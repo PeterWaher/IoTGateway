@@ -411,7 +411,9 @@ namespace Waher.Runtime.Geo
 
 		private static void Append(double Nr, char PosChar, char NegChar, StringBuilder sb)
 		{
-			int i;
+			int Degrees;
+			int Minutes;
+			double Seconds;
 			char Char;
 
 			if (Nr >= 0)
@@ -422,22 +424,44 @@ namespace Waher.Runtime.Geo
 				Nr = -Nr;
 			}
 
-			i = (int)Nr;
-			Nr -= i;
+			Degrees = (int)Nr;
+			Nr -= Degrees;
 			Nr *= 60;
 
-			sb.Append(i);
+			Minutes = (int)Nr;
+			Nr -= Minutes;
+			Nr *= 60;
+
+			Seconds = Nr;
+
+			if (Seconds < 1e-10)
+				Seconds = 0;
+			else if (Seconds > 60 - 1e-10)
+			{
+				Seconds = 0;
+				Minutes++;
+				if (Minutes == 60)
+				{
+					Minutes = 0;
+					Degrees++;
+				}
+			}
+
+			sb.Append(Degrees);
 			sb.Append("° ");
 
-			i = (int)Nr;
-			Nr -= i;
-			Nr *= 60;
+			if (Minutes != 0 || Seconds != 0)
+			{
+				sb.Append(Minutes);
+				sb.Append("' ");
 
-			sb.Append(i);
-			sb.Append("' ");
+				if (Seconds != 0)
+				{
+					sb.Append(ToString(Seconds));
+					sb.Append("\" ");
+				}
+			}
 
-			sb.Append(ToString(Nr));
-			sb.Append("\" ");
 			sb.Append(Char);
 		}
 

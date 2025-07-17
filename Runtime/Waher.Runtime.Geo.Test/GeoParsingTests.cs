@@ -280,7 +280,7 @@ namespace Waher.Runtime.Geo.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("10 20' N 30 40' W")]
+		[DataRow("10° 20' N 30° 40' W")]
 		public void Test_05_GPS_RoundingErrors(string Value)
 		{
 			Assert.IsTrue(GeoPosition.TryParseGps(Value, out GeoPosition Pos));

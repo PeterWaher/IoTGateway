@@ -16,8 +16,8 @@
 		<tags>security authentication jwt uwp</tags>
 		<dependencies>
 			<dependency id="Waher.Events" version="1.4.4"/>
-			<dependency id="Waher.Content" version="3.3.4"/>
-			<dependency id="Waher.Networking.HTTP.UWP" version="4.4.2"/>
+			<dependency id="Waher.Content" version="3.3.5"/>
+			<dependency id="Waher.Networking.HTTP.UWP" version="4.4.3"/>
 			<dependency id="Waher.Runtime.Collections" version="1.0.3"/>
 			<dependency id="Waher.Runtime.Inventory" version="1.4.3"/>
 			<dependency id="Waher.Security" version="1.0.13"/>

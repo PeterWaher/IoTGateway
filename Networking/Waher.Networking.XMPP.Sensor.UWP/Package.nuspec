@@ -15,11 +15,11 @@
 		<copyright>Copyright © Waher Data AB 2016-2025. All rights reserved.</copyright>
 		<tags>networking communication xmpp iot sensor data Neuro-Foundation uwp</tags>
 		<dependencies>
-			<dependency id="Waher.Content" version="3.3.4"/>
+			<dependency id="Waher.Content" version="3.3.5"/>
 			<dependency id="Waher.Content.Xml" version="3.1.2"/>
 			<dependency id="Waher.Events" version="1.4.4"/>
-			<dependency id="Waher.Networking.UWP" version="4.5.1"/>
-			<dependency id="Waher.Networking.XMPP.UWP" version="4.1.5"/>
+			<dependency id="Waher.Networking.UWP" version="4.5.2"/>
+			<dependency id="Waher.Networking.XMPP.UWP" version="4.1.6"/>
 			<dependency id="Waher.Networking.XMPP.PEP.UWP" version="3.1.0"/>
 			<dependency id="Waher.Networking.XMPP.Provisioning.UWP" version="4.1.1"/>
 			<dependency id="Waher.Networking.XMPP.PubSub.UWP" version="3.1.0"/>

@@ -16,7 +16,7 @@
     <tags>security DTLS UDP</tags>
     <dependencies>
       <dependency id="Waher.Events" version="1.4.4"/>
-      <dependency id="Waher.Networking.UWP" version="4.5.1"/>
+      <dependency id="Waher.Networking.UWP" version="4.5.2"/>
       <dependency id="Waher.Runtime.Cache" version="2.1.1"/>
       <dependency id="Waher.Runtime.Inventory" version="1.4.3"/>
       <dependency id="Waher.Runtime.Timing" version="2.1.1"/>

@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Getters;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Events;
 using Waher.Runtime.IO;
@@ -22,6 +23,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		public const int DefaultMaxChunkSize = 20 * 1024 * 1024;
 
 		private readonly KeyValuePair<string, string>[] putHeaders = null;
+		private readonly HttpFileUploadClient client;
 		private readonly string putUrl = null;
 		private readonly string getUrl = null;
 		private readonly ISniffer[] sniffers;
@@ -32,14 +34,15 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		/// Event arguments for HTTP File Upload callback methods.
 		/// </summary>
 		/// <param name="e">IQ response.</param>
+		/// <param name="Client">HTTP File Upload Client reference.</param>
 		/// <param name="GetUrl">GET URL.</param>
 		/// <param name="PutUrl">PUT URL.</param>
 		/// <param name="PutHeaders">HTTP Headers for PUT request.</param>
 		/// <param name="Sniffers">Sniffers to log HTTP request and response to.</param>
-		public HttpFileUploadEventArgs(IqResultEventArgs e, string GetUrl,
-			string PutUrl, KeyValuePair<string, string>[] PutHeaders,
+		public HttpFileUploadEventArgs(IqResultEventArgs e, HttpFileUploadClient Client, 
+			string GetUrl, string PutUrl, KeyValuePair<string, string>[] PutHeaders,
 			params ISniffer[] Sniffers)
-			: this(e, GetUrl, PutUrl, PutHeaders, DefaultMaxChunkSize, Sniffers)
+			: this(e, Client, GetUrl, PutUrl, PutHeaders, DefaultMaxChunkSize, Sniffers)
 		{
 		}
 
@@ -47,16 +50,18 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		/// Event arguments for HTTP File Upload callback methods.
 		/// </summary>
 		/// <param name="e">IQ response.</param>
+		/// <param name="Client">HTTP File Upload Client reference.</param>
 		/// <param name="GetUrl">GET URL.</param>
 		/// <param name="PutUrl">PUT URL.</param>
 		/// <param name="PutHeaders">HTTP Headers for PUT request.</param>
 		/// <param name="MaxChunkSize">Maximum chunk size in ranged PUT requests. (20 MB by default)</param>
 		/// <param name="Sniffers">Sniffers to log HTTP request and response to.</param>
-		public HttpFileUploadEventArgs(IqResultEventArgs e, string GetUrl,
-			string PutUrl, KeyValuePair<string, string>[] PutHeaders, int MaxChunkSize,
-			params ISniffer[] Sniffers)
+		public HttpFileUploadEventArgs(IqResultEventArgs e, HttpFileUploadClient Client,
+			string GetUrl, string PutUrl, KeyValuePair<string, string>[] PutHeaders, 
+			int MaxChunkSize, params ISniffer[] Sniffers)
 			: base(e)
 		{
+			this.client = Client;
 			this.getUrl = GetUrl;
 			this.putUrl = PutUrl;
 			this.putHeaders = PutHeaders;
@@ -64,6 +69,11 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			this.sniffers = Sniffers;
 			this.hasSniffers = (this.sniffers?.Length ?? 0) > 0;
 		}
+
+		/// <summary>
+		/// HTTP File Upload Client reference.
+		/// </summary>
+		public HttpFileUploadClient Client => this.client;
 
 		/// <summary>
 		/// GET URL.
@@ -99,23 +109,40 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		}
 
 		/// <summary>
+		/// If the server certificate can be trusted, by default.
+		/// </summary>
+		public bool TrustServer => this.client?.Client?.TrustServer ?? false;
+
+		/// <summary>
 		/// Uploads file content to the server.
 		/// </summary>
 		/// <param name="Content">Content to upload</param>
 		/// <param name="ContentType">Content-Type</param>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
-		public async Task PUT(byte[] Content, string ContentType, int Timeout)
+		public Task PUT(byte[] Content, string ContentType, int Timeout)
+		{
+			return this.PUT(Content, ContentType, Timeout, this.TrustServer);
+		}
+
+		/// <summary>
+		/// Uploads file content to the server.
+		/// </summary>
+		/// <param name="Content">Content to upload</param>
+		/// <param name="ContentType">Content-Type</param>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <param name="TrustServer">If server certificate should be trusted.</param>
+		public async Task PUT(byte[] Content, string ContentType, int Timeout, bool TrustServer)
 		{
 			if (Content.Length <= this.maxChunkSize)
 			{
 				HttpContent Body = new ByteArrayContent(Content);
-				await this.PUT(Body, ContentType, Timeout);
+				await this.PUT(Body, ContentType, Timeout, TrustServer);
 			}
 			else
 			{
 				using (MemoryStream ms = new MemoryStream(Content))
 				{
-					await this.PUT(new MemoryStream(Content), ContentType, Timeout);
+					await this.PUT(ms, ContentType, Timeout, TrustServer);
 				}
 			}
 		}
@@ -126,20 +153,32 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		/// <param name="Content">Content to upload</param>
 		/// <param name="ContentType">Content-Type</param>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
-		public async Task PUT(Stream Content, string ContentType, int Timeout)
+		public Task PUT(Stream Content, string ContentType, int Timeout)
+		{
+			return this.PUT(Content, ContentType, Timeout, this.TrustServer);
+		}
+
+		/// <summary>
+		/// Uploads file content to the server.
+		/// </summary>
+		/// <param name="Content">Content to upload</param>
+		/// <param name="ContentType">Content-Type</param>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <param name="TrustServer">If server certificate should be trusted.</param>
+		public async Task PUT(Stream Content, string ContentType, int Timeout, bool TrustServer)
 		{
 			Content.Position = 0;
 
 			if (Content.Length <= this.maxChunkSize)
 			{
 				HttpContent Body = new StreamContent(Content);
-				await this.PUT(Body, ContentType, Timeout);
+				await this.PUT(Body, ContentType, Timeout, TrustServer);
 			}
 			else
 			{
-				// Ranged PATCH
-
-				using (HttpClient HttpClient = new HttpClient())
+				HttpClientHandler Handler = WebGetter.GetClientHandler(TrustServer);
+				
+				using (HttpClient HttpClient = new HttpClient(Handler, true))
 				{
 					long Pos = 0;
 					long Len = Content.Length;
@@ -168,6 +207,8 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 						Body.Headers.Add("Content-Type", ContentType);
 						Body.Headers.Add("Content-Range", "bytes " + Pos.ToString() + "-" + (Pos + c - 1).ToString() + "/" + Len.ToString());
 
+						// Ranged PATCH
+				
 						using (HttpRequestMessage RequestMessage = new HttpRequestMessage(
 							new HttpMethod("PATCH"), this.putUrl)
 							{
@@ -199,9 +240,23 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		/// <param name="Content">Content to upload</param>
 		/// <param name="ContentType">Content-Type</param>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
-		public async Task PUT(HttpContent Content, string ContentType, int Timeout)
+		public Task PUT(HttpContent Content, string ContentType, int Timeout)
 		{
-			using (HttpClient HttpClient = new HttpClient())
+			return this.PUT(Content, ContentType, Timeout, this.TrustServer);
+		}
+
+		/// <summary>
+		/// Uploads file content to the server.
+		/// </summary>
+		/// <param name="Content">Content to upload</param>
+		/// <param name="ContentType">Content-Type</param>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <param name="TrustServer">If server certificate should be trusted.</param>
+		public async Task PUT(HttpContent Content, string ContentType, int Timeout, bool TrustServer)
+		{
+			HttpClientHandler Handler = WebGetter.GetClientHandler(TrustServer);
+
+			using (HttpClient HttpClient = new HttpClient(Handler, true))
 			{
 				HttpClient.Timeout = TimeSpan.FromMilliseconds(Timeout);
 				HttpClient.DefaultRequestHeaders.ExpectContinue = false;

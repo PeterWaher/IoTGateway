@@ -110,7 +110,17 @@ namespace Waher.Content.Getters
 		/// <returns>Http Client Handler</returns>
 		public static HttpClientHandler GetClientHandler()
 		{
-			return GetClientHandler(null, null);
+			return GetClientHandler(null, null, false);
+		}
+
+		/// <summary>
+		/// Gets a HTTP Client handler
+		/// </summary>
+		/// <param name="TrustServer">If server certificate should be trusted by default.</param>
+		/// <returns>Http Client Handler</returns>
+		public static HttpClientHandler GetClientHandler(bool TrustServer)
+		{
+			return GetClientHandler(null, null, TrustServer);
 		}
 
 		/// <summary>
@@ -122,7 +132,21 @@ namespace Waher.Content.Getters
 		public static HttpClientHandler GetClientHandler(X509Certificate Certificate,
 			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator)
 		{
-			RemoteCertificateValidator Validator = new RemoteCertificateValidator(RemoteCertificateValidator);
+			return GetClientHandler(Certificate, RemoteCertificateValidator, false);
+		}
+
+		/// <summary>
+		/// Gets a HTTP Client handler
+		/// </summary>
+		/// <param name="Certificate">Optional Client certificate</param>
+		/// <param name="RemoteCertificateValidator">Optional validator.</param>
+		/// <param name="TrustServer">If server certificate should be trusted by default.</param>
+		/// <returns>Http Client Handler</returns>
+		public static HttpClientHandler GetClientHandler(X509Certificate Certificate,
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator,
+			bool TrustServer)
+		{
+			RemoteCertificateValidator Validator = new RemoteCertificateValidator(RemoteCertificateValidator, TrustServer);
 
 			HttpClientHandler Handler = new HttpClientHandler()
 			{
@@ -157,25 +181,44 @@ namespace Waher.Content.Getters
 		private class RemoteCertificateValidator
 		{
 			private readonly EventHandler<RemoteCertificateEventArgs> callback;
+			private readonly bool trustServer;
 
 			/// <summary>
 			/// Validator of remote certificate.
 			/// </summary>
 			/// <param name="Callback">Optional callback method.</param>
 			public RemoteCertificateValidator(EventHandler<RemoteCertificateEventArgs> Callback)
+				: this(Callback, false)
+			{
+			}
+
+			/// <summary>
+			/// Validator of remote certificate.
+			/// </summary>
+			/// <param name="Callback">Optional callback method.</param>
+			/// <param name="TrustServer">If server certificate should be trusted by default.</param>
+			public RemoteCertificateValidator(EventHandler<RemoteCertificateEventArgs> Callback, 
+				bool TrustServer)
 			{
 				this.callback = Callback;
+				this.trustServer = TrustServer;
 			}
 
 			public bool RemoteCertificateValidationCallback(object Sender,
 				X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
 			{
-				RemoteCertificateEventArgs e = new RemoteCertificateEventArgs(Certificate, Chain, SslPolicyErrors);
+				if (!(this.callback is null))
+				{
+					RemoteCertificateEventArgs e = new RemoteCertificateEventArgs(Certificate, Chain, SslPolicyErrors);
 
-				this.callback.Raise(Sender, e);
+					this.callback.Raise(Sender, e);
 
-				if (e.IsValid.HasValue)
-					return e.IsValid.Value;
+					if (e.IsValid.HasValue)
+						return e.IsValid.Value;
+				}
+
+				if (this.trustServer)
+					return true;
 				else if (SslPolicyErrors == SslPolicyErrors.None)
 					return true;
 				else
@@ -187,7 +230,7 @@ namespace Waher.Content.Getters
 						foreach (X509ChainStatus Status in Chain.ChainStatus)
 						{
 							// Apple-specific error code for incomplete revocation check
-							
+
 							if (Status.Status == X509ChainStatusFlags.RevocationStatusUnknown ||
 								Status.Status == X509ChainStatusFlags.OfflineRevocation)
 							{

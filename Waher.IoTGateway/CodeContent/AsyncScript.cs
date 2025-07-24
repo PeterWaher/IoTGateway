@@ -28,7 +28,7 @@ namespace Waher.IoTGateway.CodeContent
 		private MarkdownDocument document;
 
 		/// <summary>
-		/// Class managing 2D XML Layout integration into Markdown documents.
+		/// Class managing asynchronous script execution in Markdown documents.
 		/// </summary>
 		public AsyncScript()
 		{
@@ -43,7 +43,7 @@ namespace Waher.IoTGateway.CodeContent
 		{
 			int i = Language.IndexOf(':');
 			if (i > 0)
-				Language = Language.Substring(0, i).TrimEnd();
+				Language = Language[..i].TrimEnd();
 
 			if (string.Compare(Language, "async", true) == 0)
 				return Grade.Excellent;
@@ -96,7 +96,7 @@ namespace Waher.IoTGateway.CodeContent
 			string Title;
 			int i = Language.IndexOf(':');
 			if (i > 0)
-				Title = Language.Substring(i + 1).Trim();
+				Title = Language[(i + 1)..].Trim();
 			else
 				Title = null;
 
@@ -153,14 +153,13 @@ namespace Waher.IoTGateway.CodeContent
 			{
 				try
 				{
-					using (HtmlRenderer Renderer2 = new HtmlRenderer(new HtmlSettings()
+					using HtmlRenderer Renderer2 = new HtmlRenderer(new HtmlSettings()
 					{
 						XmlEntitiesOnly = true
-					}))
-					{
-						await Renderer2.RenderObject(e.Preview.AssociatedObjectValue, true, Variables);
-						await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Renderer2.ToString(), true);
-					}
+					});
+
+					await Renderer2.RenderObject(e.Preview.AssociatedObjectValue, true, Variables);
+					await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Renderer2.ToString(), true);
 				}
 				catch (Exception ex)
 				{
@@ -168,57 +167,56 @@ namespace Waher.IoTGateway.CodeContent
 				}
 			};
 
-			using (HtmlRenderer Renderer = new HtmlRenderer(new HtmlSettings()
+			using HtmlRenderer Renderer = new HtmlRenderer(new HtmlSettings()
 			{
 				XmlEntitiesOnly = true
-			}))
+			});
+
+			Variables.OnPreview += Preview;
+			try
 			{
-				Variables.OnPreview += Preview;
-				try
-				{
-					object Result = await this.Evaluate(Script, Variables);
+				object Result = await this.Evaluate(Script, Variables);
 
-					string Printed = ImplicitPrint.ToString();
-					if (!string.IsNullOrEmpty(Printed))
+				string Printed = ImplicitPrint.ToString();
+				if (!string.IsNullOrEmpty(Printed))
+				{
+					StringBuilder sb = new StringBuilder();
+					sb.AppendLine("BodyOnly: 1");
+
+					if (this.document?.Settings.AllowScriptTag ?? false)
+						sb.AppendLine("AllowScriptTag: 1");
+
+					sb.AppendLine();
+					sb.Append(Printed);
+
+					MarkdownDocument Doc;
+
+					if (!(this.document is null))
+						Doc = await MarkdownDocument.CreateAsync(sb.ToString(), this.document.Settings);
+					else if (Variables.TryGetVariable(MarkdownDocument.MarkdownSettingsVariableName, out Variable v) &&
+						v.ValueObject is MarkdownSettings Settings)
 					{
-						StringBuilder sb = new StringBuilder();
-						sb.AppendLine("BodyOnly: 1");
-
-						if (this.document?.Settings.AllowScriptTag ?? false)
-							sb.AppendLine("AllowScriptTag: 1");
-
-						sb.AppendLine();
-						sb.Append(Printed);
-
-						MarkdownDocument Doc;
-
-						if (!(this.document is null))
-							Doc = await MarkdownDocument.CreateAsync(sb.ToString(), this.document.Settings);
-						else if (Variables.TryGetVariable(MarkdownDocument.MarkdownSettingsVariableName, out Variable v) &&
-							v.ValueObject is MarkdownSettings Settings)
-						{
-							Doc = await MarkdownDocument.CreateAsync(sb.ToString(), Settings);
-						}
-						else
-							Doc = await MarkdownDocument.CreateAsync(sb.ToString());
-
-						await Doc.RenderDocument(Renderer);
+						Doc = await MarkdownDocument.CreateAsync(sb.ToString(), Settings);
 					}
+					else
+						Doc = await MarkdownDocument.CreateAsync(sb.ToString());
 
-					await Renderer.RenderObject(Result, true, Variables);
-				}
-				catch (Exception ex)
-				{
-					Renderer.Clear();
-					await Renderer.RenderObject(ex, true, Variables);
-				}
-				finally
-				{
-					Variables.OnPreview -= Preview;
+					await Doc.RenderDocument(Renderer);
 				}
 
-				await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Renderer.ToString(), false);
+				await Renderer.RenderObject(Result, true, Variables);
 			}
+			catch (Exception ex)
+			{
+				Renderer.Clear();
+				await Renderer.RenderObject(ex, true, Variables);
+			}
+			finally
+			{
+				Variables.OnPreview -= Preview;
+			}
+
+			await asyncHtmlOutput.ReportResult(MarkdownOutputType.Html, Id, Renderer.ToString(), false);
 		}
 
 		/// <summary>

@@ -2866,8 +2866,13 @@ namespace Waher.IoTGateway
 					return;
 				}
 
-				if (!Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
-					From = "/";
+				if (Request.Session.TryGetVariable("from", out Variable v))
+				{
+					if (string.IsNullOrEmpty(From = v.ValueObject as string))
+						From = "/";
+				}
+				else
+					From = Request.Header.ResourcePart;
 
 				if (Request.Session.TryGetVariable("User", out v) &&
 					v.ValueObject is IUser &&

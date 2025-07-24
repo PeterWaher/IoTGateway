@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Security;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -83,7 +84,7 @@ namespace Waher.Content.Getters
 			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator,
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			HttpClientHandler Handler = GetClientHandler(Certificate, RemoteCertificateValidator);
+			HttpClientHandler Handler = GetClientHandler(Certificate, RemoteCertificateValidator, Uri);
 			using (HttpClient HttpClient = new HttpClient(Handler, true)
 			{
 				Timeout = TimeSpan.FromMilliseconds(TimeoutMs)
@@ -102,6 +103,44 @@ namespace Waher.Content.Getters
 					return await ProcessResponse(Response, Uri);
 				}
 			}
+		}
+
+		/// <summary>
+		/// If the server certificate can be trusted.
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <returns>If the server certificate can be trusted.</returns>
+		public static bool TrustServer(Uri Uri)
+		{
+			if (Uri.Host != "localhost")
+				return false;
+
+			if (Uri.Scheme != "https")
+				return false;
+
+			if (!Types.TryGetModuleParameter("HTTP", out object Obj) || Obj is null)
+				return false;
+
+			int Port = Uri.Port;
+			if (Port <= 0)
+				Port = 443;
+
+			Type T = Obj.GetType();
+			PropertyInfo PI = T.GetProperty("OpenHttpsPorts");
+			if (PI is null || !PI.CanRead || !PI.GetMethod.IsPublic)
+				return false;
+
+			Obj = PI.GetValue(Obj);
+			if (!(Obj is int[] OpenHttpsPorts))
+				return false;
+
+			foreach (int OpenPort in OpenHttpsPorts)
+			{
+				if (OpenPort == Port)
+					return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -133,6 +172,19 @@ namespace Waher.Content.Getters
 			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator)
 		{
 			return GetClientHandler(Certificate, RemoteCertificateValidator, false);
+		}
+
+		/// <summary>
+		/// Gets a HTTP Client handler
+		/// </summary>
+		/// <param name="Certificate">Optional Client certificate</param>
+		/// <param name="RemoteCertificateValidator">Optional validator.</param>
+		/// <param name="Uri">URI being processed.</param>
+		/// <returns>Http Client Handler</returns>
+		public static HttpClientHandler GetClientHandler(X509Certificate Certificate,
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, Uri Uri)
+		{
+			return GetClientHandler(Certificate, RemoteCertificateValidator, TrustServer(Uri));
 		}
 
 		/// <summary>
@@ -398,7 +450,7 @@ namespace Waher.Content.Getters
 			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, TemporaryStream Destination,
 			params KeyValuePair<string, string>[] Headers)
 		{
-			HttpClientHandler Handler = GetClientHandler(Certificate, RemoteCertificateValidator);
+			HttpClientHandler Handler = GetClientHandler(Certificate, RemoteCertificateValidator, Uri);
 			using (HttpClient HttpClient = new HttpClient(Handler, true)
 			{
 				Timeout = TimeSpan.FromMilliseconds(10000)
@@ -488,7 +540,7 @@ namespace Waher.Content.Getters
 			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator,
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			HttpClientHandler Handler = GetClientHandler(Certificate, RemoteCertificateValidator);
+			HttpClientHandler Handler = GetClientHandler(Certificate, RemoteCertificateValidator, Uri);
 			using (HttpClient HttpClient = new HttpClient(Handler, true)
 			{
 				Timeout = TimeSpan.FromMilliseconds(TimeoutMs)

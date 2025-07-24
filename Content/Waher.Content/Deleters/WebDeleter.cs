@@ -58,7 +58,7 @@ namespace Waher.Content.Deleters
 		public override async Task<ContentResponse> DeleteAsync(Uri Uri, X509Certificate Certificate,
 			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			HttpClientHandler Handler = WebGetter.GetClientHandler(Certificate, RemoteCertificateValidator);
+			HttpClientHandler Handler = WebGetter.GetClientHandler(Certificate, RemoteCertificateValidator, Uri);
 			using (HttpClient HttpClient = new HttpClient(Handler, true)
 			{
 				Timeout = TimeSpan.FromMilliseconds(TimeoutMs)

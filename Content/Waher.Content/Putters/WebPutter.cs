@@ -63,7 +63,7 @@ namespace Waher.Content.Putters
 			X509Certificate Certificate, EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, 
 			params KeyValuePair<string, string>[] Headers)
 		{
-			HttpClientHandler Handler = WebGetter.GetClientHandler(Certificate, RemoteCertificateValidator);
+			HttpClientHandler Handler = WebGetter.GetClientHandler(Certificate, RemoteCertificateValidator, Uri);
 			using (HttpClient HttpClient = new HttpClient(Handler, true)
 			{
 				Timeout = TimeSpan.FromMilliseconds(TimeoutMs)

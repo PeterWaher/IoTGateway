@@ -1617,6 +1617,23 @@ cIq/qS75/ygJTyMJO4yFJykjdtHMU2TFXrPwMJlxgK48aFUckxYesCQcF4Q7ScApNMi+7RVn0SA+
 AAAASUVORK5CYII=
 ```
 
+#### Embed PDF documents
+
+You can embed a PDF document directly on the Markdown page using a code block, in a way similar
+to embedding images. You include the BASE64-encoded contents of the PDF document into the code
+block, and ensure you use the Internet Content-Type `application/pdf` for PDF as the language 
+of the code block.
+
+Example:
+
+    ```application/pdf:PDF Document
+    JVBERi0xLjcNCiW1tbW1DQoxIDAgb2JqDQo8PC9UeXBlL....
+    ....
+    ```
+
+This will result in an embedded object being rendered in HTML, displaying the contents of the
+PDF document, if the browser supports embedding documents in HTML 5.
+
 ### Comments
 
 You can add comments to Markdown documents. Comments are not exported when rendering output. Comments are put in separate blocks, each row

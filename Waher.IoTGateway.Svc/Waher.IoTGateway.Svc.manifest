@@ -588,6 +588,9 @@
 	<Assembly fileName="Waher.Security.PKCS.dll" />
 	<Assembly fileName="Waher.Security.PKCS.pdb" />
 	<Assembly fileName="Waher.Security.PKCS.xml" />
+	<Assembly fileName="Waher.Security.PQC.dll" />
+	<Assembly fileName="Waher.Security.PQC.pdb" />
+	<Assembly fileName="Waher.Security.PQC.xml" />
 	<Assembly fileName="Waher.Security.SHA3.dll" />
 	<Assembly fileName="Waher.Security.SHA3.pdb" />
 	<Assembly fileName="Waher.Security.SHA3.xml" />

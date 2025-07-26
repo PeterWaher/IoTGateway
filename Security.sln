@@ -41,6 +41,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.SPF", "Secur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.Users", "Security\Waher.Security.Users\Waher.Security.Users.csproj", "{366A1B61-5AB3-17B0-B5C0-5B608F93BD36}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.PQC", "Security\Waher.Security.PQC\Waher.Security.PQC.csproj", "{049D9313-371B-6B3C-F7C6-704230A2820B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.PQC.Test", "Security\Waher.Security.PQC.Test\Waher.Security.PQC.Test.csproj", "{1FB763DD-9C70-C979-07B5-92D7EFBE3FA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +127,14 @@ Global
 		{366A1B61-5AB3-17B0-B5C0-5B608F93BD36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{366A1B61-5AB3-17B0-B5C0-5B608F93BD36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{366A1B61-5AB3-17B0-B5C0-5B608F93BD36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{049D9313-371B-6B3C-F7C6-704230A2820B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{049D9313-371B-6B3C-F7C6-704230A2820B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{049D9313-371B-6B3C-F7C6-704230A2820B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{049D9313-371B-6B3C-F7C6-704230A2820B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FB763DD-9C70-C979-07B5-92D7EFBE3FA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FB763DD-9C70-C979-07B5-92D7EFBE3FA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FB763DD-9C70-C979-07B5-92D7EFBE3FA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FB763DD-9C70-C979-07B5-92D7EFBE3FA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

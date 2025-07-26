@@ -106,16 +106,17 @@ of projects, making it easier to work with different aspects of the gateway, or 
 
 | Solution File | Description |
 |:--------------|:------------|
-| `IoTGateway.sln`     | Main repository. Contains references to all gateway projects, for most platforms.        |
-| `IoTGatewayCore.sln` | Solution file that contains core repositories only (i.e. .NET Standard and .NET Core projects). Can be compiled using VS Code on multiple platforms. |
-| `Cluster.sln`        | Contains repositories related to the cluster networking library, and their dependecies.  |
-| `Content.sln`        | Contains Content-related repositories, and their dependecies.                            |
-| `HTTP.sln`           | Contains repositories related to the HTTP networking library, and their dependecies.     |
-| `Layout.sln`         | Contains Layout-related repositories, and their dependecies.                             |
-| `Persistence.sln`    | Contains Persistence-related repositories, and their dependecies.                        |
-| `Runtime.sln`        | Contains Runtime-related repositories, and their dependecies.                            |
-| `Script.sln`         | Contains Script-related repositories, and their dependecies.                             |
-| `XMPP.sln`           | Contains repositories related to the XMPP networking libraries, and their dependecies.   |
+| `IoTGateway.sln`     | Main solution. Contains references to all gateway projects, for most platforms.       |
+| `IoTGatewayCore.sln` | Solution file that contains core libraries only (i.e. .NET Standard and .NET Core projects). Can be compiled using VS Code on multiple platforms. |
+| `Cluster.sln`        | Contains libraries related to the cluster networking library, and their dependecies.  |
+| `Content.sln`        | Contains Content-related libraries, and their dependecies.                            |
+| `HTTP.sln`           | Contains libraries related to the HTTP networking library, and their dependecies.     |
+| `Layout.sln`         | Contains Layout-related libraries, and their dependecies.                             |
+| `Persistence.sln`    | Contains Persistence-related libraries, and their dependecies.                        |
+| `Runtime.sln`        | Contains Runtime-related libraries, and their dependecies.                            |
+| `Script.sln`         | Contains Script-related libraries, and their dependecies.                             |
+| `Security.sln`       | Contains Security-related libraries, and their dependecies.                           |
+| `XMPP.sln`           | Contains libraries related to the XMPP networking libraries, and their dependecies.   |
 
 
 IoT Gateway

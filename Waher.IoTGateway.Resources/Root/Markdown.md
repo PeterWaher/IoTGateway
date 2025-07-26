@@ -1400,7 +1400,7 @@ Example of a **dot** GraphViz diagram:
 
 	```dot: Fancy graph
 	digraph G { 
-		size ="4,4"; 
+		size="4,4"; 
 		main [shape=box]; /* this is a comment */ 
 		main -> parse [weight=8]; 
 		parse -> execute; 
@@ -1420,7 +1420,7 @@ This is rendered as:
 
 ```dot: Fancy graph
 digraph G { 
-	size ="4,4"; 
+	size="4,4"; 
 	main [shape=box]; /* this is a comment */ 
 	main -> parse [weight=8]; 
 	parse -> execute; 

@@ -1169,7 +1169,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			if (!string.IsNullOrEmpty(NodeName))
 			{
-				Xml.Append(" node ='");
+				Xml.Append(" node='");
 				Xml.Append(XML.Encode(NodeName));
 				Xml.Append('\'');
 			}

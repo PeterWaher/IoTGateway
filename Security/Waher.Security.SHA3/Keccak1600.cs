@@ -516,5 +516,97 @@ namespace Waher.Security.SHA3
 		/// to validate the evaluation of the function.
 		/// </summary>
 		public event EventHandler NewState = null;
+
+		/// <summary>
+		/// Initiates a variable length digest computation using the SPONGE function, 
+		/// absorbing the input data, as defined in section 4 of NIST FIPS 202.
+		/// See NIST FIPS 203 for details on the ML-KEM algorithm and its use of the
+		/// Absorbe and Squeeze methods.
+		/// </summary>
+		/// <param name="N">Input string of variable length.</param>
+		/// <returns></returns>
+		public Context Absorb(byte[] N)
+		{
+			this.reportStates = !(this.NewState is null);
+
+			int Len = N.Length;
+			int m = Len << 3;
+			int nm1 = m / this.r;
+			byte[] S = new byte[200];
+			int Pos = 0;
+			int i, k;
+
+			for (i = 0; i < nm1; i++)
+			{
+				for (k = 0; k < this.r8; k++)
+					S[k] ^= N[Pos++];
+
+				S = this.ComputeFixed(S);
+			}
+
+			k = 0;
+			while (Pos < Len)
+				S[k++] ^= N[Pos++];
+
+			S[k] ^= this.suffix;
+			S[this.r8m1] ^= 0x80;   // Last bit of pad10*1
+			S = this.ComputeFixed(S);
+
+			return new Context(S, this);
+		}
+
+		/// <summary>
+		/// Hash digest computation context.
+		/// </summary>
+		public class Context
+		{
+			private readonly Keccak1600 hashFunction;
+			private byte[] state;
+			private int statePosition;
+
+			/// <summary>
+			/// Hash digest computation context.
+			/// </summary>
+			/// <param name="S">Internal state of algorithm.</param>
+			/// <param name="H">Hash-function performing computations.</param>
+			public Context(byte[] S, Keccak1600 H)
+			{
+				this.state = S;
+				this.hashFunction = H;
+				this.statePosition = 0;
+			}
+
+			/// <summary>
+			/// Calculates another <paramref name="NrBytes"/> number of bytes of the digest.
+			/// </summary>
+			/// <param name="NrBytes">Number of bytes to compute.</param>
+			/// <returns></returns>
+			public byte[] Squeeze(int NrBytes)
+			{
+				byte[] Z = new byte[NrBytes];
+				int Pos = 0;
+				int i;
+
+				if (this.statePosition >= this.hashFunction.r8)
+				{
+					this.state = this.hashFunction.ComputeFixed(this.state);
+					this.statePosition = 0;
+				}
+
+				while (true)
+				{
+					i = Math.Min(this.hashFunction.r8 - this.statePosition, NrBytes - Pos);
+					Array.Copy(this.state, this.statePosition, Z, Pos, i);
+					Pos += i;
+					this.statePosition += i;
+
+					if (Pos >= NrBytes)
+						return Z;
+
+					this.state = this.hashFunction.ComputeFixed(this.state);
+					this.statePosition = 0;
+				}
+			}
+		}
 	}
 }

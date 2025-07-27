@@ -39,4 +39,8 @@
 		</None>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\Waher.Security.SHA3\Waher.Security.SHA3.csproj" />
+	</ItemGroup>
+
 </Project>

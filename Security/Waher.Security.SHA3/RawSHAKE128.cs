@@ -14,7 +14,7 @@
         /// </summary>
         /// <param name="DigestSize">Digest size, in bits.</param>
         public RawSHAKE128(int DigestSize)
-			: base(256, 0b11, DigestSize)
+			: base(256, 0b11, 2, DigestSize)
 		{
 		}
 	}

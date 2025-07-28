@@ -33,9 +33,11 @@ namespace Waher.Security.SHA3
 		/// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
 		/// </summary>
 		/// <param name="Capacity">Capacity of sponge function.</param>
-		/// <param name="Suffix">Suffix to append to variable-length messages before executing the Sponge function.</param>
+		/// <param name="Suffix">Suffix (in reverse bit order) to append to variable-length messages 
+		/// before executing the Sponge function.</param>
+		/// <param name="SuffixBits">Number of bits in suffix.</param>
 		/// <param name="DigestSize">Size of results of the sponge function.</param>
-		public Keccak1600(int Capacity, byte Suffix, int DigestSize)
+		public Keccak1600(int Capacity, byte Suffix, byte SuffixBits, int DigestSize)
 		{
 			this.c = Capacity;
 			this.r = 1600 - this.c;
@@ -43,19 +45,13 @@ namespace Waher.Security.SHA3
 			this.r8m1 = this.r8 - 1;
 			this.dByteSize = DigestSize / 8;
 			this.suffix = Suffix;
-			this.suffixBits = 0;
+			this.suffixBits = SuffixBits;
 
 			if ((DigestSize & 7) != 0)
 				throw new ArgumentException("Invalid digest size.", nameof(DigestSize));
 
 			if (this.c <= 0 || this.r <= 0 || this.r8m1 < 0 || (Capacity & 7) != 0)
 				throw new ArgumentException("Invalid capacity.", nameof(Capacity));
-
-			while (Suffix > 0)
-			{
-				Suffix >>= 1;
-				this.suffixBits++;
-			}
 
 			if (this.suffixBits > 6)
 				throw new ArgumentException("Invalid suffix.", nameof(Suffix));

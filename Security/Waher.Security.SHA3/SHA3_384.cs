@@ -13,7 +13,7 @@
 		/// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
 		/// </summary>
 		public SHA3_384()
-			: base(768, 0b10, 384)
+			: base(768, 0b10, 2, 384)
 		{
 		}
 	}

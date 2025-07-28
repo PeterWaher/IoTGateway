@@ -45,6 +45,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.PQC", "Secur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.PQC.Test", "Security\Waher.Security.PQC.Test\Waher.Security.PQC.Test.csproj", "{1FB763DD-9C70-C979-07B5-92D7EFBE3FA6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.SHA3.Test", "Security\Waher.Security.SHA3.Test\Waher.Security.SHA3.Test.csproj", "{6CD14C3D-9264-3147-7493-D3904B7960EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.PKCS.Test", "Security\Waher.Security.PKCS.Test\Waher.Security.PKCS.Test.csproj", "{D9018E8B-455F-04C6-F554-5801EF6DFA0D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.SPF.Test", "Security\Waher.Security.SPF.Test\Waher.Security.SPF.Test.csproj", "{EFC92FD5-61F6-762E-3C97-F54D8ACDBFB4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +141,18 @@ Global
 		{1FB763DD-9C70-C979-07B5-92D7EFBE3FA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FB763DD-9C70-C979-07B5-92D7EFBE3FA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1FB763DD-9C70-C979-07B5-92D7EFBE3FA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CD14C3D-9264-3147-7493-D3904B7960EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CD14C3D-9264-3147-7493-D3904B7960EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CD14C3D-9264-3147-7493-D3904B7960EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CD14C3D-9264-3147-7493-D3904B7960EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9018E8B-455F-04C6-F554-5801EF6DFA0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9018E8B-455F-04C6-F554-5801EF6DFA0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9018E8B-455F-04C6-F554-5801EF6DFA0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9018E8B-455F-04C6-F554-5801EF6DFA0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFC92FD5-61F6-762E-3C97-F54D8ACDBFB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFC92FD5-61F6-762E-3C97-F54D8ACDBFB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFC92FD5-61F6-762E-3C97-F54D8ACDBFB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFC92FD5-61F6-762E-3C97-F54D8ACDBFB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

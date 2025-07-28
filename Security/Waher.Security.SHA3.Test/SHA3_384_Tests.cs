@@ -9,7 +9,7 @@ namespace Waher.Security.SHA3.Test
         [TestMethod]
         public void Test_01_0_bits()
         {
-            SHA3_384 H = new SHA3_384();
+            SHA3_384 H = new();
             int i = 0;
 
             H.NewState += (Sender, e) =>
@@ -19,7 +19,7 @@ namespace Waher.Security.SHA3.Test
                 Assert.AreEqual(Expected, Actual);
             };
 
-            byte[] Digest = H.ComputeVariable(new byte[0]);
+            byte[] Digest = H.ComputeVariable([]);
             string s = Hashes.BinaryToString(Digest);
             Assert.AreEqual("0c63a75b845e4f7d01107d852e4c2485c51a50aaaa94fc61995e71bbee983a2ac3713831264adb47fb6bd1e058d5f004", s);
             Assert.AreEqual(States0Bits.Length, i);
@@ -28,7 +28,7 @@ namespace Waher.Security.SHA3.Test
         [TestMethod]
         public void Test_02_1600_bits()
         {
-            SHA3_384 H = new SHA3_384();
+            SHA3_384 H = new();
             int i = 0;
 
             H.NewState += (Sender, e) =>
@@ -53,7 +53,7 @@ namespace Waher.Security.SHA3.Test
         [TestMethod]
         public void Test_03_1600_bits_Stream()
         {
-            SHA3_384 H = new SHA3_384();
+            SHA3_384 H = new();
             byte[] Input = new byte[200];
             int j;
 
@@ -69,7 +69,7 @@ namespace Waher.Security.SHA3.Test
         public void Test_04_Performance()
         {
             byte[] Data = new byte[80 * 1024 * 1024];
-            SHA3_384 H = new SHA3_384();
+            SHA3_384 H = new();
             H.ComputeVariable(Data);
         }
     }

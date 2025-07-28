@@ -1,5 +1,3 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 namespace Waher.Security.SHA3.Test
 {
     /// <summary>
@@ -8,8 +6,8 @@ namespace Waher.Security.SHA3.Test
     /// </summary>
     public partial class SHA3_512_Tests
     {
-        private static readonly string[] States0Bits = new string[]
-        {
+        private static readonly string[] States0Bits =
+		[
 			// Xor'd state (in bytes)
 			"06 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 " +
 			"00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 " +
@@ -1728,6 +1726,6 @@ namespace Waher.Security.SHA3.Test
 			"EA 2A D0 FB 55 A2 26 18 9E 11 D2 49 60 43 3E 2B " +
 			"0E E0 45 A4 73 09 97 76 DD 5D E7 39 DB 9B A8 19 " +
 			"D5 4C B9 03 A7 A5 D7 EE"
-        };
+        ];
     }
 }

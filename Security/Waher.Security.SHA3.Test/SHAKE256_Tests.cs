@@ -9,7 +9,7 @@ namespace Waher.Security.SHA3.Test
         [TestMethod]
         public void Test_01_0_bits()
         {
-            SHAKE256 H = new SHAKE256(4096);
+            SHAKE256 H = new(4096);
             int i = 0;
 
             H.NewState += (Sender, e) =>
@@ -19,7 +19,7 @@ namespace Waher.Security.SHA3.Test
                 Assert.AreEqual(Expected, Actual);
             };
 
-            byte[] Digest = H.ComputeVariable(new byte[0]);
+			byte[] Digest = H.ComputeVariable([]);
             string s = Hashes.BinaryToString(Digest);
             Assert.AreEqual("46b9dd2b0ba88d13233b3feb743eeb243fcd52ea62b81b82b50c27646ed5762fd75dc4ddd8c0f200cb05019d67b592f6fc821c49479ab48640292eacb3b7c4be141e96616fb13957692cc7edd0b45ae3dc07223c8e92937bef84bc0eab862853349ec75546f58fb7c2775c38462c5010d846c185c15111e595522a6bcd16cf86f3d122109e3b1fdd943b6aec468a2d621a7c06c6a957c62b54dafc3be87567d677231395f6147293b68ceab7a9e0c58d864e8efde4e1b9a46cbe854713672f5caaae314ed9083dab4b099f8e300f01b8650f1f4b1d8fcf3f3cb53fb8e9eb2ea203bdc970f50ae55428a91f7f53ac266b28419c3778a15fd248d339ede785fb7f5a1aaa96d313eacc890936c173cdcd0fab882c45755feb3aed96d477ff96390bf9a66d1368b208e21f7c10d04a3dbd4e360633e5db4b602601c14cea737db3dcf722632cc77851cbdde2aaf0a33a07b373445df490cc8fc1e4160ff118378f11f0477de055a81a9eda57a4a2cfb0c83929d310912f729ec6cfa36c6ac6a75837143045d791cc85eff5b21932f23861bcf23a52b5da67eaf7baae0f5fb1369db78f3ac45f8c4ac5671d85735cdddb09d2b1e34a1fc066ff4a162cb263d6541274ae2fcc865f618abe27c124cd8b074ccd516301b91875824d09958f341ef274bdab0bae316339894304e35877b0c28a9b1fd166c796b9cc258a064a8f57e27f2a", s);
             Assert.AreEqual(States0Bits.Length, i);
@@ -28,7 +28,7 @@ namespace Waher.Security.SHA3.Test
         [TestMethod]
         public void Test_02_1600_bits()
         {
-            SHAKE256 H = new SHAKE256(4096);
+            SHAKE256 H = new(4096);
             int i = 0;
 
             H.NewState += (Sender, e) =>
@@ -53,7 +53,7 @@ namespace Waher.Security.SHA3.Test
         [TestMethod]
         public void Test_03_1600_bits_Stream()
         {
-            SHAKE256 H = new SHAKE256(4096);
+            SHAKE256 H = new(4096);
             byte[] Input = new byte[200];
             int j;
 
@@ -69,7 +69,7 @@ namespace Waher.Security.SHA3.Test
         public void Test_04_Performance()
         {
             byte[] Data = new byte[80 * 1024 * 1024];
-            SHAKE256 H = new SHAKE256(1024);
+            SHAKE256 H = new(1024);
             H.ComputeVariable(Data);
         }
     }

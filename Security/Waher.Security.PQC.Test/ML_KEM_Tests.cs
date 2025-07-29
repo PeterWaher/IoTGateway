@@ -79,13 +79,13 @@ namespace Waher.Security.PQC.Test
 			string A, string s, string e, string ŝ, string ê, string t, string EncryptionKey,
 			string DecryptionKey, bool ConcatenateModelParameter, bool TransposeA)
 		{
-			byte[] Seed = Hashes.StringToBinary(d);
-			byte[] Seed2 = Hashes.StringToBinary(z);
-			Console.Out.WriteLine("d: " + Hashes.BinaryToString(Seed));
-			Console.Out.WriteLine("z: " + Hashes.BinaryToString(Seed2));
+			byte[] dBin = Hashes.StringToBinary(d);
+			byte[] zBin = Hashes.StringToBinary(z);
+			Console.Out.WriteLine("d: " + Hashes.BinaryToString(dBin));
+			Console.Out.WriteLine("z: " + Hashes.BinaryToString(zBin));
 
 			ML_KEM Model = ML_KEM.GetModel(ModelName);
-			ML_KEM_Keys Keys = Model.KeyGen(Seed, Seed2, ConcatenateModelParameter, TransposeA, true);
+			ML_KEM_Keys Keys = Model.KeyGen_Internal(dBin, zBin, ConcatenateModelParameter, TransposeA, true);
 
 			Console.Out.WriteLine("ρ: " + Hashes.BinaryToString(Keys.ρ));
 			Console.Out.WriteLine("σ: " + Hashes.BinaryToString(Keys.σ));
@@ -117,10 +117,10 @@ namespace Waher.Security.PQC.Test
 			)]
 		public void Test_02_Encrypt(string d, string Message)
 		{
-			byte[] Seed = Hashes.StringToBinary(d);
-			Console.Out.WriteLine("d: " + Hashes.BinaryToString(Seed));
+			byte[] dBin = Hashes.StringToBinary(d);
+			Console.Out.WriteLine("d: " + Hashes.BinaryToString(dBin));
 
-			K_PKE_Keys Keys = ML_KEM.ML_KEM_512.K_PKE_KeyGen(Seed);
+			K_PKE_Keys Keys = ML_KEM.ML_KEM_512.K_PKE_KeyGen(dBin);
 
 			byte[] PlainText = Encoding.UTF8.GetBytes(Message);
 			Array.Resize(ref PlainText, 32); // Pad to 32 bytes
@@ -137,10 +137,10 @@ namespace Waher.Security.PQC.Test
 			)]
 		public void Test_03_Decrypt(string d, string Message)
 		{
-			byte[] Seed = Hashes.StringToBinary(d);
-			Console.Out.WriteLine("d: " + Hashes.BinaryToString(Seed));
+			byte[] dBin = Hashes.StringToBinary(d);
+			Console.Out.WriteLine("d: " + Hashes.BinaryToString(dBin));
 
-			K_PKE_Keys Keys = ML_KEM.ML_KEM_512.K_PKE_KeyGen(Seed);
+			K_PKE_Keys Keys = ML_KEM.ML_KEM_512.K_PKE_KeyGen(dBin);
 
 			byte[] PlainText = Encoding.UTF8.GetBytes(Message);
 			Array.Resize(ref PlainText, 32); // Pad to 32 bytes

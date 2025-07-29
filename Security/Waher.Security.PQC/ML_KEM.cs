@@ -829,19 +829,19 @@ namespace Waher.Security.PQC
 		/// Uses randomness to generate an encryption key and a corresponding decryption key. 
 		/// (Algorithm 13 K-PKE.KeyGen(𝑑) in §5.1)
 		/// </summary>
-		/// <param name="Seed">Randomness (32 bytes)</param>
+		/// <param name="d">Randomness (32 bytes)</param>
 		/// <returns>Public Encryption Key (384k+32 bytes) and Private Decryption Key 
 		/// (384k bytes). Matrix used to calculate public key is also provided.</returns>
-		public K_PKE_Keys K_PKE_KeyGen(byte[] Seed)
+		public K_PKE_Keys K_PKE_KeyGen(byte[] d)
 		{
-			return this.K_PKE_KeyGen(Seed, true, false, false);
+			return this.K_PKE_KeyGen(d, true, false, false);
 		}
 
 		/// <summary>
 		/// Uses randomness to generate an encryption key and a corresponding decryption key. 
 		/// (Algorithm 13 K-PKE.KeyGen(𝑑) in §5.1)
 		/// </summary>
-		/// <param name="Seed">Randomness (32 bytes)</param>
+		/// <param name="d">Randomness (32 bytes)</param>
 		/// <param name="ConcatenateModelParameter">A common error in ML-KEM implementations
 		/// is that the model parameter is not concatenated to the seed before calling G(x)
 		/// in Algorithm 13. To interoperate with such systems, using seed as initial key,
@@ -855,23 +855,23 @@ namespace Waher.Security.PQC
 		/// By default, they should be cleared and forgotten.</param>
 		/// <returns>Public Encryption Key (384k+32 bytes) and Private Decryption Key 
 		/// (384k bytes). Matrix used to calculate public key is also provided.</returns>
-		public K_PKE_Keys K_PKE_KeyGen(byte[] Seed, bool ConcatenateModelParameter,
+		public K_PKE_Keys K_PKE_KeyGen(byte[] d, bool ConcatenateModelParameter,
 			bool TransposeA, bool PreserveIntermediates)
 		{
-			if (Seed.Length != 32)
-				throw new ArgumentException("Seed must be 32 bytes long.", nameof(Seed));
+			if (d.Length != 32)
+				throw new ArgumentException("Seed must be 32 bytes long.", nameof(d));
 
 			byte[] Bin;
 
 			if (ConcatenateModelParameter)
 			{
 				Bin = new byte[33];
-				Array.Copy(Seed, 0, Bin, 0, 32);
+				Array.Copy(d, 0, Bin, 0, 32);
 				Bin[32] = this.k;
 				Bin = G(Bin);
 			}
 			else
-				Bin = G(Seed);
+				Bin = G(d);
 
 			byte[] ρ = new byte[32];
 			Array.Copy(Bin, 0, ρ, 0, 32);
@@ -1158,34 +1158,34 @@ namespace Waher.Security.PQC
 
 		/// <summary>
 		/// Uses randomness to generate an encryption key and a corresponding decryption key. 
-		/// (Algorithm 16 ML-KEM.KeyGen(𝑑) in §6.1)
+		/// (Algorithm 16 ML-KEM.KeyGen_Internal(𝑑,𝑧) in §6.1)
 		/// </summary>
 		/// <returns>Public Encryption Key (384k+32 bytes) and Private Decryption Key 
 		/// (384k bytes). Matrix used to calculate public key is also provided.</returns>
-		public ML_KEM_Keys KeyGen()
+		public ML_KEM_Keys Ke_Internal()
 		{
-			return this.KeyGen(CreateSeed(), CreateSeed(), true, false, false);
+			return this.KeyGen_Internal(CreateSeed(), CreateSeed(), true, false, false);
 		}
 
 		/// <summary>
 		/// Uses randomness to generate an encryption key and a corresponding decryption key. 
-		/// (Algorithm 13 ML-KEM.KeyGen(𝑑) in §5.1)
+		/// (Algorithm 16 ML-KEM.KeyGen_Internal(𝑑,𝑧) in §6.1)
 		/// </summary>
-		/// <param name="Seed">Randomness (32 bytes)</param>
-		/// <param name="Seed2">Randomness (32 bytes)</param>
+		/// <param name="d">Randomness (32 bytes)</param>
+		/// <param name="z">Randomness (32 bytes)</param>
 		/// <returns>Public Encryption Key (384k+32 bytes) and Private Decryption Key 
 		/// (384k bytes). Matrix used to calculate public key is also provided.</returns>
-		public ML_KEM_Keys KeyGen(byte[] Seed, byte[] Seed2)
+		public ML_KEM_Keys KeyGen_Internal(byte[] d, byte[] z)
 		{
-			return this.KeyGen(Seed, Seed2, true, false, false);
+			return this.KeyGen_Internal(d, z, true, false, false);
 		}
 
 		/// <summary>
 		/// Uses randomness to generate an encryption key and a corresponding decryption key. 
-		/// (Algorithm 13 ML-KEM.KeyGen(𝑑) in §5.1)
+		/// (Algorithm 16 ML-KEM.KeyGen_Internal(𝑑,𝑧) in §6.1)
 		/// </summary>
-		/// <param name="Seed">Randomness (32 bytes)</param>
-		/// <param name="Seed2">Randomness (32 bytes)</param>
+		/// <param name="d">Randomness (32 bytes)</param>
+		/// <param name="z">Randomness (32 bytes)</param>
 		/// <param name="ConcatenateModelParameter">A common error in ML-KEM implementations
 		/// is that the model parameter is not concatenated to the seed before calling G(x)
 		/// in Algorithm 13. To interoperate with such systems, using seed as initial key,
@@ -1199,13 +1199,13 @@ namespace Waher.Security.PQC
 		/// By default, they should be cleared and forgotten.</param>
 		/// <returns>Public Encryption Key (384k+32 bytes) and Private Decryption Key 
 		/// (384k bytes). Matrix used to calculate public key is also provided.</returns>
-		public ML_KEM_Keys KeyGen(byte[] Seed, byte[] Seed2, bool ConcatenateModelParameter,
+		public ML_KEM_Keys KeyGen_Internal(byte[] d, byte[] z, bool ConcatenateModelParameter,
 			bool TransposeA, bool PreserveIntermediates)
 		{
-			if (Seed2.Length != 32)
-				throw new ArgumentException("Seed2 must be 32 bytes long.", nameof(Seed2));
+			if (z.Length != 32)
+				throw new ArgumentException("Seed must be 32 bytes long.", nameof(z));
 
-			K_PKE_Keys Keys = K_PKE_KeyGen(Seed, ConcatenateModelParameter, TransposeA, PreserveIntermediates);
+			K_PKE_Keys Keys = K_PKE_KeyGen(d, ConcatenateModelParameter, TransposeA, PreserveIntermediates);
 			byte[] DecryptionKey = new byte[768 * this.k + 96];
 			int Pos;
 
@@ -1217,7 +1217,7 @@ namespace Waher.Security.PQC
 			Array.Copy(Bin, 0, DecryptionKey, Pos, 32);
 			Pos += 32;
 
-			Array.Copy(Seed2, 0, DecryptionKey, Pos, 32);
+			Array.Copy(z, 0, DecryptionKey, Pos, 32);
 
 			return new ML_KEM_Keys(Keys, DecryptionKey);
 		}

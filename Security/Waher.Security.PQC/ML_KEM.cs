@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using Waher.Security.SHA3;
 
@@ -113,6 +114,7 @@ namespace Waher.Security.PQC
 		private const int q = 3329;
 		private const int half_q = q >> 1;
 
+		private readonly int k384;
 		private readonly byte k;
 		private readonly int η1;
 		private readonly int η2;
@@ -135,6 +137,8 @@ namespace Waher.Security.PQC
 			this.η2 = η2;
 			this.dᵤ = dᵤ;
 			this.dᵥ = dᵥ;
+
+			this.k384 = this.k * 384;
 		}
 
 		/// <summary>
@@ -865,10 +869,11 @@ namespace Waher.Security.PQC
 
 			if (ConcatenateModelParameter)
 			{
-				Bin = new byte[33];
-				Array.Copy(d, 0, Bin, 0, 32);
-				Bin[32] = this.k;
-				Bin = G(Bin);
+				byte[] Temp = new byte[33];
+				Array.Copy(d, 0, Temp, 0, 32);
+				Temp[32] = this.k;
+				Bin = G(Temp);
+				Clear(Temp);
 			}
 			else
 				Bin = G(d);
@@ -928,8 +933,8 @@ namespace Waher.Security.PQC
 					MultiplyNTTsAndAdd(Â[i, j], s[j], t[i]);
 			}
 
-			byte[] EncryptionKey = new byte[32 + 384 * this.k];
-			byte[] DecryptionKey = new byte[384 * this.k];
+			byte[] EncryptionKey = new byte[32 + this.k384];
+			byte[] DecryptionKey = new byte[this.k384];
 			int Pos = 0;
 
 			for (i = 0; i < this.k; i++)
@@ -1006,7 +1011,7 @@ namespace Waher.Security.PQC
 			if (EncryptionKey is null)
 				throw new ArgumentNullException(nameof(EncryptionKey), "Encryption key cannot be null.");
 
-			if (EncryptionKey.Length != 384 * this.k + 32)
+			if (EncryptionKey.Length != this.k384 + 32)
 				throw new ArgumentException("Encryption key must be 384k+32 bytes long.", nameof(EncryptionKey));
 
 			if (Message.Length != 32)
@@ -1111,7 +1116,7 @@ namespace Waher.Security.PQC
 			if (DecryptionKey is null)
 				throw new ArgumentNullException(nameof(DecryptionKey), "Decryption key cannot be null.");
 
-			if (DecryptionKey.Length != 384 * this.k)
+			if (DecryptionKey.Length != this.k384)
 				throw new ArgumentException("Decryption key must be 384k bytes long.", nameof(DecryptionKey));
 
 			int dᵤ32 = this.dᵤ << 5;
@@ -1157,14 +1162,22 @@ namespace Waher.Security.PQC
 		}
 
 		/// <summary>
-		/// Uses randomness to generate an encryption key and a corresponding decryption key. 
-		/// (Algorithm 16 ML-KEM.KeyGen_Internal(𝑑,𝑧) in §6.1)
+		/// Generates an encapsulation key and a corresponding decapsulation key. 
+		/// (Algorithm 19 ML-KEM.KeyGen() in §7.1)
 		/// </summary>
-		/// <returns>Public Encryption Key (384k+32 bytes) and Private Decryption Key 
-		/// (384k bytes). Matrix used to calculate public key is also provided.</returns>
-		public ML_KEM_Keys Ke_Internal()
+		/// <returns>Public Encapsulation Key (384k+32 bytes) and Private decapsulation Key 
+		/// (768k+96 bytes). Matrix used to calculate public key is also provided.</returns>
+		public ML_KEM_Keys KeyGen()
 		{
-			return this.KeyGen_Internal(CreateSeed(), CreateSeed(), true, false, false);
+			byte[] d = CreateSeed();
+			byte[] z = CreateSeed();
+
+			ML_KEM_Keys Result = this.KeyGen_Internal(d, z, true, false, false);
+
+			Clear(d);
+			Clear(z);
+
+			return Result;
 		}
 
 		/// <summary>
@@ -1173,8 +1186,8 @@ namespace Waher.Security.PQC
 		/// </summary>
 		/// <param name="d">Randomness (32 bytes)</param>
 		/// <param name="z">Randomness (32 bytes)</param>
-		/// <returns>Public Encryption Key (384k+32 bytes) and Private Decryption Key 
-		/// (384k bytes). Matrix used to calculate public key is also provided.</returns>
+		/// <returns>Public Encapsulation Key (384k+32 bytes) and Private decapsulation Key 
+		/// (768k+96 bytes). Matrix used to calculate public key is also provided.</returns>
 		public ML_KEM_Keys KeyGen_Internal(byte[] d, byte[] z)
 		{
 			return this.KeyGen_Internal(d, z, true, false, false);
@@ -1197,19 +1210,19 @@ namespace Waher.Security.PQC
 		/// <param name="PreserveIntermediates">If intermediate values should be preserved.
 		/// Default is false. For testing and debugging, intermediate values may be required.
 		/// By default, they should be cleared and forgotten.</param>
-		/// <returns>Public Encryption Key (384k+32 bytes) and Private Decryption Key 
-		/// (384k bytes). Matrix used to calculate public key is also provided.</returns>
+		/// <returns>Public Encapsulation Key (384k+32 bytes) and Private decapsulation Key 
+		/// (768k+96 bytes). Matrix used to calculate public key is also provided.</returns>
 		public ML_KEM_Keys KeyGen_Internal(byte[] d, byte[] z, bool ConcatenateModelParameter,
 			bool TransposeA, bool PreserveIntermediates)
 		{
 			if (z.Length != 32)
 				throw new ArgumentException("Seed must be 32 bytes long.", nameof(z));
 
-			K_PKE_Keys Keys = K_PKE_KeyGen(d, ConcatenateModelParameter, TransposeA, PreserveIntermediates);
+			K_PKE_Keys Keys = this.K_PKE_KeyGen(d, ConcatenateModelParameter, TransposeA, PreserveIntermediates);
 			byte[] DecryptionKey = new byte[768 * this.k + 96];
 			int Pos;
 
-			Array.Copy(Keys.DecryptionKey, 0, DecryptionKey, 0, Pos = 384 * this.k);
+			Array.Copy(Keys.DecryptionKey, 0, DecryptionKey, 0, Pos = this.k384);
 			Array.Copy(Keys.EncryptionKey, 0, DecryptionKey, Pos, Pos + 32);
 			Pos += Pos + 32;
 
@@ -1220,6 +1233,176 @@ namespace Waher.Security.PQC
 			Array.Copy(z, 0, DecryptionKey, Pos, 32);
 
 			return new ML_KEM_Keys(Keys, DecryptionKey);
+		}
+
+		/// <summary>
+		/// The method (Algorithm 17) accepts an encapsulation key and a random byte array 
+		/// as input and outputs a ciphertext and a shared key.
+		/// </summary>
+		/// <param name="EncapsulationKey">Encapsulation key.</param>
+		/// <returns>Shared Key, Cipher text.</returns>
+		public KeyValuePair<byte[], byte[]> Encapsulate(byte[] EncapsulationKey)
+		{
+			if (EncapsulationKey.Length < 384)
+				throw new ArgumentException("Encapsulation key length mismatch.", nameof(EncapsulationKey));
+
+			ushort[] x = ByteDecode(EncapsulationKey, 0, 384, 12);
+			int i, c = x.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				if (x[i] >= q)
+					throw new ArgumentException("Invalid encapsulation key.", nameof(EncapsulationKey));
+			}
+
+			byte[] m = CreateSeed();
+
+			KeyValuePair<byte[], byte[]> Result = this.Encapsulate_Internal(EncapsulationKey, m);
+			Clear(m);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// The method (Algorithm 17) accepts an encapsulation key and a random byte array 
+		/// as input and outputs a ciphertext and a shared key.
+		/// </summary>
+		/// <param name="EncapsulationKey">Encapsulation key.</param>
+		/// <param name="m">Randomness (32 bytes)</param>
+		/// <returns>Shared Key, Cipher text.</returns>
+		public KeyValuePair<byte[], byte[]> Encapsulate_Internal(byte[] EncapsulationKey,
+			byte[] m)
+		{
+			if (EncapsulationKey.Length != this.k384 + 32)
+				throw new ArgumentException("Encapsulation key length mismatch.", nameof(EncapsulationKey));
+
+			if (m.Length != 32)
+				throw new ArgumentException("Message length mismatch.", nameof(m));
+
+			byte[] Bin = new byte[64];
+
+			Array.Copy(m, 0, Bin, 0, 32);
+			Array.Copy(H(EncapsulationKey), 0, Bin, 32, 32);
+
+			byte[] Bin2 = G(Bin);
+			Clear(Bin);
+
+			byte[] K = new byte[32];
+			Array.Copy(Bin2, 0, K, 0, 32);
+
+			byte[] r = new byte[32];
+			Array.Copy(Bin2, 32, r, 0, 32);
+			Clear(Bin2);
+
+			byte[] c = this.K_PKE_Encrypt(EncapsulationKey, m, r);
+			Clear(r);
+
+			return new KeyValuePair<byte[], byte[]>(K, c);
+		}
+
+		/// <summary>
+		/// Uses the decapsulation key to produce a shared secret key from a ciphertext.
+		/// Algorithm 21 ML-KEM.Decapsulate(dk,𝑐) in §7.3.
+		/// </summary>
+		/// <param name="DecapsulationKey">Decapsulation key.</param>
+		/// <param name="c">Cipher text.</param>
+		/// <returns>Shared secret (32 bytes).</returns>
+		public byte[] Decapsulate(byte[] DecapsulationKey, byte[] c)
+		{
+			if (DecapsulationKey.Length != 768 * this.k + 96)
+				throw new ArgumentException("Decapsulation key length mismatch.", nameof(DecapsulationKey));
+
+			byte[] Bin = new byte[this.k384 + 32];
+			Array.Copy(DecapsulationKey, this.k384, Bin, 0, this.k384 + 32);
+
+			byte[] Test = H(Bin);
+			Clear(Bin);
+
+			for (int i = 0, j = (this.k384 << 1) + 32; i < 32; i++, j++)
+			{
+				if (Test[i] != DecapsulationKey[j])
+					throw new ArgumentException("Invalid decapsulation key.", nameof(DecapsulationKey));
+			}
+
+			return this.Decapsulate_Internal(DecapsulationKey, c);
+		}
+
+		/// <summary>
+		/// The method (Algorithm 18) accepts a decapsulation key and a cipher text as input, 
+		/// does not use any randomness, and outputs a shared secret key.
+		/// </summary>
+		/// <param name="DecapsulationKey">Decapsulation key.</param>
+		/// <param name="c">Cipher text.</param>
+		/// <returns>Shared secret (32 bytes).</returns>
+		public byte[] Decapsulate_Internal(byte[] DecapsulationKey, byte[] c)
+		{
+			if (DecapsulationKey.Length != 768 * this.k + 96)
+				throw new ArgumentException("Decapsulation key length mismatch.", nameof(DecapsulationKey));
+
+			if (c.Length != 32 * (this.dᵤ * this.k + this.dᵥ))
+				throw new ArgumentException("Cipher text length mismatch.", nameof(c));
+
+			int Pos;
+			byte[] DecryptionKey = new byte[Pos = this.k384];
+			Array.Copy(DecapsulationKey, 0, DecryptionKey, 0, Pos);
+
+			int Len;
+			byte[] EncryptionKey = new byte[Len = (768 - 384) * this.k + 32];
+			Array.Copy(DecapsulationKey, Pos, EncryptionKey, 0, Len);
+			Pos += Len;
+
+			byte[] h = new byte[32];
+			Array.Copy(DecapsulationKey, Pos, h, 0, 32);
+
+			//byte[] z = new byte[32];
+			//Array.Copy(DecapsulationKey, Pos + 32, z, 0, 32);
+
+			byte[] m = this.K_PKE_Decrypt(DecryptionKey, c);
+
+			byte[] Bin = new byte[64];
+			Array.Copy(m, 0, Bin, 0, 32);
+			Array.Copy(h, 0, Bin, 32, 32);
+
+			byte[] Bin2 = G(Bin);
+			//Clear(Bin);
+
+			byte[] K = new byte[32];
+			Array.Copy(Bin2, 0, K, 0, 32);
+
+			byte[] r = new byte[32];
+			Array.Copy(Bin2, 32, r, 0, 32);
+
+			Clear(Bin2);
+
+			Array.Copy(DecapsulationKey, Pos + 32, Bin, 0, 32);  // z
+			Array.Copy(c, 0, Bin, 32, 32);
+
+			byte[] K2 = J(Bin);
+			Clear(Bin);
+
+			byte[] c2 = this.K_PKE_Encrypt(EncryptionKey, m, r);
+			Clear(m);
+			Clear(r);
+
+			int i;
+			bool b = true;
+
+			for (i = 0; i < 32; i++)
+			{
+				if (c[i] != c2[i])
+					b = false;
+			}
+
+			if (b)
+			{
+				Clear(K2);
+				return K;
+			}
+			else
+			{
+				Clear(K);
+				return K2;
+			}
 		}
 
 	}

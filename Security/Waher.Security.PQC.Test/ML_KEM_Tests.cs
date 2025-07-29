@@ -8,7 +8,7 @@ namespace Waher.Security.PQC.Test
 	public sealed class ML_KEM_Tests
 	{
 		[AssemblyInitialize]
-		public static void AssemblyInit(TestContext context)
+		public static void AssemblyInit(TestContext _)
 		{
 			Types.Initialize(typeof(Expression).Assembly);
 		}
@@ -95,8 +95,8 @@ namespace Waher.Security.PQC.Test
 			Console.Out.WriteLine("ŝ: " + Expression.ToString(Keys.ŝ));
 			Console.Out.WriteLine("ê: " + Expression.ToString(Keys.ê));
 			Console.Out.WriteLine("t: " + Expression.ToString(Keys.t));
-			Console.Out.WriteLine("EncryptionKey: " + Hashes.BinaryToString(Keys.EncryptionKey));
-			Console.Out.WriteLine("DecryptionKey: " + Hashes.BinaryToString(Keys.DecryptionKey));
+			Console.Out.WriteLine("EncryptionKey: " + Hashes.BinaryToString(Keys.EncapsulationKey));
+			Console.Out.WriteLine("DecryptionKey: " + Hashes.BinaryToString(Keys.DecapsulationKey));
 
 			Assert.AreEqual(ρ, Hashes.BinaryToString(Keys.ρ).ToUpper(), "ρ mismatch");
 			Assert.AreEqual(σ, Hashes.BinaryToString(Keys.σ).ToUpper(), "σ mismatch");
@@ -106,8 +106,8 @@ namespace Waher.Security.PQC.Test
 			Assert.AreEqual(ŝ, Expression.ToString(Keys.ŝ), "ŝ mismatch");
 			Assert.AreEqual(ê, Expression.ToString(Keys.ê), "ê mismatch");
 			Assert.AreEqual(t, Expression.ToString(Keys.t), "t mismatch");
-			Assert.AreEqual(EncryptionKey, Hashes.BinaryToString(Keys.EncryptionKey).ToUpper(), "EncryptionKey mismatch");
-			Assert.AreEqual(DecryptionKey, Hashes.BinaryToString(Keys.DecryptionKey).ToUpper(), "DecryptionKey mismatch");
+			Assert.AreEqual(EncryptionKey, Hashes.BinaryToString(Keys.EncapsulationKey).ToUpper(), "EncryptionKey mismatch");
+			Assert.AreEqual(DecryptionKey, Hashes.BinaryToString(Keys.DecapsulationKey).ToUpper(), "DecryptionKey mismatch");
 		}
 
 		[DataTestMethod]

@@ -13,8 +13,8 @@
 		public ML_KEM_Keys(K_PKE_Keys Keys, byte[] DecryptionKey)
 		{
 			this.Â = Keys.Â;
-			this.EncryptionKey = Keys.EncryptionKey;
-			this.DecryptionKey = DecryptionKey;
+			this.EncapsulationKey = Keys.EncryptionKey;
+			this.DecapsulationKey = DecryptionKey;
 			this.ρ = Keys.ρ;
 			this.σ = Keys.σ;
 			this.s = Keys.s;
@@ -65,13 +65,13 @@
 		public ushort[][] ê { get; }
 
 		/// <summary>
-		/// Encoded encryption key, as defined in §5.1.
+		/// Encoded encapsulation key, as defined in §6.1.
 		/// </summary>
-		public byte[] EncryptionKey { get; }
+		public byte[] EncapsulationKey { get; }
 
 		/// <summary>
-		/// Encoded decryption key, as defined in §5.1.
+		/// Encoded decapsulation key, as defined in §6.1.
 		/// </summary>
-		public byte[] DecryptionKey { get; }
+		public byte[] DecapsulationKey { get; }
 	}
 }

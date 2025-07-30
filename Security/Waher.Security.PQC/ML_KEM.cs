@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Security.Cryptography;
-using System.Security.Principal;
 using Waher.Security.SHA3;
 
 namespace Waher.Security.PQC
@@ -115,6 +114,7 @@ namespace Waher.Security.PQC
 		private const ushort half_q_rounded = (q + 1) >> 1;
 
 		private readonly int k384;
+		private readonly int cipherTextLength;
 		private readonly byte k;
 		private readonly int η1;
 		private readonly int η2;
@@ -139,6 +139,7 @@ namespace Waher.Security.PQC
 			this.dᵥ = dᵥ;
 
 			this.k384 = this.k * 384;
+			this.cipherTextLength = 32 * (this.dᵤ * this.k + this.dᵥ);
 		}
 
 		/// <summary>
@@ -825,22 +826,6 @@ namespace Waher.Security.PQC
 				Clear(v[i]);
 		}
 
-		private static ushort[] Clone(ushort[] v)
-		{
-			return (ushort[])v.Clone();
-		}
-
-		private static ushort[][] Clone(ushort[][] v)
-		{
-			int i, c = v.Length;
-			ushort[][] Result = new ushort[c][];
-
-			for (i = 0; i < c; i++)
-				Result[i] = Clone(v[i]);
-
-			return Result;
-		}
-
 		/// <summary>
 		/// Uses randomness to generate an encryption key and a corresponding decryption key. 
 		/// (Algorithm 13 K-PKE.KeyGen(𝑑) in §5.1)
@@ -912,7 +897,7 @@ namespace Waher.Security.PQC
 
 			for (i = 0; i < this.k; i++)
 			{
-				t[i] = Clone(e[i]);
+				t[i] = (ushort[])e[i].Clone();
 
 				for (j = 0; j < this.k; j++)
 					MultiplyNTTsAndAdd(Â[i, j], s[j], t[i]);
@@ -1290,8 +1275,13 @@ namespace Waher.Security.PQC
 					throw new ArgumentException("Invalid decapsulation key.", nameof(DecapsulationKey));
 			}
 
-			return this.Decapsulate_Internal(DecapsulationKey, c, false);
+			return this.Decapsulate_Internal(DecapsulationKey, c);
 		}
+
+		/// <summary>
+		/// Expected cipher text length for the decapsulation method.
+		/// </summary>
+		public int CipherTextLength => this.cipherTextLength;
 
 		/// <summary>
 		/// The method (Algorithm 18) accepts a decapsulation key and a cipher text as input, 
@@ -1299,16 +1289,13 @@ namespace Waher.Security.PQC
 		/// </summary>
 		/// <param name="DecapsulationKey">Decapsulation key.</param>
 		/// <param name="c">Cipher text.</param>
-		/// <param name="PreserveIntermediates">If intermediate values should be preserved.
-		/// Default is false. For testing and debugging, intermediate values may be required.
-		/// By default, they should be cleared and forgotten.</param>
 		/// <returns>Shared secret (32 bytes).</returns>
-		public byte[] Decapsulate_Internal(byte[] DecapsulationKey, byte[] c, bool PreserveIntermediates)
+		public byte[] Decapsulate_Internal(byte[] DecapsulationKey, byte[] c)
 		{
 			if (DecapsulationKey.Length != 768 * this.k + 96)
 				throw new ArgumentException("Decapsulation key length mismatch.", nameof(DecapsulationKey));
 
-			if (c.Length != 32 * (this.dᵤ * this.k + this.dᵥ))
+			if (c.Length != this.cipherTextLength)
 				throw new ArgumentException("Cipher text length mismatch.", nameof(c));
 
 			int Pos;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using Waher.Security.SHA3;
 
 namespace Waher.Security.PQC
@@ -111,7 +112,7 @@ namespace Waher.Security.PQC
 
 		private const int n = 256;
 		private const ushort q = 3329;
-		private const ushort half_q = (q + 1) >> 1;
+		private const ushort half_q_rounded = (q + 1) >> 1;
 
 		private readonly int k384;
 		private readonly byte k;
@@ -215,9 +216,10 @@ namespace Waher.Security.PQC
 				throw new ArgumentOutOfRangeException(nameof(d), "d must be between 1 and 12.");
 
 			uint i = Value;
-			i <<= d;
-			i += half_q;
+			i <<= d + 1;
 			i /= q;
+			i++;
+			i >>= 1;
 			return (ushort)(i & bitMask[d]);
 		}
 
@@ -235,12 +237,15 @@ namespace Waher.Security.PQC
 			int j, c = Value.Length;
 			uint i;
 
+			d++;
+
 			for (j = 0; j < c; j++)
 			{
 				i = Value[j];
 				i <<= d;
-				i += half_q;
 				i /= q;
+				i++;
+				i >>= 1;
 				Value[j] = (ushort)i;
 			}
 		}
@@ -363,6 +368,9 @@ namespace Waher.Security.PQC
 						{
 							BitOffset -= 8;
 							Index++;
+
+							if (BitOffset > 0)
+								Output[Index] = (byte)(Value >> (d - BitOffset));
 						}
 					}
 				}
@@ -936,13 +944,15 @@ namespace Waher.Security.PQC
 		/// </summary>
 		/// <param name="EncryptionKey">Encryption key (384k+32 bytes)</param>
 		/// <param name="Message">Plain text message (32 bytes)</param>
-		/// <param name="PreserveIntermediates">If intermediate values should be preserved.
-		/// Default is false. For testing and debugging, intermediate values may be required.
-		/// By default, they should be cleared and forgotten.</param>
 		/// <returns>Ciphertext (32*(dᵤk+dᵥ) bytes)</returns>
-		public K_PKE_Encryption K_PKE_Encrypt(byte[] EncryptionKey, byte[] Message, bool PreserveIntermediates)
+		public byte[] K_PKE_Encrypt(byte[] EncryptionKey, byte[] Message)
 		{
-			return this.K_PKE_Encrypt(EncryptionKey, Message, CreateSeed(), null, PreserveIntermediates);
+			byte[] Seed = CreateSeed();
+
+			byte[] Result = this.K_PKE_Encrypt(EncryptionKey, Message, Seed, null);
+			Clear(Seed);
+
+			return Result;
 		}
 
 		/// <summary>
@@ -952,13 +962,15 @@ namespace Waher.Security.PQC
 		/// <param name="EncryptionKey">Encryption key (384k+32 bytes)</param>
 		/// <param name="Message">Plain text message (32 bytes)</param>
 		/// <param name="Â">Optional matrix generating the encryption key.</param>
-		/// <param name="PreserveIntermediates">If intermediate values should be preserved.
-		/// Default is false. For testing and debugging, intermediate values may be required.
-		/// By default, they should be cleared and forgotten.</param>
 		/// <returns>Ciphertext (32*(dᵤk+dᵥ) bytes)</returns>
-		public K_PKE_Encryption K_PKE_Encrypt(byte[] EncryptionKey, byte[] Message, ushort[,][] Â, bool PreserveIntermediates)
+		public byte[] K_PKE_Encrypt(byte[] EncryptionKey, byte[] Message, ushort[,][] Â)
 		{
-			return this.K_PKE_Encrypt(EncryptionKey, Message, CreateSeed(), Â, PreserveIntermediates);
+			byte[] Seed = CreateSeed();
+
+			byte[] Result = this.K_PKE_Encrypt(EncryptionKey, Message, Seed, Â);
+			Clear(Seed);
+
+			return Result;
 		}
 
 		/// <summary>
@@ -968,13 +980,10 @@ namespace Waher.Security.PQC
 		/// <param name="EncryptionKey">Encryption key (384k+32 bytes)</param>
 		/// <param name="Message">Plain text message (32 bytes)</param>
 		/// <param name="Seed">Randomness (32 bytes)</param>
-		/// <param name="PreserveIntermediates">If intermediate values should be preserved.
-		/// Default is false. For testing and debugging, intermediate values may be required.
-		/// By default, they should be cleared and forgotten.</param>
 		/// <returns>Ciphertext (32*(dᵤk+dᵥ) bytes)</returns>
-		public K_PKE_Encryption K_PKE_Encrypt(byte[] EncryptionKey, byte[] Message, byte[] Seed, bool PreserveIntermediates)
+		public byte[] K_PKE_Encrypt(byte[] EncryptionKey, byte[] Message, byte[] Seed)
 		{
-			return this.K_PKE_Encrypt(EncryptionKey, Message, Seed, null, PreserveIntermediates);
+			return this.K_PKE_Encrypt(EncryptionKey, Message, Seed, null);
 		}
 
 		/// <summary>
@@ -985,12 +994,9 @@ namespace Waher.Security.PQC
 		/// <param name="Message">Plain text message (32 bytes)</param>
 		/// <param name="Seed">Randomness (32 bytes)</param>
 		/// <param name="Â">Optional matrix generating the encryption key.</param>
-		/// <param name="PreserveIntermediates">If intermediate values should be preserved.
-		/// Default is false. For testing and debugging, intermediate values may be required.
-		/// By default, they should be cleared and forgotten.</param>
 		/// <returns>Ciphertext (32*(dᵤk+dᵥ) bytes)</returns>
-		public K_PKE_Encryption K_PKE_Encrypt(byte[] EncryptionKey, byte[] Message, byte[] Seed,
-			ushort[,][] Â, bool PreserveIntermediates)
+		public byte[] K_PKE_Encrypt(byte[] EncryptionKey, byte[] Message, byte[] Seed,
+			ushort[,][] Â)
 		{
 			if (EncryptionKey is null)
 				throw new ArgumentNullException(nameof(EncryptionKey), "Encryption key cannot be null.");
@@ -1036,8 +1042,6 @@ namespace Waher.Security.PQC
 			for (i = 0; i < this.k; i++)
 				y[i] = SamplePolyCBD(PRF(Seed, N++, this.η1));
 
-			ushort[][] ybak = PreserveIntermediates ? Clone(y) : null;
-
 			for (i = 0; i < this.k; i++)
 				e1[i] = SamplePolyCBD(PRF(Seed, N++, this.η2));
 
@@ -1055,26 +1059,18 @@ namespace Waher.Security.PQC
 					MultiplyNTTsAndAdd(Â[j, i], y[j], u[i]);
 			}
 
-			ushort[][] ubak = PreserveIntermediates ? Clone(u) : null;
-
 			InverseNTT(u);
-
-			ushort[][] ubak2 = PreserveIntermediates ? Clone(u) : null;
-
 			AddTo(u, e1);
 
 			ushort[] v = DotProductNTT(t, y);
 
-			ushort[] vbak = PreserveIntermediates ? Clone(v) : null;
-
 			InverseNTT(v);
 
-			ushort[] vbak2 = PreserveIntermediates ? Clone(v) : null;
 			ushort[] μ = new ushort[n];
 
 			for (i = j = 0, k = 1; i < n; i++)
 			{
-				μ[i] = (Message[j] & k) != 0 ? half_q : (ushort)0;
+				μ[i] = (Message[j] & k) != 0 ? half_q_rounded : (ushort)0;
 
 				k <<= 1;
 				if (k == 0)
@@ -1091,31 +1087,13 @@ namespace Waher.Security.PQC
 			int dᵥ32 = this.dᵥ << 5;
 			byte[] CipherText = new byte[dᵤk32 + dᵥ32];
 
-			ushort[][] ubak3 = PreserveIntermediates ? Clone(u) : null;
-
 			Compress(u, this.dᵤ);
 			ByteEncode(u, this.dᵤ, CipherText, 0);
-
-			ushort[] vbak3 = PreserveIntermediates ? Clone(v) : null;
 
 			Compress(v, this.dᵥ);
 			ByteEncode(v, this.dᵥ, CipherText, dᵤk32);
 
-			return new K_PKE_Encryption(CipherText,
-				PreserveIntermediates ? t : null,
-				ybak,
-				PreserveIntermediates ? e1 : null,
-				PreserveIntermediates ? e2 : null,
-				PreserveIntermediates ? y : null,
-				ubak,
-				ubak2,
-				ubak3,
-				PreserveIntermediates ? u : null,
-				PreserveIntermediates ? μ : null,
-				vbak,
-				vbak2,
-				vbak3,
-				PreserveIntermediates ? v : null);
+			return CipherText;
 		}
 
 		/// <summary>
@@ -1246,7 +1224,7 @@ namespace Waher.Security.PQC
 
 			byte[] m = CreateSeed();
 
-			ML_KEM_Encapsulation Result = this.Encapsulate_Internal(EncapsulationKey, m, false);
+			ML_KEM_Encapsulation Result = this.Encapsulate_Internal(EncapsulationKey, m);
 			Clear(m);
 
 			return Result;
@@ -1259,24 +1237,7 @@ namespace Waher.Security.PQC
 		/// <param name="EncapsulationKey">Encapsulation key.</param>
 		/// <param name="m">Randomness (32 bytes)</param>
 		/// <returns>Shared Key, Cipher text.</returns>
-		public ML_KEM_Encapsulation Encapsulate_Internal(byte[] EncapsulationKey,
-			byte[] m)
-		{
-			return this.Encapsulate_Internal(EncapsulationKey, m, false);
-		}
-
-		/// <summary>
-		/// The method (Algorithm 17) accepts an encapsulation key and a random byte array 
-		/// as input and outputs a ciphertext and a shared key.
-		/// </summary>
-		/// <param name="EncapsulationKey">Encapsulation key.</param>
-		/// <param name="m">Randomness (32 bytes)</param>
-		/// <param name="PreserveIntermediates">If intermediate values should be preserved.
-		/// Default is false. For testing and debugging, intermediate values may be required.
-		/// By default, they should be cleared and forgotten.</param>
-		/// <returns>Shared Key, Cipher text.</returns>
-		public ML_KEM_Encapsulation Encapsulate_Internal(byte[] EncapsulationKey,
-			byte[] m, bool PreserveIntermediates)
+		public ML_KEM_Encapsulation Encapsulate_Internal(byte[] EncapsulationKey, byte[] m)
 		{
 			if (EncapsulationKey.Length != this.k384 + 32)
 				throw new ArgumentException("Encapsulation key length mismatch.", nameof(EncapsulationKey));
@@ -1299,14 +1260,10 @@ namespace Waher.Security.PQC
 			Array.Copy(Bin2, 32, r, 0, 32);
 			Clear(Bin2);
 
-			K_PKE_Encryption c = this.K_PKE_Encrypt(EncapsulationKey, m, r, PreserveIntermediates);
-			if (!PreserveIntermediates)
-			{
-				Clear(r);
-				r = null;
-			}
+			byte[] c = this.K_PKE_Encrypt(EncapsulationKey, m, r);
+			Clear(r);
 
-			return new ML_KEM_Encapsulation(K, c, r);
+			return new ML_KEM_Encapsulation(K, c);
 		}
 
 		/// <summary>
@@ -1392,13 +1349,12 @@ namespace Waher.Security.PQC
 			byte[] K2 = J(Bin);
 			Clear(Bin);
 
-			K_PKE_Encryption c2r = this.K_PKE_Encrypt(EncryptionKey, m, r, PreserveIntermediates);
+			byte[] c2 = this.K_PKE_Encrypt(EncryptionKey, m, r);
 			Clear(m);
 			Clear(r);
 
 			int i;
 			bool b = true;
-			byte[] c2 = c2r.CipherText;
 
 			for (i = 0; i < 32; i++)
 			{

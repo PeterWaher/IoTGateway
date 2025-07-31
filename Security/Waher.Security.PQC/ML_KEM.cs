@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography;
 using Waher.Security.SHA3;
 
 namespace Waher.Security.PQC
@@ -8,7 +7,7 @@ namespace Waher.Security.PQC
 	/// Implements the ML-KEM algorithm for post-quantum cryptography, as defined in
 	/// NIST FIPS 203: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf
 	/// </summary>
-	public class ML_KEM
+	public class ML_KEM : ML_Common
 	{
 		/// <summary>
 		/// Model parameters for a required RBG strength 128 (cryptographic security strength),
@@ -51,8 +50,6 @@ namespace Waher.Security.PQC
 					throw new ArgumentException("Unknown model name: " + Name, nameof(Name));
 			}
 		}
-
-		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 
 		private static readonly ushort[] bitMask =
 		{
@@ -166,8 +163,7 @@ namespace Waher.Security.PQC
 		/// <returns>Hash digest.</returns>
 		public static byte[] H(byte[] Data)
 		{
-			SHA3_256 HashFunction = new SHA3_256();
-			return HashFunction.ComputeVariable(Data);
+			return new SHA3_256().ComputeVariable(Data);
 		}
 
 		/// <summary>
@@ -177,8 +173,7 @@ namespace Waher.Security.PQC
 		/// <returns>Hash digest.</returns>
 		public static byte[] J(byte[] Data)
 		{
-			SHAKE256 HashFunction = new SHAKE256(n);
-			return HashFunction.ComputeVariable(Data);
+			return new SHAKE256(n).ComputeVariable(Data);
 		}
 
 		/// <summary>
@@ -188,8 +183,7 @@ namespace Waher.Security.PQC
 		/// <returns>Hash digest.</returns>
 		public static byte[] G(byte[] Data)
 		{
-			SHA3_512 HashFunction = new SHA3_512();
-			return HashFunction.ComputeVariable(Data);
+			return new SHA3_512().ComputeVariable(Data);
 		}
 
 		/// <summary>
@@ -200,8 +194,7 @@ namespace Waher.Security.PQC
 		/// <returns>Output data.</returns>
 		public static byte[] XOF(byte[] Input, int OutputLength)
 		{
-			SHAKE128 HashFunction = new SHAKE128(OutputLength << 3);
-			return HashFunction.ComputeVariable(Input);
+			return new SHAKE128(OutputLength << 3).ComputeVariable(Input);
 		}
 
 		/// <summary>
@@ -478,33 +471,12 @@ namespace Waher.Security.PQC
 		/// <returns>Sample in 𝑇𝑞</returns>
 		public static ushort[] SampleNTT(byte Index1, byte Index2)
 		{
-			return SampleNTT(CreateSeed(), Index1, Index2);
-		}
+			byte[] Seed = CreateSeed();
 
-		/// <summary>
-		/// Creates a random seed value.
-		/// </summary>
-		/// <returns>Random 32-byte seed value.</returns>
-		private static byte[] CreateSeed()
-		{
-			return CreateSeed(32);
-		}
+			ushort[] Result = SampleNTT(Seed, Index1, Index2);
+			Clear(Seed);
 
-		/// <summary>
-		/// Creates a random seed value.
-		/// </summary>
-		/// <param name="NrBytes">Number of random bytes to create.</param>
-		/// <returns>Random seed value.</returns>
-		private static byte[] CreateSeed(int NrBytes)
-		{
-			byte[] Seed = new byte[NrBytes];
-
-			lock (rnd)
-			{
-				rnd.GetBytes(Seed);
-			}
-
-			return Seed;
+			return Result;
 		}
 
 		/// <summary>
@@ -806,24 +778,6 @@ namespace Waher.Security.PQC
 				MultiplyNTTsAndAdd(v1[i], v2[i], Result);
 
 			return Result;
-		}
-
-		private static void Clear(byte[] Bin)
-		{
-			Array.Clear(Bin, 0, Bin.Length);
-		}
-
-		private static void Clear(ushort[] f)
-		{
-			Array.Clear(f, 0, f.Length);
-		}
-
-		private static void Clear(ushort[][] v)
-		{
-			int i, c = v.Length;
-
-			for (i = 0; i < c; i++)
-				Clear(v[i]);
 		}
 
 		/// <summary>
@@ -1320,7 +1274,6 @@ namespace Waher.Security.PQC
 			Array.Copy(h, 0, Bin, 32, 32);
 
 			byte[] Bin2 = G(Bin);
-			//Clear(Bin);
 
 			byte[] K = new byte[32];
 			Array.Copy(Bin2, 0, K, 0, 32);

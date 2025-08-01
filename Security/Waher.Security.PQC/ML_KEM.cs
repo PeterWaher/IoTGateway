@@ -51,13 +51,6 @@ namespace Waher.Security.PQC
 			}
 		}
 
-		private static readonly ushort[] bitMask =
-		{
-			0x0000, 0x0001, 0x0003, 0x0007, 0x000F, 0x001F, 0x003F, 0x007F,
-			0x00FF, 0x01FF, 0x03FF, 0x07FF, 0x0FFF, 0x1FFF, 0x3FFF, 0x7FFF,
-			0xFFFF
-		};
-
 		/// <summary>
 		/// The following 128 numbers are the values of 𝜁^BitRev7(𝑖) mod 𝑞 for 𝑖 ∈ {0,…,127}. 
 		/// These numbers are used in Algorithms 9 and 10.
@@ -830,12 +823,7 @@ namespace Waher.Security.PQC
 			for (i = 0; i < this.k; i++)
 			{
 				for (j = 0; j < this.k; j++)
-				{
-					//if (TransposeA)
-					//	Â[i, j] = SampleNTT(ρ, (byte)i, (byte)j);
-					//else
 					Â[i, j] = SampleNTT(ρ, (byte)j, (byte)i);
-				}
 			}
 
 			for (i = 0; i < this.k; i++)
@@ -870,6 +858,8 @@ namespace Waher.Security.PQC
 
 			Array.Copy(ρ, 0, EncryptionKey, Pos, 32);
 
+			Clear(ρ);
+			Clear(σ);
 			Clear(s);
 			Clear(t);
 			Clear(e);

@@ -11,7 +11,7 @@
 		/// <param name="Â">Internal matrix used to generate encryption key.</param>
 		/// <param name="PublicKey">Public Encryption key.</param>
 		/// <param name="PrivateKey">Private Decryption key.</param>
-		public ML_DSA_Keys(ushort[,][] Â, byte[] PublicKey, byte[] PrivateKey)
+		public ML_DSA_Keys(uint[,][] Â, byte[] PublicKey, byte[] PrivateKey)
 		{
 			this.Â = Â;
 			this.PublicKey = PublicKey;
@@ -21,7 +21,7 @@
 		/// <summary>
 		/// Matrix of encryption keys, as defined in §6.1.
 		/// </summary>
-		public ushort[,][] Â { get; }
+		public uint[,][] Â { get; }
 
 		/// <summary>
 		/// Encoded public key, as defined in §6.1.

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using Waher.Security.SHA3;
 
 namespace Waher.Security.PQC
@@ -58,6 +55,7 @@ namespace Waher.Security.PQC
 		private const int q = 8380417;
 		private const int ζ = 1753;                 // 512th root of unity in ℤ𝑞
 		private const int d = 13;                   // #dropped bits from t
+		private const uint dBitMask = 0x1fff;       // & dBitMask corresponds to mod 2^d.
 
 		private readonly int τ;                     // # of ±1’s in polynomial c
 		private readonly int λ;                     // collision strength of c
@@ -68,6 +66,7 @@ namespace Waher.Security.PQC
 		private readonly int η;                     // private key range
 		private readonly int β;                     // τ*η
 		private readonly int ω;                     // max # of 1’s in the hint h
+		private readonly int bitLen2η;              // bit length of 2η, used in encoding
 
 		private readonly int privateKeySize;
 		private readonly int publicKeySize;
@@ -91,6 +90,9 @@ namespace Waher.Security.PQC
 		public ML_DSA(int τ, int λ, int γ1, int γ2, byte k, byte l, int η, int ω,
 			int PrivateKeySize, int PublicKeySize, int SignatureSize)
 		{
+			if (η != 2 && η != 4)
+				throw new ArgumentException("η must be 2 or 4.", nameof(η));
+
 			this.τ = τ;
 			this.λ = λ;
 			this.γ1 = γ1;
@@ -104,6 +106,15 @@ namespace Waher.Security.PQC
 			this.privateKeySize = PrivateKeySize;
 			this.publicKeySize = PublicKeySize;
 			this.signatureSize = SignatureSize;
+
+			int i = η;
+			this.bitLen2η = 1;
+
+			while (i > 0)
+			{
+				this.bitLen2η++;
+				i >>= 1;
+			}
 		}
 
 		/// <summary>
@@ -111,7 +122,7 @@ namespace Waher.Security.PQC
 		/// (Algorithm 1 ML-DSA.KeyGen() in §5.1)
 		/// </summary>
 		/// <returns>Public Key pk (320k+32 bytes) and Private Key sk 
-		/// (160*((l+k)*bitlin(2η)+dk) bytes).</returns>
+		/// (160*((l+k)*bitlen(2η)+dk) bytes).</returns>
 		public ML_DSA_Keys KeyGen()
 		{
 			byte[] ξ = CreateSeed();
@@ -466,7 +477,7 @@ namespace Waher.Security.PQC
 		/// </summary>
 		/// <param name="ξ">Seed</param>
 		/// <returns>Public Key pk (320k+32 bytes) and Private Key sk 
-		/// (160*((l+k)*bitlin(2η)+dk) bytes).</returns>
+		/// (160*((l+k)*bitlen(2η)+dk) bytes).</returns>
 		public ML_DSA_Keys KeyGen_Internal(byte[] ξ)
 		{
 			if (ξ.Length != 32)
@@ -491,9 +502,60 @@ namespace Waher.Security.PQC
 			Clear(Bin2);
 
 			uint[,][] Â = this.ExpandÂ(ρ);
+			uint[][] s1 = this.ExpandS1(ρ2);
+			uint[][] s2 = this.ExpandS2(ρ2);
 
+			NTT(s1);
 
-			throw new NotImplementedException();	// TODO
+			uint[][] t = new uint[this.k][];
+			int i, j;
+
+			for (i = 0; i < this.k; i++)
+			{
+				t[i] = (uint[])s2[i].Clone();
+
+				for (j = 0; j < this.l; j++)
+					MultiplyNTTsAndAdd(Â[i, j], s1[j], t[i]);
+			}
+
+			InverseNTT(t);
+
+			// Powewr2Round, decomposes t into two arrays t1, t0, where t=t1*2^d+t0 mod q
+			// (Algorithm 35, §7,4)
+
+			uint[][] t1 = new uint[this.k][];
+			uint[][] t0 = new uint[this.k][];
+
+			for (i = 0; i < this.k; i++)
+			{
+				uint[] f1, f0, f;
+				uint r, r0;
+
+				f = t[i];
+				t1[i] = f1 = new uint[n];
+				t0[i] = f0 = new uint[n];
+
+				for (j = 0; j < n; j++)
+				{
+					r = f[j];
+					f0[j] = r0 = r & dBitMask;
+					f1[i] = ((r + q - r0) % q) >> d;
+				}
+			}
+
+			byte[] PublicKey = this.PublicKeyEncode(ρ, t1);
+			byte[] tr = H(PublicKey, 64);
+			byte[] PrivateKey = this.PrivateKeyEncode(ρ, K, tr, s1, s2, t0);
+
+			Clear(t);
+			Clear(ρ);
+			Clear(ρ2);
+			Clear(K);
+			Clear(s1);
+			Clear(s2);
+			Clear(t0);
+
+			return new ML_DSA_Keys(Â, PublicKey, PrivateKey);
 		}
 
 		/// <summary>
@@ -501,7 +563,7 @@ namespace Waher.Security.PQC
 		/// (Algorithm 32, in §7.3)
 		/// </summary>
 		/// <param name="ρ">Seed</param>
-		/// <returns></returns>
+		/// <returns>Matrix of polynomials</returns>
 		private uint[,][] ExpandÂ(byte[] ρ)
 		{
 			uint[,][] Â = new uint[this.k, this.l][];
@@ -517,20 +579,117 @@ namespace Waher.Security.PQC
 		}
 
 		/// <summary>
-		/// The algorithm RejNttPoly (Algorithm 30, §7.3) converts a seed together with two 
-		/// indexing bytes into a polynomial in the NTT domain.
+		/// Samples an ℓ vector s1 of elements of 𝑇𝑞.
+		/// (Algorithm 33, in §7.3)
 		/// </summary>
-		/// <param name="Index1">Byte index value 1.</param>
-		/// <param name="Index2">Byte index value 2.</param>
-		/// <returns>Sample in 𝑇𝑞</returns>
-		public static uint[] RejNttPoly(byte Index1, byte Index2)
+		/// <param name="ρ">Seed</param>
+		/// <returns>Vector of polynomials</returns>
+		private uint[][] ExpandS1(byte[] ρ)
 		{
-			byte[] Seed = CreateSeed();
+			uint[][] s1 = new uint[this.l][];
+			byte r;
 
-			uint[] Result = RejNttPoly(Seed, Index1, Index2);
-			Clear(Seed);
+			for (r = 0; r < this.l; r++)
+				s1[r] = this.RejBoundedPoly(ρ, r);
 
-			return Result;
+			return s1;
+		}
+
+		/// <summary>
+		/// Samples a k vector s2 of elements of 𝑇𝑞.
+		/// (Algorithm 33, in §7.3)
+		/// </summary>
+		/// <param name="ρ">Seed</param>
+		/// <returns>Vector of polynomials</returns>
+		private uint[][] ExpandS2(byte[] ρ)
+		{
+			uint[][] s2 = new uint[this.k][];
+			byte r;
+
+			for (r = 0; r < this.k; r++)
+				s2[r] = this.RejBoundedPoly(ρ, (ushort)(r + this.l));
+
+			return s2;
+		}
+
+		/// <summary>
+		/// Encodes a public key for ML-DSA into a byte string.
+		/// Algorithm 22, §7.2.
+		/// </summary>
+		/// <param name="ρ">Seed</param>
+		/// <param name="t1">Polynomials to encode.</param>
+		/// <returns>Public Key</returns>
+		private byte[] PublicKeyEncode(byte[] ρ, uint[][] t1)
+		{
+			if (ρ.Length != 32)
+				throw new ArgumentException("Seed must be 32 bytes long.", nameof(ρ));
+
+			if (t1.Length != this.k)
+				throw new ArgumentException("Invalid polynomial size.", nameof(t1));
+
+			byte[] PublicKey = new byte[32 + this.k * 320];
+			int Pos = 32;
+
+			Array.Copy(ρ, 0, PublicKey, 0, 32);
+
+			for (int i = 0; i < this.k; i++)
+				Pos += SimpleBitPack(t1[i], 10, PublicKey, Pos);
+
+			return PublicKey;
+		}
+
+		/// <summary>
+		/// Encodes a public key for ML-DSA into a byte string.
+		/// Algorithm 22, §7.2.
+		/// </summary>
+		/// <param name="ρ">Seed</param>
+		/// <param name="K">Seed</param>
+		/// <param name="s1">Polynomials</param>
+		/// <param name="s2">Polynomials</param>
+		/// <param name="tr">Polynomials</param>
+		/// <param name="t0">Polynomials to encode.</param>
+		/// <returns>Public Key</returns>
+		private byte[] PrivateKeyEncode(byte[] ρ, byte[] K, byte[] tr, uint[][] s1, uint[][] s2, uint[][] t0)
+		{
+			if (ρ.Length != 32)
+				throw new ArgumentException("Seed must be 32 bytes long.", nameof(ρ));
+
+			if (K.Length != 32)
+				throw new ArgumentException("K must be 32 bytes long.", nameof(K));
+
+			if (tr.Length != 64)
+				throw new ArgumentException("tr must be 32 bytes long.", nameof(tr));
+
+			if (s1.Length != this.l)
+				throw new ArgumentException("s1 must be " + this.l + " polynomials long.", nameof(s1));
+
+			if (s2.Length != this.k)
+				throw new ArgumentException("s2 must be " + this.k + " polynomials long.", nameof(s2));
+
+			if (t0.Length != this.k)
+				throw new ArgumentException("t0 must be " + this.k + " polynomials long.", nameof(t0));
+
+			byte[] PrivateKey = new byte[128 + 32 * ((this.k + this.l) * this.bitLen2η + d * this.k)];
+			int Pos = 128;
+			int i;
+
+			Array.Copy(ρ, 0, PrivateKey, 0, 32);
+			Array.Copy(K, 0, PrivateKey, 32, 32);
+			Array.Copy(tr, 0, PrivateKey, 64, 64);
+
+			for (i = 0; i < this.l; i++)
+				Pos += BitPack(s1[i], PrivateKey, Pos, this.η, this.η);
+
+			for (i = 0; i < this.k; i++)
+				Pos += BitPack(s2[i], PrivateKey, Pos, this.η, this.η);
+
+			int b = 1 << d;
+			int a = b - 1;
+
+			for (i = 0; i < this.k; i++)
+				Pos += BitPack(t0[i], PrivateKey, Pos, a, b);
+
+			return PrivateKey;
 		}
 
 		/// <summary>
@@ -574,6 +733,449 @@ namespace Waher.Security.PQC
 		}
 
 		/// <summary>
+		/// The algorithm RejBoundedPoly (Algorithm 31, §7.3) converts a seed together with 
+		/// an index into a polynomial with bounded coefficients.
+		/// </summary>
+		/// <param name="Seed">Seed value</param>
+		/// <param name="Index">Index value.</param>
+		/// <returns>Sample in R𝑞</returns>
+		public uint[] RejBoundedPoly(byte[] Seed, ushort Index)
+		{
+			SHAKE256 HashFunction = new SHAKE256(0);
+			int c = Seed.Length;
+			byte[] B = new byte[c + 2];
+			Array.Copy(Seed, 0, B, 0, c);
+			B[c] = (byte)Index;
+			B[c + 1] = (byte)(Index >> 8);
+
+			Keccak1600.Context Context = HashFunction.Absorb(B);
+			uint[] Result = new uint[n];
+			int Pos = 0;
+
+			while (Pos < n)
+			{
+				byte z = Context.Squeeze(1)[0];
+				byte b1 = (byte)(z & 0x0f);
+				byte b2 = (byte)(z >> 4);
+
+				// CoeffFromHalfByte, Algorithm 15, §7.1
+
+				if (this.η == 2 && b1 < 15)
+					Result[Pos++] = (byte)(2 - (b1 % 5));
+				else if (this.η == 4 && b1 < 9)
+					Result[Pos++] = (byte)(4 - b1);
+
+				if (Pos < n)
+				{
+					if (this.η == 2 && b2 < 15)
+						Result[Pos++] = (byte)(2 - (b2 % 5));
+					else if (this.η == 4 && b2 < 9)
+						Result[Pos++] = (byte)(4 - b2);
+				}
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Computes the NTT representation f̂ of the given polynomial f ∈ 𝑅𝑞.
+		/// (Algorithm 41 in §7.5)
+		/// </summary>
+		/// <param name="f">Polynomial in 𝑅𝑞</param>
+		public static void NTT(uint[] f)
+		{
+			if (f.Length != n)
+				throw new ArgumentException("Polynomial must have " + n + " coefficients.", nameof(f));
+
+			int j;
+			int Len;
+			int Start;
+			int m = 0;
+			uint ζ;
+			uint t;
+
+			for (Len = n >> 1; Len >= 1; Len >>= 1)
+			{
+				for (Start = 0; Start < n; Start += Len << 1)
+				{
+					ζ = nttTransformZeta[++m];
+
+					for (j = Start; j < Start + Len; j++)
+					{
+						t = ζ * f[j + Len] % q;
+						f[j + Len] = (f[j] + q - t) % q;
+						f[j] = (f[j] + t) % q;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Canonical extension of <see cref="NTT(uint[])"/>.
+		/// </summary>
+		/// <param name="f">Array of polynomials in 𝑅𝑞</param>
+		public static void NTT(uint[][] f)
+		{
+			int i, c = f.Length;
+
+			for (i = 0; i < c; i++)
+				NTT(f[i]);
+		}
+
+		/// <summary>
+		/// Computes the NTT^-1 representation f of the given polynomial f̂ ∈ 𝑇𝑞.
+		/// (Algorithm 42 in §7.5)
+		/// </summary>
+		/// <param name="f">polynomial f̂ ∈ 𝑇𝑞</param>
+		public static void InverseNTT(uint[] f)
+		{
+			if (f.Length != n)
+				throw new ArgumentException("Polynomial must have " + n + " coefficients.", nameof(f));
+
+			int j;
+			int Len;
+			int Len2;
+			int StartLen;
+			int Start;
+			int m = 256;
+			uint ζ;
+			uint t;
+
+			for (Len = 1; Len < n; Len <<= 1)
+			{
+				Len2 = Len << 1;
+
+				for (Start = 0; Start < n; Start += Len2)
+				{
+					ζ = nttTransformZeta[--m];
+
+					StartLen = Start + Len;
+					for (j = Start; j < StartLen; j++)
+					{
+						t = f[j];
+						f[j] = (t + f[j + Len]) % q;
+						f[j + Len] = ζ * (f[j + Len] + q - t) % q;
+					}
+				}
+			}
+
+			for (j = 0; j < n; j++)
+				f[j] = 8347681 * f[j] % q;   // 8347681 = 256^-1 mod q
+		}
+
+		/// <summary>
+		/// Canonical extension of <see cref="NTT(uint[])"/>.
+		/// </summary>
+		/// <param name="f">Array of polynomials f̂ ∈ 𝑇𝑞</param>
+		public static void InverseNTT(uint[][] f)
+		{
+			int i, c = f.Length;
+
+			for (i = 0; i < c; i++)
+				InverseNTT(f[i]);
+		}
+
+		/// <summary>
+		/// Computes the product (in the ring 𝑇𝑞) of two NTT representations.
+		/// (Algorithm 45 in §7.6)
+		/// </summary>
+		/// <param name="f">Polynomial 1</param>
+		/// <param name="g">Polynomial 2</param>
+		/// <returns>f*g in 𝑇𝑞</returns>
+		/// <exception cref="ArgumentException">If polynomials are not of the correct size.</exception>
+		public static uint[] MultiplyNTTs(uint[] f, uint[] g)
+		{
+			uint[] Result = new uint[n];
+			MultiplyNTTsAndAdd(f, g, Result);
+			return Result;
+		}
+
+		/// <summary>
+		/// Computes the product (in the ring 𝑇𝑞) of two NTT representations 
+		/// (Algorithm 45 in §7.6) and adds the result to a result vector
+		/// (Algorithm 44 in §7.6).
+		/// </summary>
+		/// <param name="f">Polynomial 1</param>
+		/// <param name="g">Polynomial 2</param>
+		/// <param name="Result">Result vector.</param>
+		/// <returns>f*g in 𝑇𝑞</returns>
+		/// <exception cref="ArgumentException">If polynomials are not of the correct size.</exception>
+		public static void MultiplyNTTsAndAdd(uint[] f, uint[] g, uint[] Result)
+		{
+			if (f.Length != n || g.Length != n)
+				throw new ArgumentException("Polynomials must have " + n + " coefficients.", nameof(f));
+
+			int i;
+
+			for (i = 0; i < n; i++)
+				Result[i] = (uint)((Result[i] + (ulong)f[i] * g[i]) % q);
+		}
+
+		/// <summary>
+		/// Adds <paramref name="g"/> to <paramref name="f"/>.
+		/// </summary>
+		/// <param name="f">Polynomial that will be incremented by <paramref name="g"/>.</param>
+		/// <param name="g">Polynomial to add to <paramref name="f"/>.</param>
+		public static void AddTo(uint[] f, uint[] g)
+		{
+			int i;
+
+			for (i = 0; i < n; i++)
+				f[i] = (f[i] + g[i]) % q;
+		}
+
+		/// <summary>
+		/// Adds vector <paramref name="g"/> to vector <paramref name="f"/>.
+		/// </summary>
+		/// <param name="f">Vector of polynomials that will be incremented by <paramref name="g"/>.</param>
+		/// <param name="g">Vector of polynomials to add to <paramref name="f"/>.</param>
+		public static void AddTo(uint[][] f, uint[][] g)
+		{
+			int i, c = f.Length;
+			if (g.Length != c)
+				throw new ArgumentException("Vectors must have the same number of polynomials.", nameof(g));
+
+			for (i = 0; i < c; i++)
+				AddTo(f[i], g[i]);
+		}
+
+		/// <summary>
+		/// Negates a polynomial in 𝑅𝑞.
+		/// </summary>
+		/// <param name="f">Polynomial</param>
+		public static void Negate(uint[] f)
+		{
+			int i, c = f.Length;
+
+			for (i = 0; i < c; i++)
+				f[i] = (q - f[i]) % q;   // To avoid different CPU instructions to execute based on if bit is 0 or 1.
+		}
+
+		/// <summary>
+		/// Computes the dot product of two vectors of polynomials in 𝑇𝑞.
+		/// </summary>
+		/// <param name="v1">First vector.</param>
+		/// <param name="v2">Second vector.</param>
+		/// <returns>Dot product in 𝑇𝑞</returns>
+		/// <exception cref="ArgumentException"></exception>
+		public static uint[] DotProductNTT(uint[][] v1, uint[][] v2)
+		{
+			int i, c = v1.Length;
+
+			if (v2.Length != c)
+				throw new ArgumentException("Vectors must have the same number of polynomials.", nameof(v2));
+
+			uint[] Result = new uint[n];
+
+			for (i = 0; i < c; i++)
+				MultiplyNTTsAndAdd(v1[i], v2[i], Result);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Encodes an array of integers (mod 2^d) into a byte array, as defined by
+		/// Algorithm 16 in §7.1.
+		/// </summary>
+		/// <param name="Values">Array of integers.</param>
+		/// <param name="d">Number of bits, between 1 and 15.</param>
+		/// <returns>Byte array.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
+		public static byte[] SimpleBitPack(uint[] Values, int d)
+		{
+			int c = Values.Length;
+			int NrBits = c * d;
+			int NrBytes = (NrBits + 7) >> 3;
+			byte[] Result = new byte[NrBytes];
+
+			SimpleBitPack(Values, d, Result, 0);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Encodes an array of integers (mod 2^d) into a byte array, as defined by
+		/// Algorithm 16 in §7.1.
+		/// </summary>
+		/// <param name="Values">Array of integers.</param>
+		/// <param name="d">Number of bits, between 1 and 12.</param>
+		/// <param name="Output">Bytes will be encoded into this array.</param>
+		/// <param name="Index">Index into output array where encoding will begin.</param>
+		/// <returns>Number of bytes encoded.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
+		public static int SimpleBitPack(uint[] Values, int d, byte[] Output, int Index)
+		{
+			if (d < 1 || d > 15)
+				throw new ArgumentOutOfRangeException(nameof(d), "d must be between 1 and 15.");
+
+			int i, c = Values.Length;
+			int BitOffset = 0;
+			int Index0 = Index;
+
+			for (i = 0; i < c; i++)
+			{
+				uint Value = Values[i];
+
+				Value &= bitMask[d];
+				Output[Index] |= (byte)(Value << BitOffset);
+				BitOffset += d;
+				if (BitOffset >= 8)
+				{
+					Index++;
+					BitOffset -= 8;
+
+					if (BitOffset > 0)
+					{
+						Output[Index] = (byte)(Value >> (d - BitOffset));
+
+						if (BitOffset >= 8)
+						{
+							BitOffset -= 8;
+							Index++;
+
+							if (BitOffset > 0)
+								Output[Index] = (byte)(Value >> (d - BitOffset));
+						}
+					}
+				}
+			}
+
+			return Index - Index0;
+		}
+
+		/// <summary>
+		/// Encodes an array of integers (mod 2^d) into a byte array, as defined by
+		/// Algorithm 16 in §7.1. Canonical
+		/// extension of <see cref="SimpleBitPack(uint[], int, byte[], int)"/>.
+		/// </summary>
+		/// <param name="Values">Array of integers.</param>
+		/// <param name="d">Number of bits, between 1 and 12.</param>
+		/// <param name="Output">Bytes will be encoded into this array.</param>
+		/// <param name="Index">Index into output array where encoding will begin.</param>
+		/// <returns>Number of bytes encoded.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
+		public static int SimpleBitPack(uint[][] Values, int d, byte[] Output, int Index)
+		{
+			int Pos = Index;
+			int i, c = Values.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				int NrBytes = SimpleBitPack(Values[i], d, Output, Pos);
+				Pos += NrBytes;
+			}
+
+			return Pos - Index;
+		}
+
+		/// <summary>
+		/// Encodes an array of integers between [-a,b] into a byte array, as defined by
+		/// Algorithm 17 in §7.1.
+		/// </summary>
+		/// <param name="Values">Array of integers.</param>
+		/// <param name="a">-a is the smallest integer to encode.</param>
+		/// <param name="b">b is the largest integer to encode.</param>
+		/// <returns>Byte array.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
+		public static byte[] BitPack(uint[] Values, int a, int b)
+		{
+			int c = Values.Length;
+			int NrBits = c * d;
+			int NrBytes = (NrBits + 7) >> 3;
+			byte[] Result = new byte[NrBytes];
+
+			BitPack(Values, Result, 0, a, b);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Encodes an array of integers between [-a,b] into a byte array, as defined by
+		/// Algorithm 17 in §7.1.
+		/// </summary>
+		/// <param name="Values">Array of integers.</param>
+		/// <param name="Output">Bytes will be encoded into this array.</param>
+		/// <param name="Index">Index into output array where encoding will begin.</param>
+		/// <param name="a">-a is the smallest integer to encode.</param>
+		/// <param name="b">b is the largest integer to encode.</param>
+		/// <returns>Number of bytes encoded.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
+		public static int BitPack(uint[] Values, byte[] Output, int Index, int a, int b)
+		{
+			int d = 0;
+			int i = b + a;
+
+			while (i > 0)
+			{
+				i >>= 1;
+				d++;
+			}
+
+			if (d < 1 || d > 15)
+				throw new ArgumentOutOfRangeException(nameof(b), "d must be between 1 and 15.");
+
+			int c = Values.Length;
+			int BitOffset = 0;
+			int Index0 = Index;
+
+			for (i = 0; i < c; i++)
+			{
+				int Value = (int)(b - Values[i]);
+
+				Value &= bitMask[d];
+				Output[Index] |= (byte)(Value << BitOffset);
+				BitOffset += d;
+				if (BitOffset >= 8)
+				{
+					Index++;
+					BitOffset -= 8;
+
+					if (BitOffset > 0)
+					{
+						Output[Index] = (byte)(Value >> (d - BitOffset));
+
+						if (BitOffset >= 8)
+						{
+							BitOffset -= 8;
+							Index++;
+
+							if (BitOffset > 0)
+								Output[Index] = (byte)(Value >> (d - BitOffset));
+						}
+					}
+				}
+			}
+
+			return Index - Index0;
+		}
+
+		/// <summary>
+		/// Encodes an array of integers between [-a,b] into a byte array, as defined by
+		/// Algorithm 17 in §7.1.
+		/// extension of <see cref="BitPack(uint[], byte[], int, int, int)"/>.
+		/// </summary>
+		/// <param name="Values">Array of integers.</param>
+		/// <param name="Output">Bytes will be encoded into this array.</param>
+		/// <param name="Index">Index into output array where encoding will begin.</param>
+		/// <param name="a">-a is the smallest integer to encode.</param>
+		/// <param name="b">b is the largest integer to encode.</param>
+		/// <returns>Number of bytes encoded.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
+		public static int SimpleBitPack(uint[][] Values, byte[] Output, int Index, int a, int b)
+		{
+			int Pos = Index;
+			int i, c = Values.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				int NrBytes = BitPack(Values[i], Output, Pos, a, b);
+				Pos += NrBytes;
+			}
+
+			return Pos - Index;
+		}
+
+		/// <summary>
 		/// Hash function H, as defined in §3.7.
 		/// </summary>
 		/// <param name="Data">Input data.</param>
@@ -595,6 +1197,46 @@ namespace Waher.Security.PQC
 			return new SHAKE128(l << 3).ComputeVariable(Data);
 		}
 
+		/// <summary>
+		/// The values 𝜁BitRev8(𝑘) mod 𝑞 for 𝑘 = 1,…,255 used in the NTT Algorithms 41 and 42.
+		/// See Appendix B.
+		/// </summary>
+		private static readonly uint[] nttTransformZeta = new uint[256]
+		{
+			0, 4808194, 3765607, 3761513, 5178923, 5496691, 5234739, 5178987,
+			7778734, 3542485, 2682288, 2129892, 3764867, 7375178, 557458, 7159240,
+			5010068, 4317364, 2663378, 6705802, 4855975, 7946292, 676590, 7044481,
+			5152541, 1714295, 2453983, 1460718, 7737789, 4795319, 2815639, 2283733,
+			3602218, 3182878, 2740543, 4793971, 5269599, 2101410, 3704823, 1159875,
+			394148, 928749, 1095468, 4874037, 2071829, 4361428, 3241972, 2156050,
+			3415069, 1759347, 7562881, 4805951, 3756790, 6444618, 6663429, 4430364,
+			5483103, 3192354, 556856, 3870317, 2917338, 1853806, 3345963, 1858416,
+			3073009, 1277625, 5744944, 3852015, 4183372, 5157610, 5258977, 8106357,
+			2508980, 2028118, 1937570, 4564692, 2811291, 5396636, 7270901, 4158088,
+			1528066, 482649, 1148858, 5418153, 7814814, 169688, 2462444, 5046034,
+			4213992, 4892034, 1987814, 5183169, 1736313, 235407, 5130263, 3258457,
+			5801164, 1787943, 5989328, 6125690, 3482206, 4197502, 7080401, 6018354,
+			7062739, 2461387, 3035980, 621164, 3901472, 7153756, 2925816, 3374250,
+			1356448, 5604662, 2683270, 5601629, 4912752, 2312838, 7727142, 7921254,
+			348812, 8052569, 1011223, 6026202, 4561790, 6458164, 6143691, 1744507,
+			1753, 6444997, 5720892, 6924527, 2660408, 6600190, 8321269, 2772600,
+			1182243, 87208, 636927, 4415111, 4423672, 6084020, 5095502, 4663471,
+			8352605, 822541, 1009365, 5926272, 6400920, 1596822, 4423473, 4620952,
+			6695264, 4969849, 2678278, 4611469, 4829411, 635956, 8129971, 5925040,
+			4234153, 6607829, 2192938, 6653329, 2387513, 4768667, 8111961, 5199961,
+			3747250, 2296099, 1239911, 4541938, 3195676, 2642980, 1254190, 8368000,
+			2998219, 141835, 8291116, 2513018, 7025525, 613238, 7070156, 6161950,
+			7921677, 6458423, 4040196, 4908348, 2039144, 6500539, 7561656, 6201452,
+			6757063, 2105286, 6006015, 6346610, 586241, 7200804, 527981, 5637006,
+			6903432, 1994046, 2491325, 6987258, 507927, 7192532, 7655613, 6545891,
+			5346675, 8041997, 2647994, 3009748, 5767564, 4148469, 749577, 4357667,
+			3980599, 2569011, 6764887, 1723229, 1665318, 2028038, 1163598, 5011144,
+			3994671, 8368538, 7009900, 3020393, 3363542, 214880, 545376, 7609976,
+			3105558, 7277073, 508145, 7826699, 860144, 3430436, 140244, 6866265,
+			6195333, 3123762, 2358373, 6187330, 5365997, 6663603, 2926054, 7987710,
+			8077412, 3531229, 4405932, 4606686, 1900052, 7598542, 1054478, 7648983
+		};
+
 		private byte[] Sign_Internal(byte[] PrivateKey, byte[] Message, byte[] Signature)
 		{
 			throw new NotImplementedException();    // TODO
@@ -602,7 +1244,7 @@ namespace Waher.Security.PQC
 
 		private bool Verify_Internal(byte[] PublicKey, byte[] Message, byte[] Signature)
 		{
-			throw new NotImplementedException();	// TODO
+			throw new NotImplementedException();    // TODO
 		}
 	}
 }

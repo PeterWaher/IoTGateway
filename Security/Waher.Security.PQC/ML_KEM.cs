@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Waher.Security.SHA3;
 
 namespace Waher.Security.PQC
@@ -146,7 +147,9 @@ namespace Waher.Security.PQC
 			byte[] Bin = new byte[c + 1];
 			Array.Copy(Seed, 0, Bin, 0, c);
 			Bin[c] = Data;
-			return HashFunction.ComputeVariable(Bin);
+			byte[] Result = HashFunction.ComputeVariable(Bin);
+			Clear(Bin);
+			return Result;
 		}
 
 		/// <summary>
@@ -459,39 +462,12 @@ namespace Waher.Security.PQC
 		/// random, the resulting polynomial will be drawn from a distribution that is 
 		/// computationally indistinguishable from the uniform distribution 𝑇𝑞.
 		/// </summary>
-		/// <param name="Index1">Byte index value 1.</param>
-		/// <param name="Index2">Byte index value 2.</param>
-		/// <returns>Sample in 𝑇𝑞</returns>
-		public static ushort[] SampleNTT(byte Index1, byte Index2)
-		{
-			byte[] Seed = CreateSeed();
-
-			ushort[] Result = SampleNTT(Seed, Index1, Index2);
-			Clear(Seed);
-
-			return Result;
-		}
-
-		/// <summary>
-		/// The algorithm SampleNTT (Algorithm 7, §4.2.1) converts a seed together with two 
-		/// indexing bytes into a polynomial in the NTT domain. If the seed is uniformly 
-		/// random, the resulting polynomial will be drawn from a distribution that is 
-		/// computationally indistinguishable from the uniform distribution 𝑇𝑞.
-		/// </summary>
 		/// <param name="Seed">Seed value</param>
-		/// <param name="Index1">Byte index value 1.</param>
-		/// <param name="Index2">Byte index value 2.</param>
 		/// <returns>Sample in 𝑇𝑞</returns>
-		public static ushort[] SampleNTT(byte[] Seed, byte Index1, byte Index2)
+		private static ushort[] SampleNTT(byte[] Seed)
 		{
 			SHAKE128 HashFunction = new SHAKE128(0);
-			int c = Seed.Length;
-			byte[] B = new byte[c + 2];
-			Array.Copy(Seed, 0, B, 0, c);
-			B[c] = Index1;
-			B[c + 1] = Index2;
-
-			Keccak1600.Context Context = HashFunction.Absorb(B);
+			Keccak1600.Context Context = HashFunction.Absorb(Seed);
 			ushort[] Result = new ushort[n];
 			int Pos = 0;
 
@@ -819,12 +795,22 @@ namespace Waher.Security.PQC
 			ushort[,][] Â = new ushort[this.k, this.k][];
 			ushort[][] s = new ushort[this.k][];
 			ushort[][] e = new ushort[this.k][];
+			
+			byte[] B = new byte[34];
+			Array.Copy(ρ, 0, B, 0, 32);
 
 			for (i = 0; i < this.k; i++)
 			{
+				B[33] = (byte)i;
+
 				for (j = 0; j < this.k; j++)
-					Â[i, j] = SampleNTT(ρ, (byte)j, (byte)i);
+				{
+					B[32] = (byte)j;
+					Â[i, j] = SampleNTT(B);
+				}
 			}
+
+			Clear(B);
 
 			for (i = 0; i < this.k; i++)
 				s[i] = SamplePolyCBD(PRF(σ, N++, this.η1));
@@ -958,12 +944,22 @@ namespace Waher.Security.PQC
 			if (Â is null)
 			{
 				Â = new ushort[this.k, this.k][];
+				
+				byte[] B = new byte[34];
+				Array.Copy(ρ, 0, B, 0, 32);
 
 				for (i = 0; i < this.k; i++)
 				{
+					B[33] = (byte)i;
+
 					for (j = 0; j < this.k; j++)
-						Â[i, j] = SampleNTT(ρ, (byte)j, (byte)i);
+					{
+						B[32] = (byte)j;
+						Â[i, j] = SampleNTT(B);
+					}
 				}
+
+				Clear(B);
 			}
 			else if (Â.GetLength(0) != this.k || Â.GetLength(1) != this.k)
 				throw new ArgumentException("Matrix A must be " + this.k + "x" + this.k + ".", nameof(Â));

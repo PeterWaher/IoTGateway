@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using Waher.Security.SHA3;
 
 namespace Waher.Security.PQC
@@ -37,13 +38,13 @@ namespace Waher.Security.PQC
 		{
 			switch (Name.ToUpper())
 			{
-				case "ML-DSA-512":
+				case "ML-DSA-44":
 					return ML_DSA_44;
 
-				case "ML-DSA-768":
+				case "ML-DSA-65":
 					return ML_DSA_65;
 
-				case "ML-DSA-1024":
+				case "ML-DSA-87":
 					return ML_DSA_87;
 
 				default:
@@ -66,7 +67,6 @@ namespace Waher.Security.PQC
 		private readonly int η;                     // private key range
 		private readonly int β;                     // τ*η
 		private readonly int ω;                     // max # of 1’s in the hint h
-		private readonly int bitLen2η;              // bit length of 2η, used in encoding
 
 		private readonly int privateKeySize;
 		private readonly int publicKeySize;
@@ -106,15 +106,6 @@ namespace Waher.Security.PQC
 			this.privateKeySize = PrivateKeySize;
 			this.publicKeySize = PublicKeySize;
 			this.signatureSize = SignatureSize;
-
-			int i = η;
-			this.bitLen2η = 1;
-
-			while (i > 0)
-			{
-				this.bitLen2η++;
-				i >>= 1;
-			}
 		}
 
 		/// <summary>
@@ -539,7 +530,7 @@ namespace Waher.Security.PQC
 				{
 					r = f[j];
 					f0[j] = r0 = r & dBitMask;
-					f1[i] = ((r + q - r0) % q) >> d;
+					f1[j] = ((r + q - r0) % q) >> d;
 				}
 			}
 
@@ -566,14 +557,27 @@ namespace Waher.Security.PQC
 		/// <returns>Matrix of polynomials</returns>
 		private uint[,][] ExpandÂ(byte[] ρ)
 		{
+			if (ρ.Length != 32)
+				throw new ArgumentException("Seed must be 32 bytes long.", nameof(ρ));
+
 			uint[,][] Â = new uint[this.k, this.l][];
 			byte r, c;
 
+			byte[] B = new byte[34];
+			Array.Copy(ρ, 0, B, 0, 32);
+
 			for (r = 0; r < this.k; r++)
 			{
+				B[33] = r;
+
 				for (c = 0; c < this.l; c++)
-					Â[r, c] = RejNttPoly(ρ, c, r);
+				{
+					B[32] = c;
+					Â[r, c] = RejNttPoly(B);
+				}
 			}
+
+			Clear(B);
 
 			return Â;
 		}
@@ -582,15 +586,15 @@ namespace Waher.Security.PQC
 		/// Samples an ℓ vector s1 of elements of 𝑇𝑞.
 		/// (Algorithm 33, in §7.3)
 		/// </summary>
-		/// <param name="ρ">Seed</param>
+		/// <param name="ρ2">Seed</param>
 		/// <returns>Vector of polynomials</returns>
-		private uint[][] ExpandS1(byte[] ρ)
+		private uint[][] ExpandS1(byte[] ρ2)
 		{
 			uint[][] s1 = new uint[this.l][];
 			byte r;
 
 			for (r = 0; r < this.l; r++)
-				s1[r] = this.RejBoundedPoly(ρ, r);
+				s1[r] = this.RejBoundedPoly(ρ2, r);
 
 			return s1;
 		}
@@ -599,15 +603,15 @@ namespace Waher.Security.PQC
 		/// Samples a k vector s2 of elements of 𝑇𝑞.
 		/// (Algorithm 33, in §7.3)
 		/// </summary>
-		/// <param name="ρ">Seed</param>
+		/// <param name="ρ2">Seed</param>
 		/// <returns>Vector of polynomials</returns>
-		private uint[][] ExpandS2(byte[] ρ)
+		private uint[][] ExpandS2(byte[] ρ2)
 		{
 			uint[][] s2 = new uint[this.k][];
 			byte r;
 
 			for (r = 0; r < this.k; r++)
-				s2[r] = this.RejBoundedPoly(ρ, (ushort)(r + this.l));
+				s2[r] = this.RejBoundedPoly(ρ2, (ushort)(r + this.l));
 
 			return s2;
 		}
@@ -627,7 +631,7 @@ namespace Waher.Security.PQC
 			if (t1.Length != this.k)
 				throw new ArgumentException("Invalid polynomial size.", nameof(t1));
 
-			byte[] PublicKey = new byte[32 + this.k * 320];
+			byte[] PublicKey = new byte[this.publicKeySize];
 			int Pos = 32;
 
 			Array.Copy(ρ, 0, PublicKey, 0, 32);
@@ -669,7 +673,7 @@ namespace Waher.Security.PQC
 			if (t0.Length != this.k)
 				throw new ArgumentException("t0 must be " + this.k + " polynomials long.", nameof(t0));
 
-			byte[] PrivateKey = new byte[128 + 32 * ((this.k + this.l) * this.bitLen2η + d * this.k)];
+			byte[] PrivateKey = new byte[this.privateKeySize];
 			int Pos = 128;
 			int i;
 
@@ -683,7 +687,7 @@ namespace Waher.Security.PQC
 			for (i = 0; i < this.k; i++)
 				Pos += BitPack(s2[i], PrivateKey, Pos, this.η, this.η);
 
-			int b = 1 << d;
+			int b = 1 << (d - 1);
 			int a = b - 1;
 
 			for (i = 0; i < this.k; i++)
@@ -697,19 +701,11 @@ namespace Waher.Security.PQC
 		/// indexing bytes into a polynomial in the NTT domain.
 		/// </summary>
 		/// <param name="Seed">Seed value</param>
-		/// <param name="Index1">Byte index value 1.</param>
-		/// <param name="Index2">Byte index value 2.</param>
 		/// <returns>Sample in 𝑇𝑞</returns>
-		public static uint[] RejNttPoly(byte[] Seed, byte Index1, byte Index2)
+		private static uint[] RejNttPoly(byte[] Seed)
 		{
 			SHAKE128 HashFunction = new SHAKE128(0);
-			int c = Seed.Length;
-			byte[] B = new byte[c + 2];
-			Array.Copy(Seed, 0, B, 0, c);
-			B[c] = Index1;
-			B[c + 1] = Index2;
-
-			Keccak1600.Context Context = HashFunction.Absorb(B);
+			Keccak1600.Context Context = HashFunction.Absorb(Seed);
 			uint[] Result = new uint[n];
 			int Pos = 0;
 
@@ -751,28 +747,76 @@ namespace Waher.Security.PQC
 			Keccak1600.Context Context = HashFunction.Absorb(B);
 			uint[] Result = new uint[n];
 			int Pos = 0;
+			int i;
 
-			while (Pos < n)
+			if (this.η == 2)
 			{
-				byte z = Context.Squeeze(1)[0];
-				byte b1 = (byte)(z & 0x0f);
-				byte b2 = (byte)(z >> 4);
-
-				// CoeffFromHalfByte, Algorithm 15, §7.1
-
-				if (this.η == 2 && b1 < 15)
-					Result[Pos++] = (byte)(2 - (b1 % 5));
-				else if (this.η == 4 && b1 < 9)
-					Result[Pos++] = (byte)(4 - b1);
-
-				if (Pos < n)
+				while (Pos < n)
 				{
-					if (this.η == 2 && b2 < 15)
-						Result[Pos++] = (byte)(2 - (b2 % 5));
-					else if (this.η == 4 && b2 < 9)
-						Result[Pos++] = (byte)(4 - b2);
+					byte z = Context.Squeeze(1)[0];
+					byte b1 = (byte)(z & 0x0f);
+					byte b2 = (byte)(z >> 4);
+
+					// CoeffFromHalfByte, Algorithm 15, §7.1
+
+					if (b1 < 15)
+					{
+						i = 2 - (b1 % 5);
+						if (i < 0)
+							i += q;
+
+						Result[Pos++] = (uint)i;
+					}
+
+					if (Pos < n)
+					{
+						if (b2 < 15)
+						{
+							i = 2 - (b2 % 5);
+							if (i < 0)
+								i += q;
+
+							Result[Pos++] = (uint)i;
+						}
+					}
 				}
 			}
+			else if (this.η == 4)
+			{
+				while (Pos < n)
+				{
+					byte z = Context.Squeeze(1)[0];
+					byte b1 = (byte)(z & 0x0f);
+					byte b2 = (byte)(z >> 4);
+
+					// CoeffFromHalfByte, Algorithm 15, §7.1
+
+					if (b1 < 9)
+					{
+						i = 4 - b1;
+						if (i < 0)
+							i += q;
+
+						Result[Pos++] = (uint)i;
+					}
+
+					if (Pos < n)
+					{
+						if (b2 < 9)
+						{
+							i = 4 - b2;
+							if (i < 0)
+								i += q;
+
+							Result[Pos++] = (uint)i;
+						}
+					}
+				}
+			}
+			else
+				throw new InvalidOperationException("Invalid η.");
+
+			Clear(B);
 
 			return Result;
 		}

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using Waher.Security.SHA3;
 
 namespace Waher.Security.PQC
@@ -54,19 +53,21 @@ namespace Waher.Security.PQC
 
 		private const int n = 256;
 		private const int q = 8380417;
-		private const int ζ = 1753;                 // 512th root of unity in ℤ𝑞
-		private const int d = 13;                   // #dropped bits from t
-		private const uint dBitMask = 0x1fff;       // & dBitMask corresponds to mod 2^d.
+		private const int ζ = 1753;                     // 512th root of unity in ℤ𝑞
+		private const int d = 13;                       // #dropped bits from t
+		private const uint dBitMask = 0x1fff;           // & dBitMask corresponds to mod 2^d.
+		private const short twoDHalf = 1 << (d - 1);    // 2^(d-1)
+		private const short twoD = 1 << d;              // 2^d
 
-		private readonly int τ;                     // # of ±1’s in polynomial c
-		private readonly int λ;                     // collision strength of c
-		private readonly int γ1;                    // coefficient range of y 
-		private readonly int γ2;                    // low-order rounding range 
-		private readonly byte k;                    // Rows of matrix A
-		private readonly byte l;                    // Columns of matrix A
-		private readonly int η;                     // private key range
-		private readonly int β;                     // τ*η
-		private readonly int ω;                     // max # of 1’s in the hint h
+		private readonly int τ;                         // # of ±1’s in polynomial c
+		private readonly int λ;                         // collision strength of c
+		private readonly int γ1;                        // coefficient range of y 
+		private readonly int γ2;                        // low-order rounding range 
+		private readonly byte k;                        // Rows of matrix A
+		private readonly byte l;                        // Columns of matrix A
+		private readonly int η;                         // private key range
+		private readonly int β;                         // τ*η
+		private readonly int ω;                         // max # of 1’s in the hint h
 
 		private readonly int privateKeySize;
 		private readonly int publicKeySize;
@@ -493,12 +494,12 @@ namespace Waher.Security.PQC
 			byte[] B = new byte[66];            // ρ´ || 2 index bytes
 			Array.Copy(Bin2, 32, B, 0, 64);
 
-			uint[][] s1 = this.ExpandS(B, this.k);
-			uint[][] s2 = this.ExpandS(B, this.l);
+			short[][] s1 = this.ExpandS(B, this.k);
+			short[][] s2 = this.ExpandS(B, this.l);
 
 			Clear(B);
 
-			NTT(s1);
+			uint[][] NTTs1 = NTT(s1);
 
 			uint[][] t = new uint[this.k][];
 			int i, j;
@@ -508,32 +509,42 @@ namespace Waher.Security.PQC
 				t[i] = new uint[n];
 
 				for (j = 0; j < this.l; j++)
-					MultiplyNTTsAndAdd(Â[i, j], s1[j], t[i]);
+					MultiplyNTTsAndAdd(Â[i, j], NTTs1[j], t[i]);
 			}
 
 			InverseNTT(t);
 			AddTo(t, s2);
 
-			// Powewr2Round, decomposes t into two arrays t1, t0, where t=t1*2^d+t0 mod q
+			// Power2Round, decomposes t into two arrays t1, t0, where t=t1*2^d+t0 mod q
 			// (Algorithm 35, §7,4)
 
-			uint[][] t1 = new uint[this.k][];
-			uint[][] t0 = new uint[this.k][];
+			short[][] t0 = new short[this.k][];
+			short[][] t1 = new short[this.k][];
 
 			for (i = 0; i < this.k; i++)
 			{
-				uint[] f1, f0, f;
-				uint r, r0;
+				short[] f0, f1;
+				uint[] f;
+				short r0, r1;
+				uint r;
 
 				f = t[i];
-				t1[i] = f1 = new uint[n];
-				t0[i] = f0 = new uint[n];
+				t0[i] = f0 = new short[n];
+				t1[i] = f1 = new short[n];
 
 				for (j = 0; j < n; j++)
 				{
 					r = f[j];
-					f0[j] = r0 = r & dBitMask;
-					f1[j] = ((r + q - r0) % q) >> d;
+					r0 = (short)(r & dBitMask);
+
+					if (r0 > twoDHalf)
+						r0 -= twoD;
+
+					f0[j] = r0;
+
+					r1 = (short)((r - r0) >> d);
+
+					f1[j] = r1;
 				}
 			}
 
@@ -592,9 +603,9 @@ namespace Waher.Security.PQC
 		/// <param name="Seed">Seed</param>
 		/// <param name="Nr">Number of polynomials to generate.</param>
 		/// <returns>Vector of polynomials</returns>
-		private uint[][] ExpandS(byte[] Seed, int Nr)
+		private short[][] ExpandS(byte[] Seed, int Nr)
 		{
-			uint[][] s = new uint[Nr][];
+			short[][] s = new short[Nr][];
 			byte r = 0;
 
 			while (Nr-- > 0)
@@ -613,7 +624,7 @@ namespace Waher.Security.PQC
 		/// <param name="ρ">Seed</param>
 		/// <param name="t1">Polynomials to encode.</param>
 		/// <returns>Public Key</returns>
-		private byte[] PublicKeyEncode(byte[] ρ, uint[][] t1)
+		private byte[] PublicKeyEncode(byte[] ρ, short[][] t1)
 		{
 			if (ρ.Length != 32)
 				throw new ArgumentException("Seed must be 32 bytes long.", nameof(ρ));
@@ -643,7 +654,7 @@ namespace Waher.Security.PQC
 		/// <param name="tr">Polynomials</param>
 		/// <param name="t0">Polynomials to encode.</param>
 		/// <returns>Public Key</returns>
-		private byte[] PrivateKeyEncode(byte[] ρ, byte[] K, byte[] tr, uint[][] s1, uint[][] s2, uint[][] t0)
+		private byte[] PrivateKeyEncode(byte[] ρ, byte[] K, byte[] tr, short[][] s1, short[][] s2, short[][] t0)
 		{
 			if (ρ.Length != 32)
 				throw new ArgumentException("Seed must be 32 bytes long.", nameof(ρ));
@@ -724,13 +735,12 @@ namespace Waher.Security.PQC
 		/// </summary>
 		/// <param name="Seed">Seed value</param>
 		/// <returns>Sample in R𝑞</returns>
-		public uint[] RejBoundedPoly(byte[] Seed)
+		public short[] RejBoundedPoly(byte[] Seed)
 		{
 			SHAKE256 HashFunction = new SHAKE256(0);
 			Keccak1600.Context Context = HashFunction.Absorb(Seed);
-			uint[] Result = new uint[n];
+			short[] Result = new short[n];
 			int Pos = 0;
-			int i;
 
 			if (this.η == 2)
 			{
@@ -743,25 +753,10 @@ namespace Waher.Security.PQC
 					// CoeffFromHalfByte, Algorithm 15, §7.1
 
 					if (b1 < 15)
-					{
-						i = 2 - (b1 % 5);
-						if (i < 0)
-							i += q;
+						Result[Pos++] = (short)(2 - (b1 % 5));
 
-						Result[Pos++] = (uint)i;
-					}
-
-					if (Pos < n)
-					{
-						if (b2 < 15)
-						{
-							i = 2 - (b2 % 5);
-							if (i < 0)
-								i += q;
-
-							Result[Pos++] = (uint)i;
-						}
-					}
+					if (Pos < n && b2 < 15)
+						Result[Pos++] = (short)(2 - (b2 % 5));
 				}
 			}
 			else if (this.η == 4)
@@ -775,25 +770,10 @@ namespace Waher.Security.PQC
 					// CoeffFromHalfByte, Algorithm 15, §7.1
 
 					if (b1 < 9)
-					{
-						i = 4 - b1;
-						if (i < 0)
-							i += q;
+						Result[Pos++] = (short)(4 - b1);
 
-						Result[Pos++] = (uint)i;
-					}
-
-					if (Pos < n)
-					{
-						if (b2 < 9)
-						{
-							i = 4 - b2;
-							if (i < 0)
-								i += q;
-
-							Result[Pos++] = (uint)i;
-						}
-					}
+					if (Pos < n && b2 < 9)
+						Result[Pos++] = (short)(4 - b2);
 				}
 			}
 			else
@@ -848,6 +828,44 @@ namespace Waher.Security.PQC
 		}
 
 		/// <summary>
+		/// Canonical extension of <see cref="NTT(uint[])"/>.
+		/// </summary>
+		/// <param name="f">Array of polynomials in 𝑅𝑞</param>
+		/// <returns>NTT(f)</returns>
+		public static uint[] NTT(short[] f)
+		{
+			int i, c = f.Length;
+			uint[] f0 = new uint[n];
+			short v;
+
+			for (i = 0; i < c; i++)
+			{
+				v = f[i];
+				f0[i] = (uint)(v < 0 ? q + v : v);
+			}
+
+			NTT(f0);
+
+			return f0;
+		}
+
+		/// <summary>
+		/// Canonical extension of <see cref="NTT(short[])"/>.
+		/// </summary>
+		/// <param name="f">Array of polynomials in 𝑅𝑞</param>
+		/// <returns>NTT(f)</returns>
+		public static uint[][] NTT(short[][] f)
+		{
+			int i, c = f.Length;
+			uint[][] Result = new uint[c][];
+
+			for (i = 0; i < c; i++)
+				Result[i] = NTT(f[i]);
+
+			return Result;
+		}
+
+		/// <summary>
 		/// Computes the NTT^-1 representation f of the given polynomial f̂ ∈ 𝑇𝑞.
 		/// (Algorithm 42 in §7.5)
 		/// </summary>
@@ -889,7 +907,7 @@ namespace Waher.Security.PQC
 		}
 
 		/// <summary>
-		/// Canonical extension of <see cref="NTT(uint[])"/>.
+		/// Canonical extension of <see cref="InverseNTT(uint[])"/>.
 		/// </summary>
 		/// <param name="f">Array of polynomials f̂ ∈ 𝑇𝑞</param>
 		public static void InverseNTT(uint[][] f)
@@ -941,12 +959,20 @@ namespace Waher.Security.PQC
 		/// </summary>
 		/// <param name="f">Polynomial that will be incremented by <paramref name="g"/>.</param>
 		/// <param name="g">Polynomial to add to <paramref name="f"/>.</param>
-		public static void AddTo(uint[] f, uint[] g)
+		public static void AddTo(uint[] f, short[] g)
 		{
 			int i;
+			short v;
 
 			for (i = 0; i < n; i++)
-				f[i] = (f[i] + g[i]) % q;
+			{
+				v = g[i];
+
+				if (v < 0)
+					f[i] = (uint)((f[i] + q + v) % q);
+				else
+					f[i] = (uint)((f[i] + v) % q);
+			}
 		}
 
 		/// <summary>
@@ -954,7 +980,7 @@ namespace Waher.Security.PQC
 		/// </summary>
 		/// <param name="f">Vector of polynomials that will be incremented by <paramref name="g"/>.</param>
 		/// <param name="g">Vector of polynomials to add to <paramref name="f"/>.</param>
-		public static void AddTo(uint[][] f, uint[][] g)
+		public static void AddTo(uint[][] f, short[][] g)
 		{
 			int i, c = f.Length;
 			if (g.Length != c)
@@ -1006,7 +1032,7 @@ namespace Waher.Security.PQC
 		/// <param name="d">Number of bits, between 1 and 15.</param>
 		/// <returns>Byte array.</returns>
 		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
-		public static byte[] SimpleBitPack(uint[] Values, int d)
+		public static byte[] SimpleBitPack(short[] Values, int d)
 		{
 			int c = Values.Length;
 			int NrBits = c * d;
@@ -1028,7 +1054,7 @@ namespace Waher.Security.PQC
 		/// <param name="Index">Index into output array where encoding will begin.</param>
 		/// <returns>Number of bytes encoded.</returns>
 		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
-		public static int SimpleBitPack(uint[] Values, int d, byte[] Output, int Index)
+		public static int SimpleBitPack(short[] Values, int d, byte[] Output, int Index)
 		{
 			if (d < 1 || d > 15)
 				throw new ArgumentOutOfRangeException(nameof(d), "d must be between 1 and 15.");
@@ -1039,7 +1065,7 @@ namespace Waher.Security.PQC
 
 			for (i = 0; i < c; i++)
 			{
-				uint Value = Values[i];
+				ushort Value = (ushort)Values[i];
 
 				Value &= bitMask[d];
 				Output[Index] |= (byte)(Value << BitOffset);
@@ -1071,7 +1097,7 @@ namespace Waher.Security.PQC
 		/// <summary>
 		/// Encodes an array of integers (mod 2^d) into a byte array, as defined by
 		/// Algorithm 16 in §7.1. Canonical
-		/// extension of <see cref="SimpleBitPack(uint[], int, byte[], int)"/>.
+		/// extension of <see cref="SimpleBitPack(short[], int, byte[], int)"/>.
 		/// </summary>
 		/// <param name="Values">Array of integers.</param>
 		/// <param name="d">Number of bits, between 1 and 12.</param>
@@ -1079,7 +1105,7 @@ namespace Waher.Security.PQC
 		/// <param name="Index">Index into output array where encoding will begin.</param>
 		/// <returns>Number of bytes encoded.</returns>
 		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
-		public static int SimpleBitPack(uint[][] Values, int d, byte[] Output, int Index)
+		public static int SimpleBitPack(short[][] Values, int d, byte[] Output, int Index)
 		{
 			int Pos = Index;
 			int i, c = Values.Length;
@@ -1102,7 +1128,7 @@ namespace Waher.Security.PQC
 		/// <param name="b">b is the largest integer to encode.</param>
 		/// <returns>Byte array.</returns>
 		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
-		public static byte[] BitPack(uint[] Values, int a, int b)
+		public static byte[] BitPack(short[] Values, int a, int b)
 		{
 			int c = Values.Length;
 			int NrBits = c * d;
@@ -1125,7 +1151,7 @@ namespace Waher.Security.PQC
 		/// <param name="b">b is the largest integer to encode.</param>
 		/// <returns>Number of bytes encoded.</returns>
 		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
-		public static int BitPack(uint[] Values, byte[] Output, int Index, int a, int b)
+		public static int BitPack(short[] Values, byte[] Output, int Index, int a, int b)
 		{
 			int d = 0;
 			int i = b + a;
@@ -1145,7 +1171,7 @@ namespace Waher.Security.PQC
 
 			for (i = 0; i < c; i++)
 			{
-				int Value = (int)(b - Values[i]);
+				int Value = b - Values[i];
 
 				Value &= bitMask[d];
 				Output[Index] |= (byte)(Value << BitOffset);
@@ -1177,7 +1203,7 @@ namespace Waher.Security.PQC
 		/// <summary>
 		/// Encodes an array of integers between [-a,b] into a byte array, as defined by
 		/// Algorithm 17 in §7.1.
-		/// extension of <see cref="BitPack(uint[], byte[], int, int, int)"/>.
+		/// extension of <see cref="BitPack(short[], byte[], int, int, int)"/>.
 		/// </summary>
 		/// <param name="Values">Array of integers.</param>
 		/// <param name="Output">Bytes will be encoded into this array.</param>
@@ -1186,7 +1212,7 @@ namespace Waher.Security.PQC
 		/// <param name="b">b is the largest integer to encode.</param>
 		/// <returns>Number of bytes encoded.</returns>
 		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
-		public static int SimpleBitPack(uint[][] Values, byte[] Output, int Index, int a, int b)
+		public static int SimpleBitPack(short[][] Values, byte[] Output, int Index, int a, int b)
 		{
 			int Pos = Index;
 			int i, c = Values.Length;

@@ -631,7 +631,7 @@ namespace Waher.Security.PQC
 		}
 
 		/// <summary>
-		/// Canonical extension of <see cref="NTT(ushort[])"/>.
+		/// Canonical extension of <see cref="InverseNTT(ushort[])"/>.
 		/// </summary>
 		/// <param name="f">Array of polynomials f̂ ∈ 𝑇𝑞</param>
 		public static void InverseNTT(ushort[][] f)

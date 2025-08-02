@@ -485,16 +485,18 @@ namespace Waher.Security.PQC
 			byte[] ρ = new byte[32];
 			Array.Copy(Bin2, 0, ρ, 0, 32);
 
-			byte[] ρ2 = new byte[64];
-			Array.Copy(Bin2, 32, ρ2, 0, 64);
-
 			byte[] K = new byte[32];
 			Array.Copy(Bin2, 96, K, 0, 32);
-			Clear(Bin2);
 
 			uint[,][] Â = this.ExpandÂ(ρ);
-			uint[][] s1 = this.ExpandS1(ρ2);
-			uint[][] s2 = this.ExpandS2(ρ2);
+
+			byte[] B = new byte[66];            // ρ´ || 2 index bytes
+			Array.Copy(Bin2, 32, B, 0, 64);
+
+			uint[][] s1 = this.ExpandS(B, this.k);
+			uint[][] s2 = this.ExpandS(B, this.l);
+
+			Clear(B);
 
 			NTT(s1);
 
@@ -503,13 +505,14 @@ namespace Waher.Security.PQC
 
 			for (i = 0; i < this.k; i++)
 			{
-				t[i] = (uint[])s2[i].Clone();
+				t[i] = new uint[n];
 
 				for (j = 0; j < this.l; j++)
 					MultiplyNTTsAndAdd(Â[i, j], s1[j], t[i]);
 			}
 
 			InverseNTT(t);
+			AddTo(t, s2);
 
 			// Powewr2Round, decomposes t into two arrays t1, t0, where t=t1*2^d+t0 mod q
 			// (Algorithm 35, §7,4)
@@ -538,9 +541,9 @@ namespace Waher.Security.PQC
 			byte[] tr = H(PublicKey, 64);
 			byte[] PrivateKey = this.PrivateKeyEncode(ρ, K, tr, s1, s2, t0);
 
+			Clear(Bin2);
 			Clear(t);
 			Clear(ρ);
-			Clear(ρ2);
 			Clear(K);
 			Clear(s1);
 			Clear(s2);
@@ -583,37 +586,24 @@ namespace Waher.Security.PQC
 		}
 
 		/// <summary>
-		/// Samples an ℓ vector s1 of elements of 𝑇𝑞.
+		/// Samples elements of 𝑇𝑞.
 		/// (Algorithm 33, in §7.3)
 		/// </summary>
-		/// <param name="ρ2">Seed</param>
+		/// <param name="Seed">Seed</param>
+		/// <param name="Nr">Number of polynomials to generate.</param>
 		/// <returns>Vector of polynomials</returns>
-		private uint[][] ExpandS1(byte[] ρ2)
+		private uint[][] ExpandS(byte[] Seed, int Nr)
 		{
-			uint[][] s1 = new uint[this.l][];
-			byte r;
+			uint[][] s = new uint[Nr][];
+			byte r = 0;
 
-			for (r = 0; r < this.l; r++)
-				s1[r] = this.RejBoundedPoly(ρ2, r);
+			while (Nr-- > 0)
+			{
+				s[r++] = this.RejBoundedPoly(Seed);
+				Seed[64]++;
+			}
 
-			return s1;
-		}
-
-		/// <summary>
-		/// Samples a k vector s2 of elements of 𝑇𝑞.
-		/// (Algorithm 33, in §7.3)
-		/// </summary>
-		/// <param name="ρ2">Seed</param>
-		/// <returns>Vector of polynomials</returns>
-		private uint[][] ExpandS2(byte[] ρ2)
-		{
-			uint[][] s2 = new uint[this.k][];
-			byte r;
-
-			for (r = 0; r < this.k; r++)
-				s2[r] = this.RejBoundedPoly(ρ2, (ushort)(r + this.l));
-
-			return s2;
+			return s;
 		}
 
 		/// <summary>
@@ -733,18 +723,11 @@ namespace Waher.Security.PQC
 		/// an index into a polynomial with bounded coefficients.
 		/// </summary>
 		/// <param name="Seed">Seed value</param>
-		/// <param name="Index">Index value.</param>
 		/// <returns>Sample in R𝑞</returns>
-		public uint[] RejBoundedPoly(byte[] Seed, ushort Index)
+		public uint[] RejBoundedPoly(byte[] Seed)
 		{
 			SHAKE256 HashFunction = new SHAKE256(0);
-			int c = Seed.Length;
-			byte[] B = new byte[c + 2];
-			Array.Copy(Seed, 0, B, 0, c);
-			B[c] = (byte)Index;
-			B[c + 1] = (byte)(Index >> 8);
-
-			Keccak1600.Context Context = HashFunction.Absorb(B);
+			Keccak1600.Context Context = HashFunction.Absorb(Seed);
 			uint[] Result = new uint[n];
 			int Pos = 0;
 			int i;
@@ -816,8 +799,6 @@ namespace Waher.Security.PQC
 			else
 				throw new InvalidOperationException("Invalid η.");
 
-			Clear(B);
-
 			return Result;
 		}
 
@@ -835,7 +816,7 @@ namespace Waher.Security.PQC
 			int Len;
 			int Start;
 			int m = 0;
-			uint ζ;
+			ulong ζ;
 			uint t;
 
 			for (Len = n >> 1; Len >= 1; Len >>= 1)
@@ -846,7 +827,7 @@ namespace Waher.Security.PQC
 
 					for (j = Start; j < Start + Len; j++)
 					{
-						t = ζ * f[j + Len] % q;
+						t = (uint)(ζ * f[j + Len] % q);
 						f[j + Len] = (f[j] + q - t) % q;
 						f[j] = (f[j] + t) % q;
 					}
@@ -882,7 +863,7 @@ namespace Waher.Security.PQC
 			int StartLen;
 			int Start;
 			int m = 256;
-			uint ζ;
+			ulong ζ;
 			uint t;
 
 			for (Len = 1; Len < n; Len <<= 1)
@@ -898,13 +879,13 @@ namespace Waher.Security.PQC
 					{
 						t = f[j];
 						f[j] = (t + f[j + Len]) % q;
-						f[j + Len] = ζ * (f[j + Len] + q - t) % q;
+						f[j + Len] = (uint)(ζ * (f[j + Len] + q - t) % q);
 					}
 				}
 			}
 
 			for (j = 0; j < n; j++)
-				f[j] = 8347681 * f[j] % q;   // 8347681 = 256^-1 mod q
+				f[j] = (uint)(8347681ul * f[j] % q);   // 8347681 = 256^-1 mod q
 		}
 
 		/// <summary>

@@ -494,8 +494,8 @@ namespace Waher.Security.PQC
 			byte[] B = new byte[66];            // ρ´ || 2 index bytes
 			Array.Copy(Bin2, 32, B, 0, 64);
 
-			short[][] s1 = this.ExpandS(B, this.k);
-			short[][] s2 = this.ExpandS(B, this.l);
+			short[][] s1 = this.ExpandS(B, this.l);
+			short[][] s2 = this.ExpandS(B, this.k);
 
 			Clear(B);
 

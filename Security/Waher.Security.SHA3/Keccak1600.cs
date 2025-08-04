@@ -576,7 +576,8 @@ namespace Waher.Security.SHA3
 			/// Calculates another <paramref name="NrBytes"/> number of bytes of the digest.
 			/// </summary>
 			/// <param name="NrBytes">Number of bytes to compute.</param>
-			/// <returns></returns>
+			/// <returns>Next <paramref name="NrBytes"/> number of bytes in the dynamic
+			/// digest.</returns>
 			public byte[] Squeeze(int NrBytes)
 			{
 				byte[] Z = new byte[NrBytes];
@@ -602,6 +603,21 @@ namespace Waher.Security.SHA3
 					this.state = this.hashFunction.ComputeFixed(this.state);
 					this.statePosition = 0;
 				}
+			}
+
+			/// <summary>
+			/// Calculates another byte of the digest.
+			/// </summary>
+			/// <returns>Next byte in the dynamic digest.</returns>
+			public byte Squeeze1()
+			{
+				if (this.statePosition >= this.hashFunction.r8)
+				{
+					this.state = this.hashFunction.ComputeFixed(this.state);
+					this.statePosition = 0;
+				}
+
+				return this.state[this.statePosition++];
 			}
 		}
 	}

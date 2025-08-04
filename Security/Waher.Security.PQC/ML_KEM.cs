@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using Waher.Security.SHA3;
 
 namespace Waher.Security.PQC
@@ -210,7 +209,7 @@ namespace Waher.Security.PQC
 			i /= q;
 			i++;
 			i >>= 1;
-			return (ushort)(i & bitMask[d]);
+			return (ushort)(i & ushortBitMask[d]);
 		}
 
 		/// <summary>
@@ -342,27 +341,16 @@ namespace Waher.Security.PQC
 			{
 				ushort Value = Values[i];
 
-				Value &= bitMask[d];
+				Value &= ushortBitMask[d];
 				Output[Index] |= (byte)(Value << BitOffset);
 				BitOffset += d;
-				if (BitOffset >= 8)
+				while (BitOffset >= 8)
 				{
 					Index++;
 					BitOffset -= 8;
 
 					if (BitOffset > 0)
-					{
 						Output[Index] = (byte)(Value >> (d - BitOffset));
-
-						if (BitOffset >= 8)
-						{
-							BitOffset -= 8;
-							Index++;
-
-							if (BitOffset > 0)
-								Output[Index] = (byte)(Value >> (d - BitOffset));
-						}
-					}
 				}
 			}
 
@@ -440,7 +428,7 @@ namespace Waher.Security.PQC
 					if (BitsToUse > BitsLeft)
 						BitsToUse = BitsLeft;
 
-					Result[Pos] |= (ushort)((b & bitMask[BitsToUse]) << BitOffset);
+					Result[Pos] |= (ushort)((b & ushortBitMask[BitsToUse]) << BitOffset);
 					BitOffset += BitsToUse;
 					BitsLeft -= BitsToUse;
 					b >>= BitsToUse;

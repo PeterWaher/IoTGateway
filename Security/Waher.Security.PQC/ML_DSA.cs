@@ -1380,9 +1380,11 @@ namespace Waher.Security.PQC
 		/// <param name="Index">Index into output array where encoding will begin.</param>
 		/// <param name="a">-a is the smallest integer to encode.</param>
 		/// <param name="b">b is the largest integer to encode.</param>
+		/// <param name="MakeSigned">If integers modulus q should be represented as a 
+		/// signed residue value.</param>
 		/// <returns>Number of bytes encoded.</returns>
 		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
-		public static int BitPack(uint[] Values, byte[] Output, int Index, uint a, uint b)
+		public static int BitPack(uint[] Values, byte[] Output, int Index, uint a, uint b, bool MakeSigned)
 		{
 			int d = BitLen(b + a);
 			if (d < 1 || d > 30)
@@ -1397,7 +1399,17 @@ namespace Waher.Security.PQC
 
 			for (i = 0; i < c; i++)
 			{
-				Value = (int)(b - Values[i]);
+				Value = (int)Values[i];
+
+				if (MakeSigned)
+				{
+					Value %= q;
+					if (q - Value < Value)
+						Value -= q;
+				}
+
+				Value = (int)(b - Value);
+
 				Value &= intBitMask[d];
 				BitsLeft = d;
 
@@ -1515,11 +1527,11 @@ namespace Waher.Security.PQC
 		/// <param name="Index">Index into input array where decoding will begin.</param>
 		/// <param name="a">-a is the smallest integer to decode.</param>
 		/// <param name="b">b is the largest integer to dencode.</param>
-		/// <param name="MakeNonNegative">If integers modulus q should be represented as non-negative
-		/// integers.</param>
+		/// <param name="MakeUnsigned">If integers modulus q should be represented as non-negative
+		/// integers [0,q) (true).</param>
 		/// <returns>Number of bytes decoded.</returns>
 		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
-		public static int BitUnpack(uint[] Values, byte[] Input, int Index, uint a, uint b, bool MakeNonNegative)
+		public static int BitUnpack(uint[] Values, byte[] Input, int Index, uint a, uint b, bool MakeUnsigned)
 		{
 			int d = BitLen(b + a);
 			if (d < 1 || d > 30)
@@ -1551,8 +1563,16 @@ namespace Waher.Security.PQC
 
 				Value &= intBitMask[d];
 				j = (int)(b - Value) % q;
-				if (j < 0 && MakeNonNegative)
-					j += q;
+				if (MakeUnsigned)
+				{
+					if (j < 0)
+						j += q;
+				}
+				else
+				{
+					if (q - j < j)
+						j -= q;
+				}
 
 				Values[i] = (uint)j;
 			}
@@ -2043,7 +2063,7 @@ namespace Waher.Security.PQC
 			Array.Copy(c, 0, Result, 0, l1);
 
 			for (i = 0; i < this.l; i++)
-				l1 += BitPack(z[i], Result, l1, this.γ1 - 1, this.γ1);
+				l1 += BitPack(z[i], Result, l1, this.γ1 - 1, this.γ1, true);
 
 			Array.Copy(h, 0, Result, l1, l3);
 

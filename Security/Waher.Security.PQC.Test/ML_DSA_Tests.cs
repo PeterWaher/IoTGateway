@@ -104,7 +104,7 @@
 			}
 
 			byte[] Output = new byte[ExpectedNrBytes];
-			int NrBytes = ML_DSA.BitPack(Values, Output, 0, (uint)a, (uint)b);
+			int NrBytes = ML_DSA.BitPack(Values, Output, 0, (uint)a, (uint)b, false);
 
 			Assert.AreEqual(ExpectedNrBytes, NrBytes, "Unexpected number of bytes generated.");
 

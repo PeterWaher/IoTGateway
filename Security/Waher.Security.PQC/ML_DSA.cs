@@ -1046,6 +1046,34 @@ namespace Waher.Security.PQC
 		/// </summary>
 		/// <param name="f">Polynomial that will be incremented by <paramref name="g"/>.</param>
 		/// <param name="g">Polynomial to add to <paramref name="f"/>.</param>
+		public static void AddTo(int[] f, short[] g)
+		{
+			int i;
+
+			for (i = 0; i < n; i++)
+				f[i] += g[i];
+		}
+
+		/// <summary>
+		/// Adds vector <paramref name="g"/> to vector <paramref name="f"/>.
+		/// </summary>
+		/// <param name="f">Vector of polynomials that will be incremented by <paramref name="g"/>.</param>
+		/// <param name="g">Vector of polynomials to add to <paramref name="f"/>.</param>
+		public static void AddTo(int[][] f, short[][] g)
+		{
+			int i, c = f.Length;
+			if (g.Length != c)
+				throw new ArgumentException("Vectors must have the same number of polynomials.", nameof(g));
+
+			for (i = 0; i < c; i++)
+				AddTo(f[i], g[i]);
+		}
+
+		/// <summary>
+		/// Adds <paramref name="g"/> to <paramref name="f"/>.
+		/// </summary>
+		/// <param name="f">Polynomial that will be incremented by <paramref name="g"/>.</param>
+		/// <param name="g">Polynomial to add to <paramref name="f"/>.</param>
 		public static void AddTo(uint[] f, short[] g)
 		{
 			int i;
@@ -1231,19 +1259,17 @@ namespace Waher.Security.PQC
 			uint[][] Result = new uint[k][];
 			uint[] f;
 			uint[] si;
-			ulong a;
 
 			for (i = 0; i < k; i++)
 			{
 				Result[i] = f = new uint[n];
-				a = c[i];
 				si = s[i];
 
 				if (si.Length != n)
 					throw new ArgumentException("Polynomials must have " + n + " coefficients.", nameof(s));
 
 				for (j = 0; j < n; j++)
-					f[j] = (uint)(a * si[j] % q);
+					f[j] = (uint)((long)c[j] * si[j] % q);
 			}
 
 			return Result;
@@ -1325,6 +1351,8 @@ namespace Waher.Security.PQC
 			for (i = 0; i < c; i++)
 			{
 				Value = (int)(b - Values[i]);
+				if (Value < 0)
+					Value += q;
 
 				Value &= ushortBitMask[d];
 				Output[Index] |= (byte)(Value << BitOffset);
@@ -1370,7 +1398,6 @@ namespace Waher.Security.PQC
 			for (i = 0; i < c; i++)
 			{
 				Value = (int)(b - Values[i]);
-
 				Value &= intBitMask[d];
 				BitsLeft = d;
 
@@ -1488,9 +1515,11 @@ namespace Waher.Security.PQC
 		/// <param name="Index">Index into input array where decoding will begin.</param>
 		/// <param name="a">-a is the smallest integer to decode.</param>
 		/// <param name="b">b is the largest integer to dencode.</param>
+		/// <param name="MakeNonNegative">If integers modulus q should be represented as non-negative
+		/// integers.</param>
 		/// <returns>Number of bytes decoded.</returns>
 		/// <exception cref="ArgumentOutOfRangeException">If d lies outside of the valid range.</exception>
-		public static int BitUnpack(uint[] Values, byte[] Input, int Index, uint a, uint b)
+		public static int BitUnpack(uint[] Values, byte[] Input, int Index, uint a, uint b, bool MakeNonNegative)
 		{
 			int d = BitLen(b + a);
 			if (d < 1 || d > 30)
@@ -1521,7 +1550,11 @@ namespace Waher.Security.PQC
 				}
 
 				Value &= intBitMask[d];
-				Values[i] = (uint)(b - Value);
+				j = (int)(b - Value) % q;
+				if (j < 0 && MakeNonNegative)
+					j += q;
+
+				Values[i] = (uint)j;
 			}
 
 			if (BitOffset > 0)
@@ -1628,7 +1661,7 @@ namespace Waher.Security.PQC
 			byte[] cSeed = null;
 			uint[][] z = null;
 			bool Found = false;
-			int IterationLimit = 1000;
+			int IterationLimit = 10000;
 
 			while (!Found)
 			{
@@ -1659,7 +1692,7 @@ namespace Waher.Security.PQC
 
 				int w1Len = BitLen((uint)((q - 1) / this.twoγ2 - 1));
 
-				Bin = new byte[64 + this.k * w1Len << 5];
+				Bin = new byte[64 + this.k * (w1Len << 5)];
 				Array.Copy(μ, 0, Bin, 0, 64);
 
 				int Pos = 64;
@@ -1684,8 +1717,9 @@ namespace Waher.Security.PQC
 				SubtractFrom(w, cs2);
 				int[][] r0 = this.LowBits(w);
 
-				if (InfinityNorm(z) < this.γ1 - this.β &&
-					InfinityNorm(r0) < this.γ2 - this.β)
+				uint nz = InfinityNorm(z);
+
+				if (nz < this.γ1 - this.β && InfinityNorm(r0) < this.γ2 - this.β)
 				{
 					uint[][] ct0 = ScalarProductNTT(NTTc, NTTt0);
 					InverseNTT(ct0);
@@ -1700,6 +1734,8 @@ namespace Waher.Security.PQC
 					Clear(ct0);
 				}
 
+				Clear(y);
+				Clear(w);
 				Clear(cs1);
 				Clear(cs2);
 				Clear(z);
@@ -1831,19 +1867,19 @@ namespace Waher.Security.PQC
 			int r;
 			byte[] v;
 
-			byte[] ρ1 = new byte[34];
-			Array.Copy(ρ, 0, ρ1, 0, 32);
+			byte[] ρ1 = new byte[66];
+			Array.Copy(ρ, 0, ρ1, 0, 64);
 
 			for (r = 0; r < this.l; r++)
 			{
-				ρ1[32] = (byte)μ;
-				ρ1[33] = (byte)(μ >> 8);
+				ρ1[64] = (byte)μ;
+				ρ1[65] = (byte)(μ >> 8);
 				μ++;
 
 				v = H(ρ1, c << 5);
 
 				y[r] = new uint[n];
-				BitUnpack(y[r], v, 0, this.γ1 - 1, this.γ1);
+				BitUnpack(y[r], v, 0, this.γ1 - 1, this.γ1, true);
 			}
 
 			return y;
@@ -1930,13 +1966,11 @@ namespace Waher.Security.PQC
 			int i, k;
 			byte j;
 
-			for (i = n - this.τ; i < n; i++)
+			for (i = n - this.τ, k = 0; i < n; i++, k++)
 			{
 				j = Context.Squeeze1();
 				while (j > i)
 					j = Context.Squeeze1();
-
-				k = i + this.τ - n;
 
 				c[i] = c[j];
 				c[j] = (s[k >> 3] & (1 << (k & 7))) == 0 ? (short)1 : (short)-1;
@@ -1998,7 +2032,7 @@ namespace Waher.Security.PQC
 		private byte[] EncodeSignature(byte[] c, uint[][] z, byte[] h)
 		{
 			int l1 = c.Length;
-			int l2 = this.l * (1 + BitLen(this.γ1 - 1)) << 5;
+			int l2 = this.l * ((1 + BitLen(this.γ1 - 1)) << 5);
 			int l3 = h.Length;
 			int Len = l1 + l2 + l3;
 			int i;
@@ -2009,7 +2043,7 @@ namespace Waher.Security.PQC
 			for (i = 0; i < this.l; i++)
 				l1 += BitPack(z[i], Result, l1, this.γ1 - 1, this.γ1);
 
-			Array.Copy(h, 0, Result, l1 + l2, l3);
+			Array.Copy(h, 0, Result, l1, l3);
 
 			return Result;
 		}

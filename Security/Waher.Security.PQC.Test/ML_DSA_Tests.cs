@@ -4,6 +4,7 @@
 	public sealed class ML_DSA_Tests
 	{
 		private static readonly Random rnd = new();
+		private const int q = 8380417;
 
 		[DataTestMethod]
 		[DataRow(256, 2, 2, false, 0, 3 * 32)]
@@ -90,14 +91,16 @@
 			int ExpectedNrBytes)
 		{
 			uint[] Values = new uint[n];
-			int i;
-
+			int i, j;
+	
 			for (i = 0; i < n; i++)
 			{
 				if (Random)
-					Values[i] = (uint)(rnd.Next(0, b + a + 1) - a);
+					j = rnd.Next(0, b + a + 1) - a;
 				else
-					Values[i] = (uint)((i + ValueOffset) % (b + a) - a);
+					j = (i + ValueOffset) % (b + a + 1) - a;
+
+				Values[i] = (uint)j;
 			}
 
 			byte[] Output = new byte[ExpectedNrBytes];
@@ -106,12 +109,12 @@
 			Assert.AreEqual(ExpectedNrBytes, NrBytes, "Unexpected number of bytes generated.");
 
 			uint[] Values2 = new uint[n];
-			int NrBytes2 = ML_DSA.BitUnpack(Values2, Output, 0, (uint)a, (uint)b);
+			int NrBytes2 = ML_DSA.BitUnpack(Values2, Output, 0, (uint)a, (uint)b, false);
 
 			Assert.AreEqual(ExpectedNrBytes, NrBytes2, "Unexpected number of bytes decoded.");
 
 			for (i = 0; i < n; i++)
-				Assert.AreEqual(Values[i], Values2[i], "Unexpected decoded value at index " + i + ".");
+				Assert.AreEqual(Values[i] % q, Values2[i] % q, "Unexpected decoded value at index " + i + ".");
 		}
 
 		/// <summary>

@@ -922,17 +922,6 @@ namespace Waher.Security.PQC
 			return f0;
 		}
 
-		private static uint[][] ToUIntVectors(short[][] f)
-		{
-			int i, c = f.Length;
-			uint[][] f0 = new uint[c][];
-
-			for (i = 0; i < c; i++)
-				f0[i] = ToUIntVector(f[i]);
-
-			return f0;
-		}
-
 		/// <summary>
 		/// Canonical extension of <see cref="NTT(short[])"/>.
 		/// </summary>
@@ -1639,11 +1628,16 @@ namespace Waher.Security.PQC
 			byte[] cSeed = null;
 			uint[][] z = null;
 			bool Found = false;
+			int IterationLimit = 1000;
 
 			while (!Found)
 			{
-				short[][] y = this.ExpandMask(ρ2, κ);
+				if (--IterationLimit <= 0)
+					throw new InvalidOperationException("Unable to calculate signature.");
 
+				uint[][] y = this.ExpandMask(ρ2, κ);
+
+				z = Clone(y);
 				NTT(y);
 
 				uint[][] w = new uint[this.k][];
@@ -1685,7 +1679,6 @@ namespace Waher.Security.PQC
 				uint[][] cs2 = ScalarProductNTT(NTTc, NTTs2);
 				InverseNTT(cs2);
 
-				z = ToUIntVectors(y);
 				AddTo(z, cs1);
 
 				SubtractFrom(w, cs2);
@@ -1724,6 +1717,17 @@ namespace Waher.Security.PQC
 			Clear(NTTt0);
 
 			return this.EncodeSignature(cSeed, z, h);
+		}
+
+		private static uint[][] Clone(uint[][] v)
+		{
+			int i, c = v.Length;
+			uint[][] Result = new uint[c][];
+
+			for (i = 0; i < c; i++)
+				Result[i] = (uint[])v[i].Clone();
+
+			return Result;
 		}
 
 		/// <summary>
@@ -1820,9 +1824,9 @@ namespace Waher.Security.PQC
 			return Result;
 		}
 
-		private short[][] ExpandMask(byte[] ρ, ushort μ)
+		private uint[][] ExpandMask(byte[] ρ, ushort μ)
 		{
-			short[][] y = new short[this.l][];
+			uint[][] y = new uint[this.l][];
 			int c = BitLen(this.γ1 - 1) + 1;
 			int r;
 			byte[] v;
@@ -1838,7 +1842,7 @@ namespace Waher.Security.PQC
 
 				v = H(ρ1, c << 5);
 
-				y[r] = new short[n];
+				y[r] = new uint[n];
 				BitUnpack(y[r], v, 0, this.γ1 - 1, this.γ1);
 			}
 

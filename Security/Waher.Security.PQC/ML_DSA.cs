@@ -1670,6 +1670,9 @@ namespace Waher.Security.PQC
 
 				uint[][] y = this.ExpandMask(ρ2, κ);
 
+				if (!(z is null))
+					Clear(z);
+
 				z = Clone(y);
 				NTT(y);
 
@@ -1738,7 +1741,6 @@ namespace Waher.Security.PQC
 				Clear(w);
 				Clear(cs1);
 				Clear(cs2);
-				Clear(z);
 				Clear(r0);
 
 				κ += this.l;

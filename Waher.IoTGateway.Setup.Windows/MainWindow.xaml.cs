@@ -827,7 +827,7 @@ namespace Waher.IoTGateway.Setup.Windows
 				Doc.LoadXml(Xml);
 
 				if (EventExtensions.TryParse(Doc, out Event[] ParsedEvents))
-					Process.ProcessInstallEvents(ParsedEvents);
+					Process.ProcessInstallEvents(true, ParsedEvents);
 			}
 			catch (Exception)
 			{
@@ -852,7 +852,7 @@ namespace Waher.IoTGateway.Setup.Windows
 
 			public override async Task Queue(Event Event)
 			{
-				this.ProcessInstallEvents(Event);
+				this.ProcessInstallEvents(false, Event);
 
 				if (this.Window is not null)
 				{
@@ -870,17 +870,19 @@ namespace Waher.IoTGateway.Setup.Windows
 				}
 			}
 
-			public void ProcessInstallEvents(params Event[] ParsedEvents)
+			public void ProcessInstallEvents(bool LogEvents, params Event[] ParsedEvents)
 			{
 				int c = ParsedEvents.Length;
-				int NrEvents = this.Events.Count;
+				int NrEvents = LogEvents ? 0 : this.Events.Count;
 
 				for (int i = NrEvents; i < c; i++)
 				{
 					Event Event = ParsedEvents[i];
 
 					this.Events.Add(Event);
-					Log.Event(Event);
+				
+					if (LogEvents)
+						Log.Event(Event);
 
 					switch (Event.EventId)
 					{
@@ -899,54 +901,9 @@ namespace Waher.IoTGateway.Setup.Windows
 						case "InstallationStatus":
 							this.InstallationStatus = Event.Message;
 							break;
-
-						case "TrayIconRegistered":
-							if (Event.Tags is not null)
-							{
-								string? Executable = null;
-								string? Arguments = null;
-
-								foreach (KeyValuePair<string, object> P in Event.Tags)
-								{
-									if (P.Value is string s)
-									{
-										switch (P.Key)
-										{
-											case "Executable":
-												Executable = s;
-												break;
-
-											case "Arguments":
-												Arguments = s;
-												break;
-										}
-									}
-								}
-
-								if (!string.IsNullOrEmpty(Executable) && !string.IsNullOrEmpty(Arguments))
-									StartTrayApplication(Executable, Arguments);
-							}
-							break;
 					}
 				}
 			}
-		}
-
-		private static void StartTrayApplication(string Executable, string Arguments)
-		{
-			ProcessStartInfo StartInfo = new()
-			{
-				FileName = Executable,
-				WorkingDirectory = Path.GetDirectoryName(Executable),
-				Arguments = Arguments,
-				UseShellExecute = true
-			};
-
-			App.LogProcessStart("Starting tray icon application.", StartInfo);
-
-			Process? P = Process.Start(StartInfo);
-			if (P is null)
-				Log.Error("Unable to start tray icon application.");
 		}
 
 		private async Task ShowInstallationResult(bool Errors, int? PortNumber)

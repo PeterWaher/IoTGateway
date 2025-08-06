@@ -207,27 +207,6 @@ namespace Waher.Security.PQC
 		}
 
 		/// <summary>
-		/// Signs a message using the ML-DSA algorithm and a precomputed μ.
-		/// (Algorithm 2 ML-DSA.Sign() in §5.2)
-		/// </summary>
-		/// <param name="PrivateKey">Private key</param>
-		/// <param name="μ">Precomputed μ.</param>
-		/// <param name="Seed">Optional 32-byte randomness.</param>
-		/// <param name="RejectionCount">Number of rejected signatures created before
-		/// an approved signature was calculated.</param>
-		/// <returns>Digital signature.</returns>
-		public byte[] Sign_μPecomputed(byte[] PrivateKey, byte[] μ, byte[] Seed, 
-			out int RejectionCount)
-		{
-			if (Seed is null)
-				Seed = new byte[32];
-			else if (Seed.Length != 32)
-				throw new ArgumentException("Seed must be 32 bytes long.", nameof(Seed));
-
-			return this.Sign_Internal(PrivateKey, μ, true, Seed, out RejectionCount);
-		}
-
-		/// <summary>
 		/// Verifies a digital signature using the ML-DSA algorithm.
 		/// (Algorithm 3 ML-DSA.Verify() in §5.3)
 		/// </summary>
@@ -1687,7 +1666,16 @@ namespace Waher.Security.PQC
 			8077412, 3531229, 4405932, 4606686, 1900052, 7598542, 1054478, 7648983
 		};
 
-		private byte[] Sign_Internal(byte[] PrivateKey, byte[] Message, bool μPrecomputed,
+		/// <summary>
+		/// Internal signature interface
+		/// </summary>
+		/// <param name="PrivateKey">Private Key</param>
+		/// <param name="Message">Message</param>
+		/// <param name="μPrecomputed">If message represents a precomputed μ.</param>
+		/// <param name="Seed">Randomness</param>
+		/// <param name="RejectionCount">Rejection count.</param>
+		/// <returns>Signature</returns>
+		public byte[] Sign_Internal(byte[] PrivateKey, byte[] Message, bool μPrecomputed,
 			byte[] Seed, out int RejectionCount)
 		{
 			if (!this.TryDecodePrivateKey(PrivateKey, out byte[] ρ, out byte[] K,
@@ -1695,6 +1683,11 @@ namespace Waher.Security.PQC
 			{
 				throw new ArgumentException("Invalid private key.", nameof(PrivateKey));
 			}
+
+			if (Seed is null)
+				Seed = new byte[32];
+			else if (Seed.Length != 32)
+				throw new ArgumentException("Seed must be 32 bytes long.", nameof(Seed));
 
 			RejectionCount = 0;
 

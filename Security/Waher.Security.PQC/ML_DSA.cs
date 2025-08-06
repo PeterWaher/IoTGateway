@@ -136,10 +136,12 @@ namespace Waher.Security.PQC
 		/// </summary>
 		/// <param name="PrivateKey">Private key</param>
 		/// <param name="Message">Message to sign</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
 		/// <returns>Digital signature.</returns>
-		public byte[] Sign(byte[] PrivateKey, byte[] Message)
+		public byte[] Sign(byte[] PrivateKey, byte[] Message, out int RejectionCount)
 		{
-			return this.Sign(PrivateKey, Message, (byte[])null);
+			return this.Sign(PrivateKey, Message, (byte[])null, out RejectionCount);
 		}
 
 		/// <summary>
@@ -149,11 +151,14 @@ namespace Waher.Security.PQC
 		/// <param name="PrivateKey">Private key</param>
 		/// <param name="Message">Message to sign</param>
 		/// <param name="Context">Context, optionally empty.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
 		/// <returns>Digital signature.</returns>
-		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context)
+		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context, 
+			out int RejectionCount)
 		{
 			byte[] ξ = CreateSeed();
-			byte[] Result = this.Sign(PrivateKey, Message, Context, ξ);
+			byte[] Result = this.Sign(PrivateKey, Message, Context, ξ, out RejectionCount);
 			Clear(ξ);
 
 			return Result;
@@ -167,8 +172,11 @@ namespace Waher.Security.PQC
 		/// <param name="Message">Message to sign</param>
 		/// <param name="Context">Context, optionally empty.</param>
 		/// <param name="Seed">Optional 32-byte randomness.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
 		/// <returns>Digital signature.</returns>
-		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context, byte[] Seed)
+		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context, byte[] Seed, 
+			out int RejectionCount)
 		{
 			int MessageLen = Message.Length;
 			int ContextLen;
@@ -195,7 +203,7 @@ namespace Waher.Security.PQC
 
 			Array.Copy(Message, 0, Bin, 2 + ContextLen, MessageLen);
 
-			return this.Sign_Internal(PrivateKey, Bin, false, Seed);
+			return this.Sign_Internal(PrivateKey, Bin, false, Seed, out RejectionCount);
 		}
 
 		/// <summary>
@@ -205,15 +213,18 @@ namespace Waher.Security.PQC
 		/// <param name="PrivateKey">Private key</param>
 		/// <param name="μ">Precomputed μ.</param>
 		/// <param name="Seed">Optional 32-byte randomness.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
 		/// <returns>Digital signature.</returns>
-		public byte[] Sign_μPecomputed(byte[] PrivateKey, byte[] μ, byte[] Seed)
+		public byte[] Sign_μPecomputed(byte[] PrivateKey, byte[] μ, byte[] Seed, 
+			out int RejectionCount)
 		{
 			if (Seed is null)
 				Seed = new byte[32];
 			else if (Seed.Length != 32)
 				throw new ArgumentException("Seed must be 32 bytes long.", nameof(Seed));
 
-			return this.Sign_Internal(PrivateKey, μ, true, Seed);
+			return this.Sign_Internal(PrivateKey, μ, true, Seed, out RejectionCount);
 		}
 
 		/// <summary>
@@ -257,10 +268,13 @@ namespace Waher.Security.PQC
 		/// <param name="PrivateKey">Private key</param>
 		/// <param name="Message">Message to sign</param>
 		/// <param name="HashAlgorithm">Name of hash algorithm.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
 		/// <returns>Digital signature.</returns>
-		public byte[] Sign(byte[] PrivateKey, byte[] Message, string HashAlgorithm)
+		public byte[] Sign(byte[] PrivateKey, byte[] Message, string HashAlgorithm, 
+			out int RejectionCount)
 		{
-			return this.Sign(PrivateKey, Message, null, HashAlgorithm);
+			return this.Sign(PrivateKey, Message, null, HashAlgorithm, out RejectionCount);
 		}
 
 		/// <summary>
@@ -271,11 +285,16 @@ namespace Waher.Security.PQC
 		/// <param name="Message">Message to sign</param>
 		/// <param name="Context">Context, optionally empty.</param>
 		/// <param name="HashAlgorithm">Name of hash algorithm.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
 		/// <returns>Digital signature.</returns>
-		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context, string HashAlgorithm)
+		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context, 
+			string HashAlgorithm, out int RejectionCount)
 		{
 			byte[] ξ = CreateSeed();
-			byte[] Result = this.Sign(PrivateKey, Message, Context, ξ, HashAlgorithm);
+			byte[] Result = this.Sign(PrivateKey, Message, Context, ξ, HashAlgorithm, 
+				out RejectionCount);
+
 			Clear(ξ);
 
 			return Result;
@@ -290,9 +309,11 @@ namespace Waher.Security.PQC
 		/// <param name="Context">Context, optionally empty.</param>
 		/// <param name="Seed">Optional 32-byte randomness.</param>
 		/// <param name="HashAlgorithm">Name of hash algorithm.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
 		/// <returns>Digital signature.</returns>
 		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context, byte[] Seed,
-			string HashAlgorithm)
+			string HashAlgorithm, out int RejectionCount)
 		{
 			int ContextLen;
 
@@ -330,7 +351,7 @@ namespace Waher.Security.PQC
 
 			Array.Copy(Message, 0, Bin, Pos, MessageLen);
 
-			return this.Sign_Internal(PrivateKey, Bin, false, Seed);
+			return this.Sign_Internal(PrivateKey, Bin, false, Seed, out RejectionCount);
 		}
 
 		private static bool TryGetHashFunction(string Name, out HashFunctionArray H, out byte[] Oid)
@@ -1667,13 +1688,15 @@ namespace Waher.Security.PQC
 		};
 
 		private byte[] Sign_Internal(byte[] PrivateKey, byte[] Message, bool μPrecomputed,
-			byte[] Seed)
+			byte[] Seed, out int RejectionCount)
 		{
 			if (!this.TryDecodePrivateKey(PrivateKey, out byte[] ρ, out byte[] K,
 				out byte[] tr, out short[][] s1, out short[][] s2, out short[][] t0))
 			{
 				throw new ArgumentException("Invalid private key.", nameof(PrivateKey));
 			}
+
+			RejectionCount = 0;
 
 			uint[][] NTTs1 = NTT(s1);
 			uint[][] NTTs2 = NTT(s2);
@@ -1769,9 +1792,8 @@ namespace Waher.Security.PQC
 				SubtractFrom(w, cs2);
 				int[][] r0 = this.LowBits(w);
 
-				uint nz = InfinityNorm(z);
-
-				if (nz < this.γ1 - this.β && InfinityNorm(r0) < this.γ2 - this.β)
+				if (InfinityNorm(z) < this.γ1 - this.β &&
+					InfinityNorm(r0) < this.γ2 - this.β)
 				{
 					uint[][] ct0 = ScalarProductNTT(NTTc, NTTt0);
 					InverseNTT(ct0);
@@ -1781,10 +1803,14 @@ namespace Waher.Security.PQC
 
 					if (InfinityNorm(ct0) < this.γ2)
 						Found = true;
+					else
+						RejectionCount++;
 
 					h = this.MakeAndEncodeHint(ct0, w); // Alters ct0
 					Clear(ct0);
 				}
+				else
+					RejectionCount++;
 
 				Clear(y);
 				Clear(w);

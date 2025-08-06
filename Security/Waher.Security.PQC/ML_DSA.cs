@@ -154,7 +154,7 @@ namespace Waher.Security.PQC
 		/// <param name="RejectionCount">Number of rejected signatures created before
 		/// an approved signature was calculated.</param>
 		/// <returns>Digital signature.</returns>
-		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context, 
+		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context,
 			out int RejectionCount)
 		{
 			byte[] ξ = CreateSeed();
@@ -175,7 +175,7 @@ namespace Waher.Security.PQC
 		/// <param name="RejectionCount">Number of rejected signatures created before
 		/// an approved signature was calculated.</param>
 		/// <returns>Digital signature.</returns>
-		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context, byte[] Seed, 
+		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context, byte[] Seed,
 			out int RejectionCount)
 		{
 			int MessageLen = Message.Length;
@@ -250,7 +250,7 @@ namespace Waher.Security.PQC
 		/// <param name="RejectionCount">Number of rejected signatures created before
 		/// an approved signature was calculated.</param>
 		/// <returns>Digital signature.</returns>
-		public byte[] Sign(byte[] PrivateKey, byte[] Message, string HashAlgorithm, 
+		public byte[] Sign(byte[] PrivateKey, byte[] Message, string HashAlgorithm,
 			out int RejectionCount)
 		{
 			return this.Sign(PrivateKey, Message, null, HashAlgorithm, out RejectionCount);
@@ -267,11 +267,11 @@ namespace Waher.Security.PQC
 		/// <param name="RejectionCount">Number of rejected signatures created before
 		/// an approved signature was calculated.</param>
 		/// <returns>Digital signature.</returns>
-		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context, 
+		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context,
 			string HashAlgorithm, out int RejectionCount)
 		{
 			byte[] ξ = CreateSeed();
-			byte[] Result = this.Sign(PrivateKey, Message, Context, ξ, HashAlgorithm, 
+			byte[] Result = this.Sign(PrivateKey, Message, Context, ξ, HashAlgorithm,
 				out RejectionCount);
 
 			Clear(ξ);
@@ -1782,25 +1782,31 @@ namespace Waher.Security.PQC
 
 				AddTo(z, cs1);
 
-				SubtractFrom(w, cs2);
-				int[][] r0 = this.LowBits(w);
-
-				if (InfinityNorm(z) < this.γ1 - this.β &&
-					InfinityNorm(r0) < this.γ2 - this.β)
+				if (InfinityNorm(z) < this.γ1 - this.β)
 				{
-					uint[][] ct0 = ScalarProductNTT(NTTc, NTTt0);
-					InverseNTT(ct0);
+					SubtractFrom(w, cs2);
+					int[][] r0 = this.LowBits(w);
 
-					AddTo(w, ct0);
-					Negate(ct0);
+					if (InfinityNorm(r0) < this.γ2 - this.β)
+					{
+						uint[][] ct0 = ScalarProductNTT(NTTc, NTTt0);
+						InverseNTT(ct0);
 
-					if (InfinityNorm(ct0) < this.γ2)
-						Found = true;
+						AddTo(w, ct0);
+						Negate(ct0);
+
+						if (InfinityNorm(ct0) < this.γ2)
+							Found = true;
+						else
+							RejectionCount++;
+
+						h = this.MakeAndEncodeHint(ct0, w); // Alters ct0
+						Clear(ct0);
+					}
 					else
 						RejectionCount++;
 
-					h = this.MakeAndEncodeHint(ct0, w); // Alters ct0
-					Clear(ct0);
+					Clear(r0);
 				}
 				else
 					RejectionCount++;
@@ -1809,7 +1815,6 @@ namespace Waher.Security.PQC
 				Clear(w);
 				Clear(cs1);
 				Clear(cs2);
-				Clear(r0);
 
 				κ += this.l;
 			}
@@ -1898,9 +1903,14 @@ namespace Waher.Security.PQC
 			{
 				v = f[i];
 
-				w = q - v;
-				if (w < v)
-					v = w;
+				if (v < 0)
+					v = -v;
+				else
+				{
+					w = q - v;
+					if (w < v)
+						v = w;
+				}
 
 				if (v > Result)
 					Result = v;

@@ -166,7 +166,7 @@ namespace Waher.Security.PQC
 		/// <param name="PrivateKey">Private key</param>
 		/// <param name="Message">Message to sign</param>
 		/// <param name="Context">Context, optionally empty.</param>
-		/// <param name="Seed">32-byte randomness.</param>
+		/// <param name="Seed">Optional 32-byte randomness.</param>
 		/// <returns>Digital signature.</returns>
 		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context, byte[] Seed)
 		{
@@ -195,7 +195,25 @@ namespace Waher.Security.PQC
 
 			Array.Copy(Message, 0, Bin, 2 + ContextLen, MessageLen);
 
-			return this.Sign_Internal(PrivateKey, Bin, Seed);
+			return this.Sign_Internal(PrivateKey, Bin, false, Seed);
+		}
+
+		/// <summary>
+		/// Signs a message using the ML-DSA algorithm and a precomputed μ.
+		/// (Algorithm 2 ML-DSA.Sign() in §5.2)
+		/// </summary>
+		/// <param name="PrivateKey">Private key</param>
+		/// <param name="μ">Precomputed μ.</param>
+		/// <param name="Seed">Optional 32-byte randomness.</param>
+		/// <returns>Digital signature.</returns>
+		public byte[] Sign_μPecomputed(byte[] PrivateKey, byte[] μ, byte[] Seed)
+		{
+			if (Seed is null)
+				Seed = new byte[32];
+			else if (Seed.Length != 32)
+				throw new ArgumentException("Seed must be 32 bytes long.", nameof(Seed));
+
+			return this.Sign_Internal(PrivateKey, μ, true, Seed);
 		}
 
 		/// <summary>
@@ -270,7 +288,7 @@ namespace Waher.Security.PQC
 		/// <param name="PrivateKey">Private key</param>
 		/// <param name="Message">Message to sign</param>
 		/// <param name="Context">Context, optionally empty.</param>
-		/// <param name="Seed">32-byte randomness.</param>
+		/// <param name="Seed">Optional 32-byte randomness.</param>
 		/// <param name="HashAlgorithm">Name of hash algorithm.</param>
 		/// <returns>Digital signature.</returns>
 		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context, byte[] Seed,
@@ -312,7 +330,7 @@ namespace Waher.Security.PQC
 
 			Array.Copy(Message, 0, Bin, Pos, MessageLen);
 
-			return this.Sign_Internal(PrivateKey, Bin, Seed);
+			return this.Sign_Internal(PrivateKey, Bin, false, Seed);
 		}
 
 		private static bool TryGetHashFunction(string Name, out HashFunctionArray H, out byte[] Oid)
@@ -321,18 +339,21 @@ namespace Waher.Security.PQC
 			{
 				case "SHA256":
 				case "SHA-256":
+				case "SHA2-256":
 					Oid = oidSha256;
 					H = Hashes.ComputeSHA256Hash;
 					return true;
 
 				case "SHA384":
 				case "SHA-384":
+				case "SHA2-384":
 					Oid = oidSha384;
 					H = Hashes.ComputeSHA384Hash;
 					return true;
 
 				case "SHA512":
 				case "SHA-512":
+				case "SHA2-512":
 					Oid = oidSha512;
 					H = Hashes.ComputeSHA512Hash;
 					return true;
@@ -1645,7 +1666,8 @@ namespace Waher.Security.PQC
 			8077412, 3531229, 4405932, 4606686, 1900052, 7598542, 1054478, 7648983
 		};
 
-		private byte[] Sign_Internal(byte[] PrivateKey, byte[] Message, byte[] Seed)
+		private byte[] Sign_Internal(byte[] PrivateKey, byte[] Message, bool μPrecomputed,
+			byte[] Seed)
 		{
 			if (!this.TryDecodePrivateKey(PrivateKey, out byte[] ρ, out byte[] K,
 				out byte[] tr, out short[][] s1, out short[][] s2, out short[][] t0))
@@ -1658,15 +1680,22 @@ namespace Waher.Security.PQC
 			uint[][] NTTt0 = NTT(t0);
 
 			uint[,][] Â = this.ExpandÂ(ρ);
+			byte[] μ;
+			byte[] Bin;
 
-			int MessageLen = Message.Length;
-			byte[] Bin = new byte[64 + MessageLen];
+			if (μPrecomputed)
+				μ = Message;
+			else
+			{
+				int MessageLen = Message.Length;
+				Bin = new byte[64 + MessageLen];
 
-			Array.Copy(tr, 0, Bin, 0, 64);
-			Array.Copy(Message, 0, Bin, 64, MessageLen);
+				Array.Copy(tr, 0, Bin, 0, 64);
+				Array.Copy(Message, 0, Bin, 64, MessageLen);
 
-			byte[] μ = H(Bin, 64);
-			Clear(Bin);
+				μ = H(Bin, 64);
+				Clear(Bin);
+			}
 
 			Bin = new byte[128];
 			Array.Copy(K, 0, Bin, 0, 32);

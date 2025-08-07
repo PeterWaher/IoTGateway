@@ -53,6 +53,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.SPF.Test", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script", "Script\Waher.Script\Waher.Script.csproj", "{D2B49A6C-CE7D-215C-F4B0-77D0CAF34DA9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Profiling", "Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj", "{DBD223D8-FC18-C63A-5940-B8C586D0B6F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,6 +161,10 @@ Global
 		{D2B49A6C-CE7D-215C-F4B0-77D0CAF34DA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2B49A6C-CE7D-215C-F4B0-77D0CAF34DA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2B49A6C-CE7D-215C-F4B0-77D0CAF34DA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBD223D8-FC18-C63A-5940-B8C586D0B6F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBD223D8-FC18-C63A-5940-B8C586D0B6F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBD223D8-FC18-C63A-5940-B8C586D0B6F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBD223D8-FC18-C63A-5940-B8C586D0B6F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

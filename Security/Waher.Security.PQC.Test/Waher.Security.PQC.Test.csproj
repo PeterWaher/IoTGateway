@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\Waher.Security.PQC\Waher.Security.PQC.csproj" />
     <ProjectReference Include="..\Waher.Security\Waher.Security.csproj" />

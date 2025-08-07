@@ -213,6 +213,19 @@ namespace Waher.Security.PQC
 		/// <param name="PublicKey">Public Key</param>
 		/// <param name="Message">Message</param>
 		/// <param name="Signature">Signature</param>
+		/// <returns>If the signature is valid.</returns>
+		public bool Verify(byte[] PublicKey, byte[] Message, byte[] Signature)
+		{
+			return this.Verify(PublicKey, Message, Signature, null);
+		}
+
+		/// <summary>
+		/// Verifies a digital signature using the ML-DSA algorithm.
+		/// (Algorithm 3 ML-DSA.Verify() in §5.3)
+		/// </summary>
+		/// <param name="PublicKey">Public Key</param>
+		/// <param name="Message">Message</param>
+		/// <param name="Signature">Signature</param>
 		/// <param name="Context">Context</param>
 		/// <returns>If the signature is valid.</returns>
 		public bool Verify(byte[] PublicKey, byte[] Message, byte[] Signature, byte[] Context)
@@ -1873,6 +1886,12 @@ namespace Waher.Security.PQC
 							RejectionCount++;
 
 						h = this.MakeAndEncodeHint(ct0, w); // Alters ct0
+						if (h is null)
+						{
+							Found = false;
+							RejectionCount++;
+						}
+
 						Clear(ct0);
 					}
 					else
@@ -2172,7 +2191,12 @@ namespace Waher.Security.PQC
 				for (j = 0; j < n; j++)
 				{
 					if (f[j] != g[j])
+					{
+						if (Index >= this.ω)
+							return null;        // ???
+
 						y[Index++] = (byte)j;
+					}
 				}
 
 				y[this.ω + i] = Index;

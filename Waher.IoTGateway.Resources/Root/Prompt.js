@@ -157,6 +157,9 @@ function GraphClicked(Image, Event, Tag)
 }
 
 document.addEventListener("keydown", e => {
+	if (!e.shiftKey || !e.ctrlKey)
+		return
+
 	var Script = document.getElementById("script");
 	if (Script.value === "")
 		repeadIndex = -1

@@ -1297,6 +1297,32 @@ namespace Waher.Security.PQC
 		}
 
 		/// <summary>
+		/// Multiplies a polynomial by 2^d
+		/// </summary>
+		/// <param name="f">Polynomial</param>
+		/// <param name="d">Shift</param>
+		public static void ShiftLeft(uint[] f, int d)
+		{
+			int i, c = f.Length;
+
+			for (i = 0; i < c; i++)
+				f[i] = (uint)(((ulong)f[i] << d) % q);
+		}
+
+		/// <summary>
+		/// Multiplies a vector of polynomials by 2^d
+		/// </summary>
+		/// <param name="f">Polynomials</param>
+		/// <param name="d">Shift</param>
+		public static void ShiftLeft(uint[][] f, int d)
+		{
+			int i, c = f.Length;
+
+			for (i = 0; i < c; i++)
+				ShiftLeft(f[i], d);
+		}
+
+		/// <summary>
 		/// Encodes an array of integers (mod 2^d) into a byte array, as defined by
 		/// Algorithm 16 in §7.1.
 		/// </summary>
@@ -1365,8 +1391,6 @@ namespace Waher.Security.PQC
 			int Index0 = Index;
 			int i, j;
 			int Value;
-			int HighBit = 1 << (d - 1);
-			int NegBits = -1 << d;
 
 			for (i = 0; i < c; i++)
 			{
@@ -1386,11 +1410,7 @@ namespace Waher.Security.PQC
 					}
 				}
 
-				Value &= ushortBitMask[d];
-				if ((Value & HighBit) != 0)
-					Value |= NegBits;
-
-				Values[i] = (short)Value;
+				Values[i] = (short)(Value & ushortBitMask[d]);
 			}
 
 			return Index - Index0;
@@ -2231,43 +2251,20 @@ namespace Waher.Security.PQC
 			short[] c = this.SampleInBall(cSeed);
 
 			NTT(z);
-			NTT(c);
 
-			uint[][] w = new uint[this.k][];
+			uint[] NTTc = NTT(c);
+			uint[][] NTTt1 = NTT(t1);
+
+			ShiftLeft(NTTt1, d);
+			uint[][] w = ScalarProductNTT(NTTc, NTTt1);
 			uint[] f;
-			short[] g;
-			int i, j, b;
-			long a;
+			int i, j;
+
+			Negate(w);
 
 			for (i = 0; i < this.k; i++)
 			{
-				w[i] = f = new uint[n];
-				g = t1[i];
-
-				for (j = 0; j < n; j++)
-				{
-					a = g[j];
-					if (a < 0)
-						a += q;
-
-					a <<= d;
-					f[j] = (uint)(a % q);
-				}
-
-				NTT(f);
-
-				for (j = 0; j < n; j++)
-				{
-					a = f[j];
-					b = c[j];
-
-					if (b < 0)
-						b += q;
-
-					f[j] = (uint)(a * b % q);
-				}
-
-				Negate(f);
+				f = w[i];
 
 				for (j = 0; j < this.l; j++)
 					MultiplyNTTsAndAdd(Â[i, j], z[j], f);
@@ -2430,6 +2427,7 @@ namespace Waher.Security.PQC
 
 		/// <summary>
 		/// Unpacks hints for an encoded signature.
+		/// (Algorithm 21, §7.1)
 		/// </summary>
 		/// <param name="Input">Binary input.</param>
 		/// <param name="Pos">Index into input where hints are encoded.</param>
@@ -2441,38 +2439,36 @@ namespace Waher.Security.PQC
 			int Index = 0;
 			bool First;
 			int i, j;
-			byte b, b0;
+			byte b, b1, b2;
 
-			for (i = 0, j = this.ω + Pos; i < this.k; i++, j++)
+			for (i = 0, j = this.ω; i < this.k; i++, j++)
 			{
 				h[i] = f = new bool[n];
 
-				b = Input[j];
+				b = Input[j + Pos];
 				if (b < Index || b > this.ω)
 					return null;
 
 				First = true;
-				b0 = 0;
+
+				b2 = b1 = Input[Index + Pos];
 
 				while (Index < b)
 				{
 					if (First)
-					{
-						if (b0 >= b)
-							return null;
-
 						First = false;
-					}
+					else if (b2 >= (b1 = Input[Index + Pos]))
+						return null;
 
-					f[b] = true;
-					b0 = b;
-					b = Input[++Index];
+					f[b1] = true;
+					b2 = b1;
+					Index++;
 				}
 			}
 
 			while (Index < this.ω)
 			{
-				if (Input[Index] != 0)
+				if (Input[Index++ + Pos] != 0)
 					return null;
 			}
 

@@ -810,13 +810,14 @@ namespace Waher.Security.PQC
 			NTT(e);
 
 			ushort[][] t = new ushort[this.k][];
+			ushort[] f;
 
 			for (i = 0; i < this.k; i++)
 			{
-				t[i] = (ushort[])e[i].Clone();
+				t[i] = f = (ushort[])e[i].Clone();
 
 				for (j = 0; j < this.k; j++)
-					MultiplyNTTsAndAdd(Â[i, j], s[j], t[i]);
+					MultiplyNTTsAndAdd(Â[i, j], s[j], f);
 			}
 
 			byte[] EncryptionKey = new byte[32 + this.k384];
@@ -963,13 +964,14 @@ namespace Waher.Security.PQC
 			NTT(y);
 
 			ushort[][] u = new ushort[this.k][];
+			ushort[] f;
 
 			for (i = 0; i < this.k; i++)
 			{
-				u[i] = new ushort[n];
+				u[i] = f = new ushort[n];
 
 				for (j = 0; j < this.k; j++)
-					MultiplyNTTsAndAdd(Â[j, i], y[j], u[i]);
+					MultiplyNTTsAndAdd(Â[j, i], y[j], f);
 			}
 
 			InverseNTT(u);

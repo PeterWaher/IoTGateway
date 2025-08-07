@@ -237,7 +237,7 @@ namespace Waher.Security.PQC
 
 			Array.Copy(Message, 0, Bin, 2 + ContextLen, MessageLen);
 
-			return this.Verify_Internal(PublicKey, Bin, Signature);
+			return this.Verify_Internal(PublicKey, Bin, false, Signature);
 		}
 
 		/// <summary>
@@ -485,7 +485,7 @@ namespace Waher.Security.PQC
 
 			Array.Copy(Message, 0, Bin, Pos, MessageLen);
 
-			return this.Verify_Internal(PublicKey, Bin, Signature);
+			return this.Verify_Internal(PublicKey, Bin, false, Signature);
 		}
 
 		/// <summary>
@@ -527,14 +527,15 @@ namespace Waher.Security.PQC
 			uint[][] NTTs1 = NTT(s1);
 
 			uint[][] t = new uint[this.k][];
+			uint[] f;
 			int i, j;
 
 			for (i = 0; i < this.k; i++)
 			{
-				t[i] = new uint[n];
+				t[i] = f = new uint[n];
 
 				for (j = 0; j < this.l; j++)
-					MultiplyNTTsAndAdd(Â[i, j], NTTs1[j], t[i]);
+					MultiplyNTTsAndAdd(Â[i, j], NTTs1[j], f);
 			}
 
 			InverseNTT(t);
@@ -546,7 +547,6 @@ namespace Waher.Security.PQC
 			short[][] t0 = new short[this.k][];
 			short[][] t1 = new short[this.k][];
 			short[] f0, f1;
-			uint[] f;
 			short r0, r1;
 			uint r;
 
@@ -722,7 +722,7 @@ namespace Waher.Security.PQC
 		}
 
 		/// <summary>
-		/// Decodes a private key for ML-DSA into a byte string.
+		/// Decodes a private key for ML-DSA from a byte string.
 		/// Algorithm 25, §7.2.
 		/// </summary>
 		/// <param name="PrivateKey">Private key.</param>
@@ -732,7 +732,7 @@ namespace Waher.Security.PQC
 		/// <param name="s2">Polynomials</param>
 		/// <param name="tr">Polynomials</param>
 		/// <param name="t0">Polynomials to encode.</param>
-		/// <returns>Public Key</returns>
+		/// <returns>If private key could be decoded.</returns>
 		private bool TryDecodePrivateKey(byte[] PrivateKey, out byte[] ρ, out byte[] K,
 			out byte[] tr, out short[][] s1, out short[][] s2, out short[][] t0)
 		{
@@ -1301,7 +1301,7 @@ namespace Waher.Security.PQC
 		/// Algorithm 16 in §7.1.
 		/// </summary>
 		/// <param name="Values">Array of integers.</param>
-		/// <param name="d">Number of bits, between 1 and 15.</param>
+		/// <param name="d">Number of bits per value, between 1 and 15.</param>
 		/// <param name="Output">Bytes will be encoded into this array.</param>
 		/// <param name="Index">Index into output array where encoding will begin.</param>
 		/// <returns>Number of bytes encoded.</returns>
@@ -1341,6 +1341,56 @@ namespace Waher.Security.PQC
 						}
 					}
 				}
+			}
+
+			return Index - Index0;
+		}
+
+		/// <summary>
+		/// Decodes an array of integers (mod 2^d) from a byte array, as defined by
+		/// Algorithm 18 in §7.1.
+		/// </summary>
+		/// <param name="Values">Decoded integers will be stored here.</param>
+		/// <param name="Input">Byte array</param>
+		/// <param name="Index">Index into array where decoding starts.</param>
+		/// <param name="d">Number of bits per value, between 1 and 15.</param>
+		/// <returns>Position after unpacking.</returns>
+		public static int SimpleBitUnpack(short[] Values, byte[] Input, int Index, int d)
+		{
+			if (d < 1 || d > 15)
+				throw new ArgumentOutOfRangeException(nameof(d), "Bitlength of a+b must be between 1 and 15.");
+
+			int c = Values.Length;
+			int BitOffset = 0;
+			int Index0 = Index;
+			int i, j;
+			int Value;
+			int HighBit = 1 << (d - 1);
+			int NegBits = -1 << d;
+
+			for (i = 0; i < c; i++)
+			{
+				Value = Input[Index] >> BitOffset;
+				BitOffset += d;
+
+				while (BitOffset >= 8)
+				{
+					Index++;
+					BitOffset -= 8;
+
+					if (BitOffset > 0)
+					{
+						j = d - BitOffset;
+						Value &= ushortBitMask[j];
+						Value |= Input[Index] << j;
+					}
+				}
+
+				Value &= ushortBitMask[d];
+				if ((Value & HighBit) != 0)
+					Value |= NegBits;
+
+				Values[i] = (short)Value;
 			}
 
 			return Index - Index0;
@@ -1668,6 +1718,7 @@ namespace Waher.Security.PQC
 
 		/// <summary>
 		/// Internal signature interface
+		/// (Algorithm 7, §6.2)
 		/// </summary>
 		/// <param name="PrivateKey">Private Key</param>
 		/// <param name="Message">Message</param>
@@ -1742,14 +1793,15 @@ namespace Waher.Security.PQC
 				NTT(y);
 
 				uint[][] w = new uint[this.k][];
+				uint[] f;
 				int i, j;
 
 				for (i = 0; i < this.k; i++)
 				{
-					w[i] = new uint[n];
+					w[i] = f = new uint[n];
 
 					for (j = 0; j < this.l; j++)
-						MultiplyNTTsAndAdd(Â[i, j], y[j], w[i]);
+						MultiplyNTTsAndAdd(Â[i, j], y[j], f);
 				}
 
 				InverseNTT(w);
@@ -2045,15 +2097,23 @@ namespace Waher.Security.PQC
 			byte[] s = Context.Squeeze(8);
 			int i, k;
 			byte j;
+			byte Bit;
 
-			for (i = n - this.τ, k = 0; i < n; i++, k++)
+			for (i = n - this.τ, k = 0, Bit = 1; i < n; i++)
 			{
 				j = Context.Squeeze1();
 				while (j > i)
 					j = Context.Squeeze1();
 
 				c[i] = c[j];
-				c[j] = (s[k >> 3] & (1 << (k & 7))) == 0 ? (short)1 : (short)-1;
+				c[j] = (s[k] & Bit) == 0 ? (short)1 : (short)-1;
+
+				Bit <<= 1;
+				if (Bit == 0)
+				{
+					k++;
+					Bit = 1;
+				}
 			}
 
 			return c;
@@ -2064,9 +2124,9 @@ namespace Waher.Security.PQC
 		/// (Algorithm 39, §7.4), together with encoding of hint in signature
 		/// (Algorithm 20, §7.1).
 		/// </summary>
-		/// <param name="z"></param>
-		/// <param name="r"></param>
-		/// <returns></returns>
+		/// <param name="z">Polynomials</param>
+		/// <param name="r">Polynomials</param>
+		/// <returns>Encoded hints</returns>
 		private byte[] MakeAndEncodeHint(uint[][] z, uint[][] r)
 		{
 			// MakeHint, (Algorithm 39, §7.4)
@@ -2128,9 +2188,296 @@ namespace Waher.Security.PQC
 			return Result;
 		}
 
-		private bool Verify_Internal(byte[] PublicKey, byte[] Message, byte[] Signature)
+		/// <summary>
+		/// Internal signature verification interface
+		/// (Algorithm 8, §6.3)
+		/// </summary>
+		/// <param name="PublicKey">Public key</param>
+		/// <param name="Message">Message</param>
+		/// <param name="μPrecomputed">If message represents a precomputed μ.</param>
+		/// <param name="Signature">Signature</param>
+		public bool Verify_Internal(byte[] PublicKey, byte[] Message, bool μPrecomputed, byte[] Signature)
 		{
-			throw new NotImplementedException();    // TODO
+			if (!this.TryDecodePublicKey(PublicKey, out byte[] ρ, out short[][] t1))
+				return false;
+
+			if (!this.TryDecodeSignature(Signature, out byte[] cSeed, out uint[][] z,
+				out bool[][] h))
+			{
+				return false;
+			}
+
+			if (InfinityNorm(z) >= this.γ1 - this.β)
+				return false;
+
+			uint[,][] Â = this.ExpandÂ(ρ);
+			byte[] tr = H(PublicKey, 64);
+			byte[] μ;
+			byte[] Bin;
+
+			if (μPrecomputed)
+				μ = Message;
+			else
+			{
+				int MessageLen = Message.Length;
+				Bin = new byte[64 + MessageLen];
+
+				Array.Copy(tr, 0, Bin, 0, 64);
+				Array.Copy(Message, 0, Bin, 64, MessageLen);
+
+				μ = H(Bin, 64);
+			}
+
+			short[] c = this.SampleInBall(cSeed);
+
+			NTT(z);
+			NTT(c);
+
+			uint[][] w = new uint[this.k][];
+			uint[] f;
+			short[] g;
+			int i, j, b;
+			long a;
+
+			for (i = 0; i < this.k; i++)
+			{
+				w[i] = f = new uint[n];
+				g = t1[i];
+
+				for (j = 0; j < n; j++)
+				{
+					a = g[j];
+					if (a < 0)
+						a += q;
+
+					a <<= d;
+					f[j] = (uint)(a % q);
+				}
+
+				NTT(f);
+
+				for (j = 0; j < n; j++)
+				{
+					a = f[j];
+					b = c[j];
+
+					if (b < 0)
+						b += q;
+
+					f[j] = (uint)(a * b % q);
+				}
+
+				Negate(f);
+
+				for (j = 0; j < this.l; j++)
+					MultiplyNTTsAndAdd(Â[i, j], z[j], f);
+			}
+
+			InverseNTT(w);
+
+			short[][] w1 = this.UseHint(h, w);
+
+			// w1Encode, Algorithm 28, §7.2
+
+			int w1Len = BitLen((uint)((q - 1) / this.twoγ2 - 1));
+
+			Bin = new byte[64 + this.k * (w1Len << 5)];
+			Array.Copy(μ, 0, Bin, 0, 64);
+
+			int Pos = 64;
+
+			for (i = 0; i < this.k; i++)
+				Pos += SimpleBitPack(w1[i], w1Len, Bin, Pos);
+
+			int cLen = this.λ >> 2;
+			byte[] cSeed2 = H(Bin, cLen);
+
+			for (i = 0; i < cLen; i++)
+			{
+				if (cSeed[i] != cSeed2[i])
+					return false;
+			}
+
+			return true;
 		}
+
+		/// <summary>
+		/// Uses the hint to alter the high bits of r.
+		/// (Algorithm 40, §7.4)
+		/// </summary>
+		/// <param name="h">Hint</param>
+		/// <param name="r">Integer modulus q</param>
+		private short[][] UseHint(bool[][] h, uint[][] r)
+		{
+			short[][] Result = new short[this.k][];
+			short[] f;
+			int[] r0v2;
+			short[] r1v2;
+			bool[] h2;
+			int i, j;
+			int m = (q - 1) / this.twoγ2;
+			int r0;
+			short r1;
+
+			this.Decompose(r, out int[][] r0v, out short[][] r1v);
+
+			for (i = 0; i < this.k; i++)
+			{
+				Result[i] = f = new short[n];
+				r0v2 = r0v[i];
+				r1v2 = r1v[i];
+				h2 = h[i];
+
+				for (j = 0; j < n; j++)
+				{
+					r0 = r0v2[j];
+					r1 = r1v2[j];
+
+					if (h2[j])
+					{
+						if (r0 > 0)
+							f[j] = (short)((r1 + 1) % m);
+						else
+							f[j] = (short)((r1 - 1) % m);
+					}
+					else
+						f[j] = r1;
+				}
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Decodes a public key for ML-DSA from a byte string.
+		/// Algorithm 23, §7.2.
+		/// </summary>
+		/// <param name="PublicKey">Public key.</param>
+		/// <param name="ρ">Randomness.</param>
+		/// <param name="t1">Polynomials.</param>
+		/// <returns>If public key could be decoded.</returns>
+		private bool TryDecodePublicKey(byte[] PublicKey, out byte[] ρ, out short[][] t1)
+		{
+			ρ = null;
+			t1 = null;
+
+			if (PublicKey is null || PublicKey.Length != this.publicKeySize)
+				return false;
+
+			ρ = new byte[32];
+			Array.Copy(PublicKey, 0, ρ, 0, 32);
+
+			int Pos = 32;
+			short[] f;
+
+			t1 = new short[this.k][];
+
+			for (int i = 0; i < this.k; i++)
+			{
+				t1[i] = f = new short[n];
+				Pos += SimpleBitUnpack(f, PublicKey, Pos, 10);
+			}
+
+			return Pos == this.publicKeySize;
+		}
+
+
+		/// <summary>
+		/// Decodes an ML-DSA signature from a byte string.
+		/// Algorithm 27, §7.2.
+		/// </summary>
+		/// <param name="Signature">Encoded signature.</param>
+		/// <param name="c">Commitment hash</param>
+		/// <param name="z">Signer's response.</param>
+		/// <param name="h">Signer's hint.</param>
+		/// <returns>If signature could be decoded.</returns>
+		private bool TryDecodeSignature(byte[] Signature, out byte[] c, out uint[][] z,
+			out bool[][] h)
+		{
+			c = null;
+			z = null;
+			h = null;
+
+			if (Signature is null || Signature.Length != this.signatureSize)
+				return false;
+
+			int l1 = this.λ >> 2;
+			c = new byte[l1];
+
+			Array.Copy(Signature, 0, c, 0, l1);
+
+			uint[] f;
+			int i;
+
+			z = new uint[this.l][];
+
+			for (i = 0; i < this.l; i++)
+			{
+				z[i] = f = new uint[n];
+				l1 += BitUnpack(f, Signature, l1, this.γ1 - 1, this.γ1, true);
+			}
+
+			int l3 = Signature.Length - l1;
+			if (l3 != this.ω + this.k)
+				return false;
+
+			h = this.HintBitUnpack(Signature, l1);
+			if (h is null)
+				return false;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Unpacks hints for an encoded signature.
+		/// </summary>
+		/// <param name="Input">Binary input.</param>
+		/// <param name="Pos">Index into input where hints are encoded.</param>
+		/// <returns>Decoded hints</returns>
+		private bool[][] HintBitUnpack(byte[] Input, int Pos)
+		{
+			bool[][] h = new bool[this.k][];
+			bool[] f;
+			int Index = 0;
+			bool First;
+			int i, j;
+			byte b, b0;
+
+			for (i = 0, j = this.ω + Pos; i < this.k; i++, j++)
+			{
+				h[i] = f = new bool[n];
+
+				b = Input[j];
+				if (b < Index || b > this.ω)
+					return null;
+
+				First = true;
+				b0 = 0;
+
+				while (Index < b)
+				{
+					if (First)
+					{
+						if (b0 >= b)
+							return null;
+
+						First = false;
+					}
+
+					f[b] = true;
+					b0 = b;
+					b = Input[++Index];
+				}
+			}
+
+			while (Index < this.ω)
+			{
+				if (Input[Index] != 0)
+					return null;
+			}
+
+			return h;
+		}
+
 	}
 }

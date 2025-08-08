@@ -1,4 +1,5 @@
 ﻿using Waher.Runtime.Inventory;
+using Waher.Runtime.Profiling;
 using Waher.Script;
 
 namespace Waher.Security.PQC.Test
@@ -1627,5 +1628,142 @@ namespace Waher.Security.PQC.Test
 				});
 			}
 		}
+
+		[TestMethod]
+		public void Test_06_Benchmarking_GenKey()
+		{
+			Benchmarker1D? Benchmarker = null;
+
+			for (int i = 0; i < 2; i++)
+			{
+				Benchmarker?.Dispose();
+				Benchmarker = new();
+
+				foreach (string ModelName in new string[] { "ML-KEM-512", "ML-KEM-768", "ML-KEM-1024" })
+				{
+					ML_KEM Model = ML_KEM.GetModel(ModelName);
+					using Benchmarking Benchmarking = Benchmarker.Start(ModelName);
+
+					for (int j = 0; j < 1000; j++)
+						Model.KeyGen();
+				}
+			}
+
+			Console.Out.WriteLine(Benchmarker!.GetResultScriptMilliseconds());
+		}
+
+		[TestMethod]
+		public void Test_07_Benchmarking_Encapsulate()
+		{
+			Benchmarker1D? Benchmarker = null;
+
+			for (int i = 0; i < 2; i++)
+			{
+				Benchmarker?.Dispose();
+				Benchmarker = new();
+
+				foreach (string ModelName in new string[] { "ML-KEM-512", "ML-KEM-768", "ML-KEM-1024" })
+				{
+					ML_KEM Model = ML_KEM.GetModel(ModelName);
+					ML_KEM_Keys Keys = Model.KeyGen();
+
+					using Benchmarking Benchmarking = Benchmarker.Start(ModelName);
+
+					for (int j = 0; j < 1000; j++)
+						Model.Encapsulate(Keys.EncapsulationKey);
+				}
+			}
+
+			Console.Out.WriteLine(Benchmarker!.GetResultScriptMilliseconds());
+		}
+
+		[TestMethod]
+		public void Test_08_Benchmarking_Decapsulate()
+		{
+			Benchmarker1D? Benchmarker = null;
+
+			for (int i = 0; i < 2; i++)
+			{
+				Benchmarker?.Dispose();
+				Benchmarker = new();
+
+				foreach (string ModelName in new string[] { "ML-KEM-512", "ML-KEM-768", "ML-KEM-1024" })
+				{
+					ML_KEM Model = ML_KEM.GetModel(ModelName);
+					ML_KEM_Keys Keys = Model.KeyGen();
+
+					ML_KEM_Encapsulation[] Encapsulations = new ML_KEM_Encapsulation[1000];
+
+					for (int j = 0; j < 1000; j++)
+						Encapsulations[j] = Model.Encapsulate(Keys.EncapsulationKey);
+
+					using Benchmarking Benchmarking = Benchmarker.Start(ModelName);
+
+					for (int j = 0; j < 1000; j++)
+						Model.Decapsulate(Keys.DecapsulationKey, Encapsulations[j].CipherText);
+				}
+			}
+
+			Console.Out.WriteLine(Benchmarker!.GetResultScriptMilliseconds());
+		}
+
+		[TestMethod]
+		public void Test_09_Benchmarking_EncapsulateAndDecapsulate()
+		{
+			Benchmarker1D? Benchmarker = null;
+
+			for (int i = 0; i < 2; i++)
+			{
+				Benchmarker?.Dispose();
+				Benchmarker = new();
+
+				foreach (string ModelName in new string[] { "ML-KEM-512", "ML-KEM-768", "ML-KEM-1024" })
+				{
+					ML_KEM Model = ML_KEM.GetModel(ModelName);
+					ML_KEM_Keys Keys = Model.KeyGen();
+					int NrEncapsulations = 0;
+					ML_KEM_Encapsulation Encapsulation;
+					byte[] SharedSecret;
+					int k, c;
+					bool AreSame;
+
+					using (Benchmarking Benchmarking = Benchmarker.Start(ModelName))
+					{
+						for (int j = 0; j < 1000; j++)
+						{
+							AreSame = false;
+
+							do
+							{
+								Encapsulation = Model.Encapsulate(Keys.EncapsulationKey);
+								SharedSecret = Model.Decapsulate(Keys.DecapsulationKey, Encapsulation.CipherText);
+								NrEncapsulations++;
+
+								c = Encapsulation.SharedSecret.Length;
+								if (AreSame = (c == SharedSecret.Length))
+								{
+									for (k = 0; k < c; k++)
+									{
+										if (SharedSecret[k] != Encapsulation.SharedSecret[k])
+										{
+											AreSame = false;
+											break;
+										}
+									}
+								}
+							}
+							while (!AreSame);
+						}
+					}
+
+					Console.Out.WriteLine(ModelName);
+					Console.Out.WriteLine("Recalculations: " + (NrEncapsulations - 1000));
+					Console.Out.WriteLine();
+				}
+			}
+
+			Console.Out.WriteLine(Benchmarker!.GetResultScriptMilliseconds());
+		}
+
 	}
 }

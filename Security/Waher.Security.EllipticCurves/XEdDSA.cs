@@ -1,8 +1,4 @@
-﻿using System;
-using System.Numerics;
-using System.Security.Cryptography;
-
-namespace Waher.Security.EllipticCurves
+﻿namespace Waher.Security.EllipticCurves
 {/*
     /// <summary>
     /// Delegate to fill a byte array with random bytes.

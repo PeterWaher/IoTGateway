@@ -1,6 +1,4 @@
-﻿using System;
-using System.Security.Cryptography;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace Waher.Security.EllipticCurves
 {

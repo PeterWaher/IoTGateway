@@ -218,10 +218,10 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="DesiredSecurityStrength">Desired security strength.</param>
 		/// <param name="MinSecurityStrength">Minimum security strength.</param>
 		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
-		/// <param name="OnlyIfDerivedFrom">Only return endpoints derived from this type.</param>
+		/// <param name="OnlyIfDerivedFrom">Only return endpoints derived from these type s.</param>
 		/// <returns>Array of local endpoint keys.</returns>
 		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength,
-			Type OnlyIfDerivedFrom)
+			params Type[] OnlyIfDerivedFrom)
 		{
 			return CreateEndpoints(DesiredSecurityStrength, MinSecurityStrength, MaxSecurityStrength, OnlyIfDerivedFrom, null);
 		}
@@ -232,11 +232,11 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="DesiredSecurityStrength">Desired security strength.</param>
 		/// <param name="MinSecurityStrength">Minimum security strength.</param>
 		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
-		/// <param name="OnlyIfDerivedFrom">Only return endpoints derived from this type.</param>
+		/// <param name="OnlyIfDerivedFrom">Only return endpoints derived from these types.</param>
 		/// <param name="Thread">Optional profiling thread.</param>
 		/// <returns>Array of local endpoint keys.</returns>
 		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength,
-			Type OnlyIfDerivedFrom, ProfilerThread Thread)
+			Type[] OnlyIfDerivedFrom, ProfilerThread Thread)
 		{
 			Thread = Thread?.CreateSubThread("Endpoints", ProfilerThreadType.Sequential);
 			try
@@ -244,8 +244,13 @@ namespace Waher.Networking.XMPP.P2P
 				Thread?.Start();
 				Thread?.NewState("Init");
 
+				int i, c = OnlyIfDerivedFrom?.Length ?? 0;
+				TypeInfo[] OnlyIfDerivedFromType = c == 0 ? null : new TypeInfo[c];
+
+				for (i = 0; i < c; i++)
+					OnlyIfDerivedFromType[i] = OnlyIfDerivedFrom[i].GetTypeInfo();
+
 				List<IE2eEndpoint> Result = new List<IE2eEndpoint>();
-				TypeInfo OnlyIfDerivedFromType = OnlyIfDerivedFrom?.GetTypeInfo();
 				IEnumerable<IE2eEndpoint> Templates;
 				bool CheckHeritance = true;
 
@@ -274,8 +279,22 @@ namespace Waher.Networking.XMPP.P2P
 							if (!(e2eTypes is null) && !E2eTypeInfo.IsAssignableFrom(TI))
 								continue;
 
-							if (!(OnlyIfDerivedFromType?.IsAssignableFrom(TI) ?? true))
-								continue;
+							if (c > 0)
+							{
+								bool DerivedFrom = false;
+
+								for (i = 0; i < c; i++)
+								{
+									if (OnlyIfDerivedFromType[i].IsAssignableFrom(TI))
+									{
+										DerivedFrom = true;
+										break;
+									}
+								}
+
+								if (!DerivedFrom)
+									continue;
+							}
 
 							ConstructorInfo CI = Types.GetDefaultConstructor(T);
 							if (CI is null)
@@ -305,13 +324,27 @@ namespace Waher.Networking.XMPP.P2P
 
 				foreach (IE2eEndpoint Endpoint in Templates)
 				{
-					if (CheckHeritance && !(OnlyIfDerivedFromType?.IsAssignableFrom(Endpoint.GetType().GetTypeInfo()) ?? true))
-						continue;
+					if (CheckHeritance && c > 0)
+					{
+						bool DerivedFrom = false;
+
+						for (i = 0; i < c; i++)
+						{
+							if (OnlyIfDerivedFromType[i].IsAssignableFrom(Endpoint.GetType().GetTypeInfo()))
+							{
+								DerivedFrom = true;
+								break;
+							}
+						}
+
+						if (!DerivedFrom)
+							continue;
+					}
 
 					Thread?.NewState(Endpoint.LocalName);
 
 					IE2eEndpoint Endpoint2 = Endpoint.Create(DesiredSecurityStrength);
-					int i = Endpoint2.SecurityStrength;
+					i = Endpoint2.SecurityStrength;
 					if (i >= MinSecurityStrength && i <= MaxSecurityStrength)
 						Result.Add(Endpoint2);
 					else
@@ -464,7 +497,7 @@ namespace Waher.Networking.XMPP.P2P
 						E2e.Dispose();
 				}
 
-				Dictionary<string, IE2eEndpoint>  NewKeys = new Dictionary<string, IE2eEndpoint>();
+				Dictionary<string, IE2eEndpoint> NewKeys = new Dictionary<string, IE2eEndpoint>();
 
 				foreach (KeyValuePair<string, IE2eEndpoint> P in this.keys)
 				{
@@ -720,7 +753,11 @@ namespace Waher.Networking.XMPP.P2P
 
 				Array.Sort(Result, (ep1, ep2) =>
 				{
-					int Diff = (ep2.Safe ? 1 : 0) - (ep1.Safe ? 1 : 0);
+					int Diff = (ep2.PostQuantumCryptography ? 1 : 0) - (ep1.PostQuantumCryptography ? 1 : 0);
+					if (Diff != 0)
+						return Diff;
+
+					Diff = (ep2.Safe ? 1 : 0) - (ep1.Safe ? 1 : 0);
 					if (Diff != 0)
 						return Diff;
 
@@ -819,6 +856,7 @@ namespace Waher.Networking.XMPP.P2P
 					if (Endpoints.Default is null)
 					{
 						IE2eEndpoint[] Ordered = SortedArray(Endpoints.ByFqn);
+						IE2eEndpoint LastSafeAndFastAndSignaturesAndSharedSecretsAndPqc = null;
 						IE2eEndpoint LastSafeAndFastAndSignaturesAndSharedSecrets = null;
 						IE2eEndpoint LastSafeAndFastAndSignatures = null;
 						IE2eEndpoint LastSafeAndFast = null;
@@ -842,16 +880,22 @@ namespace Waher.Networking.XMPP.P2P
 										LastSafeAndFastAndSignatures = Endpoint;
 
 										if (Endpoint.SupportsSharedSecrets)
+										{
 											LastSafeAndFastAndSignaturesAndSharedSecrets = Endpoint;
+
+											if (Endpoint.PostQuantumCryptography)
+												LastSafeAndFastAndSignaturesAndSharedSecretsAndPqc = Endpoint;
+										}
 									}
 								}
 							}
 						}
 
-						Endpoints.Default = 
+						Endpoints.Default =
+							LastSafeAndFastAndSignaturesAndSharedSecretsAndPqc ??
 							LastSafeAndFastAndSignaturesAndSharedSecrets ??
-							LastSafeAndFastAndSignatures ?? 
-							LastSafeAndFast ?? LastSafe ?? 
+							LastSafeAndFastAndSignatures ??
+							LastSafeAndFast ?? LastSafe ??
 							Ordered[0];
 					}
 
@@ -1247,7 +1291,8 @@ namespace Waher.Networking.XMPP.P2P
 							await Callback.Raise(Sender, e);
 						}
 					});
-				};
+				}
+				;
 			}
 			else
 			{

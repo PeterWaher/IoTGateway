@@ -22,7 +22,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		private readonly string publicKeyBase64;
 
 		/// <summary>
-		/// Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
+		/// Abstract base class for Elliptic Curve endpoints.
 		/// </summary>
 		/// <param name="Curve">Curve instance</param>
 		/// <param name="DefaultSymmetricCipher">Default symmetric cipher.</param>
@@ -36,7 +36,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		}
 
 		/// <summary>
-		/// Abstract base class for Elliptic Curve / AES-256 hybrid ciphers.s
+		/// Abstract base class for Elliptic Curve endpoints.
 		/// </summary>
 		/// <param name="PublicKey">Remote public key.</param>
 		/// <param name="ReferenceCurve">Reference curve</param>
@@ -91,7 +91,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		}
 
 		/// <summary>
-		/// Shared secret, for underlying AES cipher.
+		/// Shared secret, for underlying symmetric cipher.
 		/// </summary>
 		public static byte[] GetSharedKey(EllipticCurveEndpoint LocalKey, IE2eEndpoint RemoteKey)
 		{

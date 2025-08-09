@@ -6,9 +6,19 @@ namespace Waher.Security.PQC
 	/// <summary>
 	/// Methods common to ML algorithms.
 	/// </summary>
-	public class ML_Common
+	public abstract class ML_Common
 	{
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+
+		/// <summary>
+		/// Length of the public key.
+		/// </summary>
+		public abstract int PublicKeyLength { get; }
+
+		/// <summary>
+		/// Length of the private key.
+		/// </summary>
+		public abstract int PrivateKeyLength { get; }
 
 		/// <summary>
 		/// Creates a random seed value.

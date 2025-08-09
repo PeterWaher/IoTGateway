@@ -133,6 +133,16 @@ namespace Waher.Security.PQC
 		}
 
 		/// <summary>
+		/// Length of the public key.
+		/// </summary>
+		public override int PublicKeyLength => 384 * this.k + 32;
+
+		/// <summary>
+		/// Length of the private key.
+		/// </summary>
+		public override int PrivateKeyLength => 768 * this.k + 96;
+
+		/// <summary>
 		/// Pseudorandom function (PRF), as defined in §4.1.
 		/// </summary>
 		/// <param name="Seed">32-byte input.</param>
@@ -783,7 +793,7 @@ namespace Waher.Security.PQC
 			ushort[,][] Â = new ushort[this.k, this.k][];
 			ushort[][] s = new ushort[this.k][];
 			ushort[][] e = new ushort[this.k][];
-			
+
 			byte[] B = new byte[34];
 			Array.Copy(ρ, 0, B, 0, 32);
 
@@ -851,27 +861,21 @@ namespace Waher.Security.PQC
 		/// <returns>Ciphertext (32*(dᵤk+dᵥ) bytes)</returns>
 		public byte[] K_PKE_Encrypt(byte[] EncryptionKey, byte[] Message)
 		{
-			byte[] Seed = CreateSeed();
-
-			byte[] Result = this.K_PKE_Encrypt(EncryptionKey, Message, Seed, null);
-			Clear(Seed);
-
-			return Result;
+			return this.K_PKE_Encrypt(ML_KEM_Keys.FromEncapsulationKey(EncryptionKey), Message);
 		}
 
 		/// <summary>
 		/// Uses the encryption key to encrypt a plaintext message using the given randomness
 		/// and algorithm 14 (K-PKE.Encrypt) of §5.2.
 		/// </summary>
-		/// <param name="EncryptionKey">Encryption key (384k+32 bytes)</param>
+		/// <param name="Keys">Encryption key (384k+32 bytes)</param>
 		/// <param name="Message">Plain text message (32 bytes)</param>
-		/// <param name="Â">Optional matrix generating the encryption key.</param>
 		/// <returns>Ciphertext (32*(dᵤk+dᵥ) bytes)</returns>
-		public byte[] K_PKE_Encrypt(byte[] EncryptionKey, byte[] Message, ushort[,][] Â)
+		public byte[] K_PKE_Encrypt(ML_KEM_Keys Keys, byte[] Message)
 		{
 			byte[] Seed = CreateSeed();
 
-			byte[] Result = this.K_PKE_Encrypt(EncryptionKey, Message, Seed, Â);
+			byte[] Result = this.K_PKE_Encrypt(Keys, Message, Seed);
 			Clear(Seed);
 
 			return Result;
@@ -887,26 +891,24 @@ namespace Waher.Security.PQC
 		/// <returns>Ciphertext (32*(dᵤk+dᵥ) bytes)</returns>
 		public byte[] K_PKE_Encrypt(byte[] EncryptionKey, byte[] Message, byte[] Seed)
 		{
-			return this.K_PKE_Encrypt(EncryptionKey, Message, Seed, null);
+			return this.K_PKE_Encrypt(ML_KEM_Keys.FromEncapsulationKey(EncryptionKey), Message, Seed);
 		}
 
 		/// <summary>
 		/// Uses the encryption key to encrypt a plaintext message using the given randomness
 		/// and algorithm 14 (K-PKE.Encrypt) of §5.2.
 		/// </summary>
-		/// <param name="EncryptionKey">Encryption key (384k+32 bytes)</param>
+		/// <param name="Keys">Encryption key (384k+32 bytes)</param>
 		/// <param name="Message">Plain text message (32 bytes)</param>
 		/// <param name="Seed">Randomness (32 bytes)</param>
-		/// <param name="Â">Optional matrix generating the encryption key.</param>
 		/// <returns>Ciphertext (32*(dᵤk+dᵥ) bytes)</returns>
-		public byte[] K_PKE_Encrypt(byte[] EncryptionKey, byte[] Message, byte[] Seed,
-			ushort[,][] Â)
+		public byte[] K_PKE_Encrypt(ML_KEM_Keys Keys, byte[] Message, byte[] Seed)
 		{
-			if (EncryptionKey is null)
-				throw new ArgumentNullException(nameof(EncryptionKey), "Encryption key cannot be null.");
+			if (Keys is null)
+				throw new ArgumentNullException(nameof(Keys), "Encryption key cannot be null.");
 
-			if (EncryptionKey.Length != this.k384 + 32)
-				throw new ArgumentException("Encryption key must be 384k+32 bytes long.", nameof(EncryptionKey));
+			if (Keys.EncapsulationKey.Length != this.k384 + 32)
+				throw new ArgumentException("Encryption key must be 384k+32 bytes long.", nameof(Keys));
 
 			if (Message.Length != 32)
 				throw new ArgumentException("Message must be 32 bytes long.", nameof(Message));
@@ -920,20 +922,21 @@ namespace Waher.Security.PQC
 
 			for (i = Pos = 0; i < this.k; i++)
 			{
-				t[i] = ByteDecode(EncryptionKey, Pos, 384, 12);
+				t[i] = ByteDecode(Keys.EncapsulationKey, Pos, 384, 12);
 				Pos += 384;
 			}
 
-			Array.Copy(EncryptionKey, Pos, ρ, 0, 32);
+			Array.Copy(Keys.EncapsulationKey, Pos, ρ, 0, 32);
 
 			ushort[][] y = new ushort[this.k][];
 			ushort[][] e1 = new ushort[this.k][];
 			ushort[] e2;
+			ushort[,][] Â = Keys.Â;
 
 			if (Â is null)
 			{
-				Â = new ushort[this.k, this.k][];
-				
+				Keys.Â = Â = new ushort[this.k, this.k][];
+
 				byte[] B = new byte[34];
 				Array.Copy(ρ, 0, B, 0, 32);
 
@@ -951,7 +954,7 @@ namespace Waher.Security.PQC
 				Clear(B);
 			}
 			else if (Â.GetLength(0) != this.k || Â.GetLength(1) != this.k)
-				throw new ArgumentException("Matrix A must be " + this.k + "x" + this.k + ".", nameof(Â));
+				throw new ArgumentException("Matrix Â must be " + this.k + "x" + this.k + ".", nameof(Â));
 
 			for (i = 0; i < this.k; i++)
 				y[i] = SamplePolyCBD(PRF(Seed, N++, this.η1));
@@ -1076,13 +1079,27 @@ namespace Waher.Security.PQC
 		/// (768k+96 bytes). Matrix used to calculate public key is also provided.</returns>
 		public ML_KEM_Keys KeyGen()
 		{
+			return this.KeyGen(false);
+		}
+
+		/// <summary>
+		/// Generates an encapsulation key and a corresponding decapsulation key. 
+		/// (Algorithm 19 ML-KEM.KeyGen() in §7.1)
+		/// </summary>
+		/// <returns>Public Encapsulation Key (384k+32 bytes) and Private decapsulation Key 
+		/// (768k+96 bytes). Matrix used to calculate public key is also provided.</returns>
+		public ML_KEM_Keys KeyGen(bool ReturnSeed)
+		{
 			byte[] d = CreateSeed();
 			byte[] z = CreateSeed();
 
-			ML_KEM_Keys Result = this.KeyGen_Internal(d, z);
+			ML_KEM_Keys Result = this.KeyGen_Internal(d, z, ReturnSeed);
 
-			Clear(d);
-			Clear(z);
+			if (!ReturnSeed)
+			{
+				Clear(d);
+				Clear(z);
+			}
 
 			return Result;
 		}
@@ -1096,6 +1113,20 @@ namespace Waher.Security.PQC
 		/// <returns>Public Encapsulation Key (384k+32 bytes) and Private decapsulation Key 
 		/// (768k+96 bytes). Matrix used to calculate public key is also provided.</returns>
 		public ML_KEM_Keys KeyGen_Internal(byte[] d, byte[] z)
+		{
+			return this.KeyGen_Internal(d, z, false);
+		}
+
+		/// <summary>
+		/// Uses randomness to generate an encryption key and a corresponding decryption key. 
+		/// (Algorithm 16 ML-KEM.KeyGen_Internal(𝑑,𝑧) in §6.1)
+		/// </summary>
+		/// <param name="d">Randomness (32 bytes)</param>
+		/// <param name="z">Randomness (32 bytes)</param>
+		/// <param name="ReturnSeed">If seed should be returned.</param>
+		/// <returns>Public Encapsulation Key (384k+32 bytes) and Private decapsulation Key 
+		/// (768k+96 bytes). Matrix used to calculate public key is also provided.</returns>
+		public ML_KEM_Keys KeyGen_Internal(byte[] d, byte[] z, bool ReturnSeed)
 		{
 			if (z.Length != 32)
 				throw new ArgumentException("Seed must be 32 bytes long.", nameof(z));
@@ -1114,7 +1145,38 @@ namespace Waher.Security.PQC
 
 			Array.Copy(z, 0, DecryptionKey, Pos, 32);
 
-			return new ML_KEM_Keys(Keys, DecryptionKey);
+			if (!ReturnSeed)
+				return new ML_KEM_Keys(Keys, DecryptionKey, null);
+
+			byte[] Seed = new byte[64];
+
+			Array.Copy(d, 0, Seed, 0, 32);
+			Array.Copy(z, 0, Seed, 32, 32);
+
+			return new ML_KEM_Keys(Keys, DecryptionKey, Seed);
+		}
+
+		/// <summary>
+		/// Creates a key object instance from a seed.
+		/// </summary>
+		/// <param name="Seed">64 byte seed.</param>
+		/// <param name="ReturnSeed">If seed should be returned.</param>
+		/// <returns>Keys.</returns>
+		public ML_KEM_Keys KeyGen_FromSeed(byte[] Seed, bool ReturnSeed)
+		{
+			if (Seed is null)
+				throw new ArgumentNullException(nameof(Seed));
+
+			if (Seed.Length != 64)
+				throw new ArgumentException("Seed must be 64 bytes long.", nameof(Seed));
+
+			byte[] d = new byte[32];
+			byte[] z = new byte[32];
+
+			Array.Copy(Seed, 0, d, 0, 32);
+			Array.Copy(Seed, 32, z, 0, 32);
+
+			return this.KeyGen_Internal(d, z, ReturnSeed);
 		}
 
 		/// <summary>
@@ -1125,21 +1187,32 @@ namespace Waher.Security.PQC
 		/// <returns>Shared Key, Cipher text.</returns>
 		public ML_KEM_Encapsulation Encapsulate(byte[] EncapsulationKey)
 		{
-			if (EncapsulationKey.Length < 384)
-				throw new ArgumentException("Encapsulation key length mismatch.", nameof(EncapsulationKey));
+			return this.Encapsulate(ML_KEM_Keys.FromEncapsulationKey(EncapsulationKey));
+		}
 
-			ushort[] x = ByteDecode(EncapsulationKey, 0, 384, 12);
+		/// <summary>
+		/// The method (Algorithm 17) accepts an encapsulation key and a random byte array 
+		/// as input and outputs a ciphertext and a shared key.
+		/// </summary>
+		/// <param name="Keys">Encapsulation key.</param>
+		/// <returns>Shared Key, Cipher text.</returns>
+		public ML_KEM_Encapsulation Encapsulate(ML_KEM_Keys Keys)
+		{
+			if (Keys.EncapsulationKey.Length < 384)
+				throw new ArgumentException("Encapsulation key length mismatch.", nameof(Keys));
+
+			ushort[] x = ByteDecode(Keys.EncapsulationKey, 0, 384, 12);
 			int i, c = x.Length;
 
 			for (i = 0; i < c; i++)
 			{
 				if (x[i] >= q)
-					throw new ArgumentException("Invalid encapsulation key.", nameof(EncapsulationKey));
+					throw new ArgumentException("Invalid encapsulation key.", nameof(Keys));
 			}
 
 			byte[] m = CreateSeed();
 
-			ML_KEM_Encapsulation Result = this.Encapsulate_Internal(EncapsulationKey, m);
+			ML_KEM_Encapsulation Result = this.Encapsulate_Internal(Keys, m);
 			Clear(m);
 
 			return Result;
@@ -1154,8 +1227,20 @@ namespace Waher.Security.PQC
 		/// <returns>Shared Key, Cipher text.</returns>
 		public ML_KEM_Encapsulation Encapsulate_Internal(byte[] EncapsulationKey, byte[] m)
 		{
-			if (EncapsulationKey.Length != this.k384 + 32)
-				throw new ArgumentException("Encapsulation key length mismatch.", nameof(EncapsulationKey));
+			return this.Encapsulate_Internal(ML_KEM_Keys.FromEncapsulationKey(EncapsulationKey), m);
+		}
+
+		/// <summary>
+		/// The method (Algorithm 17) accepts an encapsulation key and a random byte array 
+		/// as input and outputs a ciphertext and a shared key.
+		/// </summary>
+		/// <param name="Keys">Encapsulation key.</param>
+		/// <param name="m">Randomness (32 bytes)</param>
+		/// <returns>Shared Key, Cipher text.</returns>
+		public ML_KEM_Encapsulation Encapsulate_Internal(ML_KEM_Keys Keys, byte[] m)
+		{
+			if (Keys.EncapsulationKey.Length != this.k384 + 32)
+				throw new ArgumentException("Encapsulation key length mismatch.", nameof(Keys));
 
 			if (m.Length != 32)
 				throw new ArgumentException("Message length mismatch.", nameof(m));
@@ -1163,7 +1248,7 @@ namespace Waher.Security.PQC
 			byte[] Bin = new byte[64];
 
 			Array.Copy(m, 0, Bin, 0, 32);
-			Array.Copy(H(EncapsulationKey), 0, Bin, 32, 32);
+			Array.Copy(H(Keys.EncapsulationKey), 0, Bin, 32, 32);
 
 			byte[] Bin2 = G(Bin);
 			Clear(Bin);
@@ -1175,7 +1260,7 @@ namespace Waher.Security.PQC
 			Array.Copy(Bin2, 32, r, 0, 32);
 			Clear(Bin2);
 
-			byte[] c = this.K_PKE_Encrypt(EncapsulationKey, m, r);
+			byte[] c = this.K_PKE_Encrypt(Keys, m, r);
 			Clear(r);
 
 			return new ML_KEM_Encapsulation(K, c);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Waher.Security.SHA3;
 
 namespace Waher.Security.PQC
@@ -114,6 +115,16 @@ namespace Waher.Security.PQC
 		}
 
 		/// <summary>
+		/// Length of the public key.
+		/// </summary>
+		public override int PublicKeyLength => this.publicKeySize;
+
+		/// <summary>
+		/// Length of the private key.
+		/// </summary>
+		public override int PrivateKeyLength => this.privateKeySize;
+
+		/// <summary>
 		/// Generates a public and private key. 
 		/// (Algorithm 1 ML-DSA.KeyGen() in §5.1)
 		/// </summary>
@@ -141,7 +152,22 @@ namespace Waher.Security.PQC
 		/// <returns>Digital signature.</returns>
 		public byte[] Sign(byte[] PrivateKey, byte[] Message, out int RejectionCount)
 		{
-			return this.Sign(PrivateKey, Message, (byte[])null, out RejectionCount);
+			return this.Sign(ML_DSA_Keys.FromPrivateKey(PrivateKey), Message,
+				out RejectionCount);
+		}
+
+		/// <summary>
+		/// Signs a message using the ML-DSA algorithm.
+		/// (Algorithm 2 ML-DSA.Sign() in §5.2)
+		/// </summary>
+		/// <param name="Keys">Private key</param>
+		/// <param name="Message">Message to sign</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
+		/// <returns>Digital signature.</returns>
+		public byte[] Sign(ML_DSA_Keys Keys, byte[] Message, out int RejectionCount)
+		{
+			return this.Sign(Keys, Message, (byte[])null, out RejectionCount);
 		}
 
 		/// <summary>
@@ -157,8 +183,25 @@ namespace Waher.Security.PQC
 		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context,
 			out int RejectionCount)
 		{
+			return this.Sign(ML_DSA_Keys.FromPrivateKey(PrivateKey), Message, Context,
+				out RejectionCount);
+		}
+
+		/// <summary>
+		/// Signs a message using the ML-DSA algorithm.
+		/// (Algorithm 2 ML-DSA.Sign() in §5.2)
+		/// </summary>
+		/// <param name="Keys">Private key</param>
+		/// <param name="Message">Message to sign</param>
+		/// <param name="Context">Context, optionally empty.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
+		/// <returns>Digital signature.</returns>
+		public byte[] Sign(ML_DSA_Keys Keys, byte[] Message, byte[] Context,
+			out int RejectionCount)
+		{
 			byte[] ξ = CreateSeed();
-			byte[] Result = this.Sign(PrivateKey, Message, Context, ξ, out RejectionCount);
+			byte[] Result = this.Sign(Keys, Message, Context, ξ, out RejectionCount);
 			Clear(ξ);
 
 			return Result;
@@ -176,6 +219,24 @@ namespace Waher.Security.PQC
 		/// an approved signature was calculated.</param>
 		/// <returns>Digital signature.</returns>
 		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context, byte[] Seed,
+			out int RejectionCount)
+		{
+			return this.Sign(ML_DSA_Keys.FromPrivateKey(PrivateKey), Message, Context,
+				Seed, out RejectionCount);
+		}
+
+		/// <summary>
+		/// Signs a message using the ML-DSA algorithm.
+		/// (Algorithm 2 ML-DSA.Sign() in §5.2)
+		/// </summary>
+		/// <param name="Keys">Private key</param>
+		/// <param name="Message">Message to sign</param>
+		/// <param name="Context">Context, optionally empty.</param>
+		/// <param name="Seed">Optional 32-byte randomness.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
+		/// <returns>Digital signature.</returns>
+		public byte[] Sign(ML_DSA_Keys Keys, byte[] Message, byte[] Context, byte[] Seed,
 			out int RejectionCount)
 		{
 			int MessageLen = Message.Length;
@@ -203,7 +264,7 @@ namespace Waher.Security.PQC
 
 			Array.Copy(Message, 0, Bin, 2 + ContextLen, MessageLen);
 
-			return this.Sign_Internal(PrivateKey, Bin, false, Seed, out RejectionCount);
+			return this.Sign_Internal(Keys, Bin, false, Seed, out RejectionCount);
 		}
 
 		/// <summary>
@@ -216,7 +277,20 @@ namespace Waher.Security.PQC
 		/// <returns>If the signature is valid.</returns>
 		public bool Verify(byte[] PublicKey, byte[] Message, byte[] Signature)
 		{
-			return this.Verify(PublicKey, Message, Signature, null);
+			return this.Verify(ML_DSA_Keys.FromPublicKey(PublicKey), Message, Signature);
+		}
+
+		/// <summary>
+		/// Verifies a digital signature using the ML-DSA algorithm.
+		/// (Algorithm 3 ML-DSA.Verify() in §5.3)
+		/// </summary>
+		/// <param name="Keys">Public Key</param>
+		/// <param name="Message">Message</param>
+		/// <param name="Signature">Signature</param>
+		/// <returns>If the signature is valid.</returns>
+		public bool Verify(ML_DSA_Keys Keys, byte[] Message, byte[] Signature)
+		{
+			return this.Verify(Keys, Message, Signature, null);
 		}
 
 		/// <summary>
@@ -229,6 +303,21 @@ namespace Waher.Security.PQC
 		/// <param name="Context">Context</param>
 		/// <returns>If the signature is valid.</returns>
 		public bool Verify(byte[] PublicKey, byte[] Message, byte[] Signature, byte[] Context)
+		{
+			return this.Verify(ML_DSA_Keys.FromPublicKey(PublicKey), Message, Signature,
+				Context);
+		}
+
+		/// <summary>
+		/// Verifies a digital signature using the ML-DSA algorithm.
+		/// (Algorithm 3 ML-DSA.Verify() in §5.3)
+		/// </summary>
+		/// <param name="Keys">Public Key</param>
+		/// <param name="Message">Message</param>
+		/// <param name="Signature">Signature</param>
+		/// <param name="Context">Context</param>
+		/// <returns>If the signature is valid.</returns>
+		public bool Verify(ML_DSA_Keys Keys, byte[] Message, byte[] Signature, byte[] Context)
 		{
 			int MessageLen = Message.Length;
 			int ContextLen;
@@ -250,7 +339,7 @@ namespace Waher.Security.PQC
 
 			Array.Copy(Message, 0, Bin, 2 + ContextLen, MessageLen);
 
-			return this.Verify_Internal(PublicKey, Bin, false, Signature);
+			return this.Verify_Internal(Keys, Bin, false, Signature);
 		}
 
 		/// <summary>
@@ -266,7 +355,24 @@ namespace Waher.Security.PQC
 		public byte[] Sign(byte[] PrivateKey, byte[] Message, string HashAlgorithm,
 			out int RejectionCount)
 		{
-			return this.Sign(PrivateKey, Message, null, HashAlgorithm, out RejectionCount);
+			return this.Sign(ML_DSA_Keys.FromPrivateKey(PrivateKey), Message,
+				HashAlgorithm, out RejectionCount);
+		}
+
+		/// <summary>
+		/// Signs a message using the ML-DSA pre-hash algorithm.
+		/// (Algorithm 4 HashML-DSA.Sign() in §5.4.1)
+		/// </summary>
+		/// <param name="Keys">Private key</param>
+		/// <param name="Message">Message to sign</param>
+		/// <param name="HashAlgorithm">Name of hash algorithm.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
+		/// <returns>Digital signature.</returns>
+		public byte[] Sign(ML_DSA_Keys Keys, byte[] Message, string HashAlgorithm,
+			out int RejectionCount)
+		{
+			return this.Sign(Keys, Message, null, HashAlgorithm, out RejectionCount);
 		}
 
 		/// <summary>
@@ -283,8 +389,26 @@ namespace Waher.Security.PQC
 		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context,
 			string HashAlgorithm, out int RejectionCount)
 		{
+			return this.Sign(ML_DSA_Keys.FromPrivateKey(PrivateKey), Message, Context,
+				HashAlgorithm, out RejectionCount);
+		}
+
+		/// <summary>
+		/// Signs a message using the ML-DSA pre-hash algorithm.
+		/// (Algorithm 4 HashML-DSA.Sign() in §5.4.1)
+		/// </summary>
+		/// <param name="Keys">Private key</param>
+		/// <param name="Message">Message to sign</param>
+		/// <param name="Context">Context, optionally empty.</param>
+		/// <param name="HashAlgorithm">Name of hash algorithm.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
+		/// <returns>Digital signature.</returns>
+		public byte[] Sign(ML_DSA_Keys Keys, byte[] Message, byte[] Context,
+			string HashAlgorithm, out int RejectionCount)
+		{
 			byte[] ξ = CreateSeed();
-			byte[] Result = this.Sign(PrivateKey, Message, Context, ξ, HashAlgorithm,
+			byte[] Result = this.Sign(Keys, Message, Context, ξ, HashAlgorithm,
 				out RejectionCount);
 
 			Clear(ξ);
@@ -305,6 +429,25 @@ namespace Waher.Security.PQC
 		/// an approved signature was calculated.</param>
 		/// <returns>Digital signature.</returns>
 		public byte[] Sign(byte[] PrivateKey, byte[] Message, byte[] Context, byte[] Seed,
+			string HashAlgorithm, out int RejectionCount)
+		{
+			return this.Sign(ML_DSA_Keys.FromPrivateKey(PrivateKey), Message, Context,
+				Seed, HashAlgorithm, out RejectionCount);
+		}
+
+		/// <summary>
+		/// Signs a message using the ML-DSA pre-hash algorithm.
+		/// (Algorithm 4 HashML-DSA.Sign() in §5.4.1)
+		/// </summary>
+		/// <param name="Keys">Private key</param>
+		/// <param name="Message">Message to sign</param>
+		/// <param name="Context">Context, optionally empty.</param>
+		/// <param name="Seed">Optional 32-byte randomness.</param>
+		/// <param name="HashAlgorithm">Name of hash algorithm.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
+		/// <returns>Digital signature.</returns>
+		public byte[] Sign(ML_DSA_Keys Keys, byte[] Message, byte[] Context, byte[] Seed,
 			string HashAlgorithm, out int RejectionCount)
 		{
 			int ContextLen;
@@ -343,10 +486,189 @@ namespace Waher.Security.PQC
 
 			Array.Copy(Message, 0, Bin, Pos, MessageLen);
 
-			return this.Sign_Internal(PrivateKey, Bin, false, Seed, out RejectionCount);
+			return this.Sign_Internal(Keys, Bin, false, Seed, out RejectionCount);
+		}
+
+		/// <summary>
+		/// Signs a message using the ML-DSA pre-hash algorithm.
+		/// (Algorithm 4 HashML-DSA.Sign() in §5.4.1)
+		/// </summary>
+		/// <param name="PrivateKey">Private key</param>
+		/// <param name="Message">Message to sign</param>
+		/// <param name="Context">Context, optionally empty.</param>
+		/// <param name="HashAlgorithm">Name of hash algorithm.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
+		/// <returns>Digital signature.</returns>
+		public byte[] Sign(byte[] PrivateKey, Stream Message, byte[] Context,
+			string HashAlgorithm, out int RejectionCount)
+		{
+			return this.Sign(ML_DSA_Keys.FromPrivateKey(PrivateKey), Message, Context,
+				HashAlgorithm, out RejectionCount);
+		}
+
+		/// <summary>
+		/// Signs a message using the ML-DSA pre-hash algorithm.
+		/// (Algorithm 4 HashML-DSA.Sign() in §5.4.1)
+		/// </summary>
+		/// <param name="Keys">Private key</param>
+		/// <param name="Message">Message to sign</param>
+		/// <param name="Context">Context, optionally empty.</param>
+		/// <param name="HashAlgorithm">Name of hash algorithm.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
+		/// <returns>Digital signature.</returns>
+		public byte[] Sign(ML_DSA_Keys Keys, Stream Message, byte[] Context,
+			string HashAlgorithm, out int RejectionCount)
+		{
+			byte[] ξ = CreateSeed();
+			byte[] Result = this.Sign(Keys, Message, Context, ξ, HashAlgorithm,
+				out RejectionCount);
+
+			Clear(ξ);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Signs a message using the ML-DSA pre-hash algorithm.
+		/// (Algorithm 4 HashML-DSA.Sign() in §5.4.1)
+		/// </summary>
+		/// <param name="PrivateKey">Private key</param>
+		/// <param name="Message">Message to sign</param>
+		/// <param name="Context">Context, optionally empty.</param>
+		/// <param name="Seed">Optional 32-byte randomness.</param>
+		/// <param name="HashAlgorithm">Name of hash algorithm.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
+		/// <returns>Digital signature.</returns>
+		public byte[] Sign(byte[] PrivateKey, Stream Message, byte[] Context, byte[] Seed,
+			string HashAlgorithm, out int RejectionCount)
+		{
+			return this.Sign(ML_DSA_Keys.FromPrivateKey(PrivateKey), Message, Context,
+				Seed, HashAlgorithm, out RejectionCount);
+		}
+
+		/// <summary>
+		/// Signs a message using the ML-DSA pre-hash algorithm.
+		/// (Algorithm 4 HashML-DSA.Sign() in §5.4.1)
+		/// </summary>
+		/// <param name="Keys">Private key</param>
+		/// <param name="Message">Message to sign</param>
+		/// <param name="Context">Context, optionally empty.</param>
+		/// <param name="Seed">Optional 32-byte randomness.</param>
+		/// <param name="HashAlgorithm">Name of hash algorithm.</param>
+		/// <param name="RejectionCount">Number of rejected signatures created before
+		/// an approved signature was calculated.</param>
+		/// <returns>Digital signature.</returns>
+		public byte[] Sign(ML_DSA_Keys Keys, Stream Message, byte[] Context, byte[] Seed,
+			string HashAlgorithm, out int RejectionCount)
+		{
+			int ContextLen;
+
+			if (Context is null)
+			{
+				Context = Array.Empty<byte>();
+				ContextLen = 0;
+			}
+			else if ((ContextLen = Context.Length) > 255)
+				throw new ArgumentException("Context must be 255 bytes or less.", nameof(Context));
+
+			if (Seed is null)
+				Seed = new byte[32];
+			else if (Seed.Length != 32)
+				throw new ArgumentException("Seed must be 32 bytes long.", nameof(Seed));
+
+			if (!TryGetHashFunction(HashAlgorithm, out HashFunctionStream H, out byte[] Oid))
+				throw new ArgumentException("Unsupported hash algorithm: " + HashAlgorithm, nameof(HashAlgorithm));
+
+			Message.Position = 0;
+			byte[] Message2 = H(Message);
+
+			int Message2Len = Message2.Length;
+			int OidLen = Oid.Length;
+			int Pos;
+
+			byte[] Bin = new byte[2 + ContextLen + OidLen + Message2Len];
+			Bin[0] = 1;
+			Bin[1] = (byte)ContextLen;
+
+			if (ContextLen > 0)
+				Array.Copy(Context, 0, Bin, 2, ContextLen);
+
+			Array.Copy(Oid, 0, Bin, Pos = 2 + ContextLen, OidLen);
+			Pos += OidLen;
+
+			Array.Copy(Message2, 0, Bin, Pos, Message2Len);
+
+			return this.Sign_Internal(Keys, Bin, false, Seed, out RejectionCount);
 		}
 
 		private static bool TryGetHashFunction(string Name, out HashFunctionArray H, out byte[] Oid)
+		{
+			switch (Name.ToUpper())
+			{
+				case "SHA256":
+				case "SHA-256":
+				case "SHA2-256":
+					Oid = oidSha256;
+					H = Hashes.ComputeSHA256Hash;
+					return true;
+
+				case "SHA384":
+				case "SHA-384":
+				case "SHA2-384":
+					Oid = oidSha384;
+					H = Hashes.ComputeSHA384Hash;
+					return true;
+
+				case "SHA512":
+				case "SHA-512":
+				case "SHA2-512":
+					Oid = oidSha512;
+					H = Hashes.ComputeSHA512Hash;
+					return true;
+
+				case "SHA3-224":
+					Oid = oidSha3_224;
+					H = new SHA3_224().ComputeVariable;
+					return true;
+
+				case "SHA3-256":
+					Oid = oidSha3_256;
+					H = new SHA3_256().ComputeVariable;
+					return true;
+
+				case "SHA3-384":
+					Oid = oidSha3_384;
+					H = new SHA3_384().ComputeVariable;
+					return true;
+
+				case "SHA3-512":
+					Oid = oidSha3_512;
+					H = new SHA3_512().ComputeVariable;
+					return true;
+
+				case "SHAKE128":
+				case "SHAKE-128":
+					Oid = oidShake128;
+					H = new SHAKE128(256).ComputeVariable;
+					return true;
+
+				case "SHAKE256":
+				case "SHAKE-256":
+					Oid = oidShake256;
+					H = new SHAKE256(256).ComputeVariable;
+					return true;
+
+				default:
+					Oid = null;
+					H = null;
+					return false;
+			}
+		}
+
+		private static bool TryGetHashFunction(string Name, out HashFunctionStream H, out byte[] Oid)
 		{
 			switch (Name.ToUpper())
 			{
@@ -467,6 +789,23 @@ namespace Waher.Security.PQC
 		public bool Verify(byte[] PublicKey, byte[] Message, byte[] Signature, byte[] Context,
 			string HashAlgorithm)
 		{
+			return this.Verify(ML_DSA_Keys.FromPublicKey(PublicKey), Message, Signature,
+				Context, HashAlgorithm);
+		}
+
+		/// <summary>
+		/// Verifies a digital signature using the ML-DSA pre-hash algorithm.
+		/// (Algorithm 5 HashML-DSA.Verify() in §5.4.1)
+		/// </summary>
+		/// <param name="Keys">Public Key</param>
+		/// <param name="Message">Message</param>
+		/// <param name="Signature">Signature</param>
+		/// <param name="Context">Context</param>
+		/// <param name="HashAlgorithm">Name of hash algorithm.</param>
+		/// <returns>If the signature is valid.</returns>
+		public bool Verify(ML_DSA_Keys Keys, byte[] Message, byte[] Signature, byte[] Context,
+			string HashAlgorithm)
+		{
 			int ContextLen;
 
 			if (Context is null)
@@ -498,7 +837,72 @@ namespace Waher.Security.PQC
 
 			Array.Copy(Message, 0, Bin, Pos, MessageLen);
 
-			return this.Verify_Internal(PublicKey, Bin, false, Signature);
+			return this.Verify_Internal(Keys, Bin, false, Signature);
+		}
+
+		/// <summary>
+		/// Verifies a digital signature using the ML-DSA pre-hash algorithm.
+		/// (Algorithm 5 HashML-DSA.Verify() in §5.4.1)
+		/// </summary>
+		/// <param name="PublicKey">Public Key</param>
+		/// <param name="Message">Message</param>
+		/// <param name="Signature">Signature</param>
+		/// <param name="Context">Context</param>
+		/// <param name="HashAlgorithm">Name of hash algorithm.</param>
+		/// <returns>If the signature is valid.</returns>
+		public bool Verify(byte[] PublicKey, Stream Message, byte[] Signature, byte[] Context,
+			string HashAlgorithm)
+		{
+			return this.Verify(ML_DSA_Keys.FromPublicKey(PublicKey), Message, Signature,
+				Context, HashAlgorithm);
+		}
+
+		/// <summary>
+		/// Verifies a digital signature using the ML-DSA pre-hash algorithm.
+		/// (Algorithm 5 HashML-DSA.Verify() in §5.4.1)
+		/// </summary>
+		/// <param name="Keys">Public Key</param>
+		/// <param name="Message">Message</param>
+		/// <param name="Signature">Signature</param>
+		/// <param name="Context">Context</param>
+		/// <param name="HashAlgorithm">Name of hash algorithm.</param>
+		/// <returns>If the signature is valid.</returns>
+		public bool Verify(ML_DSA_Keys Keys, Stream Message, byte[] Signature, byte[] Context,
+			string HashAlgorithm)
+		{
+			int ContextLen;
+
+			if (Context is null)
+			{
+				Context = Array.Empty<byte>();
+				ContextLen = 0;
+			}
+			else if ((ContextLen = Context.Length) > 255)
+				return false;
+
+			if (!TryGetHashFunction(HashAlgorithm, out HashFunctionStream H, out byte[] Oid))
+				throw new ArgumentException("Unsupported hash algorithm: " + HashAlgorithm, nameof(HashAlgorithm));
+
+			Message.Position = 0;
+			byte[] Message2 = H(Message);
+
+			int Message2Len = Message2.Length;
+			int OidLen = Oid.Length;
+			int Pos;
+
+			byte[] Bin = new byte[2 + ContextLen + OidLen + Message2Len];
+			Bin[0] = 1;
+			Bin[1] = (byte)ContextLen;
+
+			if (ContextLen > 0)
+				Array.Copy(Context, 0, Bin, 2, ContextLen);
+
+			Array.Copy(Oid, 0, Bin, Pos = 2 + ContextLen, OidLen);
+			Pos += OidLen;
+
+			Array.Copy(Message2, 0, Bin, Pos, Message2Len);
+
+			return this.Verify_Internal(Keys, Bin, false, Signature);
 		}
 
 		/// <summary>
@@ -509,6 +913,19 @@ namespace Waher.Security.PQC
 		/// <returns>Public Key pk (320k+32 bytes) and Private Key sk 
 		/// (160*((l+k)*bitlen(2η)+dk) bytes).</returns>
 		public ML_DSA_Keys KeyGen_Internal(byte[] ξ)
+		{
+			return this.KeyGen_Internal(ξ, false);
+		}
+
+		/// <summary>
+		/// Generates a public and private key. 
+		/// (Algorithm 6 ML-DSA.KeyGen_Internal() in §6.1)
+		/// </summary>
+		/// <param name="ξ">Seed</param>
+		/// <param name="ReturnSeed">If seed should be returned.</param>
+		/// <returns>Public Key pk (320k+32 bytes) and Private Key sk 
+		/// (160*((l+k)*bitlen(2η)+dk) bytes).</returns>
+		public ML_DSA_Keys KeyGen_Internal(byte[] ξ, bool ReturnSeed)
 		{
 			if (ξ.Length != 32)
 				throw new ArgumentException("Seed must be 32 bytes long.", nameof(ξ));
@@ -597,7 +1014,7 @@ namespace Waher.Security.PQC
 			Clear(s2);
 			Clear(t0);
 
-			return new ML_DSA_Keys(Â, PublicKey, PrivateKey);
+			return new ML_DSA_Keys(Â, PublicKey, PrivateKey, ReturnSeed ? ξ : null);
 		}
 
 		/// <summary>
@@ -1731,7 +2148,7 @@ namespace Waher.Security.PQC
 			7062739, 2461387, 3035980, 621164, 3901472, 7153756, 2925816, 3374250,
 			1356448, 5604662, 2683270, 5601629, 4912752, 2312838, 7727142, 7921254,
 			348812, 8052569, 1011223, 6026202, 4561790, 6458164, 6143691, 1744507,
-			1753, 6444997, 5720892, 6924527, 2660408, 6600190, 8321269, 2772600,
+			ζ, 6444997, 5720892, 6924527, 2660408, 6600190, 8321269, 2772600,
 			1182243, 87208, 636927, 4415111, 4423672, 6084020, 5095502, 4663471,
 			8352605, 822541, 1009365, 5926272, 6400920, 1596822, 4423473, 4620952,
 			6695264, 4969849, 2678278, 4611469, 4829411, 635956, 8129971, 5925040,
@@ -1762,10 +2179,28 @@ namespace Waher.Security.PQC
 		public byte[] Sign_Internal(byte[] PrivateKey, byte[] Message, bool μPrecomputed,
 			byte[] Seed, out int RejectionCount)
 		{
-			if (!this.TryDecodePrivateKey(PrivateKey, out byte[] ρ, out byte[] K,
+			return this.Sign_Internal(ML_DSA_Keys.FromPrivateKey(PrivateKey), Message,
+				μPrecomputed, Seed, out RejectionCount);
+		}
+
+		/// <summary>
+		/// Internal signature interface
+		/// (Algorithm 7, §6.2)
+		/// </summary>
+		/// <param name="Keys">Private Key</param>
+		/// <param name="Message">Message</param>
+		/// <param name="μPrecomputed">If message represents a precomputed μ.</param>
+		/// <param name="Seed">Randomness</param>
+		/// <param name="RejectionCount">Rejection count.</param>
+		/// <returns>Signature</returns>
+		public byte[] Sign_Internal(ML_DSA_Keys Keys, byte[] Message, bool μPrecomputed,
+			byte[] Seed, out int RejectionCount)
+		{
+			if (Keys.PrivateKey is null ||
+				!this.TryDecodePrivateKey(Keys.PrivateKey, out byte[] ρ, out byte[] K,
 				out byte[] tr, out short[][] s1, out short[][] s2, out short[][] t0))
 			{
-				throw new ArgumentException("Invalid private key.", nameof(PrivateKey));
+				throw new ArgumentException("Invalid private key.", nameof(Keys));
 			}
 
 			if (Seed is null)
@@ -1779,7 +2214,13 @@ namespace Waher.Security.PQC
 			uint[][] NTTs2 = NTT(s2);
 			uint[][] NTTt0 = NTT(t0);
 
-			uint[,][] Â = this.ExpandÂ(ρ);
+			uint[,][] Â = Keys.Â;
+
+			if (Â is null)
+				Keys.Â = Â = this.ExpandÂ(ρ);
+			else if (Â.GetLength(0) != this.k || Â.GetLength(1) != this.l)
+				throw new ArgumentException("Matrix Â must be " + this.k + "x" + this.l + ".", nameof(Â));
+
 			byte[] μ;
 			byte[] Bin;
 
@@ -2240,10 +2681,29 @@ namespace Waher.Security.PQC
 		/// <param name="Message">Message</param>
 		/// <param name="μPrecomputed">If message represents a precomputed μ.</param>
 		/// <param name="Signature">Signature</param>
-		public bool Verify_Internal(byte[] PublicKey, byte[] Message, bool μPrecomputed, byte[] Signature)
+		public bool Verify_Internal(byte[] PublicKey, byte[] Message, bool μPrecomputed,
+			byte[] Signature)
 		{
-			if (!this.TryDecodePublicKey(PublicKey, out byte[] ρ, out short[][] t1))
+			return this.Verify_Internal(ML_DSA_Keys.FromPublicKey(PublicKey), Message,
+				μPrecomputed, Signature);
+		}
+
+		/// <summary>
+		/// Internal signature verification interface
+		/// (Algorithm 8, §6.3)
+		/// </summary>
+		/// <param name="Keys">Public key</param>
+		/// <param name="Message">Message</param>
+		/// <param name="μPrecomputed">If message represents a precomputed μ.</param>
+		/// <param name="Signature">Signature</param>
+		public bool Verify_Internal(ML_DSA_Keys Keys, byte[] Message, bool μPrecomputed,
+			byte[] Signature)
+		{
+			if (Keys.PublicKey is null ||
+				!this.TryDecodePublicKey(Keys.PublicKey, out byte[] ρ, out short[][] t1))
+			{
 				return false;
+			}
 
 			if (!this.TryDecodeSignature(Signature, out byte[] cSeed, out uint[][] z,
 				out bool[][] h))
@@ -2254,8 +2714,14 @@ namespace Waher.Security.PQC
 			if (InfinityNorm(z) >= this.γ1 - this.β)
 				return false;
 
-			uint[,][] Â = this.ExpandÂ(ρ);
-			byte[] tr = H(PublicKey, 64);
+			uint[,][] Â = Keys.Â;
+
+			if (Â is null)
+				Keys.Â = Â = this.ExpandÂ(ρ);
+			else if (Â.GetLength(0) != this.k || Â.GetLength(1) != this.l)
+				throw new ArgumentException("Matrix Â must be " + this.k + "x" + this.l + ".", nameof(Â));
+
+			byte[] tr = H(Keys.PublicKey, 64);
 			byte[] μ;
 			byte[] Bin;
 

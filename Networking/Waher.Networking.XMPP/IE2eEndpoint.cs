@@ -176,6 +176,15 @@ namespace Waher.Networking.XMPP
         {
             get;
         }
+
+		/// <summary>
+		/// If post-quantum cryptography is used.
+		/// </summary>
+		bool PostQuantumCryptography
+        {
+            get;
+        }
+
         /// <summary>
         /// Provides a score for the endpoint. More features, higher score (comparable to alternatives with the same security strength).
         /// </summary>

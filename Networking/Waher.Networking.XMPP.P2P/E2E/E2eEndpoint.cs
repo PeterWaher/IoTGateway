@@ -220,8 +220,13 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// </summary>
         public virtual bool Slow => false;
 
-        /// <inheritdoc/>
-        public override string ToString()
+        /// <summary>
+        /// If post-quantum cryptography is used.
+        /// </summary>
+        public virtual bool PostQuantumCryptography => false;
+
+		/// <inheritdoc/>
+		public override string ToString()
 		{
 			StringBuilder Xml = new StringBuilder();
 			this.ToXml(Xml, string.Empty);
@@ -253,6 +258,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
                     Result++;
 
                 if (!this.Slow)
+                    Result++;
+
+                if (this.PostQuantumCryptography)
                     Result++;
 
                 return Result;

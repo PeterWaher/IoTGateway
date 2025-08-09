@@ -381,7 +381,13 @@ namespace Waher.Networking.XMPP.Contracts
 
 				Thread?.NewState("Endpoints");
 
-				IE2eEndpoint[] AvailableEndpoints = EndpointSecurity.CreateEndpoints(256, 192, int.MaxValue, typeof(EllipticCurveEndpoint), Thread);
+				IE2eEndpoint[] AvailableEndpoints = EndpointSecurity.CreateEndpoints(256, 192,
+					int.MaxValue, new Type[]
+					{
+						typeof(EllipticCurveEndpoint),
+						typeof(ModuleLatticeEndpoint)
+					}, Thread);
+
 				DateTime? Timestamp = null;
 				bool DisposeEndpoints = true;
 				byte[] Key;
@@ -431,11 +437,14 @@ namespace Waher.Networking.XMPP.Contracts
 					foreach (IE2eEndpoint Endpoint in AvailableEndpoints)
 					{
 						if (Endpoint is EllipticCurveEndpoint Curve)
-						{
-							Key = this.GetKey(Curve.Curve);
-							await RuntimeSettings.SetAsync(this.keySettingsPrefix + Curve.LocalName, Convert.ToBase64String(Key));
-							Keys.Add(Curve);
-						}
+							Key = this.GetKey(Curve);
+						else if (Endpoint is ModuleLatticeEndpoint ModuleLattice)
+							Key = this.GetKey(ModuleLattice);
+						else
+							continue;
+
+						await RuntimeSettings.SetAsync(this.keySettingsPrefix + Endpoint.LocalName, Convert.ToBase64String(Key));
+						Keys.Add(Endpoint);
 					}
 
 					Timestamp = DateTime.Now;
@@ -478,9 +487,9 @@ namespace Waher.Networking.XMPP.Contracts
 			return true;
 		}
 
-		private byte[] GetKey(EllipticCurve Curve)
+		private byte[] GetKey(EllipticCurveEndpoint EcEndpoint)
 		{
-			string s = Curve.Export();
+			string s = EcEndpoint.Curve.Export();
 			XmlDocument Doc = new XmlDocument()
 			{
 				PreserveWhitespace = true
@@ -488,6 +497,11 @@ namespace Waher.Networking.XMPP.Contracts
 			Doc.LoadXml(s);
 			s = Doc.DocumentElement.GetAttribute("d");
 			return Convert.FromBase64String(s);
+		}
+
+		private byte[] GetKey(ModuleLatticeEndpoint MlEndpoint)
+		{
+			return MlEndpoint.ExportPrivateKey();
 		}
 
 		/// <summary>

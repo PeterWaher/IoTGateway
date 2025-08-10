@@ -873,7 +873,7 @@ namespace Waher.IoTGateway.Setup.Windows
 			public void ProcessInstallEvents(bool LogEvents, params Event[] ParsedEvents)
 			{
 				int c = ParsedEvents.Length;
-				int NrEvents = LogEvents ? 0 : this.Events.Count;
+				int NrEvents = LogEvents ? this.Events.Count : 0;
 
 				for (int i = NrEvents; i < c; i++)
 				{

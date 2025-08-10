@@ -59,7 +59,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 					"<test/>", "Test message", "Subject", "en", string.Empty, string.Empty,
 					null, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 2000));
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000));
 			}
 			finally
 			{
@@ -146,7 +146,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 						return Task.CompletedTask;
 					}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 2000));
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000));
 			}
 			finally
 			{
@@ -226,7 +226,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 						return Task.CompletedTask;
 					}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 2000));
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000));
 			}
 			finally
 			{

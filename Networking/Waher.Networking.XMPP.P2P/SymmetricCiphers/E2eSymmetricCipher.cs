@@ -309,7 +309,6 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		public virtual byte[] Encrypt(string Id, string Type, string From, string To, uint Counter, byte[] Data, IE2eEndpoint Sender, IE2eEndpoint Receiver)
 		{
 			byte[] Encrypted;
-			byte[] EncryptedKey;
 			byte[] Key;
 			byte[] IV = this.GetIV(Id, Type, From, To, Counter);
 			byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
@@ -318,17 +317,20 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 			int i, j, k, l;
 			int c = 8;
 
-			if (Sender.SupportsSharedSecrets)
+			Key = Sender.GetSharedSecretForEncryption(Receiver, this, out byte[] KeyCipherText);
+			if (KeyCipherText is null)
 			{
-				Key = Sender.GetSharedSecret(Receiver);
-				EncryptedKey = null;
 				l = 0;
+
+				if (Sender.SharedSecretUseCipherText)
+					c += 2;
 			}
 			else
 			{
-				Key = this.GenerateKey();
-				EncryptedKey = Receiver.EncryptSecret(Key);
-				l = EncryptedKey.Length;
+				if (!Sender.SharedSecretUseCipherText)
+					throw new InvalidOperationException("Shared secret ciphertexts not supported.");
+
+				l = KeyCipherText.Length;
 				c += l + 2;
 			}
 
@@ -364,7 +366,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 				}
 			}
 
-			if (l > 0)
+			if (Sender.SharedSecretUseCipherText)
 			{
 				Block[j++] = (byte)l;
 				Block[j++] = (byte)(l >> 8);
@@ -388,7 +390,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
 			if (l > 0)
 			{
-				Array.Copy(EncryptedKey, 0, Block, j, l);
+				Array.Copy(KeyCipherText, 0, Block, j, l);
 				j += l;
 			}
 
@@ -431,13 +433,13 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 			else
 				SignatureLen = 0;
 
-			if (Receiver.SupportsSharedSecrets)
-				KeyLen = 0;
-			else
+			if (Receiver.SharedSecretUseCipherText)
 			{
 				KeyLen = Data[i++];
 				KeyLen |= Data[i++] << 8;
 			}
+			else
+				KeyLen = 0;
 
 			if (i + 4 > Data.Length)
 				return null;
@@ -456,7 +458,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 				return null;
 
 			byte[] Signature = new byte[SignatureLen];
-			byte[] EncryptedKey = KeyLen > 0 ? new byte[KeyLen] : null;
+			byte[] KeyCipherText = KeyLen > 0 ? new byte[KeyLen] : null;
 			byte[] Encrypted = new byte[DataLen];
 			byte[] Key;
 
@@ -465,16 +467,13 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
 			if (KeyLen > 0)
 			{
-				Array.Copy(Data, i, EncryptedKey, 0, KeyLen);
+				Array.Copy(Data, i, KeyCipherText, 0, KeyLen);
 				i += KeyLen;
 			}
 
 			Array.Copy(Data, i, Encrypted, 0, DataLen);
 
-			if (EncryptedKey is null)
-				Key = Receiver.GetSharedSecret(Sender);
-			else
-				Key = Receiver.DecryptSecret(EncryptedKey);
+			Key = Receiver.GetSharedSecretForDecryption(Sender, KeyCipherText);
 
 			byte[] Decrypted;
 			byte[] IV = this.GetIV(Id, Type, From, To, Counter);
@@ -500,10 +499,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 			{
 				try
 				{
-					if (EncryptedKey is null)
-						Key = Receiver.Previous.GetSharedSecret(Sender);
-					else
-						Key = Receiver.Previous.DecryptSecret(EncryptedKey);
+					Key = Receiver.Previous.GetSharedSecretForDecryption(Sender, KeyCipherText);
 
 					if (!(Key is null))
 					{
@@ -543,7 +539,6 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		{
 			using TemporaryStream TempEncrypted = new TemporaryStream();
 
-			byte[] EncryptedKey;
 			byte[] Key;
 			byte[] IV = this.GetIV(Id, Type, From, To, Counter);
 			byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
@@ -551,17 +546,15 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 			long i;
 			int k, l;
 
-			if (Sender.SupportsSharedSecrets)
-			{
-				Key = Sender.GetSharedSecret(Receiver);
-				EncryptedKey = null;
+			Key = Sender.GetSharedSecretForEncryption(Receiver, this, out byte[] KeyCipherText);
+			if (KeyCipherText is null)
 				l = 0;
-			}
 			else
 			{
-				Key = this.GenerateKey();
-				EncryptedKey = Receiver.EncryptSecret(Key);
-				l = EncryptedKey.Length;
+				if (!Sender.SharedSecretUseCipherText)
+					throw new InvalidOperationException("Shared secret ciphertexts not supported.");
+
+				l = KeyCipherText.Length;
 			}
 
 			await this.Encrypt(Data, TempEncrypted, Key, IV, AssociatedData);
@@ -593,7 +586,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 				}
 			}
 
-			if (l > 0)
+			if (Receiver.SharedSecretUseCipherText)
 			{
 				Encrypted.WriteByte((byte)l);
 				Encrypted.WriteByte((byte)(l >> 8));
@@ -613,7 +606,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 				await Encrypted.WriteAsync(Signature, 0, k);
 
 			if (l > 0)
-				await Encrypted.WriteAsync(EncryptedKey, 0, l);
+				await Encrypted.WriteAsync(KeyCipherText, 0, l);
 
 			TempEncrypted.Position = 0;
 			await TempEncrypted.CopyToAsync(Encrypted);
@@ -652,13 +645,13 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 			else
 				SignatureLen = 0;
 
-			if (Receiver.SupportsSharedSecrets)
-				KeyLen = 0;
-			else
+			if (Receiver.SharedSecretUseCipherText)
 			{
 				KeyLen = Data.ReadByte();
 				KeyLen |= Data.ReadByte() << 8;
 			}
+			else
+				KeyLen = 0;
 
 			if (Data.Position + 4 > Data.Length)
 				return null;
@@ -677,7 +670,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 				return null;
 
 			byte[] Signature = new byte[SignatureLen];
-			byte[] EncryptedKey = KeyLen > 0 ? new byte[KeyLen] : null;
+			byte[] KeyCipherText = KeyLen > 0 ? new byte[KeyLen] : null;
 			byte[] Key;
 
 			if (await Data.TryReadAllAsync(Signature, 0, SignatureLen) != SignatureLen)
@@ -685,7 +678,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
 			if (KeyLen > 0)
 			{
-				if (await Data.TryReadAllAsync(EncryptedKey, 0, KeyLen) != KeyLen)
+				if (await Data.TryReadAllAsync(KeyCipherText, 0, KeyLen) != KeyLen)
 					return null;
 			}
 
@@ -693,10 +686,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
 			await Crypto.CopyAsync(Data, Encrypted, DataLen);
 
-			if (EncryptedKey is null)
-				Key = Receiver.GetSharedSecret(Sender);
-			else
-				Key = Receiver.DecryptSecret(EncryptedKey);
+			Key = Receiver.GetSharedSecretForDecryption(Sender, KeyCipherText);
 
 			byte[] IV = this.GetIV(Id, Type, From, To, Counter);
 			byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
@@ -733,10 +723,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 			{
 				try
 				{
-					if (EncryptedKey is null)
-						Key = Receiver.Previous.GetSharedSecret(Sender);
-					else
-						Key = Receiver.Previous.DecryptSecret(EncryptedKey);
+					Key = Receiver.Previous.GetSharedSecretForDecryption(Sender, KeyCipherText);
 
 					if (!(Key is null))
 					{
@@ -807,16 +794,15 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 			Xml.Append("\" c=\"");
 			Xml.Append(Counter.ToString());
 
-			if (Sender.SupportsSharedSecrets)
-				Key = Sender.GetSharedSecret(Receiver);
-			else
-			{
-				Key = this.GenerateKey();
+			Key = Sender.GetSharedSecretForEncryption(Receiver, this, out byte[] KeyCipherText);
 
-				byte[] EncryptedKey = Receiver.EncryptSecret(Key);
+			if (!(KeyCipherText is null))
+			{
+				if (!Sender.SharedSecretUseCipherText)
+					throw new InvalidOperationException("Shared secret ciphertexts not supported.");
 
 				Xml.Append("\" k=\"");
-				Xml.Append(Convert.ToBase64String(EncryptedKey));
+				Xml.Append(Convert.ToBase64String(KeyCipherText));
 			}
 
 			Encrypted = this.Encrypt(Data, Key, IV, AssociatedData, E2eBufferFillAlgorithm.Random);
@@ -852,7 +838,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		public virtual string Decrypt(string Id, string Type, string From, string To, XmlElement Xml,
 			IE2eEndpoint Sender, IE2eEndpoint Receiver)
 		{
-			byte[] EncryptedKey = null;
+			byte[] KeyCipherText = null;
 			byte[] Signature = null;
 			uint? Counter = null;
 
@@ -872,7 +858,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 						break;
 
 					case "k":
-						EncryptedKey = Convert.FromBase64String(Attr.Value);
+						KeyCipherText = Convert.FromBase64String(Attr.Value);
 						break;
 				}
 			}
@@ -884,10 +870,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 			byte[] Decrypted;
 			byte[] Key;
 
-			if (EncryptedKey is null)
-				Key = Receiver.GetSharedSecret(Sender);
-			else
-				Key = Receiver.DecryptSecret(EncryptedKey);
+			Key = Receiver.GetSharedSecretForDecryption(Sender, KeyCipherText);
 
 			byte[] IV = this.GetIV(Id, Type, From, To, Counter.Value);
 			byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
@@ -912,10 +895,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 			{
 				try
 				{
-					if (EncryptedKey is null)
-						Key = Receiver.Previous.GetSharedSecret(Sender);
-					else
-						Key = Receiver.Previous.DecryptSecret(EncryptedKey);
+					Key = Receiver.Previous.GetSharedSecretForDecryption(Sender, KeyCipherText);
 
 					if (!(Key is null))
 					{

@@ -7962,8 +7962,11 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			IE2eEndpoint LocalEndpoint = this.localKeys.FindLocalEndpoint(RecipientPublicKeyName, RecipientPublicKeyNamespace) ?? throw new NotSupportedException("Unable to find matching local key.");
 			IE2eEndpoint RemoteEndpoint = LocalEndpoint.CreatePublic(RecipientPublicKey);
+			Aes256 SymmetricCipher = new Aes256();
 			byte[] LocalPublicKey = LocalEndpoint.PublicKey;
-			byte[] Secret = LocalEndpoint.GetSharedSecret(RemoteEndpoint);
+			byte[] Secret = LocalEndpoint.GetSharedSecretForEncryption(RemoteEndpoint,
+				SymmetricCipher, out byte[] KeyCipherText);
+			int KeyCipherTextLen = KeyCipherText is null ? 0 : KeyCipherText.Length;
 			byte[] Digest = Hashes.ComputeSHA256Hash(Secret);
 			byte[] NonceDigest = Hashes.ComputeSHA256Hash(Nonce);
 			byte[] Key = new byte[16];
@@ -8018,6 +8021,46 @@ namespace Waher.Networking.XMPP.Contracts
 				Encrypted = Aes.TransformFinalBlock(ToEncrypt, 0, c);
 			}
 
+			if (LocalEndpoint.SharedSecretUseCipherText)
+			{
+				c = 0;
+				i = KeyCipherTextLen;
+
+				do
+				{
+					i >>= 7;
+					c++;
+				}
+				while (i > 0);
+
+				c += KeyCipherTextLen + Encrypted.Length;
+
+				byte[] Encrypted2 = new byte[c];
+
+				i = KeyCipherTextLen;
+				j = 0;
+
+				do
+				{
+					Encrypted2[j] = (byte)(i & 127);
+					i >>= 7;
+					if (i > 0)
+						Encrypted2[j] |= 0x80;
+
+					j++;
+				}
+				while (i > 0);
+
+				Array.Copy(KeyCipherText, 0, Encrypted2, j, KeyCipherTextLen);
+				j += KeyCipherTextLen;
+
+				Array.Copy(Encrypted, 0, Encrypted2, j, Encrypted.Length);
+
+				Encrypted = Encrypted2;
+			}
+			else if (KeyCipherTextLen > 0)
+				throw new InvalidOperationException("Shared secret ciphertexts not supported.");
+
 			return (Encrypted, LocalPublicKey);
 		}
 
@@ -8033,16 +8076,40 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			IE2eEndpoint LocalEndpoint = await this.GetMatchingLocalKeyAsync();
 			IE2eEndpoint RemoteEndpoint = LocalEndpoint.CreatePublic(SenderPublicKey);
-			byte[] Secret = LocalEndpoint.GetSharedSecret(RemoteEndpoint);
+			byte[] KeyCipherText;
+			int i, j, c;
+			byte b;
+
+			i = 0;
+			c = 0;
+
+			if (LocalEndpoint.SharedSecretUseCipherText)
+			{
+				do
+				{
+					b = EncryptedMessage[i++];
+					c <<= 7;
+					c |= b & 0x7f;
+				}
+				while ((b & 0x80) != 0);
+
+				if (c < 0 || c > EncryptedMessage.Length - i)
+					throw new InvalidOperationException("Unable to decrypt message.");
+
+				KeyCipherText = new byte[c];
+				Array.Copy(EncryptedMessage, 0, KeyCipherText, 0, c);
+			}
+			else
+				KeyCipherText = null;
+
+			byte[] Secret = LocalEndpoint.GetSharedSecretForDecryption(RemoteEndpoint, KeyCipherText);
 			byte[] NonceDigest = Hashes.ComputeSHA256Hash(Nonce);
 			byte[] Key = new byte[16];
 			byte[] IV = new byte[16];
 			byte[] Decrypted;
-			int i, c;
-			byte b;
 
-			for (i = 0; i < 32; i++)
-				Secret[i] ^= NonceDigest[i];
+			for (j = 0; j < 32; j++)
+				Secret[j] ^= NonceDigest[j];
 
 			byte[] Digest = Hashes.ComputeSHA256Hash(Secret);
 
@@ -8052,7 +8119,7 @@ namespace Waher.Networking.XMPP.Contracts
 			lock (this.aes)
 			{
 				using ICryptoTransform Aes = this.aes.CreateDecryptor(Key, IV);
-				Decrypted = Aes.TransformFinalBlock(EncryptedMessage, 0, EncryptedMessage.Length);
+				Decrypted = Aes.TransformFinalBlock(EncryptedMessage, i, EncryptedMessage.Length - i);
 			}
 
 			i = 0;

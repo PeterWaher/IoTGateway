@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Waher.Runtime.Cache;
+using Waher.Security;
 using Waher.Security.PQC;
 
 namespace Waher.Networking.XMPP.P2P.E2E
@@ -11,7 +12,6 @@ namespace Waher.Networking.XMPP.P2P.E2E
 	public abstract class ModuleLatticeEndpoint : E2eEndpoint
 	{
 		private const string preHashAlgorithm = "SHAKE-256";
-		private static readonly Cache<string, byte[]> sharedSecrets = new Cache<string, byte[]>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromDays(1), true);
 
 		private readonly ML_KEM keyEncapsulationMechanism;
 		private readonly ML_DSA signatureAlgorithm;
@@ -117,47 +117,70 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		public ML_DSA SignatureAlgorithm => this.signatureAlgorithm;
 
 		/// <summary>
-		/// Gets a shared secret
+		/// Gets a shared secret for encryption, and optionally a corresponding cipher text.
 		/// </summary>
 		/// <param name="RemoteEndpoint">Remote endpoint</param>
+		/// <param name="Cipher">Symmetric cipher to use for encryption.</param>
+		/// <param name="CipherText">Optional cipher text required by the recipient to
+		/// be able to generate the same shared secret.</param>
 		/// <returns>Shared secret.</returns>
-		public override byte[] GetSharedSecret(IE2eEndpoint RemoteEndpoint)
+		public override byte[] GetSharedSecretForEncryption(IE2eEndpoint RemoteEndpoint,
+			IE2eSymmetricCipher Cipher, out byte[] CipherText)
 		{
-			return GetSharedKey(this, RemoteEndpoint);
+			if (!(RemoteEndpoint is ModuleLatticeEndpoint RemoteModuleLatticeEndpoint))
+				throw new ArgumentException("Remote endpoint is not a Module Lattice endpoint.", nameof(RemoteEndpoint));
+
+			if (!this.keyEncapsulationMechanismKeys.HasDecapsulationKey)
+				throw new InvalidOperationException("Local endpoint does not have a private key for shared secret calculation.");
+			
+			if (this.keyEncapsulationMechanism.PublicKeyLength !=
+				RemoteModuleLatticeEndpoint.keyEncapsulationMechanism.PublicKeyLength ||
+				this.signatureAlgorithm.PublicKeyLength !=
+				RemoteModuleLatticeEndpoint.signatureAlgorithm.PublicKeyLength)
+			{
+				throw new ArgumentException("Key lengths do not match.", nameof(RemoteEndpoint));
+			}
+
+			ML_KEM_Encapsulation Encapsulation = this.keyEncapsulationMechanism.Encapsulate(
+				RemoteModuleLatticeEndpoint.keyEncapsulationMechanismKeys.EncapsulationKey);
+
+			CipherText = Encapsulation.CipherText;
+
+			return Encapsulation.SharedSecret;
 		}
 
 		/// <summary>
-		/// Shared secret, for underlying symmetric cipher.
+		/// Gets a shared secret for decryption.
 		/// </summary>
-		public static byte[] GetSharedKey(ModuleLatticeEndpoint LocalKey, IE2eEndpoint RemoteKey)
+		/// <param name="RemoteEndpoint">Remote endpoint</param>
+		/// <param name="CipherText">Optional cipher text required by the recipient to
+		/// be able to generate the same shared secret.</param>
+		/// <returns>Shared secret.</returns>
+		public override byte[] GetSharedSecretForDecryption(IE2eEndpoint RemoteEndpoint,
+			byte[] CipherText)
 		{
-			string Key = LocalKey.PublicKeyBase64 + ";" + RemoteKey.PublicKeyBase64;
+			if (!(RemoteEndpoint is ModuleLatticeEndpoint RemoteModuleLatticeEndpoint))
+				throw new ArgumentException("Remote endpoint is not a Module Lattice endpoint.", nameof(RemoteEndpoint));
 
-			if (!sharedSecrets.TryGetValue(Key, out byte[] SharedKey))
+			if (!this.keyEncapsulationMechanismKeys.HasDecapsulationKey)
+				throw new InvalidOperationException("Local endpoint does not have a private key for shared secret calculation.");
+
+			if (this.keyEncapsulationMechanism.PublicKeyLength !=
+				RemoteModuleLatticeEndpoint.keyEncapsulationMechanism.PublicKeyLength ||
+				this.signatureAlgorithm.PublicKeyLength !=
+				RemoteModuleLatticeEndpoint.signatureAlgorithm.PublicKeyLength)
 			{
-				if (!(RemoteKey is ModuleLatticeEndpoint RemoteModuleLatticeEndpoint))
-					throw new ArgumentException("Remote endpoint is not a Module Lattice endpoint.", nameof(RemoteKey));
-
-				if (!LocalKey.hasPrivateKey)
-					throw new InvalidOperationException("Local endpoint does not have a private key for shared secret calculation.");
-
-				if (LocalKey.keyEncapsulationMechanism.PublicKeyLength !=
-					RemoteModuleLatticeEndpoint.keyEncapsulationMechanism.PublicKeyLength ||
-					LocalKey.signatureAlgorithm.PublicKeyLength != 
-					RemoteModuleLatticeEndpoint.signatureAlgorithm.PublicKeyLength)
-				{
-					throw new ArgumentException("Key lengths do not match.", nameof(RemoteKey));
-				}
-
-				ML_KEM_Encapsulation Encapsulation = LocalKey.keyEncapsulationMechanism.Encapsulate(
-					RemoteModuleLatticeEndpoint.keyEncapsulationMechanismKeys.EncapsulationKey);
-
-				SharedKey = Encapsulation.SharedSecret;
-				sharedSecrets[Key] = SharedKey;
+				throw new ArgumentException("Key lengths do not match.", nameof(RemoteEndpoint));
 			}
 
-			return SharedKey;
+			return this.keyEncapsulationMechanism.Decapsulate(
+				this.keyEncapsulationMechanismKeys.DecapsulationKey, CipherText);
 		}
+
+		/// <summary>
+		/// If the recipient needs a cipher text to generate the same shared secret.
+		/// </summary>
+		public override bool SharedSecretUseCipherText => true;
 
 		/// <summary>
 		/// Signs binary data using the local private key.

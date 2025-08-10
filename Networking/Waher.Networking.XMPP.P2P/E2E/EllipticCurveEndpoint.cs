@@ -81,14 +81,37 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		public EllipticCurve PrevCurve => (this.Previous as EllipticCurveEndpoint)?.Curve;
 
 		/// <summary>
-		/// Gets a shared secret
+		/// Gets a shared secret for encryption, and optionally a corresponding cipher text.
 		/// </summary>
 		/// <param name="RemoteEndpoint">Remote endpoint</param>
+		/// <param name="Cipher">Symmetric cipher to use for encryption.</param>
+		/// <param name="CipherText">Optional cipher text required by the recipient to
+		/// be able to generate the same shared secret.</param>
 		/// <returns>Shared secret.</returns>
-		public override byte[] GetSharedSecret(IE2eEndpoint RemoteEndpoint)
+		public override byte[] GetSharedSecretForEncryption(IE2eEndpoint RemoteEndpoint,
+			IE2eSymmetricCipher Cipher, out byte[] CipherText)
+		{
+			CipherText = null;
+			return GetSharedKey(this, RemoteEndpoint);
+		}
+
+		/// <summary>
+		/// Gets a shared secret for decryption.
+		/// </summary>
+		/// <param name="RemoteEndpoint">Remote endpoint</param>
+		/// <param name="CipherText">Optional cipher text required by the recipient to
+		/// be able to generate the same shared secret.</param>
+		/// <returns>Shared secret.</returns>
+		public override byte[] GetSharedSecretForDecryption(IE2eEndpoint RemoteEndpoint,
+			byte[] CipherText)
 		{
 			return GetSharedKey(this, RemoteEndpoint);
 		}
+
+		/// <summary>
+		/// If the recipient needs a cipher text to generate the same shared secret.
+		/// </summary>
+		public override bool SharedSecretUseCipherText => false;
 
 		/// <summary>
 		/// Shared secret, for underlying symmetric cipher.

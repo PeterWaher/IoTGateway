@@ -773,10 +773,6 @@ namespace Waher.Networking.XMPP.P2P
 					if (Diff != 0)
 						return Diff;
 
-					Diff = (ep2.SupportsSharedSecrets ? 1 : 0) - (ep1.SupportsSharedSecrets ? 1 : 0);
-					if (Diff != 0)
-						return Diff;
-
 					return ep2.Score - ep1.Score;
 				});
 			}
@@ -856,8 +852,8 @@ namespace Waher.Networking.XMPP.P2P
 					if (Endpoints.Default is null)
 					{
 						IE2eEndpoint[] Ordered = SortedArray(Endpoints.ByFqn);
-						IE2eEndpoint LastSafeAndFastAndSignaturesAndSharedSecretsAndPqc = null;
-						IE2eEndpoint LastSafeAndFastAndSignaturesAndSharedSecrets = null;
+						IE2eEndpoint LastSafeAndFastAndSignaturesAndPqcAndSharedSecrets = null;
+						IE2eEndpoint LastSafeAndFastAndSignaturesAndPqc = null;
 						IE2eEndpoint LastSafeAndFastAndSignatures = null;
 						IE2eEndpoint LastSafeAndFast = null;
 						IE2eEndpoint LastSafe = null;
@@ -879,12 +875,12 @@ namespace Waher.Networking.XMPP.P2P
 									{
 										LastSafeAndFastAndSignatures = Endpoint;
 
-										if (Endpoint.SupportsSharedSecrets)
+										if (Endpoint.PostQuantumCryptography)
 										{
-											LastSafeAndFastAndSignaturesAndSharedSecrets = Endpoint;
+											LastSafeAndFastAndSignaturesAndPqc = Endpoint;
 
-											if (Endpoint.PostQuantumCryptography)
-												LastSafeAndFastAndSignaturesAndSharedSecretsAndPqc = Endpoint;
+											if (!Endpoint.SharedSecretUseCipherText)
+												LastSafeAndFastAndSignaturesAndPqcAndSharedSecrets = Endpoint;
 										}
 									}
 								}
@@ -892,8 +888,8 @@ namespace Waher.Networking.XMPP.P2P
 						}
 
 						Endpoints.Default =
-							LastSafeAndFastAndSignaturesAndSharedSecretsAndPqc ??
-							LastSafeAndFastAndSignaturesAndSharedSecrets ??
+							LastSafeAndFastAndSignaturesAndPqcAndSharedSecrets ??
+							LastSafeAndFastAndSignaturesAndPqc ??
 							LastSafeAndFastAndSignatures ??
 							LastSafeAndFast ?? LastSafe ??
 							Ordered[0];
@@ -1159,7 +1155,10 @@ namespace Waher.Networking.XMPP.P2P
 			XmppClient Client = Sender as XmppClient;
 			Tuple<string, string> T = this.Decrypt(Client, e.Id, e.Message.GetAttribute("type"), e.From, e.To, e.Content, Cipher);
 			if (T is null)
+			{
+				this.client.Error("Unable to decrypt or verify response.");
 				return Task.CompletedTask;
+			}
 
 			string Xml = T.Item1;
 			string EndpointReference = T.Item2;

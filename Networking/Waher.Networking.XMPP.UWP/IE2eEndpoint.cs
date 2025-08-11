@@ -94,39 +94,38 @@ namespace Waher.Networking.XMPP
         /// <param name="ParentNamespace">Namespace of parent element.</param>
 		void ToXml(StringBuilder Xml, string ParentNamespace);
 
-        /// <summary>
-        /// If shared secrets can be calculated from the endpoints keys.
-        /// </summary>
-        bool SupportsSharedSecrets
-        {
-            get;
-        }
+		/// <summary>
+		/// Gets a shared secret for encryption, and optionally a corresponding cipher text.
+		/// </summary>
+		/// <param name="RemoteEndpoint">Remote endpoint</param>
+		/// <param name="Cipher">Symmetric cipher to use for encryption.</param>
+		/// <param name="CipherText">Optional cipher text required by the recipient to
+		/// be able to generate the same shared secret.</param>
+		/// <returns>Shared secret.</returns>
+		byte[] GetSharedSecretForEncryption(IE2eEndpoint RemoteEndpoint, 
+            IE2eSymmetricCipher Cipher, out byte[] CipherText);
 
-        /// <summary>
-        /// Encrypts a secret. Used if shared secrets cannot be calculated.
-        /// </summary>
-        /// <param name="Secret">Secret</param>
-        /// <returns>Encrypted secret.</returns>
-        byte[] EncryptSecret(byte[] Secret);
+		/// <summary>
+		/// Gets a shared secret for decryption.
+		/// </summary>
+		/// <param name="RemoteEndpoint">Remote endpoint</param>
+		/// <param name="CipherText">Optional cipher text required by the recipient to
+		/// be able to generate the same shared secret.</param>
+		/// <returns>Shared secret.</returns>
+		byte[] GetSharedSecretForDecryption(IE2eEndpoint RemoteEndpoint, byte[] CipherText);
 
-        /// <summary>
-        /// Decrypts a secret. Used if shared secrets cannot be calculated.
-        /// </summary>
-        /// <param name="Secret">Encrypted secret</param>
-        /// <returns>Decrypted secret.</returns>
-        byte[] DecryptSecret(byte[] Secret);
+		/// <summary>
+		/// If the recipient needs a cipher text to generate the same shared secret.
+		/// </summary>
+		bool SharedSecretUseCipherText
+		{
+			get;
+		}
 
-        /// <summary>
-        /// Gets a shared secret
-        /// </summary>
-        /// <param name="RemoteEndpoint">Remote endpoint</param>
-        /// <returns>Shared secret.</returns>
-        byte[] GetSharedSecret(IE2eEndpoint RemoteEndpoint);
-
-        /// <summary>
-        /// If signatures are supported.
-        /// </summary>
-        bool SupportsSignatures
+		/// <summary>
+		/// If signatures are supported.
+		/// </summary>
+		bool SupportsSignatures
         {
             get;
         }
@@ -176,6 +175,15 @@ namespace Waher.Networking.XMPP
         {
             get;
         }
+
+		/// <summary>
+		/// If post-quantum cryptography is used.
+		/// </summary>
+		bool PostQuantumCryptography
+        {
+            get;
+        }
+
         /// <summary>
         /// Provides a score for the endpoint. More features, higher score (comparable to alternatives with the same security strength).
         /// </summary>

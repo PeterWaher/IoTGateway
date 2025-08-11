@@ -24,11 +24,9 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Networking.HTTP.Vanity;
 using Waher.Runtime.Cache;
-using Waher.Script;
 using Waher.Security;
 using Waher.Networking.HTTP.HTTP2;
 using Waher.Runtime.IO;
-using Waher.Networking.HTTP.ScriptExtensions;
 
 namespace Waher.Networking.HTTP
 {

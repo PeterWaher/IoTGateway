@@ -151,7 +151,7 @@ namespace Waher.IoTGateway
 		private static ProvisioningClient provisioningClient = null;
 		private static XmppCredentials xmppCredentials = null;
 		private static XmppClient xmppClient = null;
-		private static Networking.XMPP.Avatar.AvatarClient avatarClient = null;
+		private static AvatarClient avatarClient = null;
 		private static Networking.XMPP.InBandBytestreams.IbbClient ibbClient = null;
 		private static Socks5Proxy socksProxy = null;
 		private static ConcentratorServer concentratorServer = null;
@@ -1124,6 +1124,7 @@ namespace Waher.IoTGateway
 				webServer.Register(new Echo());
 				webServer.Register(new WebResources.Ping());
 				webServer.Register(new ProposeContract());
+				webServer.Register(new UrlShortener());
 
 				if (emoji1_24x24 is null)
 				{
@@ -1375,7 +1376,7 @@ namespace Waher.IoTGateway
 				await GetDataSources.Raise(typeof(Gateway), Sources);
 
 				concentratorServer = await ConcentratorServer.Create(xmppClient, thingRegistryClient, provisioningClient, Sources.Sources);
-				avatarClient = new Networking.XMPP.Avatar.AvatarClient(xmppClient, pepClient);
+				avatarClient = new AvatarClient(xmppClient, pepClient);
 
 				Types.SetModuleParameter("Concentrator", concentratorServer);
 				Types.SetModuleParameter("Sources", concentratorServer.DataSources);
@@ -5553,5 +5554,23 @@ namespace Waher.IoTGateway
 		private static bool httpProfilingFolderChecked = false;
 
 		#endregion
+
+		#region Temporary and short URLs
+
+		/// <summary>
+		/// Shortens a URL temporarily. Shortened URLs are available at most for 24 hours
+		/// (if used) and 1h if not used, or until the next server restart, or until it
+		/// is used once if <paramref name="OneTimeUse"/> is true.
+		/// </summary>
+		/// <param name="Url">URL</param>
+		/// <param name="OneTimeUse">If the shortened URL can be used only once.</param>
+		/// <returns>Shortened URL</returns>
+		public static string GetShortUrl(string Url, bool OneTimeUse)
+		{
+			return UrlShortener.GetShortUrl(Url, OneTimeUse);
+		}
+
+		#endregion
+
 	}
 }

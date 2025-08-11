@@ -1031,10 +1031,13 @@ namespace Waher.Networking.XMPP.P2P
 		/// Returns the local endpoint that matches a given key name and namespace.
 		/// </summary>
 		/// <param name="KeyName">Key (algorithm) name.</param>
-		/// <param name="KeyNamespace">Key (algorithm) namespace.</param>
+		/// <param name="KeyNamespace">Optional Key (algorithm) namespace.</param>
 		/// <returns>Matching key, or null if none found.</returns>
 		public IE2eEndpoint FindLocalEndpoint(string KeyName, string KeyNamespace)
 		{
+			if (string.IsNullOrEmpty(KeyNamespace))
+				KeyNamespace = IoTHarmonizationE2ECurrent;
+
 			if (this.keys?.TryGetValue(KeyNamespace + "#" + KeyName, out IE2eEndpoint Result) ?? false)
 				return Result;
 			else

@@ -42,17 +42,26 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			this.hasPrivateKey = this.keyEncapsulationMechanismKeys.HasDecapsulationKey &&
 				this.signatureAlgorithmKeys.HasPrivateKey;
 
-			this.publicKey = new byte[this.keyEncapsulationMechanism.PublicKeyLength +
-				this.signatureAlgorithm.PublicKeyLength];
+			if (this.keyEncapsulationMechanismKeys.EncapsulationKey is null ||
+				this.signatureAlgorithmKeys.PublicKey is null)
+			{
+				this.publicKey = null;
+				this.publicKeyBase64 = null;
+			}
+			else
+			{
+				this.publicKey = new byte[this.keyEncapsulationMechanism.PublicKeyLength +
+					this.signatureAlgorithm.PublicKeyLength];
 
-			Array.Copy(this.keyEncapsulationMechanismKeys.EncapsulationKey, 0,
-				this.publicKey, 0, this.keyEncapsulationMechanism.PublicKeyLength);
+				Array.Copy(this.keyEncapsulationMechanismKeys.EncapsulationKey, 0,
+					this.publicKey, 0, this.keyEncapsulationMechanism.PublicKeyLength);
 
-			Array.Copy(this.signatureAlgorithmKeys.PublicKey, 0,
-				this.publicKey, this.keyEncapsulationMechanism.PublicKeyLength,
-				this.signatureAlgorithm.PublicKeyLength);
-
-			this.publicKeyBase64 = Convert.ToBase64String(this.publicKey);
+				Array.Copy(this.signatureAlgorithmKeys.PublicKey, 0,
+					this.publicKey, this.keyEncapsulationMechanism.PublicKeyLength,
+					this.signatureAlgorithm.PublicKeyLength);
+		
+				this.publicKeyBase64 = Convert.ToBase64String(this.publicKey);
+			}
 		}
 
 		/// <summary>
@@ -311,20 +320,36 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			if (Secret is null)
 				throw new ArgumentNullException(nameof(Secret));
 
-			if (Secret.Length != 96)
-				throw new ArgumentException("Secret must be 96 bytes long.", nameof(Secret));
+			int c, d;
 
-			byte[] SeedKem = new byte[64];
-			byte[] SeedDsa = new byte[32];
+			if (Secret.Length == 96)
+			{
+				byte[] SeedKem = new byte[64];
+				byte[] SeedDsa = new byte[32];
 
-			Array.Copy(Secret, 0, SeedKem, 0, 64);
-			Array.Copy(Secret, 64, SeedDsa, 0, 32);
+				Array.Copy(Secret, 0, SeedKem, 0, 64);
+				Array.Copy(Secret, 64, SeedDsa, 0, 32);
 
-			KemKeys = ML_KEM.ML_KEM_512.KeyGen_FromSeed(SeedKem, true);
-			DsaKeys = ML_DSA.ML_DSA_44.KeyGen_Internal(SeedDsa, true);
+				KemKeys = ML_KEM.ML_KEM_512.KeyGen_FromSeed(SeedKem, true);
+				DsaKeys = ML_DSA.ML_DSA_44.KeyGen_Internal(SeedDsa, true);
 
-			Array.Clear(SeedKem, 0, SeedKem.Length);
-			Array.Clear(SeedDsa, 0, SeedDsa.Length);
+				Array.Clear(SeedKem, 0, SeedKem.Length);
+				Array.Clear(SeedDsa, 0, SeedDsa.Length);
+			}
+			else if (Secret.Length == (c = this.keyEncapsulationMechanism.PrivateKeyLength) +
+				(d = this.signatureAlgorithm.PrivateKeyLength))
+			{
+				byte[] Kem = new byte[c];
+				byte[] Dsa = new byte[d];
+
+				Array.Copy(Secret, 0, Kem, 0, c);
+				Array.Copy(Secret, c, Dsa, 0, d);
+
+				KemKeys = new ML_KEM_Keys(new K_PKE_Keys(null, null, Kem), Kem, null);
+				DsaKeys = ML_DSA_Keys.FromPrivateKey(Dsa);
+			}
+			else
+				throw new ArgumentException("Invalid private key length.", nameof(Secret));
 		}
 
 		/// <summary>
@@ -339,13 +364,28 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				throw new InvalidOperationException("Endpoint has no private keys.");
 			}
 
-			int c = this.keyEncapsulationMechanismKeys.DecapsulationKey.Length;
-			int d = this.signatureAlgorithmKeys.PrivateKey.Length;
+			byte[] KemKey;
+			byte[] DsaKey;
+
+			if (this.keyEncapsulationMechanismKeys.Seed is null ||
+				this.signatureAlgorithmKeys.Seed is null)
+			{
+				KemKey = this.keyEncapsulationMechanismKeys.DecapsulationKey;
+				DsaKey = this.signatureAlgorithmKeys.PrivateKey;
+			}
+			else
+			{
+				KemKey = this.keyEncapsulationMechanismKeys.Seed;
+				DsaKey = this.signatureAlgorithmKeys.Seed;
+			}
+
+			int c = KemKey.Length;
+			int d = DsaKey.Length;
 
 			byte[] Result = new byte[c + d];
 
-			Array.Copy(this.keyEncapsulationMechanismKeys.DecapsulationKey, 0, Result, 0, c);
-			Array.Copy(this.signatureAlgorithmKeys.PrivateKey, 0, Result, c, d);
+			Array.Copy(KemKey, 0, Result, 0, c);
+			Array.Copy(DsaKey, 0, Result, c, d);
 
 			return Result;
 		}

@@ -416,8 +416,15 @@ namespace Waher.Networking.XMPP.Contracts
 						{
 							if (Curve.LocalName == LocalName)
 							{
-								Keys.Add(Curve.CreatePrivate(Key));
-								break;
+								try
+								{
+									Keys.Add(Curve.CreatePrivate(Key));
+									break;
+								}
+								catch (Exception ex)
+								{
+									Log.Exception(ex);
+								}
 							}
 						}
 					}
@@ -7956,9 +7963,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// but must be unique for every message.</param>
 		/// <param name="RecipientPublicKey">Public key of recipient.</param>
 		/// <param name="RecipientPublicKeyName">Name of key algorithm of recipient.</param>
-		/// <param name="RecipientPublicKeyNamespace">Namespace of key algorithm of recipient.</param>
+		/// <param name="RecipientPublicKeyNamespace">Optional Namespace of key algorithm of recipient.</param>
 		/// <returns>Encrypted message, together with the public key used to obtain the shared secret.</returns>
-		public (byte[], byte[]) Encrypt(byte[] Message, byte[] Nonce, byte[] RecipientPublicKey, string RecipientPublicKeyName, string RecipientPublicKeyNamespace)
+		public (byte[], byte[]) Encrypt(byte[] Message, byte[] Nonce, byte[] RecipientPublicKey, string RecipientPublicKeyName, 
+			string RecipientPublicKeyNamespace)
 		{
 			IE2eEndpoint LocalEndpoint = this.localKeys.FindLocalEndpoint(RecipientPublicKeyName, RecipientPublicKeyNamespace) ?? throw new NotSupportedException("Unable to find matching local key.");
 			IE2eEndpoint RemoteEndpoint = LocalEndpoint.CreatePublic(RecipientPublicKey);

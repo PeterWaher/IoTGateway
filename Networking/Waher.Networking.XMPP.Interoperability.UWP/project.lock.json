@@ -1549,7 +1549,7 @@
           "lib/netstandard1.3/System.Xml.XmlDocument.dll": {}
         }
       },
-      "Waher.Content/3.3.5": {
+      "Waher.Content/3.3.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1569,7 +1569,7 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Runtime.Inventory": "1.4.3",
           "Waher.Runtime.Text": "1.2.0",
           "Waher.Script": "2.13.1"
@@ -1709,7 +1709,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Content.Xml": "3.1.2",
           "Waher.Persistence": "1.15.2",
           "Waher.Runtime.Threading": "2.1.1"
@@ -1771,7 +1771,7 @@
           "SkiaSharp": "2.88.9",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Content.Xml": "3.1.2",
           "Waher.Events": "1.4.4",
           "Waher.Runtime.Inventory": "1.4.3",
@@ -3623,7 +3623,7 @@
           "lib/netstandard1.3/System.Xml.XmlDocument.dll": {}
         }
       },
-      "Waher.Content/3.3.5": {
+      "Waher.Content/3.3.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -3643,7 +3643,7 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Runtime.Inventory": "1.4.3",
           "Waher.Runtime.Text": "1.2.0",
           "Waher.Script": "2.13.1"
@@ -3783,7 +3783,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Content.Xml": "3.1.2",
           "Waher.Persistence": "1.15.2",
           "Waher.Runtime.Threading": "2.1.1"
@@ -3845,7 +3845,7 @@
           "SkiaSharp": "2.88.9",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Content.Xml": "3.1.2",
           "Waher.Events": "1.4.4",
           "Waher.Runtime.Inventory": "1.4.3",
@@ -5802,7 +5802,7 @@
           "lib/netstandard1.3/System.Xml.XmlDocument.dll": {}
         }
       },
-      "Waher.Content/3.3.5": {
+      "Waher.Content/3.3.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -5822,7 +5822,7 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Runtime.Inventory": "1.4.3",
           "Waher.Runtime.Text": "1.2.0",
           "Waher.Script": "2.13.1"
@@ -5962,7 +5962,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Content.Xml": "3.1.2",
           "Waher.Persistence": "1.15.2",
           "Waher.Runtime.Threading": "2.1.1"
@@ -6024,7 +6024,7 @@
           "SkiaSharp": "2.88.9",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Content.Xml": "3.1.2",
           "Waher.Events": "1.4.4",
           "Waher.Runtime.Inventory": "1.4.3",
@@ -7876,7 +7876,7 @@
           "lib/netstandard1.3/System.Xml.XmlDocument.dll": {}
         }
       },
-      "Waher.Content/3.3.5": {
+      "Waher.Content/3.3.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -7896,7 +7896,7 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Runtime.Inventory": "1.4.3",
           "Waher.Runtime.Text": "1.2.0",
           "Waher.Script": "2.13.1"
@@ -8036,7 +8036,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Content.Xml": "3.1.2",
           "Waher.Persistence": "1.15.2",
           "Waher.Runtime.Threading": "2.1.1"
@@ -8098,7 +8098,7 @@
           "SkiaSharp": "2.88.9",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Content.Xml": "3.1.2",
           "Waher.Events": "1.4.4",
           "Waher.Runtime.Inventory": "1.4.3",
@@ -10055,7 +10055,7 @@
           "lib/netstandard1.3/System.Xml.XmlDocument.dll": {}
         }
       },
-      "Waher.Content/3.3.5": {
+      "Waher.Content/3.3.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10075,7 +10075,7 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Runtime.Inventory": "1.4.3",
           "Waher.Runtime.Text": "1.2.0",
           "Waher.Script": "2.13.1"
@@ -10215,7 +10215,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Content.Xml": "3.1.2",
           "Waher.Persistence": "1.15.2",
           "Waher.Runtime.Threading": "2.1.1"
@@ -10277,7 +10277,7 @@
           "SkiaSharp": "2.88.9",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Content.Xml": "3.1.2",
           "Waher.Events": "1.4.4",
           "Waher.Runtime.Inventory": "1.4.3",
@@ -12129,7 +12129,7 @@
           "lib/netstandard1.3/System.Xml.XmlDocument.dll": {}
         }
       },
-      "Waher.Content/3.3.5": {
+      "Waher.Content/3.3.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -12149,7 +12149,7 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Runtime.Inventory": "1.4.3",
           "Waher.Runtime.Text": "1.2.0",
           "Waher.Script": "2.13.1"
@@ -12289,7 +12289,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Content.Xml": "3.1.2",
           "Waher.Persistence": "1.15.2",
           "Waher.Runtime.Threading": "2.1.1"
@@ -12351,7 +12351,7 @@
           "SkiaSharp": "2.88.9",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Content.Xml": "3.1.2",
           "Waher.Events": "1.4.4",
           "Waher.Runtime.Inventory": "1.4.3",
@@ -14308,7 +14308,7 @@
           "lib/netstandard1.3/System.Xml.XmlDocument.dll": {}
         }
       },
-      "Waher.Content/3.3.5": {
+      "Waher.Content/3.3.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -14328,7 +14328,7 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Runtime.Inventory": "1.4.3",
           "Waher.Runtime.Text": "1.2.0",
           "Waher.Script": "2.13.1"
@@ -14468,7 +14468,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Content.Xml": "3.1.2",
           "Waher.Persistence": "1.15.2",
           "Waher.Runtime.Threading": "2.1.1"
@@ -14530,7 +14530,7 @@
           "SkiaSharp": "2.88.9",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content": "3.3.5",
+          "Waher.Content": "3.3.6",
           "Waher.Content.Xml": "3.1.2",
           "Waher.Events": "1.4.4",
           "Waher.Runtime.Inventory": "1.4.3",
@@ -22169,7 +22169,7 @@
         "system.xml.xmldocument.nuspec"
       ]
     },
-    "Waher.Content/3.3.5": {
+    "Waher.Content/3.3.6": {
       "type": "project",
       "path": "../../Content/Waher.Content/Waher.Content.csproj",
       "msbuildProject": "../../Content/Waher.Content/Waher.Content.csproj"

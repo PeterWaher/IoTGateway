@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using Waher.Runtime.Cache;
-using Waher.Security;
 using Waher.Security.PQC;
 
 namespace Waher.Networking.XMPP.P2P.E2E
@@ -59,7 +57,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				Array.Copy(this.signatureAlgorithmKeys.PublicKey, 0,
 					this.publicKey, this.keyEncapsulationMechanism.PublicKeyLength,
 					this.signatureAlgorithm.PublicKeyLength);
-		
+
 				this.publicKeyBase64 = Convert.ToBase64String(this.publicKey);
 			}
 		}
@@ -141,7 +139,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
 			if (!this.keyEncapsulationMechanismKeys.HasDecapsulationKey)
 				throw new InvalidOperationException("Local endpoint does not have a private key for shared secret calculation.");
-			
+
 			if (this.keyEncapsulationMechanism.PublicKeyLength !=
 				RemoteModuleLatticeEndpoint.keyEncapsulationMechanism.PublicKeyLength ||
 				this.signatureAlgorithm.PublicKeyLength !=
@@ -208,7 +206,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			{
 				Signature = this.signatureAlgorithm.Sign(this.signatureAlgorithmKeys,
 					Data, null, preHashAlgorithm, out _);
-				Valid = this.signatureAlgorithm.Verify(this.signatureAlgorithmKeys, Data, 
+				Valid = this.signatureAlgorithm.Verify(this.signatureAlgorithmKeys, Data,
 					Signature, null, preHashAlgorithm);
 			}
 			while (!Valid);
@@ -314,13 +312,11 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <param name="Secret">96-byte secret.</param>
 		/// <param name="KemKeys">Keys for key exchange</param>
 		/// <param name="DsaKeys">Keys for digital signatures.</param>
-		protected void GeneratePrivateKeys(byte[] Secret, out ML_KEM_Keys KemKeys, 
+		protected void GeneratePrivateKeys(byte[] Secret, out ML_KEM_Keys KemKeys,
 			out ML_DSA_Keys DsaKeys)
 		{
 			if (Secret is null)
 				throw new ArgumentNullException(nameof(Secret));
-
-			int c, d;
 
 			if (Secret.Length == 96)
 			{
@@ -335,18 +331,6 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
 				Array.Clear(SeedKem, 0, SeedKem.Length);
 				Array.Clear(SeedDsa, 0, SeedDsa.Length);
-			}
-			else if (Secret.Length == (c = this.keyEncapsulationMechanism.PrivateKeyLength) +
-				(d = this.signatureAlgorithm.PrivateKeyLength))
-			{
-				byte[] Kem = new byte[c];
-				byte[] Dsa = new byte[d];
-
-				Array.Copy(Secret, 0, Kem, 0, c);
-				Array.Copy(Secret, c, Dsa, 0, d);
-
-				KemKeys = new ML_KEM_Keys(new K_PKE_Keys(null, null, Kem), Kem, null);
-				DsaKeys = ML_DSA_Keys.FromPrivateKey(Dsa);
 			}
 			else
 				throw new ArgumentException("Invalid private key length.", nameof(Secret));
@@ -364,20 +348,14 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				throw new InvalidOperationException("Endpoint has no private keys.");
 			}
 
-			byte[] KemKey;
-			byte[] DsaKey;
-
 			if (this.keyEncapsulationMechanismKeys.Seed is null ||
 				this.signatureAlgorithmKeys.Seed is null)
 			{
-				KemKey = this.keyEncapsulationMechanismKeys.DecapsulationKey;
-				DsaKey = this.signatureAlgorithmKeys.PrivateKey;
+				throw new InvalidOperationException("Endpoint has no seeds, which is required to export private key.");
 			}
-			else
-			{
-				KemKey = this.keyEncapsulationMechanismKeys.Seed;
-				DsaKey = this.signatureAlgorithmKeys.Seed;
-			}
+
+			byte[] KemKey = this.keyEncapsulationMechanismKeys.Seed;
+			byte[] DsaKey = this.signatureAlgorithmKeys.Seed;
 
 			int c = KemKey.Length;
 			int d = DsaKey.Length;

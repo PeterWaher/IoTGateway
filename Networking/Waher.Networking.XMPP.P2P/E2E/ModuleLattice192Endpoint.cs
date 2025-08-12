@@ -21,8 +21,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// </summary>
 		/// <param name="DefaultSymmetricCipher">Default symmetric cipher.</param>
 		public ModuleLattice192Endpoint(IE2eSymmetricCipher DefaultSymmetricCipher)
-			: base(ML_KEM.ML_KEM_768, ML_KEM.ML_KEM_768.KeyGen(),
-				  ML_DSA.ML_DSA_65, ML_DSA.ML_DSA_65.KeyGen(),
+			: base(ML_KEM.ML_KEM_768, ML_KEM.ML_KEM_768.KeyGen(true),
+				  ML_DSA.ML_DSA_65, ML_DSA.ML_DSA_65.KeyGen(true),
 				  DefaultSymmetricCipher)
 		{
 		}

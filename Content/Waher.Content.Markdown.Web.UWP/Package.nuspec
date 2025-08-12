@@ -30,7 +30,7 @@
 				<dependency id="Waher.Networking.HTTP.UWP" version="4.4.4"/>
 				<dependency id="Waher.Runtime.Inventory" version="1.4.3"/>
 				<dependency id="Waher.Runtime.IO" version="1.0.4"/>
-				<dependency id="Waher.Script" version="2.13.1"/>
+				<dependency id="Waher.Script" version="2.13.2"/>
 				<dependency id="Waher.Security" version="1.0.13"/>
 			</group>
 		</dependencies>

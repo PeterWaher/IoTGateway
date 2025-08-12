@@ -30,7 +30,7 @@
 			<dependency id="Waher.Runtime.Collections" version="1.0.3"/>
 			<dependency id="Waher.Runtime.Inventory" version="1.4.3"/>
 			<dependency id="Waher.Runtime.Threading" version="2.1.1"/>
-			<dependency id="Waher.Script" version="2.13.1"/>
+			<dependency id="Waher.Script" version="2.13.2"/>
 			<dependency id="Waher.Script.Graphs" version="2.3.2"/>
 			<dependency id="Waher.Security" version="1.0.13"/>
 			<dependency id="Waher.Things" version="3.2.2"/>

@@ -198,21 +198,27 @@ namespace Waher.Script.Functions.DateAndTime
 			}
 			else
 			{
+				int j = s.IndexOf('T');
 				int i = s.LastIndexOfAny(DateTimeOffset.PlusMinus);
 
-				if (!System.TimeSpan.TryParse(s.Substring(i + 1), out System.TimeSpan TZ))
+				if (i >= j)
 				{
-					TP = System.DateTime.MinValue;
-					return false;
+					if (!System.TimeSpan.TryParse(s.Substring(i + 1), out System.TimeSpan TZ))
+					{
+						TP = System.DateTime.MinValue;
+						return false;
+					}
+
+					if (s[i] == '-')
+						TZ = -TZ;
+
+					s = s.Substring(0, i).TrimEnd();
+
+					Kind = DateTimeKind.Utc;
+					TimeZone = TZ;
 				}
-
-				if (s[i] == '-')
-					TZ = -TZ;
-
-				s = s.Substring(0, i).TrimEnd();
-
-				Kind = DateTimeKind.Utc;
-				TimeZone = TZ;
+				else
+					Kind = DateTimeKind.Unspecified;
 			}
 
 			int c = s.Length;

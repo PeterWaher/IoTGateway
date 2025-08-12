@@ -326,8 +326,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				Array.Copy(Secret, 0, SeedKem, 0, 64);
 				Array.Copy(Secret, 64, SeedDsa, 0, 32);
 
-				KemKeys = ML_KEM.ML_KEM_512.KeyGen_FromSeed(SeedKem, true);
-				DsaKeys = ML_DSA.ML_DSA_44.KeyGen_Internal(SeedDsa, true);
+				KemKeys = this.keyEncapsulationMechanism.KeyGen_FromSeed(SeedKem, true);
+				DsaKeys = this.signatureAlgorithm.KeyGen_Internal(SeedDsa, true);
 
 				Array.Clear(SeedKem, 0, SeedKem.Length);
 				Array.Clear(SeedDsa, 0, SeedDsa.Length);

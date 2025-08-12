@@ -132,11 +132,24 @@ namespace Waher.Security.PQC
 		/// (160*((l+k)*bitlen(2η)+dk) bytes).</returns>
 		public ML_DSA_Keys KeyGen()
 		{
+			return this.KeyGen(false);
+		}
+
+		/// <summary>
+		/// Generates a public and private key. 
+		/// (Algorithm 1 ML-DSA.KeyGen() in §5.1)
+		/// </summary>
+		/// <param name="ReturnSeed">If seed should be returned.</param>
+		/// <returns>Public Key pk (320k+32 bytes) and Private Key sk 
+		/// (160*((l+k)*bitlen(2η)+dk) bytes).</returns>
+		public ML_DSA_Keys KeyGen(bool ReturnSeed)
+		{
 			byte[] ξ = CreateSeed();
 
-			ML_DSA_Keys Result = this.KeyGen_Internal(ξ);
+			ML_DSA_Keys Result = this.KeyGen_Internal(ξ, ReturnSeed);
 
-			Clear(ξ);
+			if (!ReturnSeed)
+				Clear(ξ);
 
 			return Result;
 		}

@@ -189,6 +189,7 @@ namespace Waher.Script.Functions.DateAndTime
 			s = s.Trim();
 
 			DateTimeKind Kind;
+			System.TimeSpan? TimeZone = null;
 
 			if (s.EndsWith("z", StringComparison.CurrentCultureIgnoreCase))
 			{
@@ -196,7 +197,23 @@ namespace Waher.Script.Functions.DateAndTime
 				s = s.Substring(0, s.Length - 1).TrimEnd();
 			}
 			else
-				Kind = DateTimeKind.Unspecified;
+			{
+				int i = s.LastIndexOfAny(DateTimeOffset.PlusMinus);
+
+				if (!System.TimeSpan.TryParse(s.Substring(i + 1), out System.TimeSpan TZ))
+				{
+					TP = System.DateTime.MinValue;
+					return false;
+				}
+
+				if (s[i] == '-')
+					TZ = -TZ;
+
+				s = s.Substring(0, i).TrimEnd();
+
+				Kind = DateTimeKind.Utc;
+				TimeZone = TZ;
+			}
 
 			int c = s.Length;
 			int Pos = 0;
@@ -209,6 +226,9 @@ namespace Waher.Script.Functions.DateAndTime
 			else if (Pos >= c)
 			{
 				TP = new System.DateTime(Year, 1, 1, 0, 0, 0, Kind);
+				if (TimeZone.HasValue)
+					TP = TP.Add(TimeZone.Value);
+
 				return true;
 			}
 
@@ -220,6 +240,9 @@ namespace Waher.Script.Functions.DateAndTime
 			else if (Pos >= c)
 			{
 				TP = new System.DateTime(Year, Month, 1, 0, 0, 0, Kind);
+				if (TimeZone.HasValue)
+					TP = TP.Add(TimeZone.Value);
+
 				return true;
 			}
 
@@ -231,6 +254,9 @@ namespace Waher.Script.Functions.DateAndTime
 			else if (Pos >= c)
 			{
 				TP = new System.DateTime(Year, Month, Day, 0, 0, 0, Kind);
+				if (TimeZone.HasValue)
+					TP = TP.Add(TimeZone.Value);
+
 				return true;
 			}
 
@@ -242,6 +268,9 @@ namespace Waher.Script.Functions.DateAndTime
 			else if (Pos >= c)
 			{
 				TP = new System.DateTime(Year, Month, Day, Hour, 0, 0, Kind);
+				if (TimeZone.HasValue)
+					TP = TP.Add(TimeZone.Value);
+
 				return true;
 			}
 
@@ -253,6 +282,9 @@ namespace Waher.Script.Functions.DateAndTime
 			else if (Pos >= c)
 			{
 				TP = new System.DateTime(Year, Month, Day, Hour, Minute, 0, Kind);
+				if (TimeZone.HasValue)
+					TP = TP.Add(TimeZone.Value);
+
 				return true;
 			}
 
@@ -264,6 +296,9 @@ namespace Waher.Script.Functions.DateAndTime
 			else if (Pos >= c)
 			{
 				TP = new System.DateTime(Year, Month, Day, Hour, Minute, Second, Kind);
+				if (TimeZone.HasValue)
+					TP = TP.Add(TimeZone.Value);
+
 				return true;
 			}
 
@@ -286,6 +321,9 @@ namespace Waher.Script.Functions.DateAndTime
 			}
 
 			TP = new System.DateTime(Year, Month, Day, Hour, Minute, Second, MilliSecond, Kind);
+			if (TimeZone.HasValue)
+				TP = TP.Add(TimeZone.Value);
+
 			return true;
 		}
 

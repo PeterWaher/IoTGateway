@@ -201,7 +201,7 @@ namespace Waher.Script.Functions.DateAndTime
 			return true;
 		}
 
-		private static readonly char[] PlusMinus = new char[] { '+', '-' };
+		internal static readonly char[] PlusMinus = new char[] { '+', '-' };
 
 		/// <summary>
 		/// Performs a pattern match operation.

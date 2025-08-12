@@ -1678,7 +1678,7 @@
           "Waher.Security": "1.0.13"
         }
       },
-      "Waher.Security.SHA3/1.2.0": {
+      "Waher.Security.SHA3/1.2.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -3721,7 +3721,7 @@
           "Waher.Security": "1.0.13"
         }
       },
-      "Waher.Security.SHA3/1.2.0": {
+      "Waher.Security.SHA3/1.2.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -5869,7 +5869,7 @@
           "Waher.Security": "1.0.13"
         }
       },
-      "Waher.Security.SHA3/1.2.0": {
+      "Waher.Security.SHA3/1.2.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -7912,7 +7912,7 @@
           "Waher.Security": "1.0.13"
         }
       },
-      "Waher.Security.SHA3/1.2.0": {
+      "Waher.Security.SHA3/1.2.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10060,7 +10060,7 @@
           "Waher.Security": "1.0.13"
         }
       },
-      "Waher.Security.SHA3/1.2.0": {
+      "Waher.Security.SHA3/1.2.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -12103,7 +12103,7 @@
           "Waher.Security": "1.0.13"
         }
       },
-      "Waher.Security.SHA3/1.2.0": {
+      "Waher.Security.SHA3/1.2.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -14251,7 +14251,7 @@
           "Waher.Security": "1.0.13"
         }
       },
-      "Waher.Security.SHA3/1.2.0": {
+      "Waher.Security.SHA3/1.2.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -21844,7 +21844,7 @@
       "path": "../Waher.Security.LoginMonitor.UWP/Waher.Security.LoginMonitor.UWP.csproj",
       "msbuildProject": "../Waher.Security.LoginMonitor.UWP/Waher.Security.LoginMonitor.UWP.csproj"
     },
-    "Waher.Security.SHA3/1.2.0": {
+    "Waher.Security.SHA3/1.2.1": {
       "type": "project",
       "path": "../Waher.Security.SHA3/Waher.Security.SHA3.csproj",
       "msbuildProject": "../Waher.Security.SHA3/Waher.Security.SHA3.csproj"

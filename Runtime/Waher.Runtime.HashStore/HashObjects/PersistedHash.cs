@@ -54,7 +54,7 @@ namespace Waher.Runtime.HashStore.HashObjects
 		{
 			get
 			{
-				if (this.ExpiresUtc == DateTime.MaxValue)
+				if (this.ExpiresUtc.Year >= 9999)
 					return int.MaxValue;
 
 				TimeSpan Span = this.ExpiresUtc - DateTime.UtcNow;

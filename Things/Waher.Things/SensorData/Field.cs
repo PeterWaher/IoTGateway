@@ -222,7 +222,7 @@ namespace Waher.Things.SensorData
 		{
 			get
 			{
-				if (this.expires == DateTime.MaxValue)
+				if (this.expires.Year >= 9999)
 					return int.MaxValue;
 
 				TimeSpan Span = this.expires - DateTime.Now;

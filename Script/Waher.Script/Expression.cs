@@ -5336,6 +5336,8 @@ namespace Waher.Script
 
 				return Dest;
 			}
+			else if (DesiredType.IsEnum && Obj is string s)
+				return Enum.Parse(DesiredType, s);
 
 			return Convert.ChangeType(Obj, DesiredType);
 		}

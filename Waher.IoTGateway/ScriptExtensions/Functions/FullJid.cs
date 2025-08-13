@@ -50,9 +50,11 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			if (i > 0)
 				return new StringValue(Argument);
 
-			RosterItem Item = Gateway.XmppClient[Argument];
-			if (Item is null)
-				throw new ScriptRuntimeException("Not connected with " + Argument, this);
+			if (Argument == Gateway.XmppClient.BareJID)
+				return new StringValue(Gateway.XmppClient.FullJID);
+
+			RosterItem Item = Gateway.XmppClient[Argument]
+				?? throw new ScriptRuntimeException("Not connected with " + Argument, this);
 
 			if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
 				throw new ScriptRuntimeException(Argument + " not online.", this);

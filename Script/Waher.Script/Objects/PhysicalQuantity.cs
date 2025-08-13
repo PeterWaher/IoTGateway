@@ -271,7 +271,7 @@ namespace Waher.Script.Objects
 					return true;
 				}
 			}
-			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(PhysicalQuantity).GetTypeInfo()))
+			else if (DesiredType.IsAssignableFrom(typeof(PhysicalQuantity).GetTypeInfo()))
 			{
 				Value = this;
 				return true;

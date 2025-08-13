@@ -289,7 +289,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					Field = null;
 					Nullable = false;
 
-					if (PropertyType.GetTypeInfo().IsGenericType)
+					if (PropertyType.IsGenericType)
 					{
 						Type GT = PropertyType.GetGenericTypeDefinition();
 						if (GT == typeof(Nullable<>))
@@ -318,7 +318,7 @@ namespace Waher.Networking.XMPP.Concentrator
 								Options.ToArray(), ToolTip, StringDataType.Instance, ValidationMethod, string.Empty, false, ReadOnly, false);
 						}
 					}
-					else if (PropertyType.GetTypeInfo().IsEnum)
+					else if (PropertyType.IsEnum)
 					{
 						if (ValidationMethod is null)
 							ValidationMethod = new BasicValidation();
@@ -650,11 +650,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			string DefaultLanguageCode = null;
 
-			foreach (object Item in Type.GetTypeInfo().GetCustomAttributes(typeof(DefaultLanguageAttribute), true))
+			foreach (DefaultLanguageAttribute Attr in Type.GetCustomAttributes<DefaultLanguageAttribute>(true))
 			{
-				if (!(Item is DefaultLanguageAttribute Attr))
-					continue;
-
 				DefaultLanguageCode = Attr.LanguageCode;
 				if (!string.IsNullOrEmpty(DefaultLanguageCode))
 					break;
@@ -859,7 +856,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					DataType = null;
 					Nullable = false;
 
-					if (PropertyType.GetTypeInfo().IsGenericType)
+					if (PropertyType.IsGenericType)
 					{
 						Type GT = PropertyType.GetGenericTypeDefinition();
 						if (GT == typeof(Nullable<>))
@@ -883,7 +880,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							ValueToSet = ValueToSet2 = Parsed = Field.ValueStrings;
 							DataType = StringDataType.Instance;
 						}
-						else if (PropertyType.GetTypeInfo().IsEnum)
+						else if (PropertyType.IsEnum)
 						{
 							if (ValidationMethod is null)
 								ValidationMethod = new BasicValidation();

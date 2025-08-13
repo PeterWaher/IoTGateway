@@ -181,7 +181,7 @@ namespace Waher.Script.Xml
 					if (PI.PropertyType == typeof(ScriptNode))
 						continue;
 
-					if (typeof(IEnumerable<ScriptNode>).GetTypeInfo().IsAssignableFrom(PI.PropertyType.GetTypeInfo()))
+					if (typeof(IEnumerable<ScriptNode>).IsAssignableFrom(PI.PropertyType.GetTypeInfo()))
 						continue;
 
 					switch (PI.Name)

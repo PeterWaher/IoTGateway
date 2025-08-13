@@ -532,7 +532,7 @@ namespace Waher.Content.Markdown
 			if (Expression.IsNullOrVoid(Value))
 				return string.Empty;
 
-			if (Value.GetType().GetTypeInfo().IsValueType || Value is string)
+			if (Value.GetType().IsValueType || Value is string)
 				return Value.ToString();
 
 			if (Value is XmlDocument ||
@@ -567,7 +567,7 @@ namespace Waher.Content.Markdown
 
 			foreach (Type T in TransparentExceptionTypes)
 			{
-				if (T.GetTypeInfo().IsAssignableFrom(ExceptionType))
+				if (T.IsAssignableFrom(ExceptionType))
 					System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 		}

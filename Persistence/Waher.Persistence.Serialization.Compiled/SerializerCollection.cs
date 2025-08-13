@@ -185,7 +185,7 @@ namespace Waher.Persistence.Serialization
 							{
 								Type NullableType = Type.GenericTypeArguments[0];
 
-								if (NullableType.GetTypeInfo().IsEnum)
+								if (NullableType.IsEnum)
 									Result = new NullableTypes.NullableEnumSerializer(NullableType);
 								else
 									Result = null;

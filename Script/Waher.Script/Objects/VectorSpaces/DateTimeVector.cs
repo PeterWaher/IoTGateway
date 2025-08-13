@@ -331,7 +331,7 @@ namespace Waher.Script.Objects.VectorSpaces
                 Value = this.Values;
                 return true;
             }
-            else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(DateTimeVector).GetTypeInfo()))
+            else if (DesiredType.IsAssignableFrom(typeof(DateTimeVector).GetTypeInfo()))
             {
                 Value = this;
                 return true;

@@ -40,7 +40,7 @@ namespace Waher.Script.Operators.Membership
 				Type T = TypeValue.Value;
 				object Obj = Left.AssociatedObjectValue;
 
-				if (!(Obj is null) && T.GetTypeInfo().IsAssignableFrom(Obj.GetType().GetTypeInfo()))
+				if (!(Obj is null) && T.IsAssignableFrom(Obj.GetType().GetTypeInfo()))
 					return Left;
 				else
 					return ObjectValue.Null;
@@ -63,7 +63,7 @@ namespace Waher.Script.Operators.Membership
 				Type T = TypeValue.Value;
 				object Obj = Left.AssociatedObjectValue;
 
-				if (!(Obj is null) && T.GetTypeInfo().IsAssignableFrom(Obj.GetType().GetTypeInfo()))
+				if (!(Obj is null) && T.IsAssignableFrom(Obj.GetType().GetTypeInfo()))
 					return Task.FromResult<IElement>(Left);
 				else
 					return Task.FromResult<IElement>(ObjectValue.Null);
@@ -86,7 +86,7 @@ namespace Waher.Script.Operators.Membership
 				Type T = TypeValue.Value;
 				object Obj = Left.AssociatedObjectValue;
 
-				if (!(Obj is null) && T.GetTypeInfo().IsAssignableFrom(Obj.GetType().GetTypeInfo()))
+				if (!(Obj is null) && T.IsAssignableFrom(Obj.GetType().GetTypeInfo()))
 					return Left;
 				else
 					return ObjectValue.Null;
@@ -109,7 +109,7 @@ namespace Waher.Script.Operators.Membership
 				Type T = TypeValue.Value;
 				object Obj = Left.AssociatedObjectValue;
 
-				if (!(Obj is null) && T.GetTypeInfo().IsAssignableFrom(Obj.GetType().GetTypeInfo()))
+				if (!(Obj is null) && T.IsAssignableFrom(Obj.GetType().GetTypeInfo()))
 					return Task.FromResult<IElement>(Left);
 				else
 					return Task.FromResult<IElement>(ObjectValue.Null);

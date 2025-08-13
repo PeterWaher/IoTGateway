@@ -201,7 +201,7 @@ namespace Waher.Script.Objects
 		/// <returns>If conversion was possible.</returns>
 		public override bool TryConvertTo(Type DesiredType, out object Value)
 		{
-			if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(BigInteger).GetTypeInfo()))
+			if (DesiredType.IsAssignableFrom(typeof(BigInteger).GetTypeInfo()))
 			{
 				Value = this.value;
 				return true;

@@ -47,7 +47,7 @@ namespace Waher.Script.Operators.Membership
             object Obj = Left.AssociatedObjectValue;
             Type Candidate = Obj?.GetType() ?? typeof(object);
 
-            if (Expected.GetTypeInfo().IsAssignableFrom(Candidate.GetTypeInfo()))
+            if (Expected.IsAssignableFrom(Candidate.GetTypeInfo()))
                 return BooleanValue.True;
             else
                 return BooleanValue.False;

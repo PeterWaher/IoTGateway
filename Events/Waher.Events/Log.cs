@@ -67,7 +67,7 @@ namespace Waher.Events
 		/// <param name="ExceptionType">Type of exception to unnest.</param>
 		public static bool RegisterExceptionToUnnest(Type ExceptionType)
 		{
-			if (!typeof(Exception).GetTypeInfo().IsAssignableFrom(ExceptionType.GetTypeInfo()))
+			if (!typeof(Exception).IsAssignableFrom(ExceptionType.GetTypeInfo()))
 				return false;
 
 			lock (dynamicSinks)

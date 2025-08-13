@@ -493,7 +493,7 @@ namespace Waher.Script.Persistence.SQL
 					Type ValueType = Value?.GetType() ?? typeof(object);
 					Type FieldType = Rec.Field.FieldType;
 
-					if (!FieldType.GetTypeInfo().IsAssignableFrom(ValueType.GetTypeInfo()))
+					if (!FieldType.IsAssignableFrom(ValueType.GetTypeInfo()))
 						Value = Expression.ConvertTo(Value, FieldType, null);
 
 					Rec.Field.SetValue(this.obj, Value);
@@ -509,7 +509,7 @@ namespace Waher.Script.Persistence.SQL
 						Type ValueType = Value?.GetType() ?? typeof(object);
 						Type PropertyType = Rec.Property.PropertyType;
 
-						if (!PropertyType.GetTypeInfo().IsAssignableFrom(ValueType.GetTypeInfo()))
+						if (!PropertyType.IsAssignableFrom(ValueType.GetTypeInfo()))
 							Value = Expression.ConvertTo(Value, PropertyType, null);
 
 						if (Rec.NrIndexParameters == 1)

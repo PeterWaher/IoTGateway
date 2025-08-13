@@ -18,7 +18,7 @@ namespace Waher.Script.Xml
 		/// <returns>How well objects of this type are supported.</returns>
 		public Grade Supports(Type Object)
 		{
-			return typeof(XmlNode).GetTypeInfo().IsAssignableFrom(Object.GetTypeInfo()) ? Grade.Ok : Grade.NotAtAll;
+			return typeof(XmlNode).IsAssignableFrom(Object.GetTypeInfo()) ? Grade.Ok : Grade.NotAtAll;
 		}
 
 		/// <summary>

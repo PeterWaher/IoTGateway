@@ -85,7 +85,7 @@ namespace Waher.Networking.XMPP.Avatar
 				this.pep.OnUserAvatarMetaData += this.Pep_OnUserAvatarMetaData;
 
 			byte[] Bin = Resources.LoadResource(typeof(AvatarClient).Namespace + ".Images.DefaultAvatar.png",
-				typeof(AvatarClient).GetTypeInfo().Assembly);
+				typeof(AvatarClient).Assembly);
 
 			this.defaultAvatar = new Avatar(Client.BareJID.ToLower(), ImageCodec.ContentTypePng, Bin, 64, 64);
 

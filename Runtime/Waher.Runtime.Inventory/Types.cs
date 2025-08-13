@@ -151,7 +151,7 @@ namespace Waher.Runtime.Inventory
 					return null;
 
 				foreach (Type T in Types.Values)
-					return T.GetTypeInfo().Assembly;
+					return T.Assembly;
 			}
 
 			return null;
@@ -698,10 +698,10 @@ namespace Waher.Runtime.Inventory
 				}
 				else
 				{
-					CheckIncluded(ref Assemblies, typeof(Types).GetTypeInfo().Assembly);
-					CheckIncluded(ref Assemblies, typeof(int).GetTypeInfo().Assembly);
+					CheckIncluded(ref Assemblies, typeof(Types).Assembly);
+					CheckIncluded(ref Assemblies, typeof(int).Assembly);
 
-					if (Array.IndexOf(Assemblies, A = typeof(Types).GetTypeInfo().Assembly) < 0)
+					if (Array.IndexOf(Assemblies, A = typeof(Types).Assembly) < 0)
 					{
 						int c = Assemblies.Length;
 						Array.Resize(ref Assemblies, c + 1);
@@ -1089,7 +1089,7 @@ namespace Waher.Runtime.Inventory
 					{
 						Arg = Arguments[i];
 
-						if (!(Arg is null) && !P[i].ParameterType.GetTypeInfo().IsAssignableFrom(Arg.GetType().GetTypeInfo()))
+						if (!(Arg is null) && !P[i].ParameterType.IsAssignableFrom(Arg.GetType().GetTypeInfo()))
 						{
 							Found = false;
 							break;
@@ -1286,7 +1286,7 @@ namespace Waher.Runtime.Inventory
 		public static bool TryParseEnum(string TypeName, string StringValue, out Enum Value)
 		{
 			Type T = GetType(TypeName);
-			if (T is null || !T.GetTypeInfo().IsEnum)
+			if (T is null || !T.IsEnum)
 			{
 				Value = null;
 				return false;
@@ -1372,7 +1372,7 @@ namespace Waher.Runtime.Inventory
 
 					for (i = 0; i < NrArgs; i++)
 					{
-						if (!(ArgType[i] is null) && !Parameters[i].ParameterType.GetTypeInfo().IsAssignableFrom(ArgType[i]))
+						if (!(ArgType[i] is null) && !Parameters[i].ParameterType.IsAssignableFrom(ArgType[i]))
 							break;
 					}
 
@@ -1591,12 +1591,12 @@ namespace Waher.Runtime.Inventory
 			if (Arguments is null || Arguments.Length == 0)
 				return Result;
 
-			if (!(Type.GetTypeInfo().GetCustomAttribute(typeof(SingletonAttribute)) is null))
+			if (!(Type.GetCustomAttribute<SingletonAttribute>() is null))
 				RegisterSingleton(Result);
 			else
 			{
 				Type Type2 = Result.GetType();
-				if (Type2 != Type && !(Type2.GetTypeInfo().GetCustomAttribute(typeof(SingletonAttribute)) is null))
+				if (Type2 != Type && !(Type2.GetCustomAttribute<SingletonAttribute>() is null))
 					RegisterSingleton(Result);
 			}
 

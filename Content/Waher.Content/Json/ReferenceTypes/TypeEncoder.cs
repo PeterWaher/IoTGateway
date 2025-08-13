@@ -40,7 +40,7 @@ namespace Waher.Content.Json.ReferenceTypes
 		/// <returns>How well objects of the given type are encoded.</returns>
 		public Grade Supports(Type ObjectType)
 		{
-			return typeof(Type).GetTypeInfo().IsAssignableFrom(ObjectType.GetTypeInfo()) ? Grade.Ok : Grade.NotAtAll;
+			return typeof(Type).IsAssignableFrom(ObjectType.GetTypeInfo()) ? Grade.Ok : Grade.NotAtAll;
 		}
 	}
 }

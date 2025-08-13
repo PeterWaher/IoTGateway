@@ -344,7 +344,7 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="Handler">Event handler.</param>
 		public void RegisterHandler(Type PersonalEventType, EventHandlerAsync<PersonalEventNotificationEventArgs> Handler)
 		{
-			if (!typeof(IPersonalEvent).GetTypeInfo().IsAssignableFrom(PersonalEventType.GetTypeInfo()))
+			if (!typeof(IPersonalEvent).IsAssignableFrom(PersonalEventType.GetTypeInfo()))
 				throw new ArgumentException("Not a personal event type.", nameof(PersonalEventType));
 
 			IPersonalEvent PersonalEvent = (IPersonalEvent)Types.Instantiate(PersonalEventType);

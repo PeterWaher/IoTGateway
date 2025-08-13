@@ -74,7 +74,7 @@ namespace Waher.Content.Json.ReferenceTypes
 					return Grade.NotAtAll;	// Will be encoded by DefaultValueTypeEncoder, encoding the value type as a string.
 			}
 
-			if (!typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(TI))
+			if (!typeof(IEnumerable).IsAssignableFrom(TI))
 				return Grade.Barely;
 
 			return Grade.NotAtAll;

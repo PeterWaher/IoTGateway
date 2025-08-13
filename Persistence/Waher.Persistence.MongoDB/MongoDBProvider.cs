@@ -214,7 +214,7 @@ namespace Waher.Persistence.MongoDB
 					{
 						Type NullableType = Type.GenericTypeArguments[0];
 
-						if (NullableType.GetTypeInfo().IsEnum)
+						if (NullableType.IsEnum)
 							Result = new Serialization.NullableTypes.NullableEnumSerializer(NullableType);
 						else
 							Result = null;

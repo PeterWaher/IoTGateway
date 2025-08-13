@@ -49,7 +49,7 @@ namespace Waher.Script.Operators.Membership
             if (!(Obj is Type Candidate))
                 Candidate = Obj?.GetType() ?? typeof(object);
 
-            if (Expected.GetTypeInfo().IsAssignableFrom(Candidate.GetTypeInfo()))
+            if (Expected.IsAssignableFrom(Candidate.GetTypeInfo()))
                 return BooleanValue.True;
             else
                 return BooleanValue.False;

@@ -60,7 +60,7 @@ namespace Waher.Security.ACME
 			}
 
 			Type T = typeof(AcmeClient);
-			Version Version = T.GetTypeInfo().Assembly.GetName().Version;
+			Version Version = T.Assembly.GetName().Version;
 			StringBuilder UserAgent = new StringBuilder();
 
 			UserAgent.Append(T.Namespace);

@@ -2222,7 +2222,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				return;
 			}
 
-			if (!typeof(INode).GetTypeInfo().IsAssignableFrom(Type.GetTypeInfo()))
+			if (!typeof(INode).IsAssignableFrom(Type.GetTypeInfo()))
 			{
 				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
 				return;
@@ -2296,7 +2296,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				return;
 			}
 
-			if (!typeof(INode).GetTypeInfo().IsAssignableFrom(Type.GetTypeInfo()))
+			if (!typeof(INode).IsAssignableFrom(Type.GetTypeInfo()))
 			{
 				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
 				return;

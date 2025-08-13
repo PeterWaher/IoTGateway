@@ -353,7 +353,7 @@ namespace Waher.Script.Objects.VectorSpaces
 				Value = this.Values;
 				return true;
 			}
-			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(ComplexVector).GetTypeInfo()))
+			else if (DesiredType.IsAssignableFrom(typeof(ComplexVector).GetTypeInfo()))
 			{
 				Value = this;
 				return true;

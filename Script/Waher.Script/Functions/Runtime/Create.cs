@@ -330,7 +330,7 @@ namespace Waher.Script.Functions.Runtime
 
 					this.constructor = null;
 
-					if (T.GetTypeInfo().ContainsGenericParameters)
+					if (T.ContainsGenericParameters)
 					{
 						this.genericArguments = T.GetTypeInfo().GenericTypeParameters;
 
@@ -498,7 +498,7 @@ namespace Waher.Script.Functions.Runtime
 
 					this.constructor = null;
 
-					if (T.GetTypeInfo().ContainsGenericParameters)
+					if (T.ContainsGenericParameters)
 					{
 						this.genericArguments = T.GetTypeInfo().GenericTypeParameters;
 

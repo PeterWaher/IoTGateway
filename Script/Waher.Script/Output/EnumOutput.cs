@@ -14,7 +14,7 @@ namespace Waher.Script.Output
 		/// </summary>
 		/// <param name="Object">Object</param>
 		/// <returns>How well objects of this type are supported.</returns>
-		public Grade Supports(Type Object) => Object.GetTypeInfo().IsEnum ? Grade.Ok : Grade.NotAtAll;
+		public Grade Supports(Type Object) => Object.IsEnum ? Grade.Ok : Grade.NotAtAll;
 
 		/// <summary>
 		/// Gets a string representing a value.

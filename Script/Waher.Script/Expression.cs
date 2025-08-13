@@ -5411,7 +5411,7 @@ namespace Waher.Script
 					Result = Result2;
 					return true;
 				}
-				else if (Value is null && !typeof(T).GetTypeInfo().IsValueType)
+				else if (Value is null && !typeof(T).IsValueType)
 				{
 					Result = default;
 					return true;
@@ -5434,13 +5434,13 @@ namespace Waher.Script
 			if (Value is null)
 			{
 				Result = null;
-				return !DesiredType.GetTypeInfo().IsValueType;
+				return !DesiredType.IsValueType;
 			}
 
 			Type T = Value.GetType();
 			TypeInfo TI = T.GetTypeInfo();
 
-			if (DesiredType.GetTypeInfo().IsAssignableFrom(TI))
+			if (DesiredType.IsAssignableFrom(TI))
 			{
 				Result = Value;
 				return true;
@@ -5472,7 +5472,7 @@ namespace Waher.Script
 			if (Obj is null)
 			{
 				Result = ObjectValue.Null;
-				return !DesiredType.GetTypeInfo().IsValueType;
+				return !DesiredType.IsValueType;
 			}
 
 			Type T = Obj.GetType();
@@ -5513,7 +5513,7 @@ namespace Waher.Script
 			lock (converters)
 			{
 				if (!converters.TryGetValue(From, out Dictionary<Type, ITypeConverter> Converters) &&
-					(!From.GetTypeInfo().IsEnum || !converters.TryGetValue(typeof(Enum), out Converters)))
+					(!From.IsEnum || !converters.TryGetValue(typeof(Enum), out Converters)))
 				{
 					Converter = null;
 					return false;

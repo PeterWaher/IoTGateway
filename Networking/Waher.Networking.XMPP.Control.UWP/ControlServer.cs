@@ -423,7 +423,7 @@ namespace Waher.Networking.XMPP.Control
 									return;
 								}
 
-								if (!T.GetTypeInfo().IsEnum)
+								if (!T.IsEnum)
 								{
 									await e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
 										e.Query.NamespaceURI + "\" n=\"" + Name + "\">Type is not an enumeration.</paramError></error>");

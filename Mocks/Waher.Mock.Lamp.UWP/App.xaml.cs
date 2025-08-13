@@ -119,11 +119,11 @@ namespace Waher.Mock.Lamp.UWP
 				XmppCredentials Credentials = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
-					typeof(App).GetTypeInfo().Assembly);
+					typeof(App).Assembly);
 
 				Log.Informational("Connecting to XMPP server.");
 
-				this.xmppClient = new XmppClient(Credentials, "en", typeof(App).GetTypeInfo().Assembly);
+				this.xmppClient = new XmppClient(Credentials, "en", typeof(App).Assembly);
 
 				if (Credentials.Sniffer && !(MainPage.Sniffer is null))
 					this.xmppClient.Add(MainPage.Sniffer);

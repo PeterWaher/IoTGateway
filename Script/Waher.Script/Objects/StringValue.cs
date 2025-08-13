@@ -191,12 +191,12 @@ namespace Waher.Script.Objects
 					return false;
 				}
 			}
-			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(string).GetTypeInfo()))
+			else if (DesiredType.IsAssignableFrom(typeof(string).GetTypeInfo()))
 			{
 				Value = this.value;
 				return true;
 			}
-			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(StringValue).GetTypeInfo()))
+			else if (DesiredType.IsAssignableFrom(typeof(StringValue).GetTypeInfo()))
 			{
 				Value = this;
 				return true;

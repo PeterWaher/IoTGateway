@@ -388,7 +388,7 @@ namespace Waher.Script.Objects
 		/// <returns>If conversion was possible.</returns>
 		public override bool TryConvertTo(Type DesiredType, out object Value)
 		{
-			if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(RationalNumber).GetTypeInfo()))
+			if (DesiredType.IsAssignableFrom(typeof(RationalNumber).GetTypeInfo()))
 			{
 				Value = this;
 				return true;

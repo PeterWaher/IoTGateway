@@ -37,7 +37,7 @@ namespace Waher.Content.Json.ValueTypes
 		/// <returns>How well objects of the given type are encoded.</returns>
 		public Grade Supports(Type ObjectType)
 		{
-			return ObjectType.GetTypeInfo().IsValueType ? Grade.Barely : Grade.NotAtAll;
+			return ObjectType.IsValueType ? Grade.Barely : Grade.NotAtAll;
 		}
 	}
 }

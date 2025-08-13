@@ -69,7 +69,7 @@ namespace Waher.Script.Lab
 		{
 			try
 			{
-				string Folder = Path.GetDirectoryName(typeof(App).GetTypeInfo().Assembly.Location);
+				string Folder = Path.GetDirectoryName(typeof(App).Assembly.Location);
 				TypesLoader.Initialize(Folder);
 
 				appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ScriptLab");

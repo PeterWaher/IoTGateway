@@ -160,7 +160,7 @@ namespace Waher.Script.Objects
 		/// <returns>If conversion was possible.</returns>
 		public override bool TryConvertTo(Type DesiredType, out object Value)
 		{
-			if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(Complex).GetTypeInfo()))
+			if (DesiredType.IsAssignableFrom(typeof(Complex).GetTypeInfo()))
 			{
 				Value = this.value;
 				return true;
@@ -248,7 +248,7 @@ namespace Waher.Script.Objects
 						return true;
 					}
 				}
-				else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(Complex).GetTypeInfo()))
+				else if (DesiredType.IsAssignableFrom(typeof(Complex).GetTypeInfo()))
 				{
 					Value = this.value;
 					return true;

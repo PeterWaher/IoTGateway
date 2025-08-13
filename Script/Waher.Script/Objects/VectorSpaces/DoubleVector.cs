@@ -340,7 +340,7 @@ namespace Waher.Script.Objects.VectorSpaces
 				Value = this.Values;
 				return true;
 			}
-			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(DoubleVector).GetTypeInfo()))
+			else if (DesiredType.IsAssignableFrom(typeof(DoubleVector).GetTypeInfo()))
 			{
 				Value = this;
 				return true;

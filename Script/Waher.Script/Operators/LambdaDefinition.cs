@@ -534,7 +534,7 @@ namespace Waher.Script.Operators
 		/// <returns>If conversion was possible.</returns>
 		public bool TryConvertTo(Type DesiredType, out object Value)
 		{
-			if (DesiredType.GetTypeInfo().IsAssignableFrom(this.GetType().GetTypeInfo()))
+			if (DesiredType.IsAssignableFrom(this.GetType().GetTypeInfo()))
 			{
 				Value = this;
 				return true;

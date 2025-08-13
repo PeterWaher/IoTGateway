@@ -338,7 +338,7 @@ namespace Waher.Script.Objects
 					return true;
 				}
 			}
-			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(Measurement).GetTypeInfo()))
+			else if (DesiredType.IsAssignableFrom(typeof(Measurement).GetTypeInfo()))
 			{
 				Value = this;
 				return true;

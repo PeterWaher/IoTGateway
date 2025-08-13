@@ -2769,7 +2769,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 		private static string GenericParameterName(Type Type)
 		{
-			if (Type.GetTypeInfo().IsGenericType)
+			if (Type.IsGenericType)
 			{
 				Type GT = Type.GetGenericTypeDefinition();
 				if (GT == typeof(Nullable<>))

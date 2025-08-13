@@ -635,7 +635,7 @@ namespace Waher.Persistence.Serialization
 									{
 										Type DefaultValueType = DefaultValue.GetType();
 
-										if (DefaultValueType.GetTypeInfo().IsDefined(typeof(FlagsAttribute), false))
+										if (DefaultValueType.IsDefined(typeof(FlagsAttribute), false))
 										{
 											bool First = true;
 

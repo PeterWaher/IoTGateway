@@ -1059,7 +1059,7 @@ namespace Waher.Networking.XMPP.P2P
 						return Endpoint;
 				}
 
-				if (!typeof(IE2eEndpoint).GetTypeInfo().IsAssignableFrom(KeyType.GetTypeInfo()))
+				if (!typeof(IE2eEndpoint).IsAssignableFrom(KeyType.GetTypeInfo()))
 					throw new ArgumentException("Not assignable from " + typeof(IE2eEndpoint).FullName, nameof(KeyType));
 
 				return null;

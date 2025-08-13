@@ -149,7 +149,7 @@ namespace Waher.Script.Objects
 				Value = this.value;
 				return true;
 			}
-			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(bool).GetTypeInfo()))
+			else if (DesiredType.IsAssignableFrom(typeof(bool).GetTypeInfo()))
 			{
 				Value = this.value;
 				return true;

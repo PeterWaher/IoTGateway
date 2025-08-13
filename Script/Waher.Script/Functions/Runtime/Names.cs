@@ -45,7 +45,7 @@ namespace Waher.Script.Functions.Runtime
 			else
 				T = Argument.AssociatedObjectValue?.GetType() ?? typeof(object);
 
-			if (!T.GetTypeInfo().IsEnum)
+			if (!T.IsEnum)
 				throw new ScriptRuntimeException("Argument is not an enumeration type of value.", this);
 
 			return new ObjectVector(Enum.GetNames(T));

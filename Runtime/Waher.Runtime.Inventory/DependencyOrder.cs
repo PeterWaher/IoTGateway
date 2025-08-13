@@ -19,8 +19,8 @@ namespace Waher.Runtime.Inventory
 		{
 			Type TypeX = x.GetType();
 			Type TypeY = y.GetType();
-			IEnumerable<ModuleDependencyAttribute> AttrsX = TypeX.GetTypeInfo().GetCustomAttributes<ModuleDependencyAttribute>();
-			IEnumerable<ModuleDependencyAttribute> AttrsY = TypeY.GetTypeInfo().GetCustomAttributes<ModuleDependencyAttribute>();
+			IEnumerable<ModuleDependencyAttribute> AttrsX = TypeX.GetCustomAttributes<ModuleDependencyAttribute>();
+			IEnumerable<ModuleDependencyAttribute> AttrsY = TypeY.GetCustomAttributes<ModuleDependencyAttribute>();
 			bool XDependsOnY = false;
 			bool YDependsOnX = false;
 

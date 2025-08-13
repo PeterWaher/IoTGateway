@@ -839,7 +839,7 @@ namespace Waher.Content.Xml
 					!int.TryParse(s.Substring(5, 2), out int Month) ||
 					!int.TryParse(s.Substring(8, 2), out int Day))
 				{
-					Value = DateTime.MinValue;
+					Value = DateTimeOffset.MinValue;
 					return false;
 				}
 
@@ -896,7 +896,7 @@ namespace Waher.Content.Xml
 				}
 			}
 
-			Value = DateTime.MinValue;
+			Value = DateTimeOffset.MinValue;
 			return false;
 		}
 

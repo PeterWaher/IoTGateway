@@ -517,43 +517,43 @@ namespace Waher.Networking.XMPP.Geo
 
 		#region publish
 
-		public async Task Publish(string GeoId, GeoPosition Location, int? Ttl,
+		public Task Publish(string GeoId, GeoPosition Location, int? Ttl,
 			DateTime? From, DateTime? To, string CustomXml)
 		{
-			// TODO
+			return Task.CompletedTask;	// TODO
 		}
 
-		public async Task PublishAsync()
+		public Task PublishAsync()
 		{
-			// TODO
+			return Task.CompletedTask;	// TODO
 		}
 
 		#endregion
 
 		#region Delete
 
-		public async Task Delete()
+		public Task Delete()
 		{
-			// TODO
+			return Task.CompletedTask;	// TODO
 		}
 
-		public async Task DeleteAsync()
+		public Task DeleteAsync()
 		{
-			// TODO
+			return Task.CompletedTask;	// TODO
 		}
 
 		#endregion
 
 		#region Search
 
-		public async Task Search()
+		public Task Search()
 		{
-			// TODO
+			return Task.CompletedTask;	// TODO
 		}
 
-		public async Task SearchAsync()
+		public Task SearchAsync()
 		{
-			// TODO
+			return Task.CompletedTask;	// TODO
 		}
 
 		#endregion

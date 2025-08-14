@@ -852,6 +852,11 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// If End-to-End encryption is enabled.
+		/// </summary>
+		public bool IsE2eEncryptionEnabled => !(this.localE2eEndpoint is null);
+
+		/// <summary>
 		/// Creates an array of random bytes.
 		/// </summary>
 		/// <param name="Nr">Number of bytes.</param>

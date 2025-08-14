@@ -432,7 +432,7 @@ namespace Waher.Networking.XMPP.Contracts
 						Timestamp = TP;
 				}
 
-				if (Keys.Count == 0)
+				if (Keys.Count == 0 || (Keys.Count != AvailableEndpoints.Length && CreateIfNone))
 				{
 					if (!CreateIfNone)
 						return false;
@@ -441,8 +441,19 @@ namespace Waher.Networking.XMPP.Contracts
 
 					DisposeEndpoints = false;
 
+					int i, c = Keys.Count;
+
 					foreach (IE2eEndpoint Endpoint in AvailableEndpoints)
 					{
+						for (i = 0; i < c; i++)
+						{
+							if (Keys[i].LocalName == Endpoint.LocalName)
+								break;
+						}
+
+						if (i < c)
+							continue;
+
 						if (Endpoint is EllipticCurveEndpoint Curve)
 							Key = this.GetKey(Curve);
 						else if (Endpoint is ModuleLatticeEndpoint ModuleLattice)

@@ -14,6 +14,12 @@ namespace Waher.Networking.XMPP
 	public enum E2ETransmission
 	{
 		/// <summary>
+		/// Will only send the stanza, if end-to-end encryption using Post-Quantum Cryptography
+		/// can be used. If not, an exception is thrown.
+		/// </summary>
+		AssertE2EPQC,
+
+		/// <summary>
 		/// Will only send the stanza, if end-to-end encryption can be used. If not, an exception is thrown.
 		/// </summary>
 		AssertE2E,

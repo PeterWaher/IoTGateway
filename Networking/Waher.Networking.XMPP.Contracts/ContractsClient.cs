@@ -4971,10 +4971,37 @@ namespace Waher.Networking.XMPP.Contracts
 
 				XSL.Validate(string.Empty, Doc, Contract.ForMachinesLocalName, Contract.ForMachinesNamespace, Schemas2);
 			}
-			catch (Exception ex)
+			catch (XmlSchemaException ex)
 			{
+				// TODO: Remove
+
+				Log.Debug("Unable to validate Machine-readable content. Following events record the contents of the operation.");
+				Log.Debug("Error:\r\n\r\n```\r\n" + ex.Message + "\r\n```");
+				Log.Debug("XML:\r\n\r\n```\r\n" + Doc.OuterXml + "\r\n```");
+
+				foreach (KeyValuePair<string, XmlSchema> P in Schemas)
+				{
+					using MemoryStream ms = new MemoryStream();
+					P.Value.Write(ms);
+
+					Log.Debug("`" + P.Key + "`\r\n\r\n```\r\n" +
+						Encoding.UTF8.GetString(ms.ToArray()) + "\r\n```");
+				}
+
+				Log.Debug("End of schemas.");
+
 				await this.ReturnStatus(ContractStatus.FraudulentMachineReadable, Callback, State,
 					new KeyValuePair<string, object>("Error", ex.Message));
+
+				return;
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+
+				await this.ReturnStatus(ContractStatus.FraudulentMachineReadable, Callback, State,
+					new KeyValuePair<string, object>("Error", ex.Message));
+
 				return;
 			}
 
@@ -7981,7 +8008,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="RecipientPublicKeyName">Name of key algorithm of recipient.</param>
 		/// <param name="RecipientPublicKeyNamespace">Optional Namespace of key algorithm of recipient.</param>
 		/// <returns>Encrypted message, together with the public key used to obtain the shared secret.</returns>
-		public (byte[], byte[]) Encrypt(byte[] Message, byte[] Nonce, byte[] RecipientPublicKey, string RecipientPublicKeyName, 
+		public (byte[], byte[]) Encrypt(byte[] Message, byte[] Nonce, byte[] RecipientPublicKey, string RecipientPublicKeyName,
 			string RecipientPublicKeyNamespace)
 		{
 			IE2eEndpoint LocalEndpoint = this.localKeys.FindLocalEndpoint(RecipientPublicKeyName, RecipientPublicKeyNamespace) ?? throw new NotSupportedException("Unable to find matching local key.");

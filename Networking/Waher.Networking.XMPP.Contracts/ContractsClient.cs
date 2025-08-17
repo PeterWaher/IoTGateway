@@ -36,7 +36,6 @@ using Waher.Runtime.Temporary;
 using Waher.Script;
 using Waher.Security;
 using Waher.Security.CallStack;
-using Waher.Security.EllipticCurves;
 
 namespace Waher.Networking.XMPP.Contracts
 {

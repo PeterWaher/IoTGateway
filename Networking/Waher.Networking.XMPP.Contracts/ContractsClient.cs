@@ -33,6 +33,7 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.Profiling;
 using Waher.Runtime.Settings;
 using Waher.Runtime.Temporary;
+using Waher.Runtime.Threading;
 using Waher.Script;
 using Waher.Security;
 using Waher.Security.CallStack;
@@ -145,6 +146,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private bool keySettingsPrefixLocked = false;
 		private bool localKeysForE2e = false;
 		private bool preferredEncryptionAlgorithmLocked = false;
+		private bool disposeLocalKeys = false;
 		private RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private Aes aes;
 
@@ -186,6 +188,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.componentAddress = ComponentAddress;
 			this.approvedSources = ApprovedSources;
 			this.localKeys = null;
+			this.disposeLocalKeys = false;
 
 			#region NeuroFoundation V1
 
@@ -286,8 +289,11 @@ namespace Waher.Networking.XMPP.Contracts
 
 			#endregion
 
-			this.localKeys?.Dispose();
+			if (this.disposeLocalKeys)
+				this.localKeys?.Dispose();
+
 			this.localKeys = null;
+			this.disposeLocalKeys = false;
 			this.keysTimestamp = DateTime.MinValue;
 
 			this.rnd?.Dispose();
@@ -479,10 +485,40 @@ namespace Waher.Networking.XMPP.Contracts
 
 				Thread?.NewState("Sec");
 
-				this.localKeys?.Dispose();
+				if (this.disposeLocalKeys)
+					this.localKeys?.Dispose();
+
+				this.disposeLocalKeys = false;
 				this.localKeys = null;
 
-				this.localKeys = new EndpointSecurity(this.localKeysForE2e ? this.client : null, 128, Keys.ToArray());
+				await Semaphores.BeginWrite("XMPP.E2E");
+				try
+				{
+					if (this.localKeysForE2e)
+					{
+						if (this.client.TryGetTag("E2E", out object Obj) &&
+							Obj is EndpointSecurity EndpointSecurity)
+						{
+							this.localKeys = EndpointSecurity;
+						}
+						else
+						{
+							this.localKeys = new EndpointSecurity(this.client, 128);
+							this.client.SetTag("E2E", this.localKeys);
+							this.disposeLocalKeys = true;
+						}
+					}
+					else
+					{
+						this.localKeys = new EndpointSecurity(null, 128, Keys.ToArray());
+						this.disposeLocalKeys = true;
+					}
+				}
+				finally
+				{
+					await Semaphores.EndWrite("XMPP.E2E");
+				}
+
 				this.keysTimestamp = Timestamp.Value;
 
 				if (this.localKeysForE2e)

@@ -12,18 +12,18 @@ using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Fractals.IFS
 {
-    /// <summary>
-    /// Calculates a flame fractal in RGBA space. Intensity is calculated along the A-axis.
-    /// Gamma correction is done along the RGB-axes (vibrancy=0) or along the A-axis (vibrancy=1),
-    /// or a combination thereof.
-    /// 
-    /// For more information, see:
-    /// http://en.wikipedia.org/wiki/Fractal_flame
-    /// http://flam3.com/flame.pdf
-    /// </summary>
-    /// <example>
-    /// </example>
-    public class FlameFractalRgba : FunctionMultiVariate
+	/// <summary>
+	/// Calculates a flame fractal in RGBA space. Intensity is calculated along the A-axis.
+	/// Gamma correction is done along the RGB-axes (vibrancy=0) or along the A-axis (vibrancy=1),
+	/// or a combination thereof.
+	/// 
+	/// For more information, see:
+	/// http://en.wikipedia.org/wiki/Fractal_flame
+	/// https://flam3.com/flame_draves.pdf
+	/// </summary>
+	/// <example>
+	/// </example>
+	public class FlameFractalRgba : FunctionMultiVariate
     {
 		/// <summary>
 		/// TODO

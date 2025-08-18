@@ -1781,7 +1781,7 @@ Example:
 		],400,300)
 
 There are many different types of predefined variations[^For more information about Flame Fractals and variations, see the paper on 
-<a href="http://flam3.com/flame.pdf" target="_blank">The Fractal Flame Algorithm</a> by Scott Daves and Erik Reckase] that can be used.
+<a href="https://flam3.com/flame_draves.pdf" target="_blank">The Fractal Flame Algorithm</a> by Scott Daves and Erik Reckase] that can be used.
 You can also use the `LambdaVariation` to create your custom variations.
 
 | Flame variations        | Complex variations         | Fractal variations    |

@@ -7,6 +7,8 @@ using Waher.Content;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
+using Waher.Security;
+using Waher.Security.SHA3;
 
 namespace Waher.Utility.Upload
 {
@@ -183,17 +185,54 @@ namespace Waher.Utility.Upload
 				string TabID = Guid.NewGuid().ToString();
 				string HttpSessionID = Guid.NewGuid().ToString();
 
-				ConsoleOut.WriteLine("Logging in.");
+				ConsoleOut.WriteLine("Logging in to domain " + Login.Host + ".");
+
+				sb.Clear();
+				sb.Append(UserName);
+				sb.Append(':');
+				sb.Append(Login.Host);
+				sb.Append(':');
+				sb.Append(Password);
+
+				byte[] Nonce = new byte[32];
+				System.Security.Cryptography.RandomNumberGenerator Rnd = System.Security.Cryptography.RandomNumberGenerator.Create();
+				Rnd.GetBytes(Nonce);
+				string NonceStr = Convert.ToBase64String(Nonce);
+
+				byte[] H1 = new SHA3_256().ComputeVariable(Encoding.UTF8.GetBytes(sb.ToString()));
+				byte[] H2 = Hashes.ComputeHMACSHA256Hash(Encoding.UTF8.GetBytes(NonceStr), H1);
 
 				ContentResponse LoginResponse = await InternetContent.PostAsync(Login,
 					new Dictionary<string, string>()
 					{
 						{ "UserName", UserName },
-						{ "Password", Password }
+						{ "PasswordHash", Convert.ToBase64String(H2) },
+						{ "Nonce", NonceStr }
 					},
 					new KeyValuePair<string, string>("Cookie", "HttpSessionID=" + HttpSessionID));
 
 				LoginResponse.AssertOk();
+
+				if (LoginResponse.Decoded is not Dictionary<string, object> Response ||
+					!Response.TryGetValue("ok", out object Obj) ||
+					Obj is not bool Ok)
+				{
+					throw new Exception("Invalid response from login request.");
+				}
+
+				if (Ok)
+					Console.Out.WriteLine("Log in successful.");
+				else
+				{
+					if (!Response.TryGetValue("message", out Obj) ||
+						Obj is not string Message ||
+						string.IsNullOrEmpty(Message))
+					{
+						Message = "Login failed.";
+					}
+					
+					throw new Exception(Message);
+				}
 
 				using FileStream PackageStream = new(PackageFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
 				int BufSize = 4 * 1024 * 1024;
@@ -215,7 +254,7 @@ namespace Waher.Utility.Upload
 					await PackageStream.ReadAllAsync(Buffer, 0, c);
 					Position += c;
 
-					ContentBinaryResponse Response = await InternetContent.PostAsync(
+					ContentBinaryResponse UploadResponse = await InternetContent.PostAsync(
 						UploadPackage, Buffer, "application/octet-stream",
 						new KeyValuePair<string, string>("Cookie", "HttpSessionID=" + HttpSessionID),
 						new KeyValuePair<string, string>("X-FileName", Path.GetFileName(PackageFileName)),
@@ -225,7 +264,7 @@ namespace Waher.Utility.Upload
 						new KeyValuePair<string, string>("X-Downloadable", Downloadable ? "1" : "0"),
 						new KeyValuePair<string, string>("X-GenSign", string.IsNullOrEmpty(SignatureFileName) ? "1" : "0"));
 
-					Response.AssertOk();
+					UploadResponse.AssertOk();
 				}
 				while (Position < Length);
 
@@ -246,7 +285,7 @@ namespace Waher.Utility.Upload
 
 					await SignatureStream.ReadAllAsync(Buffer, 0, (int)Length);
 
-					ContentBinaryResponse Response = await InternetContent.PostAsync(
+					ContentBinaryResponse UploadResponse = await InternetContent.PostAsync(
 						UploadSignature, Buffer, "application/octet-stream",
 						new KeyValuePair<string, string>("Cookie", "HttpSessionID=" + HttpSessionID),
 						new KeyValuePair<string, string>("X-FileName", Path.GetFileName(SignatureFileName)),
@@ -255,7 +294,7 @@ namespace Waher.Utility.Upload
 						new KeyValuePair<string, string>("X-More", "0"),
 						new KeyValuePair<string, string>("X-Downloadable", Downloadable ? "1" : "0"));
 
-					Response.AssertOk();
+					UploadResponse.AssertOk();
 				}
 
 				ConsoleOut.WriteLine("Package uploaded successfully.");

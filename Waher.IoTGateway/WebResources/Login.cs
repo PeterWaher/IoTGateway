@@ -89,6 +89,16 @@ namespace Waher.IoTGateway.WebResources
 					return;
 				}
 			}
+			else
+			{
+				if (await Gateway.HasNonceBeenUsed(Nonce))
+				{
+					await LoginError(Response, "Invalid nonce.");
+					return;
+				}
+
+				await Gateway.RegisterNonceValue(Nonce);
+			}
 
 			LoginResult Result = await Users.Login(UserName, PasswordHash, Nonce, Request.RemoteEndPoint, "Web");
 

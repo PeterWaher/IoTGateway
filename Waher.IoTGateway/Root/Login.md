@@ -3,6 +3,7 @@ Description: {{Waher.IoTGateway.Gateway.ApplicationName}} login page.
 Date: 2016-12-25
 Author: Peter Waher
 Master: /Master.md
+Javascript: Sha3.js
 Javascript: Login.js
 Javascript: /Events.js
 Parameter: from
@@ -18,17 +19,17 @@ Domain:=!GW.HasDomain ? (x:=Before(After(GW.GetUrl("/"),"://"),"/");if contains(
 
 	<p>You need to login to proceed.</p>
 	<div class="native-carousel" id="login-carousel">
-		<form id="LoginForm" action="/Login" method="post" data-login-method="user-password" {{ LoginMethod = "user-password" ? "data-carousel-active" : "" }}>
+		<form id="LoginForm" data-login-method="user-password" {{ LoginMethod = "user-password" ? "data-carousel-active" : "" }}>
 			<div>
 				<p>User Name:</p>
-				<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="max-width:20em" />
+				<input id="UserName" type="text" autofocus="autofocus" style="max-width:20em" />
 			</div>
 			<div>
 				<p>Password:</p>
-				<input id="Password" name="Password" type="password" style="max-width:20em" />
+				<input id="Password" type="password" style="max-width:20em" onkeydown="CheckEnter(event)" />
+				<input id="Nonce" type="hidden" value="{{LoginNonce:=Base64Encode(Waher.IoTGateway.Gateway.NextBytes(32))}}" />
 			</div>
-			<button id="LoginButton" type="submit">Login</button>
-
+			<button id="LoginButton" type="button" onclick="DoLogin('{{from}}','{{Waher.IoTGateway.Gateway.Domain}}')">Login</button>
 		</form>
 
 		{{if exists(QuickLoginServiceId) and Waher.IoTGateway.Setup.LegalIdentityConfiguration.Instance.HasApprovedLegalIdentities then
@@ -54,10 +55,5 @@ Domain:=!GW.HasDomain ? (x:=Before(After(GW.GetUrl("/"),"://"),"/");if contains(
 		)
 		}}
 	</span>
-	{{if exists(LoginError) then]]
-<div class='error'>
-	<p>((LoginError))</p>
-</div>
-[[;}}
 
 </section>

@@ -45,6 +45,7 @@ using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Avatar;
@@ -2827,19 +2828,7 @@ namespace Waher.IoTGateway
 		/// Checks if a web request comes from the local host in the current session. If so, the user is automatically logged in.
 		/// </summary>
 		/// <param name="Request">Web request</param>
-		public static Task CheckLocalLogin(HttpRequest Request)
-		{
-			return CheckLocalLogin(Request, Request.Response, true);
-		}
-
-		/// <summary>
-		/// Checks if a web request comes from the local host in the current session. If so, the user is automatically logged in.
-		/// </summary>
-		/// <param name="Request">Web request</param>
-		/// <param name="Response">Response object.</param>
-		/// <param name="ThrowRedirection">If the redirection should be thrown as an Exception (true),
-		/// or written as a response directly (false).</param>
-		public static async Task CheckLocalLogin(HttpRequest Request, HttpResponse Response, bool ThrowRedirection)
+		public static async Task CheckLocalLogin(HttpRequest Request)
 		{
 			Profiler Profiler = new Profiler();
 			Profiler.Start();
@@ -2883,7 +2872,7 @@ namespace Waher.IoTGateway
 					if (DoLog)
 						Log.Debug("Already logged in.");
 
-					await Login.RedirectBackToFrom(Response, From, ThrowRedirection);
+					await Request.Response.SendResponse(new SeeOtherException(From));
 					return;
 				}
 
@@ -2892,7 +2881,7 @@ namespace Waher.IoTGateway
 					LoginAuditor.Success("User logged in by default, since XMPP not configued and loopback interface not available.",
 						string.Empty, Request.RemoteEndPoint, "Web");
 
-					await Login.DoLogin(Request, Response, From, ThrowRedirection);
+					await Login.DoLogin(Request, From);
 					return;
 				}
 
@@ -2929,7 +2918,7 @@ namespace Waher.IoTGateway
 #endif
 				{
 					LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-					await Login.DoLogin(Request, Response, From, ThrowRedirection);
+					await Login.DoLogin(Request, From);
 					return;
 				}
 
@@ -3044,7 +3033,7 @@ namespace Waher.IoTGateway
 								if (P.SessionId == CurrentSession)
 								{
 									LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-									await Login.DoLogin(Request, Response, From, ThrowRedirection);
+									await Login.DoLogin(Request, From);
 									return;
 								}
 								break;
@@ -3072,7 +3061,7 @@ namespace Waher.IoTGateway
 								if (P.SessionId == CurrentSession)
 								{
 									LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-									await Login.DoLogin(Request, Response, From, ThrowRedirection);
+									await Login.DoLogin(Request, From);
 									return;
 								}
 								break;

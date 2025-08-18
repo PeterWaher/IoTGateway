@@ -171,6 +171,7 @@ namespace Waher.Security.Users
 		/// <param name="RemoteEndPoint">Remote endpoint of user attempting to login.</param>
 		/// <param name="Protocol">Protocol used for login.</param>
 		/// <returns>Login result.</returns>
+		[Obsolete("Use the Passord Hash & Nonce overload to avoid sending passwords in clear text over the network.")]
 		public static async Task<LoginResult> Login(string UserName, string Password, string RemoteEndPoint, string Protocol)
 		{
 			if (string.IsNullOrEmpty(Password))
@@ -187,6 +188,48 @@ namespace Waher.Security.Users
 
 			if (!(User is null) && User.PasswordHash != Convert.ToBase64String(ComputeHash(UserName, Password)))
 				User = null;
+
+			if (User is null)
+				LoginAuditor.Fail("Invalid login.", UserName, RemoteEndPoint, Protocol);
+			else
+				LoginAuditor.Success("Successful login.", UserName, RemoteEndPoint, Protocol);
+
+			return new LoginResult(User);
+		}
+
+		/// <summary>
+		/// Attempts to login in the system.
+		/// </summary>
+		/// <param name="UserName">User name</param>
+		/// <param name="PasswordHash">A Password Hash computed by the client.</param>
+		/// <param name="Nonce">Nonce used in passord hash computation.</param>
+		/// <param name="RemoteEndPoint">Remote endpoint of user attempting to login.</param>
+		/// <param name="Protocol">Protocol used for login.</param>
+		/// <returns>Login result.</returns>
+		public static async Task<LoginResult> Login(string UserName, string PasswordHash, 
+			string Nonce, string RemoteEndPoint, string Protocol)
+		{
+			if (string.IsNullOrEmpty(PasswordHash))
+				return new LoginResult();
+
+			if (!(loginAuditor is null))
+			{
+				DateTime? Next = await loginAuditor.GetEarliestLoginOpportunity(RemoteEndPoint, Protocol);
+				if (Next.HasValue)
+					return new LoginResult(Next.Value);
+			}
+
+			User User = await GetUser(UserName, false);
+
+			if (!(User is null))
+			{
+				string UserPasswordHash = Convert.ToBase64String(Hashes.ComputeHMACSHA256Hash(
+					Encoding.UTF8.GetBytes(Nonce),
+					Convert.FromBase64String(User.PasswordHash)));
+
+				if (UserPasswordHash != PasswordHash)
+					User = null;
+			}
 
 			if (User is null)
 				LoginAuditor.Fail("Invalid login.", UserName, RemoteEndPoint, Protocol);

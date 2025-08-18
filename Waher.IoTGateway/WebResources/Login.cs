@@ -55,27 +55,42 @@ namespace Waher.IoTGateway.WebResources
 			}
 
 			ContentResponse Content = await Request.DecodeDataAsync();
-			string From;
 
-			if (Content.HasError ||
-				!(Content.Decoded is Dictionary<string, string> Form) ||
-				!Form.TryGetValue("UserName", out string UserName) ||
-				!Form.TryGetValue("Password", out string Password))
+			if (Content.HasError)
 			{
-				await Response.SendResponse(new BadRequestException());
+				await Response.SendResponse(Content.Error);
 				return;
 			}
 
-			if (Request.Session.TryGetVariable("from", out Variable v))
+			if (!(Content.Decoded is Dictionary<string, object> Form))
 			{
-				From = v.ValueObject as string;
-				if (string.IsNullOrEmpty(From))
-					From = "/";
+				await LoginError(Response, "Invalid request.");
+				return;
 			}
-			else
-				From = "/";
 
-			LoginResult Result = await Users.Login(UserName, Password, Request.RemoteEndPoint, "Web");
+			if (!Form.TryGetValue("UserName", out object Obj) || !(Obj is string UserName) ||
+				!Form.TryGetValue("PasswordHash", out Obj) || !(Obj is string PasswordHash) ||
+				!Form.TryGetValue("Nonce", out Obj) || !(Obj is string Nonce))
+			{
+				if (Form.ContainsKey("Password"))
+					await LoginError(Response, "You need to refresh the page to make sure you have donwloaded the most recent updates.");
+				else
+					await LoginError(Response, "Invalid request.");
+
+				return;
+			}
+
+			if (Request.Session.TryGetVariable("LoginNonce", out Variable v) &&
+				v.ValueObject is string LoginNonce)
+			{
+				if (Nonce != LoginNonce)
+				{
+					await LoginError(Response, "Invalid nonce.");
+					return;
+				}
+			}
+
+			LoginResult Result = await Users.Login(UserName, PasswordHash, Nonce, Request.RemoteEndPoint, "Web");
 
 			switch (Result.Type)
 			{
@@ -86,8 +101,7 @@ namespace Waher.IoTGateway.WebResources
 					sb.Append(Request.RemoteEndPoint);
 					sb.Append(") has been blocked from the system.");
 
-					Request.Session["LoginError"] = sb.ToString();
-					await Response.SendResponse(new SeeOtherException(Request.Header.Referer.Value));
+					await LoginError(Response, sb.ToString());
 					return;
 
 				case LoginResultType.TemporarilyBlocked:
@@ -112,48 +126,69 @@ namespace Waher.IoTGateway.WebResources
 					sb.Append(". Remote Endpoint: ");
 					sb.Append(Request.RemoteEndPoint);
 
-					Request.Session["LoginError"] = sb.ToString();
-					await Response.SendResponse(new SeeOtherException(Request.Header.Referer.Value));
+					await LoginError(Response, sb.ToString());
 					return;
 
 				case LoginResultType.NoPassword:
-					Request.Session["LoginError"] = "No password provided.";
-					await Response.SendResponse(new SeeOtherException(Request.Header.Referer.Value));
+					await LoginError(Response, "No password provided.");
 					return;
 
 				case LoginResultType.InvalidCredentials:
 				default:
-					Request.Session["LoginError"] = "Invalid login credentials provided.";
-					await Response.SendResponse(new SeeOtherException(Request.Header.Referer.Value));
+					await LoginError(Response, "Invalid login credentials provided.");
 					return;
 
 				case LoginResultType.Success:
-					await DoLogin(Request, Response, From, Result.User, false);
+					await DoLogin(Request, Result.User);
 					break;
 			}
 		}
 
-		internal static Task DoLogin(HttpRequest Request, HttpResponse Response, 
-			string From, User User, bool ThrowRedirection)
+		private static async Task LoginError(HttpResponse Response, 
+			string Error)
 		{
-			return DoLogin(Request, Response, From, false, User, ThrowRedirection);
+			await Response.Return(new Dictionary<string, object>()
+			{
+				{ "ok", false },
+				{ "message", Error }
+			});
 		}
 
-		internal static Task DoLogin(HttpRequest Request, HttpResponse Response, 
-			string From, bool ThrowRedirection)
+		internal static Task DoLogin(HttpRequest Request, User User)
 		{
-			return DoLogin(Request, Response, From, true, new InternalUser(), ThrowRedirection);
+			return DoLogin(Request, false, User);
 		}
 
-		private static async Task DoLogin(HttpRequest Request, HttpResponse Response, 
-			string From, bool AutoLogin, IUser User, bool ThrowRedirection)
+		internal static Task DoLogin(HttpRequest Request)
+		{
+			return DoLogin(Request, true, new InternalUser());
+		}
+
+		private static async Task DoLogin(HttpRequest Request, bool AutoLogin, IUser User)
+		{
+			SetLoginVariables(Request, AutoLogin, User);
+
+			if (!Request.Response.ResponseSent)
+			{
+				await Request.Response.Return(new Dictionary<string, object>()
+				{
+					{ "ok", true }
+				});
+			}
+		}
+
+		internal static async Task DoLogin(HttpRequest Request, string ReturnTo)
+		{
+			SetLoginVariables(Request, true, new InternalUser());
+
+			if (!Request.Response.ResponseSent)
+				await Request.Response.SendResponse(new SeeOtherException(ReturnTo));
+		}
+
+		private static void SetLoginVariables(HttpRequest Request, bool AutoLogin, IUser User)
 		{
 			Request.Session["User"] = User;
 			Request.Session[" AutoLogin "] = AutoLogin;
-			Request.Session.Remove("LoginError");
-
-			if (!string.IsNullOrEmpty(From))
-				await RedirectBackToFrom(Response, From, ThrowRedirection);
 		}
 
 		internal static async Task RedirectBackToFrom(HttpResponse Response, string From, 
@@ -163,7 +198,6 @@ namespace Waher.IoTGateway.WebResources
 				throw new SeeOtherException(From);
 			else
 				await Response.SendResponse(new SeeOtherException(From));
-
 		}
 
 		private class InternalUser : IUserWithClaims, IRequestOrigin

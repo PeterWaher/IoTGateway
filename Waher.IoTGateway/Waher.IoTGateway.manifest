@@ -9,6 +9,7 @@
 		<Content fileName="LoginMethod.ws"/>
 		<Content fileName="ProposeContract.js"/>
 		<Content fileName="ProposeContract.md"/>
+		<Content fileName="Sha3.js"/>
 		<Content fileName="SignatureRequest.js"/>
 		<Content fileName="SignatureRequest.md"/>
 		<Content fileName="Starting.md"/>

@@ -203,7 +203,7 @@ namespace Waher.Utility.Upload
 				byte[] H2 = Hashes.ComputeHMACSHA256Hash(Encoding.UTF8.GetBytes(NonceStr), H1);
 
 				ContentResponse LoginResponse = await InternetContent.PostAsync(Login,
-					new Dictionary<string, string>()
+					new Dictionary<string, object>()
 					{
 						{ "UserName", UserName },
 						{ "PasswordHash", Convert.ToBase64String(H2) },

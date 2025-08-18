@@ -928,6 +928,7 @@
 		<Content fileName="robots.txt"/>
 		<Content fileName='Script.md'/>
 		<Content fileName='ScriptColors.md'/>
+		<Content fileName='Sha3.js'/>
 		<Content fileName="SignatureRequest.js"/>
 		<Content fileName="SignatureRequest.md"/>
 		<Content fileName='Smileys.md'/>

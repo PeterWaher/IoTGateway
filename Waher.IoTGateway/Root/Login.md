@@ -22,7 +22,7 @@ Domain:=!GW.HasDomain ? (x:=Before(After(GW.GetUrl("/"),"://"),"/");if contains(
 		<form id="LoginForm" data-login-method="user-password" {{ LoginMethod = "user-password" ? "data-carousel-active" : "" }}>
 			<div>
 				<p>User Name:</p>
-				<input id="UserName" type="text" autofocus="autofocus" style="max-width:20em" />
+				<input id="UserName" type="text" autofocus="autofocus" style="max-width:20em" onkeydown="CheckEnter(event)" />
 			</div>
 			<div>
 				<p>Password:</p>

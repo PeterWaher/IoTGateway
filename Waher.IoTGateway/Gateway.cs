@@ -45,7 +45,6 @@ using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.HeaderFields;
-using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Avatar;
@@ -187,6 +186,7 @@ namespace Waher.IoTGateway
 		private static CaseInsensitiveString ownerJid = null;
 		private static Dictionary<string, string> defaultPageByHostName = null;
 		private static CommunicationLayer firstChanceExceptions = new CommunicationLayer(true);
+		private static IPersistentDictionary nonceValues;
 		private static string instance;
 		private static string appDataFolder;
 		private static string runtimeFolder;
@@ -766,6 +766,8 @@ namespace Waher.IoTGateway
 					new LoginInterval(2, TimeSpan.MaxValue));       // Maximum 2x2x2x5 failed login attempts in total, then blocked.
 
 				Log.Register(loginAuditor);
+
+				nonceValues = await Database.GetDictionary("Nonces");
 
 				// Protecting Markdown resources:
 				if (!MarkdownCodec.IsRawEncodingAllowedLocked)
@@ -5557,6 +5559,29 @@ namespace Waher.IoTGateway
 		public static string GetShortUrl(string Url, bool OneTimeUse)
 		{
 			return UrlShortener.GetShortUrl(Url, OneTimeUse);
+		}
+
+		#endregion
+
+		#region Nonce values
+
+		/// <summary>
+		/// Checks if a Nonce value has been used.
+		/// </summary>
+		/// <param name="Nonce">Nonce value.</param>
+		/// <returns>If Nonce value has been used.</returns>
+		public static Task<bool> HasNonceBeenUsed(string Nonce)
+		{
+			return nonceValues.ContainsKeyAsync(Nonce);
+		}
+
+		/// <summary>
+		/// Registers a nonce value.
+		/// </summary>
+		/// <param name="Nonce">Nonce value.</param>
+		public static Task RegisterNonceValue(string Nonce)
+		{
+			return nonceValues.AddAsync(Nonce, true);
 		}
 
 		#endregion

@@ -1002,7 +1002,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			this.connection?.TransmitBinary(true, Frame);
 
 			if (!(this.http2Stream is null))
-				this.connection.FlowControl?.RemoveStream(this.http2Stream);
+				this.connection?.FlowControl?.RemoveStream(this.http2Stream);
 		}
 
 		/// <summary>

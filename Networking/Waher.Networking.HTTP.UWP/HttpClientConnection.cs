@@ -969,7 +969,7 @@ namespace Waher.Networking.HTTP
 							if (Stream.DataBytesReceived > (Stream.ContentLength ?? long.MaxValue))
 								return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Data exceeds Content-Length.", StreamThread);
 
-							this.flowControl.AddPendingIncrement(Stream, DataSize);
+							this.flowControl?.AddPendingIncrement(Stream, DataSize);
 						}
 
 						if (EndStream)
@@ -1009,11 +1009,11 @@ namespace Waher.Networking.HTTP
 							if (this.http2BuildingHeadersOnStream != 0)
 								return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Headers for stream " + this.http2BuildingHeadersOnStream.ToString() + " not ended.", StreamThread);
 
-							if (!this.flowControl.TryGetStream(this.http2StreamId, out Stream))
+							if (!(this.flowControl?.TryGetStream(this.http2StreamId, out Stream) ?? false))
 							{
 								if (this.http2StreamId < this.http2LastCreatedStreamId)
 									return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Stream no longer under flow control.", StreamThread);
-								else if (this.http2StreamId == this.http2LastCreatedStreamId)
+								else if (this.http2StreamId == this.http2LastCreatedStreamId || this.flowControl is null)
 									return await this.ReturnHttp2Error(Http2Error.StreamClosed, 0, "Stream no longer under flow control.", StreamThread);
 
 								Stream = new Http2Stream(this.http2StreamId, this, StreamThread);

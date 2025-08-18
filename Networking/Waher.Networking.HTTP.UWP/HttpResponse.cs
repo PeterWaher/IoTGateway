@@ -1090,6 +1090,16 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Returns an error to the client.
+		/// </summary>
+		/// <param name="ex">Exception object.</param>
+		[Obsolete("Use SendResponse(Exception ex) method instead.")]
+		public Task Return(Exception ex)
+		{
+			return this.SendResponse(ex);
+		}
+
+		/// <summary>
 		/// Returns an object to the client. This method can only be called once per response, and only as the only method that returns a response
 		/// to the client.
 		/// </summary>

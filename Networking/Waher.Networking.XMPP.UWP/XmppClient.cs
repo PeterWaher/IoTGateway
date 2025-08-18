@@ -6870,7 +6870,7 @@ namespace Waher.Networking.XMPP
 							throw new StanzaErrors.ResourceConstraintException(string.Empty, e.Query);
 						}
 
-						if (!this.roster.ContainsKey(FromBareJid))
+						if (!this.roster.ContainsKey(FromBareJid) && e.From != e.To)
 						{
 							Log.Notice("Rejected incoming assured message. Sender not in roster.", GetBareJID(e.To), GetBareJID(e.From), "NotAllowed",
 								new KeyValuePair<string, object>("Variable", "NrAssuredMessagesPending"));

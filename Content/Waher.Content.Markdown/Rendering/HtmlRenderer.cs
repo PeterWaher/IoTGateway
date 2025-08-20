@@ -812,9 +812,9 @@ namespace Waher.Content.Markdown.Rendering
 					this.Output.Append("<figure>");
 
 				this.Output.Append("<img border=\"2\" width=\"");
-				this.Output.Append(GraphSettings.Width.ToString());
+				this.Output.Append(Pixels.Width.ToString());
 				this.Output.Append("\" height=\"");
-				this.Output.Append(GraphSettings.Height.ToString());
+				this.Output.Append(Pixels.Height.ToString());
 				this.Output.Append("\" src=\"data:image/png;base64,");
 				this.Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
 				this.Output.Append("\" alt=\"");

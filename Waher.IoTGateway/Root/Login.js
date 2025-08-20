@@ -78,8 +78,9 @@
 
 					Img.addEventListener("load", () =>
 					{
-						LoginCarousel.CalibrateHeight()
-					})
+						if (LoginCarousel)
+							LoginCarousel.CalibrateHeight();
+					});
 
 					LoginTimer = window.setTimeout(DisplayQuickLogin, 2000);
 				}
@@ -240,7 +241,7 @@ async function DoLogin(From, Domain)
 	var Result = await CallServer("/Login",
 		{
 			"UserName": UserName,
-			"PasswordHash": CalcPasswordHash(UserName, Domain, Password, Nonce),
+			"PasswordHash": await CalcPasswordHash(UserName, Domain, Password, Nonce),
 			"Nonce": Nonce
 		});
 

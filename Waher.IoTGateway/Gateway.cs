@@ -2078,7 +2078,7 @@ namespace Waher.IoTGateway
 		public static byte[] ComputeUserPasswordHash(string UserName, string Password)
 		{
 			SHA3_256 H = new SHA3_256();
-			return H.ComputeVariable(System.Text.Encoding.UTF8.GetBytes(UserName + ":" + domain + ":" + Password));
+			return H.ComputeVariable(System.Text.Encoding.UTF8.GetBytes(UserName + ":" + domain.Value + ":" + Password));
 		}
 
 		internal static async Task<bool> UpdateCertificate(DomainConfiguration Configuration)

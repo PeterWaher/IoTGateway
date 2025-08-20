@@ -164,6 +164,20 @@ namespace Waher.Security.Users
 		}
 
 		/// <summary>
+		/// Computes a two-step hash of a password.
+		/// </summary>
+		/// <param name="UserName">User name.</param>
+		/// <param name="Password">Password.</param>
+		/// <param name="Nonce">Nonce value.</param>
+		public static byte[] ComputeHash(string UserName, string Password, string Nonce)
+		{
+			byte[] H1 = ComputeHash(UserName, Password);
+			byte[] H2 = Hashes.ComputeHMACSHA256Hash(Encoding.UTF8.GetBytes(Nonce), H1);
+
+			return H2;
+		}
+
+		/// <summary>
 		/// Attempts to login in the system.
 		/// </summary>
 		/// <param name="UserName">User name</param>
@@ -223,9 +237,10 @@ namespace Waher.Security.Users
 
 			if (!(User is null))
 			{
-				string UserPasswordHash = Convert.ToBase64String(Hashes.ComputeHMACSHA256Hash(
-					Encoding.UTF8.GetBytes(Nonce),
-					Convert.FromBase64String(User.PasswordHash)));
+				string UserPasswordHash = Convert.ToBase64String(
+					Hashes.ComputeHMACSHA256Hash(
+						Encoding.UTF8.GetBytes(Nonce),
+						Convert.FromBase64String(User.PasswordHash)));
 
 				if (UserPasswordHash != PasswordHash)
 					User = null;

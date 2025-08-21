@@ -185,7 +185,7 @@ namespace Waher.Security.Users
 		/// <param name="RemoteEndPoint">Remote endpoint of user attempting to login.</param>
 		/// <param name="Protocol">Protocol used for login.</param>
 		/// <returns>Login result.</returns>
-		[Obsolete("Use the Passord Hash & Nonce overload to avoid sending passwords in clear text over the network.")]
+		[Obsolete("Use the Password Hash & Nonce overload to avoid sending passwords in clear text over the network.")]
 		public static async Task<LoginResult> Login(string UserName, string Password, string RemoteEndPoint, string Protocol)
 		{
 			if (string.IsNullOrEmpty(Password))

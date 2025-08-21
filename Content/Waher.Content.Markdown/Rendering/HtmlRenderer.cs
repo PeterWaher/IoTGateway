@@ -805,7 +805,7 @@ namespace Waher.Content.Markdown.Rendering
 
 			if (Result is Graph G)
 			{
-				PixelInformation Pixels = G.CreatePixels(out GraphSettings GraphSettings);
+				PixelInformation Pixels = G.CreatePixels(out GraphSettings _);
 				byte[] Bin = Pixels.EncodeAsPng();
 
 				if (AloneInParagraph)

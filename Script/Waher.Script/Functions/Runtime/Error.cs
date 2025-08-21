@@ -1,5 +1,5 @@
-﻿using System;
-using Waher.Script.Abstraction.Elements;
+﻿using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Functions.Runtime
@@ -40,7 +40,7 @@ namespace Waher.Script.Functions.Runtime
         public override IElement Evaluate(IElement Argument, Variables Variables)
         {
             string Msg = Argument.ToString();
-            throw new Exception(Msg);
+            throw new ScriptRuntimeErrorException(Msg, this);
         }
     }
 }

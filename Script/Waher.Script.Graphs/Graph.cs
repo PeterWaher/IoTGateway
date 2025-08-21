@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
 using Waher.Runtime.Collections;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -20,6 +21,7 @@ using Waher.Script.Operators;
 using Waher.Script.Operators.Assignments;
 using Waher.Script.Operators.Membership;
 using Waher.Script.Units;
+using Boolean = Waher.Script.Functions.Scalar.Boolean;
 
 namespace Waher.Script.Graphs
 {
@@ -124,7 +126,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public static readonly SKColor DefaultColor = SKColors.Red;
 
-		private readonly GraphSettings settings;
+		private GraphSettings settings;
 		private bool sameScale = false;
 
 		/// <summary>
@@ -685,7 +687,7 @@ namespace Waher.Script.Graphs
 		}
 
 		/// <summary>
-		/// Reference time stamp when converting <see cref="DateTime"/> to <see cref="Double"/>.
+		/// Reference time stamp when converting <see cref="DateTime"/> to <see cref="System.Double"/>.
 		/// </summary>
 		protected static readonly DateTime referenceTimestamp = new DateTime(2000, 1, 1, 0, 0, 0);
 
@@ -1553,6 +1555,7 @@ namespace Waher.Script.Graphs
 			Output.WriteAttributeString("type", this.GetType().FullName);
 
 			this.ExportGraph(Output);
+			this.settings?.ExportSettings(Output);
 
 			Output.WriteEndElement();
 		}
@@ -1641,7 +1644,7 @@ namespace Waher.Script.Graphs
 					while (Loop is NamedMember Property2)
 						Loop = Property2.Operand;
 
-					if (!(Loop is VariableReference))	// Enum values are permitted.
+					if (!(Loop is VariableReference))   // Enum values are permitted.
 					{
 						Prohibited = Node;
 						return false;
@@ -1808,6 +1811,86 @@ namespace Waher.Script.Graphs
 			}
 
 			return Label;
+		}
+
+		/// <summary>
+		/// Imports a graph from an XML element definition.
+		/// </summary>
+		/// <param name="Xml">XML definition</param>
+		/// <returns>Graph, or null if not able to parse Graph.</returns>
+		public static Task<Graph> TryImport(XmlElement Xml)
+		{
+			return TryImport(Xml, false);
+		}
+
+		/// <summary>
+		/// Imports a graph from an XML element definition. If not able to parse a graph,
+		/// an exception will be thrown.
+		/// </summary>
+		/// <param name="Xml">XML definition</param>
+		/// <returns>Graph.</returns>
+		public static Task<Graph> Import(XmlElement Xml)
+		{
+			return TryImport(Xml, true);
+		}
+
+		/// <summary>
+		/// Imports a graph from an XML element definition.
+		/// </summary>
+		/// <param name="Xml">XML definition</param>
+		/// <param name="ThrowException">If an exception should be thrown if a graph
+		/// cannot be imported. Otherwise, null will be returned.</param>
+		/// <returns>Graph</returns>
+		public static async Task<Graph> TryImport(XmlElement Xml, bool ThrowException)
+		{
+			if (Xml is null ||
+				Xml.LocalName != GraphLocalName ||
+				Xml.NamespaceURI != GraphNamespace)
+			{
+				if (ThrowException)
+					throw new ArgumentException("Invalid graph XML.", nameof(Xml));
+				else
+					return null;
+			}
+
+			string TypeName = Xml.GetAttribute("type");
+			if (string.IsNullOrEmpty(TypeName))
+			{
+				if (ThrowException)
+					throw new Exception("Empty graph type.");
+				else
+					return null;
+			}
+
+			Type T = Types.GetType(TypeName);
+			if (T is null)
+			{
+				if (ThrowException)
+					throw new Exception("Type not recognized: " + TypeName);
+				else
+					return null;
+			}
+
+			Graph G = (Graph)Types.Instantiate(T);
+			G.SameScale = Boolean.ToBoolean(Xml.GetAttribute("sameScale")) ?? false;
+
+			bool First = true;
+
+			foreach (XmlNode N in Xml.ChildNodes)
+			{
+				if (!(N is XmlElement E))
+					continue;
+
+				if (First)
+				{
+					await G.ImportGraphAsync(E);
+					First = false;
+				}
+				else if (E.LocalName=="Settings" && E.NamespaceURI == GraphNamespace)
+					G.settings = GraphSettings.Import(E);
+			}
+
+			return G;
 		}
 
 	}

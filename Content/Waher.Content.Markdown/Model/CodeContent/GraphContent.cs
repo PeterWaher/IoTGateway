@@ -1,9 +1,7 @@
 ﻿using System.Threading.Tasks;
+using System.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Script.Graphs;
-using System.Xml;
-using System;
-using Waher.Content.Xml;
 
 namespace Waher.Content.Markdown.Model.CodeContent
 {
@@ -65,30 +63,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 			XmlDocument Xml = new XmlDocument();
 			Xml.LoadXml(MarkdownDocument.AppendRows(Rows));
 
-			if (Xml.DocumentElement is null ||
-				Xml.DocumentElement.LocalName != Graph.GraphLocalName ||
-				Xml.DocumentElement.NamespaceURI != Graph.GraphNamespace)
-			{
-				throw new Exception("Invalid Graph XML");
-			}
-
-			string TypeName = XML.Attribute(Xml.DocumentElement, "type");
-			Type T = Types.GetType(TypeName)
-				?? throw new Exception("Type not recognized: " + TypeName);
-
-			Graph G = (Graph)Types.Instantiate(T);
-			G.SameScale = XML.Attribute(Xml.DocumentElement, "sameScale", false);
-
-			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
-			{
-				if (N is XmlElement E)
-				{
-					await G.ImportGraphAsync(E);
-					break;
-				}
-			}
-
-			return G;
+			return await Graph.Import(Xml.DocumentElement);
 		}
 	}
 }

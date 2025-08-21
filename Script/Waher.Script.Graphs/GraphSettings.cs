@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Xml;
 using SkiaSharp;
+using Waher.Script.Graphs.Functions.Colors;
 
 namespace Waher.Script.Graphs
 {
@@ -279,6 +281,93 @@ namespace Waher.Script.Graphs
 
 				this.approxNrLabelsY = value;
 			}
+		}
+
+		/// <summary>
+		/// Exports the settings to an XML writer.
+		/// </summary>
+		/// <param name="Output">XML Output</param>
+		public void ExportSettings(XmlWriter Output)
+		{
+			Output.WriteStartElement("Settings");
+			Output.WriteAttributeString("backgroundColor", Graph.ToRGBAStyle(this.backgroundColor));
+			Output.WriteAttributeString("axisColor", Graph.ToRGBAStyle(this.axisColor));
+			Output.WriteAttributeString("gridColor", Graph.ToRGBAStyle(this.gridColor));
+			Output.WriteAttributeString("fontName", this.fontName);
+			Output.WriteAttributeString("labelFontSize", Expression.ToString(this.labelFontSize));
+			Output.WriteAttributeString("axisWidth", this.axisWidth.ToString());
+			Output.WriteAttributeString("gridWidth", this.gridWidth.ToString());
+			Output.WriteAttributeString("approxNrLabelsX", this.approxNrLabelsX.ToString());
+			Output.WriteAttributeString("approxNrLabelsY", this.approxNrLabelsY.ToString());
+			Output.WriteAttributeString("width", this.width.ToString());
+			Output.WriteAttributeString("height", this.height.ToString());
+			Output.WriteAttributeString("marginTop", this.marginTop.ToString());
+			Output.WriteAttributeString("marginBottom", this.marginBottom.ToString());
+			Output.WriteAttributeString("marginLeft", this.marginLeft.ToString());
+			Output.WriteAttributeString("marginRight", this.marginRight.ToString());
+			Output.WriteAttributeString("marginLabel", this.marginLabel.ToString());
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Imports graph settings from an XML element.
+		/// </summary>
+		/// <param name="Xml">XML definition.</param>
+		/// <returns>Graph settings.</returns>
+		public static GraphSettings Import(XmlElement Xml)
+		{
+			GraphSettings Result = new GraphSettings();
+			string s;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("backgroundColor")) && Color.TryParse(s, out SKColor cl))
+				Result.backgroundColor = cl;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("axisColor")) && Color.TryParse(s, out cl))
+				Result.axisColor = cl;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("gridColor")) && Color.TryParse(s, out cl))
+				Result.gridColor = cl;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("fontName")))
+				Result.fontName = s;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("labelFontSize")) && Expression.TryParse(s, out double d))
+				Result.labelFontSize = d;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("axisWidth")) && int.TryParse(s, out int i))
+				Result.axisWidth = i;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("gridWidth")) && int.TryParse(s, out i))
+				Result.gridWidth = i;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("approxNrLabelsX")) && int.TryParse(s, out i))
+				Result.approxNrLabelsX = i;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("approxNrLabelsY")) && int.TryParse(s, out i))
+				Result.approxNrLabelsY = i;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("width")) && int.TryParse(s, out i))
+				Result.width = i;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("height")) && int.TryParse(s, out i))
+				Result.height = i;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("marginTop")) && int.TryParse(s, out i))
+				Result.marginTop = i;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("marginBottom")) && int.TryParse(s, out i))
+				Result.marginBottom = i;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("marginLeft")) && int.TryParse(s, out i))
+				Result.marginLeft = i;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("marginRight")) && int.TryParse(s, out i))
+				Result.marginRight = i;
+
+			if (!string.IsNullOrEmpty(s = Xml.GetAttribute("marginLabel")) && int.TryParse(s, out i))
+				Result.marginLabel = i;
+
+			return Result;
 		}
 
 	}

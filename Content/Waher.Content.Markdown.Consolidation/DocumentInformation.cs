@@ -154,33 +154,16 @@ namespace Waher.Content.Markdown.Consolidation
 								XmlDocument Xml = new XmlDocument();
 								Xml.LoadXml(sb.ToString());
 
-								if (!(Xml.DocumentElement is null) &&
-									Xml.DocumentElement.LocalName == Graph.GraphLocalName &&
-									Xml.DocumentElement.NamespaceURI == Graph.GraphNamespace)
-								{
-									string TypeName = XML.Attribute(Xml.DocumentElement, "type");
-									Result.graphType = Types.GetType(TypeName);
-									if (Result.graphType is null)
-										Result.type = DocumentType.SingleXml;
-									else
-									{
-										Result.graph = (Graph)Types.Instantiate(Result.graphType);
-										Result.graph.SameScale = XML.Attribute(Xml.DocumentElement, "sameScale", false);
+								Graph G = await Graph.TryImport(Xml.DocumentElement);
 
-										foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
-										{
-											if (N is XmlElement E2)
-											{
-												await Result.graph.ImportGraphAsync(E2);
-												break;
-											}
-										}
-
-										Result.type = DocumentType.SingleGraph;
-									}
-								}
-								else
+								if (G is null)
 									Result.type = DocumentType.SingleXml;
+								else
+								{
+									Result.graph = G;
+									Result.graphType = G.GetType();
+									Result.type = DocumentType.SingleGraph;
+								}
 							}
 							catch (Exception)
 							{

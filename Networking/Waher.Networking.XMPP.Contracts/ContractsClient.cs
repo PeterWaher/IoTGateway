@@ -4200,7 +4200,9 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (XmppClient.GetDomain(ContractId) != e.From)
 			{
-				this.Error("Client signature message ignored. Source domain not equal to contract domain.");
+				this.Error("Client signature message ignored. Source domain (" +
+					e.FromBareJID + ") not equal to contract domain (" +
+					ContractId + ").");
 				return;
 			}
 

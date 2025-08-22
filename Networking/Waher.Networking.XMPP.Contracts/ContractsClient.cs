@@ -5011,7 +5011,7 @@ namespace Waher.Networking.XMPP.Contracts
 			catch (XmlSchemaException ex)
 			{
 				// TODO: Remove
-
+				Log.Alert(ex);
 				Log.Debug("Unable to validate Machine-readable content. Following events record the contents of the operation.");
 				Log.Debug("Error:\r\n\r\n```\r\n" + ex.Message + "\r\n```");
 				Log.Debug("XML:\r\n\r\n```\r\n" + Doc.OuterXml + "\r\n```");

@@ -166,14 +166,23 @@ namespace Waher.Content.Xsl
 				}
 			}
 
-			foreach (XmlSchema Schema in Schemas)
-				Xml.Schemas.Add(Schema);
+			lock (xmlSchemaSetSynchronization)
+			{
+				foreach (XmlSchema Schema in Schemas)
+					Xml.Schemas.Add(Schema);
 
-			XmlValidator Validator = new XmlValidator(ObjectID);
-			Xml.Validate(Validator.ValidationCallback);
+				XmlValidator Validator = new XmlValidator(ObjectID);
+				Xml.Validate(Validator.ValidationCallback);
 
-			Validator.AssertNoError();
+				Validator.AssertNoError();
+			}
 		}
+
+		/// <summary>
+		/// For a reference as to why this XmlSchemaSet is not thread safe, see:
+		/// https://learn.microsoft.com/en-us/archive/blogs/xmlteam/xmlschemaset-thread-safety
+		/// </summary>
+		private static readonly object xmlSchemaSetSynchronization = new object();
 
 		#endregion
 

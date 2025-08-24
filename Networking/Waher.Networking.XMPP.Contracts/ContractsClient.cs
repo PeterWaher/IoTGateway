@@ -5244,15 +5244,19 @@ namespace Waher.Networking.XMPP.Contracts
 								return this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State);
 						}
 						else
+						{
 							return this.ReturnStatus(ContractStatus.NoProviderPublicKey, Callback, State,
-								new KeyValuePair<string, object>("Provider", Contract.Provider));
+								new KeyValuePair<string, object>("Provider", Contract.Provider),
+								new KeyValuePair<string, object>("ErrorText", e2.ErrorText));
+						}
 
 					}, State);
 				}
 				else
 				{
 					await this.ReturnStatus(ContractStatus.NoProviderPublicKey, Callback, State,
-						new KeyValuePair<string, object>("Provider", Contract.Provider));
+						new KeyValuePair<string, object>("Provider", Contract.Provider),
+						new KeyValuePair<string, object>("ErrorText", e.ErrorText));
 				}
 
 			}, State);

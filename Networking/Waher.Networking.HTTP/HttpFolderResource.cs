@@ -815,7 +815,7 @@ namespace Waher.Networking.HTTP
 
 			public Task HeaderProcessed() => this.Progress?.HeaderProcessed() ?? Task.CompletedTask;
 			public Task BodyProcessed() => this.Progress?.BodyProcessed() ?? Task.CompletedTask;
-			
+
 			public void DependencyTimestamp(DateTime Timestamp)
 			{
 				DateTime TP = Timestamp.ToUniversalTime();
@@ -961,7 +961,7 @@ namespace Waher.Networking.HTTP
 
 							ConversionState State = new ConversionState(ContentType, f, FullPath, ResourceName,
 								Request.Header.GetURL(false, false), NewContentType, f2, Request.Session, Result,
-								Alternatives?.ToArray());
+								Request.Server, Request.Server.TryGetLocalResourceFileName, Alternatives?.ToArray());
 
 							if (await Converter.ConvertAsync(State))
 							{

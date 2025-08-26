@@ -1089,10 +1089,11 @@ namespace Waher.IoTGateway
 				}
 
 				webServer.SetHttp2ConnectionSettings(Http2Enabled, Http2InitialStreamWindowSize,
-					Http2InitialConnectionWindowSize, Http2MaxFrameSize, Http2MaxConcurrentStreams, 
+					Http2InitialConnectionWindowSize, Http2MaxFrameSize, Http2MaxConcurrentStreams,
 					Http2HeaderTableSize, false, Http2NoRfc7540Priorities, Http2Profiling, true);
 
 				webServer.ConnectionProfiled += WebServer_ConnectionProfiled;
+				webServer.OnTryGetLocalResourceFileName += (string Resource, out string FileName) => TryGetLocalResourceFileName(Resource, out FileName);
 
 				Types.SetModuleParameter("HTTP", webServer);
 				Types.SetModuleParameter("X509", certificate);
@@ -5546,7 +5547,7 @@ namespace Waher.IoTGateway
 
 		#endregion
 
-		#region Temporary and short URLs
+		#region Local, Temporary, and short URLs
 
 		/// <summary>
 		/// Shortens a URL temporarily. Shortened URLs are available at most for 24 hours
@@ -5559,6 +5560,34 @@ namespace Waher.IoTGateway
 		public static string GetShortUrl(string Url, bool OneTimeUse)
 		{
 			return UrlShortener.GetShortUrl(Url, OneTimeUse);
+		}
+
+		/// <summary>
+		/// Tries to get a file name for a resource, if local.
+		/// </summary>
+		/// <param name="Resource">Resource</param>
+		/// <param name="FileName">File name, if resource identified as a local resource.</param>
+		/// <returns>If successful in identifying a local file name for the resource.</returns>
+		public static bool TryGetLocalResourceFileName(string Resource, out string FileName)
+		{
+			if (!Uri.TryCreate(Resource, UriKind.RelativeOrAbsolute, out Uri ParsedResource))
+			{
+				FileName = null;
+				return false;
+			}
+
+			if (ParsedResource.IsAbsoluteUri)
+			{
+				if (!IsDomain(ParsedResource.Host, true))
+				{
+					FileName = null;
+					return false;
+				}
+
+				Resource = ParsedResource.LocalPath;
+			}
+
+			return HttpServer.TryGetFileName(Resource, out FileName);
 		}
 
 		#endregion

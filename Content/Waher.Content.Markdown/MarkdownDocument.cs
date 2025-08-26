@@ -5345,14 +5345,22 @@ namespace Waher.Content.Markdown
 			{
 				string FileName;
 
-				if (!string.IsNullOrEmpty(this.fileName))
-					FileName = this.settings.GetFileName(this.fileName, MasterMetaValue);
+				if (!string.IsNullOrEmpty(this.url) &&
+					Uri.TryCreate(this.url, UriKind.Absolute, out Uri ParsedUri) &&
+					Uri.TryCreate(ParsedUri, MasterMetaValue, out Uri MasterUri) &&
+					!(this.settings.ResourceMap is null) &&
+					this.settings.ResourceMap.TryGetFileName(MasterUri.AbsoluteUri, false, out string s))
+				{
+					FileName = s;
+				}
 				else if (!string.IsNullOrEmpty(this.resourceName))
 				{
 					FileName = Path.Combine(this.resourceName, MasterMetaValue);
-					if (!(this.settings.ResourceMap is null) && this.settings.ResourceMap.TryGetFileName(FileName, false, out string s))
+					if (!(this.settings.ResourceMap is null) && this.settings.ResourceMap.TryGetFileName(FileName, false, out s))
 						FileName = s;
 				}
+				else if (!string.IsNullOrEmpty(this.fileName))
+					FileName = this.settings.GetFileName(this.fileName, MasterMetaValue);
 				else
 					FileName = MasterMetaValue;
 

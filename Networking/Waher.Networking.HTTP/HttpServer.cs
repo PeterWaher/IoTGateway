@@ -1899,6 +1899,36 @@ namespace Waher.Networking.HTTP
 			return Result.ToArray();
 		}
 
+		/// <summary>
+		/// Tries to get a file name for a resource, if local.
+		/// </summary>
+		/// <param name="Resource">Resource</param>
+		/// <param name="FileName">File name, if resource identified as a local resource.</param>
+		/// <returns>If successful in identifying a local file name for the resource.</returns>
+		public bool TryGetLocalResourceFileName(string Resource, out string FileName)
+		{
+			TryGetLocalResourceFileName h = this.OnTryGetLocalResourceFileName;
+			if (!(h is null))
+			{
+				try
+				{
+					return h(Resource, out FileName);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+			}
+
+			FileName = null;
+			return false;
+		}
+
+		/// <summary>
+		/// Event raised when a local resource file name is to be resolved.
+		/// </summary>
+		public event TryGetLocalResourceFileName OnTryGetLocalResourceFileName;
+
 		#endregion
 
 		#region Sessions

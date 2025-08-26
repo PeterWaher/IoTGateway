@@ -1,14 +1,25 @@
 ﻿using System;
 using System.IO;
+using Waher.Events;
 using Waher.Script;
 
 namespace Waher.Content
 {
 	/// <summary>
+	/// Delegate to callback functions that resolve local file names for local resources.
+	/// </summary>
+	/// <param name="Resource">Resource</param>
+	/// <param name="FileName">Local file name, if found.</param>
+	/// <returns>If resource corresponds to a local file resource.</returns>
+	public delegate bool TryGetLocalResourceFileName(string Resource, out string FileName);
+
+	/// <summary>
 	/// Contains the state of a content conversion process.
 	/// </summary>
 	public class ConversionState
 	{
+		private readonly TryGetLocalResourceFileName tryGetLocalResourceFileName;
+
 		/// <summary>
 		/// Contains the state of a content conversion process.
 		/// </summary>
@@ -23,10 +34,13 @@ namespace Waher.Content
 		/// <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
 		/// <param name="Session">Session states.</param>
 		/// <param name="Progress">Optional interface for reporting progress during conversion.</param>
+		/// <param name="ResourceMap">Optional resource map.</param>
+		/// <param name="TryGetLocalResourceFileName">Callback function to get a local file name from a resource.</param>
 		/// <param name="PossibleContentTypes">Possible content types the converter is allowed to convert to. 
 		/// Can be null if there are no alternatives.</param>
 		public ConversionState(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL,
-			string ToContentType, Stream To, Variables Session, ICodecProgress Progress, params string[] PossibleContentTypes)
+			string ToContentType, Stream To, Variables Session, ICodecProgress Progress, IResourceMap ResourceMap,
+			TryGetLocalResourceFileName TryGetLocalResourceFileName, params string[] PossibleContentTypes)
 		{
 			this.FromContentType = FromContentType;
 			this.From = From;
@@ -38,6 +52,8 @@ namespace Waher.Content
 			this.Session = Session;
 			this.Progress = Progress;
 			this.PossibleContentTypes = PossibleContentTypes;
+			this.ResourceMap = ResourceMap;
+			this.tryGetLocalResourceFileName = TryGetLocalResourceFileName;
 		}
 
 		/// <summary>
@@ -88,6 +104,11 @@ namespace Waher.Content
 		public ICodecProgress Progress { get; }
 
 		/// <summary>
+		/// Optional resource map.
+		/// </summary>
+		public IResourceMap ResourceMap { get; }
+
+		/// <summary>
 		/// Possible content types the converter is allowed to convert to. 
 		/// Can be null if there are no alternatives.
 		/// </summary>
@@ -102,5 +123,29 @@ namespace Waher.Content
 		/// If an error should be returned.
 		/// </summary>
 		public bool HasError => !(this.Error is null);
+
+		/// <summary>
+		/// Tries to get a file name for a resource, if local.
+		/// </summary>
+		/// <param name="Resource">Resource</param>
+		/// <param name="FileName">File name, if resource identified as a local resource.</param>
+		/// <returns>If successful in identifying a local file name for the resource.</returns>
+		public bool TryGetLocalResourceFileName(string Resource, out string FileName)
+		{
+			if (!(this.tryGetLocalResourceFileName is null))
+			{
+				try
+				{
+					return this.tryGetLocalResourceFileName(Resource, out FileName);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+			}
+
+			FileName = null;
+			return false;
+		}
 	}
 }

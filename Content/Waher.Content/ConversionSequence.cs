@@ -46,8 +46,9 @@ namespace Waher.Content
 
 					if (i == c - 1)
 					{
-						ConversionState State2 = new ConversionState(FromType, Intermediate ?? State.From, State.FromFileName, State.LocalResourceName, 
-							State.URL, State.ToContentType, State.To, State.Session, State.Progress, State.PossibleContentTypes);
+						ConversionState State2 = new ConversionState(FromType, Intermediate ?? State.From, State.FromFileName, 
+							State.LocalResourceName, State.URL, State.ToContentType, State.To, State.Session, State.Progress, 
+							State.ResourceMap, State.TryGetLocalResourceFileName, State.PossibleContentTypes);
 
 						if (await this.sequence[i].Value.ConvertAsync(State2))
 							Dynamic = true;
@@ -70,7 +71,8 @@ namespace Waher.Content
 							Intermediate2 = new TemporaryStream();
 
 						ConversionState State2 = new ConversionState(FromType, Intermediate ?? State.From, State.FromFileName,
-							State.LocalResourceName, State.URL, ToType, Intermediate2, State.Session, State.Progress);
+							State.LocalResourceName, State.URL, ToType, Intermediate2, State.Session, State.Progress,
+							State.ResourceMap, State.TryGetLocalResourceFileName);
 
 						if (await this.sequence[i].Value.ConvertAsync(State2))
 							Dynamic = true;

@@ -961,7 +961,7 @@ namespace Waher.Networking.HTTP
 
 							ConversionState State = new ConversionState(ContentType, f, FullPath, ResourceName,
 								Request.Header.GetURL(false, false), NewContentType, f2, Request.Session, Result,
-								Request.Server, Request.Server.TryGetLocalResourceFileName, Alternatives?.ToArray());
+								Request.Server, Request.TryGetLocalResourceFileName, Alternatives?.ToArray());
 
 							if (await Converter.ConvertAsync(State))
 							{

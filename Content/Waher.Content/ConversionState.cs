@@ -9,9 +9,10 @@ namespace Waher.Content
 	/// Delegate to callback functions that resolve local file names for local resources.
 	/// </summary>
 	/// <param name="Resource">Resource</param>
+	/// <param name="Host">Optional host, if available.</param>
 	/// <param name="FileName">Local file name, if found.</param>
 	/// <returns>If resource corresponds to a local file resource.</returns>
-	public delegate bool TryGetLocalResourceFileName(string Resource, out string FileName);
+	public delegate bool TryGetLocalResourceFileName(string Resource, string Host, out string FileName);
 
 	/// <summary>
 	/// Contains the state of a content conversion process.
@@ -128,15 +129,16 @@ namespace Waher.Content
 		/// Tries to get a file name for a resource, if local.
 		/// </summary>
 		/// <param name="Resource">Resource</param>
+		/// <param name="Host">Optional host, if available.</param>
 		/// <param name="FileName">File name, if resource identified as a local resource.</param>
 		/// <returns>If successful in identifying a local file name for the resource.</returns>
-		public bool TryGetLocalResourceFileName(string Resource, out string FileName)
+		public bool TryGetLocalResourceFileName(string Resource, string Host, out string FileName)
 		{
 			if (!(this.tryGetLocalResourceFileName is null))
 			{
 				try
 				{
-					return this.tryGetLocalResourceFileName(Resource, out FileName);
+					return this.tryGetLocalResourceFileName(Resource, Host, out FileName);
 				}
 				catch (Exception ex)
 				{

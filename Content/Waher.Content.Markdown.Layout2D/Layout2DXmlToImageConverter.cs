@@ -136,7 +136,7 @@ namespace Waher.Content.Markdown.Layout2D
 							{
 								string HRef = M.Groups["HRef"].Value;
 
-								if (State.TryGetLocalResourceFileName(HRef, out string FileName) &&
+								if (State.TryGetLocalResourceFileName(HRef, null, out string FileName) &&
 									File.Exists(FileName))
 								{
 									using (FileStream fs = File.OpenRead(FileName))

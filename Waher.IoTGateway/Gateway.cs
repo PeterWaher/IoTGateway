@@ -1093,7 +1093,8 @@ namespace Waher.IoTGateway
 					Http2HeaderTableSize, false, Http2NoRfc7540Priorities, Http2Profiling, true);
 
 				webServer.ConnectionProfiled += WebServer_ConnectionProfiled;
-				webServer.OnTryGetLocalResourceFileName += (string Resource, out string FileName) => TryGetLocalResourceFileName(Resource, out FileName);
+				webServer.OnTryGetLocalResourceFileName += (string Resource, string Host, out string FileName) => 
+					TryGetLocalResourceFileName(Resource, Host, out FileName);
 
 				Types.SetModuleParameter("HTTP", webServer);
 				Types.SetModuleParameter("X509", certificate);
@@ -5566,9 +5567,10 @@ namespace Waher.IoTGateway
 		/// Tries to get a file name for a resource, if local.
 		/// </summary>
 		/// <param name="Resource">Resource</param>
+		/// <param name="Host">Optional host, if available.</param>
 		/// <param name="FileName">File name, if resource identified as a local resource.</param>
 		/// <returns>If successful in identifying a local file name for the resource.</returns>
-		public static bool TryGetLocalResourceFileName(string Resource, out string FileName)
+		public static bool TryGetLocalResourceFileName(string Resource, string Host, out string FileName)
 		{
 			if (!Uri.TryCreate(Resource, UriKind.RelativeOrAbsolute, out Uri ParsedResource))
 			{
@@ -5585,6 +5587,12 @@ namespace Waher.IoTGateway
 				}
 
 				Resource = ParsedResource.LocalPath;
+			}
+
+			if (!string.IsNullOrEmpty(Host) &&
+				HttpServer.TryGetFileName("/" + Host + Resource, out FileName))
+			{
+				return true;
 			}
 
 			return HttpServer.TryGetFileName(Resource, out FileName);

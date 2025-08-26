@@ -1903,16 +1903,17 @@ namespace Waher.Networking.HTTP
 		/// Tries to get a file name for a resource, if local.
 		/// </summary>
 		/// <param name="Resource">Resource</param>
+		/// <param name="Host">Optional host, if available.</param>
 		/// <param name="FileName">File name, if resource identified as a local resource.</param>
 		/// <returns>If successful in identifying a local file name for the resource.</returns>
-		public bool TryGetLocalResourceFileName(string Resource, out string FileName)
+		public bool TryGetLocalResourceFileName(string Resource, string Host, out string FileName)
 		{
 			TryGetLocalResourceFileName h = this.OnTryGetLocalResourceFileName;
 			if (!(h is null))
 			{
 				try
 				{
-					return h(Resource, out FileName);
+					return h(Resource, Host, out FileName);
 				}
 				catch (Exception ex)
 				{

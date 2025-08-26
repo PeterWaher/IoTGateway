@@ -5353,11 +5353,14 @@ namespace Waher.Content.Markdown
 				{
 					FileName = s;
 				}
-				else if (!string.IsNullOrEmpty(this.fileName))
-					FileName = this.settings.GetFileName(this.fileName, MasterMetaValue);
+				else if (!string.IsNullOrEmpty(this.fileName) &&
+					File.Exists(s = this.settings.GetFileName(this.fileName, MasterMetaValue)))
+				{
+					FileName = s;
+				}
 				else if (!string.IsNullOrEmpty(this.resourceName))
 				{
-					FileName = Path.Combine(this.resourceName.Replace('/',Path.DirectorySeparatorChar), MasterMetaValue);
+					FileName = Path.Combine(this.resourceName.Replace('/', Path.DirectorySeparatorChar), MasterMetaValue);
 					if (!(this.settings.ResourceMap is null) && this.settings.ResourceMap.TryGetFileName(FileName, false, out s))
 						FileName = s;
 				}

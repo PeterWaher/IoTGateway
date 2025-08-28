@@ -916,6 +916,7 @@ namespace Waher.IoTGateway
 
 					root.AllowTypeConversion();
 
+					MarkdownSettings.SetDefaultEmojiSource(emoji1_24x24, true);
 					MarkdownToHtmlConverter.EmojiSource = emoji1_24x24;
 					MarkdownToHtmlConverter.RootFolder = rootFolder;
 				}
@@ -1136,6 +1137,7 @@ namespace Waher.IoTGateway
 					emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
 						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
 
+					MarkdownSettings.SetDefaultEmojiSource(emoji1_24x24, true);
 					MarkdownToHtmlConverter.EmojiSource = emoji1_24x24;
 					MarkdownToHtmlConverter.RootFolder = rootFolder;
 				}

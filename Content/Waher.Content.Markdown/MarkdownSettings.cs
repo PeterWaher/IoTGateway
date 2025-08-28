@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Waher.Content.Emoji;
 using Waher.Script;
@@ -6,19 +7,22 @@ using Waher.Script.Model;
 
 namespace Waher.Content.Markdown
 {
-    /// <summary>
-    /// Delegate for expression authorization methods.
-    /// </summary>
-    /// <param name="Expression">Expression to be authorized.</param>
-    /// <returns>If the expression is authorized to execute, null is returned. If it is prohibited, 
-    /// <see cref="ScriptNode"/> that is prohibited is returned.</returns>
-    public delegate Task<ScriptNode> AuthorizeExpression(Expression Expression);
+	/// <summary>
+	/// Delegate for expression authorization methods.
+	/// </summary>
+	/// <param name="Expression">Expression to be authorized.</param>
+	/// <returns>If the expression is authorized to execute, null is returned. If it is prohibited, 
+	/// <see cref="ScriptNode"/> that is prohibited is returned.</returns>
+	public delegate Task<ScriptNode> AuthorizeExpression(Expression Expression);
 
 	/// <summary>
 	/// Contains settings that the Markdown parser uses to customize its behavior.
 	/// </summary>
 	public class MarkdownSettings
 	{
+		private static IEmojiSource defaultEmojiSource = null;
+		private static bool defaultEmojiSourceLocked = false;
+
 		private IEmojiSource emojiSource;
 		private Variables variables;
 		private AuthorizeExpression authorizeExpression;
@@ -75,7 +79,7 @@ namespace Waher.Content.Markdown
 		/// documents.</param>
 		public MarkdownSettings(IEmojiSource EmojiSource, bool ParseMetaData, Variables Variables)
 		{
-			this.emojiSource = EmojiSource;
+			this.emojiSource = EmojiSource ?? defaultEmojiSource;
 			this.parseMetaData = ParseMetaData;
 			this.variables = Variables;
 		}
@@ -256,6 +260,27 @@ namespace Waher.Content.Markdown
 				FileName = Path.Combine(Path.GetDirectoryName(DocumentFileName), FileNameReference);
 
 			return FileName;
+		}
+
+		/// <summary>
+		/// Sets the default emoji source.
+		/// </summary>
+		/// <param name="EmojiSource">Emoji source to use if no other source is specified.</param>
+		/// <param name="Lock">If the default emoji source is to be locked.</param>
+		/// <exception cref="InvalidOperationException">If attempting to change a locked 
+		/// default emoji source.</exception>
+		public static void SetDefaultEmojiSource(IEmojiSource EmojiSource, bool Lock)
+		{
+			if (defaultEmojiSourceLocked)
+			{
+				if (defaultEmojiSource == EmojiSource)
+					return;
+				else
+					throw new InvalidOperationException("Default emoji source is locked.");
+			}
+
+			defaultEmojiSource = EmojiSource;
+			defaultEmojiSourceLocked = Lock;
 		}
 	}
 }

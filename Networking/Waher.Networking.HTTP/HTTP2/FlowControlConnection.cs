@@ -309,11 +309,13 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="StreamId">Stream ID</param>
 		public void StreamRemoved(int StreamId)
 		{
+			int MemorySize = (this.localSettings?.MaxConcurrentStreams ?? ConnectionSettings.DefaultHttp2MaxConcurrentStreams) << 1;
+
 			lock (this.removedStreams)
 			{
 				this.removedStreams.Add(StreamId);
 
-				while (this.removedStreams.Count > 256)
+				while (this.removedStreams.Count > MemorySize)
 					this.removedStreams.RemoveAt(0);
 			}
 		}

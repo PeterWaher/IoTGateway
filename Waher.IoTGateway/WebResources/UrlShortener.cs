@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.HTTP;
@@ -84,7 +85,30 @@ namespace Waher.IoTGateway.WebResources
 			if (Rec.OneTimeUse)
 				shortUrls?.Remove(s);
 
-			await Response.SendResponse(new MovedPermanentlyException(Rec.Url));
+			if ((Request.Header.QueryParameters?.Length ?? 0) > 0)
+			{
+				StringBuilder sb = new StringBuilder(Rec.Url);
+				bool First = Rec.Url.IndexOf('?') < 0;
+
+				foreach (KeyValuePair<string, string> P in Request.Header.QueryParameters)
+				{
+					if (First)
+					{
+						sb.Append('?');
+						First = false;
+					}
+					else
+						sb.Append('&');
+
+					sb.Append(System.Web.HttpUtility.UrlEncode(P.Key));
+					sb.Append('=');
+					sb.Append(System.Web.HttpUtility.UrlEncode(P.Value));
+				}
+
+				await Response.SendResponse(new MovedPermanentlyException(sb.ToString()));
+			}
+			else
+				await Response.SendResponse(new MovedPermanentlyException(Rec.Url));
 		}
 
 		/// <summary>

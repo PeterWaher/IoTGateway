@@ -10,6 +10,7 @@ Result of execution\: **some text**\.
 		<Parameters>P1:=[Color("FF0000"), 2]</Parameters>
 		<Painter>Waher.Script.Graphs.Functions.Plots.Plot2DCurvePainter</Painter>
 	</Graph2D>
+	<Settings backgroundColor="#ffffff" axisColor="#000000" gridColor="#d3d3d3" fontName="Segoe UI" labelFontSize="12" axisWidth="2" gridWidth="1" approxNrLabelsX="5" approxNrLabelsY="10" width="640" height="480" marginTop="10" marginBottom="10" marginLeft="15" marginRight="15" marginLabel="5" />
 </Graph>
 ```
 

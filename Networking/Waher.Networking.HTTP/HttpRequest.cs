@@ -6,10 +6,10 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Binary;
+using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.HTTP2;
 using Waher.Runtime.IO;
-using Waher.Script;
 using Waher.Security;
 
 namespace Waher.Networking.HTTP
@@ -297,6 +297,20 @@ namespace Waher.Networking.HTTP
 			}
 		}
 #endif
+		/// <summary>
+		/// Tries to get a file name for a resource, if local.
+		/// </summary>
+		/// <param name="Resource">Resource</param>
+		/// <param name="Host">Optional host, if available.</param>
+		/// <param name="FileName">File name, if resource identified as a local resource.</param>
+		/// <returns>If successful in identifying a local file name for the resource.</returns>
+		public bool TryGetLocalResourceFileName(string Resource, string Host, out string FileName)
+		{
+			if (string.IsNullOrEmpty(Host))
+				Host = this.Host;
+
+			return this.server.TryGetLocalResourceFileName(Resource, Host, out FileName);
+		}
 
 		/// <summary>
 		/// Disposes of the request.

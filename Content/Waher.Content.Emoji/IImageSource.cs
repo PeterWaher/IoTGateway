@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Content.Emoji
+﻿namespace Waher.Content.Emoji
 {
 	/// <summary>
 	/// Contains information about an emoji image.

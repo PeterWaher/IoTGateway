@@ -28,6 +28,7 @@ namespace Waher.Content.Markdown.Layout2D
 {
 	internal class GraphInfo
 	{
+		public XmlDocument Xml;
 		public string FileName;
 		public string Title;
 		public bool Dynamic;
@@ -281,12 +282,12 @@ namespace Waher.Content.Markdown.Layout2D
 				Result.Converted = true;
 			else
 			{
-				XmlDocument Doc = new XmlDocument();
-				Doc.LoadXml(Xml);
+				Result.Xml = new XmlDocument();
+				Result.Xml.LoadXml(Xml);
 
-				if (Layout2DDocument.IsLayoutXml(Doc))
+				if (Layout2DDocument.IsLayoutXml(Result.Xml))
 				{
-					Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Doc, Session);
+					Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Result.Xml, Session);
 					RenderSettings Settings = await LayoutDoc.GetRenderSettings(Session);
 
 					KeyValuePair<SKImage, Map[]> P = await LayoutDoc.Render(Settings);

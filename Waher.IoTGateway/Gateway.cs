@@ -916,6 +916,7 @@ namespace Waher.IoTGateway
 
 					root.AllowTypeConversion();
 
+					MarkdownSettings.SetDefaultEmojiSource(emoji1_24x24, true);
 					MarkdownToHtmlConverter.EmojiSource = emoji1_24x24;
 					MarkdownToHtmlConverter.RootFolder = rootFolder;
 				}
@@ -1089,10 +1090,12 @@ namespace Waher.IoTGateway
 				}
 
 				webServer.SetHttp2ConnectionSettings(Http2Enabled, Http2InitialStreamWindowSize,
-					Http2InitialConnectionWindowSize, Http2MaxFrameSize, Http2MaxConcurrentStreams, 
+					Http2InitialConnectionWindowSize, Http2MaxFrameSize, Http2MaxConcurrentStreams,
 					Http2HeaderTableSize, false, Http2NoRfc7540Priorities, Http2Profiling, true);
 
 				webServer.ConnectionProfiled += WebServer_ConnectionProfiled;
+				webServer.OnTryGetLocalResourceFileName += (string Resource, string Host, out string FileName) => 
+					TryGetLocalResourceFileName(Resource, Host, out FileName);
 
 				Types.SetModuleParameter("HTTP", webServer);
 				Types.SetModuleParameter("X509", certificate);
@@ -1134,6 +1137,7 @@ namespace Waher.IoTGateway
 					emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
 						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
 
+					MarkdownSettings.SetDefaultEmojiSource(emoji1_24x24, true);
 					MarkdownToHtmlConverter.EmojiSource = emoji1_24x24;
 					MarkdownToHtmlConverter.RootFolder = rootFolder;
 				}
@@ -5546,7 +5550,7 @@ namespace Waher.IoTGateway
 
 		#endregion
 
-		#region Temporary and short URLs
+		#region Local, Temporary, and short URLs
 
 		/// <summary>
 		/// Shortens a URL temporarily. Shortened URLs are available at most for 24 hours
@@ -5559,6 +5563,41 @@ namespace Waher.IoTGateway
 		public static string GetShortUrl(string Url, bool OneTimeUse)
 		{
 			return UrlShortener.GetShortUrl(Url, OneTimeUse);
+		}
+
+		/// <summary>
+		/// Tries to get a file name for a resource, if local.
+		/// </summary>
+		/// <param name="Resource">Resource</param>
+		/// <param name="Host">Optional host, if available.</param>
+		/// <param name="FileName">File name, if resource identified as a local resource.</param>
+		/// <returns>If successful in identifying a local file name for the resource.</returns>
+		public static bool TryGetLocalResourceFileName(string Resource, string Host, out string FileName)
+		{
+			if (!Uri.TryCreate(Resource, UriKind.RelativeOrAbsolute, out Uri ParsedResource))
+			{
+				FileName = null;
+				return false;
+			}
+
+			if (ParsedResource.IsAbsoluteUri)
+			{
+				if (!IsDomain(ParsedResource.Host, true))
+				{
+					FileName = null;
+					return false;
+				}
+
+				Resource = ParsedResource.LocalPath;
+			}
+
+			if (!string.IsNullOrEmpty(Host) &&
+				HttpServer.TryGetFileName("/" + Host + Resource, out FileName))
+			{
+				return true;
+			}
+
+			return HttpServer.TryGetFileName(Resource, out FileName);
 		}
 
 		#endregion

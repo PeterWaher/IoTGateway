@@ -1,4 +1,164 @@
-﻿function CheckEvents(TabID)
+﻿function FormDataStoreHandler()
+{
+	const SESSION_STORAGE_NAME = "events_form_data";
+	let enabled = true;
+	let includeDisabled = false;
+	let includeHidden = true;
+
+	function GenerateQuerySelector(element)
+	{
+		let idPart = "";
+		const attribs = {};
+		const tagName = element.tagName;
+
+		if (element.id != "")
+			idPart = `#${element.id}`;
+		if (element.name)
+			attribs["name"] = element.name;
+
+		if (element.getAttribute("type") === "radio")
+			attribs["value"] = element.value
+
+		const attribsString = Object.entries(attribs).map(([attribName, value]) => `[${attribName}="${CSS.escape(value)}"]`).join("");
+
+		return tagName + attribsString + idPart;
+	}
+
+	function GetDataInputElements()
+	{
+		const formElements = [];
+
+		let baseQuerySelection = ":not([data-refresh-nosave])";
+
+		if (!includeDisabled)
+			baseQuerySelection += ":not([disabled])";
+		if (!includeHidden)
+			baseQuerySelection += ":not([hidden])";
+
+		const inputs = Array.from(document.querySelectorAll("input:not([type=file])" + baseQuerySelection));
+		const textareas = Array.from(document.querySelectorAll("textarea" + baseQuerySelection));
+		const selections = Array.from(document.querySelectorAll("select" + baseQuerySelection));
+
+		const all = [
+			...inputs.map(input =>
+			{
+				const type = input.getAttribute("type");
+
+				return {
+					querySelector: GenerateQuerySelector(input),
+					value: type !== "radio" && type !== "checkbox" ? input.value : input.checked
+				};
+			}),
+			...[...textareas, ...selections].map(input =>
+			({
+				querySelector: GenerateQuerySelector(input),
+				value: input.value
+			})
+			)
+		];
+
+		all.forEach(element =>
+		{
+			const querySelector = element.querySelector;
+			switch (document.querySelectorAll(querySelector).length)
+			{
+				case 0:
+					console.warn(`malfunctional query selector "${querySelector}"`);
+					break;
+				case 1:
+					formElements.push(element);
+					break;
+				default:
+					console.warn(`query selector not unique "${querySelector}"`);
+			}
+		});
+
+		return formElements;
+	}
+
+	function SetValue(element, value)
+	{
+		switch (element.tagName)
+		{
+			case "SELECT":
+			case "TEXTAREA":
+				element.value = value;
+				break;
+			case "INPUT":
+				const type = element.getAttribute("type");
+				if (type === "checkbox" || type === "radio")
+					element.checked = value;
+				else
+					element.value = value;
+				break;
+		}
+	}
+
+	function Save()
+	{
+		if (!enabled)
+			return;
+
+		const dataInputElements = GetDataInputElements();
+
+		sessionStorage.setItem(SESSION_STORAGE_NAME, JSON.stringify(dataInputElements));
+	}
+
+	function Load()
+	{
+		if (!enabled)
+			return;
+
+		const string = sessionStorage.getItem(SESSION_STORAGE_NAME);
+		let json;
+		try { json = JSON.parse(string); } catch (e) { json = null; }
+
+		if (json)
+		{
+			json.forEach(entry =>
+			{
+				const querySelector = entry.querySelector;
+				const value = entry.value;
+
+				const applicableElements = document.querySelectorAll(querySelector);
+
+				switch (applicableElements.length)
+				{
+					case 0:
+						console.warn(`no such element found "${querySelector}"}`);
+						break;
+					case 1:
+						SetValue(applicableElements[0], value);
+						break;
+					default:
+						console.warn(`query selector not unique "${querySelector}"}`);
+				}
+			});
+		}
+	}
+
+	function Clear()
+	{
+		sessionStorage.removeItem(SESSION_STORAGE_NAME);
+	}
+
+	return {
+		get enabled() { return enabled; },
+		set enabled(value) { enabled = value; },
+
+		get includeDisabled() { return includeDisabled; },
+		set includeDisabled(value) { includeDisabled = value; },
+
+		get includeHidden() { return includeHidden; },
+		set includeHidden(value) { includeHidden = value; },
+
+		Save,
+		Load,
+		Clear,
+	};
+}
+
+function CheckEvents(TabID)
 {
 	try
 	{
@@ -254,7 +414,7 @@ function CheckEventsXHTTP(TabID)
 				}
 			}
 		};
-	}
+	};
 
 	EventCheckingEnabled = true;
 
@@ -332,6 +492,7 @@ async function ClearCacheAsync(Data)
 function Reload(Data)
 {
 	ClearReloadTimer();
+	FormDataStore.Save();
 	window.location.reload(false);
 }
 
@@ -403,7 +564,7 @@ function POST(Content, Resource)
 			else
 				ShowError(xhttp);
 		};
-	}
+	};
 
 	xhttp.open("POST", Resource, true);
 	xhttp.setRequestHeader("Content-Type", "application/json");
@@ -456,7 +617,7 @@ function LoadContent(Id)
 					xhttp.send();
 				}
 			};
-		}
+		};
 
 		console.log("Loading asynchronous content " + Id);
 		xhttp.open("GET", "/ClientEvents/" + Id, true);
@@ -583,3 +744,10 @@ catch (e)
 }
 
 CheckEvents(TabID);
+const FormDataStore = FormDataStoreHandler();
+
+window.addEventListener("load", () =>
+{
+	FormDataStore.Load();
+	FormDataStore.Clear();
+}); 

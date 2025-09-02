@@ -16,21 +16,24 @@
 		if (element.name)
 			attribs["name"] = element.name;
 
-		return tagName + Object.entries(attribs).map(([attribName, value]) => `[${attribName}="${CSS.escape(value)}"]`) + idPart;
+		if (element.getAttribute("type") === "radio")
+			attribs["value"] = element.value
+
+		const attribsString = Object.entries(attribs).map(([attribName, value]) => `[${attribName}="${CSS.escape(value)}"]`).join("");
+
+		return tagName + attribsString + idPart;
 	}
 
 	function GetDataInputElements()
 	{
-		const formElements = [
+		const formElements = [];
 
-		];
-
-		let baseQuerySelection = ":not(data-refresh-nosave)"
+		let baseQuerySelection = ":not([data-refresh-nosave])";
 
 		if (!includeDisabled)
-			baseQuerySelection += ":not([disabled])"
+			baseQuerySelection += ":not([disabled])";
 		if (!includeHidden)
-			baseQuerySelection += ":not([hidden])"
+			baseQuerySelection += ":not([hidden])";
 
 		const inputs = Array.from(document.querySelectorAll("input:not([type=file])" + baseQuerySelection));
 		const textareas = Array.from(document.querySelectorAll("textarea" + baseQuerySelection));
@@ -60,13 +63,13 @@
 			switch (document.querySelectorAll(querySelector).length)
 			{
 				case 0:
-					console.warn(`malfunctional query selector "${querySelector}"}`);
+					console.warn(`malfunctional query selector "${querySelector}"`);
 					break;
 				case 1:
 					formElements.push(element);
 					break;
 				default:
-					console.warn(`query selector not unique "${querySelector}"}`);
+					console.warn(`query selector not unique "${querySelector}"`);
 			}
 		});
 
@@ -91,14 +94,14 @@
 		}
 	}
 
-	function Save(data)
+	function Save()
 	{
+		if (!enabled)
+			return;
+
 		const dataInputElements = GetDataInputElements();
 
 		sessionStorage.setItem(SESSION_STORAGE_NAME, JSON.stringify(dataInputElements));
-
-		if (!enabled)
-			return;
 	}
 
 	function Load()
@@ -107,7 +110,8 @@
 			return;
 
 		const string = sessionStorage.getItem(SESSION_STORAGE_NAME);
-		const json = JSON.parse(string);
+		let json;
+		try { json = JSON.parse(string); } catch (e) { json = null; }
 
 		if (json)
 		{
@@ -128,7 +132,6 @@
 						break;
 					default:
 						console.warn(`query selector not unique "${querySelector}"}`);
-
 				}
 			});
 		}
@@ -145,7 +148,7 @@
 
 		get includeDisabled() { return includeDisabled; },
 		set includeDisabled(value) { includeDisabled = value; },
-		
+
 		get includeHidden() { return includeHidden; },
 		set includeHidden(value) { includeHidden = value; },
 

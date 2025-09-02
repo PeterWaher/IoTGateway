@@ -325,8 +325,13 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			lock (this.synchObj)
 			{
-				return this.RemoveStreamLocked(StreamId);
+				if (!this.RemoveStreamLocked(StreamId))
+					return false;
 			}
+
+			this.StreamRemoved(StreamId);
+
+			return true;
 		}
 
 		private bool RemoveStreamLocked(int StreamId)
@@ -478,10 +483,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="LastPermittedStreamId">Last permitted stream ID.</param>
 		public override void GoingAway(int LastPermittedStreamId)
 		{
+			LinkedList<int> ToRemove = null;
+
 			lock (this.synchObj)
 			{
-				LinkedList<int> ToRemove = null;
-
 				foreach (int StreamId in this.streams.Keys)
 				{
 					if (StreamId > LastPermittedStreamId)
@@ -498,6 +503,12 @@ namespace Waher.Networking.HTTP.HTTP2
 					foreach (int StreamId in ToRemove)
 						this.RemoveStreamLocked(StreamId);
 				}
+			}
+
+			if (!(ToRemove is null))
+			{
+				foreach (int StreamId in ToRemove)
+					this.StreamRemoved(StreamId);
 			}
 		}
 

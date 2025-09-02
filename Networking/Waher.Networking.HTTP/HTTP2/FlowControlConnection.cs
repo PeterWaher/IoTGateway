@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Networking.HTTP.HTTP2
 {
@@ -12,6 +13,7 @@ namespace Waher.Networking.HTTP.HTTP2
 	public abstract class FlowControlConnection : IFlowControl
 	{
 		private readonly List<PendingWindowIncrement> pendingIncrements = new List<PendingWindowIncrement>();
+		private readonly ChunkedList<int> removedStreams = new ChunkedList<int>();
 		private readonly ConnectionSettings localSettings;
 		private readonly ConnectionSettings remoteSettings;
 		private readonly HttpClientConnection connection;
@@ -299,6 +301,34 @@ namespace Waher.Networking.HTTP.HTTP2
 		protected virtual void ExportPlantUmlFooter(StringBuilder Output)
 		{
 			Output.AppendLine("@enduml");
+		}
+
+		/// <summary>
+		/// Adds a stream ID to the list of removed streams.
+		/// </summary>
+		/// <param name="StreamId">Stream ID</param>
+		public void StreamRemoved(int StreamId)
+		{
+			lock (this.removedStreams)
+			{
+				this.removedStreams.Add(StreamId);
+
+				while (this.removedStreams.Count > 256)
+					this.removedStreams.RemoveAt(0);
+			}
+		}
+
+		/// <summary>
+		/// Checks if a stream ID is in the list of removed streams.
+		/// </summary>
+		/// <param name="StreamId">Stream ID</param>
+		/// <returns>If the Stream ID has been removed.</returns>
+		public bool HasBeenRemoved(int StreamId)
+		{
+			lock (this.removedStreams)
+			{
+				return this.removedStreams.Contains(StreamId);
+			}
 		}
 	}
 }

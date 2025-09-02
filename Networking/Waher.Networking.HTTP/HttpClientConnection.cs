@@ -1329,8 +1329,11 @@ namespace Waher.Networking.HTTP
 						this.LogError(Error.Value, s, false, StreamThread);
 						StreamThread?.NewState(StreamState.Closed.ToString());
 
-						if (!this.flowControl.RemoveStream(this.http2StreamId))
+						if (!this.flowControl.RemoveStream(this.http2StreamId) &&
+							!this.flowControl.HasBeenRemoved(this.http2StreamId))
+						{
 							return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Stream not under flow control.", StreamThread);
+						}
 
 						if (this.http2StreamId == this.http2BuildingHeadersOnStream)
 							this.http2BuildingHeadersOnStream = 0;

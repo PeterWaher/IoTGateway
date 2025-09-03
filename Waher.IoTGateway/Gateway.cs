@@ -5611,7 +5611,7 @@ namespace Waher.IoTGateway
 		/// <returns>If Nonce value has been used.</returns>
 		public static Task<bool> HasNonceBeenUsed(string Nonce)
 		{
-			return nonceValues.ContainsKeyAsync(Nonce);
+			return nonceValues?.ContainsKeyAsync(Nonce) ?? Task.FromResult(false);
 		}
 
 		/// <summary>
@@ -5620,7 +5620,7 @@ namespace Waher.IoTGateway
 		/// <param name="Nonce">Nonce value.</param>
 		public static Task RegisterNonceValue(string Nonce)
 		{
-			return nonceValues.AddAsync(Nonce, true);
+			return nonceValues?.AddAsync(Nonce, true) ?? Task.CompletedTask;
 		}
 
 		#endregion

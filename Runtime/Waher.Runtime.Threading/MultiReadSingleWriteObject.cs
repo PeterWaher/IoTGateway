@@ -342,7 +342,7 @@ namespace Waher.Runtime.Threading
 				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
 
 			TaskCompletionSource<bool> Wait = null;
-			DateTime Start = DateTime.Now;
+			DateTime Start = DateTime.UtcNow;
 			bool RecordStackTrace = false;
 
 			while (true)
@@ -385,7 +385,7 @@ namespace Waher.Runtime.Threading
 
 					}, null, Timeout, System.Threading.Timeout.Infinite))
 					{
-						DateTime Now = DateTime.Now;
+						DateTime Now = DateTime.UtcNow;
 						bool Result = await Wait.Task;
 
 						if (!Result)
@@ -604,7 +604,7 @@ namespace Waher.Runtime.Threading
 
 			TaskCompletionSource<bool> Prev = null;
 			TaskCompletionSource<bool> Wait = null;
-			DateTime Start = DateTime.Now;
+			DateTime Start = DateTime.UtcNow;
 			bool RecordStackeTrace = false;
 
 			while (true)
@@ -650,7 +650,7 @@ namespace Waher.Runtime.Threading
 
 					}, null, Timeout, System.Threading.Timeout.Infinite))
 					{
-						DateTime Now = DateTime.Now;
+						DateTime Now = DateTime.UtcNow;
 						bool Result = await Wait.Task;
 
 						if (!Result)
@@ -689,7 +689,7 @@ namespace Waher.Runtime.Threading
 			{
 				TaskCompletionSource<bool> Prev = null;
 				TaskCompletionSource<bool> Wait = null;
-				DateTime Start = DateTime.Now;
+				DateTime Start = DateTime.UtcNow;
 				bool RecordStackeTrace = false;
 
 				Cancel.Register(() =>

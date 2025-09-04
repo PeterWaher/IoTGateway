@@ -26,8 +26,7 @@ MenuItem2(Text,Url,Privileges[]):=
 SnifferItem(Text,Url,Privileges[]):=
 (
 	if IsAuthorized(Privileges) then
-		]]<a href="((Url))">((Text))</a>
-[[ else ]]<div class="menuItemDisabled"><div class="menuItemContent">((Text))</div></div>
+		]]<li><a onclick="OpenSniffer('((Url))')">((Text))</a></li>
 [[
 );
 
@@ -53,7 +52,10 @@ foreach Category in Categories DO (
                 <ul>[[;
                 
                     foreach CategoryItem in Category.items DO (
-                        MenuItem(CategoryItem.label, CategoryItem.page, CategoryItem.privilage ?? "")
+                        if (CategoryItem matches { "label": PLabel, "page": PPage, "privilage": PPrivilage, "sniffer": Bool(PSniffer) }) then
+                            SnifferItem(CategoryItem.label, CategoryItem.page, CategoryItem.privilage ?? "")
+                        else
+                            MenuItem(CategoryItem.label, CategoryItem.page, CategoryItem.privilage ?? "")
                     );
                 ]]</ul>
             </li>[[;

@@ -342,7 +342,7 @@ namespace Waher.Runtime.Threading
 				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
 
 			TaskCompletionSource<bool> Wait = null;
-			DateTime Start = DateTime.Now;
+			DateTime Start = DateTime.UtcNow;
 			bool RecordStackTrace = false;
 
 			while (true)
@@ -379,29 +379,31 @@ namespace Waher.Runtime.Threading
 				}
 				else
 				{
+					DateTime Now = DateTime.UtcNow;
+					bool Result;
+
 					using (Timer Timer = new Timer((P) =>
 					{
-						Wait.TrySetResult(false);
+						Wait?.TrySetResult(false);
 
 					}, null, Timeout, System.Threading.Timeout.Infinite))
 					{
-						DateTime Now = DateTime.Now;
-						bool Result = await Wait.Task;
+						Result = await Wait.Task;
+					}
 
-						if (!Result)
+					if (!Result)
+					{
+						lock (this.synchObj)
 						{
-							lock (this.synchObj)
-							{
-								this.noWriters.Remove(Wait);
-							}
-
-							return false;
+							this.noWriters.Remove(Wait);
 						}
 
-						Timeout -= (int)((Now - Start).TotalMilliseconds + 0.5);
-						Start = Now;
-						Wait = null;
+						return false;
 					}
+
+					Timeout -= (int)((Now - Start).TotalMilliseconds + 0.5);
+					Start = Now;
+					Wait = null;
 				}
 			}
 		}
@@ -604,7 +606,7 @@ namespace Waher.Runtime.Threading
 
 			TaskCompletionSource<bool> Prev = null;
 			TaskCompletionSource<bool> Wait = null;
-			DateTime Start = DateTime.Now;
+			DateTime Start = DateTime.UtcNow;
 			bool RecordStackeTrace = false;
 
 			while (true)
@@ -644,31 +646,33 @@ namespace Waher.Runtime.Threading
 				}
 				else
 				{
+					DateTime Now = DateTime.UtcNow;
+					bool Result;
+
 					using (Timer Timer = new Timer((P) =>
 					{
-						Wait.TrySetResult(false);
+						Wait?.TrySetResult(false);
 
 					}, null, Timeout, System.Threading.Timeout.Infinite))
 					{
-						DateTime Now = DateTime.Now;
-						bool Result = await Wait.Task;
+						Result = await Wait.Task;
+					}
 
-						if (!Result)
+					if (!Result)
+					{
+						lock (this.synchObj)
 						{
-							lock (this.synchObj)
-							{
-								this.noWriters.Remove(Wait);
-								this.noReadersOrWriters.Remove(Wait);
-							}
-
-							return false;
+							this.noWriters.Remove(Wait);
+							this.noReadersOrWriters.Remove(Wait);
 						}
 
-						Timeout -= (int)((Now - Start).TotalMilliseconds + 0.5);
-						Start = Now;
-						Prev = Wait;
-						Wait = null;
+						return false;
 					}
+
+					Timeout -= (int)((Now - Start).TotalMilliseconds + 0.5);
+					Start = Now;
+					Prev = Wait;
+					Wait = null;
 				}
 			}
 		}
@@ -689,7 +693,7 @@ namespace Waher.Runtime.Threading
 			{
 				TaskCompletionSource<bool> Prev = null;
 				TaskCompletionSource<bool> Wait = null;
-				DateTime Start = DateTime.Now;
+				DateTime Start = DateTime.UtcNow;
 				bool RecordStackeTrace = false;
 
 				Cancel.Register(() =>

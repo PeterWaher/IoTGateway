@@ -177,7 +177,7 @@ namespace Waher.Script.Operators.Vectors
 
 		private static readonly Dictionary<Type, KeyValuePair<PropertyInfo, ParameterInfo[]>> indexProperties = new Dictionary<Type, KeyValuePair<PropertyInfo, ParameterInfo[]>>();
 
-		private static async Task<IElement> EvaluateIndex(object Object, Type T, PropertyInfo ItemProperty, ParameterInfo[] Parameters,
+		internal static async Task<IElement> EvaluateIndex(object Object, Type T, PropertyInfo ItemProperty, ParameterInfo[] Parameters,
 			IElement Index, ScriptNode Node)
 		{
 			if (Index.TryConvertTo(Parameters[0].ParameterType, out object IndexValue))

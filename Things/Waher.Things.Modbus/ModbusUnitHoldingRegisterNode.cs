@@ -107,7 +107,7 @@ namespace Waher.Things.Modbus
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(ModbusGatewayNode), 27, "Holding Register (4x)");
+			return Language.GetStringAsync(typeof(ModbusGatewayNode), 27, "Holding Register (3x)");
 		}
 
 		/// <summary>

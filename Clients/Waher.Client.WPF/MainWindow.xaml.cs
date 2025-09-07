@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -11,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using System.Xml;
 using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Chat;
@@ -46,7 +48,6 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Runtime.Settings;
 using Waher.Runtime.Timing;
-using Waher.Script.Constants;
 
 namespace Waher.Client.WPF
 {
@@ -68,23 +69,23 @@ namespace Waher.Client.WPF
 	{
 		public const string WindowTitle = "Simple XMPP IoT Client";
 
-		public static RoutedUICommand Add = new("Add", "Add", typeof(MainWindow));
-		public static RoutedUICommand Edit = new("Edit", "Edit", typeof(MainWindow));
-		public static RoutedUICommand Delete = new("Delete", "Delete", typeof(MainWindow));
-		public static RoutedUICommand Copy = new("Copy", "Copy", typeof(MainWindow));
-		public static RoutedUICommand Paste = new("Paste", "Paste", typeof(MainWindow));
-		public static RoutedUICommand ConnectTo = new("Connect To", "ConnectTo", typeof(MainWindow));
-		public static RoutedUICommand Refresh = new("Refresh", "Refresh", typeof(MainWindow));
-		public static RoutedUICommand Sniff = new("Sniff", "Sniff", typeof(MainWindow));
-		public static RoutedUICommand EventLog = new("EventLog", "EventLog", typeof(MainWindow));
-		public static RoutedUICommand CloseTab = new("Close Tab", "CloseTab", typeof(MainWindow));
-		public static RoutedUICommand Chat = new("Chat", "Chat", typeof(MainWindow));
-		public static RoutedUICommand ReadMomentary = new("Read Momentary", "ReadMomentary", typeof(MainWindow));
-		public static RoutedUICommand ReadDetailed = new("Read Detailed", "ReadDetailed", typeof(MainWindow));
-		public static RoutedUICommand SubscribeToMomentary = new("Subscribe to Momentary", "SubscribeToMomentary", typeof(MainWindow));
-		public static RoutedUICommand Configure = new("Configure", "Configure", typeof(MainWindow));
-		public static RoutedUICommand Search = new("Search", "Search", typeof(MainWindow));
-		public static RoutedUICommand Script = new("Script", "Script", typeof(MainWindow));
+		public static readonly RoutedUICommand Add = new("Add", "Add", typeof(MainWindow));
+		public static readonly RoutedUICommand Edit = new("Edit", "Edit", typeof(MainWindow));
+		public static readonly RoutedUICommand Delete = new("Delete", "Delete", typeof(MainWindow));
+		public static readonly RoutedUICommand Copy = new("Copy", "Copy", typeof(MainWindow));
+		public static readonly RoutedUICommand Paste = new("Paste", "Paste", typeof(MainWindow));
+		public static readonly RoutedUICommand ConnectTo = new("Connect To", "ConnectTo", typeof(MainWindow));
+		public static readonly RoutedUICommand Refresh = new("Refresh", "Refresh", typeof(MainWindow));
+		public static readonly RoutedUICommand Sniff = new("Sniff", "Sniff", typeof(MainWindow));
+		public static readonly RoutedUICommand EventLog = new("EventLog", "EventLog", typeof(MainWindow));
+		public static readonly RoutedUICommand CloseTab = new("Close Tab", "CloseTab", typeof(MainWindow));
+		public static readonly RoutedUICommand Chat = new("Chat", "Chat", typeof(MainWindow));
+		public static readonly RoutedUICommand ReadMomentary = new("Read Momentary", "ReadMomentary", typeof(MainWindow));
+		public static readonly RoutedUICommand ReadDetailed = new("Read Detailed", "ReadDetailed", typeof(MainWindow));
+		public static readonly RoutedUICommand SubscribeToMomentary = new("Subscribe to Momentary", "SubscribeToMomentary", typeof(MainWindow));
+		public static readonly RoutedUICommand Configure = new("Configure", "Configure", typeof(MainWindow));
+		public static readonly RoutedUICommand Search = new("Search", "Search", typeof(MainWindow));
+		public static readonly RoutedUICommand Script = new("Script", "Script", typeof(MainWindow));
 
 		internal static MainWindow? currentInstance = null;
 		private static string? appDataFolder = null;
@@ -1486,25 +1487,39 @@ namespace Waher.Client.WPF
 			UpdateGui(Method, Method.Method.DeclaringType + "." + Method.Method.Name, State);
 		}
 
-		private static void UpdateGui(GuiDelegateWithParameter Method, string Name, object State)
+		private static async void UpdateGui(GuiDelegateWithParameter Method, string Name, object State)
 		{
-			bool Start;
-			GuiUpdateTask Rec = new()
+			if (currentInstance?.Dispatcher.CheckAccess() ?? false)
 			{
-				Method = Method,
-				State = State,
-				Name = Name,
-				Requested = DateTime.Now
-			};
-
-			lock (guiUpdateQueue)
-			{
-				Start = guiUpdateQueue.First is null;
-				guiUpdateQueue.AddLast(Rec);
+				try
+				{
+					await Method(State);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
 			}
+			else
+			{
+				bool Start;
+				GuiUpdateTask Rec = new()
+				{
+					Method = Method,
+					State = State,
+					Name = Name,
+					Requested = DateTime.Now
+				};
 
-			if (Start)
-				currentInstance!.Dispatcher.BeginInvoke(new GuiDelegate(DoUpdates));
+				lock (guiUpdateQueue)
+				{
+					Start = guiUpdateQueue.First is null;
+					guiUpdateQueue.AddLast(Rec);
+				}
+
+				if (Start)
+					_ = currentInstance!.Dispatcher.BeginInvoke(new GuiDelegate(DoUpdates));
+			}
 		}
 
 		private static async Task DoUpdates()

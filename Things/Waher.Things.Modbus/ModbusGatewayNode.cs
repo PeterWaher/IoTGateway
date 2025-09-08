@@ -413,5 +413,21 @@ namespace Waher.Things.Modbus
 		}
 
 		#endregion
+
+		#region Commands
+
+		/// <summary>
+		/// Available command objects. If no commands are available, null is returned.
+		/// </summary>
+		public override Task<IEnumerable<ICommand>> Commands => this.GetCommands();
+
+		private async Task<IEnumerable<ICommand>> GetCommands()
+		{
+			List<ICommand> Commands = new List<ICommand>();
+			Commands.AddRange(await base.Commands);
+			return Commands.ToArray();
+		}
+
+		#endregion
 	}
 }

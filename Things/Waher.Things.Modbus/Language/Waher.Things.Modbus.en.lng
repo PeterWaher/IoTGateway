@@ -16,7 +16,7 @@
 			<String id="12">Custom field name for value.</String>
 			<String id="13">Register Number:</String>
 			<String id="14">Register number on the Modbus unit.</String>
-			<String id="15">Input Register (3x)</String>
+			<String id="15">Input Register (4x)</String>
 			<String id="16">Unit:</String>
 			<String id="17">Unit of register value (after scaling and offset).</String>
 			<String id="18">Multiplier:</String>
@@ -28,7 +28,7 @@
 			<String id="24">Raw value will be transformed as follows: Value = ((Raw * Multiplier) / Divisor) + Offset. To this transformed value, the unit will be added.</String>
 			<String id="25">Raw Name:</String>
 			<String id="26">Custom field name for raw value.</String>
-			<String id="27">Holding Register (4x)</String>
+			<String id="27">Holding Register (3x)</String>
 			<String id="28">Composite Node</String>
 			<String id="29">Discrete Input (1x)</String>
 			<String id="30">Minimum coil number:</String>
@@ -55,8 +55,8 @@
 			<String id="51">Byte Swap Order (B A D C)</String>
 			<String id="52">Word Swap Order (C D A B)</String>
 			<String id="53">Byte and Word Swap Order (D C B A)</String>
-			<String id="54">Holding Floating-point Register (4x)</String>
-			<String id="55">Input Floating-point Register (3x)</String>
+			<String id="54">Holding Floating-point Register (3x)</String>
+			<String id="55">Input Floating-point Register (4x)</String>
 			<String id="56">Fix number of decimals.</String>
 			<String id="57">If checked, the number of decimals of the value fieldd will be fixed.</String>
 			<String id="58">Number of decimals:</String>

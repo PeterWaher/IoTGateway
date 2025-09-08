@@ -157,7 +157,7 @@ namespace Waher.Things.Modbus
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(ModbusGatewayNode), 54, "Holding Floating-point Register (4x)");
+			return Language.GetStringAsync(typeof(ModbusGatewayNode), 54, "Holding Floating-point Register (3x)");
 		}
 
 		/// <summary>

@@ -52,7 +52,7 @@ foreach Category in Categories DO (
                 <ul>[[;
                 
                     foreach CategoryItem in Category.items DO (
-                        if (CategoryItem matches { "label": PLabel, "page": PPage, "privilage": PPrivilage, "sniffer": Bool(PSniffer) }) then
+                        if (exists(CategoryItem.sniffer) and CategoryItem.sniffer) then
                             SnifferItem(CategoryItem.label, CategoryItem.page, CategoryItem.privilage ?? "")
                         else
                             MenuItem(CategoryItem.label, CategoryItem.page, CategoryItem.privilage ?? "")

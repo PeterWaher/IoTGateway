@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
+using Waher.Content.Html.Elements;
 using Waher.Content.Xml;
 using Waher.Content.Xml.Text;
 using Waher.Content.Xsl;
@@ -2968,6 +2969,100 @@ namespace Waher.Networking.XMPP.Contracts
 					Result.TrySetResult(new KeyValuePair<LegalIdentity, Exception>(e.Identity, null));
 				else
 					Result.TrySetResult(new KeyValuePair<LegalIdentity, Exception>(null, e.StanzaError ?? new Exception("Unable to verify signature.")));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return await Result.Task;
+		}
+
+		#endregion
+
+		#region Trust Chain
+
+		/// <summary>
+		/// Gets the trust chain from the current domain. The trust chain is a list of domains, each
+		/// one the parent of the following, starting from the trust anchor (root) and ending
+		/// with the domain itself.
+		/// </summary>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public Task GetTrustChain(EventHandlerAsync<TrustChainEventArgs> Callback, object State)
+		{
+			return this.GetTrustChain(this.client.Domain, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets the trust chain from a domain. The trust chain is a list of domains, each
+		/// one the parent of the following, starting from the trust anchor (root) and ending
+		/// with the domain itself.
+		/// </summary>
+		/// <param name="Domain">Domain of broker whose trust chain is requested.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public async Task GetTrustChain(string Domain, EventHandlerAsync<TrustChainEventArgs> Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getTrustChain xmlns=\"");
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
+			Xml.Append("\"/>");
+
+			await this.client.SendIqGet(Domain, Xml.ToString(), async (Sender, e) =>
+			{
+				ChunkedList<string> Brokers = null;
+				XmlElement E;
+
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "trustChain")
+				{
+					Brokers = new ChunkedList<string>();
+
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						if (N is XmlElement E2 &&
+							E2.LocalName == "broker" &&
+							IsNamespaceLegalIdentity(E2.NamespaceURI))
+						{
+							Brokers.Add(XML.Attribute(E2, "domain"));
+						}
+					}
+				}
+				else
+					e.Ok = false;
+
+				await Callback.Raise(this, new TrustChainEventArgs(e, Brokers?.ToArray()));
+			}, State);
+		}
+
+		/// <summary>
+		/// Gets the trust chain from the current domain. The trust chain is a list of domains, each
+		/// one the parent of the following, starting from the trust anchor (root) and ending
+		/// with the domain itself.
+		/// </summary>
+		/// <returns>Trust chain of domains.</returns>
+		public Task<string[]> GetTrustChainAsync()
+		{
+			return this.GetTrustChainAsync(this.client.Domain);
+		}
+
+		/// <summary>
+		/// Gets the trust chain from a domain. The trust chain is a list of domains, each
+		/// one the parent of the following, starting from the trust anchor (root) and ending
+		/// with the domain itself.
+		/// </summary>
+		/// <param name="Domain">Domain of broker whose trust chain is requested.</param>
+		/// <returns>Trust chain of domains.</returns>
+		public async Task<string[]> GetTrustChainAsync(string Domain)
+		{
+			TaskCompletionSource<string[]> Result = new TaskCompletionSource<string[]>();
+
+			await this.GetTrustChain(Domain, (Sender, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(e.Domains);
+				else
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get the trust chain of domains from " + Domain + "."));
 
 				return Task.CompletedTask;
 

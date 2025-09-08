@@ -915,4 +915,31 @@
 		</xs:restriction>
 	</xs:simpleType>
 
+	<xs:element name='getTrustChain'>
+		<xs:annotation>
+			<xs:documentation>Sent by one entity to another when it needs to get the chain of trust of a broker.</xs:documentation>
+			<xs:documentation>Expected response element: trustChain</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+
+	<xs:element name='trustChain'>
+		<xs:annotation>
+			<xs:documentation>Sent in response to a request of a brokers trust chain.</xs:documentation>
+			<xs:documentation>Contains a sequence of parent brokers, from the trust anchor (root) down to the broker itself.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name='broker' minOccurs='1' maxOccurs='unbounded'>
+					<xs:complexType>
+						<xs:attribute name='domain' use='required' type='xs:string'>
+							<xs:annotation>
+								<xs:documentation>The domain name of the broker.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
 </xs:schema>

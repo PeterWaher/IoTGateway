@@ -8,7 +8,7 @@ Categories := [
             { label: "Notification", page: "/Settings/Notification.md", privilage: "Admin.Communication.Notification" },
             { label: "Roster", page: "/Settings/Roster.md", privilage: "Admin.Communication.Roster" },
             { label: "XMPP", page: "/Settings/XMPP.md", privilage: "Admin.Communication.XMPP" },
-            { label: "XMPP Sniffer", page: "/Sniffers/XMPP.md", privilage: ["Admin.Communication.XMPP", "Admin.Communication.Sniffer"] }
+            { label: "XMPP Sniffer", page: "/Sniffers/XMPP.md", privilage: ["Admin.Communication.XMPP", "Admin.Communication.Sniffer"], sniffer: true }
         ]
     },
     {
@@ -16,8 +16,8 @@ Categories := [
         items: [
             { label: "Backup", page: "/Settings/Backup.md", privilage: "Admin.Data.Backup" },
             { label: "Database", page: "/Settings/Database.md", privilage: "Admin.Data.Database" },
-            { label: "Database Sniffer", page: "/Sniffers/Database.md", privilage: ["Admin.Data.Database", "Admin.Communication.Sniffer"] },
-            { label: "Events", page: "/Sniffers/EventLog.md", privilage: "Admin.Data.Events" },
+            { label: "Database Sniffer", page: "/Sniffers/Database.md", privilage: ["Admin.Data.Database", "Admin.Communication.Sniffer"], sniffer: true },
+            { label: "Events", page: "/Sniffers/EventLog.md", privilage: "Admin.Data.Events", sniffer: true },
             { label: "Graph Store", page: "/GraphStore.md", privilage: "Admin.Graphs.Get" },
             { label: "Restore", page: "/Settings/Restore.md", privilage: "Admin.Data.Restore" },
             { label: "SPARQL", page: "/Sparql.md", privilage: "Admin.Graphs.Query" }

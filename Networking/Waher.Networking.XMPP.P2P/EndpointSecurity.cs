@@ -11,6 +11,7 @@ using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Networking.XMPP.StanzaErrors;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Profiling;
 
@@ -1030,7 +1031,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="DataXml">XML data</param>
 		/// <param name="Xml">Output</param>
 		/// <returns>If E2E information was available and encryption was possible.</returns>
-		public bool Encrypt(XmppClient Client, string Id, string Type, string From, string To, 
+		public bool Encrypt(XmppClient Client, string Id, string Type, string From, string To,
 			string DataXml, StringBuilder Xml)
 		{
 			return this.Encrypt(Client, Id, Type, From, To, false, 0, DataXml, Xml);
@@ -1162,6 +1163,33 @@ namespace Waher.Networking.XMPP.P2P
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Returns all local endpoints that are compatible with a given public key,
+		/// based on its length.
+		/// </summary>
+		/// <param name="PublicKey">Public key.</param>
+		/// <returns>Array (possibly empty) of local endpoints with public keys
+		/// matching in length to <paramref name="PublicKey"/>.</returns>
+		public IE2eEndpoint[] FindCompatibleLocalEndpoints(byte[] PublicKey)
+		{
+			ChunkedList<IE2eEndpoint> Result = null;
+			int Len = PublicKey?.Length ?? 0;
+
+			lock (this.synchObject)
+			{
+				foreach (IE2eEndpoint Endpoint in this.Keys)
+				{
+					if ((Endpoint.PublicKey?.Length ?? 0) == Len)
+					{
+						Result ??= new ChunkedList<IE2eEndpoint>();
+						Result.Add(Endpoint);
+					}
+				}
+			}
+
+			return Result?.ToArray() ?? Array.Empty<IE2eEndpoint>();
 		}
 
 		/// <summary>

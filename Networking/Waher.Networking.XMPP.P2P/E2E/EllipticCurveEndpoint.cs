@@ -120,10 +120,12 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		{
 			string Key = LocalKey.PublicKeyBase64 + ";" + RemoteKey.PublicKeyBase64;
 
-			if (!sharedSecrets.TryGetValue(Key, out byte[] SharedKey))
+			if (sharedSecrets.TryGetValue(Key, out byte[] SharedKey))
+				SharedKey = (byte[])SharedKey.Clone();
+			else
 			{
 				SharedKey = LocalKey.curve.GetSharedKey(RemoteKey.PublicKey, Hashes.ComputeSHA256Hash);
-				sharedSecrets[Key] = SharedKey;
+				sharedSecrets[Key] = (byte[])SharedKey.Clone();
 			}
 
 			return SharedKey;

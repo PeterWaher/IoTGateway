@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
-using Waher.Content.Html.Elements;
 using Waher.Content.Xml;
 using Waher.Content.Xml.Text;
 using Waher.Content.Xsl;
@@ -8147,7 +8146,9 @@ namespace Waher.Networking.XMPP.Contracts
 		public (byte[], byte[]) Encrypt(byte[] Message, byte[] Nonce, byte[] RecipientPublicKey, string RecipientPublicKeyName,
 			string RecipientPublicKeyNamespace)
 		{
-			IE2eEndpoint LocalEndpoint = this.localKeys.FindLocalEndpoint(RecipientPublicKeyName, RecipientPublicKeyNamespace) ?? throw new NotSupportedException("Unable to find matching local key.");
+			IE2eEndpoint LocalEndpoint = this.localKeys.FindLocalEndpoint(RecipientPublicKeyName, RecipientPublicKeyNamespace) 
+				?? throw new NotSupportedException("Unable to find matching local key.");
+
 			IE2eEndpoint RemoteEndpoint = LocalEndpoint.CreatePublic(RecipientPublicKey);
 			Aes256 SymmetricCipher = new Aes256();
 			byte[] LocalPublicKey = LocalEndpoint.PublicKey;
@@ -8163,7 +8164,7 @@ namespace Waher.Networking.XMPP.Contracts
 			int i, j, c;
 
 			for (i = 0; i < 32; i++)
-				Secret[i] ^= NonceDigest[i];
+				Digest[i] ^= NonceDigest[i];
 
 			i = Message.Length;
 			c = 0;
@@ -8255,13 +8256,116 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Decrypts a message that was aimed at the client using the current keys.
 		/// </summary>
 		/// <param name="EncryptedMessage">Encrypted message.</param>
-		/// <param name="SenderPublicKey">Public key used by the sender.</param>
+		/// <param name="SenderPublicKey">Public key of the sender.</param>
 		/// <param name="Nonce">Nonce-value to use during decryption. Must be the same
 		/// as the one used during encryption.</param>
 		/// <returns>Decrypted message.</returns>
-		public async Task<byte[]> Decrypt(byte[] EncryptedMessage, byte[] SenderPublicKey, byte[] Nonce)
+		public byte[] DecryptReceivedMessage(byte[] EncryptedMessage, byte[] SenderPublicKey, 
+			byte[] Nonce)
 		{
-			IE2eEndpoint LocalEndpoint = await this.GetMatchingLocalKeyAsync();
+			IE2eEndpoint[] LocalEndpoints = this.localKeys?.FindCompatibleLocalEndpoints(SenderPublicKey) ?? Array.Empty<IE2eEndpoint>();
+			ChunkedList<Exception> Exceptions = null;
+
+			foreach (IE2eEndpoint LocalEndpoint in LocalEndpoints)
+			{
+				try
+				{
+					IE2eEndpoint RemoteEndpoint = LocalEndpoint.CreatePublic(SenderPublicKey);
+					byte[] KeyCipherText;
+					int i, j, c;
+					byte b;
+
+					i = 0;
+					c = 0;
+
+					if (LocalEndpoint.SharedSecretUseCipherText)
+					{
+						do
+						{
+							b = EncryptedMessage[i++];
+							c <<= 7;
+							c |= b & 0x7f;
+						}
+						while ((b & 0x80) != 0);
+
+						if (c < 0 || c > EncryptedMessage.Length - i)
+							throw new InvalidOperationException("Unable to decrypt message.");
+
+						KeyCipherText = new byte[c];
+						Array.Copy(EncryptedMessage, 0, KeyCipherText, 0, c);
+					}
+					else
+						KeyCipherText = null;
+
+					byte[] Secret = LocalEndpoint.GetSharedSecretForDecryption(RemoteEndpoint, KeyCipherText);
+					byte[] Digest = Hashes.ComputeSHA256Hash(Secret);
+					byte[] NonceDigest = Hashes.ComputeSHA256Hash(Nonce);
+					byte[] Key = new byte[16];
+					byte[] IV = new byte[16];
+					byte[] Decrypted;
+
+					for (j = 0; j < 32; j++)
+						Digest[j] ^= NonceDigest[j];
+
+					Array.Copy(Digest, 0, Key, 0, 16);
+					Array.Copy(Digest, 16, IV, 0, 16);
+
+					lock (this.aes)
+					{
+						using ICryptoTransform Aes = this.aes.CreateDecryptor(Key, IV);
+						Decrypted = Aes.TransformFinalBlock(EncryptedMessage, i, EncryptedMessage.Length - i);
+					}
+
+					i = 0;
+					c = 0;
+					do
+					{
+						b = Decrypted[i++];
+						c <<= 7;
+						c |= b & 0x7f;
+					}
+					while ((b & 0x80) != 0);
+
+					if (c < 0 || c > Decrypted.Length - i)
+					{
+						Exceptions ??= new ChunkedList<Exception>();
+						Exceptions.Add(new InvalidOperationException("Unable to decrypt message."));
+						continue;
+					}
+
+					byte[] Message = new byte[c];
+
+					Array.Copy(Decrypted, i, Message, 0, c);
+
+					return Message;
+				}
+				catch (Exception ex)
+				{
+					Exceptions ??= new ChunkedList<Exception>();
+					Exceptions.Add(ex);
+				}
+			}
+
+			if (Exceptions is null)
+				throw new NotSupportedException("No compatible local key found.");
+			else if (Exceptions.Count == 1)
+				throw Exceptions.FirstItem;
+			else
+				throw new AggregateException(Exceptions.ToArray());
+		}
+
+		/// <summary>
+		/// Decrypts a message that was sent by the client using the current keys.
+		/// </summary>
+		/// <param name="EncryptedMessage">Encrypted message.</param>
+		/// <param name="SenderPublicKey">Public key of the sender.</param>
+		/// <param name="Nonce">Nonce-value to use during decryption. Must be the same
+		/// as the one used during encryption.</param>
+		/// <returns>Decrypted message.</returns>
+		public byte[] DecryptSentMessage(byte[] EncryptedMessage, byte[] SenderPublicKey,
+			byte[] Nonce)
+		{
+			IE2eEndpoint LocalEndpoint = this.localKeys.FindLocalEndpoint(SenderPublicKey);
 			IE2eEndpoint RemoteEndpoint = LocalEndpoint.CreatePublic(SenderPublicKey);
 			byte[] KeyCipherText;
 			int i, j, c;
@@ -8289,16 +8393,16 @@ namespace Waher.Networking.XMPP.Contracts
 			else
 				KeyCipherText = null;
 
-			byte[] Secret = LocalEndpoint.GetSharedSecretForDecryption(RemoteEndpoint, KeyCipherText);
+			IE2eSymmetricCipher SymmetricCipher = new Aes256();
+			byte[] Secret = LocalEndpoint.GetSharedSecretForEncryption(RemoteEndpoint, SymmetricCipher, out _);
+			byte[] Digest = Hashes.ComputeSHA256Hash(Secret);
 			byte[] NonceDigest = Hashes.ComputeSHA256Hash(Nonce);
 			byte[] Key = new byte[16];
 			byte[] IV = new byte[16];
 			byte[] Decrypted;
 
 			for (j = 0; j < 32; j++)
-				Secret[j] ^= NonceDigest[j];
-
-			byte[] Digest = Hashes.ComputeSHA256Hash(Secret);
+				Digest[j] ^= NonceDigest[j];
 
 			Array.Copy(Digest, 0, Key, 0, 16);
 			Array.Copy(Digest, 16, IV, 0, 16);

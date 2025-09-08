@@ -90,8 +90,19 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Exports the public key information to XML.
 		/// </summary>
+		string ToXml();
+
+		/// <summary>
+		/// Exports the public key information to XML.
+		/// </summary>
+		/// <param name="ParentNamespace">Namespace of parent element.</param>
+		string ToXml(string ParentNamespace);
+
+		/// <summary>
+		/// Exports the public key information to XML.
+		/// </summary>
 		/// <param name="Xml">XML output</param>
-        /// <param name="ParentNamespace">Namespace of parent element.</param>
+		/// <param name="ParentNamespace">Namespace of parent element.</param>
 		void ToXml(StringBuilder Xml, string ParentNamespace);
 
 		/// <summary>

@@ -121,6 +121,26 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			return null;
 		}
 
+
+		/// <summary>
+		/// Exports the public key information to XML.
+		/// </summary>
+		public string ToXml()
+		{
+			return this.ToXml(string.Empty);
+		}
+
+		/// <summary>
+		/// Exports the public key information to XML.
+		/// </summary>
+		/// <param name="ParentNamespace">Namespace of parent element.</param>
+		public string ToXml(string ParentNamespace)
+		{
+			StringBuilder Xml = new StringBuilder();
+			this.ToXml(Xml, ParentNamespace);
+			return Xml.ToString();
+		}
+
 		/// <summary>
 		/// Exports the public key information to XML.
 		/// </summary>

@@ -8390,8 +8390,6 @@ namespace Waher.Networking.XMPP.Contracts
 				KeyCipherText = new byte[c];
 				Array.Copy(EncryptedMessage, 0, KeyCipherText, 0, c);
 			}
-			else
-				KeyCipherText = null;
 
 			IE2eSymmetricCipher SymmetricCipher = new Aes256();
 			byte[] Secret = LocalEndpoint.GetSharedSecretForEncryption(RemoteEndpoint, SymmetricCipher, out _);

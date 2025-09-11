@@ -20,20 +20,20 @@ namespace Waher.Security.JWT
 	/// </summary>
 	public class JwtToken
 	{
-		private readonly string token;
-		private readonly IJwsAlgorithm algorithm;
-		private readonly Dictionary<string, object> claims;
-		private readonly string header;
-		private readonly string payload;
-		private readonly string signature = null;
-		private readonly string type = null;
-		private readonly string issuer = null;
-		private readonly string subject = null;
-		private readonly string id = null;
-		private readonly string[] audience = null;
-		private readonly DateTime? expiration = null;
-		private readonly DateTime? notBefore = null;
-		private readonly DateTime? issuedAt = null;
+		private string token;
+		private IJwsAlgorithm algorithm;
+		private Dictionary<string, object> claims;
+		private string header;
+		private string payload;
+		private string signature = null;
+		private string type = null;
+		private string issuer = null;
+		private string subject = null;
+		private string id = null;
+		private string[] audience = null;
+		private DateTime? expiration = null;
+		private DateTime? notBefore = null;
+		private DateTime? issuedAt = null;
 
 		/// <summary>
 		/// Contains information about a Java Web Token (JWT). JWT is defined in RFC 7519:
@@ -45,100 +45,165 @@ namespace Waher.Security.JWT
 		/// Signature algorithms are defined in RFC 7518:
 		/// https://tools.ietf.org/html/rfc7518
 		/// </summary>
+		/// <param name="Token">String-representation of token.</param>
 		public JwtToken(string Token)
 		{
-			this.token = Token;
+			if (!ParseInto(Token, this, out string Reason))
+				throw new Exception("Unable to parse JWT token: " + Token + "\r\nReason: " + Reason);
+		}
 
+		/// <summary>
+		/// Contains information about a Java Web Token (JWT). JWT is defined in RFC 7519:
+		/// </summary>
+		private JwtToken()
+		{
+		}
+
+		/// <summary>
+		/// Tries to parse a JWT token.
+		/// </summary>
+		/// <param name="Token">String-representation of token.</param>
+		/// <param name="ParsedToken">Parsed token, if successful.</param>
+		/// <returns>If successful in parsing token.</returns>
+		public static bool TryParse(string Token, out JwtToken ParsedToken)
+		{
+			return TryParse(Token, out ParsedToken, out _);
+		}
+
+		/// <summary>
+		/// Tries to parse a JWT token.
+		/// </summary>
+		/// <param name="Token">String-representation of token.</param>
+		/// <param name="ParsedToken">Parsed token, if successful.</param>
+		/// <param name="Reason">Reason, if not successful.</param>
+		/// <returns>If successful in parsing token.</returns>
+		public static bool TryParse(string Token, out JwtToken ParsedToken, out string Reason)
+		{
+			ParsedToken = new JwtToken();
+			return ParseInto(Token, ParsedToken, out Reason);
+		}
+
+		/// <summary>
+		/// Parses a token into a provided JwtToken object.
+		/// </summary>
+		/// <param name="Token">String-representation of token.</param>
+		/// <param name="ParsedToken">Token to receive parsed information.</param>
+		/// <param name="Reason">Reason, if not successful.</param>
+		/// <returns>If successful in parsing token.</returns>
+		public static bool ParseInto(string Token, JwtToken ParsedToken, out string Reason)
+		{
 			try
 			{
+				ParsedToken.token = Token;
+				
 				string[] Parts = Token.Split('.');
-				byte[] HeaderBin = Base64Url.Decode(this.header = Parts[0]);
+				ParsedToken.header = Parts[0];
+
+				byte[] HeaderBin = Base64Url.Decode(ParsedToken.header);
 				string HeaderString = Encoding.UTF8.GetString(HeaderBin);
 
-				if (JSON.Parse(HeaderString) is Dictionary<string, object> Header)
+				if (!(JSON.Parse(HeaderString) is Dictionary<string, object> Header))
 				{
-					if (Header.TryGetValue("typ", out object Typ))
-						this.type = Typ as string;
-
-					if (!Header.TryGetValue("alg", out object Alg) || !(Alg is string AlgStr))
-						throw new ArgumentException("Invalid alg header field.", nameof(Token));
-
-					if (string.IsNullOrEmpty(AlgStr) || string.Compare(AlgStr, "none", true) == 0)
-						this.algorithm = null;
-					else if (!JwsAlgorithm.TryGetAlgorithm(AlgStr, out this.algorithm))
-						throw new ArgumentException("Unrecognized algorithm reference in header field.", nameof(Token));
+					Reason = "Invalid JSON header.";
+					return false;
 				}
-				else
-					throw new Exception("Invalid JSON header.");
+
+				if (Header.TryGetValue("typ", out object Typ))
+					ParsedToken.type = Typ as string;
+
+				if (!Header.TryGetValue("alg", out object Alg) || !(Alg is string AlgStr))
+				{
+					Reason = "Invalid alg header field.";
+					return false;
+				}
+
+				if (string.IsNullOrEmpty(AlgStr) || string.Compare(AlgStr, "none", true) == 0)
+					ParsedToken.algorithm = null;
+				else if (!JwsAlgorithm.TryGetAlgorithm(AlgStr, out ParsedToken.algorithm))
+				{
+					Reason = "Unrecognized algorithm reference in header field.";
+					return false;
+				}
 
 				if (Parts.Length < 2)
-					throw new Exception("Claims set missing.");
+				{
+					Reason = "Claims set missing.";
+					return false;
+				}
 
-				byte[] ClaimsBin = Base64Url.Decode(this.payload = Parts[1]);
+				byte[] ClaimsBin = Base64Url.Decode(ParsedToken.payload = Parts[1]);
 				string ClaimsString = Encoding.UTF8.GetString(ClaimsBin);
 
-				if (JSON.Parse(ClaimsString) is Dictionary<string, object> Claims)
+				if (!(JSON.Parse(ClaimsString) is Dictionary<string, object> Claims))
 				{
-					this.claims = Claims;
+					Reason = "Invalid JSON claims set.";
+					return false;
+				}
 
-					foreach (KeyValuePair<string, object> P in Claims)
+				ParsedToken.claims = Claims;
+
+				foreach (KeyValuePair<string, object> P in Claims)
+				{
+					switch (P.Key)
 					{
-						switch (P.Key)
-						{
-							case JwtClaims.Issuer:
-								this.issuer = P.Value as string;
-								break;
+						case JwtClaims.Issuer:
+							ParsedToken.issuer = P.Value as string;
+							break;
 
-							case JwtClaims.Subject:
-								this.subject = P.Value as string;
-								break;
+						case JwtClaims.Subject:
+							ParsedToken.subject = P.Value as string;
+							break;
 
-							case JwtClaims.JwtId:
-								this.id = P.Value as string;
-								break;
+						case JwtClaims.JwtId:
+							ParsedToken.id = P.Value as string;
+							break;
 
-							case JwtClaims.Audience:
-								if (P.Value is string AudStr)
-									this.audience = AudStr.Split(',');
-								else if (P.Value is Array A)
-								{
-									ChunkedList<string> Audience = new ChunkedList<string>();
+						case JwtClaims.Audience:
+							if (P.Value is string AudStr)
+								ParsedToken.audience = AudStr.Split(',');
+							else if (P.Value is Array A)
+							{
+								ChunkedList<string> Audience2 = new ChunkedList<string>();
 
-									foreach (object Item in A)
-										Audience.Add(Item.ToString());
+								foreach (object Item in A)
+									Audience2.Add(Item.ToString());
 
-									this.audience = Audience.ToArray();
-								}
-								break;
+								ParsedToken.audience = Audience2.ToArray();
+							}
+							break;
 
-							case JwtClaims.ExpirationTime:
-								this.expiration = JSON.UnixEpoch.AddSeconds(Expression.ToDouble(P.Value));
-								break;
+						case JwtClaims.ExpirationTime:
+							ParsedToken.expiration = JSON.UnixEpoch.AddSeconds(Expression.ToDouble(P.Value));
+							break;
 
-							case JwtClaims.NotBeforeTime:
-								this.notBefore = JSON.UnixEpoch.AddSeconds(Expression.ToDouble(P.Value));
-								break;
+						case JwtClaims.NotBeforeTime:
+							ParsedToken.notBefore = JSON.UnixEpoch.AddSeconds(Expression.ToDouble(P.Value));
+							break;
 
-							case JwtClaims.IssueTime:
-								this.issuedAt = JSON.UnixEpoch.AddSeconds(Expression.ToDouble(P.Value));
-								break;
+						case JwtClaims.IssueTime:
+							ParsedToken.issuedAt = JSON.UnixEpoch.AddSeconds(Expression.ToDouble(P.Value));
+							break;
 
-							case "expires":
-								break;
-						}
+						case "expires":
+							break;
 					}
 				}
-				else
-					throw new Exception("Invalid JSON claims set.");
 
 				if (Parts.Length < 3)
-					throw new Exception("Signature missing.");
+				{
+					Reason = "Signature missing.";
+					return false;
+				}
 
-				this.signature = Parts[2];
+				ParsedToken.signature = Parts[2];
+
+				Reason = null;
+				return true;
 			}
 			catch (Exception ex)
 			{
-				throw new Exception("Unable to parse JWT token: " + Token, ex);
+				Reason = ex.Message;
+				return false;
 			}
 		}
 
@@ -223,6 +288,5 @@ namespace Waher.Security.JWT
 		/// Token issued at this time, if available, null otherwise.
 		/// </summary>
 		public DateTime? IssuedAt => this.issuedAt;
-
 	}
 }

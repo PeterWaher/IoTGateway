@@ -134,7 +134,9 @@ namespace Waher.Security.JWT
 
 			try
 			{
-				JwtToken Token = new JwtToken(TokenStr);
+				if (!JwtToken.TryParse(TokenStr, out JwtToken Token))
+					return null;
+
 				string UserName = Token.Subject;
 
 				if (!this.factory.IsValid(Token, out Reason Reason))

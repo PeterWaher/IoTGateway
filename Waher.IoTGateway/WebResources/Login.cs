@@ -18,6 +18,17 @@ namespace Waher.IoTGateway.WebResources
 	public class Login : HttpSynchronousResource, IHttpPostMethod
 	{
 		/// <summary>
+		/// User
+		/// </summary>
+		public const string UserVariableName = "User";
+
+		/// <summary>
+		/// Variable to indicate if the user was automatically logged in.
+		/// Not accessible via script.
+		/// </summary>
+		public const string AutoLoginVariableName = " AutoLogin ";
+
+		/// <summary>
 		/// Provides a resource that allows the caller to login to the gateway through a POST method call.
 		/// </summary>
 		public Login()
@@ -193,8 +204,8 @@ namespace Waher.IoTGateway.WebResources
 
 		private static void SetLoginVariables(HttpRequest Request, bool AutoLogin, IUser User)
 		{
-			Request.Session["User"] = User;
-			Request.Session[" AutoLogin "] = AutoLogin;
+			Request.Session[UserVariableName] = User;
+			Request.Session[AutoLoginVariableName] = AutoLogin;
 		}
 
 		internal static async Task RedirectBackToFrom(HttpResponse Response, string From, 

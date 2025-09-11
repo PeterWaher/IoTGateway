@@ -4560,8 +4560,11 @@ namespace Waher.IoTGateway
 					}
 				}
 
-				if (!Session.TryGetVariable(" AutoLogin ", out v) || !(v.ValueObject is bool AutoLogin) || !AutoLogin)
+				if (!Session.TryGetVariable(Login.AutoLoginVariableName, out v) ||
+					!(v.ValueObject is bool AutoLogin) || !AutoLogin)
+				{
 					Result.Add(new WebMenuItem("Logout", "/Logout"));
+				}
 			}
 
 			return Result.ToArray();

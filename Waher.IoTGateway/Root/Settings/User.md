@@ -36,7 +36,7 @@ if exists(Posted) then
 	);
 
 	if exists(Posted.LegalId) then
-		Item.LegalId:=Posted.LegalId;
+		Item.UpdateLegalId(Posted.LegalId);
 
 	if exists(Posted.PersonalNumber) then
 		Item.PersonalNumber:=Posted.PersonalNumber;

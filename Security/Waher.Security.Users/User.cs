@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Persistence.Attributes;
 using Waher.Security.JWT;
 using Waher.Things;
@@ -294,5 +295,26 @@ namespace Waher.Security.Users
 		{
 			return Factory.Create(await this.CreateClaims(Encrypted));
 		}
+
+		/// <summary>
+		/// Updates the Legal ID of a user object. If the new Legal ID is different from the
+		/// existing Legal ID, the <see cref="UpdatingUserLegalId"/> event is also raised.
+		/// </summary>
+		/// <param name="NewLegalId">New Legal ID</param>
+		public async Task UpdateLegalId(string NewLegalId)
+		{
+			if (this.legalId != NewLegalId)
+			{
+				string OldLegalId = this.legalId;
+				this.legalId = NewLegalId;
+
+				await UpdatingUserLegalId.Raise(this, new UpdatingLegalIdEventArgs(this, OldLegalId, NewLegalId));
+			}
+		}
+
+		/// <summary>
+		/// Event raised when the Legal ID of a user object is being updated.
+		/// </summary>
+		public static event EventHandlerAsync<UpdatingLegalIdEventArgs> UpdatingUserLegalId;
 	}
 }

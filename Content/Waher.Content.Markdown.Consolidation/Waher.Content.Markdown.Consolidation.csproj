@@ -17,9 +17,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Markdown Consolidation multiple sources</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>6.0.1</AssemblyVersion>
-    <FileVersion>6.0.1</FileVersion>
-    <Version>6.0.1</Version>
+    <AssemblyVersion>6.0.2</AssemblyVersion>
+    <FileVersion>6.0.2</FileVersion>
+    <Version>6.0.2</Version>
   </PropertyGroup>
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>

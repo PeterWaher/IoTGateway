@@ -1364,7 +1364,7 @@
           "lib/win8/_._": {}
         }
       },
-      "Waher.Content/3.3.6": {
+      "Waher.Content/3.4.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -3215,7 +3215,7 @@
           "lib/win8/_._": {}
         }
       },
-      "Waher.Content/3.3.6": {
+      "Waher.Content/3.4.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -5171,7 +5171,7 @@
           "lib/win8/_._": {}
         }
       },
-      "Waher.Content/3.3.6": {
+      "Waher.Content/3.4.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -7022,7 +7022,7 @@
           "lib/win8/_._": {}
         }
       },
-      "Waher.Content/3.3.6": {
+      "Waher.Content/3.4.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -8978,7 +8978,7 @@
           "lib/win8/_._": {}
         }
       },
-      "Waher.Content/3.3.6": {
+      "Waher.Content/3.4.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10829,7 +10829,7 @@
           "lib/win8/_._": {}
         }
       },
-      "Waher.Content/3.3.6": {
+      "Waher.Content/3.4.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -12785,7 +12785,7 @@
           "lib/win8/_._": {}
         }
       },
-      "Waher.Content/3.3.6": {
+      "Waher.Content/3.4.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -20262,7 +20262,7 @@
         "system.threading.tasks.nuspec"
       ]
     },
-    "Waher.Content/3.3.6": {
+    "Waher.Content/3.4.0": {
       "type": "project",
       "path": "../../Content/Waher.Content/Waher.Content.csproj",
       "msbuildProject": "../../Content/Waher.Content/Waher.Content.csproj"

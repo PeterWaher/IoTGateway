@@ -10,9 +10,9 @@
     <Company>Waher Data AB</Company>
     <Copyright>Copyright © Waher Data AB 2016-2025. All rights reserved.</Copyright>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.13.2</AssemblyVersion>
-    <FileVersion>1.13.2</FileVersion>
-		<Version>1.13.2</Version>
+    <AssemblyVersion>1.13.3</AssemblyVersion>
+    <FileVersion>1.13.3</FileVersion>
+		<Version>1.13.3</Version>
 		<Authors>Peter Waher</Authors>
     <Product>Waher.IoTGateway</Product>
     <PackageLicenseUrl></PackageLicenseUrl>

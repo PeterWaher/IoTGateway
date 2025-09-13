@@ -17,9 +17,9 @@
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>security users roles privileges authorization</PackageTags>
-    <AssemblyVersion>1.3.2</AssemblyVersion>
-    <FileVersion>1.3.2</FileVersion>
-    <Version>1.3.2</Version>
+    <AssemblyVersion>1.3.3</AssemblyVersion>
+    <FileVersion>1.3.3</FileVersion>
+    <Version>1.3.3</Version>
     <NeutralLanguage>English</NeutralLanguage>
   </PropertyGroup>
 

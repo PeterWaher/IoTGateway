@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Security.JWT
@@ -50,7 +51,11 @@ namespace Waher.Security.JWT
 			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
 			string Token = (Encoding ?? Encoding.ASCII).GetString(Data);
-			return Task.FromResult(new ContentResponse(ContentType, new JwtToken(Token), Data));
+
+			if (JwtToken.TryParse(Token, out JwtToken ParsedToken, out string Reason))
+				return Task.FromResult(new ContentResponse(ContentType, ParsedToken, Data));
+			else
+				return Task.FromResult(new ContentResponse(new BadRequestException(Reason)));
 		}
 
 		/// <summary>

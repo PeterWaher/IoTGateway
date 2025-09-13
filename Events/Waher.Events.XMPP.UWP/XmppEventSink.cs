@@ -199,7 +199,18 @@ namespace Waher.Events.XMPP
 		/// <param name="Tags">Tags to append.</param>
 		public static void AppendTags(StringBuilder Xml, params KeyValuePair<string, object>[] Tags)
 		{
-			if (!(Tags is null) && Tags.Length > 0)
+			if ((Tags?.Length ?? 0) > 0)
+				AppendTags(Xml, (IEnumerable<KeyValuePair<string, object>>)Tags);
+		}
+
+		/// <summary>
+		/// Appends a collection of tags to an XML string.
+		/// </summary>
+		/// <param name="Xml">XML string being constructed.</param>
+		/// <param name="Tags">Tags to append.</param>
+		public static void AppendTags(StringBuilder Xml, IEnumerable<KeyValuePair<string, object>> Tags)
+		{
+			if (!(Tags is null))
 			{
 				foreach (KeyValuePair<string, object> Tag in Tags)
 				{

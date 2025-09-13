@@ -567,6 +567,22 @@ namespace Waher.Persistence.Files
 			this.master?.Dispose();
 			this.master = null;
 
+			if (!(this.dictionaries is null))
+			{
+				StringDictionary[] Dictionaries;
+
+				lock (this.files)
+				{
+					Dictionaries = new StringDictionary[this.dictionaries.Count];
+					this.dictionaries.Values.CopyTo(Dictionaries, 0);
+				}
+
+				foreach (StringDictionary Dictionary in Dictionaries)
+					Dictionary?.Dispose();
+
+				this.dictionaries.Clear();
+			}
+
 			if (!(this.files is null))
 			{
 				foreach (ObjectBTreeFile File in this.files.Values)

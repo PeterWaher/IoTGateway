@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Operators.Membership;
@@ -325,7 +324,11 @@ namespace Waher.Script.Functions.Runtime
 				IElement E;
 
 				if (this.mode == ExecutionMode.Default)
+				{
 					E = await this.Argument.EvaluateAsync(Variables);
+					if (!this.IsWellDefined(E))
+						return BooleanValue.False;
+				}
 				else
 				{
 					if (Variables.TryGetVariable(this.variableName, out Variable v))

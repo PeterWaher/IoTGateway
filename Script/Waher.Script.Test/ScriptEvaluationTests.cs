@@ -1043,17 +1043,26 @@ namespace Waher.Script.Test
 
 			await Test("Obj:={a:1,b:2};exists(Obj['a'])", true);
 			await Test("Obj:={a:1,b:2};exists(Obj['b'])", true);
+			await Test("Obj:={a:1,b:2};exists(x:=Obj['b'])", true);
 			await Test("Obj:={a:1,b:2};exists(Obj['c'])", false);
 			await Test("Obj:={a:1,b:2};exists(Obj2['a'])", false);
+			await Test("Obj:={a:1,b:2,c:null};exists(Obj2['c'])", false);
+			await Test("Obj:={a:1,b:2,c:null};exists(x:=Obj2['c'])", false);
 
 			await Test("Obj:={a:1,b:2};exists(Obj.a)", true);
 			await Test("Obj:={a:1,b:2};exists(Obj.b)", true);
+			await Test("Obj:={a:1,b:2};exists(x:=Obj.b)", true);
 			await Test("Obj:={a:1,b:2};exists(Obj.c)", false);
 			await Test("Obj:={a:1,b:2};exists(Obj2.a)", false);
+			await Test("Obj:={a:1,b:2,c:null};exists(Obj2.c)", false);
+			await Test("Obj:={a:1,b:2,c:null};exists(x:=Obj2.c)", false);
 
 			await Test("Obj:=[1,2];exists(Obj[0])", true);
 			await Test("Obj:=[1,2];exists(Obj[1])", true);
+			await Test("Obj:=[1,2];exists(x:=Obj[1])", true);
 			await Test("Obj:=[1,2];exists(Obj[2])", false);
+			await Test("Obj:=[1,2,null];exists(Obj[2])", false);
+			await Test("Obj:=[1,2,null];exists(x:=Obj[2])", false);
 
 			await Test("print('hej')", "hej");
 			await Test("printline('hej')", "hej");

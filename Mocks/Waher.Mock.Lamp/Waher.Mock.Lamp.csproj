@@ -60,6 +60,7 @@
 			<Project>{A93E546D-6CA5-4AA6-B9B7-3100B8D6467F}</Project>
 			<Name>Waher.Runtime.Console</Name>
 		</ProjectReference>
+		<ProjectReference Include="..\..\Runtime\Waher.Runtime.Queue\Waher.Runtime.Queue.csproj" />
 		<ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
 			<Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
 			<Name>Waher.Security</Name>

@@ -29,7 +29,7 @@ Domain:=!GW.HasDomain ? (x:=Before(After(GW.GetUrl("/"),"://"),"/");if contains(
 				<input id="Password" type="password" style="max-width:20em" onkeydown="CheckEnter(event)" />
 				<input id="Nonce" type="hidden" value="{{LoginNonce:=Base64Encode(Waher.IoTGateway.Gateway.NextBytes(32))}}" />
 			</div>
-			<button id="LoginButton" type="button" onclick="DoLogin('{{from}}','{{Waher.IoTGateway.Gateway.Domain}}')">Login</button>
+			<button id="LoginButton" type="button" onclick="DoLogin('{{exists(from)?from:"/"}}','{{Waher.IoTGateway.Gateway.Domain}}')">Login</button>
 		</form>
 
 		{{if exists(QuickLoginServiceId) and Waher.IoTGateway.Setup.LegalIdentityConfiguration.Instance.HasApprovedLegalIdentities then

@@ -1556,13 +1556,13 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Temporary": "1.1.0",
-          "Waher.Script": "2.13.2",
+          "Waher.Script": "2.13.3",
           "Waher.Security": "1.0.13"
         }
       },
-      "Waher.Content.Xml/3.1.2": {
+      "Waher.Content.Xml/3.1.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1570,12 +1570,12 @@
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "3.4.0",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Text": "1.2.0",
-          "Waher.Script": "2.13.2"
+          "Waher.Script": "2.13.3"
         }
       },
-      "Waher.Events/1.4.4": {
+      "Waher.Events/1.4.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1593,14 +1593,14 @@
           "System.Net.Http": "4.3.4",
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Collections": "1.0.3",
           "Waher.Runtime.Console": "1.2.0",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Queue": "3.2.1",
-          "Waher.Runtime.Threading": "2.1.1",
+          "Waher.Runtime.Threading": "2.1.2",
           "Waher.Security": "1.0.13"
         }
       },
@@ -1615,12 +1615,12 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.PubSub.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Security": "1.0.13"
         }
       },
@@ -1650,8 +1650,8 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
@@ -1681,8 +1681,8 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Runtime.Inventory": "1.4.3",
-          "Waher.Runtime.Profiling": "1.1.1"
+          "Waher.Runtime.Inventory": "1.4.4",
+          "Waher.Runtime.Profiling": "1.1.2"
         }
       },
       "Waher.Runtime.Cache/2.1.1": {
@@ -1691,7 +1691,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
@@ -1705,17 +1705,17 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Queue": "3.2.1"
         }
       },
-      "Waher.Runtime.Inventory/1.4.3": {
+      "Waher.Runtime.Inventory/1.4.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
@@ -1723,7 +1723,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
       "Waher.Runtime.Language/1.2.0": {
@@ -1733,11 +1733,11 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Persistence": "1.15.2",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Settings": "1.2.0"
         }
       },
-      "Waher.Runtime.Profiling/1.1.1": {
+      "Waher.Runtime.Profiling/1.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1752,7 +1752,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
       "Waher.Runtime.Settings/1.2.0": {
@@ -1762,9 +1762,9 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
+          "Waher.Content.Xml": "3.1.3",
           "Waher.Persistence": "1.15.2",
-          "Waher.Runtime.Threading": "2.1.1"
+          "Waher.Runtime.Threading": "2.1.2"
         }
       },
       "Waher.Runtime.Temporary/1.1.0": {
@@ -1773,7 +1773,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
       "Waher.Runtime.Text/1.2.0": {
@@ -1785,13 +1785,13 @@
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
-      "Waher.Runtime.Threading/2.1.1": {
+      "Waher.Runtime.Threading/2.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Cache": "2.1.1"
         }
       },
@@ -1801,18 +1801,18 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
-      "Waher.Script/2.13.2": {
+      "Waher.Script/2.13.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3",
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
       "Waher.Security/1.0.13": {
@@ -1822,10 +1822,10 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
-      "Waher.Things/3.2.2": {
+      "Waher.Things/3.2.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1833,11 +1833,11 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Language": "1.2.0",
-          "Waher.Script": "2.13.2"
+          "Waher.Script": "2.13.3"
         }
       }
     },
@@ -3691,13 +3691,13 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Temporary": "1.1.0",
-          "Waher.Script": "2.13.2",
+          "Waher.Script": "2.13.3",
           "Waher.Security": "1.0.13"
         }
       },
-      "Waher.Content.Xml/3.1.2": {
+      "Waher.Content.Xml/3.1.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -3705,12 +3705,12 @@
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "3.4.0",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Text": "1.2.0",
-          "Waher.Script": "2.13.2"
+          "Waher.Script": "2.13.3"
         }
       },
-      "Waher.Events/1.4.4": {
+      "Waher.Events/1.4.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -3728,14 +3728,14 @@
           "System.Net.Http": "4.3.4",
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Collections": "1.0.3",
           "Waher.Runtime.Console": "1.2.0",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Queue": "3.2.1",
-          "Waher.Runtime.Threading": "2.1.1",
+          "Waher.Runtime.Threading": "2.1.2",
           "Waher.Security": "1.0.13"
         }
       },
@@ -3750,12 +3750,12 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.PubSub.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Security": "1.0.13"
         }
       },
@@ -3785,8 +3785,8 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
@@ -3816,8 +3816,8 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Runtime.Inventory": "1.4.3",
-          "Waher.Runtime.Profiling": "1.1.1"
+          "Waher.Runtime.Inventory": "1.4.4",
+          "Waher.Runtime.Profiling": "1.1.2"
         }
       },
       "Waher.Runtime.Cache/2.1.1": {
@@ -3826,7 +3826,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
@@ -3840,17 +3840,17 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Queue": "3.2.1"
         }
       },
-      "Waher.Runtime.Inventory/1.4.3": {
+      "Waher.Runtime.Inventory/1.4.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
@@ -3858,7 +3858,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
       "Waher.Runtime.Language/1.2.0": {
@@ -3868,11 +3868,11 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Persistence": "1.15.2",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Settings": "1.2.0"
         }
       },
-      "Waher.Runtime.Profiling/1.1.1": {
+      "Waher.Runtime.Profiling/1.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -3887,7 +3887,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
       "Waher.Runtime.Settings/1.2.0": {
@@ -3897,9 +3897,9 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
+          "Waher.Content.Xml": "3.1.3",
           "Waher.Persistence": "1.15.2",
-          "Waher.Runtime.Threading": "2.1.1"
+          "Waher.Runtime.Threading": "2.1.2"
         }
       },
       "Waher.Runtime.Temporary/1.1.0": {
@@ -3908,7 +3908,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
       "Waher.Runtime.Text/1.2.0": {
@@ -3920,13 +3920,13 @@
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
-      "Waher.Runtime.Threading/2.1.1": {
+      "Waher.Runtime.Threading/2.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Cache": "2.1.1"
         }
       },
@@ -3936,18 +3936,18 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
-      "Waher.Script/2.13.2": {
+      "Waher.Script/2.13.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3",
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
       "Waher.Security/1.0.13": {
@@ -3957,10 +3957,10 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
-      "Waher.Things/3.2.2": {
+      "Waher.Things/3.2.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -3968,11 +3968,11 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Language": "1.2.0",
-          "Waher.Script": "2.13.2"
+          "Waher.Script": "2.13.3"
         }
       }
     },
@@ -5931,13 +5931,13 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Temporary": "1.1.0",
-          "Waher.Script": "2.13.2",
+          "Waher.Script": "2.13.3",
           "Waher.Security": "1.0.13"
         }
       },
-      "Waher.Content.Xml/3.1.2": {
+      "Waher.Content.Xml/3.1.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -5945,12 +5945,12 @@
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "3.4.0",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Text": "1.2.0",
-          "Waher.Script": "2.13.2"
+          "Waher.Script": "2.13.3"
         }
       },
-      "Waher.Events/1.4.4": {
+      "Waher.Events/1.4.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -5968,14 +5968,14 @@
           "System.Net.Http": "4.3.4",
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Collections": "1.0.3",
           "Waher.Runtime.Console": "1.2.0",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Queue": "3.2.1",
-          "Waher.Runtime.Threading": "2.1.1",
+          "Waher.Runtime.Threading": "2.1.2",
           "Waher.Security": "1.0.13"
         }
       },
@@ -5990,12 +5990,12 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.PubSub.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Security": "1.0.13"
         }
       },
@@ -6025,8 +6025,8 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
@@ -6056,8 +6056,8 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Runtime.Inventory": "1.4.3",
-          "Waher.Runtime.Profiling": "1.1.1"
+          "Waher.Runtime.Inventory": "1.4.4",
+          "Waher.Runtime.Profiling": "1.1.2"
         }
       },
       "Waher.Runtime.Cache/2.1.1": {
@@ -6066,7 +6066,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
@@ -6080,17 +6080,17 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Queue": "3.2.1"
         }
       },
-      "Waher.Runtime.Inventory/1.4.3": {
+      "Waher.Runtime.Inventory/1.4.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
@@ -6098,7 +6098,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
       "Waher.Runtime.Language/1.2.0": {
@@ -6108,11 +6108,11 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Persistence": "1.15.2",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Settings": "1.2.0"
         }
       },
-      "Waher.Runtime.Profiling/1.1.1": {
+      "Waher.Runtime.Profiling/1.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -6127,7 +6127,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
       "Waher.Runtime.Settings/1.2.0": {
@@ -6137,9 +6137,9 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
+          "Waher.Content.Xml": "3.1.3",
           "Waher.Persistence": "1.15.2",
-          "Waher.Runtime.Threading": "2.1.1"
+          "Waher.Runtime.Threading": "2.1.2"
         }
       },
       "Waher.Runtime.Temporary/1.1.0": {
@@ -6148,7 +6148,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
       "Waher.Runtime.Text/1.2.0": {
@@ -6160,13 +6160,13 @@
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
-      "Waher.Runtime.Threading/2.1.1": {
+      "Waher.Runtime.Threading/2.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Cache": "2.1.1"
         }
       },
@@ -6176,18 +6176,18 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
-      "Waher.Script/2.13.2": {
+      "Waher.Script/2.13.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3",
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
       "Waher.Security/1.0.13": {
@@ -6197,10 +6197,10 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
-      "Waher.Things/3.2.2": {
+      "Waher.Things/3.2.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -6208,11 +6208,11 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Language": "1.2.0",
-          "Waher.Script": "2.13.2"
+          "Waher.Script": "2.13.3"
         }
       }
     },
@@ -8066,13 +8066,13 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Temporary": "1.1.0",
-          "Waher.Script": "2.13.2",
+          "Waher.Script": "2.13.3",
           "Waher.Security": "1.0.13"
         }
       },
-      "Waher.Content.Xml/3.1.2": {
+      "Waher.Content.Xml/3.1.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -8080,12 +8080,12 @@
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "3.4.0",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Text": "1.2.0",
-          "Waher.Script": "2.13.2"
+          "Waher.Script": "2.13.3"
         }
       },
-      "Waher.Events/1.4.4": {
+      "Waher.Events/1.4.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -8103,14 +8103,14 @@
           "System.Net.Http": "4.3.4",
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Collections": "1.0.3",
           "Waher.Runtime.Console": "1.2.0",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Queue": "3.2.1",
-          "Waher.Runtime.Threading": "2.1.1",
+          "Waher.Runtime.Threading": "2.1.2",
           "Waher.Security": "1.0.13"
         }
       },
@@ -8125,12 +8125,12 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.PubSub.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Security": "1.0.13"
         }
       },
@@ -8160,8 +8160,8 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
@@ -8191,8 +8191,8 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Runtime.Inventory": "1.4.3",
-          "Waher.Runtime.Profiling": "1.1.1"
+          "Waher.Runtime.Inventory": "1.4.4",
+          "Waher.Runtime.Profiling": "1.1.2"
         }
       },
       "Waher.Runtime.Cache/2.1.1": {
@@ -8201,7 +8201,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
@@ -8215,17 +8215,17 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Queue": "3.2.1"
         }
       },
-      "Waher.Runtime.Inventory/1.4.3": {
+      "Waher.Runtime.Inventory/1.4.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
@@ -8233,7 +8233,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
       "Waher.Runtime.Language/1.2.0": {
@@ -8243,11 +8243,11 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Persistence": "1.15.2",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Settings": "1.2.0"
         }
       },
-      "Waher.Runtime.Profiling/1.1.1": {
+      "Waher.Runtime.Profiling/1.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -8262,7 +8262,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
       "Waher.Runtime.Settings/1.2.0": {
@@ -8272,9 +8272,9 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
+          "Waher.Content.Xml": "3.1.3",
           "Waher.Persistence": "1.15.2",
-          "Waher.Runtime.Threading": "2.1.1"
+          "Waher.Runtime.Threading": "2.1.2"
         }
       },
       "Waher.Runtime.Temporary/1.1.0": {
@@ -8283,7 +8283,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
       "Waher.Runtime.Text/1.2.0": {
@@ -8295,13 +8295,13 @@
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
-      "Waher.Runtime.Threading/2.1.1": {
+      "Waher.Runtime.Threading/2.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Cache": "2.1.1"
         }
       },
@@ -8311,18 +8311,18 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
-      "Waher.Script/2.13.2": {
+      "Waher.Script/2.13.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3",
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
       "Waher.Security/1.0.13": {
@@ -8332,10 +8332,10 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
-      "Waher.Things/3.2.2": {
+      "Waher.Things/3.2.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -8343,11 +8343,11 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Language": "1.2.0",
-          "Waher.Script": "2.13.2"
+          "Waher.Script": "2.13.3"
         }
       }
     },
@@ -10306,13 +10306,13 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Temporary": "1.1.0",
-          "Waher.Script": "2.13.2",
+          "Waher.Script": "2.13.3",
           "Waher.Security": "1.0.13"
         }
       },
-      "Waher.Content.Xml/3.1.2": {
+      "Waher.Content.Xml/3.1.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10320,12 +10320,12 @@
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "3.4.0",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Text": "1.2.0",
-          "Waher.Script": "2.13.2"
+          "Waher.Script": "2.13.3"
         }
       },
-      "Waher.Events/1.4.4": {
+      "Waher.Events/1.4.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10343,14 +10343,14 @@
           "System.Net.Http": "4.3.4",
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Collections": "1.0.3",
           "Waher.Runtime.Console": "1.2.0",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Queue": "3.2.1",
-          "Waher.Runtime.Threading": "2.1.1",
+          "Waher.Runtime.Threading": "2.1.2",
           "Waher.Security": "1.0.13"
         }
       },
@@ -10365,12 +10365,12 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.PubSub.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Security": "1.0.13"
         }
       },
@@ -10400,8 +10400,8 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
@@ -10431,8 +10431,8 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Runtime.Inventory": "1.4.3",
-          "Waher.Runtime.Profiling": "1.1.1"
+          "Waher.Runtime.Inventory": "1.4.4",
+          "Waher.Runtime.Profiling": "1.1.2"
         }
       },
       "Waher.Runtime.Cache/2.1.1": {
@@ -10441,7 +10441,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
@@ -10455,17 +10455,17 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Queue": "3.2.1"
         }
       },
-      "Waher.Runtime.Inventory/1.4.3": {
+      "Waher.Runtime.Inventory/1.4.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
@@ -10473,7 +10473,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
       "Waher.Runtime.Language/1.2.0": {
@@ -10483,11 +10483,11 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Persistence": "1.15.2",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Settings": "1.2.0"
         }
       },
-      "Waher.Runtime.Profiling/1.1.1": {
+      "Waher.Runtime.Profiling/1.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10502,7 +10502,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
       "Waher.Runtime.Settings/1.2.0": {
@@ -10512,9 +10512,9 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
+          "Waher.Content.Xml": "3.1.3",
           "Waher.Persistence": "1.15.2",
-          "Waher.Runtime.Threading": "2.1.1"
+          "Waher.Runtime.Threading": "2.1.2"
         }
       },
       "Waher.Runtime.Temporary/1.1.0": {
@@ -10523,7 +10523,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
       "Waher.Runtime.Text/1.2.0": {
@@ -10535,13 +10535,13 @@
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
-      "Waher.Runtime.Threading/2.1.1": {
+      "Waher.Runtime.Threading/2.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Cache": "2.1.1"
         }
       },
@@ -10551,18 +10551,18 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
-      "Waher.Script/2.13.2": {
+      "Waher.Script/2.13.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3",
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
       "Waher.Security/1.0.13": {
@@ -10572,10 +10572,10 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
-      "Waher.Things/3.2.2": {
+      "Waher.Things/3.2.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10583,11 +10583,11 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Language": "1.2.0",
-          "Waher.Script": "2.13.2"
+          "Waher.Script": "2.13.3"
         }
       }
     },
@@ -12441,13 +12441,13 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Temporary": "1.1.0",
-          "Waher.Script": "2.13.2",
+          "Waher.Script": "2.13.3",
           "Waher.Security": "1.0.13"
         }
       },
-      "Waher.Content.Xml/3.1.2": {
+      "Waher.Content.Xml/3.1.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -12455,12 +12455,12 @@
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "3.4.0",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Text": "1.2.0",
-          "Waher.Script": "2.13.2"
+          "Waher.Script": "2.13.3"
         }
       },
-      "Waher.Events/1.4.4": {
+      "Waher.Events/1.4.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -12478,14 +12478,14 @@
           "System.Net.Http": "4.3.4",
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Collections": "1.0.3",
           "Waher.Runtime.Console": "1.2.0",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Queue": "3.2.1",
-          "Waher.Runtime.Threading": "2.1.1",
+          "Waher.Runtime.Threading": "2.1.2",
           "Waher.Security": "1.0.13"
         }
       },
@@ -12500,12 +12500,12 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.PubSub.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Security": "1.0.13"
         }
       },
@@ -12535,8 +12535,8 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
@@ -12566,8 +12566,8 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Runtime.Inventory": "1.4.3",
-          "Waher.Runtime.Profiling": "1.1.1"
+          "Waher.Runtime.Inventory": "1.4.4",
+          "Waher.Runtime.Profiling": "1.1.2"
         }
       },
       "Waher.Runtime.Cache/2.1.1": {
@@ -12576,7 +12576,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
@@ -12590,17 +12590,17 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Queue": "3.2.1"
         }
       },
-      "Waher.Runtime.Inventory/1.4.3": {
+      "Waher.Runtime.Inventory/1.4.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
@@ -12608,7 +12608,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
       "Waher.Runtime.Language/1.2.0": {
@@ -12618,11 +12618,11 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Persistence": "1.15.2",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Settings": "1.2.0"
         }
       },
-      "Waher.Runtime.Profiling/1.1.1": {
+      "Waher.Runtime.Profiling/1.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -12637,7 +12637,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
       "Waher.Runtime.Settings/1.2.0": {
@@ -12647,9 +12647,9 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
+          "Waher.Content.Xml": "3.1.3",
           "Waher.Persistence": "1.15.2",
-          "Waher.Runtime.Threading": "2.1.1"
+          "Waher.Runtime.Threading": "2.1.2"
         }
       },
       "Waher.Runtime.Temporary/1.1.0": {
@@ -12658,7 +12658,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
       "Waher.Runtime.Text/1.2.0": {
@@ -12670,13 +12670,13 @@
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
-      "Waher.Runtime.Threading/2.1.1": {
+      "Waher.Runtime.Threading/2.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Cache": "2.1.1"
         }
       },
@@ -12686,18 +12686,18 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
-      "Waher.Script/2.13.2": {
+      "Waher.Script/2.13.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3",
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
       "Waher.Security/1.0.13": {
@@ -12707,10 +12707,10 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
-      "Waher.Things/3.2.2": {
+      "Waher.Things/3.2.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -12718,11 +12718,11 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Language": "1.2.0",
-          "Waher.Script": "2.13.2"
+          "Waher.Script": "2.13.3"
         }
       }
     },
@@ -14681,13 +14681,13 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Temporary": "1.1.0",
-          "Waher.Script": "2.13.2",
+          "Waher.Script": "2.13.3",
           "Waher.Security": "1.0.13"
         }
       },
-      "Waher.Content.Xml/3.1.2": {
+      "Waher.Content.Xml/3.1.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -14695,12 +14695,12 @@
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "3.4.0",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Text": "1.2.0",
-          "Waher.Script": "2.13.2"
+          "Waher.Script": "2.13.3"
         }
       },
-      "Waher.Events/1.4.4": {
+      "Waher.Events/1.4.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -14718,14 +14718,14 @@
           "System.Net.Http": "4.3.4",
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Collections": "1.0.3",
           "Waher.Runtime.Console": "1.2.0",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Queue": "3.2.1",
-          "Waher.Runtime.Threading": "2.1.1",
+          "Waher.Runtime.Threading": "2.1.2",
           "Waher.Security": "1.0.13"
         }
       },
@@ -14740,12 +14740,12 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.PubSub.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Security": "1.0.13"
         }
       },
@@ -14775,8 +14775,8 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
@@ -14806,8 +14806,8 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Runtime.Inventory": "1.4.3",
-          "Waher.Runtime.Profiling": "1.1.1"
+          "Waher.Runtime.Inventory": "1.4.4",
+          "Waher.Runtime.Profiling": "1.1.2"
         }
       },
       "Waher.Runtime.Cache/2.1.1": {
@@ -14816,7 +14816,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
@@ -14830,17 +14830,17 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Queue": "3.2.1"
         }
       },
-      "Waher.Runtime.Inventory/1.4.3": {
+      "Waher.Runtime.Inventory/1.4.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
@@ -14848,7 +14848,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
       "Waher.Runtime.Language/1.2.0": {
@@ -14858,11 +14858,11 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Persistence": "1.15.2",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Settings": "1.2.0"
         }
       },
-      "Waher.Runtime.Profiling/1.1.1": {
+      "Waher.Runtime.Profiling/1.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -14877,7 +14877,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
       "Waher.Runtime.Settings/1.2.0": {
@@ -14887,9 +14887,9 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
+          "Waher.Content.Xml": "3.1.3",
           "Waher.Persistence": "1.15.2",
-          "Waher.Runtime.Threading": "2.1.1"
+          "Waher.Runtime.Threading": "2.1.2"
         }
       },
       "Waher.Runtime.Temporary/1.1.0": {
@@ -14898,7 +14898,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
       "Waher.Runtime.Text/1.2.0": {
@@ -14910,13 +14910,13 @@
           "Waher.Runtime.Collections": "1.0.3"
         }
       },
-      "Waher.Runtime.Threading/2.1.1": {
+      "Waher.Runtime.Threading/2.1.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Cache": "2.1.1"
         }
       },
@@ -14926,18 +14926,18 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4"
+          "Waher.Events": "1.4.5"
         }
       },
-      "Waher.Script/2.13.2": {
+      "Waher.Script/2.13.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.4",
+          "Waher.Events": "1.4.5",
           "Waher.Runtime.Collections": "1.0.3",
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
       "Waher.Security/1.0.13": {
@@ -14947,10 +14947,10 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.IO": "1.0.4",
-          "Waher.Runtime.Inventory": "1.4.3"
+          "Waher.Runtime.Inventory": "1.4.4"
         }
       },
-      "Waher.Things/3.2.2": {
+      "Waher.Things/3.2.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -14958,11 +14958,11 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
-          "Waher.Content.Xml": "3.1.2",
-          "Waher.Events": "1.4.4",
-          "Waher.Runtime.Inventory": "1.4.3",
+          "Waher.Content.Xml": "3.1.3",
+          "Waher.Events": "1.4.5",
+          "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Language": "1.2.0",
-          "Waher.Script": "2.13.2"
+          "Waher.Script": "2.13.3"
         }
       }
     }
@@ -22601,12 +22601,12 @@
       "path": "../../Content/Waher.Content/Waher.Content.csproj",
       "msbuildProject": "../../Content/Waher.Content/Waher.Content.csproj"
     },
-    "Waher.Content.Xml/3.1.2": {
+    "Waher.Content.Xml/3.1.3": {
       "type": "project",
       "path": "../../Content/Waher.Content.Xml/Waher.Content.Xml.csproj",
       "msbuildProject": "../../Content/Waher.Content.Xml/Waher.Content.Xml.csproj"
     },
-    "Waher.Events/1.4.4": {
+    "Waher.Events/1.4.5": {
       "type": "project",
       "path": "../../Events/Waher.Events/Waher.Events.csproj",
       "msbuildProject": "../../Events/Waher.Events/Waher.Events.csproj"
@@ -22656,7 +22656,7 @@
       "path": "../../Runtime/Waher.Runtime.Console/Waher.Runtime.Console.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Console/Waher.Runtime.Console.csproj"
     },
-    "Waher.Runtime.Inventory/1.4.3": {
+    "Waher.Runtime.Inventory/1.4.4": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Inventory/Waher.Runtime.Inventory.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Inventory/Waher.Runtime.Inventory.csproj"
@@ -22671,7 +22671,7 @@
       "path": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj"
     },
-    "Waher.Runtime.Profiling/1.1.1": {
+    "Waher.Runtime.Profiling/1.1.2": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Profiling/Waher.Runtime.Profiling.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Profiling/Waher.Runtime.Profiling.csproj"
@@ -22696,7 +22696,7 @@
       "path": "../../Runtime/Waher.Runtime.Text/Waher.Runtime.Text.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Text/Waher.Runtime.Text.csproj"
     },
-    "Waher.Runtime.Threading/2.1.1": {
+    "Waher.Runtime.Threading/2.1.2": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Threading/Waher.Runtime.Threading.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Threading/Waher.Runtime.Threading.csproj"
@@ -22706,7 +22706,7 @@
       "path": "../../Runtime/Waher.Runtime.Timing/Waher.Runtime.Timing.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Timing/Waher.Runtime.Timing.csproj"
     },
-    "Waher.Script/2.13.2": {
+    "Waher.Script/2.13.3": {
       "type": "project",
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"
@@ -22716,7 +22716,7 @@
       "path": "../../Security/Waher.Security/Waher.Security.csproj",
       "msbuildProject": "../../Security/Waher.Security/Waher.Security.csproj"
     },
-    "Waher.Things/3.2.2": {
+    "Waher.Things/3.2.3": {
       "type": "project",
       "path": "../../Things/Waher.Things/Waher.Things.csproj",
       "msbuildProject": "../../Things/Waher.Things/Waher.Things.csproj"

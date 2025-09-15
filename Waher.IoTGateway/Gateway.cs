@@ -2369,31 +2369,70 @@ namespace Waher.IoTGateway
 			stopped = true;
 			try
 			{
-				scheduler?.Dispose();
+				SafeDispose(scheduler);
 				scheduler = null;
 
-				await PlantUml.Terminate();
-				await GraphViz.Terminate();
+				try
+				{
+					await PlantUml.Terminate();
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
 
-				await Script.Threading.Functions.Background.TerminateTasks(10000);
-				await Types.StopAllModules();
+				try
+				{
+					await GraphViz.Terminate();
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+
+				try
+				{
+					await Script.Threading.Functions.Background.TerminateTasks(10000);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+
+				try
+				{
+					await Types.StopAllModules();
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
 
 				Database.CollectionRepaired -= Database_CollectionRepaired;
 
 				if (StopInternalProvider)
-					await internalProvider.Stop();
+				{
+					try
+					{
+						await internalProvider.Stop();
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+				}
 
 				if (!(startingServer is null))
 				{
 					await startingServer.ReleaseMutex();
-					startingServer.Dispose();
+					SafeDispose(startingServer);
 					startingServer = null;
 				}
 
 				if (!(gatewayRunning is null))
 				{
 					await gatewayRunning.ReleaseMutex();
-					gatewayRunning.Dispose();
+					SafeDispose(gatewayRunning);
 					gatewayRunning = null;
 				}
 
@@ -2404,9 +2443,9 @@ namespace Waher.IoTGateway
 						try
 						{
 							if (Configuration is IDisposableAsync DAsync)
-								await DAsync.DisposeAsync();
+								await SafeDispose(DAsync);
 							else if (Configuration is IDisposable D)
-								D.Dispose();
+								SafeDispose(D);
 						}
 						catch (Exception ex)
 						{
@@ -2417,73 +2456,89 @@ namespace Waher.IoTGateway
 					configurations = null;
 				}
 
-				ibbClient?.Dispose();
+				SafeDispose(ibbClient);
 				ibbClient = null;
 
-				httpxProxy?.Dispose();
+				SafeDispose(httpxProxy);
 				httpxProxy = null;
 
-				httpxServer?.Dispose();
+				SafeDispose(httpxServer);
 				httpxServer = null;
 
-				provisioningClient?.Dispose();
+				SafeDispose(provisioningClient);
 				provisioningClient = null;
 
-				thingRegistryClient?.Dispose();
+				SafeDispose(thingRegistryClient);
 				thingRegistryClient = null;
 
-				concentratorServer?.Dispose();
+				SafeDispose(concentratorServer);
 				concentratorServer = null;
 
-				avatarClient?.Dispose();
+				SafeDispose(avatarClient);
 				avatarClient = null;
 
-				sensorClient?.Dispose();
+				SafeDispose(sensorClient);
 				sensorClient = null;
 
-				controlClient?.Dispose();
+				SafeDispose(controlClient);
 				controlClient = null;
 
-				concentratorClient?.Dispose();
+				SafeDispose(concentratorClient);
 				concentratorClient = null;
 
-				synchronizationClient?.Dispose();
+				SafeDispose(synchronizationClient);
 				synchronizationClient = null;
 
-				pepClient?.Dispose();
+				SafeDispose(pepClient);
 				pepClient = null;
 
-				mucClient?.Dispose();
+				SafeDispose(mucClient);
 				mucClient = null;
 
-				mailClient?.Dispose();
+				SafeDispose(mailClient);
 				mailClient = null;
 
-				contractsClient?.Dispose();
+				SafeDispose(contractsClient);
 				contractsClient = null;
 
-				softwareUpdateClient?.Dispose();
+				SafeDispose(softwareUpdateClient);
 				softwareUpdateClient = null;
 
-				geoClient?.Dispose();
+				SafeDispose(geoClient);
 				geoClient = null;
 
 				if (!(xmppClient is null))
 				{
-					await xmppClient.OfflineAndDisposeAsync();
+					try
+					{
+						await xmppClient.OfflineAndDisposeAsync();
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+
 					xmppClient = null;
 				}
 
 				if (!(coapEndpoint is null))
 				{
-					await coapEndpoint.DisposeAsync();
+					await SafeDispose(coapEndpoint);
 					coapEndpoint = null;
 				}
 
 				if (!(webServer is null))
 				{
-					await webServer.RemoveRange(webServer.Sniffers, true);
-					await webServer.DisposeAsync();
+					try
+					{
+						await webServer.RemoveRange(webServer.Sniffers, true);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+
+					await SafeDispose(webServer);
 					webServer = null;
 				}
 
@@ -2513,6 +2568,44 @@ namespace Waher.IoTGateway
 
 				if (StopInternalProvider)
 					internalProvider.Flush().Wait(60000);
+			}
+		}
+
+		/// <summary>
+		/// Disposes an object, catching and logging any exceptions.
+		/// </summary>
+		/// <param name="Object">Object to dispose.s</param>
+		public static void SafeDispose(IDisposable Object)
+		{
+			if (!(Object is null))
+			{
+				try
+				{
+					Object.Dispose();
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Disposes an object, catching and logging any exceptions.
+		/// </summary>
+		/// <param name="Object">Object to dispose.s</param>
+		public static async Task SafeDispose(IDisposableAsync Object)
+		{
+			if (!(Object is null))
+			{
+				try
+				{
+					await Object.DisposeAsync();
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
 			}
 		}
 

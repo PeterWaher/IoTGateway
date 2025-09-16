@@ -50,7 +50,7 @@ namespace Waher.Networking.HTTP.Test
 					e.Profiler.ExportPlantUml(Runtime.Profiling.TimeUnit.MilliSeconds));
 
 				await Files.WriteAllTextAsync(Path.ChangeExtension(SnifferFileName, "2.uml"),
-					e.FlowControl.ExportPlantUml(out _));
+					e.FlowControl?.ExportPlantUml(out _) ?? string.Empty);
 			};
 
 			DeflateContentEncoding DeflateContentEncoding = new();

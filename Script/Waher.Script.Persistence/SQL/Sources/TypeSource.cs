@@ -281,169 +281,176 @@ namespace Waher.Script.Persistence.SQL.Sources
 			if (Conditions is null)
 				return null;
 
-			if (Conditions is TernaryOperator Tercery)
+			try
 			{
-				if (Conditions is Operators.Comparisons.Range Range &&
-					Range.MiddleOperand is VariableReference Ref)
+				if (Conditions is TernaryOperator Tercery)
 				{
-					ScriptNode LO = Reduce(Range.LeftOperand, Name);
-					ScriptNode RO = Reduce(Range.RightOperand, Name);
-					string FieldName = Ref.VariableName;
-					object Min = (await LO.EvaluateAsync(Variables))?.AssociatedObjectValue ?? null;
-					object Max = (await RO.EvaluateAsync(Variables))?.AssociatedObjectValue ?? null;
+					if (Conditions is Operators.Comparisons.Range Range &&
+						Range.MiddleOperand is VariableReference Ref)
+					{
+						ScriptNode LO = Reduce(Range.LeftOperand, Name);
+						ScriptNode RO = Reduce(Range.RightOperand, Name);
+						string FieldName = Ref.VariableName;
+						object Min = (await LO.EvaluateAsync(Variables))?.AssociatedObjectValue ?? null;
+						object Max = (await RO.EvaluateAsync(Variables))?.AssociatedObjectValue ?? null;
 
-					Filter[] Filters = new Filter[2];
+						Filter[] Filters = new Filter[2];
 
-					if (Range.LeftInclusive)
-						Filters[0] = new FilterFieldGreaterOrEqualTo(Ref.VariableName, Min);
-					else
-						Filters[0] = new FilterFieldGreaterThan(Ref.VariableName, Min);
+						if (Range.LeftInclusive)
+							Filters[0] = new FilterFieldGreaterOrEqualTo(Ref.VariableName, Min);
+						else
+							Filters[0] = new FilterFieldGreaterThan(Ref.VariableName, Min);
 
-					if (Range.RightInclusive)
-						Filters[1] = new FilterFieldLesserOrEqualTo(Ref.VariableName, Max);
-					else
-						Filters[1] = new FilterFieldLesserThan(Ref.VariableName, Max);
+						if (Range.RightInclusive)
+							Filters[1] = new FilterFieldLesserOrEqualTo(Ref.VariableName, Max);
+						else
+							Filters[1] = new FilterFieldLesserThan(Ref.VariableName, Max);
 
-					return new FilterAnd(Filters);
+						return new FilterAnd(Filters);
+					}
 				}
+				else if (Conditions is BinaryOperator Bin)
+				{
+					ScriptNode LO = Reduce(Bin.LeftOperand, Name);
+					ScriptNode RO = Reduce(Bin.RightOperand, Name);
+
+					if (Conditions is Operators.Logical.And || Conditions is Operators.Dual.And)
+					{
+						Filter L = await ConvertAsync(LO, Variables, Name);
+						Filter R = await ConvertAsync(RO, Variables, Name);
+
+						ChunkedList<Filter> Filters = new ChunkedList<Filter>();
+
+						if (L is FilterAnd L2)
+							Filters.AddRange(L2.ChildFilters);
+						else
+							Filters.Add(L);
+
+						if (R is FilterAnd R2)
+							Filters.AddRange(R2.ChildFilters);
+						else
+							Filters.Add(R);
+
+						return new FilterAnd(Filters.ToArray());
+					}
+
+					if (Conditions is Operators.Logical.Or || Conditions is Operators.Dual.Or)
+					{
+						Filter L = await ConvertAsync(LO, Variables, Name);
+						Filter R = await ConvertAsync(RO, Variables, Name);
+
+						ChunkedList<Filter> Filters = new ChunkedList<Filter>();
+
+						if (L is FilterOr L2)
+							Filters.AddRange(L2.ChildFilters);
+						else
+							Filters.Add(L);
+
+						if (R is FilterOr R2)
+							Filters.AddRange(R2.ChildFilters);
+						else
+							Filters.Add(R);
+
+						return new FilterOr(Filters.ToArray());
+					}
+
+					if (LO is VariableReference LVar)
+					{
+						string FieldName = LVar.VariableName;
+						object Value = (await RO.EvaluateAsync(Variables))?.AssociatedObjectValue ?? null;
+
+						if (Conditions is Operators.Comparisons.EqualTo ||
+							Conditions is Operators.Comparisons.EqualToElementWise ||
+							Conditions is Operators.Comparisons.IdenticalTo ||
+							Conditions is Operators.Comparisons.IdenticalToElementWise)
+						{
+							return new FilterFieldEqualTo(FieldName, Value);
+						}
+						else if (Conditions is Operators.Comparisons.NotEqualTo ||
+							Conditions is Operators.Comparisons.NotEqualToElementWise)
+						{
+							return new FilterFieldNotEqualTo(FieldName, Value);
+						}
+						else if (Conditions is Operators.Comparisons.GreaterThan)
+							return new FilterFieldGreaterThan(FieldName, Value);
+						else if (Conditions is Operators.Comparisons.GreaterThanOrEqualTo)
+							return new FilterFieldGreaterOrEqualTo(FieldName, Value);
+						else if (Conditions is Operators.Comparisons.LesserThan)
+							return new FilterFieldLesserThan(FieldName, Value);
+						else if (Conditions is Operators.Comparisons.LesserThanOrEqualTo)
+							return new FilterFieldLesserOrEqualTo(FieldName, Value);
+						else if (Conditions is Operators.Comparisons.Like Like)
+						{
+							string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+							Like.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
+							return new FilterFieldLikeRegEx(FieldName, RegEx);
+						}
+						else if (Conditions is Operators.Comparisons.NotLike NotLike)
+						{
+							string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+							NotLike.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
+							return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
+						}
+					}
+					else if (RO is VariableReference RVar)
+					{
+						string FieldName = RVar.VariableName;
+						object Value = (await LO.EvaluateAsync(Variables))?.AssociatedObjectValue ?? null;
+
+						if (Conditions is Operators.Comparisons.EqualTo ||
+							Conditions is Operators.Comparisons.EqualToElementWise ||
+							Conditions is Operators.Comparisons.IdenticalTo ||
+							Conditions is Operators.Comparisons.IdenticalToElementWise)
+						{
+							return new FilterFieldEqualTo(FieldName, Value);
+						}
+						else if (Conditions is Operators.Comparisons.NotEqualTo ||
+							Conditions is Operators.Comparisons.NotEqualToElementWise)
+						{
+							return new FilterFieldNotEqualTo(FieldName, Value);
+						}
+						else if (Conditions is Operators.Comparisons.GreaterThan)
+							return new FilterFieldLesserThan(FieldName, Value);
+						else if (Conditions is Operators.Comparisons.GreaterThanOrEqualTo)
+							return new FilterFieldLesserOrEqualTo(FieldName, Value);
+						else if (Conditions is Operators.Comparisons.LesserThan)
+							return new FilterFieldGreaterThan(FieldName, Value);
+						else if (Conditions is Operators.Comparisons.LesserThanOrEqualTo)
+							return new FilterFieldGreaterOrEqualTo(FieldName, Value);
+						else if (Conditions is Operators.Comparisons.Like Like)
+						{
+							string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+							Like.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
+							return new FilterFieldLikeRegEx(FieldName, RegEx);
+						}
+						else if (Conditions is Operators.Comparisons.NotLike NotLike)
+						{
+							string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+							NotLike.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
+							return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
+						}
+					}
+				}
+				else if (Conditions is UnaryOperator UnOp)
+				{
+					if (Conditions is Operators.Logical.Not Not)
+					{
+						Filter F = await ConvertAsync(Reduce(Not.Operand, Name), Variables, Name);
+						if (F is FilterNot Not2)
+							return Not2.ChildFilter;
+						else
+							return new FilterNot(F);
+					}
+				}
+				else if (Conditions is VariableReference Ref)
+					return new FilterFieldEqualTo(Ref.VariableName, true);
+
+				return new FilterCustom<object>(new ScriptNodeFilter(Conditions, Variables).Passes);
 			}
-			else if (Conditions is BinaryOperator Bin)
+			catch (Exception)
 			{
-				ScriptNode LO = Reduce(Bin.LeftOperand, Name);
-				ScriptNode RO = Reduce(Bin.RightOperand, Name);
-
-				if (Conditions is Operators.Logical.And || Conditions is Operators.Dual.And)
-				{
-					Filter L = await ConvertAsync(LO, Variables, Name);
-					Filter R = await ConvertAsync(RO, Variables, Name);
-
-					ChunkedList<Filter> Filters = new ChunkedList<Filter>();
-
-					if (L is FilterAnd L2)
-						Filters.AddRange(L2.ChildFilters);
-					else
-						Filters.Add(L);
-
-					if (R is FilterAnd R2)
-						Filters.AddRange(R2.ChildFilters);
-					else
-						Filters.Add(R);
-
-					return new FilterAnd(Filters.ToArray());
-				}
-
-				if (Conditions is Operators.Logical.Or || Conditions is Operators.Dual.Or)
-				{
-					Filter L = await ConvertAsync(LO, Variables, Name);
-					Filter R = await ConvertAsync(RO, Variables, Name);
-
-					ChunkedList<Filter> Filters = new ChunkedList<Filter>();
-
-					if (L is FilterOr L2)
-						Filters.AddRange(L2.ChildFilters);
-					else
-						Filters.Add(L);
-
-					if (R is FilterOr R2)
-						Filters.AddRange(R2.ChildFilters);
-					else
-						Filters.Add(R);
-
-					return new FilterOr(Filters.ToArray());
-				}
-
-				if (LO is VariableReference LVar)
-				{
-					string FieldName = LVar.VariableName;
-					object Value = (await RO.EvaluateAsync(Variables))?.AssociatedObjectValue ?? null;
-
-					if (Conditions is Operators.Comparisons.EqualTo ||
-						Conditions is Operators.Comparisons.EqualToElementWise ||
-						Conditions is Operators.Comparisons.IdenticalTo ||
-						Conditions is Operators.Comparisons.IdenticalToElementWise)
-					{
-						return new FilterFieldEqualTo(FieldName, Value);
-					}
-					else if (Conditions is Operators.Comparisons.NotEqualTo ||
-						Conditions is Operators.Comparisons.NotEqualToElementWise)
-					{
-						return new FilterFieldNotEqualTo(FieldName, Value);
-					}
-					else if (Conditions is Operators.Comparisons.GreaterThan)
-						return new FilterFieldGreaterThan(FieldName, Value);
-					else if (Conditions is Operators.Comparisons.GreaterThanOrEqualTo)
-						return new FilterFieldGreaterOrEqualTo(FieldName, Value);
-					else if (Conditions is Operators.Comparisons.LesserThan)
-						return new FilterFieldLesserThan(FieldName, Value);
-					else if (Conditions is Operators.Comparisons.LesserThanOrEqualTo)
-						return new FilterFieldLesserOrEqualTo(FieldName, Value);
-					else if (Conditions is Operators.Comparisons.Like Like)
-					{
-						string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
-						Like.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
-						return new FilterFieldLikeRegEx(FieldName, RegEx);
-					}
-					else if (Conditions is Operators.Comparisons.NotLike NotLike)
-					{
-						string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
-						NotLike.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
-						return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
-					}
-				}
-				else if (RO is VariableReference RVar)
-				{
-					string FieldName = RVar.VariableName;
-					object Value = (await LO.EvaluateAsync(Variables))?.AssociatedObjectValue ?? null;
-
-					if (Conditions is Operators.Comparisons.EqualTo ||
-						Conditions is Operators.Comparisons.EqualToElementWise ||
-						Conditions is Operators.Comparisons.IdenticalTo ||
-						Conditions is Operators.Comparisons.IdenticalToElementWise)
-					{
-						return new FilterFieldEqualTo(FieldName, Value);
-					}
-					else if (Conditions is Operators.Comparisons.NotEqualTo ||
-						Conditions is Operators.Comparisons.NotEqualToElementWise)
-					{
-						return new FilterFieldNotEqualTo(FieldName, Value);
-					}
-					else if (Conditions is Operators.Comparisons.GreaterThan)
-						return new FilterFieldLesserThan(FieldName, Value);
-					else if (Conditions is Operators.Comparisons.GreaterThanOrEqualTo)
-						return new FilterFieldLesserOrEqualTo(FieldName, Value);
-					else if (Conditions is Operators.Comparisons.LesserThan)
-						return new FilterFieldGreaterThan(FieldName, Value);
-					else if (Conditions is Operators.Comparisons.LesserThanOrEqualTo)
-						return new FilterFieldGreaterOrEqualTo(FieldName, Value);
-					else if (Conditions is Operators.Comparisons.Like Like)
-					{
-						string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
-						Like.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
-						return new FilterFieldLikeRegEx(FieldName, RegEx);
-					}
-					else if (Conditions is Operators.Comparisons.NotLike NotLike)
-					{
-						string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
-						NotLike.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
-						return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
-					}
-				}
+				return new FilterCustom<object>(new ScriptNodeFilter(Conditions, Variables).Passes);
 			}
-			else if (Conditions is UnaryOperator UnOp)
-			{
-				if (Conditions is Operators.Logical.Not Not)
-				{
-					Filter F = await ConvertAsync(Reduce(Not.Operand, Name), Variables, Name);
-					if (F is FilterNot Not2)
-						return Not2.ChildFilter;
-					else
-						return new FilterNot(F);
-				}
-			}
-			else if (Conditions is VariableReference Ref)
-				return new FilterFieldEqualTo(Ref.VariableName, true);
-
-			return new FilterCustom<object>(new ScriptNodeFilter(Conditions, Variables).Passes);
 		}
 
 		private class ScriptNodeFilter

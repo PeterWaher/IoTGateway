@@ -202,21 +202,21 @@ namespace Waher.Networking.HTTP
 		/// <param name="Server">HTTP Server</param>
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
-		public override Task Execute(HttpServer Server, HttpRequest Request, HttpResponse Response)
+		public override async Task Execute(HttpServer Server, HttpRequest Request, HttpResponse Response)
 		{
 			if (this.includeSubPaths)
 			{
 				if (this.permanent)
-					throw new PermanentRedirectException(this.location + Request.SubPath);
+					await Response.SendResponse(new PermanentRedirectException(this.location + Request.SubPath));
 				else
-					throw new TemporaryRedirectException(this.location + Request.SubPath);
+					await Response.SendResponse(new TemporaryRedirectException(this.location + Request.SubPath));
 			}
 			else
 			{
 				if (this.permanent)
-					throw new PermanentRedirectException(this.location);
+					await Response.SendResponse(new PermanentRedirectException(this.location));
 				else
-					throw new TemporaryRedirectException(this.location);
+					await Response.SendResponse(new TemporaryRedirectException(this.location));
 			}
 		}
 	}

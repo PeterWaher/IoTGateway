@@ -926,20 +926,10 @@ namespace Waher.Networking.HTTP
 						Stream f2 = null;
 						Stream f = File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 						bool Ok = false;
-						bool SessionLocked = false;
 
 						try
 						{
 							f2 = f.Length < HttpClientConnection.MaxInmemoryMessageSize ? (Stream)new MemoryStream() : new TemporaryFile();
-
-							if (!(Request.Session is null))
-							{
-								await Request.Session.LockAsync();
-								SessionLocked = true;
-
-								Request.Session.CurrentRequest = Request;
-								Request.Session.CurrentResponse = Response;
-							}
 
 							List<string> Alternatives = null;
 							string[] Range = Converter.ToContentTypes;
@@ -982,9 +972,6 @@ namespace Waher.Networking.HTTP
 						}
 						finally
 						{
-							if (SessionLocked)
-								Request.Session.Release();
-
 							if (f2 is null)
 								f.Dispose();
 							else if (!Ok)

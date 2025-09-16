@@ -22,6 +22,7 @@ namespace Waher.Networking.HTTP
 		private Variables currentPageVariables = null;
 		private ObjectValue currentPageVariablesElement = ObjectValue.Null;
 		private string currentPageUrl = null;
+		private bool locked = false;
 
 		/// <summary>
 		/// Collection of session variables.
@@ -51,7 +52,12 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Reference to current request.
+		/// Reference to current request. 
+		/// 
+		/// Note: This value is only valid during the execution of the resource verb handler 
+		/// method. If the resource is asynchronous and continues returning the response 
+		/// after the method returns, the property will be null or contain a reference to 
+		/// another request.
 		/// </summary>
 		public HttpRequest CurrentRequest
 		{
@@ -61,6 +67,11 @@ namespace Waher.Networking.HTTP
 
 		/// <summary>
 		/// Reference to current response.
+		/// 
+		/// Note: This value is only valid during the execution of the resource verb handler 
+		/// method. If the resource is asynchronous and continues returning the response 
+		/// after the method returns, the property will be null or contain a reference to 
+		/// another request.
 		/// </summary>
 		public HttpResponse CurrentResponse
 		{
@@ -81,6 +92,11 @@ namespace Waher.Networking.HTTP
 					ObjectValue.Null : new ObjectValue(this.currentPageVariables);
 			}
 		}
+
+		/// <summary>
+		/// If the session variables are currently locked.
+		/// </summary>
+		public bool Locked => this.locked;
 
 		/// <summary>
 		/// Script element with reference to current page collection of variables.
@@ -104,9 +120,9 @@ namespace Waher.Networking.HTTP
 		/// Each successful call to this method must be followed by exacty one call to <see cref="Release"/>.
 		/// </summary>
 		/// <exception cref="TimeoutException">If access to the collection was not granted in the alotted time</exception>
-		public Task LockAsync()
+		public async Task LockAsync()
 		{
-			return this.LockAsync(30000);
+			await this.LockAsync(30000);
 		}
 
 		/// <summary>
@@ -125,6 +141,8 @@ namespace Waher.Networking.HTTP
 
 			if (!await this.semaphore.WaitAsync(Timeout))
 				throw new TimeoutException("Unique access to variables connection was not granted.");
+
+			this.locked = true;
 		}
 
 		/// <summary>
@@ -133,6 +151,7 @@ namespace Waher.Networking.HTTP
 		public void Release()
 		{
 			this.semaphore.Release();
+			this.locked = false;
 		}
 
 		/// <summary>

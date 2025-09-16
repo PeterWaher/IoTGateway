@@ -286,15 +286,16 @@ namespace Waher.Networking.HTTP
 		{
 			HttpRequestHeader Header = Request.Header;
 			string Method = Request.Header.Method;
+			SessionVariables SessionVariables;
 
 			if (this.UserSessions)
 			{
 				string HttpSessionID;
 
-				if (Request.Session is null)
+				if ((SessionVariables = Request.Session) is null)
 				{
 					HttpSessionID = GetSessionId(Request, Response);
-					Request.Session = Server.GetSession(HttpSessionID);
+					Request.Session = SessionVariables = Server.GetSession(HttpSessionID);
 				}
 				else if (Request.tempSession)
 				{
@@ -304,193 +305,213 @@ namespace Waher.Networking.HTTP
 					Server.SetSession(HttpSessionID, Request.Session);
 					Request.tempSession = false;
 				}
+
+				await SessionVariables.LockAsync();
+
+				SessionVariables.CurrentRequest = Request;
+				SessionVariables.CurrentResponse = Response;
 			}
+			else
+				SessionVariables = null;
 
-			switch (Method)
+			try
 			{
-				case "GET":
-				case "HEAD":
-					if (!(this.getRanges is null))
-					{
-						Response.SetHeader("Accept-Ranges", "bytes");
-
-						if (!(Header.Range is null))
+				switch (Method)
+				{
+					case "GET":
+					case "HEAD":
+						if (!(this.getRanges is null))
 						{
-							ByteRangeInterval FirstInterval = Header.Range.FirstInterval;
-							if (FirstInterval is null)
-								throw new RangeNotSatisfiableException();
+							Response.SetHeader("Accept-Ranges", "bytes");
+
+							if (!(Header.Range is null))
+							{
+								ByteRangeInterval FirstInterval = Header.Range.FirstInterval;
+								if (FirstInterval is null)
+									throw new RangeNotSatisfiableException();
+								else
+								{
+									Response.OnlyHeader = Method == "HEAD";
+									Response.StatusCode = 206;
+									Response.StatusMessage = "Partial Content";
+
+									await this.getRanges.GET(Request, Response, FirstInterval);
+								}
+							}
 							else
 							{
 								Response.OnlyHeader = Method == "HEAD";
-								Response.StatusCode = 206;
-								Response.StatusMessage = "Partial Content";
 
-								await this.getRanges.GET(Request, Response, FirstInterval);
+								if (!(this.get is null))
+									await this.get.GET(Request, Response);
+								else
+									await this.getRanges.GET(Request, Response, new ByteRangeInterval(0, null));
 							}
 						}
-						else
+						else if (!(this.get is null))
 						{
 							Response.OnlyHeader = Method == "HEAD";
-
-							if (!(this.get is null))
-								await this.get.GET(Request, Response);
-							else
-								await this.getRanges.GET(Request, Response, new ByteRangeInterval(0, null));
-						}
-					}
-					else if (!(this.get is null))
-					{
-						Response.OnlyHeader = Method == "HEAD";
-						await this.get.GET(Request, Response);
-					}
-					else
-						throw new MethodNotAllowedException(this.allowedMethods, Request);
-					break;
-
-				case "POST":
-					if (!(this.postRanges is null))
-					{
-						if (!(Header.ContentRange is null))
-						{
-							ContentByteRangeInterval Interval = Header.ContentRange.Interval;
-							if (Interval is null)
-								throw new RangeNotSatisfiableException();
-							else
-								await this.postRanges.POST(Request, Response, Interval);
+							await this.get.GET(Request, Response);
 						}
 						else
+							throw new MethodNotAllowedException(this.allowedMethods, Request);
+						break;
+
+					case "POST":
+						if (!(this.postRanges is null))
 						{
-							if (!(this.post is null))
-								await this.post.POST(Request, Response);
+							if (!(Header.ContentRange is null))
+							{
+								ContentByteRangeInterval Interval = Header.ContentRange.Interval;
+								if (Interval is null)
+									throw new RangeNotSatisfiableException();
+								else
+									await this.postRanges.POST(Request, Response, Interval);
+							}
 							else
 							{
-								long Total;
-
-								if (!(Header.ContentLength is null))
-									Total = Header.ContentLength.ContentLength;
-								else if (!(Request.DataStream is null))
-									Total = Request.DataStream.Position;
+								if (!(this.post is null))
+									await this.post.POST(Request, Response);
 								else
-									Total = 0;
+								{
+									long Total;
 
-								await this.postRanges.POST(Request, Response, new ContentByteRangeInterval(0, Total - 1, Total));
+									if (!(Header.ContentLength is null))
+										Total = Header.ContentLength.ContentLength;
+									else if (!(Request.DataStream is null))
+										Total = Request.DataStream.Position;
+									else
+										Total = 0;
+
+									await this.postRanges.POST(Request, Response, new ContentByteRangeInterval(0, Total - 1, Total));
+								}
 							}
 						}
-					}
-					else if (!(this.post is null))
-						await this.post.POST(Request, Response);
-					else
-						throw new MethodNotAllowedException(this.allowedMethods, Request);
-					break;
-
-				case "PUT":
-					if (!(this.putRanges is null))
-					{
-						if (!(Header.ContentRange is null))
-						{
-							ContentByteRangeInterval Interval = Header.ContentRange.Interval;
-							if (Interval is null)
-								throw new RangeNotSatisfiableException();
-							else
-								await this.putRanges.PUT(Request, Response, Interval);
-						}
+						else if (!(this.post is null))
+							await this.post.POST(Request, Response);
 						else
+							throw new MethodNotAllowedException(this.allowedMethods, Request);
+						break;
+
+					case "PUT":
+						if (!(this.putRanges is null))
 						{
-							if (!(this.put is null))
-								await this.put.PUT(Request, Response);
+							if (!(Header.ContentRange is null))
+							{
+								ContentByteRangeInterval Interval = Header.ContentRange.Interval;
+								if (Interval is null)
+									throw new RangeNotSatisfiableException();
+								else
+									await this.putRanges.PUT(Request, Response, Interval);
+							}
 							else
 							{
-								long Total;
-
-								if (!(Header.ContentLength is null))
-									Total = Header.ContentLength.ContentLength;
-								else if (!(Request.DataStream is null))
-									Total = Request.DataStream.Position;
+								if (!(this.put is null))
+									await this.put.PUT(Request, Response);
 								else
-									Total = 0;
+								{
+									long Total;
 
-								await this.putRanges.PUT(Request, Response, new ContentByteRangeInterval(0, Total - 1, Total));
+									if (!(Header.ContentLength is null))
+										Total = Header.ContentLength.ContentLength;
+									else if (!(Request.DataStream is null))
+										Total = Request.DataStream.Position;
+									else
+										Total = 0;
+
+									await this.putRanges.PUT(Request, Response, new ContentByteRangeInterval(0, Total - 1, Total));
+								}
 							}
 						}
-					}
-					else if (!(this.put is null))
-						await this.put.PUT(Request, Response);
-					else
-						throw new MethodNotAllowedException(this.allowedMethods, Request);
-					break;
-
-				case "PATCH":
-					if (!(this.patchRanges is null))
-					{
-						if (!(Header.ContentRange is null))
-						{
-							ContentByteRangeInterval Interval = Header.ContentRange.Interval;
-							if (Interval is null)
-								throw new RangeNotSatisfiableException();
-							else
-								await this.patchRanges.PATCH(Request, Response, Interval);
-						}
+						else if (!(this.put is null))
+							await this.put.PUT(Request, Response);
 						else
+							throw new MethodNotAllowedException(this.allowedMethods, Request);
+						break;
+
+					case "PATCH":
+						if (!(this.patchRanges is null))
 						{
-							if (!(this.patch is null))
-								await this.patch.PATCH(Request, Response);
+							if (!(Header.ContentRange is null))
+							{
+								ContentByteRangeInterval Interval = Header.ContentRange.Interval;
+								if (Interval is null)
+									throw new RangeNotSatisfiableException();
+								else
+									await this.patchRanges.PATCH(Request, Response, Interval);
+							}
 							else
 							{
-								long Total;
-
-								if (!(Header.ContentLength is null))
-									Total = Header.ContentLength.ContentLength;
-								else if (!(Request.DataStream is null))
-									Total = Request.DataStream.Position;
+								if (!(this.patch is null))
+									await this.patch.PATCH(Request, Response);
 								else
-									Total = 0;
+								{
+									long Total;
 
-								await this.patchRanges.PATCH(Request, Response, new ContentByteRangeInterval(0, Total - 1, Total));
+									if (!(Header.ContentLength is null))
+										Total = Header.ContentLength.ContentLength;
+									else if (!(Request.DataStream is null))
+										Total = Request.DataStream.Position;
+									else
+										Total = 0;
+
+									await this.patchRanges.PATCH(Request, Response, new ContentByteRangeInterval(0, Total - 1, Total));
+								}
 							}
 						}
-					}
-					else if (!(this.patch is null))
-						await this.patch.PATCH(Request, Response);
-					else
-						throw new MethodNotAllowedException(this.allowedMethods, Request);
-					break;
+						else if (!(this.patch is null))
+							await this.patch.PATCH(Request, Response);
+						else
+							throw new MethodNotAllowedException(this.allowedMethods, Request);
+						break;
 
-				case "DELETE":
-					if (this.delete is null)
-						throw new MethodNotAllowedException(this.allowedMethods, Request);
-					else
-						await this.delete.DELETE(Request, Response);
-					break;
+					case "DELETE":
+						if (this.delete is null)
+							throw new MethodNotAllowedException(this.allowedMethods, Request);
+						else
+							await this.delete.DELETE(Request, Response);
+						break;
 
-				case "OPTIONS":
-					if (this.options is null)
-						throw new MethodNotAllowedException(this.allowedMethods, Request);
-					else
-						await this.options.OPTIONS(Request, Response);
-					break;
+					case "OPTIONS":
+						if (this.options is null)
+							throw new MethodNotAllowedException(this.allowedMethods, Request);
+						else
+							await this.options.OPTIONS(Request, Response);
+						break;
 
-				case "TRACE":
-					if (this.trace is null)
-						throw new MethodNotAllowedException(this.allowedMethods, Request);
-					else
-						await this.trace.TRACE(Request, Response);
-					break;
+					case "TRACE":
+						if (this.trace is null)
+							throw new MethodNotAllowedException(this.allowedMethods, Request);
+						else
+							await this.trace.TRACE(Request, Response);
+						break;
 
-				case "CONNECT":
-					if (this.connect is null)
-						throw new MethodNotAllowedException(this.allowedMethods, Request);
-					else
-						await this.connect.CONNECT(Request, Response);
-					break;
+					case "CONNECT":
+						if (this.connect is null)
+							throw new MethodNotAllowedException(this.allowedMethods, Request);
+						else
+							await this.connect.CONNECT(Request, Response);
+						break;
 
-				default:
-					throw new MethodNotAllowedException(this.allowedMethods, Request);
+					default:
+						throw new MethodNotAllowedException(this.allowedMethods, Request);
+				}
+
+				if (this.Synchronous)
+				{
+					await Response.SendResponse();
+					await Response.DisposeAsync();
+				}
 			}
-
-			if (this.Synchronous)
+			finally
 			{
-				await Response.SendResponse();
-				await Response.DisposeAsync();
+				if (!(SessionVariables is null))
+				{
+					SessionVariables.CurrentRequest = null;
+					SessionVariables.CurrentResponse = null;
+
+					SessionVariables.Release();
+				}
 			}
 		}
 

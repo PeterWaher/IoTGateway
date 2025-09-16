@@ -16,7 +16,7 @@ namespace Waher.Networking.HTTP
 	/// <summary>
 	/// Publishes a web resource whose contents is produced by script.
 	/// </summary>
-	public class HttpScriptResource : HttpAsynchronousResource, IHttpGetMethod
+	public class HttpScriptResource : HttpSynchronousResource, IHttpGetMethod
 	{
 		private readonly Expression script;
 		private readonly ScriptNode scriptNode;
@@ -106,13 +106,23 @@ namespace Waher.Networking.HTTP
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			SessionVariables v = Request.Session ?? new SessionVariables();
+			bool SessionLocked;
 
-			await v.LockAsync();
-			try
+			if (v.Locked)
+				SessionLocked = false;
+			else
 			{
+				v = new SessionVariables();
+				await v.LockAsync();
+
 				v.CurrentRequest = Request;
 				v.CurrentResponse = Response;
 
+				SessionLocked = true;
+			}
+
+			try
+			{
 				object Result;
 
 				if (!(this.script is null))
@@ -310,7 +320,13 @@ namespace Waher.Networking.HTTP
 			}
 			finally
 			{
-				v.Release();
+				if (SessionLocked)
+				{
+					v.CurrentRequest = null;
+					v.CurrentResponse = null;
+
+					v.Release();
+				}
 			}
 		}
 	}

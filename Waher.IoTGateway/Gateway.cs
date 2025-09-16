@@ -5070,80 +5070,101 @@ namespace Waher.IoTGateway
 				if (File.Exists(FullFileName))
 				{
 					DateTime TP2 = File.GetLastWriteTimeUtc(FullFileName);
+					SessionVariables SessionVariables = null;
 					MarkdownSettings Settings;
 					MarkdownDocument Detail;
 					string Markdown;
+					bool SessionLocked = false;
 
-					if (Doc is null || TP2 > TP)
+					try
 					{
-						Markdown = await Files.ReadAllTextAsync(FullFileName);
-						Settings = new MarkdownSettings(emoji1_24x24, true)
+						if (Doc is null || TP2 > TP)
 						{
-							RootFolder = rootFolder,
-							Variables = Request.Session ?? HttpServer.CreateSessionVariables()
-						};
-
-						if (Settings.Variables is SessionVariables SessionVariables)
-							SessionVariables.CurrentRequest = Request;
-
-						Doc = await MarkdownDocument.CreateAsync(Markdown, Settings, RootFolder, string.Empty, string.Empty);
-
-						lock (defaultDocuments)
-						{
-							defaultDocuments[LocalFileName] = new KeyValuePair<DateTime, MarkdownDocument>(TP2, Doc);
-						}
-					}
-
-					if (IsEmpty || Content is null)
-						Detail = null;
-					else
-					{
-						System.Text.Encoding Encoding = null;
-						int i = ContentType.IndexOf(';');
-
-						if (i > 0)
-						{
-							KeyValuePair<string, string>[] Fields = CommonTypes.ParseFieldValues(ContentType[(i + 1)..].TrimStart());
-
-							foreach (KeyValuePair<string, string> Field in Fields)
+							Markdown = await Files.ReadAllTextAsync(FullFileName);
+							Settings = new MarkdownSettings(emoji1_24x24, true)
 							{
-								if (string.Compare(Field.Key, "CHARSET", true) == 0)
-									Encoding = InternetContent.GetEncoding(Field.Value);
+								RootFolder = rootFolder,
+								Variables = SessionVariables = Request.Session ?? HttpServer.CreateSessionVariables()
+							};
+
+							if (!SessionVariables.Locked)
+							{
+								await SessionVariables.LockAsync();
+								SessionLocked = true;
+
+								SessionVariables.CurrentRequest = Request;
+								SessionVariables.CurrentResponse = Request.Response;
+							}
+
+							Doc = await MarkdownDocument.CreateAsync(Markdown, Settings, RootFolder, string.Empty, string.Empty);
+
+							lock (defaultDocuments)
+							{
+								defaultDocuments[LocalFileName] = new KeyValuePair<DateTime, MarkdownDocument>(TP2, Doc);
 							}
 						}
 
-						Encoding ??= System.Text.Encoding.UTF8;
-
-						Markdown = Strings.GetString(Content, Encoding);
-						if (IsText)
+						if (IsEmpty || Content is null)
+							Detail = null;
+						else
 						{
-							MarkdownSettings Settings2 = new MarkdownSettings(null, false);
-							Detail = await MarkdownDocument.CreateAsync("```\r\n" + Markdown + "\r\n```", Settings2);
+							System.Text.Encoding Encoding = null;
+							int i = ContentType.IndexOf(';');
+
+							if (i > 0)
+							{
+								KeyValuePair<string, string>[] Fields = CommonTypes.ParseFieldValues(ContentType[(i + 1)..].TrimStart());
+
+								foreach (KeyValuePair<string, string> Field in Fields)
+								{
+									if (string.Compare(Field.Key, "CHARSET", true) == 0)
+										Encoding = InternetContent.GetEncoding(Field.Value);
+								}
+							}
+
+							Encoding ??= System.Text.Encoding.UTF8;
+
+							Markdown = Strings.GetString(Content, Encoding);
+							if (IsText)
+							{
+								MarkdownSettings Settings2 = new MarkdownSettings(null, false);
+								Detail = await MarkdownDocument.CreateAsync("```\r\n" + Markdown + "\r\n```", Settings2);
+							}
+							else
+								Detail = await MarkdownDocument.CreateAsync(Markdown, Doc.Settings);
+						}
+
+						if (!(Doc.Tag is MultiReadSingleWriteObject DocSynchObj))
+						{
+							DocSynchObj = new MultiReadSingleWriteObject(Doc);
+							Doc.Tag = DocSynchObj;
+						}
+
+						if (await DocSynchObj.TryBeginWrite(30000))
+						{
+							try
+							{
+								Doc.Detail = Detail;
+								return await Doc.GenerateHTML();
+							}
+							finally
+							{
+								await DocSynchObj.EndWrite();
+							}
 						}
 						else
-							Detail = await MarkdownDocument.CreateAsync(Markdown, Doc.Settings);
+							throw new ServiceUnavailableException("Unable to generate custom HTML error document.");
 					}
-
-					if (!(Doc.Tag is MultiReadSingleWriteObject DocSynchObj))
+					finally
 					{
-						DocSynchObj = new MultiReadSingleWriteObject(Doc);
-						Doc.Tag = DocSynchObj;
-					}
+						if (SessionLocked)
+						{
+							SessionVariables.CurrentRequest = null;
+							SessionVariables.CurrentResponse = null;
 
-					if (await DocSynchObj.TryBeginWrite(30000))
-					{
-						try
-						{
-							Doc.Detail = Detail;
-							return await Doc.GenerateHTML();
-						}
-						finally
-						{
-							await DocSynchObj.EndWrite();
+							SessionVariables?.Release();
 						}
 					}
-					else
-						throw new ServiceUnavailableException("Unable to generate custom HTML error document.");
 				}
 				else
 				{

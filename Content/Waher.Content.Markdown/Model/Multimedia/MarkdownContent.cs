@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
-using System;
-using Waher.Runtime.Inventory;
-using Waher.Script;
-using Waher.Content.Markdown.Rendering;
-using Waher.Runtime.IO;
+﻿using System;
 using System.IO;
+using System.Threading.Tasks;
+using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
+using Waher.Script;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {

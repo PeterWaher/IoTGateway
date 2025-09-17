@@ -73,6 +73,7 @@
 								<xs:documentation>FIRST = First name</xs:documentation>
 								<xs:documentation>MIDDLE = Middle name</xs:documentation>
 								<xs:documentation>LAST = Last name</xs:documentation>
+								<xs:documentation>FULLNAME = Full name. Can be used instead of FIRST, MIDDLE and LAST.</xs:documentation>
 								<xs:documentation>PNR = Personal number</xs:documentation>
 								<xs:documentation>ADDR = Address</xs:documentation>
 								<xs:documentation>ADDR2 = Address, second line</xs:documentation>
@@ -82,10 +83,25 @@
 								<xs:documentation>REGION = Region, state</xs:documentation>
 								<xs:documentation>COUNTRY = Country</xs:documentation>
 								<xs:documentation>NATIONALITY = Nationality</xs:documentation>
-								<xs:documentation>GENDER = Gender (M or F)</xs:documentation>
 								<xs:documentation>BDAY = Birth Day</xs:documentation>
 								<xs:documentation>BMONTH = Birth Month</xs:documentation>
 								<xs:documentation>BYEAR = Birth Year</xs:documentation>
+								<xs:documentation>GENDER = Gender (M or F)</xs:documentation>
+								<xs:documentation>PHONE = Phone number, international phone number format.</xs:documentation>
+								<xs:documentation>EMAIL = E-mail address.</xs:documentation>
+								<xs:documentation>JID = XMPP address (Jabber ID).</xs:documentation>
+								<xs:documentation>DOMAIN = If the ID represents the legal representative of a domain.</xs:documentation>
+								<xs:documentation>ORGNAME = Name of organization</xs:documentation>
+								<xs:documentation>ORGNR = Organization number</xs:documentation>
+								<xs:documentation>ORGDEPT = Organization department, where person works.</xs:documentation>
+								<xs:documentation>ORGROLE = Role of person in organization.</xs:documentation>
+								<xs:documentation>ORGADDR = Address of organization.</xs:documentation>
+								<xs:documentation>ORGADDR2 = Address of organization, second line</xs:documentation>
+								<xs:documentation>ORGZIP = Zip or postal code of organization</xs:documentation>
+								<xs:documentation>ORGAREA = Area of organization.</xs:documentation>
+								<xs:documentation>ORGCITY = City of organization.</xs:documentation>
+								<xs:documentation>ORGREGION = Region or state of organization.</xs:documentation>
+								<xs:documentation>ORGCOUNTRY = Country code of organization.</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						<xs:attribute name='value' type='xs:string' use='required'>

@@ -296,7 +296,15 @@ namespace Waher.Script.Persistence.SQL
 				else
 					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Property.GetValue(this.obj));    // TODO: Async
 
-				if (!(Value is null))
+				if (Value is null)
+				{
+					if (Expression.TryGetConstant(Name, this, out IElement ConstantElement))
+					{
+						Variable = new Variable(Name, ConstantElement);
+						return true;
+					}
+				}
+				else
 				{
 					Variable = this.CreateVariable(Name, Value);
 					return true;

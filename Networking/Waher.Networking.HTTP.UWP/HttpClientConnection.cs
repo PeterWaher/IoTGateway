@@ -1129,6 +1129,20 @@ namespace Waher.Networking.HTTP
 
 							if (EndHeaders && !EndStream && this.http2FrameType == FrameType.Headers)
 								return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Second headers frame on stream lacks END_STREAM.", StreamThread);
+
+#if INFO_IN_SNIFFERS
+							if (this.HasSniffers)
+							{
+								sb.Clear();
+								sb.Append("Stream ");
+								sb.Append(this.http2StreamId);
+								sb.Append(" updated. (Window input size: ");
+								sb.Append(Stream.DataInputWindowSize.ToString());
+								sb.Append(')');
+
+								this.Information(sb.ToString());
+							}
+#endif
 						}
 
 						if (EndHeaders)

@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define INFO_IN_SNIFFERS
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -46,7 +48,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			: base(LocalSettings, RemoteSettings, Connection)
 		{
 			this.profiler = Profiler;
-			this.root = new PriorityNodeRfc7540(null, null, null, 1, this, this.profiler);
+			this.root = new PriorityNodeRfc7540(null, null, null, 1, this, this.profiler, Connection);
 			this.root.CheckProfilerThreads();
 
 			this.lastRemoteStreamWindowSize = this.RemoteSettings.InitialStreamWindowSize;
@@ -209,6 +211,9 @@ namespace Waher.Networking.HTTP.HTTP2
 						DependentOn = null;
 				}
 
+#if INFO_IN_SNIFFERS
+				this.ReportStreamStates("Before adding node.");
+#endif
 				PriorityNodeRfc7540 Parent = DependentOn ?? this.root;
 
 				if (this.nodes.TryGetValue(Stream.StreamId, out PriorityNodeRfc7540 Node))
@@ -229,10 +234,14 @@ namespace Waher.Networking.HTTP.HTTP2
 						Parent.AddChildDependency(Node);
 
 					Node.Weight = Weight;
+
+#if INFO_IN_SNIFFERS
+					this.ReportStreamStates("Node existed and updated.");
+#endif
 				}
 				else
 				{
-					Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this, this.profiler);
+					Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this, this.profiler, this.Connection);
 
 					if (Exclusive && !(DependentOn is null))
 						this.MoveChildrenLocked(DependentOn, Node);
@@ -241,8 +250,11 @@ namespace Waher.Networking.HTTP.HTTP2
 					Node.CheckProfilerThreads();
 
 					this.nodes[Stream.StreamId] = Node;
-				}
 
+#if INFO_IN_SNIFFERS
+					this.ReportStreamStates("Node added.");
+#endif
+				}
 				return Node.AvailableResources;
 			}
 		}
@@ -296,6 +308,9 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				Node.Weight = Weight;
 
+#if INFO_IN_SNIFFERS
+				this.ReportStreamStates("Node updated.");
+#endif
 				return true;
 			}
 		}
@@ -329,6 +344,9 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			this.StreamRemoved(StreamId);
 
+#if INFO_IN_SNIFFERS
+			this.ReportStreamStates("Node removed.");
+#endif
 			return true;
 		}
 
@@ -545,6 +563,17 @@ namespace Waher.Networking.HTTP.HTTP2
 			base.ExportPlantUmlHeader(Output);
 
 			this.root?.ExportPlantUml(Output);
+		}
+
+		private void ReportStreamStates(string Reason)
+		{
+			StringBuilder sb = new StringBuilder(Reason);
+			Dictionary<int, bool> Exported = new Dictionary<int, bool>();
+
+			sb.AppendLine(" Updated stream states:");
+			this.root.ExportStates(sb, 0, Exported);
+
+			this.Connection?.Information(sb.ToString());
 		}
 
 	}

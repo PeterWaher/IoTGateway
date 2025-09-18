@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿//#define INFO_IN_SNIFFERS
+
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -56,7 +58,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			: base(LocalSettings, RemoteSettings, Connection)
 		{
 			this.profiler = Profiler;
-			this.root = new PriorityNodeRfc9218(null, this, this.profiler);
+			this.root = new PriorityNodeRfc9218(null, this, this.profiler, Connection);
 			this.root.CheckProfilerThreads();
 
 			this.lastRemoteStreamWindowSize = this.RemoteSettings.InitialStreamWindowSize;
@@ -230,7 +232,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (Priority < 0 || Priority >= priorityLevels)
 					Priority = 3;
 
-				PriorityNodeRfc9218 Node = new PriorityNodeRfc9218(Stream, this, this.profiler);
+				PriorityNodeRfc9218 Node = new PriorityNodeRfc9218(Stream, this, this.profiler, this.Connection);
 
 				StreamRec Rec = new StreamRec()
 				{
@@ -251,6 +253,9 @@ namespace Waher.Networking.HTTP.HTTP2
 				Nodes.AddLast(Rec.Node);
 				Node.CheckProfilerThreads();
 
+#if INFO_IN_SNIFFERS
+				this.ReportStreamStates("Node added.");
+#endif
 				return Rec.Node.AvailableResources;
 			}
 		}
@@ -298,6 +303,9 @@ namespace Waher.Networking.HTTP.HTTP2
 					}
 				}
 
+#if INFO_IN_SNIFFERS
+				this.ReportStreamStates("Node updated.");
+#endif
 				return true;
 			}
 		}
@@ -331,6 +339,9 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			this.StreamRemoved(StreamId);
 
+#if INFO_IN_SNIFFERS
+			this.ReportStreamStates("Node removed.");
+#endif
 			return true;
 		}
 
@@ -608,6 +619,26 @@ namespace Waher.Networking.HTTP.HTTP2
 			base.ExportPlantUmlHeader(Output);
 
 			this.root?.ExportPlantUml(Output);
+		}
+
+		private void ReportStreamStates(string Reason)
+		{
+			StringBuilder sb = new StringBuilder(Reason);
+
+			sb.AppendLine(" Updated stream states:");
+
+			this.root.ExportStates(sb, 0);
+
+			foreach (LinkedList<PriorityNodeRfc9218> Priority in this.priorities)
+			{
+				if (Priority is null)
+					continue;
+
+				foreach (PriorityNodeRfc9218 Node in Priority)
+					Node.ExportStates(sb, 1);
+			}
+
+			this.Connection?.Information(sb.ToString());
 		}
 
 	}

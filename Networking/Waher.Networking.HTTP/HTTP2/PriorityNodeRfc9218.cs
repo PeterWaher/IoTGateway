@@ -1,8 +1,11 @@
-﻿using System;
+﻿//#define INFO_IN_SNIFFERS
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Runtime.Profiling;
 
 namespace Waher.Networking.HTTP.HTTP2
@@ -14,6 +17,7 @@ namespace Waher.Networking.HTTP.HTTP2
 	{
 		private readonly PriorityNodeRfc9218 root;
 		private readonly Profiler profiler;
+		private readonly IObservableLayer observable;
 		private readonly HttpClientConnection connection;
 		private LinkedList<PendingRequest> pendingRequests = null;
 		private ProfilerThread windowThread;
@@ -30,8 +34,9 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Stream">Corresponding HTTP/2 stream.</param>
 		/// <param name="FlowControl">Flow control object.</param>
 		/// <param name="Profiler">Profiler, if any</param>
+		/// <param name="Observable">Observable object.</param>
 		internal PriorityNodeRfc9218(Http2Stream Stream, FlowControlRfc9218 FlowControl, 
-			Profiler Profiler)
+			Profiler Profiler, IObservableLayer Observable)
 		{
 			if (Stream is null)
 				this.outputWindowSize0 = ConnectionSettings.DefaultHttp2InitialConnectionWindowSize;
@@ -45,6 +50,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.profiler = Profiler;
 			this.hasProfiler = !(this.profiler is null);
 			this.connection = FlowControl.Connection;
+			this.observable = Observable;
 		}
 
 		/// <summary>
@@ -86,8 +92,27 @@ namespace Waher.Networking.HTTP.HTTP2
 		public Task<int> RequestAvailableResources(int RequestedResources,
 			CancellationToken? CancellationToken)
 		{
-			int Available = Math.Min(RequestedResources, this.AvailableResources);
-			Available = Math.Min(Available, this.root.AvailableResources);
+			int AvailableResources = this.AvailableResources;
+			int RootAvailableResources = this.root.AvailableResources;
+			int Available = Math.Min(RequestedResources,
+				Math.Min(RootAvailableResources, AvailableResources));
+
+#if INFO_IN_SNIFFERS
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("Stream ");
+			sb.Append((this.Stream?.StreamId ?? 0).ToString());
+			sb.Append(" Requests resources: Requested = ");
+			sb.Append(RequestedResources.ToString());
+			sb.Append(", Available = ");
+			sb.Append(AvailableResources.ToString());
+			sb.Append(" (at root = ");
+			sb.Append(RootAvailableResources.ToString());
+			sb.Append("), Granted = ");
+			sb.Append(Available.ToString());
+
+			this.observable?.Information(sb.ToString());
+#endif
 
 			if (Available <= 0)
 			{
@@ -155,13 +180,40 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			this.outputWindowSize = NewSize;
 
+#if INFO_IN_SNIFFERS
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("Stream ");
+			sb.Append((this.Stream?.StreamId ?? 0).ToString());
+			sb.Append(" State: New Size = ");
+			sb.Append(NewSize.ToString());
+#endif
+
 			if (NewSize > this.outputWindowSize0)
+			{
 				this.outputWindowSize0 = NewSize;
+
+#if INFO_IN_SNIFFERS
+				sb.Append(", New Max Size = ");
+				sb.Append(this.outputWindowSize0.ToString());
+#endif
+			}
 
 			if (this.hasProfiler)
 				this.windowThread.NewSample(this.AvailableResources);
 
-			Resources = Math.Min(this.root.AvailableResources, NewSize);
+			int RootAvailableResources = this.root.AvailableResources;
+			Resources = Math.Min(RootAvailableResources, this.AvailableResources);
+
+#if INFO_IN_SNIFFERS
+			sb.Append(", Available Resources = ");
+			sb.Append(Resources.ToString());
+			sb.Append(" (at root = ");
+			sb.Append(RootAvailableResources.ToString());
+			sb.Append(')');
+
+			this.observable?.Information(sb.ToString());
+#endif
 			this.TriggerPending(ref Resources);
 
 			return this.outputWindowSize;
@@ -379,6 +431,31 @@ namespace Waher.Networking.HTTP.HTTP2
 				Output.AppendLine(this.Stream.StreamId.ToString());
 				Output.AppendLine();
 			}
+		}
+
+		internal void ExportStates(StringBuilder sb, int Indent)
+		{
+			int AvailableResources = this.AvailableResources;
+
+			sb.Append("| ");
+
+			if (Indent > 0)
+				sb.Append("+-");
+
+			sb.Append((this.Stream?.StreamId ?? 0).ToString());
+			sb.Append(": Available = ");
+			sb.Append(AvailableResources.ToString());
+
+			if (!(this.root is null))
+			{
+				int RootAvailableResources = this.root.AvailableResources;
+
+				sb.Append(" (at root = ");
+				sb.Append(RootAvailableResources.ToString());
+				sb.Append(')');
+			}
+
+			sb.AppendLine();
 		}
 
 	}

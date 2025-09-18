@@ -1,9 +1,12 @@
-﻿using System;
+﻿//#define INFO_IN_SNIFFERS
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Runtime.Profiling;
 
 namespace Waher.Networking.HTTP.HTTP2
@@ -19,6 +22,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		private ProfilerThread dataThread;
 		private ProfilerThread windowThread;
 		private readonly Profiler profiler;
+		private readonly IObservableLayer observable;
 		private readonly PriorityNodeRfc7540 root;
 		private readonly FlowControlRfc7540 flowControl;
 		private readonly int outputMaxFrameSize;
@@ -30,6 +34,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		private int outputWindowSize;
 		private int outputWindowSizeFraction;
 		private byte weight;
+		private bool customWindowSize = false;
 		private bool disposed = false;
 
 		/// <summary>
@@ -41,11 +46,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Weight">Weight assigned to the node.</param>
 		/// <param name="FlowControl">Flow control object.</param>
 		/// <param name="Profiler">Profiler, if available.</param>
+		/// <param name="Observable">Observable object.</param>
 		public PriorityNodeRfc7540(PriorityNodeRfc7540 DependentNode, PriorityNodeRfc7540 Root, Http2Stream Stream, byte Weight,
-			FlowControlRfc7540 FlowControl, Profiler Profiler)
+			FlowControlRfc7540 FlowControl, Profiler Profiler, IObservableLayer Observable)
 		{
 			this.isStream = !(Stream is null);
-		
+
 			if (this.isStream)
 				this.outputWindowSize0 = FlowControl.RemoteSettings.InitialStreamWindowSize;
 			else
@@ -58,6 +64,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.outputWindowSize = this.outputWindowSizeFraction = this.outputWindowSize0;
 			this.outputMaxFrameSize = FlowControl.RemoteSettings.MaxFrameSize;
 			this.profiler = Profiler;
+			this.observable = Observable;
 			this.hasProfiler = !(this.profiler is null);
 			this.flowControl = FlowControl;
 		}
@@ -124,7 +131,16 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Currently available resources
 		/// </summary>
-		public int AvailableResources => this.outputWindowSize + this.outputWindowSizeFraction - this.outputWindowSize0;
+		public int AvailableResources
+		{
+			get
+			{
+				if (this.customWindowSize)
+					return this.outputWindowSize;
+				else
+					return this.outputWindowSize + this.outputWindowSizeFraction - this.outputWindowSize0;
+			}
+		}
 
 		/// <summary>
 		/// Weight assigned to the node.
@@ -230,13 +246,31 @@ namespace Waher.Networking.HTTP.HTTP2
 					Child = Loop.Value;
 
 					Child.resourceFraction = this.resourceFraction * Child.weight / this.totalChildWeights;
-					
-					Size = (int)Math.Floor(this.outputWindowSize0 * Child.resourceFraction);
-					if (Child.isStream && Size > MaxStreamWindow)
-						Size = MaxStreamWindow;
 
-					Child.outputWindowSizeFraction = Size;
+					if (!Child.customWindowSize)
+					{
+						Size = (int)Math.Floor(this.outputWindowSize0 * Child.resourceFraction);
+						if (Child.isStream && Size > MaxStreamWindow)
+							Size = MaxStreamWindow;
 
+						Child.outputWindowSizeFraction = Size;
+					}
+
+#if INFO_IN_SNIFFERS
+					StringBuilder sb = new StringBuilder();
+					sb.Append("Stream ");
+					sb.Append((Child.Stream?.StreamId ?? 0).ToString());
+					sb.Append(" State: Available Resources = ");
+					sb.Append(Child.AvailableResources.ToString());
+
+					if (!Child.customWindowSize)
+					{
+						sb.Append(", New Max Size Fraction = ");
+						sb.Append(Child.outputWindowSizeFraction.ToString());
+					}
+
+					this.observable?.Information(sb.ToString());
+#endif
 					Loop = Loop.Next;
 				}
 			}
@@ -269,9 +303,27 @@ namespace Waher.Networking.HTTP.HTTP2
 		public Task<int> RequestAvailableResources(int RequestedResources,
 			CancellationToken? CancellationToken)
 		{
-			int Available = Math.Min(RequestedResources, this.AvailableResources);
-			Available = Math.Min(Available, this.root.AvailableResources);
+			int AvailableResources = this.AvailableResources;
+			int RootAvailableResources = this.root.AvailableResources;
+			int Available = Math.Min(RequestedResources,
+				Math.Min(RootAvailableResources, AvailableResources));
 
+#if INFO_IN_SNIFFERS
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("Stream ");
+			sb.Append((this.Stream?.StreamId ?? 0).ToString());
+			sb.Append(" Requests resources: Requested = ");
+			sb.Append(RequestedResources.ToString());
+			sb.Append(", Available = ");
+			sb.Append(AvailableResources.ToString());
+			sb.Append(" (at root = ");
+			sb.Append(RootAvailableResources.ToString());
+			sb.Append("), Granted = ");
+			sb.Append(Available.ToString());
+
+			this.observable?.Information(sb.ToString());
+#endif
 			if (Available <= 0)
 			{
 				PendingRequest Request = new PendingRequest(RequestedResources);
@@ -345,16 +397,41 @@ namespace Waher.Networking.HTTP.HTTP2
 			else
 				this.outputWindowSize = NewSize;
 
+#if INFO_IN_SNIFFERS
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("Stream ");
+			sb.Append((this.Stream?.StreamId ?? 0).ToString());
+			sb.Append(" State: New Size = ");
+			sb.Append(NewSize.ToString());
+#endif
+
 			if (NewSize > this.outputWindowSize0)
 			{
 				this.outputWindowSize0 = NewSize;
-				this.outputWindowSizeFraction = (int)Math.Floor(this.outputWindowSize0 * this.resourceFraction);
-
+				this.customWindowSize = true;
+				
 				// Note: Client allowed to increase a particular stream's window size beyond
 				//       the initial stream size defined for the connection.
+
+#if INFO_IN_SNIFFERS
+				sb.Append(", New Max Size = ");
+				sb.Append(this.outputWindowSize0.ToString());
+#endif
 			}
 
-			Resources = Math.Min(this.root.AvailableResources, NewSize);
+			int RootAvailableResources = this.root.AvailableResources;
+			Resources = Math.Min(RootAvailableResources, this.AvailableResources);
+
+#if INFO_IN_SNIFFERS
+			sb.Append(", Available Resources = ");
+			sb.Append(Resources.ToString());
+			sb.Append(" (at root = ");
+			sb.Append(RootAvailableResources.ToString());
+			sb.Append(')');
+
+			this.observable?.Information(sb.ToString());
+#endif
 			this.TriggerPending(ref Resources);
 
 			return this.outputWindowSize;
@@ -440,19 +517,41 @@ namespace Waher.Networking.HTTP.HTTP2
 			else
 				this.outputWindowSize = NewSize;
 
+#if INFO_IN_SNIFFERS
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("Stream ");
+			sb.Append((this.Stream?.StreamId ?? 0).ToString());
+			sb.Append(" State: New Size = ");
+			sb.Append(NewSize.ToString());
+#endif
+
 			if (NewSize > this.outputWindowSize0)
 			{
 				this.outputWindowSize0 = NewSize;
-
-				int Size = (int)Math.Floor(this.outputWindowSize0 * this.resourceFraction);
-				if (this.isStream)
-					Size = Math.Min(this.flowControl.RemoteSettings.InitialStreamWindowSize, Size);
-
-				this.outputWindowSizeFraction = Size;
+				this.customWindowSize = true;
 
 				this.RecalculateChildWindows(this.outputWindowSize0, this.outputWindowSizeFraction, true);
+
+#if INFO_IN_SNIFFERS
+				sb.Append(", New Max Size = ");
+				sb.Append(this.outputWindowSize0.ToString());
+#endif
 			}
 
+#if INFO_IN_SNIFFERS
+			sb.Append(", Available Resources = ");
+			sb.Append(this.AvailableResources.ToString());
+
+			if (!(this.root is null))
+			{
+				sb.Append(" (at root = ");
+				sb.Append(this.root.AvailableResources.ToString());
+				sb.Append(')');
+			}
+
+			this.observable?.Information(sb.ToString());
+#endif
 			Resources = NewSize;
 			this.TriggerPendingIfAvailbleDown(ref Resources);
 
@@ -670,6 +769,46 @@ namespace Waher.Networking.HTTP.HTTP2
 				Label = Label.Substring(0, i).TrimEnd();
 
 			return Label;
+		}
+
+		internal void ExportStates(StringBuilder sb, int Indent, Dictionary<int, bool> Exported)
+		{
+			int StreamId = this.Stream?.StreamId ?? 0;
+			if (Exported.ContainsKey(StreamId))
+				return;
+
+			Exported[StreamId] = true;
+
+			int AvailableResources = this.AvailableResources;
+
+			for (int i = 1; i < Indent; i++)
+				sb.Append("| ");
+
+			if (Indent > 0)
+				sb.Append("+-");
+
+			sb.Append(StreamId.ToString());
+			sb.Append(": Available = ");
+			sb.Append(AvailableResources.ToString());
+
+			if (!(this.root is null))
+			{
+				int RootAvailableResources = this.root.AvailableResources;
+
+				sb.Append(" (at root = ");
+				sb.Append(RootAvailableResources.ToString());
+				sb.Append(')');
+			}
+
+			sb.AppendLine();
+
+			if (!(this.childNodes is null))
+			{
+				Indent++;
+
+				foreach (PriorityNodeRfc7540 ChildNode in this.childNodes)
+					ChildNode.ExportStates(sb, Indent, Exported);
+			}
 		}
 	}
 }

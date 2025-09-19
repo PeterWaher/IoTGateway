@@ -12,8 +12,12 @@
         <xs:element name="Assembly" type="Assembly" minOccurs="0" maxOccurs="unbounded"/>
         <xs:element name="Content" type="Content" minOccurs="0" maxOccurs="unbounded"/>
         <xs:element name="Folder" type="Folder" minOccurs="0" maxOccurs="unbounded"/>
-        <xs:element name="External" type="External" minOccurs="0" maxOccurs="unbounded"/>
-      </xs:sequence>
+				<xs:element name="External" type="External" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="From" type="From" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="Volume" type="Volume" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="Port" type="Port" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="Variable" type="Variable" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
     </xs:complexType>
   </xs:element>
 
@@ -377,5 +381,80 @@
       </xs:annotation>
     </xs:attribute>
   </xs:complexType>
+
+	<xs:complexType name="From">
+		<xs:annotation>
+			<xs:documentation>Defines an image from which to start.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="image" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Name of image to start from.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="Volume">
+		<xs:annotation>
+			<xs:documentation>Defines a volume for persistent storage.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="path" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Path of the volume used for persistent storage.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="Port">
+		<xs:annotation>
+			<xs:documentation>Defines a listening port for incoming network communication.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="portNumber" use="required">
+			<xs:annotation>
+				<xs:documentation>Port number being listened on.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:positiveInteger">
+					<xs:maxInclusive value="65535"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="type" use="required">
+			<xs:annotation>
+				<xs:documentation>Type of port.</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="TCP"/>
+					<xs:enumeration value="UDP"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="protocol" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Protocol being used on port.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="Variable">
+		<xs:annotation>
+			<xs:documentation>Defines an environment variable used by the application.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="name" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Name of variable.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="default" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Default value of variable.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="label" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Label associated with variable.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
 
 </xs:schema>

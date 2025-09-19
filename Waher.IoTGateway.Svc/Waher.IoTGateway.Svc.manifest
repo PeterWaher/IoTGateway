@@ -1163,4 +1163,118 @@
 		<Content fileName='Waher.Things.Virtual.en.lng'/>
 		<Content fileName='Waher.Things.Xmpp.en.lng'/>
 	</Folder>
+	<From image="mcr.microsoft.com/dotnet/runtime:8.0"/>
+	<Volume path="/ProgramData/IoT Gateway"/>
+	<Port portNumber="80" type="TCP" protocol="HTTP"/>
+	<Variable name="GATEWAY_SIMPLE_SETUP" default="false" label="true or 1 for simplified setup, false or 0 for detailed setup."/>
+	<Variable name="GATEWAY_DB_PROVIDER" default="Waher.IoTGateway.Setup.Databases.InternalDatabase" label="Fully qualified name of the database provider to use."/>
+	<!-- Variables used if GATEWAY_DB_PROVIDER is set to "Waher.IoTGateway.Setup.Databases.MongoDBDatabase" -->
+	<Variable name="MONGO_DB_HOST" default="" label="Host name of MongoDB database service."/>
+	<Variable name="MONGO_DB_NAME" default="" label="Name of database to connect to."/>
+	<Variable name="MONGO_DB_DEFAULT" default="Default" label="Optional name of default collection. If not provided, the default collection name will be Default."/>
+	<Variable name="MONGO_DB_USER" default="" label="User name to use when connecting to MongoDB database service."/>
+	<Variable name="MONGO_DB_PASSWORD" default="" label="Password to authenticate user."/>
+	<Variable name="MONGO_DB_PORT" default="27017" label="Optional port number used in connnection. If not provided, the library default port number will be used."/>
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	<Variable name="FILES_DB_SALT" label="Available on machines that do not have operating system support to secure cryptographic keys, to ensure encryption in each instance is done using a unique key."/>
+	<Variable name="GATEWAY_PII_CONSENT" default="true" label="true or 1 to give consent for processing personal inforamtion, false or 0 otherwise."/>
+	<Variable name="GATEWAY_RESTORE" default="false" label="true or 1 if a restore should be performed, false or 0 if no restore should be performed. (If not, the following variables can be skipped.)"/>
+	<Variable name="GATEWAY_RESTORE_BAKFILE" default="" label="File name of backup file to restore."/>
+	<Variable name="GATEWAY_RESTORE_KEYFILE" default="" label="Optional file name of key file corresponding to the backup file, if available."/>
+	<Variable name="GATEWAY_RESTORE_OVERWRITE" default="" label="If restore should overwrite existing information."/>
+	<Variable name="GATEWAY_RESTORE_COLLECTIONS" default="" label="Optional comma-separated list of collections to restore. Empty value represents all collections."/>
+	<Variable name="GATEWAY_RESTORE_PARTS" default="" label="Optional comma-separated list of parts to restore. Empty value represents all parts. Available parts include Database, Ledger and Files."/>
+	<Variable name="GATEWAY_BACKUP" default="true" label="true or 1 if automatic backups should be performed, false or 0 if no automatic backups should be performed. (If not, the following variables can be skipped.)"/>
+	<Variable name="GATEWAY_BACKUP_TIME" default="05:00" label="A TimeSpan value representing a time of day, determining when automatic backups are performed."/>
+	<Variable name="GATEWAY_BACKUP_DAYS" default="3" label="The number of days daily backups are kept."/>
+	<Variable name="GATEWAY_BACKUP_MONTHS" default="3" label="The number of months monthly backups are kept."/>
+	<Variable name="GATEWAY_BACKUP_YEARS" default="3" label="The number of years yearly backups are kept."/>
+	<Variable name="GATEWAY_BACKUP_FOLDER" default="/ProgramData/IoT Gateway/Backup" label="Optional variable determining the folder backup files are to be stored, if different from the default backup folder."/>
+	<Variable name="GATEWAY_KEY_FOLDER" default="/ProgramData/IoT Gateway/Backup" label="Optional variable determining the folder key files are to be stored, if different from the default key folder."/>
+	<Variable name="GATEWAY_BACKUP_HOSTS" default="" label="A comma-separated list of secondary backup hosts for redundant storage of backup files."/>
+	<Variable name="GATEWAY_KEY_HOSTS" default="" label="A comma-separated list of secondary key hosts for redundant storage of key files."/>
+	<Variable name="GATEWAY_DOMAIN_USE" default="false" label="true or 1 if gateway uses a domain name, false or 0 if not."/>
+	<Variable name="GATEWAY_HR_NAME" default="" label="Default Human-readable name for gateway."/>
+	<Variable name="GATEWAY_HR_NAME_LANG" default="" label="Language code (ISO-639-1) of GATEWAY_HR_NAME."/>
+	<Variable name="GATEWAY_HR_DESC" default="" label="Default Human-readable description of gateway."/>
+	<Variable name="GATEWAY_HR_DESC_LANG" default="" label="Language code (ISO-639-1) of GATEWAY_HR_DESC."/>
+	<Variable name="GATEWAY_HR_NAME_LOC" default="en" label="Comma-separated list of Language Codes (ISO-639-1) for available localizations of the human-readable name for the gateway."/>
+	<Variable name="GATEWAY_HR_NAME_en" default="" label="Localized Human-readable name for the gateway, where [lang] is replaced by any of the ISO-639-1 language codes available in GATEWAY_HR_NAME_LOC."/>
+	<Variable name="GATEWAY_HR_DESC_LOC" default="en" label="Comma-separated list of Language Codes (ISO-639-1) for available localizations of the human-readable description of the gateway."/>
+	<Variable name="GATEWAY_HR_DESC_en" default="" label="Localized Human-readable description of the gateway, where [lang] is replaced by any of the ISO-639-1 language codes available in GATEWAY_HR_DESC_LOC."/>
+	<Variable name="GATEWAY_DOMAIN_NAME" default="" label="Main Domain Name of the gateway."/>
+	<Variable name="GATEWAY_DOMAIN_ALT_NAMES" default="" label="Comma-separated list of alternative domain names for the gateway, if defined."/>
+	<Variable name="GATEWAY_DYNDNS" default="false" label="true or 1 if gateway should use a Dynamic DNS-service, false or 0 if IP-address of Gateway is static."/>
+	<Variable name="GATEWAY_ENCRYPTION" default="false" label="true or 1 if gateway should use X.509-based encryption (for example TLS over HTTP, HTTPS), false or 0 if encryption is disabled."/>
+	<!-- Variables used if GATEWAY_ENCRYPTION is set to "true" or "1" -->
+	<Variable name="GATEWAY_CA_CUSTOM" default="false" label="true or 1 if gateway should use a custom Certificate Authority (must support ACME), false or 0 if Let’s Encrypt should be used to generate certificates for the gateway."/>
+	<Variable name="GATEWAY_ACME_EMAIL" default="" label="E-mail address for contact person associated with generated certificates."/>
+	<Variable name="GATEWAY_ACME_ACCEPT_TOS" default="true" label="If Certificate Authority Terms of Services are accepted."/>
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	<!-- Variables used if GATEWAY_DYNDNS is set to "true" or "1" -->
+	<Variable name="GATEWAY_DYNDNS_TEMPLATE" default="" label="Name of template to use for reporting IP address changes to the Dynamic DNS-service."/>
+	<Variable name="GATEWAY_DYNDNS_CHECK" default="" label="Script to use to check the current public IP address of the gateway."/>
+	<Variable name="GATEWAY_DYNDNS_UPDATE" default="" label="Script to use to update the current public IP address of the gateway in the Dynamic DNS service."/>
+	<Variable name="GATEWAY_DYNDNS_ACCOUNT" default="" label="Account of the gateway in the Dynamic DNS service."/>
+	<Variable name="GATEWAY_DYNDNS_PASSWORD" default="" label="Password of the Dynamic DNS service account."/>
+	<Variable name="GATEWAY_DYNDNS_INTERVAL" default="300" label="Interval (in seconds) for checking if the IP address has changed."/>
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	<!-- Variables used if GATEWAY_CA_CUSTOM is set to "true" or "1" -->
+	<Variable name="GATEWAY_ACME_DIRECTORY" default="" label="URL to the custom ACME directory to use to generate certificates for the gateway if a custom CA has been selected."/>
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	<Variable name="GATEWAY_XMPP_HOST" default="" label="XMPP broker to connect to."/>
+	<Variable name="GATEWAY_XMPP_TRANSPORT" default="C2S" label="XMPP transport method (a.k.a. binding). Can be C2S (default if variable not available), BOSH (Bidirectional HTTP) or WS (Web-socket)."/>
+	<Variable name="GATEWAY_XMPP_PORT" default="5222" label="Optional Port number to use when connecting to host. (If C2S binding has been selected.) If not provided, the default port number will be used."/>
+	<Variable name="GATEWAY_XMPP_BOSHURL" default="" label="URL to use when connecting to host. (If BOSH binding has been selected)."/>
+	<Variable name="GATEWAY_XMPP_WSURL" default="" label="URL to use when connecting to host. (If WS binding has been selected)."/>
+	<Variable name="GATEWAY_XMPP_CREATE" default="" label="If an account is to be created."/>
+	<Variable name="GATEWAY_XMPP_CREATE_KEY" default="" label="API-Key to use when creating account, if host is not one of the featured hosts."/>
+	<Variable name="GATEWAY_XMPP_CREATE_SECRET" default="" label="API-Key secret to use when creating account, if host is not one of the featured hosts."/>
+	<Variable name="GATEWAY_XMPP_ACCOUNT" default="" label="Name of account."/>
+	<Variable name="GATEWAY_XMPP_PASSWORD" default="" label="Password of account. If creating an account, this variable is optional. If not available, a secure password will be generated."/>
+	<Variable name="GATEWAY_XMPP_ACCOUNT_NAME" default="" label="Optional Human-readable name of account."/>
+	<Variable name="GATEWAY_XMPP_LOG" default="true" label="Optional. true or 1 if gateway should log communication to program data folder, false or 0 if communication should not be logged (default)."/>
+	<Variable name="GATEWAY_XMPP_TRUST" default="false" label="Optional. true or 1 if gateway should trust server certificate, even if it does not validate, false or 0 if server should be distrusted (default)."/>
+	<Variable name="GATEWAY_XMPP_OBS_AUTH" default="false" label="Optional. true or 1 if gateway should be allowed to use obsolete and insecure authentication mechanisms, false or 0 if only secure mechanisms should be allowed (default)."/>
+	<Variable name="GATEWAY_XMPP_CLEAR_PWD" default="false" label="Optional. true or 1 if gateway should store password as-is in the database, false or 0 if only the password hash should be stored (default)."/>
+	<Variable name="GATEWAY_ID_USE" default="false" label="If a legal identity is to be used by the gateway. If used, the folllowing optional variables can be used to provide information going into the application."/>
+	<!-- Variables used if GATEWAY_ID_USE is set to "true" or "1" -->
+	<Variable name="GATEWAY_ID_FIRST" default="" label="First name of legal identity."/>
+	<Variable name="GATEWAY_ID_MIDDLE" default="" label="Middle name of legal identity."/>
+	<Variable name="GATEWAY_ID_LAST" default="" label="Last name of legal identity."/>
+	<Variable name="GATEWAY_ID_PNR" default="" label="Personal number of legal identity."/>
+	<Variable name="GATEWAY_ID_ADDR" default="" label="Address (line 1) of legal identity."/>
+	<Variable name="GATEWAY_ID_ADDR2" default="" label="Address (line 2) of legal identity."/>
+	<Variable name="GATEWAY_ID_ZIP" default="" label="Postal code of legal identity."/>
+	<Variable name="GATEWAY_ID_AREA" default="" label="Area of legal identity."/>
+	<Variable name="GATEWAY_ID_CITY" default="" label="City of legal identity."/>
+	<Variable name="GATEWAY_ID_REGION" default="" label="Region of legal identity."/>
+	<Variable name="GATEWAY_ID_COUNTRY" default="" label="Country of legal identity."/>
+	<Variable name="GATEWAY_ID_NATIONALITY" default="" label="Nationality of legal identity."/>
+	<Variable name="GATEWAY_ID_GENDER" default="" label="Gender of legal identity."/>
+	<Variable name="GATEWAY_ID_BDATE" default="" label="Birth Date of legal identity."/>
+	<Variable name="GATEWAY_ID_ORGNAME" default="" label="Organization name of legal identity."/>
+	<Variable name="GATEWAY_ID_ORGDEPT" default="" label="Organization department of legal identity."/>
+	<Variable name="GATEWAY_ID_ORGROLE" default="" label="Organization role of legal identity."/>
+	<Variable name="GATEWAY_ID_ORGNR" default="" label="Organization number of legal identity."/>
+	<Variable name="GATEWAY_ID_ORGADDR" default="" label="Organization address (line 1) of legal identity."/>
+	<Variable name="GATEWAY_ID_ORGADDR2" default="" label="Organization address (line 2) of legal identity."/>
+	<Variable name="GATEWAY_ID_ORGZIP" default="" label="Organization postal code of legal identity."/>
+	<Variable name="GATEWAY_ID_ORGAREA" default="" label="Organization area of legal identity."/>
+	<Variable name="GATEWAY_ID_ORGCITY" default="" label="Organization city of legal identity."/>
+	<Variable name="GATEWAY_ID_ORGREGION" default="" label="Organization region of legal identity."/>
+	<Variable name="GATEWAY_ID_ORGCOUNTRY" default="" label="Organization country of legal identity."/>
+	<Variable name="GATEWAY_ID_ALT" default="" label="Comma-separated list of alternative fields to send in identity application. Add GATEWAY_ID_ALT_[field] for each."/>
+	<Variable name="GATEWAY_ID_PASSWORD" default="" label="Protect legal identity with this password."/>
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	<Variable name="GATEWAY_ROSTER_ADD" default="" label="Optional Comma-separated list of Bare JIDs to add to the roster."/>
+	<Variable name="GATEWAY_ROSTER_SUBSCRIBE" default="" label="Optional Comma-separated list of Bare JIDs to send presence subscription requests to."/>
+	<Variable name="GATEWAY_ROSTER_ACCEPT" default="" label="Optional Comma-separated list of Bare JIDs to accept presence subscription requests from."/>
+	<Variable name="GATEWAY_ROSTER_GROUPS" default="" label="Optional Comma-separated list of groups to define."/>
+	<!--
+	<Variable name="GATEWAY_ROSTER_GRP_[group]" default="" label="Optional Comma-separated list of Bare JIDs in the roster to add to the group [group]."/>
+	<Variable name="GATEWAY_ROSTER_NAME_[jid]" default="" label="Optional human-readable name of a JID in the roster."/>
+	-->
+	<Variable name="GATEWAY_THEME_ID" default="WinterDawn" label="ID of theme to use."/>
+	<Variable name="GATEWAY_NOTIFICATION_JIDS" default="" label="IDs of operators of gateway."/>
 </Module>

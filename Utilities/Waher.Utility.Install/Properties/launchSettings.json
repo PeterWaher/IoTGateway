@@ -1,7 +1,9 @@
 {
   "profiles": {
     "Waher.Utility.Install": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "-dk IoTGateway.Dockerfile -d \"/ProgramData/IoT Gateway/\" -s \"/Program Files (x86)/IoTGateway/\" -m IoTGateway\\Waher.IoTGateway.Svc\\bin\\Release\\PublishOutput\\Waher.IoTGateway.Svc.manifest",
+      "workingDirectory": "C:\\My Projects"
     }
   }
 }

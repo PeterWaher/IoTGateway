@@ -416,7 +416,7 @@ namespace Waher.Utility.Install
 								case "Folder":
 								case "File":
 								case "External":
-									continue;	// Handled elsewhere
+									continue;   // Handled elsewhere
 
 								case "From":
 									string Image = XML.Attribute(E, "image");
@@ -449,7 +449,7 @@ namespace Waher.Utility.Install
 									string Name = XML.Attribute(E, "name");
 									string Default = XML.Attribute(E, "default");
 									string Label = XML.Attribute(E, "label");
-									
+
 									Variables[Name] = new KeyValuePair<string, string>(Label, Default);
 									break;
 							}
@@ -485,8 +485,8 @@ namespace Waher.Utility.Install
 					foreach (KeyValuePair<string, KeyValuePair<string, string>> P in Variables)
 					{
 						DockerOutput.WriteLine("ARG " + P.Key);
-						DockerOutput.WriteLine("ENV " + P.Key + "=\"" + P.Value.Value.Replace("\"", "\\\""));
-						DockerOutput.WriteLine("LABEL env."+P.Key + "=\"" + P.Value.Key.Replace("\"", "\\\"") + "\"");
+						DockerOutput.WriteLine("ENV " + P.Key + "=\"" + P.Value.Value.Replace("\"", "\\\"") + "\"");
+						DockerOutput.WriteLine("LABEL env." + P.Key + "=\"" + P.Value.Key.Replace("\"", "\\\"") + "\"");
 						DockerOutput.WriteLine();
 					}
 
@@ -494,7 +494,7 @@ namespace Waher.Utility.Install
 					{
 						GenerateDockerCopyInstructions(ManifestFile, DockerOutput, ProgramDataFolder, ServerApplication, ContentOnly,
 							ExcludeCategories);
-				
+
 						DockerOutput.WriteLine();
 					}
 
@@ -2219,7 +2219,7 @@ namespace Waher.Utility.Install
 					case "Volume":
 					case "Port":
 					case "Variable":
-						break;	// Handled elsewhere
+						break;  // Handled elsewhere
 				}
 			}
 		}

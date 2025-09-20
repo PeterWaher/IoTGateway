@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
@@ -17,6 +18,7 @@ using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
+using Waher.Script;
 using Waher.Security.SHA3;
 using static System.Environment;
 
@@ -394,13 +396,106 @@ namespace Waher.Utility.Install
 					if (Packages.First is not null)
 						throw new Exception("Docker files are generated from manifest files, not package files.");
 
-
-					using StreamWriter DockerOutput = File.CreateText(DockerFile);
+					Dictionary<string, bool> Froms = [];
+					Dictionary<string, bool> Volumes = [];
+					Dictionary<int, string> TcpPorts = [];
+					Dictionary<int, string> UdpPorts = [];
+					Dictionary<string, KeyValuePair<string, string>> Variables = [];
 
 					foreach (string ManifestFile in ManifestFiles)
 					{
-						GenerateDockerInstructions(ManifestFile, DockerOutput, ProgramDataFolder, ServerApplication, ContentOnly,
+						XmlElement Module = LoadManifestFile(ManifestFile);
+						foreach (XmlNode N in Module.ChildNodes)
+						{
+							if (N is not XmlElement E)
+								continue;
+
+							switch (E.LocalName)
+							{
+								case "Content":
+								case "Folder":
+								case "File":
+								case "External":
+									continue;   // Handled elsewhere
+
+								case "From":
+									string Image = XML.Attribute(E, "image");
+									Froms[Image] = true;
+									break;
+
+								case "Volume":
+									string Path = XML.Attribute(E, "path");
+									Volumes[Path] = true;
+									break;
+
+								case "Port":
+									int PortNumber = XML.Attribute(E, "portNumber", 0);
+									string PortType = XML.Attribute(E, "type");
+									string Protocol = XML.Attribute(E, "protocol");
+
+									switch (PortType)
+									{
+										case "TCP":
+											TcpPorts[PortNumber] = Protocol;
+											break;
+
+										case "UDP":
+											UdpPorts[PortNumber] = Protocol;
+											break;
+									}
+									break;
+
+								case "Variable":
+									string Name = XML.Attribute(E, "name");
+									string Default = XML.Attribute(E, "default");
+									string Label = XML.Attribute(E, "label");
+
+									Variables[Name] = new KeyValuePair<string, string>(Label, Default);
+									break;
+							}
+						}
+					}
+
+					using StreamWriter DockerOutput = File.CreateText(DockerFile);
+
+					foreach (string Image in Froms.Keys)
+						DockerOutput.WriteLine("FROM " + Image);
+
+					if (Froms.Count > 0)
+						DockerOutput.WriteLine();
+
+					foreach (string Path in Volumes.Keys)
+						DockerOutput.WriteLine("VOLUME [\"" + Path + "\"]");
+
+					if (Volumes.Count > 0)
+						DockerOutput.WriteLine();
+
+					foreach (KeyValuePair<int, string> P in TcpPorts)
+						DockerOutput.WriteLine("EXPOSE " + P.Key.ToString() + "\t# " + P.Value);
+
+					if (TcpPorts.Count > 0)
+						DockerOutput.WriteLine();
+
+					foreach (KeyValuePair<int, string> P in UdpPorts)
+						DockerOutput.WriteLine("EXPOSE " + P.Key.ToString() + "/udp\t# " + P.Value);
+
+					if (UdpPorts.Count > 0)
+						DockerOutput.WriteLine();
+
+					foreach (KeyValuePair<string, KeyValuePair<string, string>> P in Variables)
+					{
+						DockerOutput.WriteLine("ARG " + P.Key);
+						DockerOutput.WriteLine("ENV " + P.Key + "=\"" + P.Value.Value.Replace("\"", "\\\"") + "\"");
+						DockerOutput.WriteLine("LABEL env." + P.Key + "=\"" + P.Value.Key.Replace("\"", "\\\"") + "\"");
+						DockerOutput.WriteLine();
+					}
+
+					foreach (string ManifestFile in ManifestFiles)
+					{
+						GenerateDockerCopyInstructions(ManifestFile, DockerOutput, ProgramDataFolder, ServerApplication, ContentOnly,
 							ExcludeCategories);
+
+						DockerOutput.WriteLine();
 					}
 
 					DockerOutput.Flush();
@@ -467,6 +562,8 @@ namespace Waher.Utility.Install
 				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.CommonApplicationData), "IoT Gateway");
 				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(ProgramDataFolder))
 					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/usr/local/share");
+				else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && !Directory.Exists(ProgramDataFolder))
+					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/var/lib");
 
 				Log.Informational("Using default program data folder: " + ProgramDataFolder);
 			}
@@ -517,20 +614,7 @@ namespace Waher.Utility.Install
 					throw new Exception("Invalid deps.json file. Unable to install.");
 			}
 
-			Log.Informational("Loading manifest file.");
-
-			XmlDocument Manifest = new()
-			{
-				PreserveWhitespace = true
-			};
-			Manifest.Load(ManifestFile);
-
-			Log.Informational("Validating manifest file.");
-
-			XmlSchema Schema = XSL.LoadSchema(typeof(Program).Namespace + ".Schema.ModuleManifest.xsd", Assembly.GetExecutingAssembly());
-			XSL.Validate(ManifestFile, Manifest, "Module", "http://waher.se/Schema/ModuleManifest.xsd", Schema);
-
-			XmlElement Module = Manifest["Module"];
+			XmlElement Module = LoadManifestFile(ManifestFile);
 			string SourceFolder = Path.GetDirectoryName(ManifestFile);
 			string AppFolder = Path.GetDirectoryName(ServerApplication);
 			string DestManifestFileName = Path.Combine(AppFolder, Path.GetFileName(ManifestFile));
@@ -892,6 +976,8 @@ namespace Waher.Utility.Install
 				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.CommonApplicationData), "IoT Gateway");
 				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(ProgramDataFolder))
 					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/usr/local/share");
+				else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && !Directory.Exists(ProgramDataFolder))
+					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/var/lib");
 
 				Log.Informational("Using default program data folder: " + ProgramDataFolder);
 			}
@@ -939,20 +1025,7 @@ namespace Waher.Utility.Install
 					throw new Exception("Invalid deps.json file. Unable to install.");
 			}
 
-			Log.Informational("Loading manifest file.");
-
-			XmlDocument Manifest = new()
-			{
-				PreserveWhitespace = true
-			};
-			Manifest.Load(ManifestFile);
-
-			Log.Informational("Validating manifest file.");
-
-			XmlSchema Schema = XSL.LoadSchema(typeof(Program).Namespace + ".Schema.ModuleManifest.xsd", Assembly.GetExecutingAssembly());
-			XSL.Validate(ManifestFile, Manifest, "Module", "http://waher.se/Schema/ModuleManifest.xsd", Schema);
-
-			XmlElement Module = Manifest["Module"];
+			XmlElement Module = LoadManifestFile(ManifestFile);
 			string AppFolder = Path.GetDirectoryName(ServerApplication);
 
 			Log.Informational("App folder: " + AppFolder);
@@ -1108,20 +1181,7 @@ namespace Waher.Utility.Install
 
 				foreach (string ManifestFile in ManifestFiles)
 				{
-					Log.Informational("Loading manifest file.");
-
-					XmlDocument Manifest = new()
-					{
-						PreserveWhitespace = true
-					};
-					Manifest.Load(ManifestFile);
-
-					Log.Informational("Validating manifest file.");
-
-					XmlSchema Schema = XSL.LoadSchema(typeof(Program).Namespace + ".Schema.ModuleManifest.xsd", Assembly.GetExecutingAssembly());
-					XSL.Validate(ManifestFile, Manifest, "Module", "http://waher.se/Schema/ModuleManifest.xsd", Schema);
-
-					XmlElement Module = Manifest["Module"];
+					XmlElement Module = LoadManifestFile(ManifestFile);
 					string SourceFolder = Path.GetDirectoryName(ManifestFile);
 
 					Log.Informational("Source folder: " + SourceFolder);
@@ -1435,6 +1495,8 @@ namespace Waher.Utility.Install
 				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.CommonApplicationData), "IoT Gateway");
 				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(ProgramDataFolder))
 					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/usr/local/share");
+				else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && !Directory.Exists(ProgramDataFolder))
+					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/var/lib");
 
 				Log.Informational("Using default program data folder: " + ProgramDataFolder);
 			}
@@ -1517,6 +1579,8 @@ namespace Waher.Utility.Install
 						ExternalFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder), FolderName);
 						if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(ExternalFolder))
 							ExternalFolder = ExternalFolder.Replace("/usr/share", "/usr/local/share");
+						else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && !Directory.Exists(ExternalFolder))
+							ExternalFolder = ExternalFolder.Replace("/usr/share", "/var/lib");
 
 						if (!Directory.Exists(ExternalFolder))
 						{
@@ -1794,6 +1858,8 @@ namespace Waher.Utility.Install
 				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.CommonApplicationData), "IoT Gateway");
 				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(ProgramDataFolder))
 					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/usr/local/share");
+				else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && !Directory.Exists(ProgramDataFolder))
+					ProgramDataFolder = ProgramDataFolder.Replace("/usr/share", "/var/lib");
 
 				Log.Informational("Using default program data folder: " + ProgramDataFolder);
 			}
@@ -1998,28 +2064,10 @@ namespace Waher.Utility.Install
 			}
 		}
 
-		/// <summary>
-		/// Generates Docker Instructions from information available in a manifest file.
-		/// </summary>
-		/// <param name="ManifestFile">File name of manifest file.</param>
-		/// <param name="DockerOutput">Docker output</param>
-		/// <param name="ProgramDataFolder">Data folder inside Docker container.</param>
-		/// <param name="ServerApplication">Path to server application inside Docker container.</param>
-		/// <param name="ContentOnly">If only content files should be copied.</param>
-		/// <param name="ExcludeCategories">Any categories that should be exluded.</param>
-		public static void GenerateDockerInstructions(string ManifestFile, StreamWriter DockerOutput,
-			string ProgramDataFolder, string ServerApplication, bool ContentOnly, Dictionary<string, bool> ExcludeCategories)
+		private static XmlElement LoadManifestFile(string ManifestFile)
 		{
-			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
-
 			if (string.IsNullOrEmpty(ManifestFile))
 				throw new Exception("Missing manifest file.");
-
-			if (string.IsNullOrEmpty(ProgramDataFolder))
-				throw new Exception("Program Data folder for Docker image not specified.");
-
-			if (string.IsNullOrEmpty(ServerApplication))
-				throw new Exception("Missing server application.");
 
 			Log.Informational("Loading manifest file.");
 
@@ -2034,7 +2082,30 @@ namespace Waher.Utility.Install
 			XmlSchema Schema = XSL.LoadSchema(typeof(Program).Namespace + ".Schema.ModuleManifest.xsd", Assembly.GetExecutingAssembly());
 			XSL.Validate(ManifestFile, Manifest, "Module", "http://waher.se/Schema/ModuleManifest.xsd", Schema);
 
-			XmlElement Module = Manifest["Module"];
+			return Manifest["Module"];
+		}
+
+		/// <summary>
+		/// Generates Docker Instructions from information available in a manifest file.
+		/// </summary>
+		/// <param name="ManifestFile">File name of manifest file.</param>
+		/// <param name="DockerOutput">Docker output</param>
+		/// <param name="ProgramDataFolder">Data folder inside Docker container.</param>
+		/// <param name="ServerApplication">Path to server application inside Docker container.</param>
+		/// <param name="ContentOnly">If only content files should be copied.</param>
+		/// <param name="ExcludeCategories">Any categories that should be exluded.</param>
+		public static void GenerateDockerCopyInstructions(string ManifestFile, StreamWriter DockerOutput,
+			string ProgramDataFolder, string ServerApplication, bool ContentOnly, Dictionary<string, bool> ExcludeCategories)
+		{
+			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
+
+			if (string.IsNullOrEmpty(ProgramDataFolder))
+				throw new Exception("Program Data folder for Docker image not specified.");
+
+			if (string.IsNullOrEmpty(ServerApplication))
+				throw new Exception("Missing server application.");
+
+			XmlElement Module = LoadManifestFile(ManifestFile);
 			string SourceFolder = Path.GetDirectoryName(ManifestFile);
 			string AppFolder = Path.GetDirectoryName(ServerApplication);
 			string DestManifestFileName = Path.Combine(AppFolder, Path.GetFileName(ManifestFile));
@@ -2153,6 +2224,12 @@ namespace Waher.Utility.Install
 						//
 						//CopyContent(SourceFolder2, AppFolder2, DataFolder2, E);
 						break;
+
+					case "From":
+					case "Volume":
+					case "Port":
+					case "Variable":
+						break;  // Handled elsewhere
 				}
 			}
 		}

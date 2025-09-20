@@ -154,6 +154,11 @@ namespace Waher.Client.WPF
 						appDataFolder = appDataFolder.Replace("/usr/share", "/usr/local/share");
 						Directory.CreateDirectory(appDataFolder);
 					}
+					else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+					{
+						appDataFolder = appDataFolder.Replace("/usr/share", "/var/lib");
+						Directory.CreateDirectory(appDataFolder);
+					}
 					else
 						ExceptionDispatchInfo.Capture(ex).Throw();
 				}

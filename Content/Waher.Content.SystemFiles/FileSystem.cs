@@ -156,6 +156,8 @@ namespace Waher.Content.SystemFiles
 
 					if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && Path.StartsWith("/usr/share"))
 						Result.Add(Path.Replace("/usr/share", "/usr/local/share"));
+					else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && Path.StartsWith("/usr/share"))
+						Result.Add(Path.Replace("/usr/share", "/var/lib"));
 				}
 			}
 

@@ -284,6 +284,8 @@ namespace Waher.IoTGateway
 
 				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(appDataFolder))
 					appDataFolder = appDataFolder.Replace("/usr/share", "/usr/local/share");
+				else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && !Directory.Exists(appDataFolder))
+					appDataFolder = appDataFolder.Replace("/usr/share", "/var/lib");
 
 				appDataFolder += Path.DirectorySeparatorChar;
 				rootFolder = appDataFolder + "Root" + Path.DirectorySeparatorChar;

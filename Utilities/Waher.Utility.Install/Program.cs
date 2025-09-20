@@ -398,7 +398,9 @@ namespace Waher.Utility.Install
 					if (string.IsNullOrEmpty(ServerApplication))
 						throw new Exception("Missing server application.");
 
-					string AppFolder = Path.GetDirectoryName(ServerApplication);
+					string AppFolder = Path.GetDirectoryName(ServerApplication).Replace(Path.DirectorySeparatorChar, '/');
+					if (!AppFolder.EndsWith('/'))
+						AppFolder += "/";
 
 					Dictionary<string, bool> Froms = [];
 					Dictionary<string, bool> Volumes = [];

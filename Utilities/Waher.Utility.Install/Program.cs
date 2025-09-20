@@ -15,6 +15,7 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Security.SHA3;
@@ -394,11 +395,18 @@ namespace Waher.Utility.Install
 					if (Packages.First is not null)
 						throw new Exception("Docker files are generated from manifest files, not package files.");
 
+					if (string.IsNullOrEmpty(ServerApplication))
+						throw new Exception("Missing server application.");
+
+					string AppFolder = Path.GetDirectoryName(ServerApplication);
+
 					Dictionary<string, bool> Froms = [];
 					Dictionary<string, bool> Volumes = [];
 					Dictionary<int, string> TcpPorts = [];
 					Dictionary<int, string> UdpPorts = [];
 					Dictionary<string, KeyValuePair<string, string>> Variables = [];
+					ChunkedList<KeyValuePair<string, string[]>> Commands = [];
+					KeyValuePair<string, string[]>? EntryPoint = null;
 
 					foreach (string ManifestFile in ManifestFiles)
 					{
@@ -450,6 +458,32 @@ namespace Waher.Utility.Install
 
 									Variables[Name] = new KeyValuePair<string, string>(Label, Default);
 									break;
+
+								case "Command":
+									string Executable = XML.Attribute(E, "executable");
+									ChunkedList<string> Arguments = [];
+
+									foreach (XmlNode N2 in E.ChildNodes)
+									{
+										if (N2 is XmlElement E2 && E2.LocalName == "Argument")
+											Arguments.Add(E2.InnerText);
+									}
+
+									Commands.Add(new KeyValuePair<string, string[]>(Executable, Arguments.ToArray()));
+									break;
+
+								case "EntryPoint":
+									Executable = XML.Attribute(E, "executable");
+									Arguments = [];
+
+									foreach (XmlNode N2 in E.ChildNodes)
+									{
+										if (N2 is XmlElement E2 && E2.LocalName == "Argument")
+											Arguments.Add(E2.InnerText);
+									}
+
+									EntryPoint = new KeyValuePair<string, string[]>(Executable, Arguments.ToArray());
+									break;
 							}
 						}
 					}
@@ -464,6 +498,8 @@ namespace Waher.Utility.Install
 
 					foreach (string Path in Volumes.Keys)
 						DockerOutput.WriteLine("VOLUME [\"" + Path + "\"]");
+
+					DockerOutput.WriteLine("WORKDIR \"" + AppFolder + "\"");
 
 					if (Volumes.Count > 0)
 						DockerOutput.WriteLine();
@@ -490,10 +526,23 @@ namespace Waher.Utility.Install
 
 					foreach (string ManifestFile in ManifestFiles)
 					{
-						GenerateDockerCopyInstructions(ManifestFile, DockerOutput, ProgramDataFolder, ServerApplication, ContentOnly,
+						GenerateDockerCopyInstructions(ManifestFile, DockerOutput, ProgramDataFolder, AppFolder, ContentOnly,
 							ExcludeCategories);
 
 						DockerOutput.WriteLine();
+					}
+
+					foreach (KeyValuePair<string, string[]> Command in Commands)
+					{
+						WriteCommand(DockerOutput, "CMD", Command.Key, Command.Value,
+							AppFolder, ServerApplication, ProgramDataFolder);
+					}
+
+					if (EntryPoint.HasValue)
+					{
+						WriteCommand(DockerOutput, "ENTRYPOINT", EntryPoint.Value.Key,
+							EntryPoint.Value.Value, AppFolder, ServerApplication, 
+							ProgramDataFolder);
 					}
 
 					DockerOutput.Flush();
@@ -516,6 +565,34 @@ namespace Waher.Utility.Install
 				ConsoleOut.Flush(true);
 				Log.TerminateAsync().Wait();
 			}
+		}
+
+		private static void WriteCommand(StreamWriter DockerOutput, string DockerCommand,
+			string Command, string[] Arguments, string AppFolder, string ServerApplication,
+			string ProgramDataFolder)
+		{
+			DockerOutput.Write(DockerCommand);
+			DockerOutput.Write(" [\"");
+			DockerOutput.Write(Command.
+				Replace("%AppFolder%", AppFolder).
+				Replace("%Executable%", ServerApplication).
+				Replace("%DataFolder%", ProgramDataFolder).
+				Replace("\"", "\\\""));
+			DockerOutput.Write('"');
+
+			foreach (string Argument in Arguments)
+			{
+				DockerOutput.Write(", \"");
+				DockerOutput.Write(Argument.
+					Replace("%AppFolder%", AppFolder).
+					Replace("%Executable%", ServerApplication).
+					Replace("%DataFolder%", ProgramDataFolder).
+					Replace("\"", "\\\""));
+				DockerOutput.Write('"');
+			}
+
+			DockerOutput.WriteLine("]");
+			DockerOutput.WriteLine();
 		}
 
 		public static void StartService(string ServiceName)
@@ -2094,19 +2171,15 @@ namespace Waher.Utility.Install
 		/// <param name="ContentOnly">If only content files should be copied.</param>
 		/// <param name="ExcludeCategories">Any categories that should be exluded.</param>
 		public static void GenerateDockerCopyInstructions(string ManifestFile, StreamWriter DockerOutput,
-			string ProgramDataFolder, string ServerApplication, bool ContentOnly, Dictionary<string, bool> ExcludeCategories)
+			string ProgramDataFolder, string AppFolder, bool ContentOnly, Dictionary<string, bool> ExcludeCategories)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
 			if (string.IsNullOrEmpty(ProgramDataFolder))
 				throw new Exception("Program Data folder for Docker image not specified.");
 
-			if (string.IsNullOrEmpty(ServerApplication))
-				throw new Exception("Missing server application.");
-
 			XmlElement Module = LoadManifestFile(ManifestFile);
 			string SourceFolder = Path.GetDirectoryName(ManifestFile);
-			string AppFolder = Path.GetDirectoryName(ServerApplication);
 			string DestManifestFileName = Path.Combine(AppFolder, Path.GetFileName(ManifestFile));
 
 			CopyFile(ManifestFile, DestManifestFileName, DockerOutput);
@@ -2228,6 +2301,8 @@ namespace Waher.Utility.Install
 					case "Volume":
 					case "Port":
 					case "Variable":
+					case "Command":
+					case "EntryPoint":
 						break;  // Handled elsewhere
 				}
 			}

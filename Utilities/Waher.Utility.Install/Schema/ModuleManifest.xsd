@@ -17,6 +17,8 @@
 				<xs:element name="Volume" type="Volume" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="Port" type="Port" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="Variable" type="Variable" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="Command" type="Command" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="EntryPoint" type="EntryPoint" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -455,6 +457,33 @@
 				<xs:documentation>Label associated with variable.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="Command">
+		<xs:annotation>
+			<xs:documentation>Defines a command that needs to be executed main application is executed.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Argument" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Defines an argument to send in the command.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="executable" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>The executable to execute as part of the command.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="EntryPoint">
+		<xs:annotation>
+			<xs:documentation>Defines the executable of the main application.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="Command"/>
+		</xs:complexContent>
 	</xs:complexType>
 
 </xs:schema>

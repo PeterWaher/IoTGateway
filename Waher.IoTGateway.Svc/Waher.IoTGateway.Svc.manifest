@@ -1164,7 +1164,7 @@
 		<Content fileName='Waher.Things.Xmpp.en.lng'/>
 	</Folder>
 	<From image="mcr.microsoft.com/dotnet/runtime:8.0"/>
-	<Volume path="/ProgramData/IoT Gateway"/>
+	<Volume path="/var/lib/IoT Gateway"/>
 	<Port portNumber="80" type="TCP" protocol="HTTP"/>
 	<Variable name="GATEWAY_SIMPLE_SETUP" default="false" label="true or 1 for simplified setup, false or 0 for detailed setup."/>
 	<Variable name="GATEWAY_DB_PROVIDER" default="Waher.IoTGateway.Setup.Databases.InternalDatabase" label="Fully qualified name of the database provider to use."/>
@@ -1277,4 +1277,8 @@
 	-->
 	<Variable name="GATEWAY_THEME_ID" default="WinterDawn" label="ID of theme to use."/>
 	<Variable name="GATEWAY_NOTIFICATION_JIDS" default="" label="IDs of operators of gateway."/>
+	<EntryPoint executable="dotnet">
+		<Argument>%Executable%</Argument>
+		<Argument>-console</Argument>
+	</EntryPoint>
 </Module>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
@@ -18,7 +17,6 @@ using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
-using Waher.Script;
 using Waher.Security.SHA3;
 using static System.Environment;
 

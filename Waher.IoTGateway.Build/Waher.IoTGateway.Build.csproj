@@ -9,6 +9,26 @@
   </PropertyGroup>
   
   <Target Name="Test">
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Acme\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Acme\Waher.Utility.Acme.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.AnalyzeClock\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.AnalyzeClock\Waher.Utility.AnalyzeClock.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.AnalyzeDB\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.AnalyzeDB\Waher.Utility.AnalyzeDB.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Asn1ToCSharp\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Asn1ToCSharp\Waher.Utility.Asn1ToCSharp.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Csp\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Csp\Waher.Utility.Csp.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.DeleteDB\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.DeleteDB\Waher.Utility.DeleteDB.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.ExStat\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.ExStat\Waher.Utility.ExStat.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Extract\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Extract\Waher.Utility.Extract.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.GenManifest\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.GenManifest\Waher.Utility.GenManifest.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Install\Waher.Utility.Install.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Markdown\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Markdown\Waher.Utility.Markdown.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.RegEx\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.RegEx\Waher.Utility.RegEx.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.RunScript\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.RunScript\Waher.Utility.RunScript.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Sign\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Sign\Waher.Utility.Sign.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.TextDiff\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.TextDiff\Waher.Utility.TextDiff.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Transform\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Transform\Waher.Utility.Transform.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Translate\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Translate\Waher.Utility.Translate.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Upload\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Upload\Waher.Utility.Upload.csproj&quot;"/>
+
+		<Exec Command="dotnet publish -o:&quot;..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutputLinux&quot; -c:$(Configuration) -r linux-x64 --self-contained:true &quot;..\Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj&quot;"/>
 	</Target>
 
 	<Target Name="BuildUtilityInstall">
@@ -17,6 +37,7 @@
 	</Target>
 
 	<Target Name="BuildSetup">
+		<!-- Building projects -->
 		<MSBuild Projects="..\Waher.IoTGateway\Waher.IoTGateway.csproj" Targets="Build" 
 						 Properties="Configuration=$(Configuration);SolutionDir=$(MSBuildThisFileDirectory)..\"/>
 
@@ -27,56 +48,81 @@
 						 Properties="Configuration=$(Configuration);SolutionDir=$(MSBuildThisFileDirectory)..\"/>
 		
 		<MSBuild Projects="..\Utilities\Waher.Utility.Acme\Waher.Utility.Acme.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Acme\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Acme\Waher.Utility.Acme.csproj&quot;"/>
 		<MSBuild Projects="..\Utilities\Waher.Utility.AnalyzeClock\Waher.Utility.AnalyzeClock.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.AnalyzeClock\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.AnalyzeClock\Waher.Utility.AnalyzeClock.csproj&quot;"/>
-    <MSBuild Projects="..\Utilities\Waher.Utility.AnalyzeDB\Waher.Utility.AnalyzeDB.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.AnalyzeDB\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.AnalyzeDB\Waher.Utility.AnalyzeDB.csproj&quot;"/>
-    <MSBuild Projects="..\Utilities\Waher.Utility.Asn1ToCSharp\Waher.Utility.Asn1ToCSharp.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Asn1ToCSharp\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Asn1ToCSharp\Waher.Utility.Asn1ToCSharp.csproj&quot;"/>
-    <MSBuild Projects="..\Utilities\Waher.Utility.Csp\Waher.Utility.Csp.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Csp\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Csp\Waher.Utility.Csp.csproj&quot;"/>
-    <MSBuild Projects="..\Utilities\Waher.Utility.DeleteDB\Waher.Utility.DeleteDB.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.DeleteDB\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.DeleteDB\Waher.Utility.DeleteDB.csproj&quot;"/>
-    <MSBuild Projects="..\Utilities\Waher.Utility.ExStat\Waher.Utility.ExStat.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.ExStat\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.ExStat\Waher.Utility.ExStat.csproj&quot;"/>
-    <MSBuild Projects="..\Utilities\Waher.Utility.Extract\Waher.Utility.Extract.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Extract\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Extract\Waher.Utility.Extract.csproj&quot;"/>
-    <MSBuild Projects="..\Utilities\Waher.Utility.GenManifest\Waher.Utility.GenManifest.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.GenManifest\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.GenManifest\Waher.Utility.GenManifest.csproj&quot;"/>
+		<MSBuild Projects="..\Utilities\Waher.Utility.AnalyzeDB\Waher.Utility.AnalyzeDB.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<MSBuild Projects="..\Utilities\Waher.Utility.Asn1ToCSharp\Waher.Utility.Asn1ToCSharp.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<MSBuild Projects="..\Utilities\Waher.Utility.Csp\Waher.Utility.Csp.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<MSBuild Projects="..\Utilities\Waher.Utility.DeleteDB\Waher.Utility.DeleteDB.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<MSBuild Projects="..\Utilities\Waher.Utility.ExStat\Waher.Utility.ExStat.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<MSBuild Projects="..\Utilities\Waher.Utility.Extract\Waher.Utility.Extract.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<MSBuild Projects="..\Utilities\Waher.Utility.GenManifest\Waher.Utility.GenManifest.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
     <MSBuild Projects="..\Utilities\Waher.Utility.Install\Waher.Utility.Install.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Install\Waher.Utility.Install.csproj&quot;"/>
 		<MSBuild Projects="..\Utilities\Waher.Utility.Markdown\Waher.Utility.Markdown.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Markdown\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Markdown\Waher.Utility.Markdown.csproj&quot;"/>
 		<MSBuild Projects="..\Utilities\Waher.Utility.RegEx\Waher.Utility.RegEx.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.RegEx\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.RegEx\Waher.Utility.RegEx.csproj&quot;"/>
     <MSBuild Projects="..\Utilities\Waher.Utility.RunScript\Waher.Utility.RunScript.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.RunScript\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.RunScript\Waher.Utility.RunScript.csproj&quot;"/>
-    <MSBuild Projects="..\Utilities\Waher.Utility.Sign\Waher.Utility.Sign.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Sign\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Sign\Waher.Utility.Sign.csproj&quot;"/>
+		<MSBuild Projects="..\Utilities\Waher.Utility.Sign\Waher.Utility.Sign.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
 		<MSBuild Projects="..\Utilities\Waher.Utility.TextDiff\Waher.Utility.TextDiff.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.TextDiff\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.TextDiff\Waher.Utility.TextDiff.csproj&quot;"/>
 		<MSBuild Projects="..\Utilities\Waher.Utility.Transform\Waher.Utility.Transform.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Transform\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Transform\Waher.Utility.Transform.csproj&quot;"/>
-    <MSBuild Projects="..\Utilities\Waher.Utility.Translate\Waher.Utility.Translate.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Translate\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Translate\Waher.Utility.Translate.csproj&quot;"/>
+		<MSBuild Projects="..\Utilities\Waher.Utility.Translate\Waher.Utility.Translate.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
 		<MSBuild Projects="..\Utilities\Waher.Utility.Upload\Waher.Utility.Upload.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<MSBuild Projects="..\WebServices\Waher.WebService.Tesseract\Waher.WebService.Tesseract.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<MSBuild Projects="..\Clients\Waher.Client.WPF\Waher.Client.WPF.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<MSBuild Projects="..\Waher.IoTGateway.Setup.Windows\Waher.IoTGateway.Setup.Windows.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+
+		<!-- Publishing Windows executables -->
+
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Acme\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Acme\Waher.Utility.Acme.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.AnalyzeClock\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.AnalyzeClock\Waher.Utility.AnalyzeClock.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.AnalyzeDB\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.AnalyzeDB\Waher.Utility.AnalyzeDB.csproj&quot;"/>
+    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Asn1ToCSharp\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Asn1ToCSharp\Waher.Utility.Asn1ToCSharp.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Csp\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Csp\Waher.Utility.Csp.csproj&quot;"/>
+    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.DeleteDB\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.DeleteDB\Waher.Utility.DeleteDB.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.ExStat\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.ExStat\Waher.Utility.ExStat.csproj&quot;"/>
+    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Extract\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Extract\Waher.Utility.Extract.csproj&quot;"/>
+    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.GenManifest\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.GenManifest\Waher.Utility.GenManifest.csproj&quot;"/>
+    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Install\Waher.Utility.Install.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Markdown\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Markdown\Waher.Utility.Markdown.csproj&quot;"/>
+    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.RegEx\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.RegEx\Waher.Utility.RegEx.csproj&quot;"/>
+    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.RunScript\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.RunScript\Waher.Utility.RunScript.csproj&quot;"/>
+    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Sign\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Sign\Waher.Utility.Sign.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.TextDiff\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.TextDiff\Waher.Utility.TextDiff.csproj&quot;"/>
+    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Transform\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Transform\Waher.Utility.Transform.csproj&quot;"/>
+    <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Translate\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Translate\Waher.Utility.Translate.csproj&quot;"/>
 		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Upload\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Upload\Waher.Utility.Upload.csproj&quot;"/>
 
-		<MSBuild Projects="..\WebServices\Waher.WebService.Tesseract\Waher.WebService.Tesseract.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
 		<Exec Command="dotnet publish -o:&quot;..\WebServices\Waher.WebService.Tesseract\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\WebServices\Waher.WebService.Tesseract\Waher.WebService.Tesseract.csproj&quot;"/>
 
-		<Exec Command="dotnet publish -o:&quot;..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutput&quot; -c:$(Configuration) --self-contained:true &quot;..\Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutput&quot; -c:$(Configuration) -r win-x86 --self-contained:true &quot;..\Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj&quot;"/>
 		<Exec Command="..\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutput\win-x86\Waher.Utility.Install.exe -p ..\..\IoTGateway.package -m ..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutput\Waher.IoTGateway.Svc.manifest"/>
 
-		<MSBuild Projects="..\Clients\Waher.Client.WPF\Waher.Client.WPF.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
 		<Exec Command="dotnet publish -o:&quot;..\Clients\Waher.Client.WPF\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true /p:PublishSingleFile=true &quot;..\Clients\Waher.Client.WPF\Waher.Client.WPF.csproj&quot;"/>
 		<Exec Command="copy /Y &quot;..\Clients\Waher.Client.WPF\bin\$(Configuration)\PublishOutput\win-x86\Waher.Client.WPF.exe&quot; ..\..\IoTClient.exe"/>
 
-		<MSBuild Projects="..\Waher.IoTGateway.Setup.Windows\Waher.IoTGateway.Setup.Windows.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
 		<Exec Command="dotnet publish -o:&quot;..\Waher.IoTGateway.Setup.Windows\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true /p:PublishSingleFile=true &quot;..\Waher.IoTGateway.Setup.Windows\Waher.IoTGateway.Setup.Windows.csproj&quot;"/>
 		<Exec Command="copy /Y &quot;..\Waher.IoTGateway.Setup.Windows\bin\$(Configuration)\PublishOutput\win-x86\Waher.IoTGateway.Setup.Windows.exe&quot; ..\..\IoTGatewaySetup.exe"/>
 
+		<!-- Publishing Windows executables -->
+
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Acme\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Acme\Waher.Utility.Acme.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.AnalyzeClock\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.AnalyzeClock\Waher.Utility.AnalyzeClock.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.AnalyzeDB\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.AnalyzeDB\Waher.Utility.AnalyzeDB.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Asn1ToCSharp\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Asn1ToCSharp\Waher.Utility.Asn1ToCSharp.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Csp\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Csp\Waher.Utility.Csp.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.DeleteDB\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.DeleteDB\Waher.Utility.DeleteDB.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.ExStat\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.ExStat\Waher.Utility.ExStat.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Extract\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Extract\Waher.Utility.Extract.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.GenManifest\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.GenManifest\Waher.Utility.GenManifest.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Install\Waher.Utility.Install.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Markdown\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Markdown\Waher.Utility.Markdown.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.RegEx\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.RegEx\Waher.Utility.RegEx.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.RunScript\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.RunScript\Waher.Utility.RunScript.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Sign\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Sign\Waher.Utility.Sign.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.TextDiff\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.TextDiff\Waher.Utility.TextDiff.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Transform\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Transform\Waher.Utility.Transform.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Translate\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Translate\Waher.Utility.Translate.csproj&quot;"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Upload\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Upload\Waher.Utility.Upload.csproj&quot;"/>
+
+		<Exec Command="dotnet publish -o:&quot;..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutputLinux&quot; -c:$(Configuration) -r linux-x64 --self-contained:true &quot;..\Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj&quot;"/>
 	</Target>
 
 </Project>

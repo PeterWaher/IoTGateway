@@ -21,9 +21,11 @@
     <PackageIcon>Icon_64x64.png</PackageIcon>
     <RuntimeFrameworkVersion>8.0</RuntimeFrameworkVersion>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <RuntimeIdentifier Condition="'$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64;osx-x64;osx-arm64;linux-x64;linux-arm64</RuntimeIdentifiers>
+		<RuntimeIdentifier Condition="'$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
     <RuntimeIdentifier Condition="'$(OS)' == 'Unix'">osx-arm64</RuntimeIdentifier>
-    <SelfContained>true</SelfContained>
+		<RuntimeIdentifier Condition="'$(OS)' == 'Linux'">linux-x64</RuntimeIdentifier>
+		<SelfContained>true</SelfContained>
   </PropertyGroup>
 
   <ItemGroup>

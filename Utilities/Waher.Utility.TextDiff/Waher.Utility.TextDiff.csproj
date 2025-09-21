@@ -15,7 +15,11 @@
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <AssemblyVersion>1.0.0</AssemblyVersion>
-  </PropertyGroup>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64;osx-x64;osx-arm64;linux-x64;linux-arm64</RuntimeIdentifiers>
+		<RuntimeIdentifier Condition="'$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
+		<RuntimeIdentifier Condition="'$(OS)' == 'Unix'">osx-arm64</RuntimeIdentifier>
+		<RuntimeIdentifier Condition="'$(OS)' == 'Linux'">linux-x64</RuntimeIdentifier>
+	</PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

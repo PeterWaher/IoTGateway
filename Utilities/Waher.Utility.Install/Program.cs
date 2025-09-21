@@ -528,11 +528,31 @@ namespace Waher.Utility.Install
 						DockerOutput.WriteLine();
 					}
 
+					string DockerFileFolder = Path.GetDirectoryName(Path.GetFullPath(DockerFile));
+					Dictionary<string, ChunkedList<string>> FilesPerDestinationFolder = [];
+
 					foreach (string ManifestFile in ManifestFiles)
 					{
-						GenerateDockerCopyInstructions(ManifestFile, DockerOutput, ProgramDataFolder, 
-							AppFolder, DockerFile, ContentOnly, ExcludeCategories);
+						PrepareDockerCopyInstructions(ManifestFile, FilesPerDestinationFolder, 
+							ProgramDataFolder, AppFolder, DockerFileFolder, ContentOnly, ExcludeCategories);
+					}
 
+					foreach (KeyValuePair<string, ChunkedList<string>> CopyInstructions in FilesPerDestinationFolder)
+					{
+						string DestinationPath = CopyInstructions.Key;
+
+						DockerOutput.WriteLine("COPY [ \\");
+
+						foreach (string RelativeSourcePath in CopyInstructions.Value)
+						{
+							DockerOutput.Write("\t\"");
+							DockerOutput.Write(RelativeSourcePath.Replace("\"", "\\\""));
+							DockerOutput.WriteLine("\", \\");
+						}
+
+						DockerOutput.Write("\t\"");
+						DockerOutput.Write(DestinationPath.Replace("\"", "\\\""));
+						DockerOutput.WriteLine("\"]");
 						DockerOutput.WriteLine();
 					}
 
@@ -2169,14 +2189,17 @@ namespace Waher.Utility.Install
 		/// Generates Docker Instructions from information available in a manifest file.
 		/// </summary>
 		/// <param name="ManifestFile">File name of manifest file.</param>
-		/// <param name="DockerOutput">Docker output</param>
+		/// <param name="FilesPerDestinationFolder">Files to copy, sorted by destination
+		/// folder.</param>
 		/// <param name="ProgramDataFolder">Data folder inside Docker container.</param>
-		/// <param name="ServerApplication">Path to server application inside Docker container.</param>
+		/// <param name="AppFolder">Path to where execitables are copied.</param>
+		/// <param name="DockerFileFolder">Folder containing Dockerfile.</param>
 		/// <param name="ContentOnly">If only content files should be copied.</param>
 		/// <param name="ExcludeCategories">Any categories that should be exluded.</param>
-		public static void GenerateDockerCopyInstructions(string ManifestFile, 
-			StreamWriter DockerOutput, string ProgramDataFolder, string AppFolder, 
-			string DockerFileName, bool ContentOnly, Dictionary<string, bool> ExcludeCategories)
+		public static void PrepareDockerCopyInstructions(string ManifestFile, 
+			Dictionary<string, ChunkedList<string>> FilesPerDestinationFolder, 
+			string ProgramDataFolder, string AppFolder, string DockerFileFolder, 
+			bool ContentOnly, Dictionary<string, bool> ExcludeCategories)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
@@ -2187,7 +2210,7 @@ namespace Waher.Utility.Install
 			string SourceFolder = Path.GetDirectoryName(ManifestFile);
 			string DestManifestFileName = Path.Combine(AppFolder, Path.GetFileName(ManifestFile));
 
-			CopyFile(ManifestFile, DestManifestFileName, DockerFileName, DockerOutput);
+			PrepareCopyFile(ManifestFile, DestManifestFileName, DockerFileFolder, FilesPerDestinationFolder);
 
 			Log.Informational("Source folder: " + SourceFolder);
 			Log.Informational("App folder: " + AppFolder);
@@ -2211,34 +2234,40 @@ namespace Waher.Utility.Install
 						else
 							Log.Informational("Application file: " + FileName, string.Empty, string.Empty, "FileCopy");
 
-						CopyFile(SourceFileName, Path.Combine(AppFolder, FileName), DockerFileName, DockerOutput);
+						PrepareCopyFile(SourceFileName, Path.Combine(AppFolder, FileName), DockerFileFolder, FilesPerDestinationFolder);
 						if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 						{
 							string PdbFileName = FileName[0..^4] + ".pdb";
 							if (File.Exists(PdbFileName))
-								CopyFile(Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), DockerFileName, DockerOutput);
+								PrepareCopyFile(Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), DockerFileFolder, FilesPerDestinationFolder);
 						}
 					}
 				}
 			}
 
-			CopyContent(SourceFolder, AppFolder, ProgramDataFolder, DockerFileName, Module, DockerOutput, ExcludeCategories);
+			PrepareCopyContent(SourceFolder, AppFolder, ProgramDataFolder, DockerFileFolder, Module, FilesPerDestinationFolder, ExcludeCategories);
 		}
 
-		private static void CopyFile(string SourceFileName, string DestFileName, 
-			string DockerFileName, StreamWriter DockerOutput)
+		private static void PrepareCopyFile(string SourceFileName, string DestFileName,
+			string DockerFileFolder, Dictionary<string, ChunkedList<string>> FilesPerDestinationFolder)
 		{
-			string RelativeSourcePath = Path.GetRelativePath(DockerFileName, SourceFileName);
+			string RelativeSourcePath = Path.GetRelativePath(DockerFileFolder, SourceFileName).Replace(Path.DirectorySeparatorChar, '/');
+			string DestinationPath = Path.GetDirectoryName(DestFileName).Replace(Path.DirectorySeparatorChar, '/');
 
-			DockerOutput.Write("COPY [\"");
-			DockerOutput.Write(RelativeSourcePath.Replace(Path.DirectorySeparatorChar, '/').Replace("\"", "\\\""));
-			DockerOutput.Write("\", \"");
-			DockerOutput.Write(DestFileName.Replace(Path.DirectorySeparatorChar, '/').Replace("\"", "\\\""));
-			DockerOutput.WriteLine("\"]");
+			if (!DestinationPath.EndsWith('/'))
+				DestinationPath += "/";
+
+			if (!FilesPerDestinationFolder.TryGetValue(DestinationPath, out ChunkedList<string> Files))
+			{
+				Files = [];
+				FilesPerDestinationFolder[DestinationPath] = Files;
+			}
+
+			Files.Add(RelativeSourcePath);
 		}
 
-		private static void CopyContent(string SourceFolder, string AppFolder, string DataFolder,
-			string DockerFileName, XmlElement Parent, StreamWriter DockerOutput, 
+		private static void PrepareCopyContent(string SourceFolder, string AppFolder, string DataFolder,
+			string DockerFileFolder, XmlElement Parent, Dictionary<string, ChunkedList<string>> FilesPerDestinationFolder, 
 			Dictionary<string, bool> ExcludeCategories)
 		{
 			foreach (XmlNode N in Parent.ChildNodes)
@@ -2256,8 +2285,8 @@ namespace Waher.Utility.Install
 
 						Log.Informational("Content file: " + FileName);
 
-						CopyFile(SourceFileName, Path.Combine(DataFolder, FileName), DockerFileName, DockerOutput);
-						CopyFile(SourceFileName, Path.Combine(AppFolder, FileName), DockerFileName, DockerOutput);
+						PrepareCopyFile(SourceFileName, Path.Combine(DataFolder, FileName), DockerFileFolder, FilesPerDestinationFolder);
+						PrepareCopyFile(SourceFileName, Path.Combine(AppFolder, FileName), DockerFileFolder, FilesPerDestinationFolder);
 						break;
 
 					case "Folder":
@@ -2272,7 +2301,7 @@ namespace Waher.Utility.Install
 							new KeyValuePair<string, object>("App", AppFolder2),
 							new KeyValuePair<string, object>("Data", DataFolder2));
 
-						CopyContent(SourceFolder2, AppFolder2, DataFolder2, DockerFileName, E, DockerOutput, ExcludeCategories);
+						PrepareCopyContent(SourceFolder2, AppFolder2, DataFolder2, DockerFileFolder, E, FilesPerDestinationFolder, ExcludeCategories);
 						break;
 
 					case "File":

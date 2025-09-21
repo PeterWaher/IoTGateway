@@ -11,7 +11,12 @@
   <Target Name="Test">
 	</Target>
 
-  <Target Name="BuildSetup">
+	<Target Name="BuildUtilityInstall">
+		<MSBuild Projects="..\Utilities\Waher.Utility.Install\Waher.Utility.Install.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Install\Waher.Utility.Install.csproj&quot;"/>
+	</Target>
+
+	<Target Name="BuildSetup">
 		<MSBuild Projects="..\Waher.IoTGateway\Waher.IoTGateway.csproj" Targets="Build" 
 						 Properties="Configuration=$(Configuration);SolutionDir=$(MSBuildThisFileDirectory)..\"/>
 

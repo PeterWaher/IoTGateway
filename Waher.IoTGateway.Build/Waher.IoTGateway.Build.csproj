@@ -9,26 +9,7 @@
   </PropertyGroup>
   
   <Target Name="Test">
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Acme\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Acme\Waher.Utility.Acme.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.AnalyzeClock\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.AnalyzeClock\Waher.Utility.AnalyzeClock.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.AnalyzeDB\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.AnalyzeDB\Waher.Utility.AnalyzeDB.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Asn1ToCSharp\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Asn1ToCSharp\Waher.Utility.Asn1ToCSharp.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Csp\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Csp\Waher.Utility.Csp.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.DeleteDB\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.DeleteDB\Waher.Utility.DeleteDB.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.ExStat\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.ExStat\Waher.Utility.ExStat.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Extract\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Extract\Waher.Utility.Extract.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.GenManifest\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.GenManifest\Waher.Utility.GenManifest.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Install\Waher.Utility.Install.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Markdown\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Markdown\Waher.Utility.Markdown.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.RegEx\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.RegEx\Waher.Utility.RegEx.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.RunScript\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.RunScript\Waher.Utility.RunScript.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Sign\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Sign\Waher.Utility.Sign.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.TextDiff\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.TextDiff\Waher.Utility.TextDiff.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Transform\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Transform\Waher.Utility.Transform.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Translate\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Translate\Waher.Utility.Translate.csproj&quot;"/>
-		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Upload\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Upload\Waher.Utility.Upload.csproj&quot;"/>
-
-		<Exec Command="dotnet publish -o:&quot;..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutputLinux&quot; -c:$(Configuration) -r linux-x64 --self-contained:true &quot;..\Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj&quot;"/>
+		<Exec Command="..\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutput\win-x86\Waher.Utility.Install.exe -p ..\..\IoTGateway.Linux.package -m ..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutputLinux\Waher.IoTGateway.Svc.Linux.manifest"/>
 	</Target>
 
 	<Target Name="BuildUtilityInstall">
@@ -101,7 +82,7 @@
 		<Exec Command="dotnet publish -o:&quot;..\Waher.IoTGateway.Setup.Windows\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true /p:PublishSingleFile=true &quot;..\Waher.IoTGateway.Setup.Windows\Waher.IoTGateway.Setup.Windows.csproj&quot;"/>
 		<Exec Command="copy /Y &quot;..\Waher.IoTGateway.Setup.Windows\bin\$(Configuration)\PublishOutput\win-x86\Waher.IoTGateway.Setup.Windows.exe&quot; ..\..\IoTGatewaySetup.exe"/>
 
-		<!-- Publishing Windows executables -->
+		<!-- Publishing Linux executables -->
 
 		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Acme\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Acme\Waher.Utility.Acme.csproj&quot;"/>
 		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.AnalyzeClock\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.AnalyzeClock\Waher.Utility.AnalyzeClock.csproj&quot;"/>
@@ -123,6 +104,7 @@
 		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Upload\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Upload\Waher.Utility.Upload.csproj&quot;"/>
 
 		<Exec Command="dotnet publish -o:&quot;..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutputLinux&quot; -c:$(Configuration) -r linux-x64 --self-contained:true &quot;..\Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj&quot;"/>
+		<Exec Command="..\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutput\win-x86\Waher.Utility.Install.exe -p ..\..\IoTGateway.Linux.package -m ..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutputLinux\Waher.IoTGateway.Svc.Linux.manifest"/>
 	</Target>
 
 </Project>

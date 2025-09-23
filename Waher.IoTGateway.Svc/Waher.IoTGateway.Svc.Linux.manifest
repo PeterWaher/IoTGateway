@@ -1,33 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
-	<Assembly fileName='clretwrc.dll'/>
-	<Assembly fileName='clrgc.dll'/>
-	<Assembly fileName='clrjit.dll'/>
-	<Assembly fileName='coreclr.dll'/>
-	<Assembly fileName='createdump.exe'/>
-	<Assembly fileName='hostfxr.dll'/>
-	<Assembly fileName='hostpolicy.dll'/>
+	<Assembly fileName='createdump'/>
+	<Assembly fileName='libclrgc.so'/>
+	<Assembly fileName='libclrjit.so'/>
+	<Assembly fileName='libcoreclr.so'/>
+	<Assembly fileName='libcoreclrtraceptprovider.so'/>
+	<Assembly fileName='libhostfxr.so'/>
+	<Assembly fileName='libhostpolicy.so'/>
+	<Assembly fileName='libmscordaccore.so'/>
+	<Assembly fileName='libmscordbi.so'/>
+	<Assembly fileName='libSystem.Globalization.Native.so'/>
+	<Assembly fileName='libSystem.IO.Compression.Native.so'/>
+	<Assembly fileName='libSystem.Native.so'/>
+	<Assembly fileName='libSystem.Net.Security.Native.so'/>
+	<Assembly fileName='libSystem.Security.Cryptography.Native.OpenSsl.so'/>
 	<Assembly fileName='Microsoft.Bcl.Cryptography.dll'/>
 	<Assembly fileName='Microsoft.CodeAnalysis.CSharp.dll'/>
 	<Assembly fileName='Microsoft.CodeAnalysis.dll'/>
 	<Assembly fileName='Microsoft.CSharp.dll'/>
-	<Assembly fileName='Microsoft.DiaSymReader.Native.x86.dll'/>
 	<Assembly fileName='Microsoft.Extensions.DependencyInjection.Abstractions.dll'/>
 	<Assembly fileName='Microsoft.Extensions.Logging.Abstractions.dll'/>
 	<Assembly fileName='Microsoft.VisualBasic.Core.dll'/>
 	<Assembly fileName='Microsoft.VisualBasic.dll'/>
 	<Assembly fileName='Microsoft.Win32.Primitives.dll'/>
 	<Assembly fileName='Microsoft.Win32.Registry.dll'/>
-	<Assembly fileName='mscordaccore_x86_x86_8.0.23.53103.dll'/>
-	<Assembly fileName='mscordbi.dll'/>
 	<Assembly fileName='mscorlib.dll'/>
-	<Assembly fileName='mscorrc.dll'/>
-	<Assembly fileName='msquic.dll'/>
 	<Assembly fileName='netstandard.dll'/>
 	<Assembly fileName='WindowsBase.dll'/>
 
 	<Assembly fileName='DnsClient.dll'/>
-	<Assembly fileName='libSkiaSharp.dll'/>
 	<Assembly fileName='MongoDB.Bson.dll'/>
 	<Assembly fileName='MongoDB.Driver.dll'/>
 	<Assembly fileName='MySqlConnector.dll'/> 
@@ -86,7 +87,6 @@
 	<Assembly fileName='System.IO.Compression.Brotli.dll'/>
 	<Assembly fileName='System.IO.Compression.dll'/>
 	<Assembly fileName='System.IO.Compression.FileSystem.dll'/>
-	<Assembly fileName='System.IO.Compression.Native.dll'/>
 	<Assembly fileName='System.IO.Compression.ZipFile.dll'/>
 	<Assembly fileName='System.IO.dll'/>
 	<Assembly fileName='System.IO.FileSystem.AccessControl.dll'/>
@@ -161,10 +161,10 @@
 	<Assembly fileName='System.Runtime.Serialization.Xml.dll'/>
 	<Assembly fileName='System.Security.AccessControl.dll'/>
 	<Assembly fileName='System.Security.Claims.dll'/>
-	<Assembly fileName='System.Security.Cryptography.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Algorithms.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Cng.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Csp.dll'/>
+	<Assembly fileName='System.Security.Cryptography.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Encoding.dll'/>
 	<Assembly fileName='System.Security.Cryptography.OpenSsl.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Pkcs.dll'/>
@@ -1163,7 +1163,7 @@
 		<Content fileName='Waher.Things.Virtual.en.lng'/>
 		<Content fileName='Waher.Things.Xmpp.en.lng'/>
 	</Folder>
-	<From image="mcr.microsoft.com/dotnet/runtime:8.0"/>
+	<From image="mcr.microsoft.com/dotnet/runtime-deps:8.0"/>
 	<Volume path="/var/lib/IoT Gateway"/>
 	<Port portNumber="80" type="TCP" protocol="HTTP"/>
 	<Variable name="GATEWAY_SIMPLE_SETUP" default="false" label="true or 1 for simplified setup, false or 0 for detailed setup."/>
@@ -1277,8 +1277,12 @@
 	-->
 	<Variable name="GATEWAY_THEME_ID" default="WinterDawn" label="ID of theme to use."/>
 	<Variable name="GATEWAY_NOTIFICATION_JIDS" default="" label="IDs of operators of gateway."/>
-	<EntryPoint executable="dotnet">
-		<Argument>%Executable%</Argument>
+	<Variable name="DOTNET_EnableDiagnostics" default="0" label="If .NET diagnostics should be activated."/>
+	<Command executable="chmod">
+		<Argument>+x</Argument>
+		<Argument>/opt/IoTGateway/Waher.IoTGateway.Svc</Argument>
+	</Command>
+	<EntryPoint executable="%Executable%">
 		<Argument>-console</Argument>
 	</EntryPoint>
 </Module>

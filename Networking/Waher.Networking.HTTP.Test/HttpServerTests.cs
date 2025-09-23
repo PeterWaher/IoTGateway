@@ -273,8 +273,10 @@ namespace Waher.Networking.HTTP.Test
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli, int FileSize)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
-			if (!this.server.TryGetResource("/Test09", false, out _, out _))
-				this.server.Register(new HttpFolderResource("/Test09", "Data", true, false, true, false));
+
+			string Resource = "/Test09";
+			if (!this.server.TryGetResource(ref Resource, false, out _, out _))
+				this.server.Register(new HttpFolderResource(Resource, "Data", true, false, true, false));
 
 			StringBuilder sb = new();
 			int i = 0;

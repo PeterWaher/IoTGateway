@@ -176,7 +176,11 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Resource
 		/// </summary>
-		public string Resource => this.resource;
+		public string Resource
+		{
+			get => this.resource;
+			internal set => this.resource = value;
+		}
 
 		/// <summary>
 		/// Contains original resource part of request.

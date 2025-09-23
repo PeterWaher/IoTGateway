@@ -193,8 +193,9 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.Setup(false, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
-			if (!this.server.TryGetResource("/Test02", false, out _, out _))
-				this.server.Register(new HttpFolderResource("/Test02", "Data", true, false, true, false));
+			string Resource = "/Test02";
+			if (!this.server.TryGetResource(ref Resource, false, out _, out _))
+				this.server.Register(new HttpFolderResource(Resource, "Data", true, false, true, false));
 
 			if (!putTestJited)
 			{

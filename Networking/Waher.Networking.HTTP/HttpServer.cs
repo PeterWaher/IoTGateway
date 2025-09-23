@@ -1768,11 +1768,18 @@ namespace Waher.Networking.HTTP
 			}
 			else
 			{
-				bool Result = this.TryGetResource(RequestHeader.Resource, PermitResourceOverride,
+				string ResourcePart = RequestHeader.Resource;
+
+				bool Result = this.TryGetResource(ref ResourcePart, PermitResourceOverride,
 					out Resource, out SubPath, ref Host);
 
-				if (Host != RequestHeader.Host)
-					RequestHeader.Host = Host;
+				if (ResourcePart != RequestHeader.Resource)
+				{
+					RequestHeader.Resource = ResourcePart;
+
+					if (Host != RequestHeader.Host)
+						RequestHeader.Host = Host;
+				}
 
 				return Result;
 			}
@@ -1781,40 +1788,43 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Tries to get a resource from the server.
 		/// </summary>
-		/// <param name="ResourceName">Full resource name.</param>
+		/// <param name="ResourceName">Full resource name. The resource name can be changed.
+		/// Absolute path resources will be converted to origin resources.</param>
 		/// <param name="Resource">Resource matching the full resource name.</param>
 		/// <param name="SubPath">Trailing end of full resource name, relative to the best resource that was found.</param>
 		/// <returns>If a resource was found matching the full resource name.</returns>
-		public bool TryGetResource(string ResourceName, out HttpResource Resource, out string SubPath)
+		public bool TryGetResource(ref string ResourceName, out HttpResource Resource, out string SubPath)
 		{
 			HttpFieldHost Host = null;
-			return this.TryGetResource(ResourceName, true, out Resource, out SubPath, ref Host);
+			return this.TryGetResource(ref ResourceName, true, out Resource, out SubPath, ref Host);
 		}
 
 		/// <summary>
 		/// Tries to get a resource from the server.
 		/// </summary>
-		/// <param name="ResourceName">Full resource name.</param>
+		/// <param name="ResourceName">Full resource name. The resource name can be changed.
+		/// Absolute path resources will be converted to origin resources.</param>
 		/// <param name="PermitResourceOverride">If resource overrides should be considered.</param>
 		/// <param name="Resource">Resource matching the full resource name.</param>
 		/// <param name="SubPath">Trailing end of full resource name, relative to the best resource that was found.</param>
 		/// <returns>If a resource was found matching the full resource name.</returns>
-		public bool TryGetResource(string ResourceName, bool PermitResourceOverride, out HttpResource Resource, out string SubPath)
+		public bool TryGetResource(ref string ResourceName, bool PermitResourceOverride, out HttpResource Resource, out string SubPath)
 		{
 			HttpFieldHost Host = null;
-			return this.TryGetResource(ResourceName, PermitResourceOverride, out Resource, out SubPath, ref Host);
+			return this.TryGetResource(ref ResourceName, PermitResourceOverride, out Resource, out SubPath, ref Host);
 		}
 
 		/// <summary>
 		/// Tries to get a resource from the server.
 		/// </summary>
-		/// <param name="ResourceName">Full resource name.</param>
+		/// <param name="ResourceName">Full resource name. The resource name can be changed.
+		/// Absolute path resources will be converted to origin resources.</param>
 		/// <param name="PermitResourceOverride">If resource overrides should be considered.</param>
 		/// <param name="Resource">Resource matching the full resource name.</param>
 		/// <param name="SubPath">Trailing end of full resource name, relative to the best resource that was found.</param>
 		/// <param name="HostHeader">Host header reference.</param>
 		/// <returns>If a resource was found matching the full resource name.</returns>
-		public bool TryGetResource(string ResourceName, bool PermitResourceOverride,
+		public bool TryGetResource(ref string ResourceName, bool PermitResourceOverride,
 			out HttpResource Resource, out string SubPath, ref HttpFieldHost HostHeader)
 		{
 			int i;
@@ -2284,7 +2294,7 @@ namespace Waher.Networking.HTTP
 
 			if (NetworkingModule.Stopping)
 				return new Tuple<int, string, byte[]>(ServiceUnavailableException.Code, ServiceUnavailableException.StatusMessage, null);
-			else if (this.TryGetResource(ResourceName, true, out HttpResource Resource, out string SubPath) &&
+			else if (this.TryGetResource(ref ResourceName, true, out HttpResource Resource, out string SubPath) &&
 				Resource is IHttpGetMethod GetMethod)
 			{
 				using (MemoryStream ms = new MemoryStream())
@@ -2337,7 +2347,7 @@ namespace Waher.Networking.HTTP
 			if (i >= 0)
 				ResourceName = ResourceName.Substring(0, i);
 
-			if (this.TryGetResource(ResourceName, false, out HttpResource Resource, out string SubPath) &&
+			if (this.TryGetResource(ref ResourceName, false, out HttpResource Resource, out string SubPath) &&
 				Resource is HttpFolderResource Folder)
 			{
 				this.vanityResources.CheckVanityResource(ref SubPath);

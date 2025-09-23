@@ -1719,14 +1719,7 @@ namespace Waher.Networking.HTTP
 		/// <returns>If a resource was found matching the full resource name.</returns>
 		public bool TryGetResource(HttpRequest Request, out HttpResource Resource, out string SubPath)
 		{
-			if (this.hasProxyDomains && this.TryGetDomainProxy(Request.Host, out HttpReverseProxyResource DomainProxy))
-			{
-				Resource = DomainProxy;
-				SubPath = Request.SubPath;
-				return true;
-			}
-			else
-				return this.TryGetResource(Request.Header.Resource, true, out Resource, out SubPath);
+			return this.TryGetResource(Request.Header, true, out Resource, out SubPath);
 		}
 
 		/// <summary>
@@ -1739,14 +1732,7 @@ namespace Waher.Networking.HTTP
 		/// <returns>If a resource was found matching the full resource name.</returns>
 		public bool TryGetResource(HttpRequest Request, bool PermitResourceOverride, out HttpResource Resource, out string SubPath)
 		{
-			if (this.hasProxyDomains && this.TryGetDomainProxy(Request.Host, out HttpReverseProxyResource DomainProxy))
-			{
-				Resource = DomainProxy;
-				SubPath = Request.Header.Resource;
-				return true;
-			}
-			else
-				return this.TryGetResource(Request.Header.Resource, PermitResourceOverride, out Resource, out SubPath);
+			return this.TryGetResource(Request.Header, PermitResourceOverride, out Resource, out SubPath);
 		}
 
 		/// <summary>
@@ -1758,15 +1744,7 @@ namespace Waher.Networking.HTTP
 		/// <returns>If a resource was found matching the full resource name.</returns>
 		public bool TryGetResource(HttpRequestHeader RequestHeader, out HttpResource Resource, out string SubPath)
 		{
-			if (this.hasProxyDomains && !(RequestHeader.Host is null) &&
-				this.TryGetDomainProxy(RequestHeader.Host.Value, out HttpReverseProxyResource DomainProxy))
-			{
-				Resource = DomainProxy;
-				SubPath = RequestHeader.ResourcePart;
-				return true;
-			}
-			else
-				return this.TryGetResource(RequestHeader.Resource, true, out Resource, out SubPath);
+			return this.TryGetResource(RequestHeader, true, out Resource, out SubPath);
 		}
 
 		/// <summary>
@@ -1779,15 +1757,25 @@ namespace Waher.Networking.HTTP
 		/// <returns>If a resource was found matching the full resource name.</returns>
 		public bool TryGetResource(HttpRequestHeader RequestHeader, bool PermitResourceOverride, out HttpResource Resource, out string SubPath)
 		{
-			if (this.hasProxyDomains && !(RequestHeader.Host is null) &&
-				this.TryGetDomainProxy(RequestHeader.Host.Value, out HttpReverseProxyResource DomainProxy))
+			HttpFieldHost Host = RequestHeader.Host;
+
+			if (this.hasProxyDomains && !(Host is null) &&
+				this.TryGetDomainProxy(Host.Value, out HttpReverseProxyResource DomainProxy))
 			{
 				Resource = DomainProxy;
 				SubPath = RequestHeader.ResourcePart;
 				return true;
 			}
 			else
-				return this.TryGetResource(RequestHeader.Resource, PermitResourceOverride, out Resource, out SubPath);
+			{
+				bool Result = this.TryGetResource(RequestHeader.Resource, PermitResourceOverride,
+					out Resource, out SubPath, ref Host);
+
+				if (Host != RequestHeader.Host)
+					RequestHeader.Host = Host;
+
+				return Result;
+			}
 		}
 
 		/// <summary>
@@ -1799,7 +1787,8 @@ namespace Waher.Networking.HTTP
 		/// <returns>If a resource was found matching the full resource name.</returns>
 		public bool TryGetResource(string ResourceName, out HttpResource Resource, out string SubPath)
 		{
-			return this.TryGetResource(ResourceName, true, out Resource, out SubPath);
+			HttpFieldHost Host = null;
+			return this.TryGetResource(ResourceName, true, out Resource, out SubPath, ref Host);
 		}
 
 		/// <summary>
@@ -1812,12 +1801,56 @@ namespace Waher.Networking.HTTP
 		/// <returns>If a resource was found matching the full resource name.</returns>
 		public bool TryGetResource(string ResourceName, bool PermitResourceOverride, out HttpResource Resource, out string SubPath)
 		{
+			HttpFieldHost Host = null;
+			return this.TryGetResource(ResourceName, PermitResourceOverride, out Resource, out SubPath, ref Host);
+		}
+
+		/// <summary>
+		/// Tries to get a resource from the server.
+		/// </summary>
+		/// <param name="ResourceName">Full resource name.</param>
+		/// <param name="PermitResourceOverride">If resource overrides should be considered.</param>
+		/// <param name="Resource">Resource matching the full resource name.</param>
+		/// <param name="SubPath">Trailing end of full resource name, relative to the best resource that was found.</param>
+		/// <param name="HostHeader">Host header reference.</param>
+		/// <returns>If a resource was found matching the full resource name.</returns>
+		public bool TryGetResource(string ResourceName, bool PermitResourceOverride,
+			out HttpResource Resource, out string SubPath, ref HttpFieldHost HostHeader)
+		{
 			int i;
 
 			if (PermitResourceOverride && !string.IsNullOrEmpty(this.resourceOverride))
 			{
 				if (this.resourceOverrideFilter is null || this.resourceOverrideFilter.IsMatch(ResourceName))
 					ResourceName = this.resourceOverride;
+			}
+			else
+			{
+				if (!string.IsNullOrEmpty(ResourceName) &&
+					ResourceName[0] != '/' &&
+					ResourceName.StartsWith("http") &&
+					(i = ResourceName.IndexOf(':')) > 0 &&
+					ResourceName.Length > i + 2 &&
+					ResourceName[i + 1] == '/' &&
+					ResourceName[i + 2] == '/') // Absolute form, RFC 7230, §5.3.2.
+				{
+					int j = ResourceName.IndexOf('/', i + 3);
+					if (j > 0)
+					{
+						string Authority = ResourceName.Substring(i + 3, j - (i + 3));
+
+						if (HostHeader is null)
+							HostHeader = new HttpFieldHost("Host", Authority);
+						else if (HostHeader.Value != Authority)
+						{
+							Resource = null;
+							SubPath = null;
+							return false;
+						}
+
+						ResourceName = ResourceName.Substring(j);
+					}
+				}
 			}
 
 			SubPath = string.Empty;

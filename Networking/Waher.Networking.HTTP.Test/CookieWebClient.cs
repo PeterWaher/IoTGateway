@@ -49,9 +49,14 @@ namespace Waher.Networking.HTTP.Test
 			set => this.credentials = value;
 		}
 
-		public async Task<byte[]> DownloadData(string Url)
+		public Task<byte[]> DownloadData(string Url)
 		{
-			using HttpClient Client = this.GetClient();
+			return this.DownloadData(Url, false);
+		}
+
+		public async Task<byte[]> DownloadData(string Url, bool AbsoluteForm)
+		{
+			using HttpClient Client = this.GetClient(AbsoluteForm);
 			HttpRequestMessage Request = this.GetRequest(HttpMethod.Get, Url);
 			HttpResponseMessage Response = await Client.SendAsync(Request);
 			Response.EnsureSuccessStatusCode();
@@ -59,6 +64,11 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		private HttpClient GetClient()
+		{
+			return this.GetClient(false);
+		}
+
+		private HttpClient GetClient(bool AbsoluteForm)
 		{
 			SocketsHttpHandler Handler = new()
 			{
@@ -74,6 +84,12 @@ namespace Waher.Networking.HTTP.Test
 					RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
 				}
 			};
+
+			if (AbsoluteForm)
+			{
+				Handler.Proxy = new WebProxy("http://localhost:8081");
+				Handler.UseProxy = true;
+			}
 
 			HttpClient Client = new(Handler)
 			{

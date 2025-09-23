@@ -1125,5 +1125,26 @@ namespace Waher.Networking.HTTP.Test
 			string s = Encoding.UTF8.GetString(Data);
 			Assert.AreEqual("hej på dej", s);
 		}
+
+		[DataTestMethod]
+		[DataRow("HTTP_01_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_01_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_01_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_01_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_01_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_01_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_01_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_01_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_34_Absolute_Form(string SnifferFileName, bool NoRfc7540Priorities,
+			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
+		{
+			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.server.Register("/test01.txt", (req, resp) => resp.Return("hej på dej"));
+
+			using CookieWebClient Client = new(this.ProtocolVersion);
+			byte[] Data = await Client.DownloadData("http://localhost:8081/test01.txt", true);
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("hej på dej", s);
+		}
 	}
 }

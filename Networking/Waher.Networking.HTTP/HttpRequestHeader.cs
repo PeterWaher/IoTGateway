@@ -332,7 +332,11 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Host HTTP Field header. (RFC 2616, §14.23)
 		/// </summary>
-		public HttpFieldHost Host => this.host;
+		public HttpFieldHost Host
+		{
+			get => this.host;
+			internal set => this.host = value;
+		}
 
 		/// <summary>
 		/// If-Match HTTP Field header. (RFC 2616, §14.24)

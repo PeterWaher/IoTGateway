@@ -36,7 +36,6 @@
 	<Assembly fileName='SharpCompress.dll'/> 
 	<Assembly fileName='SkiaSharp.dll'/>
 	<Assembly fileName='Snappier.dll'/>
-	<Assembly fileName='sni.dll'/>
 	<Assembly fileName='ZstdSharp.dll'/>
 
 	<Assembly fileName='System.AppContext.dll'/>
@@ -66,7 +65,6 @@
 	<Assembly fileName='System.Diagnostics.Debug.dll'/>
 	<Assembly fileName='System.Diagnostics.DiagnosticSource.dll'/>
 	<Assembly fileName='System.Diagnostics.EventLog.dll'/>
-	<Assembly fileName='System.Diagnostics.EventLog.Messages.dll'/>
 	<Assembly fileName='System.Diagnostics.FileVersionInfo.dll'/>
 	<Assembly fileName='System.Diagnostics.PerformanceCounter.dll'/>
 	<Assembly fileName='System.Diagnostics.Process.dll'/>
@@ -321,7 +319,7 @@
 	<Assembly fileName="Waher.IoTGateway.Resources.xml" />
 	<Assembly fileName="Waher.IoTGateway.Svc.deps.json" />
 	<Assembly fileName="Waher.IoTGateway.Svc.dll" />
-	<Assembly fileName="Waher.IoTGateway.Svc.exe" />
+	<Assembly fileName="Waher.IoTGateway.Svc" />
 	<Assembly fileName="Waher.IoTGateway.Svc.manifest" />
 	<Assembly fileName="Waher.IoTGateway.Svc.pdb" />
 	<Assembly fileName="Waher.IoTGateway.Svc.runtimeconfig.json" />
@@ -666,75 +664,75 @@
 	<Assembly fileName="Waher.WebService.Sparql.dll" />
 	<Assembly fileName="Waher.WebService.Sparql.pdb" />
 	<Assembly fileName="Waher.WebService.Sparql.xml" />
-	<Assembly fileName='Waher.Utility.AnalyzeClock.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.AnalyzeClock.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.AnalyzeClock.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.AnalyzeClock.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.AnalyzeDB.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.AnalyzeDB.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.AnalyzeDB.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.AnalyzeDB.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Asn1ToCSharp.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Asn1ToCSharp.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Asn1ToCSharp.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Asn1ToCSharp.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Csp.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Csp\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Csp.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Csp\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Csp.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Csp\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Csp.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Csp\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.DeleteDB.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.DeleteDB\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.DeleteDB.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.DeleteDB\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.DeleteDB.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.DeleteDB\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.DeleteDB.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.DeleteDB\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.ExStat.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.ExStat.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.ExStat.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.ExStat.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Extract.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Extract\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Extract.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Extract\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Extract.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Extract\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Extract.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Extract\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.GenManifest.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.GenManifest\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.GenManifest.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.GenManifest\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.GenManifest.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.GenManifest\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.GenManifest.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.GenManifest\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Install.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Install.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Install.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Install.manifest' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Install.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Markdown.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Markdown\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Markdown.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Markdown\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Markdown.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Markdown\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Markdown.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Markdown\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.RegEx.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.RegEx.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.RegEx.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.RegEx.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.RunScript.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.RunScript\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.RunScript.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.RunScript\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.RunScript.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RunScript\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.RunScript.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RunScript\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Sign.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Sign.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Sign.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Sign.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.TextDiff.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.TextDiff\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.TextDiff.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.TextDiff\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.TextDiff.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.TextDiff\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.TextDiff.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.TextDiff\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Transform.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Transform.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Transform.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Transform.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Translate.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Translate\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Translate.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Translate\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Translate.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Translate\bin\Release\PublishOutputLinux\win-x86\'/>
-  <Assembly fileName='Waher.Utility.Translate.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Translate\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Upload.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Upload\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Upload.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Upload\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Upload.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Upload\bin\Release\PublishOutputLinux\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Upload.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Upload\bin\Release\PublishOutputLinux\win-x86\'/>
+	<Assembly fileName='Waher.Utility.AnalyzeClock' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.AnalyzeClock.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.AnalyzeClock.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.AnalyzeClock.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.AnalyzeDB' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.AnalyzeDB.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.AnalyzeDB.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.AnalyzeDB.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeDB\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Asn1ToCSharp' altFolder='..\..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Asn1ToCSharp.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Asn1ToCSharp.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Asn1ToCSharp.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Csp' altFolder='..\..\..\..\Utilities\Waher.Utility.Csp\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Csp.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Csp\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Csp.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Csp\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Csp.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Csp\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.DeleteDB' altFolder='..\..\..\..\Utilities\Waher.Utility.DeleteDB\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.DeleteDB.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.DeleteDB\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.DeleteDB.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.DeleteDB\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.DeleteDB.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.DeleteDB\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.ExStat' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.ExStat.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.ExStat.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.ExStat.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.Extract' altFolder='..\..\..\..\Utilities\Waher.Utility.Extract\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.Extract.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Extract\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.Extract.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Extract\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.Extract.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Extract\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.GenManifest' altFolder='..\..\..\..\Utilities\Waher.Utility.GenManifest\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.GenManifest.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.GenManifest\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.GenManifest.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.GenManifest\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.GenManifest.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.GenManifest\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.Install' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Install.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Install.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Install.manifest' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Install.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Markdown' altFolder='..\..\..\..\Utilities\Waher.Utility.Markdown\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Markdown.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Markdown\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Markdown.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Markdown\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Markdown.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Markdown\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.RegEx' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.RegEx.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.RegEx.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.RegEx.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.RunScript' altFolder='..\..\..\..\Utilities\Waher.Utility.RunScript\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.RunScript.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.RunScript\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.RunScript.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RunScript\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.RunScript.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RunScript\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.Sign' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Sign.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Sign.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Sign.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.TextDiff' altFolder='..\..\..\..\Utilities\Waher.Utility.TextDiff\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.TextDiff.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.TextDiff\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.TextDiff.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.TextDiff\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.TextDiff.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.TextDiff\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Transform' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.Transform.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.Transform.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.Transform.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.Translate' altFolder='..\..\..\..\Utilities\Waher.Utility.Translate\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Translate.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Translate\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Translate.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Translate\bin\Release\PublishOutputLinux\linux-x64\'/>
+  <Assembly fileName='Waher.Utility.Translate.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Translate\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Upload' altFolder='..\..\..\..\Utilities\Waher.Utility.Upload\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Upload.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Upload\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Upload.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Upload\bin\Release\PublishOutputLinux\linux-x64\'/>
+	<Assembly fileName='Waher.Utility.Upload.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Upload\bin\Release\PublishOutputLinux\linux-x64\'/>
 	<!-- Content files merged from Waher.IoTGateway and Waher.IoTGateway.Resources, as well as built-in themes and module language files. -->
   <Folder name="Default">
 		<Content fileName="400.md"/>

@@ -331,7 +331,6 @@ namespace Waher.Networking.HTTP
 									throw new RangeNotSatisfiableException();
 								else
 								{
-									Response.OnlyHeader = Method == "HEAD";
 									Response.StatusCode = 206;
 									Response.StatusMessage = "Partial Content";
 
@@ -340,8 +339,6 @@ namespace Waher.Networking.HTTP
 							}
 							else
 							{
-								Response.OnlyHeader = Method == "HEAD";
-
 								if (!(this.get is null))
 									await this.get.GET(Request, Response);
 								else
@@ -349,10 +346,7 @@ namespace Waher.Networking.HTTP
 							}
 						}
 						else if (!(this.get is null))
-						{
-							Response.OnlyHeader = Method == "HEAD";
 							await this.get.GET(Request, Response);
-						}
 						else
 							throw new MethodNotAllowedException(this.allowedMethods, Request);
 						break;

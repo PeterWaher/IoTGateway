@@ -6,7 +6,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Binary;
-using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.HTTP2;
 using Waher.Runtime.IO;

@@ -5401,7 +5401,7 @@ namespace Waher.IoTGateway
 		/// <returns>If a script resource with the given resource name was found and removed.</returns>
 		private static async Task<bool> RemoveScriptResource(string ResourceName, bool ConsiderNonexistantRemoved)
 		{
-			if (!webServer.TryGetResource(ResourceName, false, out HttpResource Resource, out string SubPath))
+			if (!webServer.TryGetResource(ref ResourceName, false, out HttpResource Resource, out string SubPath))
 				return false;
 
 			if (!string.IsNullOrEmpty(SubPath))

@@ -10,9 +10,11 @@ using Waher.Events;
 using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.HTTP2;
+using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
+using Waher.Script.Functions.Runtime;
 
 namespace Waher.Networking.HTTP
 {
@@ -29,6 +31,7 @@ namespace Waher.Networking.HTTP
 		private List<string> challenges = null;
 		private readonly Encoding encoding = Encoding.UTF8;
 		private readonly Http2Stream http2Stream;
+		private readonly bool onlyHeader = false;
 		private bool encodingUsed = false;
 		private DateTimeOffset date = DateTimeOffset.UtcNow;
 		private DateTimeOffset? expires = null;
@@ -42,7 +45,6 @@ namespace Waher.Networking.HTTP
 		private int statusCode = 200;
 		private bool responseSent = false;
 		private bool disposed = false;
-		private bool onlyHeader = false;
 		private bool closeAfterResponse = false;
 		private bool txText = false;
 
@@ -63,6 +65,7 @@ namespace Waher.Networking.HTTP
 			this.httpServer = null;
 			this.httpRequest = null;
 			this.http2Stream = null;
+			this.onlyHeader = false;
 		}
 
 		/// <summary>
@@ -79,6 +82,7 @@ namespace Waher.Networking.HTTP
 			this.httpServer = HttpServer;
 			this.httpRequest = Request;
 			this.http2Stream = Request?.Http2Stream;
+			this.onlyHeader = Request?.Header?.Method == "HEAD";
 
 			if (!(Request is null))
 			{
@@ -106,6 +110,7 @@ namespace Waher.Networking.HTTP
 			this.httpServer = HttpServer;
 			this.httpRequest = Request;
 			this.http2Stream = Request?.Http2Stream;
+			this.onlyHeader = Request?.Header?.Method == "HEAD";
 
 			if (!(Request is null))
 				Request.Response = this;
@@ -230,15 +235,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If only the header is of interest.
 		/// </summary>
-		public bool OnlyHeader
-		{
-			get => this.onlyHeader;
-			internal set
-			{
-				this.AssertHeaderOpen();
-				this.onlyHeader = value;
-			}
-		}
+		public bool OnlyHeader => this.onlyHeader;
 
 		/// <summary>
 		/// Optional progress reporting of encoding/decoding. Can be null.

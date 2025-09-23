@@ -48,15 +48,17 @@ namespace Waher.IoTGateway.Console
                             i++;
                             if (i >= c)
                             {
+								ConsoleOut.WriteLine("Missing instance name.");
                                 Error = true;
-                                break;
+								break;
                             }
 
                             InstanceName = args[i];
                             break;
 
                         default:
-                            Error = true;
+							ConsoleOut.WriteLine("Unrecognized argument: " + Arg);
+							Error = true;
                             break;
                     }
                 }

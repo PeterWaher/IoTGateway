@@ -205,6 +205,7 @@ namespace Waher.IoTGateway.Svc
 							i++;
 							if (i >= c)
 							{
+								ConsoleOut.WriteLine("Missing display name.");
 								Error = true;
 								break;
 							}
@@ -216,6 +217,7 @@ namespace Waher.IoTGateway.Svc
 							i++;
 							if (i >= c)
 							{
+								ConsoleOut.WriteLine("Missing description.");
 								Error = true;
 								break;
 							}
@@ -227,12 +229,14 @@ namespace Waher.IoTGateway.Svc
 							i++;
 							if (i >= c)
 							{
+								ConsoleOut.WriteLine("Missing start option.");
 								Error = true;
 								break;
 							}
 
 							if (!Enum.TryParse(args[i], out StartType))
 							{
+								ConsoleOut.WriteLine("Unrecognized start option: " + args[i]);
 								Error = true;
 								break;
 							}
@@ -254,6 +258,7 @@ namespace Waher.IoTGateway.Svc
 							i++;
 							if (i >= c)
 							{
+								ConsoleOut.WriteLine("Missing instance name.");
 								Error = true;
 								break;
 							}
@@ -262,6 +267,7 @@ namespace Waher.IoTGateway.Svc
 							break;
 
 						default:
+							ConsoleOut.WriteLine("Unrecognized argument: " + Arg);
 							Error = true;
 							break;
 					}
@@ -315,6 +321,10 @@ namespace Waher.IoTGateway.Svc
 						{
 							Log.Exception(ex);
 						}
+						break;
+
+					default:
+						AsConsole = true;
 						break;
 				}
 

@@ -57,6 +57,7 @@ namespace Waher.IoTGateway.Setup
 		{
 			"Waher.Service.IoTBroker.Legal.MFA.QuickLogin",
 			"Waher.Service.IoTBroker.Marketplace.MarketplaceProcessor",
+			"Waher.Service.IoTBroker.WebServices.Agent.Account.RemoteQuickLogin",
 			"Waher.Service.Abc4Io.Model.Actions.Contract.SignContract",
 			ApplyLegalIdentityRegex,
 			ApplyIdRegex,

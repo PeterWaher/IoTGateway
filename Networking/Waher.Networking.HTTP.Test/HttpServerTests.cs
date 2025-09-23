@@ -1138,6 +1138,9 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_34_Absolute_Form(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
+			if (this.ProtocolVersion == HttpVersion.Version20)
+				Assert.Inconclusive("WebProxy does not support HTTP/2");
+
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register("/test01.txt", (req, resp) => resp.Return("hej på dej"));
 

@@ -96,7 +96,9 @@ namespace Waher.Utility.Install
 				LinkedList<KeyValuePair<string, string>> Packages = new();
 				List<string> ManifestFiles = new();
 				string ProgramDataFolder = null;
+				string AlternativeDataFolder = null;
 				string ServerApplication = null;
+				string AppFolder = null;
 				string PackageFile = null;
 				string DockerFile = null;
 				string Key = string.Empty;
@@ -135,12 +137,25 @@ namespace Waher.Utility.Install
 								throw new Exception("Only one program data folder allowed.");
 							break;
 
+						case "-a":
+							if (i >= c)
+								throw new Exception("Missing alternative data folder.");
+
+							if (string.IsNullOrEmpty(AlternativeDataFolder))
+								AlternativeDataFolder = args[i++];
+							else
+								throw new Exception("Only one alternative data folder allowed.");
+							break;
+
 						case "-s":
 							if (i >= c)
 								throw new Exception("Missing server application.");
 
 							if (string.IsNullOrEmpty(ServerApplication))
+							{
 								ServerApplication = args[i++];
+								AppFolder = Path.GetDirectoryName(ServerApplication);
+							}
 							else
 								throw new Exception("Only one server application allowed.");
 							break;
@@ -273,6 +288,9 @@ namespace Waher.Utility.Install
 					ConsoleOut.WriteLine("                     be used instead.");
 					ConsoleOut.WriteLine("-d APP_DATA_FOLDER   Points to the application data folder. Required if");
 					ConsoleOut.WriteLine("                     installing a module.");
+					ConsoleOut.WriteLine("-a ALT_DATA_FOLDER   Points to an alternative data folder where files will be copied.");
+					ConsoleOut.WriteLine("                     If not provided, it will default to the application folder");
+					ConsoleOut.WriteLine("                     where the server executable is stored.");
 					ConsoleOut.WriteLine("-s SERVER_EXE        Points to the executable file of the IoT Gateway. Required");
 					ConsoleOut.WriteLine("                     if installing a module.");
 					ConsoleOut.WriteLine("-k KEY               Encryption key used for the package file. Secret used in");
@@ -284,7 +302,10 @@ namespace Waher.Utility.Install
 					ConsoleOut.WriteLine("                     file will be generated. the -d switch specifies a folder within");
 					ConsoleOut.WriteLine("                     the Docker image where content files will be copied. The -s");
 					ConsoleOut.WriteLine("                     switch specifies a full path of the server executable within");
-					ConsoleOut.WriteLine("                     the Docker image.");
+					ConsoleOut.WriteLine("                     the Docker image. The -a switch must be used to specify an");
+					ConsoleOut.WriteLine("                     alternative data folder to which files will be copied. From");
+					ConsoleOut.WriteLine("                     that folder, only the newer files will be copied to the data");
+					ConsoleOut.WriteLine("                     folder.");
 					ConsoleOut.WriteLine("-v                   Verbose mode.");
 					ConsoleOut.WriteLine("-i                   Install. This the default. Switch not required.");
 					ConsoleOut.WriteLine("-u                   Uninstall. Add this switch if the module is being uninstalled.");
@@ -313,6 +334,14 @@ namespace Waher.Utility.Install
 
 				Types.Initialize(typeof(Program).Assembly,
 					typeof(JSON).Assembly);
+
+				if (string.IsNullOrEmpty(AlternativeDataFolder))
+				{
+					if (!string.IsNullOrEmpty(DockerFile))
+						throw new Exception("Alternative Data Folder must be specified when generating docker files.");
+
+					AlternativeDataFolder = Path.GetDirectoryName(ServerApplication);
+				}
 
 				if (string.IsNullOrEmpty(DockerFile))
 				{
@@ -404,9 +433,15 @@ namespace Waher.Utility.Install
 					if (string.IsNullOrEmpty(ServerApplication))
 						throw new Exception("Missing server application.");
 
-					string AppFolder = Path.GetDirectoryName(ServerApplication).Replace(Path.DirectorySeparatorChar, '/');
+					AppFolder = AppFolder.Replace(Path.DirectorySeparatorChar, '/');
 					if (!AppFolder.EndsWith('/'))
 						AppFolder += "/";
+
+					if (string.IsNullOrEmpty(AlternativeDataFolder))
+						throw new Exception("Alternative data folder not specified.");
+
+					if (!AlternativeDataFolder.EndsWith('/'))
+						AlternativeDataFolder += "/";
 
 					Dictionary<string, bool> Froms = [];
 					Dictionary<string, bool> Volumes = [];
@@ -515,7 +550,7 @@ namespace Waher.Utility.Install
 					foreach (KeyValuePair<int, string> P in TcpPorts)
 					{
 						DockerOutput.WriteLine("# " + P.Value);
-						DockerOutput.WriteLine("EXPOSE " + P.Key.ToString()+"/tcp");
+						DockerOutput.WriteLine("EXPOSE " + P.Key.ToString() + "/tcp");
 						DockerOutput.WriteLine();
 					}
 
@@ -539,8 +574,8 @@ namespace Waher.Utility.Install
 
 					foreach (string ManifestFile in ManifestFiles)
 					{
-						PrepareDockerCopyInstructions(ManifestFile, FilesPerDestinationFolder, 
-							ProgramDataFolder, AppFolder, DockerFileFolder, ContentOnly, ExcludeCategories);
+						PrepareDockerCopyInstructions(ManifestFile, FilesPerDestinationFolder,
+							AlternativeDataFolder, AppFolder, DockerFileFolder, ContentOnly, ExcludeCategories);
 					}
 
 					foreach (KeyValuePair<string, ChunkedList<string>> CopyInstructions in FilesPerDestinationFolder)
@@ -562,17 +597,30 @@ namespace Waher.Utility.Install
 						DockerOutput.WriteLine();
 					}
 
+					if (AlternativeDataFolder != ProgramDataFolder)
+					{
+						WriteCommand(DockerOutput, "RUN", "cp", new string[]
+						{
+							"-ru", AlternativeDataFolder + ".", ProgramDataFolder
+						}, AppFolder, ServerApplication, ProgramDataFolder, AlternativeDataFolder);
+
+						WriteCommand(DockerOutput, "RUN", "rm", new string[]
+						{
+							"-rf", AlternativeDataFolder
+						}, AppFolder, ServerApplication, ProgramDataFolder, AlternativeDataFolder);
+					}
+
 					foreach (KeyValuePair<string, string[]> Command in Commands)
 					{
 						WriteCommand(DockerOutput, "RUN", Command.Key, Command.Value,
-							AppFolder, ServerApplication, ProgramDataFolder);
+							AppFolder, ServerApplication, ProgramDataFolder, AlternativeDataFolder);
 					}
 
 					if (EntryPoint.HasValue)
 					{
 						WriteCommand(DockerOutput, "ENTRYPOINT", EntryPoint.Value.Key,
-							EntryPoint.Value.Value, AppFolder, ServerApplication, 
-							ProgramDataFolder);
+							EntryPoint.Value.Value, AppFolder, ServerApplication,
+							ProgramDataFolder, AlternativeDataFolder);
 					}
 
 					DockerOutput.Flush();
@@ -599,7 +647,7 @@ namespace Waher.Utility.Install
 
 		private static void WriteCommand(StreamWriter DockerOutput, string DockerCommand,
 			string Command, string[] Arguments, string AppFolder, string ServerApplication,
-			string ProgramDataFolder)
+			string ProgramDataFolder, string AlternativeDataFolder)
 		{
 			DockerOutput.Write(DockerCommand);
 			DockerOutput.Write(" [\"");
@@ -607,6 +655,7 @@ namespace Waher.Utility.Install
 				Replace("%AppFolder%", AppFolder).
 				Replace("%Executable%", ServerApplication).
 				Replace("%DataFolder%", ProgramDataFolder).
+				Replace("%AlternativeFolder%", AlternativeDataFolder).
 				Replace("\"", "\\\""));
 			DockerOutput.Write('"');
 
@@ -617,6 +666,7 @@ namespace Waher.Utility.Install
 					Replace("%AppFolder%", AppFolder).
 					Replace("%Executable%", ServerApplication).
 					Replace("%DataFolder%", ProgramDataFolder).
+					Replace("%AlternativeFolder%", AlternativeDataFolder).
 					Replace("\"", "\\\""));
 				DockerOutput.Write('"');
 			}
@@ -1677,7 +1727,7 @@ namespace Waher.Utility.Install
 
 						SpecialFolder SpecialFolder = Enum.Parse<SpecialFolder>(SpecialFolderName);
 						ExternalFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder), FolderName);
-						
+
 						if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !Directory.Exists(ExternalFolder))
 							ExternalFolder = ExternalFolder.Replace("/usr/share", "/usr/local/share");
 						else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && !Directory.Exists(ExternalFolder))
@@ -2190,9 +2240,9 @@ namespace Waher.Utility.Install
 		/// <param name="DockerFileFolder">Folder containing Dockerfile.</param>
 		/// <param name="ContentOnly">If only content files should be copied.</param>
 		/// <param name="ExcludeCategories">Any categories that should be exluded.</param>
-		public static void PrepareDockerCopyInstructions(string ManifestFile, 
-			Dictionary<string, ChunkedList<string>> FilesPerDestinationFolder, 
-			string ProgramDataFolder, string AppFolder, string DockerFileFolder, 
+		public static void PrepareDockerCopyInstructions(string ManifestFile,
+			Dictionary<string, ChunkedList<string>> FilesPerDestinationFolder,
+			string ProgramDataFolder, string AppFolder, string DockerFileFolder,
 			bool ContentOnly, Dictionary<string, bool> ExcludeCategories)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
@@ -2261,7 +2311,7 @@ namespace Waher.Utility.Install
 		}
 
 		private static void PrepareCopyContent(string SourceFolder, string AppFolder, string DataFolder,
-			string DockerFileFolder, XmlElement Parent, Dictionary<string, ChunkedList<string>> FilesPerDestinationFolder, 
+			string DockerFileFolder, XmlElement Parent, Dictionary<string, ChunkedList<string>> FilesPerDestinationFolder,
 			Dictionary<string, bool> ExcludeCategories)
 		{
 			foreach (XmlNode N in Parent.ChildNodes)

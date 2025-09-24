@@ -630,7 +630,9 @@ namespace Waher.Utility.Install
 		public static AssemblyName GetAssemblyName(string ServerApplication)
 		{
 			if (ServerApplication.EndsWith(".exe", StringComparison.CurrentCultureIgnoreCase))
-				ServerApplication = ServerApplication[0..^4] + ".dll";
+				ServerApplication = ServerApplication[0..^4];
+
+			ServerApplication += ".dll";
 
 			return AssemblyName.GetAssemblyName(ServerApplication);
 		}
@@ -646,6 +648,19 @@ namespace Waher.Utility.Install
 			string Category = E.GetAttribute("category");
 
 			return ExcludeCategories.ContainsKey(Category);
+		}
+
+		private static string GetDepsJsonFileName(string ServerApplication)
+		{
+			string DepsJsonFileName = ServerApplication;
+
+			if (DepsJsonFileName.EndsWith(".exe", StringComparison.CurrentCultureIgnoreCase) ||
+				DepsJsonFileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+			{
+				DepsJsonFileName = DepsJsonFileName[0..^4];
+			}
+
+			return DepsJsonFileName + ".deps.json";
 		}
 
 		public static void Install(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool ContentOnly,
@@ -689,14 +704,7 @@ namespace Waher.Utility.Install
 				ServerName = GetAssemblyName(ServerApplication);
 				Log.Informational("Server assembly name: " + ServerName.ToString());
 
-				int i = ServerApplication.LastIndexOf('.');
-				if (i < 0)
-					DepsJsonFileName = ServerApplication;
-				else
-					DepsJsonFileName = ServerApplication[..i];
-
-				DepsJsonFileName += ".deps.json";
-
+				DepsJsonFileName = GetDepsJsonFileName(ServerApplication);
 				Log.Informational("deps.json file name: " + DepsJsonFileName);
 
 				if (!File.Exists(DepsJsonFileName))
@@ -1096,18 +1104,11 @@ namespace Waher.Utility.Install
 			}
 			else
 			{
-				Log.Informational("Getting assembly name of server.");
+				Log.Informational("Getting assembly name of server");
 				ServerName = GetAssemblyName(ServerApplication);
 				Log.Informational("Server assembly name: " + ServerName.ToString());
 
-				int i = ServerApplication.LastIndexOf('.');
-				if (i < 0)
-					DepsJsonFileName = ServerApplication;
-				else
-					DepsJsonFileName = ServerApplication[..i];
-
-				DepsJsonFileName += ".deps.json";
-
+				DepsJsonFileName = GetDepsJsonFileName(ServerApplication);
 				Log.Informational("deps.json file name: " + DepsJsonFileName);
 
 				if (!File.Exists(DepsJsonFileName))
@@ -1619,14 +1620,7 @@ namespace Waher.Utility.Install
 				ServerName = GetAssemblyName(ServerApplication);
 				Log.Informational("Server assembly name: " + ServerName.ToString());
 
-				int i = ServerApplication.LastIndexOf('.');
-				if (i < 0)
-					DepsJsonFileName = ServerApplication;
-				else
-					DepsJsonFileName = ServerApplication[..i];
-
-				DepsJsonFileName += ".deps.json";
-
+				DepsJsonFileName = GetDepsJsonFileName(ServerApplication);
 				Log.Informational("deps.json file name: " + DepsJsonFileName);
 
 				if (!File.Exists(DepsJsonFileName))
@@ -1983,14 +1977,7 @@ namespace Waher.Utility.Install
 				ServerName = GetAssemblyName(ServerApplication);
 				Log.Informational("Server assembly name: " + ServerName.ToString());
 
-				int i = ServerApplication.LastIndexOf('.');
-				if (i < 0)
-					DepsJsonFileName = ServerApplication;
-				else
-					DepsJsonFileName = ServerApplication[..i];
-
-				DepsJsonFileName += ".deps.json";
-
+				DepsJsonFileName = GetDepsJsonFileName(ServerApplication);
 				Log.Informational("deps.json file name: " + DepsJsonFileName);
 
 				if (!File.Exists(DepsJsonFileName))

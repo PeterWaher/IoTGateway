@@ -558,7 +558,7 @@ namespace Waher.Utility.Install
 
 					foreach (KeyValuePair<string, string[]> Command in Commands)
 					{
-						WriteCommand(DockerOutput, "CMD", Command.Key, Command.Value,
+						WriteCommand(DockerOutput, "RUN", Command.Key, Command.Value,
 							AppFolder, ServerApplication, ProgramDataFolder);
 					}
 

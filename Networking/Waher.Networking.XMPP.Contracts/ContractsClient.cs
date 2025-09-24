@@ -491,8 +491,7 @@ namespace Waher.Networking.XMPP.Contracts
 				this.disposeLocalKeys = false;
 				this.localKeys = null;
 
-				await Semaphores.BeginWrite("XMPP.E2E");
-				try
+				using (Semaphore Lock = await Semaphores.BeginWrite("XMPP.E2E"))
 				{
 					if (this.localKeysForE2e)
 					{
@@ -503,7 +502,7 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 						else
 						{
-							this.localKeys = new EndpointSecurity(this.client, 128);
+							this.localKeys = new EndpointSecurity(this.client, 128, Keys.ToArray());
 							this.client.SetTag("E2E", this.localKeys);
 							this.disposeLocalKeys = true;
 						}
@@ -513,10 +512,6 @@ namespace Waher.Networking.XMPP.Contracts
 						this.localKeys = new EndpointSecurity(null, 128, Keys.ToArray());
 						this.disposeLocalKeys = true;
 					}
-				}
-				finally
-				{
-					await Semaphores.EndWrite("XMPP.E2E");
 				}
 
 				this.keysTimestamp = Timestamp.Value;
@@ -8146,7 +8141,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public (byte[], byte[]) Encrypt(byte[] Message, byte[] Nonce, byte[] RecipientPublicKey, string RecipientPublicKeyName,
 			string RecipientPublicKeyNamespace)
 		{
-			IE2eEndpoint LocalEndpoint = this.localKeys.FindLocalEndpoint(RecipientPublicKeyName, RecipientPublicKeyNamespace) 
+			IE2eEndpoint LocalEndpoint = this.localKeys.FindLocalEndpoint(RecipientPublicKeyName, RecipientPublicKeyNamespace)
 				?? throw new NotSupportedException("Unable to find matching local key.");
 
 			IE2eEndpoint RemoteEndpoint = LocalEndpoint.CreatePublic(RecipientPublicKey);
@@ -8260,7 +8255,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Nonce">Nonce-value to use during decryption. Must be the same
 		/// as the one used during encryption.</param>
 		/// <returns>Decrypted message.</returns>
-		public byte[] DecryptReceivedMessage(byte[] EncryptedMessage, byte[] SenderPublicKey, 
+		public byte[] DecryptReceivedMessage(byte[] EncryptedMessage, byte[] SenderPublicKey,
 			byte[] Nonce)
 		{
 			IE2eEndpoint[] LocalEndpoints = this.localKeys?.FindCompatibleLocalEndpoints(SenderPublicKey) ?? Array.Empty<IE2eEndpoint>();

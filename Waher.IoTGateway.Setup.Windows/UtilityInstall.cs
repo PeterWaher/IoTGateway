@@ -38,6 +38,9 @@ namespace Waher.Utility.Install
 	///                      be used instead.
 	/// -d APP_DATA_FOLDER   Points to the application data folder. Required if
 	///                      installing a module.
+	/// -a ALT_DATA_FOLDER   Points to an alternative data folder where files will be copied.
+	///                      If not provided, it will default to the application folder
+	///                      where the server executable is stored.
 	/// -s SERVER_EXE        Points to the executable file of the IoT Gateway. Required
 	///                      if installing a module.
 	/// -k KEY               Encryption key used for the package file. Secret used in
@@ -49,7 +52,10 @@ namespace Waher.Utility.Install
 	///                      file will be generated. the -d switch specifies a folder within
 	///                      the Docker image where content files will be copied. The -s
 	///                      switch specifies a full path of the server executable within
-	///                      the Docker image.
+	///                      the Docker image. The -a switch must be used to specify an
+	///                      alternative data folder to which files will be copied. From
+	///                      that folder, only the newer files will be copied to the data
+	///                      folder.
 	/// -v                   Verbose mode.
 	/// -i                   Install. This is the default. Switch not required.
 	/// -u                   Uninstall. Add this switch if the module is being uninstalled.
@@ -630,7 +636,10 @@ namespace Waher.Utility.Install
 		public static AssemblyName GetAssemblyName(string ServerApplication)
 		{
 			if (ServerApplication.EndsWith(".exe", StringComparison.CurrentCultureIgnoreCase))
-				ServerApplication = ServerApplication[0..^4] + ".dll";
+				ServerApplication = ServerApplication[0..^4];
+
+			if (!ServerApplication.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+				ServerApplication += ".dll";
 
 			return AssemblyName.GetAssemblyName(ServerApplication);
 		}
@@ -646,6 +655,19 @@ namespace Waher.Utility.Install
 			string Category = E.GetAttribute("category");
 
 			return ExcludeCategories.ContainsKey(Category);
+		}
+
+		private static string GetDepsJsonFileName(string ServerApplication)
+		{
+			string DepsJsonFileName = ServerApplication;
+
+			if (DepsJsonFileName.EndsWith(".exe", StringComparison.CurrentCultureIgnoreCase) ||
+				DepsJsonFileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+			{
+				DepsJsonFileName = DepsJsonFileName[0..^4];
+			}
+
+			return DepsJsonFileName + ".deps.json";
 		}
 
 		public static void Install(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool ContentOnly,
@@ -689,14 +711,7 @@ namespace Waher.Utility.Install
 				ServerName = GetAssemblyName(ServerApplication);
 				Log.Informational("Server assembly name: " + ServerName.ToString());
 
-				int i = ServerApplication.LastIndexOf('.');
-				if (i < 0)
-					DepsJsonFileName = ServerApplication;
-				else
-					DepsJsonFileName = ServerApplication[..i];
-
-				DepsJsonFileName += ".deps.json";
-
+				DepsJsonFileName = GetDepsJsonFileName(ServerApplication);
 				Log.Informational("deps.json file name: " + DepsJsonFileName);
 
 				if (!File.Exists(DepsJsonFileName))
@@ -1096,18 +1111,11 @@ namespace Waher.Utility.Install
 			}
 			else
 			{
-				Log.Informational("Getting assembly name of server.");
+				Log.Informational("Getting assembly name of server");
 				ServerName = GetAssemblyName(ServerApplication);
 				Log.Informational("Server assembly name: " + ServerName.ToString());
 
-				int i = ServerApplication.LastIndexOf('.');
-				if (i < 0)
-					DepsJsonFileName = ServerApplication;
-				else
-					DepsJsonFileName = ServerApplication[..i];
-
-				DepsJsonFileName += ".deps.json";
-
+				DepsJsonFileName = GetDepsJsonFileName(ServerApplication);
 				Log.Informational("deps.json file name: " + DepsJsonFileName);
 
 				if (!File.Exists(DepsJsonFileName))
@@ -1619,14 +1627,7 @@ namespace Waher.Utility.Install
 				ServerName = GetAssemblyName(ServerApplication);
 				Log.Informational("Server assembly name: " + ServerName.ToString());
 
-				int i = ServerApplication.LastIndexOf('.');
-				if (i < 0)
-					DepsJsonFileName = ServerApplication;
-				else
-					DepsJsonFileName = ServerApplication[..i];
-
-				DepsJsonFileName += ".deps.json";
-
+				DepsJsonFileName = GetDepsJsonFileName(ServerApplication);
 				Log.Informational("deps.json file name: " + DepsJsonFileName);
 
 				if (!File.Exists(DepsJsonFileName))
@@ -1983,14 +1984,7 @@ namespace Waher.Utility.Install
 				ServerName = GetAssemblyName(ServerApplication);
 				Log.Informational("Server assembly name: " + ServerName.ToString());
 
-				int i = ServerApplication.LastIndexOf('.');
-				if (i < 0)
-					DepsJsonFileName = ServerApplication;
-				else
-					DepsJsonFileName = ServerApplication[..i];
-
-				DepsJsonFileName += ".deps.json";
-
+				DepsJsonFileName = GetDepsJsonFileName(ServerApplication);
 				Log.Informational("deps.json file name: " + DepsJsonFileName);
 
 				if (!File.Exists(DepsJsonFileName))

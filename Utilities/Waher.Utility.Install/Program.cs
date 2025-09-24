@@ -632,7 +632,8 @@ namespace Waher.Utility.Install
 			if (ServerApplication.EndsWith(".exe", StringComparison.CurrentCultureIgnoreCase))
 				ServerApplication = ServerApplication[0..^4];
 
-			ServerApplication += ".dll";
+			if (!ServerApplication.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+				ServerApplication += ".dll";
 
 			return AssemblyName.GetAssemblyName(ServerApplication);
 		}

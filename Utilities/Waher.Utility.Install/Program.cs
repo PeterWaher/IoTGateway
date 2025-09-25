@@ -783,7 +783,7 @@ namespace Waher.Utility.Install
 			string AppFolder = Path.GetDirectoryName(ServerApplication);
 			string DestManifestFileName = Path.Combine(AppFolder, Path.GetFileName(ManifestFile));
 
-			CopyFileIfNewer(ManifestFile, DestManifestFileName, null, false);
+			CopyFileWithOptions(ManifestFile, DestManifestFileName, null, CopyOptions.Always);
 
 			Log.Informational("Source folder: " + SourceFolder);
 			Log.Informational("App folder: " + AppFolder);
@@ -807,7 +807,7 @@ namespace Waher.Utility.Install
 						else
 							Log.Informational("Application file: " + FileName, string.Empty, string.Empty, "FileCopy");
 
-						if (CopyFileIfNewer(SourceFileName, Path.Combine(AppFolder, FileName), null, true))
+						if (CopyFileWithOptions(SourceFileName, Path.Combine(AppFolder, FileName), null, CopyOptions.IfNewer))
 						{
 							if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 							{
@@ -816,7 +816,7 @@ namespace Waher.Utility.Install
 								{
 									Log.Informational("Symbol file: " + PdbFileName, string.Empty, string.Empty, "FileCopy");
 
-									CopyFileIfNewer(Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), null, true);
+									CopyFileWithOptions(Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), null, CopyOptions.IfNewer);
 								}
 							}
 						}
@@ -899,38 +899,43 @@ namespace Waher.Utility.Install
 			}
 		}
 
-		private static bool CopyFileIfNewer(string From, string To, string To2, bool OnlyIfNewer)
+		private static bool CopyFileWithOptions(string From, string To, string To2, CopyOptions CopyOptions)
 		{
 			if (!File.Exists(From))
 				throw new FileNotFoundException("File not found: " + From);
 
 			bool Copy1 = From != To;
 
-			if (Copy1 && OnlyIfNewer && File.Exists(To))
+			if (Copy1 && CopyOptions != CopyOptions.Always && File.Exists(To))
 			{
-				DateTime ToTP = File.GetLastWriteTimeUtc(To);
-				DateTime FromTP = File.GetLastWriteTimeUtc(From);
-
-				if (ToTP >= FromTP)
-				{
-					if (ToTP > FromTP)
-					{
-						Log.Warning("Skipping file. Destination folder contains newer version: " + From,
-							new KeyValuePair<string, object>("FromTP", FromTP),
-							new KeyValuePair<string, object>("ToTP", ToTP),
-							new KeyValuePair<string, object>("From", From),
-							new KeyValuePair<string, object>("To", To));
-					}
-					else
-					{
-						Log.Notice("Skipping file. Destination folder contains same version: " + From,
-							new KeyValuePair<string, object>("FromTP", FromTP),
-							new KeyValuePair<string, object>("ToTP", ToTP),
-							new KeyValuePair<string, object>("From", From),
-							new KeyValuePair<string, object>("To", To));
-					}
-
+				if (CopyOptions == CopyOptions.IfNotExists)
 					Copy1 = false;
+				else if (CopyOptions == CopyOptions.IfNewer)
+				{
+					DateTime ToTP = File.GetLastWriteTimeUtc(To);
+					DateTime FromTP = File.GetLastWriteTimeUtc(From);
+
+					if (ToTP >= FromTP)
+					{
+						if (ToTP > FromTP)
+						{
+							Log.Warning("Skipping file. Destination folder contains newer version: " + From,
+								new KeyValuePair<string, object>("FromTP", FromTP),
+								new KeyValuePair<string, object>("ToTP", ToTP),
+								new KeyValuePair<string, object>("From", From),
+								new KeyValuePair<string, object>("To", To));
+						}
+						else
+						{
+							Log.Notice("Skipping file. Destination folder contains same version: " + From,
+								new KeyValuePair<string, object>("FromTP", FromTP),
+								new KeyValuePair<string, object>("ToTP", ToTP),
+								new KeyValuePair<string, object>("From", From),
+								new KeyValuePair<string, object>("To", To));
+						}
+
+						Copy1 = false;
+					}
 				}
 			}
 
@@ -944,33 +949,38 @@ namespace Waher.Utility.Install
 			{
 				bool Copy2 = From != To2;
 
-				if (Copy2 && OnlyIfNewer && File.Exists(To2))
+				if (Copy2 && CopyOptions != CopyOptions.Always && File.Exists(To2))
 				{
-					DateTime ToTP = File.GetLastWriteTimeUtc(To2);
-					DateTime FromTP = File.GetLastWriteTimeUtc(From);
-
-					if (ToTP >= FromTP)
-					{
-						if (ToTP > FromTP)
-						{
-							Log.Warning("Skipping file. Destination folder contains newer version: " + From,
-								string.Empty, string.Empty, "FileSkip",
-								new KeyValuePair<string, object>("FromTP", FromTP),
-								new KeyValuePair<string, object>("ToTP", ToTP),
-								new KeyValuePair<string, object>("From", From),
-								new KeyValuePair<string, object>("To", To2));
-						}
-						else
-						{
-							Log.Notice("Skipping file. Destination folder contains same version: " + From,
-								string.Empty, string.Empty, "FileSkip",
-								new KeyValuePair<string, object>("FromTP", FromTP),
-								new KeyValuePair<string, object>("ToTP", ToTP),
-								new KeyValuePair<string, object>("From", From),
-								new KeyValuePair<string, object>("To", To2));
-						}
-
+					if (CopyOptions == CopyOptions.IfNotExists)
 						Copy2 = false;
+					else if (CopyOptions == CopyOptions.IfNewer)
+					{
+						DateTime ToTP = File.GetLastWriteTimeUtc(To2);
+						DateTime FromTP = File.GetLastWriteTimeUtc(From);
+
+						if (ToTP >= FromTP)
+						{
+							if (ToTP > FromTP)
+							{
+								Log.Warning("Skipping file. Destination folder contains newer version: " + From,
+									string.Empty, string.Empty, "FileSkip",
+									new KeyValuePair<string, object>("FromTP", FromTP),
+									new KeyValuePair<string, object>("ToTP", ToTP),
+									new KeyValuePair<string, object>("From", From),
+									new KeyValuePair<string, object>("To", To2));
+							}
+							else
+							{
+								Log.Notice("Skipping file. Destination folder contains same version: " + From,
+									string.Empty, string.Empty, "FileSkip",
+									new KeyValuePair<string, object>("FromTP", FromTP),
+									new KeyValuePair<string, object>("ToTP", ToTP),
+									new KeyValuePair<string, object>("From", From),
+									new KeyValuePair<string, object>("To", To2));
+							}
+
+							Copy2 = false;
+						}
 					}
 				}
 
@@ -1015,7 +1025,8 @@ namespace Waher.Utility.Install
 		private enum CopyOptions
 		{
 			IfNewer = 3,
-			Always = 4
+			Always = 4,
+			IfNotExists = 6
 		}
 
 		private static void CopyContent(string SourceFolder, string AppFolder, string DataFolder, XmlElement Parent,
@@ -1049,10 +1060,10 @@ namespace Waher.Utility.Install
 							Directory.CreateDirectory(AppFolder);
 						}
 
-						CopyFileIfNewer(SourceFileName,
+						CopyFileWithOptions(SourceFileName,
 							Path.Combine(DataFolder, FileName),
 							Path.Combine(AppFolder, FileName),
-							CopyOptions == CopyOptions.IfNewer);
+							CopyOptions);
 						break;
 
 					case "Folder":
@@ -1776,7 +1787,7 @@ namespace Waher.Utility.Install
 									else
 										Log.Informational("Assembly file: " + FileName, string.Empty, string.Empty, "FileCopy");
 
-									CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
+									CopyFile(Decompressed, FileName, Program.CopyOptions.Always, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
 
 									if (b == 2)
 									{
@@ -1858,19 +1869,20 @@ namespace Waher.Utility.Install
 
 							case 3: // Content file (copy if newer)
 							case 4: // Content file (always copy)
-								bool OnlyIfNewer = b == 3;
+							case 6: // Content file (if not exists)
+								CopyOptions CopyOptions =(CopyOptions)b;
 
 								FileName = Path.Combine(AppFolder, RelativeName);
 								Log.Informational("Content file: " + FileName, string.Empty, string.Empty, "FileCopy");
 
-								CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
+								CopyFile(Decompressed, FileName, CopyOptions.Always, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
 
 								using (FileStream TempFile = File.OpenRead(FileName))
 								{
 									FileName = Path.Combine(ProgramDataFolder, RelativeName);
 									Log.Informational("Content file: " + FileName, string.Empty, string.Empty, "FileCopy");
 
-									CopyFile(TempFile, FileName, OnlyIfNewer, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
+									CopyFile(TempFile, FileName, CopyOptions, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
 								}
 								break;
 
@@ -1878,7 +1890,7 @@ namespace Waher.Utility.Install
 								FileName = Path.Combine(ExternalFolder, RelativeName);
 								Log.Informational("External file: " + FileName, string.Empty, string.Empty, "FileCopy");
 
-								CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
+								CopyFile(Decompressed, FileName, CopyOptions.Always, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
 								break;
 
 							default:
@@ -1902,7 +1914,7 @@ namespace Waher.Utility.Install
 			}
 		}
 
-		private static void CopyFile(Stream Input, string OutputFileName, bool OnlyIfNewer, ulong Bytes, FileAttributes Attr,
+		private static void CopyFile(Stream Input, string OutputFileName, CopyOptions CopyOptions, ulong Bytes, FileAttributes Attr,
 			DateTime CreationTimeUtc, DateTime LastAccessTimeUtc, DateTime LastWriteTimeUtc, byte[] Buffer)
 		{
 			try
@@ -1915,14 +1927,35 @@ namespace Waher.Utility.Install
 					Directory.CreateDirectory(Folder);
 				}
 
-				if (OnlyIfNewer && File.Exists(OutputFileName))
+				bool Skip;
+
+				switch (CopyOptions)
 				{
-					DateTime ExistingLastWriteTime = File.GetLastWriteTimeUtc(OutputFileName);
-					if (ExistingLastWriteTime >= LastWriteTimeUtc)
-					{
-						SkipBytes(Input, Bytes, Buffer);
-						return;
-					}
+					case CopyOptions.Always:
+					default:
+						Skip = false;
+						break;
+
+					case CopyOptions.IfNewer:
+						Skip = false;
+						if (File.Exists(OutputFileName))
+						{
+							DateTime ExistingLastWriteTime = File.GetLastWriteTimeUtc(OutputFileName);
+							if (ExistingLastWriteTime >= LastWriteTimeUtc)
+								Skip = true;
+							break;
+						}
+						break;
+
+					case CopyOptions.IfNotExists:
+						Skip = File.Exists(OutputFileName);
+						break;
+				}
+
+				if (Skip)
+				{
+					SkipBytes(Input, Bytes, Buffer);
+					return;
 				}
 
 				FileStream f;

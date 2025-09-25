@@ -70,8 +70,9 @@
 
   <xs:simpleType name="CopyOptions">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="IfNewer"/>
-      <xs:enumeration value="Always"/>
+			<xs:enumeration value="IfNotExists"/>
+			<xs:enumeration value="IfNewer"/>
+			<xs:enumeration value="Always"/>
     </xs:restriction>
   </xs:simpleType>
 

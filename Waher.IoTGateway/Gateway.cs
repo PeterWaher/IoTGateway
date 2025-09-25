@@ -315,10 +315,10 @@ namespace Waher.IoTGateway
 						string s = Path.Combine(runtimeFolder, "Root");
 						if (Directory.Exists(s))
 						{
-							CopyFolder(runtimeFolder, appDataFolder, "*.config", true);
-							CopyFolders(s, rootFolder, true);
-							CopyFolders(Path.Combine(runtimeFolder, "Graphics"), Path.Combine(appDataFolder, "Graphics"), true);
-							CopyFolders(Path.Combine(runtimeFolder, "Transforms"), Path.Combine(appDataFolder, "Transforms"), true);
+							CopyFolder(runtimeFolder, appDataFolder, "*.config", CopyOptions.IfNewer);
+							CopyFolders(s, rootFolder, CopyOptions.IfNewer);
+							CopyFolders(Path.Combine(runtimeFolder, "Graphics"), Path.Combine(appDataFolder, "Graphics"), CopyOptions.IfNewer);
+							CopyFolders(Path.Combine(runtimeFolder, "Transforms"), Path.Combine(appDataFolder, "Transforms"), CopyOptions.IfNewer);
 						}
 					}
 
@@ -1787,7 +1787,8 @@ namespace Waher.IoTGateway
 		private enum CopyOptions
 		{
 			IfNewer,
-			Always
+			Always,
+			IfNotExists
 		}
 
 		private static void CheckContentFiles(XmlElement Element, string RuntimeFolder, string RuntimeSubfolder, string AppDataSubFolder,
@@ -2298,7 +2299,7 @@ namespace Waher.IoTGateway
 			});
 		}
 
-		private static bool CopyFile(string From, string To, bool OnlyIfNewer)
+		private static bool CopyFile(string From, string To, CopyOptions CopyOptions)
 		{
 			if (From == To)
 				return false;
@@ -2306,13 +2307,18 @@ namespace Waher.IoTGateway
 			if (!File.Exists(From))
 				return false;
 
-			if (OnlyIfNewer && File.Exists(To))
+			if (CopyOptions != CopyOptions.Always && File.Exists(To))
 			{
-				DateTime ToTP = File.GetLastWriteTimeUtc(To);
-				DateTime FromTP = File.GetLastWriteTimeUtc(From);
-
-				if (ToTP >= FromTP)
+				if (CopyOptions == CopyOptions.IfNotExists)
 					return false;
+				else if (CopyOptions == CopyOptions.IfNewer)
+				{
+					DateTime ToTP = File.GetLastWriteTimeUtc(To);
+					DateTime FromTP = File.GetLastWriteTimeUtc(From);
+
+					if (ToTP >= FromTP)
+						return false;
+				}
 			}
 
 			File.Copy(From, To, true);
@@ -2320,7 +2326,7 @@ namespace Waher.IoTGateway
 			return true;
 		}
 
-		private static void CopyFolder(string From, string To, string Mask, bool OnlyIfNewer)
+		private static void CopyFolder(string From, string To, string Mask, CopyOptions CopyOptions)
 		{
 			if (Directory.Exists(From))
 			{
@@ -2332,23 +2338,23 @@ namespace Waher.IoTGateway
 				foreach (string File in Files)
 				{
 					string FileName = Path.GetFileName(File);
-					CopyFile(File, Path.Combine(To, FileName), OnlyIfNewer);
+					CopyFile(File, Path.Combine(To, FileName), CopyOptions);
 				}
 			}
 		}
 
-		private static void CopyFolders(string From, string To, bool OnlyIfNewer)
+		private static void CopyFolders(string From, string To, CopyOptions CopyOptions)
 		{
 			if (Directory.Exists(From))
 			{
-				CopyFolder(From, To, "*.*", OnlyIfNewer);
+				CopyFolder(From, To, "*.*", CopyOptions);
 
 				string[] Folders = Directory.GetDirectories(From, "*.*", SearchOption.TopDirectoryOnly);
 
 				foreach (string Folder in Folders)
 				{
 					string FolderName = Path.GetFileName(Folder);
-					CopyFolders(Folder, Path.Combine(To, FolderName), OnlyIfNewer);
+					CopyFolders(Folder, Path.Combine(To, FolderName), CopyOptions);
 				}
 			}
 		}

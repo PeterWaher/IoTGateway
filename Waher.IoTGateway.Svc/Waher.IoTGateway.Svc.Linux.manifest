@@ -734,6 +734,7 @@
 	<Assembly fileName='Waher.Utility.Upload.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Upload\bin\Release\PublishOutputLinux\linux-x64\'/>
 	<Assembly fileName='Waher.Utility.Upload.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Upload\bin\Release\PublishOutputLinux\linux-x64\'/>
 	<!-- Content files merged from Waher.IoTGateway and Waher.IoTGateway.Resources, as well as built-in themes and module language files. -->
+	<Content fileName='Gateway.config' copy='IfNotExists' altFolder='..\..\..\..\Waher.IoTGateway.Svc\Gateway.config'/>
 	<Folder name="Default">
 		<Content fileName="400.md"/>
 		<Content fileName="401.md"/>

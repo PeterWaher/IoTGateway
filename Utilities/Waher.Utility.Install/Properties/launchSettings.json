@@ -2,7 +2,7 @@
   "profiles": {
     "Waher.Utility.Install": {
       "commandName": "Project",
-      "commandLineArgs": "-dk IoTGateway.Dockerfile -d \"/ProgramData/IoT Gateway/\" -s \"/Program Files (x86)/IoTGateway/\" -m IoTGateway\\Waher.IoTGateway.Svc\\bin\\Release\\PublishOutput\\Waher.IoTGateway.Svc.manifest",
+      "commandLineArgs": "-dk IoTGateway.Dockerfile -d \"/ProgramData/IoT Gateway/\" -a \"/var/lib/temp/\" -s \"/Program Files (x86)/IoTGateway/\" -m IoTGateway\\Waher.IoTGateway.Svc\\bin\\Release\\PublishOutputLinux\\Waher.IoTGateway.Svc.Linux.manifest",
       "workingDirectory": "C:\\My Projects"
     }
   }

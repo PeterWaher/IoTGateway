@@ -1096,7 +1096,7 @@ namespace Waher.IoTGateway
 					Http2HeaderTableSize, false, Http2NoRfc7540Priorities, Http2Profiling, true);
 
 				webServer.ConnectionProfiled += WebServer_ConnectionProfiled;
-				webServer.OnTryGetLocalResourceFileName += (string Resource, string Host, out string FileName) => 
+				webServer.OnTryGetLocalResourceFileName += (string Resource, string Host, out string FileName) =>
 					TryGetLocalResourceFileName(Resource, Host, out FileName);
 
 				Types.SetModuleParameter("HTTP", webServer);
@@ -2523,11 +2523,8 @@ namespace Waher.IoTGateway
 					xmppClient = null;
 				}
 
-				if (!(coapEndpoint is null))
-				{
-					await SafeDispose(coapEndpoint);
-					coapEndpoint = null;
-				}
+				await SafeDispose(coapEndpoint);
+				coapEndpoint = null;
 
 				if (!(webServer is null))
 				{

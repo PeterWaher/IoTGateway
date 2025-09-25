@@ -676,13 +676,31 @@ namespace Waher.Networking.HTTP
 				this.listeners = null;
 
 				foreach (KeyValuePair<StreamSocketListener, Guid> Listener in Listeners)
-					Listener.Key.Dispose();
+				{
+					try
+					{
+						Listener.Key.Dispose();
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+				}
 #else
 				LinkedList<KeyValuePair<TcpListener, bool>> Listeners = this.listeners;
 				this.listeners = null;
 
 				foreach (KeyValuePair<TcpListener, bool> Listener in Listeners)
-					Listener.Key.Stop();
+				{
+					try
+					{
+						Listener.Key.Stop();
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+				}
 #endif
 			}
 
@@ -693,6 +711,14 @@ namespace Waher.Networking.HTTP
 				try
 				{
 					await this.Remove(Connection);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+
+				try
+				{
 					await Connection.DisposeAsync();
 				}
 				catch (Exception ex)
@@ -701,45 +727,41 @@ namespace Waher.Networking.HTTP
 				}
 			}
 
-			this.sessions?.Dispose();
-			this.sessions = null;
+			try
+			{
+				this.sessions?.Dispose();
+				this.sessions = null;
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 
-			this.currentRequests?.Dispose();
-			this.currentRequests = null;
+			try
+			{
+				this.currentRequests?.Dispose();
+				this.currentRequests = null;
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
 		/// <summary>
 		/// Ports successfully opened.
 		/// </summary>
-		public int[] OpenPorts
-		{
-			get
-			{
-				return this.GetPorts(true, true);
-			}
-		}
+		public int[] OpenPorts => this.GetPorts(true, true);
 
 		/// <summary>
 		/// HTTP Ports successfully opened.
 		/// </summary>
-		public int[] OpenHttpPorts
-		{
-			get
-			{
-				return this.GetPorts(true, false);
-			}
-		}
+		public int[] OpenHttpPorts => this.GetPorts(true, false);
 
 		/// <summary>
 		/// HTTPS Ports successfully opened.
 		/// </summary>
-		public int[] OpenHttpsPorts
-		{
-			get
-			{
-				return this.GetPorts(false, true);
-			}
-		}
+		public int[] OpenHttpsPorts => this.GetPorts(false, true);
 
 		/// <summary>
 		/// IP Addresses receiving requests on.

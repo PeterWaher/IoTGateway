@@ -1795,9 +1795,10 @@ namespace Waher.Networking.HTTP
 				bool Result = this.TryGetResource(ref ResourcePart, PermitResourceOverride,
 					out Resource, out SubPath, ref Host);
 
-				if (ResourcePart != RequestHeader.Resource)
+				string s = ResourcePart + SubPath;
+				if (s != RequestHeader.Resource)
 				{
-					RequestHeader.Resource = ResourcePart;
+					RequestHeader.Resource = s;
 
 					if (Host != RequestHeader.Host)
 						RequestHeader.Host = Host;

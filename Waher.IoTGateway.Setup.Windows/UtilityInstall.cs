@@ -570,7 +570,7 @@ namespace Waher.Utility.Install
 					}
 
 					string DockerFileFolder = Path.GetDirectoryName(Path.GetFullPath(DockerFile));
-					Dictionary<string, ChunkedList<string>> FilesPerDestinationFolder = [];
+					Dictionary<string, Dictionary<string, string>> FilesPerDestinationFolder = [];
 
 					foreach (string ManifestFile in ManifestFiles)
 					{
@@ -578,13 +578,13 @@ namespace Waher.Utility.Install
 							AlternativeDataFolder, AppFolder, DockerFileFolder, ContentOnly, ExcludeCategories);
 					}
 
-					foreach (KeyValuePair<string, ChunkedList<string>> CopyInstructions in FilesPerDestinationFolder)
+					foreach (KeyValuePair<string, Dictionary<string, string>> CopyInstructions in FilesPerDestinationFolder)
 					{
 						string DestinationPath = CopyInstructions.Key;
 
 						DockerOutput.WriteLine("COPY [ \\");
 
-						foreach (string RelativeSourcePath in CopyInstructions.Value)
+						foreach (string RelativeSourcePath in CopyInstructions.Value.Values)
 						{
 							DockerOutput.Write("\t\"");
 							DockerOutput.Write(RelativeSourcePath.Replace("\"", "\\\""));
@@ -1577,35 +1577,39 @@ namespace Waher.Utility.Install
 		{
 			string FileName = XML.Attribute(E, "fileName");
 			string AbsFileName = Path.Combine(ReferenceFolder, FileName);
-			if (File.Exists(AbsFileName))
-				return (FileName, Path.GetFullPath(AbsFileName));
-
 			string AltFolder = XML.Attribute(E, "altFolder");
+			string AltAbsFileName;
+			bool AltFolderOk;
+
 			if (string.IsNullOrEmpty(AltFolder))
+				AltFolderOk = true;
+			else
 			{
-				if (!CheckFileExists)
-					return (FileName, Path.GetFullPath(AbsFileName));
+				if (AltFolderOk = Directory.Exists(AltFolder))
+				{
+					AltAbsFileName = Path.Combine(AltFolder, FileName);
+					if (File.Exists(AltAbsFileName))
+						return (FileName, Path.GetFullPath(AltAbsFileName));
+				}
 
-				throw new FileNotFoundException("File not found: " + AbsFileName);
+				string AltFolder2 = Path.Combine(ReferenceFolder, AltFolder);
+				if (Directory.Exists(AltFolder2))
+				{
+					AltFolderOk = true;
+					AltAbsFileName = Path.Combine(AltFolder2, FileName);
+
+					if (File.Exists(AltAbsFileName))
+						return (FileName, Path.GetFullPath(AltAbsFileName));
+				}
 			}
 
-			AltFolder = Path.Combine(ReferenceFolder, AltFolder);
-			if (!Directory.Exists(AltFolder))
-			{
-				if (!CheckFileExists)
-					return (FileName, Path.GetFullPath(AbsFileName));
-
-				throw new Exception("Folder not found: " + AltFolder);
-			}
-
-			string AbsFileName2 = Path.Combine(AltFolder, FileName);
-			if (File.Exists(AbsFileName2))
-				return (FileName, Path.GetFullPath(AbsFileName2));
-
-			if (!CheckFileExists)
+			if (!CheckFileExists || File.Exists(AbsFileName))
 				return (FileName, Path.GetFullPath(AbsFileName));
 
-			throw new FileNotFoundException("File not found: " + AbsFileName);
+			if (AltFolderOk)
+				throw new FileNotFoundException("File not found: " + AbsFileName);
+			else
+				throw new Exception("Folder not found: " + AltFolder);
 		}
 
 		private static void InstallPackage(LinkedList<KeyValuePair<string, string>> Packages, string ServerApplication,
@@ -1870,7 +1874,7 @@ namespace Waher.Utility.Install
 							case 3: // Content file (copy if newer)
 							case 4: // Content file (always copy)
 							case 6: // Content file (if not exists)
-								CopyOptions CopyOptions =(CopyOptions)b;
+								CopyOptions CopyOptions = (CopyOptions)b;
 
 								FileName = Path.Combine(AppFolder, RelativeName);
 								Log.Informational("Content file: " + FileName, string.Empty, string.Empty, "FileCopy");
@@ -2274,7 +2278,7 @@ namespace Waher.Utility.Install
 		/// <param name="ContentOnly">If only content files should be copied.</param>
 		/// <param name="ExcludeCategories">Any categories that should be exluded.</param>
 		public static void PrepareDockerCopyInstructions(string ManifestFile,
-			Dictionary<string, ChunkedList<string>> FilesPerDestinationFolder,
+			Dictionary<string, Dictionary<string, string>> FilesPerDestinationFolder,
 			string ProgramDataFolder, string AppFolder, string DockerFileFolder,
 			bool ContentOnly, Dictionary<string, bool> ExcludeCategories)
 		{
@@ -2287,7 +2291,7 @@ namespace Waher.Utility.Install
 			string SourceFolder = Path.GetDirectoryName(ManifestFile);
 			string DestManifestFileName = Path.Combine(AppFolder, Path.GetFileName(ManifestFile));
 
-			PrepareCopyFile(ManifestFile, DestManifestFileName, DockerFileFolder, FilesPerDestinationFolder);
+			PrepareCopyFile(ManifestFile, Path.GetFileName(ManifestFile), DestManifestFileName, DockerFileFolder, FilesPerDestinationFolder);
 
 			Log.Informational("Source folder: " + SourceFolder);
 			Log.Informational("App folder: " + AppFolder);
@@ -2311,12 +2315,15 @@ namespace Waher.Utility.Install
 						else
 							Log.Informational("Application file: " + FileName, string.Empty, string.Empty, "FileCopy");
 
-						PrepareCopyFile(SourceFileName, Path.Combine(AppFolder, FileName), DockerFileFolder, FilesPerDestinationFolder);
+						PrepareCopyFile(SourceFileName, FileName, Path.Combine(AppFolder, FileName), DockerFileFolder, FilesPerDestinationFolder);
 						if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 						{
 							string PdbFileName = FileName[0..^4] + ".pdb";
 							if (File.Exists(PdbFileName))
-								PrepareCopyFile(Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), DockerFileFolder, FilesPerDestinationFolder);
+							{
+								PrepareCopyFile(Path.Combine(SourceFolder, PdbFileName),
+									PdbFileName, Path.Combine(AppFolder, PdbFileName), DockerFileFolder, FilesPerDestinationFolder);
+							}
 						}
 					}
 				}
@@ -2325,26 +2332,26 @@ namespace Waher.Utility.Install
 			PrepareCopyContent(SourceFolder, AppFolder, ProgramDataFolder, DockerFileFolder, Module, FilesPerDestinationFolder, ExcludeCategories);
 		}
 
-		private static void PrepareCopyFile(string SourceFileName, string DestFileName,
-			string DockerFileFolder, Dictionary<string, ChunkedList<string>> FilesPerDestinationFolder)
+		private static void PrepareCopyFile(string SourcePath, string FileName, string DestFileName,
+			string DockerFileFolder, Dictionary<string, Dictionary<string, string>> FilesPerDestinationFolder)
 		{
-			string RelativeSourcePath = Path.GetRelativePath(DockerFileFolder, SourceFileName).Replace(Path.DirectorySeparatorChar, '/');
+			string RelativeSourcePath = Path.GetRelativePath(DockerFileFolder, SourcePath).Replace(Path.DirectorySeparatorChar, '/');
 			string DestinationPath = Path.GetDirectoryName(DestFileName).Replace(Path.DirectorySeparatorChar, '/');
 
 			if (!DestinationPath.EndsWith('/'))
 				DestinationPath += "/";
 
-			if (!FilesPerDestinationFolder.TryGetValue(DestinationPath, out ChunkedList<string> Files))
+			if (!FilesPerDestinationFolder.TryGetValue(DestinationPath, out Dictionary<string, string> Files))
 			{
 				Files = [];
 				FilesPerDestinationFolder[DestinationPath] = Files;
 			}
 
-			Files.Add(RelativeSourcePath);
+			Files[FileName] = RelativeSourcePath;
 		}
 
 		private static void PrepareCopyContent(string SourceFolder, string AppFolder, string DataFolder,
-			string DockerFileFolder, XmlElement Parent, Dictionary<string, ChunkedList<string>> FilesPerDestinationFolder,
+			string DockerFileFolder, XmlElement Parent, Dictionary<string, Dictionary<string, string>> FilesPerDestinationFolder,
 			Dictionary<string, bool> ExcludeCategories)
 		{
 			foreach (XmlNode N in Parent.ChildNodes)
@@ -2362,8 +2369,8 @@ namespace Waher.Utility.Install
 
 						Log.Informational("Content file: " + FileName);
 
-						PrepareCopyFile(SourceFileName, Path.Combine(DataFolder, FileName), DockerFileFolder, FilesPerDestinationFolder);
-						PrepareCopyFile(SourceFileName, Path.Combine(AppFolder, FileName), DockerFileFolder, FilesPerDestinationFolder);
+						PrepareCopyFile(SourceFileName, FileName, Path.Combine(DataFolder, FileName), DockerFileFolder, FilesPerDestinationFolder);
+						PrepareCopyFile(SourceFileName, FileName, Path.Combine(AppFolder, FileName), DockerFileFolder, FilesPerDestinationFolder);
 						break;
 
 					case "Folder":

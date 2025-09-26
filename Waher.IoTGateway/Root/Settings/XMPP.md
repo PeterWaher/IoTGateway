@@ -164,7 +164,7 @@ Password is incorrect, or a new account was not permitted to be created.
 [[ else ]]
 <button id='NextButton' type='button' onclick='Ok()'>OK</button>
 [[;
-if User.HasPrivilege("Admin.Communication.Sniffer") then ]]<button type='button' onclick='OpenSniffer("/Sniffers/XMPP.md")'>Sniffer</button>
+if (User?.HasPrivilege("Admin.Communication.Sniffer") ?? false) then ]]<button type='button' onclick='OpenSniffer("/Sniffers/XMPP.md")'>Sniffer</button>
 [[;}}
 
 </fieldset>

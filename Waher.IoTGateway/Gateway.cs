@@ -45,6 +45,7 @@ using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Networking.PeerToPeer;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Avatar;
@@ -3294,6 +3295,21 @@ namespace Waher.IoTGateway
 
 				if (DoLog)
 					Log.Debug("IP Address not found among network adapters: " + Address.ToString());
+
+				if (InternetGatewayRegistrator.IsPublicAddress(Address))
+				{
+					if (DoLog)
+						Log.Debug("IP Address public: " + Address.ToString());
+
+					return false;
+				}
+
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) &&
+					string.IsNullOrEmpty(XmppConfiguration.Instance?.Host) &&
+					Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
+				{
+					return true;
+				}
 
 				return false;
 			}

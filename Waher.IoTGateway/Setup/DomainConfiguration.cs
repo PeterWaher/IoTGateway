@@ -1892,8 +1892,11 @@ namespace Waher.IoTGateway.Setup
 			}
 			else
 			{
-				if (!this.TryGetEnvironmentVariable(GATEWAY_DOMAIN_NAME, true, out string Value))
-					return true;
+				if (!this.TryGetEnvironmentVariable(GATEWAY_DOMAIN_NAME, true, out string Value) ||
+					string.IsNullOrEmpty(Value))
+				{
+					return !this.useDomainName;
+				}
 
 				if (string.Compare(Value, "localhost", true) == 0)
 				{

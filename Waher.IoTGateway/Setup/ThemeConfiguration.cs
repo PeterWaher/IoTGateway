@@ -113,44 +113,52 @@ namespace Waher.IoTGateway.Setup
 			instance = Configuration as ThemeConfiguration;
 		}
 
+		private void CheckLoaded()
+		{
+			if (themeDefinitions.Count > 0)
+				return;
+
+			string ThemesFolder = Path.Combine(Gateway.AppDataFolder, "Root", "Themes");
+			if (!Directory.Exists(ThemesFolder))
+				return;
+
+			XmlSchema Schema = XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.Theme.xsd", typeof(Gateway).Assembly);
+			ThemeDefinition Def;
+
+			foreach (string FileName in Directory.GetFiles(ThemesFolder, "*.xml", SearchOption.AllDirectories))
+			{
+				try
+				{
+					XmlDocument Doc = new XmlDocument()
+					{
+						PreserveWhitespace = true
+					};
+					Doc.Load(FileName);
+
+					XSL.Validate(FileName, Doc, "Theme", "http://waher.se/Schema/Theme.xsd", Schema);
+
+					Def = new ThemeDefinition(Doc);
+					themeDefinitions[Def.Id] = Def;
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex, FileName);
+					continue;
+				}
+			}
+		}
+
 		/// <summary>
 		/// Initializes the setup object.
 		/// </summary>
 		/// <param name="WebServer">Current Web Server object.</param>
 		public override async Task InitSetup(HttpServer WebServer)
 		{
-			XmlSchema Schema = XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.Theme.xsd", typeof(Gateway).Assembly);
-			string ThemesFolder = Path.Combine(Gateway.AppDataFolder, "Root", "Themes");
-			ThemeDefinition Def;
-
 			await base.InitSetup(WebServer);
 
 			await WebServer.SetETagSalt(this.Updated.Ticks.ToString());
 
-			if (Directory.Exists(ThemesFolder))
-			{
-				foreach (string FileName in Directory.GetFiles(ThemesFolder, "*.xml", SearchOption.AllDirectories))
-				{
-					try
-					{
-						XmlDocument Doc = new XmlDocument()
-						{
-							PreserveWhitespace = true
-						};
-						Doc.Load(FileName);
-
-						XSL.Validate(FileName, Doc, "Theme", "http://waher.se/Schema/Theme.xsd", Schema);
-
-						Def = new ThemeDefinition(Doc);
-						themeDefinitions[Def.Id] = Def;
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex, FileName);
-						continue;
-					}
-				}
-			}
+			this.CheckLoaded();
 
 			bool Update = false;
 
@@ -183,7 +191,7 @@ namespace Waher.IoTGateway.Setup
 				await Database.Update(this);
 			}
 
-			if (!string.IsNullOrEmpty(this.themeId) && themeDefinitions.TryGetValue(this.themeId, out Def))
+			if (!string.IsNullOrEmpty(this.themeId) && themeDefinitions.TryGetValue(this.themeId, out ThemeDefinition Def))
 				Theme.CurrentTheme = Def;
 			else if (themeDefinitions.TryGetValue("CactusRose", out Def))
 				Theme.CurrentTheme = Def;
@@ -332,6 +340,8 @@ namespace Waher.IoTGateway.Setup
 			string Value = Environment.GetEnvironmentVariable(GATEWAY_THEME_ID);
 			if (string.IsNullOrEmpty(Value))
 				return Task.FromResult(false);
+
+			this.CheckLoaded();
 
 			if (!themeDefinitions.ContainsKey(Value))
 			{

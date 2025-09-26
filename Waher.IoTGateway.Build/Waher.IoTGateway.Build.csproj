@@ -9,7 +9,7 @@
   </PropertyGroup>
   
   <Target Name="Test">
-		<Exec Command="..\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutput\win-x86\Waher.Utility.Install.exe -p ..\..\IoTGateway.Linux.package -m ..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutputLinux\Waher.IoTGateway.Svc.Linux.manifest"/>
+		<Exec Command="IoTGateway\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutput\win-x86\Waher.Utility.Install.exe -p IoTGateway.Linux.package -m IoTGateway\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutputLinux\Waher.IoTGateway.Svc.Linux.manifest" WorkingDirectory="..\.."/>
 	</Target>
 
 	<Target Name="BuildUtilityInstall">
@@ -105,7 +105,7 @@
 		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Upload\bin\$(Configuration)\PublishOutputLinux\linux-x64&quot; -r linux-x64 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Upload\Waher.Utility.Upload.csproj&quot;"/>
 
 		<Exec Command="dotnet publish -o:&quot;..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutputLinux&quot; -c:$(Configuration) -r linux-x64 --self-contained:true &quot;..\Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj&quot;"/>
-		<Exec Command="..\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutput\win-x86\Waher.Utility.Install.exe -p ..\..\IoTGateway.Linux.package -m ..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutputLinux\Waher.IoTGateway.Svc.Linux.manifest"/>
+		<Exec Command="IoTGateway\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutput\win-x86\Waher.Utility.Install.exe -p IoTGateway.Linux.package -m IoTGateway\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutputLinux\Waher.IoTGateway.Svc.Linux.manifest" WorkingDirectory="..\.."/>
 	</Target>
 
 </Project>

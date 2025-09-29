@@ -56,6 +56,9 @@ namespace Waher.Utility.Install
 	///                      alternative data folder to which files will be copied. From
 	///                      that folder, only the newer files will be copied to the data
 	///                      folder.
+	/// -de ENVIRONMENT_FILE If generating a Docker file, this option also generates an
+	///                      environment file that allows the user to provide environment
+	///                      variables to Docker in a simpler manner.
 	/// -v                   Verbose mode.
 	/// -i                   Install. This is the default. Switch not required.
 	/// -u                   Uninstall. Add this switch if the module is being uninstalled.
@@ -101,6 +104,7 @@ namespace Waher.Utility.Install
 				string AppFolder = null;
 				string PackageFile = null;
 				string DockerFile = null;
+				string EnvironmentFile = null;
 				string Key = string.Empty;
 				string Suffix = string.Empty;
 				string ServiceName = string.Empty;
@@ -199,6 +203,16 @@ namespace Waher.Utility.Install
 								throw new Exception("A Docker file name has already been specified.");
 
 							DockerFile = args[i++];
+							break;
+
+						case "-de":
+							if (i >= c)
+								throw new Exception("Missing Docker environment file name.");
+
+							if (!string.IsNullOrEmpty(EnvironmentFile))
+								throw new Exception("A Docker environment file name has already been specified.");
+
+							EnvironmentFile = args[i++];
 							break;
 
 						case "-n":
@@ -306,6 +320,9 @@ namespace Waher.Utility.Install
 					ConsoleOut.WriteLine("                     alternative data folder to which files will be copied. From");
 					ConsoleOut.WriteLine("                     that folder, only the newer files will be copied to the data");
 					ConsoleOut.WriteLine("                     folder.");
+					ConsoleOut.WriteLine("-de ENVIRONMENT_FILE If generating a Docker file, this option also generates an");
+					ConsoleOut.WriteLine("                     environment file that allows the user to provide environment");
+					ConsoleOut.WriteLine("                     variables to Docker in a simpler manner.");
 					ConsoleOut.WriteLine("-v                   Verbose mode.");
 					ConsoleOut.WriteLine("-i                   Install. This the default. Switch not required.");
 					ConsoleOut.WriteLine("-u                   Uninstall. Add this switch if the module is being uninstalled.");
@@ -321,7 +338,6 @@ namespace Waher.Utility.Install
 					ConsoleOut.WriteLine("-co                  If only content (content only) should be installed.");
 					ConsoleOut.WriteLine("-sn SERVICE_NAME     If provided, the utility will attempt to start the service with");
 					ConsoleOut.WriteLine("                     the given service name before exiting.");
-
 					ConsoleOut.WriteLine("-?                   Help.");
 					ConsoleOut.WriteLine();
 					ConsoleOut.WriteLine("Note: Alternating -p and -k attributes can be used to process multiple packages in");
@@ -571,11 +587,13 @@ namespace Waher.Utility.Install
 
 					string DockerFileFolder = Path.GetDirectoryName(Path.GetFullPath(DockerFile));
 					Dictionary<string, Dictionary<string, string>> FilesPerDestinationFolder = [];
+					bool HasContentFiles = false;
 
 					foreach (string ManifestFile in ManifestFiles)
 					{
 						PrepareDockerCopyInstructions(ManifestFile, FilesPerDestinationFolder,
-							AlternativeDataFolder, AppFolder, DockerFileFolder, ContentOnly, ExcludeCategories);
+							AlternativeDataFolder, AppFolder, DockerFileFolder, ContentOnly,
+							ExcludeCategories, ref HasContentFiles);
 					}
 
 					foreach (KeyValuePair<string, Dictionary<string, string>> CopyInstructions in FilesPerDestinationFolder)
@@ -597,7 +615,7 @@ namespace Waher.Utility.Install
 						DockerOutput.WriteLine();
 					}
 
-					if (AlternativeDataFolder != ProgramDataFolder)
+					if (HasContentFiles && AlternativeDataFolder != ProgramDataFolder)
 					{
 						WriteCommand(DockerOutput, "RUN", "cp", new string[]
 						{
@@ -624,6 +642,40 @@ namespace Waher.Utility.Install
 					}
 
 					DockerOutput.Flush();
+
+					if (!string.IsNullOrEmpty(EnvironmentFile))
+					{
+						using StreamWriter EnvironmentOutput = File.CreateText(EnvironmentFile);
+						int MaxLen = 0;
+						int Len;
+
+						foreach (KeyValuePair<string, KeyValuePair<string, string>> P in Variables)
+						{
+							s = P.Value.Value.Replace("\"", "\\\"");
+							Len = P.Key.Length + 3 + s.Length;
+							if (Len > MaxLen)
+								MaxLen = Len;
+						}
+
+						MaxLen += 2;
+
+						foreach (KeyValuePair<string, KeyValuePair<string, string>> P in Variables)
+						{
+							s = P.Value.Value.Replace("\"", "\\\"");
+							Len = P.Key.Length + 3 + s.Length;
+
+							EnvironmentOutput.Write(P.Key);
+							EnvironmentOutput.Write("=\"");
+							EnvironmentOutput.Write(s);
+							EnvironmentOutput.Write("\"");
+							EnvironmentOutput.Write(new string(' ', MaxLen - Len));
+							EnvironmentOutput.Write("# ");
+							EnvironmentOutput.Write(P.Value.Key.Replace("\"", "\\\""));
+							EnvironmentOutput.WriteLine("\"");
+						}
+
+						EnvironmentOutput.Flush();
+					}
 				}
 
 				if (!string.IsNullOrEmpty(ServiceName))
@@ -2277,10 +2329,12 @@ namespace Waher.Utility.Install
 		/// <param name="DockerFileFolder">Folder containing Dockerfile.</param>
 		/// <param name="ContentOnly">If only content files should be copied.</param>
 		/// <param name="ExcludeCategories">Any categories that should be exluded.</param>
+		/// <param name="HasContentFiles">If content files were found.</param>
 		public static void PrepareDockerCopyInstructions(string ManifestFile,
 			Dictionary<string, Dictionary<string, string>> FilesPerDestinationFolder,
 			string ProgramDataFolder, string AppFolder, string DockerFileFolder,
-			bool ContentOnly, Dictionary<string, bool> ExcludeCategories)
+			bool ContentOnly, Dictionary<string, bool> ExcludeCategories,
+			ref bool HasContentFiles)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
@@ -2329,7 +2383,8 @@ namespace Waher.Utility.Install
 				}
 			}
 
-			PrepareCopyContent(SourceFolder, AppFolder, ProgramDataFolder, DockerFileFolder, Module, FilesPerDestinationFolder, ExcludeCategories);
+			PrepareCopyContent(SourceFolder, AppFolder, ProgramDataFolder, DockerFileFolder,
+				Module, FilesPerDestinationFolder, ExcludeCategories, ref HasContentFiles);
 		}
 
 		private static void PrepareCopyFile(string SourcePath, string FileName, string DestFileName,
@@ -2352,7 +2407,7 @@ namespace Waher.Utility.Install
 
 		private static void PrepareCopyContent(string SourceFolder, string AppFolder, string DataFolder,
 			string DockerFileFolder, XmlElement Parent, Dictionary<string, Dictionary<string, string>> FilesPerDestinationFolder,
-			Dictionary<string, bool> ExcludeCategories)
+			Dictionary<string, bool> ExcludeCategories, ref bool HasContentFiles)
 		{
 			foreach (XmlNode N in Parent.ChildNodes)
 			{
@@ -2369,6 +2424,7 @@ namespace Waher.Utility.Install
 
 						Log.Informational("Content file: " + FileName);
 
+						HasContentFiles = true;
 						PrepareCopyFile(SourceFileName, FileName, Path.Combine(DataFolder, FileName), DockerFileFolder, FilesPerDestinationFolder);
 						PrepareCopyFile(SourceFileName, FileName, Path.Combine(AppFolder, FileName), DockerFileFolder, FilesPerDestinationFolder);
 						break;
@@ -2385,7 +2441,7 @@ namespace Waher.Utility.Install
 							new KeyValuePair<string, object>("App", AppFolder2),
 							new KeyValuePair<string, object>("Data", DataFolder2));
 
-						PrepareCopyContent(SourceFolder2, AppFolder2, DataFolder2, DockerFileFolder, E, FilesPerDestinationFolder, ExcludeCategories);
+						PrepareCopyContent(SourceFolder2, AppFolder2, DataFolder2, DockerFileFolder, E, FilesPerDestinationFolder, ExcludeCategories, ref HasContentFiles);
 						break;
 
 					case "File":

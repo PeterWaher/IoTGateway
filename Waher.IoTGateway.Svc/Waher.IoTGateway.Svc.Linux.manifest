@@ -1188,8 +1188,8 @@
 	<Variable name="GATEWAY_BACKUP_DAYS" default="3" label="The number of days daily backups are kept."/>
 	<Variable name="GATEWAY_BACKUP_MONTHS" default="3" label="The number of months monthly backups are kept."/>
 	<Variable name="GATEWAY_BACKUP_YEARS" default="3" label="The number of years yearly backups are kept."/>
-	<Variable name="GATEWAY_BACKUP_FOLDER" default="/ProgramData/IoT Gateway/Backup" label="Optional variable determining the folder backup files are to be stored, if different from the default backup folder."/>
-	<Variable name="GATEWAY_KEY_FOLDER" default="/ProgramData/IoT Gateway/Backup" label="Optional variable determining the folder key files are to be stored, if different from the default key folder."/>
+	<Variable name="GATEWAY_BACKUP_FOLDER" default="/var/lib/IoT Gateway/Backup" label="Optional variable determining the folder backup files are to be stored, if different from the default backup folder."/>
+	<Variable name="GATEWAY_KEY_FOLDER" default="/var/lib/IoT Gateway/Backup" label="Optional variable determining the folder key files are to be stored, if different from the default key folder."/>
 	<Variable name="GATEWAY_BACKUP_HOSTS" default="" label="A comma-separated list of secondary backup hosts for redundant storage of backup files."/>
 	<Variable name="GATEWAY_KEY_HOSTS" default="" label="A comma-separated list of secondary key hosts for redundant storage of key files."/>
 	<Variable name="GATEWAY_DOMAIN_USE" default="false" label="true or 1 if gateway uses a domain name, false or 0 if not."/>

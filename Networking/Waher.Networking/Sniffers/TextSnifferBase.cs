@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Networking.Sniffers.Model;
 
 namespace Waher.Networking.Sniffers
@@ -42,7 +43,8 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		protected virtual Task BeforeWrite()
 		{
-			return Task.CompletedTask;	// Do nothing by default.
+			this.OnBeforeWrite.Raise(this, EventArgs.Empty);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -50,8 +52,19 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		protected virtual Task AfterWrite()
 		{
-			return Task.CompletedTask;	// Do nothing by default.
+			this.OnAfterWrite.Raise(this, EventArgs.Empty);
+			return Task.CompletedTask;
 		}
+
+		/// <summary>
+		/// Event raised before a write operation takes place.
+		/// </summary>
+		public event EventHandler OnBeforeWrite;
+
+		/// <summary>
+		/// Event raised before a write operation takes place.
+		/// </summary>
+		public event EventHandler OnAfterWrite;
 
 		/// <summary>
 		/// Processes a binary reception event.

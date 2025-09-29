@@ -192,25 +192,8 @@ namespace Waher.Events.Files
 			if (this.deleteAfterDays < int.MaxValue)
 			{
 				string FolderName = Path.GetDirectoryName(s);
-				if (string.IsNullOrEmpty(FolderName))
-					FolderName = ".";
 
-				string[] Files = Directory.GetFiles(FolderName, "*.*");
-
-				foreach (string FileName in Files)
-				{
-					if ((DateTime.UtcNow - File.GetLastWriteTimeUtc(FileName)).TotalDays >= this.deleteAfterDays)
-					{
-						try
-						{
-							File.Delete(FileName);
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
-				}
+				Runtime.IO.Files.DeleteOldFiles(FolderName, TimeSpan.FromDays(this.deleteAfterDays), SearchOption.AllDirectories, true);
 			}
 		}
 

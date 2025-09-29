@@ -129,6 +129,7 @@
     <Compile Include="ContentEncodings\IContentEncoding.cs" />
     <Compile Include="ContentEncodings\PrecompressedFileReturner.cs" />
     <Compile Include="Cookie.cs" />
+    <Compile Include="CustomSniffersEventArgs.cs" />
     <Compile Include="Exceptions\Redirections\PermanentRedirectException.cs" />
     <Compile Include="HTTP2\BinaryReader.cs" />
     <Compile Include="HTTP2\BinaryWriter.cs" />

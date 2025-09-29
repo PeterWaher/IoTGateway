@@ -1103,7 +1103,7 @@ namespace Waher.Networking.HTTP
 		#region Connections
 
 #if WINDOWS_UWP
-		private void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
+		private async void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
 		{
 			try
 			{
@@ -1122,7 +1122,9 @@ namespace Waher.Networking.HTTP
 
 				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client, false);
 				BinaryTcpClient.Bind(true);
-				HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, Port, this.http2Profiling, this.Sniffers);
+
+				ISniffer[] Sniffers = await this.GetConnectionSniffers(BinaryTcpClient.RemoteEndPoint);
+				HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, Port, this.http2Profiling, Sniffers);
 				BinaryTcpClient.Continue();
 
 				lock (this.connections)
@@ -1194,7 +1196,8 @@ namespace Waher.Networking.HTTP
 							}
 							else
 							{
-								HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, Port, this.http2Profiling, this.Sniffers);
+								ISniffer[] Sniffers = await this.GetConnectionSniffers(BinaryTcpClient.RemoteEndPoint);
+								HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, Port, this.http2Profiling, Sniffers);
 								BinaryTcpClient.Continue();
 
 								lock (this.connections)
@@ -1309,7 +1312,8 @@ namespace Waher.Networking.HTTP
 						}
 					}
 
-					HttpClientConnection Connection = new HttpClientConnection(this, Client, true, Port, this.http2Profiling, this.Sniffers);
+					ISniffer[] Sniffers = await this.GetConnectionSniffers(Client.RemoteEndPoint);
+					HttpClientConnection Connection = new HttpClientConnection(this, Client, true, Port, this.http2Profiling, Sniffers);
 
 					if (this.HasSniffers)
 					{
@@ -1369,6 +1373,23 @@ namespace Waher.Networking.HTTP
 				await Client.DisposeAsync();
 			}
 		}
+
+		private async Task<ISniffer[]> GetConnectionSniffers(string RemoteEndpoint)
+		{
+			EventHandlerAsync<CustomSniffersEventArgs> h = this.GetCustomSniffers;
+			if (h is null)
+				return this.Sniffers;
+
+			CustomSniffersEventArgs e = new CustomSniffersEventArgs(RemoteEndpoint, this.Sniffers);
+			await h.Raise(this, e);
+
+			return e.Sniffers ?? Array.Empty<ISniffer>();
+		}
+
+		/// <summary>
+		/// Event raised when custom sniffers are requested for a new connection.
+		/// </summary>
+		public event EventHandlerAsync<CustomSniffersEventArgs> GetCustomSniffers = null;
 
 		private async Task LoginFailure(Exception ex, BinaryTcpClient Client, string RemoteIpEndpoint)
 		{
@@ -2262,7 +2283,7 @@ namespace Waher.Networking.HTTP
 		/// <returns>If request found among current requests.</returns>
 		public bool PingRequest(HttpRequest Request)
 		{
-			return this.currentRequests?.TryGetValue(Request, out RequestInfo _) == false;
+			return this.currentRequests?.Ping(Request) ?? false;
 		}
 
 		private Task CurrentRequests_Removed(object Sender, CacheItemEventArgs<HttpRequest, RequestInfo> e)

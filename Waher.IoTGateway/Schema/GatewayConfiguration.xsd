@@ -129,6 +129,11 @@
 								<xs:documentation>If profiling should be enabled to analyse HTTP/2 performance.</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
+						<xs:attribute name="sniffersPerEndpoint" type="xs:boolean" use="optional" default="false">
+							<xs:annotation>
+								<xs:documentation>If sniffers should be recorded in separate sub-folders based on the remote endpoint.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="Database">

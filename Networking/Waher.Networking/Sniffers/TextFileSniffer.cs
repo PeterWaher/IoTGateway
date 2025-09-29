@@ -72,10 +72,12 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Method is called before writing something to the text file.
 		/// </summary>
-		protected override Task BeforeWrite()
+		protected override async Task BeforeWrite()
 		{
+			await base.BeforeWrite();
+
 			if (!this.fileSequence.TryGetNewFileName(out string s))
-				return Task.CompletedTask;
+				return;
 
 			try
 			{
@@ -94,28 +96,9 @@ namespace Waher.Networking.Sniffers
 			if (this.deleteAfterDays < int.MaxValue)
 			{
 				string FolderName = Path.GetDirectoryName(s);
-				if (string.IsNullOrEmpty(FolderName))
-					FolderName = ".";
 
-				string[] Files = Directory.GetFiles(FolderName, "*.*");
-
-				foreach (string FileName in Files)
-				{
-					if ((DateTime.UtcNow - File.GetLastWriteTimeUtc(FileName)).TotalDays >= this.deleteAfterDays)
-					{
-						try
-						{
-							File.Delete(FileName);
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
-				}
+				Files.DeleteOldFiles(FolderName, TimeSpan.FromDays(this.deleteAfterDays), SearchOption.AllDirectories, true);
 			}
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>

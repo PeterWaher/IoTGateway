@@ -279,28 +279,7 @@ namespace Waher.Persistence.XmlLedger
 				string FolderName = Path.GetDirectoryName(s);
 
 				if (!string.IsNullOrEmpty(FolderName))
-				{
-					string[] Files = Directory.GetFiles(FolderName, "*.*");
-
-					foreach (string FileName in Files)
-					{
-						if ((DateTime.UtcNow - File.GetLastWriteTimeUtc(FileName)).TotalDays >= this.deleteAfterDays)
-						{
-							try
-							{
-								File.Delete(FileName);
-							}
-							catch (IOException ex)
-							{
-								Log.Error("Unable to delete file: " + ex.Message, FileName);
-							}
-							catch (Exception ex)
-							{
-								Log.Exception(ex, FileName);
-							}
-						}
-					}
-				}
+					Files.DeleteOldFiles(FolderName, TimeSpan.FromDays(this.deleteAfterDays), SearchOption.AllDirectories, true);
 			}
 		}
 

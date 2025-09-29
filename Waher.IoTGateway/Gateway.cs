@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -72,6 +73,7 @@ using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Reports;
 using Waher.Reports.Files;
+using Waher.Runtime.Cache;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Inventory.Loader;
@@ -146,6 +148,7 @@ namespace Waher.IoTGateway
 		private static readonly Dictionary<EventHandlerAsync, int> serviceCommandNrByCallback = new Dictionary<EventHandlerAsync, int>();
 		private static readonly Dictionary<string, DateTime> lastUnauthorizedAccess = new Dictionary<string, DateTime>();
 		private static readonly DateTime startTime = DateTime.Now;
+		private static Cache<string, XmlFileSniffer> xmlFileSnifferCache = null;
 		private static byte[] emergencyMemory = new byte[1024 * 1024];
 		private static IDatabaseProvider internalProvider = null;
 		private static ThingRegistryClient thingRegistryClient = null;
@@ -387,6 +390,7 @@ namespace Waher.IoTGateway
 				int Http2HeaderTableSize = 8192;
 				bool Http2NoRfc7540Priorities = false;
 				bool Http2Profiling = false;
+				bool HttpSniffersPerEndpoint = false;
 
 				// Bandwidth Delay Product, 100 MBit/s * 200 ms = 20 MBit = 2.5 MB window size
 				// to avoid congestion.
@@ -433,6 +437,7 @@ namespace Waher.IoTGateway
 								Http2HeaderTableSize = XML.Attribute(E, "headerTableSize", Http2HeaderTableSize);
 								Http2NoRfc7540Priorities = XML.Attribute(E, "noRfc7540Priorities", Http2NoRfc7540Priorities);
 								Http2Profiling = XML.Attribute(E, "profiling", Http2Profiling);
+								HttpSniffersPerEndpoint = XML.Attribute(E, "sniffersPerEndpoint", false);
 								break;
 
 							case "ContentEncodings":
@@ -1321,7 +1326,7 @@ namespace Waher.IoTGateway
 				httpxProxy.Socks5Proxy = socksProxy;
 				httpxServer.Socks5Proxy = socksProxy;
 
-				if (xmppCredentials.Sniffer)
+				if (xmppCredentials.Sniffer || HttpSniffersPerEndpoint)
 				{
 					ISniffer Sniffer;
 
@@ -1330,6 +1335,14 @@ namespace Waher.IoTGateway
 						appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
 						7, BinaryPresentationMethod.ByteCount);
 					webServer.Add(Sniffer);
+
+					if (HttpSniffersPerEndpoint)
+					{
+						xmlFileSnifferCache = new Cache<string, XmlFileSniffer>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromHours(1));
+						xmlFileSnifferCache.Removed += XmlFileSnifferCache_Removed;
+
+						webServer.GetCustomSniffers += GetCustomHttpSniffers;
+					}
 				}
 
 				await ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
@@ -1582,6 +1595,44 @@ namespace Waher.IoTGateway
 			}
 
 			return true;
+		}
+
+		private static Task GetCustomHttpSniffers(object Sender, CustomSniffersEventArgs e)
+		{
+			int i, c = e.Sniffers?.Length ?? 0;
+
+			for (i = 0; i < c; i++)
+			{
+				if (e.Sniffers[i] is XmlFileSniffer)
+				{
+					string RemoteIp = e.RemoteEndpoint.RemovePortNumber();
+
+					if (!(xmlFileSnifferCache?.TryGetValue(RemoteIp, out XmlFileSniffer Cached) ?? false))
+					{
+						Cached = new XmlFileSniffer(appDataFolder + "HTTP" + Path.DirectorySeparatorChar +
+							RemoteIp.Replace(':', '_') + Path.DirectorySeparatorChar +
+							"HTTP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
+							appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
+							7, BinaryPresentationMethod.ByteCount);
+
+						Cached.OnBeforeWrite += (sender, e2) =>
+						{
+							xmlFileSnifferCache?.Ping(RemoteIp);
+						};
+
+						xmlFileSnifferCache?.Add(RemoteIp, Cached);
+					}
+
+					e.Sniffers[i] = Cached;
+				}
+			}
+
+			return Task.CompletedTask;
+		}
+
+		private static async Task XmlFileSnifferCache_Removed(object Sender, CacheItemEventArgs<string, XmlFileSniffer> e)
+		{
+			await e.Value.DisposeAsync();
 		}
 
 		private static Task ProvisionedMeteringNode_QrCodeUrlRequested(object Sender, GetQrCodeUrlEventArgs e)
@@ -2547,6 +2598,9 @@ namespace Waher.IoTGateway
 					await SafeDispose(webServer);
 					webServer = null;
 				}
+
+				SafeDispose(xmlFileSnifferCache);
+				xmlFileSnifferCache = null;
 
 				root = null;
 

@@ -147,6 +147,8 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		protected override async Task BeforeWrite()
 		{
+			await base.BeforeWrite();
+
 			if (!this.fileSequence.TryGetNewFileName(out string s))
 				return;
 
@@ -212,29 +214,8 @@ namespace Waher.Networking.Sniffers
 			if (this.deleteAfterDays < int.MaxValue)
 			{
 				string FolderName = Path.GetDirectoryName(s);
-				if (string.IsNullOrEmpty(FolderName))
-					FolderName = ".";
 
-				string[] Files = Directory.GetFiles(FolderName, "*.*");
-
-				foreach (string FileName in Files)
-				{
-					if ((DateTime.UtcNow - File.GetLastWriteTimeUtc(FileName)).TotalDays >= this.deleteAfterDays)
-					{
-						try
-						{
-							File.Delete(FileName);
-						}
-						catch (IOException ex)
-						{
-							Log.Error("Unable to delete file: " + ex.Message, FileName);
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex, FileName);
-						}
-					}
-				}
+				Files.DeleteOldFiles(FolderName, TimeSpan.FromDays(this.deleteAfterDays), SearchOption.AllDirectories, true);
 			}
 		}
 

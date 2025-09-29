@@ -430,7 +430,12 @@ namespace Waher.Networking.HTTP
 				else
 					Folder = this.GetRootHostFolder(Host);
 
-				if (Found = File.Exists(s2 = Folder + s))
+				if (Folder.EndsWith(Path.DirectorySeparatorChar) && s.StartsWith(Path.DirectorySeparatorChar))
+					s2 = Folder + s.Substring(1);
+				else
+					s2 = Folder + s;
+
+				if (Found = File.Exists(s2))
 					return s2;
 
 				i = s2.LastIndexOf('.');

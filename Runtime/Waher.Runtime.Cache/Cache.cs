@@ -216,6 +216,16 @@ namespace Waher.Runtime.Cache
 		}
 
 		/// <summary>
+		/// Pings an entry in the cache, to keep it from being removed.
+		/// </summary>
+		/// <param name="Key">Key of value.</param>
+		/// <returns>If the item was found in the cache.</returns>
+		public bool Ping(KeyType Key)
+		{
+			return this.TryGetValue(Key, out _);
+		}
+
+		/// <summary>
 		/// Tries to get a value from the cache.
 		/// </summary>
 		/// <param name="Key">Key of value.</param>
@@ -316,7 +326,7 @@ namespace Waher.Runtime.Cache
 		/// <returns>If the key is available.</returns>
 		public bool ContainsKey(KeyType Key)
 		{
-			return (this.TryGetValue(Key, out ValueType _));
+			return this.TryGetValue(Key, out ValueType _);
 		}
 
 		private DateTime GetLastUsageTimeLocked()

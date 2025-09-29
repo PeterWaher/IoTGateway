@@ -1,6 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Events;
 
 namespace Waher.Runtime.IO
 {
@@ -129,5 +132,88 @@ namespace Waher.Runtime.IO
 			}
 		}
 
+		/// <summary>
+		/// Deletes old files.
+		/// </summary>
+		/// <param name="FolderName">Folder to search for old files. Search is not recursive.</param>
+		/// <param name="MaxAge">Maximum age.</param>
+		public static void DeleteOldFiles(string FolderName, TimeSpan MaxAge)
+		{
+			DeleteOldFiles(FolderName, MaxAge, SearchOption.TopDirectoryOnly, false);
+		}
+
+		/// <summary>
+		/// Deletes old files.
+		/// </summary>
+		/// <param name="FolderName">Folder to search for old files.</param>
+		/// <param name="MaxAge">Maximum age.</param>
+		/// <param name="SearchOption">Search options.</param>
+		/// <param name="DeleteEmptySubFolders">If empty sub-folders should be deleted.</param>
+		public static void DeleteOldFiles(string FolderName, TimeSpan MaxAge, SearchOption SearchOption, bool DeleteEmptySubFolders)
+		{
+			if (string.IsNullOrEmpty(FolderName))
+				FolderName = ".";
+
+			FolderName = Path.GetFullPath(FolderName);
+			if (FolderName[FolderName.Length - 1] != Path.DirectorySeparatorChar)
+				FolderName += Path.DirectorySeparatorChar;
+
+			string[] Files = Directory.GetFiles(FolderName, "*.*", SearchOption);
+			Dictionary<string, bool> Folders = new Dictionary<string, bool>();
+			double MaxDays = MaxAge.TotalDays;
+
+			foreach (string FileName in Files)
+			{
+				if ((DateTime.UtcNow - File.GetLastWriteTimeUtc(FileName)).TotalDays >= MaxDays)
+				{
+					try
+					{
+						File.Delete(FileName);
+						Folders[Path.GetDirectoryName(FileName)] = true;
+					}
+					catch (IOException ex)
+					{
+						Log.Error("Unable to delete file: " + ex.Message, FileName);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+				}
+			}
+
+			if (DeleteEmptySubFolders && SearchOption != SearchOption.TopDirectoryOnly)
+			{
+				foreach (string Folder in Folders.Keys)
+				{
+					if (Folder.Length <= FolderName.Length)
+						continue;
+
+					try
+					{
+						IEnumerable<string> Entries = Directory.EnumerateFileSystemEntries(Folder);
+						
+						using (IEnumerator<string> Enumerator = Entries.GetEnumerator())
+						{
+							if (Enumerator.MoveNext())
+								continue;
+
+							try
+							{
+								Directory.Delete(Folder);
+							}
+							catch (IOException ex)
+							{
+								Log.Error("Unable to delete folder: " + ex.Message, Folder);
+							}
+						}
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+				}
+			}
+		}
 	}
 }

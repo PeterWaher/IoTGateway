@@ -571,11 +571,13 @@ namespace Waher.Utility.Install
 
 					string DockerFileFolder = Path.GetDirectoryName(Path.GetFullPath(DockerFile));
 					Dictionary<string, Dictionary<string, string>> FilesPerDestinationFolder = [];
+					bool HasContentFiles = false;
 
 					foreach (string ManifestFile in ManifestFiles)
 					{
 						PrepareDockerCopyInstructions(ManifestFile, FilesPerDestinationFolder,
-							AlternativeDataFolder, AppFolder, DockerFileFolder, ContentOnly, ExcludeCategories);
+							AlternativeDataFolder, AppFolder, DockerFileFolder, ContentOnly, 
+							ExcludeCategories, ref HasContentFiles);
 					}
 
 					foreach (KeyValuePair<string, Dictionary<string, string>> CopyInstructions in FilesPerDestinationFolder)
@@ -597,7 +599,7 @@ namespace Waher.Utility.Install
 						DockerOutput.WriteLine();
 					}
 
-					if (AlternativeDataFolder != ProgramDataFolder)
+					if (HasContentFiles && AlternativeDataFolder != ProgramDataFolder)
 					{
 						WriteCommand(DockerOutput, "RUN", "cp", new string[]
 						{
@@ -2277,10 +2279,12 @@ namespace Waher.Utility.Install
 		/// <param name="DockerFileFolder">Folder containing Dockerfile.</param>
 		/// <param name="ContentOnly">If only content files should be copied.</param>
 		/// <param name="ExcludeCategories">Any categories that should be exluded.</param>
+		/// <param name="HasContentFiles">If content files were found.</param>
 		public static void PrepareDockerCopyInstructions(string ManifestFile,
 			Dictionary<string, Dictionary<string, string>> FilesPerDestinationFolder,
 			string ProgramDataFolder, string AppFolder, string DockerFileFolder,
-			bool ContentOnly, Dictionary<string, bool> ExcludeCategories)
+			bool ContentOnly, Dictionary<string, bool> ExcludeCategories,
+			ref bool HasContentFiles)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
@@ -2329,7 +2333,8 @@ namespace Waher.Utility.Install
 				}
 			}
 
-			PrepareCopyContent(SourceFolder, AppFolder, ProgramDataFolder, DockerFileFolder, Module, FilesPerDestinationFolder, ExcludeCategories);
+			PrepareCopyContent(SourceFolder, AppFolder, ProgramDataFolder, DockerFileFolder, 
+				Module, FilesPerDestinationFolder, ExcludeCategories, ref HasContentFiles);
 		}
 
 		private static void PrepareCopyFile(string SourcePath, string FileName, string DestFileName,
@@ -2352,7 +2357,7 @@ namespace Waher.Utility.Install
 
 		private static void PrepareCopyContent(string SourceFolder, string AppFolder, string DataFolder,
 			string DockerFileFolder, XmlElement Parent, Dictionary<string, Dictionary<string, string>> FilesPerDestinationFolder,
-			Dictionary<string, bool> ExcludeCategories)
+			Dictionary<string, bool> ExcludeCategories, ref bool HasContentFiles)
 		{
 			foreach (XmlNode N in Parent.ChildNodes)
 			{
@@ -2369,6 +2374,7 @@ namespace Waher.Utility.Install
 
 						Log.Informational("Content file: " + FileName);
 
+						HasContentFiles = true;
 						PrepareCopyFile(SourceFileName, FileName, Path.Combine(DataFolder, FileName), DockerFileFolder, FilesPerDestinationFolder);
 						PrepareCopyFile(SourceFileName, FileName, Path.Combine(AppFolder, FileName), DockerFileFolder, FilesPerDestinationFolder);
 						break;
@@ -2385,7 +2391,7 @@ namespace Waher.Utility.Install
 							new KeyValuePair<string, object>("App", AppFolder2),
 							new KeyValuePair<string, object>("Data", DataFolder2));
 
-						PrepareCopyContent(SourceFolder2, AppFolder2, DataFolder2, DockerFileFolder, E, FilesPerDestinationFolder, ExcludeCategories);
+						PrepareCopyContent(SourceFolder2, AppFolder2, DataFolder2, DockerFileFolder, E, FilesPerDestinationFolder, ExcludeCategories, ref HasContentFiles);
 						break;
 
 					case "File":

@@ -670,8 +670,8 @@ namespace Waher.Utility.Install
 							EnvironmentOutput.Write("\"");
 							EnvironmentOutput.Write(new string(' ', MaxLen - Len));
 							EnvironmentOutput.Write("# ");
-							EnvironmentOutput.Write(P.Value.Key.Replace("\"", "\\\""));
-							EnvironmentOutput.WriteLine("\"");
+							EnvironmentOutput.Write(P.Value.Key);
+							EnvironmentOutput.WriteLine();
 						}
 
 						EnvironmentOutput.Flush();

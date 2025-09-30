@@ -1374,6 +1374,17 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
+		private async Task LoginFailure(Exception ex, BinaryTcpClient Client, string RemoteIpEndpoint)
+		{
+			Exception ex2 = Log.UnnestException(ex);
+			Security.LoginMonitor.LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "HTTPS");
+
+			if (this.HasSniffers)
+				this.Error("Connection closed (authentication failed).");
+
+			await Client.DisposeAsync();
+		}
+#endif
 		private async Task<ISniffer[]> GetConnectionSniffers(string RemoteEndpoint)
 		{
 			EventHandlerAsync<CustomSniffersEventArgs> h = this.GetCustomSniffers;
@@ -1390,18 +1401,6 @@ namespace Waher.Networking.HTTP
 		/// Event raised when custom sniffers are requested for a new connection.
 		/// </summary>
 		public event EventHandlerAsync<CustomSniffersEventArgs> GetCustomSniffers = null;
-
-		private async Task LoginFailure(Exception ex, BinaryTcpClient Client, string RemoteIpEndpoint)
-		{
-			Exception ex2 = Log.UnnestException(ex);
-			Security.LoginMonitor.LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "HTTPS");
-
-			if (this.HasSniffers)
-				this.Error("Connection closed (authentication failed).");
-
-			await Client.DisposeAsync();
-		}
-#endif
 
 		internal async Task<bool> Remove(HttpClientConnection Connection)
 		{

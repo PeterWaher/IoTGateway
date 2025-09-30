@@ -306,7 +306,12 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Accept-Encoding HTTP Field header. (RFC 2616, §14.3)
 		/// </summary>
-		public HttpFieldAcceptEncoding AcceptEncoding => this.acceptEncoding;
+		/// <remarks>Note: You can set property to null to disable Content Encoding.</remarks>
+		public HttpFieldAcceptEncoding AcceptEncoding
+		{
+			get => this.acceptEncoding;
+			set => this.acceptEncoding = value;
+		}
 
 		/// <summary>
 		/// Accept-Language HTTP Field header. (RFC 2616, §14.4)

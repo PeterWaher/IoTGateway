@@ -104,13 +104,13 @@ Solution Files
 The repository contains multiple solution files. Since the repo contains many different pojects, different solution files different subsets
 of projects, making it easier to work with different aspects of the gateway, or on different platforms.
 
-| Solution File | Description |
-|:--------------|:------------|
-| `IoTGateway.sln`     | Main solution. Contains references to all gateway projects, for most platforms.       |
-| `IoTGatewayCore.sln` | Solution file that contains core libraries only (i.e. .NET Standard and .NET Core projects). Can be compiled using VS Code on multiple platforms. |
+| Solution File        | Description |
+|:---------------------|:------------|
 | `Cluster.sln`        | Contains libraries related to the cluster networking library, and their dependecies.  |
 | `Content.sln`        | Contains Content-related libraries, and their dependecies.                            |
 | `HTTP.sln`           | Contains libraries related to the HTTP networking library, and their dependecies.     |
+| `IoTGateway.sln`     | Main solution. Contains references to all gateway projects, for most platforms.       |
+| `IoTGatewayCore.sln` | Solution file that contains core libraries only (i.e. .NET Standard and .NET Core projects). Can be compiled using VS Code on multiple platforms. |
 | `Layout.sln`         | Contains Layout-related libraries, and their dependecies.                             |
 | `Persistence.sln`    | Contains Persistence-related libraries, and their dependecies.                        |
 | `Runtime.sln`        | Contains Runtime-related libraries, and their dependecies.                            |

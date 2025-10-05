@@ -53,6 +53,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.FullTextSearch
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Collections", "Runtime\Waher.Runtime.Collections\Waher.Runtime.Collections.csproj", "{5CDF528D-0A11-1018-12C2-6701324C8856}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.XmlLedger", "Persistence\Waher.Persistence.XmlLedger\Waher.Persistence.XmlLedger.csproj", "{B5393774-223B-23D2-B46C-E4C861669BC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.XmlLedger.Test", "Persistence\Waher.Persistence.XmlLedger.Test\Waher.Persistence.XmlLedger.Test.csproj", "{93A5CE96-3187-15F8-36F6-7FC4A5F665D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +139,14 @@ Global
 		{5CDF528D-0A11-1018-12C2-6701324C8856}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CDF528D-0A11-1018-12C2-6701324C8856}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CDF528D-0A11-1018-12C2-6701324C8856}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5393774-223B-23D2-B46C-E4C861669BC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5393774-223B-23D2-B46C-E4C861669BC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5393774-223B-23D2-B46C-E4C861669BC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5393774-223B-23D2-B46C-E4C861669BC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93A5CE96-3187-15F8-36F6-7FC4A5F665D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93A5CE96-3187-15F8-36F6-7FC4A5F665D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93A5CE96-3187-15F8-36F6-7FC4A5F665D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93A5CE96-3187-15F8-36F6-7FC4A5F665D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -147,6 +159,7 @@ Global
 		{382C12E9-EAA0-40CC-8896-563AAB42E0DB} = {38AE860A-1581-4605-B415-3822A9CDC705}
 		{9F660EE6-8F34-4B5C-B1CC-33EDBDA27091} = {0D510A76-814B-4D6E-8D13-9C59507F7A7C}
 		{98F40C68-0AB6-49CB-B913-95DC23D18D75} = {38AE860A-1581-4605-B415-3822A9CDC705}
+		{5CDF528D-0A11-1018-12C2-6701324C8856} = {0D510A76-814B-4D6E-8D13-9C59507F7A7C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09539FCE-8EB5-447C-A9AF-6FA30BE14418}

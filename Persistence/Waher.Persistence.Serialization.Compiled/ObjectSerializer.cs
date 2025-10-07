@@ -226,6 +226,7 @@ namespace Waher.Persistence.Serialization
 		private bool hasByRef = false;
 		private bool backupCollection = true;
 		private bool prepared = false;
+		private bool hasEncrypted = false;
 		private string noBackupReason = null;
 
 		internal ObjectSerializer(ISerializerContext Context, Type Type)    // Note order.
@@ -2341,12 +2342,17 @@ namespace Waher.Persistence.Serialization
 					CSharp.Append(this.objectIdMemberInfo.Name);
 					CSharp.AppendLine(";");
 
+					CSharp.Append("\t\t\tif (");
+
+					if (!HasEncrypted)
+						CSharp.Append("!Embedded && ");
+
 					if (this.objectIdMemberType == typeof(Guid))
-						CSharp.AppendLine("\t\t\tif (!Embedded && ObjectId.Equals(Guid.Empty))");
+						CSharp.AppendLine("ObjectId.Equals(Guid.Empty))");
 					else if (this.objectIdMemberType == typeof(string))
-						CSharp.AppendLine("\t\t\tif (!Embedded && string.IsNullOrEmpty(ObjectId))");
+						CSharp.AppendLine("string.IsNullOrEmpty(ObjectId))");
 					else if (this.objectIdMemberType == typeof(byte[]))
-						CSharp.AppendLine("\t\t\tif (!Embedded && ObjectId is null)");
+						CSharp.AppendLine("ObjectId is null)");
 					else
 						throw new SerializationException("Invalid Object ID type.", this.type);
 
@@ -3610,6 +3616,7 @@ namespace Waher.Persistence.Serialization
 						else if (Attr is EncryptedAttribute EncryptedAttribute)
 						{
 							Encrypted = true;
+							this.hasEncrypted = true;
 							DecryptedMinLength = EncryptedAttribute.MinLength;
 						}
 					}
@@ -4685,7 +4692,8 @@ namespace Waher.Persistence.Serialization
 							Writer.Write(this.collectionName);
 					}
 				}
-				else
+
+				if (!Embedded || this.hasEncrypted)
 				{
 					if (this.objectIdMember is null)
 						ObjectId = this.context.CreateGuid();

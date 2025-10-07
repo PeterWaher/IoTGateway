@@ -1886,15 +1886,15 @@ namespace Waher.Utility.Install
 														Dependencies2[Dependency.Name] = Dependency.Version.ToString();
 
 													Dictionary<string, object> Runtime = new()
-												{
-													{ Path.GetFileName(FileName), new Dictionary<string,object>() }
-												};
+													{
+														{ Path.GetFileName(FileName), new Dictionary<string,object>() }
+													};
 
 													Target[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
-												{
-													{ "dependencies", Dependencies2 },
-													{ "runtime", Runtime }
-												};
+													{
+														{ "dependencies", Dependencies2 },
+														{ "runtime", Runtime }
+													};
 												}
 											}
 										}
@@ -1913,11 +1913,11 @@ namespace Waher.Utility.Install
 											}
 
 											Libraries[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
-										{
-											{ "type", "project" },
-											{ "serviceable", false },
-											{ "sha512", string.Empty }
-										};
+											{
+												{ "type", "project" },
+												{ "serviceable", false },
+												{ "sha512", string.Empty }
+											};
 										}
 									}
 								}

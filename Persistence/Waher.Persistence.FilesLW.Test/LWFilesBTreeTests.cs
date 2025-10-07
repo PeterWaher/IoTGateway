@@ -69,6 +69,8 @@ namespace Waher.Persistence.FilesLW.Test
 				typeof(Expression).Assembly,
 				typeof(Script.Persistence.SQL.Select).Assembly,
 				typeof(Duration).Assembly);
+
+			Types.SetModuleParameter("Data", "Data");
 		}
 
 		[TestInitialize]

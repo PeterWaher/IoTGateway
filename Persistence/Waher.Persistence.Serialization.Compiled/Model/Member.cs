@@ -17,12 +17,14 @@ namespace Waher.Persistence.Serialization.Model
 		private IObjectSerializer nestedSerializer = null;
 		private readonly ulong fieldCode;
 		private readonly uint memberFieldDataTypeCode;
+		private readonly int decryptedMinLength;
 		private readonly bool isNestedObject;
 		private bool byReference = false;
 		private readonly bool nullable = false;
 		private bool isDefaultValueDefined = false;
 		private readonly bool isEnum = false;
 		private readonly bool hasFlags = false;
+		private readonly bool encrypted = false;
 
 		/// <summary>
 		/// Class member.
@@ -30,12 +32,18 @@ namespace Waher.Persistence.Serialization.Model
 		/// <param name="Name">Member name.</param>
 		/// <param name="FieldCode">Field Code.</param>
 		/// <param name="MemberType">Member type.</param>
-		public Member(string Name, ulong FieldCode, Type MemberType)
+		/// <param name="Encrypted">If the member is/should be encrypted.</param>
+		/// <param name="DecryptedMinLength">Minimum length of the property, in bytes, before 
+		/// encryption. If the clear text property is shorter than this, random bytes will be 
+		/// appended to pad the property to this length, before encryption.</param>
+		public Member(string Name, ulong FieldCode, Type MemberType, bool Encrypted, int DecryptedMinLength)
 		{
 			this.name = Name;
 			this.fieldCode = FieldCode;
 			this.memberType = MemberType;
 			this.memberTypeInfo = MemberType.GetTypeInfo();
+			this.encrypted = Encrypted;
+			this.decryptedMinLength = DecryptedMinLength;
 
 			if (this.memberTypeInfo.IsGenericType)
 			{
@@ -183,6 +191,17 @@ namespace Waher.Persistence.Serialization.Model
 		/// If the member type represents a nested object.
 		/// </summary>
 		public bool IsNestedObject => this.isNestedObject;
+
+		/// <summary>
+		/// If the member is/should be encrypted.
+		/// </summary>
+		public bool Encrypted => this.encrypted;
+
+		/// <summary>Minimum length of the property, in bytes, before encryption. If the 
+		/// clear text property is shorter than this, random bytes will be appended to pad 
+		/// the property to this length, before encryption.
+		/// </summary>
+		public int DecryptedMinLength => this.decryptedMinLength;
 
 		/// <summary>
 		/// Default value.

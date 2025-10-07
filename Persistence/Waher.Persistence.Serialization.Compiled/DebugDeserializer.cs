@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 
 namespace Waher.Persistence.Serialization
 {
@@ -26,6 +27,11 @@ namespace Waher.Persistence.Serialization
 		/// Name of current collection.
 		/// </summary>
 		public string CollectionName => this.deserializer.CollectionName;
+
+		/// <summary>
+		/// Text encoding used.
+		/// </summary>
+		public Encoding Encoding => this.deserializer.Encoding;
 
 		/// <summary>
 		/// Deserializes a value.

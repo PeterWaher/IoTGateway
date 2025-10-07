@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Waher.Persistence.Serialization
 {
@@ -11,6 +12,14 @@ namespace Waher.Persistence.Serialization
 		/// Name of current collection.
 		/// </summary>
 		string CollectionName
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Text encoding used.
+		/// </summary>
+		Encoding Encoding
 		{
 			get;
 		}

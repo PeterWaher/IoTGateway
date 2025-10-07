@@ -70,6 +70,7 @@ namespace Waher.Persistence.FilesLW.Test
 				Double = 12345.6789,
 				Single = 12345.6789f,
 				String = "Today, there will be a lot of ☀.",
+				ShortString = "Hello",
 				DateTime = DateTime.Now,
 				DateTimeOffset = DateTimeOffset.Now,
 				Guid = Guid.NewGuid(),
@@ -115,6 +116,8 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.Single, Value);
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("String", Obj));
 			AssertEx.Same(Obj.String, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("ShortString", Obj));
+			AssertEx.Same(Obj.ShortString, Value);
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("DateTime", Obj));
 			AssertEx.Same(Obj.DateTime, Value);
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("DateTimeOffset", Obj));
@@ -214,6 +217,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.Double, GenObj["Double"]);
 			AssertEx.Same(Obj.Single, GenObj["Single"]);
 			AssertEx.Same(Obj.String, GenObj["String"]);
+			AssertEx.Same(Obj.ShortString, GenObj["ShortString"]);
 			AssertEx.Same(Obj.DateTime, GenObj["DateTime"]);
 			AssertEx.Same(Obj.DateTimeOffset, GenObj["DateTimeOffset"]);
 			AssertEx.Same(Obj.TimeSpan, GenObj["TimeSpan"]);
@@ -237,6 +241,8 @@ namespace Waher.Persistence.FilesLW.Test
 
 				ConsoleOut.Write(Data[i].ToString("x2"));
 			}
+
+			ConsoleOut.WriteLine();
 		}
 
 		private static void AssertBinaryLength(byte[] Data, DebugDeserializer Reader)
@@ -2560,6 +2566,187 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
 
 			AssertBinaryLength(Data, Reader);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_29_SimpleEncryptedObject()
+		{
+			SimpleEncrypted Obj = new()
+			{
+				Boolean1 = true,
+				Boolean2 = false,
+				Byte = 15,
+				Short = -1234,
+				Int = -23456789,
+				Long = -345456456456456345,
+				SByte = -45,
+				UShort = 23456,
+				UInt = 334534564,
+				ULong = 4345345345345345,
+				Char = '☀',
+				Decimal = 12345.6789M,
+				Double = 12345.6789,
+				Single = 12345.6789f,
+				String = "Today, there will be a lot of ☀.",
+				DateTime = DateTime.Now,
+				DateTimeOffset = DateTimeOffset.Now,
+				Guid = Guid.NewGuid(),
+				NormalEnum = NormalEnum.Option3,
+				FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4,
+				CIString = "Hello World!"
+			};
+
+			Obj.TimeSpan = Obj.DateTime.TimeOfDay;
+
+			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(SimpleEncrypted));
+			object Value;
+
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean1", Obj));
+			AssertEx.Same(Obj.Boolean1, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean2", Obj));
+			AssertEx.Same(Obj.Boolean2, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Byte", Obj));
+			AssertEx.Same(Obj.Byte, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Short", Obj));
+			AssertEx.Same(Obj.Short, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Int", Obj));
+			AssertEx.Same(Obj.Int, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Long", Obj));
+			AssertEx.Same(Obj.Long, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("SByte", Obj));
+			AssertEx.Same(Obj.SByte, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UShort", Obj));
+			AssertEx.Same(Obj.UShort, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UInt", Obj));
+			AssertEx.Same(Obj.UInt, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("ULong", Obj));
+			AssertEx.Same(Obj.ULong, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Char", Obj));
+			AssertEx.Same(Obj.Char, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Decimal", Obj));
+			AssertEx.Same(Obj.Decimal, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Double", Obj));
+			AssertEx.Same(Obj.Double, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Single", Obj));
+			AssertEx.Same(Obj.Single, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("String", Obj));
+			AssertEx.Same(Obj.String, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("DateTime", Obj));
+			AssertEx.Same(Obj.DateTime, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("DateTimeOffset", Obj));
+			AssertEx.Same(Obj.DateTimeOffset, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("TimeSpan", Obj));
+			AssertEx.Same(Obj.TimeSpan, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Guid", Obj));
+			AssertEx.Same(Obj.Guid, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("NormalEnum", Obj));
+			AssertEx.Same(Obj.NormalEnum, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("FlagsEnum", Obj));
+			AssertEx.Same(Obj.FlagsEnum, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("CIString", Obj));
+			AssertEx.Same(Obj.CIString, Value);
+
+			DebugSerializer Writer = new(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			WriteData(Data);
+
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+
+			DebugDeserializer Reader = new(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
+
+			SimpleEncrypted Obj2 = (SimpleEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new(provider);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEncrypted(Obj, GenObj);
+
+			Writer.Restart();
+
+			await GS.Serialize(Writer, false, false, GenObj, null);
+
+			Data = Writer.GetSerialization();
+			WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (SimpleEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
+		}
+
+		internal static void AssertEqual(SimpleEncrypted Obj, SimpleEncrypted Obj2)
+		{
+			AssertEx.Same(Obj.Boolean1, Obj2.Boolean1);
+			AssertEx.Same(Obj.Boolean2, Obj2.Boolean2);
+			AssertEx.Same(Obj.Byte, Obj2.Byte);
+			AssertEx.Same(Obj.Short, Obj2.Short);
+			AssertEx.Same(Obj.Int, Obj2.Int);
+			AssertEx.Same(Obj.Long, Obj2.Long);
+			AssertEx.Same(Obj.SByte, Obj2.SByte);
+			AssertEx.Same(Obj.UShort, Obj2.UShort);
+			AssertEx.Same(Obj.UInt, Obj2.UInt);
+			AssertEx.Same(Obj.ULong, Obj2.ULong);
+			AssertEx.Same(Obj.Char, Obj2.Char);
+			AssertEx.Same(Obj.Decimal, Obj2.Decimal);
+			AssertEx.Same(Obj.Double, Obj2.Double);
+			AssertEx.Same(Obj.Single, Obj2.Single);
+			AssertEx.Same(Obj.String, Obj2.String);
+			AssertEx.Same(Obj.DateTime, Obj2.DateTime);
+			AssertEx.Same(Obj.DateTimeOffset, Obj2.DateTimeOffset);
+			AssertEx.Same(Obj.TimeSpan, Obj2.TimeSpan);
+			AssertEx.Same(Obj.Guid, Obj2.Guid);
+			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
+			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
+			AssertEx.Same(Obj.CIString, Obj2.CIString);
+			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
+		}
+
+		internal static void AssertEncrypted(SimpleEncrypted Obj, GenericObject GenObj)
+		{
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEncrypted(GenObj, "Boolean1", 100);
+			AssertEncrypted(GenObj, "Boolean2", 0);
+			AssertEncrypted(GenObj, "Byte", 100);
+			AssertEncrypted(GenObj, "Short", 0);
+			AssertEncrypted(GenObj, "Int", 100);
+			AssertEncrypted(GenObj, "Long", 0);
+			AssertEncrypted(GenObj, "SByte", 100);
+			AssertEncrypted(GenObj, "UShort", 0);
+			AssertEncrypted(GenObj, "UInt", 100);
+			AssertEncrypted(GenObj, "ULong", 0);
+			AssertEncrypted(GenObj, "Char", 100);
+			AssertEncrypted(GenObj, "Decimal", 0);
+			AssertEncrypted(GenObj, "Double", 100);
+			AssertEncrypted(GenObj, "Single", 0);
+			AssertEncrypted(GenObj, "String", 100);
+			AssertEncrypted(GenObj, "ShortString", 0);
+			AssertEncrypted(GenObj, "DateTime", 100);
+			AssertEncrypted(GenObj, "DateTimeOffset", 0);
+			AssertEncrypted(GenObj, "TimeSpan", 100);
+			AssertEncrypted(GenObj, "Guid", 0);
+			AssertEncrypted(GenObj, "NormalEnum", 100);
+			AssertEncrypted(GenObj, "FlagsEnum", 0);
+			AssertEncrypted(GenObj, "CIString", 100);
+			AssertEx.Same(Obj.ObjectId, GenObj.ObjectId);
+		}
+
+		private static void AssertEncrypted(GenericObject GenObj, string Property, int MinLength)
+		{
+			Assert.IsTrue(GenObj[Property] is byte[] Encrypted &&
+				Encrypted.Length >= MinLength);
 		}
 
 		// TODO: Objects, by reference, nullable (incl. null strings, arrays)

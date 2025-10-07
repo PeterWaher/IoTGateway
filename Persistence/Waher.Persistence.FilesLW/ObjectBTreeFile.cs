@@ -65,7 +65,7 @@ namespace Waher.Persistence.Files
 		private uint blockLimit;
 		private uint blobBlockLimit;
 		private bool emptyRoot = false;
-		private readonly Aes aes;
+		private Aes aes;
 		private byte[] aesKey;
 		private byte[] ivSeed;
 		private int ivSeedLen;
@@ -220,12 +220,7 @@ namespace Waher.Persistence.Files
 				Encoding, TimeoutMilliseconds, Encrypted, RecordHandler, FileAccess);
 
 			if (Result.encrypted)
-			{
-				KeyValuePair<byte[], byte[]> P = await Result.provider.GetKeys(Result.fileName, Result.file.FilePreExisting);
-				Result.aesKey = P.Key;
-				Result.ivSeed = P.Value;
-				Result.ivSeedLen = Result.ivSeed.Length;
-			}
+				await Result.EnsureKeys();
 
 			if (!Result.file.FilePreExisting || Result.file.Length == 0)
 				await Result.CreateFirstBlock();
@@ -233,6 +228,29 @@ namespace Waher.Persistence.Files
 			Result.blockLimit = Result.file.BlockLimit;
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Ensures cryptographic keys are loaded.
+		/// </summary>
+		internal async Task EnsureKeys()
+		{
+			if (this.aesKey is null || this.ivSeed is null)
+			{
+				KeyValuePair<byte[], byte[]> P = await this.provider.GetKeys(this.fileName, this.file.FilePreExisting);
+				this.aesKey = P.Key;
+				this.ivSeed = P.Value;
+				this.ivSeedLen = this.ivSeed.Length;
+			}
+
+			if (this.aes is null)
+			{
+				this.aes = Aes.Create();
+				this.aes.BlockSize = 128;
+				this.aes.KeySize = 256;
+				this.aes.Mode = CipherMode.CBC;
+				this.aes.Padding = PaddingMode.None;
+			}
 		}
 
 		/// <summary>
@@ -257,7 +275,7 @@ namespace Waher.Persistence.Files
 
 			if (!(this.fileAccess is null))
 			{
-				if (!this.fileAccess.Disposed)	// Object shared between object file and index files.
+				if (!this.fileAccess.Disposed)  // Object shared between object file and index files.
 					this.fileAccess.Dispose();
 			}
 		}
@@ -6571,5 +6589,178 @@ namespace Waher.Persistence.Files
 
 		#endregion
 
+		#region Encryption & Description
+
+		/// <summary>
+		/// Encrypts field data.
+		/// </summary>
+		/// <param name="Data">Data to encrypt.</param>
+		/// <param name="Property">Name of property.</param>
+		/// <param name="ObjectId">Object ID of object with encrypted data.</param>
+		/// <param name="MinLength">Minimum length of the property, in bytes, before 
+		/// encryption. If the clear text property is shorter than this, random bytes 
+		/// will be appended to pad the property to this length, before encryption.</param>
+		/// <returns>Encrypted field data.</returns>
+		internal byte[] Encrypt(byte[] Data, string Property, Guid ObjectId, int MinLength)
+		{
+			return this.Encrypt(Data, 0, Data?.Length ?? 0, Property, ObjectId, MinLength);
+		}
+
+		/// <summary>
+		/// Encrypts field data.
+		/// </summary>
+		/// <param name="Data">Data to encrypt.</param>
+		/// <param name="Offset">Offset into <paramref name="Data"/> where data begins.</param>
+		/// <param name="Count">Number of bytes to encrypt.</param>
+		/// <param name="Property">Name of property.</param>
+		/// <param name="ObjectId">Object ID of object with encrypted data.</param>
+		/// <param name="MinLength">Minimum length of the property, in bytes, before 
+		/// encryption. If the clear text property is shorter than this, random bytes 
+		/// will be appended to pad the property to this length, before encryption.</param>
+		/// <returns>Encrypted field data.</returns>
+		internal byte[] Encrypt(byte[] Data, int Offset, int Count, string Property, 
+			Guid ObjectId, int MinLength)
+		{
+			this.GetFieldKeys(Property, ObjectId, out byte[] Key, out byte[] IV);
+
+			if (Data is null)
+				Data = Array.Empty<byte>();
+
+			int i = Count;
+			int c = i;
+
+			do
+			{
+				c++;
+				i >>= 7;
+			}
+			while (i > 0);
+
+			if (c < MinLength)
+				c = MinLength;
+
+			i = c & 15;
+			if (i > 0)
+				c += 16 - i;
+
+			byte[] Bin = new byte[c];
+			int Pos = 0;
+			byte b;
+
+			i = Count;
+			do 
+			{
+				b = (byte)(i & 127);
+				i >>= 7;
+				if (i > 0)
+					b |= 0x80;
+
+				Bin[Pos++] = b;
+			}
+			while (i > 0);
+
+			if (Count > 0)
+			{
+				Array.Copy(Data, Offset, Bin, Pos, Count);
+				Pos += Count;
+			}
+
+			if (Pos < c)
+				FilesProvider.GetRandomBytes(Bin, Pos, c - Pos);
+
+			using (ICryptoTransform Aes = this.aes.CreateEncryptor(Key, IV))
+			{
+				Bin = Aes.TransformFinalBlock(Bin, 0, c);
+			}
+
+			return Bin;
+		}
+
+		/// <summary>
+		/// Decrypts field data.
+		/// </summary>
+		/// <param name="Data">Data to decrypt.</param>
+		/// <param name="Property">Name of property.</param>
+		/// <param name="ObjectId">Object ID of object with encrypted data.</param>
+		/// <returns>Decrypted field data.</returns>
+		internal byte[] Decrypt(byte[] Data, string Property, Guid ObjectId)
+		{
+			return this.Decrypt(Data, 0, Data?.Length ?? 0, Property, ObjectId);
+		}
+
+		/// <summary>
+		/// Decrypts field data.
+		/// </summary>
+		/// <param name="Data">Data to decrypt.</param>
+		/// <param name="Offset">Offset into <paramref name="Data"/> where data begins.</param>
+		/// <param name="Count">Number of bytes to encrypt.</param>
+		/// <param name="Property">Name of property.</param>
+		/// <param name="ObjectId">Object ID of object with encrypted data.</param>
+		/// <returns>Decrypted field data.</returns>
+		internal byte[] Decrypt(byte[] Data, int Offset, int Count, string Property, Guid ObjectId)
+		{
+			this.GetFieldKeys(Property, ObjectId, out byte[] Key, out byte[] IV);
+
+			byte[] Bin;
+
+			using (ICryptoTransform Aes = this.aes.CreateDecryptor(Key, IV))
+			{
+				Bin = Aes.TransformFinalBlock(Data, Offset, Count);
+			}
+
+			int Pos = 0;
+			int c = 0;
+			byte b;
+
+			do
+			{
+				c <<= 7;
+				b = Bin[Pos++];
+				c |= b & 0x7f;
+			}
+			while (b >= 0x80);
+
+			byte[] Result = new byte[c];
+			Array.Copy(Bin, Pos, Result, 0, c);
+
+			return Result;
+		}
+
+		private void GetFieldKeys(string Property, Guid ObjectId, out byte[] Key, out byte[] IV)
+		{
+			byte[] B;
+			int i, c;
+
+			using (SHA256 Sha256 = SHA256.Create())
+			{
+				Key = Sha256.ComputeHash(ObjectId.ToByteArray());
+				IV = Sha256.ComputeHash(Encoding.UTF8.GetBytes(Property));
+
+				if (this.aesKey.Length == (c = Key.Length))
+					B = this.aesKey;
+				else
+					B = Sha256.ComputeHash(this.aesKey);
+
+				for (i = 0; i < c; i++)
+					Key[i] ^= B[i];
+
+				if (this.ivSeedLen == c)
+					B = this.ivSeed;
+				else
+					B = Sha256.ComputeHash(this.ivSeed);
+
+				for (i = 0; i < c; i++)
+					IV[i] ^= B[i];
+
+				c >>= 1;
+
+				for (i = 0; i < c; i++)
+					IV[i] ^= IV[i + 16];
+
+				Array.Resize(ref IV, 16);
+			}
+		}
+
+		#endregion
 	}
 }

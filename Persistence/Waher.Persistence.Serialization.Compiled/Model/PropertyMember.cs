@@ -5,8 +5,8 @@ namespace Waher.Persistence.Serialization.Model
 	/// <summary>
 	/// Property member.
 	/// </summary>
-    public class PropertyMember : Member
-    {
+	public class PropertyMember : Member
+	{
 		private readonly PropertyInfo pi;
 
 		/// <summary>
@@ -14,8 +14,12 @@ namespace Waher.Persistence.Serialization.Model
 		/// </summary>
 		/// <param name="PI">Property information.</param>
 		/// <param name="FieldCode">Field Code.</param>
-		public PropertyMember(PropertyInfo PI, ulong FieldCode)
-			: base(PI.Name, FieldCode, PI.PropertyType)
+		/// <param name="Encrypted">If the member is/should be encrypted.</param>
+		/// <param name="DecryptedMinLength">Minimum length of the property, in bytes, before 
+		/// encryption. If the clear text property is shorter than this, random bytes will be 
+		/// appended to pad the property to this length, before encryption.</param>
+		public PropertyMember(PropertyInfo PI, ulong FieldCode, bool Encrypted, int DecryptedMinLength)
+			: base(PI.Name, FieldCode, PI.PropertyType, Encrypted, DecryptedMinLength)
 		{
 			this.pi = PI;
 		}

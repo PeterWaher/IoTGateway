@@ -111,5 +111,29 @@ namespace Waher.Persistence.Serialization
 		/// <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
 		/// <returns>Loaded object.</returns>
 		Task<object> TryLoadObject(Type T, Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter);
+
+		/// <summary>
+		/// Encrypts field data.
+		/// </summary>
+		/// <param name="Data">Data to encrypt.</param>
+		/// <param name="Property">Name of property.</param>
+		/// <param name="Collection">Collection in which the data is persisted.</param>
+		/// <param name="ObjectId">Object ID of object with encrypted data.</param>
+		/// <param name="MinLength">Minimum length of the property, in bytes, before 
+		/// encryption. If the clear text property is shorter than this, random bytes 
+		/// will be appended to pad the property to this length, before encryption.</param>
+		/// <returns>Encrypted field data.</returns>
+		Task<byte[]> Encrypt(byte[] Data, string Property, string Collection, Guid ObjectId, 
+			int MinLength);
+
+		/// <summary>
+		/// Decrypts field data.
+		/// </summary>
+		/// <param name="Data">Data to decrypt.</param>
+		/// <param name="Property">Name of property.</param>
+		/// <param name="Collection">Collection in which the data is persisted.</param>
+		/// <param name="ObjectId">Object ID of object with encrypted data.</param>
+		/// <returns>Decrypted field data.</returns>
+		Task<byte[]> Decrypt(byte[] Data, string Property, string Collection, Guid ObjectId);
 	}
 }

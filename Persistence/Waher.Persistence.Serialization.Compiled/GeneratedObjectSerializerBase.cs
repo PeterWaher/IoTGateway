@@ -187,8 +187,8 @@ namespace Waher.Persistence.Serialization
 		{
 			switch (FieldDataType)
 			{
-				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean() ? (byte)1 : (byte)0;
 				case ObjectSerializer.TYPE_BYTE: return Reader.ReadByte();
+				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean() ? (byte)1 : (byte)0;
 				case ObjectSerializer.TYPE_INT16: return (byte)Reader.ReadInt16();
 				case ObjectSerializer.TYPE_INT32: return (byte)Reader.ReadInt32();
 				case ObjectSerializer.TYPE_INT64: return (byte)Reader.ReadInt64();
@@ -239,12 +239,12 @@ namespace Waher.Persistence.Serialization
 		{
 			switch (FieldDataType)
 			{
+				case ObjectSerializer.TYPE_SBYTE: return (sbyte)Reader.ReadSByte();
 				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean() ? (sbyte)1 : (sbyte)0;
 				case ObjectSerializer.TYPE_BYTE: return (sbyte)Reader.ReadByte();
 				case ObjectSerializer.TYPE_INT16: return (sbyte)Reader.ReadInt16();
 				case ObjectSerializer.TYPE_INT32: return (sbyte)Reader.ReadInt32();
 				case ObjectSerializer.TYPE_INT64: return (sbyte)Reader.ReadInt64();
-				case ObjectSerializer.TYPE_SBYTE: return (sbyte)Reader.ReadSByte();
 				case ObjectSerializer.TYPE_UINT16: return (sbyte)Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return (sbyte)Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return (sbyte)Reader.ReadUInt64();
@@ -291,9 +291,9 @@ namespace Waher.Persistence.Serialization
 		{
 			switch (FieldDataType)
 			{
+				case ObjectSerializer.TYPE_INT16: return Reader.ReadInt16();
 				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean() ? (short)1 : (short)0;
 				case ObjectSerializer.TYPE_BYTE: return Reader.ReadByte();
-				case ObjectSerializer.TYPE_INT16: return Reader.ReadInt16();
 				case ObjectSerializer.TYPE_INT32: return (short)Reader.ReadInt32();
 				case ObjectSerializer.TYPE_INT64: return (short)Reader.ReadInt64();
 				case ObjectSerializer.TYPE_SBYTE: return Reader.ReadSByte();
@@ -343,10 +343,10 @@ namespace Waher.Persistence.Serialization
 		{
 			switch (FieldDataType)
 			{
+				case ObjectSerializer.TYPE_INT32: return Reader.ReadInt32();
 				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean() ? 1 : 0;
 				case ObjectSerializer.TYPE_BYTE: return Reader.ReadByte();
 				case ObjectSerializer.TYPE_INT16: return Reader.ReadInt16();
-				case ObjectSerializer.TYPE_INT32: return Reader.ReadInt32();
 				case ObjectSerializer.TYPE_INT64: return (int)Reader.ReadInt64();
 				case ObjectSerializer.TYPE_SBYTE: return Reader.ReadSByte();
 				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16();
@@ -396,7 +396,8 @@ namespace Waher.Persistence.Serialization
 		{
 			switch (FieldDataType)
 			{
-				case ObjectSerializer.TYPE_BYTE: return Enum.ToObject(EnumType, (int)ReadByte(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_BYTE: 
+					return Enum.ToObject(EnumType, (int)ReadByte(Reader, FieldDataType));
 				case ObjectSerializer.TYPE_INT16:
 				case ObjectSerializer.TYPE_VARINT16:
 					return Enum.ToObject(EnumType, (int)ReadInt16(Reader, FieldDataType));
@@ -406,7 +407,8 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_INT64:
 				case ObjectSerializer.TYPE_VARINT64:
 					return Enum.ToObject(EnumType, ReadInt64(Reader, FieldDataType));
-				case ObjectSerializer.TYPE_SBYTE: return Enum.ToObject(EnumType, (int)ReadSByte(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_SBYTE:
+					return Enum.ToObject(EnumType, (int)ReadSByte(Reader, FieldDataType));
 				case ObjectSerializer.TYPE_UINT16:
 				case ObjectSerializer.TYPE_VARUINT16:
 					return Enum.ToObject(EnumType, (int)ReadUInt16(Reader, FieldDataType));
@@ -416,9 +418,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT64:
 				case ObjectSerializer.TYPE_VARUINT64:
 					return Enum.ToObject(EnumType, (long)ReadUInt64(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_ENUM:
 				case ObjectSerializer.TYPE_STRING:
-				case ObjectSerializer.TYPE_CI_STRING: return Enum.Parse(EnumType, Reader.ReadString());
-				case ObjectSerializer.TYPE_NULL: return null;
+				case ObjectSerializer.TYPE_CI_STRING: 
+					return Enum.Parse(EnumType, Reader.ReadString());
+				case ObjectSerializer.TYPE_NULL:
+					return null;
 				default:
 					throw new ArgumentException("Expected an enumerated value, but was a " +
 						ObjectSerializer.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
@@ -436,11 +441,11 @@ namespace Waher.Persistence.Serialization
 		{
 			switch (FieldDataType)
 			{
+				case ObjectSerializer.TYPE_INT64: return Reader.ReadInt64();
 				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean() ? 1 : 0;
 				case ObjectSerializer.TYPE_BYTE: return Reader.ReadByte();
 				case ObjectSerializer.TYPE_INT16: return Reader.ReadInt16();
 				case ObjectSerializer.TYPE_INT32: return Reader.ReadInt32();
-				case ObjectSerializer.TYPE_INT64: return Reader.ReadInt64();
 				case ObjectSerializer.TYPE_SBYTE: return Reader.ReadSByte();
 				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return Reader.ReadUInt32();
@@ -488,13 +493,13 @@ namespace Waher.Persistence.Serialization
 		{
 			switch (FieldDataType)
 			{
+				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean() ? (ushort)1 : (ushort)0;
 				case ObjectSerializer.TYPE_BYTE: return Reader.ReadByte();
 				case ObjectSerializer.TYPE_INT16: return (ushort)Reader.ReadInt16();
 				case ObjectSerializer.TYPE_INT32: return (ushort)Reader.ReadInt32();
 				case ObjectSerializer.TYPE_INT64: return (ushort)Reader.ReadInt64();
 				case ObjectSerializer.TYPE_SBYTE: return (ushort)Reader.ReadSByte();
-				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return (ushort)Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return (ushort)Reader.ReadUInt64();
 				case ObjectSerializer.TYPE_VARINT16: return (ushort)Reader.ReadVariableLengthInt16();
@@ -540,6 +545,7 @@ namespace Waher.Persistence.Serialization
 		{
 			switch (FieldDataType)
 			{
+				case ObjectSerializer.TYPE_UINT32: return Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean() ? (uint)1 : (uint)0;
 				case ObjectSerializer.TYPE_BYTE: return Reader.ReadByte();
 				case ObjectSerializer.TYPE_INT16: return (uint)Reader.ReadInt16();
@@ -547,7 +553,6 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_INT64: return (uint)Reader.ReadInt64();
 				case ObjectSerializer.TYPE_SBYTE: return (uint)Reader.ReadSByte();
 				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16();
-				case ObjectSerializer.TYPE_UINT32: return Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return (uint)Reader.ReadUInt64();
 				case ObjectSerializer.TYPE_VARINT16: return (uint)Reader.ReadVariableLengthInt16();
 				case ObjectSerializer.TYPE_VARINT32: return (uint)Reader.ReadVariableLengthInt32();
@@ -592,6 +597,7 @@ namespace Waher.Persistence.Serialization
 		{
 			switch (FieldDataType)
 			{
+				case ObjectSerializer.TYPE_UINT64: return Reader.ReadUInt64();
 				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean() ? (ulong)1 : (ulong)0;
 				case ObjectSerializer.TYPE_BYTE: return Reader.ReadByte();
 				case ObjectSerializer.TYPE_INT16: return (ulong)Reader.ReadInt16();
@@ -600,7 +606,6 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_SBYTE: return (ulong)Reader.ReadSByte();
 				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return Reader.ReadUInt32();
-				case ObjectSerializer.TYPE_UINT64: return Reader.ReadUInt64();
 				case ObjectSerializer.TYPE_VARINT16: return (ulong)Reader.ReadVariableLengthInt16();
 				case ObjectSerializer.TYPE_VARINT32: return (ulong)Reader.ReadVariableLengthInt32();
 				case ObjectSerializer.TYPE_VARINT64: return (ulong)Reader.ReadVariableLengthInt64();
@@ -644,6 +649,7 @@ namespace Waher.Persistence.Serialization
 		{
 			switch (FieldDataType)
 			{
+				case ObjectSerializer.TYPE_DECIMAL: return Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean() ? 1 : 0;
 				case ObjectSerializer.TYPE_BYTE: return Reader.ReadByte();
 				case ObjectSerializer.TYPE_INT16: return Reader.ReadInt16();
@@ -659,7 +665,6 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_VARUINT16: return Reader.ReadVariableLengthUInt16();
 				case ObjectSerializer.TYPE_VARUINT32: return Reader.ReadVariableLengthUInt32();
 				case ObjectSerializer.TYPE_VARUINT64: return Reader.ReadVariableLengthUInt64();
-				case ObjectSerializer.TYPE_DECIMAL: return Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (decimal)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (decimal)Reader.ReadSingle();
 				case ObjectSerializer.TYPE_STRING:
@@ -696,6 +701,7 @@ namespace Waher.Persistence.Serialization
 		{
 			switch (FieldDataType)
 			{
+				case ObjectSerializer.TYPE_DOUBLE: return Reader.ReadDouble();
 				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean() ? 1 : 0;
 				case ObjectSerializer.TYPE_BYTE: return Reader.ReadByte();
 				case ObjectSerializer.TYPE_INT16: return Reader.ReadInt16();
@@ -712,7 +718,6 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_VARUINT32: return Reader.ReadVariableLengthUInt32();
 				case ObjectSerializer.TYPE_VARUINT64: return Reader.ReadVariableLengthUInt64();
 				case ObjectSerializer.TYPE_DECIMAL: return (double)Reader.ReadDecimal();
-				case ObjectSerializer.TYPE_DOUBLE: return Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle();
 				case ObjectSerializer.TYPE_STRING:
 				case ObjectSerializer.TYPE_CI_STRING: return double.Parse(Reader.ReadString());
@@ -748,6 +753,7 @@ namespace Waher.Persistence.Serialization
 		{
 			switch (FieldDataType)
 			{
+				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle();
 				case ObjectSerializer.TYPE_BOOLEAN: return Reader.ReadBoolean() ? 1 : 0;
 				case ObjectSerializer.TYPE_BYTE: return Reader.ReadByte();
 				case ObjectSerializer.TYPE_INT16: return Reader.ReadInt16();
@@ -765,7 +771,6 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_VARUINT64: return Reader.ReadVariableLengthUInt64();
 				case ObjectSerializer.TYPE_DECIMAL: return (float)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (float)Reader.ReadDouble();
-				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle();
 				case ObjectSerializer.TYPE_STRING:
 				case ObjectSerializer.TYPE_CI_STRING: return float.Parse(Reader.ReadString());
 				default:
@@ -897,8 +902,8 @@ namespace Waher.Persistence.Serialization
 		{
 			switch (FieldDataType)
 			{
-				case ObjectSerializer.TYPE_DATETIME: return (DateTimeOffset)Reader.ReadDateTime();
 				case ObjectSerializer.TYPE_DATETIMEOFFSET: return Reader.ReadDateTimeOffset();
+				case ObjectSerializer.TYPE_DATETIME: return (DateTimeOffset)Reader.ReadDateTime();
 				case ObjectSerializer.TYPE_STRING:
 				case ObjectSerializer.TYPE_CI_STRING: return DateTimeOffset.Parse(Reader.ReadString());
 
@@ -1007,7 +1012,7 @@ namespace Waher.Persistence.Serialization
 			switch (FieldDataType)
 			{
 				case ObjectSerializer.TYPE_STRING:
-				case ObjectSerializer.TYPE_CI_STRING: return Reader.ReadString();
+				case ObjectSerializer.TYPE_CI_STRING:
 				case ObjectSerializer.TYPE_ENUM: return Reader.ReadString();
 				case ObjectSerializer.TYPE_NULL: return null;
 				case ObjectSerializer.TYPE_CHAR: return new string(Reader.ReadChar(), 1);

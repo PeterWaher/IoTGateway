@@ -24,4 +24,8 @@
     <ProjectReference Include="..\Waher.Persistence\Waher.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Classes\Test\" />
+  </ItemGroup>
+
 </Project>

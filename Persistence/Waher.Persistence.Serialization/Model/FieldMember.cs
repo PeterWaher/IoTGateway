@@ -14,8 +14,12 @@ namespace Waher.Persistence.Serialization.Model
 		/// </summary>
 		/// <param name="FI">Field information.</param>
 		/// <param name="FieldCode">Field Code.</param>
-		public FieldMember(FieldInfo FI, ulong FieldCode)
-			: base(FI.Name, FieldCode, FI.FieldType)
+		/// <param name="Encrypted">If the member is/should be encrypted.</param>
+		/// <param name="DecryptedMinLength">Minimum length of the property, in bytes, before 
+		/// encryption. If the clear text property is shorter than this, random bytes will be 
+		/// appended to pad the property to this length, before encryption.</param>
+		public FieldMember(FieldInfo FI, ulong FieldCode, bool Encrypted, int DecryptedMinLength)
+			: base(FI.Name, FieldCode, FI.FieldType, Encrypted, DecryptedMinLength)
 		{
 			this.fi = FI;
 		}

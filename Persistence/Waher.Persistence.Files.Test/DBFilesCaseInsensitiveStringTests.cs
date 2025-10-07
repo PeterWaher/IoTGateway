@@ -81,8 +81,8 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			CaseInsensitiveString S = "Hello World!";
 
-			Assert.AreEqual(1, S.IndexOfAny(new CaseInsensitiveString[] { "LO", "EL" }));
-			Assert.AreEqual(1, S.IndexOfAny(new CaseInsensitiveString[] { "EL", "LO" }));
+			Assert.AreEqual(1, S.IndexOfAny(["LO", "EL"]));
+			Assert.AreEqual(1, S.IndexOfAny(["EL", "LO"]));
 		}
 
 		[TestMethod]
@@ -98,8 +98,8 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			CaseInsensitiveString S = "Hello World!";
 
-			CaseInsensitiveString[] Expected = new CaseInsensitiveString[] { "HE", " W", "R", "D!" };
-			CaseInsensitiveString[] Actual = S.Split(new CaseInsensitiveString[] { "L", "O" }, StringSplitOptions.RemoveEmptyEntries);
+			CaseInsensitiveString[] Expected = ["HE", " W", "R", "D!"];
+			CaseInsensitiveString[] Actual = S.Split(["L", "O"], StringSplitOptions.RemoveEmptyEntries);
 			int i, c;
 
 			Assert.AreEqual(c = Expected.Length, Actual.Length);

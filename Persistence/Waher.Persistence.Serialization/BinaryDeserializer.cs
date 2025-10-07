@@ -50,6 +50,11 @@ namespace Waher.Persistence.Serialization
 		public string CollectionName => this.collectionName;
 
 		/// <summary>
+		/// Text encoding used.
+		/// </summary>
+		public Encoding Encoding => this.encoding;
+
+		/// <summary>
 		/// Deserializes a value.
 		/// </summary>
 		/// <returns>Deserialized value.</returns>

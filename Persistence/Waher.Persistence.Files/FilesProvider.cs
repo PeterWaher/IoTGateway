@@ -1,7 +1,4 @@
-﻿#if COMPILED
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-#endif
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ExceptionServices;
@@ -67,6 +64,8 @@ namespace Waher.Persistence.Files
 
 #if COMPILED
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+#else
+		private static readonly Random rnd = new Random();
 #endif
 		private static bool asyncFileIo = true;
 
@@ -94,10 +93,10 @@ namespace Waher.Persistence.Files
 		private string salt = null;
 		private readonly bool encrypted;
 		private readonly CustomKeyHandler customKeyMethod;
-#if COMPILED
 		private bool rsaFailure = false;
-		private readonly bool compiled;
 		private bool deleteObsoleteKeys = true;
+#if COMPILED
+		private readonly bool compiled;
 #endif
 
 		#region Constructors
@@ -857,10 +856,8 @@ namespace Waher.Persistence.Files
 		{
 			byte[] Key, IV;
 
-#if COMPILED
 			if (!(this.customKeyMethod is null))
 			{
-#endif
 				KeyValuePair<byte[], byte[]> P = await this.customKeyMethod(FileName);
 
 				using (SHA256 Sha256 = SHA256.Create())
@@ -868,7 +865,6 @@ namespace Waher.Persistence.Files
 					Key = Sha256.ComputeHash(P.Key);
 					IV = Sha256.ComputeHash(P.Value);
 				}
-#if COMPILED
 			}
 			else if (this.rsaFailure)
 				return this.GetKeysUsingSalt(FileName);
@@ -931,16 +927,8 @@ namespace Waher.Persistence.Files
 						{
 							Parameters = rsa.ExportParameters(true);
 
-							byte[] P, Q;
-
-							lock (rnd)
-							{
-								P = new byte[48];
-								rnd.GetBytes(P);
-
-								Q = new byte[48];
-								rnd.GetBytes(Q);
-							}
+							byte[] P = GetRandomBytes(48);
+							byte[] Q = GetRandomBytes(48);
 
 							P[47] = 1;
 							Q[47] = 1;
@@ -1015,7 +1003,7 @@ namespace Waher.Persistence.Files
 					}
 				}
 			}
-#endif
+		
 			return new KeyValuePair<byte[], byte[]>(Key, IV);
 		}
 
@@ -1039,6 +1027,74 @@ namespace Waher.Persistence.Files
 
 				return new KeyValuePair<byte[], byte[]>(Key, IV);
 			}
+		}
+
+		internal static byte[] GetRandomBytes(int NrBytes)
+		{
+			byte[] Result = new byte[NrBytes];
+
+			lock (rnd)
+			{
+#if COMPILED
+				rnd.GetBytes(Result);
+#else
+				rnd.NextBytes(Result);
+#endif
+			}
+
+			return Result;
+		}
+
+		internal static void GetRandomBytes(byte[] Data, int Offset, int Count)
+		{
+			lock (rnd)
+			{
+#if COMPILED
+				rnd.GetBytes(Data, Offset, Count);
+#else
+				byte[] Bin = new byte[Count];
+				rnd.NextBytes(Bin);
+				Array.Copy(Bin, 0, Data, Offset, Count);
+#endif
+			}
+		}
+
+		/// <summary>
+		/// Encrypts field data.
+		/// </summary>
+		/// <param name="Data">Data to encrypt.</param>
+		/// <param name="Property">Name of property.</param>
+		/// <param name="Collection">Collection in which the data is persisted.</param>
+		/// <param name="ObjectId">Object ID of object with encrypted data.</param>
+		/// <param name="MinLength">Minimum length of the property, in bytes, before 
+		/// encryption. If the clear text property is shorter than this, random bytes 
+		/// will be appended to pad the property to this length, before encryption.</param>
+		/// <returns>Encrypted field data.</returns>
+		public async Task<byte[]> Encrypt(byte[] Data, string Property, string Collection, 
+			Guid ObjectId, int MinLength)
+		{
+			ObjectBTreeFile File = await this.GetFile(Collection, true);
+			if (!File.Encrypted)
+				await File.EnsureKeys();
+
+			return File.Encrypt(Data, Property, ObjectId, MinLength);
+		}
+
+		/// <summary>
+		/// Decrypts field data.
+		/// </summary>
+		/// <param name="Data">Data to decrypt.</param>
+		/// <param name="Property">Name of property.</param>
+		/// <param name="Collection">Collection in which the data is persisted.</param>
+		/// <param name="ObjectId">Object ID of object with encrypted data.</param>
+		/// <returns>Decrypted field data.</returns>
+		public async Task<byte[]> Decrypt(byte[] Data, string Property, string Collection, Guid ObjectId)
+		{
+			ObjectBTreeFile File = await this.GetFile(Collection, true);
+			if (!File.Encrypted)
+				await File.EnsureKeys();
+
+			return File.Decrypt(Data, Property, ObjectId);
 		}
 
 		#endregion

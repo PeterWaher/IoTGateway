@@ -2335,7 +2335,35 @@ namespace Waher.Persistence.Serialization
 
 				if (HasObjectId)
 				{
-					CSharp.AppendLine("\t\t\tif (Embedded && Writer.BitOffset > 0)");
+					CSharp.Append("\t\t\t");
+					AppendType(this.objectIdMemberType, CSharp);
+					CSharp.Append(" ObjectId = Value.");
+					CSharp.Append(this.objectIdMemberInfo.Name);
+					CSharp.AppendLine(";");
+
+					if (this.objectIdMemberType == typeof(Guid))
+						CSharp.AppendLine("\t\t\tif (!Embedded && ObjectId.Equals(Guid.Empty))");
+					else if (this.objectIdMemberType == typeof(string))
+						CSharp.AppendLine("\t\t\tif (!Embedded && string.IsNullOrEmpty(ObjectId))");
+					else if (this.objectIdMemberType == typeof(byte[]))
+						CSharp.AppendLine("\t\t\tif (!Embedded && ObjectId is null)");
+					else
+						throw new SerializationException("Invalid Object ID type.", this.type);
+
+					CSharp.AppendLine("\t\t\t{");
+
+					if (this.objectIdMemberType == typeof(Guid))
+						CSharp.AppendLine("\t\t\t\tObjectId = this.context.CreateGuid();");
+					else if (this.objectIdMemberType == typeof(string))
+						CSharp.AppendLine("\t\t\t\tObjectId = this.context.CreateGuid().ToString();");
+					else if (this.objectIdMemberType == typeof(byte[]))
+						CSharp.AppendLine("\t\t\t\tObjectId = this.context.CreateGuid().ToByteArray();");
+
+					CSharp.Append("\t\t\t\tValue.");
+					CSharp.Append(this.objectIdMemberInfo.Name);
+					CSharp.AppendLine(" = ObjectId;");
+					CSharp.AppendLine("\t\t\t}");
+					CSharp.AppendLine("\t\t\telse if (Embedded && Writer.BitOffset > 0)");
 					CSharp.AppendLine("\t\t\t{");
 
 					if (this.objectIdMemberType == typeof(Guid))
@@ -2503,148 +2531,133 @@ namespace Waher.Persistence.Serialization
 						}
 					}
 
-					if (Ignore)
+					if (Ignore || ObjectIdField)
 						continue;
 
 					CSharp.AppendLine();
 
-					if (ObjectIdField)
+					if (HasDefaultValue)
 					{
-						CSharp.Append("\t\t\t");
-						AppendType(MemberType, CSharp);
-						CSharp.Append(" ObjectId = Value.");
-						CSharp.Append(Member.Name);
-						CSharp.AppendLine(";");
-
-						if (this.objectIdMemberType == typeof(Guid))
-							CSharp.AppendLine("\t\t\tif (ObjectId.Equals(Guid.Empty))");
-						else if (this.objectIdMemberType == typeof(string))
-							CSharp.AppendLine("\t\t\tif (string.IsNullOrEmpty(ObjectId))");
-						else if (this.objectIdMemberType == typeof(byte[]))
-							CSharp.AppendLine("\t\t\tif (ObjectId is null)");
+						if (DefaultValue is null)
+						{
+							CSharp.Append("\t\t\tif (!((object)Value.");
+							CSharp.Append(Member.Name);
+							CSharp.AppendLine(" is null))");
+						}
+						else if (MemberType == typeof(string) && DefaultValue is string s2 && string.IsNullOrEmpty(s2))
+						{
+							CSharp.Append("\t\t\tif (!string.IsNullOrEmpty(Value.");
+							CSharp.Append(Member.Name);
+							CSharp.AppendLine("))");
+						}
+						else if (MemberType == typeof(CaseInsensitiveString) && DefaultValue is CaseInsensitiveString s3 && CaseInsensitiveString.IsNullOrEmpty(s3))
+						{
+							CSharp.Append("\t\t\tif (!CaseInsensitiveString.IsNullOrEmpty(Value.");
+							CSharp.Append(Member.Name);
+							CSharp.AppendLine("))");
+						}
 						else
-							throw new SerializationException("Invalid Object ID type.", this.type);
+						{
+							CSharp.Append("\t\t\tif (!default");
+							CSharp.Append(Member.Name);
+							CSharp.Append(".Equals(Value.");
+							CSharp.Append(Member.Name);
+							CSharp.AppendLine("))");
+						}
 
 						CSharp.AppendLine("\t\t\t{");
+						Indent = "\t\t\t\t";
+					}
+					else
+						Indent = "\t\t\t";
 
-						if (this.objectIdMemberType == typeof(Guid))
-							CSharp.AppendLine("\t\t\t\tObjectId = this.context.CreateGuid();");
-						else if (this.objectIdMemberType == typeof(string))
-							CSharp.AppendLine("\t\t\t\tObjectId = this.context.CreateGuid().ToString();");
-						else if (this.objectIdMemberType == typeof(byte[]))
-							CSharp.AppendLine("\t\t\t\tObjectId = this.context.CreateGuid().ToByteArray();");
+					CSharp.Append(Indent);
 
-						CSharp.Append("\t\t\t\tValue.");
-						CSharp.Append(this.objectIdMemberInfo.Name);
-						CSharp.AppendLine(" = ObjectId;");
-						CSharp.AppendLine("\t\t\t}");
+					if (this.normalized)
+					{
+						CSharp.Append("Writer.WriteVariableLengthUInt64(");
+						CSharp.Append(await this.context.GetFieldCode(this.collectionName, Member.Name));
+						CSharp.Append(");\t// ");
+						CSharp.AppendLine(Member.Name);
 					}
 					else
 					{
-						if (HasDefaultValue)
-						{
-							if (DefaultValue is null)
-							{
-								CSharp.Append("\t\t\tif (!((object)Value.");
-								CSharp.Append(Member.Name);
-								CSharp.AppendLine(" is null))");
-							}
-							else if (MemberType == typeof(string) && DefaultValue is string s2 && string.IsNullOrEmpty(s2))
-							{
-								CSharp.Append("\t\t\tif (!string.IsNullOrEmpty(Value.");
-								CSharp.Append(Member.Name);
-								CSharp.AppendLine("))");
-							}
-							else if (MemberType == typeof(CaseInsensitiveString) && DefaultValue is CaseInsensitiveString s3 && CaseInsensitiveString.IsNullOrEmpty(s3))
-							{
-								CSharp.Append("\t\t\tif (!CaseInsensitiveString.IsNullOrEmpty(Value.");
-								CSharp.Append(Member.Name);
-								CSharp.AppendLine("))");
-							}
-							else
-							{
-								CSharp.Append("\t\t\tif (!default");
-								CSharp.Append(Member.Name);
-								CSharp.Append(".Equals(Value.");
-								CSharp.Append(Member.Name);
-								CSharp.AppendLine("))");
-							}
+						CSharp.Append("Writer.Write(\"");
 
-							CSharp.AppendLine("\t\t\t{");
-							Indent = "\t\t\t\t";
-						}
+						if (string.IsNullOrEmpty(ShortName))
+							CSharp.Append(Member.Name);
 						else
-							Indent = "\t\t\t";
+							CSharp.Append(ShortName);
+
+						CSharp.AppendLine("\");");
+					}
+
+					if (Encrypted)
+					{
+						CSharp.Append(Indent);
+						CSharp.AppendLine("Writer = Writer.CreateNew();");
+					}
+
+					if (Nullable)
+					{
+						Indent2 = Indent + "\t";
 
 						CSharp.Append(Indent);
+						CSharp.Append("if (!Value.");
+						CSharp.Append(Member.Name);
+						CSharp.AppendLine(".HasValue)");
+						CSharp.Append(Indent2);
+						CSharp.Append("Writer.WriteBits(");
+						CSharp.Append(TYPE_NULL);
+						CSharp.AppendLine(", 6);\t// TYPE_NULL");
+						CSharp.Append(Indent);
+						CSharp.AppendLine("else");
+						CSharp.Append(Indent);
+						CSharp.AppendLine("{");
+					}
+					else
+						Indent2 = Indent;
 
-						if (this.normalized)
+					if (MemberTypeInfo.IsEnum)
+					{
+						if (MemberTypeInfo.IsDefined(typeof(FlagsAttribute), false))
 						{
-							CSharp.Append("Writer.WriteVariableLengthUInt64(");
-							CSharp.Append(await this.context.GetFieldCode(this.collectionName, Member.Name));
-							CSharp.Append(");\t// ");
-							CSharp.AppendLine(Member.Name);
-						}
-						else
-						{
-							CSharp.Append("Writer.Write(\"");
-
-							if (string.IsNullOrEmpty(ShortName))
-								CSharp.Append(Member.Name);
-							else
-								CSharp.Append(ShortName);
-
-							CSharp.AppendLine("\");");
-						}
-
-						if (Encrypted)
-						{
-							CSharp.Append(Indent);
-							CSharp.AppendLine("Writer = Writer.CreateNew();");
-						}
-
-						if (Nullable)
-						{
-							Indent2 = Indent + "\t";
-
-							CSharp.Append(Indent);
-							CSharp.Append("if (!Value.");
-							CSharp.Append(Member.Name);
-							CSharp.AppendLine(".HasValue)");
 							CSharp.Append(Indent2);
 							CSharp.Append("Writer.WriteBits(");
-							CSharp.Append(TYPE_NULL);
-							CSharp.AppendLine(", 6);\t// TYPE_NULL");
-							CSharp.Append(Indent);
-							CSharp.AppendLine("else");
-							CSharp.Append(Indent);
-							CSharp.AppendLine("{");
+							CSharp.Append(TYPE_INT32);
+							CSharp.AppendLine(", 6);\t// TYPE_INT32");
+
+							CSharp.Append(Indent2);
+							CSharp.Append("Writer.Write((int)Value.");
+							CSharp.Append(Member.Name);
+							if (Nullable)
+								CSharp.Append(".Value");
+							CSharp.AppendLine(");");
 						}
 						else
-							Indent2 = Indent;
-
-						if (MemberTypeInfo.IsEnum)
 						{
-							if (MemberTypeInfo.IsDefined(typeof(FlagsAttribute), false))
-							{
-								CSharp.Append(Indent2);
-								CSharp.Append("Writer.WriteBits(");
-								CSharp.Append(TYPE_INT32);
-								CSharp.AppendLine(", 6);\t// TYPE_INT32");
+							CSharp.Append(Indent2);
+							CSharp.Append("Writer.WriteBits(");
+							CSharp.Append(TYPE_ENUM);
+							CSharp.AppendLine(", 6);\t// TYPE_ENUM");
 
-								CSharp.Append(Indent2);
-								CSharp.Append("Writer.Write((int)Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(");");
-							}
-							else
-							{
+							CSharp.Append(Indent2);
+							CSharp.Append("Writer.Write(Value.");
+							CSharp.Append(Member.Name);
+							if (Nullable)
+								CSharp.Append(".Value");
+							CSharp.AppendLine(");");
+						}
+					}
+					else
+					{
+						switch (Type.GetTypeCode(MemberType))
+						{
+							case TypeCode.Boolean:
 								CSharp.Append(Indent2);
 								CSharp.Append("Writer.WriteBits(");
-								CSharp.Append(TYPE_ENUM);
-								CSharp.AppendLine(", 6);\t// TYPE_ENUM");
+								CSharp.Append(TYPE_BOOLEAN);
+								CSharp.AppendLine(", 6);\t// TYPE_BOOLEAN");
 
 								CSharp.Append(Indent2);
 								CSharp.Append("Writer.Write(Value.");
@@ -2652,262 +2665,532 @@ namespace Waher.Persistence.Serialization
 								if (Nullable)
 									CSharp.Append(".Value");
 								CSharp.AppendLine(");");
-							}
-						}
-						else
-						{
-							switch (Type.GetTypeCode(MemberType))
-							{
-								case TypeCode.Boolean:
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.WriteBits(");
-									CSharp.Append(TYPE_BOOLEAN);
-									CSharp.AppendLine(", 6);\t// TYPE_BOOLEAN");
+								break;
 
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.Write(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-									break;
+							case TypeCode.Byte:
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_BYTE);
+								CSharp.AppendLine(", 6);\t// TYPE_BYTE");
 
-								case TypeCode.Byte:
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.WriteBits(");
-									CSharp.Append(TYPE_BYTE);
-									CSharp.AppendLine(", 6);\t// TYPE_BYTE");
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+								break;
 
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.Write(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-									break;
+							case TypeCode.Char:
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_CHAR);
+								CSharp.AppendLine(", 6);\t// TYPE_CHAR");
 
-								case TypeCode.Char:
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.WriteBits(");
-									CSharp.Append(TYPE_CHAR);
-									CSharp.AppendLine(", 6);\t// TYPE_CHAR");
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+								break;
 
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.Write(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-									break;
+							case TypeCode.DateTime:
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_DATETIME);
+								CSharp.AppendLine(", 6);\t// TYPE_DATETIME");
 
-								case TypeCode.DateTime:
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.WriteBits(");
-									CSharp.Append(TYPE_DATETIME);
-									CSharp.AppendLine(", 6);\t// TYPE_DATETIME");
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+								break;
 
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.Write(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-									break;
+							case TypeCode.Decimal:
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_DECIMAL);
+								CSharp.AppendLine(", 6);\t// TYPE_DECIMAL");
 
-								case TypeCode.Decimal:
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.WriteBits(");
-									CSharp.Append(TYPE_DECIMAL);
-									CSharp.AppendLine(", 6);\t// TYPE_DECIMAL");
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+								break;
 
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.Write(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-									break;
+							case TypeCode.Double:
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_DOUBLE);
+								CSharp.AppendLine(", 6);\t// TYPE_DOUBLE");
 
-								case TypeCode.Double:
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.WriteBits(");
-									CSharp.Append(TYPE_DOUBLE);
-									CSharp.AppendLine(", 6);\t// TYPE_DOUBLE");
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+								break;
 
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.Write(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-									break;
+							case TypeCode.Single:
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_SINGLE);
+								CSharp.AppendLine(", 6);\t// TYPE_SINGLE");
 
-								case TypeCode.Single:
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.WriteBits(");
-									CSharp.Append(TYPE_SINGLE);
-									CSharp.AppendLine(", 6);\t// TYPE_SINGLE");
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+								break;
 
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.Write(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-									break;
+							case TypeCode.Int16:
+								CSharp.Append(Indent2);
+								CSharp.Append("if (Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.Append(" > Int16VarSizeMinLimit && Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(" < Int16VarSizeMaxLimit)");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("{");
 
-								case TypeCode.Int16:
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_VARINT16);
+								CSharp.AppendLine(", 6);\t// TYPE_VARINT16");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteVariableLengthInt16(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("}");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("else");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("{");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_INT16);
+								CSharp.AppendLine(", 6);\t// TYPE_INT16");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("}");
+								break;
+
+							case TypeCode.Int32:
+								CSharp.Append(Indent2);
+								CSharp.Append("if (Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.Append(" > Int32VarSizeMinLimit && Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(" < Int32VarSizeMaxLimit)");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("{");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_VARINT32);
+								CSharp.AppendLine(", 6);\t// TYPE_VARINT32");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteVariableLengthInt32(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("}");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("else");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("{");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_INT32);
+								CSharp.AppendLine(", 6);\t// TYPE_INT32");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("}");
+								break;
+
+							case TypeCode.Int64:
+								CSharp.Append(Indent2);
+								CSharp.Append("if (Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.Append(" > Int64VarSizeMinLimit && Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(" < Int64VarSizeMaxLimit)");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("{");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_VARINT64);
+								CSharp.AppendLine(", 6);\t// TYPE_VARINT64");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteVariableLengthInt64(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("}");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("else");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("{");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_INT64);
+								CSharp.AppendLine(", 6);\t// TYPE_INT64");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("}");
+								break;
+
+							case TypeCode.SByte:
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_SBYTE);
+								CSharp.AppendLine(", 6);\t// TYPE_SBYTE");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+								break;
+
+							case TypeCode.String:
+								CSharp.Append(Indent2);
+								CSharp.Append("if (Value.");
+								CSharp.Append(Member.Name);
+								CSharp.AppendLine(" is null)");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_NULL);
+								CSharp.AppendLine(", 6);\t// TYPE_NULL");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("else");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("{");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_STRING);
+								CSharp.AppendLine(", 6);\t// TYPE_STRING");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.Write(Value.");
+								CSharp.Append(Member.Name);
+								CSharp.AppendLine(");");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("}");
+								break;
+
+							case TypeCode.UInt16:
+								CSharp.Append(Indent2);
+								CSharp.Append("if (Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(" < UInt16VarSizeLimit)");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("{");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_VARUINT16);
+								CSharp.AppendLine(", 6);\t// TYPE_VARUINT16");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteVariableLengthUInt16(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("}");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("else");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("{");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_UINT16);
+								CSharp.AppendLine(", 6);\t// TYPE_UINT16");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("}");
+								break;
+
+							case TypeCode.UInt32:
+								CSharp.Append(Indent2);
+								CSharp.Append("if (Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(" < UInt32VarSizeLimit)");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("{");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_VARUINT32);
+								CSharp.AppendLine(", 6);\t// TYPE_VARUINT32");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteVariableLengthUInt32(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("}");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("else");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("{");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_UINT32);
+								CSharp.AppendLine(", 6);\t// TYPE_UINT32");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("}");
+								break;
+
+							case TypeCode.UInt64:
+								CSharp.Append(Indent2);
+								CSharp.Append("if (Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(" < UInt64VarSizeLimit)");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("{");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_VARUINT64);
+								CSharp.AppendLine(", 6);\t// TYPE_VARUINT64");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteVariableLengthUInt64(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("}");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("else");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("{");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_UINT64);
+								CSharp.AppendLine(", 6);\t// TYPE_UINT64");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("}");
+								break;
+
+							case TypeCode.Empty:
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_NULL);
+								CSharp.AppendLine(", 6);\t// TYPE_NULL");
+								break;
+
+							default:
+								sb.Clear();
+
+								sb.Append("Invalid member type: ");
+								AppendType(MemberType, CSharp);
+
+								throw new SerializationException(sb.ToString(), this.type);
+
+							case TypeCode.Object:
+								if (MemberType.IsArray)
+								{
+									if (MemberType == typeof(byte[]))
+									{
+										CSharp.Append(Indent2);
+										CSharp.Append("if (Value.");
+										CSharp.Append(Member.Name);
+										CSharp.AppendLine(" is null)");
+
+										CSharp.Append(Indent2);
+										CSharp.Append("\tWriter.WriteBits(");
+										CSharp.Append(TYPE_NULL);
+										CSharp.AppendLine(", 6);\t// TYPE_NULL");
+
+										CSharp.Append(Indent2);
+										CSharp.AppendLine("else");
+
+										CSharp.Append(Indent2);
+										CSharp.AppendLine("{");
+										CSharp.Append(Indent2);
+										CSharp.Append("\tWriter.WriteBits(");
+										CSharp.Append(TYPE_BYTEARRAY);
+										CSharp.AppendLine(", 6);\t// TYPE_BYTEARRAY");
+
+										CSharp.Append(Indent2);
+										CSharp.Append("\tWriter.Write(Value.");
+										CSharp.Append(Member.Name);
+										CSharp.AppendLine(");");
+										CSharp.Append(Indent2);
+										CSharp.AppendLine("}");
+									}
+									else
+									{
+										MemberType = MemberType.GetElementType();
+
+										CSharp.Append(Indent2);
+
+										if (MemberType == typeof(KeyValuePair<string, object>))
+											CSharp.Append("await WriteTagArray");
+										else if (MemberType == typeof(KeyValuePair<string, IElement>))
+											CSharp.Append("await WriteTagElementArray");
+										else
+										{
+											CSharp.Append("await WriteArray<");
+											AppendType(MemberType, CSharp);
+											CSharp.Append(">");
+										}
+
+										CSharp.Append("(this.context, Writer, Value.");
+										CSharp.Append(Member.Name);
+										CSharp.AppendLine(", State);");
+									}
+								}
+								else if (ByReference)
+								{
 									CSharp.Append(Indent2);
 									CSharp.Append("if (Value.");
 									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.Append(" > Int16VarSizeMinLimit && Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(" < Int16VarSizeMaxLimit)");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("{");
-
+									CSharp.AppendLine(" is null)");
 									CSharp.Append(Indent2);
 									CSharp.Append("\tWriter.WriteBits(");
-									CSharp.Append(TYPE_VARINT16);
-									CSharp.AppendLine(", 6);\t// TYPE_VARINT16");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteVariableLengthInt16(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("}");
+									CSharp.Append(TYPE_NULL);
+									CSharp.AppendLine(", 6);\t// TYPE_NULL");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("else");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("{");
-
 									CSharp.Append(Indent2);
 									CSharp.Append("\tWriter.WriteBits(");
-									CSharp.Append(TYPE_INT16);
-									CSharp.AppendLine(", 6);\t// TYPE_INT16");
-
+									CSharp.Append(TYPE_GUID);
+									CSharp.AppendLine(", 6);\t// TYPE_GUID");
 									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.Write(Value.");
+									CSharp.Append("\tObjectSerializer Serializer");
 									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-
+									CSharp.Append(" = (ObjectSerializer)await this.context.GetObjectSerializer(typeof(");
+									AppendType(MemberType, CSharp);
+									CSharp.AppendLine("));");
+									CSharp.Append(Indent2);
+									CSharp.Append("\tGuid ");
+									CSharp.Append(Member.Name);
+									CSharp.Append("Id = await Serializer");
+									CSharp.Append(Member.Name);
+									CSharp.Append(".GetObjectId(Value.");
+									CSharp.Append(Member.Name);
+									CSharp.AppendLine(", true, State);");
+									CSharp.Append(Indent2);
+									CSharp.Append("\tWriter.Write(");
+									CSharp.Append(Member.Name);
+									CSharp.AppendLine("Id);");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("}");
-									break;
-
-								case TypeCode.Int32:
-									CSharp.Append(Indent2);
-									CSharp.Append("if (Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.Append(" > Int32VarSizeMinLimit && Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(" < Int32VarSizeMaxLimit)");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("{");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteBits(");
-									CSharp.Append(TYPE_VARINT32);
-									CSharp.AppendLine(", 6);\t// TYPE_VARINT32");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteVariableLengthInt32(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("}");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("else");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("{");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteBits(");
-									CSharp.Append(TYPE_INT32);
-									CSharp.AppendLine(", 6);\t// TYPE_INT32");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.Write(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("}");
-									break;
-
-								case TypeCode.Int64:
-									CSharp.Append(Indent2);
-									CSharp.Append("if (Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.Append(" > Int64VarSizeMinLimit && Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(" < Int64VarSizeMaxLimit)");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("{");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteBits(");
-									CSharp.Append(TYPE_VARINT64);
-									CSharp.AppendLine(", 6);\t// TYPE_VARINT64");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteVariableLengthInt64(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("}");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("else");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("{");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteBits(");
-									CSharp.Append(TYPE_INT64);
-									CSharp.AppendLine(", 6);\t// TYPE_INT64");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.Write(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("}");
-									break;
-
-								case TypeCode.SByte:
+								}
+								else if (MemberType == typeof(TimeSpan))
+								{
 									CSharp.Append(Indent2);
 									CSharp.Append("Writer.WriteBits(");
-									CSharp.Append(TYPE_SBYTE);
-									CSharp.AppendLine(", 6);\t// TYPE_SBYTE");
+									CSharp.Append(TYPE_TIMESPAN);
+									CSharp.AppendLine(", 6);\t// TYPE_TIMESPAN");
 
 									CSharp.Append(Indent2);
 									CSharp.Append("Writer.Write(Value.");
@@ -2915,9 +3198,37 @@ namespace Waher.Persistence.Serialization
 									if (Nullable)
 										CSharp.Append(".Value");
 									CSharp.AppendLine(");");
-									break;
+								}
+								else if (MemberType == typeof(DateTimeOffset))
+								{
+									CSharp.Append(Indent2);
+									CSharp.Append("Writer.WriteBits(");
+									CSharp.Append(TYPE_DATETIMEOFFSET);
+									CSharp.AppendLine(", 6);\t// TYPE_DATETIMEOFFSET");
 
-								case TypeCode.String:
+									CSharp.Append(Indent2);
+									CSharp.Append("Writer.Write(Value.");
+									CSharp.Append(Member.Name);
+									if (Nullable)
+										CSharp.Append(".Value");
+									CSharp.AppendLine(");");
+								}
+								else if (MemberType == typeof(Guid))
+								{
+									CSharp.Append(Indent2);
+									CSharp.Append("Writer.WriteBits(");
+									CSharp.Append(TYPE_GUID);
+									CSharp.AppendLine(", 6);\t// TYPE_GUID");
+
+									CSharp.Append(Indent2);
+									CSharp.Append("Writer.Write(Value.");
+									CSharp.Append(Member.Name);
+									if (Nullable)
+										CSharp.Append(".Value");
+									CSharp.AppendLine(");");
+								}
+								else if (MemberType == typeof(CaseInsensitiveString))
+								{
 									CSharp.Append(Indent2);
 									CSharp.Append("if (Value.");
 									CSharp.Append(Member.Name);
@@ -2935,388 +3246,71 @@ namespace Waher.Persistence.Serialization
 
 									CSharp.Append(Indent2);
 									CSharp.Append("\tWriter.WriteBits(");
-									CSharp.Append(TYPE_STRING);
-									CSharp.AppendLine(", 6);\t// TYPE_STRING");
+									CSharp.Append(TYPE_CI_STRING);
+									CSharp.AppendLine(", 6);\t// TYPE_CI_STRING");
 
 									CSharp.Append(Indent2);
 									CSharp.Append("\tWriter.Write(Value.");
 									CSharp.Append(Member.Name);
-									CSharp.AppendLine(");");
+									CSharp.AppendLine(".Value);");
 
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("}");
-									break;
-
-								case TypeCode.UInt16:
+								}
+								else
+								{
 									CSharp.Append(Indent2);
-									CSharp.Append("if (Value.");
+									CSharp.Append("if (this.serializer");
 									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(" < UInt16VarSizeLimit)");
+									CSharp.AppendLine(" is null)");
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("{");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteBits(");
-									CSharp.Append(TYPE_VARUINT16);
-									CSharp.AppendLine(", 6);\t// TYPE_VARUINT16");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteVariableLengthUInt16(Value.");
+									CSharp.Append("\tthis.serializer");
 									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("}");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("else");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("{");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteBits(");
-									CSharp.Append(TYPE_UINT16);
-									CSharp.AppendLine(", 6);\t// TYPE_UINT16");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.Write(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("}");
-									break;
-
-								case TypeCode.UInt32:
-									CSharp.Append(Indent2);
-									CSharp.Append("if (Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(" < UInt32VarSizeLimit)");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("{");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteBits(");
-									CSharp.Append(TYPE_VARUINT32);
-									CSharp.AppendLine(", 6);\t// TYPE_VARUINT32");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteVariableLengthUInt32(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("}");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("else");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("{");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteBits(");
-									CSharp.Append(TYPE_UINT32);
-									CSharp.AppendLine(", 6);\t// TYPE_UINT32");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.Write(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("}");
-									break;
-
-								case TypeCode.UInt64:
-									CSharp.Append(Indent2);
-									CSharp.Append("if (Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(" < UInt64VarSizeLimit)");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("{");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteBits(");
-									CSharp.Append(TYPE_VARUINT64);
-									CSharp.AppendLine(", 6);\t// TYPE_VARUINT64");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteVariableLengthUInt64(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("}");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("else");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("{");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.WriteBits(");
-									CSharp.Append(TYPE_UINT64);
-									CSharp.AppendLine(", 6);\t// TYPE_UINT64");
-
-									CSharp.Append(Indent2);
-									CSharp.Append("\tWriter.Write(Value.");
-									CSharp.Append(Member.Name);
-									if (Nullable)
-										CSharp.Append(".Value");
-									CSharp.AppendLine(");");
-
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("}");
-									break;
-
-								case TypeCode.Empty:
-									CSharp.Append(Indent2);
-									CSharp.Append("Writer.WriteBits(");
-									CSharp.Append(TYPE_NULL);
-									CSharp.AppendLine(", 6);\t// TYPE_NULL");
-									break;
-
-								default:
-									sb.Clear();
-
-									sb.Append("Invalid member type: ");
+									CSharp.Append(" = await this.context.GetObjectSerializer(typeof(");
 									AppendType(MemberType, CSharp);
+									CSharp.AppendLine("));");
 
-									throw new SerializationException(sb.ToString(), this.type);
-
-								case TypeCode.Object:
-									if (MemberType.IsArray)
-									{
-										if (MemberType == typeof(byte[]))
-										{
-											CSharp.Append(Indent2);
-											CSharp.Append("if (Value.");
-											CSharp.Append(Member.Name);
-											CSharp.AppendLine(" is null)");
-
-											CSharp.Append(Indent2);
-											CSharp.Append("\tWriter.WriteBits(");
-											CSharp.Append(TYPE_NULL);
-											CSharp.AppendLine(", 6);\t// TYPE_NULL");
-
-											CSharp.Append(Indent2);
-											CSharp.AppendLine("else");
-
-											CSharp.Append(Indent2);
-											CSharp.AppendLine("{");
-											CSharp.Append(Indent2);
-											CSharp.Append("\tWriter.WriteBits(");
-											CSharp.Append(TYPE_BYTEARRAY);
-											CSharp.AppendLine(", 6);\t// TYPE_BYTEARRAY");
-
-											CSharp.Append(Indent2);
-											CSharp.Append("\tWriter.Write(Value.");
-											CSharp.Append(Member.Name);
-											CSharp.AppendLine(");");
-											CSharp.Append(Indent2);
-											CSharp.AppendLine("}");
-										}
-										else
-										{
-											MemberType = MemberType.GetElementType();
-
-											CSharp.Append(Indent2);
-
-											if (MemberType == typeof(KeyValuePair<string, object>))
-												CSharp.Append("await WriteTagArray");
-											else if (MemberType == typeof(KeyValuePair<string, IElement>))
-												CSharp.Append("await WriteTagElementArray");
-											else
-											{
-												CSharp.Append("await WriteArray<");
-												AppendType(MemberType, CSharp);
-												CSharp.Append(">");
-											}
-
-											CSharp.Append("(this.context, Writer, Value.");
-											CSharp.Append(Member.Name);
-											CSharp.AppendLine(", State);");
-										}
-									}
-									else if (ByReference)
-									{
-										CSharp.Append(Indent2);
-										CSharp.Append("if (Value.");
-										CSharp.Append(Member.Name);
-										CSharp.AppendLine(" is null)");
-										CSharp.Append(Indent2);
-										CSharp.Append("\tWriter.WriteBits(");
-										CSharp.Append(TYPE_NULL);
-										CSharp.AppendLine(", 6);\t// TYPE_NULL");
-										CSharp.Append(Indent2);
-										CSharp.AppendLine("else");
-										CSharp.Append(Indent2);
-										CSharp.AppendLine("{");
-										CSharp.Append(Indent2);
-										CSharp.Append("\tWriter.WriteBits(");
-										CSharp.Append(TYPE_GUID);
-										CSharp.AppendLine(", 6);\t// TYPE_GUID");
-										CSharp.Append(Indent2);
-										CSharp.Append("\tObjectSerializer Serializer");
-										CSharp.Append(Member.Name);
-										CSharp.Append(" = (ObjectSerializer)await this.context.GetObjectSerializer(typeof(");
-										AppendType(MemberType, CSharp);
-										CSharp.AppendLine("));");
-										CSharp.Append(Indent2);
-										CSharp.Append("\tGuid ");
-										CSharp.Append(Member.Name);
-										CSharp.Append("Id = await Serializer");
-										CSharp.Append(Member.Name);
-										CSharp.Append(".GetObjectId(Value.");
-										CSharp.Append(Member.Name);
-										CSharp.AppendLine(", true, State);");
-										CSharp.Append(Indent2);
-										CSharp.Append("\tWriter.Write(");
-										CSharp.Append(Member.Name);
-										CSharp.AppendLine("Id);");
-										CSharp.Append(Indent2);
-										CSharp.AppendLine("}");
-									}
-									else if (MemberType == typeof(TimeSpan))
-									{
-										CSharp.Append(Indent2);
-										CSharp.Append("Writer.WriteBits(");
-										CSharp.Append(TYPE_TIMESPAN);
-										CSharp.AppendLine(", 6);\t// TYPE_TIMESPAN");
-
-										CSharp.Append(Indent2);
-										CSharp.Append("Writer.Write(Value.");
-										CSharp.Append(Member.Name);
-										if (Nullable)
-											CSharp.Append(".Value");
-										CSharp.AppendLine(");");
-									}
-									else if (MemberType == typeof(DateTimeOffset))
-									{
-										CSharp.Append(Indent2);
-										CSharp.Append("Writer.WriteBits(");
-										CSharp.Append(TYPE_DATETIMEOFFSET);
-										CSharp.AppendLine(", 6);\t// TYPE_DATETIMEOFFSET");
-
-										CSharp.Append(Indent2);
-										CSharp.Append("Writer.Write(Value.");
-										CSharp.Append(Member.Name);
-										if (Nullable)
-											CSharp.Append(".Value");
-										CSharp.AppendLine(");");
-									}
-									else if (MemberType == typeof(Guid))
-									{
-										CSharp.Append(Indent2);
-										CSharp.Append("Writer.WriteBits(");
-										CSharp.Append(TYPE_GUID);
-										CSharp.AppendLine(", 6);\t// TYPE_GUID");
-
-										CSharp.Append(Indent2);
-										CSharp.Append("Writer.Write(Value.");
-										CSharp.Append(Member.Name);
-										if (Nullable)
-											CSharp.Append(".Value");
-										CSharp.AppendLine(");");
-									}
-									else if (MemberType == typeof(CaseInsensitiveString))
-									{
-										CSharp.Append(Indent2);
-										CSharp.Append("if (Value.");
-										CSharp.Append(Member.Name);
-										CSharp.AppendLine(" is null)");
-
-										CSharp.Append(Indent2);
-										CSharp.Append("\tWriter.WriteBits(");
-										CSharp.Append(TYPE_NULL);
-										CSharp.AppendLine(", 6);\t// TYPE_NULL");
-
-										CSharp.Append(Indent2);
-										CSharp.AppendLine("else");
-										CSharp.Append(Indent2);
-										CSharp.AppendLine("{");
-
-										CSharp.Append(Indent2);
-										CSharp.Append("\tWriter.WriteBits(");
-										CSharp.Append(TYPE_CI_STRING);
-										CSharp.AppendLine(", 6);\t// TYPE_CI_STRING");
-
-										CSharp.Append(Indent2);
-										CSharp.Append("\tWriter.Write(Value.");
-										CSharp.Append(Member.Name);
-										CSharp.AppendLine(".Value);");
-
-										CSharp.Append(Indent2);
-										CSharp.AppendLine("}");
-									}
-									else
-									{
-										CSharp.Append(Indent2);
-										CSharp.Append("if (this.serializer");
-										CSharp.Append(Member.Name);
-										CSharp.AppendLine(" is null)");
-										CSharp.Append(Indent2);
-										CSharp.Append("\tthis.serializer");
-										CSharp.Append(Member.Name);
-										CSharp.Append(" = await this.context.GetObjectSerializer(typeof(");
-										AppendType(MemberType, CSharp);
-										CSharp.AppendLine("));");
-
-										CSharp.Append(Indent2);
-										CSharp.Append("await this.serializer");
-										CSharp.Append(Member.Name);
-										CSharp.Append(".Serialize(Writer, true, true, Value.");
-										CSharp.Append(Member.Name);
-										if (Nullable)
-											CSharp.Append(".Value");
-										CSharp.AppendLine(", State);");
-									}
-									break;
-							}
+									CSharp.Append(Indent2);
+									CSharp.Append("await this.serializer");
+									CSharp.Append(Member.Name);
+									CSharp.Append(".Serialize(Writer, true, true, Value.");
+									CSharp.Append(Member.Name);
+									if (Nullable)
+										CSharp.Append(".Value");
+									CSharp.AppendLine(", State);");
+								}
+								break;
 						}
+					}
 
-						if (Nullable)
-						{
-							CSharp.Append(Indent);
-							CSharp.AppendLine("}");
-						}
+					if (Nullable)
+					{
+						CSharp.Append(Indent);
+						CSharp.AppendLine("}");
+					}
 
-						if (Encrypted)
-						{
-							CSharp.Append(Indent);
-							CSharp.AppendLine("Writer.FlushBits();");
-							CSharp.Append(Indent);
-							CSharp.AppendLine("Unencrypted = Writer.GetSerialization();");
-							CSharp.Append(Indent);
-							CSharp.Append("Encrypted = await this.context.Encrypt(Unencrypted, \"");
-							CSharp.Append(Member.Name);
-							CSharp.Append("\", \"");
-							CSharp.Append(Escape(this.collectionName));
-							CSharp.Append("\", ObjectId, ");
-							CSharp.Append(DecryptedMinLength);
-							CSharp.AppendLine(");");
-							CSharp.Append(Indent);
-							CSharp.AppendLine("Writer = WriterBak2;");
-							CSharp.Append(Indent);
-							CSharp.Append("Writer.WriteBits(");
-							CSharp.Append(TYPE_BYTEARRAY);
-							CSharp.AppendLine(", 6);\t// TYPE_BYTEARRAY");
-							CSharp.Append(Indent);
-							CSharp.AppendLine("Writer.Write(Encrypted);");
-						}
+					if (Encrypted)
+					{
+						CSharp.Append(Indent);
+						CSharp.AppendLine("Writer.FlushBits();");
+						CSharp.Append(Indent);
+						CSharp.AppendLine("Unencrypted = Writer.GetSerialization();");
+						CSharp.Append(Indent);
+						CSharp.Append("Encrypted = await this.context.Encrypt(Unencrypted, \"");
+						CSharp.Append(Member.Name);
+						CSharp.Append("\", \"");
+						CSharp.Append(Escape(this.collectionName));
+						CSharp.Append("\", ObjectId, ");
+						CSharp.Append(DecryptedMinLength);
+						CSharp.AppendLine(");");
+						CSharp.Append(Indent);
+						CSharp.AppendLine("Writer = WriterBak2;");
+						CSharp.Append(Indent);
+						CSharp.Append("Writer.WriteBits(");
+						CSharp.Append(TYPE_BYTEARRAY);
+						CSharp.AppendLine(", 6);\t// TYPE_BYTEARRAY");
+						CSharp.Append(Indent);
+						CSharp.AppendLine("Writer.Write(Encrypted);");
 					}
 
 					if (HasDefaultValue)

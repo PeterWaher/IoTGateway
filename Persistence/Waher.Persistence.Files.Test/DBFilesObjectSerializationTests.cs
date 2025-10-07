@@ -3269,6 +3269,113 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertBinaryLength(Data, Reader);
 		}
 
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_34_SimpleArraysEncrypted()
+		{
+			SimpleArraysEncrypted Obj = new()
+			{
+				Boolean = [true, false],
+				Byte = [1, 2, 3],
+				Short = [1, 2, 3],
+				Int = [1, 2, 3],
+				Long = [1, 2, 3],
+				SByte = [1, 2, 3],
+				UShort = [1, 2, 3],
+				UInt = [1, 2, 3],
+				ULong = [1, 2, 3],
+				Char = ['a', 'b', 'c', '☀'],
+				Decimal = [1, 2, 3],
+				Double = [1, 2, 3],
+				Single = [1, 2, 3],
+				String = ["a", "b", "c", "Today, there will be a lot of ☀."],
+				DateTime = [DateTime.Now, DateTime.Today, DateTime.MinValue, DateTime.MaxValue],
+				TimeSpan = [DateTime.Now.TimeOfDay, TimeSpan.Zero],
+				Guid = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()],
+				NormalEnum = [NormalEnum.Option3, NormalEnum.Option1, NormalEnum.Option4],
+				FlagsEnum = [FlagsEnum.Option1 | FlagsEnum.Option4, FlagsEnum.Option3],
+				CIStrings = ["a", "b", "c", "Today, there will be a lot of ☀."]
+			};
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(SimpleArraysEncrypted));
+			DebugSerializer Writer = new(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			byte[] Data = Writer.GetSerialization();
+			WriteData(Data);
+
+			DebugDeserializer Reader = new(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
+
+			SimpleArraysEncrypted Obj2 = (SimpleArraysEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new(provider);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.ObjectId, GenObj.ObjectId);
+			AssertEncrypted(GenObj, "Boolean", 200);
+			AssertEncrypted(GenObj, "Byte", 500);
+			AssertEncrypted(GenObj, "Short", 200);
+			AssertEncrypted(GenObj, "Int", 500);
+			AssertEncrypted(GenObj, "Long", 200);
+			AssertEncrypted(GenObj, "SByte", 500);
+			AssertEncrypted(GenObj, "UShort", 200);
+			AssertEncrypted(GenObj, "UInt", 500);
+			AssertEncrypted(GenObj, "ULong", 200);
+			AssertEncrypted(GenObj, "Char", 500);
+			AssertEncrypted(GenObj, "Decimal", 200);
+			AssertEncrypted(GenObj, "Double", 500);
+			AssertEncrypted(GenObj, "Single", 200);
+			AssertEncrypted(GenObj, "String", 500);
+			AssertEncrypted(GenObj, "DateTime", 200);
+			AssertEncrypted(GenObj, "TimeSpan", 500);
+			AssertEncrypted(GenObj, "Guid", 200);
+			AssertEncrypted(GenObj, "NormalEnum", 500);
+			AssertEncrypted(GenObj, "FlagsEnum", 200);
+			AssertEncrypted(GenObj, "CIStrings", 500);
+
+			Writer.Restart();
+
+			await GS.Serialize(Writer, false, false, GenObj, null);
+
+			Data = Writer.GetSerialization();
+			WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (SimpleArraysEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
+		}
+
+		private static void AssertEqual(SimpleArraysEncrypted Obj, SimpleArraysEncrypted Obj2)
+		{
+			AssertEx.Same(Obj.Boolean, Obj2.Boolean);
+			AssertEx.Same(Obj.Byte, Obj2.Byte);
+			AssertEx.Same(Obj.Short, Obj2.Short);
+			AssertEx.Same(Obj.Int, Obj2.Int);
+			AssertEx.Same(Obj.Long, Obj2.Long);
+			AssertEx.Same(Obj.SByte, Obj2.SByte);
+			AssertEx.Same(Obj.UShort, Obj2.UShort);
+			AssertEx.Same(Obj.UInt, Obj2.UInt);
+			AssertEx.Same(Obj.ULong, Obj2.ULong);
+			AssertEx.Same(Obj.Char, Obj2.Char);
+			AssertEx.Same(Obj.Decimal, Obj2.Decimal);
+			AssertEx.Same(Obj.Double, Obj2.Double);
+			AssertEx.Same(Obj.Single, Obj2.Single);
+			AssertEx.Same(Obj.String, Obj2.String);
+			AssertEx.Same(Obj.DateTime, Obj2.DateTime);
+			AssertEx.Same(Obj.TimeSpan, Obj2.TimeSpan);
+			AssertEx.Same(Obj.Guid, Obj2.Guid);
+			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
+			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
+			AssertEx.Same(Obj.CIStrings, Obj2.CIStrings);
+		}
+
 		// TODO: Objects, by reference, nullable (incl. null strings, arrays)
 		// TODO: Multidimensional arrays
 	}

@@ -459,6 +459,7 @@ namespace Waher.Persistence.Serialization
 				bool Nullable;
 				bool HasEncrypted = false;
 				bool Encrypted;
+				bool IsObjectId;
 				bool HasObjectId = false;
 
 				CSharp.AppendLine("using System;");
@@ -512,10 +513,12 @@ namespace Waher.Persistence.Serialization
 					this.memberTypes[Member.Name] = MemberType;
 					this.members[Member.Name] = Member;
 
+					IsObjectId = false;
 					Ignore = false;
 					ShortName = null;
 					ByReference = false;
 					Nullable = false;
+					Encrypted = false;
 
 					MemberTypeInfo = MemberType.GetTypeInfo();
 					if (MemberTypeInfo.IsGenericType)
@@ -710,10 +713,11 @@ namespace Waher.Persistence.Serialization
 							this.objectIdMemberInfo = Member;
 							this.objectIdMemberType = MemberType;
 							HasObjectId = true;
-							Ignore = true;
+							IsObjectId = true;
 						}
 						else if (Attr is EncryptedAttribute)
 						{
+							Encrypted = true;
 							HasEncrypted = true;
 
 							if (!HasObjectId)
@@ -721,7 +725,10 @@ namespace Waher.Persistence.Serialization
 						}
 					}
 
-					if (Ignore)
+					if (IsObjectId && Encrypted)
+						throw new SerializationException("Object ID cannot be encrypted.", this.type);
+
+					if (Ignore || IsObjectId)
 						continue;
 
 					if (GetFieldDataTypeCode(Type) == TYPE_OBJECT)
@@ -3588,12 +3595,14 @@ namespace Waher.Persistence.Serialization
 				int DecryptedMinLength;
 				bool Ignore;
 				bool Encrypted;
+				bool IsObjectId;
 
 				foreach (MemberInfo MemberInfo in GetMembers(this.typeInfo))
 				{
 
 					Ignore = false;
 					Encrypted = false;
+					IsObjectId = false;
 					DecryptedMinLength = 0;
 					ShortName = null;
 
@@ -3638,6 +3647,7 @@ namespace Waher.Persistence.Serialization
 						continue;
 
 					ShortName = null;
+					IsObjectId = false;
 
 					foreach (object Attr in MemberInfo.GetCustomAttributes(true))
 					{
@@ -3665,13 +3675,16 @@ namespace Waher.Persistence.Serialization
 						else if (Attr is ObjectIdAttribute)
 						{
 							this.objectIdMember = Member;
-							Ignore = true;
+							IsObjectId = true;
 						}
 						else if (Attr is ShortNameAttribute ShortNameAttribute)
 							ShortName = ShortNameAttribute.Name;
 					}
 
-					if (Ignore)
+					if (IsObjectId && Encrypted)
+						throw new SerializationException("Object ID cannot be encrypted.", this.type);
+
+					if (Ignore || IsObjectId)
 						continue;
 
 					this.membersByName[Member.Name] = Member;

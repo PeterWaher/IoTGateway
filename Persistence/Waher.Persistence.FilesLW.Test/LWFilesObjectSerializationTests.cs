@@ -1584,6 +1584,30 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertBinaryLength(Data2, Reader);
 		}
 
+		private static void AssertEqual(ArraysOfArrays Obj, ArraysOfArrays Obj2)
+		{
+			AssertEx.Same(Obj.Boolean, Obj2.Boolean);
+			AssertEx.Same(Obj.Byte, Obj2.Byte);
+			AssertEx.Same(Obj.Short, Obj2.Short);
+			AssertEx.Same(Obj.Int, Obj2.Int);
+			AssertEx.Same(Obj.Long, Obj2.Long);
+			AssertEx.Same(Obj.SByte, Obj2.SByte);
+			AssertEx.Same(Obj.UShort, Obj2.UShort);
+			AssertEx.Same(Obj.UInt, Obj2.UInt);
+			AssertEx.Same(Obj.ULong, Obj2.ULong);
+			AssertEx.Same(Obj.Char, Obj2.Char);
+			AssertEx.Same(Obj.Decimal, Obj2.Decimal);
+			AssertEx.Same(Obj.Double, Obj2.Double);
+			AssertEx.Same(Obj.Single, Obj2.Single);
+			AssertEx.Same(Obj.String, Obj2.String);
+			AssertEx.Same(Obj.CIStrings, Obj2.CIStrings);
+			AssertEx.Same(Obj.DateTime, Obj2.DateTime);
+			AssertEx.Same(Obj.TimeSpan, Obj2.TimeSpan);
+			AssertEx.Same(Obj.Guid, Obj2.Guid);
+			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
+			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
+		}
+
 		[TestMethod]
 		public async Task DBFiles_ObjSerialization_15_ObsoleteMethod()
 		{
@@ -1699,30 +1723,6 @@ namespace Waher.Persistence.FilesLW.Test
 
 			AssertEqual(Obj, Obj2);
 			AssertBinaryLength(Data2, Reader);
-		}
-
-		private static void AssertEqual(ArraysOfArrays Obj, ArraysOfArrays Obj2)
-		{
-			AssertEx.Same(Obj.Boolean, Obj2.Boolean);
-			AssertEx.Same(Obj.Byte, Obj2.Byte);
-			AssertEx.Same(Obj.Short, Obj2.Short);
-			AssertEx.Same(Obj.Int, Obj2.Int);
-			AssertEx.Same(Obj.Long, Obj2.Long);
-			AssertEx.Same(Obj.SByte, Obj2.SByte);
-			AssertEx.Same(Obj.UShort, Obj2.UShort);
-			AssertEx.Same(Obj.UInt, Obj2.UInt);
-			AssertEx.Same(Obj.ULong, Obj2.ULong);
-			AssertEx.Same(Obj.Char, Obj2.Char);
-			AssertEx.Same(Obj.Decimal, Obj2.Decimal);
-			AssertEx.Same(Obj.Double, Obj2.Double);
-			AssertEx.Same(Obj.Single, Obj2.Single);
-			AssertEx.Same(Obj.String, Obj2.String);
-			AssertEx.Same(Obj.CIStrings, Obj2.CIStrings);
-			AssertEx.Same(Obj.DateTime, Obj2.DateTime);
-			AssertEx.Same(Obj.TimeSpan, Obj2.TimeSpan);
-			AssertEx.Same(Obj.Guid, Obj2.Guid);
-			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
-			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
 		}
 
 		[TestMethod]
@@ -3650,6 +3650,286 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.MultipleEmbeddedNullable[2].Short, Obj2.MultipleEmbeddedNullable[2].Short);
 			AssertEx.Same(Obj.MultipleEmbeddedNullable[2].Int, Obj2.MultipleEmbeddedNullable[2].Int);
 			AssertEx.Same(Obj.MultipleEmbeddedNull, Obj2.MultipleEmbeddedNull);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_37_ArraysOfArraysEncrypted()
+		{
+			ArraysOfArraysEncrypted Obj = new()
+			{
+				Boolean = [[true, false], [false, true]],
+				Byte = [[1, 2, 3], [2, 3, 4]],
+				Short = [[1, 2, 3], [2, 3, 4]],
+				Int = [[1, 2, 3], [2, 3, 4]],
+				Long = [[1, 2, 3], [2, 3, 4]],
+				SByte = [[1, 2, 3], [2, 3, 4]],
+				UShort = [[1, 2, 3], [2, 3, 4]],
+				UInt = [[1, 2, 3], [2, 3, 4]],
+				ULong = [[1, 2, 3], [2, 3, 4]],
+				Char = [['a', 'b', 'c', '☀'], ['a', 'b', 'c']],
+				Decimal = [[1, 2, 3], [2, 3, 4]],
+				Double = [[1, 2, 3], [2, 3, 4]],
+				Single = [[1, 2, 3], [2, 3, 4]],
+				String = [["a", "b", "c", "Today, there will be a lot of ☀."], ["a", "b", "c"]],
+				CIStrings = [["a", "b", "c", "Today, there will be a lot of ☀."], ["a", "b", "c"]],
+				DateTime = [[DateTime.Now, DateTime.Today, DateTime.MinValue, DateTime.MaxValue], [DateTime.MinValue, DateTime.MaxValue]],
+				TimeSpan = [[DateTime.Now.TimeOfDay, TimeSpan.Zero], [TimeSpan.MinValue, TimeSpan.MaxValue]],
+				Guid = [[Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()], [Guid.NewGuid(), Guid.NewGuid()]],
+				NormalEnum = [[NormalEnum.Option3, NormalEnum.Option1, NormalEnum.Option4], [NormalEnum.Option1, NormalEnum.Option2]],
+				FlagsEnum = [[FlagsEnum.Option1 | FlagsEnum.Option4, FlagsEnum.Option3], [FlagsEnum.Option2, FlagsEnum.Option3]]
+			};
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(ArraysOfArraysEncrypted));
+			DebugSerializer Writer = new(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			byte[] Data = Writer.GetSerialization();
+			WriteData(Data);
+
+			DebugDeserializer Reader = new(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
+
+			ArraysOfArraysEncrypted Obj2 = (ArraysOfArraysEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new(provider);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEncrypted(GenObj, "Boolean", 200);
+			AssertEncrypted(GenObj, "Byte", 500);
+			AssertEncrypted(GenObj, "Short", 200);
+			AssertEncrypted(GenObj, "Int", 500);
+			AssertEncrypted(GenObj, "Long", 200);
+			AssertEncrypted(GenObj, "SByte", 500);
+			AssertEncrypted(GenObj, "UShort", 200);
+			AssertEncrypted(GenObj, "UInt", 500);
+			AssertEncrypted(GenObj, "ULong", 200);
+			AssertEncrypted(GenObj, "Char", 500);
+			AssertEncrypted(GenObj, "Decimal", 200);
+			AssertEncrypted(GenObj, "Double", 500);
+			AssertEncrypted(GenObj, "Single", 200);
+			AssertEncrypted(GenObj, "String", 500);
+			AssertEncrypted(GenObj, "DateTime", 200);
+			AssertEncrypted(GenObj, "TimeSpan", 500);
+			AssertEncrypted(GenObj, "Guid", 200);
+			AssertEncrypted(GenObj, "NormalEnum", 500);
+			AssertEncrypted(GenObj, "CIStrings", 200);
+			AssertEncrypted(GenObj, "FlagsEnum", 500);
+
+			Writer.Restart();
+
+			await GS.Serialize(Writer, false, false, GenObj, null);
+
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
+
+			//Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			// Note: Enumerations are serialized as strings in the generic object, so serializations will not be equal.
+
+			Reader.Restart(Data2, 0);
+			Obj2 = (ArraysOfArraysEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data2, Reader);
+		}
+
+		private static void AssertEqual(ArraysOfArraysEncrypted Obj, ArraysOfArraysEncrypted Obj2)
+		{
+			AssertEx.Same(Obj.Boolean, Obj2.Boolean);
+			AssertEx.Same(Obj.Byte, Obj2.Byte);
+			AssertEx.Same(Obj.Short, Obj2.Short);
+			AssertEx.Same(Obj.Int, Obj2.Int);
+			AssertEx.Same(Obj.Long, Obj2.Long);
+			AssertEx.Same(Obj.SByte, Obj2.SByte);
+			AssertEx.Same(Obj.UShort, Obj2.UShort);
+			AssertEx.Same(Obj.UInt, Obj2.UInt);
+			AssertEx.Same(Obj.ULong, Obj2.ULong);
+			AssertEx.Same(Obj.Char, Obj2.Char);
+			AssertEx.Same(Obj.Decimal, Obj2.Decimal);
+			AssertEx.Same(Obj.Double, Obj2.Double);
+			AssertEx.Same(Obj.Single, Obj2.Single);
+			AssertEx.Same(Obj.String, Obj2.String);
+			AssertEx.Same(Obj.CIStrings, Obj2.CIStrings);
+			AssertEx.Same(Obj.DateTime, Obj2.DateTime);
+			AssertEx.Same(Obj.TimeSpan, Obj2.TimeSpan);
+			AssertEx.Same(Obj.Guid, Obj2.Guid);
+			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
+			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_38_StructsEncrypted()
+		{
+			StructsEncrypted Obj = new()
+			{
+				Duration = new Content.Duration(true, 1, 2, 3, 4, 5, 6)
+			};
+
+			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(StructsEncrypted));
+			DebugSerializer Writer = new(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			WriteData(Data);
+
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+
+			DebugDeserializer Reader = new(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
+			StructsEncrypted Obj2 = (StructsEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			Assert.IsNotNull(Obj2.Duration);
+			Assert.AreEqual(true, Obj2.Duration.Negation);
+			Assert.AreEqual(1, Obj2.Duration.Years);
+			Assert.AreEqual(2, Obj2.Duration.Months);
+			Assert.AreEqual(3, Obj2.Duration.Days);
+			Assert.AreEqual(4, Obj2.Duration.Hours);
+			Assert.AreEqual(5, Obj2.Duration.Minutes);
+			Assert.AreEqual(6, Obj2.Duration.Seconds);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_39_BinaryEncrypted()
+		{
+			DockerBlobEncrypted Obj = new()
+			{
+				ObjectId = Guid.NewGuid().ToString(),
+				Function = HashFunction.SHA256,
+				Digest =
+				[
+					0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+					10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+					20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+					30, 31
+				],
+				FileName = "Some file",
+				AccountName = "Some user"
+			};
+
+			ObjectSerializer S = (ObjectSerializer)await provider.GetObjectSerializer(typeof(DockerBlobEncrypted));
+			DebugSerializer Writer = new(new BinarySerializer(await S.CollectionName(Obj), Encoding.UTF8), ConsoleOut.Writer);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			byte[] Data = Writer.GetSerialization();
+			WriteData(Data);
+
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+
+			DebugDeserializer Reader = new(new BinaryDeserializer(await S.CollectionName(Obj), Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
+
+			DockerBlobEncrypted Obj2 = (DockerBlobEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			Assert.AreEqual(Obj.Function, Obj2.Function);
+			Assert.AreEqual(Convert.ToBase64String(Obj.Digest), Convert.ToBase64String(Obj2.Digest));
+			Assert.AreEqual(Obj.FileName, Obj2.FileName);
+			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
+
+			AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new(provider);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, GenObj.ObjectId.ToString());
+			AssertEncrypted(GenObj, "Function", 100);
+			AssertEncrypted(GenObj, "Digest", 200);
+			AssertEncrypted(GenObj, "FileName", 100);
+			AssertEncrypted(GenObj, "AccountName", 200);
+
+			Writer.Restart();
+
+			await GS.Serialize(Writer, false, false, GenObj, null);
+
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
+
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
+			Obj2 = (DockerBlobEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			Assert.AreEqual(Obj.Function, Obj2.Function);
+			Assert.AreEqual(Convert.ToBase64String(Obj.Digest), Convert.ToBase64String(Obj2.Digest));
+			Assert.AreEqual(Obj.FileName, Obj2.FileName);
+			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
+
+			AssertBinaryLength(Data2, Reader);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_40_BinaryNullEncrypted()
+		{
+			DockerBlobEncrypted Obj = new()
+			{
+				ObjectId = Guid.NewGuid().ToString(),
+				FileName = "Some file",
+				AccountName = "Some user"
+			};
+
+			ObjectSerializer S = (ObjectSerializer)await provider.GetObjectSerializer(typeof(DockerBlobEncrypted));
+			DebugSerializer Writer = new(new BinarySerializer(await S.CollectionName(Obj), Encoding.UTF8), ConsoleOut.Writer);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			byte[] Data = Writer.GetSerialization();
+			WriteData(Data);
+
+			ConsoleOut.WriteLine();
+			ConsoleOut.WriteLine();
+
+			DebugDeserializer Reader = new(new BinaryDeserializer(await S.CollectionName(Obj), Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
+
+			DockerBlobEncrypted Obj2 = (DockerBlobEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			Assert.AreEqual(Obj.Function, Obj2.Function);
+			Assert.AreEqual(Obj.Digest, Obj2.Digest);
+			Assert.AreEqual(Obj.FileName, Obj2.FileName);
+			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
+
+			AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new(provider);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, GenObj.ObjectId.ToString());
+			AssertEncrypted(GenObj, "Function", 100);
+			AssertEncrypted(GenObj, "Digest", 200);
+			AssertEncrypted(GenObj, "FileName", 100);
+			AssertEncrypted(GenObj, "AccountName", 200);
+
+			Writer.Restart();
+
+			await GS.Serialize(Writer, false, false, GenObj, null);
+
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
+
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
+			Obj2 = (DockerBlobEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			Assert.AreEqual(Obj.Function, Obj2.Function);
+			Assert.AreEqual(Obj.Digest, Obj2.Digest);
+			Assert.AreEqual(Obj.FileName, Obj2.FileName);
+			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
+
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		// TODO: Objects, by reference, nullable (incl. null strings, arrays)

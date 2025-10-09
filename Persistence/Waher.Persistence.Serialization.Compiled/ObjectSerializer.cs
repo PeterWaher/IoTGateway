@@ -731,7 +731,7 @@ namespace Waher.Persistence.Serialization
 					if (Ignore || IsObjectId)
 						continue;
 
-					if (GetFieldDataTypeCode(Type) == TYPE_OBJECT)
+					if (GetFieldDataTypeCode(MemberType) == TYPE_OBJECT)
 					{
 						CSharp.Append("\t\tprivate IObjectSerializer serializer");
 						CSharp.Append(Member.Name);
@@ -805,7 +805,7 @@ namespace Waher.Persistence.Serialization
 					if (Ignore)
 						continue;
 
-					if (GetFieldDataTypeCode(Type) == TYPE_OBJECT)
+					if (GetFieldDataTypeCode(MemberType) == TYPE_OBJECT)
 					{
 						if (!InitWritten)
 						{
@@ -1700,28 +1700,33 @@ namespace Waher.Persistence.Serialization
 									{
 										CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
 										CSharp.AppendLine("\t\t\t\t\t\t{");
-										CSharp.Append("\t\t\t\t\t\t\tcase ");
-										CSharp.Append(TYPE_OBJECT);
-										CSharp.AppendLine(":\t// TYPE_OBJECT");
 
-										CSharp.Append("\t\t\t\t\t\t\t\tif (this.serializer");
-										CSharp.Append(Member.Name);
-										CSharp.AppendLine(" is null)");
-										CSharp.Append("\t\t\t\t\t\t\t\t\tthis.serializer");
-										CSharp.Append(Member.Name);
-										CSharp.Append(" = await this.context.GetObjectSerializer(typeof(");
-										AppendType(MemberType, CSharp);
-										CSharp.AppendLine("));");
+										if (GetFieldDataTypeCode(MemberType) == TYPE_OBJECT)
+										{
+											CSharp.Append("\t\t\t\t\t\t\tcase ");
+											CSharp.Append(TYPE_OBJECT);
+											CSharp.AppendLine(":\t// TYPE_OBJECT");
 
-										CSharp.Append("\t\t\t\t\t\t\t\tResult.");
-										CSharp.Append(Member.Name);
-										CSharp.Append(" = (");
-										AppendType(MemberType, CSharp);
-										CSharp.Append(")await this.serializer");
-										CSharp.Append(Member.Name);
-										CSharp.AppendLine(".Deserialize(Reader, FieldDataType, true);");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-										CSharp.AppendLine();
+											CSharp.Append("\t\t\t\t\t\t\t\tif (this.serializer");
+											CSharp.Append(Member.Name);
+											CSharp.AppendLine(" is null)");
+											CSharp.Append("\t\t\t\t\t\t\t\t\tthis.serializer");
+											CSharp.Append(Member.Name);
+											CSharp.Append(" = await this.context.GetObjectSerializer(typeof(");
+											AppendType(MemberType, CSharp);
+											CSharp.AppendLine("));");
+
+											CSharp.Append("\t\t\t\t\t\t\t\tResult.");
+											CSharp.Append(Member.Name);
+											CSharp.Append(" = (");
+											AppendType(MemberType, CSharp);
+											CSharp.Append(")await this.serializer");
+											CSharp.Append(Member.Name);
+											CSharp.AppendLine(".Deserialize(Reader, FieldDataType, true);");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+											CSharp.AppendLine();
+										}
+
 										CSharp.Append("\t\t\t\t\t\t\tcase ");
 										CSharp.Append(TYPE_NULL);
 										CSharp.AppendLine(":\t// TYPE_NULL");
@@ -5658,8 +5663,6 @@ namespace Waher.Persistence.Serialization
 				return TYPE_BYTEARRAY;
 			else if (FieldDataType == typeof(Guid))
 				return TYPE_GUID;
-			else if (FieldDataType == typeof(CaseInsensitiveString))
-				return TYPE_CI_STRING;
 			else if (TI.IsArray)
 			{
 				if (FieldDataType == typeof(KeyValuePair<string, object>[]) ||

@@ -12,7 +12,7 @@ namespace Waher.Persistence.FilesLW.Test.Classes
 	/// A Docker BLOB reference
 	/// Ref: https://github.com/Trust-Anchor-Group/NeuronDockerRegistry/blob/main/TAG.Networking.DockerRegistry/Model/DockerBlob.cs
 	/// </summary>
-	[CollectionName("DockerBlobs")]
+	[CollectionName("DockerEncryptedBlobs")]
 	[TypeName(TypeNameSerialization.None)]
 	[Index("Digest", "Function")]
 	[Index("AccountName", "Digest", "Function")]

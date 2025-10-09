@@ -332,6 +332,9 @@ namespace Waher.Persistence.XmlLedger
 			}
 
 			await this.Flush();
+
+			this.output?.Dispose();
+			this.output = null;
 		}
 
 		/// <summary>

@@ -162,14 +162,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (Simple)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		internal static void AssertEqual(Simple Obj, Simple Obj2)
@@ -375,14 +376,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (Classes.Nullable)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		private static void AssertEqual(Classes.Nullable Obj, Classes.Nullable Obj2)
@@ -514,14 +516,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (Classes.Nullable)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		[TestMethod]
@@ -630,14 +633,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (Default)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		internal static void AssertEqual(Default Obj, Default Obj2)
@@ -773,14 +777,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (Default)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		[TestMethod]
@@ -855,14 +860,17 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			//Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			// Note: Enumerations are serialized as strings in the generic object, so serializations will not be equal.
+
+			Reader.Restart(Data2, 0);
 			Obj2 = (SimpleArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		private static void AssertEqual(SimpleArrays Obj, SimpleArrays Obj2)
@@ -958,14 +966,17 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			//Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			// Note: Enumerations are serialized as strings in the generic object, so serializations will not be equal.
+
+			Reader.Restart(Data2, 0);
 			Obj2 = (NullableArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		private static void AssertEqual(NullableArrays Obj, NullableArrays Obj2)
@@ -1092,14 +1103,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (Container)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		private static void AssertEqual(Container Obj, Container Obj2)
@@ -1166,14 +1178,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (ObjectIdString)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		private static void AssertEqual(ObjectIdString Obj, ObjectIdString Obj2)
@@ -1221,14 +1234,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (ObjectIdByteArray)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		private static void AssertEqual(ObjectIdByteArray Obj, ObjectIdByteArray Obj2)
@@ -1467,14 +1481,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (CollectionTest)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		private static void AssertEqual(CollectionTest Obj, CollectionTest Obj2)
@@ -1556,14 +1571,17 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			//Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			// Note: Enumerations are serialized as strings in the generic object, so serializations will not be equal.
+
+			Reader.Restart(Data2, 0);
 			Obj2 = (ArraysOfArrays)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		[TestMethod]
@@ -1672,14 +1690,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (ObsoleteMethod)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		private static void AssertEqual(ArraysOfArrays Obj, ArraysOfArrays Obj2)
@@ -2020,14 +2039,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		[TestMethod]
@@ -2088,14 +2108,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		[TestMethod]
@@ -2156,14 +2177,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		[TestMethod]
@@ -2224,14 +2246,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		internal static void AssertEqual(VarLenIntegers Obj, VarLenIntegers Obj2)
@@ -2291,14 +2314,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (NestedClass)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		private static NestedClass CreateNestedTestClass()
@@ -2491,10 +2515,11 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (DockerBlob)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
@@ -2503,7 +2528,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.AreEqual(Obj.FileName, Obj2.FileName);
 			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
 
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		[TestMethod]
@@ -2553,10 +2578,11 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (DockerBlob)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
@@ -2565,7 +2591,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.AreEqual(Obj.FileName, Obj2.FileName);
 			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
 
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		[TestMethod]
@@ -2677,14 +2703,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (SimpleEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		internal static void AssertEqual(SimpleEncrypted Obj, SimpleEncrypted Obj2)
@@ -2856,14 +2883,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (NullableEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		private static void AssertEqual(NullableEncrypted Obj, NullableEncrypted Obj2)
@@ -2997,14 +3025,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (NullableEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		[TestMethod]
@@ -3114,14 +3143,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (DefaultEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		internal static void AssertEqual(DefaultEncrypted Obj, DefaultEncrypted Obj2)
@@ -3259,14 +3289,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (DefaultEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		[TestMethod]
@@ -3342,14 +3373,15 @@ namespace Waher.Persistence.FilesLW.Test
 
 			await GS.Serialize(Writer, false, false, GenObj, null);
 
-			Data = Writer.GetSerialization();
-			WriteData(Data);
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
 
-			Reader.Restart(Data, 0);
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
 			Obj2 = (SimpleArraysEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			AssertEqual(Obj, Obj2);
-			AssertBinaryLength(Data, Reader);
+			AssertBinaryLength(Data2, Reader);
 		}
 
 		private static void AssertEqual(SimpleArraysEncrypted Obj, SimpleArraysEncrypted Obj2)
@@ -3374,6 +3406,250 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
 			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
 			AssertEx.Same(Obj.CIStrings, Obj2.CIStrings);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_35_NullableArraysEncrypted()
+		{
+			NullableArraysEncrypted Obj = new()
+			{
+				Boolean = [true, null, false],
+				Byte = [1, null, 3],
+				Short = [1, null, 3],
+				Int = [1, null, 3],
+				Long = [1, null, 3],
+				SByte = [1, null, 3],
+				UShort = [1, null, 3],
+				UInt = [1, null, 3],
+				ULong = [1, null, 3],
+				Char = ['a', 'b', null, '☀'],
+				Decimal = [1, null, 3],
+				Double = [1, null, 3],
+				Single = [1, null, 3],
+				DateTime = [DateTime.Now, null, DateTime.MinValue, DateTime.MaxValue],
+				TimeSpan = [DateTime.Now.TimeOfDay, null, TimeSpan.Zero],
+				Guid = [Guid.NewGuid(), null, Guid.NewGuid()],
+				NormalEnum = [NormalEnum.Option3, null, NormalEnum.Option4],
+				FlagsEnum = [FlagsEnum.Option1 | FlagsEnum.Option4, null, FlagsEnum.Option3]
+			};
+
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(NullableArraysEncrypted));
+			DebugSerializer Writer = new(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			byte[] Data = Writer.GetSerialization();
+			WriteData(Data);
+
+			DebugDeserializer Reader = new(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
+
+			NullableArraysEncrypted Obj2 = (NullableArraysEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new(provider);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.ObjectId, GenObj.ObjectId);
+			AssertEncrypted(GenObj, "Boolean", 200);
+			AssertEncrypted(GenObj, "Byte", 500);
+			AssertEncrypted(GenObj, "Short", 200);
+			AssertEncrypted(GenObj, "Int", 500);
+			AssertEncrypted(GenObj, "Long", 200);
+			AssertEncrypted(GenObj, "SByte", 500);
+			AssertEncrypted(GenObj, "UShort", 200);
+			AssertEncrypted(GenObj, "UInt", 500);
+			AssertEncrypted(GenObj, "ULong", 200);
+			AssertEncrypted(GenObj, "Char", 500);
+			AssertEncrypted(GenObj, "Decimal", 200);
+			AssertEncrypted(GenObj, "Double", 500);
+			AssertEncrypted(GenObj, "Single", 200);
+			AssertEncrypted(GenObj, "DateTime", 500);
+			AssertEncrypted(GenObj, "TimeSpan", 200);
+			AssertEncrypted(GenObj, "Guid", 500);
+			AssertEncrypted(GenObj, "NormalEnum", 200);
+			AssertEncrypted(GenObj, "FlagsEnum", 500);
+
+			Writer.Restart();
+
+			await GS.Serialize(Writer, false, false, GenObj, null);
+
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
+
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
+			Obj2 = (NullableArraysEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data2, Reader);
+		}
+
+		private static void AssertEqual(NullableArraysEncrypted Obj, NullableArraysEncrypted Obj2)
+		{
+			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
+			AssertEx.Same(Obj.Boolean, Obj2.Boolean);
+			AssertEx.Same(Obj.Byte, Obj2.Byte);
+			AssertEx.Same(Obj.Short, Obj2.Short);
+			AssertEx.Same(Obj.Int, Obj2.Int);
+			AssertEx.Same(Obj.Long, Obj2.Long);
+			AssertEx.Same(Obj.SByte, Obj2.SByte);
+			AssertEx.Same(Obj.UShort, Obj2.UShort);
+			AssertEx.Same(Obj.UInt, Obj2.UInt);
+			AssertEx.Same(Obj.ULong, Obj2.ULong);
+			AssertEx.Same(Obj.Char, Obj2.Char);
+			AssertEx.Same(Obj.Decimal, Obj2.Decimal);
+			AssertEx.Same(Obj.Double, Obj2.Double);
+			AssertEx.Same(Obj.Single, Obj2.Single);
+			AssertEx.Same(Obj.DateTime, Obj2.DateTime);
+			AssertEx.Same(Obj.TimeSpan, Obj2.TimeSpan);
+			AssertEx.Same(Obj.Guid, Obj2.Guid);
+			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
+			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_36_EmbeddedEncrypted()
+		{
+			ContainerEncrypted Obj = new()
+			{
+				Embedded = new()
+				{
+					Byte = 10,
+					Short = 1000,
+					Int = 10000000
+				},
+				EmbeddedNull = null,
+				MultipleEmbedded =
+				[
+					new()
+					{
+						Byte = 20,
+						Short = 2000,
+						Int = 20000000
+					},
+					new()
+					{
+						Byte = 30,
+						Short = 3000,
+						Int = 30000000
+					},
+					new()
+					{
+						Byte = 40,
+						Short = 4000,
+						Int = 40000000
+					}
+				],
+				MultipleEmbeddedNullable =
+				[
+					new()
+					{
+						Byte = 20,
+						Short = 2000,
+						Int = 20000000
+					},
+					null,
+					new()
+					{
+						Byte = 40,
+						Short = 4000,
+						Int = 40000000
+					}
+				],
+				MultipleEmbeddedNull = null
+			};
+
+			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(ContainerEncrypted));
+			DebugSerializer Writer = new(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), ConsoleOut.Writer);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			WriteData(Data);
+
+			DebugDeserializer Reader = new(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), ConsoleOut.Writer);
+
+			ContainerEncrypted Obj2 = (ContainerEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new(provider);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.ObjectId, GenObj.ObjectId);
+			AssertEncrypted((GenericObject)GenObj["Embedded"], "Byte", 0);
+			AssertEncrypted((GenericObject)GenObj["Embedded"], "Short", 100);
+			AssertEncrypted((GenericObject)GenObj["Embedded"], "Int", 0);
+			AssertEx.Same(null, GenObj["EmbeddedNull"]);
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(0), "Byte", 0);
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(0), "Short", 100);
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(0), "Int", 0);
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(1), "Byte", 0);
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(1), "Short", 100);
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(1), "Int", 0);
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(2), "Byte", 0);
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(2), "Short", 100);
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(2), "Int", 0);
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(0), "Byte", 0);
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(0), "Short", 100);
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(0), "Int", 0);
+			AssertEx.Same(null, ((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(1));
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(2), "Byte", 0);
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(2), "Short", 100);
+			AssertEncrypted((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(2), "Int", 0);
+			AssertEx.Same(null, GenObj["MultipleEmbeddedNull"]);
+
+			Writer.Restart();
+
+			await GS.Serialize(Writer, false, false, GenObj, null);
+
+			byte[] Data2 = Writer.GetSerialization();
+			WriteData(Data2);
+
+			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Reader.Restart(Data2, 0);
+			Obj2 = (ContainerEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			AssertBinaryLength(Data2, Reader);
+		}
+
+		private static void AssertEqual(ContainerEncrypted Obj, ContainerEncrypted Obj2)
+		{
+			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
+			AssertEx.Same(Obj.Embedded.Byte, Obj2.Embedded.Byte);
+			AssertEx.Same(Obj.Embedded.Short, Obj2.Embedded.Short);
+			AssertEx.Same(Obj.Embedded.Int, Obj2.Embedded.Int);
+			AssertEx.Same(Obj.EmbeddedNull, Obj2.EmbeddedNull);
+			AssertEx.Same(Obj.MultipleEmbedded[0].Byte, Obj2.MultipleEmbedded[0].Byte);
+			AssertEx.Same(Obj.MultipleEmbedded[0].Short, Obj2.MultipleEmbedded[0].Short);
+			AssertEx.Same(Obj.MultipleEmbedded[0].Int, Obj2.MultipleEmbedded[0].Int);
+			AssertEx.Same(Obj.MultipleEmbedded[1].Byte, Obj2.MultipleEmbedded[1].Byte);
+			AssertEx.Same(Obj.MultipleEmbedded[1].Short, Obj2.MultipleEmbedded[1].Short);
+			AssertEx.Same(Obj.MultipleEmbedded[1].Int, Obj2.MultipleEmbedded[1].Int);
+			AssertEx.Same(Obj.MultipleEmbedded[2].Byte, Obj2.MultipleEmbedded[2].Byte);
+			AssertEx.Same(Obj.MultipleEmbedded[2].Short, Obj2.MultipleEmbedded[2].Short);
+			AssertEx.Same(Obj.MultipleEmbedded[2].Int, Obj2.MultipleEmbedded[2].Int);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[0].Byte, Obj2.MultipleEmbeddedNullable[0].Byte);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[0].Short, Obj2.MultipleEmbeddedNullable[0].Short);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[0].Int, Obj2.MultipleEmbeddedNullable[0].Int);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[1], Obj2.MultipleEmbeddedNullable[1]);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[2].Byte, Obj2.MultipleEmbeddedNullable[2].Byte);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[2].Short, Obj2.MultipleEmbeddedNullable[2].Short);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[2].Int, Obj2.MultipleEmbeddedNullable[2].Int);
+			AssertEx.Same(Obj.MultipleEmbeddedNull, Obj2.MultipleEmbeddedNull);
 		}
 
 		// TODO: Objects, by reference, nullable (incl. null strings, arrays)

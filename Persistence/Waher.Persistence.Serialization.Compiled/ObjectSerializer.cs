@@ -18,7 +18,6 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
 using Waher.Script.Abstraction.Elements;
 using Waher.Runtime.Collections;
-using Waher.Script.Operators.Arithmetics;
 
 namespace Waher.Persistence.Serialization
 {
@@ -2336,77 +2335,88 @@ namespace Waher.Persistence.Serialization
 
 				if (HasObjectId)
 				{
-					CSharp.Append("\t\t\t");
-					AppendType(this.objectIdMemberType, CSharp);
-					CSharp.Append(" ObjectId = Value.");
-					CSharp.Append(this.objectIdMemberInfo.Name);
-					CSharp.AppendLine(";");
-
-					CSharp.Append("\t\t\tif (");
-
-					if (!HasEncrypted)
-						CSharp.Append("!Embedded && ");
+					CSharp.AppendLine("\t\t\tbool HasObjectId;");
 
 					if (this.objectIdMemberType == typeof(Guid))
-						CSharp.AppendLine("ObjectId.Equals(Guid.Empty))");
+					{
+						CSharp.Append("\t\t\tGuid ObjectId = Value.");
+						CSharp.Append(this.objectIdMemberInfo.Name);
+						CSharp.AppendLine(";");
+						CSharp.AppendLine();
+						CSharp.AppendLine("\t\t\tHasObjectId = !ObjectId.Equals(Guid.Empty);");
+
+						CSharp.Append("\t\t\tif (");
+						if (!HasEncrypted)
+							CSharp.Append("!Embedded && ");
+
+						CSharp.AppendLine("!HasObjectId)");
+					}
 					else if (this.objectIdMemberType == typeof(string))
-						CSharp.AppendLine("string.IsNullOrEmpty(ObjectId))");
+					{
+						CSharp.AppendLine("\t\t\tGuid ObjectId;");
+						CSharp.Append("\t\t\tstring ObjectIdStr = Value.");
+						CSharp.Append(this.objectIdMemberInfo.Name);
+						CSharp.AppendLine(";");
+						CSharp.AppendLine();
+						CSharp.AppendLine("\t\t\tHasObjectId = !string.IsNullOrEmpty(ObjectIdStr);");
+
+						CSharp.AppendLine("\t\t\tif (HasObjectId)");
+						CSharp.AppendLine("\t\t\t\tObjectId = new Guid(ObjectIdStr);");
+						CSharp.Append("\t\t\telse");
+						if (HasEncrypted)
+							CSharp.AppendLine();
+						else
+						{
+							CSharp.AppendLine(" if (Embedded)");
+							CSharp.AppendLine("\t\t\t\tObjectId = Guid.Empty;");
+							CSharp.AppendLine("\t\t\telse");
+						}
+					}
 					else if (this.objectIdMemberType == typeof(byte[]))
-						CSharp.AppendLine("ObjectId is null)");
+					{
+						CSharp.AppendLine("\t\t\tGuid ObjectId;");
+						CSharp.Append("\t\t\tbyte[] ObjectIdBin = Value.");
+						CSharp.Append(this.objectIdMemberInfo.Name);
+						CSharp.AppendLine(";");
+						CSharp.AppendLine();
+						CSharp.AppendLine("\t\t\tHasObjectId = !(ObjectIdBin is null);");
+
+						CSharp.AppendLine("\t\t\tif (HasObjectId)");
+						CSharp.AppendLine("\t\t\t\tObjectId = new Guid(ObjectIdBin);");
+						CSharp.Append("\t\t\telse");
+						if (HasEncrypted)
+							CSharp.AppendLine();
+						else
+						{
+							CSharp.AppendLine(" if (Embedded)");
+							CSharp.AppendLine("\t\t\t\tObjectId = Guid.Empty;");
+							CSharp.AppendLine("\t\t\telse");
+						}
+					}
 					else
 						throw new SerializationException("Invalid Object ID type.", this.type);
 
 					CSharp.AppendLine("\t\t\t{");
-
-					if (this.objectIdMemberType == typeof(Guid))
-						CSharp.AppendLine("\t\t\t\tObjectId = this.context.CreateGuid();");
-					else if (this.objectIdMemberType == typeof(string))
-						CSharp.AppendLine("\t\t\t\tObjectId = this.context.CreateGuid().ToString();");
-					else if (this.objectIdMemberType == typeof(byte[]))
-						CSharp.AppendLine("\t\t\t\tObjectId = this.context.CreateGuid().ToByteArray();");
-
+					CSharp.AppendLine("\t\t\t\tHasObjectId = true;");
+					CSharp.AppendLine("\t\t\t\tObjectId = this.context.CreateGuid();");
 					CSharp.Append("\t\t\t\tValue.");
 					CSharp.Append(this.objectIdMemberInfo.Name);
-					CSharp.AppendLine(" = ObjectId;");
-					CSharp.AppendLine("\t\t\t}");
-					CSharp.AppendLine("\t\t\telse if (Embedded && Writer.BitOffset > 0)");
-					CSharp.AppendLine("\t\t\t{");
+					CSharp.Append(" = ");
 
 					if (this.objectIdMemberType == typeof(Guid))
-					{
-						CSharp.Append("\t\t\t\tbool WriteObjectId = !Value.");
-						CSharp.Append(this.objectIdMemberInfo.Name);
-						CSharp.AppendLine(".Equals(Guid.Empty);");
-					}
+						CSharp.AppendLine("ObjectId;");
 					else if (this.objectIdMemberType == typeof(string))
-					{
-						CSharp.Append("\t\t\t\tbool WriteObjectId = !string.IsNullOrEmpty(Value.");
-						CSharp.Append(this.objectIdMemberInfo.Name);
-						CSharp.AppendLine(");");
-					}
+						CSharp.AppendLine("ObjectId.ToString();");
 					else if (this.objectIdMemberType == typeof(byte[]))
-					{
-						CSharp.Append("\t\t\t\tbool WriteObjectId = !(Value.");
-						CSharp.Append(this.objectIdMemberInfo.Name);
-						CSharp.AppendLine(" is null);");
-					}
+						CSharp.AppendLine("ObjectId.ToByteArray();");
 
-					CSharp.AppendLine("\t\t\t\tWriter.WriteBit(WriteObjectId);");
-					CSharp.AppendLine("\t\t\t\tif (WriteObjectId)");
-
-					if (this.objectIdMemberType == typeof(Guid))
-					{
-						CSharp.Append("\t\t\t\t\tWriter.Write(Value.");
-						CSharp.Append(this.objectIdMemberInfo.Name);
-						CSharp.AppendLine(");");
-					}
-					else
-					{
-						CSharp.Append("\t\t\t\t\tWriter.Write(new Guid(Value.");
-						CSharp.Append(this.objectIdMemberInfo.Name);
-						CSharp.AppendLine("));");
-					}
-
+					CSharp.AppendLine("\t\t\t}");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\tif (Embedded && Writer.BitOffset > 0)");
+					CSharp.AppendLine("\t\t\t{");
+					CSharp.AppendLine("\t\t\t\tWriter.WriteBit(HasObjectId);");
+					CSharp.AppendLine("\t\t\t\tif (HasObjectId)");
+					CSharp.AppendLine("\t\t\t\t\tWriter.Write(ObjectId);");
 					CSharp.AppendLine("\t\t\t}");
 					CSharp.AppendLine();
 				}
@@ -2460,6 +2470,13 @@ namespace Waher.Persistence.Serialization
 					CSharp.Append(string.IsNullOrEmpty(this.collectionName) ? this.context.DefaultCollectionName : this.collectionName);
 					CSharp.AppendLine("\");");
 				}
+
+				bool OutputInt16 = false;
+				bool OutputInt32 = false;
+				bool OutputInt64 = false;
+				bool OutputUInt16 = false;
+				bool OutputUInt32 = false;
+				bool OutputUInt64 = false;
 
 				foreach (MemberInfo Member in Members)
 				{
@@ -2541,6 +2558,73 @@ namespace Waher.Persistence.Serialization
 						continue;
 
 					CSharp.AppendLine();
+
+					TypeCode MemberTypeCode = Type.GetTypeCode(MemberType);
+
+					if (HasDefaultValue || Nullable)
+					{
+						if (MemberTypeInfo.IsEnum && MemberTypeInfo.IsDefined(typeof(FlagsAttribute), false))
+						{
+							if (!OutputInt32)
+							{
+								OutputInt32 = true;
+								CSharp.AppendLine("\t\t\tint i32;");
+							}
+						}
+						else
+						{
+							switch (MemberTypeCode)
+							{
+								case TypeCode.Int16:
+									if (!OutputInt16)
+									{
+										OutputInt16 = true;
+										CSharp.AppendLine("\t\t\tshort i16;");
+									}
+									break;
+
+								case TypeCode.Int32:
+									if (!OutputInt32)
+									{
+										OutputInt32 = true;
+										CSharp.AppendLine("\t\t\tint i32;");
+									}
+									break;
+
+								case TypeCode.Int64:
+									if (!OutputInt64)
+									{
+										OutputInt64 = true;
+										CSharp.AppendLine("\t\t\tlong i64;");
+									}
+									break;
+
+								case TypeCode.UInt16:
+									if (!OutputUInt16)
+									{
+										OutputUInt16 = true;
+										CSharp.AppendLine("\t\t\tushort ui16;");
+									}
+									break;
+
+								case TypeCode.UInt32:
+									if (!OutputUInt32)
+									{
+										OutputUInt32 = true;
+										CSharp.AppendLine("\t\t\tuint ui32;");
+									}
+									break;
+
+								case TypeCode.UInt64:
+									if (!OutputUInt64)
+									{
+										OutputUInt64 = true;
+										CSharp.AppendLine("\t\t\tulong ui64;");
+									}
+									break;
+							}
+						}
+					}
 
 					if (HasDefaultValue)
 					{
@@ -2629,16 +2713,45 @@ namespace Waher.Persistence.Serialization
 						if (MemberTypeInfo.IsDefined(typeof(FlagsAttribute), false))
 						{
 							CSharp.Append(Indent2);
-							CSharp.Append("Writer.WriteBits(");
-							CSharp.Append(TYPE_INT32);
-							CSharp.AppendLine(", 6);\t// TYPE_INT32");
 
-							CSharp.Append(Indent2);
-							CSharp.Append("Writer.Write((int)Value.");
+							if (!OutputInt32)
+							{
+								OutputInt32 = true;
+								CSharp.Append("int ");
+							}
+
+							CSharp.Append("i32 = (int)Value.");
 							CSharp.Append(Member.Name);
 							if (Nullable)
 								CSharp.Append(".Value");
-							CSharp.AppendLine(");");
+							CSharp.AppendLine(";");
+
+							CSharp.Append(Indent2);
+							CSharp.AppendLine("if (i32 > Int32VarSizeMinLimit && i32 < Int32VarSizeMaxLimit)");
+							CSharp.Append(Indent2);
+							CSharp.AppendLine("{");
+
+							CSharp.Append(Indent2);
+							CSharp.Append("\tWriter.WriteBits(");
+							CSharp.Append(TYPE_VARINT32);
+							CSharp.AppendLine(", 6);\t// TYPE_VARINT32");
+							CSharp.Append(Indent2);
+							CSharp.AppendLine("\tWriter.WriteVariableLengthInt32(i32);");
+							CSharp.Append(Indent2);
+							CSharp.AppendLine("}");
+							CSharp.Append(Indent2);
+							CSharp.AppendLine("else");
+							CSharp.Append(Indent2);
+							CSharp.AppendLine("{");
+
+							CSharp.Append(Indent2);
+							CSharp.Append("\tWriter.WriteBits(");
+							CSharp.Append(TYPE_INT32);
+							CSharp.AppendLine(", 6);\t// TYPE_INT32");
+							CSharp.Append(Indent2);
+							CSharp.AppendLine("\tWriter.Write(i32);");
+							CSharp.Append(Indent2);
+							CSharp.AppendLine("}");
 						}
 						else
 						{
@@ -2657,7 +2770,7 @@ namespace Waher.Persistence.Serialization
 					}
 					else
 					{
-						switch (Type.GetTypeCode(MemberType))
+						switch (MemberTypeCode)
 						{
 							case TypeCode.Boolean:
 								CSharp.Append(Indent2);
@@ -2758,16 +2871,23 @@ namespace Waher.Persistence.Serialization
 								break;
 
 							case TypeCode.Int16:
+
 								CSharp.Append(Indent2);
-								CSharp.Append("if (Value.");
+
+								if (!OutputInt16)
+								{
+									OutputInt16 = true;
+									CSharp.Append("short ");
+								}
+
+								CSharp.Append("i16 = Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
-								CSharp.Append(" > Int16VarSizeMinLimit && Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(" < Int16VarSizeMaxLimit)");
+								CSharp.AppendLine(";");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("if (i16 > Int16VarSizeMinLimit && i16 < Int16VarSizeMaxLimit)");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("{");
 
@@ -2775,14 +2895,8 @@ namespace Waher.Persistence.Serialization
 								CSharp.Append("\tWriter.WriteBits(");
 								CSharp.Append(TYPE_VARINT16);
 								CSharp.AppendLine(", 6);\t// TYPE_VARINT16");
-
 								CSharp.Append(Indent2);
-								CSharp.Append("\tWriter.WriteVariableLengthInt16(Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(");");
-
+								CSharp.AppendLine("\tWriter.WriteVariableLengthInt16(i16);");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("}");
 								CSharp.Append(Indent2);
@@ -2794,29 +2908,29 @@ namespace Waher.Persistence.Serialization
 								CSharp.Append("\tWriter.WriteBits(");
 								CSharp.Append(TYPE_INT16);
 								CSharp.AppendLine(", 6);\t// TYPE_INT16");
-
 								CSharp.Append(Indent2);
-								CSharp.Append("\tWriter.Write(Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(");");
-
+								CSharp.AppendLine("\tWriter.Write(i16);");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("}");
 								break;
 
 							case TypeCode.Int32:
 								CSharp.Append(Indent2);
-								CSharp.Append("if (Value.");
+
+								if (!OutputInt32)
+								{
+									OutputInt32 = true;
+									CSharp.Append("int ");
+								}
+
+								CSharp.Append("i32 = Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
-								CSharp.Append(" > Int32VarSizeMinLimit && Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(" < Int32VarSizeMaxLimit)");
+								CSharp.AppendLine(";");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("if (i32 > Int32VarSizeMinLimit && i32 < Int32VarSizeMaxLimit)");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("{");
 
@@ -2824,14 +2938,8 @@ namespace Waher.Persistence.Serialization
 								CSharp.Append("\tWriter.WriteBits(");
 								CSharp.Append(TYPE_VARINT32);
 								CSharp.AppendLine(", 6);\t// TYPE_VARINT32");
-
 								CSharp.Append(Indent2);
-								CSharp.Append("\tWriter.WriteVariableLengthInt32(Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(");");
-
+								CSharp.AppendLine("\tWriter.WriteVariableLengthInt32(i32);");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("}");
 								CSharp.Append(Indent2);
@@ -2843,29 +2951,29 @@ namespace Waher.Persistence.Serialization
 								CSharp.Append("\tWriter.WriteBits(");
 								CSharp.Append(TYPE_INT32);
 								CSharp.AppendLine(", 6);\t// TYPE_INT32");
-
 								CSharp.Append(Indent2);
-								CSharp.Append("\tWriter.Write(Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(");");
-
+								CSharp.AppendLine("\tWriter.Write(i32);");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("}");
 								break;
 
 							case TypeCode.Int64:
 								CSharp.Append(Indent2);
-								CSharp.Append("if (Value.");
+
+								if (!OutputInt64)
+								{
+									OutputInt64 = true;
+									CSharp.Append("long ");
+								}
+
+								CSharp.Append("i64 = Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
-								CSharp.Append(" > Int64VarSizeMinLimit && Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(" < Int64VarSizeMaxLimit)");
+								CSharp.AppendLine(";");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("if (i64 > Int64VarSizeMinLimit && i64 < Int64VarSizeMaxLimit)");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("{");
 
@@ -2873,14 +2981,8 @@ namespace Waher.Persistence.Serialization
 								CSharp.Append("\tWriter.WriteBits(");
 								CSharp.Append(TYPE_VARINT64);
 								CSharp.AppendLine(", 6);\t// TYPE_VARINT64");
-
 								CSharp.Append(Indent2);
-								CSharp.Append("\tWriter.WriteVariableLengthInt64(Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(");");
-
+								CSharp.AppendLine("\tWriter.WriteVariableLengthInt64(i64);");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("}");
 								CSharp.Append(Indent2);
@@ -2892,14 +2994,8 @@ namespace Waher.Persistence.Serialization
 								CSharp.Append("\tWriter.WriteBits(");
 								CSharp.Append(TYPE_INT64);
 								CSharp.AppendLine(", 6);\t// TYPE_INT64");
-
 								CSharp.Append(Indent2);
-								CSharp.Append("\tWriter.Write(Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(");");
-
+								CSharp.AppendLine("\tWriter.Write(i64);");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("}");
 								break;
@@ -2950,11 +3046,21 @@ namespace Waher.Persistence.Serialization
 
 							case TypeCode.UInt16:
 								CSharp.Append(Indent2);
-								CSharp.Append("if (Value.");
+
+								if (!OutputUInt16)
+								{
+									OutputUInt16 = true;
+									CSharp.Append("ushort ");
+								}
+
+								CSharp.Append("ui16 = Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
-								CSharp.AppendLine(" < UInt16VarSizeLimit)");
+								CSharp.AppendLine(";");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("if (ui16 < UInt16VarSizeLimit)");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("{");
 
@@ -2962,14 +3068,8 @@ namespace Waher.Persistence.Serialization
 								CSharp.Append("\tWriter.WriteBits(");
 								CSharp.Append(TYPE_VARUINT16);
 								CSharp.AppendLine(", 6);\t// TYPE_VARUINT16");
-
 								CSharp.Append(Indent2);
-								CSharp.Append("\tWriter.WriteVariableLengthUInt16(Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(");");
-
+								CSharp.AppendLine("\tWriter.WriteVariableLengthUInt16(ui16);");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("}");
 								CSharp.Append(Indent2);
@@ -2981,25 +3081,29 @@ namespace Waher.Persistence.Serialization
 								CSharp.Append("\tWriter.WriteBits(");
 								CSharp.Append(TYPE_UINT16);
 								CSharp.AppendLine(", 6);\t// TYPE_UINT16");
-
 								CSharp.Append(Indent2);
-								CSharp.Append("\tWriter.Write(Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(");");
-
+								CSharp.AppendLine("\tWriter.Write(ui16);");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("}");
 								break;
 
 							case TypeCode.UInt32:
 								CSharp.Append(Indent2);
-								CSharp.Append("if (Value.");
+
+								if (!OutputUInt32)
+								{
+									OutputUInt32 = true;
+									CSharp.Append("uint ");
+								}
+
+								CSharp.Append("ui32 = Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
-								CSharp.AppendLine(" < UInt32VarSizeLimit)");
+								CSharp.AppendLine(";");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("if (ui32 < UInt32VarSizeLimit)");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("{");
 
@@ -3007,14 +3111,8 @@ namespace Waher.Persistence.Serialization
 								CSharp.Append("\tWriter.WriteBits(");
 								CSharp.Append(TYPE_VARUINT32);
 								CSharp.AppendLine(", 6);\t// TYPE_VARUINT32");
-
 								CSharp.Append(Indent2);
-								CSharp.Append("\tWriter.WriteVariableLengthUInt32(Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(");");
-
+								CSharp.AppendLine("\tWriter.WriteVariableLengthUInt32(ui32);");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("}");
 								CSharp.Append(Indent2);
@@ -3026,25 +3124,29 @@ namespace Waher.Persistence.Serialization
 								CSharp.Append("\tWriter.WriteBits(");
 								CSharp.Append(TYPE_UINT32);
 								CSharp.AppendLine(", 6);\t// TYPE_UINT32");
-
 								CSharp.Append(Indent2);
-								CSharp.Append("\tWriter.Write(Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(");");
-
+								CSharp.AppendLine("\tWriter.Write(ui32);");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("}");
 								break;
 
 							case TypeCode.UInt64:
 								CSharp.Append(Indent2);
-								CSharp.Append("if (Value.");
+
+								if (!OutputUInt64)
+								{
+									OutputUInt64 = true;
+									CSharp.Append("ulong ");
+								}
+
+								CSharp.Append("ui64 = Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
-								CSharp.AppendLine(" < UInt64VarSizeLimit)");
+								CSharp.AppendLine(";");
+
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("if (ui64 < UInt64VarSizeLimit)");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("{");
 
@@ -3052,14 +3154,8 @@ namespace Waher.Persistence.Serialization
 								CSharp.Append("\tWriter.WriteBits(");
 								CSharp.Append(TYPE_VARUINT64);
 								CSharp.AppendLine(", 6);\t// TYPE_VARUINT64");
-
 								CSharp.Append(Indent2);
-								CSharp.Append("\tWriter.WriteVariableLengthUInt64(Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(");");
-
+								CSharp.AppendLine("\tWriter.WriteVariableLengthUInt64(ui64);");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("}");
 								CSharp.Append(Indent2);
@@ -3071,14 +3167,8 @@ namespace Waher.Persistence.Serialization
 								CSharp.Append("\tWriter.WriteBits(");
 								CSharp.Append(TYPE_UINT64);
 								CSharp.AppendLine(", 6);\t// TYPE_UINT64");
-
 								CSharp.Append(Indent2);
-								CSharp.Append("\tWriter.Write(Value.");
-								CSharp.Append(Member.Name);
-								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.AppendLine(");");
-
+								CSharp.AppendLine("\tWriter.Write(ui64);");
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("}");
 								break;
@@ -3330,16 +3420,14 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine("\t\t\tif (!Embedded)");
 				CSharp.AppendLine("\t\t\t{");
 
-				if (this.objectIdMemberType is null)
-					CSharp.AppendLine("\t\t\t\tWriterBak.Write(this.context.CreateGuid());");
-				else if (this.objectIdMemberType == typeof(Guid))
+				if (HasObjectId)
+				{
+					CSharp.AppendLine("\t\t\t\tif (!HasObjectId)");
+					CSharp.AppendLine("\t\t\t\t\tObjectId = this.context.CreateGuid();");
 					CSharp.AppendLine("\t\t\t\tWriterBak.Write(ObjectId);");
-				else if (this.objectIdMemberType == typeof(string))
-					CSharp.AppendLine("\t\t\t\tWriterBak.Write(new Guid(ObjectId));");
-				else if (this.objectIdMemberType == typeof(byte[]))
-					CSharp.AppendLine("\t\t\t\tWriterBak.Write(new Guid(ObjectId));");
+				}
 				else
-					throw new SerializationException("Invalid Object ID type.", this.type);
+					CSharp.AppendLine("\t\t\t\tWriterBak.Write(this.context.CreateGuid());");
 
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\t\tbyte[] Bin = Writer.GetSerialization();");
@@ -4961,8 +5049,19 @@ namespace Waher.Persistence.Serialization
 							case TYPE_ENUM:
 								if (Member.HasFlags)
 								{
-									Writer.WriteBits(TYPE_INT32, 6);
-									Writer.Write(Convert.ToInt32(MemberValue));
+									int i = Convert.ToInt32(MemberValue);
+
+									if (i > GeneratedObjectSerializerBase.Int32VarSizeMinLimit &&
+										i < GeneratedObjectSerializerBase.Int32VarSizeMaxLimit)
+									{
+										Writer.WriteBits(TYPE_VARINT32, 6);
+										Writer.WriteVariableLengthInt32(i);
+									}
+									else
+									{
+										Writer.WriteBits(TYPE_INT32, 6);
+										Writer.Write(i);
+									}
 								}
 								else
 								{

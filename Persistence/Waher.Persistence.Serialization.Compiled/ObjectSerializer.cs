@@ -4727,6 +4727,70 @@ namespace Waher.Persistence.Serialization
 
 				ISerializer WriterBak2 = Writer;
 				Guid ObjectId;
+				bool HasObjectId = false;
+
+				if (!Embedded || this.hasEncrypted)
+				{
+					if (this.objectIdMember is null)
+						ObjectId = this.context.CreateGuid();
+					else
+					{
+						object ObjectIdObj = this.objectIdMember.Get(Value);
+						int ObjectIdType = 0;
+
+						if (this.objectIdMember.MemberFieldDataTypeCode == TYPE_GUID)
+						{
+							ObjectIdType = 1;
+							if (ObjectIdObj is Guid Guid && !Guid.Equals(Guid.Empty))
+							{
+								ObjectId = Guid;
+								HasObjectId = true;
+							}
+						}
+						else if (this.objectIdMember.MemberFieldDataTypeCode == TYPE_STRING)
+						{
+							ObjectIdType = 2;
+
+							if (ObjectIdObj is string s && !string.IsNullOrEmpty(s))
+							{
+								ObjectId = new Guid(s);
+								HasObjectId = true;
+							}
+						}
+						else if (this.objectIdMember.MemberFieldDataTypeCode == TYPE_BYTEARRAY)
+						{
+							ObjectIdType = 3;
+
+							if (ObjectIdObj is byte[] Bin2)
+							{
+								ObjectId = new Guid(Bin2);
+								HasObjectId = true;
+							}
+						}
+						else
+							throw new SerializationException("Invalid Object ID type.", this.type);
+
+						if (!HasObjectId)
+						{
+							ObjectId = this.context.CreateGuid();
+
+							switch (ObjectIdType)
+							{
+								case 1:
+									this.objectIdMember.Set(Value, ObjectId);
+									break;
+
+								case 2:
+									this.objectIdMember.Set(Value, ObjectId.ToString());
+									break;
+
+								case 3:
+									this.objectIdMember.Set(Value, ObjectId.ToByteArray());
+									break;
+							}
+						}
+					}
+				}
 
 				if (WriteTypeCode)
 				{
@@ -4740,6 +4804,13 @@ namespace Waher.Persistence.Serialization
 				}
 				else if (Value is null)
 					throw new NullReferenceException("Value cannot be null.");
+
+				if (Embedded && Writer.BitOffset > 0)
+				{
+					Writer.WriteBit(HasObjectId);
+					if (HasObjectId)
+						Writer.Write(ObjectId);
+				}
 
 				if (this.typeNameSerialization == TypeNameSerialization.None)
 					Writer.WriteVariableLengthUInt64(0);    // Same as Writer.Write("") for non-normalized serialization.
@@ -4778,70 +4849,6 @@ namespace Waher.Persistence.Serialization
 							Writer.Write(this.context.DefaultCollectionName);
 						else
 							Writer.Write(this.collectionName);
-					}
-				}
-
-				if (!Embedded || this.hasEncrypted)
-				{
-					if (this.objectIdMember is null)
-						ObjectId = this.context.CreateGuid();
-					else
-					{
-						object ObjectIdObj = this.objectIdMember.Get(Value);
-						int ObjectIdType = 0;
-						bool HasGuid = false;
-
-						if (this.objectIdMember.MemberFieldDataTypeCode == TYPE_GUID)
-						{
-							ObjectIdType = 1;
-							if (ObjectIdObj is Guid Guid && !Guid.Equals(Guid.Empty))
-							{
-								ObjectId = Guid;
-								HasGuid = true;
-							}
-						}
-						else if (this.objectIdMember.MemberFieldDataTypeCode == TYPE_STRING)
-						{
-							ObjectIdType = 2;
-						
-							if (ObjectIdObj is string s && !string.IsNullOrEmpty(s))
-							{
-								ObjectId = new Guid(s);
-								HasGuid = true;
-							}
-						}
-						else if (this.objectIdMember.MemberFieldDataTypeCode == TYPE_BYTEARRAY)
-						{
-							ObjectIdType = 3;
-
-							if (ObjectIdObj is byte[] Bin2)
-							{
-								ObjectId = new Guid(Bin2);
-								HasGuid = true;
-							}
-						}
-						else
-							throw new SerializationException("Invalid Object ID type.", this.type);
-
-						if (!HasGuid)
-						{
-							ObjectId = this.context.CreateGuid();
-
-							switch (ObjectIdType)
-							{
-								case 1:
-									this.objectIdMember.Set(Value, ObjectId);
-									break;
-
-								case 2:
-									this.objectIdMember.Set(Value, ObjectId.ToString());
-									break;
-
-								case 3:
-									this.objectIdMember.Set(Value, ObjectId.ToByteArray());
-									break;
-							}
-						}
 					}
 				}
 

@@ -71,7 +71,7 @@ namespace Waher.Things.Mqtt
 		[Header(5, "Password:")]
 		[ToolTip(6, "Password used during authentication process. NOTE: Will be sent in clear text. Don't reuse passwords.")]
 		[Masked]
-		[DefaultValueStringEmpty]
+		[Encrypted(32)]
 		public string Password
 		{
 			get => this.password;

@@ -219,7 +219,7 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Password for PFX file, if any.
 		/// </summary>
-		[DefaultValueStringEmpty]
+		[Encrypted(32)]
 		public string Password
 		{
 			get => this.password;

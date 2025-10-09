@@ -164,7 +164,7 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Password
 		/// </summary>
-		[DefaultValueStringEmpty]
+		[Encrypted(32)]
 		public string Password
 		{
 			get => this.password;

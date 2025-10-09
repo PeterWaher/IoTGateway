@@ -5,6 +5,7 @@ using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
+using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Script;
 using Waher.Things.Attributes;
@@ -31,6 +32,7 @@ namespace Waher.Things.Script.Parameters
         [Header(29, "Default value:")]
         [ToolTip(30, "Default value presented to user.")]
         [Masked]
+        [Encrypted(32)]
         public string DefaultValue { get; set; }
 
         /// <summary>

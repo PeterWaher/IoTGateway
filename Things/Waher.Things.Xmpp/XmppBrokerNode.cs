@@ -59,7 +59,7 @@ namespace Waher.Things.Xmpp
 		[Header(15, "Password:")]
 		[ToolTip(16, "Password used during authentication process.")]
 		[Masked]
-		[DefaultValueStringEmpty]
+		[Encrypted(32)]
 		public string Password
 		{
 			get => this.password;

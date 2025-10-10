@@ -19,7 +19,7 @@ namespace Waher.Things.Xmpp
     /// <summary>
     /// Node representing an XMPP broker.
     /// </summary>
-    public class XmppBrokerNode : IpHostPort, ICommunicationLayer
+    public class XmppBrokerNode : IpHostPort, ICommunicationLayer, IEncryptedProperties
 	{
 		private readonly Dictionary<CaseInsensitiveString, RosterItemNode> roster = new Dictionary<CaseInsensitiveString, RosterItemNode>();
 		private string userName = string.Empty;
@@ -65,6 +65,11 @@ namespace Waher.Things.Xmpp
 			get => this.password;
 			set => this.password = value;
 		}
+
+		/// <summary>
+		/// Array of properties that are encrypted.
+		/// </summary>
+		public string[] EncryptedProperties => new string[] { nameof(this.Password) };
 
 		/// <summary>
 		/// Password authentication mechanism

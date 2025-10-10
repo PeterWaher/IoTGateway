@@ -51,7 +51,7 @@ namespace Waher.IoTGateway.Setup
 	/// <summary>
 	/// XMPP Configuration
 	/// </summary>
-	public partial class XmppConfiguration : SystemMultiStepConfiguration, IHostReference
+	public partial class XmppConfiguration : SystemMultiStepConfiguration, IHostReference, IEncryptedProperties
 	{
 		private static XmppConfiguration instance = null;
 		private static string defaultFacility = string.Empty;
@@ -170,6 +170,11 @@ namespace Waher.IoTGateway.Setup
 			get => this.password;
 			set => this.password = value;
 		}
+
+		/// <summary>
+		/// Array of properties that are encrypted.
+		/// </summary>
+		public string[] EncryptedProperties => new string[] { nameof(this.Password) };
 
 		/// <summary>
 		/// Type of password. Empty string = clear text, otherwise, type of hash.

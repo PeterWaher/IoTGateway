@@ -28,7 +28,7 @@ namespace Waher.IoTGateway.Setup
 	/// <summary>
 	/// Domain Configuration
 	/// </summary>
-	public class DomainConfiguration : SystemMultiStepConfiguration
+	public class DomainConfiguration : SystemMultiStepConfiguration, IEncryptedProperties
 	{
 		private static DomainConfiguration instance = null;
 
@@ -225,6 +225,11 @@ namespace Waher.IoTGateway.Setup
 			get => this.password;
 			set => this.password = value;
 		}
+
+		/// <summary>
+		/// Array of properties that are encrypted.
+		/// </summary>
+		public string[] EncryptedProperties => new string[] { nameof(this.Password) };
 
 		/// <summary>
 		/// Path to OpenSSL

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Networking;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
+using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
@@ -17,7 +18,7 @@ namespace Waher.Things.Mqtt
 	/// <summary>
 	/// Node representing a connection to an MQTT broker.
 	/// </summary>
-	public class MqttBrokerNode : IpHostPort, ICommunicationLayer
+	public class MqttBrokerNode : IpHostPort, ICommunicationLayer, IEncryptedProperties
 	{
 		private MqttQualityOfService willQoS = MqttQualityOfService.AtLeastOnce;
 		private string userName = string.Empty;
@@ -77,6 +78,11 @@ namespace Waher.Things.Mqtt
 			get => this.password;
 			set => this.password = value;
 		}
+
+		/// <summary>
+		/// Array of properties that are encrypted.
+		/// </summary>
+		public string[] EncryptedProperties => new string[] { nameof(this.Password) };
 
 		/// <summary>
 		/// Startup subscription

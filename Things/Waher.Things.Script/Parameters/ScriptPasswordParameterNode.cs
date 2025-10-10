@@ -5,6 +5,7 @@ using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
+using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Script;
@@ -15,8 +16,8 @@ namespace Waher.Things.Script.Parameters
     /// <summary>
     /// Represents a password-valued script parameter.
     /// </summary>
-    public class ScriptPasswordParameterNode : ScriptParameterNode
-    {
+    public class ScriptPasswordParameterNode : ScriptParameterNode, IEncryptedProperties
+	{
         /// <summary>
         /// Represents a password-valued script parameter.
         /// </summary>
@@ -35,12 +36,17 @@ namespace Waher.Things.Script.Parameters
         [Encrypted(32)]
         public string DefaultValue { get; set; }
 
-        /// <summary>
-        /// Gets the type name of the node.
-        /// </summary>
-        /// <param name="Language">Language to use.</param>
-        /// <returns>Localized type node.</returns>
-        public override Task<string> GetTypeNameAsync(Language Language)
+		/// <summary>
+		/// Array of properties that are encrypted.
+		/// </summary>
+		public string[] EncryptedProperties => new string[] { nameof(this.DefaultValue) };
+
+		/// <summary>
+		/// Gets the type name of the node.
+		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <returns>Localized type node.</returns>
+		public override Task<string> GetTypeNameAsync(Language Language)
         {
             return Language.GetStringAsync(typeof(ScriptNode), 58, "Password-valued parameter");
         }

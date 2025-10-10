@@ -1,4 +1,5 @@
 ﻿using Waher.Content;
+using Waher.Persistence;
 using Waher.Persistence.Attributes;
 
 namespace Waher.IoTGateway.Setup.Databases
@@ -6,7 +7,7 @@ namespace Waher.IoTGateway.Setup.Databases
 	/// <summary>
 	/// MongoDB Settings.
 	/// </summary>
-	public class MongoDBSettings : DatabaseSettings, IHostReference
+	public class MongoDBSettings : DatabaseSettings, IHostReference, IEncryptedProperties
 	{
 		private string host = string.Empty;
 		private string database = "IoTGateway";
@@ -81,5 +82,10 @@ namespace Waher.IoTGateway.Setup.Databases
 			get => this.password;
 			set => this.password = value;
 		}
+
+		/// <summary>
+		/// Array of properties that are encrypted.
+		/// </summary>
+		public string[] EncryptedProperties => new string[] { nameof(this.Password) };
 	}
 }

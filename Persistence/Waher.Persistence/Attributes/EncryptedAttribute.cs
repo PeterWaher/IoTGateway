@@ -4,6 +4,8 @@ namespace Waher.Persistence.Attributes
 {
 	/// <summary>
 	/// This attribute informs the persistence layer that the property must be encrypted before persisting it.
+	/// Combine this attribute with implementing the <see cref="IEncryptedProperties"/> interface on the class
+	/// containing the encrypted properties.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
 	public class EncryptedAttribute : Attribute
@@ -12,6 +14,8 @@ namespace Waher.Persistence.Attributes
 
 		/// <summary>
 		/// This attribute informs the persistence layer that the property must be encrypted before persisting it.
+		/// Combine this attribute with implementing the <see cref="IEncryptedProperties"/> interface on the class
+		/// containing the encrypted properties.
 		/// </summary>
 		public EncryptedAttribute()
 			: this(0)
@@ -20,6 +24,8 @@ namespace Waher.Persistence.Attributes
 
 		/// <summary>
 		/// This attribute informs the persistence layer that the property must be encrypted before persisting it.
+		/// Combine this attribute with implementing the <see cref="IEncryptedProperties"/> interface on the class
+		/// containing the encrypted properties.
 		/// </summary>
 		/// <param name="MinLength">Minimum length of the property, in bytes, before 
 		/// encryption. If the clear text property is shorter than this, random bytes 

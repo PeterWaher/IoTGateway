@@ -538,9 +538,8 @@ namespace Waher.WebService.Script
 				if (!string.IsNullOrEmpty(s2))
 				{
 					StringBuilder sb2 = new StringBuilder();
-
 					sb2.Append("<p><font style=\"color:");
-					sb2.Append(Theme.GetCurrentTheme(this.variables).LinkColorUnvisited.ToString());
+					IoTGateway.Cssx.CssxToCss.ColorToCss(sb2, Theme.GetCurrentTheme(this.variables).LinkColorUnvisited);
 					sb2.Append("\"><code>");
 					sb2.Append(this.FormatText(XML.HtmlValueEncode(s2)));
 					sb2.Append("</code></font></p>");

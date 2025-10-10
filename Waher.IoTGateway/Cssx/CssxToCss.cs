@@ -165,27 +165,7 @@ namespace Waher.IoTGateway.Cssx
 					Value = await Exp.EvaluateAsync(Session);
 
 					if (Value is SKColor Color)
-					{
-						if (Color.Alpha == 255)
-						{
-							Result.Append('#');
-							Result.Append(Color.Red.ToString("X2"));
-							Result.Append(Color.Green.ToString("X2"));
-							Result.Append(Color.Blue.ToString("X2"));
-						}
-						else
-						{
-							Result.Append("rgba(");
-							Result.Append(Color.Red.ToString());
-							Result.Append(',');
-							Result.Append(Color.Green.ToString());
-							Result.Append(',');
-							Result.Append(Color.Blue.ToString());
-							Result.Append(',');
-							Result.Append(Expression.ToString(Color.Alpha / 255.0));
-							Result.Append(')');
-						}
-					}
+						ColorToCss(Result, Color);
 					else if (Value is string s)
 						Result.Append(s);
 					else
@@ -205,5 +185,47 @@ namespace Waher.IoTGateway.Cssx
 					Session.Pop();
 			}
 		}
+
+		/// <summary>
+		/// Converts a color to its CSS representation.
+		/// </summary>
+		/// <param name="Color">Color</param>
+		/// <returns>CSS representation.</returns>
+		public static string ColorToCss(SKColor Color)
+		{
+			StringBuilder sb = new StringBuilder();
+			ColorToCss(sb, Color);
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Converts a color to its CSS representation.
+		/// </summary>
+		/// <param name="Result">Result will be output here.</param>
+		/// <param name="Color">Color</param>
+		/// <returns>CSS representation.</returns>
+		public static void ColorToCss(StringBuilder Result, SKColor Color)
+		{
+			if (Color.Alpha == 255)
+			{
+				Result.Append('#');
+				Result.Append(Color.Red.ToString("X2"));
+				Result.Append(Color.Green.ToString("X2"));
+				Result.Append(Color.Blue.ToString("X2"));
+			}
+			else
+			{
+				Result.Append("rgba(");
+				Result.Append(Color.Red.ToString());
+				Result.Append(',');
+				Result.Append(Color.Green.ToString());
+				Result.Append(',');
+				Result.Append(Color.Blue.ToString());
+				Result.Append(',');
+				Result.Append(Expression.ToString(Color.Alpha / 255.0));
+				Result.Append(')');
+			}
+		}
+
 	}
 }

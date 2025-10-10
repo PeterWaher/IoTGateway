@@ -2381,5 +2381,6 @@ namespace Waher.Persistence.MongoDB
 		//	* SortedDictionary<string,T> fields.
 		//	* Aggregates
 		//  * Case insensitive strings.
+		//  * Encrypted properties
 	}
 }

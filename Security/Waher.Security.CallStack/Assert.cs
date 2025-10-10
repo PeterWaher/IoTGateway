@@ -62,6 +62,16 @@ namespace Waher.Security.CallStack
 		}
 
 		/// <summary>
+		/// Makes sure the call is NOT made from one of the listed sources.
+		/// </summary>
+		/// <param name="Sources">Original call must NOT be made from one of these sources. Can be a mix of
+		/// <see cref="Assembly"/>, <see cref="Type"/>, <see cref="string"/> and <see cref="Regex"/> objects.</param>
+		public static void CallNotFromSource(params Prohibited[] Sources)
+		{
+			AssertSource(Sources);
+		}
+
+		/// <summary>
 		/// Makes sure the call is made from one of the listed sources.
 		/// </summary>
 		/// <param name="Sources">Original call must be made from one of these sources. Can be a mix of
@@ -94,8 +104,9 @@ namespace Waher.Security.CallStack
 			}
 
 			int Caller = Skip++;
+			bool Prohibited = false;
 
-			while (true)
+			while (!Prohibited)
 			{
 				Frame = new StackFrame(Skip++);
 				Method = Frame.GetMethod();
@@ -140,7 +151,51 @@ namespace Waher.Security.CallStack
 							return;
 						}
 					}
+					else if (Source is Prohibited P)
+					{
+						if (P.Source is Assembly PA)
+						{
+							if (PA == Assembly)
+							{
+								Prohibited = true;
+								break;
+							}
+						}
+						else if (P.Source is Type PT)
+						{
+							if (PT == Type)
+							{
+								Prohibited = true;
+								break;
+							}
+						}
+						else if (P.Source is Regex PRegex)
+						{
+							if (IsMatch(PRegex, TypeName + "." + Method.Name) ||
+								IsMatch(PRegex, TypeName) ||
+								IsMatch(PRegex, AssemblyName))
+							{
+								Prohibited = true;
+								break;
+							}
+						}
+						else if (P.Source is string Ps)
+						{
+							if (TypeName + "." + Method.Name == Ps ||
+								TypeName == Ps ||
+								AssemblyName == Ps)
+							{
+								Prohibited = true;
+								break;
+							}
+						}
+					}
+					else
+						throw new ArgumentException("Invalid source type: " + Source.GetType().FullName, nameof(Sources));
 				}
+
+				if (Prohibited)
+					break;
 
 				if (!Other || !AsynchTask || !WaherPersistence)
 				{
@@ -169,7 +224,7 @@ namespace Waher.Security.CallStack
 				}
 			}
 
-			if (AsynchTask && WaherPersistence && !Other)
+			if (!Prohibited && AsynchTask && WaherPersistence && !Other)
 				return; // In asynch call - stack trace not showing asynchronous call stack. If loading from database, i.e. populating object asynchronously, (possibly, check is vulnerable), give check a pass. Access will be restricted at a later stage, when accessing properties synchronously.
 
 			Frame = new StackFrame(Skip = Caller);

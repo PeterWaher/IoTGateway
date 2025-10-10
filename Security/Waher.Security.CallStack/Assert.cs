@@ -87,13 +87,13 @@ namespace Waher.Security.CallStack
 					break;
 
 				Type = Method.DeclaringType;
-				if (Type != typeof(Assert))
+				if (!(Type is null) && Type != typeof(Assert))
 					break;
 
 				Skip++;
 			}
 
-			int Caller = Skip;
+			int Caller = Skip++;
 
 			while (true)
 			{
@@ -103,6 +103,9 @@ namespace Waher.Security.CallStack
 					break;
 
 				Type = Method.DeclaringType;
+				if (Type is null)
+					continue;
+
 				TypeName = Type.FullName;
 				Assembly = Type.Assembly;
 				AssemblyName = Assembly.GetName().Name;
@@ -193,11 +196,16 @@ namespace Waher.Security.CallStack
 					break;
 
 				Type = Method.DeclaringType;
-				TypeName = Type.FullName;
-				Assembly = Type.Assembly;
-				AssemblyName = Assembly.GetName().Name;
+				if (Type is null)
+					Tags.Add(new KeyValuePair<string, object>("Pos" + Skip.ToString(), Frame.ToString()));
+				else
+				{
+					TypeName = Type.FullName;
+					Assembly = Type.Assembly;
+					AssemblyName = Assembly.GetName().Name;
 
-				Tags.Add(new KeyValuePair<string, object>("Pos" + Skip.ToString(), Assembly.GetName().Name + ", " + TypeName + ", " + Method.Name));
+					Tags.Add(new KeyValuePair<string, object>("Pos" + Skip.ToString(), Assembly.GetName().Name + ", " + TypeName + ", " + Method.Name));
+				}
 
 				Skip++;
 			}

@@ -719,9 +719,6 @@ namespace Waher.Persistence.Serialization
 						{
 							Encrypted = true;
 							HasEncrypted = true;
-
-							if (!HasObjectId)
-								throw new SerializationException("Encrypting properties requires an Object ID defined before the encrypted property.", this.type);
 						}
 					}
 
@@ -738,6 +735,9 @@ namespace Waher.Persistence.Serialization
 						CSharp.AppendLine(";");
 					}
 				}
+
+				if (HasEncrypted && !HasObjectId)
+					throw new SerializationException("Encrypting properties requires an Object ID defined.", this.type);
 
 				if (NrDefault > 0)
 					CSharp.AppendLine();

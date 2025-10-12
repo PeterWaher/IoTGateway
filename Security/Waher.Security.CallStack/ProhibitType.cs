@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Waher.Security.CallStack
 {
@@ -30,8 +31,16 @@ namespace Waher.Security.CallStack
 		{
 			if (Frame.Type == this.type)
 				return false;
-			else
-				return null;
+
+			Type T = Frame.Type;
+			while (!(T is null) && T.Attributes.HasFlag(TypeAttributes.NestedPrivate))
+			{
+				T = T.DeclaringType;
+				if (T == this.type)
+					return false;
+			}
+
+			return null;
 		}
 	}
 }

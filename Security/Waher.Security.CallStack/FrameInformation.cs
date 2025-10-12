@@ -39,7 +39,7 @@ namespace Waher.Security.CallStack
 				{
 					this.valid = true;
 
-					this.typeName = this.type.Name;
+					this.typeName = this.type.FullName;
 					this.assembly = this.type.Assembly;
 					this.assemblyName = this.assembly.GetName().Name;
 				}

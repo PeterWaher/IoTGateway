@@ -139,7 +139,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private EndpointSecurity localE2eEndpoint;
 		private DateTime keysTimestamp = DateTime.MinValue;
 		private SymmetricCipherAlgorithms preferredEncryptionAlgorithm = DefaultCipherAlgorithm;
-		private object[] approvedSources = null;
+		private ICallStackCheck[] approvedSources = null;
 		private readonly string componentAddress;
 		private string keySettingsPrefix;
 		private string contractKeySettingsPrefix;
@@ -182,7 +182,26 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Client">XMPP Client to use.</param>
 		/// <param name="ComponentAddress">Address to the contracts component.</param>
 		/// <param name="ApprovedSources">If access to sensitive methods is only accessible from a set of approved sources.</param>
+		[Obsolete("Use overload with ICallStackCheck[] instead.")]
 		public ContractsClient(XmppClient Client, string ComponentAddress, object[] ApprovedSources)
+			: this(Client,ComponentAddress, Assert.Convert(ApprovedSources))
+		{
+		}
+
+		/// <summary>
+		/// Adds support for legal identities, smart contracts and signatures to an XMPP client.
+		/// 
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
+		/// 
+		/// Before the Contracts Client can be used, you either need to load previously stored
+		/// keys using <see cref="LoadKeys(bool)"/>, or generate new keys, calling
+		/// <see cref="GenerateNewKeys"/>.
+		/// </summary>
+		/// <param name="Client">XMPP Client to use.</param>
+		/// <param name="ComponentAddress">Address to the contracts component.</param>
+		/// <param name="ApprovedSources">If access to sensitive methods is only accessible from a set of approved sources.</param>
+		public ContractsClient(XmppClient Client, string ComponentAddress, ICallStackCheck[] ApprovedSources)
 			: base(Client)
 		{
 			this.componentAddress = ComponentAddress;
@@ -970,7 +989,18 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="ApprovedSources">Approved sources.</param>
 		/// <exception cref="NotSupportedException">If trying to change previously set sources.</exception>
+		[Obsolete("Use the overload taking ICallStackCheck instances instead.")]
 		public void SetAllowedSources(object[] ApprovedSources)
+		{
+			this.SetAllowedSources(Assert.Convert(ApprovedSources));
+		}
+
+		/// <summary>
+		/// If access to sensitive methods is only accessible from a set of approved sources.
+		/// </summary>
+		/// <param name="ApprovedSources">Approved sources.</param>
+		/// <exception cref="NotSupportedException">If trying to change previously set sources.</exception>
+		public void SetAllowedSources(ICallStackCheck[] ApprovedSources)
 		{
 			if (!(this.approvedSources is null))
 				throw new NotSupportedException("Changing approved sources not permitted.");

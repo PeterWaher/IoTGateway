@@ -17,18 +17,32 @@ namespace Waher.Security.CallStack
 		/// Makes sure the call is made from one of the listed assemblies.
 		/// </summary>
 		/// <param name="Assemblies">Original call must be made from one of these assemblies.</param>
+		[Obsolete("Use CallFromSource(ICallStackCheck[]) instead.")]
 		public static void CallFromAssembly(params Assembly[] Assemblies)
 		{
-			AssertSource(Assemblies);
+			int i, c = Assemblies.Length;
+			ICallStackCheck[] Sources = new ICallStackCheck[c];
+
+			for (i = 0; i < c; i++)
+				Sources[i] = new ApproveAssembly(Assemblies[i]);
+
+			CallFromSource(Sources);
 		}
 
 		/// <summary>
 		/// Makes sure the call is made from one of the listed classes.
 		/// </summary>
 		/// <param name="Classes">Original call must be made from one of these classes.</param>
+		[Obsolete("Use CallFromSource(ICallStackCheck[]) instead.")]
 		public static void CallFromClass(params Type[] Classes)
 		{
-			AssertSource(Classes);
+			int i, c = Classes.Length;
+			ICallStackCheck[] Sources = new ICallStackCheck[c];
+
+			for (i = 0; i < c; i++)
+				Sources[i] = new ApproveType(Classes[i]);
+
+			CallFromSource(Sources);
 		}
 
 		/// <summary>
@@ -36,9 +50,16 @@ namespace Waher.Security.CallStack
 		/// </summary>
 		/// <param name="Sources">Original call must be made from one of these sources. Source strings are checked against
 		/// Assemblies, classes and method names.</param>
+		[Obsolete("Use CallFromSource(ICallStackCheck[]) instead.")]
 		public static void CallFromSource(params string[] Sources)
 		{
-			AssertSource(Sources);
+			int i, c = Sources.Length;
+			ICallStackCheck[] Sources2 = new ICallStackCheck[c];
+
+			for (i = 0; i < c; i++)
+				Sources2[i] = new ApproveString(Sources[i]);
+
+			CallFromSource(Sources2);
 		}
 
 		/// <summary>
@@ -46,9 +67,16 @@ namespace Waher.Security.CallStack
 		/// </summary>
 		/// <param name="Sources">Original call must be made from one of these sources. Source strings are checked against
 		/// Assemblies, classes and method names.</param>
+		[Obsolete("Use CallFromSource(ICallStackCheck[]) instead.")]
 		public static void CallFromSource(params Regex[] Sources)
 		{
-			AssertSource(Sources);
+			int i, c = Sources.Length;
+			ICallStackCheck[] Sources2 = new ICallStackCheck[c];
+
+			for (i = 0; i < c; i++)
+				Sources2[i] = new ApproveRegex(Sources[i]);
+
+			CallFromSource(Sources2);
 		}
 
 		/// <summary>
@@ -56,34 +84,53 @@ namespace Waher.Security.CallStack
 		/// </summary>
 		/// <param name="Sources">Original call must be made from one of these sources. Can be a mix of
 		/// <see cref="Assembly"/>, <see cref="Type"/>, <see cref="string"/> and <see cref="Regex"/> objects.</param>
+		[Obsolete("Use CallFromSource(ICallStackCheck[]) instead.")]
 		public static void CallFromSource(params object[] Sources)
 		{
-			AssertSource(Sources);
+			CallFromSource(Convert(Sources));
 		}
 
 		/// <summary>
-		/// Makes sure the call is NOT made from one of the listed sources.
+		/// Converts an array of objects into an array of <see cref="ICallStackCheck"/> 
+		/// objects, assuming each listed source is approved.
 		/// </summary>
-		/// <param name="Sources">Original call must NOT be made from one of these sources. Can be a mix of
-		/// <see cref="Assembly"/>, <see cref="Type"/>, <see cref="string"/> and <see cref="Regex"/> objects.</param>
-		public static void CallNotFromSource(params Prohibited[] Sources)
+		/// <param name="Sources">Sources</param>
+		/// <returns>Array of corresponding Callstack checks.</returns>
+		public static ICallStackCheck[] Convert(params object[] Sources)
 		{
-			AssertSource(Sources);
+			int i, c = Sources.Length;
+			ICallStackCheck[] Sources2 = new ICallStackCheck[c];
+
+			for (i = 0; i < c; i++)
+			{
+				object Source = Sources[i];
+
+				if (Source is ICallStackCheck Check)
+					Sources2[i] = Check;
+				else if (Source is Assembly A)
+					Sources2[i] = new ApproveAssembly(A);
+				else if (Source is Type T)
+					Sources2[i] = new ApproveType(T);
+				else if (Source is Regex Regex)
+					Sources2[i] = new ApproveRegex(Regex);
+				else if (Source is string s)
+					Sources2[i] = new ApproveString(s);
+				else
+					throw new ArgumentException("Invalid source type: " + Source.GetType().FullName, nameof(Sources));
+			}
+
+			return Sources2;
 		}
 
 		/// <summary>
-		/// Makes sure the call is made from one of the listed sources.
+		/// Makes sure the call is made from one of the approved sources and not from one
+		/// of the prohibited sources.
 		/// </summary>
-		/// <param name="Sources">Original call must be made from one of these sources. Can be a mix of
-		/// <see cref="Assembly"/>, <see cref="Type"/>, <see cref="string"/> and <see cref="Regex"/> objects.</param>
-		private static void AssertSource(params object[] Sources)
+		/// <param name="Sources">The stack trace from the original call is checked for approved
+		/// or prohibited sources to assert the code can proceed.</param>
+		public static void CallFromSource(params ICallStackCheck[] Sources)
 		{
-			StackFrame Frame;
-			MethodBase Method;
-			Type Type;
-			Assembly Assembly;
-			string TypeName;
-			string AssemblyName;
+			FrameInformation FrameInfo;
 			int Skip = 1;
 			bool WaherPersistence = false;
 			bool AsynchTask = false;
@@ -91,13 +138,11 @@ namespace Waher.Security.CallStack
 
 			while (true)
 			{
-				Frame = new StackFrame(Skip);
-				Method = Frame.GetMethod();
-				if (Method is null)
+				FrameInfo = new FrameInformation(new StackFrame(Skip));
+				if (FrameInfo.Last)
 					break;
 
-				Type = Method.DeclaringType;
-				if (!(Type is null) && Type != typeof(Assert))
+				if (FrameInfo.Valid && FrameInfo.Type != typeof(Assert))
 					break;
 
 				Skip++;
@@ -105,93 +150,30 @@ namespace Waher.Security.CallStack
 
 			int Caller = Skip++;
 			bool Prohibited = false;
+			bool? Status;
 
 			while (!Prohibited)
 			{
-				Frame = new StackFrame(Skip++);
-				Method = Frame.GetMethod();
-				if (Method is null)
+				FrameInfo = new FrameInformation(new StackFrame(Skip++));
+				if (FrameInfo.Last)
 					break;
 
-				Type = Method.DeclaringType;
-				if (Type is null)
+				if (!FrameInfo.Valid)
 					continue;
 
-				TypeName = Type.FullName;
-				Assembly = Type.Assembly;
-				AssemblyName = Assembly.GetName().Name;
-
-				foreach (object Source in Sources)
+				foreach (ICallStackCheck Source in Sources)
 				{
-					if (Source is Assembly A)
+					Status = Source.Check(FrameInfo);
+					if (Status.HasValue)
 					{
-						if (A == Assembly)
+						if (Status.Value)
 							return;
-					}
-					else if (Source is Type T)
-					{
-						if (T == Type)
-							return;
-					}
-					else if (Source is Regex Regex)
-					{
-						if (IsMatch(Regex, TypeName + "." + Method.Name) ||
-							IsMatch(Regex, TypeName) ||
-							IsMatch(Regex, AssemblyName))
+						else
 						{
-							return;
+							Prohibited = true;
+							break;
 						}
 					}
-					else if (Source is string s)
-					{
-						if (TypeName + "." + Method.Name == s ||
-							TypeName == s ||
-							AssemblyName == s)
-						{
-							return;
-						}
-					}
-					else if (Source is Prohibited P)
-					{
-						if (P.Source is Assembly PA)
-						{
-							if (PA == Assembly)
-							{
-								Prohibited = true;
-								break;
-							}
-						}
-						else if (P.Source is Type PT)
-						{
-							if (PT == Type)
-							{
-								Prohibited = true;
-								break;
-							}
-						}
-						else if (P.Source is Regex PRegex)
-						{
-							if (IsMatch(PRegex, TypeName + "." + Method.Name) ||
-								IsMatch(PRegex, TypeName) ||
-								IsMatch(PRegex, AssemblyName))
-							{
-								Prohibited = true;
-								break;
-							}
-						}
-						else if (P.Source is string Ps)
-						{
-							if (TypeName + "." + Method.Name == Ps ||
-								TypeName == Ps ||
-								AssemblyName == Ps)
-							{
-								Prohibited = true;
-								break;
-							}
-						}
-					}
-					else
-						throw new ArgumentException("Invalid source type: " + Source.GetType().FullName, nameof(Sources));
 				}
 
 				if (Prohibited)
@@ -199,26 +181,26 @@ namespace Waher.Security.CallStack
 
 				if (!Other || !AsynchTask || !WaherPersistence)
 				{
-					if (string.IsNullOrEmpty(Assembly.Location))
+					if (string.IsNullOrEmpty(FrameInfo.Assembly.Location))
 					{
-						if (AssemblyName.StartsWith("WPSA."))
+						if (FrameInfo.AssemblyName.StartsWith("WPSA."))
 							WaherPersistence = true;
 						else
 							Other = true;
 					}
 					else
 					{
-						if (Type == typeof(System.Threading.Tasks.Task))
+						if (FrameInfo.Type == typeof(System.Threading.Tasks.Task))
 							AsynchTask = true;
-						else if (TypeName.StartsWith(AssemblyName) &&
-							AssemblyName + "." == Path.ChangeExtension(Path.GetFileName(Assembly.Location), string.Empty))
+						else if (FrameInfo.TypeName.StartsWith(FrameInfo.AssemblyName) &&
+							FrameInfo.AssemblyName + "." == Path.ChangeExtension(Path.GetFileName(FrameInfo.Assembly.Location), string.Empty))
 						{
-							if (AssemblyName.StartsWith("Waher.Persistence."))
+							if (FrameInfo.AssemblyName.StartsWith("Waher.Persistence."))
 								WaherPersistence = true;
-							else if (!AssemblyName.StartsWith("Waher.") && !AssemblyName.StartsWith("System."))
+							else if (!FrameInfo.AssemblyName.StartsWith("Waher.") && !FrameInfo.AssemblyName.StartsWith("System."))
 								Other = true;
 						}
-						else if (!Path.GetFileName(Assembly.Location).StartsWith("System."))
+						else if (!Path.GetFileName(FrameInfo.Assembly.Location).StartsWith("System."))
 							Other = true;
 					}
 				}
@@ -227,56 +209,43 @@ namespace Waher.Security.CallStack
 			if (!Prohibited && AsynchTask && WaherPersistence && !Other)
 				return; // In asynch call - stack trace not showing asynchronous call stack. If loading from database, i.e. populating object asynchronously, (possibly, check is vulnerable), give check a pass. Access will be restricted at a later stage, when accessing properties synchronously.
 
-			Frame = new StackFrame(Skip = Caller);
-			Method = Frame.GetMethod();
-			Type = Method.DeclaringType;
-			Assembly = Type.Assembly;
+			FrameInfo = new FrameInformation(new StackFrame(Skip = Caller));
 
-			string ObjectId = Type.FullName + "." + Method.Name;
+			string ObjectId = FrameInfo.Type.FullName + "." + FrameInfo.Method.Name;
 			StackTrace Trace = new StackTrace(Skip, false);
-			UnauthorizedAccessEventArgs e = new UnauthorizedAccessEventArgs(Method, Type, Assembly, Trace);
+			UnauthorizedAccessEventArgs e = new UnauthorizedAccessEventArgs(FrameInfo, Trace);
 			List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>()
 			{
-				new KeyValuePair<string, object>("Method", Method.Name),
-				new KeyValuePair<string, object>("Type", Type.FullName),
-				new KeyValuePair<string, object>("Assembly", Assembly.FullName)
+				new KeyValuePair<string, object>("Method", FrameInfo.Method.Name),
+				new KeyValuePair<string, object>("Type", FrameInfo.Type.FullName),
+				new KeyValuePair<string, object>("Assembly", FrameInfo.Assembly.FullName)
 			};
 
 			Skip = 0;
 			while (true)
 			{
-				Frame = new StackFrame(Skip);
-				Method = Frame.GetMethod();
-				if (Method is null)
+				FrameInfo = new FrameInformation(new StackFrame(Skip));
+				if (FrameInfo.Last)
 					break;
 
-				Type = Method.DeclaringType;
-				if (Type is null)
-					Tags.Add(new KeyValuePair<string, object>("Pos" + Skip.ToString(), Frame.ToString()));
-				else
+				if (FrameInfo.Valid)
 				{
-					TypeName = Type.FullName;
-					Assembly = Type.Assembly;
-					AssemblyName = Assembly.GetName().Name;
-
-					Tags.Add(new KeyValuePair<string, object>("Pos" + Skip.ToString(), Assembly.GetName().Name + ", " + TypeName + ", " + Method.Name));
+					Tags.Add(new KeyValuePair<string, object>("Pos" + Skip.ToString(),
+						FrameInfo.Assembly.GetName().Name + ", " + FrameInfo.TypeName + ", " +
+						FrameInfo.Method.Name));
 				}
+				else
+					Tags.Add(new KeyValuePair<string, object>("Pos" + Skip.ToString(), FrameInfo.ToString()));
 
 				Skip++;
 			}
 
-			Log.Warning("Unauthorized access detected and prevented.", ObjectId, string.Empty, "UnauthorizedAccess", EventLevel.Major, 
-				string.Empty, Assembly.FullName, Trace.ToString(), Tags.ToArray());
+			Log.Warning("Unauthorized access detected and prevented.", ObjectId, string.Empty, "UnauthorizedAccess", EventLevel.Major,
+				string.Empty, e.Assembly.FullName, Trace.ToString(), Tags.ToArray());
 
 			UnauthorizedAccess?.Raise(null, e);
 
 			throw new UnauthorizedCallstackException("Unauthorized access.");
-		}
-
-		private static bool IsMatch(Regex Regex, string s)
-		{
-			Match M = Regex.Match(s);
-			return M.Success && M.Index == 0 && M.Length == s.Length;
 		}
 
 		/// <summary>

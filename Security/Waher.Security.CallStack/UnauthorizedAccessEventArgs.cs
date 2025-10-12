@@ -17,16 +17,14 @@ namespace Waher.Security.CallStack
 		/// <summary>
 		/// Event arguments for the <see cref="Assert.UnauthorizedAccess"/> event.
 		/// </summary>
-		/// <param name="Method">Method being accessed.</param>
-		/// <param name="Type">Type on which the method is defined.</param>
-		/// <param name="Assembly">Assembly in which the type is defined.</param>
+		/// <param name="Frame">Frame being accessed.</param>
 		/// <param name="Trace">StackTrace Trace</param>
-		public UnauthorizedAccessEventArgs(MethodBase Method, Type Type, Assembly Assembly, StackTrace Trace)
+		public UnauthorizedAccessEventArgs(FrameInformation Frame, StackTrace Trace)
 			: base()
 		{
-			this.method = Method;
-			this.type = Type;
-			this.assembly = Assembly;
+			this.method = Frame.Method;
+			this.type = Frame.Type;
+			this.assembly = Frame.Assembly;
 			this.trace = Trace;
 		}
 

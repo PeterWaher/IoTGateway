@@ -44,7 +44,7 @@ namespace Waher.IoTGateway.Setup
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex GetAttachmentRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<GetAttachmentAsync>\w*[.]\w*",
 			RegexOptions.Compiled | RegexOptions.Singleline);
-		private static readonly object[] approvedSources = new object[]
+		private static readonly ICallStackCheck[] approvedSources = Assert.Convert(new object[]
 		{
 			"Waher.Persistence.NeuroLedger.NeuroLedgerProvider",
 			typeof(Content.Markdown.Web.MarkdownToHtmlConverter),
@@ -52,8 +52,8 @@ namespace Waher.IoTGateway.Setup
 			FromSaveUnsavedRegex,
 			FromUpdateObjectRegex,
 			GatewayStartupRegex
-		};
-		private static readonly object[] approvedContractClientSources = new object[]
+		});
+		private static readonly ICallStackCheck[] approvedContractClientSources = Assert.Convert(new object[]
 		{
 			"Waher.Service.IoTBroker.Legal.MFA.QuickLogin",
 			"Waher.Service.IoTBroker.Marketplace.MarketplaceProcessor",
@@ -64,7 +64,7 @@ namespace Waher.IoTGateway.Setup
 			typeof(LegalIdentityConfiguration),
 			GenerateNewKeysRegex,
 			GetAttachmentRegex
-		};
+		});
 
 		private static LegalIdentityConfiguration instance = null;
 		private static LegalIdentity[] allIdentities = null;

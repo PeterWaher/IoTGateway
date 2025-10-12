@@ -34,15 +34,15 @@ namespace Waher.IoTGateway.Setup
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex FromUpdateObjectRegex = new Regex(@"Waher[.]Persistence[.]Files[.]ObjectBTreeFile[.+]((<UpdateObject>\w*[.]\w*)|(UpdateObjectLocked))",
 			RegexOptions.Compiled | RegexOptions.Singleline);
-		internal static readonly Regex GatewayStartupRegex = new Regex(@"Waher[.]IoTGateway[.]Gateway([.]Start|[.+]<Start>\w*[.]\w*)",
+		internal static readonly Regex GatewayStartupRegex = new Regex(@"Waher[.]IoTGateway[.]Gateway([.]Start|[.+]<?Start>?\w*[.]\w*)",
 			RegexOptions.Compiled | RegexOptions.Singleline);
-		internal static readonly Regex ApplyLegalIdentityRegex = new Regex(@"Waher[.]IoTGateway[.]Setup[.]LegalIdentityConfiguration([.]ApplyLegalIdentity|[.+]<ApplyLegalIdentity>\w*[.]\w*)",
+		internal static readonly Regex ApplyLegalIdentityRegex = new Regex(@"Waher[.]IoTGateway[.]Setup[.]LegalIdentityConfiguration([.]ApplyLegalIdentity|[.+]<?ApplyLegalIdentity>?\w*[.]\w*)",
 			RegexOptions.Compiled | RegexOptions.Singleline);
-		internal static readonly Regex ApplyIdRegex = new Regex(@"Waher[.]IoTGateway[.]Setup[.]LegalIdentityConfiguration([.]ApplyId|[.+]<ApplyId>\w*[.]\w*)",
+		internal static readonly Regex ApplyIdRegex = new Regex(@"Waher[.]IoTGateway[.]Setup[.]LegalIdentityConfiguration([.]ApplyId|[.+]<?ApplyId>?\w*[.]\w*)",
 			RegexOptions.Compiled | RegexOptions.Singleline);
-		internal static readonly Regex GenerateNewKeysRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient([.]GenerateNewKeys|[.+]<GenerateNewKeys>\w*[.]\w*)",
+		internal static readonly Regex GenerateNewKeysRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient([.]GenerateNewKeys|[.+]<?GenerateNewKeys>?\w*[.]\w*)",
 			RegexOptions.Compiled | RegexOptions.Singleline);
-		internal static readonly Regex GetAttachmentRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<GetAttachmentAsync>\w*[.]\w*",
+		internal static readonly Regex GetAttachmentRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?GetAttachmentAsync>?\w*[.]\w*",
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		private static readonly ICallStackCheck[] approvedSources = Assert.Convert(new object[]
 		{

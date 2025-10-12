@@ -1,4 +1,7 @@
-﻿namespace Waher.Security.CallStack
+﻿using System;
+using System.Reflection;
+
+namespace Waher.Security.CallStack
 {
 	/// <summary>
 	/// Checks for approved sources in the call stack using a string.
@@ -32,8 +35,20 @@
 			{
 				return true;
 			}
-			else
-				return null;
+
+			Type T = Frame.Type;
+			while (!(T is null) && T.Attributes.HasFlag(TypeAttributes.NestedPrivate))
+			{
+				T = T.DeclaringType;
+
+				if (T.FullName + "." + Frame.Method.Name == this.s ||
+					T.FullName == this.s)
+				{
+					return true;
+				}
+			}
+
+			return null;
 		}
 	}
 }

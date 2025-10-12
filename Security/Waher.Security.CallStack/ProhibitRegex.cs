@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Waher.Security.CallStack
 {
@@ -34,8 +36,20 @@ namespace Waher.Security.CallStack
 			{
 				return false;
 			}
-			else
-				return null;
+
+			Type T = Frame.Type;
+			while (!(T is null) && T.Attributes.HasFlag(TypeAttributes.NestedPrivate))
+			{
+				T = T.DeclaringType;
+
+				if (ApproveRegex.IsMatch(this.regex, T.FullName + "." + Frame.Method.Name) ||
+					ApproveRegex.IsMatch(this.regex, T.FullName))
+				{
+					return false;
+				}
+			}
+
+			return null;
 		}
 	}
 }

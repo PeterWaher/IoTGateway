@@ -1675,7 +1675,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Persistence/1.15.2": {
+      "Waher.Persistence/1.16.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1732,7 +1732,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Persistence": "1.15.2",
+          "Waher.Persistence": "1.16.0",
           "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Settings": "1.2.0"
         }
@@ -1763,7 +1763,7 @@
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
           "Waher.Content.Xml": "3.1.3",
-          "Waher.Persistence": "1.15.2",
+          "Waher.Persistence": "1.16.0",
           "Waher.Runtime.Threading": "2.1.2"
         }
       },
@@ -3810,7 +3810,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Persistence/1.15.2": {
+      "Waher.Persistence/1.16.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -3867,7 +3867,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Persistence": "1.15.2",
+          "Waher.Persistence": "1.16.0",
           "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Settings": "1.2.0"
         }
@@ -3898,7 +3898,7 @@
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
           "Waher.Content.Xml": "3.1.3",
-          "Waher.Persistence": "1.15.2",
+          "Waher.Persistence": "1.16.0",
           "Waher.Runtime.Threading": "2.1.2"
         }
       },
@@ -6050,7 +6050,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Persistence/1.15.2": {
+      "Waher.Persistence/1.16.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -6107,7 +6107,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Persistence": "1.15.2",
+          "Waher.Persistence": "1.16.0",
           "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Settings": "1.2.0"
         }
@@ -6138,7 +6138,7 @@
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
           "Waher.Content.Xml": "3.1.3",
-          "Waher.Persistence": "1.15.2",
+          "Waher.Persistence": "1.16.0",
           "Waher.Runtime.Threading": "2.1.2"
         }
       },
@@ -8185,7 +8185,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Persistence/1.15.2": {
+      "Waher.Persistence/1.16.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -8242,7 +8242,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Persistence": "1.15.2",
+          "Waher.Persistence": "1.16.0",
           "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Settings": "1.2.0"
         }
@@ -8273,7 +8273,7 @@
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
           "Waher.Content.Xml": "3.1.3",
-          "Waher.Persistence": "1.15.2",
+          "Waher.Persistence": "1.16.0",
           "Waher.Runtime.Threading": "2.1.2"
         }
       },
@@ -10425,7 +10425,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Persistence/1.15.2": {
+      "Waher.Persistence/1.16.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10482,7 +10482,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Persistence": "1.15.2",
+          "Waher.Persistence": "1.16.0",
           "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Settings": "1.2.0"
         }
@@ -10513,7 +10513,7 @@
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
           "Waher.Content.Xml": "3.1.3",
-          "Waher.Persistence": "1.15.2",
+          "Waher.Persistence": "1.16.0",
           "Waher.Runtime.Threading": "2.1.2"
         }
       },
@@ -12560,7 +12560,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Persistence/1.15.2": {
+      "Waher.Persistence/1.16.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -12617,7 +12617,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Persistence": "1.15.2",
+          "Waher.Persistence": "1.16.0",
           "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Settings": "1.2.0"
         }
@@ -12648,7 +12648,7 @@
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
           "Waher.Content.Xml": "3.1.3",
-          "Waher.Persistence": "1.15.2",
+          "Waher.Persistence": "1.16.0",
           "Waher.Runtime.Threading": "2.1.2"
         }
       },
@@ -14800,7 +14800,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Persistence/1.15.2": {
+      "Waher.Persistence/1.16.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -14857,7 +14857,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Persistence": "1.15.2",
+          "Waher.Persistence": "1.16.0",
           "Waher.Runtime.Inventory": "1.4.4",
           "Waher.Runtime.Settings": "1.2.0"
         }
@@ -14888,7 +14888,7 @@
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.4.0",
           "Waher.Content.Xml": "3.1.3",
-          "Waher.Persistence": "1.15.2",
+          "Waher.Persistence": "1.16.0",
           "Waher.Runtime.Threading": "2.1.2"
         }
       },
@@ -22636,7 +22636,7 @@
       "path": "../Waher.Networking.XMPP.UWP/project.json",
       "msbuildProject": "../Waher.Networking.XMPP.UWP/Waher.Networking.XMPP.UWP.csproj"
     },
-    "Waher.Persistence/1.15.2": {
+    "Waher.Persistence/1.16.0": {
       "type": "project",
       "path": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj",
       "msbuildProject": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj"

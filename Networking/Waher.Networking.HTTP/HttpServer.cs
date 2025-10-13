@@ -1902,6 +1902,10 @@ namespace Waher.Networking.HTTP
 						}
 
 						ResourceName = ResourceName.Substring(j);
+
+						Log.Debug("Absolute URL.",
+							new KeyValuePair<string, object>("Authority", Authority),
+							new KeyValuePair<string, object>("Resource", ResourceName));
 					}
 				}
 			}
@@ -2390,12 +2394,24 @@ namespace Waher.Networking.HTTP
 			if (i >= 0)
 				ResourceName = ResourceName.Substring(0, i);
 
-			if (this.TryGetResource(ref ResourceName, false, out HttpResource Resource, out string SubPath) &&
-				Resource is HttpFolderResource Folder)
+			HttpFieldHost Host = null;
+
+			if (this.TryGetResource(ref ResourceName, false, out HttpResource Resource, 
+				out string SubPath, ref Host) && Resource is HttpFolderResource Folder)
 			{
 				this.vanityResources.CheckVanityResource(ref SubPath);
 
-				FileName = Folder.GetFullPath(null, SubPath, false, MustExist, out bool Exists);
+				HttpRequestHeader Header = new HttpRequestHeader("GET", ResourceName,
+					"1.1", "https", this.vanityResources,
+					new KeyValuePair<string, string>("Host", Host?.Value ?? string.Empty),
+					new KeyValuePair<string, string>("Accept", "*/*"));
+
+				HttpRequest Request = new HttpRequest(this, Header, null, string.Empty, string.Empty)
+				{
+					SubPath = SubPath
+				};
+
+				FileName = Folder.GetFullPath(Request, false, MustExist, out bool Exists);
 
 				return Exists;
 			}

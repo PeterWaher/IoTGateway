@@ -5025,28 +5025,45 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			Dictionary<string, XmlSchema> Schemas = new Dictionary<string, XmlSchema>();
-			LinkedList<XmlNode> ToCheck = new LinkedList<XmlNode>();
+			ChunkedList<XmlElement> ToCheck = new ChunkedList<XmlElement>
+			{
+				Doc.DocumentElement
+			};
+			XmlElement E;
+			string LastNamespace = null;
+			string Namespace;
 			XmlSchema Schema;
 
-			ToCheck.AddLast(Doc.DocumentElement);
-
-			while (!(ToCheck.First is null))
+			while (ToCheck.HasFirstItem)
 			{
-				XmlNode N = ToCheck.First.Value;
-				ToCheck.RemoveFirst();
-
-				while (!(N is null))
+				E = ToCheck.RemoveFirst();
+				Namespace = E.NamespaceURI;
+				if (!string.IsNullOrEmpty(Namespace) && Namespace != LastNamespace)
 				{
-					if (N is XmlElement E)
+					Schemas[Namespace] = null;
+					LastNamespace = Namespace;
+				}
+
+				if (E.HasAttributes)
+				{
+					foreach (XmlAttribute Attr in E.Attributes)
 					{
-						if (!string.IsNullOrEmpty(E.NamespaceURI))
-							Schemas[E.NamespaceURI] = null;
+						Namespace = Attr.NamespaceURI;
 
-						foreach (XmlNode N2 in E.ChildNodes)
-							ToCheck.AddLast(N2);
+						if (!string.IsNullOrEmpty(Namespace) &&
+							Namespace != LastNamespace &&
+							Namespace != "http://www.w3.org/XML/1998/namespace" &&
+							Namespace != "http://www.w3.org/2000/xmlns/")
+						{
+							Schemas[Namespace] = null;  // Only change LastNamespace when element namespaces change.
+						}
 					}
+				}
 
-					N = N.NextSibling;
+				foreach (XmlNode N in E.ChildNodes)
+				{
+					if (N is XmlElement E2)
+						ToCheck.Add(E2);
 				}
 			}
 
@@ -5093,30 +5110,30 @@ namespace Waher.Networking.XMPP.Contracts
 			else
 				ContractComponent = Contract.ContractId[(i + 1)..];
 
-			foreach (string Namespace in Namespaces)
+			foreach (string Namespace2 in Namespaces)
 			{
-				if (Schemas.TryGetValue(Namespace, out Schema) && !(Schema is null))
+				if (Schemas.TryGetValue(Namespace2, out Schema) && !(Schema is null))
 					continue;
 
-				SchemaResult = await this.LoadSchema(this.componentAddress, Namespace, null, null);
+				SchemaResult = await this.LoadSchema(this.componentAddress, Namespace2, null, null);
 
 				if (SchemaResult.Item2.HasValue)
 				{
 					await this.ReturnStatus(SchemaResult.Item2.Value, Callback, State,
 						new KeyValuePair<string, object>("Error", SchemaResult.Item3?.Message ?? string.Empty),
-						new KeyValuePair<string, object>("Namespace", Namespace));
+						new KeyValuePair<string, object>("Namespace", Namespace2));
 					return;
 				}
 				else if (SchemaResult.Item1 is null)
 				{
 					await this.ReturnStatus(ContractStatus.NoSchemaAccess, Callback, State,
-						new KeyValuePair<string, object>("Namespace", Namespace));
+						new KeyValuePair<string, object>("Namespace", Namespace2));
 					return;
 				}
 				else
 				{
 					Schema = SchemaResult.Item1;
-					Schemas[Namespace] = Schema;
+					Schemas[Namespace2] = Schema;
 				}
 			}
 

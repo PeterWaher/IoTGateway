@@ -130,6 +130,19 @@ namespace Waher.Security.CallStack
 		/// or prohibited sources to assert the code can proceed.</param>
 		public static void CallFromSource(params ICallStackCheck[] Sources)
 		{
+			CallFromSource(new ICallStackCheck[][] { Sources });
+		}
+
+		/// <summary>
+		/// Makes sure the call is made from one of the approved sources and not from one
+		/// of the prohibited sources.
+		/// </summary>
+		/// <param name="SourcesByPriority">The stack trace from the original call is checked 
+		/// for approved or prohibited sources to assert the code can proceed. The Sources 
+		/// lists are evaluated in order, and the first list resulting in a conclusion is 
+		/// used.</param>
+		public static void CallFromSource(params ICallStackCheck[][] SourcesByPriority)
+		{
 			FrameInformation FrameInfo;
 			int Skip = 1;
 			bool WaherPersistence = false;
@@ -148,62 +161,70 @@ namespace Waher.Security.CallStack
 				Skip++;
 			}
 
-			int Caller = Skip++;
+			int Caller = Skip;
 			bool Prohibited = false;
 			bool? Status;
 
-			while (!Prohibited)
+			foreach (ICallStackCheck[] Sources in SourcesByPriority)
 			{
-				FrameInfo = new FrameInformation(new StackFrame(Skip++));
-				if (FrameInfo.Last)
-					break;
+				Skip = Caller + 1;
 
-				if (!FrameInfo.Valid)
-					continue;
-
-				foreach (ICallStackCheck Source in Sources)
+				while (!Prohibited)
 				{
-					Status = Source.Check(FrameInfo);
-					if (Status.HasValue)
+					FrameInfo = new FrameInformation(new StackFrame(Skip++));
+					if (FrameInfo.Last)
+						break;
+
+					if (!FrameInfo.Valid)
+						continue;
+
+					foreach (ICallStackCheck Source in Sources)
 					{
-						if (Status.Value)
-							return;
+						Status = Source.Check(FrameInfo);
+						if (Status.HasValue)
+						{
+							if (Status.Value)
+								return;
+							else
+							{
+								Prohibited = true;
+								break;
+							}
+						}
+					}
+
+					if (Prohibited)
+						break;
+
+					if (!Other || !AsynchTask || !WaherPersistence)
+					{
+						if (string.IsNullOrEmpty(FrameInfo.Assembly.Location))
+						{
+							if (FrameInfo.AssemblyName.StartsWith("WPSA."))
+								WaherPersistence = true;
+							else
+								Other = true;
+						}
 						else
 						{
-							Prohibited = true;
-							break;
+							if (FrameInfo.Type == typeof(System.Threading.Tasks.Task))
+								AsynchTask = true;
+							else if (FrameInfo.TypeName.StartsWith(FrameInfo.AssemblyName) &&
+								FrameInfo.AssemblyName + "." == Path.ChangeExtension(Path.GetFileName(FrameInfo.Assembly.Location), string.Empty))
+							{
+								if (FrameInfo.AssemblyName.StartsWith("Waher.Persistence."))
+									WaherPersistence = true;
+								else if (!FrameInfo.AssemblyName.StartsWith("Waher.") && !FrameInfo.AssemblyName.StartsWith("System."))
+									Other = true;
+							}
+							else if (!Path.GetFileName(FrameInfo.Assembly.Location).StartsWith("System."))
+								Other = true;
 						}
 					}
 				}
 
 				if (Prohibited)
 					break;
-
-				if (!Other || !AsynchTask || !WaherPersistence)
-				{
-					if (string.IsNullOrEmpty(FrameInfo.Assembly.Location))
-					{
-						if (FrameInfo.AssemblyName.StartsWith("WPSA."))
-							WaherPersistence = true;
-						else
-							Other = true;
-					}
-					else
-					{
-						if (FrameInfo.Type == typeof(System.Threading.Tasks.Task))
-							AsynchTask = true;
-						else if (FrameInfo.TypeName.StartsWith(FrameInfo.AssemblyName) &&
-							FrameInfo.AssemblyName + "." == Path.ChangeExtension(Path.GetFileName(FrameInfo.Assembly.Location), string.Empty))
-						{
-							if (FrameInfo.AssemblyName.StartsWith("Waher.Persistence."))
-								WaherPersistence = true;
-							else if (!FrameInfo.AssemblyName.StartsWith("Waher.") && !FrameInfo.AssemblyName.StartsWith("System."))
-								Other = true;
-						}
-						else if (!Path.GetFileName(FrameInfo.Assembly.Location).StartsWith("System."))
-							Other = true;
-					}
-				}
 			}
 
 			if (!Prohibited && AsynchTask && WaherPersistence && !Other)

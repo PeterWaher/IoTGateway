@@ -15,6 +15,11 @@ namespace Waher.Content.Semantic.Ontologies
 		/// <summary>
 		/// http://www.w3.org/2000/01/rdf-schema#label
 		/// </summary>
-		public static readonly Uri Label = new Uri(Namespace + "label");
+		public static readonly Uri label = new Uri(Namespace + "label");
+
+		/// <summary>
+		/// http://www.w3.org/2000/01/rdf-schema#comment
+		/// </summary>
+		public static readonly Uri comment = new Uri(Namespace + "comment");
 	}
 }

@@ -300,12 +300,12 @@ namespace Waher.Content.Semantic
 					if (Literal is StringLiteral StringLiteral &&
 						!string.IsNullOrEmpty(StringLiteral.Language))
 					{
-						w.WriteAttributeString("xml:lang", StringLiteral.Language);
+						w.WriteAttributeString("xml", "lang", null, StringLiteral.Language);
 					}
 					else if (Literal is CustomLiteral CustomLiteral &&
 						!string.IsNullOrEmpty(CustomLiteral.Language))
 					{
-						w.WriteAttributeString("xml:lang", CustomLiteral.Language);
+						w.WriteAttributeString("xml", "lang", null, CustomLiteral.Language);
 					}
 
 					w.WriteValue(Literal.Value);

@@ -20,27 +20,27 @@ namespace Waher.Content.Semantic.Ontologies
 			/// <summary>
 			/// http://purl.org/dc/terms/type
 			/// </summary>
-			public static readonly Uri Type = new Uri(Namespace + "type");
+			public static readonly Uri type = new Uri(Namespace + "type");
 
 			/// <summary>
 			/// http://purl.org/dc/terms/created
 			/// </summary>
-			public static readonly Uri Created = new Uri(Namespace + "created");
+			public static readonly Uri created = new Uri(Namespace + "created");
 
 			/// <summary>
 			/// http://purl.org/dc/terms/updated
 			/// </summary>
-			public static readonly Uri Updated = new Uri(Namespace + "updated");
+			public static readonly Uri updated = new Uri(Namespace + "updated");
 
 			/// <summary>
 			/// http://purl.org/dc/terms/creator
 			/// </summary>
-			public static readonly Uri Creator = new Uri(Namespace + "creator");
+			public static readonly Uri creator = new Uri(Namespace + "creator");
 
 			/// <summary>
 			/// http://purl.org/dc/terms/contributor
 			/// </summary>
-			public static readonly Uri Contributor = new Uri(Namespace + "contributor");
+			public static readonly Uri contributor = new Uri(Namespace + "contributor");
 		}
 
 		/// <summary>

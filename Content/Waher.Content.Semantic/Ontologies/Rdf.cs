@@ -15,37 +15,37 @@ namespace Waher.Content.Semantic.Ontologies
 		/// <summary>
 		/// URI representing rdf:type
 		/// </summary>
-		public static readonly Uri Type = new Uri(Namespace + "type");
+		public static readonly Uri type = new Uri(Namespace + "type");
 
 		/// <summary>
 		/// URI representing rdf:first
 		/// </summary>
-		public static readonly Uri First = new Uri(Namespace + "first");
+		public static readonly Uri first = new Uri(Namespace + "first");
 
 		/// <summary>
 		/// URI representing rdf:rest
 		/// </summary>
-		public static readonly Uri Rest = new Uri(Namespace + "rest");
+		public static readonly Uri rest = new Uri(Namespace + "rest");
 
 		/// <summary>
 		/// URI representing rdf:nil
 		/// </summary>
-		public static readonly Uri Nil = new Uri(Namespace + "nil");
+		public static readonly Uri nil = new Uri(Namespace + "nil");
 
 		/// <summary>
 		/// URI representing rdf:subject
 		/// </summary>
-		public static readonly Uri Subject = new Uri(Namespace + "subject");
+		public static readonly Uri subject = new Uri(Namespace + "subject");
 
 		/// <summary>
 		/// URI representing rdf:predicate
 		/// </summary>
-		public static readonly Uri Predicate = new Uri(Namespace + "predicate");
+		public static readonly Uri predicate = new Uri(Namespace + "predicate");
 
 		/// <summary>
 		/// URI representing rdf:object
 		/// </summary>
-		public static readonly Uri Object = new Uri(Namespace + "object");
+		public static readonly Uri @object = new Uri(Namespace + "object");
 
 		/// <summary>
 		/// URI representing rdf:Statement
@@ -58,9 +58,14 @@ namespace Waher.Content.Semantic.Ontologies
 		public static readonly Uri Bag = new Uri(Namespace + "Bag");
 
 		/// <summary>
+		/// URI representing rdf:List
+		/// </summary>
+		public static readonly Uri List = new Uri(Namespace + "List");
+
+		/// <summary>
 		/// URI representing rdf:li
 		/// </summary>
-		public static readonly Uri Li = new Uri(Namespace + "li");
+		public static readonly Uri li = new Uri(Namespace + "li");
 
 		/// <summary>
 		/// URI representing an item in a list.

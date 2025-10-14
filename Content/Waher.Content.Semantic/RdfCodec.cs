@@ -215,7 +215,7 @@ namespace Waher.Content.Semantic
 										if (Literal is StringLiteral StringLiteral &&
 											!string.IsNullOrEmpty(StringLiteral.Language))
 										{
-											w.WriteAttributeString("xml", "lang", string.Empty, StringLiteral.Language);
+											w.WriteAttributeString("xml", "lang", null, StringLiteral.Language);
 											w.WriteValue(Literal.StringValue);
 										}
 										else

@@ -41,7 +41,7 @@ namespace Waher.Content.Semantic
 
 			if (!Triple.Object.IsLiteral &&
 				Triple.Predicate is UriNode Predicate &&
-				Predicate.Uri != Rdf.Type)
+				Predicate.Uri != Rdf.type)
 			{
 				this.nodes[Triple.Object] = true;
 				this.nodesStatic = null;
@@ -119,7 +119,7 @@ namespace Waher.Content.Semantic
 						if (Predicates.Current is UriNode UriNode)
 						{
 							PropertyName = UriNode.ShortName;
-							IsRdfType = UriNode.Uri == Rdf.Type;
+							IsRdfType = UriNode.Uri == Rdf.type;
 						}
 						else
 						{

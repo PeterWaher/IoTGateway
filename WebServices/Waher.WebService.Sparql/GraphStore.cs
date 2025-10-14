@@ -162,17 +162,17 @@ namespace Waher.WebService.Sparql
 
 					Result.Add(new SemanticTriple(
 						GraphUriNode,
-						new UriNode(DublinCore.Terms.Type),
+						new UriNode(DublinCore.Terms.type),
 						new UriNode(DublinCore.MetadataInitiative.Type.Dataset)));
 
 					Result.Add(new SemanticTriple(
 						GraphUriNode,
-						new UriNode(DublinCore.Terms.Created),
+						new UriNode(DublinCore.Terms.created),
 						new DateTimeLiteral(Reference.Created)));
 
 					Result.Add(new SemanticTriple(
 						GraphUriNode,
-						new UriNode(DublinCore.Terms.Updated),
+						new UriNode(DublinCore.Terms.updated),
 						new DateTimeLiteral(Reference.Updated)));
 
 					if (!(Reference.Creators is null))
@@ -187,14 +187,14 @@ namespace Waher.WebService.Sparql
 
 								Result.Add(new SemanticTriple(
 									GraphUriNode,
-									new UriNode(DublinCore.Terms.Creator),
+									new UriNode(DublinCore.Terms.creator),
 									new StringLiteral(Creator)));
 							}
 							else
 							{
 								Result.Add(new SemanticTriple(
 									GraphUriNode,
-									new UriNode(DublinCore.Terms.Contributor),
+									new UriNode(DublinCore.Terms.contributor),
 									new StringLiteral(Creator)));
 							}
 						}

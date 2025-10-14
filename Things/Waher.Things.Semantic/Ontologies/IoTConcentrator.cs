@@ -13,6 +13,11 @@ namespace Waher.Things.Semantic.Ontologies
 		public const string Namespace = "urn:nf:iot:concentrator:1.0:";
 
 		/// <summary>
+		/// urn:nf:iot:concentrator:1.0:Broker
+		/// </summary>
+		public static readonly Uri Broker = new Uri(Namespace + "Broker");
+
+		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:DataSource
 		/// </summary>
 		public static readonly Uri DataSource = new Uri(Namespace + "DataSource");
@@ -23,89 +28,104 @@ namespace Waher.Things.Semantic.Ontologies
 		public static readonly Uri Node = new Uri(Namespace + "Node");
 
 		/// <summary>
+		/// urn:nf:iot:concentrator:1.0:mainDomain
+		/// </summary>
+		public static readonly Uri mainDomain = new Uri(Namespace + "mainDomain");
+
+		/// <summary>
+		/// urn:nf:iot:concentrator:1.0:alternativeDomains
+		/// </summary>
+		public static readonly Uri alternativeDomains = new Uri(Namespace + "alternativeDomains");
+
+		/// <summary>
+		/// urn:nf:iot:concentrator:1.0:rootSource
+		/// </summary>
+		public static readonly Uri rootSource = new Uri(Namespace + "rootSource");
+
+		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:hasChildSource
 		/// </summary>
-		public static readonly Uri HasChildSource = new Uri(Namespace + "hasChildSource");
+		public static readonly Uri hasChildSource = new Uri(Namespace + "hasChildSource");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:childSource
 		/// </summary>
-		public static readonly Uri ChildSource = new Uri(Namespace + "childSource");
+		public static readonly Uri childSource = new Uri(Namespace + "childSource");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:rootNode
 		/// </summary>
-		public static readonly Uri RootNode = new Uri(Namespace + "rootNode");
+		public static readonly Uri rootNode = new Uri(Namespace + "rootNode");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:childNode
 		/// </summary>
-		public static readonly Uri ChildNode = new Uri(Namespace + "childNode");
+		public static readonly Uri childNode = new Uri(Namespace + "childNode");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:parentNode
 		/// </summary>
-		public static readonly Uri ParentNode = new Uri(Namespace + "parentNode");
+		public static readonly Uri parentNode = new Uri(Namespace + "parentNode");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:nodeId
 		/// </summary>
-		public static readonly Uri NodeId = new Uri(Namespace + "nodeId");
+		public static readonly Uri nodeId = new Uri(Namespace + "nodeId");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:sourceId
 		/// </summary>
-		public static readonly Uri SourceId = new Uri(Namespace + "sourceId");
+		public static readonly Uri sourceId = new Uri(Namespace + "sourceId");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:partition
 		/// </summary>
-		public static readonly Uri Partition = new Uri(Namespace + "partition");
+		public static readonly Uri partition = new Uri(Namespace + "partition");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:logId
 		/// </summary>
-		public static readonly Uri LogId = new Uri(Namespace + "logId");
+		public static readonly Uri logId = new Uri(Namespace + "logId");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:localId
 		/// </summary>
-		public static readonly Uri LocalId = new Uri(Namespace + "localId");
+		public static readonly Uri localId = new Uri(Namespace + "localId");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:hasCommands
 		/// </summary>
-		public static readonly Uri HasCommands = new Uri(Namespace + "hasCommands");
+		public static readonly Uri hasCommands = new Uri(Namespace + "hasCommands");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:isControllable
 		/// </summary>
-		public static readonly Uri IsControllable = new Uri(Namespace + "isControllable");
+		public static readonly Uri isControllable = new Uri(Namespace + "isControllable");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:isReadable
 		/// </summary>
-		public static readonly Uri IsReadable = new Uri(Namespace + "isReadable");
+		public static readonly Uri isReadable = new Uri(Namespace + "isReadable");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:state
 		/// </summary>
-		public static readonly Uri State = new Uri(Namespace + "state");
+		public static readonly Uri state = new Uri(Namespace + "state");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:nodeState
 		/// </summary>
-		public static readonly Uri NodeState = new Uri(Namespace + "nodeState");
+		public static readonly Uri nodeState = new Uri(Namespace + "nodeState");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:typeName
 		/// </summary>
-		public static readonly Uri TypeName = new Uri(Namespace + "typeName");
+		public static readonly Uri typeName = new Uri(Namespace + "typeName");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:commands
 		/// </summary>
-		public static readonly Uri Commands = new Uri(Namespace + "commands");
+		public static readonly Uri commands = new Uri(Namespace + "commands");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:Command
@@ -115,86 +135,86 @@ namespace Waher.Things.Semantic.Ontologies
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:commandId
 		/// </summary>
-		public static readonly Uri CommandId = new Uri(Namespace + "commandId");
+		public static readonly Uri commandId = new Uri(Namespace + "commandId");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:commandType
 		/// </summary>
-		public static readonly Uri CommandType = new Uri(Namespace + "commandType");
+		public static readonly Uri commandType = new Uri(Namespace + "commandType");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:sortCategory
 		/// </summary>
-		public static readonly Uri SortCategory = new Uri(Namespace + "sortCategory");
+		public static readonly Uri sortCategory = new Uri(Namespace + "sortCategory");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:sortKey
 		/// </summary>
-		public static readonly Uri SortKey = new Uri(Namespace + "sortKey");
+		public static readonly Uri sortKey = new Uri(Namespace + "sortKey");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:success
 		/// </summary>
-		public static readonly Uri Success = new Uri(Namespace + "success");
+		public static readonly Uri success = new Uri(Namespace + "success");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:failure
 		/// </summary>
-		public static readonly Uri Failure = new Uri(Namespace + "failure");
+		public static readonly Uri failure = new Uri(Namespace + "failure");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:confirmation
 		/// </summary>
-		public static readonly Uri Confirmation = new Uri(Namespace + "confirmation");
+		public static readonly Uri confirmation = new Uri(Namespace + "confirmation");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:dispParam
 		/// </summary>
-		public static readonly Uri DisplayableParameters = new Uri(Namespace + "dispParam");
+		public static readonly Uri dispParam = new Uri(Namespace + "dispParam");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:parameterId
 		/// </summary>
-		public static readonly Uri ParameterId = new Uri(Namespace + "parameterId");
+		public static readonly Uri parameterId = new Uri(Namespace + "parameterId");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:messages
 		/// </summary>
-		public static readonly Uri Messages = new Uri(Namespace + "messages");
+		public static readonly Uri messages = new Uri(Namespace + "messages");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:eventId
 		/// </summary>
-		public static readonly Uri EventId = new Uri(Namespace + "eventId");
+		public static readonly Uri eventId = new Uri(Namespace + "eventId");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:body
 		/// </summary>
-		public static readonly Uri Body = new Uri(Namespace + "body");
+		public static readonly Uri body = new Uri(Namespace + "body");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:messageType
 		/// </summary>
-		public static readonly Uri MessageType = new Uri(Namespace + "messageType");
+		public static readonly Uri messageType = new Uri(Namespace + "messageType");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:operations
 		/// </summary>
-		public static readonly Uri Operations = new Uri(Namespace + "operations");
+		public static readonly Uri operations = new Uri(Namespace + "operations");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:edit
 		/// </summary>
-		public static readonly Uri Edit = new Uri(Namespace + "edit");
+		public static readonly Uri edit = new Uri(Namespace + "edit");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:read
 		/// </summary>
-		public static readonly Uri Read = new Uri(Namespace + "read");
+		public static readonly Uri read = new Uri(Namespace + "read");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:control
 		/// </summary>
-		public static readonly Uri Control = new Uri(Namespace + "control");
+		public static readonly Uri control = new Uri(Namespace + "control");
 	}
 }

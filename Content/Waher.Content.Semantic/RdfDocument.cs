@@ -23,37 +23,37 @@ namespace Waher.Content.Semantic
 		/// <summary>
 		/// rdf:type predicate
 		/// </summary>
-		public static UriNode RdfType => new UriNode(Rdf.Type, "rdf:type");
+		public static UriNode RdfType => new UriNode(Rdf.type, "rdf:type");
 
 		/// <summary>
 		/// Predefined reference to first element in a collection.
 		/// </summary>
-		public static UriNode RdfFirst => new UriNode(Rdf.First, "rdf:first");
+		public static UriNode RdfFirst => new UriNode(Rdf.first, "rdf:first");
 
 		/// <summary>
 		/// Predefined reference to next element in a collection.
 		/// </summary>
-		public static UriNode RdfRest => new UriNode(Rdf.Rest, "rdf:rest");
+		public static UriNode RdfRest => new UriNode(Rdf.rest, "rdf:rest");
 
 		/// <summary>
 		/// Predefined reference to end of collection.
 		/// </summary>
-		public static UriNode RdfNil => new UriNode(Rdf.Nil, "rdf:nil");
+		public static UriNode RdfNil => new UriNode(Rdf.nil, "rdf:nil");
 
 		/// <summary>
 		/// Subject reference, during reification.
 		/// </summary>
-		public static UriNode RdfSubject => new UriNode(Rdf.Subject, "rdf:subject");
+		public static UriNode RdfSubject => new UriNode(Rdf.subject, "rdf:subject");
 
 		/// <summary>
 		/// Predicate reference, during reification.
 		/// </summary>
-		public static UriNode RdfPredicate => new UriNode(Rdf.Predicate, "rdf:predicate");
+		public static UriNode RdfPredicate => new UriNode(Rdf.predicate, "rdf:predicate");
 
 		/// <summary>
 		/// object reference, during reification.
 		/// </summary>
-		public static UriNode RdfObject => new UriNode(Rdf.Object, "rdf:object");
+		public static UriNode RdfObject => new UriNode(Rdf.@object, "rdf:object");
 
 		/// <summary>
 		/// Statement reference
@@ -68,7 +68,7 @@ namespace Waher.Content.Semantic
 		/// <summary>
 		/// List item reference.
 		/// </summary>
-		public static UriNode RdfLi => new UriNode(Rdf.Li, "rdf:li");
+		public static UriNode RdfLi => new UriNode(Rdf.li, "rdf:li");
 
 		private readonly Dictionary<string, ISemanticLiteral> dataTypes = new Dictionary<string, ISemanticLiteral>();
 		private readonly XmlDocument xml;
@@ -560,7 +560,7 @@ namespace Waher.Content.Semantic
 					continue;
 
 				UriNode Predicate = this.CreateUriNode(E2, BaseUri);
-				if (Predicate.UriString.EndsWith("#li") && Predicate.Uri == Rdf.Li)
+				if (Predicate.UriString.EndsWith("#li") && Predicate.Uri == Rdf.li)
 				{
 					string Item = "_" + (++ItemCounter).ToString();
 					Predicate = new UriNode(new Uri(Rdf.Namespace + Item), "rdf:" + Item);

@@ -8,6 +8,7 @@ using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Semantic.Ontologies;
 using Waher.IoTGateway;
+using Waher.IoTGateway.Setup;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Inventory;
@@ -51,13 +52,16 @@ namespace Waher.Things.Semantic.Sources
 			string[] Parts = s.Split('/');
 			int c = Parts.Length;
 
-			if (c <= 1 || !string.IsNullOrEmpty(Parts[0]))
+			if (c < 1 || !string.IsNullOrEmpty(Parts[0]))
 				return Grade.NotAtAll;
 
 			if (string.IsNullOrEmpty(Parts[c - 1]))
 				c--;
 
-			if (c <= 2 || !Gateway.ConcentratorServer.TryGetDataSource(HttpUtility.UrlDecode(Parts[1]), out _))
+			if (c == 1)
+				return Grade.Ok;
+
+			if (!Gateway.ConcentratorServer.TryGetDataSource(HttpUtility.UrlDecode(Parts[1]), out _))
 				return Grade.NotAtAll;
 
 			return Grade.Excellent;
@@ -86,14 +90,20 @@ namespace Waher.Things.Semantic.Sources
 			string[] Parts = s.Split('/');
 			int c = Parts.Length;
 
-			if (c <= 1 || !string.IsNullOrEmpty(Parts[0]))
+			if (c < 1 || !string.IsNullOrEmpty(Parts[0]))
 				return null;
 
 			if (string.IsNullOrEmpty(Parts[c - 1]))
 				c--;
 
-			if (c <= 2)
-				return null;
+			InMemorySemanticCube Result = new InMemorySemanticCube();
+			Language Language = await Translator.GetDefaultLanguageAsync();  // TODO: Check Accept-Language HTTP header.
+
+			if (c == 1)
+			{
+				await AppendBrokerInformation(Result);
+				return Result;
+			}
 
 			string SourceID = HttpUtility.UrlDecode(Parts[1]);
 			if (!Gateway.ConcentratorServer.TryGetDataSource(SourceID, out IDataSource Source))
@@ -102,15 +112,14 @@ namespace Waher.Things.Semantic.Sources
 			if (!await Source.CanViewAsync(Caller))
 				return null;
 
-			InMemorySemanticCube Result = new InMemorySemanticCube();
-			Language Language = await Translator.GetDefaultLanguageAsync();  // TODO: Check Accept-Language HTTP header.
+			if (c == 2) // DOMAIN/Source
+			{
+				await AppendSourceInformation(Result, Source, Language, null);
+				return Result;
+			}
 
 			switch (c)
 			{
-				case 2: // DOMAIN/Source
-					await AppendSourceInformation(Result, Source, Language, null);
-					break;
-
 				case 3: // /DOMAIN/Source/NodeID
 					string NodeID = HttpUtility.UrlDecode(Parts[2]);
 					INode NodeObj = await Source.GetNodeAsync(new ThingReference(NodeID, SourceID));
@@ -157,6 +166,90 @@ namespace Waher.Things.Semantic.Sources
 		}
 
 		/// <summary>
+		/// Appends semantic information about the broker to a graph.
+		/// </summary>
+		/// <param name="Result">Graph being generated.</param>
+		public static Task AppendBrokerInformation(InMemorySemanticCube Result)
+		{
+			string BrokerPath = "/";
+			UriNode BrokerGraphUriNode = new UriNode(new Uri(Gateway.GetUrl(BrokerPath)));
+			int i, c;
+
+			Result.Add(BrokerGraphUriNode, Rdf.type, IoTConcentrator.Broker);
+
+			if (!string.IsNullOrEmpty(DomainConfiguration.Instance.HumanReadableName))
+			{
+				Result.Add(BrokerGraphUriNode, RdfSchema.label,
+					DomainConfiguration.Instance.HumanReadableName,
+					DomainConfiguration.Instance.HumanReadableNameLanguage);
+			}
+
+			if ((c = (DomainConfiguration.Instance.LocalizedNames?.Length) ?? 0) > 0)
+			{
+				ISemanticElement[] Items = new ISemanticElement[c];
+
+				for (i = 0; i < Items.Length; i++)
+				{
+					Items[i] = new StringLiteral(
+						DomainConfiguration.Instance.LocalizedNames[i].Value,
+						DomainConfiguration.Instance.LocalizedNames[i].Key);
+				}
+
+				if (!string.IsNullOrEmpty(DomainConfiguration.Instance.HumanReadableName))
+				{
+					Result.Add(BrokerGraphUriNode, Skos.prefLabel,
+						DomainConfiguration.Instance.HumanReadableName,
+						DomainConfiguration.Instance.HumanReadableNameLanguage);
+				}
+
+				Result.AddLinkedList(BrokerGraphUriNode, Skos.altLabel, Items);
+			}
+
+			if (!string.IsNullOrEmpty(DomainConfiguration.Instance.HumanReadableDescription))
+			{
+				Result.Add(BrokerGraphUriNode, RdfSchema.comment,
+					DomainConfiguration.Instance.HumanReadableDescription,
+					DomainConfiguration.Instance.HumanReadableDescriptionLanguage);
+			}
+
+			if ((c = (DomainConfiguration.Instance.LocalizedDescriptions?.Length) ?? 0) > 0)
+			{
+				ISemanticElement[] Items = new ISemanticElement[c];
+
+				for (i = 0; i < Items.Length; i++)
+				{
+					Items[i] = new StringLiteral(
+						DomainConfiguration.Instance.LocalizedDescriptions[i].Value,
+						DomainConfiguration.Instance.LocalizedDescriptions[i].Key);
+				}
+
+				Result.AddLinkedList(BrokerGraphUriNode, RdfSchema.comment, Items);
+			}
+
+			if (DomainConfiguration.Instance.UseDomainName)
+			{
+				Result.Add(BrokerGraphUriNode, 
+					IoTConcentrator.mainDomain,
+					DomainConfiguration.Instance.Domain);
+
+				if ((DomainConfiguration.Instance.AlternativeDomains?.Length ?? 0) > 0)
+				{
+					Result.AddLinkedList(BrokerGraphUriNode,
+						IoTConcentrator.alternativeDomains,
+						DomainConfiguration.Instance.AlternativeDomains);
+				}
+			}
+
+			foreach (IDataSource RootSource in Gateway.ConcentratorServer.RootDataSources)
+			{
+				Result.Add(BrokerGraphUriNode, IoTConcentrator.rootSource,
+					new Uri(Gateway.GetUrl("/" + HttpUtility.UrlEncode(RootSource.SourceID))));
+			}
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// Appends semantic information about a data source to a graph.
 		/// </summary>
 		/// <param name="Result">Graph being generated.</param>
@@ -175,39 +268,18 @@ namespace Waher.Things.Semantic.Sources
 			string SourcePath = "/" + HttpUtility.UrlEncode(Source.SourceID);
 			UriNode SourceGraphUriNode = new UriNode(new Uri(Gateway.GetUrl(SourcePath)));
 
-			Result.Add(new SemanticTriple(
-				SourceGraphUriNode,
-				new UriNode(DublinCore.Terms.Type),
-				new UriNode(IoTConcentrator.DataSource)));
-
-			Result.Add(new SemanticTriple(
-				SourceGraphUriNode,
-				new UriNode(IoTConcentrator.SourceId),
-				new StringLiteral(Source.SourceID)));
-
-			Result.Add(new SemanticTriple(
-				SourceGraphUriNode,
-				new UriNode(RdfSchema.Label),
-				new StringLiteral(await Source.GetNameAsync(Language))));
-
-			Result.Add(new SemanticTriple(
-				SourceGraphUriNode,
-				new UriNode(DublinCore.Terms.Updated),
-				new DateTimeLiteral(Source.LastChanged)));
-
-			Result.Add(new SemanticTriple(
-				SourceGraphUriNode,
-				new UriNode(IoTConcentrator.HasChildSource),
-				new BooleanLiteral(Source.HasChildren)));
+			Result.Add(SourceGraphUriNode, Rdf.type, IoTConcentrator.DataSource);
+			Result.Add(SourceGraphUriNode, IoTConcentrator.sourceId, Source.SourceID);
+			Result.Add(SourceGraphUriNode, RdfSchema.label, await Source.GetNameAsync(Language));
+			Result.Add(SourceGraphUriNode, DublinCore.Terms.updated, Source.LastChanged);
+			Result.Add(SourceGraphUriNode, IoTConcentrator.hasChildSource, Source.HasChildren);
 
 			if (Source.HasChildren)
 			{
 				foreach (IDataSource ChildSource in Source.ChildSources)
 				{
-					Result.Add(new SemanticTriple(
-						SourceGraphUriNode,
-						new UriNode(IoTConcentrator.ChildSource),
-						new UriNode(new Uri(Gateway.GetUrl("/" + HttpUtility.UrlEncode(ChildSource.SourceID))))));
+					Result.Add(SourceGraphUriNode, IoTConcentrator.childSource,
+						new Uri(Gateway.GetUrl("/" + HttpUtility.UrlEncode(ChildSource.SourceID))));
 				}
 			}
 
@@ -216,12 +288,7 @@ namespace Waher.Things.Semantic.Sources
 			if (!(RootNodes is null))
 			{
 				foreach (INode RootNode in RootNodes)
-				{
-					Result.Add(new SemanticTriple(
-						SourceGraphUriNode,
-						new UriNode(IoTConcentrator.RootNode),
-						new UriNode(GetNodeUri(RootNode))));
-				}
+					Result.Add(SourceGraphUriNode, IoTConcentrator.rootNode, GetNodeUri(RootNode));
 			}
 		}
 
@@ -275,86 +342,30 @@ namespace Waher.Things.Semantic.Sources
 
 			UriNode NodeGraphUriNode = new UriNode(GetNodeUri(Node));
 
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(DublinCore.Terms.Type),
-				new UriNode(IoTConcentrator.Node)));
+			Result.Add(NodeGraphUriNode, Rdf.type, IoTConcentrator.Node);
 
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(IoTConcentrator.TypeName),
-				new StringLiteral(await Node.GetTypeNameAsync(Language))));
+			Result.Add(NodeGraphUriNode, IoTConcentrator.typeName,
+				await Node.GetTypeNameAsync(Language));
 
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(IoTConcentrator.SourceId),
-				new StringLiteral(Node.SourceId)));
-
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(IoTConcentrator.NodeId),
-				new StringLiteral(Node.NodeId)));
-
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(IoTConcentrator.LogId),
-				new StringLiteral(Node.LogId)));
-
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(IoTConcentrator.LocalId),
-				new StringLiteral(Node.LocalId)));
-
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(RdfSchema.Label),
-				new StringLiteral(Node.LocalId)));
+			Result.Add(NodeGraphUriNode, IoTConcentrator.sourceId, Node.SourceId);
+			Result.Add(NodeGraphUriNode, IoTConcentrator.nodeId, Node.NodeId);
+			Result.Add(NodeGraphUriNode, IoTConcentrator.logId, Node.LogId);
+			Result.Add(NodeGraphUriNode, IoTConcentrator.localId, Node.LocalId);
+			Result.Add(NodeGraphUriNode, RdfSchema.label, Node.LocalId);
 
 			if (!string.IsNullOrEmpty(Node.Partition))
-			{
-				Result.Add(new SemanticTriple(
-					NodeGraphUriNode,
-					new UriNode(IoTConcentrator.Partition),
-					new StringLiteral(Node.Partition)));
-			}
+				Result.Add(NodeGraphUriNode, IoTConcentrator.partition, Node.Partition);
 
 			if (!(Node.Parent is null))
-			{
-				Result.Add(new SemanticTriple(
-					NodeGraphUriNode,
-					new UriNode(IoTConcentrator.ParentNode),
-					new UriNode(GetNodeUri(Node.Parent))));
-			}
+				Result.Add(NodeGraphUriNode, IoTConcentrator.parentNode, GetNodeUri(Node.Parent));
 
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(DublinCore.Terms.Updated),
-				new DateTimeLiteral(Node.LastChanged)));
-
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(IoTConcentrator.HasChildSource),
-				new BooleanLiteral(Node.HasChildren)));
-
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(IoTConcentrator.HasCommands),
-				new BooleanLiteral(Node.HasCommands)));
-
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(IoTConcentrator.IsControllable),
-				new BooleanLiteral(Node.IsControllable)));
-
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(IoTConcentrator.IsReadable),
-				new BooleanLiteral(Node.IsReadable)));
-
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(IoTConcentrator.State),
-				new CustomLiteral(Node.State.ToString(), IoTConcentrator.NodeState.AbsoluteUri)));
+			Result.Add(NodeGraphUriNode, DublinCore.Terms.updated, Node.LastChanged);
+			Result.Add(NodeGraphUriNode, IoTConcentrator.hasChildSource, Node.HasChildren);
+			Result.Add(NodeGraphUriNode, IoTConcentrator.hasCommands, Node.HasCommands);
+			Result.Add(NodeGraphUriNode, IoTConcentrator.isControllable, Node.IsControllable);
+			Result.Add(NodeGraphUriNode, IoTConcentrator.isReadable, Node.IsReadable);
+			Result.Add(NodeGraphUriNode, IoTConcentrator.state, Node.State.ToString(), 
+				IoTConcentrator.nodeState);
 
 			IEnumerable<DisplayableParameters.Parameter> Parameters = await Node.GetDisplayableParametersAsync(Language, Caller);
 			int ItemIndex;
@@ -364,34 +375,21 @@ namespace Waher.Things.Semantic.Sources
 				BlankNode DisplayableParameters = new BlankNode("n" + Guid.NewGuid().ToString());
 				ItemIndex = 0;
 
-				Result.Add(new SemanticTriple(
-					NodeGraphUriNode,
-					new UriNode(IoTConcentrator.DisplayableParameters),
-					DisplayableParameters));
+				Result.Add(NodeGraphUriNode, IoTConcentrator.dispParam,
+					DisplayableParameters);
 
 				foreach (DisplayableParameters.Parameter P in Parameters)
 				{
 					BlankNode DisplayableParameter = new BlankNode("n" + Guid.NewGuid().ToString());
 
-					Result.Add(new SemanticTriple(
-						DisplayableParameters,
-						new UriNode(Rdf.ListItem(++ItemIndex)),
-						DisplayableParameter));
+					Result.Add(DisplayableParameters, Rdf.ListItem(++ItemIndex),
+						DisplayableParameter);
 
-					Result.Add(new SemanticTriple(
-						DisplayableParameter,
-						new UriNode(RdfSchema.Label),
-						new StringLiteral(P.Name)));
+					Result.Add(DisplayableParameter, RdfSchema.label, P.Name);
+					Result.Add(DisplayableParameter, IoTConcentrator.parameterId, P.Id);
 
-					Result.Add(new SemanticTriple(
-						DisplayableParameter,
-						new UriNode(IoTConcentrator.ParameterId),
-						new StringLiteral(P.Id)));
-
-					Result.Add(new SemanticTriple(
-						DisplayableParameter,
-						new UriNode(IoTSensorData.Value),
-						SemanticElements.Encapsulate(P.UntypedValue)));
+					Result.Add(DisplayableParameter, IoTSensorData.value,
+						SemanticElements.Encapsulate(P.UntypedValue));
 				}
 			}
 
@@ -401,42 +399,20 @@ namespace Waher.Things.Semantic.Sources
 				BlankNode Messages = new BlankNode("n" + Guid.NewGuid().ToString());
 				ItemIndex = 0;
 
-				Result.Add(new SemanticTriple(
-					NodeGraphUriNode,
-					new UriNode(IoTConcentrator.Messages),
-					Messages));
+				Result.Add(NodeGraphUriNode, IoTConcentrator.messages, Messages);
 
 				foreach (DisplayableParameters.Message M in NodeMessages)
 				{
 					BlankNode Message = new BlankNode("n" + Guid.NewGuid().ToString());
 
-					Result.Add(new SemanticTriple(
-						Messages,
-						new UriNode(Rdf.ListItem(++ItemIndex)),
-						Message));
-
-					Result.Add(new SemanticTriple(
-						Message,
-						new UriNode(IoTConcentrator.Body),
-						new StringLiteral(M.Body)));
-
-					Result.Add(new SemanticTriple(
-						Message,
-						new UriNode(IoTSensorData.Timestamp),
-						new DateTimeLiteral(M.Timestamp)));
+					Result.Add(Messages, Rdf.ListItem(++ItemIndex), Message);
+					Result.Add(Message, IoTConcentrator.body, M.Body);
+					Result.Add(Message, IoTSensorData.timestamp, M.Timestamp);
 
 					if (!string.IsNullOrEmpty(M.EventId))
-					{
-						Result.Add(new SemanticTriple(
-							Message,
-							new UriNode(IoTConcentrator.EventId),
-							new StringLiteral(M.EventId)));
-					}
+						Result.Add(Message, IoTConcentrator.eventId, M.EventId);
 
-					Result.Add(new SemanticTriple(
-						Message,
-						new UriNode(Rdf.Type),
-						new CustomLiteral(M.Type.ToString(), IoTConcentrator.MessageType.AbsoluteUri)));
+					Result.Add(Message, Rdf.type, M.Type.ToString(), IoTConcentrator.messageType);
 				}
 			}
 
@@ -444,10 +420,8 @@ namespace Waher.Things.Semantic.Sources
 			{
 				foreach (INode ChildNode in await Node.ChildNodes)
 				{
-					Result.Add(new SemanticTriple(
-						NodeGraphUriNode,
-						new UriNode(IoTConcentrator.ChildNode),
-						new UriNode(GetNodeUri(ChildNode))));
+					Result.Add(NodeGraphUriNode, IoTConcentrator.childNode, 
+						GetNodeUri(ChildNode));
 				}
 			}
 
@@ -456,10 +430,7 @@ namespace Waher.Things.Semantic.Sources
 				BlankNode Commands = new BlankNode("n" + Guid.NewGuid().ToString());
 				ItemIndex = 0;
 
-				Result.Add(new SemanticTriple(
-					NodeGraphUriNode,
-					new UriNode(IoTConcentrator.Commands),
-					Commands));
+				Result.Add(NodeGraphUriNode, IoTConcentrator.commands, Commands);
 
 				IEnumerable<ICommand> NodeCommands = await Node.Commands;
 
@@ -472,48 +443,26 @@ namespace Waher.Things.Semantic.Sources
 
 						UriNode CommandUriNode = new UriNode(GetCommandUri(Node, Command));
 
-						Result.Add(new SemanticTriple(
-							Commands,
-							new UriNode(Rdf.ListItem(++ItemIndex)),
-							CommandUriNode));
+						Result.Add(Commands, Rdf.ListItem(++ItemIndex), CommandUriNode);
+						Result.Add(CommandUriNode, Rdf.type, IoTConcentrator.Command);
+						Result.Add(CommandUriNode, RdfSchema.label, 
+							await Command.GetNameAsync(Language), Language.Code);
+						Result.Add(CommandUriNode, IoTConcentrator.commandId, Command.CommandID);
+						Result.Add(CommandUriNode, IoTConcentrator.sortCategory, Command.SortCategory);
+						Result.Add(CommandUriNode, IoTConcentrator.sortKey, Command.SortKey);
+						Result.Add(CommandUriNode, IoTConcentrator.commandType,
+							Command.Type.ToString(), IoTConcentrator.commandType);
 
-						Result.Add(new SemanticTriple(
-							CommandUriNode,
-							new UriNode(DublinCore.Terms.Type),
-							new UriNode(IoTConcentrator.Command)));
-
-						Result.Add(new SemanticTriple(
-							CommandUriNode,
-							new UriNode(RdfSchema.Label),
-							new StringLiteral(await Command.GetNameAsync(Language))));
-
-						Result.Add(new SemanticTriple(
-							CommandUriNode,
-							new UriNode(IoTConcentrator.CommandId),
-							new StringLiteral(Command.CommandID)));
-
-						Result.Add(new SemanticTriple(
-							CommandUriNode,
-							new UriNode(IoTConcentrator.SortCategory),
-							new StringLiteral(Command.SortCategory)));
-
-						Result.Add(new SemanticTriple(
-							CommandUriNode,
-							new UriNode(IoTConcentrator.SortKey),
-							new StringLiteral(Command.SortKey)));
-
-						Result.Add(new SemanticTriple(
-							CommandUriNode,
-							new UriNode(IoTConcentrator.CommandType),
-							new CustomLiteral(Command.Type.ToString(), IoTConcentrator.CommandType.AbsoluteUri)));
-
-						AddOptionalStringLiteral(Result, CommandUriNode, IoTConcentrator.Success,
+						AddOptionalStringLiteral(Result, CommandUriNode, 
+							IoTConcentrator.success,
 							await Command.GetSuccessStringAsync(Language));
 
-						AddOptionalStringLiteral(Result, CommandUriNode, IoTConcentrator.Failure,
+						AddOptionalStringLiteral(Result, CommandUriNode, 
+							IoTConcentrator.failure,
 							await Command.GetFailureStringAsync(Language));
 
-						AddOptionalStringLiteral(Result, CommandUriNode, IoTConcentrator.Confirmation,
+						AddOptionalStringLiteral(Result, CommandUriNode, 
+							IoTConcentrator.confirmation,
 							await Command.GetConfirmationStringAsync(Language));
 					}
 				}
@@ -522,38 +471,35 @@ namespace Waher.Things.Semantic.Sources
 			BlankNode Operations = new BlankNode("n" + Guid.NewGuid().ToString());
 			ItemIndex = 0;
 
-			Result.Add(new SemanticTriple(
-				NodeGraphUriNode,
-				new UriNode(IoTConcentrator.Operations),
-				Operations));
+			Result.Add(NodeGraphUriNode, IoTConcentrator.operations, Operations);
 
-			AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Edit, GetOperationUri(Node, "edit", "parameters"),
+			AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.edit, GetOperationUri(Node, "edit", "parameters"),
 				await Language.GetStringAsync(typeof(DataSourceGraph), 1, "Editable parameters for the node."));
 
 			if (Node.IsReadable && Node is ISensor)
 			{
-				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "all"),
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.read, GetOperationUri(Node, "read", "all"),
 					await Language.GetStringAsync(typeof(DataSourceGraph), 2, "Read all available sensor data from node."));
 
-				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "momentary"),
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.read, GetOperationUri(Node, "read", "momentary"),
 					await Language.GetStringAsync(typeof(DataSourceGraph), 3, "Read momentary sensor data from node."));
 
-				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "identity"),
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.read, GetOperationUri(Node, "read", "identity"),
 					await Language.GetStringAsync(typeof(DataSourceGraph), 4, "Read identity sensor data from node."));
 
-				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "status"),
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.read, GetOperationUri(Node, "read", "status"),
 					await Language.GetStringAsync(typeof(DataSourceGraph), 5, "Read status sensor data from node."));
 
-				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "computed"),
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.read, GetOperationUri(Node, "read", "computed"),
 					await Language.GetStringAsync(typeof(DataSourceGraph), 6, "Read computed sensor data from node."));
 
-				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "peak"),
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.read, GetOperationUri(Node, "read", "peak"),
 					await Language.GetStringAsync(typeof(DataSourceGraph), 7, "Read peak sensor data from node."));
 
-				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "historical"),
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.read, GetOperationUri(Node, "read", "historical"),
 					await Language.GetStringAsync(typeof(DataSourceGraph), 8, "Read historical sensor data from node."));
 
-				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Read, GetOperationUri(Node, "read", "nonHistorical"),
+				AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.read, GetOperationUri(Node, "read", "nonHistorical"),
 					await Language.GetStringAsync(typeof(DataSourceGraph), 9, "Read all non-historical sensor data from node."));
 			}
 
@@ -561,7 +507,7 @@ namespace Waher.Things.Semantic.Sources
 			{
 				foreach (ControlParameter P in await Actuator.GetControlParameters())
 				{
-					AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.Control, GetOperationUri(Node, "control", P.Name),
+					AddOperation(Result, Operations, ref ItemIndex, IoTConcentrator.control, GetOperationUri(Node, "control", P.Name),
 						string.IsNullOrEmpty(P.Description) ? await Language.GetStringAsync(typeof(DataSourceGraph), 10, "Control parameter.") : P.Description);
 				}
 			}
@@ -571,32 +517,16 @@ namespace Waher.Things.Semantic.Sources
 			ISemanticElement Subject, Uri PredicateUri, string Value)
 		{
 			if (!string.IsNullOrEmpty(Value))
-			{
-				Result.Add(new SemanticTriple(
-					Subject,
-					new UriNode(PredicateUri),
-					new StringLiteral(Value)));
-			}
+				Result.Add(Subject, PredicateUri, Value);
 		}
 
 		private static void AddOperation(InMemorySemanticCube Result, BlankNode Operations, ref int ItemIndex, Uri Predicate, Uri Graph, string Label)
 		{
 			BlankNode Operation = new BlankNode("n" + Guid.NewGuid().ToString());
 
-			Result.Add(new SemanticTriple(
-				Operations,
-				new UriNode(Rdf.ListItem(++ItemIndex)),
-				Operation));
-
-			Result.Add(new SemanticTriple(
-				Operation,
-				new UriNode(Predicate),
-				new UriNode(Graph)));
-
-			Result.Add(new SemanticTriple(
-				Operation,
-				new UriNode(RdfSchema.Label),
-				new StringLiteral(Label)));
+			Result.Add(Operations, Rdf.ListItem(++ItemIndex), Operation);
+			Result.Add(Operation, Predicate, Graph);
+			Result.Add(Operation, RdfSchema.label, Label);
 		}
 
 		/// <summary>
@@ -711,18 +641,12 @@ namespace Waher.Things.Semantic.Sources
 					BlankNode Fields = new BlankNode("n" + Guid.NewGuid().ToString());
 					int FieldIndex = 0;
 
-					Result.Add(new SemanticTriple(
-						NodeGraphUriNode,
-						new UriNode(IoTSensorData.Fields),
-						Fields));
+					Result.Add(NodeGraphUriNode, IoTSensorData.fields, Fields);
 
 					BlankNode Errors = new BlankNode("n" + Guid.NewGuid().ToString());
 					int ErrorIndex = 0;
 
-					Result.Add(new SemanticTriple(
-						NodeGraphUriNode,
-						new UriNode(IoTSensorData.Errors),
-						Errors));
+					Result.Add(NodeGraphUriNode, IoTSensorData.errors, Errors);
 
 					IThingReference[] Nodes = new IThingReference[] { Node };
 					ApprovedReadoutParameters Approval = await Gateway.ConcentratorServer.SensorServer.CanReadAsync(FieldTypes, Nodes, null, Caller)
@@ -737,10 +661,7 @@ namespace Waher.Things.Semantic.Sources
 							{
 								BlankNode FieldNode = new BlankNode("n" + Guid.NewGuid().ToString());
 
-								Result.Add(new SemanticTriple(
-									Fields,
-									new UriNode(Rdf.ListItem(++FieldIndex)),
-									FieldNode));
+								Result.Add(Fields, Rdf.ListItem(++FieldIndex), FieldNode);
 
 								string LocalizedName;
 
@@ -759,205 +680,138 @@ namespace Waher.Things.Semantic.Sources
 								}
 
 								if (string.IsNullOrEmpty(LocalizedName))
-								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(RdfSchema.Label),
-										new StringLiteral(F.Name)));
-								}
+									Result.Add(FieldNode, RdfSchema.label, F.Name);
 								else if (LocalizedName == F.Name)
-								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(RdfSchema.Label),
-										new StringLiteral(F.Name, Language.Code)));
-								}
+									Result.Add(FieldNode, RdfSchema.label, F.Name, Language.Code);
 								else
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(RdfSchema.Label),
-										new StringLiteral(F.Name)));
-
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(RdfSchema.Label),
-										new StringLiteral(LocalizedName, Language.Code)));
+									Result.Add(FieldNode, RdfSchema.label, F.Name);
+									Result.Add(FieldNode, RdfSchema.label, LocalizedName, Language.Code);
 								}
 
-								Result.Add(new SemanticTriple(
-									FieldNode,
-									new UriNode(IoTSensorData.Value),
-									SemanticElements.Encapsulate(F.ObjectValue)));
-
-								Result.Add(new SemanticTriple(
-									FieldNode,
-									new UriNode(IoTSensorData.Timestamp),
-									new DateTimeLiteral(F.Timestamp)));
+								Result.Add(FieldNode, IoTSensorData.value, F.ObjectValue);
+								Result.Add(FieldNode, IoTSensorData.timestamp, F.Timestamp);
 
 								if (F.QoS.HasFlag(FieldQoS.Missing))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.QoSUri),
-										new CustomLiteral(nameof(FieldQoS.Missing), IoTSensorData.QoS)));
+									Result.Add(FieldNode, IoTSensorData.qos,
+										nameof(FieldQoS.Missing), IoTSensorData.qos);
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.InProgress))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.QoSUri),
-										new CustomLiteral(nameof(FieldQoS.InProgress), IoTSensorData.QoS)));
+									Result.Add(FieldNode, IoTSensorData.qos,
+										nameof(FieldQoS.InProgress), IoTSensorData.qos);
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.AutomaticEstimate))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.QoSUri),
-										new CustomLiteral(nameof(FieldQoS.AutomaticEstimate), IoTSensorData.QoS)));
+									Result.Add(FieldNode, IoTSensorData.qos,
+										nameof(FieldQoS.AutomaticEstimate), IoTSensorData.qos);
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.ManualEstimate))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.QoSUri),
-										new CustomLiteral(nameof(FieldQoS.ManualEstimate), IoTSensorData.QoS)));
+									Result.Add(FieldNode, IoTSensorData.qos,
+										nameof(FieldQoS.ManualEstimate), IoTSensorData.qos);
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.ManualReadout))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.QoSUri),
-										new CustomLiteral(nameof(FieldQoS.ManualReadout), IoTSensorData.QoS)));
+									Result.Add(FieldNode, IoTSensorData.qos,
+										nameof(FieldQoS.ManualReadout), IoTSensorData.qos);
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.AutomaticReadout))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.QoSUri),
-										new CustomLiteral(nameof(FieldQoS.AutomaticReadout), IoTSensorData.QoS)));
+									Result.Add(FieldNode, IoTSensorData.qos,
+										nameof(FieldQoS.AutomaticReadout), IoTSensorData.qos);
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.TimeOffset))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.QoSUri),
-										new CustomLiteral(nameof(FieldQoS.TimeOffset), IoTSensorData.QoS)));
+									Result.Add(FieldNode, IoTSensorData.qos,
+										nameof(FieldQoS.TimeOffset), IoTSensorData.qos);
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.Warning))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.QoSUri),
-										new CustomLiteral(nameof(FieldQoS.Warning), IoTSensorData.QoS)));
+									Result.Add(FieldNode, IoTSensorData.qos,
+										nameof(FieldQoS.Warning), IoTSensorData.qos);
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.Error))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.QoSUri),
-										new CustomLiteral(nameof(FieldQoS.Error), IoTSensorData.QoS)));
+									Result.Add(FieldNode, IoTSensorData.qos,
+										nameof(FieldQoS.Error), IoTSensorData.qos);
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.Signed))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.QoSUri),
-										new CustomLiteral(nameof(FieldQoS.Signed), IoTSensorData.QoS)));
+									Result.Add(FieldNode, IoTSensorData.qos,
+										nameof(FieldQoS.Signed), IoTSensorData.qos);
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.Invoiced))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.QoSUri),
-										new CustomLiteral(nameof(FieldQoS.Invoiced), IoTSensorData.QoS)));
+									Result.Add(FieldNode, IoTSensorData.qos,
+										nameof(FieldQoS.Invoiced), IoTSensorData.qos);
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.EndOfSeries))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.QoSUri),
-										new CustomLiteral(nameof(FieldQoS.EndOfSeries), IoTSensorData.QoS)));
+									Result.Add(FieldNode, IoTSensorData.qos,
+										nameof(FieldQoS.EndOfSeries), IoTSensorData.qos);
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.PowerFailure))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.QoSUri),
-										new CustomLiteral(nameof(FieldQoS.PowerFailure), IoTSensorData.QoS)));
+									Result.Add(FieldNode, IoTSensorData.qos,
+										nameof(FieldQoS.PowerFailure), IoTSensorData.qos);
 								}
 
 								if (F.QoS.HasFlag(FieldQoS.InvoiceConfirmed))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(IoTSensorData.QoSUri),
-										new CustomLiteral(nameof(FieldQoS.InvoiceConfirmed), IoTSensorData.QoS)));
+									Result.Add(FieldNode, IoTSensorData.qos,
+										nameof(FieldQoS.InvoiceConfirmed), IoTSensorData.qos);
 								}
 
-								Result.Add(new SemanticTriple(
-									FieldNode,
-									new UriNode(IoTConcentrator.IsControllable),
-									new BooleanLiteral(F.Writable)));
+								Result.Add(FieldNode, IoTConcentrator.isControllable, F.Writable);
 
 								if (F.Type.HasFlag(FieldType.Momentary))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(Rdf.Type),
-										new CustomLiteral(nameof(FieldType.Momentary), IoTSensorData.FieldType)));
+									Result.Add(FieldNode, Rdf.type,
+										nameof(FieldType.Momentary), IoTSensorData.fieldType);
 								}
 
 								if (F.Type.HasFlag(FieldType.Identity))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(Rdf.Type),
-										new CustomLiteral(nameof(FieldType.Identity), IoTSensorData.FieldType)));
+									Result.Add(FieldNode, Rdf.type,
+										nameof(FieldType.Identity), IoTSensorData.fieldType);
 								}
 
 								if (F.Type.HasFlag(FieldType.Status))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(Rdf.Type),
-										new CustomLiteral(nameof(FieldType.Status), IoTSensorData.FieldType)));
+									Result.Add(FieldNode, Rdf.type,
+										nameof(FieldType.Status), IoTSensorData.fieldType);
 								}
 
 								if (F.Type.HasFlag(FieldType.Computed))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(Rdf.Type),
-										new CustomLiteral(nameof(FieldType.Computed), IoTSensorData.FieldType)));
+									Result.Add(FieldNode, Rdf.type,
+										nameof(FieldType.Computed), IoTSensorData.fieldType);
 								}
 
 								if (F.Type.HasFlag(FieldType.Peak))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(Rdf.Type),
-										new CustomLiteral(nameof(FieldType.Peak), IoTSensorData.FieldType)));
+									Result.Add(FieldNode, Rdf.type,
+										nameof(FieldType.Peak), IoTSensorData.fieldType);
 								}
 
 								if (F.Type.HasFlag(FieldType.Historical))
 								{
-									Result.Add(new SemanticTriple(
-										FieldNode,
-										new UriNode(Rdf.Type),
-										new CustomLiteral(nameof(FieldType.Historical), IoTSensorData.FieldType)));
+									Result.Add(FieldNode, Rdf.type,
+										nameof(FieldType.Historical), IoTSensorData.fieldType);
 								}
 							}
 
@@ -970,44 +824,18 @@ namespace Waher.Things.Semantic.Sources
 							{
 								BlankNode ErrorNode = new BlankNode("n" + Guid.NewGuid().ToString());
 
-								Result.Add(new SemanticTriple(
-									Errors,
-									new UriNode(Rdf.ListItem(++ErrorIndex)),
-									ErrorNode));
+								Result.Add(Errors, Rdf.ListItem(++ErrorIndex), ErrorNode);
+								Result.Add(ErrorNode, RdfSchema.label, Error.ErrorMessage);
+								Result.Add(ErrorNode, IoTSensorData.timestamp, Error.Timestamp);
 
-								Result.Add(new SemanticTriple(
-									ErrorNode,
-									new UriNode(RdfSchema.Label),
-									new StringLiteral(Error.ErrorMessage)));
+								if (!string.IsNullOrEmpty(Error.NodeId))
+									Result.Add(ErrorNode, IoTConcentrator.nodeId, Error.NodeId);
 
-								Result.Add(new SemanticTriple(
-									ErrorNode,
-									new UriNode(IoTSensorData.Timestamp),
-									new DateTimeLiteral(Error.Timestamp)));
+								if (!string.IsNullOrEmpty(Error.SourceId))
+									Result.Add(ErrorNode, IoTConcentrator.sourceId, Error.SourceId);
 
-								if (!string.IsNullOrEmpty((Error.NodeId)))
-								{
-									Result.Add(new SemanticTriple(
-										ErrorNode,
-										new UriNode(IoTConcentrator.NodeId),
-										new StringLiteral(Error.NodeId)));
-								}
-
-								if (!string.IsNullOrEmpty((Error.SourceId)))
-								{
-									Result.Add(new SemanticTriple(
-										ErrorNode,
-										new UriNode(IoTConcentrator.SourceId),
-										new StringLiteral(Error.SourceId)));
-								}
-
-								if (!string.IsNullOrEmpty((Error.Partition)))
-								{
-									Result.Add(new SemanticTriple(
-										ErrorNode,
-										new UriNode(IoTConcentrator.Partition),
-										new StringLiteral(Error.Partition)));
-								}
+								if (!string.IsNullOrEmpty(Error.Partition))
+									Result.Add(ErrorNode, IoTConcentrator.partition, Error.Partition);
 							}
 
 							if (e.Done)
@@ -1023,20 +851,9 @@ namespace Waher.Things.Semantic.Sources
 					{
 						BlankNode ErrorNode = new BlankNode("n" + Guid.NewGuid().ToString());
 
-						Result.Add(new SemanticTriple(
-							Errors,
-							new UriNode(Rdf.ListItem(++ErrorIndex)),
-							ErrorNode));
-
-						Result.Add(new SemanticTriple(
-							ErrorNode,
-							new UriNode(RdfSchema.Label),
-							new StringLiteral("Timeout.")));
-
-						Result.Add(new SemanticTriple(
-							ErrorNode,
-							new UriNode(IoTSensorData.Timestamp),
-							new DateTimeLiteral(DateTime.UtcNow)));
+						Result.Add(Errors, Rdf.ListItem(++ErrorIndex), ErrorNode);
+						Result.Add(ErrorNode, RdfSchema.label, "Timeout.");
+						Result.Add(ErrorNode, IoTSensorData.timestamp, DateTime.UtcNow);
 					}
 					break;
 

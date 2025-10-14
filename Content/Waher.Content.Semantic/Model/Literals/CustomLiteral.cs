@@ -15,8 +15,10 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// Represents a custom literal.
 		/// </summary>
 		public CustomLiteral()
-			: this(null, null)
+			: base(null, null)
 		{
+			this.Type = null;
+			this.language = null;
 		}
 
 		/// <summary>
@@ -36,11 +38,36 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// </summary>
 		/// <param name="Value">Literal value</param>
 		/// <param name="Type">Data type.</param>
+		public CustomLiteral(string Value, Uri Type)
+			: base(Value, Value)
+		{
+			this.Type = Type.AbsoluteUri;
+			this.language = null;
+		}
+
+		/// <summary>
+		/// Represents a custom literal.
+		/// </summary>
+		/// <param name="Value">Literal value</param>
+		/// <param name="Type">Data type.</param>
 		/// <param name="Language">Language of string.</param>
 		public CustomLiteral(string Value, string Type, string Language)
 			: base(Value, Value)
 		{
 			this.Type = Type;
+			this.language = Language;
+		}
+
+		/// <summary>
+		/// Represents a custom literal.
+		/// </summary>
+		/// <param name="Value">Literal value</param>
+		/// <param name="Type">Data type.</param>
+		/// <param name="Language">Language of string.</param>
+		public CustomLiteral(string Value, Uri Type, string Language)
+			: base(Value, Value)
+		{
+			this.Type = Type.AbsoluteUri;
 			this.language = Language;
 		}
 

@@ -53,9 +53,20 @@ namespace Waher.Content.Semantic.Ontologies
 		public static readonly Uri Statement = new Uri(Namespace + "Statement");
 
 		/// <summary>
-		/// URI representing rdf:Bag
+		/// URI representing rdf:Seq, an ordered container.
+		/// </summary>
+		public static readonly Uri Seq = new Uri(Namespace + "Seq");
+
+		/// <summary>
+		/// URI representing rdf:Bag, an unordered container.
 		/// </summary>
 		public static readonly Uri Bag = new Uri(Namespace + "Bag");
+
+		/// <summary>
+		/// URI representing rdf:Alt, an unordered set of alternatives, where the first
+		/// one is the default option.
+		/// </summary>
+		public static readonly Uri Alt = new Uri(Namespace + "Alt");
 
 		/// <summary>
 		/// URI representing rdf:List

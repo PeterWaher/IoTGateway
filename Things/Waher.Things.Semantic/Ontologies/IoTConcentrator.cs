@@ -28,39 +28,34 @@ namespace Waher.Things.Semantic.Ontologies
 		public static readonly Uri Node = new Uri(Namespace + "Node");
 
 		/// <summary>
-		/// urn:nf:iot:concentrator:1.0:mainDomain
+		/// urn:nf:iot:concentrator:1.0:domains
 		/// </summary>
-		public static readonly Uri mainDomain = new Uri(Namespace + "mainDomain");
+		public static readonly Uri domain = new Uri(Namespace + "domains");
 
 		/// <summary>
-		/// urn:nf:iot:concentrator:1.0:alternativeDomains
+		/// urn:nf:iot:concentrator:1.0:rootSources
 		/// </summary>
-		public static readonly Uri alternativeDomains = new Uri(Namespace + "alternativeDomains");
+		public static readonly Uri rootSources = new Uri(Namespace + "rootSources");
 
 		/// <summary>
-		/// urn:nf:iot:concentrator:1.0:rootSource
+		/// urn:nf:iot:concentrator:1.0:hasChildSources
 		/// </summary>
-		public static readonly Uri rootSource = new Uri(Namespace + "rootSource");
+		public static readonly Uri hasChildSources = new Uri(Namespace + "hasChildSources");
 
 		/// <summary>
-		/// urn:nf:iot:concentrator:1.0:hasChildSource
+		/// urn:nf:iot:concentrator:1.0:childSources
 		/// </summary>
-		public static readonly Uri hasChildSource = new Uri(Namespace + "hasChildSource");
+		public static readonly Uri childSources = new Uri(Namespace + "childSources");
 
 		/// <summary>
-		/// urn:nf:iot:concentrator:1.0:childSource
+		/// urn:nf:iot:concentrator:1.0:rootNodes
 		/// </summary>
-		public static readonly Uri childSource = new Uri(Namespace + "childSource");
+		public static readonly Uri rootNodes = new Uri(Namespace + "rootNodes");
 
 		/// <summary>
-		/// urn:nf:iot:concentrator:1.0:rootNode
+		/// urn:nf:iot:concentrator:1.0:childNodes
 		/// </summary>
-		public static readonly Uri rootNode = new Uri(Namespace + "rootNode");
-
-		/// <summary>
-		/// urn:nf:iot:concentrator:1.0:childNode
-		/// </summary>
-		public static readonly Uri childNode = new Uri(Namespace + "childNode");
+		public static readonly Uri childNodes = new Uri(Namespace + "childNodes");
 
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:parentNode

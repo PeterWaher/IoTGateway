@@ -456,6 +456,8 @@ namespace Waher.Content.Semantic
 
 		#endregion
 
+		#region Adding Linked Lists
+
 		/// <summary>
 		/// Adds a linked list of items to the graph.
 		/// </summary>
@@ -512,6 +514,294 @@ namespace Waher.Content.Semantic
 
 			for (i = 0; i < c; i++)
 				Literals[i] = new StringLiteral(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params bool[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new BooleanLiteral(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params byte[][] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new Base64Literal(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params decimal[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new DecimalLiteral(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params double[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new DoubleLiteral(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params float[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new SingleLiteral(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params Duration[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new DurationLiteral(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params sbyte[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new Int8Literal(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params short[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new Int16Literal(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params int[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new Int32Literal(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params long[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new Int64Literal(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params byte[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new UInt8Literal(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params ushort[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new UInt16Literal(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params uint[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new UInt32Literal(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params ulong[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new UInt64Literal(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params BigInteger[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new IntegerLiteral(Items[i]);
+
+			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddLinkedList(ISemanticElement Subject, ISemanticElement Predicate,
+			params TimeSpan[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new TimeLiteral(Items[i]);
 
 			this.AddLinkedList(Subject, Predicate, (IEnumerable<ISemanticElement>)Literals);
 		}
@@ -615,6 +905,472 @@ namespace Waher.Content.Semantic
 			this.Add(Loop ?? Container, Rdf.rest, Rdf.nil);
 		}
 
+		#endregion
+
+		#region Adding Containers
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, Uri Predicate,
+			params object[] Items)
+		{
+			this.AddContainer(Subject, Type, new UriNode(Predicate), Items);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params object[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = SemanticElements.EncapsulateLiteral(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, Uri Predicate,
+			params string[] Items)
+		{
+			this.AddContainer(Subject, Type, new UriNode(Predicate), Items);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params string[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new StringLiteral(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params bool[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new BooleanLiteral(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params byte[][] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new Base64Literal(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params decimal[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new DecimalLiteral(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params double[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new DoubleLiteral(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params float[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new SingleLiteral(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params Duration[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new DurationLiteral(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params sbyte[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new Int8Literal(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params short[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new Int16Literal(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params int[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new Int32Literal(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params long[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new Int64Literal(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params byte[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new UInt8Literal(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params ushort[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new UInt16Literal(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params uint[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new UInt32Literal(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params ulong[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new UInt64Literal(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params BigInteger[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new IntegerLiteral(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params TimeSpan[] Items)
+		{
+			int i, c = Items.Length;
+			ISemanticElement[] Literals = new ISemanticElement[c];
+
+			for (i = 0; i < c; i++)
+				Literals[i] = new TimeLiteral(Items[i]);
+
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, Uri Predicate,
+			IEnumerable Items)
+		{
+			this.AddContainer(Subject, Type, new UriNode(Predicate), Items);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			IEnumerable Items)
+		{
+			ChunkedList<ISemanticElement> Literals = new ChunkedList<ISemanticElement>();
+
+			foreach (object Item in Items)
+				Literals.Add(SemanticElements.EncapsulateLiteral(Item));
+
+			this.AddContainer(Subject, Type, Predicate, Literals);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, Uri Predicate,
+			params ISemanticElement[] Items)
+		{
+			this.AddContainer(Subject, Type, new UriNode(Predicate), Items);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			params ISemanticElement[] Items)
+		{
+			this.AddContainer(Subject, Type, Predicate, (IEnumerable<ISemanticElement>)Items);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public void AddContainer(ISemanticElement Subject, Uri Type, Uri Predicate,
+			IEnumerable<ISemanticElement> Items)
+		{
+			this.AddContainer(Subject, Type, new UriNode(Predicate), Items);
+		}
+
+		/// <summary>
+		/// Adds a linked list of items to the graph.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Type">Container type (rdf:Seq, rdf:Bag, rdf:Alt).</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Items">Items to add</param>
+		public virtual void AddContainer(ISemanticElement Subject, Uri Type, ISemanticElement Predicate,
+			IEnumerable<ISemanticElement> Items)
+		{
+			BlankNode Container = new BlankNode("n" + Guid.NewGuid().ToString());
+			int i = 0;
+
+			this.Add(Subject, Predicate, Container);
+			this.Add(Container, Rdf.type, Type);
+
+			foreach (ISemanticElement Item in Items)
+				this.Add(Container, Rdf.ListItem(++i), Item);
+		}
+
+		#endregion
+
+		#region Type Conversions
+
 		/// <summary>
 		/// Converts the object to a matrix.
 		/// </summary>
@@ -646,5 +1402,7 @@ namespace Waher.Content.Semantic
 		{
 			return VectorDefinition.Encapsulate(this.triples, false, null);
 		}
+
+		#endregion
 	}
 }

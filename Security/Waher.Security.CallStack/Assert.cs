@@ -146,6 +146,7 @@ namespace Waher.Security.CallStack
 			FrameInformation FrameInfo;
 			int Skip = 1;
 			bool WaherPersistence = false;
+			bool WaherRuntimeIo = false;
 			bool AsynchTask = false;
 			bool Other = false;
 
@@ -214,6 +215,8 @@ namespace Waher.Security.CallStack
 							{
 								if (FrameInfo.AssemblyName.StartsWith("Waher.Persistence."))
 									WaherPersistence = true;
+								else if (FrameInfo.AssemblyName == "Waher.Runtime.IO")
+									WaherRuntimeIo = true;
 								else if (!FrameInfo.AssemblyName.StartsWith("Waher.") && !FrameInfo.AssemblyName.StartsWith("System."))
 									Other = true;
 							}
@@ -227,8 +230,13 @@ namespace Waher.Security.CallStack
 					break;
 			}
 
-			if (!Prohibited && AsynchTask && WaherPersistence && !Other)
-				return; // In asynch call - stack trace not showing asynchronous call stack. If loading from database, i.e. populating object asynchronously, (possibly, check is vulnerable), give check a pass. Access will be restricted at a later stage, when accessing properties synchronously.
+			// In asynch call - stack trace not showing asynchronous call stack after JIT.
+			// If loading from database, i.e. populating object asynchronously, (possibly,
+			// check is vulnerable), give check a pass. Access will be restricted at a later
+			// stage, when accessing properties synchronously.
+
+			if (!Prohibited && AsynchTask && (WaherPersistence || WaherRuntimeIo) && !Other)
+				return; 
 
 			FrameInfo = new FrameInformation(new StackFrame(Skip = Caller));
 

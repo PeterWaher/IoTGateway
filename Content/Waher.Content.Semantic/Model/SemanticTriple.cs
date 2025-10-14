@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Runtime.Collections;
@@ -87,6 +88,201 @@ namespace Waher.Content.Semantic.Model
 			this.Subject = Subject;
 			this.Predicate = new UriNode(Predicate);
 			this.Object = new BooleanLiteral(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, byte[] Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new Base64Literal(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, decimal Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new DecimalLiteral(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, double Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new DoubleLiteral(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, float Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new SingleLiteral(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, Duration Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new DurationLiteral(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, sbyte Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new Int8Literal(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, short Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new Int16Literal(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, int Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new Int32Literal(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, long Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new Int64Literal(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, byte Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new UInt8Literal(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, ushort Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new UInt16Literal(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, uint Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new UInt32Literal(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, ulong Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new UInt64Literal(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, BigInteger Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new IntegerLiteral(Object);
+		}
+
+		/// <summary>
+		/// Implements a semantic triple.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public SemanticTriple(ISemanticElement Subject, Uri Predicate, TimeSpan Object)
+		{
+			this.Subject = Subject;
+			this.Predicate = new UriNode(Predicate);
+			this.Object = new TimeLiteral(Object);
 		}
 
 		/// <summary>

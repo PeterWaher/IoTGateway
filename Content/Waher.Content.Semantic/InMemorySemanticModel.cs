@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Semantic.Ontologies;
@@ -21,6 +22,8 @@ namespace Waher.Content.Semantic
 		/// Triples in model.
 		/// </summary>
 		protected readonly ChunkedList<ISemanticTriple> triples;
+
+		#region Constructors
 
 		/// <summary>
 		/// In-memory semantic model.
@@ -47,6 +50,10 @@ namespace Waher.Content.Semantic
 			}
 		}
 
+		#endregion
+
+		#region Enumerators
+
 		/// <summary>
 		/// Gets an enumerator of available triples.
 		/// </summary>
@@ -64,6 +71,10 @@ namespace Waher.Content.Semantic
 		{
 			return this.triples.GetEnumerator();
 		}
+
+		#endregion
+
+		#region Adding triples
 
 		/// <summary>
 		/// Adds a triple to the model.
@@ -182,6 +193,186 @@ namespace Waher.Content.Semantic
 		/// <param name="Subject">Subject</param>
 		/// <param name="Predicate">Predicate</param>
 		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, byte[] Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new Base64Literal(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, decimal Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new DecimalLiteral(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, double Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new DoubleLiteral(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, float Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new SingleLiteral(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, Duration Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new DurationLiteral(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, sbyte Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new Int8Literal(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, short Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new Int16Literal(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, int Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new Int32Literal(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, long Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new Int64Literal(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, byte Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new UInt8Literal(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, ushort Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new UInt16Literal(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, uint Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new UInt32Literal(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, ulong Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new UInt64Literal(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, BigInteger Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new IntegerLiteral(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
+		public void Add(ISemanticElement Subject, Uri Predicate, TimeSpan Object)
+		{
+			this.triples.Add(new SemanticTriple(Subject, new UriNode(Predicate),
+				new TimeLiteral(Object)));
+		}
+
+		/// <summary>
+		/// Adds a triple to the model.
+		/// </summary>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Predicate">Predicate</param>
+		/// <param name="Object">Object</param>
 		public void Add(ISemanticElement Subject, ISemanticElement Predicate, ISemanticElement Object)
 		{
 			this.triples.Add(new SemanticTriple(Subject, Predicate, Object));
@@ -262,6 +453,8 @@ namespace Waher.Content.Semantic
 		{
 			this.triples.Add(Triple);
 		}
+
+		#endregion
 
 		/// <summary>
 		/// Adds a linked list of items to the graph.

@@ -146,7 +146,7 @@ namespace Waher.Security.CallStack
 			FrameInformation FrameInfo;
 			int Skip = 1;
 			bool WaherPersistence = false;
-			bool WaherRuntimeIo = false;
+			bool WaherRuntime = false;
 			bool AsynchTask = false;
 			bool Other = false;
 
@@ -215,8 +215,8 @@ namespace Waher.Security.CallStack
 							{
 								if (FrameInfo.AssemblyName.StartsWith("Waher.Persistence."))
 									WaherPersistence = true;
-								else if (FrameInfo.AssemblyName == "Waher.Runtime.IO")
-									WaherRuntimeIo = true;
+								else if (FrameInfo.AssemblyName.StartsWith("Waher.Runtime."))
+									WaherRuntime = true;
 								else if (!FrameInfo.AssemblyName.StartsWith("Waher.") && !FrameInfo.AssemblyName.StartsWith("System."))
 									Other = true;
 							}
@@ -235,7 +235,7 @@ namespace Waher.Security.CallStack
 			// check is vulnerable), give check a pass. Access will be restricted at a later
 			// stage, when accessing properties synchronously.
 
-			if (!Prohibited && AsynchTask && (WaherPersistence || WaherRuntimeIo) && !Other)
+			if (!Prohibited && AsynchTask && (WaherPersistence || WaherRuntime) && !Other)
 				return; 
 
 			FrameInfo = new FrameInformation(new StackFrame(Skip = Caller));

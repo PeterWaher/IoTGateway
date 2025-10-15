@@ -52,7 +52,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Number of seconds before a Tab ID is purged, unless references or kept alive.
 		/// </summary>
-		public const int TabIdCacheTimeoutSeconds = 30;
+		public const int TabIdCacheTimeoutSeconds = 60;
 
 		/// <summary>
 		/// Half of <see cref="TabIdCacheTimeoutSeconds"/>.
@@ -433,8 +433,8 @@ namespace Waher.IoTGateway
 
 		internal static void Ping(string TabID)
 		{
-			if (eventsByTabID.TryGetValue(TabID, out TabQueue TabQueue) && !string.IsNullOrEmpty(TabQueue.SessionID))
-				Gateway.HttpServer?.GetSession(TabQueue.SessionID, false);
+			if (eventsByTabID.TryGetValue(TabID, out TabQueue TabQueue))
+				TabQueue.Ping();
 		}
 
 		internal static async Task UnregisterWebSocket(WebSocket Socket, string Location, string TabID)
@@ -1350,12 +1350,17 @@ namespace Waher.IoTGateway
 				this.Queue?.Clear();
 			}
 
-			public Task Ping(object Sender, WebSocketEventArgs e)
+			private Task Ping(object Sender, WebSocketEventArgs e)
 			{
 				eventsByTabID.Ping(this.TabID);
-				timeoutByTabID.Ping(this.TabID);
-
+				this.Ping();
 				return Task.CompletedTask;
+			}
+
+			public void Ping()
+			{
+				if (!string.IsNullOrEmpty(this.SessionID))
+					Gateway.HttpServer?.GetSession(this.SessionID, false);
 			}
 		}
 

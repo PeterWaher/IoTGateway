@@ -213,10 +213,15 @@ namespace Waher.Security.CallStack
 							else if (FrameInfo.TypeName.StartsWith(FrameInfo.AssemblyName) &&
 								FrameInfo.AssemblyName + "." == Path.ChangeExtension(Path.GetFileName(FrameInfo.Assembly.Location), string.Empty))
 							{
-								if (FrameInfo.AssemblyName.StartsWith("Waher.Persistence."))
+								if (FrameInfo.AssemblyName.StartsWith("Waher.Persistence.") ||
+									FrameInfo.AssemblyName.StartsWith("WPSA."))
+								{
 									WaherPersistence = true;
+								}
 								else if (FrameInfo.AssemblyName.StartsWith("Waher.Runtime."))
 									WaherRuntime = true;
+								else if (FrameInfo.AssemblyName.StartsWith("WPSA."))
+									WaherPersistence = true;
 								else if (!FrameInfo.AssemblyName.StartsWith("Waher.") && !FrameInfo.AssemblyName.StartsWith("System."))
 									Other = true;
 							}

@@ -1294,13 +1294,14 @@ namespace Waher.IoTGateway
 
 		internal class TabQueue : IDisposableAsync
 		{
+			private WebSocket webSocket;
+
 			public string TabID;
 			public string SessionID;
 			public SessionVariables Session;
 			public MultiReadSingleWriteObject SyncObj;
 			public LinkedList<string> Queue = new LinkedList<string>();
 			public HttpResponse Response = null;
-			public WebSocket WebSocket = null;
 			public Uri Uri = null;
 			public DateTime KeepAliveUntil = DateTime.MinValue;
 			public (string, string, string)[] Query = null;
@@ -1313,6 +1314,24 @@ namespace Waher.IoTGateway
 				this.Session = Session;
 			}
 
+			public WebSocket WebSocket
+			{
+				get => this.webSocket;
+				set
+				{
+					if (this.webSocket != value)
+					{
+						if (!(this.webSocket is null))
+							this.webSocket.Heartbeat -= this.Ping;
+
+						this.webSocket = value;
+
+						if (!(this.webSocket is null))
+							this.webSocket.Heartbeat += this.Ping;
+					}
+				}
+			}
+
 			[Obsolete("Use DisposeAsync instead.")]
 			public void Dispose()
 			{
@@ -1321,12 +1340,22 @@ namespace Waher.IoTGateway
 
 			public async Task DisposeAsync()
 			{
+				this.WebSocket = null;
+
 				await this.SyncObj.TryBeginWrite(10000);
 
 				this.SyncObj?.Dispose();
 				this.SyncObj = null;
 
 				this.Queue?.Clear();
+			}
+
+			public Task Ping(object Sender, WebSocketEventArgs e)
+			{
+				eventsByTabID.Ping(this.TabID);
+				timeoutByTabID.Ping(this.TabID);
+
+				return Task.CompletedTask;
 			}
 		}
 

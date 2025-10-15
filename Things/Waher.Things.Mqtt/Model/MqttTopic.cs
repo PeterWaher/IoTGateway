@@ -366,8 +366,17 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		/// <summary>
-		/// TODO
+		/// If the node can be controlled.
 		/// </summary>
+		public bool IsControllable
+		{
+			get => this.data?.IsControllable ?? false;
+		}
+
+		/// <summary>
+		/// Get control parameters for the actuator.
+		/// </summary>
+		/// <returns>Collection of control parameters for actuator.</returns>
 		public ControlParameter[] GetControlParameters()
 		{
 			if (this.data is null || !this.data.IsControllable)

@@ -149,6 +149,20 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
+		/// If the node can be controlled.
+		/// </summary>
+		public override bool IsControllable
+		{
+			get
+			{
+				if (base.IsControllable)
+					return true;
+
+				return this.GetTopic().Result?.IsControllable ?? false;
+			}
+		}
+
+		/// <summary>
 		/// Get control parameters for the actuator.
 		/// </summary>
 		/// <returns>Collection of control parameters for actuator.</returns>
@@ -157,7 +171,7 @@ namespace Waher.Things.Mqtt
 			List<ControlParameter> Parameters = new List<ControlParameter>();
 			Parameters.AddRange(await base.GetControlParameters());
 
-			if (this.GetTopic()?.Result?.GetControlParameters() is ControlParameter[] P)
+			if ((await this.GetTopic())?.GetControlParameters() is ControlParameter[] P)
 				Parameters.AddRange(P);
 
 			return Parameters.ToArray();

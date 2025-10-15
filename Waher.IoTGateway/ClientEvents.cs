@@ -6,7 +6,6 @@ using Waher.Content;
 using Waher.Content.Json;
 using Waher.Content.Text;
 using Waher.Events;
-using Waher.Networking.CoAP.Options;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Persistence.Serialization;

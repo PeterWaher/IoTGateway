@@ -62,29 +62,41 @@ function ExecuteQuery()
 {
 	var xhttp = new XMLHttpRequest();
 	var IsHtml = false;
-	var Binary = false;
+	var IsBinary = false;
 
 	xhttp.onreadystatechange = function ()
 	{
 		if (xhttp.readyState == 4)
 		{
-			if (Binary)
-			{
-				var Blob = xhttp.response;
-				var Url = window.URL.createObjectURL(Blob);
+			var Result = document.getElementById("Result");
 
-				window.open(Url);
-			}
+			if (IsHtml)
+				Result.innerHTML = "<legend>Result</legend>" + xhttp.responseText;
 			else
 			{
-				var Result = document.getElementById("Result");
+				Result.innerHTML = "<legend>Result</legend>";
 
-				if (IsHtml)
-					Result.innerHTML = "<legend>Result</legend>" + xhttp.responseText;
+				if (IsBinary)
+				{
+					var Blob = xhttp.response;
+					var Url = window.URL.createObjectURL(Blob);
+
+					var A = document.createElement("A");
+					A.href = Url;
+					A.download = "SPARQL Result Set.xlsx";
+
+					Result.appendChild(A);
+					A.click();
+					Result.removeChild(A);
+
+					var P = document.createElement("P");
+					P.innerText = "The result has been downloaded.";
+					Result.appendChild(P);
+
+					window.URL.revokeObjectURL(Url);
+				}
 				else
 				{
-					Result.innerHTML = "<legend>Result</legend>";
-
 					var Pre = document.createElement("PRE");
 					Result.appendChild(Pre);
 
@@ -93,9 +105,9 @@ function ExecuteQuery()
 
 					Code.innerText = xhttp.responseText;
 				}
-
-				Result.setAttribute("style", "display:block");
 			}
+
+			Result.setAttribute("style", "display:block");
 
 			delete xhttp;
 		}
@@ -150,7 +162,7 @@ function ExecuteQuery()
 			break;
 
 		case "Excel":
-			Binary = true;
+			IsBinary = true;
 			xhttp.setRequestHeader("Accept", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 			xhttp.responseType = "blob";
 			break;

@@ -1,12 +1,40 @@
 ﻿using System;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic.Ontologies
 {
 	/// <summary>
-	/// RDF Schema Ontology
+	/// RDF Ontology
 	/// </summary>
-	public static class Rdf
+	public class Rdf : IOntology
 	{
+		/// <summary>
+		/// RDF Ontology
+		/// </summary>
+		public Rdf()
+		{
+		}
+
+		/// <summary>
+		/// Ontology namespace.
+		/// </summary>
+		public string OntologyNamespace => Namespace;
+
+		/// <summary>
+		/// Well-known ontology prefix.
+		/// </summary>
+		public string OntologyPrefix => "rdf";
+
+		/// <summary>
+		/// If the interface understands objects such as <paramref name="Uri"/>.
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <returns>How well objects of this type are supported.</returns>
+		public Grade Supports(string Uri)
+		{
+			return Uri.StartsWith(Namespace) ? Grade.Ok : Grade.NotAtAll;
+		}
+
 		/// <summary>
 		/// http://www.w3.org/1999/02/22-rdf-syntax-ns#
 		/// </summary>

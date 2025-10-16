@@ -208,9 +208,27 @@ namespace Waher.Security.CallStack
 						}
 						else
 						{
+							string AssemblyName = FrameInfo.AssemblyName;
+
+							switch (AssemblyName)
+							{
+								case "Waher.Persistence.Serialization.Compiled":
+									AssemblyName = "Waher.Persistence.Serialization";
+									break;
+
+								case "Waher.Persistence.FilesLW":
+									AssemblyName = "Waher.Persistence.Files";
+									break;
+
+								default:
+									if (AssemblyName.EndsWith(".UWP"))
+										AssemblyName = AssemblyName.Substring(0, AssemblyName.Length - 4);
+									break;
+							}
+
 							if (FrameInfo.Type == typeof(System.Threading.Tasks.Task))
 								AsynchTask = true;
-							else if (FrameInfo.TypeName.StartsWith(FrameInfo.AssemblyName) &&
+							else if (FrameInfo.TypeName.StartsWith(AssemblyName) &&
 								FrameInfo.AssemblyName + "." == Path.ChangeExtension(Path.GetFileName(FrameInfo.Assembly.Location), string.Empty))
 							{
 								if (FrameInfo.AssemblyName.StartsWith("Waher.Persistence.") ||
@@ -241,7 +259,7 @@ namespace Waher.Security.CallStack
 			// stage, when accessing properties synchronously.
 
 			if (!Prohibited && AsynchTask && (WaherPersistence || WaherRuntime) && !Other)
-				return; 
+				return;
 
 			FrameInfo = new FrameInformation(new StackFrame(Skip = Caller));
 

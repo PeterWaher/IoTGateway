@@ -4,14 +4,14 @@ using Waher.Runtime.Inventory;
 namespace Waher.Content.Semantic.Ontologies
 {
 	/// <summary>
-	/// RDF Schema Ontology
+	/// Dublin Core Metadata Initiative (DCMI) type Ontology
 	/// </summary>
-	public class RdfSchema : IOntology
+	public class DublinCoreMetadataInitiativeType : IOntology
 	{
 		/// <summary>
-		/// RDF Schema Ontology
+		/// Dublin Core Metadata Initiative (DCMI) type Ontology
 		/// </summary>
-		public RdfSchema()
+		public DublinCoreMetadataInitiativeType()
 		{
 		}
 
@@ -23,7 +23,7 @@ namespace Waher.Content.Semantic.Ontologies
 		/// <summary>
 		/// Well-known ontology prefix.
 		/// </summary>
-		public string OntologyPrefix => "rdfs";
+		public string OntologyPrefix => "dcmitype";
 
 		/// <summary>
 		/// If the interface understands objects such as <paramref name="Uri"/>.
@@ -36,18 +36,13 @@ namespace Waher.Content.Semantic.Ontologies
 		}
 
 		/// <summary>
-		/// http://www.w3.org/2000/01/rdf-schema#
+		/// http://purl.org/dc/dcmitype/
 		/// </summary>
-		public const string Namespace = "http://www.w3.org/2000/01/rdf-schema#";
+		public const string Namespace = "http://purl.org/dc/dcmitype/";
 
 		/// <summary>
-		/// http://www.w3.org/2000/01/rdf-schema#label
+		/// http://purl.org/dc/dcmitype/Dataset
 		/// </summary>
-		public static readonly Uri label = new Uri(Namespace + "label");
-
-		/// <summary>
-		/// http://www.w3.org/2000/01/rdf-schema#comment
-		/// </summary>
-		public static readonly Uri comment = new Uri(Namespace + "comment");
+		public static readonly Uri Dataset = new Uri(Namespace + "Dataset");
 	}
 }

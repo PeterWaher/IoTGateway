@@ -1,4 +1,5 @@
 ﻿using System;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic.Ontologies
 {
@@ -6,8 +7,30 @@ namespace Waher.Content.Semantic.Ontologies
 	/// SKOS Simple Knowledge Organization System Ontology
 	/// https://www.w3.org/TR/skos-reference/
 	/// </summary>
-	public static class Skos
+	public class Skos
 	{
+		/// <summary>
+		/// SKOS Simple Knowledge Organization System Ontology
+		/// </summary>
+		public Skos()
+		{
+		}
+
+		/// <summary>
+		/// Ontology namespace.
+		/// </summary>
+		public string OntologyNamespace => Namespace;
+
+		/// <summary>
+		/// If the interface understands objects such as <paramref name="Uri"/>.
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <returns>How well objects of this type are supported.</returns>
+		public Grade Supports(Uri Uri)
+		{
+			return Uri.AbsolutePath.StartsWith(Namespace) ? Grade.Ok : Grade.NotAtAll;
+		}
+
 		/// <summary>
 		/// http://www.w3.org/2004/02/skos/core#
 		/// </summary>

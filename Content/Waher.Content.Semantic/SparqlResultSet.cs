@@ -34,6 +34,8 @@ namespace Waher.Content.Semantic
 
 		private readonly Dictionary<string, ISemanticLiteral> dataTypes = new Dictionary<string, ISemanticLiteral>();
 		private readonly Uri baseUri;
+		private Dictionary<string, string> shortBlankNodeLabels = null;
+		private Dictionary<string, string> shortUris = null;
 
 		/// <summary>
 		/// Contains the results of a SPARQL query.
@@ -465,7 +467,7 @@ namespace Waher.Content.Semantic
 
 				case "triple":
 					if (!(Object.TryGetValue("value", out ValueObject)) ||
-						!(ValueObject is Dictionary<string,object> Triple))
+						!(ValueObject is Dictionary<string, object> Triple))
 					{
 						return null;
 					}
@@ -589,5 +591,54 @@ namespace Waher.Content.Semantic
 			return new ObjectVector(((ObjectMatrix)this.ToMatrix()).VectorElements);
 		}
 
+		/// <summary>
+		/// Gets a short blank node label for the given blank node.
+		/// </summary>
+		/// <param name="Node">Blank node.</param>
+		/// <returns>Short blank node label.</returns>
+		public string GetShortBlankNodeLabel(BlankNode Node)
+		{
+			string s = Node.NodeId;
+
+			if (this.shortBlankNodeLabels is null)
+				this.shortBlankNodeLabels = new Dictionary<string, string>();
+
+			if (!this.shortBlankNodeLabels.TryGetValue(s, out string Short))
+			{
+				Short = "_:bn" + (this.shortBlankNodeLabels.Count + 1).ToString();
+				this.shortBlankNodeLabels[s] = Short;
+			}
+
+			return Short;
+		}
+
+		/// <summary>
+		/// Gets a short URI label for the given uri node.
+		/// </summary>
+		/// <param name="Node">URI node.</param>
+		/// <returns>Short URI node label.</returns>
+		public string GetShortUri(UriNode Node)
+		{
+			string s = Node.Uri.AbsoluteUri;
+
+			if (this.shortUris is null)
+				this.shortUris = new Dictionary<string, string>();
+
+			if (!this.shortUris.TryGetValue(s, out string Short))
+			{
+				IOntology Ontology = Types.FindBest<IOntology, string>(s);
+				if (Ontology is null)
+					this.shortUris[s] = Short = s;
+				else
+				{
+					Short = Ontology.OntologyPrefix + ":" +
+						s.Substring(Ontology.OntologyNamespace.Length);
+
+					this.shortUris[s] = Short;
+				}
+			}
+
+			return Short;
+		}
 	}
 }

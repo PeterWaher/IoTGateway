@@ -264,7 +264,7 @@ namespace Waher.Things.Semantic.Sources
 			Result.Add(SourceGraphUriNode, Rdf.type, IoTConcentrator.DataSource);
 			Result.Add(SourceGraphUriNode, IoTConcentrator.sourceId, Source.SourceID);
 			Result.Add(SourceGraphUriNode, RdfSchema.label, await Source.GetNameAsync(Language));
-			Result.Add(SourceGraphUriNode, DublinCore.Terms.updated, Source.LastChanged);
+			Result.Add(SourceGraphUriNode, DublinCoreTerms.updated, Source.LastChanged);
 			Result.Add(SourceGraphUriNode, IoTConcentrator.hasChildSources, Source.HasChildren);
 
 			ChunkedList<ISemanticElement> Items = new ChunkedList<ISemanticElement>();
@@ -368,7 +368,7 @@ namespace Waher.Things.Semantic.Sources
 			if (!(Node.Parent is null))
 				Result.Add(NodeGraphUriNode, IoTConcentrator.parentNode, GetNodeUri(Node.Parent));
 
-			Result.Add(NodeGraphUriNode, DublinCore.Terms.updated, Node.LastChanged);
+			Result.Add(NodeGraphUriNode, DublinCoreTerms.updated, Node.LastChanged);
 			Result.Add(NodeGraphUriNode, IoTConcentrator.hasChildSources, Node.HasChildren);
 			Result.Add(NodeGraphUriNode, IoTConcentrator.hasCommands, Node.HasCommands);
 			Result.Add(NodeGraphUriNode, IoTConcentrator.isControllable, Node.IsControllable);

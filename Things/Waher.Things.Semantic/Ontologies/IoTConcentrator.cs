@@ -1,12 +1,41 @@
 ﻿using System;
+using Waher.Content.Semantic;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Things.Semantic.Ontologies
 {
 	/// <summary>
 	/// IoT Concentrator Ontology
 	/// </summary>
-	public static class IoTConcentrator
+	public class IoTConcentrator : IOntology
 	{
+		/// <summary>
+		/// IoT Concentrator Ontology
+		/// </summary>
+		public IoTConcentrator()
+		{
+		}
+
+		/// <summary>
+		/// Ontology namespace.
+		/// </summary>
+		public string OntologyNamespace => Namespace;
+
+		/// <summary>
+		/// Well-known ontology prefix.
+		/// </summary>
+		public string OntologyPrefix => "conc";
+
+		/// <summary>
+		/// If the interface understands objects such as <paramref name="Uri"/>.
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <returns>How well objects of this type are supported.</returns>
+		public Grade Supports(string Uri)
+		{
+			return Uri.StartsWith(Namespace) ? Grade.Ok : Grade.NotAtAll;
+		}
+
 		/// <summary>
 		/// urn:nf:iot:concentrator:1.0:
 		/// </summary>

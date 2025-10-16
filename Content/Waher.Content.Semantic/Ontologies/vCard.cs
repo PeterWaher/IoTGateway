@@ -3,14 +3,14 @@
 namespace Waher.Content.Semantic.Ontologies
 {
 	/// <summary>
-	/// XML Schema Datatypes
+	/// vCard Ontology
 	/// </summary>
-	public class XmlSchema : IOntology
+	public class vCard : IOntology
 	{
 		/// <summary>
-		/// XML Schema Datatypes
+		/// vCard Ontology
 		/// </summary>
-		public XmlSchema()
+		public vCard()
 		{
 		}
 
@@ -22,7 +22,7 @@ namespace Waher.Content.Semantic.Ontologies
 		/// <summary>
 		/// Well-known ontology prefix.
 		/// </summary>
-		public string OntologyPrefix => "xsd";
+		public string OntologyPrefix => "vcard";
 
 		/// <summary>
 		/// If the interface understands objects such as <paramref name="Uri"/>.
@@ -35,8 +35,8 @@ namespace Waher.Content.Semantic.Ontologies
 		}
 
 		/// <summary>
-		/// http://www.w3.org/2001/XMLSchema#
+		/// http://www.w3.org/2006/vcard/ns#
 		/// </summary>
-		public const string Namespace = "http://www.w3.org/2001/XMLSchema#";
+		public const string Namespace = "http://www.w3.org/2006/vcard/ns#";
 	}
 }

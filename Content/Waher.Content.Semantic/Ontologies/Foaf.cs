@@ -3,14 +3,14 @@
 namespace Waher.Content.Semantic.Ontologies
 {
 	/// <summary>
-	/// XML Schema Datatypes
+	/// FOAF (Friend of a Friend)
 	/// </summary>
-	public class XmlSchema : IOntology
+	public class Foaf : IOntology
 	{
 		/// <summary>
-		/// XML Schema Datatypes
+		/// FOAF (Friend of a Friend)
 		/// </summary>
-		public XmlSchema()
+		public Foaf()
 		{
 		}
 
@@ -22,7 +22,7 @@ namespace Waher.Content.Semantic.Ontologies
 		/// <summary>
 		/// Well-known ontology prefix.
 		/// </summary>
-		public string OntologyPrefix => "xsd";
+		public string OntologyPrefix => "foaf";
 
 		/// <summary>
 		/// If the interface understands objects such as <paramref name="Uri"/>.
@@ -35,8 +35,8 @@ namespace Waher.Content.Semantic.Ontologies
 		}
 
 		/// <summary>
-		/// http://www.w3.org/2001/XMLSchema#
+		/// http://xmlns.com/foaf/0.1/
 		/// </summary>
-		public const string Namespace = "http://www.w3.org/2001/XMLSchema#";
+		public const string Namespace = "http://xmlns.com/foaf/0.1/";
 	}
 }

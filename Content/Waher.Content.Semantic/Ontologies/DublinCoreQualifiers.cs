@@ -1,16 +1,17 @@
-﻿using Waher.Runtime.Inventory;
+﻿using System;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic.Ontologies
 {
 	/// <summary>
-	/// XML Schema Datatypes
+	/// Dublin Core Qualifiers Ontology
 	/// </summary>
-	public class XmlSchema : IOntology
+	public class DublinCoreQualifiers : IOntology
 	{
 		/// <summary>
-		/// XML Schema Datatypes
+		/// Dublin Core Qualifiers Ontology
 		/// </summary>
-		public XmlSchema()
+		public DublinCoreQualifiers()
 		{
 		}
 
@@ -22,7 +23,7 @@ namespace Waher.Content.Semantic.Ontologies
 		/// <summary>
 		/// Well-known ontology prefix.
 		/// </summary>
-		public string OntologyPrefix => "xsd";
+		public string OntologyPrefix => "dcq";
 
 		/// <summary>
 		/// If the interface understands objects such as <paramref name="Uri"/>.
@@ -35,8 +36,8 @@ namespace Waher.Content.Semantic.Ontologies
 		}
 
 		/// <summary>
-		/// http://www.w3.org/2001/XMLSchema#
+		/// http://purl.org/metadata/dublin_core_qualifiers#
 		/// </summary>
-		public const string Namespace = "http://www.w3.org/2001/XMLSchema#";
+		public const string Namespace = "http://purl.org/metadata/dublin_core_qualifiers#";
 	}
 }

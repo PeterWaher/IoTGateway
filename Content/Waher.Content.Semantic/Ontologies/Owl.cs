@@ -3,14 +3,14 @@
 namespace Waher.Content.Semantic.Ontologies
 {
 	/// <summary>
-	/// XML Schema Datatypes
+	/// OWL (Web Ontology Language)
 	/// </summary>
-	public class XmlSchema : IOntology
+	public class Owl : IOntology
 	{
 		/// <summary>
-		/// XML Schema Datatypes
+		/// OWL (Web Ontology Language)
 		/// </summary>
-		public XmlSchema()
+		public Owl()
 		{
 		}
 
@@ -22,7 +22,7 @@ namespace Waher.Content.Semantic.Ontologies
 		/// <summary>
 		/// Well-known ontology prefix.
 		/// </summary>
-		public string OntologyPrefix => "xsd";
+		public string OntologyPrefix => "owl";
 
 		/// <summary>
 		/// If the interface understands objects such as <paramref name="Uri"/>.
@@ -35,8 +35,8 @@ namespace Waher.Content.Semantic.Ontologies
 		}
 
 		/// <summary>
-		/// http://www.w3.org/2001/XMLSchema#
+		/// http://www.w3.org/2002/07/owl#
 		/// </summary>
-		public const string Namespace = "http://www.w3.org/2001/XMLSchema#";
+		public const string Namespace = "http://www.w3.org/2002/07/owl#";
 	}
 }

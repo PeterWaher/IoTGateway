@@ -7,7 +7,7 @@ namespace Waher.Content.Semantic.Ontologies
 	/// SKOS Simple Knowledge Organization System Ontology
 	/// https://www.w3.org/TR/skos-reference/
 	/// </summary>
-	public class Skos
+	public class Skos : IOntology
 	{
 		/// <summary>
 		/// SKOS Simple Knowledge Organization System Ontology
@@ -22,13 +22,18 @@ namespace Waher.Content.Semantic.Ontologies
 		public string OntologyNamespace => Namespace;
 
 		/// <summary>
+		/// Well-known ontology prefix.
+		/// </summary>
+		public string OntologyPrefix => "skos";
+
+		/// <summary>
 		/// If the interface understands objects such as <paramref name="Uri"/>.
 		/// </summary>
 		/// <param name="Uri">URI</param>
 		/// <returns>How well objects of this type are supported.</returns>
-		public Grade Supports(Uri Uri)
+		public Grade Supports(string Uri)
 		{
-			return Uri.AbsolutePath.StartsWith(Namespace) ? Grade.Ok : Grade.NotAtAll;
+			return Uri.StartsWith(Namespace) ? Grade.Ok : Grade.NotAtAll;
 		}
 
 		/// <summary>

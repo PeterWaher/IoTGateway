@@ -3,14 +3,14 @@
 namespace Waher.Content.Semantic.Ontologies
 {
 	/// <summary>
-	/// XML Schema Datatypes
+	/// Dublin Core Elements 1.1
 	/// </summary>
-	public class XmlSchema : IOntology
+	public class DublinCoreElements1_1 : IOntology
 	{
 		/// <summary>
-		/// XML Schema Datatypes
+		/// Dublin Core Elements 1.1
 		/// </summary>
-		public XmlSchema()
+		public DublinCoreElements1_1()
 		{
 		}
 
@@ -22,7 +22,7 @@ namespace Waher.Content.Semantic.Ontologies
 		/// <summary>
 		/// Well-known ontology prefix.
 		/// </summary>
-		public string OntologyPrefix => "xsd";
+		public string OntologyPrefix => "dce11";
 
 		/// <summary>
 		/// If the interface understands objects such as <paramref name="Uri"/>.
@@ -35,8 +35,8 @@ namespace Waher.Content.Semantic.Ontologies
 		}
 
 		/// <summary>
-		/// http://www.w3.org/2001/XMLSchema#
+		/// http://purl.org/dc/elements/1.1/
 		/// </summary>
-		public const string Namespace = "http://www.w3.org/2001/XMLSchema#";
+		public const string Namespace = "http://purl.org/dc/elements/1.1/";
 	}
 }

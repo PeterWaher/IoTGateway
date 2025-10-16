@@ -5,12 +5,12 @@ namespace Waher.Content.Semantic.Ontologies
 	/// <summary>
 	/// XML Schema Datatypes
 	/// </summary>
-	public class XmlSchema : IOntology
+	public class Xsd : IOntology
 	{
 		/// <summary>
 		/// XML Schema Datatypes
 		/// </summary>
-		public XmlSchema()
+		public Xsd()
 		{
 		}
 

@@ -17,9 +17,9 @@
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Security Internal Call Stack Access</PackageTags>
-    <AssemblyVersion>1.3.0</AssemblyVersion>
-    <FileVersion>1.3.0</FileVersion>
-    <Version>1.3.0</Version>
+    <AssemblyVersion>1.3.1</AssemblyVersion>
+    <FileVersion>1.3.1</FileVersion>
+    <Version>1.3.1</Version>
     <PackageIcon>Icon_64x64.png</PackageIcon>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>

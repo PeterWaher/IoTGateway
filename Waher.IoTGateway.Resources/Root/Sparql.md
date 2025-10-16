@@ -25,7 +25,24 @@ The query editor accepts `TAB` characters.
 <form id="QueryForm" action="/sparql" method="post" enctype="application/x-www-form-urlencoded">
 
 Query:  
-<textarea id="query" name="query" autofocus="autofocus" wrap="hard" onkeydown="return QueryKeyDown(this,event);">{{query}}</textarea>
+<textarea id="query" name="query" autofocus="autofocus" wrap="hard" onkeydown="return QueryKeyDown(this,event);">{{
+if empty(query) then
+(
+	Ontologies:=[foreach T in Waher.Runtime.Inventory.Types.GetTypesImplementingInterface(IOntology):Create(T)];
+	Ontologies:=Sort(Ontologies,(o1,o2)->o1.OntologyPrefix.CompareTo(o2.OntologyPrefix));
+	Prefixes:=Ontologies.OntologyPrefix;
+	MaxLen:=max(len(Prefixes));
+	MaxLen+=2;
+	Spaces:=Create(System.String,' ',MaxLen);
+	foreach Ontology in Ontologies do 
+		]]PREFIX ((Ontology.OntologyPrefix)):((left(Spaces,MaxLen-Len(Ontology.OntologyPrefix) ) ))<((Ontology.OntologyNamespace))>
+[[;
+	]]
+SELECT [[
+)
+else
+	]]((query))[[
+}}</textarea>
 
 Default Graph\(s): (Will be loaded before executing script. Can be omitted if specified in the query.)  
 <input type="text" id="defaultGraph1" name="default-graph-uri"/>
@@ -41,6 +58,7 @@ Return results as:
 <option value="Tsv">TSV</option>
 <option value="Html">HTML</option>
 <option value="Text">Text</option>
+{{if exists(TAG.Content.Microsoft.ExcelUtilities) then ]]<option value="Excel">Excel</option>[[}}
 </select>
 
 <button type="button" onclick="ExecuteQuery()">Execute</button>

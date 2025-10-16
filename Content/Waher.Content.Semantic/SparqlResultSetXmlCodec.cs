@@ -155,11 +155,11 @@ namespace Waher.Content.Semantic
 			using (XmlWriter w = XmlWriter.Create(sb, Settings))
 			{
 				if (Object is SparqlResultSet Result2)
-					this.EncodeAsync(Result2, w);
+					this.Encode(Result2, w);
 				else if (Object is ObjectMatrix M)
-					this.EncodeAsync(M, w);
+					this.Encode(M, w);
 				else if (Object is bool b)
-					this.EncodeAsync(b, w);
+					this.Encode(b, w);
 				else
 					return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object))));
 
@@ -174,7 +174,7 @@ namespace Waher.Content.Semantic
 			}
 		}
 
-		private void EncodeAsync(SparqlResultSet Result, XmlWriter w)
+		private void Encode(SparqlResultSet Result, XmlWriter w)
 		{
 			w.WriteStartElement(SparqlResultSet.LocalName, SparqlResultSet.Namespace);
 
@@ -234,7 +234,7 @@ namespace Waher.Content.Semantic
 			w.WriteEndElement();
 		}
 
-		private void EncodeAsync(ObjectMatrix Result, XmlWriter w)
+		private void Encode(ObjectMatrix Result, XmlWriter w)
 		{
 			w.WriteStartElement(SparqlResultSet.LocalName, SparqlResultSet.Namespace);
 
@@ -278,7 +278,7 @@ namespace Waher.Content.Semantic
 			w.WriteEndElement();
 		}
 
-		private void EncodeAsync(bool Result, XmlWriter w)
+		private void Encode(bool Result, XmlWriter w)
 		{
 			w.WriteStartElement(SparqlResultSet.LocalName, SparqlResultSet.Namespace);
 			w.WriteElementString("head", string.Empty);

@@ -139,13 +139,13 @@ namespace Waher.Content.Semantic
 
 			if (Object is SparqlResultSet Result)
 			{
-				ResultObj = this.EncodeAsync(Result);
+				ResultObj = this.Encode(Result);
 				Pretty = Result.Pretty;
 			}
 			else if (Object is ObjectMatrix M)
-				ResultObj = this.EncodeAsync(M);
+				ResultObj = this.Encode(M);
 			else if (Object is bool b)
-				ResultObj = this.EncodeAsync(b);
+				ResultObj = this.Encode(b);
 			else
 				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object))));
 
@@ -156,7 +156,7 @@ namespace Waher.Content.Semantic
 			return Task.FromResult(new ContentResponse(ContentType, Object, Bin));
 		}
 
-		private Dictionary<string, object> EncodeAsync(SparqlResultSet Result)
+		private Dictionary<string, object> Encode(SparqlResultSet Result)
 		{
 			Dictionary<string, object> Head = new Dictionary<string, object>();
 			Dictionary<string, object> ResultObj = new Dictionary<string, object>()
@@ -205,7 +205,7 @@ namespace Waher.Content.Semantic
 			return ResultObj;
 		}
 
-		private Dictionary<string, object> EncodeAsync(ObjectMatrix Result)
+		private Dictionary<string, object> Encode(ObjectMatrix Result)
 		{
 			Dictionary<string, object> Head = new Dictionary<string, object>();
 			Dictionary<string, object> ResultObj = new Dictionary<string, object>()
@@ -240,7 +240,7 @@ namespace Waher.Content.Semantic
 			return ResultObj;
 		}
 
-		private Dictionary<string, object> EncodeAsync(bool Result)
+		private Dictionary<string, object> Encode(bool Result)
 		{
 			Dictionary<string, object> Head = new Dictionary<string, object>();
 			Dictionary<string, object> ResultObj = new Dictionary<string, object>()

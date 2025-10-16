@@ -16,5 +16,10 @@ namespace Waher.Content.Semantic
 		/// Well-known ontology prefix.
 		/// </summary>
 		string OntologyPrefix { get; }
+		
+		/// <summary>
+		/// If the ontology should be shown by default in query interfaces.
+		/// </summary>
+		bool ShowByDefault { get; }
 	}
 }

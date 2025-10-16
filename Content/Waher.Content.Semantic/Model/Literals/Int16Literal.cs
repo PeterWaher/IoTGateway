@@ -39,7 +39,7 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <summary>
 		/// http://www.w3.org/2001/XMLSchema#short
 		/// </summary>
-		public const string TypeUri = XmlSchema.Namespace + "short";
+		public static readonly string TypeUri = XmlSchema.@short.OriginalString;
 
 		/// <summary>
 		/// Type name

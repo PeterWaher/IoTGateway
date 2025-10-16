@@ -40,7 +40,7 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <summary>
 		/// http://www.w3.org/2001/XMLSchema#date
 		/// </summary>
-		public const string TypeUri = XmlSchema.Namespace + "date";
+		public static readonly string TypeUri = XmlSchema.date.OriginalString;
 		
 		/// <summary>
 		/// Type name

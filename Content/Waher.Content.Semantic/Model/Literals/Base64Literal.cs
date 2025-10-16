@@ -39,7 +39,7 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <summary>
 		/// http://www.w3.org/2001/XMLSchema#base64Binary
 		/// </summary>
-		public const string TypeUri = XmlSchema.Namespace + "base64Binary";
+		public static readonly string TypeUri = XmlSchema.base64Binary.OriginalString;
 
 		/// <summary>
 		/// Type name

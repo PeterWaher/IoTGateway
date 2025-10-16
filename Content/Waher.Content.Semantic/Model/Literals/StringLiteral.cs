@@ -45,7 +45,7 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <summary>
 		/// http://www.w3.org/2001/XMLSchema#string
 		/// </summary>
-		public const string TypeUri = XmlSchema.Namespace + "string";
+		public static readonly string TypeUri = XmlSchema.@string.OriginalString;
 
 		/// <summary>
 		/// Type name

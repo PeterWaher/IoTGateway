@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Text;
 using System.Xml;
+using Waher.Content.Semantic.Ontologies;
 using Waher.Content.Xml;
 using Waher.Runtime.Inventory;
 
@@ -64,7 +65,7 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <summary>
 		/// http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral
 		/// </summary>
-		public const string TypeUri = "http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral";
+		public static readonly string TypeUri = Rdf.XMLLiteral.OriginalString;
 
 		/// <summary>
 		/// Type name

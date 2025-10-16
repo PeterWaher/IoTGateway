@@ -39,7 +39,7 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <summary>
 		/// http://www.w3.org/2001/XMLSchema#unsignedLong
 		/// </summary>
-		public const string TypeUri = XmlSchema.Namespace + "unsignedLong";
+		public static readonly string TypeUri = XmlSchema.unsignedLong.OriginalString;
 
 		/// <summary>
 		/// Type name

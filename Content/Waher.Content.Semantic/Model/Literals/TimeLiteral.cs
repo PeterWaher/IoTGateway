@@ -39,7 +39,7 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <summary>
 		/// http://www.w3.org/2001/XMLSchema#time
 		/// </summary>
-		public const string TypeUri = XmlSchema.Namespace + "time";
+		public static readonly string TypeUri = XmlSchema.time.OriginalString;
 
 		/// <summary>
 		/// Type name

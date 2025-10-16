@@ -26,6 +26,11 @@ namespace Waher.Content.Semantic.Ontologies
 		public string OntologyPrefix => "rdf";
 
 		/// <summary>
+		/// If the ontology should be shown by default in query interfaces.
+		/// </summary>
+		public bool ShowByDefault => true;
+
+		/// <summary>
 		/// If the interface understands objects such as <paramref name="Uri"/>.
 		/// </summary>
 		/// <param name="Uri">URI</param>
@@ -105,6 +110,11 @@ namespace Waher.Content.Semantic.Ontologies
 		/// URI representing rdf:li
 		/// </summary>
 		public static readonly Uri li = new Uri(Namespace + "li");
+
+		/// <summary>
+		/// URI representing rdf:XMLLiteral
+		/// </summary>
+		public static readonly Uri XMLLiteral = new Uri(Namespace + "XMLLiteral");
 
 		/// <summary>
 		/// URI representing an item in a list.

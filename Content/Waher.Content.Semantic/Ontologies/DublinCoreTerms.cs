@@ -26,6 +26,11 @@ namespace Waher.Content.Semantic.Ontologies
 		public string OntologyPrefix => "dcterms";
 
 		/// <summary>
+		/// If the ontology should be shown by default in query interfaces.
+		/// </summary>
+		public bool ShowByDefault => true;
+
+		/// <summary>
 		/// If the interface understands objects such as <paramref name="Uri"/>.
 		/// </summary>
 		/// <param name="Uri">URI</param>

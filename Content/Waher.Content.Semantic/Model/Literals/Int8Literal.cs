@@ -39,7 +39,7 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <summary>
 		/// http://www.w3.org/2001/XMLSchema#byte
 		/// </summary>
-		public const string TypeUri = XmlSchema.Namespace + "byte";
+		public static readonly string TypeUri = XmlSchema.@byte.OriginalString;
 
 		/// <summary>
 		/// Type name

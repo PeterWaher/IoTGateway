@@ -62,29 +62,40 @@ function ExecuteQuery()
 {
 	var xhttp = new XMLHttpRequest();
 	var IsHtml = false;
+	var Binary = false;
 
 	xhttp.onreadystatechange = function ()
 	{
 		if (xhttp.readyState == 4)
 		{
-			var Result = document.getElementById("Result");
+			if (Binary)
+			{
+				var Blob = xhttp.response;
+				var Url = window.URL.createObjectURL(Blob);
 
-			if (IsHtml)
-				Result.innerHTML = "<legend>Result</legend>" + xhttp.responseText;
+				window.open(Url);
+			}
 			else
 			{
-				Result.innerHTML = "<legend>Result</legend>";
+				var Result = document.getElementById("Result");
 
-				var Pre = document.createElement("PRE");
-				Result.appendChild(Pre);
+				if (IsHtml)
+					Result.innerHTML = "<legend>Result</legend>" + xhttp.responseText;
+				else
+				{
+					Result.innerHTML = "<legend>Result</legend>";
 
-				var Code = document.createElement("CODE");
-				Pre.appendChild(Code);
+					var Pre = document.createElement("PRE");
+					Result.appendChild(Pre);
 
-				Code.innerText = xhttp.responseText;
+					var Code = document.createElement("CODE");
+					Pre.appendChild(Code);
+
+					Code.innerText = xhttp.responseText;
+				}
+
+				Result.setAttribute("style", "display:block");
 			}
-
-			Result.setAttribute("style", "display:block");
 
 			delete xhttp;
 		}
@@ -136,6 +147,12 @@ function ExecuteQuery()
 
 		case "Text":
 			xhttp.setRequestHeader("Accept", "text/turtle, text/csv;q=0.9, text/tab-separated-values;q=0.9, text/plain;q=0.2, text/*;q=0.1");
+			break;
+
+		case "Excel":
+			Binary = true;
+			xhttp.setRequestHeader("Accept", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+			xhttp.responseType = "blob";
 			break;
 	}
 

@@ -34,7 +34,7 @@ if empty(query) then
 	MaxLen:=max(len(Prefixes));
 	MaxLen+=2;
 	Spaces:=Create(System.String,' ',MaxLen);
-	foreach Ontology in Ontologies do 
+	foreach Ontology in Ontologies do if Ontology.ShowByDefault then
 		]]PREFIX ((Ontology.OntologyPrefix)):((left(Spaces,MaxLen-Len(Ontology.OntologyPrefix) ) ))<((Ontology.OntologyNamespace))>
 [[;
 	]]
@@ -58,7 +58,7 @@ Return results as:
 <option value="Tsv">TSV</option>
 <option value="Html">HTML</option>
 <option value="Text">Text</option>
-{{if exists(TAG.Content.Microsoft.ExcelUtilities) then ]]<option value="Excel">Excel</option>[[}}
+{{if exists(TAG.Content.Microsoft.Content.ExcelCodec) then ]]<option value="Excel">Excel</option>[[}}
 </select>
 
 <button type="button" onclick="ExecuteQuery()">Execute</button>

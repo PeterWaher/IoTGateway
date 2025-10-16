@@ -58,7 +58,7 @@ Return results as:
 <option value="Tsv">TSV</option>
 <option value="Html">HTML</option>
 <option value="Text">Text</option>
-{{if exists(TAG.Content.Microsoft.Content.ExcelCodec) then ]]<option value="Excel">Excel</option>[[}}
+{{if exists(TAG.Content.Microsoft.Content.SparqlResultSetExcelEncoder) then ]]<option value="Excel">Excel</option>[[}}
 </select>
 
 <button type="button" onclick="ExecuteQuery()">Execute</button>

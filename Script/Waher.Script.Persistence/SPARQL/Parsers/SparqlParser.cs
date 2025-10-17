@@ -381,7 +381,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			{
 				Parser.NextToken();
 
-				ValuesPattern Values = this.ParseValues(Parser);
+				ValuesPattern Values = this.ParseValues(Parser, out ChunkedList<SemanticQueryTriple> AdditionalTriples);
+				if (!(AdditionalTriples is null))
+					throw Parser.SyntaxError("Blank Nodes not supported in a VALUES statement.");
 
 				if (Where is null)
 					Where = Values;
@@ -683,7 +685,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					}
 				}
 
-				Object = this.ParseElement(Parser, TriplePosition);
+				Object = this.ParseElement(Parser, TriplePosition,
+					out ChunkedList<SemanticQueryTriple> AdditionalTriples);
+
 				if (Object is null)
 				{
 					if (Subject is null)
@@ -703,11 +707,17 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				{
 					Subject = Object;
 					TriplePosition++;
+
+					if (!(AdditionalTriples is null))
+						this.AddTriples(AdditionalTriples);
 				}
 				else if (Predicate is null)
 				{
 					Predicate = Object;
 					TriplePosition++;
+
+					if (!(AdditionalTriples is null))
+						this.AddTriples(AdditionalTriples);
 				}
 				else
 				{
@@ -718,6 +728,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					}
 
 					this.currentRegularPattern.AddTriple(new SemanticQueryTriple(Subject, Predicate, Object));
+
+					if (!(AdditionalTriples is null))
+						this.AddTriples(AdditionalTriples);
 
 					switch (Parser.NextNonWhitespaceChar())
 					{
@@ -857,6 +870,18 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			}
 		}
 
+		private void AddTriples(ChunkedList<SemanticQueryTriple> AdditionalTriples)
+		{
+			if (this.currentRegularPattern is null)
+			{
+				this.currentRegularPattern = new SparqlRegularPattern();
+				this.currentPattern = new IntersectionPattern(this.currentPattern, this.currentRegularPattern);
+			}
+
+			foreach (SemanticQueryTriple Triple in AdditionalTriples)
+				this.currentRegularPattern.AddTriple(Triple);
+		}
+
 		private bool ParsePatternOperator(ScriptParser Parser)
 		{
 			switch (Parser.PeekNextToken().ToUpper())
@@ -894,7 +919,11 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				case "VALUES":
 					Parser.NextToken();
 
-					ValuesPattern Values = this.ParseValues(Parser);
+					ValuesPattern Values = this.ParseValues(Parser,
+						out ChunkedList<SemanticQueryTriple> AdditionalTriples);
+
+					if (!(AdditionalTriples is null))
+						throw Parser.SyntaxError("Blank Nodes not supported in a VALUES statement.");
 
 					this.currentRegularPattern = null;
 
@@ -951,8 +980,11 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			}
 		}
 
-		private ValuesPattern ParseValues(ScriptParser Parser)
+		private ValuesPattern ParseValues(ScriptParser Parser,
+			out ChunkedList<SemanticQueryTriple> AdditionalTriples)
 		{
+			AdditionalTriples = null;
+
 			Parser.SkipWhiteSpace();
 			switch (Parser.PeekNextChar())
 			{
@@ -980,7 +1012,17 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 								return new ValuesPattern(s, Values.ToArray());
 
 							default:
-								ISemanticElement Element = this.ParseElement(Parser, 2);
+								ISemanticElement Element = this.ParseElement(Parser, 2,
+									out ChunkedList<SemanticQueryTriple> AdditionalTriples2);
+
+								if (!(AdditionalTriples2 is null))
+								{
+									if (AdditionalTriples is null)
+										AdditionalTriples = new ChunkedList<SemanticQueryTriple>();
+
+									AdditionalTriples.AddRange(AdditionalTriples2);
+								}
+
 								if (Element is UndefinedLiteral)
 									Values.Add(null);
 								else
@@ -1030,7 +1072,16 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 								for (i = 0; i < c; i++)
 								{
-									ISemanticElement Element = this.ParseElement(Parser, 2);
+									ISemanticElement Element = this.ParseElement(Parser, 2,
+										out ChunkedList<SemanticQueryTriple> AdditionalTriples2);
+
+									if (!(AdditionalTriples2 is null))
+									{
+										if (AdditionalTriples is null)
+											AdditionalTriples = new ChunkedList<SemanticQueryTriple>();
+
+										AdditionalTriples.AddRange(AdditionalTriples2);
+									}
 
 									if (Element is UndefinedLiteral)
 										Values.Add(null);
@@ -1301,7 +1352,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						case '9':
 						case '.':
 							Parser.UndoChar();
-							ISemanticElement Element2 = this.ParseElement(Parser, 2);
+							ISemanticElement Element2 = this.ParseElement(Parser, 2, out _);
+							
 							return new ConstantElement(Element2, Start, Parser.Position - Start, Parser.Expression);
 
 						default:
@@ -1335,7 +1387,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				case '8':
 				case '9':
 				case '.':
-					ISemanticElement Element = this.ParseElement(Parser, 2);
+					ISemanticElement Element = this.ParseElement(Parser, 2, out _);
+
 					return new ConstantElement(Element, Start, Parser.Position - Start, Parser.Expression);
 
 				case '<':
@@ -1919,8 +1972,11 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			return Arguments.ToArray();
 		}
 
-		private ISemanticElement ParseElement(ScriptParser Parser, int TriplePosition)
+		private ISemanticElement ParseElement(ScriptParser Parser, int TriplePosition,
+			out ChunkedList<SemanticQueryTriple> AdditionalTriples)
 		{
+			AdditionalTriples = null;
+
 			while (true)
 			{
 				char ch = Parser.NextNonWhitespaceChar();
@@ -1931,15 +1987,40 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						return null;
 
 					case '[':
-						if (TriplePosition == 1)
-							throw Parser.SyntaxError("Predicate cannot be a blank node.");
+						switch (TriplePosition)
+						{
+							case 0:
+								BlankNode Node = this.CreateBlankNode();
+								this.ParseTriples(Parser, Node);
+								return Node;
 
-						BlankNode Node = this.CreateBlankNode();
-						this.ParseTriples(Parser, Node);
-						return Node;
+							case 1:
+								throw Parser.SyntaxError("Predicate cannot be a blank node.");
+
+							case 2:
+								Node = this.CreateBlankNode();
+
+								SparqlRegularPattern Bak = this.currentRegularPattern;
+								ISparqlPattern Bak2 = this.currentPattern;
+
+								this.currentRegularPattern = new SparqlRegularPattern();
+								this.currentPattern = this.currentRegularPattern;
+
+								this.ParseTriples(Parser, Node);
+
+								AdditionalTriples = this.currentRegularPattern.Triples;
+
+								this.currentRegularPattern = Bak;
+								this.currentPattern = Bak2;
+
+								return Node;
+
+							default:
+								throw Parser.SyntaxError("Unrecognized triple position.");
+						}
 
 					case '(':
-						return this.ParseCollection(Parser);
+						return this.ParseCollection(Parser, out AdditionalTriples);
 
 					case ']':
 						return null;
@@ -2076,9 +2157,11 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			return new BlankNode("n" + (++this.blankNodeIndex).ToString());
 		}
 
-		private ISemanticElement ParseCollection(ScriptParser Parser)
+		private ISemanticElement ParseCollection(ScriptParser Parser,
+			out ChunkedList<SemanticQueryTriple> AdditionalTriples)
 		{
 			ChunkedList<ISemanticElement> Elements = null;
+			AdditionalTriples = null;
 
 			Parser.SkipWhiteSpace();
 
@@ -2124,7 +2207,17 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					return Result;
 				}
 
-				ISemanticElement Element = this.ParseElement(Parser, 2);
+				ISemanticElement Element = this.ParseElement(Parser, 2,
+					out ChunkedList<SemanticQueryTriple> AdditionalTriples2);
+
+				if (!(AdditionalTriples2 is null))
+				{
+					if (AdditionalTriples is null)
+						AdditionalTriples = new ChunkedList<SemanticQueryTriple>();
+
+					AdditionalTriples.AddRange(AdditionalTriples2);
+				}
+
 				if (Element is null)
 					break;
 

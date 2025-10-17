@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Semantic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;

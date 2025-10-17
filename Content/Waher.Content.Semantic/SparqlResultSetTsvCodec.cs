@@ -92,7 +92,7 @@ namespace Waher.Content.Semantic
 				}
 				else
 				{
-					IMatrix M = Result.ToMatrix();
+					IMatrix M = Result.ToMatrix(false);
 
 					if (M is ObjectMatrix OM && !(OM.ColumnNames is null))
 					{

@@ -91,7 +91,7 @@ namespace Waher.Content.Semantic
 					Text = CSV.Encode(Records);
 				}
 				else
-					Text = CSV.Encode(Result.ToMatrix());
+					Text = CSV.Encode(Result.ToMatrix(false));
 			}
 			else if (Object is ObjectMatrix M)
 				Text = CSV.Encode(M, ElementToString);

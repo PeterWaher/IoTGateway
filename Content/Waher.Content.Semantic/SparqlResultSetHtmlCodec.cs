@@ -87,7 +87,7 @@ namespace Waher.Content.Semantic
 				{
 					using (HtmlRenderer Renderer = new HtmlRenderer(new HtmlSettings()))
 					{
-						await Renderer.RenderObject(Result.ToMatrix(), true, new Script.Variables());
+						await Renderer.RenderObject(Result.ToMatrix(true), true, new Script.Variables());
 						Html = Renderer.ToString();
 					}
 				}

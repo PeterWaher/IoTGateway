@@ -560,6 +560,16 @@ namespace Waher.Content.Semantic
 		/// <returns>Matrix.</returns>
 		public IMatrix ToMatrix()
 		{
+			return this.ToMatrix(true);
+		}
+
+		/// <summary>
+		/// Converts the object to a matrix.
+		/// </summary>
+		/// <param name="ShortLinks">If short links should be used, where possible.</param>
+		/// <returns>Matrix.</returns>
+		public IMatrix ToMatrix(bool ShortLinks)
+		{
 			if (this.BooleanResult.HasValue)
 				return new BooleanMatrix(new bool[1, 1] { { this.BooleanResult.Value } });
 
@@ -573,7 +583,19 @@ namespace Waher.Content.Semantic
 				ISparqlResultRecord Record = this.Records[y];
 
 				for (x = 0; x < Columns; x++)
-					Elements[y, x] = (IElement)Record[this.Variables[x]] ?? ObjectValue.Null;
+				{
+					IElement Element = (IElement)Record[this.Variables[x]] ?? ObjectValue.Null;
+
+					if (ShortLinks)
+					{
+						if (Element is BlankNode BlankNode)
+							Element = new StringValue(this.GetShortBlankNodeLabel(BlankNode));
+						else if (Element is UriNode UriNode)
+							Element = new StringValue(this.GetShortUri(UriNode));
+					}
+
+					Elements[y, x] = Element;
+				}
 			}
 
 			return new ObjectMatrix(Elements)
@@ -588,7 +610,7 @@ namespace Waher.Content.Semantic
 		/// <returns>Matrix.</returns>
 		public IElement ToVector()
 		{
-			return new ObjectVector(((ObjectMatrix)this.ToMatrix()).VectorElements);
+			return new ObjectVector(((ObjectMatrix)this.ToMatrix(true)).VectorElements);
 		}
 
 		/// <summary>

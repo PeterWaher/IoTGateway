@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Waher.Content.Semantic;
+using Waher.Content.Semantic.Model;
 using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SPARQL
@@ -86,6 +87,12 @@ namespace Waher.Script.Persistence.SPARQL
 				this.SubjectVariable = VarRef.VariableName;
 				i = 1;
 			}
+			else if (Subject is BlankNode Node)  // §4.1.4: Blank nodes in graph patterns act as variables
+			{
+				this.SubjectIsVariable = true;
+				this.SubjectVariable = Node.ToString();
+				i = 1;
+			}
 			else
 			{
 				this.SubjectIsVariable = false;
@@ -99,6 +106,12 @@ namespace Waher.Script.Persistence.SPARQL
 				this.PredicateVariable = VarRef2.VariableName;
 				i += 2;
 			}
+			else if (Predicate is BlankNode Node)  // §4.1.4: Blank nodes in graph patterns act as variables
+			{
+				this.PredicateIsVariable = true;
+				this.PredicateVariable = Node.ToString();
+				i = 1;
+			}
 			else
 			{
 				this.PredicateIsVariable = false;
@@ -111,6 +124,12 @@ namespace Waher.Script.Persistence.SPARQL
 				this.ObjectIsVariable = true;
 				this.ObjectVariable = VarRef3.VariableName;
 				i += 4;
+			}
+			else if (Object is BlankNode Node)  // §4.1.4: Blank nodes in graph patterns act as variables
+			{
+				this.ObjectIsVariable = true;
+				this.ObjectVariable = Node.ToString();
+				i = 1;
 			}
 			else
 			{

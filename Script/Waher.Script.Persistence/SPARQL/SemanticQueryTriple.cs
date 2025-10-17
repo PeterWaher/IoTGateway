@@ -110,7 +110,7 @@ namespace Waher.Script.Persistence.SPARQL
 			{
 				this.PredicateIsVariable = true;
 				this.PredicateVariable = Node.ToString();
-				i = 1;
+				i += 2;
 			}
 			else
 			{
@@ -129,7 +129,7 @@ namespace Waher.Script.Persistence.SPARQL
 			{
 				this.ObjectIsVariable = true;
 				this.ObjectVariable = Node.ToString();
-				i = 1;
+				i += 4;
 			}
 			else
 			{

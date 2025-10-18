@@ -162,6 +162,8 @@ namespace Waher.Content.Semantic.Test
 			await Print(Parsed);
 			Console.Out.WriteLine();
 
+			await RdfTests.ExportAsImage(Parsed, "jsonld", FileName);
+
 			if (ParsedExpected is not null)
 			{
 				await TurtleTests.Print(ParsedExpected);

@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
-using Waher.Content.Html.Elements;
 using Waher.Content.Images;
 using Waher.Content.Markdown.Contracts;
 using Waher.Content.Markdown.Latex;
@@ -29,9 +28,19 @@ using Waher.Security;
 
 namespace Waher.Content.Markdown.GraphViz
 {
-	internal enum ResultType
+	/// <summary>
+	/// Image types supported by GraphViz
+	/// </summary>
+	public enum ResultType
 	{
+		/// <summary>
+		/// SVG
+		/// </summary>
 		Svg,
+
+		/// <summary>
+		/// PNG
+		/// </summary>
 		Png
 	}
 

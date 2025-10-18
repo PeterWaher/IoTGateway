@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
+using Waher.Content.Markdown.GraphViz;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 
@@ -14,7 +15,16 @@ namespace Waher.Content.Semantic.Test
 			Types.Initialize(
 				typeof(InternetContent).Assembly,
 				typeof(TurtleDocument).Assembly,
-				typeof(TurtleTests).Assembly);
+				typeof(TurtleTests).Assembly,
+				typeof(GraphVizUtilities).Assembly);
+
+			if (!Directory.Exists("GraphViz"))
+				Directory.CreateDirectory("GraphViz");
+
+			if (!Directory.Exists("GraphOutput"))
+				Directory.CreateDirectory("GraphOutput");
+
+			GraphViz.Init(Directory.GetCurrentDirectory());
 		}
 
 		[DataTestMethod]
@@ -122,12 +132,16 @@ namespace Waher.Content.Semantic.Test
 				Console.Out.Write('\t');
 				Console.Out.WriteLine(T.Object.ToString());
 			}
+
+			await RdfTests.ExportAsImage(Parsed, "turtle", FileName);
 		}
 
 		private static async Task PerformTest(string FileName, string BaseUri)
 		{
 			TurtleDocument Parsed = await LoadTurtleDocument(FileName, new Uri(BaseUri + FileName));
 			await Print(Parsed);
+
+			await RdfTests.ExportAsImage(Parsed, "turtle", FileName);
 		}
 
 		internal static async Task Print(TurtleDocument Parsed)
@@ -160,6 +174,8 @@ namespace Waher.Content.Semantic.Test
 			TurtleDocument ParsedExpected = await LoadTurtleDocument(ExpectedFileName, new Uri(BaseUri + ExpectedFileName));
 
 			await Print(Parsed);
+
+			await RdfTests.ExportAsImage(Parsed, "turtle", FileName);
 
 			CompareTriples(Parsed, ParsedExpected);
 		}

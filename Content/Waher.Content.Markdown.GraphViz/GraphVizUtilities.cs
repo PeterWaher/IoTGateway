@@ -2,6 +2,9 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Semantic;
+using Waher.Content.Semantic.Functions;
+using Waher.Content.Semantic.Model;
+using Waher.Content.Semantic.Model.Literals;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.GraphViz
@@ -119,6 +122,21 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <returns>GraphViz dot graph.</returns>
 		public static string GenerateGraph(ISemanticModel Graph, string Title)
 		{
+			return GenerateGraph(null, Graph, Title);
+		}
+
+		/// <summary>
+		/// Generates a GraphViz dot graph from a semantic graph.
+		/// </summary>
+		/// <param name="ResultSet">SPARQL Result Set for shortening URLs and Blank Nodes</param>
+		/// <param name="Graph">Semantic graph.</param>
+		/// <param name="Title">Title of graph.</param>
+		/// <returns>GraphViz dot graph.</returns>
+		public static string GenerateGraph(SparqlResultSet ResultSet, ISemanticModel Graph, string Title)
+		{
+			if (ResultSet is null)
+				ResultSet = new SparqlResultSet(false); // Object only used for shortening URIs and Blank Nodes.
+
 			StringBuilder sb = new StringBuilder();
 			Dictionary<string, string> NodeNames = new Dictionary<string, string>();
 
@@ -126,32 +144,65 @@ namespace Waher.Content.Markdown.GraphViz
 			sb.AppendLine("\trankdir=LR");
 			sb.AppendLine("\tbgcolor=\"transparent\"");
 			sb.AppendLine("\tnode [style=filled,fillcolor=white]");
-			sb.Append("\tlabel=\"");
-			sb.Append(JSON.Encode(Title).Replace("\\", "\\\\").Replace("\"", "\\\""));
-			sb.AppendLine("\"");
-			sb.AppendLine("\tlabelloc=\"t\"");
-			sb.AppendLine("\tfontsize=20");
+
+			if (!string.IsNullOrEmpty(Title))
+			{
+				sb.Append("\tlabel=\"");
+				sb.Append(JSON.Encode(Title));
+				sb.AppendLine("\"");
+				sb.AppendLine("\tlabelloc=\"t\"");
+				sb.AppendLine("\tfontsize=20");
+			}
 
 			foreach (ISemanticTriple Triple in Graph)
 			{
-				AddName(Triple.Subject.ToString(), NodeNames, sb);
-				AddName(Triple.Object.ToString(), NodeNames, sb);
+				AddName(GetShortName(ResultSet, Triple.Subject), NodeNames, sb);
+				AddName(GetShortName(ResultSet, Triple.Object), NodeNames, sb);
 			}
 
 			foreach (ISemanticTriple Triple in Graph)
 			{
 				sb.Append("\t");
-				sb.Append(NodeNames[Triple.Subject.ToString()]);
+				sb.Append(NodeNames[GetShortName(ResultSet, Triple.Subject)]);
 				sb.Append(" -> ");
-				sb.Append(NodeNames[Triple.Object.ToString()]);
+				sb.Append(NodeNames[GetShortName(ResultSet, Triple.Object)]);
 				sb.Append(" [label=\"");
-				sb.Append(JSON.Encode(Triple.Predicate.ToString()).Replace("\\", "\\\\").Replace("\"", "\\\""));
+				sb.Append(JSON.Encode(GetShortName(ResultSet, Triple.Predicate)));
 				sb.AppendLine("\"]");
 			}
 
 			sb.AppendLine("}");
 
 			return sb.ToString();
+		}
+
+		private static string GetShortName(SparqlResultSet Result, ISemanticElement Element)
+		{
+			if (Element is UriNode UriNode)
+				return Result.GetShortUri(UriNode);
+			else if (Element is BlankNode BlankNode)
+				return Result.GetShortBlankNodeLabel(BlankNode);
+			else if (Element is SemanticLiteral SemanticLiteral)
+			{
+				string Type = SemanticLiteral.StringType;
+				string ShortType = Result.GetShortUri(SemanticLiteral.StringType);
+
+				if (ShortType == Type)
+					return Element.ToString();
+
+				if (SemanticLiteral is CustomLiteral CustomLiteral)
+				{
+					return CustomLiteral.ToString(CustomLiteral.StringValue,
+						CustomLiteral.Language, ShortType);
+				}
+				else
+				{
+					return CustomLiteral.ToString(SemanticLiteral.StringValue,
+						null, ShortType);
+				}
+			}
+			else
+				return Element.ToString();
 		}
 
 		private static void AddName(string Node, Dictionary<string, string> NodeNames,
@@ -164,7 +215,7 @@ namespace Waher.Content.Markdown.GraphViz
 				sb.Append("\t");
 				sb.Append(NodeName);
 				sb.Append(" [label=\"");
-				sb.Append(JSON.Encode(Node).Replace("\\", "\\\\").Replace("\"", "\\\""));
+				sb.Append(JSON.Encode(Node));
 				sb.AppendLine("\"]");
 			}
 		}

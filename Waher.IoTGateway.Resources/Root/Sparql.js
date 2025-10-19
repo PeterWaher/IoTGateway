@@ -63,6 +63,8 @@ function ExecuteQuery()
 	var xhttp = new XMLHttpRequest();
 	var IsHtml = false;
 	var IsBinary = false;
+	var IsPng = false;
+	var IsSvg = false;
 
 	xhttp.onreadystatechange = function ()
 	{
@@ -94,6 +96,29 @@ function ExecuteQuery()
 					Result.appendChild(P);
 
 					window.URL.revokeObjectURL(Url);
+				}
+				else if (IsSvg)
+				{
+					var Div = document.createElement("DIV");
+					Result.appendChild(Div);
+
+					Div.innerHTML = xhttp.responseText;
+}
+				else if (IsPng)
+				{
+					var Blob = xhttp.response;
+					var Reader = new FileReader();
+
+					Reader.onload = function (e)
+					{
+						var Img = document.createElement("IMG");
+						Img.src = e.target.result;
+						Img.alt = "SPARQL Result Image";
+
+						Result.appendChild(Img);
+					};
+
+					Reader.readAsDataURL(Blob);
 				}
 				else
 				{
@@ -161,10 +186,25 @@ function ExecuteQuery()
 			xhttp.setRequestHeader("Accept", "text/turtle, text/csv;q=0.9, text/tab-separated-values;q=0.9, text/plain;q=0.2, text/*;q=0.1");
 			break;
 
-		case "Excel":
+		case "Xlsx":
 			IsBinary = true;
 			xhttp.setRequestHeader("Accept", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 			xhttp.responseType = "blob";
+			break;
+
+		case "Dot":
+			xhttp.setRequestHeader("Accept", "text/vnd.graphviz");
+			break;
+
+		case "Png":
+			IsPng = true;
+			xhttp.setRequestHeader("Accept", "image/png");
+			xhttp.responseType = "blob";
+			break;
+
+		case "Svg":
+			IsSvg = true;
+			xhttp.setRequestHeader("Accept", "image/svg+xml");
 			break;
 	}
 

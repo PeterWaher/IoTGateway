@@ -52,13 +52,16 @@ Named Graph\(s): (Only loaded if used in query. Can be omitted if specified in t
 
 Return results as:  
 <select id="ReturnType">
-<option selected value="Xml">XML</option>
-<option value="Json">JSON</option>
-<option value="Csv">CSV</option>
-<option value="Tsv">TSV</option>
-<option value="Html">HTML</option>
-<option value="Text">Text</option>
-{{if exists(TAG.Content.Microsoft.Content.SparqlResultSetExcelEncoder) then ]]<option value="Excel">Excel</option>[[}}
+<option selected value="Xml">XML (Extensible Markup Language)</option>
+<option value="Json">JSON (JavaScript Object Notation)</option>
+<option value="Csv">CSV (Comma-Separated Values)</option>
+<option value="Tsv">TSV (TAB-Separated Values)</option>
+<option value="Html">HTML (HyperText Markup Language)</option>
+<option value="Text">Text (Plain text)</option>
+<option value="Dot">DOT (GraphViz representation, only for semantic triple result sets)</option>
+<option value="Png">PNG (Image, only for semantic triple result sets)</option>
+<option value="Svg">SVG (Image, only for semantic triple result sets)</option>
+{{if exists(TAG.Content.Microsoft.Content.SparqlResultSetExcelEncoder) then ]]<option value="Xlsx">XLSX  (Microsoft Excel spreadsheet)</option>[[}}
 </select>
 
 <button type="button" onclick="ExecuteQuery()">Execute</button>

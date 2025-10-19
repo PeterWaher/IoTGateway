@@ -10,15 +10,15 @@ using Waher.Script.Objects.Matrices;
 namespace Waher.Content.Semantic
 {
 	/// <summary>
-	/// Encoder and Decoder of semantic information from SPARQL queries using CSV.
+	/// Encoder of semantic information from SPARQL queries using TSV.
 	/// https://www.w3.org/TR/sparql12-results-csv-tsv/
 	/// </summary>
-	public class SparqlResultSetCsvCodec : IContentEncoder
+	public class SparqlResultSetTsvEncoder : IContentEncoder
 	{
 		/// <summary>
-		/// Encoder and Decoder of semantic information from SPARQL queries using CSV.
+		/// Encoder and Decoder of semantic information from SPARQL queries using TSV.
 		/// </summary>
-		public SparqlResultSetCsvCodec()
+		public SparqlResultSetTsvEncoder()
 		{
 		}
 
@@ -42,19 +42,19 @@ namespace Waher.Content.Semantic
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
 			if (Object is SparqlResultSet &&
-				InternetContent.IsAccepted(CsvCodec.CsvContentTypes, AcceptedContentTypes))
+				InternetContent.IsAccepted(TsvCodec.TsvContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Excellent;
 				return true;
 			}
 			else if (Object is ObjectMatrix M && M.HasColumnNames &&
-				InternetContent.IsAccepted(CsvCodec.CsvContentTypes, AcceptedContentTypes))
+				InternetContent.IsAccepted(TsvCodec.TsvContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Ok;
 				return true;
 			}
 			else if (Object is bool &&
-				InternetContent.IsAccepted(CsvCodec.CsvContentTypes, AcceptedContentTypes))
+				InternetContent.IsAccepted(TsvCodec.TsvContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Barely;
 				return true;
@@ -88,25 +88,37 @@ namespace Waher.Content.Semantic
 					string[][] Records = new string[1][];
 					Records[0] = new string[] { CommonTypes.Encode(Result.BooleanResult.Value) };
 
-					Text = CSV.Encode(Records);
+					Text = TSV.Encode(Records);
 				}
 				else
-					Text = CSV.Encode(Result.ToMatrix(false));
+				{
+					IMatrix M = Result.ToMatrix(false);
+
+					if (M is ObjectMatrix OM && !(OM.ColumnNames is null))
+					{
+						int i, c = OM.ColumnNames.Length;
+
+						for (i = 0; i < c; i++)
+							OM.ColumnNames[i] = "?" + OM.ColumnNames[i];
+					}
+
+					Text = TSV.Encode(M);
+				}
 			}
 			else if (Object is ObjectMatrix M)
-				Text = CSV.Encode(M, ElementToString);
+				Text = TSV.Encode(M, ElementToString, false);
 			else if (Object is bool b)
 			{
 				string[][] Records = new string[1][];
 				Records[0] = new string[] { CommonTypes.Encode(b) };
 
-				Text = CSV.Encode(Records);
+				Text = TSV.Encode(Records);
 			}
 			else
 				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object))));
 
 			byte[] Bin = Encoding.GetBytes(Text);
-			string ContentType = CsvCodec.CsvContentTypes[0] + "; charset=" + Encoding.WebName;
+			string ContentType = TsvCodec.TsvContentTypes[0] + "; charset=" + Encoding.WebName;
 
 			return Task.FromResult(new ContentResponse(ContentType, Object, Bin));
 		}
@@ -115,11 +127,7 @@ namespace Waher.Content.Semantic
 		{
 			object Obj = E.AssociatedObjectValue;
 
-			if (Obj is string s)
-				return s;
-			else if (Obj is SemanticLiteral Literal)
-				return Literal.StringValue;
-			else if (Obj is SemanticTriple Triple)
+			if (Obj is SemanticTriple Triple)
 			{
 				StringBuilder sb = new StringBuilder();
 
@@ -133,8 +141,10 @@ namespace Waher.Content.Semantic
 
 				return sb.ToString();
 			}
+			else if (Obj is ISemanticElement)
+				return Obj.ToString();
 			else
-				return Obj?.ToString() ?? string.Empty;
+				return JSON.Encode(Obj?.ToString() ?? string.Empty);
 		}
 
 		/// <summary>

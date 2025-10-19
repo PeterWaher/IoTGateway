@@ -641,22 +641,30 @@ namespace Waher.Content.Semantic
 		/// <returns>Short URI node label.</returns>
 		public string GetShortUri(UriNode Node)
 		{
-			string s = Node.Uri.AbsoluteUri;
+			return this.GetShortUri(Node.Uri.AbsoluteUri);
+		}
 
+		/// <summary>
+		/// Gets a short URI label for the given uri node.
+		/// </summary>
+		/// <param name="Uri">URI to shorten.</param>
+		/// <returns>Short URI node label.</returns>
+		public string GetShortUri(string Uri)
+		{
 			if (this.shortUris is null)
 				this.shortUris = new Dictionary<string, string>();
 
-			if (!this.shortUris.TryGetValue(s, out string Short))
+			if (!this.shortUris.TryGetValue(Uri, out string Short))
 			{
-				IOntology Ontology = Types.FindBest<IOntology, string>(s);
+				IOntology Ontology = Types.FindBest<IOntology, string>(Uri);
 				if (Ontology is null)
-					this.shortUris[s] = Short = s;
+					this.shortUris[Uri] = Short = Uri;
 				else
 				{
 					Short = Ontology.OntologyPrefix + ":" +
-						s.Substring(Ontology.OntologyNamespace.Length);
+						Uri.Substring(Ontology.OntologyNamespace.Length);
 
-					this.shortUris[s] = Short;
+					this.shortUris[Uri] = Short;
 				}
 			}
 

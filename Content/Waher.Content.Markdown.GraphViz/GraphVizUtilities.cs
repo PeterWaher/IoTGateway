@@ -2,8 +2,6 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Semantic;
-
-using Waher.Content.Semantic;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.GraphViz
@@ -129,7 +127,7 @@ namespace Waher.Content.Markdown.GraphViz
 			sb.AppendLine("\tbgcolor=\"transparent\"");
 			sb.AppendLine("\tnode [style=filled,fillcolor=white]");
 			sb.Append("\tlabel=\"");
-			sb.Append(Title.Replace("\\", "\\\\").Replace("\"", "\\\""));
+			sb.Append(JSON.Encode(Title).Replace("\\", "\\\\").Replace("\"", "\\\""));
 			sb.AppendLine("\"");
 			sb.AppendLine("\tlabelloc=\"t\"");
 			sb.AppendLine("\tfontsize=20");
@@ -147,7 +145,7 @@ namespace Waher.Content.Markdown.GraphViz
 				sb.Append(" -> ");
 				sb.Append(NodeNames[Triple.Object.ToString()]);
 				sb.Append(" [label=\"");
-				sb.Append(Triple.Predicate.ToString().Replace("\\", "\\\\").Replace("\"", "\\\""));
+				sb.Append(JSON.Encode(Triple.Predicate.ToString()).Replace("\\", "\\\\").Replace("\"", "\\\""));
 				sb.AppendLine("\"]");
 			}
 
@@ -166,7 +164,7 @@ namespace Waher.Content.Markdown.GraphViz
 				sb.Append("\t");
 				sb.Append(NodeName);
 				sb.Append(" [label=\"");
-				sb.Append(Node.Replace("\\", "\\\\").Replace("\"", "\\\""));
+				sb.Append(JSON.Encode(Node).Replace("\\", "\\\\").Replace("\"", "\\\""));
 				sb.AppendLine("\"]");
 			}
 		}

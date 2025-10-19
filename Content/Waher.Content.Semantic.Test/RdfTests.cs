@@ -388,13 +388,26 @@ namespace Waher.Content.Semantic.Test
 		internal static async Task ExportAsImage(ISemanticCube Graph, string Subfolder, string FileName)
 		{
 			string GraphText = GraphVizUtilities.GenerateGraph(Graph, FileName);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine("GraphViz Graph:");
+			Console.Out.WriteLine();
+			Console.Out.WriteLine(GraphText);
+			Console.Out.WriteLine();
+
 			byte[] Bin = await GraphVizUtilities.DotToImage(GraphText, ResultType.Svg);
 			string Folder = Path.Combine("GraphOutput", Subfolder);
 
 			if (!Directory.Exists(Folder))
 				Directory.CreateDirectory(Folder);
 
-			File.WriteAllBytes(Path.Combine(Folder, Path.ChangeExtension(FileName, ".svg")), Bin);
+			FileName = Path.Combine(Folder, Path.ChangeExtension(FileName, ".svg"));
+			Folder = Path.GetDirectoryName(FileName)!;
+
+			if (!Directory.Exists(Folder))
+				Directory.CreateDirectory(Folder);
+
+			File.WriteAllBytes(FileName, Bin);
 		}
 	}
 }

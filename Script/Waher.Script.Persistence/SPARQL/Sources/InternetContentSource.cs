@@ -62,11 +62,8 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 			{
 				// TODO: Include caller credentials in request, if available.
 
-				if (!Types.TryGetModuleParameter("X509", out object Obj) ||
-					!(Obj is X509Certificate Certificate))
-				{
+				if (!Types.TryGetModuleParameter("X509", out X509Certificate Certificate))
 					Certificate = null;
-				}
 
 				ContentResponse Content = await InternetContent.GetAsync(Source, Certificate,
 					new KeyValuePair<string, string>("Accept", "text/turtle, application/x-turtle, application/rdf+xml;q=0.9, application/ld+json;q=0.8, text/xml;q=0.2, " + PlainTextCodec.DefaultContentType + ";q=0.1"));

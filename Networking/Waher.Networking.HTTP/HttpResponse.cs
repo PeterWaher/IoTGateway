@@ -1110,19 +1110,15 @@ namespace Waher.Networking.HTTP
 				EncodingResult Result = await this.TryEncode(Object);
 
 				if (Result is null)
-				{
-					this.statusCode = NotAcceptableException.Code;
-					this.statusMessage = NotAcceptableException.StatusMessage;
-				}
+					await this.SendResponse(new NotAcceptableException());
 				else
 				{
 					this.ContentType = Result.ContentType;
 					this.ContentLength = Result.Data.Length;
 
 					await this.Write(true, Result.Data);
+					await this.SendResponse();
 				}
-
-				await this.SendResponse();
 			}
 		}
 
@@ -1291,6 +1287,9 @@ namespace Waher.Networking.HTTP
 							if (InternetContent.Encodes(Object, out Grade Grade2, out IContentEncoder Encoder, Rec.Item))
 							{
 								P = await Encoder.EncodeAsync(Object, this.encoding, this.progress, ContentType, Rec.Item);
+								if (P.HasError)
+									return null;
+
 								this.encodingUsed |= P.ContentType.StartsWith("text/");
 								Data = P.Encoded;
 								ContentType = P.ContentType;

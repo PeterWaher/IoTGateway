@@ -129,7 +129,9 @@ namespace Waher.Content.Semantic
 
 			while (this.pos < this.len)
 			{
-				Object = this.ParseElement(TriplePosition);
+				Object = this.ParseElement(TriplePosition,
+					out ChunkedList<SemanticTriple> AdditionalTriples);
+
 				if (Object is null)
 				{
 					if (Subject is null)
@@ -149,15 +151,23 @@ namespace Waher.Content.Semantic
 				{
 					Subject = Object;
 					TriplePosition++;
+
+					if (!(AdditionalTriples is null))
+						this.triples.AddRange(AdditionalTriples);
 				}
 				else if (Predicate is null)
 				{
 					Predicate = Object;
 					TriplePosition++;
+
+					if (!(AdditionalTriples is null))
+						this.triples.AddRange(AdditionalTriples);
 				}
 				else
 				{
 					this.Add(new SemanticTriple(Subject, Predicate, Object));
+					if (!(AdditionalTriples is null))
+						this.triples.AddRange(AdditionalTriples);
 
 					switch (this.NextNonWhitespaceChar())
 					{
@@ -227,8 +237,11 @@ namespace Waher.Content.Semantic
 			}
 		}
 
-		private ISemanticElement ParseElement(int TriplePosition)
+		private ISemanticElement ParseElement(int TriplePosition, 
+			out ChunkedList<SemanticTriple> AdditionalTriples)
 		{
+			AdditionalTriples = null;
+
 			while (true)
 			{
 				char ch = this.NextNonWhitespaceChar();
@@ -291,14 +304,17 @@ namespace Waher.Content.Semantic
 							if (this.PeekNextChar() == '.')
 							{
 								this.pos++;
-								return this.ParseElement(0);
+								ISemanticElement Result = this.ParseElement(0, out AdditionalTriples);
+								if (!(AdditionalTriples is null))
+									this.triples.AddRange(AdditionalTriples);
+								return Result;
 							}
 						}
 
 						return Node;
 
 					case '(':
-						return this.ParseCollection();
+						return this.ParseCollection(out AdditionalTriples);
 
 					case ']':
 						return null;
@@ -308,15 +324,24 @@ namespace Waher.Content.Semantic
 						{
 							this.pos++;
 
-							ISemanticElement Subject = this.ParseElement(0);
-							ISemanticElement Predicate = this.ParseElement(1);
-							ISemanticElement Object = this.ParseElement(2);
+							ISemanticElement Subject = this.ParseElement(0, out ChunkedList<SemanticTriple> AdditionalTriples1);
+							ISemanticElement Predicate = this.ParseElement(1, out ChunkedList<SemanticTriple> AdditionalTriples2);
+							ISemanticElement Object = this.ParseElement(2, out ChunkedList<SemanticTriple> AdditionalTriples3);
 
 							if (this.NextNonWhitespaceChar() != '>')
 								throw this.ParsingException("Expected >");
 
 							if (this.NextNonWhitespaceChar() != '>')
 								throw this.ParsingException("Expected >");
+
+							if (!(AdditionalTriples1 is null))
+								this.triples.AddRange(AdditionalTriples1);
+
+							if (!(AdditionalTriples2 is null))
+								this.triples.AddRange(AdditionalTriples2);
+
+							if (!(AdditionalTriples3 is null))
+								this.triples.AddRange(AdditionalTriples3);
 
 							return new SemanticTriple(Subject, Predicate, Object);
 						}
@@ -430,9 +455,10 @@ namespace Waher.Content.Semantic
 				return new BlankNode(this.blankNodeIdPrefix + (++this.blankNodeIndex).ToString());
 		}
 
-		private ISemanticElement ParseCollection()
+		private ISemanticElement ParseCollection(out ChunkedList<SemanticTriple> AdditionalTriples)
 		{
 			ChunkedList<ISemanticElement> Elements = null;
+			AdditionalTriples = null;
 
 			this.SkipWhiteSpace();
 
@@ -472,7 +498,17 @@ namespace Waher.Content.Semantic
 					return Result;
 				}
 
-				ISemanticElement Element = this.ParseElement(2);
+				ISemanticElement Element = this.ParseElement(2,
+					out ChunkedList<SemanticTriple> AdditionalTriples2);
+
+				if (!(AdditionalTriples2 is null))
+				{
+					if (AdditionalTriples is null)
+						AdditionalTriples = new ChunkedList<SemanticTriple>();
+
+					AdditionalTriples.AddRange(AdditionalTriples2);
+				}
+
 				if (Element is null)
 					break;
 

@@ -21,7 +21,7 @@ namespace Waher.Content.Semantic
 		/// <summary>
 		/// Triples in model.
 		/// </summary>
-		protected readonly ChunkedList<ISemanticTriple> triples;
+		protected ChunkedList<ISemanticTriple> triples;
 
 		#region Constructors
 

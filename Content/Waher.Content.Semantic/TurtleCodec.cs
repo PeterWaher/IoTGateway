@@ -24,7 +24,10 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		public string[] ContentTypes => TurtleContentTypes;
 
-		private static readonly string[] TurtleContentTypes = new string[]
+		/// <summary>
+		/// Internet Content-Types indicating a Turtle Document.
+		/// </summary>
+		public static readonly string[] TurtleContentTypes = new string[]
 		{
 			DefaultContentType,
 			"application/x-turtle"

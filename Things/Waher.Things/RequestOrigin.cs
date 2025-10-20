@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Waher.Things
 {
@@ -12,7 +11,7 @@ namespace Waher.Things
 		/// Empty request origin.
 		/// </summary>
 		public static readonly RequestOrigin Empty = new RequestOrigin(string.Empty,
-			Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), null);
+			null, null, null, null);
 
 		private readonly IRequestOrigin authority;
 		private readonly string[] deviceTokens;

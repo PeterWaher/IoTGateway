@@ -523,9 +523,13 @@ namespace Waher.Content.Semantic
 				return string.Empty;
 
 			int Start = this.pos++;
+			bool LastPeriod = false;
 
-			while (IsNameChar(this.PeekNextChar()))
+			while (IsNameChar(this.PeekNextChar(), ref LastPeriod))
 				this.pos++;
+
+			if (LastPeriod)
+				this.pos--;
 
 			return this.text.Substring(Start, this.pos - Start);
 		}
@@ -605,31 +609,55 @@ namespace Waher.Content.Semantic
 		/// Checks if a character can be included in a name.
 		/// </summary>
 		/// <param name="ch">Character</param>
+		/// <param name="LastPeriod">If the last character was a period character.</param>
 		/// <returns>If characters can be included in a name.</returns>
-		public static bool IsNameChar(char ch)
+		public static bool IsNameChar(char ch, ref bool LastPeriod)
 		{
 			if (IsNameStartChar(ch))
+			{
+				LastPeriod = false;
 				return true;
+			}
 			else if (ch < '-')
 				return false;
 			else if (ch == '-')
+			{
+				LastPeriod = false;
 				return true;
+			}
+			else if (ch == '.')
+			{
+				LastPeriod = true;
+				return true;
+			}
 			else if (ch < '0')
 				return false;
 			else if (ch <= '9')
+			{
+				LastPeriod = false;
 				return true;
+			}
 			else if (ch < '\x00B7')
 				return false;
 			else if (ch == '\x00B7')
+			{
+				LastPeriod = false;
 				return true;
+			}
 			else if (ch < '\x0300')
 				return false;
 			else if (ch <= '\x036F')
+			{
+				LastPeriod = false;
 				return true;
+			}
 			else if (ch < '\x203F')
 				return false;
 			else if (ch <= '\x2040')
+			{
+				LastPeriod = false;
 				return true;
+			}
 			else
 				return false;
 		}

@@ -2268,10 +2268,15 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				return string.Empty;
 
 			int Start = Parser.Position;
+			bool LastPeriod = false;
+			
 			Parser.NextChar();
 
-			while (TurtleDocument.IsNameChar(Parser.PeekNextChar()))
+			while (TurtleDocument.IsNameChar(Parser.PeekNextChar(), ref LastPeriod))
 				Parser.NextChar();
+
+			if (LastPeriod)
+				Parser.UndoChar();
 
 			return Parser.Expression.Script.Substring(Start, Parser.Position - Start);
 		}

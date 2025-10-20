@@ -11,7 +11,8 @@ namespace Waher.Things
 		/// <summary>
 		/// Empty request origin.
 		/// </summary>
-		public static readonly RequestOrigin Empty = new RequestOrigin(string.Empty, Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), null);
+		public static readonly RequestOrigin Empty = new RequestOrigin(string.Empty,
+			Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), null);
 
 		private readonly IRequestOrigin authority;
 		private readonly string[] deviceTokens;

@@ -436,9 +436,9 @@
     <ProjectReference Include="..\Security\Waher.Security.SPF\Waher.Security.SPF.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.Users\Waher.Security.Users.csproj" />
     <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj" />
-    <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />
-    <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />
-    <ProjectReference Include="..\Runtime\Waher.Runtime.Threading.Sync\Waher.Runtime.Threading.Sync.csproj" />
+		<ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />
+		<ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />
+		<ProjectReference Include="..\Runtime\Waher.Runtime.Threading.Sync\Waher.Runtime.Threading.Sync.csproj" />
   </ItemGroup>
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="if not exist &quot;$(ProjectDir)\..\..\Registration.cs.bak&quot; copy &quot;$(ProjectDir)Setup\Registration.cs&quot; &quot;$(ProjectDir)\..\..\Registration.cs.bak&quot;" Condition="'$(OS)'=='Windows_NT'" />

@@ -22,7 +22,7 @@ using Waher.Script.Persistence.SPARQL;
 using Waher.Script.Persistence.SPARQL.Sources;
 using Waher.Security;
 using Waher.Things;
-using Waher.Things.Semantic.Sources;
+using Waher.Things.Semantic.Sources.DynamicGraphs;
 
 namespace Waher.WebService.Sparql
 {
@@ -154,7 +154,7 @@ namespace Waher.WebService.Sparql
 				bool First;
 
 				foreach (IDataSource Source in Gateway.ConcentratorServer.RootDataSources)
-					await DataSourceGraph.AppendSourceInformation(Result, Source, Language, Caller);
+					await SourceGraph.GenerateGraph(Result, Language, Source);
 
 				foreach (GraphReference Reference in await Database.Find<GraphReference>())
 				{

@@ -1,24 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using Waher.Content.Semantic;
-using Waher.Content.Semantic.Model;
-using Waher.Content.Semantic.Model.Literals;
-using Waher.Content.Semantic.Ontologies;
 using Waher.IoTGateway;
-using Waher.IoTGateway.Setup;
 using Waher.Networking.HTTP;
-using Waher.Networking.XMPP.Sensor;
-using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Script.Model;
 using Waher.Script.Persistence.SPARQL;
-using Waher.Things.ControlParameters;
-using Waher.Things.Semantic.Ontologies;
-using Waher.Things.SensorData;
+using Waher.Things.Semantic.Sources.DynamicGraphs;
 
 namespace Waher.Things.Semantic.Sources
 {
@@ -84,11 +75,40 @@ namespace Waher.Things.Semantic.Sources
 				!string.IsNullOrEmpty(GraphUri.Fragment) ||
 				Gateway.ConcentratorServer is null)
 			{
-				return null;
+				if (NullIfNotFound)
+					return null;
+				else
+					throw new NotFoundException("Graph not found.");
 			}
 
-			string s = GraphUri.AbsolutePath;
-			string[] Parts = s.Split('/');
+			IDynamicGraph DynamicGraph = await FindDynamicGraph(GraphUri.AbsolutePath, Caller);
+			if (DynamicGraph is null)
+			{
+				if (NullIfNotFound)
+					return null;
+				else
+					throw new NotFoundException("Graph not found.");
+			}
+
+			// TODO: Check access rights
+
+			InMemorySemanticCube Result = new InMemorySemanticCube();
+			Language Language = await Translator.GetDefaultLanguageAsync();  // TODO: Check Accept-Language HTTP header.
+
+			await DynamicGraph.GenerateGraph(Result, Language, Caller);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Finds a dynamic graph, based on its relative path.
+		/// </summary>
+		/// <param name="Path">Resource path.</param>
+		/// <param name="Caller">Information about entity making the request.</param>
+		/// <returns>Dynamic graph, if found, null otherwise.</returns>
+		public static async Task<IDynamicGraph> FindDynamicGraph(string Path, RequestOrigin Caller)
+		{
+			string[] Parts = Path.Split('/');
 			int c = Parts.Length;
 
 			if (c < 1 || !string.IsNullOrEmpty(Parts[0]))
@@ -97,14 +117,8 @@ namespace Waher.Things.Semantic.Sources
 			if (string.IsNullOrEmpty(Parts[c - 1]))
 				c--;
 
-			InMemorySemanticCube Result = new InMemorySemanticCube();
-			Language Language = await Translator.GetDefaultLanguageAsync();  // TODO: Check Accept-Language HTTP header.
-
 			if (c == 1)
-			{
-				await AppendBrokerInformation(Result);
-				return Result;
-			}
+				return new MachineGraph();
 
 			string SourceID = HttpUtility.UrlDecode(Parts[1]);
 			if (!Gateway.ConcentratorServer.TryGetDataSource(SourceID, out IDataSource Source))
@@ -114,10 +128,7 @@ namespace Waher.Things.Semantic.Sources
 				return null;
 
 			if (c == 2) // DOMAIN/Source
-			{
-				await AppendSourceInformation(Result, Source, Language, null);
-				return Result;
-			}
+				return new SourceGraph(Source);
 
 			switch (c)
 			{
@@ -127,8 +138,10 @@ namespace Waher.Things.Semantic.Sources
 					if (NodeObj is null)
 						return null;
 
-					await AppendNodeInformation(Result, NodeObj, Language, Caller);
-					break;
+					if (!await NodeObj.CanViewAsync(Caller))
+						return null;
+
+					return new NodeGraph(NodeObj);
 
 				case 4: // /DOMAIN/Source/Partition/NodeID
 					string Partition = HttpUtility.UrlDecode(Parts[2]);
@@ -137,8 +150,10 @@ namespace Waher.Things.Semantic.Sources
 					if (NodeObj is null)
 						return null;
 
-					await AppendNodeInformation(Result, NodeObj, Language, Caller);
-					break;
+					if (!await NodeObj.CanViewAsync(Caller))
+						return null;
+
+					return new NodeGraph(NodeObj);
 
 				case 5: // /DOMAIN/Source/NodeID/Category/Action
 					NodeID = HttpUtility.UrlDecode(Parts[2]);
@@ -146,9 +161,15 @@ namespace Waher.Things.Semantic.Sources
 					if (NodeObj is null)
 						return null;
 
-					return await GetNodeActionGraph(Result, NodeObj, Language, HttpUtility.UrlDecode(Parts[3]), 
-						HttpUtility.UrlDecode(Parts[4]), Caller);
+					if (!await NodeObj.CanViewAsync(Caller))
+						return null;
 
+					return HttpUtility.UrlDecode(Parts[3]) switch
+					{
+						"read" => new NodeReadActionGraph(NodeObj, HttpUtility.UrlDecode(Parts[4])),
+						// TODO: cmd, edit, control
+						_ => null,
+					};
 				case 6: // /DOMAIN/Source/Partition/NodeID/Category/Action
 					Partition = HttpUtility.UrlDecode(Parts[2]);
 					NodeID = HttpUtility.UrlDecode(Parts[3]);
@@ -156,138 +177,17 @@ namespace Waher.Things.Semantic.Sources
 					if (NodeObj is null)
 						return null;
 
-					return await GetNodeActionGraph(Result, NodeObj, Language, HttpUtility.UrlDecode(Parts[4]), 
-						HttpUtility.UrlDecode(Parts[5]), Caller);
+					if (!await NodeObj.CanViewAsync(Caller))
+						return null;
 
+					return HttpUtility.UrlDecode(Parts[4]) switch
+					{
+						"read" => new NodeReadActionGraph(NodeObj, HttpUtility.UrlDecode(Parts[5])),
+						// TODO: cmd, edit, control
+						_ => null,
+					};
 				default:
 					return null;
-			}
-
-			return Result;
-		}
-
-		/// <summary>
-		/// Appends semantic information about the broker to a graph.
-		/// </summary>
-		/// <param name="Result">Graph being generated.</param>
-		public static Task AppendBrokerInformation(InMemorySemanticCube Result)
-		{
-			string BrokerPath = "/";
-			UriNode BrokerGraphUriNode = new UriNode(new Uri(Gateway.GetUrl(BrokerPath)));
-			int i, c;
-
-			Result.Add(BrokerGraphUriNode, Rdf.type, IoTConcentrator.Broker);
-
-			ChunkedList<ISemanticElement> Names = new ChunkedList<ISemanticElement>();
-
-			if (!string.IsNullOrEmpty(DomainConfiguration.Instance.HumanReadableName))
-			{
-				Names.Add(new StringLiteral(DomainConfiguration.Instance.HumanReadableName,
-					DomainConfiguration.Instance.HumanReadableNameLanguage));
-			}
-
-			if ((c = (DomainConfiguration.Instance.LocalizedNames?.Length) ?? 0) > 0)
-			{
-				for (i = 0; i < c; i++)
-				{
-					Names.Add(new StringLiteral(
-						DomainConfiguration.Instance.LocalizedNames[i].Value,
-						DomainConfiguration.Instance.LocalizedNames[i].Key));
-				}
-			}
-
-			Result.AddContainer(BrokerGraphUriNode, Rdf.Alt, RdfSchema.label, Names);
-			Names.Clear();
-
-			if (!string.IsNullOrEmpty(DomainConfiguration.Instance.HumanReadableDescription))
-			{
-				Names.Add(new StringLiteral(
-					DomainConfiguration.Instance.HumanReadableDescription,
-					DomainConfiguration.Instance.HumanReadableDescriptionLanguage));
-			}
-
-			if ((c = (DomainConfiguration.Instance.LocalizedDescriptions?.Length) ?? 0) > 0)
-			{
-				for (i = 0; i < c; i++)
-				{
-					Names.Add(new StringLiteral(
-						DomainConfiguration.Instance.LocalizedDescriptions[i].Value,
-						DomainConfiguration.Instance.LocalizedDescriptions[i].Key));
-				}
-			}
-
-			Result.AddContainer(BrokerGraphUriNode, Rdf.Alt, RdfSchema.comment, Names);
-			Names.Clear();
-
-			if (DomainConfiguration.Instance.UseDomainName)
-			{
-				ChunkedList<string> Domains = new ChunkedList<string>()
-				{
-					DomainConfiguration.Instance.Domain             
-				};
-
-				if ((DomainConfiguration.Instance.AlternativeDomains?.Length ?? 0) > 0)
-					Domains.AddRange(DomainConfiguration.Instance.AlternativeDomains);
-
-				Result.AddContainer(BrokerGraphUriNode, Rdf.Alt, IoTConcentrator.domain,
-					Domains.ToArray());
-			}
-
-			ChunkedList<ISemanticElement> Items = new ChunkedList<ISemanticElement>();
-			
-			foreach (IDataSource RootSource in Gateway.ConcentratorServer.RootDataSources)
-				Items.Add(new UriNode(GetSourceUri(RootSource.SourceID)));
-
-			Result.AddContainer(BrokerGraphUriNode, Rdf.Bag, IoTConcentrator.rootSources, Items);
-
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Appends semantic information about a data source to a graph.
-		/// </summary>
-		/// <param name="Result">Graph being generated.</param>
-		/// <param name="Source">Source to append information about.</param>
-		/// <param name="Language">Language</param>
-		/// <param name="Caller">Caller; can be null if authorization has been performed at a higher level.</param>
-		public static async Task AppendSourceInformation(InMemorySemanticCube Result,
-			IDataSource Source, Language Language, RequestOrigin Caller)
-		{
-			if (Source is null)
-				return;
-
-			if (!(Caller is null) && !await Source.CanViewAsync(Caller))
-				return;
-
-			UriNode SourceGraphUriNode = new UriNode(GetSourceUri(Source.SourceID));
-
-			Result.Add(SourceGraphUriNode, Rdf.type, IoTConcentrator.DataSource);
-			Result.Add(SourceGraphUriNode, IoTConcentrator.sourceId, Source.SourceID);
-			Result.Add(SourceGraphUriNode, RdfSchema.label, await Source.GetNameAsync(Language));
-			Result.Add(SourceGraphUriNode, DublinCoreTerms.updated, Source.LastChanged);
-			Result.Add(SourceGraphUriNode, IoTConcentrator.hasChildSources, Source.HasChildren);
-
-			ChunkedList<ISemanticElement> Items = new ChunkedList<ISemanticElement>();
-
-			if (Source.HasChildren)
-			{
-				foreach (IDataSource ChildSource in Source.ChildSources)
-					Items.Add(new UriNode(GetSourceUri(ChildSource.SourceID)));
-
-				Result.AddContainer(SourceGraphUriNode, Rdf.Bag, IoTConcentrator.childSources,
-					Items);
-
-				Items.Clear();
-			}
-
-			IEnumerable<INode> RootNodes = Source.RootNodes;
-
-			if (!(RootNodes is null))
-			{
-				foreach (INode RootNode in RootNodes)
-					Items.Add(new UriNode(GetNodeUri(RootNode)));
-
-				Result.AddContainer(SourceGraphUriNode, Rdf.Bag, IoTConcentrator.rootNodes, Items);
 			}
 		}
 
@@ -318,7 +218,7 @@ namespace Waher.Things.Semantic.Sources
 		/// </summary>
 		/// <param name="Node">Node reference.</param>
 		/// <param name="sb">URI being built.</param>
-		private static void GetNodeUri(INode Node, StringBuilder sb)
+		public static void GetNodeUri(INode Node, StringBuilder sb)
 		{
 			sb.Append('/');
 			sb.Append(HttpUtility.UrlEncode(Node.SourceId));
@@ -331,201 +231,6 @@ namespace Waher.Things.Semantic.Sources
 
 			sb.Append('/');
 			sb.Append(HttpUtility.UrlEncode(Node.NodeId));
-		}
-
-		/// <summary>
-		/// Appends semantic information about a node to a graph.
-		/// </summary>
-		/// <param name="Result">Graph being generated.</param>
-		/// <param name="Node">NOde to append information about.</param>
-		/// <param name="Language">Language</param>
-		/// <param name="Caller">Caller, required.</param>
-		public static async Task AppendNodeInformation(InMemorySemanticCube Result,
-			INode Node, Language Language, RequestOrigin Caller)
-		{
-			if (Node is null)
-				return;
-
-			if (!await Node.CanViewAsync(Caller))
-				return;
-
-			UriNode NodeGraphUriNode = new UriNode(GetNodeUri(Node));
-
-			Result.Add(NodeGraphUriNode, Rdf.type, IoTConcentrator.Node);
-
-			Result.Add(NodeGraphUriNode, IoTConcentrator.typeName,
-				await Node.GetTypeNameAsync(Language));
-
-			Result.Add(NodeGraphUriNode, IoTConcentrator.sourceId, Node.SourceId);
-			Result.Add(NodeGraphUriNode, IoTConcentrator.nodeId, Node.NodeId);
-			Result.Add(NodeGraphUriNode, IoTConcentrator.logId, Node.LogId);
-			Result.Add(NodeGraphUriNode, IoTConcentrator.localId, Node.LocalId);
-			Result.Add(NodeGraphUriNode, RdfSchema.label, Node.LocalId);
-
-			if (!string.IsNullOrEmpty(Node.Partition))
-				Result.Add(NodeGraphUriNode, IoTConcentrator.partition, Node.Partition);
-
-			if (!(Node.Parent is null))
-				Result.Add(NodeGraphUriNode, IoTConcentrator.parentNode, GetNodeUri(Node.Parent));
-
-			Result.Add(NodeGraphUriNode, DublinCoreTerms.updated, Node.LastChanged);
-			Result.Add(NodeGraphUriNode, IoTConcentrator.hasChildSources, Node.HasChildren);
-			Result.Add(NodeGraphUriNode, IoTConcentrator.hasCommands, Node.HasCommands);
-			Result.Add(NodeGraphUriNode, IoTConcentrator.isControllable, Node.IsControllable);
-			Result.Add(NodeGraphUriNode, IoTConcentrator.isReadable, Node.IsReadable);
-			Result.Add(NodeGraphUriNode, IoTConcentrator.state, Node.State.ToString(), 
-				IoTConcentrator.nodeState);
-
-			IEnumerable<DisplayableParameters.Parameter> Parameters = await Node.GetDisplayableParametersAsync(Language, Caller);
-			ChunkedList<ISemanticElement> Items = new ChunkedList<ISemanticElement>();
-
-			if (!(Parameters is null))
-			{
-				foreach (DisplayableParameters.Parameter P in Parameters)
-				{
-					BlankNode DisplayableParameter = new BlankNode("n" + Guid.NewGuid().ToString());
-					Items.Add(DisplayableParameter);
-
-					Result.Add(DisplayableParameter, RdfSchema.label, P.Name);
-					Result.Add(DisplayableParameter, IoTConcentrator.parameterId, P.Id);
-
-					Result.Add(DisplayableParameter, IoTSensorData.value,
-						SemanticElements.Encapsulate(P.UntypedValue));
-				}
-
-				Result.AddContainer(NodeGraphUriNode, Rdf.Seq, IoTConcentrator.dispParam, Items);
-				Items.Clear();
-			}
-
-			IEnumerable<DisplayableParameters.Message> NodeMessages = await Node.GetMessagesAsync(Caller);
-			if (!(NodeMessages is null))
-			{
-				foreach (DisplayableParameters.Message M in NodeMessages)
-				{
-					BlankNode Message = new BlankNode("n" + Guid.NewGuid().ToString());
-					Items.Add(Message);
-
-					Result.Add(Message, IoTConcentrator.body, M.Body);
-					Result.Add(Message, IoTSensorData.timestamp, M.Timestamp);
-
-					if (!string.IsNullOrEmpty(M.EventId))
-						Result.Add(Message, IoTConcentrator.eventId, M.EventId);
-
-					Result.Add(Message, Rdf.type, M.Type.ToString(), IoTConcentrator.messageType);
-				}
-
-				Result.AddContainer(NodeGraphUriNode, Rdf.Seq, IoTConcentrator.messages, Items);
-				Items.Clear();
-			}
-
-			if (Node.HasChildren)
-			{
-				foreach (INode ChildNode in await Node.ChildNodes)
-					Items.Add(new UriNode(GetNodeUri(ChildNode)));
-				
-				Result.AddContainer(NodeGraphUriNode, Rdf.Bag, IoTConcentrator.childNodes, Items);
-				Items.Clear();
-			}
-
-			if (Node.HasCommands)
-			{
-				IEnumerable<ICommand> NodeCommands = await Node.Commands;
-
-				if (!(NodeCommands is null))
-				{
-					foreach (ICommand Command in NodeCommands)
-					{
-						if (!await Command.CanExecuteAsync(Caller))
-							continue;
-
-						UriNode CommandUriNode = new UriNode(GetCommandUri(Node, Command));
-
-						Result.Add(CommandUriNode, Rdf.type, IoTConcentrator.Command);
-						Result.Add(CommandUriNode, RdfSchema.label, 
-							await Command.GetNameAsync(Language), Language.Code);
-						Result.Add(CommandUriNode, IoTConcentrator.commandId, Command.CommandID);
-						Result.Add(CommandUriNode, IoTConcentrator.sortCategory, Command.SortCategory);
-						Result.Add(CommandUriNode, IoTConcentrator.sortKey, Command.SortKey);
-						Result.Add(CommandUriNode, IoTConcentrator.commandType,
-							Command.Type.ToString(), IoTConcentrator.commandType);
-
-						AddOptionalStringLiteral(Result, CommandUriNode, 
-							IoTConcentrator.success,
-							await Command.GetSuccessStringAsync(Language));
-
-						AddOptionalStringLiteral(Result, CommandUriNode, 
-							IoTConcentrator.failure,
-							await Command.GetFailureStringAsync(Language));
-
-						AddOptionalStringLiteral(Result, CommandUriNode, 
-							IoTConcentrator.confirmation,
-							await Command.GetConfirmationStringAsync(Language));
-
-						Items.Add(CommandUriNode);
-					}
-				}
-
-				Result.AddContainer(NodeGraphUriNode, Rdf.Seq, IoTConcentrator.commands, Items);
-				Items.Clear();
-			}
-
-			AddOperation(Result, Items, IoTConcentrator.edit, GetOperationUri(Node, "edit", "parameters"),
-				await Language.GetStringAsync(typeof(DataSourceGraph), 1, "Editable parameters for the node."));
-
-			if (Node.IsReadable && Node is ISensor)
-			{
-				AddOperation(Result, Items, IoTConcentrator.read, GetOperationUri(Node, "read", "all"),
-					await Language.GetStringAsync(typeof(DataSourceGraph), 2, "Read all available sensor data from node."));
-
-				AddOperation(Result, Items, IoTConcentrator.read, GetOperationUri(Node, "read", "momentary"),
-					await Language.GetStringAsync(typeof(DataSourceGraph), 3, "Read momentary sensor data from node."));
-
-				AddOperation(Result, Items, IoTConcentrator.read, GetOperationUri(Node, "read", "identity"),
-					await Language.GetStringAsync(typeof(DataSourceGraph), 4, "Read identity sensor data from node."));
-
-				AddOperation(Result, Items, IoTConcentrator.read, GetOperationUri(Node, "read", "status"),
-					await Language.GetStringAsync(typeof(DataSourceGraph), 5, "Read status sensor data from node."));
-
-				AddOperation(Result, Items, IoTConcentrator.read, GetOperationUri(Node, "read", "computed"),
-					await Language.GetStringAsync(typeof(DataSourceGraph), 6, "Read computed sensor data from node."));
-
-				AddOperation(Result, Items, IoTConcentrator.read, GetOperationUri(Node, "read", "peak"),
-					await Language.GetStringAsync(typeof(DataSourceGraph), 7, "Read peak sensor data from node."));
-
-				AddOperation(Result, Items, IoTConcentrator.read, GetOperationUri(Node, "read", "historical"),
-					await Language.GetStringAsync(typeof(DataSourceGraph), 8, "Read historical sensor data from node."));
-
-				AddOperation(Result, Items, IoTConcentrator.read, GetOperationUri(Node, "read", "nonHistorical"),
-					await Language.GetStringAsync(typeof(DataSourceGraph), 9, "Read all non-historical sensor data from node."));
-			}
-
-			if (Node.IsControllable && Node is IActuator Actuator)
-			{
-				foreach (ControlParameter P in await Actuator.GetControlParameters())
-				{
-					AddOperation(Result, Items, IoTConcentrator.control, GetOperationUri(Node, "control", P.Name),
-						string.IsNullOrEmpty(P.Description) ? await Language.GetStringAsync(typeof(DataSourceGraph), 10, "Control parameter.") : P.Description);
-				}
-			}
-
-			Result.AddContainer(NodeGraphUriNode, Rdf.Seq, IoTConcentrator.operations, Items);
-		}
-
-		private static void AddOptionalStringLiteral(InMemorySemanticCube Result,
-			ISemanticElement Subject, Uri PredicateUri, string Value)
-		{
-			if (!string.IsNullOrEmpty(Value))
-				Result.Add(Subject, PredicateUri, Value);
-		}
-
-		private static void AddOperation(InMemorySemanticCube Result, 
-			ChunkedList<ISemanticElement> Operations, Uri Predicate, Uri Graph, string Label)
-		{
-			BlankNode Operation = new BlankNode("n" + Guid.NewGuid().ToString());
-			Operations.Add(Operation);
-
-			Result.Add(Operation, Predicate, Graph);
-			Result.Add(Operation, RdfSchema.label, Label);
 		}
 
 		/// <summary>
@@ -547,7 +252,7 @@ namespace Waher.Things.Semantic.Sources
 		/// <param name="Node">Node reference.</param>
 		/// <param name="Command">Command reference.</param>
 		/// <param name="sb">URI building built.</param>
-		private static void GetCommandUri(INode Node, ICommand Command, StringBuilder sb)
+		public static void GetCommandUri(INode Node, ICommand Command, StringBuilder sb)
 		{
 			GetNodeUri(Node, sb);
 			sb.Append("/cmd/");
@@ -560,7 +265,7 @@ namespace Waher.Things.Semantic.Sources
 		/// <param name="Node">Node reference.</param>
 		/// <param name="Category">Operation category.</param>
 		/// <param name="Action">Operation action</param>
-		private static Uri GetOperationUri(INode Node, string Category, string Action)
+		public static Uri GetOperationUri(INode Node, string Category, string Action)
 		{
 			StringBuilder sb = new StringBuilder();
 			GetOperationUri(Node, Category, Action, sb);
@@ -574,296 +279,13 @@ namespace Waher.Things.Semantic.Sources
 		/// <param name="Category">Operation category.</param>
 		/// <param name="Action">Operation action</param>
 		/// <param name="sb">URI building built.</param>
-		private static void GetOperationUri(INode Node, string Category, string Action, StringBuilder sb)
+		public static void GetOperationUri(INode Node, string Category, string Action, StringBuilder sb)
 		{
 			GetNodeUri(Node, sb);
 			sb.Append('/');
 			sb.Append(Category);
 			sb.Append('/');
 			sb.Append(Action);
-		}
-
-		private static async Task<ISemanticCube> GetNodeActionGraph(InMemorySemanticCube Result,
-			INode Node, Language Language, string Category, string Action, RequestOrigin Caller)
-		{
-			UriNode NodeGraphUriNode = new UriNode(GetNodeUri(Node));
-
-			switch (Category)
-			{
-				case "read":
-					if (!(Node is ISensor Sensor))
-						return null;
-
-					FieldType FieldTypes = 0;
-
-					foreach (string Part in Action.Split(' '))
-					{
-						switch (Part.Trim().ToLower())
-						{
-							case "all":
-								FieldTypes |= FieldType.All;
-								break;
-
-							case "momentary":
-								FieldTypes |= FieldType.Momentary;
-								break;
-
-							case "identity":
-								FieldTypes |= FieldType.Identity;
-								break;
-
-							case "status":
-								FieldTypes |= FieldType.Status;
-								break;
-
-							case "computed":
-								FieldTypes |= FieldType.Computed;
-								break;
-
-							case "peak":
-								FieldTypes |= FieldType.Peak;
-								break;
-
-							case "historical":
-								FieldTypes |= FieldType.Historical;
-								break;
-
-							case "nonhistorical":
-								FieldTypes |= FieldType.AllExceptHistorical;
-								break;
-						}
-					}
-
-					if (FieldTypes == 0)
-						return null;
-
-					BlankNode Fields = new BlankNode("n" + Guid.NewGuid().ToString());
-					int FieldIndex = 0;
-
-					Result.Add(NodeGraphUriNode, IoTSensorData.fields, Fields);
-
-					BlankNode Errors = new BlankNode("n" + Guid.NewGuid().ToString());
-					int ErrorIndex = 0;
-
-					Result.Add(NodeGraphUriNode, IoTSensorData.errors, Errors);
-
-					IThingReference[] Nodes = new IThingReference[] { Node };
-					ApprovedReadoutParameters Approval = await Gateway.ConcentratorServer.SensorServer.CanReadAsync(FieldTypes, Nodes, null, Caller)
-						?? throw new ForbiddenException("Not authorized to read sensor-data from node.");
-
-					TaskCompletionSource<bool> ReadoutCompleted = new TaskCompletionSource<bool>();
-					InternalReadoutRequest Request = await Gateway.ConcentratorServer.SensorServer.DoInternalReadout(Caller.From,
-						Approval.Nodes, Approval.FieldTypes, Approval.FieldNames, DateTime.MinValue, DateTime.MaxValue,
-						async (Sender, e) =>
-						{
-							foreach (Field F in e.Fields)
-							{
-								BlankNode FieldNode = new BlankNode("n" + Guid.NewGuid().ToString());
-
-								Result.Add(Fields, Rdf.ListItem(++FieldIndex), FieldNode);
-
-								string LocalizedName;
-
-								if (F.StringIdSteps is null || F.StringIdSteps.Length == 0)
-									LocalizedName = null;
-								else
-								{
-									Namespace BaseModule;
-
-									if (string.IsNullOrEmpty(F.Module))
-										BaseModule = null;
-									else
-										BaseModule = await Language.GetNamespaceAsync(F.Module);
-
-									LocalizedName = await LocalizationStep.TryGetLocalization(Language, BaseModule, F.StringIdSteps);
-								}
-
-								if (string.IsNullOrEmpty(LocalizedName))
-									Result.Add(FieldNode, RdfSchema.label, F.Name);
-								else if (LocalizedName == F.Name)
-									Result.Add(FieldNode, RdfSchema.label, F.Name, Language.Code);
-								else
-								{
-									Result.Add(FieldNode, RdfSchema.label, F.Name);
-									Result.Add(FieldNode, RdfSchema.label, LocalizedName, Language.Code);
-								}
-
-								Result.Add(FieldNode, IoTSensorData.value, F.ObjectValue);
-								Result.Add(FieldNode, IoTSensorData.timestamp, F.Timestamp);
-
-								if (F.QoS.HasFlag(FieldQoS.Missing))
-								{
-									Result.Add(FieldNode, IoTSensorData.qos,
-										nameof(FieldQoS.Missing), IoTSensorData.qos);
-								}
-
-								if (F.QoS.HasFlag(FieldQoS.InProgress))
-								{
-									Result.Add(FieldNode, IoTSensorData.qos,
-										nameof(FieldQoS.InProgress), IoTSensorData.qos);
-								}
-
-								if (F.QoS.HasFlag(FieldQoS.AutomaticEstimate))
-								{
-									Result.Add(FieldNode, IoTSensorData.qos,
-										nameof(FieldQoS.AutomaticEstimate), IoTSensorData.qos);
-								}
-
-								if (F.QoS.HasFlag(FieldQoS.ManualEstimate))
-								{
-									Result.Add(FieldNode, IoTSensorData.qos,
-										nameof(FieldQoS.ManualEstimate), IoTSensorData.qos);
-								}
-
-								if (F.QoS.HasFlag(FieldQoS.ManualReadout))
-								{
-									Result.Add(FieldNode, IoTSensorData.qos,
-										nameof(FieldQoS.ManualReadout), IoTSensorData.qos);
-								}
-
-								if (F.QoS.HasFlag(FieldQoS.AutomaticReadout))
-								{
-									Result.Add(FieldNode, IoTSensorData.qos,
-										nameof(FieldQoS.AutomaticReadout), IoTSensorData.qos);
-								}
-
-								if (F.QoS.HasFlag(FieldQoS.TimeOffset))
-								{
-									Result.Add(FieldNode, IoTSensorData.qos,
-										nameof(FieldQoS.TimeOffset), IoTSensorData.qos);
-								}
-
-								if (F.QoS.HasFlag(FieldQoS.Warning))
-								{
-									Result.Add(FieldNode, IoTSensorData.qos,
-										nameof(FieldQoS.Warning), IoTSensorData.qos);
-								}
-
-								if (F.QoS.HasFlag(FieldQoS.Error))
-								{
-									Result.Add(FieldNode, IoTSensorData.qos,
-										nameof(FieldQoS.Error), IoTSensorData.qos);
-								}
-
-								if (F.QoS.HasFlag(FieldQoS.Signed))
-								{
-									Result.Add(FieldNode, IoTSensorData.qos,
-										nameof(FieldQoS.Signed), IoTSensorData.qos);
-								}
-
-								if (F.QoS.HasFlag(FieldQoS.Invoiced))
-								{
-									Result.Add(FieldNode, IoTSensorData.qos,
-										nameof(FieldQoS.Invoiced), IoTSensorData.qos);
-								}
-
-								if (F.QoS.HasFlag(FieldQoS.EndOfSeries))
-								{
-									Result.Add(FieldNode, IoTSensorData.qos,
-										nameof(FieldQoS.EndOfSeries), IoTSensorData.qos);
-								}
-
-								if (F.QoS.HasFlag(FieldQoS.PowerFailure))
-								{
-									Result.Add(FieldNode, IoTSensorData.qos,
-										nameof(FieldQoS.PowerFailure), IoTSensorData.qos);
-								}
-
-								if (F.QoS.HasFlag(FieldQoS.InvoiceConfirmed))
-								{
-									Result.Add(FieldNode, IoTSensorData.qos,
-										nameof(FieldQoS.InvoiceConfirmed), IoTSensorData.qos);
-								}
-
-								Result.Add(FieldNode, IoTConcentrator.isControllable, F.Writable);
-
-								if (F.Type.HasFlag(FieldType.Momentary))
-								{
-									Result.Add(FieldNode, Rdf.type,
-										nameof(FieldType.Momentary), IoTSensorData.fieldType);
-								}
-
-								if (F.Type.HasFlag(FieldType.Identity))
-								{
-									Result.Add(FieldNode, Rdf.type,
-										nameof(FieldType.Identity), IoTSensorData.fieldType);
-								}
-
-								if (F.Type.HasFlag(FieldType.Status))
-								{
-									Result.Add(FieldNode, Rdf.type,
-										nameof(FieldType.Status), IoTSensorData.fieldType);
-								}
-
-								if (F.Type.HasFlag(FieldType.Computed))
-								{
-									Result.Add(FieldNode, Rdf.type,
-										nameof(FieldType.Computed), IoTSensorData.fieldType);
-								}
-
-								if (F.Type.HasFlag(FieldType.Peak))
-								{
-									Result.Add(FieldNode, Rdf.type,
-										nameof(FieldType.Peak), IoTSensorData.fieldType);
-								}
-
-								if (F.Type.HasFlag(FieldType.Historical))
-								{
-									Result.Add(FieldNode, Rdf.type,
-										nameof(FieldType.Historical), IoTSensorData.fieldType);
-								}
-							}
-
-							if (e.Done)
-								ReadoutCompleted.TrySetResult(true);
-						},
-						(Sender, e) =>
-						{
-							foreach (ThingError Error in e.Errors)
-							{
-								BlankNode ErrorNode = new BlankNode("n" + Guid.NewGuid().ToString());
-
-								Result.Add(Errors, Rdf.ListItem(++ErrorIndex), ErrorNode);
-								Result.Add(ErrorNode, RdfSchema.label, Error.ErrorMessage);
-								Result.Add(ErrorNode, IoTSensorData.timestamp, Error.Timestamp);
-
-								if (!string.IsNullOrEmpty(Error.NodeId))
-									Result.Add(ErrorNode, IoTConcentrator.nodeId, Error.NodeId);
-
-								if (!string.IsNullOrEmpty(Error.SourceId))
-									Result.Add(ErrorNode, IoTConcentrator.sourceId, Error.SourceId);
-
-								if (!string.IsNullOrEmpty(Error.Partition))
-									Result.Add(ErrorNode, IoTConcentrator.partition, Error.Partition);
-							}
-
-							if (e.Done)
-								ReadoutCompleted.TrySetResult(true);
-
-							return Task.CompletedTask;
-						}, null);
-
-					Task Timeout = Task.Delay(60000);
-					Task T = await Task.WhenAny(ReadoutCompleted.Task, Timeout);
-
-					if (!ReadoutCompleted.Task.IsCompleted)
-					{
-						BlankNode ErrorNode = new BlankNode("n" + Guid.NewGuid().ToString());
-
-						Result.Add(Errors, Rdf.ListItem(++ErrorIndex), ErrorNode);
-						Result.Add(ErrorNode, RdfSchema.label, "Timeout.");
-						Result.Add(ErrorNode, IoTSensorData.timestamp, DateTime.UtcNow);
-					}
-					break;
-
-				case "cmd":     // TODO
-				case "edit":    // TODO
-				case "control": // TODO
-				default:
-					return null;
-			}
-
-			return Result;
 		}
 
 	}

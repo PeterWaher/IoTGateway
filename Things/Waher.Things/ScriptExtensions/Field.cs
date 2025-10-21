@@ -201,8 +201,10 @@ namespace Waher.Things.ScriptExtensions.SensorData
 				return new ObjectValue(new Int64Field(ThingRef, TP, FieldName, ui32, Type, QoS, Writable));
 			else if (ValueObject is ulong ui64)
 				return new ObjectValue(new QuantityField(ThingRef, TP, FieldName, ui64, 0, string.Empty, Type, QoS, Writable));
+			else if (ValueObject is null)
+				throw new ScriptRuntimeException("Fields cannot have a null value.", this);
 			else
-				throw new ScriptRuntimeException("Field type not supported.", this);
+				throw new ScriptRuntimeException("Field type not supported: " + ValueObject.GetType().FullName, this);
 		}
 
 	}

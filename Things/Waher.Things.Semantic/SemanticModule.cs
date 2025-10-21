@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Waher.Content.Semantic;
 using Waher.IoTGateway;
 using Waher.Networking.HTTP;
@@ -36,23 +37,31 @@ namespace Waher.Things.Semantic
 			if (e.Exception is null)
 				return; // Already processed
 
-			HttpRequest Request = e.Request;
-			RequestOrigin Caller;
+			try
+			{
+				HttpRequest Request = e.Request;
+				RequestOrigin Caller;
 
-			if (Request.User is IRequestOrigin Origin)
-				Caller = await Origin.GetOrigin();
-			else
-				Caller = RequestOrigin.Empty;
+				if (Request.User is IRequestOrigin Origin)
+					Caller = await Origin.GetOrigin();
+				else
+					Caller = RequestOrigin.Empty;
 
-			IDynamicGraph Graph = await DataSourceGraph.FindDynamicGraph(e.Request.SubPath, Caller);
-			if (Graph is null)
-				return;
+				IDynamicGraph Graph = await DataSourceGraph.FindDynamicGraph(e.Request.SubPath, Caller);
+				if (Graph is null)
+					return;
 
-			InMemorySemanticCube Result = new InMemorySemanticCube();
-			Language Language = await Translator.GetDefaultLanguageAsync();  // TODO: Check Accept-Language HTTP header.
+				InMemorySemanticCube Result = new InMemorySemanticCube();
+				Language Language = await Translator.GetDefaultLanguageAsync();  // TODO: Check Accept-Language HTTP header.
 
-			await Graph.GenerateGraph(Result, Language, Caller);
-			await e.Response.Return(Result);
+				await Graph.GenerateGraph(Result, Language, Caller);
+				await e.Response.Return(Result);
+			}
+			catch (Exception ex)
+			{
+				await e.Response.SendResponse(ex);
+			}
+
 			e.Exception = null;
 		}
 	}

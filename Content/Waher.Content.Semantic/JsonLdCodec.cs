@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Json;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 
@@ -102,11 +103,18 @@ namespace Waher.Content.Semantic
 				Grade = Grade.Excellent;
 				return true;
 			}
-			else if (Object is ISemanticModel &&
-				InternetContent.IsAccepted(JsonLdContentTypes, AcceptedContentTypes))
+			else if (Object is ISemanticModel)
 			{
-				Grade = Grade.Barely;
-				return true;
+				if (InternetContent.IsAccepted(JsonLdContentTypes, AcceptedContentTypes))
+				{
+					Grade = Grade.Ok;
+					return true;
+				}
+				else if (InternetContent.IsAccepted(JsonCodec.JsonContentTypes, AcceptedContentTypes))
+				{
+					Grade = Grade.Barely;
+					return true;
+				}
 			}
 
 			Grade = Grade.NotAtAll;

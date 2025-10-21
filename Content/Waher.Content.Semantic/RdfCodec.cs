@@ -6,6 +6,7 @@ using System.Xml;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Semantic.Ontologies;
+using Waher.Content.Xml.Text;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
@@ -107,17 +108,22 @@ namespace Waher.Content.Semantic
 				Grade = Grade.Excellent;
 				return true;
 			}
-			else if (Object is ISemanticModel &&
-				InternetContent.IsAccepted(RdfContentTypes, AcceptedContentTypes))
+			else if (Object is ISemanticModel)
 			{
-				Grade = Grade.Barely;
-				return true;
+				if (InternetContent.IsAccepted(RdfContentTypes, AcceptedContentTypes))
+				{
+					Grade = Grade.Ok;
+					return true;
+				}
+				else if (InternetContent.IsAccepted(XmlCodec.XmlContentTypes, AcceptedContentTypes))
+				{
+					Grade = Grade.Barely;
+					return true;
+				}
 			}
-			else
-			{
-				Grade = Grade.NotAtAll;
-				return false;
-			}
+
+			Grade = Grade.NotAtAll;
+			return false;
 		}
 
 		/// <summary>
@@ -168,7 +174,10 @@ namespace Waher.Content.Semantic
 						CheckPrefix(Triple.Predicate, Prefixes);
 						CheckPrefix(Triple.Object, Prefixes);
 
-						s = Triple.Subject.ToString();
+						if (Triple.Subject is UriNode UriNode)
+							s = UriNode.Uri.ToString();
+						else
+							s = Triple.Subject.ToString();
 
 						if (!PerSubject.TryGetValue(s, out ChunkedList<ISemanticTriple> List))
 						{
@@ -182,16 +191,16 @@ namespace Waher.Content.Semantic
 					w.WriteStartElement("rdf", "RDF", Rdf.Namespace);
 
 					foreach (KeyValuePair<string, string> P in Prefixes)
-						w.WriteAttributeString("xmlns", P.Key, string.Empty, P.Value);
+						w.WriteAttributeString("xmlns", P.Value, string.Empty, P.Key);
 
 					foreach (KeyValuePair<string, ChunkedList<ISemanticTriple>> Subject in PerSubject)
 					{
 						w.WriteStartElement("rdf", "Description", Rdf.Namespace);
 
-						if (Subject.Value.FirstItem is BlankNode SubjectBlankNode)
-							w.WriteAttributeString("rdf", "nodeID", string.Empty, SubjectBlankNode.NodeId);
+						if (Subject.Key.StartsWith("_:"))
+							w.WriteAttributeString("rdf", "nodeID", Rdf.Namespace, Subject.Key.Substring(3));
 						else
-							w.WriteAttributeString("rdf", "about", string.Empty, Subject.Key);
+							w.WriteAttributeString("rdf", "about", Rdf.Namespace, Subject.Key);
 
 						foreach (ISemanticTriple Triple in Subject.Value)
 						{
@@ -200,7 +209,8 @@ namespace Waher.Content.Semantic
 								string Uri = Predicate.UriString;
 								string Namespace = GetNamespace(Uri);
 
-								if (Prefixes.TryGetValue(Namespace, out string Prefix))
+								if (!(Namespace is null) &&
+									Prefixes.TryGetValue(Namespace, out string Prefix))
 								{
 									string LocalName = Uri.Substring(Namespace.Length);
 									w.WriteStartElement(Prefix, LocalName, Namespace);
@@ -223,14 +233,14 @@ namespace Waher.Content.Semantic
 									}
 									else
 									{
-										w.WriteAttributeString("rdf", "datatype", string.Empty, Literal.StringType);
+										w.WriteAttributeString("rdf", "datatype", Rdf.Namespace, Literal.StringType);
 										w.WriteValue(Literal.StringValue);
 									}
 								}
 								else if (Triple.Object is BlankNode BlankNode)
-									w.WriteAttributeString("rdf", "nodeID", string.Empty, BlankNode.NodeId);
+									w.WriteAttributeString("rdf", "nodeID", Rdf.Namespace, BlankNode.NodeId);
 								else if (Triple.Object is UriNode UriNode)
-									w.WriteAttributeString("rdf", "resource", string.Empty, UriNode.UriString);
+									w.WriteAttributeString("rdf", "resource", Rdf.Namespace, UriNode.UriString);
 								else
 									w.WriteValue(Triple.Object.ToString());
 
@@ -278,6 +288,10 @@ namespace Waher.Content.Semantic
 				return Uri.Substring(0, i + 1);
 
 			i = Uri.LastIndexOf('/');
+			if (i >= 0)
+				return Uri.Substring(0, i + 1);
+
+			i = Uri.LastIndexOf(':');
 			if (i >= 0)
 				return Uri.Substring(0, i + 1);
 

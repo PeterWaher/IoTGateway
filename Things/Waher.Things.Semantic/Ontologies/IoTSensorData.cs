@@ -57,6 +57,11 @@ namespace Waher.Things.Semantic.Ontologies
 		public static readonly Uri timestamp = new Uri(Namespace + "timestamp");
 
 		/// <summary>
+		/// urn:nf:iot:sd:1.0:timestamps
+		/// </summary>
+		public static readonly Uri timestamps = new Uri(Namespace + "timestamps");
+
+		/// <summary>
 		/// urn:nf:iot:sd:1.0:fields
 		/// </summary>
 		public static readonly Uri fields = new Uri(Namespace + "fields");

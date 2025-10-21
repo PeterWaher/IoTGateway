@@ -36,6 +36,7 @@ namespace Waher.Content.Semantic
 		private readonly Uri baseUri;
 		private Dictionary<string, string> shortBlankNodeLabels = null;
 		private Dictionary<string, string> shortUris = null;
+		private Dictionary<string, SemanticLiteral> literals = null;
 
 		/// <summary>
 		/// Contains the results of a SPARQL query.
@@ -669,6 +670,24 @@ namespace Waher.Content.Semantic
 			}
 
 			return Short;
+		}
+
+		/// <summary>
+		/// Gets a label unique for a literal.
+		/// </summary>
+		/// <param name="Literal">Literal node.</param>
+		/// <returns>SLiteral label.</returns>
+		public string GetLiteralLabel(SemanticLiteral Literal)
+		{
+			if (this.literals is null)
+				this.literals = new Dictionary<string, SemanticLiteral>();
+
+			int i = this.literals.Count + 1;
+			string Label = "L" + i.ToString();
+			
+			this.literals[Label] = Literal;
+
+			return Label;
 		}
 	}
 }

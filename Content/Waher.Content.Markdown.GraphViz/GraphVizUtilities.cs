@@ -2,7 +2,6 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Semantic;
-using Waher.Content.Semantic.Functions;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Script;
@@ -154,20 +153,24 @@ namespace Waher.Content.Markdown.GraphViz
 				sb.AppendLine("\tfontsize=20");
 			}
 
+			int LiteralIndex = 0;
+
 			foreach (ISemanticTriple Triple in Graph)
 			{
-				AddName(GetShortName(ResultSet, Triple.Subject), NodeNames, sb);
-				AddName(GetShortName(ResultSet, Triple.Object), NodeNames, sb);
+				AddShortName(ResultSet, Triple.Subject, NodeNames, sb, ref LiteralIndex);
+				AddShortName(ResultSet, Triple.Object, NodeNames, sb, ref LiteralIndex);
 			}
+
+			LiteralIndex = 0;
 
 			foreach (ISemanticTriple Triple in Graph)
 			{
 				sb.Append("\t");
-				sb.Append(NodeNames[GetShortName(ResultSet, Triple.Subject)]);
+				sb.Append(GetNodeName(ResultSet, Triple.Subject, NodeNames, false, ref LiteralIndex));
 				sb.Append(" -> ");
-				sb.Append(NodeNames[GetShortName(ResultSet, Triple.Object)]);
+				sb.Append(GetNodeName(ResultSet, Triple.Object, NodeNames, false, ref LiteralIndex));
 				sb.Append(" [label=\"");
-				sb.Append(JSON.Encode(GetShortName(ResultSet, Triple.Predicate)));
+				sb.Append(JSON.Encode(GetNodeName(ResultSet, Triple.Predicate, null, true, ref LiteralIndex)));
 				sb.AppendLine("\"]");
 			}
 
@@ -176,48 +179,91 @@ namespace Waher.Content.Markdown.GraphViz
 			return sb.ToString();
 		}
 
-		private static string GetShortName(SparqlResultSet Result, ISemanticElement Element)
+		private static string GetNodeName(SparqlResultSet Result, ISemanticElement Element,
+			Dictionary<string, string> NodeNames, bool IgnoreLiteral, ref int LiteralIndex)
 		{
+			string Name;
+
 			if (Element is UriNode UriNode)
-				return Result.GetShortUri(UriNode);
+				Name = Result.GetShortUri(UriNode);
 			else if (Element is BlankNode BlankNode)
-				return Result.GetShortBlankNodeLabel(BlankNode);
+				Name = Result.GetShortBlankNodeLabel(BlankNode);
+			else if (Element is SemanticLiteral)
+			{
+				if (IgnoreLiteral)
+					return "\"" + Element.ToString().Replace("\"", "\\\"") + "\"";
+				else
+					return "L" + (++LiteralIndex).ToString();
+			}
+			else
+				Name = Element.ToString();
+
+			if (NodeNames is null)
+				return Name;
+			else
+				return NodeNames[Name];
+		}
+
+		private static void AddShortName(SparqlResultSet Result, ISemanticElement Element,
+			Dictionary<string, string> NodeNames, StringBuilder sb, ref int LiteralIndex)
+		{
+			string Name;
+			string NodeName = null;
+			string AdditionalStyle = null;
+
+			if (Element is UriNode UriNode)
+			{
+				Name = Result.GetShortUri(UriNode);
+				AdditionalStyle = ",fillcolor=azure";
+			}
+			else if (Element is BlankNode BlankNode)
+			{
+				Name = Result.GetShortBlankNodeLabel(BlankNode);
+				AdditionalStyle = ",fillcolor=lightgray";
+			}
 			else if (Element is SemanticLiteral SemanticLiteral)
 			{
 				string Type = SemanticLiteral.StringType;
 				string ShortType = Result.GetShortUri(SemanticLiteral.StringType);
 
-				if (ShortType == Type)
-					return Element.ToString();
+				NodeName = "L" + (++LiteralIndex).ToString();
+				AdditionalStyle = ",fillcolor=honeydew,shape=box,style=\"rounded,filled\",margin=\"0.2,0\",height=0.35";
 
-				if (SemanticLiteral is CustomLiteral CustomLiteral)
+				if (ShortType == Type)
+					Name = Element.ToString();
+				else if (SemanticLiteral is CustomLiteral CustomLiteral)
 				{
-					return CustomLiteral.ToString(CustomLiteral.StringValue,
+					Name = CustomLiteral.ToString(CustomLiteral.StringValue,
 						CustomLiteral.Language, ShortType);
 				}
 				else
 				{
-					return CustomLiteral.ToString(SemanticLiteral.StringValue,
+					Name = CustomLiteral.ToString(SemanticLiteral.StringValue,
 						null, ShortType);
 				}
 			}
 			else
-				return Element.ToString();
-		}
+				Name = Element.ToString();
 
-		private static void AddName(string Node, Dictionary<string, string> NodeNames,
-			StringBuilder sb)
-		{
-			if (!NodeNames.ContainsKey(Node))
+			if (string.IsNullOrEmpty(NodeName))
 			{
-				string NodeName = "N" + (NodeNames.Count + 1).ToString();
-				NodeNames[Node] = NodeName;
-				sb.Append("\t");
-				sb.Append(NodeName);
-				sb.Append(" [label=\"");
-				sb.Append(JSON.Encode(Node));
-				sb.AppendLine("\"]");
+				NodeName = "N" + (NodeNames.Count + 1).ToString();
+				if (NodeNames.ContainsKey(Name))
+					return;
+				
+				NodeNames[Name] = NodeName;
 			}
+
+			sb.Append("\t");
+			sb.Append(NodeName);
+			sb.Append(" [label=\"");
+			sb.Append(JSON.Encode(Name));
+			sb.Append('"');
+
+			if (!string.IsNullOrEmpty(AdditionalStyle))
+				sb.Append(AdditionalStyle);
+
+			sb.AppendLine("]");
 		}
 
 		#endregion

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Ontologies;
 using Waher.IoTGateway;
+using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;
@@ -87,19 +89,24 @@ namespace Waher.Things.Semantic.Sources.DynamicGraphs
 			if (FieldTypes == 0)
 				return;
 
-			BlankNode Fields = new BlankNode("n" + Guid.NewGuid().ToString());
-			int FieldIndex = 0;
+			BlankNode Timestamps = new BlankNode("n" + Guid.NewGuid().ToString());
+			int TimestampIndex = 0;
 
-			Result.Add(NodeGraphUriNode, IoTSensorData.fields, Fields);
+			Result.Add(NodeGraphUriNode, IoTSensorData.timestamps, Timestamps);
+			Result.Add(Timestamps, Rdf.type, Rdf.Seq);
 
 			BlankNode Errors = new BlankNode("n" + Guid.NewGuid().ToString());
 			int ErrorIndex = 0;
 
 			Result.Add(NodeGraphUriNode, IoTSensorData.errors, Errors);
+			Result.Add(Errors, Rdf.type, Rdf.Seq);
 
+			Dictionary<DateTime, TimestampRec> TimestampNodes = new Dictionary<DateTime, TimestampRec>();
 			IThingReference[] Nodes = new IThingReference[] { this.node };
 			ApprovedReadoutParameters Approval = await Gateway.ConcentratorServer.SensorServer.CanReadAsync(FieldTypes, Nodes, null, Caller)
 				?? throw new ForbiddenException("Not authorized to read sensor-data from node.");
+			DateTime Timestamp = DateTime.MinValue;
+			TimestampRec TimestampRec = null;
 
 			TaskCompletionSource<bool> ReadoutCompleted = new TaskCompletionSource<bool>();
 			InternalReadoutRequest Request = await Gateway.ConcentratorServer.SensorServer.DoInternalReadout(Caller.From,
@@ -108,9 +115,29 @@ namespace Waher.Things.Semantic.Sources.DynamicGraphs
 				{
 					foreach (Field F in e.Fields)
 					{
+						if (TimestampRec is null || F.Timestamp != Timestamp)
+						{
+							Timestamp = F.Timestamp;
+							if (!TimestampNodes.TryGetValue(Timestamp, out TimestampRec))
+							{
+								TimestampNodes[Timestamp] = TimestampRec = new TimestampRec()
+								{
+									Node = new BlankNode("n" + Guid.NewGuid().ToString()),
+									Fields = new BlankNode("n" + Guid.NewGuid().ToString()),
+									FieldIndex = 0
+								};
+
+								Result.Add(Timestamps, Rdf.ListItem(++TimestampIndex), TimestampRec.Node);
+								Result.Add(TimestampRec.Node, Rdf.type, Rdf.Seq);
+								Result.Add(TimestampRec.Node, IoTSensorData.timestamp, Timestamp);
+								Result.Add(TimestampRec.Node, Rdf.ListItem(++TimestampRec.FieldIndex), TimestampRec.Fields);
+								Result.Add(TimestampRec.Fields, Rdf.type, Rdf.Seq);
+							}
+						}
+
 						BlankNode FieldNode = new BlankNode("n" + Guid.NewGuid().ToString());
 
-						Result.Add(Fields, Rdf.ListItem(++FieldIndex), FieldNode);
+						Result.Add(TimestampRec.Fields, Rdf.ListItem(++TimestampRec.FieldIndex), FieldNode);
 
 						string LocalizedName;
 
@@ -139,7 +166,6 @@ namespace Waher.Things.Semantic.Sources.DynamicGraphs
 						}
 
 						Result.Add(FieldNode, IoTSensorData.value, F.ObjectValue);
-						Result.Add(FieldNode, IoTSensorData.timestamp, F.Timestamp);
 
 						if (F.QoS.HasFlag(FieldQoS.Missing))
 						{
@@ -304,6 +330,13 @@ namespace Waher.Things.Semantic.Sources.DynamicGraphs
 				Result.Add(ErrorNode, RdfSchema.label, "Timeout.");
 				Result.Add(ErrorNode, IoTSensorData.timestamp, DateTime.UtcNow);
 			}
+		}
+
+		private class TimestampRec
+		{
+			public BlankNode Node;
+			public BlankNode Fields;
+			public int FieldIndex;
 		}
 
 	}

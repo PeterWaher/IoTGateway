@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
@@ -34,7 +35,7 @@ namespace Waher.Things.Semantic
 			: base(Value.Magnitude, CommonTypes.Encode(Value.Magnitude))
 		{
 			this.value = Value;
-			this.stringType = IoTSensorData.UnitNamespace + this.value?.Unit;
+			this.stringType = IoTSensorData.UnitNamespace + HttpUtility.UrlEncode(this.value?.Unit.ToString() ?? string.Empty);
 		}
 
 		/// <summary>
@@ -84,7 +85,7 @@ namespace Waher.Things.Semantic
 		{
 			if (DataType.StartsWith(IoTSensorData.UnitNamespace, StringComparison.CurrentCultureIgnoreCase) &&
 				CommonTypes.TryParse(Value, out double Magnitude) &&
-				Unit.TryParse(DataType.Substring(IoTSensorData.UnitNamespace.Length), out Unit Unit2))
+				Unit.TryParse(HttpUtility.UrlDecode(DataType[IoTSensorData.UnitNamespace.Length..]), out Unit Unit2))
 			{
 				return new QuantityLiteral(new PhysicalQuantity(Magnitude, Unit2));
 			}
@@ -100,7 +101,7 @@ namespace Waher.Things.Semantic
 		public override Grade Supports(string DataType)
 		{
 			if (DataType.StartsWith(IoTSensorData.UnitNamespace, StringComparison.CurrentCultureIgnoreCase) &&
-				Unit.TryParse(DataType.Substring(IoTSensorData.UnitNamespace.Length), out _))
+				Unit.TryParse(HttpUtility.UrlDecode(DataType[IoTSensorData.UnitNamespace.Length..]), out _))
 			{
 				return Grade.Ok;
 			}

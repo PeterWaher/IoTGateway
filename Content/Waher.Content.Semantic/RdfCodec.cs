@@ -198,7 +198,7 @@ namespace Waher.Content.Semantic
 						w.WriteStartElement("rdf", "Description", Rdf.Namespace);
 
 						if (Subject.Key.StartsWith("_:"))
-							w.WriteAttributeString("rdf", "nodeID", Rdf.Namespace, Subject.Key.Substring(3));
+							w.WriteAttributeString("rdf", "nodeID", Rdf.Namespace, Subject.Key.Substring(2));
 						else
 							w.WriteAttributeString("rdf", "about", Rdf.Namespace, Subject.Key);
 

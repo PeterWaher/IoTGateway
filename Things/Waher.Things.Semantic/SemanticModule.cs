@@ -37,6 +37,7 @@ namespace Waher.Things.Semantic
 			if (e.Exception is null)
 				return; // Already processed
 
+			e.Exception = null;
 			try
 			{
 				HttpRequest Request = e.Request;
@@ -61,8 +62,6 @@ namespace Waher.Things.Semantic
 			{
 				await e.Response.SendResponse(ex);
 			}
-
-			e.Exception = null;
 		}
 	}
 }

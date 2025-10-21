@@ -32,36 +32,45 @@ namespace Waher.Things.Semantic
 			return Task.CompletedTask;
 		}
 
-		private async Task CheckDynamicGraphs(object Sender, FileNotFoundEventArgs e)
+		private Task CheckDynamicGraphs(object Sender, FileNotFoundEventArgs e)
 		{
-			if (e.Exception is null)
-				return; // Already processed
-
-			e.Exception = null;
-			try
+			if (!(e.Exception is null))
 			{
-				HttpRequest Request = e.Request;
-				RequestOrigin Caller;
+				e.Exception = null;
 
-				if (Request.User is IRequestOrigin Origin)
-					Caller = await Origin.GetOrigin();
-				else
-					Caller = RequestOrigin.Empty;
+				_ = Task.Run(async () =>
+				{
+					try
+					{
+						RequestOrigin Caller;
 
-				IDynamicGraph Graph = await DataSourceGraph.FindDynamicGraph(e.Request.SubPath, Caller);
-				if (Graph is null)
-					return;
+						if (e.Request.User is IRequestOrigin Origin)
+							Caller = await Origin.GetOrigin();
+						else
+							Caller = RequestOrigin.Empty;
 
-				InMemorySemanticCube Result = new InMemorySemanticCube();
-				Language Language = await Translator.GetDefaultLanguageAsync();  // TODO: Check Accept-Language HTTP header.
+						IDynamicGraph Graph = await DataSourceGraph.FindDynamicGraph(e.Request.SubPath, Caller);
+						if (Graph is null)
+							return;
 
-				await Graph.GenerateGraph(Result, Language, Caller);
-				await e.Response.Return(Result);
+						InMemorySemanticCube Result = new InMemorySemanticCube();
+						Language Language = await Translator.GetDefaultLanguageAsync();  // TODO: Check Accept-Language HTTP header.
+
+						await Graph.GenerateGraph(Result, Language, Caller);
+						await e.Response.Return(Result);
+					}
+					catch (Exception ex)
+					{
+						await e.Response.SendResponse(ex);
+					}
+					finally
+					{
+						await e.Response.DisposeAsync();
+					}
+				});
 			}
-			catch (Exception ex)
-			{
-				await e.Response.SendResponse(ex);
-			}
+
+			return Task.CompletedTask;
 		}
 	}
 }

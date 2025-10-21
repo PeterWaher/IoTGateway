@@ -128,9 +128,8 @@ namespace Waher.Things.Semantic.Sources.DynamicGraphs
 								};
 
 								Result.Add(Timestamps, Rdf.ListItem(++TimestampIndex), TimestampRec.Node);
-								Result.Add(TimestampRec.Node, Rdf.type, Rdf.Seq);
 								Result.Add(TimestampRec.Node, IoTSensorData.timestamp, Timestamp);
-								Result.Add(TimestampRec.Node, Rdf.ListItem(++TimestampRec.FieldIndex), TimestampRec.Fields);
+								Result.Add(TimestampRec.Node, IoTSensorData.fields, TimestampRec.Fields);
 								Result.Add(TimestampRec.Fields, Rdf.type, Rdf.Seq);
 							}
 						}

@@ -60,98 +60,121 @@ function AddGraph(Id, Name)
 
 function ExecuteQuery()
 {
+	var Result = document.getElementById("Result");
 	var xhttp = new XMLHttpRequest();
 	var IsHtml = false;
 	var IsBinary = false;
 	var IsPng = false;
 	var IsSvg = false;
+	var IsBlob = false;
 
 	xhttp.onreadystatechange = function ()
 	{
-		if (xhttp.readyState == 4)
+		switch (xhttp.readyState)
 		{
-			var Result = document.getElementById("Result");
+			case 2:
+				Result.innerHTML = "<legend>Receiving</legend><p>Response is being received...</p>";
+				break;
 
-			switch (xhttp.status)
-			{
-				case 200:
-					if (IsHtml)
-						Result.innerHTML = "<legend>Result</legend>" + xhttp.responseText;
-					else
-					{
-						Result.innerHTML = "<legend>Result</legend>";
-
-						if (IsBinary)
+			case 4:
+				switch (xhttp.status)
+				{
+					case 200:
+						if (IsHtml)
+							Result.innerHTML = "<legend>Result</legend>" + xhttp.responseText;
+						else
 						{
-							var Blob = xhttp.response;
-							var Url = window.URL.createObjectURL(Blob);
+							Result.innerHTML = "<legend>Result</legend>";
 
-							var A = document.createElement("A");
-							A.href = Url;
-							A.download = "SPARQL Result Set.xlsx";
+							if (IsBinary)
+							{
+								var Blob = xhttp.response;
+								var Url = window.URL.createObjectURL(Blob);
 
-							Result.appendChild(A);
-							A.click();
-							Result.removeChild(A);
+								var A = document.createElement("A");
+								A.href = Url;
+								A.download = "SPARQL Result Set.xlsx";
 
-							var P = document.createElement("P");
-							P.innerText = "The result has been downloaded.";
-							Result.appendChild(P);
+								Result.appendChild(A);
+								A.click();
+								Result.removeChild(A);
 
-							window.URL.revokeObjectURL(Url);
+								var P = document.createElement("P");
+								P.innerText = "The result has been downloaded.";
+								Result.appendChild(P);
+
+								window.URL.revokeObjectURL(Url);
+							}
+							else if (IsSvg)
+							{
+								var Div = document.createElement("DIV");
+								Result.appendChild(Div);
+
+								Div.innerHTML = xhttp.responseText;
+							}
+							else if (IsPng)
+							{
+								var Blob = xhttp.response;
+								var Reader = new FileReader();
+
+								Reader.onload = function (e)
+								{
+									var Img = document.createElement("IMG");
+									Img.src = e.target.result;
+									Img.alt = "SPARQL Result Image";
+
+									Result.appendChild(Img);
+								};
+
+								Reader.readAsDataURL(Blob);
+							}
+							else
+							{
+								var Pre = document.createElement("PRE");
+								Result.appendChild(Pre);
+
+								var Code = document.createElement("CODE");
+								Pre.appendChild(Code);
+
+								Code.innerText = xhttp.responseText;
+							}
 						}
-						else if (IsSvg)
-						{
-							var Div = document.createElement("DIV");
-							Result.appendChild(Div);
+						break;
 
-							Div.innerHTML = xhttp.responseText;
-						}
-						else if (IsPng)
+					default:
+						var s = "<legend>Error " + xhttp.status + " - ";
+
+						if (xhttp.statusText)
+							s += xhttp.statusText;
+						else
+							s += GetStatusText(xhttp.status);
+
+						s += "</legend>";
+
+						if (IsBlob)
 						{
-							var Blob = xhttp.response;
 							var Reader = new FileReader();
 
 							Reader.onload = function (e)
 							{
-								var Img = document.createElement("IMG");
-								Img.src = e.target.result;
-								Img.alt = "SPARQL Result Image";
-
-								Result.appendChild(Img);
+								s += "<pre><code class='nohighlight'>" + Reader.result + "</code></pre>";
+								Result.innerHTML = s;
 							};
 
-							Reader.readAsDataURL(Blob);
+							Reader.readAsText(xhttp.response);
 						}
 						else
 						{
-							var Pre = document.createElement("PRE");
-							Result.appendChild(Pre);
-
-							var Code = document.createElement("CODE");
-							Pre.appendChild(Code);
-
-							Code.innerText = xhttp.responseText;
+							s += "<pre><code class='nohighlight'>" + xhttp.responseText + "</code></pre>";
+							Result.innerHTML = s;
 						}
-					}
-					break;
+						break;
+				}
 
-				default:
-					var s = "<legend>Error " + xhttp.status + " - ";
+				Result.setAttribute("style", "display:block");
 
-					if (xhttp.statusText)
-						s += xhttp.statusText;
-					else
-						s += GetStatusText(xhttp.status);
-
-					Result.innerHTML += "</legend>" + xhttp.responseText;
-					Result.innerHTML = s;
-					break;
-			}
-
-			Result.setAttribute("style", "display:block");
-
-			delete xhttp;
+				delete xhttp;
+				break;
 		}
 	};
 
@@ -205,6 +228,7 @@ function ExecuteQuery()
 
 		case "Xlsx":
 			IsBinary = true;
+			IsBlob = true;
 			xhttp.setRequestHeader("Accept", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 			xhttp.responseType = "blob";
 			break;
@@ -215,6 +239,7 @@ function ExecuteQuery()
 
 		case "Png":
 			IsPng = true;
+			IsBlob = true;
 			xhttp.setRequestHeader("Accept", "image/png");
 			xhttp.responseType = "blob";
 			break;
@@ -224,6 +249,9 @@ function ExecuteQuery()
 			xhttp.setRequestHeader("Accept", "image/svg+xml");
 			break;
 	}
+
+	Result.setAttribute("style", "display:block");
+	Result.innerHTML = "<legend>Processing</legend><p>Query is being processed...</p>";
 
 	xhttp.send(Form);
 }

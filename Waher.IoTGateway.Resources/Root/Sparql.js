@@ -157,7 +157,7 @@ function ExecuteQuery()
 
 							Reader.onload = function (e)
 							{
-								s += "<pre><code class='nohighlight'>" + Reader.result + "</code></pre>";
+								s += "<pre><code class='nohighlight'>" + ExtractMessage(Reader.result) + "</code></pre>";
 								Result.innerHTML = s;
 							};
 
@@ -165,7 +165,7 @@ function ExecuteQuery()
 						}
 						else
 						{
-							s += "<pre><code class='nohighlight'>" + xhttp.responseText + "</code></pre>";
+							s += "<pre><code class='nohighlight'>" + ExtractMessage(xhttp.responseText) + "</code></pre>";
 							Result.innerHTML = s;
 						}
 						break;
@@ -254,6 +254,47 @@ function ExecuteQuery()
 	Result.innerHTML = "<legend>Processing</legend><p>Query is being processed...</p>";
 
 	xhttp.send(Form);
+}
+
+function ExtractMessage(Html)
+{
+	return GetCode(GetPre(GetBody(Html)));
+}
+
+function GetBody(Html)
+{
+	return GetElementContent(Html, "body")
+}
+
+function GetPre(Html)
+{
+	return GetElementContent(Html, "pre")
+}
+
+function GetCode(Html)
+{
+	return GetElementContent(Html, "code")
+}
+
+function GetElementContent(Html, TagName)
+{
+	if (!Html)
+		return Html;
+
+	var Lower = Html.toLowerCase();
+	var StartTagIndex = Lower.indexOf("<" + TagName);
+	if (StartTagIndex < 0)
+		return Html;
+
+	var StartTagClose = Lower.indexOf(">", StartTagIndex);
+	if (StartTagClose < 0)
+		return Html;
+
+	var EndTagIndex = Lower.indexOf("</" + TagName, StartTagClose + 1);
+	if (EndTagIndex < 0)
+		return Html;
+
+	return Html.substring(StartTagClose + 1, EndTagIndex);
 }
 
 function GetStatusText(status)

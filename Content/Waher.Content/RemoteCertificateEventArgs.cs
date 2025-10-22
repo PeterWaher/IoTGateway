@@ -34,7 +34,7 @@ namespace Waher.Content
 			get => this.isValid;
 			set
 			{
-				if (this.isValid.HasValue)
+				if (this.isValid.HasValue && this.isValid != value)
 					throw new InvalidOperationException("Value has already been set.");
 
 				this.isValid = value;

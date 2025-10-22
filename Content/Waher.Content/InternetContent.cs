@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Binary;
+using Waher.Events;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
@@ -2499,6 +2501,32 @@ namespace Waher.Content
 
 			return Header.HeadAsync(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 		}
+
+		#endregion
+
+		#region Local domains
+
+		/// <summary>
+		/// Checks if a domain or nost name is local.
+		/// </summary>
+		/// <param name="DomainOrHost">Domain or host name.</param>
+		/// <param name="IncludeAlternativeDomains">If alternative domains are to be checked as well.</param>
+		/// <returns>If the domain or host name is local.</returns>
+		public static bool IsLocalDomain(string DomainOrHost, bool IncludeAlternativeDomains)
+		{
+			if (DomainOrHost == "localhost")
+				return true;
+
+			LocalDomainEventArgs e = new LocalDomainEventArgs(DomainOrHost, IncludeAlternativeDomains);
+			LocalDomainCheck.Raise(typeof(InternetContent), e);
+
+			return e.IsLocal ?? false;
+		}
+
+		/// <summary>
+		/// Event raised when a local domain is to be checked.
+		/// </summary>
+		public static event EventHandler<LocalDomainEventArgs> LocalDomainCheck = null;
 
 		#endregion
 	}

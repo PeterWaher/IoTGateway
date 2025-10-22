@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Runtime.ExceptionServices;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Semantic;
-using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Things;
@@ -17,14 +16,14 @@ using Waher.Things;
 namespace Waher.Script.Persistence.SPARQL.Sources
 {
 	/// <summary>
-	/// Graph source on the Internet.
+	/// Graph source on the local machine.
 	/// </summary>
-	public class InternetContentSource : IGraphSource
+	public class LocalContentSource : IGraphSource
 	{
 		/// <summary>
-		/// Graph source on the Internet.
+		/// Graph source on the local machine.
 		/// </summary>
-		public InternetContentSource()
+		public LocalContentSource()
 		{
 		}
 
@@ -35,14 +34,31 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 		/// <returns>How well the class supports loading the graph.</returns>
 		public Grade Supports(Uri Source)
 		{
-			if (!Source.IsAbsoluteUri || 
-				LocalContentSource.IsLocal(Source) ||
-				!InternetContent.CanGet(Source, out Grade _, out _))
-			{
+			if (!Source.IsAbsoluteUri || !IsLocal(Source))
 				return Grade.NotAtAll;
-			}
 			else
 				return Grade.Barely;
+		}
+
+		/// <summary>
+		/// Checks if an URI corresponds to a local file name resource.
+		/// </summary>
+		/// <param name="Source">Source</param>
+		/// <returns>If the source is a local file name resource.</returns>
+		public static bool IsLocal(Uri Source)
+		{
+			if (!InternetContent.IsLocalDomain(Source.Host, true))
+				return false;
+
+			if (!string.IsNullOrEmpty(Source.Query))
+				return false;
+
+			if (!Types.TryGetModuleParameter("HTTP", out IResourceMap ResourceMap))
+				return false;
+
+			return 
+				ResourceMap.TryGetFileName(Source.AbsolutePath, true, out string _) ||
+				ResourceMap.TryGetFileName("/" + Source.Host + Source.AbsolutePath, true, out string _);
 		}
 
 		/// <summary>
@@ -63,18 +79,20 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 			{
 				// TODO: Include caller credentials in request, if available.
 
-				if (!Types.TryGetModuleParameter("X509", out X509Certificate Certificate))
-					Certificate = null;
+				if (!Types.TryGetModuleParameter("HTTP", out IResourceMap ResourceMap))
+					throw new Exception("No appropriate resource map registered.");
 
-				ContentResponse Content = await InternetContent.GetAsync(Source, Certificate,
-					new KeyValuePair<string, string>("Accept", "text/turtle, application/x-turtle, application/rdf+xml;q=0.9, application/ld+json;q=0.8, text/xml;q=0.2, " + PlainTextCodec.DefaultContentType + ";q=0.1"));
+				if (!ResourceMap.TryGetFileName(Source.AbsolutePath, true, out string FileName))
+					throw new Exception("Local resource file not found.");
 
-				if (NullIfNotFound && Content.HasError)
-					return null;
-				else
-					Content.AssertOk();
+				string ContentType = InternetContent.GetContentType(Path.GetExtension(FileName));
+				byte[] Data = await Files.ReadAllBytesAsync(FileName);
 
-				Result = Content.Decoded;
+				ContentResponse Response = await InternetContent.DecodeAsync(ContentType, Data, Source);
+				Response.AssertOk();
+
+				Result = Response.Decoded;
+
 				if (Result is ISemanticCube Cube)
 					return Cube;
 

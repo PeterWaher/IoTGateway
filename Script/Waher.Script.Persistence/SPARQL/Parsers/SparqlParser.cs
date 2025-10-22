@@ -324,10 +324,11 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				Parser.NextToken();
 				Parser.SkipWhiteSpace();
 
+				int Start2 = Parser.Position;
+
 				switch (Parser.PeekNextChar())
 				{
 					case '<':
-						int Start2 = Parser.Position;
 						Parser.NextChar();
 						UriNode FromUri = this.ParseUri(Parser);
 
@@ -339,13 +340,25 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 						if (string.Compare(Parser.PeekNextToken(), "NAMED", true) == 0)
 						{
 							Parser.NextToken();
-							if (Parser.NextNonWhitespaceChar() != '<')
-							{
-								Parser.UndoChar();
-								throw Parser.SyntaxError("Expected <");
-							}
+							Parser.SkipWhiteSpace();
 
-							FromUri = this.ParseUri(Parser);
+							if (Parser.PeekNextChar() == '<')
+							{
+								Parser.NextChar();
+								FromUri = this.ParseUri(Parser);
+							}
+							else
+							{
+								Node = Parser.ParseObject();
+
+								if (Node is VariableReference Ref3 && this.PeekNextChar(Parser) == ':')
+								{
+									Parser.NextChar();
+									FromUri = this.ParsePrefixedToken(Parser, Ref3.VariableName);
+								}
+								else
+									throw Parser.SyntaxError("Aboslute or prefixed URI expected.");
+							}
 
 							if (NamedGraphs is null)
 								NamedGraphs = new Dictionary<UriNode, ISemanticCube>();
@@ -353,11 +366,33 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 							NamedGraphs[FromUri] = null;
 						}
 						else
-							From.Add(Parser.ParseObject());
+						{
+							Node = Parser.ParseObject();
+
+							this.SkipWhiteSpace(Parser);
+							if (Node is VariableReference Ref2 && this.PeekNextChar(Parser) == ':')
+							{
+								Parser.NextChar();
+								FromUri = this.ParsePrefixedToken(Parser, Ref2.VariableName);
+								From.Add(new ConstantElement(FromUri, Start2, Parser.Position - Start2, Parser.Expression));
+							}
+							else
+								From.Add(Node);
+						}
 						break;
 
 					default:
-						From.Add(Parser.ParseObject());
+						Node = Parser.ParseObject();
+
+						this.SkipWhiteSpace(Parser);
+						if (Node is VariableReference Ref && this.PeekNextChar(Parser) == ':')
+						{
+							Parser.NextChar();
+							FromUri = this.ParsePrefixedToken(Parser, Ref.VariableName);
+							From.Add(new ConstantElement(FromUri, Start2, Parser.Position - Start2, Parser.Expression));
+						}
+						else
+							From.Add(Node);
 						break;
 				}
 

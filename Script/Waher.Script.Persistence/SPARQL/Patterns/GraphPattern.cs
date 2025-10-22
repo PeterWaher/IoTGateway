@@ -63,13 +63,15 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 			Variables Variables, IEnumerable<Possibility> ExistingMatches, SparqlQuery Query)
 		{
 			ObjectProperties ObjectProperties = null;
-			IElement Graph;
+			UriNode Graph;
 
 			if (ExistingMatches is null)
 			{
 				if (this.graphIsVariableRef &&
 					!Variables.ContainsVariable(this.graphVariableRef))
 				{
+					await Query.LoadUnloadedNamedGraphs(Variables);
+
 					ChunkedList<Possibility> Result = new ChunkedList<Possibility>();
 
 					foreach (UriNode GraphName in Query.NamedGraphNames)
@@ -100,14 +102,15 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 				}
 				else
 				{
-					Graph = await this.graph.EvaluateAsync(Variables);
+					Graph = Query.GetGraphName((await this.graph.EvaluateAsync(Variables)).AssociatedObjectValue);
 					Cube = await Query.GetNamedGraph(Graph.AssociatedObjectValue, Variables);
 					return await this.pattern.Search(Cube, Variables, ExistingMatches, Query);
 				}
 			}
 			else
 			{
-				ChunkedList<Possibility> Result = new ChunkedList<Possibility>();
+				ChunkedList<KeyValuePair<Possibility, UriNode>> ToProcess = new ChunkedList<KeyValuePair<Possibility, UriNode>>();
+				Dictionary<UriNode, bool> ReferencedGraphs = new Dictionary<UriNode, bool>();
 
 				foreach (Possibility P in ExistingMatches)
 				{
@@ -119,34 +122,98 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 					if (!this.graphIsVariableRef ||
 						ObjectProperties.ContainsVariable(this.graphVariableRef))
 					{
-						Graph = await this.graph.EvaluateAsync(ObjectProperties);
-						Cube = await Query.GetNamedGraph(Graph.AssociatedObjectValue, Variables);
+						Graph = Query.GetGraphName(await this.graph.EvaluateAsync(ObjectProperties));
+						if (Graph is null)
+							continue;
+					}
+					else
+					{
+						ToProcess = null;
+						ReferencedGraphs = null;
+						break;
+					}
+
+					ToProcess.Add(new KeyValuePair<Possibility, UriNode>(P, Graph));
+					ReferencedGraphs[Graph] = true;
+				}
+
+				if (!(ReferencedGraphs is null))
+				{
+					UriNode[] Referenced = new UriNode[ReferencedGraphs.Count];
+					ReferencedGraphs.Keys.CopyTo(Referenced, 0);
+
+					await Query.LoadUnloadedNamedGraphs(Variables, Referenced);
+				}
+				else
+					await Query.LoadUnloadedNamedGraphs(Variables);
+
+				ChunkedList<Possibility> Result = new ChunkedList<Possibility>();
+
+				if (!(ToProcess is null))
+				{
+					foreach (KeyValuePair<Possibility, UriNode> P in ToProcess)
+					{
+						if (ObjectProperties is null)
+							ObjectProperties = new ObjectProperties(P.Key, Variables);
+						else
+							ObjectProperties.Object = P.Key;
+
+						Cube = await Query.GetNamedGraph(P.Value, Variables);
 
 						if (!(Cube is null))
 						{
 							IEnumerable<Possibility> PartResult = await this.pattern.Search(
-								Cube, ObjectProperties, new Possibility[] { P }, Query);
+								Cube, ObjectProperties, new Possibility[] { P.Key }, Query);
 
 							if (!(PartResult is null))
 								Result.AddRange(PartResult);
 						}
 					}
-					else
+				}
+				else
+				{
+					foreach (Possibility P in ExistingMatches)
 					{
-						foreach (UriNode GraphName in Query.NamedGraphNames)
+						if (ObjectProperties is null)
+							ObjectProperties = new ObjectProperties(P, Variables);
+						else
+							ObjectProperties.Object = P;
+
+						if (!this.graphIsVariableRef ||
+							ObjectProperties.ContainsVariable(this.graphVariableRef))
 						{
-							Cube = await Query.GetNamedGraph(GraphName, Variables);
+							Graph = Query.GetGraphName(await this.graph.EvaluateAsync(ObjectProperties));
+							if (Graph is null)
+								continue;
+
+							Cube = await Query.GetNamedGraph(Graph, Variables);
 
 							if (!(Cube is null))
 							{
 								IEnumerable<Possibility> PartResult = await this.pattern.Search(
-									Cube, ObjectProperties, new Possibility[]
-									{
-										new Possibility(this.graphVariableRef, GraphName, P)
-									}, Query);
+									Cube, ObjectProperties, new Possibility[] { P }, Query);
 
 								if (!(PartResult is null))
 									Result.AddRange(PartResult);
+							}
+						}
+						else
+						{
+							foreach (UriNode GraphName in Query.NamedGraphNames)
+							{
+								Cube = await Query.GetNamedGraph(GraphName, Variables);
+
+								if (!(Cube is null))
+								{
+									IEnumerable<Possibility> PartResult = await this.pattern.Search(
+										Cube, ObjectProperties, new Possibility[]
+										{
+											new Possibility(this.graphVariableRef, GraphName, P)
+										}, Query);
+
+									if (!(PartResult is null))
+										Result.AddRange(PartResult);
+								}
 							}
 						}
 					}

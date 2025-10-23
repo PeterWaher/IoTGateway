@@ -916,7 +916,8 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
             <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
               <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="ThirdParty">
                 <Margins left="0.5em" right="0.5em">
-                  <Label text="cibernotar.io" x="50%" y="50%" halign="Center" valign="Center"/>
+				    <Label text="votodirecto.online" x="50%" y="50%" halign="Center"
+						    valign="Center" />
                 </Margins>
               </RoundedRectangle>
             </Margins>
@@ -968,7 +969,8 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
         <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
             <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="ThirdParty">
             <Margins left="0.5em" right="0.5em">
-                <Label text="cibernotar.io" x="50%" y="50%" halign="Center" valign="Center"/>
+				<Label text="votodirecto.online" x="50%" y="50%" halign="Center"
+						valign="Center" />
             </Margins>
             </RoundedRectangle>
         </Margins>
@@ -993,10 +995,10 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
         </Cell>
         <Cell colSpan="2">
         <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-            <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="ThirdParty">
-            <Margins left="0.5em" right="0.5em">
-                <Label text="TPN" x="50%" y="50%" halign="Center" valign="Center"/>
-            </Margins>
+            <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="App">
+                <Margins left="0.5em" right="0.5em">
+				    <Label text="SPARQL" x="50%" y="50%" halign="Center" valign="Center" />
+                </Margins>
             </RoundedRectangle>
         </Margins>
         </Cell>

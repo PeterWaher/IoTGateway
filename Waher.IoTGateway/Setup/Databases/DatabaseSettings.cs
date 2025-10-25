@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Waher.Runtime.Language;
-using Waher.Persistence.Attributes;
+﻿using Waher.Persistence.Attributes;
 
 namespace Waher.IoTGateway.Setup.Databases
 {
@@ -12,11 +8,23 @@ namespace Waher.IoTGateway.Setup.Databases
 	[TypeName(TypeNameSerialization.FullName)]
 	public class DatabaseSettings
 	{
+		private string objectId = null;
+
 		/// <summary>
 		/// Interface for Database settings
 		/// </summary>
 		public DatabaseSettings()
 		{
+		}
+
+		/// <summary>
+		/// Object ID
+		/// </summary>
+		[ObjectId]
+		public string ObjectId
+		{
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 	}
 }

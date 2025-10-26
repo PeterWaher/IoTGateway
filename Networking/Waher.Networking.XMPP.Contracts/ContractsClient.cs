@@ -1571,8 +1571,8 @@ namespace Waher.Networking.XMPP.Contracts
 			IdentityReviewEventArgs e2 = new IdentityReviewEventArgs(e, LegalId);
 			this.ParseValidationDetails(e.Content, e2);
 
-			if ((!e2.IsValid.HasValue && (e2.HasValidatedClaims || e2.HasValidatedPhotos)) ||
-				e2.IsValid.Value)
+			if ((e2.IsValid.HasValue && e2.IsValid.Value) ||
+				(!e2.IsValid.HasValue && (e2.HasValidatedClaims || e2.HasValidatedPhotos)))
 			{
 				await this.AddIdentityReviewAttachment(e2);
 			}

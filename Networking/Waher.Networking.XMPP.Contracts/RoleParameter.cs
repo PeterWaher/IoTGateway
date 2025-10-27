@@ -15,7 +15,7 @@ namespace Waher.Networking.XMPP.Contracts
 	{
 		private string role = string.Empty;
 		private string property = string.Empty;
-		private string @value = string.Empty;
+		private string @value = null;
 		private int index = 0;
 		private bool required = false;
 
@@ -178,7 +178,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
 		public override void SetValue(object Value)
 		{
-			this.@value = Value?.ToString() ?? string.Empty;
+			this.@value = Value?.ToString();
 			this.ProtectedValue = null;
 		}
 

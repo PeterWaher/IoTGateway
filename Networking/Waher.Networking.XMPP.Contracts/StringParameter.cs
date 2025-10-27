@@ -370,7 +370,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
 		public override void SetValue(object Value)
 		{
-			this.Value = Value.ToString();
+			this.Value = Value?.ToString();
 		}
 
 		/// <summary>

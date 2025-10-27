@@ -19,7 +19,12 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		public InlineElement[] InlineElements
 		{
 			get => this.inlineElements;
-			set => this.inlineElements = value;
+			set
+			{
+				this.UnregisterParent(this.inlineElements);
+				this.inlineElements = value;
+				this.RegisterParent(this.inlineElements);
+			}
 		}
 
 		/// <summary>
@@ -28,7 +33,12 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		public BlockElement[] BlockElements
 		{
 			get => this.blockElements;
-			set => this.blockElements = value;
+			set
+			{
+				this.UnregisterParent(this.blockElements);
+				this.blockElements = value;
+				this.RegisterParent(this.blockElements);
+			}
 		}
 
 		/// <summary>

@@ -15,7 +15,12 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		public Item[] Items
 		{
 			get => this.items;
-			set => this.items = value;
+			set
+			{
+				this.UnregisterParent(this.items);
+				this.items = value;
+				this.RegisterParent(this.items);
+			}
 		}
 
 		/// <summary>

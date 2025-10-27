@@ -1,9 +1,10 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
+using Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.ValueRendering;
 using Waher.Persistence;
-using Waher.Runtime.Geo;
+using Waher.Runtime.Inventory;
+using Waher.Runtime.Language;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 {
@@ -95,7 +96,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 
 							Value = Parameter.ObjectValue;
 
-							if (Parameter is AttachmentParameter AttachmentParameter)
+							if (Parameter is AttachmentParameter)
 							{
 								// TODO: Use attachment as value.
 							}
@@ -141,18 +142,26 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 					}
 					else
 					{
+						IParameterValueRenderer ValueRenderer =
+							Types.FindBest<IParameterValueRenderer, object>(Value);
+
 						string s;
 
-						if (Value is bool BooleanValue)
-							s = BooleanValue ? "[X]" : "[ ]";
-						else if (Value is DateTime TP && TP.TimeOfDay == TimeSpan.Zero)
-							s = TP.ToShortDateString();
-						else if (Value is GeoPosition Position)
-							s = Position.HumanReadable;
+						if (ValueRenderer is null)
+							s = MarkdownEncode(Value.ToString(), Settings.SimpleEscape);
 						else
-							s = Value.ToString();
+						{
+							s = this.GetLanguage(Settings.Contract);
+							if (string.IsNullOrEmpty(s))
+								s = Translator.DefaultLanguageCode;
 
-						Markdown.Append(MarkdownEncode(s, Settings.SimpleEscape));
+							s = await ValueRenderer.ToString(Value, s, Settings);
+
+							if (!ValueRenderer.IsMarkdownOutput)
+								s = MarkdownEncode(s, Settings.SimpleEscape);
+						}
+
+						Markdown.Append(s);
 					}
 					break;
 			}

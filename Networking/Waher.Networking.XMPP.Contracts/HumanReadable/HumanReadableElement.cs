@@ -6,6 +6,7 @@ using Waher.Content;
 using Waher.Content.Markdown;
 using Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements;
 using Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements;
+using Waher.Script.Functions.ComplexNumbers;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable
 {
@@ -14,6 +15,42 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 	/// </summary>
 	public abstract class HumanReadableElement
 	{
+		private HumanReadableElement parent = null;
+
+		/// <summary>
+		/// Parent element.
+		/// </summary>
+		public HumanReadableElement Parent => this.parent;
+
+		/// <summary>
+		/// Registers a parent for a set of elements.
+		/// </summary>
+		/// <param name="Elements">Elements</param>
+		protected void RegisterParent(HumanReadableElement[] Elements)
+		{
+			if (!(Elements is null))
+			{
+				foreach (HumanReadableElement E in Elements)
+					E.parent = this;
+			}
+		}
+
+		/// <summary>
+		/// Unregisters a parent from a set of elements.
+		/// </summary>
+		/// <param name="Elements">Elements</param>
+		protected void UnregisterParent(HumanReadableElement[] Elements)
+		{
+			if (!(Elements is null))
+			{
+				foreach (HumanReadableElement E in Elements)
+				{
+					if (E.parent == this)
+						E.parent = null;
+				}
+			}
+		}
+
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
@@ -171,5 +208,24 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 			}
 		}
 
+		/// <summary>
+		/// Gets the language of the current element.
+		/// </summary>
+		/// <param name="Contract">Contract reference.</param>
+		/// <returns>Language code, if found.</returns>
+		public string GetLanguage(Contract Contract)
+		{
+			HumanReadableElement Loop = this;
+
+			while (!(Loop is null))
+			{
+				if (Loop is HumanReadableText Text && !string.IsNullOrEmpty(Text.Language))
+					return Text.Language;
+
+				Loop = Loop.parent;
+			}
+
+			return Contract?.DefaultLanguage ?? string.Empty;
+		}
 	}
 }

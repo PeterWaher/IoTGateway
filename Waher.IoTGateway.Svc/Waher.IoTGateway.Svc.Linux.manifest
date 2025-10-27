@@ -1148,6 +1148,7 @@
 		<Content fileName="Waher.IoTGateway.en.lng"/>
 		<Content fileName="Waher.IoTGateway.es.lng"/>
 		<Content fileName='Waher.Networking.XMPP.Concentrator.en.lng'/>
+		<Content fileName='Waher.Networking.XMPP.Contracts.en.lng'/>
 		<Content fileName='Waher.Reports.en.lng'/>
 		<Content fileName='Waher.Reports.Files.en.lng'/>
 		<Content fileName='Waher.Things.Files.en.lng'/>

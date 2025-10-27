@@ -1902,10 +1902,6 @@ namespace Waher.Networking.HTTP
 						}
 
 						ResourceName = ResourceName.Substring(j);
-
-						Log.Debug("Absolute URL.",
-							new KeyValuePair<string, object>("Authority", Authority),
-							new KeyValuePair<string, object>("Resource", ResourceName));
 					}
 				}
 			}

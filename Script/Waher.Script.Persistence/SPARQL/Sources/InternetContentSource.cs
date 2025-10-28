@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -34,7 +35,8 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 		/// <returns>How well the class supports loading the graph.</returns>
 		public Grade Supports(Uri Source)
 		{
-			if (!Source.IsAbsoluteUri ||
+			if (!Source.IsAbsoluteUri || 
+				LocalContentSource.IsLocal(Source) ||
 				!InternetContent.CanGet(Source, out Grade _, out _))
 			{
 				return Grade.NotAtAll;
@@ -59,10 +61,14 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 
 			try
 			{
-				// TODO: Include credentials in request, if available.
+				// TODO: Include caller credentials in request, if available.
 
-				ContentResponse Content = await InternetContent.GetAsync(Source,
+				if (!Types.TryGetModuleParameter("X509", out X509Certificate Certificate))
+					Certificate = null;
+
+				ContentResponse Content = await InternetContent.GetAsync(Source, Certificate,
 					new KeyValuePair<string, string>("Accept", "text/turtle, application/x-turtle, application/rdf+xml;q=0.9, application/ld+json;q=0.8, text/xml;q=0.2, " + PlainTextCodec.DefaultContentType + ";q=0.1"));
+
 				if (NullIfNotFound && Content.HasError)
 					return null;
 				else

@@ -17,9 +17,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp iot legal smart contracts signatures</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>4.8.0</AssemblyVersion>
-    <FileVersion>4.8.0</FileVersion>
-    <Version>4.8.0</Version>
+    <AssemblyVersion>4.9.2</AssemblyVersion>
+    <FileVersion>4.9.2</FileVersion>
+    <Version>4.9.2</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
@@ -33,6 +33,11 @@
     <None Remove="Schema\SmartContracts.xsd" />
     <None Remove="Schema\Xml.xsd" />
     <None Remove="Schema\Xmlns.xsd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Language\Waher.Networking.XMPP.Contracts.en.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Schema\E2E.xsd" />

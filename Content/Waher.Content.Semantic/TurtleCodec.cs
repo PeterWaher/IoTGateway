@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Text;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 
@@ -24,7 +25,10 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		public string[] ContentTypes => TurtleContentTypes;
 
-		private static readonly string[] TurtleContentTypes = new string[]
+		/// <summary>
+		/// Internet Content-Types indicating a Turtle Document.
+		/// </summary>
+		public static readonly string[] TurtleContentTypes = new string[]
 		{
 			DefaultContentType,
 			"application/x-turtle"
@@ -103,11 +107,18 @@ namespace Waher.Content.Semantic
 				Grade = Grade.Excellent;
 				return true;
 			}
-			else if (Object is ISemanticModel &&
-				InternetContent.IsAccepted(TurtleContentTypes, AcceptedContentTypes))
+			else if (Object is ISemanticModel)
 			{
-				Grade = Grade.Barely;
-				return true;
+				if (InternetContent.IsAccepted(TurtleContentTypes, AcceptedContentTypes))
+				{
+					Grade = Grade.Ok;
+					return true;
+				}
+				else if (InternetContent.IsAccepted(PlainTextCodec.DefaultContentType, AcceptedContentTypes))
+				{
+					Grade = Grade.Barely;
+					return true;
+				}
 			}
 
 			Grade = Grade.NotAtAll;

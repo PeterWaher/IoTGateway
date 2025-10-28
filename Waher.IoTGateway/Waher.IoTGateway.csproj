@@ -17,9 +17,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway HTTP CoAP MQTT XMPP LWM2M DNS</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>3.4.10</AssemblyVersion>
-    <FileVersion>3.4.10</FileVersion>
-    <Version>3.4.10</Version>
+    <AssemblyVersion>3.4.11</AssemblyVersion>
+    <FileVersion>3.4.11</FileVersion>
+    <Version>3.4.11</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -436,9 +436,9 @@
     <ProjectReference Include="..\Security\Waher.Security.SPF\Waher.Security.SPF.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.Users\Waher.Security.Users.csproj" />
     <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj" />
-    <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />
-    <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />
-    <ProjectReference Include="..\Runtime\Waher.Runtime.Threading.Sync\Waher.Runtime.Threading.Sync.csproj" />
+		<ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />
+		<ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />
+		<ProjectReference Include="..\Runtime\Waher.Runtime.Threading.Sync\Waher.Runtime.Threading.Sync.csproj" />
   </ItemGroup>
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="if not exist &quot;$(ProjectDir)\..\..\Registration.cs.bak&quot; copy &quot;$(ProjectDir)Setup\Registration.cs&quot; &quot;$(ProjectDir)\..\..\Registration.cs.bak&quot;" Condition="'$(OS)'=='Windows_NT'" />

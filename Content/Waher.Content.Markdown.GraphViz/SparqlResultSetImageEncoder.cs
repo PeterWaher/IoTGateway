@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content.Html;
-using Waher.Content.Markdown.Rendering;
+using Waher.Content.Images;
+using Waher.Content.Semantic;
+using Waher.Content.Text;
 using Waher.Runtime.Inventory;
-using Waher.Script.Objects.Matrices;
 
-namespace Waher.Content.Semantic
+namespace Waher.Content.Markdown.GraphViz
 {
 	/// <summary>
-	/// Encoder and Decoder of semantic information from SPARQL queries using HTML.
+	/// Encoder of semantic information from SPARQL queries as images.
 	/// </summary>
-	public class SparqlResultSetHtmlCodec : IContentEncoder
+	public class SparqlResultSetImageEncoder : IContentEncoder
 	{
 		/// <summary>
 		/// Encoder and Decoder of semantic information from SPARQL queries using HTML.
 		/// </summary>
-		public SparqlResultSetHtmlCodec()
+		public SparqlResultSetImageEncoder()
 		{
 		}
 
@@ -40,21 +40,11 @@ namespace Waher.Content.Semantic
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
 			if (Object is SparqlResultSet &&
-				InternetContent.IsAccepted(HtmlCodec.HtmlContentTypes, AcceptedContentTypes))
-			{
-				Grade = Grade.Excellent;
-				return true;
-			}
-			else if (Object is ObjectMatrix M && M.HasColumnNames &&
-				InternetContent.IsAccepted(HtmlCodec.HtmlContentTypes, AcceptedContentTypes))
+				(InternetContent.IsAccepted(ImageCodec.ContentTypeSvg, AcceptedContentTypes) ||
+				InternetContent.IsAccepted(ImageCodec.ContentTypePng, AcceptedContentTypes) ||
+				InternetContent.IsAccepted(GraphVizCodec.DefaultContentType, AcceptedContentTypes)))
 			{
 				Grade = Grade.Ok;
-				return true;
-			}
-			else if (Object is bool &&
-				InternetContent.IsAccepted(HtmlCodec.HtmlContentTypes, AcceptedContentTypes))
-			{
-				Grade = Grade.Barely;
 				return true;
 			}
 			else
@@ -74,39 +64,57 @@ namespace Waher.Content.Semantic
 		/// <returns>Encoded object.</returns>
 		public async Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
-			string Html;
-
-			if (Encoding is null)
-				Encoding = Encoding.UTF8;
-
-			if (Object is SparqlResultSet Result)
-			{
-				if (Result.BooleanResult.HasValue)
-					Html = CommonTypes.Encode(Result.BooleanResult.Value);
-				else
-				{
-					using (HtmlRenderer Renderer = new HtmlRenderer(new HtmlSettings()))
-					{
-						await Renderer.RenderObject(Result.ToMatrix(), true, new Script.Variables());
-						Html = Renderer.ToString();
-					}
-				}
-			}
-			else if (Object is ObjectMatrix M)
-			{
-				using (HtmlRenderer Renderer = new HtmlRenderer(new HtmlSettings()))
-				{
-					await Renderer.RenderObject(M, true, new Script.Variables());
-					Html = Renderer.ToString();
-				}
-			}
-			else if (Object is bool b)
-				Html = CommonTypes.Encode(b);
-			else
+			if (!(Object is SparqlResultSet Result))
 				return new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object)));
 
-			byte[] Bin = Encoding.GetBytes(Html);
-			string ContentType = HtmlCodec.HtmlContentTypes[0] + "; charset=" + Encoding.WebName;
+			if ((Result.Variables?.Length ?? 0) != 3)
+				return new ContentResponse(new ArgumentException("Graphs can only be generated for semantic-triple result sets.", nameof(Object)));
+
+			InMemorySemanticCube Cube = new InMemorySemanticCube();
+			string SubjectVariable = Result.Variables[0];
+			string PredicateVariable = Result.Variables[1];
+			string ObjectVariable = Result.Variables[2];
+
+			foreach (ISparqlResultRecord Record in Result.Records)
+			{
+				ISemanticElement Subject = Record[SubjectVariable];
+				ISemanticElement Predicate = Record[PredicateVariable];
+				ISemanticElement Object2 = Record[ObjectVariable];
+
+				if (Subject is null || Predicate is null || Object2 is null)
+					return new ContentResponse(new ArgumentException("Graphs can only be generated for semantic-triple result sets.", nameof(Object)));
+
+				Cube.Add(Subject, Predicate, Object2);
+			}
+
+			string Graph = GraphVizUtilities.GenerateGraph(Cube, string.Empty);
+			string ContentType;
+			byte[] Bin;
+
+			if (InternetContent.IsAccepted(ImageCodec.ContentTypeSvg, AcceptedContentTypes))
+			{
+				Bin = await GraphVizUtilities.DotToImage(Graph, ResultType.Svg);
+				ContentType = ImageCodec.ContentTypeSvg;
+			}
+			else if (InternetContent.IsAccepted(ImageCodec.ContentTypePng, AcceptedContentTypes))
+			{
+				Bin = await GraphVizUtilities.DotToImage(Graph, ResultType.Png);
+				ContentType = ImageCodec.ContentTypePng;
+			}
+			else if (InternetContent.IsAccepted(GraphVizCodec.DefaultContentType, AcceptedContentTypes))
+			{
+				if (Encoding is null)
+				{
+					ContentType = GraphVizCodec.DefaultContentType + "; charset=utf-8";
+					Encoding = Encoding.UTF8;
+				}
+				else
+					ContentType = GraphVizCodec.DefaultContentType + "; charset=" + Encoding.WebName;
+
+				Bin = Encoding.GetBytes(Graph);
+			}
+			else
+				return new ContentResponse(new ArgumentException("Requestd Content-Type not acceptable.", nameof(AcceptedContentTypes)));
 
 			return new ContentResponse(ContentType, Object, Bin);
 		}

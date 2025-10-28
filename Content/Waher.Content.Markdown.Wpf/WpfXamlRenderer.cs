@@ -423,8 +423,12 @@ namespace Waher.Content.Markdown.Wpf
 			this.XmlOutput.WriteAttributeString("xml", "space", null, "preserve");
 			this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
 			this.XmlOutput.WriteAttributeString("FontFamily", "Courier New");
+
 			if (this.Alignment != TextAlignment.Left)
 				this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
+
+			if (!string.IsNullOrEmpty(this.XamlSettings.CodeBlockBackgroundColor))
+				this.XmlOutput.WriteAttributeString("Background", this.XamlSettings.CodeBlockBackgroundColor);
 
 			this.XmlOutput.WriteValue(Element.Code);
 
@@ -1013,8 +1017,12 @@ namespace Waher.Content.Markdown.Wpf
 			this.XmlOutput.WriteAttributeString("TextWrapping", "NoWrap");
 			this.XmlOutput.WriteAttributeString("Margin", this.XamlSettings.ParagraphMargins);
 			this.XmlOutput.WriteAttributeString("FontFamily", "Courier New");
+			
 			if (this.Alignment != TextAlignment.Left)
 				this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
+
+			if (!string.IsNullOrEmpty(this.XamlSettings.CodeBlockBackgroundColor))
+				this.XmlOutput.WriteAttributeString("Background", this.XamlSettings.CodeBlockBackgroundColor);
 
 			for (i = Element.Start; i <= Element.End; i++)
 			{

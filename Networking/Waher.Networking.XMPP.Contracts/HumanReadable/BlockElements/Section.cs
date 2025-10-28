@@ -17,7 +17,12 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		public InlineElement[] Header
 		{
 			get => this.header;
-			set => this.header = value;
+			set
+			{
+				this.UnregisterParent(this.header);
+				this.header = value;
+				this.RegisterParent(this.header);
+			}
 		}
 
 		/// <summary>

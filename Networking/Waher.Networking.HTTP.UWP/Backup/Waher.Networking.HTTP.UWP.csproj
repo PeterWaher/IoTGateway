@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5D9D4910-B0D3-4510-A914-D49A548011C7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Waher.Networking.HTTP</RootNamespace>
+    <AssemblyName>Waher.Networking.HTTP.UWP</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+    <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
+    <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <DocumentationFile>bin\x86\Debug\Waher.Networking.HTTP.UWP.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <DocumentationFile>bin\x86\Release\Waher.Networking.HTTP.UWP.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
+    <PlatformTarget>ARM</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ARM\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
+    <PlatformTarget>ARM</PlatformTarget>
+    <OutputPath>bin\ARM\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <None Include="Package.nuspec">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Authentication\AnonymousAuthentication.cs" />
+    <Compile Include="Authentication\BasicAuthentication.cs" />
+    <Compile Include="Authentication\DigestAuthentication.cs" />
+    <Compile Include="Authentication\MutualTlsAuthentication.cs" />
+    <Compile Include="ByteRangeInterval.cs" />
+    <Compile Include="CommunicationStatistics.cs" />
+    <Compile Include="ContentByteRangeInterval.cs" />
+    <Compile Include="ContentEncodings\DeflateContentEncoding.cs" />
+    <Compile Include="ContentEncodings\DeflateEncoder.cs" />
+    <Compile Include="ContentEncodings\GZipContentEncoding.cs" />
+    <Compile Include="ContentEncodings\GZipEncoder.cs" />
+    <Compile Include="ContentEncodings\IContentEncoding.cs" />
+    <Compile Include="ContentEncodings\PrecompressedFileReturner.cs" />
+    <Compile Include="Cookie.cs" />
+    <Compile Include="CustomSniffersEventArgs.cs" />
+    <Compile Include="Exceptions\Redirections\PermanentRedirectException.cs" />
+    <Compile Include="HTTP2\BinaryReader.cs" />
+    <Compile Include="HTTP2\BinaryWriter.cs" />
+    <Compile Include="HTTP2\ConnectionSettings.cs" />
+    <Compile Include="HTTP2\DynamicHeader.cs" />
+    <Compile Include="HTTP2\DynamicHeaders.cs" />
+    <Compile Include="HTTP2\DynamicRecord.cs" />
+    <Compile Include="HTTP2\FlowControlConnection.cs" />
+    <Compile Include="HTTP2\FlowControlRfc7540.cs" />
+    <Compile Include="HTTP2\FlowControlRfc9218.cs" />
+    <Compile Include="HTTP2\FrameType.cs" />
+    <Compile Include="HTTP2\HeaderReader.cs" />
+    <Compile Include="HTTP2\HeaderWriter.cs" />
+    <Compile Include="HTTP2\Http2Error.cs" />
+    <Compile Include="HTTP2\Http2Stream.cs" />
+    <Compile Include="HTTP2\HuffmanDecoding.cs" />
+    <Compile Include="HTTP2\HuffmanEncoding.cs" />
+    <Compile Include="HTTP2\IFlowControl.cs" />
+    <Compile Include="HTTP2\IndexMode.cs" />
+    <Compile Include="HTTP2\IPriorityNode.cs" />
+    <Compile Include="HTTP2\PendingRequest.cs" />
+    <Compile Include="HTTP2\PendingWindowIncrement.cs" />
+    <Compile Include="HTTP2\PriorityNodeRfc7540.cs" />
+    <Compile Include="HTTP2\PriorityNodeRfc9218.cs" />
+    <Compile Include="HTTP2\PrioritySettings.cs" />
+    <Compile Include="HTTP2\StaticRecord.cs" />
+    <Compile Include="HTTP2\StreamState.cs" />
+    <Compile Include="HttpRedirectionResource.cs" />
+    <Compile Include="Interfaces\IHttpConnectMethod.cs" />
+    <Compile Include="ProfilingEventArgs.cs" />
+    <Compile Include="ProxyRequestEventArgs.cs" />
+    <Compile Include="CustomErrorEventArgs.cs" />
+    <Compile Include="Exceptions\ClientErrors\BadRequestException.cs" />
+    <Compile Include="Exceptions\ClientErrors\ConflictException.cs" />
+    <Compile Include="Exceptions\ClientErrors\FailedDependencyException.cs" />
+    <Compile Include="Exceptions\ClientErrors\ForbiddenException.cs" />
+    <Compile Include="Exceptions\ClientErrors\GoneException.cs" />
+    <Compile Include="Exceptions\ClientErrors\LockedException.cs" />
+    <Compile Include="Exceptions\ClientErrors\MethodNotAllowedException.cs" />
+    <Compile Include="Exceptions\ClientErrors\MisdirectedRequestException.cs" />
+    <Compile Include="Exceptions\ClientErrors\NotAcceptableException.cs" />
+    <Compile Include="Exceptions\ClientErrors\NotFoundException.cs" />
+    <Compile Include="Exceptions\ClientErrors\PreconditionFailedException.cs" />
+    <Compile Include="Exceptions\ClientErrors\PreconditionRequiredException.cs" />
+    <Compile Include="Exceptions\ClientErrors\RangeNotSatisfiableException.cs" />
+    <Compile Include="Exceptions\ClientErrors\RequestTimeoutException.cs" />
+    <Compile Include="Exceptions\ClientErrors\TooManyRequestsException.cs" />
+    <Compile Include="Exceptions\ClientErrors\UnauthorizedException.cs" />
+    <Compile Include="Exceptions\ClientErrors\UnavailableForLegalReasonsException.cs" />
+    <Compile Include="Exceptions\ClientErrors\UnprocessableEntityException.cs" />
+    <Compile Include="Exceptions\ClientErrors\UnsupportedMediaTypeException.cs" />
+    <Compile Include="Exceptions\ClientErrors\UpgradeRequiredException.cs" />
+    <Compile Include="Exceptions\Redirections\FoundException.cs" />
+    <Compile Include="Exceptions\Redirections\MovedPermanentlyException.cs" />
+    <Compile Include="Exceptions\Redirections\NotModifiedException.cs" />
+    <Compile Include="Exceptions\Redirections\SeeOtherException.cs" />
+    <Compile Include="Exceptions\Redirections\TemporaryRedirectException.cs" />
+    <Compile Include="Exceptions\Redirections\UseProxyException.cs" />
+    <Compile Include="Exceptions\ServerErrors\BadGatewayException.cs" />
+    <Compile Include="Exceptions\ServerErrors\GatewayTimeoutException.cs" />
+    <Compile Include="Exceptions\ServerErrors\InsufficientStorageException.cs" />
+    <Compile Include="Exceptions\ServerErrors\InternalServerErrorException.cs" />
+    <Compile Include="Exceptions\ServerErrors\LoopDetectedException.cs" />
+    <Compile Include="Exceptions\ServerErrors\NetworkAuthenticationRequiredException.cs" />
+    <Compile Include="Exceptions\ServerErrors\NotExtendedException.cs" />
+    <Compile Include="Exceptions\ServerErrors\NotImplementedException.cs" />
+    <Compile Include="Exceptions\ServerErrors\ServiceUnavailableException.cs" />
+    <Compile Include="Exceptions\ServerErrors\VariantAlsoNegotiatesException.cs" />
+    <Compile Include="FileNotFoundEventArgs.cs" />
+    <Compile Include="HeaderFields\AcceptRecord.cs" />
+    <Compile Include="HeaderFields\HttpFieldAccept.cs" />
+    <Compile Include="HeaderFields\HttpFieldAcceptCharset.cs" />
+    <Compile Include="HeaderFields\HttpFieldAcceptEncoding.cs" />
+    <Compile Include="HeaderFields\HttpFieldAcceptLanguage.cs" />
+    <Compile Include="HeaderFields\HttpFieldAcceptRecords.cs" />
+    <Compile Include="HeaderFields\HttpFieldAuthorization.cs" />
+    <Compile Include="HeaderFields\HttpFieldContentEncoding.cs" />
+    <Compile Include="HeaderFields\HttpFieldContentLanguage.cs" />
+    <Compile Include="HeaderFields\HttpFieldContentLength.cs" />
+    <Compile Include="HeaderFields\HttpFieldContentLocation.cs" />
+    <Compile Include="HeaderFields\HttpFieldContentMD5.cs" />
+    <Compile Include="HeaderFields\HttpFieldContentRange.cs" />
+    <Compile Include="HeaderFields\HttpFieldContentType.cs" />
+    <Compile Include="HeaderFields\HttpFieldCookie.cs" />
+    <Compile Include="HeaderFields\HttpFieldExpect.cs" />
+    <Compile Include="HeaderFields\HttpFieldFrom.cs" />
+    <Compile Include="HeaderFields\HttpFieldHost.cs" />
+    <Compile Include="HeaderFields\HttpFieldIfMatch.cs" />
+    <Compile Include="HeaderFields\HttpFieldIfModifiedSince.cs" />
+    <Compile Include="HeaderFields\HttpFieldIfNoneMatch.cs" />
+    <Compile Include="HeaderFields\HttpFieldIfRange.cs" />
+    <Compile Include="HeaderFields\HttpFieldIfUnmodifiedSince.cs" />
+    <Compile Include="HeaderFields\HttpFieldRange.cs" />
+    <Compile Include="HeaderFields\HttpFieldReferer.cs" />
+    <Compile Include="HeaderFields\HttpFieldTransferEncoding.cs" />
+    <Compile Include="HeaderFields\HttpFieldUpgradeInsecureRequests.cs" />
+    <Compile Include="HeaderFields\HttpFieldUserAgent.cs" />
+    <Compile Include="HeaderFields\HttpFieldVia.cs" />
+    <Compile Include="HeaderFields\HttpStringValueField.cs" />
+    <Compile Include="HttpAsynchronousResource.cs" />
+    <Compile Include="HttpAuthenticationScheme.cs" />
+    <Compile Include="HttpClientConnection.cs" />
+    <Compile Include="HttpEmbeddedResource.cs" />
+    <Compile Include="HttpException.cs" />
+    <Compile Include="HttpField.cs" />
+    <Compile Include="HttpFolderResource.cs" />
+    <Compile Include="HttpGetDelegateResource.cs" />
+    <Compile Include="HttpGetPostDelegateResource.cs" />
+    <Compile Include="HttpHeader.cs" />
+    <Compile Include="HttpRequest.cs" />
+    <Compile Include="HttpRequestHeader.cs" />
+    <Compile Include="HttpResource.cs" />
+    <Compile Include="HttpResponse.cs" />
+    <Compile Include="HttpReverseProxyResource.cs" />
+    <Compile Include="HttpScriptResource.cs" />
+    <Compile Include="HttpServer.cs" />
+    <Compile Include="HttpSynchronousResource.cs" />
+    <Compile Include="Interfaces\IHttpDeleteMethod.cs" />
+    <Compile Include="Interfaces\IHttpGetMethod.cs" />
+    <Compile Include="Interfaces\IHttpGetRangesMethod.cs" />
+    <Compile Include="Interfaces\IHttpOptionsMethod.cs" />
+    <Compile Include="Interfaces\IHttpPatchMethod.cs" />
+    <Compile Include="Interfaces\IHttpPatchRangesMethod.cs" />
+    <Compile Include="Interfaces\IHttpPostMethod.cs" />
+    <Compile Include="Interfaces\IHttpPostRangesMethod.cs" />
+    <Compile Include="Interfaces\IHttpPutMethod.cs" />
+    <Compile Include="Interfaces\IHttpPutRangesMethod.cs" />
+    <Compile Include="Interfaces\IHttpTraceMethod.cs" />
+    <Compile Include="PostedInformation.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProxyResponseEventArgs.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\BadRequest.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\Conflict.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\FailedDependency.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\Forbidden.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\Gone.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\Locked.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\MisdirectedRequest.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\NotAcceptable.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\NotFound.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\PreconditionFailed.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\PreconditionRequired.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\RangeNotSatisfiable.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\RequestTimeout.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\TooManyRequests.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\UnavailableForLegalReasons.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\UnprocessableEntity.cs" />
+    <Compile Include="ScriptExtensions\Functions\ClientErrors\UnsupportedMediaType.cs" />
+    <Compile Include="ScriptExtensions\Functions\HttpError.cs" />
+    <Compile Include="ScriptExtensions\Functions\Redirections\Found.cs" />
+    <Compile Include="ScriptExtensions\Functions\Redirections\MovedPermanently.cs" />
+    <Compile Include="ScriptExtensions\Functions\Redirections\NotModified.cs" />
+    <Compile Include="ScriptExtensions\Functions\Redirections\PermanentRedirect.cs" />
+    <Compile Include="ScriptExtensions\Functions\Redirections\SeeOther.cs" />
+    <Compile Include="ScriptExtensions\Functions\Redirections\TemporaryRedirect.cs" />
+    <Compile Include="ScriptExtensions\Functions\Redirections\UseProxy.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\AuthenticateBasic.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\AuthenticateDigestMd5.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\AuthenticateDigestSha256.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\AuthenticateDigestSha3_256.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\AuthenticateMutualTls.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\AuthenticateSession.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\Authorize.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\EphemeralUser.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\BadGateway.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\GatewayTimeout.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\InsufficientStorage.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\InternalServerError.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\LoopDetected.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\NetworkAuthenticationRequired.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\NotExtended.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\NotImplemented.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\ServiceUnavailable.cs" />
+    <Compile Include="ScriptExtensions\Functions\ServerErrors\VariantAlsoNegotiates.cs" />
+    <Compile Include="ScriptExtensions\Global.cs" />
+    <Compile Include="ScriptExtensions\Page.cs" />
+    <Compile Include="ScriptExtensions\Posted.cs" />
+    <Compile Include="ScriptExtensions\Request.cs" />
+    <Compile Include="ScriptExtensions\Response.cs" />
+    <Compile Include="SessionVariables.cs" />
+    <Compile Include="TransferEncoding.cs" />
+    <Compile Include="TransferEncodings\ChunkedTransferEncoding.cs" />
+    <Compile Include="TransferEncodings\ContentLengthEncoding.cs" />
+    <Compile Include="TransferEncodings\Http2TransferEncoding.cs" />
+    <Compile Include="TransferEncodings\InternalTransfer.cs" />
+    <Compile Include="Vanity\VanityResources.cs" />
+    <Compile Include="WebSockets\WebSocket.cs" />
+    <Compile Include="WebSockets\WebSocketBinaryEventArgs.cs" />
+    <Compile Include="WebSockets\WebSocketClosedEventArgs.cs" />
+    <Compile Include="WebSockets\WebSocketCloseStatus.cs" />
+    <Compile Include="WebSockets\WebSocketEventArgs.cs" />
+    <Compile Include="WebSockets\WebSocketListener.cs" />
+    <Compile Include="WebSockets\WebSocketOpcode.cs" />
+    <Compile Include="WebSockets\WebSocketTextEventArgs.cs" />
+    <EmbeddedResource Include="Properties\Waher.Networking.HTTP.UWP.rd.xml" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
+      <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>
+      <Name>Waher.Content.Xml</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
+      <Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>
+      <Name>Waher.Content</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Events\Waher.Events.Statistics\Waher.Events.Statistics.csproj">
+      <Project>{1af98bce-c165-4cfe-a8d5-d83a4c742545}</Project>
+      <Name>Waher.Events.Statistics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
+      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
+      <Name>Waher.Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
+      <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
+      <Name>Waher.Persistence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
+      <Project>{7d5a1c49-15e9-4e74-a7b5-3ff9b705e73f}</Project>
+      <Name>Waher.Runtime.Cache</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Collections\Waher.Runtime.Collections.csproj">
+      <Project>{4e8600b1-cd70-4a68-9346-1e2b81b0d9f5}</Project>
+      <Name>Waher.Runtime.Collections</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
+      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
+      <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj">
+      <Project>{3b744b26-affc-450d-9d21-0291299c5281}</Project>
+      <Name>Waher.Runtime.IO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj">
+      <Project>{add58298-121f-4c09-b4eb-6b90f8acd803}</Project>
+      <Name>Waher.Runtime.Profiling</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Temporary\Waher.Runtime.Temporary.csproj">
+      <Project>{9641a3ba-2873-4e87-9302-dbaa950d9ca0}</Project>
+      <Name>Waher.Runtime.Temporary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Text\Waher.Runtime.Text.csproj">
+      <Project>{7289981d-1cfc-4428-80db-64c098ad5d94}</Project>
+      <Name>Waher.Runtime.Text</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
+      <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
+      <Name>Waher.Script</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security.LoginMonitor.UWP\Waher.Security.LoginMonitor.UWP.csproj">
+      <Project>{8024d9a2-2ec9-404c-8506-d34fc861e6b4}</Project>
+      <Name>Waher.Security.LoginMonitor.UWP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security.SHA3\Waher.Security.SHA3.csproj">
+      <Project>{f264c147-82eb-45ab-991b-e1fe784d78d9}</Project>
+      <Name>Waher.Security.SHA3</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
+      <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
+      <Name>Waher.Security</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.UWP\Waher.Networking.UWP.csproj">
+      <Project>{6c7adaeb-7809-4d79-ad1b-e981b4a18b1f}</Project>
+      <Name>Waher.Networking.UWP</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
+    <VisualStudioVersion>14.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\*.cs" "$(ProjectDir)" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Authentication\*.cs" "$(ProjectDir)Authentication" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ContentEncodings\*.cs" "$(ProjectDir)ContentEncodings" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\ClientErrors\*.cs" "$(ProjectDir)Exceptions\ClientErrors" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\Redirections\*.cs" "$(ProjectDir)Exceptions\Redirections" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\ServerErrors\*.cs" "$(ProjectDir)Exceptions\ServerErrors" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\HeaderFields\*.cs" "$(ProjectDir)HeaderFields" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\HTTP2\*.cs" "$(ProjectDir)HTTP2" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Interfaces\*.cs" "$(ProjectDir)Interfaces" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\*.cs" "$(ProjectDir)ScriptExtensions" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\*.cs" "$(ProjectDir)ScriptExtensions\Functions" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\ClientErrors\*.cs" "$(ProjectDir)ScriptExtensions\Functions\ClientErrors" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\Redirections\*.cs" "$(ProjectDir)ScriptExtensions\Functions\Redirections" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\Security\*.cs" "$(ProjectDir)ScriptExtensions\Functions\Security" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\ServerErrors\*.cs" "$(ProjectDir)ScriptExtensions\Functions\ServerErrors" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\TransferEncodings\*.cs" "$(ProjectDir)TransferEncodings" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Vanity\*.cs" "$(ProjectDir)Vanity" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\WebSockets\*.cs" "$(ProjectDir)WebSockets" /Y
+</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>cd "$(ProjectDir)bin"
+"$(SolutionDir)..\nuget" pack ..\Package.nuspec</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

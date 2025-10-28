@@ -10,15 +10,15 @@ using Waher.Script.Objects.Matrices;
 namespace Waher.Content.Semantic
 {
 	/// <summary>
-	/// Encoder and Decoder of semantic information from SPARQL queries using TSV.
+	/// Encoder of semantic information from SPARQL queries using TSV.
 	/// https://www.w3.org/TR/sparql12-results-csv-tsv/
 	/// </summary>
-	public class SparqlResultSetTsvCodec : IContentEncoder
+	public class SparqlResultSetTsvEncoder : IContentEncoder
 	{
 		/// <summary>
 		/// Encoder and Decoder of semantic information from SPARQL queries using TSV.
 		/// </summary>
-		public SparqlResultSetTsvCodec()
+		public SparqlResultSetTsvEncoder()
 		{
 		}
 
@@ -92,7 +92,7 @@ namespace Waher.Content.Semantic
 				}
 				else
 				{
-					IMatrix M = Result.ToMatrix();
+					IMatrix M = Result.ToMatrix(false);
 
 					if (M is ObjectMatrix OM && !(OM.ColumnNames is null))
 					{

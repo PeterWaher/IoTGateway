@@ -2,3 +2,9 @@
 {
 	min-height:40vh;
 }
+
+svg
+{
+	width: 100%;
+	height: auto;
+}

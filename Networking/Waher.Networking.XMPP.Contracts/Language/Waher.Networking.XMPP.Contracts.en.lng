@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Translation xmlns="http://waher.se/Schema/Translation.xsd">
+	<Language code="en" name="English">
+		<Namespace name="Waher.Networking.XMPP.Contracts">
+			<String id="1">year</String>
+			<String id="2">years</String>
+			<String id="3">month</String>
+			<String id="4">months</String>
+			<String id="5">day</String>
+			<String id="6">days</String>
+			<String id="7">hour</String>
+			<String id="8">hours</String>
+			<String id="9">minute</String>
+			<String id="10">minutes</String>
+			<String id="11">second</String>
+			<String id="12">seconds</String>
+		</Namespace>
+	</Language>
+</Translation>

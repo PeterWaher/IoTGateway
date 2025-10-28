@@ -40,7 +40,7 @@
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			return "_:" + this.NodeId.ToString();
+			return "_:" + this.NodeId;
 		}
 
 		/// <inheritdoc/>

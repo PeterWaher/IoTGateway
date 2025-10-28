@@ -1,6 +1,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
+using Waher.Content.Markdown.GraphViz;
 using Waher.Runtime.IO;
+using Waher.Script.Functions.Strings;
 
 namespace Waher.Content.Semantic.Test
 {
@@ -46,7 +48,6 @@ namespace Waher.Content.Semantic.Test
 
 			foreach (ISemanticElement Element in Graph.Nodes)
 				Console.Out.WriteLine(Element.ToString());
-
 
 			Console.Out.WriteLine();
 			Console.Out.WriteLine("UML");
@@ -304,6 +305,9 @@ namespace Waher.Content.Semantic.Test
 		{
 			RdfDocument Parsed = await LoadRdfDocument(FileName, null);
 			await Print(Parsed);
+
+			await ExportAsImage(Parsed, "rdf", FileName);
+
 			return Parsed;
 		}
 
@@ -376,8 +380,34 @@ namespace Waher.Content.Semantic.Test
 			Console.Out.WriteLine();
 			await TurtleTests.Print(ParsedExpected);
 
+			await ExportAsImage(Parsed, "rdf", FileName);
+
 			CompareTriples(Parsed, ParsedExpected);
 		}
 
+		internal static async Task ExportAsImage(ISemanticCube Graph, string Subfolder, string FileName)
+		{
+			string GraphText = GraphVizUtilities.GenerateGraph(Graph, FileName);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine("GraphViz Graph:");
+			Console.Out.WriteLine();
+			Console.Out.WriteLine(GraphText);
+			Console.Out.WriteLine();
+
+			byte[] Bin = await GraphVizUtilities.DotToImage(GraphText, ResultType.Svg);
+			string Folder = Path.Combine("GraphOutput", Subfolder);
+
+			if (!Directory.Exists(Folder))
+				Directory.CreateDirectory(Folder);
+
+			FileName = Path.Combine(Folder, Path.ChangeExtension(FileName, ".svg"));
+			Folder = Path.GetDirectoryName(FileName)!;
+
+			if (!Directory.Exists(Folder))
+				Directory.CreateDirectory(Folder);
+
+			File.WriteAllBytes(FileName, Bin);
+		}
 	}
 }

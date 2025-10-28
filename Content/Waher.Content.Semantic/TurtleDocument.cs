@@ -129,7 +129,9 @@ namespace Waher.Content.Semantic
 
 			while (this.pos < this.len)
 			{
-				Object = this.ParseElement(TriplePosition);
+				Object = this.ParseElement(TriplePosition,
+					out ChunkedList<ISemanticTriple> AdditionalTriples);
+
 				if (Object is null)
 				{
 					if (Subject is null)
@@ -149,15 +151,23 @@ namespace Waher.Content.Semantic
 				{
 					Subject = Object;
 					TriplePosition++;
+
+					if (!(AdditionalTriples is null))
+						this.triples.AddRange(AdditionalTriples);
 				}
 				else if (Predicate is null)
 				{
 					Predicate = Object;
 					TriplePosition++;
+
+					if (!(AdditionalTriples is null))
+						this.triples.AddRange(AdditionalTriples);
 				}
 				else
 				{
 					this.Add(new SemanticTriple(Subject, Predicate, Object));
+					if (!(AdditionalTriples is null))
+						this.triples.AddRange(AdditionalTriples);
 
 					switch (this.NextNonWhitespaceChar())
 					{
@@ -227,8 +237,11 @@ namespace Waher.Content.Semantic
 			}
 		}
 
-		private ISemanticElement ParseElement(int TriplePosition)
+		private ISemanticElement ParseElement(int TriplePosition, 
+			out ChunkedList<ISemanticTriple> AdditionalTriples)
 		{
+			AdditionalTriples = null;
+
 			while (true)
 			{
 				char ch = this.NextNonWhitespaceChar();
@@ -279,26 +292,44 @@ namespace Waher.Content.Semantic
 						break;
 
 					case '[':
-						if (TriplePosition == 1)
-							throw this.ParsingException("Predicate cannot be a blank node.");
-
-						BlankNode Node = this.CreateBlankNode();
-						this.ParseTriples(Node);
-
-						if (TriplePosition == 0)
+						switch (TriplePosition)
 						{
-							this.SkipWhiteSpace();
-							if (this.PeekNextChar() == '.')
-							{
-								this.pos++;
-								return this.ParseElement(0);
-							}
+							case 0:
+								BlankNode Node = this.CreateBlankNode();
+								this.ParseTriples(Node);
+
+								this.SkipWhiteSpace();
+								if (this.PeekNextChar() == '.')
+								{
+									this.pos++;
+									ISemanticElement Result = this.ParseElement(0, out AdditionalTriples);
+									if (!(AdditionalTriples is null))
+										this.triples.AddRange(AdditionalTriples);
+									return Result;
+								}
+
+								return Node;
+
+							case 1:
+								throw this.ParsingException("Predicate cannot be a blank node.");
+
+							case 2:
+								ChunkedList<ISemanticTriple> Bak = this.triples;
+								this.triples = AdditionalTriples = new ChunkedList<ISemanticTriple>();
+
+								Node = this.CreateBlankNode();
+								this.ParseTriples(Node);
+
+								this.triples = Bak;
+
+								return Node;
+
+							default:
+								throw this.ParsingException("Unrecognized triple position.");
 						}
 
-						return Node;
-
 					case '(':
-						return this.ParseCollection();
+						return this.ParseCollection(out AdditionalTriples);
 
 					case ']':
 						return null;
@@ -308,15 +339,24 @@ namespace Waher.Content.Semantic
 						{
 							this.pos++;
 
-							ISemanticElement Subject = this.ParseElement(0);
-							ISemanticElement Predicate = this.ParseElement(1);
-							ISemanticElement Object = this.ParseElement(2);
+							ISemanticElement Subject = this.ParseElement(0, out ChunkedList<ISemanticTriple> AdditionalTriples1);
+							ISemanticElement Predicate = this.ParseElement(1, out ChunkedList<ISemanticTriple> AdditionalTriples2);
+							ISemanticElement Object = this.ParseElement(2, out ChunkedList<ISemanticTriple> AdditionalTriples3);
 
 							if (this.NextNonWhitespaceChar() != '>')
 								throw this.ParsingException("Expected >");
 
 							if (this.NextNonWhitespaceChar() != '>')
 								throw this.ParsingException("Expected >");
+
+							if (!(AdditionalTriples1 is null))
+								this.triples.AddRange(AdditionalTriples1);
+
+							if (!(AdditionalTriples2 is null))
+								this.triples.AddRange(AdditionalTriples2);
+
+							if (!(AdditionalTriples3 is null))
+								this.triples.AddRange(AdditionalTriples3);
 
 							return new SemanticTriple(Subject, Predicate, Object);
 						}
@@ -430,9 +470,10 @@ namespace Waher.Content.Semantic
 				return new BlankNode(this.blankNodeIdPrefix + (++this.blankNodeIndex).ToString());
 		}
 
-		private ISemanticElement ParseCollection()
+		private ISemanticElement ParseCollection(out ChunkedList<ISemanticTriple> AdditionalTriples)
 		{
 			ChunkedList<ISemanticElement> Elements = null;
+			AdditionalTriples = null;
 
 			this.SkipWhiteSpace();
 
@@ -472,7 +513,17 @@ namespace Waher.Content.Semantic
 					return Result;
 				}
 
-				ISemanticElement Element = this.ParseElement(2);
+				ISemanticElement Element = this.ParseElement(2,
+					out ChunkedList<ISemanticTriple> AdditionalTriples2);
+
+				if (!(AdditionalTriples2 is null))
+				{
+					if (AdditionalTriples is null)
+						AdditionalTriples = new ChunkedList<ISemanticTriple>();
+
+					AdditionalTriples.AddRange(AdditionalTriples2);
+				}
+
 				if (Element is null)
 					break;
 
@@ -523,9 +574,13 @@ namespace Waher.Content.Semantic
 				return string.Empty;
 
 			int Start = this.pos++;
+			bool LastPeriod = false;
 
-			while (IsNameChar(this.PeekNextChar()))
+			while (IsNameChar(this.PeekNextChar(), ref LastPeriod))
 				this.pos++;
+
+			if (LastPeriod)
+				this.pos--;
 
 			return this.text.Substring(Start, this.pos - Start);
 		}
@@ -605,31 +660,55 @@ namespace Waher.Content.Semantic
 		/// Checks if a character can be included in a name.
 		/// </summary>
 		/// <param name="ch">Character</param>
+		/// <param name="LastPeriod">If the last character was a period character.</param>
 		/// <returns>If characters can be included in a name.</returns>
-		public static bool IsNameChar(char ch)
+		public static bool IsNameChar(char ch, ref bool LastPeriod)
 		{
 			if (IsNameStartChar(ch))
+			{
+				LastPeriod = false;
 				return true;
+			}
 			else if (ch < '-')
 				return false;
 			else if (ch == '-')
+			{
+				LastPeriod = false;
 				return true;
+			}
+			else if (ch == '.')
+			{
+				LastPeriod = true;
+				return true;
+			}
 			else if (ch < '0')
 				return false;
 			else if (ch <= '9')
+			{
+				LastPeriod = false;
 				return true;
+			}
 			else if (ch < '\x00B7')
 				return false;
 			else if (ch == '\x00B7')
+			{
+				LastPeriod = false;
 				return true;
+			}
 			else if (ch < '\x0300')
 				return false;
 			else if (ch <= '\x036F')
+			{
+				LastPeriod = false;
 				return true;
+			}
 			else if (ch < '\x203F')
 				return false;
 			else if (ch <= '\x2040')
+			{
+				LastPeriod = false;
 				return true;
+			}
 			else
 				return false;
 		}

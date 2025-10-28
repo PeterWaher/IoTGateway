@@ -36,6 +36,7 @@ namespace Waher.Content.Semantic
 		private readonly Uri baseUri;
 		private Dictionary<string, string> shortBlankNodeLabels = null;
 		private Dictionary<string, string> shortUris = null;
+		private Dictionary<string, SemanticLiteral> literals = null;
 
 		/// <summary>
 		/// Contains the results of a SPARQL query.
@@ -560,6 +561,16 @@ namespace Waher.Content.Semantic
 		/// <returns>Matrix.</returns>
 		public IMatrix ToMatrix()
 		{
+			return this.ToMatrix(true);
+		}
+
+		/// <summary>
+		/// Converts the object to a matrix.
+		/// </summary>
+		/// <param name="ShortLinks">If short links should be used, where possible.</param>
+		/// <returns>Matrix.</returns>
+		public IMatrix ToMatrix(bool ShortLinks)
+		{
 			if (this.BooleanResult.HasValue)
 				return new BooleanMatrix(new bool[1, 1] { { this.BooleanResult.Value } });
 
@@ -573,7 +584,19 @@ namespace Waher.Content.Semantic
 				ISparqlResultRecord Record = this.Records[y];
 
 				for (x = 0; x < Columns; x++)
-					Elements[y, x] = (IElement)Record[this.Variables[x]] ?? ObjectValue.Null;
+				{
+					IElement Element = (IElement)Record[this.Variables[x]] ?? ObjectValue.Null;
+
+					if (ShortLinks)
+					{
+						if (Element is BlankNode BlankNode)
+							Element = new StringValue(this.GetShortBlankNodeLabel(BlankNode));
+						else if (Element is UriNode UriNode)
+							Element = new StringValue(this.GetShortUri(UriNode));
+					}
+
+					Elements[y, x] = Element;
+				}
 			}
 
 			return new ObjectMatrix(Elements)
@@ -588,7 +611,7 @@ namespace Waher.Content.Semantic
 		/// <returns>Matrix.</returns>
 		public IElement ToVector()
 		{
-			return new ObjectVector(((ObjectMatrix)this.ToMatrix()).VectorElements);
+			return new ObjectVector(((ObjectMatrix)this.ToMatrix(true)).VectorElements);
 		}
 
 		/// <summary>
@@ -619,26 +642,52 @@ namespace Waher.Content.Semantic
 		/// <returns>Short URI node label.</returns>
 		public string GetShortUri(UriNode Node)
 		{
-			string s = Node.Uri.AbsoluteUri;
+			return this.GetShortUri(Node.Uri.AbsoluteUri);
+		}
 
+		/// <summary>
+		/// Gets a short URI label for the given uri node.
+		/// </summary>
+		/// <param name="Uri">URI to shorten.</param>
+		/// <returns>Short URI node label.</returns>
+		public string GetShortUri(string Uri)
+		{
 			if (this.shortUris is null)
 				this.shortUris = new Dictionary<string, string>();
 
-			if (!this.shortUris.TryGetValue(s, out string Short))
+			if (!this.shortUris.TryGetValue(Uri, out string Short))
 			{
-				IOntology Ontology = Types.FindBest<IOntology, string>(s);
+				IOntology Ontology = Types.FindBest<IOntology, string>(Uri);
 				if (Ontology is null)
-					this.shortUris[s] = Short = s;
+					this.shortUris[Uri] = Short = Uri;
 				else
 				{
 					Short = Ontology.OntologyPrefix + ":" +
-						s.Substring(Ontology.OntologyNamespace.Length);
+						Uri.Substring(Ontology.OntologyNamespace.Length);
 
-					this.shortUris[s] = Short;
+					this.shortUris[Uri] = Short;
 				}
 			}
 
 			return Short;
+		}
+
+		/// <summary>
+		/// Gets a label unique for a literal.
+		/// </summary>
+		/// <param name="Literal">Literal node.</param>
+		/// <returns>SLiteral label.</returns>
+		public string GetLiteralLabel(SemanticLiteral Literal)
+		{
+			if (this.literals is null)
+				this.literals = new Dictionary<string, SemanticLiteral>();
+
+			int i = this.literals.Count + 1;
+			string Label = "L" + i.ToString();
+			
+			this.literals[Label] = Literal;
+
+			return Label;
 		}
 	}
 }

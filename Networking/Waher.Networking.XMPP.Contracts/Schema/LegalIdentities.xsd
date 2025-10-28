@@ -91,6 +91,7 @@
 								<xs:documentation>EMAIL = E-mail address.</xs:documentation>
 								<xs:documentation>JID = XMPP address (Jabber ID).</xs:documentation>
 								<xs:documentation>DOMAIN = If the ID represents the legal representative of a domain.</xs:documentation>
+								<xs:documentation>PSEUDONYM = Lists which properties are pseudonymous. Comma-separated list.</xs:documentation>
 								<xs:documentation>ORGNAME = Name of organization</xs:documentation>
 								<xs:documentation>ORGNR = Organization number</xs:documentation>
 								<xs:documentation>ORGDEPT = Organization department, where person works.</xs:documentation>

@@ -797,7 +797,7 @@ namespace Waher.Script.Persistence.SPARQL
 				return await Source.LoadGraph(Uri, this, NullIfNotFound, await Caller2.GetOrigin());
 			}
 			else
-				return await Source.LoadGraph(Uri, this, NullIfNotFound, new RequestOrigin(string.Empty, null, null, null, null));
+				return await Source.LoadGraph(Uri, this, NullIfNotFound, RequestOrigin.Empty);
 		}
 
 		/// <summary>
@@ -824,6 +824,23 @@ namespace Waher.Script.Persistence.SPARQL
 		}
 
 		/// <summary>
+		/// Gets the graph name from an untyped name.
+		/// </summary>
+		/// <param name="Name">Untyped name</param>
+		/// <returns>Graph name, or null if unable to get graph name.</returns>
+		internal UriNode GetGraphName(object Name)
+		{
+			if (Name is UriNode UriNode)
+				return UriNode;
+			else if (Name is Uri Uri)
+				return new UriNode(Uri, Uri.ToString());
+			else if (Name is string s && System.Uri.TryCreate(s, UriKind.RelativeOrAbsolute, out Uri))
+				return new UriNode(Uri, s);
+			else
+				return null;
+		}
+
+		/// <summary>
 		/// Gets a named source
 		/// </summary>
 		/// <param name="Name">URI of named data source.</param>
@@ -831,14 +848,11 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <returns>Semantic data set, if found, or null, if not found, or not defined.</returns>
 		internal Task<ISemanticCube> GetNamedGraph(object Name, Variables Variables)
 		{
-			if (Name is UriNode UriNode)
-				return this.GetNamedGraph(UriNode, Variables);
-			else if (Name is Uri Uri)
-				return this.GetNamedGraph(new UriNode(Uri, Uri.ToString()), Variables);
-			else if (Name is string s && System.Uri.TryCreate(s, UriKind.RelativeOrAbsolute, out Uri))
-				return this.GetNamedGraph(new UriNode(Uri, s), Variables);
+			UriNode UriNode = this.GetGraphName(Name);
+			if (UriNode is null)
+				return Task.FromResult<ISemanticCube>(null);
 			else
-				return null;
+				return this.GetNamedGraph(UriNode, Variables);
 		}
 
 		/// <summary>
@@ -849,23 +863,94 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <returns>Semantic data set, if found, or null, if not found, or not defined.</returns>
 		internal async Task<ISemanticCube> GetNamedGraph(UriNode Uri, Variables Variables)
 		{
-			if (!(this.namedGraphs is null) &&
-				this.namedGraphs.TryGetValue(Uri, out ISemanticCube Cube) &&
-				!(Cube is null))
+			ISemanticCube Cube;
+
+			if (this.namedGraphs is null)
+				this.namedGraphs = new Dictionary<UriNode, ISemanticCube>();
+
+			lock (this.namedGraphs)
 			{
-				return Cube;
+				if (!(this.namedGraphs is null) &&
+					this.namedGraphs.TryGetValue(Uri, out Cube) &&
+					!(Cube is null))
+				{
+					return Cube;
+				}
 			}
 
 			Cube = await this.GetDataSource(Uri, Variables, true);
 			if (Cube is null)
 				Cube = new InMemorySemanticCube();
 
-			if (this.namedGraphs is null)
-				this.namedGraphs = new Dictionary<UriNode, ISemanticCube>();
-
-			this.namedGraphs[Uri] = Cube;
+			lock (this.namedGraphs)
+			{
+				this.namedGraphs[Uri] = Cube;
+			}
 
 			return Cube;
+		}
+
+		/// <summary>
+		/// Loads all unloaded named graphs.
+		/// </summary>
+		/// <param name="Variables">Current set of variables.</param>
+		internal Task LoadUnloadedNamedGraphs(Variables Variables)
+		{
+			ChunkedList<UriNode> NotLoaded = null;
+
+			lock (this.namedGraphs)
+			{
+				foreach (KeyValuePair<UriNode, ISemanticCube> P in this.namedGraphs)
+				{
+					if (P.Value is null)
+					{
+						if (NotLoaded is null)
+							NotLoaded = new ChunkedList<UriNode>();
+
+						NotLoaded.Add(P.Key);
+					}
+				}
+			}
+
+			if (NotLoaded is null)
+				return Task.CompletedTask;
+
+			return this.LoadUnloadedNamedGraphs(Variables, NotLoaded.ToArray());
+		}
+
+		/// <summary>
+		/// Loads unloaded named graphs from the set <paramref name="Names"/>.
+		/// </summary>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="Names">Graphs to make sure are loaded.</param>
+		internal Task LoadUnloadedNamedGraphs(Variables Variables, params string[] Names)
+		{
+			return this.LoadUnloadedNamedGraphs(Variables, Convert(Names));
+		}
+
+		/// <summary>
+		/// Loads unloaded named graphs from the set <paramref name="Names"/>.
+		/// </summary>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="Names">Graphs to make sure are loaded.</param>
+		internal Task LoadUnloadedNamedGraphs(Variables Variables, params Uri[] Names)
+		{
+			return this.LoadUnloadedNamedGraphs(Variables, Convert(Names));
+		}
+
+		/// <summary>
+		/// Loads unloaded named graphs from the set <paramref name="Names"/>.
+		/// </summary>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="Names">Graphs to make sure are loaded.</param>
+		internal async Task LoadUnloadedNamedGraphs(Variables Variables, params UriNode[] Names)
+		{
+			ChunkedList<Task> Tasks = new ChunkedList<Task>();
+
+			foreach (UriNode Name in Names)
+				Tasks.Add(this.GetNamedGraph(Name, Variables));
+
+			await Task.WhenAll(Tasks.ToArray());
 		}
 
 		/// <summary>
@@ -874,6 +959,11 @@ namespace Waher.Script.Persistence.SPARQL
 		/// </summary>
 		/// <param name="Names">Graph names.</param>
 		public void RegisterNamedGraph(params string[] Names)
+		{
+			this.RegisterNamedGraph(Convert(Names));
+		}
+
+		private static UriNode[] Convert(string[] Names)
 		{
 			int i, c = Names.Length;
 			UriNode[] Nodes = new UriNode[Names.Length];
@@ -886,7 +976,7 @@ namespace Waher.Script.Persistence.SPARQL
 				Nodes[i] = new UriNode(Name, Names[i]);
 			}
 
-			this.RegisterNamedGraph(Nodes);
+			return Nodes;
 		}
 
 		/// <summary>
@@ -896,13 +986,18 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="Names">Graph names.</param>
 		public void RegisterNamedGraph(params Uri[] Names)
 		{
+			this.RegisterNamedGraph(Convert(Names));
+		}
+
+		private static UriNode[] Convert(Uri[] Names)
+		{
 			int i, c = Names.Length;
 			UriNode[] Nodes = new UriNode[Names.Length];
 
 			for (i = 0; i < c; i++)
 				Nodes[i] = new UriNode(Names[i], Names[i].ToString());
 
-			this.RegisterNamedGraph(Nodes);
+			return Nodes;
 		}
 
 		/// <summary>
@@ -915,14 +1010,17 @@ namespace Waher.Script.Persistence.SPARQL
 			if (this.namedGraphs is null)
 				this.namedGraphs = new Dictionary<UriNode, ISemanticCube>();
 
-			foreach (UriNode Name in Names)
+			lock (this.namedGraphs)
 			{
-				if (!this.namedGraphs.ContainsKey(Name))
-					this.namedGraphs[Name] = null;
-			}
+				foreach (UriNode Name in Names)
+				{
+					if (!this.namedGraphs.ContainsKey(Name))
+						this.namedGraphs[Name] = null;
+				}
 
-			this.namedGraphNames = new UriNode[this.namedGraphs.Count];
-			this.namedGraphs.Keys.CopyTo(this.namedGraphNames, 0);
+				this.namedGraphNames = new UriNode[this.namedGraphs.Count];
+				this.namedGraphs.Keys.CopyTo(this.namedGraphNames, 0);
+			}
 		}
 
 	}

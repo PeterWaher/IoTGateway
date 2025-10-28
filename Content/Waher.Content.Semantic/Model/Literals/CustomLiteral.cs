@@ -121,20 +121,32 @@ namespace Waher.Content.Semantic.Model.Literals
 		/// <inheritdoc/>
 		public override string ToString()
 		{
+			return ToString(this.StringValue, this.language, this.StringType);
+		}
+
+		/// <summary>
+		/// Outputs a string-representation of a custom literal.
+		/// </summary>
+		/// <param name="StringValue">String-representation of value.</param>
+		/// <param name="Language">Optional language.</param>
+		/// <param name="StringType">Type URI.</param>
+		/// <returns>String-representation of custom literal.</returns>
+		public static string ToString(string StringValue, string Language, string StringType)
+		{
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append('"');
-			sb.Append(JSON.Encode(this.StringValue));
+			sb.Append(JSON.Encode(StringValue));
 			sb.Append('"');
 
-			if (!string.IsNullOrEmpty(this.language))
+			if (!string.IsNullOrEmpty(Language))
 			{
 				sb.Append('@');
-				sb.Append(this.language);
+				sb.Append(Language);
 			}
 
 			sb.Append("^^<");
-			sb.Append(this.StringType);
+			sb.Append(StringType);
 			sb.Append('>');
 
 			return sb.ToString();

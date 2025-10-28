@@ -1109,6 +1109,8 @@ namespace Waher.IoTGateway
 				Types.SetModuleParameter("X509", certificate);
 				Types.SetModuleParameter("LoginAuditor", webServer.LoginAuditor);
 
+				InternetContent.LocalDomainCheck += InternetContent_LocalDomainCheck;
+
 				await WriteWebServerOpenPorts();
 				webServer.OnNetworkChanged += async (Sender, e) =>
 				{
@@ -2583,6 +2585,8 @@ namespace Waher.IoTGateway
 
 				await SafeDispose(coapEndpoint);
 				coapEndpoint = null;
+
+				InternetContent.LocalDomainCheck -= InternetContent_LocalDomainCheck;
 
 				if (!(webServer is null))
 				{
@@ -4661,6 +4665,11 @@ namespace Waher.IoTGateway
 			}
 
 			return false;
+		}
+
+		private static void InternetContent_LocalDomainCheck(object sender, LocalDomainEventArgs e)
+		{
+			e.IsLocal = IsDomain(e.DomainOrHost, e.IncludeAlternativeDomains);
 		}
 
 		private static async Task Resend(object P)

@@ -32,7 +32,12 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 		/// <summary>
 		/// Triples, null if none.
 		/// </summary>
-		public IEnumerable<SemanticQueryTriple> Triples => this.triples;
+		public ChunkedList<SemanticQueryTriple> Triples => this.triples;
+
+		/// <summary>
+		/// Number of triples registered.
+		/// </summary>
+		public int TripleCount => this.triples?.Count ?? 0;
 
 		/// <summary>
 		/// Bound variables, null if none.
@@ -67,7 +72,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 		{
 			if (this.triples is null)
 				this.triples = new ChunkedList<SemanticQueryTriple>();
-
+			
 			this.triples.Add(Triple);
 		}
 

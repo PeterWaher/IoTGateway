@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Waher.Content.Semantic.Model.Literals;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
@@ -131,15 +132,7 @@ namespace Waher.Content.Semantic.Model
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder();
-
-			sb.Append('"');
-			sb.Append(JSON.Encode(this.StringValue));
-			sb.Append("\"^^<");
-			sb.Append(this.StringType);
-			sb.Append('>');
-
-			return sb.ToString();
+			return CustomLiteral.ToString(this.StringValue, null, this.StringType);
 		}
 
 		/// <summary>

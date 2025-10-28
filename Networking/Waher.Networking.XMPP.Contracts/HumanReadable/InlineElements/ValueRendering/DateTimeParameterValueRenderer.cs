@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 
@@ -34,13 +35,23 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements.ValueRend
 		/// <param name="Language">Desired language.</param>
 		/// <param name="Settings">Markdown settings.</param>
 		/// <returns>Markdown string.</returns>
-		public override Task<string> ToString(object Value, string Language,
+		public override async Task<string> ToString(object Value, string Language,
 			MarkdownSettings Settings)
 		{
-			if (Value is DateTime TP && TP.TimeOfDay == TimeSpan.Zero)
-				return Task.FromResult(TP.ToShortDateString());
+			if (Value is DateTime TP)
+			{
+				if (TP.TimeOfDay == TimeSpan.Zero)
+					return TP.ToShortDateString();
+
+				string s = await base.ToString(Value, Language, Settings);
+
+				if (TP.Kind == DateTimeKind.Utc)
+					s += " (UTC)";
+
+				return s;
+			}
 			else
-				return base.ToString(Value, Language, Settings);
+				return await base.ToString(Value, Language, Settings);
 		}
 	}
 }

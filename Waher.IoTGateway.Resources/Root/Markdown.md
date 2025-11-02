@@ -1636,6 +1636,15 @@ Example:
 This will result in an embedded object being rendered in HTML, displaying the contents of the
 PDF document, if the browser supports embedding documents in HTML 5.
 
+You can also embed PDF documents using the multimedia construct, as shown in the following
+example:
+
+    ![`Harmonized Web API for real-time data.pdf`](https://neuro-foundation.io/Papers/Harmonized%20Web%20API%20for%20real-time%20data.pdf)
+
+This results in the document being embedded as follows:
+
+![`Harmonized Web API for real-time data.pdf`](https://neuro-foundation.io/Papers/Harmonized%20Web%20API%20for%20real-time%20data.pdf)
+
 ### Comments
 
 You can add comments to Markdown documents. Comments are not exported when rendering output. Comments are put in separate blocks, each row

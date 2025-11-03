@@ -92,8 +92,8 @@ namespace Waher.Networking.HTTP
 #if !WINDOWS_UWP
 		private int[] httpsPorts;
 		private int? upgradePort = null;
-		private bool closed = false;
 #endif
+		private bool disposed = false;
 		private bool adaptToNetworkChanges;
 		private bool hasProxyDomains = false;
 
@@ -647,6 +647,10 @@ namespace Waher.Networking.HTTP
 			this.upgradePort = null;
 		}
 #endif
+		/// <summary>
+		/// If object has been disposed.
+		/// </summary>
+		public bool Disposed => this.disposed;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -662,10 +666,10 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public async Task DisposeAsync()
 		{
+			this.disposed = true;
 #if WINDOWS_UWP
 			NetworkInformation.NetworkStatusChanged -= this.NetworkChange_NetworkAddressChanged;
 #else
-			this.closed = true;
 			NetworkChange.NetworkAddressChanged -= this.NetworkChange_NetworkAddressChanged;
 #endif
 
@@ -1150,7 +1154,7 @@ namespace Waher.Networking.HTTP
 		{
 			try
 			{
-				while (!this.closed && !NetworkingModule.Stopping)
+				while (!this.disposed && !NetworkingModule.Stopping)
 				{
 					try
 					{
@@ -1159,7 +1163,7 @@ namespace Waher.Networking.HTTP
 						try
 						{
 							Client = await Listener.AcceptTcpClientAsync();
-							if (this.closed || NetworkingModule.Stopping)
+							if (this.disposed || NetworkingModule.Stopping)
 							{
 								Client?.Dispose();
 								return;
@@ -1221,7 +1225,7 @@ namespace Waher.Networking.HTTP
 					}
 					catch (Exception ex)
 					{
-						if (this.closed || this.listeners is null)
+						if (this.disposed || this.listeners is null)
 							break;
 
 						bool Found = false;
@@ -1244,7 +1248,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (Exception ex)
 			{
-				if (this.closed || this.listeners is null)
+				if (this.disposed || this.listeners is null)
 					return;
 
 				Log.Exception(ex);

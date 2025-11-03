@@ -5,7 +5,6 @@ using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -4543,7 +4542,7 @@ namespace Waher.IoTGateway
 		/// <returns>URL</returns>
 		public static string GetUrl(string LocalResource)
 		{
-			return GetUrl(LocalResource, webServer);
+			return GetUrl(LocalResource, HttpServer);
 		}
 
 		/// <summary>

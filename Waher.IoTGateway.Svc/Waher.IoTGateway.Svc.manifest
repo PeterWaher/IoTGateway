@@ -1159,6 +1159,7 @@
 		<Content fileName='Waher.Reports.en.lng'/>
 		<Content fileName='Waher.Reports.Files.en.lng'/>
 		<Content fileName='Waher.Things.Files.en.lng'/>
+		<Content fileName='Waher.Things.Groups.en.lng'/>
 		<Content fileName='Waher.Things.Ieee1451.en.lng'/>
 		<Content fileName='Waher.Things.IP.en.lng'/>
 		<Content fileName='Waher.Things.Metering.en.lng'/>

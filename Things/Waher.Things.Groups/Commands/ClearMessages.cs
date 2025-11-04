@@ -1,74 +1,48 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Waher.Events;
+using Waher.Persistence;
+using Waher.Persistence.Filters;
 using Waher.Runtime.Language;
-using Waher.Things.Attributes;
-using Waher.Things.DisplayableParameters;
 using Waher.Things.Queries;
 
-namespace Waher.Things.Metering.Commands
+namespace Waher.Things.Groups.Commands
 {
 	/// <summary>
-	/// Logs a message on a node.
+	/// Clears all messages for a group.
 	/// </summary>
-	public class LogMessage : ICommand
+	public class ClearMessages : ICommand
 	{
-		private readonly MeteringNode node;
-		private MessageType messageType = MessageType.Information;
-		private string messageBody = string.Empty;
+		private readonly GroupNode node;
 
 		/// <summary>
-		/// Logs a message on a node.
+		/// Clears all messages for a group.
 		/// </summary>
-		/// <param name="Node">Metering node.</param>
-		public LogMessage(MeteringNode Node)
+		/// <param name="Node">Group node.</param>
+		public ClearMessages(GroupNode Node)
 		{
 			this.node = Node;
 		}
 
 		/// <summary>
-		/// Type of message.
-		/// </summary>
-		[Page(100, "Message")]
-		[Header(101, "Type:")]
-		[ToolTip(102, "Type of message to log.")]
-		[Required]
-		public MessageType MessageType
-		{
-			get => this.messageType;
-			set => this.messageType = value;
-		}
-
-		/// <summary>
-		/// Message body
-		/// </summary>
-		[Page(100, "Message")]
-		[Header(103, "Body:")]
-		[ToolTip(104, "Text of the message to log.")]
-		[Required]
-		public string MessageBody
-		{
-			get => this.messageBody;
-			set => this.messageBody = value;
-		}
-
-		/// <summary>
 		/// ID of command.
 		/// </summary>
-		public string CommandID => nameof(LogMessage);
+		public string CommandID => nameof(ClearMessages);
 
 		/// <summary>
 		/// Type of command.
 		/// </summary>
-		public CommandType Type => CommandType.Parametrized;
+		public CommandType Type => CommandType.Simple;
 
 		/// <summary>
 		/// Sort Category, if available.
 		/// </summary>
-		public string SortCategory => "Node";
+		public string SortCategory => "Group";
 
 		/// <summary>
 		/// Sort Key, if available.
 		/// </summary>
-		public string SortKey => "LogMessage";
+		public string SortKey => "ClearMessages";
 
 		/// <summary>
 		/// If the command can be executed by the caller.
@@ -86,15 +60,34 @@ namespace Waher.Things.Metering.Commands
 		/// <returns>Copy of command object.</returns>
 		public ICommand Copy()
 		{
-			return new LogMessage(this.node);
+			return new ClearMessages(this.node);
 		}
 
 		/// <summary>
 		/// Executes the command.
 		/// </summary>
-		public Task ExecuteCommandAsync()
+		public async Task ExecuteCommandAsync()
 		{
-			return this.node.LogMessageAsync(this.messageType, this.messageBody);
+			IEnumerable<GroupMessage> Messages = await Database.FindDelete<GroupMessage>(
+				new FilterFieldEqualTo("NodeId", this.node.ObjectId));
+			int Count = 0;
+
+			foreach (GroupMessage Message in Messages)
+				Count++;
+
+			if (Count == 0)
+				Log.Informational("No messages found to clear.", this.node.NodeId);
+			else
+				Log.Informational("Number of messages cleared: " + Count.ToString(), this.node.NodeId);
+
+			if (this.node.State != NodeState.None)
+			{
+				this.node.State = NodeState.None;
+				await Database.Update(this.node);
+				await this.node.RaiseUpdate();
+			}
+
+			await this.node.NodeStateChanged();
 		}
 
 		/// <summary>
@@ -103,7 +96,7 @@ namespace Waher.Things.Metering.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MeteringTopology), 105, "Log message...");
+			return Language.GetStringAsync(typeof(GroupSource), 6, "Erase messages");
 		}
 
 		/// <summary>
@@ -112,7 +105,7 @@ namespace Waher.Things.Metering.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetSuccessStringAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MeteringTopology), 106, "Message successfully logged.");
+			return Language.GetStringAsync(typeof(GroupSource), 7, "Messages successfully erased.");
 		}
 
 		/// <summary>
@@ -121,7 +114,7 @@ namespace Waher.Things.Metering.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetConfirmationStringAsync(Language Language)
 		{
-			return Task.FromResult(string.Empty);
+			return Language.GetStringAsync(typeof(GroupSource), 8, "Are you sure you want to erase all messages for the selected group(s)?");
 		}
 
 		/// <summary>
@@ -130,7 +123,7 @@ namespace Waher.Things.Metering.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetFailureStringAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MeteringTopology), 107, "Unable to log message.");
+			return Language.GetStringAsync(typeof(GroupSource), 9, "Unable to erase messages.");
 		}
 
 		/// <summary>

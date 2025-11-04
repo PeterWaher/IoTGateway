@@ -1,11 +1,10 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Runtime.Language;
-using Waher.Things.Queries;
+using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
-using System.Collections.Generic;
-using Waher.Events;
+using Waher.Runtime.Language;
+using Waher.Things.Queries;
 
 namespace Waher.Things.Metering.Commands
 {

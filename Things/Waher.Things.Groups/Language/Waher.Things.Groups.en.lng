@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Translation xmlns="http://waher.se/Schema/Translation.xsd">
+	<Language code="en" name="English">
+		<Namespace name="Waher.Things.Metering">
+			<String id="1">Groups</String>
+			<String id="2">ID:</String>
+			<String id="3">Group</String>
+			<String id="4">Group identity in the collection of groups.</String>
+			<String id="5">Root</String>
+			<String id="6">Erase messages</String>
+			<String id="7">Messages successfully erased.</String>
+			<String id="8">Are you sure you want to erase all messages for the selected group(s)?</String>
+			<String id="9">Unable to erase messages.</String>
+			<String id="10">Message</String>
+			<String id="11">Type:</String>
+			<String id="12">Type of message to log.</String>
+			<String id="13">Body:</String>
+			<String id="14">Text of the message to log.</String>
+			<String id="15">Log message...</String>
+			<String id="16">Message successfully logged.</String>
+			<String id="17">Unable to log message.</String>
+			<String id="18"></String>
+			<String id="19"></String>
+		</Namespace>
+	</Language>
+</Translation>

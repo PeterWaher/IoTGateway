@@ -93,6 +93,7 @@ using Waher.Security.LoginMonitor;
 using Waher.Security.SHA3;
 using Waher.Security.Users;
 using Waher.Things;
+using Waher.Things.Groups;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Things.SourceEvents;
@@ -1366,6 +1367,7 @@ namespace Waher.IoTGateway
 					InitialSources = new IDataSource[]
 					{
 						new MeteringTopology(),
+						new GroupSource(),
 						new ReportsDataSource()
 					};
 
@@ -1380,6 +1382,7 @@ namespace Waher.IoTGateway
 						InitialSources ??= new IDataSource[]
 						{
 							new MeteringTopology(),
+							new GroupSource(),
 							new ReportsDataSource()
 						};
 

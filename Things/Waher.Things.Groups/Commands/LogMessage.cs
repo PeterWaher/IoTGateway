@@ -4,22 +4,22 @@ using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Queries;
 
-namespace Waher.Things.Metering.Commands
+namespace Waher.Things.Groups.Commands
 {
 	/// <summary>
-	/// Logs a message on a node.
+	/// Logs a message on a group.
 	/// </summary>
 	public class LogMessage : ICommand
 	{
-		private readonly MeteringNode node;
+		private readonly GroupNode node;
 		private MessageType messageType = MessageType.Information;
 		private string messageBody = string.Empty;
 
 		/// <summary>
-		/// Logs a message on a node.
+		/// Logs a message on a group.
 		/// </summary>
-		/// <param name="Node">Metering node.</param>
-		public LogMessage(MeteringNode Node)
+		/// <param name="Node">Group node.</param>
+		public LogMessage(GroupNode Node)
 		{
 			this.node = Node;
 		}
@@ -27,9 +27,9 @@ namespace Waher.Things.Metering.Commands
 		/// <summary>
 		/// Type of message.
 		/// </summary>
-		[Page(100, "Message")]
-		[Header(101, "Type:")]
-		[ToolTip(102, "Type of message to log.")]
+		[Page(10, "Message")]
+		[Header(11, "Type:")]
+		[ToolTip(12, "Type of message to log.")]
 		[Required]
 		public MessageType MessageType
 		{
@@ -40,9 +40,9 @@ namespace Waher.Things.Metering.Commands
 		/// <summary>
 		/// Message body
 		/// </summary>
-		[Page(100, "Message")]
-		[Header(103, "Body:")]
-		[ToolTip(104, "Text of the message to log.")]
+		[Page(10, "Message")]
+		[Header(13, "Body:")]
+		[ToolTip(14, "Text of the message to log.")]
 		[Required]
 		public string MessageBody
 		{
@@ -63,7 +63,7 @@ namespace Waher.Things.Metering.Commands
 		/// <summary>
 		/// Sort Category, if available.
 		/// </summary>
-		public string SortCategory => "Node";
+		public string SortCategory => "Group";
 
 		/// <summary>
 		/// Sort Key, if available.
@@ -103,7 +103,7 @@ namespace Waher.Things.Metering.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MeteringTopology), 105, "Log message...");
+			return Language.GetStringAsync(typeof(GroupSource), 15, "Log message...");
 		}
 
 		/// <summary>
@@ -112,7 +112,7 @@ namespace Waher.Things.Metering.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetSuccessStringAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MeteringTopology), 106, "Message successfully logged.");
+			return Language.GetStringAsync(typeof(GroupSource), 16, "Message successfully logged.");
 		}
 
 		/// <summary>
@@ -130,7 +130,7 @@ namespace Waher.Things.Metering.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetFailureStringAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MeteringTopology), 107, "Unable to log message.");
+			return Language.GetStringAsync(typeof(GroupSource), 17, "Unable to log message.");
 		}
 
 		/// <summary>

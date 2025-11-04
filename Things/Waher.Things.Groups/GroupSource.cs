@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Runtime.Settings;
 using Waher.Things.Groups.NodeTypes;
@@ -22,9 +24,11 @@ namespace Waher.Things.Groups
 		/// </summary>
 		public const string SourceID = "Groups";
 
+		private static readonly Dictionary<string, IDataSource> sources = new Dictionary<string, IDataSource>();
 		private static readonly Dictionary<string, GroupNode> nodes = new Dictionary<string, GroupNode>();
 		private static Root root = null;
 		private static GroupSource instance = null;
+		private static IDataSources dataSources = null;
 
 		private DateTime lastChanged;
 
@@ -360,6 +364,34 @@ namespace Waher.Things.Groups
 			}
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Tries to get a data source, given its Source ID.
+		/// </summary>
+		/// <param name="SourceId">Data Source ID.</param>
+		/// <param name="Source">Source, if found.</param>
+		/// <returns>If a source was found with the corresponding ID.</returns>
+		public static bool TryGetDataSource(string SourceId, out IDataSource Source)
+		{
+			lock (sources)
+			{
+				if (sources.TryGetValue(SourceId, out Source))
+					return !(Source is null);
+			}
+
+			if (dataSources is null)
+				Types.TryGetModuleParameter("Concentrator", out dataSources);
+
+			if (dataSources is null || !dataSources.TryGetDataSource(SourceId, out Source))
+				Source = null;
+
+			lock (sources)
+			{
+				sources[SourceId] = Source;
+			}
+
+			return !(Source is null);
 		}
 	}
 }

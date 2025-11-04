@@ -1,15 +1,15 @@
 ﻿using System.Threading.Tasks;
 using Waher.Runtime.Language;
 
-namespace Waher.Things.Groups.NodeTypes
+namespace Waher.Things.Jobs.NodeTypes
 {
 	/// <summary>
-	/// Class for the root node of the Groups data source.
+	/// Class for the root node of the Jobs data source.
 	/// </summary>
-	public class Root : GroupNode
+	public class Root : JobNode
 	{
 		/// <summary>
-		/// Class for the root node of the Groups data source.
+		/// Class for the root node of the Jobs data source.
 		/// </summary>
 		public Root()
 			: base()
@@ -23,7 +23,7 @@ namespace Waher.Things.Groups.NodeTypes
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(GroupSource), 5, "Root");
+			return Language.GetStringAsync(typeof(JobSource), 5, "Root");
 		}
 
 		/// <summary>

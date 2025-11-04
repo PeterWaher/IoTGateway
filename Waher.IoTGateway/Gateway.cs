@@ -94,6 +94,7 @@ using Waher.Security.SHA3;
 using Waher.Security.Users;
 using Waher.Things;
 using Waher.Things.Groups;
+using Waher.Things.Jobs;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Things.SourceEvents;
@@ -1368,6 +1369,7 @@ namespace Waher.IoTGateway
 					{
 						new MeteringTopology(),
 						new GroupSource(),
+						new JobSource(),
 						new ReportsDataSource()
 					};
 
@@ -1383,6 +1385,7 @@ namespace Waher.IoTGateway
 						{
 							new MeteringTopology(),
 							new GroupSource(),
+							new JobSource(),
 							new ReportsDataSource()
 						};
 

@@ -1162,6 +1162,7 @@
 		<Content fileName='Waher.Things.Groups.en.lng'/>
 		<Content fileName='Waher.Things.Ieee1451.en.lng'/>
 		<Content fileName='Waher.Things.IP.en.lng'/>
+		<Content fileName='Waher.Things.Jobs.en.lng'/>
 		<Content fileName='Waher.Things.Metering.en.lng'/>
 		<Content fileName='Waher.Things.Modbus.en.lng'/>
 		<Content fileName='Waher.Things.Mqtt.en.lng'/>

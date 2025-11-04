@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Translation xmlns="http://waher.se/Schema/Translation.xsd">
 	<Language code="en" name="English">
-		<Namespace name="Waher.Things.Groups">
+		<Namespace name="Waher.Things.Jobs">
 			<String id="1">Groups</String>
 			<String id="2">ID:</String>
 			<String id="3">Group</String>

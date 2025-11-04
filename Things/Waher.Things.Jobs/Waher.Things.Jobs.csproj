@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Language\Waher.Things.Jobs.en.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Waher.Things.Groups\Waher.Things.Groups.csproj" />
     <ProjectReference Include="..\Waher.Things\Waher.Things.csproj" />
   </ItemGroup>

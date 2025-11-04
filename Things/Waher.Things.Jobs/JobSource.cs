@@ -240,7 +240,7 @@ namespace Waher.Things.Jobs
 			{
 				Result = new Root()
 				{
-					NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(JobSource), 14, "Root")
+					NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(JobSource), 5, "Root")
 				};
 
 				await Database.Insert(Result);

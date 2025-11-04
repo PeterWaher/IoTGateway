@@ -240,7 +240,7 @@ namespace Waher.Things.Groups
 			{
 				Result = new Root()
 				{
-					NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(GroupSource), 14, "Root")
+					NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(GroupSource), 5, "Root")
 				};
 
 				await Database.Insert(Result);

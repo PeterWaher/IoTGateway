@@ -38,7 +38,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
 	/// https://neuro-foundation.io
 	/// </summary>
-	public class ConcentratorServer : XmppExtension
+	public class ConcentratorServer : XmppExtension, IDataSources
 	{
 		/// <summary>
 		/// urn:ieee:iot:concentrator:1.0

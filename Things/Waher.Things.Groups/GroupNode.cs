@@ -1262,6 +1262,5 @@ namespace Waher.Things.Groups
 		}
 
 		#endregion
-
 	}
 }

@@ -757,7 +757,7 @@ namespace Waher.Things.Jobs
 		/// <returns>If the node is visible to the caller.</returns>
 		public virtual Task<bool> CanViewAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return Task.FromResult(Caller.HasPrivilege("Source." + JobSource.SourceID + ".Node.View"));
 		}
 
 		/// <summary>
@@ -767,7 +767,7 @@ namespace Waher.Things.Jobs
 		/// <returns>If the node can be edited by the caller.</returns>
 		public virtual Task<bool> CanEditAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return Task.FromResult(Caller.HasPrivilege("Source." + JobSource.SourceID + ".Node.Edit"));
 		}
 
 		/// <summary>
@@ -777,7 +777,7 @@ namespace Waher.Things.Jobs
 		/// <returns>If the node can be added to by the caller.</returns>
 		public virtual Task<bool> CanAddAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return Task.FromResult(Caller.HasPrivilege("Source." + JobSource.SourceID + ".Node.Add"));
 		}
 
 		/// <summary>
@@ -787,7 +787,7 @@ namespace Waher.Things.Jobs
 		/// <returns>If the node can be destroyed to by the caller.</returns>
 		public virtual Task<bool> CanDestroyAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return Task.FromResult(Caller.HasPrivilege("Source." + JobSource.SourceID + ".Node.Destroy"));
 		}
 
 		/// <summary>

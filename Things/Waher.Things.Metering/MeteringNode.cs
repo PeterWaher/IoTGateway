@@ -759,7 +759,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the node is visible to the caller.</returns>
 		public virtual Task<bool> CanViewAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return Task.FromResult(Caller.HasPrivilege("Source." + MeteringTopology.SourceID + ".Node.View"));
 		}
 
 		/// <summary>
@@ -769,7 +769,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the node can be edited by the caller.</returns>
 		public virtual Task<bool> CanEditAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return Task.FromResult(Caller.HasPrivilege("Source." + MeteringTopology.SourceID + ".Node.Edit"));
 		}
 
 		/// <summary>
@@ -779,7 +779,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the node can be added to by the caller.</returns>
 		public virtual Task<bool> CanAddAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return Task.FromResult(Caller.HasPrivilege("Source." + MeteringTopology.SourceID + ".Node.Add"));
 		}
 
 		/// <summary>
@@ -789,7 +789,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the node can be destroyed to by the caller.</returns>
 		public virtual Task<bool> CanDestroyAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return Task.FromResult(Caller.HasPrivilege("Source." + MeteringTopology.SourceID + ".Node.Destroy"));
 		}
 
 		/// <summary>

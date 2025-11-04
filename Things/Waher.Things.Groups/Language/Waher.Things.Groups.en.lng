@@ -30,7 +30,6 @@
 			<String id="26">Partition of the node being referenced.</String>
 			<String id="27">Include child nodes.</String>
 			<String id="28">If child nodes should be included in the reference.</String>
-			<String id="29"></String>
 		</Namespace>
 	</Language>
 </Translation>

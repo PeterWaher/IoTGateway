@@ -19,8 +19,21 @@
 			<String id="15">Log message...</String>
 			<String id="16">Message successfully logged.</String>
 			<String id="17">Unable to log message.</String>
-			<String id="18">Job Node</String>
-			<String id="19"></String>
+			<String id="18"></String>
+			<String id="19">Node Reference</String>
+			<String id="20">Node ID:</String>
+			<String id="21">Reference</String>
+			<String id="22">Node ID of the node being referenced.</String>
+			<String id="23">Source ID:</String>
+			<String id="24">Source ID of the node being referenced.</String>
+			<String id="25">Partition:</String>
+			<String id="26">Partition of the node being referenced.</String>
+			<String id="27">Include child nodes.</String>
+			<String id="28">If child nodes should be included in the reference.</String>
+			<String id="29">Metering Node Reference</String>
+			<String id="30">Group ID:</String>
+			<String id="31">ID of the group being referenced.</String>
+			<String id="32">Group Reference</String>
 		</Namespace>
 	</Language>
 </Translation>

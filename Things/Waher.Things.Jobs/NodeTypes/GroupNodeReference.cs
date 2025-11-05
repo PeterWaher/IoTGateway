@@ -1,22 +1,31 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
+using Waher.Things.Attributes;
 using Waher.Things.Groups;
 
 namespace Waher.Things.Jobs.NodeTypes
 {
 	/// <summary>
-	/// Represents a job.
+	/// A reference to a group node.
 	/// </summary>
-	public class Job : JobNode, IGroup
+	public class GroupNodeReference : JobNode, IGroup
 	{
 		/// <summary>
-		/// Represents a job.
+		/// A reference to a group node.
 		/// </summary>
-		public Job()
+		public GroupNodeReference()
 		{
 		}
+
+		/// <summary>
+		/// ID of node.
+		/// </summary>
+		[Header(30, "Group ID:", 0)]
+		[Page(21, "Reference", 0)]
+		[ToolTip(31, "ID of the group being referenced.")]
+		[Required]
+		public string ReferenceGroupId { get; set; }
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -25,7 +34,7 @@ namespace Waher.Things.Jobs.NodeTypes
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(JobSource), 3, "Job");
+			return Language.GetStringAsync(typeof(GroupSource), 32, "Group Reference");
 		}
 
 		/// <summary>
@@ -35,9 +44,7 @@ namespace Waher.Things.Jobs.NodeTypes
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is NodeReference || 
-				Child is MeteringNodeReference || 
-				Child is GroupNodeReference);
+			return Task.FromResult(false);
 		}
 
 		/// <summary>
@@ -47,7 +54,7 @@ namespace Waher.Things.Jobs.NodeTypes
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(Parent is Root);
+			return Task.FromResult(Parent is Job);
 		}
 
 		/// <summary>
@@ -57,15 +64,16 @@ namespace Waher.Things.Jobs.NodeTypes
 		public async Task FindNodes<T>(ChunkedList<T> Nodes)
 			where T : INode
 		{
-			IEnumerable<INode> Children = await this.ChildNodes;
-			if (Children is null)
-				return;
+			INode Node = await GroupSource.GetNode(this.ReferenceGroupId);
 
-			foreach (INode Child in Children)
+			if (Node is null)
 			{
-				if (Child is IGroup Group)
-					await Group.FindNodes(Nodes);
+				await this.LogErrorAsync("InvalidReference", "Group not found.");
+				return;
 			}
+
+			if (Node is IGroup Group)
+				await Group.FindNodes(Nodes);
 		}
 	}
 }

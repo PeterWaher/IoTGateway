@@ -3,16 +3,17 @@ using System.Threading.Tasks;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
+using Waher.Things.Groups;
 
-namespace Waher.Things.Groups.NodeTypes
+namespace Waher.Things.Jobs.NodeTypes
 {
 	/// <summary>
-	/// A reference to a node.
+	/// A reference to another node.
 	/// </summary>
-	public class NodeReference : GroupNode, IGroup
+	public class NodeReference : JobNode, IGroup
 	{
 		/// <summary>
-		/// A reference to a node.
+		/// A reference to another node.
 		/// </summary>
 		public NodeReference()
 		{
@@ -79,7 +80,7 @@ namespace Waher.Things.Groups.NodeTypes
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(Parent is Group);
+			return Task.FromResult(Parent is Job);
 		}
 
 		/// <summary>

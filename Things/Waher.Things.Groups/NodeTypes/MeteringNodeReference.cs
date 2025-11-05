@@ -3,18 +3,19 @@ using System.Threading.Tasks;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
+using Waher.Things.Metering;
 
 namespace Waher.Things.Groups.NodeTypes
 {
 	/// <summary>
-	/// A reference to a node.
+	/// A reference to a metering node.
 	/// </summary>
-	public class NodeReference : GroupNode, IGroup
+	public class MeteringNodeReference : GroupNode, IGroup
 	{
 		/// <summary>
-		/// A reference to a node.
+		/// A reference to a metering node.
 		/// </summary>
-		public NodeReference()
+		public MeteringNodeReference()
 		{
 		}
 
@@ -26,23 +27,6 @@ namespace Waher.Things.Groups.NodeTypes
 		[ToolTip(22, "Node ID of the node being referenced.")]
 		[Required]
 		public string ReferenceNodeId { get; set; }
-
-		/// <summary>
-		/// Source ID of node.
-		/// </summary>
-		[Header(23, "Source ID:", 0)]
-		[Page(21, "Reference", 0)]
-		[ToolTip(24, "Source ID of the node being referenced.")]
-		[Required]
-		public string ReferenceSourceId { get; set; }
-
-		/// <summary>
-		/// Partition of node.
-		/// </summary>
-		[Header(25, "Partition:", 0)]
-		[Page(21, "Reference", 0)]
-		[ToolTip(26, "Partition of the node being referenced.")]
-		public string ReferencePartition { get; set; }
 
 		/// <summary>
 		/// If child nodes should be included.
@@ -59,7 +43,7 @@ namespace Waher.Things.Groups.NodeTypes
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(GroupSource), 19, "Node Reference");
+			return Language.GetStringAsync(typeof(GroupSource), 29, "Metering Node Reference");
 		}
 
 		/// <summary>
@@ -89,24 +73,7 @@ namespace Waher.Things.Groups.NodeTypes
 		public async Task FindNodes<T>(ChunkedList<T> Nodes)
 			where T : INode
 		{
-			if (!GroupSource.TryGetDataSource(this.ReferenceSourceId, out IDataSource Source))
-			{
-				await this.LogErrorAsync("InvalidReference", "Data Source not found.");
-				return;
-			}
-
-			INode Node;
-
-			if (string.IsNullOrEmpty(this.ReferencePartition))
-			{
-				Node = await Source.GetNodeAsync(new ThingReference(this.ReferenceNodeId,
-					this.ReferenceSourceId));
-			}
-			else
-			{
-				Node = await Source.GetNodeAsync(new ThingReference(this.ReferenceNodeId,
-					this.ReferenceSourceId, this.ReferencePartition));
-			}
+			INode Node = await MeteringTopology.GetNode(this.ReferenceNodeId);
 
 			if (Node is null)
 			{

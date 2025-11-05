@@ -24,7 +24,7 @@ namespace Waher.Things.Groups.NodeTypes
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(GroupSource), 18, "Group Node");
+			return Language.GetStringAsync(typeof(GroupSource), 3, "Group");
 		}
 
 		/// <summary>
@@ -34,7 +34,8 @@ namespace Waher.Things.Groups.NodeTypes
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is NodeReference || Child is Group);
+			return Task.FromResult(Child is NodeReference || 
+				Child is MeteringNodeReference || Child is Group);
 		}
 
 		/// <summary>
@@ -51,7 +52,8 @@ namespace Waher.Things.Groups.NodeTypes
 		/// Finds nodes referenced by the group node.
 		/// </summary>
 		/// <param name="Nodes">Nodes found will be added to this collection.</param>
-		public async Task FindNodes(ChunkedList<INode> Nodes)
+		public async Task FindNodes<T>(ChunkedList<T> Nodes)
+			where T : INode
 		{
 			IEnumerable<INode> Children = await this.ChildNodes;
 			if (Children is null)

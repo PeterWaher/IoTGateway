@@ -1,31 +1,42 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.Groups;
+using Waher.Things.Jobs.NodeTypes.Jobs;
+using Waher.Things.Metering;
 
-namespace Waher.Things.Jobs.NodeTypes
+namespace Waher.Things.Jobs.NodeTypes.References
 {
 	/// <summary>
-	/// A reference to a group node.
+	/// A reference to a metering node.
 	/// </summary>
-	public class GroupNodeReference : JobNode, IGroup
+	public class MeteringNodeReference : JobNode, IGroup
 	{
 		/// <summary>
-		/// A reference to a group node.
+		/// A reference to a metering node.
 		/// </summary>
-		public GroupNodeReference()
+		public MeteringNodeReference()
 		{
 		}
 
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(30, "Group ID:", 0)]
+		[Header(20, "Node ID:", 0)]
 		[Page(21, "Reference", 0)]
-		[ToolTip(31, "ID of the group being referenced.")]
+		[ToolTip(22, "Node ID of the node being referenced.")]
 		[Required]
-		public string ReferenceGroupId { get; set; }
+		public string ReferenceNodeId { get; set; }
+
+		/// <summary>
+		/// If child nodes should be included.
+		/// </summary>
+		[Header(27, "Include child nodes.", 0)]
+		[Page(21, "Reference", 0)]
+		[ToolTip(28, "If child nodes should be included in the reference.")]
+		public bool IncludeChildNodes { get; set; }
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -34,7 +45,7 @@ namespace Waher.Things.Jobs.NodeTypes
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(GroupSource), 32, "Group Reference");
+			return Language.GetStringAsync(typeof(GroupSource), 29, "Metering Node Reference");
 		}
 
 		/// <summary>
@@ -75,16 +86,38 @@ namespace Waher.Things.Jobs.NodeTypes
 		public async Task FindNodes<T>(ChunkedList<T> Nodes)
 			where T : INode
 		{
-			INode Node = await GroupSource.GetNode(this.ReferenceGroupId);
+			INode Node = await MeteringTopology.GetNode(this.ReferenceNodeId);
 
 			if (Node is null)
 			{
-				await this.LogErrorAsync("InvalidReference", "Group not found.");
+				await this.LogErrorAsync("InvalidReference", "Node not found.");
 				return;
 			}
 
-			if (Node is IGroup Group)
-				await Group.FindNodes(Nodes);
+			if (Node is T TypedNode)
+				Nodes.Add(TypedNode);
+
+			if (this.IncludeChildNodes)
+			{
+				ChunkedList<INode> CheckChildren = new ChunkedList<INode>() { Node };
+
+				while (CheckChildren.HasFirstItem)
+				{
+					Node = CheckChildren.RemoveFirst();
+					IEnumerable<INode> Children = await Node.ChildNodes;
+
+					if (!(Children is null))
+					{
+						foreach (INode Child in Children)
+						{
+							if (Child is T TypedChild)
+								Nodes.Add(TypedChild);
+
+							CheckChildren.Add(Child);
+						}
+					}
+				}
+			}
 		}
 	}
 }

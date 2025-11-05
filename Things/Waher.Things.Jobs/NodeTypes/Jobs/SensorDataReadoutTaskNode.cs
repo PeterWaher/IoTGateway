@@ -11,10 +11,11 @@ using Waher.Runtime.Queue;
 using Waher.Script.Functions.Runtime;
 using Waher.Things.Attributes;
 using Waher.Things.Groups;
+using Waher.Things.Jobs.NodeTypes.References;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 
-namespace Waher.Things.Jobs.NodeTypes
+namespace Waher.Things.Jobs.NodeTypes.Jobs
 {
 	/// <summary>
 	/// Sensor data readout task node.
@@ -100,7 +101,7 @@ namespace Waher.Things.Jobs.NodeTypes
 		{
 			get
 			{
-				FieldType Result = (FieldType)0;
+				FieldType Result = 0;
 
 				if (this.Momentary)
 					Result |= FieldType.Momentary;

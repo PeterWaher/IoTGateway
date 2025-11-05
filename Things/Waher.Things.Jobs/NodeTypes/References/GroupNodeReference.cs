@@ -1,41 +1,32 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.Groups;
-using Waher.Things.Metering;
+using Waher.Things.Jobs.NodeTypes.Jobs;
 
-namespace Waher.Things.Jobs.NodeTypes
+namespace Waher.Things.Jobs.NodeTypes.References
 {
 	/// <summary>
-	/// A reference to a metering node.
+	/// A reference to a group node.
 	/// </summary>
-	public class MeteringNodeReference : JobNode, IGroup
+	public class GroupNodeReference : JobNode, IGroup
 	{
 		/// <summary>
-		/// A reference to a metering node.
+		/// A reference to a group node.
 		/// </summary>
-		public MeteringNodeReference()
+		public GroupNodeReference()
 		{
 		}
 
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(20, "Node ID:", 0)]
+		[Header(30, "Group ID:", 0)]
 		[Page(21, "Reference", 0)]
-		[ToolTip(22, "Node ID of the node being referenced.")]
+		[ToolTip(31, "ID of the group being referenced.")]
 		[Required]
-		public string ReferenceNodeId { get; set; }
-
-		/// <summary>
-		/// If child nodes should be included.
-		/// </summary>
-		[Header(27, "Include child nodes.", 0)]
-		[Page(21, "Reference", 0)]
-		[ToolTip(28, "If child nodes should be included in the reference.")]
-		public bool IncludeChildNodes { get; set; }
+		public string ReferenceGroupId { get; set; }
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -44,7 +35,7 @@ namespace Waher.Things.Jobs.NodeTypes
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(GroupSource), 29, "Metering Node Reference");
+			return Language.GetStringAsync(typeof(GroupSource), 32, "Group Reference");
 		}
 
 		/// <summary>
@@ -85,38 +76,16 @@ namespace Waher.Things.Jobs.NodeTypes
 		public async Task FindNodes<T>(ChunkedList<T> Nodes)
 			where T : INode
 		{
-			INode Node = await MeteringTopology.GetNode(this.ReferenceNodeId);
+			INode Node = await GroupSource.GetNode(this.ReferenceGroupId);
 
 			if (Node is null)
 			{
-				await this.LogErrorAsync("InvalidReference", "Node not found.");
+				await this.LogErrorAsync("InvalidReference", "Group not found.");
 				return;
 			}
 
-			if (Node is T TypedNode)
-				Nodes.Add(TypedNode);
-
-			if (this.IncludeChildNodes)
-			{
-				ChunkedList<INode> CheckChildren = new ChunkedList<INode>() { Node };
-
-				while (CheckChildren.HasFirstItem)
-				{
-					Node = CheckChildren.RemoveFirst();
-					IEnumerable<INode> Children = await Node.ChildNodes;
-
-					if (!(Children is null))
-					{
-						foreach (INode Child in Children)
-						{
-							if (Child is T TypedChild)
-								Nodes.Add(TypedChild);
-
-							CheckChildren.Add(Child);
-						}
-					}
-				}
-			}
+			if (Node is IGroup Group)
+				await Group.FindNodes(Nodes);
 		}
 	}
 }

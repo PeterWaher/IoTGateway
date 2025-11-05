@@ -1,41 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Runtime.Collections;
-using Waher.Runtime.Language;
 using Waher.Things.Groups;
 
-namespace Waher.Things.Jobs.NodeTypes
+namespace Waher.Things.Jobs.NodeTypes.Jobs
 {
 	/// <summary>
-	/// Represents a job.
+	/// Abstract bast class for job tasks.
 	/// </summary>
-	public class Job : JobNode, IGroup
+	public abstract class JobTaskNode : JobNode, IGroup
 	{
 		/// <summary>
-		/// Represents a job.
+		/// Abstract bast class for job tasks.
 		/// </summary>
-		public Job()
+		public JobTaskNode()
 		{
-		}
-
-		/// <summary>
-		/// Gets the type name of the node.
-		/// </summary>
-		/// <param name="Language">Language to use.</param>
-		/// <returns>Localized type node.</returns>
-		public override Task<string> GetTypeNameAsync(Language Language)
-		{
-			return Language.GetStringAsync(typeof(JobSource), 3, "Job");
-		}
-
-		/// <summary>
-		/// If the node accepts a presumptive child, i.e. can receive as a child (if that child accepts the node as a parent).
-		/// </summary>
-		/// <param name="Child">Presumptive child node.</param>
-		/// <returns>If the child is acceptable.</returns>
-		public override Task<bool> AcceptsChildAsync(INode Child)
-		{
-			return Task.FromResult(Child is JobTaskNode);
 		}
 
 		/// <summary>
@@ -45,7 +24,7 @@ namespace Waher.Things.Jobs.NodeTypes
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(Parent is Root);
+			return Task.FromResult(Parent is Job);
 		}
 
 		/// <summary>
@@ -76,5 +55,11 @@ namespace Waher.Things.Jobs.NodeTypes
 					await Group.FindNodes(Nodes);
 			}
 		}
+
+		/// <summary>
+		/// Executes the task.
+		/// </summary>
+		/// <param name="Status">Execution status.</param>
+		public abstract Task ExecuteTask(JobExecutionStatus Status);
 	}
 }

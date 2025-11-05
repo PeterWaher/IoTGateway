@@ -4,8 +4,9 @@ using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.Groups;
+using Waher.Things.Jobs.NodeTypes.Jobs;
 
-namespace Waher.Things.Jobs.NodeTypes
+namespace Waher.Things.Jobs.NodeTypes.References
 {
 	/// <summary>
 	/// A reference to another node.

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Waher.Things.Jobs.NodeTypes;
+using Waher.Things.Jobs.NodeTypes.Jobs;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 

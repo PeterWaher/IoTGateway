@@ -40,7 +40,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is DiscoverableTopicNode || Child is MqttNcapTopicNode);
+			return Task.FromResult(
+				Child is DiscoverableTopicNode || 
+				Child is MqttNcapTopicNode);
 		}
 
 		/// <summary>

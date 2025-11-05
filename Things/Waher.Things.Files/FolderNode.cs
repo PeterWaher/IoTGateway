@@ -147,7 +147,9 @@ namespace Waher.Things.Files
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is SubFolderNode || Child is FileNode);
+			return Task.FromResult(
+				Child is SubFolderNode || 
+				Child is FileNode);
 		}
 
 		/// <summary>

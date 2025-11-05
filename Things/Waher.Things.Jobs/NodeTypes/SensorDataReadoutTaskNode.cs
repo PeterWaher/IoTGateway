@@ -191,7 +191,6 @@ namespace Waher.Things.Jobs.NodeTypes
 
 			await Processor.WaitUntilIdle();
 		}
-
 		
 		private Task FieldsReported(ISensor Sensor, Field[] Fields, JobExecutionStatus Status)
 		{

@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Queue\Waher.Runtime.Queue.csproj" />
     <ProjectReference Include="..\Waher.Things.Groups\Waher.Things.Groups.csproj" />
     <ProjectReference Include="..\Waher.Things\Waher.Things.csproj" />
   </ItemGroup>

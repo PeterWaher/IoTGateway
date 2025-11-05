@@ -35,9 +35,7 @@ namespace Waher.Things.Jobs.NodeTypes
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is NodeReference || 
-				Child is MeteringNodeReference || 
-				Child is GroupNodeReference);
+			return Task.FromResult(Child is JobTaskNode);
 		}
 
 		/// <summary>
@@ -48,6 +46,17 @@ namespace Waher.Things.Jobs.NodeTypes
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
 			return Task.FromResult(Parent is Root);
+		}
+
+		/// <summary>
+		/// Finds nodes referenced by the group node.
+		/// </summary>
+		public async Task<T[]> FindNodes<T>()
+			where T : INode
+		{
+			ChunkedList<T> Nodes = new ChunkedList<T>();
+			await this.FindNodes(Nodes);
+			return Nodes.ToArray();
 		}
 
 		/// <summary>

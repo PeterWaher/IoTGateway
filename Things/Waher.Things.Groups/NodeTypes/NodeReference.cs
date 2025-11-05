@@ -85,6 +85,17 @@ namespace Waher.Things.Groups.NodeTypes
 		/// <summary>
 		/// Finds nodes referenced by the group node.
 		/// </summary>
+		public async Task<T[]> FindNodes<T>()
+			where T : INode
+		{
+			ChunkedList<T> Nodes = new ChunkedList<T>();
+			await this.FindNodes(Nodes);
+			return Nodes.ToArray();
+		}
+
+		/// <summary>
+		/// Finds nodes referenced by the group node.
+		/// </summary>
 		/// <param name="Nodes">Nodes found will be added to this collection.</param>
 		public async Task FindNodes<T>(ChunkedList<T> Nodes)
 			where T : INode

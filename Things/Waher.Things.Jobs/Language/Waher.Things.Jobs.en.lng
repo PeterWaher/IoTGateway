@@ -34,6 +34,28 @@
 			<String id="30">Group ID:</String>
 			<String id="31">ID of the group being referenced.</String>
 			<String id="32">Group Reference</String>
+			<String id="33">Sensor Data Readout Task</String>
+			<String id="34">Readout</String>
+			<String id="35">Parallel readouts:</String>
+			<String id="36">Maximum number of parallel readouts.</String>
+			<String id="37">Field names to read:</String>
+			<String id="38">Leave blank to read all fields.</String>
+			<String id="39">Momentary</String>
+			<String id="40">Check, if momentary values should be read.</String>
+			<String id="41">Identity</String>
+			<String id="42">Check, if identity values should be read.</String>
+			<String id="43">Status</String>
+			<String id="44">Check, if status values should be read.</String>
+			<String id="45">Computed</String>
+			<String id="46">Check, if computed values should be read.</String>
+			<String id="47">Peak</String>
+			<String id="48">Check, if peak values should be read.</String>
+			<String id="49">Historical</String>
+			<String id="50">Check, if historical values should be read.</String>
+			<String id="51">From:</String>
+			<String id="52">Read historical data from this point in time.</String>
+			<String id="53">To:</String>
+			<String id="54">Read historical data to this point in time.</String>
 		</Namespace>
 	</Language>
 </Translation>

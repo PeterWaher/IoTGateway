@@ -64,7 +64,18 @@ namespace Waher.Things.Jobs.NodeTypes
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(Parent is Job);
+			return Task.FromResult(Parent is SensorDataReadoutTaskNode);
+		}
+
+		/// <summary>
+		/// Finds nodes referenced by the group node.
+		/// </summary>
+		public async Task<T[]> FindNodes<T>()
+			where T : INode
+		{
+			ChunkedList<T> Nodes = new ChunkedList<T>();
+			await this.FindNodes(Nodes);
+			return Nodes.ToArray();
 		}
 
 		/// <summary>

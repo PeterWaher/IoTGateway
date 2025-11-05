@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Waher.Runtime.Language;
 
-namespace Waher.Things.Jobs.NodeTypes
+namespace Waher.Things.Jobs.NodeTypes.Jobs
 {
 	/// <summary>
 	/// Class for the root node of the Jobs data source.

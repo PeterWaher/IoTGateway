@@ -6,7 +6,7 @@ using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Language;
 using Waher.Runtime.Settings;
-using Waher.Things.Jobs.NodeTypes;
+using Waher.Things.Jobs.NodeTypes.Jobs;
 using Waher.Things.SourceEvents;
 
 namespace Waher.Things.Jobs

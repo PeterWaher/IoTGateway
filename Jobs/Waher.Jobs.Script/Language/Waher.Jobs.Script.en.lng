@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Translation xmlns="http://waher.se/Schema/Translation.xsd">
+	<Language code="en" name="English">
+		<Namespace name="Waher.Jobs.Script.NodeTypes">
+			<String id="1">Script:</String>
+			<String id="2">Script</String>
+			<String id="3">Script to execute.</String>
+			<String id="4">Script Execution Task</String>
+		</Namespace>
+	</Language>
+</Translation>

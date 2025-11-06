@@ -12,6 +12,7 @@ using Waher.Processors.Metering;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Runtime.Queue;
+using Waher.Script;
 using Waher.Script.Functions.Runtime;
 using Waher.Things;
 using Waher.Things.Attributes;
@@ -78,7 +79,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		[ToolTip(11, "Check, if computed values should be read.")]
 		[DefaultValue(false)]
 		public bool Computed { get; set; } = false;
-		
+
 		/// <summary>
 		/// If peak values should be read.
 		/// </summary>
@@ -197,10 +198,19 @@ namespace Waher.Jobs.Metering.NodeTypes
 			}
 
 			await Processor.WaitUntilIdle();
+
+			if (Status.Variables.TryGetVariable("Errors", out Variable v) &&
+				v.ValueObject is ChunkedList<ThingError> JobErrors &&
+				JobErrors.Count > 0)
+			{
+				await Status.Job.LogErrorAsync("ReadoutErrors", JobErrors.Count.ToString() + " errors reported during readout.");
+			}
+			else
+				await Status.Job.RemoveErrorAsync("ReadoutErrors");
 		}
 
-		private async Task FieldsReported(ISensor Sensor, Field[] Fields, 
-			ThingError[] Errors, JobExecutionStatus Status, 
+		private async Task FieldsReported(ISensor Sensor, Field[] Fields,
+			ThingError[] Errors, JobExecutionStatus Status,
 			ISensorDataProcessor[] Processors, ISensorDataOutput[] Outputs)
 		{
 			if (!(Fields is null))
@@ -240,6 +250,10 @@ namespace Waher.Jobs.Metering.NodeTypes
 
 			if (!(Errors is null))
 			{
+				if (!Status.Variables.TryGetVariable("Errors", out Variable v))
+					Status.Variables["Errors"] = new ChunkedList<ThingError>(Errors);
+				else if (v.ValueObject is ChunkedList<ThingError> JobErrors)
+					JobErrors.AddRange(Errors);
 			}
 		}
 

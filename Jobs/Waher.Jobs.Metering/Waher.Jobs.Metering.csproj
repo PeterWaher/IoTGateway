@@ -53,6 +53,7 @@
 	  <ProjectReference Include="..\..\Output\Waher.Output\Waher.Output.csproj" />
 	  <ProjectReference Include="..\..\Processors\Waher.Processors.Metering\Waher.Processors.Metering.csproj" />
 	  <ProjectReference Include="..\..\Processors\Waher.Processors\Waher.Processors.csproj" />
+	  <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
 	  <ProjectReference Include="..\Waher.Jobs\Waher.Jobs.csproj" />
 	</ItemGroup>
 

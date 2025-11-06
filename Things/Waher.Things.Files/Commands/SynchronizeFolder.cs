@@ -61,7 +61,7 @@ namespace Waher.Things.Files.Commands
 		/// <summary>
 		/// Sort Key, if available.
 		/// </summary>
-		public string SortKey => "Synchronize";
+		public string SortKey => nameof(SynchronizeFolder);
 
 		/// <summary>
 		/// If the command can be executed by the caller.

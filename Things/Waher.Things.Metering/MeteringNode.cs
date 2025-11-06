@@ -8,6 +8,7 @@ using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Language;
+using Waher.Runtime.Threading;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering.Commands;
@@ -523,22 +524,18 @@ namespace Waher.Things.Metering
 		/// <returns>A Node ID that does not exist in the database.</returns>
 		public static async Task<string> GetUniqueNodeId(string NodeId)
 		{
+			using Semaphore Semaphore = await Semaphores.BeginWrite("Metering." + NodeId);
 			string Suffix = string.Empty;
+			string s;
 			int i = 1;
-			bool Found;
 
 			while (true)
 			{
-				Found = false;
-
-				foreach (MeteringNode Node in await Database.Find<MeteringNode>(0, 1, new FilterFieldEqualTo("NodeId", NodeId + Suffix)))
+				if (await Database.FindFirstIgnoreRest<MeteringNode>(
+					new FilterFieldEqualTo("NodeId", s = NodeId + Suffix)) is null)
 				{
-					Found = true;
-					break;
+					return s;
 				}
-
-				if (!Found)
-					return NodeId + Suffix;
 
 				i++;
 				Suffix = " (" + i.ToString() + ")";

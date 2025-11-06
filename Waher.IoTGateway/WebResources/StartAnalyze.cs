@@ -99,7 +99,7 @@ namespace Waher.IoTGateway.WebResources
 			BasePath += Path.DirectorySeparatorChar;
 
 			string FullFileName = Path.Combine(BasePath, "DBReport " + DateTime.Now.ToString("yyyy-MM-dd HH_mm_ss"));
-			FullFileName = StartExport.GetUniqueFileName(FullFileName, ".xml");
+			FullFileName = await StartExport.GetUniqueFileName(FullFileName, ".xml");
 			FileStream fs = null;
 
 			try

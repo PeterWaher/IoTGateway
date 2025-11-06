@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Translation xmlns="http://waher.se/Schema/Translation.xsd">
+	<Language code="en" name="English">
+		<Namespace name="Waher.Jobs.Metering.NodeTypes">
+			<String id="1">Readout</String>
+			<String id="2">Parallel readouts:</String>
+			<String id="3">Maximum number of parallel readouts.</String>
+			<String id="4">Momentary values.</String>
+			<String id="5">Check, if momentary values should be read.</String>
+			<String id="6">Identity values.</String>
+			<String id="7">Check, if identity values should be read.</String>
+			<String id="8">Status values.</String>
+			<String id="9">Check, if status values should be read.</String>
+			<String id="10">Computed values.</String>
+			<String id="11">Check, if computed values should be read.</String>
+			<String id="12">Peak values.</String>
+			<String id="13">Check, if peak values should be read.</String>
+			<String id="14">Historical values.</String>
+			<String id="15">Check, if historical values should be read.</String>
+			<String id="16">Field names to read:</String>
+			<String id="17">Leave blank to read all fields.</String>
+			<String id="18">From:</String>
+			<String id="19">Read historical data from this point in time.</String>
+			<String id="20">To:</String>
+			<String id="21">Read historical data to this point in time.</String>
+			<String id="22">Sensor Data Readout Task</String>
+		</Namespace>
+	</Language>
+</Translation>

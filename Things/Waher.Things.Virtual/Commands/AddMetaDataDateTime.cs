@@ -58,7 +58,7 @@ namespace Waher.Things.Virtual.Commands
 		/// <summary>
 		/// Sort Key, if available.
 		/// </summary>
-		public string SortKey => "AddDateTime";
+		public string SortKey => nameof(AddMetaDataDateTime);
 
 		/// <summary>
 		/// If the command can be executed by the caller.

@@ -42,7 +42,7 @@ namespace Waher.Things.Metering.Commands
 		/// <summary>
 		/// Sort Key, if available.
 		/// </summary>
-		public string SortKey => "ClearMessages";
+		public string SortKey => nameof(ClearMessages);
 
 		/// <summary>
 		/// If the command can be executed by the caller.

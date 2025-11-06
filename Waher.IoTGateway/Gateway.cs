@@ -34,12 +34,14 @@ using Waher.Events.Files;
 using Waher.Events.Filter;
 using Waher.Events.Persistence;
 using Waher.Events.XMPP;
+using Waher.Groups;
 using Waher.IoTGateway.Events;
 using Waher.IoTGateway.Exceptions;
 using Waher.IoTGateway.Setup;
 using Waher.IoTGateway.Setup.Legal;
 using Waher.IoTGateway.WebResources;
 using Waher.IoTGateway.WebResources.ExportFormats;
+using Waher.Jobs;
 using Waher.Networking;
 using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
@@ -68,8 +70,10 @@ using Waher.Networking.XMPP.PubSub.Events;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.Software;
 using Waher.Networking.XMPP.Synchronization;
+using Waher.Output;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Processors;
 using Waher.Reports;
 using Waher.Reports.Files;
 using Waher.Runtime.Cache;
@@ -93,8 +97,6 @@ using Waher.Security.LoginMonitor;
 using Waher.Security.SHA3;
 using Waher.Security.Users;
 using Waher.Things;
-using Waher.Things.Groups;
-using Waher.Things.Jobs;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Things.SourceEvents;
@@ -1367,9 +1369,11 @@ namespace Waher.IoTGateway
 				{
 					InitialSources = new IDataSource[]
 					{
-						new MeteringTopology(),
 						new GroupSource(),
 						new JobSource(),
+						new MeteringTopology(),
+						new OutputSource(),
+						new ProcessorSource(),
 						new ReportsDataSource()
 					};
 
@@ -1383,9 +1387,11 @@ namespace Waher.IoTGateway
 					{
 						InitialSources ??= new IDataSource[]
 						{
-							new MeteringTopology(),
 							new GroupSource(),
 							new JobSource(),
+							new MeteringTopology(),
+							new OutputSource(),
+							new ProcessorSource(),
 							new ReportsDataSource()
 						};
 

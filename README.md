@@ -9,10 +9,14 @@ Apart from the [IoT Gateway](#iot-gateway) projects, the solution is divided int
 * [Clients](#clients)
 * [Content](#content)
 * [Events](#events)
+* [Groups](#groups)
+* [Jobs](#jobs)
 * [Layout](#layout)
 * [Mocks](#mocks)
 * [Networking](#networking)
+* [Output](#output)
 * [Persistence](#persistence)
+* [Processors](#processors)
 * [Reports](#reports)
 * [Runtime](#runtime)
 * [Script](#script)
@@ -226,6 +230,29 @@ The folder also contains the following unit test projects:
 | **Waher.Events.Pipe.Test**   | .NET 8.0 | The [Waher.Events.Pipe.Test](Events/Waher.Events.Pipe.Test) project contains unit tests for the **Waher.Events.Pipe** project. |
 | **Waher.Events.Socket.Test** | .NET 8.0 | The [Waher.Events.Socket.Test](Events/Waher.Events.Socket.Test) project contains unit tests for the **Waher.Events.Socket** project. |
 
+Groups
+----------------------
+
+The [Groups](Groups) folder contains libraries that define a data source and nodes for logical
+grouping of other nodes in other sources.
+
+| Project                   | Type          | Link                                                           | Project description |
+|---------------------------|---------------|----------------------------------------------------------------|---------------------|
+| **Waher.Groups**          | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Groups/)          | The [Waher.Groups](Groups/Waher.Groups) project publishes a data source where logical groups can be created with references to other nodes in other data sources. |
+| **Waher.Groups.Metering** | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Groups.Metering/) | The [Waher.Groups.Metering](Groups/Waher.Groups.Metering) project simplifies the creation of groups of metering nodes (things). |
+
+Jobs
+----------------------
+
+The [Jobs](Jobs) folder contains libraries that define a data source and nodes for processing
+and execution of jobs.
+
+| Project                 | Type          | Link                                                         | Project description |
+|-------------------------|---------------|--------------------------------------------------------------|---------------------|
+| **Waher.Jobs**          | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Jobs/)          | The [Waher.Jobs](Jobs/Waher.Jobs) project publishes a data source manging executable jobs. |
+| **Waher.Jobs.Metering** | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Jobs.Metering/) | The [Waher.Jobs.Metering](Jobs/Waher.Jobs.Metering) project contains job types that operate on metering nodes such as sensor data readout or actuator control. |
+| **Waher.Jobs.Script**   | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Jobs.Script/)   | The [Waher.Jobs.Script](Jobs/Waher.Jobs.Script) project allows for the creation of script-based jobs. |
+
 Layout
 ----------------------
 
@@ -336,6 +363,17 @@ The folder also contains the following unit test projects:
 | **Waher.Networking.WHOIS.Test**      | .NET 8.0 | The [Waher.Networking.WHOIS.Test](Networking/Waher.Networking.WHOIS.Test) project contains unit-tests for the [Waher.Networking.WHOIS](Networking/Waher.Networking.WHOIS) library. |
 | **Waher.Networking.XMPP.Test**       | .NET 8.0 | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
 
+Output
+----------------------
+
+The [Output](Output) folder contains libraries that define a data source and nodes for 
+storing output data.
+
+| Project                   | Type          | Link                                                           | Project description |
+|---------------------------|---------------|----------------------------------------------------------------|---------------------|
+| **Waher.Output**          | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Output/)          | The [Waher.Output](Output/Waher.Output) project publishes a data source manging data output. |
+| **Waher.Output.Metering** | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Output.Metering/) | The [Waher.Output.Metering](Output/Waher.Output.Metering) project helps with the storage of sensor data. |
+
 Persistence
 ----------------------
 
@@ -363,6 +401,17 @@ The folder also contains the following unit test projects:
 | **Waher.Persistence.FullTextSearch.Test** | .NET 8.0 | The [Waher.Persistence.FullTextSearch.Test](Persistence/Waher.Persistence.FullTextSearch.Test) project contains unit tests for the [Waher.Persistence.FullTextSearch](Persistence/Waher.Persistence.FullTextSearch) project. |
 | **Waher.Persistence.MongoDB.Test**        | .NET 8.0 | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
 | **Waher.Persistence.XmlLedger.Test**      | .NET 8.0 | The [Waher.Persistence.XmlLedger.Test](Persistence/Waher.Persistence.XmlLedger.Test) project contains unit tests for the [Waher.Persistence.XmlLedger](Persistence/Waher.Persistence.XmlLedger) project. |
+
+Processors
+----------------------
+
+The [Processors](Processors) folder contains libraries that define a data source and nodes for 
+processing data in transit.
+
+| Project                       | Type          | Link                                                               | Project description |
+|-------------------------------|---------------|--------------------------------------------------------------------|---------------------|
+| **Waher.Processors**          | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Processors/)          | The [Waher.Processors](Processors/Waher.Processors) project publishes a data source manging data processors. |
+| **Waher.Processors.Metering** | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Processors.Metering/) | The [Waher.Processors.Metering](Processors/Waher.Processors.Metering) project helps with the processing of in transit sensor data. |
 
 Reports
 ----------------------
@@ -533,9 +582,7 @@ to form more complex devices, such as concentrators or bridges.
 | **Waher.Things**          | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Things/)          | The [Waher.Things](Things/Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |
 | **Waher.Things.Ieee1451** | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Things.Ieee1451/) | The [Waher.Things.Ieee1451](Things/Waher.Things.Ieee1451) project is a class library that publishes nodes that communicate using the IEEE 1451 family of standards. |
 | **Waher.Things.Files**    | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Things.Files/)    | The [Waher.Things.Files](Things/Waher.Things.Files) project publishes nodes that permit you to define sensor and actuator nodes in the network based on files in the file-system. |
-| **Waher.Things.Groups**   | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Things.Groups/)   | The [Waher.Things.Groups](Things/Waher.Things.Groups) project publishes a data source where logical groups can be created with references to other nodes in other data sources. |
 | **Waher.Things.Ip**       | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Things.Ip/)       | The [Waher.Things.Ip](Things/Waher.Things.Ip) project is a class library that publishes nodes representing nodes on an IP network. |
-| **Waher.Things.Jobs**     | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Things.Jobs/)     | The [Waher.Things.Jobs](Things/Waher.Things.Groups) project publishes a data source manging executable jobs. |
 | **Waher.Things.Metering** | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Things.Metering/) | The [Waher.Things.Metering](Things/Waher.Things.Metering) project is a class library that defines a basic metering infrastructure. |
 | **Waher.Things.Modbus**   | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Things.Modbus/)   | The [Waher.Things.Modbus](Things/Waher.Things.Modbus) project is a class library that publishes nodes representing Modbus devices. |
 | **Waher.Things.Mqtt**     | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Things.Mqtt/)     | The [Waher.Things.Mqtt](Things/Waher.Things.Mqtt) project is a class library that publishes nodes representing devices connected to MQTT brokers. |

@@ -68,7 +68,7 @@ namespace Waher.Things.Metering.Commands
 		/// <summary>
 		/// Sort Key, if available.
 		/// </summary>
-		public string SortKey => "LogMessage";
+		public string SortKey => nameof(LogMessage);
 
 		/// <summary>
 		/// If the command can be executed by the caller.

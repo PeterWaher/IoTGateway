@@ -370,6 +370,11 @@
     <ProjectReference Include="..\Events\Waher.Events.Persistence\Waher.Events.Persistence.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj" />
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\Groups\Waher.Groups.Metering\Waher.Groups.Metering.csproj" />
+    <ProjectReference Include="..\Groups\Waher.Groups\Waher.Groups.csproj" />
+    <ProjectReference Include="..\Jobs\Waher.Jobs.Metering\Waher.Jobs.Metering.csproj" />
+    <ProjectReference Include="..\Jobs\Waher.Jobs.Script\Waher.Jobs.Script.csproj" />
+    <ProjectReference Include="..\Jobs\Waher.Jobs\Waher.Jobs.csproj" />
     <ProjectReference Include="..\Layout\Waher.Layout.Layout2D\Waher.Layout.Layout2D.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.Cluster\Waher.Networking.Cluster.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.CoAP\Waher.Networking.CoAP.csproj" />
@@ -394,9 +399,13 @@
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.WebSocket\Waher.Networking.XMPP.WebSocket.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking\Waher.Networking.csproj" />
+    <ProjectReference Include="..\Output\Waher.Output.Metering\Waher.Output.Metering.csproj" />
+    <ProjectReference Include="..\Output\Waher.Output\Waher.Output.csproj" />
     <ProjectReference Include="..\Persistence\Waher.Persistence.FullTextSearch\Waher.Persistence.FullTextSearch.csproj" />
     <ProjectReference Include="..\Persistence\Waher.Persistence.XmlLedger\Waher.Persistence.XmlLedger.csproj" />
     <ProjectReference Include="..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+    <ProjectReference Include="..\Processors\Waher.Processors.Metering\Waher.Processors.Metering.csproj" />
+    <ProjectReference Include="..\Processors\Waher.Processors\Waher.Processors.csproj" />
     <ProjectReference Include="..\Reports\Waher.Reports.Files\Waher.Reports.Files.csproj" />
     <ProjectReference Include="..\Reports\Waher.Reports\Waher.Reports.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
@@ -436,8 +445,6 @@
     <ProjectReference Include="..\Security\Waher.Security.SPF\Waher.Security.SPF.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.Users\Waher.Security.Users.csproj" />
     <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj" />
-    <ProjectReference Include="..\Things\Waher.Things.Groups\Waher.Things.Groups.csproj" />
-    <ProjectReference Include="..\Things\Waher.Things.Jobs\Waher.Things.Jobs.csproj" />
 		<ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />
 		<ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />
 		<ProjectReference Include="..\Runtime\Waher.Runtime.Threading.Sync\Waher.Runtime.Threading.Sync.csproj" />

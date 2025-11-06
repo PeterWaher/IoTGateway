@@ -34,7 +34,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		}
 
 		/// <summary>
-		/// ID of node.
+		/// Maximum number of parallel readouts.
 		/// </summary>
 		[Header(2, "Parallel readouts:", 0)]
 		[Page(1, "Readout", 0)]
@@ -130,7 +130,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		}
 
 		/// <summary>
-		/// ID of node.
+		/// Field names to read.
 		/// </summary>
 		[Header(16, "Field names to read:", 0)]
 		[Page(1, "Readout", 0)]

@@ -25,6 +25,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="LineEndingMethod">Line ending method.</param>
 		public ConsoleOutSniffer(BinaryPresentationMethod BinaryPresentationMethod,
 			LineEnding LineEndingMethod)
+			: base("Console Out Sniffer")
 		{
 			this.binaryPresentationMethod = BinaryPresentationMethod;
 			this.lineEndingMethod = LineEndingMethod;

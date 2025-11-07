@@ -7,6 +7,7 @@ using Waher.Content;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Security;
 using Waher.Things.Attributes;
@@ -80,11 +81,15 @@ namespace Waher.Things.Ip
 		/// <returns>Binary TCP transport.</returns>
 		public async Task<BinaryTcpClient> ConnectTcp(bool DecoupledEvents, params ISniffer[] Sniffers)
 		{
+			X509Certificate Certificate = Types.TryGetModuleParameter<X509Certificate>("X509");
 			BinaryTcpClient Client = new BinaryTcpClient(DecoupledEvents, Sniffers);
-			await Client.ConnectAsync(this.Host, this.port);
+			await Client.ConnectAsync(this.Host, this.port, this.tls);
 
 			if (this.tls)
-				await Client.UpgradeToTlsAsClient(Crypto.SecureTls);
+			{
+				await Client.UpgradeToTlsAsClient(Certificate, Crypto.SecureTls);
+				Client.Continue();
+			}
 
 			return Client;
 		}
@@ -100,11 +105,15 @@ namespace Waher.Things.Ip
 		/// <returns>Text-based TCP transport.</returns>
 		public async Task<TextTcpClient> ConnectTcp(Encoding Encoding, bool DecoupledEvents, params ISniffer[] Sniffers)
 		{
+			X509Certificate Certificate = Types.TryGetModuleParameter<X509Certificate>("X509");
 			TextTcpClient Client = new TextTcpClient(Encoding, DecoupledEvents, Sniffers);
-			await Client.ConnectAsync(this.Host, this.port);
+			await Client.ConnectAsync(this.Host, this.port, this.tls);
 
 			if (this.tls)
-				await Client.UpgradeToTlsAsClient(Crypto.SecureTls);
+			{
+				await Client.UpgradeToTlsAsClient(Certificate, Crypto.SecureTls);
+				Client.Continue();
+			}
 
 			return Client;
 		}

@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Groups.Metering.NodeTypes;
 using Waher.Jobs.NodeTypes;
 using Waher.Output.Metering;
 using Waher.Processors.Metering;

@@ -24,6 +24,15 @@
 			<String id="20">To:</String>
 			<String id="21">Read historical data to this point in time.</String>
 			<String id="22">Sensor Data Readout Task</String>
+			<String id="23">Reference</String>
+			<String id="24">Node ID:</String>
+			<String id="25">Node ID of the node being referenced.</String>
+			<String id="26">Include child nodes.</String>
+			<String id="27">If child nodes should be included in the reference.</String>
+			<String id="28">Metering Node Reference</String>
+			<String id="29">Group ID:</String>
+			<String id="30">Group ID of the group being referenced.</String>
+			<String id="31">Metering Group Reference</String>
 		</Namespace>
 	</Language>
 </Translation>

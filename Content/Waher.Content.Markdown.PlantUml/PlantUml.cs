@@ -55,7 +55,7 @@ namespace Waher.Content.Markdown.PlantUml
 	{
 		private const int chartGenerationTimeout = 30000;
 
-		private static readonly AsyncProcessor<ChartRecord> queue = new AsyncProcessor<ChartRecord>(1);
+		private static readonly AsyncProcessor<ChartRecord> queue = new AsyncProcessor<ChartRecord>(1, "PlantUML processor");
 		private static readonly Random rnd = new Random();
 		private static Scheduler scheduler = null;
 		private static string jarPath = null;

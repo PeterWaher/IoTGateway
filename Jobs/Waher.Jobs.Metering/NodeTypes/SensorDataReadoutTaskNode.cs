@@ -188,7 +188,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 			ISensorDataProcessor[] Processors = await this.FindNodes<ISensorDataProcessor>();
 			ISensorDataOutput[] Outputs = await this.FindNodes<ISensorDataOutput>();
 
-			using AsyncProcessor<ReadoutWorkItem> Processor = new AsyncProcessor<ReadoutWorkItem>(this.ParallelReadouts);
+			using AsyncProcessor<ReadoutWorkItem> Processor = new AsyncProcessor<ReadoutWorkItem>(this.ParallelReadouts, "Job Task: " + this.NodeId);
 
 			foreach (IMeteringNode Node in Nodes)
 			{

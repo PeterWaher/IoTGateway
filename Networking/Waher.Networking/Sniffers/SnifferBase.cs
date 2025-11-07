@@ -13,7 +13,7 @@ namespace Waher.Networking.Sniffers
 	/// </summary>
 	public abstract class SnifferBase : ISniffer, ISniffEventProcessor, IDisposableAsync
 	{
-		private AsyncProcessor<SnifferEvent> processor = new AsyncProcessor<SnifferEvent>(1);
+		private AsyncProcessor<SnifferEvent> processor = new AsyncProcessor<SnifferEvent>(1, "Sniffer");
 		private readonly bool onlyBinaryCount;
 
 		/// <summary>

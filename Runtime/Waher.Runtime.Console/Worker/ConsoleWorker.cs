@@ -9,7 +9,7 @@ namespace Waher.Runtime.Console.Worker
 	/// </summary>
 	public static class ConsoleWorker
 	{
-		private static AsyncProcessor<WorkItem> worker = new AsyncProcessor<WorkItem>(1);
+		private static AsyncProcessor<WorkItem> worker = new AsyncProcessor<WorkItem>(1, "Console Output");
 
 		static ConsoleWorker()
 		{

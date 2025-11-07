@@ -15,6 +15,7 @@ namespace Waher.Runtime.Queue
 		private readonly CancellationTokenSource[] cancelWorkSources;
 		private readonly T[] currentWorkItem;
 		private readonly Task[] processors;
+		private readonly string name;
 		private readonly int nrProcessors;
 		private AsyncQueue<T> queue = new AsyncQueue<T>();
 		private int nrProcessorsRunning;
@@ -26,13 +27,25 @@ namespace Waher.Runtime.Queue
 		/// Processes work tasks, in an asynchronous manner.
 		/// </summary>
 		/// <param name="NrProcessors">Number of processors working in parallel.</param>
+		[Obsolete("Use the constructor with a Name argument.")]
 		public AsyncProcessor(int NrProcessors)
+			: this(NrProcessors, Guid.NewGuid().ToString())
+		{
+		}
+
+		/// <summary>
+		/// Processes work tasks, in an asynchronous manner.
+		/// </summary>
+		/// <param name="NrProcessors">Number of processors working in parallel.</param>
+		/// <param name="Name">Name of processor.</param>
+		public AsyncProcessor(int NrProcessors, string Name)
 		{
 			if (NrProcessors <= 0)
 				throw new ArgumentException("Number of processors must be positive.", nameof(NrProcessors));
 
 			int i;
 
+			this.name = Name;
 			this.nrProcessors = this.nrProcessorsRunning = NrProcessors;
 			this.processors = new Task[NrProcessors];
 
@@ -160,6 +173,11 @@ namespace Waher.Runtime.Queue
 			else
 				return Task.FromResult(false);
 		}
+
+		/// <summary>
+		/// Name of processor.
+		/// </summary>
+		public string Name => this.name;
 
 		/// <summary>
 		/// If the console worker is being terminated.

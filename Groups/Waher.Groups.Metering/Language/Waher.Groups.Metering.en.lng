@@ -10,7 +10,7 @@
 			<String id="6">Include child nodes.</String>
 			<String id="7">If child nodes should be included in the reference.</String>
 			<String id="8">Group ID:</String>
-			<Stirng id="9">Group ID of the group being referenced.</Stirng>
+			<String id="9">Group ID of the group being referenced.</Stirng>
 			<String id="10">Metering Group Reference</String>
 		</Namespace>
 	</Language>

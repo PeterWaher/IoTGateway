@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Translation xmlns="http://waher.se/Schema/Translation.xsd">
+	<Language code="en" name="English">
+		<Namespace name="Waher.Output">
+			<String id="1">Output ID</String>
+			<String id="2">Parent ID</String>
+			<String id="3">#Children</String>
+			<String id="4">Type</String>
+			<String id="5">State</String>
+			<String id="6">Created</String>
+			<String id="7">Updated</String>
+			<String id="8">Information</String>
+			<String id="9">Unsigned Warning</String>
+			<String id="10">Warning</String>
+			<String id="11">Unsigned Error</String>
+			<String id="12">Error</String>
+			<String id="13">Output</String>
+		</Namespace>
+		<Namespace name="Waher.Output.Commands">
+			<String id="1">Erase messages</String>
+			<String id="2">Messages successfully erased.</String>
+			<String id="3">Are you sure you want to erase all messages for the selected output(s)?</String>
+			<String id="4">Unable to erase messages.</String>
+			<String id="5">Message</String>
+			<String id="6">Type:</String>
+			<String id="7">Type of message to log.</String>
+			<String id="8">Body:</String>
+			<String id="9">Text of the message to log.</String>
+			<String id="10">Log message...</String>
+			<String id="11">Message successfully logged.</String>
+			<String id="12">Unable to log message.</String>
+		</Namespace>
+		<Namespace name="Waher.Output.NodeTypes">
+			<String id="1">Root</String>
+		</Namespace>
+	</Language>
+</Translation>

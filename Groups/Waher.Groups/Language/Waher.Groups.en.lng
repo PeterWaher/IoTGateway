@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Translation xmlns="http://waher.se/Schema/Translation.xsd">
+	<Language code="en" name="English">
+		<Namespace name="Waher.Groups">
+			<String id="1">Groups</String>
+			<String id="2">Group ID:</String>
+			<String id="3">Group</String>
+			<String id="4">Group identity in the collection of groups.</String>
+			<String id="5">Group ID</String>
+			<String id="6">Type</String>
+			<String id="7">Parent ID</String>
+			<String id="8">#Children</String>
+			<String id="9">Information</String>
+			<String id="10">Unsigned Warning</String>
+			<String id="11">Warning</String>
+			<String id="12">Unsigned Error</String>
+			<String id="13">Error</String>
+			<String id="14">State</String>
+			<String id="15">Created</String>
+			<String id="16">Updated</String>
+		</Namespace>
+		<Namespace name="Waher.Groups.Commands">
+			<String id="1">Erase messages</String>
+			<String id="2">Messages successfully erased.</String>
+			<String id="3">Are you sure you want to erase all messages for the selected group(s)?</String>
+			<String id="4">Unable to erase messages.</String>
+			<String id="5">Message</String>
+			<String id="6">Type:</String>
+			<String id="7">Type of message to log.</String>
+			<String id="8">Body:</String>
+			<String id="9">Text of the message to log.</String>
+			<String id="10">Log message...</String>
+			<String id="11">Message successfully logged.</String>
+			<String id="12">Unable to log message.</String>
+		</Namespace>
+		<Namespace name="Waher.Groups.NodeTypes">
+			<String id="1">Group</String>
+			<String id="2">Reference</String>
+			<String id="3">Node ID:</String>
+			<String id="4">Node ID of the node being referenced.</String>
+			<String id="5">Source ID:</String>
+			<String id="6">Source ID of the node being referenced.</String>
+			<String id="7">Partition:</String>
+			<String id="8">Partition of the node being referenced.</String>
+			<String id="9">Include child nodes.</String>
+			<String id="10">If child nodes should be included in the reference.</String>
+			<String id="11">Node Reference</String>
+			<String id="12">Root</String>
+		</Namespace>
+	</Language>
+</Translation>

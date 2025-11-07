@@ -20,6 +20,7 @@ using Waher.Persistence;
 using Waher.Persistence.XmlLedger;
 using Waher.Runtime.IO;
 using Waher.Runtime.Profiling;
+using Waher.Runtime.Threading;
 
 namespace Waher.IoTGateway.WebResources
 {
@@ -215,7 +216,7 @@ namespace Waher.IoTGateway.WebResources
 			switch (TypeOfFile)
 			{
 				case "XML":
-					Result.FullBackupFileName = GetUniqueFileName(Result.FullBackupFileName, ".xml");
+					Result.FullBackupFileName = await GetUniqueFileName(Result.FullBackupFileName, ".xml");
 					FileStream fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
 					DateTime Created = File.GetCreationTime(Result.FullBackupFileName);
 					XmlWriterSettings Settings = XML.WriterSettings(true, false);
@@ -226,7 +227,7 @@ namespace Waher.IoTGateway.WebResources
 					break;
 
 				case "Binary":
-					Result.FullBackupFileName = GetUniqueFileName(Result.FullBackupFileName, ".bin");
+					Result.FullBackupFileName = await GetUniqueFileName(Result.FullBackupFileName, ".bin");
 					fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
 					Created = File.GetCreationTime(Result.FullBackupFileName);
 					Result.LocalBackupFileName = Result.FullBackupFileName[BasePath.Length..];
@@ -234,7 +235,7 @@ namespace Waher.IoTGateway.WebResources
 					break;
 
 				case "Compressed":
-					Result.FullBackupFileName = GetUniqueFileName(Result.FullBackupFileName, ".gz");
+					Result.FullBackupFileName = await GetUniqueFileName(Result.FullBackupFileName, ".gz");
 					fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
 					Created = File.GetCreationTime(Result.FullBackupFileName);
 					Result.LocalBackupFileName = Result.FullBackupFileName[BasePath.Length..];
@@ -243,7 +244,7 @@ namespace Waher.IoTGateway.WebResources
 					break;
 
 				case "Encrypted":
-					Result.FullBackupFileName = GetUniqueFileName(Result.FullBackupFileName, ".bak");
+					Result.FullBackupFileName = await GetUniqueFileName(Result.FullBackupFileName, ".bak");
 					fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
 					Created = File.GetCreationTime(Result.FullBackupFileName);
 					Result.LocalBackupFileName = Result.FullBackupFileName[BasePath.Length..];
@@ -309,8 +310,9 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="Base">Filename base</param>
 		/// <param name="Extension">Extension</param>
 		/// <returns>Unique file name.</returns>
-		public static string GetUniqueFileName(string Base, string Extension)
+		public static async Task<string> GetUniqueFileName(string Base, string Extension)
 		{
+			using Semaphore Semaphore = await Semaphores.BeginWrite("Export." + Base);
 			string Suffix = string.Empty;
 			string s;
 			int i = 1;

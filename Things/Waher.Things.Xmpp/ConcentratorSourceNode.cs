@@ -62,7 +62,9 @@ namespace Waher.Things.Xmpp
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is ConcentratorPartitionNode || Child is ConcentratorNode);
+			return Task.FromResult(
+				Child is ConcentratorPartitionNode || 
+				Child is ConcentratorNode);
 		}
 
 		/// <summary>

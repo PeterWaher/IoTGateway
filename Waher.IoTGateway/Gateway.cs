@@ -5,7 +5,6 @@ using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -35,12 +34,14 @@ using Waher.Events.Files;
 using Waher.Events.Filter;
 using Waher.Events.Persistence;
 using Waher.Events.XMPP;
+using Waher.Groups;
 using Waher.IoTGateway.Events;
 using Waher.IoTGateway.Exceptions;
 using Waher.IoTGateway.Setup;
 using Waher.IoTGateway.Setup.Legal;
 using Waher.IoTGateway.WebResources;
 using Waher.IoTGateway.WebResources.ExportFormats;
+using Waher.Jobs;
 using Waher.Networking;
 using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
@@ -69,8 +70,10 @@ using Waher.Networking.XMPP.PubSub.Events;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.Software;
 using Waher.Networking.XMPP.Synchronization;
+using Waher.Output;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Processors;
 using Waher.Reports;
 using Waher.Reports.Files;
 using Waher.Runtime.Cache;
@@ -1366,7 +1369,11 @@ namespace Waher.IoTGateway
 				{
 					InitialSources = new IDataSource[]
 					{
+						new GroupSource(),
+						new JobSource(),
 						new MeteringTopology(),
+						new OutputSource(),
+						new ProcessorSource(),
 						new ReportsDataSource()
 					};
 
@@ -1380,7 +1387,11 @@ namespace Waher.IoTGateway
 					{
 						InitialSources ??= new IDataSource[]
 						{
+							new GroupSource(),
+							new JobSource(),
 							new MeteringTopology(),
+							new OutputSource(),
+							new ProcessorSource(),
 							new ReportsDataSource()
 						};
 
@@ -4543,7 +4554,7 @@ namespace Waher.IoTGateway
 		/// <returns>URL</returns>
 		public static string GetUrl(string LocalResource)
 		{
-			return GetUrl(LocalResource, webServer);
+			return GetUrl(LocalResource, HttpServer);
 		}
 
 		/// <summary>

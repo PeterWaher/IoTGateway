@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
@@ -69,7 +68,7 @@ namespace Waher.Things.Metering.Commands
 		/// <summary>
 		/// Sort Key, if available.
 		/// </summary>
-		public string SortKey => "LogMessage";
+		public string SortKey => nameof(LogMessage);
 
 		/// <summary>
 		/// If the command can be executed by the caller.

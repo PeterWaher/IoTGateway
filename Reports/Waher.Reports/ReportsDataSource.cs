@@ -73,7 +73,7 @@ namespace Waher.Reports
 		/// <returns>If the source is visible to the caller.</returns>
 		public Task<bool> CanViewAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return Task.FromResult(Caller.HasPrivilege("Source." + SourceID + ".View"));
 		}
 
 		/// <summary>

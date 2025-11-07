@@ -57,7 +57,7 @@ namespace Waher.Things.Virtual.Commands
 		/// <summary>
 		/// Sort Key, if available.
 		/// </summary>
-		public string SortKey => "AddInt32";
+		public string SortKey => nameof(AddMetaDataInt32);
 
 		/// <summary>
 		/// If the command can be executed by the caller.

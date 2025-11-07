@@ -8,6 +8,7 @@ using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Language;
+using Waher.Runtime.Threading;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering.Commands;
@@ -523,22 +524,18 @@ namespace Waher.Things.Metering
 		/// <returns>A Node ID that does not exist in the database.</returns>
 		public static async Task<string> GetUniqueNodeId(string NodeId)
 		{
+			using Semaphore Semaphore = await Semaphores.BeginWrite("Metering." + NodeId);
 			string Suffix = string.Empty;
+			string s;
 			int i = 1;
-			bool Found;
 
 			while (true)
 			{
-				Found = false;
-
-				foreach (MeteringNode Node in await Database.Find<MeteringNode>(0, 1, new FilterFieldEqualTo("NodeId", NodeId + Suffix)))
+				if (await Database.FindFirstIgnoreRest<MeteringNode>(
+					new FilterFieldEqualTo("NodeId", s = NodeId + Suffix)) is null)
 				{
-					Found = true;
-					break;
+					return s;
 				}
-
-				if (!Found)
-					return NodeId + Suffix;
 
 				i++;
 				Suffix = " (" + i.ToString() + ")";
@@ -759,7 +756,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the node is visible to the caller.</returns>
 		public virtual Task<bool> CanViewAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return Task.FromResult(Caller.HasPrivilege("Source." + MeteringTopology.SourceID + ".Node.View"));
 		}
 
 		/// <summary>
@@ -769,7 +766,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the node can be edited by the caller.</returns>
 		public virtual Task<bool> CanEditAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return Task.FromResult(Caller.HasPrivilege("Source." + MeteringTopology.SourceID + ".Node.Edit"));
 		}
 
 		/// <summary>
@@ -779,7 +776,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the node can be added to by the caller.</returns>
 		public virtual Task<bool> CanAddAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return Task.FromResult(Caller.HasPrivilege("Source." + MeteringTopology.SourceID + ".Node.Add"));
 		}
 
 		/// <summary>
@@ -789,7 +786,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the node can be destroyed to by the caller.</returns>
 		public virtual Task<bool> CanDestroyAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return Task.FromResult(Caller.HasPrivilege("Source." + MeteringTopology.SourceID + ".Node.Destroy"));
 		}
 
 		/// <summary>
@@ -1235,32 +1232,6 @@ namespace Waher.Things.Metering
 					new LogMessage(this)
 				});
 			}
-		}
-
-		/// <summary>
-		/// Joins sets of commands.
-		/// </summary>
-		/// <param name="Commands">First set of commands.</param>
-		/// <param name="Commands2">Second set of commands.</param>
-		/// <returns>Joined set of commands.</returns>
-		public static async Task<IEnumerable<ICommand>> Join(Task<IEnumerable<ICommand>> Commands, params ICommand[] Commands2)
-		{
-			IEnumerable<ICommand> Commands1 = await Commands;
-
-			if (Commands1 is null)
-				return Commands2;
-
-			if (!(Commands1 is List<ICommand> Result))
-			{
-				Result = new List<ICommand>();
-
-				foreach (ICommand Cmd in Commands1)
-					Result.Add(Cmd);
-			}
-
-			Result.AddRange(Commands2);
-
-			return Result;
 		}
 
 		#endregion

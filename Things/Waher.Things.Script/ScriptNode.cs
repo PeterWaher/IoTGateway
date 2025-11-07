@@ -64,7 +64,10 @@ namespace Waher.Things.Script
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is ScriptNode || Child is ScriptReferenceNode || Child is ScriptCommandNodeBase);
+			return Task.FromResult(
+				Child is ScriptNode || 
+				Child is ScriptReferenceNode || 
+				Child is ScriptCommandNodeBase);
 		}
 
 		/// <summary>
@@ -74,7 +77,12 @@ namespace Waher.Things.Script
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(Parent is Root || Parent is VirtualNode || Parent is ScriptNode || Parent is ScriptReferenceNode);
+			return Task.FromResult(
+				Parent is Root || 
+				Parent is NodeCollection ||
+				Parent is VirtualNode || 
+				Parent is ScriptNode || 
+				Parent is ScriptReferenceNode);
 		}
 
 		/// <summary>

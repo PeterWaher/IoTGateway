@@ -147,7 +147,9 @@ namespace Waher.Things.Files
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is SubFolderNode || Child is FileNode);
+			return Task.FromResult(
+				Child is SubFolderNode || 
+				Child is FileNode);
 		}
 
 		/// <summary>
@@ -157,7 +159,10 @@ namespace Waher.Things.Files
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(Parent is Root || Parent is VirtualNode);
+			return Task.FromResult(
+				Parent is Root ||
+				Parent is NodeCollection ||
+				Parent is VirtualNode);
 		}
 
 		private void CheckSynchronization()

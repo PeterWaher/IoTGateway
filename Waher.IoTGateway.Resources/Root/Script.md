@@ -3034,6 +3034,9 @@ values
 **Note**: Lazy inserts (or updates, deletions) are done when able. The statement may return before
 the operation completes. The operation will be executed at the next opportune time.
 
+**Note 2**: If a referenced collection does not exist, it is automatically created. To ensure
+performance, make sure to create corresponding indices. Indices are not created automatically.
+
 #### INSERT SELECT
 
 You can insert multiple objects into a data source by combining an `INSERT` and a `SELECT`
@@ -3060,6 +3063,9 @@ select
 from
 	...
 ```
+
+**Note**: If a referenced collection does not exist, it is automatically created. To ensure
+performance, make sure to create corresponding indices. Indices are not created automatically.
 
 #### INSERT OBJECT
 
@@ -3089,6 +3095,9 @@ object
 
 **Note**: When inserting an object, that object will be returned from the statement. This includes a reference to its newly generated
 Object ID. If inserting an object ex-nihilo, the Object ID is found referring to the property `ObjectId` on the resulting object.
+
+**Note 2**: If a referenced collection does not exist, it is automatically created. To ensure
+performance, make sure to create corresponding indices. Indices are not created automatically.
 
 #### INSERT OBJECTS
 
@@ -3127,6 +3136,9 @@ objects
 
 **Note 2**: The objects returned will have their newly generated Object IDs. If inserting an objects ex-nihilo, the Object ID 
 is found referring to the property `ObjectId` on the resulting objects.
+
+**Note 3**: If a referenced collection does not exist, it is automatically created. To ensure
+performance, make sure to create corresponding indices. Indices are not created automatically.
 
 #### UPDATE
 

@@ -1232,33 +1232,7 @@ namespace Waher.Output
 				});
 			}
 		}
-
-		/// <summary>
-		/// Joins sets of commands.
-		/// </summary>
-		/// <param name="Commands">First set of commands.</param>
-		/// <param name="Commands2">Second set of commands.</param>
-		/// <returns>Joined set of commands.</returns>
-		public static async Task<IEnumerable<ICommand>> Join(Task<IEnumerable<ICommand>> Commands, params ICommand[] Commands2)
-		{
-			IEnumerable<ICommand> Commands1 = await Commands;
-
-			if (Commands1 is null)
-				return Commands2;
-
-			if (!(Commands1 is List<ICommand> Result))
-			{
-				Result = new List<ICommand>();
-
-				foreach (ICommand Cmd in Commands1)
-					Result.Add(Cmd);
-			}
-
-			Result.AddRange(Commands2);
-
-			return Result;
-		}
-
+		
 		#endregion
 	}
 }

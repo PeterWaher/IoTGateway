@@ -37,7 +37,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// Maximum number of parallel readouts.
 		/// </summary>
 		[Header(2, "Parallel readouts:", 0)]
-		[Page(1, "Readout", 0)]
+		[Page(1, "Readout", 100)]
 		[ToolTip(3, "Maximum number of parallel readouts.")]
 		[Required]
 		[Range(1, 100)]
@@ -48,7 +48,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// If momentary values should be read.
 		/// </summary>
 		[Header(4, "Momentary values.", 0)]
-		[Page(1, "Readout", 0)]
+		[Page(1, "Readout", 100)]
 		[ToolTip(5, "Check, if momentary values should be read.")]
 		[DefaultValue(true)]
 		public bool Momentary { get; set; } = true;
@@ -57,7 +57,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// If identity values should be read.
 		/// </summary>
 		[Header(6, "Identity values.", 0)]
-		[Page(1, "Readout", 0)]
+		[Page(1, "Readout", 100)]
 		[ToolTip(7, "Check, if identity values should be read.")]
 		[DefaultValue(false)]
 		public bool Identity { get; set; } = false;
@@ -66,7 +66,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// If status values should be read.
 		/// </summary>
 		[Header(8, "Status values.", 0)]
-		[Page(1, "Readout", 0)]
+		[Page(1, "Readout", 100)]
 		[ToolTip(9, "Check, if status values should be read.")]
 		[DefaultValue(false)]
 		public bool Status { get; set; } = false;
@@ -75,7 +75,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// If computed values should be read.
 		/// </summary>
 		[Header(10, "Computed values.", 0)]
-		[Page(1, "Readout", 0)]
+		[Page(1, "Readout", 100)]
 		[ToolTip(11, "Check, if computed values should be read.")]
 		[DefaultValue(false)]
 		public bool Computed { get; set; } = false;
@@ -84,7 +84,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// If peak values should be read.
 		/// </summary>
 		[Header(12, "Peak values.", 0)]
-		[Page(1, "Readout", 0)]
+		[Page(1, "Readout", 100)]
 		[ToolTip(13, "Check, if peak values should be read.")]
 		[DefaultValue(false)]
 		public bool Peak { get; set; } = false;
@@ -93,7 +93,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// If historical values should be read.
 		/// </summary>
 		[Header(14, "Historical values.", 0)]
-		[Page(1, "Readout", 0)]
+		[Page(1, "Readout", 100)]
 		[ToolTip(15, "Check, if historical values should be read.")]
 		[DefaultValue(false)]
 		public bool Historical { get; set; } = false;
@@ -133,7 +133,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// Field names to read.
 		/// </summary>
 		[Header(16, "Field names to read:", 0)]
-		[Page(1, "Readout", 0)]
+		[Page(1, "Readout", 100)]
 		[ToolTip(17, "Leave blank to read all fields.")]
 		[ContentType("text/plain")]
 		public string[] FieldNames { get; set; }
@@ -142,7 +142,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// From when data should be read.
 		/// </summary>
 		[Header(18, "From:", 0)]
-		[Page(1, "Readout", 0)]
+		[Page(1, "Readout", 100)]
 		[ToolTip(19, "Read historical data from this point in time.")]
 		public Duration From { get; set; } = Duration.Zero;
 
@@ -150,7 +150,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// To when data should be read.
 		/// </summary>
 		[Header(20, "To:", 0)]
-		[Page(1, "Readout", 0)]
+		[Page(1, "Readout", 100)]
 		[ToolTip(21, "Read historical data to this point in time.")]
 		public Duration To { get; set; } = Duration.Zero;
 

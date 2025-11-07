@@ -39,6 +39,8 @@
 			<String id="35">If checked, mTLS will be used, requiring connecting clients to provide a client certificate authorizing access to port.</String>
 			<String id="36">Restrict to Remote IPs</String>
 			<String id="37">IP Addresses are specified using a comma-delimited list of IP Addresses or IP CIDR ranges.</String>
+			<String id="38">Ping host.</String>
+			<String id="39">If host name should be pinged during readout.</String>
 		</Namespace>
 	</Language>
 </Translation>

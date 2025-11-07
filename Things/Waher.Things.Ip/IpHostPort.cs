@@ -134,43 +134,42 @@ namespace Waher.Things.Ip
 			{
 				DateTime Now = DateTime.Now;
 				string Module = typeof(IpHost).Namespace;
+				
+				using BinaryTcpClient Client = await this.ConnectTcp(false);
 
-				using (BinaryTcpClient Client = await this.ConnectTcp(false))
-				{
-					List<Field> Fields = new List<Field>()
+				List<Field> Fields = new List<Field>()
 					{
 						new QuantityField(this, Now, "Connect", (DateTime.Now-Now).TotalMilliseconds, 0, "ms", FieldType.Momentary, FieldQoS.AutomaticReadout, Module, 13)
 					};
 
-					if (Request.IsIncluded(FieldType.Identity) && this.Tls)
+				if (Request.IsIncluded(FieldType.Identity) && this.Tls)
+				{
+					X509Certificate Cert = Client.RemoteCertificate;
+					string s;
+
+					if (!(Cert is null))
 					{
-						X509Certificate Cert = Client.RemoteCertificate;
-						string s;
+						Fields.Add(new BooleanField(this, Now, "Certificate Valid", Client.RemoteCertificateValid, FieldType.Identity | FieldType.Status, FieldQoS.AutomaticReadout, Module, 14));
+						Fields.Add(new StringField(this, Now, "Subject", Cert.Subject, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 15));
+						Fields.Add(new StringField(this, Now, "Issuer", Cert.Issuer, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 16));
+						Fields.Add(new StringField(this, Now, "S/N", Cert.GetSerialNumberString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 17));
+						Fields.Add(new StringField(this, Now, "Digest", Cert.GetCertHashString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 20));
+						Fields.Add(new StringField(this, Now, "Algorithm", Cert.GetKeyAlgorithm(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 21));
+						Fields.Add(new StringField(this, Now, "Public Key", Cert.GetPublicKeyString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 22));
 
-						if (!(Cert is null))
-						{
-							Fields.Add(new BooleanField(this, Now, "Certificate Valid", Client.RemoteCertificateValid, FieldType.Identity | FieldType.Status, FieldQoS.AutomaticReadout, Module, 14));
-							Fields.Add(new StringField(this, Now, "Subject", Cert.Subject, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 15));
-							Fields.Add(new StringField(this, Now, "Issuer", Cert.Issuer, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 16));
-							Fields.Add(new StringField(this, Now, "S/N", Cert.GetSerialNumberString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 17));
-							Fields.Add(new StringField(this, Now, "Digest", Cert.GetCertHashString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 20));
-							Fields.Add(new StringField(this, Now, "Algorithm", Cert.GetKeyAlgorithm(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 21));
-							Fields.Add(new StringField(this, Now, "Public Key", Cert.GetPublicKeyString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 22));
+						if (CommonTypes.TryParseRfc822(s = Cert.GetEffectiveDateString(), out DateTimeOffset TP))
+							Fields.Add(new DateTimeField(this, Now, "Effective", TP.UtcDateTime, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 18));
+						else
+							Fields.Add(new StringField(this, Now, "Effective", s, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 18));
 
-							if (CommonTypes.TryParseRfc822(s = Cert.GetEffectiveDateString(), out DateTimeOffset TP))
-								Fields.Add(new DateTimeField(this, Now, "Effective", TP.UtcDateTime, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 18));
-							else
-								Fields.Add(new StringField(this, Now, "Effective", s, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 18));
-
-							if (CommonTypes.TryParseRfc822(s = Cert.GetExpirationDateString(), out TP))
-								Fields.Add(new DateTimeField(this, Now, "Expires", TP.UtcDateTime, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 19));
-							else
-								Fields.Add(new StringField(this, Now, "Expires", Cert.GetExpirationDateString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 19));
-						}
+						if (CommonTypes.TryParseRfc822(s = Cert.GetExpirationDateString(), out TP))
+							Fields.Add(new DateTimeField(this, Now, "Expires", TP.UtcDateTime, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 19));
+						else
+							Fields.Add(new StringField(this, Now, "Expires", Cert.GetExpirationDateString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 19));
 					}
-
-					await Request.ReportFields(false, Fields);
 				}
+
+				await Request.ReportFields(false, Fields);
 			}
 			catch (Exception ex)
 			{

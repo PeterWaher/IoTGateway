@@ -4,6 +4,7 @@ using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Things.Metering;
 using Waher.Things.Ip;
+using Waher.Things.Metering.NodeTypes;
 
 namespace Waher.Things.Xmpp
 {
@@ -34,8 +35,8 @@ namespace Waher.Things.Xmpp
 			{
 				if (Child is XmppBrokerNode BrokerNode)
 					await BrokerNode.GetBroker(); // Makes sure it is initialized.
-				else if (Child is IpHost IpHost)
-					await this.CheckNode(IpHost);
+				else if (Child is IpHost || Child is NodeCollection)
+					await this.CheckNode(Child);
 			}
 		}
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
@@ -488,7 +489,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="Fields">List of fields being constructed.</param>
 		/// <param name="Now">Timestamp of readout.</param>
-		public virtual void AddIdentityReadout(List<Field> Fields, DateTime Now)
+		public virtual void AddIdentityReadout(ChunkedList<Field> Fields, DateTime Now)
 		{
 			string Module = typeof(MeteringTopology).Namespace;
 

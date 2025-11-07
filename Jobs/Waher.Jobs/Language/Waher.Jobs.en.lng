@@ -32,6 +32,9 @@
 			<String id="10">Log message...</String>
 			<String id="11">Message successfully logged.</String>
 			<String id="12">Unable to log message.</String>
+			<String id="13">Execute Job once.</String>
+			<String id="14">Job successfully started.</String>
+			<String id="15">Unable to start the execution of the job.</String>
 		</Namespace>
 		<Namespace name="Waher.Jobs.NodeTypes">
 			<String id="1">Root</String>

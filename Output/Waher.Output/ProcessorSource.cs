@@ -241,7 +241,7 @@ namespace Waher.Output
 			{
 				Result = new Root()
 				{
-					NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(OutputSource), 5, "Root")
+					NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(Root), 1, "Root")
 				};
 
 				await Database.Insert(Result);

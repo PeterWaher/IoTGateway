@@ -244,7 +244,7 @@ namespace Waher.Groups
 			{
 				Result = new Root()
 				{
-					NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(GroupSource), 5, "Root")
+					NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(Root), 12, "Root")
 				};
 
 				await Database.Insert(Result);

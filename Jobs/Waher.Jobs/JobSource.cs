@@ -241,7 +241,7 @@ namespace Waher.Jobs
 			{
 				Result = new Root()
 				{
-					NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(JobSource), 5, "Root")
+					NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(Root), 1, "Root")
 				};
 
 				await Database.Insert(Result);

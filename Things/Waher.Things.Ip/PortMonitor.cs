@@ -9,10 +9,11 @@ using Waher.Networking.Sniffers;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
-using Waher.Script.Constants;
+using Waher.Script.Functions.Runtime;
 using Waher.Security;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
+using Waher.Things.Metering;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.Ip
@@ -20,8 +21,9 @@ namespace Waher.Things.Ip
 	/// <summary>
 	/// Node representing a port on an IP Host machine.
 	/// </summary>
-	public class IpHostPort : IpHost
+	public class PortMonitor : ProvisionedMeteringNode, ISensor
 	{
+		private string protocol = string.Empty;
 		private int port = 0;
 		private bool tls = false;
 
@@ -36,13 +38,23 @@ namespace Waher.Things.Ip
 		}
 
 		/// <summary>
+		/// If the node accepts a presumptive parent, i.e. can be added to that parent (if that parent accepts the node as a child).
+		/// </summary>
+		/// <param name="Parent">Presumptive parent node.</param>
+		/// <returns>If the parent is acceptable.</returns>
+		public override Task<bool> AcceptsParentAsync(INode Parent)
+		{
+			return Task.FromResult(Parent is IpHost);
+		}
+
+		/// <summary>
 		/// Gets the type name of the node.
 		/// </summary>
 		/// <param name="Language">Language to use.</param>
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(IpHostPort), 23, "Port on IP Host");
+			return Language.GetStringAsync(typeof(PortMonitor), 40, "Port Monitor");
 		}
 
 		/// <summary>
@@ -73,6 +85,43 @@ namespace Waher.Things.Ip
 		}
 
 		/// <summary>
+		/// Port number.
+		/// </summary>
+		[Page(1, "IP")]
+		[Header(41, "Protocol:", 60)]
+		[ToolTip(42, "Name of protocol or service on port number.")]
+		[DefaultValueStringEmpty]
+		[Required]
+		public string Protocol
+		{
+			get => this.protocol;
+			set => this.protocol = value;
+		}
+
+		/// <summary>
+		/// Old property, replaced by <see cref="Protocol"/>.
+		/// </summary>
+		[Obsolete]
+		public string PortName
+		{
+			get => this.protocol;
+			set => this.protocol = value;
+		}
+
+		/// <summary>
+		/// Gets the host name or IP address of the parent IP Host node.
+		/// </summary>
+		/// <returns>Host name.</returns>
+		/// <exception cref="Exception">If parent node is not an IP Host node.</exception>
+		public async Task<string> GetHostName()
+		{
+			if (await this.GetParent() is IpHost Parent)
+				return Parent.Host;
+			else
+				throw new Exception("Parent node not an IP Host node.");
+		}
+
+		/// <summary>
 		/// Connect to the remote host and port using a binary protocol over TCP.
 		/// </summary>
 		/// <param name="DecoupledEvents">If events raised from the communication 
@@ -84,7 +133,8 @@ namespace Waher.Things.Ip
 		{
 			X509Certificate Certificate = Types.TryGetModuleParameter<X509Certificate>("X509");
 			BinaryTcpClient Client = new BinaryTcpClient(DecoupledEvents, Sniffers);
-			await Client.ConnectAsync(this.Host, this.port, this.tls);
+			string HostName = await this.GetHostName();
+			await Client.ConnectAsync(HostName, this.port, this.tls);
 
 			if (this.tls)
 			{
@@ -108,7 +158,8 @@ namespace Waher.Things.Ip
 		{
 			X509Certificate Certificate = Types.TryGetModuleParameter<X509Certificate>("X509");
 			TextTcpClient Client = new TextTcpClient(Encoding, DecoupledEvents, Sniffers);
-			await Client.ConnectAsync(this.Host, this.port, this.tls);
+			string HostName = await this.GetHostName();
+			await Client.ConnectAsync(HostName, this.port, this.tls);
 
 			if (this.tls)
 			{
@@ -131,6 +182,9 @@ namespace Waher.Things.Ip
 
 			Result.AddLast(new Int32Parameter("Port", await Language.GetStringAsync(typeof(IpHost), 10, "Port"), this.port));
 
+			if (!string.IsNullOrEmpty(this.Protocol))
+				Result.AddLast(new StringParameter("Protocol", await Language.GetStringAsync(typeof(IpHost), 43, "Protocol"), this.protocol));
+
 			return Result;
 		}
 
@@ -138,7 +192,7 @@ namespace Waher.Things.Ip
 		/// Starts the readout of the sensor.
 		/// </summary>
 		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
-		public async override Task StartReadout(ISensorReadout Request)
+		public async virtual Task StartReadout(ISensorReadout Request)
 		{
 			try
 			{
@@ -149,59 +203,20 @@ namespace Waher.Things.Ip
 
 				List<Field> Fields = new List<Field>()
 					{
-						new QuantityField(this, Now, "Connect", (DateTime.UtcNow-Now).TotalMilliseconds, 
-							0, "ms", FieldType.Momentary, FieldQoS.AutomaticReadout, Module, 13)
+						new QuantityField(this, Now, "Connect", (DateTime.UtcNow-Now).TotalMilliseconds, 0, "ms", FieldType.Momentary, FieldQoS.AutomaticReadout, Module, 13)
 					};
 
 				if (Request.IsIncluded(FieldType.Identity) && this.Tls)
 				{
-					AddCertificateFields(Client.RemoteCertificate, 
+					IpHostPort.AddCertificateFields(Client.RemoteCertificate, 
 						Client.RemoteCertificateValid, this, Now, Fields);
 				}
 
-				await Request.ReportFields(false, Fields);
+				await Request.ReportFields(true, Fields);
 			}
 			catch (Exception ex)
 			{
-				await Request.ReportErrors(false, new ThingError(this, ex.Message));
-			}
-
-			await base.StartReadout(Request);
-		}
-
-		/// <summary>
-		/// Adds information from a certificate as fields to a collection of fields.
-		/// </summary>
-		/// <param name="Certificate">Certificate</param>
-		/// <param name="IsValid">If certificate is valid.</param>
-		/// <param name="Node">Node reporting certificate.</param>
-		/// <param name="Timestamp">Timestamp of readout.</param>
-		/// <param name="Fields">Collection of fields.</param>
-		public static void AddCertificateFields(X509Certificate Certificate, bool IsValid,
-			ThingReference Node, DateTime Timestamp, List<Field> Fields)
-		{
-			if (!(Certificate is null))
-			{
-				string Module = typeof(IpHost).Namespace;
-				string s;
-
-				Fields.Add(new BooleanField(Node, Timestamp, "Certificate Valid", IsValid, FieldType.Identity | FieldType.Status, FieldQoS.AutomaticReadout, Module, 14));
-				Fields.Add(new StringField(Node, Timestamp, "Subject", Certificate.Subject, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 15));
-				Fields.Add(new StringField(Node, Timestamp, "Issuer", Certificate.Issuer, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 16));
-				Fields.Add(new StringField(Node, Timestamp, "S/N", Certificate.GetSerialNumberString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 17));
-				Fields.Add(new StringField(Node, Timestamp, "Digest", Certificate.GetCertHashString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 20));
-				Fields.Add(new StringField(Node, Timestamp, "Algorithm", Certificate.GetKeyAlgorithm(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 21));
-				Fields.Add(new StringField(Node, Timestamp, "Public Key", Certificate.GetPublicKeyString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 22));
-
-				if (CommonTypes.TryParseRfc822(s = Certificate.GetEffectiveDateString(), out DateTimeOffset TP))
-					Fields.Add(new DateTimeField(Node, Timestamp, "Effective", TP.UtcDateTime, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 18));
-				else
-					Fields.Add(new StringField(Node, Timestamp, "Effective", s, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 18));
-
-				if (CommonTypes.TryParseRfc822(s = Certificate.GetExpirationDateString(), out TP))
-					Fields.Add(new DateTimeField(Node, Timestamp, "Expires", TP.UtcDateTime, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 19));
-				else
-					Fields.Add(new StringField(Node, Timestamp, "Expires", s, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 19));
+				await Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 		}
 

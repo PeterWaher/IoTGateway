@@ -4,8 +4,12 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Networking;
+using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
+using Waher.Script.Constants;
 using Waher.Script.Functions.Runtime;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
@@ -43,7 +47,9 @@ namespace Waher.Things.Ip
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is IpHost);
+			return Task.FromResult(
+				Child is IpHost ||
+				Child is PortMonitor);
 		}
 
 		/// <summary>
@@ -96,37 +102,58 @@ namespace Waher.Things.Ip
 		{
 			try
 			{
+				string Module = typeof(IpHost).Namespace;
+				ChunkedList<Field> Fields = new ChunkedList<Field>();
+
+				foreach (INode Node in await this.ChildNodes)
+				{
+					if (Node is PortMonitor Monitor)
+					{
+						DateTime Now = DateTime.UtcNow;
+						string Protocol = Monitor.Protocol;
+
+						try
+						{
+							if (string.IsNullOrEmpty(Protocol))
+								Protocol = Monitor.Port.ToString();
+
+							using BinaryTcpClient Client = await Monitor.ConnectTcp(false);
+
+							Fields.Add(new QuantityField(this, Now, Protocol,
+								(DateTime.UtcNow - Now).TotalMilliseconds, 0, "ms",
+								FieldType.Momentary, FieldQoS.AutomaticReadout));
+						}
+						catch (Exception ex)
+						{
+							await Request.ReportErrors(false, new ThingError(this, Now,
+								"Unable to connect using " + Protocol + ": " + ex.Message));
+						}
+					}
+				}
+
 				if (this.pingHost)
 				{
 					using Ping Icmp = new Ping();
 
 					PingReply Response = await Icmp.SendPingAsync(this.host, 2000, data, options);
-					DateTime Now = DateTime.Now;
-					string Module = typeof(IpHost).Namespace;
+					DateTime Now = DateTime.UtcNow;
 
 					if (Response.Status == IPStatus.Success)
 					{
-						List<Field> Fields = new List<Field>()
-						{
-							new QuantityField(this, Now, "Ping", Response.RoundtripTime, 0, "ms", FieldType.Momentary, FieldQoS.AutomaticReadout, Module, 7)
-						};
-
 						if (Request.IsIncluded(FieldType.Identity))
 						{
 							Fields.Add(new StringField(this, Now, "IP Address", Response.Address.ToString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 8));
 							this.AddIdentityReadout(Fields, Now);
 						}
-
-						await Request.ReportFields(true, Fields);
 					}
 					else
 					{
-						await Request.ReportErrors(true, new ThingError(this, Now,
+						await Request.ReportErrors(false, new ThingError(this, Now,
 							GetErrorMessage(Response)));
 					}
 				}
-				else
-					await Request.ReportFields(true);
+
+				await Request.ReportFields(true, Fields.ToArray());
 			}
 			catch (PingException ex)
 			{

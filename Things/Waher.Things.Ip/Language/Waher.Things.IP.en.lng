@@ -41,6 +41,10 @@
 			<String id="37">IP Addresses are specified using a comma-delimited list of IP Addresses or IP CIDR ranges.</String>
 			<String id="38">Ping host.</String>
 			<String id="39">If host name should be pinged during readout.</String>
+			<String id="40">Port Monitor</String>
+			<String id="41">Protocol:</String>
+			<String id="42">Name of protocol or service on port number.</String>
+			<String id="43">Protocol</String>
 		</Namespace>
 	</Language>
 </Translation>

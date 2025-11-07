@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Groups;
+using Waher.Jobs.Commands;
+using Waher.Persistence.Attributes;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Things;
@@ -73,9 +75,42 @@ namespace Waher.Jobs.NodeTypes
 
 			foreach (INode Child in Children)
 			{
+				if (Child is T Typed)
+					Nodes.Add(Typed);
+
 				if (Child is IGroup Group)
 					await Group.FindNodes(Nodes);
 			}
 		}
+
+		/// <summary>
+		/// Available command objects. If no commands are available, null is returned.
+		/// </summary>
+		public override Task<IEnumerable<ICommand>> Commands => this.GetCommands();
+
+		private async Task<IEnumerable<ICommand>> GetCommands()
+		{
+			ChunkedList<ICommand> Commands = new ChunkedList<ICommand>
+			{
+				new ExecuteJob(this)
+			};
+
+			Commands.AddRange(await base.Commands);
+
+			return Commands.ToArray();
+		}
+
+		/// <summary>
+		/// Executes the job.
+		/// </summary>
+		public async Task ExecuteJob()
+		{
+			JobExecutionStatus State = new JobExecutionStatus(this);
+			JobTaskNode[] Tasks = await this.FindNodes<JobTaskNode>();
+
+			foreach (JobTaskNode Task in Tasks)
+				await Task.ExecuteTask(State);
+		}
+
 	}
 }

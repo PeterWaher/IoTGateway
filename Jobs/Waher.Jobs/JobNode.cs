@@ -1227,7 +1227,6 @@ namespace Waher.Jobs
 			{
 				return Task.FromResult<IEnumerable<ICommand>>(new ICommand[]
 				{
-					new ExecuteJob(this),
 					new ClearMessages(this),
 					new LogMessage(this)
 				});

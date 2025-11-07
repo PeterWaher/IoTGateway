@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Jobs.NodeTypes;
 using Waher.Runtime.Language;
 using Waher.Things;
 using Waher.Things.Queries;
@@ -12,13 +13,13 @@ namespace Waher.Jobs.Commands
 	/// </summary>
 	public class ExecuteJob : ICommand
 	{
-		private readonly JobNode node;
+		private readonly Job node;
 
 		/// <summary>
 		/// Executes a job.
 		/// </summary>
 		/// <param name="Node">Job node.</param>
-		public ExecuteJob(JobNode Node)
+		public ExecuteJob(Job Node)
 		{
 			this.node = Node;
 		}
@@ -36,7 +37,7 @@ namespace Waher.Jobs.Commands
 		/// <summary>
 		/// Sort Category, if available.
 		/// </summary>
-		public string SortCategory => "Job";
+		public string SortCategory => "Execution";
 
 		/// <summary>
 		/// Sort Key, if available.
@@ -73,6 +74,7 @@ namespace Waher.Jobs.Commands
 				{
 					try
 					{
+						await this.node.ExecuteJob();
 						await this.node.RemoveErrorAsync("ExecutionError");
 					}
 					catch (Exception ex)

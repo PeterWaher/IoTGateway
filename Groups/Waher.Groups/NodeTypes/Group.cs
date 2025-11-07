@@ -74,6 +74,9 @@ namespace Waher.Groups.NodeTypes
 
 			foreach (INode Child in Children)
 			{
+				if (Child is T Typed)
+					Nodes.Add(Typed);
+
 				if (Child is IGroup Group)
 					await Group.FindNodes(Nodes);
 			}

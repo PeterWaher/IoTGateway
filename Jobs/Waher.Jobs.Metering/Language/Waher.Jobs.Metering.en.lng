@@ -58,6 +58,8 @@
 			<String id="54">Sensor Data will be output to **1** output.</String>
 			<String id="55">Readout completed.</String>
 			<String id="56">%0% of %1% nodes processed.</String>
+			<String id="57">Overview</String>
+			<String id="58">Readout</String>
 		</Namespace>
 	</Language>
 </Translation>

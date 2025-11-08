@@ -190,6 +190,9 @@ namespace Waher.Jobs.Metering.NodeTypes
 			{
 				await this.ReportStart(Status);
 
+				if (Status.ReportDetail != JobReportDetail.None)
+					await Status.Query.BeginSection(await this.GetString(Status, 57, "Overview"));
+
 				ISensor[] Sensors = await this.FindNodes<ISensor>();
 				if (Sensors is null || Sensors.Length == 0)
 				{
@@ -236,7 +239,12 @@ namespace Waher.Jobs.Metering.NodeTypes
 				else
 					await this.ReportMessage(Status, 36, "Sensor Data will be output to **%0%** outputs.", Outputs.Length);
 
-				await this.ReportStatus(Status, 37, "Starting readout.");
+				if (Status.ReportDetail != JobReportDetail.None)
+				{
+					await Status.Query.EndSection();
+					await Status.Query.BeginSection(await this.GetString(Status, 58, "Readout"));
+					await this.ReportStatus(Status, 37, "Starting readout.");
+				}
 
 				if (Status.ReportDetail == JobReportDetail.Summary)
 				{
@@ -260,7 +268,11 @@ namespace Waher.Jobs.Metering.NodeTypes
 				if (Status.ReportDetail == JobReportDetail.Summary)
 					await Status.Query.TableDone("Summary");
 
-				await this.ReportStatus(Status, 55, "Readout completed.");
+				if (Status.ReportDetail != JobReportDetail.None)
+				{
+					await Status.Query.EndSection();
+					await this.ReportStatus(Status, 55, "Readout completed.");
+				}
 
 				if (Status.Variables.TryGetVariable("Errors", out Variable v) &&
 					v.ValueObject is ChunkedList<ThingError> JobErrors &&
@@ -286,7 +298,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 			{
 				await Status.Query.Start();
 				await this.ReportTitle(Status, this.NodeId);
-				await this.ReportMessage(Status, 32, "Starting sensor data readout job task.");
+				await this.ReportStatus(Status, 32, "Starting sensor data readout job task.");
 			}
 		}
 

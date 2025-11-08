@@ -143,8 +143,8 @@ namespace Waher.Groups.NodeTypes
 						{
 							if (Child is T TypedChild)
 								Nodes.Add(TypedChild);
-
-							CheckChildren.Add(Child);
+							else
+								CheckChildren.Add(Child);
 						}
 					}
 				}

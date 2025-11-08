@@ -77,8 +77,7 @@ namespace Waher.Jobs.NodeTypes
 			{
 				if (Child is T Typed)
 					Nodes.Add(Typed);
-
-				if (Child is IGroup Group)
+				else if (Child is IGroup Group)
 					await Group.FindNodes(Nodes);
 			}
 		}

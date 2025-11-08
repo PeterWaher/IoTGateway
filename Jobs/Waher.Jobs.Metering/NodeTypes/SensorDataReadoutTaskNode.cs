@@ -27,6 +27,9 @@ namespace Waher.Jobs.Metering.NodeTypes
 	/// </summary>
 	public class SensorDataReadoutTaskNode : JobTaskNode
 	{
+		private const string TotalNodeCount = " TotalNodeCount ";
+		private const string NodeCount = " NodeCount ";
+
 		/// <summary>
 		/// Sensor data readout task node.
 		/// </summary>
@@ -183,72 +186,98 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <param name="Status">Execution status.</param>
 		public override async Task ExecuteTask(JobExecutionStatus Status)
 		{
-			await this.ReportStart(Status);
-
-			ISensor[] Sensors = await this.FindNodes<ISensor>();
-			if (Sensors is null || Sensors.Length == 0)
+			try
 			{
-				await this.ReportMessage(Status, 33, "No readable sensor(s) found to read.");
-				await this.ReportDone(Status);
-				return;
+				await this.ReportStart(Status);
+
+				ISensor[] Sensors = await this.FindNodes<ISensor>();
+				if (Sensors is null || Sensors.Length == 0)
+				{
+					await this.ReportMessage(Status, 33, "No readable sensors found to read.");
+					await this.ReportDone(Status);
+					return;
+				}
+
+				ChunkedList<ISensor> ReadableSensors = new ChunkedList<ISensor>();
+
+				foreach (ISensor Sensor in Sensors)
+				{
+					if (Sensor.IsReadable)
+						ReadableSensors.Add(Sensor);
+				}
+
+				Sensors = ReadableSensors.ToArray();
+				if (Sensors.Length == 0)
+				{
+					await this.ReportMessage(Status, 33, "No readable sensors found to read.");
+					await this.ReportDone(Status);
+					return;
+				}
+
+				Status.Variables[TotalNodeCount] = Sensors.Length;
+				Status.Variables[NodeCount] = 0.0;
+
+				if (Sensors.Length == 1)
+					await this.ReportMessage(Status, 52, "**1** readable sensor found to read.");
+				else
+					await this.ReportMessage(Status, 34, "**%0%** readable sensors found to read.", Sensors.Length);
+
+				ISensorDataProcessor[] Processors = await this.FindNodes<ISensorDataProcessor>();
+
+				if (Processors.Length == 1)
+					await this.ReportMessage(Status, 53, "**1** sensor data processor will be used.");
+				else
+					await this.ReportMessage(Status, 35, "**%0%** sensor data processors will be used.", Processors.Length);
+
+				ISensorDataOutput[] Outputs = await this.FindNodes<ISensorDataOutput>();
+
+				if (Outputs.Length == 1)
+					await this.ReportMessage(Status, 54, "Sensor Data will be output to **1** output.");
+				else
+					await this.ReportMessage(Status, 36, "Sensor Data will be output to **%0%** outputs.", Outputs.Length);
+
+				await this.ReportStatus(Status, 37, "Starting readout.");
+
+				if (Status.ReportDetail == JobReportDetail.Summary)
+				{
+					await Status.Query.NewTable("Summary",
+						await Status.Language.GetStringAsync(typeof(SensorDataReadoutTaskNode), 38, "Sensor Data Readout Summary"),
+						new Column("NodeId", await this.GetString(Status, 39, "Node ID"),
+							MeteringTopology.SourceID, null, null, null, ColumnAlignment.Left, null),
+						new Column("NrFields", await this.GetString(Status, 40, "#Fields"),
+							null, null, null, null, ColumnAlignment.Right, 0),
+						new Column("NrErrors", await this.GetString(Status, 41, "#Errors"),
+							null, null, null, null, ColumnAlignment.Right, 0));
+				}
+
+				using AsyncProcessor<ReadoutWorkItem> Processor = new AsyncProcessor<ReadoutWorkItem>(this.ParallelReadouts, "Job Task: " + this.NodeId);
+
+				foreach (ISensor Sensor in Sensors)
+					Processor.Queue(new ReadoutWorkItem(Sensor, this, Status, Processors, Outputs));
+
+				await Processor.WaitUntilIdle();
+
+				if (Status.ReportDetail == JobReportDetail.Summary)
+					await Status.Query.TableDone("Summary");
+
+				await this.ReportStatus(Status, 55, "Readout completed.");
+
+				if (Status.Variables.TryGetVariable("Errors", out Variable v) &&
+					v.ValueObject is ChunkedList<ThingError> JobErrors &&
+					JobErrors.Count > 0)
+				{
+					await Status.Job.LogErrorAsync("ReadoutErrors", JobErrors.Count.ToString() + " errors reported during readout.");
+				}
+				else
+					await Status.Job.RemoveErrorAsync("ReadoutErrors");
 			}
-
-			ChunkedList<ISensor> ReadableSensors = new ChunkedList<ISensor>();
-
-			foreach (ISensor Sensor in Sensors)
+			catch (Exception ex)
 			{
-				if (Sensor.IsReadable)
-					ReadableSensors.Add(Sensor);
+				if (Status.ReportDetail != JobReportDetail.None)
+					await Status.Query.LogMessage(ex);
+
+				await Status.Job.LogErrorAsync("ReadoutErrors", ex.Message);
 			}
-
-			Sensors = ReadableSensors.ToArray();
-			if (Sensors.Length == 0)
-			{
-				await this.ReportMessage(Status, 33, "No readable sensor(s) found to read.");
-				await this.ReportDone(Status);
-				return;
-			}
-
-			await this.ReportMessage(Status, 34, "**%0%** readable sensor(s) found to read.", Sensors.Length);
-
-			ISensorDataProcessor[] Processors = await this.FindNodes<ISensorDataProcessor>();
-			await this.ReportMessage(Status, 35, "**%0%** sensor data processor(s) found.", Processors.Length);
-
-			ISensorDataOutput[] Outputs = await this.FindNodes<ISensorDataOutput>();
-			await this.ReportMessage(Status, 36, "**%0%** sensor data output(s) found.", Outputs.Length);
-
-			await this.ReportMessage(Status, 37, "Starting readout.");
-
-			if (Status.ReportDetail == JobReportDetail.Summary)
-			{
-				await Status.Query.NewTable("Summary",
-					await Status.Language.GetStringAsync(typeof(SensorDataReadoutTaskNode), 38, "Sensor Data Readout Summary"),
-					new Column("NodeId", await this.GetString(Status, 39, "Node ID"),
-						MeteringTopology.SourceID, null, null, null, ColumnAlignment.Left, null),
-					new Column("NrFields", await this.GetString(Status, 40, "#Fields"),
-						null, null, null, null, ColumnAlignment.Right, 0),
-					new Column("NrErrors", await this.GetString(Status, 41, "#Errors"),
-						null, null, null, null, ColumnAlignment.Right, 0));
-			}
-
-			using AsyncProcessor<ReadoutWorkItem> Processor = new AsyncProcessor<ReadoutWorkItem>(this.ParallelReadouts, "Job Task: " + this.NodeId);
-
-			foreach (ISensor Sensor in Sensors)
-				Processor.Queue(new ReadoutWorkItem(Sensor, this, Status, Processors, Outputs));
-
-			await Processor.WaitUntilIdle();
-
-			if (Status.ReportDetail == JobReportDetail.Summary)
-				await Status.Query.TableDone("Summary");
-
-			if (Status.Variables.TryGetVariable("Errors", out Variable v) &&
-				v.ValueObject is ChunkedList<ThingError> JobErrors &&
-				JobErrors.Count > 0)
-			{
-				await Status.Job.LogErrorAsync("ReadoutErrors", JobErrors.Count.ToString() + " errors reported during readout.");
-			}
-			else
-				await Status.Job.RemoveErrorAsync("ReadoutErrors");
 		}
 
 		private async Task ReportStart(JobExecutionStatus Status)
@@ -276,38 +305,75 @@ namespace Waher.Jobs.Metering.NodeTypes
 		private Task ReportMessage(JobExecutionStatus Status, int StringId,
 			string Message)
 		{
-			return this.ReportMessage(Status, StringId, Message, null);
+			return this.ReportMessage(Status, StringId, Message, (string[])null);
 		}
 
 		private Task ReportMessage(JobExecutionStatus Status, int StringId,
-			string Message, object Parameter)
+			string Message, params object[] Parameters)
 		{
-			return this.ReportMessage(Status, StringId, Message, Parameter?.ToString());
+			return this.ReportMessage(Status, StringId, Message, ToString(Parameters));
 		}
 
 		private async Task ReportMessage(JobExecutionStatus Status, int StringId,
-			string Message, string Parameter)
+			string Message, params string[] Parameters)
 		{
 			if (Status.ReportDetail != JobReportDetail.None)
-				await Status.Query.NewObject(new MarkdownContent(await this.GetString(Status, StringId, Message, Parameter)));
+			{
+				await Status.Query.NewObject(new MarkdownContent(
+					await this.GetString(Status, StringId, Message, Parameters)));
+			}
+		}
+
+		private Task ReportStatus(JobExecutionStatus Status, int StringId,
+			string Message)
+		{
+			return this.ReportStatus(Status, StringId, Message, (string[])null);
+		}
+
+		private Task ReportStatus(JobExecutionStatus Status, int StringId,
+			string Message, params object[] Parameters)
+		{
+			return this.ReportStatus(Status, StringId, Message, ToString(Parameters));
+		}
+
+		private async Task ReportStatus(JobExecutionStatus Status, int StringId,
+			string Message, params string[] Parameters)
+		{
+			if (Status.ReportDetail != JobReportDetail.None)
+				await Status.Query.SetStatus(await this.GetString(Status, StringId, Message, Parameters));
 		}
 
 		private Task<string> GetString(JobExecutionStatus Status, int StringId, string Message)
 		{
-			return this.GetString(Status, StringId, Message, null);
+			return this.GetString(Status, StringId, Message, (string[])null);
 		}
 
-		private Task<string> GetString(JobExecutionStatus Status, int StringId, string Message, object Parameter)
+		private static string[] ToString(object[] Parameters)
 		{
-			return this.GetString(Status, StringId, Message, Parameter?.ToString());
+			if (Parameters is null)
+				return null;
+
+			int i, c = Parameters.Length;
+			string[] Result = new string[c];
+
+			for (i = 0; i < c; i++)
+				Result[i] = Parameters[i]?.ToString();
+
+			return Result;
 		}
 
-		private async Task<string> GetString(JobExecutionStatus Status, int StringId, string Message, string Parameter)
+		private async Task<string> GetString(JobExecutionStatus Status, int StringId, string Message,
+			params string[] Parameters)
 		{
 			Message = await Status.Language.GetStringAsync(typeof(SensorDataReadoutTaskNode), StringId, Message);
 
-			if (!(Parameter is null))
-				Message = Message.Replace("%0%", Parameter);
+			if (!(Parameters is null))
+			{
+				int i, c = Parameters.Length;
+
+				for (i = 0; i < c; i++)
+					Message = Message.Replace("%" + i.ToString() + "%", Parameters[i]);
+			}
 
 			return Message;
 		}
@@ -375,7 +441,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 						if ((Fields?.Length ?? 0) > 0)
 						{
 							string TableId = "Fields: " + Sensor.NodeId;
-							await Status.Query.NewTable(TableId, 
+							await Status.Query.NewTable(TableId,
 								await this.GetString(Status, 50, "Reported Sensor Data"),
 								new Column("Timestamp", await this.GetString(Status, 44, "Timestamp"),
 									null, null, null, null, ColumnAlignment.Left, null),
@@ -447,6 +513,18 @@ namespace Waher.Jobs.Metering.NodeTypes
 
 						await Status.Query.EndSection();
 						break;
+				}
+
+				if (Status.Variables.TryGetVariable(TotalNodeCount, out Variable v) &&
+					v.ValueObject is double TotalNrNodes &&
+					Status.Variables.TryGetVariable(NodeCount, out v) &&
+					v.ValueObject is double NrNodes)
+				{
+					NrNodes++;
+					Status.Variables[NodeCount] = NrNodes;
+
+					await this.ReportStatus(Status, 56, "%0% of %1% nodes processed.",
+						(int)NrNodes, (int)TotalNrNodes);
 				}
 			}
 			finally

@@ -110,9 +110,9 @@
 			<String id="106">Message successfully logged.</String>
 			<String id="107">Unable to log message.</String>
 			<String id="108">Node Collection</String>
-			<String id="109"></String>
-			<String id="110"></String>
-			<String id="111"></String>
+			<String id="109">Disabled node.</String>
+			<String id="110">If checked, node is disabled for readout or control.</String>
+			<String id="111">Disabled</String>
 			<String id="112"></String>
 			<String id="113"></String>
 			<String id="114"></String>

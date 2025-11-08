@@ -39,6 +39,7 @@ namespace Waher.Things.Metering
 		private DateTime created = DateTime.Now;
 		private DateTime updated = DateTime.MinValue;
 		private ThingReference thingReference = null;
+		private bool disabled = false;
 
 		/// <summary>
 		/// Base class for all metering nodes.
@@ -138,6 +139,18 @@ namespace Waher.Things.Metering
 				if (this.oldId is null && !string.IsNullOrEmpty(value))
 					this.oldId = value;
 			}
+		}
+
+		/// <summary>
+		/// ID of node.
+		/// </summary>
+		[Header(109, "Disabled node.", 0)]
+		[Page(16, "Identity", 0)]
+		[ToolTip(110, "If checked, node is disabled for readout or control.")]
+		public bool Disabled
+		{
+			get => this.disabled;
+			set => this.disabled = value;
 		}
 
 		/// <summary>
@@ -587,13 +600,13 @@ namespace Waher.Things.Metering
 		/// If the node can be read.
 		/// </summary>
 		[IgnoreMember]
-		public virtual bool IsReadable => this is ISensor;
+		public virtual bool IsReadable => !this.disabled && this is ISensor;
 
 		/// <summary>
 		/// If the node can be controlled.
 		/// </summary>
 		[IgnoreMember]
-		public virtual bool IsControllable => this is IActuator;
+		public virtual bool IsControllable => !this.disabled && this is IActuator;
 
 		/// <summary>
 		/// If the node has registered commands or not.
@@ -806,6 +819,9 @@ namespace Waher.Things.Metering
 
 			if (!(this.parent is null))
 				Result.AddLast(new StringParameter("ParentId", await Namespace.GetStringAsync(2, "Parent ID"), this.parent.nodeId));
+
+			if (this.disabled)
+				Result.AddLast(new BooleanParameter("Disabled", await Namespace.GetStringAsync(111, "Disabled"), this.disabled));
 
 			if (!this.childrenLoaded)
 				await this.LoadChildren();

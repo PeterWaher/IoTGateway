@@ -155,6 +155,9 @@ namespace Waher.Things.Mqtt
 		{
 			get
 			{
+				if (this.Disabled)
+					return false;
+
 				if (base.IsControllable)
 					return true;
 
@@ -180,7 +183,7 @@ namespace Waher.Things.Mqtt
 		/// <summary>
 		/// If the node can be read.
 		/// </summary>
-		public override bool IsReadable => true;
+		public override bool IsReadable => !this.Disabled;
 
 		/// <summary>
 		/// Starts the readout of the sensor.

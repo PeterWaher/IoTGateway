@@ -91,7 +91,7 @@ namespace Waher.Things.Ip
 		/// <summary>
 		/// If the node can be read.
 		/// </summary>
-		public override bool IsReadable => true;
+		public override bool IsReadable => !this.Disabled;
 
 		/// <summary>
 		/// Starts the readout of the sensor.
@@ -106,7 +106,7 @@ namespace Waher.Things.Ip
 
 				foreach (INode Node in await this.ChildNodes)
 				{
-					if (Node is PortMonitor Monitor)
+					if (Node is PortMonitor Monitor && Node.IsReadable)
 					{
 						DateTime Now = DateTime.UtcNow;
 						string Protocol = Monitor.Protocol;

@@ -553,6 +553,9 @@ namespace Waher.Things.Virtual
 		{
 			get
 			{
+				if (this.Disabled)
+					return false;
+
 				lock (this.fields)
 				{
 					return this.fields.Count > 0;
@@ -592,6 +595,9 @@ namespace Waher.Things.Virtual
 		{
 			get
 			{
+				if (this.Disabled)
+					return false;
+
 				if (this.TryGetMetaDataValue("Callback", out object Obj) && Obj is string &&
 					this.TryGetMetaDataValue("Payload", out Obj) && Obj is string &&
 					this.TryGetMetaDataValue("FieldName", out Obj) && Obj is string &&

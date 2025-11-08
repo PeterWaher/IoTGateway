@@ -9,7 +9,6 @@ using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
-using Waher.Script.Constants;
 using Waher.Script.Functions.Runtime;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;

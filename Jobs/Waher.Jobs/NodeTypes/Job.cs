@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using Waher.Groups;
 using Waher.Jobs.Commands;
-using Waher.Persistence.Attributes;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Things;
+using Waher.Things.Queries;
 
 namespace Waher.Jobs.NodeTypes
 {
@@ -103,9 +103,32 @@ namespace Waher.Jobs.NodeTypes
 		/// <summary>
 		/// Executes the job.
 		/// </summary>
-		public async Task ExecuteJob()
+		public Task ExecuteJob()
 		{
-			JobExecutionStatus State = new JobExecutionStatus(this);
+			return this.ExecuteJob(null);
+		}
+
+		/// <summary>
+		/// Executes the job.
+		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		public Task ExecuteJob(Language Language)
+		{
+			return this.ExecuteJob(null, Language, JobReportDetail.None);
+		}
+
+		/// <summary>
+		/// Executes the job.
+		/// </summary>
+		/// <param name="Query">Query data receptor.</param>
+		/// <param name="Language">Language to use.</param>
+		/// <param name="ReportDetail">How much detail to include in the report.</param>
+		public async Task ExecuteJob(Query Query, Language Language,
+			JobReportDetail ReportDetail)
+		{
+			Language ??= await Translator.GetDefaultLanguageAsync();
+
+			using JobExecutionStatus State = new JobExecutionStatus(this, Query, Language, ReportDetail);
 			JobTaskNode[] Tasks = await this.FindNodes<JobTaskNode>();
 
 			foreach (JobTaskNode Task in Tasks)

@@ -33,6 +33,26 @@
 			<String id="29">Group ID:</String>
 			<String id="30">Group ID of the group being referenced.</String>
 			<String id="31">Metering Group Reference</String>
+			<String id="32">Starting sensor data readout job task.</String>
+			<String id="33">No readable sensor(s) found to read.</String>
+			<String id="34">**%0%** readable sensor(s) found to read.</String>
+			<String id="35">**%0%** sensor data processor(s) found.</String>
+			<String id="36">**%0%** sensor data output(s) found.</String>
+			<String id="37">Starting readout.</String>
+			<String id="38">Sensor Data Readout Summary</String>
+			<String id="39">Node ID</String>
+			<String id="40">#Fields</String>
+			<String id="41">#Errors</String>
+			<String id="42">"No sensor data reported."</String>
+			<String id="43">No errors reported.</String>
+			<String id="44">Timestamp</String>
+			<String id="45">Field Name</String>
+			<String id="46">Field Type</String>
+			<String id="47">Value</String>
+			<String id="48">QoS</String>
+			<String id="49">Error Message</String>
+			<String id="50">Reported Sensor Data</String>
+			<String id="51">Reported Errors</String>
 		</Namespace>
 	</Language>
 </Translation>

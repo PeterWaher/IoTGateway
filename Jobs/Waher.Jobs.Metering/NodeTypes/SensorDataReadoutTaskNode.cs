@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Markdown;
 using Waher.Jobs.NodeTypes;
 using Waher.Output.Metering;
 using Waher.Processors.Metering;
@@ -16,6 +17,7 @@ using Waher.Script.Functions.Runtime;
 using Waher.Things;
 using Waher.Things.Attributes;
 using Waher.Things.Metering;
+using Waher.Things.Queries;
 using Waher.Things.SensorData;
 
 namespace Waher.Jobs.Metering.NodeTypes
@@ -181,22 +183,63 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <param name="Status">Execution status.</param>
 		public override async Task ExecuteTask(JobExecutionStatus Status)
 		{
-			IMeteringNode[] Nodes = await this.FindNodes<IMeteringNode>();
-			if (Nodes is null || Nodes.Length == 0)
+			await this.ReportStart(Status);
+
+			ISensor[] Sensors = await this.FindNodes<ISensor>();
+			if (Sensors is null || Sensors.Length == 0)
+			{
+				await this.ReportMessage(Status, 33, "No readable sensor(s) found to read.");
+				await this.ReportDone(Status);
 				return;
+			}
+
+			ChunkedList<ISensor> ReadableSensors = new ChunkedList<ISensor>();
+
+			foreach (ISensor Sensor in Sensors)
+			{
+				if (Sensor.IsReadable)
+					ReadableSensors.Add(Sensor);
+			}
+
+			Sensors = ReadableSensors.ToArray();
+			if (Sensors.Length == 0)
+			{
+				await this.ReportMessage(Status, 33, "No readable sensor(s) found to read.");
+				await this.ReportDone(Status);
+				return;
+			}
+
+			await this.ReportMessage(Status, 34, "**%0%** readable sensor(s) found to read.", Sensors.Length);
 
 			ISensorDataProcessor[] Processors = await this.FindNodes<ISensorDataProcessor>();
+			await this.ReportMessage(Status, 35, "**%0%** sensor data processor(s) found.", Processors.Length);
+
 			ISensorDataOutput[] Outputs = await this.FindNodes<ISensorDataOutput>();
+			await this.ReportMessage(Status, 36, "**%0%** sensor data output(s) found.", Outputs.Length);
+
+			await this.ReportMessage(Status, 37, "Starting readout.");
+
+			if (Status.ReportDetail == JobReportDetail.Summary)
+			{
+				await Status.Query.NewTable("Summary",
+					await Status.Language.GetStringAsync(typeof(SensorDataReadoutTaskNode), 38, "Sensor Data Readout Summary"),
+					new Column("NodeId", await this.GetString(Status, 39, "Node ID"),
+						MeteringTopology.SourceID, null, null, null, ColumnAlignment.Left, null),
+					new Column("NrFields", await this.GetString(Status, 40, "#Fields"),
+						null, null, null, null, ColumnAlignment.Right, 0),
+					new Column("NrErrors", await this.GetString(Status, 41, "#Errors"),
+						null, null, null, null, ColumnAlignment.Right, 0));
+			}
 
 			using AsyncProcessor<ReadoutWorkItem> Processor = new AsyncProcessor<ReadoutWorkItem>(this.ParallelReadouts, "Job Task: " + this.NodeId);
 
-			foreach (IMeteringNode Node in Nodes)
-			{
-				if (Node.IsReadable && Node is ISensor Sensor)
-					Processor.Queue(new ReadoutWorkItem(Sensor, this, Status, Processors, Outputs));
-			}
+			foreach (ISensor Sensor in Sensors)
+				Processor.Queue(new ReadoutWorkItem(Sensor, this, Status, Processors, Outputs));
 
 			await Processor.WaitUntilIdle();
+
+			if (Status.ReportDetail == JobReportDetail.Summary)
+				await Status.Query.TableDone("Summary");
 
 			if (Status.Variables.TryGetVariable("Errors", out Variable v) &&
 				v.ValueObject is ChunkedList<ThingError> JobErrors &&
@@ -206,6 +249,67 @@ namespace Waher.Jobs.Metering.NodeTypes
 			}
 			else
 				await Status.Job.RemoveErrorAsync("ReadoutErrors");
+		}
+
+		private async Task ReportStart(JobExecutionStatus Status)
+		{
+			if (Status.ReportDetail != JobReportDetail.None)
+			{
+				await Status.Query.Start();
+				await this.ReportTitle(Status, this.NodeId);
+				await this.ReportMessage(Status, 32, "Starting sensor data readout job task.");
+			}
+		}
+
+		private async Task ReportDone(JobExecutionStatus Status)
+		{
+			if (Status.ReportDetail != JobReportDetail.None)
+				await Status.Query.Done();
+		}
+
+		private async Task ReportTitle(JobExecutionStatus Status, string Title)
+		{
+			if (Status.ReportDetail != JobReportDetail.None)
+				await Status.Query.SetTitle(Title);
+		}
+
+		private Task ReportMessage(JobExecutionStatus Status, int StringId,
+			string Message)
+		{
+			return this.ReportMessage(Status, StringId, Message, null);
+		}
+
+		private Task ReportMessage(JobExecutionStatus Status, int StringId,
+			string Message, object Parameter)
+		{
+			return this.ReportMessage(Status, StringId, Message, Parameter?.ToString());
+		}
+
+		private async Task ReportMessage(JobExecutionStatus Status, int StringId,
+			string Message, string Parameter)
+		{
+			if (Status.ReportDetail != JobReportDetail.None)
+				await Status.Query.NewObject(new MarkdownContent(await this.GetString(Status, StringId, Message, Parameter)));
+		}
+
+		private Task<string> GetString(JobExecutionStatus Status, int StringId, string Message)
+		{
+			return this.GetString(Status, StringId, Message, null);
+		}
+
+		private Task<string> GetString(JobExecutionStatus Status, int StringId, string Message, object Parameter)
+		{
+			return this.GetString(Status, StringId, Message, Parameter?.ToString());
+		}
+
+		private async Task<string> GetString(JobExecutionStatus Status, int StringId, string Message, string Parameter)
+		{
+			Message = await Status.Language.GetStringAsync(typeof(SensorDataReadoutTaskNode), StringId, Message);
+
+			if (!(Parameter is null))
+				Message = Message.Replace("%0%", Parameter);
+
+			return Message;
 		}
 
 		private async Task FieldsReported(ISensor Sensor, Field[] Fields,
@@ -253,6 +357,101 @@ namespace Waher.Jobs.Metering.NodeTypes
 					Status.Variables["Errors"] = new ChunkedList<ThingError>(Errors);
 				else if (v.ValueObject is ChunkedList<ThingError> JobErrors)
 					JobErrors.AddRange(Errors);
+			}
+
+			await Status.Lock();
+			try
+			{
+				switch (Status.ReportDetail)
+				{
+					case JobReportDetail.Summary:
+						await Status.Query.NewRecords("Summary", new Record(
+							Sensor.NodeId, Fields?.Length ?? 0, Errors?.Length ?? 0));
+						break;
+
+					case JobReportDetail.Details:
+						await Status.Query.BeginSection(Sensor.NodeId);
+
+						if ((Fields?.Length ?? 0) > 0)
+						{
+							string TableId = "Fields: " + Sensor.NodeId;
+							await Status.Query.NewTable(TableId, 
+								await this.GetString(Status, 50, "Reported Sensor Data"),
+								new Column("Timestamp", await this.GetString(Status, 44, "Timestamp"),
+									null, null, null, null, ColumnAlignment.Left, null),
+								new Column("FieldName", await this.GetString(Status, 45, "Field Name"),
+									null, null, null, null, ColumnAlignment.Left, null),
+								new Column("FieldType", await this.GetString(Status, 46, "Field Type"),
+									null, null, null, null, ColumnAlignment.Left, null),
+								new Column("Value", await this.GetString(Status, 47, "Value"),
+									null, null, null, null, ColumnAlignment.Right, null),
+								new Column("QoS", await this.GetString(Status, 48, "QoS"),
+									null, null, null, null, ColumnAlignment.Left, null));
+
+							ChunkedList<Record> Records = new ChunkedList<Record>();
+							int i = 0;
+
+							foreach (Field Field in Fields)
+							{
+								Records.Add(new Record(Field.Timestamp, Field.Name,
+									Field.Type, Field.ObjectValue, Field.QoS));
+
+								if (++i == 100)
+								{
+									await Status.Query.NewRecords(TableId, Records.ToArray());
+									Records.Clear();
+									i = 0;
+								}
+							}
+
+							if (i > 0)
+								await Status.Query.NewRecords(TableId, Records.ToArray());
+
+							await Status.Query.TableDone(TableId);
+						}
+						else
+							await this.ReportMessage(Status, 42, "No sensor data reported.");
+
+						if ((Errors?.Length ?? 0) > 0)
+						{
+							string TableId = "Errors: " + Sensor.NodeId;
+							await Status.Query.NewTable(TableId,
+								await this.GetString(Status, 51, "Reported Errors"),
+								new Column("Timestamp", await this.GetString(Status, 44, "Timestamp"),
+									null, null, null, null, ColumnAlignment.Left, null),
+								new Column("Error", await this.GetString(Status, 49, "Error Message"),
+									null, null, null, null, ColumnAlignment.Left, null));
+
+							ChunkedList<Record> Records = new ChunkedList<Record>();
+							int i = 0;
+
+							foreach (ThingError Error in Errors)
+							{
+								Records.Add(new Record(Error.Timestamp, Error.ErrorMessage));
+
+								if (++i == 100)
+								{
+									await Status.Query.NewRecords(TableId, Records.ToArray());
+									Records.Clear();
+									i = 0;
+								}
+							}
+
+							if (i > 0)
+								await Status.Query.NewRecords(TableId, Records.ToArray());
+
+							await Status.Query.TableDone(TableId);
+						}
+						else
+							await this.ReportMessage(Status, 43, "No errors reported.");
+
+						await Status.Query.EndSection();
+						break;
+				}
+			}
+			finally
+			{
+				Status.Unlock();
 			}
 		}
 

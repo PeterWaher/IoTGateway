@@ -128,8 +128,7 @@ namespace Waher.Groups.NodeTypes
 
 			if (Node is T TypedNode)
 				Nodes.Add(TypedNode);
-
-			if (this.IncludeChildNodes)
+			else if (this.IncludeChildNodes)
 			{
 				ChunkedList<INode> CheckChildren = new ChunkedList<INode>() { Node };
 

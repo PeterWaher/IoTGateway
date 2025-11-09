@@ -11,12 +11,12 @@ namespace Waher.Jobs.Metering.NodeTypes
 	/// <summary>
 	/// A reference to a metering group.
 	/// </summary>
-	public class MeteringGroupReference : JobNode, IGroup
+	public class GroupReference : JobNode, IGroup
 	{
 		/// <summary>
 		/// A reference to a metering group.
 		/// </summary>
-		public MeteringGroupReference()
+		public GroupReference()
 		{
 		}
 
@@ -25,7 +25,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// </summary>
 		[Header(29, "Group ID:", 0)]
 		[Page(23, "Reference", 100)]
-		[ToolTip(30, "Group ID of the group being referenced.")]
+		[ToolTip(30, "ID of the group being referenced.")]
 		[Required]
 		public string ReferenceNodeId { get; set; }
 
@@ -36,7 +36,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MeteringGroupReference), 31, "Metering Group Reference");
+			return Language.GetStringAsync(typeof(GroupReference), 31, "Group Reference");
 		}
 
 		/// <summary>
@@ -87,22 +87,24 @@ namespace Waher.Jobs.Metering.NodeTypes
 
 			if (Node is T TypedNode)
 				Nodes.Add(TypedNode);
-
-			ChunkedList<INode> CheckChildren = new ChunkedList<INode>() { Node };
-
-			while (CheckChildren.HasFirstItem)
+			else
 			{
-				Node = CheckChildren.RemoveFirst();
-				IEnumerable<INode> Children = await Node.ChildNodes;
+				ChunkedList<INode> CheckChildren = new ChunkedList<INode>() { Node };
 
-				if (!(Children is null))
+				while (CheckChildren.HasFirstItem)
 				{
-					foreach (INode Child in Children)
+					Node = CheckChildren.RemoveFirst();
+					IEnumerable<INode> Children = await Node.ChildNodes;
+
+					if (!(Children is null))
 					{
-						if (Child is T TypedChild)
-							Nodes.Add(TypedChild);
-						else
-							CheckChildren.Add(Child);
+						foreach (INode Child in Children)
+						{
+							if (Child is T TypedChild)
+								Nodes.Add(TypedChild);
+							else
+								CheckChildren.Add(Child);
+						}
 					}
 				}
 			}

@@ -1,42 +1,34 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Groups;
+using Waher.Processors;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Things;
 using Waher.Things.Attributes;
-using Waher.Things.Metering;
 
 namespace Waher.Jobs.Metering.NodeTypes
 {
 	/// <summary>
-	/// A reference to a metering node.
+	/// A reference to a processor.
 	/// </summary>
-	public class MeteringNodeReference : JobNode, IGroup
+	public class ProcessorReference : JobNode, IGroup
 	{
 		/// <summary>
-		/// A reference to a metering node.
+		/// A reference to a processor.
 		/// </summary>
-		public MeteringNodeReference()
+		public ProcessorReference()
 		{
 		}
 
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(24, "Node ID:", 0)]
+		[Header(59, "Processor ID:", 0)]
 		[Page(23, "Reference", 100)]
-		[ToolTip(25, "ID of the node being referenced.")]
+		[ToolTip(60, "ID of the processor being referenced.")]
 		[Required]
 		public string ReferenceNodeId { get; set; }
-
-		/// <summary>
-		/// If child nodes should be included.
-		/// </summary>
-		[Header(26, "Include child nodes.", 0)]
-		[Page(23, "Reference", 100)]
-		[ToolTip(27, "If child nodes should be included in the reference.")]
-		public bool IncludeChildNodes { get; set; }
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -45,7 +37,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MeteringNodeReference), 28, "Metering Node Reference");
+			return Language.GetStringAsync(typeof(GroupReference), 61, "Processor Reference");
 		}
 
 		/// <summary>
@@ -86,17 +78,17 @@ namespace Waher.Jobs.Metering.NodeTypes
 		public async Task FindNodes<T>(ChunkedList<T> Nodes)
 			where T : INode
 		{
-			INode Node = await MeteringTopology.GetNode(this.ReferenceNodeId);
+			INode Node = await ProcessorSource.GetNode(this.ReferenceNodeId);
 
 			if (Node is null)
 			{
-				await this.LogErrorAsync("InvalidReference", "Node not found.");
+				await this.LogErrorAsync("InvalidReference", "Processor not found.");
 				return;
 			}
 
 			if (Node is T TypedNode)
 				Nodes.Add(TypedNode);
-			else if (this.IncludeChildNodes)
+			else
 			{
 				ChunkedList<INode> CheckChildren = new ChunkedList<INode>() { Node };
 

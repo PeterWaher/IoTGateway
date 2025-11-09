@@ -177,7 +177,9 @@ namespace Waher.Jobs.Metering.NodeTypes
 		{
 			return Task.FromResult(
 				Child is MeteringNodeReference ||
-				Child is MeteringGroupReference);
+				Child is GroupReference ||
+				Child is ProcessorReference ||
+				Child is OutputReference);
 		}
 
 		/// <summary>

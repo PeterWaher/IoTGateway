@@ -26,13 +26,13 @@
 			<String id="22">Sensor Data Readout Task</String>
 			<String id="23">Reference</String>
 			<String id="24">Node ID:</String>
-			<String id="25">Node ID of the node being referenced.</String>
+			<String id="25">ID of the node being referenced.</String>
 			<String id="26">Include child nodes.</String>
 			<String id="27">If child nodes should be included in the reference.</String>
 			<String id="28">Metering Node Reference</String>
 			<String id="29">Group ID:</String>
-			<String id="30">Group ID of the group being referenced.</String>
-			<String id="31">Metering Group Reference</String>
+			<String id="30">ID of the group being referenced.</String>
+			<String id="31">Group Reference</String>
 			<String id="32">Starting sensor data readout job task.</String>
 			<String id="33">No readable sensors found to read.</String>
 			<String id="34">**%0%** readable sensors found to read.</String>
@@ -60,6 +60,12 @@
 			<String id="56">%0% of %1% nodes processed.</String>
 			<String id="57">Overview</String>
 			<String id="58">Readout</String>
+			<String id="59">Processor ID:</String>
+			<String id="60">ID of the processor being referenced.</String>
+			<String id="61">Processor Reference</String>
+			<String id="62">Output ID:</String>
+			<String id="63">ID of the output being referenced.</String>
+			<String id="64">Output Reference</String>
 		</Namespace>
 	</Language>
 </Translation>

@@ -66,6 +66,9 @@
 			<String id="62">Output ID:</String>
 			<String id="63">ID of the output being referenced.</String>
 			<String id="64">Output Reference</String>
+			<String id="65">Label:</String>
+			<String id="66">Job</String>
+			<String id="67">Label presenting the node in the job source.</String>
 		</Namespace>
 	</Language>
 </Translation>

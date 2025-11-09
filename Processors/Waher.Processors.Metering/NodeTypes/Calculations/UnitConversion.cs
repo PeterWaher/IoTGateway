@@ -31,6 +31,15 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 		public string Unit { get; set; }
 
 		/// <summary>
+		/// If the unit is missing, sets it to the target unit.
+		/// </summary>
+
+		[Header(40, "Set unit if missing.", 30)]
+		[Page(21, "Processor", 0)]
+		[ToolTip(41, "If a numeric field lacks a unit, the unit will be set to the specified unit.")]
+		public bool SetUnitIfMissing { get; set; }
+
+		/// <summary>
 		/// Gets the type name of the node.
 		/// </summary>
 		/// <param name="Language">Language to use.</param>
@@ -55,13 +64,18 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 			{
 				if (string.IsNullOrEmpty(QuantityField.Unit))
 				{
-					return Task.FromResult(new Field[]
+					if (this.SetUnitIfMissing)
 					{
-						new QuantityField(Field.Thing, Field.Timestamp, Field.Name,
-							QuantityField.Value, QuantityField.NrDecimals, this.Unit,
-							Field.Type, Field.QoS, Field.Writable, Field.Module,
-							Field.StringIdSteps)
-					});
+						return Task.FromResult(new Field[]
+						{
+							new QuantityField(Field.Thing, Field.Timestamp, Field.Name,
+								QuantityField.Value, QuantityField.NrDecimals, this.Unit,
+								Field.Type, Field.QoS, Field.Writable, Field.Module,
+								Field.StringIdSteps)
+						});
+					}
+					else
+						return Task.FromResult<Field[]>(null);
 				}
 
 				if (!Script.Units.Unit.TryParse(QuantityField.Unit, out Unit FromUnit))
@@ -79,6 +93,34 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 						ToValue, ToNrDec, this.Unit, Field.Type, Field.QoS, Field.Writable,
 						Field.Module, Field.StringIdSteps)
 				});
+			}
+			else if (Field is Int32Field Int32Field)
+			{
+				if (this.SetUnitIfMissing)
+				{
+					return Task.FromResult(new Field[]
+					{
+						new QuantityField(Field.Thing, Field.Timestamp, Field.Name,
+							Int32Field.Value, 0, this.Unit, Field.Type, Field.QoS, 
+							Field.Writable, Field.Module, Field.StringIdSteps)
+					});
+				}
+				else
+					return Task.FromResult<Field[]>(null);
+			}
+			else if (Field is Int64Field Int64Field)
+			{
+				if (this.SetUnitIfMissing)
+				{
+					return Task.FromResult(new Field[]
+					{
+						new QuantityField(Field.Thing, Field.Timestamp, Field.Name,
+							Int64Field.Value, 0, this.Unit, Field.Type, Field.QoS,
+							Field.Writable, Field.Module, Field.StringIdSteps)
+					});
+				}
+				else
+					return Task.FromResult<Field[]>(null);
 			}
 			else
 				return Task.FromResult<Field[]>(null);

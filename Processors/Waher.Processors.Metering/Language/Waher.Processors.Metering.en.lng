@@ -41,6 +41,8 @@
 			<String id="37">Unit Conversion</String>
 			<String id="38">Unit:</String>
 			<String id="39">The unit to convert to.</String>
+			<String id="40">Set unit if missing.</String>
+			<String id="41">If a numeric field lacks a unit, the unit will be set to the specified unit.</String>
 		</Namespace>
 	</Language>
 </Translation>

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -15,6 +16,7 @@ namespace Waher.Processors.Metering.NodeTypes
 		public DecisionTreeStatement()
 			: base()
 		{
+			this.NodeId = Guid.NewGuid().ToString();
 		}
 
 		/// <summary>

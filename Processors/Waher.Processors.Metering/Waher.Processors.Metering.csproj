@@ -41,6 +41,7 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\Jobs\Waher.Jobs\Waher.Jobs.csproj" />
 	  <ProjectReference Include="..\Waher.Processors\Waher.Processors.csproj" />
 	</ItemGroup>
 

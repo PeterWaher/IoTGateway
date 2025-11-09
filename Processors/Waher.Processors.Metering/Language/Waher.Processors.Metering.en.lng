@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Translation xmlns="http://waher.se/Schema/Translation.xsd">
+	<Language code="en" name="English">
+		<Namespace name="Waher.Processors.Metering.NodeTypes">
+			<String id="1">Decision Tree</String>
+			<String id="2">Conditional Processing</String>
+			<String id="3">If Field Type</String>
+			<String id="4">Field Type</String>
+			<String id="5">Momentary values.</String>
+			<String id="6">Check, if momentary values should be read.</String>
+			<String id="7">Identity values.</String>
+			<String id="8">Check, if identity values should be read.</String>
+			<String id="9">Status values.</String>
+			<String id="10">Check, if status values should be read.</String>
+			<String id="11">Computed values.</String>
+			<String id="12">Check, if computed values should be read.</String>
+			<String id="13">Peak values.</String>
+			<String id="14">Check, if peak values should be read.</String>
+			<String id="15">Historical values.</String>
+			<String id="16">Check, if historical values should be read.</String>
+			<String id="17">Else</String>
+			<String id="18">Accept Field</String>
+			<String id="19">Reject Field</String>
+		</Namespace>
+	</Language>
+</Translation>

@@ -32,7 +32,7 @@ namespace Waher.Processors
 		private string nodeId = string.Empty;
 		private string oldId = null;
 		private NodeState state = NodeState.None;
-		private ChunkedList<ProcessorNode> children = null;
+		private List<ProcessorNode> children = null;
 		private bool childrenLoaded = false;
 		private readonly object synchObject = new object();
 		private DateTime created = DateTime.Now;

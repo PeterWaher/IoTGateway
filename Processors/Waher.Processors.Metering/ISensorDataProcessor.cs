@@ -14,7 +14,7 @@ namespace Waher.Processors.Metering
 		/// </summary>
 		/// <param name="Sensor">Sensor reporting the fields.</param>
 		/// <param name="Fields">Fields to process.</param>
-		/// <returns>Processed set of fields.</returns>
+		/// <returns>Processed set of fields. Can be null if no fields pass processing.</returns>
 		Task<Field[]> ProcessFields(ISensor Sensor, Field[] Fields);
 	}
 }

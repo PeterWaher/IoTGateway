@@ -38,6 +38,9 @@
 			<String id="34">Lesser than or equal to (&lt;=)</String>
 			<String id="35">Greater than (&gt;)</String>
 			<String id="36">Greater than or equal to (&gt;=)</String>
+			<String id="37">Unit Conversion</String>
+			<String id="38">Unit:</String>
+			<String id="39">The unit to convert to.</String>
 		</Namespace>
 	</Language>
 </Translation>

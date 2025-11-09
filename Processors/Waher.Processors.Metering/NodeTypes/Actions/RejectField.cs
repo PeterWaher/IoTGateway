@@ -9,7 +9,7 @@ namespace Waher.Processors.Metering.NodeTypes.Actions
 	/// <summary>
 	/// Rejects a field.
 	/// </summary>
-	public class RejectField : DecisionTreeStatement
+	public class RejectField : DecisionTreeLeafStatement
 	{
 		/// <summary>
 		/// Rejects a field.
@@ -27,16 +27,6 @@ namespace Waher.Processors.Metering.NodeTypes.Actions
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(Conditional), 19, "Reject Field");
-		}
-
-		/// <summary>
-		/// If the node accepts a presumptive child, i.e. can receive as a child (if that child accepts the node as a parent).
-		/// </summary>
-		/// <param name="Child">Presumptive child node.</param>
-		/// <returns>If the child is acceptable.</returns>
-		public override Task<bool> AcceptsChildAsync(INode Child)
-		{
-			return Task.FromResult(false);
 		}
 
 		/// <summary>

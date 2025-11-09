@@ -35,8 +35,7 @@ namespace Waher.Processors.Metering.NodeTypes
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(
-				Child is IConditionNode);
+			return Task.FromResult(Child is IConditionNode);
 		}
 
 		/// <summary>
@@ -46,8 +45,7 @@ namespace Waher.Processors.Metering.NodeTypes
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(
-				Parent is IDecisionTreeStatements);
+			return Task.FromResult(Parent is IDecisionTreeStatements);
 		}
 
 		/// <summary>

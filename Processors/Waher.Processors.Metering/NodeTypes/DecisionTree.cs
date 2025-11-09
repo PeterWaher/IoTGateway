@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Waher.Processors.Metering.NodeTypes.Comparisons;
 using Waher.Processors.NodeTypes;
 using Waher.Runtime.Language;
 using Waher.Things;

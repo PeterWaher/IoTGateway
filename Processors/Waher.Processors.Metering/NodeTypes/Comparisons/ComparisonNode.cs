@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Waher.Things.Attributes;
 
-namespace Waher.Processors.Metering.NodeTypes
+namespace Waher.Processors.Metering.NodeTypes.Comparisons
 {
 	/// <summary>
 	/// Abstract base class of comparison nodes.

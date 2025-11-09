@@ -4,7 +4,7 @@ using Waher.Things;
 using Waher.Things.Attributes;
 using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes
+namespace Waher.Processors.Metering.NodeTypes.Comparisons
 {
 	/// <summary>
 	/// Abstract base class of condition nodes.

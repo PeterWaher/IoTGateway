@@ -1,19 +1,20 @@
 ﻿using System.Threading.Tasks;
+using Waher.Processors.Metering.NodeTypes.Comparisons;
 using Waher.Runtime.Language;
 using Waher.Things;
 using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes
+namespace Waher.Processors.Metering.NodeTypes.Actions
 {
 	/// <summary>
-	/// Rejects a field.
+	/// Accepts a field.
 	/// </summary>
-	public class RejectField : DecisionTreeStatement
+	public class AcceptField : DecisionTreeStatement
 	{
 		/// <summary>
-		/// Rejects a field.
+		/// Accepts a field.
 		/// </summary>
-		public RejectField()
+		public AcceptField()
 			: base()
 		{
 		}
@@ -25,7 +26,7 @@ namespace Waher.Processors.Metering.NodeTypes
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(Conditional), 19, "Reject Field");
+			return Language.GetStringAsync(typeof(Conditional), 18, "Accept Field");
 		}
 
 		/// <summary>
@@ -46,7 +47,7 @@ namespace Waher.Processors.Metering.NodeTypes
 		/// <returns>Processed set of fields. Can be null if field does not pass processing.</returns>
 		public override Task<Field[]> ProcessField(ISensor Sensor, Field Field)
 		{
-			return Task.FromResult<Field[]>(null);
+			return Task.FromResult(new Field[] { Field });
 		}
 	}
 }

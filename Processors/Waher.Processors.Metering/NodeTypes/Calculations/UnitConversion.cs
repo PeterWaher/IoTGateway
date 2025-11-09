@@ -33,7 +33,6 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 		/// <summary>
 		/// If the unit is missing, sets it to the target unit.
 		/// </summary>
-
 		[Header(40, "Set unit if missing.", 30)]
 		[Page(21, "Processor", 0)]
 		[ToolTip(41, "If a numeric field lacks a unit, the unit will be set to the specified unit.")]

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Waher.Things;
 using Waher.Things.Attributes;
 using Waher.Things.SensorData;
@@ -16,6 +17,7 @@ namespace Waher.Processors.Metering.NodeTypes
 		public ConditionNode()
 			: base()
 		{
+			this.NodeId = Guid.NewGuid().ToString();
 		}
 
 		/// <summary>

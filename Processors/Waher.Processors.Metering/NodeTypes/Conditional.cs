@@ -19,6 +19,11 @@ namespace Waher.Processors.Metering.NodeTypes
 		}
 
 		/// <summary>
+		/// If the children of the node have an intrinsic order (true), or if the order is not important (false).
+		/// </summary>
+		public override bool ChildrenOrdered => true;
+
+		/// <summary>
 		/// Gets the type name of the node.
 		/// </summary>
 		/// <param name="Language">Language to use.</param>

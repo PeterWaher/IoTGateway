@@ -122,9 +122,9 @@ namespace Waher.Output
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(2, "ID:", 0)]
-		[Page(56, "Output", 0)]
-		[ToolTip(57, "Output identity in the collection of output.")]
+		[Header(14, "ID:", 0)]
+		[Page(15, "Output", 0)]
+		[ToolTip(16, "Output identity in the collection of output.")]
 		[Required]
 		public string NodeId
 		{

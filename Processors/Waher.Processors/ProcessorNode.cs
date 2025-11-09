@@ -122,9 +122,9 @@ namespace Waher.Processors
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(2, "ID:", 0)]
-		[Page(56, "Processor", 0)]
-		[ToolTip(57, "Processor identity in the collection of processors.")]
+		[Header(14, "ID:", 0)]
+		[Page(15, "Processor", 0)]
+		[ToolTip(16, "Processor identity in the collection of processors.")]
 		[Required]
 		public string NodeId
 		{

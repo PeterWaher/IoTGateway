@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Waher.Jobs.NodeTypes;
+using Waher.Processors.NodeTypes;
 using Waher.Runtime.Language;
 using Waher.Things;
 
@@ -35,7 +35,7 @@ namespace Waher.Processors.Metering.NodeTypes
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(Parent is JobTaskNode);
+			return Task.FromResult(Parent is Root);
 		}
 	}
 }

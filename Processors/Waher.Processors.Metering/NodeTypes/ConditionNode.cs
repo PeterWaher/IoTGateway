@@ -12,7 +12,7 @@ namespace Waher.Processors.Metering.NodeTypes
 	public abstract class ConditionNode : DecisionTreeStatements, IConditionNode
 	{
 		/// <summary>
-		/// Condition on field type.
+		/// Abstract base class of condition nodes.
 		/// </summary>
 		public ConditionNode()
 			: base()

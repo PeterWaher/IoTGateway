@@ -5,7 +5,7 @@
 			<String id="1">Decision Tree</String>
 			<String id="2">Conditional Processing</String>
 			<String id="3">If Field Type</String>
-			<String id="4">Field Type</String>
+			<String id="4">Condition</String>
 			<String id="5">Momentary values.</String>
 			<String id="6">Check, if momentary values should be read.</String>
 			<String id="7">Identity values.</String>
@@ -24,6 +24,20 @@
 			<String id="20">Label:</String>
 			<String id="21">Processor</String>
 			<String id="22">Label presenting the node in the decision tree.</String>
+			<String id="23">If Field Name</String>
+			<String id="24">Field Names:</String>
+			<String id="25">Check, if field name matches any in the list.</String>
+			<String id="26">Age Limit:</String>
+			<String id="27">Compares the field age with this value.</String>
+			<String id="28">If Field Age</String>
+			<String id="29">Comparison Operator:</String>
+			<String id="30">What comparison operator to use.</String>
+			<String id="31">Equal to (=)</String>
+			<String id="32">Not equal to (&lt;&gt;)</String>
+			<String id="33">Lesser than (&lt;)</String>
+			<String id="34">Lesser than or equal to (&lt;=)</String>
+			<String id="35">Greater than (&gt;)</String>
+			<String id="36">Greater than or equal to (&gt;=)</String>
 		</Namespace>
 	</Language>
 </Translation>

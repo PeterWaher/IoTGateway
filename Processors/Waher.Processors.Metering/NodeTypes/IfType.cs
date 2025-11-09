@@ -23,7 +23,7 @@ namespace Waher.Processors.Metering.NodeTypes
 		/// If momentary values should be read.
 		/// </summary>
 		[Header(5, "Momentary values.", 0)]
-		[Page(5, "Field Type", 100)]
+		[Page(4, "Condition", 100)]
 		[ToolTip(6, "Check, if momentary values should be read.")]
 		[DefaultValue(true)]
 		public bool Momentary { get; set; } = true;
@@ -32,7 +32,7 @@ namespace Waher.Processors.Metering.NodeTypes
 		/// If identity values should be read.
 		/// </summary>
 		[Header(7, "Identity values.", 0)]
-		[Page(5, "Field Type", 100)]
+		[Page(4, "Condition", 100)]
 		[ToolTip(8, "Check, if identity values should be read.")]
 		[DefaultValue(false)]
 		public bool Identity { get; set; } = false;
@@ -41,7 +41,7 @@ namespace Waher.Processors.Metering.NodeTypes
 		/// If status values should be read.
 		/// </summary>
 		[Header(9, "Status values.", 0)]
-		[Page(5, "Field Type", 100)]
+		[Page(4, "Condition", 100)]
 		[ToolTip(10, "Check, if status values should be read.")]
 		[DefaultValue(false)]
 		public bool Status { get; set; } = false;
@@ -50,7 +50,7 @@ namespace Waher.Processors.Metering.NodeTypes
 		/// If computed values should be read.
 		/// </summary>
 		[Header(11, "Computed values.", 0)]
-		[Page(5, "Field Type", 100)]
+		[Page(4, "Condition", 100)]
 		[ToolTip(12, "Check, if computed values should be read.")]
 		[DefaultValue(false)]
 		public bool Computed { get; set; } = false;
@@ -59,7 +59,7 @@ namespace Waher.Processors.Metering.NodeTypes
 		/// If peak values should be read.
 		/// </summary>
 		[Header(13, "Peak values.", 0)]
-		[Page(5, "Field Type", 100)]
+		[Page(4, "Condition", 100)]
 		[ToolTip(14, "Check, if peak values should be read.")]
 		[DefaultValue(false)]
 		public bool Peak { get; set; } = false;
@@ -68,7 +68,7 @@ namespace Waher.Processors.Metering.NodeTypes
 		/// If historical values should be read.
 		/// </summary>
 		[Header(15, "Historical values.", 0)]
-		[Page(5, "Field Type", 100)]
+		[Page(4, "Condition", 100)]
 		[ToolTip(16, "Check, if historical values should be read.")]
 		[DefaultValue(false)]
 		public bool Historical { get; set; } = false;

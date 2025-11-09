@@ -21,6 +21,9 @@
 			<String id="17">Else</String>
 			<String id="18">Accept Field</String>
 			<String id="19">Reject Field</String>
+			<String id="20">Label:</String>
+			<String id="21">Processor</String>
+			<String id="22">Label presenting the node in the decision tree.</String>
 		</Namespace>
 	</Language>
 </Translation>

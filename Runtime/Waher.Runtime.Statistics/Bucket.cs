@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Persistence;
@@ -20,7 +21,8 @@ namespace Waher.Runtime.Statistics
 	{
 		private string objectId = null;
 		private ChunkedList<double> samples;
-		private string id;
+		private byte[] id;
+		private bool idIsText = false;
 		private bool retainSamplesInPeriod;
 		private Duration bucketTime;
 		private DateTime start;
@@ -40,7 +42,7 @@ namespace Waher.Runtime.Statistics
 		/// Statistical bucket
 		/// </summary>
 		public Bucket()
-			: this(null, false, DateTime.MinValue, Duration.Zero, false)
+			: this(null, false, false, DateTime.MinValue, Duration.Zero, false)
 		{
 		}
 
@@ -53,10 +55,28 @@ namespace Waher.Runtime.Statistics
 		/// <param name="StartTime">Starting time</param>
 		/// <param name="BucketTime">Duration of one bucket, where statistics is collected.</param>
 		/// <param name="PersistSamples">If samples generated should be persisted.</param>
-		public Bucket(string Id, bool RetainSamplesInPeriod, DateTime StartTime, 
+		public Bucket(string Id, bool RetainSamplesInPeriod, DateTime StartTime,
+			Duration BucketTime, bool PersistSamples)
+			: this(Encoding.UTF8.GetBytes(Id), true, RetainSamplesInPeriod, StartTime, 
+				  BucketTime, PersistSamples)
+		{
+		}
+
+		/// <summary>
+		/// Statistical bucket
+		/// </summary>
+		/// <param name="Id">ID of bucket.</param>
+		/// <param name="IdIsText">If the binary ID representation is UTF-encoded text.</param>
+		/// <param name="RetainSamplesInPeriod">If standard deviation, variance or median 
+		/// values are to be calculated, samples need to be retained in the period.</param>
+		/// <param name="StartTime">Starting time</param>
+		/// <param name="BucketTime">Duration of one bucket, where statistics is collected.</param>
+		/// <param name="PersistSamples">If samples generated should be persisted.</param>
+		public Bucket(byte[] Id, bool IdIsText, bool RetainSamplesInPeriod, DateTime StartTime,
 			Duration BucketTime, bool PersistSamples)
 		{
 			this.id = Id;
+			this.idIsText = IdIsText;
 			this.samples = RetainSamplesInPeriod ? new ChunkedList<double>() : null;
 			this.retainSamplesInPeriod = RetainSamplesInPeriod;
 			this.bucketTime = BucketTime;
@@ -78,10 +98,35 @@ namespace Waher.Runtime.Statistics
 		/// <summary>
 		/// Bucket ID
 		/// </summary>
-		public string Id
+		public byte[] Id
 		{
 			get => this.id;
 			set => this.id = value;
+		}
+
+		/// <summary>
+		/// If the binary ID representation is UTF-encoded text.
+		/// </summary>
+		public bool IdIstext
+		{
+			get => this.idIsText;
+			set => this.idIsText = value;
+		}
+
+		/// <summary>
+		/// Text ID
+		/// </summary>
+		public string TextId
+		{
+			get
+			{
+				if (this.id is null)
+					return string.Empty;
+				else if (this.idIsText)
+					return Encoding.UTF8.GetString(this.id);
+				else
+					return Convert.ToBase64String(this.id);
+			}
 		}
 
 		/// <summary>
@@ -391,7 +436,7 @@ namespace Waher.Runtime.Statistics
 
 					Result = new SampleStatistic()
 					{
-						Id = this.id,
+						Id = this.TextId,
 						Start = this.start,
 						Stop = this.stop,
 						Count = this.count,
@@ -410,7 +455,7 @@ namespace Waher.Runtime.Statistics
 				{
 					Result = new SampleStatistic()
 					{
-						Id = this.id,
+						Id = this.TextId,
 						Start = this.start,
 						Stop = this.stop,
 						Count = this.count,
@@ -430,7 +475,7 @@ namespace Waher.Runtime.Statistics
 			{
 				Result = new SampleStatistic()
 				{
-					Id = this.id,
+					Id = this.TextId,
 					Start = this.start,
 					Stop = this.stop,
 					Count = this.count,
@@ -477,7 +522,6 @@ namespace Waher.Runtime.Statistics
 		{
 			ChunkedList<SampleStatistic> Statistics = null;
 			SampleStatistic Statistic = null;
-			DateTime Result;
 
 			lock (this)
 			{
@@ -515,8 +559,6 @@ namespace Waher.Runtime.Statistics
 				}
 
 				this.samples?.Add(Value);
-
-				Result = this.start;
 			}
 
 			if (this.persistSamples && !(Statistic is null))
@@ -540,12 +582,11 @@ namespace Waher.Runtime.Statistics
 		/// Counts one occurrence
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of occurrence.</param>
-		/// <returns>Start time of bucket to which the value was reported.</returns>
-		public async Task<DateTime> CountOccurrence(DateTime Timestamp)
+		/// <returns>Sample statistic of last period, if period changed.</returns>
+		public async Task<SampleStatistic> CountOccurrence(DateTime Timestamp)
 		{
 			ChunkedList<SampleStatistic> Statistics = null;
 			SampleStatistic Statistic = null;
-			DateTime Result;
 
 			lock (this)
 			{
@@ -562,8 +603,6 @@ namespace Waher.Runtime.Statistics
 
 				this.count++;
 				this.totCount++;
-
-				Result = this.start;
 			}
 
 			if (this.persistSamples && !(Statistic is null))
@@ -580,7 +619,7 @@ namespace Waher.Runtime.Statistics
 			if (!string.IsNullOrEmpty(this.objectId))
 				await Database.Update(this);
 
-			return Result;
+			return Statistic;
 		}
 
 		/// <summary>

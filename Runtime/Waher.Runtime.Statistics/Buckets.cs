@@ -26,7 +26,7 @@ namespace Waher.Runtime.Statistics
 		/// <param name="BucketTime">Duration of one bucket, where statistics is collected.</param>
 		/// <param name="PersistBuckets">If buckets are to be persisted.</param>
 		/// <param name="PersistSamples">If generated samples are to be persisted.</param>
-		public Buckets(DateTime StartTime, Duration BucketTime, bool PersistBuckets, 
+		public Buckets(DateTime StartTime, Duration BucketTime, bool PersistBuckets,
 			bool PersistSamples)
 			: this(StartTime, BucketTime, PersistBuckets, PersistSamples, false)
 		{
@@ -51,29 +51,79 @@ namespace Waher.Runtime.Statistics
 			this.retainSamplesInPeriod = RetainSamplesInPeriod;
 		}
 
-		/// <summary>
-		/// Counts an event.
-		/// </summary>
-		/// <param name="Counter">Counter ID</param>
-		public async Task CountEvent(string Counter)
+		private async Task<Bucket> GetBucket(string Id)
 		{
 			Bucket Bucket;
 
 			lock (this.buckets)
 			{
-				if (!this.buckets.TryGetValue(Counter, out Bucket))
-				{
-					Bucket = new Bucket(Counter, this.retainSamplesInPeriod, this.start, 
-						this.bucketTime, this.persistSamples);
+				if (this.buckets.TryGetValue(Id, out Bucket))
+					return Bucket;
 
-					this.buckets[Counter] = Bucket;
-				}
+				Bucket = new Bucket(Id, this.retainSamplesInPeriod, this.start,
+					this.bucketTime, this.persistSamples);
+
+				this.buckets[Id] = Bucket;
 			}
 
-			this.start = await Bucket.CountOccurrence(DateTime.UtcNow);
-
-			if (this.persistBuckets && string.IsNullOrEmpty(Bucket.ObjectId))
+			if (this.persistBuckets)
 				await Database.Insert(Bucket);
+
+			return Bucket;
+		}
+
+		private async Task<Bucket> GetBucket(byte[] Id)
+		{
+			string TextId = Convert.ToBase64String(Id);
+			Bucket Bucket;
+
+			lock (this.buckets)
+			{
+				if (this.buckets.TryGetValue(TextId, out Bucket))
+					return Bucket;
+
+				Bucket = new Bucket(Id, false, this.retainSamplesInPeriod, this.start,
+					this.bucketTime, this.persistSamples);
+
+				this.buckets[TextId] = Bucket;
+			}
+
+			if (this.persistBuckets)
+				await Database.Insert(Bucket);
+
+			return Bucket;
+		}
+
+		/// <summary>
+		/// Counts an event.
+		/// </summary>
+		/// <param name="Counter">Counter ID</param>
+		/// <returns>Sample statistic of last period, if period changed.</returns>
+		public async Task<SampleStatistic> CountEvent(string Counter)
+		{
+			Bucket Bucket = await this.GetBucket(Counter);
+
+			SampleStatistic Statistic = await Bucket.CountOccurrence(DateTime.UtcNow);
+			if (this.persistSamples && !(Statistic is null))
+				this.start = Statistic.Stop;
+
+			return Statistic;
+		}
+
+		/// <summary>
+		/// Counts an event.
+		/// </summary>
+		/// <param name="Counter">Counter ID</param>
+		/// <returns>Sample statistic of last period, if period changed.</returns>
+		public async Task<SampleStatistic> CountEvent(byte[] Counter)
+		{
+			Bucket Bucket = await this.GetBucket(Counter);
+
+			SampleStatistic Statistic = await Bucket.CountOccurrence(DateTime.UtcNow);
+			if (this.persistSamples && !(Statistic is null))
+				this.start = Statistic.Stop;
+
+			return Statistic;
 		}
 
 		/// <summary>
@@ -83,25 +133,27 @@ namespace Waher.Runtime.Statistics
 		/// <returns>Sample statistic of last period, if period changed.</returns>
 		public async Task<SampleStatistic> IncrementCounter(string Counter)
 		{
-			Bucket Bucket;
-
-			lock (this.buckets)
-			{
-				if (!this.buckets.TryGetValue(Counter, out Bucket))
-				{
-					Bucket = new Bucket(Counter, false, this.start, this.bucketTime,
-						this.persistSamples);
-
-					this.buckets[Counter] = Bucket;
-				}
-			}
+			Bucket Bucket = await this.GetBucket(Counter);
 
 			SampleStatistic Statistic = await Bucket.Inc();
 			if (this.persistSamples && !(Statistic is null))
 				this.start = Statistic.Stop;
 
-			if (this.persistBuckets && string.IsNullOrEmpty(Bucket.ObjectId))
-				await Database.Insert(Bucket);
+			return Statistic;
+		}
+
+		/// <summary>
+		/// Increments a counter.
+		/// </summary>
+		/// <param name="Counter">Counter ID</param>
+		/// <returns>Sample statistic of last period, if period changed.</returns>
+		public async Task<SampleStatistic> IncrementCounter(byte[] Counter)
+		{
+			Bucket Bucket = await this.GetBucket(Counter);
+
+			SampleStatistic Statistic = await Bucket.Inc();
+			if (this.persistSamples && !(Statistic is null))
+				this.start = Statistic.Stop;
 
 			return Statistic;
 		}
@@ -113,26 +165,28 @@ namespace Waher.Runtime.Statistics
 		/// <returns>Sample statistic of last period, if period changed.</returns>
 		public async Task<SampleStatistic> DecrementCounter(string Counter)
 		{
-			Bucket Bucket;
-
-			lock (this.buckets)
-			{
-				if (!this.buckets.TryGetValue(Counter, out Bucket))
-				{
-					Bucket = new Bucket(Counter, false, this.start, this.bucketTime, 
-						this.persistSamples);
-
-					this.buckets[Counter] = Bucket;
-				}
-			}
+			Bucket Bucket = await this.GetBucket(Counter);
 
 			SampleStatistic Statistic = await Bucket.Dec();
 			if (this.persistSamples && !(Statistic is null))
 				this.start = Statistic.Stop;
 
-			if (this.persistBuckets && string.IsNullOrEmpty(Bucket.ObjectId))
-				await Database.Insert(Bucket);
-		
+			return Statistic;
+		}
+
+		/// <summary>
+		/// Decrements a counter.
+		/// </summary>
+		/// <param name="Counter">Counter ID</param>
+		/// <returns>Sample statistic of last period, if period changed.</returns>
+		public async Task<SampleStatistic> DecrementCounter(byte[] Counter)
+		{
+			Bucket Bucket = await this.GetBucket(Counter);
+
+			SampleStatistic Statistic = await Bucket.Dec();
+			if (this.persistSamples && !(Statistic is null))
+				this.start = Statistic.Stop;
+
 			return Statistic;
 		}
 
@@ -144,26 +198,29 @@ namespace Waher.Runtime.Statistics
 		/// <returns>Sample statistic of last period, if period changed.</returns>
 		public async Task<SampleStatistic> Sample(string Counter, double Value)
 		{
-			Bucket Bucket;
-
-			lock (this.buckets)
-			{
-				if (!this.buckets.TryGetValue(Counter, out Bucket))
-				{
-					Bucket = new Bucket(Counter, true, this.start, this.bucketTime, 
-						this.persistSamples);
-
-					this.buckets[Counter] = Bucket;
-				}
-			}
+			Bucket Bucket = await this.GetBucket(Counter);
 
 			SampleStatistic Statistic = await Bucket.Sample(DateTime.UtcNow, Value);
 			if (this.persistSamples && !(Statistic is null))
 				this.start = Statistic.Stop;
 
-			if (this.persistBuckets && string.IsNullOrEmpty(Bucket.ObjectId))
-				await Database.Insert(Bucket);
-		
+			return Statistic;
+		}
+
+		/// <summary>
+		/// Samples a value
+		/// </summary>
+		/// <param name="Counter">Counter ID</param>
+		/// <param name="Value">Value</param>
+		/// <returns>Sample statistic of last period, if period changed.</returns>
+		public async Task<SampleStatistic> Sample(byte[] Counter, double Value)
+		{
+			Bucket Bucket = await this.GetBucket(Counter);
+
+			SampleStatistic Statistic = await Bucket.Sample(DateTime.UtcNow, Value);
+			if (this.persistSamples && !(Statistic is null))
+				this.start = Statistic.Stop;
+
 			return Statistic;
 		}
 
@@ -174,26 +231,28 @@ namespace Waher.Runtime.Statistics
 		/// <param name="Value">Value</param>
 		public async Task<SampleStatistic> Sample(string Counter, PhysicalQuantity Value)
 		{
-			Bucket Bucket;
-
-			lock (this.buckets)
-			{
-				if (!this.buckets.TryGetValue(Counter, out Bucket))
-				{
-					Bucket = new Bucket(Counter, true, this.start, this.bucketTime, 
-						this.persistSamples);
-
-					this.buckets[Counter] = Bucket;
-				}
-			}
+			Bucket Bucket = await this.GetBucket(Counter);
 
 			SampleStatistic Statistic = await Bucket.Sample(DateTime.UtcNow, Value);
 			if (this.persistSamples && !(Statistic is null))
 				this.start = Statistic.Stop;
 
-			if (this.persistBuckets && string.IsNullOrEmpty(Bucket.ObjectId))
-				await Database.Insert(Bucket);
-		
+			return Statistic;
+		}
+
+		/// <summary>
+		/// Samples a value
+		/// </summary>
+		/// <param name="Counter">Counter ID</param>
+		/// <param name="Value">Value</param>
+		public async Task<SampleStatistic> Sample(byte[] Counter, PhysicalQuantity Value)
+		{
+			Bucket Bucket = await this.GetBucket(Counter);
+
+			SampleStatistic Statistic = await Bucket.Sample(DateTime.UtcNow, Value);
+			if (this.persistSamples && !(Statistic is null))
+				this.start = Statistic.Stop;
+
 			return Statistic;
 		}
 
@@ -226,69 +285,16 @@ namespace Waher.Runtime.Statistics
 		}
 
 		/// <summary>
-		/// Gets a sample bucket.
+		/// Tries to get a bucket, given its ID.
 		/// </summary>
 		/// <param name="Id">Bucket ID</param>
-		/// <returns>Bucket.</returns>
-		public async Task<Bucket> GetSampleBucket(string Id)
-		{
-			Bucket Bucket;
-
-			lock (this.buckets)
-			{
-				if (!this.buckets.TryGetValue(Id, out Bucket))
-				{
-					Bucket = new Bucket(Id, true, this.start, this.bucketTime, 
-						this.persistSamples);
-
-					this.buckets[Id] = Bucket;
-				}
-			}
-
-			if (this.persistBuckets && string.IsNullOrEmpty(Bucket.ObjectId))
-				await Database.Insert(Bucket);
-
-			return Bucket;
-		}
-
-		/// <summary>
-		/// Gets a count bucket.
-		/// </summary>
-		/// <param name="Id">Bucket ID</param>
-		/// <returns>Bucket.</returns>
-		public async Task<Bucket> GetCountBucket(string Id)
-		{
-			Bucket Bucket;
-
-			lock (this.buckets)
-			{
-				if (!this.buckets.TryGetValue(Id, out Bucket))
-				{
-					Bucket = new Bucket(Id, false, this.start, this.bucketTime, 
-						this.persistSamples);
-
-					this.buckets[Id] = Bucket;
-				}
-			}
-
-			if (this.persistBuckets && string.IsNullOrEmpty(Bucket.ObjectId))
-				await Database.Insert(Bucket);
-
-			return Bucket;
-		}
-
-		/// <summary>
-		/// Registers a custom bucket.
-		/// </summary>
-		/// <param name="Bucket">Bucket</param>
-		public void Register(Bucket Bucket)
+		/// <param name="Bucket">Bucket, if found.</param>
+		/// <returns>If a bucket was found.</returns>
+		public bool TryGetBucket(byte[] Id, out Bucket Bucket)
 		{
 			lock (this.buckets)
 			{
-				if (this.buckets.ContainsKey(Bucket.Id))
-					throw new Exception("A bucket with ID " + Bucket.Id + " already registered.");
-
-				this.buckets[Bucket.Id] = Bucket;
+				return this.buckets.TryGetValue(Convert.ToBase64String(Id), out Bucket);
 			}
 		}
 

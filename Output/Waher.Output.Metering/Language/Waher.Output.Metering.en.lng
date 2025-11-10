@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Translation xmlns="http://waher.se/Schema/Translation.xsd">
+	<Language code="en" name="English">
+		<Namespace name="Waher.Output.Metering.NodeTypes">
+			<String id="1">Internal Database Output</String>
+			<String id="2">Collection:</String>
+			<String id="3">Output</String>
+			<String id="4">Name of collection in internal database that will house the sensor data.</String>
+			<String id="5">Index field names:</String>
+			<String id="6">Indices will be added on these field names for quicker access to records.</String>
+			<String id="7">Store physical units.</String>
+			<String id="8">If physical units should be stored in a separate property.</String>
+			<String id="9">Store field type.</String>
+			<String id="10">If field type should be stored in a separate property.</String>
+			<String id="11">Store quality of service.</String>
+			<String id="12">If quality of service should be stored in a separate property.</String>
+		</Namespace>
+	</Language>
+</Translation>

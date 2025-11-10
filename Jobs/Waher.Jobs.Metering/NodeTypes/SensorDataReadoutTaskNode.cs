@@ -49,9 +49,20 @@ namespace Waher.Jobs.Metering.NodeTypes
 		public int ParallelReadouts { get; set; } = 1;
 
 		/// <summary>
+		/// Maximum number of parallel readouts.
+		/// </summary>
+		[Header(68, "Timeout (s):", 10)]
+		[Page(1, "Readout", 100)]
+		[ToolTip(69, "If a sensor does not respond within this time, the readout will be cancelled.")]
+		[Required]
+		[Range(1, 300)]
+		[DefaultValue(60)]
+		public int SensorTimeoutSeconds { get; set; } = 60;
+
+		/// <summary>
 		/// If momentary values should be read.
 		/// </summary>
-		[Header(4, "Momentary values.", 0)]
+		[Header(4, "Momentary values.", 20)]
 		[Page(1, "Readout", 100)]
 		[ToolTip(5, "Check, if momentary values should be read.")]
 		[DefaultValue(true)]
@@ -60,7 +71,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If identity values should be read.
 		/// </summary>
-		[Header(6, "Identity values.", 0)]
+		[Header(6, "Identity values.", 30)]
 		[Page(1, "Readout", 100)]
 		[ToolTip(7, "Check, if identity values should be read.")]
 		[DefaultValue(false)]
@@ -69,7 +80,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If status values should be read.
 		/// </summary>
-		[Header(8, "Status values.", 0)]
+		[Header(8, "Status values.", 40)]
 		[Page(1, "Readout", 100)]
 		[ToolTip(9, "Check, if status values should be read.")]
 		[DefaultValue(false)]
@@ -78,7 +89,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If computed values should be read.
 		/// </summary>
-		[Header(10, "Computed values.", 0)]
+		[Header(10, "Computed values.", 50)]
 		[Page(1, "Readout", 100)]
 		[ToolTip(11, "Check, if computed values should be read.")]
 		[DefaultValue(false)]
@@ -87,7 +98,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If peak values should be read.
 		/// </summary>
-		[Header(12, "Peak values.", 0)]
+		[Header(12, "Peak values.", 60)]
 		[Page(1, "Readout", 100)]
 		[ToolTip(13, "Check, if peak values should be read.")]
 		[DefaultValue(false)]
@@ -96,7 +107,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If historical values should be read.
 		/// </summary>
-		[Header(14, "Historical values.", 0)]
+		[Header(14, "Historical values.", 70)]
 		[Page(1, "Readout", 100)]
 		[ToolTip(15, "Check, if historical values should be read.")]
 		[DefaultValue(false)]
@@ -136,7 +147,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// Field names to read.
 		/// </summary>
-		[Header(16, "Field names to read:", 0)]
+		[Header(16, "Field names to read:", 80)]
 		[Page(1, "Readout", 100)]
 		[ToolTip(17, "Leave blank to read all fields.")]
 		[ContentType("text/plain")]
@@ -145,7 +156,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// From when data should be read.
 		/// </summary>
-		[Header(18, "From:", 0)]
+		[Header(18, "From:", 90)]
 		[Page(1, "Readout", 100)]
 		[ToolTip(19, "Read historical data from this point in time.")]
 		public Duration From { get; set; } = Duration.Zero;
@@ -153,7 +164,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// To when data should be read.
 		/// </summary>
-		[Header(20, "To:", 0)]
+		[Header(20, "To:", 100)]
 		[Page(1, "Readout", 100)]
 		[ToolTip(21, "Read historical data to this point in time.")]
 		public Duration To { get; set; } = Duration.Zero;
@@ -570,10 +581,17 @@ namespace Waher.Jobs.Metering.NodeTypes
 
 			public override async Task Execute(CancellationToken Cancel)
 			{
-				JobReadout Readout = new JobReadout(this);
+				TaskCompletionSource<bool> Completed = new TaskCompletionSource<bool>();
+				JobReadout Readout = new JobReadout(this, Completed);
 				try
 				{
 					await this.sensor.StartReadout(Readout);
+
+					_ = Task.Delay(this.task.SensorTimeoutSeconds * 1000).ContinueWith(
+						(_) => Completed.TrySetResult(false));
+
+					if (!await Completed.Task)
+						await Readout.ReportErrors(true, new ThingError(this.sensor, "Sensor did not respond."));
 				}
 				catch (Exception ex)
 				{
@@ -609,15 +627,17 @@ namespace Waher.Jobs.Metering.NodeTypes
 
 			private class JobReadout : ISensorReadout
 			{
+				private readonly TaskCompletionSource<bool> completed;
 				private readonly ReadoutWorkItem item;
 				private readonly DateTime from;
 				private readonly DateTime to;
 
-				public JobReadout(ReadoutWorkItem Item)
+				public JobReadout(ReadoutWorkItem Item, TaskCompletionSource<bool> Completed)
 				{
 					this.item = Item;
 					this.from = Item.status.StartTime - this.item.task.From;
 					this.to = Item.status.StartTime - this.item.task.To;
+					this.completed = Completed;
 				}
 
 				public IThingReference[] Nodes => new IThingReference[] { this.item.sensor };
@@ -663,6 +683,10 @@ namespace Waher.Jobs.Metering.NodeTypes
 				{
 					this.item.errors ??= new ChunkedList<ThingError>();
 					this.item.errors.AddRange(Errors);
+
+					if (Done)
+						this.completed.TrySetResult(true);
+
 					return Task.CompletedTask;
 				}
 
@@ -670,6 +694,10 @@ namespace Waher.Jobs.Metering.NodeTypes
 				{
 					this.item.errors ??= new ChunkedList<ThingError>();
 					this.item.errors.AddRange(Errors);
+
+					if (Done)
+						this.completed.TrySetResult(true);
+
 					return Task.CompletedTask;
 				}
 
@@ -677,6 +705,10 @@ namespace Waher.Jobs.Metering.NodeTypes
 				{
 					this.item.fields ??= new ChunkedList<Field>();
 					this.item.fields.AddRange(Fields);
+
+					if (Done)
+						this.completed.TrySetResult(true);
+
 					return Task.CompletedTask;
 				}
 
@@ -684,6 +716,10 @@ namespace Waher.Jobs.Metering.NodeTypes
 				{
 					this.item.fields ??= new ChunkedList<Field>();
 					this.item.fields.AddRange(Fields);
+
+					if (Done)
+						this.completed.TrySetResult(true);
+
 					return Task.CompletedTask;
 				}
 

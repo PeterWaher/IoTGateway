@@ -678,17 +678,20 @@ namespace Waher.Runtime.Statistics
 
 		private double? CalcMedianLocked()
 		{
-			int c = this.samples.Count;
+			double[] Samples = this.samples.ToArray();
+			Array.Sort(Samples);
+
+			int c = Samples.Length;
 
 			if ((c & 1) == 1)
-				return this.samples[c >> 1];
+				return Samples[c >> 1];
 			else if (c == 0)
 				return null;
 			else
 			{
 				int c2 = c >> 1;
-				double Left = this.samples[c2 - 1];
-				double Right = this.samples[c2];
+				double Left = Samples[c2 - 1];
+				double Right = Samples[c2];
 				return (Left + Right) / 2;
 			}
 		}

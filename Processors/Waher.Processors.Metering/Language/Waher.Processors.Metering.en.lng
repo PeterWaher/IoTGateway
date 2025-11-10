@@ -5,7 +5,7 @@
 			<String id="1">Decision Tree</String>
 			<String id="2">Conditional Processing</String>
 			<String id="3">If Field Type</String>
-			<String id="4">Condition</String>
+			<String id="4"></String>
 			<String id="5">Momentary values.</String>
 			<String id="6">Check, if momentary values should be read.</String>
 			<String id="7">Identity values.</String>
@@ -43,6 +43,29 @@
 			<String id="39">The unit to convert to.</String>
 			<String id="40">Set unit if missing.</String>
 			<String id="41">If a numeric field lacks a unit, the unit will be set to the specified unit.</String>
+			<String id="42">Period (s):</String>
+			<String id="43">Time period, in seconds, over which statistics is computed.</String>
+			<String id="44">Reject incompatible fields.</String>
+			<String id="45">If checked, all non-momentary numerical values will be rejected.</String>
+			<String id="46">Replace sampled values.</String>
+			<String id="47">If checked, all field values used in the calculation will be rejected after they have been used to calculate the aggregate values.</String>
+			<String id="48">Statistics</String>
+			<String id="49">Persisted state.</String>
+			<String id="50">If checked, All computations will be persisted, allowing for server to be restarted in mid period.</String>
+			<String id="51">Count samples.</String>
+			<String id="52">If checked, the count of samples will be calcaulted.</String>
+			<String id="53">Calcaulte Average.</String>
+			<String id="54">If checked, the average of the samples will be calcaulted.</String>
+			<String id="55">Calcaulte Median.</String>
+			<String id="56">If checked, the median of the samples will be calcaulted.</String>
+			<String id="57">Calcaulte Minimum.</String>
+			<String id="58">If checked, the minimum of the samples will be calcaulted.</String>
+			<String id="59">Calcaulte Maximum.</String>
+			<String id="60">If checked, the maximum of the samples will be calcaulted.</String>
+			<String id="61">Calcaulte Variance.</String>
+			<String id="62">If checked, the variance of the samples will be calcaulted.</String>
+			<String id="63">Calcaulte Standard Deviation.</String>
+			<String id="64">If checked, the standard deviation of the samples will be calcaulted.</String>
 		</Namespace>
 	</Language>
 </Translation>

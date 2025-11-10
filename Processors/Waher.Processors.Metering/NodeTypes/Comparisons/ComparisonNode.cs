@@ -20,7 +20,7 @@ namespace Waher.Processors.Metering.NodeTypes.Comparisons
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(29, "Comparison Operator:", 10)]
+		[Header(29, "Comparison Operator:", 20)]
 		[Page(21, "Processor", 0)]
 		[ToolTip(30, "What comparison operator to use.")]
 		[Required]

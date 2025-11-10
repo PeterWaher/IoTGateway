@@ -24,7 +24,7 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 		/// <summary>
 		/// Unit to convert to.
 		/// </summary>
-		[Header(38, "Unit:", 20)]
+		[Header(38, "Unit:", 30)]
 		[Page(21, "Processor", 0)]
 		[ToolTip(39, "The unit to convert to.")]
 		[Required]

@@ -22,8 +22,8 @@ namespace Waher.Processors.Metering.NodeTypes.Comparisons
 		/// <summary>
 		/// If historical values should be read.
 		/// </summary>
-		[Header(24, "Field Names:", 0)]
-		[Page(4, "Condition", 100)]
+		[Header(24, "Field Names:", 30)]
+		[Page(21, "Processor", 0)]
 		[ToolTip(25, "Check, if field name matches any in the list.")]
 		public string[] FieldNames { get; set; }
 

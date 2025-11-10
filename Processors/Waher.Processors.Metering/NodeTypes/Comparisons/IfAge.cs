@@ -23,8 +23,8 @@ namespace Waher.Processors.Metering.NodeTypes.Comparisons
 		/// <summary>
 		/// If historical values should be read.
 		/// </summary>
-		[Header(26, "Age Limit:", 0)]
-		[Page(4, "Condition", 100)]
+		[Header(26, "Age Limit:", 30)]
+		[Page(21, "Processor", 0)]
 		[ToolTip(27, "Compares the field age with this value.")]
 		public Duration AgeLimit { get; set; }
 

@@ -140,6 +140,11 @@ namespace Waher.Processors
 		}
 
 		/// <summary>
+		/// Previous ID of node (during update).
+		/// </summary>
+		protected string OldId => this.oldId;
+
+		/// <summary>
 		/// Optional ID of source containing node.
 		/// </summary>
 		[IgnoreMember]

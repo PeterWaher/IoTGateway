@@ -1,6 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Processors.Metering.NodeTypes.Comparisons;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
+using Waher.Runtime.Statistics;
+using Waher.Script.Objects;
+using Waher.Security;
 using Waher.Things;
 using Waher.Things.Attributes;
 using Waher.Things.SensorData;
@@ -12,6 +20,8 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 	/// </summary>
 	public class Statistics : DecisionTreeLeafStatement
 	{
+		private static readonly Dictionary<string, Buckets> buckets = new Dictionary<string, Buckets>();
+
 		/// <summary>
 		/// Calculates statistics of momentary values over a period of time.
 		/// </summary>
@@ -139,17 +149,17 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 			if (Field is QuantityField QuantityField)
 			{
 				return this.ComputeStatisticsAsync(Sensor, Field,
-					QuantityField.Value, QuantityField.Unit);
+					QuantityField.Value, QuantityField.NrDecimals, QuantityField.Unit);
 			}
 			else if (Field is Int32Field Int32Field)
 			{
-				return this.ComputeStatisticsAsync(Sensor, Field, 
-					Int32Field.Value, null);
+				return this.ComputeStatisticsAsync(Sensor, Field,
+					Int32Field.Value, 0, null);
 			}
 			else if (Field is Int64Field Int64Field)
 			{
 				return this.ComputeStatisticsAsync(Sensor, Field,
-					Int64Field.Value, null);
+					Int64Field.Value, 0, null);
 			}
 			else
 			{
@@ -161,9 +171,238 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 		}
 
 		private async Task<Field[]> ComputeStatisticsAsync(ISensor Sensor, Field Field,
-			double Value, string Unit)
+			double Value, byte NrDec, string Unit)
 		{
-			return null;
+			Buckets NodeBuckets;
+			Duration Period;
+
+			lock (buckets)
+			{
+				if (buckets.TryGetValue(this.NodeId, out NodeBuckets))
+				{
+					Period = NodeBuckets.Period;
+
+					if (Period.Seconds != this.PeriodSeconds ||
+						Period.Minutes != 0 ||
+						Period.Hours != 0 ||
+						Period.Days != 0 ||
+						Period.Months != 0 ||
+						Period.Years != 0 ||
+						Period.Negation)
+					{
+						NodeBuckets = null;
+					}
+				}
+				else
+					NodeBuckets = null;
+
+				if (NodeBuckets is null)
+				{
+					DateTime Now = DateTime.UtcNow;
+					TimeSpan Span = Now.Subtract(JSON.UnixEpoch);
+					double Seconds = Span.TotalSeconds;
+					Seconds -= Math.IEEERemainder(Seconds, this.PeriodSeconds);
+					DateTime Start = JSON.UnixEpoch.AddSeconds(Seconds);
+
+					Period = new Duration(false, 0, 0, 0, 0, 0, this.PeriodSeconds);
+					NodeBuckets = new Buckets(Start, Period, true, false, this.NeedsSampleInstances);
+
+					buckets[this.NodeId] = NodeBuckets;
+				}
+			}
+
+			StringBuilder sb = new StringBuilder();
+			sb.Append(Sensor.NodeId);
+			sb.Append('|');
+			sb.Append(Sensor.SourceId);
+			sb.Append('|');
+			sb.Append(Sensor.Partition);
+			sb.Append('|');
+			sb.Append(Field.Name);
+			sb.Append('|');
+			sb.Append(((int)Field.Type).ToString());
+
+			byte[] BucketId = Hashes.ComputeSHA256Hash(Encoding.UTF8.GetBytes(sb.ToString()));
+			SampleStatistic Statistic;
+
+			if (string.IsNullOrEmpty(Unit))
+				Statistic = await NodeBuckets.Sample(BucketId, Value);
+			else if (Script.Units.Unit.TryParse(Unit, out Script.Units.Unit ParsedUnit))
+				Statistic = await NodeBuckets.Sample(BucketId, new PhysicalQuantity(Value, ParsedUnit));
+			else
+				Statistic = null;
+
+			if (Statistic is null)
+			{
+				if (this.ReplaceCompatible)
+					return null;
+				else
+					return new Field[] { Field };
+			}
+
+			ChunkedList<Field> Fields = new ChunkedList<Field>();
+			byte AvgNrDec;
+
+			if (Statistic.Count > 1)
+				AvgNrDec = (byte)(NrDec + Math.Floor(Math.Log10(Statistic.Count)));
+			else
+				AvgNrDec = NrDec;
+
+			if(!this.ReplaceCompatible)
+				Fields.Add(Field);
+
+			if (this.CalculateCount)
+			{
+				Fields.Add(new Int64Field(Field.Thing, Statistic.Stop,
+					Field.Name + ", Count", Statistic.Count, FieldType.Computed,
+					FieldQoS.AutomaticReadout, false));
+
+				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Count, Start", Statistic.Start, FieldType.Computed,
+					FieldQoS.AutomaticReadout, false));
+
+				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Count, Stop", Statistic.Stop, FieldType.Computed,
+					FieldQoS.AutomaticReadout, false));
+
+				// TODO: Localization steps
+			}
+
+			if (this.CalculateAverage && Statistic.Mean.HasValue)
+			{
+				Fields.Add(new QuantityField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Mean", Statistic.Mean.Value, AvgNrDec, Statistic.Unit,
+					FieldType.Computed, FieldQoS.AutomaticReadout, false));
+
+				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Mean, Start", Statistic.Start, FieldType.Computed, 
+					FieldQoS.AutomaticReadout, false));
+
+				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Mean, Stop", Statistic.Stop, FieldType.Computed,
+					FieldQoS.AutomaticReadout, false));
+
+				// TODO: Localization steps
+			}
+
+			if (this.CalculateMedian && Statistic.Median.HasValue)
+			{
+				Fields.Add(new QuantityField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Median", Statistic.Median.Value, NrDec, Statistic.Unit,
+					FieldType.Computed, FieldQoS.AutomaticReadout, false));
+
+				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Median, Start", Statistic.Start, FieldType.Computed,
+					FieldQoS.AutomaticReadout, false));
+
+				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Median, Stop", Statistic.Stop, FieldType.Computed,
+					FieldQoS.AutomaticReadout, false));
+
+				// TODO: Localization steps
+			}
+
+			if (this.CalculateMin && Statistic.Min.HasValue)
+			{
+				Fields.Add(new QuantityField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Min", Statistic.Min.Value, NrDec, Statistic.Unit,
+					FieldType.Peak, FieldQoS.AutomaticReadout, false));
+
+				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Min, Start", Statistic.Start, FieldType.Peak,
+					FieldQoS.AutomaticReadout, false));
+
+				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Min, Stop", Statistic.Stop, FieldType.Peak,
+					FieldQoS.AutomaticReadout, false));
+
+				// TODO: Localization steps
+			}
+
+			if (this.CalculateMax && Statistic.Max.HasValue)
+			{
+				Fields.Add(new QuantityField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Max", Statistic.Max.Value, NrDec, Statistic.Unit,
+					FieldType.Peak, FieldQoS.AutomaticReadout, false));
+
+				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Max, Start", Statistic.Start, FieldType.Peak,
+					FieldQoS.AutomaticReadout, false));
+
+				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Max, Stop", Statistic.Stop, FieldType.Peak,
+					FieldQoS.AutomaticReadout, false));
+
+				// TODO: Localization steps
+			}
+
+			if (this.CalculateVariance && Statistic.Variance.HasValue)
+			{
+				Fields.Add(new QuantityField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Variance", Statistic.Variance.Value, AvgNrDec, Statistic.Unit,
+					FieldType.Computed, FieldQoS.AutomaticReadout, false));
+
+				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Variance, Start", Statistic.Start, FieldType.Computed,
+					FieldQoS.AutomaticReadout, false));
+
+				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+					Field.Name + ", Variance, Stop", Statistic.Stop, FieldType.Computed,
+					FieldQoS.AutomaticReadout, false));
+
+				// TODO: Localization steps
+			}
+
+			if (this.CalculateStdDev && Statistic.StdDev.HasValue)
+			{
+				Fields.Add(new QuantityField(Field.Thing, Statistic.Stop,
+					Field.Name + ", StdDev", Statistic.StdDev.Value, AvgNrDec, Statistic.Unit,
+					FieldType.Computed, FieldQoS.AutomaticReadout, false));
+
+				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+					Field.Name + ", StdDev, Start", Statistic.Start, FieldType.Computed,
+					FieldQoS.AutomaticReadout, false));
+
+				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+					Field.Name + ", StdDev, Stop", Statistic.Stop, FieldType.Computed,
+					FieldQoS.AutomaticReadout, false));
+
+				// TODO: Localization steps
+			}
+
+			return Fields.ToArray();
+		}
+
+		/// <summary>
+		/// Destroys the node. If it is a child to a parent node, it is removed from the parent first.
+		/// </summary>
+		public override Task DestroyAsync()
+		{
+			lock (buckets)
+			{
+				buckets.Remove(this.NodeId);
+			}
+
+			return base.DestroyAsync();
+		}
+
+		/// <summary>
+		/// Persists changes to the node, and generates a node updated event.
+		/// </summary>
+		protected override Task NodeUpdated()
+		{
+			if (this.OldId != this.NodeId)
+			{
+				lock (buckets)
+				{
+					if (buckets.TryGetValue(this.OldId, out Buckets Buckets))
+						buckets[this.NodeId] = Buckets;
+
+					buckets.Remove(this.OldId);
+				}
+			}
+
+			return base.NodeUpdated();
 		}
 	}
 }

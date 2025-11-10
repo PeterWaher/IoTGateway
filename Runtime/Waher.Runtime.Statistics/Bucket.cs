@@ -24,7 +24,7 @@ namespace Waher.Runtime.Statistics
 		private byte[] id;
 		private bool idIsText = false;
 		private bool retainSamplesInPeriod;
-		private Duration bucketTime;
+		private Duration period;
 		private DateTime start;
 		private DateTime stop;
 		private string unit = null;
@@ -53,12 +53,12 @@ namespace Waher.Runtime.Statistics
 		/// <param name="RetainSamplesInPeriod">If standard deviation, variance or median 
 		/// values are to be calculated, samples need to be retained in the period.</param>
 		/// <param name="StartTime">Starting time</param>
-		/// <param name="BucketTime">Duration of one bucket, where statistics is collected.</param>
+		/// <param name="Period">Duration when samples are collected.</param>
 		/// <param name="PersistSamples">If samples generated should be persisted.</param>
 		public Bucket(string Id, bool RetainSamplesInPeriod, DateTime StartTime,
-			Duration BucketTime, bool PersistSamples)
+			Duration Period, bool PersistSamples)
 			: this(Encoding.UTF8.GetBytes(Id), true, RetainSamplesInPeriod, StartTime, 
-				  BucketTime, PersistSamples)
+				  Period, PersistSamples)
 		{
 		}
 
@@ -70,18 +70,18 @@ namespace Waher.Runtime.Statistics
 		/// <param name="RetainSamplesInPeriod">If standard deviation, variance or median 
 		/// values are to be calculated, samples need to be retained in the period.</param>
 		/// <param name="StartTime">Starting time</param>
-		/// <param name="BucketTime">Duration of one bucket, where statistics is collected.</param>
+		/// <param name="Period">Duration when samples are collected.</param>
 		/// <param name="PersistSamples">If samples generated should be persisted.</param>
 		public Bucket(byte[] Id, bool IdIsText, bool RetainSamplesInPeriod, DateTime StartTime,
-			Duration BucketTime, bool PersistSamples)
+			Duration Period, bool PersistSamples)
 		{
 			this.id = Id;
 			this.idIsText = IdIsText;
 			this.samples = RetainSamplesInPeriod ? new ChunkedList<double>() : null;
 			this.retainSamplesInPeriod = RetainSamplesInPeriod;
-			this.bucketTime = BucketTime;
+			this.period = Period;
 			this.start = StartTime;
-			this.stop = this.start + BucketTime;
+			this.stop = this.start + Period;
 			this.persistSamples = PersistSamples;
 		}
 
@@ -130,12 +130,12 @@ namespace Waher.Runtime.Statistics
 		}
 
 		/// <summary>
-		/// Time to accumulate values.
+		/// Duration when samples are collected.
 		/// </summary>
-		public Duration BucketTime
+		public Duration Period
 		{
-			get => this.bucketTime;
-			set => this.bucketTime = value;
+			get => this.period;
+			set => this.period = value;
 		}
 
 		/// <summary>
@@ -485,7 +485,7 @@ namespace Waher.Runtime.Statistics
 
 			this.count = 0;
 			this.start = this.stop;
-			this.stop = this.start + this.bucketTime;
+			this.stop = this.start + this.period;
 
 			return Result;
 		}

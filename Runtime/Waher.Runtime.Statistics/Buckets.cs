@@ -13,7 +13,7 @@ namespace Waher.Runtime.Statistics
 	public class Buckets
 	{
 		private readonly Dictionary<string, Bucket> buckets = new Dictionary<string, Bucket>();
-		private readonly Duration bucketTime;
+		private readonly Duration period;
 		private readonly bool persistBuckets;
 		private readonly bool persistSamples;
 		private readonly bool retainSamplesInPeriod;
@@ -23,12 +23,12 @@ namespace Waher.Runtime.Statistics
 		/// A collection of buckets
 		/// </summary>
 		/// <param name="StartTime">Starting time</param>
-		/// <param name="BucketTime">Duration of one bucket, where statistics is collected.</param>
+		/// <param name="Period">Duration when samples are collected.</param>
 		/// <param name="PersistBuckets">If buckets are to be persisted.</param>
 		/// <param name="PersistSamples">If generated samples are to be persisted.</param>
-		public Buckets(DateTime StartTime, Duration BucketTime, bool PersistBuckets,
+		public Buckets(DateTime StartTime, Duration Period, bool PersistBuckets,
 			bool PersistSamples)
-			: this(StartTime, BucketTime, PersistBuckets, PersistSamples, false)
+			: this(StartTime, Period, PersistBuckets, PersistSamples, false)
 		{
 		}
 
@@ -36,16 +36,16 @@ namespace Waher.Runtime.Statistics
 		/// A collection of buckets
 		/// </summary>
 		/// <param name="StartTime">Starting time</param>
-		/// <param name="BucketTime">Duration of one bucket, where statistics is collected.</param>
+		/// <param name="Period">Duration when samples are collected.</param>
 		/// <param name="PersistBuckets">If buckets are to be persisted.</param>
 		/// <param name="PersistSamples">If generated samples are to be persisted.</param>
 		/// <param name="RetainSamplesInPeriod">If standard deviation, variance or median 
 		/// values are to be calculated, samples need to be retained in the period.</param>
-		public Buckets(DateTime StartTime, Duration BucketTime, bool PersistBuckets,
+		public Buckets(DateTime StartTime, Duration Period, bool PersistBuckets,
 			bool PersistSamples, bool RetainSamplesInPeriod)
 		{
 			this.start = StartTime;
-			this.bucketTime = BucketTime;
+			this.period = Period;
 			this.persistBuckets = PersistBuckets;
 			this.persistSamples = PersistSamples;
 			this.retainSamplesInPeriod = RetainSamplesInPeriod;
@@ -61,7 +61,7 @@ namespace Waher.Runtime.Statistics
 					return Bucket;
 
 				Bucket = new Bucket(Id, this.retainSamplesInPeriod, this.start,
-					this.bucketTime, this.persistSamples);
+					this.period, this.persistSamples);
 
 				this.buckets[Id] = Bucket;
 			}
@@ -83,7 +83,7 @@ namespace Waher.Runtime.Statistics
 					return Bucket;
 
 				Bucket = new Bucket(Id, false, this.retainSamplesInPeriod, this.start,
-					this.bucketTime, this.persistSamples);
+					this.period, this.persistSamples);
 
 				this.buckets[TextId] = Bucket;
 			}
@@ -255,6 +255,11 @@ namespace Waher.Runtime.Statistics
 
 			return Statistic;
 		}
+
+		/// <summary>
+		/// Period of buckets
+		/// </summary>
+		public Duration Period => this.period;
 
 		/// <summary>
 		/// Number of counters

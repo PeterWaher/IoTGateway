@@ -24,7 +24,7 @@
 			<String id="20">To:</String>
 			<String id="21">Read historical data to this point in time.</String>
 			<String id="22">Sensor Data Readout Task</String>
-			<String id="23">Reference</String>
+			<String id="23"></String>
 			<String id="24">Node ID:</String>
 			<String id="25">ID of the node being referenced.</String>
 			<String id="26">Include child nodes.</String>

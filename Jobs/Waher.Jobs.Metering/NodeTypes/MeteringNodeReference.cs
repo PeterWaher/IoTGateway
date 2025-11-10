@@ -25,8 +25,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(24, "Node ID:", 0)]
-		[Page(23, "Reference", 100)]
+		[Header(24, "Node ID:", 20)]
+		[Page(66, "Job", 0)]
 		[ToolTip(25, "ID of the node being referenced.")]
 		[Required]
 		public string ReferenceNodeId { get; set; }
@@ -34,8 +34,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If child nodes should be included.
 		/// </summary>
-		[Header(26, "Include child nodes.", 0)]
-		[Page(23, "Reference", 100)]
+		[Header(26, "Include child nodes.", 30)]
+		[Page(66, "Job", 0)]
 		[ToolTip(27, "If child nodes should be included in the reference.")]
 		public bool IncludeChildNodes { get; set; }
 

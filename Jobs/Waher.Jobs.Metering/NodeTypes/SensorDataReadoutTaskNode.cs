@@ -40,8 +40,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// Maximum number of parallel readouts.
 		/// </summary>
-		[Header(2, "Parallel readouts:", 0)]
-		[Page(1, "Readout", 100)]
+		[Header(2, "Parallel readouts:", 10)]
+		[Page(66, "Job", 0)]
 		[ToolTip(3, "Maximum number of parallel readouts.")]
 		[Required]
 		[Range(1, 100)]
@@ -51,8 +51,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// Maximum number of parallel readouts.
 		/// </summary>
-		[Header(68, "Timeout (s):", 10)]
-		[Page(1, "Readout", 100)]
+		[Header(68, "Timeout (s):", 20)]
+		[Page(66, "Job", 0)]
 		[ToolTip(69, "If a sensor does not respond within this time, the readout will be cancelled.")]
 		[Required]
 		[Range(1, 300)]
@@ -62,8 +62,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If momentary values should be read.
 		/// </summary>
-		[Header(4, "Momentary values.", 20)]
-		[Page(1, "Readout", 100)]
+		[Header(4, "Momentary values.", 30)]
+		[Page(66, "Job", 0)]
 		[ToolTip(5, "Check, if momentary values should be read.")]
 		[DefaultValue(true)]
 		public bool Momentary { get; set; } = true;
@@ -71,8 +71,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If identity values should be read.
 		/// </summary>
-		[Header(6, "Identity values.", 30)]
-		[Page(1, "Readout", 100)]
+		[Header(6, "Identity values.", 40)]
+		[Page(66, "Job", 0)]
 		[ToolTip(7, "Check, if identity values should be read.")]
 		[DefaultValue(false)]
 		public bool Identity { get; set; } = false;
@@ -80,8 +80,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If status values should be read.
 		/// </summary>
-		[Header(8, "Status values.", 40)]
-		[Page(1, "Readout", 100)]
+		[Header(8, "Status values.", 50)]
+		[Page(66, "Job", 0)]
 		[ToolTip(9, "Check, if status values should be read.")]
 		[DefaultValue(false)]
 		public bool Status { get; set; } = false;
@@ -89,8 +89,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If computed values should be read.
 		/// </summary>
-		[Header(10, "Computed values.", 50)]
-		[Page(1, "Readout", 100)]
+		[Header(10, "Computed values.", 60)]
+		[Page(66, "Job", 0)]
 		[ToolTip(11, "Check, if computed values should be read.")]
 		[DefaultValue(false)]
 		public bool Computed { get; set; } = false;
@@ -98,8 +98,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If peak values should be read.
 		/// </summary>
-		[Header(12, "Peak values.", 60)]
-		[Page(1, "Readout", 100)]
+		[Header(12, "Peak values.", 70)]
+		[Page(66, "Job", 0)]
 		[ToolTip(13, "Check, if peak values should be read.")]
 		[DefaultValue(false)]
 		public bool Peak { get; set; } = false;
@@ -107,8 +107,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If historical values should be read.
 		/// </summary>
-		[Header(14, "Historical values.", 70)]
-		[Page(1, "Readout", 100)]
+		[Header(14, "Historical values.", 80)]
+		[Page(66, "Job", 0)]
 		[ToolTip(15, "Check, if historical values should be read.")]
 		[DefaultValue(false)]
 		public bool Historical { get; set; } = false;
@@ -147,8 +147,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// Field names to read.
 		/// </summary>
-		[Header(16, "Field names to read:", 80)]
-		[Page(1, "Readout", 100)]
+		[Header(16, "Field names to read:", 90)]
+		[Page(66, "Job", 0)]
 		[ToolTip(17, "Leave blank to read all fields.")]
 		[ContentType("text/plain")]
 		public string[] FieldNames { get; set; }
@@ -156,16 +156,16 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// From when data should be read.
 		/// </summary>
-		[Header(18, "From:", 90)]
-		[Page(1, "Readout", 100)]
+		[Header(18, "From:", 100)]
+		[Page(66, "Job", 0)]
 		[ToolTip(19, "Read historical data from this point in time.")]
 		public Duration From { get; set; } = Duration.Zero;
 
 		/// <summary>
 		/// To when data should be read.
 		/// </summary>
-		[Header(20, "To:", 100)]
-		[Page(1, "Readout", 100)]
+		[Header(20, "To:", 110)]
+		[Page(66, "Job", 0)]
 		[ToolTip(21, "Read historical data to this point in time.")]
 		public Duration To { get; set; } = Duration.Zero;
 

@@ -35,7 +35,7 @@
 		</Namespace>
 		<Namespace name="Waher.Groups.NodeTypes">
 			<String id="1">Group</String>
-			<String id="2">Reference</String>
+			<String id="2"></String>
 			<String id="3">Node ID:</String>
 			<String id="4">Node ID of the node being referenced.</String>
 			<String id="5">Source ID:</String>

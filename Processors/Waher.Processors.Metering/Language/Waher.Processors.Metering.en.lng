@@ -54,17 +54,17 @@
 			<String id="50">If checked, All computations will be persisted, allowing for server to be restarted in mid period.</String>
 			<String id="51">Count samples.</String>
 			<String id="52">If checked, the count of samples will be calcaulted.</String>
-			<String id="53">Calcaulte Average.</String>
+			<String id="53">Calculate Average.</String>
 			<String id="54">If checked, the average of the samples will be calcaulted.</String>
-			<String id="55">Calcaulte Median.</String>
+			<String id="55">Calculate Median.</String>
 			<String id="56">If checked, the median of the samples will be calcaulted.</String>
-			<String id="57">Calcaulte Minimum.</String>
+			<String id="57">Calculate Minimum.</String>
 			<String id="58">If checked, the minimum of the samples will be calcaulted.</String>
-			<String id="59">Calcaulte Maximum.</String>
+			<String id="59">Calculate Maximum.</String>
 			<String id="60">If checked, the maximum of the samples will be calcaulted.</String>
-			<String id="61">Calcaulte Variance.</String>
+			<String id="61">Calculate Variance.</String>
 			<String id="62">If checked, the variance of the samples will be calcaulted.</String>
-			<String id="63">Calcaulte Standard Deviation.</String>
+			<String id="63">Calculate Standard Deviation.</String>
 			<String id="64">If checked, the standard deviation of the samples will be calcaulted.</String>
 		</Namespace>
 	</Language>

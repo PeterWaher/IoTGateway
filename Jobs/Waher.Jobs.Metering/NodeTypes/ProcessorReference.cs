@@ -24,8 +24,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(59, "Processor ID:", 0)]
-		[Page(23, "Reference", 100)]
+		[Header(59, "Processor ID:", 20)]
+		[Page(66, "Job", 0)]
 		[ToolTip(60, "ID of the processor being referenced.")]
 		[Required]
 		public string ReferenceNodeId { get; set; }

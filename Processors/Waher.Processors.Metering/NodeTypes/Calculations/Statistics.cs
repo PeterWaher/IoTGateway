@@ -74,7 +74,7 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 		/// <summary>
 		/// Calculates the average value in the period.
 		/// </summary>
-		[Header(53, "Calcaulte Average.", 70)]
+		[Header(53, "Calculate Average.", 70)]
 		[Page(21, "Processor", 0)]
 		[ToolTip(54, "If checked, the average of the samples will be calcaulted.")]
 		public bool CalculateAverage { get; set; }
@@ -82,7 +82,7 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 		/// <summary>
 		/// Calculates the median value in the period.
 		/// </summary>
-		[Header(55, "Calcaulte Median.", 80)]
+		[Header(55, "Calculate Median.", 80)]
 		[Page(21, "Processor", 0)]
 		[ToolTip(56, "If checked, the median of the samples will be calcaulted.")]
 		public bool CalculateMedian { get; set; }
@@ -90,7 +90,7 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 		/// <summary>
 		/// Calculates the minimum value in the period.
 		/// </summary>
-		[Header(57, "Calcaulte Minimum.", 90)]
+		[Header(57, "Calculate Minimum.", 90)]
 		[Page(21, "Processor", 0)]
 		[ToolTip(58, "If checked, the minimum of the samples will be calcaulted.")]
 		public bool CalculateMin { get; set; }
@@ -98,7 +98,7 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 		/// <summary>
 		/// Calculates the maximum value in the period.
 		/// </summary>
-		[Header(59, "Calcaulte Maximum.", 100)]
+		[Header(59, "Calculate Maximum.", 100)]
 		[Page(21, "Processor", 0)]
 		[ToolTip(60, "If checked, the maximum of the samples will be calcaulted.")]
 		public bool CalculateMax { get; set; }
@@ -106,7 +106,7 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 		/// <summary>
 		/// Calculates the variance of the values in the period.
 		/// </summary>
-		[Header(61, "Calcaulte Variance.", 110)]
+		[Header(61, "Calculate Variance.", 110)]
 		[Page(21, "Processor", 0)]
 		[ToolTip(62, "If checked, the variance of the samples will be calcaulted.")]
 		public bool CalculateVariance { get; set; }
@@ -114,7 +114,7 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 		/// <summary>
 		/// Calculates the standard deviation of the values in the period.
 		/// </summary>
-		[Header(63, "Calcaulte Standard Deviation.", 120)]
+		[Header(63, "Calculate Standard Deviation.", 120)]
 		[Page(21, "Processor", 0)]
 		[ToolTip(64, "If checked, the standard deviation of the samples will be calcaulted.")]
 		public bool CalculateStdDev { get; set; }

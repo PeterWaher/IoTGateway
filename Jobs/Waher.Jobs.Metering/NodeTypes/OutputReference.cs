@@ -24,8 +24,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(62, "Output ID:", 0)]
-		[Page(23, "Reference", 100)]
+		[Header(62, "Output ID:", 20)]
+		[Page(66, "Job", 0)]
 		[ToolTip(63, "ID of the output being referenced.")]
 		[Required]
 		public string ReferenceNodeId { get; set; }

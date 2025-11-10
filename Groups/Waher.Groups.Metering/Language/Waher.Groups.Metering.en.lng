@@ -5,7 +5,7 @@
 			<String id="1">Metering Group</String>
 			<String id="2">Metering Node Reference</String>
 			<String id="3">Node ID:</String>
-			<String id="4">Reference</String>
+			<String id="4">Group</String>
 			<String id="5">Node ID of the node being referenced.</String>
 			<String id="6">Include child nodes.</String>
 			<String id="7">If child nodes should be included in the reference.</String>

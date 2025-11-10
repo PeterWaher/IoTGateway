@@ -22,8 +22,8 @@ namespace Waher.Groups.NodeTypes
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(3, "Node ID:", 0)]
-		[Page(2, "Reference", 100)]
+		[Header(3, "Node ID:", 10)]
+		[Page(1, "Group", 0)]
 		[ToolTip(4, "Node ID of the node being referenced.")]
 		[Required]
 		public string ReferenceNodeId { get; set; }
@@ -31,8 +31,8 @@ namespace Waher.Groups.NodeTypes
 		/// <summary>
 		/// Source ID of node.
 		/// </summary>
-		[Header(5, "Source ID:", 0)]
-		[Page(2, "Reference", 100)]
+		[Header(5, "Source ID:", 20)]
+		[Page(1, "Group", 0)]
 		[ToolTip(6, "Source ID of the node being referenced.")]
 		[Required]
 		public string ReferenceSourceId { get; set; }
@@ -40,16 +40,16 @@ namespace Waher.Groups.NodeTypes
 		/// <summary>
 		/// Partition of node.
 		/// </summary>
-		[Header(7, "Partition:", 0)]
-		[Page(2, "Reference", 100)]
+		[Header(7, "Partition:", 30)]
+		[Page(1, "Group", 0)]
 		[ToolTip(8, "Partition of the node being referenced.")]
 		public string ReferencePartition { get; set; }
 
 		/// <summary>
 		/// If child nodes should be included.
 		/// </summary>
-		[Header(9, "Include child nodes.", 0)]
-		[Page(2, "Reference", 100)]
+		[Header(9, "Include child nodes.", 40)]
+		[Page(1, "Group", 0)]
 		[ToolTip(10, "If child nodes should be included in the reference.")]
 		public bool IncludeChildNodes { get; set; }
 

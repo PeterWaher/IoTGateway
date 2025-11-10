@@ -22,8 +22,8 @@ namespace Waher.Groups.Metering.NodeTypes
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(8, "Group ID:", 0)]
-		[Page(4, "Reference", 100)]
+		[Header(8, "Group ID:", 10)]
+		[Page(4, "Group", 0)]
 		[ToolTip(9, "Group ID of the group being referenced.")]
 		[Required]
 		public string ReferenceNodeId { get; set; }

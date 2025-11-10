@@ -248,21 +248,23 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 			else
 				AvgNrDec = NrDec;
 
-			if(!this.ReplaceCompatible)
+			if (!this.ReplaceCompatible)
 				Fields.Add(Field);
+
+			Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+				"Period, Start", Statistic.Start, FieldType.Computed,
+				FieldQoS.AutomaticReadout, false));
+
+			Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
+				"Period, Stop", Statistic.Stop, FieldType.Computed,
+				FieldQoS.AutomaticReadout, false));
+
+			// TODO: Localization steps
 
 			if (this.CalculateCount)
 			{
 				Fields.Add(new Int64Field(Field.Thing, Statistic.Stop,
 					Field.Name + ", Count", Statistic.Count, FieldType.Computed,
-					FieldQoS.AutomaticReadout, false));
-
-				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
-					Field.Name + ", Count, Start", Statistic.Start, FieldType.Computed,
-					FieldQoS.AutomaticReadout, false));
-
-				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
-					Field.Name + ", Count, Stop", Statistic.Stop, FieldType.Computed,
 					FieldQoS.AutomaticReadout, false));
 
 				// TODO: Localization steps
@@ -274,14 +276,6 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 					Field.Name + ", Mean", Statistic.Mean.Value, AvgNrDec, Statistic.Unit,
 					FieldType.Computed, FieldQoS.AutomaticReadout, false));
 
-				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
-					Field.Name + ", Mean, Start", Statistic.Start, FieldType.Computed, 
-					FieldQoS.AutomaticReadout, false));
-
-				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
-					Field.Name + ", Mean, Stop", Statistic.Stop, FieldType.Computed,
-					FieldQoS.AutomaticReadout, false));
-
 				// TODO: Localization steps
 			}
 
@@ -290,14 +284,6 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 				Fields.Add(new QuantityField(Field.Thing, Statistic.Stop,
 					Field.Name + ", Median", Statistic.Median.Value, NrDec, Statistic.Unit,
 					FieldType.Computed, FieldQoS.AutomaticReadout, false));
-
-				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
-					Field.Name + ", Median, Start", Statistic.Start, FieldType.Computed,
-					FieldQoS.AutomaticReadout, false));
-
-				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
-					Field.Name + ", Median, Stop", Statistic.Stop, FieldType.Computed,
-					FieldQoS.AutomaticReadout, false));
 
 				// TODO: Localization steps
 			}
@@ -308,14 +294,6 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 					Field.Name + ", Min", Statistic.Min.Value, NrDec, Statistic.Unit,
 					FieldType.Peak, FieldQoS.AutomaticReadout, false));
 
-				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
-					Field.Name + ", Min, Start", Statistic.Start, FieldType.Peak,
-					FieldQoS.AutomaticReadout, false));
-
-				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
-					Field.Name + ", Min, Stop", Statistic.Stop, FieldType.Peak,
-					FieldQoS.AutomaticReadout, false));
-
 				// TODO: Localization steps
 			}
 
@@ -324,14 +302,6 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 				Fields.Add(new QuantityField(Field.Thing, Statistic.Stop,
 					Field.Name + ", Max", Statistic.Max.Value, NrDec, Statistic.Unit,
 					FieldType.Peak, FieldQoS.AutomaticReadout, false));
-
-				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
-					Field.Name + ", Max, Start", Statistic.Start, FieldType.Peak,
-					FieldQoS.AutomaticReadout, false));
-
-				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
-					Field.Name + ", Max, Stop", Statistic.Stop, FieldType.Peak,
-					FieldQoS.AutomaticReadout, false));
 
 				// TODO: Localization steps
 			}
@@ -342,14 +312,6 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 					Field.Name + ", Variance", Statistic.Variance.Value, AvgNrDec, Statistic.Unit,
 					FieldType.Computed, FieldQoS.AutomaticReadout, false));
 
-				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
-					Field.Name + ", Variance, Start", Statistic.Start, FieldType.Computed,
-					FieldQoS.AutomaticReadout, false));
-
-				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
-					Field.Name + ", Variance, Stop", Statistic.Stop, FieldType.Computed,
-					FieldQoS.AutomaticReadout, false));
-
 				// TODO: Localization steps
 			}
 
@@ -358,14 +320,6 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 				Fields.Add(new QuantityField(Field.Thing, Statistic.Stop,
 					Field.Name + ", StdDev", Statistic.StdDev.Value, AvgNrDec, Statistic.Unit,
 					FieldType.Computed, FieldQoS.AutomaticReadout, false));
-
-				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
-					Field.Name + ", StdDev, Start", Statistic.Start, FieldType.Computed,
-					FieldQoS.AutomaticReadout, false));
-
-				Fields.Add(new DateTimeField(Field.Thing, Statistic.Stop,
-					Field.Name + ", StdDev, Stop", Statistic.Stop, FieldType.Computed,
-					FieldQoS.AutomaticReadout, false));
 
 				// TODO: Localization steps
 			}

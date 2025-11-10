@@ -37,5 +37,11 @@
 			<PackagePath />
 		</None>
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+	  <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+	  <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
+	  <ProjectReference Include="..\Waher.Runtime.Collections\Waher.Runtime.Collections.csproj" />
+	</ItemGroup>
 
 </Project>

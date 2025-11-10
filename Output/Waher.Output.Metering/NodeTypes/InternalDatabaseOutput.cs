@@ -175,6 +175,10 @@ namespace Waher.Output.Metering.NodeTypes
 
 				foreach (string FieldName in this.fieldIndices ?? Array.Empty<string>())
 				{
+					string s = FieldName.Trim();
+					if (string.IsNullOrEmpty(s))
+						continue;
+
 					await this.AddIndexIfNotDefined(Indices, new string[]
 					{
 						FieldName,

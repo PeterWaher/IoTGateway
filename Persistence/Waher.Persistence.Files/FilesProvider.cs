@@ -1003,7 +1003,7 @@ namespace Waher.Persistence.Files
 					}
 				}
 			}
-		
+
 			return new KeyValuePair<byte[], byte[]>(Key, IV);
 		}
 
@@ -1070,7 +1070,7 @@ namespace Waher.Persistence.Files
 		/// encryption. If the clear text property is shorter than this, random bytes 
 		/// will be appended to pad the property to this length, before encryption.</param>
 		/// <returns>Encrypted field data.</returns>
-		public async Task<byte[]> Encrypt(byte[] Data, string Property, string Collection, 
+		public async Task<byte[]> Encrypt(byte[] Data, string Property, string Collection,
 			Guid ObjectId, int MinLength)
 		{
 			ObjectBTreeFile File = await this.GetFile(Collection, true);
@@ -2274,7 +2274,7 @@ namespace Waher.Persistence.Files
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, 
+		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter,
 			T ContinueAfter, params string[] SortOrder)
 			where T : class
 		{
@@ -2384,7 +2384,7 @@ namespace Waher.Persistence.Files
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public async Task<IEnumerable<T>> Find<T>(string Collection, int Offset, int MaxCount, 
+		public async Task<IEnumerable<T>> Find<T>(string Collection, int Offset, int MaxCount,
 			Filter Filter, T ContinueAfter, params string[] SortOrder)
 			where T : class
 		{
@@ -4199,6 +4199,39 @@ namespace Waher.Persistence.Files
 				s = s.Substring(this.folder.Length);
 
 			await this.master.RemoveAsync(s);
+		}
+
+		/// <summary>
+		/// Removes an index from a collection, if one exist.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		/// <returns>Sort order of each index. Each string represents a field name. 
+		/// By default, sort order is ascending. If descending sort order is desired, 
+		/// the field name is prefixed by a hyphen (minus) sign.</returns>
+		public async Task<string[][]> GetIndices(string CollectionName)
+		{
+			ObjectBTreeFile File = await this.GetFile(CollectionName, false);
+			if (File is null)
+				return new string[0][];
+
+			ChunkedList<string[]> Indices = new ChunkedList<string[]>();
+
+			foreach (IndexBTreeFile IndexFile in File.Indices)
+			{
+				string[] FieldNames = (string[])IndexFile.FieldNames.Clone();
+				bool[] Ascending = IndexFile.Ascending;
+				int i, c = Math.Min(FieldNames.Length, Ascending.Length);
+
+				for (i = 0; i < c; i++)
+				{
+					if (!Ascending[i])
+						FieldNames[i] = "-" + FieldNames;
+				}
+
+				Indices.Add(FieldNames);
+			}
+
+			return Indices.ToArray();
 		}
 
 		#endregion

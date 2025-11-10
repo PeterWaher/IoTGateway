@@ -17,6 +17,7 @@ using Waher.Persistence.MongoDB.Serialization.ReferenceTypes;
 using Waher.Persistence.MongoDB.Serialization.ValueTypes;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Cache;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Profiling;
 
@@ -1607,7 +1608,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="CollectionName">Name of collection.</param>
 		/// <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		public Task AddIndex(string CollectionName, string[] FieldNames)
+		public async Task AddIndex(string CollectionName, string[] FieldNames)
 		{
 			IMongoCollection<BsonDocument> Collection;
 			List<BsonDocument> Indices;
@@ -1617,10 +1618,10 @@ namespace Waher.Persistence.MongoDB
 			else
 				Collection = this.GetCollection(CollectionName);
 
-			IAsyncCursor<BsonDocument> Cursor = Collection.Indexes.List();
-			Indices = Cursor.ToList<BsonDocument>();
+			IAsyncCursor<BsonDocument> Cursor = await Collection.Indexes.ListAsync();
+			Indices = await Cursor.ToListAsync<BsonDocument>();
 
-			return ObjectSerializer.CheckIndexExists(Collection, Indices, FieldNames, null);
+			await ObjectSerializer.CheckIndexExists(Collection, Indices, FieldNames, null);
 		}
 
 		/// <summary>
@@ -1629,7 +1630,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="CollectionName">Name of collection.</param>
 		/// <param name="FieldNames">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		public Task RemoveIndex(string CollectionName, string[] FieldNames)
+		public async Task RemoveIndex(string CollectionName, string[] FieldNames)
 		{
 			IMongoCollection<BsonDocument> Collection;
 			List<BsonDocument> Indices;
@@ -1639,10 +1640,76 @@ namespace Waher.Persistence.MongoDB
 			else
 				Collection = this.GetCollection(CollectionName);
 
-			IAsyncCursor<BsonDocument> Cursor = Collection.Indexes.List();
-			Indices = Cursor.ToList<BsonDocument>();
+			IAsyncCursor<BsonDocument> Cursor = await Collection.Indexes.ListAsync();
+			Indices = await Cursor.ToListAsync<BsonDocument>();
 
-			return ObjectSerializer.RemoveIndex(Collection, Indices, FieldNames);
+			await ObjectSerializer.RemoveIndex(Collection, Indices, FieldNames);
+		}
+
+		/// <summary>
+		/// Removes an index from a collection, if one exist.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		/// <returns>Sort order of each index. Each string represents a field name. 
+		/// By default, sort order is ascending. If descending sort order is desired, 
+		/// the field name is prefixed by a hyphen (minus) sign.</returns>
+		public async Task<string[][]> GetIndices(string CollectionName)
+		{
+			IMongoCollection<BsonDocument> Collection;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.DefaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			IAsyncCursor<BsonDocument> Cursor = await Collection.Indexes.ListAsync();
+			ChunkedList<string[]> Result = new ChunkedList<string[]>();
+
+			while (await Cursor.MoveNextAsync())
+			{
+				foreach (BsonDocument Index in Cursor.Current)
+				{
+					ChunkedList<string> FieldNames = null;
+
+					foreach (BsonElement E in Index.Elements)
+					{
+						if (E.Name != "key")
+							continue;
+
+						FieldNames = new ChunkedList<string>();
+
+						foreach (BsonElement E2 in E.Value.AsBsonDocument.Elements)
+						{
+							// Value is typically 1 (ascending) or -1 (descending). Can also be "text" etc.
+							if (E2.Value.IsInt32 || E2.Value.IsInt64 || E2.Value.IsDouble)
+							{
+								double v = E2.Value.ToDouble();
+								if (v < 0)
+									FieldNames.Add("-" + E2.Name);
+								else
+									FieldNames.Add(E2.Name);
+							}
+							else if (E2.Value.IsString)
+							{
+								// For text or hashed indexes we just report the field name without sign.
+								FieldNames.Add(E2.Name);
+							}
+							else
+							{
+								// Fallback: just add field name.
+								FieldNames.Add(E2.Name);
+							}
+						}
+
+						break; // Done with this index.
+					}
+
+					if (FieldNames != null && FieldNames.Count > 0)
+						Result.Add(FieldNames.ToArray());
+				}
+			}
+
+			return Result.ToArray();
 		}
 
 		/// <summary>

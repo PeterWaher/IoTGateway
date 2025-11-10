@@ -34,12 +34,13 @@ namespace Waher.Runtime.Statistics
 		private double min = double.MaxValue;
 		private double max = double.MinValue;
 		private bool hasSamples = false;
+		private bool persistSamples = false;
 
 		/// <summary>
 		/// Statistical bucket
 		/// </summary>
 		public Bucket()
-			: this(null, false, DateTime.MinValue, Duration.Zero)
+			: this(null, false, DateTime.MinValue, Duration.Zero, false)
 		{
 		}
 
@@ -51,7 +52,9 @@ namespace Waher.Runtime.Statistics
 		/// values are to be calculated, samples need to be retained in the period.</param>
 		/// <param name="StartTime">Starting time</param>
 		/// <param name="BucketTime">Duration of one bucket, where statistics is collected.</param>
-		public Bucket(string Id, bool RetainSamplesInPeriod, DateTime StartTime, Duration BucketTime)
+		/// <param name="PersistSamples">If samples generated should be persisted.</param>
+		public Bucket(string Id, bool RetainSamplesInPeriod, DateTime StartTime, 
+			Duration BucketTime, bool PersistSamples)
 		{
 			this.id = Id;
 			this.samples = RetainSamplesInPeriod ? new ChunkedList<double>() : null;
@@ -59,6 +62,7 @@ namespace Waher.Runtime.Statistics
 			this.bucketTime = BucketTime;
 			this.start = StartTime;
 			this.stop = this.start + BucketTime;
+			this.persistSamples = PersistSamples;
 		}
 
 		/// <summary>
@@ -111,6 +115,15 @@ namespace Waher.Runtime.Statistics
 		{
 			get => this.retainSamplesInPeriod;
 			set => this.retainSamplesInPeriod = value;
+		}
+
+		/// <summary>
+		/// If samples generated should be persisted.
+		/// </summary>
+		public bool PersistSamples
+		{
+			get => this.persistSamples;
+			set => this.persistSamples = value;
 		}
 
 		/// <summary>
@@ -332,8 +345,8 @@ namespace Waher.Runtime.Statistics
 		/// <summary>
 		/// Increments counter.
 		/// </summary>
-		/// <returns>Start time of bucket that was incremented.</returns>
-		public Task<DateTime> Inc()
+		/// <returns>Sample statistic of last period, if period changed.</returns>
+		public Task<SampleStatistic> Inc()
 		{
 			DateTime Timestamp = DateTime.UtcNow;
 			long Count;
@@ -349,8 +362,8 @@ namespace Waher.Runtime.Statistics
 		/// <summary>
 		/// Decrements counter.
 		/// </summary>
-		/// <returns>Start time of bucket that was incremented.</returns>
-		public Task<DateTime> Dec()
+		/// <returns>Sample statistic of last period, if period changed.</returns>
+		public Task<SampleStatistic> Dec()
 		{
 			DateTime Timestamp = DateTime.UtcNow;
 			long Count;
@@ -437,8 +450,8 @@ namespace Waher.Runtime.Statistics
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of value.</param>
 		/// <param name="Value">Sample value reported</param>
-		/// <returns>Start time of bucket to which the value was reported.</returns>
-		public Task<DateTime> Sample(DateTime Timestamp, PhysicalQuantity Value)
+		/// <returns>Sample statistic of last period, if period changed.</returns>
+		public Task<SampleStatistic> Sample(DateTime Timestamp, PhysicalQuantity Value)
 		{
 			double v;
 
@@ -459,16 +472,25 @@ namespace Waher.Runtime.Statistics
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of value.</param>
 		/// <param name="Value">Sample value reported</param>
-		/// <returns>Start time of bucket to which the value was reported.</returns>
-		public async Task<DateTime> Sample(DateTime Timestamp, double Value)
+		/// <returns>Sample statistic of last period, if period changed.</returns>
+		public async Task<SampleStatistic> Sample(DateTime Timestamp, double Value)
 		{
+			ChunkedList<SampleStatistic> Statistics = null;
 			SampleStatistic Statistic = null;
 			DateTime Result;
 
 			lock (this)
 			{
 				while (Timestamp >= this.stop)
+				{
+					if (!(Statistic is null))
+					{
+						Statistics ??= new ChunkedList<SampleStatistic>();
+						Statistics.Add(Statistic);
+					}
+
 					Statistic = this.NextStatisticLocked();
+				}
 
 				this.sum += Value;
 				this.count++;
@@ -497,13 +519,21 @@ namespace Waher.Runtime.Statistics
 				Result = this.start;
 			}
 
-			if (!(Statistic is null))
-				await Database.Insert(Statistic);
+			if (this.persistSamples && !(Statistic is null))
+			{
+				if (Statistics is null)
+					await Database.Insert(Statistic);
+				else
+				{
+					Statistics.Add(Statistic);
+					await Database.Insert(Statistics);
+				}
+			}
 
 			if (!string.IsNullOrEmpty(this.objectId))
 				await Database.Update(this);
 
-			return Result;
+			return Statistic;
 		}
 
 		/// <summary>
@@ -513,13 +543,22 @@ namespace Waher.Runtime.Statistics
 		/// <returns>Start time of bucket to which the value was reported.</returns>
 		public async Task<DateTime> CountOccurrence(DateTime Timestamp)
 		{
+			ChunkedList<SampleStatistic> Statistics = null;
 			SampleStatistic Statistic = null;
 			DateTime Result;
 
 			lock (this)
 			{
 				while (Timestamp >= this.stop)
+				{
+					if (!(Statistic is null))
+					{
+						Statistics ??= new ChunkedList<SampleStatistic>();
+						Statistics.Add(Statistic);
+					}
+
 					Statistic = this.NextStatisticLocked();
+				}
 
 				this.count++;
 				this.totCount++;
@@ -527,8 +566,16 @@ namespace Waher.Runtime.Statistics
 				Result = this.start;
 			}
 
-			if (!(Statistic is null))
-				await Database.Insert(Statistic);
+			if (this.persistSamples && !(Statistic is null))
+			{
+				if (Statistics is null)
+					await Database.Insert(Statistic);
+				else
+				{
+					Statistics.Add(Statistic);
+					await Database.Insert(Statistics);
+				}
+			}
 
 			if (!string.IsNullOrEmpty(this.objectId))
 				await Database.Update(this);
@@ -610,22 +657,26 @@ namespace Waher.Runtime.Statistics
 		/// <summary>
 		/// Terminates the ongoing collection of data.
 		/// </summary>
-		public async Task FlushAsync()
+		/// <returns>Sample statistic of last period, if period changed.</returns>
+		public async Task<SampleStatistic> FlushAsync()
 		{
 			SampleStatistic Statistic;
 
 			lock (this)
 			{
 				if (this.count == 0)
-					return;
+					return null;
 
 				Statistic = this.NextStatisticLocked();
 			}
 
-			await Database.Insert(Statistic);
+			if (this.persistSamples)
+				await Database.Insert(Statistic);
 
 			if (!string.IsNullOrEmpty(this.objectId))
 				await Database.Update(this);
+
+			return Statistic;
 		}
 	}
 }

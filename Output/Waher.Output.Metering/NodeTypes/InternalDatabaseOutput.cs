@@ -181,14 +181,14 @@ namespace Waher.Output.Metering.NodeTypes
 
 					await this.AddIndexIfNotDefined(Indices, new string[]
 					{
-						FieldName,
+						s,
 						"NodeId",
 						"Timestamp"
 					});
 
 					await this.AddIndexIfNotDefined(Indices, new string[]
 					{
-						FieldName,
+						s,
 						"Timestamp",
 						"NodeId"
 					});

@@ -36,7 +36,7 @@ namespace Waher.Output.Metering.NodeTypes
 		/// <summary>
 		/// Collection to store data in.
 		/// </summary>
-		[Header(2, "Collection:", 0)]
+		[Header(2, "Collection:", 10)]
 		[Page(3, "Output", 0)]
 		[ToolTip(4, "Name of collection in internal database that will house the sensor data.")]
 		[Required]
@@ -57,7 +57,7 @@ namespace Waher.Output.Metering.NodeTypes
 		/// <summary>
 		/// Fields to index in collection.
 		/// </summary>
-		[Header(5, "Index field names:", 10)]
+		[Header(5, "Index field names:", 20)]
 		[Page(3, "Output", 0)]
 		[ToolTip(6, "Indices will be added on these field names for quicker access to records.")]
 		public string[] FieldIndices
@@ -76,7 +76,7 @@ namespace Waher.Output.Metering.NodeTypes
 		/// <summary>
 		/// If physical quantity units should be stored.
 		/// </summary>
-		[Header(7, "Store physical units.", 20)]
+		[Header(7, "Store physical units.", 30)]
 		[Page(3, "Output", 0)]
 		[ToolTip(8, "If physical units should be stored in a separate property.")]
 		public bool StoreUnits { get; set; }
@@ -84,7 +84,7 @@ namespace Waher.Output.Metering.NodeTypes
 		/// <summary>
 		/// If field type should be stored.
 		/// </summary>
-		[Header(9, "Store field type.", 30)]
+		[Header(9, "Store field type.", 40)]
 		[Page(3, "Output", 0)]
 		[ToolTip(10, "If field type should be stored in a separate property.")]
 		public bool StoreFieldType { get; set; }
@@ -92,7 +92,7 @@ namespace Waher.Output.Metering.NodeTypes
 		/// <summary>
 		/// If field type should be stored.
 		/// </summary>
-		[Header(11, "Store quality of service.", 40)]
+		[Header(11, "Store quality of service.", 50)]
 		[Page(3, "Output", 0)]
 		[ToolTip(12, "If quality of service should be stored in a separate property.")]
 		public bool StoreQoS { get; set; }

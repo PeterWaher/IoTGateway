@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Output.Commands;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
-using Waher.Output.Commands;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Runtime.Threading;
 using Waher.Things;
@@ -850,11 +851,8 @@ namespace Waher.Output
 		/// <returns>Set of displayable parameters.</returns>
 		public async Task<Parameter[]> GetDisplayableParameterAraryAsync(Language Language, RequestOrigin Caller)
 		{
-			List<Parameter> Result = new List<Parameter>();
-
-			foreach (Parameter P in await this.GetDisplayableParametersAsync(Language, Caller))
-				Result.Add(P);
-
+			ChunkedList<Parameter> Result = new ChunkedList<Parameter>();
+			Result.AddRange(await this.GetDisplayableParametersAsync(Language, Caller));
 			return Result.ToArray();
 		}
 

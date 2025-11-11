@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using System.Xml;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xml;
 using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.Sniffers;
@@ -217,7 +217,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Raised when the node has been updated. The sender argument will contain a reference to the node.
 		/// </summary>
-		public event EventHandler Updated = null;
+		public event EventHandler<SelectableItemEventArgs> Updated = null;
 
 		/// <summary>
 		/// Raises the <see cref="Updated"/> event.
@@ -250,12 +250,12 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Event raised when the node has been expanded.
 		/// </summary>
-		public event EventHandler Expanded = null;
+		public event EventHandler<SelectableItemEventArgs> Expanded = null;
 
 		/// <summary>
 		/// Event raised when the node has been collapsed.
 		/// </summary>
-		public event EventHandler Collapsed = null;
+		public event EventHandler<SelectableItemEventArgs> Collapsed = null;
 
 		/// <summary>
 		/// Raises the <see cref="Expanded"/> event.
@@ -369,10 +369,10 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		/// <param name="Parent">Parent node.</param>
 		/// <param name="OnDeleted">Method called when node has been successfully deleted.</param>
-		public virtual Task Delete(TreeNode Parent, EventHandler OnDeleted)
+		public virtual Task Delete(TreeNode Parent, EventHandler<SelectableItemEventArgs> OnDeleted)
 		{
 			Parent?.RemoveChild(this);
-			OnDeleted.Raise(this, EventArgs.Empty);
+			OnDeleted.Raise(this, new SelectableItemEventArgs(this));
 			return Task.CompletedTask;
 		}
 
@@ -612,18 +612,12 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If it's possible to search for data on the node.
 		/// </summary>
-		public virtual bool CanSearch
-		{
-			get { return false; }
-		}
+		public virtual bool CanSearch => false;
 
 		/// <summary>
 		/// Performs a search on the node.
 		/// </summary>
-		public virtual void Search()
-		{
-			throw new NotSupportedException();
-		}
+		public virtual void Search() => throw new NotSupportedException();
 
 		/// <summary>
 		/// Adds context sensitive menu items to a context menu.

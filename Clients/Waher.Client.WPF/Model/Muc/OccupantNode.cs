@@ -76,12 +76,12 @@ namespace Waher.Client.WPF.Model.Muc
 
 		private void SetParameters()
 		{
-			List<Parameter> Parameters = new List<Parameter>()
-			{
+			List<Parameter> Parameters =
+			[
 				new StringParameter("RoomID", "Room ID", this.roomId),
 				new StringParameter("Domain", "Domain", this.domain),
 				new StringParameter("NickName", "Nick-Name", this.nickName)
-			};
+			];
 
 			if (!string.IsNullOrEmpty(this.jid))
 				Parameters.Add(new StringParameter("JID", "JID", this.jid));
@@ -95,7 +95,7 @@ namespace Waher.Client.WPF.Model.Muc
 			if (this.availability.HasValue)
 				Parameters.Add(new StringParameter("Availability", "Availability", this.Availability.ToString()));
 
-			this.parameters = new DisplayableParameters(Parameters.ToArray());
+			this.parameters = new DisplayableParameters([.. Parameters]);
 		}
 
 		public override string ToolTip => this.Jid;
@@ -116,28 +116,15 @@ namespace Waher.Client.WPF.Model.Muc
 				if (!this.availability.HasValue)
 					return XmppAccountNode.offline;
 
-				switch (this.availability.Value)
+				return this.availability.Value switch
 				{
-					case Networking.XMPP.Availability.Away:
-						return XmppAccountNode.away;
-
-					case Networking.XMPP.Availability.Chat:
-						return XmppAccountNode.chat;
-
-					case Networking.XMPP.Availability.DoNotDisturb:
-						return XmppAccountNode.busy;
-
-					case Networking.XMPP.Availability.ExtendedAway:
-						return XmppAccountNode.away;
-
-
-					case Networking.XMPP.Availability.Online:
-						return XmppAccountNode.online;
-
-					case Networking.XMPP.Availability.Offline:
-					default:
-						return XmppAccountNode.offline;
-				}
+					Networking.XMPP.Availability.Away => XmppAccountNode.away,
+					Networking.XMPP.Availability.Chat => XmppAccountNode.chat,
+					Networking.XMPP.Availability.DoNotDisturb => XmppAccountNode.busy,
+					Networking.XMPP.Availability.ExtendedAway => XmppAccountNode.away,
+					Networking.XMPP.Availability.Online => XmppAccountNode.online,
+					_ => XmppAccountNode.offline,
+				};
 			}
 		}
 
@@ -179,9 +166,10 @@ namespace Waher.Client.WPF.Model.Muc
 		public override bool CanEdit => true;
 		public override bool CanChat => true;
 
-		public override async Task Delete(TreeNode Parent, EventHandler OnDeleted)
+		public override async Task Delete(TreeNode Parent, 
+			EventHandler<SelectableItemEventArgs> OnDeleted)
 		{
-			if (!(this.MucClient is null))
+			if (this.MucClient is not null)
 				await this.MucClient.Kick(this.RoomId, this.domain, this.nickName, null, null);
 
 			await base.Delete(Parent, OnDeleted);
@@ -189,7 +177,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 		public override void Edit()
 		{
-			OccupantPrivilegesForm Form = new OccupantPrivilegesForm();
+			OccupantPrivilegesForm Form = new();
 
 			Form.Affiliation.SelectedIndex = (int)this.affiliation;
 			Form.Role.SelectedIndex = (int)this.role;
@@ -366,7 +354,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 		private void Ban_Click(object Sender, RoutedEventArgs e)
 		{
-			BanOccupantForm Form = new BanOccupantForm(this.nickName);
+			BanOccupantForm Form = new(this.nickName);
 			bool? b = Form.ShowDialog();
 
 			if (b.HasValue && b.Value)

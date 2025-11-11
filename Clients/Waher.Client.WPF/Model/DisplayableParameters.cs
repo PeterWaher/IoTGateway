@@ -1,12 +1,12 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Waher.Things.DisplayableParameters;
 
 namespace Waher.Client.WPF.Model
 {
-	public class DisplayableParameters
+	public class DisplayableParameters : IEnumerable<Parameter>
 	{
-		private readonly Dictionary<string, Parameter> parameters = new Dictionary<string, Parameter>();
+		private readonly Dictionary<string, Parameter> parameters = [];
 		private Parameter[] ordered;
 
 		public DisplayableParameters(Parameter[] Parameters)
@@ -27,6 +27,22 @@ namespace Waher.Client.WPF.Model
 				this.parameters[P.Id] = P;
 
 			this.ordered = null;
+		}
+
+		public void Clear()
+		{
+			this.parameters.Clear();
+			this.ordered = null;
+		}
+
+		public IEnumerator<Parameter> GetEnumerator()
+		{
+			return this.parameters.Values.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return this.parameters.Values.GetEnumerator();
 		}
 
 		public Parameter[] Ordered

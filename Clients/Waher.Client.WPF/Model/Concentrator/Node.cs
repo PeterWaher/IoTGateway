@@ -541,7 +541,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// </summary>
 		/// <param name="Parent">Parent node.</param>
 		/// <param name="OnDeleted">Method called when node has been successfully deleted.</param>
-		public override async Task Delete(TreeNode Parent, EventHandler OnDeleted)
+		public override async Task Delete(TreeNode Parent, 
+			EventHandler<SelectableItemEventArgs> OnDeleted)
 		{
 			string FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;

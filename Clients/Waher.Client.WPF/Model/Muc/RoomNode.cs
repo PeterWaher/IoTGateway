@@ -23,7 +23,7 @@ namespace Waher.Client.WPF.Model.Muc
 	/// </summary>
 	public class RoomNode : TreeNode
 	{
-		private readonly Dictionary<string, OccupantNode> occupantByNick = new Dictionary<string, OccupantNode>();
+		private readonly Dictionary<string, OccupantNode> occupantByNick = [];
 		private readonly string roomId;
 		private readonly string domain;
 		private readonly string name;
@@ -81,11 +81,11 @@ namespace Waher.Client.WPF.Model.Muc
 
 		private void SetParameters()
 		{
-			List<Parameter> Parameters = new List<Parameter>()
-			{
+			List<Parameter> Parameters =
+			[
 				new StringParameter("RoomID", "Room ID", this.roomId),
 				new StringParameter("Domain", "Domain", this.domain)
-			};
+			];
 
 			if (!string.IsNullOrEmpty(this.name))
 				Parameters.Add(new StringParameter("Name", "Name", this.name));
@@ -98,7 +98,7 @@ namespace Waher.Client.WPF.Model.Muc
 				{ string.Empty, new Loading(this) }
 			};
 
-			this.parameters = new DisplayableParameters(Parameters.ToArray());
+			this.parameters = new DisplayableParameters([.. Parameters]);
 		}
 
 		public override string ToolTip => this.name;
@@ -196,7 +196,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 						if (e.Ok)
 						{
-							SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
+							SortedDictionary<string, TreeNode> Children = [];
 
 							lock (this.occupantByNick)
 							{
@@ -253,7 +253,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 			if (this.IsLoaded)
 			{
-				if (!(this.children is null))
+				if (this.children is not null)
 					this.Service?.NodesRemoved(this.children.Values, this);
 
 				this.children = new SortedDictionary<string, TreeNode>()
@@ -315,7 +315,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 					while (!(e?.Ok ?? false))
 					{
-						TaskCompletionSource<bool> InputReceived = new TaskCompletionSource<bool>();
+						TaskCompletionSource<bool> InputReceived = new();
 
 						if (Form is null)
 						{
@@ -408,9 +408,10 @@ namespace Waher.Client.WPF.Model.Muc
 			}
 		}
 
-		public override async Task Delete(TreeNode Parent, EventHandler OnDeleted)
+		public override async Task Delete(TreeNode Parent, 
+			EventHandler<SelectableItemEventArgs> OnDeleted)
 		{
-			DestroyRoomForm Form = new DestroyRoomForm(this.Header)
+			DestroyRoomForm Form = new(this.Header)
 			{
 				Owner = MainWindow.currentInstance
 			};
@@ -441,7 +442,7 @@ namespace Waher.Client.WPF.Model.Muc
 		{
 			try
 			{
-				SendRoomInvitationForm Form = new SendRoomInvitationForm()
+				SendRoomInvitationForm Form = new()
 				{
 					Owner = MainWindow.currentInstance
 				};
@@ -507,7 +508,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 		private OccupantNode AddOccupantNode(string RoomId, string Domain, string NickName, Affiliation? Affiliation, Role? Role, string Jid)
 		{
-			OccupantNode Node = new OccupantNode(this, RoomId, Domain, NickName, Affiliation, Role, Jid);
+			OccupantNode Node = new(this, RoomId, Domain, NickName, Affiliation, Role, Jid);
 
 			lock (this.occupantByNick)
 			{
@@ -530,7 +531,7 @@ namespace Waher.Client.WPF.Model.Muc
 				{
 					this.Service?.Account?.View?.NodeAdded(this, Node);
 
-					if (!(Node.Children is null))
+					if (Node.Children is not null)
 					{
 						foreach (TreeNode Node2 in Node.Children)
 							this.Service?.Account?.View?.NodeAdded(Node, Node2);
@@ -734,7 +735,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 		private void ChangeSubject_Click(object Sender, RoutedEventArgs e)
 		{
-			ChangeSubjectForm Form = new ChangeSubjectForm()
+			ChangeSubjectForm Form = new()
 			{
 				Owner = MainWindow.currentInstance
 			};
@@ -790,7 +791,7 @@ namespace Waher.Client.WPF.Model.Muc
 		{
 			if (e.Ok)
 			{
-				OccupantListForm Form = new OccupantListForm((string)e.State, e.Occupants)
+				OccupantListForm Form = new((string)e.State, e.Occupants)
 				{
 					Owner = MainWindow.currentInstance
 				};

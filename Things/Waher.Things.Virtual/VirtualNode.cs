@@ -418,7 +418,7 @@ namespace Waher.Things.Virtual
 			else
 				this.SetMetaDataPriv(Name, Value);
 
-			await Database.Update(this);
+			await this.UpdateAsync();
 		}
 
 		private void SetMetaDataPriv(string Name, object Value)

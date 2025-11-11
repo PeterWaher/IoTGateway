@@ -42,6 +42,16 @@
 		<Namespace name="Waher.Jobs.NodeTypes">
 			<String id="1">Root</String>
 			<String id="2">Job</String>
+			<String id="3">Scheduled execution time:</String>
+			<String id="4">When the job is scheduled to execute.</String>
+			<String id="5">Job Period:</String>
+			<String id="6">Time between job executions. Defines a repetitive job.</String>
+			<String id="7">Burst count:</String>
+			<String id="8">Number of times the job will be executed each period.</String>
+			<String id="9">Burst Interval:</String>
+			<String id="10">Time between job executions in a burst.</String>
+			<String id="11">Burst count left:</String>
+			<String id="12">Number of times left the job will be executed within the current period.</String>
 		</Namespace>
 	</Language>
 </Translation>

@@ -54,6 +54,9 @@
 			<String id="12">Period</String>
 			<String id="13">Burst Interval</String>
 			<String id="14">Burst Count</String>
+			<String id="15">Expires:</String>
+			<String id="16">Repetitive job is not scheduled after this point in time.</String>
+			<String id="17">Expires</String>
 		</Namespace>
 	</Language>
 </Translation>

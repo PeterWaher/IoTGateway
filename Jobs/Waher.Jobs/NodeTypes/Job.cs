@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Events;
 using Waher.Groups;
 using Waher.Jobs.Commands;
 using Waher.Persistence.Attributes;
@@ -23,6 +22,7 @@ namespace Waher.Jobs.NodeTypes
 		private DateTime? executionTime = null;
 		private Duration? period = null;
 		private Duration? burstInterval = null;
+		private DateTime? expires = null;
 		private int burstCount = 1;
 
 		/// <summary>
@@ -82,6 +82,19 @@ namespace Waher.Jobs.NodeTypes
 		{
 			get => this.burstInterval;
 			set => this.burstInterval = value;
+		}
+
+		/// <summary>
+		/// Gets or sets the scheduled execution time of the job.
+		/// </summary>
+		[Header(15, "Expires:", 40)]
+		[Page(2, "Job", 0)]
+		[ToolTip(16, "Repetitive job is not scheduled after this point in time.")]
+		[DefaultValueNull]
+		public DateTime? Expires
+		{
+			get => this.expires;
+			set => this.expires = value;
 		}
 
 		/// <summary>
@@ -260,6 +273,13 @@ namespace Waher.Jobs.NodeTypes
 				Parameters.AddLast(new Int32Parameter("BurstCount",
 					await Language.GetStringAsync(typeof(Job), 14, "Burst Count"),
 					this.burstCount));
+			}
+
+			if (this.expires.HasValue)
+			{
+				Parameters.AddLast(new DateTimeParameter("Expires",
+					await Language.GetStringAsync(typeof(Job), 17, "Expires"),
+					this.expires.Value));
 			}
 
 			return Parameters;

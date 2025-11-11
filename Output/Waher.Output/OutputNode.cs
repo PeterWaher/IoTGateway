@@ -1087,7 +1087,7 @@ namespace Waher.Output
 				IsReadable = this.IsReadable,
 				IsControllable = this.IsControllable,
 				HasCommands = this.HasCommands,
-				ParentId = this.NodeId,
+				ParentId = (await this.GetParent()).NodeId,
 				ParentPartition = this.Partition,
 				Updated = this.Updated,
 				State = this.State,

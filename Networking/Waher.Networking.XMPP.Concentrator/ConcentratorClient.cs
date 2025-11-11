@@ -623,7 +623,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			if (s.Length == 6)
 			{
-				if (byte.TryParse(s.Substring(0, 2), NumberStyles.HexNumber, null, out byte R) &&
+				if (byte.TryParse(s[..2], NumberStyles.HexNumber, null, out byte R) &&
 					byte.TryParse(s.Substring(2, 2), NumberStyles.HexNumber, null, out byte G) &&
 					byte.TryParse(s.Substring(4, 2), NumberStyles.HexNumber, null, out byte B))
 				{
@@ -633,7 +633,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 			else if (s.Length == 8)
 			{
-				if (byte.TryParse(s.Substring(0, 2), NumberStyles.HexNumber, null, out byte R) &&
+				if (byte.TryParse(s[..2], NumberStyles.HexNumber, null, out byte R) &&
 					byte.TryParse(s.Substring(2, 2), NumberStyles.HexNumber, null, out byte G) &&
 					byte.TryParse(s.Substring(4, 2), NumberStyles.HexNumber, null, out byte B) &&
 					byte.TryParse(s.Substring(6, 2), NumberStyles.HexNumber, null, out byte A))

@@ -14,7 +14,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 	/// </summary>
 	public class DataSource : TreeNode
 	{
-		private readonly Dictionary<string, Node> nodes = new Dictionary<string, Node>();
+		private readonly Dictionary<string, Node> nodes = [];
 		private DateTime timer = DateTime.MinValue;
 		private readonly string key;
 		private readonly string header;
@@ -110,11 +110,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 							if (e.Ok)
 							{
-								SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
+								SortedDictionary<string, TreeNode> Children = [];
 
 								foreach (DataSourceReference Ref in e.DataSources)
 								{
-									DataSource DataSource = new DataSource(this, Ref.SourceID, Ref.SourceID, Ref.HasChildren);
+									DataSource DataSource = new(this, Ref.SourceID, Ref.SourceID, Ref.HasChildren);
 									Children[Ref.SourceID] = DataSource;
 
 									DataSource.SubscribeToEvents();
@@ -140,7 +140,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 							if (e.Ok)
 							{
-								SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
+								SortedDictionary<string, TreeNode> Children = [];
 
 								foreach (NodeInformation Ref in e.NodesInformation)
 									Children[Ref.NodeId] = new Node(this, Ref);
@@ -204,7 +204,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			if (this.unsubscribed)
 				return;
 
-			if (!(State is bool))
+			if (State is not bool)
 				return;
 
 			XmppConcentrator Concentrator = this.Concentrator;
@@ -267,7 +267,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			if (this.IsLoaded)
 			{
-				if (!(this.children is null))
+				if (this.children is not null)
 					this.NodesRemoved(this.children.Values, this);
 
 				this.children = new SortedDictionary<string, TreeNode>()
@@ -360,7 +360,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						}
 
 						Node.Parent.RemoveChild(Node);
-						this.NodesRemoved(new TreeNode[] { Node }, Node.Parent);
+						this.NodesRemoved([Node], Node.Parent);
 					}
 					break;
 

@@ -21,15 +21,15 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public partial class LogView : UserControl, ITabView
 	{
-		private readonly string identifier;
-		private LogSink sink;
+		private readonly string? identifier;
+		private LogSink? sink;
 
 		/// <summary>
 		/// Interaction logic for LogView.xaml
 		/// </summary>
 		/// <param name="Identifier">Identifier</param>
 		/// <param name="Register">If the log view should be registered with <see cref="Log"/>.</param>
-		public LogView(string Identifier, bool Register)
+		public LogView(string? Identifier, bool Register)
 		{
 			this.identifier = Identifier;
 
@@ -54,7 +54,7 @@ namespace Waher.Client.WPF.Controls
 
 		public void Dispose()
 		{
-			if (!(this.sink is null))
+			if (this.sink is not null)
 			{
 				Log.Unregister(this.sink);
 				this.sink = null;
@@ -86,7 +86,7 @@ namespace Waher.Client.WPF.Controls
 
 		public void SaveAsButton_Click(object Sender, RoutedEventArgs e)
 		{
-			SaveFileDialog Dialog = new SaveFileDialog()
+			SaveFileDialog Dialog = new()
 			{
 				AddExtension = true,
 				CheckPathExists = true,
@@ -104,7 +104,7 @@ namespace Waher.Client.WPF.Controls
 				{
 					if (Dialog.FilterIndex == 2)
 					{
-						StringBuilder Xml = new StringBuilder();
+						StringBuilder Xml = new();
 						using (XmlWriter w = XmlWriter.Create(Xml, XML.WriterSettings(true, true)))
 						{
 							this.SaveAsXml(w);
@@ -116,13 +116,10 @@ namespace Waher.Client.WPF.Controls
 					}
 					else
 					{
-						using (FileStream f = File.Create(Dialog.FileName))
-						{
-							using (XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false)))
-							{
-								this.SaveAsXml(w);
-							}
-						}
+						using FileStream f = File.Create(Dialog.FileName);
+						using XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false));
+						
+						this.SaveAsXml(w);
 					}
 				}
 				catch (Exception ex)
@@ -172,14 +169,14 @@ namespace Waher.Client.WPF.Controls
 
 				w.WriteEndElement();
 
-				if (!(Event.Tags is null) && Event.Tags.Length > 0)
+				if (Event.Tags is not null && Event.Tags.Length > 0)
 				{
 					foreach (KeyValuePair<string, object> Tag in Event.Tags)
 					{
 						w.WriteStartElement("Tag");
 						w.WriteAttributeString("key", Tag.Key);
 
-						if (!(Tag.Value is null))
+						if (Tag.Value is not null)
 							w.WriteAttributeString("value", Tag.Value.ToString());
 
 						w.WriteEndElement();
@@ -211,7 +208,7 @@ namespace Waher.Client.WPF.Controls
 
 		internal static string Encode(DateTime DT)
 		{
-			StringBuilder sb = new StringBuilder();
+			StringBuilder sb = new();
 
 			sb.Append(DT.Year.ToString("D4"));
 			sb.Append('-');
@@ -228,7 +225,7 @@ namespace Waher.Client.WPF.Controls
 			sb.Append(DT.Millisecond.ToString("D3"));
 
 			if (DT.Kind == DateTimeKind.Utc)
-				sb.Append("Z");
+				sb.Append('Z');
 
 			return sb.ToString();
 		}
@@ -237,7 +234,7 @@ namespace Waher.Client.WPF.Controls
 		{
 			try
 			{
-				OpenFileDialog Dialog = new OpenFileDialog()
+				OpenFileDialog Dialog = new()
 				{
 					AddExtension = true,
 					CheckFileExists = true,
@@ -253,7 +250,7 @@ namespace Waher.Client.WPF.Controls
 
 				if (Result.HasValue && Result.Value)
 				{
-					XmlDocument Xml = new XmlDocument()
+					XmlDocument Xml = new()
 					{
 						PreserveWhitespace = true
 					};
@@ -293,9 +290,9 @@ namespace Waher.Client.WPF.Controls
 				string Actor = XML.Attribute(E, "actor");
 				string Module = XML.Attribute(E, "module");
 				string Facility = XML.Attribute(E, "facility");
-				StringBuilder Message = new StringBuilder();
+				StringBuilder Message = new();
 				StringBuilder StackTrace = null;
-				List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>();
+				List<KeyValuePair<string, object>> Tags = [];
 
 				foreach (XmlNode N2 in E.ChildNodes)
 				{
@@ -325,8 +322,7 @@ namespace Waher.Client.WPF.Controls
 							break;
 
 						case "StackTrace":
-							if (StackTrace is null)
-								StackTrace = new StringBuilder();
+							StackTrace ??= new StringBuilder();
 
 							foreach (XmlNode N3 in E2.ChildNodes)
 							{
@@ -341,8 +337,8 @@ namespace Waher.Client.WPF.Controls
 					}
 				}
 
-				Event Event = new Event(Timestamp, Type, Message.ToString(), Object, Actor, EventId, Level, Facility, Module,
-					StackTrace?.ToString() ?? string.Empty, Tags.ToArray());
+				Event Event = new(Timestamp, Type, Message.ToString(), Object, Actor, EventId, Level, Facility, Module,
+					StackTrace?.ToString() ?? string.Empty, [.. Tags]);
 
 				this.Add(new LogItem(Event));
 			}

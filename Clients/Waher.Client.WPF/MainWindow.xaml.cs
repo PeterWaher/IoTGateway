@@ -87,10 +87,10 @@ namespace Waher.Client.WPF
 		public static readonly RoutedUICommand Search = new("Search", "Search", typeof(MainWindow));
 		public static readonly RoutedUICommand Script = new("Script", "Script", typeof(MainWindow));
 
-		internal static MainWindow? currentInstance = null;
-		private static string? appDataFolder = null;
-		private static FilesProvider? databaseProvider = null;
-		private static Scheduler? scheduler = new();
+		internal static MainWindow currentInstance = null;
+		private static string appDataFolder = null;
+		private static FilesProvider databaseProvider = null;
+		private static Scheduler scheduler = new();
 		private static readonly LinkedList<GuiUpdateTask> guiUpdateQueue = new();
 
 		public MainWindow()
@@ -203,9 +203,9 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		public static string? AppDataFolder => appDataFolder;
+		public static string AppDataFolder => appDataFolder;
 
-		internal static Scheduler? Scheduler => scheduler;
+		internal static Scheduler Scheduler => scheduler;
 
 		internal static readonly string registryKey = Registry.CurrentUser + @"\Software\Waher Data AB\Waher.Client.WPF";
 
@@ -299,7 +299,7 @@ namespace Waher.Client.WPF
 			this.MainView.ConnectTo_Executed(Sender, e);
 		}
 
-		public ITabView? CurrentTab
+		public ITabView CurrentTab
 		{
 			get
 			{
@@ -332,7 +332,7 @@ namespace Waher.Client.WPF
 
 		internal void SelectionChanged()
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 
 			if (Node is null)
 			{
@@ -370,7 +370,7 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		private TreeNode? SelectedNode
+		private TreeNode SelectedNode
 		{
 			get
 			{
@@ -387,9 +387,9 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		public static MainWindow? FindWindow(FrameworkElement? Element)
+		public static MainWindow FindWindow(FrameworkElement Element)
 		{
-			MainWindow? MainWindow = Element as MainWindow;
+			MainWindow MainWindow = Element as MainWindow;
 
 			while (MainWindow is null && Element is not null)
 			{
@@ -402,13 +402,13 @@ namespace Waher.Client.WPF
 
 		private void Add_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			e.CanExecute = Node is not null && Node.CanAddChildren;
 		}
 
 		private void Add_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanAddChildren)
 				return;
 
@@ -417,13 +417,13 @@ namespace Waher.Client.WPF
 
 		private void Refresh_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (Node is not null && Node.CanRecycle);
 		}
 
 		private void Refresh_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanRecycle)
 				return;
 
@@ -432,13 +432,13 @@ namespace Waher.Client.WPF
 
 		private void Delete_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (Node is not null && Node.CanDelete);
 		}
 
 		private void Delete_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanDelete)
 				return;
 
@@ -459,13 +459,13 @@ namespace Waher.Client.WPF
 
 		private void Edit_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (Node is not null && Node.CanEdit);
 		}
 
 		private void Edit_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanEdit)
 				return;
 
@@ -474,13 +474,13 @@ namespace Waher.Client.WPF
 
 		private void Copy_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (Node is not null && Node.CanCopy);
 		}
 
 		private void Copy_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanCopy)
 				return;
 
@@ -491,13 +491,13 @@ namespace Waher.Client.WPF
 
 		private void Paste_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (Node is not null && Node.CanPaste);
 		}
 
 		private void Paste_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanPaste)
 				return;
 
@@ -506,22 +506,22 @@ namespace Waher.Client.WPF
 
 		private void Sniff_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (Node is not null && Node.IsSniffable);
 		}
 
 		private void Sniff_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.IsSniffable)
 				return;
 
 			this.GetSnifferView(Node, null, false);
 		}
 
-		internal SnifferView GetSnifferView(TreeNode Node, string? Identifier, bool Custom)
+		internal SnifferView GetSnifferView(TreeNode Node, string Identifier, bool Custom)
 		{
-			SnifferView? View;
+			SnifferView View;
 
 			foreach (TabItem Tab in this.Tabs.Items)
 			{
@@ -552,7 +552,7 @@ namespace Waher.Client.WPF
 
 		internal LogView GetLogView(string Identifier)
 		{
-			LogView? View;
+			LogView View;
 
 			foreach (TabItem Tab in this.Tabs.Items)
 			{
@@ -629,13 +629,13 @@ namespace Waher.Client.WPF
 
 		private void Chat_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (Node is not null && Node.CanChat);
 		}
 
 		private void Chat_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanChat)
 				return;
 
@@ -1032,7 +1032,7 @@ namespace Waher.Client.WPF
 
 		private void ReadMomentary_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (Node is not null && Node.CanReadSensorData);
 		}
 
@@ -1040,7 +1040,7 @@ namespace Waher.Client.WPF
 		{
 			try
 			{
-				TreeNode? Node = this.SelectedNode;
+				TreeNode Node = this.SelectedNode;
 				if (Node is null || !Node.CanReadSensorData)
 					return;
 
@@ -1064,7 +1064,7 @@ namespace Waher.Client.WPF
 
 		private void ReadDetailed_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (Node is not null && Node.CanReadSensorData);
 		}
 
@@ -1072,7 +1072,7 @@ namespace Waher.Client.WPF
 		{
 			try
 			{
-				TreeNode? Node = this.SelectedNode;
+				TreeNode Node = this.SelectedNode;
 				if (Node is null || !Node.CanReadSensorData)
 					return;
 
@@ -1096,7 +1096,7 @@ namespace Waher.Client.WPF
 
 		private void SubscribeToMomentary_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (Node is not null && Node.CanSubscribeToSensorData);
 		}
 
@@ -1104,7 +1104,7 @@ namespace Waher.Client.WPF
 		{
 			try
 			{
-				TreeNode? Node = this.SelectedNode;
+				TreeNode Node = this.SelectedNode;
 				if (Node is null || !Node.CanSubscribeToSensorData)
 					return;
 
@@ -1134,13 +1134,13 @@ namespace Waher.Client.WPF
 
 		private void Configure_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (Node is not null && Node.CanConfigure);
 		}
 
 		private void Configure_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanConfigure)
 				return;
 
@@ -1183,13 +1183,13 @@ namespace Waher.Client.WPF
 
 		private void Search_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (Node is not null && Node.CanSearch);
 		}
 
 		private void Search_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode? Node = this.SelectedNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanSearch)
 				return;
 
@@ -1308,12 +1308,12 @@ namespace Waher.Client.WPF
 			return QuestionView;
 		}
 
-		internal static TabItem NewTab(string? HeaderText)
+		internal static TabItem NewTab(string HeaderText)
 		{
 			return NewTab(HeaderText, out TextBlock _);
 		}
 
-		internal static TabItem NewTab(string? HeaderText, out TextBlock HeaderLabel)
+		internal static TabItem NewTab(string HeaderText, out TextBlock HeaderLabel)
 		{
 			TabItem Result = new();
 			NewHeader(HeaderText, Result, out HeaderLabel);
@@ -1325,7 +1325,7 @@ namespace Waher.Client.WPF
 			NewHeader(HeaderText, Tab, out TextBlock _);
 		}
 
-		internal static void NewHeader(string? HeaderText, TabItem Tab, out TextBlock HeaderLabel)
+		internal static void NewHeader(string HeaderText, TabItem Tab, out TextBlock HeaderLabel)
 		{
 			StackPanel Header = new()
 			{
@@ -1434,7 +1434,7 @@ namespace Waher.Client.WPF
 
 				foreach (KeyValuePair<string, string> Error in EditResult.Errors)
 				{
-					Field? Field = Form[Error.Key];
+					Field Field = Form[Error.Key];
 					if (Field is null)
 						continue;
 
@@ -1531,8 +1531,8 @@ namespace Waher.Client.WPF
 		{
 			try
 			{
-				GuiUpdateTask? Rec = null;
-				GuiUpdateTask? Prev;
+				GuiUpdateTask Rec = null;
+				GuiUpdateTask Prev;
 
 				while (true)
 				{
@@ -1582,9 +1582,9 @@ namespace Waher.Client.WPF
 
 		private class GuiUpdateTask
 		{
-			public GuiDelegateWithParameter? Method;
-			public object? State;
-			public string? Name;
+			public GuiDelegateWithParameter Method;
+			public object State;
+			public string Name;
 			public DateTime Requested;
 			public DateTime Started;
 			public DateTime Ended;

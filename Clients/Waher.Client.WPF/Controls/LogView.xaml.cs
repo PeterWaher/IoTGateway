@@ -21,15 +21,15 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public partial class LogView : UserControl, ITabView
 	{
-		private readonly string? identifier;
-		private LogSink? sink;
+		private readonly string identifier;
+		private LogSink sink;
 
 		/// <summary>
 		/// Interaction logic for LogView.xaml
 		/// </summary>
 		/// <param name="Identifier">Identifier</param>
 		/// <param name="Register">If the log view should be registered with <see cref="Log"/>.</param>
-		public LogView(string? Identifier, bool Register)
+		public LogView(string Identifier, bool Register)
 		{
 			this.identifier = Identifier;
 
@@ -45,12 +45,12 @@ namespace Waher.Client.WPF.Controls
 		/// <summary>
 		/// Identifier of log view.
 		/// </summary>
-		public string? Identifier => this.identifier;
+		public string Identifier => this.identifier;
 
 		/// <summary>
 		/// Log sink registered with <see cref="Log"/>, if registered, null otherwise.
 		/// </summary>
-		public LogSink? Sink => this.sink;
+		public LogSink Sink => this.sink;
 
 		public void Dispose()
 		{

@@ -17,7 +17,7 @@ namespace Waher.Client.WPF.Model
 		{
 		}
 
-		protected void Raise(EventHandler? h)
+		protected void Raise(EventHandler h)
 		{
 			if (h is not null)
 			{
@@ -55,12 +55,12 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Event raised when the node has been selected.
 		/// </summary>
-		public event EventHandler? Selected = null;
+		public event EventHandler Selected = null;
 
 		/// <summary>
 		/// Event raised when the node has been deselected.
 		/// </summary>
-		public event EventHandler? Deselected = null;
+		public event EventHandler Deselected = null;
 
 		/// <summary>
 		/// Raises the <see cref="Selected"/> event.

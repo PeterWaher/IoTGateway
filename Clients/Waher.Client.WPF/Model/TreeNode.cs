@@ -24,12 +24,12 @@ namespace Waher.Client.WPF.Model
 	/// Abstract base class for tree nodes in the connection view.
 	/// </remarks>
 	/// <param name="Parent">Parent node.</param>
-	public abstract class TreeNode(TreeNode? Parent) : SelectableItem, IDisposable
+	public abstract class TreeNode(TreeNode Parent) : SelectableItem, IDisposable
 	{
-		private readonly TreeNode? parent = Parent;
-		protected DisplayableParameters? parameters = null;
-		protected SortedDictionary<string, TreeNode>? children = null;
-		private object? tag = null;
+		private readonly TreeNode parent = Parent;
+		protected DisplayableParameters parameters = null;
+		protected SortedDictionary<string, TreeNode> children = null;
+		private object tag = null;
 		private bool expanded = false;
 
 		/// <summary>
@@ -63,7 +63,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Children of the node. If null, children are not loaded.
 		/// </summary>
-		public TreeNode[]? Children
+		public TreeNode[] Children
 		{
 			get
 			{
@@ -88,7 +88,7 @@ namespace Waher.Client.WPF.Model
 		/// <param name="ChildKey">Child Key</param>
 		/// <param name="Child">Child, if found, or null otherwise.</param>
 		/// <returns>If a child with the given key was found.</returns>
-		public bool TryGetChild(string ChildKey, [NotNullWhen(true)] out TreeNode? Child)
+		public bool TryGetChild(string ChildKey, [NotNullWhen(true)] out TreeNode Child)
 		{
 			if (this.children is null)
 			{
@@ -105,12 +105,12 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Parent node. May be null if a root node.
 		/// </summary>
-		public TreeNode? Parent => this.parent;
+		public TreeNode Parent => this.parent;
 
 		/// <summary>
 		/// Object tagged to the node.
 		/// </summary>
-		public object? Tag
+		public object Tag
 		{
 			get => this.tag;
 			set => this.tag = value;
@@ -156,7 +156,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Secondary image resource for the node.
 		/// </summary>
-		public virtual ImageSource? ImageResource2
+		public virtual ImageSource ImageResource2
 		{
 			get { return null; }
 		}
@@ -212,12 +212,12 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Gets available displayable parameters.
 		/// </summary>
-		public virtual DisplayableParameters? DisplayableParameters => this.parameters;
+		public virtual DisplayableParameters DisplayableParameters => this.parameters;
 
 		/// <summary>
 		/// Raised when the node has been updated. The sender argument will contain a reference to the node.
 		/// </summary>
-		public event EventHandler? Updated = null;
+		public event EventHandler Updated = null;
 
 		/// <summary>
 		/// Raises the <see cref="Updated"/> event.
@@ -250,12 +250,12 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Event raised when the node has been expanded.
 		/// </summary>
-		public event EventHandler? Expanded = null;
+		public event EventHandler Expanded = null;
 
 		/// <summary>
 		/// Event raised when the node has been collapsed.
 		/// </summary>
-		public event EventHandler? Collapsed = null;
+		public event EventHandler Collapsed = null;
 
 		/// <summary>
 		/// Raises the <see cref="Expanded"/> event.
@@ -604,7 +604,7 @@ namespace Waher.Client.WPF.Model
 		/// <param name="Callback">Method called when form is returned or when operation fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
-		public virtual Task GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object? State)
+		public virtual Task GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
 		{
 			throw new NotSupportedException();
 		}

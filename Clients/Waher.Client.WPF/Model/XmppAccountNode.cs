@@ -113,7 +113,7 @@ namespace Waher.Client.WPF.Model
 		/// <param name="PasswordHashMethod">Password hash method.</param>
 		/// <param name="TrustCertificate">If the server certificate should be trusted.</param>
 		/// <param name="AllowInsecureAuthentication">If insecure authentication mechanisms are to be allowed.</param>
-		public XmppAccountNode(Connections Connections, TreeNode? Parent, string Host, TransportMethod Transport, int Port, string UrlBindResource,
+		public XmppAccountNode(Connections Connections, TreeNode Parent, string Host, TransportMethod Transport, int Port, string UrlBindResource,
 			string Account, string PasswordHash, string PasswordHashMethod, bool TrustCertificate, bool AllowInsecureAuthentication)
 			: base(Parent)
 		{

@@ -39,11 +39,11 @@ namespace Waher.Client.WPF.Controls
 		private readonly LinkedList<ThreadStart> guiQueue = [];
 		private readonly LinkedList<ReportElement> elements = [];
 		private readonly TextBlock headerLabel;
-		private Node? node;
-		private NodeQuery? query;
-		private StackPanel? currentPanel;
+		private Node node;
+		private NodeQuery query;
+		private StackPanel currentPanel;
 
-		private QueryResultView(Node? Node, NodeQuery? Query, TextBlock HeaderLabel)
+		private QueryResultView(Node Node, NodeQuery Query, TextBlock HeaderLabel)
 		{
 			this.node = Node;
 			this.query = Query;
@@ -52,7 +52,7 @@ namespace Waher.Client.WPF.Controls
 			this.InitializeComponent();
 		}
 
-		public static async Task<QueryResultView> CreateAsync(Node? Node, NodeQuery? Query, TextBlock HeaderLabel)
+		public static async Task<QueryResultView> CreateAsync(Node Node, NodeQuery Query, TextBlock HeaderLabel)
 		{
 			QueryResultView Result = new(Node, Query, HeaderLabel);
 
@@ -79,8 +79,8 @@ namespace Waher.Client.WPF.Controls
 			return Result;
 		}
 
-		public Node? Node => this.node;
-		public NodeQuery? Query => this.query;
+		public Node Node => this.node;
+		public NodeQuery Query => this.query;
 
 		private void UpdateGui(ThreadStart P)
 		{

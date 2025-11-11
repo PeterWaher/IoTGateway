@@ -39,15 +39,17 @@ namespace Waher.Client.WPF.Controls
 
 		public void Dispose()
 		{
-			this.node?.RemoveSniffer(this.sniffer);
+			if (this.sniffer is not null)
+				this.node?.RemoveSniffer(this.sniffer);
+
 			this.node?.ViewClosed();
 		}
 
-		public TreeNode Node => this.node;
-		public string Identifier => this.identifier;
+		public TreeNode? Node => this.node;
+		public string? Identifier => this.identifier;
 		public bool Custom => this.custom;
 
-		public TabSniffer Sniffer
+		public TabSniffer? Sniffer
 		{
 			get => this.sniffer;
 			internal set => this.sniffer = value;

@@ -24,9 +24,9 @@ namespace Waher.Client.WPF.Model
 	/// Abstract base class for tree nodes in the connection view.
 	/// </remarks>
 	/// <param name="Parent">Parent node.</param>
-	public abstract class TreeNode(TreeNode Parent) : SelectableItem, IDisposable
+	public abstract class TreeNode(TreeNode? Parent) : SelectableItem, IDisposable
 	{
-		private readonly TreeNode parent = Parent;
+		private readonly TreeNode? parent = Parent;
 		protected DisplayableParameters? parameters = null;
 		protected SortedDictionary<string, TreeNode>? children = null;
 		private object? tag = null;
@@ -105,7 +105,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Parent node. May be null if a root node.
 		/// </summary>
-		public TreeNode Parent => this.parent;
+		public TreeNode? Parent => this.parent;
 
 		/// <summary>
 		/// Object tagged to the node.

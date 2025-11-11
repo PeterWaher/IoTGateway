@@ -79,8 +79,8 @@ namespace Waher.Client.WPF.Controls
 			return Result;
 		}
 
-		public Node Node => this.node;
-		public NodeQuery Query => this.query;
+		public Node? Node => this.node;
+		public NodeQuery? Query => this.query;
 
 		private void UpdateGui(ThreadStart P)
 		{

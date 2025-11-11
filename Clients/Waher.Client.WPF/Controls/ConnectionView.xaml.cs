@@ -24,8 +24,8 @@ namespace Waher.Client.WPF.Controls
 	public partial class ConnectionView : UserControl, ITabView
 	{
 		private string fileName = string.Empty;
-		private Connections connections;
-		private TreeNode selectedNode = null;
+		private Connections? connections;
+		private TreeNode? selectedNode = null;
 
 		public ConnectionView()
 		{
@@ -42,7 +42,7 @@ namespace Waher.Client.WPF.Controls
 			this.connections.New();
 		}
 
-		public MainWindow MainWindow
+		public MainWindow? MainWindow
 		{
 			get { return MainWindow.FindWindow(this); }
 		}
@@ -56,9 +56,9 @@ namespace Waher.Client.WPF.Controls
 			{
 				this.fileName = value;
 				if (string.IsNullOrEmpty(this.fileName))
-					this.MainWindow.Title = MainWindow.WindowTitle;
+					this.MainWindow!.Title = MainWindow.WindowTitle;
 				else
-					this.MainWindow.Title = this.fileName + " - " + MainWindow.WindowTitle;
+					this.MainWindow!.Title = this.fileName + " - " + MainWindow.WindowTitle;
 			}
 		}
 

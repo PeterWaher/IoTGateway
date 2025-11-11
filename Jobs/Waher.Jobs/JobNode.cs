@@ -7,6 +7,7 @@ using Waher.Jobs.Commands;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Runtime.Threading;
 using Waher.Things;
@@ -850,11 +851,8 @@ namespace Waher.Jobs
 		/// <returns>Set of displayable parameters.</returns>
 		public async Task<Parameter[]> GetDisplayableParameterAraryAsync(Language Language, RequestOrigin Caller)
 		{
-			List<Parameter> Result = new List<Parameter>();
-
-			foreach (Parameter P in await this.GetDisplayableParametersAsync(Language, Caller))
-				Result.Add(P);
-
+			ChunkedList<Parameter> Result = new ChunkedList<Parameter>();
+			Result.AddRange(await this.GetDisplayableParametersAsync(Language, Caller));
 			return Result.ToArray();
 		}
 

@@ -10,6 +10,7 @@ using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Things;
 using Waher.Things.Attributes;
+using Waher.Things.DisplayableParameters;
 using Waher.Things.Queries;
 
 namespace Waher.Jobs.NodeTypes
@@ -19,12 +20,10 @@ namespace Waher.Jobs.NodeTypes
 	/// </summary>
 	public class Job : JobNode, IGroup
 	{
-		private DateTime? scheduledExecutionTime = null;
 		private DateTime? executionTime = null;
 		private Duration? period = null;
 		private Duration? burstInterval = null;
 		private int burstCount = 1;
-		private int burstCountLeft = 1;
 
 		/// <summary>
 		/// Represents a job.
@@ -43,14 +42,7 @@ namespace Waher.Jobs.NodeTypes
 		public DateTime? ExecutionTime
 		{
 			get => this.executionTime;
-			set
-			{
-				if (this.executionTime != value)
-				{
-					this.executionTime = value;
-					Task.Run(async () => await this.RescheduleJobDelayed(1000));
-				}
-			}
+			set => this.executionTime = value;
 		}
 
 		/// <summary>
@@ -93,16 +85,23 @@ namespace Waher.Jobs.NodeTypes
 		}
 
 		/// <summary>
-		/// Number of executions each period.
+		/// Persists changes to the node, and generates a node updated event.
 		/// </summary>
-		[Header(11, "Burst count left:", 50)]
-		[Page(2, "Job", 0)]
-		[ToolTip(12, "Number of times left the job will be executed within the current period.")]
-		[DefaultValue(1)]
-		public int BurstCountLeft
+		protected override Task NodeUpdated()
 		{
-			get => this.burstCountLeft;
-			set => this.burstCountLeft = value;
+			return this.NodeUpdated(true);
+		}
+
+		/// <summary>
+		/// Persists changes to the node, and generates a node updated event.
+		/// </summary>
+		/// <param name="ScheduleJob">If job should be (re)schduled.</param>
+		private async Task NodeUpdated(bool ScheduleJob)
+		{
+			await base.NodeUpdated();
+
+			if (ScheduleJob)
+				_ = Task.Run(async () => await JobScheduler.Schedule(this, true));
 		}
 
 		/// <summary>
@@ -219,117 +218,51 @@ namespace Waher.Jobs.NodeTypes
 		}
 
 		/// <summary>
-		/// Reschedules the job, with a small delay.
+		/// Job execution time is updated from the scheduler.
 		/// </summary>
-		/// <param name="DelayMs">Milliseconds to delay the rescheduling of the job.</param>
-		public async Task RescheduleJobDelayed(int DelayMs)
+		/// <param name="ExecutionTime">New execution time.</param>
+		internal async Task ExecutionTimeUpdated(DateTime? ExecutionTime)
 		{
-			await Task.Delay(DelayMs);
-			await this.RescheduleJob();
+			this.executionTime = ExecutionTime;
+			await this.NodeUpdated(false);
 		}
 
 		/// <summary>
-		/// Reschedules a job.
+		/// Gets displayable parameters.
 		/// </summary>
-		public async Task RescheduleJob()
+		/// <param name="Language">Language to use.</param>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>Set of displayable parameters.</returns>
+		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
-			try
+			LinkedList<Parameter> Parameters = (LinkedList<Parameter>)await base.GetDisplayableParametersAsync(Language, Caller);
+
+			if (this.executionTime.HasValue)
 			{
-				if (this.scheduledExecutionTime.HasValue)
-				{
-					JobScheduler.Scheduler?.Remove(this.scheduledExecutionTime.Value);
-					this.scheduledExecutionTime = null;
-				}
-
-				if (!this.executionTime.HasValue)
-					return;
-
-				DateTime Now = DateTime.UtcNow;
-				bool Changed = false;
-
-				while (this.executionTime.Value.ToUniversalTime() < Now &&
-					await this.AdvanceToNextTime(false))
-				{
-					Changed = true;
-				}
-
-				if (Changed)
-					await this.UpdateAsync();
-
-				if (this.executionTime.HasValue)
-				{
-					this.scheduledExecutionTime = JobScheduler.Scheduler?.Add(
-						this.executionTime.Value, this.ExecuteScheduledJob, null);
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
-		}
-
-		private async Task ExecuteScheduledJob(object _)
-		{
-			try
-			{
-				await this.ExecuteJob(await Translator.GetDefaultLanguageAsync());
-				await this.RemoveErrorAsync("ExecutionError");
-			}
-			catch (Exception ex)
-			{
-				await this.LogErrorAsync("ExecutionError", ex.Message);
-			}
-			finally
-			{
-				await this.AdvanceToNextTime(true);
-			}
-		}
-
-		private async Task<bool> AdvanceToNextTime(bool PersistChange)
-		{
-			if (!this.executionTime.HasValue)
-				return false;
-
-			DateTime TP = this.executionTime.Value;
-
-			if (this.burstInterval.HasValue &&
-				this.burstInterval.Value > Duration.Zero)
-			{
-				if (this.burstCountLeft > 0)
-				{
-					this.executionTime = TP + this.burstInterval.Value;
-					this.burstCountLeft--;
-
-					if (PersistChange)
-						await this.NodeUpdated();
-
-					return true;
-				}
-				else if (this.period.HasValue && this.period.Value > Duration.Zero)
-				{
-					this.burstCountLeft = this.burstCount;
-					this.executionTime = TP - this.burstCount * this.burstInterval.Value;
-				}
-				else
-					return false;
+				Parameters.AddLast(new DateTimeParameter("ExecutionTime",
+					await Language.GetStringAsync(typeof(Job), 11, "Execution Time"),
+					this.executionTime.Value));
 			}
 
-			if (this.period.HasValue && this.period.Value > Duration.Zero)
+			if (this.period.HasValue)
 			{
-				this.executionTime += this.period.Value;
-
-				if (PersistChange)
-					await this.NodeUpdated();
-
-				return true;
+				Parameters.AddLast(new DurationParameter("Period",
+					await Language.GetStringAsync(typeof(Job), 12, "Period"),
+					this.period.Value));
 			}
 
-			this.executionTime = null;
+			if (this.burstInterval.HasValue)
+			{
+				Parameters.AddLast(new DurationParameter("BurstInterval",
+					await Language.GetStringAsync(typeof(Job), 13, "Burst Interval"),
+					this.burstInterval.Value));
 
-			if (PersistChange)
-				await this.NodeUpdated();
+				Parameters.AddLast(new Int32Parameter("BurstCount",
+					await Language.GetStringAsync(typeof(Job), 14, "Burst Count"),
+					this.burstCount));
+			}
 
-			return false;
+			return Parameters;
 		}
 	}
 }

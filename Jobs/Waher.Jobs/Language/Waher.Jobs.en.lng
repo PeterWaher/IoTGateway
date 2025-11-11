@@ -50,8 +50,10 @@
 			<String id="8">Number of times the job will be executed each period.</String>
 			<String id="9">Burst Interval:</String>
 			<String id="10">Time between job executions in a burst.</String>
-			<String id="11">Burst count left:</String>
-			<String id="12">Number of times left the job will be executed within the current period.</String>
+			<String id="11">Execution Time</String>
+			<String id="12">Period</String>
+			<String id="13">Burst Interval</String>
+			<String id="14">Burst Count</String>
 		</Namespace>
 	</Language>
 </Translation>

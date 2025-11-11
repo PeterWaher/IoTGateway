@@ -2269,7 +2269,13 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				await MeteringTopology.DeleteOldEvents(TimeSpan.FromDays(7));
+				TimeSpan Limit = TimeSpan.FromDays(7);
+
+				await MeteringTopology.DeleteOldEvents(Limit);
+				await GroupSource.DeleteOldEvents(Limit);
+				await JobSource.DeleteOldEvents(Limit);
+				await ProcessorSource.DeleteOldEvents(Limit);
+				await OutputSource.DeleteOldEvents(Limit);
 			}
 			catch (Exception ex)
 			{

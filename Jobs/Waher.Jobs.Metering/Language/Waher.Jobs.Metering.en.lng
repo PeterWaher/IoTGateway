@@ -71,6 +71,8 @@
 			<String id="67">Label presenting the node in the job source.</String>
 			<String id="68">Timeout (s):</String>
 			<String id="69">If a sensor does not respond within this time, the readout will be cancelled.</String>
+			<String id="70">**1** thing error processor will be used.</String>
+			<String id="71">**%0%** thing error processors will be used.</String>
 		</Namespace>
 	</Language>
 </Translation>

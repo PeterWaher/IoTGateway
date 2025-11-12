@@ -238,12 +238,19 @@ namespace Waher.Jobs.Metering.NodeTypes
 				else
 					await this.ReportMessage(Status, 34, "**%0%** readable sensors found to read.", Sensors.Length);
 
-				ISensorDataProcessor[] Processors = await this.FindNodes<ISensorDataProcessor>();
+				ISensorDataProcessor[] SensorDataProcessors = await this.FindNodes<ISensorDataProcessor>();
 
-				if (Processors.Length == 1)
+				if (SensorDataProcessors.Length == 1)
 					await this.ReportMessage(Status, 53, "**1** sensor data processor will be used.");
 				else
-					await this.ReportMessage(Status, 35, "**%0%** sensor data processors will be used.", Processors.Length);
+					await this.ReportMessage(Status, 35, "**%0%** sensor data processors will be used.", SensorDataProcessors.Length);
+
+				IThingErrorProcessor[] ErrorProcessors = await this.FindNodes<IThingErrorProcessor>();
+
+				if (ErrorProcessors.Length == 1)
+					await this.ReportMessage(Status, 70, "**1** thing error processor will be used.");
+				else
+					await this.ReportMessage(Status, 71, "**%0%** thing error processors will be used.", SensorDataProcessors.Length);
 
 				ISensorDataOutput[] Outputs = await this.FindNodes<ISensorDataOutput>();
 
@@ -274,7 +281,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 				using AsyncProcessor<ReadoutWorkItem> Processor = new AsyncProcessor<ReadoutWorkItem>(this.ParallelReadouts, "Job Task: " + this.NodeId);
 
 				foreach (ISensor Sensor in Sensors)
-					Processor.Queue(new ReadoutWorkItem(Sensor, this, Status, Processors, Outputs));
+					Processor.Queue(new ReadoutWorkItem(Sensor, this, Status,
+						SensorDataProcessors, ErrorProcessors, Outputs));
 
 				await Processor.WaitUntilIdle();
 
@@ -403,21 +411,22 @@ namespace Waher.Jobs.Metering.NodeTypes
 			return Message;
 		}
 
-		private async Task FieldsReported(ISensor Sensor, Field[] Fields,
+		private async Task SensorReadoutCompleted(ISensor Sensor, Field[] Fields,
 			ThingError[] Errors, JobExecutionStatus Status,
-			ISensorDataProcessor[] Processors, ISensorDataOutput[] Outputs)
+			ISensorDataProcessor[] SensorDataProcessors, IThingErrorProcessor[] ErrorProcessors,
+			ISensorDataOutput[] Outputs)
 		{
 			if (!(Fields is null))
 			{
-				if ((Processors?.Length ?? 0) > 0)
+				if ((SensorDataProcessors?.Length ?? 0) > 0)
 				{
-					foreach (ISensorDataProcessor Processor in Processors)
+					foreach (ISensorDataProcessor Processor in SensorDataProcessors)
 					{
 						try
 						{
 							Fields = await Processor.ProcessFields(Sensor, Fields);
 							if ((Fields?.Length ?? 0) == 0)
-								return;
+								break;
 						}
 						catch (Exception ex)
 						{
@@ -426,7 +435,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 					}
 				}
 
-				if ((Outputs?.Length ?? 0) > 0)
+				if ((Outputs?.Length ?? 0) > 0 && (Fields?.Length ?? 0) > 0)
 				{
 					foreach (ISensorDataOutput Output in Outputs)
 					{
@@ -442,12 +451,32 @@ namespace Waher.Jobs.Metering.NodeTypes
 				}
 			}
 
-			if (!(Errors is null))
+			if ((Errors?.Length ?? 0) > 0)
 			{
-				if (!Status.Variables.TryGetVariable("Errors", out Variable v))
-					Status.Variables["Errors"] = new ChunkedList<ThingError>(Errors);
-				else if (v.ValueObject is ChunkedList<ThingError> JobErrors)
-					JobErrors.AddRange(Errors);
+				if ((ErrorProcessors?.Length ?? 0) > 0)
+				{
+					foreach (IThingErrorProcessor Processor in ErrorProcessors)
+					{
+						try
+						{
+							Errors = await Processor.ProcessErrors(Sensor, Errors);
+							if ((Errors?.Length ?? 0) == 0)
+								break;
+						}
+						catch (Exception ex)
+						{
+							await Processor.LogErrorAsync("ProcessingError", ex.Message);
+						}
+					}
+				}
+
+				if ((Errors?.Length ?? 0) > 0)
+				{
+					if (!Status.Variables.TryGetVariable("Errors", out Variable v))
+						Status.Variables["Errors"] = new ChunkedList<ThingError>(Errors);
+					else if (v.ValueObject is ChunkedList<ThingError> JobErrors)
+						JobErrors.AddRange(Errors);
+				}
 			}
 
 			await Status.Lock();
@@ -563,19 +592,21 @@ namespace Waher.Jobs.Metering.NodeTypes
 			private readonly ISensor sensor;
 			private readonly SensorDataReadoutTaskNode task;
 			private readonly JobExecutionStatus status;
-			private readonly ISensorDataProcessor[] processors;
+			private readonly ISensorDataProcessor[] sensorDataProcessors;
+			private readonly IThingErrorProcessor[] errorProcessors;
 			private readonly ISensorDataOutput[] outputs;
 			private ChunkedList<Field> fields = null;
 			private ChunkedList<ThingError> errors = null;
 
 			public ReadoutWorkItem(ISensor Sensor, SensorDataReadoutTaskNode TaskNode,
-				JobExecutionStatus Status, ISensorDataProcessor[] Processors,
-				ISensorDataOutput[] Outputs)
+				JobExecutionStatus Status, ISensorDataProcessor[] SensorDataProcessors,
+				IThingErrorProcessor[] ErrorProcessors, ISensorDataOutput[] Outputs)
 			{
 				this.sensor = Sensor;
 				this.task = TaskNode;
 				this.status = Status;
-				this.processors = Processors;
+				this.sensorDataProcessors = SensorDataProcessors;
+				this.errorProcessors = ErrorProcessors;
 				this.outputs = Outputs;
 			}
 
@@ -621,8 +652,9 @@ namespace Waher.Jobs.Metering.NodeTypes
 					}
 				}
 
-				await this.task.FieldsReported(this.sensor, this.fields?.ToArray(),
-					this.errors?.ToArray(), this.status, this.processors, this.outputs);
+				await this.task.SensorReadoutCompleted(this.sensor, this.fields?.ToArray(),
+					this.errors?.ToArray(), this.status, this.sensorDataProcessors, 
+					this.errorProcessors, this.outputs);
 			}
 
 			private class JobReadout : ISensorReadout

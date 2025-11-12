@@ -408,33 +408,15 @@ namespace Waher.Client.WPF.Controls
 			else
 				Parent.RemoveChild(ChildNode);
 
-			this.RefreshTreeView(false);
+			this.RefreshTreeView();
 		}
 
 		private void Node_Updated(object Sender, SelectableItemEventArgs e)
 		{
-			bool RefreshListView = false;
-
-			if (e.Item is TreeNode Node &&
-				Node.Parent is not null &&
-				Node.Parent.IsSelected)
-			{
-				RefreshListView = true;
-
-				if (Node.Parent.TryGetChild(Node.Key, out TreeNode Node2) &&
-					Node != Node2 &&
-					Node2.DisplayableParameters is not null &&
-					Node.DisplayableParameters is not null)
-				{
-					Node2.DisplayableParameters.Clear();
-					Node2.DisplayableParameters.AddRange(Node.DisplayableParameters);
-				}
-			}
-
-			this.RefreshTreeView(RefreshListView);
+			this.RefreshTreeView();
 		}
 
-		private void RefreshTreeView(bool RefreshListView)
+		private void RefreshTreeView()
 		{
 			if (this.refreshTimer > DateTime.MinValue)
 			{
@@ -443,7 +425,7 @@ namespace Waher.Client.WPF.Controls
 			}
 
 			this.refreshTimer = MainWindow.Scheduler!.Add(DateTime.Now.AddMilliseconds(250),
-				this.RefreshTree, RefreshListView);
+				this.RefreshTree, null);
 		}
 
 		public void ShowStatus(string Message)
@@ -468,8 +450,6 @@ namespace Waher.Client.WPF.Controls
 
 		private void RefreshTree(object P)
 		{
-			bool RefreshListView = (bool)P;
-
 			if (this.statusTimer > DateTime.MinValue)
 			{
 				MainWindow.Scheduler?.Remove(this.statusTimer);
@@ -479,10 +459,6 @@ namespace Waher.Client.WPF.Controls
 			MainWindow.UpdateGui(() =>
 			{
 				this.ConnectionTree.Items.Refresh();
-
-				if (RefreshListView)
-					this.ConnectionListView.Items.Refresh();
-
 				return Task.CompletedTask;
 			});
 		}

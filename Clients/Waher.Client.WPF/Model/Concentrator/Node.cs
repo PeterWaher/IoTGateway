@@ -99,7 +99,16 @@ namespace Waher.Client.WPF.Model.Concentrator
 		public NodeInformation NodeInformation
 		{
 			get => this.nodeInfo;
-			internal set => this.nodeInfo = value;
+			internal set
+			{
+				this.nodeInfo = value;
+
+				if (this.nodeInfo.ParameterList is not null)
+				{
+					this.DisplayableParameters.Clear();
+					this.DisplayableParameters.AddRange(this.nodeInfo.ParameterList);
+				}
+			}
 		}
 
 		/// <summary>

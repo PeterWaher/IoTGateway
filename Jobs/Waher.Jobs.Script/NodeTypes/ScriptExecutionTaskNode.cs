@@ -15,6 +15,9 @@ namespace Waher.Jobs.Script.NodeTypes
 	/// </summary>
 	public class ScriptExecutionTaskNode : JobTaskNode
 	{
+		private string[] script;
+		private Expression parsedScript;
+
 		/// <summary>
 		/// Sensor data readout task node.
 		/// </summary>
@@ -29,7 +32,15 @@ namespace Waher.Jobs.Script.NodeTypes
 		[Page(2, "Job", 0)]
 		[ToolTip(3, "Script to execute.")]
 		[ContentType("application/x-webscript")]
-		public string[] Script { get; set; }
+		public string[] Script 
+		{
+			get => this.script;
+			set
+			{
+				this.script = value;
+				this.parsedScript = null;
+			}
+		}
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -65,13 +76,18 @@ namespace Waher.Jobs.Script.NodeTypes
 					await Status.Query.SetTitle(this.NodeId);
 				}
 
-				StringBuilder sb = new StringBuilder();
+				if (this.parsedScript is null)
+				{
+					StringBuilder sb = new StringBuilder();
 
-				foreach (string s in this.Script)
-					sb.AppendLine(s);
+					foreach (string s in this.Script)
+						sb.AppendLine(s);
+
+					this.parsedScript = new Expression(sb.ToString());
+				}
 
 				DateTime Start = DateTime.UtcNow;
-				object Result = await Expression.EvalAsync(sb.ToString(), Status.Variables);
+				object Result = await this.parsedScript.EvaluateAsync(Status.Variables);
 				TimeSpan ExecutionTime = DateTime.UtcNow.Subtract(Start);
 
 				if (Status.ReportDetail == JobReportDetail.Details)
@@ -82,7 +98,7 @@ namespace Waher.Jobs.Script.NodeTypes
 
 				if (Status.ReportDetail != JobReportDetail.None)
 				{
-					sb.Clear();
+					StringBuilder sb = new StringBuilder();
 
 					sb.Append("Execution time: **");
 					sb.Append(MarkdownDocument.Encode(ExecutionTime.ToString()));

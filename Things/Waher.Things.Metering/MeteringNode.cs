@@ -361,7 +361,7 @@ namespace Waher.Things.Metering
 				NodeId = this.NodeId,
 				Partition = this.Partition,
 				SourceId = this.SourceId,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			});
 		}
 
@@ -1030,7 +1030,7 @@ namespace Waher.Things.Metering
 				NodeId = Child.NodeId,
 				Partition = Child.Partition,
 				SourceId = Child.SourceId,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			});
 
 			return true;
@@ -1082,7 +1082,7 @@ namespace Waher.Things.Metering
 				NodeId = Child.NodeId,
 				Partition = Child.Partition,
 				SourceId = Child.SourceId,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			});
 
 			return true;
@@ -1167,7 +1167,7 @@ namespace Waher.Things.Metering
 					LogId = NodeAdded.EmptyIfSame(Node.LogId, Node.NodeId),
 					LocalId = NodeAdded.EmptyIfSame(Node.LocalId, Node.NodeId),
 					SourceId = Node.SourceId,
-					Timestamp = DateTime.Now
+					Timestamp = DateTime.UtcNow
 				};
 
 				if (this.ChildrenOrdered && !(After is null))
@@ -1210,7 +1210,7 @@ namespace Waher.Things.Metering
 				LogId = NodeAdded.EmptyIfSame(this.LogId, this.NodeId),
 				LocalId = NodeAdded.EmptyIfSame(this.LocalId, this.NodeId),
 				SourceId = this.SourceId,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			});
 
 			if (this.oldId != this.nodeId)
@@ -1281,7 +1281,7 @@ namespace Waher.Things.Metering
 					NodeId = Node.NodeId,
 					Partition = Node.Partition,
 					SourceId = Node.SourceId,
-					Timestamp = DateTime.Now
+					Timestamp = DateTime.UtcNow
 				});
 			}
 

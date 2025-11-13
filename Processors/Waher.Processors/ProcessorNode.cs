@@ -352,7 +352,7 @@ namespace Waher.Processors
 				NodeId = this.NodeId,
 				Partition = this.Partition,
 				SourceId = this.SourceId,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			});
 		}
 
@@ -1018,7 +1018,7 @@ namespace Waher.Processors
 				NodeId = Child.NodeId,
 				Partition = Child.Partition,
 				SourceId = Child.SourceId,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			});
 
 			return true;
@@ -1070,7 +1070,7 @@ namespace Waher.Processors
 				NodeId = Child.NodeId,
 				Partition = Child.Partition,
 				SourceId = Child.SourceId,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			});
 
 			return true;
@@ -1155,7 +1155,7 @@ namespace Waher.Processors
 					LogId = NodeAdded.EmptyIfSame(Node.LogId, Node.NodeId),
 					LocalId = NodeAdded.EmptyIfSame(Node.LocalId, Node.NodeId),
 					SourceId = Node.SourceId,
-					Timestamp = DateTime.Now
+					Timestamp = DateTime.UtcNow
 				};
 
 				if (this.ChildrenOrdered && !(After is null))
@@ -1198,7 +1198,7 @@ namespace Waher.Processors
 				LogId = NodeAdded.EmptyIfSame(this.LogId, this.NodeId),
 				LocalId = NodeAdded.EmptyIfSame(this.LocalId, this.NodeId),
 				SourceId = this.SourceId,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			});
 
 			if (this.oldId != this.nodeId)
@@ -1269,7 +1269,7 @@ namespace Waher.Processors
 					NodeId = Node.NodeId,
 					Partition = Node.Partition,
 					SourceId = Node.SourceId,
-					Timestamp = DateTime.Now
+					Timestamp = DateTime.UtcNow
 				});
 			}
 

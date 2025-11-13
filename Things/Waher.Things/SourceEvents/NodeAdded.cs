@@ -80,7 +80,7 @@ namespace Waher.Things.SourceEvents
 				LogId = EmptyIfSame(Node.LogId, Node.NodeId),
 				LocalId = EmptyIfSame(Node.LocalId, Node.NodeId),
 				SourceId = Node.SourceId,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			};
 		}
 

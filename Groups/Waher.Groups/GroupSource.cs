@@ -270,7 +270,7 @@ namespace Waher.Groups
 					LogId = NodeAdded.EmptyIfSame(Result.LogId, Result.NodeId),
 					LocalId = NodeAdded.EmptyIfSame(Result.LocalId, Result.NodeId),
 					SourceId = Result.SourceId,
-					Timestamp = DateTime.Now
+					Timestamp = DateTime.UtcNow
 				});
 			}
 

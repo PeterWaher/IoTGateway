@@ -98,7 +98,7 @@ namespace Waher.Things.SourceEvents
 				LogId = NodeAdded.EmptyIfSame(Node.LogId, Node.NodeId),
 				LocalId = NodeAdded.EmptyIfSame(Node.LocalId, Node.NodeId),
 				SourceId = Node.SourceId,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			};
 		}
 

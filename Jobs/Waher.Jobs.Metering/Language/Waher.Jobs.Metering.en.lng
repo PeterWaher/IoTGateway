@@ -43,7 +43,7 @@
 			<String id="39">Node ID</String>
 			<String id="40">#Fields</String>
 			<String id="41">#Errors</String>
-			<String id="42">"No sensor data reported."</String>
+			<String id="42">No sensor data reported.</String>
 			<String id="43">No errors reported.</String>
 			<String id="44">Timestamp</String>
 			<String id="45">Field Name</String>

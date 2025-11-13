@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Markdown;
 using Waher.Jobs.NodeTypes;
 using Waher.Runtime.Language;
 using Waher.Script;
@@ -58,17 +59,48 @@ namespace Waher.Jobs.Script.NodeTypes
 		{
 			try
 			{
+				if (Status.ReportDetail != JobReportDetail.None)
+				{
+					await Status.Query.Start();
+					await Status.Query.SetTitle(this.NodeId);
+				}
+
 				StringBuilder sb = new StringBuilder();
 
 				foreach (string s in this.Script)
 					sb.AppendLine(s);
 
-				await Expression.EvalAsync(sb.ToString(), Status.Variables);
+				DateTime Start = DateTime.UtcNow;
+				object Result = await Expression.EvalAsync(sb.ToString(), Status.Variables);
+				TimeSpan ExecutionTime = DateTime.UtcNow.Subtract(Start);
+
+				if (Status.ReportDetail == JobReportDetail.Details)
+				{
+					if (!(Result is null))
+						await Status.Query.NewObject(Result);
+				}
+
+				if (Status.ReportDetail != JobReportDetail.None)
+				{
+					sb.Clear();
+
+					sb.Append("Execution time: **");
+					sb.Append(MarkdownDocument.Encode(ExecutionTime.ToString()));
+					sb.Append("**");
+
+					await Status.Query.NewObject(new MarkdownContent(sb.ToString()));
+				}
+
 				await Status.Job.RemoveErrorAsync("ScriptError");
 			}
 			catch (Exception ex)
 			{
 				await Status.Job.LogErrorAsync("ScriptError", ex.Message);
+			}
+			finally
+			{
+				if (Status.ReportDetail != JobReportDetail.None)
+					await Status.Query.Done();
 			}
 		}
 	}

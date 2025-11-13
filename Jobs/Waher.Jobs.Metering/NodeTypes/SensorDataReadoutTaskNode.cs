@@ -311,6 +311,10 @@ namespace Waher.Jobs.Metering.NodeTypes
 
 				await Status.Job.LogErrorAsync("ReadoutErrors", ex.Message);
 			}
+			finally
+			{
+				await this.ReportDone(Status);
+			}
 		}
 
 		private async Task ReportStart(JobExecutionStatus Status)

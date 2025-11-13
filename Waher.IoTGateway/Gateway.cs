@@ -487,8 +487,24 @@ namespace Waher.IoTGateway
 											{
 												Log.Informational("Processing " + ExceptionFile);
 												Analyze.Process(ExceptionFile, XmlFile);
+												File.Delete(ExceptionFile);
 											}
 										}
+									}
+									catch (Exception ex)
+									{
+										Log.Exception(ex, ExceptionFile);
+									}
+								}
+
+								ExceptionFiles = Directory.GetFiles(exceptionFolder, "*.xml", SearchOption.TopDirectoryOnly);
+								foreach (string ExceptionFile in ExceptionFiles)
+								{
+									try
+									{
+										DateTime TP = File.GetLastWriteTimeUtc(ExceptionFile);
+										if ((UtcNow - TP).TotalDays > 90)
+											File.Delete(ExceptionFile);
 									}
 									catch (Exception ex)
 									{

@@ -24,8 +24,8 @@ namespace Waher.Jobs.Script.NodeTypes
 		/// <summary>
 		/// Script to execute.
 		/// </summary>
-		[Header(1, "Script:", 0)]
-		[Page(2, "Script", 0)]
+		[Header(1, "Script:", 10)]
+		[Page(2, "Job", 0)]
 		[ToolTip(3, "Script to execute.")]
 		[ContentType("application/x-webscript")]
 		public string[] Script { get; set; }

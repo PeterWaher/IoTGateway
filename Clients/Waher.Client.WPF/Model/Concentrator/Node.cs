@@ -21,6 +21,7 @@ using Waher.Networking.XMPP.Sensor;
 using Waher.Things;
 using Waher.Things.SensorData;
 using Waher.Networking.XMPP.Events;
+using System.ComponentModel;
 
 namespace Waher.Client.WPF.Model.Concentrator
 {
@@ -322,6 +323,62 @@ namespace Waher.Client.WPF.Model.Concentrator
 			int Ordinal2 = (Node2 as Node)?.ordinal ?? int.MaxValue;
 
 			return Ordinal1.CompareTo(Ordinal2);
+		}
+
+		/// <summary>
+		/// Moves a child node up, if possible.
+		/// </summary>
+		/// <param name="Node">Child node.</param>
+		/// <returns>If node was possible to move up.</returns>
+		public override bool MoveUp(TreeNode Node)
+		{
+			if (this.nodeInfo is null || !this.nodeInfo.ChildrenOrdered)
+				return false;
+
+			if (Node is not Node TypedNode)
+				return false;
+
+			TreeNode[] Children = this.Children;
+			int i = Array.IndexOf(Children, TypedNode);
+			if (i <= 0)
+				return false;
+
+			if (Children[i - 1] is not Node TypedNode2)
+				return false;
+
+			i = TypedNode.ordinal;
+			TypedNode.ordinal = TypedNode2.ordinal;
+			TypedNode2.ordinal = i;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Moves a child node down, if possible.
+		/// </summary>
+		/// <param name="Node">Child node.</param>
+		/// <returns>If node was possible to move down.</returns>
+		public override bool MoveDown(TreeNode Node)
+		{
+			if (this.nodeInfo is null || !this.nodeInfo.ChildrenOrdered)
+				return false;
+
+			if (Node is not Node TypedNode)
+				return false;
+
+			TreeNode[] Children = this.Children;
+			int i = Array.IndexOf(Children, TypedNode);
+			if (i < 0 || i >= Children.Length - 1)
+				return false;
+
+			if (Children[i + 1] is not Node TypedNode2)
+				return false;
+
+			i = TypedNode.ordinal;
+			TypedNode.ordinal = TypedNode2.ordinal;
+			TypedNode2.ordinal = i;
+
+			return true;
 		}
 
 		/// <summary>

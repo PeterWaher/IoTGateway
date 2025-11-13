@@ -473,6 +473,26 @@ namespace Waher.Client.WPF.Model
 		}
 
 		/// <summary>
+		/// Moves a child node up, if possible.
+		/// </summary>
+		/// <param name="Node">Child node.</param>
+		/// <returns>If node was possible to move up.</returns>
+		public virtual bool MoveUp(TreeNode Node)
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Moves a child node down, if possible.
+		/// </summary>
+		/// <param name="Node">Child node.</param>
+		/// <returns>If node was possible to move down.</returns>
+		public virtual bool MoveDown(TreeNode Node)
+		{
+			return false;
+		}
+
+		/// <summary>
 		/// If the node can be sniffed.
 		/// </summary>
 		public virtual bool IsSniffable => false;

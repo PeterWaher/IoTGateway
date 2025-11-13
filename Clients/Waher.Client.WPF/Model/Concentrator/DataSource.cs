@@ -398,7 +398,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 								return Task.CompletedTask; // Parent not loaded.
 						}
 
-						// TODO: Node.Parent?.MoveUp(Node);
+						if (Node.Parent?.MoveUp(Node) ?? false)
+							Node.Parent.OnUpdated();
 					}
 					break;
 
@@ -413,7 +414,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 								return Task.CompletedTask; // Parent not loaded.
 						}
 
-						// TODO: Node.Parent?.MoveDown(Node);
+						if (Node.Parent?.MoveDown(Node) ?? false)
+							Node.Parent.OnUpdated();
 					}
 					break;
 			}

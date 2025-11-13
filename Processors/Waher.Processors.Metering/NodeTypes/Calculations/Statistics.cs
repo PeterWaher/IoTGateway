@@ -135,7 +135,7 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(Conditional), 48, "Statistics");
+			return Language.GetStringAsync(typeof(Statistics), 48, "Statistics");
 		}
 
 		/// <summary>

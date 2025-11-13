@@ -3,41 +3,22 @@
 	<Language code="en" name="English">
 		<Namespace name="Waher.Processors.Metering.NodeTypes">
 			<String id="1">Decision Tree</String>
-			<String id="2">Conditional Processing</String>
-			<String id="3">If Field Type</String>
-			<String id="4"></String>
-			<String id="5">Momentary values.</String>
-			<String id="6">Check, if momentary values should be read.</String>
-			<String id="7">Identity values.</String>
-			<String id="8">Check, if identity values should be read.</String>
-			<String id="9">Status values.</String>
-			<String id="10">Check, if status values should be read.</String>
-			<String id="11">Computed values.</String>
-			<String id="12">Check, if computed values should be read.</String>
-			<String id="13">Peak values.</String>
-			<String id="14">Check, if peak values should be read.</String>
-			<String id="15">Historical values.</String>
-			<String id="16">Check, if historical values should be read.</String>
-			<String id="17">Else</String>
-			<String id="18">Accept Field</String>
-			<String id="19">Reject Field</String>
 			<String id="20">Label:</String>
 			<String id="21">Processor</String>
 			<String id="22">Label presenting the node in the decision tree.</String>
-			<String id="23">If Field Name</String>
-			<String id="24">Field Names:</String>
-			<String id="25">Check, if field name matches any in the list.</String>
-			<String id="26">Age Limit:</String>
-			<String id="27">Compares the field age with this value.</String>
-			<String id="28">If Field Age</String>
-			<String id="29">Comparison Operator:</String>
-			<String id="30">What comparison operator to use.</String>
-			<String id="31">Equal to (=)</String>
-			<String id="32">Not equal to (&lt;&gt;)</String>
-			<String id="33">Lesser than (&lt;)</String>
-			<String id="34">Lesser than or equal to (&lt;=)</String>
-			<String id="35">Greater than (&gt;)</String>
-			<String id="36">Greater than or equal to (&gt;=)</String>
+		</Namespace>
+		<Namespace name="Waher.Processors.Metering.NodeTypes.Actions">
+			<String id="1">Script</String>
+			<String id="4">Process field using script</String>
+			<String id="18">Accept Field</String>
+			<String id="19">Reject Field</String>
+			<String id="21">Processor</String>
+			<String id="65">Script:</String>
+			<String id="66">Script used to process fields.</String>
+			<String id="67">When executing the script, the variables Sensor and Field will contain references to the corresponding sensor and field objects being processed. Remember to return the field or array of fields you want to continue to process. Returning null or something that is not a field rejects the field from future processing.</String>
+		</Namespace>
+		<Namespace name="Waher.Processors.Metering.NodeTypes.Calculations">
+			<String id="21">Processor</String>
 			<String id="37">Unit Conversion</String>
 			<String id="38">Unit:</String>
 			<String id="39">The unit to convert to.</String>
@@ -66,6 +47,40 @@
 			<String id="62">If checked, the variance of the samples will be calcaulted.</String>
 			<String id="63">Calculate Standard Deviation.</String>
 			<String id="64">If checked, the standard deviation of the samples will be calcaulted.</String>
+		</Namespace>
+		<Namespace name="Waher.Processors.Metering.NodeTypes.Comparisons">
+			<String id="2">Conditional Processing</String>
+			<String id="3">If Field Type</String>
+			<String id="5">Momentary values.</String>
+			<String id="6">Check, if momentary values should be read.</String>
+			<String id="7">Identity values.</String>
+			<String id="8">Check, if identity values should be read.</String>
+			<String id="9">Status values.</String>
+			<String id="10">Check, if status values should be read.</String>
+			<String id="11">Computed values.</String>
+			<String id="12">Check, if computed values should be read.</String>
+			<String id="13">Peak values.</String>
+			<String id="14">Check, if peak values should be read.</String>
+			<String id="15">Historical values.</String>
+			<String id="16">Check, if historical values should be read.</String>
+			<String id="17">Else</String>
+			<String id="20">Label:</String>
+			<String id="21">Processor</String>
+			<String id="22">Label presenting the node in the decision tree.</String>
+			<String id="23">If Field Name</String>
+			<String id="24">Field Names:</String>
+			<String id="25">Check, if field name matches any in the list.</String>
+			<String id="26">Age Limit:</String>
+			<String id="27">Compares the field age with this value.</String>
+			<String id="28">If Field Age</String>
+			<String id="29">Comparison Operator:</String>
+			<String id="30">What comparison operator to use.</String>
+			<String id="31">Equal to (=)</String>
+			<String id="32">Not equal to (&lt;&gt;)</String>
+			<String id="33">Lesser than (&lt;)</String>
+			<String id="34">Lesser than or equal to (&lt;=)</String>
+			<String id="35">Greater than (&gt;)</String>
+			<String id="36">Greater than or equal to (&gt;=)</String>
 		</Namespace>
 	</Language>
 </Translation>

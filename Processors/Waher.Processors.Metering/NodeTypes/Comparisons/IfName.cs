@@ -34,7 +34,7 @@ namespace Waher.Processors.Metering.NodeTypes.Comparisons
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(Conditional), 23, "If Field Name");
+			return Language.GetStringAsync(typeof(IfName), 23, "If Field Name");
 		}
 
 		/// <summary>

@@ -24,7 +24,7 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 		/// <summary>
 		/// Unit to convert to.
 		/// </summary>
-		[Header(38, "Unit:", 30)]
+		[Header(38, "Unit:", 20)]
 		[Page(21, "Processor", 0)]
 		[ToolTip(39, "The unit to convert to.")]
 		[Required]
@@ -45,7 +45,7 @@ namespace Waher.Processors.Metering.NodeTypes.Calculations
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(Conditional), 37, "Unit Conversion");
+			return Language.GetStringAsync(typeof(UnitConversion), 37, "Unit Conversion");
 		}
 
 		/// <summary>

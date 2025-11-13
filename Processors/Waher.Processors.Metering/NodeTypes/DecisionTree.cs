@@ -26,7 +26,7 @@ namespace Waher.Processors.Metering.NodeTypes
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(Conditional), 1, "Decision Tree");
+			return Language.GetStringAsync(typeof(DecisionTree), 1, "Decision Tree");
 		}
 
 		/// <summary>

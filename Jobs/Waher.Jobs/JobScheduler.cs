@@ -240,5 +240,29 @@ namespace Waher.Jobs
 				}
 			}
 		}
+
+		/// <summary>
+		/// Removes any scheduled activity for the job.
+		/// </summary>
+		/// <param name="Job">Job</param>
+		/// <returns>If a scheduled event was found and removed.</returns>
+		public static async Task<bool> Remove(Job Job)
+		{
+			using Semaphore Semaphore = await Semaphores.BeginWrite("Jobs." + Job.NodeId);
+			
+			lock (scheduledJobs)
+			{
+				if (!scheduledJobs.TryGetValue(Job.NodeId, out JobSchedule Schedule))
+					return false;
+
+				if (Schedule.ScheduledExecutionTime.HasValue)
+				{
+					scheduler.Remove(Schedule.ScheduledExecutionTime.Value);
+					Schedule.ScheduledExecutionTime = null;
+				}
+
+				return scheduledJobs.Remove(Job.NodeId);
+			}
+		}
 	}
 }

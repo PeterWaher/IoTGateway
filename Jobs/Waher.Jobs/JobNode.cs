@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Jobs.Commands;
+using Waher.Jobs.NodeTypes;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
@@ -1232,5 +1233,23 @@ namespace Waher.Jobs
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Node has been added to the root node.
+		/// </summary>
+		/// <param name="Root">Root node.</param>
+		public virtual Task AddedToRoot(Root Root)
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Node has been removed from the root node.
+		/// </summary>
+		/// <param name="Root">Root node.</param>
+		public virtual Task RemovedFromRoot(Root Root)
+		{
+			return Task.CompletedTask;
+		}
 	}
 }

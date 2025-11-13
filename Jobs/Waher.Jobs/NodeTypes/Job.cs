@@ -284,5 +284,23 @@ namespace Waher.Jobs.NodeTypes
 
 			return Parameters;
 		}
+
+		/// <summary>
+		/// Node has been added to the root node.
+		/// </summary>
+		/// <param name="Root">Root node.</param>
+		public override Task AddedToRoot(Root Root)
+		{
+			return JobScheduler.Schedule(this, true);
+		}
+
+		/// <summary>
+		/// Node has been removed from the root node.
+		/// </summary>
+		/// <param name="Root">Root node.</param>
+		public override Task RemovedFromRoot(Root Root)
+		{
+			return JobScheduler.Remove(this);
+		}
 	}
 }

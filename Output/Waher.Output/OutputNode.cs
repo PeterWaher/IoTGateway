@@ -34,6 +34,7 @@ namespace Waher.Output
 		private string oldId = null;
 		private NodeState state = NodeState.None;
 		private List<OutputNode> children = null;
+		private int siblingOrdinal = 0;
 		private bool childrenLoaded = false;
 		private readonly object synchObject = new object();
 		private DateTime created = DateTime.Now;
@@ -118,6 +119,16 @@ namespace Waher.Output
 		{
 			get => this.updated;
 			set => this.updated = value;
+		}
+
+		/// <summary>
+		/// Sibling ordinal, used to order siblings when ordered.
+		/// </summary>
+		[DefaultValue(0)]
+		public int SiblingOrdinal
+		{
+			get => this.siblingOrdinal;
+			set => this.siblingOrdinal = value;
 		}
 
 		/// <summary>
@@ -703,36 +714,81 @@ namespace Waher.Output
 
 		private async Task LoadChildren()
 		{
-			IEnumerable<OutputNode> Children = await Database.Find<OutputNode>(new FilterFieldEqualTo("ParentId", this.objectId));
-			LinkedList<OutputNode> Children2 = new LinkedList<OutputNode>();
+			List<OutputNode> Children = new List<OutputNode>();
+			OutputNode[] ToUpdate = null;
 
-			foreach (OutputNode Node in Children)
-				Children2.AddLast(OutputSource.RegisterNode(Node));
+			foreach (OutputNode Node in await Database.Find<OutputNode>(
+				new FilterFieldEqualTo("ParentId", this.objectId)))
+			{
+				Children.Add(OutputSource.RegisterNode(Node));
+			}
 
 			lock (this.synchObject)
 			{
 				this.children = null;
 
-				foreach (OutputNode Child in Children2)
+				if (Children.Count > 0)
 				{
-					this.children ??= new List<OutputNode>();
-					this.children.Add(Child);
-					
-					Child.parent = this;
+					foreach (OutputNode Child in Children)
+						Child.parent = this;
+
+					ToUpdate = this.SortChildrenAfterLoadLocked(Children);
+					this.children = Children;
 				}
 
-				this.SortChildrenAfterLoadLocked(this.children);
 				this.childrenLoaded = true;
 			}
+
+			if (!(ToUpdate is null))
+				await Database.Update(ToUpdate);
 		}
 
 		/// <summary>
 		/// Method that allows the node to sort its children, after they have been loaded.
 		/// </summary>
 		/// <param name="Children">Loaded children.</param>
-		protected virtual void SortChildrenAfterLoadLocked(List<OutputNode> Children)
+		/// <returns>Child nodes that need to be updated, or null if no such nodes.</returns>
+		protected virtual OutputNode[] SortChildrenAfterLoadLocked(List<OutputNode> Children)
 		{
-			// Do nothing by default.
+			if (this.ChildrenOrdered)
+			{
+				Children.Sort((n1, n2) => n1.siblingOrdinal.CompareTo(n2.siblingOrdinal));
+				return this.CheckOrderLocked(Children);
+			}
+			else
+			{
+				Children.Sort((n1, n2) => n1.nodeId.CompareTo(n2.nodeId));
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Checks the ordering of children.
+		/// </summary>
+		/// <param name="Children">Child nodes.</param>
+		/// <returns>Child nodes that need to be updated, or null if no such nodes.</returns>
+		protected virtual OutputNode[] CheckOrderLocked(List<OutputNode> Children)
+		{
+			if (this.ChildrenOrdered)
+			{
+				ChunkedList<OutputNode> ToUpdate = null;
+				int Expected = 0;
+
+				foreach (OutputNode Child in Children)
+				{
+					if (Child.SiblingOrdinal != Expected)
+					{
+						ToUpdate ??= new ChunkedList<OutputNode>();
+						ToUpdate.Add(Child);
+						Child.siblingOrdinal = Expected;
+					}
+
+					Expected++;
+				}
+				return ToUpdate?.ToArray();
+			}
+			else
+				return null;
 		}
 
 		internal async Task<OutputNode> LoadParent()
@@ -920,11 +976,19 @@ namespace Waher.Output
 		/// <returns>If the child node was moved up.</returns>
 		public virtual async Task<bool> MoveUpAsync(OutputNode Child, RequestOrigin Caller)
 		{
-			if (!this.ChildrenOrdered || this.children is null)
+			if (!this.ChildrenOrdered)
+				return false;
+
+			if (!this.childrenLoaded)
+				await this.LoadChildren();
+
+			if (this.children is null)
 				return false;
 
 			if (!await this.CanEditAsync(Caller) || !await Child.CanEditAsync(Caller))
 				return false;
+
+			OutputNode Child2;
 
 			lock (this.children)
 			{
@@ -932,9 +996,17 @@ namespace Waher.Output
 				if (i <= 0)
 					return false;
 
+				Child2 = this.children[i - 1];
+
 				this.children.RemoveAt(i);
 				this.children.Insert(i - 1, Child);
+
+				i = Child.siblingOrdinal;
+				Child.siblingOrdinal = Child2.siblingOrdinal;
+				Child2.siblingOrdinal = i;
 			}
+
+			await Database.Update(Child, Child2);
 
 			await OutputSource.NewEvent(new NodeMovedUp()
 			{
@@ -955,11 +1027,19 @@ namespace Waher.Output
 		/// <returns>If the child node was moved down.</returns>
 		public virtual async Task<bool> MoveDownAsync(OutputNode Child, RequestOrigin Caller)
 		{
-			if (!this.ChildrenOrdered || this.children is null)
+			if (!this.ChildrenOrdered)
+				return false;
+
+			if (!this.childrenLoaded)
+				await this.LoadChildren();
+
+			if (this.children is null)
 				return false;
 
 			if (!await this.CanEditAsync(Caller) || !await Child.CanEditAsync(Caller))
 				return false;
+
+			OutputNode Child2;
 
 			lock (this.children)
 			{
@@ -968,9 +1048,17 @@ namespace Waher.Output
 				if (i < 0 || i + 1 >= c)
 					return false;
 
+				Child2 = this.children[i + 1];
+
 				this.children.RemoveAt(i);
 				this.children.Insert(i + 1, Child);
+
+				i = Child.siblingOrdinal;
+				Child.siblingOrdinal = Child2.siblingOrdinal;
+				Child2.siblingOrdinal = i;
 			}
+
+			await Database.Update(Child, Child2);
 
 			await OutputSource.NewEvent(new NodeMovedDown()
 			{
@@ -1014,6 +1102,7 @@ namespace Waher.Output
 
 			Node.parentId = this.objectId;
 
+			OutputNode[] ToUpdate;
 			OutputNode After = null;
 			int c;
 
@@ -1024,9 +1113,16 @@ namespace Waher.Output
 				else if ((c = this.children.Count) > 0)
 					After = this.children[c - 1];
 
-				this.children.Add(Node);
+				ToUpdate = this.CheckOrderLocked(this.children);
+
+				Node.siblingOrdinal = this.children.Count;
 				Node.parent = this;
+
+				this.children.Add(Node);
 			}
+
+			if (!(ToUpdate is null))
+				await Database.Update(ToUpdate);
 
 			if (Node.objectId == Guid.Empty)
 			{
@@ -1131,6 +1227,7 @@ namespace Waher.Output
 			if (!this.childrenLoaded)
 				await this.LoadChildren();
 
+			OutputNode[] ToUpdate = null;
 			int i;
 
 			lock (this.synchObject)
@@ -1143,11 +1240,16 @@ namespace Waher.Output
 						this.children.RemoveAt(i);
 						if (i == 0 && this.children.Count == 0)
 							this.children = null;
+						else
+							ToUpdate = this.CheckOrderLocked(this.children);
 					}
 				}
 				else
 					i = -1;
 			}
+
+			if (!(ToUpdate is null))
+				await Database.Update(ToUpdate);
 
 			Node.parentId = Guid.Empty;
 			Node.parent = null;
@@ -1178,15 +1280,24 @@ namespace Waher.Output
 			{
 				if (this.parent.childrenLoaded)
 				{
+					OutputNode[] ToUpdate = null;
+
 					lock (this.parent.synchObject)
 					{
 						if (!(this.parent.children is null))
 						{
-							this.parent.children.Remove(this);
-							if (this.parent.children.Count == 0)
-								this.parent.children = null;
+							if (this.parent.children.Remove(this))
+							{
+								if (this.parent.children.Count == 0)
+									this.parent.children = null;
+								else
+									ToUpdate = this.parent.CheckOrderLocked(this.parent.children);
+							}
 						}
 					}
+
+					if (!(ToUpdate is null))
+						await Database.Update(ToUpdate);
 				}
 			}
 
@@ -1195,7 +1306,10 @@ namespace Waher.Output
 
 			if (!(this.children is null))
 			{
-				foreach (OutputNode Child in this.children)
+				List<OutputNode> Children = this.children;
+				this.children = null;
+
+				foreach (OutputNode Child in Children)
 				{
 					Child.parent = null;
 					Child.parentId = Guid.Empty;

@@ -18,10 +18,10 @@ using Waher.Things.SourceEvents;
 
 namespace Waher.Things.Metering
 {
-    /// <summary>
-    /// Base class for all metering nodes.
-    /// </summary>
-    [CollectionName("MeteringTopology")]
+	/// <summary>
+	/// Base class for all metering nodes.
+	/// </summary>
+	[CollectionName("MeteringTopology")]
 	[TypeName(TypeNameSerialization.FullName)]
 	[ArchivingTime]
 	[Index("NodeId")]
@@ -35,6 +35,7 @@ namespace Waher.Things.Metering
 		private string oldId = null;
 		private NodeState state = NodeState.None;
 		private List<MeteringNode> children = null;
+		private int siblingOrdinal = 0;
 		private bool childrenLoaded = false;
 		private readonly object synchObject = new object();
 		private DateTime created = DateTime.Now;
@@ -120,6 +121,16 @@ namespace Waher.Things.Metering
 		{
 			get => this.updated;
 			set => this.updated = value;
+		}
+
+		/// <summary>
+		/// Sibling ordinal, used to order siblings when ordered.
+		/// </summary>
+		[DefaultValue(0)]
+		public int SiblingOrdinal
+		{
+			get => this.siblingOrdinal;
+			set => this.siblingOrdinal = value;
 		}
 
 		/// <summary>
@@ -487,7 +498,7 @@ namespace Waher.Things.Metering
 					NewStateSigned = NodeState.Information;
 					NewStateUnsigned = NodeState.Information;
 				}
-				else 
+				else
 				{
 					NewStateSigned = NodeState.None;
 					NewStateUnsigned = NodeState.None;
@@ -717,36 +728,81 @@ namespace Waher.Things.Metering
 
 		private async Task LoadChildren()
 		{
-			IEnumerable<MeteringNode> Children = await Database.Find<MeteringNode>(new FilterFieldEqualTo("ParentId", this.objectId));
-			LinkedList<MeteringNode> Children2 = new LinkedList<MeteringNode>();
+			List<MeteringNode> Children = new List<MeteringNode>();
+			MeteringNode[] ToUpdate = null;
 
-			foreach (MeteringNode Node in Children)
-				Children2.AddLast(MeteringTopology.RegisterNode(Node));
+			foreach (MeteringNode Node in await Database.Find<MeteringNode>(
+				new FilterFieldEqualTo("ParentId", this.objectId)))
+			{
+				Children.Add(MeteringTopology.RegisterNode(Node));
+			}
 
 			lock (this.synchObject)
 			{
 				this.children = null;
 
-				foreach (MeteringNode Child in Children2)
+				if (Children.Count > 0)
 				{
-					this.children ??= new List<MeteringNode>();
-					this.children.Add(Child);
-					
-					Child.parent = this;
+					foreach (MeteringNode Child in Children)
+						Child.parent = this;
+
+					ToUpdate = this.SortChildrenAfterLoadLocked(Children);
+					this.children = Children;
 				}
 
-				this.SortChildrenAfterLoadLocked(this.children);
 				this.childrenLoaded = true;
 			}
+
+			if (!(ToUpdate is null))
+				await Database.Update(ToUpdate);
 		}
 
 		/// <summary>
 		/// Method that allows the node to sort its children, after they have been loaded.
 		/// </summary>
 		/// <param name="Children">Loaded children.</param>
-		protected virtual void SortChildrenAfterLoadLocked(List<MeteringNode> Children)
+		/// <returns>Child nodes that need to be updated, or null if no such nodes.</returns>
+		protected virtual MeteringNode[] SortChildrenAfterLoadLocked(List<MeteringNode> Children)
 		{
-			// Do nothing by default.
+			if (this.ChildrenOrdered)
+			{
+				Children.Sort((n1, n2) => n1.siblingOrdinal.CompareTo(n2.siblingOrdinal));
+				return this.CheckOrderLocked(Children);
+			}
+			else
+			{
+				Children.Sort((n1, n2) => n1.nodeId.CompareTo(n2.nodeId));
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Checks the ordering of children.
+		/// </summary>
+		/// <param name="Children">Child nodes.</param>
+		/// <returns>Child nodes that need to be updated, or null if no such nodes.</returns>
+		protected virtual MeteringNode[] CheckOrderLocked(List<MeteringNode> Children)
+		{
+			if (this.ChildrenOrdered)
+			{
+				ChunkedList<MeteringNode> ToUpdate = null;
+				int Expected = 0;
+
+				foreach (MeteringNode Child in Children)
+				{
+					if (Child.SiblingOrdinal != Expected)
+					{
+						ToUpdate ??= new ChunkedList<MeteringNode>();
+						ToUpdate.Add(Child);
+						Child.siblingOrdinal = Expected;
+					}
+
+					Expected++;
+				}
+				return ToUpdate?.ToArray();
+			}
+			else
+				return null;
 		}
 
 		internal async Task<MeteringNode> LoadParent()
@@ -937,11 +993,19 @@ namespace Waher.Things.Metering
 		/// <returns>If the child node was moved up.</returns>
 		public virtual async Task<bool> MoveUpAsync(MeteringNode Child, RequestOrigin Caller)
 		{
-			if (!this.ChildrenOrdered || this.children is null)
+			if (!this.ChildrenOrdered)
+				return false;
+
+			if (!this.childrenLoaded)
+				await this.LoadChildren();
+
+			if (this.children is null)
 				return false;
 
 			if (!await this.CanEditAsync(Caller) || !await Child.CanEditAsync(Caller))
 				return false;
+
+			MeteringNode Child2;
 
 			lock (this.children)
 			{
@@ -949,9 +1013,17 @@ namespace Waher.Things.Metering
 				if (i <= 0)
 					return false;
 
+				Child2 = this.children[i - 1];
+
 				this.children.RemoveAt(i);
 				this.children.Insert(i - 1, Child);
+
+				i = Child.siblingOrdinal;
+				Child.siblingOrdinal = Child2.siblingOrdinal;
+				Child2.siblingOrdinal = i;
 			}
+
+			await Database.Update(Child, Child2);
 
 			await MeteringTopology.NewEvent(new NodeMovedUp()
 			{
@@ -972,11 +1044,19 @@ namespace Waher.Things.Metering
 		/// <returns>If the child node was moved down.</returns>
 		public virtual async Task<bool> MoveDownAsync(MeteringNode Child, RequestOrigin Caller)
 		{
-			if (!this.ChildrenOrdered || this.children is null)
+			if (!this.ChildrenOrdered)
+				return false;
+
+			if (!this.childrenLoaded)
+				await this.LoadChildren();
+
+			if (this.children is null)
 				return false;
 
 			if (!await this.CanEditAsync(Caller) || !await Child.CanEditAsync(Caller))
 				return false;
+
+			MeteringNode Child2;
 
 			lock (this.children)
 			{
@@ -985,9 +1065,17 @@ namespace Waher.Things.Metering
 				if (i < 0 || i + 1 >= c)
 					return false;
 
+				Child2 = this.children[i + 1];
+
 				this.children.RemoveAt(i);
 				this.children.Insert(i + 1, Child);
+
+				i = Child.siblingOrdinal;
+				Child.siblingOrdinal = Child2.siblingOrdinal;
+				Child2.siblingOrdinal = i;
 			}
+
+			await Database.Update(Child, Child2);
 
 			await MeteringTopology.NewEvent(new NodeMovedDown()
 			{
@@ -1031,6 +1119,7 @@ namespace Waher.Things.Metering
 
 			Node.parentId = this.objectId;
 
+			MeteringNode[] ToUpdate;
 			MeteringNode After = null;
 			int c;
 
@@ -1041,9 +1130,16 @@ namespace Waher.Things.Metering
 				else if ((c = this.children.Count) > 0)
 					After = this.children[c - 1];
 
-				this.children.Add(Node);
+				ToUpdate = this.CheckOrderLocked(this.children);
+
+				Node.siblingOrdinal = this.children.Count;
 				Node.parent = this;
+
+				this.children.Add(Node);
 			}
+
+			if (!(ToUpdate is null))
+				await Database.Update(ToUpdate);
 
 			if (Node.objectId == Guid.Empty)
 			{
@@ -1148,6 +1244,7 @@ namespace Waher.Things.Metering
 			if (!this.childrenLoaded)
 				await this.LoadChildren();
 
+			MeteringNode[] ToUpdate = null;
 			int i;
 
 			lock (this.synchObject)
@@ -1160,11 +1257,16 @@ namespace Waher.Things.Metering
 						this.children.RemoveAt(i);
 						if (i == 0 && this.children.Count == 0)
 							this.children = null;
+						else
+							ToUpdate = this.CheckOrderLocked(this.children);
 					}
 				}
 				else
 					i = -1;
 			}
+
+			if (!(ToUpdate is null))
+				await Database.Update(ToUpdate);
 
 			Node.parentId = Guid.Empty;
 			Node.parent = null;
@@ -1195,15 +1297,24 @@ namespace Waher.Things.Metering
 			{
 				if (this.parent.childrenLoaded)
 				{
+					MeteringNode[] ToUpdate = null;
+
 					lock (this.parent.synchObject)
 					{
 						if (!(this.parent.children is null))
 						{
-							this.parent.children.Remove(this);
-							if (this.parent.children.Count == 0)
-								this.parent.children = null;
+							if (this.parent.children.Remove(this))
+							{
+								if (this.parent.children.Count == 0)
+									this.parent.children = null;
+								else
+									ToUpdate = this.parent.CheckOrderLocked(this.parent.children);
+							}
 						}
 					}
+
+					if (!(ToUpdate is null))
+						await Database.Update(ToUpdate);
 				}
 			}
 
@@ -1212,15 +1323,16 @@ namespace Waher.Things.Metering
 
 			if (!(this.children is null))
 			{
-				foreach (MeteringNode Child in this.children)
+				List<MeteringNode> Children = this.children;
+				this.children = null;
+
+				foreach (MeteringNode Child in Children)
 				{
 					Child.parent = null;
 					Child.parentId = Guid.Empty;
 
 					await Child.DestroyAsync();
 				}
-
-				this.children = null;
 			}
 
 			if (this.objectId != Guid.Empty)

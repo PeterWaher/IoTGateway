@@ -75,8 +75,19 @@ namespace Waher.Client.WPF.Model
 					this.children.Values.CopyTo(Children, 0);
 				}
 
+				this.ChildOrder(Children);
+
 				return Children;
 			}
+		}
+
+		/// <summary>
+		/// Orders children before they are presented.
+		/// </summary>
+		/// <param name="Children">Available children.</param>
+		protected virtual void ChildOrder(TreeNode[] Children)
+		{
+			// Leave default order (by Node ID).
 		}
 
 		/// <summary>

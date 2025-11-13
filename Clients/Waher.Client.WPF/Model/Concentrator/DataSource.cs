@@ -141,9 +141,10 @@ namespace Waher.Client.WPF.Model.Concentrator
 							if (e.Ok)
 							{
 								SortedDictionary<string, TreeNode> Children = [];
+								int Ordinal = 0;
 
 								foreach (NodeInformation Ref in e.NodesInformation)
-									Children[Ref.NodeId] = new Node(this, Ref);
+									Children[Ref.NodeId] = new Node(this, Ref, Ordinal++);
 
 								this.children = Children;
 
@@ -306,7 +307,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 								NodeAdded.NodeType, NodeAdded.DisplayName, NodeAdded.State, NodeAdded.LocalId, NodeAdded.LogId,
 								NodeAdded.HasChildren, NodeAdded.ChildrenOrdered, NodeAdded.IsReadable, NodeAdded.IsControllable,
 								NodeAdded.HasCommands, NodeAdded.Sniffable, NodeAdded.ParentId, NodeAdded.ParentPartition,
-								NodeAdded.Updated, NodeAdded.Parameters, null));
+								NodeAdded.Updated, NodeAdded.Parameters, null),
+								Parent.Children?.Length ?? 0);
 
 							this.nodes[Key] = Node;
 						}

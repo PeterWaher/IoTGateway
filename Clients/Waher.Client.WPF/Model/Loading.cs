@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using System.Xml;
 
 namespace Waher.Client.WPF.Model
@@ -7,13 +6,9 @@ namespace Waher.Client.WPF.Model
 	/// <summary>
 	/// Represents a data source in a concentrator.
 	/// </summary>
-	public class Loading : TreeNode
+	public class Loading(TreeNode Parent) 
+		: TreeNode(Parent)
 	{
-		public Loading(TreeNode Parent)
-			: base(Parent)
-		{
-		}
-
 		public override string Key => string.Empty;
 		public override string ToolTip => "Items are being loaded.";
 		public override string TypeName => string.Empty;

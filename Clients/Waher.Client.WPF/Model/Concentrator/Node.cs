@@ -31,16 +31,19 @@ namespace Waher.Client.WPF.Model.Concentrator
 	{
 		private NodeInformation nodeInfo;
 		private NodeCommand[] commands = null;
+		private int ordinal;
 
 		/// <summary>
 		/// Represents a node in a concentrator.
 		/// </summary>
 		/// <param name="Parent">Parent node</param>
 		/// <param name="NodeInfo">Node information</param>
-		public Node(TreeNode Parent, NodeInformation NodeInfo)
+		/// <param name="Ordinal">Ordinal of node among its siblings.</param>
+		public Node(TreeNode Parent, NodeInformation NodeInfo, int Ordinal)
 			: base(Parent)
 		{
 			this.nodeInfo = NodeInfo;
+			this.ordinal = Ordinal;
 
 			if (this.nodeInfo.ParameterList is null)
 				this.parameters = null;
@@ -75,6 +78,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// Key in parent child collection.
 		/// </summary>
 		public override string Key => this.nodeInfo.NodeId;
+
+		/// <summary>
+		/// Ordinal of node among its siblings.
+		/// </summary>
+		public int Ordinal => this.ordinal;
 
 		/// <summary>
 		/// Tree Node header text.
@@ -243,9 +251,10 @@ namespace Waher.Client.WPF.Model.Concentrator
 							if (e.Ok)
 							{
 								SortedDictionary<string, TreeNode> Children = [];
+								int Ordinal = 0;
 
 								foreach (NodeInformation Ref in e.NodesInformation)
-									Children[Ref.NodeId] = new Node(this, Ref);
+									Children[Ref.NodeId] = new Node(this, Ref, Ordinal++);
 
 								this.children = Children;
 
@@ -293,6 +302,26 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 				this.OnUpdated();
 			}
+		}
+
+		/// <summary>
+		/// Orders children before they are presented.
+		/// </summary>
+		/// <param name="Children">Available children.</param>
+		protected override void ChildOrder(TreeNode[] Children)
+		{
+			if (this.nodeInfo?.ChildrenOrdered ?? false)
+			{
+				Array.Sort(Children, ByOrdinal);
+			}
+		}
+
+		private static int ByOrdinal(TreeNode Node1, TreeNode Node2)
+		{
+			int Ordinal1 = (Node1 as Node)?.ordinal ?? int.MaxValue;
+			int Ordinal2 = (Node2 as Node)?.ordinal ?? int.MaxValue;
+
+			return Ordinal1.CompareTo(Ordinal2);
 		}
 
 		/// <summary>
@@ -513,7 +542,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 				}, (Sender, e) =>
 				{
 					if (e.Ok)
-						this.Add(new Node(this, e.NodeInformation));
+						this.Add(new Node(this, e.NodeInformation, this.children?.Count ?? 0));
 					else if (!string.IsNullOrEmpty(e.From))
 						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to set parameters." : e.ErrorText);
 
@@ -1260,7 +1289,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 				{
 					if (e.Ok)
 					{
-						Node NewNode = new(Parent, e.NodeInformation);
+						Node NewNode = new(Parent, e.NodeInformation, Parent.children?.Count ?? 0);
 						Parent.Add(NewNode);
 						Request.TrySetResult(NewNode);
 					}

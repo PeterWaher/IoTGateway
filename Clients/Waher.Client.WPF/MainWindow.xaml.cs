@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -12,7 +11,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 using System.Xml;
 using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Chat;
@@ -72,6 +70,8 @@ namespace Waher.Client.WPF
 		public static readonly RoutedUICommand Add = new("Add", "Add", typeof(MainWindow));
 		public static readonly RoutedUICommand Edit = new("Edit", "Edit", typeof(MainWindow));
 		public static readonly RoutedUICommand Delete = new("Delete", "Delete", typeof(MainWindow));
+		public static readonly RoutedUICommand MoveUp = new("MoveUp", "MoveUp", typeof(MainWindow));
+		public static readonly RoutedUICommand MoveDown = new("MoveDown", "MoveDown", typeof(MainWindow));
 		public static readonly RoutedUICommand Copy = new("Copy", "Copy", typeof(MainWindow));
 		public static readonly RoutedUICommand Paste = new("Paste", "Paste", typeof(MainWindow));
 		public static readonly RoutedUICommand ConnectTo = new("Connect To", "ConnectTo", typeof(MainWindow));
@@ -339,6 +339,8 @@ namespace Waher.Client.WPF
 				this.AddButton.IsEnabled = false;
 				this.EditButton.IsEnabled = false;
 				this.DeleteButton.IsEnabled = false;
+				this.MoveUpButton.IsEnabled = false;
+				this.MoveDownButton.IsEnabled = false;
 				this.RefreshButton.IsEnabled = false;
 				this.SniffButton.IsEnabled = false;
 				this.ChatButton.IsEnabled = false;
@@ -357,6 +359,8 @@ namespace Waher.Client.WPF
 				this.AddButton.IsEnabled = Node.CanAddChildren;
 				this.EditButton.IsEnabled = Node.CanEdit;
 				this.DeleteButton.IsEnabled = Node.CanDelete;
+				this.MoveUpButton.IsEnabled = Node.CanMoveUp;
+				this.MoveDownButton.IsEnabled = Node.CanMoveDown;
 				this.RefreshButton.IsEnabled = Node.CanRecycle;
 				this.SniffButton.IsEnabled = Node.IsSniffable;
 				this.ChatButton.IsEnabled = Node.CanChat;
@@ -470,6 +474,36 @@ namespace Waher.Client.WPF
 				return;
 
 			Node.Edit();
+		}
+
+		private void MoveUp_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = Node is not null && Node.CanMoveUp;
+		}
+
+		private void MoveUp_Executed(object Sender, ExecutedRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			if (Node is null || !Node.CanMoveUp)
+				return;
+
+			Node.MoveUp();
+		}
+
+		private void MoveDown_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = Node is not null && Node.CanMoveDown;
+		}
+
+		private void MoveDown_Executed(object Sender, ExecutedRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			if (Node is null || !Node.CanMoveDown)
+				return;
+
+			Node.MoveDown();
 		}
 
 		private void Copy_CanExecute(object Sender, CanExecuteRoutedEventArgs e)

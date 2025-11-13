@@ -21,6 +21,8 @@
         <CommandBinding Command="{x:Static wcw:MainWindow.Add}" Executed="Add_Executed" CanExecute="Add_CanExecute" />
         <CommandBinding Command="Delete" Executed="Delete_Executed" CanExecute="Delete_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.Edit}" Executed="Edit_Executed" CanExecute="Edit_CanExecute" />
+		<CommandBinding Command="{x:Static wcw:MainWindow.MoveUp}" Executed="MoveUp_Executed" CanExecute="MoveUp_CanExecute" />
+		<CommandBinding Command="{x:Static wcw:MainWindow.MoveDown}" Executed="MoveDown_Executed" CanExecute="MoveDown_CanExecute" />
 		<CommandBinding Command="{x:Static wcw:MainWindow.Copy}" Executed="Copy_Executed" CanExecute="Copy_CanExecute" />
 		<CommandBinding Command="{x:Static wcw:MainWindow.Paste}" Executed="Paste_Executed" CanExecute="Paste_CanExecute" />
 		<CommandBinding Command="{x:Static wcw:MainWindow.ConnectTo}" Executed="ConnectTo_Executed" />
@@ -53,8 +55,10 @@
         <KeyBinding Modifiers="Control" Key="D" Command="{x:Static wcw:MainWindow.ReadDetailed}"/>
         <KeyBinding Modifiers="Control" Key="B" Command="{x:Static wcw:MainWindow.SubscribeToMomentary}"/>
         <KeyBinding Modifiers="Control" Key="Enter" Command="{x:Static wcw:MainWindow.Configure}"/>
-        <KeyBinding Modifiers="Control" Key="F" Command="{x:Static wcw:MainWindow.Search}"/>
-    </Window.InputBindings>
+		<KeyBinding Modifiers="Control" Key="F" Command="{x:Static wcw:MainWindow.Search}"/>
+		<KeyBinding Modifiers="Control" Key="Up" Command="{x:Static wcw:MainWindow.MoveUp}"/>
+		<KeyBinding Modifiers="Control" Key="Down" Command="{x:Static wcw:MainWindow.MoveDown}"/>
+	</Window.InputBindings>
     <DockPanel Name="DockPanel" VerticalAlignment="Stretch" Height="Auto" FocusManager.FocusedElement="{Binding ElementName=ConnectionTree}">
         <Menu Height="23" HorizontalAlignment="Left" Margin="0,0,0,0" Name="MainMenu" VerticalAlignment="Top" 
               Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Top">
@@ -92,8 +96,18 @@
                         <Image Source="Graphics/delete_32_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
-            </MenuItem>
-            <MenuItem Name="ConnectionMenu" Header="_Communication">
+				<MenuItem Name="MoveUpMenuItem" Header="Move _Up" IsEnabled="{Binding ElementName=MoveUpButton, Path=IsEnabled}" Command="{x:Static wcw:MainWindow.MoveUp}">
+					<MenuItem.Icon>
+						<Image Source="Graphics/move-up-16.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+					</MenuItem.Icon>
+				</MenuItem>
+				<MenuItem Name="MoveDownMenuItem" Header="Move Do_wn" IsEnabled="{Binding ElementName=MoveDownButton, Path=IsEnabled}" Command="{x:Static wcw:MainWindow.MoveDown}">
+					<MenuItem.Icon>
+						<Image Source="Graphics/move-down-16.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+					</MenuItem.Icon>
+				</MenuItem>
+			</MenuItem>
+            <MenuItem Name="CommunicationMenu" Header="_Communication">
                 <MenuItem Name="ConnectToMenuItem" Header="_Connect to..." Command="{x:Static wcw:MainWindow.ConnectTo}">
                     <MenuItem.Icon>
                         <Image Source="Graphics/favorites_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
@@ -168,7 +182,7 @@
                     <Image Source="Graphics/save_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
             </ToolBar>
-            <ToolBar Name="ConnectionToolBar">
+            <ToolBar Name="CommunicationToolBar">
                 <Button Name="ConnectToButton" ToolTip="Connect to..." Command="{x:Static wcw:MainWindow.ConnectTo}">
                     <Image Source="Graphics/favorites_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
@@ -189,10 +203,16 @@
                 <Button Name="EditButton" ToolTip="Edit..." IsEnabled="False" Command="{x:Static wcw:MainWindow.Edit}">
                     <Image Source="Graphics/Properties-icon_32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
-                <Button Name="DeleteButton" ToolTip="Delete..." IsEnabled="False" Command="Delete">
+				<Button Name="DeleteButton" ToolTip="Delete..." IsEnabled="False" Command="Delete">
                     <Image Source="Graphics/delete_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
-            </ToolBar>
+				<Button Name="MoveUpButton" ToolTip="Move Up" IsEnabled="False" Command="{x:Static wcw:MainWindow.MoveUp}">
+					<Image Source="Graphics/move-up-32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+				</Button>
+				<Button Name="MoveDownButton" ToolTip="Move Down" IsEnabled="False" Command="{x:Static wcw:MainWindow.MoveDown}">
+					<Image Source="Graphics/move-down-32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+				</Button>
+			</ToolBar>
 			<ToolBar Name="ClipboardToolBar">
 				<Button Name="CopyButton" ToolTip="Copy" IsEnabled="False" Command="{x:Static wcw:MainWindow.Copy}">
 					<Image Source="Graphics/Amitjakhu-Drip-Copy.32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>

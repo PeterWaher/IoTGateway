@@ -8,7 +8,6 @@ using System.Windows.Input;
 using System.Xml;
 using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Sniffers;
-using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Dialogs.IoT;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -21,7 +20,6 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things;
 using Waher.Things.SensorData;
-using Waher.Networking;
 using Waher.Networking.XMPP.Events;
 
 namespace Waher.Client.WPF.Model.Concentrator
@@ -1281,5 +1279,80 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// If the node can be moved up.
+		/// </summary>
+		public override bool CanMoveUp
+		{
+			get
+			{
+				return 
+					this.Parent is Node ParentNode &&
+					(ParentNode.nodeInfo?.ChildrenOrdered ?? false);
+			}
+		}
+
+		/// <summary>
+		/// Is called when the user wants to move a node up.
+		/// </summary>
+		public override void MoveUp()
+		{
+			string FullJid = this.Concentrator?.FullJid;
+			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+
+			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
+			{
+				Mouse.OverrideCursor = Cursors.Wait;
+
+				ConcentratorClient.MoveNodeUp(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (Sender, e) =>
+				{
+					MainWindow.MouseDefault();
+
+					if (!e.Ok)
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to move node up." : e.ErrorText);
+
+					return Task.CompletedTask;
+
+				}, null);
+			}
+		}
+
+		/// <summary>
+		/// If the node can be moved down.
+		/// </summary>
+		public override bool CanMoveDown
+		{
+			get
+			{
+				return
+					this.Parent is Node ParentNode &&
+					(ParentNode.nodeInfo?.ChildrenOrdered ?? false);
+			}
+		}
+
+		/// <summary>
+		/// Is called when the user wants to move a node down.
+		/// </summary>
+		public override void MoveDown()
+		{
+			string FullJid = this.Concentrator?.FullJid;
+			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+
+			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
+			{
+				Mouse.OverrideCursor = Cursors.Wait;
+
+				ConcentratorClient.MoveNodeDown(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (Sender, e) =>
+				{
+					MainWindow.MouseDefault();
+
+					if (!e.Ok)
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to move node down." : e.ErrorText);
+
+					return Task.CompletedTask;
+
+				}, null);
+			}
+		}
 	}
 }

@@ -35,10 +35,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Key in parent child collection.
 		/// </summary>
-		public abstract string Key
-		{
-			get;
-		}
+		public abstract string Key { get; }
 
 		/// <summary>
 		/// If the node has child nodes or not. If null, the state is undefined, and might need to be checked by consulting with the
@@ -119,10 +116,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Tree Node header text.
 		/// </summary>
-		public abstract string Header
-		{
-			get;
-		}
+		public abstract string Header { get; }
 
 		/// <summary>
 		/// Disposes of the node and its resources.
@@ -140,50 +134,32 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Image resource for the node.
 		/// </summary>
-		public abstract ImageSource ImageResource
-		{
-			get;
-		}
+		public abstract ImageSource ImageResource { get; }
 
 		/// <summary>
 		/// If the second image resource is visible or not.
 		/// </summary>
-		public virtual Visibility ImageResourceVisibility
-		{
-			get { return Visibility.Visible; }
-		}
+		public virtual Visibility ImageResourceVisibility => Visibility.Visible;
 
 		/// <summary>
 		/// Secondary image resource for the node.
 		/// </summary>
-		public virtual ImageSource ImageResource2
-		{
-			get { return null; }
-		}
+		public virtual ImageSource ImageResource2 => null;
 
 		/// <summary>
 		/// If the second image resource is visible or not.
 		/// </summary>
-		public virtual Visibility ImageResource2Visibility
-		{
-			get { return Visibility.Hidden; }
-		}
+		public virtual Visibility ImageResource2Visibility => Visibility.Hidden;
 
 		/// <summary>
 		/// Tool Tip for node.
 		/// </summary>
-		public abstract string ToolTip
-		{
-			get;
-		}
+		public abstract string ToolTip { get; }
 
 		/// <summary>
 		/// Node Type Name.
 		/// </summary>
-		public abstract string TypeName
-		{
-			get;
-		}
+		public abstract string TypeName { get; }
 
 		/// <summary>
 		/// Gets a displayable parameter value.
@@ -337,10 +313,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If children can be added to the node.
 		/// </summary>
-		public abstract bool CanAddChildren
-		{
-			get;
-		}
+		public abstract bool CanAddChildren { get; }
 
 		/// <summary>
 		/// Is called when the user wants to add a node to the current node.
@@ -354,10 +327,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If the node can be deleted.
 		/// </summary>
-		public abstract bool CanDelete
-		{
-			get;
-		}
+		public abstract bool CanDelete { get; }
 
 		/// <summary>
 		/// If the node provides a custom delete question.
@@ -379,10 +349,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If the node can be edited.
 		/// </summary>
-		public abstract bool CanEdit
-		{
-			get;
-		}
+		public abstract bool CanEdit { get; }
 
 		/// <summary>
 		/// Is called when the user wants to edit a node.
@@ -394,12 +361,37 @@ namespace Waher.Client.WPF.Model
 		}
 
 		/// <summary>
+		/// If the node can be moved up.
+		/// </summary>
+		public virtual bool CanMoveUp => false;
+
+		/// <summary>
+		/// Is called when the user wants to move a node up.
+		/// </summary>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
+		public virtual void MoveUp()
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// If the node can be moved down.
+		/// </summary>
+		public virtual bool CanMoveDown => false;
+
+		/// <summary>
+		/// Is called when the user wants to move a node down.
+		/// </summary>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
+		public virtual void MoveDown()
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
 		/// If node can be copied to clipboard.
 		/// </summary>
-		public virtual bool CanCopy
-		{
-			get => false;
-		}
+		public virtual bool CanCopy => false;
 
 		/// <summary>
 		/// Is called when the user wants to copy the node to the clipboard.
@@ -413,10 +405,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If node can be pasted to, from the clipboard.
 		/// </summary>
-		public virtual bool CanPaste
-		{
-			get => false;
-		}
+		public virtual bool CanPaste => false;
 
 		/// <summary>
 		/// Is called when the user wants to paste data from the clipboard to the node.
@@ -430,10 +419,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If the node can be recycled.
 		/// </summary>
-		public abstract bool CanRecycle
-		{
-			get;
-		}
+		public abstract bool CanRecycle { get; }
 
 		/// <summary>
 		/// Is called when the user wants to recycle the node.
@@ -478,10 +464,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If the node can be sniffed.
 		/// </summary>
-		public virtual bool IsSniffable
-		{
-			get { return false; }
-		}
+		public virtual bool IsSniffable => false;
 
 		/// <summary>
 		/// Adds a sniffer to the node.
@@ -643,7 +626,7 @@ namespace Waher.Client.WPF.Model
 				});
 			}
 
-			if (this.Parent is not null && this.Parent.CanDelete)
+			if (this.CanDelete)
 			{
 				CurrentGroup = "Edit";
 				Menu.Items.Add(new MenuItem()
@@ -654,6 +637,40 @@ namespace Waher.Client.WPF.Model
 					Icon = new Image()
 					{
 						Source = new BitmapImage(new Uri("../Graphics/delete_32_h.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+
+			if (this.CanMoveUp)
+			{
+				CurrentGroup = "Edit";
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "Move _Up",
+					IsEnabled = true,
+					Command = MainWindow.MoveUp,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/move-up-16.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+
+			if (this.CanMoveDown)
+			{
+				CurrentGroup = "Edit";
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "Move Do_wn",
+					IsEnabled = true,
+					Command = MainWindow.MoveDown,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/move-down-16.png", UriKind.Relative)),
 						Width = 16,
 						Height = 16
 					}
@@ -676,6 +693,7 @@ namespace Waher.Client.WPF.Model
 					}
 				});
 			}
+
 			if (this.CanPaste)
 			{
 				CurrentGroup = "Edit";

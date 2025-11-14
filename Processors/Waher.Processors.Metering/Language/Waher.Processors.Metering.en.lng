@@ -7,6 +7,16 @@
 			<String id="3">Processor</String>
 			<String id="4">Label presenting the node in the thing error decision tree.</String>
 		</Namespace>
+		<Namespace name="Waher.Processors.Metering.NodeTypes.Errors.Actions">
+			<String id="1">Script</String>
+			<String id="2">Script:</String>
+			<String id="3">Script used to process fields.</String>
+			<String id="4">Process error using script</String>
+			<String id="5">When executing the script, the variables Device and Error will contain references to the corresponding device and error objects being processed. Remember to return the error or array of errors you want to continue to process. Returning null or something that is not an error mutes the error from future processing.</String>
+			<String id="18">Accept Field</String>
+			<String id="19">Reject Field</String>
+			<String id="21">Processor</String>
+		</Namespace>
 		<Namespace name="Waher.Processors.Metering.NodeTypes.Fields">
 			<String id="1">Sensor Data Decision Tree</String>
 			<String id="2">Label:</String>
@@ -15,13 +25,13 @@
 		</Namespace>
 		<Namespace name="Waher.Processors.Metering.NodeTypes.Fields.Actions">
 			<String id="1">Script</String>
+			<String id="2">Script:</String>
+			<String id="3">Script used to process fields.</String>
 			<String id="4">Process field using script</String>
+			<String id="5">When executing the script, the variables Sensor and Field will contain references to the corresponding sensor and field objects being processed. Remember to return the field or array of fields you want to continue to process. Returning null or something that is not a field rejects the field from future processing.</String>
 			<String id="18">Accept Field</String>
 			<String id="19">Reject Field</String>
 			<String id="21">Processor</String>
-			<String id="65">Script:</String>
-			<String id="66">Script used to process fields.</String>
-			<String id="67">When executing the script, the variables Sensor and Field will contain references to the corresponding sensor and field objects being processed. Remember to return the field or array of fields you want to continue to process. Returning null or something that is not a field rejects the field from future processing.</String>
 		</Namespace>
 		<Namespace name="Waher.Processors.Metering.NodeTypes.Fields.Calculations">
 			<String id="21">Processor</String>

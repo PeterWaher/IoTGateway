@@ -4,17 +4,17 @@ using Waher.Things;
 using Waher.Things.Attributes;
 using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes
+namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 {
 	/// <summary>
-	/// Abstract base class for decision tree statement nodes.
+	/// Abstract base class of condition nodes.
 	/// </summary>
-	public abstract class DecisionTreeStatement : ProcessorNode, IDecisionTreeStatement
+	public abstract class ConditionNode : DecisionTreeStatements, IConditionNode
 	{
 		/// <summary>
-		/// Abstract base class for decision tree statement nodes.
+		/// Abstract base class of condition nodes.
 		/// </summary>
-		public DecisionTreeStatement()
+		public ConditionNode()
 			: base()
 		{
 			this.NodeId = Guid.NewGuid().ToString();
@@ -46,15 +46,14 @@ namespace Waher.Processors.Metering.NodeTypes
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult(Parent is IDecisionTreeStatements);
+			return Task.FromResult(Parent is Conditional);
 		}
 
 		/// <summary>
-		/// Processes a single sensor data field.
+		/// Checks if condition applies to field.
 		/// </summary>
-		/// <param name="Sensor">Sensor reporting the field.</param>
-		/// <param name="Field">Field to process.</param>
-		/// <returns>Processed set of fields. Can be null if field does not pass processing.</returns>
-		public abstract Task<Field[]> ProcessField(ISensor Sensor, Field Field);
+		/// <param name="Field">Field</param>
+		/// <returns>If the condition applies.</returns>
+		public abstract Task<bool> AppliesTo(Field Field);
 	}
 }

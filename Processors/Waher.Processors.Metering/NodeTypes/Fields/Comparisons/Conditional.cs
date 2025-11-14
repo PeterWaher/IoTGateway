@@ -3,7 +3,7 @@ using Waher.Runtime.Language;
 using Waher.Things;
 using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes.Comparisons
+namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 {
 	/// <summary>
 	/// Conditional processing statement.

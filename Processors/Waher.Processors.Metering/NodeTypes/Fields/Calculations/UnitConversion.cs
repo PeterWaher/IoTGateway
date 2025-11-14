@@ -1,12 +1,11 @@
 ﻿using System.Threading.Tasks;
-using Waher.Processors.Metering.NodeTypes.Comparisons;
 using Waher.Runtime.Language;
 using Waher.Script.Units;
 using Waher.Things;
 using Waher.Things.Attributes;
 using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes.Calculations
+namespace Waher.Processors.Metering.NodeTypes.Fields.Calculations
 {
 	/// <summary>
 	/// Converts the value of a field to a specific unit.

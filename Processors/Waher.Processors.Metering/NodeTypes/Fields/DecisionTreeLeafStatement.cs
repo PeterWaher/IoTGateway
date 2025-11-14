@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Waher.Things;
 
-namespace Waher.Processors.Metering.NodeTypes
+namespace Waher.Processors.Metering.NodeTypes.Fields
 {
 	/// <summary>
 	/// Abstract base class for decision tree statement leaf nodes.

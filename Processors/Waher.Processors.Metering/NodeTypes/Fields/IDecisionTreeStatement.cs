@@ -2,7 +2,7 @@
 using Waher.Things;
 using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes
+namespace Waher.Processors.Metering.NodeTypes.Fields
 {
 	/// <summary>
 	/// Interface for decision tree staement nodes.

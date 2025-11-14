@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Waher.Processors.Metering.NodeTypes.Comparisons;
 using Waher.Runtime.Language;
 using Waher.Things;
 using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes.Actions
+namespace Waher.Processors.Metering.NodeTypes.Fields.Actions
 {
 	/// <summary>
 	/// Accepts a field.

@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes.Comparisons
+namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 {
 	/// <summary>
-	/// Condition on field age.
+	/// Condition on field name.
 	/// </summary>
-	public class IfAge : ComparisonNode
+	public class IfName : ConditionNode
 	{
 		/// <summary>
-		/// Condition on field age.
+		/// Condition on field name.
 		/// </summary>
-		public IfAge()
+		public IfName()
 			: base()
 		{
 		}
@@ -23,10 +22,10 @@ namespace Waher.Processors.Metering.NodeTypes.Comparisons
 		/// <summary>
 		/// If historical values should be read.
 		/// </summary>
-		[Header(26, "Age Limit:", 30)]
+		[Header(24, "Field Names:", 30)]
 		[Page(21, "Processor", 0)]
-		[ToolTip(27, "Compares the field age with this value.")]
-		public Duration AgeLimit { get; set; }
+		[ToolTip(25, "Check, if field name matches any in the list.")]
+		public string[] FieldNames { get; set; }
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -35,7 +34,7 @@ namespace Waher.Processors.Metering.NodeTypes.Comparisons
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(IfAge), 28, "If Field Age");
+			return Language.GetStringAsync(typeof(IfName), 23, "If Field Name");
 		}
 
 		/// <summary>
@@ -45,7 +44,10 @@ namespace Waher.Processors.Metering.NodeTypes.Comparisons
 		/// <returns>If the condition applies.</returns>
 		public override Task<bool> AppliesTo(Field Field)
 		{
-			return this.CompareTo(Field.Timestamp.ToUniversalTime(), DateTime.UtcNow - this.AgeLimit);
+			if (this.FieldNames is null)
+				return Task.FromResult(false);
+			else
+				return Task.FromResult(Array.IndexOf(this.FieldNames, Field.Name) >= 0);
 		}
 	}
 }

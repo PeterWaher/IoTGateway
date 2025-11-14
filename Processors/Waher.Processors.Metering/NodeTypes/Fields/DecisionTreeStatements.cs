@@ -3,7 +3,7 @@ using Waher.Runtime.Collections;
 using Waher.Things;
 using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes
+namespace Waher.Processors.Metering.NodeTypes.Fields
 {
 	/// <summary>
 	/// Abstract base class for decision tree nodes containing its own set of statements.

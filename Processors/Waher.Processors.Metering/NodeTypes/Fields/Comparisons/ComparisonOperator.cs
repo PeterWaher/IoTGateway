@@ -1,4 +1,4 @@
-﻿namespace Waher.Processors.Metering.NodeTypes.Comparisons
+﻿namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 {
 	/// <summary>
 	/// Identifies a comparison operator.

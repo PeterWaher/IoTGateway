@@ -8,7 +8,7 @@ using Waher.Things;
 using Waher.Things.Attributes;
 using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes.Actions
+namespace Waher.Processors.Metering.NodeTypes.Fields.Actions
 {
 	/// <summary>
 	/// Processes a field using script.

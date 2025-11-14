@@ -4,7 +4,7 @@ using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes.Comparisons
+namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 {
 	/// <summary>
 	/// Condition on field type.

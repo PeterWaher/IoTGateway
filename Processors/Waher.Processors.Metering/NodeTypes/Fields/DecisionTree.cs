@@ -3,7 +3,7 @@ using Waher.Processors.NodeTypes;
 using Waher.Runtime.Language;
 using Waher.Things;
 
-namespace Waher.Processors.Metering.NodeTypes
+namespace Waher.Processors.Metering.NodeTypes.Fields
 {
 	/// <summary>
 	/// Processing of sensor data via a decision tree.

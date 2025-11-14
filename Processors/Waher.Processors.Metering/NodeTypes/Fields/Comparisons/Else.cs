@@ -2,7 +2,7 @@
 using Waher.Runtime.Language;
 using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes.Comparisons
+namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 {
 	/// <summary>
 	/// Condition that is always true.

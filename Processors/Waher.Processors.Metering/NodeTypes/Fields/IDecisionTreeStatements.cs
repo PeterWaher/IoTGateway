@@ -1,4 +1,4 @@
-﻿namespace Waher.Processors.Metering.NodeTypes
+﻿namespace Waher.Processors.Metering.NodeTypes.Fields
 {
 	/// <summary>
 	/// Interface for processing nodes that can take multiple decision tree statements.

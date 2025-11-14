@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes.Comparisons
+namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 {
 	/// <summary>
 	/// Interface for condition nodes.

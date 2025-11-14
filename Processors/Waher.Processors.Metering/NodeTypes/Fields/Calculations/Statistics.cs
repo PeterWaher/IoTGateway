@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Processors.Metering.NodeTypes.Comparisons;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Runtime.Statistics;
@@ -13,7 +12,7 @@ using Waher.Things;
 using Waher.Things.Attributes;
 using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes.Calculations
+namespace Waher.Processors.Metering.NodeTypes.Fields.Calculations
 {
 	/// <summary>
 	/// Calculates statistics of momentary values over a period of time.

@@ -23,18 +23,18 @@ namespace Waher.Processors.Metering.NodeTypes.Fields.Calculations
 		/// <summary>
 		/// Unit to convert to.
 		/// </summary>
-		[Header(38, "Unit:", 20)]
-		[Page(21, "Processor", 0)]
-		[ToolTip(39, "The unit to convert to.")]
+		[Header(3, "Unit:", 20)]
+		[Page(1, "Processor", 0)]
+		[ToolTip(4, "The unit to convert to.")]
 		[Required]
 		public string Unit { get; set; }
 
 		/// <summary>
 		/// If the unit is missing, sets it to the target unit.
 		/// </summary>
-		[Header(40, "Set unit if missing.", 30)]
-		[Page(21, "Processor", 0)]
-		[ToolTip(41, "If a numeric field lacks a unit, the unit will be set to the specified unit.")]
+		[Header(5, "Set unit if missing.", 30)]
+		[Page(1, "Processor", 0)]
+		[ToolTip(6, "If a numeric field lacks a unit, the unit will be set to the specified unit.")]
 		public bool SetUnitIfMissing { get; set; }
 
 		/// <summary>
@@ -44,7 +44,7 @@ namespace Waher.Processors.Metering.NodeTypes.Fields.Calculations
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(UnitConversion), 37, "Unit Conversion");
+			return Language.GetStringAsync(typeof(UnitConversion), 2, "Unit Conversion");
 		}
 
 		/// <summary>

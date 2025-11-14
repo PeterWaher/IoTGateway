@@ -22,9 +22,9 @@ namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 		/// <summary>
 		/// If historical values should be read.
 		/// </summary>
-		[Header(24, "Field Names:", 30)]
+		[Header(18, "Field Names:", 30)]
 		[Page(21, "Processor", 0)]
-		[ToolTip(25, "Check, if field name matches any in the list.")]
+		[ToolTip(19, "Check, if field name matches any in the list.")]
 		public string[] FieldNames { get; set; }
 
 		/// <summary>
@@ -34,7 +34,7 @@ namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(IfName), 23, "If Field Name");
+			return Language.GetStringAsync(typeof(IfName), 20, "If Field Name");
 		}
 
 		/// <summary>

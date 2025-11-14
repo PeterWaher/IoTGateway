@@ -20,16 +20,16 @@ namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(29, "Comparison Operator:", 20)]
+		[Header(25, "Comparison Operator:", 20)]
 		[Page(21, "Processor", 0)]
-		[ToolTip(30, "What comparison operator to use.")]
+		[ToolTip(26, "What comparison operator to use.")]
 		[Required]
-		[Option(ComparisonOperator.Equal, 31, "Equal to (=)")]
-		[Option(ComparisonOperator.NotEqual, 32, "Not equal to (<>)")]
-		[Option(ComparisonOperator.LesserThan, 33, "Lesser than (<)")]
-		[Option(ComparisonOperator.LesserThanOrEqual, 34, "Lesser than or equal to (<=)")]
-		[Option(ComparisonOperator.GreaterThan, 35, "Greater than (>)")]
-		[Option(ComparisonOperator.GreaterThanOrEqual, 36, "Greater than or equal to (>=)")]
+		[Option(ComparisonOperator.Equal, 27, "Equal to (=)")]
+		[Option(ComparisonOperator.NotEqual, 28, "Not equal to (<>)")]
+		[Option(ComparisonOperator.LesserThan, 29, "Lesser than (<)")]
+		[Option(ComparisonOperator.LesserThanOrEqual, 30, "Lesser than or equal to (<=)")]
+		[Option(ComparisonOperator.GreaterThan, 31, "Greater than (>)")]
+		[Option(ComparisonOperator.GreaterThanOrEqual, 32, "Greater than or equal to (>=)")]
 		public ComparisonOperator Operator { get; set; }
 
 		/// <summary>

@@ -32,90 +32,90 @@ namespace Waher.Processors.Metering.NodeTypes.Fields.Calculations
 		/// <summary>
 		/// Aggregation period.
 		/// </summary>
-		[Header(42, "Period (s):", 30)]
-		[Page(21, "Processor", 0)]
-		[ToolTip(43, "Time period, in seconds, over which statistics is computed.")]
+		[Header(7, "Period (s):", 30)]
+		[Page(1, "Processor", 0)]
+		[ToolTip(8, "Time period, in seconds, over which statistics is computed.")]
 		[Required]
 		public int PeriodSeconds { get; set; }
 
 		/// <summary>
 		/// If incompatible fields are to be rejected.
 		/// </summary>
-		[Header(49, "Persisted state.", 30)]
-		[Page(21, "Processor", 0)]
-		[ToolTip(50, "If checked, All computations will be persisted, allowing for server to be restarted in mid period.")]
+		[Header(14, "Persisted state.", 30)]
+		[Page(1, "Processor", 0)]
+		[ToolTip(15, "If checked, All computations will be persisted, allowing for server to be restarted in mid period.")]
 		public bool PersistedState { get; set; }
 
 		/// <summary>
 		/// If incompatible fields are to be rejected.
 		/// </summary>
-		[Header(44, "Reject incompatible fields.", 40)]
-		[Page(21, "Processor", 0)]
-		[ToolTip(45, "If checked, all non-momentary numerical values will be rejected.")]
+		[Header(9, "Reject incompatible fields.", 40)]
+		[Page(1, "Processor", 0)]
+		[ToolTip(10, "If checked, all non-momentary numerical values will be rejected.")]
 		public bool RejectIncompatible { get; set; }
 
 		/// <summary>
 		/// If compatible fields are to be replaced with the statistical aggregate values.
 		/// </summary>
-		[Header(46, "Replace sampled values.", 50)]
-		[Page(21, "Processor", 0)]
-		[ToolTip(47, "If checked, all field values used in the calculation will be rejected after they have been used to calculate the aggregate values.")]
+		[Header(11, "Replace sampled values.", 50)]
+		[Page(1, "Processor", 0)]
+		[ToolTip(12, "If checked, all field values used in the calculation will be rejected after they have been used to calculate the aggregate values.")]
 		public bool ReplaceCompatible { get; set; }
 
 		/// <summary>
 		/// Calculate the number of samples in the period.
 		/// </summary>
-		[Header(51, "Count samples.", 60)]
-		[Page(21, "Processor", 0)]
-		[ToolTip(52, "If checked, the count of samples will be calcaulted.")]
+		[Header(16, "Count samples.", 60)]
+		[Page(1, "Processor", 0)]
+		[ToolTip(17, "If checked, the count of samples will be calcaulted.")]
 		public bool CalculateCount { get; set; }
 
 		/// <summary>
 		/// Calculates the average value in the period.
 		/// </summary>
-		[Header(53, "Calculate Average.", 70)]
-		[Page(21, "Processor", 0)]
-		[ToolTip(54, "If checked, the average of the samples will be calcaulted.")]
+		[Header(18, "Calculate Average.", 70)]
+		[Page(1, "Processor", 0)]
+		[ToolTip(19, "If checked, the average of the samples will be calcaulted.")]
 		public bool CalculateAverage { get; set; }
 
 		/// <summary>
 		/// Calculates the median value in the period.
 		/// </summary>
-		[Header(55, "Calculate Median.", 80)]
-		[Page(21, "Processor", 0)]
-		[ToolTip(56, "If checked, the median of the samples will be calcaulted.")]
+		[Header(20, "Calculate Median.", 80)]
+		[Page(1, "Processor", 0)]
+		[ToolTip(21, "If checked, the median of the samples will be calcaulted.")]
 		public bool CalculateMedian { get; set; }
 
 		/// <summary>
 		/// Calculates the minimum value in the period.
 		/// </summary>
-		[Header(57, "Calculate Minimum.", 90)]
-		[Page(21, "Processor", 0)]
-		[ToolTip(58, "If checked, the minimum of the samples will be calcaulted.")]
+		[Header(22, "Calculate Minimum.", 90)]
+		[Page(1, "Processor", 0)]
+		[ToolTip(23, "If checked, the minimum of the samples will be calcaulted.")]
 		public bool CalculateMin { get; set; }
 
 		/// <summary>
 		/// Calculates the maximum value in the period.
 		/// </summary>
-		[Header(59, "Calculate Maximum.", 100)]
-		[Page(21, "Processor", 0)]
-		[ToolTip(60, "If checked, the maximum of the samples will be calcaulted.")]
+		[Header(24, "Calculate Maximum.", 100)]
+		[Page(1, "Processor", 0)]
+		[ToolTip(25, "If checked, the maximum of the samples will be calcaulted.")]
 		public bool CalculateMax { get; set; }
 
 		/// <summary>
 		/// Calculates the variance of the values in the period.
 		/// </summary>
-		[Header(61, "Calculate Variance.", 110)]
-		[Page(21, "Processor", 0)]
-		[ToolTip(62, "If checked, the variance of the samples will be calcaulted.")]
+		[Header(26, "Calculate Variance.", 110)]
+		[Page(1, "Processor", 0)]
+		[ToolTip(27, "If checked, the variance of the samples will be calcaulted.")]
 		public bool CalculateVariance { get; set; }
 
 		/// <summary>
 		/// Calculates the standard deviation of the values in the period.
 		/// </summary>
-		[Header(63, "Calculate Standard Deviation.", 120)]
-		[Page(21, "Processor", 0)]
-		[ToolTip(64, "If checked, the standard deviation of the samples will be calcaulted.")]
+		[Header(28, "Calculate Standard Deviation.", 120)]
+		[Page(1, "Processor", 0)]
+		[ToolTip(29, "If checked, the standard deviation of the samples will be calcaulted.")]
 		public bool CalculateStdDev { get; set; }
 
 		/// <summary>
@@ -134,7 +134,7 @@ namespace Waher.Processors.Metering.NodeTypes.Fields.Calculations
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(Statistics), 48, "Statistics");
+			return Language.GetStringAsync(typeof(Statistics), 13, "Statistics");
 		}
 
 		/// <summary>

@@ -25,7 +25,7 @@ namespace Waher.Processors.Metering.NodeTypes.Fields.Actions
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(RejectField), 19, "Reject Field");
+			return Language.GetStringAsync(typeof(RejectField), 7, "Reject Field");
 		}
 
 		/// <summary>

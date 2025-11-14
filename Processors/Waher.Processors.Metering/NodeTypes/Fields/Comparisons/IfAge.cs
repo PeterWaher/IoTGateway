@@ -23,9 +23,9 @@ namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 		/// <summary>
 		/// If historical values should be read.
 		/// </summary>
-		[Header(26, "Age Limit:", 30)]
+		[Header(22, "Age Limit:", 30)]
 		[Page(21, "Processor", 0)]
-		[ToolTip(27, "Compares the field age with this value.")]
+		[ToolTip(23, "Compares the field age with this value.")]
 		public Duration AgeLimit { get; set; }
 
 		/// <summary>
@@ -35,7 +35,7 @@ namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(IfAge), 28, "If Field Age");
+			return Language.GetStringAsync(typeof(IfAge), 24, "If Field Age");
 		}
 
 		/// <summary>

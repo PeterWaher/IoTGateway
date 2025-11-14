@@ -24,7 +24,7 @@ namespace Waher.Processors.Metering.NodeTypes.Errors.Actions
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(ForwardError), 18, "Accept Field");
+			return Language.GetStringAsync(typeof(ForwardError), 6, "Forward Error");
 		}
 
 		/// <summary>

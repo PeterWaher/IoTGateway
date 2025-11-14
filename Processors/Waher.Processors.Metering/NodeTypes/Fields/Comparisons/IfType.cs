@@ -22,54 +22,54 @@ namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 		/// <summary>
 		/// If momentary values should be read.
 		/// </summary>
-		[Header(5, "Momentary values.", 30)]
+		[Header(3, "Momentary values.", 30)]
 		[Page(21, "Processor", 0)]
-		[ToolTip(6, "Check, if momentary values should be read.")]
+		[ToolTip(4, "Check, if momentary values should be read.")]
 		[DefaultValue(true)]
 		public bool Momentary { get; set; } = true;
 
 		/// <summary>
 		/// If identity values should be read.
 		/// </summary>
-		[Header(7, "Identity values.", 40)]
+		[Header(5, "Identity values.", 40)]
 		[Page(21, "Processor", 0)]
-		[ToolTip(8, "Check, if identity values should be read.")]
+		[ToolTip(6, "Check, if identity values should be read.")]
 		[DefaultValue(false)]
 		public bool Identity { get; set; } = false;
 
 		/// <summary>
 		/// If status values should be read.
 		/// </summary>
-		[Header(9, "Status values.", 50)]
+		[Header(7, "Status values.", 50)]
 		[Page(21, "Processor", 0)]
-		[ToolTip(10, "Check, if status values should be read.")]
+		[ToolTip(8, "Check, if status values should be read.")]
 		[DefaultValue(false)]
 		public bool Status { get; set; } = false;
 
 		/// <summary>
 		/// If computed values should be read.
 		/// </summary>
-		[Header(11, "Computed values.", 60)]
+		[Header(9, "Computed values.", 60)]
 		[Page(21, "Processor", 0)]
-		[ToolTip(12, "Check, if computed values should be read.")]
+		[ToolTip(10, "Check, if computed values should be read.")]
 		[DefaultValue(false)]
 		public bool Computed { get; set; } = false;
 
 		/// <summary>
 		/// If peak values should be read.
 		/// </summary>
-		[Header(13, "Peak values.", 70)]
+		[Header(11, "Peak values.", 70)]
 		[Page(21, "Processor", 0)]
-		[ToolTip(14, "Check, if peak values should be read.")]
+		[ToolTip(12, "Check, if peak values should be read.")]
 		[DefaultValue(false)]
 		public bool Peak { get; set; } = false;
 
 		/// <summary>
 		/// If historical values should be read.
 		/// </summary>
-		[Header(15, "Historical values.", 80)]
+		[Header(13, "Historical values.", 80)]
 		[Page(21, "Processor", 0)]
-		[ToolTip(16, "Check, if historical values should be read.")]
+		[ToolTip(14, "Check, if historical values should be read.")]
 		[DefaultValue(false)]
 		public bool Historical { get; set; } = false;
 
@@ -111,7 +111,7 @@ namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(IfType), 3, "If Field Type");
+			return Language.GetStringAsync(typeof(IfType), 2, "If Field Type");
 		}
 
 		/// <summary>

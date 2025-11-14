@@ -5,14 +5,14 @@ using Waher.Things;
 namespace Waher.Processors.Metering.NodeTypes.Errors.Actions
 {
 	/// <summary>
-	/// Rejects a field.
+	/// Mutes the error.
 	/// </summary>
-	public class RejectField : DecisionTreeLeafStatement
+	public class MuteError : DecisionTreeLeafStatement
 	{
 		/// <summary>
-		/// Rejects a field.
+		/// Mutes the error.
 		/// </summary>
-		public RejectField()
+		public MuteError()
 			: base()
 		{
 		}
@@ -24,7 +24,7 @@ namespace Waher.Processors.Metering.NodeTypes.Errors.Actions
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(RejectField), 19, "Reject Field");
+			return Language.GetStringAsync(typeof(MuteError), 7, "Mute Error");
 		}
 
 		/// <summary>

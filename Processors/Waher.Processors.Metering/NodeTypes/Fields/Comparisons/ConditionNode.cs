@@ -23,9 +23,9 @@ namespace Waher.Processors.Metering.NodeTypes.Fields.Comparisons
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(20, "Label:", 10)]
+		[Header(16, "Label:", 10)]
 		[Page(21, "Processor", 0)]
-		[ToolTip(22, "Label presenting the node in the decision tree.")]
+		[ToolTip(17, "Label presenting the node in the decision tree.")]
 		[Required]
 		public string Label { get; set; }
 

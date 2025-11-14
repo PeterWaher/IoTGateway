@@ -2,9 +2,8 @@
 using System.Threading.Tasks;
 using Waher.Things;
 using Waher.Things.Attributes;
-using Waher.Things.SensorData;
 
-namespace Waher.Processors.Metering.NodeTypes.Fields
+namespace Waher.Processors.Metering.NodeTypes.Errors
 {
 	/// <summary>
 	/// Abstract base class for decision tree statement nodes.
@@ -23,9 +22,9 @@ namespace Waher.Processors.Metering.NodeTypes.Fields
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(2, "Label:", 10)]
-		[Page(3, "Processor", 0)]
-		[ToolTip(4, "Label presenting the node in the sensor data decision tree.")]
+		[Header(20, "Label:", 10)]
+		[Page(21, "Processor", 0)]
+		[ToolTip(22, "Label presenting the node in the thing error decision tree.")]
 		[Required]
 		public string Label { get; set; }
 
@@ -50,11 +49,11 @@ namespace Waher.Processors.Metering.NodeTypes.Fields
 		}
 
 		/// <summary>
-		/// Processes a single sensor data field.
+		/// Processes a single thing error.
 		/// </summary>
-		/// <param name="Sensor">Sensor reporting the field.</param>
-		/// <param name="Field">Field to process.</param>
+		/// <param name="Device">Thing reporting the errors.</param>
+		/// <param name="Error">Error to process.</param>
 		/// <returns>Processed set of fields. Can be null if field does not pass processing.</returns>
-		public abstract Task<Field[]> ProcessField(ISensor Sensor, Field Field);
+		public abstract Task<ThingError[]> ProcessError(INode Device, ThingError Error);
 	}
 }

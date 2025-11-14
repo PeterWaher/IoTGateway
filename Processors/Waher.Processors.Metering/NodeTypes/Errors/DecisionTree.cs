@@ -3,12 +3,12 @@ using Waher.Processors.NodeTypes;
 using Waher.Runtime.Language;
 using Waher.Things;
 
-namespace Waher.Processors.Metering.NodeTypes.Fields
+namespace Waher.Processors.Metering.NodeTypes.Errors
 {
 	/// <summary>
 	/// Processing of sensor data via a decision tree.
 	/// </summary>
-	public class DecisionTree : DecisionTreeStatements, ISensorDataProcessor
+	public class DecisionTree : DecisionTreeStatements, IThingErrorProcessor
 	{
 		/// <summary>
 		/// Processing of sensor data via a decision tree.
@@ -25,7 +25,7 @@ namespace Waher.Processors.Metering.NodeTypes.Fields
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(DecisionTree), 1, "Sensor Data Decision Tree");
+			return Language.GetStringAsync(typeof(DecisionTree), 1, "Thing Error Decision Tree");
 		}
 
 		/// <summary>

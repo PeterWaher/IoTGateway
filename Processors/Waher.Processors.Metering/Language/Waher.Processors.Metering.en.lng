@@ -1,11 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Translation xmlns="http://waher.se/Schema/Translation.xsd">
 	<Language code="en" name="English">
-		<Namespace name="Waher.Processors.Metering.NodeTypes">
-			<String id="1">Decision Tree</String>
-			<String id="20">Label:</String>
-			<String id="21">Processor</String>
-			<String id="22">Label presenting the node in the decision tree.</String>
+		<Namespace name="Waher.Processors.Metering.NodeTypes.Errors">
+			<String id="1">Thing Error Decision Tree</String>
+			<String id="2">Label:</String>
+			<String id="3">Processor</String>
+			<String id="4">Label presenting the node in the thing error decision tree.</String>
+		</Namespace>
+		<Namespace name="Waher.Processors.Metering.NodeTypes.Fields">
+			<String id="1">Sensor Data Decision Tree</String>
+			<String id="2">Label:</String>
+			<String id="3">Processor</String>
+			<String id="4">Label presenting the node in the sensor data decision tree.</String>
 		</Namespace>
 		<Namespace name="Waher.Processors.Metering.NodeTypes.Fields.Actions">
 			<String id="1">Script</String>

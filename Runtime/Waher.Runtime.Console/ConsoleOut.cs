@@ -44,6 +44,21 @@ namespace Waher.Runtime.Console
 		public static string NewLine => System.Console.Out.NewLine;
 
 		/// <summary>
+		/// Checks if the console is available.
+		/// </summary>
+		public static bool HasConsole
+		{
+			get
+			{
+				return !(
+					System.Console.IsOutputRedirected ||
+					System.Console.IsErrorRedirected ||
+					System.Console.IsInputRedirected ||
+					!Environment.UserInteractive);
+			}
+		}
+
+		/// <summary>
 		/// Width of window.
 		/// </summary>
 		public static int WindowWidth => System.Console.WindowWidth;

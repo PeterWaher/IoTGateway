@@ -184,7 +184,7 @@ namespace Waher.Networking.Sniffers
 				{
 					int i, w;
 
-					if (this.consoleWidthWorks)
+					if (this.consoleWidthWorks && ConsoleOut.HasConsole)
 					{
 						try
 						{

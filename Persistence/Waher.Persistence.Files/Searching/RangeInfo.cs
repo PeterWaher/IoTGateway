@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Waher.Persistence.Files.Searching
+﻿namespace Waher.Persistence.Files.Searching
 {
 	/// <summary>
 	/// Contains information about a range in a search operation.

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Waher.Content.Xml;
 
 namespace Waher.Networking.XMPP.Provisioning.SearchOperators
@@ -10,7 +9,7 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 	public class StringTagMask : SearchOperatorString
 	{
 		private readonly string wildcard;
-
+		
 		/// <summary>
 		/// Filters things with a named string-valued tag like a given value.
 		/// </summary>
@@ -18,7 +17,19 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 		/// <param name="Value">Tag value.</param>
 		/// <param name="Wildcard">Wildcard string used.</param>
 		public StringTagMask(string Name, string Value, string Wildcard)
-			: base(Name, Value)
+			: this(Name, null, Value, Wildcard)
+		{
+		}
+		
+		/// <summary>
+		/// Filters things with a named string-valued tag like a given value.
+		/// </summary>
+		/// <param name="Name">Tag name.</param>
+		/// <param name="NameWildcard">Optional wildcard used in the name.</param>
+		/// <param name="Value">Tag value.</param>
+		/// <param name="Wildcard">Wildcard string used.</param>
+		public StringTagMask(string Name, string NameWildcard, string Value, string Wildcard)
+			: base(Name, NameWildcard, Value)
 		{
 			this.wildcard = Wildcard;
 		}

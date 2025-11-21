@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Waher.Content;
 
 namespace Waher.Networking.XMPP.Provisioning.SearchOperators
@@ -10,14 +9,15 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 	public abstract class SearchOperatorNumeric : SearchOperator
 	{
 		private readonly double value;
-
+		
 		/// <summary>
 		/// Numeric search operator.
 		/// </summary>
 		/// <param name="Name">Tag name.</param>
+		/// <param name="NameWildcard">Optional wildcard used in the name.</param>
 		/// <param name="Value">Tag value.</param>
-		public SearchOperatorNumeric(string Name, double Value)
-			: base(Name)
+		public SearchOperatorNumeric(string Name, string NameWildcard, double Value)
+			: base(Name, NameWildcard)
 		{
 			this.value = Value;
 		}

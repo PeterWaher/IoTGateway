@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Waher.Content;
 using Waher.Content.Xml;
 
@@ -14,17 +13,19 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 		private readonly string max;
 		private readonly bool minIncluded;
 		private readonly bool maxIncluded;
-
+		
 		/// <summary>
 		/// Abstract base class for ranged string operators.
 		/// </summary>
 		/// <param name="Name">Tag name.</param>
+		/// <param name="NameWildcard">Optional wildcard used in the name.</param>
 		/// <param name="Min">Minimum value.</param>
 		/// <param name="MinIncluded">If the minimum value is included in the range.</param>
 		/// <param name="Max">Maximum value.</param>
 		/// <param name="MaxIncluded">If the maximum value is included in the range.</param>
-		public StringTagRange(string Name, string Min, bool MinIncluded, string Max, bool MaxIncluded)
-			: base(Name)
+		public StringTagRange(string Name, string NameWildcard, string Min, 
+			bool MinIncluded, string Max, bool MaxIncluded)
+			: base(Name, NameWildcard)
 		{
 			this.min = Min;
 			this.minIncluded = MinIncluded;

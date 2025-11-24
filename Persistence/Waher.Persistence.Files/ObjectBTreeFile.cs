@@ -5753,7 +5753,8 @@ namespace Waher.Persistence.Files
 					{
 						if (ChildFilter is FilterFieldValue FilterFieldValue)
 						{
-							if (!FieldOrder.TryGetValue(FilterFieldValue.FieldName, out i) || ChildFilter is FilterFieldNotEqualTo)
+							if (!FieldOrder.TryGetValue(FilterFieldValue.FieldName, out i) || 
+								i >= NrFields || ChildFilter is FilterFieldNotEqualTo)
 							{
 								if (AdditionalFields is null)
 									AdditionalFields = new ChunkedList<Searching.IApplicableFilter>();
@@ -5761,6 +5762,8 @@ namespace Waher.Persistence.Files
 								AdditionalFields.Add(this.ConvertFilter(FilterFieldValue));
 								continue;
 							}
+
+							RangeInfo[i].AddFilterReference(ChildFilter);
 
 							if (FilterFieldValue is FilterFieldEqualTo)
 							{
@@ -5817,10 +5820,12 @@ namespace Waher.Persistence.Files
 							AdditionalFields.Add(FilterFieldLikeRegEx2);
 
 							if (!FieldOrder.TryGetValue(FilterFieldLikeRegEx.FieldName, out i) ||
-								string.IsNullOrEmpty(ConstantPrefix))
+								i >= NrFields || string.IsNullOrEmpty(ConstantPrefix))
 							{
 								continue;
 							}
+
+							RangeInfo[i].AddFilterReference(ChildFilter);
 
 							int c = ConstantPrefix.Length - 1;
 							char LastChar = ConstantPrefix[c];
@@ -5844,6 +5849,31 @@ namespace Waher.Persistence.Files
 								Consistent = false;
 								break;
 							}
+
+
+							c = NrFields;
+							NrFields = ++i;
+
+							if (i < c)
+							{
+								for (; i < c; i++)
+								{
+									Searching.RangeInfo R = RangeInfo[i];
+
+									if (R.HasFilters)
+									{
+										foreach (Filter F in R)
+										{
+											if (AdditionalFields is null)
+												AdditionalFields = new ChunkedList<Searching.IApplicableFilter>();
+
+											AdditionalFields.Add(this.ConvertFilter(F));
+										}
+									}
+								}
+
+								Array.Resize(ref RangeInfo, NrFields);
+							}
 						}
 						else if (ChildFilter is ICustomFilter CustomFilter)
 						{
@@ -5854,6 +5884,31 @@ namespace Waher.Persistence.Files
 						}
 						else
 							throw this.UnknownFilterType(Filter);
+					}
+
+					for (i = 0; i < NrFields; i++)
+					{
+						if (!RangeInfo[i].HasFilters)
+						{
+							for (int j = i + 1; j < NrFields; j++)
+							{
+								Searching.RangeInfo R = RangeInfo[j];
+
+								if (R.HasFilters)
+								{
+									foreach (Filter F in R)
+									{
+										if (AdditionalFields is null)
+											AdditionalFields = new ChunkedList<Searching.IApplicableFilter>();
+
+										AdditionalFields.Add(this.ConvertFilter(F));
+									}
+								}
+							}
+
+							Array.Resize(ref RangeInfo, i);
+							NrFields = i;
+						}
 					}
 
 					if (Consistent)

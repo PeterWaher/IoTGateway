@@ -215,7 +215,10 @@
 			{
 				i = Comparison.Compare(this.point, Value);
 
-				return !(!i.HasValue || i.Value < 0 || (i.Value == 0 && !Inclusive));
+				if (Inclusive)
+					return i.HasValue && i.Value >= 0;
+				else
+					return i.HasValue && i.Value > 0;
 			}
 			else
 			{
@@ -343,6 +346,5 @@
 			Destination.isRange = this.isRange;
 			Destination.isPoint = this.isPoint;
 		}
-
 	}
 }

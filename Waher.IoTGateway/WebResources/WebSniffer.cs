@@ -46,7 +46,7 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
 		public WebSniffer(string SnifferId, string PageResource, TimeSpan MaxLife, BinaryPresentationMethod BinaryPresentationMethod, ICommunicationLayer ComLayer,
 			string UserVariable, params string[] Privileges)
-			: base()
+			: base("Web Sniffer: " + PageResource)
 		{
 			this.expires = DateTime.UtcNow.Add(MaxLife);
 			this.comLayer = ComLayer;

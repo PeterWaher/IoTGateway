@@ -104,8 +104,8 @@ namespace Waher.Script.Operators.Comparisons
 			{
 				if (this.lastExpression is null || Expression != this.lastExpression)
 				{
-					this.lastExpression = Expression;
 					this.regex = new Regex(Expression, this.options);
+					this.lastExpression = Expression;
 
 					ChunkedList<string> Names = null;
 

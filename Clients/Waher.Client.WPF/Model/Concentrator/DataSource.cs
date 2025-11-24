@@ -14,7 +14,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 	/// </summary>
 	public class DataSource : TreeNode
 	{
-		private readonly Dictionary<string, Node> nodes = new Dictionary<string, Node>();
+		private readonly Dictionary<string, Node> nodes = [];
 		private DateTime timer = DateTime.MinValue;
 		private readonly string key;
 		private readonly string header;
@@ -110,11 +110,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 							if (e.Ok)
 							{
-								SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
+								SortedDictionary<string, TreeNode> Children = [];
 
 								foreach (DataSourceReference Ref in e.DataSources)
 								{
-									DataSource DataSource = new DataSource(this, Ref.SourceID, Ref.SourceID, Ref.HasChildren);
+									DataSource DataSource = new(this, Ref.SourceID, Ref.SourceID, Ref.HasChildren);
 									Children[Ref.SourceID] = DataSource;
 
 									DataSource.SubscribeToEvents();
@@ -140,10 +140,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 							if (e.Ok)
 							{
-								SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
+								SortedDictionary<string, TreeNode> Children = [];
+								int Ordinal = 0;
 
 								foreach (NodeInformation Ref in e.NodesInformation)
-									Children[Ref.NodeId] = new Node(this, Ref);
+									Children[Ref.NodeId] = new Node(this, Ref, Ordinal++);
 
 								this.children = Children;
 
@@ -204,7 +205,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			if (this.unsubscribed)
 				return;
 
-			if (!(State is bool))
+			if (State is not bool)
 				return;
 
 			XmppConcentrator Concentrator = this.Concentrator;
@@ -267,7 +268,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			if (this.IsLoaded)
 			{
-				if (!(this.children is null))
+				if (this.children is not null)
 					this.NodesRemoved(this.children.Values, this);
 
 				this.children = new SortedDictionary<string, TreeNode>()
@@ -306,7 +307,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 								NodeAdded.NodeType, NodeAdded.DisplayName, NodeAdded.State, NodeAdded.LocalId, NodeAdded.LogId,
 								NodeAdded.HasChildren, NodeAdded.ChildrenOrdered, NodeAdded.IsReadable, NodeAdded.IsControllable,
 								NodeAdded.HasCommands, NodeAdded.Sniffable, NodeAdded.ParentId, NodeAdded.ParentPartition,
-								NodeAdded.Updated, NodeAdded.Parameters, null));
+								NodeAdded.Updated, NodeAdded.Parameters, null),
+								Parent.Children?.Length ?? 0);
 
 							this.nodes[Key] = Node;
 						}
@@ -360,7 +362,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						}
 
 						Node.Parent.RemoveChild(Node);
-						this.NodesRemoved(new TreeNode[] { Node }, Node.Parent);
+						this.NodesRemoved([Node], Node.Parent);
 					}
 					break;
 
@@ -396,7 +398,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 								return Task.CompletedTask; // Parent not loaded.
 						}
 
-						// TODO: Node.Parent?.MoveUp(Node);
+						if (Node.Parent?.MoveUp(Node) ?? false)
+							Node.Parent.OnUpdated();
 					}
 					break;
 
@@ -411,7 +414,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 								return Task.CompletedTask; // Parent not loaded.
 						}
 
-						// TODO: Node.Parent?.MoveDown(Node);
+						if (Node.Parent?.MoveDown(Node) ?? false)
+							Node.Parent.OnUpdated();
 					}
 					break;
 			}

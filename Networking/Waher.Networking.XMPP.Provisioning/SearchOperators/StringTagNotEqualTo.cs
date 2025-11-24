@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.Provisioning.SearchOperators
+﻿namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 {
 	/// <summary>
 	/// Filters things with a named string-valued tag not equal to a given value.
@@ -13,13 +11,21 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 		/// <param name="Name">Tag name.</param>
 		/// <param name="Value">Tag value.</param>
 		public StringTagNotEqualTo(string Name, string Value)
-			: base(Name, Value)
+			: this(Name, null, Value)
 		{
 		}
 
-		internal override string TagName
+		/// <summary>
+		/// Filters things with a named string-valued tag not equal to a given value.
+		/// </summary>
+		/// <param name="Name">Tag name.</param>
+		/// <param name="NameWildcard">Optional wildcard used in the name.</param>
+		/// <param name="Value">Tag value.</param>
+		public StringTagNotEqualTo(string Name, string NameWildcard, string Value)
+			: base(Name, NameWildcard, Value)
 		{
-			get { return "strNEq"; }
 		}
+
+		internal override string TagName => "strNEq";
 	}
 }

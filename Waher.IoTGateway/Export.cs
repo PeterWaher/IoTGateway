@@ -7,7 +7,6 @@ using Waher.Content;
 using Waher.Events;
 using Waher.IoTGateway.Setup;
 using Waher.IoTGateway.WebResources.ExportFormats;
-using Waher.Networking;
 using Waher.Runtime.Settings;
 
 namespace Waher.IoTGateway

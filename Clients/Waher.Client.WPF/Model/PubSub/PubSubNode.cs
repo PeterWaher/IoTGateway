@@ -43,7 +43,7 @@ namespace Waher.Client.WPF.Model.PubSub
 
 		private void SetParameters()
 		{
-			List<Parameter> Parameters = new List<Parameter>();
+			List<Parameter> Parameters = [];
 
 			if (!string.IsNullOrEmpty(this.jid))
 				Parameters.Add(new StringParameter("JID", "JID", this.jid));
@@ -61,7 +61,7 @@ namespace Waher.Client.WPF.Model.PubSub
 				{ string.Empty, new Loading(this) }
 			};
 
-			this.parameters = new DisplayableParameters(Parameters.ToArray());
+			this.parameters = new DisplayableParameters([.. Parameters]);
 		}
 
 		public override string Key => this.node;
@@ -129,7 +129,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			if (!this.loadingChildren && !this.IsLoaded)
 			{
-				SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
+				SortedDictionary<string, TreeNode> Children = [];
 
 				Mouse.OverrideCursor = Cursors.Wait;
 				this.loadingChildren = true;
@@ -179,12 +179,12 @@ namespace Waher.Client.WPF.Model.PubSub
 
 							if (this.nodeType == NodeType.leaf)
 							{
-								List<string> ItemIds = new List<string>();
+								List<string> ItemIds = [];
 
 								foreach (Item Item in e.Items)
 									ItemIds.Add(Item.Name);
 
-								this.Service.PubSubClient.GetItems(this.node, ItemIds.ToArray(), (sender2, e2) =>
+								this.Service.PubSubClient.GetItems(this.node, [.. ItemIds], (sender2, e2) =>
 								{
 									if (e2.Ok)
 									{
@@ -202,7 +202,7 @@ namespace Waher.Client.WPF.Model.PubSub
 										{
 											foreach (Item Item in e.Items)
 											{
-												this.Service.PubSubClient.GetItems(this.node, new string[] { Item.Name }, (sender3, e3) =>
+												this.Service.PubSubClient.GetItems(this.node, [Item.Name], (sender3, e3) =>
 												{
 													if (e3.Ok)
 													{
@@ -219,7 +219,7 @@ namespace Waher.Client.WPF.Model.PubSub
 															}
 
 															this.OnUpdated();
-															this.Service.NodesAdded(new TreeNode[] { NewNode }, this);
+															this.Service.NodesAdded([NewNode], this);
 														}
 													}
 													else
@@ -273,7 +273,7 @@ namespace Waher.Client.WPF.Model.PubSub
 											}
 
 											this.OnUpdated();
-											this.Service.NodesAdded(new TreeNode[] { NewNode }, this);
+											this.Service.NodesAdded([NewNode], this);
 										}
 										else
 											MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get information." : e2.ErrorText);
@@ -302,7 +302,7 @@ namespace Waher.Client.WPF.Model.PubSub
 
 			if (this.IsLoaded)
 			{
-				if (!(this.children is null))
+				if (this.children is not null)
 					this.Service?.NodesRemoved(this.children.Values, this);
 
 				this.children = new SortedDictionary<string, TreeNode>()
@@ -319,7 +319,6 @@ namespace Waher.Client.WPF.Model.PubSub
 		public override void Add()
 		{
 			DataForm Form = null;
-			ParameterDialog Dialog = null;
 
 			Form = new DataForm(this.Service.PubSubClient.Client,
 				(sender2, e2) =>
@@ -329,7 +328,7 @@ namespace Waher.Client.WPF.Model.PubSub
 
 					try
 					{
-						XmlDocument Xml = new XmlDocument()
+						XmlDocument Xml = new()
 						{
 							PreserveWhitespace = true
 						};
@@ -372,9 +371,9 @@ namespace Waher.Client.WPF.Model.PubSub
 					// Do nothing.
 					return Task.CompletedTask;
 				}, string.Empty, string.Empty,
-				new TextSingleField(null, "ItemId", "Item ID:", false, new string[] { string.Empty }, null, "ID of item to create. If not provided, one will be generated for you.",
+				new TextSingleField(null, "ItemId", "Item ID:", false, [string.Empty], null, "ID of item to create. If not provided, one will be generated for you.",
 					StringDataType.Instance, null, string.Empty, false, false, false),
-				new TextMultiField(null, "Payload", "XML:", false, new string[] { string.Empty }, null, "XML payload of item.",
+				new TextMultiField(null, "Payload", "XML:", false, [string.Empty], null, "XML payload of item.",
 					StringDataType.Instance, null, string.Empty, false, false, false));
 
 			_ = MainWindow.ShowParameterDialog(Form);
@@ -514,14 +513,14 @@ namespace Waher.Client.WPF.Model.PubSub
 						if (!e2.Ok)
 							MainWindow.ErrorBox("Unable to get the affiliations for the node: " + e2.ErrorText);
 
-						AffiliationsForm Form = new AffiliationsForm(this.node)
+						AffiliationsForm Form = new(this.node)
 						{
 							Owner = MainWindow.currentInstance
 						};
 
 						foreach (Affiliation Affiliation in e2.Affiliations)
 						{
-							ListViewItem Item = new ListViewItem()
+							ListViewItem Item = new()
 							{
 								Content = new AffiliationItem(Affiliation)
 							};
@@ -532,7 +531,7 @@ namespace Waher.Client.WPF.Model.PubSub
 						bool? b = Form.ShowDialog();
 						if (b.HasValue && b.Value)
 						{
-							List<KeyValuePair<string, AffiliationStatus>> Affiliations = new List<KeyValuePair<string, AffiliationStatus>>();
+							List<KeyValuePair<string, AffiliationStatus>> Affiliations = [];
 
 							foreach (ListViewItem Item in Form.AffiliationView.Items)
 							{
@@ -633,7 +632,8 @@ namespace Waher.Client.WPF.Model.PubSub
 			}, null);
 		}
 
-		public override async Task Delete(TreeNode Parent, EventHandler OnDeleted)
+		public override async Task Delete(TreeNode Parent, 
+			EventHandler<SelectableItemEventArgs> OnDeleted)
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 

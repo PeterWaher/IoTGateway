@@ -71,12 +71,12 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				XmppAccountNode? AccountNode = this.XmppAccountNode;
+				XmppAccountNode AccountNode = this.XmppAccountNode;
 				if (AccountNode is null || !AccountNode.IsOnline)
 					return Availability.Offline;
 
 				RosterItem Item = this.client[this.bareJid];
-				PresenceEventArgs? e = Item?.LastPresence;
+				PresenceEventArgs e = Item?.LastPresence;
 
 				if (e is null)
 					return Availability.Offline;
@@ -89,7 +89,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				XmppAccountNode? AccountNode = this.XmppAccountNode;
+				XmppAccountNode AccountNode = this.XmppAccountNode;
 				if (AccountNode is null || !AccountNode.IsOnline)
 					return SubscriptionState.Unknown;
 
@@ -117,7 +117,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public override ImageSource? ImageResource2
+		public override ImageSource ImageResource2
 		{
 			get
 			{
@@ -148,13 +148,13 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				XmppAccountNode? AccountNode = this.XmppAccountNode;
+				XmppAccountNode AccountNode = this.XmppAccountNode;
 				if (AccountNode is null)
 					return string.Empty;
 				else if (!AccountNode.IsOnline)
 					return AccountNode.BareJID + " is not connected.";
 
-				PresenceEventArgs? e = this.RosterItem?.LastPresence;
+				PresenceEventArgs e = this.RosterItem?.LastPresence;
 
 				if (e is null)
 					return "Status unknown. No presence received.";
@@ -205,12 +205,12 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public XmppAccountNode? XmppAccountNode
+		public XmppAccountNode XmppAccountNode
 		{
 			get
 			{
 				TreeNode Loop = this.Parent;
-				XmppAccountNode? Result = Loop as XmppAccountNode;
+				XmppAccountNode Result = Loop as XmppAccountNode;
 
 				while (Result is null && Loop is not null)
 				{
@@ -224,10 +224,10 @@ namespace Waher.Client.WPF.Model
 
 		public override async Task SendChatMessage(string Message, string ThreadId, MarkdownDocument Markdown)
 		{
-			XmppAccountNode? XmppAccountNode = this.XmppAccountNode;
+			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			if (XmppAccountNode is not null)
 			{
-				string? To = this.RosterItem?.LastPresenceFullJid;
+				string To = this.RosterItem?.LastPresenceFullJid;
 				if (string.IsNullOrEmpty(To))
 					To = this.bareJid;
 
@@ -270,7 +270,7 @@ namespace Waher.Client.WPF.Model
 		{
 			base.AddContexMenuItems(ref CurrentGroup, Menu);
 
-			XmppAccountNode? XmppAccountNode = this.XmppAccountNode;
+			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 
 			if (XmppAccountNode is not null && XmppAccountNode.IsOnline)
 			{
@@ -341,7 +341,7 @@ namespace Waher.Client.WPF.Model
 
 		public override bool CanConfigure => this.supportsRdp && !string.IsNullOrEmpty(this.LastOnlineFullJid);
 
-		private string? LastOnlineFullJid
+		private string LastOnlineFullJid
 		{
 			get
 			{
@@ -380,11 +380,11 @@ namespace Waher.Client.WPF.Model
 				return;
 			}
 
-			string? FullJid = this.LastOnlineFullJid;
+			string FullJid = this.LastOnlineFullJid;
 			if (string.IsNullOrEmpty(FullJid))
 				return;
 
-			RemoteDesktopClient? RdpClient = this.XmppAccountNode?.RdpClient;
+			RemoteDesktopClient RdpClient = this.XmppAccountNode?.RdpClient;
 			if (RdpClient is null)
 				return;
 

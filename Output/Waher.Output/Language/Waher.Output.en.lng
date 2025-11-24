@@ -15,6 +15,9 @@
 			<String id="11">Unsigned Error</String>
 			<String id="12">Error</String>
 			<String id="13">Output</String>
+			<String id="14">ID:</String>
+			<String id="15">Output</String>
+			<String id="16">Output identity in the collection of output.</String>
 		</Namespace>
 		<Namespace name="Waher.Output.Commands">
 			<String id="1">Erase messages</String>

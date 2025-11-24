@@ -32,13 +32,31 @@
 			<String id="10">Log message...</String>
 			<String id="11">Message successfully logged.</String>
 			<String id="12">Unable to log message.</String>
-			<String id="13">Execute Job once.</String>
-			<String id="14">Job successfully started.</String>
+			<String id="13">Execute Job once...</String>
+			<String id="14"></String>
 			<String id="15">Unable to start the execution of the job.</String>
+			<String id="16">Job</String>
+			<String id="17">Report Detail:</String>
+			<String id="18">How much detail to include in job reports.</String>
 		</Namespace>
 		<Namespace name="Waher.Jobs.NodeTypes">
 			<String id="1">Root</String>
 			<String id="2">Job</String>
+			<String id="3">Scheduled execution time:</String>
+			<String id="4">When the job is scheduled to execute.</String>
+			<String id="5">Job Period:</String>
+			<String id="6">Time between job executions. Defines a repetitive job.</String>
+			<String id="7">Burst count:</String>
+			<String id="8">Number of times the job will be executed each period.</String>
+			<String id="9">Burst Interval:</String>
+			<String id="10">Time between job executions in a burst.</String>
+			<String id="11">Execution Time</String>
+			<String id="12">Period</String>
+			<String id="13">Burst Interval</String>
+			<String id="14">Burst Count</String>
+			<String id="15">Expires:</String>
+			<String id="16">Repetitive job is not scheduled after this point in time.</String>
+			<String id="17">Expires</String>
 		</Namespace>
 	</Language>
 </Translation>

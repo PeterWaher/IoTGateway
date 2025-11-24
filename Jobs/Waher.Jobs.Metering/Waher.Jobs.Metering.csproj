@@ -47,6 +47,7 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
 	  <ProjectReference Include="..\..\Groups\Waher.Groups.Metering\Waher.Groups.Metering.csproj" />
 	  <ProjectReference Include="..\..\Groups\Waher.Groups\Waher.Groups.csproj" />
 	  <ProjectReference Include="..\..\Output\Waher.Output.Metering\Waher.Output.Metering.csproj" />

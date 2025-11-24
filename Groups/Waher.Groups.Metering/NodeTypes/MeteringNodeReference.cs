@@ -23,8 +23,8 @@ namespace Waher.Groups.Metering.NodeTypes
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		[Header(3, "Node ID:", 0)]
-		[Page(4, "Reference", 0)]
+		[Header(3, "Node ID:", 10)]
+		[Page(4, "Group", 0)]
 		[ToolTip(5, "Node ID of the node being referenced.")]
 		[Required]
 		public string ReferenceNodeId { get; set; }
@@ -32,8 +32,8 @@ namespace Waher.Groups.Metering.NodeTypes
 		/// <summary>
 		/// If child nodes should be included.
 		/// </summary>
-		[Header(6, "Include child nodes.", 0)]
-		[Page(4, "Reference", 0)]
+		[Header(6, "Include child nodes.", 20)]
+		[Page(4, "Group", 0)]
 		[ToolTip(7, "If child nodes should be included in the reference.")]
 		public bool IncludeChildNodes { get; set; }
 
@@ -95,8 +95,7 @@ namespace Waher.Groups.Metering.NodeTypes
 
 			if (Node is T TypedNode)
 				Nodes.Add(TypedNode);
-
-			if (this.IncludeChildNodes)
+			else if (this.IncludeChildNodes)
 			{
 				ChunkedList<INode> CheckChildren = new ChunkedList<INode>() { Node };
 
@@ -111,8 +110,8 @@ namespace Waher.Groups.Metering.NodeTypes
 						{
 							if (Child is T TypedChild)
 								Nodes.Add(TypedChild);
-
-							CheckChildren.Add(Child);
+							else
+								CheckChildren.Add(Child);
 						}
 					}
 				}

@@ -4,13 +4,17 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Networking;
+using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
+using Waher.Script.Functions.Runtime;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
-using Waher.Things.SensorData;
 using Waher.Things.Metering;
 using Waher.Things.Metering.NodeTypes;
+using Waher.Things.SensorData;
 
 namespace Waher.Things.Ip
 {
@@ -20,6 +24,7 @@ namespace Waher.Things.Ip
 	public class IpHost : ProvisionedMeteringNode, ISensor, IHostReference
 	{
 		private string host = string.Empty;
+		private bool pingHost = true;
 
 		/// <summary>
 		/// If the node accepts a presumptive parent, i.e. can be added to that parent (if that parent accepts the node as a child).
@@ -41,7 +46,9 @@ namespace Waher.Things.Ip
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is IpHost);
+			return Task.FromResult(
+				Child is IpHost ||
+				Child is PortMonitor);
 		}
 
 		/// <summary>
@@ -69,9 +76,22 @@ namespace Waher.Things.Ip
 		}
 
 		/// <summary>
+		/// If host should be pinged during readout.
+		/// </summary>
+		[Page(1, "IP")]
+		[Header(38, "Ping host.", 50)]
+		[ToolTip(39, "If host name should be pinged during readout.")]
+		[DefaultValue(true)]
+		public bool PingHost
+		{
+			get => this.pingHost;
+			set => this.pingHost = value;
+		}
+
+		/// <summary>
 		/// If the node can be read.
 		/// </summary>
-		public override bool IsReadable => true;
+		public override bool IsReadable => !this.Disabled;
 
 		/// <summary>
 		/// Starts the readout of the sensor.
@@ -81,33 +101,58 @@ namespace Waher.Things.Ip
 		{
 			try
 			{
-				using (Ping Icmp = new Ping())
+				string Module = typeof(IpHost).Namespace;
+				ChunkedList<Field> Fields = new ChunkedList<Field>();
+
+				foreach (INode Node in await this.ChildNodes)
 				{
+					if (Node is PortMonitor Monitor && Node.IsReadable)
+					{
+						DateTime Now = DateTime.UtcNow;
+						string Protocol = Monitor.Protocol;
+
+						try
+						{
+							if (string.IsNullOrEmpty(Protocol))
+								Protocol = Monitor.Port.ToString();
+
+							using BinaryTcpClient Client = await Monitor.ConnectTcp(false);
+
+							Fields.Add(new QuantityField(this, Now, Protocol,
+								(DateTime.UtcNow - Now).TotalMilliseconds, 0, "ms",
+								FieldType.Momentary, FieldQoS.AutomaticReadout));
+						}
+						catch (Exception ex)
+						{
+							await Request.ReportErrors(false, new ThingError(this, Now,
+								"Unable to connect using " + Protocol + ": " + ex.Message));
+						}
+					}
+				}
+
+				if (this.pingHost)
+				{
+					using Ping Icmp = new Ping();
+
 					PingReply Response = await Icmp.SendPingAsync(this.host, 2000, data, options);
-					DateTime Now = DateTime.Now;
-					string Module = typeof(IpHost).Namespace;
+					DateTime Now = DateTime.UtcNow;
 
 					if (Response.Status == IPStatus.Success)
 					{
-						List<Field> Fields = new List<Field>()
-						{
-							new QuantityField(this, Now, "Ping", Response.RoundtripTime, 0, "ms", FieldType.Momentary, FieldQoS.AutomaticReadout, Module, 7)
-						};
-
 						if (Request.IsIncluded(FieldType.Identity))
 						{
 							Fields.Add(new StringField(this, Now, "IP Address", Response.Address.ToString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 8));
 							this.AddIdentityReadout(Fields, Now);
 						}
-
-						await Request.ReportFields(true, Fields);
 					}
 					else
 					{
-						await Request.ReportErrors(true, new ThingError(this, Now,
+						await Request.ReportErrors(false, new ThingError(this, Now,
 							GetErrorMessage(Response)));
 					}
 				}
+
+				await Request.ReportFields(true, Fields.ToArray());
 			}
 			catch (PingException ex)
 			{
@@ -124,35 +169,33 @@ namespace Waher.Things.Ip
 
 		private static string GetErrorMessage(PingReply Response)
 		{
-			switch (Response.Status)
+			return Response.Status switch
 			{
-				case IPStatus.Success: return null;
-				case IPStatus.BadDestination: return "Bad destination";
-				case IPStatus.BadHeader: return "Bad header";
-				case IPStatus.BadOption: return "Bad option";
-				case IPStatus.BadRoute: return "Bad route";
-				case IPStatus.DestinationHostUnreachable: return "Destination host unreachable";
-				case IPStatus.DestinationNetworkUnreachable: return "Destination network unreachable";
-				case IPStatus.DestinationPortUnreachable: return "Destination port unreachable";
-				case IPStatus.DestinationProhibited: return "Destination prohibited";
+				IPStatus.Success => null,
+				IPStatus.BadDestination => "Bad destination",
+				IPStatus.BadHeader => "Bad header",
+				IPStatus.BadOption => "Bad option",
+				IPStatus.BadRoute => "Bad route",
+				IPStatus.DestinationHostUnreachable => "Destination host unreachable",
+				IPStatus.DestinationNetworkUnreachable => "Destination network unreachable",
+				IPStatus.DestinationPortUnreachable => "Destination port unreachable",
+				IPStatus.DestinationProhibited => "Destination prohibited",
 				//case IPStatus.DestinationProtocolUnreachable: return "Destination protocol unreachable";
-				case IPStatus.DestinationScopeMismatch: return "Destination scope mismatch";
-				case IPStatus.DestinationUnreachable: return "Destination unreachable";
-				case IPStatus.HardwareError: return "Hardware error";
-				case IPStatus.IcmpError: return "ICMP error";
-				case IPStatus.NoResources: return "No resources";
-				case IPStatus.PacketTooBig: return "Packet too big";
-				case IPStatus.ParameterProblem: return "Parameter problem";
-				case IPStatus.SourceQuench: return "Source quench";
-				case IPStatus.TimedOut: return "Timed out";
-				case IPStatus.TimeExceeded: return "Time exceeded";
-				case IPStatus.TtlExpired: return "TTL expired";
-				case IPStatus.TtlReassemblyTimeExceeded: return "TTL reassembly time exceeded";
-				case IPStatus.UnrecognizedNextHeader: return "Unrecognized next header";
-				case IPStatus.Unknown:
-				default:
-					return "Unknown error";
-			}
+				IPStatus.DestinationScopeMismatch => "Destination scope mismatch",
+				IPStatus.DestinationUnreachable => "Destination unreachable",
+				IPStatus.HardwareError => "Hardware error",
+				IPStatus.IcmpError => "ICMP error",
+				IPStatus.NoResources => "No resources",
+				IPStatus.PacketTooBig => "Packet too big",
+				IPStatus.ParameterProblem => "Parameter problem",
+				IPStatus.SourceQuench => "Source quench",
+				IPStatus.TimedOut => "Timed out",
+				IPStatus.TimeExceeded => "Time exceeded",
+				IPStatus.TtlExpired => "TTL expired",
+				IPStatus.TtlReassemblyTimeExceeded => "TTL reassembly time exceeded",
+				IPStatus.UnrecognizedNextHeader => "Unrecognized next header",
+				_ => "Unknown error",
+			};
 		}
 
 		private static readonly byte[] data = Encoding.ASCII.GetBytes("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");

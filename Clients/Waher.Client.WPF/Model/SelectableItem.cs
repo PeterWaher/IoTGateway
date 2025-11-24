@@ -17,13 +17,13 @@ namespace Waher.Client.WPF.Model
 		{
 		}
 
-		protected void Raise(EventHandler? h)
+		protected void Raise(EventHandler<SelectableItemEventArgs> h)
 		{
 			if (h is not null)
 			{
 				try
 				{
-					h(this, EventArgs.Empty);
+					h(this, new SelectableItemEventArgs(this));
 				}
 				catch (Exception ex)
 				{
@@ -55,12 +55,12 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Event raised when the node has been selected.
 		/// </summary>
-		public event EventHandler? Selected = null;
+		public event EventHandler<SelectableItemEventArgs> Selected = null;
 
 		/// <summary>
 		/// Event raised when the node has been deselected.
 		/// </summary>
-		public event EventHandler? Deselected = null;
+		public event EventHandler<SelectableItemEventArgs> Deselected = null;
 
 		/// <summary>
 		/// Raises the <see cref="Selected"/> event.

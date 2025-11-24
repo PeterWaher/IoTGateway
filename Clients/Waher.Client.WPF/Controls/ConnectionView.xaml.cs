@@ -56,9 +56,9 @@ namespace Waher.Client.WPF.Controls
 			{
 				this.fileName = value;
 				if (string.IsNullOrEmpty(this.fileName))
-					this.MainWindow.Title = MainWindow.WindowTitle;
+					this.MainWindow!.Title = MainWindow.WindowTitle;
 				else
-					this.MainWindow.Title = this.fileName + " - " + MainWindow.WindowTitle;
+					this.MainWindow!.Title = this.fileName + " - " + MainWindow.WindowTitle;
 			}
 		}
 
@@ -75,7 +75,7 @@ namespace Waher.Client.WPF.Controls
 				GridView = null;
 
 			this.selectedNode = this.ConnectionTree.SelectedItem as TreeNode;
-			if (!(this.selectedNode is null))
+			if (this.selectedNode is not null)
 			{
 				TreeNode[] Children = this.selectedNode.Children;
 				Dictionary<string, bool> Headers = null;
@@ -97,14 +97,13 @@ namespace Waher.Client.WPF.Controls
 									if (P.Id == "NodeId" || P.Id == "Type")
 										continue;
 
-									if (Headers is null)
-										Headers = new Dictionary<string, bool>();
+									Headers ??= [];
 
 									if (!Headers.ContainsKey(P.Id))
 									{
 										Headers[P.Id] = true;
 
-										GridViewColumn Column = new GridViewColumn()
+										GridViewColumn Column = new()
 										{
 											Header = P.Name,
 											Width = double.NaN,
@@ -161,7 +160,7 @@ namespace Waher.Client.WPF.Controls
 
 		public bool SaveNewFile()
 		{
-			SaveFileDialog Dialog = new SaveFileDialog()
+			SaveFileDialog Dialog = new()
 			{
 				AddExtension = true,
 				CheckPathExists = true,
@@ -187,7 +186,7 @@ namespace Waher.Client.WPF.Controls
 		{
 			try
 			{
-				XmlDocument Xml = new XmlDocument()
+				XmlDocument Xml = new()
 				{
 					PreserveWhitespace = true
 				};
@@ -208,7 +207,7 @@ namespace Waher.Client.WPF.Controls
 						TabItem TabItem = MainWindow.NewTab(Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
-						SnifferView SnifferView = new SnifferView(null, null, true);
+						SnifferView SnifferView = new(null, null, true);
 						TabItem.Content = SnifferView;
 
 						SnifferView.Sniffer = new TabSniffer(SnifferView);
@@ -223,7 +222,7 @@ namespace Waher.Client.WPF.Controls
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
 						bool Muc = XML.Attribute(Xml.DocumentElement, "muc", false);
-						ChatView ChatView = new ChatView(null, Muc);
+						ChatView ChatView = new(null, Muc);
 						ChatView.Input.IsEnabled = false;
 						ChatView.SendButton.IsEnabled = false;
 
@@ -238,7 +237,7 @@ namespace Waher.Client.WPF.Controls
 						TabItem = MainWindow.NewTab(Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
-						SensorDataView SensorDataView = new SensorDataView(null, null, false);
+						SensorDataView SensorDataView = new(null, null, false);
 						TabItem.Content = SensorDataView;
 
 						this.MainWindow.Tabs.SelectedItem = TabItem;
@@ -250,7 +249,7 @@ namespace Waher.Client.WPF.Controls
 						TabItem = MainWindow.NewTab(Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
-						SearchResultView SearchResultView = new SearchResultView();
+						SearchResultView SearchResultView = new();
 						TabItem.Content = SearchResultView;
 
 						this.MainWindow.Tabs.SelectedItem = TabItem;
@@ -262,7 +261,7 @@ namespace Waher.Client.WPF.Controls
 						TabItem = MainWindow.NewTab(Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
-						ScriptView ScriptView = new ScriptView();
+						ScriptView ScriptView = new();
 						TabItem.Content = ScriptView;
 
 						this.MainWindow.Tabs.SelectedItem = TabItem;
@@ -274,7 +273,7 @@ namespace Waher.Client.WPF.Controls
 						TabItem = MainWindow.NewTab(Path.GetFileName(FileName));
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
-						LogView LogView = new LogView(null, false);
+						LogView LogView = new(null, false);
 						TabItem.Content = LogView;
 
 						this.MainWindow.Tabs.SelectedItem = TabItem;
@@ -332,7 +331,7 @@ namespace Waher.Client.WPF.Controls
 				if (!this.CheckSaved())
 					return;
 
-				OpenFileDialog Dialog = new OpenFileDialog()
+				OpenFileDialog Dialog = new()
 				{
 					AddExtension = true,
 					CheckFileExists = true,
@@ -358,7 +357,7 @@ namespace Waher.Client.WPF.Controls
 
 		public void ConnectTo_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			ConnectToForm Dialog = new ConnectToForm()
+			ConnectToForm Dialog = new()
 			{
 				Owner = this.MainWindow
 			};
@@ -369,7 +368,7 @@ namespace Waher.Client.WPF.Controls
 				if (!int.TryParse(Dialog.XmppPort.Text, out int Port))
 					Port = XmppCredentials.DefaultPort;
 
-				XmppAccountNode Node = new XmppAccountNode(this.connections, null, Dialog.XmppServer.Text,
+				XmppAccountNode Node = new(this.connections, null, Dialog.XmppServer.Text,
 					(TransportMethod)Dialog.ConnectionMethod.SelectedIndex, Port, Dialog.UrlEndpoint.Text,
 					Dialog.AccountName.Text, Dialog.PasswordHash, Dialog.PasswordHashMethod,
 					Dialog.TrustServerCertificate.IsChecked.HasValue && Dialog.TrustServerCertificate.IsChecked.Value,
@@ -409,10 +408,15 @@ namespace Waher.Client.WPF.Controls
 			else
 				Parent.RemoveChild(ChildNode);
 
-			this.Node_Updated(this, EventArgs.Empty);
+			this.RefreshTreeView();
 		}
 
-		private void Node_Updated(object Sender, EventArgs e)
+		private void Node_Updated(object Sender, SelectableItemEventArgs e)
+		{
+			this.RefreshTreeView();
+		}
+
+		private void RefreshTreeView()
 		{
 			if (this.refreshTimer > DateTime.MinValue)
 			{
@@ -420,7 +424,8 @@ namespace Waher.Client.WPF.Controls
 				this.refreshTimer = DateTime.MinValue;
 			}
 
-			this.refreshTimer = MainWindow.Scheduler.Add(DateTime.Now.AddMilliseconds(250), this.RefreshTree, null);
+			this.refreshTimer = MainWindow.Scheduler!.Add(DateTime.Now.AddMilliseconds(250),
+				this.RefreshTree, null);
 		}
 
 		public void ShowStatus(string Message)
@@ -436,14 +441,14 @@ namespace Waher.Client.WPF.Controls
 				this.statusTimer = DateTime.MinValue;
 			}
 
-			this.statusTimer = MainWindow.Scheduler.Add(DateTime.Now.AddMilliseconds(250), this.SetStatus, null);
+			this.statusTimer = MainWindow.Scheduler!.Add(DateTime.Now.AddMilliseconds(250), this.SetStatus, null);
 		}
 
 		private string status = string.Empty;
 		private DateTime refreshTimer = DateTime.MinValue;
 		private DateTime statusTimer = DateTime.MinValue;
 
-		private void RefreshTree(object _)
+		private void RefreshTree(object P)
 		{
 			if (this.statusTimer > DateTime.MinValue)
 			{

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Things.Metering;
+using Waher.Things.Metering.NodeTypes;
 using Waher.Things.Virtual;
 
 namespace Waher.Things.Files
@@ -49,8 +50,8 @@ namespace Waher.Things.Files
 						Log.Exception(ex);
 					}
 				}
-				else if (Child is VirtualNode VirtualNode)
-					await this.CheckNode(VirtualNode);
+				else if (Child is VirtualNode || Child is NodeCollection)
+					await this.CheckNode(Child);
 			}
 		}
 

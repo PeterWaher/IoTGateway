@@ -514,6 +514,9 @@
 	<Assembly fileName="Waher.Runtime.Settings.dll" />
 	<Assembly fileName="Waher.Runtime.Settings.pdb" />
 	<Assembly fileName="Waher.Runtime.Settings.xml" />
+	<Assembly fileName="Waher.Runtime.Statistics.dll" />
+	<Assembly fileName="Waher.Runtime.Statistics.pdb" />
+	<Assembly fileName="Waher.Runtime.Statistics.xml" />
 	<Assembly fileName="Waher.Runtime.Temporary.dll" />
 	<Assembly fileName="Waher.Runtime.Temporary.pdb" />
 	<Assembly fileName="Waher.Runtime.Temporary.xml" />

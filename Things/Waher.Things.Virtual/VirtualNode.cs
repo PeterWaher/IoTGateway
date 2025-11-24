@@ -418,7 +418,7 @@ namespace Waher.Things.Virtual
 			else
 				this.SetMetaDataPriv(Name, Value);
 
-			await Database.Update(this);
+			await this.UpdateAsync();
 		}
 
 		private void SetMetaDataPriv(string Name, object Value)
@@ -553,6 +553,9 @@ namespace Waher.Things.Virtual
 		{
 			get
 			{
+				if (this.Disabled)
+					return false;
+
 				lock (this.fields)
 				{
 					return this.fields.Count > 0;
@@ -592,6 +595,9 @@ namespace Waher.Things.Virtual
 		{
 			get
 			{
+				if (this.Disabled)
+					return false;
+
 				if (this.TryGetMetaDataValue("Callback", out object Obj) && Obj is string &&
 					this.TryGetMetaDataValue("Payload", out Obj) && Obj is string &&
 					this.TryGetMetaDataValue("FieldName", out Obj) && Obj is string &&

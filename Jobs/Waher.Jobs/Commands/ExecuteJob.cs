@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Jobs.NodeTypes;
 using Waher.Runtime.Language;
 using Waher.Things;
+using Waher.Things.Attributes;
 using Waher.Things.Queries;
 
 namespace Waher.Jobs.Commands
@@ -12,13 +14,13 @@ namespace Waher.Jobs.Commands
 	/// </summary>
 	public class ExecuteJob : ICommand
 	{
-		private readonly JobNode node;
+		private readonly Job node;
 
 		/// <summary>
 		/// Executes a job.
 		/// </summary>
 		/// <param name="Node">Job node.</param>
-		public ExecuteJob(JobNode Node)
+		public ExecuteJob(Job Node)
 		{
 			this.node = Node;
 		}
@@ -31,17 +33,27 @@ namespace Waher.Jobs.Commands
 		/// <summary>
 		/// Type of command.
 		/// </summary>
-		public CommandType Type => CommandType.Simple;
+		public CommandType Type => CommandType.Query;
 
 		/// <summary>
 		/// Sort Category, if available.
 		/// </summary>
-		public string SortCategory => "Job";
+		public string SortCategory => "Execution";
 
 		/// <summary>
 		/// Sort Key, if available.
 		/// </summary>
 		public string SortKey => nameof(ExecuteJob);
+
+		/// <summary>
+		/// How much detail to include in job reports.
+		/// </summary>
+		[Page(16, "Job", 0)]
+		[Header(17, "Report Detail:")]
+		[ToolTip(18, "How much detail to include in job reports.")]
+		[Option(JobReportDetail.Summary, 19, "Return summary information only.")]
+		[Option(JobReportDetail.Details, 20, "Return detailed information.")]
+		public JobReportDetail ReportDetail { get; set; } = JobReportDetail.Details;
 
 		/// <summary>
 		/// If the command can be executed by the caller.
@@ -67,25 +79,6 @@ namespace Waher.Jobs.Commands
 		/// </summary>
 		public Task ExecuteCommandAsync()
 		{
-			Task.Run(async () =>
-			{
-				try
-				{
-					try
-					{
-						await this.node.RemoveErrorAsync("ExecutionError");
-					}
-					catch (Exception ex)
-					{
-						await this.node.LogErrorAsync("ExecutionError", ex.Message);
-					}
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			});
-
 			return Task.CompletedTask;
 		}
 
@@ -95,7 +88,7 @@ namespace Waher.Jobs.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(ExecuteJob), 13, "Execute Job once.");
+			return Language.GetStringAsync(typeof(ExecuteJob), 13, "Execute Job once...");
 		}
 
 		/// <summary>
@@ -104,7 +97,7 @@ namespace Waher.Jobs.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetSuccessStringAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(ExecuteJob), 14, "Job successfully started.");
+			return Task.FromResult(string.Empty);
 		}
 
 		/// <summary>
@@ -132,6 +125,26 @@ namespace Waher.Jobs.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task StartQueryExecutionAsync(Query Query, Language Language)
 		{
+			Task.Run(async () =>
+			{
+				try
+				{
+					try
+					{
+						await this.node.ExecuteJob(Query, Language, this.ReportDetail);
+						await this.node.RemoveErrorAsync("ExecutionError");
+					}
+					catch (Exception ex)
+					{
+						await this.node.LogErrorAsync("ExecutionError", ex.Message);
+					}
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+			});
+
 			return Task.CompletedTask;
 		}
 	}

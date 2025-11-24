@@ -76,6 +76,9 @@ namespace Waher.Things.Script
 		{
 			get
 			{
+				if (this.Disabled)
+					return false;
+
 				if (base.IsReadable)
 					return true;
 

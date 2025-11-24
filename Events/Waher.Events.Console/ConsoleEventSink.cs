@@ -57,7 +57,7 @@ namespace Waher.Events.Console
 			bool WriteLine = true;
 			int i;
 
-			if (this.consoleWidthWorks)
+			if (this.consoleWidthWorks && ConsoleOut.HasConsole)
 			{
 				try
 				{

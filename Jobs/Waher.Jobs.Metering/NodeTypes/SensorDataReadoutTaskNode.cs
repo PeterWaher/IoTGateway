@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Groups.Metering.NodeTypes;
+using Waher.Content.Markdown;
 using Waher.Jobs.NodeTypes;
 using Waher.Output.Metering;
 using Waher.Processors.Metering;
@@ -17,6 +17,7 @@ using Waher.Script.Functions.Runtime;
 using Waher.Things;
 using Waher.Things.Attributes;
 using Waher.Things.Metering;
+using Waher.Things.Queries;
 using Waher.Things.SensorData;
 
 namespace Waher.Jobs.Metering.NodeTypes
@@ -26,6 +27,9 @@ namespace Waher.Jobs.Metering.NodeTypes
 	/// </summary>
 	public class SensorDataReadoutTaskNode : JobTaskNode
 	{
+		private const string TotalNodeCount = " TotalNodeCount ";
+		private const string NodeCount = " NodeCount ";
+
 		/// <summary>
 		/// Sensor data readout task node.
 		/// </summary>
@@ -36,8 +40,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// Maximum number of parallel readouts.
 		/// </summary>
-		[Header(2, "Parallel readouts:", 0)]
-		[Page(1, "Readout", 0)]
+		[Header(2, "Parallel readouts:", 10)]
+		[Page(66, "Job", 0)]
 		[ToolTip(3, "Maximum number of parallel readouts.")]
 		[Required]
 		[Range(1, 100)]
@@ -45,10 +49,21 @@ namespace Waher.Jobs.Metering.NodeTypes
 		public int ParallelReadouts { get; set; } = 1;
 
 		/// <summary>
+		/// Maximum number of parallel readouts.
+		/// </summary>
+		[Header(68, "Timeout (s):", 20)]
+		[Page(66, "Job", 0)]
+		[ToolTip(69, "If a sensor does not respond within this time, the readout will be cancelled.")]
+		[Required]
+		[Range(1, 300)]
+		[DefaultValue(60)]
+		public int SensorTimeoutSeconds { get; set; } = 60;
+
+		/// <summary>
 		/// If momentary values should be read.
 		/// </summary>
-		[Header(4, "Momentary values.", 0)]
-		[Page(1, "Readout", 0)]
+		[Header(4, "Momentary values.", 30)]
+		[Page(66, "Job", 0)]
 		[ToolTip(5, "Check, if momentary values should be read.")]
 		[DefaultValue(true)]
 		public bool Momentary { get; set; } = true;
@@ -56,8 +71,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If identity values should be read.
 		/// </summary>
-		[Header(6, "Identity values.", 0)]
-		[Page(1, "Readout", 0)]
+		[Header(6, "Identity values.", 40)]
+		[Page(66, "Job", 0)]
 		[ToolTip(7, "Check, if identity values should be read.")]
 		[DefaultValue(false)]
 		public bool Identity { get; set; } = false;
@@ -65,8 +80,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If status values should be read.
 		/// </summary>
-		[Header(8, "Status values.", 0)]
-		[Page(1, "Readout", 0)]
+		[Header(8, "Status values.", 50)]
+		[Page(66, "Job", 0)]
 		[ToolTip(9, "Check, if status values should be read.")]
 		[DefaultValue(false)]
 		public bool Status { get; set; } = false;
@@ -74,8 +89,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If computed values should be read.
 		/// </summary>
-		[Header(10, "Computed values.", 0)]
-		[Page(1, "Readout", 0)]
+		[Header(10, "Computed values.", 60)]
+		[Page(66, "Job", 0)]
 		[ToolTip(11, "Check, if computed values should be read.")]
 		[DefaultValue(false)]
 		public bool Computed { get; set; } = false;
@@ -83,8 +98,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If peak values should be read.
 		/// </summary>
-		[Header(12, "Peak values.", 0)]
-		[Page(1, "Readout", 0)]
+		[Header(12, "Peak values.", 70)]
+		[Page(66, "Job", 0)]
 		[ToolTip(13, "Check, if peak values should be read.")]
 		[DefaultValue(false)]
 		public bool Peak { get; set; } = false;
@@ -92,8 +107,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// If historical values should be read.
 		/// </summary>
-		[Header(14, "Historical values.", 0)]
-		[Page(1, "Readout", 0)]
+		[Header(14, "Historical values.", 80)]
+		[Page(66, "Job", 0)]
 		[ToolTip(15, "Check, if historical values should be read.")]
 		[DefaultValue(false)]
 		public bool Historical { get; set; } = false;
@@ -132,8 +147,8 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// Field names to read.
 		/// </summary>
-		[Header(16, "Field names to read:", 0)]
-		[Page(1, "Readout", 0)]
+		[Header(16, "Field names to read:", 90)]
+		[Page(66, "Job", 0)]
 		[ToolTip(17, "Leave blank to read all fields.")]
 		[ContentType("text/plain")]
 		public string[] FieldNames { get; set; }
@@ -141,16 +156,16 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <summary>
 		/// From when data should be read.
 		/// </summary>
-		[Header(18, "From:", 0)]
-		[Page(1, "Readout", 0)]
+		[Header(18, "From:", 100)]
+		[Page(66, "Job", 0)]
 		[ToolTip(19, "Read historical data from this point in time.")]
 		public Duration From { get; set; } = Duration.Zero;
 
 		/// <summary>
 		/// To when data should be read.
 		/// </summary>
-		[Header(20, "To:", 0)]
-		[Page(1, "Readout", 0)]
+		[Header(20, "To:", 110)]
+		[Page(66, "Job", 0)]
 		[ToolTip(21, "Read historical data to this point in time.")]
 		public Duration To { get; set; } = Duration.Zero;
 
@@ -173,7 +188,9 @@ namespace Waher.Jobs.Metering.NodeTypes
 		{
 			return Task.FromResult(
 				Child is MeteringNodeReference ||
-				Child is MeteringGroupReference);
+				Child is GroupReference ||
+				Child is ProcessorReference ||
+				Child is OutputReference);
 		}
 
 		/// <summary>
@@ -182,48 +199,238 @@ namespace Waher.Jobs.Metering.NodeTypes
 		/// <param name="Status">Execution status.</param>
 		public override async Task ExecuteTask(JobExecutionStatus Status)
 		{
-			IMeteringNode[] Nodes = await this.FindNodes<IMeteringNode>();
-			if (Nodes is null || Nodes.Length == 0)
-				return;
-
-			ISensorDataProcessor[] Processors = await this.FindNodes<ISensorDataProcessor>();
-			ISensorDataOutput[] Outputs = await this.FindNodes<ISensorDataOutput>();
-
-			using AsyncProcessor<ReadoutWorkItem> Processor = new AsyncProcessor<ReadoutWorkItem>(this.ParallelReadouts);
-
-			foreach (IMeteringNode Node in Nodes)
+			try
 			{
-				if (Node.IsReadable && Node is ISensor Sensor)
-					Processor.Queue(new ReadoutWorkItem(Sensor, this, Status, Processors, Outputs));
+				await this.ReportStart(Status);
+
+				if (Status.ReportDetail != JobReportDetail.None)
+					await Status.Query.BeginSection(await this.GetString(Status, 57, "Overview"));
+
+				ISensor[] Sensors = await this.FindNodes<ISensor>();
+				if (Sensors is null || Sensors.Length == 0)
+				{
+					await this.ReportMessage(Status, 33, "No readable sensors found to read.");
+					await this.ReportDone(Status);
+					return;
+				}
+
+				ChunkedList<ISensor> ReadableSensors = new ChunkedList<ISensor>();
+
+				foreach (ISensor Sensor in Sensors)
+				{
+					if (Sensor.IsReadable)
+						ReadableSensors.Add(Sensor);
+				}
+
+				Sensors = ReadableSensors.ToArray();
+				if (Sensors.Length == 0)
+				{
+					await this.ReportMessage(Status, 33, "No readable sensors found to read.");
+					await this.ReportDone(Status);
+					return;
+				}
+
+				Status.Variables[TotalNodeCount] = Sensors.Length;
+				Status.Variables[NodeCount] = 0.0;
+
+				if (Sensors.Length == 1)
+					await this.ReportMessage(Status, 52, "**1** readable sensor found to read.");
+				else
+					await this.ReportMessage(Status, 34, "**%0%** readable sensors found to read.", Sensors.Length);
+
+				ISensorDataProcessor[] SensorDataProcessors = await this.FindNodes<ISensorDataProcessor>();
+
+				if (SensorDataProcessors.Length == 1)
+					await this.ReportMessage(Status, 53, "**1** sensor data processor will be used.");
+				else
+					await this.ReportMessage(Status, 35, "**%0%** sensor data processors will be used.", SensorDataProcessors.Length);
+
+				IThingErrorProcessor[] ErrorProcessors = await this.FindNodes<IThingErrorProcessor>();
+
+				if (ErrorProcessors.Length == 1)
+					await this.ReportMessage(Status, 70, "**1** thing error processor will be used.");
+				else
+					await this.ReportMessage(Status, 71, "**%0%** thing error processors will be used.", SensorDataProcessors.Length);
+
+				ISensorDataOutput[] Outputs = await this.FindNodes<ISensorDataOutput>();
+
+				if (Outputs.Length == 1)
+					await this.ReportMessage(Status, 54, "Sensor Data will be output to **1** output.");
+				else
+					await this.ReportMessage(Status, 36, "Sensor Data will be output to **%0%** outputs.", Outputs.Length);
+
+				if (Status.ReportDetail != JobReportDetail.None)
+				{
+					await Status.Query.EndSection();
+					await Status.Query.BeginSection(await this.GetString(Status, 58, "Readout"));
+					await this.ReportStatus(Status, 37, "Starting readout.");
+				}
+
+				if (Status.ReportDetail == JobReportDetail.Summary)
+				{
+					await Status.Query.NewTable("Summary",
+						await Status.Language.GetStringAsync(typeof(SensorDataReadoutTaskNode), 38, "Sensor Data Readout Summary"),
+						new Column("NodeId", await this.GetString(Status, 39, "Node ID"),
+							MeteringTopology.SourceID, null, null, null, ColumnAlignment.Left, null),
+						new Column("NrFields", await this.GetString(Status, 40, "#Fields"),
+							null, null, null, null, ColumnAlignment.Right, 0),
+						new Column("NrErrors", await this.GetString(Status, 41, "#Errors"),
+							null, null, null, null, ColumnAlignment.Right, 0));
+				}
+
+				using AsyncProcessor<ReadoutWorkItem> Processor = new AsyncProcessor<ReadoutWorkItem>(this.ParallelReadouts, "Job Task: " + this.NodeId);
+
+				foreach (ISensor Sensor in Sensors)
+					Processor.Queue(new ReadoutWorkItem(Sensor, this, Status,
+						SensorDataProcessors, ErrorProcessors, Outputs));
+
+				await Processor.WaitUntilIdle();
+
+				if (Status.ReportDetail == JobReportDetail.Summary)
+					await Status.Query.TableDone("Summary");
+
+				if (Status.ReportDetail != JobReportDetail.None)
+				{
+					await Status.Query.EndSection();
+					await this.ReportStatus(Status, 55, "Readout completed.");
+				}
+
+				if (Status.Variables.TryGetVariable("Errors", out Variable v) &&
+					v.ValueObject is ChunkedList<ThingError> JobErrors &&
+					JobErrors.Count > 0)
+				{
+					await Status.Job.LogErrorAsync("ReadoutErrors", JobErrors.Count.ToString() + " errors reported during readout.");
+				}
+				else
+					await Status.Job.RemoveErrorAsync("ReadoutErrors");
 			}
-
-			await Processor.WaitUntilIdle();
-
-			if (Status.Variables.TryGetVariable("Errors", out Variable v) &&
-				v.ValueObject is ChunkedList<ThingError> JobErrors &&
-				JobErrors.Count > 0)
+			catch (Exception ex)
 			{
-				await Status.Job.LogErrorAsync("ReadoutErrors", JobErrors.Count.ToString() + " errors reported during readout.");
+				if (Status.ReportDetail != JobReportDetail.None)
+					await Status.Query.LogMessage(ex);
+
+				await Status.Job.LogErrorAsync("ReadoutErrors", ex.Message);
 			}
-			else
-				await Status.Job.RemoveErrorAsync("ReadoutErrors");
+			finally
+			{
+				await this.ReportDone(Status);
+			}
 		}
 
-		private async Task FieldsReported(ISensor Sensor, Field[] Fields,
+		private async Task ReportStart(JobExecutionStatus Status)
+		{
+			if (Status.ReportDetail != JobReportDetail.None)
+			{
+				await Status.Query.Start();
+				await this.ReportTitle(Status, this.NodeId);
+				await this.ReportStatus(Status, 32, "Starting sensor data readout job task.");
+			}
+		}
+
+		private async Task ReportDone(JobExecutionStatus Status)
+		{
+			if (Status.ReportDetail != JobReportDetail.None)
+				await Status.Query.Done();
+		}
+
+		private async Task ReportTitle(JobExecutionStatus Status, string Title)
+		{
+			if (Status.ReportDetail != JobReportDetail.None)
+				await Status.Query.SetTitle(Title);
+		}
+
+		private Task ReportMessage(JobExecutionStatus Status, int StringId,
+			string Message)
+		{
+			return this.ReportMessage(Status, StringId, Message, (string[])null);
+		}
+
+		private Task ReportMessage(JobExecutionStatus Status, int StringId,
+			string Message, params object[] Parameters)
+		{
+			return this.ReportMessage(Status, StringId, Message, ToString(Parameters));
+		}
+
+		private async Task ReportMessage(JobExecutionStatus Status, int StringId,
+			string Message, params string[] Parameters)
+		{
+			if (Status.ReportDetail != JobReportDetail.None)
+			{
+				await Status.Query.NewObject(new MarkdownContent(
+					await this.GetString(Status, StringId, Message, Parameters)));
+			}
+		}
+
+		private Task ReportStatus(JobExecutionStatus Status, int StringId,
+			string Message)
+		{
+			return this.ReportStatus(Status, StringId, Message, (string[])null);
+		}
+
+		private Task ReportStatus(JobExecutionStatus Status, int StringId,
+			string Message, params object[] Parameters)
+		{
+			return this.ReportStatus(Status, StringId, Message, ToString(Parameters));
+		}
+
+		private async Task ReportStatus(JobExecutionStatus Status, int StringId,
+			string Message, params string[] Parameters)
+		{
+			if (Status.ReportDetail != JobReportDetail.None)
+				await Status.Query.SetStatus(await this.GetString(Status, StringId, Message, Parameters));
+		}
+
+		private Task<string> GetString(JobExecutionStatus Status, int StringId, string Message)
+		{
+			return this.GetString(Status, StringId, Message, (string[])null);
+		}
+
+		private static string[] ToString(object[] Parameters)
+		{
+			if (Parameters is null)
+				return null;
+
+			int i, c = Parameters.Length;
+			string[] Result = new string[c];
+
+			for (i = 0; i < c; i++)
+				Result[i] = Parameters[i]?.ToString();
+
+			return Result;
+		}
+
+		private async Task<string> GetString(JobExecutionStatus Status, int StringId, string Message,
+			params string[] Parameters)
+		{
+			Message = await Status.Language.GetStringAsync(typeof(SensorDataReadoutTaskNode), StringId, Message);
+
+			if (!(Parameters is null))
+			{
+				int i, c = Parameters.Length;
+
+				for (i = 0; i < c; i++)
+					Message = Message.Replace("%" + i.ToString() + "%", Parameters[i]);
+			}
+
+			return Message;
+		}
+
+		private async Task SensorReadoutCompleted(ISensor Sensor, Field[] Fields,
 			ThingError[] Errors, JobExecutionStatus Status,
-			ISensorDataProcessor[] Processors, ISensorDataOutput[] Outputs)
+			ISensorDataProcessor[] SensorDataProcessors, IThingErrorProcessor[] ErrorProcessors,
+			ISensorDataOutput[] Outputs)
 		{
 			if (!(Fields is null))
 			{
-				if ((Processors?.Length ?? 0) > 0)
+				if ((SensorDataProcessors?.Length ?? 0) > 0)
 				{
-					foreach (ISensorDataProcessor Processor in Processors)
+					foreach (ISensorDataProcessor Processor in SensorDataProcessors)
 					{
 						try
 						{
 							Fields = await Processor.ProcessFields(Sensor, Fields);
 							if ((Fields?.Length ?? 0) == 0)
-								return;
+								break;
 						}
 						catch (Exception ex)
 						{
@@ -232,7 +439,7 @@ namespace Waher.Jobs.Metering.NodeTypes
 					}
 				}
 
-				if ((Outputs?.Length ?? 0) > 0)
+				if ((Outputs?.Length ?? 0) > 0 && (Fields?.Length ?? 0) > 0)
 				{
 					foreach (ISensorDataOutput Output in Outputs)
 					{
@@ -248,12 +455,139 @@ namespace Waher.Jobs.Metering.NodeTypes
 				}
 			}
 
-			if (!(Errors is null))
+			if ((Errors?.Length ?? 0) > 0)
 			{
-				if (!Status.Variables.TryGetVariable("Errors", out Variable v))
-					Status.Variables["Errors"] = new ChunkedList<ThingError>(Errors);
-				else if (v.ValueObject is ChunkedList<ThingError> JobErrors)
-					JobErrors.AddRange(Errors);
+				if ((ErrorProcessors?.Length ?? 0) > 0)
+				{
+					foreach (IThingErrorProcessor Processor in ErrorProcessors)
+					{
+						try
+						{
+							Errors = await Processor.ProcessErrors(Sensor, Errors);
+							if ((Errors?.Length ?? 0) == 0)
+								break;
+						}
+						catch (Exception ex)
+						{
+							await Processor.LogErrorAsync("ProcessingError", ex.Message);
+						}
+					}
+				}
+
+				if ((Errors?.Length ?? 0) > 0)
+				{
+					if (!Status.Variables.TryGetVariable("Errors", out Variable v))
+						Status.Variables["Errors"] = new ChunkedList<ThingError>(Errors);
+					else if (v.ValueObject is ChunkedList<ThingError> JobErrors)
+						JobErrors.AddRange(Errors);
+				}
+			}
+
+			await Status.Lock();
+			try
+			{
+				switch (Status.ReportDetail)
+				{
+					case JobReportDetail.Summary:
+						await Status.Query.NewRecords("Summary", new Record(
+							Sensor.NodeId, Fields?.Length ?? 0, Errors?.Length ?? 0));
+						break;
+
+					case JobReportDetail.Details:
+						await Status.Query.BeginSection(Sensor.NodeId);
+
+						if ((Fields?.Length ?? 0) > 0)
+						{
+							string TableId = "Fields: " + Sensor.NodeId;
+							await Status.Query.NewTable(TableId,
+								await this.GetString(Status, 50, "Reported Sensor Data"),
+								new Column("Timestamp", await this.GetString(Status, 44, "Timestamp"),
+									null, null, null, null, ColumnAlignment.Left, null),
+								new Column("FieldName", await this.GetString(Status, 45, "Field Name"),
+									null, null, null, null, ColumnAlignment.Left, null),
+								new Column("FieldType", await this.GetString(Status, 46, "Field Type"),
+									null, null, null, null, ColumnAlignment.Left, null),
+								new Column("Value", await this.GetString(Status, 47, "Value"),
+									null, null, null, null, ColumnAlignment.Right, null),
+								new Column("QoS", await this.GetString(Status, 48, "QoS"),
+									null, null, null, null, ColumnAlignment.Left, null));
+
+							ChunkedList<Record> Records = new ChunkedList<Record>();
+							int i = 0;
+
+							foreach (Field Field in Fields)
+							{
+								Records.Add(new Record(Field.Timestamp, Field.Name,
+									Field.Type, Field.ObjectValue, Field.QoS));
+
+								if (++i == 100)
+								{
+									await Status.Query.NewRecords(TableId, Records.ToArray());
+									Records.Clear();
+									i = 0;
+								}
+							}
+
+							if (i > 0)
+								await Status.Query.NewRecords(TableId, Records.ToArray());
+
+							await Status.Query.TableDone(TableId);
+						}
+						else
+							await this.ReportMessage(Status, 42, "No sensor data reported.");
+
+						if ((Errors?.Length ?? 0) > 0)
+						{
+							string TableId = "Errors: " + Sensor.NodeId;
+							await Status.Query.NewTable(TableId,
+								await this.GetString(Status, 51, "Reported Errors"),
+								new Column("Timestamp", await this.GetString(Status, 44, "Timestamp"),
+									null, null, null, null, ColumnAlignment.Left, null),
+								new Column("Error", await this.GetString(Status, 49, "Error Message"),
+									null, null, null, null, ColumnAlignment.Left, null));
+
+							ChunkedList<Record> Records = new ChunkedList<Record>();
+							int i = 0;
+
+							foreach (ThingError Error in Errors)
+							{
+								Records.Add(new Record(Error.Timestamp, Error.ErrorMessage));
+
+								if (++i == 100)
+								{
+									await Status.Query.NewRecords(TableId, Records.ToArray());
+									Records.Clear();
+									i = 0;
+								}
+							}
+
+							if (i > 0)
+								await Status.Query.NewRecords(TableId, Records.ToArray());
+
+							await Status.Query.TableDone(TableId);
+						}
+						else
+							await this.ReportMessage(Status, 43, "No errors reported.");
+
+						await Status.Query.EndSection();
+						break;
+				}
+
+				if (Status.Variables.TryGetVariable(TotalNodeCount, out Variable v) &&
+					v.ValueObject is double TotalNrNodes &&
+					Status.Variables.TryGetVariable(NodeCount, out v) &&
+					v.ValueObject is double NrNodes)
+				{
+					NrNodes++;
+					Status.Variables[NodeCount] = NrNodes;
+
+					await this.ReportStatus(Status, 56, "%0% of %1% nodes processed.",
+						(int)NrNodes, (int)TotalNrNodes);
+				}
+			}
+			finally
+			{
+				Status.Unlock();
 			}
 		}
 
@@ -262,28 +596,37 @@ namespace Waher.Jobs.Metering.NodeTypes
 			private readonly ISensor sensor;
 			private readonly SensorDataReadoutTaskNode task;
 			private readonly JobExecutionStatus status;
-			private readonly ISensorDataProcessor[] processors;
+			private readonly ISensorDataProcessor[] sensorDataProcessors;
+			private readonly IThingErrorProcessor[] errorProcessors;
 			private readonly ISensorDataOutput[] outputs;
 			private ChunkedList<Field> fields = null;
 			private ChunkedList<ThingError> errors = null;
 
 			public ReadoutWorkItem(ISensor Sensor, SensorDataReadoutTaskNode TaskNode,
-				JobExecutionStatus Status, ISensorDataProcessor[] Processors,
-				ISensorDataOutput[] Outputs)
+				JobExecutionStatus Status, ISensorDataProcessor[] SensorDataProcessors,
+				IThingErrorProcessor[] ErrorProcessors, ISensorDataOutput[] Outputs)
 			{
 				this.sensor = Sensor;
 				this.task = TaskNode;
 				this.status = Status;
-				this.processors = Processors;
+				this.sensorDataProcessors = SensorDataProcessors;
+				this.errorProcessors = ErrorProcessors;
 				this.outputs = Outputs;
 			}
 
 			public override async Task Execute(CancellationToken Cancel)
 			{
-				JobReadout Readout = new JobReadout(this);
+				TaskCompletionSource<bool> Completed = new TaskCompletionSource<bool>();
+				JobReadout Readout = new JobReadout(this, Completed);
 				try
 				{
 					await this.sensor.StartReadout(Readout);
+
+					_ = Task.Delay(this.task.SensorTimeoutSeconds * 1000).ContinueWith(
+						(_) => Completed.TrySetResult(false));
+
+					if (!await Completed.Task)
+						await Readout.ReportErrors(true, new ThingError(this.sensor, "Sensor did not respond."));
 				}
 				catch (Exception ex)
 				{
@@ -313,21 +656,24 @@ namespace Waher.Jobs.Metering.NodeTypes
 					}
 				}
 
-				await this.task.FieldsReported(this.sensor, this.fields?.ToArray(),
-					this.errors?.ToArray(), this.status, this.processors, this.outputs);
+				await this.task.SensorReadoutCompleted(this.sensor, this.fields?.ToArray(),
+					this.errors?.ToArray(), this.status, this.sensorDataProcessors, 
+					this.errorProcessors, this.outputs);
 			}
 
 			private class JobReadout : ISensorReadout
 			{
+				private readonly TaskCompletionSource<bool> completed;
 				private readonly ReadoutWorkItem item;
 				private readonly DateTime from;
 				private readonly DateTime to;
 
-				public JobReadout(ReadoutWorkItem Item)
+				public JobReadout(ReadoutWorkItem Item, TaskCompletionSource<bool> Completed)
 				{
 					this.item = Item;
 					this.from = Item.status.StartTime - this.item.task.From;
 					this.to = Item.status.StartTime - this.item.task.To;
+					this.completed = Completed;
 				}
 
 				public IThingReference[] Nodes => new IThingReference[] { this.item.sensor };
@@ -373,6 +719,10 @@ namespace Waher.Jobs.Metering.NodeTypes
 				{
 					this.item.errors ??= new ChunkedList<ThingError>();
 					this.item.errors.AddRange(Errors);
+
+					if (Done)
+						this.completed.TrySetResult(true);
+
 					return Task.CompletedTask;
 				}
 
@@ -380,6 +730,10 @@ namespace Waher.Jobs.Metering.NodeTypes
 				{
 					this.item.errors ??= new ChunkedList<ThingError>();
 					this.item.errors.AddRange(Errors);
+
+					if (Done)
+						this.completed.TrySetResult(true);
+
 					return Task.CompletedTask;
 				}
 
@@ -387,6 +741,10 @@ namespace Waher.Jobs.Metering.NodeTypes
 				{
 					this.item.fields ??= new ChunkedList<Field>();
 					this.item.fields.AddRange(Fields);
+
+					if (Done)
+						this.completed.TrySetResult(true);
+
 					return Task.CompletedTask;
 				}
 
@@ -394,6 +752,10 @@ namespace Waher.Jobs.Metering.NodeTypes
 				{
 					this.item.fields ??= new ChunkedList<Field>();
 					this.item.fields.AddRange(Fields);
+
+					if (Done)
+						this.completed.TrySetResult(true);
+
 					return Task.CompletedTask;
 				}
 

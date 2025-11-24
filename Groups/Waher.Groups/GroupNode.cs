@@ -7,6 +7,7 @@ using Waher.Groups.Commands;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Runtime.Threading;
 using Waher.Things;
@@ -16,10 +17,10 @@ using Waher.Things.SourceEvents;
 
 namespace Waher.Groups
 {
-    /// <summary>
-    /// Base class for all group nodes.
-    /// </summary>
-    [CollectionName("Groups")]
+	/// <summary>
+	/// Base class for all group nodes.
+	/// </summary>
+	[CollectionName("Groups")]
 	[TypeName(TypeNameSerialization.FullName)]
 	[ArchivingTime]
 	[Index("NodeId")]
@@ -33,6 +34,7 @@ namespace Waher.Groups
 		private string oldId = null;
 		private NodeState state = NodeState.None;
 		private List<GroupNode> children = null;
+		private int siblingOrdinal = 0;
 		private bool childrenLoaded = false;
 		private readonly object synchObject = new object();
 		private DateTime created = DateTime.Now;
@@ -117,6 +119,16 @@ namespace Waher.Groups
 		{
 			get => this.updated;
 			set => this.updated = value;
+		}
+
+		/// <summary>
+		/// Sibling ordinal, used to order siblings when ordered.
+		/// </summary>
+		[DefaultValue(0)]
+		public int SiblingOrdinal
+		{
+			get => this.siblingOrdinal;
+			set => this.siblingOrdinal = value;
 		}
 
 		/// <summary>
@@ -335,7 +347,7 @@ namespace Waher.Groups
 				NodeId = this.NodeId,
 				Partition = this.Partition,
 				SourceId = this.SourceId,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			});
 		}
 
@@ -472,7 +484,7 @@ namespace Waher.Groups
 					NewStateSigned = NodeState.Information;
 					NewStateUnsigned = NodeState.Information;
 				}
-				else 
+				else
 				{
 					NewStateSigned = NodeState.None;
 					NewStateUnsigned = NodeState.None;
@@ -703,36 +715,81 @@ namespace Waher.Groups
 
 		private async Task LoadChildren()
 		{
-			IEnumerable<GroupNode> Children = await Database.Find<GroupNode>(new FilterFieldEqualTo("ParentId", this.objectId));
-			LinkedList<GroupNode> Children2 = new LinkedList<GroupNode>();
+			List<GroupNode> Children = new List<GroupNode>();
+			GroupNode[] ToUpdate = null;
 
-			foreach (GroupNode Node in Children)
-				Children2.AddLast(GroupSource.RegisterNode(Node));
+			foreach (GroupNode Node in await Database.Find<GroupNode>(
+				new FilterFieldEqualTo("ParentId", this.objectId)))
+			{
+				Children.Add(GroupSource.RegisterNode(Node));
+			}
 
 			lock (this.synchObject)
 			{
 				this.children = null;
 
-				foreach (GroupNode Child in Children2)
+				if (Children.Count > 0)
 				{
-					this.children ??= new List<GroupNode>();
-					this.children.Add(Child);
-					
-					Child.parent = this;
+					foreach (GroupNode Child in Children)
+						Child.parent = this;
+
+					ToUpdate = this.SortChildrenAfterLoadLocked(Children);
+					this.children = Children;
 				}
 
-				this.SortChildrenAfterLoadLocked(this.children);
 				this.childrenLoaded = true;
 			}
+
+			if (!(ToUpdate is null))
+				await Database.Update(ToUpdate);
 		}
 
 		/// <summary>
 		/// Method that allows the node to sort its children, after they have been loaded.
 		/// </summary>
 		/// <param name="Children">Loaded children.</param>
-		protected virtual void SortChildrenAfterLoadLocked(List<GroupNode> Children)
+		/// <returns>Child nodes that need to be updated, or null if no such nodes.</returns>
+		protected virtual GroupNode[] SortChildrenAfterLoadLocked(List<GroupNode> Children)
 		{
-			// Do nothing by default.
+			if (this.ChildrenOrdered)
+			{
+				Children.Sort((n1, n2) => n1.siblingOrdinal.CompareTo(n2.siblingOrdinal));
+				return this.CheckOrderLocked(Children);
+			}
+			else
+			{
+				Children.Sort((n1, n2) => n1.nodeId.CompareTo(n2.nodeId));
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Checks the ordering of children.
+		/// </summary>
+		/// <param name="Children">Child nodes.</param>
+		/// <returns>Child nodes that need to be updated, or null if no such nodes.</returns>
+		protected virtual GroupNode[] CheckOrderLocked(List<GroupNode> Children)
+		{
+			if (this.ChildrenOrdered)
+			{
+				ChunkedList<GroupNode> ToUpdate = null;
+				int Expected = 0;
+
+				foreach (GroupNode Child in Children)
+				{
+					if (Child.SiblingOrdinal != Expected)
+					{
+						ToUpdate ??= new ChunkedList<GroupNode>();
+						ToUpdate.Add(Child);
+						Child.siblingOrdinal = Expected;
+					}
+
+					Expected++;
+				}
+				return ToUpdate?.ToArray();
+			}
+			else
+				return null;
 		}
 
 		internal async Task<GroupNode> LoadParent()
@@ -851,11 +908,8 @@ namespace Waher.Groups
 		/// <returns>Set of displayable parameters.</returns>
 		public async Task<Parameter[]> GetDisplayableParameterAraryAsync(Language Language, RequestOrigin Caller)
 		{
-			List<Parameter> Result = new List<Parameter>();
-
-			foreach (Parameter P in await this.GetDisplayableParametersAsync(Language, Caller))
-				Result.Add(P);
-
+			ChunkedList<Parameter> Result = new ChunkedList<Parameter>();
+			Result.AddRange(await this.GetDisplayableParametersAsync(Language, Caller));
 			return Result.ToArray();
 		}
 
@@ -923,11 +977,19 @@ namespace Waher.Groups
 		/// <returns>If the child node was moved up.</returns>
 		public virtual async Task<bool> MoveUpAsync(GroupNode Child, RequestOrigin Caller)
 		{
-			if (!this.ChildrenOrdered || this.children is null)
+			if (!this.ChildrenOrdered)
+				return false;
+
+			if (!this.childrenLoaded)
+				await this.LoadChildren();
+
+			if (this.children is null)
 				return false;
 
 			if (!await this.CanEditAsync(Caller) || !await Child.CanEditAsync(Caller))
 				return false;
+
+			GroupNode Child2;
 
 			lock (this.children)
 			{
@@ -935,16 +997,24 @@ namespace Waher.Groups
 				if (i <= 0)
 					return false;
 
+				Child2 = this.children[i - 1];
+
 				this.children.RemoveAt(i);
 				this.children.Insert(i - 1, Child);
+
+				i = Child.siblingOrdinal;
+				Child.siblingOrdinal = Child2.siblingOrdinal;
+				Child2.siblingOrdinal = i;
 			}
+
+			await Database.Update(Child, Child2);
 
 			await GroupSource.NewEvent(new NodeMovedUp()
 			{
 				NodeId = Child.NodeId,
 				Partition = Child.Partition,
 				SourceId = Child.SourceId,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			});
 
 			return true;
@@ -958,11 +1028,19 @@ namespace Waher.Groups
 		/// <returns>If the child node was moved down.</returns>
 		public virtual async Task<bool> MoveDownAsync(GroupNode Child, RequestOrigin Caller)
 		{
-			if (!this.ChildrenOrdered || this.children is null)
+			if (!this.ChildrenOrdered)
+				return false;
+
+			if (!this.childrenLoaded)
+				await this.LoadChildren();
+
+			if (this.children is null)
 				return false;
 
 			if (!await this.CanEditAsync(Caller) || !await Child.CanEditAsync(Caller))
 				return false;
+
+			GroupNode Child2;
 
 			lock (this.children)
 			{
@@ -971,16 +1049,24 @@ namespace Waher.Groups
 				if (i < 0 || i + 1 >= c)
 					return false;
 
+				Child2 = this.children[i + 1];
+
 				this.children.RemoveAt(i);
 				this.children.Insert(i + 1, Child);
+
+				i = Child.siblingOrdinal;
+				Child.siblingOrdinal = Child2.siblingOrdinal;
+				Child2.siblingOrdinal = i;
 			}
+
+			await Database.Update(Child, Child2);
 
 			await GroupSource.NewEvent(new NodeMovedDown()
 			{
 				NodeId = Child.NodeId,
 				Partition = Child.Partition,
 				SourceId = Child.SourceId,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			});
 
 			return true;
@@ -1017,6 +1103,7 @@ namespace Waher.Groups
 
 			Node.parentId = this.objectId;
 
+			GroupNode[] ToUpdate;
 			GroupNode After = null;
 			int c;
 
@@ -1027,9 +1114,16 @@ namespace Waher.Groups
 				else if ((c = this.children.Count) > 0)
 					After = this.children[c - 1];
 
-				this.children.Add(Node);
+				ToUpdate = this.CheckOrderLocked(this.children);
+
+				Node.siblingOrdinal = this.children.Count;
 				Node.parent = this;
+
+				this.children.Add(Node);
 			}
+
+			if (!(ToUpdate is null))
+				await Database.Update(ToUpdate);
 
 			if (Node.objectId == Guid.Empty)
 			{
@@ -1057,7 +1151,7 @@ namespace Waher.Groups
 					LogId = NodeAdded.EmptyIfSame(Node.LogId, Node.NodeId),
 					LocalId = NodeAdded.EmptyIfSame(Node.LocalId, Node.NodeId),
 					SourceId = Node.SourceId,
-					Timestamp = DateTime.Now
+					Timestamp = DateTime.UtcNow
 				};
 
 				if (this.ChildrenOrdered && !(After is null))
@@ -1090,7 +1184,7 @@ namespace Waher.Groups
 				IsReadable = this.IsReadable,
 				IsControllable = this.IsControllable,
 				HasCommands = this.HasCommands,
-				ParentId = this.NodeId,
+				ParentId = (await this.GetParent()).NodeId,
 				ParentPartition = this.Partition,
 				Updated = this.Updated,
 				State = this.State,
@@ -1100,7 +1194,7 @@ namespace Waher.Groups
 				LogId = NodeAdded.EmptyIfSame(this.LogId, this.NodeId),
 				LocalId = NodeAdded.EmptyIfSame(this.LocalId, this.NodeId),
 				SourceId = this.SourceId,
-				Timestamp = DateTime.Now
+				Timestamp = DateTime.UtcNow
 			});
 
 			if (this.oldId != this.nodeId)
@@ -1134,6 +1228,7 @@ namespace Waher.Groups
 			if (!this.childrenLoaded)
 				await this.LoadChildren();
 
+			GroupNode[] ToUpdate = null;
 			int i;
 
 			lock (this.synchObject)
@@ -1146,11 +1241,16 @@ namespace Waher.Groups
 						this.children.RemoveAt(i);
 						if (i == 0 && this.children.Count == 0)
 							this.children = null;
+						else
+							ToUpdate = this.CheckOrderLocked(this.children);
 					}
 				}
 				else
 					i = -1;
 			}
+
+			if (!(ToUpdate is null))
+				await Database.Update(ToUpdate);
 
 			Node.parentId = Guid.Empty;
 			Node.parent = null;
@@ -1165,7 +1265,7 @@ namespace Waher.Groups
 					NodeId = Node.NodeId,
 					Partition = Node.Partition,
 					SourceId = Node.SourceId,
-					Timestamp = DateTime.Now
+					Timestamp = DateTime.UtcNow
 				});
 			}
 
@@ -1181,15 +1281,24 @@ namespace Waher.Groups
 			{
 				if (this.parent.childrenLoaded)
 				{
+					GroupNode[] ToUpdate = null;
+
 					lock (this.parent.synchObject)
 					{
 						if (!(this.parent.children is null))
 						{
-							this.parent.children.Remove(this);
-							if (this.parent.children.Count == 0)
-								this.parent.children = null;
+							if (this.parent.children.Remove(this))
+							{
+								if (this.parent.children.Count == 0)
+									this.parent.children = null;
+								else
+									ToUpdate = this.parent.CheckOrderLocked(this.parent.children);
+							}
 						}
 					}
+
+					if (!(ToUpdate is null))
+						await Database.Update(ToUpdate);
 				}
 			}
 
@@ -1198,7 +1307,10 @@ namespace Waher.Groups
 
 			if (!(this.children is null))
 			{
-				foreach (GroupNode Child in this.children)
+				List<GroupNode> Children = this.children;
+				this.children = null;
+
+				foreach (GroupNode Child in Children)
 				{
 					Child.parent = null;
 					Child.parentId = Guid.Empty;

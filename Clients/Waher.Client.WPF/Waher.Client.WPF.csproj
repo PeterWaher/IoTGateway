@@ -3,7 +3,6 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
 		<UseWindowsForms>true</UseWindowsForms>
 		<UseWPF>true</UseWPF>
@@ -52,6 +51,12 @@
 		<SignAssembly>False</SignAssembly>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="Graphics\move-down-16.png" />
+	  <None Remove="Graphics\move-down-32.png" />
+	  <None Remove="Graphics\move-up-16.png" />
+	  <None Remove="Graphics\move-up-32.png" />
+	</ItemGroup>
+	<ItemGroup>
 		<EmbeddedResource Include="Dialogs\AvalonExtensions\Markdown.xshd" />
 		<EmbeddedResource Include="Dialogs\AvalonExtensions\CSS.xshd" />
 		<EmbeddedResource Include="Dialogs\AvalonExtensions\HTML.xshd" />
@@ -87,6 +92,10 @@
 		</EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>
+		<Resource Include="Graphics\move-down-16.png" />
+		<Resource Include="Graphics\move-down-32.png" />
+		<Resource Include="Graphics\move-up-16.png" />
+		<Resource Include="Graphics\move-up-32.png" />
 		<Resource Include="Graphics\open_document_32_h.png" />
 	</ItemGroup>
 	<ItemGroup>

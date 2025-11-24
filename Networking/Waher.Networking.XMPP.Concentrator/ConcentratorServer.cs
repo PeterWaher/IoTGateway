@@ -83,8 +83,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ThingRegistryClient">Thing Registry client.</param>
 		/// <param name="ProvisioningClient">Provisioning client.</param>
-		/// <param name="DataSources">Data sources.</param>
-		private ConcentratorServer(XmppClient Client, ThingRegistryClient ThingRegistryClient, ProvisioningClient ProvisioningClient, params IDataSource[] DataSources)
+		private ConcentratorServer(XmppClient Client, ThingRegistryClient ThingRegistryClient, ProvisioningClient ProvisioningClient)
 			: base(Client)
 		{
 			this.thingRegistryClient = ThingRegistryClient;

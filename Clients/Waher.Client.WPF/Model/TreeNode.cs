@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using System.Xml;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xml;
 using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.Sniffers;
@@ -27,18 +27,15 @@ namespace Waher.Client.WPF.Model
 	public abstract class TreeNode(TreeNode Parent) : SelectableItem, IDisposable
 	{
 		private readonly TreeNode parent = Parent;
-		protected DisplayableParameters? parameters = null;
-		protected SortedDictionary<string, TreeNode>? children = null;
-		private object? tag = null;
+		protected DisplayableParameters parameters = null;
+		protected SortedDictionary<string, TreeNode> children = null;
+		private object tag = null;
 		private bool expanded = false;
 
 		/// <summary>
 		/// Key in parent child collection.
 		/// </summary>
-		public abstract string Key
-		{
-			get;
-		}
+		public abstract string Key { get; }
 
 		/// <summary>
 		/// If the node has child nodes or not. If null, the state is undefined, and might need to be checked by consulting with the
@@ -63,7 +60,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Children of the node. If null, children are not loaded.
 		/// </summary>
-		public TreeNode[]? Children
+		public TreeNode[] Children
 		{
 			get
 			{
@@ -78,8 +75,19 @@ namespace Waher.Client.WPF.Model
 					this.children.Values.CopyTo(Children, 0);
 				}
 
+				this.ChildOrder(Children);
+
 				return Children;
 			}
+		}
+
+		/// <summary>
+		/// Orders children before they are presented.
+		/// </summary>
+		/// <param name="Children">Available children.</param>
+		protected virtual void ChildOrder(TreeNode[] Children)
+		{
+			// Leave default order (by Node ID).
 		}
 
 		/// <summary>
@@ -88,7 +96,7 @@ namespace Waher.Client.WPF.Model
 		/// <param name="ChildKey">Child Key</param>
 		/// <param name="Child">Child, if found, or null otherwise.</param>
 		/// <returns>If a child with the given key was found.</returns>
-		public bool TryGetChild(string ChildKey, [NotNullWhen(true)] out TreeNode? Child)
+		public bool TryGetChild(string ChildKey, [NotNullWhen(true)] out TreeNode Child)
 		{
 			if (this.children is null)
 			{
@@ -110,7 +118,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Object tagged to the node.
 		/// </summary>
-		public object? Tag
+		public object Tag
 		{
 			get => this.tag;
 			set => this.tag = value;
@@ -119,10 +127,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Tree Node header text.
 		/// </summary>
-		public abstract string Header
-		{
-			get;
-		}
+		public abstract string Header { get; }
 
 		/// <summary>
 		/// Disposes of the node and its resources.
@@ -140,50 +145,32 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Image resource for the node.
 		/// </summary>
-		public abstract ImageSource ImageResource
-		{
-			get;
-		}
+		public abstract ImageSource ImageResource { get; }
 
 		/// <summary>
 		/// If the second image resource is visible or not.
 		/// </summary>
-		public virtual Visibility ImageResourceVisibility
-		{
-			get { return Visibility.Visible; }
-		}
+		public virtual Visibility ImageResourceVisibility => Visibility.Visible;
 
 		/// <summary>
 		/// Secondary image resource for the node.
 		/// </summary>
-		public virtual ImageSource? ImageResource2
-		{
-			get { return null; }
-		}
+		public virtual ImageSource ImageResource2 => null;
 
 		/// <summary>
 		/// If the second image resource is visible or not.
 		/// </summary>
-		public virtual Visibility ImageResource2Visibility
-		{
-			get { return Visibility.Hidden; }
-		}
+		public virtual Visibility ImageResource2Visibility => Visibility.Hidden;
 
 		/// <summary>
 		/// Tool Tip for node.
 		/// </summary>
-		public abstract string ToolTip
-		{
-			get;
-		}
+		public abstract string ToolTip { get; }
 
 		/// <summary>
 		/// Node Type Name.
 		/// </summary>
-		public abstract string TypeName
-		{
-			get;
-		}
+		public abstract string TypeName { get; }
 
 		/// <summary>
 		/// Gets a displayable parameter value.
@@ -212,12 +199,12 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Gets available displayable parameters.
 		/// </summary>
-		public virtual DisplayableParameters? DisplayableParameters => this.parameters;
+		public virtual DisplayableParameters DisplayableParameters => this.parameters;
 
 		/// <summary>
 		/// Raised when the node has been updated. The sender argument will contain a reference to the node.
 		/// </summary>
-		public event EventHandler? Updated = null;
+		public event EventHandler<SelectableItemEventArgs> Updated = null;
 
 		/// <summary>
 		/// Raises the <see cref="Updated"/> event.
@@ -250,12 +237,12 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Event raised when the node has been expanded.
 		/// </summary>
-		public event EventHandler? Expanded = null;
+		public event EventHandler<SelectableItemEventArgs> Expanded = null;
 
 		/// <summary>
 		/// Event raised when the node has been collapsed.
 		/// </summary>
-		public event EventHandler? Collapsed = null;
+		public event EventHandler<SelectableItemEventArgs> Collapsed = null;
 
 		/// <summary>
 		/// Raises the <see cref="Expanded"/> event.
@@ -337,10 +324,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If children can be added to the node.
 		/// </summary>
-		public abstract bool CanAddChildren
-		{
-			get;
-		}
+		public abstract bool CanAddChildren { get; }
 
 		/// <summary>
 		/// Is called when the user wants to add a node to the current node.
@@ -354,10 +338,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If the node can be deleted.
 		/// </summary>
-		public abstract bool CanDelete
-		{
-			get;
-		}
+		public abstract bool CanDelete { get; }
 
 		/// <summary>
 		/// If the node provides a custom delete question.
@@ -369,20 +350,17 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		/// <param name="Parent">Parent node.</param>
 		/// <param name="OnDeleted">Method called when node has been successfully deleted.</param>
-		public virtual Task Delete(TreeNode Parent, EventHandler OnDeleted)
+		public virtual Task Delete(TreeNode Parent, EventHandler<SelectableItemEventArgs> OnDeleted)
 		{
 			Parent?.RemoveChild(this);
-			OnDeleted.Raise(this, EventArgs.Empty);
+			OnDeleted.Raise(this, new SelectableItemEventArgs(this));
 			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// If the node can be edited.
 		/// </summary>
-		public abstract bool CanEdit
-		{
-			get;
-		}
+		public abstract bool CanEdit { get; }
 
 		/// <summary>
 		/// Is called when the user wants to edit a node.
@@ -394,12 +372,37 @@ namespace Waher.Client.WPF.Model
 		}
 
 		/// <summary>
+		/// If the node can be moved up.
+		/// </summary>
+		public virtual bool CanMoveUp => false;
+
+		/// <summary>
+		/// Is called when the user wants to move a node up.
+		/// </summary>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
+		public virtual void MoveUp()
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// If the node can be moved down.
+		/// </summary>
+		public virtual bool CanMoveDown => false;
+
+		/// <summary>
+		/// Is called when the user wants to move a node down.
+		/// </summary>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
+		public virtual void MoveDown()
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
 		/// If node can be copied to clipboard.
 		/// </summary>
-		public virtual bool CanCopy
-		{
-			get => false;
-		}
+		public virtual bool CanCopy => false;
 
 		/// <summary>
 		/// Is called when the user wants to copy the node to the clipboard.
@@ -413,10 +416,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If node can be pasted to, from the clipboard.
 		/// </summary>
-		public virtual bool CanPaste
-		{
-			get => false;
-		}
+		public virtual bool CanPaste => false;
 
 		/// <summary>
 		/// Is called when the user wants to paste data from the clipboard to the node.
@@ -430,10 +430,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If the node can be recycled.
 		/// </summary>
-		public abstract bool CanRecycle
-		{
-			get;
-		}
+		public abstract bool CanRecycle { get; }
 
 		/// <summary>
 		/// Is called when the user wants to recycle the node.
@@ -476,12 +473,29 @@ namespace Waher.Client.WPF.Model
 		}
 
 		/// <summary>
+		/// Moves a child node up, if possible.
+		/// </summary>
+		/// <param name="Node">Child node.</param>
+		/// <returns>If node was possible to move up.</returns>
+		public virtual bool MoveUp(TreeNode Node)
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Moves a child node down, if possible.
+		/// </summary>
+		/// <param name="Node">Child node.</param>
+		/// <returns>If node was possible to move down.</returns>
+		public virtual bool MoveDown(TreeNode Node)
+		{
+			return false;
+		}
+
+		/// <summary>
 		/// If the node can be sniffed.
 		/// </summary>
-		public virtual bool IsSniffable
-		{
-			get { return false; }
-		}
+		public virtual bool IsSniffable => false;
 
 		/// <summary>
 		/// Adds a sniffer to the node.
@@ -604,7 +618,7 @@ namespace Waher.Client.WPF.Model
 		/// <param name="Callback">Method called when form is returned or when operation fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
-		public virtual Task GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object? State)
+		public virtual Task GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
 		{
 			throw new NotSupportedException();
 		}
@@ -612,18 +626,12 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If it's possible to search for data on the node.
 		/// </summary>
-		public virtual bool CanSearch
-		{
-			get { return false; }
-		}
+		public virtual bool CanSearch => false;
 
 		/// <summary>
 		/// Performs a search on the node.
 		/// </summary>
-		public virtual void Search()
-		{
-			throw new NotSupportedException();
-		}
+		public virtual void Search() => throw new NotSupportedException();
 
 		/// <summary>
 		/// Adds context sensitive menu items to a context menu.
@@ -649,7 +657,7 @@ namespace Waher.Client.WPF.Model
 				});
 			}
 
-			if (this.Parent is not null && this.Parent.CanDelete)
+			if (this.CanDelete)
 			{
 				CurrentGroup = "Edit";
 				Menu.Items.Add(new MenuItem()
@@ -660,6 +668,40 @@ namespace Waher.Client.WPF.Model
 					Icon = new Image()
 					{
 						Source = new BitmapImage(new Uri("../Graphics/delete_32_h.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+
+			if (this.CanMoveUp)
+			{
+				CurrentGroup = "Edit";
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "Move _Up",
+					IsEnabled = true,
+					Command = MainWindow.MoveUp,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/move-up-16.png", UriKind.Relative)),
+						Width = 16,
+						Height = 16
+					}
+				});
+			}
+
+			if (this.CanMoveDown)
+			{
+				CurrentGroup = "Edit";
+				Menu.Items.Add(new MenuItem()
+				{
+					Header = "Move Do_wn",
+					IsEnabled = true,
+					Command = MainWindow.MoveDown,
+					Icon = new Image()
+					{
+						Source = new BitmapImage(new Uri("../Graphics/move-down-16.png", UriKind.Relative)),
 						Width = 16,
 						Height = 16
 					}
@@ -682,6 +724,7 @@ namespace Waher.Client.WPF.Model
 					}
 				});
 			}
+
 			if (this.CanPaste)
 			{
 				CurrentGroup = "Edit";

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Markdown;
 using Waher.Jobs.NodeTypes;
 using Waher.Runtime.Language;
 using Waher.Script;
@@ -14,6 +15,9 @@ namespace Waher.Jobs.Script.NodeTypes
 	/// </summary>
 	public class ScriptExecutionTaskNode : JobTaskNode
 	{
+		private string[] script;
+		private Expression parsedScript;
+
 		/// <summary>
 		/// Sensor data readout task node.
 		/// </summary>
@@ -24,11 +28,19 @@ namespace Waher.Jobs.Script.NodeTypes
 		/// <summary>
 		/// Script to execute.
 		/// </summary>
-		[Header(1, "Script:", 0)]
-		[Page(2, "Script", 0)]
+		[Header(1, "Script:", 10)]
+		[Page(2, "Job", 0)]
 		[ToolTip(3, "Script to execute.")]
 		[ContentType("application/x-webscript")]
-		public string[] Script { get; set; }
+		public string[] Script 
+		{
+			get => this.script;
+			set
+			{
+				this.script = value;
+				this.parsedScript = null;
+			}
+		}
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -58,17 +70,53 @@ namespace Waher.Jobs.Script.NodeTypes
 		{
 			try
 			{
-				StringBuilder sb = new StringBuilder();
+				if (Status.ReportDetail != JobReportDetail.None)
+				{
+					await Status.Query.Start();
+					await Status.Query.SetTitle(this.NodeId);
+				}
 
-				foreach (string s in this.Script)
-					sb.AppendLine(s);
+				if (this.parsedScript is null)
+				{
+					StringBuilder sb = new StringBuilder();
 
-				await Expression.EvalAsync(sb.ToString(), Status.Variables);
+					foreach (string s in this.Script)
+						sb.AppendLine(s);
+
+					this.parsedScript = new Expression(sb.ToString());
+				}
+
+				DateTime Start = DateTime.UtcNow;
+				object Result = await this.parsedScript.EvaluateAsync(Status.Variables);
+				TimeSpan ExecutionTime = DateTime.UtcNow.Subtract(Start);
+
+				if (Status.ReportDetail == JobReportDetail.Details)
+				{
+					if (!(Result is null))
+						await Status.Query.NewObject(Result);
+				}
+
+				if (Status.ReportDetail != JobReportDetail.None)
+				{
+					StringBuilder sb = new StringBuilder();
+
+					sb.Append("Execution time: **");
+					sb.Append(MarkdownDocument.Encode(ExecutionTime.ToString()));
+					sb.Append("**");
+
+					await Status.Query.NewObject(new MarkdownContent(sb.ToString()));
+				}
+
 				await Status.Job.RemoveErrorAsync("ScriptError");
 			}
 			catch (Exception ex)
 			{
 				await Status.Job.LogErrorAsync("ScriptError", ex.Message);
+			}
+			finally
+			{
+				if (Status.ReportDetail != JobReportDetail.None)
+					await Status.Query.Done();
 			}
 		}
 	}

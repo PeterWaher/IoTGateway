@@ -7,7 +7,9 @@ using Waher.Content;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
+using Waher.Script.Constants;
 using Waher.Security;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
@@ -80,11 +82,15 @@ namespace Waher.Things.Ip
 		/// <returns>Binary TCP transport.</returns>
 		public async Task<BinaryTcpClient> ConnectTcp(bool DecoupledEvents, params ISniffer[] Sniffers)
 		{
+			X509Certificate Certificate = Types.TryGetModuleParameter<X509Certificate>("X509");
 			BinaryTcpClient Client = new BinaryTcpClient(DecoupledEvents, Sniffers);
-			await Client.ConnectAsync(this.Host, this.port);
+			await Client.ConnectAsync(this.Host, this.port, this.tls);
 
 			if (this.tls)
-				await Client.UpgradeToTlsAsClient(Crypto.SecureTls);
+			{
+				await Client.UpgradeToTlsAsClient(Certificate, Crypto.SecureTls);
+				Client.Continue();
+			}
 
 			return Client;
 		}
@@ -100,11 +106,15 @@ namespace Waher.Things.Ip
 		/// <returns>Text-based TCP transport.</returns>
 		public async Task<TextTcpClient> ConnectTcp(Encoding Encoding, bool DecoupledEvents, params ISniffer[] Sniffers)
 		{
+			X509Certificate Certificate = Types.TryGetModuleParameter<X509Certificate>("X509");
 			TextTcpClient Client = new TextTcpClient(Encoding, DecoupledEvents, Sniffers);
-			await Client.ConnectAsync(this.Host, this.port);
+			await Client.ConnectAsync(this.Host, this.port, this.tls);
 
 			if (this.tls)
-				await Client.UpgradeToTlsAsClient(Crypto.SecureTls);
+			{
+				await Client.UpgradeToTlsAsClient(Certificate, Crypto.SecureTls);
+				Client.Continue();
+			}
 
 			return Client;
 		}
@@ -132,45 +142,24 @@ namespace Waher.Things.Ip
 		{
 			try
 			{
-				DateTime Now = DateTime.Now;
+				DateTime Now = DateTime.UtcNow;
 				string Module = typeof(IpHost).Namespace;
+				
+				using BinaryTcpClient Client = await this.ConnectTcp(false);
 
-				using (BinaryTcpClient Client = await this.ConnectTcp(false))
-				{
-					List<Field> Fields = new List<Field>()
+				List<Field> Fields = new List<Field>()
 					{
-						new QuantityField(this, Now, "Connect", (DateTime.Now-Now).TotalMilliseconds, 0, "ms", FieldType.Momentary, FieldQoS.AutomaticReadout, Module, 13)
+						new QuantityField(this, Now, "Connect", (DateTime.UtcNow-Now).TotalMilliseconds, 
+							0, "ms", FieldType.Momentary, FieldQoS.AutomaticReadout, Module, 13)
 					};
 
-					if (Request.IsIncluded(FieldType.Identity) && this.Tls)
-					{
-						X509Certificate Cert = Client.RemoteCertificate;
-						string s;
-
-						if (!(Cert is null))
-						{
-							Fields.Add(new BooleanField(this, Now, "Certificate Valid", Client.RemoteCertificateValid, FieldType.Identity | FieldType.Status, FieldQoS.AutomaticReadout, Module, 14));
-							Fields.Add(new StringField(this, Now, "Subject", Cert.Subject, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 15));
-							Fields.Add(new StringField(this, Now, "Issuer", Cert.Issuer, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 16));
-							Fields.Add(new StringField(this, Now, "S/N", Cert.GetSerialNumberString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 17));
-							Fields.Add(new StringField(this, Now, "Digest", Cert.GetCertHashString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 20));
-							Fields.Add(new StringField(this, Now, "Algorithm", Cert.GetKeyAlgorithm(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 21));
-							Fields.Add(new StringField(this, Now, "Public Key", Cert.GetPublicKeyString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 22));
-
-							if (CommonTypes.TryParseRfc822(s = Cert.GetEffectiveDateString(), out DateTimeOffset TP))
-								Fields.Add(new DateTimeField(this, Now, "Effective", TP.UtcDateTime, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 18));
-							else
-								Fields.Add(new StringField(this, Now, "Effective", s, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 18));
-
-							if (CommonTypes.TryParseRfc822(s = Cert.GetExpirationDateString(), out TP))
-								Fields.Add(new DateTimeField(this, Now, "Expires", TP.UtcDateTime, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 19));
-							else
-								Fields.Add(new StringField(this, Now, "Expires", Cert.GetExpirationDateString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 19));
-						}
-					}
-
-					await Request.ReportFields(false, Fields);
+				if (Request.IsIncluded(FieldType.Identity) && this.Tls)
+				{
+					AddCertificateFields(Client.RemoteCertificate, 
+						Client.RemoteCertificateValid, this, Now, Fields);
 				}
+
+				await Request.ReportFields(false, Fields);
 			}
 			catch (Exception ex)
 			{
@@ -178,6 +167,42 @@ namespace Waher.Things.Ip
 			}
 
 			await base.StartReadout(Request);
+		}
+
+		/// <summary>
+		/// Adds information from a certificate as fields to a collection of fields.
+		/// </summary>
+		/// <param name="Certificate">Certificate</param>
+		/// <param name="IsValid">If certificate is valid.</param>
+		/// <param name="Node">Node reporting certificate.</param>
+		/// <param name="Timestamp">Timestamp of readout.</param>
+		/// <param name="Fields">Collection of fields.</param>
+		public static void AddCertificateFields(X509Certificate Certificate, bool IsValid,
+			ThingReference Node, DateTime Timestamp, List<Field> Fields)
+		{
+			if (!(Certificate is null))
+			{
+				string Module = typeof(IpHost).Namespace;
+				string s;
+
+				Fields.Add(new BooleanField(Node, Timestamp, "Certificate Valid", IsValid, FieldType.Identity | FieldType.Status, FieldQoS.AutomaticReadout, Module, 14));
+				Fields.Add(new StringField(Node, Timestamp, "Subject", Certificate.Subject, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 15));
+				Fields.Add(new StringField(Node, Timestamp, "Issuer", Certificate.Issuer, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 16));
+				Fields.Add(new StringField(Node, Timestamp, "S/N", Certificate.GetSerialNumberString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 17));
+				Fields.Add(new StringField(Node, Timestamp, "Digest", Certificate.GetCertHashString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 20));
+				Fields.Add(new StringField(Node, Timestamp, "Algorithm", Certificate.GetKeyAlgorithm(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 21));
+				Fields.Add(new StringField(Node, Timestamp, "Public Key", Certificate.GetPublicKeyString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 22));
+
+				if (CommonTypes.TryParseRfc822(s = Certificate.GetEffectiveDateString(), out DateTimeOffset TP))
+					Fields.Add(new DateTimeField(Node, Timestamp, "Effective", TP.UtcDateTime, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 18));
+				else
+					Fields.Add(new StringField(Node, Timestamp, "Effective", s, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 18));
+
+				if (CommonTypes.TryParseRfc822(s = Certificate.GetExpirationDateString(), out TP))
+					Fields.Add(new DateTimeField(Node, Timestamp, "Expires", TP.UtcDateTime, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 19));
+				else
+					Fields.Add(new StringField(Node, Timestamp, "Expires", s, FieldType.Identity, FieldQoS.AutomaticReadout, Module, 19));
+			}
 		}
 
 	}

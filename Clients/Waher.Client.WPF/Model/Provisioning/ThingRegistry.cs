@@ -33,10 +33,10 @@ namespace Waher.Client.WPF.Model.Provisioning
 	{
 		private readonly bool supportsProvisioning;
 		private readonly bool supportsSoftwareUpdates;
-		private readonly string? packageFolder;
-		private ThingRegistryClient? registryClient;
-		private ProvisioningClient? provisioningClient;
-		private SoftwareUpdateClient? softwareClient;
+		private readonly string packageFolder;
+		private ThingRegistryClient registryClient;
+		private ProvisioningClient provisioningClient;
+		private SoftwareUpdateClient softwareClient;
 
 		public ThingRegistry(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features)
 			: base(Parent, JID, Name, Node, Features)
@@ -112,9 +112,9 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 		public bool SupportsProvisioning => this.supportsProvisioning;
 
-		public ThingRegistryClient? ThingRegistryClient => this.registryClient;
+		public ThingRegistryClient ThingRegistryClient => this.registryClient;
 
-		public ProvisioningClient? ProvisioningClient => this.provisioningClient;
+		public ProvisioningClient ProvisioningClient => this.provisioningClient;
 
 		private async Task ProvisioningClient_IsFriendQuestion(object Sender, IsFriendEventArgs e)
 		{
@@ -1002,7 +1002,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 				if (!Directory.Exists(this.packageFolder))
 					Directory.CreateDirectory(this.packageFolder!);
 
-				Regex? Filter;
+				Regex Filter;
 
 				if (string.IsNullOrEmpty(DialogParameters.Filter))
 					Filter = null;

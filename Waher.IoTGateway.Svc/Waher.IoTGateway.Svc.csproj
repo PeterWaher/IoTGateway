@@ -142,6 +142,7 @@
     <ProjectReference Include="..\Runtime\Waher.Runtime.Queue\Waher.Runtime.Queue.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.ServiceRegistration\Waher.Runtime.ServiceRegistration.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj" />
+    <ProjectReference Include="..\Runtime\Waher.Runtime.Statistics\Waher.Runtime.Statistics.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Temporary\Waher.Runtime.Temporary.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Text\Waher.Runtime.Text.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Threading.Sync\Waher.Runtime.Threading.Sync.csproj" />

@@ -450,6 +450,52 @@ namespace Waher.Content
 			}
 		}
 
+		/// <summary>
+		/// Scalar multiplication of an integer and a duration.
+		/// </summary>
+		/// <param name="Scalar">Integer scalar.</param>
+		/// <param name="D">Duration</param>
+		/// <returns>Scalar*Duration</returns>
+		public static Duration operator *(int Scalar, Duration D)
+		{
+			if (Scalar < 0)
+			{
+				Scalar = -Scalar;
+				return new Duration(
+					!D.negation,
+					Scalar * D.years,
+					Scalar * D.months,
+					Scalar * D.days,
+					Scalar * D.hours,
+					Scalar * D.minutes,
+					Scalar * D.seconds);
+			}
+			else if (Scalar == 0)
+				return Zero;
+			else
+			{
+				return new Duration(
+					D.negation,
+					Scalar * D.years,
+					Scalar * D.months,
+					Scalar * D.days,
+					Scalar * D.hours,
+					Scalar * D.minutes,
+					Scalar * D.seconds);
+			}
+		}
+
+		/// <summary>
+		/// Scalar multiplication of a duration and an integer.
+		/// </summary>
+		/// <param name="D">Duration</param>
+		/// <param name="Scalar">Integer scalar.</param>
+		/// <returns>Duration*Scalar</returns>
+		public static Duration operator *(Duration D, int Scalar)
+		{
+			return Scalar * D;
+		}
+
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{

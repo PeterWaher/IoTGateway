@@ -8,7 +8,6 @@ using System.Windows.Input;
 using System.Xml;
 using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Sniffers;
-using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Dialogs.IoT;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -21,8 +20,8 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things;
 using Waher.Things.SensorData;
-using Waher.Networking;
 using Waher.Networking.XMPP.Events;
+using System.ComponentModel;
 
 namespace Waher.Client.WPF.Model.Concentrator
 {
@@ -33,16 +32,19 @@ namespace Waher.Client.WPF.Model.Concentrator
 	{
 		private NodeInformation nodeInfo;
 		private NodeCommand[] commands = null;
+		private int ordinal;
 
 		/// <summary>
 		/// Represents a node in a concentrator.
 		/// </summary>
 		/// <param name="Parent">Parent node</param>
 		/// <param name="NodeInfo">Node information</param>
-		public Node(TreeNode Parent, NodeInformation NodeInfo)
+		/// <param name="Ordinal">Ordinal of node among its siblings.</param>
+		public Node(TreeNode Parent, NodeInformation NodeInfo, int Ordinal)
 			: base(Parent)
 		{
 			this.nodeInfo = NodeInfo;
+			this.ordinal = Ordinal;
 
 			if (this.nodeInfo.ParameterList is null)
 				this.parameters = null;
@@ -79,6 +81,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 		public override string Key => this.nodeInfo.NodeId;
 
 		/// <summary>
+		/// Ordinal of node among its siblings.
+		/// </summary>
+		public int Ordinal => this.ordinal;
+
+		/// <summary>
 		/// Tree Node header text.
 		/// </summary>
 		public override string Header => this.nodeInfo.LocalId;
@@ -99,7 +106,16 @@ namespace Waher.Client.WPF.Model.Concentrator
 		public NodeInformation NodeInformation
 		{
 			get => this.nodeInfo;
-			internal set => this.nodeInfo = value;
+			internal set
+			{
+				this.nodeInfo = value;
+
+				if (this.nodeInfo.ParameterList is not null)
+				{
+					this.DisplayableParameters.Clear();
+					this.DisplayableParameters.AddRange(this.nodeInfo.ParameterList);
+				}
+			}
 		}
 
 		/// <summary>
@@ -109,7 +125,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			get
 			{
-				if (!(this.parameters is null))
+				if (this.parameters is not null)
 				{
 					string s = this.parameters["Type"];
 					if (!string.IsNullOrEmpty(s))
@@ -218,7 +234,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			if (!this.loadingChildren && !this.IsLoaded)
 			{
-				string? FullJid = this.Concentrator?.FullJid;
+				string FullJid = this.Concentrator?.FullJid;
 				ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
 				if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
@@ -235,10 +251,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 							if (e.Ok)
 							{
-								SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
+								SortedDictionary<string, TreeNode> Children = [];
+								int Ordinal = 0;
 
 								foreach (NodeInformation Ref in e.NodesInformation)
-									Children[Ref.NodeId] = new Node(this, Ref);
+									Children[Ref.NodeId] = new Node(this, Ref, Ordinal++);
 
 								this.children = Children;
 
@@ -254,7 +271,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 					}
 					else
 					{
-						if (!(this.children is null))
+						if (this.children is not null)
 							this.DataSource?.NodesRemoved(this.children.Values, this);
 
 						this.children = null;
@@ -276,7 +293,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			if (this.nodeInfo.HasChildren && this.IsLoaded)
 			{
-				if (!(this.children is null))
+				if (this.children is not null)
 					this.DataSource?.NodesRemoved(this.children.Values, this);
 
 				this.children = new SortedDictionary<string, TreeNode>()
@@ -286,6 +303,82 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 				this.OnUpdated();
 			}
+		}
+
+		/// <summary>
+		/// Orders children before they are presented.
+		/// </summary>
+		/// <param name="Children">Available children.</param>
+		protected override void ChildOrder(TreeNode[] Children)
+		{
+			if (this.nodeInfo?.ChildrenOrdered ?? false)
+			{
+				Array.Sort(Children, ByOrdinal);
+			}
+		}
+
+		private static int ByOrdinal(TreeNode Node1, TreeNode Node2)
+		{
+			int Ordinal1 = (Node1 as Node)?.ordinal ?? int.MaxValue;
+			int Ordinal2 = (Node2 as Node)?.ordinal ?? int.MaxValue;
+
+			return Ordinal1.CompareTo(Ordinal2);
+		}
+
+		/// <summary>
+		/// Moves a child node up, if possible.
+		/// </summary>
+		/// <param name="Node">Child node.</param>
+		/// <returns>If node was possible to move up.</returns>
+		public override bool MoveUp(TreeNode Node)
+		{
+			if (this.nodeInfo is null || !this.nodeInfo.ChildrenOrdered)
+				return false;
+
+			if (Node is not Node TypedNode)
+				return false;
+
+			TreeNode[] Children = this.Children;
+			int i = Array.IndexOf(Children, TypedNode);
+			if (i <= 0)
+				return false;
+
+			if (Children[i - 1] is not Node TypedNode2)
+				return false;
+
+			i = TypedNode.ordinal;
+			TypedNode.ordinal = TypedNode2.ordinal;
+			TypedNode2.ordinal = i;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Moves a child node down, if possible.
+		/// </summary>
+		/// <param name="Node">Child node.</param>
+		/// <returns>If node was possible to move down.</returns>
+		public override bool MoveDown(TreeNode Node)
+		{
+			if (this.nodeInfo is null || !this.nodeInfo.ChildrenOrdered)
+				return false;
+
+			if (Node is not Node TypedNode)
+				return false;
+
+			TreeNode[] Children = this.Children;
+			int i = Array.IndexOf(Children, TypedNode);
+			if (i < 0 || i >= Children.Length - 1)
+				return false;
+
+			if (Children[i + 1] is not Node TypedNode2)
+				return false;
+
+			i = TypedNode.ordinal;
+			TypedNode.ordinal = TypedNode2.ordinal;
+			TypedNode2.ordinal = i;
+
+			return true;
 		}
 
 		/// <summary>
@@ -307,10 +400,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
 			SensorClient SensorClient;
 
-			if (XmppAccountNode is not null && !((SensorClient = XmppAccountNode.SensorClient) is null))
+			if (XmppAccountNode is not null && 
+				(SensorClient = XmppAccountNode.SensorClient) is not null)
 			{
 				return await SensorClient.RequestReadout(Concentrator.RosterItem.LastPresenceFullJid,
-					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) }, FieldType.Momentary);
+					[new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition)], FieldType.Momentary);
 			}
 			else
 				return null;
@@ -325,10 +419,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
 			SensorClient SensorClient;
 
-			if (XmppAccountNode is not null && !((SensorClient = XmppAccountNode.SensorClient) is null))
+			if (XmppAccountNode is not null && 
+				(SensorClient = XmppAccountNode.SensorClient) is not null)
 			{
 				return SensorClient.RequestReadout(Concentrator.RosterItem.LastPresenceFullJid,
-					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) }, FieldType.All);
+					[new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition)], FieldType.All);
 			}
 			else
 				throw new NotSupportedException();
@@ -343,13 +438,13 @@ namespace Waher.Client.WPF.Model.Concentrator
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
 			SensorClient SensorClient;
 
-			if (XmppAccountNode is not null && !((SensorClient = XmppAccountNode.SensorClient) is null))
+			if (XmppAccountNode is not null &&
+				(SensorClient = XmppAccountNode.SensorClient) is not null)
 			{
 				return await SensorClient.Subscribe(Concentrator.RosterItem.LastPresenceFullJid,
-					new ThingReference[]
-					{
+					[
 						new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition)
-					},
+					],
 					FieldType.Momentary, Rules, Duration.FromSeconds(1), Duration.FromMinutes(1), false);
 			}
 			else
@@ -372,7 +467,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
 			ControlClient ControlClient;
 
-			if (XmppAccountNode is not null && !((ControlClient = XmppAccountNode.ControlClient) is null))
+			if (XmppAccountNode is not null && 
+				(ControlClient = XmppAccountNode.ControlClient) is not null)
 			{
 				await ControlClient.GetForm(Concentrator.RosterItem.LastPresenceFullJid, "en", Callback, State,
 					new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition));
@@ -421,7 +517,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// </summary>
 		public override void Add()
 		{
-			string? FullJid = this.Concentrator?.FullJid;
+			string FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
 			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
@@ -451,7 +547,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 							default:
 								MainWindow.UpdateGui(() =>
 								{
-									SelectItemDialog Form = new SelectItemDialog("Add node", "Select type of node to add:",
+									SelectItemDialog Form = new("Add node", "Select type of node to add:",
 										"Add node of selected type.", "Type", "Class", e.Result)
 									{
 										Owner = MainWindow.currentInstance
@@ -482,7 +578,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		private void Add(string Type)
 		{
-			string? FullJid = this.Concentrator?.FullJid;
+			string FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
 			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
@@ -503,7 +599,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 				}, (Sender, e) =>
 				{
 					if (e.Ok)
-						this.Add(new Node(this, e.NodeInformation));
+						this.Add(new Node(this, e.NodeInformation, this.children?.Count ?? 0));
 					else if (!string.IsNullOrEmpty(e.From))
 						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to set parameters." : e.ErrorText);
 
@@ -517,9 +613,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			if (!this.loadingChildren && this.IsLoaded)
 			{
-				SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
+				SortedDictionary<string, TreeNode> Children = [];
 
-				if (!(this.children is null))
+				if (this.children is not null)
 				{
 					foreach (KeyValuePair<string, TreeNode> P in this.children)
 						Children[P.Key] = P.Value;
@@ -538,9 +634,10 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// </summary>
 		/// <param name="Parent">Parent node.</param>
 		/// <param name="OnDeleted">Method called when node has been successfully deleted.</param>
-		public override async Task Delete(TreeNode Parent, EventHandler OnDeleted)
+		public override async Task Delete(TreeNode Parent, 
+			EventHandler<SelectableItemEventArgs> OnDeleted)
 		{
-			string? FullJid = this.Concentrator?.FullJid;
+			string FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
 			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
@@ -576,7 +673,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// </summary>
 		public override void Edit()
 		{
-			string? FullJid = this.Concentrator?.FullJid;
+			string FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 			string OldKey = this.Key;
 
@@ -628,7 +725,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// <param name="Sniffer">Sniffer object.</param>
 		public override void AddSniffer(ISniffer Sniffer)
 		{
-			string? FullJid = this.Concentrator?.FullJid;
+			string FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
 			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
@@ -661,7 +758,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// <returns>If the sniffer was found and removed.</returns>
 		public override async Task<bool> RemoveSniffer(ISniffer Sniffer)
 		{
-			string? FullJid = this.Concentrator?.FullJid;
+			string FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
 			if (Sniffer is TabSniffer TabSniffer &&
@@ -689,14 +786,14 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			base.SelectionChanged();
 
-			if (!(this.nodeInfo is null) && this.nodeInfo.HasCommands && this.commands is null)
+			if (this.nodeInfo is not null && this.nodeInfo.HasCommands && this.commands is null)
 			{
-				string? FullJid = this.Concentrator?.FullJid;
+				string FullJid = this.Concentrator?.FullJid;
 				ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
 				if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
 				{
-					this.commands = new NodeCommand[0];
+					this.commands = [];
 
 					this.ConcentratorClient.GetNodeCommands(FullJid, this.nodeInfo, string.Empty, string.Empty, string.Empty, (Sender, e) =>
 					{
@@ -719,7 +816,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// <param name="Menu">Menu being built.</param>
 		public void AddContexMenuItems(TreeNode Node, ref string CurrentGroup, ContextMenu Menu)
 		{
-			if (Node == this && !(this.commands is null))
+			if (Node == this && this.commands is not null)
 			{
 				MenuItem Item;
 
@@ -744,7 +841,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		private void NodeCommandClick(object Sender, System.Windows.RoutedEventArgs e)
 		{
-			string? FullJid = this.Concentrator?.FullJid;
+			string FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
 			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
@@ -843,7 +940,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		private void ShowCommandResult(IqResultEventArgs e, NodeCommand Command)
 		{
-			if (!(this.commands is null))
+			if (this.commands is not null)
 			{
 				this.commands = null;
 				this.SelectionChanged();
@@ -870,7 +967,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			get
 			{
-				if (!(this.commands is null))
+				if (this.commands is not null)
 				{
 					foreach (NodeCommand Command in this.commands)
 					{
@@ -888,13 +985,13 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// </summary>
 		public override void Search()
 		{
-			if (!(this.commands is null))
+			if (this.commands is not null)
 			{
 				foreach (NodeCommand Command in this.commands)
 				{
 					if (Command.Command == "Search")
 					{
-						MenuItem Item = new MenuItem()
+						MenuItem Item = new()
 						{
 							Header = Command.Name,
 							IsEnabled = true,
@@ -920,7 +1017,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// </summary>
 		public override async void Copy()
 		{
-			string? FullJid = this.Concentrator?.FullJid;
+			string FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
 			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
@@ -930,7 +1027,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 				try
 				{
-					StringBuilder sb = new StringBuilder();
+					StringBuilder sb = new();
 					await ExportToXml(FullJid, ConcentratorClient, (this.Parent as Node)?.nodeInfo, this.nodeInfo, sb);
 					System.Windows.Clipboard.SetText(XML.PrettyXml(sb.ToString()));
 					MainWindow.MouseDefault();
@@ -951,7 +1048,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		private static async Task ExportToXml(string FullJid, ConcentratorClient ConcentratorClient,
 			NodeInformation Parent, NodeInformation Node, StringBuilder sb)
 		{
-			TaskCompletionSource<DataForm> Request = new TaskCompletionSource<DataForm>();
+			TaskCompletionSource<DataForm> Request = new();
 			async Task ParametersResult(object Sender, DataFormEventArgs e)
 			{
 				if (e.Ok)
@@ -999,7 +1096,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			if (Node.HasChildren)
 			{
-				TaskCompletionSource<NodeInformation[]> NodesInformation = new TaskCompletionSource<NodeInformation[]>();
+				TaskCompletionSource<NodeInformation[]> NodesInformation = new();
 
 				await ConcentratorClient.GetChildNodes(FullJid, Node, true, false, "en", string.Empty, string.Empty, string.Empty, (Sender, e) =>
 				{
@@ -1031,7 +1128,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			get
 			{
-				string? FullJid = this.Concentrator?.FullJid;
+				string FullJid = this.Concentrator?.FullJid;
 				if (string.IsNullOrEmpty(FullJid))
 					return false;
 
@@ -1051,11 +1148,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 				try
 				{
-					XmlDocument Doc = new XmlDocument();
+					XmlDocument Doc = new();
 					Doc.LoadXml(s);
 
 					return
-						!(Doc.DocumentElement is null) &&
+						Doc.DocumentElement is not null &&
 						Doc.DocumentElement.LocalName == "createNewNode" &&
 						Doc.DocumentElement.NamespaceURI == ConcentratorServer.NamespaceConcentratorCurrent;
 				}
@@ -1075,7 +1172,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			try
 			{
-				string? FullJid = this.Concentrator?.FullJid;
+				string FullJid = this.Concentrator?.FullJid;
 				if (string.IsNullOrEmpty(FullJid))
 					return;
 
@@ -1093,7 +1190,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 				if (string.IsNullOrEmpty(s))
 					return;
 
-				XmlDocument Doc = new XmlDocument();
+				XmlDocument Doc = new();
 				Doc.LoadXml(s);
 
 				Mouse.OverrideCursor = Cursors.Wait;
@@ -1139,7 +1236,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
-				if (!(N is XmlElement E))
+				if (N is not XmlElement E)
 					continue;
 
 				switch (E.LocalName)
@@ -1152,9 +1249,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						break;
 
 					case "createNewNode":
-						if (ChildElements is null)
-							ChildElements = new LinkedList<XmlElement>();
-
+						ChildElements ??= new LinkedList<XmlElement>();
 						ChildElements.AddLast(E);
 						break;
 
@@ -1168,17 +1263,17 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			MainWindow.ShowStatus("Adding " + NodeType + " to " + Parent.NodeId + "...");
 
-			TaskCompletionSource<Node> Request = new TaskCompletionSource<Node>();
+			TaskCompletionSource<Node> Request = new();
 			int IdCounter = 0;
 
 			await ConcentratorClient.GetParametersForNewNode(FullJid, Parent.nodeInfo, NodeType, "en", string.Empty, string.Empty, string.Empty,
-				async (object Sender, DataFormEventArgs e) =>
+				async (Sender, e) =>
 				{
 					try
 					{
 						if (e.Ok)
 						{
-							Dictionary<string, bool> VariablesProcessed = new Dictionary<string, bool>();
+							Dictionary<string, bool> VariablesProcessed = [];
 
 							foreach (Networking.XMPP.DataForms.Field Field in e.Form.Fields)
 							{
@@ -1226,17 +1321,12 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 								VariablesProcessed[Field.Var] = true;
 
-								if (ExtendedFields is null)
-								{
-									ExtendedFields = new List<Networking.XMPP.DataForms.Field>();
-									ExtendedFields.AddRange(e.Form.Fields);
-								}
-
+								ExtendedFields ??= [.. e.Form.Fields];
 								ExtendedFields.Add(Field);
 							}
 
 							if (ExtendedFields is not null)
-								e.Form.Fields = ExtendedFields.ToArray();
+								e.Form.Fields = [.. ExtendedFields];
 
 							await e.Form.Submit();
 						}
@@ -1251,11 +1341,12 @@ namespace Waher.Client.WPF.Model.Concentrator
 						Request.TrySetException(ex);
 					}
 
-				}, (object Sender, NodeInformationEventArgs e) =>
+				}, 
+				(Sender, e) =>
 				{
 					if (e.Ok)
 					{
-						Node NewNode = new Node(Parent, e.NodeInformation);
+						Node NewNode = new(Parent, e.NodeInformation, Parent.children?.Count ?? 0);
 						Parent.Add(NewNode);
 						Request.TrySetResult(NewNode);
 					}
@@ -1274,5 +1365,80 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
+		/// <summary>
+		/// If the node can be moved up.
+		/// </summary>
+		public override bool CanMoveUp
+		{
+			get
+			{
+				return 
+					this.Parent is Node ParentNode &&
+					(ParentNode.nodeInfo?.ChildrenOrdered ?? false);
+			}
+		}
+
+		/// <summary>
+		/// Is called when the user wants to move a node up.
+		/// </summary>
+		public override void MoveUp()
+		{
+			string FullJid = this.Concentrator?.FullJid;
+			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+
+			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
+			{
+				Mouse.OverrideCursor = Cursors.Wait;
+
+				ConcentratorClient.MoveNodeUp(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (Sender, e) =>
+				{
+					MainWindow.MouseDefault();
+
+					if (!e.Ok)
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to move node up." : e.ErrorText);
+
+					return Task.CompletedTask;
+
+				}, null);
+			}
+		}
+
+		/// <summary>
+		/// If the node can be moved down.
+		/// </summary>
+		public override bool CanMoveDown
+		{
+			get
+			{
+				return
+					this.Parent is Node ParentNode &&
+					(ParentNode.nodeInfo?.ChildrenOrdered ?? false);
+			}
+		}
+
+		/// <summary>
+		/// Is called when the user wants to move a node down.
+		/// </summary>
+		public override void MoveDown()
+		{
+			string FullJid = this.Concentrator?.FullJid;
+			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
+
+			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
+			{
+				Mouse.OverrideCursor = Cursors.Wait;
+
+				ConcentratorClient.MoveNodeDown(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (Sender, e) =>
+				{
+					MainWindow.MouseDefault();
+
+					if (!e.Ok)
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to move node down." : e.ErrorText);
+
+					return Task.CompletedTask;
+
+				}, null);
+			}
+		}
 	}
 }

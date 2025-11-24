@@ -22,7 +22,7 @@ namespace Waher.Client.WPF.Model.Muc
 {
 	public class MucService : XmppComponent
 	{
-		private readonly Dictionary<string, RoomNode> roomByJid = new Dictionary<string, RoomNode>();
+		private readonly Dictionary<string, RoomNode> roomByJid = [];
 		private readonly MultiUserChatClient mucClient;
 		private bool handlersAdded;
 
@@ -101,7 +101,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 		public override async Task Recycle(MainWindow Window)
 		{
-			if (!(this.children is null))
+			if (this.children is not null)
 			{
 				foreach (TreeNode Node in this.children.Values)
 				{
@@ -129,7 +129,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 					if (e.Ok)
 					{
-						SortedDictionary<string, TreeNode> Children = new SortedDictionary<string, TreeNode>();
+						SortedDictionary<string, TreeNode> Children = [];
 
 						this.NodesRemoved(this.children.Values, this);
 
@@ -152,8 +152,8 @@ namespace Waher.Client.WPF.Model.Muc
 							}
 							else
 							{
-								RoomId = Item.JID.Substring(0, i);
-								Domain = Item.JID.Substring(i + 1);
+								RoomId = Item.JID[..i];
+								Domain = Item.JID[(i + 1)..];
 							}
 
 							string Jid = RoomId + "@" + Domain;
@@ -190,7 +190,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 		public override void Add()
 		{
-			EnterRoomForm Dialog = new EnterRoomForm(this.mucClient.ComponentAddress)
+			EnterRoomForm Dialog = new(this.mucClient.ComponentAddress)
 			{
 				Owner = MainWindow.currentInstance
 			};
@@ -265,7 +265,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 		private RoomNode AddRoomNode(string RoomId, string Domain, string NickName, string Password, string Name, bool Entered)
 		{
-			RoomNode Node = new RoomNode(this, RoomId, Domain, NickName, Password, Name, Entered);
+			RoomNode Node = new(this, RoomId, Domain, NickName, Password, Name, Entered);
 
 			lock (this.roomByJid)
 			{
@@ -302,7 +302,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 		private Task MucClient_RoomInvitationReceived(object Sender, RoomInvitationMessageEventArgs e)
 		{
-			RoomInvitationReceivedForm Form = new RoomInvitationReceivedForm()
+			RoomInvitationReceivedForm Form = new()
 			{
 				Owner = MainWindow.currentInstance,
 				InviteTo = XmppClient.GetBareJID(e.To),
@@ -340,7 +340,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 				MainWindow.UpdateGui(() =>
 				{
-					this.ShowInvitationForm(Form, e, e2);
+					ShowInvitationForm(Form, e, e2);
 					return Task.CompletedTask;
 				});
 
@@ -350,7 +350,7 @@ namespace Waher.Client.WPF.Model.Muc
 			return Task.CompletedTask;
 		}
 
-		private void ShowInvitationForm(RoomInvitationReceivedForm Form, RoomInvitationMessageEventArgs e, RoomInformationEventArgs e2)
+		private static void ShowInvitationForm(RoomInvitationReceivedForm Form, RoomInvitationMessageEventArgs e, RoomInformationEventArgs e2)
 		{
 			bool? b = Form.ShowDialog();
 
@@ -368,7 +368,7 @@ namespace Waher.Client.WPF.Model.Muc
 									string.IsNullOrEmpty(e3.ErrorText) ? "Unable to process invitation." : e3.ErrorText,
 									"Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
-								RoomInvitationReceivedForm Form2 = new RoomInvitationReceivedForm()
+								RoomInvitationReceivedForm Form2 = new()
 								{
 									Owner = MainWindow.currentInstance,
 									InviteTo = XmppClient.GetBareJID(e.To),
@@ -389,7 +389,7 @@ namespace Waher.Client.WPF.Model.Muc
 									Unsecured = e2.Unsecured
 								};
 
-								this.ShowInvitationForm(Form2, e, e2);
+								ShowInvitationForm(Form2, e, e2);
 
 								return Task.CompletedTask;
 							});
@@ -405,7 +405,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 		private Task MucClient_RoomDeclinedInvitationReceived(object Sender, RoomDeclinedMessageEventArgs e)
 		{
-			StringBuilder sb = new StringBuilder();
+			StringBuilder sb = new();
 
 			sb.Append("Your invitation sent to ");
 			sb.Append(e.DeclinedFrom);
@@ -428,7 +428,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 		private async Task<RoomNode> GetRoomNode(string RoomId, string Domain)
 		{
-			RoomNode? Result;
+			RoomNode Result;
 			string Jid = RoomId + "@" + Domain;
 
 			lock (this.roomByJid)
@@ -511,7 +511,7 @@ namespace Waher.Client.WPF.Model.Muc
 		{
 			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
 			OccupantNode OccupantNode = RoomNode.GetOccupantNode(e.NickName, e.Affiliation, e.Role, e.FullJid);
-			ChatView? View = null;
+			ChatView View = null;
 
 			if (!OccupantNode.Availability.HasValue || e.Availability != OccupantNode.Availability.Value)
 			{
@@ -565,12 +565,11 @@ namespace Waher.Client.WPF.Model.Muc
 			{
 				RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
 
-				if (View is null)
-					View = MainWindow.currentInstance!.FindRoomView(e.From, XmppClient.GetBareJID(e.To));
+				View ??= MainWindow.currentInstance!.FindRoomView(e.From, XmppClient.GetBareJID(e.To));
 
 				if (View is not null)
 				{
-					foreach (MucStatus Status in e.MucStatus ?? new MucStatus[0])
+					foreach (MucStatus Status in e.MucStatus ?? [])
 					{
 						switch (Status)
 						{

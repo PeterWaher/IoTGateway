@@ -91,7 +91,7 @@ namespace Waher.Things.Semantic.Nodes
 		/// <summary>
 		/// If the node can be read.
 		/// </summary>
-		public override bool IsReadable => true;
+		public override bool IsReadable => !this.Disabled;
 
 		/// <summary>
 		/// Starts the readout of the sensor.

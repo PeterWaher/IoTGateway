@@ -39,7 +39,9 @@ namespace Waher.Client.WPF.Controls
 
 		public void Dispose()
 		{
-			this.node?.RemoveSniffer(this.sniffer);
+			if (this.sniffer is not null)
+				this.node?.RemoveSniffer(this.sniffer);
+
 			this.node?.ViewClosed();
 		}
 

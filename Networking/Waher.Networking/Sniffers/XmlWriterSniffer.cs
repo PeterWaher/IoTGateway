@@ -29,7 +29,21 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+		[Obsolete("Use constructor with Name argument instead.")]
 		public XmlWriterSniffer(XmlWriter Output, BinaryPresentationMethod BinaryPresentationMethod)
+			: this(Output, BinaryPresentationMethod, "XML Writer Sniffer")
+		{
+		}
+
+		/// <summary>
+		/// Outputs sniffed data to an XML writer.
+		/// </summary>
+		/// <param name="Output">Output</param>
+		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+		/// <param name="Name">Name of sniffer.</param>
+		public XmlWriterSniffer(XmlWriter Output, BinaryPresentationMethod BinaryPresentationMethod,
+			string Name)
+			: base(Name)
 		{
 			this.semaphore = new MultiReadSingleWriteObject(this);
 			this.output = Output;

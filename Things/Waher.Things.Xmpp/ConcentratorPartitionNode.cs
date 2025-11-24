@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.Metering;
@@ -9,7 +8,6 @@ namespace Waher.Things.Xmpp
 	/// <summary>
 	/// Node representing a partition in a data source in an XMPP concentrator.
 	/// </summary>
-	[TypeAlias("Waher.Things.Xmpp.PartitionNode")]
 	public class ConcentratorPartitionNode : ProvisionedMeteringNode
 	{
 		/// <summary>

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.Xmpp.Commands;
@@ -10,7 +9,6 @@ namespace Waher.Things.Xmpp
 	/// <summary>
 	/// Base class for nodes in a remote concentrator.
 	/// </summary>
-	[TypeAlias("Waher.Things.Xmpp.XmppNode")]
 	public class ConcentratorNode : XmppDevice
 	{
 		/// <summary>

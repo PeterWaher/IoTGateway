@@ -35,9 +35,9 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public partial class QueryResultView : UserControl, ITabView
 	{
-		private readonly Dictionary<string, (DataTable, Column[], ListView)> tables = new Dictionary<string, (DataTable, Column[], ListView)>();
-		private readonly LinkedList<ThreadStart> guiQueue = new LinkedList<ThreadStart>();
-		private readonly LinkedList<ReportElement> elements = new LinkedList<ReportElement>();
+		private readonly Dictionary<string, (DataTable, Column[], ListView)> tables = [];
+		private readonly LinkedList<ThreadStart> guiQueue = [];
+		private readonly LinkedList<ReportElement> elements = [];
 		private readonly TextBlock headerLabel;
 		private Node node;
 		private NodeQuery query;
@@ -54,9 +54,9 @@ namespace Waher.Client.WPF.Controls
 
 		public static async Task<QueryResultView> CreateAsync(Node Node, NodeQuery Query, TextBlock HeaderLabel)
 		{
-			QueryResultView Result = new QueryResultView(Node, Query, HeaderLabel);
+			QueryResultView Result = new(Node, Query, HeaderLabel);
 
-			if (!(Result.query is null))
+			if (Result.query is not null)
 			{
 				Result.query.Aborted += Result.Query_Aborted;
 				Result.query.EventMessageReceived += Result.Query_EventMessageReceived;
@@ -110,7 +110,7 @@ namespace Waher.Client.WPF.Controls
 
 					P = this.guiQueue.First.Value;
 					this.guiQueue.RemoveFirst();
-					More = !(this.guiQueue.First is null);
+					More = this.guiQueue.First is not null;
 				}
 
 				try
@@ -240,7 +240,7 @@ namespace Waher.Client.WPF.Controls
 				this.elements.AddLast(Event);
 			}
 
-			StackPanel Section = new StackPanel()
+			StackPanel Section = new()
 			{
 				Margin = new Thickness(16, 8, 16, 8)
 			};
@@ -275,8 +275,7 @@ namespace Waher.Client.WPF.Controls
 			}
 
 			this.currentPanel = this.currentPanel.Parent as StackPanel;
-			if (this.currentPanel is null)
-				this.currentPanel = this.ReportPanel;
+			this.currentPanel ??= this.ReportPanel;
 		}
 
 		private Task Query_TableAdded(object Sender, NodeQueryTableEventArgs e)
@@ -301,8 +300,8 @@ namespace Waher.Client.WPF.Controls
 			{
 				if (!this.tables.ContainsKey(Event.TableId))
 				{
-					DataTable Table = new DataTable(Event.Name);
-					GridView GridView = new GridView();
+					DataTable Table = new(Event.Name);
+					GridView GridView = new();
 
 					foreach (Column Column in Event.Columns)
 					{
@@ -317,7 +316,7 @@ namespace Waher.Client.WPF.Controls
 						});
 					}
 
-					ListView TableView = new ListView()
+					ListView TableView = new()
 					{
 						ItemsSource = Table.DefaultView,
 						View = GridView
@@ -476,7 +475,7 @@ namespace Waher.Client.WPF.Controls
 				BitmapImage BitmapImage;
 				byte[] Bin = Pixels.EncodeAsPng();
 
-				using (MemoryStream ms = new MemoryStream(Bin))
+				using (MemoryStream ms = new(Bin))
 				{
 					BitmapImage = new BitmapImage();
 					BitmapImage.BeginInit();
@@ -544,7 +543,7 @@ namespace Waher.Client.WPF.Controls
 
 		public void SaveAsButton_Click(object Sender, RoutedEventArgs e)
 		{
-			SaveFileDialog Dialog = new SaveFileDialog()
+			SaveFileDialog Dialog = new()
 			{
 				AddExtension = true,
 				CheckPathExists = true,
@@ -562,7 +561,7 @@ namespace Waher.Client.WPF.Controls
 				{
 					if (Dialog.FilterIndex == 2)
 					{
-						StringBuilder Xml = new StringBuilder();
+						StringBuilder Xml = new();
 						using (XmlWriter w = XmlWriter.Create(Xml, XML.WriterSettings(true, true)))
 						{
 							this.SaveAsXml(w);
@@ -574,13 +573,10 @@ namespace Waher.Client.WPF.Controls
 					}
 					else
 					{
-						using (FileStream f = File.Create(Dialog.FileName))
-						{
-							using (XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false)))
-							{
-								this.SaveAsXml(w);
-							}
-						}
+						using FileStream f = File.Create(Dialog.FileName);
+						using XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false));
+						
+						this.SaveAsXml(w);
 					}
 				}
 				catch (Exception ex)
@@ -611,7 +607,7 @@ namespace Waher.Client.WPF.Controls
 		{
 			try
 			{
-				OpenFileDialog Dialog = new OpenFileDialog()
+				OpenFileDialog Dialog = new()
 				{
 					AddExtension = true,
 					CheckFileExists = true,
@@ -627,7 +623,7 @@ namespace Waher.Client.WPF.Controls
 
 				if (Result.HasValue && Result.Value)
 				{
-					XmlDocument Xml = new XmlDocument()
+					XmlDocument Xml = new()
 					{
 						PreserveWhitespace = true
 					};
@@ -652,11 +648,11 @@ namespace Waher.Client.WPF.Controls
 				this.NewButton_Click(null, null);
 				this.headerLabel.Text = XML.Attribute(Xml.DocumentElement, "title");
 
-				Dictionary<string, Column[]> ColumnsByTableId = new Dictionary<string, Column[]>();
+				Dictionary<string, Column[]> ColumnsByTableId = [];
 
 				foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
 				{
-					if (!(N is XmlElement E))
+					if (N is not XmlElement E)
 						continue;
 
 					switch (E.LocalName)
@@ -678,7 +674,7 @@ namespace Waher.Client.WPF.Controls
 							break;
 
 						case "TableStart":
-							ReportTableCreated Table = new ReportTableCreated(E);
+							ReportTableCreated Table = new(E);
 							ColumnsByTableId[Table.TableId] = Table.Columns;
 
 							this.Add(Table);

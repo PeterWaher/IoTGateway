@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Translation xmlns="http://waher.se/Schema/Translation.xsd">
+	<Language code="en" name="English">
+		<Namespace name="Waher.Processors.Metering.NodeTypes.Errors">
+			<String id="1">Thing Error Decision Tree</String>
+			<String id="2">Label:</String>
+			<String id="3">Processor</String>
+			<String id="4">Label presenting the node in the thing error decision tree.</String>
+		</Namespace>
+		<Namespace name="Waher.Processors.Metering.NodeTypes.Errors.Actions">
+			<String id="1">Script</String>
+			<String id="2">Script:</String>
+			<String id="3">Script used to process fields.</String>
+			<String id="4">Process error using script</String>
+			<String id="5">When executing the script, the variables Device and Error will contain references to the corresponding device and error objects being processed. Remember to return the error or array of errors you want to continue to process. Returning null or something that is not an error mutes the error from future processing.</String>
+			<String id="6">Forward Error</String>
+			<String id="7">Mute Error</String>
+		</Namespace>
+		<Namespace name="Waher.Processors.Metering.NodeTypes.Fields">
+			<String id="1">Sensor Data Decision Tree</String>
+			<String id="2">Label:</String>
+			<String id="3">Processor</String>
+			<String id="4">Label presenting the node in the sensor data decision tree.</String>
+		</Namespace>
+		<Namespace name="Waher.Processors.Metering.NodeTypes.Fields.Actions">
+			<String id="1">Script</String>
+			<String id="2">Script:</String>
+			<String id="3">Script used to process fields.</String>
+			<String id="4">Process field using script</String>
+			<String id="5">When executing the script, the variables Sensor and Field will contain references to the corresponding sensor and field objects being processed. Remember to return the field or array of fields you want to continue to process. Returning null or something that is not a field rejects the field from future processing.</String>
+			<String id="6">Accept Field</String>
+			<String id="7">Reject Field</String>
+		</Namespace>
+		<Namespace name="Waher.Processors.Metering.NodeTypes.Fields.Calculations">
+			<String id="1">Processor</String>
+			<String id="2">Unit Conversion</String>
+			<String id="3">Unit:</String>
+			<String id="4">The unit to convert to.</String>
+			<String id="5">Set unit if missing.</String>
+			<String id="6">If a numeric field lacks a unit, the unit will be set to the specified unit.</String>
+			<String id="7">Period (s):</String>
+			<String id="8">Time period, in seconds, over which statistics is computed.</String>
+			<String id="9">Reject incompatible fields.</String>
+			<String id="10">If checked, all non-momentary numerical values will be rejected.</String>
+			<String id="11">Replace sampled values.</String>
+			<String id="12">If checked, all field values used in the calculation will be rejected after they have been used to calculate the aggregate values.</String>
+			<String id="13">Statistics</String>
+			<String id="14">Persisted state.</String>
+			<String id="15">If checked, All computations will be persisted, allowing for server to be restarted in mid period.</String>
+			<String id="16">Count samples.</String>
+			<String id="17">If checked, the count of samples will be calcaulted.</String>
+			<String id="18">Calculate Average.</String>
+			<String id="19">If checked, the average of the samples will be calcaulted.</String>
+			<String id="20">Calculate Median.</String>
+			<String id="21">If checked, the median of the samples will be calcaulted.</String>
+			<String id="22">Calculate Minimum.</String>
+			<String id="23">If checked, the minimum of the samples will be calcaulted.</String>
+			<String id="24">Calculate Maximum.</String>
+			<String id="25">If checked, the maximum of the samples will be calcaulted.</String>
+			<String id="26">Calculate Variance.</String>
+			<String id="27">If checked, the variance of the samples will be calcaulted.</String>
+			<String id="28">Calculate Standard Deviation.</String>
+			<String id="29">If checked, the standard deviation of the samples will be calcaulted.</String>
+		</Namespace>
+		<Namespace name="Waher.Processors.Metering.NodeTypes.Fields.Comparisons">
+			<String id="1">Conditional Processing</String>
+			<String id="2">If Field Type</String>
+			<String id="3">Momentary values.</String>
+			<String id="4">Check, if momentary values should be read.</String>
+			<String id="5">Identity values.</String>
+			<String id="6">Check, if identity values should be read.</String>
+			<String id="7">Status values.</String>
+			<String id="8">Check, if status values should be read.</String>
+			<String id="9">Computed values.</String>
+			<String id="10">Check, if computed values should be read.</String>
+			<String id="11">Peak values.</String>
+			<String id="12">Check, if peak values should be read.</String>
+			<String id="13">Historical values.</String>
+			<String id="14">Check, if historical values should be read.</String>
+			<String id="15">Else</String>
+			<String id="16">Label:</String>
+			<String id="17">Label presenting the node in the decision tree.</String>
+			<String id="18">Field Names:</String>
+			<String id="19">Check, if field name matches any in the list.</String>
+			<String id="20">If Field Name</String>
+			<String id="21">Processor</String>
+			<String id="22">Age Limit:</String>
+			<String id="23">Compares the field age with this value.</String>
+			<String id="24">If Field Age</String>
+			<String id="25">Comparison Operator:</String>
+			<String id="26">What comparison operator to use.</String>
+			<String id="27">Equal to (=)</String>
+			<String id="28">Not equal to (&lt;&gt;)</String>
+			<String id="29">Lesser than (&lt;)</String>
+			<String id="30">Lesser than or equal to (&lt;=)</String>
+			<String id="31">Greater than (&gt;)</String>
+			<String id="32">Greater than or equal to (&gt;=)</String>
+		</Namespace>
+	</Language>
+</Translation>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
@@ -8,14 +9,16 @@ namespace Waher.Runtime.Queue
 	/// <summary>
 	/// Processes work tasks, in an asynchronous manner.
 	/// </summary>
-	public class AsyncProcessor<T> : IDisposableAsync
+	public class AsyncProcessor<T> : IAsyncProcessor
 		where T : class, IWorkItem
 	{
 		private readonly CancellationTokenSource[] cancelWaitSources;
 		private readonly CancellationTokenSource[] cancelWorkSources;
 		private readonly T[] currentWorkItem;
 		private readonly Task[] processors;
+		private readonly string name;
 		private readonly int nrProcessors;
+		private LinkedListNode<IAsyncProcessor> processorNode;
 		private AsyncQueue<T> queue = new AsyncQueue<T>();
 		private int nrProcessorsRunning;
 		private bool terminating = false;
@@ -26,19 +29,32 @@ namespace Waher.Runtime.Queue
 		/// Processes work tasks, in an asynchronous manner.
 		/// </summary>
 		/// <param name="NrProcessors">Number of processors working in parallel.</param>
+		[Obsolete("Use the constructor with a Name argument.")]
 		public AsyncProcessor(int NrProcessors)
+			: this(NrProcessors, Guid.NewGuid().ToString())
+		{
+		}
+
+		/// <summary>
+		/// Processes work tasks, in an asynchronous manner.
+		/// </summary>
+		/// <param name="NrProcessors">Number of processors working in parallel.</param>
+		/// <param name="Name">Name of processor.</param>
+		public AsyncProcessor(int NrProcessors, string Name)
 		{
 			if (NrProcessors <= 0)
 				throw new ArgumentException("Number of processors must be positive.", nameof(NrProcessors));
 
 			int i;
 
+			this.name = Name;
 			this.nrProcessors = this.nrProcessorsRunning = NrProcessors;
 			this.processors = new Task[NrProcessors];
 
 			this.cancelWaitSources = new CancellationTokenSource[NrProcessors];
 			this.cancelWorkSources = new CancellationTokenSource[NrProcessors];
 			this.currentWorkItem = new T[NrProcessors];
+			this.processorNode = AsyncProcessors.RegisterProcessor(this);
 
 			for (i = 0; i < this.nrProcessors; i++)
 				this.processors[i] = this.PerformWork(i);
@@ -59,6 +75,12 @@ namespace Waher.Runtime.Queue
 		public async Task DisposeAsync()
 		{
 			this.terminating = true;
+
+			if (!(this.processorNode is null))
+			{
+				AsyncProcessors.UnregisterProcessor(this.processorNode);
+				this.processorNode = null;
+			}
 
 			if (!this.terminated)
 			{
@@ -81,10 +103,7 @@ namespace Waher.Runtime.Queue
 		/// </summary>
 		public void CloseForTermination()
 		{
-			this.terminating = true;
-
-			for (int i = 0; i < this.nrProcessors; i++)
-				this.cancelWaitSources[i]?.Cancel();
+			_ = this.CloseForTermination(false, 0);
 		}
 
 		/// <summary>
@@ -108,26 +127,33 @@ namespace Waher.Runtime.Queue
 		/// current workers will be cancelled.</param>
 		public async Task CloseForTermination(bool WaitForCompletion, int Timeout)
 		{
-			this.terminating = true;
-
-			for (int i = 0; i < this.nrProcessors; i++)
-				this.cancelWaitSources[i]?.Cancel();
-
-			if (!this.terminated)
+			try
 			{
-				if (Timeout > 0 && Timeout < int.MaxValue)
+				this.terminating = true;
+
+				for (int i = 0; i < this.nrProcessors; i++)
+					this.cancelWaitSources[i]?.Cancel();
+
+				if (!this.terminated && Timeout > 0)
 				{
-					_ = Task.Delay(Timeout).ContinueWith((_) =>
+					if (Timeout > 0 && Timeout < int.MaxValue)
 					{
-						for (int i = 0; i < this.nrProcessors; i++)
-							this.cancelWorkSources[i]?.Cancel();
-					});
+						_ = Task.Delay(Timeout).ContinueWith((_) =>
+						{
+							for (int i = 0; i < this.nrProcessors; i++)
+								this.cancelWorkSources[i]?.Cancel();
+						});
+					}
+
+					if (WaitForCompletion)
+						await Task.WhenAll(this.processors);
+
+					this.terminated = true;
 				}
-
-				if (WaitForCompletion)
-					await Task.WhenAll(this.processors);
-
-				this.terminated = true;
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
 			}
 		}
 
@@ -160,6 +186,11 @@ namespace Waher.Runtime.Queue
 			else
 				return Task.FromResult(false);
 		}
+
+		/// <summary>
+		/// Name of processor.
+		/// </summary>
+		public string Name => this.name;
 
 		/// <summary>
 		/// If the console worker is being terminated.

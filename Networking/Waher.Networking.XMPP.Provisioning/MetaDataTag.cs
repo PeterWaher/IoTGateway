@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
@@ -37,6 +38,18 @@ namespace Waher.Networking.XMPP.Provisioning
 		public abstract object Value
 		{
 			get;
+		}
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(this.name);
+			sb.Append('=');
+			sb.Append(this.StringValue);
+
+			return sb.ToString();
 		}
 	}
 }

@@ -3,7 +3,7 @@
 	<Language code="en" name="English">
 		<Namespace name="Waher.Jobs.Script.NodeTypes">
 			<String id="1">Script:</String>
-			<String id="2">Script</String>
+			<String id="2">Job</String>
 			<String id="3">Script to execute.</String>
 			<String id="4">Script Execution Task</String>
 		</Namespace>

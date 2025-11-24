@@ -1812,6 +1812,58 @@ namespace Waher.Events
 			return Result;
 		}
 
+		/// <summary>
+		/// Compares two arrays to see if their elements are equal
+		/// </summary>
+		/// <typeparam name="T">Element type.</typeparam>
+		/// <param name="Array1">First array</param>
+		/// <param name="Array2">Second array.</param>
+		/// <returns>If the elements of both arrays are equal.</returns>
+		public static bool ElementEquals<T>(this T[] Array1, params T[] Array2)
+		{
+			int c1 = Array1?.Length ?? 0;
+			int c2 = Array2?.Length ?? 0;
+			int i = c1 - c2;
+
+			if (i != 0)
+				return false;
+
+			for (int j = 0; j < c1; j++)
+			{
+				if (!Array1[j].Equals(Array2[j]))
+					return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Compares two arrays
+		/// </summary>
+		/// <typeparam name="T">Element type.</typeparam>
+		/// <param name="Array1">First array</param>
+		/// <param name="Array2">Second array.</param>
+		/// <returns>Comparison of the arrays.</returns>
+		public static int Compare<T>(this T[] Array1, params T[] Array2)
+			where T : IComparable
+		{
+			int c1 = Array1?.Length ?? 0;
+			int c2 = Array2?.Length ?? 0;
+			int i = c1 - c2;
+
+			if (i != 0)
+				return i;
+
+			for (int j = 0; j < c1; j++)
+			{
+				i = Array1[j].CompareTo(Array2[j]);
+				if (i != 0)
+					return i;
+			}
+
+			return 0;
+		}
+
 		#endregion
 	}
 }

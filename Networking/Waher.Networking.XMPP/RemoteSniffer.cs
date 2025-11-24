@@ -28,7 +28,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="Node">Node being sniffed.</param>
 		/// <param name="Client">XMPP Client transmitting messages.</param>
 		/// <param name="Namespace">Namespace used when creating sniffer.</param>
-		public RemoteSniffer(string FullJID, DateTime Expires, ICommunicationLayer Node, XmppClient Client, string Namespace)
+		public RemoteSniffer(string FullJID, DateTime Expires, ICommunicationLayer Node,
+			XmppClient Client, string Namespace)
+			: base("Remote Sniffer for " + FullJID)
 		{
 			this.id = Guid.NewGuid().ToString().Replace("-", string.Empty);
 			this.fullJID = FullJID;

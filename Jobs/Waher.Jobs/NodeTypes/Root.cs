@@ -66,5 +66,32 @@ namespace Waher.Jobs.NodeTypes
         {
             return Task.FromResult(false);
         }
+
+		/// <summary>
+		/// Adds a new child to the node.
+		/// </summary>
+		/// <param name="Child">New child to add.</param>
+		public override async Task AddAsync(INode Child)
+		{
+			await base.AddAsync(Child);
+
+			if (Child is JobNode JobNode)
+				await JobNode.AddedToRoot(this);
+		}
+
+		/// <summary>
+		/// Removes a child from the node.
+		/// </summary>
+		/// <param name="Child">Child to remove.</param>
+		/// <returns>If the Child node was found and removed.</returns>
+		public override async Task<bool> RemoveAsync(INode Child)
+		{
+			bool Removed = await base.RemoveAsync(Child);
+
+			if (Removed && Child is JobNode JobNode)
+				await JobNode.RemovedFromRoot(this);
+
+			return Removed;
+		}
     }
 }

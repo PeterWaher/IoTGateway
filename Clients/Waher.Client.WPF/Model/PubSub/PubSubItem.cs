@@ -60,7 +60,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			{
 				this.xml.LoadXml(Payload);
 
-				if (!(this.xml is null) && !((E = this.xml.DocumentElement) is null))
+				if (this.xml is not null && (E = this.xml.DocumentElement) is not null)
 				{
 					if (E.LocalName == "entry" && E.NamespaceURI == "http://www.w3.org/2005/Atom")
 					{
@@ -98,7 +98,7 @@ namespace Waher.Client.WPF.Model.PubSub
 				this.xml = null;    // Not XML payload.
 			}
 
-			List<Parameter> Parameters = new List<Parameter>();
+			List<Parameter> Parameters = [];
 
 			if (!string.IsNullOrEmpty(this.jid))
 				Parameters.Add(new StringParameter("JID", "JID", this.jid));
@@ -112,10 +112,10 @@ namespace Waher.Client.WPF.Model.PubSub
 			if (!string.IsNullOrEmpty(this.title))
 				Parameters.Add(new StringParameter("Title", "Title", this.title));
 
-			if (!(this.published is null))
+			if (this.published is not null)
 				Parameters.Add(new DateTimeParameter("Published", "Published", this.published.Value));
 
-			this.parameters = new DisplayableParameters(Parameters.ToArray());
+			this.parameters = new DisplayableParameters([.. Parameters]);
 		}
 
 		public override string Key => this.itemId;
@@ -161,7 +161,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 
-			this.Service.PubSubClient.GetItems(this.node, new string[] { this.itemId }, (Sender, e) =>
+			this.Service.PubSubClient.GetItems(this.node, [this.itemId], (Sender, e) =>
 			{
 				MainWindow.MouseDefault();
 
@@ -171,7 +171,6 @@ namespace Waher.Client.WPF.Model.PubSub
 					{
 						Networking.XMPP.PubSub.PubSubItem Item = e.Items[0];
 						DataForm Form = null;
-						ParameterDialog Dialog = null;
 
 						Form = new DataForm(this.Service.PubSubClient.Client,
 							(sender2, e2) =>
@@ -180,7 +179,7 @@ namespace Waher.Client.WPF.Model.PubSub
 
 								try
 								{
-									XmlDocument Xml = new XmlDocument()
+									XmlDocument Xml = new()
 									{
 										PreserveWhitespace = true
 									};
@@ -230,9 +229,9 @@ namespace Waher.Client.WPF.Model.PubSub
 								// Do nothing.
 								return Task.CompletedTask;
 							}, e.From, e.To,
-							new JidSingleField(null, "Publisher", "Publisher:", false, new string[] { Item.Publisher }, null, "JID of publisher.",
+							new JidSingleField(null, "Publisher", "Publisher:", false, [Item.Publisher], null, "JID of publisher.",
 								null, null, string.Empty, false, true, false),
-							new TextMultiField(null, "Payload", "XML:", false, new string[] { Item.Payload }, null, "XML payload of item.",
+							new TextMultiField(null, "Payload", "XML:", false, [Item.Payload], null, "XML payload of item.",
 								StringDataType.Instance, null, string.Empty, false, false, false));
 
 						_ = MainWindow.ShowParameterDialog(Form);
@@ -246,7 +245,8 @@ namespace Waher.Client.WPF.Model.PubSub
 			}, null);
 		}
 
-		public override async Task Delete(TreeNode Parent, EventHandler OnDeleted)
+		public override async Task Delete(TreeNode Parent, 
+			EventHandler<SelectableItemEventArgs> OnDeleted)
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 

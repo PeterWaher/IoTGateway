@@ -5816,10 +5816,30 @@ namespace Waher.Persistence.Files
 
 							AdditionalFields.Add(FilterFieldLikeRegEx2);
 
-							if (!FieldOrder.TryGetValue(FilterFieldLikeRegEx.FieldName, out i) || string.IsNullOrEmpty(ConstantPrefix))
+							if (!FieldOrder.TryGetValue(FilterFieldLikeRegEx.FieldName, out i) ||
+								string.IsNullOrEmpty(ConstantPrefix))
+							{
 								continue;
+							}
 
-							if (!RangeInfo[i].SetMin(ConstantPrefix, true, out Smaller))
+							int c = ConstantPrefix.Length - 1;
+							char LastChar = ConstantPrefix[c];
+							string ConstantPrefix2;
+							bool MaxInclusive;
+
+							if (LastChar < char.MaxValue)
+							{
+								ConstantPrefix2 = ConstantPrefix.Substring(0, c) + new string((char)(LastChar + 1), 1);
+								MaxInclusive = false;
+							}
+							else
+							{
+								ConstantPrefix2 = ConstantPrefix;
+								MaxInclusive = true;
+							}
+
+							if (!RangeInfo[i].SetMin(ConstantPrefix, true, out Smaller) ||
+								!RangeInfo[i].SetMax(ConstantPrefix2, MaxInclusive, out Smaller))
 							{
 								Consistent = false;
 								break;
@@ -6293,7 +6313,8 @@ namespace Waher.Persistence.Files
 				Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter);
 				IndexBTreeFile Index = this.FindBestIndex(FilterFieldLikeRegEx.FieldName);
 
-				string ConstantPrefix = Index is null ? string.Empty : FilterFieldLikeRegEx.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
+				string ConstantPrefix = Index is null ? string.Empty : 
+					FilterFieldLikeRegEx.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 
 				if (string.IsNullOrEmpty(ConstantPrefix))
 					return true;

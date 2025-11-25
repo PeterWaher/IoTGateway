@@ -335,9 +335,7 @@ namespace Waher.Persistence.Files.Searching
 					if (FieldValue is null)
 						continue;
 
-					bool Inclusive =
-						OutOfStartRangeFieldIndex >= 0 ||
-						i < OutOfEndRangeFieldIndex;
+					bool Inclusive = OutOfStartRangeFieldIndex >= 0;
 
 					if (this.ascending[i])
 					{
@@ -584,9 +582,7 @@ namespace Waher.Persistence.Files.Searching
 					if (FieldValue is null)
 						continue;
 
-					bool Inclusive =
-						OutOfStartRangeFieldIndex >= 0 ||
-						i < OutOfEndRangeFieldIndex;
+					bool Inclusive = OutOfStartRangeFieldIndex >= 0;
 
 					if (this.ascending[i])
 					{

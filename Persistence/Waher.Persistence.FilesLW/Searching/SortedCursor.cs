@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
-using System.Collections;
+using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.Files.Searching
 {

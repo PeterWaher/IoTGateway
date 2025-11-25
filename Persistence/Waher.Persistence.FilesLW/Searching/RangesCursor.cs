@@ -15,7 +15,7 @@ namespace Waher.Persistence.Files.Searching
 	{
 		private readonly RangeInfo[] ranges;
 		private readonly IndexBTreeFile index;
-		private readonly IApplicableFilter[] additionalfilters;
+		private readonly IApplicableFilter[] additionalFilters;
 		private RangeInfo[] currentLimits;
 		private ICursor<T> currentRange;
 		private KeyValuePair<string, IApplicableFilter>[] startRangeFilters;
@@ -25,6 +25,9 @@ namespace Waher.Persistence.Files.Searching
 		private int limitsUpdatedAt;
 		private readonly bool firstAscending;
 		private readonly bool[] ascending;
+		private IObjectSerializer prevSerializer = null;
+		private Type prevType = null;
+
 
 		/// <summary>
 		/// Provides a cursor that joins results from multiple cursors. It only returns an object once, regardless of how many times
@@ -34,11 +37,12 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="Ranges">Ranges to enumerate.</param>
 		/// <param name="AdditionalFilters">Additional filters.</param>
 		/// <param name="Provider">Files provider.</param>
-		public RangesCursor(IndexBTreeFile Index, RangeInfo[] Ranges, IApplicableFilter[] AdditionalFilters, FilesProvider Provider)
+		public RangesCursor(IndexBTreeFile Index, RangeInfo[] Ranges,
+			IApplicableFilter[] AdditionalFilters, FilesProvider Provider)
 		{
 			this.index = Index;
 			this.ranges = Ranges;
-			this.additionalfilters = AdditionalFilters;
+			this.additionalFilters = AdditionalFilters;
 			this.currentRange = null;
 			this.ascending = Index.Ascending;
 			this.firstAscending = this.ascending[0];
@@ -202,7 +206,17 @@ namespace Waher.Persistence.Files.Searching
 							{
 								Value = Range.Max;
 
-								if (!this.ascending[i])
+								if (this.ascending[i])
+								{
+									if (EndFilters is null)
+										EndFilters = new ChunkedList<KeyValuePair<string, IApplicableFilter>>();
+
+									if (Range.MaxInclusive)
+										EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldLesserOrEqualTo(Range.FieldName, Value)));
+									else
+										EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldLesserThan(Range.FieldName, Value)));
+								}
+								else
 								{
 									if (StartFilters is null)
 										StartFilters = new ChunkedList<KeyValuePair<string, IApplicableFilter>>();
@@ -219,24 +233,20 @@ namespace Waher.Persistence.Files.Searching
 
 									SearchParameters.Add(new KeyValuePair<string, object>(Range.FieldName, Value));
 								}
-								else
-								{
-									if (EndFilters is null)
-										EndFilters = new ChunkedList<KeyValuePair<string, IApplicableFilter>>();
-
-									if (Range.MaxInclusive)
-										EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldLesserOrEqualTo(Range.FieldName, Value)));
-									else
-										EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldLesserThan(Range.FieldName, Value)));
-								}
 							}
 						}
 					}
 
 					if (this.firstAscending)
-						this.currentRange = await this.index.FindFirstGreaterOrEqualToLocked<T>(SearchParameters.ToArray());
+					{
+						this.currentRange = await this.index.FindFirstGreaterOrEqualToLocked<T>(
+							SearchParameters.ToArray());
+					}
 					else
-						this.currentRange = await this.index.FindLastLesserOrEqualToLocked<T>(SearchParameters.ToArray());
+					{
+						this.currentRange = await this.index.FindLastLesserOrEqualToLocked<T>(
+							SearchParameters.ToArray());
+					}
 
 					this.startRangeFilters = StartFilters?.ToArray();
 					this.endRangeFilters = EndFilters?.ToArray();
@@ -257,15 +267,27 @@ namespace Waher.Persistence.Files.Searching
 					continue;
 
 				object CurrentValue = this.currentRange.Current;
+				Type CurrentType = CurrentValue.GetType();
 				IObjectSerializer CurrentSerializer = this.currentRange.CurrentSerializer;
-				string OutOfStartRangeField = null;
-				string OutOfEndRangeField = null;
+				int OutOfStartRangeFieldIndex = -1;
+				int OutOfEndRangeFieldIndex = -1;
 				bool Ok = true;
 				bool Smaller;
 
-				if (!(this.additionalfilters is null))
+				if (CurrentSerializer.ValueType != CurrentType)
 				{
-					foreach (IApplicableFilter Filter in this.additionalfilters)
+					if (CurrentType == this.prevType)
+						CurrentSerializer = this.prevSerializer;
+					else
+					{
+						CurrentSerializer = this.prevSerializer = await this.provider.GetObjectSerializer(CurrentType);
+						this.prevType = CurrentType;
+					}
+				}
+
+				if (!(this.additionalFilters is null))
+				{
+					foreach (IApplicableFilter Filter in this.additionalFilters)
 					{
 						if (!await Filter.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
@@ -277,62 +299,73 @@ namespace Waher.Persistence.Files.Searching
 
 				if (!(this.startRangeFilters is null))
 				{
+					i = 0;
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.startRangeFilters)
 					{
 						if (!await Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
-							OutOfStartRangeField = Filter.Key;
+							OutOfStartRangeFieldIndex = i;
 							Ok = false;
 							break;
 						}
+						else
+							i++;
 					}
 				}
 
-				if (!(this.endRangeFilters is null) && OutOfStartRangeField is null)
+				if (!(this.endRangeFilters is null) && OutOfStartRangeFieldIndex < 0)
 				{
+					i = 0;
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.endRangeFilters)
 					{
 						if (!await Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
-							OutOfEndRangeField = Filter.Key;
+							OutOfEndRangeFieldIndex = i;
 							Ok = false;
 							break;
 						}
+						else
+							i++;
 					}
 				}
 
 				for (i = 0; i < this.limitsUpdatedAt; i++)
 				{
 					object FieldValue = await CurrentSerializer.TryGetFieldValue(this.ranges[i].FieldName, CurrentValue);
+					if (FieldValue is null)
+						continue;
 
-					if (!(FieldValue is null))
+					bool Inclusive =
+						OutOfStartRangeFieldIndex >= 0 ||
+						i < OutOfEndRangeFieldIndex;
+
+					if (this.ascending[i])
 					{
-						if (this.ascending[i])
+						if (this.currentLimits[i].SetMin(FieldValue,
+							Inclusive, out Smaller) && Smaller)
 						{
-							if (this.currentLimits[i].SetMin(FieldValue, !(OutOfStartRangeField is null), out Smaller) && Smaller)
-							{
-								i++;
-								this.limitsUpdatedAt = i;
+							i++;
+							this.limitsUpdatedAt = i;
 
-								while (i < this.nrRanges)
-								{
-									this.ranges[i].CopyTo(this.currentLimits[i]);
-									i++;
-								}
+							while (i < this.nrRanges)
+							{
+								this.ranges[i].CopyTo(this.currentLimits[i]);
+								i++;
 							}
 						}
-						else
+					}
+					else
+					{
+						if (this.currentLimits[i].SetMax(FieldValue,
+							Inclusive, out Smaller) && Smaller)
 						{
-							if (this.currentLimits[i].SetMax(FieldValue, !(OutOfStartRangeField is null), out Smaller) && Smaller)
-							{
-								i++;
-								this.limitsUpdatedAt = i;
+							i++;
+							this.limitsUpdatedAt = i;
 
-								while (i < this.nrRanges)
-								{
-									this.ranges[i].CopyTo(this.currentLimits[i]);
-									i++;
-								}
+							while (i < this.nrRanges)
+							{
+								this.ranges[i].CopyTo(this.currentLimits[i]);
+								i++;
 							}
 						}
 					}
@@ -340,7 +373,8 @@ namespace Waher.Persistence.Files.Searching
 
 				if (Ok)
 					return true;
-				else if (!(OutOfStartRangeField is null) || !(OutOfEndRangeField is null))
+
+				if (OutOfStartRangeFieldIndex >= 0 || OutOfEndRangeFieldIndex >= 0)
 				{
 					this.currentRange = null;
 
@@ -453,9 +487,15 @@ namespace Waher.Persistence.Files.Searching
 					}
 
 					if (this.firstAscending)
-						this.currentRange = await this.index.FindLastLesserOrEqualToLocked<T>(SearchParameters.ToArray());
+					{
+						this.currentRange = await this.index.FindLastLesserOrEqualToLocked<T>(
+							SearchParameters.ToArray());
+					}
 					else
-						this.currentRange = await this.index.FindFirstGreaterOrEqualToLocked<T>(SearchParameters.ToArray());
+					{
+						this.currentRange = await this.index.FindFirstGreaterOrEqualToLocked<T>(
+							SearchParameters.ToArray());
+					}
 
 					this.startRangeFilters = StartFilters?.ToArray();
 					this.endRangeFilters = EndFilters?.ToArray();
@@ -476,15 +516,27 @@ namespace Waher.Persistence.Files.Searching
 					continue;
 
 				object CurrentValue = this.currentRange.Current;
+				Type CurrentType = CurrentValue.GetType();
 				IObjectSerializer CurrentSerializer = this.currentRange.CurrentSerializer;
-				string OutOfStartRangeField = null;
-				string OutOfEndRangeField = null;
+				int OutOfStartRangeFieldIndex = -1;
+				int OutOfEndRangeFieldIndex = -1;
 				bool Ok = true;
 				bool Smaller;
 
-				if (!(this.additionalfilters is null))
+				if (CurrentSerializer.ValueType != CurrentType)
 				{
-					foreach (IApplicableFilter Filter in this.additionalfilters)
+					if (CurrentType == this.prevType)
+						CurrentSerializer = this.prevSerializer;
+					else
+					{
+						CurrentSerializer = this.prevSerializer = await this.provider.GetObjectSerializer(CurrentType);
+						this.prevType = CurrentType;
+					}
+				}
+
+				if (!(this.additionalFilters is null))
+				{
+					foreach (IApplicableFilter Filter in this.additionalFilters)
 					{
 						if (!await Filter.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
@@ -496,62 +548,73 @@ namespace Waher.Persistence.Files.Searching
 
 				if (!(this.startRangeFilters is null))
 				{
+					i = 0;
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.startRangeFilters)
 					{
 						if (!await Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
-							OutOfStartRangeField = Filter.Key;
+							OutOfStartRangeFieldIndex = i;
 							Ok = false;
 							break;
 						}
+						else
+							i++;
 					}
 				}
 
-				if (!(this.endRangeFilters is null) && OutOfStartRangeField is null)
+				if (!(this.endRangeFilters is null) && OutOfStartRangeFieldIndex < 0)
 				{
+					i = 0;
 					foreach (KeyValuePair<string, IApplicableFilter> Filter in this.endRangeFilters)
 					{
 						if (!await Filter.Value.AppliesTo(CurrentValue, CurrentSerializer, this.provider))
 						{
-							OutOfEndRangeField = Filter.Key;
+							OutOfEndRangeFieldIndex = i;
 							Ok = false;
 							break;
 						}
+						else
+							i++;
 					}
 				}
 
 				for (i = 0; i < this.limitsUpdatedAt; i++)
 				{
 					object FieldValue = await CurrentSerializer.TryGetFieldValue(this.ranges[i].FieldName, CurrentValue);
+					if (FieldValue is null)
+						continue;
 
-					if (!(FieldValue is null))
+					bool Inclusive =
+						OutOfStartRangeFieldIndex >= 0 ||
+						i < OutOfEndRangeFieldIndex;
+
+					if (this.ascending[i])
 					{
-						if (this.ascending[i])
+						if (this.currentLimits[i].SetMax(FieldValue, 
+							Inclusive, out Smaller) && Smaller)
 						{
-							if (this.currentLimits[i].SetMax(FieldValue, !(OutOfStartRangeField is null), out Smaller) && Smaller)
-							{
-								i++;
-								this.limitsUpdatedAt = i;
+							i++;
+							this.limitsUpdatedAt = i;
 
-								while (i < this.nrRanges)
-								{
-									this.ranges[i].CopyTo(this.currentLimits[i]);
-									i++;
-								}
+							while (i < this.nrRanges)
+							{
+								this.ranges[i].CopyTo(this.currentLimits[i]);
+								i++;
 							}
 						}
-						else
+					}
+					else
+					{
+						if (this.currentLimits[i].SetMin(FieldValue, 
+							Inclusive, out Smaller) && Smaller)
 						{
-							if (this.currentLimits[i].SetMin(FieldValue, !(OutOfStartRangeField is null), out Smaller) && Smaller)
-							{
-								i++;
-								this.limitsUpdatedAt = i;
+							i++;
+							this.limitsUpdatedAt = i;
 
-								while (i < this.nrRanges)
-								{
-									this.ranges[i].CopyTo(this.currentLimits[i]);
-									i++;
-								}
+							while (i < this.nrRanges)
+							{
+								this.ranges[i].CopyTo(this.currentLimits[i]);
+								i++;
 							}
 						}
 					}
@@ -559,7 +622,8 @@ namespace Waher.Persistence.Files.Searching
 
 				if (Ok)
 					return true;
-				else if (!(OutOfStartRangeField is null) || !(OutOfEndRangeField is null))
+
+				if (OutOfStartRangeFieldIndex >= 0 || OutOfEndRangeFieldIndex >= 0)
 				{
 					this.currentRange = null;
 

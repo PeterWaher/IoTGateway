@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using Waher.Persistence.Filters;
 
 namespace Waher.Persistence.Files.Searching
@@ -401,6 +402,41 @@ namespace Waher.Persistence.Files.Searching
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return this.GetEnumerator();
+		}
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			if (this.isPoint)
+			{
+				sb.Append(this.fieldName);
+				sb.Append('=');
+				sb.Append(this.point?.ToString());
+			}
+			else if (this.isRange)
+			{
+				sb.Append(this.min?.ToString());
+
+				if (this.minInclusive)
+					sb.Append('≤');
+				else
+					sb.Append('<');
+
+				sb.Append(this.fieldName);
+
+				if (this.maxInclusive)
+					sb.Append('≤');
+				else
+					sb.Append('<');
+
+				sb.Append(this.max?.ToString());
+			}
+			else
+				sb.Append(this.fieldName);
+
+			return sb.ToString();
 		}
 	}
 }

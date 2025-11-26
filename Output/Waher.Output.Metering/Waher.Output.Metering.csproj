@@ -31,6 +31,14 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="Language\Waher.Output.Metering.en.lng" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Content Include="Language\Waher.Output.Metering.en.lng">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+	<ItemGroup>
 		<None Include="..\..\Images\Icon_64x64.png">
 			<Pack>True</Pack>
 			<PackagePath />

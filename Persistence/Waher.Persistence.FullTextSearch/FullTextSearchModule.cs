@@ -173,7 +173,7 @@ namespace Waher.Persistence.FullTextSearch
 					await synchObj.EndWrite();
 				}
 
-				queryCache.Clear();
+				queryCache?.Clear();
 
 				await Search.RaiseObjectAddedToIndex(this, new ObjectReferenceEventArgs(Ref));
 			}

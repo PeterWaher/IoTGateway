@@ -7113,8 +7113,34 @@ namespace Waher.Networking.XMPP
 
 								this.pendingRequestsByTimeout[Request.Timeout] = Request;
 							}
-							else
-								this.pendingRequestsBySeqNr.Remove(Request.SeqNr);
+                            else
+                            {
+                                this.pendingRequestsBySeqNr.Remove(Request.SeqNr);
+                                StringBuilder Xml = new StringBuilder();
+
+                                Xml.Append("<iq xmlns='" + NamespaceClient + "' type='error' from='");
+                                Xml.Append(Request.To);
+                                Xml.Append("' id='");
+                                Xml.Append(Request.SeqNr.ToString());
+                                Xml.Append("'><error type='wait'><recipient-unavailable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
+                                Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Timeout.</text></error></iq>");
+
+                                XmlDocument Doc = new XmlDocument()
+                                {
+                                    PreserveWhitespace = true
+                                };
+                                Doc.LoadXml(Xml.ToString());
+                                if (!(Request.IqCallback is null))
+                                {
+                                    IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
+                                    Request.State);
+                                    Request.IqCallback.Raise(this, e);
+                                }
+                                if (!(Request.PresenceCallback is null))
+                                {
+                                    Request.PresenceCallback.Raise(this, new PresenceEventArgs(this, Doc.DocumentElement));
+                                }
+                            }
 						}
 
 						try

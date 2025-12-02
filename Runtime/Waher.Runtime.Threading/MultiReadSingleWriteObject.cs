@@ -292,6 +292,7 @@ namespace Waher.Runtime.Threading
 					{
 						if (this.nrReaders == 0)
 						{
+							this.start = watch.ElapsedTicks;
 							this.token++;
 
 							if (this.recordStackTraces)
@@ -343,6 +344,7 @@ namespace Waher.Runtime.Threading
 				if (this.nrReaders == 0)
 				{
 					this.token++;
+					this.start = 0;
 
 					if (this.recordStackTraces)
 						this.lockStackTrace = null;
@@ -386,6 +388,7 @@ namespace Waher.Runtime.Threading
 					{
 						if (this.nrReaders == 0)
 						{
+							this.start = watch.ElapsedTicks;
 							this.token++;
 
 							if (this.recordStackTraces)
@@ -471,6 +474,7 @@ namespace Waher.Runtime.Threading
 						{
 							if (this.nrReaders == 0)
 							{
+								this.start = watch.ElapsedTicks;
 								this.token++;
 
 								if (this.recordStackTraces)
@@ -545,6 +549,7 @@ namespace Waher.Runtime.Threading
 
 					if (this.nrReaders == 0 && !this.isWriting)
 					{
+						this.start = watch.ElapsedTicks;
 						this.token++;
 						this.isWriting = true;
 
@@ -594,6 +599,7 @@ namespace Waher.Runtime.Threading
 
 				this.token++;
 				this.isWriting = false;
+				this.start = 0;
 
 				if (this.recordStackTraces)
 					this.lockStackTrace = null;
@@ -640,7 +646,7 @@ namespace Waher.Runtime.Threading
 			TaskCompletionSource<bool> Prev = null;
 			TaskCompletionSource<bool> Wait = null;
 			DateTime Start = DateTime.UtcNow;
-			bool RecordStackeTrace = false;
+			bool RecordStackTrace = false;
 
 			while (true)
 			{
@@ -654,11 +660,12 @@ namespace Waher.Runtime.Threading
 
 					if (this.nrReaders == 0 && !this.isWriting)
 					{
+						this.start = watch.ElapsedTicks;
 						this.token++;
 						this.isWriting = true;
 
 						if (this.recordStackTraces)
-							RecordStackeTrace = true;
+							RecordStackTrace = true;
 					}
 					else if (Timeout <= 0)
 						return false;
@@ -672,7 +679,7 @@ namespace Waher.Runtime.Threading
 
 				if (Wait is null)
 				{
-					if (RecordStackeTrace)
+					if (RecordStackTrace)
 						this.lockStackTrace = Environment.StackTrace;
 
 					return true;
@@ -727,7 +734,7 @@ namespace Waher.Runtime.Threading
 				TaskCompletionSource<bool> Prev = null;
 				TaskCompletionSource<bool> Wait = null;
 				DateTime Start = DateTime.UtcNow;
-				bool RecordStackeTrace = false;
+				bool RecordStackTrace = false;
 
 				Cancel.Register(() =>
 				{
@@ -747,11 +754,12 @@ namespace Waher.Runtime.Threading
 
 						if (this.nrReaders == 0 && !this.isWriting)
 						{
+							this.start = watch.ElapsedTicks;
 							this.token++;
 							this.isWriting = true;
 
 							if (this.recordStackTraces)
-								RecordStackeTrace = true;
+								RecordStackTrace = true;
 						}
 						else if (Cancel.IsCancellationRequested)
 							return false;
@@ -765,7 +773,7 @@ namespace Waher.Runtime.Threading
 
 					if (Wait is null)
 					{
-						if (RecordStackeTrace)
+						if (RecordStackTrace)
 							this.lockStackTrace = Environment.StackTrace;
 
 						return true;
@@ -810,6 +818,7 @@ namespace Waher.Runtime.Threading
 				this.nrReaders = 0;
 				this.isWriting = false;
 				this.token++;
+				this.start = 0;
 
 				if (this.recordStackTraces)
 					this.lockStackTrace = null;

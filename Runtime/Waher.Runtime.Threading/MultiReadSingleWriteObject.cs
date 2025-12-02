@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,6 +12,13 @@ namespace Waher.Runtime.Threading
 	/// </summary>
 	public class MultiReadSingleWriteObject : IMultiReadSingleWriteObject, IDisposable
 	{
+		private static readonly Stopwatch watch = new Stopwatch();
+
+		static MultiReadSingleWriteObject()
+		{
+			watch.Start();
+		}
+
 		private readonly bool recordStackTraces;
 		private readonly object owner;
 		private readonly string creatorStackTrace;
@@ -19,6 +27,7 @@ namespace Waher.Runtime.Threading
 		private LinkedList<TaskCompletionSource<bool>> noReadersOrWriters = new LinkedList<TaskCompletionSource<bool>>();
 		private readonly object synchObj = new object();
 		private long token = 0;
+		private long start = 0;
 		private int nrReaders = 0;
 		private bool isWriting = false;
 		private bool disposed = false;
@@ -163,6 +172,30 @@ namespace Waher.Runtime.Threading
 				}
 			}
 		}
+
+		/// <summary>
+		/// Number of ticks the object has been locked.
+		/// </summary>
+		public long TicksLocked
+		{
+			get
+			{
+				lock (this.synchObj)
+				{
+					if (this.disposed)
+						return 0;
+					else if (this.nrReaders > 0 || this.isWriting)
+						return watch.ElapsedTicks - this.start;
+					else
+						return 0;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Number of milliseconds the object has been locked.
+		/// </summary>
+		public double MillisecondsLocked => this.TicksLocked * 1000.0 / Stopwatch.Frequency;
 
 		/// <summary>
 		/// If object has been disposed.

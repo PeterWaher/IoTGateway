@@ -101,7 +101,7 @@ namespace Waher.Networking.Sniffers
 		/// in the corresponding folder will be removed. Default value is 7 days.</param>
 		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
 		public XmlFileSniffer(string FileName, string Transform, int DeleteAfterDays, BinaryPresentationMethod BinaryPresentationMethod)
-			: base(null, BinaryPresentationMethod)
+			: base(null, BinaryPresentationMethod, "XML File Sniffer: " + FileName)
 		{
 			this.file = null;
 			this.output = null;

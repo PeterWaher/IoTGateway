@@ -21,8 +21,18 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Sniffer that stores events in memory.
 		/// </summary>
+		[Obsolete("Use constructor with Name argument instead.")]
 		public InMemorySniffer()
-			: this(int.MaxValue)
+			: this(int.MaxValue, "In-Memory Sniffer")
+		{
+		}
+
+		/// <summary>
+		/// Sniffer that stores events in memory.
+		/// </summary>
+		/// <param name="Name">Name of sniffer.</param>
+		public InMemorySniffer(string Name)
+			: this(int.MaxValue, Name)
 		{
 		}
 
@@ -30,7 +40,19 @@ namespace Waher.Networking.Sniffers
 		/// Sniffer that stores events in memory.
 		/// </summary>
 		/// <param name="MaxCount">Maximum number of records in memory.</param>
+		[Obsolete("Use constructor with Name argument instead.")]
 		public InMemorySniffer(int MaxCount)
+			: this(MaxCount, "In-Memory Sniffer")
+		{
+		}
+
+		/// <summary>
+		/// Sniffer that stores events in memory.
+		/// </summary>
+		/// <param name="MaxCount">Maximum number of records in memory.</param>
+		/// <param name="Name">Name of sniffer.</param>
+		public InMemorySniffer(int MaxCount, string Name)
+			: base(Name)
 		{
 			this.maxCount = MaxCount;
 		}

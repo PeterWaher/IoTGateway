@@ -3,7 +3,7 @@
 	if !exists(Page.Table) or !exists(Posted) then 
 		Page.Table:=GetScript is System.String ? eval(GetScript) : GetScript();
 
-	if exists(Posted) then
+	if (exists(Posted) and exists(Posted.data)) then
 	(
 		if exists(Page.Order) and Page.Order=Posted.data then
 			Page.Order:="-"+Page.Order

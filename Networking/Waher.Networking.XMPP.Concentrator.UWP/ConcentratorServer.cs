@@ -38,7 +38,7 @@ namespace Waher.Networking.XMPP.Concentrator
 	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
 	/// https://neuro-foundation.io
 	/// </summary>
-	public class ConcentratorServer : XmppExtension
+	public class ConcentratorServer : XmppExtension, IDataSources
 	{
 		/// <summary>
 		/// urn:ieee:iot:concentrator:1.0
@@ -83,8 +83,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ThingRegistryClient">Thing Registry client.</param>
 		/// <param name="ProvisioningClient">Provisioning client.</param>
-		/// <param name="DataSources">Data sources.</param>
-		private ConcentratorServer(XmppClient Client, ThingRegistryClient ThingRegistryClient, ProvisioningClient ProvisioningClient, params IDataSource[] DataSources)
+		private ConcentratorServer(XmppClient Client, ThingRegistryClient ThingRegistryClient, ProvisioningClient ProvisioningClient)
 			: base(Client)
 		{
 			this.thingRegistryClient = ThingRegistryClient;

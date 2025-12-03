@@ -623,7 +623,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			if (s.Length == 6)
 			{
-				if (byte.TryParse(s.Substring(0, 2), NumberStyles.HexNumber, null, out byte R) &&
+				if (byte.TryParse(s[..2], NumberStyles.HexNumber, null, out byte R) &&
 					byte.TryParse(s.Substring(2, 2), NumberStyles.HexNumber, null, out byte G) &&
 					byte.TryParse(s.Substring(4, 2), NumberStyles.HexNumber, null, out byte B))
 				{
@@ -633,7 +633,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 			else if (s.Length == 8)
 			{
-				if (byte.TryParse(s.Substring(0, 2), NumberStyles.HexNumber, null, out byte R) &&
+				if (byte.TryParse(s[..2], NumberStyles.HexNumber, null, out byte R) &&
 					byte.TryParse(s.Substring(2, 2), NumberStyles.HexNumber, null, out byte G) &&
 					byte.TryParse(s.Substring(4, 2), NumberStyles.HexNumber, null, out byte B) &&
 					byte.TryParse(s.Substring(6, 2), NumberStyles.HexNumber, null, out byte A))
@@ -1328,6 +1328,98 @@ namespace Waher.Networking.XMPP.Concentrator
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<destroyNode xmlns='");
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
+			Xml.Append("'");
+			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, false, false, Language);
+			Xml.Append("'/>");
+
+			return this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Moves a node up.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public Task MoveNodeUp(string To, IThingReference Node, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<IqResultEventArgs> Callback, object State)
+		{
+			return this.MoveNodeUp(To, Node.NodeId, Node.SourceId, Node.Partition, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
+		}
+
+		/// <summary>
+		/// Moves a node up.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public Task MoveNodeUp(string To, string NodeID, string SourceID, string Partition, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<IqResultEventArgs> Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<moveNodeUp xmlns='");
+			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
+			Xml.Append("'");
+			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);
+			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
+			this.AppendNodeInfoAttributes(Xml, false, false, Language);
+			Xml.Append("'/>");
+
+			return this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Moves a node down.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public Task MoveNodeDown(string To, IThingReference Node, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<IqResultEventArgs> Callback, object State)
+		{
+			return this.MoveNodeDown(To, Node.NodeId, Node.SourceId, Node.Partition, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
+		}
+
+		/// <summary>
+		/// Moves a node down.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public Task MoveNodeDown(string To, string NodeID, string SourceID, string Partition, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<IqResultEventArgs> Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<moveNodeDown xmlns='");
 			Xml.Append(ConcentratorServer.NamespaceConcentratorCurrent);
 			Xml.Append("'");
 			this.AppendNodeAttributes(Xml, NodeID, SourceID, Partition);

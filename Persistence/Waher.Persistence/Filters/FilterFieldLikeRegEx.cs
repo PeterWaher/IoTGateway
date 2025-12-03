@@ -253,7 +253,17 @@ namespace Waher.Persistence.Filters
 						}
 					}
 				}
-				else if (".$^{[(|)*+?".IndexOf(ch) >= 0)
+				else if (ch == '|')
+					return string.Empty;
+				else if (ch == '?' || ch == '*')
+				{
+					j = Result.Length;
+					if (j <= 1)
+						return string.Empty;
+					else
+						return Result.ToString().Substring(0, j - 1);
+				}
+				else if (".$^{[()+".IndexOf(ch) >= 0)
 					return Result.ToString();
 				else
 					Result.Append(ch);

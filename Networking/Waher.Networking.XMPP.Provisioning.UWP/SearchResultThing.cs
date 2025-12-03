@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Things;
+﻿using Waher.Things;
 
 namespace Waher.Networking.XMPP.Provisioning
 {

@@ -2071,6 +2071,42 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
+		/// Gets devices owned by the caller.
+		/// </summary>
+		/// <param name="Offset">Device list offset.</param>
+		/// <param name="MaxCount">Maximum number of things to return.</param>
+		/// <returns>Search result.</returns>
+		public Task<SearchResultEventArgs> GetDevicesAsync(int Offset, int MaxCount)
+		{
+			return this.GetDevicesAsync(this.provisioningServerAddress, Offset, MaxCount);
+		}
+
+		/// <summary>
+		/// Gets devices owned by the caller.
+		/// </summary>
+		/// <param name="ServiceJID">JID of provisioning service.</param>
+		/// <param name="Offset">Device list offset.</param>
+		/// <param name="MaxCount">Maximum number of things to return.</param>
+		/// <returns>Search result.</returns>
+		public async Task<SearchResultEventArgs> GetDevicesAsync(string ServiceJID, int Offset, int MaxCount)
+		{
+			TaskCompletionSource<SearchResultEventArgs> Result = new TaskCompletionSource<SearchResultEventArgs>();
+
+			await this.GetDevices(ServiceJID, Offset, MaxCount, (_, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(e);
+				else
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to perform search operation."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return await Result.Task;
+		}
+
+		/// <summary>
 		/// Deletes te device rules of all owned devices.
 		/// </summary>
 		public Task DeleteDeviceRules()

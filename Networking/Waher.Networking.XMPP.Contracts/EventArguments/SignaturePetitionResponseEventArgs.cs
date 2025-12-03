@@ -38,6 +38,16 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		}
 
 		/// <summary>
+		/// Event arguments for signature petition responses
+		/// </summary>
+		/// <param name="e">Signature petition response event arguments.</param>
+		public SignaturePetitionResponseEventArgs(SignaturePetitionResponseEventArgs e)
+			: this(e, e.RequestedIdentity, e.PetitionId, e.Signature, e.Response, 
+				  e.ClientEndpoint, e.Context)
+		{
+		}
+
+		/// <summary>
 		/// Requested identity, if accepted, null if rejected.
 		/// </summary>
 		public LegalIdentity RequestedIdentity => this.requestedIdentity;

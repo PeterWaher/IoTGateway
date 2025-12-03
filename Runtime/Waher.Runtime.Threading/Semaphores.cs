@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Waher.Runtime.Cache;
+using Waher.Runtime.Collections;
 
 namespace Waher.Runtime.Threading
 {
@@ -115,6 +116,47 @@ namespace Waher.Runtime.Threading
 		public static Task<bool> TryBeginWrite(string Key, int Timeout)
 		{
 			return GetSemaphore(Key).TryBeginWrite(Timeout);
+		}
+
+		/// <summary>
+		/// Returns an array of objects that have been locked for more time than the 
+		/// specified threshold.
+		/// </summary>
+		/// <param name="MillisecondsThreshold">Threshold, in number of milliseconds.</param>
+		/// <returns>Objects that have been locked for more time than the specified threshold.</returns>
+		public static MultiReadSingleWriteObject[] FindLockedObjects(int MillisecondsThreshold)
+		{
+			return FindLockedObjects(MillisecondsThreshold, true);
+		}
+
+		/// <summary>
+		/// Returns an array of objects that have been locked for more time than the 
+		/// specified threshold.
+		/// </summary>
+		/// <param name="MillisecondsThreshold">Threshold, in number of milliseconds.</param>
+		/// <param name="OnlyIfWaitingTasks">Only include objects with tasks actively waiting 
+		/// for object to be released.</param>
+		/// <returns>Objects that have been locked for more time than the specified threshold.</returns>
+		public static MultiReadSingleWriteObject[] FindLockedObjects(int MillisecondsThreshold,
+			bool OnlyIfWaitingTasks)
+		{
+			if (MillisecondsThreshold <= 0)
+				throw new ArgumentOutOfRangeException("MilliSecondsThreshold must be greater than zero.", nameof(MillisecondsThreshold));
+
+			ChunkedList<MultiReadSingleWriteObject> Result = new ChunkedList<MultiReadSingleWriteObject>();
+
+			foreach (MultiReadSingleWriteObject Obj in semaphores.Values)
+			{
+				if (Obj.MillisecondsLocked > MillisecondsThreshold)
+				{
+					if (OnlyIfWaitingTasks && Obj.QueueSize == 0)
+						continue;
+
+					Result.Add(Obj);
+				}
+			}
+
+			return Result.ToArray();
 		}
 	}
 }

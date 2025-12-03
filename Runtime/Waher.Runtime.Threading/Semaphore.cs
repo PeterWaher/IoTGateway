@@ -15,11 +15,12 @@ namespace Waher.Runtime.Threading
 	/// Note: Semaphores are unique in the space of the current application domain
 	/// only.
 	/// </summary>
-	public class Semaphore : IMultiReadSingleWriteObject, IDisposable
+	public class Semaphore : IMultiReadSingleWriteObject, IDisposable, IDisposableAsync
 	{
 		private readonly string name;
 		private int nrReaders = 0;
 		private bool isWriting = false;
+		private bool disposed = false;
 
 		/// <summary>
 		/// Represents a named semaphore, i.e. an object, identified by a name,
@@ -77,6 +78,9 @@ namespace Waher.Runtime.Threading
 		/// <returns>Number of concurrent readers when returning from locked section of call.</returns>
 		public async Task<int> BeginRead()
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(Semaphore));
+			
 			await Semaphores.BeginRead(this.name);
 			return ++this.nrReaders;
 		}
@@ -99,6 +103,9 @@ namespace Waher.Runtime.Threading
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		public async Task<bool> TryBeginRead(int Timeout)
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(Semaphore));
+
 			if (await Semaphores.TryBeginRead(this.name, Timeout))
 			{
 				this.nrReaders++;
@@ -114,6 +121,9 @@ namespace Waher.Runtime.Threading
 		/// </summary>
 		public async Task BeginWrite()
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(Semaphore));
+
 			await Semaphores.BeginWrite(this.name);
 			this.isWriting = true;
 		}
@@ -135,6 +145,9 @@ namespace Waher.Runtime.Threading
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		public async Task<bool> TryBeginWrite(int Timeout)
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(Semaphore));
+
 			if (await Semaphores.TryBeginWrite(this.name, Timeout))
 			{
 				this.isWriting = true;
@@ -158,20 +171,44 @@ namespace Waher.Runtime.Threading
 		/// Disposes of the named semaphore, and releases any locks the object
 		/// manages.
 		/// </summary>
+		[Obsolete("Use DisposeAsync instead.")]
 		public async void Dispose()
 		{
-			try
+			if (!this.disposed)
 			{
+				this.disposed = true;
+
+				try
+				{
+					if (this.isWriting)
+						await this.EndWrite();
+
+					while (this.nrReaders > 0)
+						await this.EndRead();
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Disposes of the object, asynchronously.
+		/// </summary>
+		public async Task DisposeAsync()
+		{
+			if (!this.disposed)
+			{
+				this.disposed = true;
+
 				if (this.isWriting)
 					await this.EndWrite();
 
 				while (this.nrReaders > 0)
 					await this.EndRead();
 			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
 		}
+
 	}
 }

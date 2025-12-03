@@ -1,11 +1,18 @@
-﻿namespace Waher.Persistence.Files.Searching
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using Waher.Persistence.Filters;
+
+namespace Waher.Persistence.Files.Searching
 {
 	/// <summary>
 	/// Contains information about a range in a search operation.
 	/// </summary>
-	public class RangeInfo
+	public class RangeInfo : IEnumerable<Filter>
 	{
 		private readonly string fieldName;
+		private LinkedList<Filter> filters = null;
 		private object min;
 		private object max;
 		private object point;
@@ -21,6 +28,18 @@
 		public RangeInfo(string FieldName)
 		{
 			this.fieldName = FieldName;
+			this.filters = new LinkedList<Filter>();
+		}
+
+		/// <summary>
+		/// Contains information about a range in a search operation.
+		/// </summary>
+		/// <param name="FieldName">Field name being searched.</param>
+		/// <param name="Filters">Filter references</param>
+		public RangeInfo(string FieldName, LinkedList<Filter> Filters)
+		{
+			this.fieldName = FieldName;
+			this.filters = Filters;
 		}
 
 		/// <summary>
@@ -85,6 +104,23 @@
 		public bool HasMax
 		{
 			get { return (this.isRange && !(this.max is null)) || (this.isPoint && !(this.point is null)); }
+		}
+
+		/// <summary>
+		/// If range has associated filters.
+		/// </summary>
+		public bool HasFilters => !(this.filters is null);
+
+		/// <summary>
+		/// Adds a reference to a filter.
+		/// </summary>
+		/// <param name="Filter">Filter reference.</param>
+		public void AddFilterReference(Filter Filter)
+		{
+			if (this.filters is null)
+				this.filters = new LinkedList<Filter>();
+
+			this.filters.AddLast(Filter);
 		}
 
 		/// <summary>
@@ -215,7 +251,10 @@
 			{
 				i = Comparison.Compare(this.point, Value);
 
-				return !(!i.HasValue || i.Value < 0 || (i.Value == 0 && !Inclusive));
+				if (Inclusive)
+					return i.HasValue && i.Value >= 0;
+				else
+					return i.HasValue && i.Value > 0;
 			}
 			else
 			{
@@ -324,7 +363,7 @@
 		/// <returns>Copy</returns>
 		public RangeInfo Copy()
 		{
-			RangeInfo Result = new RangeInfo(this.fieldName);
+			RangeInfo Result = new RangeInfo(this.fieldName, this.filters);
 			this.CopyTo(Result);
 			return Result;
 		}
@@ -344,5 +383,60 @@
 			Destination.isPoint = this.isPoint;
 		}
 
+		/// <summary>
+		/// Gets an enumerator of associated fields.
+		/// </summary>
+		/// <returns>Enumerator</returns>
+		public IEnumerator<Filter> GetEnumerator()
+		{
+			if (this.filters is null)
+				return (IEnumerator<Filter>)Array.Empty<Filter>().GetEnumerator();
+			else
+				return this.filters.GetEnumerator();
+		}
+
+		/// <summary>
+		/// Gets an enumerator of associated fields.
+		/// </summary>
+		/// <returns>Enumerator</returns>
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return this.GetEnumerator();
+		}
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			if (this.isPoint)
+			{
+				sb.Append(this.fieldName);
+				sb.Append('=');
+				sb.Append(this.point?.ToString());
+			}
+			else if (this.isRange)
+			{
+				sb.Append(this.min?.ToString());
+
+				if (this.minInclusive)
+					sb.Append('≤');
+				else
+					sb.Append('<');
+
+				sb.Append(this.fieldName);
+
+				if (this.maxInclusive)
+					sb.Append('≤');
+				else
+					sb.Append('<');
+
+				sb.Append(this.max?.ToString());
+			}
+			else
+				sb.Append(this.fieldName);
+
+			return sb.ToString();
+		}
 	}
 }

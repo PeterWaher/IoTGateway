@@ -21,8 +21,21 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+		[Obsolete("Use constructor with Name argument instead.")]
 		public TextWriterSniffer(TextWriter Output, BinaryPresentationMethod BinaryPresentationMethod)
-			: base(BinaryPresentationMethod)
+			: this(Output, BinaryPresentationMethod, "Text Writer Sniffer")
+		{
+		}
+
+		/// <summary>
+		/// Outputs sniffed data to a text writer.
+		/// </summary>
+		/// <param name="Output">Output</param>
+		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+		/// <param name="Name">Name of the sniffer.</param>
+		public TextWriterSniffer(TextWriter Output, BinaryPresentationMethod BinaryPresentationMethod,
+			string Name)
+			: base(BinaryPresentationMethod, Name)
 		{
 			this.output = Output;
 		}

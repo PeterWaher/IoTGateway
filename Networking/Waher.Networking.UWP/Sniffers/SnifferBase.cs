@@ -13,15 +13,26 @@ namespace Waher.Networking.Sniffers
 	/// </summary>
 	public abstract class SnifferBase : ISniffer, ISniffEventProcessor, IDisposableAsync
 	{
-		private AsyncProcessor<SnifferEvent> processor = new AsyncProcessor<SnifferEvent>(1);
+		private AsyncProcessor<SnifferEvent> processor;
 		private readonly bool onlyBinaryCount;
 
 		/// <summary>
 		/// Abstract base class for sniffers. Implements default method overloads.
 		/// </summary>
+		[Obsolete("Use constructor with Name argument instead.")]
 		public SnifferBase()
+			: this("Sniffer")
+		{
+		}
+
+		/// <summary>
+		/// Abstract base class for sniffers. Implements default method overloads.
+		/// </summary>
+		/// <param name="Name">Name of sniffer.</param>
+		public SnifferBase(string Name)
 		{
 			this.onlyBinaryCount = this.BinaryPresentationMethod == BinaryPresentationMethod.ByteCount;
+			this.processor = new AsyncProcessor<SnifferEvent>(1, Name);
 		}
 
 		/// <summary>

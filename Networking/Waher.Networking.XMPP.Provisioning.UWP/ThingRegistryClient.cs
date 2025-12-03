@@ -817,7 +817,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="SearchOperators">Search operators to use in search.</param>
 		/// <param name="Callback">Method to call when result has been received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public Task Search(int Offset, int MaxCount, SearchOperator[] SearchOperators, EventHandlerAsync<SearchResultEventArgs> Callback, object State)
+		public Task Search(int Offset, int MaxCount, SearchOperator[] SearchOperators, 
+			EventHandlerAsync<SearchResultEventArgs> Callback, object State)
 		{
 			return this.Search(this.thingRegistryAddress, Offset, MaxCount, SearchOperators, Callback, State);
 		}
@@ -831,7 +832,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="SearchOperators">Search operators to use in search.</param>
 		/// <param name="Callback">Method to call when result has been received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public Task Search(string RegistryJid, int Offset, int MaxCount, SearchOperator[] SearchOperators, EventHandlerAsync<SearchResultEventArgs> Callback, object State)
+		public Task Search(string RegistryJid, int Offset, int MaxCount, SearchOperator[] SearchOperators, 
+			EventHandlerAsync<SearchResultEventArgs> Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -852,6 +854,45 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				return ParseResultSet(Offset, MaxCount, this, e, Callback, State);
 			}, State);
+		}
+
+		/// <summary>
+		/// Searches for publically available things in the thing registry.
+		/// </summary>
+		/// <param name="Offset">Search offset.</param>
+		/// <param name="MaxCount">Maximum number of things to return.</param>
+		/// <param name="SearchOperators">Search operators to use in search.</param>
+		/// <returns>Search result.</returns>
+		public Task<SearchResultEventArgs> SearchAsync(int Offset, int MaxCount, params SearchOperator[] SearchOperators)
+		{
+			return this.SearchAsync(this.thingRegistryAddress, Offset, MaxCount, SearchOperators);
+		}
+
+		/// <summary>
+		/// Searches for publically available things in the thing registry.
+		/// </summary>
+		/// <param name="RegistryJid">JID of registry service.</param>
+		/// <param name="Offset">Search offset.</param>
+		/// <param name="MaxCount">Maximum number of things to return.</param>
+		/// <param name="SearchOperators">Search operators to use in search.</param>
+		/// <returns>Search result.</returns>
+		public async Task<SearchResultEventArgs> SearchAsync(string RegistryJid, int Offset, int MaxCount,
+			params SearchOperator[] SearchOperators)
+		{
+			TaskCompletionSource<SearchResultEventArgs> Result = new TaskCompletionSource<SearchResultEventArgs>();
+
+			await this.Search(RegistryJid, Offset, MaxCount, SearchOperators, (_, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(e);
+				else
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to perform search operation."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return await Result.Task;
 		}
 
 		internal static async Task ParseResultSet(int Offset, int MaxCount, object Sender, IqResultEventArgs e, EventHandlerAsync<SearchResultEventArgs> Callback, object State)

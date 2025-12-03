@@ -521,6 +521,8 @@ namespace Waher.Client.WPF.Controls
 		{
 			this.query?.Dispose();
 			this.query = null;
+
+			GC.SuppressFinalize(this);
 		}
 
 		public void NewButton_Click(object Sender, RoutedEventArgs e)

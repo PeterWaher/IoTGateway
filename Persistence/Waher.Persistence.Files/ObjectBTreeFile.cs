@@ -5753,7 +5753,8 @@ namespace Waher.Persistence.Files
 					{
 						if (ChildFilter is FilterFieldValue FilterFieldValue)
 						{
-							if (!FieldOrder.TryGetValue(FilterFieldValue.FieldName, out i) || ChildFilter is FilterFieldNotEqualTo)
+							if (!FieldOrder.TryGetValue(FilterFieldValue.FieldName, out i) || 
+								i >= NrFields || ChildFilter is FilterFieldNotEqualTo)
 							{
 								if (AdditionalFields is null)
 									AdditionalFields = new ChunkedList<Searching.IApplicableFilter>();
@@ -5761,6 +5762,8 @@ namespace Waher.Persistence.Files
 								AdditionalFields.Add(this.ConvertFilter(FilterFieldValue));
 								continue;
 							}
+
+							RangeInfo[i].AddFilterReference(ChildFilter);
 
 							if (FilterFieldValue is FilterFieldEqualTo)
 							{
@@ -5816,13 +5819,60 @@ namespace Waher.Persistence.Files
 
 							AdditionalFields.Add(FilterFieldLikeRegEx2);
 
-							if (!FieldOrder.TryGetValue(FilterFieldLikeRegEx.FieldName, out i) || string.IsNullOrEmpty(ConstantPrefix))
+							if (!FieldOrder.TryGetValue(FilterFieldLikeRegEx.FieldName, out i) ||
+								i >= NrFields || string.IsNullOrEmpty(ConstantPrefix))
+							{
 								continue;
+							}
 
-							if (!RangeInfo[i].SetMin(ConstantPrefix, true, out Smaller))
+							RangeInfo[i].AddFilterReference(ChildFilter);
+
+							int c = ConstantPrefix.Length - 1;
+							char LastChar = ConstantPrefix[c];
+							string ConstantPrefix2;
+							bool MaxInclusive;
+
+							if (LastChar < char.MaxValue)
+							{
+								ConstantPrefix2 = ConstantPrefix.Substring(0, c) + new string((char)(LastChar + 1), 1);
+								MaxInclusive = false;
+							}
+							else
+							{
+								ConstantPrefix2 = ConstantPrefix;
+								MaxInclusive = true;
+							}
+
+							if (!RangeInfo[i].SetMin(ConstantPrefix, true, out Smaller) ||
+								!RangeInfo[i].SetMax(ConstantPrefix2, MaxInclusive, out Smaller))
 							{
 								Consistent = false;
 								break;
+							}
+
+
+							c = NrFields;
+							NrFields = ++i;
+
+							if (i < c)
+							{
+								for (; i < c; i++)
+								{
+									Searching.RangeInfo R = RangeInfo[i];
+
+									if (R.HasFilters)
+									{
+										foreach (Filter F in R)
+										{
+											if (AdditionalFields is null)
+												AdditionalFields = new ChunkedList<Searching.IApplicableFilter>();
+
+											AdditionalFields.Add(this.ConvertFilter(F));
+										}
+									}
+								}
+
+								Array.Resize(ref RangeInfo, NrFields);
 							}
 						}
 						else if (ChildFilter is ICustomFilter CustomFilter)
@@ -5834,6 +5884,31 @@ namespace Waher.Persistence.Files
 						}
 						else
 							throw this.UnknownFilterType(Filter);
+					}
+
+					for (i = 0; i < NrFields; i++)
+					{
+						if (!RangeInfo[i].HasFilters)
+						{
+							for (int j = i + 1; j < NrFields; j++)
+							{
+								Searching.RangeInfo R = RangeInfo[j];
+
+								if (R.HasFilters)
+								{
+									foreach (Filter F in R)
+									{
+										if (AdditionalFields is null)
+											AdditionalFields = new ChunkedList<Searching.IApplicableFilter>();
+
+										AdditionalFields.Add(this.ConvertFilter(F));
+									}
+								}
+							}
+
+							Array.Resize(ref RangeInfo, i);
+							NrFields = i;
+						}
 					}
 
 					if (Consistent)
@@ -6293,7 +6368,8 @@ namespace Waher.Persistence.Files
 				Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter);
 				IndexBTreeFile Index = this.FindBestIndex(FilterFieldLikeRegEx.FieldName);
 
-				string ConstantPrefix = Index is null ? string.Empty : FilterFieldLikeRegEx.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
+				string ConstantPrefix = Index is null ? string.Empty : 
+					FilterFieldLikeRegEx.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 
 				if (string.IsNullOrEmpty(ConstantPrefix))
 					return true;

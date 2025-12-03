@@ -174,6 +174,23 @@ namespace Waher.Runtime.Threading
 		}
 
 		/// <summary>
+		/// Number of tasks waiting.
+		/// </summary>
+		public int QueueSize
+		{
+			get
+			{
+				lock (this.synchObj)
+				{
+					if (this.disposed)
+						throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+					
+					return this.noReadersOrWriters.Count;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Number of ticks the object has been locked.
 		/// </summary>
 		public long TicksLocked

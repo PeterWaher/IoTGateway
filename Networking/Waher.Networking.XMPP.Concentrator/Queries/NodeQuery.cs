@@ -7,6 +7,7 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.Events;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Threading;
 using Waher.Script.Objects;
 using Waher.Script.Units;
@@ -17,7 +18,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 	/// <summary>
 	/// Client-side Node Query object. It collects the results of the query.
 	/// </summary>
-	public class NodeQuery : IDisposable
+	public class NodeQuery : IObservableLayer, IDisposable
 	{
 		private readonly MultiReadSingleWriteObject syncObj;
 		private readonly string queryId;
@@ -39,7 +40,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		private QueryItem[] resultFixed = null;
 		private readonly Dictionary<string, QueryTable> tables = new Dictionary<string, QueryTable>();
 		private QuerySection currentSection = null;
-		private LinkedList<KeyValuePair<int, MessageEventArgs>> queuedMessages = null;
+		private SortedDictionary<int, MessageEventArgs> queuedMessages = null;
 
 		/// <summary>
 		/// Client-side Node Query object. It collects the results of the query.
@@ -164,18 +165,18 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		/// </summary>
 		public async Task ResumeAsync()
 		{
-			LinkedList<KeyValuePair<int, MessageEventArgs>> ToDo = new LinkedList<KeyValuePair<int, MessageEventArgs>>();
+			ChunkedList<MessageEventArgs> ToDo = null;
 
 			await this.syncObj.BeginWrite();
 			try
 			{
-				while (!(this.queuedMessages?.First is null))
+				if (!(this.queuedMessages is null))
 				{
-					ToDo.AddLast(this.queuedMessages.First.Value);
-					this.queuedMessages.RemoveFirst();
+					ToDo = new ChunkedList<MessageEventArgs>();
+					ToDo.AddRange(this.queuedMessages.Values);
+					this.queuedMessages = null;
 				}
 
-				this.queuedMessages = null;
 				this.paused = false;
 			}
 			finally
@@ -183,8 +184,11 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 				await this.syncObj.EndWrite();
 			}
 
-			foreach (KeyValuePair<int, MessageEventArgs> P in ToDo)
-				await this.Process(P.Value);
+			if (!(ToDo is null))
+			{
+				foreach (MessageEventArgs Message in ToDo)
+					await this.Process(Message);
+			}
 		}
 
 		internal async Task Process(MessageEventArgs e)
@@ -193,7 +197,16 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 			int ExpectedSeqNr = this.SequenceNr + 1;
 			if (SequenceNr < ExpectedSeqNr)
+			{
+				Log.Warning("Dropping query progress message with old sequence number.",
+					new KeyValuePair<string, object>("NodeID", this.nodeID),
+					new KeyValuePair<string, object>("SourceID", this.sourceID),
+					new KeyValuePair<string, object>("Partition", this.partition),
+					new KeyValuePair<string, object>("Command", this.command),
+					new KeyValuePair<string, object>("QueryID", this.queryId),
+					new KeyValuePair<string, object>("SequenceNr", SequenceNr));
 				return;
+			}
 
 			if (SequenceNr == ExpectedSeqNr && !this.paused)
 			{
@@ -232,8 +245,8 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 						switch (E.LocalName)
 						{
 							case "title":
-								s = XML.Attribute(E, "name");
-								await this.SetTitle(s, e);
+								this.title = XML.Attribute(E, "name");
+								await this.NewTitle.Raise(this, new NodeQueryEventArgs(this, e));
 								break;
 
 							case "tableDone":
@@ -247,7 +260,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 								break;
 
 							case "queryStarted":
-								await this.ReportStarted(e);
+								await this.Started.Raise(this, new NodeQueryEventArgs(this, e));
 								break;
 
 							case "newTable":
@@ -467,7 +480,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 								break;
 
 							case "queryDone":
-								await this.ReportDone(e);
+								await this.Done.Raise(this, new NodeQueryEventArgs(this, e));
 								break;
 
 							case "beginSection":
@@ -476,7 +489,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 								break;
 
 							case "queryAborted":
-								await this.ReportAborted(e);
+								await this.Aborted.Raise(this, new NodeQueryEventArgs(this, e));
 								break;
 
 							default:
@@ -513,17 +526,6 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			}
 		}
 
-		private Task Invoke(EventHandlerAsync<NodeQueryEventArgs> h, MessageEventArgs e)
-		{
-			return h.Raise(this, new NodeQueryEventArgs(this, e));
-		}
-
-		internal Task SetTitle(string Title, MessageEventArgs e)
-		{
-			this.title = Title;
-			return this.Invoke(this.NewTitle, e);
-		}
-
 		/// <summary>
 		/// Title os response report.
 		/// </summary>
@@ -534,31 +536,15 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		/// </summary>
 		public event EventHandlerAsync<NodeQueryEventArgs> NewTitle = null;
 
-		internal Task ReportStarted(MessageEventArgs e)
-		{
-			return this.Invoke(this.Started, e);
-		}
-
 		/// <summary>
 		/// Raised when the result report has started.
 		/// </summary>
 		public event EventHandlerAsync<NodeQueryEventArgs> Started = null;
 
-		internal Task ReportDone(MessageEventArgs e)
-		{
-			this.isDone = true;
-			return this.Invoke(this.Done, e);
-		}
-
 		/// <summary>
 		/// Raised when the result report is completed.
 		/// </summary>
 		public event EventHandlerAsync<NodeQueryEventArgs> Done = null;
-
-		internal Task ReportAborted(MessageEventArgs e)
-		{
-			return this.Invoke(this.Aborted, e);
-		}
 
 		/// <summary>
 		/// Raised when the result report is aborted.
@@ -591,18 +577,13 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 				this.tables[Table.TableId] = Table2;
 			}
 
-			return this.Invoke(this.TableAdded, Table2, e);
+			return this.TableAdded.Raise(this, new NodeQueryTableEventArgs(Table2, this, e));
 		}
 
 		/// <summary>
 		/// Event raised when a new table has been added to the report.
 		/// </summary>
 		public event EventHandlerAsync<NodeQueryTableEventArgs> TableAdded = null;
-
-		private Task Invoke(EventHandlerAsync<NodeQueryTableEventArgs> Callback, QueryTable Table, MessageEventArgs e)
-		{
-			return Callback.Raise(this, new NodeQueryTableEventArgs(Table, this, e));
-		}
 
 		internal Task NewRecords(string TableId, Record[] Records, MessageEventArgs e)
 		{
@@ -616,12 +597,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 			Table.Add(Records);
 
-			return this.Invoke(this.TableUpdated, Table, Records, e);
-		}
-
-		private Task Invoke(EventHandlerAsync<NodeQueryTableUpdatedEventArgs> h, QueryTable Table, Record[] NewRecords, MessageEventArgs e)
-		{
-			return h.Raise(this, new NodeQueryTableUpdatedEventArgs(Table, this, NewRecords, e));
+			return this.TableUpdated.Raise(this, new NodeQueryTableUpdatedEventArgs(Table, this, Records, e));
 		}
 
 		/// <summary>
@@ -641,7 +617,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 			Table.Done();
 
-			return this.Invoke(this.TableCompleted, Table, e);
+			return this.TableCompleted.Raise(this, new NodeQueryTableEventArgs(Table, this, e));
 		}
 
 		/// <summary>
@@ -670,18 +646,13 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 				}
 			}
 
-			return this.Invoke(this.ObjectAdded, Obj, e);
+			return this.ObjectAdded.Raise(this, new NodeQueryObjectEventArgs(Obj, this, e));
 		}
 
 		/// <summary>
 		/// Raised when an object has been added to the report.
 		/// </summary>
 		public event EventHandlerAsync<NodeQueryObjectEventArgs> ObjectAdded = null;
-
-		private Task Invoke(EventHandlerAsync<NodeQueryObjectEventArgs> Callback, QueryObject Object, MessageEventArgs e)
-		{
-			return Callback.Raise(this, new NodeQueryObjectEventArgs(Object, this, e));
-		}
 
 		internal Task BeginSection(string Header, MessageEventArgs e)
 		{
@@ -706,12 +677,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 				this.currentSection = Section;
 			}
 
-			return this.Invoke(this.SectionAdded, Section, e);
-		}
-
-		private Task Invoke(EventHandlerAsync<NodeQuerySectionEventArgs> Callback, QuerySection Section, MessageEventArgs e)
-		{
-			return Callback.Raise(this, new NodeQuerySectionEventArgs(Section, this, e));
+			return this.SectionAdded.Raise(this, new NodeQuerySectionEventArgs(Section, this, e));
 		}
 
 		/// <summary>
@@ -732,7 +698,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 				this.currentSection = this.currentSection.Parent as QuerySection;
 			}
 
-			return this.Invoke(this.SectionCompleted, Section, e);
+			return this.SectionCompleted.Raise(this, new NodeQuerySectionEventArgs(Section, this, e));
 		}
 
 		/// <summary>
@@ -786,27 +752,9 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			try
 			{
 				if (this.queuedMessages is null)
-				{
-					this.queuedMessages = new LinkedList<KeyValuePair<int, MessageEventArgs>>();
-					this.queuedMessages.AddLast(new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
-				}
-				else
-				{
-					LinkedListNode<KeyValuePair<int, MessageEventArgs>> Loop = this.queuedMessages.First;
+					this.queuedMessages = new SortedDictionary<int, MessageEventArgs>();
 
-					while (!(Loop is null))
-					{
-						if (SequenceNr < Loop.Value.Key)
-						{
-							this.queuedMessages.AddBefore(Loop, new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
-							return;
-						}
-						else
-							Loop = Loop.Next;
-					}
-
-					this.queuedMessages.AddLast(new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
-				}
+				this.queuedMessages[SequenceNr] = e;
 			}
 			finally
 			{
@@ -819,7 +767,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			await this.syncObj.BeginWrite();
 			try
 			{
-				return !(this.queuedMessages is null);
+				return (this.queuedMessages?.Count ?? 0) > 0;
 			}
 			finally
 			{
@@ -839,18 +787,16 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			await this.syncObj.BeginWrite();
 			try
 			{
-				KeyValuePair<int, MessageEventArgs> P;
+				if (this.queuedMessages is null)
+					return null;
 
-				if (!(this.queuedMessages is null) &&
-					!(this.queuedMessages.First is null) &&
-					(P = this.queuedMessages.First.Value).Key == ExpectedSequenceNr)
+				if (this.queuedMessages.TryGetValue(ExpectedSequenceNr, out MessageEventArgs E))
 				{
-					this.queuedMessages.RemoveFirst();
-
-					if (this.queuedMessages.First is null)
+					this.queuedMessages.Remove(ExpectedSequenceNr);
+					if (this.queuedMessages.Count == 0)
 						this.queuedMessages = null;
 
-					return P.Value;
+					return E;
 				}
 				else
 					return null;
@@ -861,5 +807,79 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			}
 		}
 
+		#region IObservableLayer
+
+		/// <summary>
+		/// If events raised from the communication layer are decoupled, i.e. executed
+		/// in parallel with the source that raised them.
+		/// </summary>
+		public bool DecoupledEvents => true;
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Comment">Comment.</param>
+		public void Information(string Comment) => this.client.Information(Comment);
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Comment">Comment.</param>
+		public void Information(DateTime Timestamp, string Comment) => this.client.Information(Timestamp, Comment);
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Warning">Warning.</param>
+		public void Warning(string Warning) => this.client.Warning(Warning);
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Warning">Warning.</param>
+		public void Warning(DateTime Timestamp, string Warning) => this.client.Warning(Timestamp, Warning);
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Error">Error.</param>
+		public void Error(string Error) => this.client.Error(Error);
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Error">Error.</param>
+		public void Error(DateTime Timestamp, string Error) => this.client.Error(Timestamp, Error);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public void Exception(string Exception) => this.client.Exception(Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public void Exception(DateTime Timestamp, string Exception) => this.client.Exception(Timestamp, Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public void Exception(Exception Exception) => this.client.Exception(Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public void Exception(DateTime Timestamp, Exception Exception) => this.client.Exception(Timestamp, Exception);
+
+		#endregion
 	}
 }

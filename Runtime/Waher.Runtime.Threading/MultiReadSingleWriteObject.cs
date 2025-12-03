@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Runtime.Threading
 {
@@ -23,14 +24,30 @@ namespace Waher.Runtime.Threading
 		private readonly object owner;
 		private readonly string creatorStackTrace;
 		private string lockStackTrace;
-		private LinkedList<TaskCompletionSource<bool>> noWriters = new LinkedList<TaskCompletionSource<bool>>();
-		private LinkedList<TaskCompletionSource<bool>> noReadersOrWriters = new LinkedList<TaskCompletionSource<bool>>();
+		private LinkedList<WaitRec> noWriters = new LinkedList<WaitRec>();
+		private LinkedList<WaitRec> noReadersOrWriters = new LinkedList<WaitRec>();
 		private readonly object synchObj = new object();
 		private long token = 0;
 		private long start = 0;
 		private int nrReaders = 0;
 		private bool isWriting = false;
 		private bool disposed = false;
+
+		private class WaitRec
+		{
+			public TaskCompletionSource<bool> Pending;
+			public string StackTrace;
+
+			public WaitRec(bool RecordStackTraces)
+			{
+				this.Pending = new TaskCompletionSource<bool>();
+
+				if (RecordStackTraces)
+					this.StackTrace = Environment.StackTrace;
+				else
+					this.StackTrace = null;
+			}
+		}
 
 		/// <summary>
 		/// Represents an object that allows single concurrent writers but multiple concurrent readers.
@@ -191,6 +208,36 @@ namespace Waher.Runtime.Threading
 		}
 
 		/// <summary>
+		/// Recorded stack traces waiting for access.
+		/// </summary>
+		public string[] QueuedStackTraces
+		{
+			get
+			{
+				ChunkedList<string> Result = null;
+
+				lock (this.synchObj)
+				{
+					if (this.disposed)
+						throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+
+					foreach (WaitRec Rec in this.noReadersOrWriters)
+					{
+						if (!string.IsNullOrEmpty(Rec.StackTrace))
+						{
+							if (Result is null)
+								Result = new ChunkedList<string>();
+
+							Result.Add(Rec.StackTrace);
+						}
+					}
+				}
+
+				return Result?.ToArray() ?? Array.Empty<string>();
+			}
+		}
+
+		/// <summary>
 		/// Number of ticks the object has been locked.
 		/// </summary>
 		public long TicksLocked
@@ -297,7 +344,7 @@ namespace Waher.Runtime.Threading
 			if (this.disposed)
 				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
 
-			TaskCompletionSource<bool> Wait = null;
+			WaitRec Wait = null;
 			int Result = 0;
 			bool RecordStackTrace = false;
 
@@ -320,7 +367,7 @@ namespace Waher.Runtime.Threading
 					}
 					else
 					{
-						Wait = new TaskCompletionSource<bool>();
+						Wait = new WaitRec(this.recordStackTraces);
 						this.noWriters.AddLast(Wait);
 					}
 				}
@@ -334,7 +381,7 @@ namespace Waher.Runtime.Threading
 				}
 				else
 				{
-					await Wait.Task;
+					await Wait.Pending.Task;
 					Wait = null;
 				}
 			}
@@ -350,7 +397,7 @@ namespace Waher.Runtime.Threading
 			if (this.disposed)
 				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
 
-			LinkedList<TaskCompletionSource<bool>> List = null;
+			LinkedList<WaitRec> List = null;
 
 			lock (this.synchObj)
 			{
@@ -373,11 +420,11 @@ namespace Waher.Runtime.Threading
 					return Task.FromResult(0);
 
 				List = this.noReadersOrWriters;
-				this.noReadersOrWriters = new LinkedList<TaskCompletionSource<bool>>();
+				this.noReadersOrWriters = new LinkedList<WaitRec>();
 			}
 
-			foreach (TaskCompletionSource<bool> T in List)
-				T.TrySetResult(true);
+			foreach (WaitRec Rec in List)
+				Rec.Pending.TrySetResult(true);
 
 			return Task.FromResult(0);
 		}
@@ -393,7 +440,7 @@ namespace Waher.Runtime.Threading
 			if (this.disposed)
 				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
 
-			TaskCompletionSource<bool> Wait = null;
+			WaitRec Wait = null;
 			DateTime Start = DateTime.UtcNow;
 			bool RecordStackTrace = false;
 
@@ -418,7 +465,7 @@ namespace Waher.Runtime.Threading
 						return false;
 					else
 					{
-						Wait = new TaskCompletionSource<bool>();
+						Wait = new WaitRec(this.recordStackTraces);
 						this.noWriters.AddLast(Wait);
 					}
 				}
@@ -437,11 +484,11 @@ namespace Waher.Runtime.Threading
 
 					using (Timer Timer = new Timer((P) =>
 					{
-						Wait?.TrySetResult(false);
+						Wait?.Pending.TrySetResult(false);
 
 					}, null, Timeout, System.Threading.Timeout.Infinite))
 					{
-						Result = await Wait.Task;
+						Result = await Wait.Pending.Task;
 					}
 
 					if (!Result)
@@ -475,12 +522,12 @@ namespace Waher.Runtime.Threading
 
 			if (Cancel.CanBeCanceled)
 			{
-				TaskCompletionSource<bool> Wait = null;
+				WaitRec Wait = null;
 				bool RecordStackTrace = false;
 
 				Cancel.Register(() =>
 				{
-					Wait?.TrySetResult(false);
+					Wait?.Pending.TrySetResult(false);
 				});
 
 				while (true)
@@ -504,7 +551,7 @@ namespace Waher.Runtime.Threading
 							return false;
 						else
 						{
-							Wait = new TaskCompletionSource<bool>();
+							Wait = new WaitRec(this.recordStackTraces);
 							this.noWriters.AddLast(Wait);
 						}
 					}
@@ -518,7 +565,7 @@ namespace Waher.Runtime.Threading
 					}
 					else
 					{
-						bool Result = await Wait.Task;
+						bool Result = await Wait.Pending.Task;
 
 						if (!Result)
 						{
@@ -550,8 +597,8 @@ namespace Waher.Runtime.Threading
 			if (this.disposed)
 				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
 
-			TaskCompletionSource<bool> Prev = null;
-			TaskCompletionSource<bool> Wait = null;
+			WaitRec Prev = null;
+			WaitRec Wait = null;
 			bool RecordStackTrace = false;
 
 			while (true)
@@ -575,7 +622,7 @@ namespace Waher.Runtime.Threading
 					}
 					else
 					{
-						Wait = new TaskCompletionSource<bool>();
+						Wait = new WaitRec(this.recordStackTraces);
 						this.noReadersOrWriters.AddLast(Wait);
 						this.noWriters.AddLast(Wait);
 					}
@@ -590,7 +637,7 @@ namespace Waher.Runtime.Threading
 				}
 				else
 				{
-					await Wait.Task;
+					await Wait.Pending.Task;
 					Prev = Wait;
 					Wait = null;
 				}
@@ -606,8 +653,8 @@ namespace Waher.Runtime.Threading
 			if (this.disposed)
 				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
 
-			LinkedList<TaskCompletionSource<bool>> List = null;
-			LinkedList<TaskCompletionSource<bool>> List2 = null;
+			LinkedList<WaitRec> List = null;
+			LinkedList<WaitRec> List2 = null;
 
 			lock (this.synchObj)
 			{
@@ -624,26 +671,26 @@ namespace Waher.Runtime.Threading
 				if (!(this.noReadersOrWriters.First is null))
 				{
 					List = this.noReadersOrWriters;
-					this.noReadersOrWriters = new LinkedList<TaskCompletionSource<bool>>();
+					this.noReadersOrWriters = new LinkedList<WaitRec>();
 				}
 
 				if (!(this.noWriters.First is null))
 				{
 					List2 = this.noWriters;
-					this.noWriters = new LinkedList<TaskCompletionSource<bool>>();
+					this.noWriters = new LinkedList<WaitRec>();
 				}
 			}
 
 			if (!(List is null))
 			{
-				foreach (TaskCompletionSource<bool> T in List)
-					T.TrySetResult(true);
+				foreach (WaitRec Rec in List)
+					Rec.Pending.TrySetResult(true);
 			}
 
 			if (!(List2 is null))
 			{
-				foreach (TaskCompletionSource<bool> T in List2)
-					T.TrySetResult(true);
+				foreach (WaitRec Rec in List2)
+					Rec.Pending.TrySetResult(true);
 			}
 
 			return Task.CompletedTask;
@@ -660,8 +707,8 @@ namespace Waher.Runtime.Threading
 			if (this.disposed)
 				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
 
-			TaskCompletionSource<bool> Prev = null;
-			TaskCompletionSource<bool> Wait = null;
+			WaitRec Prev = null;
+			WaitRec Wait = null;
 			DateTime Start = DateTime.UtcNow;
 			bool RecordStackTrace = false;
 
@@ -688,7 +735,7 @@ namespace Waher.Runtime.Threading
 						return false;
 					else
 					{
-						Wait = new TaskCompletionSource<bool>();
+						Wait = new WaitRec(this.recordStackTraces);
 						this.noWriters.AddLast(Wait);
 						this.noReadersOrWriters.AddLast(Wait);
 					}
@@ -708,11 +755,11 @@ namespace Waher.Runtime.Threading
 
 					using (Timer Timer = new Timer((P) =>
 					{
-						Wait?.TrySetResult(false);
+						Wait?.Pending.TrySetResult(false);
 
 					}, null, Timeout, System.Threading.Timeout.Infinite))
 					{
-						Result = await Wait.Task;
+						Result = await Wait.Pending.Task;
 					}
 
 					if (!Result)
@@ -748,15 +795,15 @@ namespace Waher.Runtime.Threading
 
 			if (Cancel.CanBeCanceled)
 			{
-				TaskCompletionSource<bool> Prev = null;
-				TaskCompletionSource<bool> Wait = null;
+				WaitRec Prev = null;
+				WaitRec Wait = null;
 				DateTime Start = DateTime.UtcNow;
 				bool RecordStackTrace = false;
 
 				Cancel.Register(() =>
 				{
-					Prev?.TrySetResult(false);
-					Wait?.TrySetResult(false);
+					Prev?.Pending.TrySetResult(false);
+					Wait?.Pending.TrySetResult(false);
 				});
 
 				while (true)
@@ -782,7 +829,7 @@ namespace Waher.Runtime.Threading
 							return false;
 						else
 						{
-							Wait = new TaskCompletionSource<bool>();
+							Wait = new WaitRec(this.recordStackTraces);
 							this.noWriters.AddLast(Wait);
 							this.noReadersOrWriters.AddLast(Wait);
 						}
@@ -797,7 +844,7 @@ namespace Waher.Runtime.Threading
 					}
 					else
 					{
-						bool Result = await Wait.Task;
+						bool Result = await Wait.Pending.Task;
 
 						if (!Result)
 						{
@@ -827,8 +874,8 @@ namespace Waher.Runtime.Threading
 		/// </summary>
 		public virtual Task Unlock()
 		{
-			LinkedList<TaskCompletionSource<bool>> List = null;
-			LinkedList<TaskCompletionSource<bool>> List2 = null;
+			LinkedList<WaitRec> List = null;
+			LinkedList<WaitRec> List2 = null;
 
 			lock (this.synchObj)
 			{
@@ -843,26 +890,26 @@ namespace Waher.Runtime.Threading
 				if (!(this.noReadersOrWriters.First is null))
 				{
 					List = this.noReadersOrWriters;
-					this.noReadersOrWriters = new LinkedList<TaskCompletionSource<bool>>();
+					this.noReadersOrWriters = new LinkedList<WaitRec>();
 				}
 
 				if (!(this.noWriters.First is null))
 				{
 					List2 = this.noWriters;
-					this.noWriters = new LinkedList<TaskCompletionSource<bool>>();
+					this.noWriters = new LinkedList<WaitRec>();
 				}
 			}
 
 			if (!(List is null))
 			{
-				foreach (TaskCompletionSource<bool> T in List)
-					T.TrySetResult(false);
+				foreach (WaitRec Rec in List)
+					Rec.Pending.TrySetResult(false);
 			}
 
 			if (!(List2 is null))
 			{
-				foreach (TaskCompletionSource<bool> T in List2)
-					T.TrySetResult(false);
+				foreach (WaitRec Rec in List2)
+					Rec.Pending.TrySetResult(false);
 			}
 
 			return Task.CompletedTask;

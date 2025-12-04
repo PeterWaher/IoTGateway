@@ -78,7 +78,7 @@ namespace Waher.Runtime.Profiling.Events
 			if (!string.IsNullOrEmpty(this.label))
 			{
 				Output.Append(" : \"");
-				Output.Append(this.label.Replace('"', '\''));
+				Output.Append(Profiler.EscapeLabel(this.label));
 				Output.Append('"');
 			}
 

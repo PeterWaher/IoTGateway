@@ -38,5 +38,10 @@
         <ImageInternal cid="img0001"/>
       </Margins>
     </Cell>
-  </Flexible>
+		<Cell halign="Center" valign="Center" border="BlackPen">
+			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
+				<ImageInternal cid="img0002"/>
+			</Margins>
+		</Cell>
+	</Flexible>
 </Layout2D>

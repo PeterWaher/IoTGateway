@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Script;
+using Waher.Script.Graphs;
 
 namespace Waher.Layout.Layout2D.Model.Images
 {
@@ -89,14 +91,30 @@ namespace Waher.Layout.Layout2D.Model.Images
 		protected override async Task<SKImage> LoadImage(DrawingState State)
 		{
 			string ContentId = await this.cid.Evaluate(State.Session, string.Empty);
-			if (!string.IsNullOrEmpty(ContentId) &&
-				this.Document.TryGetContent(ContentId, out object Content) &&
-				Content is SKImage Image)
-			{
-				return Image;
-			}
-			else
+			if (string.IsNullOrEmpty(ContentId))
 				return null;
+
+			if (this.Document.TryGetContent(ContentId, out object Content))
+				return Content as SKImage;
+
+			if (State.Session.TryGetVariable(ContentId, out Variable v))
+			{
+				object Obj = v.ValueObject;
+
+				if (Obj is SKImage Image)
+					return Image;
+
+				if (Obj is PixelInformation Pixels)
+					return Pixels.CreateBitmap();
+
+				if (Obj is Graph Graph)
+				{
+					Pixels = Graph.CreatePixels(State.Session);
+					return Pixels.CreateBitmap();
+				}
+			}
+
+			return null;
 		}
 
 		/// <summary>

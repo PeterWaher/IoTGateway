@@ -114,7 +114,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 				}
 			}
 
-			return null;
+			return await this.Document.RaiseGetInternalImage(ContentId);
 		}
 
 		/// <summary>

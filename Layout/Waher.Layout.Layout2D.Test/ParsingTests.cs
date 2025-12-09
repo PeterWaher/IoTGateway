@@ -45,13 +45,14 @@ namespace Waher.Layout.Layout2D.Test
 		protected Task Test(string FileName,
 			params KeyValuePair<string, object>[] ContentAttachments)
 		{
-			return this.Test(FileName, new Variables(), ContentAttachments);
+			return this.Test(FileName, [], ContentAttachments);
 		}
 
 		protected virtual async Task Test(string FileName, Variables Variables,
 			params KeyValuePair<string, object>[] ContentAttachments)
 		{
-			await Layout2DDocument.FromFile(Path.Combine("Xml", FileName + ".xml"), true, Variables, ContentAttachments);
+			await Layout2DDocument.FromFile(Path.Combine("Xml", FileName + ".xml"), 
+				true, Variables, ContentAttachments);
 		}
 
 		[TestMethod]
@@ -275,8 +276,13 @@ namespace Waher.Layout.Layout2D.Test
 		{
 			SKBitmap Bitmap = SKBitmap.Decode(Path.Combine("Images", "Icon_64x64_File.png"));
 			SKImage Image = SKImage.FromBitmap(Bitmap);
+			Variables Variables = new Variables()
+			{
+				{ "img0002", Image }
+			};
 
-			await this.Test("Test_37_Images", new KeyValuePair<string, object>("img0001", Image));
+			await this.Test("Test_37_Images", Variables,
+				new KeyValuePair<string, object>("img0001", Image));
 		}
 
 		[TestMethod]

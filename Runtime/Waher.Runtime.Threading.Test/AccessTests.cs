@@ -558,11 +558,11 @@ namespace Waher.Runtime.Threading.Test
 							}
 						}
 
-						((TaskCompletionSource<bool>)P).SetResult(true);
+						((TaskCompletionSource<bool>)P).TrySetResult(true);
 					}
 					catch (Exception ex)
 					{
-						((TaskCompletionSource<bool>)P).SetException(ex);
+						((TaskCompletionSource<bool>)P).TrySetException(ex);
 					}
 				});
 

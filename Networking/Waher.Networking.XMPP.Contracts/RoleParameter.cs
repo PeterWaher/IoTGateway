@@ -16,6 +16,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private string role = string.Empty;
 		private string property = string.Empty;
 		private string @value = null;
+		private string contentType = null;
 		private int index = 0;
 		private bool required = false;
 
@@ -79,6 +80,20 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Internet Content-Type (may include wildcards), if parameter refers to an identity attachment.
+		/// </summary>
+		public string ContentType
+		{
+			get => this.contentType;
+			set => this.contentType = value;
+		}
+
+		/// <summary>
+		/// If the value refers to an attachment.
+		/// </summary>
+		public bool RefersToAttachment => !string.IsNullOrEmpty(this.contentType);
+
+		/// <summary>
 		/// Parameter type name, corresponding to the local name of the parameter element in XML.
 		/// </summary>
 		public override string ParameterType => "roleParameter";
@@ -94,10 +109,10 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				Xml.Append("<roleParameter");
 
-				if (!string.IsNullOrEmpty(this.Guide))
+				if (!string.IsNullOrEmpty(this.contentType))
 				{
-					Xml.Append(" guide=\"");
-					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
+					Xml.Append(" contentType=\"");
+					Xml.Append(XML.Encode(this.contentType.Normalize(NormalizationForm.FormC)));
 					Xml.Append('"');
 				}
 
@@ -105,6 +120,13 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					Xml.Append(" exp=\"");
 					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
+					Xml.Append('"');
+				}
+
+				if (!string.IsNullOrEmpty(this.Guide))
+				{
+					Xml.Append(" guide=\"");
+					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
 					Xml.Append('"');
 				}
 
@@ -213,6 +235,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.Index = XML.Attribute(Xml, "index", 0);
 			this.Property = XML.Attribute(Xml, "property");
 			this.Required = XML.Attribute(Xml, "required", false);
+			this.ContentType = XML.Attribute(Xml, "contentType");
 
 			return base.Import(Xml);
 		}

@@ -309,8 +309,8 @@ namespace Waher.Layout.Layout2D
 		/// <param name="Xml">XML Definition</param>
 		public static bool IsLayoutXml(XmlElement Xml)
 		{
-			return !(Xml is null) && 
-				Xml.LocalName == LocalName && 
+			return !(Xml is null) &&
+				Xml.LocalName == LocalName &&
 				Xml.NamespaceURI == Namespace;
 		}
 
@@ -737,6 +737,23 @@ namespace Waher.Layout.Layout2D
 			Output.WriteEndElement();
 		}
 
+		/// <summary>
+		/// Raises the <see cref="OnGetInternalImage"/> event.
+		/// </summary>
+		/// <param name="ContentId">Content ID requested.</param>
+		/// <returns>Resulting image, if found.</returns>
+		internal async Task<SKImage> RaiseGetInternalImage(string ContentId)
+		{
+			InteralImageEventArgs e = new InteralImageEventArgs(this, ContentId);
+			await this.OnGetInternalImage.Raise(this, e);
+			return e.Image;
+		}
+
+		/// <summary>
+		/// Event raised when an internal image is requested, and one is not found in the
+		/// document or variables.
+		/// </summary>
+		public event EventHandlerAsync<InteralImageEventArgs> OnGetInternalImage = null;
 	}
 
 	/* TODO:

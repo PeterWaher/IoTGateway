@@ -579,7 +579,7 @@ namespace Waher.Runtime.Profiling
 				foreach (KeyValuePair<string, int> P in this.eventOrdinals)
 				{
 					Output.Append("concise \"");
-					Output.Append(P.Key);
+					Output.Append(EscapeLabel(P.Key));
 					Output.Append("\" as E");
 					Output.AppendLine(P.Value.ToString());
 				}
@@ -590,7 +590,7 @@ namespace Waher.Runtime.Profiling
 				foreach (KeyValuePair<string, int> P in this.exceptionOrdinals)
 				{
 					Output.Append("concise \"");
-					Output.Append(P.Key);
+					Output.Append(EscapeLabel(P.Key));
 					Output.Append("\" as X");
 					Output.AppendLine(P.Value.ToString());
 				}
@@ -663,6 +663,15 @@ namespace Waher.Runtime.Profiling
 
 			Output.Append(States.Summary.ToString());
 			Output.AppendLine("@enduml");
+		}
+
+		internal static string EscapeLabel(string s)
+		{
+			return s.
+				Replace("\\", "\\\\").
+				Replace('"', '\'').
+				Replace("\r", "\\r").
+				Replace("\n", "\\n");
 		}
 
 		/// <summary>

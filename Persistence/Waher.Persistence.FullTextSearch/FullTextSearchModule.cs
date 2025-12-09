@@ -266,6 +266,9 @@ namespace Waher.Persistence.FullTextSearch
 
 		private static async Task<ulong> GetNextIndexNrLocked(string IndexedCollection)
 		{
+			if (collectionInformation is null)
+				throw new ObjectDisposedException(nameof(FullTextSearchModule));
+
 			string Key = " C(" + IndexedCollection + ")";
 			KeyValuePair<bool, object> P = await collectionInformation.TryGetValueAsync(Key);
 

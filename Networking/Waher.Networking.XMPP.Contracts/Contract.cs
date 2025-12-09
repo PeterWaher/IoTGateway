@@ -1219,7 +1219,39 @@ namespace Waher.Networking.XMPP.Contracts
 												return null;
 										}
 
-										RoleParameter.SetValue(XML.Attribute(E3, "value"));
+										string s = E3.InnerText.Trim();
+										if (string.IsNullOrEmpty(s))
+											RoleParameter.SetValue(XML.Attribute(E3, "value"));
+										else
+										{
+											try
+											{
+												string AttachmentId2 = XML.Attribute(E3, "value");
+												string ContentType = XML.Attribute(E3, "contentType");
+												string LegalId = XML.Attribute(E3, "legalId");
+												string FileName = XML.Attribute(E3, "fileName");
+												byte[] Signature2 = Convert.FromBase64String(XML.Attribute(E3, "signature"));
+												DateTime Timestamp = XML.Attribute(E3, "timestamp", DateTime.MinValue);
+												string Url2 = XML.Attribute(E3, "url");
+												byte[] Data = Convert.FromBase64String(s);
+												ContentResponse Decoded = await InternetContent.DecodeAsync(
+													ContentType, Data, new Uri(Url2));
+
+												if (Decoded.HasError)
+												{
+													Log.Error(Decoded.Error);
+													return null;
+												}
+
+												RoleParameter.SetValue(AttachmentId2, LegalId, ContentType,
+													FileName, Signature2, Timestamp, Url2, Data, Decoded.Decoded);
+											}
+											catch (Exception ex)
+											{
+												Log.Exception(ex);
+												return null;
+											}
+										}
 									}
 								}
 							}
@@ -1808,11 +1840,41 @@ namespace Waher.Networking.XMPP.Contracts
 
 					foreach (RoleParameter RoleParameter in RoleParameters)
 					{
-						Xml.Append("<parameter name=\"");
-						Xml.Append(XML.Encode(RoleParameter.Name));
-						Xml.Append("\" value=\"");
-						Xml.Append(XML.Encode(RoleParameter.ObjectValue?.ToString()));
-						Xml.Append("\"/>");
+						Xml.Append("<parameter");
+
+						if (RoleParameter.HasAttachmentValue)
+						{
+							Xml.Append(" contentType=\"");
+							Xml.Append(XML.Encode(RoleParameter.AttachmentContentType));
+							Xml.Append("\" fileName=\"");
+							Xml.Append(XML.Encode(RoleParameter.AttachmentFileName));
+							Xml.Append("\" legalId=\"");
+							Xml.Append(XML.Encode(RoleParameter.AttachmentLegalId.Value));
+							Xml.Append("\" name=\"");
+							Xml.Append(XML.Encode(RoleParameter.Name));
+							Xml.Append("\" signature=\"");
+							Xml.Append(XML.Encode(Convert.ToBase64String(RoleParameter.AttachmentSignature)));
+							Xml.Append("\" timestamp=\"");
+							Xml.Append(XML.Encode(RoleParameter.AttachmentTimestamp));
+							Xml.Append("\" url=\"");
+							Xml.Append(XML.Encode(RoleParameter.AttachmentUrl));
+							Xml.Append("\" value=\"");
+							Xml.Append(XML.Encode(RoleParameter.AttachmentId.Value));
+							Xml.Append("\">");
+
+							if (!(RoleParameter.EncodedAttachment is null))
+								Xml.Append(Convert.ToBase64String(RoleParameter.EncodedAttachment));
+
+							Xml.Append("</parameter>");
+						}
+						else
+						{
+							Xml.Append(" name=\"");
+							Xml.Append(XML.Encode(RoleParameter.Name));
+							Xml.Append("\" value=\"");
+							Xml.Append(XML.Encode(RoleParameter.ObjectValue?.ToString()));
+							Xml.Append("\"/>");
+						}
 					}
 
 					Xml.Append("</roleParameters></status>");

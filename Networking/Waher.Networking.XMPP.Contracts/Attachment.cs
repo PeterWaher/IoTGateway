@@ -32,7 +32,7 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Legal ID of uploader of attachment
+		/// Legal ID of uploader of the attachment
 		/// </summary>
 		public string LegalId
 		{

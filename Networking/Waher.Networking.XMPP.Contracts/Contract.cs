@@ -1745,8 +1745,9 @@ namespace Waher.Networking.XMPP.Contracts
 					Parameter.Serialize(Xml, false);
 
 					if (Parameter is RoleParameter RoleParameter &&
-						RoleParameter.ObjectValue is string RoleParameterValue &&
-						!string.IsNullOrEmpty(RoleParameterValue))
+						((RoleParameter.ObjectValue is string RoleParameterValue &&
+						!string.IsNullOrEmpty(RoleParameterValue)) ||
+						RoleParameter.HasAttachmentValue))
 					{
 						RoleParameters ??= new LinkedList<RoleParameter>();
 						RoleParameters.AddLast(RoleParameter);

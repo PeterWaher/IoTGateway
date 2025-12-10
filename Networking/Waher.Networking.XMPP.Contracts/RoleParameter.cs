@@ -38,7 +38,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get
 			{
-				if (this.decodedValue is null)
+				if (this.encodedValue is null)
 					return this.propertyValue;
 				else
 					return this.decodedValue;
@@ -114,7 +114,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// If the value is an attachment reference.
 		/// </summary>
-		public bool HasAttachmentValue => !(this.decodedValue is null);
+		public bool HasAttachmentValue => !(this.encodedValue is null);
 
 		/// <summary>
 		/// Name of role the parameter references.
@@ -173,14 +173,6 @@ namespace Waher.Networking.XMPP.Contracts
 			set
 			{
 				this.propertyValue = value;
-				this.attachmentId = null;
-				this.attachmentLegalId = null;
-				this.attachmentContentType = null;
-				this.attachmentFileName = null;
-				this.attachmentSignature = null;
-				this.attachmentTimestamp = DateTime.MinValue;
-				this.attachmentUrl = null;
-				this.decodedValue = null;
 				this.ProtectedValue = null;
 			}
 		}
@@ -296,7 +288,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Variables">Variable collection.</param>
 		public override void Populate(Variables Variables)
 		{
-			if (this.decodedValue is null)
+			if (this.encodedValue is null)
 				Variables[this.Name] = this.propertyValue;
 			else
 				Variables[this.Name] = this.decodedValue;
@@ -310,6 +302,15 @@ namespace Waher.Networking.XMPP.Contracts
 		public override void SetValue(object Value)
 		{
 			this.StringValue = Value?.ToString();
+			this.attachmentId = null;
+			this.attachmentLegalId = null;
+			this.attachmentContentType = null;
+			this.attachmentFileName = null;
+			this.attachmentSignature = null;
+			this.attachmentTimestamp = DateTime.MinValue;
+			this.attachmentUrl = null;
+			this.encodedValue = null;
+			this.decodedValue = null;
 		}
 
 		/// <summary>

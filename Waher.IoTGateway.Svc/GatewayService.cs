@@ -160,6 +160,12 @@ namespace Waher.IoTGateway.Svc
 				{
 					using PendingTimer Timer = new(this);
 
+					Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
+					Gateway.GetDatabaseProvider += Program.GetDatabase;
+					Gateway.RegistrationSuccessful += Program.RegistrationSuccessful;
+					Gateway.OnTerminate += this.TerminateService;
+
 					this.starting = true;
 					try
 					{
@@ -637,6 +643,10 @@ namespace Waher.IoTGateway.Svc
 			try
 			{
 				using PendingTimer Timer = new(this);
+
+				Gateway.GetDatabaseProvider -= Program.GetDatabase;
+				Gateway.RegistrationSuccessful -= Program.RegistrationSuccessful;
+				Gateway.OnTerminate -= this.TerminateService;
 
 				Flush();
 				Gateway.Stop().Wait();

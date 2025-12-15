@@ -1589,6 +1589,9 @@ namespace Waher.IoTGateway
 					{
 						webServer.ResourceOverride = null;
 						webServer.ResourceOverrideFilter = null;
+
+						if (webServer.GetPorts(true, true).Length == 0) // No ports opened
+							ScheduleEvent(AttemptReopenPorts, DateTime.Now.AddMinutes(1), null);
 					}
 
 					if (!(startingServer is null))
@@ -1624,6 +1627,14 @@ namespace Waher.IoTGateway
 			}
 
 			return true;
+		}
+
+		private static void AttemptReopenPorts(object _)
+		{
+			webServer.NetworkChanged();
+
+			if (webServer.GetPorts(true, true).Length == 0) // No ports opened
+				ScheduleEvent(AttemptReopenPorts, DateTime.Now.AddMinutes(1), null);
 		}
 
 		private static Task GetCustomHttpSniffers(object Sender, CustomSniffersEventArgs e)

@@ -1,6 +1,8 @@
 ﻿using SkiaSharp;
 using System;
 using System.Threading.Tasks;
+using System.Xml;
+using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Layout.Layout2D.Model.Figures;
 
 namespace Waher.Layout.Layout2D.Model.Images
@@ -10,6 +12,8 @@ namespace Waher.Layout.Layout2D.Model.Images
 	/// </summary>
 	public abstract class Image : FigurePoint2
 	{
+		private BooleanAttribute keepAspectRatio;
+
 		/// <summary>
 		/// Abstract base class for images.
 		/// </summary>
@@ -21,6 +25,15 @@ namespace Waher.Layout.Layout2D.Model.Images
 		}
 
 		/// <summary>
+		/// Keep aspect-ratio
+		/// </summary>
+		public BooleanAttribute KeepAspectRatioAttribute
+		{
+			get => this.keepAspectRatio;
+			set => this.keepAspectRatio = value;
+		}
+
+		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		public override void Dispose()
@@ -29,6 +42,51 @@ namespace Waher.Layout.Layout2D.Model.Images
 
 			this.image?.Dispose();
 			this.image = null;
+		}
+
+		/// <summary>
+		/// Populates the element (including children) with information from its XML definition.
+		/// </summary>
+		/// <param name="Input">XML definition.</param>
+		public override Task FromXml(XmlElement Input)
+		{
+			this.keepAspectRatio = new BooleanAttribute(Input, "keepAspectRatio", this.Document);
+
+			return base.FromXml(Input);
+		}
+
+		/// <summary>
+		/// Exports attributes to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportAttributes(XmlWriter Output)
+		{
+			base.ExportAttributes(Output);
+
+			this.keepAspectRatio?.Export(Output);
+		}
+
+		/// <summary>
+		/// Copies contents (attributes and children) to the destination element.
+		/// </summary>
+		/// <param name="Destination">Destination element</param>
+		public override void CopyContents(ILayoutElement Destination)
+		{
+			base.CopyContents(Destination);
+
+			if (Destination is Image Dest)
+				Dest.keepAspectRatio = this.keepAspectRatio?.CopyIfNotPreset(Destination.Document);
+		}
+
+		/// <summary>
+		/// Exports the local attributes of the current element.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public override void ExportStateAttributes(XmlWriter Output)
+		{
+			base.ExportStateAttributes(Output);
+
+			this.keepAspectRatio?.ExportState(Output);
 		}
 
 		/// <summary>

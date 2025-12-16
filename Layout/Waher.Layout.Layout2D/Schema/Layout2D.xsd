@@ -71,7 +71,6 @@
 				<xs:attribute name="maxHeight" type="Length" use="optional"/>
 				<xs:attribute name="minWidth" type="Length" use="optional"/>
 				<xs:attribute name="minHeight" type="Length" use="optional"/>
-				<xs:attribute name="keepAspectRatio" type="Boolean" use="optional"/>
 				<xs:attribute name="overflow" type="Overflow" use="optional"/>
 				<xs:attribute name="onClick" type="Expression" use="optional"/>
 			</xs:extension>
@@ -478,7 +477,9 @@
 
 	<xs:complexType name="Image">
 		<xs:complexContent>
-			<xs:extension base="FigurePoint2"/>
+			<xs:extension base="FigurePoint2">
+				<xs:attribute name="keepAspectRatio" type="Boolean" use="optional"/>
+			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 

@@ -43,5 +43,23 @@
 				<ImageInternal cid="img0002"/>
 			</Margins>
 		</Cell>
+		<Cell halign="Center" valign="Center" border="BlackPen">
+			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
+				<ImageUrl url="https://waher.se/Images/logo-WaherDataAB-500x97.png" alt="Loading"
+									x="0mm" y="0mm" x2="5mm" y2="5mm"/>
+			</Margins>
+		</Cell>
+		<Cell halign="Center" valign="Center" border="BlackPen">
+			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
+				<ImageUrl url="https://waher.se/Images/logo-WaherDataAB-500x97.png" alt="Loading"
+									x="0mm" y="0mm" x2="5mm" y2="5mm" keepAspectRatio="false"/>
+			</Margins>
+		</Cell>
+		<Cell halign="Center" valign="Center" border="BlackPen">
+			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
+				<ImageUrl url="https://waher.se/Images/logo-WaherDataAB-500x97.png" alt="Loading"
+									x="0mm" y="0mm" x2="5mm" y2="5mm" keepAspectRatio="true"/>
+			</Margins>
+		</Cell>
 	</Flexible>
 </Layout2D>

@@ -31,7 +31,6 @@ namespace Waher.Layout.Layout2D.Model
 		private LengthAttribute maxHeight;
 		private LengthAttribute minWidth;
 		private LengthAttribute minHeight;
-		private BooleanAttribute keepAspectRatio;
 		private EnumAttribute<Overflow> overflow;
 		private ExpressionAttribute onClick;
 
@@ -100,15 +99,6 @@ namespace Waher.Layout.Layout2D.Model
 		}
 
 		/// <summary>
-		/// Keep aspect-ratio
-		/// </summary>
-		public BooleanAttribute KeepAspectRatioAttribute
-		{
-			get => this.keepAspectRatio;
-			set => this.keepAspectRatio = value;
-		}
-
-		/// <summary>
 		/// Overflow
 		/// </summary>
 		public EnumAttribute<Overflow> OverflowAttribute
@@ -138,7 +128,6 @@ namespace Waher.Layout.Layout2D.Model
 			this.maxHeight = new LengthAttribute(Input, "maxHeight", this.Document);
 			this.minWidth = new LengthAttribute(Input, "minWidth", this.Document);
 			this.minHeight = new LengthAttribute(Input, "minHeight", this.Document);
-			this.keepAspectRatio = new BooleanAttribute(Input, "keepAspectRatio", this.Document);
 			this.overflow = new EnumAttribute<Overflow>(Input, "overflow", this.Document);
 			this.onClick = new ExpressionAttribute(Input, "onClick", this.Document);
 		
@@ -159,7 +148,6 @@ namespace Waher.Layout.Layout2D.Model
 			this.maxHeight?.Export(Output);
 			this.minWidth?.Export(Output);
 			this.minHeight?.Export(Output);
-			this.keepAspectRatio?.Export(Output);
 			this.overflow?.Export(Output);
 			this.onClick?.Export(Output);
 		}
@@ -180,7 +168,6 @@ namespace Waher.Layout.Layout2D.Model
 				Dest.maxHeight = this.maxHeight?.CopyIfNotPreset(Destination.Document);
 				Dest.minWidth = this.minWidth?.CopyIfNotPreset(Destination.Document);
 				Dest.minHeight = this.minHeight?.CopyIfNotPreset(Destination.Document);
-				Dest.keepAspectRatio = this.keepAspectRatio?.CopyIfNotPreset(Destination.Document);
 				Dest.overflow = this.overflow?.CopyIfNotPreset(Destination.Document);
 				Dest.onClick = this.onClick?.CopyIfNotPreset(Destination.Document);
 			}
@@ -259,7 +246,6 @@ namespace Waher.Layout.Layout2D.Model
 			this.maxHeight?.ExportState(Output);
 			this.minWidth?.ExportState(Output);
 			this.minHeight?.ExportState(Output);
-			this.keepAspectRatio?.ExportState(Output);
 			this.overflow?.ExportState(Output);
 			this.onClick?.ExportState(Output);
 		}

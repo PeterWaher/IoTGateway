@@ -479,6 +479,7 @@
 		<xs:complexContent>
 			<xs:extension base="FigurePoint2">
 				<xs:attribute name="keepAspectRatio" type="Boolean" use="optional"/>
+				<xs:attribute name="clip" type="Boolean" use="optional"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

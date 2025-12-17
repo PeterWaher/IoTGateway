@@ -45,6 +45,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		public override Task FromXml(XmlElement Input)
 		{
 			this.cid = new StringAttribute(Input, "cid", this.Document);
+
 			return base.FromXml(Input);
 		}
 

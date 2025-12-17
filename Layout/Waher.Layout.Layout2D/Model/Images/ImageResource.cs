@@ -44,6 +44,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		public override Task FromXml(XmlElement Input)
 		{
 			this.resource = new StringAttribute(Input, "resource", this.Document);
+
 			return base.FromXml(Input);
 		}
 

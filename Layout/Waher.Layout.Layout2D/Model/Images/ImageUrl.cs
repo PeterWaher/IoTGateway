@@ -60,6 +60,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		{
 			this.url = new StringAttribute(Input, "url", this.Document);
 			this.alt = new StringAttribute(Input, "alt", this.Document);
+
 			return base.FromXml(Input);
 		}
 

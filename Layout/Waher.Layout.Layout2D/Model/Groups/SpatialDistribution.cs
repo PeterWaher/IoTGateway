@@ -106,13 +106,13 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		public override async Task Draw(DrawingState State)
 		{
 			SKCanvas Canvas = State.Canvas;
-			SKMatrix M = Canvas.TotalMatrix;
 
 			foreach (Padding P in this.measured)
 			{
+				Canvas.Save();
 				Canvas.Translate(P.OffsetX, P.OffsetY);
 				await P.Element.Draw(State);
-				Canvas.SetMatrix(M);
+				Canvas.Restore();
 			}
 		}
 

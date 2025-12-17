@@ -129,12 +129,12 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// <param name="State">Current drawing state.</param>
 		public override async Task Draw(DrawingState State)
 		{
-			SKMatrix M = State.Canvas.TotalMatrix;
+			State.Canvas.Save();
 			State.Canvas.Translate(this.dx, this.dy);
 
 			await base.Draw(State);
 
-			State.Canvas.SetMatrix(M);
+			State.Canvas.Restore();
 		}
 
 		/// <summary>

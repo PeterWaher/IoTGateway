@@ -98,6 +98,7 @@ namespace Waher.Layout.Layout2D.Test
 				Directory.CreateDirectory(Path);
 		}
 
+		[TestMethod]
 		[ExpectedException(typeof(InvalidOperationException))]
 		public override Task Test_57_HeightUndefined()
 		{

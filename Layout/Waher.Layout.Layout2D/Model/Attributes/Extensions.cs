@@ -108,7 +108,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		public static Task<string> Evaluate(this StringAttribute Attribute, Variables Session, string DefaultValue)
 		{
 			if (Attribute is null)
-				return Task.FromResult<string>(DefaultValue);
+				return Task.FromResult(DefaultValue);
 			else
 				return Attribute.EvaluateAsync(Session, DefaultValue);
 		}
@@ -123,7 +123,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		public static Task<bool> Evaluate(this BooleanAttribute Attribute, Variables Session, bool DefaultValue)
 		{
 			if (Attribute is null)
-				return Task.FromResult<bool>(DefaultValue);
+				return Task.FromResult(DefaultValue);
 			else
 				return Attribute.EvaluateAsync(Session, DefaultValue);
 		}
@@ -138,7 +138,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		public static Task<SKColor> Evaluate(this ColorAttribute Attribute, Variables Session, SKColor DefaultValue)
 		{
 			if (Attribute is null)
-				return Task.FromResult<SKColor>(DefaultValue);
+				return Task.FromResult(DefaultValue);
 			else
 				return Attribute.EvaluateAsync(Session, DefaultValue);
 		}
@@ -153,7 +153,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		public static Task<Expression> Evaluate(this ExpressionAttribute Attribute, Variables Session, Expression DefaultValue)
 		{
 			if (Attribute is null)
-				return Task.FromResult<Expression>(DefaultValue);
+				return Task.FromResult(DefaultValue);
 			else
 				return Attribute.EvaluateAsync(Session, DefaultValue);
 		}
@@ -168,7 +168,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		public static Task<float> Evaluate(this FloatAttribute Attribute, Variables Session, float DefaultValue)
 		{
 			if (Attribute is null)
-				return Task.FromResult<float>(DefaultValue);
+				return Task.FromResult(DefaultValue);
 			else
 				return Attribute.EvaluateAsync(Session, DefaultValue);
 		}
@@ -183,7 +183,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		public static Task<Length> Evaluate(this LengthAttribute Attribute, Variables Session, Length DefaultValue)
 		{
 			if (Attribute is null)
-				return Task.FromResult<Length>(DefaultValue);
+				return Task.FromResult(DefaultValue);
 			else
 				return Attribute.EvaluateAsync(Session, DefaultValue);
 		}
@@ -198,7 +198,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		public static Task<int> Evaluate(this PositiveIntegerAttribute Attribute, Variables Session, int DefaultValue)
 		{
 			if (Attribute is null)
-				return Task.FromResult<int>(DefaultValue);
+				return Task.FromResult(DefaultValue);
 			else
 				return Attribute.EvaluateAsync(Session, DefaultValue);
 		}
@@ -214,7 +214,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 			where T : struct
 		{
 			if (Attribute is null)
-				return Task.FromResult<T>(DefaultValue);
+				return Task.FromResult(DefaultValue);
 			else
 				return Attribute.EvaluateAsync(Session, DefaultValue);
 		}

@@ -46,19 +46,77 @@
 		<Cell halign="Center" valign="Center" border="BlackPen">
 			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
 				<ImageUrl url="https://waher.se/Images/logo-WaherDataAB-500x97.png" alt="Loading"
-									x="0mm" y="0mm" x2="5mm" y2="5mm"/>
+									x="0px" y="0px" x2="100px" y2="100px"/>
 			</Margins>
 		</Cell>
 		<Cell halign="Center" valign="Center" border="BlackPen">
 			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
 				<ImageUrl url="https://waher.se/Images/logo-WaherDataAB-500x97.png" alt="Loading"
-									x="0mm" y="0mm" x2="5mm" y2="5mm" keepAspectRatio="false"/>
+									x="0px" y="0px" x2="100px" y2="100px" keepAspectRatio="true"/>
 			</Margins>
 		</Cell>
 		<Cell halign="Center" valign="Center" border="BlackPen">
 			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
 				<ImageUrl url="https://waher.se/Images/logo-WaherDataAB-500x97.png" alt="Loading"
-									x="0mm" y="0mm" x2="5mm" y2="5mm" keepAspectRatio="true"/>
+									x="0px" y="0px" x2="100px" y2="100px" keepAspectRatio="true" clip="true"/>
+			</Margins>
+		</Cell>
+		<Cell halign="Center" valign="Center" border="BlackPen">
+			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
+				<ImageUrl url="https://waher.se/Images/logo-WaherDataAB-500x97.png" alt="Loading"
+									width="100px" height="100px" keepAspectRatio="true"/>
+			</Margins>
+		</Cell>
+		<Cell halign="Center" valign="Center" border="BlackPen">
+			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
+				<ImageUrl url="https://waher.se/Images/logo-WaherDataAB-500x97.png" alt="Loading"
+									width="100px" height="100px" keepAspectRatio="true" clip="true"/>
+			</Margins>
+		</Cell>
+		<Cell halign="Center" valign="Center" border="BlackPen">
+			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
+				<ImageInternal cid="img0001" keepAspectRatio="true"/>
+			</Margins>
+		</Cell>
+		<Cell halign="Center" valign="Center" border="BlackPen">
+			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
+				<ImageInternal cid="img0001" keepAspectRatio="true" clip="true"/>
+			</Margins>
+		</Cell>
+		<Cell halign="Center" valign="Center" border="BlackPen">
+			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
+				<ImageUrl url="https://waher.se/Images/logo-WaherDataAB-500x97.png" alt="Loading"
+									x="100px" y="0px" x2="0px" y2="100px" keepAspectRatio="true"/>
+			</Margins>
+		</Cell>
+		<Cell halign="Center" valign="Center" border="BlackPen">
+			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
+				<ImageUrl url="https://waher.se/Images/logo-WaherDataAB-500x97.png" alt="Loading"
+									x="0px" y="100px" x2="100px" y2="0px" keepAspectRatio="true"/>
+			</Margins>
+		</Cell>
+		<Cell halign="Center" valign="Center" border="BlackPen">
+			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
+				<ImageUrl url="https://waher.se/Images/logo-WaherDataAB-500x97.png" alt="Loading"
+									x="100px" y="100px" x2="0px" y2="0px" keepAspectRatio="true"/>
+			</Margins>
+		</Cell>
+		<Cell halign="Center" valign="Center" border="BlackPen">
+			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
+				<ImageUrl url="https://waher.se/Images/logo-WaherDataAB-500x97.png" alt="Loading"
+									x="100px" y="0px" x2="0px" y2="100px" keepAspectRatio="true" clip="true"/>
+			</Margins>
+		</Cell>
+		<Cell halign="Center" valign="Center" border="BlackPen">
+			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
+				<ImageUrl url="https://waher.se/Images/logo-WaherDataAB-500x97.png" alt="Loading"
+									x="0px" y="100px" x2="100px" y2="0px" keepAspectRatio="true" clip="true"/>
+			</Margins>
+		</Cell>
+		<Cell halign="Center" valign="Center" border="BlackPen">
+			<Margins top="5mm" bottom="5mm" left="5mm" right="5mm">
+				<ImageUrl url="https://waher.se/Images/logo-WaherDataAB-500x97.png" alt="Loading"
+									x="100px" y="100px" x2="0px" y2="0px" keepAspectRatio="true" clip="true"/>
 			</Margins>
 		</Cell>
 	</Flexible>

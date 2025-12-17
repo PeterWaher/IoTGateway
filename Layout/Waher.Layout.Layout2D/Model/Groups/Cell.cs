@@ -356,12 +356,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				await base.Draw(State);
 			else
 			{
-				SKMatrix M = State.Canvas.TotalMatrix;
+				State.Canvas.Save();
 				State.Canvas.Translate(this.dx, this.dy);
 
 				await base.Draw(State);
 
-				State.Canvas.SetMatrix(M);
+				State.Canvas.Restore();
 			}
 		}
 

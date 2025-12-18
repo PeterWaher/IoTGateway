@@ -7102,7 +7102,8 @@ namespace Waher.Networking.XMPP
 								this.pendingRequestsBySeqNr.Remove(Request.SeqNr);
 								continue;   // Already processed
 							}
-							else if (Retry = Request.CanRetry())
+							
+							if (Retry = Request.CanRetry())
 							{
 								TP = Request.Timeout;
 
@@ -7113,41 +7114,13 @@ namespace Waher.Networking.XMPP
 
 								this.pendingRequestsByTimeout[Request.Timeout] = Request;
 							}
-                            else
-                            {
-                                this.pendingRequestsBySeqNr.Remove(Request.SeqNr);
-                                StringBuilder Xml = new StringBuilder();
-
-                                Xml.Append("<iq xmlns='" + NamespaceClient + "' type='error' from='");
-                                Xml.Append(Request.To);
-                                Xml.Append("' id='");
-                                Xml.Append(Request.SeqNr.ToString());
-                                Xml.Append("'><error type='wait'><recipient-unavailable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
-                                Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Timeout.</text></error></iq>");
-
-                                XmlDocument Doc = new XmlDocument()
-                                {
-                                    PreserveWhitespace = true
-                                };
-                                Doc.LoadXml(Xml.ToString());
-                                if (!(Request.IqCallback is null))
-                                {
-                                    IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
-                                    Request.State);
-                                    Request.IqCallback.Raise(this, e);
-                                }
-                                if (!(Request.PresenceCallback is null))
-                                {
-                                    Request.PresenceCallback.Raise(this, new PresenceEventArgs(this, Doc.DocumentElement));
-                                }
-                            }
 						}
 
 						try
 						{
 							if (Retry)
 								await this.BeginWrite(Request.Xml, null, null);
-							else if (!(Request.IqCallback is null))
+							else
 							{
 								StringBuilder Xml = new StringBuilder();
 
@@ -7163,11 +7136,20 @@ namespace Waher.Networking.XMPP
 									PreserveWhitespace = true
 								};
 								Doc.LoadXml(Xml.ToString());
+								
+								if (!(Request.IqCallback is null))
+								{
+									IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
+										Request.State);
 
-								IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
-									Request.State);
+									await Request.IqCallback.Raise(this, e);
+								}
 
-								await Request.IqCallback.Raise(this, e);
+								if (!(Request.PresenceCallback is null))
+								{
+									PresenceEventArgs e = new PresenceEventArgs(this, Doc.DocumentElement);
+									await Request.PresenceCallback.Raise(this, e);
+								}
 							}
 						}
 						catch (Exception ex)

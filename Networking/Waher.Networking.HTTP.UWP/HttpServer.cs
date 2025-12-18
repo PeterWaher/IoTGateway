@@ -832,7 +832,13 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public event EventHandlerAsync ETagSaltChanged = null;
 
-		private int[] GetPorts(bool Http, bool Https)
+		/// <summary>
+		/// Gets open ports
+		/// </summary>
+		/// <param name="Http">If HTTP ports should be included.</param>
+		/// <param name="Https">If HTTPs ports should be included.</param>
+		/// <returns>Open ports.</returns>
+		public int[] GetPorts(bool Http, bool Https)
 		{
 			SortedDictionary<int, bool> Open = new SortedDictionary<int, bool>();
 

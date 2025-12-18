@@ -737,7 +737,7 @@ let NativeHeader;
 let NativeFavicon;
 let NativeBackdrop;
 
-window.addEventListener("load", () =>
+window.addEventListener("DOMContentLoaded", () =>
 {
     NativeHeader = NativeHeaderHandler();
     Popup = PopupHandler();

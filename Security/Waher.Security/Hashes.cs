@@ -263,6 +263,129 @@ namespace Waher.Security
 			}
 		}
 
+		/// <summary>
+		/// Computes a hash of a block of binary data.
+		/// </summary>
+		/// <param name="Function">Hash function.</param>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeHMACHashString(HashFunction Function, byte[] Key, byte[] Data)
+		{
+			switch (Function)
+			{
+				case HashFunction.MD5:
+					return ComputeHMACMD5HashString(Key, Data);
+
+				case HashFunction.SHA1:
+					return ComputeHMACSHA1HashString(Key, Data);
+
+				case HashFunction.SHA256:
+					return ComputeHMACSHA256HashString(Key, Data);
+
+				case HashFunction.SHA384:
+					return ComputeHMACSHA384HashString(Key, Data);
+
+				case HashFunction.SHA512:
+					return ComputeHMACSHA512HashString(Key, Data);
+
+				default:
+					throw new ArgumentException("Unrecognized hash function", nameof(Function));
+			}
+		}
+
+		/// <summary>
+		/// Computes a hash of a block of binary data.
+		/// </summary>
+		/// <param name="Function">Hash function.</param>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeHMACHashString(HashFunction Function, byte[] Key, Stream Data)
+		{
+			switch (Function)
+			{
+				case HashFunction.MD5:
+					return BinaryToString(ComputeHMACMD5Hash(Key, Data));
+
+				case HashFunction.SHA1:
+					return BinaryToString(ComputeHMACSHA1Hash(Key, Data));
+
+				case HashFunction.SHA256:
+					return BinaryToString(ComputeHMACSHA256Hash(Key, Data));
+
+				case HashFunction.SHA384:
+					return BinaryToString(ComputeHMACSHA384Hash(Key, Data));
+
+				case HashFunction.SHA512:
+					return BinaryToString(ComputeHMACSHA512Hash(Key, Data));
+
+				default:
+					throw new ArgumentException("Unrecognized hash function", nameof(Function));
+			}
+		}
+
+		/// <summary>
+		/// Computes a hash of a block of binary data.
+		/// </summary>
+		/// <param name="Function">Hash function.</param>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeHMACHash(HashFunction Function, byte[] Key, byte[] Data)
+		{
+			switch (Function)
+			{
+				case HashFunction.MD5:
+					return ComputeHMACMD5Hash(Key, Data);
+
+				case HashFunction.SHA1:
+					return ComputeHMACSHA1Hash(Key, Data);
+
+				case HashFunction.SHA256:
+					return ComputeHMACSHA256Hash(Key, Data);
+
+				case HashFunction.SHA384:
+					return ComputeHMACSHA384Hash(Key, Data);
+
+				case HashFunction.SHA512:
+					return ComputeHMACSHA512Hash(Key, Data);
+
+				default:
+					throw new ArgumentException("Unrecognized hash function", nameof(Function));
+			}
+		}
+
+		/// <summary>
+		/// Computes a hash of a block of binary data.
+		/// </summary>
+		/// <param name="Function">Hash function.</param>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeHMACHash(HashFunction Function, byte[] Key, Stream Data)
+		{
+			switch (Function)
+			{
+				case HashFunction.MD5:
+					return ComputeHMACMD5Hash(Key, Data);
+
+				case HashFunction.SHA1:
+					return ComputeHMACSHA1Hash(Key, Data);
+
+				case HashFunction.SHA256:
+					return ComputeHMACSHA256Hash(Key, Data);
+
+				case HashFunction.SHA384:
+					return ComputeHMACSHA384Hash(Key, Data);
+
+				case HashFunction.SHA512:
+					return ComputeHMACSHA512Hash(Key, Data);
+
+				default:
+					throw new ArgumentException("Unrecognized hash function", nameof(Function));
+			}
+		}
 
 		/// <summary>
 		/// Computes the SHA-1 hash of a block of binary data.
@@ -554,6 +677,35 @@ namespace Waher.Security
 		public static byte[] ComputeHMACSHA1Hash(byte[] Key, byte[] Data)
 		{
 			byte[] Result;
+			
+			using (HMACSHA1 HMACSHA1 = new HMACSHA1(Key))
+			{
+				Result = HMACSHA1.ComputeHash(Data);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-1 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeHMACSHA1HashString(byte[] Key, Stream Data)
+		{
+			return BinaryToString(ComputeHMACSHA1Hash(Key, Data));
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-1 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeHMACSHA1Hash(byte[] Key, Stream Data)
+		{
+			byte[] Result;
 
 			using (HMACSHA1 HMACSHA1 = new HMACSHA1(Key))
 			{
@@ -581,6 +733,35 @@ namespace Waher.Security
 		/// <param name="Data">Binary data.</param>
 		/// <returns>Hash value.</returns>
 		public static byte[] ComputeHMACSHA256Hash(byte[] Key, byte[] Data)
+		{
+			byte[] Result;
+
+			using (HMACSHA256 HMACSHA256 = new HMACSHA256(Key))
+			{
+				Result = HMACSHA256.ComputeHash(Data);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-256 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeHMACSHA256HashString(byte[] Key, Stream Data)
+		{
+			return BinaryToString(ComputeHMACSHA256Hash(Key, Data));
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-256 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeHMACSHA256Hash(byte[] Key, Stream Data)
 		{
 			byte[] Result;
 
@@ -622,6 +803,35 @@ namespace Waher.Security
 		}
 
 		/// <summary>
+		/// Computes the HMAC-SHA-384 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeHMACSHA384HashString(byte[] Key, Stream Data)
+		{
+			return BinaryToString(ComputeHMACSHA384Hash(Key, Data));
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-384 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeHMACSHA384Hash(byte[] Key, Stream Data)
+		{
+			byte[] Result;
+
+			using (HMACSHA384 HMACSHA384 = new HMACSHA384(Key))
+			{
+				Result = HMACSHA384.ComputeHash(Data);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
 		/// Computes the HMAC-SHA-512 hash of a block of binary data.
 		/// </summary>
 		/// <param name="Key">Binary key.</param>
@@ -650,6 +860,92 @@ namespace Waher.Security
 			return Result;
 		}
 
+		/// <summary>
+		/// Computes the HMAC-SHA-512 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeHMACSHA512HashString(byte[] Key, Stream Data)
+		{
+			return BinaryToString(ComputeHMACSHA512Hash(Key, Data));
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-512 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeHMACSHA512Hash(byte[] Key, Stream Data)
+		{
+			byte[] Result;
+
+			using (HMACSHA512 HMACSHA512 = new HMACSHA512(Key))
+			{
+				Result = HMACSHA512.ComputeHash(Data);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-1 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeHMACMD5HashString(byte[] Key, byte[] Data)
+		{
+			return BinaryToString(ComputeHMACMD5Hash(Key, Data));
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-1 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeHMACMD5Hash(byte[] Key, byte[] Data)
+		{
+			byte[] Result;
+
+			using (HMACMD5 HMACMD5 = new HMACMD5(Key))
+			{
+				Result = HMACMD5.ComputeHash(Data);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-1 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeHMACMD5HashString(byte[] Key, Stream Data)
+		{
+			return BinaryToString(ComputeHMACMD5Hash(Key, Data));
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-1 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeHMACMD5Hash(byte[] Key, Stream Data)
+		{
+			byte[] Result;
+
+			using (HMACMD5 HMACMD5 = new HMACMD5(Key))
+			{
+				Result = HMACMD5.ComputeHash(Data);
+			}
+
+			return Result;
+		}
 
 	}
 }

@@ -946,6 +946,11 @@
 						<xs:documentation>If existance of the signatory and property value is required or not for the contract to be complete.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
+				<xs:attribute name='contentType' type='xs:string' use='optional'>
+					<xs:annotation>
+						<xs:documentation>If the property refers to an attachment, the expected Internet Content-Type (wildcards allowed) of the attachment.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

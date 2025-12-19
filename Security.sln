@@ -55,6 +55,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script", "Script\Wahe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Profiling", "Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj", "{DBD223D8-FC18-C63A-5940-B8C586D0B6F2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.TOTP", "Security\Waher.Security.TOTP\Waher.Security.TOTP.csproj", "{BAF8A73B-7688-453D-8FC2-82E249B6FF94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.TOTP.Test", "Security\Waher.Security.TOTP.Test\Waher.Security.TOTP.Test.csproj", "{BAB4EFB1-DF25-40C7-A229-C3F68AA2C99E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,6 +169,14 @@ Global
 		{DBD223D8-FC18-C63A-5940-B8C586D0B6F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBD223D8-FC18-C63A-5940-B8C586D0B6F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBD223D8-FC18-C63A-5940-B8C586D0B6F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAF8A73B-7688-453D-8FC2-82E249B6FF94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAF8A73B-7688-453D-8FC2-82E249B6FF94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAF8A73B-7688-453D-8FC2-82E249B6FF94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAF8A73B-7688-453D-8FC2-82E249B6FF94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAB4EFB1-DF25-40C7-A229-C3F68AA2C99E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAB4EFB1-DF25-40C7-A229-C3F68AA2C99E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAB4EFB1-DF25-40C7-A229-C3F68AA2C99E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAB4EFB1-DF25-40C7-A229-C3F68AA2C99E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

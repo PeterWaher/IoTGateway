@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\Waher.Security.TOTP\Waher.Security.TOTP.csproj" />
     <ProjectReference Include="..\Waher.Security\Waher.Security.csproj" />
   </ItemGroup>

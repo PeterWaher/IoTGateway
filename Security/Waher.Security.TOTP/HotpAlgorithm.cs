@@ -94,7 +94,7 @@ namespace Waher.Security.TOTP
 			}
 
 			byte[] HMAC = Hashes.ComputeHMACHash(this.hashFunction, this.secret, Data);
-			int Offset = HMAC[HMAC.Length - 1] & 0x0F;
+			int Offset = HMAC[HMAC.Length - 1] & 0x0f;
 			int Nr = 0;
 
 			for (i = 0; i < 4; i++)

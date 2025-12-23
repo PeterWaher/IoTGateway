@@ -5,6 +5,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using System.Threading;
 
 namespace Waher.Script.System.Functions
 {
@@ -61,7 +62,7 @@ namespace Waher.Script.System.Functions
 		/// <param name="Arguments">Function arguments.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
-		public override Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
+		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
 			if (!(Arguments[0].AssociatedObjectValue is string FileName) ||
 				!(Arguments[1].AssociatedObjectValue is string Arg) ||
@@ -114,12 +115,15 @@ namespace Waher.Script.System.Functions
 
 			Task _ = Task.Delay(1000 * 60 * 5).ContinueWith(Prev => ResultSource.TrySetException(new TimeoutException("Process did not exit within the provided time.")));
 
-			P.StartInfo = ProcessInformation;
-			P.EnableRaisingEvents = true;
-			P.Start();
+			using (CancellationTokenRegistration Registration = Variables.CancellationToken.Register(
+				() => ResultSource.TrySetException(new OperationCanceledException("Evaluation cancelled."))))
+			{
+				P.StartInfo = ProcessInformation;
+				P.EnableRaisingEvents = true;
+				P.Start();
 
-			return ResultSource.Task;
+				return await ResultSource.Task;
+			}
 		}
-
 	}
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Script.Abstraction.Elements;
@@ -26,6 +27,8 @@ namespace Waher.Script
 		/// Internal set of variables.
 		/// </summary>
 		protected Dictionary<string, Variable> variables = new Dictionary<string, Variable>();
+
+		private CancellationTokenSource cancellation = new CancellationTokenSource();
 		private Stack<Dictionary<string, Variable>> stack = null;
 		private TextWriter consoleOut = null;
 		private IContextVariables contextVariables = null;
@@ -342,7 +345,11 @@ namespace Waher.Script
 		/// </summary>
 		public void Abort()
 		{
-			this.active = false;
+			if (this.active)
+			{
+				this.active = false;
+				this.cancellation.Cancel();
+			}
 		}
 
 		/// <summary>
@@ -350,7 +357,11 @@ namespace Waher.Script
 		/// </summary>
 		public void CancelAbort()
 		{
-			this.active = true;
+			if (!this.active)
+			{
+				this.active = true;
+				this.cancellation = new CancellationTokenSource();
+			}
 		}
 
 		/// <summary>
@@ -423,5 +434,10 @@ namespace Waher.Script
 		/// Event raised when a status message has been reported.
 		/// </summary>
 		public event EventHandlerAsync<StatusEventArgs> OnStatus = null;
+
+		/// <summary>
+		/// Cancellation token, that can be used to monitor for script abortion.
+		/// </summary>
+		public CancellationToken CancellationToken => this.cancellation.Token;
 	}
 }

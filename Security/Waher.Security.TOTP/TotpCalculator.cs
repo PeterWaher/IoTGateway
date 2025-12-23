@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Waher.Security.TOTP
 {
@@ -8,6 +9,11 @@ namespace Waher.Security.TOTP
 	/// </summary>
 	public class TotpCalculator
 	{
+		/// <summary>
+		/// Default time-step, in seconds (30).
+		/// </summary>
+		public const int DefaultTimeStepSeconds = 30;
+
 		private readonly HotpCalculator hotp;
 		private readonly int timeStepSeconds;
 
@@ -17,7 +23,7 @@ namespace Waher.Security.TOTP
 		/// </summary>
 		/// <param name="Secret">Shared secret.</param>
 		public TotpCalculator(byte[] Secret)
-			: this(6, Secret, HashFunction.SHA1)
+			: this(HotpCalculator.DefaultNrDigits, Secret, HotpCalculator.DefaultHashFunction)
 		{
 		}
 
@@ -28,7 +34,7 @@ namespace Waher.Security.TOTP
 		/// <param name="NrDigits">Number of digits to present.</param>
 		/// <param name="Secret">Shared secret.</param>
 		public TotpCalculator(int NrDigits, byte[] Secret)
-			: this(NrDigits, Secret, HashFunction.SHA1)
+			: this(NrDigits, Secret, HotpCalculator.DefaultHashFunction)
 		{
 		}
 
@@ -40,7 +46,7 @@ namespace Waher.Security.TOTP
 		/// <param name="Secret">Shared secret.</param>
 		/// <param name="HashFunction">Hash function to use in computation.</param>
 		public TotpCalculator(int NrDigits, byte[] Secret, HashFunction HashFunction)
-			: this(NrDigits, Secret, HashFunction, 30)
+			: this(NrDigits, Secret, HashFunction, DefaultTimeStepSeconds)
 		{
 		}
 
@@ -63,6 +69,56 @@ namespace Waher.Security.TOTP
 
 			this.timeStepSeconds = TimeStepSeconds;
 			this.hotp = new HotpCalculator(NrDigits, Secret, HashFunction);
+		}
+
+		/// <summary>
+		/// Tries to create a TOTP calculator for the given endpoint.
+		/// </summary>
+		/// <param name="Endpoint">Endpoint</param>
+		public static Task<TotpCalculator> TryCreate(string Endpoint)
+		{
+			return TryCreate(HotpCalculator.DefaultNrDigits, Endpoint, 
+				HotpCalculator.DefaultHashFunction, DefaultTimeStepSeconds);
+		}
+
+		/// <summary>
+		/// Tries to create a TOTP calculator for the given endpoint.
+		/// </summary>
+		/// <param name="NrDigits">Number of digits to present.</param>
+		/// <param name="Endpoint">Endpoint</param>
+		public static Task<TotpCalculator> TryCreate(int NrDigits, string Endpoint)
+		{
+			return TryCreate(NrDigits, Endpoint, HotpCalculator.DefaultHashFunction, 
+				DefaultTimeStepSeconds);
+		}
+
+		/// <summary>
+		/// Tries to create a TOTP calculator for the given endpoint.
+		/// </summary>
+		/// <param name="NrDigits">Number of digits to present.</param>
+		/// <param name="Endpoint">Endpoint</param>
+		/// <param name="HashFunction">Hash function to use in computation.</param>
+		public static Task<TotpCalculator> TryCreate(int NrDigits, string Endpoint,
+			HashFunction HashFunction)
+		{
+			return TryCreate(NrDigits, Endpoint, HashFunction, DefaultTimeStepSeconds);
+		}
+
+		/// <summary>
+		/// Tries to create a TOTP calculator for the given endpoint.
+		/// </summary>
+		/// <param name="NrDigits">Number of digits to present.</param>
+		/// <param name="Endpoint">Endpoint</param>
+		/// <param name="HashFunction">Hash function to use in computation.</param>
+		/// <param name="TimeStepSeconds">Time step in seconds.</param>
+		public static async Task<TotpCalculator> TryCreate(int NrDigits, string Endpoint,
+			HashFunction HashFunction, int TimeStepSeconds)
+		{
+			byte[] Secret = await OtpSecret.GetSecret(Endpoint);
+			if (Secret is null)
+				return null;
+
+			return new TotpCalculator(NrDigits, Secret, HashFunction, TimeStepSeconds);
 		}
 
 		/// <summary>
@@ -96,7 +152,7 @@ namespace Waher.Security.TOTP
 		/// <returns>One-time password.</returns>
 		public int Compute(DateTime Timestamp)
 		{
-			long Counter = (long)(Timestamp.ToUniversalTime().Subtract(UnixEpoch).TotalSeconds / this.timeStepSeconds);	
+			long Counter = (long)(Timestamp.ToUniversalTime().Subtract(UnixEpoch).TotalSeconds / this.timeStepSeconds);
 			return this.hotp.Compute(Counter);
 		}
 
@@ -113,7 +169,7 @@ namespace Waher.Security.TOTP
 		/// <returns>One-time password.</returns>
 		public static int Compute(byte[] Secret, DateTime Timestamp)
 		{
-			return Compute(6, Secret, Timestamp);
+			return Compute(HotpCalculator.DefaultNrDigits, Secret, Timestamp);
 		}
 
 		/// <summary>
@@ -125,7 +181,7 @@ namespace Waher.Security.TOTP
 		/// <returns>One-time password.</returns>
 		public static int Compute(int NrDigits, byte[] Secret, DateTime Timestamp)
 		{
-			return Compute(NrDigits, Secret, HashFunction.SHA1, Timestamp);
+			return Compute(NrDigits, Secret, HotpCalculator.DefaultHashFunction, Timestamp);
 		}
 
 		/// <summary>
@@ -136,9 +192,10 @@ namespace Waher.Security.TOTP
 		/// <param name="HashFunction">Hash function to use in computation.</param>
 		/// <param name="Timestamp">Compute code for this point in time.</param>
 		/// <returns>One-time password.</returns>
-		public static int Compute(int NrDigits, byte[] Secret, HashFunction HashFunction, DateTime Timestamp)
+		public static int Compute(int NrDigits, byte[] Secret, HashFunction HashFunction,
+			DateTime Timestamp)
 		{
-			return Compute(NrDigits, Secret, HashFunction.SHA1, 30, Timestamp);
+			return Compute(NrDigits, Secret, HashFunction, DefaultTimeStepSeconds, Timestamp);
 		}
 
 		/// <summary>
@@ -150,7 +207,7 @@ namespace Waher.Security.TOTP
 		/// <param name="TimeStepSeconds">Time step in seconds.</param>
 		/// <param name="Timestamp">Compute code for this point in time.</param>
 		/// <returns>One-time password.</returns>
-		public static int Compute(int NrDigits, byte[] Secret, HashFunction HashFunction, 
+		public static int Compute(int NrDigits, byte[] Secret, HashFunction HashFunction,
 			int TimeStepSeconds, DateTime Timestamp)
 		{
 			if (TimeStepSeconds <= 0)

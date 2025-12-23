@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Waher.Security.TOTP
 {
@@ -8,6 +9,16 @@ namespace Waher.Security.TOTP
 	/// </summary>
 	public class HotpCalculator
 	{
+		/// <summary>
+		/// Default number of digits (6).
+		/// </summary>
+		public const int DefaultNrDigits = 6;
+
+		/// <summary>
+		/// Default Hash Function (SHA-1)
+		/// </summary>
+		public const HashFunction DefaultHashFunction = HashFunction.SHA1;
+
 		private readonly int nrDigits;
 		private readonly byte[] secret;
 		private readonly HashFunction hashFunction;
@@ -18,7 +29,7 @@ namespace Waher.Security.TOTP
 		/// </summary>
 		/// <param name="Secret">Shared secret.</param>
 		public HotpCalculator(byte[] Secret)
-			: this(6, Secret, HashFunction.SHA1)
+			: this(DefaultNrDigits, Secret, DefaultHashFunction)
 		{
 		}
 
@@ -29,7 +40,7 @@ namespace Waher.Security.TOTP
 		/// <param name="NrDigits">Number of digits to present.</param>
 		/// <param name="Secret">Shared secret.</param>
 		public HotpCalculator(int NrDigits, byte[] Secret)
-			: this(NrDigits, Secret, HashFunction.SHA1)
+			: this(NrDigits, Secret, DefaultHashFunction)
 		{
 		}
 
@@ -76,6 +87,44 @@ namespace Waher.Security.TOTP
 		public HashFunction HashFunction => this.hashFunction;
 
 		/// <summary>
+		/// Tries to create an HOTP calculator for the given endpoint.
+		/// </summary>
+		/// <param name="Endpoint">Endpoint</param>
+		/// <returns>HOTP Calculator, if endpoint was found, null otherwise.</returns>
+		public static Task<HotpCalculator> TryCreate(string Endpoint)
+		{
+			return TryCreate(DefaultNrDigits, Endpoint, DefaultHashFunction);
+		}
+
+		/// <summary>
+		/// Tries to create an HOTP calculator for the given endpoint.
+		/// </summary>
+		/// <param name="NrDigits">Number of digits to present.</param>
+		/// <param name="Endpoint">Endpoint</param>
+		/// <returns>HOTP Calculator, if endpoint was found, null otherwise.</returns>
+		public static Task<HotpCalculator> TryCreate(int NrDigits, string Endpoint)
+		{
+			return TryCreate(NrDigits, Endpoint, DefaultHashFunction);
+		}
+
+		/// <summary>
+		/// Tries to create an HOTP calculator for the given endpoint.
+		/// </summary>
+		/// <param name="NrDigits">Number of digits to present.</param>
+		/// <param name="Endpoint">Endpoint</param>
+		/// <param name="HashFunction">Hash function to use in computation.</param>
+		/// <returns>HOTP Calculator, if endpoint was found, null otherwise.</returns>
+		public static async Task<HotpCalculator> TryCreate(int NrDigits, string Endpoint,
+			HashFunction HashFunction)
+		{
+			byte[] Secret = await OtpSecret.GetSecret(Endpoint);
+			if (Secret is null)
+				return null;
+
+			return new HotpCalculator(NrDigits, Secret, HashFunction);
+		}
+
+		/// <summary>
 		/// Calculates the expected one-time-password for the given counter value.
 		/// </summary>
 		/// <param name="Counter">Counter value.</param>
@@ -93,7 +142,7 @@ namespace Waher.Security.TOTP
 		/// <returns>One-time password.</returns>
 		public static int Compute(byte[] Secret, long Counter)
 		{
-			return Compute(6, Secret, Counter);
+			return Compute(DefaultNrDigits, Secret, Counter);
 		}
 
 		/// <summary>
@@ -105,7 +154,7 @@ namespace Waher.Security.TOTP
 		/// <returns>One-time password.</returns>
 		public static int Compute(int NrDigits, byte[] Secret, long Counter)
 		{
-			return Compute(NrDigits, Secret, HashFunction.SHA1, Counter);
+			return Compute(NrDigits, Secret, DefaultHashFunction, Counter);
 		}
 
 		/// <summary>
@@ -116,7 +165,8 @@ namespace Waher.Security.TOTP
 		/// <param name="HashFunction">Hash function to use in computation.</param>
 		/// <param name="Counter">Counter value.</param>
 		/// <returns>One-time password.</returns>
-		public static int Compute(int NrDigits, byte[] Secret, HashFunction HashFunction, long Counter)
+		public static int Compute(int NrDigits, byte[] Secret, HashFunction HashFunction,
+			long Counter)
 		{
 			if (NrDigits < 6)
 			{

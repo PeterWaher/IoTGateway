@@ -3534,209 +3534,228 @@ namespace Waher.Persistence.Files
 
 						RepairThread?.Start();
 
-						using (ObjectBTreeFile TempFile = await ObjectBTreeFile.Create(TempBtreeFileName, File.CollectionName, TempBlobFileName,
-							File.BlockSize, File.BlobBlockSize, this, File.Encoding, File.TimeoutMilliseconds, File.Encrypted))
+						try
 						{
-							int c = 0;
-
-							RepairThread?.NewState("Scan Blocks");
-
-							ObjectIds = new Dictionary<Guid, bool>();
-
-							await this.StartBulk();
-							try
+							using (ObjectBTreeFile TempFile = await ObjectBTreeFile.Create(TempBtreeFileName, File.CollectionName, TempBlobFileName,
+								File.BlockSize, File.BlobBlockSize, this, File.Encoding, File.TimeoutMilliseconds, File.Encrypted))
 							{
-								for (uint BlockIndex = 0; BlockIndex < FileStat.NrBlocks; BlockIndex++)
+								int c = 0;
+
+								RepairThread?.NewState("Scan Blocks");
+
+								ObjectIds = new Dictionary<Guid, bool>();
+
+								await this.StartBulk();
+								try
 								{
-									byte[] Block = await File.LoadBlockLocked(BlockIndex, false);
-									BinaryDeserializer Reader = new BinaryDeserializer(File.CollectionName, this.encoding, Block, File.BlockLimit);
-									BinaryDeserializer Reader2;
-									BlockHeader Header = new BlockHeader(Reader);
-									int Pos = 14;
-
-									while (Reader.BytesLeft >= 4)
+									for (uint BlockIndex = 0; BlockIndex < FileStat.NrBlocks; BlockIndex++)
 									{
-										Reader.SkipBlockLink();
-										object ObjectId = File.RecordHandler.GetKey(Reader);
-										if (ObjectId is null)
-											break;
+										byte[] Block = await File.LoadBlockLocked(BlockIndex, false);
+										BinaryDeserializer Reader = new BinaryDeserializer(File.CollectionName, this.encoding, Block, File.BlockLimit);
+										BinaryDeserializer Reader2;
+										BlockHeader Header = new BlockHeader(Reader);
+										int Pos = 14;
 
-										uint Len = await File.RecordHandler.GetFullPayloadSize(Reader);
-
-										if (Len > 0)
+										while (Reader.BytesLeft >= 4)
 										{
-											int Pos2 = 0;
+											Reader.SkipBlockLink();
+											object ObjectId = File.RecordHandler.GetKey(Reader);
+											if (ObjectId is null)
+												break;
 
-											if (Reader.Position - Pos - 4 + Len > File.InlineObjectSizeLimit)
+											uint Len = await File.RecordHandler.GetFullPayloadSize(Reader);
+
+											if (Len > 0)
 											{
-												Reader2 = null;
+												int Pos2 = 0;
 
-												try
+												if (Reader.Position - Pos - 4 + Len > File.InlineObjectSizeLimit)
 												{
-													Reader2 = await File.LoadBlobLocked(Block, Pos + 4, null, null);
-													Reader2.Position = 0;
-													Pos2 = Reader2.Data.Length;
-												}
-												catch (Exception ex)
-												{
-													RepairThread?.Exception(ex);
 													Reader2 = null;
-												}
 
-												Len = 4;
-												Reader.Position += (int)Len;
-											}
-											else
-											{
-												if (Len > Reader.BytesLeft)
-													break;
+													try
+													{
+														Reader2 = await File.LoadBlobLocked(Block, Pos + 4, null, null);
+														Reader2.Position = 0;
+														Pos2 = Reader2.Data.Length;
+													}
+													catch (Exception ex)
+													{
+														RepairThread?.Exception(ex);
+														Reader2 = null;
+													}
+
+													Len = 4;
+													Reader.Position += (int)Len;
+												}
 												else
 												{
-													Reader.Position += (int)Len;
-													Pos2 = Reader.Position;
-
-													Reader2 = Reader;
-													Reader2.Position = Pos + 4;
-												}
-											}
-
-											if (!(Reader2 is null))
-											{
-												object Obj;
-												int Len2;
-
-												try
-												{
-													Obj = await File.GenericSerializer.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false, true);
-													Len2 = Pos2 - Reader2.Position;
-												}
-												catch (Exception)
-												{
-													Len2 = 0;
-													Obj = null;
-												}
-
-												if (Len2 != 0)
-													break;
-
-												if (ObjectId is Guid Guid && !(Obj is null))
-												{
-													if (ObjectIds.ContainsKey(Guid))
-														FileStat.LogError("Object with Object ID " + Guid.ToString() + " occurred multiple times.");
+													if (Len > Reader.BytesLeft)
+														break;
 													else
 													{
-														try
-														{
-															await TempFile.SaveNewObject(Obj, true, null);
-															ObjectIds[Guid] = true;
-														}
-														catch (Exception ex)
-														{
-															RepairThread?.Exception(ex);
+														Reader.Position += (int)Len;
+														Pos2 = Reader.Position;
 
-															if (Exceptions is null)
-																Exceptions = new ChunkedList<Exception>();
+														Reader2 = Reader;
+														Reader2.Position = Pos + 4;
+													}
+												}
 
-															Exceptions.Add(ex);
-															continue;
-														}
+												if (!(Reader2 is null))
+												{
+													object Obj;
+													int Len2;
 
-														c++;
-														if (c >= 1000)
+													try
+													{
+														Obj = await File.GenericSerializer.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false, true);
+														Len2 = Pos2 - Reader2.Position;
+													}
+													catch (Exception)
+													{
+														Len2 = 0;
+														Obj = null;
+													}
+
+													if (Len2 != 0)
+														break;
+
+													if (ObjectId is Guid Guid && !(Obj is null))
+													{
+														if (ObjectIds.ContainsKey(Guid))
+															FileStat.LogError("Object with Object ID " + Guid.ToString() + " occurred multiple times.");
+														else
 														{
-															await this.EndBulk();
-															await this.StartBulk();
-															c = 0;
+															try
+															{
+																await TempFile.SaveNewObject(Obj, true, null);
+																ObjectIds[Guid] = true;
+															}
+															catch (Exception ex)
+															{
+																RepairThread?.Exception(ex);
+
+																if (Exceptions is null)
+																	Exceptions = new ChunkedList<Exception>();
+
+																Exceptions.Add(ex);
+																continue;
+															}
+
+															c++;
+															if (c >= 1000)
+															{
+																await this.EndBulk();
+																await this.StartBulk();
+																c = 0;
+															}
 														}
 													}
 												}
 											}
+
+											Pos = Reader.Position;
 										}
-
-										Pos = Reader.Position;
 									}
-								}
 
-								await this.EndBulk();
-								await File.ClearAsyncLocked();
+									await this.EndBulk();
+									await File.ClearAsyncLocked();
 
-								foreach (IndexBTreeFile Index in File.Indices)
-									await Index.ClearAsyncLocked();
+									foreach (IndexBTreeFile Index in File.Indices)
+										await Index.ClearAsyncLocked();
 
-								await this.StartBulk();
-								c = 0;
+									await this.StartBulk();
+									c = 0;
 
-								RepairThread?.NewState("Regenerate");
+									RepairThread?.NewState("Regenerate");
 
-								await TempFile.BeginRead();
-								try
-								{
-									ObjectBTreeFileCursor<object> e = await TempFile.GetTypedEnumeratorAsyncLocked<object>();
-
-									while (await e.MoveNextAsyncLocked())
+									await TempFile.BeginRead();
+									try
 									{
-										if (e.CurrentTypeCompatible)
+										ObjectBTreeFileCursor<object> e = await TempFile.GetTypedEnumeratorAsyncLocked<object>();
+
+										while (await e.MoveNextAsyncLocked())
 										{
-											object State = NestedLocks.CreateIfNested(File, true, e.CurrentSerializer);
-
-											await File.SaveNewObjectLocked(e.Current, State);
-
-											c++;
-											if (c >= 1000)
+											if (e.CurrentTypeCompatible)
 											{
-												await this.EndBulk();
-												await this.StartBulk();
-												c = 0;
+												object State = NestedLocks.CreateIfNested(File, true, e.CurrentSerializer);
+
+												await File.SaveNewObjectLocked(e.Current, State);
+
+												c++;
+												if (c >= 1000)
+												{
+													await this.EndBulk();
+													await this.StartBulk();
+													c = 0;
+												}
 											}
 										}
+									}
+									finally
+									{
+										await TempFile.EndRead();
 									}
 								}
 								finally
 								{
-									await TempFile.EndRead();
+									await this.EndBulk();
+								}
+
+								foreach (Guid Guid in P.Value.Keys)
+								{
+									if (!ObjectIds.ContainsKey(Guid))
+										FileStat.LogError("Unable to recover object with Object ID " + Guid.ToString());
 								}
 							}
-							finally
-							{
-								await this.EndBulk();
-							}
-
-							foreach (Guid Guid in P.Value.Keys)
-							{
-								if (!ObjectIds.ContainsKey(Guid))
-									FileStat.LogError("Unable to recover object with Object ID " + Guid.ToString());
-							}
 						}
-
-#if COMPILED
-						if (File.Encrypted && this.customKeyMethod is null)
+						finally
 						{
-							try
+#if COMPILED
+							if (File.Encrypted && this.customKeyMethod is null)
 							{
-								CspParameters Csp = new CspParameters()
+								try
 								{
-									KeyContainerName = TempBtreeFileName,
-									Flags = CspProviderFlags.UseMachineKeyStore | CspProviderFlags.UseExistingKey
-								};
+									CspParameters Csp = new CspParameters()
+									{
+										KeyContainerName = TempBtreeFileName,
+										Flags = CspProviderFlags.UseMachineKeyStore | CspProviderFlags.UseExistingKey
+									};
 
-								using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(Csp))
-								{
-									RSA.PersistKeyInCsp = false;    // Deletes key.
+									using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(Csp))
+									{
+										RSA.PersistKeyInCsp = false;    // Deletes key.
+									}
+
+									Csp.KeyContainerName = TempBlobFileName;
+
+									using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(Csp))
+									{
+										RSA.PersistKeyInCsp = false;    // Deletes key.
+									}
 								}
-
-								Csp.KeyContainerName = TempBlobFileName;
-
-								using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(Csp))
+								catch (Exception ex)
 								{
-									RSA.PersistKeyInCsp = false;    // Deletes key.
+									Log.Exception(ex);
 								}
 							}
-							catch (Exception)
+#endif
+							string[] Files = Directory.GetFiles(Path.GetDirectoryName(TempFileName), Path.GetFileName(TempFileName) + "*.*");
+
+							foreach (string FileName in Files)
 							{
-								// Ignore
+								try
+								{
+									System.IO.File.Delete(FileName);
+								}
+								catch (Exception ex)
+								{
+									Log.Exception(ex);
+								}
 							}
 						}
-#endif
+
 						P = await File.ComputeStatisticsLocked();
 						FileStat = P.Key;
 						ObjectIds = P.Value;
@@ -3750,20 +3769,6 @@ namespace Waher.Persistence.Files
 						{
 							foreach (Exception ex in Exceptions)
 								FileStat.LogError(ex.Message);
-						}
-
-						string[] Files = Directory.GetFiles(Path.GetDirectoryName(TempFileName), Path.GetFileName(TempFileName) + "*.*");
-
-						foreach (string FileName in Files)
-						{
-							try
-							{
-								System.IO.File.Delete(FileName);
-							}
-							catch (Exception)
-							{
-								// Ignore
-							}
 						}
 
 						RepairThread?.Idle();

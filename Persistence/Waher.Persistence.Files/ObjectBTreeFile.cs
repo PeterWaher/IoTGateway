@@ -3,22 +3,22 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using System.Xml;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Events;
 using Waher.Persistence.Exceptions;
-using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
+using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
-using Waher.Runtime.Collections;
-using System.Diagnostics;
 
 namespace Waher.Persistence.Files
 {

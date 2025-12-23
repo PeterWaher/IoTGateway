@@ -22,6 +22,7 @@ using Waher.Runtime.Language;
 using Waher.Script;
 using Waher.Security;
 using Waher.Security.CallStack;
+using Waher.Security.TOTP;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -64,6 +65,13 @@ namespace Waher.IoTGateway.Setup
 			typeof(LegalIdentityConfiguration),
 			GenerateNewKeysRegex,
 			GetAttachmentRegex
+		});
+		private static readonly ICallStackCheck[] approvedOtpSources = Assert.Convert(new object[]
+		{
+			typeof(Content.Markdown.Web.MarkdownToHtmlConverter),
+			FromSaveUnsavedRegex,
+			FromUpdateObjectRegex,
+			GatewayStartupRegex
 		});
 
 		private static LegalIdentityConfiguration instance = null;
@@ -483,6 +491,7 @@ namespace Waher.IoTGateway.Setup
 				Gateway.ContractsClient.PetitionedContractResponseReceived += this.ContractsClient_PetitionedContractResponseReceived;
 
 				Gateway.ContractsClient.SetAllowedSources(approvedContractClientSources);
+				OtpSecret.SetAllowedSources(approvedOtpSources);
 
 				if (Gateway.XmppClient.State == XmppState.Connected)
 					await this.GetLegalIdentities(null);

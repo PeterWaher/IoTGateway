@@ -444,6 +444,7 @@
     <ProjectReference Include="..\Security\Waher.Security.PQC\Waher.Security.PQC.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.SHA3\Waher.Security.SHA3.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.SPF\Waher.Security.SPF.csproj" />
+    <ProjectReference Include="..\Security\Waher.Security.TOTP\Waher.Security.TOTP.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.Users\Waher.Security.Users.csproj" />
     <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj" />
 		<ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />

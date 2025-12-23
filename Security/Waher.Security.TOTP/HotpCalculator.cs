@@ -6,7 +6,7 @@ namespace Waher.Security.TOTP
 	/// Implements the HOTP algorithm, as defined in RFC 4226:
 	/// https://datatracker.ietf.org/doc/html/rfc4226
 	/// </summary>
-	public class HotpAlgorithm
+	public class HotpCalculator
 	{
 		private readonly int nrDigits;
 		private readonly byte[] secret;
@@ -18,7 +18,7 @@ namespace Waher.Security.TOTP
 		/// https://datatracker.ietf.org/doc/html/rfc4226
 		/// </summary>
 		/// <param name="Secret">Shared secret.</param>
-		public HotpAlgorithm(byte[] Secret)
+		public HotpCalculator(byte[] Secret)
 			: this(6, Secret, HashFunction.SHA1)
 		{
 		}
@@ -29,7 +29,7 @@ namespace Waher.Security.TOTP
 		/// </summary>
 		/// <param name="NrDigits">Number of digits to present.</param>
 		/// <param name="Secret">Shared secret.</param>
-		public HotpAlgorithm(int NrDigits, byte[] Secret)
+		public HotpCalculator(int NrDigits, byte[] Secret)
 			: this(NrDigits, Secret, HashFunction.SHA1)
 		{
 		}
@@ -41,7 +41,7 @@ namespace Waher.Security.TOTP
 		/// <param name="NrDigits">Number of digits to present.</param>
 		/// <param name="Secret">Shared secret.</param>
 		/// <param name="HashFunction">Hash function to use in computation.</param>
-		public HotpAlgorithm(int NrDigits, byte[] Secret, HashFunction HashFunction)
+		public HotpCalculator(int NrDigits, byte[] Secret, HashFunction HashFunction)
 		{
 			if (NrDigits < 6)
 			{

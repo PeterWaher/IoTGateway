@@ -17,7 +17,7 @@
 		public void Test_01_Calculate(HashFunction HashFunction, int NrDigits, string Secret, 
 			long Counter, int Password)
 		{
-			HotpAlgorithm Hotp = new(NrDigits, Hashes.StringToBinary(Secret), HashFunction);
+			HotpCalculator Hotp = new(NrDigits, Hashes.StringToBinary(Secret), HashFunction);
 			int ComputedPassword = Hotp.Compute(Counter);
 
 			Assert.AreEqual(Password, ComputedPassword);

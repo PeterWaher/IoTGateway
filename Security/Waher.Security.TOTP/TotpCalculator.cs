@@ -6,9 +6,9 @@ namespace Waher.Security.TOTP
 	/// Implements the TOTP algorithm, as defined in RFC 6238:
 	/// https://datatracker.ietf.org/doc/html/rfc6238
 	/// </summary>
-	public class TotpAlgorithm
+	public class TotpCalculator
 	{
-		private readonly HotpAlgorithm hotp;
+		private readonly HotpCalculator hotp;
 		private readonly int timeStepSeconds;
 
 		/// <summary>
@@ -16,7 +16,7 @@ namespace Waher.Security.TOTP
 		/// https://datatracker.ietf.org/doc/html/rfc6238
 		/// </summary>
 		/// <param name="Secret">Shared secret.</param>
-		public TotpAlgorithm(byte[] Secret)
+		public TotpCalculator(byte[] Secret)
 			: this(6, Secret, HashFunction.SHA1)
 		{
 		}
@@ -27,7 +27,7 @@ namespace Waher.Security.TOTP
 		/// </summary>
 		/// <param name="NrDigits">Number of digits to present.</param>
 		/// <param name="Secret">Shared secret.</param>
-		public TotpAlgorithm(int NrDigits, byte[] Secret)
+		public TotpCalculator(int NrDigits, byte[] Secret)
 			: this(NrDigits, Secret, HashFunction.SHA1)
 		{
 		}
@@ -39,7 +39,7 @@ namespace Waher.Security.TOTP
 		/// <param name="NrDigits">Number of digits to present.</param>
 		/// <param name="Secret">Shared secret.</param>
 		/// <param name="HashFunction">Hash function to use in computation.</param>
-		public TotpAlgorithm(int NrDigits, byte[] Secret, HashFunction HashFunction)
+		public TotpCalculator(int NrDigits, byte[] Secret, HashFunction HashFunction)
 			: this(NrDigits, Secret, HashFunction, 30)
 		{
 		}
@@ -52,7 +52,7 @@ namespace Waher.Security.TOTP
 		/// <param name="Secret">Shared secret.</param>
 		/// <param name="HashFunction">Hash function to use in computation.</param>
 		/// <param name="TimeStepSeconds">Time step in seconds.</param>
-		public TotpAlgorithm(int NrDigits, byte[] Secret, HashFunction HashFunction,
+		public TotpCalculator(int NrDigits, byte[] Secret, HashFunction HashFunction,
 			int TimeStepSeconds)
 		{
 			if (TimeStepSeconds <= 0)
@@ -62,7 +62,7 @@ namespace Waher.Security.TOTP
 			}
 
 			this.timeStepSeconds = TimeStepSeconds;
-			this.hotp = new HotpAlgorithm(NrDigits, Secret, HashFunction);
+			this.hotp = new HotpCalculator(NrDigits, Secret, HashFunction);
 		}
 
 		/// <summary>

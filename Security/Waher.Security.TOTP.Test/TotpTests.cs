@@ -29,7 +29,7 @@ namespace Waher.Security.TOTP.Test
 			string Timestamp, string Secret, int Password)
 		{
 			DateTime ParsedTimestamp = XML.ParseDateTime(Timestamp);
-			TotpAlgorithm Hotp = new(NrDigits, Encoding.ASCII.GetBytes(Secret), HashFunction, TimeStepSeconds);
+			TotpCalculator Hotp = new(NrDigits, Encoding.ASCII.GetBytes(Secret), HashFunction, TimeStepSeconds);
 			int ComputedPassword = Hotp.Compute(ParsedTimestamp);
 
 			Assert.AreEqual(Password, ComputedPassword);

@@ -7,69 +7,74 @@ using Waher.Security.LoginMonitor;
 namespace Waher.Security.TOTP
 {
 	/// <summary>
-	/// Implements the HOTP validator algorithm, as defined in RFC 4226:
-	/// https://datatracker.ietf.org/doc/html/rfc4226
+	/// Implements the TOTP validator algorithm, as defined in RFC 6238:
+	/// https://datatracker.ietf.org/doc/html/rfc6238
 	/// </summary>
-	public class HotpValidator
+	public class TotpValidator
 	{
 		/// <summary>
-		/// Protocol name (HOTP).
+		/// Protocol name (TOTP).
 		/// </summary>
-		public const string ProtocolName = "HOTP";
+		public const string ProtocolName = "TOTP";
 
 		private readonly int nrDigits;
 		private readonly byte[] secret;
 		private readonly HashFunction hashFunction;
 		private readonly LoginAuditor auditor;
 		private readonly string endpoint;
+		private readonly int timeStepSeconds;
 
 		/// <summary>
-		/// Implements the HOTP validator algorithm, as defined in RFC 4226:
-		/// https://datatracker.ietf.org/doc/html/rfc4226
+		/// Implements the TOTP validator algorithm, as defined in RFC 6238:
+		/// https://datatracker.ietf.org/doc/html/rfc6238
 		/// </summary>
 		/// <param name="Secret">Shared secret.</param>
 		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <param name="Auditor">Login auditor.</param>
-		public HotpValidator(byte[] Secret, string OtpEndpoint, LoginAuditor Auditor)
+		public TotpValidator(byte[] Secret, string OtpEndpoint, LoginAuditor Auditor)
 			: this(HotpCalculator.DefaultNrDigits, Secret,
-				  HotpCalculator.DefaultHashFunction, OtpEndpoint, Auditor)
+				  HotpCalculator.DefaultHashFunction, TotpCalculator.DefaultTimeStepSeconds, 
+				  OtpEndpoint, Auditor)
 		{
 		}
 
 		/// <summary>
-		/// Implements the HOTP validator algorithm, as defined in RFC 4226:
-		/// https://datatracker.ietf.org/doc/html/rfc4226
+		/// Implements the TOTP validator algorithm, as defined in RFC 6238:
+		/// https://datatracker.ietf.org/doc/html/rfc6238
 		/// </summary>
 		/// <param name="NrDigits">Number of digits to present.</param>
 		/// <param name="Secret">Shared secret.</param>
 		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <param name="Auditor">Login auditor.</param>
-		public HotpValidator(int NrDigits, byte[] Secret, string OtpEndpoint, 
-			LoginAuditor Auditor)
-			: this(NrDigits, Secret, HotpCalculator.DefaultHashFunction, OtpEndpoint, Auditor)
+		public TotpValidator(int NrDigits, byte[] Secret, string OtpEndpoint, LoginAuditor Auditor)
+			: this(NrDigits, Secret, HotpCalculator.DefaultHashFunction,
+				  TotpCalculator.DefaultTimeStepSeconds, OtpEndpoint, Auditor)
 		{
 		}
 
 		/// <summary>
-		/// Implements the HOTP validator algorithm, as defined in RFC 4226:
-		/// https://datatracker.ietf.org/doc/html/rfc4226
+		/// Implements the TOTP validator algorithm, as defined in RFC 6238:
+		/// https://datatracker.ietf.org/doc/html/rfc6238
 		/// </summary>
 		/// <param name="NrDigits">Number of digits to present.</param>
 		/// <param name="Secret">Shared secret.</param>
 		/// <param name="HashFunction">Hash function to use in computation.</param>
+		/// <param name="TimeStepSeconds">Time step in seconds.</param>
 		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <param name="Auditor">Login auditor.</param>
-		public HotpValidator(int NrDigits, byte[] Secret, HashFunction HashFunction,
-			string OtpEndpoint, LoginAuditor Auditor)
+		public TotpValidator(int NrDigits, byte[] Secret, HashFunction HashFunction,
+			int TimeStepSeconds, string OtpEndpoint, LoginAuditor Auditor)
 		{
 			HotpCalculator.CheckNrDigits(NrDigits);
 			HotpCalculator.CheckSecret(Secret);
+			TotpCalculator.CheckTimeStepSeconds(TimeStepSeconds);
 
 			this.nrDigits = NrDigits;
 			this.secret = Secret;
 			this.hashFunction = HashFunction;
 			this.endpoint = OtpEndpoint;
 			this.auditor = Auditor;
+			this.timeStepSeconds = TimeStepSeconds;
 		}
 
 		/// <summary>
@@ -83,6 +88,11 @@ namespace Waher.Security.TOTP
 		public HashFunction HashFunction => this.hashFunction;
 
 		/// <summary>
+		/// Time step in seconds.
+		/// </summary>
+		public int TimeStepSeconds => this.timeStepSeconds;
+
+		/// <summary>
 		/// OTP Endpoint
 		/// </summary>
 		public string OtpEndpoint => this.endpoint;
@@ -93,33 +103,48 @@ namespace Waher.Security.TOTP
 		public LoginAuditor Auditor => this.auditor;
 
 		/// <summary>
-		/// Tries to create an HOTP calculator for the given endpoint.
+		/// Tries to create an TOTP calculator for the given endpoint.
 		/// </summary>
 		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <param name="Auditor">Login auditor.</param>
-		/// <returns>HOTP Calculator, if endpoint was found, null otherwise.</returns>
-		public static Task<HotpValidator> TryCreate(string OtpEndpoint,
-			LoginAuditor Auditor)
+		/// <returns>TOTP Calculator, if endpoint was found, null otherwise.</returns>
+		public static Task<TotpValidator> TryCreate(string OtpEndpoint, LoginAuditor Auditor)
 		{
-			return TryCreate(HotpCalculator.DefaultNrDigits, OtpEndpoint, Auditor);
+			return TryCreate(HotpCalculator.DefaultNrDigits, TotpCalculator.DefaultTimeStepSeconds,
+				OtpEndpoint, Auditor);
 		}
 
 		/// <summary>
-		/// Tries to create an HOTP calculator for the given endpoint.
+		/// Tries to create an TOTP calculator for the given endpoint.
 		/// </summary>
 		/// <param name="NrDigits">Number of digits to present.</param>
 		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <param name="Auditor">Login auditor.</param>
-		/// <returns>HOTP Calculator, if endpoint was found, null otherwise.</returns>
-		public static async Task<HotpValidator> TryCreate(int NrDigits, string OtpEndpoint, 
+		/// <returns>TOTP Calculator, if endpoint was found, null otherwise.</returns>
+		public static Task<TotpValidator> TryCreate(int NrDigits, string OtpEndpoint,
 			LoginAuditor Auditor)
+		{
+			return TryCreate(NrDigits, TotpCalculator.DefaultTimeStepSeconds,
+				OtpEndpoint, Auditor);
+		}
+
+		/// <summary>
+		/// Tries to create an TOTP calculator for the given endpoint.
+		/// </summary>
+		/// <param name="NrDigits">Number of digits to present.</param>
+		/// <param name="TimeStepSeconds">Time step in seconds.</param>
+		/// <param name="OtpEndpoint">OTP Endpoint</param>
+		/// <param name="Auditor">Login auditor.</param>
+		/// <returns>TOTP Calculator, if endpoint was found, null otherwise.</returns>
+		public static async Task<TotpValidator> TryCreate(int NrDigits, int TimeStepSeconds,
+			string OtpEndpoint, LoginAuditor Auditor)
 		{
 			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint);
 			if (Secret is null)
 				return null;
 
-			return new HotpValidator(NrDigits, Secret.Secret, Secret.HashFunction, 
-				OtpEndpoint, Auditor);
+			return new TotpValidator(NrDigits, Secret.Secret, Secret.HashFunction, 
+				TimeStepSeconds, OtpEndpoint, Auditor);
 		}
 
 		/// <summary>
@@ -127,14 +152,14 @@ namespace Waher.Security.TOTP
 		/// </summary>
 		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <param name="RemoteEndPoint">String-representation of remote endpoint.</param>
-		/// <param name="Counter">Counter value.</param>
+		/// <param name="Timestamp">Compute code for this point in time.</param>
 		/// <param name="PassCode">Pass code to validate.</param>
 		/// <returns>Validation result.</returns>
 		public Task<ValidationResult> Validate(string OtpEndpoint, string RemoteEndPoint,
-			long Counter, int PassCode)
+			DateTime Timestamp, int PassCode)
 		{
 			return Validate(this.nrDigits, this.secret, this.hashFunction, OtpEndpoint, 
-				RemoteEndPoint, Counter, PassCode, this.auditor);
+				RemoteEndPoint, Timestamp, this.timeStepSeconds, PassCode, this.auditor);
 		}
 
 		/// <summary>
@@ -143,15 +168,17 @@ namespace Waher.Security.TOTP
 		/// <param name="Secret">Shared secret.</param>
 		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <param name="RemoteEndPoint">String-representation of remote endpoint.</param>
-		/// <param name="Counter">Counter value.</param>
+		/// <param name="Timestamp">Compute code for this point in time.</param>
+		/// <param name="TimeStepSeconds">Time step in seconds.</param>
 		/// <param name="PassCode">Pass code to validate.</param>
 		/// <param name="Auditor">Login auditor.</param>
 		/// <returns>Validation result.</returns>
 		public static Task<ValidationResult> Validate(byte[] Secret, string OtpEndpoint, 
-			string RemoteEndPoint, long Counter, int PassCode, LoginAuditor Auditor)
+			string RemoteEndPoint, DateTime Timestamp, int TimeStepSeconds, int PassCode, 
+			LoginAuditor Auditor)
 		{
 			return Validate(HotpCalculator.DefaultNrDigits, Secret, OtpEndpoint, 
-				RemoteEndPoint, Counter, PassCode, Auditor);
+				RemoteEndPoint, Timestamp, TimeStepSeconds, PassCode, Auditor);
 		}
 
 		/// <summary>
@@ -161,16 +188,17 @@ namespace Waher.Security.TOTP
 		/// <param name="Secret">Shared secret.</param>
 		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <param name="RemoteEndPoint">String-representation of remote endpoint.</param>
-		/// <param name="Counter">Counter value.</param>
+		/// <param name="Timestamp">Compute code for this point in time.</param>
+		/// <param name="TimeStepSeconds">Time step in seconds.</param>
 		/// <param name="PassCode">Pass code to validate.</param>
 		/// <param name="Auditor">Login auditor.</param>
 		/// <returns>Validation result.</returns>
 		public static Task<ValidationResult> Validate(int NrDigits, byte[] Secret,
-			string OtpEndpoint, string RemoteEndPoint, long Counter, int PassCode, 
-			LoginAuditor Auditor)
+			string OtpEndpoint, string RemoteEndPoint, DateTime Timestamp, int TimeStepSeconds,
+			int PassCode, LoginAuditor Auditor)
 		{
 			return Validate(NrDigits, Secret, HotpCalculator.DefaultHashFunction,
-				OtpEndpoint, RemoteEndPoint, Counter, PassCode, Auditor);
+				OtpEndpoint, RemoteEndPoint, Timestamp, TimeStepSeconds, PassCode, Auditor);
 		}
 
 		/// <summary>
@@ -181,18 +209,21 @@ namespace Waher.Security.TOTP
 		/// <param name="HashFunction">Hash function to use in computation.</param>
 		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <param name="RemoteEndPoint">String-representation of remote endpoint.</param>
-		/// <param name="Counter">Counter value.</param>
+		/// <param name="Timestamp">Compute code for this point in time.</param>
+		/// <param name="TimeStepSeconds">Time step in seconds.</param>
 		/// <param name="PassCode">Pass code to validate.</param>
 		/// <param name="Auditor">Login auditor.</param>
 		/// <returns>Validation result.</returns>
 		public static async Task<ValidationResult> Validate(int NrDigits, byte[] Secret,
-			HashFunction HashFunction, string OtpEndpoint, string RemoteEndPoint, 
-			long Counter, int PassCode, LoginAuditor Auditor)
+			HashFunction HashFunction, string OtpEndpoint, string RemoteEndPoint,
+			DateTime Timestamp, int TimeStepSeconds, int PassCode, LoginAuditor Auditor)
 		{
 			using Semaphore Lock = await Semaphores.BeginWrite(ProtocolName + ":" + OtpEndpoint);
 
 			string Key = ProtocolName + "." + OtpEndpoint;
 			long LastCounter = await RuntimeCounters.GetCount(Key);
+			long Counter = TotpCalculator.CalcCounter(Timestamp, TimeStepSeconds);
+
 			if (Counter <= LastCounter)
 			{
 				LoginAuditor.Fail("Counter value not valid (replay attack?).", OtpEndpoint,
@@ -208,6 +239,16 @@ namespace Waher.Security.TOTP
 
 			int Expected = HotpCalculator.Compute(NrDigits, Secret, HashFunction, Counter);
 			bool Ok = Expected == PassCode;
+
+			if (!Ok)	// Check previous time step
+			{
+				Counter--;
+				Expected = HotpCalculator.Compute(NrDigits, Secret, HashFunction, Counter);
+				Ok = Expected == PassCode;
+
+				if (Ok)
+					await RuntimeCounters.DecrementCounter(Key);
+			}
 
 			if (Ok)
 			{

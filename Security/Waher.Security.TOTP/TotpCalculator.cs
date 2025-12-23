@@ -142,7 +142,7 @@ namespace Waher.Security.TOTP
 		/// <returns>One-time password.</returns>
 		public int Compute(DateTime Timestamp)
 		{
-			long Counter = (long)(Timestamp.ToUniversalTime().Subtract(UnixEpoch).TotalSeconds / this.timeStepSeconds);
+			long Counter = CalcCounter(Timestamp, this.timeStepSeconds);
 			return this.hotp.Compute(Counter);
 		}
 
@@ -202,8 +202,19 @@ namespace Waher.Security.TOTP
 		{
 			CheckTimeStepSeconds(TimeStepSeconds);
 
-			long Counter = (long)(Timestamp.ToUniversalTime().Subtract(UnixEpoch).TotalSeconds / TimeStepSeconds);
+			long Counter = CalcCounter(Timestamp, TimeStepSeconds);
 			return HotpCalculator.Compute(NrDigits, Secret, HashFunction, Counter);
+		}
+
+		/// <summary>
+		/// Calculates the counter number for use with the HOTP algorithm.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp</param>
+		/// <param name="TimeStepSeconds">Time step in seconds</param>
+		/// <returns>Counter number</returns>
+		public static long CalcCounter(DateTime Timestamp, int TimeStepSeconds)
+		{
+			return (long)(Timestamp.ToUniversalTime().Subtract(UnixEpoch).TotalSeconds / TimeStepSeconds);
 		}
 	}
 }

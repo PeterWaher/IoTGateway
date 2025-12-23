@@ -1,11 +1,54 @@
 ﻿using System.Text;
 using Waher.Content.Xml;
+using Waher.Persistence;
+using Waher.Persistence.Files;
+using Waher.Persistence.Serialization;
+using Waher.Runtime.Counters;
+using Waher.Runtime.Inventory;
+using Waher.Security.LoginMonitor;
 
 namespace Waher.Security.TOTP.Test
 {
 	[TestClass]
 	public sealed class TotpTests
 	{
+		private const string remoteEndpoint = "TestEP";
+		private const string protocol = "TOTP";
+		private static FilesProvider? filesProvider;
+		private static LoginAuditor? auditor;
+
+		[AssemblyInitialize]
+		public static async Task AssemblyInitialize(TestContext _)
+		{
+			Types.Initialize(
+				typeof(Database).Assembly,
+				typeof(FilesProvider).Assembly,
+				typeof(ObjectSerializer).Assembly,
+				typeof(RuntimeCounters).Assembly,
+				typeof(LoginAuditor).Assembly);
+
+			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+			Database.Register(filesProvider);
+
+			auditor = new LoginAuditor("Login Auditor",
+				new LoginInterval(5, TimeSpan.FromHours(1)),    // Maximum 5 failed login attempts in an hour
+				new LoginInterval(2, TimeSpan.FromDays(1)),     // Maximum 2x5 failed login attempts in a day
+				new LoginInterval(2, TimeSpan.FromDays(7)),     // Maximum 2x2x5 failed login attempts in a week
+				new LoginInterval(2, TimeSpan.MaxValue));       // Maximum 2x2x2x5 failed login attempts in total, then blocked.
+		}
+
+		[AssemblyCleanup]
+		public static async Task AssemblyCleanup()
+		{
+			if (filesProvider is not null)
+			{
+				await filesProvider.DisposeAsync();
+				filesProvider = null;
+			}
+		}
+
+		internal static LoginAuditor? Auditor => auditor;
+
 		[TestMethod]
 		[DataRow(HashFunction.SHA1, 8, 30, "1970-01-01T00:00:59Z", "12345678901234567890", 94287082)]
 		[DataRow(HashFunction.SHA256, 8, 30, "1970-01-01T00:00:59Z", "12345678901234567890123456789012", 46119246)]

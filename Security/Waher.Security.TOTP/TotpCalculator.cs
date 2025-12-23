@@ -104,5 +104,63 @@ namespace Waher.Security.TOTP
 		/// Unix Date and Time epoch, starting at 1970-01-01T00:00:00Z
 		/// </summary>
 		public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+		/// <summary>
+		/// Calculates the expected one-time-password for the given counter value.
+		/// </summary>
+		/// <param name="Secret">Shared secret.</param>
+		/// <param name="Timestamp">Compute code for this point in time.</param>
+		/// <returns>One-time password.</returns>
+		public static int Compute(byte[] Secret, DateTime Timestamp)
+		{
+			return Compute(6, Secret, Timestamp);
+		}
+
+		/// <summary>
+		/// Calculates the expected one-time-password for the given counter value.
+		/// </summary>
+		/// <param name="NrDigits">Number of digits to present.</param>
+		/// <param name="Secret">Shared secret.</param>
+		/// <param name="Timestamp">Compute code for this point in time.</param>
+		/// <returns>One-time password.</returns>
+		public static int Compute(int NrDigits, byte[] Secret, DateTime Timestamp)
+		{
+			return Compute(NrDigits, Secret, HashFunction.SHA1, Timestamp);
+		}
+
+		/// <summary>
+		/// Calculates the expected one-time-password for the given counter value.
+		/// </summary>
+		/// <param name="NrDigits">Number of digits to present.</param>
+		/// <param name="Secret">Shared secret.</param>
+		/// <param name="HashFunction">Hash function to use in computation.</param>
+		/// <param name="Timestamp">Compute code for this point in time.</param>
+		/// <returns>One-time password.</returns>
+		public static int Compute(int NrDigits, byte[] Secret, HashFunction HashFunction, DateTime Timestamp)
+		{
+			return Compute(NrDigits, Secret, HashFunction.SHA1, 30, Timestamp);
+		}
+
+		/// <summary>
+		/// Calculates the expected one-time-password for the given counter value.
+		/// </summary>
+		/// <param name="NrDigits">Number of digits to present.</param>
+		/// <param name="Secret">Shared secret.</param>
+		/// <param name="HashFunction">Hash function to use in computation.</param>
+		/// <param name="TimeStepSeconds">Time step in seconds.</param>
+		/// <param name="Timestamp">Compute code for this point in time.</param>
+		/// <returns>One-time password.</returns>
+		public static int Compute(int NrDigits, byte[] Secret, HashFunction HashFunction, 
+			int TimeStepSeconds, DateTime Timestamp)
+		{
+			if (TimeStepSeconds <= 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(TimeStepSeconds),
+					"Time step must be a positive integer.");
+			}
+
+			long Counter = (long)(Timestamp.ToUniversalTime().Subtract(UnixEpoch).TotalSeconds / TimeStepSeconds);
+			return HotpCalculator.Compute(NrDigits, Secret, HashFunction, Counter);
+		}
 	}
 }

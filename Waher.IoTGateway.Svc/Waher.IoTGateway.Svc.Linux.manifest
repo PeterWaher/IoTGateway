@@ -625,6 +625,9 @@
 	<Assembly fileName="Waher.Security.SPF.dll" />
 	<Assembly fileName="Waher.Security.SPF.pdb" />
 	<Assembly fileName="Waher.Security.SPF.xml" />
+	<Assembly fileName="Waher.Security.TOTP.dll" />
+	<Assembly fileName="Waher.Security.TOTP.pdb" />
+	<Assembly fileName="Waher.Security.TOTP.xml" />
 	<Assembly fileName="Waher.Security.Users.dll" />
 	<Assembly fileName="Waher.Security.Users.pdb" />
 	<Assembly fileName="Waher.Security.Users.xml" />

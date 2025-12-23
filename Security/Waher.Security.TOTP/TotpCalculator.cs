@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Waher.Security.TOTP
 {
 	/// <summary>
-	/// Implements the TOTP algorithm, as defined in RFC 6238:
+	/// Implements the TOTP calculator algorithm, as defined in RFC 6238:
 	/// https://datatracker.ietf.org/doc/html/rfc6238
 	/// </summary>
 	public class TotpCalculator
@@ -18,7 +18,7 @@ namespace Waher.Security.TOTP
 		private readonly int timeStepSeconds;
 
 		/// <summary>
-		/// Implements the TOTP algorithm, as defined in RFC 6238:
+		/// Implements the TOTP calculator algorithm, as defined in RFC 6238:
 		/// https://datatracker.ietf.org/doc/html/rfc6238
 		/// </summary>
 		/// <param name="Secret">Shared secret.</param>
@@ -28,7 +28,7 @@ namespace Waher.Security.TOTP
 		}
 
 		/// <summary>
-		/// Implements the TOTP algorithm, as defined in RFC 6238:
+		/// Implements the TOTP calculator algorithm, as defined in RFC 6238:
 		/// https://datatracker.ietf.org/doc/html/rfc6238
 		/// </summary>
 		/// <param name="NrDigits">Number of digits to present.</param>
@@ -39,7 +39,7 @@ namespace Waher.Security.TOTP
 		}
 
 		/// <summary>
-		/// Implements the TOTP algorithm, as defined in RFC 6238:
+		/// Implements the TOTP calculator algorithm, as defined in RFC 6238:
 		/// https://datatracker.ietf.org/doc/html/rfc6238
 		/// </summary>
 		/// <param name="NrDigits">Number of digits to present.</param>
@@ -51,7 +51,7 @@ namespace Waher.Security.TOTP
 		}
 
 		/// <summary>
-		/// Implements the TOTP algorithm, as defined in RFC 6238:
+		/// Implements the TOTP calculator algorithm, as defined in RFC 6238:
 		/// https://datatracker.ietf.org/doc/html/rfc6238
 		/// </summary>
 		/// <param name="NrDigits">Number of digits to present.</param>
@@ -61,64 +61,54 @@ namespace Waher.Security.TOTP
 		public TotpCalculator(int NrDigits, byte[] Secret, HashFunction HashFunction,
 			int TimeStepSeconds)
 		{
-			if (TimeStepSeconds <= 0)
-			{
-				throw new ArgumentOutOfRangeException(nameof(TimeStepSeconds),
-					"Time step must be a positive integer.");
-			}
+			CheckTimeStepSeconds(TimeStepSeconds);
 
 			this.timeStepSeconds = TimeStepSeconds;
 			this.hotp = new HotpCalculator(NrDigits, Secret, HashFunction);
 		}
 
+		internal static void CheckTimeStepSeconds(int TimeStepSeconds)
+		{
+			if (TimeStepSeconds <= 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(TimeStepSeconds),
+					"Time step must be a positive integer.");
+			}
+		}
+
 		/// <summary>
 		/// Tries to create a TOTP calculator for the given endpoint.
 		/// </summary>
-		/// <param name="Endpoint">Endpoint</param>
-		public static Task<TotpCalculator> TryCreate(string Endpoint)
+		/// <param name="OtpEndpoint">OTP Endpoint</param>
+		public static Task<TotpCalculator> TryCreate(string OtpEndpoint)
 		{
-			return TryCreate(HotpCalculator.DefaultNrDigits, Endpoint, 
-				HotpCalculator.DefaultHashFunction, DefaultTimeStepSeconds);
+			return TryCreate(HotpCalculator.DefaultNrDigits, OtpEndpoint, DefaultTimeStepSeconds);
 		}
 
 		/// <summary>
 		/// Tries to create a TOTP calculator for the given endpoint.
 		/// </summary>
 		/// <param name="NrDigits">Number of digits to present.</param>
-		/// <param name="Endpoint">Endpoint</param>
-		public static Task<TotpCalculator> TryCreate(int NrDigits, string Endpoint)
+		/// <param name="OtpEndpoint">OTP Endpoint</param>
+		public static Task<TotpCalculator> TryCreate(int NrDigits, string OtpEndpoint)
 		{
-			return TryCreate(NrDigits, Endpoint, HotpCalculator.DefaultHashFunction, 
-				DefaultTimeStepSeconds);
+			return TryCreate(NrDigits, OtpEndpoint, DefaultTimeStepSeconds);
 		}
 
 		/// <summary>
 		/// Tries to create a TOTP calculator for the given endpoint.
 		/// </summary>
 		/// <param name="NrDigits">Number of digits to present.</param>
-		/// <param name="Endpoint">Endpoint</param>
-		/// <param name="HashFunction">Hash function to use in computation.</param>
-		public static Task<TotpCalculator> TryCreate(int NrDigits, string Endpoint,
-			HashFunction HashFunction)
-		{
-			return TryCreate(NrDigits, Endpoint, HashFunction, DefaultTimeStepSeconds);
-		}
-
-		/// <summary>
-		/// Tries to create a TOTP calculator for the given endpoint.
-		/// </summary>
-		/// <param name="NrDigits">Number of digits to present.</param>
-		/// <param name="Endpoint">Endpoint</param>
-		/// <param name="HashFunction">Hash function to use in computation.</param>
+		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <param name="TimeStepSeconds">Time step in seconds.</param>
-		public static async Task<TotpCalculator> TryCreate(int NrDigits, string Endpoint,
-			HashFunction HashFunction, int TimeStepSeconds)
+		public static async Task<TotpCalculator> TryCreate(int NrDigits, string OtpEndpoint,
+			int TimeStepSeconds)
 		{
-			byte[] Secret = await OtpSecret.GetSecret(Endpoint);
+			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint);
 			if (Secret is null)
 				return null;
 
-			return new TotpCalculator(NrDigits, Secret, HashFunction, TimeStepSeconds);
+			return new TotpCalculator(NrDigits, Secret.Secret, Secret.HashFunction, TimeStepSeconds);
 		}
 
 		/// <summary>
@@ -210,11 +200,7 @@ namespace Waher.Security.TOTP
 		public static int Compute(int NrDigits, byte[] Secret, HashFunction HashFunction,
 			int TimeStepSeconds, DateTime Timestamp)
 		{
-			if (TimeStepSeconds <= 0)
-			{
-				throw new ArgumentOutOfRangeException(nameof(TimeStepSeconds),
-					"Time step must be a positive integer.");
-			}
+			CheckTimeStepSeconds(TimeStepSeconds);
 
 			long Counter = (long)(Timestamp.ToUniversalTime().Subtract(UnixEpoch).TotalSeconds / TimeStepSeconds);
 			return HotpCalculator.Compute(NrDigits, Secret, HashFunction, Counter);

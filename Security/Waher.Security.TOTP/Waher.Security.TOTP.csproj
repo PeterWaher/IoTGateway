@@ -40,6 +40,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
 	  <ProjectReference Include="..\..\Runtime\Waher.Runtime.Counters\Waher.Runtime.Counters.csproj" />
+	  <ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj" />
 	  <ProjectReference Include="..\Waher.Security.CallStack\Waher.Security.CallStack.csproj" />
 	  <ProjectReference Include="..\Waher.Security.LoginMonitor\Waher.Security.LoginMonitor.csproj" />
 	  <ProjectReference Include="..\Waher.Security\Waher.Security.csproj" />

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Waher.Security.TOTP
 {
 	/// <summary>
-	/// Implements the HOTP algorithm, as defined in RFC 4226:
+	/// Implements the HOTP calculator algorithm, as defined in RFC 4226:
 	/// https://datatracker.ietf.org/doc/html/rfc4226
 	/// </summary>
 	public class HotpCalculator
@@ -24,7 +24,7 @@ namespace Waher.Security.TOTP
 		private readonly HashFunction hashFunction;
 
 		/// <summary>
-		/// Implements the HOTP algorithm, as defined in RFC 4226:
+		/// Implements the HOTP calculator algorithm, as defined in RFC 4226:
 		/// https://datatracker.ietf.org/doc/html/rfc4226
 		/// </summary>
 		/// <param name="Secret">Shared secret.</param>
@@ -34,7 +34,7 @@ namespace Waher.Security.TOTP
 		}
 
 		/// <summary>
-		/// Implements the HOTP algorithm, as defined in RFC 4226:
+		/// Implements the HOTP calculator algorithm, as defined in RFC 4226:
 		/// https://datatracker.ietf.org/doc/html/rfc4226
 		/// </summary>
 		/// <param name="NrDigits">Number of digits to present.</param>
@@ -45,13 +45,23 @@ namespace Waher.Security.TOTP
 		}
 
 		/// <summary>
-		/// Implements the HOTP algorithm, as defined in RFC 4226:
+		/// Implements the HOTP calculator algorithm, as defined in RFC 4226:
 		/// https://datatracker.ietf.org/doc/html/rfc4226
 		/// </summary>
 		/// <param name="NrDigits">Number of digits to present.</param>
 		/// <param name="Secret">Shared secret.</param>
 		/// <param name="HashFunction">Hash function to use in computation.</param>
 		public HotpCalculator(int NrDigits, byte[] Secret, HashFunction HashFunction)
+		{
+			CheckNrDigits(NrDigits);
+			CheckSecret(Secret);
+
+			this.nrDigits = NrDigits;
+			this.secret = Secret;
+			this.hashFunction = HashFunction;
+		}
+
+		internal static void CheckNrDigits(int NrDigits)
 		{
 			if (NrDigits < 6)
 			{
@@ -64,16 +74,15 @@ namespace Waher.Security.TOTP
 				throw new ArgumentOutOfRangeException(nameof(NrDigits),
 					"Number of digits must be at most 8.");
 			}
+		}
 
+		internal static void CheckSecret(byte[] Secret)
+		{
 			if (Secret is null)
 				throw new ArgumentNullException(nameof(Secret));
 
 			if (Secret.Length == 0)
 				throw new ArgumentException("Secret must have a length greater than zero.", nameof(Secret));
-
-			this.nrDigits = NrDigits;
-			this.secret = Secret;
-			this.hashFunction = HashFunction;
 		}
 
 		/// <summary>
@@ -89,39 +98,26 @@ namespace Waher.Security.TOTP
 		/// <summary>
 		/// Tries to create an HOTP calculator for the given endpoint.
 		/// </summary>
-		/// <param name="Endpoint">Endpoint</param>
+		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <returns>HOTP Calculator, if endpoint was found, null otherwise.</returns>
-		public static Task<HotpCalculator> TryCreate(string Endpoint)
+		public static Task<HotpCalculator> TryCreate(string OtpEndpoint)
 		{
-			return TryCreate(DefaultNrDigits, Endpoint, DefaultHashFunction);
+			return TryCreate(DefaultNrDigits, OtpEndpoint);
 		}
 
 		/// <summary>
 		/// Tries to create an HOTP calculator for the given endpoint.
 		/// </summary>
 		/// <param name="NrDigits">Number of digits to present.</param>
-		/// <param name="Endpoint">Endpoint</param>
+		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <returns>HOTP Calculator, if endpoint was found, null otherwise.</returns>
-		public static Task<HotpCalculator> TryCreate(int NrDigits, string Endpoint)
+		public static async Task<HotpCalculator> TryCreate(int NrDigits, string OtpEndpoint)
 		{
-			return TryCreate(NrDigits, Endpoint, DefaultHashFunction);
-		}
-
-		/// <summary>
-		/// Tries to create an HOTP calculator for the given endpoint.
-		/// </summary>
-		/// <param name="NrDigits">Number of digits to present.</param>
-		/// <param name="Endpoint">Endpoint</param>
-		/// <param name="HashFunction">Hash function to use in computation.</param>
-		/// <returns>HOTP Calculator, if endpoint was found, null otherwise.</returns>
-		public static async Task<HotpCalculator> TryCreate(int NrDigits, string Endpoint,
-			HashFunction HashFunction)
-		{
-			byte[] Secret = await OtpSecret.GetSecret(Endpoint);
+			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint);
 			if (Secret is null)
 				return null;
 
-			return new HotpCalculator(NrDigits, Secret, HashFunction);
+			return new HotpCalculator(NrDigits, Secret.Secret, Secret.HashFunction);
 		}
 
 		/// <summary>
@@ -168,23 +164,8 @@ namespace Waher.Security.TOTP
 		public static int Compute(int NrDigits, byte[] Secret, HashFunction HashFunction,
 			long Counter)
 		{
-			if (NrDigits < 6)
-			{
-				throw new ArgumentOutOfRangeException(nameof(NrDigits),
-					"Number of digits must be at least 6.");
-			}
-
-			if (NrDigits > 8)
-			{
-				throw new ArgumentOutOfRangeException(nameof(NrDigits),
-					"Number of digits must be at most 8.");
-			}
-
-			if (Secret is null)
-				throw new ArgumentNullException(nameof(Secret));
-
-			if (Secret.Length == 0)
-				throw new ArgumentException("Secret must have a length greater than zero.", nameof(Secret));
+			CheckNrDigits(NrDigits);
+			CheckSecret(Secret);
 
 			byte[] Data = new byte[8];
 			int i;

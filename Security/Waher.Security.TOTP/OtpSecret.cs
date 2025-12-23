@@ -32,6 +32,18 @@ namespace Waher.Security.TOTP
 		public string Endpoint { get; set; }
 
 		/// <summary>
+		/// Optional name of the endpoint.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string Name { get; set; }
+
+		/// <summary>
+		/// Optional description of the endpoint.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string Description { get; set; }
+
+		/// <summary>
 		/// Endpoint secret.
 		/// </summary>
 		[Encrypted(32)]
@@ -49,6 +61,11 @@ namespace Waher.Security.TOTP
 				this.secret = value;
 			}
 		}
+
+		/// <summary>
+		/// Hash function used for the endpoint.
+		/// </summary>
+		public HashFunction HashFunction { get; set; }
 
 		/// <summary>
 		/// Array of properties that are encrypted.
@@ -79,12 +96,10 @@ namespace Waher.Security.TOTP
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
 		/// <returns>Secret, if exists, null otherwise.</returns>
-		internal static async Task<byte[]> GetSecret(string Endpoint)
+		internal static async Task<OtpSecret> GetSecret(string Endpoint)
 		{
-			OtpSecret Secret = await Database.FindFirstIgnoreRest<OtpSecret>(
+			return await Database.FindFirstIgnoreRest<OtpSecret>(
 				new FilterFieldEqualTo(nameof(Endpoint), Endpoint));
-
-			return Secret?.Secret;
 		}
 	}
 }

@@ -113,7 +113,7 @@ namespace Waher.Security.TOTP
 		/// <returns>HOTP Calculator, if endpoint was found, null otherwise.</returns>
 		public static async Task<HotpCalculator> TryCreate(int NrDigits, string OtpEndpoint)
 		{
-			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint);
+			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint, OtpType.HOTP);
 			if (Secret is null)
 				return null;
 

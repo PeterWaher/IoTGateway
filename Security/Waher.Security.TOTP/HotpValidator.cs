@@ -114,7 +114,7 @@ namespace Waher.Security.TOTP
 		public static async Task<HotpValidator> TryCreate(int NrDigits, string OtpEndpoint, 
 			LoginAuditor Auditor)
 		{
-			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint);
+			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint, OtpType.HOTP);
 			if (Secret is null)
 				return null;
 

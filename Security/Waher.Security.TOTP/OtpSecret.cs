@@ -8,12 +8,28 @@ using Waher.Security.CallStack;
 namespace Waher.Security.TOTP
 {
 	/// <summary>
+	/// Specifies the type of one-time password (OTP) algorithm to use.
+	/// </summary>
+	public enum OtpType
+	{
+		/// <summary>
+		/// Counter-based one-time password (HOTP) algorithm (RFC 4226).
+		/// </summary>
+		HOTP,
+
+		/// <summary>
+		/// Time-based one-time password (TOTP) algorithm (RFC 6238).
+		/// </summary>
+		TOTP
+	}
+
+	/// <summary>
 	/// Contains OTP secret information for an OTP endpoint.
 	/// </summary>
 	[CollectionName("OtpSecrets")]
 	[TypeName(TypeNameSerialization.None)]
 	[ArchivingTime]
-	[Index("Endpoint")]
+	[Index("Endpoint", "Type")]
 	public class OtpSecret : IEncryptedProperties
 	{
 		private static ICallStackCheck[] approvedSources = null;
@@ -35,13 +51,18 @@ namespace Waher.Security.TOTP
 		/// Optional name of the endpoint.
 		/// </summary>
 		[DefaultValueStringEmpty]
-		public string Name { get; set; }
+		public string Label { get; set; }
 
 		/// <summary>
 		/// Optional description of the endpoint.
 		/// </summary>
 		[DefaultValueStringEmpty]
 		public string Description { get; set; }
+
+		/// <summary>
+		/// OTP Algorithm type.
+		/// </summary>
+		public OtpType Type { get; set; }
 
 		/// <summary>
 		/// Endpoint secret.
@@ -95,11 +116,13 @@ namespace Waher.Security.TOTP
 		/// Gets a secret for an endpoint, if one exists.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
+		/// <param name="Type">OTP Algorithm type.</param>
 		/// <returns>Secret, if exists, null otherwise.</returns>
-		internal static async Task<OtpSecret> GetSecret(string Endpoint)
+		internal static async Task<OtpSecret> GetSecret(string Endpoint, OtpType Type)
 		{
-			return await Database.FindFirstIgnoreRest<OtpSecret>(
-				new FilterFieldEqualTo(nameof(Endpoint), Endpoint));
+			return await Database.FindFirstIgnoreRest<OtpSecret>(new FilterAnd(
+				new FilterFieldEqualTo(nameof(Endpoint), Endpoint),
+				new FilterFieldEqualTo(nameof(Type), Type)));
 		}
 	}
 }

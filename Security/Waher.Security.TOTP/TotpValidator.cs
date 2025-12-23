@@ -139,7 +139,7 @@ namespace Waher.Security.TOTP
 		public static async Task<TotpValidator> TryCreate(int NrDigits, int TimeStepSeconds,
 			string OtpEndpoint, LoginAuditor Auditor)
 		{
-			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint);
+			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint, OtpType.TOTP);
 			if (Secret is null)
 				return null;
 

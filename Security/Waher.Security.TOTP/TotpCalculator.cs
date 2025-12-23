@@ -104,7 +104,7 @@ namespace Waher.Security.TOTP
 		public static async Task<TotpCalculator> TryCreate(int NrDigits, string OtpEndpoint,
 			int TimeStepSeconds)
 		{
-			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint);
+			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint, OtpType.TOTP);
 			if (Secret is null)
 				return null;
 

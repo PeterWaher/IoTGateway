@@ -4111,6 +4111,8 @@ namespace Waher.IoTGateway
 			if (ExportFolder != KeyFolder)
 				DeleteOldFiles(KeyFolder, KeepDays, KeepMonths, KeepYears, Now);
 
+			DeleteOldFiles(Path.GetTempPath(), 7, 0, 0, Now);
+
 			await OnAfterBackup.Raise(typeof(Gateway), EventArgs.Empty);
 		}
 
@@ -4135,16 +4137,16 @@ namespace Waher.IoTGateway
 					{
 						CreationTime = File.GetCreationTime(FileName);
 
-						if (CreationTime.Day == 1)
+						if (KeepMonths > 0 && CreationTime.Day == 1)
 						{
-							if (CreationTime.Month == 1)    // Yearly
+							if (KeepYears > 0 && CreationTime.Month == 1)    // Yearly
 							{
 								if (Now.Year - CreationTime.Year <= KeepYears)
 									continue;
 							}
 							else    // Monthly
 							{
-								if (((Now.Year * 12 + Now.Month) - (CreationTime.Year * 12 + Now.Month)) <= KeepMonths)
+								if ((Now.Year * 12 + Now.Month - (CreationTime.Year * 12 + Now.Month)) <= KeepMonths)
 									continue;
 							}
 						}

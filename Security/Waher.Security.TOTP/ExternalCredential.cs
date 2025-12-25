@@ -24,7 +24,12 @@ namespace Waher.Security.TOTP
 		/// <summary>
 		/// Time-based one-time password (TOTP) algorithm (RFC 6238).
 		/// </summary>
-		TOTP
+		TOTP,
+
+		/// <summary>
+		/// Credentials are static (not one-time passwords).
+		/// </summary>
+		Static
 	}
 
 	/// <summary>

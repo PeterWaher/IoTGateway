@@ -80,35 +80,14 @@ namespace Waher.Security.TOTP
 		/// Tries to create a TOTP calculator for the given endpoint.
 		/// </summary>
 		/// <param name="OtpEndpoint">OTP Endpoint</param>
-		public static Task<TotpCalculator> TryCreate(string OtpEndpoint)
+		public static async Task<TotpCalculator> TryCreate(string OtpEndpoint)
 		{
-			return TryCreate(HotpCalculator.DefaultNrDigits, OtpEndpoint, DefaultTimeStepSeconds);
-		}
-
-		/// <summary>
-		/// Tries to create a TOTP calculator for the given endpoint.
-		/// </summary>
-		/// <param name="NrDigits">Number of digits to present.</param>
-		/// <param name="OtpEndpoint">OTP Endpoint</param>
-		public static Task<TotpCalculator> TryCreate(int NrDigits, string OtpEndpoint)
-		{
-			return TryCreate(NrDigits, OtpEndpoint, DefaultTimeStepSeconds);
-		}
-
-		/// <summary>
-		/// Tries to create a TOTP calculator for the given endpoint.
-		/// </summary>
-		/// <param name="NrDigits">Number of digits to present.</param>
-		/// <param name="OtpEndpoint">OTP Endpoint</param>
-		/// <param name="TimeStepSeconds">Time step in seconds.</param>
-		public static async Task<TotpCalculator> TryCreate(int NrDigits, string OtpEndpoint,
-			int TimeStepSeconds)
-		{
-			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint, OtpType.TOTP);
-			if (Secret is null)
+			ExternalCredential Secret = await ExternalCredential.GetSecret(OtpEndpoint, CredentialAlgorithm.TOTP);
+			if (Secret is null || !Secret.HashFunction.HasValue)
 				return null;
 
-			return new TotpCalculator(NrDigits, Secret.Secret, Secret.HashFunction, TimeStepSeconds);
+			return new TotpCalculator(Secret.NrDigits, Secret.Secret, Secret.HashFunction.Value,
+				Secret.TimeStepSeconds);
 		}
 
 		/// <summary>

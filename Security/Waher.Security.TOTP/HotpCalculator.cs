@@ -100,24 +100,13 @@ namespace Waher.Security.TOTP
 		/// </summary>
 		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <returns>HOTP Calculator, if endpoint was found, null otherwise.</returns>
-		public static Task<HotpCalculator> TryCreate(string OtpEndpoint)
+		public static async Task<HotpCalculator> TryCreate(string OtpEndpoint)
 		{
-			return TryCreate(DefaultNrDigits, OtpEndpoint);
-		}
-
-		/// <summary>
-		/// Tries to create an HOTP calculator for the given endpoint.
-		/// </summary>
-		/// <param name="NrDigits">Number of digits to present.</param>
-		/// <param name="OtpEndpoint">OTP Endpoint</param>
-		/// <returns>HOTP Calculator, if endpoint was found, null otherwise.</returns>
-		public static async Task<HotpCalculator> TryCreate(int NrDigits, string OtpEndpoint)
-		{
-			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint, OtpType.HOTP);
-			if (Secret is null)
+			ExternalCredential Secret = await ExternalCredential.GetSecret(OtpEndpoint, CredentialAlgorithm.HOTP);
+			if (Secret is null || !Secret.HashFunction.HasValue)
 				return null;
 
-			return new HotpCalculator(NrDigits, Secret.Secret, Secret.HashFunction);
+			return new HotpCalculator(Secret.NrDigits, Secret.Secret, Secret.HashFunction.Value);
 		}
 
 		/// <summary>

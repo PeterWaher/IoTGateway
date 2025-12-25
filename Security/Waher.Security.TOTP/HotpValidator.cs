@@ -98,27 +98,14 @@ namespace Waher.Security.TOTP
 		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <param name="Auditor">Login auditor.</param>
 		/// <returns>HOTP Calculator, if endpoint was found, null otherwise.</returns>
-		public static Task<HotpValidator> TryCreate(string OtpEndpoint,
+		public static async Task<HotpValidator> TryCreate(string OtpEndpoint, 
 			LoginAuditor Auditor)
 		{
-			return TryCreate(HotpCalculator.DefaultNrDigits, OtpEndpoint, Auditor);
-		}
-
-		/// <summary>
-		/// Tries to create an HOTP calculator for the given endpoint.
-		/// </summary>
-		/// <param name="NrDigits">Number of digits to present.</param>
-		/// <param name="OtpEndpoint">OTP Endpoint</param>
-		/// <param name="Auditor">Login auditor.</param>
-		/// <returns>HOTP Calculator, if endpoint was found, null otherwise.</returns>
-		public static async Task<HotpValidator> TryCreate(int NrDigits, string OtpEndpoint, 
-			LoginAuditor Auditor)
-		{
-			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint, OtpType.HOTP);
-			if (Secret is null)
+			ExternalCredential Secret = await ExternalCredential.GetSecret(OtpEndpoint, CredentialAlgorithm.HOTP);
+			if (Secret is null || !Secret.HashFunction.HasValue)
 				return null;
 
-			return new HotpValidator(NrDigits, Secret.Secret, Secret.HashFunction, 
+			return new HotpValidator(Secret.NrDigits, Secret.Secret, Secret.HashFunction.Value, 
 				OtpEndpoint, Auditor);
 		}
 

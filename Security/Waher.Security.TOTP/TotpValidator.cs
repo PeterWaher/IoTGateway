@@ -108,43 +108,14 @@ namespace Waher.Security.TOTP
 		/// <param name="OtpEndpoint">OTP Endpoint</param>
 		/// <param name="Auditor">Login auditor.</param>
 		/// <returns>TOTP Calculator, if endpoint was found, null otherwise.</returns>
-		public static Task<TotpValidator> TryCreate(string OtpEndpoint, LoginAuditor Auditor)
+		public static async Task<TotpValidator> TryCreate(string OtpEndpoint, LoginAuditor Auditor)
 		{
-			return TryCreate(HotpCalculator.DefaultNrDigits, TotpCalculator.DefaultTimeStepSeconds,
-				OtpEndpoint, Auditor);
-		}
-
-		/// <summary>
-		/// Tries to create an TOTP calculator for the given endpoint.
-		/// </summary>
-		/// <param name="NrDigits">Number of digits to present.</param>
-		/// <param name="OtpEndpoint">OTP Endpoint</param>
-		/// <param name="Auditor">Login auditor.</param>
-		/// <returns>TOTP Calculator, if endpoint was found, null otherwise.</returns>
-		public static Task<TotpValidator> TryCreate(int NrDigits, string OtpEndpoint,
-			LoginAuditor Auditor)
-		{
-			return TryCreate(NrDigits, TotpCalculator.DefaultTimeStepSeconds,
-				OtpEndpoint, Auditor);
-		}
-
-		/// <summary>
-		/// Tries to create an TOTP calculator for the given endpoint.
-		/// </summary>
-		/// <param name="NrDigits">Number of digits to present.</param>
-		/// <param name="TimeStepSeconds">Time step in seconds.</param>
-		/// <param name="OtpEndpoint">OTP Endpoint</param>
-		/// <param name="Auditor">Login auditor.</param>
-		/// <returns>TOTP Calculator, if endpoint was found, null otherwise.</returns>
-		public static async Task<TotpValidator> TryCreate(int NrDigits, int TimeStepSeconds,
-			string OtpEndpoint, LoginAuditor Auditor)
-		{
-			OtpSecret Secret = await OtpSecret.GetSecret(OtpEndpoint, OtpType.TOTP);
-			if (Secret is null)
+			ExternalCredential Secret = await ExternalCredential.GetSecret(OtpEndpoint, CredentialAlgorithm.TOTP);
+			if (Secret is null || !Secret.HashFunction.HasValue)
 				return null;
 
-			return new TotpValidator(NrDigits, Secret.Secret, Secret.HashFunction, 
-				TimeStepSeconds, OtpEndpoint, Auditor);
+			return new TotpValidator(Secret.NrDigits, Secret.Secret, Secret.HashFunction.Value, 
+				Secret.TimeStepSeconds, OtpEndpoint, Auditor);
 		}
 
 		/// <summary>

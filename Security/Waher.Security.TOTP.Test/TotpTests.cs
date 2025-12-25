@@ -101,7 +101,7 @@ namespace Waher.Security.TOTP.Test
 			long PrevCounterDelta, string Timestamp, string Secret, int Password, OtpValidationResult ExpectedResult)
 		{
 			DateTime ParsedTimestamp = XML.ParseDateTime(Timestamp);
-			long Counter = TotpCalculator.CalcCounter(ParsedTimestamp, TimeStepSeconds);
+			long Counter = TotpCalculator.CalcCounter(ParsedTimestamp, TimeStepSeconds, TotpCalculator.DefaultT0);
 			long PrevCounter = Counter + PrevCounterDelta;
 
 			long UsedCounter = await RuntimeCounters.GetCount("TOTP.UnitTest");

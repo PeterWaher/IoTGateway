@@ -491,7 +491,7 @@ namespace Waher.IoTGateway.Setup
 				Gateway.ContractsClient.PetitionedContractResponseReceived += this.ContractsClient_PetitionedContractResponseReceived;
 
 				Gateway.ContractsClient.SetAllowedSources(approvedContractClientSources);
-				OtpSecret.SetAllowedSources(approvedOtpSources);
+				ExternalCredential.SetAllowedSources(approvedOtpSources);
 
 				if (Gateway.XmppClient.State == XmppState.Connected)
 					await this.GetLegalIdentities(null);

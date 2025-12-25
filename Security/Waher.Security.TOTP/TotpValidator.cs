@@ -230,7 +230,7 @@ namespace Waher.Security.TOTP
 		/// <returns>Validation result.</returns>
 		public static async Task<ValidationResult> Validate(int NrDigits, byte[] Secret,
 			HashFunction HashFunction, string OtpEndpoint, string RemoteEndPoint,
-			DateTime Timestamp, int TimeStepSeconds, long T0, int PassCode, 
+			DateTime Timestamp, int TimeStepSeconds, long T0, int PassCode,
 			LoginAuditor Auditor)
 		{
 			using Semaphore Lock = await Semaphores.BeginWrite(ProtocolName + ":" + OtpEndpoint);
@@ -257,12 +257,21 @@ namespace Waher.Security.TOTP
 
 			if (!Ok)    // Check previous time step
 			{
-				Counter--;
+				Counter--;  // Checking -1
 				Expected = HotpCalculator.Compute(NrDigits, Secret, HashFunction, Counter);
 				Ok = Expected == PassCode;
 
 				if (Ok)
 					await RuntimeCounters.DecrementCounter(Key);
+				else
+				{
+					Counter += 2;  // Checking +1
+					Expected = HotpCalculator.Compute(NrDigits, Secret, HashFunction, Counter);
+					Ok = Expected == PassCode;
+
+					if (Ok)
+						await RuntimeCounters.IncrementCounter(Key);
+				}
 			}
 
 			if (Ok)

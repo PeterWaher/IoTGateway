@@ -226,5 +226,17 @@ namespace Waher.Security.TOTP
 		{
 			return ((long)Timestamp.ToUniversalTime().Subtract(UnixEpoch).TotalSeconds - T0) / TimeStepSeconds;
 		}
+
+		/// <summary>
+		/// Point in time when the current step (and passcode) ends and the next begins.
+		/// </summary>
+		public DateTime NextStep
+		{
+			get
+			{
+				long Counter = CalcCounter(DateTime.UtcNow, this.timeStepSeconds, this.t0);
+				return UnixEpoch.AddSeconds(((Counter + 1) * this.timeStepSeconds) + this.t0);
+			}
+		}
 	}
 }

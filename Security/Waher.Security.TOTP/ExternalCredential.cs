@@ -317,7 +317,7 @@ namespace Waher.Security.TOTP
 
 			CredentialAlgorithm Type;
 			string Label = OtpAuthUri.AbsolutePath;
-			HashFunction HashFunction = HashFunction.SHA1;
+			HashFunction HashFunction = HotpCalculator.DefaultHashFunction;
 			string Key, Value;
 			string Issuer = null;
 			string Account = null;

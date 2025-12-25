@@ -33,6 +33,8 @@ namespace Waher.Content
 					Buffer |= (byte)(ch - '2' + 26);
 				else if (ch == '=')
 					break;
+				else if (ch >= 'a' && ch <= 'z')
+					Buffer |= (byte)(ch - 'a'); // Support lower-case letters as well.
 				else
 					throw new FormatException("Invalid Base32 character: " + ch.ToString());
 

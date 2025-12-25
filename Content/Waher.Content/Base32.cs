@@ -24,6 +24,9 @@ namespace Waher.Content
 
 			foreach (char ch in Base32)
 			{
+				if (char.IsWhiteSpace(ch))
+					continue;
+
 				Buffer <<= 5;
 				Offset += 5;
 

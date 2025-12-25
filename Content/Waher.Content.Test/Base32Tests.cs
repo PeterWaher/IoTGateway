@@ -30,6 +30,13 @@ namespace Waher.Content.Test
 		[DataRow("foob", "MZXW6YQ=")]
 		[DataRow("fooba", "MZXW6YTB")]
 		[DataRow("foobar", "MZXW6YTBOI======")]
+		[DataRow("f", "my======")]
+		[DataRow("fo", "mzxq====")]
+		[DataRow("foo", "mzxw6===")]
+		[DataRow("foob", "mzxw6yq=")]
+		[DataRow("fooba", "mzxw6ytb")]
+		[DataRow("foobar", "mzxw6ytboi======")]
+		[DataRow("foobar", "mzx w6yt\r\nboi======")]
 		public void Test_02_Decode(string AsciiString, string Base32String)
 		{
 			byte[] Bin = Base32.Decode(Base32String);

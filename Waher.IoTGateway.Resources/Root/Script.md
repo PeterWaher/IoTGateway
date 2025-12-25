@@ -2131,6 +2131,8 @@ The following functions are available in the `Waher.Script.Content` library.
 
 | Function                                           | Description | Example |
 |----------------------------------------------------|-------------|---------|
+| `Base32Decode(Data)`                               | Decodes binary data from a string using BASE32 encoding. | [Example][Base32DecodeExample] |
+| `Base32Encode(Data)`                               | Encodes binary data to a string using BASE32 encoding. | [Example][Base32EncodeExample] |
 | `Base64Decode(Data)`                               | Decodes binary data from a string using BASE64 encoding. | [Example][Base64DecodeExample] |
 | `Base64Encode(Data)`                               | Encodes binary data to a string using BASE64 encoding. | [Example][Base64EncodeExample] |
 | `Base64UrlDecode(Data)`                            | Decodes binary data from a string using BASE64URL encoding. | [Example][Base64UrlDecodeExample] |
@@ -2168,6 +2170,8 @@ The following functions are available in the `Waher.Script.Content` library.
 | `XmlDecode(s)`                                     | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. | [Example][XmlDecodeExample] |
 | `XmlEncode(s)`                                     | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. | [Example][XmlEncodeExample] |
 
+[Base32DecodeExample]: Prompt.md?Expression=Decode(Base32Decode("MZXW6YTBOI======"),"text/plain")
+[Base32EncodeExample]: Prompt.md?Expression=Base32Encode(Encode("Hello")[0])
 [Base64DecodeExample]: Prompt.md?Expression=Decode(Base64Decode("SGVsbG8="),"text/plain")
 [Base64EncodeExample]: Prompt.md?Expression=Base64Encode(Encode("Hello")[0])
 [Base64UrlDecodeExample]: Prompt.md?Expression=Decode(Base64UrlDecode("SGVsbG8"),"text/plain")

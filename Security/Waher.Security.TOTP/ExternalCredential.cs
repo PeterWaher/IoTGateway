@@ -515,7 +515,7 @@ namespace Waher.Security.TOTP
 		/// <summary>
 		/// Gets the next password for the endpoint.
 		/// </summary>
-		public string Next
+		public string Current
 		{
 			get
 			{
@@ -549,6 +549,46 @@ namespace Waher.Security.TOTP
 		}
 
 		/// <summary>
+		/// When current pass code changes.
+		/// </summary>
+		public TimeSpan? Next
+		{
+			get
+			{
+				switch (this.Type)
+				{
+					case CredentialAlgorithm.TOTP:
+						if (!this.timeStepSeconds.HasValue || !this.timeStepSeconds.HasValue)
+							return null;
+
+						DateTime Now = DateTime.UtcNow;
+						long Counter = TotpCalculator.CalcCounter(Now, this.timeStepSeconds.Value, TotpCalculator.DefaultT0);
+						DateTime Next = TotpCalculator.UnixEpoch.AddSeconds(((Counter + 1) * this.timeStepSeconds.Value) + TotpCalculator.DefaultT0);
+
+						return Next.Subtract(Now);
+
+					default:
+						return null;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Label for when current pass code changes.
+		/// </summary>
+		public string NextLabel
+		{
+			get
+			{
+				TimeSpan? Next = this.Next;
+				if (Next.HasValue)
+					return Math.Ceiling(Next.Value.TotalSeconds).ToString() + " s";
+				else
+					return string.Empty;
+			}
+		}
+
+		/// <summary>
 		/// Creates a credential.
 		/// </summary>
 		/// <returns>Credential object.</returns>
@@ -557,7 +597,7 @@ namespace Waher.Security.TOTP
 			ExternalCredential Credential = TryParse(OtpAuthUri)
 				?? throw new ArgumentException("Invalid OTP Auth URI.", nameof(OtpAuthUri));
 
-			return CreateAsync(Credential.Type, Credential.Endpoint, 
+			return CreateAsync(Credential.Type, Credential.Endpoint,
 				Credential.HashFunction, Credential.Secret, Credential.Issuer,
 				Credential.Account, Credential.Label, Credential.Description,
 				Credential.Counter, Credential.NrDigits, Credential.TimeStepSeconds);

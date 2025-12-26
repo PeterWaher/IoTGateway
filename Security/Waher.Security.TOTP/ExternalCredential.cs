@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Threading;
 using Waher.Security.CallStack;
 
 namespace Waher.Security.TOTP
@@ -27,9 +29,9 @@ namespace Waher.Security.TOTP
 		TOTP,
 
 		/// <summary>
-		/// Credentials are static (not one-time passwords).
+		/// Credentials are static UTF-8 encoded passwords.
 		/// </summary>
-		Static
+		UTF8
 	}
 
 	/// <summary>
@@ -39,6 +41,7 @@ namespace Waher.Security.TOTP
 	[TypeName(TypeNameSerialization.None)]
 	[ArchivingTime]
 	[Index("Type", "Endpoint")]
+	[Index("Endpoint", "Type")]
 	public class ExternalCredential : IEncryptedProperties
 	{
 		private static ICallStackCheck[] approvedSources = null;
@@ -50,8 +53,8 @@ namespace Waher.Security.TOTP
 		private string label;
 		private string description;
 		private long? counter;
-		private int nrDigits = HotpCalculator.DefaultNrDigits;
-		private int timeStepSeconds = TotpCalculator.DefaultTimeStepSeconds;
+		private int? nrDigits = null;
+		private int? timeStepSeconds = null;
 
 		/// <summary>
 		/// Object ID
@@ -83,7 +86,9 @@ namespace Waher.Security.TOTP
 
 			set
 			{
-				AssertAllowed();
+				if (!string.IsNullOrEmpty(this.label))
+					AssertAllowed();
+
 				this.label = value;
 			}
 		}
@@ -102,7 +107,9 @@ namespace Waher.Security.TOTP
 
 			set
 			{
-				AssertAllowed();
+				if (!string.IsNullOrEmpty(this.description))
+					AssertAllowed();
+
 				this.description = value;
 			}
 		}
@@ -121,7 +128,9 @@ namespace Waher.Security.TOTP
 
 			set
 			{
-				AssertAllowed();
+				if (!(this.secret is null))
+					AssertAllowed();
+
 				this.secret = value;
 			}
 		}
@@ -140,7 +149,9 @@ namespace Waher.Security.TOTP
 
 			set
 			{
-				AssertAllowed();
+				if (!string.IsNullOrEmpty(this.issuer))
+					AssertAllowed();
+
 				this.issuer = value;
 			}
 		}
@@ -159,7 +170,9 @@ namespace Waher.Security.TOTP
 
 			set
 			{
-				AssertAllowed();
+				if (!string.IsNullOrEmpty(this.account))
+					AssertAllowed();
+
 				this.account = value;
 			}
 		}
@@ -178,7 +191,9 @@ namespace Waher.Security.TOTP
 
 			set
 			{
-				AssertAllowed();
+				if (this.hashFunction.HasValue)
+					AssertAllowed();
+
 				this.hashFunction = value;
 			}
 		}
@@ -192,12 +207,14 @@ namespace Waher.Security.TOTP
 			get
 			{
 				AssertAllowed();
-				return this.nrDigits;
+				return this.nrDigits ?? HotpCalculator.DefaultNrDigits;
 			}
 
 			set
 			{
-				AssertAllowed();
+				if (this.nrDigits.HasValue)
+					AssertAllowed();
+
 				this.nrDigits = value;
 			}
 		}
@@ -216,7 +233,9 @@ namespace Waher.Security.TOTP
 
 			set
 			{
-				AssertAllowed();
+				if (this.counter.HasValue)
+					AssertAllowed();
+
 				this.counter = value;
 			}
 		}
@@ -230,12 +249,14 @@ namespace Waher.Security.TOTP
 			get
 			{
 				AssertAllowed();
-				return this.timeStepSeconds;
+				return this.timeStepSeconds ?? TotpCalculator.DefaultTimeStepSeconds;
 			}
 
 			set
 			{
-				AssertAllowed();
+				if (this.timeStepSeconds.HasValue)
+					AssertAllowed();
+
 				this.timeStepSeconds = value;
 			}
 		}
@@ -480,5 +501,148 @@ namespace Waher.Security.TOTP
 				TimeStepSeconds = TimeStepSeconds
 			};
 		}
+
+		/// <summary>
+		/// Gets stored credentials.
+		/// </summary>
+		/// <returns>Enumerated set of credentials.</returns>
+		public static async Task<IEnumerable<ExternalCredential>> GetCredentials()
+		{
+			AssertAllowed();
+			return await Database.Find<ExternalCredential>("Endpoint");
+		}
+
+		/// <summary>
+		/// Gets the next password for the endpoint.
+		/// </summary>
+		public string Next
+		{
+			get
+			{
+				AssertAllowed();
+
+				switch (this.Type)
+				{
+					case CredentialAlgorithm.HOTP:
+						if (!this.Counter.HasValue)
+							throw new InvalidOperationException("Counter not set for HOTP credential.");
+
+						int Code = HotpCalculator.Compute(this.NrDigits, this.secret,
+							this.hashFunction ?? HotpCalculator.DefaultHashFunction, this.counter.Value);
+
+						return Code.ToString("D" + this.nrDigits.ToString());
+
+					case CredentialAlgorithm.TOTP:
+						Code = TotpCalculator.Compute(this.NrDigits, this.Secret,
+							this.hashFunction ?? HotpCalculator.DefaultHashFunction,
+							this.TimeStepSeconds, DateTime.UtcNow, TotpCalculator.DefaultT0);
+
+						return Code.ToString("D" + this.nrDigits.ToString());
+
+					case CredentialAlgorithm.UTF8:
+						return Encoding.UTF8.GetString(this.Secret);
+
+					default:
+						throw new InvalidOperationException("Unknown credential algorithm type.");
+				}
+			}
+		}
+
+		/// <summary>
+		/// Creates a credential.
+		/// </summary>
+		/// <returns>Credential object.</returns>
+		public static Task<ExternalCredential> CreateAsync(string OtpAuthUri)
+		{
+			ExternalCredential Credential = TryParse(OtpAuthUri)
+				?? throw new ArgumentException("Invalid OTP Auth URI.", nameof(OtpAuthUri));
+
+			return CreateAsync(Credential.Type, Credential.Endpoint, 
+				Credential.HashFunction, Credential.Secret, Credential.Issuer,
+				Credential.Account, Credential.Label, Credential.Description,
+				Credential.Counter, Credential.NrDigits, Credential.TimeStepSeconds);
+		}
+
+		/// <summary>
+		/// Creates a credential.
+		/// </summary>
+		/// <param name="Type">Type of credential</param>
+		/// <param name="EndPoint">Name of endpoint</param>
+		/// <param name="HashFunction">Hash algorithm to use (if any).</param>
+		/// <param name="Secret">Secret</param>
+		/// <param name="Issuer">Issuer</param>
+		/// <param name="Account">Account</param>
+		/// <param name="Label">Label</param>
+		/// <param name="Description">Description</param>
+		/// <param name="Counter">Counter, if any.</param>
+		/// <param name="NrDigits">Number of digits, if any.</param>
+		/// <param name="TimeStepSeconds">Time step, in seconds, if any.</param>
+		/// <returns>Credential object.</returns>
+		public static async Task<ExternalCredential> CreateAsync(CredentialAlgorithm Type,
+			string EndPoint, HashFunction? HashFunction, byte[] Secret, string Issuer,
+			string Account, string Label, string Description, long? Counter, int? NrDigits,
+			int? TimeStepSeconds)
+		{
+			int i;
+
+			if (string.IsNullOrEmpty(Label))
+				Label = Issuer + ":" + Account;
+			else if (string.IsNullOrEmpty(Issuer) && string.IsNullOrEmpty(Account))
+			{
+				i = Label.IndexOf(':');
+				if (i > 0)
+				{
+					Issuer = Label[..i];
+					Account = Label[(i + 1)..];
+				}
+				else
+					Issuer = Label;
+			}
+
+			if (string.IsNullOrEmpty(EndPoint))
+				EndPoint = Label;
+
+			using Semaphore CredentialLock = await Semaphores.BeginWrite("External Credentials");
+
+			string Suffix = string.Empty;
+			i = 1;
+			ExternalCredential Result = await Database.FindFirstIgnoreRest<ExternalCredential>(new FilterAnd(
+				new FilterFieldEqualTo(nameof(Endpoint), EndPoint + Suffix),
+				new FilterFieldEqualTo(nameof(Type), Type)));
+
+			while (!(Result is null))
+			{
+				i++;
+				Suffix = " (" + i.ToString() + ")";
+
+				Result = await Database.FindFirstIgnoreRest<ExternalCredential>(new FilterAnd(
+					new FilterFieldEqualTo(nameof(Endpoint), EndPoint + Suffix),
+					new FilterFieldEqualTo(nameof(Type), Type)));
+			}
+
+			Result = new ExternalCredential()
+			{
+				Endpoint = EndPoint + Suffix,
+				Type = Type,
+				HashFunction = HashFunction,
+				Secret = Secret,
+				Issuer = Issuer,
+				Account = Account,
+				Label = Label,
+				Description = Description,
+				Counter = Counter
+			};
+
+			if (NrDigits.HasValue)
+				Result.NrDigits = NrDigits.Value;
+
+			if (TimeStepSeconds.HasValue)
+				Result.TimeStepSeconds = TimeStepSeconds.Value;
+
+			await Database.Insert(Result);
+
+			return Result;
+		}
+
 	}
 }

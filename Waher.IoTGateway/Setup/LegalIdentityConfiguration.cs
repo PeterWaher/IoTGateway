@@ -45,7 +45,7 @@ namespace Waher.IoTGateway.Setup
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex GetAttachmentRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?GetAttachmentAsync>?\w*[.]\w*",
 			RegexOptions.Compiled | RegexOptions.Singleline);
-		internal static readonly Regex CreateCredentialRegex = new Regex(@"Waher[.]Security[.]TOTP[.]ExternalCredential[.+]<?CreateAsync>?\w*[.]\w*",
+		internal static readonly Regex CreateCredentialRegex = new Regex(@"Waher[.]Security[.]TOTP[.]ExternalCredential[.+](CreateAsync|<?CreateAsync>?\w*[.]\w*)",
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		private static readonly ICallStackCheck[] approvedSources = Assert.Convert(new object[]
 		{

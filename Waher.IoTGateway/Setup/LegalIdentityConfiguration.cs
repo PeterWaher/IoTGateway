@@ -45,6 +45,8 @@ namespace Waher.IoTGateway.Setup
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex GetAttachmentRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?GetAttachmentAsync>?\w*[.]\w*",
 			RegexOptions.Compiled | RegexOptions.Singleline);
+		internal static readonly Regex CreateCredentialRegex = new Regex(@"Waher[.]Security[.]TOTP[.]ExternalCredential[.+]<?CreateAsync>?\w*[.]\w*",
+			RegexOptions.Compiled | RegexOptions.Singleline);
 		private static readonly ICallStackCheck[] approvedSources = Assert.Convert(new object[]
 		{
 			"Waher.Persistence.NeuroLedger.NeuroLedgerProvider",
@@ -71,7 +73,8 @@ namespace Waher.IoTGateway.Setup
 			typeof(Content.Markdown.Web.MarkdownToHtmlConverter),
 			FromSaveUnsavedRegex,
 			FromUpdateObjectRegex,
-			GatewayStartupRegex
+			GatewayStartupRegex,
+			CreateCredentialRegex
 		});
 
 		private static LegalIdentityConfiguration instance = null;

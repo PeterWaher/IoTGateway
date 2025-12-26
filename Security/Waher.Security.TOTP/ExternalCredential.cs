@@ -597,7 +597,7 @@ namespace Waher.Security.TOTP
 			ExternalCredential Credential = TryParse(OtpAuthUri)
 				?? throw new ArgumentException("Invalid OTP Auth URI.", nameof(OtpAuthUri));
 
-			return CreateAsync(Credential.Type, Credential.Endpoint,
+			return CreateAsync(Credential, Credential.Type, Credential.Endpoint,
 				Credential.HashFunction, Credential.Secret, Credential.Issuer,
 				Credential.Account, Credential.Label, Credential.Description,
 				Credential.Counter, Credential.NrDigits, Credential.TimeStepSeconds);
@@ -606,6 +606,7 @@ namespace Waher.Security.TOTP
 		/// <summary>
 		/// Creates a credential.
 		/// </summary>
+		/// <param name="Parsed">Parsed object.</param>
 		/// <param name="Type">Type of credential</param>
 		/// <param name="EndPoint">Name of endpoint</param>
 		/// <param name="HashFunction">Hash algorithm to use (if any).</param>
@@ -618,10 +619,10 @@ namespace Waher.Security.TOTP
 		/// <param name="NrDigits">Number of digits, if any.</param>
 		/// <param name="TimeStepSeconds">Time step, in seconds, if any.</param>
 		/// <returns>Credential object.</returns>
-		public static async Task<ExternalCredential> CreateAsync(CredentialAlgorithm Type,
-			string EndPoint, HashFunction? HashFunction, byte[] Secret, string Issuer,
-			string Account, string Label, string Description, long? Counter, int? NrDigits,
-			int? TimeStepSeconds)
+		public static async Task<ExternalCredential> CreateAsync(ExternalCredential Parsed,
+			CredentialAlgorithm Type, string EndPoint, HashFunction? HashFunction,
+			byte[] Secret, string Issuer, string Account, string Label, string Description,
+			long? Counter, int? NrDigits, int? TimeStepSeconds)
 		{
 			int i;
 
@@ -660,24 +661,41 @@ namespace Waher.Security.TOTP
 					new FilterFieldEqualTo(nameof(Type), Type)));
 			}
 
-			Result = new ExternalCredential()
+			if (Parsed is null)
 			{
-				Endpoint = EndPoint + Suffix,
-				Type = Type,
-				HashFunction = HashFunction,
-				Secret = Secret,
-				Issuer = Issuer,
-				Account = Account,
-				Label = Label,
-				Description = Description,
-				Counter = Counter
-			};
+				Result = new ExternalCredential()
+				{
+					Endpoint = EndPoint + Suffix,
+					Type = Type,
+					HashFunction = HashFunction,
+					Secret = Secret,
+					Issuer = Issuer,
+					Account = Account,
+					Label = Label,
+					Description = Description,
+					Counter = Counter
+				};
+			}
+			else
+			{
+				Result = Parsed;
+
+				Result.Endpoint = EndPoint + Suffix;
+				Result.Type = Type;
+				Result.hashFunction = HashFunction;
+				Result.secret = Secret;
+				Result.issuer = Issuer;
+				Result.account = Account;
+				Result.label = Label;
+				Result.description = Description;
+				Result.counter = Counter;
+			}
 
 			if (NrDigits.HasValue)
-				Result.NrDigits = NrDigits.Value;
+				Result.nrDigits = NrDigits.Value;
 
 			if (TimeStepSeconds.HasValue)
-				Result.TimeStepSeconds = TimeStepSeconds.Value;
+				Result.timeStepSeconds = TimeStepSeconds.Value;
 
 			await Database.Insert(Result);
 

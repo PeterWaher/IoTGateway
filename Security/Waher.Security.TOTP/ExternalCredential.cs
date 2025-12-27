@@ -702,5 +702,9 @@ namespace Waher.Security.TOTP
 			return Result;
 		}
 
+		public static async Task ExportAsync(string FileName, string Password)
+		{
+
+		}
 	}
 }

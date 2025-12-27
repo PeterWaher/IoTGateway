@@ -287,6 +287,9 @@
 	<Assembly fileName="Waher.Content.Xsl.dll" />
 	<Assembly fileName="Waher.Content.Xsl.pdb" />
 	<Assembly fileName="Waher.Content.Xsl.xml" />
+	<Assembly fileName="Waher.Content.Zip.dll" />
+	<Assembly fileName="Waher.Content.Zip.pdb" />
+	<Assembly fileName="Waher.Content.Zip.xml" />
 	<Assembly fileName="Waher.Events.dll" />
 	<Assembly fileName="Waher.Events.pdb" />
 	<Assembly fileName="Waher.Events.xml" />

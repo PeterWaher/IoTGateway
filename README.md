@@ -185,6 +185,7 @@ corresponding Internet Content Type encodings and decodings.
 | **Waher.Content.SystemFiles**            | .NET Std 2.0 | [NuGet](https://www.nuget.org/packages/Waher.Content.SystemFiles/)            | The [Waher.Content.SystemFiles](Content/Waher.Content.SystemFiles) helps modules to find files and applications installed on the system, for integration purposes. |
 | **Waher.Content.Xml**                    | .NET Std 2.0 | [NuGet](https://www.nuget.org/packages/Waher.Content.Xml/)                    | The [Waher.Content.Xml](Content/Waher.Content.Xml) project helps with encoding and decoding of XML. It integrates with the architecture defined in [Waher.Content](Content/Waher.Content). |
 | **Waher.Content.Xsl**                    | .NET Std 2.0 | [NuGet](https://www.nuget.org/packages/Waher.Content.Xsl/)                    | The [Waher.Content.Xsl](Content/Waher.Content.Xsl) project helps with validating and transforming XML documents. It integrates with the architecture defined in [Waher.Content](Content/Waher.Content). |
+| **Waher.Content.Zip**                    | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Content.Zip/)                    | The [Waher.Content.Zip](Content/Waher.Content.Zip) project allows applications to create or export zip-files, including password-protected zip files. It integrates with the architecture defined in [Waher.Content](Content/Waher.Content). |
 
 The folder also contains the following unit test projects:
 
@@ -198,6 +199,7 @@ The folder also contains the following unit test projects:
 | **Waher.Content.Rss.Test**         | .NET 8.0 | The [Waher.Content.Rss.Test](Content/Waher.Content.Rss.Test) project contains unit tests for the **Waher.Content.Rss** project. |
 | **Waher.Content.Semantic.Test**    | .NET 8.0 | The [Waher.Content.Semantic.Test](Content/Waher.Content.Semantic.Test) project contains unit tests for the **Waher.Content.Semantic** project. |
 | **Waher.Content.Test**             | .NET 8.0 | The [Waher.Content.Test](Content/Waher.Content.Test) project contains unit tests for the **Waher.Content** project. |
+| **Waher.Content.Zip.Test**         | .NET 8.0 | The [Waher.Content.Zip.Test](Content/Waher.Content.Zip.Test) project contains unit tests for the **Waher.Content.Zip** project. |
 
 
 Events
@@ -543,6 +545,7 @@ The folder also contains the following unit test projects:
 | **Waher.Security.PQC.Test**            | .NET 8.0 | The [Waher.Security.PQC.Test](Security/Waher.Security.PQC.Test) project contains unit tests for the  [Waher.Security.PQC](Security/Waher.Security.PQC) project. |
 | **Waher.Security.SHA3.Test**           | .NET 8.0 | The [Waher.Security.SHA3.Test](Security/Waher.Security.SHA3.Test) project contains unit tests for the  [Waher.Security.SHA3](Security/Waher.Security.SHA3) project. |
 | **Waher.Security.SPF.Test**            | .NET 8.0 | The [Waher.Security.SPF.Test](Security/Waher.Security.SPF.Test) project contains unit tests for the  [Waher.Security.SPF](Security/Waher.Security.SPF) project. |
+| **Waher.Security.TOTP.Test**           | .NET 8.0 | The [Waher.Security.TOTP.Test](Security/Waher.Security.TOTP.Test) project contains unit tests for the  [Waher.Security.TOTP](Security/Waher.Security.TOTP) project. |
 
 Services
 ----------------------

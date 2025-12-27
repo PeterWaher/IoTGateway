@@ -9,7 +9,7 @@ using Waher.Runtime.IO;
 namespace Waher.Content.Zip
 {
 	/// <summary>
-	/// Static class for creating password-protected ZIP files.
+	/// Static class for creating ZIP files.
 	/// 
 	/// Reference:
 	/// https://pkwaredownloads.blob.core.windows.net/pem/APPNOTE.txt
@@ -18,26 +18,49 @@ namespace Waher.Content.Zip
 	public static class Zip
 	{
 		/// <summary>
-		/// Creates a password-protected ZIP containing a single file.
+		/// Creates a ZIP file containing a single file.
 		/// </summary>
 		/// <param name="SourceFileName">File name of source file to include.</param>
 		/// <param name="OutputFileName">File name of the protected zip file to create.</param>
-		/// <param name="Password">Password to use to protect file name.</param>
-		public static Task CreateProtectedZipFile(string SourceFileName,
-			string OutputFileName, string Password)
+		public static Task CreateZipFile(string SourceFileName, string OutputFileName)
 		{
-			return CreateProtectedZipFile(SourceFileName, OutputFileName, false, Password);
+			return CreateZipFile(SourceFileName, OutputFileName, null);
 		}
 
 		/// <summary>
-		/// Creates a password-protected ZIP containing a single file.
+		/// Creates a ZIP file, possible password-protected, containing a single file.
+		/// </summary>
+		/// <param name="SourceFileName">File name of source file to include.</param>
+		/// <param name="OutputFileName">File name of the protected zip file to create.</param>
+		/// <param name="Password">Optional password to use to protect file name.</param>
+		public static Task CreateZipFile(string SourceFileName,
+			string OutputFileName, string Password)
+		{
+			return CreateZipFile(SourceFileName, OutputFileName, false, Password);
+		}
+
+		/// <summary>
+		/// Creates a ZIP file containing a single file.
 		/// </summary>
 		/// <param name="SourceFileName">File name of source file to include.</param>
 		/// <param name="OutputFileName">File name of the protected zip file to create.</param>
 		/// <param name="CreateFolder">Whether to create a folder for the zip file
 		/// if it does not exist.</param>
-		/// <param name="Password">Password to use to protect file name.</param>
-		public static async Task CreateProtectedZipFile(string SourceFileName,
+		public static Task CreateZipFile(string SourceFileName,
+			string OutputFileName, bool CreateFolder)
+		{
+			return CreateZipFile(SourceFileName, OutputFileName, CreateFolder, null);
+		}
+
+		/// <summary>
+		/// Creates a ZIP file, possible password-protected, containing a single file.
+		/// </summary>
+		/// <param name="SourceFileName">File name of source file to include.</param>
+		/// <param name="OutputFileName">File name of the protected zip file to create.</param>
+		/// <param name="CreateFolder">Whether to create a folder for the zip file
+		/// if it does not exist.</param>
+		/// <param name="Password">Optional password to use to protect file name.</param>
+		public static async Task CreateZipFile(string SourceFileName,
 			string OutputFileName, bool CreateFolder, string Password)
 		{
 			if (CreateFolder)
@@ -51,156 +74,449 @@ namespace Waher.Content.Zip
 			using FileStream fs = File.OpenRead(SourceFileName);
 			using FileStream Output = File.Create(OutputFileName);
 
-			await CreateProtectedZipFile(SourceFileName, fs, LastWriteTime,
+			await CreateZipFile(SourceFileName, fs, LastWriteTime,
 				Output, Password);
 		}
 
 		/// <summary>
-		/// Creates a password-protected ZIP containing a single file.
+		/// Creates a ZIP file containing a single file.
 		/// </summary>
 		/// <param name="SourceFileName">File name of source file to include.</param>
 		/// <param name="SourceFileContents">Contents of file.</param>
-		/// <param name="Password">Password to use to protect file name.</param>
 		/// <returns>Contents of Password-protected zip file.</returns>
-		public static Task<byte[]> CreateProtectedZipFile(string SourceFileName,
+		public static Task<byte[]> CreateZipFile(string SourceFileName,
+			byte[] SourceFileContents)
+		{
+			return CreateZipFile(SourceFileName, SourceFileContents, null);
+		}
+
+		/// <summary>
+		/// Creates a ZIP file, possible password-protected, containing a single file.
+		/// </summary>
+		/// <param name="SourceFileName">File name of source file to include.</param>
+		/// <param name="SourceFileContents">Contents of file.</param>
+		/// <param name="Password">Optional password to use to protect file name.</param>
+		/// <returns>Contents of Password-protected zip file.</returns>
+		public static Task<byte[]> CreateZipFile(string SourceFileName,
 			byte[] SourceFileContents, string Password)
 		{
-			return CreateProtectedZipFile(SourceFileName, SourceFileContents,
+			return CreateZipFile(SourceFileName, SourceFileContents,
 				DateTime.Now, Password);
 		}
 
 		/// <summary>
-		/// Creates a password-protected ZIP containing a single file.
+		/// Creates a ZIP file containing a single file.
 		/// </summary>
 		/// <param name="SourceFileName">File name of source file to include.</param>
 		/// <param name="SourceFileContents">Stream containing contents of file.</param>
 		/// <param name="SourceLastWriteTime">Last write time of source file.</param>
-		/// <param name="Password">Password to use to protect file name.</param>
 		/// <returns>Contents of Password-protected zip file.</returns>
-		public static async Task<byte[]> CreateProtectedZipFile(string SourceFileName,
+		public static Task<byte[]> CreateZipFile(string SourceFileName,
+			byte[] SourceFileContents, DateTime SourceLastWriteTime)
+		{
+			return CreateZipFile(SourceFileName, SourceFileContents,
+				SourceLastWriteTime, null);
+		}
+
+		/// <summary>
+		/// Creates a ZIP file, possible password-protected, containing a single file.
+		/// </summary>
+		/// <param name="SourceFileName">File name of source file to include.</param>
+		/// <param name="SourceFileContents">Stream containing contents of file.</param>
+		/// <param name="SourceLastWriteTime">Last write time of source file.</param>
+		/// <param name="Password">Optional password to use to protect file name.</param>
+		/// <returns>Contents of Password-protected zip file.</returns>
+		public static async Task<byte[]> CreateZipFile(string SourceFileName,
 			byte[] SourceFileContents, DateTime SourceLastWriteTime, string Password)
 		{
 			using MemoryStream SourceFile = new MemoryStream(SourceFileContents);
 			using MemoryStream ZipFile = new MemoryStream();
 
-			await CreateProtectedZipFile(SourceFileName, SourceFile, SourceLastWriteTime,
+			await CreateZipFile(SourceFileName, SourceFile, SourceLastWriteTime,
 				ZipFile, Password);
 
 			return ZipFile.ToArray();
 		}
 
 		/// <summary>
-		/// Creates a password-protected ZIP containing a single file.
+		/// Creates a ZIP file containing a single file.
 		/// </summary>
 		/// <param name="SourceFileName">File name of source file to include.</param>
 		/// <param name="SourceFileContents">Stream containing contents of file.</param>
 		/// <param name="SourceLastWriteTime">Last write time of source file.</param>
 		/// <param name="Output">Output stream to receive the protected zip file.</param>
-		/// <param name="Password">Password to use to protect file name.</param>
-		public static async Task CreateProtectedZipFile(string SourceFileName,
+		public static Task CreateZipFile(string SourceFileName,
+			Stream SourceFileContents, DateTime SourceLastWriteTime, Stream Output)
+		{
+			return CreateZipFile(SourceFileName, SourceFileContents,
+				SourceLastWriteTime, Output, null);
+		}
+
+		/// <summary>
+		/// Creates a ZIP file, possible password-protected, containing a single file.
+		/// </summary>
+		/// <param name="SourceFileName">File name of source file to include.</param>
+		/// <param name="SourceFileContents">Stream containing contents of file.</param>
+		/// <param name="SourceLastWriteTime">Last write time of source file.</param>
+		/// <param name="Output">Output stream to receive the protected zip file.</param>
+		/// <param name="Password">Optional password to use to protect file name.</param>
+		public static Task CreateZipFile(string SourceFileName,
 			Stream SourceFileContents, DateTime SourceLastWriteTime, Stream Output,
 			string Password)
 		{
-			SourceFileContents.Position = 0;
+			return CreateZipFile(new string[] { SourceFileName },
+				new Stream[] { SourceFileContents },
+				new DateTime[] { SourceLastWriteTime }, Output, Password);
+		}
 
-			byte[] Bin = await SourceFileContents.ReadAllAsync();
-			int UncompressedSize = Bin.Length;
-			uint FileCrc32 = Crc32.Compute(Bin);
-			byte[] Compressed;
+		/// <summary>
+		/// Creates a ZIP file containing a single file.
+		/// </summary>
+		/// <param name="SourceFileNames">File names of source files to include.</param>
+		/// <param name="OutputFileName">File name of the protected zip file to create.</param>
+		public static Task CreateZipFile(string[] SourceFileNames, string OutputFileName)
+		{
+			return CreateZipFile(SourceFileNames, OutputFileName, null);
+		}
 
-			using (MemoryStream ms = new MemoryStream())
+		/// <summary>
+		/// Creates a ZIP file, possible password-protected, containing a single file.
+		/// </summary>
+		/// <param name="SourceFileNames">File names of source files to include.</param>
+		/// <param name="OutputFileName">File name of the protected zip file to create.</param>
+		/// <param name="Password">Optional password to use to protect file name.</param>
+		public static Task CreateZipFile(string[] SourceFileNames,
+			string OutputFileName, string Password)
+		{
+			return CreateZipFile(SourceFileNames, OutputFileName, false, Password);
+		}
+
+		/// <summary>
+		/// Creates a ZIP file containing a single file.
+		/// </summary>
+		/// <param name="SourceFileNames">File names of source files to include.</param>
+		/// <param name="OutputFileName">File name of the protected zip file to create.</param>
+		/// <param name="CreateFolder">Whether to create a folder for the zip file
+		/// if it does not exist.</param>
+		public static Task CreateZipFile(string[] SourceFileNames,
+			string OutputFileName, bool CreateFolder)
+		{
+			return CreateZipFile(SourceFileNames, OutputFileName, CreateFolder, null);
+		}
+
+		/// <summary>
+		/// Creates a ZIP file, possible password-protected, containing a single file.
+		/// </summary>
+		/// <param name="SourceFileNames">File names of source files to include.</param>
+		/// <param name="OutputFileName">File name of the protected zip file to create.</param>
+		/// <param name="CreateFolder">Whether to create a folder for the zip file
+		/// if it does not exist.</param>
+		/// <param name="Password">Optional password to use to protect file name.</param>
+		public static async Task CreateZipFile(string[] SourceFileNames,
+			string OutputFileName, bool CreateFolder, string Password)
+		{
+			if (CreateFolder)
 			{
-				using (DeflateStream ds = new DeflateStream(ms, CompressionLevel.Optimal, true))
+				string Folder = Path.GetDirectoryName(OutputFileName);
+				if (!Directory.Exists(Folder))
+					Directory.CreateDirectory(Folder);
+			}
+
+			int c = SourceFileNames.Length;
+			FileStream[] SourceFiles = new FileStream[c];
+			DateTime[] LastWriteTimes = new DateTime[c];
+			try
+			{
+				for (int i = 0; i < c; i++)
 				{
-					ds.Write(Bin, 0, UncompressedSize);
+					SourceFiles[i] = File.OpenRead(SourceFileNames[i]);
+					LastWriteTimes[i] = File.GetLastWriteTime(SourceFileNames[i]);
 				}
 
-				Compressed = ms.ToArray();
+				using FileStream Output = File.Create(OutputFileName);
+
+				await CreateZipFile(SourceFileNames, SourceFiles, LastWriteTimes,
+					Output, Password);
 			}
-
-			int CompressedSize = Compressed.Length;
-
-			uint Key0 = 0x12345678;
-			uint Key1 = 0x23456789;
-			uint Key2 = 0x34567890;
-
-			foreach (char ch in Password)
+			finally
 			{
-				if (ch > 255)
-					throw new ArgumentException("Password contains invalid characters.", nameof(Password));
-
-				UpdateKeys(ref Key0, ref Key1, ref Key2, (byte)ch);
+				foreach (FileStream fs in SourceFiles)
+					fs?.Dispose();
 			}
+		}
 
-			using RandomNumberGenerator Rnd = RandomNumberGenerator.Create();
-			byte[] EncryptionHeader = new byte[12];
+		/// <summary>
+		/// Creates a ZIP file containing a single file.
+		/// </summary>
+		/// <param name="SourceFileNames">File names of source files to include.</param>
+		/// <param name="SourceFileContents">Contents of file.</param>
+		/// <returns>Contents of Password-protected zip file.</returns>
+		public static Task<byte[]> CreateZipFile(string[] SourceFileNames,
+			byte[][] SourceFileContents)
+		{
+			return CreateZipFile(SourceFileNames, SourceFileContents, (string)null);
+		}
 
-			Rnd.GetBytes(EncryptionHeader, 0, 11);
-			EncryptionHeader[11] = (byte)(FileCrc32 >> 24);
+		/// <summary>
+		/// Creates a ZIP file, possible password-protected, containing a single file.
+		/// </summary>
+		/// <param name="SourceFileNames">File names of source files to include.</param>
+		/// <param name="SourceFileContents">Contents of file.</param>
+		/// <param name="Password">Optional password to use to protect file name.</param>
+		/// <returns>Contents of Password-protected zip file.</returns>
+		public static Task<byte[]> CreateZipFile(string[] SourceFileNames,
+			byte[][] SourceFileContents, string Password)
+		{
+			int c = SourceFileNames.Length;
+			DateTime[] LastWriteTimes = new DateTime[c];
+			DateTime Now = DateTime.Now;
 
-			string FileName = Path.GetFileName(SourceFileName);
-			byte[] FileNameBytes = Encoding.UTF8.GetBytes(FileName);
-			ushort FilenameLength = (ushort)FileNameBytes.Length;
+			for (int i = 0; i < c; i++)
+				LastWriteTimes[i] = Now;
 
+			return CreateZipFile(SourceFileNames, SourceFileContents,
+				LastWriteTimes, Password);
+		}
 
-			Output.WriteUInt32(0x04034b50); // Local file header signature 0x04034b50
-			Output.WriteUInt16(20);         // Version needed to extract (2.0 -> 20 in hex 0x0014)
-			Output.WriteUInt16(0x0001);     // General purpose bit flag: bit0=1 (encrypted), others 0 (0x0001)
-			Output.WriteUInt16(8);          // Compression method: 8 = Deflate (or 0 for store if no compression)
+		/// <summary>
+		/// Creates a ZIP file containing a single file.
+		/// </summary>
+		/// <param name="SourceFileNames">File names of source files to include.</param>
+		/// <param name="SourceFileContents">Stream containing contents of file.</param>
+		/// <param name="SourceLastWriteTimes">Last write times of source files.</param>
+		/// <returns>Contents of Password-protected zip file.</returns>
+		public static Task<byte[]> CreateZipFile(string[] SourceFileNames,
+			byte[][] SourceFileContents, DateTime[] SourceLastWriteTimes)
+		{
+			return CreateZipFile(SourceFileNames, SourceFileContents,
+				SourceLastWriteTimes, null);
+		}
 
-			Output.WriteUInt16(SourceLastWriteTime.ToDosTime());
-			Output.WriteUInt16(SourceLastWriteTime.ToDosDate());
-			Output.WriteUInt32(FileCrc32);
-			Output.WriteUInt32((uint)(CompressedSize + 12));  // include encryption header in compressed size
-			Output.WriteUInt32((uint)UncompressedSize);
-			Output.WriteUInt16(FilenameLength);             // File name length
-			Output.WriteUInt16(0);                          // Extra field length (no extra)
-			Output.Write(FileNameBytes, 0, FileNameBytes.Length);
+		/// <summary>
+		/// Creates a ZIP file, possible password-protected, containing a single file.
+		/// </summary>
+		/// <param name="SourceFileNames">File names of source files to include.</param>
+		/// <param name="SourceFileContents">Stream containing contents of file.</param>
+		/// <param name="SourceLastWriteTimes">Last write times of source files.</param>
+		/// <param name="Password">Optional password to use to protect file name.</param>
+		/// <returns>Contents of Password-protected zip file.</returns>
+		public static async Task<byte[]> CreateZipFile(string[] SourceFileNames,
+			byte[][] SourceFileContents, DateTime[] SourceLastWriteTimes, string Password)
+		{
+			MemoryStream[] SourceFiles = new MemoryStream[SourceFileContents.Length];
 
-			// --- Write encrypted data: 12-byte header + compressed content ---
-
-			// Encrypt and write the 12-byte encryption header
-			foreach (byte b in EncryptionHeader)
+			try
 			{
-				byte EncryptedByte = EncryptByte(ref Key0, ref Key1, ref Key2, b);
-				Output.WriteByte(EncryptedByte);
-			}
+				for (int i = 0; i < SourceFileContents.Length; i++)
+					SourceFiles[i] = new MemoryStream(SourceFileContents[i]);
 
-			// Encrypt and write the compressed file bytes
-			foreach (byte b in Compressed)
+				using MemoryStream ZipFile = new MemoryStream();
+
+				await CreateZipFile(SourceFileNames, SourceFiles, SourceLastWriteTimes,
+					ZipFile, Password);
+
+				return ZipFile.ToArray();
+			}
+			finally
 			{
-				byte EncryptedByte = EncryptByte(ref Key0, ref Key1, ref Key2, b);
-				Output.WriteByte(EncryptedByte);
+				foreach (MemoryStream ms in SourceFiles)
+					ms?.Dispose();
 			}
+		}
 
-			// Record the offset where the central directory will start
-			long CentralDirOffset = Output.Position;
+		/// <summary>
+		/// Creates a ZIP file containing a single file.
+		/// </summary>
+		/// <param name="SourceFileNames">File names of source files to include.</param>
+		/// <param name="SourceFileContents">Stream containing contents of file.</param>
+		/// <param name="SourceLastWriteTimes">Last write times of source files.</param>
+		/// <param name="Output">Output stream to receive the protected zip file.</param>
+		public static Task CreateZipFile(string[] SourceFileNames,
+			Stream[] SourceFileContents, DateTime[] SourceLastWriteTimes, Stream Output)
+		{
+			return CreateZipFile(SourceFileNames, SourceFileContents,
+				SourceLastWriteTimes, Output, null);
+		}
+
+		/// <summary>
+		/// Creates a ZIP file, possible password-protected, containing a single file.
+		/// </summary>
+		/// <param name="SourceFileNames">File names of source files to include.</param>
+		/// <param name="SourceFileContents">Streams containing contents of files.</param>
+		/// <param name="SourceLastWriteTimes">Last write times of source files.</param>
+		/// <param name="Output">Output stream to receive the protected zip file.</param>
+		/// <param name="Password">Optional password to use to protect file name.</param>
+		public static async Task CreateZipFile(string[] SourceFileNames,
+			Stream[] SourceFileContents, DateTime[] SourceLastWriteTimes, Stream Output,
+			string Password)
+		{
+			if (SourceFileNames is null)
+				throw new ArgumentNullException(nameof(SourceFileNames));
+
+			if (SourceFileContents is null)
+				throw new ArgumentNullException(nameof(SourceFileContents));
+
+			if (SourceLastWriteTimes is null)
+				throw new ArgumentNullException(nameof(SourceLastWriteTimes));
+
+			int Count = SourceFileNames.Length;
+			if (SourceFileContents.Length != Count)
+				throw new ArgumentException("Number of source file contents differ from number of source file names.", nameof(SourceFileContents));
+
+			if (SourceLastWriteTimes.Length != Count)
+				throw new ArgumentException("Number of source file last write times differ from number of source file names.", nameof(SourceLastWriteTimes));
+
+			if (Count > ushort.MaxValue)
+				throw new IOException("Too many entries for non-ZIP64 archive.");
+
+			bool Encrypt = !string.IsNullOrEmpty(Password);
+			byte[] PasswordBytes = Encrypt ? Encoding.UTF8.GetBytes(Password) : Array.Empty<byte>();
+
+			EntryMeta[] Entries = new EntryMeta[Count];
+
+			for (int FileIndex = 0; FileIndex < Count; FileIndex++)
+			{
+				string SourceFileName = SourceFileNames[FileIndex];
+				Stream SourceFileContent = SourceFileContents[FileIndex];
+				DateTime SourceLastWriteTime = SourceLastWriteTimes[FileIndex];
+
+				SourceFileContent.Position = 0;
+
+				byte[] Bin = await SourceFileContent.ReadAllAsync();
+				int UncompressedSize = Bin.Length;
+				uint FileCrc32 = Crc32.Compute(Bin);
+				byte[] Compressed;
+
+				using (MemoryStream ms = new MemoryStream())
+				{
+					using (DeflateStream ds = new DeflateStream(ms, CompressionLevel.Optimal, true))
+					{
+						ds.Write(Bin, 0, UncompressedSize);
+					}
+
+					Compressed = ms.ToArray();
+				}
+
+				int CompressedSize = Compressed.Length;
+
+				string FileName = Path.GetFileName(SourceFileName);
+				byte[] FileNameBytes = Encoding.UTF8.GetBytes(FileName);
+				ushort FileNameLength = (ushort)FileNameBytes.Length;
+
+				if (FileNameLength > ushort.MaxValue)
+					throw new ArgumentException("Zip entry name too long: " + FileName, nameof(SourceFileNames));
+
+				ushort Flags = 0x0800;		// UTF-8 names.
+				if (Encrypt)
+					Flags |= 0x0001;        // Encrypted file.
+
+				long HeaderOffset = Output.Position;
+				if (HeaderOffset > int.MaxValue)
+					throw new IOException("ZIP output too large (>2GB). ZIP64 is not implemented.");
+
+				if (Encrypt)
+				{
+					CompressedSize += 12;
+					if (CompressedSize < 0)
+						throw new IOException("ZIP output too large (>2GB). ZIP64 is not implemented.");
+				}
+
+				EntryMeta Entry = new EntryMeta()
+				{
+					FileNameBytes = FileNameBytes,
+					Flags = Flags,
+					CompressionMethod = 8,
+					LastWriteTime = SourceLastWriteTime.ToDosTime(),
+					LastWriteDate = SourceLastWriteTime.ToDosDate(),
+					Crc32 = FileCrc32,
+					CompressedSize = CompressedSize,
+					UncompressedSize = UncompressedSize,
+					HeaderOffset = (int)HeaderOffset
+				};
+				Entries[FileIndex] = Entry;
+
+				Output.WriteUInt32(0x04034b50); // Local file header signature 0x04034b50
+				Output.WriteUInt16(20);         // Version needed to extract (2.0 -> 20 in hex 0x0014)
+				Output.WriteUInt16(Flags);      // General purpose bit flag: bit0=1 (encrypted), others 0 (0x0001)
+				Output.WriteUInt16(8);          // Compression method: 8 = Deflate (or 0 for store if no compression)
+				Output.WriteUInt16(Entry.LastWriteTime);
+				Output.WriteUInt16(Entry.LastWriteDate);
+				Output.WriteUInt32(FileCrc32);
+				Output.WriteUInt32((uint)CompressedSize);  // include encryption header in compressed size
+				Output.WriteUInt32((uint)UncompressedSize);
+
+				Output.WriteUInt16(FileNameLength);             // File name length
+				Output.WriteUInt16(0);                          // Extra field length (no extra)
+				Output.Write(FileNameBytes, 0, FileNameBytes.Length);
+
+				if (Encrypt)
+				{
+					uint Key0 = 0x12345678;
+					uint Key1 = 0x23456789;
+					uint Key2 = 0x34567890;
+
+					foreach (byte b in PasswordBytes)
+						UpdateKeys(ref Key0, ref Key1, ref Key2, b);
+
+					using RandomNumberGenerator Rnd = RandomNumberGenerator.Create();
+					byte[] EncryptionHeader = new byte[12];
+
+					Rnd.GetBytes(EncryptionHeader, 0, 11);
+					EncryptionHeader[11] = (byte)(FileCrc32 >> 24);
+
+					// --- Write encrypted data: 12-byte header + compressed content ---
+
+					// Encrypt and write the 12-byte encryption header
+					foreach (byte b in EncryptionHeader)
+					{
+						byte EncryptedByte = EncryptByte(ref Key0, ref Key1, ref Key2, b);
+						Output.WriteByte(EncryptedByte);
+					}
+
+					// Encrypt and write the compressed file bytes
+					foreach (byte b in Compressed)
+					{
+						byte EncryptedByte = EncryptByte(ref Key0, ref Key1, ref Key2, b);
+						Output.WriteByte(EncryptedByte);
+					}
+				}
+				else
+					Output.Write(Compressed, 0, Compressed.Length);
+			}
 
 			// --- Write Central Directory File Header ---
 
+			// Record the offset where the central directory will start
+			long CentralDirOffset = Output.Position;
+			if (CentralDirOffset > int.MaxValue)
+				throw new IOException("ZIP output too large (>2GB). ZIP64 is not implemented.");
 
-			Output.WriteUInt32(0x02014b50);     // Central dir file header signature 0x02014b50
-			Output.WriteUInt16(0x0014);         // Version made by (use 2.0 on DOS/Windows = 20 + OS indicator in high byte, e.g. 0x0314 for NTFS)
-			Output.WriteUInt16(20);             // Version needed to extract
-			Output.WriteUInt16(0x0001);         // General purpose bit flag (same as local: 0x0001 for encryption)
-			Output.WriteUInt16(8);              // Compression method
-			Output.WriteUInt16(SourceLastWriteTime.ToDosTime());
-			Output.WriteUInt16(SourceLastWriteTime.ToDosDate());
-			Output.WriteUInt32(FileCrc32);
-			Output.WriteUInt32((uint)(CompressedSize + 12));
-			Output.WriteUInt32((uint)UncompressedSize);
+			foreach (EntryMeta Entry in Entries)
+			{
+				Output.WriteUInt32(0x02014b50);     // Central dir file header signature 0x02014b50
+				Output.WriteUInt16(0x0014);         // Version made by (use 2.0 on DOS/Windows = 20 + OS indicator in high byte, e.g. 0x0314 for NTFS)
+				Output.WriteUInt16(20);             // Version needed to extract
+				Output.WriteUInt16(Entry.Flags);    // General purpose bit flag (same as local: 0x0001 for encryption)
+				Output.WriteUInt16(8);              // Compression method
+				Output.WriteUInt16(Entry.LastWriteTime);
+				Output.WriteUInt16(Entry.LastWriteDate);
+				Output.WriteUInt32(Entry.Crc32);
+				Output.WriteUInt32((uint)Entry.CompressedSize);
+				Output.WriteUInt32((uint)Entry.UncompressedSize);
 
-			Output.WriteUInt16(FilenameLength); // File name length
-			Output.WriteUInt16(0);              // extra field length, file comment length
-			Output.WriteUInt16(0);              // file comment length
+				Output.WriteUInt16((ushort)Entry.FileNameBytes.Length); // File name length
+				Output.WriteUInt16(0);              // extra field length, file comment length
+				Output.WriteUInt16(0);              // file comment length
 
-			Output.WriteUInt16(0);              // Disk number start
-			Output.WriteUInt16(0);              // internal file attrs, external file attrs
-			Output.WriteUInt32(0);              // external attrs (0 for default)
+				Output.WriteUInt16(0);              // Disk number start
+				Output.WriteUInt16(0);              // internal file attrs, external file attrs
+				Output.WriteUInt32(0);              // external attrs (0 for default)
 
-			Output.WriteUInt32(0);              // Relative offset of local header (start at 0 for this file)
+				Output.WriteUInt32((uint)Entry.HeaderOffset);   // Relative offset of local header (start at 0 for this file)
 
-			Output.Write(FileNameBytes, 0, FileNameBytes.Length);
+				Output.Write(Entry.FileNameBytes, 0, Entry.FileNameBytes.Length);
+			}
+
 
 			// --- Output.Write End of Central Directory (EOCD) record ---
 
@@ -209,8 +525,8 @@ namespace Waher.Content.Zip
 			Output.WriteUInt16(0);              // Disk numbers (for single-disk archive, both 0)
 			Output.WriteUInt16(0);
 
-			Output.WriteUInt16(1);              // Number of entries on this disk and total number of entries
-			Output.WriteUInt16(1);
+			Output.WriteUInt16((ushort)Count);	// Number of entries on this disk and total number of entries
+			Output.WriteUInt16((ushort)Count);
 
 
 			uint CentralDirSize = (uint)(Output.Position - CentralDirOffset);
@@ -222,6 +538,19 @@ namespace Waher.Content.Zip
 			Output.WriteUInt16(0);              // .ZIP file comment length (0 for no comment)
 
 			await Output.FlushAsync();
+		}
+
+		private struct EntryMeta
+		{
+			public byte[] FileNameBytes;
+			public ushort Flags;
+			public ushort CompressionMethod;
+			public ushort LastWriteTime;
+			public ushort LastWriteDate;
+			public uint Crc32;
+			public int CompressedSize;
+			public int UncompressedSize;
+			public int HeaderOffset;
 		}
 
 		/// <summary>

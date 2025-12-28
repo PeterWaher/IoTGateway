@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
@@ -350,8 +351,9 @@ namespace Waher.Content.Zip
 		/// <param name="SourceFileContents">Stream containing contents of file.</param>
 		/// <param name="SourceLastWriteTimes">Last write times of source files.</param>
 		/// <param name="Output">Output stream to receive the protected zip file.</param>
-		public static Task CreateZipFile(string[] SourceFileNames,
-			Stream[] SourceFileContents, DateTime[] SourceLastWriteTimes, Stream Output)
+		public static Task CreateZipFile(IEnumerable<string> SourceFileNames,
+			IEnumerable<Stream> SourceFileContents, IEnumerable<DateTime> SourceLastWriteTimes,
+			Stream Output)
 		{
 			return CreateZipFile(SourceFileNames, SourceFileContents,
 				SourceLastWriteTimes, Output, null, ZipEncryption.None);
@@ -366,9 +368,9 @@ namespace Waher.Content.Zip
 		/// <param name="Output">Output stream to receive the protected zip file.</param>
 		/// <param name="Password">Optional password to use to protect file name.</param>
 		/// <param name="EncryptionMethod">ZIP Encryption method to use.</param>
-		public static async Task CreateZipFile(string[] SourceFileNames,
-			Stream[] SourceFileContents, DateTime[] SourceLastWriteTimes, Stream Output,
-			string Password, ZipEncryption EncryptionMethod)
+		public static async Task CreateZipFile(IEnumerable<string> SourceFileNames,
+			IEnumerable<Stream> SourceFileContents, IEnumerable<DateTime> SourceLastWriteTimes,
+			Stream Output, string Password, ZipEncryption EncryptionMethod)
 		{
 			if (SourceFileNames is null)
 				throw new ArgumentNullException(nameof(SourceFileNames));
@@ -379,15 +381,18 @@ namespace Waher.Content.Zip
 			if (SourceLastWriteTimes is null)
 				throw new ArgumentNullException(nameof(SourceLastWriteTimes));
 
-			int Count = SourceFileNames.Length;
-			if (SourceFileContents.Length != Count)
-				throw new ArgumentException("Number of source file contents differ from number of source file names.", nameof(SourceFileContents));
+			int Count = 0;
+			int FileIndex = 0;
 
-			if (SourceLastWriteTimes.Length != Count)
-				throw new ArgumentException("Number of source file last write times differ from number of source file names.", nameof(SourceLastWriteTimes));
+			foreach (string _ in SourceFileNames)
+				Count++;
 
 			if (Count > ushort.MaxValue)
 				throw new IOException("Too many entries for non-ZIP64 archive.");
+
+			IEnumerator<string> SourceFileNameEnumerator = SourceFileNames.GetEnumerator();
+			IEnumerator<Stream> SourceFileContentEnumerator = SourceFileContents.GetEnumerator();
+			IEnumerator<DateTime> SourceLastWriteTimeEnumerator = SourceLastWriteTimes.GetEnumerator();
 
 			bool Encrypt;
 
@@ -409,7 +414,7 @@ namespace Waher.Content.Zip
 			EntryMeta[] Entries = new EntryMeta[Count];
 			ushort VersionToExtract = EncryptionMethod switch
 			{
-				ZipEncryption.Aes128Ae1 => 51,	// Version needed to extract (5.1 -> 51)
+				ZipEncryption.Aes128Ae1 => 51,  // Version needed to extract (5.1 -> 51)
 				ZipEncryption.Aes192Ae1 => 51,
 				ZipEncryption.Aes256Ae1 => 51,
 				ZipEncryption.Aes128Ae2 => 51,
@@ -418,11 +423,13 @@ namespace Waher.Content.Zip
 				_ => 20                         // Version needed to extract (2.0 -> 20 in hex 0x0014)
 			};
 
-			for (int FileIndex = 0; FileIndex < Count; FileIndex++)
+			while (SourceFileNameEnumerator.MoveNext() &&
+				SourceFileContentEnumerator.MoveNext() &&
+				SourceLastWriteTimeEnumerator.MoveNext())
 			{
-				string SourceFileName = SourceFileNames[FileIndex];
-				Stream SourceFileContent = SourceFileContents[FileIndex];
-				DateTime SourceLastWriteTime = SourceLastWriteTimes[FileIndex];
+				string SourceFileName = SourceFileNameEnumerator.Current;
+				Stream SourceFileContent = SourceFileContentEnumerator.Current;
+				DateTime SourceLastWriteTime = SourceLastWriteTimeEnumerator.Current;
 
 				SourceFileContent.Position = 0;
 
@@ -483,9 +490,8 @@ namespace Waher.Content.Zip
 						CompressedSizeTot += 12;
 					else
 					{
+						Flags |= 0x0040;        // Strong encryption.
 						Method = 99;            // PKWARE AES: local header method must be 99
-						Flags |= 0x0008;		// Signals use of a data descriptor (CRC/sizes written after data).
-						DataDescriptor = true;
 
 						ushort AesVersion = EncryptionMethod switch
 						{
@@ -509,6 +515,17 @@ namespace Waher.Content.Zip
 							_ => 1
 						};
 
+						DataDescriptor = EncryptionMethod switch
+						{
+							ZipEncryption.Aes128Ae2 => true,
+							ZipEncryption.Aes192Ae2 => true,
+							ZipEncryption.Aes256Ae2 => true,
+							_ => false,
+						};
+
+						if (DataDescriptor)
+							Flags |= 0x0008;        // Signals use of a data descriptor (CRC/sizes written after data).
+
 						SaltLen = Strength switch
 						{
 							1 => 8,     // 128 bits
@@ -517,7 +534,7 @@ namespace Waher.Content.Zip
 							_ => 8
 						};
 
-						Extra = new byte[10]
+						Extra = new byte[11]
 						{
 							0x01,
 							0x99,	// ID = 0x9901
@@ -528,11 +545,13 @@ namespace Waher.Content.Zip
 							0x41,
 							0x45,	// Vendor "AE" (0x4541)
 							Strength,
-							0x08	// Deflate
+							0x08,
+							0x00	// Deflate
 						};
 
-						ExtraLen = 10;
+						ExtraLen = 11;
 
+						CompressedSizeTot += SaltLen + 2;
 						if (Ae2)
 							CompressedSizeTot += 10;
 					}
@@ -555,7 +574,7 @@ namespace Waher.Content.Zip
 					Extra = Extra,
 					ExtraLen = ExtraLen
 				};
-				Entries[FileIndex] = Entry;
+				Entries[FileIndex++] = Entry;
 
 				Output.WriteUInt32(0x04034b50); // Local file header signature 0x04034b50
 				Output.WriteUInt16(VersionToExtract);
@@ -681,7 +700,7 @@ namespace Waher.Content.Zip
 
 							byte[] KeyStream = new byte[16];
 							int Offset = 0;
-							int BytesLeft=CompressedSize0;
+							int BytesLeft = CompressedSize0;
 
 							while (Offset < CompressedSize0)
 							{
@@ -727,6 +746,9 @@ namespace Waher.Content.Zip
 					Output.WriteUInt32((uint)UncompressedSize);
 				}
 			}
+
+			if (FileIndex != Count)
+				throw new InvalidOperationException("Mismatched number of zip entries.");
 
 			// --- Write Central Directory File Header ---
 

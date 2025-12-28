@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Content;
+using Waher.Content.Xml;
+using Waher.Content.Zip;
 using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
@@ -702,9 +705,70 @@ namespace Waher.Security.TOTP
 			return Result;
 		}
 
-		public static async Task ExportAsync(string FileName, string Password)
+		/// <summary>
+		/// Exports credentials to a password-protected ZIP file.
+		/// </summary>
+		/// <param name="Password">Password to use to protect file.</param>
+		public static Task<ZipFile> ExportAsync(string Password)
 		{
+			return ExportAsync(null, Password);
+		}
 
+		/// <summary>
+		/// Exports credentials to a password-protected ZIP file.
+		/// </summary>
+		/// <param name="CredentialFileName">File name of the credentials file inside the ZIP file.</param>
+		/// <param name="Password">Password to use to protect file.</param>
+		public static async Task<ZipFile> ExportAsync(string CredentialFileName, 
+			string Password)
+		{
+			StringBuilder sb = new StringBuilder();
+			XmlWriterSettings Settings = XML.WriterSettings(true, false);
+			Settings.Encoding = Encoding.UTF8;
+
+			using XmlWriter w = XmlWriter.Create(sb, Settings);
+
+			w.WriteStartDocument();
+			w.WriteStartElement("Credentials", "http://waher.se/schema/Credentials.xsd");
+
+			foreach (ExternalCredential Credential in await GetCredentials())
+			{
+				w.WriteStartElement("Credential");
+				w.WriteAttributeString("type", Credential.Type.ToString());
+				w.WriteAttributeString("endpoint", Credential.Endpoint);
+				w.WriteAttributeString("label", Credential.Label);
+				w.WriteAttributeString("description", Credential.Description);
+				w.WriteAttributeString("issuer", Credential.Issuer);
+				w.WriteAttributeString("account", Credential.Account);
+
+				if (Credential.hashFunction.HasValue)
+					w.WriteAttributeString("hashFunction", Credential.hashFunction.Value.ToString());
+
+				if (Credential.nrDigits.HasValue)
+					w.WriteAttributeString("nrDigits", Credential.nrDigits.Value.ToString());
+
+				if (Credential.counter.HasValue)
+					w.WriteAttributeString("counter", Credential.counter.Value.ToString());
+
+				if (Credential.timeStepSeconds.HasValue)
+					w.WriteAttributeString("timeStepSeconds", Credential.timeStepSeconds.Value.ToString());
+
+				w.WriteAttributeString("secret", Convert.ToBase64String(Credential.Secret));
+				w.WriteEndElement();
+			}
+
+			w.WriteEndElement();
+			w.WriteEndDocument();
+			w.Flush();
+
+			if (string.IsNullOrEmpty(CredentialFileName))
+				CredentialFileName = "Credentials.xml";
+
+			string Xml = sb.ToString();
+			byte[] Bin = Encoding.UTF8.GetBytes(Xml);
+			byte[] Archive = await Zip.CreateZipFile(CredentialFileName, Bin, Password);
+
+			return new ZipFile(Archive);
 		}
 	}
 }

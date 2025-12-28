@@ -370,7 +370,6 @@ namespace Waher.Content.Zip
 				throw new IOException("Too many entries for non-ZIP64 archive.");
 
 			bool Encrypt = !string.IsNullOrEmpty(Password);
-			byte[] PasswordBytes = Encrypt ? Encoding.UTF8.GetBytes(Password) : Array.Empty<byte>();
 
 			EntryMeta[] Entries = new EntryMeta[Count];
 
@@ -410,6 +409,7 @@ namespace Waher.Content.Zip
 				if (Encrypt)
 					Flags |= 0x0001;        // Encrypted file.
 
+				await Output.FlushAsync();
 				long HeaderOffset = Output.Position;
 				if (HeaderOffset > int.MaxValue)
 					throw new IOException("ZIP output too large (>2GB). ZIP64 is not implemented.");
@@ -455,8 +455,13 @@ namespace Waher.Content.Zip
 					uint Key1 = 0x23456789;
 					uint Key2 = 0x34567890;
 
-					foreach (byte b in PasswordBytes)
-						UpdateKeys(ref Key0, ref Key1, ref Key2, b);
+					foreach (char ch in Password)
+					{
+						if (ch > 255)
+							throw new ArgumentException("Password contains invalid character: " + ch.ToString(), nameof(Password));
+
+						UpdateKeys(ref Key0, ref Key1, ref Key2, (byte)ch);
+					}
 
 					using RandomNumberGenerator Rnd = RandomNumberGenerator.Create();
 					byte[] EncryptionHeader = new byte[12];
@@ -487,6 +492,7 @@ namespace Waher.Content.Zip
 			// --- Write Central Directory File Header ---
 
 			// Record the offset where the central directory will start
+			await Output.FlushAsync();
 			long CentralDirOffset = Output.Position;
 			if (CentralDirOffset > int.MaxValue)
 				throw new IOException("ZIP output too large (>2GB). ZIP64 is not implemented.");
@@ -520,21 +526,16 @@ namespace Waher.Content.Zip
 
 			// --- Output.Write End of Central Directory (EOCD) record ---
 
+			await Output.FlushAsync();
+			uint CentralDirSize = (uint)(Output.Position - CentralDirOffset);
 
 			Output.WriteUInt32(0x06054b50);     // EOCD signature 0x06054b50
 			Output.WriteUInt16(0);              // Disk numbers (for single-disk archive, both 0)
 			Output.WriteUInt16(0);
-
 			Output.WriteUInt16((ushort)Count);	// Number of entries on this disk and total number of entries
 			Output.WriteUInt16((ushort)Count);
-
-
-			uint CentralDirSize = (uint)(Output.Position - CentralDirOffset);
 			Output.WriteUInt32(CentralDirSize); // Size of central directory
-
-
 			Output.WriteUInt32((uint)CentralDirOffset); // Offset of start of central directory
-
 			Output.WriteUInt16(0);              // .ZIP file comment length (0 for no comment)
 
 			await Output.FlushAsync();

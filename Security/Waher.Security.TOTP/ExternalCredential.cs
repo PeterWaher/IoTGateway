@@ -766,7 +766,8 @@ namespace Waher.Security.TOTP
 
 			string Xml = sb.ToString();
 			byte[] Bin = Encoding.UTF8.GetBytes(Xml);
-			byte[] Archive = await Zip.CreateZipFile(CredentialFileName, Bin, Password);
+			byte[] Archive = await Zip.CreateZipFile(CredentialFileName, Bin, Password,
+				ZipEncryption.Aes256Ae2);
 
 			return new ZipFile(Archive);
 		}

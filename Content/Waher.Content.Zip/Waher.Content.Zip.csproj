@@ -9,13 +9,13 @@
 		<Authors>Peter Waher</Authors>
 		<Company>Waher Data AB</Company>
 		<Product>Waher.IoTGateway</Product>
-		<Description>Allows applications to create or export zip-files, including password protected zip files. It integrates with the architecture defined in Waher.Content.</Description>
+		<Description>Allows applications to create or export zip-files, including password protected zip files. It integrates with the architecture defined in Waher.Content. Legacy ZIP Crypto, as well as ZIP AES AE1 and AE2 crypto (AES-128, 192 and 256, with or without HMAC) supported.</Description>
 		<Copyright>Copyright © Waher Data AB 2025. All rights reserved.</Copyright>
 		<PackageLicenseUrl />
 		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Zip</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
 		<RepositoryType>GitHub</RepositoryType>
-		<PackageTags>internet content zip</PackageTags>
+		<PackageTags>internet content zip crypto password ZipCrypto AES AE1 AE2</PackageTags>
 		<NeutralLanguage>English</NeutralLanguage>
 		<AssemblyVersion>1.0.0</AssemblyVersion>
 		<FileVersion>1.0.0</FileVersion>

@@ -36,6 +36,7 @@ using Waher.Events.Filter;
 using Waher.Events.Persistence;
 using Waher.Events.XMPP;
 using Waher.Groups;
+using Waher.IoTGateway.Cssx;
 using Waher.IoTGateway.Events;
 using Waher.IoTGateway.Exceptions;
 using Waher.IoTGateway.Setup;
@@ -801,7 +802,9 @@ namespace Waher.IoTGateway
 				if (!MarkdownCodec.IsRawEncodingAllowedLocked)
 					MarkdownCodec.AllowRawEncoding(false, true);
 				HttpFolderResource.ProtectContentType(MarkdownCodec.ContentType);
+				HttpFolderResource.ProtectContentType(CssxDecoder.DefaultContentType);
 				ObjectToZipConverter.ProtectContentType(MarkdownCodec.ContentType);
+				ObjectToZipConverter.ProtectContentType(CssxDecoder.DefaultContentType);
 
 				// Protecting web-script resources:
 				if (!WsCodec.IsRawEncodingAllowedLocked)

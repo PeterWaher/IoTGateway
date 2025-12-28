@@ -82,7 +82,7 @@ namespace Waher.Content.Zip
 		/// <summary>
 		/// How well the content is converted.
 		/// </summary>
-		public virtual Grade ConversionGrade => Grade.Ok;
+		public virtual Grade ConversionGrade => Grade.Barely;
 
 		/// <summary>
 		/// Performs the actual conversion.

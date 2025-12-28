@@ -9,6 +9,7 @@ using Waher.Networking.HTTP.HeaderFields;
 using Waher.Runtime.Temporary;
 using Waher.Script;
 using Waher.Runtime.IO;
+using System.Text;
 
 namespace Waher.Networking.HTTP
 {
@@ -849,9 +850,17 @@ namespace Waher.Networking.HTTP
 			if (!(Header.Accept is null))
 			{
 				bool Acceptable = Header.Accept.IsAcceptable(ContentType, out double Quality, out AcceptanceLevel TypeAcceptance, null);
+				bool CheckConversion = !Acceptable || 
+					(TypeAcceptance == AcceptanceLevel.Wildcard && IsProtected(ContentType));
 
-				if ((!Acceptable || TypeAcceptance == AcceptanceLevel.Wildcard) && (this.allowTypeConversionFrom is null ||
-					(this.allowTypeConversionFrom.TryGetValue(ContentType, out bool Allowed) && Allowed)))
+				if (!(this.allowTypeConversionFrom is null) &&
+					(!this.allowTypeConversionFrom.TryGetValue(ContentType, out bool Allowed) ||
+					!Allowed))
+				{
+					CheckConversion = false;
+				}
+
+				if (CheckConversion)
 				{
 					IContentConverter Converter = null;
 					string NewContentType = null;

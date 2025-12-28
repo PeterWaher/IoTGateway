@@ -29,6 +29,7 @@ using Waher.Content.SystemFiles;
 using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
+using Waher.Content.Zip;
 using Waher.Events;
 using Waher.Events.Files;
 using Waher.Events.Filter;
@@ -800,11 +801,13 @@ namespace Waher.IoTGateway
 				if (!MarkdownCodec.IsRawEncodingAllowedLocked)
 					MarkdownCodec.AllowRawEncoding(false, true);
 				HttpFolderResource.ProtectContentType(MarkdownCodec.ContentType);
+				ObjectToZipConverter.ProtectContentType(MarkdownCodec.ContentType);
 
 				// Protecting web-script resources:
 				if (!WsCodec.IsRawEncodingAllowedLocked)
 					WsCodec.AllowRawEncoding(false, true);
 				HttpFolderResource.ProtectContentType(WsCodec.ContentType);
+				ObjectToZipConverter.ProtectContentType(WsCodec.ContentType);
 
 				LinkedList<SystemConfiguration> NewConfigurations = null;
 				Dictionary<string, Type> SystemConfigurationTypes = new Dictionary<string, Type>();

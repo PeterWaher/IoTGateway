@@ -15,6 +15,8 @@ namespace Waher.Content.Zip
 	/// Reference:
 	/// https://pkwaredownloads.blob.core.windows.net/pem/APPNOTE.txt
 	/// https://www.rfc-editor.org/rfc/rfc1952.html
+	/// http://www.gladman.me.uk/cryptography_technology/fileencrypt/
+	/// https://www.winzip.com/en/support/aes-encryption/
 	/// </summary>
 	public static class Zip
 	{
@@ -499,7 +501,10 @@ namespace Waher.Content.Zip
 						CompressedSizeTot += 12;
 					else
 					{
-						CompressionMethod = 99;            // PKWARE AES: local header method must be 99
+						//Flags |= 0x48;                    // Bit 6: Strong encryption, Bit 3: Use of a data descriptor.
+						Flags |= 0x08;                      // Bit 3: Use of a data descriptor.
+						CompressionMethod = 99;             // PKWARE AES: local header method must be 99
+						DataDescriptor = true;
 
 						ushort AesVersion = EncryptionMethod switch
 						{
@@ -520,48 +525,62 @@ namespace Waher.Content.Zip
 							ZipEncryption.Aes192Ae2 => 2,
 							ZipEncryption.Aes256Ae1 => 3,
 							ZipEncryption.Aes256Ae2 => 3,
-							_ => 1
+							_ => throw new ArgumentException("Invalid ZIP encryption method.", nameof(EncryptionMethod))
 						};
 
-						DataDescriptor = EncryptionMethod switch
-						{
-							ZipEncryption.Aes128Ae2 => true,
-							ZipEncryption.Aes192Ae2 => true,
-							ZipEncryption.Aes256Ae2 => true,
-							_ => false,
-						};
+						//ushort AlgId = Strength switch
+						//{
+						//	1 => 0x660e,    // AES-128
+						//	2 => 0x660f,    // AES-192
+						//	3 => 0x6610,    // AES-256
+						//	_ => throw new ArgumentException("Invalid ZIP encryption method.", nameof(EncryptionMethod))
+						//};
+						//
+						//ushort BitLen = Strength switch
+						//{
+						//	1 => 128,    // AES-128
+						//	2 => 192,    // AES-192
+						//	3 => 256,    // AES-256
+						//	_ => throw new ArgumentException("Invalid ZIP encryption method.", nameof(EncryptionMethod))
+						//};
 
 						// Strong encryption? Bit 6...
 						// 4.5.12 -Strong Encryption Header (0x0017):
 						// 0x9901        AE-x encryption structure (see APPENDIX E)
-
-						if (DataDescriptor)
-							Flags |= 0x0008;        // Signals use of a data descriptor (CRC/sizes written after data).
 
 						SaltLen = Strength switch
 						{
 							1 => 8,     // 128 bits
 							2 => 12,    // 192 bits
 							3 => 16,    // 256 bits
-							_ => 8
+							_ => throw new ArgumentException("Invalid ZIP encryption method.", nameof(EncryptionMethod))
 						};
 
-						Extra = new byte[11]
+						Extra = new byte[]
 						{
+							//0x17, 0x00,	// ID = 0x0017, Strong Encryption Header
+							//0x08, 0x00,	// Data size = 8
+							//0x02, 0x00,	// Data format identifier = 2,
+							//(byte)AlgId, (byte)(AlgId >> 8),
+							//(byte)BitLen, (byte)(BitLen >> 8),
+							//0x01, 0x00, // Processing flags = 1 (password required)
+
 							0x01, 0x99,	// ID = 0x9901
-							0x07, 0x00,	// Data size = 7,
+							0x07, 0x00,	// Data size = 7
 							(byte)AesVersion, 0x00,	// AES Version
 							0x41, 0x45,	// Vendor "AE" (0x4541)
 							Strength,
 							0x08, 0x00	// Deflate
 						};
 
-						ExtraLen = 11;
+						ExtraLen = (ushort)Extra.Length;
 
 						CompressedSizeTot += SaltLen + 2;
 						if (Ae2)
 						{
-							FileCrc32 = 0;
+							if (UncompressedSize < 20)
+								FileCrc32 = 0;  // To avoid leaking information about the file via the CRC. Ref: §IV: https://www.winzip.com/en/support/aes-encryption/
+
 							CompressedSizeTot += 10;
 						}
 					}
@@ -655,39 +674,21 @@ namespace Waher.Content.Zip
 					}
 					else    // PKWARE AES (AE-1/AE-2)
 					{
-						int KeyLen = EncryptionMethod switch
-						{
-							ZipEncryption.Aes128Ae1 => 16,
-							ZipEncryption.Aes128Ae2 => 16,
-							ZipEncryption.Aes192Ae1 => 24,
-							ZipEncryption.Aes192Ae2 => 24,
-							ZipEncryption.Aes256Ae1 => 32,
-							ZipEncryption.Aes256Ae2 => 32,
-							_ => 16
-						};
-
+						int KeyLen = SaltLen << 1;
 						byte[] Salt = new byte[SaltLen];
 						using (RandomNumberGenerator rnd = RandomNumberGenerator.Create())
 							rnd.GetBytes(Salt);
 
 						// Derive key material with PBKDF2-HMAC-SHA1 (1000 iterations)
-						// Total length: EncryptionKey (KeyLen) + PasswordVerifier (2) + MacKey (16)
+						// Total length: EncryptionKey (KeyLen) + MacKey (16) + PasswordVerifier (2)
 
-						int KdfLen = 2 * KeyLen + 2;
-						byte[] PasswordBytes = Encoding.UTF8.GetBytes(Password);
 						using Rfc2898DeriveBytes Pbkdf2 = new Rfc2898DeriveBytes(
-							PasswordBytes, Salt, 1000, HashAlgorithmName.SHA1);
-						byte[] KeyMaterial = Pbkdf2.GetBytes(KdfLen);
+							Password, Salt, 1000, HashAlgorithmName.SHA1);
 
-						byte[] EncryptionKey = new byte[KeyLen];
-						Buffer.BlockCopy(KeyMaterial, 0, EncryptionKey, 0, KeyLen);
-
-						byte[] MacKey = new byte[KeyLen];
-						Buffer.BlockCopy(KeyMaterial, KeyLen, MacKey, 0, KeyLen);
-
-						byte[] PasswordVerifier = new byte[2];
-						Buffer.BlockCopy(KeyMaterial, 2 * KeyLen, PasswordVerifier, 0, 2);
-
+						byte[] EncryptionKey = Pbkdf2.GetBytes(KeyLen);
+						byte[] MacKey = Pbkdf2.GetBytes(KeyLen);
+						byte[] PasswordVerifier = Pbkdf2.GetBytes(2);
+	
 						// Write salt and password verifier
 						Output.Write(Salt, 0, SaltLen);
 						Output.Write(PasswordVerifier, 0, 2);
@@ -702,32 +703,25 @@ namespace Waher.Content.Zip
 							Aes.BlockSize = 128;
 							Aes.Mode = CipherMode.ECB;
 							Aes.Padding = PaddingMode.None;
-							Aes.Key = EncryptionKey;
-							Aes.IV = new byte[16];
 
-							using ICryptoTransform Ecb = Aes.CreateEncryptor();
+							using ICryptoTransform Ecb = Aes.CreateEncryptor(EncryptionKey, new byte[16]);
 							byte[] CounterBin = new byte[16];
-							uint Counter = 1;
-							CounterBin[15] = 1;
-
 							byte[] KeyStream = new byte[16];
 							int Offset = 0;
 							int BytesLeft = CompressedSize0;
+							int i;
 
 							while (Offset < CompressedSize0)
 							{
+								i = 0;
+								while (++CounterBin[i] == 0)
+									i++;
+
 								Ecb.TransformBlock(CounterBin, 0, 16, KeyStream, 0);
 
 								int BlockSize = Math.Min(16, BytesLeft);
-								for (int i = 0; i < BlockSize; i++)
+								for (i = 0; i < BlockSize; i++)
 									EncryptedPayload[Offset + i] = (byte)(Compressed[Offset + i] ^ KeyStream[i]);
-
-								// Increment counter (last 4 bytes, big-endian)
-								Counter++;
-								CounterBin[12] = (byte)(Counter >> 24);
-								CounterBin[13] = (byte)(Counter >> 16);
-								CounterBin[14] = (byte)(Counter >> 8);
-								CounterBin[15] = (byte)Counter;
 
 								Offset += BlockSize;
 								BytesLeft -= BlockSize;
@@ -778,7 +772,7 @@ namespace Waher.Content.Zip
 				Output.WriteUInt32(PK_CENTRAL_DIRECTORY_FILE_HEADER);
 				Output.WriteUInt16(VersionToExtract);   // Version made by
 				Output.WriteUInt16(VersionToExtract);   // Version needed to extract
-				Output.WriteUInt16(Entry.Flags);		// General purpose bit flag (same as local: 0x0001 for encryption)
+				Output.WriteUInt16(Entry.Flags);        // General purpose bit flag (same as local: 0x0001 for encryption)
 				Output.WriteUInt16(Entry.CompressionMethod);
 				Output.WriteUInt16(Entry.LastWriteTime);
 				Output.WriteUInt16(Entry.LastWriteDate);
@@ -787,12 +781,12 @@ namespace Waher.Content.Zip
 				Output.WriteUInt32((uint)Entry.UncompressedSize);
 
 				Output.WriteUInt16((ushort)Entry.FileNameBytes.Length); // File name length
-				Output.WriteUInt16(Entry.ExtraLen);		// extra field length, file comment length
-				Output.WriteUInt16(0);					// file comment length
+				Output.WriteUInt16(Entry.ExtraLen);     // extra field length, file comment length
+				Output.WriteUInt16(0);                  // file comment length
 
-				Output.WriteUInt16(0);					// Disk number start
-				Output.WriteUInt16(0);					// internal file attrs
-				Output.WriteUInt32(0);					// external attrs (0 for default)
+				Output.WriteUInt16(0);                  // Disk number start
+				Output.WriteUInt16(0);                  // internal file attrs
+				Output.WriteUInt32(0);                  // external attrs (0 for default)
 
 				Output.WriteUInt32((uint)Entry.HeaderOffset);   // Relative offset of local header (start at 0 for this file)
 

@@ -2,6 +2,9 @@
 
 namespace Waher.Content.Zip
 {
+	/// <summary>
+	/// Static class for converting DateTime values to DOS date and time formats.
+	/// </summary>
 	public static class DosDateTime
 	{
 		/// <summary>

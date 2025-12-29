@@ -13,9 +13,9 @@ namespace Waher.Content.Zip
 		None,
 
 		/// <summary>
-		/// Traditional PKWARE
+		/// Traditional PKWARE.
+		/// ZipCrypto is considered insecure.
 		/// </summary>
-		[Obsolete("ZipCrypto is considered insecure.")]
 		ZipCrypto,
 
 		/// <summary>

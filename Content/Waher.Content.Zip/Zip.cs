@@ -501,7 +501,6 @@ namespace Waher.Content.Zip
 						CompressedSizeTot += 12;
 					else
 					{
-						//Flags |= 0x48;                    // Bit 6: Strong encryption, Bit 3: Use of a data descriptor.
 						Flags |= 0x08;                      // Bit 3: Use of a data descriptor.
 						CompressionMethod = 99;             // PKWARE AES: local header method must be 99
 						DataDescriptor = true;
@@ -528,26 +527,6 @@ namespace Waher.Content.Zip
 							_ => throw new ArgumentException("Invalid ZIP encryption method.", nameof(EncryptionMethod))
 						};
 
-						//ushort AlgId = Strength switch
-						//{
-						//	1 => 0x660e,    // AES-128
-						//	2 => 0x660f,    // AES-192
-						//	3 => 0x6610,    // AES-256
-						//	_ => throw new ArgumentException("Invalid ZIP encryption method.", nameof(EncryptionMethod))
-						//};
-						//
-						//ushort BitLen = Strength switch
-						//{
-						//	1 => 128,    // AES-128
-						//	2 => 192,    // AES-192
-						//	3 => 256,    // AES-256
-						//	_ => throw new ArgumentException("Invalid ZIP encryption method.", nameof(EncryptionMethod))
-						//};
-
-						// Strong encryption? Bit 6...
-						// 4.5.12 -Strong Encryption Header (0x0017):
-						// 0x9901        AE-x encryption structure (see APPENDIX E)
-
 						SaltLen = Strength switch
 						{
 							1 => 8,     // 128 bits
@@ -558,13 +537,6 @@ namespace Waher.Content.Zip
 
 						Extra = new byte[]
 						{
-							//0x17, 0x00,	// ID = 0x0017, Strong Encryption Header
-							//0x08, 0x00,	// Data size = 8
-							//0x02, 0x00,	// Data format identifier = 2,
-							//(byte)AlgId, (byte)(AlgId >> 8),
-							//(byte)BitLen, (byte)(BitLen >> 8),
-							//0x01, 0x00, // Processing flags = 1 (password required)
-
 							0x01, 0x99,	// ID = 0x9901
 							0x07, 0x00,	// Data size = 7
 							(byte)AesVersion, 0x00,	// AES Version
@@ -680,7 +652,6 @@ namespace Waher.Content.Zip
 							rnd.GetBytes(Salt);
 
 						// Derive key material with PBKDF2-HMAC-SHA1 (1000 iterations)
-						// Total length: EncryptionKey (KeyLen) + MacKey (16) + PasswordVerifier (2)
 
 						using Rfc2898DeriveBytes Pbkdf2 = new Rfc2898DeriveBytes(
 							Password, Salt, 1000, HashAlgorithmName.SHA1);
@@ -709,6 +680,7 @@ namespace Waher.Content.Zip
 							byte[] KeyStream = new byte[16];
 							int Offset = 0;
 							int BytesLeft = CompressedSize0;
+							int BlockSize = 16;
 							int i;
 
 							while (Offset < CompressedSize0)
@@ -719,11 +691,12 @@ namespace Waher.Content.Zip
 
 								Ecb.TransformBlock(CounterBin, 0, 16, KeyStream, 0);
 
-								int BlockSize = Math.Min(16, BytesLeft);
-								for (i = 0; i < BlockSize; i++)
-									EncryptedPayload[Offset + i] = (byte)(Compressed[Offset + i] ^ KeyStream[i]);
+								if (BytesLeft < 16)
+									BlockSize = BytesLeft;
+								
+								for (i = 0; i < BlockSize; i++, Offset++)
+									EncryptedPayload[Offset] = (byte)(Compressed[Offset] ^ KeyStream[i]);
 
-								Offset += BlockSize;
 								BytesLeft -= BlockSize;
 							}
 						}

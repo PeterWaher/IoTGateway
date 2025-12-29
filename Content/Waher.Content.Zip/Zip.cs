@@ -18,6 +18,11 @@ namespace Waher.Content.Zip
 	/// </summary>
 	public static class Zip
 	{
+		private const int PK_LOCAL_FILE_HEADER = 0x04034b50;
+		private const int PK_DATA_DESCRIPTOR = 0x08074b50;
+		private const int PK_CENTRAL_DIRECTORY_FILE_HEADER = 0x02014b50;
+		private const int PK_END_OF_CENTRAL_DIRECTORY = 0x06054b50;
+
 		/// <summary>
 		/// Creates a ZIP file containing a single file.
 		/// </summary>
@@ -412,15 +417,18 @@ namespace Waher.Content.Zip
 			}
 
 			EntryMeta[] Entries = new EntryMeta[Count];
+
+			// §4.4.3 version needed to extract
+
 			ushort VersionToExtract = EncryptionMethod switch
 			{
-				ZipEncryption.Aes128Ae1 => 51,  // Version needed to extract (5.1 -> 51)
+				ZipEncryption.Aes128Ae1 => 51,  // v5.1 supports AES encryption
 				ZipEncryption.Aes192Ae1 => 51,
 				ZipEncryption.Aes256Ae1 => 51,
 				ZipEncryption.Aes128Ae2 => 51,
 				ZipEncryption.Aes192Ae2 => 51,
 				ZipEncryption.Aes256Ae2 => 51,
-				_ => 20                         // Version needed to extract (2.0 -> 20 in hex 0x0014)
+				_ => 20                         // v2.0 supports Deflate compression method
 			};
 
 			while (SourceFileNameEnumerator.MoveNext() &&
@@ -458,11 +466,12 @@ namespace Waher.Content.Zip
 				if (FileNameLength > ushort.MaxValue)
 					throw new ArgumentException("Zip entry name too long: " + FileName, nameof(SourceFileNames));
 
+				// §4.4.4 general purpose bit flag
 				ushort Flags = 0x0800;      // UTF-8 names.
 
 				byte[] Extra = null;
 				ushort ExtraLen = 0;
-				ushort Method = 8;          // Compression method: 8 = Deflate
+				ushort CompressionMethod = 8;          // Compression method: 8 = Deflate
 				bool DataDescriptor = false;
 
 				await Output.FlushAsync();
@@ -490,8 +499,7 @@ namespace Waher.Content.Zip
 						CompressedSizeTot += 12;
 					else
 					{
-						Flags |= 0x0040;        // Strong encryption.
-						Method = 99;            // PKWARE AES: local header method must be 99
+						CompressionMethod = 99;            // PKWARE AES: local header method must be 99
 
 						ushort AesVersion = EncryptionMethod switch
 						{
@@ -523,6 +531,10 @@ namespace Waher.Content.Zip
 							_ => false,
 						};
 
+						// Strong encryption? Bit 6...
+						// 4.5.12 -Strong Encryption Header (0x0017):
+						// 0x9901        AE-x encryption structure (see APPENDIX E)
+
 						if (DataDescriptor)
 							Flags |= 0x0008;        // Signals use of a data descriptor (CRC/sizes written after data).
 
@@ -536,24 +548,22 @@ namespace Waher.Content.Zip
 
 						Extra = new byte[11]
 						{
-							0x01,
-							0x99,	// ID = 0x9901
-							0x07,
-							0x00,	// Data size = 7,
-							(byte)AesVersion,
-							0x00,	// AES Version
-							0x41,
-							0x45,	// Vendor "AE" (0x4541)
+							0x01, 0x99,	// ID = 0x9901
+							0x07, 0x00,	// Data size = 7,
+							(byte)AesVersion, 0x00,	// AES Version
+							0x41, 0x45,	// Vendor "AE" (0x4541)
 							Strength,
-							0x08,
-							0x00	// Deflate
+							0x08, 0x00	// Deflate
 						};
 
 						ExtraLen = 11;
 
 						CompressedSizeTot += SaltLen + 2;
 						if (Ae2)
+						{
+							FileCrc32 = 0;
 							CompressedSizeTot += 10;
+						}
 					}
 
 					if (CompressedSizeTot < 0)
@@ -564,7 +574,7 @@ namespace Waher.Content.Zip
 				{
 					FileNameBytes = FileNameBytes,
 					Flags = Flags,
-					CompressionMethod = Method,
+					CompressionMethod = CompressionMethod,
 					LastWriteTime = SourceLastWriteTime.ToDosTime(),
 					LastWriteDate = SourceLastWriteTime.ToDosDate(),
 					Crc32 = FileCrc32,
@@ -576,10 +586,12 @@ namespace Waher.Content.Zip
 				};
 				Entries[FileIndex++] = Entry;
 
-				Output.WriteUInt32(0x04034b50); // Local file header signature 0x04034b50
+				// §4.3.7  Local file header:
+
+				Output.WriteUInt32(PK_LOCAL_FILE_HEADER);
 				Output.WriteUInt16(VersionToExtract);
 				Output.WriteUInt16(Flags);      // General purpose bit flag: bit0=1 (encrypted), others 0 (0x0001)
-				Output.WriteUInt16(Method);
+				Output.WriteUInt16(CompressionMethod);
 				Output.WriteUInt16(Entry.LastWriteTime);
 				Output.WriteUInt16(Entry.LastWriteDate);
 
@@ -661,7 +673,7 @@ namespace Waher.Content.Zip
 						// Derive key material with PBKDF2-HMAC-SHA1 (1000 iterations)
 						// Total length: EncryptionKey (KeyLen) + PasswordVerifier (2) + MacKey (16)
 
-						int KdfLen = KeyLen + 2 + 16;
+						int KdfLen = 2 * KeyLen + 2;
 						byte[] PasswordBytes = Encoding.UTF8.GetBytes(Password);
 						using Rfc2898DeriveBytes Pbkdf2 = new Rfc2898DeriveBytes(
 							PasswordBytes, Salt, 1000, HashAlgorithmName.SHA1);
@@ -670,11 +682,11 @@ namespace Waher.Content.Zip
 						byte[] EncryptionKey = new byte[KeyLen];
 						Buffer.BlockCopy(KeyMaterial, 0, EncryptionKey, 0, KeyLen);
 
-						byte[] PasswordVerifier = new byte[2];
-						Buffer.BlockCopy(KeyMaterial, KeyLen, PasswordVerifier, 0, 2);
+						byte[] MacKey = new byte[KeyLen];
+						Buffer.BlockCopy(KeyMaterial, KeyLen, MacKey, 0, KeyLen);
 
-						byte[] MacKey = new byte[16];
-						Buffer.BlockCopy(KeyMaterial, KeyLen + 2, MacKey, 0, 16);
+						byte[] PasswordVerifier = new byte[2];
+						Buffer.BlockCopy(KeyMaterial, 2 * KeyLen, PasswordVerifier, 0, 2);
 
 						// Write salt and password verifier
 						Output.Write(Salt, 0, SaltLen);
@@ -739,8 +751,9 @@ namespace Waher.Content.Zip
 
 				if (DataDescriptor)
 				{
-					// Optional signature 0x08074b50 + CRC32 + compressed size + uncompressed size (all little-endian)
-					Output.WriteUInt32(0x08074b50);
+					// §4.3.9  Data descriptor:
+
+					Output.WriteUInt32(PK_DATA_DESCRIPTOR);
 					Output.WriteUInt32(FileCrc32);
 					Output.WriteUInt32((uint)CompressedSizeTot);  // include encryption header in compressed size
 					Output.WriteUInt32((uint)UncompressedSize);
@@ -760,10 +773,12 @@ namespace Waher.Content.Zip
 
 			foreach (EntryMeta Entry in Entries)
 			{
-				Output.WriteUInt32(0x02014b50);     // Central dir file header signature 0x02014b50
-				Output.WriteUInt16(VersionToExtract);
-				Output.WriteUInt16(VersionToExtract);
-				Output.WriteUInt16(Entry.Flags);    // General purpose bit flag (same as local: 0x0001 for encryption)
+				// §4.3.12  Central directory structure:
+
+				Output.WriteUInt32(PK_CENTRAL_DIRECTORY_FILE_HEADER);
+				Output.WriteUInt16(VersionToExtract);   // Version made by
+				Output.WriteUInt16(VersionToExtract);   // Version needed to extract
+				Output.WriteUInt16(Entry.Flags);		// General purpose bit flag (same as local: 0x0001 for encryption)
 				Output.WriteUInt16(Entry.CompressionMethod);
 				Output.WriteUInt16(Entry.LastWriteTime);
 				Output.WriteUInt16(Entry.LastWriteDate);
@@ -772,12 +787,12 @@ namespace Waher.Content.Zip
 				Output.WriteUInt32((uint)Entry.UncompressedSize);
 
 				Output.WriteUInt16((ushort)Entry.FileNameBytes.Length); // File name length
-				Output.WriteUInt16(Entry.ExtraLen); // extra field length, file comment length
-				Output.WriteUInt16(0);              // file comment length
+				Output.WriteUInt16(Entry.ExtraLen);		// extra field length, file comment length
+				Output.WriteUInt16(0);					// file comment length
 
-				Output.WriteUInt16(0);              // Disk number start
-				Output.WriteUInt16(0);              // internal file attrs, external file attrs
-				Output.WriteUInt32(0);              // external attrs (0 for default)
+				Output.WriteUInt16(0);					// Disk number start
+				Output.WriteUInt16(0);					// internal file attrs
+				Output.WriteUInt32(0);					// external attrs (0 for default)
 
 				Output.WriteUInt32((uint)Entry.HeaderOffset);   // Relative offset of local header (start at 0 for this file)
 
@@ -785,6 +800,8 @@ namespace Waher.Content.Zip
 
 				if (Entry.ExtraLen > 0)
 					Output.Write(Entry.Extra, 0, Entry.ExtraLen);
+
+				// No file comment
 			}
 
 
@@ -793,11 +810,13 @@ namespace Waher.Content.Zip
 			await Output.FlushAsync();
 			uint CentralDirSize = (uint)(Output.Position - CentralDirOffset);
 
-			Output.WriteUInt32(0x06054b50);     // EOCD signature 0x06054b50
+			// §End of central directory record:
+
+			Output.WriteUInt32(PK_END_OF_CENTRAL_DIRECTORY);
 			Output.WriteUInt16(0);              // Disk numbers (for single-disk archive, both 0)
-			Output.WriteUInt16(0);
-			Output.WriteUInt16((ushort)Count);  // Number of entries on this disk and total number of entries
-			Output.WriteUInt16((ushort)Count);
+			Output.WriteUInt16(0);              // Number of the disk with the start of the central directory
+			Output.WriteUInt16((ushort)Count);  // Number of entries on this disk
+			Output.WriteUInt16((ushort)Count);  // Total number of entries
 			Output.WriteUInt32(CentralDirSize); // Size of central directory
 			Output.WriteUInt32((uint)CentralDirOffset); // Offset of start of central directory
 			Output.WriteUInt16(0);              // .ZIP file comment length (0 for no comment)

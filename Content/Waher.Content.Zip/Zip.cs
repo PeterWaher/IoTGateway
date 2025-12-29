@@ -548,13 +548,10 @@ namespace Waher.Content.Zip
 						ExtraLen = (ushort)Extra.Length;
 
 						CompressedSizeTot += SaltLen + 2;
-						if (Ae2)
-						{
-							if (UncompressedSize < 20)
-								FileCrc32 = 0;  // To avoid leaking information about the file via the CRC. Ref: §IV: https://www.winzip.com/en/support/aes-encryption/
+						if (Ae2 && UncompressedSize < 20)
+							FileCrc32 = 0;  // To avoid leaking information about the file via the CRC. Ref: §IV: https://www.winzip.com/en/support/aes-encryption/
 
-							CompressedSizeTot += 10;
-						}
+						CompressedSizeTot += 10;
 					}
 
 					if (CompressedSizeTot < 0)
@@ -659,7 +656,7 @@ namespace Waher.Content.Zip
 						byte[] EncryptionKey = Pbkdf2.GetBytes(KeyLen);
 						byte[] MacKey = Pbkdf2.GetBytes(KeyLen);
 						byte[] PasswordVerifier = Pbkdf2.GetBytes(2);
-	
+
 						// Write salt and password verifier
 						Output.Write(Salt, 0, SaltLen);
 						Output.Write(PasswordVerifier, 0, 2);
@@ -693,7 +690,7 @@ namespace Waher.Content.Zip
 
 								if (BytesLeft < 16)
 									BlockSize = BytesLeft;
-								
+
 								for (i = 0; i < BlockSize; i++, Offset++)
 									EncryptedPayload[Offset] = (byte)(Compressed[Offset] ^ KeyStream[i]);
 
@@ -704,13 +701,11 @@ namespace Waher.Content.Zip
 						// Write encrypted payload
 						Output.Write(EncryptedPayload, 0, CompressedSize0);
 
-						// AE-2: Write authentication code (first 10 bytes of HMAC-SHA1 over encrypted payload)
-						if (Ae2)
-						{
-							using HMACSHA1 Hmac = new HMACSHA1(MacKey);
-							byte[] Auth = Hmac.ComputeHash(EncryptedPayload);
-							Output.Write(Auth, 0, 10);
-						}
+						// Write authentication code (first 10 bytes of HMAC-SHA1 over encrypted payload)
+
+						using HMACSHA1 Hmac = new HMACSHA1(MacKey);
+						byte[] Auth = Hmac.ComputeHash(EncryptedPayload);
+						Output.Write(Auth, 0, 10);
 					}
 				}
 				else

@@ -937,6 +937,7 @@
 			<xs:documentation>Sent by one entity to another when it needs to get the chain of trust of a broker.</xs:documentation>
 			<xs:documentation>Expected response element: trustChain</xs:documentation>
 		</xs:annotation>
+		<xs:complexType/>
 	</xs:element>
 
 	<xs:element name='trustChain'>
@@ -955,6 +956,33 @@
 						</xs:attribute>
 					</xs:complexType>
 				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='getIdentityReferences'>
+		<xs:annotation>
+			<xs:documentation>Sent by one broker to another broker in an iq get stanza, when it needs to get references to valid legal identities used by a JID on the recipient.</xs:documentation>
+			<xs:documentation>Expected response element: identityReferences</xs:documentation>
+			<xs:documentation>Note: Sender and Recipient must be the domain names of the brokers, not the corresponding legal components.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='jid' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Bare JID on the recipient broker.</xs:documentation>
+					<xs:documentation>Note: JID must be an account on the receiving broker.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='identityReferences'>
+		<xs:annotation>
+			<xs:documentation>Sent as an iq response stanza, from one broker to another broker to inform the requestor of a set of identifiers for approved Legal Identities used by a JID.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name='identityReference' minOccurs='0' maxOccurs='unbounded' type='xs:string'/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

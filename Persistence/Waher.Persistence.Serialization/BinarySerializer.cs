@@ -564,7 +564,7 @@ namespace Waher.Persistence.Serialization
 			if (Data.Length > c)
 			{
 				byte[] Data2 = new byte[c];
-				Array.Copy(Data, 0, Data2, 0, c);
+				System.Buffer.BlockCopy(Data, 0, Data2, 0, c);
 				Data = Data2;
 			}
 

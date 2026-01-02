@@ -3401,7 +3401,7 @@ namespace Waher.Persistence.Files.Storage
 				return null;
 
 			byte[] Key = new byte[Len];
-			Array.Copy(Reader.Data, Pos, Key, 0, Len);
+			Buffer.BlockCopy(Reader.Data, Pos, Key, 0, Len);
 
 			return Key;
 		}

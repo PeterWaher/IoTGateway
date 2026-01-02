@@ -521,7 +521,7 @@ namespace Waher.Networking.Modbus
 
 			byte[] Bytes = new byte[ByteCount];
 
-			Array.Copy(Response.Data, i, Bytes, 0, ByteCount);
+			Buffer.BlockCopy(Response.Data, i, Bytes, 0, ByteCount);
 
 			return new BitArray(Bytes);
 		}
@@ -558,7 +558,7 @@ namespace Waher.Networking.Modbus
 
 			byte[] Bytes = new byte[ByteCount];
 
-			Array.Copy(Response.Data, i, Bytes, 0, ByteCount);
+			Buffer.BlockCopy(Response.Data, i, Bytes, 0, ByteCount);
 
 			return new BitArray(Bytes);
 		}

@@ -842,8 +842,8 @@ namespace Waher.Persistence.Files
 		private byte[] GetIV(long Position)
 		{
 			byte[] Input = new byte[this.ivSeedLen + 8];
-			Array.Copy(this.ivSeed, 0, Input, 0, this.ivSeedLen);
-			Array.Copy(BitConverter.GetBytes(Position), 0, Input, this.ivSeedLen, 8);
+			Buffer.BlockCopy(this.ivSeed, 0, Input, 0, this.ivSeedLen);
+			Buffer.BlockCopy(BitConverter.GetBytes(Position), 0, Input, this.ivSeedLen, 8);
 			byte[] Hash;
 
 			using (SHA1 Sha1 = SHA1.Create())
@@ -914,14 +914,14 @@ namespace Waher.Persistence.Files
 						Header = new BlockHeader(Reader);
 
 						if (Header.LastBlockIndex == PrevBlockIndex)
-							Array.Copy(BitConverter.GetBytes(BlockIndex), 0, Block, 6, 4);
+							Buffer.BlockCopy(BitConverter.GetBytes(BlockIndex), 0, Block, 6, 4);
 						else
 						{
 							await this.ForEachObject(Block, (Link, ObjectId, Pos, Len) =>
 							{
 								if (Link == PrevBlockIndex)
 								{
-									Array.Copy(BitConverter.GetBytes(BlockIndex), 0, Block, Pos - 4, 4);
+									Buffer.BlockCopy(BitConverter.GetBytes(BlockIndex), 0, Block, Pos - 4, 4);
 									return false;
 								}
 								else
@@ -980,8 +980,8 @@ namespace Waher.Persistence.Files
 
 			byte[] Result = new byte[HeaderSize + 4];
 			byte[] EncryptedBlock;
-			Array.Copy(Bin, 0, Result, 0, HeaderSize);
-			Array.Copy(BitConverter.GetBytes(this.blobBlockLimit), 0, Result, HeaderSize, 4);
+			Buffer.BlockCopy(Bin, 0, Result, 0, HeaderSize);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.blobBlockLimit), 0, Result, HeaderSize, 4);
 			byte[] Block = new byte[this.blobBlockSize];
 			int Left;
 			uint Prev = uint.MaxValue;
@@ -989,19 +989,19 @@ namespace Waher.Persistence.Files
 			int Pos = HeaderSize;
 			uint BlobBlockIndex = this.blobFile.BlockLimit;
 
-			Array.Copy(Bin, 0, Block, 0, KeySize);
+			Buffer.BlockCopy(Bin, 0, Block, 0, KeySize);
 
 			Len += HeaderSize;
 			while (Pos < Len)
 			{
-				Array.Copy(BitConverter.GetBytes(Prev), 0, Block, KeySize, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(Prev), 0, Block, KeySize, 4);
 				Prev = this.blobBlockLimit;
 
 				Left = Len - Pos;
 				if (Left <= Limit)
 				{
-					Array.Copy(BitConverter.GetBytes(uint.MaxValue), 0, Block, KeySize + 4, 4);
-					Array.Copy(Bin, Pos, Block, KeySize + 8, Left);
+					Buffer.BlockCopy(BitConverter.GetBytes(uint.MaxValue), 0, Block, KeySize + 4, 4);
+					Buffer.BlockCopy(Bin, Pos, Block, KeySize + 8, Left);
 					if (Left < Limit)
 						Array.Clear(Block, (int)(KeySize + 8 + Left), (int)(Limit - Left));
 
@@ -1009,8 +1009,8 @@ namespace Waher.Persistence.Files
 				}
 				else
 				{
-					Array.Copy(BitConverter.GetBytes(++this.blobBlockLimit), 0, Block, KeySize + 4, 4);
-					Array.Copy(Bin, Pos, Block, KeySize + 8, Limit);
+					Buffer.BlockCopy(BitConverter.GetBytes(++this.blobBlockLimit), 0, Block, KeySize + 4, 4);
+					Buffer.BlockCopy(Bin, Pos, Block, KeySize + 8, Limit);
 					Pos += Limit;
 				}
 
@@ -1057,7 +1057,7 @@ namespace Waher.Persistence.Files
 				int NrRead;
 				bool ChainError = false;
 
-				Array.Copy(Block, Pos, Result, 0, Bookmark);
+				Buffer.BlockCopy(Block, Pos, Result, 0, Bookmark);
 				Len += (uint)Bookmark;
 
 				while (i < Len)
@@ -1103,7 +1103,7 @@ namespace Waher.Persistence.Files
 
 					NrRead = Math.Min(this.blobBlockSize - KeySize - 8, (int)(Len - i));
 
-					Array.Copy(DecryptedBlock, KeySize + 8, Result, i, NrRead);
+					Buffer.BlockCopy(DecryptedBlock, KeySize + 8, Result, i, NrRead);
 					i += NrRead;
 
 					Statistics?.ReportBlobBlockStatistics((uint)(KeySize + 8 + NrRead), (uint)(this.blobBlockSize - NrRead - KeySize - 8));
@@ -1251,14 +1251,14 @@ namespace Waher.Persistence.Files
 							Len = await this.recordHandler.GetFullPayloadSize(Reader);
 							if (Reader.Position - Info.InternalPosition - 4 + Len > this.inlineObjectSizeLimit)
 							{
-								Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, Info.Block, Reader.Position, 4);
+								Buffer.BlockCopy(BitConverter.GetBytes(BlobBlockIndex), 0, Info.Block, Reader.Position, 4);
 								this.QueueSaveBlockLocked(Info.BlockIndex, Info.Block);
 							}
 						}
 					}
 				}
 				else if (TranslationFromTo.TryGetValue(Prev, out To))
-					Array.Copy(BitConverter.GetBytes(To), 0, DecryptedBlock, KeySize2, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(To), 0, DecryptedBlock, KeySize2, 4);
 				else
 				{
 					await this.blobFile.LoadBlock(Prev, BlobBlock);
@@ -1274,7 +1274,7 @@ namespace Waher.Persistence.Files
 					else
 						DecryptedBlock2 = BlobBlock;
 
-					Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize2 + 4, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize2 + 4, 4);
 
 					if (this.encrypted)
 					{
@@ -1291,7 +1291,7 @@ namespace Waher.Persistence.Files
 				}
 
 				if (TranslationFromTo.TryGetValue(Next, out To))
-					Array.Copy(BitConverter.GetBytes(To), 0, DecryptedBlock, KeySize2 + 4, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(To), 0, DecryptedBlock, KeySize2 + 4, 4);
 				else if (Next != uint.MaxValue)
 				{
 					await this.blobFile.LoadBlock(Next, BlobBlock);
@@ -1307,7 +1307,7 @@ namespace Waher.Persistence.Files
 					else
 						DecryptedBlock2 = BlobBlock;
 
-					Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize2, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize2, 4);
 
 					if (this.encrypted)
 					{
@@ -1634,26 +1634,26 @@ namespace Waher.Persistence.Files
 				if (InsertAt < BlockHeaderSize + Used)
 				{
 					InsertAt += 4;
-					Array.Copy(Block, InsertAt, Block, InsertAt + 4 + Bin.Length, BlockHeaderSize + Used - InsertAt);
-					Array.Copy(Bin, 0, Block, InsertAt, Bin.Length);
+					Buffer.BlockCopy(Block, InsertAt, Block, InsertAt + 4 + Bin.Length, BlockHeaderSize + Used - InsertAt);
+					Buffer.BlockCopy(Bin, 0, Block, InsertAt, Bin.Length);
 					InsertAt += Bin.Length;
-					Array.Copy(BitConverter.GetBytes(ChildRightLink), 0, Block, InsertAt, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(ChildRightLink), 0, Block, InsertAt, 4);
 				}
 				else
 				{
-					Array.Copy(Block, 6, Block, InsertAt, 4);   // Last block link
+					Buffer.BlockCopy(Block, 6, Block, InsertAt, 4);   // Last block link
 					InsertAt += 4;
-					Array.Copy(Bin, 0, Block, InsertAt, Bin.Length);
-					Array.Copy(BitConverter.GetBytes(ChildRightLink), 0, Block, 6, 4);  // New last block link
+					Buffer.BlockCopy(Bin, 0, Block, InsertAt, Bin.Length);
+					Buffer.BlockCopy(BitConverter.GetBytes(ChildRightLink), 0, Block, 6, 4);  // New last block link
 				}
 
 				Header.BytesUsed += (ushort)(4 + Bin.Length);
-				Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+				Buffer.BlockCopy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 
 				if (IncSize && Header.SizeSubtree < uint.MaxValue)
 				{
 					Header.SizeSubtree++;
-					Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 				}
 
 				this.QueueSaveBlockLocked(BlockIndex, Block);
@@ -1673,7 +1673,7 @@ namespace Waher.Persistence.Files
 
 						Header.SizeSubtree++;
 
-						Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+						Buffer.BlockCopy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 						this.QueueSaveBlockLocked(BlockIndex, Block);
 					}
 				}
@@ -1779,13 +1779,13 @@ namespace Waher.Persistence.Files
 
 				uint ParentLink = BlockIndex == 0 ? 0 : Header.ParentBlockIndex;
 
-				Array.Copy(BitConverter.GetBytes(LeftBytesUsed), 0, Splitter.LeftBlock, 0, 2);
-				Array.Copy(BitConverter.GetBytes(Splitter.LeftSizeSubtree), 0, Splitter.LeftBlock, 2, 4);
-				Array.Copy(BitConverter.GetBytes(ParentLink), 0, Splitter.LeftBlock, 10, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(LeftBytesUsed), 0, Splitter.LeftBlock, 0, 2);
+				Buffer.BlockCopy(BitConverter.GetBytes(Splitter.LeftSizeSubtree), 0, Splitter.LeftBlock, 2, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(ParentLink), 0, Splitter.LeftBlock, 10, 4);
 
-				Array.Copy(BitConverter.GetBytes(RightBytesUsed), 0, Splitter.RightBlock, 0, 2);
-				Array.Copy(BitConverter.GetBytes(Splitter.RightSizeSubtree), 0, Splitter.RightBlock, 2, 4);
-				Array.Copy(BitConverter.GetBytes(ParentLink), 0, Splitter.RightBlock, 10, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(RightBytesUsed), 0, Splitter.RightBlock, 0, 2);
+				Buffer.BlockCopy(BitConverter.GetBytes(Splitter.RightSizeSubtree), 0, Splitter.RightBlock, 2, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(ParentLink), 0, Splitter.RightBlock, 10, 4);
 
 				this.QueueSaveBlockLocked(LeftLink, Splitter.LeftBlock);
 				this.QueueSaveBlockLocked(RightLink, Splitter.RightBlock);
@@ -1799,11 +1799,11 @@ namespace Waher.Persistence.Files
 					if (NewParentSizeSubtree <= Splitter.LeftSizeSubtree || NewParentSizeSubtree <= Splitter.RightSizeSubtree)
 						NewParentSizeSubtree = uint.MaxValue;
 
-					Array.Copy(BitConverter.GetBytes(NewParentBytesUsed), 0, NewParentBlock, 0, 2);
-					Array.Copy(BitConverter.GetBytes(NewParentSizeSubtree), 0, NewParentBlock, 2, 4);
-					Array.Copy(BitConverter.GetBytes(RightLink), 0, NewParentBlock, 6, 4);
-					Array.Copy(BitConverter.GetBytes(LeftLink), 0, NewParentBlock, 14, 4);
-					Array.Copy(Splitter.ParentObject, 0, NewParentBlock, 18, Splitter.ParentObject.Length);
+					Buffer.BlockCopy(BitConverter.GetBytes(NewParentBytesUsed), 0, NewParentBlock, 0, 2);
+					Buffer.BlockCopy(BitConverter.GetBytes(NewParentSizeSubtree), 0, NewParentBlock, 2, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(RightLink), 0, NewParentBlock, 6, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(LeftLink), 0, NewParentBlock, 14, 4);
+					Buffer.BlockCopy(Splitter.ParentObject, 0, NewParentBlock, 18, Splitter.ParentObject.Length);
 
 					this.QueueSaveBlockLocked(0, NewParentBlock);
 				}
@@ -1906,7 +1906,7 @@ namespace Waher.Persistence.Files
 			uint ChildParentLink = BitConverter.ToUInt32(ChildBlock, 10);
 			if (ChildParentLink != NewParentLink)
 			{
-				Array.Copy(BitConverter.GetBytes(NewParentLink), 0, ChildBlock, 10, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(NewParentLink), 0, ChildBlock, 10, 4);
 				this.QueueSaveBlockLocked(ChildLink, ChildBlock);
 			}
 		}
@@ -2367,16 +2367,16 @@ namespace Waher.Persistence.Files
 				{
 					i = Header.BytesUsed + BlockHeaderSize - (Info.InternalPosition + 4 + OldSize);
 					if (i > 0)
-						Array.Copy(Block, Info.InternalPosition + 4 + OldSize, Block, Info.InternalPosition + 4 + NewSize, i);
+						Buffer.BlockCopy(Block, Info.InternalPosition + 4 + OldSize, Block, Info.InternalPosition + 4 + NewSize, i);
 
 					Header.BytesUsed += (ushort)DeltaSize;
-					Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+					Buffer.BlockCopy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 
 					if (DeltaSize < 0)
 						Array.Clear(Block, Header.BytesUsed + BlockHeaderSize, -DeltaSize);
 				}
 
-				Array.Copy(Bin, 0, Block, Info.InternalPosition + 4, NewSize);
+				Buffer.BlockCopy(Bin, 0, Block, Info.InternalPosition + 4, NewSize);
 
 				this.QueueSaveBlockLocked(BlockIndex, Block);
 			}
@@ -2455,13 +2455,13 @@ namespace Waher.Persistence.Files
 
 				uint ParentLink = BlockIndex == 0 ? 0 : Header.ParentBlockIndex;
 
-				Array.Copy(BitConverter.GetBytes(LeftBytesUsed), 0, Splitter.LeftBlock, 0, 2);
-				Array.Copy(BitConverter.GetBytes(Splitter.LeftSizeSubtree), 0, Splitter.LeftBlock, 2, 4);
-				Array.Copy(BitConverter.GetBytes(ParentLink), 0, Splitter.LeftBlock, 10, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(LeftBytesUsed), 0, Splitter.LeftBlock, 0, 2);
+				Buffer.BlockCopy(BitConverter.GetBytes(Splitter.LeftSizeSubtree), 0, Splitter.LeftBlock, 2, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(ParentLink), 0, Splitter.LeftBlock, 10, 4);
 
-				Array.Copy(BitConverter.GetBytes(RightBytesUsed), 0, Splitter.RightBlock, 0, 2);
-				Array.Copy(BitConverter.GetBytes(Splitter.RightSizeSubtree), 0, Splitter.RightBlock, 2, 4);
-				Array.Copy(BitConverter.GetBytes(ParentLink), 0, Splitter.RightBlock, 10, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(RightBytesUsed), 0, Splitter.RightBlock, 0, 2);
+				Buffer.BlockCopy(BitConverter.GetBytes(Splitter.RightSizeSubtree), 0, Splitter.RightBlock, 2, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(ParentLink), 0, Splitter.RightBlock, 10, 4);
 
 				this.QueueSaveBlockLocked(LeftLink, Splitter.LeftBlock);
 				this.QueueSaveBlockLocked(RightLink, Splitter.RightBlock);
@@ -2475,11 +2475,11 @@ namespace Waher.Persistence.Files
 					if (NewParentSizeSubtree <= Splitter.LeftSizeSubtree || NewParentSizeSubtree <= Splitter.RightSizeSubtree)
 						NewParentSizeSubtree = uint.MaxValue;
 
-					Array.Copy(BitConverter.GetBytes(NewParentBytesUsed), 0, NewParentBlock, 0, 2);
-					Array.Copy(BitConverter.GetBytes(NewParentSizeSubtree), 0, NewParentBlock, 2, 4);
-					Array.Copy(BitConverter.GetBytes(RightLink), 0, NewParentBlock, 6, 4);
-					Array.Copy(BitConverter.GetBytes(LeftLink), 0, NewParentBlock, 14, 4);
-					Array.Copy(Splitter.ParentObject, 0, NewParentBlock, 18, Splitter.ParentObject.Length);
+					Buffer.BlockCopy(BitConverter.GetBytes(NewParentBytesUsed), 0, NewParentBlock, 0, 2);
+					Buffer.BlockCopy(BitConverter.GetBytes(NewParentSizeSubtree), 0, NewParentBlock, 2, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(RightLink), 0, NewParentBlock, 6, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(LeftLink), 0, NewParentBlock, 14, 4);
+					Buffer.BlockCopy(Splitter.ParentObject, 0, NewParentBlock, 18, Splitter.ParentObject.Length);
 
 					this.QueueSaveBlockLocked(0, NewParentBlock);
 				}
@@ -2726,14 +2726,14 @@ namespace Waher.Persistence.Files
 			if (LeftBlockLink == 0)
 			{
 				if (c > 0)
-					Array.Copy(Block, i, Block, Info.InternalPosition, c);
+					Buffer.BlockCopy(Block, i, Block, Info.InternalPosition, c);
 
 				Header.BytesUsed -= (ushort)(i - Info.InternalPosition);
 				Header.SizeSubtree--;
 
 				Array.Clear(Block, Header.BytesUsed + BlockHeaderSize, i - Info.InternalPosition);
-				Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
-				Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+				Buffer.BlockCopy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 
 				if (Header.BytesUsed == 0)
 				{
@@ -2754,8 +2754,8 @@ namespace Waher.Persistence.Files
 					else
 					{
 						Header.SizeSubtree = 0;
-						Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
-						Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+						Buffer.BlockCopy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+						Buffer.BlockCopy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 
 						this.QueueSaveBlockLocked(BlockIndex, Block);
 						await this.DecreaseSizeLocked(Header.ParentBlockIndex);
@@ -2799,7 +2799,7 @@ namespace Waher.Persistence.Files
 						throw Database.FlagForRepair(this.collectionName, "Suspected circular reference found in database.");
 
 					byte[] Separator = new byte[ObjLen];
-					Array.Copy(Block, Info.InternalPosition + 4, Separator, 0, ObjLen);
+					Buffer.BlockCopy(Block, Info.InternalPosition + 4, Separator, 0, ObjLen);
 
 					MergeResult MergeResult = await this.MergeBlocksLocked(LeftBlockLink, Separator, RightBlockLink);
 
@@ -2821,13 +2821,13 @@ namespace Waher.Persistence.Files
 							c = Header.BytesUsed + BlockHeaderSize - i;
 
 							Header.LastBlockIndex = LeftBlockLink;
-							Array.Copy(BitConverter.GetBytes(Header.LastBlockIndex), 0, Block, 6, 4);
+							Buffer.BlockCopy(BitConverter.GetBytes(Header.LastBlockIndex), 0, Block, 6, 4);
 						}
 					}
 					else
 					{
 						c = Header.BytesUsed + BlockHeaderSize - Reader.Position;
-						Array.Copy(Block, Reader.Position, Block, Info.InternalPosition + 4, c);
+						Buffer.BlockCopy(Block, Reader.Position, Block, Info.InternalPosition + 4, c);
 						i = Info.InternalPosition + 4 + c;
 						c = Header.BytesUsed + BlockHeaderSize - i;
 					}
@@ -2835,7 +2835,7 @@ namespace Waher.Persistence.Files
 					Array.Clear(Block, i, c);
 
 					Header.BytesUsed -= (ushort)c;
-					Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+					Buffer.BlockCopy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 
 					this.QueueSaveBlockLocked(BlockIndex, Block);
 					this.QueueSaveBlockLocked(LeftBlockLink, MergeResult.ResultBlock);
@@ -2952,7 +2952,7 @@ namespace Waher.Persistence.Files
 			else
 				Header.SizeSubtree = (uint)Size;
 
-			Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+			Buffer.BlockCopy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 			this.QueueSaveBlockLocked(BlockIndex, Block);
 
 			if (BlockIndex != 0)
@@ -2976,7 +2976,7 @@ namespace Waher.Persistence.Files
 					await this.ForEachObjectAsync(Block, async (Link, ObjectId2, Pos, Len) =>
 					{
 						byte[] Obj = new byte[Len];
-						Array.Copy(Block, Pos, Obj, 0, Len);
+						Buffer.BlockCopy(Block, Pos, Obj, 0, Len);
 						BlockInfo Leaf2 = await this.FindLeafNodeLocked(ObjectId2);
 						await this.InsertObjectLocked(Leaf2.BlockIndex, Leaf2.Header, Leaf2.Block, Obj, Leaf2.InternalPosition, 0, 0, true, Leaf2.LastObject);
 
@@ -3047,12 +3047,12 @@ namespace Waher.Persistence.Files
 			else
 			{
 				Array.Clear(Block, BlockHeaderSize, 4);
-				Array.Copy(Object, 0, Block, BlockHeaderSize + 4, Object.Length);
+				Buffer.BlockCopy(Object, 0, Block, BlockHeaderSize + 4, Object.Length);
 
 				Header.BytesUsed = (ushort)(4 + Object.Length);
 				Header.SizeSubtree++;
-				Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
-				Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+				Buffer.BlockCopy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 
 				if (Header.LastBlockIndex == 0)
 					this.QueueSaveBlockLocked(BlockIndex, Block);
@@ -3062,7 +3062,7 @@ namespace Waher.Persistence.Files
 					byte[] NewChildBlock = NewChild.Item2;
 					uint NewChildBlockIndex = NewChild.Item1;
 
-					Array.Copy(BitConverter.GetBytes(NewChildBlockIndex), 0, Block, BlockHeaderSize, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(NewChildBlockIndex), 0, Block, BlockHeaderSize, 4);
 
 					this.QueueSaveBlockLocked(BlockIndex, Block);
 
@@ -3072,12 +3072,12 @@ namespace Waher.Persistence.Files
 
 					if (!(Object2 is null))
 					{
-						Array.Copy(Object2, 0, NewChildBlock, BlockHeaderSize + 4, Object2.Length);
-						Array.Copy(BitConverter.GetBytes((ushort)(Object2.Length + 4)), 0, NewChildBlock, 0, 2);
-						Array.Copy(BitConverter.GetBytes((uint)1), 0, NewChildBlock, 2, 4);
+						Buffer.BlockCopy(Object2, 0, NewChildBlock, BlockHeaderSize + 4, Object2.Length);
+						Buffer.BlockCopy(BitConverter.GetBytes((ushort)(Object2.Length + 4)), 0, NewChildBlock, 0, 2);
+						Buffer.BlockCopy(BitConverter.GetBytes((uint)1), 0, NewChildBlock, 2, 4);
 					}
 
-					Array.Copy(BitConverter.GetBytes(BlockIndex), 0, NewChildBlock, 10, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(BlockIndex), 0, NewChildBlock, 10, 4);
 
 					this.QueueSaveBlockLocked(NewChildBlockIndex, NewChildBlock);
 
@@ -3116,14 +3116,14 @@ namespace Waher.Persistence.Files
 
 					c = ParentHeader.BytesUsed + BlockHeaderSize - LastPos;
 					byte[] Separator = new byte[c];
-					Array.Copy(ParentBlock, LastPos, Separator, 0, c);
+					Buffer.BlockCopy(ParentBlock, LastPos, Separator, 0, c);
 					MergeResult MergeResult = await this.MergeBlocksLocked(LastLink, Separator, ChildBlockIndex);
 
 					Array.Clear(ParentBlock, LastPos - 4, ParentHeader.BytesUsed + BlockHeaderSize - (LastPos - 4));
 					ParentHeader.BytesUsed = (ushort)(LastPos - 4 - BlockHeaderSize);
 					ParentHeader.LastBlockIndex = LastLink;
-					Array.Copy(BitConverter.GetBytes(ParentHeader.BytesUsed), 0, ParentBlock, 0, 2);
-					Array.Copy(BitConverter.GetBytes(ParentHeader.LastBlockIndex), 0, ParentBlock, 6, 2);
+					Buffer.BlockCopy(BitConverter.GetBytes(ParentHeader.BytesUsed), 0, ParentBlock, 0, 2);
+					Buffer.BlockCopy(BitConverter.GetBytes(ParentHeader.LastBlockIndex), 0, ParentBlock, 6, 2);
 
 					this.QueueSaveBlockLocked(LastLink, MergeResult.ResultBlock);
 					this.QueueSaveBlockLocked(ParentBlockIndex, ParentBlock);
@@ -3174,7 +3174,7 @@ namespace Waher.Persistence.Files
 				}
 
 				byte[] Separator = new byte[c = i - LastPos];
-				Array.Copy(ParentBlock, LastPos, Separator, 0, c);
+				Buffer.BlockCopy(ParentBlock, LastPos, Separator, 0, c);
 
 				MergeResult MergeResult = await this.MergeBlocksLocked(ChildBlockIndex, Separator, RightLink);
 
@@ -3185,20 +3185,20 @@ namespace Waher.Persistence.Files
 					Array.Clear(ParentBlock, LastPos - 4, ParentHeader.BytesUsed + BlockHeaderSize - (LastPos - 4));
 					ParentHeader.LastBlockIndex = ChildBlockIndex;
 					ParentHeader.BytesUsed = (ushort)(LastPos - BlockHeaderSize - 4);
-					Array.Copy(BitConverter.GetBytes(ParentHeader.BytesUsed), 0, ParentBlock, 0, 2);
-					Array.Copy(BitConverter.GetBytes(ParentHeader.LastBlockIndex), 0, ParentBlock, 6, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(ParentHeader.BytesUsed), 0, ParentBlock, 0, 2);
+					Buffer.BlockCopy(BitConverter.GetBytes(ParentHeader.LastBlockIndex), 0, ParentBlock, 6, 4);
 				}
 				else
 				{
 					this.RegisterEmptyBlockLocked(RightLink);
 
 					c = ParentHeader.BytesUsed + BlockHeaderSize - i - 4;
-					Array.Copy(ParentBlock, i + 4, ParentBlock, LastPos, c);
+					Buffer.BlockCopy(ParentBlock, i + 4, ParentBlock, LastPos, c);
 					c += LastPos;
 
 					Array.Clear(ParentBlock, c, ParentHeader.BytesUsed + BlockHeaderSize - c);
 					ParentHeader.BytesUsed = (ushort)(c - BlockHeaderSize);
-					Array.Copy(BitConverter.GetBytes(ParentHeader.BytesUsed), 0, ParentBlock, 0, 2);
+					Buffer.BlockCopy(BitConverter.GetBytes(ParentHeader.BytesUsed), 0, ParentBlock, 0, 2);
 				}
 
 				this.QueueSaveBlockLocked(ParentBlockIndex, ParentBlock);
@@ -3272,10 +3272,10 @@ namespace Waher.Persistence.Files
 				return true;
 			});
 
-			Array.Copy(BitConverter.GetBytes((ushort)(Splitter.LeftPos - BlockHeaderSize)), 0, Splitter.LeftBlock, 0, 2);
-			Array.Copy(BitConverter.GetBytes(Splitter.LeftSizeSubtree), 0, Splitter.LeftBlock, 2, 4);
-			Array.Copy(BitConverter.GetBytes(Splitter.LeftLastBlockIndex), 0, Splitter.LeftBlock, 6, 4);
-			Array.Copy(Left, 10, Splitter.LeftBlock, 10, 4);
+			Buffer.BlockCopy(BitConverter.GetBytes((ushort)(Splitter.LeftPos - BlockHeaderSize)), 0, Splitter.LeftBlock, 0, 2);
+			Buffer.BlockCopy(BitConverter.GetBytes(Splitter.LeftSizeSubtree), 0, Splitter.LeftBlock, 2, 4);
+			Buffer.BlockCopy(BitConverter.GetBytes(Splitter.LeftLastBlockIndex), 0, Splitter.LeftBlock, 6, 4);
+			Buffer.BlockCopy(Left, 10, Splitter.LeftBlock, 10, 4);
 
 			if (RightLastLink == 0)
 				Size = 0;
@@ -3301,8 +3301,8 @@ namespace Waher.Persistence.Files
 				}
 
 				Result.Residue = null;
-				Array.Copy(Right, 6, Result.ResultBlock, 6, 4);
-				Array.Copy(BitConverter.GetBytes(Result.ResultBlockSize), 0, Result.ResultBlock, 2, 4);
+				Buffer.BlockCopy(Right, 6, Result.ResultBlock, 6, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(Result.ResultBlockSize), 0, Result.ResultBlock, 2, 4);
 			}
 			else
 			{
@@ -3315,9 +3315,9 @@ namespace Waher.Persistence.Files
 					Splitter.RightSizeSubtree = Size2;
 				}
 
-				Array.Copy(BitConverter.GetBytes((ushort)(Splitter.RightPos - BlockHeaderSize)), 0, Splitter.RightBlock, 0, 2);
-				Array.Copy(BitConverter.GetBytes(Splitter.RightSizeSubtree), 0, Splitter.RightBlock, 2, 4);
-				Array.Copy(Right, 6, Splitter.RightBlock, 6, 8);
+				Buffer.BlockCopy(BitConverter.GetBytes((ushort)(Splitter.RightPos - BlockHeaderSize)), 0, Splitter.RightBlock, 0, 2);
+				Buffer.BlockCopy(BitConverter.GetBytes(Splitter.RightSizeSubtree), 0, Splitter.RightBlock, 2, 4);
+				Buffer.BlockCopy(Right, 6, Splitter.RightBlock, 6, 8);
 
 				Result.Residue = Splitter.RightBlock;
 				Result.ResidueSize = Splitter.RightSizeSubtree;
@@ -3436,7 +3436,7 @@ namespace Waher.Persistence.Files
 						c = Reader.Position + Len - LastPos - 4;
 
 						byte[] Separator = new byte[c];
-						Array.Copy(Block, LastPos + 4, Separator, 0, c);
+						Buffer.BlockCopy(Block, LastPos + 4, Separator, 0, c);
 
 						MergeResult MergeResult = await this.MergeBlocksLocked(Link, Separator, Header.LastBlockIndex);
 
@@ -3447,8 +3447,8 @@ namespace Waher.Persistence.Files
 
 							Array.Clear(Block, LastPos, c + 4);
 							Header.BytesUsed -= (ushort)(c + 4);
-							Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
-							Array.Copy(BitConverter.GetBytes(Header.LastBlockIndex), 0, Block, 6, 4);
+							Buffer.BlockCopy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+							Buffer.BlockCopy(BitConverter.GetBytes(Header.LastBlockIndex), 0, Block, 6, 4);
 
 							this.QueueSaveBlockLocked(BlockIndex, Block);
 							this.QueueSaveBlockLocked(Link, MergeResult.ResultBlock);
@@ -3498,16 +3498,16 @@ namespace Waher.Persistence.Files
 							if (Prev != 0)
 							{
 								byte[] Result2 = new byte[Header.BytesUsed - 4];
-								Array.Copy(Block, Prev + 4, Result2, 0, Header.BytesUsed - 4);
+								Buffer.BlockCopy(Block, Prev + 4, Result2, 0, Header.BytesUsed - 4);
 
-								Array.Copy(Result, 0, Block, Prev + 4, Result.Length);
+								Buffer.BlockCopy(Result, 0, Block, Prev + 4, Result.Length);
 
 								c = Result.Length + 4;
 								if (c < Header.BytesUsed)
 									Array.Clear(Block, BlockHeaderSize + c, Header.BytesUsed - c);
 
 								Header.BytesUsed = (ushort)c;
-								Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+								Buffer.BlockCopy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 
 								this.QueueSaveBlockLocked(BlockIndex, Block);
 
@@ -3520,13 +3520,13 @@ namespace Waher.Persistence.Files
 				{
 					c = Reader.Position - Prev - 4;
 					Result = new byte[c];
-					Array.Copy(Block, Prev + 4, Result, 0, c);
+					Buffer.BlockCopy(Block, Prev + 4, Result, 0, c);
 					Array.Clear(Block, Prev, c + 4);
 
 					Header.BytesUsed -= (ushort)(c + 4);
 					Header.SizeSubtree--;
-					Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
-					Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+					Buffer.BlockCopy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 
 					this.QueueSaveBlockLocked(BlockIndex, Block);
 
@@ -3583,7 +3583,7 @@ namespace Waher.Persistence.Files
 
 								c = Second - First - 4;
 								byte[] Separator = new byte[c];
-								Array.Copy(Block, First + 4, Separator, 0, c);
+								Buffer.BlockCopy(Block, First + 4, Separator, 0, c);
 
 								MergeResult MergeResult = await this.MergeBlocksLocked(Link, Separator, RightLink);
 
@@ -3593,14 +3593,14 @@ namespace Waher.Persistence.Files
 
 									c = Header.BytesUsed + BlockHeaderSize - Second - 4;
 									if (c > 0)
-										Array.Copy(Block, Second + 4, Block, First + 4, c);
+										Buffer.BlockCopy(Block, Second + 4, Block, First + 4, c);
 									else
-										Array.Copy(BitConverter.GetBytes(Link), 0, Block, 6, 4);
+										Buffer.BlockCopy(BitConverter.GetBytes(Link), 0, Block, 6, 4);
 
 									c = Second - First;
 									Header.BytesUsed -= (ushort)c;
 									Array.Clear(Block, Header.BytesUsed + BlockHeaderSize, c);
-									Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+									Buffer.BlockCopy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 
 									this.QueueSaveBlockLocked(BlockIndex, Block);
 									this.QueueSaveBlockLocked(Link, MergeResult.ResultBlock);
@@ -3657,9 +3657,9 @@ namespace Waher.Persistence.Files
 					{
 						c = Header.BytesUsed - 4;
 						Result = new byte[c];
-						Array.Copy(Block, First + 4, Result, 0, c);
+						Buffer.BlockCopy(Block, First + 4, Result, 0, c);
 
-						Array.Copy(NewChild, 0, Block, First + 4, NewChild.Length);
+						Buffer.BlockCopy(NewChild, 0, Block, First + 4, NewChild.Length);
 
 						c -= NewChild.Length;
 						if (c != 0)
@@ -3668,7 +3668,7 @@ namespace Waher.Persistence.Files
 								Array.Clear(Block, First + 4 + NewChild.Length, c);
 
 							Header.BytesUsed -= (ushort)c;
-							Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+							Buffer.BlockCopy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 						}
 
 						this.QueueSaveBlockLocked(BlockIndex, Block);
@@ -3679,14 +3679,14 @@ namespace Waher.Persistence.Files
 			{
 				c = Second - First - 4;
 				Result = new byte[c];
-				Array.Copy(Block, First + 4, Result, 0, c);
-				Array.Copy(Block, Second, Block, First, Header.BytesUsed + BlockHeaderSize - Second);
+				Buffer.BlockCopy(Block, First + 4, Result, 0, c);
+				Buffer.BlockCopy(Block, Second, Block, First, Header.BytesUsed + BlockHeaderSize - Second);
 
 				Header.BytesUsed -= (ushort)(c + 4);
 				Header.SizeSubtree--;
 				Array.Clear(Block, Header.BytesUsed + BlockHeaderSize, c + 4);
-				Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
-				Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+				Buffer.BlockCopy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 
 				this.QueueSaveBlockLocked(BlockIndex, Block);
 
@@ -3797,7 +3797,7 @@ namespace Waher.Persistence.Files
 			int c;
 			byte[] OldSeparator = new byte[c = Pos - PrevPos - 4];
 
-			Array.Copy(Block, PrevPos + 4, OldSeparator, 0, c);
+			Buffer.BlockCopy(Block, PrevPos + 4, OldSeparator, 0, c);
 
 			await this.ReplaceObjectLocked(Object, new BlockInfo(Header, Block, BlockIndex, PrevPos, false, true), false);
 
@@ -3926,7 +3926,7 @@ namespace Waher.Persistence.Files
 			int c;
 			byte[] OldSeparator = new byte[c = Pos - PrevPos - 4];
 
-			Array.Copy(Block, PrevPos + 4, OldSeparator, 0, c);
+			Buffer.BlockCopy(Block, PrevPos + 4, OldSeparator, 0, c);
 
 			await this.ReplaceObjectLocked(Object, new BlockInfo(Header, Block, BlockIndex, PrevPos, false, true), false);
 
@@ -3962,7 +3962,7 @@ namespace Waher.Persistence.Files
 				else
 					Size -= Delta;
 
-				Array.Copy(BitConverter.GetBytes(Size), 0, Block, 2, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(Size), 0, Block, 2, 4);
 
 				this.QueueSaveBlockLocked(BlockIndex, Block);
 
@@ -3986,7 +3986,7 @@ namespace Waher.Persistence.Files
 				if (Size < uint.MaxValue)
 				{
 					Size++;
-					Array.Copy(BitConverter.GetBytes(Size), 0, Block, 2, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(Size), 0, Block, 2, 4);
 					this.QueueSaveBlockLocked(BlockIndex, Block);
 
 					if (BlockIndex == 0)
@@ -4359,7 +4359,7 @@ namespace Waher.Persistence.Files
 				{
 					if (this.fileAccess.IsWriting)
 					{
-						Array.Copy(BitConverter.GetBytes(NrObjects), 0, Block, 2, 4);
+						Buffer.BlockCopy(BitConverter.GetBytes(NrObjects), 0, Block, 2, 4);
 						this.QueueSaveBlockLocked(BlockIndex, Block);
 
 						Statistics.LogComment("Size of subtree rooted at block " + BlockIndex.ToString() + " updated. Incorrect count: " + Header.SizeSubtree.ToString() + ", Actual count: " + NrObjects.ToString());
@@ -6737,7 +6737,7 @@ namespace Waher.Persistence.Files
 
 			if (Count > 0)
 			{
-				Array.Copy(Data, Offset, Bin, Pos, Count);
+				Buffer.BlockCopy(Data, Offset, Bin, Pos, Count);
 				Pos += Count;
 			}
 
@@ -6797,7 +6797,7 @@ namespace Waher.Persistence.Files
 			while (b >= 0x80);
 
 			byte[] Result = new byte[c];
-			Array.Copy(Bin, Pos, Result, 0, c);
+			Buffer.BlockCopy(Bin, Pos, Result, 0, c);
 
 			return Result;
 		}

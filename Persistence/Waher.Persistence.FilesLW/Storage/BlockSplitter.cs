@@ -20,13 +20,13 @@ namespace Waher.Persistence.Files.Storage
 		public uint LeftLastBlockIndex
 		{
 			get { return BitConverter.ToUInt32(this.LeftBlock, 6); }
-			set { Array.Copy(BitConverter.GetBytes(value), 0, this.LeftBlock, 6, 4); }
+			set { Buffer.BlockCopy(BitConverter.GetBytes(value), 0, this.LeftBlock, 6, 4); }
 		}
 
 		public uint RightLastBlockIndex
 		{
 			get { return BitConverter.ToUInt32(this.RightBlock, 6); }
-			set { Array.Copy(BitConverter.GetBytes(value), 0, this.RightBlock, 6, 4); }
+			set { Buffer.BlockCopy(BitConverter.GetBytes(value), 0, this.RightBlock, 6, 4); }
 		}
 
 		public abstract void NextBlock(uint BlockLink, byte[] Block, int Pos, int Len, uint ChildSize);

@@ -162,7 +162,7 @@ namespace Waher.Networking.Modbus
 
 						byte[] Data = new byte[c + 1];
 						Data[0] = (byte)c;
-						Array.Copy(Bytes, 0, Data, 1, c);
+						Buffer.BlockCopy(Bytes, 0, Data, 1, c);
 
 						return await this.SendResponse(e, false, Data);
 
@@ -195,7 +195,7 @@ namespace Waher.Networking.Modbus
 
 						Data = new byte[c + 1];
 						Data[0] = (byte)c;
-						Array.Copy(Bytes, 0, Data, 1, c);
+						Buffer.BlockCopy(Bytes, 0, Data, 1, c);
 
 						return await this.SendResponse(e, false, Data);
 
@@ -228,7 +228,7 @@ namespace Waher.Networking.Modbus
 
 						Data = new byte[c + 1];
 						Data[0] = (byte)c;
-						Array.Copy(Bytes, 0, Data, 1, c);
+						Buffer.BlockCopy(Bytes, 0, Data, 1, c);
 
 						return await this.SendResponse(e, false, Data);
 
@@ -261,7 +261,7 @@ namespace Waher.Networking.Modbus
 
 						Data = new byte[c + 1];
 						Data[0] = (byte)c;
-						Array.Copy(Bytes, 0, Data, 1, c);
+						Buffer.BlockCopy(Bytes, 0, Data, 1, c);
 
 						return await this.SendResponse(e, false, Data);
 
@@ -362,7 +362,7 @@ namespace Waher.Networking.Modbus
 						}
 
 						Data = new byte[4];
-						Array.Copy(this.data, 0, Data, 0, 4);
+						Buffer.BlockCopy(this.data, 0, Data, 0, 4);
 
 						return await this.SendResponse(e, false, Data);
 

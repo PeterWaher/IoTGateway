@@ -48,7 +48,7 @@ namespace Waher.Persistence.Files.Storage
 				string MachineData = sb.ToString();
 				byte[] Hash = Sha1.ComputeHash(Encoding.UTF8.GetBytes(MachineData));
 				this.machineNr = new byte[3];
-				Array.Copy(Hash, 0, this.machineNr, 0, 3);
+				Buffer.BlockCopy(Hash, 0, this.machineNr, 0, 3);
 			}
 
 			this.gen = RandomNumberGenerator.Create();
@@ -100,7 +100,7 @@ namespace Waher.Persistence.Files.Storage
 				Buf = BitConverter.GetBytes(Ticks);
 				if (this.reverseOrder)
 					Array.Reverse(Buf);
-				Array.Copy(Buf, 0, b, 0, 4);
+				Buffer.BlockCopy(Buf, 0, b, 0, 4);
 
 				Buf = BitConverter.GetBytes(this.counter++);
 				if (this.reverseOrder)
@@ -111,9 +111,9 @@ namespace Waher.Persistence.Files.Storage
 				b[6] = Buf[0];
 				b[7] = Buf[1];
 
-				Array.Copy(this.processId, 0, b, 8, 2);
-				Array.Copy(this.machineNr, 0, b, 10, 3);
-				Array.Copy(this.random, 0, b, 13, 3);
+				Buffer.BlockCopy(this.processId, 0, b, 8, 2);
+				Buffer.BlockCopy(this.machineNr, 0, b, 10, 3);
+				Buffer.BlockCopy(this.random, 0, b, 13, 3);
 			}
 
 			return new Guid(b);

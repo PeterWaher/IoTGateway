@@ -171,7 +171,7 @@ namespace Waher.Client.WPF.Controls
 
 					case 2:
 						int j = Math.Min(this.blockLeft, c);
-						Array.Copy(Data, i, this.block, this.blockPos, j);
+						Buffer.BlockCopy(Data, i, this.block, this.blockPos, j);
 						this.blockPos += j;
 						this.blockLeft -= j;
 						i += j;
@@ -259,7 +259,7 @@ namespace Waher.Client.WPF.Controls
 
 					case 8:
 						j = Math.Min(this.left, c);
-						Array.Copy(Data, i, this.buffer, this.pos, j);
+						Buffer.BlockCopy(Data, i, this.buffer, this.pos, j);
 						this.pos += j;
 						this.left -= j;
 						i += j;

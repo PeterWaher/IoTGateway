@@ -1368,8 +1368,8 @@ namespace Waher.Utility.Install
 			CryptoStream Encrypted = null;
 			GZipStream Compressed = null;
 
-			Array.Copy(Digest, 0, AesKey, 0, 32);
-			Array.Copy(Digest, 32, IV, 0, 16);
+			Buffer.BlockCopy(Digest, 0, AesKey, 0, 32);
+			Buffer.BlockCopy(Digest, 32, IV, 0, 16);
 
 			try
 			{
@@ -1691,8 +1691,8 @@ namespace Waher.Utility.Install
 			byte[] AesKey = new byte[32];
 			byte[] IV = new byte[16];
 
-			Array.Copy(Digest, 0, AesKey, 0, 32);
-			Array.Copy(Digest, 32, IV, 0, 16);
+			Buffer.BlockCopy(Digest, 0, AesKey, 0, 32);
+			Buffer.BlockCopy(Digest, 32, IV, 0, 16);
 
 			using Aes Aes = Aes.Create();
 			Aes.BlockSize = 128;
@@ -2154,8 +2154,8 @@ namespace Waher.Utility.Install
 			CryptoStream Decrypted = null;
 			GZipStream Decompressed = null;
 
-			Array.Copy(Digest, 0, AesKey, 0, 32);
-			Array.Copy(Digest, 32, IV, 0, 16);
+			System.Buffer.BlockCopy(Digest, 0, AesKey, 0, 32);
+			System.Buffer.BlockCopy(Digest, 32, IV, 0, 16);
 
 			try
 			{

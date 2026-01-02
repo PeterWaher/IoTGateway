@@ -187,7 +187,7 @@ namespace Waher.Utility.ExStat
 								if (Last > 0)
 								{
 									if (Last < BufSize)
-										Array.Copy(Buffer, Last, Buffer, 0, (i = BufSize - Last));
+										System.Buffer.BlockCopy(Buffer, Last, Buffer, 0, (i = BufSize - Last));
 									else
 										SkipHyphens = true;
 

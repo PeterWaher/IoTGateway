@@ -668,7 +668,7 @@ namespace Waher.Persistence.XmlLedger
 								}
 
 								if (Buf != Bin)
-									Array.Copy(Bin, i, Buf, 0, j);
+									Buffer.BlockCopy(Bin, i, Buf, 0, j);
 
 								await Output.WriteElementStringAsync(string.Empty, "Chunk", Namespace, Convert.ToBase64String(Buf, 0, j));
 								i += j;

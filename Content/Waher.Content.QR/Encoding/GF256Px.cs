@@ -81,7 +81,7 @@ namespace Waher.Content.QR.Encoding
 			}
 
 			byte[] Residue = new byte[Divisor.degree];
-			Array.Copy(C, c + 1, Residue, 0, Divisor.degree);
+			Buffer.BlockCopy(C, c + 1, Residue, 0, Divisor.degree);
 
 			return new GF256Px(Residue);
 		}

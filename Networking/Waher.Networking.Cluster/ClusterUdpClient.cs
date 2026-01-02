@@ -30,7 +30,7 @@ namespace Waher.Networking.Cluster
 			else
 			{
 				byte[] A = LocalAddress.GetAddressBytes();
-				Array.Copy(A, 0, this.ivTx, 8, 4);
+				Buffer.BlockCopy(A, 0, this.ivTx, 8, 4);
 
 				this.hmac = new HMACSHA1(A);
 			}
@@ -100,11 +100,11 @@ namespace Waher.Networking.Cluster
 							continue;
 						}
 
-						Array.Copy(Datagram, 0, this.ivRx, 0, 8);
-						Array.Copy(Datagram, 8, this.ivRx, 12, 4);
+						Buffer.BlockCopy(Datagram, 0, this.ivRx, 0, 8);
+						Buffer.BlockCopy(Datagram, 8, this.ivRx, 12, 4);
 
 						byte[] A = Data.RemoteEndPoint.Address.GetAddressBytes();
-						Array.Copy(A, 0, this.ivRx, 8, 4);
+						Buffer.BlockCopy(A, 0, this.ivRx, 8, 4);
 
 						int FragmentNr = this.ivRx[13];
 						bool LastFragment = (FragmentNr & 0x80) != 0;
@@ -135,7 +135,7 @@ namespace Waher.Networking.Cluster
 						}
 
 						byte[] Received = new byte[c];
-						Array.Copy(Decrypted, 20, Received, 0, c);
+						Buffer.BlockCopy(Decrypted, 20, Received, 0, c);
 
 						if (LastFragment && FragmentNr == 0)
 							this.endpoint.DataReceived(true, Received, Data.RemoteEndPoint);
@@ -230,7 +230,7 @@ namespace Waher.Networking.Cluster
 						throw new ArgumentOutOfRangeException("Message too big.", nameof(Message));
 
 					byte[] TP = BitConverter.GetBytes(DateTime.UtcNow.Ticks);
-					Array.Copy(TP, 0, this.ivTx, 0, 8);
+					Buffer.BlockCopy(TP, 0, this.ivTx, 0, 8);
 
 					for (FragmentNr = 0; FragmentNr < NrFragments; FragmentNr++, Pos += 32768)
 					{
@@ -246,18 +246,18 @@ namespace Waher.Networking.Cluster
 
 						this.ivTx[14] = (byte)((this.ivTx[14] & 0x0f) | (Padding << 4));
 
-						Array.Copy(this.ivTx, 0, Datagram, 0, 8);
-						Array.Copy(this.ivTx, 12, Datagram, 8, 4);
+						Buffer.BlockCopy(this.ivTx, 0, Datagram, 0, 8);
+						Buffer.BlockCopy(this.ivTx, 12, Datagram, 8, 4);
 
 						byte[] MAC = this.hmac.ComputeHash(Message, Pos, FragmentSize);
 
-						Array.Copy(MAC, 0, Datagram, 12, 20);
-						Array.Copy(Message, Pos, Datagram, 32, FragmentSize);
+						Buffer.BlockCopy(MAC, 0, Datagram, 12, 20);
+						Buffer.BlockCopy(Message, Pos, Datagram, 32, FragmentSize);
 
 						using (ICryptoTransform Encryptor = this.endpoint.aes.CreateEncryptor(this.endpoint.key, this.ivTx))
 						{
 							byte[] Encrypted = Encryptor.TransformFinalBlock(Datagram, 12, Datagram.Length - 12);
-							Array.Copy(Encrypted, 0, Datagram, 12, Encrypted.Length);
+							Buffer.BlockCopy(Encrypted, 0, Datagram, 12, Encrypted.Length);
 						}
 
 						if (++this.ivTx[15] == 0)

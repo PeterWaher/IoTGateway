@@ -266,8 +266,8 @@ namespace Waher.Security.EllipticCurves
 
 			byte[] Result = new byte[this.orderBytes << 1];
 
-			Array.Copy(X, 0, Result, 0, this.orderBytes);
-			Array.Copy(Y, 0, Result, this.orderBytes, this.orderBytes);
+			Buffer.BlockCopy(X, 0, Result, 0, this.orderBytes);
+			Buffer.BlockCopy(Y, 0, Result, this.orderBytes, this.orderBytes);
 
 			return Result;
 		}
@@ -294,8 +294,8 @@ namespace Waher.Security.EllipticCurves
 			byte[] X = new byte[XLen];
 			byte[] Y = new byte[YLen];
 
-			Array.Copy(Point, 0, X, 0, this.orderBytes);
-			Array.Copy(Point, this.orderBytes, Y, 0, this.orderBytes);
+			Buffer.BlockCopy(Point, 0, X, 0, this.orderBytes);
+			Buffer.BlockCopy(Point, this.orderBytes, Y, 0, this.orderBytes);
 
 			return new PointOnCurve(new BigInteger(X), new BigInteger(Y));
 		}

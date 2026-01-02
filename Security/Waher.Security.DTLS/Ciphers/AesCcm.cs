@@ -145,7 +145,7 @@ namespace Waher.Security.DTLS.Ciphers
 					B = new byte[i];
 					B[16] = (byte)(a >> 8);
 					B[17] = (byte)a;
-					Array.Copy(AssociatedData, 0, B, 18, a);
+					Buffer.BlockCopy(AssociatedData, 0, B, 18, a);
 				}
 				else
 				{
@@ -165,17 +165,17 @@ namespace Waher.Security.DTLS.Ciphers
 					B[18] = (byte)i;
 					B[17] = 0xfe;
 					B[16] = 0xff;
-					Array.Copy(AssociatedData, 0, B, 22, a);
+					Buffer.BlockCopy(AssociatedData, 0, B, 22, a);
 				}
 
 				// §A.2.3. Formatting of the Payload:
 
-				Array.Copy(Plaintext, 0, B, j, Q);
+				Buffer.BlockCopy(Plaintext, 0, B, j, Q);
 
 				// §A.2.1. Formatting of the Control Information and the Nonce:
 
 				B[0] = (byte)((a > 0 ? 0x40 : 0) + (((this.t - 2) / 2) << 3) + (this.q - 1));
-				Array.Copy(Nonce, 0, B, 1, this.n);
+				Buffer.BlockCopy(Nonce, 0, B, 1, this.n);
 
 				i = 15;
 				j = Q;
@@ -194,7 +194,7 @@ namespace Waher.Security.DTLS.Ciphers
 				byte[] Y = new byte[j = B.Length];
 				byte[] Temp;
 
-				Array.Copy(B, 0, Y, 0, j);
+				Buffer.BlockCopy(B, 0, Y, 0, j);
 
 				for (i = 0; i < j; i += 16)
 				{
@@ -202,26 +202,26 @@ namespace Waher.Security.DTLS.Ciphers
 						XOR(Y, i, 16, Y, i - 16, 16);
 
 					Temp = Aes.TransformFinalBlock(Y, i, 16);
-					Array.Copy(Temp, 0, Y, i, 16);
+					Buffer.BlockCopy(Temp, 0, Y, i, 16);
 				}
 
 				byte[] Tag = new byte[this.t];
-				Array.Copy(Y, j - 16, Tag, 0, this.t);
+				Buffer.BlockCopy(Y, j - 16, Tag, 0, this.t);
 
 				// §A.3. Formatting of the Counter Blocks:
 
 				byte[] Ctr = new byte[16];
 
 				Ctr[0] = (byte)(B[0] & 7);
-				Array.Copy(Nonce, 0, Ctr, 1, this.n);
+				Buffer.BlockCopy(Nonce, 0, Ctr, 1, this.n);
 
 				int m = (Q + 15) >> 4;
 
 				byte[] S = Aes.TransformFinalBlock(Ctr, 0, 16);
 				byte[] Result = new byte[Q + this.t];
 
-				Array.Copy(Plaintext, 0, Result, 0, Q);
-				Array.Copy(XOR(Tag, S), 0, Result, Q, t);
+				Buffer.BlockCopy(Plaintext, 0, Result, 0, Q);
+				Buffer.BlockCopy(XOR(Tag, S), 0, Result, Q, t);
 
 				for (i = 1; i <= m; i++)
 				{
@@ -267,7 +267,7 @@ namespace Waher.Security.DTLS.Ciphers
 				byte[] Ctr = new byte[16];
 
 				Ctr[0] = (byte)(this.q - 1);
-				Array.Copy(Nonce, 0, Ctr, 1, this.n);
+				Buffer.BlockCopy(Nonce, 0, Ctr, 1, this.n);
 
 				byte[] S0 = Aes.TransformFinalBlock(Ctr, 0, 16);
 				int i, j, k;
@@ -275,7 +275,7 @@ namespace Waher.Security.DTLS.Ciphers
 				byte[] Result = new byte[Q];
 				byte[] S;
 
-				Array.Copy(Ciphertext, 0, Result, 0, Q);
+				Buffer.BlockCopy(Ciphertext, 0, Result, 0, Q);
 
 				for (i = 1; i <= m; i++)
 				{
@@ -314,7 +314,7 @@ namespace Waher.Security.DTLS.Ciphers
 					B = new byte[i];
 					B[16] = (byte)(a >> 8);
 					B[17] = (byte)a;
-					Array.Copy(AssociatedData, 0, B, 18, a);
+					Buffer.BlockCopy(AssociatedData, 0, B, 18, a);
 				}
 				else
 				{
@@ -334,17 +334,17 @@ namespace Waher.Security.DTLS.Ciphers
 					B[18] = (byte)i;
 					B[17] = 0xfe;
 					B[16] = 0xff;
-					Array.Copy(AssociatedData, 0, B, 22, a);
+					Buffer.BlockCopy(AssociatedData, 0, B, 22, a);
 				}
 
 				// §A.2.3. Formatting of the Payload:
 
-				Array.Copy(Result, 0, B, j, Q);
+				Buffer.BlockCopy(Result, 0, B, j, Q);
 
 				// §A.2.1. Formatting of the Control Information and the Nonce:
 
 				B[0] = (byte)((a > 0 ? 0x40 : 0) + (((this.t - 2) / 2) << 3) + (this.q - 1));
-				Array.Copy(Nonce, 0, B, 1, this.n);
+				Buffer.BlockCopy(Nonce, 0, B, 1, this.n);
 
 				i = 15;
 				j = Q;
@@ -363,7 +363,7 @@ namespace Waher.Security.DTLS.Ciphers
 				byte[] Y = new byte[j = B.Length];
 				byte[] Temp;
 
-				Array.Copy(B, 0, Y, 0, j);
+				Buffer.BlockCopy(B, 0, Y, 0, j);
 
 				for (i = 0; i < j; i += 16)
 				{
@@ -371,11 +371,11 @@ namespace Waher.Security.DTLS.Ciphers
 						XOR(Y, i, 16, Y, i - 16, 16);
 
 					Temp = Aes.TransformFinalBlock(Y, i, 16);
-					Array.Copy(Temp, 0, Y, i, 16);
+					Buffer.BlockCopy(Temp, 0, Y, i, 16);
 				}
 
 				byte[] Tag = new byte[this.t];
-				Array.Copy(Y, j - 16, Tag, 0, this.t);
+				Buffer.BlockCopy(Y, j - 16, Tag, 0, this.t);
 
 				XOR(Tag, 0, this.t, S0, 0, this.t);
 

@@ -257,7 +257,7 @@ namespace Waher.Security.DTLS
 						break;
 
 					Rec.fragment = new byte[Rec.length];
-					Array.Copy(Data, Pos, Rec.fragment, 0, Rec.length);
+					Buffer.BlockCopy(Data, Pos, Rec.fragment, 0, Rec.length);
 					Pos += Rec.length;
 
 					if (!await this.RecordReceived(Rec, Data, Start, State, First))
@@ -351,8 +351,8 @@ namespace Waher.Security.DTLS
 				if (this.HasSniffers)
 				{
 					byte[] NewRecord = new byte[13 + Record.length];
-					Array.Copy(Record.datagram, Record.recordOffset, NewRecord, 0, 13);
-					Array.Copy(Record.fragment, 0, NewRecord, 13, Record.length);
+					Buffer.BlockCopy(Record.datagram, Record.recordOffset, NewRecord, 0, 13);
+					Buffer.BlockCopy(Record.fragment, 0, NewRecord, 13, Record.length);
 
 					Record.datagram = NewRecord;
 					Record.recordOffset = 0;
@@ -570,7 +570,7 @@ namespace Waher.Security.DTLS
 
 									int Len = Record.fragment[Pos++];
 									State.cookie = new byte[Len + 1];
-									Array.Copy(Record.fragment, Pos - 1, State.cookie, 0, Len + 1);
+									Buffer.BlockCopy(Record.fragment, Pos - 1, State.cookie, 0, Len + 1);
 									Pos += Len;
 
 									await this.SendClientHello(State);
@@ -586,14 +586,14 @@ namespace Waher.Security.DTLS
 								else
 								{
 									State.serverRandom = new byte[32];
-									Array.Copy(Record.fragment, Pos, State.serverRandom, 0, 32);
+									Buffer.BlockCopy(Record.fragment, Pos, State.serverRandom, 0, 32);
 									Pos += 32;
 
 									byte[] PrevSessionId = State.sessionId;
 
 									int Len = Record.fragment[Pos++];
 									State.sessionId = new byte[Len];
-									Array.Copy(Record.fragment, Pos, State.sessionId, 0, Len);
+									Buffer.BlockCopy(Record.fragment, Pos, State.sessionId, 0, Len);
 									Pos += Len;
 
 									ushort CipherSuite = Record.fragment[Pos++];
@@ -642,17 +642,17 @@ namespace Waher.Security.DTLS
 								Pos++;  // Minor version.
 
 								byte[] ClientRandom = new byte[32];
-								Array.Copy(Record.fragment, Pos, ClientRandom, 0, 32);
+								Buffer.BlockCopy(Record.fragment, Pos, ClientRandom, 0, 32);
 								Pos += 32;
 
 								byte SessionIdLen = Record.fragment[Pos++];
 								byte[] SessionId = new byte[SessionIdLen];
-								Array.Copy(Record.fragment, Pos, SessionId, 0, SessionIdLen);
+								Buffer.BlockCopy(Record.fragment, Pos, SessionId, 0, SessionIdLen);
 								Pos += SessionIdLen;
 
 								byte CookieLen = Record.fragment[Pos++];
 								byte[] Cookie = new byte[CookieLen];
-								Array.Copy(Record.fragment, Pos, Cookie, 0, CookieLen);
+								Buffer.BlockCopy(Record.fragment, Pos, Cookie, 0, CookieLen);
 								Pos += CookieLen;
 
 								int CipherPos = Pos;
@@ -724,7 +724,7 @@ namespace Waher.Security.DTLS
 										HelloVerifyRequest[1] = 253;
 										HelloVerifyRequest[2] = (byte)CookieLen2;
 
-										Array.Copy(Cookie2, 0, HelloVerifyRequest, 3, CookieLen2);
+										Buffer.BlockCopy(Cookie2, 0, HelloVerifyRequest, 3, CookieLen2);
 
 										await this.SendHandshake(HandshakeType.hello_verify_request,
 											HelloVerifyRequest, false, true, State);
@@ -754,9 +754,9 @@ namespace Waher.Security.DTLS
 
 								ServerHello[0] = 254;
 								ServerHello[1] = 253;
-								Array.Copy(State.serverRandom, 0, ServerHello, 2, 32);
+								Buffer.BlockCopy(State.serverRandom, 0, ServerHello, 2, 32);
 								ServerHello[34] = 32;
-								Array.Copy(SessionId, 0, ServerHello, 35, 32);
+								Buffer.BlockCopy(SessionId, 0, ServerHello, 35, 32);
 								ServerHello[67] = (byte)(CipherCode >> 8);
 								ServerHello[68] = (byte)CipherCode;
 								ServerHello[69] = 0;
@@ -783,7 +783,7 @@ namespace Waher.Security.DTLS
 									break;
 
 								byte[] VerifyData = new byte[12];
-								Array.Copy(Record.fragment, Pos, VerifyData, 0, 12);
+								Buffer.BlockCopy(Record.fragment, Pos, VerifyData, 0, 12);
 								Pos += 12;
 
 								if (!State.currentCipher.VerifyFinished(VerifyData, State))
@@ -1118,15 +1118,15 @@ namespace Waher.Security.DTLS
 
 			byte[] Record = new byte[Length + 13];
 
-			Array.Copy(Header, 0, Record, 0, 13);
-			Array.Copy(Payload, 0, Record, 13, Length);
+			Buffer.BlockCopy(Header, 0, Record, 0, 13);
+			Buffer.BlockCopy(Payload, 0, Record, 13, Length);
 
 			if (this.HasSniffers)
 			{
 				byte[] Readable = new byte[13 + Fragment.Length];
 
-				Array.Copy(Record, 0, Readable, 0, 13);
-				Array.Copy(Fragment, 0, Readable, 13, Fragment.Length);
+				Buffer.BlockCopy(Record, 0, Readable, 0, 13);
+				Buffer.BlockCopy(Fragment, 0, Readable, 13, Fragment.Length);
 
 				this.SniffMsg(Readable, 0, false);
 			}
@@ -1252,7 +1252,7 @@ namespace Waher.Security.DTLS
 			Fragment[10] = Fragment[2];
 			Fragment[11] = Fragment[3];
 
-			Array.Copy(Payload, 0, Fragment, 12, Payload.Length);
+			Buffer.BlockCopy(Payload, 0, Fragment, 12, Payload.Length);
 
 			this.AddHandshakeMessageToHash(Type, Fragment, 0, Fragment.Length, State, true);
 
@@ -1349,15 +1349,15 @@ namespace Waher.Security.DTLS
 			ClientHello[1] = 253;
 
 			this.SetUnixTime(State.clientRandom, 0);
-			Array.Copy(State.clientRandom, 0, ClientHello, 2, 32);
+			Buffer.BlockCopy(State.clientRandom, 0, ClientHello, 2, 32);
 
 			Pos = 34;
 
 			ClientHello[Pos++] = (byte)State.sessionId.Length;
-			Array.Copy(State.sessionId, 0, ClientHello, Pos, State.sessionId.Length);
+			Buffer.BlockCopy(State.sessionId, 0, ClientHello, Pos, State.sessionId.Length);
 			Pos += State.sessionId.Length;
 
-			Array.Copy(State.cookie, 0, ClientHello, Pos, State.cookie.Length);
+			Buffer.BlockCopy(State.cookie, 0, ClientHello, Pos, State.cookie.Length);
 			Pos += State.cookie.Length;
 
 			ClientHello[Pos++] = (byte)(CipherLen >> 8);
@@ -1416,7 +1416,7 @@ namespace Waher.Security.DTLS
 			else
 			{
 				HashMsg = new byte[Count];
-				Array.Copy(Msg, Offset, HashMsg, 0, Count);
+				Buffer.BlockCopy(Msg, Offset, HashMsg, 0, Count);
 			}
 
 			switch (Type)

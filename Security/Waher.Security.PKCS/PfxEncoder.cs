@@ -381,9 +381,9 @@ namespace Waher.Security.PKCS
 			{
 				j = c - i;
 				if (j < Len)
-					Array.Copy(Bin, 0, Result, i, j);
+					Buffer.BlockCopy(Bin, 0, Result, i, j);
 				else
-					Array.Copy(Bin, 0, Result, i, Len);
+					Buffer.BlockCopy(Bin, 0, Result, i, Len);
 			}
 
 			return Result;

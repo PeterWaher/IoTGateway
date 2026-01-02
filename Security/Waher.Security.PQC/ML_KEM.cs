@@ -154,7 +154,7 @@ namespace Waher.Security.PQC
 			SHAKE256 HashFunction = new SHAKE256(8 * 64 * η);
 			int c = Seed.Length;
 			byte[] Bin = new byte[c + 1];
-			Array.Copy(Seed, 0, Bin, 0, c);
+			Buffer.BlockCopy(Seed, 0, Bin, 0, c);
 			Bin[c] = Data;
 			byte[] Result = HashFunction.ComputeVariable(Bin);
 			Clear(Bin);
@@ -776,16 +776,16 @@ namespace Waher.Security.PQC
 				throw new ArgumentException("Seed must be 32 bytes long.", nameof(d));
 
 			byte[] Temp = new byte[33];
-			Array.Copy(d, 0, Temp, 0, 32);
+			Buffer.BlockCopy(d, 0, Temp, 0, 32);
 			Temp[32] = this.k;
 			byte[] Bin = G(Temp);
 			Clear(Temp);
 
 			byte[] ρ = new byte[32];
-			Array.Copy(Bin, 0, ρ, 0, 32);
+			Buffer.BlockCopy(Bin, 0, ρ, 0, 32);
 
 			byte[] σ = new byte[32];
-			Array.Copy(Bin, 32, σ, 0, 32);
+			Buffer.BlockCopy(Bin, 32, σ, 0, 32);
 			Clear(Bin);
 
 			byte N = 0;
@@ -795,7 +795,7 @@ namespace Waher.Security.PQC
 			ushort[][] e = new ushort[this.k][];
 
 			byte[] B = new byte[34];
-			Array.Copy(ρ, 0, B, 0, 32);
+			Buffer.BlockCopy(ρ, 0, B, 0, 32);
 
 			for (i = 0; i < this.k; i++)
 			{
@@ -841,7 +841,7 @@ namespace Waher.Security.PQC
 				Pos += 384;
 			}
 
-			Array.Copy(ρ, 0, EncryptionKey, Pos, 32);
+			Buffer.BlockCopy(ρ, 0, EncryptionKey, Pos, 32);
 
 			Clear(ρ);
 			Clear(σ);
@@ -926,7 +926,7 @@ namespace Waher.Security.PQC
 				Pos += 384;
 			}
 
-			Array.Copy(Keys.EncapsulationKey, Pos, ρ, 0, 32);
+			Buffer.BlockCopy(Keys.EncapsulationKey, Pos, ρ, 0, 32);
 
 			ushort[][] y = new ushort[this.k][];
 			ushort[][] e1 = new ushort[this.k][];
@@ -938,7 +938,7 @@ namespace Waher.Security.PQC
 				Keys.Â = Â = new ushort[this.k, this.k][];
 
 				byte[] B = new byte[34];
-				Array.Copy(ρ, 0, B, 0, 32);
+				Buffer.BlockCopy(ρ, 0, B, 0, 32);
 
 				for (i = 0; i < this.k; i++)
 				{
@@ -1135,23 +1135,23 @@ namespace Waher.Security.PQC
 			byte[] DecryptionKey = new byte[768 * this.k + 96];
 			int Pos;
 
-			Array.Copy(Keys.DecryptionKey, 0, DecryptionKey, 0, Pos = this.k384);
-			Array.Copy(Keys.EncryptionKey, 0, DecryptionKey, Pos, Pos + 32);
+			Buffer.BlockCopy(Keys.DecryptionKey, 0, DecryptionKey, 0, Pos = this.k384);
+			Buffer.BlockCopy(Keys.EncryptionKey, 0, DecryptionKey, Pos, Pos + 32);
 			Pos += Pos + 32;
 
 			byte[] Bin = H(Keys.EncryptionKey);
-			Array.Copy(Bin, 0, DecryptionKey, Pos, 32);
+			Buffer.BlockCopy(Bin, 0, DecryptionKey, Pos, 32);
 			Pos += 32;
 
-			Array.Copy(z, 0, DecryptionKey, Pos, 32);
+			Buffer.BlockCopy(z, 0, DecryptionKey, Pos, 32);
 
 			if (!ReturnSeed)
 				return new ML_KEM_Keys(Keys, DecryptionKey, null);
 
 			byte[] Seed = new byte[64];
 
-			Array.Copy(d, 0, Seed, 0, 32);
-			Array.Copy(z, 0, Seed, 32, 32);
+			Buffer.BlockCopy(d, 0, Seed, 0, 32);
+			Buffer.BlockCopy(z, 0, Seed, 32, 32);
 
 			return new ML_KEM_Keys(Keys, DecryptionKey, Seed);
 		}
@@ -1173,8 +1173,8 @@ namespace Waher.Security.PQC
 			byte[] d = new byte[32];
 			byte[] z = new byte[32];
 
-			Array.Copy(Seed, 0, d, 0, 32);
-			Array.Copy(Seed, 32, z, 0, 32);
+			Buffer.BlockCopy(Seed, 0, d, 0, 32);
+			Buffer.BlockCopy(Seed, 32, z, 0, 32);
 
 			return this.KeyGen_Internal(d, z, ReturnSeed);
 		}
@@ -1247,17 +1247,17 @@ namespace Waher.Security.PQC
 
 			byte[] Bin = new byte[64];
 
-			Array.Copy(m, 0, Bin, 0, 32);
-			Array.Copy(H(Keys.EncapsulationKey), 0, Bin, 32, 32);
+			Buffer.BlockCopy(m, 0, Bin, 0, 32);
+			Buffer.BlockCopy(H(Keys.EncapsulationKey), 0, Bin, 32, 32);
 
 			byte[] Bin2 = G(Bin);
 			Clear(Bin);
 
 			byte[] K = new byte[32];
-			Array.Copy(Bin2, 0, K, 0, 32);
+			Buffer.BlockCopy(Bin2, 0, K, 0, 32);
 
 			byte[] r = new byte[32];
-			Array.Copy(Bin2, 32, r, 0, 32);
+			Buffer.BlockCopy(Bin2, 32, r, 0, 32);
 			Clear(Bin2);
 
 			byte[] c = this.K_PKE_Encrypt(Keys, m, r);
@@ -1279,7 +1279,7 @@ namespace Waher.Security.PQC
 				throw new ArgumentException("Decapsulation key length mismatch.", nameof(DecapsulationKey));
 
 			byte[] Bin = new byte[this.k384 + 32];
-			Array.Copy(DecapsulationKey, this.k384, Bin, 0, this.k384 + 32);
+			Buffer.BlockCopy(DecapsulationKey, this.k384, Bin, 0, this.k384 + 32);
 
 			byte[] Test = H(Bin);
 			Clear(Bin);
@@ -1315,37 +1315,37 @@ namespace Waher.Security.PQC
 
 			int Pos;
 			byte[] DecryptionKey = new byte[Pos = this.k384];
-			Array.Copy(DecapsulationKey, 0, DecryptionKey, 0, Pos);
+			Buffer.BlockCopy(DecapsulationKey, 0, DecryptionKey, 0, Pos);
 
 			int Len;
 			byte[] EncryptionKey = new byte[Len = (768 - 384) * this.k + 32];
-			Array.Copy(DecapsulationKey, Pos, EncryptionKey, 0, Len);
+			Buffer.BlockCopy(DecapsulationKey, Pos, EncryptionKey, 0, Len);
 			Pos += Len;
 
 			byte[] h = new byte[32];
-			Array.Copy(DecapsulationKey, Pos, h, 0, 32);
+			Buffer.BlockCopy(DecapsulationKey, Pos, h, 0, 32);
 
 			//byte[] z = new byte[32];
-			//Array.Copy(DecapsulationKey, Pos + 32, z, 0, 32);
+			//Buffer.BlockCopy(DecapsulationKey, Pos + 32, z, 0, 32);
 
 			byte[] m = this.K_PKE_Decrypt(DecryptionKey, c);
 
 			byte[] Bin = new byte[64];
-			Array.Copy(m, 0, Bin, 0, 32);
-			Array.Copy(h, 0, Bin, 32, 32);
+			Buffer.BlockCopy(m, 0, Bin, 0, 32);
+			Buffer.BlockCopy(h, 0, Bin, 32, 32);
 
 			byte[] Bin2 = G(Bin);
 
 			byte[] K = new byte[32];
-			Array.Copy(Bin2, 0, K, 0, 32);
+			Buffer.BlockCopy(Bin2, 0, K, 0, 32);
 
 			byte[] r = new byte[32];
-			Array.Copy(Bin2, 32, r, 0, 32);
+			Buffer.BlockCopy(Bin2, 32, r, 0, 32);
 
 			Clear(Bin2);
 
-			Array.Copy(DecapsulationKey, Pos + 32, Bin, 0, 32);  // z
-			Array.Copy(c, 0, Bin, 32, 32);
+			Buffer.BlockCopy(DecapsulationKey, Pos + 32, Bin, 0, 32);  // z
+			Buffer.BlockCopy(c, 0, Bin, 32, 32);
 
 			byte[] K2 = J(Bin);
 			Clear(Bin);

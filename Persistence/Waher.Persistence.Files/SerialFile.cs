@@ -174,7 +174,7 @@ namespace Waher.Persistence.Files
 					Block = await this.ReadBlockLocked(Position, BlockSize);
 
 				byte[] Data = new byte[c];
-				Array.Copy(Block, Pos, Data, 0, c);
+				Buffer.BlockCopy(Block, Pos, Data, 0, c);
 
 				return new KeyValuePair<byte[], long>(Data, Position + BlockSize);
 			}
@@ -267,7 +267,7 @@ namespace Waher.Persistence.Files
 				c++;
 			}
 
-			Array.Copy(Data, 0, Block, c, Data.Length);
+			Buffer.BlockCopy(Data, 0, Block, c, Data.Length);
 
 			long Position;
 
@@ -300,8 +300,8 @@ namespace Waher.Persistence.Files
 		private byte[] GetIV(long Position)
 		{
 			byte[] Input = new byte[this.ivSeedLen + 8];
-			Array.Copy(this.ivSeed, 0, Input, 0, this.ivSeedLen);
-			Array.Copy(BitConverter.GetBytes(Position), 0, Input, this.ivSeedLen, 8);
+			Buffer.BlockCopy(this.ivSeed, 0, Input, 0, this.ivSeedLen);
+			Buffer.BlockCopy(BitConverter.GetBytes(Position), 0, Input, this.ivSeedLen, 8);
 			byte[] Hash;
 
 			using (SHA1 Sha1 = SHA1.Create())

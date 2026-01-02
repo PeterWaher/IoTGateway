@@ -378,7 +378,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			}
 
 			byte[] Temp = new byte[4];
-			Array.Copy(this.Body, this.pos, Temp, 0, 4);
+			Buffer.BlockCopy(this.Body, this.pos, Temp, 0, 4);
 			Array.Reverse(Temp);
 
 			float Result = BitConverter.ToSingle(Temp, this.pos);
@@ -400,7 +400,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				throw UnexpectedEndOfData();
 
 			byte[] Temp = new byte[8];
-			Array.Copy(this.Body, this.pos, Temp, 0, 8);
+			Buffer.BlockCopy(this.Body, this.pos, Temp, 0, 8);
 			Array.Reverse(Temp);
 
 			double Result = BitConverter.ToDouble(Temp, this.pos);

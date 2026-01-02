@@ -56,7 +56,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             int c = Encrypted.Length;
             
             Array.Resize(ref Encrypted, c + 16);
-            Array.Copy(Mac, 0, Encrypted, c, 16);
+			Buffer.BlockCopy(Mac, 0, Encrypted, c, 16);
 
             return Encrypted;
         }
@@ -77,7 +77,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
             Security.ChaChaPoly.AeadChaCha20Poly1305 Acp = new Security.ChaChaPoly.AeadChaCha20Poly1305(Key, IV);
             byte[] Mac = new byte[16];
-            Array.Copy(Data, c - 16, Mac, 0, 16);
+			Buffer.BlockCopy(Data, c - 16, Mac, 0, 16);
 
             Array.Resize(ref Data, c - 16);
 

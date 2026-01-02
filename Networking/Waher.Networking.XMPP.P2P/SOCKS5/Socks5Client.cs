@@ -421,7 +421,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						}
 
 						byte[] A = new byte[4];
-						Array.Copy(Buffer, Offset, A, 0, 4);
+						System.Buffer.BlockCopy(Buffer, Offset, A, 0, 4);
 						Offset += 4;
 						Addr = new IPAddress(A);
 						break;
@@ -448,7 +448,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						}
 
 						A = new byte[16];
-						Array.Copy(Buffer, Offset, A, 0, 16);
+						System.Buffer.BlockCopy(Buffer, Offset, A, 0, 16);
 						Offset += 16;
 						Addr = new IPAddress(A);
 						break;

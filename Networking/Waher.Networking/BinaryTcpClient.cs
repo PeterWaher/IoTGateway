@@ -1205,7 +1205,7 @@ namespace Waher.Networking
 					Task = Task
 				};
 
-				Array.Copy(Buffer, Offset, Item.Data, 0, Count);
+				System.Buffer.BlockCopy(Buffer, Offset, Item.Data, 0, Count);
 			}
 
 			TaskCompletionSource<bool> Wait;

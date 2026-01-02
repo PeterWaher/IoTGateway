@@ -32,8 +32,8 @@ namespace Waher.Content.Asn1
 
 			this.segments = new uint[c + d];
 
-			Array.Copy(Id.segments, 0, this.segments, 0, c);
-			Array.Copy(Segments, 0, this.segments, c, d);
+			Buffer.BlockCopy(Id.segments, 0, this.segments, 0, c);
+			Buffer.BlockCopy(Segments, 0, this.segments, c, d);
 		}
 
 		/// <summary>

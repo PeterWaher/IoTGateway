@@ -103,31 +103,31 @@ namespace Waher.Security.SHA3
 		{
 			byte[] Data = new byte[200];    // this.byteSize
 
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_0 : this.A_0), 0, Data, 0, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_1 : this.A_1), 0, Data, 8, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_2 : this.A_2), 0, Data, 16, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_3 : this.A_3), 0, Data, 24, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_4 : this.A_4), 0, Data, 32, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_5 : this.A_5), 0, Data, 40, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_6 : this.A_6), 0, Data, 48, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_7 : this.A_7), 0, Data, 56, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_8 : this.A_8), 0, Data, 64, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_9 : this.A_9), 0, Data, 72, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_10 : this.A_10), 0, Data, 80, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_11 : this.A_11), 0, Data, 88, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_12 : this.A_12), 0, Data, 96, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_13 : this.A_13), 0, Data, 104, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_14 : this.A_14), 0, Data, 112, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_15 : this.A_15), 0, Data, 120, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_16 : this.A_16), 0, Data, 128, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_17 : this.A_17), 0, Data, 136, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_18 : this.A_18), 0, Data, 144, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_19 : this.A_19), 0, Data, 152, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_20 : this.A_20), 0, Data, 160, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_21 : this.A_21), 0, Data, 168, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_22 : this.A_22), 0, Data, 176, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_23 : this.A_23), 0, Data, 184, 8);
-			Array.Copy(BitConverter.GetBytes(this.inA2 ? this.A2_24 : this.A_24), 0, Data, 192, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_0 : this.A_0), 0, Data, 0, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_1 : this.A_1), 0, Data, 8, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_2 : this.A_2), 0, Data, 16, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_3 : this.A_3), 0, Data, 24, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_4 : this.A_4), 0, Data, 32, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_5 : this.A_5), 0, Data, 40, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_6 : this.A_6), 0, Data, 48, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_7 : this.A_7), 0, Data, 56, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_8 : this.A_8), 0, Data, 64, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_9 : this.A_9), 0, Data, 72, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_10 : this.A_10), 0, Data, 80, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_11 : this.A_11), 0, Data, 88, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_12 : this.A_12), 0, Data, 96, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_13 : this.A_13), 0, Data, 104, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_14 : this.A_14), 0, Data, 112, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_15 : this.A_15), 0, Data, 120, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_16 : this.A_16), 0, Data, 128, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_17 : this.A_17), 0, Data, 136, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_18 : this.A_18), 0, Data, 144, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_19 : this.A_19), 0, Data, 152, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_20 : this.A_20), 0, Data, 160, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_21 : this.A_21), 0, Data, 168, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_22 : this.A_22), 0, Data, 176, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_23 : this.A_23), 0, Data, 184, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(this.inA2 ? this.A2_24 : this.A_24), 0, Data, 192, 8);
 
 			return Data;
 		}
@@ -438,7 +438,7 @@ namespace Waher.Security.SHA3
 			while (true)
 			{
 				i = Math.Min(this.r8, this.dByteSize - Pos);
-				Array.Copy(S, 0, Z, Pos, i);
+				Buffer.BlockCopy(S, 0, Z, Pos, i);
 				Pos += i;
 
 				if (Pos >= this.dByteSize)
@@ -497,7 +497,7 @@ namespace Waher.Security.SHA3
 			while (true)
 			{
 				i = Math.Min(this.r8, this.dByteSize - Pos);
-				Array.Copy(S, 0, Z, Pos, i);
+				Buffer.BlockCopy(S, 0, Z, Pos, i);
 				Pos += i;
 
 				if (Pos >= this.dByteSize)
@@ -593,7 +593,7 @@ namespace Waher.Security.SHA3
 				while (true)
 				{
 					i = Math.Min(this.hashFunction.r8 - this.statePosition, NrBytes - Pos);
-					Array.Copy(this.state, this.statePosition, Z, Pos, i);
+					Buffer.BlockCopy(this.state, this.statePosition, Z, Pos, i);
 					Pos += i;
 					this.statePosition += i;
 

@@ -119,9 +119,9 @@ namespace Waher.Networking.XMPP.Contracts
 			int c = this.key.Length;
 			int d = ContractNonce.Length;
 
-			Array.Copy(this.key, 0, Data, 0, c);
-			Array.Copy(ContractNonce, 0, Data, c, d);
-			Array.Copy(BitConverter.GetBytes(ParameterIndex), 0, Data, c + d, 4);
+			Buffer.BlockCopy(this.key, 0, Data, 0, c);
+			Buffer.BlockCopy(ContractNonce, 0, Data, c, d);
+			Buffer.BlockCopy(BitConverter.GetBytes(ParameterIndex), 0, Data, c + d, 4);
 
 			Data = Hashes.ComputeSHA256Hash(Data);
 
@@ -152,7 +152,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Data = new byte[1 + c + SuffixLength];
 
 				Data[0] = (byte)Prefix;
-				Array.Copy(Data2, 0, Data, 1, c);
+				Buffer.BlockCopy(Data2, 0, Data, 1, c);
 			}
 
 			byte[] IV = this.instance.GetIV(ParameterName, ParameterType, CreatorJid,

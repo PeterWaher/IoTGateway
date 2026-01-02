@@ -169,7 +169,7 @@ namespace Waher.Networking.Sniffers
 			else
 			{
 				byte[] Data2 = new byte[Count];
-				Array.Copy(Data, Offset, Data2, 0, Count);
+				Buffer.BlockCopy(Data, Offset, Data2, 0, Count);
 				return Data2;
 			}
 		}

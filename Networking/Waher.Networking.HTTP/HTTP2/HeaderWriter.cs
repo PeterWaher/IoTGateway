@@ -270,7 +270,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				throw new InternalBufferOverflowException();
 
 			byte[] Result = new byte[this.pos];
-			Array.Copy(this.buffer, 0, Result, 0, this.pos);
+			System.Buffer.BlockCopy(this.buffer, 0, Result, 0, this.pos);
 
 			return Result;
 		}
@@ -355,7 +355,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (this.pos + Length >= this.bufferSize)
 					return false;
 
-				Array.Copy(Bin, 0, this.buffer, this.pos, Length);
+				System.Buffer.BlockCopy(Bin, 0, this.buffer, this.pos, Length);
 				this.pos += Length;
 			}
 

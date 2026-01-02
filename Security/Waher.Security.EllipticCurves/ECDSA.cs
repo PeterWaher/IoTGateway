@@ -53,13 +53,13 @@ namespace Waher.Security.EllipticCurves
             if (S.Length != ScalarBytes)
                 Array.Resize(ref S, ScalarBytes);
 
-            Array.Copy(S, 0, Signature, 0, ScalarBytes);
+			Buffer.BlockCopy(S, 0, Signature, 0, ScalarBytes);
 
             S = s.ToByteArray();
             if (S.Length != ScalarBytes)
                 Array.Resize(ref S, ScalarBytes);
 
-            Array.Copy(S, 0, Signature, ScalarBytes, ScalarBytes);
+			Buffer.BlockCopy(S, 0, Signature, ScalarBytes, ScalarBytes);
 
             return Signature;
         }
@@ -122,13 +122,13 @@ namespace Waher.Security.EllipticCurves
             if (S.Length != ScalarBytes)
                 Array.Resize(ref S, ScalarBytes);
 
-            Array.Copy(S, 0, Signature, 0, ScalarBytes);
+			Buffer.BlockCopy(S, 0, Signature, 0, ScalarBytes);
 
             S = s.ToByteArray();
             if (S.Length != ScalarBytes)
                 Array.Resize(ref S, ScalarBytes);
 
-            Array.Copy(S, 0, Signature, ScalarBytes, ScalarBytes);
+			Buffer.BlockCopy(S, 0, Signature, ScalarBytes, ScalarBytes);
 
             return Signature;
         }
@@ -168,12 +168,12 @@ namespace Waher.Security.EllipticCurves
             c >>= 1;
 
             byte[] Bin = new byte[c];
-            Array.Copy(Signature, 0, Bin, 0, c);
+			Buffer.BlockCopy(Signature, 0, Bin, 0, c);
 
             BigInteger r = EllipticCurve.ToInt(Bin);
 
             Bin = new byte[c];
-            Array.Copy(Signature, c, Bin, 0, c);
+			Buffer.BlockCopy(Signature, c, Bin, 0, c);
 
             BigInteger s = EllipticCurve.ToInt(Bin);
             PointOnCurve PublicKeyPoint = Curve.Decode(PublicKey);
@@ -222,12 +222,12 @@ namespace Waher.Security.EllipticCurves
             c >>= 1;
 
             byte[] Bin = new byte[c];
-            Array.Copy(Signature, 0, Bin, 0, c);
+			Buffer.BlockCopy(Signature, 0, Bin, 0, c);
 
             BigInteger r = EllipticCurve.ToInt(Bin);
 
             Bin = new byte[c];
-            Array.Copy(Signature, c, Bin, 0, c);
+			Buffer.BlockCopy(Signature, c, Bin, 0, c);
 
             BigInteger s = EllipticCurve.ToInt(Bin);
             PointOnCurve PublicKeyPoint = Curve.Decode(PublicKey);

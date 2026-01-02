@@ -1001,7 +1001,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						case 2:
 							d = Math.Min(Count, Rx.BlockSize - Rx.BlockPos);
 
-							Array.Copy(Buffer, Offset, Rx.Block, Rx.BlockPos, d);
+							System.Buffer.BlockCopy(Buffer, Offset, Rx.Block, Rx.BlockPos, d);
 							Offset += d;
 							Rx.BlockPos += d;
 							Count -= d;

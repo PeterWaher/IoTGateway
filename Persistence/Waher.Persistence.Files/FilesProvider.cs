@@ -989,8 +989,8 @@ namespace Waher.Persistence.Files
 							int qLen = Parameters.Q.Length;
 							byte[] Bin = new byte[pLen + qLen];
 
-							Array.Copy(Parameters.P, 0, Bin, 0, pLen);
-							Array.Copy(Parameters.Q, 0, Bin, pLen, qLen);
+							Buffer.BlockCopy(Parameters.P, 0, Bin, 0, pLen);
+							Buffer.BlockCopy(Parameters.Q, 0, Bin, pLen, qLen);
 
 							Key = Sha256.ComputeHash(Bin);
 							IV = Sha256.ComputeHash(Parameters.Modulus);
@@ -1022,8 +1022,8 @@ namespace Waher.Persistence.Files
 				byte[] Key = new byte[32];
 				byte[] IV = new byte[32];
 
-				Array.Copy(Bin, 0, Key, 0, 32);
-				Array.Copy(Bin, 32, IV, 0, 32);
+				Buffer.BlockCopy(Bin, 0, Key, 0, 32);
+				Buffer.BlockCopy(Bin, 32, IV, 0, 32);
 
 				return new KeyValuePair<byte[], byte[]>(Key, IV);
 			}
@@ -1054,7 +1054,7 @@ namespace Waher.Persistence.Files
 #else
 				byte[] Bin = new byte[Count];
 				rnd.NextBytes(Bin);
-				Array.Copy(Bin, 0, Data, Offset, Count);
+				Buffer.BlockCopy(Bin, 0, Data, Offset, Count);
 #endif
 			}
 		}

@@ -528,7 +528,7 @@ namespace Waher.Networking.SMTP
 				else
 				{
 					byte[] Bin = new byte[j - i];
-					Array.Copy(Body, i, Bin, 0, j - i);
+					Buffer.BlockCopy(Body, i, Bin, 0, j - i);
 					await this.Write(true, Bin);
 				}
 

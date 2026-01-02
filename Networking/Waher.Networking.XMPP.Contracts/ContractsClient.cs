@@ -8236,14 +8236,14 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 			while (i > 0);
 
-			Array.Copy(Message, 0, ToEncrypt, j, Message.Length);
+			Buffer.BlockCopy(Message, 0, ToEncrypt, j, Message.Length);
 			j += Message.Length;
 
 			if (j < c)
 				this.rnd.GetBytes(ToEncrypt, j, c - j);
 
-			Array.Copy(Digest, 0, Key, 0, 16);
-			Array.Copy(Digest, 16, IV, 0, 16);
+			Buffer.BlockCopy(Digest, 0, Key, 0, 16);
+			Buffer.BlockCopy(Digest, 16, IV, 0, 16);
 
 			lock (this.aes)
 			{
@@ -8281,10 +8281,10 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				while (i > 0);
 
-				Array.Copy(KeyCipherText, 0, Encrypted2, j, KeyCipherTextLen);
+				Buffer.BlockCopy(KeyCipherText, 0, Encrypted2, j, KeyCipherTextLen);
 				j += KeyCipherTextLen;
 
-				Array.Copy(Encrypted, 0, Encrypted2, j, Encrypted.Length);
+				Buffer.BlockCopy(Encrypted, 0, Encrypted2, j, Encrypted.Length);
 
 				Encrypted = Encrypted2;
 			}
@@ -8334,7 +8334,7 @@ namespace Waher.Networking.XMPP.Contracts
 							throw new InvalidOperationException("Unable to decrypt message.");
 
 						KeyCipherText = new byte[c];
-						Array.Copy(EncryptedMessage, 0, KeyCipherText, 0, c);
+						Buffer.BlockCopy(EncryptedMessage, 0, KeyCipherText, 0, c);
 					}
 					else
 						KeyCipherText = null;
@@ -8349,8 +8349,8 @@ namespace Waher.Networking.XMPP.Contracts
 					for (j = 0; j < 32; j++)
 						Digest[j] ^= NonceDigest[j];
 
-					Array.Copy(Digest, 0, Key, 0, 16);
-					Array.Copy(Digest, 16, IV, 0, 16);
+					Buffer.BlockCopy(Digest, 0, Key, 0, 16);
+					Buffer.BlockCopy(Digest, 16, IV, 0, 16);
 
 					lock (this.aes)
 					{
@@ -8377,7 +8377,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					byte[] Message = new byte[c];
 
-					Array.Copy(Decrypted, i, Message, 0, c);
+					Buffer.BlockCopy(Decrypted, i, Message, 0, c);
 
 					return Message;
 				}
@@ -8430,7 +8430,7 @@ namespace Waher.Networking.XMPP.Contracts
 					throw new InvalidOperationException("Unable to decrypt message.");
 
 				KeyCipherText = new byte[c];
-				Array.Copy(EncryptedMessage, 0, KeyCipherText, 0, c);
+				Buffer.BlockCopy(EncryptedMessage, 0, KeyCipherText, 0, c);
 			}
 
 			IE2eSymmetricCipher SymmetricCipher = new Aes256();
@@ -8444,8 +8444,8 @@ namespace Waher.Networking.XMPP.Contracts
 			for (j = 0; j < 32; j++)
 				Digest[j] ^= NonceDigest[j];
 
-			Array.Copy(Digest, 0, Key, 0, 16);
-			Array.Copy(Digest, 16, IV, 0, 16);
+			Buffer.BlockCopy(Digest, 0, Key, 0, 16);
+			Buffer.BlockCopy(Digest, 16, IV, 0, 16);
 
 			lock (this.aes)
 			{
@@ -8468,7 +8468,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			byte[] Message = new byte[c];
 
-			Array.Copy(Decrypted, i, Message, 0, c);
+			Buffer.BlockCopy(Decrypted, i, Message, 0, c);
 
 			return Message;
 		}

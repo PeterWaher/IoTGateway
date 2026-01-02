@@ -75,11 +75,11 @@ namespace Waher.Security.EllipticCurves
             byte[] PrivateKey = new byte[32];
 
             if (this.hashSecret)
-                Array.Copy(Bin, 0, PrivateKey, 0, 32);
+				Buffer.BlockCopy(Bin, 0, PrivateKey, 0, 32);
             else
-                Array.Copy(Secret, 0, PrivateKey, 0, Math.Min(32, Secret.Length));
+				Buffer.BlockCopy(Secret, 0, PrivateKey, 0, Math.Min(32, Secret.Length));
 
-            Array.Copy(Bin, 32, AdditionalInfo, 0, 32);
+			Buffer.BlockCopy(Bin, 32, AdditionalInfo, 0, 32);
 
             PrivateKey[0] &= 0xf8;
             PrivateKey[31] &= 0x3f;

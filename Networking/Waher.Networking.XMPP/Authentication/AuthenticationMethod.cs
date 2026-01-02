@@ -142,7 +142,7 @@ namespace Waher.Networking.XMPP.Authentication
 			foreach (byte[] Part in Data)
 			{
 				j = Part.Length;
-				Array.Copy(Part, 0, Result, i, j);
+				Buffer.BlockCopy(Part, 0, Result, i, j);
 				i += j;
 			}
 

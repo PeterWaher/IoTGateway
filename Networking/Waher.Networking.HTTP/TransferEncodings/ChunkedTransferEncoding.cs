@@ -189,7 +189,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 				if (NrLeft <= NrBytes)
 				{
-					Array.Copy(Data, Offset, this.chunk, this.pos, NrLeft);
+					Buffer.BlockCopy(Data, Offset, this.chunk, this.pos, NrLeft);
 					Offset += NrLeft;
 					NrBytes -= NrLeft;
 					this.pos += NrLeft;
@@ -199,7 +199,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				}
 				else
 				{
-					Array.Copy(Data, Offset, this.chunk, this.pos, NrBytes);
+					Buffer.BlockCopy(Data, Offset, this.chunk, this.pos, NrBytes);
 					this.pos += NrBytes;
 					NrBytes = 0;
 				}
@@ -218,8 +218,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			int Len = ChunkHeader.Length;
 			byte[] Chunk = new byte[Len + this.pos + 2];
 
-			Array.Copy(ChunkHeader, 0, Chunk, 0, Len);
-			Array.Copy(this.chunk, 0, Chunk, Len, this.pos);
+			Buffer.BlockCopy(ChunkHeader, 0, Chunk, 0, Len);
+			Buffer.BlockCopy(this.chunk, 0, Chunk, Len, this.pos);
 			Len += this.pos;
 			Chunk[Len] = (byte)'\r';
 			Chunk[Len + 1] = (byte)'\n';

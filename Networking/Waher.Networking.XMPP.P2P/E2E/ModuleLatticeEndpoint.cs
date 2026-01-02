@@ -51,10 +51,10 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				this.publicKey = new byte[this.keyEncapsulationMechanism.PublicKeyLength +
 					this.signatureAlgorithm.PublicKeyLength];
 
-				Array.Copy(this.keyEncapsulationMechanismKeys.EncapsulationKey, 0,
+				Buffer.BlockCopy(this.keyEncapsulationMechanismKeys.EncapsulationKey, 0,
 					this.publicKey, 0, this.keyEncapsulationMechanism.PublicKeyLength);
 
-				Array.Copy(this.signatureAlgorithmKeys.PublicKey, 0,
+				Buffer.BlockCopy(this.signatureAlgorithmKeys.PublicKey, 0,
 					this.publicKey, this.keyEncapsulationMechanism.PublicKeyLength,
 					this.signatureAlgorithm.PublicKeyLength);
 
@@ -91,8 +91,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			byte[] EncapsulationKey = new byte[this.keyEncapsulationMechanism.PublicKeyLength];
 			byte[] SignaturePublicKey = new byte[this.signatureAlgorithm.PublicKeyLength];
 
-			Array.Copy(PublicKey, 0, EncapsulationKey, 0, EncapsulationKey.Length);
-			Array.Copy(PublicKey, EncapsulationKey.Length, SignaturePublicKey, 0, SignaturePublicKey.Length);
+			Buffer.BlockCopy(PublicKey, 0, EncapsulationKey, 0, EncapsulationKey.Length);
+			Buffer.BlockCopy(PublicKey, EncapsulationKey.Length, SignaturePublicKey, 0, SignaturePublicKey.Length);
 
 			this.keyEncapsulationMechanismKeys = ML_KEM_Keys.FromEncapsulationKey(EncapsulationKey);
 			this.signatureAlgorithmKeys = ML_DSA_Keys.FromPublicKey(SignaturePublicKey);
@@ -323,8 +323,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				byte[] SeedKem = new byte[64];
 				byte[] SeedDsa = new byte[32];
 
-				Array.Copy(Secret, 0, SeedKem, 0, 64);
-				Array.Copy(Secret, 64, SeedDsa, 0, 32);
+				Buffer.BlockCopy(Secret, 0, SeedKem, 0, 64);
+				Buffer.BlockCopy(Secret, 64, SeedDsa, 0, 32);
 
 				KemKeys = this.keyEncapsulationMechanism.KeyGen_FromSeed(SeedKem, true);
 				DsaKeys = this.signatureAlgorithm.KeyGen_Internal(SeedDsa, true);
@@ -362,8 +362,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
 			byte[] Result = new byte[c + d];
 
-			Array.Copy(KemKey, 0, Result, 0, c);
-			Array.Copy(DsaKey, 0, Result, c, d);
+			Buffer.BlockCopy(KemKey, 0, Result, 0, c);
+			Buffer.BlockCopy(DsaKey, 0, Result, c, d);
 
 			return Result;
 		}

@@ -561,7 +561,7 @@ namespace Waher.Networking.HTTP
 											if (this.http2Frame is null)
 												this.http2Frame = new byte[this.localSettings.MaxFrameSize];
 
-											Array.Copy(Buffer, Offset, this.http2Frame, 0, i);
+											System.Buffer.BlockCopy(Buffer, Offset, this.http2Frame, 0, i);
 											Offset += i;
 											this.http2FramePos = i;
 											this.http2State = 9;
@@ -651,7 +651,7 @@ namespace Waher.Networking.HTTP
 										if (this.http2Frame is null)
 											this.http2Frame = new byte[this.localSettings.MaxFrameSize];
 
-										Array.Copy(Buffer, Offset, this.http2Frame, 0, i);
+										System.Buffer.BlockCopy(Buffer, Offset, this.http2Frame, 0, i);
 										Offset += i;
 										this.http2FramePos = i;
 										this.http2State++;
@@ -671,7 +671,7 @@ namespace Waher.Networking.HTTP
 
 					case 9: // Frame payload
 						i = Math.Min(End - Offset, this.http2FrameLength - this.http2FramePos);
-						Array.Copy(Buffer, Offset, this.http2Frame, this.http2FramePos, i);
+						System.Buffer.BlockCopy(Buffer, Offset, this.http2Frame, this.http2FramePos, i);
 						Offset += i;
 						this.http2FramePos += i;
 
@@ -1819,7 +1819,7 @@ namespace Waher.Networking.HTTP
 				Payload[5] = (byte)(i >> 16);
 				Payload[6] = (byte)(i >> 8);
 				Payload[7] = (byte)i;
-				Array.Copy(ReasonBin, 0, Payload, 8, c);
+				Buffer.BlockCopy(ReasonBin, 0, Payload, 8, c);
 
 				await this.SendHttp2Frame(FrameType.GoAway, 0, false, 0, null, Payload);
 
@@ -1948,7 +1948,7 @@ namespace Waher.Networking.HTTP
 			Data[8] = (byte)StreamId;
 
 			if (Count > 0)
-				Array.Copy(Payload, Offset, Data, 9, Count);
+				Buffer.BlockCopy(Payload, Offset, Data, 9, Count);
 
 			if (this.client is null)
 				return false;

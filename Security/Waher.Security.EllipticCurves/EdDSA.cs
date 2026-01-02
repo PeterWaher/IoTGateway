@@ -35,8 +35,8 @@ namespace Waher.Security.EllipticCurves
             byte[] A = Encode(P, Curve);
             int c = Data.Length;
             byte[] Bin = new byte[ScalarBytes + c];             // dom2(F, C) = blank string
-            Array.Copy(Prefix, 0, Bin, 0, ScalarBytes);         // prefix
-            Array.Copy(Data, 0, Bin, ScalarBytes, c);           // PH(M)=M
+            Buffer.BlockCopy(Prefix, 0, Bin, 0, ScalarBytes);         // prefix
+			Buffer.BlockCopy(Data, 0, Bin, ScalarBytes, c);           // PH(M)=M
 
             byte[] h = HashFunction(Bin);
             BigInteger r = BigInteger.Remainder(EllipticCurve.ToInt(h), Curve.Order);
@@ -44,9 +44,9 @@ namespace Waher.Security.EllipticCurves
             byte[] Rs = Encode(R, Curve);
 
             Bin = new byte[(ScalarBytes << 1) + c];             // dom2(F, C) = blank string
-            Array.Copy(Rs, 0, Bin, 0, ScalarBytes);
-            Array.Copy(A, 0, Bin, ScalarBytes, ScalarBytes);
-            Array.Copy(Data, 0, Bin, ScalarBytes << 1, c);      // PH(M)=M
+            Buffer.BlockCopy(Rs, 0, Bin, 0, ScalarBytes);
+            Buffer.BlockCopy(A, 0, Bin, ScalarBytes, ScalarBytes);
+			Buffer.BlockCopy(Data, 0, Bin, ScalarBytes << 1, c);      // PH(M)=M
 
             h = HashFunction(Bin);
 
@@ -59,8 +59,8 @@ namespace Waher.Security.EllipticCurves
 
             byte[] Signature = new byte[ScalarBytes << 1];
 
-            Array.Copy(Rs, 0, Signature, 0, ScalarBytes);
-            Array.Copy(Bin, 0, Signature, ScalarBytes, ScalarBytes);
+            Buffer.BlockCopy(Rs, 0, Signature, 0, ScalarBytes);
+			Buffer.BlockCopy(Bin, 0, Signature, ScalarBytes, ScalarBytes);
 
             return Signature;
         }
@@ -125,8 +125,8 @@ namespace Waher.Security.EllipticCurves
 
             byte[] Signature = new byte[ScalarBytes << 1];
 
-            Array.Copy(Rs, 0, Signature, 0, ScalarBytes);
-            Array.Copy(Bin, 0, Signature, ScalarBytes, ScalarBytes);
+            Buffer.BlockCopy(Rs, 0, Signature, 0, ScalarBytes);
+			Buffer.BlockCopy(Bin, 0, Signature, ScalarBytes, ScalarBytes);
 
             return Signature;
         }
@@ -209,10 +209,10 @@ namespace Waher.Security.EllipticCurves
                 ScalarBytes >>= 1;
 
                 byte[] R = new byte[ScalarBytes];
-                Array.Copy(Signature, 0, R, 0, ScalarBytes);
+				Buffer.BlockCopy(Signature, 0, R, 0, ScalarBytes);
                 PointOnCurve r = Decode(R, Curve);
                 byte[] S = new byte[ScalarBytes];
-                Array.Copy(Signature, ScalarBytes, S, 0, ScalarBytes);
+				Buffer.BlockCopy(Signature, ScalarBytes, S, 0, ScalarBytes);
                 BigInteger s = EllipticCurve.ToInt(S);
 
                 if (s >= Curve.Order)
@@ -220,9 +220,9 @@ namespace Waher.Security.EllipticCurves
 
                 int c = Data.Length;
                 byte[] Bin = new byte[(ScalarBytes << 1) + c];              // dom2(F, C) = blank string
-                Array.Copy(R, 0, Bin, 0, ScalarBytes);
-                Array.Copy(PublicKey, 0, Bin, ScalarBytes, ScalarBytes);
-                Array.Copy(Data, 0, Bin, ScalarBytes << 1, c);              // PH(M)=M
+                Buffer.BlockCopy(R, 0, Bin, 0, ScalarBytes);
+                Buffer.BlockCopy(PublicKey, 0, Bin, ScalarBytes, ScalarBytes);
+				Buffer.BlockCopy(Data, 0, Bin, ScalarBytes << 1, c);              // PH(M)=M
 
                 byte[] h = HashFunction(Bin);
 
@@ -263,10 +263,10 @@ namespace Waher.Security.EllipticCurves
                 ScalarBytes >>= 1;
 
                 byte[] R = new byte[ScalarBytes];
-                Array.Copy(Signature, 0, R, 0, ScalarBytes);
+				Buffer.BlockCopy(Signature, 0, R, 0, ScalarBytes);
                 PointOnCurve r = Decode(R, Curve);
                 byte[] S = new byte[ScalarBytes];
-                Array.Copy(Signature, ScalarBytes, S, 0, ScalarBytes);
+				Buffer.BlockCopy(Signature, ScalarBytes, S, 0, ScalarBytes);
                 BigInteger s = EllipticCurve.ToInt(S);
                 byte[] h;
 

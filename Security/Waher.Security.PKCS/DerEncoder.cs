@@ -174,7 +174,7 @@ namespace Waher.Security.PKCS
 					int c = Value.Length;
 					byte[] Value2 = new byte[c + 1];
 					Value2[0] = 0xff;
-					Array.Copy(Value, 0, Value2, 1, Value.Length);
+					Buffer.BlockCopy(Value, 0, Value2, 1, Value.Length);
 					Value = Value2;
 				}
 			}
@@ -187,7 +187,7 @@ namespace Waher.Security.PKCS
 					int c = Value.Length;
 					byte[] Value2 = new byte[c + 1];
 					Value2[0] = 0;
-					Array.Copy(Value, 0, Value2, 1, Value.Length);
+					Buffer.BlockCopy(Value, 0, Value2, 1, Value.Length);
 					Value = Value2;
 				}
 			}
@@ -279,7 +279,7 @@ namespace Waher.Security.PKCS
 			int c = Bytes.Length;
 			byte[] Bytes2 = new byte[c + 1];
 			Bytes2[0] = 0;  // Unused bits.
-			Array.Copy(Bytes, 0, Bytes2, 1, c);
+			Buffer.BlockCopy(Bytes, 0, Bytes2, 1, c);
 
 			this.EncodeBinary(Bytes2);
 		}

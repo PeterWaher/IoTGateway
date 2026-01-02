@@ -626,7 +626,7 @@ namespace Waher.Networking.CoAP
 						}
 
 						Payload = new byte[Length];
-						Array.Copy(Packet, Pos, Payload, 0, Length);
+						Buffer.BlockCopy(Packet, Pos, Payload, 0, Length);
 						Pos += Length;
 					}
 
@@ -659,7 +659,7 @@ namespace Waher.Networking.CoAP
 				else
 				{
 					Payload = new byte[Len - Pos];
-					Array.Copy(Packet, Pos, Payload, 0, Len - Pos);
+					Buffer.BlockCopy(Packet, Pos, Payload, 0, Len - Pos);
 				}
 			}
 			else
@@ -1715,7 +1715,7 @@ namespace Waher.Networking.CoAP
 				}
 
 				Payload = new byte[NrLeft];
-				Array.Copy(OrgPayload, Pos, Payload, 0, NrLeft);
+				Buffer.BlockCopy(OrgPayload, Pos, Payload, 0, NrLeft);
 			}
 
 			Message = new Message()

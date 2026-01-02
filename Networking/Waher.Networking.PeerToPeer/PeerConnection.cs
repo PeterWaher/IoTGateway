@@ -89,7 +89,7 @@ namespace Waher.Networking.PeerToPeer
 
 						case 1:
 							NrLeft = Math.Min(Count, this.packetSize - this.packetPos);
-							Array.Copy(Buffer, Offset, this.packetBuffer, this.packetPos, NrLeft);
+							System.Buffer.BlockCopy(Buffer, Offset, this.packetBuffer, this.packetPos, NrLeft);
 							Offset += NrLeft;
 							this.packetPos += NrLeft;
 
@@ -114,7 +114,7 @@ namespace Waher.Networking.PeerToPeer
 			{
 				this.packetSize = Count;
 				this.packetBuffer = new byte[Count];
-				Array.Copy(Buffer, Offset, this.packetBuffer, 0, Count);
+				System.Buffer.BlockCopy(Buffer, Offset, this.packetBuffer, 0, Count);
 				Continue = await this.OnPacketReceived();
 			}
 
@@ -299,7 +299,7 @@ namespace Waher.Networking.PeerToPeer
 			i = Packet.Length;
 
 			byte[] Packet2 = new byte[c + i];
-			Array.Copy(Packet, 0, Packet2, c, i);
+			Buffer.BlockCopy(Packet, 0, Packet2, c, i);
 			ConstantBuffer = true;
 
 			do
@@ -357,12 +357,12 @@ namespace Waher.Networking.PeerToPeer
 
 					ToSend = new byte[c];
 					j = EncodedPacket.Length;
-					Array.Copy(EncodedPacket, 0, ToSend, 0, j);
+					Buffer.BlockCopy(EncodedPacket, 0, ToSend, 0, j);
 
 					i = 0;
 					foreach (byte[] Packet2 in this.historicPackets)
 					{
-						Array.Copy(Packet2, 0, ToSend, j, Packet2.Length);
+						Buffer.BlockCopy(Packet2, 0, ToSend, j, Packet2.Length);
 						j += Packet2.Length;
 						i++;
 						if (i >= IncludeNrPreviousPackets)
@@ -482,7 +482,7 @@ namespace Waher.Networking.PeerToPeer
 							break;
 
 						Packet = new byte[PacketLen];
-						Array.Copy(Data, Pos, Packet, 0, PacketLen);
+						Buffer.BlockCopy(Data, Pos, Packet, 0, PacketLen);
 						Pos += PacketLen;
 
 						if ((short)(PacketNr - this.lastReceivedPacket) > 0)
@@ -541,7 +541,7 @@ namespace Waher.Networking.PeerToPeer
 				int Len = Data.Length;
 				byte[] Packet = new byte[Len];
 
-				Array.Copy(Data, 0, Packet, 0, Len);
+				Buffer.BlockCopy(Data, 0, Packet, 0, Len);
 
 				BinaryDataReadEventHandler h = this.OnReceived;
 				if (!(h is null))

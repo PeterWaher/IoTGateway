@@ -27,9 +27,9 @@ namespace Waher.Persistence.Files.Storage
 						this.RightSizeSubtree = uint.MaxValue;
 				}
 
-				Array.Copy(BitConverter.GetBytes(BlockLink), 0, RightBlock, RightPos, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(BlockLink), 0, RightBlock, RightPos, 4);
 				this.RightPos += 4;
-				Array.Copy(Block, Pos, RightBlock, RightPos, Len);
+				Buffer.BlockCopy(Block, Pos, RightBlock, RightPos, Len);
 				this.RightPos += Len;
 				this.TotPos += c;
 			}
@@ -44,9 +44,9 @@ namespace Waher.Persistence.Files.Storage
 						this.LeftSizeSubtree = uint.MaxValue;
 				}
 
-				Array.Copy(BitConverter.GetBytes(BlockLink), 0, LeftBlock, LeftPos, 4);
+				Buffer.BlockCopy(BitConverter.GetBytes(BlockLink), 0, LeftBlock, LeftPos, 4);
 				this.LeftPos += 4;
-				Array.Copy(Block, Pos, LeftBlock, LeftPos, Len);
+				Buffer.BlockCopy(Block, Pos, LeftBlock, LeftPos, Len);
 				this.LeftPos += Len;
 				this.TotPos += c;
 			}
@@ -58,7 +58,7 @@ namespace Waher.Persistence.Files.Storage
 					this.LeftSizeSubtree = uint.MaxValue;
 
 				this.ParentObject = new byte[Len];
-				Array.Copy(Block, Pos, this.ParentObject, 0, Len);
+				Buffer.BlockCopy(Block, Pos, this.ParentObject, 0, Len);
 			}
 		}
 

@@ -155,7 +155,7 @@ namespace Waher.Content.QR
 			for (i = 0; i < Version.BlocksPerGroup1; i++)
 			{
 				DataBlocks[i] = new byte[c];
-				Array.Copy(Message, SourceIndex, DataBlocks[i], 0, c);
+				Buffer.BlockCopy(Message, SourceIndex, DataBlocks[i], 0, c);
 				SourceIndex += c;
 			}
 
@@ -165,7 +165,7 @@ namespace Waher.Content.QR
 				for (j = 0; j < Version.BlocksPerGroup2; j++)
 				{
 					DataBlocks[i] = new byte[c];
-					Array.Copy(Message, SourceIndex, DataBlocks[i++], 0, c);
+					Buffer.BlockCopy(Message, SourceIndex, DataBlocks[i++], 0, c);
 					SourceIndex += c;
 				}
 			}

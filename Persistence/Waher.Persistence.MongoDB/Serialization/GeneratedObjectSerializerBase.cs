@@ -922,7 +922,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 					c = Bin.Length;
 					Result = Array.CreateInstance(T, c);
-					Array.Copy(Bin, 0, Result, 0, c);
+					Buffer.BlockCopy(Bin, 0, Result, 0, c);
 
 					return Result;
 
@@ -1083,7 +1083,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 		public static Guid ObjectIdToGuid(ObjectId ObjectId)
 		{
 			byte[] A = new byte[16];
-			Array.Copy(ObjectId.ToByteArray(), 0, A, 0, 12);
+			Buffer.BlockCopy(ObjectId.ToByteArray(), 0, A, 0, 12);
 			return new Guid(A);
 		}
 

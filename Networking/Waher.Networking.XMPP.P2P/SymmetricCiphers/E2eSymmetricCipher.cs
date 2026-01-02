@@ -131,7 +131,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 			}
 			while (i != 0);
 
-			Array.Copy(Data, 0, Encrypted, j, c);
+			Buffer.BlockCopy(Data, 0, Encrypted, j, c);
 
 			if (ContentLen < BlockLen)
 			{
@@ -147,7 +147,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 							rnd.GetBytes(Bin);
 						}
 
-						Array.Copy(Bin, 0, Encrypted, ContentLen, c);
+						Buffer.BlockCopy(Bin, 0, Encrypted, ContentLen, c);
 						break;
 
 					case E2eBufferFillAlgorithm.Zeroes:
@@ -187,7 +187,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
 			byte[] Decrypted = new byte[c];
 
-			Array.Copy(Data, i, Decrypted, 0, c);
+			Buffer.BlockCopy(Data, i, Decrypted, 0, c);
 
 			return Decrypted;
 		}
@@ -384,17 +384,17 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
 			if (k > 0)
 			{
-				Array.Copy(Signature, 0, Block, j, k);
+				Buffer.BlockCopy(Signature, 0, Block, j, k);
 				j += k;
 			}
 
 			if (l > 0)
 			{
-				Array.Copy(KeyCipherText, 0, Block, j, l);
+				Buffer.BlockCopy(KeyCipherText, 0, Block, j, l);
 				j += l;
 			}
 
-			Array.Copy(Encrypted, 0, Block, j, i);
+			Buffer.BlockCopy(Encrypted, 0, Block, j, i);
 
 			return Block;
 		}
@@ -462,16 +462,16 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 			byte[] Encrypted = new byte[DataLen];
 			byte[] Key;
 
-			Array.Copy(Data, i, Signature, 0, SignatureLen);
+			Buffer.BlockCopy(Data, i, Signature, 0, SignatureLen);
 			i += SignatureLen;
 
 			if (KeyLen > 0)
 			{
-				Array.Copy(Data, i, KeyCipherText, 0, KeyLen);
+				Buffer.BlockCopy(Data, i, KeyCipherText, 0, KeyLen);
 				i += KeyLen;
 			}
 
-			Array.Copy(Data, i, Encrypted, 0, DataLen);
+			Buffer.BlockCopy(Data, i, Encrypted, 0, DataLen);
 
 			Key = Receiver.GetSharedSecretForDecryption(Sender, KeyCipherText);
 

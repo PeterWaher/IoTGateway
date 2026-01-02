@@ -169,7 +169,7 @@ namespace Waher.Security.ChaChaPoly
                     this.NextBlock();
 
                 j = Math.Min(NrBytes - i, 64 - this.pos);
-                Array.Copy(this.block, this.pos, Result, i, j);
+				Buffer.BlockCopy(this.block, this.pos, Result, i, j);
                 this.pos += j;
                 i += j;
             }

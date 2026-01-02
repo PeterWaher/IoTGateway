@@ -198,7 +198,7 @@ namespace Waher.Content.Multipart
 					Raw = Data2
 				};
 
-				Array.Copy(Data, j + 4, Data2, 0, NrBytes);
+				Buffer.BlockCopy(Data, j + 4, Data2, 0, NrBytes);
 
 				string[] Rows = Header.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
 				l = Rows.Length;

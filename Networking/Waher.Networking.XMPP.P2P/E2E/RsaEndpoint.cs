@@ -136,8 +136,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
 
 			this.publicKey[0] = (byte)(this.keySize);
 			this.publicKey[1] = (byte)(this.keySize >> 8);
-			Array.Copy(this.modulus, 0, this.publicKey, 2, c);
-			Array.Copy(this.exponent, 0, this.publicKey, c + 2, d);
+			Buffer.BlockCopy(this.modulus, 0, this.publicKey, 2, c);
+			Buffer.BlockCopy(this.exponent, 0, this.publicKey, c + 2, d);
 
 			this.publicKeyBase64 = Convert.ToBase64String(this.publicKey);
 		}
@@ -321,8 +321,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			byte[] Modulus = new byte[ModSize];
 			byte[] Exponent = new byte[ExpSize];
 
-			Array.Copy(PublicKey, 2, Modulus, 0, ModSize);
-			Array.Copy(PublicKey, 2 + ModSize, Exponent, 0, ExpSize);
+			Buffer.BlockCopy(PublicKey, 2, Modulus, 0, ModSize);
+			Buffer.BlockCopy(PublicKey, 2 + ModSize, Exponent, 0, ExpSize);
 
 			return new RsaEndpoint(KeySize, Modulus, Exponent, this.DefaultSymmetricCipher.CreteNew());
 		}
@@ -441,8 +441,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			byte[] Modulus = new byte[c];
 			byte[] Exponent = new byte[d];
 
-			Array.Copy(PublicKey, 0, Modulus, 0, c);
-			Array.Copy(PublicKey, c, Exponent, 0, d);
+			Buffer.BlockCopy(PublicKey, 0, Modulus, 0, c);
+			Buffer.BlockCopy(PublicKey, c, Exponent, 0, d);
 
 			return Verify(Data, Signature, KeySize, Modulus, Exponent);
 		}
@@ -465,8 +465,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			byte[] Modulus = new byte[c];
 			byte[] Exponent = new byte[d];
 
-			Array.Copy(PublicKey, 0, Modulus, 0, c);
-			Array.Copy(PublicKey, c, Exponent, 0, d);
+			Buffer.BlockCopy(PublicKey, 0, Modulus, 0, c);
+			Buffer.BlockCopy(PublicKey, c, Exponent, 0, d);
 
 			return Verify(Data, Signature, KeySize, Modulus, Exponent);
 		}

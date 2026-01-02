@@ -55,13 +55,13 @@ namespace Waher.Security.ChaChaPoly
             c += 16;
 
             byte[] Bin = new byte[c];
-            Array.Copy(AdditionalData, 0, Bin, 0, c = AdditionalData.Length);
+			Buffer.BlockCopy(AdditionalData, 0, Bin, 0, c = AdditionalData.Length);
 
             i = c & 15;
             if (i != 0)
                 c += 16 - i;
 
-            Array.Copy(Encrypting ? Encrypted : Data, 0, Bin, c, Encrypted.Length);
+			Buffer.BlockCopy(Encrypting ? Encrypted : Data, 0, Bin, c, Encrypted.Length);
 
             i = Bin.Length - 16;
             c = AdditionalData.Length;

@@ -359,7 +359,7 @@ namespace Waher.Persistence.Serialization
 			int c = (int)this.ReadVariableLengthUInt64();
 			byte[] Result = new byte[c];
 
-			Array.Copy(this.data, this.pos, Result, 0, c);
+			Buffer.BlockCopy(this.data, this.pos, Result, 0, c);
 			this.pos += c;
 
 			return Result;
@@ -374,7 +374,7 @@ namespace Waher.Persistence.Serialization
 		{
 			byte[] Result = new byte[NrBytes];
 
-			Array.Copy(this.data, this.pos, Result, 0, NrBytes);
+			Buffer.BlockCopy(this.data, this.pos, Result, 0, NrBytes);
 			this.pos += NrBytes;
 
 			return Result;
@@ -413,7 +413,7 @@ namespace Waher.Persistence.Serialization
 				this.FlushBits();
 
 			byte[] Data = new byte[16];
-			Array.Copy(this.data, this.pos, Data, 0, 16);
+			Buffer.BlockCopy(this.data, this.pos, Data, 0, 16);
 			this.pos += 16;
 
 			return new Guid(Data);

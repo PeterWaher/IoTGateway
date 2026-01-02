@@ -29,8 +29,8 @@ namespace Waher.Security.ChaChaPoly
             byte[] rBin = new byte[(Key[15] & 0x80) != 0 ? 17 : 16];
             byte[] sBin = new byte[(Key[31] & 0x80) != 0 ? 17 : 16];
 
-            Array.Copy(Key, 0, rBin, 0, 16);
-            Array.Copy(Key, 16, sBin, 0, 16);
+			Buffer.BlockCopy(Key, 0, rBin, 0, 16);
+            Buffer.BlockCopy(Key, 16, sBin, 0, 16);
 
             rBin[3] &= 15;
             rBin[7] &= 15;
@@ -74,7 +74,7 @@ namespace Waher.Security.ChaChaPoly
             while (i < c)
             {
                 j = Math.Min(c - i, 16);
-                Array.Copy(Data, i, Bin, 0, j);
+				Buffer.BlockCopy(Data, i, Bin, 0, j);
                 i += j;
                 Bin[j++] = 1;
                 while (j < 17)

@@ -215,7 +215,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					Block[0] = (byte)(i >> 8);
 					Block[1] = (byte)i;
 
-					Array.Copy(Encrypted, 0, Block, 2, i);
+					Buffer.BlockCopy(Encrypted, 0, Block, 2, i);
 				}
 
 				this.isWriting = true;

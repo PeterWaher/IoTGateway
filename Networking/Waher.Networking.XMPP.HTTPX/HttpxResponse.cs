@@ -380,7 +380,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					{
 						if (NrBytes <= NrLeft)
 						{
-							Array.Copy(Buffer, Offset, this.chunk, this.pos, NrBytes);
+							System.Buffer.BlockCopy(Buffer, Offset, this.chunk, this.pos, NrBytes);
 							this.pos += NrBytes;
 							NrBytes = 0;
 
@@ -389,7 +389,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						}
 						else
 						{
-							Array.Copy(Buffer, Offset, this.chunk, this.pos, NrLeft);
+							System.Buffer.BlockCopy(Buffer, Offset, this.chunk, this.pos, NrLeft);
 							this.pos += NrLeft;
 							Offset += NrLeft;
 							NrBytes -= NrLeft;
@@ -415,9 +415,9 @@ namespace Waher.Networking.XMPP.HTTPX
 					int j;
 
 					if (i > 0)
-						Array.Copy(this.tail, 0, Bin, 0, i);
+						System.Buffer.BlockCopy(this.tail, 0, Bin, 0, i);
 
-					Array.Copy(Buffer, Offset, Bin, i, j = c - i);
+					System.Buffer.BlockCopy(Buffer, Offset, Bin, i, j = c - i);
 
 					if (d == 0)
 						this.tail = null;
@@ -426,7 +426,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						if (this.tail is null || this.tail.Length != d)
 							this.tail = new byte[d];
 
-						Array.Copy(Buffer, Offset + j, this.tail, 0, d);
+						System.Buffer.BlockCopy(Buffer, Offset + j, this.tail, 0, d);
 					}
 
 					this.response.Append(Convert.ToBase64String(Bin));

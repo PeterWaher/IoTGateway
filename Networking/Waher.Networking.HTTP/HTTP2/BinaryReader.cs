@@ -153,7 +153,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				throw new IOException("Unexpected end of data.");
 
 			byte[] Result = new byte[NrBytes];
-			Array.Copy(this.buffer, this.pos, Result, 0, NrBytes);
+			System.Buffer.BlockCopy(this.buffer, this.pos, Result, 0, NrBytes);
 			this.pos += NrBytes;
 
 			return Result;

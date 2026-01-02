@@ -43,7 +43,7 @@ namespace Waher.Security.PKCS.Passwords
 
 			this.key = new byte[KeyLength];
 
-			Array.Copy(Bin, 0, this.key, 0, KeyLength);
+			Buffer.BlockCopy(Bin, 0, this.key, 0, KeyLength);
 		}
 	}
 }

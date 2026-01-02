@@ -27,7 +27,7 @@ namespace Waher.Security.PKCS
 			foreach (byte[] A in OctetStrings)
 			{
 				c = A.Length;
-				Array.Copy(A, 0, Result, i, c);
+				Buffer.BlockCopy(A, 0, Result, i, c);
 				i += c;
 			}
 

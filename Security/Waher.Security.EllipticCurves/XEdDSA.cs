@@ -80,9 +80,9 @@
 
             GetRandomBytes?.Invoke(Z);
 
-            Array.Copy(a, 0, Bin, 0, ScalarBytes);
-            Array.Copy(Data, 0, Bin, ScalarBytes, DataLen);
-            Array.Copy(Z, 0, Bin, ScalarBytes + DataLen, 64);
+            Buffer.BlockCopy(a, 0, Bin, 0, ScalarBytes);
+            Buffer.BlockCopy(Data, 0, Bin, ScalarBytes, DataLen);
+            Buffer.BlockCopy(Z, 0, Bin, ScalarBytes + DataLen, 64);
 
             BigInteger r = EllipticCurve.ToInt(Hash1(Bin, ScalarBytes, HashFunction));
             r = BigInteger.Remainder(r, Pair.Order);
@@ -94,9 +94,9 @@
 
             Bin = new byte[(ScalarBytes << 1) + DataLen];
 
-            Array.Copy(Rs, 0, Bin, 0, ScalarBytes);
-            Array.Copy(A, 0, Bin, ScalarBytes, ScalarBytes);
-            Array.Copy(Data, 0, Bin, ScalarBytes << 1, DataLen);
+            Buffer.BlockCopy(Rs, 0, Bin, 0, ScalarBytes);
+            Buffer.BlockCopy(A, 0, Bin, ScalarBytes, ScalarBytes);
+            Buffer.BlockCopy(Data, 0, Bin, ScalarBytes << 1, DataLen);
 
             BigInteger h = EllipticCurve.ToInt(HashFunction(Bin));
             h = BigInteger.Remainder(h, Pair.Order);
@@ -105,8 +105,8 @@
             byte[] ss = s.ToByteArray();
             byte[] Signature = new byte[ScalarBytes << 1];
 
-            Array.Copy(Rs, 0, Signature, 0, ScalarBytes);
-            Array.Copy(ss, 0, Signature, ScalarBytes, ss.Length);
+            Buffer.BlockCopy(Rs, 0, Signature, 0, ScalarBytes);
+            Buffer.BlockCopy(ss, 0, Signature, ScalarBytes, ss.Length);
 
             return Signature;
         }
@@ -122,7 +122,7 @@
             for (i = 1; i < ScalarBytes; i++)
                 Bin[i] = 0xff;
 
-            Array.Copy(Data, 0, Bin, ScalarBytes, c);
+            Buffer.BlockCopy(Data, 0, Bin, ScalarBytes, c);
 
             return HashFunction(Data);
         }
@@ -167,12 +167,12 @@
                 //     return false;
                 // 
                 // byte[] Rs = new byte[ScalarBytes];
-                // Array.Copy(Signature, 0, Rs, 0, ScalarBytes);
+                // Buffer.BlockCopy(Signature, 0, Rs, 0, ScalarBytes);
                 // EdwardsCurveBase Pair = Curve.Pair;
                 // PointOnCurve R = EdDSA.Decode(Rs, Pair);
                 // 
                 // byte[] ss = new byte[ScalarBytes];
-                // Array.Copy(Signature, ScalarBytes, ss, 0, ScalarBytes);
+                // Buffer.BlockCopy(Signature, ScalarBytes, ss, 0, ScalarBytes);
                 // BigInteger s = EllipticCurve.ToInt(ss);
                 // 
                 // if (ModulusP.CalcBits(R.Y) >= PBits)
@@ -198,9 +198,9 @@
                 // int DataLen = Data.Length;
                 // 
                 // Bin = new byte[(ScalarBytes << 1) + DataLen];
-                // Array.Copy(Rs, 0, Bin, 0, ScalarBytes);
-                // Array.Copy(A, 0, Bin, ScalarBytes, ScalarBytes);
-                // Array.Copy(Data, 0, Bin, ScalarBytes << 1, DataLen);
+                // Buffer.BlockCopy(Rs, 0, Bin, 0, ScalarBytes);
+                // Buffer.BlockCopy(A, 0, Bin, ScalarBytes, ScalarBytes);
+                // Buffer.BlockCopy(Data, 0, Bin, ScalarBytes << 1, DataLen);
                 // 
                 // BigInteger h = EllipticCurve.ToInt(HashFunction(Bin));
                 // h = BigInteger.Remainder(h, Pair.Order);

@@ -273,9 +273,9 @@ namespace Waher.Security.PQC
 			Bin[1] = (byte)ContextLen;
 
 			if (ContextLen > 0)
-				Array.Copy(Context, 0, Bin, 2, ContextLen);
+				Buffer.BlockCopy(Context, 0, Bin, 2, ContextLen);
 
-			Array.Copy(Message, 0, Bin, 2 + ContextLen, MessageLen);
+			Buffer.BlockCopy(Message, 0, Bin, 2 + ContextLen, MessageLen);
 
 			return this.Sign_Internal(Keys, Bin, false, Seed, out RejectionCount);
 		}
@@ -348,9 +348,9 @@ namespace Waher.Security.PQC
 			Bin[1] = (byte)ContextLen;
 
 			if (ContextLen > 0)
-				Array.Copy(Context, 0, Bin, 2, ContextLen);
+				Buffer.BlockCopy(Context, 0, Bin, 2, ContextLen);
 
-			Array.Copy(Message, 0, Bin, 2 + ContextLen, MessageLen);
+			Buffer.BlockCopy(Message, 0, Bin, 2 + ContextLen, MessageLen);
 
 			return this.Verify_Internal(Keys, Bin, false, Signature);
 		}
@@ -492,12 +492,12 @@ namespace Waher.Security.PQC
 			Bin[1] = (byte)ContextLen;
 
 			if (ContextLen > 0)
-				Array.Copy(Context, 0, Bin, 2, ContextLen);
+				Buffer.BlockCopy(Context, 0, Bin, 2, ContextLen);
 
-			Array.Copy(Oid, 0, Bin, Pos = 2 + ContextLen, OidLen);
+			Buffer.BlockCopy(Oid, 0, Bin, Pos = 2 + ContextLen, OidLen);
 			Pos += OidLen;
 
-			Array.Copy(Message, 0, Bin, Pos, MessageLen);
+			Buffer.BlockCopy(Message, 0, Bin, Pos, MessageLen);
 
 			return this.Sign_Internal(Keys, Bin, false, Seed, out RejectionCount);
 		}
@@ -607,12 +607,12 @@ namespace Waher.Security.PQC
 			Bin[1] = (byte)ContextLen;
 
 			if (ContextLen > 0)
-				Array.Copy(Context, 0, Bin, 2, ContextLen);
+				Buffer.BlockCopy(Context, 0, Bin, 2, ContextLen);
 
-			Array.Copy(Oid, 0, Bin, Pos = 2 + ContextLen, OidLen);
+			Buffer.BlockCopy(Oid, 0, Bin, Pos = 2 + ContextLen, OidLen);
 			Pos += OidLen;
 
-			Array.Copy(Message2, 0, Bin, Pos, Message2Len);
+			Buffer.BlockCopy(Message2, 0, Bin, Pos, Message2Len);
 
 			return this.Sign_Internal(Keys, Bin, false, Seed, out RejectionCount);
 		}
@@ -843,12 +843,12 @@ namespace Waher.Security.PQC
 			Bin[1] = (byte)ContextLen;
 
 			if (ContextLen > 0)
-				Array.Copy(Context, 0, Bin, 2, ContextLen);
+				Buffer.BlockCopy(Context, 0, Bin, 2, ContextLen);
 
-			Array.Copy(Oid, 0, Bin, Pos = 2 + ContextLen, OidLen);
+			Buffer.BlockCopy(Oid, 0, Bin, Pos = 2 + ContextLen, OidLen);
 			Pos += OidLen;
 
-			Array.Copy(Message, 0, Bin, Pos, MessageLen);
+			Buffer.BlockCopy(Message, 0, Bin, Pos, MessageLen);
 
 			return this.Verify_Internal(Keys, Bin, false, Signature);
 		}
@@ -908,12 +908,12 @@ namespace Waher.Security.PQC
 			Bin[1] = (byte)ContextLen;
 
 			if (ContextLen > 0)
-				Array.Copy(Context, 0, Bin, 2, ContextLen);
+				Buffer.BlockCopy(Context, 0, Bin, 2, ContextLen);
 
-			Array.Copy(Oid, 0, Bin, Pos = 2 + ContextLen, OidLen);
+			Buffer.BlockCopy(Oid, 0, Bin, Pos = 2 + ContextLen, OidLen);
 			Pos += OidLen;
 
-			Array.Copy(Message2, 0, Bin, Pos, Message2Len);
+			Buffer.BlockCopy(Message2, 0, Bin, Pos, Message2Len);
 
 			return this.Verify_Internal(Keys, Bin, false, Signature);
 		}
@@ -944,7 +944,7 @@ namespace Waher.Security.PQC
 				throw new ArgumentException("Seed must be 32 bytes long.", nameof(ξ));
 
 			byte[] Bin = new byte[34];
-			Array.Copy(ξ, 0, Bin, 0, 32);
+			Buffer.BlockCopy(ξ, 0, Bin, 0, 32);
 			Bin[32] = this.k;
 			Bin[33] = this.l;
 
@@ -952,15 +952,15 @@ namespace Waher.Security.PQC
 			Clear(Bin);
 
 			byte[] ρ = new byte[32];
-			Array.Copy(Bin2, 0, ρ, 0, 32);
+			Buffer.BlockCopy(Bin2, 0, ρ, 0, 32);
 
 			byte[] K = new byte[32];
-			Array.Copy(Bin2, 96, K, 0, 32);
+			Buffer.BlockCopy(Bin2, 96, K, 0, 32);
 
 			uint[,][] Â = this.ExpandÂ(ρ);
 
 			byte[] B = new byte[66];            // ρ´ || 2 index bytes
-			Array.Copy(Bin2, 32, B, 0, 64);
+			Buffer.BlockCopy(Bin2, 32, B, 0, 64);
 
 			short[][] s1 = this.ExpandS(B, this.l);
 			short[][] s2 = this.ExpandS(B, this.k);
@@ -1045,7 +1045,7 @@ namespace Waher.Security.PQC
 			byte r, c;
 
 			byte[] B = new byte[34];
-			Array.Copy(ρ, 0, B, 0, 32);
+			Buffer.BlockCopy(ρ, 0, B, 0, 32);
 
 			for (r = 0; r < this.k; r++)
 			{
@@ -1102,7 +1102,7 @@ namespace Waher.Security.PQC
 			byte[] PublicKey = new byte[this.publicKeySize];
 			int Pos = 32;
 
-			Array.Copy(ρ, 0, PublicKey, 0, 32);
+			Buffer.BlockCopy(ρ, 0, PublicKey, 0, 32);
 
 			for (int i = 0; i < this.k; i++)
 				Pos += SimpleBitPack(t1[i], 10, PublicKey, Pos);
@@ -1145,9 +1145,9 @@ namespace Waher.Security.PQC
 			int Pos = 128;
 			int i;
 
-			Array.Copy(ρ, 0, PrivateKey, 0, 32);
-			Array.Copy(K, 0, PrivateKey, 32, 32);
-			Array.Copy(tr, 0, PrivateKey, 64, 64);
+			Buffer.BlockCopy(ρ, 0, PrivateKey, 0, 32);
+			Buffer.BlockCopy(K, 0, PrivateKey, 32, 32);
+			Buffer.BlockCopy(tr, 0, PrivateKey, 64, 64);
 
 			for (i = 0; i < this.l; i++)
 				Pos += BitPack(s1[i], PrivateKey, Pos, this.η, this.η);
@@ -1201,9 +1201,9 @@ namespace Waher.Security.PQC
 			s2 = new short[this.k][];
 			t0 = new short[this.k][];
 
-			Array.Copy(PrivateKey, 0, ρ, 0, 32);
-			Array.Copy(PrivateKey, 32, K, 0, 32);
-			Array.Copy(PrivateKey, 64, tr, 0, 64);
+			Buffer.BlockCopy(PrivateKey, 0, ρ, 0, 32);
+			Buffer.BlockCopy(PrivateKey, 32, K, 0, 32);
+			Buffer.BlockCopy(PrivateKey, 64, tr, 0, 64);
 
 			for (i = 0; i < this.l; i++)
 			{
@@ -2244,17 +2244,17 @@ namespace Waher.Security.PQC
 				int MessageLen = Message.Length;
 				Bin = new byte[64 + MessageLen];
 
-				Array.Copy(tr, 0, Bin, 0, 64);
-				Array.Copy(Message, 0, Bin, 64, MessageLen);
+				Buffer.BlockCopy(tr, 0, Bin, 0, 64);
+				Buffer.BlockCopy(Message, 0, Bin, 64, MessageLen);
 
 				μ = H(Bin, 64);
 				Clear(Bin);
 			}
 
 			Bin = new byte[128];
-			Array.Copy(K, 0, Bin, 0, 32);
-			Array.Copy(Seed, 0, Bin, 32, 32);
-			Array.Copy(μ, 0, Bin, 64, 64);
+			Buffer.BlockCopy(K, 0, Bin, 0, 32);
+			Buffer.BlockCopy(Seed, 0, Bin, 32, 32);
+			Buffer.BlockCopy(μ, 0, Bin, 64, 64);
 
 			byte[] ρ2 = H(Bin, 64);
 			Clear(Bin);
@@ -2300,7 +2300,7 @@ namespace Waher.Security.PQC
 				int w1Len = BitLen((uint)((q - 1) / this.twoγ2 - 1));
 
 				Bin = new byte[64 + this.k * (w1Len << 5)];
-				Array.Copy(μ, 0, Bin, 0, 64);
+				Buffer.BlockCopy(μ, 0, Bin, 0, 64);
 
 				int Pos = 64;
 
@@ -2493,7 +2493,7 @@ namespace Waher.Security.PQC
 			byte[] v;
 
 			byte[] ρ1 = new byte[66];
-			Array.Copy(ρ, 0, ρ1, 0, 64);
+			Buffer.BlockCopy(ρ, 0, ρ1, 0, 64);
 
 			for (r = 0; r < this.l; r++)
 			{
@@ -2676,12 +2676,12 @@ namespace Waher.Security.PQC
 			int i;
 			byte[] Result = new byte[Len];
 
-			Array.Copy(c, 0, Result, 0, l1);
+			Buffer.BlockCopy(c, 0, Result, 0, l1);
 
 			for (i = 0; i < this.l; i++)
 				l1 += BitPack(z[i], Result, l1, this.γ1 - 1, this.γ1, true);
 
-			Array.Copy(h, 0, Result, l1, l3);
+			Buffer.BlockCopy(h, 0, Result, l1, l3);
 
 			return Result;
 		}
@@ -2745,8 +2745,8 @@ namespace Waher.Security.PQC
 				int MessageLen = Message.Length;
 				Bin = new byte[64 + MessageLen];
 
-				Array.Copy(tr, 0, Bin, 0, 64);
-				Array.Copy(Message, 0, Bin, 64, MessageLen);
+				Buffer.BlockCopy(tr, 0, Bin, 0, 64);
+				Buffer.BlockCopy(Message, 0, Bin, 64, MessageLen);
 
 				μ = H(Bin, 64);
 			}
@@ -2782,7 +2782,7 @@ namespace Waher.Security.PQC
 			int w1Len = BitLen((uint)((q - 1) / this.twoγ2 - 1));
 
 			Bin = new byte[64 + this.k * (w1Len << 5)];
-			Array.Copy(μ, 0, Bin, 0, 64);
+			Buffer.BlockCopy(μ, 0, Bin, 0, 64);
 
 			int Pos = 64;
 
@@ -2865,7 +2865,7 @@ namespace Waher.Security.PQC
 				return false;
 
 			ρ = new byte[32];
-			Array.Copy(PublicKey, 0, ρ, 0, 32);
+			Buffer.BlockCopy(PublicKey, 0, ρ, 0, 32);
 
 			int Pos = 32;
 			short[] f;
@@ -2904,7 +2904,7 @@ namespace Waher.Security.PQC
 			int l1 = this.λ >> 2;
 			c = new byte[l1];
 
-			Array.Copy(Signature, 0, c, 0, l1);
+			Buffer.BlockCopy(Signature, 0, c, 0, l1);
 
 			uint[] f;
 			int i;

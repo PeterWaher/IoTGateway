@@ -69,8 +69,8 @@ namespace Waher.Networking.CoAP.Test
 				return Task.CompletedTask;
 			};
 
-			//this.lwm2mClient.Register(20, new Lwm2mServerReference("leshan.eclipse.org"));
-			await this.lwm2mClient.Register(20, new Lwm2mServerReference("leshan.eclipse.org",
+			//this.lwm2mClient.Register(20, new Lwm2mServerReference("leshan.eclipseprojects.io"));
+			await this.lwm2mClient.Register(20, new Lwm2mServerReference("leshan.eclipseprojects.io",
 				new PresharedKey("testid", new byte[] { 1, 2, 3, 4 })));
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));

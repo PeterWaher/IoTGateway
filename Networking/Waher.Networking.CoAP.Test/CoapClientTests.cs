@@ -234,19 +234,19 @@ namespace Waher.Networking.CoAP.Test
 		{
 			// Default test resource
 
-			await this.Get("coap://californium.eclipse.org/test");
+			await this.Get("coap://californium.eclipseprojects.io/test");
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_02_Root()
 		{
-			await this.Get("coap://californium.eclipse.org/");
+			await this.Get("coap://californium.eclipseprojects.io/");
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_03_Discover()
 		{
-			LinkDocument Doc = await this.Get("coap://californium.eclipse.org/.well-known/core") as LinkDocument;
+			LinkDocument Doc = await this.Get("coap://californium.eclipseprojects.io/.well-known/core") as LinkDocument;
 			Assert.IsNotNull(Doc);
 		}
 
@@ -254,42 +254,42 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Client_Test_04_Separate()
 		{
 			// Resource which cannot be served immediately and which cannot be acknowledged in a piggy-backed way
-			await this.Get("coap://californium.eclipse.org/separate");
+			await this.Get("coap://californium.eclipseprojects.io/separate");
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_05_LongPath()
 		{
 			// Long path resource
-			await this.Get("coap://californium.eclipse.org/seg1");
+			await this.Get("coap://californium.eclipseprojects.io/seg1");
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_06_LongPath()
 		{
 			// Long path resource
-			await this.Get("coap://californium.eclipse.org/seg1/seg2");
+			await this.Get("coap://californium.eclipseprojects.io/seg1/seg2");
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_07_LongPath()
 		{
 			// Long path resource
-			await this.Get("coap://californium.eclipse.org/seg1/seg2/seg3");
+			await this.Get("coap://californium.eclipseprojects.io/seg1/seg2/seg3");
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_08_Large()
 		{
 			// Large resource
-			await this.Get("coap://californium.eclipse.org/large");
+			await this.Get("coap://californium.eclipseprojects.io/large");
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_09_LargeSeparate()
 		{
 			// Large resource
-			await this.Get("coap://californium.eclipse.org/large-separate");
+			await this.Get("coap://californium.eclipseprojects.io/large-separate");
 		}
 
 		[TestMethod]
@@ -297,10 +297,10 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Client_Test_10_MultiFormat()
 		{
 			// Resource that exists in different content formats (text/plain utf8 and application/xml)
-			string s = await this.Get("coap://californium.eclipse.org/multi-format", new CoapOptionAccept(0)) as string;
+			string s = await this.Get("coap://californium.eclipseprojects.io/multi-format", new CoapOptionAccept(0)) as string;
 			AssertNotNull(s);
 
-			XmlDocument Xml = await this.Get("coap://californium.eclipse.org/multi-format", new CoapOptionAccept(41)) as XmlDocument;
+			XmlDocument Xml = await this.Get("coap://californium.eclipseprojects.io/multi-format", new CoapOptionAccept(41)) as XmlDocument;
 			AssertNotNull(Xml);
 		}
 
@@ -313,59 +313,59 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Client_Test_11_Hierarchical()
 		{
 			// Hierarchical link description entry
-			AssertNotNull(await this.Get("coap://californium.eclipse.org/path") as LinkDocument);
-			AssertNotNull(await this.Get("coap://californium.eclipse.org/path/sub1") as string);
-			AssertNotNull(await this.Get("coap://californium.eclipse.org/path/sub2") as string);
-			AssertNotNull(await this.Get("coap://californium.eclipse.org/path/sub3") as string);
+			AssertNotNull(await this.Get("coap://californium.eclipseprojects.io/path") as LinkDocument);
+			AssertNotNull(await this.Get("coap://californium.eclipseprojects.io/path/sub1") as string);
+			AssertNotNull(await this.Get("coap://californium.eclipseprojects.io/path/sub2") as string);
+			AssertNotNull(await this.Get("coap://californium.eclipseprojects.io/path/sub3") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_12_Query()
 		{
 			// Hierarchical link description entry
-			AssertNotNull(await this.Get("coap://californium.eclipse.org/query?A=1&B=2") as string);
+			AssertNotNull(await this.Get("coap://californium.eclipseprojects.io/query?A=1&B=2") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_13_Observable()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coap://californium.eclipse.org/obs") as string);
+			AssertNotNull(await this.Observe("coap://californium.eclipseprojects.io/obs") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_14_Observable_Large()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coap://californium.eclipse.org/obs-large") as string);
+			AssertNotNull(await this.Observe("coap://californium.eclipseprojects.io/obs-large") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_15_Observable_NON()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coap://californium.eclipse.org/obs-non") as string);
+			AssertNotNull(await this.Observe("coap://californium.eclipseprojects.io/obs-non") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_16_Observable_Pumping()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coap://californium.eclipse.org/obs-pumping") as string);
+			AssertNotNull(await this.Observe("coap://californium.eclipseprojects.io/obs-pumping") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_17_Observable_Pumping_NON()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coap://californium.eclipse.org/obs-pumping-non") as string);
+			AssertNotNull(await this.Observe("coap://californium.eclipseprojects.io/obs-pumping-non") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_18_POST()
 		{
 			// Perform POST transaction with responses containing several Location-Query options (CON mode)
-			await this.Post("coap://californium.eclipse.org/location-query", Encoding.UTF8.GetBytes("Hello"), 64, new CoapOptionContentFormat(0));
+			await this.Post("coap://californium.eclipseprojects.io/location-query", Encoding.UTF8.GetBytes("Hello"), 64, new CoapOptionContentFormat(0));
 		}
 
 		[TestMethod]
@@ -378,7 +378,7 @@ namespace Waher.Networking.CoAP.Test
 			s = s + s + s + s + s + s + s + s + s + s;
 			s += s;
 
-			await this.Post("coap://californium.eclipse.org/large-create", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
+			await this.Post("coap://californium.eclipseprojects.io/large-create", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}
 
 		[TestMethod]
@@ -391,14 +391,14 @@ namespace Waher.Networking.CoAP.Test
 			s = s + s + s + s + s + s + s + s + s + s;
 			s += s;
 
-			await this.Post("coap://californium.eclipse.org/large-post", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
+			await this.Post("coap://californium.eclipseprojects.io/large-post", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_21_PUT()
 		{
 			// Large resource that can be updated using PUT method
-			await this.Put("coap://californium.eclipse.org/large-update", Encoding.UTF8.GetBytes("Hello"), 64, new CoapOptionContentFormat(0));
+			await this.Put("coap://californium.eclipseprojects.io/large-update", Encoding.UTF8.GetBytes("Hello"), 64, new CoapOptionContentFormat(0));
 		}
 
 		[TestMethod]
@@ -411,7 +411,7 @@ namespace Waher.Networking.CoAP.Test
 			s = s + s + s + s + s + s + s + s + s + s;
 			s += s;
 
-			await this.Put("coap://californium.eclipse.org/large-update", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
+			await this.Put("coap://californium.eclipseprojects.io/large-update", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}
 
 		/*

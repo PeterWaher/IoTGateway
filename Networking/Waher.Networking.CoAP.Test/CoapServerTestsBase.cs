@@ -56,15 +56,15 @@ namespace Waher.Networking.CoAP.Test
 
 		protected virtual void SetupClientServer()
 		{
-			this.server = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort }, null, null, null, false, true, 
+			this.server = new CoapEndpoint([CoapEndpoint.DefaultCoapPort + 10], null, null, null, false, true, 
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 
-			this.client = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort + 2 }, null, null, null, true, false);
+			this.client = new CoapEndpoint([CoapEndpoint.DefaultCoapPort + 12], null, null, null, true, false);
 			this.clientCredentials = null;
 		}
 
 		[TestInitialize]
-		public void TestInitialize()
+		public async Task TestInitialize()
 		{
 			this.SetupClientServer();
 
@@ -108,7 +108,7 @@ namespace Waher.Networking.CoAP.Test
 			this.server.Register("/large", async (req, resp) =>
 			{
 				await resp.RespondAsync(CoapCode.Content, ResponseLarge, 64);
-			}, Notifications.None, "Large resource", new string[] { "block" }, null, null, 1280);
+			}, Notifications.None, "Large resource", ["block"], null, null, 1280);
 
 			this.server.Register("/large-separate", (req, resp) =>
 			{
@@ -119,7 +119,7 @@ namespace Waher.Networking.CoAP.Test
 				});
 
 				return Task.CompletedTask;
-			}, Notifications.None, "Large resource", new string[] { "block" }, null, null, 1280);
+			}, Notifications.None, "Large resource", ["block"], null, null, 1280);
 
 			this.server.Register("/multi-format", async (req, resp) =>
 			{
@@ -134,14 +134,14 @@ namespace Waher.Networking.CoAP.Test
 					throw new CoapException(CoapCode.NotAcceptable);
 
 			}, Notifications.None, "Resource that exists in different content formats (text/plain utf8 and application/xml)",
-				null, null, new int[] { PlainText.ContentFormatCode, Xml.ContentFormatCode });
+				null, null, [PlainText.ContentFormatCode, Xml.ContentFormatCode]);
 
 			this.server.Register("/path", async (req, resp) =>
 			{
 				await resp.RespondAsync(CoapCode.Content, ResponseHierarchical, 64,
 					new CoapOptionContentFormat(CoreLinkFormat.ContentFormatCode));
 			}, Notifications.None, "Hierarchical link description entry", null, null,
-				new int[] { CoreLinkFormat.ContentFormatCode });
+				[CoreLinkFormat.ContentFormatCode]);
 
 			this.server.Register("/path/sub1", async (req, resp) =>
 			{
@@ -189,9 +189,9 @@ namespace Waher.Networking.CoAP.Test
 			{
 				await resp.RespondAsync(CoapCode.Content, DateTime.Now.ToString("T"), 64);
 			}, Notifications.Acknowledged, "Observable resource which changes every 5 seconds",
-				new string[] { "observe" });
+				["observe"]);
 
-			Obs.TriggerAll(new TimeSpan(0, 0, 5));
+			await Obs.TriggerAll(new TimeSpan(0, 0, 5));
 
 			Obs = this.server.Register("/obs-large", async (req, resp) =>
 			{
@@ -204,33 +204,33 @@ namespace Waher.Networking.CoAP.Test
 				await resp.RespondAsync(CoapCode.Content, Response, 64);
 
 			}, Notifications.Acknowledged, "Observable resource which changes every 5 seconds",
-				new string[] { "observe" });
+				["observe"]);
 
-			Obs.TriggerAll(new TimeSpan(0, 0, 5));
+			await Obs.TriggerAll(new TimeSpan(0, 0, 5));
 
 			Obs = this.server.Register("/obs-non", async (req, resp) =>
 			{
 				await resp.RespondAsync(CoapCode.Content, DateTime.Now.ToString("T"), 64);
 			}, Notifications.Unacknowledged, "Observable resource which changes every 5 seconds",
-				new string[] { "observe" });
+				["observe"]);
 
-			Obs.TriggerAll(new TimeSpan(0, 0, 5));
+			await Obs.TriggerAll(new TimeSpan(0, 0, 5));
 
 			Obs = this.server.Register("/obs-pumping", async (req, resp) =>
 			{
 				await resp.RespondAsync(CoapCode.Content, DateTime.Now.ToString("T"), 64);
 			}, Notifications.Acknowledged, "Observable resource which changes every 5 seconds",
-				new string[] { "observe" });
+				["observe"]);
 
-			Obs.TriggerAll(new TimeSpan(0, 0, 5));
+			await Obs.TriggerAll(new TimeSpan(0, 0, 5));
 
 			Obs = this.server.Register("/obs-pumping-non", async (req, resp) =>
 			{
 				await resp.RespondAsync(CoapCode.Content, DateTime.Now.ToString("T"), 64);
 			}, Notifications.Unacknowledged, "Observable resource which changes every 5 seconds",
-				new string[] { "observe" });
+				["observe"]);
 
-			Obs.TriggerAll(new TimeSpan(0, 0, 5));
+			await Obs.TriggerAll(new TimeSpan(0, 0, 5));
 
 			this.server.Register("/location-query", null, async (req, resp) =>
 			{
@@ -241,13 +241,13 @@ namespace Waher.Networking.CoAP.Test
 			{
 				await resp.RespondAsync(CoapCode.Created, req.Payload, 64);
 			}, Notifications.None, "Large resource that can be created using POST method",
-				new string[] { "block" }, null, new int[] { 0 }, 2000);
+				["block"], null, [0], 2000);
 
 			this.server.Register("/large-post", null, async (req, resp) =>
 			{
 				await resp.RespondAsync(CoapCode.Content, req.Payload, 64);
 			}, Notifications.None, "Handle POST with two-way blockwise transfer",
-				new string[] { "block" });
+				["block"]);
 
 			this.server.Register(new LargeUpdate());
 		}
@@ -269,8 +269,8 @@ namespace Waher.Networking.CoAP.Test
 
 			public override Notifications Notifications => Notifications.None;
 			public override string Title => "Large resource that can be updated using PUT method";
-			public override string[] ResourceTypes => new string[] { "block" };
-			public override int[] ContentFormats => new int[] { 0 };
+			public override string[] ResourceTypes => ["block"];
+			public override int[] ContentFormats => [0];
 			public override int? MaximumSizeEstimate => 2000;
 		}
 
@@ -321,7 +321,7 @@ namespace Waher.Networking.CoAP.Test
 					Error.Set();
 			}, null, Options);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 30000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 30000));
 			Assert.IsNotNull(Result);
 
 			ConsoleOut.WriteLine(Result.ToString());
@@ -353,7 +353,7 @@ namespace Waher.Networking.CoAP.Test
 					Error.Set();
 			}, null, Options);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 30000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 30000));
 			Assert.IsNotNull(Result);
 
 			Done.Reset();
@@ -369,7 +369,7 @@ namespace Waher.Networking.CoAP.Test
 
 			}, null, Options);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000));
 
 			return Result;
 		}
@@ -393,7 +393,7 @@ namespace Waher.Networking.CoAP.Test
 					Error.Set();
 			}, null, Options);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 30000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 30000));
 		}
 
 		protected async Task Put(string Uri, byte[] Payload, int BlockSize, params CoapOption[] Options)
@@ -415,7 +415,7 @@ namespace Waher.Networking.CoAP.Test
 					Error.Set();
 			}, null, Options);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 30000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 30000));
 		}
 
 		protected async Task Delete(string Uri, params CoapOption[] Options)
@@ -437,7 +437,7 @@ namespace Waher.Networking.CoAP.Test
 					Error.Set();
 			}, null, Options);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 30000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 30000));
 		}
 	}
 }

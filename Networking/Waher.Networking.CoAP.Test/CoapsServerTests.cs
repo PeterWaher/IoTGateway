@@ -1,11 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.Sniffers;
 using Waher.Networking.CoAP.CoRE;
 using Waher.Networking.CoAP.Options;
+using Waher.Networking.Sniffers;
 using Waher.Security;
 using Waher.Security.DTLS;
 
@@ -19,32 +18,32 @@ namespace Waher.Networking.CoAP.Test
 		protected override void SetupClientServer()
 		{
 			this.users = new Users(new User("testid", "01020304", "HEX", "CoAP"));
-			this.server = new CoapEndpoint(null, new int[] { CoapEndpoint.DefaultCoapsPort }, 
+			this.server = new CoapEndpoint(null, [CoapEndpoint.DefaultCoapsPort + 10], 
 				this.users, "CoAP", false, true);
-			this.client = new CoapEndpoint(null, new int[] { CoapEndpoint.DefaultCoapsPort + 2 }, 
+			this.client = new CoapEndpoint(null, [CoapEndpoint.DefaultCoapsPort + 12], 
 				null, null, true, false, new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
-			this.clientCredentials = new PresharedKey("testid", new byte[] { 1, 2, 3, 4 });
+			this.clientCredentials = new PresharedKey("testid", [1, 2, 3, 4]);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_01_GET()
 		{
 			// Default test resource
-			object Response = await this.Get("coaps://127.0.0.1/test");
+			object Response = await this.Get("coaps://127.0.0.1:5694/test");
 			Assert.AreEqual(ResponseTest, Response);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_02_Root()
 		{
-			object Response = await this.Get("coaps://127.0.0.1/");
+			object Response = await this.Get("coaps://127.0.0.1:5694/");
 			Assert.AreEqual(ResponseRoot, Response);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_03_Discover()
 		{
-			LinkDocument Doc = await this.Get("coaps://127.0.0.1/.well-known/core") as LinkDocument;
+			LinkDocument Doc = await this.Get("coaps://127.0.0.1:5694/.well-known/core") as LinkDocument;
 			Assert.IsNotNull(Doc);
 		}
 
@@ -52,7 +51,7 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Server_Test_04_Separate()
 		{
 			// Resource which cannot be served immediately and which cannot be acknowledged in a piggy-backed way
-			object Response = await this.Get("coaps://127.0.0.1/separate");
+			object Response = await this.Get("coaps://127.0.0.1:5694/separate");
 			Assert.AreEqual(ResponseTest, Response);
 		}
 
@@ -60,7 +59,7 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Server_Test_05_LongPath()
 		{
 			// Long path resource
-			object Response = await this.Get("coaps://127.0.0.1/seg1");
+			object Response = await this.Get("coaps://127.0.0.1:5694/seg1");
 			Assert.AreEqual(ResponseTest, Response);
 		}
 
@@ -68,7 +67,7 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Server_Test_06_LongPath()
 		{
 			// Long path resource
-			object Response = await this.Get("coaps://127.0.0.1/seg1/seg2");
+			object Response = await this.Get("coaps://127.0.0.1:5694/seg1/seg2");
 			Assert.AreEqual(ResponseTest, Response);
 		}
 
@@ -76,7 +75,7 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Server_Test_07_LongPath()
 		{
 			// Long path resource
-			object Response = await this.Get("coaps://127.0.0.1/seg1/seg2/seg3");
+			object Response = await this.Get("coaps://127.0.0.1:5694/seg1/seg2/seg3");
 			Assert.AreEqual(ResponseTest, Response);
 		}
 
@@ -84,7 +83,7 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Server_Test_08_Large()
 		{
 			// Large resource
-			object Response = await this.Get("coaps://127.0.0.1/large");
+			object Response = await this.Get("coaps://127.0.0.1:5694/large");
 			Assert.AreEqual(ResponseLarge, Response);
 		}
 
@@ -92,7 +91,7 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Server_Test_09_LargeSeparate()
 		{
 			// Large resource
-			object Response = await this.Get("coaps://127.0.0.1/large-separate");
+			object Response = await this.Get("coaps://127.0.0.1:5694/large-separate");
 			Assert.AreEqual(ResponseLarge, Response);
 		}
 
@@ -100,10 +99,10 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Server_Test_10_MultiFormat()
 		{
 			// Resource that exists in different content formats (text/plain utf8 and application/xml)
-			string s = await this.Get("coaps://127.0.0.1/multi-format", new CoapOptionAccept(0)) as string;
+			string s = await this.Get("coaps://127.0.0.1:5694/multi-format", new CoapOptionAccept(0)) as string;
 			AssertNotNull(s);
 
-			XmlDocument Xml = await this.Get("coaps://127.0.0.1/multi-format", new CoapOptionAccept(41)) as XmlDocument;
+			XmlDocument Xml = await this.Get("coaps://127.0.0.1:5694/multi-format", new CoapOptionAccept(41)) as XmlDocument;
 			AssertNotNull(Xml);
 		}
 
@@ -116,59 +115,59 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Server_Test_11_Hierarchical()
 		{
 			// Hierarchical link description entry
-			Assert.AreEqual(ResponseHierarchical, (await this.Get("coaps://127.0.0.1/path")).ToString());
-			Assert.AreEqual("/path/sub1", await this.Get("coaps://127.0.0.1/path/sub1"));
-			Assert.AreEqual("/path/sub2", await this.Get("coaps://127.0.0.1/path/sub2"));
-			Assert.AreEqual("/path/sub3", await this.Get("coaps://127.0.0.1/path/sub3"));
+			Assert.AreEqual(ResponseHierarchical, (await this.Get("coaps://127.0.0.1:5694/path")).ToString());
+			Assert.AreEqual("/path/sub1", await this.Get("coaps://127.0.0.1:5694/path/sub1"));
+			Assert.AreEqual("/path/sub2", await this.Get("coaps://127.0.0.1:5694/path/sub2"));
+			Assert.AreEqual("/path/sub3", await this.Get("coaps://127.0.0.1:5694/path/sub3"));
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_12_Query()
 		{
 			// Hierarchical link description entry
-			Assert.AreEqual("?A=1&B=2", await this.Get("coaps://127.0.0.1/query?A=1&B=2"));
+			Assert.AreEqual("?A=1&B=2", await this.Get("coaps://127.0.0.1:5694/query?A=1&B=2"));
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_13_Observable()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coaps://127.0.0.1/obs") as string);
+			AssertNotNull(await this.Observe("coaps://127.0.0.1:5694/obs") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_14_Observable_Large()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coaps://127.0.0.1/obs-large") as string);
+			AssertNotNull(await this.Observe("coaps://127.0.0.1:5694/obs-large") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_15_Observable_NON()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coaps://127.0.0.1/obs-non") as string);
+			AssertNotNull(await this.Observe("coaps://127.0.0.1:5694/obs-non") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_16_Observable_Pumping()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coaps://127.0.0.1/obs-pumping") as string);
+			AssertNotNull(await this.Observe("coaps://127.0.0.1:5694/obs-pumping") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_17_Observable_Pumping_NON()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coaps://127.0.0.1/obs-pumping-non") as string);
+			AssertNotNull(await this.Observe("coaps://127.0.0.1:5694/obs-pumping-non") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_18_POST()
 		{
 			// Perform POST transaction with responses containing several Location-Query options (CON mode)
-			await this.Post("coaps://127.0.0.1/location-query", Encoding.UTF8.GetBytes("Hello"), 64, new CoapOptionContentFormat(0));
+			await this.Post("coaps://127.0.0.1:5694/location-query", Encoding.UTF8.GetBytes("Hello"), 64, new CoapOptionContentFormat(0));
 		}
 
 		[TestMethod]
@@ -181,7 +180,7 @@ namespace Waher.Networking.CoAP.Test
 			s = s + s + s + s + s + s + s + s + s + s;
 			s += s;
 
-			await this.Post("coaps://127.0.0.1/large-create", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
+			await this.Post("coaps://127.0.0.1:5694/large-create", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}
 
 		[TestMethod]
@@ -194,14 +193,14 @@ namespace Waher.Networking.CoAP.Test
 			s = s + s + s + s + s + s + s + s + s + s;
 			s += s;
 
-			await this.Post("coaps://127.0.0.1/large-post", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
+			await this.Post("coaps://127.0.0.1:5694/large-post", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_21_PUT()
 		{
 			// Large resource that can be updated using PUT method
-			await this.Put("coaps://127.0.0.1/large-update", Encoding.UTF8.GetBytes("Hello"), 64, new CoapOptionContentFormat(0));
+			await this.Put("coaps://127.0.0.1:5694/large-update", Encoding.UTF8.GetBytes("Hello"), 64, new CoapOptionContentFormat(0));
 		}
 
 		[TestMethod]
@@ -214,7 +213,7 @@ namespace Waher.Networking.CoAP.Test
 			s = s + s + s + s + s + s + s + s + s + s;
 			s += s;
 
-			await this.Put("coaps://127.0.0.1/large-update", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
+			await this.Put("coaps://127.0.0.1:5694/large-update", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}
 
 		/*

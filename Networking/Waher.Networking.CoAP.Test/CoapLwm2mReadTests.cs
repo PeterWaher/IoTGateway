@@ -62,7 +62,7 @@ namespace Waher.Networking.CoAP.Test
 				Done.Set();
 				return Task.CompletedTask;
 			};
-			this.lwm2mClient.RequestBootstrap(new Lwm2mServerReference("leshan.eclipse.org", 5783));
+			this.lwm2mClient.RequestBootstrap(new Lwm2mServerReference("leshan.eclipseprojects.io", 5783));
 
 			Task.Delay(10000).ContinueWith((_) => Timeout.Set());
 

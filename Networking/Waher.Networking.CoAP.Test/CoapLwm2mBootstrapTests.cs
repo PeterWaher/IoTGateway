@@ -16,7 +16,7 @@ namespace Waher.Networking.CoAP.Test
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
-			this.coapClient = new CoapEndpoint(new int[] { 5783 }, new int[] { 5784 }, null, null,
+			this.coapClient = new CoapEndpoint([5783], [5784], null, null,
 				false, false, new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 
 			this.lwm2mClient = await Lwm2mClient.Create("Lwm2mTestClient", this.coapClient,
@@ -83,7 +83,7 @@ namespace Waher.Networking.CoAP.Test
 			};
 
 			await this.lwm2mClient.RequestBootstrap(
-				new Lwm2mServerReference("leshan.eclipse.org", 5783),
+				new Lwm2mServerReference("leshan.eclipseprojects.io", 5783),
 				(Sender, e) =>
 				{
 					if (e.Ok)
@@ -94,9 +94,9 @@ namespace Waher.Networking.CoAP.Test
 					return Task.CompletedTask;
 				}, null);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000));
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000));
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done3, Error3 }, 10000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 10000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done3, Error3], 10000));
 		}
 
 		[TestMethod]
@@ -142,9 +142,9 @@ namespace Waher.Networking.CoAP.Test
 				return Task.CompletedTask;
 			}, null));
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000));
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000));
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done3, Error3 }, 10000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 10000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done3, Error3], 10000));
 		}
 
 	}

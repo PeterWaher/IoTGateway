@@ -75,8 +75,8 @@ namespace Waher.Security.DTLS.Ciphers
 
 				AeadCipher = new byte[RecordIvLength + N];
 
-				Array.Copy(Nonce, this.fixedIvLength, AeadCipher, 0, RecordIvLength);
-				Array.Copy(CipherText, 0, AeadCipher, RecordIvLength, N);
+				Buffer.BlockCopy(Nonce, this.fixedIvLength, AeadCipher, 0, RecordIvLength);
+				Buffer.BlockCopy(CipherText, 0, AeadCipher, RecordIvLength, N);
 
 				return AeadCipher;
 			}
@@ -91,9 +91,9 @@ namespace Waher.Security.DTLS.Ciphers
 
 			byte[] AssociatedData = new byte[13];
 
-			Array.Copy(Header, Start + 3, AssociatedData, 0, 8);    // seq_num
-			Array.Copy(Header, Start, AssociatedData, 8, 3);		// Type, version
-			Array.Copy(Header, Start + 11, AssociatedData, 11, 2);  // length
+			Buffer.BlockCopy(Header, Start + 3, AssociatedData, 0, 8);    // seq_num
+			Buffer.BlockCopy(Header, Start, AssociatedData, 8, 3);      // Type, version
+			Buffer.BlockCopy(Header, Start + 11, AssociatedData, 11, 2);  // length
 
 			return AssociatedData;
 		}
@@ -129,18 +129,18 @@ namespace Waher.Security.DTLS.Ciphers
 				AD[11] = (byte)(Len >> 8);
 				AD[12] = (byte)Len;
 
-				Array.Copy(Data, 0, Nonce, this.fixedIvLength, RecordIvLength);
-				Array.Copy(Data, RecordIvLength, CipherText, 0, N);
+				Buffer.BlockCopy(Data, 0, Nonce, this.fixedIvLength, RecordIvLength);
+				Buffer.BlockCopy(Data, RecordIvLength, CipherText, 0, N);
 
 				if (State.isClient)
 				{
-					Array.Copy(State.server_write_IV, 0, Nonce, 0, this.fixedIvLength);
+					Buffer.BlockCopy(State.server_write_IV, 0, Nonce, 0, this.fixedIvLength);
 					PlainText = this.aesCcm.AuthenticateAndDecrypt(CipherText, AD, Nonce, 
 						State.server_write_key);
 				}
 				else
 				{
-					Array.Copy(State.client_write_IV, 0, Nonce, 0, this.fixedIvLength);
+					Buffer.BlockCopy(State.client_write_IV, 0, Nonce, 0, this.fixedIvLength);
 					PlainText = this.aesCcm.AuthenticateAndDecrypt(CipherText, AD, Nonce, 
 						State.client_write_key);
 				}

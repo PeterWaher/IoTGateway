@@ -723,7 +723,7 @@ namespace Waher.Networking.HTTP.WebSockets
 				{
 					int j = Math.Min(i + MaxFrameSize, c);
 					byte[] Bin = new byte[j - i];
-					Array.Copy(Payload, i, Bin, 0, j - i);
+					Buffer.BlockCopy(Payload, i, Bin, 0, j - i);
 					i = j;
 
 					if (!await this.Send(Bin, i < c))
@@ -892,7 +892,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			}
 
 			if (Len > 0)
-				Array.Copy(Bin, 0, Packet, i, Len);
+				Buffer.BlockCopy(Bin, 0, Packet, i, Len);
 
 			return Packet;
 		}
@@ -1056,7 +1056,7 @@ namespace Waher.Networking.HTTP.WebSockets
 
 			Payload[0] = (byte)(Code >> 8);
 			Payload[1] = (byte)Code;
-			Array.Copy(Bin, 0, Payload, 2, c);
+			Buffer.BlockCopy(Bin, 0, Payload, 2, c);
 
 			return this.CreateFrame(Payload, WebSocketOpcode.Close, false);
 		}

@@ -52,7 +52,7 @@ namespace Waher.Security.DTLS.Ciphers
 				ClientKeyExchange[0] = (byte)(N >> 8);
 				ClientKeyExchange[1] = (byte)N;
 
-				Array.Copy(Psk.Identity, 0, ClientKeyExchange, 2, N);
+				Buffer.BlockCopy(Psk.Identity, 0, ClientKeyExchange, 2, N);
 
 				await Endpoint.SendHandshake(HandshakeType.client_key_exchange, ClientKeyExchange, true, true, State);
 
@@ -78,7 +78,7 @@ namespace Waher.Security.DTLS.Ciphers
 				PremasterSecret[N + 3] = (byte)N;
 
 				if (N > 0)
-					Array.Copy(Psk.Key, 0, PremasterSecret, N + 4, N);
+					Buffer.BlockCopy(Psk.Key, 0, PremasterSecret, N + 4, N);
 
 				// RFC 5246, §8.1, Computing the Master Secret:
 
@@ -124,7 +124,7 @@ namespace Waher.Security.DTLS.Ciphers
 			Len |= Data[Offset++];
 
 			State.psk_identity_hint = new byte[Len];
-			Array.Copy(Data, Offset, State.psk_identity_hint, 0, Len);
+			Buffer.BlockCopy(Data, Offset, State.psk_identity_hint, 0, Len);
 			Offset += Len;
 		}
 
@@ -142,7 +142,7 @@ namespace Waher.Security.DTLS.Ciphers
 			N |= Data[Offset++];
 
 			byte[] Identity = new byte[N];
-			Array.Copy(Data, Offset, Identity, 0, N);
+			Buffer.BlockCopy(Data, Offset, Identity, 0, N);
 			Offset += N;
 
 			string UserId = Encoding.UTF8.GetString(Identity);

@@ -121,7 +121,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				}
 				else
 				{
-					Array.Copy(Data, Offset, this.buffer, this.pos, NrToWrite);
+					Buffer.BlockCopy(Data, Offset, this.buffer, this.pos, NrToWrite);
 					this.pos += NrToWrite;
 
 					if (this.pos == this.bufferSize || Last)
@@ -134,7 +134,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 						{
 							int RestBytes = this.pos - NrWritten;
 
-							Array.Copy(this.buffer, NrWritten, this.buffer, 0, RestBytes);
+							Buffer.BlockCopy(this.buffer, NrWritten, this.buffer, 0, RestBytes);
 							this.pos = RestBytes;
 						}
 						else

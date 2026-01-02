@@ -219,7 +219,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 			if (BitConverter.IsLittleEndian)
 			{
 				Bin = new byte[4];
-				Array.Copy(this.rawValue, 0, Bin, 0, 4);
+				Buffer.BlockCopy(this.rawValue, 0, Bin, 0, 4);
 				Array.Reverse(Bin);
 			}
 			else
@@ -251,7 +251,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 			if (BitConverter.IsLittleEndian)
 			{
 				Bin = new byte[8];
-				Array.Copy(this.rawValue, 0, Bin, 0, 8);
+				Buffer.BlockCopy(this.rawValue, 0, Bin, 0, 8);
 				Array.Reverse(Bin);
 			}
 			else

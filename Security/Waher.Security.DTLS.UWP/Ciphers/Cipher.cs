@@ -82,27 +82,27 @@ namespace Waher.Security.DTLS.Ciphers
 			int Pos = 0;
 
 			State.client_write_MAC_key = new byte[this.macKeyLength];
-			Array.Copy(KeyBlock, Pos, State.client_write_MAC_key, 0, this.macKeyLength);
+			Buffer.BlockCopy(KeyBlock, Pos, State.client_write_MAC_key, 0, this.macKeyLength);
 			Pos += this.macKeyLength;
 
 			State.server_write_MAC_key = new byte[this.macKeyLength];
-			Array.Copy(KeyBlock, Pos, State.server_write_MAC_key, 0, this.macKeyLength);
+			Buffer.BlockCopy(KeyBlock, Pos, State.server_write_MAC_key, 0, this.macKeyLength);
 			Pos += this.macKeyLength;
 
 			State.client_write_key = new byte[this.encKeyLength];
-			Array.Copy(KeyBlock, Pos, State.client_write_key, 0, this.encKeyLength);
+			Buffer.BlockCopy(KeyBlock, Pos, State.client_write_key, 0, this.encKeyLength);
 			Pos += this.encKeyLength;
 
 			State.server_write_key = new byte[this.encKeyLength];
-			Array.Copy(KeyBlock, Pos, State.server_write_key, 0, this.encKeyLength);
+			Buffer.BlockCopy(KeyBlock, Pos, State.server_write_key, 0, this.encKeyLength);
 			Pos += this.encKeyLength;
 
 			State.client_write_IV = new byte[this.fixedIvLength];
-			Array.Copy(KeyBlock, Pos, State.client_write_IV, 0, this.fixedIvLength);
+			Buffer.BlockCopy(KeyBlock, Pos, State.client_write_IV, 0, this.fixedIvLength);
 			Pos += this.fixedIvLength;
 
 			State.server_write_IV = new byte[this.fixedIvLength];
-			Array.Copy(KeyBlock, Pos, State.server_write_IV, 0, this.fixedIvLength);
+			Buffer.BlockCopy(KeyBlock, Pos, State.server_write_IV, 0, this.fixedIvLength);
 		}
 
 		/// <summary>
@@ -162,13 +162,13 @@ namespace Waher.Security.DTLS.Ciphers
 
 					if (BytesLeft < P.Length)
 					{
-						Array.Copy(P, 0, Result, Pos, (int)BytesLeft);
+						Buffer.BlockCopy(P, 0, Result, Pos, (int)BytesLeft);
 						Pos += (int)BytesLeft;
 						BytesLeft = 0;
 					}
 					else
 					{
-						Array.Copy(P, 0, Result, Pos, P.Length);
+						Buffer.BlockCopy(P, 0, Result, Pos, P.Length);
 						Pos += P.Length;
 						BytesLeft -= (uint)P.Length;
 					}
@@ -264,9 +264,9 @@ namespace Waher.Security.DTLS.Ciphers
 			byte[] Nonce = new byte[12];
 
 			if (ClientSender)
-				Array.Copy(State.client_write_IV, 0, Nonce, 0, this.fixedIvLength);
+				Buffer.BlockCopy(State.client_write_IV, 0, Nonce, 0, this.fixedIvLength);
 			else
-				Array.Copy(State.server_write_IV, 0, Nonce, 0, this.fixedIvLength);
+				Buffer.BlockCopy(State.server_write_IV, 0, Nonce, 0, this.fixedIvLength);
 
 			ulong c = State.nonceCount++;
 			int Pos = 12;

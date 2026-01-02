@@ -16,8 +16,8 @@ namespace Waher.Networking.CoAP.Test
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
-			this.coapClient = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort },
-				new int[] { CoapEndpoint.DefaultCoapsPort }, null, null, false, false,
+			this.coapClient = new CoapEndpoint([CoapEndpoint.DefaultCoapPort],
+				[CoapEndpoint.DefaultCoapsPort], null, null, false, false,
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 
 			this.lwm2mClient = await Lwm2mClient.Create("Lwm2mTestClient", this.coapClient,
@@ -66,7 +66,7 @@ namespace Waher.Networking.CoAP.Test
 
 			Task.Delay(10000).ContinueWith((_) => Timeout.Set());
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Timeout }));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Timeout]));
 		}
 
 	}

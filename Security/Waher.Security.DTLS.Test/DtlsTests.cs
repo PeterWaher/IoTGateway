@@ -71,9 +71,9 @@ namespace Waher.Security.DTLS.Test
 			};
 
 			this.client.StartHandshake(string.Empty, 
-				new PresharedKey("testid", new byte[] { 1, 2, 3, 4 }));
+				new PresharedKey("testid", [1, 2, 3, 4]));
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 60000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 60000));
 		}
 
 		[TestMethod]
@@ -86,7 +86,7 @@ namespace Waher.Security.DTLS.Test
 			{
 				try
 				{
-					AesCcmTests.AssertEqual(new byte[] { 1, 2, 3, 4, 5 }, e.ApplicationData);
+					AesCcmTests.AssertEqual([1, 2, 3, 4, 5], e.ApplicationData);
 					Done.Set();
 				}
 				catch (Exception)
@@ -99,9 +99,9 @@ namespace Waher.Security.DTLS.Test
 
 			this.Test_01_Handshake();
 
-			this.client.SendApplicationData(new byte[] { 1, 2, 3, 4, 5 }, string.Empty);
+			this.client.SendApplicationData([1, 2, 3, 4, 5], string.Empty);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 60000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 60000));
 		}
 
 		[TestMethod]
@@ -137,8 +137,8 @@ namespace Waher.Security.DTLS.Test
 			this.client.Dispose();
 			this.client = null;
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 60000));
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 60000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 60000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 60000));
 		}
 
 		[TestMethod]

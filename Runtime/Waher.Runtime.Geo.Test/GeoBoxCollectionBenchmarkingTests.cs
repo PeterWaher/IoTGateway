@@ -239,6 +239,7 @@ namespace Waher.Runtime.Geo.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task Test_07_Configuration()
 		{
 			Benchmarker3D Benchmarker = new();

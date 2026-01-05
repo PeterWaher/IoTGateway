@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -57,7 +56,7 @@ namespace Waher.Script.System.Functions
 		/// <param name="Arguments">Command-line arguments.</param>
 		/// <param name="WorkFolder">Working folder.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (0=infinite or no timeout).</param>
-		/// <param name="LogStandardOutput">Wether to log standard output or return when execution is done.</param>
+		/// <param name="LogStandardOutput">If to log standard output or return when execution is done.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
@@ -65,6 +64,25 @@ namespace Waher.Script.System.Functions
 			ScriptNode TimeoutMs, ScriptNode LogStandardOutput, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { FileName, Arguments, WorkFolder, TimeoutMs, LogStandardOutput },
 				  argumentTypes5Scalar, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
+		/// ShellExecute(FileName,Arguments,WorkFolder,TimeoutMs)
+		/// </summary>
+		/// <param name="FileName">File name of executable file.</param>
+		/// <param name="Arguments">Command-line arguments.</param>
+		/// <param name="WorkFolder">Working folder.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (0=infinite or no timeout).</param>
+		/// <param name="LogStandardOutput">If to log standard output or return when execution is done.</param>
+		/// <param name="KillOnException">If to kill the process if the script recives an exception (eg timeout).</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public ShellExecute(ScriptNode FileName, ScriptNode Arguments, ScriptNode WorkFolder,
+			ScriptNode TimeoutMs, ScriptNode LogStandardOutput, ScriptNode KillOnException, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { FileName, Arguments, WorkFolder, TimeoutMs, LogStandardOutput, KillOnException },
+				  argumentTypes6Scalar, Start, Length, Expression)
 		{
 		}
 
@@ -78,7 +96,7 @@ namespace Waher.Script.System.Functions
 		/// </summary>
 		public override string[] DefaultArgumentNames => new string[]
 		{
-			"FileName", "Arguments", "WorkFolder", "TimeoutMs", "LogStandardOutput"
+			"FileName", "Arguments", "WorkFolder", "TimeoutMs", "LogStandardOutput", "KillOnException"
 		};
 
 		/// <summary>
@@ -115,6 +133,7 @@ namespace Waher.Script.System.Functions
 
 			int TimeoutMs;
 			bool LogStandardOut = false;
+			bool KillOnTimeout = true;
 
 			if (Arguments.Length > 3)
 			{
@@ -130,7 +149,15 @@ namespace Waher.Script.System.Functions
 				if (Arguments[4].AssociatedObjectValue is bool PLogStandardOut)
 					LogStandardOut = PLogStandardOut;
 				else
-					throw new ScriptRuntimeException("Log standard out must be a boolean.", this);
+					throw new ScriptRuntimeException("LogStandardOut out must be a boolean.", this);
+			}
+
+			if (Arguments.Length > 5)
+			{
+				if (Arguments[5].AssociatedObjectValue is bool PKillOnTimout)
+					KillOnTimeout = PKillOnTimout;
+				else
+					throw new ScriptRuntimeException("KillOnException must be a boolean.", this);
 			}
 
 			ProcessStartInfo ProcessInformation = new ProcessStartInfo()
@@ -149,44 +176,41 @@ namespace Waher.Script.System.Functions
 			Process P = new Process();
 			TaskCompletionSource<IElement> ResultSource = new TaskCompletionSource<IElement>();
 
-			P.Exited += async (Sender, e) =>
+			if (LogStandardOut)
 			{
-				try
+				P.Exited += (Sender, e) =>
 				{
-					if (P.ExitCode != 0)
+					ResultSource.TrySetResult(new BooleanValue(P.ExitCode == 0));
+				};
+			}
+			else
+			{
+				P.Exited += async (Sender, e) =>
+				{
+					try
 					{
-						if (LogStandardOut)
-							ResultSource.TrySetResult(new BooleanValue(false));
-						else
+						if (P.ExitCode != 0)
 						{
 							string ErrorText = await P.StandardError.ReadToEndAsync();
 							ResultSource.TrySetException(new ScriptRuntimeException(ErrorText, this));
 						}
-					}
-					else
-					{
-						if (LogStandardOut)
-							ResultSource.TrySetResult(new BooleanValue(true));
 						else
 						{
 							string s = await P.StandardOutput.ReadToEndAsync();
 							ResultSource.TrySetResult(new StringValue(s));
 						}
 					}
-				}
-				catch (Exception ex)
-				{
-					ResultSource.TrySetException(ex);
-				}
-			};
+					catch (Exception ex)
+					{
+						ResultSource.TrySetException(ex);
+					}
+				};
+			}
 
 			if (TimeoutMs > 0)
-				_ = Task.Delay(TimeoutMs).ContinueWith(Prev =>
-					ResultSource.TrySetException(new TimeoutException("Process did not exit within the provided time."))
-				);
+				_ = Task.Delay(TimeoutMs).ContinueWith(Prev => ResultSource.TrySetException(new TimeoutException("Process did not exit within the provided time.")));
 
-			using (CancellationTokenRegistration Registration = Variables.CancellationToken.Register(
-				() => ResultSource.TrySetException(new OperationCanceledException("Evaluation cancelled."))))
+			using (CancellationTokenRegistration Registration = Variables.CancellationToken.Register(() => ResultSource.TrySetException(new OperationCanceledException("Evaluation cancelled."))))
 			{
 				P.StartInfo = ProcessInformation;
 				P.EnableRaisingEvents = true;
@@ -197,15 +221,8 @@ namespace Waher.Script.System.Functions
 					BufferedLogger OutputLogger = new BufferedLogger((string message) => Log.Informational(message));
 					BufferedLogger ErrorLogger = new BufferedLogger((string message) => Log.Error(message));
 
-					P.ErrorDataReceived += async (Sender, e) =>
-					{
-						ErrorLogger.Push(e.Data);
-					};
-
-					P.OutputDataReceived += async (Sender, e) =>
-					{
-						OutputLogger.Push(e.Data);
-					};
+					P.ErrorDataReceived += (Sender, e) => ErrorLogger.Push(e.Data);
+					P.OutputDataReceived += (Sender, e) => OutputLogger.Push(e.Data);
 
 					P.BeginOutputReadLine();
 					P.BeginErrorReadLine();
@@ -217,22 +234,26 @@ namespace Waher.Script.System.Functions
 				}
 				finally
 				{
-					if (!P.HasExited)
+					try
 					{
-						try
-						{
+						bool Kill = true;
+
+						if (P.HasExited)
+							Kill = false;
+
+						if (!(ResultSource.Task.Exception.InnerException is OperationCanceledException) && !KillOnTimeout)
+							Kill = false;
+
+						if (Kill)
 							P.Kill();
-						}
-						catch (Exception e)
-						{
-							Log.Exception(e);
-						}
+					}
+					catch (Exception e)
+					{
+						Log.Exception(e);
 					}
 				}
 			}
 		}
-
-
 
 		private class BufferedLogger
 		{
@@ -283,10 +304,10 @@ namespace Waher.Script.System.Functions
 
 				lock (Lock)
 				{
-					if (Buffer.Length == 0)
+					message = Buffer.ToString();
+					if (string.IsNullOrEmpty(message.Trim()))
 						return;
 
-					message = Buffer.ToString();
 					Buffer.Clear();
 				}
 

@@ -296,7 +296,11 @@ namespace Waher.Networking.CoAP
 			else if (!this.contentFormat.HasValue)
 				return this.payload;
 			else
-				return await CoapEndpoint.DecodeAsync((int)this.contentFormat.Value, this.payload, this.baseUri);
+			{
+				ContentResponse Content = await CoapEndpoint.DecodeAsync((int)this.contentFormat.Value, this.payload, this.baseUri);
+				Content.AssertOk();
+				return Content.Decoded;
+			}
 		}
 
 		/// <summary>

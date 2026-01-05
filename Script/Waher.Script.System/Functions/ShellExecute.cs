@@ -75,13 +75,13 @@ namespace Waher.Script.System.Functions
 		/// <param name="WorkFolder">Working folder.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (0=infinite or no timeout).</param>
 		/// <param name="LogStandardOutput">If to log standard output or return when execution is done.</param>
-		/// <param name="KillOnException">If to kill the process if the script recives an exception (eg timeout).</param>
+		/// <param name="KillOnTimeout">If to kill the process if the script recives an exception (eg timeout).</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public ShellExecute(ScriptNode FileName, ScriptNode Arguments, ScriptNode WorkFolder,
-			ScriptNode TimeoutMs, ScriptNode LogStandardOutput, ScriptNode KillOnException, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { FileName, Arguments, WorkFolder, TimeoutMs, LogStandardOutput, KillOnException },
+			ScriptNode TimeoutMs, ScriptNode LogStandardOutput, ScriptNode KillOnTimeout, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { FileName, Arguments, WorkFolder, TimeoutMs, LogStandardOutput, KillOnTimeout },
 				  argumentTypes6Scalar, Start, Length, Expression)
 		{
 		}
@@ -96,7 +96,7 @@ namespace Waher.Script.System.Functions
 		/// </summary>
 		public override string[] DefaultArgumentNames => new string[]
 		{
-			"FileName", "Arguments", "WorkFolder", "TimeoutMs", "LogStandardOutput", "KillOnException"
+			"FileName", "Arguments", "WorkFolder", "TimeoutMs", "LogStandardOutput", "KillOnTimeout"
 		};
 
 		/// <summary>
@@ -133,7 +133,7 @@ namespace Waher.Script.System.Functions
 
 			int TimeoutMs;
 			bool LogStandardOut = false;
-			bool KillOnException = true;
+			bool KillOnTimeout = true;
 
 			if (Arguments.Length > 3)
 			{
@@ -155,7 +155,7 @@ namespace Waher.Script.System.Functions
 			if (Arguments.Length > 5)
 			{
 				if (Arguments[5].AssociatedObjectValue is bool PKillOnTimout)
-					KillOnException = PKillOnTimout;
+					KillOnTimeout = PKillOnTimout;
 				else
 					throw new ScriptRuntimeException("KillOnException must be a boolean.", this);
 			}
@@ -236,9 +236,18 @@ namespace Waher.Script.System.Functions
 				{
 					try
 					{
-						if (!P.HasExited &&
-							(KillOnException || ResultSource.Task.Exception.InnerException is OperationCanceledException)
-						)
+						bool Kill = false;
+
+						if (ResultSource.Task.Exception.InnerException is OperationCanceledException)
+							Kill = true;
+
+						if (ResultSource.Task.Exception.InnerException is TimeoutException && KillOnTimeout)
+							Kill = true;
+
+                        if (P.HasExited)
+							Kill = false;
+
+						if (Kill)
 							P.Kill();
 					}
 					catch (Exception e)

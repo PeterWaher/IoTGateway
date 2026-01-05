@@ -308,6 +308,9 @@
 	<Assembly fileName="Waher.Events.Statistics.dll" />
 	<Assembly fileName="Waher.Events.Statistics.pdb" />
 	<Assembly fileName="Waher.Events.Statistics.xml" />
+	<Assembly fileName="Waher.Events.WebHook.dll" />
+	<Assembly fileName="Waher.Events.WebHook.pdb" />
+	<Assembly fileName="Waher.Events.WebHook.xml" />
 	<Assembly fileName="Waher.Events.WindowsEventLog.dll" />
 	<Assembly fileName="Waher.Events.WindowsEventLog.pdb" />
 	<Assembly fileName="Waher.Events.WindowsEventLog.xml" />

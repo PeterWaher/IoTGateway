@@ -81,6 +81,7 @@
     <ProjectReference Include="..\Events\Waher.Events.Files\Waher.Events.Files.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.Filter\Waher.Events.Filter.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.Persistence\Waher.Events.Persistence.csproj" />
+    <ProjectReference Include="..\Events\Waher.Events.WebHook\Waher.Events.WebHook.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.WindowsEventLog\Waher.Events.WindowsEventLog.csproj" />
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\Groups\Waher.Groups.Metering\Waher.Groups.Metering.csproj" />

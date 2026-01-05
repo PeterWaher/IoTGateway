@@ -1321,7 +1321,8 @@
 	<Variable name="GATEWAY_ROSTER_NAME_[jid]" default="" label="Optional human-readable name of a JID in the roster."/>
 	-->
 	<Variable name="GATEWAY_THEME_ID" default="WinterDawn" label="ID of theme to use."/>
-	<Variable name="GATEWAY_NOTIFICATION_JIDS" default="" label="IDs of operators of gateway."/>
+	<Variable name="GATEWAY_NOTIFICATION_JIDS" default="" label="JIDs (or e-mail addresses) of operators of gateway."/>
+	<Variable name="GATEWAY_NOTIFICATION_URLS" default="" label="Webhook URLs of operators of gateway."/>
 	<Variable name="DOTNET_EnableDiagnostics" default="0" label="If .NET diagnostics should be activated."/>
 	<Command executable="chmod">
 		<Argument>+x</Argument>

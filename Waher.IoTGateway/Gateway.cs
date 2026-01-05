@@ -4290,8 +4290,42 @@ namespace Waher.IoTGateway
 				CaseInsensitiveString[] Addresses = GetNotificationAddresses();
 				(string Text, string Html) = await ConvertMarkdown(Markdown);
 
-				foreach (CaseInsensitiveString Admin in Addresses)
-					await SendNotification(Admin, Markdown, Text, Html, MessageId, Update);
+				foreach (CaseInsensitiveString AdminAddress in Addresses)
+				{
+					try
+					{
+						await SendNotification(AdminAddress, Markdown, Text, Html, MessageId, Update);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex, AdminAddress);
+					}
+				}
+
+				Addresses = GetNotificationWebHooks();
+				if (Addresses.Length > 0)
+				{
+					Dictionary<string, object> Data = new Dictionary<string, object>()
+					{
+						{ "Markdown", Markdown },
+						{ "Text", Text },
+						{ "Html", Html }
+					};
+
+					foreach (CaseInsensitiveString AdminUrl in Addresses)
+					{
+						try
+						{
+							ContentResponse Response = await InternetContent.PostAsync(new Uri(AdminUrl), Data, certificate);
+							if (Response.HasError)
+								Log.Error(Response.Error, AdminUrl);
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex, AdminUrl);
+						}
+					}
+				}
 			}
 			catch (Exception ex)
 			{
@@ -4333,6 +4367,15 @@ namespace Waher.IoTGateway
 		public static CaseInsensitiveString[] GetNotificationAddresses()
 		{
 			return NotificationConfiguration.Instance?.Addresses ?? Array.Empty<CaseInsensitiveString>();
+		}
+
+		/// <summary>
+		/// Returns configured notification webhooks.
+		/// </summary>
+		/// <returns>Array of URLs</returns>
+		public static CaseInsensitiveString[] GetNotificationWebHooks()
+		{
+			return NotificationConfiguration.Instance?.Urls ?? Array.Empty<CaseInsensitiveString>();
 		}
 
 		private static async Task SendNotification(string To, string Markdown, string Text, string Html, string MessageId, bool Update)

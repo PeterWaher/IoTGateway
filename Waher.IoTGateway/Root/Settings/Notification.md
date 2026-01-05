@@ -24,16 +24,20 @@ enter one or more addresses below to which notifications will be sent.
 <legend>Notification Settings</legend>
 
 <p>
-<label for="NotificationAddresses">Send notifications to:</label>  
-<input id="NotificationAddresses" name="NotificationAddresses" type="text" style="max-width:20em" title="Notifications will be sent to these addresses."
-	value="{{ConfigClass:=Waher.IoTGateway.Setup.NotificationConfiguration;Config:=ConfigClass.Instance;Config.AddressesString}}" autofocus/>
+<label for="NotificationAddresses">Send notifications to: (One XMPP{{if Waher.IoTGateway.Setup.XmppConfiguration.Instance.Mail then ]] or eMail[[}} address per row)</label>  
+<textarea id="NotificationAddresses" name="NotificationAddresses" autofocus rows="10" title="Notifications will be sent to these addresses.">{{
+ConfigClass:=Waher.IoTGateway.Setup.NotificationConfiguration;
+Config:=ConfigClass.Instance;
+foreach Address in Config.Addresses do ]]((Address))
+[[}}</textarea>
 </p>
 
-**Note**: Separate addresses using semi-colon `;`
-
-{{if Waher.IoTGateway.Setup.XmppConfiguration.Instance.Mail then ]]
-**Note 2**: Notification addresses can be both XMPP addresses and normal mail addresses.
-[[}}
+<p>
+<label for="NotificationUrls">Call the following Web Hooks: (One URL per row)</label>  
+<textarea id="NotificationUrls" name="NotificationUrls" rows="10" title="Notifications will be posted to these URLs.">{{
+foreach Url in Config.Urls do ]]((Url))
+[[}}</textarea>
+</p>
 
 <p>Press the Test button to send a test-notification to the notification addresses.</p>
 <p id="TestError" class="error" style="display:none">Unable to send a notification. Please verify the addresses, and try again.</p>

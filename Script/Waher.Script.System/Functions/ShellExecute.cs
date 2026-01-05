@@ -133,7 +133,7 @@ namespace Waher.Script.System.Functions
 
 			int TimeoutMs;
 			bool LogStandardOut = false;
-			bool KillOnTimeout = true;
+			bool KillOnException = true;
 
 			if (Arguments.Length > 3)
 			{
@@ -155,7 +155,7 @@ namespace Waher.Script.System.Functions
 			if (Arguments.Length > 5)
 			{
 				if (Arguments[5].AssociatedObjectValue is bool PKillOnTimout)
-					KillOnTimeout = PKillOnTimout;
+					KillOnException = PKillOnTimout;
 				else
 					throw new ScriptRuntimeException("KillOnException must be a boolean.", this);
 			}
@@ -236,15 +236,9 @@ namespace Waher.Script.System.Functions
 				{
 					try
 					{
-						bool Kill = true;
-
-						if (P.HasExited)
-							Kill = false;
-
-						if (!(ResultSource.Task.Exception.InnerException is OperationCanceledException) && !KillOnTimeout)
-							Kill = false;
-
-						if (Kill)
+						if (!P.HasExited &&
+							(KillOnException || ResultSource.Task.Exception.InnerException is OperationCanceledException)
+						)
 							P.Kill();
 					}
 					catch (Exception e)

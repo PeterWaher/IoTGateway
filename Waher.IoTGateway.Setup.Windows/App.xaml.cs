@@ -291,10 +291,10 @@ namespace Waher.IoTGateway.Setup.Windows
 			try
 			{
 				string GatewayConfigFileName = Path.Combine(AppDataFolder, "Gateway.config");
-				if (!System.IO.File.Exists(GatewayConfigFileName))
+				if (!File.Exists(GatewayConfigFileName))
 					return null;
 
-				byte[] Bin = System.IO.File.ReadAllBytes(GatewayConfigFileName);
+				byte[] Bin = File.ReadAllBytes(GatewayConfigFileName);
 				string s = Strings.GetString(Bin, Encoding.UTF8);
 
 				int i = s.IndexOf("<Port protocol=\"HTTP\">");
@@ -357,7 +357,7 @@ namespace Waher.IoTGateway.Setup.Windows
 						"<Port protocol=\"HTTP\">80</Port>",
 						"<Port protocol=\"HTTP\">" + PortNumber.ToString() + "</Port>");
 
-					System.IO.File.WriteAllText(Path.Combine(ProgramDataFolder, "Gateway.config"), s);
+					File.WriteAllText(Path.Combine(ProgramDataFolder, "Gateway.config"), s);
 
 					Log.Notice("Custom Gateway.config saved.", string.Empty, string.Empty, "FileCopy");
 				}
@@ -597,7 +597,7 @@ namespace Waher.IoTGateway.Setup.Windows
 			{
 				string FileName = Path.Combine(InstallationFolder, "Waher.IoTGateway.Svc.exe");
 
-				if (System.IO.File.Exists(FileName))
+				if (File.Exists(FileName))
 				{
 					StringBuilder Arguments = new();
 

@@ -33,7 +33,11 @@ using Waher.Content.Zip;
 using Waher.Events;
 using Waher.Events.Files;
 using Waher.Events.Filter;
+using Waher.Events.MQTT;
 using Waher.Events.Persistence;
+using Waher.Events.Pipe;
+using Waher.Events.Socket;
+using Waher.Events.WebHook;
 using Waher.Events.XMPP;
 using Waher.Groups;
 using Waher.IoTGateway.Cssx;
@@ -49,6 +53,7 @@ using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Networking.MQTT;
 using Waher.Networking.PeerToPeer;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
@@ -759,6 +764,148 @@ namespace Waher.IoTGateway
 									Log.Error("Login Auditor intervals not specified.", GatewayConfigLocalFileName);
 								else
 									loginAuditor = new LoginAuditor("Login Auditor", EndpointExceptions.ToArray(), LoginIntervals);
+
+								break;
+
+							case "EventSinks":
+
+								static IEventSink[] ParseSinks(XmlElement E)
+								{
+									ChunkedList<IEventSink> Sinks = new ChunkedList<IEventSink>();
+
+									foreach (XmlNode N2 in E.ChildNodes)
+									{
+										if (!(N2 is XmlElement E2) || E2.NamespaceURI != E.NamespaceURI)
+											continue;
+
+										try
+										{
+											switch (E2.LocalName)
+											{
+												case "TextFileEventSink":
+													string SinkId = XML.Attribute(E2, "id");
+													string FileName = XML.Attribute(E2, "fileName");
+													int DeleteAfterDays = XML.Attribute(E2, "deleteAfterDays", 7);
+
+													Sinks.Add(new TextFileEventSink(SinkId, FileName, DeleteAfterDays));
+													break;
+
+												case "XmlFileEventSink":
+													SinkId = XML.Attribute(E2, "id");
+													FileName = XML.Attribute(E2, "fileName");
+													DeleteAfterDays = XML.Attribute(E2, "deleteAfterDays", 7);
+
+													string TransformFileName = XML.Attribute(E2, "transformFileName");
+													if (string.IsNullOrEmpty(TransformFileName))
+														TransformFileName = appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "EventXmlToHtml.xslt";
+
+													Sinks.Add(new XmlFileEventSink(SinkId, FileName, TransformFileName, DeleteAfterDays));
+													break;
+
+												case "MqttEventSink":
+													SinkId = XML.Attribute(E2, "id");
+													string Broker = XML.Attribute(E2, "broker");
+													int Port = XML.Attribute(E2, "port", 1883);
+													bool Tls = XML.Attribute(E2, "tls", false);
+													string UserName = XML.Attribute(E2, "userName");
+													string Password = XML.Attribute(E2, "password");
+													string Topic = XML.Attribute(E2, "topic");
+
+													MqttClient MqttClient;
+
+													if (string.IsNullOrEmpty(UserName))
+													{
+														MqttClient = new MqttClient(Broker, Port, certificate,
+															null, MqttQualityOfService.AtMostOnce, false, null);
+													}
+													else
+													{
+														MqttClient = new MqttClient(Broker, Port, Tls, UserName, Password,
+															null, MqttQualityOfService.AtMostOnce, false, null);
+													}
+
+													Sinks.Add(new MqttEventSink(SinkId, MqttClient, Topic, true));
+													break;
+
+												case "PipeEventSink":
+													SinkId = XML.Attribute(E2, "id");
+													string PipeName = XML.Attribute(E2, "pipeName");
+
+													Sinks.Add(new PipeEventSink(SinkId, PipeName));
+													break;
+
+												case "SocketEventSink":
+													SinkId = XML.Attribute(E2, "id");
+													string Host = XML.Attribute(E2, "host");
+													Port = XML.Attribute(E2, "port", 0);
+													Tls = XML.Attribute(E2, "tls", false);
+
+													Sinks.Add(new SocketEventSink(SinkId, Host, Port, Tls));
+													break;
+
+												case "WebHookEventSink":
+													SinkId = XML.Attribute(E2, "id");
+													string Url = XML.Attribute(E2, "url");
+
+													Sinks.Add(new WebHookEventSink(SinkId, Url));
+													break;
+
+												case "XmppEventSink":
+													SinkId = XML.Attribute(E2, "id");
+													string Jid = XML.Attribute(E2, "jid");
+
+													Sinks.Add(new XmppEventSink(SinkId, xmppClient, Jid, false));
+													break;
+
+												case "EventFilter":
+													SinkId = XML.Attribute(E2, "id");
+													FromEventLevel Debug = XML.Attribute(E2, "debug", FromEventLevel.None);
+													FromEventLevel Informational = XML.Attribute(E2, "informational", FromEventLevel.None);
+													FromEventLevel Notice = XML.Attribute(E2, "notice", FromEventLevel.None);
+													FromEventLevel Warning = XML.Attribute(E2, "warning", FromEventLevel.None);
+													FromEventLevel Error = XML.Attribute(E2, "error", FromEventLevel.None);
+													FromEventLevel Critical = XML.Attribute(E2, "critical", FromEventLevel.None);
+													FromEventLevel Alert = XML.Attribute(E2, "alert", FromEventLevel.None);
+													FromEventLevel Emergency = XML.Attribute(E2, "emergency", FromEventLevel.None);
+													string EventIdsString = XML.Attribute(E2, "eventIds").Trim();
+													string[] EventIds;
+
+													if (string.IsNullOrEmpty(EventIdsString))
+														EventIds = null;
+													else
+														EventIds = EventIdsString.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+													IEventSink[] ChildSinks = ParseSinks(E2);
+
+													switch (ChildSinks.Length)
+													{
+														case 0:
+															break;
+
+														case 1:
+															Sinks.Add(new EventFilter(SinkId, ChildSinks[0], Debug, Informational, Notice, Warning,
+																Error, Critical, Alert, Emergency, null, EventIds));
+															break;
+
+														default:
+															Sinks.Add(new EventFilter(SinkId, new EventSinks(SinkId, ChildSinks), Debug, Informational, Notice, Warning,
+																Error, Critical, Alert, Emergency, null, EventIds));
+															break;
+													}
+													break;
+											}
+										}
+										catch (Exception ex)
+										{
+											Log.Exception(ex, GatewayConfigLocalFileName);
+										}
+									}
+
+									return Sinks.ToArray();
+								}
+
+								foreach (IEventSink Sink in ParseSinks(E))
+									Log.Register(Sink);
 
 								break;
 						}

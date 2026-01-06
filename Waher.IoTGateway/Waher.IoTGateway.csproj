@@ -368,7 +368,10 @@
     <ProjectReference Include="..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.Files\Waher.Events.Files.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.Filter\Waher.Events.Filter.csproj" />
+    <ProjectReference Include="..\Events\Waher.Events.MQTT\Waher.Events.MQTT.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.Persistence\Waher.Events.Persistence.csproj" />
+    <ProjectReference Include="..\Events\Waher.Events.Pipe\Waher.Events.Pipe.csproj" />
+    <ProjectReference Include="..\Events\Waher.Events.Socket\Waher.Events.Socket.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.WebHook\Waher.Events.WebHook.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj" />
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj" />

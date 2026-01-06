@@ -299,9 +299,99 @@
 						</xs:choice>
 					</xs:complexType>
 				</xs:element>
+				<xs:element name="EventSinks" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:choice minOccurs="0" maxOccurs="unbounded">
+							<xs:group ref="EventSinks"/>
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+
+	<xs:group name="EventSinks">
+		<xs:choice>
+			<xs:element name="TextFileEventSink">
+				<xs:complexType>
+					<xs:attribute name="id" type="xs:string" use="required"/>
+					<xs:attribute name="fileName" type="xs:string" use="required"/>
+					<xs:attribute name="deleteAfterDays" type="xs:positiveInteger" use="optional" default="7"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="XmlFileEventSink">
+				<xs:complexType>
+					<xs:attribute name="id" type="xs:string" use="required"/>
+					<xs:attribute name="fileName" type="xs:string" use="required"/>
+					<xs:attribute name="transformFileName" type="xs:string" use="optional"/>
+					<xs:attribute name="deleteAfterDays" type="xs:positiveInteger" use="optional" default="7"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="MqttEventSink">
+				<xs:complexType>
+					<xs:attribute name="id" type="xs:string" use="required"/>
+					<xs:attribute name="broker" type="xs:string" use="required"/>
+					<xs:attribute name="port" type="PortNumber" use="optional" default="1883"/>
+					<xs:attribute name="tls" type="xs:boolean" use="optional" default="false"/>
+					<xs:attribute name="userName" type="xs:string" use="optional"/>
+					<xs:attribute name="password" type="xs:string" use="optional"/>
+					<xs:attribute name="topic" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="PipeEventSink">
+				<xs:complexType>
+					<xs:attribute name="id" type="xs:string" use="required"/>
+					<xs:attribute name="pipeName" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SocketEventSink">
+				<xs:complexType>
+					<xs:attribute name="id" type="xs:string" use="required"/>
+					<xs:attribute name="host" type="xs:string" use="required"/>
+					<xs:attribute name="port" type="PortNumber" use="required"/>
+					<xs:attribute name="tls" type="xs:boolean" use="optional" default="false"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="WebHookEventSink">
+				<xs:complexType>
+					<xs:attribute name="id" type="xs:string" use="required"/>
+					<xs:attribute name="url" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="XmppEventSink">
+				<xs:complexType>
+					<xs:attribute name="id" type="xs:string" use="required"/>
+					<xs:attribute name="jid" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="EventFilter">
+				<xs:complexType>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:group ref="EventSinks"/>
+					</xs:choice>
+					<xs:attribute name="id" type="xs:string" use="required"/>
+					<xs:attribute name="debug" type="FromEventLevel" use="optional" default="None"/>
+					<xs:attribute name="informational" type="FromEventLevel" use="optional" default="None"/>
+					<xs:attribute name="notice" type="FromEventLevel" use="optional" default="None"/>
+					<xs:attribute name="warning" type="FromEventLevel" use="optional" default="None"/>
+					<xs:attribute name="error" type="FromEventLevel" use="optional" default="None"/>
+					<xs:attribute name="critical" type="FromEventLevel" use="optional" default="None"/>
+					<xs:attribute name="alert" type="FromEventLevel" use="optional" default="None"/>
+					<xs:attribute name="emergency" type="FromEventLevel" use="optional" default="None"/>
+					<xs:attribute name="eventIds" type="xs:string" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:group>
+
+	<xs:simpleType name="FromEventLevel">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Minor"/>
+			<xs:enumeration value="Medium"/>
+			<xs:enumeration value="Major"/>
+			<xs:enumeration value="None"/>
+		</xs:restriction>
+	</xs:simpleType>
 
 	<xs:complexType name="DefaultHttpResponseHeaders">
 		<xs:sequence>

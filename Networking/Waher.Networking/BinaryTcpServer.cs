@@ -31,7 +31,10 @@ namespace Waher.Networking
 	/// maintains a list of current connection, and removes unused connections
 	/// automatically.
 	/// </summary>
-	public class BinaryTcpServer : CommunicationLayer, IDisposable, ITlsCertificateEndpoint
+	public class BinaryTcpServer : CommunicationLayer, IDisposable
+#if !WINDOWS_UWP
+		, ITlsCertificateEndpoint
+#endif
 	{
 		/// <summary>
 		/// Default Client-to-Client Connection backlog (10).

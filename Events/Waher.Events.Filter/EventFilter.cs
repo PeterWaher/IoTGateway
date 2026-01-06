@@ -103,6 +103,30 @@ namespace Waher.Events.Filter
 		/// <param name="AllowEmergency">What levels of emergency events are allowed.</param>param>
 		/// <param name="CustomEventFilters">Custom event filters.</param>
 		public EventFilter(string ObjectID, IEventSink EventSink,
+			FromEventLevel AllowDebug, FromEventLevel AllowInformational, FromEventLevel AllowNotice, FromEventLevel AllowWarning,
+			FromEventLevel AllowError, FromEventLevel AllowCritical, FromEventLevel AllowAlert, FromEventLevel AllowEmergency,
+			params ICustomEventFilter[] CustomEventFilters)
+			: this(ObjectID, EventSink, (EventLevelFilter)AllowDebug, (EventLevelFilter)AllowInformational,
+				  (EventLevelFilter)AllowNotice, (EventLevelFilter)AllowWarning, (EventLevelFilter)AllowError,
+				  (EventLevelFilter)AllowCritical, (EventLevelFilter)AllowAlert, (EventLevelFilter)AllowEmergency, CustomEventFilters)
+		{
+		}
+
+		/// <summary>
+		/// Filters incoming events and passes remaining events to a secondary event sink.
+		/// </summary>
+		/// <param name="ObjectID">Object ID</param>
+		/// <param name="EventSink">Secondary event sink that will receive events that pass the filter.</param>
+		/// <param name="AllowDebug">What levels of debug events are allowed.</param>
+		/// <param name="AllowInformational">What levels of informational events are allowed.</param>
+		/// <param name="AllowNotice">What levels of notice events are allowed.</param>
+		/// <param name="AllowWarning">What levels of warning events are allowed.</param>
+		/// <param name="AllowError">What levels of error events are allowed.</param>
+		/// <param name="AllowCritical">What levels of critical events are allowed.</param>
+		/// <param name="AllowAlert">What levels of alert events are allowed.</param>
+		/// <param name="AllowEmergency">What levels of emergency events are allowed.</param>param>
+		/// <param name="CustomEventFilters">Custom event filters.</param>
+		public EventFilter(string ObjectID, IEventSink EventSink,
 			EventLevelFilter AllowDebug, EventLevelFilter AllowInformational, EventLevelFilter AllowNotice, EventLevelFilter AllowWarning,
 			EventLevelFilter AllowError, EventLevelFilter AllowCritical, EventLevelFilter AllowAlert, EventLevelFilter AllowEmergency,
 			params ICustomEventFilter[] CustomEventFilters)

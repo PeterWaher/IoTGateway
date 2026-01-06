@@ -1,6 +1,32 @@
 ﻿namespace Waher.Events.Filter
 {
 	/// <summary>
+	/// Allows events from a certain level.
+	/// </summary>
+	public enum FromEventLevel
+	{
+		/// <summary>
+		/// Allows Minor, Medium, and Major events of a given type.
+		/// </summary>
+		Minor,
+
+		/// <summary>
+		/// Allows Medium, and Major events of a given type.
+		/// </summary>
+		Medium,
+
+		/// <summary>
+		/// Allows Major events of a given type.
+		/// </summary>
+		Major,
+
+		/// <summary>
+		/// Does not allow events of a given type.
+		/// </summary>
+		None
+	};
+
+	/// <summary>
 	/// Filters events based on their <see cref="EventLevel"/> value.
 	/// </summary>
 	public class EventLevelFilter : ICustomEventFilter
@@ -19,7 +45,20 @@
 		/// </summary>
 		/// <param name="FromLevel">From what event level events are allowed.</param>
 		public EventLevelFilter(EventLevel FromLevel)
-			: this(FromLevel <= EventLevel.Major, FromLevel <= EventLevel.Medium, FromLevel <= EventLevel.Minor)
+			: this(FromLevel <= EventLevel.Major, 
+				  FromLevel <= EventLevel.Medium, 
+				  FromLevel <= EventLevel.Minor)
+		{
+		}
+
+		/// <summary>
+		/// Filters events based on their <see cref="EventLevel"/> value.
+		/// </summary>
+		/// <param name="FromLevel">From what event level events are allowed.</param>
+		public EventLevelFilter(FromEventLevel FromLevel)
+			: this(FromLevel <= FromEventLevel.Major, 
+				  FromLevel <= FromEventLevel.Medium, 
+				  FromLevel <= FromEventLevel.Minor)
 		{
 		}
 
@@ -50,6 +89,15 @@
 		/// </summary>
 		/// <param name="FromLevel">From what event level events are allowed.</param>
 		public static implicit operator EventLevelFilter(EventLevel FromLevel)
+		{
+			return new EventLevelFilter(FromLevel);
+		}
+
+		/// <summary>
+		/// Filters events based on their <see cref="EventLevel"/> value.
+		/// </summary>
+		/// <param name="FromLevel">From what event level events are allowed.</param>
+		public static implicit operator EventLevelFilter(FromEventLevel FromLevel)
 		{
 			return new EventLevelFilter(FromLevel);
 		}

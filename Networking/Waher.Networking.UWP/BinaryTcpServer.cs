@@ -32,6 +32,9 @@ namespace Waher.Networking
 	/// automatically.
 	/// </summary>
 	public class BinaryTcpServer : CommunicationLayer, IDisposable
+#if !WINDOWS_UWP
+		, ITlsCertificateEndpoint
+#endif
 	{
 		/// <summary>
 		/// Default Client-to-Client Connection backlog (10).

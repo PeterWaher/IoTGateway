@@ -1,11 +1,13 @@
 ﻿using System;
-using System.Threading;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.MQTT;
+using Waher.Security;
 
 namespace Waher.Events.MQTT
 {
@@ -16,6 +18,9 @@ namespace Waher.Events.MQTT
 	/// http://xmpp.org/extensions/xep-0337.html
 	/// </summary>
 	public class MqttEventSink : EventSink
+#if !WINDOWS_UWP
+		, ITlsCertificateEndpoint
+#endif
 	{
 		/// <summary>
 		/// urn:xmpp:eventlog
@@ -120,6 +125,18 @@ namespace Waher.Events.MQTT
 		/// Destination topic of event messages.
 		/// </summary>
 		public string Topic => this.topic;
+
+#if !WINDOWS_UWP
+		/// <summary>
+		/// Updates the certificate used in mTLS negotiation.
+		/// </summary>
+		/// <param name="Certificate">Updated Certificate</param>
+		public void UpdateCertificate(X509Certificate Certificate)
+		{
+			if (this.client.HasClientCertificate)
+				this.client.UpdateCertificate(Certificate);
+		}
+#endif
 
 		/// <inheritdoc/>
 		public override Task Queue(Event Event)

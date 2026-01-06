@@ -24,11 +24,14 @@ namespace Waher.Networking.MQTT
     /// http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
     /// </summary>
     public class MqttClient : CommunicationLayer, IDisposableAsync, IHostReference
+#if !WINDOWS_UWP
+		, ITlsCertificateEndpoint
+#endif
 	{
 		private const int KeepAliveTimeSeconds = 30;
 
 #if !WINDOWS_UWP
-		private readonly X509Certificate clientCertificate = null;
+		private X509Certificate clientCertificate = null;
 #endif
 		private readonly SortedDictionary<DateTime, OutputRecord> packetByTimeout = new SortedDictionary<DateTime, OutputRecord>();
 		private readonly SortedDictionary<int, DateTime> timeoutByPacketIdentifier = new SortedDictionary<int, DateTime>();
@@ -815,6 +818,22 @@ namespace Waher.Networking.MQTT
 		/// Current state of connection.
 		/// </summary>
 		public MqttState State => this.state;
+
+#if !WINDOWS_UWP
+		/// <summary>
+		/// Updates the certificate used in mTLS negotiation.
+		/// </summary>
+		/// <param name="Certificate">Updated Certificate</param>
+		public void UpdateCertificate(X509Certificate Certificate)
+		{
+			this.clientCertificate = Certificate;
+		}
+
+		/// <summary>
+		/// If the client uses a client certificate.
+		/// </summary>
+		public bool HasClientCertificate => !(this.clientCertificate is null);
+#endif
 
 		internal async Task SetState(MqttState NewState)
 		{

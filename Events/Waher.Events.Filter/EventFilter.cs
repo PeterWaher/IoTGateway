@@ -228,7 +228,7 @@ namespace Waher.Events.Filter
 				else
 				{
 					Dictionary<string, bool> EventIds = new Dictionary<string, bool>();
-
+					
 					foreach (string EventId in value)
 						EventIds[EventId] = true;
 

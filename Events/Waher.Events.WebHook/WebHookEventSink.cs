@@ -10,7 +10,7 @@ namespace Waher.Events.WebHook
 	/// <summary>
 	/// Event sink sending events to a remote service using POST.
 	/// </summary>
-	public class WebHookSink : EventSink, ITlsCertificateEndpoint
+	public class WebHookEventSink : EventSink, ITlsCertificateEndpoint
 	{
 		private readonly Uri callbackUrl;
 		private X509Certificate certificate;
@@ -20,7 +20,7 @@ namespace Waher.Events.WebHook
 		/// </summary>
 		/// <param name="ObjectID">Object ID</param>
 		/// <param name="CallbackUrl">Webhook Callback URL</param>
-		public WebHookSink(string ObjectID, string CallbackUrl)
+		public WebHookEventSink(string ObjectID, string CallbackUrl)
 			: this(ObjectID, CallbackUrl, null)
 		{
 		}
@@ -31,7 +31,7 @@ namespace Waher.Events.WebHook
 		/// <param name="ObjectID">Object ID</param>
 		/// <param name="CallbackUrl">Webhook Callback URL</param>
 		/// <param name="Certificate">Certificate to use if mTLS is negotiated.</param>
-		public WebHookSink(string ObjectID, string CallbackUrl, X509Certificate Certificate)
+		public WebHookEventSink(string ObjectID, string CallbackUrl, X509Certificate Certificate)
 			: base(ObjectID)
 		{
 			this.callbackUrl = new Uri(CallbackUrl);

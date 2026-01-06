@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Waher.Events.Filter
@@ -11,6 +12,8 @@ namespace Waher.Events.Filter
 		private readonly IEventSink sink;
 		private readonly int nrCustomFilters;
 		private readonly ICustomEventFilter[] customEventFilters;
+		private string[] allowEventIds;
+		private Dictionary<string,bool> eventIds = null;
 
 		/// <summary>
 		/// Filters incoming events and passes remaining events to a secondary event sink.
@@ -101,8 +104,33 @@ namespace Waher.Events.Filter
 		/// <param name="CustomEventFilters">Custom event filters.</param>
 		public EventFilter(string ObjectID, IEventSink EventSink,
 			EventLevelFilter AllowDebug, EventLevelFilter AllowInformational, EventLevelFilter AllowNotice, EventLevelFilter AllowWarning,
-			EventLevelFilter AllowError, EventLevelFilter AllowCritical, EventLevelFilter AllowAlert, EventLevelFilter AllowEmergency, 
+			EventLevelFilter AllowError, EventLevelFilter AllowCritical, EventLevelFilter AllowAlert, EventLevelFilter AllowEmergency,
 			params ICustomEventFilter[] CustomEventFilters)
+			: this(ObjectID, EventSink, AllowDebug, AllowInformational, AllowNotice, AllowWarning,
+				  AllowError, AllowCritical, AllowAlert, AllowEmergency, CustomEventFilters, null)
+		{
+		}
+
+		/// <summary>
+		/// Filters incoming events and passes remaining events to a secondary event sink.
+		/// </summary>
+		/// <param name="ObjectID">Object ID</param>
+		/// <param name="EventSink">Secondary event sink that will receive events that pass the filter.</param>
+		/// <param name="AllowDebug">What levels of debug events are allowed.</param>
+		/// <param name="AllowInformational">What levels of informational events are allowed.</param>
+		/// <param name="AllowNotice">What levels of notice events are allowed.</param>
+		/// <param name="AllowWarning">What levels of warning events are allowed.</param>
+		/// <param name="AllowError">What levels of error events are allowed.</param>
+		/// <param name="AllowCritical">What levels of critical events are allowed.</param>
+		/// <param name="AllowAlert">What levels of alert events are allowed.</param>
+		/// <param name="AllowEmergency">What levels of emergency events are allowed.</param>param>
+		/// <param name="CustomEventFilters">Custom event filters.</param>
+		/// <param name="EventIds">What Event IDs are allowed. If null, all event IDs are allowed, including
+		/// events with no event IDs.</param>
+		public EventFilter(string ObjectID, IEventSink EventSink,
+			EventLevelFilter AllowDebug, EventLevelFilter AllowInformational, EventLevelFilter AllowNotice, EventLevelFilter AllowWarning,
+			EventLevelFilter AllowError, EventLevelFilter AllowCritical, EventLevelFilter AllowAlert, EventLevelFilter AllowEmergency, 
+			ICustomEventFilter[] CustomEventFilters, string[] EventIds)
 			: base(ObjectID)
 		{
 			this.sink = EventSink;
@@ -114,6 +142,7 @@ namespace Waher.Events.Filter
 			this.AllowCritical = AllowCritical;
 			this.AllowAlert = AllowAlert;
 			this.AllowEmergency = AllowEmergency;
+			this.AllowEventIds = EventIds;
 
 			this.customEventFilters = CustomEventFilters;
 			this.nrCustomFilters = this.customEventFilters?.Length ?? 0;
@@ -158,6 +187,31 @@ namespace Waher.Events.Filter
 		/// What levels of emergency events are allowed.
 		/// </summary>
 		public EventLevelFilter AllowEmergency { get; set; }
+
+		/// <summary>
+		/// What Event IDs are allowed. If null, all event IDs are allowed, including
+		/// events with no event IDs.
+		/// </summary>
+		public string[] AllowEventIds
+		{
+			get => this.allowEventIds;
+			set
+			{
+				this.allowEventIds = value;
+
+				if (value is null)
+					this.eventIds = null;
+				else
+				{
+					Dictionary<string, bool> EventIds = new Dictionary<string, bool>();
+
+					foreach (string EventId in value)
+						EventIds[EventId] = true;
+
+					this.eventIds = EventIds;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Secondary event sink receiving the events passing the filter.
@@ -213,6 +267,15 @@ namespace Waher.Events.Filter
 
 			if (!TypeFilter.IsAllowed(Event.Level))
 				return false;
+
+			if (!(this.eventIds is null))
+			{
+				if (string.IsNullOrEmpty(Event.EventId))
+					return false;
+
+				if (!this.eventIds.ContainsKey(Event.EventId))
+					return false;
+			}
 
 			if (this.nrCustomFilters > 0)
 			{

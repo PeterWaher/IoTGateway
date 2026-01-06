@@ -2207,6 +2207,12 @@ namespace Waher.IoTGateway
 				{
 					webServer?.UpdateCertificate(Certificate);
 
+					foreach (IEventSink Sink in Log.Sinks)
+					{
+						if (Sink is ITlsCertificateEndpoint TlsCertificateEndpoint)
+							TlsCertificateEndpoint.UpdateCertificate(Certificate);
+					}
+
 					await OnNewCertificate.Raise(typeof(Gateway), new Events.CertificateEventArgs(certificate));
 				}
 				catch (Exception ex)

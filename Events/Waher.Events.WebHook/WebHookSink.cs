@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Security;
 
 namespace Waher.Events.WebHook
 {
 	/// <summary>
 	/// Event sink sending events to a remote service using POST.
 	/// </summary>
-	public class WebHookSink : EventSink
+	public class WebHookSink : EventSink, ITlsCertificateEndpoint
 	{
 		private readonly Uri callbackUrl;
+		private X509Certificate certificate;
 
 		/// <summary>
 		/// Event sink sending events to a remote service using POST.
@@ -18,9 +21,30 @@ namespace Waher.Events.WebHook
 		/// <param name="ObjectID">Object ID</param>
 		/// <param name="CallbackUrl">Webhook Callback URL</param>
 		public WebHookSink(string ObjectID, string CallbackUrl)
+			: this(ObjectID, CallbackUrl, null)
+		{
+		}
+
+		/// <summary>
+		/// Event sink sending events to a remote service using POST.
+		/// </summary>
+		/// <param name="ObjectID">Object ID</param>
+		/// <param name="CallbackUrl">Webhook Callback URL</param>
+		/// <param name="Certificate">Certificate to use if mTLS is negotiated.</param>
+		public WebHookSink(string ObjectID, string CallbackUrl, X509Certificate Certificate)
 			: base(ObjectID)
 		{
 			this.callbackUrl = new Uri(CallbackUrl);
+			this.certificate = Certificate;
+		}
+
+		/// <summary>
+		/// Updates the certificate used in mTLS negotiation.
+		/// </summary>
+		/// <param name="Certificate">Updated Certificate</param>
+		public void UpdateCertificate(X509Certificate Certificate)
+		{
+			this.certificate = Certificate;
 		}
 
 		/// <summary>
@@ -44,7 +68,7 @@ namespace Waher.Events.WebHook
 				{ "StackTrace", Event.StackTrace }
 			};
 
-			return InternetContent.PostAsync(this.callbackUrl, Payload);
+			return InternetContent.PostAsync(this.callbackUrl, Payload, this.certificate);
 		}
 	}
 }

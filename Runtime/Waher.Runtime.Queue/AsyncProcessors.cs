@@ -33,7 +33,8 @@ namespace Waher.Runtime.Queue
 			{
 				lock (activeProcessors)
 				{
-					activeProcessors.Remove(Node);
+					if (!(Node.List is null))
+						activeProcessors.Remove(Node);
 				}
 			}
 		}

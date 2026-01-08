@@ -140,6 +140,10 @@
       <Project>{3b744b26-affc-450d-9d21-0291299c5281}</Project>
       <Name>Waher.Runtime.IO</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
+      <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
+      <Name>Waher.Security</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Events\Waher.Events.csproj">
       <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
       <Name>Waher.Events</Name>

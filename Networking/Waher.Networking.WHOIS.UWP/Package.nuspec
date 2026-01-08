@@ -16,7 +16,7 @@
     <tags>networking communication WHOIS UWP</tags>
     <dependencies>
 			<dependency id="Waher.Events" version="1.4.6"/>
-			<dependency id="Waher.Networking.UWP" version="4.6.0"/>
+			<dependency id="Waher.Networking.UWP" version="4.6.1"/>
     </dependencies>
   </metadata>
   <files>

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Networking.UWP</id>
-    <version>4.6.0</version>
+    <version>4.6.1</version>
     <title>Waher.Networking.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -20,10 +20,10 @@
 			<dependency id="Waher.Runtime.Collections" version="1.0.3"/>
 			<dependency id="Waher.Runtime.Console" version="1.2.0"/>
 			<dependency id="Waher.Runtime.Inventory" version="1.4.5"/>
-			<dependency id="Waher.Runtime.IO" version="1.0.5"/>
+			<dependency id="Waher.Runtime.IO" version="1.0.6"/>
 			<dependency id="Waher.Runtime.Threading" version="2.2.0"/>
-			<dependency id="Waher.Runtime.Queue" version="3.2.2"/>
-			<dependency id="Waher.Security" version="1.0.14"/>
+			<dependency id="Waher.Runtime.Queue" version="3.2.3"/>
+			<dependency id="Waher.Security" version="1.0.15"/>
 		</dependencies>
   </metadata>
   <files>

@@ -18,9 +18,9 @@
 		<RepositoryType>GitHub</RepositoryType>
 		<PackageTags>Security PQC Quantum Cryptography ML-KEM ML-KEM-512 ML-KEM-768 ML-KEM-1024 ML-DSA ML-DSA-44 ML-DSA-67 ML-DSA-87</PackageTags>
 		<NeutralLanguage>English</NeutralLanguage>
-		<AssemblyVersion>1.0.1</AssemblyVersion>
-		<FileVersion>1.0.1</FileVersion>
-		<Version>1.0.1</Version>
+		<AssemblyVersion>1.0.2</AssemblyVersion>
+		<FileVersion>1.0.2</FileVersion>
+		<Version>1.0.2</Version>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<PackageIcon>Icon_64x64.png</PackageIcon>
 	</PropertyGroup>

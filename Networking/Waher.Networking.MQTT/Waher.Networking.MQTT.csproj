@@ -16,9 +16,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication mqtt</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>3.1.0</AssemblyVersion>
-    <FileVersion>3.1.0</FileVersion>
-    <Version>3.1.0</Version>
+    <AssemblyVersion>3.1.1</AssemblyVersion>
+    <FileVersion>3.1.1</FileVersion>
+    <Version>3.1.1</Version>
     <PackageIconUrl />
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.MQTT\</UpgradeBackupLocation>

@@ -19,9 +19,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>object serialization</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.11.0</AssemblyVersion>
-    <FileVersion>1.11.0</FileVersion>
-    <Version>1.11.0</Version>
+    <AssemblyVersion>1.11.1</AssemblyVersion>
+    <FileVersion>1.11.1</FileVersion>
+    <Version>1.11.1</Version>
   </PropertyGroup>
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>

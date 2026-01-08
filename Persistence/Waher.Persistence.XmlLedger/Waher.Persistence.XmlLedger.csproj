@@ -14,9 +14,9 @@
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>persistence ledger xml</PackageTags>
-    <AssemblyVersion>1.2.3</AssemblyVersion>
-    <FileVersion>1.2.3</FileVersion>
-		<Version>1.2.3</Version>
+    <AssemblyVersion>1.2.4</AssemblyVersion>
+    <FileVersion>1.2.4</FileVersion>
+		<Version>1.2.4</Version>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <IncludeSymbols>True</IncludeSymbols>

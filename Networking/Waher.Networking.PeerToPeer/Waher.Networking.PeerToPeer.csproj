@@ -13,9 +13,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication peer-to-peer p2p multi-player</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>3.1.1</AssemblyVersion>
-    <FileVersion>3.1.1</FileVersion>
-		<Version>3.1.1</Version>
+    <AssemblyVersion>3.1.2</AssemblyVersion>
+    <FileVersion>3.1.2</FileVersion>
+		<Version>3.1.2</Version>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>

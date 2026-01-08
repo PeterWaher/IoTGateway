@@ -12,7 +12,7 @@
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Defines an event sink that sends events to a TCP listener socket, for UWP. Events are sent as XML fragments.</description>
-    <copyright>Copyright © Waher Data AB 2023-2025. All rights reserved.</copyright>
+    <copyright>Copyright © Waher Data AB 2023-2026. All rights reserved.</copyright>
     <tags>logger logging logs events eventlogging eventlogs socket XML UWP</tags>
     <dependencies>
       <dependency id="Waher.Content" version="3.4.4"/>

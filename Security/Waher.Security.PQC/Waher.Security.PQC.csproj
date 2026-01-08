@@ -10,7 +10,7 @@
 		<Company>Waher Data AB</Company>
 		<Product>Waher.IoTGateway</Product>
 		<Description>Implements ML-KEM (512, 768 and 1024), as defined in NIST FIPS 203, and ML-DSA (44, 65 and 87), as defined in FIPS 204 for Post-Quantum Cryptography.</Description>
-		<Copyright>Copyright © Waher Data AB 2025. All rights reserved.</Copyright>
+		<Copyright>Copyright © Waher Data AB 2025-2026. All rights reserved.</Copyright>
 		<PackageLicenseUrl></PackageLicenseUrl>
 		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.PQC</PackageProjectUrl>
 		<PackageIconUrl></PackageIconUrl>

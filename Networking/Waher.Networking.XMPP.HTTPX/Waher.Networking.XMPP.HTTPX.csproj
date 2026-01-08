@@ -6,7 +6,7 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Implements the HTTP over XMPP extension XEP-0332.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2025. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2026. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>

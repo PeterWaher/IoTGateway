@@ -9,7 +9,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Class library that keeps an inventory of types and interfaces available in your code. It also provides a means to access available types given an interface, and can find the best implementation to process a task or item. It can be used to implement an Inversion of Control Pattern, and helps instantiate interfaces, abstract classes and normal classes, including recursively instantiating constructor arguments. Handles singleton types.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2025. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2026. All rights reserved.</Copyright>
     <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Runtime/Waher.Runtime.Inventory</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>

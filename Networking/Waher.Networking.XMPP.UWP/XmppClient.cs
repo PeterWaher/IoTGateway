@@ -1203,10 +1203,57 @@ namespace Waher.Networking.XMPP
 
 			if (!(this.pendingRequestsBySeqNr is null))
 			{
+				PendingRequest[] PendingRequests;
+
 				lock (this.synchObject)
 				{
+					PendingRequests = new PendingRequest[this.pendingRequestsBySeqNr.Count];
+					this.pendingRequestsBySeqNr.Values.CopyTo(PendingRequests, 0);
+
 					this.pendingRequestsBySeqNr.Clear();
 					this.pendingRequestsByTimeout.Clear();
+				}
+
+				if (PendingRequests.Length > 0)
+				{
+					foreach (PendingRequest Request in PendingRequests)
+					{
+						try
+						{
+							StringBuilder Xml = new StringBuilder();
+
+							Xml.Append("<iq xmlns='" + NamespaceClient + "' type='error' from='");
+							Xml.Append(Request.To);
+							Xml.Append("' id='");
+							Xml.Append(Request.SeqNr.ToString());
+							Xml.Append("'><error type='cancel'><service-unavailable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
+							Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Client disposed.</text></error></iq>");
+
+							XmlDocument Doc = new XmlDocument()
+							{
+								PreserveWhitespace = true
+							};
+							Doc.LoadXml(Xml.ToString());
+
+							if (!(Request.IqCallback is null))
+							{
+								IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
+									Request.State);
+
+								await Request.IqCallback.Raise(this, e);
+							}
+
+							if (!(Request.PresenceCallback is null))
+							{
+								PresenceEventArgs e = new PresenceEventArgs(this, Doc.DocumentElement);
+								await Request.PresenceCallback.Raise(this, e);
+							}
+						}
+						catch (Exception ex)
+						{
+							this.Exception(ex);
+						}
+					}
 				}
 			}
 

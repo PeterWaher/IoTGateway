@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Events;
+﻿using Waher.Events;
 
 namespace Waher.Persistence.Exceptions
 {

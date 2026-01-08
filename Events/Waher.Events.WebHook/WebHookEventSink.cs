@@ -224,6 +224,17 @@ namespace Waher.Events.WebHook
 					{ "First", Rec.First },
 					{ "Last", Rec.Last },
 					{ "Count", Rec.Events.Count },
+					{ "Collect", new Dictionary<string, object>()
+						{
+							{ "OnType", this.collectOnType },
+							{ "OnLevel", this.collectOnLevel },
+							{ "OnEventId", this.collectOnEventId },
+							{ "OnObject", this.collectOnObject },
+							{ "OnActor", this.collectOnActor },
+							{ "OnFacility", this.collectOnFacility },
+							{ "OnModule", this.collectOnModule }
+						}
+					},
 					{ "Events", Rec.Events.ToArray() }
 				};
 

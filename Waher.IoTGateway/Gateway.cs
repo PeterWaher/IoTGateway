@@ -846,8 +846,20 @@ namespace Waher.IoTGateway
 												case "WebHookEventSink":
 													SinkId = XML.Attribute(E2, "id");
 													string Url = XML.Attribute(E2, "url");
+													int MaxSecondsUsed = XML.Attribute(E2, "maxSecondsUsed", 0);
+													int MaxSecondsUnused = XML.Attribute(E2, "maxSecondsUnused", 0);
+													bool CollectOnType = XML.Attribute(E2, "collectOnType", false);
+													bool CollectOnLevel = XML.Attribute(E2, "collectOnLevel", false);
+													bool CollectOnEventId = XML.Attribute(E2, "collectOnEventId", false);
+													bool CollectOnObject = XML.Attribute(E2, "collectOnObject", false);
+													bool CollectOnActor = XML.Attribute(E2, "collectOnActor", false);
+													bool CollectOnFacility = XML.Attribute(E2, "collectOnFacility", false);
+													bool CollectOnModule = XML.Attribute(E2, "collectOnModule", false);
 
-													Sinks.Add(new WebHookEventSink(SinkId, Url));
+													Sinks.Add(new WebHookEventSink(SinkId, Url, null, MaxSecondsUsed,
+														MaxSecondsUnused, CollectOnType, CollectOnLevel,
+														CollectOnEventId, CollectOnObject, CollectOnActor,
+														CollectOnFacility, CollectOnModule));
 													break;
 
 												case "XmppEventSink":

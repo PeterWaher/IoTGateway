@@ -356,6 +356,15 @@
 				<xs:complexType>
 					<xs:attribute name="id" type="xs:string" use="required"/>
 					<xs:attribute name="url" type="xs:string" use="required"/>
+					<xs:attribute name="maxSecondsUsed" type="xs:nonNegativeInteger" use="optional" default="0"/>
+					<xs:attribute name="maxSecondsUnused" type="xs:nonNegativeInteger" use="optional" default="0"/>
+					<xs:attribute name="collectOnType" type="xs:boolean" use="optional" default="false"/>
+					<xs:attribute name="collectOnLevel" type="xs:boolean" use="optional" default="false"/>
+					<xs:attribute name="collectOnEventId" type="xs:boolean" use="optional" default="false"/>
+					<xs:attribute name="collectOnObject" type="xs:boolean" use="optional" default="false"/>
+					<xs:attribute name="collectOnActor" type="xs:boolean" use="optional" default="false"/>
+					<xs:attribute name="collectOnFacility" type="xs:boolean" use="optional" default="false"/>
+					<xs:attribute name="collectOnModule" type="xs:boolean" use="optional" default="false"/>
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="XmppEventSink">

@@ -2352,19 +2352,20 @@ namespace Waher.Networking.HTTP
 			{
 #if !WINDOWS_UWP
 				HttpRequestHeader Header = Request.Header;
+				string HostNoPort;
 				int? UpgradePort = null;
 
 				if (!this.encrypted &&
 					(Header.UpgradeInsecureRequests?.Upgrade ?? false) &&
 					!(Header.Host is null) &&
-					string.Compare(Header.Host.Value, "localhost", true) != 0 &&
+					string.Compare(HostNoPort = Header.Host.Value.RemovePortNumber(), "localhost", true) != 0 &&
 					(UpgradePort = this.server.UpgradePort).HasValue)
 				{
 					StringBuilder Location = new StringBuilder();
 					string s;
 
 					Location.Append("https://");
-					Location.Append(Header.Host.Value.RemovePortNumber());
+					Location.Append(HostNoPort);
 
 					if (!(UpgradePort is null) && UpgradePort.Value != HttpServer.DefaultHttpsPort)
 					{

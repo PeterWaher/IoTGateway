@@ -29,7 +29,10 @@
     document.getElementById("NextMessage").style.display = "none";
 
     xhttp.open("POST", "/Settings/TestNotificationAddresses", true);
-    xhttp.setRequestHeader("Content-Type", "text/plain");
+    xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.setRequestHeader("X-TabID", TabID);
-    xhttp.send(" " + document.getElementById("NotificationAddresses").value);
+    xhttp.send(JSON.stringify({
+        "NotificationAddresses": document.getElementById("NotificationAddresses").value,
+        "NotificationUrls": document.getElementById("NotificationUrls").value
+    }));
 }

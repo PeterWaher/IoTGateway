@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+		<Description>Defines an event sink that logs events to an external service using HTTP POST calls to a web hook URL.</Description>
+		<Copyright>Copyright © Waher Data AB 2026. All rights reserved.</Copyright>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<Authors>Peter Waher</Authors>
+		<Company>Waher Data AB</Company>
+		<Product>Waher.IoTGateway</Product>
+		<PackageLicenseUrl></PackageLicenseUrl>
+		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Events/Waher.Events.WebHook</PackageProjectUrl>
+		<PackageIconUrl></PackageIconUrl>
+		<RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+		<RepositoryType>GitHub</RepositoryType>
+		<PackageTags>logger logging logs events eventlogging eventlogs webhook POST</PackageTags>
+		<NeutralLanguage>English</NeutralLanguage>
+		<AssemblyVersion>1.0.0</AssemblyVersion>
+		<FileVersion>1.0.0</FileVersion>
+		<Version>1.0.0</Version>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageIcon>Icon_64x64.png</PackageIcon>
+	</PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+		<ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
+		<ProjectReference Include="..\Waher.Events\Waher.Events.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\Images\Icon_64x64.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\LICENSE.txt">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+</Project>

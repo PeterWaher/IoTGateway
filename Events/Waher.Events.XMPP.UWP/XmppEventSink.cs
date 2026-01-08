@@ -187,9 +187,7 @@ namespace Waher.Events.XMPP
 
 			Xml.Append("</log>");
 
-			this.client.SendMessage(MessageType.Normal, this.destination, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-
-			return Task.CompletedTask;
+			return this.client.SendMessage(MessageType.Normal, this.destination, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 		}
 
 		/// <summary>

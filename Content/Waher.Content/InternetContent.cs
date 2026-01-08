@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Content.Binary;
 using Waher.Events;
@@ -233,7 +232,14 @@ namespace Waher.Content
 		{
 			string Key;
 
-			if (AcceptedContentTypes is null || AcceptedContentTypes.Length == 0)
+			if (!(AcceptedContentTypes is null) &&
+				AcceptedContentTypes.Length == 1 &&
+				AcceptedContentTypes[0] == "*")
+			{
+				AcceptedContentTypes = Array.Empty<string>();
+				Key = Object.GetType().FullName;
+			}
+			else if (AcceptedContentTypes is null || AcceptedContentTypes.Length == 0)
 				Key = Object.GetType().FullName;
 			else
 			{

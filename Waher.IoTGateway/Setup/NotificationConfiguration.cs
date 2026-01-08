@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Mail;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Markdown;
@@ -22,6 +21,7 @@ namespace Waher.IoTGateway.Setup
 		private HttpResource testAddresses = null;
 
 		private CaseInsensitiveString[] addresses = Array.Empty<CaseInsensitiveString>();
+		private CaseInsensitiveString[] urls = Array.Empty<CaseInsensitiveString>();
 
 		/// <summary>
 		/// Notification Configuration
@@ -47,27 +47,13 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
-		/// A string containing all addresses, delimited by "; ".
+		/// Notification addresses.
 		/// </summary>
-		public string AddressesString
+		[DefaultValueNull]
+		public CaseInsensitiveString[] Urls
 		{
-			get
-			{
-				StringBuilder sb = new StringBuilder();
-				bool First = true;
-
-				foreach (string s in this.addresses)
-				{
-					if (First)
-						First = false;
-					else
-						sb.Append("; ");
-
-					sb.Append(s);
-				}
-
-				return sb.ToString();
-			}
+			get => this.urls;
+			set => this.urls = value;
 		}
 
 		/// <summary>
@@ -145,7 +131,12 @@ namespace Waher.IoTGateway.Setup
 			}
 
 			ContentResponse Content = await Request.DecodeDataAsync();
-			if (Content.HasError || !(Content.Decoded is string Address))
+			if (Content.HasError ||
+				!(Content.Decoded is Dictionary<string, object> Obj) ||
+				!Obj.TryGetValue("NotificationAddresses", out object Obj2) ||
+				!(Obj2 is string NotificationAddresses) ||
+				!Obj.TryGetValue("NotificationUrls", out Obj2) ||
+				!(Obj2 is string NotificationUrls))
 			{
 				await Response.SendResponse(new BadRequestException());
 				return;
@@ -154,12 +145,13 @@ namespace Waher.IoTGateway.Setup
 			string TabID = Request.Header["X-TabID"];
 
 			List<CaseInsensitiveString> Addresses = new List<CaseInsensitiveString>();
+			List<CaseInsensitiveString> WebHooks = new List<CaseInsensitiveString>();
 
 			Response.StatusCode = 200;
 
 			try
 			{
-				foreach (string Part in Address.Split(';'))
+				foreach (string Part in NotificationAddresses.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries))
 				{
 					string s = Part.Trim();
 					if (string.IsNullOrEmpty(s))
@@ -172,11 +164,22 @@ namespace Waher.IoTGateway.Setup
 					Addresses.Add(Addr.Address);
 				}
 
+				foreach (string Part in NotificationUrls.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries))
+				{
+					string s = Part.Trim();
+					if (string.IsNullOrEmpty(s))
+						continue;
+
+					Uri Uri = new Uri(s);
+					WebHooks.Add(Uri.ToString());
+				}
+
 				this.addresses = Addresses.ToArray();
+				this.urls = WebHooks.ToArray();
 
 				await Database.Update(this);
 
-				if (this.addresses.Length > 0)
+				if (this.addresses.Length > 0 || this.urls.Length > 0)
 				{
 					await Gateway.SendNotification("Test\r\n===========\r\n\r\nThis message was generated to test the notification feature of **" +
 						MarkdownDocument.Encode(Gateway.ApplicationName) + "**.");
@@ -214,28 +217,54 @@ namespace Waher.IoTGateway.Setup
 		public const string GATEWAY_NOTIFICATION_JIDS = nameof(GATEWAY_NOTIFICATION_JIDS);
 
 		/// <summary>
+		/// Webhook URLs of operators of gateway.
+		/// </summary>
+		public const string GATEWAY_NOTIFICATION_URLS = nameof(GATEWAY_NOTIFICATION_URLS);
+
+		/// <summary>
 		/// Environment configuration by configuring values available in environment variables.
 		/// </summary>
 		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		public override Task<bool> EnvironmentConfiguration()
 		{
+			bool ValuesSet = false;
 			CaseInsensitiveString Value = Environment.GetEnvironmentVariable(GATEWAY_NOTIFICATION_JIDS);
-			if (CaseInsensitiveString.IsNullOrEmpty(Value))
-				return Task.FromResult(false);
 
-			CaseInsensitiveString[] Jids = Value.Split(',');
-			foreach (CaseInsensitiveString Jid in Jids)
+			if (!CaseInsensitiveString.IsNullOrEmpty(Value))
 			{
-				if (!XmppClient.BareJidRegEx.IsMatch(Jid))
+				CaseInsensitiveString[] Jids = Value.Split(',');
+				foreach (CaseInsensitiveString Jid in Jids)
 				{
-					this.LogEnvironmentError("Invalid JID.", GATEWAY_NOTIFICATION_JIDS, Jid);
-					return Task.FromResult(false);
+					if (!XmppClient.BareJidRegEx.IsMatch(Jid))
+					{
+						this.LogEnvironmentError("Invalid JID.", GATEWAY_NOTIFICATION_JIDS, Jid);
+						return Task.FromResult(false);
+					}
 				}
+
+				this.addresses = Jids;
+				ValuesSet = true;
 			}
 
-			this.addresses = Jids;
+			Value = Environment.GetEnvironmentVariable(GATEWAY_NOTIFICATION_URLS);
 
-			return Task.FromResult(true);
+			if (!CaseInsensitiveString.IsNullOrEmpty(Value))
+			{
+				CaseInsensitiveString[] Urls = Value.Split(',');
+				foreach (CaseInsensitiveString Url in Urls)
+				{
+					if (!Uri.TryCreate(Url, UriKind.Absolute, out _))
+					{
+						this.LogEnvironmentError("Invalid URL.", GATEWAY_NOTIFICATION_URLS, Url);
+						return Task.FromResult(false);
+					}
+				}
+
+				this.urls = Urls;
+				ValuesSet = true;
+			}
+
+			return Task.FromResult(ValuesSet);
 		}
 
 	}

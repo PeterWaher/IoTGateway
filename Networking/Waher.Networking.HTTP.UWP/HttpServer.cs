@@ -33,7 +33,7 @@ namespace Waher.Networking.HTTP
 	/// <summary>
 	/// Implements an HTTP server.
 	/// </summary>
-	public class HttpServer : CommunicationLayer, IDisposableAsync, IResourceMap
+	public class HttpServer : CommunicationLayer, IDisposableAsync, IResourceMap, ITlsCertificateEndpoint
 	{
 		/// <summary>
 		/// Default HTTP Port (80).

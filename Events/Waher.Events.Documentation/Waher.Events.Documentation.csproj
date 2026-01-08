@@ -112,6 +112,114 @@
     <Analyzer Include="..\..\packages\Microsoft.DependencyValidation.Analyzers.0.11.0\analyzers\dotnet\cs\Microsoft.DependencyValidation.Analyzers.resources.dll" />
     <Analyzer Include="..\..\packages\Microsoft.DependencyValidation.Analyzers.0.11.0\analyzers\dotnet\Microsoft.DependencyValidation.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\AccessDenied.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\AccountCreated.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\AccountDeleted.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\ContractDeleted.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\ContractRegistered.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\ContractSigned.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\eDalerCreated.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\eDalerIssueUri.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\eDalerReceived.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\eDalerTransmitted.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\Error.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\GatewayConfigUpdated.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\IdPetition.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\InternalPayment.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\LegalIdDeleted.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\LegalIdRegistered.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\LegalIdUpdated.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\Offline.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\PasswordUpdated.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\ProxyError.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\Register.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\RosterItemCreated.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\RosterItemUpdated.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\ScriptError.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\SparqlEval.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\TedsResponseError.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\TokenPayment.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\TransducerRequestError.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\TransducerResponseError.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\UnauthorizedAccess.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\Update.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\vCardUpdated.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\XmppCloseS2s.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\XmppIncomingS2SFailure.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\XmppOpenS2s.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TODO\XmppOutgoingS2SSuccess.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

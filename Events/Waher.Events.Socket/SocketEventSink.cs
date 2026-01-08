@@ -169,6 +169,7 @@ namespace Waher.Events.Socket
 		/// Queues XML-encoded information to be output.
 		/// </summary>
 		/// <param name="Xml">XML to queue to the pipe.</param>
+		/// <param name="ValidateXml">If XML should be validated before sending.</param>
 		private async Task Queue(string Xml, bool ValidateXml)
 		{
 			if (ValidateXml && !XML.IsValidXml(Xml))

@@ -300,12 +300,24 @@
 	<Assembly fileName="Waher.Events.Filter.dll" />
 	<Assembly fileName="Waher.Events.Filter.pdb" />
 	<Assembly fileName="Waher.Events.Filter.xml" />
+	<Assembly fileName="Waher.Events.MQTT.dll" />
+	<Assembly fileName="Waher.Events.MQTT.pdb" />
+	<Assembly fileName="Waher.Events.MQTT.xml" />
 	<Assembly fileName="Waher.Events.Persistence.dll" />
 	<Assembly fileName="Waher.Events.Persistence.pdb" />
 	<Assembly fileName="Waher.Events.Persistence.xml" />
+	<Assembly fileName="Waher.Events.Pipe.dll" />
+	<Assembly fileName="Waher.Events.Pipe.pdb" />
+	<Assembly fileName="Waher.Events.Pipe.xml" />
+	<Assembly fileName="Waher.Events.Socket.dll" />
+	<Assembly fileName="Waher.Events.Socket.pdb" />
+	<Assembly fileName="Waher.Events.Socket.xml" />
 	<Assembly fileName="Waher.Events.Statistics.dll" />
 	<Assembly fileName="Waher.Events.Statistics.pdb" />
 	<Assembly fileName="Waher.Events.Statistics.xml" />
+	<Assembly fileName="Waher.Events.WebHook.dll" />
+	<Assembly fileName="Waher.Events.WebHook.pdb" />
+	<Assembly fileName="Waher.Events.WebHook.xml" />
 	<Assembly fileName="Waher.Events.WindowsEventLog.dll" />
 	<Assembly fileName="Waher.Events.WindowsEventLog.pdb" />
 	<Assembly fileName="Waher.Events.WindowsEventLog.xml" />
@@ -1321,7 +1333,8 @@
 	<Variable name="GATEWAY_ROSTER_NAME_[jid]" default="" label="Optional human-readable name of a JID in the roster."/>
 	-->
 	<Variable name="GATEWAY_THEME_ID" default="WinterDawn" label="ID of theme to use."/>
-	<Variable name="GATEWAY_NOTIFICATION_JIDS" default="" label="IDs of operators of gateway."/>
+	<Variable name="GATEWAY_NOTIFICATION_JIDS" default="" label="JIDs (or e-mail addresses) of operators of gateway."/>
+	<Variable name="GATEWAY_NOTIFICATION_URLS" default="" label="Webhook URLs of operators of gateway."/>
 	<Variable name="DOTNET_EnableDiagnostics" default="0" label="If .NET diagnostics should be activated."/>
 	<Command executable="chmod">
 		<Argument>+x</Argument>

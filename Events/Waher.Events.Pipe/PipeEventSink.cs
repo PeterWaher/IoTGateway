@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Events.Files;
-using Waher.Networking;
 
 namespace Waher.Events.Pipe
 {

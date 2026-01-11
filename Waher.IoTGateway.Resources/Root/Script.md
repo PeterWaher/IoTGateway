@@ -2094,7 +2094,7 @@ The following functions are available in the `Waher.Script.Statistics` library.
 
 | Function | Description |
 |----------|-------------|
-| `ShellExecute(FileName,Arguments,WorkFolder[,TimeoutMs])` | Starts a process and executes a shell command-line instruction. A timeout (in milliseconds) can be provided. If no timeout is provided, a default timeout of 300000 ms is used (5 minutes). If zero timeout is provided, no timeout is provided (i.e. infinite timeout). |
+| `ShellExecute(FileName,Arguments,WorkFolder[,TimeoutMs,LogStandardOutput,KillOnTimeout])` | Starts a process and executes a shell command-line instruction. A timeout (in milliseconds) can be provided. If no timeout is provided, a default timeout of 300000 ms is used (5 minutes). If zero timeout is provided, no timeout is provided (i.e. infinite timeout). The process gets killed after the timeout, if that is not desired, set KillOnTimout to false. The output of the process is returned when the process is done, if you instead want to stream std out and error to events, set LogStandardOutput to true |
 
 #### Threading-related functions (Waher.Script.Threading)
 

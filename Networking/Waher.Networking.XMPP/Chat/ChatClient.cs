@@ -35,7 +35,9 @@ namespace Waher.Networking.XMPP.Chat
 		private readonly Dictionary<string, string> currentThreadIdPerContact = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 		private readonly HashSet<string> endedThreads = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 		private readonly Dictionary<string, bool> chatStateCapabilitiesByNodeVersion = new Dictionary<string, bool>(StringComparer.Ordinal);
+		private readonly Dictionary<string, bool> chatStateCapabilitiesByJid = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 		private readonly HashSet<string> pendingChatStateCapabilityRequests = new HashSet<string>(StringComparer.Ordinal);
+		private readonly HashSet<string> pendingChatStateDiscoveryRequests = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 		private readonly object synchObject = new object();
 		private bool enableChatStateNotifications = false;
 		private bool enableDeliveryReceipts = false;
@@ -712,6 +714,7 @@ namespace Waher.Networking.XMPP.Chat
 				this.currentThreadIdPerContact.Clear();
 				this.endedThreads.Clear();
 				this.pendingChatStateCapabilityRequests.Clear();
+				this.pendingChatStateDiscoveryRequests.Clear();
 			}
 		}
 
@@ -991,7 +994,11 @@ namespace Waher.Networking.XMPP.Chat
 			string Node = e.EntityCapabilityNode;
 			string Version = e.EntityCapabilityVersion;
 			if (string.IsNullOrEmpty(Node) || string.IsNullOrEmpty(Version))
+			{
+				string FullJid = string.IsNullOrEmpty(e.From) ? BareJid : e.From;
+				this.RequestExplicitChatStateDiscovery(FullJid, BareJid);
 				return;
+			}
 
 			string Key = Node + "#" + Version;
 			bool Supported;
@@ -1000,7 +1007,7 @@ namespace Waher.Networking.XMPP.Chat
 			{
 				if (this.chatStateCapabilitiesByNodeVersion.TryGetValue(Key, out Supported))
 				{
-					_ = this.ApplyCapabilityNegotiationAsync(BareJid, Supported);
+					this.FireAndForget(this.ApplyCapabilityNegotiationAsync(BareJid, Supported));
 					return;
 				}
 
@@ -1012,7 +1019,7 @@ namespace Waher.Networking.XMPP.Chat
 
 			try
 			{
-				_ = this.client.SendServiceDiscoveryRequest(e.From, DiscoNode, async (sender, args) =>
+                this.FireAndForget(this.client.SendServiceDiscoveryRequest(e.From, DiscoNode, async (sender, args) =>
 				{
 					bool Supports = false;
 
@@ -1026,13 +1033,61 @@ namespace Waher.Networking.XMPP.Chat
 					}
 
 					await this.ApplyCapabilityNegotiationAsync(BareJid, Supports);
-				}, null);
+				}, null));
 			}
 			catch (Exception Ex)
 			{
 				lock (this.synchObject)
 				{
 					this.pendingChatStateCapabilityRequests.Remove(Key);
+				}
+
+				this.Exception(Ex);
+			}
+		}
+
+		private void RequestExplicitChatStateDiscovery(string FullJid, string BareJid)
+		{
+			if (string.IsNullOrEmpty(FullJid) || string.IsNullOrEmpty(BareJid))
+				return;
+
+			bool Supported;
+
+			lock (this.synchObject)
+			{
+				if (this.chatStateCapabilitiesByJid.TryGetValue(FullJid, out Supported))
+				{
+                    this.FireAndForget(this.ApplyCapabilityNegotiationAsync(BareJid, Supported));
+					return;
+				}
+
+				if (!this.pendingChatStateDiscoveryRequests.Add(FullJid))
+					return;
+			}
+
+			try
+			{
+                this.FireAndForget(this.client.SendServiceDiscoveryRequest(FullJid, async (sender, args) =>
+				{
+					bool Supports = false;
+
+					if (args.Ok)
+						Supports = args.HasFeature(NamespaceChatStates);
+
+					lock (this.synchObject)
+					{
+						this.chatStateCapabilitiesByJid[FullJid] = Supports;
+						this.pendingChatStateDiscoveryRequests.Remove(FullJid);
+					}
+
+					await this.ApplyCapabilityNegotiationAsync(BareJid, Supports);
+				}, null));
+			}
+			catch (Exception Ex)
+			{
+				lock (this.synchObject)
+				{
+					this.pendingChatStateDiscoveryRequests.Remove(FullJid);
 				}
 
 				this.Exception(Ex);
@@ -1183,5 +1238,15 @@ namespace Waher.Networking.XMPP.Chat
 				return NewThread;
 			}
 		}
-	}
+
+        private void FireAndForget(Task Task)
+        {
+            _ = Task.ContinueWith(FaultedTask =>
+            {
+                if (FaultedTask.Exception != null)
+                    this.Exception(FaultedTask.Exception);
+            }, TaskContinuationOptions.OnlyOnFaulted);
+        }
+
+    }
 }

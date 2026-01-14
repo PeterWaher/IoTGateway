@@ -731,5 +731,69 @@ namespace Waher.Networking.XMPP.Test
 				return (int)countProperty.GetValue(value);
 			}
 		}
+
+		[TestMethod]
+		public async Task ChatStates_Test_13_ExplicitDiscoveryFallbackWhenCapsMissing()
+		{
+			await this.ConnectClients();
+
+			ChatClient chatClient1 = new ChatClient(this.client1);
+			ChatClient chatClient2 = new ChatClient(this.client2);
+
+			chatClient1.EnableChatStateNotifications = true;
+			chatClient2.EnableChatStateNotifications = true;
+
+			using ManualResetEvent supportedReceived = new ManualResetEvent(false);
+
+			ChatStateSupportDeterminedEventHandler supportHandler = (bareJid, supported) =>
+			{
+				if (supported && bareJid == this.client2.BareJID)
+					supportedReceived.Set();
+
+				return Task.CompletedTask;
+			};
+
+			InMemorySniffer sniffer = new InMemorySniffer(200, "ChatState-Disco-Fallback");
+			this.client1.Add(sniffer);
+
+			string originalNode = this.client2.EntityNode;
+			this.client2.EntityNode = string.Empty;
+
+			chatClient1.OnChatStateSupportDetermined += supportHandler;
+
+			try
+			{
+				await this.client2.SetPresence(Availability.Chat);
+
+				Assert.IsTrue(supportedReceived.WaitOne(10000), "Client 1 did not resolve chat state support via explicit discovery.");
+				Assert.IsTrue(chatClient1.IsChatStateSupported(this.client2.BareJID), "Client 1 should mark chat state support after explicit discovery.");
+
+				bool discoSent = false;
+				string toJid = "to='" + this.client2.FullJID + "'";
+
+				foreach (SnifferEvent evt in sniffer.ToArray())
+				{
+					if (evt is SnifferTxText tx &&
+						tx.Text.Contains("disco#info") &&
+						tx.Text.Contains(toJid))
+					{
+						discoSent = true;
+						break;
+					}
+				}
+
+				Assert.IsTrue(discoSent, "Explicit disco#info request to the full JID was not observed.");
+			}
+			finally
+			{
+				this.client2.EntityNode = originalNode;
+				this.client1.Remove(sniffer);
+				await sniffer.DisposeAsync();
+				chatClient1.OnChatStateSupportDetermined -= supportHandler;
+				chatClient1.Dispose();
+				chatClient2.Dispose();
+				await this.DisposeClients();
+			}
+		}
 	}
 }

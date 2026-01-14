@@ -41,6 +41,7 @@ namespace Waher.Content.Markdown.PlantUml
 		public string BaseFileName;
 		public string TxtFileName;
 		public string ImageFileName;
+		public bool ImageExists;
 		public string PlantUmlFolder;
 		public string Title;
 		public string AsyncId;
@@ -297,7 +298,8 @@ namespace Waher.Content.Markdown.PlantUml
 			StringBuilder Output = Renderer.Output;
 			bool GenerateIfNotExists = asyncHtmlOutput is null;
 			GraphInfo Info = await GetGraphInfo(Language, Rows, ResultType.Svg, GenerateIfNotExists);
-			if (GenerateIfNotExists || File.Exists(Info.ImageFileName))
+			
+			if (GenerateIfNotExists || Info.ImageExists)
 			{
 				this.GenerateHTML(Output, Info);
 				return true;
@@ -581,6 +583,14 @@ namespace Waher.Content.Markdown.PlantUml
 					break;
 			}
 
+			Result.ImageExists = File.Exists(Result.ImageFileName);
+			if (Result.ImageExists)
+			{
+				FileInfo Info = new FileInfo(Result.ImageFileName);
+				if (Info.Length == 0)
+					Result.ImageExists = false;
+			}
+
 			return Result;
 		}
 
@@ -593,7 +603,7 @@ namespace Waher.Content.Markdown.PlantUml
 		{
 			GraphInfo Result = await GetGraphInfo(Language, GraphDefinition, Type);
 
-			if (GenerateIfNotExists && !File.Exists(Result.ImageFileName))
+			if (GenerateIfNotExists && !Result.ImageExists)
 				await ExecutePlantUml(Type, Result);
 
 			return Result;

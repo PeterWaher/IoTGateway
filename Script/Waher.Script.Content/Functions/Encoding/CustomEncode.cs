@@ -75,7 +75,6 @@ namespace Waher.Script.Content.Functions.Encoding
 					{
 						System.Text.Encoding Encondig = System.Text.Encoding.GetEncoding(Charset);
 						Bin = Encondig.GetBytes(s);
-
 					}
 				}
 				else

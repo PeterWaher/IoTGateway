@@ -344,6 +344,7 @@ namespace Waher.Networking.MQTT
 				}
 			}
 
+			// TODO: Handle response from SendAsync
 			await this.client.SendAsync(ConstantBuffer, Packet, Callback, State);
 			this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 		}

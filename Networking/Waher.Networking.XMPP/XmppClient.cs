@@ -2288,7 +2288,20 @@ namespace Waher.Networking.XMPP
 		{
 			try
 			{
-				EventHandlerAsync<MessageFormEventArgs> FormHandler = null;
+                EventHandlerAsync<MessageEventArgs> Received = this.OnMessageReceived;
+                if (!(Received is null))
+                {
+                    try
+                    {
+                        await Received.Raise(this, e);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Exception(ex);
+                    }
+                }
+
+                EventHandlerAsync<MessageFormEventArgs> FormHandler = null;
 				EventHandlerAsync<MessageEventArgs> MessageHandler = null;
 				DataForm Form = null;
 				string FormType = null;
@@ -2409,8 +2422,56 @@ namespace Waher.Networking.XMPP
 				}
 			}
 		}
+        internal async Task RaiseMessageEventAsync(MessageEventArgs e)
+        {
+            if (e is null)
+                return;
 
-		private Task MessageFormSubmitted(object _, DataForm Form)
+            EventHandlerAsync<MessageEventArgs> messageHandler = null;
+
+            switch (e.Type)
+            {
+                case MessageType.Chat:
+                    this.Information("OnChatMessage()");
+                    messageHandler = this.OnChatMessage;
+                    break;
+
+                case MessageType.Error:
+                    this.Information("OnErrorMessage()");
+                    messageHandler = this.OnErrorMessage;
+                    break;
+
+                case MessageType.GroupChat:
+                    this.Information("OnGroupChatMessage()");
+                    messageHandler = this.OnGroupChatMessage;
+                    break;
+
+                case MessageType.Headline:
+                    this.Information("OnHeadlineMessage()");
+                    messageHandler = this.OnHeadlineMessage;
+                    break;
+
+                case MessageType.Normal:
+                default:
+                    this.Information("OnNormalMessage()");
+                    messageHandler = this.OnNormalMessage;
+                    break;
+            }
+
+            if (!(messageHandler is null))
+            {
+                try
+                {
+                    await messageHandler(this, e);
+                }
+                catch (Exception ex)
+                {
+                    this.Exception(ex);
+                }
+            }
+        }
+
+        private Task MessageFormSubmitted(object _, DataForm Form)
 		{
 			MessageEventArgs e = (MessageEventArgs)Form.State;
 			this.SubmitForm(Form, e.Type, e.ThreadID, e.ParentThreadID);
@@ -3179,10 +3240,15 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public event EventHandlerAsync<PresenceEventArgs> OnPresenceUnsubscribed = null;
 
-		/// <summary>
-		/// Raised when a chat message has been received, that is not handled by a specific message handler.
-		/// </summary>
-		public event EventHandlerAsync<MessageEventArgs> OnChatMessage = null;
+        /// <summary>
+        /// Raised when a message stanza has been received, before specific handlers are resolved.
+        /// </summary>
+        public event EventHandlerAsync<MessageEventArgs> OnMessageReceived = null;
+
+        /// <summary>
+        /// Raised when a chat message has been received, that is not handled by a specific message handler.
+        /// </summary>
+        public event EventHandlerAsync<MessageEventArgs> OnChatMessage = null;
 
 		/// <summary>
 		/// Raised when an error message has been received, that is not handled by a specific message handler.

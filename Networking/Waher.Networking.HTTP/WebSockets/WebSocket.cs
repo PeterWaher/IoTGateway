@@ -501,28 +501,31 @@ namespace Waher.Networking.HTTP.WebSockets
 				{
 					try
 					{
+						bool Sent;
+
 						if (this.http2)
-						{
-							if (!await this.http2Stream.TryWriteAllData(ConstantBuffer, Frame, 0, Frame.Length, Last, null))
-							{
-								if (!(Callback is null))
-									await Callback.Raise(this, new DeliveryEventArgs(State, false));
-
-								await this.ClearQueue();
-
-								try
-								{
-									await this.DisposeAsync();
-								}
-								catch (Exception ex2)
-								{
-									Log.Exception(ex2);
-								}
-								return;
-							}
-						}
+							Sent = await this.http2Stream.TryWriteAllData(ConstantBuffer, Frame, 0, Frame.Length, Last, null);
 						else
-							await this.httpResponse.WriteRawAsync(ConstantBuffer, Frame);
+							Sent = await this.httpResponse.WriteRawAsync(ConstantBuffer, Frame);
+
+						if (!Sent)
+						{
+							if (!(Callback is null))
+								await Callback.Raise(this, new DeliveryEventArgs(State, false));
+
+							await this.ClearQueue();
+
+							try
+							{
+								await this.DisposeAsync();
+							}
+							catch (Exception ex2)
+							{
+								Log.Exception(ex2);
+							}
+						
+							return;
+						}
 
 						if (!(Callback is null))
 							await Callback.Raise(this, new DeliveryEventArgs(State, true));

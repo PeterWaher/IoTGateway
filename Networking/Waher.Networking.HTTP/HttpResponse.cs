@@ -918,10 +918,12 @@ namespace Waher.Networking.HTTP
 						string Header = Output.ToString();
 						byte[] HeaderBin = InternetContent.ISO_8859_1.GetBytes(Header);
 
-						if (this.responseStream is null || this.clientConnection.Disposed)
+						if (this.clientConnection.Disposed)
 							return false;
 
-						this.responseStream?.SendAsync(true, HeaderBin, 0, HeaderBin.Length);
+						if (!await (this.responseStream?.SendAsync(true, HeaderBin, 0, HeaderBin.Length) ?? Task.FromResult(false)))
+							return false;
+
 						this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
 
 						if (this.clientConnection.HasSniffers)
@@ -1371,20 +1373,20 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		internal async Task WriteRawAsync(bool ConstantBuffer, byte[] Data)
+		internal async Task<bool> WriteRawAsync(bool ConstantBuffer, byte[] Data)
 		{
-			if (!(this.responseStream is null))
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+
+			if (!await (this.responseStream?.SendAsync(ConstantBuffer, Data, 0, Data.Length, (Sender, e) =>
 			{
-				TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-
-				await this.responseStream.SendAsync(ConstantBuffer, Data, 0, Data.Length, (Sender, e) =>
-				{
-					Result.TrySetResult(true);
-					return Task.CompletedTask;
-				}, null);
-
-				await Result.Task;
+				Result.TrySetResult(true);
+				return Task.CompletedTask;
+			}, null) ?? Task.FromResult(false)))
+			{
+				Result.TrySetResult(false);
 			}
+
+			return await Result.Task;
 		}
 
 		/// <summary>

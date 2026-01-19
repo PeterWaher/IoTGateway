@@ -1391,7 +1391,7 @@ namespace Waher.Persistence
 		/// <param name="Reason">Reason for flagging collection.</param>
 		public static Exception FlagForRepair(string Collection, string Reason)
 		{
-			InconsistencyException Result = new InconsistencyException(Collection, Reason);
+			InconsistencyException Result = new InconsistencyException(Collection, Reason + " (" + Collection + ")");
 			string StackTrace = Log.CleanStackTrace(Environment.StackTrace);
 			string Key = Reason + " | " + StackTrace;
 

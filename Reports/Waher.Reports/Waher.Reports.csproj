@@ -10,7 +10,7 @@
 		<Company>Waher Data AB</Company>
 		<Product>Waher.IoTGateway</Product>
 		<Description>Class library that defines a harmonized data source for reports and report folders.</Description>
-		<Copyright>Copyright © Waher Data AB 2025. All rights reserved.</Copyright>
+		<Copyright>Copyright © Waher Data AB 2025-2026. All rights reserved.</Copyright>
 		<PackageLicenseUrl />
 		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Reports/Waher.Reports</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>

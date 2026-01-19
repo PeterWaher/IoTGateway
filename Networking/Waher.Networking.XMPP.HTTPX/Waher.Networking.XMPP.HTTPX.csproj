@@ -6,7 +6,7 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Implements the HTTP over XMPP extension XEP-0332.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2025. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2026. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -17,9 +17,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication server http xmpp xep-0332</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>4.2.7</AssemblyVersion>
-    <FileVersion>4.2.7</FileVersion>
-    <Version>4.2.7</Version>
+    <AssemblyVersion>4.2.8</AssemblyVersion>
+    <FileVersion>4.2.8</FileVersion>
+    <Version>4.2.8</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.XMPP.HTTPX\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

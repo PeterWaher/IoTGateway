@@ -9,7 +9,7 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Copyright>Copyright © Waher Data AB 2017-2025. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2017-2026. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.LWM2M</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
@@ -17,9 +17,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication coap core dtls lwm2m</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>3.1.0</AssemblyVersion>
-    <FileVersion>3.1.0</FileVersion>
-    <Version>3.1.0</Version>
+    <AssemblyVersion>3.1.1</AssemblyVersion>
+    <FileVersion>3.1.1</FileVersion>
+    <Version>3.1.1</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.LWM2M\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

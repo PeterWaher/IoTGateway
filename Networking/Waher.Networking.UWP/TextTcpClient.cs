@@ -186,7 +186,17 @@ namespace Waher.Networking
 			byte[] Data = this.encoding.GetBytes(Text);
 			this.lastTransmittedBytes = Data.Length;
 			bool Result = await base.SendAsync(true, Data, Callback, State);
-			await this.TextDataSent(Text);
+
+			if (Result)
+				await this.TextDataSent(Text);
+			else if (this.HasSniffers)
+			{
+				if (this.sniffText)
+					this.Error("Unable to send: " + Text);
+				else
+					this.Error("Unable to send text.");
+			}
+
 			return Result;
 		}
 

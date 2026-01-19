@@ -224,10 +224,11 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			Chunk[Len] = (byte)'\r';
 			Chunk[Len + 1] = (byte)'\n';
 
-			await this.output.SendAsync(true, Chunk, 0, Len + 2);
+			if (!await this.output.SendAsync(true, Chunk, 0, Len + 2))
+				return false;
 
-			if (Flush)
-				await this.output.FlushAsync();
+			if (Flush && !await this.output.FlushAsync())
+				return false;
 
 			if (!(this.clientConnection is null))
 			{
@@ -277,7 +278,9 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			}
 
 			byte[] Chunk = new byte[5] { (byte)'0', 13, 10, 13, 10 };
-			await this.output.SendAsync(true, Chunk, 0, 5);
+			if (!await this.output.SendAsync(true, Chunk, 0, 5))
+				return false;
+
 			if (!await this.output.FlushAsync())
 				return false;
 

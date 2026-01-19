@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
 [assembly: AssemblyProduct("Waher.IoTGateway")]
-[assembly: AssemblyCopyright("Copyright © Waher Data AB 2016-2025. All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © Waher Data AB 2016-2026. All rights reserved.")]
 [assembly: AssemblyTrademark("IoT Gateway")]
 [assembly: AssemblyCulture("")]
 
@@ -23,5 +23,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.1.2")]
+[assembly: AssemblyVersion("2.1.3")]
 [assembly: ComVisible(false)]

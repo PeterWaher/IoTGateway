@@ -9,7 +9,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Class library that helps applications maintain a set of persistent settings. Server-side runtime settings, as well as host-specific and user-specific settings are supported.</Description>
-    <Copyright>Copyright © Waher Data AB 2017-2025. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2017-2026. All rights reserved.</Copyright>
     <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Runtime/Waher.Runtime.Settings</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>

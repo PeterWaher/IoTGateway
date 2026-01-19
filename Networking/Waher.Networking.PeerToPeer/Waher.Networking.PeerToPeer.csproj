@@ -5,7 +5,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Class library for peer-to-peer and multi-player communication.</Description>
-    <Copyright>Copyright © Waher Data AB 2015-2025. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2015-2026. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.PeerToPeer</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
@@ -13,9 +13,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication peer-to-peer p2p multi-player</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>3.1.1</AssemblyVersion>
-    <FileVersion>3.1.1</FileVersion>
-		<Version>3.1.1</Version>
+    <AssemblyVersion>3.1.2</AssemblyVersion>
+    <FileVersion>3.1.2</FileVersion>
+		<Version>3.1.2</Version>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>

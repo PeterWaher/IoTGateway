@@ -9,16 +9,16 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Library that provides basic abstraction for Internet Content Type, and basic encodings and decodings. This includes handling and parsing of common data types, text, JSON, CSV, binary data and multi-part content, forms, etc. Encoding can be easily extended in external libraries.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2025. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2026. All rights reserved.</Copyright>
     <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>internet content data type encoding decoding extensible</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>3.4.3</AssemblyVersion>
-    <FileVersion>3.4.3</FileVersion>
-    <Version>3.4.3</Version>
+    <AssemblyVersion>3.4.4</AssemblyVersion>
+    <FileVersion>3.4.4</FileVersion>
+    <Version>3.4.4</Version>
     <PackageIconUrl />
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content\</UpgradeBackupLocation>

@@ -9,7 +9,7 @@
 </table>
 This is an example of <b>bold text</b>\.
 
-© Waher Data AB 2016\-2025\. All rights reserved\.
+© Waher Data AB 2016\-2026\. All rights reserved\.
 
 AT\&T
 

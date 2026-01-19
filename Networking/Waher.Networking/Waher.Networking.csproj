@@ -9,16 +9,16 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Library that provides the basic architecture and tools for all networking libraries. This includes sniffers, simplified communication libraries for text and/or binary protocols, etc., as well as classes for building client and server applications.</Description>
-    <Copyright>Copyright © Waher Data AB 2015-2025. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2015-2026. All rights reserved.</Copyright>
     <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>4.6.0</AssemblyVersion>
-    <FileVersion>4.6.0</FileVersion>
-    <Version>4.6.0</Version>
+    <AssemblyVersion>4.6.1</AssemblyVersion>
+    <FileVersion>4.6.1</FileVersion>
+    <Version>4.6.1</Version>
     <PackageIconUrl />
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking\</UpgradeBackupLocation>

@@ -599,10 +599,14 @@ namespace Waher.Content.Markdown.GraphViz
 
 			if (File.Exists(Result.FileName))
 			{
-				if (!File.Exists(Result.MapFileName))
-					Result.MapFileName = null;
+				FileInfo Info = new FileInfo(Result.FileName);
+				if (Info.Length > 0)
+				{
+					if (!File.Exists(Result.MapFileName))
+						Result.MapFileName = null;
 
-				return Result;
+					return Result;
+				}
 			}
 
 			if (!GenerateIfNotExists)
@@ -726,7 +730,7 @@ namespace Waher.Content.Markdown.GraphViz
 							File.Delete(this.info.FileName);
 
 						if (!string.IsNullOrEmpty(this.info.MapFileName) &&
-						File.Exists(this.info.MapFileName))
+							File.Exists(this.info.MapFileName))
 						{
 							File.Delete(this.info.MapFileName);
 						}

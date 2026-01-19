@@ -1225,8 +1225,8 @@ namespace Waher.Networking
 
 					if (!this.connected)
 					{
-						Task.TrySetException(new InvalidOperationException("Not connected."));
-						return;
+						Task.TrySetResult(false);
+						break;
 					}
 
 					if (this.sending)

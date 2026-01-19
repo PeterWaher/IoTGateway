@@ -9,7 +9,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Defines internet content types, encoding and decoding for images. Contains extraction of EXIF meta-data from images. Can parse SVG paths, for generating polygons and images.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2025. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2026. All rights reserved.</Copyright>
     <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Images</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>

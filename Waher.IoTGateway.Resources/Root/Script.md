@@ -160,6 +160,7 @@ There are also a set of predefined variables:
 | `Exception`            | Access to current exception object, in a `CATCH` statement. |
 | `Now`                  | Current date and time, local time coordinates.              |
 | `NowUtc`               | Current date and time, UTC coordinates.                     |
+| `OsTime`               | Time since the operating system was started.                |
 | `Time`                 | Current time, local time coordinates.                       |
 | `TimeUtc`              | Current time, UTC coordinates.                              |
 | `Today`                | Current date, local time coordinates.                       |

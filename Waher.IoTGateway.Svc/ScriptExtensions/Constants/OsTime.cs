@@ -1,26 +1,27 @@
-﻿using Waher.Script;
+﻿using System;
+using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
-using Waher.Script.Objects.VectorSpaces;
+using Waher.Script.Objects;
 
 namespace Waher.IoTGateway.Svc.ScriptExtensions.Constants
 {
 	/// <summary>
-	/// Returns an array of performance counter category names.
+	/// Time since the operating system was started.
 	/// </summary>
-	public class PerformanceCategoryNames : IConstant
+	public class OsTime : IConstant
 	{
 		/// <summary>
-		/// Returns an array of performance counter category names.
+		/// Time since the operating system was started.
 		/// </summary>
-		public PerformanceCategoryNames()
+		public OsTime()
 		{
 		}
 
 		/// <summary>
 		/// Name of the constant
 		/// </summary>
-		public string ConstantName => nameof(PerformanceCategoryNames);
+		public string ConstantName => nameof(OsTime);
 
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the constant, null is returned.
@@ -33,7 +34,7 @@ namespace Waher.IoTGateway.Svc.ScriptExtensions.Constants
 		/// <param name="Variables">Current set of variables.</param>
 		public IElement GetValueElement(Variables Variables)
 		{
-			return new ObjectVector(PerformanceCounters.CategoryNames);
+			return new ObjectValue(TimeSpan.FromMilliseconds(Environment.TickCount64));
 		}
 	}
 }

@@ -9,13 +9,14 @@ using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL.Groups
 {
-    /// <summary>
-    /// Enumerator that groups items into groups, and returns aggregated elements.
-    /// </summary>
-    public class GroupEnumerator : IResultSetEnumerator
+	/// <summary>
+	/// Enumerator that groups items into groups, and returns aggregated elements.
+	/// </summary>
+	public class GroupEnumerator : IResultSetEnumerator
 	{
 		private readonly ScriptNode[] groupBy;
 		private readonly ScriptNode[] groupNames;
+		private readonly bool[] groupByAsynchronous;
 		private readonly Variables variables;
 		private readonly IResultSetEnumerator e;
 		private bool processLast = false;
@@ -31,7 +32,7 @@ namespace Waher.Script.Persistence.SQL.Groups
 		/// <param name="GroupNames">Names given to grouped fields</param>
 		/// <param name="AdditionalFields">Optional calculated fields.</param>
 		/// <param name="Having">Optional having clause</param>
-		public GroupEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables, 
+		public GroupEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables,
 			ScriptNode[] GroupBy, ScriptNode[] GroupNames,
 			ChunkedList<KeyValuePair<string, ScriptNode>> AdditionalFields,
 			ref ScriptNode Having)
@@ -40,6 +41,13 @@ namespace Waher.Script.Persistence.SQL.Groups
 			this.variables = Variables;
 			this.groupBy = GroupBy;
 			this.groupNames = GroupNames;
+
+			int i, c = GroupBy.Length;
+
+			this.groupByAsynchronous = new bool[c];
+
+			for (i = 0; i < c; i++)
+				this.groupByAsynchronous[i] = GroupBy[i].IsAsynchronous;
 		}
 
 		/// <summary>
@@ -84,7 +92,11 @@ namespace Waher.Script.Persistence.SQL.Groups
 
 					for (i = 0; i < c; i++)
 					{
-						E = this.groupBy[i].Evaluate(this.objectVariables);
+						if (this.groupByAsynchronous[i])
+							E = await this.groupBy[i].EvaluateAsync(this.objectVariables);
+						else
+							E = this.groupBy[i].Evaluate(this.objectVariables);
+
 						Last[i] = E.AssociatedObjectValue;
 					}
 				}
@@ -92,7 +104,10 @@ namespace Waher.Script.Persistence.SQL.Groups
 				{
 					for (i = 0; i < c; i++)
 					{
-						E = this.groupBy[i].Evaluate(this.objectVariables);
+						if (this.groupByAsynchronous[i])
+							E = await this.groupBy[i].EvaluateAsync(this.objectVariables);
+						else
+							E = this.groupBy[i].Evaluate(this.objectVariables);
 
 						o1 = Last[i];
 						o2 = E.AssociatedObjectValue;

@@ -87,7 +87,7 @@ namespace Waher.Script.Persistence.SQL
 					this.properties.Object = e.Current;
 
 				foreach (Assignment SetOperation in this.setOperations)
-					SetOperation.Evaluate(this.properties);
+					await SetOperation.EvaluateAsync(this.properties);
 
 				ToUpdate.Add(e.Current);
 				Count++;

@@ -67,12 +67,22 @@ namespace Waher.Script.Persistence.SQL.Enumerators
             if (this.current is GenericObject GenObj)
             {
                 foreach (KeyValuePair<string, ScriptNode> P in this.additionalFields)
-                    GenObj[P.Key] = P.Value.Evaluate(this.objectVariables);
+                {
+                    if (P.Value.IsAsynchronous)
+                        GenObj[P.Key] = await P.Value.EvaluateAsync(this.objectVariables);
+					else
+						GenObj[P.Key] = P.Value.Evaluate(this.objectVariables);
+                }
             }
             else if (this.current is GroupObject GroupObj)
             {
                 foreach (KeyValuePair<string, ScriptNode> P in this.additionalFields)
-                    GroupObj[P.Key] = P.Value.Evaluate(this.objectVariables);
+                {
+                    if (P.Value.IsAsynchronous)
+                        GroupObj[P.Key] = await P.Value.EvaluateAsync(this.objectVariables);
+					else
+						GroupObj[P.Key] = P.Value.Evaluate(this.objectVariables);
+                }
             }
             else
             {

@@ -10,8 +10,8 @@ namespace Waher.Script.Functions.Vectors
     /// <summary>
     /// Xor(v)
     /// </summary>
-    public class Xor : FunctionOneVectorVariable
-    {
+    public class Xor : FunctionOneVectorVariable, IIterativeEvaluation
+	{
         /// <summary>
         /// Xor(v)
         /// </summary>
@@ -138,5 +138,20 @@ namespace Waher.Script.Functions.Vectors
             return Result;
         }
 
-    }
+		#region IIterativeEvaluation
+
+		/// <summary>
+		/// If the node can be evaluated iteratively.
+		/// </summary>
+		public bool CanEvaluateIteratively => true;
+
+		/// <summary>
+		/// Creates an iterative evaluator for the node.
+		/// </summary>
+		/// <returns>Iterative evaluator reference.</returns>
+		public IIterativeEvaluator CreateEvaluator() => new XorEvaluator(this);
+
+		#endregion
+
+	}
 }

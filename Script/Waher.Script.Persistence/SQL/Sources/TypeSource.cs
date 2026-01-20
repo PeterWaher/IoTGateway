@@ -475,7 +475,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 				try
 				{
-					IElement Result = this.node.Evaluate(this.properties);
+					IElement Result = this.node.Evaluate(this.properties);  // TODO: Async
 					return Result.AssociatedObjectValue is bool bv && bv;
 				}
 				catch (Exception)

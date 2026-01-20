@@ -51,8 +51,9 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Select(ScriptNode[] Columns, ScriptNode[] ColumnNames, SourceDefinition Source, ScriptNode Where, ScriptNode[] GroupBy,
-			ScriptNode[] GroupByNames, ScriptNode Having, KeyValuePair<ScriptNode, bool>[] OrderBy, ScriptNode Top, ScriptNode Offset,
+		public Select(ScriptNode[] Columns, ScriptNode[] ColumnNames, SourceDefinition Source, 
+			ScriptNode Where, ScriptNode[] GroupBy, ScriptNode[] GroupByNames, ScriptNode Having, 
+			KeyValuePair<ScriptNode, bool>[] OrderBy, ScriptNode Top, ScriptNode Offset,
 			bool Distinct, bool Generic, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{

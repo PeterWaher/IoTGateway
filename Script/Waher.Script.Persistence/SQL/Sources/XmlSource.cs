@@ -80,7 +80,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			else
 			{
 				ObjectProperties P = new ObjectProperties(this.xmlDocument ?? this.xmlNode, Variables);
-				Obj = WhereXPath.Evaluate(P);
+				Obj = WhereXPath.Evaluate(P);   // TODO: Async
 			}
 
 			if (!(Obj is IVector Vector))

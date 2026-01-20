@@ -34,7 +34,7 @@ namespace Waher.Script.Persistence.SPARQL.Functions.Order
         /// <returns>Result.</returns>
         public override IElement Evaluate(Variables Variables)
         {
-            return Argument.Evaluate(Variables);
+            return this.Argument.Evaluate(Variables);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Waher.Script.Persistence.SPARQL.Functions.Order
         /// <returns>Result.</returns>
         public override Task<IElement> EvaluateAsync(Variables Variables)
         {
-            return Argument.EvaluateAsync(Variables);
+            return this.Argument.EvaluateAsync(Variables);
         }
     }
 }

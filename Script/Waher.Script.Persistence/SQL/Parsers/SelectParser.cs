@@ -333,9 +333,9 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				Offset = Parser.ParseNoWhiteSpace();
 			}
 
-			Result = new Select(Columns?.ToArray(), ColumnNames?.ToArray(), Source, Where, GroupBy?.ToArray(),
-				GroupByNames?.ToArray(), Having, OrderBy?.ToArray(), Top, Offset, Distinct, Generic,
-				Parser.Start, Parser.Length, Parser.Expression);
+			Result = new Select(Columns?.ToArray(), ColumnNames?.ToArray(), Source, Where,
+				GroupBy?.ToArray(), GroupByNames?.ToArray(), Having, OrderBy?.ToArray(), 
+				Top, Offset, Distinct, Generic, Parser.Start, Parser.Length, Parser.Expression);
 
 			return true;
 		}

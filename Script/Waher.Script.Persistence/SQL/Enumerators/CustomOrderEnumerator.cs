@@ -97,10 +97,10 @@ namespace Waher.Script.Persistence.SQL.Enumerators
                     for (i = 0; i < c; i++)
                     {
                         Node = this.order[i].Key;
-                        Ex = Node.Evaluate(Vx);
-                        Ey = Node.Evaluate(Vy);
+                        Ex = Node.Evaluate(Vx);     // TODO: Async
+						Ey = Node.Evaluate(Vy);     // TODO: Async
 
-                        if (!(Ex.AssociatedSet is IOrderedSet S))
+						if (!(Ex.AssociatedSet is IOrderedSet S))
                             throw new ScriptRuntimeException("Result not member of an ordered set.", Node);
 
                         j = S.Compare(Ex, Ey);

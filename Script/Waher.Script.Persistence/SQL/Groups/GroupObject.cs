@@ -51,7 +51,7 @@ namespace Waher.Script.Persistence.SQL.Groups
 					Name = Ref.VariableName;
 				else
 				{
-					E = Node.Evaluate(Variables);
+					E = Node.Evaluate(Variables);	// TODO: Async
 					Name = E.AssociatedObjectValue?.ToString();
 				}
 

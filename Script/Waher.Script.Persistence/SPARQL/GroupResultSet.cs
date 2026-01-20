@@ -146,7 +146,7 @@ namespace Waher.Script.Persistence.SPARQL
 		{
 			try
 			{
-				return Expression.Evaluate(Variables)?.AssociatedObjectValue;
+				return Expression.Evaluate(Variables)?.AssociatedObjectValue;   // TODO: Async
 			}
 			catch (ScriptReturnValueException ex)
 			{

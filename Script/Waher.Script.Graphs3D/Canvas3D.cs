@@ -2871,7 +2871,7 @@ namespace Waher.Script.Graphs3D
 			{
 				Paint = new SKPaint()
 				{
-					Typeface = SKTypeface.FromFamilyName(FontFamily, Weight, Width, Slant),
+					Typeface = SKTypeface.FromFamilyName(FontFamily, Weight, Width, Slant) ?? SKTypeface.Default,
 					TextSize = TextSize
 				};
 
@@ -3132,7 +3132,7 @@ namespace Waher.Script.Graphs3D
 			{
 				Paint = new SKPaint()
 				{
-					Typeface = SKTypeface.FromFamilyName(FontFamily, Weight, Width, Slant),
+					Typeface = SKTypeface.FromFamilyName(FontFamily, Weight, Width, Slant) ?? SKTypeface.Default,
 					TextSize = TextSize
 				};
 

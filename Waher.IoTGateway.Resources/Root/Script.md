@@ -1174,7 +1174,6 @@ The following functions operate on vectors:
 | `Sum(v)`                                               | Sum of elements in the vector `v`. | `Sum([1,2,3,4,5])` |
 | `Var(v)`                                               | Alias for `Variance(v)` | `Var([1,2,3,4,5])` |
 | `Variance(v)`                                          | Variance of elements in the vector `v`. | `Variance([1,2,3,4,5])` |
-| `Xnor(v)`                                              | Logical or binary XNOR of all elements in vector | `Xnor([1,2,3,4,5])`, `Xnor([true,false,true])` |
 | `Xor(v)`                                               | Logical or binary XOR of all elements in vector | `Xor([1,2,3,4,5])`, `Xor([true,false,true])` |
 | `Zeroes(N)`                                            | Creates an N-dimensional vector with all elements set to 0. | `Zeroes(5)` |
 

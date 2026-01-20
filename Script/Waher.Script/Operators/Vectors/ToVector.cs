@@ -2,6 +2,7 @@
 using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
+using Waher.Script.Functions.Vectors;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -10,7 +11,7 @@ namespace Waher.Script.Operators.Vectors
 	/// <summary>
 	/// To-Vector operator.
 	/// </summary>
-	public class ToVector : NullCheckUnaryOperator
+	public class ToVector : NullCheckUnaryOperator, IIterativeEvaluation
 	{
 		/// <summary>
 		/// To-Vector operator.
@@ -161,5 +162,20 @@ namespace Waher.Script.Operators.Vectors
 			public ChunkedList<IElement> New;
 			public IElement Prev;
 		}
+
+		#region IIterativeEvaluation
+
+		/// <summary>
+		/// If the node can be evaluated iteratively.
+		/// </summary>
+		public bool CanEvaluateIteratively => true;
+
+		/// <summary>
+		/// Creates an iterative evaluator for the node.
+		/// </summary>
+		/// <returns>Iterative evaluator reference.</returns>
+		public IIterativeEvaluator CreateEvaluator() => new ToVectorEvaluator(this);
+
+		#endregion
 	}
 }

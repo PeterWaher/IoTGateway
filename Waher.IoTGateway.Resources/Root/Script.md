@@ -1156,8 +1156,6 @@ The following functions operate on vectors:
 | `Median(v)`                                            | The median element in the vector `v`. | `Median([1,2,3,4,5])` |
 | `Mid(v,Pos,Len)`                                       | Returns a vector containing elements from `v`, starting a element `Pos` and continuing `Len` elements. The `Pos` index is zero-based. If the requested vector goes beyond the scope of `v`, the resulting vector gets truncated accordingly. | `Mid(v,5,2)` |
 | `Min(v)`                                               | The smallest element in the vector `v`. | `Min([1,2,3,4,5])` |
-| `Nand(v)`                                              | Logical or binary NAND of all elements in vector | `Nand([1,2,3,4,5])`, `Nand([true,false,true])` |
-| `Nor(v)`                                               | Logical or binary NOR of all elements in vector | `Nor([1,2,3,4,5])`, `Nor([true,false,true])` |
 | `Ones(N)`                                              | Creates an N-dimensional vector with all elements set to 1. | `Ones(5)` |
 | `Or(v)`                                                | Logical or binary OR of all elements in vector | `Or([1,2,3,4,5])`, `Or([true,false,true])` |
 | `PopFirst(v)`                                          | Returns the first element in a vector `v`, and if `v` is a variable reference, the variable will contain a vector where the first element has been removed. | `PopFirst(v)` |

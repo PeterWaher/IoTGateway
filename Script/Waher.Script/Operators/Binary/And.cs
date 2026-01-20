@@ -32,46 +32,8 @@ namespace Waher.Script.Operators.Binary
 		/// <returns>Result</returns>
 		public override IElement Evaluate(double Left, double Right)
 		{
-			ulong L, R;
-			bool LSigned;
-			bool RSigned;
-
-			if (Left != Math.Floor(Left) || Right != Math.Floor(Right))
-				throw new ScriptRuntimeException("Operands must be integer values.", this);
-
-			if (Left < 0)
-			{
-				LSigned = true;
-				if (Left < long.MinValue)
-					throw new ScriptRuntimeException("Operand out of bounds.", this);
-
-				L = (ulong)((long)Left);
-			}
-			else
-			{
-				LSigned = false;
-				if (Left > ulong.MaxValue)
-					throw new ScriptRuntimeException("Operand out of bounds.", this);
-
-				L = (ulong)Left;
-			}
-
-			if (Right < 0)
-			{
-				RSigned = true;
-				if (Right < long.MinValue)
-					throw new ScriptRuntimeException("Operand out of bounds.", this);
-
-				R = (ulong)((long)Right);
-			}
-			else
-			{
-				RSigned = false;
-				if (Right > ulong.MaxValue)
-					throw new ScriptRuntimeException("Operand out of bounds.", this);
-
-				R = (ulong)Right;
-			}
+			ulong L = ToUInt64(Left, out bool LSigned, this);
+			ulong R = ToUInt64(Right, out bool RSigned, this);
 
 			L &= R;
 
@@ -81,5 +43,31 @@ namespace Waher.Script.Operators.Binary
 				return new DoubleNumber(L);
 		}
 
+		internal static ulong ToUInt64(double Operand, out bool Signed, ScriptNode Node)
+		{
+			if (Operand != Math.Floor(Operand))
+				throw new ScriptRuntimeException("Operands must be integer values.", Node);
+
+			ulong Result;
+
+			if (Operand < 0)
+			{
+				Signed = true;
+				if (Operand < long.MinValue)
+					throw new ScriptRuntimeException("Operand out of bounds.", Node);
+
+				Result = (ulong)(long)Operand;
+			}
+			else
+			{
+				Signed = false;
+				if (Operand > ulong.MaxValue)
+					throw new ScriptRuntimeException("Operand out of bounds.", Node);
+
+				Result = (ulong)Operand;
+			}
+
+			return Result;
+		}
 	}
 }

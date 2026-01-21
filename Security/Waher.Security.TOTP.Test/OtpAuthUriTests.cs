@@ -8,19 +8,22 @@ namespace Waher.Security.TOTP.Test
 		[TestMethod]
 		[DataRow("otpauth://totp/Example:alice@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example",
 			CredentialAlgorithm.TOTP, "Example:alice@google.com", "JBSWY3DPEHPK3PXP", "Example",
-			"alice@google.com", HashFunction.SHA1, 6, 30)]
+			"alice@google.com", HashFunction.SHA1, 6, 30, null)]
 		[DataRow("otpauth://totp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA1&digits=6&period=30",
 			CredentialAlgorithm.TOTP, "ACME Co:john.doe@email.com", "HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ", "ACME Co",
-			"john.doe@email.com", HashFunction.SHA1, 6, 30)]
+			"john.doe@email.com", HashFunction.SHA1, 6, 30, null)]
 		[DataRow("otpauth://totp/example:alice@google.com?secret=jbswy3dpehpk3pxp&issuer=example&algorithm=sha256",
 			CredentialAlgorithm.TOTP, "example:alice@google.com", "JBSWY3DPEHPK3PXP", "example",
-			"alice@google.com", HashFunction.SHA256, 6, 30)]
+			"alice@google.com", HashFunction.SHA256, 6, 30, null)]
 		[DataRow("otpauth://totp/acme%20co:john.doe@email.com?secret=hxdmvjecjjwsrb3hwizr4ifugftmxboz&issuer=acme%20co&algorithm=sha512&digits=6&period=30",
 			CredentialAlgorithm.TOTP, "acme co:john.doe@email.com", "HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ", "acme co",
-			"john.doe@email.com", HashFunction.SHA512, 6, 30)]
+			"john.doe@email.com", HashFunction.SHA512, 6, 30, null)]
+		[DataRow("otpauth://totp/acme%20co:john.doe@email.com?secret=hxdmvjecjjwsrb3hwizr4ifugftmxboz&issuer=acme%20co&algorithm=sha512&digits=6&period=30&image=https%3A%2F%2Fexample.com%2FImage.jpg",
+			CredentialAlgorithm.TOTP, "acme co:john.doe@email.com", "HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ", "acme co",
+			"john.doe@email.com", HashFunction.SHA512, 6, 30, "https://example.com/Image.jpg")]
 		public void Test_01_Parse(string Uri, CredentialAlgorithm OtpAlgorithm, string Label,
 			string Secret, string Issuer, string Account, HashFunction Algorithm, int Digits, 
-			int CounterPeriod)
+			int CounterPeriod, string Image)
 		{
 			ExternalCredential? Credentials = ExternalCredential.TryParse(Uri);
 			Assert.IsNotNull(Credentials);
@@ -31,6 +34,7 @@ namespace Waher.Security.TOTP.Test
 			Assert.AreEqual(Account, Credentials.Account);
 			Assert.AreEqual(Algorithm, Credentials.HashFunction);
 			Assert.AreEqual(Digits, Credentials.NrDigits);
+			Assert.AreEqual(Image, Credentials.Image);
 
 			switch (OtpAlgorithm)
 			{

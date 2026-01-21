@@ -55,6 +55,7 @@ namespace Waher.Security.TOTP
 		private string issuer;
 		private string label;
 		private string description;
+		private string image;
 		private long? counter;
 		private int? nrDigits = null;
 		private int? timeStepSeconds = null;
@@ -114,6 +115,27 @@ namespace Waher.Security.TOTP
 					AssertAllowed();
 
 				this.description = value;
+			}
+		}
+
+		/// <summary>
+		/// Optional image URI of the endpoint.
+		/// </summary>
+		[Encrypted(32)]
+		public string Image
+		{
+			get
+			{
+				AssertAllowed();
+				return this.image;
+			}
+
+			set
+			{
+				if (!string.IsNullOrEmpty(this.image))
+					AssertAllowed();
+
+				this.image = value;
 			}
 		}
 
@@ -278,7 +300,8 @@ namespace Waher.Security.TOTP
 			nameof(this.HashFunction),
 			nameof(this.NrDigits),
 			nameof(this.Counter),
-			nameof(this.TimeStepSeconds)
+			nameof(this.TimeStepSeconds),
+			nameof(this.Image)
 		};
 
 		/// <summary>
@@ -350,6 +373,7 @@ namespace Waher.Security.TOTP
 			string Key, Value;
 			string Issuer = null;
 			string Account = null;
+			string Image = null;
 			byte[] Secret = null;
 			int NrDigits = HotpCalculator.DefaultNrDigits;
 			int TimeStepSeconds = TotpCalculator.DefaultTimeStepSeconds;
@@ -476,6 +500,10 @@ namespace Waher.Security.TOTP
 						TimeStepSeconds = i;
 						break;
 
+					case "image":
+						Image = Value;
+						break;
+
 					default:
 						Log.Warning("Unsupported OTP Auth URI parameter: " + Key,
 							new KeyValuePair<string, object>("Key", Key),
@@ -501,7 +529,8 @@ namespace Waher.Security.TOTP
 				Secret = Secret,
 				NrDigits = NrDigits,
 				Counter = Counter,
-				TimeStepSeconds = TimeStepSeconds
+				TimeStepSeconds = TimeStepSeconds,
+				Image = Image
 			};
 		}
 
@@ -603,7 +632,8 @@ namespace Waher.Security.TOTP
 			return CreateAsync(Credential, Credential.Type, Credential.Endpoint,
 				Credential.HashFunction, Credential.Secret, Credential.Issuer,
 				Credential.Account, Credential.Label, Credential.Description,
-				Credential.Counter, Credential.NrDigits, Credential.TimeStepSeconds);
+				Credential.Counter, Credential.NrDigits, Credential.TimeStepSeconds, 
+				Credential.Image);
 		}
 
 		/// <summary>
@@ -622,10 +652,36 @@ namespace Waher.Security.TOTP
 		/// <param name="NrDigits">Number of digits, if any.</param>
 		/// <param name="TimeStepSeconds">Time step, in seconds, if any.</param>
 		/// <returns>Credential object.</returns>
-		public static async Task<ExternalCredential> CreateAsync(ExternalCredential Parsed,
+		public static Task<ExternalCredential> CreateAsync(ExternalCredential Parsed,
 			CredentialAlgorithm Type, string EndPoint, HashFunction? HashFunction,
 			byte[] Secret, string Issuer, string Account, string Label, string Description,
 			long? Counter, int? NrDigits, int? TimeStepSeconds)
+		{
+			return CreateAsync(Parsed, Type, EndPoint, HashFunction, Secret, Issuer,
+				Account, Label, Description, Counter, NrDigits, TimeStepSeconds, null);
+		}
+
+		/// <summary>
+		/// Creates a credential.
+		/// </summary>
+		/// <param name="Parsed">Parsed object.</param>
+		/// <param name="Type">Type of credential</param>
+		/// <param name="EndPoint">Name of endpoint</param>
+		/// <param name="HashFunction">Hash algorithm to use (if any).</param>
+		/// <param name="Secret">Secret</param>
+		/// <param name="Issuer">Issuer</param>
+		/// <param name="Account">Account</param>
+		/// <param name="Label">Label</param>
+		/// <param name="Description">Description</param>
+		/// <param name="Counter">Counter, if any.</param>
+		/// <param name="NrDigits">Number of digits, if any.</param>
+		/// <param name="TimeStepSeconds">Time step, in seconds, if any.</param>
+		/// <param name="Image">Unofficial optional Image URI, if any.</param>
+		/// <returns>Credential object.</returns>
+		public static async Task<ExternalCredential> CreateAsync(ExternalCredential Parsed,
+			CredentialAlgorithm Type, string EndPoint, HashFunction? HashFunction,
+			byte[] Secret, string Issuer, string Account, string Label, string Description,
+			long? Counter, int? NrDigits, int? TimeStepSeconds, string Image)
 		{
 			int i;
 
@@ -676,7 +732,8 @@ namespace Waher.Security.TOTP
 					Account = Account,
 					Label = Label,
 					Description = Description,
-					Counter = Counter
+					Counter = Counter,
+					Image = Image
 				};
 			}
 			else
@@ -692,6 +749,7 @@ namespace Waher.Security.TOTP
 				Result.label = Label;
 				Result.description = Description;
 				Result.counter = Counter;
+				Result.image = Image;
 			}
 
 			if (NrDigits.HasValue)
@@ -719,7 +777,7 @@ namespace Waher.Security.TOTP
 		/// </summary>
 		/// <param name="CredentialFileName">File name of the credentials file inside the ZIP file.</param>
 		/// <param name="Password">Password to use to protect file.</param>
-		public static async Task<ZipFile> ExportAsync(string CredentialFileName, 
+		public static async Task<ZipFile> ExportAsync(string CredentialFileName,
 			string Password)
 		{
 			StringBuilder sb = new StringBuilder();
@@ -752,6 +810,9 @@ namespace Waher.Security.TOTP
 
 				if (Credential.timeStepSeconds.HasValue)
 					w.WriteAttributeString("timeStepSeconds", Credential.timeStepSeconds.Value.ToString());
+				
+				if (!string.IsNullOrEmpty(Credential.Image))
+					w.WriteAttributeString("image", Credential.Image);
 
 				w.WriteAttributeString("secret", Convert.ToBase64String(Credential.Secret));
 				w.WriteEndElement();

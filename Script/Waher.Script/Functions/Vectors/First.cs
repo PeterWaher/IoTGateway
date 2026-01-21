@@ -52,20 +52,10 @@ namespace Waher.Script.Functions.Vectors
                 return Argument.GetElement(0);
         }
 
-		#region IIterativeEvaluation
-
-		/// <summary>
-		/// If the node can be evaluated iteratively.
-		/// </summary>
-		public bool CanEvaluateIteratively => true;
-
 		/// <summary>
 		/// Creates an iterative evaluator for the node.
 		/// </summary>
 		/// <returns>Iterative evaluator reference.</returns>
-		public IIterativeEvaluator CreateEvaluator() => new FirstEvaluator(this);
-
-		#endregion
-
+		public override IIterativeEvaluator CreateEvaluator() => new FirstEvaluator(this);
 	}
 }

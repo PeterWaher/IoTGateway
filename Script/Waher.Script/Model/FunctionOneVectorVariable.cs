@@ -11,7 +11,7 @@ namespace Waher.Script.Model
     /// <summary>
     /// Base class for funcions of one vector variable.
     /// </summary>
-    public abstract class FunctionOneVectorVariable : FunctionOneVariable
+    public abstract class FunctionOneVectorVariable : FunctionOneVariable, IIterativeEvaluation
     {
         /// <summary>
         /// Base class for funcions of one vector variable.
@@ -291,5 +291,23 @@ namespace Waher.Script.Model
         {
             return Task.FromResult(this.EvaluateVector(Argument, Variables));
         }
-    }
+
+		#region IIterativeEvaluation
+
+		/// <summary>
+		/// If the node can be evaluated iteratively.
+		/// </summary>
+		public virtual bool CanEvaluateIteratively => true;
+
+        /// <summary>
+        /// Creates an iterative evaluator for the node.
+        /// </summary>
+        /// <returns>Iterative evaluator reference.</returns>
+        public virtual IIterativeEvaluator CreateEvaluator()
+        {
+            return new FunctionOneVectorVariableIterator(this);
+        }
+
+		#endregion
+	}
 }

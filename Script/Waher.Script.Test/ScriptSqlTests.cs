@@ -142,7 +142,25 @@ namespace Waher.Script.Test
 				Assert.AreEqual(NrColumns = ExpectedRow.Length, Row.Dimension, "Number of columns in response incorrect.");
 
 				for (ColumnIndex = 0; ColumnIndex < NrColumns; ColumnIndex++)
-					Assert.AreEqual(ExpectedRow[ColumnIndex], Row.GetElement(ColumnIndex).AssociatedObjectValue);
+				{
+					object Expected = ExpectedRow[ColumnIndex];
+					object Value = Row.GetElement(ColumnIndex).AssociatedObjectValue;
+
+					if (Expected is double ExpectedDouble &&
+						Value is double ExpectedValue &&
+						ExpectedDouble != 0)
+					{
+						double Diff = ExpectedValue / ExpectedDouble - 1.0;
+
+						if (Math.Abs(Diff) > 1e-10)
+						{
+							Assert.Fail("Expected " + Expected.ToString() + ", but was " +
+								Value.ToString() + " (" + (100.0 * Diff).ToString() + "%)");
+						}
+					}
+					else
+						Assert.AreEqual(Expected, Value);
+				}
 			}
 
 			ScriptParsingTests.AssertParentNodesAndSubsexpressions(Exp);
@@ -800,17 +818,29 @@ namespace Waher.Script.Test
 		{
 			await Database.Clear("Collection1");
 
+			Variables v = [];
+			double[] Var =
+			[
+				(double)await Expression.EvalAsync("x:=0..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=1..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=2..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=3..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=4..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=5..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=6..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v)
+			];
+
 			await Test(
 				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
 				"select B, Median(A), Variance(A), StdDev(A) from Collection1 group by B",
 				[
-					[ 0d, 714264285d, 0d, 99995d ],
-					[ 1d, 714278571d, 1d, 99996d ],
-					[ 2d, 714292857d, 2d, 99997d ],
-					[ 3d, 714307143d, 3d, 99998d ],
-					[ 4d, 714321429d, 4d, 99999d ],
-					[ 5d, 714235715d, 5d, 99993d ],
-					[ 6d, 714250000d, 6d, 99994d ]
+					[ 0d, 50001d, Var[0], Math.Sqrt(Var[0]) ],
+					[ 1d, 50002d, Var[1], Math.Sqrt(Var[1]) ],
+					[ 2d, 50003d, Var[2], Math.Sqrt(Var[2]) ],
+					[ 3d, 50004d, Var[3], Math.Sqrt(Var[3]) ],
+					[ 4d, 50005d, Var[4], Math.Sqrt(Var[4]) ],
+					[ 5d, 49999d, Var[5], Math.Sqrt(Var[5]) ],
+					[ 6d, 50000d, Var[6], Math.Sqrt(Var[6]) ]
 				]);
 		}
 
@@ -819,17 +849,29 @@ namespace Waher.Script.Test
 		{
 			await Database.Clear("Collection1");
 
+			Variables v = [];
+			double[] Var =
+			[
+				(double)await Expression.EvalAsync("x:=0..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=1..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=2..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=3..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=4..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=5..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=6..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v)
+			];
+
 			await Test(
 				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
 				"select B, Median(A), Variance(A), StdDev(A) from Collection1 group by B order by B",
 				[
-					[ 0d, 714264285d, 0d, 99995d ],
-					[ 1d, 714278571d, 1d, 99996d ],
-					[ 2d, 714292857d, 2d, 99997d ],
-					[ 3d, 714307143d, 3d, 99998d ],
-					[ 4d, 714321429d, 4d, 99999d ],
-					[ 5d, 714235715d, 5d, 99993d ],
-					[ 6d, 714250000d, 6d, 99994d ]
+					[ 0d, 50001d, Var[0], Math.Sqrt(Var[0]) ],
+					[ 1d, 50002d, Var[1], Math.Sqrt(Var[1]) ],
+					[ 2d, 50003d, Var[2], Math.Sqrt(Var[2]) ],
+					[ 3d, 50004d, Var[3], Math.Sqrt(Var[3]) ],
+					[ 4d, 50005d, Var[4], Math.Sqrt(Var[4]) ],
+					[ 5d, 49999d, Var[5], Math.Sqrt(Var[5]) ],
+					[ 6d, 50000d, Var[6], Math.Sqrt(Var[6]) ]
 				]);
 		}
 
@@ -1474,17 +1516,29 @@ namespace Waher.Script.Test
 		{
 			await Database.Clear("Collection1");
 
+			Variables v = [];
+			double[] Var =
+			[
+				(double)await Expression.EvalAsync("x:=0..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=1..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=2..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=3..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=4..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=5..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=6..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v)
+			];
+
 			await Test(
 				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
 				"select generic B, Median(A), Variance(A), StdDev(A) from Collection1 group by B",
 				[
-					[ 0d, 714264285d, 0d, 99995d ],
-					[ 1d, 714278571d, 1d, 99996d ],
-					[ 2d, 714292857d, 2d, 99997d ],
-					[ 3d, 714307143d, 3d, 99998d ],
-					[ 4d, 714321429d, 4d, 99999d ],
-					[ 5d, 714235715d, 5d, 99993d ],
-					[ 6d, 714250000d, 6d, 99994d ]
+					[ 0d, 50001d, Var[0], Math.Sqrt(Var[0]) ],
+					[ 1d, 50002d, Var[1], Math.Sqrt(Var[1]) ],
+					[ 2d, 50003d, Var[2], Math.Sqrt(Var[2]) ],
+					[ 3d, 50004d, Var[3], Math.Sqrt(Var[3]) ],
+					[ 4d, 50005d, Var[4], Math.Sqrt(Var[4]) ],
+					[ 5d, 49999d, Var[5], Math.Sqrt(Var[5]) ],
+					[ 6d, 50000d, Var[6], Math.Sqrt(Var[6]) ]
 				]);
 		}
 
@@ -1493,17 +1547,29 @@ namespace Waher.Script.Test
 		{
 			await Database.Clear("Collection1");
 
+			Variables v = [];
+			double[] Var =
+			[
+				(double)await Expression.EvalAsync("x:=0..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=1..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=2..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=3..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=4..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=5..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v),
+				(double)await Expression.EvalAsync("x:=6..99999|7;n:=count(x);E:=avg(x);sum((x-E)^2)/n;", v)
+			];
+
 			await Test(
 				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
 				"select generic B, Median(A), Variance(A), StdDev(A) from Collection1 group by B order by B",
 				[
-					[ 0d, 714264285d, 0d, 99995d ],
-					[ 1d, 714278571d, 1d, 99996d ],
-					[ 2d, 714292857d, 2d, 99997d ],
-					[ 3d, 714307143d, 3d, 99998d ],
-					[ 4d, 714321429d, 4d, 99999d ],
-					[ 5d, 714235715d, 5d, 99993d ],
-					[ 6d, 714250000d, 6d, 99994d ]
+					[ 0d, 50001d, Var[0], Math.Sqrt(Var[0]) ],
+					[ 1d, 50002d, Var[1], Math.Sqrt(Var[1]) ],
+					[ 2d, 50003d, Var[2], Math.Sqrt(Var[2]) ],
+					[ 3d, 50004d, Var[3], Math.Sqrt(Var[3]) ],
+					[ 4d, 50005d, Var[4], Math.Sqrt(Var[4]) ],
+					[ 5d, 49999d, Var[5], Math.Sqrt(Var[5]) ],
+					[ 6d, 50000d, Var[6], Math.Sqrt(Var[6]) ]
 				]);
 		}
 

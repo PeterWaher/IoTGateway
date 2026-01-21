@@ -11,8 +11,8 @@ namespace Waher.Script.Functions.Vectors
     /// <summary>
     /// Product(v), Prod(v)
     /// </summary>
-    public class Product : FunctionOneVectorVariable
-    {
+    public class Product : FunctionOneVectorVariable, IIterativeEvaluation
+	{
         /// <summary>
         /// Product(v), Prod(v)
         /// </summary>
@@ -155,5 +155,20 @@ namespace Waher.Script.Functions.Vectors
                 return Result;
         }
 
-    }
+		#region IIterativeEvalaution
+
+		/// <summary>
+		/// If the node can be evaluated iteratively.
+		/// </summary>
+		public bool CanEvaluateIteratively => true;
+
+		/// <summary>
+		/// Creates an iterative evaluator for the node.
+		/// </summary>
+		/// <returns>Iterative evaluator reference.</returns>
+		public IIterativeEvaluator CreateEvaluator() => new ProductEvaluator(this);
+
+		#endregion
+
+	}
 }

@@ -402,7 +402,7 @@ namespace Waher.Script.Operators
 							if (Dimension < 0)
 								Dimension = ChildElements.Count;
 							else if (ChildElements.Count != Dimension)
-								throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
+								throw new ArgumentDimensionsInconsistentScriptException(this);
 
 							e[i] = ChildElements.GetEnumerator();
 							if (Encapsulation is null)
@@ -418,7 +418,7 @@ namespace Waher.Script.Operators
 							if (Dimension < 0)
 								Dimension = M.Rows;
 							else if (M.Rows != Dimension)
-								throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
+								throw new ArgumentDimensionsInconsistentScriptException(this);
 
 							ChunkedList<IElement> Vectors = new ChunkedList<IElement>();
 
@@ -433,12 +433,12 @@ namespace Waher.Script.Operators
 						{
 							int? Size = S.Size;
 							if (!Size.HasValue)
-								throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
+								throw new ArgumentDimensionsInconsistentScriptException(this);
 
 							if (Dimension < 0)
 								Dimension = Size.Value;
 							else if (Size.Value != Dimension)
-								throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
+								throw new ArgumentDimensionsInconsistentScriptException(this);
 
 							e[i] = S.ChildElements.GetEnumerator();
 							if (Encapsulation is null)
@@ -464,7 +464,7 @@ namespace Waher.Script.Operators
 							if (Dimension < 0)
 								Dimension = M.Rows;
 							else if (M.Rows != Dimension)
-								throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
+								throw new ArgumentDimensionsInconsistentScriptException(this);
 
 							ChunkedList<IElement> Vectors = new ChunkedList<IElement>();
 
@@ -497,12 +497,12 @@ namespace Waher.Script.Operators
 						{
 							int? Size = S.Size;
 							if (!Size.HasValue)
-								throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
+								throw new ArgumentDimensionsInconsistentScriptException(this);
 
 							if (Dimension < 0)
 								Dimension = Size.Value;
 							else if (Size.Value != Dimension)
-								throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
+								throw new ArgumentDimensionsInconsistentScriptException(this);
 
 							e[i] = S.ChildElements.GetEnumerator();
 							if (Encapsulation is null)

@@ -59,7 +59,7 @@ namespace Waher.Script.Operators.Vectors
 				
                 Condition = this.right.Evaluate(Variables) as BooleanValue;
                 if (Condition is null)
-                    throw new ScriptRuntimeException("Condition must evaluate to a boolean value.", this);
+                    throw new ConditionNotBooleanScriptException(this);
             }
             while (Condition.Value);
 
@@ -103,7 +103,7 @@ namespace Waher.Script.Operators.Vectors
 
 				Condition = await this.right.EvaluateAsync(Variables) as BooleanValue;
                 if (Condition is null)
-                    throw new ScriptRuntimeException("Condition must evaluate to a boolean value.", this);
+                    throw new ConditionNotBooleanScriptException(this);
             }
             while (Condition.Value);
 

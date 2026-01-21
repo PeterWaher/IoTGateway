@@ -102,13 +102,13 @@ namespace Waher.Script.Operators.Matrices
 			if (Index.AssociatedObjectValue is double d)
 			{
                 if (d < 0 || d > int.MaxValue || d != Math.Truncate(d))
-                    throw new ScriptRuntimeException("Row index must be a non-negative integer.", Node);
+                    throw new ArgumentNonNegativeIntegerScriptException("Row Index", Node);
 
                 return Matrix.GetRow((int)d);
             }
 
             if (Index.IsScalar)
-                throw new ScriptRuntimeException("Row index must be a non-negative integer.", Node);
+                throw new ArgumentNonNegativeIntegerScriptException("Row Index", Node);
             else
             {
 				ChunkedList<IElement> Elements = new ChunkedList<IElement>();

@@ -795,6 +795,44 @@ namespace Waher.Script.Test
 				]);
 		}
 
+		[TestMethod]
+		public async Task SELECT_Test_61_GroupBy_FullVector()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select B, Median(A), Variance(A), StdDev(A) from Collection1 group by B",
+				[
+					[ 0d, 714264285d, 0d, 99995d ],
+					[ 1d, 714278571d, 1d, 99996d ],
+					[ 2d, 714292857d, 2d, 99997d ],
+					[ 3d, 714307143d, 3d, 99998d ],
+					[ 4d, 714321429d, 4d, 99999d ],
+					[ 5d, 714235715d, 5d, 99993d ],
+					[ 6d, 714250000d, 6d, 99994d ]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_62_GroupBy_FullVector_OrderBy()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select B, Sum(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B order by B",
+				[
+					[ 0d, 714264285d, 0d, 99995d ],
+					[ 1d, 714278571d, 1d, 99996d ],
+					[ 2d, 714292857d, 2d, 99997d ],
+					[ 3d, 714307143d, 3d, 99998d ],
+					[ 4d, 714321429d, 4d, 99999d ],
+					[ 5d, 714235715d, 5d, 99993d ],
+					[ 6d, 714250000d, 6d, 99994d ]
+				]);
+		}
+
 		#endregion
 
 		#region SELECT GENERIC
@@ -1400,7 +1438,7 @@ namespace Waher.Script.Test
 
 			await Test(
 				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
-				"select B, Sum(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B",
+				"select generic B, Sum(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B",
 				[
 					[ 0d, 714264285d, 0d, 99995d, (0d + 99995d) / 2, 0d, 99995d, 0d, 131071d, 116859d, 14286d ],
 					[ 1d, 714278571d, 1d, 99996d, (1d + 99996d) / 2, 1d, 99996d, 0d, 131071d, 65609d, 14286d ],
@@ -1419,7 +1457,7 @@ namespace Waher.Script.Test
 
 			await Test(
 				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
-				"select B, Sum(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B order by B",
+				"select generic B, Sum(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B order by B",
 				[
 					[ 0d, 714264285d, 0d, 99995d, (0d + 99995d) / 2, 0d, 99995d, 0d, 131071d, 116859d, 14286d ],
 					[ 1d, 714278571d, 1d, 99996d, (1d + 99996d) / 2, 1d, 99996d, 0d, 131071d, 65609d, 14286d ],
@@ -1428,6 +1466,44 @@ namespace Waher.Script.Test
 					[ 4d, 714321429d, 4d, 99999d, (4d + 99999d) / 2, 4d, 99999d, 0d, 131071d, 22971d, 14286d ],
 					[ 5d, 714235715d, 5d, 99993d, (5d + 99993d) / 2, 5d, 99993d, 0d, 131071d, 108521d, 14285d ],
 					[ 6d, 714250000d, 6d, 99994d, (6d + 99994d) / 2, 6d, 99994d, 0d, 131071d, 130998d, 14285d ]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_GENERIC_61_GroupBy_FullVector()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select generic B, Median(A), Variance(A), StdDev(A) from Collection1 group by B",
+				[
+					[ 0d, 714264285d, 0d, 99995d ],
+					[ 1d, 714278571d, 1d, 99996d ],
+					[ 2d, 714292857d, 2d, 99997d ],
+					[ 3d, 714307143d, 3d, 99998d ],
+					[ 4d, 714321429d, 4d, 99999d ],
+					[ 5d, 714235715d, 5d, 99993d ],
+					[ 6d, 714250000d, 6d, 99994d ]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_GENERIC_62_GroupBy_FullVector_OrderBy()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select generic B, Sum(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B order by B",
+				[
+					[ 0d, 714264285d, 0d, 99995d ],
+					[ 1d, 714278571d, 1d, 99996d ],
+					[ 2d, 714292857d, 2d, 99997d ],
+					[ 3d, 714307143d, 3d, 99998d ],
+					[ 4d, 714321429d, 4d, 99999d ],
+					[ 5d, 714235715d, 5d, 99993d ],
+					[ 6d, 714250000d, 6d, 99994d ]
 				]);
 		}
 

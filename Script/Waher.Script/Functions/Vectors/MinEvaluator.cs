@@ -56,7 +56,7 @@ namespace Waher.Script.Functions.Vectors
 				else
 				{
 					if (!(Element.AssociatedSet is IOrderedSet S))
-						throw new ScriptRuntimeException("Cannot compare operands.", this.Node);
+						throw new OperandComparisonScriptException(this.Node);
 
 					this.isDouble = false;
 					this.min = Element;
@@ -73,7 +73,7 @@ namespace Waher.Script.Functions.Vectors
 			else if (this.min is null || this.minSet.Compare(this.min, Element) > 0)
 			{
 				if (!(Element.AssociatedSet is IOrderedSet S))
-					throw new ScriptRuntimeException("Cannot compare operands.", this.Node);
+					throw new OperandComparisonScriptException(this.Node);
 
 				this.min = Element;
 				this.minSet = S;

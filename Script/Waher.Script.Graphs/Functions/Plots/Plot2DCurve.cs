@@ -2,6 +2,7 @@
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Graphs.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Graphs.Functions.Plots
@@ -102,7 +103,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 
 			int Dimension = X.Dimension;
 			if (Y.Dimension != Dimension)
-				throw new ScriptRuntimeException("Vector size mismatch.", this);
+				throw new VectorSizeMismatchScriptException(this);
 
 			IElement Color = Arguments.Length <= 2 ? null : Arguments[2];
 			IElement Size = Arguments.Length <= 3 ? null : Arguments[3];

@@ -56,7 +56,7 @@ namespace Waher.Script.Functions.Vectors
 				else
 				{
 					if (!(Element.AssociatedSet is IOrderedSet S))
-						throw new ScriptRuntimeException("Cannot compare operands.", this.Node);
+						throw new OperandComparisonScriptException(this.Node);
 
 					this.isDouble = false;
 					this.max = Element;
@@ -73,7 +73,7 @@ namespace Waher.Script.Functions.Vectors
 			else if (this.max is null || this.maxSet.Compare(this.max, Element) < 0)
 			{
 				if (!(Element.AssociatedSet is IOrderedSet S))
-					throw new ScriptRuntimeException("Cannot compare operands.", this.Node);
+					throw new OperandComparisonScriptException(this.Node);
 
 				this.max = Element;
 				this.maxSet = S;

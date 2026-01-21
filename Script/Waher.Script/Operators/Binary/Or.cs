@@ -37,13 +37,13 @@ namespace Waher.Script.Operators.Binary
 			bool RSigned;
 
 			if (Left != Math.Floor(Left) || Right != Math.Floor(Right))
-				throw new ScriptRuntimeException("Operands must be integer values.", this);
+				throw new OperandNonIntegerScriptException(this);
 
 			if (Left < 0)
 			{
 				LSigned = true;
 				if (Left < long.MinValue)
-					throw new ScriptRuntimeException("Operand out of bounds.", this);
+					throw new OperandOutOfBoundsScriptException(this);
 
 				L = (ulong)((long)Left);
 			}
@@ -51,7 +51,7 @@ namespace Waher.Script.Operators.Binary
 			{
 				LSigned = false;
 				if (Left > ulong.MaxValue)
-					throw new ScriptRuntimeException("Operand out of bounds.", this);
+					throw new OperandOutOfBoundsScriptException(this);
 
 				L = (ulong)Left;
 			}
@@ -60,7 +60,7 @@ namespace Waher.Script.Operators.Binary
 			{
 				RSigned = true;
 				if (Right < long.MinValue)
-					throw new ScriptRuntimeException("Operand out of bounds.", this);
+					throw new OperandOutOfBoundsScriptException(this);
 
 				R = (ulong)((long)Right);
 			}
@@ -68,7 +68,7 @@ namespace Waher.Script.Operators.Binary
 			{
 				RSigned = false;
 				if (Right > ulong.MaxValue)
-					throw new ScriptRuntimeException("Operand out of bounds.", this);
+					throw new OperandOutOfBoundsScriptException(this);
 
 				R = (ulong)Right;
 			}

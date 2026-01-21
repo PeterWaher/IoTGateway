@@ -31,7 +31,7 @@ namespace Waher.Script.Operators.Assignments.WithSelf
 		public override IElement Evaluate(Variables Variables)
 		{
 			if (!Variables.TryGetVariable(this.VariableName, out Variable v))
-				throw new ScriptRuntimeException("Variable not found.", this);
+				new VariableNotFoundScriptException(this.VariableName, this);
 
 			IElement E = this.op.Evaluate(Variables);
             E = Arithmetics.Divide.EvaluateDivision(v.ValueElement, E, this);
@@ -52,7 +52,7 @@ namespace Waher.Script.Operators.Assignments.WithSelf
 				return this.Evaluate(Variables);
 
 			if (!Variables.TryGetVariable(this.VariableName, out Variable v))
-				throw new ScriptRuntimeException("Variable not found.", this);
+				new VariableNotFoundScriptException(this.VariableName, this);
 
 			IElement E = await this.op.EvaluateAsync(Variables);
 			E = Arithmetics.Divide.EvaluateDivision(v.ValueElement, E, this);

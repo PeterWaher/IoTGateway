@@ -31,7 +31,7 @@ namespace Waher.Script.Operators.Arithmetics
         public override IElement Evaluate(double Operand)
         {
             if (Operand < 0 || Math.Truncate(Operand) != Operand)
-                throw new ScriptRuntimeException("Operand must be a non-negative integer.", this);
+                throw new ArgumentNonNegativeIntegerScriptException("Operand", this);
 
             double Result = 1;
 

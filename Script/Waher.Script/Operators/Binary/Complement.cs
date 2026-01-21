@@ -31,19 +31,19 @@ namespace Waher.Script.Operators.Binary
 		public override IElement Evaluate(double Operand)
 		{
 			if (Operand != Math.Floor(Operand))
-				throw new ScriptRuntimeException("Operands must be integer values.", this);
+				throw new OperandNonIntegerScriptException(this);
 
 			if (Operand < 0)
 			{
 				if (Operand < long.MinValue)
-					throw new ScriptRuntimeException("Operand out of bounds.", this);
+					throw new OperandOutOfBoundsScriptException(this);
 
 				return new DoubleNumber(~(long)Operand);
 			}
 			else
 			{
 				if (Operand > ulong.MaxValue)
-					throw new ScriptRuntimeException("Operand out of bounds.", this);
+					throw new OperandOutOfBoundsScriptException(this);
 
 				return new DoubleNumber(~(ulong)Operand);
 			}

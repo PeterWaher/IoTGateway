@@ -41,7 +41,7 @@ namespace Waher.Script.Cryptography.Functions.HashFunctions
 		public override IElement Evaluate(IElement Argument1, IElement Argument2, Variables Variables)
 		{
 			if (!(Argument1.AssociatedObjectValue is byte[] Data))
-				throw new ScriptRuntimeException("Binary data expected.", this);
+				throw new BinaryDataExpectedScriptException(this);
 
 			if (!(Argument2.AssociatedObjectValue is byte[] Key))
 				throw new ScriptRuntimeException("Binary key expected.", this);

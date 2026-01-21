@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Fractals.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
@@ -172,7 +173,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             }
 
             if (dimx <= 0 || dimx > 5000 || dimy <= 0 || dimy > 5000)
-                throw new ScriptRuntimeException("Image size must be within 1x1 to 5000x5000", this);
+                throw new FractalImageSizeScriptException(this);
 
             if (!(f is null))
             {
@@ -358,19 +359,11 @@ namespace Waher.Script.Fractals.ComplexFractals
                     Row = Obj.AssociatedObjectValue as Complex[];
 
                     if (Row is null)
-                    {
-                        throw new ScriptRuntimeException("Lambda expression must be able to accept complex vectors, " +
-                            "and return complex vectors of equal length. Type returned: " +
-                            Obj.GetType().FullName, Node);
-                    }
-                    else if (Row.Length != c)
-                    {
-                        throw new ScriptRuntimeException("Lambda expression must be able to accept complex vectors, " +
-                            "and return complex vectors of equal length. Length returned: " +
-                            Row.Length.ToString() + ". Expected: " + c.ToString(), Node);
-                    }
+						throw new LambdaTypeScriptException(Obj.GetType(), Node);
+					else if (Row.Length != c)
+						throw new LambdaLengthScriptException(Row.Length, c, Node);
 
-                    for (x = x2 = 0; x < c; x++)
+					for (x = x2 = 0; x < c; x++)
                     {
                         z = Row[x];
                         j = Offset[x];

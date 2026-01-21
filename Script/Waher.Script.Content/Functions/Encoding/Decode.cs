@@ -62,7 +62,7 @@ namespace Waher.Script.Content.Functions.Encoding
 		public override Task<IElement> EvaluateScalarAsync(IElement Argument1, IElement Argument2, Variables Variables)
 		{
 			if (!(Argument1.AssociatedObjectValue is byte[] Bin))
-				throw new ScriptRuntimeException("Binary data expected.", this);
+				throw new BinaryDataExpectedScriptException(this);
 
 			string ContentType = Argument2.AssociatedObjectValue is string s2 ? s2 : Expression.ToString(Argument2.AssociatedObjectValue);
 

@@ -40,7 +40,7 @@ namespace Waher.Script.Operators.Assignments
             IElement Index = this.middle.Evaluate(Variables);
 
             if (!(Index.AssociatedObjectValue is double d) || d < 0 || d > int.MaxValue || d != Math.Truncate(d))
-                throw new ScriptRuntimeException("Index must be a non-negative integer.", this);
+                throw new ArgumentNonNegativeIntegerScriptException("Index", this);
 
             IElement Value = this.right.Evaluate(Variables);
             if (!(Value is IVector V))
@@ -71,7 +71,7 @@ namespace Waher.Script.Operators.Assignments
             IElement Index = await this.middle.EvaluateAsync(Variables);
 
             if (!(Index.AssociatedObjectValue is double d) || d < 0 || d > int.MaxValue || d != Math.Truncate(d))
-                throw new ScriptRuntimeException("Index must be a non-negative integer.", this);
+                throw new ArgumentNonNegativeIntegerScriptException("Index", this);
 
             IElement Value = await this.right.EvaluateAsync(Variables);
             if (!(Value is IVector V))

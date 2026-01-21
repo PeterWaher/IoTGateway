@@ -37,7 +37,7 @@ namespace Waher.Script.Content.Functions.Encoding
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
 			if (!(Argument.AssociatedObjectValue is byte[] Bin))
-				throw new ScriptRuntimeException("Binary data expected.", this);
+				throw new BinaryDataExpectedScriptException(this);
 
 			return new StringValue(System.Text.Encoding.UTF8.GetString(Bin));
 		}

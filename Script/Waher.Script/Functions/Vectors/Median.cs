@@ -58,7 +58,7 @@ namespace Waher.Script.Functions.Vectors
             int c = Values.Length;
 
             if (c == 0)
-                throw new ScriptRuntimeException("Empty set of values.", Node);
+                throw new EmptySetOfValuesScriptException(Node);
 
             Array.Sort(Values);
 
@@ -77,7 +77,7 @@ namespace Waher.Script.Functions.Vectors
             int c = 0;
 
             if (c == 0)
-                throw new ScriptRuntimeException("Empty set of values.", this);
+                throw new EmptySetOfValuesScriptException(this);
 
             IElement[] A = new IElement[Elements.Count];
             Elements.CopyTo(A, 0);

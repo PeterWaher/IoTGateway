@@ -117,7 +117,7 @@ namespace Waher.Script.Operators.Matrices
             if (IndexX.IsScalar)
             {
                 if (IndexY.IsScalar)
-                    throw new ScriptRuntimeException("Index must be a non-negative integer.", Node);
+                    throw new ArgumentNonNegativeIntegerScriptException("Index", Node);
                 else
                 {
                     ChunkedList<IElement> Elements = new ChunkedList<IElement>();

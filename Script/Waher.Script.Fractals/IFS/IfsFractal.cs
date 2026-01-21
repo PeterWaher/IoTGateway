@@ -5,6 +5,7 @@ using SkiaSharp;
 using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Fractals.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -291,7 +292,7 @@ namespace Waher.Script.Fractals.IFS
 			}
 
 			if (dimx <= 0 || dimx > 5000 || dimy <= 0 || dimy > 5000)
-				throw new ScriptRuntimeException("Image size must be within 1x1 to 5000x5000", this);
+				throw new FractalImageSizeScriptException(this);
 
 			if (!(Matrices is null))
 			{

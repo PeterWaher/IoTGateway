@@ -6,6 +6,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects.VectorSpaces;
+using Waher.Script.Fractals.Exceptions;
 
 namespace Waher.Script.Fractals.ComplexFractals
 {
@@ -160,7 +161,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             }
 
             if (dimx <= 0 || dimx > 5000 || dimy <= 0 || dimy > 5000)
-                throw new ScriptRuntimeException("Image size must be within 1x1 to 5000x5000", this);
+                throw new FractalImageSizeScriptException(this);
 
             return CalcNovaJulia(Variables, rc, ic, r0, i0, dr, Rr, Ri, pr, pi, Palette, dimx, dimy, this, this.FractalZoomScript, 
                 new object[] { Palette, dimx, dimy, r0, i0, Rr, Ri, pr, pi, ColorExpression });

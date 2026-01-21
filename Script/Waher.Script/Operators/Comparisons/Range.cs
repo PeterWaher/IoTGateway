@@ -79,7 +79,7 @@ namespace Waher.Script.Operators.Comparisons
 		private IElement Evaluate(IElement Left, IElement Middle, IElement Right)
 		{
 			if (!(Middle.AssociatedSet is IOrderedSet S))
-				throw new ScriptRuntimeException("Cannot compare operands.", this);
+				throw new OperandComparisonScriptException(this);
 
 			int i = S.Compare(Middle, Left);
 

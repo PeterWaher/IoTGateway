@@ -100,7 +100,7 @@ namespace Waher.Script.Statistics.Functions.RandomNumbers
                     double d = Expression.ToDouble(Arguments[0].AssociatedObjectValue);
                     int N = (int)Math.Round(d);
                     if (N < 0 || N != d)
-                        throw new ScriptRuntimeException("N must be a non-negative integer.", this);
+                        throw new ArgumentNonNegativeIntegerScriptException("N", this);
 
                     double[] v = new double[N];
                     int i;
@@ -123,7 +123,7 @@ namespace Waher.Script.Statistics.Functions.RandomNumbers
                     d = Expression.ToDouble(Arguments[2].AssociatedObjectValue);
                     N = (int)Math.Round(d);
                     if (N < 0 || N != d)
-                        throw new ScriptRuntimeException("N must be a non-negative integer.", this);
+                        throw new ArgumentNonNegativeIntegerScriptException("N", this);
 
                     v = new double[N];
 

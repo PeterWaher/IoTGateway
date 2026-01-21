@@ -65,7 +65,7 @@ namespace Waher.Script.Functions.Vectors
             bool Signed = false;
 
             if (c == 0)
-                throw new ScriptRuntimeException("Empty set of values.", Node);
+                throw new EmptySetOfValuesScriptException(Node);
 
             d = Values[0];
             if (d < long.MinValue || d > ulong.MaxValue || d != Math.Truncate(d))
@@ -133,7 +133,7 @@ namespace Waher.Script.Functions.Vectors
             int i, c = Values.Length;
 
             if (c == 0)
-                throw new ScriptRuntimeException("Empty set of values.", Node);
+                throw new EmptySetOfValuesScriptException(Node);
 
             for (i = 0; i < c; i++)
             {

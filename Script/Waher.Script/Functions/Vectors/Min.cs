@@ -58,7 +58,7 @@ namespace Waher.Script.Functions.Vectors
 			double d;
 
 			if (c == 0)
-				throw new ScriptRuntimeException("Empty set of values.", Node);
+				throw new EmptySetOfValuesScriptException(Node);
 
 			Result = Values[0];
 
@@ -104,7 +104,7 @@ namespace Waher.Script.Functions.Vectors
 					Result = E;
 					S = Result.AssociatedSet as IOrderedSet;
 					if (S is null)
-						throw new ScriptRuntimeException("Cannot compare operands.", Node);
+						throw new OperandComparisonScriptException(Node);
 				}
 			}
 
@@ -135,7 +135,7 @@ namespace Waher.Script.Functions.Vectors
 					Result = E;
 					S = Result.AssociatedSet as IOrderedSet;
 					if (S is null)
-						throw new ScriptRuntimeException("Cannot compare operands.", Node);
+						throw new OperandComparisonScriptException(Node);
 				}
 			}
 

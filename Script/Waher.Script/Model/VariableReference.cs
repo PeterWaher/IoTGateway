@@ -102,7 +102,7 @@ namespace Waher.Script.Model
 				}
 			}
 
-			throw new ScriptRuntimeException("Variable not found: " + this.variableName, this);
+			throw new VariableNotFoundScriptException(this.variableName, this);
 		}
 
 		/// <summary>

@@ -1,6 +1,7 @@
 ﻿using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Graphs.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Graphs.Functions.Plots
@@ -72,7 +73,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 
 			int Dimension = Labels.Dimension;
 			if (Values.Dimension != Dimension)
-				throw new ScriptRuntimeException("Vector size mismatch.", this);
+				throw new VectorSizeMismatchScriptException(this);
 
 			IElement Color = Arguments.Length <= 2 ? null : Arguments[2];
 

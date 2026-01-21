@@ -60,7 +60,7 @@ namespace Waher.Script.Cryptography.Functions.Encoding
 			if (c == 1)
 			{
 				if (!(Arguments[0].AssociatedObjectValue is byte[] Bin))
-					throw new ScriptRuntimeException("Binary data expected.", this);
+					throw new BinaryDataExpectedScriptException(this);
 
 				return new StringValue(Hashes.BinaryToString(Bin));
 			}

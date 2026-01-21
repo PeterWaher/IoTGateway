@@ -210,7 +210,7 @@ namespace Waher.Script.Model
 					if (!(Right.AssociatedObjectValue is bool r)
 						&& !Expression.TryConvert(Right.AssociatedObjectValue, out r))
 					{
-						throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+						throw new ScalarOperandsNotBooleanScriptException(this);
 					}
 
 					return this.Evaluate(exLeft, r);
@@ -221,7 +221,7 @@ namespace Waher.Script.Model
 				if (!(Left.AssociatedObjectValue is bool l) &&
 					!Expression.TryConvert(Left.AssociatedObjectValue, out l))
 				{
-					throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+					throw new ScalarOperandsNotBooleanScriptException(this);
 				}
 
 				return this.Evaluate(l, exRight);
@@ -231,13 +231,13 @@ namespace Waher.Script.Model
 				if (!(Left.AssociatedObjectValue is bool l) &&
 					!Expression.TryConvert(Left.AssociatedObjectValue, out l))
 				{
-					throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+					throw new ScalarOperandsNotBooleanScriptException(this);
 				}
 
 				if (!(Right.AssociatedObjectValue is bool r)
 					&& !Expression.TryConvert(Right.AssociatedObjectValue, out r))
 				{
-					throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+					throw new ScalarOperandsNotBooleanScriptException(this);
 				}
 
 				return this.Evaluate(l, r);
@@ -262,7 +262,7 @@ namespace Waher.Script.Model
 					if (!(Right.AssociatedObjectValue is bool r)
 						&& !Expression.TryConvert(Right.AssociatedObjectValue, out r))
 					{
-						throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+						throw new ScalarOperandsNotBooleanScriptException(this);
 					}
 
 					return await this.EvaluateAsync(exLeft, r);
@@ -273,7 +273,7 @@ namespace Waher.Script.Model
 				if (!(Left.AssociatedObjectValue is bool l) &&
 					!Expression.TryConvert(Left.AssociatedObjectValue, out l))
 				{
-					throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+					throw new ScalarOperandsNotBooleanScriptException(this);
 				}
 
 				return await this.EvaluateAsync(l, exRight);
@@ -283,13 +283,13 @@ namespace Waher.Script.Model
 				if (!(Left.AssociatedObjectValue is bool l) &&
 					!Expression.TryConvert(Left.AssociatedObjectValue, out l))
 				{
-					throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+					throw new ScalarOperandsNotBooleanScriptException(this);
 				}
 
 				if (!(Right.AssociatedObjectValue is bool r)
 					&& !Expression.TryConvert(Right.AssociatedObjectValue, out r))
 				{
-					throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+					throw new ScalarOperandsNotBooleanScriptException(this);
 				}
 
 				return await this.EvaluateAsync(l, r);

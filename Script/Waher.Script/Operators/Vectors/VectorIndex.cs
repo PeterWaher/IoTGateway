@@ -227,13 +227,13 @@ namespace Waher.Script.Operators.Vectors
 			if (Index.AssociatedObjectValue is double d)
 			{
 				if (d < 0 || d > int.MaxValue || d != Math.Truncate(d))
-					throw new ScriptRuntimeException("Index must be a non-negative integer.", Node);
+					throw new ArgumentNonNegativeIntegerScriptException("Index", Node);
 
 				return Vector.GetElement((int)d);
 			}
 
 			if (Index.IsScalar)
-				throw new ScriptRuntimeException("Index must be a non-negative integer.", Node);
+				throw new ArgumentNonNegativeIntegerScriptException("Index", Node);
 			else
 			{
 				ChunkedList<IElement> Elements = new ChunkedList<IElement>();

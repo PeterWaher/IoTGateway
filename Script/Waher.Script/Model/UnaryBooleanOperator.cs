@@ -71,7 +71,7 @@ namespace Waher.Script.Model
 			else if (Expression.TryConvert(Obj, out bool b))
 				return this.Evaluate(b);
 			else
-				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+				throw new ScalarOperandsNotBooleanScriptException(this);
 		}
 
 		/// <summary>
@@ -89,7 +89,7 @@ namespace Waher.Script.Model
 			else if (Expression.TryConvert(Obj, out bool b))
 				return await this.EvaluateAsync(b);
 			else
-				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+				throw new ScalarOperandsNotBooleanScriptException(this);
 		}
 
 		/// <summary>

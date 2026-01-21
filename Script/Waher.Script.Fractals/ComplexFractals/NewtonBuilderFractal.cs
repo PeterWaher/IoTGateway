@@ -7,6 +7,7 @@ using Waher.Script.Model;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
+using Waher.Script.Fractals.Exceptions;
 
 namespace Waher.Script.Fractals.ComplexFractals
 {
@@ -195,7 +196,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             }
 
             if (dimx <= 0 || dimx > 5000 || dimy <= 0 || dimy > 5000)
-                throw new ScriptRuntimeException("Image size must be within 1x1 to 5000x5000", this);
+                throw new FractalImageSizeScriptException(this);
 
             return NewtonFractal.CalcNewton(Variables, rc, ic, dr, R, CoefficientsZ, Palette, dimx, dimy, this, this.FractalZoomScript,
                 new object[] { Palette, dimx, dimy, R, CoefficientsZ, ColorExpression, rc, ic });

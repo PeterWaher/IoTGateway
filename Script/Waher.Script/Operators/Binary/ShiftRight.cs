@@ -35,24 +35,24 @@ namespace Waher.Script.Operators.Binary
 			sbyte R;
 
 			if (Left != Math.Floor(Left) || Right != Math.Floor(Right))
-				throw new ScriptRuntimeException("Operands must be integer values.", this);
+				throw new OperandNonIntegerScriptException(this);
 
 			if (Right < sbyte.MinValue || Right > sbyte.MaxValue)
-				throw new ScriptRuntimeException("Operand out of bounds.", this);
+				throw new OperandOutOfBoundsScriptException(this);
 
 			R = (sbyte)Right;
 
 			if (Left < 0)
 			{
 				if (Left < long.MinValue)
-					throw new ScriptRuntimeException("Operand out of bounds.", this);
+					throw new OperandOutOfBoundsScriptException(this);
 
 				return new DoubleNumber(((long)Left) >> R);
 			}
 			else
 			{
 				if (Left > ulong.MaxValue)
-					throw new ScriptRuntimeException("Operand out of bounds.", this);
+					throw new OperandOutOfBoundsScriptException(this);
 
 				return new DoubleNumber(((ulong)Left) >> R);
 			}

@@ -39,7 +39,7 @@ namespace Waher.Script.Functions.Vectors
 			int N = (int)Argument;
 
 			if (N != Argument || N < 0)
-				throw new ScriptRuntimeException("Dimension must be a non-negative integer.", this);
+				throw new ArgumentNonNegativeIntegerScriptException("Dimension", this);
 
 			double[] E = new double[N];
 			int i;

@@ -46,7 +46,7 @@ namespace Waher.Script.Operators.Binary
 		internal static ulong ToUInt64(double Operand, out bool Signed, ScriptNode Node)
 		{
 			if (Operand != Math.Floor(Operand))
-				throw new ScriptRuntimeException("Operands must be integer values.", Node);
+				throw new OperandNonIntegerScriptException(Node);
 
 			ulong Result;
 
@@ -54,7 +54,7 @@ namespace Waher.Script.Operators.Binary
 			{
 				Signed = true;
 				if (Operand < long.MinValue)
-					throw new ScriptRuntimeException("Operand out of bounds.", Node);
+					throw new OperandOutOfBoundsScriptException(Node);
 
 				Result = (ulong)(long)Operand;
 			}
@@ -62,7 +62,7 @@ namespace Waher.Script.Operators.Binary
 			{
 				Signed = false;
 				if (Operand > ulong.MaxValue)
-					throw new ScriptRuntimeException("Operand out of bounds.", Node);
+					throw new OperandOutOfBoundsScriptException(Node);
 
 				Result = (ulong)Operand;
 			}

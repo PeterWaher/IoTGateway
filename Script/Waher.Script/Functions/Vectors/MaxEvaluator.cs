@@ -15,6 +15,7 @@ namespace Waher.Script.Functions.Vectors
 		private IOrderedSet maxSet = null;
 		private double? doubleMax = null;
 		private bool isDouble = true;
+		private bool first = true;
 
 		/// <summary>
 		/// Max(v) iterative evaluator
@@ -33,6 +34,7 @@ namespace Waher.Script.Functions.Vectors
 			this.max = null;
 			this.doubleMax = null;
 			this.isDouble = true;
+			this.first = true;
 		}
 
 		/// <summary>
@@ -41,7 +43,27 @@ namespace Waher.Script.Functions.Vectors
 		/// <param name="Element">Element.</param>
 		public override void AggregateElement(IElement Element)
 		{
-			if (this.isDouble && Element is DoubleNumber D)
+			if (this.first)
+			{
+				this.first = false;
+
+				if (Element is DoubleNumber D)
+				{
+					this.doubleMax = D.Value;
+					this.max = D;
+					this.maxSet = (IOrderedSet)D.AssociatedSet;
+				}
+				else
+				{
+					if (!(Element.AssociatedSet is IOrderedSet S))
+						throw new ScriptRuntimeException("Cannot compare operands.", this.Node);
+
+					this.isDouble = false;
+					this.max = Element;
+					this.maxSet = S;
+				}
+			}
+			else if (this.isDouble && Element is DoubleNumber D)
 			{
 				double d = D.Value;
 

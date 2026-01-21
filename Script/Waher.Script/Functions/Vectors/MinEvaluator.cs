@@ -15,6 +15,7 @@ namespace Waher.Script.Functions.Vectors
 		private IOrderedSet minSet = null;
 		private double? doubleMin = null;
 		private bool isDouble = true;
+		private bool first = true;
 
 		/// <summary>
 		/// Min(v) iterative evaluator
@@ -33,6 +34,7 @@ namespace Waher.Script.Functions.Vectors
 			this.min = null;
 			this.doubleMin = null;
 			this.isDouble = true;
+			this.first = true;
 		}
 
 		/// <summary>
@@ -41,7 +43,27 @@ namespace Waher.Script.Functions.Vectors
 		/// <param name="Element">Element.</param>
 		public override void AggregateElement(IElement Element)
 		{
-			if (this.isDouble && Element is DoubleNumber D)
+			if (this.first)
+			{
+				this.first = false;
+
+				if (Element is DoubleNumber D)
+				{
+					this.doubleMin = D.Value;
+					this.min = D;
+					this.minSet = (IOrderedSet)D.AssociatedSet;
+				}
+				else
+				{
+					if (!(Element.AssociatedSet is IOrderedSet S))
+						throw new ScriptRuntimeException("Cannot compare operands.", this.Node);
+
+					this.isDouble = false;
+					this.min = Element;
+					this.minSet = S;
+				}
+			}
+			else if (this.isDouble && Element is DoubleNumber D)
 			{
 				double d = D.Value;
 

@@ -125,7 +125,7 @@ namespace Waher.Script.Test
 			Expression Exp = new(Script);
 			object Obj = await Exp.EvaluateAsync(v);
 			ConsoleOut.WriteLine(Expression.ToString(Obj));
-			
+
 			ObjectMatrix M = Obj as ObjectMatrix;
 			int NrRows, RowIndex;
 			int NrColumns, ColumnIndex;
@@ -144,7 +144,7 @@ namespace Waher.Script.Test
 				for (ColumnIndex = 0; ColumnIndex < NrColumns; ColumnIndex++)
 					Assert.AreEqual(ExpectedRow[ColumnIndex], Row.GetElement(ColumnIndex).AssociatedObjectValue);
 			}
-	
+
 			ScriptParsingTests.AssertParentNodesAndSubsexpressions(Exp);
 
 			ConsoleOut.WriteLine();
@@ -758,40 +758,40 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public async Task SELECT_Test_59_GroupBy()
+		public async Task SELECT_Test_59_GroupBy_Iterative()
 		{
 			await Database.Clear("Collection1");
 
 			await Test(
 				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
-				"select B, Sum(A) from Collection1 group by B",
+				"select B, Sum(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B",
 				[
-					[0d, 714264285d],
-					[1d, 714278571d],
-					[2d, 714292857d],
-					[3d, 714307143d],
-					[4d, 714321429d],
-					[5d, 714235715d],
-					[6d, 714250000d]
+					[ 0d, 714264285d, 0d, 99995d, (0d + 99995d) / 2, 0d, 99995d, 0d, 131071d, 116859d, 14286d ],
+					[ 1d, 714278571d, 1d, 99996d, (1d + 99996d) / 2, 1d, 99996d, 0d, 131071d, 65609d, 14286d ],
+					[ 2d, 714292857d, 2d, 99997d, (2d + 99997d) / 2, 2d, 99997d, 0d, 131071d, 51231d, 14286d ],
+					[ 3d, 714307143d, 3d, 99998d, (3d + 99998d) / 2, 3d, 99998d, 0d, 131071d, 457d, 14286d ],
+					[ 4d, 714321429d, 4d, 99999d, (4d + 99999d) / 2, 4d, 99999d, 0d, 131071d, 22971d, 14286d ],
+					[ 5d, 714235715d, 5d, 99993d, (5d + 99993d) / 2, 5d, 99993d, 0d, 131071d, 108521d, 14285d ],
+					[ 6d, 714250000d, 6d, 99994d, (6d + 99994d) / 2, 6d, 99994d, 0d, 131071d, 130998d, 14285d ]
 				]);
 		}
 
 		[TestMethod]
-		public async Task SELECT_Test_60_GroupBy_OrderBy()
+		public async Task SELECT_Test_60_GroupBy_Iterative_OrderBy()
 		{
 			await Database.Clear("Collection1");
 
 			await Test(
 				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
-				"select B, Sum(A) from Collection1 group by B order by B",
+				"select B, Sum(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B order by B",
 				[
-					[0d, 714264285d],
-					[1d, 714278571d],
-					[2d, 714292857d],
-					[3d, 714307143d],
-					[4d, 714321429d],
-					[5d, 714235715d],
-					[6d, 714250000d]
+					[ 0d, 714264285d, 0d, 99995d, (0d + 99995d) / 2, 0d, 99995d, 0d, 131071d, 116859d, 14286d ],
+					[ 1d, 714278571d, 1d, 99996d, (1d + 99996d) / 2, 1d, 99996d, 0d, 131071d, 65609d, 14286d ],
+					[ 2d, 714292857d, 2d, 99997d, (2d + 99997d) / 2, 2d, 99997d, 0d, 131071d, 51231d, 14286d ],
+					[ 3d, 714307143d, 3d, 99998d, (3d + 99998d) / 2, 3d, 99998d, 0d, 131071d, 457d, 14286d ],
+					[ 4d, 714321429d, 4d, 99999d, (4d + 99999d) / 2, 4d, 99999d, 0d, 131071d, 22971d, 14286d ],
+					[ 5d, 714235715d, 5d, 99993d, (5d + 99993d) / 2, 5d, 99993d, 0d, 131071d, 108521d, 14285d ],
+					[ 6d, 714250000d, 6d, 99994d, (6d + 99994d) / 2, 6d, 99994d, 0d, 131071d, 130998d, 14285d ]
 				]);
 		}
 
@@ -1394,40 +1394,40 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public async Task SELECT_Test_GENERIC_59_GroupBy()
+		public async Task SELECT_Test_GENERIC_59_GroupBy_Iterative()
 		{
 			await Database.Clear("Collection1");
 
 			await Test(
 				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
-				"select B, Sum(A) from Collection1 group by B",
+				"select B, Sum(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B",
 				[
-					[ 0d, 714264285d ],
-					[ 1d, 714278571d ],
-					[ 2d, 714292857d ],
-					[ 3d, 714307143d ],
-					[ 4d, 714321429d ],
-					[ 5d, 714235715d ],
-					[ 6d, 714250000d ]
+					[ 0d, 714264285d, 0d, 99995d, (0d + 99995d) / 2, 0d, 99995d, 0d, 131071d, 116859d, 14286d ],
+					[ 1d, 714278571d, 1d, 99996d, (1d + 99996d) / 2, 1d, 99996d, 0d, 131071d, 65609d, 14286d ],
+					[ 2d, 714292857d, 2d, 99997d, (2d + 99997d) / 2, 2d, 99997d, 0d, 131071d, 51231d, 14286d ],
+					[ 3d, 714307143d, 3d, 99998d, (3d + 99998d) / 2, 3d, 99998d, 0d, 131071d, 457d, 14286d ],
+					[ 4d, 714321429d, 4d, 99999d, (4d + 99999d) / 2, 4d, 99999d, 0d, 131071d, 22971d, 14286d ],
+					[ 5d, 714235715d, 5d, 99993d, (5d + 99993d) / 2, 5d, 99993d, 0d, 131071d, 108521d, 14285d ],
+					[ 6d, 714250000d, 6d, 99994d, (6d + 99994d) / 2, 6d, 99994d, 0d, 131071d, 130998d, 14285d ]
 				]);
 		}
 
 		[TestMethod]
-		public async Task SELECT_Test_GENERIC_60_GroupBy_OrderBy()
+		public async Task SELECT_Test_GENERIC_60_GroupB_Iterative_OrderBy()
 		{
 			await Database.Clear("Collection1");
 
 			await Test(
 				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
-				"select B, Sum(A) from Collection1 group by B order by B",
+				"select B, Sum(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B order by B",
 				[
-					[ 0d, 714264285d ],
-					[ 1d, 714278571d ],
-					[ 2d, 714292857d ],
-					[ 3d, 714307143d ],
-					[ 4d, 714321429d ],
-					[ 5d, 714235715d ],
-					[ 6d, 714250000d ]
+					[ 0d, 714264285d, 0d, 99995d, (0d + 99995d) / 2, 0d, 99995d, 0d, 131071d, 116859d, 14286d ],
+					[ 1d, 714278571d, 1d, 99996d, (1d + 99996d) / 2, 1d, 99996d, 0d, 131071d, 65609d, 14286d ],
+					[ 2d, 714292857d, 2d, 99997d, (2d + 99997d) / 2, 2d, 99997d, 0d, 131071d, 51231d, 14286d ],
+					[ 3d, 714307143d, 3d, 99998d, (3d + 99998d) / 2, 3d, 99998d, 0d, 131071d, 457d, 14286d ],
+					[ 4d, 714321429d, 4d, 99999d, (4d + 99999d) / 2, 4d, 99999d, 0d, 131071d, 22971d, 14286d ],
+					[ 5d, 714235715d, 5d, 99993d, (5d + 99993d) / 2, 5d, 99993d, 0d, 131071d, 108521d, 14285d ],
+					[ 6d, 714250000d, 6d, 99994d, (6d + 99994d) / 2, 6d, 99994d, 0d, 131071d, 130998d, 14285d ]
 				]);
 		}
 
@@ -1439,7 +1439,7 @@ namespace Waher.Script.Test
 		public async Task INSERT_Test_01_INSERT_VALUES()
 		{
 			await Test(
-				"insert into WebUsers (UserName, Password) values (\"User01\", \"Pwd01\");"+
+				"insert into WebUsers (UserName, Password) values (\"User01\", \"Pwd01\");" +
 				"select UserName, Password from WebUsers where UserName=\"User01\" order by UserName",
 				[
 					[ "User01", "Pwd01" ]
@@ -1501,7 +1501,7 @@ namespace Waher.Script.Test
 		public async Task INSERT_Test_05_INSERT_OBJECTS_1()
 		{
 			await Test(
-				"insert into WebUsers objects "+
+				"insert into WebUsers objects " +
 				"[{UserName:\"User22\",Password:\"Pwd22\"}," +
 				"{UserName:\"User23\",Password:\"Pwd23\"}," +
 				"{UserName:\"User24\",Password:\"Pwd24\"}];" +
@@ -1665,4 +1665,3 @@ namespace Waher.Script.Test
 
 	}
 }
- 

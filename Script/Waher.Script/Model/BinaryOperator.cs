@@ -199,8 +199,8 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public static IElement EvaluateNamedOperator(string Name, IElement Left, IElement Right, ScriptNode Node)
 		{
-			ScriptNode[] ArgumentNodes = new ScriptNode[] { Node, Node };
-			NamedMethodCall OperatorMethod = new NamedMethodCall(Node, Name, ArgumentNodes, 
+			ScriptNode[] ArgumentNodes = new ScriptNode[2];
+			NamedMethodCall OperatorMethod = new NamedMethodCall(null, Name, ArgumentNodes, 
 				false, Node?.Start ?? 0, Node?.Length ?? 0, Node?.Expression);
 
 			IElement[] Arguments = new IElement[] { Left, Right };

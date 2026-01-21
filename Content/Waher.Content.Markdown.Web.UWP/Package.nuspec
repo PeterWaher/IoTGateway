@@ -27,10 +27,10 @@
 				<dependency id="Waher.Content.Markdown.Xamarin" version="5.0.1"/>
 				<dependency id="Waher.Content.Markdown.Xml" version="4.0.0"/>
 				<dependency id="Waher.Events" version="1.4.6"/>
-				<dependency id="Waher.Networking.HTTP.UWP" version="4.5.6"/>
+				<dependency id="Waher.Networking.HTTP.UWP" version="4.5.7"/>
 				<dependency id="Waher.Runtime.Inventory" version="1.4.5"/>
 				<dependency id="Waher.Runtime.IO" version="1.0.6"/>
-				<dependency id="Waher.Script" version="2.13.5"/>
+				<dependency id="Waher.Script" version="2.13.6"/>
 				<dependency id="Waher.Security" version="1.0.15"/>
 			</group>
 		</dependencies>

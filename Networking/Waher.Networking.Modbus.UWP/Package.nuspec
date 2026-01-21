@@ -16,7 +16,7 @@
     <tags>networking communication modbus tcp uwp</tags>
     <dependencies>
       <dependency id="Waher.Events" version="1.4.6"/>
-      <dependency id="Waher.Networking.UWP" version="4.6.1"/>
+      <dependency id="Waher.Networking.UWP" version="4.6.2"/>
 			<dependency id="Waher.Runtime.Threading" version="2.2.0"/>
 			<dependency id="Waher.Security" version="1.0.15"/>
 		</dependencies>

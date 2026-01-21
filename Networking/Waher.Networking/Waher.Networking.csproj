@@ -16,9 +16,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>4.6.1</AssemblyVersion>
-    <FileVersion>4.6.1</FileVersion>
-    <Version>4.6.1</Version>
+    <AssemblyVersion>4.6.2</AssemblyVersion>
+    <FileVersion>4.6.2</FileVersion>
+    <Version>4.6.2</Version>
     <PackageIconUrl />
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking\</UpgradeBackupLocation>

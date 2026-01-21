@@ -11,11 +11,10 @@ namespace Waher.Script.Functions.Vectors
 	/// <summary>
 	/// StandardDeviation(v) iterative evaluator
 	/// </summary>
-	public class StandardDeviationEvaluator : IIterativeEvaluator
+	public class StandardDeviationEvaluator : UnaryIterativeEvaluator
 	{
 		private ChunkedList<double> doubleValues = new ChunkedList<double>();
 		private ChunkedList<IElement> elementValues = null;
-		private readonly StandardDeviation node;
 		private IElement sum = null;
 		private double doubleSum = 0;
 		private long count = 0;
@@ -24,15 +23,16 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// StandardDeviation(v) iterative evaluator
 		/// </summary>
+		/// <param name="Node">Node being iteratively evaluated.</param>
 		public StandardDeviationEvaluator(StandardDeviation Node)
+			: base(Node.Argument)
 		{
-			this.node = Node;
 		}
 
 		/// <summary>
 		/// Restarts the evaluator.
 		/// </summary>
-		public void RestartEvaluator()
+		public override void RestartEvaluator()
 		{
 			this.sum = null;
 			this.count = 0;
@@ -51,7 +51,7 @@ namespace Waher.Script.Functions.Vectors
 		/// Aggregates one new element.
 		/// </summary>
 		/// <param name="Element">Element.</param>
-		public void AggregateElement(IElement Element)
+		public override void AggregateElement(IElement Element)
 		{
 			if (this.isDouble && Element is DoubleNumber D)
 			{
@@ -80,13 +80,13 @@ namespace Waher.Script.Functions.Vectors
 				if (this.sum is null)
 					this.sum = Element;
 				else
-					this.sum = Add.EvaluateAddition(new DoubleNumber(this.doubleSum), Element, this.node);
+					this.sum = Add.EvaluateAddition(new DoubleNumber(this.doubleSum), Element, this.Node);
 
 				this.elementValues.Add(Element);
 			}
 			else
 			{
-				this.sum = Add.EvaluateAddition(this.sum, Element, this.node);
+				this.sum = Add.EvaluateAddition(this.sum, Element, this.Node);
 				this.elementValues.Add(Element);
 			}
 
@@ -96,7 +96,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Gets the aggregated result.
 		/// </summary>
-		public IElement GetAggregatedResult()
+		public override IElement GetAggregatedResult()
 		{
 			if (this.count == 0)
 				return ObjectValue.Null;
@@ -124,7 +124,7 @@ namespace Waher.Script.Functions.Vectors
 			}
 			else
 			{
-				IElement Average = Divide.EvaluateDivision(this.sum, new DoubleNumber(this.count), this.node);
+				IElement Average = Divide.EvaluateDivision(this.sum, new DoubleNumber(this.count), this.Node);
 				IElement Result = null;
 				IElement Term;
 
@@ -135,13 +135,13 @@ namespace Waher.Script.Functions.Vectors
 				{
 					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 					{
-						Term = Subtract.EvaluateSubtraction(Loop[i], Average, this.node);
-						Term = Multiply.EvaluateMultiplication(Term, Term, this.node);
+						Term = Subtract.EvaluateSubtraction(Loop[i], Average, this.Node);
+						Term = Multiply.EvaluateMultiplication(Term, Term, this.Node);
 
 						if (Result is null)
 							Result = Term;
 						else
-							Result = Add.EvaluateAddition(Result, Term, this.node);
+							Result = Add.EvaluateAddition(Result, Term, this.Node);
 					}
 
 					Loop = Loop.Next;
@@ -151,8 +151,8 @@ namespace Waher.Script.Functions.Vectors
 					return ObjectValue.Null;
 				else
 				{
-					Result = Divide.EvaluateDivision(Result, new DoubleNumber(this.count), this.node);
-					return Sqrt.EvaluateSquareRoot(Result, this.node);
+					Result = Divide.EvaluateDivision(Result, new DoubleNumber(this.count), this.Node);
+					return Sqrt.EvaluateSquareRoot(Result, this.Node);
 				}
 			}
 		}

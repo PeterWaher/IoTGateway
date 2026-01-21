@@ -1,16 +1,14 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Persistence.SQL.Groups;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Persistence.SQL
 {
 	/// <summary>
 	/// Represents the Wildcard symbol *
 	/// </summary>
-	public class Wildcard : ScriptLeafNode
+	public class Wildcard : ScriptLeafNode, IIterativeEvaluation
 	{
 		/// <summary>
 		/// Represents the Wildcard symbol *
@@ -30,13 +28,10 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			if (Variables is ObjectProperties Properties &&
-				Properties.Object is GroupObject GroupObject)
-			{
-				return Expression.Encapsulate(GroupObject.Objects);
-			}
+			if (Variables is ObjectProperties Properties)
+				return Expression.Encapsulate(Properties.Object);
 			else
-				throw new ScriptRuntimeException("Invalid context.", this);
+				return ObjectValue.Null;
 		}
 
 		/// <summary>
@@ -61,5 +56,22 @@ namespace Waher.Script.Persistence.SQL
 			return "*".GetHashCode();
 		}
 
+		#region IIterativeEvaluation
+
+		/// <summary>
+		/// If the node can be evaluated iteratively.
+		/// </summary>
+		public bool CanEvaluateIteratively => true;
+
+		/// <summary>
+		/// Creates an iterative evaluator for the node.
+		/// </summary>
+		/// <returns>Iterative evaluator reference.</returns>
+		public IIterativeEvaluator CreateEvaluator()
+		{
+			return new WildcardEvaluator(this);
+		}
+
+		#endregion
 	}
 }

@@ -13,7 +13,8 @@ namespace Waher.Script.Persistence.SQL.Enumerators
     /// </summary>
     public class FieldAggregatorEnumerator : IResultSetEnumerator
     {
-        private readonly KeyValuePair<string, ScriptNode>[] additionalFields;
+        private readonly KeyValuePair<string, int>[] additionalFields;
+        private readonly ScriptNode[] columns;
         private readonly IResultSetEnumerator e;
         private readonly Variables variables;
         private ObjectProperties objectVariables = null;
@@ -25,13 +26,15 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <param name="ItemEnumerator">Item enumerator</param>
         /// <param name="Variables">Current set of variables</param>
         /// <param name="AdditionalFields">Fields to add to enumerated items.</param>
+        /// <param name="Columns">Columns to select.</param>
         public FieldAggregatorEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables, 
-            KeyValuePair<string, ScriptNode>[] AdditionalFields)
+            KeyValuePair<string, int>[] AdditionalFields, ScriptNode[] Columns)
         {
 			this.e = ItemEnumerator;
 			this.variables = Variables;
 			this.additionalFields = AdditionalFields;
-        }
+            this.columns = Columns;
+		}
 
         /// <summary>
         /// <see cref="IEnumerator.Current"/>
@@ -54,6 +57,8 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         public async Task<bool> MoveNextAsync()
         {
+            ScriptNode Node;
+
             if (!await this.e.MoveNextAsync())
                 return false;
 
@@ -66,30 +71,41 @@ namespace Waher.Script.Persistence.SQL.Enumerators
 
             if (this.current is GenericObject GenObj)
             {
-                foreach (KeyValuePair<string, ScriptNode> P in this.additionalFields)
+                foreach (KeyValuePair<string, int> P in this.additionalFields)
                 {
-                    if (P.Value.IsAsynchronous)
-                        GenObj[P.Key] = await P.Value.EvaluateAsync(this.objectVariables);
+                    Node = this.columns[P.Value];
+
+                    if (Node.IsAsynchronous)
+                        GenObj[P.Key] = await Node.EvaluateAsync(this.objectVariables);
 					else
-						GenObj[P.Key] = P.Value.Evaluate(this.objectVariables);
+						GenObj[P.Key] = Node.Evaluate(this.objectVariables);
                 }
             }
             else if (this.current is GroupObject GroupObj)
             {
-                foreach (KeyValuePair<string, ScriptNode> P in this.additionalFields)
+                foreach (KeyValuePair<string, int> P in this.additionalFields)
                 {
-                    if (P.Value.IsAsynchronous)
-                        GroupObj[P.Key] = await P.Value.EvaluateAsync(this.objectVariables);
+					Node = this.columns[P.Value];
+
+					if (Node.IsAsynchronous)
+                        GroupObj[P.Key] = await Node.EvaluateAsync(this.objectVariables);
 					else
-						GroupObj[P.Key] = P.Value.Evaluate(this.objectVariables);
+						GroupObj[P.Key] = Node.Evaluate(this.objectVariables);
                 }
             }
             else
             {
-                GroupObject Obj = new GroupObject(new object[] { this.current }, Array.Empty<object>(), Array.Empty<ScriptNode>(), this.objectVariables);
+                GroupObject Obj = new GroupObject(Array.Empty<object>(), Array.Empty<ScriptNode>(), this.objectVariables);
 
-                foreach (KeyValuePair<string, ScriptNode> P in this.additionalFields)
-                    Obj[P.Key] = P.Value.Evaluate(this.objectVariables);
+                foreach (KeyValuePair<string, int> P in this.additionalFields)
+                {
+					Node = this.columns[P.Value];
+					
+                    if (Node.IsAsynchronous)
+                        Obj[P.Key] = await Node.EvaluateAsync(this.objectVariables);
+                    else
+                        Obj[P.Key] = Node.Evaluate(this.objectVariables);
+                }
 
 				this.current = Obj;
             }

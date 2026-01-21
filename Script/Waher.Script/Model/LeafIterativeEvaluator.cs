@@ -4,32 +4,52 @@ using Waher.Script.Abstraction.Elements;
 namespace Waher.Script.Model
 {
 	/// <summary>
-	/// An interative evaluator of a function supporting the <see cref="IIterativeEvaluation"/>
-	/// interface.
+	/// An interative evaluator of a leaf script node.
 	/// </summary>
-	public interface IIterativeEvaluator
+	public abstract class LeafIterativeEvaluator : IIterativeEvaluator
 	{
+		private readonly ScriptLeafNode node;
+
+		/// <summary>
+		/// An interative evaluator of a leaf script node.
+		/// </summary>
+		/// <param name="Node">Node being evaluated.</param>
+		public LeafIterativeEvaluator(ScriptLeafNode Node)
+		{
+			this.node = Node;
+		}
+
+		/// <summary>
+		/// Node being evaluated.
+		/// </summary>
+		public ScriptLeafNode Node => this.node;
+
 		/// <summary>
 		/// Restarts the evaluator.
 		/// </summary>
-		void RestartEvaluator();
+		public abstract void RestartEvaluator();
+
+		/// <summary>
+		/// Gets the aggregated result.
+		/// </summary>
+		public abstract IElement GetAggregatedResult();
 
 		/// <summary>
 		/// If the evaluator uses the current element in its aggregate evaluation.
 		/// </summary>
-		bool UsesElement { get; }
+		public virtual bool UsesElement => true;
 
 		/// <summary>
 		/// Aggregates one new element.
 		/// </summary>
 		/// <param name="Element">Element.</param>
-		void AggregateElement(IElement Element);
+		public abstract void AggregateElement(IElement Element);
 
 		/// <summary>
 		/// If the evaluator include asynchronous evaluation. Asynchronous evaluators
 		/// should be evaluated using <see cref="EvaluateAsync(Variables)"/>.
 		/// </summary>
-		bool IsAsynchronous { get; }
+		public virtual bool IsAsynchronous => false;
 
 		/// <summary>
 		/// Evaluates the evaluator, using the variables provided in the <paramref name="Variables"/> 
@@ -38,7 +58,7 @@ namespace Waher.Script.Model
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		IElement Evaluate(Variables Variables);
+		public abstract IElement Evaluate(Variables Variables);
 
 		/// <summary>
 		/// Evaluates the evaluator, using the variables provided in the <paramref name="Variables"/> 
@@ -47,11 +67,9 @@ namespace Waher.Script.Model
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		Task<IElement> EvaluateAsync(Variables Variables);
-
-		/// <summary>
-		/// Gets the aggregated result.
-		/// </summary>
-		IElement GetAggregatedResult();
+		public virtual Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			return Task.FromResult(this.Evaluate(Variables));
+		}
 	}
 }

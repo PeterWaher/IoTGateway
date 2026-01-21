@@ -7,21 +7,23 @@ namespace Waher.Script.Functions.Vectors
     /// <summary>
     /// Last(v) iterative evaluator
     /// </summary>
-    public class LastEvaluator : IIterativeEvaluator
-    {
+    public class LastEvaluator : UnaryIterativeEvaluator
+	{
 		private IElement last = null;
 
 		/// <summary>
 		/// Last(v) iterative evaluator
 		/// </summary>
-		public LastEvaluator()
+		/// <param name="Node">Node being iteratively evaluated.</param>
+		public LastEvaluator(Last Node)
+			: base(Node.Argument)
         {
         }
 
 		/// <summary>
 		/// Restarts the evaluator.
 		/// </summary>
-		public void RestartEvaluator()
+		public override	void RestartEvaluator()
 		{
 			this.last = null;
 		}
@@ -30,7 +32,7 @@ namespace Waher.Script.Functions.Vectors
 		/// Aggregates one new element.
 		/// </summary>
 		/// <param name="Element">Element.</param>
-		public void AggregateElement(IElement Element)
+		public override void AggregateElement(IElement Element)
 		{
 			this.last = Element;
 		}
@@ -38,7 +40,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Gets the aggregated result.
 		/// </summary>
-		public IElement GetAggregatedResult()
+		public override IElement GetAggregatedResult()
 		{
 			return this.last ?? ObjectValue.Null;
 		}

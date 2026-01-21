@@ -241,7 +241,7 @@ namespace Waher.Script.Persistence.SQL
 
 			ChunkedList<IElement[]> Items = new ChunkedList<IElement[]>();
 			Dictionary<string, int> ColumnIndices = new Dictionary<string, int>();
-			ChunkedList<KeyValuePair<string, ScriptNode>> AdditionalFields = null;
+			ChunkedList<KeyValuePair<string, int>> AdditionalFields = null;
 			ScriptNode[] Columns2 = this.columns;
 			bool Columns2Cloned = false;
 			IResultSetEnumerator e;
@@ -266,9 +266,9 @@ namespace Waher.Script.Persistence.SQL
 						Columns2[i] = Ref2;
 
 						if (AdditionalFields is null)
-							AdditionalFields = new ChunkedList<KeyValuePair<string, ScriptNode>>();
+							AdditionalFields = new ChunkedList<KeyValuePair<string, int>>();
 
-						AdditionalFields.Add(new KeyValuePair<string, ScriptNode>(Ref2.VariableName, this.columns[i]));
+						AdditionalFields.Add(new KeyValuePair<string, int>(Ref2.VariableName, i));
 					}
 					else if (this.columns[i] is VariableReference Ref)
 						ColumnIndices[Ref.VariableName] = i;
@@ -276,8 +276,6 @@ namespace Waher.Script.Persistence.SQL
 			}
 			else
 				c = 0;
-
-			ScriptNode Having = this.having;
 
 			if (this.groupBy is null)
 			{
@@ -288,15 +286,19 @@ namespace Waher.Script.Persistence.SQL
 			else
 			{
 				e = await Source.Find(0, int.MaxValue, this.generic, this.where, Variables, OrderBy.ToArray(), this);
+
 				e = new GroupEnumerator(e, Variables, this.groupBy, this.groupByNames,
-					AdditionalFields, ref Having);
+					this.columns, ref this.having);
 			}
 
 			if (!(AdditionalFields is null))
-				e = new FieldAggregatorEnumerator(e, Variables, AdditionalFields?.ToArray());
+			{
+				e = new FieldAggregatorEnumerator(e, Variables, AdditionalFields.ToArray(),
+					this.columns);
+			}
 
-			if (!(Having is null))
-				e = new ConditionalEnumerator(e, Variables, Having);
+			if (!(this.having is null))
+				e = new ConditionalEnumerator(e, Variables, this.having);
 
 			if (CalculatedOrder)
 			{

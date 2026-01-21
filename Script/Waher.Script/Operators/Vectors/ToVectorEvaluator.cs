@@ -7,24 +7,23 @@ namespace Waher.Script.Operators.Vectors
 	/// <summary>
 	/// ToVector(v) iterative evaluator
 	/// </summary>
-	public class ToVectorEvaluator : IIterativeEvaluator
+	public class ToVectorEvaluator : UnaryIterativeEvaluator
 	{
 		private readonly ChunkedList<IElement> elements = new ChunkedList<IElement>();
-		private readonly ToVector node;
 
 		/// <summary>
 		/// ToVector(v) iterative evaluator
 		/// </summary>
-		/// <param name="Node">Node reference</param>
+		/// <param name="Node">Node being iteratively evaluated.</param>
 		public ToVectorEvaluator(ToVector Node)
+			: base(Node.Operand)
 		{
-			this.node = Node;
 		}
 
 		/// <summary>
 		/// Restarts the evaluator.
 		/// </summary>
-		public void RestartEvaluator()
+		public override void RestartEvaluator()
 		{
 			this.elements.Clear();
 		}
@@ -33,7 +32,7 @@ namespace Waher.Script.Operators.Vectors
 		/// Aggregates one new element.
 		/// </summary>
 		/// <param name="Element">Element.</param>
-		public void AggregateElement(IElement Element)
+		public override void AggregateElement(IElement Element)
 		{
 			this.elements.Add(Element);
 		}
@@ -41,9 +40,9 @@ namespace Waher.Script.Operators.Vectors
 		/// <summary>
 		/// Gets the aggregated result.
 		/// </summary>
-		public IElement GetAggregatedResult()
+		public override IElement GetAggregatedResult()
 		{
-			return VectorDefinition.Encapsulate(this.elements.ToArray(), false, this.node);
+			return VectorDefinition.Encapsulate(this.elements.ToArray(), false, this.Node);
 		}
 	}
 }

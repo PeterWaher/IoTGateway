@@ -66,7 +66,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <returns>Iterative evaluator reference.</returns>
 		public IIterativeEvaluator CreateEvaluator()
 		{
-			return new LastEvaluator();
+			return new LastEvaluator(this);
 		}
 
 		#endregion

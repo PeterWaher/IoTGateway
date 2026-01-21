@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL.Groups
@@ -17,8 +17,12 @@ namespace Waher.Script.Persistence.SQL.Groups
 		private readonly ScriptNode[] groupBy;
 		private readonly ScriptNode[] groupNames;
 		private readonly bool[] groupByAsynchronous;
+		private readonly IIterativeEvaluator[] iterators;
+		private readonly bool[] iteratorUsesElement;
+		private readonly bool[] iteratorAsynchronous;
 		private readonly Variables variables;
 		private readonly IResultSetEnumerator e;
+		private readonly int iteratorCount;
 		private bool processLast = false;
 		private GroupObject current = null;
 		private ObjectProperties objectVariables = null;
@@ -30,11 +34,10 @@ namespace Waher.Script.Persistence.SQL.Groups
 		/// <param name="Variables">Current set of variables</param>
 		/// <param name="GroupBy">Group on these fields</param>
 		/// <param name="GroupNames">Names given to grouped fields</param>
-		/// <param name="AdditionalFields">Optional calculated fields.</param>
+		/// <param name="Columns">Columns to select</param>
 		/// <param name="Having">Optional having clause</param>
 		public GroupEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables,
-			ScriptNode[] GroupBy, ScriptNode[] GroupNames,
-			ChunkedList<KeyValuePair<string, ScriptNode>> AdditionalFields,
+			ScriptNode[] GroupBy, ScriptNode[] GroupNames, ScriptNode[] Columns,
 			ref ScriptNode Having)
 		{
 			this.e = ItemEnumerator;
@@ -48,6 +51,69 @@ namespace Waher.Script.Persistence.SQL.Groups
 
 			for (i = 0; i < c; i++)
 				this.groupByAsynchronous[i] = GroupBy[i].IsAsynchronous;
+
+			ChunkedList<IIterativeEvaluator> Iterators = new ChunkedList<IIterativeEvaluator>();
+
+			if (!(Columns is null))
+			{
+				for (i = 0, c = Columns.Length; i < c; i++)
+					FindIterators(ref Columns[i], Iterators);
+			}
+
+			FindIterators(ref Having, Iterators);
+
+			this.iterators = Iterators.ToArray();
+			this.iteratorCount = this.iterators.Length;
+
+			this.iteratorUsesElement = new bool[this.iteratorCount];
+			this.iteratorAsynchronous = new bool[this.iteratorCount];
+
+			for (i = 0; i < this.iteratorCount; i++)
+			{
+				this.iteratorUsesElement[i] = this.iterators[i].UsesElement;
+				this.iteratorAsynchronous[i] = this.iterators[i].IsAsynchronous;
+			}
+		}
+
+		private static void FindIterators(ref ScriptNode Node, ChunkedList<IIterativeEvaluator> Iterators)
+		{
+			if (Node is IIterativeEvaluation IterativeEvaluation2)
+			{
+				IIterativeEvaluator Evaluator = IterativeEvaluation2.CreateEvaluator();
+				Iterators.Add(Evaluator);
+
+				ScriptNode Node0 = Node;
+
+				Node = new GroupIteratorValue(Evaluator, Node.Start, Node.Length,
+					Node.Expression);
+				Node.SetParent(Node0.Parent);
+			}
+			else if (Node is GroupIteratorValue GroupIteratorValue2)
+				Iterators.Add(GroupIteratorValue2.Iterator);
+			else
+				Node?.ForAllChildNodes(FindIterators, Iterators, SearchMethod.TreeOrder);
+		}
+
+		private static bool FindIterators(ScriptNode Node, out ScriptNode NewNode, object State)
+		{
+			NewNode = null;
+
+			if (Node is IIterativeEvaluation IterativeEvaluation)
+			{
+				ChunkedList<IIterativeEvaluator> Iterators = (ChunkedList<IIterativeEvaluator>)State;
+				IIterativeEvaluator Evaluator = IterativeEvaluation.CreateEvaluator();
+				Iterators.Add(Evaluator);
+
+				NewNode = new GroupIteratorValue(Evaluator, Node.Start, Node.Length,
+					Node.Expression);
+			}
+			else if (Node is GroupIteratorValue GroupIteratorValue)
+			{
+				ChunkedList<IIterativeEvaluator> Iterators = (ChunkedList<IIterativeEvaluator>)State;
+				Iterators.Add(GroupIteratorValue.Iterator);
+			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -71,11 +137,12 @@ namespace Waher.Script.Persistence.SQL.Groups
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public async Task<bool> MoveNextAsync()
 		{
-			ChunkedList<object> Objects = null;
+			IIterativeEvaluator Iterator;
 			IElement E;
 			object[] Last = null;
-			int i, c = this.groupBy.Length;
+			int i, j, c = this.groupBy.Length;
 			object o1, o2;
+			bool Found = false;
 
 			while (this.processLast || await this.e.MoveNextAsync())
 			{
@@ -92,12 +159,18 @@ namespace Waher.Script.Persistence.SQL.Groups
 
 					for (i = 0; i < c; i++)
 					{
-						if (this.groupByAsynchronous[i])
+						if (this.groupBy[i].IsAsynchronous)
 							E = await this.groupBy[i].EvaluateAsync(this.objectVariables);
 						else
 							E = this.groupBy[i].Evaluate(this.objectVariables);
 
 						Last[i] = E.AssociatedObjectValue;
+					}
+
+					if (this.iteratorCount > 0)
+					{
+						for (j = 0; j < this.iteratorCount; j++)
+							this.iterators[j].RestartEvaluator();
 					}
 				}
 				else
@@ -126,16 +199,33 @@ namespace Waher.Script.Persistence.SQL.Groups
 					}
 				}
 
-				if (Objects is null)
-					Objects = new ChunkedList<object>();
+				if (this.iteratorCount > 0)
+				{
+					for (j = 0; j < this.iteratorCount; j++)
+					{
+						Iterator = this.iterators[j];
 
-				Objects.Add(this.e.Current);
+						if (this.iteratorUsesElement[j])
+						{
+							if (this.iteratorAsynchronous[j])
+								E = await Iterator.EvaluateAsync(this.objectVariables);
+							else
+								E = Iterator.Evaluate(this.objectVariables);
+
+							Iterator.AggregateElement(E);
+						}
+						else
+							Iterator.AggregateElement(ObjectValue.Null);
+					}
+				}
+
+				Found = true;
 			}
 
-			if (Objects is null)
+			if (!Found)
 				return false;
 
-			this.current = new GroupObject(Objects.ToArray(), Last, this.groupNames, this.variables);
+			this.current = new GroupObject(Last, this.groupNames, this.variables);
 
 			return true;
 		}

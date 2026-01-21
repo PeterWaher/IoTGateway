@@ -224,7 +224,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 		}
 
 		/// <summary>
-		/// Sets the parent node. Can only be used when expression is being parsed.
+		/// Sets the parent node. Can only be used when expression is being parsed or created.
 		/// </summary>
 		/// <param name="Parent">Parent Node</param>
 		public void SetParent(ScriptNode Parent)

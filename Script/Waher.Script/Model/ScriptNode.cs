@@ -126,12 +126,12 @@ namespace Waher.Script.Model
 		public ScriptNode Parent => this.parent;
 
 		/// <summary>
-		/// Sets the parent node. Can only be used when expression is being parsed.
+		/// Sets the parent node. Can only be used when expression is being parsed or created.
 		/// </summary>
 		/// <param name="Parent">Parent Node</param>
 		public void SetParent(ScriptNode Parent)
 		{
-			if (this.expression?.Root is null)
+			if (this.parent is null || this.expression?.Root is null)
 				this.parent = Parent;
 		}
 

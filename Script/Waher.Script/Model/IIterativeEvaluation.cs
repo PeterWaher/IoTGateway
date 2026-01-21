@@ -5,7 +5,7 @@
 	/// computed one element at a time, not requiring access to all elements in a vector
 	/// to compute the final result.
 	/// </summary>
-	public interface IIterativeEvaluation : IFunction
+	public interface IIterativeEvaluation
 	{
 		/// <summary>
 		/// If the node can be evaluated iteratively.

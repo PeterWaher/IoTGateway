@@ -27,7 +27,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
             Variables Variables, IEnumerable<Possibility> ExistingMatches, SparqlQuery Query);
 
         /// <summary>
-        /// Sets the parent node. Can only be used when expression is being parsed.
+        /// Sets the parent node. Can only be used when expression is being parsed or created.
         /// </summary>
         /// <param name="Parent">Parent Node</param>
         void SetParent(ScriptNode Parent);

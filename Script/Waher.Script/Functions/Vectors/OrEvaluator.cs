@@ -8,9 +8,8 @@ namespace Waher.Script.Functions.Vectors
 	/// <summary>
 	/// Or(v) iterative evaluator
 	/// </summary>
-	public class OrEvaluator : IIterativeEvaluator
+	public class OrEvaluator : UnaryIterativeEvaluator
 	{
-		private readonly Or node;
 		private ulong integerResult = 0;
 		private bool integerSigned = false;
 		private bool booleanResult = false;
@@ -21,16 +20,16 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Or(v) iterative evaluator
 		/// </summary>
-		/// <param name="Node">Node reference</param>
+		/// <param name="Node">Node being iteratively evaluated.</param>
 		public OrEvaluator(Or Node)
+			: base(Node.Argument)
 		{
-			this.node = Node;
 		}
 
 		/// <summary>
 		/// Restarts the evaluator.
 		/// </summary>
-		public void RestartEvaluator()
+		public override void RestartEvaluator()
 		{
 			this.integerResult = 0;
 			this.booleanResult = false;
@@ -43,7 +42,7 @@ namespace Waher.Script.Functions.Vectors
 		/// Aggregates one new element.
 		/// </summary>
 		/// <param name="Element">Element.</param>
-		public void AggregateElement(IElement Element)
+		public override void AggregateElement(IElement Element)
 		{
 			if (this.first)
 			{
@@ -58,38 +57,38 @@ namespace Waher.Script.Functions.Vectors
 				{
 					this.isInteger = true;
 					this.integerResult = Operators.Binary.And.ToUInt64(D.Value,
-						out this.integerSigned, this.node);
+						out this.integerSigned, this.Node);
 				}
 				else
-					throw new ScriptRuntimeException("Operands must be integer or Boolean values.", this.node);
+					throw new ScriptRuntimeException("Operands must be integer or Boolean values.", this.Node);
 			}
 			else if (this.isBoolean)
 			{
 				if (Element is BooleanValue B)
 					this.booleanResult |= B.Value;
 				else
-					throw new ScriptRuntimeException("Operands do not match.", this.node);
+					throw new ScriptRuntimeException("Operands do not match.", this.Node);
 			}
 			else if (this.isInteger)
 			{
 				if (Element is DoubleNumber D)
 				{
-					ulong Value = Operators.Binary.And.ToUInt64(D.Value, out bool Signed, this.node);
+					ulong Value = Operators.Binary.And.ToUInt64(D.Value, out bool Signed, this.Node);
 
 					this.integerResult |= Value;
 					this.integerSigned |= Signed;
 				}
 				else
-					throw new ScriptRuntimeException("Operands do not match.", this.node);
+					throw new ScriptRuntimeException("Operands do not match.", this.Node);
 			}
 			else
-				throw new ScriptRuntimeException("Operands must be integer or Boolean values.", this.node);
+				throw new ScriptRuntimeException("Operands must be integer or Boolean values.", this.Node);
 		}
 
 		/// <summary>
 		/// Gets the aggregated result.
 		/// </summary>
-		public IElement GetAggregatedResult()
+		public override IElement GetAggregatedResult()
 		{
 			if (this.first)
 				return ObjectValue.Null;
@@ -103,7 +102,7 @@ namespace Waher.Script.Functions.Vectors
 					return new DoubleNumber(this.integerResult);
 			}
 			else
-				throw new ScriptRuntimeException("Operands must be integer or Boolean values.", this.node);
+				throw new ScriptRuntimeException("Operands must be integer or Boolean values.", this.Node);
 		}
 	}
 }

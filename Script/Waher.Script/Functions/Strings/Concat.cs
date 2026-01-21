@@ -91,10 +91,7 @@ namespace Waher.Script.Functions.Strings
 		/// <returns>Iterative evaluator reference.</returns>
 		public IIterativeEvaluator CreateEvaluator()
 		{
-			if (this.Arguments.Length == 2 && this.Arguments[1] is ConstantElement C)
-				return new ConcatEvaluator(C.Constant.AssociatedObjectValue?.ToString());
-			else
-				return new ConcatEvaluator(null);
+			return new ConcatEvaluator(this);
 		}
 
 		#endregion

@@ -9,9 +9,8 @@ namespace Waher.Script.Functions.Vectors
 	/// <summary>
 	/// Min(v) iterative evaluator
 	/// </summary>
-	public class MinEvaluator : IIterativeEvaluator
+	public class MinEvaluator : UnaryIterativeEvaluator
 	{
-		private readonly Min node;
 		private IElement min = null;
 		private IOrderedSet minSet = null;
 		private double? doubleMin = null;
@@ -20,16 +19,16 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Min(v) iterative evaluator
 		/// </summary>
-		/// <param name="Node">Node reference</param>
+		/// <param name="Node">Node being iteratively evaluated.</param>
 		public MinEvaluator(Min Node)
+			: base(Node.Argument)
 		{
-			this.node = Node;
 		}
 
 		/// <summary>
 		/// Restarts the evaluator.
 		/// </summary>
-		public void RestartEvaluator()
+		public override void RestartEvaluator()
 		{
 			this.min = null;
 			this.doubleMin = null;
@@ -40,7 +39,7 @@ namespace Waher.Script.Functions.Vectors
 		/// Aggregates one new element.
 		/// </summary>
 		/// <param name="Element">Element.</param>
-		public void AggregateElement(IElement Element)
+		public override void AggregateElement(IElement Element)
 		{
 			if (this.isDouble && Element is DoubleNumber D)
 			{
@@ -52,7 +51,7 @@ namespace Waher.Script.Functions.Vectors
 			else if (this.min is null || this.minSet.Compare(this.min, Element) > 0)
 			{
 				if (!(Element.AssociatedSet is IOrderedSet S))
-					throw new ScriptRuntimeException("Cannot compare operands.", this.node);
+					throw new ScriptRuntimeException("Cannot compare operands.", this.Node);
 
 				this.min = Element;
 				this.minSet = S;
@@ -63,7 +62,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Gets the aggregated result.
 		/// </summary>
-		public IElement GetAggregatedResult()
+		public override IElement GetAggregatedResult()
 		{
 			if (this.isDouble)
 			{

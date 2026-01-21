@@ -7,21 +7,23 @@ namespace Waher.Script.Functions.Vectors
     /// <summary>
     /// First(v) iterative evaluator
     /// </summary>
-    public class FirstEvaluator : IIterativeEvaluator
-    {
+    public class FirstEvaluator : UnaryIterativeEvaluator
+	{
 		private IElement first = null;
 
 		/// <summary>
 		/// First(v) iterative evaluator
 		/// </summary>
-		public FirstEvaluator()
+		/// <param name="Node">Node being iteratively evaluated.</param>
+		public FirstEvaluator(First Node)
+			: base(Node.Argument)
 		{
 		}
 
 		/// <summary>
 		/// Restarts the evaluator.
 		/// </summary>
-		public void RestartEvaluator()
+		public override void RestartEvaluator()
 		{
 			this.first = null;
 		}
@@ -30,7 +32,7 @@ namespace Waher.Script.Functions.Vectors
 		/// Aggregates one new element.
 		/// </summary>
 		/// <param name="Element">Element.</param>
-		public void AggregateElement(IElement Element)
+		public override void AggregateElement(IElement Element)
 		{
             if (this.first is null)
 				this.first = Element;
@@ -39,7 +41,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Gets the aggregated result.
 		/// </summary>
-		public IElement GetAggregatedResult()
+		public override IElement GetAggregatedResult()
 		{
             return this.first ?? ObjectValue.Null;
 		}

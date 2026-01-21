@@ -63,7 +63,7 @@ namespace Waher.Script.Functions.Vectors
 		/// Creates an iterative evaluator for the node.
 		/// </summary>
 		/// <returns>Iterative evaluator reference.</returns>
-		public IIterativeEvaluator CreateEvaluator() => new FirstEvaluator();
+		public IIterativeEvaluator CreateEvaluator() => new FirstEvaluator(this);
 
 		#endregion
 

@@ -9,9 +9,8 @@ namespace Waher.Script.Functions.Vectors
 	/// <summary>
 	/// Max(v) iterative evaluator
 	/// </summary>
-	public class MaxEvaluator : IIterativeEvaluator
-    {
-		private readonly Max node;
+	public class MaxEvaluator : UnaryIterativeEvaluator
+	{
 		private IElement max = null;
 		private IOrderedSet maxSet = null;
 		private double? doubleMax = null;
@@ -20,16 +19,16 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Max(v) iterative evaluator
 		/// </summary>
-		/// <param name="Node">Node reference</param>
+		/// <param name="Node">Node being iteratively evaluated.</param>
 		public MaxEvaluator(Max Node)
+			: base(Node.Argument)
         {
-			this.node = Node;
 		}
 
 		/// <summary>
 		/// Restarts the evaluator.
 		/// </summary>
-		public void RestartEvaluator()
+		public override void RestartEvaluator()
 		{
 			this.max = null;
 			this.doubleMax = null;
@@ -40,7 +39,7 @@ namespace Waher.Script.Functions.Vectors
 		/// Aggregates one new element.
 		/// </summary>
 		/// <param name="Element">Element.</param>
-		public void AggregateElement(IElement Element)
+		public override void AggregateElement(IElement Element)
 		{
 			if (this.isDouble && Element is DoubleNumber D)
 			{
@@ -52,7 +51,7 @@ namespace Waher.Script.Functions.Vectors
 			else if (this.max is null || this.maxSet.Compare(this.max, Element) < 0)
 			{
 				if (!(Element.AssociatedSet is IOrderedSet S))
-					throw new ScriptRuntimeException("Cannot compare operands.", this.node);
+					throw new ScriptRuntimeException("Cannot compare operands.", this.Node);
 
 				this.max = Element;
 				this.maxSet = S;
@@ -63,7 +62,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Gets the aggregated result.
 		/// </summary>
-		public IElement GetAggregatedResult()
+		public override IElement GetAggregatedResult()
 		{
 			if (this.isDouble)
 			{

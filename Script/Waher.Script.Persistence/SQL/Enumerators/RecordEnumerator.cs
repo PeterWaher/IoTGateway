@@ -7,100 +7,108 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SQL.Enumerators
 {
-    /// <summary>
-    /// Enumerator that limits the return set to a maximum number of records.
-    /// </summary>
-    public class RecordEnumerator : IResultSetEnumerator
-    {
-        private readonly IResultSetEnumerator e;
-        private readonly ScriptNode[] columns;
-        private readonly Variables variables;
-        private readonly int count;
-        private IElement[] record;
-        private ObjectProperties properties = null;
+	/// <summary>
+	/// Enumerator that limits the return set to a maximum number of records.
+	/// </summary>
+	public class RecordEnumerator : IResultSetEnumerator
+	{
+		private readonly IResultSetEnumerator e;
+		private readonly ScriptNode[] columns;
+		private readonly bool[] columnAsynchronous;
+		private readonly Variables variables;
+		private readonly int count;
+		private IElement[] record;
+		private ObjectProperties properties = null;
 
-        /// <summary>
-        /// Enumerator that limits the return set to a maximum number of records.
-        /// </summary>
-        /// <param name="ItemEnumerator">Item enumerator</param>
-        /// <param name="Columns">Column definitions. Might be null if objects are to be returned.</param>
-        /// <param name="Variables">Current set of variables.</param>
-        public RecordEnumerator(IResultSetEnumerator ItemEnumerator, ScriptNode[] Columns, Variables Variables)
-        {
+		/// <summary>
+		/// Enumerator that limits the return set to a maximum number of records.
+		/// </summary>
+		/// <param name="ItemEnumerator">Item enumerator</param>
+		/// <param name="Columns">Column definitions. Might be null if objects are to be returned.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		public RecordEnumerator(IResultSetEnumerator ItemEnumerator, ScriptNode[] Columns, Variables Variables)
+		{
 			this.e = ItemEnumerator;
 			this.columns = Columns;
 			this.variables = Variables;
 			this.count = this.columns?.Length ?? 0;
-        }
+			this.columnAsynchronous = new bool[this.count];
 
-        /// <summary>
-        /// <see cref="IEnumerator.Current"/>
-        /// </summary>
-        public object Current => this.e.Current;
+			for (int i = 0; i < this.count; i++)
+				this.columnAsynchronous[i] = this.columns[i].IsAsynchronous;
+		}
 
-        /// <summary>
-        /// Current record
-        /// </summary>
-        public IElement[] CurrentRecord => this.record;
+		/// <summary>
+		/// <see cref="IEnumerator.Current"/>
+		/// </summary>
+		public object Current => this.e.Current;
 
-        /// <summary>
-        /// <see cref="IEnumerator.MoveNext"/>
-        /// </summary>
-        public virtual bool MoveNext()
-        {
-            return this.MoveNextAsync().Result;
-        }
+		/// <summary>
+		/// Current record
+		/// </summary>
+		public IElement[] CurrentRecord => this.record;
 
-        /// <summary>
-        /// Advances the enumerator to the next element of the collection.
-        /// </summary>
-        /// <returns>true if the enumerator was successfully advanced to the next element; false if
-        /// the enumerator has passed the end of the collection.</returns>
-        /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-        public virtual async Task<bool> MoveNextAsync()
-        {
-            if (!await this.e.MoveNextAsync())
-                return false;
+		/// <summary>
+		/// <see cref="IEnumerator.MoveNext"/>
+		/// </summary>
+		public virtual bool MoveNext()
+		{
+			return this.MoveNextAsync().Result;
+		}
 
-            int i;
-            object Item = this.e.Current;
-            IElement Element = Item as IElement;
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public virtual async Task<bool> MoveNextAsync()
+		{
+			if (!await this.e.MoveNextAsync())
+				return false;
 
-            if (this.properties is null)
+			int i;
+			object Item = this.e.Current;
+			IElement Element = Item as IElement;
+
+			if (this.properties is null)
 				this.properties = new ObjectProperties(Element?.AssociatedObjectValue ?? Item, this.variables);
-            else
+			else
 				this.properties.Object = Element?.AssociatedObjectValue ?? Item;
 
-            if (this.columns is null)
+			if (this.columns is null)
 				this.record = new IElement[1] { Element ?? Expression.Encapsulate(Item) };
-            else
-            {
+			else
+			{
 				this.record = new IElement[this.count];
 
-                for (i = 0; i < this.count; i++)
-                {
-                    try
-                    {
-						this.record[i] = await this.columns[i].EvaluateAsync(this.properties);
-                    }
-                    catch (Exception ex)
-                    {
-                        ex = Log.UnnestException(ex);
+				for (i = 0; i < this.count; i++)
+				{
+					try
+					{
+						if (this.columnAsynchronous[i])
+							this.record[i] = await this.columns[i].EvaluateAsync(this.properties);
+						else
+							this.record[i] = this.columns[i].Evaluate(this.properties);
+					}
+					catch (Exception ex)
+					{
+						ex = Log.UnnestException(ex);
 						this.record[i] = Expression.Encapsulate(ex);
-                    }
-                }
-            }
+					}
+				}
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        /// <summary>
-        /// <see cref="IEnumerator.Reset"/>
-        /// </summary>
-        public virtual void Reset()
-        {
+		/// <summary>
+		/// <see cref="IEnumerator.Reset"/>
+		/// </summary>
+		public virtual void Reset()
+		{
 			this.e.Reset();
-        }
+		}
 
-    }
+	}
 }

@@ -8,9 +8,8 @@ namespace Waher.Script.Functions.Vectors
 	/// <summary>
 	/// Sum(v) iterative evaluator
 	/// </summary>
-	public class SumEvaluator : IIterativeEvaluator
-    {
-        private readonly Sum node;
+	public class SumEvaluator : UnaryIterativeEvaluator
+	{
 		private IElement sum = null;
 		private double doubleSum = 0;
 		private bool isDouble = true;
@@ -18,15 +17,16 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Sum(v) iterative evaluator
 		/// </summary>
+		/// <param name="Node">Node being iteratively evaluated.</param>
 		public SumEvaluator(Sum Node)
+			: base(Node.Argument)
         {
-            this.node = Node;
 		}
 
 		/// <summary>
 		/// Restarts the evaluator.
 		/// </summary>
-		public void RestartEvaluator()
+		public override void RestartEvaluator()
 		{
 			this.sum = null;
 			this.doubleSum = 0;
@@ -37,7 +37,7 @@ namespace Waher.Script.Functions.Vectors
 		/// Aggregates one new element.
 		/// </summary>
 		/// <param name="Element">Element.</param>
-		public void AggregateElement(IElement Element)
+		public override void AggregateElement(IElement Element)
 		{
 			if (this.isDouble && Element is DoubleNumber D)
 				this.doubleSum += D.Value;
@@ -48,21 +48,21 @@ namespace Waher.Script.Functions.Vectors
 				if (this.sum is null)
 					this.sum = Element;
 				else
-					this.sum = Add.EvaluateAddition(new DoubleNumber(this.doubleSum), Element, this.node);
+					this.sum = Add.EvaluateAddition(new DoubleNumber(this.doubleSum), Element, this.Node);
 			}
 			else
-				this.sum = Add.EvaluateAddition(this.sum, Element, this.node);
+				this.sum = Add.EvaluateAddition(this.sum, Element, this.Node);
 		}
 
 		/// <summary>
 		/// Gets the aggregated result.
 		/// </summary>
-		public IElement GetAggregatedResult()
+		public override IElement GetAggregatedResult()
 		{
-			if (this.sum is null)
-				return ObjectValue.Null;
+			if (this.isDouble)
+				return new DoubleNumber(this.doubleSum);
 			else 
-				return this.sum;
+				return this.sum ?? ObjectValue.Null;
 		}
 	}
 }

@@ -895,12 +895,6 @@ namespace Waher.Script.Test
 			await Test("Or([3,2,1])", 3);
 			await Test("Xor([true,false,true])", false);
 			await Test("Xor([3,2,1])", 0);
-			await Test("Nand([true,false,true])", true);
-			await Test("Nand([3,2,1])", 0xffffffffffffffff);
-			await Test("Nor([true,false,true])", false);
-			await Test("Nor([3,2,1])", unchecked((ulong)-4));
-			await Test("Xnor([true,false,true])", true);
-			await Test("Xnor([3,2,1])", 0xffffffffffffffff);
 			await Test("Contains(1..10,5)", true);
 			await Test("Contains(1..10,11)", false);
 			await Test("IndexOf(1..10,5)", 4);

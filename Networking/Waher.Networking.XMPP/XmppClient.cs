@@ -1222,7 +1222,9 @@ namespace Waher.Networking.XMPP
 						{
 							StringBuilder Xml = new StringBuilder();
 
-							Xml.Append("<iq xmlns='" + NamespaceClient + "' type='error' from='");
+							Xml.Append("<iq xmlns='");
+							Xml.Append(NamespaceClient);
+							Xml.Append("' type='error' from='");
 							Xml.Append(Request.To);
 							Xml.Append("' id='");
 							Xml.Append(Request.SeqNr.ToString());
@@ -4184,7 +4186,9 @@ namespace Waher.Networking.XMPP
 						{
 							StringBuilder Xml = new StringBuilder();
 
-							Xml.Append("<query xmlns='" + NamespaceRegister + "'>");
+							Xml.Append("<query xmlns='");
+							Xml.Append(NamespaceRegister);
+							Xml.Append("'>");
 
 							if (!(UserName is null))
 							{
@@ -4226,7 +4230,9 @@ namespace Waher.Networking.XMPP
 			if (!string.IsNullOrEmpty(this.formSignatureKey) && !string.IsNullOrEmpty(this.formSignatureSecret))
 				await RegistrationForm.Sign(this.formSignatureKey, this.formSignatureSecret);
 
-			Xml.Append("<query xmlns='" + NamespaceRegister + "'>");
+			Xml.Append("<query xmlns='");
+			Xml.Append(NamespaceRegister);
+			Xml.Append("'>");
 			RegistrationForm.SerializeSubmit(Xml);
 			Xml.Append("</query>");
 
@@ -4238,7 +4244,9 @@ namespace Waher.Networking.XMPP
 			IqResultEventArgs e = (IqResultEventArgs)RegistrationForm.State;
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<query xmlns='" + NamespaceRegister + "'>");
+			Xml.Append("<query xmlns='");
+			Xml.Append(NamespaceRegister);
+			Xml.Append("'>");
 			RegistrationForm.SerializeCancel(Xml);
 			Xml.Append("</query>");
 
@@ -4320,7 +4328,9 @@ namespace Waher.Networking.XMPP
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<query xmlns='" + NamespaceRegister + "'><username>");
+			Xml.Append("<query xmlns='");
+			Xml.Append(NamespaceRegister);
+			Xml.Append("'><username>");
 			Xml.Append(XML.Encode(this.userName));
 			Xml.Append("</username><password>");
 			Xml.Append(XML.Encode(NewPassword));
@@ -4409,7 +4419,9 @@ namespace Waher.Networking.XMPP
 			if (!string.IsNullOrEmpty(this.formSignatureKey) && !string.IsNullOrEmpty(this.formSignatureSecret))
 				await RegistrationForm.Sign(this.formSignatureKey, this.formSignatureSecret);
 
-			Xml.Append("<query xmlns='" + NamespaceRegister + "'>");
+			Xml.Append("<query xmlns='");
+			Xml.Append(NamespaceRegister);
+			Xml.Append("'>");
 			RegistrationForm.SerializeSubmit(Xml);
 			Xml.Append("</query>");
 
@@ -4421,7 +4433,9 @@ namespace Waher.Networking.XMPP
 			IqResultEventArgs e = (IqResultEventArgs)RegistrationForm.State;
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<query xmlns='" + NamespaceRegister + "'>");
+			Xml.Append("<query xmlns='");
+			Xml.Append(NamespaceRegister);
+			Xml.Append("'>");
 			RegistrationForm.SerializeCancel(Xml);
 			Xml.Append("</query>");
 
@@ -7171,7 +7185,9 @@ namespace Waher.Networking.XMPP
 							{
 								StringBuilder Xml = new StringBuilder();
 
-								Xml.Append("<iq xmlns='" + NamespaceClient + "' type='error' from='");
+								Xml.Append("<iq xmlns='");
+								Xml.Append(NamespaceClient);
+								Xml.Append("' type='error' from='");
 								Xml.Append(Request.To);
 								Xml.Append("' id='");
 								Xml.Append(Request.SeqNr.ToString());

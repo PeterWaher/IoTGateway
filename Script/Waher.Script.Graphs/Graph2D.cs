@@ -654,7 +654,8 @@ namespace Waher.Script.Graphs
 					IsAntialias = true,
 					Style = SKPaintStyle.Fill,
 					Color = Settings.AxisColor,
-					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Normal) ?? SKTypeface.Default,
+					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Normal) 
+						?? SKTypeface.Default,
 					TextSize = (float)Settings.LabelFontSize
 				};
 				SKRect Bounds = new SKRect();
@@ -844,7 +845,8 @@ namespace Waher.Script.Graphs
 					IsAntialias = true,
 					Style = SKPaintStyle.Fill,
 					Color = Settings.AxisColor,
-					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Bold) ?? SKTypeface.Default,
+					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Bold) 
+						?? SKTypeface.Default,
 					TextSize = (float)(Settings.LabelFontSize * 1.5)
 				};
 

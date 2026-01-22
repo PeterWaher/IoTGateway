@@ -52,7 +52,8 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 				Subpixel = true,
 				Size = Bak.Size,
 				Typeface = SKTypeface.FromFamilyName(Bak.Typeface.FamilyName,
-					(int)SKFontStyleWeight.Bold, Bak.Typeface.FontWidth, Bak.Typeface.FontSlant) ?? SKTypeface.Default
+					(int)SKFontStyleWeight.Bold, Bak.Typeface.FontWidth, Bak.Typeface.FontSlant) 
+					?? SKTypeface.Default
             };
 
 			State.Text = State.Text.Clone();

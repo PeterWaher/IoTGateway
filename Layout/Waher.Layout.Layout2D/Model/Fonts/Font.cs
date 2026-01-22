@@ -218,8 +218,8 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 				Hinting = SKFontHinting.Full,
 				Subpixel = true,
 				Size = Size * State.PixelsPerInch / 72,
-				Typeface = SKTypeface.FromFamilyName(Name, Weight, Width, Slant)
-			};
+				Typeface = SKTypeface.FromFamilyName(Name, Weight, Width, Slant) ?? SKTypeface.Default
+            };
 
 			this.text = new SKPaint()
 			{

@@ -12,7 +12,7 @@ using Waher.Script.Objects;
 namespace Waher.Script.System.Functions
 {
 	/// <summary>
-	/// ShellExecute(FileName,Arguments,WorkFolder)
+	/// ShellExecute(FileName,Arguments,WorkFolder[,TimeoutMs[,LogStandardOutput[,KillOnTimeout]]])
 	/// </summary>
 	public class ShellExecute : FunctionMultiVariate
 	{
@@ -50,7 +50,6 @@ namespace Waher.Script.System.Functions
 		}
 
 		/// <summary>
-		/// ShellExecute(FileName,Arguments,WorkFolder,TimeoutMs)
 		/// </summary>
 		/// <param name="FileName">File name of executable file.</param>
 		/// <param name="Arguments">Command-line arguments.</param>
@@ -68,7 +67,7 @@ namespace Waher.Script.System.Functions
 		}
 
 		/// <summary>
-		/// ShellExecute(FileName,Arguments,WorkFolder,TimeoutMs)
+		/// ShellExecute(FileName,Arguments,WorkFolder,TimeoutMs,LogStandardOutput,KillOnTimeout)
 		/// </summary>
 		/// <param name="FileName">File name of executable file.</param>
 		/// <param name="Arguments">Command-line arguments.</param>
@@ -96,7 +95,12 @@ namespace Waher.Script.System.Functions
 		/// </summary>
 		public override string[] DefaultArgumentNames => new string[]
 		{
-			"FileName", "Arguments", "WorkFolder", "TimeoutMs", "LogStandardOutput", "KillOnTimeout"
+			"FileName", 
+			"Arguments", 
+			"WorkFolder", 
+			"TimeoutMs", 
+			"LogStandardOutput", 
+			"KillOnTimeout"
 		};
 
 		/// <summary>
@@ -149,7 +153,7 @@ namespace Waher.Script.System.Functions
 				if (Arguments[4].AssociatedObjectValue is bool PLogStandardOut)
 					LogStandardOut = PLogStandardOut;
 				else
-					throw new ScriptRuntimeException("LogStandardOut out must be a boolean.", this);
+					throw new ScriptRuntimeException("LogStandardOut out must be a Boolean value.", this);
 			}
 
 			if (Arguments.Length > 5)
@@ -157,7 +161,7 @@ namespace Waher.Script.System.Functions
 				if (Arguments[5].AssociatedObjectValue is bool PKillOnTimout)
 					KillOnTimeout = PKillOnTimout;
 				else
-					throw new ScriptRuntimeException("KillOnException must be a boolean.", this);
+					throw new ScriptRuntimeException("PKillOnTimout must be a Boolean value.", this);
 			}
 
 			ProcessStartInfo ProcessInformation = new ProcessStartInfo()
@@ -218,8 +222,8 @@ namespace Waher.Script.System.Functions
 
 				if (LogStandardOut)
 				{
-					BufferedLogger OutputLogger = new BufferedLogger((string message) => Log.Informational(message));
-					BufferedLogger ErrorLogger = new BufferedLogger((string message) => Log.Error(message));
+					BufferedLogger OutputLogger = new BufferedLogger(Message => Log.Informational(Message));
+					BufferedLogger ErrorLogger = new BufferedLogger(Message => Log.Error(Message));
 
 					P.ErrorDataReceived += (Sender, e) => ErrorLogger.Push(e.Data);
 					P.OutputDataReceived += (Sender, e) => OutputLogger.Push(e.Data);
@@ -260,61 +264,63 @@ namespace Waher.Script.System.Functions
 
 		private class BufferedLogger
 		{
-			private readonly object Lock;
-			private readonly StringBuilder Buffer;
-			private CancellationTokenSource Cts;
-			Action<string> Logger;
+			private readonly object @lock;
+			private readonly StringBuilder buffer;
+			private readonly Action<string> logger;
+			private CancellationTokenSource cts;
 
 			public BufferedLogger(Action<string> Logger)
 			{
-				this.Lock = new object();
-				this.Buffer = new StringBuilder();
-				this.Cts = new CancellationTokenSource();
-				this.Logger = Logger;
+				this.@lock = new object();
+				this.buffer = new StringBuilder();
+				this.cts = new CancellationTokenSource();
+				this.logger = Logger;
 			}
 
-			public void Push(string text)
+			public void Push(string Text)
 			{
-				lock (Lock)
+				lock (this.@lock)
 				{
-					Buffer.AppendLine(text);
+					this.buffer.AppendLine(Text);
 
-					Cts.Cancel();
-					Cts.Dispose();
-					Cts = new CancellationTokenSource();
+					CancellationTokenSource Prev = this.cts;
+					this.cts = new CancellationTokenSource();
 
-					_ = FlushDelayed(Cts.Token);
+					Prev.Cancel();
+					Prev.Dispose();
+
+					_ = this.FlushDelayed(this.cts.Token);
 				}
 			}
 
-			async Task FlushDelayed(CancellationToken token)
+			private async Task FlushDelayed(CancellationToken Token)
 			{
 				try
 				{
-					await Task.Delay(500, token);
+					await Task.Delay(500, Token);
 				}
 				catch (TaskCanceledException)
 				{
 					return;
 				}
 
-				Flush();
+				this.Flush();
 			}
 
 			void Flush()
 			{
-				string message;
+				string Message;
 
-				lock (Lock)
+				lock (this.@lock)
 				{
-					message = Buffer.ToString();
-					if (string.IsNullOrEmpty(message.Trim()))
+					Message = this.buffer.ToString();
+					if (string.IsNullOrEmpty(Message.Trim()))
 						return;
 
-					Buffer.Clear();
+					this.buffer.Clear();
 				}
 
-				Logger(message);
+				this.logger(Message);
 			}
 		}
 	}

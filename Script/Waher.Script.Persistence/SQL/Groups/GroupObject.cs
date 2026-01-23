@@ -64,6 +64,8 @@ namespace Waher.Script.Persistence.SQL.Groups
 			{
 				if (this.groupedValues.TryGetValue(Name, out object Value))
 					return Value;
+				else if (this.variables.TryGetVariable(Name, out Variable v))
+					return v.ValueObject;
 				else
 					return null;
 			}

@@ -108,7 +108,7 @@ namespace Waher.Script.Content.Functions.Encoding
 						foreach (string s in Rec)
 						{
 							if (s is null || string.IsNullOrEmpty(s))
-								Elements.Add(new ObjectValue(null));
+								Elements.Add(ObjectValue.Null);
 							else if (CommonTypes.TryParse(s, out double dbl))
 								Elements.Add(new DoubleNumber(dbl));
 							else if (CommonTypes.TryParse(s, out bool b))

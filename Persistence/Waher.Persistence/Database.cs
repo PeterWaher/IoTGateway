@@ -6,6 +6,7 @@ using System.Xml;
 using Waher.Events;
 using Waher.Persistence.Exceptions;
 using Waher.Persistence.Filters;
+using Waher.Persistence.Processors;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Profiling;
@@ -805,6 +806,402 @@ namespace Waher.Persistence
 			where T : class
 		{
 			return Provider.Process(Processor, Collection, Offset, MaxCount, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(Predicate<T> Processor, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateProcessor<T>(Processor), 0, int.MaxValue, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(Predicate<T> Processor, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateProcessor<T>(Processor), 0, int.MaxValue, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(Predicate<T> Processor, int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateProcessor<T>(Processor), Offset, MaxCount, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(Predicate<T> Processor, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateProcessor<T>(Processor), Offset, MaxCount, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process(Predicate<object> Processor, string Collection, params string[] SortOrder)
+		{
+			return Provider.Process(new PredicateProcessor<object>(Processor), Collection, 0, int.MaxValue, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process(Predicate<object> Processor, string Collection, Filter Filter, params string[] SortOrder)
+		{
+			return Provider.Process(new PredicateProcessor<object>(Processor), Collection, 0, int.MaxValue, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process(Predicate<object> Processor, string Collection, int Offset, int MaxCount, params string[] SortOrder)
+		{
+			return Provider.Process(new PredicateProcessor<object>(Processor), Collection, Offset, MaxCount, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process(Predicate<object> Processor, string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			return Provider.Process(new PredicateProcessor<object>(Processor), Collection, Offset, MaxCount, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(Predicate<T> Processor, string Collection, string[] SortOrder)   // Note: No params, to avoid confusion with Find<T>(params SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateProcessor<T>(Processor), Collection, 0, int.MaxValue, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(Predicate<T> Processor, string Collection, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateProcessor<T>(Processor), Collection, 0, int.MaxValue, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(Predicate<T> Processor, string Collection, int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateProcessor<T>(Processor), Collection, Offset, MaxCount, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(Predicate<T> Processor, string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateProcessor<T>(Processor), Collection, Offset, MaxCount, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(PredicateAsync<T> Processor, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateAsyncProcessor<T>(Processor), 0, int.MaxValue, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(PredicateAsync<T> Processor, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateAsyncProcessor<T>(Processor), 0, int.MaxValue, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateAsyncProcessor<T>(Processor), Offset, MaxCount, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateAsyncProcessor<T>(Processor), Offset, MaxCount, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process(PredicateAsync<object> Processor, string Collection, params string[] SortOrder)
+		{
+			return Provider.Process(new PredicateAsyncProcessor<object>(Processor), Collection, 0, int.MaxValue, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process(PredicateAsync<object> Processor, string Collection, Filter Filter, params string[] SortOrder)
+		{
+			return Provider.Process(new PredicateAsyncProcessor<object>(Processor), Collection, 0, int.MaxValue, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process(PredicateAsync<object> Processor, string Collection, int Offset, int MaxCount, params string[] SortOrder)
+		{
+			return Provider.Process(new PredicateAsyncProcessor<object>(Processor), Collection, Offset, MaxCount, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process(PredicateAsync<object> Processor, string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			return Provider.Process(new PredicateAsyncProcessor<object>(Processor), Collection, Offset, MaxCount, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(PredicateAsync<T> Processor, string Collection, string[] SortOrder)   // Note: No params, to avoid confusion with Find<T>(params SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateAsyncProcessor<T>(Processor), Collection, 0, int.MaxValue, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(PredicateAsync<T> Processor, string Collection, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateAsyncProcessor<T>(Processor), Collection, 0, int.MaxValue, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(PredicateAsync<T> Processor, string Collection, int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateAsyncProcessor<T>(Processor), Collection, Offset, MaxCount, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public static Task<bool> Process<T>(PredicateAsync<T> Processor, string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.Process(new PredicateAsyncProcessor<T>(Processor), Collection, Offset, MaxCount, Filter, SortOrder);
 		}
 
 		/// <summary>

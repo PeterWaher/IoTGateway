@@ -1326,7 +1326,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, params string[] SortOrder)
+		public Task<bool> Process<T>(IProcessor<T> Processor, int Offset, int MaxCount, params string[] SortOrder)
 			where T : class
 		{
 			return this.Process<T>(Processor, Offset, MaxCount, (Filter)null, SortOrder);
@@ -1344,7 +1344,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		public Task<bool> Process<T>(IProcessor<T> Processor, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 			where T : class
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
@@ -1378,7 +1378,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, Filter Filter,
+		public Task<bool> Process<T>(IProcessor<T> Processor, int Offset, int MaxCount, Filter Filter,
 			T ContinueAfter, params string[] SortOrder)
 			where T : class
 		{
@@ -1412,7 +1412,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter,
+		public Task<bool> Process<T>(IProcessor<T> Processor, int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter,
 			params string[] SortOrder)
 			where T : class
 		{
@@ -1440,7 +1440,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public Task<bool> Process<T>(PredicateAsync<T> Processor, string CollectionName, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		public Task<bool> Process<T>(IProcessor<T> Processor, string CollectionName, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 			where T : class
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
@@ -1473,7 +1473,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public Task<bool> Process<T>(PredicateAsync<T> Processor, string CollectionName, int Offset, int MaxCount, Filter Filter,
+		public Task<bool> Process<T>(IProcessor<T> Processor, string CollectionName, int Offset, int MaxCount, Filter Filter,
 			T ContinueAfter, params string[] SortOrder)
 			where T : class
 		{
@@ -1505,7 +1505,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public Task<bool> Process(PredicateAsync<object> Processor, string CollectionName, int Offset, int MaxCount, params string[] SortOrder)
+		public Task<bool> Process(IProcessor<object> Processor, string CollectionName, int Offset, int MaxCount, params string[] SortOrder)
 		{
 			return this.Process(Processor, CollectionName, Offset, MaxCount, null, SortOrder);
 		}
@@ -1522,7 +1522,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public Task<bool> Process(PredicateAsync<object> Processor, string CollectionName, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		public Task<bool> Process(IProcessor<object> Processor, string CollectionName, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(object));
 			IMongoCollection<BsonDocument> Collection;
@@ -1541,7 +1541,7 @@ namespace Waher.Persistence.MongoDB
 			return this.Process<object>(Processor, Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
 		}
 
-		private async Task<bool> Process<T>(PredicateAsync<T> Processor, ObjectSerializer Serializer, IMongoCollection<BsonDocument> Collection,
+		private async Task<bool> Process<T>(IProcessor<T> Processor, ObjectSerializer Serializer, IMongoCollection<BsonDocument> Collection,
 			int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter, T ContinueAfter, params string[] SortOrder)
 			where T : class
 		{
@@ -1587,6 +1587,9 @@ namespace Waher.Persistence.MongoDB
 				NominalType = typeof(T)
 			};
 
+			bool Asynchronous = Processor.IsAsynchronous;
+			bool Continue;
+
 			while (await Cursor.MoveNextAsync())
 			{
 				foreach (BsonDocument Document in Cursor.Current)
@@ -1596,7 +1599,12 @@ namespace Waher.Persistence.MongoDB
 
 					if (Serializer.Deserialize(Context, Args) is T Obj)
 					{
-						if (!await Processor(Obj))
+						if (Asynchronous)
+							Continue = await Processor.ProcessAsync(Obj);
+						else
+							Continue = Processor.Process(Obj);
+
+						if (!Continue)
 							return false;
 					}
 				}

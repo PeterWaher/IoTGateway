@@ -211,7 +211,7 @@ namespace Waher.Persistence
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, params string[] SortOrder)
+		Task<bool> Process<T>(IProcessor<T> Processor, int Offset, int MaxCount, params string[] SortOrder)
 			where T : class;
 
 		/// <summary>
@@ -226,7 +226,7 @@ namespace Waher.Persistence
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, 
+		Task<bool> Process<T>(IProcessor<T> Processor, int Offset, int MaxCount, 
 			Filter Filter, params string[] SortOrder)
 			where T : class;
 
@@ -241,7 +241,7 @@ namespace Waher.Persistence
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		Task<bool> Process(PredicateAsync<object> Processor, string Collection, int Offset, int MaxCount,
+		Task<bool> Process(IProcessor<object> Processor, string Collection, int Offset, int MaxCount,
 			params string[] SortOrder);
 
 		/// <summary>
@@ -256,7 +256,7 @@ namespace Waher.Persistence
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		Task<bool> Process(PredicateAsync<object> Processor, string Collection, int Offset, int MaxCount, 
+		Task<bool> Process(IProcessor<object> Processor, string Collection, int Offset, int MaxCount, 
 			Filter Filter, params string[] SortOrder);
 
 		/// <summary>
@@ -272,7 +272,7 @@ namespace Waher.Persistence
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		Task<bool> Process<T>(PredicateAsync<T> Processor, string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		Task<bool> Process<T>(IProcessor<T> Processor, string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 			where T : class;
 
 		/// <summary>

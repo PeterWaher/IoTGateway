@@ -2290,7 +2290,7 @@ namespace Waher.Persistence.Files
 			{
 				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
 				await ResultSet.ContinueAfterLocked(ContinueAfter);
-				return await LoadAllLocked<T>(ResultSet);
+				return await LoadAllLocked(ResultSet);
 			}
 			finally
 			{
@@ -2364,7 +2364,7 @@ namespace Waher.Persistence.Files
 			try
 			{
 				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
-				return await LoadAllLocked<T>(ResultSet);
+				return await LoadAllLocked(ResultSet);
 			}
 			finally
 			{
@@ -2399,7 +2399,7 @@ namespace Waher.Persistence.Files
 			{
 				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
 				await ResultSet.ContinueAfterLocked(ContinueAfter);
-				return await LoadAllLocked<T>(ResultSet);
+				return await LoadAllLocked(ResultSet);
 			}
 			finally
 			{
@@ -2528,10 +2528,10 @@ namespace Waher.Persistence.Files
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, params string[] SortOrder)
+		public Task<bool> Process<T>(IProcessor<T> Processor, int Offset, int MaxCount, params string[] SortOrder)
 			where T : class
 		{
-			return this.Process<T>(Processor, Offset, MaxCount, null, SortOrder);
+			return this.Process(Processor, Offset, MaxCount, null, SortOrder);
 		}
 
 		/// <summary>
@@ -2546,7 +2546,7 @@ namespace Waher.Persistence.Files
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public async Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		public async Task<bool> Process<T>(IProcessor<T> Processor, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 			where T : class
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
@@ -2560,7 +2560,7 @@ namespace Waher.Persistence.Files
 			try
 			{
 				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
-				return await ProcessAllLocked<T>(Processor, ResultSet);
+				return await ProcessAllLocked(Processor, ResultSet);
 			}
 			finally
 			{
@@ -2581,7 +2581,7 @@ namespace Waher.Persistence.Files
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public async Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, Filter Filter,
+		public async Task<bool> Process<T>(IProcessor<T> Processor, int Offset, int MaxCount, Filter Filter,
 			T ContinueAfter, params string[] SortOrder)
 			where T : class
 		{
@@ -2597,7 +2597,7 @@ namespace Waher.Persistence.Files
 			{
 				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
 				await ResultSet.ContinueAfterLocked(ContinueAfter);
-				return await ProcessAllLocked<T>(Processor, ResultSet);
+				return await ProcessAllLocked(Processor, ResultSet);
 			}
 			finally
 			{
@@ -2605,13 +2605,21 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		internal static async Task<bool> ProcessAllLocked<T>(PredicateAsync<T> Processor, ICursor<T> ResultSet)
+		internal static async Task<bool> ProcessAllLocked<T>(IProcessor<T> Processor, ICursor<T> ResultSet)
 		{
+			bool Asynchronous = Processor.IsAsynchronous;
+			bool Continue;
+
 			while (await ResultSet.MoveNextAsyncLocked())
 			{
 				if (ResultSet.CurrentTypeCompatible)
 				{
-					if (!await Processor(ResultSet.Current))
+					if (Asynchronous)
+						Continue = await Processor.ProcessAsync(ResultSet.Current);
+					else
+						Continue = Processor.Process(ResultSet.Current);
+
+					if (!Continue)
 						return false;
 				}
 			}
@@ -2630,7 +2638,7 @@ namespace Waher.Persistence.Files
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public Task<bool> Process(PredicateAsync<object> Processor, string Collection, int Offset, int MaxCount, params string[] SortOrder)
+		public Task<bool> Process(IProcessor<object> Processor, string Collection, int Offset, int MaxCount, params string[] SortOrder)
 		{
 			return this.Process<object>(Processor, Collection, Offset, MaxCount, null, SortOrder);
 		}
@@ -2647,7 +2655,7 @@ namespace Waher.Persistence.Files
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public Task<bool> Process(PredicateAsync<object> Processor, string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		public Task<bool> Process(IProcessor<object> Processor, string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
 			return this.Process<object>(Processor, Collection, Offset, MaxCount, Filter, SortOrder);
 		}
@@ -2665,7 +2673,7 @@ namespace Waher.Persistence.Files
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public async Task<bool> Process<T>(PredicateAsync<T> Processor, string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		public async Task<bool> Process<T>(IProcessor<T> Processor, string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 			where T : class
 		{
 			ObjectBTreeFile File = await this.GetFile(Collection, false);
@@ -2678,7 +2686,7 @@ namespace Waher.Persistence.Files
 			try
 			{
 				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
-				return await ProcessAllLocked<T>(Processor, ResultSet);
+				return await ProcessAllLocked(Processor, ResultSet);
 			}
 			finally
 			{
@@ -2700,7 +2708,7 @@ namespace Waher.Persistence.Files
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public async Task<bool> Process<T>(PredicateAsync<T> Processor, string Collection, int Offset, int MaxCount,
+		public async Task<bool> Process<T>(IProcessor<T> Processor, string Collection, int Offset, int MaxCount,
 			Filter Filter, T ContinueAfter, params string[] SortOrder)
 			where T : class
 		{
@@ -2715,7 +2723,7 @@ namespace Waher.Persistence.Files
 			{
 				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
 				await ResultSet.ContinueAfterLocked(ContinueAfter);
-				return await ProcessAllLocked<T>(Processor, ResultSet);
+				return await ProcessAllLocked(Processor, ResultSet);
 			}
 			finally
 			{

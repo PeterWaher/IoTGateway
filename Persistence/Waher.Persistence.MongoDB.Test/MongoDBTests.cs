@@ -120,41 +120,43 @@ namespace Waher.Persistence.MongoDB.Test
 		[TestMethod]
 		public async Task Test_11_Process()
 		{
-			await Database.Process<ThingReference>((ThingReference) =>
+			await Database.Process(new ConsoleOutProcessor<ThingReference>());
+		}
+
+		private class ConsoleOutProcessor<T> : IProcessor<T>
+		{
+			public ConsoleOutProcessor()
 			{
-				ConsoleOut.WriteLine(ThingReference.ToString());
-				return Task.FromResult(true);
-			});
+			}
+
+			public bool IsAsynchronous => false;
+			public bool Process(T Object)
+			{
+				ConsoleOut.WriteLine(Object.ToString());
+				return true;
+			}
+
+			public Task<bool> ProcessAsync(T Object) => Task.FromResult(false);
 		}
 
 		[TestMethod]
 		public async Task Test_12_ProcessFilter()
 		{
-			await Database.Process<ThingReference>((ThingReference) =>
-			{
-				ConsoleOut.WriteLine(ThingReference.ToString());
-				return Task.FromResult(true);
-			}, new FilterFieldEqualTo("NodeId", "Node2"));
+			await Database.Process(new ConsoleOutProcessor<ThingReference>(),
+				new FilterFieldEqualTo("NodeId", "Node2"));
 		}
 
 		[TestMethod]
 		public async Task Test_13_ProcessFilterSort()
 		{
-			await Database.Process<ThingReference>((ThingReference) =>
-			{
-				ConsoleOut.WriteLine(ThingReference.ToString());
-				return Task.FromResult(true);
-			}, new FilterFieldLikeRegEx("NodeId", "Node(2|3)"), "-NodeId");
+			await Database.Process(new ConsoleOutProcessor<ThingReference>(), 
+				new FilterFieldLikeRegEx("NodeId", "Node(2|3)"), "-NodeId");
 		}
 
 		[TestMethod]
 		public async Task Test_14_ProcessInherited()
 		{
-			await Database.Process<Field>((Field) =>
-			{
-				ConsoleOut.WriteLine(Field.ToString());
-				return Task.FromResult(true);
-			});
+			await Database.Process(new ConsoleOutProcessor<Field>());
 		}
 
 	}

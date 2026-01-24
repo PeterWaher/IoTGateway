@@ -466,7 +466,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, 
+		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter,
 			T ContinueAfter, params string[] SortOrder)
 			where T : class
 		{
@@ -555,7 +555,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public Task<IEnumerable<T>> Find<T>(string CollectionName, int Offset, int MaxCount, Filter Filter, 
+		public Task<IEnumerable<T>> Find<T>(string CollectionName, int Offset, int MaxCount, Filter Filter,
 			T ContinueAfter, params string[] SortOrder)
 			where T : class
 		{
@@ -1314,6 +1314,296 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		private readonly Cache<string, object> loadCache = new Cache<string, object>(10000, new TimeSpan(0, 0, 10), new TimeSpan(0, 0, 5), true);  // TODO: Make parameters configurable.
+
+		/// <summary>
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
+		{
+			return this.Process<T>(Processor, Offset, MaxCount, (Filter)null, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			string CollectionName = Serializer.CollectionName(null);
+			IMongoCollection<BsonDocument> Collection;
+			FilterDefinition<BsonDocument> BsonFilter;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			if (Filter is null)
+				BsonFilter = new BsonDocument();
+			else
+				BsonFilter = this.Convert(Filter, Serializer);
+
+			return this.Process<T>(Processor, Serializer, Collection, Offset, MaxCount, BsonFilter, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="ContinueAfter">Continue returning results after this object.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, Filter Filter,
+			T ContinueAfter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			string CollectionName = Serializer.CollectionName(null);
+			IMongoCollection<BsonDocument> Collection;
+			FilterDefinition<BsonDocument> BsonFilter;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			if (Filter is null)
+				BsonFilter = new BsonDocument();
+			else
+				BsonFilter = this.Convert(Filter, Serializer);
+
+			return this.Process(Processor, Serializer, Collection, Offset, MaxCount, BsonFilter, ContinueAfter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="BsonFilter">Search filter.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter,
+			params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			string CollectionName = Serializer.CollectionName(null);
+			IMongoCollection<BsonDocument> Collection;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			return this.Process<T>(Processor, Serializer, Collection, Offset, MaxCount, BsonFilter, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="CollectionName">Collection Name</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public Task<bool> Process<T>(PredicateAsync<T> Processor, string CollectionName, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			IMongoCollection<BsonDocument> Collection;
+			FilterDefinition<BsonDocument> BsonFilter;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			if (Filter is null)
+				BsonFilter = new BsonDocument();
+			else
+				BsonFilter = this.Convert(Filter, Serializer);
+
+			return this.Process<T>(Processor, Serializer, Collection, Offset, MaxCount, BsonFilter, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="CollectionName">Collection Name</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="ContinueAfter">Continue returning results after this object.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public Task<bool> Process<T>(PredicateAsync<T> Processor, string CollectionName, int Offset, int MaxCount, Filter Filter,
+			T ContinueAfter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			IMongoCollection<BsonDocument> Collection;
+			FilterDefinition<BsonDocument> BsonFilter;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			if (Filter is null)
+				BsonFilter = new BsonDocument();
+			else
+				BsonFilter = this.Convert(Filter, Serializer);
+
+			return this.Process(Processor, Serializer, Collection, Offset, MaxCount, BsonFilter, ContinueAfter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="CollectionName">Collection Name</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public Task<bool> Process(PredicateAsync<object> Processor, string CollectionName, int Offset, int MaxCount, params string[] SortOrder)
+		{
+			return this.Process(Processor, CollectionName, Offset, MaxCount, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="CollectionName">Collection Name</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public Task<bool> Process(PredicateAsync<object> Processor, string CollectionName, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(object));
+			IMongoCollection<BsonDocument> Collection;
+			FilterDefinition<BsonDocument> BsonFilter;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			if (Filter is null)
+				BsonFilter = new BsonDocument();
+			else
+				BsonFilter = this.Convert(Filter, Serializer);
+
+			return this.Process<object>(Processor, Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
+		}
+
+		private async Task<bool> Process<T>(PredicateAsync<T> Processor, ObjectSerializer Serializer, IMongoCollection<BsonDocument> Collection,
+			int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter, T ContinueAfter, params string[] SortOrder)
+			where T : class
+		{
+			if (!(ContinueAfter is null))
+				throw new NotImplementedException("Paginated searches not implemented in MongoDB provider.");
+
+			IFindFluent<BsonDocument, BsonDocument> ResultSet = Collection.Find(BsonFilter);
+
+			if (SortOrder.Length > 0)
+			{
+				SortDefinition<BsonDocument> SortDefinition = null;
+
+				foreach (string SortBy in SortOrder)
+				{
+					if (SortDefinition is null)
+					{
+						if (SortBy.StartsWith("-"))
+							SortDefinition = Builders<BsonDocument>.Sort.Descending(Serializer.ToShortName(SortBy.Substring(1)));
+						else
+							SortDefinition = Builders<BsonDocument>.Sort.Ascending(Serializer.ToShortName(SortBy));
+					}
+					else
+					{
+						if (SortBy.StartsWith("-"))
+							SortDefinition = SortDefinition.Descending(Serializer.ToShortName(SortBy.Substring(1)));
+						else
+							SortDefinition = SortDefinition.Ascending(Serializer.ToShortName(SortBy));
+					}
+				}
+
+				ResultSet = ResultSet.Sort(SortDefinition);
+			}
+
+			if (Offset > 0)
+				ResultSet = ResultSet.Skip(Offset);
+
+			if (MaxCount < int.MaxValue)
+				ResultSet = ResultSet.Limit(MaxCount);
+
+			IAsyncCursor<BsonDocument> Cursor = await ResultSet.ToCursorAsync();
+			BsonDeserializationArgs Args = new BsonDeserializationArgs()
+			{
+				NominalType = typeof(T)
+			};
+
+			while (await Cursor.MoveNextAsync())
+			{
+				foreach (BsonDocument Document in Cursor.Current)
+				{
+					BsonDocumentReader Reader = new BsonDocumentReader(Document);
+					BsonDeserializationContext Context = BsonDeserializationContext.CreateRoot(Reader);
+
+					if (Serializer.Deserialize(Context, Args) is T Obj)
+					{
+						if (!await Processor(Obj))
+							return false;
+					}
+				}
+			}
+
+			return true;
+		}
 
 		/// <summary>
 		/// Updates an object in the database.

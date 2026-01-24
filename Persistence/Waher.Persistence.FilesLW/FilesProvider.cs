@@ -2518,7 +2518,213 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
+		{
+			return this.Process<T>(Processor, Offset, MaxCount, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public async Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
+			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null), false);
+
+			if (File is null)
+				return true;
+
+			await File.CheckIndicesInitialized(Serializer);
+			await File.BeginRead();
+			try
+			{
+				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
+				return await ProcessAllLocked<T>(Processor, ResultSet);
+			}
+			finally
+			{
+				await File.EndRead();
+			}
+		}
+
+		/// <summary>
+		/// Processes objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="ContinueAfter">Continue returning results after this object.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public async Task<bool> Process<T>(PredicateAsync<T> Processor, int Offset, int MaxCount, Filter Filter,
+			T ContinueAfter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
+			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null), false);
+
+			if (File is null)
+				return true;
+
+			await File.CheckIndicesInitialized(Serializer);
+			await File.BeginRead();
+			try
+			{
+				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
+				await ResultSet.ContinueAfterLocked(ContinueAfter);
+				return await ProcessAllLocked<T>(Processor, ResultSet);
+			}
+			finally
+			{
+				await File.EndRead();
+			}
+		}
+
+		internal static async Task<bool> ProcessAllLocked<T>(PredicateAsync<T> Processor, ICursor<T> ResultSet)
+		{
+			while (await ResultSet.MoveNextAsyncLocked())
+			{
+				if (ResultSet.CurrentTypeCompatible)
+				{
+					if (!await Processor(ResultSet.Current))
+						return false;
+				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public Task<bool> Process(PredicateAsync<object> Processor, string Collection, int Offset, int MaxCount, params string[] SortOrder)
+		{
+			return this.Process<object>(Processor, Collection, Offset, MaxCount, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public Task<bool> Process(PredicateAsync<object> Processor, string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			return this.Process<object>(Processor, Collection, Offset, MaxCount, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public async Task<bool> Process<T>(PredicateAsync<T> Processor, string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectBTreeFile File = await this.GetFile(Collection, false);
+
+			if (File is null)
+				return true;
+
+			await File.CheckIndicesInitialized<T>();
+			await File.BeginRead();
+			try
+			{
+				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
+				return await ProcessAllLocked<T>(Processor, ResultSet);
+			}
+			finally
+			{
+				await File.EndRead();
+			}
+		}
+
+		/// <summary>
+		/// Processes objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to process.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="ContinueAfter">Continue returning results after this object.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public async Task<bool> Process<T>(PredicateAsync<T> Processor, string Collection, int Offset, int MaxCount,
+			Filter Filter, T ContinueAfter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectBTreeFile File = await this.GetFile(Collection, false);
+
+			if (File is null)
+				return true;
+
+			await File.CheckIndicesInitialized<T>();
+			await File.BeginRead();
+			try
+			{
+				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
+				await ResultSet.ContinueAfterLocked(ContinueAfter);
+				return await ProcessAllLocked<T>(Processor, ResultSet);
+			}
+			finally
+			{
+				await File.EndRead();
+			}
+		}
+
+		/// <summary>
+		/// Finds and deletes objects of a given class <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 		/// <param name="Offset">Result offset.</param>
@@ -2533,7 +2739,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// Finds and deletes objects of a given class <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 		/// <param name="Offset">Result offset.</param>
@@ -2555,7 +2761,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Finds objects in a given collection.
+		/// Finds and deletes objects in a given collection.
 		/// </summary>
 		/// <param name="Collection">Name of collection to search.</param>
 		/// <param name="Offset">Result offset.</param>
@@ -2569,7 +2775,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Finds objects in a given collection.
+		/// Finds and deletes objects in a given collection.
 		/// </summary>
 		/// <param name="Collection">Name of collection to search.</param>
 		/// <param name="Offset">Result offset.</param>

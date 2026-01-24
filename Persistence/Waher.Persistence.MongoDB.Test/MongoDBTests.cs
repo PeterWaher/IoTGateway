@@ -117,5 +117,45 @@ namespace Waher.Persistence.MongoDB.Test
 			await Database.Delete(Fields);
 		}
 
+		[TestMethod]
+		public async Task Test_11_Process()
+		{
+			await Database.Process<ThingReference>((ThingReference) =>
+			{
+				ConsoleOut.WriteLine(ThingReference.ToString());
+				return Task.FromResult(true);
+			});
+		}
+
+		[TestMethod]
+		public async Task Test_12_ProcessFilter()
+		{
+			await Database.Process<ThingReference>((ThingReference) =>
+			{
+				ConsoleOut.WriteLine(ThingReference.ToString());
+				return Task.FromResult(true);
+			}, new FilterFieldEqualTo("NodeId", "Node2"));
+		}
+
+		[TestMethod]
+		public async Task Test_13_ProcessFilterSort()
+		{
+			await Database.Process<ThingReference>((ThingReference) =>
+			{
+				ConsoleOut.WriteLine(ThingReference.ToString());
+				return Task.FromResult(true);
+			}, new FilterFieldLikeRegEx("NodeId", "Node(2|3)"), "-NodeId");
+		}
+
+		[TestMethod]
+		public async Task Test_14_ProcessInherited()
+		{
+			await Database.Process<Field>((Field) =>
+			{
+				ConsoleOut.WriteLine(Field.ToString());
+				return Task.FromResult(true);
+			});
+		}
+
 	}
 }

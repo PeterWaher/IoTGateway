@@ -2624,6 +2624,11 @@ namespace Waher.Persistence.Files
 				}
 			}
 
+			if (Asynchronous)
+				await Processor.FlushAsync();
+			else
+				Processor.Flush();
+
 			return true;
 		}
 

@@ -25,5 +25,15 @@ namespace Waher.Persistence
 		/// <param name="Object">Object to process.</param>
 		/// <returns>If processing should continue (true), or be cancelled (false).</returns>
 		Task<bool> ProcessAsync(T Object);
+
+		/// <summary>
+		/// Called at the end of processing, to allow for flushing of buffers, etc.
+		/// </summary>
+		void Flush();
+
+		/// <summary>
+		/// Called at the end of processing, to allow for flushing of buffers, etc.
+		/// </summary>
+		Task FlushAsync();
 	}
 }

@@ -1610,6 +1610,11 @@ namespace Waher.Persistence.MongoDB
 				}
 			}
 
+			if (Asynchronous)
+				await Processor.FlushAsync();
+			else
+				Processor.Flush();
+
 			return true;
 		}
 

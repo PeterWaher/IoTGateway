@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -12,10 +13,10 @@ using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
-    /// <summary>
-    /// Data Source defined by XML.
-    /// </summary>
-    public class XmlSource : IDataSource
+	/// <summary>
+	/// Data Source defined by XML.
+	/// </summary>
+	public class XmlSource : IDataSource
 	{
 		private readonly XmlDocument xmlDocument;
 		private readonly XmlNode xmlNode;
@@ -66,8 +67,49 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Enumerator.</returns>
-		public Task<IResultSetEnumerator> Find(int Offset, int Top, bool Generic, ScriptNode Where, Variables Variables,
+		public async Task<IResultSetEnumerator> Find(int Offset, int Top, bool Generic, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
+		{
+			XPath WhereXPath = Where as XPath;
+			if (WhereXPath is null && !(Where is null))
+				throw new ScriptRuntimeException("WHERE clause must use an XPATH expression when selecting nodes from XML.", Where);
+
+			IElement Obj;
+
+			if (WhereXPath is null)
+				Obj = new ObjectValue(this.xmlDocument ?? this.xmlNode);
+			else
+			{
+				ObjectProperties P = new ObjectProperties(this.xmlDocument ?? this.xmlNode, Variables);
+
+				if (WhereXPath.IsAsynchronous)
+					Obj = await WhereXPath.EvaluateAsync(P);
+				else
+					Obj = WhereXPath.Evaluate(P);
+			}
+
+			if (!(Obj is IVector Vector))
+				Vector = Operators.Vectors.VectorDefinition.Encapsulate(new IElement[] { Obj }, false, Node);
+
+			return await VectorSource.Find(Vector, Offset, Top, Generic, null, Variables, Order, Node);
+		}
+
+		/// <summary>
+		/// Processes objects matching filter conditions in <paramref name="Where"/>.
+		/// </summary>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Offset at which to return elements.</param>
+		/// <param name="Top">Maximum number of elements to process.</param>
+		/// <param name="Generic">If objects of type <see cref="GenericObject"/> should be processed.</param>
+		/// <param name="Where">Filter conditions.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="Order">Order at which to order the result set.</param>
+		/// <param name="Node">Script node performing the evaluation.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public async Task<bool> Process(IProcessor<object> Processor, int Offset, int Top, bool Generic,
+			ScriptNode Where, Variables Variables, KeyValuePair<VariableReference, bool>[] Order,
+			ScriptNode Node)
 		{
 			XPath WhereXPath = Where as XPath;
 			if (WhereXPath is null && !(Where is null))
@@ -86,7 +128,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			if (!(Obj is IVector Vector))
 				Vector = Operators.Vectors.VectorDefinition.Encapsulate(new IElement[] { Obj }, false, Node);
 
-			return VectorSource.Find(Vector, Offset, Top, Generic, null, Variables, Order, Node);
+			return await VectorSource.Process(Processor, Vector, Offset, Top, Generic, null, Variables, Order, Node);
 		}
 
 		/// <summary>
@@ -96,7 +138,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <param name="Objects">Objects to update</param>
 		public Task Update(bool Lazy, IEnumerable<object> Objects)
 		{
-			return Task.CompletedTask;	// Do nothing.
+			return Task.CompletedTask;  // Do nothing.
 		}
 
 		private Exception InvalidOperation()
@@ -162,7 +204,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <returns>If the name refers to the source.</returns>
 		public bool IsSource(string Name)
 		{
-			return 
+			return
 				string.Compare(this.name, Name, true) == 0 ||
 				string.Compare(this.alias, Name, true) == 0;
 		}
@@ -194,7 +236,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <returns>If an index was found and dropped.</returns>
 		public Task<bool> DropIndex(string Name)
 		{
-			throw InvalidOperation();
+			throw this.InvalidOperation();
 		}
 
 		/// <summary>
@@ -202,7 +244,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// </summary>
 		public Task DropCollection()
 		{
-			throw InvalidOperation();
+			throw this.InvalidOperation();
 		}
 
 	}

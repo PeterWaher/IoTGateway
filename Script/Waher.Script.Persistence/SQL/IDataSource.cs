@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Script.Model;
 using Waher.Script.Persistence.SQL.Enumerators;
@@ -24,6 +25,23 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Enumerator.</returns>
 		Task<IResultSetEnumerator> Find(int Offset, int Top, bool Generic, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node);
+
+		/// <summary>
+		/// Processes objects matching filter conditions in <paramref name="Where"/>.
+		/// </summary>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Offset at which to return elements.</param>
+		/// <param name="Top">Maximum number of elements to process.</param>
+		/// <param name="Generic">If objects of type <see cref="GenericObject"/> should be processed.</param>
+		/// <param name="Where">Filter conditions.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="Order">Order at which to order the result set.</param>
+		/// <param name="Node">Script node performing the evaluation.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		Task<bool> Process(IProcessor<object> Processor, int Offset, int Top, bool Generic, 
+			ScriptNode Where, Variables Variables, KeyValuePair<VariableReference, bool>[] Order, 
+			ScriptNode Node);
 
 		/// <summary>
 		/// Finds and Deletes a set of objects.

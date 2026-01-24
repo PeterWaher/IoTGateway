@@ -6,20 +6,20 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SQL.Enumerators
 {
-    /// <summary>
-    /// Enumerator that limits the return set to a maximum number of records.
-    /// </summary>
-    public class DistinctEnumerator : RecordEnumerator
+	/// <summary>
+	/// Enumerator that returns a tabular result set of unique rows.
+	/// </summary>
+	public class DistinctEnumerator : RecordEnumerator
     {
         private readonly Dictionary<Record, bool> reported = new Dictionary<Record, bool>();
 
-        /// <summary>
-        /// Enumerator that limits the return set to a maximum number of records.
-        /// </summary>
-        /// <param name="ItemEnumerator">Item enumerator</param>
-        /// <param name="Columns">Column definitions. Might be null if objects are to be returned.</param>
-        /// <param name="Variables">Current set of variables.</param>
-        public DistinctEnumerator(IResultSetEnumerator ItemEnumerator, ScriptNode[] Columns, Variables Variables)
+		/// <summary>
+		/// Enumerator that returns a tabular result set of unique rows.
+		/// </summary>
+		/// <param name="ItemEnumerator">Item enumerator</param>
+		/// <param name="Columns">Column definitions. Might be null if objects are to be returned.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		public DistinctEnumerator(IResultSetEnumerator ItemEnumerator, ScriptNode[] Columns, Variables Variables)
             : base(ItemEnumerator, Columns, Variables)
         {
         }

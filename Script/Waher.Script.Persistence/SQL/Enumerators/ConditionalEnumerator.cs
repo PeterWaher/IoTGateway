@@ -72,7 +72,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
                 else
 					this.properties.Object = this.e.Current;
 
-                IElement E = this.conditions.Evaluate(this.properties);
+                IElement E = this.conditions.Evaluate(this.properties); // TODO: Async
                 if (!(E.AssociatedObjectValue is bool B) || !B)
                     return false;
 

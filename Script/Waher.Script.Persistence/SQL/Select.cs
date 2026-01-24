@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
@@ -11,6 +12,7 @@ using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Persistence.SQL.Enumerators;
 using Waher.Script.Persistence.SQL.Groups;
+using Waher.Script.Persistence.SQL.Processors;
 
 namespace Waher.Script.Persistence.SQL
 {
@@ -191,8 +193,6 @@ namespace Waher.Script.Persistence.SQL
 			else
 				Offset = 0;
 
-			IDataSource Source = await this.source.GetSource(Variables);
-
 			ChunkedList<KeyValuePair<VariableReference, bool>> OrderBy = new ChunkedList<KeyValuePair<VariableReference, bool>>();
 			bool CalculatedOrder = false;
 
@@ -239,14 +239,10 @@ namespace Waher.Script.Persistence.SQL
 				}
 			}
 
-			ChunkedList<IElement[]> Items = new ChunkedList<IElement[]>();
-			Dictionary<string, int> ColumnIndices = new Dictionary<string, int>();
 			ChunkedList<KeyValuePair<string, int>> AdditionalFields = null;
+			Dictionary<string, int> ColumnIndices = new Dictionary<string, int>();
 			ScriptNode[] Columns2 = this.columns;
 			bool Columns2Cloned = false;
-			IResultSetEnumerator e;
-			RecordEnumerator e2;
-			int NrRecords = 0;
 
 			if (!(this.columns is null))
 			{
@@ -276,6 +272,53 @@ namespace Waher.Script.Persistence.SQL
 			}
 			else
 				c = 0;
+
+			IDataSource Source = await this.source.GetSource(Variables);
+			/*
+			IProcessor<object> Processor;
+			RecordProcessor Records;
+
+			if (this.distinct)
+				Records = new DistinctRecordProcessor(Columns2, Variables);
+			else
+				Records = new RecordProcessor(Columns2, Variables);
+
+			Processor = Records;
+
+			if (Top != int.MaxValue)
+				Processor = new MaxCountProcessor(Processor, Top);
+
+			if (Offset > 0)
+				Processor = new OffsetProcessor(Processor, Offset);
+
+			if (CalculatedOrder)
+			{
+				ChunkedList<KeyValuePair<ScriptNode, bool>> Order = new ChunkedList<KeyValuePair<ScriptNode, bool>>();
+
+				if (!(this.orderBy is null))
+					Order.AddRange(this.orderBy);
+
+				if (!(this.groupByNames is null))
+				{
+					foreach (ScriptNode Group in this.groupByNames)
+					{
+						if (!(Group is null))
+							Order.Add(new KeyValuePair<ScriptNode, bool>(Group, true));
+					}
+				}
+
+				Processor = new CustomOrderProcessor(Processor, Variables, Order.ToArray());
+			}
+
+			if (!(this.having is null))
+				Processor = new ConditionalProcessor(Processor, Variables, this.having);
+
+			*/
+
+
+
+
+			IResultSetEnumerator e;
 
 			if (this.groupBy is null)
 			{
@@ -325,17 +368,22 @@ namespace Waher.Script.Persistence.SQL
 			if (Top != int.MaxValue)
 				e = new MaxCountEnumerator(e, Top);
 
+			RecordEnumerator e2;
+
 			if (this.distinct)
 				e2 = new DistinctEnumerator(e, Columns2, Variables);
 			else
 				e2 = new RecordEnumerator(e, Columns2, Variables);
+
+			ChunkedList<IElement[]> Items = new ChunkedList<IElement[]>();
+			int NrRecords = 0;
 
 			while (await e2.MoveNextAsync())
 			{
 				Items.Add(e2.CurrentRecord);
 				NrRecords++;
 			}
-
+			
 			if (this.selectOneObject)
 			{
 				if (!Items.HasFirstItem)
@@ -355,7 +403,7 @@ namespace Waher.Script.Persistence.SQL
 				if (c > 0)
 				{
 					while (i % c != 0)
-						Elements[i++] = new ObjectValue(null);
+						Elements[i++] = ObjectValue.Null;
 				}
 			}
 

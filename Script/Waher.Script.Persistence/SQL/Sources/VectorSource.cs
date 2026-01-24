@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -15,10 +16,10 @@ using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
-    /// <summary>
-    /// Data Source defined by a vector.
-    /// </summary>
-    public class VectorSource : IDataSource
+	/// <summary>
+	/// Data Source defined by a vector.
+	/// </summary>
+	public class VectorSource : IDataSource
 	{
 		private readonly Dictionary<Type, bool> types = new Dictionary<Type, bool>();
 		private readonly Dictionary<string, bool> isLabel = new Dictionary<string, bool>();
@@ -129,6 +130,50 @@ namespace Waher.Script.Persistence.SQL.Sources
 		private static PropertyOrder ToPropertyOrder(ScriptNode Node, KeyValuePair<VariableReference, bool> Order)
 		{
 			return new PropertyOrder(Node, Order.Key.VariableName, Order.Value ? 1 : -1);
+		}
+
+		/// <summary>
+		/// Processes objects matching filter conditions in <paramref name="Where"/>.
+		/// </summary>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Offset at which to return elements.</param>
+		/// <param name="Top">Maximum number of elements to process.</param>
+		/// <param name="Generic">If objects of type <see cref="GenericObject"/> should be processed.</param>
+		/// <param name="Where">Filter conditions.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="Order">Order at which to order the result set.</param>
+		/// <param name="Node">Script node performing the evaluation.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public Task<bool> Process(IProcessor<object> Processor, int Offset, int Top, bool Generic,
+			ScriptNode Where, Variables Variables, KeyValuePair<VariableReference, bool>[] Order,
+			ScriptNode Node)
+		{
+			return Process(Processor, this.vector, Offset, Top, Generic, Where, Variables, Order, Node);
+		}
+
+		internal static async Task<bool> Process(IProcessor<object> Processor, IVector Vector,
+			int Offset, int Top, bool Generic, ScriptNode Where, Variables Variables,
+			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
+		{
+			IResultSetEnumerator e = await Find(Vector, Offset, Top, Generic, Where, Variables, Order, Node);
+			bool IsAsynchronous = Processor.IsAsynchronous;
+
+			while (await e.MoveNextAsync())
+			{
+				if (IsAsynchronous)
+				{
+					if (!await Processor.ProcessAsync(e.Current))
+						return false;
+				}
+				else
+				{
+					if (!Processor.Process(e.Current))
+						return false;
+				}
+			}
+			
+			return true;
 		}
 
 		/// <summary>

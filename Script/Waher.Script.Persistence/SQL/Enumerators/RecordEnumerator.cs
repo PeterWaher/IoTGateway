@@ -8,7 +8,7 @@ using Waher.Script.Model;
 namespace Waher.Script.Persistence.SQL.Enumerators
 {
 	/// <summary>
-	/// Enumerator that limits the return set to a maximum number of records.
+	/// Enumerator that returns a tabular result set.
 	/// </summary>
 	public class RecordEnumerator : IResultSetEnumerator
 	{
@@ -21,7 +21,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
 		private ObjectProperties properties = null;
 
 		/// <summary>
-		/// Enumerator that limits the return set to a maximum number of records.
+		/// Enumerator that returns a tabular result set.
 		/// </summary>
 		/// <param name="ItemEnumerator">Item enumerator</param>
 		/// <param name="Columns">Column definitions. Might be null if objects are to be returned.</param>

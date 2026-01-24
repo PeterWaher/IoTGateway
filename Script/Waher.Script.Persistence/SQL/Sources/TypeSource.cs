@@ -11,13 +11,14 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Persistence.SQL.Enumerators;
+using Waher.Script.Persistence.SQL.Processors;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
-    /// <summary>
-    /// Data Source defined by a type definition
-    /// </summary>
-    public class TypeSource : IDataSource
+	/// <summary>
+	/// Data Source defined by a type definition
+	/// </summary>
+	public class TypeSource : IDataSource
 	{
 		private readonly Dictionary<string, bool> isLabel = new Dictionary<string, bool>();
 		private readonly Type type;
@@ -58,12 +59,27 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 			if (Generic)
 			{
-				FindParameters = new object[] { await Database.GetCollection(this.type), Offset, Top, await ConvertAsync(Where, Variables, this.Name), Convert(Order) };
+				FindParameters = new object[]
+				{
+					await Database.GetCollection(this.type),
+					Offset,
+					Top,
+					await ConvertAsync(Where, Variables, this.Name),
+					Convert(Order)
+				};
+
 				MI = FindMethodGeneric.MakeGenericMethod(typeof(GenericObject));
 			}
 			else
 			{
-				FindParameters = new object[] { Offset, Top, await ConvertAsync(Where, Variables, this.Name), Convert(Order) };
+				FindParameters = new object[]
+				{
+					Offset,
+					Top,
+					await ConvertAsync(Where, Variables, this.Name),
+					Convert(Order)
+				};
+
 				MI = FindMethod.MakeGenericMethod(this.type);
 			}
 
@@ -151,6 +167,153 @@ namespace Waher.Script.Persistence.SQL.Sources
 		}
 
 		/// <summary>
+		/// Processes objects matching filter conditions in <paramref name="Where"/>.
+		/// </summary>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Offset at which to return elements.</param>
+		/// <param name="Top">Maximum number of elements to process.</param>
+		/// <param name="Generic">If objects of type <see cref="GenericObject"/> should be processed.</param>
+		/// <param name="Where">Filter conditions.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="Order">Order at which to order the result set.</param>
+		/// <param name="Node">Script node performing the evaluation.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public async Task<bool> Process(IProcessor<object> Processor, int Offset, int Top, bool Generic,
+			ScriptNode Where, Variables Variables, KeyValuePair<VariableReference, bool>[] Order,
+			ScriptNode Node)
+		{
+			object[] ProcessParameters;
+			MethodInfo MI;
+
+			if (Generic)
+			{
+				ProcessParameters = new object[]
+				{
+					new TypedObjectProcessor<GenericObject>(Processor),
+					await Database.GetCollection(this.type),
+					Offset,
+					Top,
+					await ConvertAsync(Where, Variables, this.Name),
+					Convert(Order)
+				};
+
+				MI = ProcessMethodGeneric.MakeGenericMethod(typeof(GenericObject));
+			}
+			else
+			{
+				ConstructorInfo CI;
+
+				lock (typedObjectProcessConstructors)
+				{
+					if (!typedObjectProcessConstructors.TryGetValue(this.type, out CI))
+					{
+						Type ProcessorType = typeof(TypedObjectProcessor<>).MakeGenericType(this.type);
+						CI = ProcessorType.GetConstructor(new Type[] { typeof(IProcessor<object>) });
+						typedObjectProcessConstructors[this.type] = CI;
+					}
+				}
+
+				ProcessParameters = new object[]
+				{
+					CI.Invoke(new object[]{ Processor }),
+					Offset,
+					Top,
+					await ConvertAsync(Where, Variables, this.Name),
+					Convert(Order)
+				};
+
+				MI = ProcessMethod.MakeGenericMethod(this.type);
+			}
+
+			object Obj = MI.Invoke(null, ProcessParameters);
+			Obj = await ScriptNode.WaitPossibleTask(Obj);
+
+			if (!(Obj is bool Result))
+				throw new ScriptRuntimeException("Unexpected response.", Node);
+
+			return Result;
+		}
+
+		private static readonly Dictionary<Type, ConstructorInfo> typedObjectProcessConstructors = new Dictionary<Type, ConstructorInfo>();
+		private static MethodInfo processMethod = null;
+		private static MethodInfo processMethodGeneric = null;
+
+		/// <summary>
+		/// Generic object database Process method: <see cref="Database.Process{T}(IProcessor{T}, int, int, Filter, string[])"/>
+		/// </summary>
+		public static MethodInfo ProcessMethod
+		{
+			get
+			{
+				if (processMethod is null)
+				{
+					foreach (MethodInfo MI in typeof(Database).GetTypeInfo().GetDeclaredMethods("Process"))
+					{
+						if (!MI.ContainsGenericParameters)
+							continue;
+
+						ParameterInfo[] Parameters = MI.GetParameters();
+						if (Parameters.Length != 5 ||
+							Parameters[0].ParameterType != typeof(IProcessor<>) ||
+							Parameters[1].ParameterType != typeof(int) ||
+							Parameters[2].ParameterType != typeof(int) ||
+							Parameters[3].ParameterType != typeof(Filter) ||
+							Parameters[4].ParameterType != typeof(string[]))
+						{
+							continue;
+						}
+
+						processMethod = MI;
+					}
+
+					if (processMethod is null)
+						throw new InvalidOperationException("Appropriate Database.Process method not found.");
+				}
+
+				return processMethod;
+			}
+		}
+
+		/// <summary>
+		/// Generic object database Process method: <see cref="Database.Process{T}(IProcessor{T}, string, int, int, Filter, string[])"/>
+		/// </summary>
+		public static MethodInfo ProcessMethodGeneric
+		{
+			get
+			{
+				if (processMethodGeneric is null)
+				{
+					foreach (MethodInfo MI in typeof(Database).GetTypeInfo().GetDeclaredMethods("Process"))
+					{
+						if (!MI.ContainsGenericParameters)
+							continue;
+
+						ParameterInfo[] Parameters = MI.GetParameters();
+						if (Parameters.Length != 6 ||
+							Parameters[0].ParameterType != typeof(IProcessor<>) ||
+							Parameters[1].ParameterType != typeof(string) ||
+							Parameters[2].ParameterType != typeof(int) ||
+							Parameters[3].ParameterType != typeof(int) ||
+							Parameters[4].ParameterType != typeof(Filter) ||
+							Parameters[5].ParameterType != typeof(string[]))
+						{
+							continue;
+						}
+
+						processMethodGeneric = MI;
+					}
+
+					if (processMethodGeneric is null)
+						throw new InvalidOperationException("Appropriate Database.Process method not found.");
+				}
+
+				return processMethodGeneric;
+			}
+		}
+
+
+		/// <summary>
 		/// Finds and Deletes a set of objects.
 		/// </summary>
 		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
@@ -168,7 +331,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 			object[] FindParameters = new object[] { Offset, Top, Filter, Convert(Order) };
 			object Obj = (Lazy ? DeleteLazyMethod : FindDeleteMethod).MakeGenericMethod(this.type).Invoke(null, FindParameters);
-			
+
 			if (Lazy)
 				return null;
 

@@ -8,6 +8,7 @@ using Waher.Persistence.Serialization;
 using Waher.Runtime.Settings;
 using Waher.Script.Model;
 using Waher.Script.Persistence.SQL.Enumerators;
+using Waher.Script.Persistence.SQL.Processors;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
@@ -58,6 +59,35 @@ namespace Waher.Script.Persistence.SQL.Sources
 					await TypeSource.ConvertAsync(Where, Variables, this.Name), TypeSource.Convert(Order));
 
 				return new SynchEnumerator(Objects.GetEnumerator());
+			}
+		}
+
+		/// <summary>
+		/// Processes objects matching filter conditions in <paramref name="Where"/>.
+		/// </summary>
+		/// <param name="Processor">Processor to call for every object, unless the
+		/// processor returns false, in which the process is cancelled.</param>
+		/// <param name="Offset">Offset at which to return elements.</param>
+		/// <param name="Top">Maximum number of elements to process.</param>
+		/// <param name="Generic">If objects of type <see cref="GenericObject"/> should be processed.</param>
+		/// <param name="Where">Filter conditions.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <param name="Order">Order at which to order the result set.</param>
+		/// <param name="Node">Script node performing the evaluation.</param>
+		/// <returns>If process was completed (true) or cancelled (false).</returns>
+		public async Task<bool> Process(IProcessor<object> Processor, int Offset, int Top, bool Generic,
+			ScriptNode Where, Variables Variables, KeyValuePair<VariableReference, bool>[] Order,
+			ScriptNode Node)
+		{
+			if (Generic)
+			{
+				return await Database.Process(new TypedObjectProcessor<GenericObject>(Processor), this.collectionName, Offset, Top,
+					await TypeSource.ConvertAsync(Where, Variables, this.Name), TypeSource.Convert(Order));
+			}
+			else
+			{
+				return await Database.Process(Processor, this.collectionName, Offset, Top,
+					await TypeSource.ConvertAsync(Where, Variables, this.Name), TypeSource.Convert(Order));
 			}
 		}
 

@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Script.Model;
 using Waher.Script.Persistence.SQL.Enumerators;
+using Waher.Script.Persistence.SQL.Processors;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
-    /// <summary>
-    /// Data source formed through an INNER JOIN of two sources.
-    /// </summary>
-    public class InnerJoinedSource : JoinedSource
+	/// <summary>
+	/// Data source formed through an INNER JOIN of two sources.
+	/// </summary>
+	public class InnerJoinedSource : JoinedSource
 	{
 		/// <summary>
 		/// Data source formed through an INNER JOIN of two sources.
@@ -74,7 +74,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			private JoinedObject current = null;
 			private ObjectProperties leftVariables = null;
 
-			public InnerJoinEnumerator(IResultSetEnumerator Left, string LeftName, IDataSource RightSource, string RightName, 
+			public InnerJoinEnumerator(IResultSetEnumerator Left, string LeftName, IDataSource RightSource, string RightName,
 				bool Generic, ScriptNode Conditions, Variables Variables)
 			{
 				this.left = Left;
@@ -122,7 +122,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 					if (this.hasLeftName)
 						this.leftVariables[this.leftName] = this.left.Current;
 
-					this.right = await this.rightSource.Find(0, int.MaxValue, this.generic, this.conditions, this.leftVariables, 
+					this.right = await this.rightSource.Find(0, int.MaxValue, this.generic, this.conditions, this.leftVariables,
 						null, this.conditions);
 				}
 			}
@@ -148,12 +148,109 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public override Task<bool> Process(IProcessor<object> Processor, int Offset, int Top, bool Generic,
+		public override async Task<bool> Process(IProcessor<object> Processor, int Offset, int Top, bool Generic,
 			ScriptNode Where, Variables Variables, KeyValuePair<VariableReference, bool>[] Order,
 			ScriptNode Node)
 		{
-			// TODO: Implement inner join processing.
-			throw new NotImplementedException("Inner join processing not implemented.");
+			ScriptNode LeftWhere = await Reduce(this.Left, Where);
+			KeyValuePair<VariableReference, bool>[] LeftOrder = await Reduce(this.Left, Order);
+
+			ScriptNode RightWhere = await Reduce(this.Right, this.Left, Where);
+			RightWhere = this.Combine(RightWhere, this.Conditions);
+
+			if (Top != int.MaxValue)
+				Processor = new MaxCountProcessor(Processor, Top);
+
+			if (Offset > 0)
+				Processor = new OffsetProcessor(Processor, Offset);
+
+			if (!(Where is null))
+				Processor = new ConditionalProcessor(Processor, Variables, Where);
+
+			Processor = new InnerJoinLeftProcessor(Processor, this.Left.Name, this.Right,
+				this.Right.Name, Generic, RightWhere, Variables);
+
+			return await this.Left.Process(Processor, 0, int.MaxValue, Generic,
+				LeftWhere, Variables, LeftOrder, Node);
+		}
+
+		private class InnerJoinLeftProcessor : IProcessor<object>
+		{
+			private readonly InnerJoinRightProcessor rightProcessor;
+			private readonly IDataSource rightSource;
+			private readonly ScriptNode conditions;
+			private readonly Variables variables;
+			private readonly string leftName;
+			private readonly bool hasLeftName;
+			private readonly bool generic;
+			private ObjectProperties leftVariables = null;
+
+			public InnerJoinLeftProcessor(IProcessor<object> Processor, string LeftName,
+				IDataSource RightSource, string RightName, bool Generic,
+				ScriptNode Conditions, Variables Variables)
+			{
+				this.rightProcessor = new InnerJoinRightProcessor(Processor, LeftName, RightName);
+				this.leftName = LeftName;
+				this.rightSource = RightSource;
+				this.generic = Generic;
+				this.conditions = Conditions;
+				this.variables = Variables;
+				this.hasLeftName = !string.IsNullOrEmpty(this.leftName);
+			}
+
+			public bool IsAsynchronous => true;
+			public bool Process(object Object) => this.ProcessAsync(Object).Result;
+			public bool Flush() => this.rightProcessor.Flush();
+			public Task<bool> FlushAsync() => this.rightProcessor.FlushAsync();
+
+			public async Task<bool> ProcessAsync(object Object)
+			{
+				if (this.leftVariables is null)
+					this.leftVariables = new ObjectProperties(Object, this.variables);
+				else
+					this.leftVariables.Object = Object;
+
+				if (this.hasLeftName)
+					this.leftVariables[this.leftName] = Object;
+
+				this.rightProcessor.CurrentLeft = Object;
+
+				return await this.rightSource.Process(this.rightProcessor, 0, int.MaxValue,
+					this.generic, this.conditions, this.leftVariables, null, this.conditions);
+			}
+		}
+
+		private class InnerJoinRightProcessor : IProcessor<object>
+		{
+			private readonly IProcessor<object> processor;
+			private readonly string leftName;
+			private readonly string rightName;
+
+			public InnerJoinRightProcessor(IProcessor<object> Processor, string LeftName,
+				string RightName)
+			{
+				this.processor = Processor;
+				this.leftName = LeftName;
+				this.rightName = RightName;
+			}
+
+			public object CurrentLeft { get; set; }
+
+			public bool IsAsynchronous => this.processor.IsAsynchronous;
+			public bool Flush() => this.processor.Flush();
+			public Task<bool> FlushAsync() => this.processor.FlushAsync();
+
+			public bool Process(object Object)
+			{
+				return this.processor.Process(new JoinedObject(this.CurrentLeft, 
+					this.leftName, Object, this.rightName));
+			}
+
+			public Task<bool> ProcessAsync(object Object)
+			{
+				return this.processor.ProcessAsync(new JoinedObject(this.CurrentLeft, 
+					this.leftName, Object, this.rightName));
+			}
 		}
 
 	}

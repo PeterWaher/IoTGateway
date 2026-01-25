@@ -5,13 +5,14 @@ using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Script.Model;
 using Waher.Script.Persistence.SQL.Enumerators;
+using Waher.Script.Persistence.SQL.Processors;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
-    /// <summary>
-    /// Data source formed through an LEFT [OUTER] JOIN of two sources.
-    /// </summary>
-    public class LeftOuterJoinedSource : JoinedSource
+	/// <summary>
+	/// Data source formed through an LEFT [OUTER] JOIN of two sources.
+	/// </summary>
+	public class LeftOuterJoinedSource : JoinedSource
 	{
 		/// <summary>
 		/// Data source formed through an LEFT [OUTER] JOIN of two sources.
@@ -81,7 +82,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			private GenericObject defaultRight = null;
 			private ObjectProperties leftVariables = null;
 
-			public LeftOuterJoinEnumerator(IResultSetEnumerator Left, string LeftName, IDataSource RightSource, string RightName, 
+			public LeftOuterJoinEnumerator(IResultSetEnumerator Left, string LeftName, IDataSource RightSource, string RightName,
 				bool Generic, ScriptNode Conditions, Variables Variables, bool Flipped)
 			{
 				this.left = Left;
@@ -153,7 +154,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 					if (this.hasLeftName)
 						this.leftVariables[this.leftName] = this.left.Current;
 
-					this.right = await this.rightSource.Find(0, int.MaxValue, this.generic, this.conditions, this.leftVariables, 
+					this.right = await this.rightSource.Find(0, int.MaxValue, this.generic, this.conditions, this.leftVariables,
 						null, this.conditions);
 
 					this.rightFirst = true;
@@ -181,12 +182,178 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>If process was completed (true) or cancelled (false).</returns>
-		public override Task<bool> Process(IProcessor<object> Processor, int Offset, int Top, bool Generic,
+		public override async Task<bool> Process(IProcessor<object> Processor, int Offset, int Top, bool Generic,
 			ScriptNode Where, Variables Variables, KeyValuePair<VariableReference, bool>[] Order,
 			ScriptNode Node)
 		{
-			// TODO: Implement left outer join processing.
-			throw new NotImplementedException("Left outer join processing not implemented.");
+			ScriptNode LeftWhere = await Reduce(this.Left, Where);
+			KeyValuePair<VariableReference, bool>[] LeftOrder = await Reduce(this.Left, Order);
+
+			ScriptNode RightWhere = await Reduce(this.Right, this.Left, Where);
+			RightWhere = this.Combine(RightWhere, this.Conditions);
+
+			if (Top != int.MaxValue)
+				Processor = new MaxCountProcessor(Processor, Top);
+
+			if (Offset > 0)
+				Processor = new OffsetProcessor(Processor, Offset);
+
+			if (!(Where is null))
+				Processor = new ConditionalProcessor(Processor, Variables, Where);
+
+			Processor = new OuterJoinLeftProcessor(Processor, this.Left.Name, this.Right,
+				this.Right.Name, Generic, RightWhere, Variables, this.Flipped);
+
+			return await this.Left.Process(Processor, 0, int.MaxValue, Generic,
+				LeftWhere, Variables, LeftOrder, Node);
+		}
+
+		private class OuterJoinLeftProcessor : IProcessor<object>
+		{
+			private readonly OuterJoinRightProcessor rightProcessor;
+			private readonly IDataSource rightSource;
+			private readonly ScriptNode conditions;
+			private readonly Variables variables;
+			private readonly string leftName;
+			private readonly bool hasLeftName;
+			private readonly bool generic;
+			private ObjectProperties leftVariables = null;
+
+			public OuterJoinLeftProcessor(IProcessor<object> Processor, string LeftName,
+				IDataSource RightSource, string RightName, bool Generic,
+				ScriptNode Conditions, Variables Variables, bool Flipped)
+			{
+				this.rightProcessor = new OuterJoinRightProcessor(Processor, LeftName,
+					RightSource, RightName, Flipped);
+
+				this.leftName = LeftName;
+				this.rightSource = RightSource;
+				this.generic = Generic;
+				this.conditions = Conditions;
+				this.variables = Variables;
+				this.hasLeftName = !string.IsNullOrEmpty(this.leftName);
+			}
+
+			public bool IsAsynchronous => true;
+			public bool Process(object Object) => this.ProcessAsync(Object).Result;
+			public bool Flush() => this.rightProcessor.Flush();
+			public Task<bool> FlushAsync() => this.rightProcessor.FlushAsync();
+
+			public async Task<bool> ProcessAsync(object Object)
+			{
+				if (this.leftVariables is null)
+					this.leftVariables = new ObjectProperties(Object, this.variables);
+				else
+					this.leftVariables.Object = Object;
+
+				if (this.hasLeftName)
+					this.leftVariables[this.leftName] = Object;
+
+				this.rightProcessor.CurrentLeft = Object;
+
+				return await this.rightSource.Process(this.rightProcessor, 0, int.MaxValue,
+					this.generic, this.conditions, this.leftVariables, null, this.conditions);
+			}
+		}
+
+		private class OuterJoinRightProcessor : IProcessor<object>
+		{
+			private readonly IDataSource rightSource;
+			private readonly IProcessor<object> processor;
+			private readonly string leftName;
+			private readonly string rightName;
+			private readonly bool flipped;
+			private GenericObject defaultRight = null;
+			private object currentLeft = null;
+			private bool firstRight = true;
+
+			public OuterJoinRightProcessor(IProcessor<object> Processor, string LeftName,
+				IDataSource RightSource, string RightName, bool Flipped)
+			{
+				this.processor = Processor;
+				this.leftName = LeftName;
+				this.rightSource = RightSource;
+				this.rightName = RightName;
+				this.flipped = Flipped;
+			}
+
+			public object CurrentLeft
+			{
+				get => this.currentLeft;
+				set
+				{
+					this.currentLeft = value;
+					this.firstRight = true;
+				}
+			}
+
+			public bool IsAsynchronous => this.processor.IsAsynchronous;
+
+			public bool Process(object Object)
+			{
+				this.firstRight = false;
+
+				if (this.flipped)
+				{
+					return this.processor.Process(new JoinedObject(Object, this.rightName,
+						this.CurrentLeft, this.leftName));
+				}
+				else
+				{
+					return this.processor.Process(new JoinedObject(this.CurrentLeft,
+						this.leftName, Object, this.rightName));
+				}
+			}
+
+			public Task<bool> ProcessAsync(object Object)
+			{
+				this.firstRight = false;
+
+				if (this.flipped)
+				{
+					return this.processor.ProcessAsync(new JoinedObject(Object, this.rightName,
+						this.CurrentLeft, this.leftName));
+				}
+				else
+				{
+					return this.processor.ProcessAsync(new JoinedObject(this.CurrentLeft,
+						this.leftName, Object, this.rightName));
+				}
+			}
+
+			public bool Flush()
+			{
+				if (this.firstRight)
+				{
+					if (this.defaultRight is null)
+					{
+						this.defaultRight = new GenericObject(this.rightSource.CollectionName,
+							typeof(GenericObject).FullName, Guid.Empty,
+							Array.Empty<KeyValuePair<string, object>>());
+					}
+
+					this.Process(this.defaultRight);
+				}
+
+				return this.processor.Flush();
+			}
+
+			public async Task<bool> FlushAsync()
+			{
+				if (this.firstRight)
+				{
+					if (this.defaultRight is null)
+					{
+						this.defaultRight = new GenericObject(this.rightSource.CollectionName,
+							typeof(GenericObject).FullName, Guid.Empty,
+							Array.Empty<KeyValuePair<string, object>>());
+					}
+
+					await this.ProcessAsync(this.defaultRight);
+				}
+
+				return await this.processor.FlushAsync();
+			}
 		}
 
 	}

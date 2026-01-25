@@ -8,118 +8,132 @@ using Waher.Script.Persistence.SQL.Groups;
 
 namespace Waher.Script.Persistence.SQL.Enumerators
 {
-    /// <summary>
-    /// Enumerator that adds fields to enumerated items.
-    /// </summary>
-    public class FieldAggregatorEnumerator : IResultSetEnumerator
-    {
-        private readonly KeyValuePair<string, int>[] additionalFields;
-        private readonly ScriptNode[] columns;
-        private readonly IResultSetEnumerator e;
-        private readonly Variables variables;
-        private ObjectProperties objectVariables = null;
-        private object current = null;
+	/// <summary>
+	/// Enumerator that adds fields to enumerated items.
+	/// </summary>
+	public class FieldAggregatorEnumerator : IResultSetEnumerator
+	{
+		private readonly KeyValuePair<string, ScriptNode>[] additionalFields;
+		private readonly bool[] additionalFieldAsynchronous;
+		private readonly IResultSetEnumerator e;
+		private readonly Variables variables;
+		private readonly int count;
+		private ObjectProperties objectVariables = null;
+		private object current = null;
 
-        /// <summary>
-        /// Enumerator that adds fields to enumerated items.
-        /// </summary>
-        /// <param name="ItemEnumerator">Item enumerator</param>
-        /// <param name="Variables">Current set of variables</param>
-        /// <param name="AdditionalFields">Fields to add to enumerated items.</param>
-        /// <param name="Columns">Columns to select.</param>
-        public FieldAggregatorEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables, 
-            KeyValuePair<string, int>[] AdditionalFields, ScriptNode[] Columns)
-        {
+		/// <summary>
+		/// Enumerator that adds fields to enumerated items.
+		/// </summary>
+		/// <param name="ItemEnumerator">Item enumerator</param>
+		/// <param name="Variables">Current set of variables</param>
+		/// <param name="AdditionalFields">Fields to add to enumerated items.</param>
+		/// <param name="Columns">Columns to select.</param>
+		public FieldAggregatorEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables,
+			KeyValuePair<string, int>[] AdditionalFields, ScriptNode[] Columns)
+		{
 			this.e = ItemEnumerator;
 			this.variables = Variables;
-			this.additionalFields = AdditionalFields;
-            this.columns = Columns;
+
+			this.count = AdditionalFields.Length;
+
+			this.additionalFieldAsynchronous = new bool[this.count];
+			this.additionalFields = new KeyValuePair<string, ScriptNode>[this.count];
+
+			for (int i = 0; i < this.count; i++)
+			{
+				KeyValuePair<string, int> P = AdditionalFields[i];
+				ScriptNode Node = Columns[P.Value];
+
+				this.additionalFields[i] = new KeyValuePair<string, ScriptNode>(P.Key, Node);
+				this.additionalFieldAsynchronous[i] = Node.IsAsynchronous;
+			}
 		}
 
-        /// <summary>
-        /// <see cref="IEnumerator.Current"/>
-        /// </summary>
-        public object Current => this.current;
+		/// <summary>
+		/// <see cref="IEnumerator.Current"/>
+		/// </summary>
+		public object Current => this.current;
 
-        /// <summary>
-        /// <see cref="IEnumerator.MoveNext"/>
-        /// </summary>
-        public bool MoveNext()
-        {
-            return this.MoveNextAsync().Result;
-        }
+		/// <summary>
+		/// <see cref="IEnumerator.MoveNext"/>
+		/// </summary>
+		public bool MoveNext()
+		{
+			return this.MoveNextAsync().Result;
+		}
 
-        /// <summary>
-        /// Advances the enumerator to the next element of the collection.
-        /// </summary>
-        /// <returns>true if the enumerator was successfully advanced to the next element; false if
-        /// the enumerator has passed the end of the collection.</returns>
-        /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-        public async Task<bool> MoveNextAsync()
-        {
-            ScriptNode Node;
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public async Task<bool> MoveNextAsync()
+		{
+			KeyValuePair<string, ScriptNode> P;
+			int i;
 
-            if (!await this.e.MoveNextAsync())
-                return false;
+			if (!await this.e.MoveNextAsync())
+				return false;
 
 			this.current = this.e.Current;
 
-            if (this.objectVariables is null)
+			if (this.objectVariables is null)
 				this.objectVariables = new ObjectProperties(this.current, this.variables);
-            else
+			else
 				this.objectVariables.Object = this.e.Current;
 
-            if (this.current is GenericObject GenObj)
-            {
-                foreach (KeyValuePair<string, int> P in this.additionalFields)
-                {
-                    Node = this.columns[P.Value];
+			if (this.current is GenericObject GenObj)
+			{
+				for (i = 0; i < this.count; i++)
+				{
+					P = this.additionalFields[i];
 
-                    if (Node.IsAsynchronous)
-                        GenObj[P.Key] = await Node.EvaluateAsync(this.objectVariables);
+					if (this.additionalFieldAsynchronous[i])
+						GenObj[P.Key] = await P.Value.EvaluateAsync(this.objectVariables);
 					else
-						GenObj[P.Key] = Node.Evaluate(this.objectVariables);
-                }
-            }
-            else if (this.current is GroupObject GroupObj)
-            {
-                foreach (KeyValuePair<string, int> P in this.additionalFields)
-                {
-					Node = this.columns[P.Value];
+						GenObj[P.Key] = P.Value.Evaluate(this.objectVariables);
+				}
+			}
+			else if (this.current is GroupObject GroupObj)
+			{
+				for (i = 0; i < this.count; i++)
+				{
+					P = this.additionalFields[i];
 
-					if (Node.IsAsynchronous)
-                        GroupObj[P.Key] = await Node.EvaluateAsync(this.objectVariables);
+					if (this.additionalFieldAsynchronous[i])
+						GroupObj[P.Key] = await P.Value.EvaluateAsync(this.objectVariables);
 					else
-						GroupObj[P.Key] = Node.Evaluate(this.objectVariables);
-                }
-            }
-            else
-            {
-                GroupObject Obj = new GroupObject(Array.Empty<object>(), Array.Empty<ScriptNode>(), this.objectVariables);
+						GroupObj[P.Key] = P.Value.Evaluate(this.objectVariables);
+				}
+			}
+			else
+			{
+				GroupObject Obj = new GroupObject(Array.Empty<object>(), Array.Empty<ScriptNode>(), this.objectVariables);
 
-                foreach (KeyValuePair<string, int> P in this.additionalFields)
-                {
-					Node = this.columns[P.Value];
-					
-                    if (Node.IsAsynchronous)
-                        Obj[P.Key] = await Node.EvaluateAsync(this.objectVariables);
-                    else
-                        Obj[P.Key] = Node.Evaluate(this.objectVariables);
-                }
+				for (i = 0; i < this.count; i++)
+				{
+					P = this.additionalFields[i];
+
+					if (this.additionalFieldAsynchronous[i])
+						Obj[P.Key] = await P.Value.EvaluateAsync(this.objectVariables);
+					else
+						Obj[P.Key] = P.Value.Evaluate(this.objectVariables);
+				}
 
 				this.current = Obj;
-            }
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        /// <summary>
-        /// <see cref="IEnumerator.Reset"/>
-        /// </summary>
-        public void Reset()
-        {
+		/// <summary>
+		/// <see cref="IEnumerator.Reset"/>
+		/// </summary>
+		public void Reset()
+		{
 			this.e.Reset();
 			this.current = null;
-        }
-    }
+		}
+	}
 }

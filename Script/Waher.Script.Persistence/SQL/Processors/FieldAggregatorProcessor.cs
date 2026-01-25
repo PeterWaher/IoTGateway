@@ -13,10 +13,11 @@ namespace Waher.Script.Persistence.SQL.Processors
 	/// </summary>
 	public class FieldAggregatorProcessor : IProcessor<object>
 	{
-		private readonly KeyValuePair<string, int>[] additionalFields;
-		private readonly ScriptNode[] columns;
+		private readonly KeyValuePair<string, ScriptNode>[] additionalFields;
+		private readonly bool[] additionalFieldAsynchronous;
 		private readonly IProcessor<object> processor;
 		private readonly Variables variables;
+		private readonly int count;
 		private readonly bool isAsynchronous;
 		private ObjectProperties objectVariables = null;
 
@@ -32,20 +33,22 @@ namespace Waher.Script.Persistence.SQL.Processors
 		{
 			this.processor = Processor;
 			this.variables = Variables;
-			this.additionalFields = AdditionalFields;
-			this.columns = Columns;
+
+			this.count = AdditionalFields.Length;
+
+			this.additionalFieldAsynchronous = new bool[this.count];
+			this.additionalFields = new KeyValuePair<string, ScriptNode>[this.count];
 			this.isAsynchronous = Processor.IsAsynchronous;
 
-			if (!(Columns is null))
+			for (int i = 0; i < this.count; i++)
 			{
-				foreach (ScriptNode Node in Columns)
-				{
-					if (Node.IsAsynchronous)
-					{
-						this.isAsynchronous = true;
-						break;
-					}
-				}
+				KeyValuePair<string, int> P = AdditionalFields[i];
+				ScriptNode Node = Columns[P.Value];
+
+				this.additionalFields[i] = new KeyValuePair<string, ScriptNode>(P.Key, Node);
+
+				if (this.additionalFieldAsynchronous[i] = Node.IsAsynchronous)
+					this.isAsynchronous = true;
 			}
 		}
 
@@ -61,7 +64,8 @@ namespace Waher.Script.Persistence.SQL.Processors
 		/// <returns>If processing should continue (true), or be cancelled (false).</returns>
 		public bool Process(object Object)
 		{
-			ScriptNode Node;
+			KeyValuePair<string, ScriptNode> P;
+			int i;
 
 			if (this.objectVariables is null)
 				this.objectVariables = new ObjectProperties(Object, this.variables);
@@ -70,28 +74,28 @@ namespace Waher.Script.Persistence.SQL.Processors
 
 			if (Object is GenericObject GenObj)
 			{
-				foreach (KeyValuePair<string, int> P in this.additionalFields)
+				for (i = 0; i < this.count; i++)
 				{
-					Node = this.columns[P.Value];
-					GenObj[P.Key] = Node.Evaluate(this.objectVariables);
+					P = this.additionalFields[i];
+					GenObj[P.Key] = P.Value.Evaluate(this.objectVariables);
 				}
 			}
 			else if (Object is GroupObject GroupObj)
 			{
-				foreach (KeyValuePair<string, int> P in this.additionalFields)
+				for (i = 0; i < this.count; i++)
 				{
-					Node = this.columns[P.Value];
-					GroupObj[P.Key] = Node.Evaluate(this.objectVariables);
+					P = this.additionalFields[i];
+					GroupObj[P.Key] = P.Value.Evaluate(this.objectVariables);
 				}
 			}
 			else
 			{
 				GroupObject Obj = new GroupObject(Array.Empty<object>(), Array.Empty<ScriptNode>(), this.objectVariables);
 
-				foreach (KeyValuePair<string, int> P in this.additionalFields)
+				for (i = 0; i < this.count; i++)
 				{
-					Node = this.columns[P.Value];
-					Obj[P.Key] = Node.Evaluate(this.objectVariables);
+					P = this.additionalFields[i];
+					Obj[P.Key] = P.Value.Evaluate(this.objectVariables);
 				}
 
 				Object = Obj;
@@ -107,7 +111,8 @@ namespace Waher.Script.Persistence.SQL.Processors
 		/// <returns>If processing should continue (true), or be cancelled (false).</returns>
 		public async Task<bool> ProcessAsync(object Object)
 		{
-			ScriptNode Node;
+			KeyValuePair<string, ScriptNode> P;
+			int i;
 
 			if (this.objectVariables is null)
 				this.objectVariables = new ObjectProperties(Object, this.variables);
@@ -116,40 +121,40 @@ namespace Waher.Script.Persistence.SQL.Processors
 
 			if (Object is GenericObject GenObj)
 			{
-				foreach (KeyValuePair<string, int> P in this.additionalFields)
+				for (i = 0; i < this.count; i++)
 				{
-					Node = this.columns[P.Value];
+					P = this.additionalFields[i];
 
-					if (Node.IsAsynchronous)
-						GenObj[P.Key] = await Node.EvaluateAsync(this.objectVariables);
+					if (this.additionalFieldAsynchronous[i])
+						GenObj[P.Key] = await P.Value.EvaluateAsync(this.objectVariables);
 					else
-						GenObj[P.Key] = Node.Evaluate(this.objectVariables);
+						GenObj[P.Key] = P.Value.Evaluate(this.objectVariables);
 				}
 			}
 			else if (Object is GroupObject GroupObj)
 			{
-				foreach (KeyValuePair<string, int> P in this.additionalFields)
+				for (i = 0; i < this.count; i++)
 				{
-					Node = this.columns[P.Value];
+					P = this.additionalFields[i];
 
-					if (Node.IsAsynchronous)
-						GroupObj[P.Key] = await Node.EvaluateAsync(this.objectVariables);
+					if (this.additionalFieldAsynchronous[i])
+						GroupObj[P.Key] = await P.Value.EvaluateAsync(this.objectVariables);
 					else
-						GroupObj[P.Key] = Node.Evaluate(this.objectVariables);
+						GroupObj[P.Key] = P.Value.Evaluate(this.objectVariables);
 				}
 			}
 			else
 			{
 				GroupObject Obj = new GroupObject(Array.Empty<object>(), Array.Empty<ScriptNode>(), this.objectVariables);
 
-				foreach (KeyValuePair<string, int> P in this.additionalFields)
+				for (i = 0; i < this.count; i++)
 				{
-					Node = this.columns[P.Value];
+					P = this.additionalFields[i];
 
-					if (Node.IsAsynchronous)
-						Obj[P.Key] = await Node.EvaluateAsync(this.objectVariables);
+					if (this.additionalFieldAsynchronous[i])
+						Obj[P.Key] = await P.Value.EvaluateAsync(this.objectVariables);
 					else
-						Obj[P.Key] = Node.Evaluate(this.objectVariables);
+						Obj[P.Key] = P.Value.Evaluate(this.objectVariables);
 				}
 
 				Object = Obj;

@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -875,6 +874,22 @@ namespace Waher.Script.Test
 				]);
 		}
 
+		[TestMethod]
+		public async Task SELECT_Test_63_GroupBy_Having()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select B, Sum(A), Prod(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B having Sum(A)>714270000",
+				[
+					[ 1d, 714278571d, 0d, 1d, 99996d, (1d + 99996d) / 2, 1d, 99996d, 0d, 131071d, 65609d, 14286d ],
+					[ 2d, 714292857d, 0d, 2d, 99997d, (2d + 99997d) / 2, 2d, 99997d, 0d, 131071d, 51231d, 14286d ],
+					[ 3d, 714307143d, 0d, 3d, 99998d, (3d + 99998d) / 2, 3d, 99998d, 0d, 131071d, 457d, 14286d ],
+					[ 4d, 714321429d, 0d, 4d, 99999d, (4d + 99999d) / 2, 4d, 99999d, 0d, 131071d, 22971d, 14286d ]
+				]);
+		}
+
 		#endregion
 
 		#region SELECT GENERIC
@@ -1573,6 +1588,22 @@ namespace Waher.Script.Test
 				]);
 		}
 
+		[TestMethod]
+		public async Task SELECT_Test_GENERIC_63_GroupBy_Having()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select generic B, Sum(A), Prod(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B having Sum(A)>714270000",
+				[
+					[ 1d, 714278571d, 0d, 1d, 99996d, (1d + 99996d) / 2, 1d, 99996d, 0d, 131071d, 65609d, 14286d ],
+					[ 2d, 714292857d, 0d, 2d, 99997d, (2d + 99997d) / 2, 2d, 99997d, 0d, 131071d, 51231d, 14286d ],
+					[ 3d, 714307143d, 0d, 3d, 99998d, (3d + 99998d) / 2, 3d, 99998d, 0d, 131071d, 457d, 14286d ],
+					[ 4d, 714321429d, 0d, 4d, 99999d, (4d + 99999d) / 2, 4d, 99999d, 0d, 131071d, 22971d, 14286d ]
+				]);
+		}
+
 		#endregion
 
 		#region INSERT
@@ -1679,6 +1710,23 @@ namespace Waher.Script.Test
 					[ "User29", "Pwd29" ],
 					[ "User30", "Pwd30" ]
 				]);
+		}
+
+		#endregion
+
+		#region DELETE
+
+		[TestMethod]
+		public async Task DELETE_Test_01()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"delete from Collection1 where A MOD 2 = 0", 50000);
+
+			await Test(
+				"select count(*) from Collection1", 50000);
 		}
 
 		#endregion

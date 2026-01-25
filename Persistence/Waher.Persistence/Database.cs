@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -1370,7 +1371,7 @@ namespace Waher.Persistence
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
+		/// <returns>Objects found and deleted.</returns>
 		public static Task<IEnumerable<T>> FindDelete<T>(params string[] SortOrder)
 			where T : class
 		{
@@ -1385,7 +1386,7 @@ namespace Waher.Persistence
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
+		/// <returns>Objects found and deleted.</returns>
 		public static async Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, params string[] SortOrder)
 			where T : class
 		{
@@ -1404,7 +1405,7 @@ namespace Waher.Persistence
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
+		/// <returns>Objects found and deleted.</returns>
 		public static Task<IEnumerable<T>> FindDelete<T>(Filter Filter, params string[] SortOrder)
 			where T : class
 		{
@@ -1420,7 +1421,7 @@ namespace Waher.Persistence
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
+		/// <returns>Objects found and deleted.</returns>
 		public static async Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 			where T : class
 		{
@@ -1438,7 +1439,7 @@ namespace Waher.Persistence
 		/// <param name="Collection">Name of collection to search.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
+		/// <returns>Objects found and deleted.</returns>
 		public static Task<IEnumerable<object>> FindDelete(string Collection, params string[] SortOrder)
 		{
 			return FindDelete(Collection, 0, int.MaxValue, SortOrder);
@@ -1452,7 +1453,7 @@ namespace Waher.Persistence
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
+		/// <returns>Objects found and deleted.</returns>
 		public static async Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, params string[] SortOrder)
 		{
 			IEnumerable<object> Result = await Provider.FindDelete(Collection, Offset, MaxCount, SortOrder);
@@ -1470,7 +1471,7 @@ namespace Waher.Persistence
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
+		/// <returns>Objects found and deleted.</returns>
 		public static Task<IEnumerable<object>> FindDelete(string Collection, Filter Filter, params string[] SortOrder)
 		{
 			return FindDelete(Collection, 0, int.MaxValue, Filter, SortOrder);
@@ -1485,7 +1486,7 @@ namespace Waher.Persistence
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
+		/// <returns>Objects found and deleted.</returns>
 		public static async Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
 			IEnumerable<object> Result = await Provider.FindDelete(Collection, Offset, MaxCount, Filter, SortOrder);
@@ -1494,6 +1495,202 @@ namespace Waher.Persistence
 				RaiseDeleted(Object);
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Number of objects found and deleted.</returns>
+		public static Task<int> Delete<T>(params string[] SortOrder)
+			where T : class
+		{
+			return Delete<T>(0, int.MaxValue, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Number of objects found and deleted.</returns>
+		public static async Task<int> Delete<T>(int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
+		{
+			int MaxCount2;
+			int Count = 0;
+			bool Found;
+
+			do
+			{
+				Found = false;
+				MaxCount2 = Math.Min(MaxCount, 1000);
+
+				IEnumerable<T> Result = await Provider.FindDelete<T>(Offset, MaxCount2, SortOrder);
+
+				foreach (T Object in Result)
+				{
+					RaiseDeleted(Object);
+					MaxCount--;
+					Count++;
+					Found = true;
+				}
+			}
+			while (Found && MaxCount > 0);
+
+			return Count;
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Number of objects found and deleted.</returns>
+		public static Task<int> Delete<T>(Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return Delete<T>(0, int.MaxValue, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Number of objects found and deleted.</returns>
+		public static async Task<int> Delete<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			int MaxCount2;
+			int Count = 0;
+			bool Found;
+
+			do
+			{
+				Found = false;
+				MaxCount2 = Math.Min(MaxCount, 1000);
+
+				IEnumerable<T> Result = await Provider.FindDelete<T>(Offset, MaxCount2, Filter, SortOrder);
+
+				foreach (T Object in Result)
+				{
+					RaiseDeleted(Object);
+					MaxCount--;
+					Count++;
+					Found = true;
+				}
+			}
+			while (Found && MaxCount > 0);
+
+			return Count;
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Number of objects found and deleted.</returns>
+		public static Task<int> Delete(string Collection, params string[] SortOrder)
+		{
+			return Delete(Collection, 0, int.MaxValue, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Number of objects found and deleted.</returns>
+		public static async Task<int> Delete(string Collection, int Offset, int MaxCount, params string[] SortOrder)
+		{
+			int MaxCount2;
+			int Count = 0;
+			bool Found;
+
+			do
+			{
+				Found = false;
+				MaxCount2 = Math.Min(MaxCount, 1000);
+
+				IEnumerable<object> Result = await Provider.FindDelete(Collection, Offset, MaxCount2, SortOrder);
+
+				foreach (object Object in Result)
+				{
+					RaiseDeleted(Object);
+					MaxCount--;
+					Count++;
+					Found = true;
+				}
+			}
+			while (Found && MaxCount > 0);
+
+			return Count;
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Number of objects found and deleted.</returns>
+		public static Task<int> Delete(string Collection, Filter Filter, params string[] SortOrder)
+		{
+			return Delete(Collection, 0, int.MaxValue, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Number of objects found and deleted.</returns>
+		public static async Task<int> Delete(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			int MaxCount2;
+			int Count = 0;
+			bool Found;
+
+			do
+			{
+				Found = false;
+				MaxCount2 = Math.Min(MaxCount, 1000);
+
+				IEnumerable<object> Result = await Provider.FindDelete(Collection, Offset, MaxCount2, Filter, SortOrder);
+
+				foreach (object Object in Result)
+				{
+					RaiseDeleted(Object);
+					MaxCount--;
+					Count++;
+					Found = true;
+				}
+			}
+			while (Found && MaxCount > 0);
+
+			return Count;
 		}
 
 		/// <summary>

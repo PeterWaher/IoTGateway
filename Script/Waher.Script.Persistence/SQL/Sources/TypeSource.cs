@@ -332,7 +332,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 
 		/// <summary>
-		/// Finds and Deletes a set of objects.
+		/// Deletes a set of objects.
 		/// </summary>
 		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
 		/// <param name="Offset">Offset at which to return elements.</param>
@@ -342,42 +342,37 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Number of objects deleted, if known.</returns>
-		public async Task<int?> FindDelete(bool Lazy, int Offset, int Top, ScriptNode Where, Variables Variables,
+		public async Task<int?> Delete(bool Lazy, int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
 			Filter Filter = await TypeSource.ConvertAsync(Where, Variables, this.Name);
 
 			object[] FindParameters = new object[] { Offset, Top, Filter, Convert(Order) };
-			object Obj = (Lazy ? DeleteLazyMethod : FindDeleteMethod).MakeGenericMethod(this.type).Invoke(null, FindParameters);
+			object Obj = (Lazy ? DeleteLazyMethod : DeleteMethod).MakeGenericMethod(this.type).Invoke(null, FindParameters);
 
 			if (Lazy)
 				return null;
 
 			Obj = await ScriptNode.WaitPossibleTask(Obj);
-			if (!(Obj is IEnumerable<object> Objects))
+			if (!(Obj is int Count))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
-
-			int Count = 0;
-
-			foreach (object Obj2 in Objects)
-				Count++;
 
 			return Count;
 		}
 
-		private static MethodInfo findDeleteMethod = null;
+		private static MethodInfo deleteMethod = null;
 		private static MethodInfo deleteLazyMethod = null;
 
 		/// <summary>
-		/// Generic object database FindDelete method: <see cref="Database.FindDelete{T}(int, int, Filter, string[])"/>
+		/// Generic object database Delete method: <see cref="Database.Delete{T}(int, int, Filter, string[])"/>
 		/// </summary>
-		public static MethodInfo FindDeleteMethod
+		public static MethodInfo DeleteMethod
 		{
 			get
 			{
-				if (findDeleteMethod is null)
+				if (deleteMethod is null)
 				{
-					foreach (MethodInfo MI in typeof(Database).GetTypeInfo().GetDeclaredMethods("FindDelete"))
+					foreach (MethodInfo MI in typeof(Database).GetTypeInfo().GetDeclaredMethods("Delete"))
 					{
 						if (!MI.ContainsGenericParameters)
 							continue;
@@ -392,14 +387,14 @@ namespace Waher.Script.Persistence.SQL.Sources
 							continue;
 						}
 
-						findDeleteMethod = MI;
+						deleteMethod = MI;
 					}
 
-					if (findDeleteMethod is null)
-						throw new InvalidOperationException("Appropriate Database.FindDelete method not found.");
+					if (deleteMethod is null)
+						throw new InvalidOperationException("Appropriate Database.Delete method not found.");
 				}
 
-				return findDeleteMethod;
+				return deleteMethod;
 			}
 		}
 

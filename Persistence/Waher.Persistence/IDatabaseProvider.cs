@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Profiling;
-using Waher.Runtime.Collections;
 
 namespace Waher.Persistence
 {
@@ -361,7 +360,7 @@ namespace Waher.Persistence
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
+		/// <returns>Objects found and deleted.</returns>
 		Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, params string[] SortOrder)
 			where T : class;
 
@@ -374,7 +373,7 @@ namespace Waher.Persistence
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
+		/// <returns>Objects found and deleted.</returns>
 		Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 			where T : class;
 
@@ -386,7 +385,7 @@ namespace Waher.Persistence
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
+		/// <returns>Objects found and deleted.</returns>
 		Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, params string[] SortOrder);
 
 		/// <summary>
@@ -398,7 +397,7 @@ namespace Waher.Persistence
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
+		/// <returns>Objects found and deleted.</returns>
 		Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder);
 
 		/// <summary>

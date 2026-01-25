@@ -44,7 +44,7 @@ namespace Waher.Script.Persistence.SQL
 			ScriptNode Node);
 
 		/// <summary>
-		/// Finds and Deletes a set of objects.
+		/// Deletes a set of objects.
 		/// </summary>
 		/// <param name="Offset">Offset at which to return elements.</param>
 		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
@@ -54,7 +54,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Number of objects deleted, if known.</returns>
-		Task<int?> FindDelete(bool Lazy, int Offset, int Top, ScriptNode Where, Variables Variables,
+		Task<int?> Delete(bool Lazy, int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node);
 
 		/// <summary>

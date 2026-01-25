@@ -92,7 +92,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		}
 
 		/// <summary>
-		/// Finds and Deletes a set of objects.
+		/// Deletes a set of objects.
 		/// </summary>
 		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
 		/// <param name="Offset">Offset at which to return elements.</param>
@@ -102,7 +102,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Number of objects deleted, if known.</returns>
-		public async Task<int?> FindDelete(bool Lazy, int Offset, int Top, ScriptNode Where, Variables Variables,
+		public async Task<int?> Delete(bool Lazy, int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
 			Filter Filter = await TypeSource.ConvertAsync(Where, Variables, this.Name);
@@ -118,15 +118,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 				return null;
 			}
 			else
-			{
-				IEnumerable<object> Objects = await Database.FindDelete(this.collectionName, Offset, Top, Filter, TypeSource.Convert(Order));
-				int Count = 0;
-
-				foreach (object Obj in Objects)
-					Count++;
-
-				return Count;
-			}
+				return await Database.Delete(this.collectionName, Offset, Top, Filter, TypeSource.Convert(Order));
 		}
 
 		/// <summary>

@@ -286,10 +286,16 @@ namespace Waher.Script.Persistence.SQL
 			if (!(this.groupBy is null))
 			{
 				if (Top != int.MaxValue)
+				{
 					Processor = new MaxCountProcessor(Processor, Top);
+					Top = int.MaxValue;
+				}
 
 				if (Offset > 0)
+				{
 					Processor = new OffsetProcessor(Processor, Offset);
+					Offset = 0;
+				}
 			}
 
 			if (CalculatedOrder)

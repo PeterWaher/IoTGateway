@@ -951,7 +951,16 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public async Task SELECT_Test_66_Distinct()
+		public async Task SELECT_Test_66_Top_Offset()
+		{
+			await Test("Select Top 1 OrderID, CustomerID, OrderDate from Orders offset 1",
+				[
+					[2d, 3d, new DateTime(2020, 5, 1)]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_67_Distinct()
 		{
 			await Database.Clear("Collection1");
 
@@ -970,7 +979,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public async Task SELECT_Test_67_OrderBy()
+		public async Task SELECT_Test_68_OrderBy()
 		{
 			await Test("Select OrderID, CustomerID, OrderDate from Orders order by OrderID desc",
 				[
@@ -981,7 +990,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public async Task SELECT_Test_68_GroupBy_OrderBy()
+		public async Task SELECT_Test_69_GroupBy_OrderBy()
 		{
 			await Database.Clear("Collection1");
 
@@ -996,6 +1005,51 @@ namespace Waher.Script.Test
 					[ 2d, 714292857d, 0d, 2d, 99997d, (2d + 99997d) / 2, 2d, 99997d, 0d, 131071d, 51231d, 14286d ],
 					[ 3d, 714307143d, 0d, 3d, 99998d, (3d + 99998d) / 2, 3d, 99998d, 0d, 131071d, 457d, 14286d ],
 					[ 4d, 714321429d, 0d, 4d, 99999d, (4d + 99999d) / 2, 4d, 99999d, 0d, 131071d, 22971d, 14286d ]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_70_GroupBy_Top()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select top 2 B, Sum(A) S, Prod(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B",
+				[
+					[ 0d, 714264285d, 0d, 0d, 99995d, (0d + 99995d) / 2, 0d, 99995d, 0d, 131071d, 116859d, 14286d ],
+					[ 1d, 714278571d, 0d, 1d, 99996d, (1d + 99996d) / 2, 1d, 99996d, 0d, 131071d, 65609d, 14286d ]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_71_GroupBy_Offset()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select B, Sum(A) S, Prod(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B offset 2",
+				[
+					[ 2d, 714292857d, 0d, 2d, 99997d, (2d + 99997d) / 2, 2d, 99997d, 0d, 131071d, 51231d, 14286d ],
+					[ 3d, 714307143d, 0d, 3d, 99998d, (3d + 99998d) / 2, 3d, 99998d, 0d, 131071d, 457d, 14286d ],
+					[ 4d, 714321429d, 0d, 4d, 99999d, (4d + 99999d) / 2, 4d, 99999d, 0d, 131071d, 22971d, 14286d ],
+					[ 5d, 714235715d, 0d, 5d, 99993d, (5d + 99993d) / 2, 5d, 99993d, 0d, 131071d, 108521d, 14285d ],
+					[ 6d, 714250000d, 0d, 6d, 99994d, (6d + 99994d) / 2, 6d, 99994d, 0d, 131071d, 130998d, 14285d ],
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_72_GroupBy_Top_Offset()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select top 2 B, Sum(A) S, Prod(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B offset 2",
+				[
+					[ 2d, 714292857d, 0d, 2d, 99997d, (2d + 99997d) / 2, 2d, 99997d, 0d, 131071d, 51231d, 14286d ],
+					[ 3d, 714307143d, 0d, 3d, 99998d, (3d + 99998d) / 2, 3d, 99998d, 0d, 131071d, 457d, 14286d ]
 				]);
 		}
 
@@ -1734,7 +1788,16 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public async Task SELECT_Test_GENERIC_66_Distinct()
+		public async Task SELECT_Test_GENERIC_66_Top_Offset()
+		{
+			await Test("Select generic Top 1 OrderID, CustomerID, OrderDate from Orders offset 1",
+				[
+					[2d, 3d, new DateTime(2020, 5, 1)]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_GENERIC_67_Distinct()
 		{
 			await Database.Clear("Collection1");
 
@@ -1753,7 +1816,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public async Task SELECT_Test_GENERIC_67_OrderBy()
+		public async Task SELECT_Test_GENERIC_68_OrderBy()
 		{
 			await Test("Select generic OrderID, CustomerID, OrderDate from Orders order by OrderID desc",
 				[
@@ -1764,7 +1827,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public async Task SELECT_Test_GENERIC_68_GroupBy_OrderBy()
+		public async Task SELECT_Test_GENERIC_69_GroupBy_OrderBy()
 		{
 			await Database.Clear("Collection1");
 
@@ -1779,6 +1842,51 @@ namespace Waher.Script.Test
 					[ 2d, 714292857d, 0d, 2d, 99997d, (2d + 99997d) / 2, 2d, 99997d, 0d, 131071d, 51231d, 14286d ],
 					[ 3d, 714307143d, 0d, 3d, 99998d, (3d + 99998d) / 2, 3d, 99998d, 0d, 131071d, 457d, 14286d ],
 					[ 4d, 714321429d, 0d, 4d, 99999d, (4d + 99999d) / 2, 4d, 99999d, 0d, 131071d, 22971d, 14286d ]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_GENERIC_70_GroupBy_Top()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select generic top 2 B, Sum(A) S, Prod(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B",
+				[
+					[ 0d, 714264285d, 0d, 0d, 99995d, (0d + 99995d) / 2, 0d, 99995d, 0d, 131071d, 116859d, 14286d ],
+					[ 1d, 714278571d, 0d, 1d, 99996d, (1d + 99996d) / 2, 1d, 99996d, 0d, 131071d, 65609d, 14286d ]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_GENERIC_71_GroupBy_Offset()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select generic B, Sum(A) S, Prod(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B offset 2",
+				[
+					[ 2d, 714292857d, 0d, 2d, 99997d, (2d + 99997d) / 2, 2d, 99997d, 0d, 131071d, 51231d, 14286d ],
+					[ 3d, 714307143d, 0d, 3d, 99998d, (3d + 99998d) / 2, 3d, 99998d, 0d, 131071d, 457d, 14286d ],
+					[ 4d, 714321429d, 0d, 4d, 99999d, (4d + 99999d) / 2, 4d, 99999d, 0d, 131071d, 22971d, 14286d ],
+					[ 5d, 714235715d, 0d, 5d, 99993d, (5d + 99993d) / 2, 5d, 99993d, 0d, 131071d, 108521d, 14285d ],
+					[ 6d, 714250000d, 0d, 6d, 99994d, (6d + 99994d) / 2, 6d, 99994d, 0d, 131071d, 130998d, 14285d ],
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_GENERIC_72_GroupBy_Top_Offset()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select generic top 2 B, Sum(A) S, Prod(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B offset 2",
+				[
+					[ 2d, 714292857d, 0d, 2d, 99997d, (2d + 99997d) / 2, 2d, 99997d, 0d, 131071d, 51231d, 14286d ],
+					[ 3d, 714307143d, 0d, 3d, 99998d, (3d + 99998d) / 2, 3d, 99998d, 0d, 131071d, 457d, 14286d ]
 				]);
 		}
 

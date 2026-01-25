@@ -45,6 +45,11 @@ namespace Waher.Script.Persistence.SQL.Processors
 		public bool IsAsynchronous => this.isAsynchronous;
 
 		/// <summary>
+		/// Number of records processed.
+		/// </summary>
+		public int Count => this.items.Count;
+
+		/// <summary>
 		/// Gets the generated record set.
 		/// </summary>
 		/// <returns>Array of records.</returns>
@@ -174,16 +179,19 @@ namespace Waher.Script.Persistence.SQL.Processors
 		/// <summary>
 		/// Called at the end of processing, to allow for flushing of buffers, etc.
 		/// </summary>
-		public void Flush()
+		/// <returns>If processing should continue (true), or be cancelled (false).</returns>
+		public bool Flush()
 		{
+			return true;
 		}
 
 		/// <summary>
 		/// Called at the end of processing, to allow for flushing of buffers, etc.
 		/// </summary>
-		public Task FlushAsync()
+		/// <returns>If processing should continue (true), or be cancelled (false).</returns>
+		public Task<bool> FlushAsync()
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 	}
 }

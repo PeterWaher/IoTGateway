@@ -137,8 +137,8 @@ namespace Waher.Persistence.MongoDB.Test
 			}
 
 			public Task<bool> ProcessAsync(T Object) => Task.FromResult(false);
-			public void Flush() { }
-			public Task FlushAsync() => Task.CompletedTask;
+			public bool Flush() => true;
+			public Task<bool> FlushAsync() => Task.FromResult(true);
 		}
 
 		[TestMethod]

@@ -254,8 +254,17 @@ namespace Waher.Script.Persistence.SQL.Sources
 							continue;
 
 						ParameterInfo[] Parameters = MI.GetParameters();
-						if (Parameters.Length != 5 ||
-							Parameters[0].ParameterType != typeof(IProcessor<>) ||
+						if (Parameters.Length != 5)
+							continue;
+
+						Type ProcessorType = Parameters[0].ParameterType;
+						if (!ProcessorType.IsGenericType)
+							continue;
+
+						if (!ProcessorType.IsGenericTypeDefinition)
+							ProcessorType = ProcessorType.GetGenericTypeDefinition();
+
+						if (ProcessorType != typeof(IProcessor<>) ||
 							Parameters[1].ParameterType != typeof(int) ||
 							Parameters[2].ParameterType != typeof(int) ||
 							Parameters[3].ParameterType != typeof(Filter) ||
@@ -290,8 +299,17 @@ namespace Waher.Script.Persistence.SQL.Sources
 							continue;
 
 						ParameterInfo[] Parameters = MI.GetParameters();
-						if (Parameters.Length != 6 ||
-							Parameters[0].ParameterType != typeof(IProcessor<>) ||
+						if (Parameters.Length != 6)
+							continue;
+
+						Type ProcessorType = Parameters[0].ParameterType;
+						if (!ProcessorType.IsGenericType)
+							continue;
+
+						if (!ProcessorType.IsGenericTypeDefinition)
+							ProcessorType = ProcessorType.GetGenericTypeDefinition();
+
+						if (ProcessorType != typeof(IProcessor<>) ||
 							Parameters[1].ParameterType != typeof(string) ||
 							Parameters[2].ParameterType != typeof(int) ||
 							Parameters[3].ParameterType != typeof(int) ||

@@ -43,16 +43,19 @@ namespace Waher.Persistence.Processors
 		/// <summary>
 		/// Called at the end of processing, to allow for flushing of buffers, etc.
 		/// </summary>
-		public void Flush()
+		/// <returns>If processing should continue (true), or be cancelled (false).</returns>
+		public bool Flush()
 		{
+			return true;
 		}
 
 		/// <summary>
 		/// Called at the end of processing, to allow for flushing of buffers, etc.
 		/// </summary>
-		public Task FlushAsync()
+		/// <returns>If processing should continue (true), or be cancelled (false).</returns>
+		public Task<bool> FlushAsync()
 		{
-			return Task.CompletedTask;
+			return Task.FromResult(true);
 		}
 	}
 }

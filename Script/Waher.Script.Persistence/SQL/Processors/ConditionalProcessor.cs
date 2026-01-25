@@ -91,11 +91,13 @@ namespace Waher.Script.Persistence.SQL.Processors
 		/// <summary>
 		/// Called at the end of processing, to allow for flushing of buffers, etc.
 		/// </summary>
-		public void Flush() => this.processor.Flush();
+		/// <returns>If processing should continue (true), or be cancelled (false).</returns>
+		public bool Flush() => this.processor.Flush();
 
 		/// <summary>
 		/// Called at the end of processing, to allow for flushing of buffers, etc.
 		/// </summary>
-		public Task FlushAsync() => this.processor.FlushAsync();
+		/// <returns>If processing should continue (true), or be cancelled (false).</returns>
+		public Task<bool> FlushAsync() => this.processor.FlushAsync();
 	}
 }

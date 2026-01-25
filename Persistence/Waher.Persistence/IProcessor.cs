@@ -29,11 +29,13 @@ namespace Waher.Persistence
 		/// <summary>
 		/// Called at the end of processing, to allow for flushing of buffers, etc.
 		/// </summary>
-		void Flush();
+		/// <returns>If processing should continue (true), or be cancelled (false).</returns>
+		bool Flush();
 
 		/// <summary>
 		/// Called at the end of processing, to allow for flushing of buffers, etc.
 		/// </summary>
-		Task FlushAsync();
+		/// <returns>If processing should continue (true), or be cancelled (false).</returns>
+		Task<bool> FlushAsync();
 	}
 }

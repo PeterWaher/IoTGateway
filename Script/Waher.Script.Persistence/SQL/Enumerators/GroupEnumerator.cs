@@ -5,9 +5,10 @@ using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Persistence.SQL.Enumerators;
+using Waher.Script.Persistence.SQL.Groups;
+using Waher.Script.Persistence.SQL.Processors;
 
-namespace Waher.Script.Persistence.SQL.Groups
+namespace Waher.Script.Persistence.SQL.Enumerators
 {
 	/// <summary>
 	/// Enumerator that groups items into groups, and returns aggregated elements.
@@ -57,10 +58,10 @@ namespace Waher.Script.Persistence.SQL.Groups
 			if (!(Columns is null))
 			{
 				for (i = 0, c = Columns.Length; i < c; i++)
-					FindIterators(ref Columns[i], Iterators);
+					GroupProcessor.FindIterators(ref Columns[i], Iterators);
 			}
 
-			FindIterators(ref Having, Iterators);
+			GroupProcessor.FindIterators(ref Having, Iterators);
 
 			this.iterators = Iterators.ToArray();
 			this.iteratorCount = this.iterators.Length;
@@ -73,47 +74,6 @@ namespace Waher.Script.Persistence.SQL.Groups
 				this.iteratorUsesElement[i] = this.iterators[i].UsesElement;
 				this.iteratorAsynchronous[i] = this.iterators[i].IsAsynchronous;
 			}
-		}
-
-		private static void FindIterators(ref ScriptNode Node, ChunkedList<IIterativeEvaluator> Iterators)
-		{
-			if (Node is IIterativeEvaluation IterativeEvaluation2)
-			{
-				IIterativeEvaluator Evaluator = IterativeEvaluation2.CreateEvaluator();
-				Iterators.Add(Evaluator);
-
-				ScriptNode Node0 = Node;
-
-				Node = new GroupIteratorValue(Evaluator, Node.Start, Node.Length,
-					Node.Expression);
-				Node.SetParent(Node0.Parent);
-			}
-			else if (Node is GroupIteratorValue GroupIteratorValue2)
-				Iterators.Add(GroupIteratorValue2.Iterator);
-			else
-				Node?.ForAllChildNodes(FindIterators, Iterators, SearchMethod.TreeOrder);
-		}
-
-		private static bool FindIterators(ScriptNode Node, out ScriptNode NewNode, object State)
-		{
-			NewNode = null;
-
-			if (Node is IIterativeEvaluation IterativeEvaluation)
-			{
-				ChunkedList<IIterativeEvaluator> Iterators = (ChunkedList<IIterativeEvaluator>)State;
-				IIterativeEvaluator Evaluator = IterativeEvaluation.CreateEvaluator();
-				Iterators.Add(Evaluator);
-
-				NewNode = new GroupIteratorValue(Evaluator, Node.Start, Node.Length,
-					Node.Expression);
-			}
-			else if (Node is GroupIteratorValue GroupIteratorValue)
-			{
-				ChunkedList<IIterativeEvaluator> Iterators = (ChunkedList<IIterativeEvaluator>)State;
-				Iterators.Add(GroupIteratorValue.Iterator);
-			}
-
-			return true;
 		}
 
 		/// <summary>
@@ -159,7 +119,7 @@ namespace Waher.Script.Persistence.SQL.Groups
 
 					for (i = 0; i < c; i++)
 					{
-						if (this.groupBy[i].IsAsynchronous)
+						if (this.groupByAsynchronous[i])
 							E = await this.groupBy[i].EvaluateAsync(this.objectVariables);
 						else
 							E = this.groupBy[i].Evaluate(this.objectVariables);

@@ -10,8 +10,6 @@ using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
-using Waher.Script.Persistence.SQL.Enumerators;
-using Waher.Script.Persistence.SQL.Groups;
 using Waher.Script.Persistence.SQL.Processors;
 
 namespace Waher.Script.Persistence.SQL
@@ -274,7 +272,7 @@ namespace Waher.Script.Persistence.SQL
 				c = 0;
 
 			IDataSource Source = await this.source.GetSource(Variables);
-			/*
+			
 			IProcessor<object> Processor;
 			RecordProcessor Records;
 
@@ -285,11 +283,14 @@ namespace Waher.Script.Persistence.SQL
 
 			Processor = Records;
 
-			if (Top != int.MaxValue)
-				Processor = new MaxCountProcessor(Processor, Top);
+			if (!(this.groupBy is null))
+			{
+				if (Top != int.MaxValue)
+					Processor = new MaxCountProcessor(Processor, Top);
 
-			if (Offset > 0)
-				Processor = new OffsetProcessor(Processor, Offset);
+				if (Offset > 0)
+					Processor = new OffsetProcessor(Processor, Offset);
+			}
 
 			if (CalculatedOrder)
 			{
@@ -313,89 +314,30 @@ namespace Waher.Script.Persistence.SQL
 			if (!(this.having is null))
 				Processor = new ConditionalProcessor(Processor, Variables, this.having);
 
-			*/
-
-
-
-
-			IResultSetEnumerator e;
-
-			if (this.groupBy is null)
-			{
-				e = await Source.Find(Offset, Top, this.generic, this.where, Variables, OrderBy.ToArray(), this);
-				Offset = 0;
-				Top = int.MaxValue;
-			}
-			else
-			{
-				e = await Source.Find(0, int.MaxValue, this.generic, this.where, Variables, OrderBy.ToArray(), this);
-
-				e = new GroupEnumerator(e, Variables, this.groupBy, this.groupByNames,
-					this.columns, ref this.having);
-			}
-
 			if (!(AdditionalFields is null))
 			{
-				e = new FieldAggregatorEnumerator(e, Variables, AdditionalFields.ToArray(),
+				Processor = new FieldAggregatorProcessor(Processor, Variables, AdditionalFields.ToArray(),
 					this.columns);
 			}
 
-			if (!(this.having is null))
-				e = new ConditionalEnumerator(e, Variables, this.having);
-
-			if (CalculatedOrder)
-			{
-				ChunkedList<KeyValuePair<ScriptNode, bool>> Order = new ChunkedList<KeyValuePair<ScriptNode, bool>>();
-
-				if (!(this.orderBy is null))
-					Order.AddRange(this.orderBy);
-
-				if (!(this.groupByNames is null))
-				{
-					foreach (ScriptNode Group in this.groupByNames)
-					{
-						if (!(Group is null))
-							Order.Add(new KeyValuePair<ScriptNode, bool>(Group, true));
-					}
-				}
-
-				e = new CustomOrderEnumerator(e, Variables, Order.ToArray());
-			}
-
-			if (Offset > 0)
-				e = new OffsetEnumerator(e, Offset);
-
-			if (Top != int.MaxValue)
-				e = new MaxCountEnumerator(e, Top);
-
-			RecordEnumerator e2;
-
-			if (this.distinct)
-				e2 = new DistinctEnumerator(e, Columns2, Variables);
+			if (this.groupBy is null)
+				await Source.Process(Processor, Offset, Top, this.generic, this.where, Variables, OrderBy.ToArray(), this);
 			else
-				e2 = new RecordEnumerator(e, Columns2, Variables);
-
-			ChunkedList<IElement[]> Items = new ChunkedList<IElement[]>();
-			int NrRecords = 0;
-
-			while (await e2.MoveNextAsync())
 			{
-				Items.Add(e2.CurrentRecord);
-				NrRecords++;
-			}
-			
-			if (this.selectOneObject)
-			{
-				if (!Items.HasFirstItem)
-					return ObjectValue.Null;
-				else if (NrRecords == 1 && Items.FirstItem.Length == 1)
-					return Items.FirstItem[0];
+				Processor = new GroupProcessor(Processor, Variables, this.groupBy, this.groupByNames,
+					this.columns, ref this.having);
+
+				await Source.Process(Processor, 0, int.MaxValue, this.generic, this.where, Variables, OrderBy.ToArray(), this);
 			}
 
+			if (this.selectOneObject && Records.TryGetSingleElement(out E))
+				return E;
+
+			int NrRecords = Records.Count;
 			IElement[] Elements = new IElement[Columns2 is null ? NrRecords : NrRecords * c];
 
 			i = 0;
-			foreach (IElement[] Record in Items)
+			foreach (IElement[] Record in Records.GetRecordSet())
 			{
 				foreach (IElement Item in Record)
 					Elements[i++] = Item;

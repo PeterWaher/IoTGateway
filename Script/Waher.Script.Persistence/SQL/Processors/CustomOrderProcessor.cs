@@ -35,6 +35,15 @@ namespace Waher.Script.Persistence.SQL.Processors
 			this.order = Order;
 			this.variables = Variables;
 			this.isAsynchronous = Processor.IsAsynchronous;
+
+			foreach (KeyValuePair<ScriptNode, bool> P in Order)
+			{
+				if (P.Key.IsAsynchronous)
+				{
+					this.isAsynchronous = true;
+					break;
+				}
+			}
 		}
 
 		/// <summary>
@@ -67,14 +76,18 @@ namespace Waher.Script.Persistence.SQL.Processors
 		/// <summary>
 		/// Called at the end of processing, to allow for flushing of buffers, etc.
 		/// </summary>
-		public void Flush()
+		/// <returns>If processing should continue (true), or be cancelled (false).</returns>
+		public bool Flush()
 		{
 			this.Sort();
 
 			foreach (object Item in this.items)
-				this.processor.Process(Item);
+			{
+				if (!this.processor.Process(Item))
+					return false;
+			}
 
-			this.processor.Flush();
+			return this.processor.Flush();
 		}
 
 		private void Sort()
@@ -140,14 +153,18 @@ namespace Waher.Script.Persistence.SQL.Processors
 		/// <summary>
 		/// Called at the end of processing, to allow for flushing of buffers, etc.
 		/// </summary>
-		public async Task FlushAsync()
+		/// <returns>If processing should continue (true), or be cancelled (false).</returns>
+		public async Task<bool> FlushAsync()
 		{
 			this.Sort();
 
 			foreach (object Item in this.items)
-				await this.processor.ProcessAsync(Item);
+			{
+				if (!await this.processor.ProcessAsync(Item))
+					return false;
+			}
 
-			await this.processor.FlushAsync();
+			return await this.processor.FlushAsync();
 		}
 	}
 }

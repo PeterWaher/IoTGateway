@@ -169,6 +169,46 @@ namespace Waher.Script.Test
 			ConsoleOut.WriteLine();
 		}
 
+		private static async Task Test(string Script, object[] ExpectedOutput)
+		{
+			Variables v = [];
+			Expression Exp = new(Script);
+			object Obj = await Exp.EvaluateAsync(v);
+			ConsoleOut.WriteLine(Expression.ToString(Obj));
+
+			Array V = Obj as Array;
+			int Count, Index;
+
+			Assert.IsNotNull(V, "Vector expected.");
+			Assert.AreEqual(Count = ExpectedOutput.Length, V.Length, "Number of elements in response incorrect.");
+			for (Index = 0; Index < Count; Index++)
+			{
+				object Expected = ExpectedOutput[Index];
+				object Value = V.GetValue(Index);
+
+				if (Expected is double ExpectedDouble &&
+					Value is double ExpectedValue &&
+					ExpectedDouble != 0)
+				{
+					double Diff = ExpectedValue / ExpectedDouble - 1.0;
+
+					if (Math.Abs(Diff) > 1e-10)
+					{
+						Assert.Fail("Expected " + Expected.ToString() + ", but was " +
+							Value.ToString() + " (" + (100.0 * Diff).ToString() + "%)");
+					}
+				}
+				else
+					Assert.AreEqual(Expected, Value);
+			}
+
+			ScriptParsingTests.AssertParentNodesAndSubsexpressions(Exp);
+
+			ConsoleOut.WriteLine();
+			Exp.ToXml(ConsoleOut.Writer);
+			ConsoleOut.WriteLine();
+		}
+
 		private static async Task Test(string Script, double ExpectedOutput)
 		{
 			Variables v = [];
@@ -890,6 +930,75 @@ namespace Waher.Script.Test
 				]);
 		}
 
+		[TestMethod]
+		public async Task SELECT_Test_64_Top()
+		{
+			await Test("Select top 2 OrderID, CustomerID, OrderDate from Orders",
+				[
+					[1d, 2d, new DateTime(2020, 4, 30)],
+					[2d, 3d, new DateTime(2020, 5, 1)]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_65_Offset()
+		{
+			await Test("Select OrderID, CustomerID, OrderDate from Orders offset 1",
+				[
+					[2d, 3d, new DateTime(2020, 5, 1)],
+					[3d, 4d, new DateTime(2020, 5, 2)]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_66_Distinct()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select distinct B from Collection1",
+				[
+					0d,
+					1d,
+					2d,
+					3d,
+					4d,
+					5d,
+					6d
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_67_OrderBy()
+		{
+			await Test("Select OrderID, CustomerID, OrderDate from Orders order by OrderID desc",
+				[
+					[3d, 4d, new DateTime(2020, 5, 2)],
+					[2d, 3d, new DateTime(2020, 5, 1)],
+					[1d, 2d, new DateTime(2020, 4, 30)]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_68_GroupBy_OrderBy()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select B, Sum(A) S, Prod(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B order by S",
+				[
+					[ 5d, 714235715d, 0d, 5d, 99993d, (5d + 99993d) / 2, 5d, 99993d, 0d, 131071d, 108521d, 14285d ],
+					[ 6d, 714250000d, 0d, 6d, 99994d, (6d + 99994d) / 2, 6d, 99994d, 0d, 131071d, 130998d, 14285d ],
+					[ 0d, 714264285d, 0d, 0d, 99995d, (0d + 99995d) / 2, 0d, 99995d, 0d, 131071d, 116859d, 14286d ],
+					[ 1d, 714278571d, 0d, 1d, 99996d, (1d + 99996d) / 2, 1d, 99996d, 0d, 131071d, 65609d, 14286d ],
+					[ 2d, 714292857d, 0d, 2d, 99997d, (2d + 99997d) / 2, 2d, 99997d, 0d, 131071d, 51231d, 14286d ],
+					[ 3d, 714307143d, 0d, 3d, 99998d, (3d + 99998d) / 2, 3d, 99998d, 0d, 131071d, 457d, 14286d ],
+					[ 4d, 714321429d, 0d, 4d, 99999d, (4d + 99999d) / 2, 4d, 99999d, 0d, 131071d, 22971d, 14286d ]
+				]);
+		}
+
 		#endregion
 
 		#region SELECT GENERIC
@@ -1604,6 +1713,75 @@ namespace Waher.Script.Test
 				]);
 		}
 
+		[TestMethod]
+		public async Task SELECT_Test_GENERIC_64_Top()
+		{
+			await Test("Select generic top 2 OrderID, CustomerID, OrderDate from Orders",
+				[
+					[1d, 2d, new DateTime(2020, 4, 30)],
+					[2d, 3d, new DateTime(2020, 5, 1)]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_GENERIC_65_Offset()
+		{
+			await Test("Select Generic OrderID, CustomerID, OrderDate from Orders offset 1",
+				[
+					[2d, 3d, new DateTime(2020, 5, 1)],
+					[3d, 4d, new DateTime(2020, 5, 2)]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_GENERIC_66_Distinct()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select generic distinct B from Collection1",
+				[
+					0d,
+					1d,
+					2d,
+					3d,
+					4d,
+					5d,
+					6d
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_GENERIC_67_OrderBy()
+		{
+			await Test("Select generic OrderID, CustomerID, OrderDate from Orders order by OrderID desc",
+				[
+					[3d, 4d, new DateTime(2020, 5, 2)],
+					[2d, 3d, new DateTime(2020, 5, 1)],
+					[1d, 2d, new DateTime(2020, 4, 30)]
+				]);
+		}
+
+		[TestMethod]
+		public async Task SELECT_Test_GENERIC_68_GroupBy_OrderBy()
+		{
+			await Database.Clear("Collection1");
+
+			await Test(
+				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
+				"select generic B, Sum(A) S, Prod(A), Min(A), Max(A), Average(A), First(A), Last(A), And(A), Or(A), Xor(A), Count(*) from Collection1 group by B order by S",
+				[
+					[ 5d, 714235715d, 0d, 5d, 99993d, (5d + 99993d) / 2, 5d, 99993d, 0d, 131071d, 108521d, 14285d ],
+					[ 6d, 714250000d, 0d, 6d, 99994d, (6d + 99994d) / 2, 6d, 99994d, 0d, 131071d, 130998d, 14285d ],
+					[ 0d, 714264285d, 0d, 0d, 99995d, (0d + 99995d) / 2, 0d, 99995d, 0d, 131071d, 116859d, 14286d ],
+					[ 1d, 714278571d, 0d, 1d, 99996d, (1d + 99996d) / 2, 1d, 99996d, 0d, 131071d, 65609d, 14286d ],
+					[ 2d, 714292857d, 0d, 2d, 99997d, (2d + 99997d) / 2, 2d, 99997d, 0d, 131071d, 51231d, 14286d ],
+					[ 3d, 714307143d, 0d, 3d, 99998d, (3d + 99998d) / 2, 3d, 99998d, 0d, 131071d, 457d, 14286d ],
+					[ 4d, 714321429d, 0d, 4d, 99999d, (4d + 99999d) / 2, 4d, 99999d, 0d, 131071d, 22971d, 14286d ]
+				]);
+		}
+
 		#endregion
 
 		#region INSERT
@@ -1846,11 +2024,6 @@ namespace Waher.Script.Test
 		/* TODO:
 		 *	SELECT
 		 *		UNION	
-		 *		HAVING
-		 *		ORDER BY
-		 *		TOP
-		 *		DISTINCT
-		 *		OFFSET
 		 */
 
 	}

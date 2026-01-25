@@ -208,7 +208,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 				LeftWhere, Variables, LeftOrder, Node);
 		}
 
-		private class OuterJoinLeftProcessor : IProcessor<object>
+		internal class OuterJoinLeftProcessor : IProcessor<object>
 		{
 			private readonly OuterJoinRightProcessor rightProcessor;
 			private readonly IDataSource rightSource;

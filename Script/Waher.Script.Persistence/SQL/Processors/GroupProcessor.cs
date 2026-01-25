@@ -20,10 +20,10 @@ namespace Waher.Script.Persistence.SQL.Processors
 		private readonly bool[] iteratorUsesElement;
 		private readonly bool[] iteratorAsynchronous;
 		private readonly Variables variables;
-		private readonly IProcessor<object> processor;
 		private readonly int iteratorCount;
 		private readonly int count;
 		private readonly bool isAsynchronous;
+		private IProcessor<object> processor;
 		private ObjectProperties objectVariables = null;
 		private object[] last = null;
 		private object[] current = null;
@@ -31,17 +31,15 @@ namespace Waher.Script.Persistence.SQL.Processors
 		/// <summary>
 		/// Processor that groups items into groups, and processes aggregated elements.
 		/// </summary>
-		/// <param name="Processor">Inner processor.</param>
 		/// <param name="Variables">Current set of variables</param>
 		/// <param name="GroupBy">Group on these fields</param>
 		/// <param name="GroupNames">Names given to grouped fields</param>
 		/// <param name="Columns">Columns to select</param>
 		/// <param name="Having">Optional having clause</param>
-		public GroupProcessor(IProcessor<object> Processor, Variables Variables,
+		public GroupProcessor(Variables Variables,
 			ScriptNode[] GroupBy, ScriptNode[] GroupNames, ScriptNode[] Columns,
 			ref ScriptNode Having)
 		{
-			this.processor = Processor;
 			this.variables = Variables;
 			this.groupBy = GroupBy;
 			this.groupNames = GroupNames;
@@ -108,6 +106,15 @@ namespace Waher.Script.Persistence.SQL.Processors
 				this.iteratorAsynchronous[i] = b = this.iterators[i].IsAsynchronous;
 				this.isAsynchronous |= b;
 			}
+		}
+
+		/// <summary>
+		/// Sets the inner processor.
+		/// </summary>
+		/// <param name="Processor">Inner processor.</param>
+		public void SetInnerProcessor(IProcessor<object> Processor)
+		{
+			this.processor = Processor;
 		}
 
 		internal static void FindIterators(ref ScriptNode Node, ChunkedList<IIterativeEvaluator> Iterators)
@@ -212,6 +219,9 @@ namespace Waher.Script.Persistence.SQL.Processors
 
 				if (!Same)
 				{
+					if (this.processor is null)
+						return false;
+
 					GroupObject Obj = new GroupObject(this.last, this.groupNames, this.variables);
 					if (!this.processor.Process(Obj))
 						return false;
@@ -309,6 +319,9 @@ namespace Waher.Script.Persistence.SQL.Processors
 
 				if (!Same)
 				{
+					if (this.processor is null)
+						return false;
+
 					GroupObject Obj = new GroupObject(this.last, this.groupNames, this.variables);
 					if (!await this.processor.ProcessAsync(Obj))
 						return false;

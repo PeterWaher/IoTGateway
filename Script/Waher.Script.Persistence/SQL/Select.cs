@@ -237,6 +237,20 @@ namespace Waher.Script.Persistence.SQL
 				}
 			}
 
+			GroupProcessor GroupProcessor;
+
+			if (this.groupBy is null)
+				GroupProcessor = null;
+			else
+			{
+				// GroupProcessor will change script nodes to iterators, where appropriate.
+				// Important to create GroupProcessor before other iterators that may use
+				// these script nodes.
+
+				GroupProcessor = new GroupProcessor(Variables, this.groupBy, this.groupByNames,
+					this.columns, ref this.having);
+			}
+
 			ChunkedList<KeyValuePair<string, int>> AdditionalFields = null;
 			Dictionary<string, int> ColumnIndices = new Dictionary<string, int>();
 			ScriptNode[] Columns2 = this.columns;
@@ -280,7 +294,7 @@ namespace Waher.Script.Persistence.SQL
 				Records = new DistinctRecordProcessor(Columns2, Variables);
 			else
 				Records = new RecordProcessor(Columns2, Variables);
-
+			
 			Processor = Records;
 
 			if (!(this.groupBy is null))
@@ -330,10 +344,8 @@ namespace Waher.Script.Persistence.SQL
 				await Source.Process(Processor, Offset, Top, this.generic, this.where, Variables, OrderBy.ToArray(), this);
 			else
 			{
-				Processor = new GroupProcessor(Processor, Variables, this.groupBy, this.groupByNames,
-					this.columns, ref this.having);
-
-				await Source.Process(Processor, 0, int.MaxValue, this.generic, this.where, Variables, OrderBy.ToArray(), this);
+				GroupProcessor.SetInnerProcessor(Processor);
+				await Source.Process(GroupProcessor, 0, int.MaxValue, this.generic, this.where, Variables, OrderBy.ToArray(), this);
 			}
 
 			if (this.selectOneObject && Records.TryGetSingleElement(out E))

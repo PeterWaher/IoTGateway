@@ -794,13 +794,11 @@ namespace Waher.Runtime.Settings
         {
             using (Semaphore Semaphore = await Semaphores.BeginWrite("hostsetting:" + Host + " " + Key))
             {
-                foreach (HostSetting _ in await Database.FindDelete<HostSetting>(new FilterAnd(
-                    new FilterFieldEqualTo("Host", Host), new FilterFieldEqualTo("Key", Key))))
-                {
-                    return true;
-                }
+                int Count = await Database.Delete<HostSetting>(new FilterAnd(
+                    new FilterFieldEqualTo("Host", Host),
+                    new FilterFieldEqualTo("Key", Key)));
 
-                return false;
+                return Count > 0;
             }
         }
 
@@ -928,14 +926,9 @@ namespace Waher.Runtime.Settings
         /// </summary>
         /// <param name="Filter">Search filter.</param>
         /// <returns>Number of settings deleted.</returns>
-        public static async Task<int> DeleteWhereAsync(Filter Filter)
+        public static Task<int> DeleteWhereAsync(Filter Filter)
         {
-            int Result = 0;
-
-            foreach (HostSetting Setting in await Database.FindDelete<HostSetting>(Filter))
-                Result++;
-
-            return Result;
+            return Database.Delete<HostSetting>(Filter);
         }
 
         /// <summary>

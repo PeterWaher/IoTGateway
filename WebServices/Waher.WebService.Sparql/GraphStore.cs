@@ -411,7 +411,7 @@ namespace Waher.WebService.Sparql
 					Reference.Creators = new string[] { Request.User.UserName };
 
 					if (Reference.InDatabase)
-						await Database.FindDelete<DatabaseTriple>(new FilterFieldEqualTo("GraphKey", Reference.DatabaseKey));
+						await Database.Delete<DatabaseTriple>(new FilterFieldEqualTo("GraphKey", Reference.DatabaseKey));
 				}
 				else
 				{
@@ -488,7 +488,7 @@ namespace Waher.WebService.Sparql
 			}
 
 			if (Reference.InDatabase)
-				await Database.FindDelete<DatabaseTriple>(new FilterFieldEqualTo("GraphKey", Reference.DatabaseKey));
+				await Database.Delete<DatabaseTriple>(new FilterFieldEqualTo("GraphKey", Reference.DatabaseKey));
 
 			await Database.Delete(Reference);
 

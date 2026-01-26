@@ -68,12 +68,8 @@ namespace Waher.Things.Metering.Commands
 		/// </summary>
 		public async Task ExecuteCommandAsync()
 		{
-			IEnumerable<MeteringMessage> Messages = await Database.FindDelete<MeteringMessage>(
+			int Count = await Database.Delete<MeteringMessage>(
 				new FilterFieldEqualTo("NodeId", this.node.ObjectId));
-			int Count = 0;
-
-			foreach (MeteringMessage Message in Messages)
-				Count++;
 
 			if (Count == 0)
 				Log.Informational("No messages found to clear.", this.node.NodeId);

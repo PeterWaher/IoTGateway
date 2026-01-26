@@ -142,20 +142,8 @@ namespace Waher.Events.Persistence
 		/// <returns>Number of events deleted.</returns>
 		public static async Task<int> DeleteOld(string ObjectId, DateTime Limit)
 		{
-			int NrEvents = 0;
-			bool Deleted;
-
-			do
-			{
-				Deleted = false;
-
-				foreach (PersistedEvent Event in await Database.FindDelete<PersistedEvent>(0, 100, new FilterFieldLesserOrEqualTo("Timestamp", Limit)))
-				{
-					NrEvents++;
-					Deleted = true;
-				}
-			}
-			while (Deleted);
+			int NrEvents = await Database.Delete<PersistedEvent>(
+				new FilterFieldLesserOrEqualTo("Timestamp", Limit));
 
 			if (NrEvents > 0)
 			{

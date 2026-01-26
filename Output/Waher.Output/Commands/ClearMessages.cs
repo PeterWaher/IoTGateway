@@ -69,12 +69,8 @@ namespace Waher.Output.Commands
 		/// </summary>
 		public async Task ExecuteCommandAsync()
 		{
-			IEnumerable<OutputMessage> Messages = await Database.FindDelete<OutputMessage>(
+			int Count = await Database.Delete<OutputMessage>(
 				new FilterFieldEqualTo("NodeId", this.node.ObjectId));
-			int Count = 0;
-
-			foreach (OutputMessage Message in Messages)
-				Count++;
 
 			if (Count == 0)
 				Log.Informational("No messages found to clear.", this.node.NodeId);

@@ -290,21 +290,9 @@ namespace Waher.Jobs
 				throw new ArgumentException("Age must be positive.", nameof(MaxAge));
 
 			DateTime Limit = DateTime.Now.Subtract(MaxAge);
-			int NrEvents = 0;
-			bool Deleted;
-
-			do
-			{
-				Deleted = false;
-
-				foreach (SourceEvent Event in await Database.FindDelete<SourceEvent>(0, 100, new FilterAnd(
-					new FilterFieldEqualTo("SourceId", SourceID), new FilterFieldLesserOrEqualTo("Timestamp", Limit))))
-				{
-					NrEvents++;
-					Deleted = true;
-				}
-			}
-			while (Deleted);
+			int NrEvents = await Database.Delete<SourceEvent>(new FilterAnd(
+				new FilterFieldEqualTo("SourceId", SourceID), 
+				new FilterFieldLesserOrEqualTo("Timestamp", Limit)));
 
 			if (NrEvents > 0)
 			{

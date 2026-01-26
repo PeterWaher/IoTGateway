@@ -69,12 +69,8 @@ namespace Waher.Processors.Commands
 		/// </summary>
 		public async Task ExecuteCommandAsync()
 		{
-			IEnumerable<ProcessorMessage> Messages = await Database.FindDelete<ProcessorMessage>(
+			int Count = await Database.Delete<ProcessorMessage>(
 				new FilterFieldEqualTo("NodeId", this.node.ObjectId));
-			int Count = 0;
-
-			foreach (ProcessorMessage Message in Messages)
-				Count++;
 
 			if (Count == 0)
 				Log.Informational("No messages found to clear.", this.node.NodeId);

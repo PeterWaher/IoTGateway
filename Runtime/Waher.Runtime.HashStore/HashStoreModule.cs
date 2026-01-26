@@ -53,7 +53,7 @@ namespace Waher.Runtime.HashStore
 		{
 			try
 			{
-				await Database.FindDelete<PersistedHash>(
+				await Database.Delete<PersistedHash>(
 					new FilterFieldLesserOrEqualTo("ExpiresUtc", DateTime.UtcNow));
 			}
 			catch (Exception ex)

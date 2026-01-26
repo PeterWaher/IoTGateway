@@ -69,12 +69,8 @@ namespace Waher.Groups.Commands
 		/// </summary>
 		public async Task ExecuteCommandAsync()
 		{
-			IEnumerable<GroupMessage> Messages = await Database.FindDelete<GroupMessage>(
+			int Count = await Database.Delete<GroupMessage>(
 				new FilterFieldEqualTo("NodeId", this.node.ObjectId));
-			int Count = 0;
-
-			foreach (GroupMessage Message in Messages)
-				Count++;
 
 			if (Count == 0)
 				Log.Informational("No messages found to clear.", this.node.NodeId);

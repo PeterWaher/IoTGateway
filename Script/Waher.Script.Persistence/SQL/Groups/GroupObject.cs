@@ -10,6 +10,7 @@ namespace Waher.Script.Persistence.SQL.Groups
 	/// </summary>
 	public class GroupObject
 	{
+		private readonly IElement[] aggregates;
 		private readonly Variables variables;
 		private readonly Dictionary<string, object> groupedValues = new Dictionary<string, object>();
 		private readonly int groupCount;
@@ -18,11 +19,14 @@ namespace Waher.Script.Persistence.SQL.Groups
 		/// Represents a collection of objects grouped together useing a GROUP BY construct.
 		/// </summary>
 		/// <param name="GroupByValues">Grouped values that are constant in the group.</param>
+		/// <param name="Aggregates">Aggregates that are calculated for the group.</param>
 		/// <param name="GroupNames">Names of the grouped values.</param>
 		/// <param name="Variables">Current set of variables.</param>
-		public GroupObject(object[] GroupByValues, ScriptNode[] GroupNames, Variables Variables)
+		public GroupObject(object[] GroupByValues, IElement[] Aggregates,
+			ScriptNode[] GroupNames, Variables Variables)
 		{
 			this.variables = Variables;
+			this.aggregates = Aggregates;
 
 			int i;
 
@@ -75,5 +79,10 @@ namespace Waher.Script.Persistence.SQL.Groups
 				this.groupedValues[Name] = value;
 			}
 		}
+
+		/// <summary>
+		/// Aggregates calculated for the group.
+		/// </summary>
+		public IElement[] Aggregates => this.aggregates;
 	}
 }

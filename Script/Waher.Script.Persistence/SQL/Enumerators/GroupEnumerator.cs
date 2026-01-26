@@ -185,7 +185,16 @@ namespace Waher.Script.Persistence.SQL.Enumerators
 			if (!Found)
 				return false;
 
-			this.current = new GroupObject(Last, this.groupNames, this.variables);
+			IElement[] Aggregates = new IElement[this.iteratorCount];
+
+			for (i = 0; i < this.iteratorCount; i++)
+			{
+				Iterator = this.iterators[i];
+				Aggregates[i] = Iterator.GetAggregatedResult();
+				Iterator.RestartEvaluator();
+			}
+
+			this.current = new GroupObject(Last, Aggregates, this.groupNames, this.variables);
 
 			return true;
 		}

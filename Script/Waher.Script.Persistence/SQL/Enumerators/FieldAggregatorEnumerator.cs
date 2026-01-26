@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Persistence.SQL.Groups;
 
@@ -109,7 +110,8 @@ namespace Waher.Script.Persistence.SQL.Enumerators
 			}
 			else
 			{
-				GroupObject Obj = new GroupObject(Array.Empty<object>(), Array.Empty<ScriptNode>(), this.objectVariables);
+				GroupObject Obj = new GroupObject(Array.Empty<object>(), Array.Empty<IElement>(),
+					Array.Empty<ScriptNode>(), this.objectVariables);
 
 				for (i = 0; i < this.count; i++)
 				{

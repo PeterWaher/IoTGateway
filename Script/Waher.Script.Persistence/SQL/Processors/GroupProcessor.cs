@@ -121,13 +121,15 @@ namespace Waher.Script.Persistence.SQL.Processors
 		{
 			if (Node is IIterativeEvaluation IterativeEvaluation2)
 			{
+				int IteratorIndex = Iterators.Count;
 				IIterativeEvaluator Evaluator = IterativeEvaluation2.CreateEvaluator();
 				Iterators.Add(Evaluator);
 
 				ScriptNode Node0 = Node;
 
-				Node = new GroupIteratorValue(Evaluator, Node.Start, Node.Length,
-					Node.Expression);
+				Node = new GroupIteratorValue(Evaluator, IteratorIndex,
+					Node.Start, Node.Length, Node.Expression);
+
 				Node.SetParent(Node0.Parent);
 			}
 			else if (Node is GroupIteratorValue GroupIteratorValue2)
@@ -143,11 +145,12 @@ namespace Waher.Script.Persistence.SQL.Processors
 			if (Node is IIterativeEvaluation IterativeEvaluation)
 			{
 				ChunkedList<IIterativeEvaluator> Iterators = (ChunkedList<IIterativeEvaluator>)State;
+				int IteratorIndex = Iterators.Count;
 				IIterativeEvaluator Evaluator = IterativeEvaluation.CreateEvaluator();
 				Iterators.Add(Evaluator);
 
-				NewNode = new GroupIteratorValue(Evaluator, Node.Start, Node.Length,
-					Node.Expression);
+				NewNode = new GroupIteratorValue(Evaluator, IteratorIndex,
+					Node.Start, Node.Length, Node.Expression);
 			}
 			else if (Node is GroupIteratorValue GroupIteratorValue)
 			{
@@ -222,18 +225,14 @@ namespace Waher.Script.Persistence.SQL.Processors
 					if (this.processor is null)
 						return false;
 
-					GroupObject Obj = new GroupObject(this.last, this.groupNames, this.variables);
+					GroupObject Obj = this.GetGroupObject();
+					this.last = null;
+
 					if (!this.processor.Process(Obj))
 						return false;
 
 					this.last = this.current;
 					this.current = null;
-
-					if (this.iteratorCount > 0)
-					{
-						for (j = 0; j < this.iteratorCount; j++)
-							this.iterators[j].RestartEvaluator();
-					}
 				}
 			}
 
@@ -254,6 +253,22 @@ namespace Waher.Script.Persistence.SQL.Processors
 			}
 
 			return true;
+		}
+
+		private GroupObject GetGroupObject()
+		{
+			IElement[] Aggregates = new IElement[this.iteratorCount];
+			IIterativeEvaluator Iterator;
+			int i;
+
+			for (i = 0; i < this.iteratorCount; i++)
+			{
+				Iterator = this.iterators[i];
+				Aggregates[i] = Iterator.GetAggregatedResult();
+				Iterator.RestartEvaluator();
+			}
+
+			return new GroupObject(this.last, Aggregates, this.groupNames, this.variables);
 		}
 
 		/// <summary>
@@ -322,18 +337,14 @@ namespace Waher.Script.Persistence.SQL.Processors
 					if (this.processor is null)
 						return false;
 
-					GroupObject Obj = new GroupObject(this.last, this.groupNames, this.variables);
+					GroupObject Obj = this.GetGroupObject();
+					this.last = null;
+
 					if (!await this.processor.ProcessAsync(Obj))
 						return false;
 
 					this.last = this.current;
 					this.current = null;
-
-					if (this.iteratorCount > 0)
-					{
-						for (j = 0; j < this.iteratorCount; j++)
-							this.iterators[j].RestartEvaluator();
-					}
 				}
 			}
 
@@ -368,7 +379,9 @@ namespace Waher.Script.Persistence.SQL.Processors
 		{
 			if (!(this.last is null))
 			{
-				GroupObject Obj = new GroupObject(this.last, this.groupNames, this.variables);
+				GroupObject Obj = this.GetGroupObject();
+				this.last = null;
+			
 				if (!this.processor.Process(Obj))
 					return false;
 			}
@@ -384,7 +397,9 @@ namespace Waher.Script.Persistence.SQL.Processors
 		{
 			if (!(this.last is null))
 			{
-				GroupObject Obj = new GroupObject(this.last, this.groupNames, this.variables);
+				GroupObject Obj = this.GetGroupObject();
+				this.last = null;
+
 				if (!await this.processor.ProcessAsync(Obj))
 					return false;
 			}

@@ -174,6 +174,17 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public async Task<ulong> GetCurrentRankLocked()
 		{
+			if (!this.hasCurrent)
+			{
+				if (!(this.startingPoint is null))
+				{
+					this.GoToStartingPoint(this.startingPoint);
+					this.hasCurrent = true;
+				}
+				else
+					await this.GoToFirstLocked();
+			}
+
 			if (this.hasCurrent)
 			{
 				if (!this.currentRank.HasValue)

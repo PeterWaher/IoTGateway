@@ -5527,7 +5527,15 @@ namespace Waher.Persistence.Files
 					Result = await this.GetTypedEnumeratorAsyncLocked<T>();
 
 					if (!(SortOrder is null) && SortOrder.Length > 0)
-						Result = await this.SortLocked<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true, false);
+						Result = await this.SortLocked(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true, false);
+				}
+
+				if (Offset > 0 && Result.CanSkip)
+				{
+					if (await Result.Skip(Offset - 1))  // One element will be skipped in the first MoveNext
+						Offset = 0;
+					else
+						return new Searching.EmptyCursor<T>();
 				}
 
 				if (Offset > 0 || MaxCount < int.MaxValue)
@@ -5538,7 +5546,15 @@ namespace Waher.Persistence.Files
 				Result = await this.ConvertFilterToCursorLocked<T>(Filter.Normalize(), SortOrder, MaxCount == int.MaxValue);
 
 				if (!(SortOrder is null) && SortOrder.Length > 0)
-					Result = await this.SortLocked<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true, true);
+					Result = await this.SortLocked(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true, true);
+
+				if (Offset > 0 && Result.CanSkip)
+				{
+					if (await Result.Skip(Offset - 1))  // One element will be skipped in the first MoveNext
+						Offset = 0;
+					else
+						return new Searching.EmptyCursor<T>();
+				}
 
 				if (Offset > 0 || MaxCount < int.MaxValue)
 					Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result);

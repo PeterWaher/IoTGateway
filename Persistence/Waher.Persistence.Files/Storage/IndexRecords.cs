@@ -65,6 +65,7 @@ namespace Waher.Persistence.Files.Storage
 			this.keySizeLimit = KeySizeLimit;
 
 			int i;
+			bool Cloned = false;
 
 			this.ascending = new bool[this.fieldCount];
 
@@ -72,6 +73,12 @@ namespace Waher.Persistence.Files.Storage
 			{
 				if (this.fieldNames[i].StartsWith("-"))
 				{
+					if (!Cloned)
+					{
+						this.fieldNames = (string[])FieldNames.Clone();
+						Cloned = true;
+					}
+
 					this.fieldNames[i] = this.fieldNames[i].Substring(1);
 					this.ascending[i] = false;
 				}
@@ -80,7 +87,15 @@ namespace Waher.Persistence.Files.Storage
 					this.ascending[i] = true;
 
 					if (this.fieldNames[i].StartsWith("+"))
+					{
+						if (!Cloned)
+						{
+							this.fieldNames = (string[])FieldNames.Clone();
+							Cloned = true;
+						}
+
 						this.fieldNames[i] = this.fieldNames[i].Substring(1);
+					}
 				}
 			}
 		}

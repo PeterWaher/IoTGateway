@@ -175,16 +175,13 @@ namespace Waher.Persistence.Files.Searching
 		/// <summary>
 		/// If cursor supports skipping elements.
 		/// </summary>
-		public bool CanSkip => this.cursor.CanSkip;
+		public bool CanSkip => false;
 
 		/// <summary>
 		/// Skips a number of objects.
 		/// </summary>
 		/// <param name="NrObjects">Number of objects to skip.</param>
 		/// <returns>If the skip operation was successful and a new object is available in <see cref="Current"/>.</returns>
-		public Task<bool> Skip(long NrObjects)
-		{
-			return this.cursor.Skip(-NrObjects);
-		}
+		public Task<bool> Skip(long NrObjects) => Task.FromResult(false);
 	}
 }

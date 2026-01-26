@@ -120,7 +120,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public Task<bool> MovePreviousAsyncLocked()
 		{
-			return this.MoveNextAsyncLocked();	// Ordering only in one direction.
+			return this.MoveNextAsyncLocked();  // Ordering only in one direction.
 		}
 
 		/// <summary>
@@ -163,6 +163,21 @@ namespace Waher.Persistence.Files.Searching
 		public Task ContinueBeforeLocked(T LastItem)
 		{
 			throw new NotSupportedException("Paginated search is not supported for query with post-load sort process. Consider using an index.s");
+		}
+
+		/// <summary>
+		/// If cursor supports skipping elements.
+		/// </summary>
+		public bool CanSkip => false;
+
+		/// <summary>
+		/// Skips a number of objects.
+		/// </summary>
+		/// <param name="NrObjects">Number of objects to skip.</param>
+		/// <returns>If the skip operation was successful and a new object is available in <see cref="Current"/>.</returns>
+		public Task<bool> Skip(long NrObjects)
+		{
+			return Task.FromResult(false);
 		}
 	}
 }

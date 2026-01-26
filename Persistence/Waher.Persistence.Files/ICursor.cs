@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
+using Waher.Script.Units.BaseQuantities;
 
 namespace Waher.Persistence.Files
 {
@@ -84,5 +85,17 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="LastItem">Last item in a previous process.</param>
 		Task ContinueBeforeLocked(T LastItem);
+
+		/// <summary>
+		/// If cursor supports skipping elements.
+		/// </summary>
+		bool CanSkip { get; }
+
+		/// <summary>
+		/// Skips a number of objects.
+		/// </summary>
+		/// <param name="NrObjects">Number of objects to skip.</param>
+		/// <returns>If the skip operation was successful and a new object is available in <see cref="Current"/>.</returns>
+		Task<bool> Skip(long NrObjects);
 	}
 }

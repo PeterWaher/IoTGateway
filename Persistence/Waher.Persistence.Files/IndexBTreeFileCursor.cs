@@ -369,5 +369,20 @@ namespace Waher.Persistence.Files
 
 			await this.e.ContinueBeforeLocked(Bin);
 		}
+
+		/// <summary>
+		/// If cursor supports skipping elements.
+		/// </summary>
+		public bool CanSkip => true;
+
+		/// <summary>
+		/// Skips a number of objects.
+		/// </summary>
+		/// <param name="NrObjects">Number of objects to skip.</param>
+		/// <returns>If the skip operation was successful and a new object is available in <see cref="Current"/>.</returns>
+		public Task<bool> Skip(long NrObjects)
+		{
+			return this.SkipLocked(NrObjects);
+		}
 	}
 }

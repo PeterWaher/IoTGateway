@@ -290,6 +290,7 @@ namespace Waher.Networking.XMPP
 		private bool? checkConnection = null;
 		private bool openBracketReceived = false;
 		private bool monitorContactResourcesAlive = true;
+		private bool autoRespondToDeliveryReceiptRequests = true;
 		private bool upgradeToTls = false;
 		private bool legacyTls = false;
 		private bool performingQuickLogin = false;
@@ -2339,6 +2340,9 @@ namespace Waher.Networking.XMPP
 						}
 						else if (E.LocalName == "request" && E.NamespaceURI == NamespaceMessageDeliveryReceipts && !string.IsNullOrEmpty(e.Id))
 						{
+							if (!this.autoRespondToDeliveryReceiptRequests)
+								continue;
+
 							RosterItem Item = this.GetRosterItemLocked(GetBareJID(e.To));
 							if (!(Item is null) && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.From))
 							{
@@ -7396,6 +7400,16 @@ namespace Waher.Networking.XMPP
 		{
 			get => this.sendFromAddress;
 			set => this.sendFromAddress = value;
+		}
+
+		/// <summary>
+		/// If delivery receipt requests (XEP-0184) should be auto-acknowledged.
+		/// Default is true.
+		/// </summary>
+		public bool AutoRespondToDeliveryReceiptRequests
+		{
+			get => this.autoRespondToDeliveryReceiptRequests;
+			set => this.autoRespondToDeliveryReceiptRequests = value;
 		}
 
 		/// <summary>

@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.Chat
 	/// Chat-focused client that encapsulates user messaging behaviors,
 	/// delivery receipts (XEP-0184) https://xmpp.org/extensions/xep-0184.html
 	/// displayed markers (XEP-0333) https://xmpp.org/extensions/xep-0333.html,
-	/// message corrections (XEP-0308) https://xmpp.org/extensions/xep-0308.html
+	/// last message corrections (XEP-0308) https://xmpp.org/extensions/xep-0308.html
 	/// It registers message handlers on the underlying <see cref="XmppClient"/>, raises chat-specific events,
 	/// and forwards content messages to default message routing when appropriate.
 	/// </summary>
@@ -45,6 +45,8 @@ namespace Waher.Networking.XMPP.Chat
 		private bool enableMessageCorrection = false;
 		private bool autoRespondToReceiptRequests = false;
 		private bool autoSendDisplayedMarkers = false;
+		private bool xmppReceiptAutoRespondWasEnabled = true;
+		private bool xmppReceiptAutoRespondOverridden = false;
 
 		/// <summary>
 		/// Chat-focused client that encapsulates user messaging behaviors,
@@ -70,6 +72,8 @@ namespace Waher.Networking.XMPP.Chat
 			this.client.OnPresence += this.Client_OnPresence;
 			this.client.OnMessageReceived += this.Client_OnMessageReceived;
 			this.client.OnStateChanged += this.Client_OnStateChanged;
+
+			this.UpdateReceiptAutoRespondOwnership();
 		}
 
 		/// <inheritdoc/>
@@ -99,7 +103,38 @@ namespace Waher.Networking.XMPP.Chat
 			if (this.enableMessageCorrection)
 				this.client.UnregisterFeature(MessageCorrections.NamespaceMessageCorrection);
 
+			if (this.xmppReceiptAutoRespondOverridden)
+			{
+				this.client.AutoRespondToDeliveryReceiptRequests = this.xmppReceiptAutoRespondWasEnabled;
+				this.xmppReceiptAutoRespondOverridden = false;
+			}
+
 			base.Dispose();
+		}
+
+		private void UpdateReceiptAutoRespondOwnership()
+		{
+			bool chatClientShouldAutoRespond;
+			lock (this.synchObject)
+			{
+				chatClientShouldAutoRespond = this.enableDeliveryReceipts && this.autoRespondToReceiptRequests;
+			}
+
+			if (chatClientShouldAutoRespond)
+			{
+				if (!this.xmppReceiptAutoRespondOverridden)
+				{
+					this.xmppReceiptAutoRespondWasEnabled = this.client.AutoRespondToDeliveryReceiptRequests;
+					this.xmppReceiptAutoRespondOverridden = true;
+				}
+
+				this.client.AutoRespondToDeliveryReceiptRequests = false;
+			}
+			else if (this.xmppReceiptAutoRespondOverridden)
+			{
+				this.client.AutoRespondToDeliveryReceiptRequests = this.xmppReceiptAutoRespondWasEnabled;
+				this.xmppReceiptAutoRespondOverridden = false;
+			}
 		}
 
 		/// <summary>
@@ -168,6 +203,8 @@ namespace Waher.Networking.XMPP.Chat
 					this.client.RegisterFeature(DeliveryReceipts.NamespaceDeliveryReceipts);
 				else
 					this.client.UnregisterFeature(DeliveryReceipts.NamespaceDeliveryReceipts);
+
+				this.UpdateReceiptAutoRespondOwnership();
 			}
 		}
 
@@ -253,6 +290,8 @@ namespace Waher.Networking.XMPP.Chat
 				{
 					this.autoRespondToReceiptRequests = value;
 				}
+
+				this.UpdateReceiptAutoRespondOwnership();
 			}
 		}
 
@@ -1019,7 +1058,7 @@ namespace Waher.Networking.XMPP.Chat
 
 			try
 			{
-                this.FireAndForget(this.client.SendServiceDiscoveryRequest(e.From, DiscoNode, async (sender, args) =>
+				this.FireAndForget(this.client.SendServiceDiscoveryRequest(e.From, DiscoNode, async (sender, args) =>
 				{
 					bool Supports = false;
 
@@ -1057,7 +1096,7 @@ namespace Waher.Networking.XMPP.Chat
 			{
 				if (this.chatStateCapabilitiesByJid.TryGetValue(FullJid, out Supported))
 				{
-                    this.FireAndForget(this.ApplyCapabilityNegotiationAsync(BareJid, Supported));
+					this.FireAndForget(this.ApplyCapabilityNegotiationAsync(BareJid, Supported));
 					return;
 				}
 
@@ -1067,7 +1106,7 @@ namespace Waher.Networking.XMPP.Chat
 
 			try
 			{
-                this.FireAndForget(this.client.SendServiceDiscoveryRequest(FullJid, async (sender, args) =>
+				this.FireAndForget(this.client.SendServiceDiscoveryRequest(FullJid, async (sender, args) =>
 				{
 					bool Supports = false;
 
@@ -1239,14 +1278,14 @@ namespace Waher.Networking.XMPP.Chat
 			}
 		}
 
-        private void FireAndForget(Task Task)
-        {
-            _ = Task.ContinueWith(FaultedTask =>
-            {
-                if (FaultedTask.Exception != null)
-                    this.Exception(FaultedTask.Exception);
-            }, TaskContinuationOptions.OnlyOnFaulted);
-        }
+		private void FireAndForget(Task Task)
+		{
+			_ = Task.ContinueWith(FaultedTask =>
+			{
+				if (FaultedTask.Exception != null)
+					this.Exception(FaultedTask.Exception);
+			}, TaskContinuationOptions.OnlyOnFaulted);
+		}
 
-    }
+	}
 }

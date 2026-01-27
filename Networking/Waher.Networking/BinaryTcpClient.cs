@@ -2207,6 +2207,7 @@ namespace Waher.Networking
 					EnabledSslProtocols = Protocols,
 					EncryptionPolicy = EncryptionPolicy.RequireEncryption,
 					ServerCertificate = ServerCertificate
+					// TODO: TLS SNI with ServerCertificateSelectionCallback
 				};
 
 				if (!(AlpnProtocols is null) && AlpnProtocols.Length > 0)

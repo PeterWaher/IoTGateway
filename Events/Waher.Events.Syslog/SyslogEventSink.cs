@@ -18,12 +18,13 @@ namespace Waher.Events.Syslog
 		/// <param name="Tls">If TLS is to be used.</param>
 		/// <param name="LocalHostName">Local host name</param>
 		/// <param name="AppName">Application name</param>
+		/// <param name="Separation">How events are separated in the event stream.</param>
 		/// <param name="ObjectID">Object ID</param>
 		public SyslogEventSink(string Host, int Port, bool Tls, string LocalHostName,
-			string AppName, string ObjectID)
+			string AppName, SyslogEventSeparation Separation, string ObjectID)
 			: base(ObjectID)
 		{
-			this.client = new SyslogClient(Host, Port, Tls, LocalHostName, AppName);
+			this.client = new SyslogClient(Host, Port, Tls, LocalHostName, AppName, Separation);
 		}
 
 		/// <summary>

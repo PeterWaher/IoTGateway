@@ -18,7 +18,7 @@ namespace Waher.Events.Syslog
 	/// https://datatracker.ietf.org/doc/html/rfc5425
 	/// https://datatracker.ietf.org/doc/html/rfc6587
 	/// </summary>
-	public class SyslogClient : IDisposable, IDisposableAsync
+	public class SyslogClient : CommunicationLayer, IDisposable, IDisposableAsync
 	{
 		/// <summary>
 		/// Default Syslog over TCP/IP port number (514).
@@ -30,7 +30,7 @@ namespace Waher.Events.Syslog
 		/// </summary>
 		public const int DefaultTlsPort = 6514;
 
-		private readonly ISniffer[] sniffers;
+		private readonly SyslogEventSeparation separation;
 		private readonly byte[] localHostName;
 		private readonly byte[] appName;
 		private readonly string host;
@@ -49,23 +49,35 @@ namespace Waher.Events.Syslog
 		/// <param name="Tls">If TLS is to be used.</param>
 		/// <param name="LocalHostName">Local host name</param>
 		/// <param name="AppName">Application name</param>
+		/// <param name="Separation">How events are separated in the event stream.</param>
 		/// <param name="Sniffers">Sniffers</param>
 		public SyslogClient(string Host, int Port, bool Tls, string LocalHostName,
-			string AppName, params ISniffer[] Sniffers)
+			string AppName, SyslogEventSeparation Separation, params ISniffer[] Sniffers)
+			: base(true, Sniffers)
 		{
 			this.host = Host;
 			this.port = Port;
 			this.tls = Tls;
 			this.localHostName = EncodeName(LocalHostName);
 			this.appName = EncodeName(AppName);
-			this.sniffers = Sniffers;
+			this.separation = Separation;
 		}
 
 		/// <summary>
 		/// Sends an event to the syslog server.
 		/// </summary>
 		/// <param name="Event">Event to send</param>
-		public async Task Send(Event Event)
+		public Task Send(Event Event)
+		{
+			return this.Send(Event, false);
+		}
+
+		/// <summary>
+		/// Sends an event to the syslog server.
+		/// </summary>
+		/// <param name="Event">Event to send</param>
+		/// <param name="WaitSent">If the method should wait for the packet to be sent.</param>
+		public async Task Send(Event Event, bool WaitSent)
 		{
 			bool ResendIfError = true;
 
@@ -73,17 +85,29 @@ namespace Waher.Events.Syslog
 			{
 				if (!(this.client is null) && !this.client.Connected)
 				{
+					this.Warning("Disposing/Closing TCP client.");
+
 					await this.client.DisposeAsync();
 					this.client = null;
 				}
 
 				if (this.client is null)
 				{
-					this.client = new BinaryTcpClient(true, true, this.sniffers);
+					this.Information("Connecting to " + this.host + ":" + this.port.ToString());
+
+					this.client = new BinaryTcpClient(true, true);
+					this.client.OnDisconnected += this.Client_OnDisconnected;
+					this.client.OnError += this.Client_OnError;
+					this.client.OnReceived += this.Client_OnReceived;
+
 					await this.client.ConnectAsync(this.host, this.port, this.tls);
+
+					this.Information("Connected to " + this.host + ":" + this.port.ToString());
 
 					if (this.tls)
 					{
+						this.Information("Upgrading to TLS.");
+
 						await this.client.UpgradeToTlsAsClient(SslProtocols.Tls12);
 						this.client.Continue();
 					}
@@ -91,30 +115,66 @@ namespace Waher.Events.Syslog
 
 				byte[] Message = this.CreateMessage(Event);
 				int MessageLength = Message.Length;
-				byte[] Prefix = Encoding.ASCII.GetBytes(MessageLength.ToString());
-				int PrefixLength = Prefix.Length;
-				byte[] Packet = new byte[PrefixLength + MessageLength + 1];
+				byte[] Packet;
 
-				Buffer.BlockCopy(Prefix, 0, Packet, 0, PrefixLength);
-				Packet[PrefixLength] = (byte)' ';
-				Buffer.BlockCopy(Message, 0, Packet, PrefixLength + 1, MessageLength);
+				switch (this.separation)
+				{
+					case SyslogEventSeparation.OctetCounting:
+					default:
+						byte[] Prefix = Encoding.ASCII.GetBytes(MessageLength.ToString());
+						int PrefixLength = Prefix.Length;
+						Packet = new byte[PrefixLength + MessageLength + 1];
+						Buffer.BlockCopy(Prefix, 0, Packet, 0, PrefixLength);
+						Packet[PrefixLength] = (byte)' ';
+						Buffer.BlockCopy(Message, 0, Packet, PrefixLength + 1, MessageLength);
+						break;
+
+					case SyslogEventSeparation.CrLf:
+						Packet = new byte[MessageLength + 2];
+						Buffer.BlockCopy(Message, 0, Packet, 0, MessageLength);
+						Packet[MessageLength] = (byte)'\r';
+						Packet[MessageLength + 1] = (byte)'\n';
+						break;
+				}
 
 				bool Ok;
 
 				try
 				{
-					Ok = await this.client.SendAsync(true, Packet);
+					if (this.HasSniffers)
+						this.TransmitText(Encoding.UTF8.GetString(Packet));
+
+					if (WaitSent)
+					{
+						TaskCompletionSource<bool> Sent = new TaskCompletionSource<bool>();
+
+						Ok = await this.client.SendAsync(true, Packet,
+							(sender, e) =>
+							{
+								Sent.TrySetResult(e.Ok);
+								return Task.CompletedTask;
+							}, null);
+
+						await Sent.Task;
+					}
+					else
+						Ok = await this.client.SendAsync(true, Packet);
 				}
 				catch (Exception ex)
 				{
-					this.client.Exception(ex);
+					this.Exception(ex);
 					Ok = false;
 				}
-				
-				if (!Ok)
+
+				if (Ok)
+					break;
+				else
 				{
 					if (ResendIfError)
 					{
+						this.Information("Resending...");
+
+						ResendIfError = false;
 						await this.client.DisposeAsync();
 						this.client = null;
 					}
@@ -122,6 +182,29 @@ namespace Waher.Events.Syslog
 						throw new IOException("Unable to send message to Syslog server.");
 				}
 			}
+		}
+
+		private Task<bool> Client_OnReceived(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
+		{
+			if (this.HasSniffers)
+			{
+				this.ReceiveText(Encoding.UTF8.GetString(Buffer, Offset, Count));
+				this.Warning("Received unexpected data from Syslog server. Data ignored.");
+			}
+
+			return Task.FromResult(true);
+		}
+
+		private Task Client_OnError(object Sender, Exception e)
+		{
+			this.Error(e.Message);
+			return Task.CompletedTask;
+		}
+
+		private Task Client_OnDisconnected(object Sender, EventArgs e)
+		{
+			this.Information("Disconnected.");
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -245,6 +328,9 @@ namespace Waher.Events.Syslog
 
 			ms.WriteByte((byte)' ');
 			ms.Write(EncodeValue(Event.Message));
+
+			ms.WriteByte((byte)'\r');
+			ms.WriteByte((byte)'\n');
 
 			return ms.ToArray();
 		}

@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.IO;
+using Waher.Security;
 
 namespace Waher.Events.Syslog
 {
@@ -18,7 +20,8 @@ namespace Waher.Events.Syslog
 	/// https://datatracker.ietf.org/doc/html/rfc5425
 	/// https://datatracker.ietf.org/doc/html/rfc6587
 	/// </summary>
-	public class SyslogClient : CommunicationLayer, IDisposable, IDisposableAsync
+	public class SyslogClient : CommunicationLayer, IDisposable, IDisposableAsync, 
+		ITlsCertificateEndpoint
 	{
 		/// <summary>
 		/// Default Syslog over TCP/IP port number (514).
@@ -36,6 +39,7 @@ namespace Waher.Events.Syslog
 		private readonly string host;
 		private readonly int port;
 		private readonly bool tls;
+		private X509Certificate clientCertificate;
 		private BinaryTcpClient client = null;
 
 		/// <summary>
@@ -61,6 +65,28 @@ namespace Waher.Events.Syslog
 			this.localHostName = EncodeName(LocalHostName);
 			this.appName = EncodeName(AppName);
 			this.separation = Separation;
+		}
+
+		/// <summary>
+		/// Syslog over TCP/IP client application, as defined in RFCs 5224, 5425, 6587:
+		/// https://datatracker.ietf.org/doc/html/rfc5424
+		/// https://datatracker.ietf.org/doc/html/rfc5425
+		/// https://datatracker.ietf.org/doc/html/rfc6587
+		/// </summary>
+		/// <param name="Host">Syslog server to send events to.</param>
+		/// <param name="Port">Syslog server port number to use.</param>
+		/// <param name="ClientCertificate">Client certificate to use for mTLS authentication,
+		/// as defined in RFC 5425.</param>
+		/// <param name="LocalHostName">Local host name</param>
+		/// <param name="AppName">Application name</param>
+		/// <param name="Separation">How events are separated in the event stream.</param>
+		/// <param name="Sniffers">Sniffers</param>
+		public SyslogClient(string Host, int Port, X509Certificate ClientCertificate,
+			string LocalHostName, string AppName, SyslogEventSeparation Separation,
+			params ISniffer[] Sniffers)
+			: this(Host, Port, true, LocalHostName, AppName, Separation, Sniffers)
+		{
+			this.clientCertificate = ClientCertificate;
 		}
 
 		/// <summary>
@@ -128,7 +154,14 @@ namespace Waher.Events.Syslog
 					{
 						this.Information("Upgrading to TLS.");
 
-						await this.client.UpgradeToTlsAsClient(SslProtocols.Tls12);
+						if (this.clientCertificate is null)
+							await this.client.UpgradeToTlsAsClient(SslProtocols.Tls12);
+						else
+						{
+							await this.client.UpgradeToTlsAsClient(this.clientCertificate,
+								SslProtocols.Tls12);
+						}
+						
 						this.client.Continue();
 					}
 				}
@@ -420,5 +453,14 @@ namespace Waher.Events.Syslog
 		private static readonly byte[] eventFacility = Encoding.ASCII.GetBytes("\" Facility=\"");
 		private static readonly byte[] eventModule = Encoding.ASCII.GetBytes("\" Module=\"");
 		private static readonly byte[] eventStackTrace = Encoding.ASCII.GetBytes("\" StackTrace=\"");
+
+		/// <summary>
+		/// Updates the certificate used in mTLS negotiation.
+		/// </summary>
+		/// <param name="Certificate">Updated Certificate</param>
+		public void UpdateCertificate(X509Certificate Certificate)
+		{
+			this.clientCertificate = Certificate;
+		}
 	}
 }

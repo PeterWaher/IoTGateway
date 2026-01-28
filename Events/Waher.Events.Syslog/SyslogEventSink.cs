@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Waher.Security;
 
 namespace Waher.Events.Syslog
 {
 	/// <summary>
 	/// Event sink that sends events to a Syslog server using the Syslog protocol.
 	/// </summary>
-	public class SyslogEventSink : EventSink
+	public class SyslogEventSink : EventSink, ITlsCertificateEndpoint
 	{
 		private SyslogClient client;
 
@@ -25,6 +27,24 @@ namespace Waher.Events.Syslog
 			: base(ObjectID)
 		{
 			this.client = new SyslogClient(Host, Port, Tls, LocalHostName, AppName, Separation);
+		}
+
+		/// <summary>
+		/// Event sink that sends events to a Syslog server using the Syslog protocol.
+		/// </summary>
+		/// <param name="Host">Syslog server to send events to.</param>
+		/// <param name="Port">Syslog server port number to use.</param>
+		/// <param name="Certificate">Client certificate for use with mTLS.</param>
+		/// <param name="LocalHostName">Local host name</param>
+		/// <param name="AppName">Application name</param>
+		/// <param name="Separation">How events are separated in the event stream.</param>
+		/// <param name="ObjectID">Object ID</param>
+		public SyslogEventSink(string Host, int Port, X509Certificate Certificate, 
+			string LocalHostName, string AppName, SyslogEventSeparation Separation, 
+			string ObjectID)
+			: base(ObjectID)
+		{
+			this.client = new SyslogClient(Host, Port, Certificate, LocalHostName, AppName, Separation);
 		}
 
 		/// <summary>
@@ -62,6 +82,13 @@ namespace Waher.Events.Syslog
 			await base.DisposeAsync();
 		}
 
-		// TODO: mTLS
+		/// <summary>
+		/// Updates the certificate used in mTLS negotiation.
+		/// </summary>
+		/// <param name="Certificate">Updated Certificate</param>
+		public void UpdateCertificate(X509Certificate Certificate)
+		{
+			this.client.UpdateCertificate(Certificate);
+		}
 	}
 }

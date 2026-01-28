@@ -5,6 +5,10 @@ using Waher.Runtime.Threading;
 
 namespace Waher.Events.Syslog.Test
 {
+	/// <summary>
+	/// Tests run using a Visual Syslog Server as recipient.
+	/// https://github.com/MaxBelkov/visualsyslog/
+	/// </summary>
 	[TestClass]
 	public sealed class SyslogTests
 	{

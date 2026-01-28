@@ -64,6 +64,26 @@ namespace Waher.Events.Syslog
 		}
 
 		/// <summary>
+		/// Host name or address of the Syslog server.
+		/// </summary>
+		public string Host => this.host;
+
+		/// <summary>
+		/// Port number of the Syslog server.
+		/// </summary>
+		public int Port => this.port;
+
+		/// <summary>
+		/// If TLS is used.
+		/// </summary>
+		public bool Tls => this.tls;
+
+		/// <summary>
+		/// How events are separated in the event stream.
+		/// </summary>
+		public SyslogEventSeparation Separation => this.separation;
+
+		/// <summary>
 		/// Sends an event to the syslog server.
 		/// </summary>
 		/// <param name="Event">Event to send</param>
@@ -135,6 +155,18 @@ namespace Waher.Events.Syslog
 						Packet[MessageLength] = (byte)'\r';
 						Packet[MessageLength + 1] = (byte)'\n';
 						break;
+
+					case SyslogEventSeparation.Lf:
+						Packet = new byte[MessageLength + 1];
+						Buffer.BlockCopy(Message, 0, Packet, 0, MessageLength);
+						Packet[MessageLength] = (byte)'\n';
+						break;
+
+					case SyslogEventSeparation.Null:
+						Packet = new byte[MessageLength + 1];
+						Buffer.BlockCopy(Message, 0, Packet, 0, MessageLength);
+						Packet[MessageLength] = 0;
+						break;
 				}
 
 				bool Ok;
@@ -155,7 +187,8 @@ namespace Waher.Events.Syslog
 								return Task.CompletedTask;
 							}, null);
 
-						await Sent.Task;
+						if (Ok)
+							await Sent.Task;
 					}
 					else
 						Ok = await this.client.SendAsync(true, Packet);
@@ -274,38 +307,38 @@ namespace Waher.Events.Syslog
 			#region STRUCTURED-DATA
 
 			ms.Write(eventType);
-			ms.Write(EncodeValue(Event.Type.ToString()));
+			ms.Write(this.EncodeValue(Event.Type.ToString()));
 			ms.Write(eventLevel);
-			ms.Write(EncodeValue(Event.Level.ToString()));
+			ms.Write(this.EncodeValue(Event.Level.ToString()));
 
 			if (!string.IsNullOrEmpty(Event.Object))
 			{
 				ms.Write(eventObject);
-				ms.Write(EncodeValue(Event.Object));
+				ms.Write(this.EncodeValue(Event.Object));
 			}
 
 			if (!string.IsNullOrEmpty(Event.Actor))
 			{
 				ms.Write(eventActor);
-				ms.Write(EncodeValue(Event.Actor));
+				ms.Write(this.EncodeValue(Event.Actor));
 			}
 
 			if (!string.IsNullOrEmpty(Event.Facility))
 			{
 				ms.Write(eventFacility);
-				ms.Write(EncodeValue(Event.Facility));
+				ms.Write(this.EncodeValue(Event.Facility));
 			}
 
 			if (!string.IsNullOrEmpty(Event.Module))
 			{
 				ms.Write(eventModule);
-				ms.Write(EncodeValue(Event.Module));
+				ms.Write(this.EncodeValue(Event.Module));
 			}
 
 			if (!string.IsNullOrEmpty(Event.StackTrace))
 			{
 				ms.Write(eventStackTrace);
-				ms.Write(EncodeValue(Event.StackTrace));
+				ms.Write(this.EncodeValue(Event.StackTrace));
 			}
 
 			if ((Event.Tags?.Length ?? 0) > 0)
@@ -317,7 +350,7 @@ namespace Waher.Events.Syslog
 					ms.Write(EncodeName(Tag.Key));
 					ms.WriteByte((byte)'=');
 					ms.WriteByte((byte)'"');
-					ms.Write(EncodeValue(Tag.Value?.ToString() ?? string.Empty));
+					ms.Write(this.EncodeValue(Tag.Value?.ToString() ?? string.Empty));
 				}
 			}
 
@@ -327,7 +360,7 @@ namespace Waher.Events.Syslog
 			#endregion
 
 			ms.WriteByte((byte)' ');
-			ms.Write(EncodeValue(Event.Message));
+			ms.Write(this.EncodeValue(Event.Message));
 
 			ms.WriteByte((byte)'\r');
 			ms.WriteByte((byte)'\n');
@@ -343,9 +376,19 @@ namespace Waher.Events.Syslog
 				return Encoding.ASCII.GetBytes(s.Replace(' ', '_'));
 		}
 
-		private static byte[] EncodeValue(string s)
+		private byte[] EncodeValue(string s)
 		{
-			return Strings.Utf8WithBom.GetBytes(s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("]", "\\]"));
+			s = s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("]", "\\]");
+
+			switch (this.separation)
+			{
+				case SyslogEventSeparation.CrLf:
+				case SyslogEventSeparation.Lf:
+					s = s.Replace("\r", "<CR>").Replace("\n", "<LF>");
+					break;
+			}
+
+			return Strings.Utf8WithBom.GetBytes(s);
 		}
 
 		/// <summary>

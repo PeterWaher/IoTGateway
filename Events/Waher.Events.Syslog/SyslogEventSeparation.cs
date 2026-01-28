@@ -6,14 +6,26 @@
 	public enum SyslogEventSeparation
 	{
 		/// <summary>
-		/// Using an Octet count, as defined in RFC 6587.
+		/// Using an Octet count, as defined in §3.4.1 in RFC 6587.
 		/// </summary>
 		OctetCounting,
 
 		/// <summary>
-		/// Using a Carriage Return and Line Feed (CRLF), as defined in early versions
-		/// of Syslog.
+		/// Using a Non-Transparent-Framing using Carriage Return and Line Feed (CRLF), 
+		/// as defined in §3.4.2 in RFRC 6587.
 		/// </summary>
-		CrLf
+		CrLf,
+
+		/// <summary>
+		/// Using a Non-Transparent-Framing using Line Feed (LF), as defined in 
+		/// §3.4.2 in RFRC 6587.
+		/// </summary>
+		Lf,
+
+		/// <summary>
+		/// Using a Non-Transparent-Framing using a NULL character (0), as defined in 
+		/// §3.4.2 in RFRC 6587.
+		/// </summary>
+		Null
 	}
 }

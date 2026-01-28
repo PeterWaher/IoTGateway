@@ -221,6 +221,7 @@ The [Events](Events) folder contains libraries that manage different aspects of 
 | **Waher.Events.Socket**          | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Events.Socket/)          | The [Waher.Events.Socket](Events/Waher.Events.Socket) project defines an event sink that sends events to a TCP listener socket. Events are sent as XML fragments. |
 | **Waher.Events.Socket.UWP**      | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Events.Socket.UWP/)      | The [Waher.Events.Socket.UWP](Events/Waher.Events.Socket.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Events.Socket** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Events.Statistics**      | .NET Std 2.0 | [NuGet](https://www.nuget.org/packages/Waher.Events.Statistics/)      | The [Waher.Events.Statistics](Events/Waher.Events.Statistics) project defines an event sink that computes statistics of events being logged. |
+| **Waher.Events.Syslog**          | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Events.Syslog/)          | The [Waher.Events.Syslog](Events/Waher.Events.Syslog) project defines an event sink that transmits logged events to an external service using the Syslog protocol over TLS and TCP/IP. |
 | **Waher.Events.WebHook**         | .NET Std 2.0 | [NuGet](https://www.nuget.org/packages/Waher.Events.WebHook/)         | The [Waher.Events.WebHook](Events/Waher.Events.WebHook) project defines an event sink that logs events to an external service using HTTP POST calls to a web hook URL. |
 | **Waher.Events.WindowsEventLog** | .NET Std 2.0 | [NuGet](https://www.nuget.org/packages/Waher.Events.WindowsEventLog/) | The [Waher.Events.WindowsEventLog](Events/Waher.Events.WindowsEventLog) project defines an event sink that logs events to a Windows Event Log. |
 | **Waher.Events.XMPP**            | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Events.XMPP/)            | The [Waher.Events.XMPP](Events/Waher.Events.XMPP) project defines an event sink that distributes events over XMPP, according to [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
@@ -232,6 +233,7 @@ The folder also contains the following unit test projects:
 |------------------------------|----------|---------------------|
 | **Waher.Events.Pipe.Test**   | .NET 8.0 | The [Waher.Events.Pipe.Test](Events/Waher.Events.Pipe.Test) project contains unit tests for the **Waher.Events.Pipe** project. |
 | **Waher.Events.Socket.Test** | .NET 8.0 | The [Waher.Events.Socket.Test](Events/Waher.Events.Socket.Test) project contains unit tests for the **Waher.Events.Socket** project. |
+| **Waher.Events.Syslog.Test** | .NET 8.0 | The [Waher.Events.Syslog.Test](Events/Waher.Events.Syslog.Test) project contains unit tests for the **Waher.Events.Syslog** project. |
 
 Groups
 ----------------------

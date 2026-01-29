@@ -16,9 +16,8 @@ namespace Waher.Security.WAF
 		/// </summary>
 		/// <param name="Xml">XML Definition</param>
 		public WebApplicationFirewall(string Xml)
+			: this(XML.ParseXml(Xml, true))
 		{
-			XmlDocument Doc = new XmlDocument();
-			Doc.LoadXml(Xml);
 		}
 
 		/// <summary>
@@ -26,6 +25,7 @@ namespace Waher.Security.WAF
 		/// </summary>
 		/// <param name="Xml">XML Definition</param>
 		public WebApplicationFirewall(XmlDocument Xml)
+			: this(Xml.DocumentElement)
 		{
 		}
 

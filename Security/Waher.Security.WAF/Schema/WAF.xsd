@@ -28,8 +28,175 @@
 
 	<xs:group name="Rule">
 		<xs:choice>
-
+			<xs:element name="Allow" type="WafAction"/>
+			<xs:element name="Forbid" type="WafAction"/>
+			<xs:element name="NotFound" type="WafAction"/>
+			<xs:element name="RateLimited" type="WafAction"/>
+			<xs:element name="Ignore" type="WafAction"/>
+			<xs:element name="Close" type="WafAction"/>
+			<xs:element name="BlockEndpoint" type="WafAction"/>
+			<xs:element name="UriMatch" type="WafCondition"/>
+			<xs:element name="PathMatch" type="WafCondition"/>
+			<xs:element name="ResourceMatch" type="WafCondition"/>
+			<xs:element name="MethodMatch" type="WafCondition"/>
+			<xs:element name="ContentTypeMatch" type="WafCondition"/>
+			<xs:element name="EndpointMatch" type="WafCondition"/>
+			<xs:element name="CertificateSubjectMatch" type="WafCondition"/>
+			<xs:element name="CertificateSerialNumberMatch" type="WafCondition"/>
+			<xs:element name="HeaderMatch" type="WafNamedCondition"/>
+			<xs:element name="QueryMatch" type="WafNamedCondition"/>
+			<xs:element name="IsBlocked" type="WafActions"/>
+			<xs:element name="IsUnencrypted" type="WafActions"/>
+			<xs:element name="IsEncrypted">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafActions">
+							<xs:attribute name="minSecurityStrength" type="xs:positiveInteger" use="required"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="IsContent">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafActions">
+							<xs:attribute name="manifestFile" type="xs:string" use="required"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="RequestsExceeded">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafActions">
+							<xs:attribute name="duration" type="xs:duration" use="required"/>
+							<xs:attribute name="limit" type="xs:positiveInteger" use="required"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="BytesExceeded">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafActions">
+							<xs:attribute name="duration" type="xs:duration" use="required"/>
+							<xs:attribute name="limit" type="xs:positiveInteger" use="required"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ConnectionsExceeded">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafActions">
+							<xs:attribute name="duration" type="xs:duration" use="required"/>
+							<xs:attribute name="limit" type="xs:positiveInteger" use="required"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ContentSizeExceeded">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafActions">
+							<xs:attribute name="limit" type="xs:positiveInteger" use="required"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Log">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafAction">
+							<xs:sequence>
+								<xs:element name="Tag" minOccurs="0" maxOccurs="unbounded">
+									<xs:complexType>
+										<xs:attribute name="name" type="xs:string" use="required"/>
+										<xs:attribute name="value" type="xs:string" use="required"/>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+							<xs:attribute name="message" type="xs:string" use="required"/>
+							<xs:attribute name="type" type="EventType" use="optional" default="Informational"/>
+							<xs:attribute name="level" type="EventLevel" use="optional" default="Minor"/>
+							<xs:attribute name="object" type="xs:string" use="optional"/>
+							<xs:attribute name="actor" type="xs:string" use="optional"/>
+							<xs:attribute name="eventId" type="xs:string" use="optional"/>
+							<xs:attribute name="facility" type="xs:string" use="optional"/>
+							<xs:attribute name="module" type="xs:string" use="optional"/>
+							<xs:attribute name="stackTrace" type="xs:string" use="optional"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
 		</xs:choice>
 	</xs:group>
+
+	<xs:simpleType name="EventType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Debug"/>
+			<xs:enumeration value="Informational"/>
+			<xs:enumeration value="Notice"/>
+			<xs:enumeration value="Warning"/>
+			<xs:enumeration value="Error"/>
+			<xs:enumeration value="Critical"/>
+			<xs:enumeration value="Alert"/>
+			<xs:enumeration value="Emergency"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="EventLevel">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Minor"/>
+			<xs:enumeration value="Medium"/>
+			<xs:enumeration value="Major"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="WafAction">
+	</xs:complexType>
+
+	<xs:complexType name="WafActions">
+		<xs:complexContent>
+			<xs:extension base="WafAction">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:group ref="Rule" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="WafCondition">
+		<xs:complexContent>
+			<xs:extension base="WafActions">
+				<xs:attribute name="value" type="xs:string" use="required"/>
+				<xs:attribute name="mode" type="ComparisonMode" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="WafNamedCondition">
+		<xs:complexContent>
+			<xs:extension base="WafCondition">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:simpleType name="ComparisonMode">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ContainsRegex"/>
+			<xs:enumeration value="StartsWithRegex"/>
+			<xs:enumeration value="EndsWithRegex"/>
+			<xs:enumeration value="ExactRegex"/>
+			<xs:enumeration value="ContainsConstant"/>
+			<xs:enumeration value="StartsWithConstant"/>
+			<xs:enumeration value="EndsWithConstant"/>
+			<xs:enumeration value="ExactConstant"/>
+			<xs:enumeration value="Script"/>
+			<xs:enumeration value="FileList"/>
+			<xs:enumeration value="DatabaseList"/>
+		</xs:restriction>
+	</xs:simpleType>
 
 </xs:schema>

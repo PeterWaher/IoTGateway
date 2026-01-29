@@ -99,11 +99,7 @@ namespace Waher.IoTGateway.WebResources
 
 					Contract.NormalizeXml(ParsedContract.Contract.ForMachines, sb, ParsedContract.Contract.Namespace);
 
-					Doc = new XmlDocument()
-					{
-						PreserveWhitespace = true
-					};
-					Doc.LoadXml(Xml = sb.ToString());
+					Doc = XML.ParseXml(Xml = sb.ToString(), true);
 
 					ParsedContract.Contract.ForMachines = Doc.DocumentElement;
 

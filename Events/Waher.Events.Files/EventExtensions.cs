@@ -137,9 +137,8 @@ namespace Waher.Events.Files
 		/// <returns>If able to parse event or events.</returns>
 		public static bool TryParse(string Xml, out Event[] Parsed)
 		{
-			XmlDocument Doc = new XmlDocument();
-			Doc.LoadXml(Xml);
-			return TryParse(Xml, out Parsed);
+			XmlDocument Doc = XML.ParseXml(Xml);
+			return TryParse(Doc, out Parsed);
 		}
 
 		/// <summary>

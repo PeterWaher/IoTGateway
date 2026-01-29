@@ -328,11 +328,7 @@ namespace Waher.Client.WPF.Model.PubSub
 
 					try
 					{
-						XmlDocument Xml = new()
-						{
-							PreserveWhitespace = true
-						};
-						Xml.LoadXml(Payload);
+						XML.ParseXml(Payload, true);
 					}
 					catch (XmlException ex)
 					{

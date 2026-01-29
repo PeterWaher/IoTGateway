@@ -8,6 +8,7 @@ using Waher.Content.Getters;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Semantic.Ontologies;
+using Waher.Content.Xml;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
@@ -166,11 +167,7 @@ namespace Waher.Content.Semantic
 
 		internal static XmlDocument ToXml(string Text)
 		{
-			XmlDocument Xml = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-			Xml.LoadXml(Text);
+			XmlDocument Xml = XML.ParseXml(Text, true);
 
 			return Xml;
 		}

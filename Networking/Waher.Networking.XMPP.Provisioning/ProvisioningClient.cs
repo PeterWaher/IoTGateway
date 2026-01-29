@@ -1137,11 +1137,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 				try
 				{
-					XmlDocument Doc = new XmlDocument()
-					{
-						PreserveWhitespace = true
-					};
-					Doc.LoadXml(Query.Response);
+					XmlDocument Doc = XML.ParseXml(Query.Response, true);
 
 					XmlElement E = Doc.DocumentElement;
 					string Type = XML.Attribute(E, "type");

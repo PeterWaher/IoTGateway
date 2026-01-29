@@ -642,11 +642,7 @@ namespace Waher.Networking.XMPP.P2P
 				else
 					this.streamFooter = "</" + Xml[1..i] + ":stream>";
 
-				XmlDocument Doc = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-				Doc.LoadXml(Xml + this.streamFooter);
+				XmlDocument Doc = XML.ParseXml(Xml + this.streamFooter, true);
 
 				if (Doc.DocumentElement.LocalName != "stream")
 					throw new XmppException("Invalid stream.", Doc.DocumentElement);

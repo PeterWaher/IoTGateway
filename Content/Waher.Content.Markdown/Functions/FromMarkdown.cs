@@ -174,8 +174,7 @@ namespace Waher.Content.Markdown.Functions
 						foreach (string Row in CodeBlock.Rows)
 							sb.AppendLine(Row);
 
-						XmlDocument Doc = new XmlDocument();
-						Doc.LoadXml(sb.ToString());
+						XmlDocument Doc = XML.ParseXml(sb.ToString());
 
 						return new ObjectValue(Doc);
 

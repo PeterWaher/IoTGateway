@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Persistence.Attributes;
 
@@ -52,11 +53,7 @@ namespace Waher.IoTGateway.Setup.Legal
 		{
 			if (this.contract is null)
 			{
-				XmlDocument Doc = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-				Doc.LoadXml(this.contractXml);
+				XmlDocument Doc = XML.ParseXml(this.contractXml, true);
 				ParsedContract Parsed = await Contract.Parse(Doc.DocumentElement, Gateway.ContractsClient, true);
 				this.contract = Parsed.Contract;
 			}

@@ -103,12 +103,7 @@ namespace Waher.Content.Semantic.Model.Literals
 		{
 			try
 			{
-				XmlDocument Doc = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-
-				Doc.LoadXml(Value);
+				XmlDocument Doc = XML.ParseXml(Value, true);
 
 				return new XmlLiteral(Doc.ChildNodes, string.Empty, Value, Language);
 			}
@@ -155,11 +150,7 @@ namespace Waher.Content.Semantic.Model.Literals
 
 				try
 				{
-					XmlDocument Doc = new XmlDocument()
-					{
-						PreserveWhitespace = true
-					};
-					Doc.LoadXml("<root>" + Custom.StringValue + "</root>");
+					XmlDocument Doc = XML.ParseXml("<root>" + Custom.StringValue + "</root>", true);
 
 					s2 = XML.NormalizeXml(Doc.DocumentElement.ChildNodes, false);
 				}

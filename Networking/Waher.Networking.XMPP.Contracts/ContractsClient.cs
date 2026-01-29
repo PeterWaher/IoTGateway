@@ -557,11 +557,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private byte[] GetKey(EllipticCurveEndpoint EcEndpoint)
 		{
 			string s = EcEndpoint.Curve.Export();
-			XmlDocument Doc = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-			Doc.LoadXml(s);
+			XmlDocument Doc = XML.ParseXml(s, true);
 			s = Doc.DocumentElement.GetAttribute("d");
 			return Convert.FromBase64String(s);
 		}
@@ -729,8 +725,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>If keys could be loaded into the client.</returns>
 		public Task<bool> ImportKeys(string Xml)
 		{
-			XmlDocument Doc = new XmlDocument();
-			Doc.LoadXml(Xml);
+			XmlDocument Doc = XML.ParseXml(Xml);
 
 			return this.ImportKeys(Doc);
 		}
@@ -5010,12 +5005,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			try
 			{
-				Doc = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-
-				Doc.LoadXml(Contract.ForMachines.OuterXml);
+				Doc = XML.ParseXml(Contract.ForMachines.OuterXml, true);
 			}
 			catch (Exception ex)
 			{
@@ -7279,8 +7269,7 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					try
 					{
-						XmlDocument Doc = new XmlDocument();
-						Doc.LoadXml(s);
+						XmlDocument Doc = XML.ParseXml(s);
 
 						if (Doc.DocumentElement.LocalName == "identity")
 						{

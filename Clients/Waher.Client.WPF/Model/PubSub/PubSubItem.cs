@@ -51,14 +51,9 @@ namespace Waher.Client.WPF.Model.PubSub
 			this.summary = null;
 			this.link = null;
 
-			this.xml = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-
 			try
 			{
-				this.xml.LoadXml(Payload);
+				this.xml = XML.ParseXml(Payload, true);
 
 				if (this.xml is not null && (E = this.xml.DocumentElement) is not null)
 				{
@@ -179,11 +174,7 @@ namespace Waher.Client.WPF.Model.PubSub
 
 								try
 								{
-									XmlDocument Xml = new()
-									{
-										PreserveWhitespace = true
-									};
-									Xml.LoadXml(Payload);
+									XML.ParseXml(Payload, true);
 								}
 								catch (XmlException ex)
 								{

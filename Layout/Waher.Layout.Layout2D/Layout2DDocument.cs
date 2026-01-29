@@ -195,11 +195,11 @@ namespace Waher.Layout.Layout2D
 			if (Preprocess)
 				Xml = await Expression.TransformAsync(Xml, "{{", "}}", Session);
 
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc;
 
 			try
 			{
-				Doc.LoadXml(Xml);
+				Doc = XML.ParseXml(Xml);
 			}
 			catch (XmlException ex)
 			{

@@ -286,9 +286,7 @@ namespace Waher.Events.Socket
 		{
 			try
 			{
-				XmlDocument Doc = new XmlDocument();
-
-				Doc.LoadXml(Xml);
+				XmlDocument Doc = XML.ParseXml(Xml);
 
 				if (EventExtensions.TryParse(Doc.DocumentElement, out Event Event))
 				{

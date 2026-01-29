@@ -1389,11 +1389,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Normalized XML</returns>
 		public static string NormalizeXml(string Xml)
 		{
-			XmlDocument Doc = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-			Doc.LoadXml(Xml);
+			XmlDocument Doc = XML.ParseXml(Xml, true);
 
 			StringBuilder sb = new StringBuilder();
 

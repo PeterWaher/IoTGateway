@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
 using System.Xml;
+using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -72,8 +73,7 @@ namespace Waher.Script.XmlDSig.Functions
 			}
 			catch (PlatformNotSupportedException)
 			{
-				XmlDocument Doc = new XmlDocument();
-				Doc.LoadXml(Xml);
+				XmlDocument Doc = XML.ParseXml(Xml);
 
 				if (Doc.DocumentElement is null || Doc.DocumentElement.LocalName != "RSAKeyValue")
 					throw new ScriptRuntimeException("Not an RSA Public Key XML document.", Node);

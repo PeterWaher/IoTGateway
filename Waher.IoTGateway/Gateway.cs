@@ -1669,11 +1669,7 @@ namespace Waher.IoTGateway
 									Log.Informational("Importing language file.", FileName);
 
 									Xml = await Files.ReadAllTextAsync(LanguageFile);
-									XmlDocument Doc = new XmlDocument()
-									{
-										PreserveWhitespace = true
-									};
-									Doc.LoadXml(Xml);
+									XmlDocument Doc = XML.ParseXml(Xml, true);
 
 									XSL.Validate(FileName, Doc, Translator.SchemaRoot, Translator.SchemaNamespace, Schema);
 

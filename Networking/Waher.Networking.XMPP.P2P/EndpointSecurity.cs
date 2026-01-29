@@ -731,11 +731,7 @@ namespace Waher.Networking.XMPP.P2P
 
 				this.AppendE2eInfo(Xml);
 
-				XmlDocument Doc = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-				Doc.LoadXml(Xml.ToString());
+				XmlDocument Doc = XML.ParseXml(Xml.ToString(), true);
 
 				return SortedArray(ParseE2eKeys(Doc.DocumentElement, this.securityStrength) ?? new Dictionary<string, IE2eEndpoint>());
 			}
@@ -1268,11 +1264,7 @@ namespace Waher.Networking.XMPP.P2P
 			string Xml = T.Item1;
 			string EndpointReference = T.Item2;
 
-			XmlDocument Doc = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-			Doc.LoadXml(Xml);
+			XmlDocument Doc = XML.ParseXml(Xml, true);
 
 			MessageEventArgs e2 = new MessageEventArgs(Client, Doc.DocumentElement)
 			{
@@ -1352,11 +1344,7 @@ namespace Waher.Networking.XMPP.P2P
 				Xml.Append(Content);
 				Xml.Append("</iq>");
 
-				XmlDocument Doc = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-				Doc.LoadXml(Xml.ToString());
+				XmlDocument Doc = XML.ParseXml(Xml.ToString(), true);
 
 				IqResultEventArgs e2 = new IqResultEventArgs(this, EndpointReference, Cipher,
 					Doc.DocumentElement, e.Id, e.To, e.From, e.Ok, State);
@@ -1472,11 +1460,7 @@ namespace Waher.Networking.XMPP.P2P
 			string Content = T.Item1;
 			string EndpointReference = T.Item2;
 
-			XmlDocument Doc = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-			Doc.LoadXml(this.EmbedIq(e, "get", Content));
+			XmlDocument Doc = XML.ParseXml(this.EmbedIq(e, "get", Content), true);
 
 			IqEventArgs e2 = new IqEventArgs(Client, this, EndpointReference, Cipher, Doc.DocumentElement, e.Id, e.To, e.From);
 			await Client.ProcessIqGet(e2);
@@ -1510,11 +1494,7 @@ namespace Waher.Networking.XMPP.P2P
 			string Content = T.Item1;
 			string EndpointReference = T.Item2;
 
-			XmlDocument Doc = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-			Doc.LoadXml(this.EmbedIq(e, "set", Content));
+			XmlDocument Doc = XML.ParseXml(this.EmbedIq(e, "set", Content), true);
 
 			IqEventArgs e2 = new IqEventArgs(Client, this, EndpointReference, Cipher, Doc.DocumentElement, e.Id, e.To, e.From);
 			await Client.ProcessIqSet(e2);

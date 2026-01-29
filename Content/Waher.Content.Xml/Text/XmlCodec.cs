@@ -98,13 +98,15 @@ namespace Waher.Content.Xml.Text
 		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
 			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
-			XmlDocument Doc = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
+			XmlDocument Doc;
 
 			if (Encoding is null)
 			{
+				Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
+
 				using (MemoryStream ms = new MemoryStream(Data))
 				{
 					Doc.Load(ms);
@@ -113,7 +115,7 @@ namespace Waher.Content.Xml.Text
 			else
 			{
 				string s = Strings.GetString(Data, Encoding);
-				Doc.LoadXml(s);
+				Doc = XML.ParseXml(s, true);
 			}
 
 			return Task.FromResult(new ContentResponse(ContentType, Doc, Data));

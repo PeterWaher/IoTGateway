@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
+using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -80,8 +81,7 @@ namespace Waher.Script.XmlDSig.Functions
 				s = sb.ToString();
 			}
 
-			XmlDocument Doc = new XmlDocument();
-			Doc.LoadXml(s);
+			XmlDocument Doc = XML.ParseXml(s);
 
 			return new ObjectValue(Doc);
 		}

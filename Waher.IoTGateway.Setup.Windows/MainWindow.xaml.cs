@@ -823,8 +823,7 @@ namespace Waher.IoTGateway.Setup.Windows
 				if (!Xml.EndsWith("</EventOutput>"))
 					Xml += "</EventOutput>";
 
-				XmlDocument Doc = new();
-				Doc.LoadXml(Xml);
+				XmlDocument Doc = XML.ParseXml(Xml);
 
 				if (EventExtensions.TryParse(Doc, out Event[] ParsedEvents))
 					Process.ProcessInstallEvents(true, ParsedEvents);

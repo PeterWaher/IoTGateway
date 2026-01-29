@@ -771,6 +771,7 @@ namespace Waher.Networking.XMPP.BOSH
 					string Language = null;
 					string StreamPrefix = "stream";
 					LinkedList<KeyValuePair<string, string>> Namespaces = null;
+					
 					XmlDocument BodyDoc = XML.ParseXml(Body, true);
 
 					foreach (XmlAttribute Attr in BodyDoc.DocumentElement.Attributes)

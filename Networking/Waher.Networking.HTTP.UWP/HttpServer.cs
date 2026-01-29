@@ -27,6 +27,7 @@ using Waher.Runtime.Cache;
 using Waher.Security;
 using Waher.Networking.HTTP.HTTP2;
 using Waher.Runtime.IO;
+using Waher.Networking.HTTP.Interfaces;
 
 namespace Waher.Networking.HTTP
 {
@@ -85,6 +86,7 @@ namespace Waher.Networking.HTTP
 		private readonly Dictionary<int, bool> failedPorts = new Dictionary<int, bool>();
 		private readonly VanityResources vanityResources = new VanityResources();
 		private ILoginAuditor loginAuditor = null;
+		private IWebApplicationFirewall webApplicationFirewall = null;
 		private DateTime lastStat = DateTime.MinValue;
 		private string eTagSalt = string.Empty;
 		private string name = typeof(HttpServer).Namespace;
@@ -1535,6 +1537,22 @@ namespace Waher.Networking.HTTP
 					this.loginAuditor = value;
 				else
 					throw new InvalidOperationException("Login Auditor already set.");
+			}
+		}
+
+		/// <summary>
+		/// Reference to Web Application Firewall (WAF) to help remove unwanted communication
+		/// from the server
+		/// </summary>
+		public IWebApplicationFirewall WebApplicationFirewall
+		{
+			get => this.webApplicationFirewall;
+			set
+			{
+				if (this.webApplicationFirewall is null || this.webApplicationFirewall == value)
+					this.webApplicationFirewall = value;
+				else
+					throw new InvalidOperationException("Web Application Firewall already set.");
 			}
 		}
 

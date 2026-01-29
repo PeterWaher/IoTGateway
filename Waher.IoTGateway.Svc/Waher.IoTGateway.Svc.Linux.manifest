@@ -315,6 +315,9 @@
 	<Assembly fileName="Waher.Events.Statistics.dll" />
 	<Assembly fileName="Waher.Events.Statistics.pdb" />
 	<Assembly fileName="Waher.Events.Statistics.xml" />
+	<Assembly fileName="Waher.Events.Syslog.dll" />
+	<Assembly fileName="Waher.Events.Syslog.pdb" />
+	<Assembly fileName="Waher.Events.Syslog.xml" />
 	<Assembly fileName="Waher.Events.WebHook.dll" />
 	<Assembly fileName="Waher.Events.WebHook.pdb" />
 	<Assembly fileName="Waher.Events.WebHook.xml" />

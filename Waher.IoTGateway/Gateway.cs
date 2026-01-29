@@ -37,6 +37,7 @@ using Waher.Events.MQTT;
 using Waher.Events.Persistence;
 using Waher.Events.Pipe;
 using Waher.Events.Socket;
+using Waher.Events.Syslog;
 using Waher.Events.WebHook;
 using Waher.Events.XMPP;
 using Waher.Groups;
@@ -843,9 +844,38 @@ namespace Waher.IoTGateway
 													Sinks.Add(new SocketEventSink(SinkId, Host, Port, Tls));
 													break;
 
+												case "SyslogEventSink":
+													SinkId = XML.Attribute(E2, "id");
+													string Name = XML.Attribute(E2, "name");
+													Host = XML.Attribute(E2, "host");
+													Port = XML.Attribute(E2, "port", 514);
+													Tls = XML.Attribute(E2, "tls", false);
+													SyslogEventSeparation Separation = XML.Attribute(E2, "separation", SyslogEventSeparation.OctetCounting);
+
+													if (Tls)
+													{
+														if (certificate is null)
+														{
+															Sinks.Add(new SyslogEventSink(Host, Port, true, Name, applicationName,
+																Separation, SinkId));
+														}
+														else
+														{
+															Sinks.Add(new SyslogEventSink(Host, Port, certificate, Name, applicationName,
+																Separation, SinkId));
+														}
+													}
+													else
+													{
+														Sinks.Add(new SyslogEventSink(Host, Port, false, Name, applicationName,
+															Separation, SinkId));
+													}
+													break;
+
 												case "WebHookEventSink":
 													SinkId = XML.Attribute(E2, "id");
 													string Url = XML.Attribute(E2, "url");
+
 													int MaxSecondsUsed = XML.Attribute(E2, "maxSecondsUsed", 0);
 													int MaxSecondsUnused = XML.Attribute(E2, "maxSecondsUnused", 0);
 													bool CollectOnType = XML.Attribute(E2, "collectOnType", false);

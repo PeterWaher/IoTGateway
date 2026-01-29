@@ -649,6 +649,9 @@
 	<Assembly fileName="Waher.Security.Users.dll" />
 	<Assembly fileName="Waher.Security.Users.pdb" />
 	<Assembly fileName="Waher.Security.Users.xml" />
+	<Assembly fileName="Waher.Security.WAF.dll" />
+	<Assembly fileName="Waher.Security.WAF.pdb" />
+	<Assembly fileName="Waher.Security.WAF.xml" />
 	<Assembly fileName="Waher.Theme.Base.dll" />
 	<Assembly fileName="Waher.Theme.Base.manifest" />
 	<Assembly fileName="Waher.Theme.Base.pdb" />

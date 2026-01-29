@@ -27,6 +27,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Events", "Events\Wahe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Events.Console", "Events\Waher.Events.Console\Waher.Events.Console.csproj", "{3DCD9D46-D6CE-4277-B513-585D54113649}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.WAF", "Security\Waher.Security.WAF\Waher.Security.WAF.csproj", "{8B52F0F6-C75E-6A0E-A4E8-A55DC6A07D93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.WAF.Test", "Security\Waher.Security.WAF.Test\Waher.Security.WAF.Test.csproj", "{ECFC276F-4CDB-4654-4E15-CF2AFCCB9F65}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +85,14 @@ Global
 		{3DCD9D46-D6CE-4277-B513-585D54113649}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DCD9D46-D6CE-4277-B513-585D54113649}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DCD9D46-D6CE-4277-B513-585D54113649}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B52F0F6-C75E-6A0E-A4E8-A55DC6A07D93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B52F0F6-C75E-6A0E-A4E8-A55DC6A07D93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B52F0F6-C75E-6A0E-A4E8-A55DC6A07D93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B52F0F6-C75E-6A0E-A4E8-A55DC6A07D93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECFC276F-4CDB-4654-4E15-CF2AFCCB9F65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECFC276F-4CDB-4654-4E15-CF2AFCCB9F65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECFC276F-4CDB-4654-4E15-CF2AFCCB9F65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECFC276F-4CDB-4654-4E15-CF2AFCCB9F65}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

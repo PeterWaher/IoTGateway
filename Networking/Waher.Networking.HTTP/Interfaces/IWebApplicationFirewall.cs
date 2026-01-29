@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.Interfaces
 		/// <summary>
 		/// Return a Rate Limit error to client.
 		/// </summary>
-		RateLimit,
+		RateLimited,
 
 		/// <summary>
 		/// Ignore request (no response is returned to client)

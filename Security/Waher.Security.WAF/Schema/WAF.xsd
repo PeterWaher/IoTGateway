@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="GatewayConfiguration"
+           targetNamespace="http://waher.se/Schema/WAF.xsd"
+           elementFormDefault="qualified"
+           xmlns="http://waher.se/Schema/WAF.xsd"
+           xmlns:mstns="http://waher.se/Schema/WAF.xsd"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="WebApplicationFirewall">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:group ref="Rule" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:choice>
+			<xs:attribute name="defaultResult" type="Result" use="optional" default="Allow"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="Result">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Allow"/>
+			<xs:enumeration value="Forbid"/>
+			<xs:enumeration value="NotFound"/>
+			<xs:enumeration value="RateLimited"/>
+			<xs:enumeration value="Ignore"/>
+			<xs:enumeration value="Close"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:group name="Rule">
+		<xs:choice>
+
+		</xs:choice>
+	</xs:group>
+
+</xs:schema>

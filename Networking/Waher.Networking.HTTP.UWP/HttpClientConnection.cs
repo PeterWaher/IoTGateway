@@ -2167,7 +2167,7 @@ namespace Waher.Networking.HTTP
 							Request.Dispose();
 							return true;
 
-						case WafAction.RateLimit:
+						case WafAction.RateLimited:
 							await this.SendResponse(Request, null, new TooManyRequestsException(), true);
 							Request.Dispose();
 							return true;

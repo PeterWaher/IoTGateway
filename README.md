@@ -533,6 +533,7 @@ authorization and encryption.
 | **Waher.Security.SPF**              | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Security.SPF/)              | The [Waher.Security.SPF](Security/Waher.Security.SPF) project contains a class library for resolving Sender Policy Framework (SPF) strings as defined in [RFC 7208](https://tools.ietf.org/html/rfc7208). |
 | **Waher.Security.TOTP**             | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Security.TOTP/)             | The [Waher.Security.TOTP](Security/Waher.Security.TOTP) project contains a class library that support HOTP (HMAC-Based One-Time Password) as defined in [RFC 4226](https://tools.ietf.org/html/rfc4226), and TOTP (Time-Based One-Time Password) as defined in [RFC 4226](https://tools.ietf.org/html/rfc6238). |
 | **Waher.Security.Users**            | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Security.Users/)            | The [Waher.Security.Users](Security/Waher.Security.Users) project defines an architecture of persistent users, roles and privileges that can be used to provide detailed authorization in applications. Privileges are ordered in a tree structure. Roles contains a list of allowed privileges (nodes or entire branches), or explicitly prohibited privileges (nodes or branches). Each user can be assigned one or more roles. Credentials are protected using hash digests. Objects are persisted through the object database abstraction layer, defined in Waher.Persistence. |
+| **Waher.Security.WAF**              | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Security.WAF/)              | The [Waher.Security.WAF](Security/Waher.Security.WAF) project provides a customizable Web Application Firewall (WAF) for the web server defined in Waher.Networking.HTTP. |
 
 The folder also contains the following unit test projects:
 
@@ -549,6 +550,7 @@ The folder also contains the following unit test projects:
 | **Waher.Security.SHA3.Test**           | .NET 8.0 | The [Waher.Security.SHA3.Test](Security/Waher.Security.SHA3.Test) project contains unit tests for the  [Waher.Security.SHA3](Security/Waher.Security.SHA3) project. |
 | **Waher.Security.SPF.Test**            | .NET 8.0 | The [Waher.Security.SPF.Test](Security/Waher.Security.SPF.Test) project contains unit tests for the  [Waher.Security.SPF](Security/Waher.Security.SPF) project. |
 | **Waher.Security.TOTP.Test**           | .NET 8.0 | The [Waher.Security.TOTP.Test](Security/Waher.Security.TOTP.Test) project contains unit tests for the  [Waher.Security.TOTP](Security/Waher.Security.TOTP) project. |
+| **Waher.Security.WAF.Test**            | .NET 8.0 | The [Waher.Security.WAF.Test](Security/Waher.Security.WAF.Test) project contains unit tests for the  [Waher.Security.WAF](Security/Waher.Security.WAF) project. |
 
 Services
 ----------------------

@@ -2143,9 +2143,15 @@ namespace Waher.Networking.HTTP
 					return false;
 				}
 
+				if (!this.server.TryGetResource(Request, true, out HttpResource Resource, out string SubPath))
+				{
+					Resource = null;
+					SubPath = null;
+				}
+
 				if (!(this.webApplicationFirewall is null))
 				{
-					switch (await this.webApplicationFirewall.Review(Request))
+					switch (await this.webApplicationFirewall.Review(Request, Resource, SubPath))
 					{
 						case WafAction.Allow:
 							break;
@@ -2176,7 +2182,7 @@ namespace Waher.Networking.HTTP
 					}
 				}
 
-				if (!this.server.TryGetResource(Request, true, out HttpResource Resource, out string SubPath))
+				if (Resource is null)
 				{
 					this.server.RequestReceived(Request, this.client.RemoteEndPoint, null, Request.Header.Resource);
 

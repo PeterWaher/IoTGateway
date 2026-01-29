@@ -46,8 +46,10 @@ namespace Waher.Networking.HTTP.Interfaces
 		/// <summary>
 		/// Reviews an incoming request.
 		/// </summary>
-		/// <param name="Request"></param>
-		/// <returns></returns>
-		Task<WafAction> Review(HttpRequest Request);
+		/// <param name="Request">Current HTTP Request</param>
+		/// <param name="Resource">Corresponding HTTP Resource, if found.</param>
+		/// <param name="SubPath">Sub-path within the resource, if applicable.</param>
+		/// <returns>Action to take.</returns>
+		Task<WafAction> Review(HttpRequest Request, HttpResource Resource, string SubPath);
 	}
 }

@@ -250,12 +250,7 @@ namespace Waher.Client.WPF.Controls
 
 				if (Result.HasValue && Result.Value)
 				{
-					XmlDocument Xml = new()
-					{
-						PreserveWhitespace = true
-					};
-					Xml.Load(Dialog.FileName);
-
+					XmlDocument Xml = XML.LoadFromFile(Dialog.FileName, true);
 					this.Load(Xml, Dialog.FileName);
 				}
 			}

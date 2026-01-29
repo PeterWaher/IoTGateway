@@ -1656,5 +1656,37 @@ namespace Waher.Content.Xml
 		}
 
 		#endregion
+
+		#region Loading
+
+		/// <summary>
+		/// Loads an XML document from a file.
+		/// </summary>
+		/// <param name="FileName">File Name</param>
+		/// <returns>Parsed XML Document.</returns>
+		public static XmlDocument LoadFromFile(string FileName)
+		{
+			return LoadFromFile(FileName, false);
+		}
+
+		/// <summary>
+		/// Loads an XML document from a file.
+		/// </summary>
+		/// <param name="FileName">File Name</param>
+		/// <param name="PreserveWhitespace">If whitespace should be preserved.</param>
+		/// <returns>Parsed XML Document.</returns>
+		public static XmlDocument LoadFromFile(string FileName, bool PreserveWhitespace)
+		{
+			XmlDocument Xml = new XmlDocument()
+			{
+				PreserveWhitespace = PreserveWhitespace
+			};
+
+			Xml.Load(FileName);
+
+			return Xml;
+		}
+
+		#endregion
 	}
 }

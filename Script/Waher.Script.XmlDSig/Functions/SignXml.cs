@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
 using System.Xml;
+using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -102,13 +103,7 @@ namespace Waher.Script.XmlDSig.Functions
 					Xml.AppendChild(Xml.ImportNode(E, true));
 				}
 				else if (Object is string s)
-				{
-					Xml = new XmlDocument()
-					{
-						PreserveWhitespace = true
-					};
-					Xml.Load(s);
-				}
+					Xml = XML.LoadFromFile(s, true);
 				else
 					throw new ScriptRuntimeException("Third argument must be XML.", Node);
 			}

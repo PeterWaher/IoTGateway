@@ -376,16 +376,13 @@ namespace Waher.IoTGateway
 					});
 				}
 
-				XmlDocument Config = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
 
 				string GatewayConfigFileName = ConfigFilePath;
 				if (!File.Exists(GatewayConfigFileName))
 					GatewayConfigFileName = GatewayConfigLocalFileName;
 
-				Config.Load(GatewayConfigFileName);
+				XmlDocument Config = XML.LoadFromFile(GatewayConfigFileName, true);
+				
 				XSL.Validate(GatewayConfigLocalFileName, Config, GatewayConfigLocalName, GatewayConfigNamespace,
 					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.GatewayConfiguration.xsd", typeof(Gateway).Assembly));
 
@@ -2052,11 +2049,7 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				XmlDocument Doc = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-				Doc.Load(ManifestFileName);
+				XmlDocument Doc = XML.LoadFromFile(ManifestFileName, true);
 
 				if (!(Doc.DocumentElement is null) &&
 					Doc.DocumentElement.LocalName == "Module" &&
@@ -2145,11 +2138,7 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				XmlDocument Doc = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-				Doc.Load(ManifestFileName);
+				XmlDocument Doc = XML.LoadFromFile(ManifestFileName, true);
 
 				if (!(Doc.DocumentElement is null) &&
 					Doc.DocumentElement.LocalName == "Module" &&
@@ -5887,8 +5876,7 @@ namespace Waher.IoTGateway
 				if (!File.Exists(ConfigurationFileName))
 					return false;
 
-				XmlDocument Doc = new XmlDocument();
-				Doc.Load(ConfigurationFileName);
+				XmlDocument Doc = XML.LoadFromFile(ConfigurationFileName);
 
 				if (Doc.DocumentElement.LocalName != ServiceConfigurationRoot || Doc.DocumentElement.NamespaceURI != ServiceConfigurationNamespace)
 					return false;

@@ -164,11 +164,7 @@ namespace Waher.Service.PcSensor
 				SortedDictionary<string, string[]?> CategoryIncluded = [];
 
 				List<string> Instances = [];
-				XmlDocument Doc = new()
-				{
-					PreserveWhitespace = true
-				};
-				Doc.Load("categories.xml");
+				XmlDocument Doc = XML.LoadFromFile("categories.xml", true);
 
 				XSL.Validate("categories.xml", Doc, "Categories", "http://waher.se/Schema/PerformanceCounterCategories.xsd",
 					XSL.LoadSchema("Waher.Service.PcSensor.Schema.PerformanceCounterCategories.xsd"));

@@ -186,11 +186,7 @@ namespace Waher.Client.WPF.Controls
 		{
 			try
 			{
-				XmlDocument Xml = new()
-				{
-					PreserveWhitespace = true
-				};
-				Xml.Load(FileName);
+				XmlDocument Xml = XML.LoadFromFile(FileName, true);
 
 				switch (Xml.DocumentElement.LocalName)
 				{

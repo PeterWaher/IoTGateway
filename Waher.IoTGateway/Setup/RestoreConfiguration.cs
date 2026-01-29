@@ -1730,11 +1730,7 @@ namespace Waher.IoTGateway.Setup
 			Doc.Load(File);
 
 			string OriginalFileName = Gateway.ConfigFilePath;
-			XmlDocument Original = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-			Original.Load(OriginalFileName);
+			XmlDocument Original = XML.LoadFromFile(OriginalFileName, true);
 
 			if (!(Doc.DocumentElement is null) && Doc.DocumentElement.LocalName == "GatewayConfiguration")
 			{

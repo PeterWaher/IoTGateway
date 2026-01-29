@@ -559,12 +559,7 @@ namespace Waher.Client.WPF.Controls
 				{
 					if (Dialog.FilterIndex == 1)
 					{
-						XmlDocument Xml = new XmlDocument()
-						{
-							PreserveWhitespace = true
-						};
-						Xml.Load(Dialog.FileName);
-
+						XmlDocument Xml = XML.LoadFromFile(Dialog.FileName, true);
 						this.Load(Xml, Dialog.FileName);
 					}
 					else

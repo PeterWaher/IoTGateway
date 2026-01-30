@@ -5,7 +5,7 @@ namespace Waher.Networking.HTTP.Interfaces
 	/// <summary>
 	/// Actions that a Web Server can take after reviewing a request.
 	/// </summary>
-	public enum WafAction
+	public enum WafResult
 	{
 		/// <summary>
 		/// Allow request
@@ -50,6 +50,6 @@ namespace Waher.Networking.HTTP.Interfaces
 		/// <param name="Resource">Corresponding HTTP Resource, if found.</param>
 		/// <param name="SubPath">Sub-path within the resource, if applicable.</param>
 		/// <returns>Action to take.</returns>
-		Task<WafAction> Review(HttpRequest Request, HttpResource Resource, string SubPath);
+		Task<WafResult> Review(HttpRequest Request, HttpResource Resource, string SubPath);
 	}
 }

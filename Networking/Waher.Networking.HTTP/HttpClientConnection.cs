@@ -2153,30 +2153,30 @@ namespace Waher.Networking.HTTP
 				{
 					switch (await this.webApplicationFirewall.Review(Request, Resource, SubPath))
 					{
-						case WafAction.Allow:
+						case WafResult.Allow:
 							break;
 
-						case WafAction.Forbid:
+						case WafResult.Forbid:
 						default:
 							await this.SendResponse(Request, null, new ForbiddenException(), true);
 							Request.Dispose();
 							return true;
 
-						case WafAction.NotFound:
+						case WafResult.NotFound:
 							await this.SendResponse(Request, null, new NotFoundException(), true);
 							Request.Dispose();
 							return true;
 
-						case WafAction.RateLimited:
+						case WafResult.RateLimited:
 							await this.SendResponse(Request, null, new TooManyRequestsException(), true);
 							Request.Dispose();
 							return true;
 						
-						case WafAction.Ignore:
+						case WafResult.Ignore:
 							Request.Dispose();
 							return true;
 
-						case WafAction.Close:
+						case WafResult.Close:
 							Request.Dispose();
 							return false;
 					}

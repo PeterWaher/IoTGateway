@@ -45,5 +45,10 @@ namespace Waher.Security.WAF.Model
 		/// Child actions.
 		/// </summary>
 		public WafAction[] Actions => this.actions;
+
+		/// <summary>
+		/// If the action contains no child actions.
+		/// </summary>
+		public bool IsEmpty => this.actions.Length == 0;
 	}
 }

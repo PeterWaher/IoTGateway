@@ -1,10 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Interfaces;
+using Waher.Security.WAF.Model;
 
 namespace Waher.Security.WAF
 {
@@ -14,11 +16,6 @@ namespace Waher.Security.WAF
 	public class WebApplicationFirewall : IWebApplicationFirewall
 	{
 		/// <summary>
-		/// WebApplicationFirewall
-		/// </summary>
-		public const string ExpectedRoot = "WebApplicationFirewall";
-
-		/// <summary>
 		/// http://waher.se/Schema/WAF.xsd
 		/// </summary>
 		public const string Namespace = "http://waher.se/Schema/WAF.xsd";
@@ -27,6 +24,8 @@ namespace Waher.Security.WAF
 		/// Schema to validate WAF XML files.
 		/// </summary>
 		private static readonly XmlSchema schema = XSL.LoadSchema(typeof(WebApplicationFirewall).Namespace + ".Schema.WAF.xsd");
+
+		private readonly Root root;
 
 		/// <summary>
 		/// Web Application Firewall for <see cref="HttpServer"/>.
@@ -52,6 +51,9 @@ namespace Waher.Security.WAF
 		/// <param name="Xml">XML Definition</param>
 		public WebApplicationFirewall(XmlElement Xml)
 		{
+			this.root = WafAction.Parse(Xml) as Root;
+			if (this.root is null)
+				throw new Exception("Invalid root element of WAF definition.");	
 		}
 
 		/// <summary>
@@ -62,7 +64,7 @@ namespace Waher.Security.WAF
 		public static WebApplicationFirewall LoadFromFile(string FileName)
 		{
 			XmlDocument Doc = XML.LoadFromFile(FileName, true);
-			XSL.Validate(FileName, Doc, ExpectedRoot, Namespace, schema);
+			XSL.Validate(FileName, Doc, nameof(Root), Namespace, schema);
 			return new WebApplicationFirewall(Doc);
 		}
 
@@ -73,9 +75,9 @@ namespace Waher.Security.WAF
 		/// <param name="Resource">Corresponding HTTP Resource, if found.</param>
 		/// <param name="SubPath">Sub-path within the resource, if applicable.</param>
 		/// <returns>Action to take.</returns>
-		public Task<WafAction> Review(HttpRequest Request, HttpResource Resource, string SubPath)
+		public Task<WafResult> Review(HttpRequest Request, HttpResource Resource, string SubPath)
 		{
-			return Task.FromResult(WafAction.Allow);
+			return Task.FromResult(this.root.DefaultResult);
 		}
 	}
 }

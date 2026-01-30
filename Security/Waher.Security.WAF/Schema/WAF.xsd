@@ -6,7 +6,7 @@
            xmlns:mstns="http://waher.se/Schema/WAF.xsd"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-	<xs:element name="WebApplicationFirewall">
+	<xs:element name="Root">
 		<xs:complexType>
 			<xs:choice minOccurs="0" maxOccurs="unbounded">
 				<xs:group ref="Rule" minOccurs="0" maxOccurs="unbounded"/>

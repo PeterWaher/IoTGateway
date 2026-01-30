@@ -1,5 +1,6 @@
 ﻿using System.Xml;
 using Waher.Content.Xml;
+using Waher.Security.WAF.Model.Comparisons;
 
 namespace Waher.Security.WAF.Model.Conditions
 {
@@ -60,6 +61,11 @@ namespace Waher.Security.WAF.Model.Conditions
 		Script,
 
 		/// <summary>
+		/// The value is compared against a list of comma-separated values.
+		/// </summary>
+		List,
+
+		/// <summary>
 		/// The value is compared against the contents of a list available in a file.
 		/// </summary>
 		FileList,
@@ -74,7 +80,7 @@ namespace Waher.Security.WAF.Model.Conditions
 	/// <summary>
 	/// Abstract base class for Web Application Firewall conditions.
 	/// </summary>
-	public abstract class WafCondition : WafActions
+	public abstract class WafCondition : WafComparison
 	{
 		private readonly ComparisonMode mode;
 		private readonly string value;
@@ -97,5 +103,15 @@ namespace Waher.Security.WAF.Model.Conditions
 			this.value = XML.Attribute(Xml, "value");
 			this.mode = XML.Attribute(Xml, "mode", ComparisonMode.ContainsRegex);
 		}
+
+		/// <summary>
+		/// String-representation of value.
+		/// </summary>
+		public string Value => this.value;
+
+		/// <summary>
+		/// Comparison mode.
+		/// </summary>
+		public ComparisonMode Mode => this.mode;
 	}
 }

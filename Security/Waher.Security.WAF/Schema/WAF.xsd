@@ -280,6 +280,7 @@
 			<xs:enumeration value="EndsWithConstant"/>
 			<xs:enumeration value="ExactConstant"/>
 			<xs:enumeration value="Script"/>
+			<xs:enumeration value="List"/>
 			<xs:enumeration value="FileList"/>
 			<xs:enumeration value="DatabaseList"/>
 		</xs:restriction>

@@ -133,6 +133,7 @@
 			</xs:element>
 			<xs:element name="GoTo" type="WafActionReference"/>
 			<xs:element name="Call" type="WafActionReference"/>
+			<xs:element name="References" type="WafActions"/>
 		</xs:choice>
 	</xs:group>
 

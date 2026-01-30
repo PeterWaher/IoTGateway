@@ -28,7 +28,6 @@ namespace Waher.Security.WAF
 		/// </summary>
 		private static readonly XmlSchema schema = XSL.LoadSchema(typeof(WebApplicationFirewall).Namespace + ".Schema.WAF.xsd");
 
-
 		/// <summary>
 		/// Web Application Firewall for <see cref="HttpServer"/>.
 		/// </summary>

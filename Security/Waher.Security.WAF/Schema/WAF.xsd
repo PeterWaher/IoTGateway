@@ -40,12 +40,15 @@
 			<xs:element name="ResourceMatch" type="WafCondition"/>
 			<xs:element name="MethodMatch" type="WafCondition"/>
 			<xs:element name="ContentTypeMatch" type="WafCondition"/>
+			<xs:element name="ContentMatch" type="WafCondition"/>
 			<xs:element name="EndpointMatch" type="WafCondition"/>
 			<xs:element name="CertificateSubjectMatch" type="WafCondition"/>
 			<xs:element name="CertificateSerialNumberMatch" type="WafCondition"/>
 			<xs:element name="HeaderMatch" type="WafNamedCondition"/>
 			<xs:element name="QueryMatch" type="WafNamedCondition"/>
 			<xs:element name="IsBlocked" type="WafActions"/>
+			<xs:element name="IsPermanentlyBlocked" type="WafActions"/>
+			<xs:element name="IsTemporarilyBlocked" type="WafActions"/>
 			<xs:element name="IsUnencrypted" type="WafActions"/>
 			<xs:element name="IsEncrypted">
 				<xs:complexType>
@@ -104,7 +107,28 @@
 					</xs:complexContent>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="Log">
+			<xs:element name="FromIpLocation">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafActions">
+							<xs:attribute name="country" type="xs:string" use="optional"/>
+							<xs:attribute name="region" type="xs:string" use="optional"/>
+							<xs:attribute name="city" type="xs:string" use="optional"/>
+							<xs:attribute name="area" type="xs:string" use="optional"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="FromIp">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafActions">
+							<xs:attribute name="value" type="xs:string" use="required"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="LogEvent">
 				<xs:complexType>
 					<xs:complexContent>
 						<xs:extension base="WafAction">
@@ -125,6 +149,68 @@
 							<xs:attribute name="facility" type="xs:string" use="optional"/>
 							<xs:attribute name="module" type="xs:string" use="optional"/>
 							<xs:attribute name="stackTrace" type="xs:string" use="optional"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="LedgerEntry">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafAction">
+							<xs:sequence>
+								<xs:element name="Property" minOccurs="0" maxOccurs="unbounded">
+									<xs:complexType>
+										<xs:attribute name="name" type="xs:string" use="required"/>
+										<xs:attribute name="value" type="xs:string" use="required"/>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+							<xs:attribute name="collection" type="EventLevel" use="required"/>
+							<xs:attribute name="type" type="xs:string" use="required"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="AddOpenIntelligence">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafAction">
+							<xs:sequence>
+								<xs:element name="Tag" minOccurs="0" maxOccurs="unbounded">
+									<xs:complexType>
+										<xs:attribute name="name" type="xs:string" use="required"/>
+										<xs:attribute name="value" type="xs:string" use="required"/>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+							<xs:attribute name="duration" type="xs:duration" use="required"/>
+							<xs:attribute name="vector" type="xs:string" use="optional"/>
+							<xs:attribute name="protocol" type="xs:string" use="optional"/>
+							<xs:attribute name="classification" type="xs:string" use="optional"/>
+							<xs:attribute name="code" type="xs:string" use="optional"/>
+							<xs:attribute name="message" type="xs:string" use="optional"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="HasOpenIntelligence">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafAction">
+							<xs:sequence>
+								<xs:element name="Tag" minOccurs="0" maxOccurs="unbounded">
+									<xs:complexType>
+										<xs:attribute name="name" type="xs:string" use="required"/>
+										<xs:attribute name="value" type="xs:string" use="required"/>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+							<xs:attribute name="duration" type="xs:duration" use="required"/>
+							<xs:attribute name="vector" type="xs:string" use="optional"/>
+							<xs:attribute name="protocol" type="xs:string" use="optional"/>
+							<xs:attribute name="classification" type="xs:string" use="optional"/>
+							<xs:attribute name="code" type="xs:string" use="optional"/>
+							<xs:attribute name="message" type="xs:string" use="optional"/>
 						</xs:extension>
 					</xs:complexContent>
 				</xs:complexType>

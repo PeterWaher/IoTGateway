@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System;
+using System.Xml;
 using Waher.Runtime.Collections;
 
 namespace Waher.Security.WAF.Model
@@ -10,6 +11,15 @@ namespace Waher.Security.WAF.Model
 	public abstract class WafActions : WafAction
 	{
 		private readonly WafAction[] actions;
+
+		/// <summary>
+		/// Abstract base class for Web Application Firewall actions containing other
+		/// child actions.
+		/// </summary>
+		public WafActions()
+		{
+			this.actions = Array.Empty<WafAction>();
+		}
 
 		/// <summary>
 		/// Abstract base class for Web Application Firewall actions containing other

@@ -17,6 +17,13 @@ namespace Waher.Security.WAF.Model
 		/// <summary>
 		/// Abstract base class for Web Application Firewall actions.
 		/// </summary>
+		public WafAction()
+		{
+		}
+
+		/// <summary>
+		/// Abstract base class for Web Application Firewall actions.
+		/// </summary>
 		/// <param name="Xml">XML definition.</param>
 		public WafAction(XmlElement Xml)
 		{

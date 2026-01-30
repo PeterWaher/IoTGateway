@@ -215,6 +215,15 @@
 					</xs:complexContent>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="Delay">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafAction">
+							<xs:attribute name="seconds" type="xs:positiveInteger" use="required"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
 		</xs:choice>
 	</xs:group>
 

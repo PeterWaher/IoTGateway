@@ -17,6 +17,7 @@ namespace Waher.Security.WAF.Model
 		/// child actions.
 		/// </summary>
 		public WafActions()
+			: base()
 		{
 			this.actions = Array.Empty<WafAction>();
 		}

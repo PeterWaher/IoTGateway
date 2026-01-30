@@ -1,21 +1,12 @@
 ﻿using System.Xml;
-using Waher.Content;
-using Waher.Content.Xml;
 
 namespace Waher.Security.WAF.Model.Actions
 {
 	/// <summary>
 	/// Checks if an endpoint has an Open Intelligence record associated with it.
 	/// </summary>
-	public class HasOpenIntelligence : WafActionWithTags
+	public class HasOpenIntelligence : WafActionOpenIntelligence
 	{
-		private readonly Duration duration;
-		private readonly string vector;
-		private readonly string protocol;
-		private readonly string classification;
-		private readonly string code;
-		private readonly string message;
-
 		/// <summary>
 		/// Checks if an endpoint has an Open Intelligence record associated with it.
 		/// </summary>
@@ -31,12 +22,6 @@ namespace Waher.Security.WAF.Model.Actions
 		public HasOpenIntelligence(XmlElement Xml)
 			: base(Xml)
 		{
-			this.duration = XML.Attribute(Xml, "duration", Duration.Zero);
-			this.vector = XML.Attribute(Xml, "vector");
-			this.protocol = XML.Attribute(Xml, "protocol");
-			this.classification = XML.Attribute(Xml, "classification");
-			this.code = XML.Attribute(Xml, "code");
-			this.message = XML.Attribute(Xml, "message");
 		}
 
 		/// <summary>

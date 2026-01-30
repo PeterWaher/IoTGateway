@@ -5,7 +5,7 @@ namespace Waher.Security.WAF.Model.Comparisons
 	/// <summary>
 	/// Checks if the remote endpoint has made too many connections.
 	/// </summary>
-	public class ConnectionsExceeded : RateExceeded
+	public class ConnectionsExceeded : RateLimitComparison
 	{
 		/// <summary>
 		/// Checks if the remote endpoint has made too many connections.

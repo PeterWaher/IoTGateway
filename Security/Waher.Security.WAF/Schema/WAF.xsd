@@ -46,14 +46,14 @@
 			<xs:element name="CertificateSerialNumberMatch" type="WafCondition"/>
 			<xs:element name="HeaderMatch" type="WafNamedCondition"/>
 			<xs:element name="QueryMatch" type="WafNamedCondition"/>
-			<xs:element name="IsBlocked" type="WafActions"/>
-			<xs:element name="IsPermanentlyBlocked" type="WafActions"/>
-			<xs:element name="IsTemporarilyBlocked" type="WafActions"/>
-			<xs:element name="IsUnencrypted" type="WafActions"/>
+			<xs:element name="IsBlocked" type="WafComparison"/>
+			<xs:element name="IsPermanentlyBlocked" type="WafComparison"/>
+			<xs:element name="IsTemporarilyBlocked" type="WafComparison"/>
+			<xs:element name="IsUnencrypted" type="WafComparison"/>
 			<xs:element name="IsEncrypted">
 				<xs:complexType>
 					<xs:complexContent>
-						<xs:extension base="WafActions">
+						<xs:extension base="WafComparison">
 							<xs:attribute name="minSecurityStrength" type="xs:positiveInteger" use="required"/>
 						</xs:extension>
 					</xs:complexContent>
@@ -62,55 +62,20 @@
 			<xs:element name="IsContent">
 				<xs:complexType>
 					<xs:complexContent>
-						<xs:extension base="WafActions">
+						<xs:extension base="WafComparison">
 							<xs:attribute name="manifestFile" type="xs:string" use="required"/>
 						</xs:extension>
 					</xs:complexContent>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="RequestsExceeded">
-				<xs:complexType>
-					<xs:complexContent>
-						<xs:extension base="WafActions">
-							<xs:attribute name="duration" type="xs:duration" use="required"/>
-							<xs:attribute name="limit" type="xs:positiveInteger" use="required"/>
-						</xs:extension>
-					</xs:complexContent>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="BytesExceeded">
-				<xs:complexType>
-					<xs:complexContent>
-						<xs:extension base="WafActions">
-							<xs:attribute name="duration" type="xs:duration" use="required"/>
-							<xs:attribute name="limit" type="xs:positiveInteger" use="required"/>
-						</xs:extension>
-					</xs:complexContent>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="ConnectionsExceeded">
-				<xs:complexType>
-					<xs:complexContent>
-						<xs:extension base="WafActions">
-							<xs:attribute name="duration" type="xs:duration" use="required"/>
-							<xs:attribute name="limit" type="xs:positiveInteger" use="required"/>
-						</xs:extension>
-					</xs:complexContent>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="ContentSizeExceeded">
-				<xs:complexType>
-					<xs:complexContent>
-						<xs:extension base="WafActions">
-							<xs:attribute name="limit" type="xs:positiveInteger" use="required"/>
-						</xs:extension>
-					</xs:complexContent>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="RequestsExceeded" type="RateLimitComparison"/>
+			<xs:element name="BytesExceeded" type="RateLimitComparison"/>
+			<xs:element name="ConnectionsExceeded" type="RateLimitComparison"/>
+			<xs:element name="ContentSizeExceeded" type="LimitComparison"/>
 			<xs:element name="FromIpLocation">
 				<xs:complexType>
 					<xs:complexContent>
-						<xs:extension base="WafActions">
+						<xs:extension base="WafComparison">
 							<xs:attribute name="country" type="xs:string" use="optional"/>
 							<xs:attribute name="region" type="xs:string" use="optional"/>
 							<xs:attribute name="city" type="xs:string" use="optional"/>
@@ -122,7 +87,7 @@
 			<xs:element name="FromIp">
 				<xs:complexType>
 					<xs:complexContent>
-						<xs:extension base="WafActions">
+						<xs:extension base="WafComparison">
 							<xs:attribute name="value" type="xs:string" use="required"/>
 						</xs:extension>
 					</xs:complexContent>
@@ -131,15 +96,7 @@
 			<xs:element name="LogEvent">
 				<xs:complexType>
 					<xs:complexContent>
-						<xs:extension base="WafAction">
-							<xs:sequence>
-								<xs:element name="Tag" minOccurs="0" maxOccurs="unbounded">
-									<xs:complexType>
-										<xs:attribute name="name" type="xs:string" use="required"/>
-										<xs:attribute name="value" type="xs:string" use="required"/>
-									</xs:complexType>
-								</xs:element>
-							</xs:sequence>
+						<xs:extension base="WafActionWithTags">
 							<xs:attribute name="message" type="xs:string" use="required"/>
 							<xs:attribute name="type" type="EventType" use="optional" default="Informational"/>
 							<xs:attribute name="level" type="EventLevel" use="optional" default="Minor"/>
@@ -156,65 +113,15 @@
 			<xs:element name="LedgerEntry">
 				<xs:complexType>
 					<xs:complexContent>
-						<xs:extension base="WafAction">
-							<xs:sequence>
-								<xs:element name="Property" minOccurs="0" maxOccurs="unbounded">
-									<xs:complexType>
-										<xs:attribute name="name" type="xs:string" use="required"/>
-										<xs:attribute name="value" type="xs:string" use="required"/>
-									</xs:complexType>
-								</xs:element>
-							</xs:sequence>
+						<xs:extension base="WafActionWithTags">
 							<xs:attribute name="collection" type="EventLevel" use="required"/>
 							<xs:attribute name="type" type="xs:string" use="required"/>
 						</xs:extension>
 					</xs:complexContent>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="AddOpenIntelligence">
-				<xs:complexType>
-					<xs:complexContent>
-						<xs:extension base="WafAction">
-							<xs:sequence>
-								<xs:element name="Tag" minOccurs="0" maxOccurs="unbounded">
-									<xs:complexType>
-										<xs:attribute name="name" type="xs:string" use="required"/>
-										<xs:attribute name="value" type="xs:string" use="required"/>
-									</xs:complexType>
-								</xs:element>
-							</xs:sequence>
-							<xs:attribute name="duration" type="xs:duration" use="required"/>
-							<xs:attribute name="vector" type="xs:string" use="optional"/>
-							<xs:attribute name="protocol" type="xs:string" use="optional"/>
-							<xs:attribute name="classification" type="xs:string" use="optional"/>
-							<xs:attribute name="code" type="xs:string" use="optional"/>
-							<xs:attribute name="message" type="xs:string" use="optional"/>
-						</xs:extension>
-					</xs:complexContent>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="HasOpenIntelligence">
-				<xs:complexType>
-					<xs:complexContent>
-						<xs:extension base="WafAction">
-							<xs:sequence>
-								<xs:element name="Tag" minOccurs="0" maxOccurs="unbounded">
-									<xs:complexType>
-										<xs:attribute name="name" type="xs:string" use="required"/>
-										<xs:attribute name="value" type="xs:string" use="required"/>
-									</xs:complexType>
-								</xs:element>
-							</xs:sequence>
-							<xs:attribute name="duration" type="xs:duration" use="required"/>
-							<xs:attribute name="vector" type="xs:string" use="optional"/>
-							<xs:attribute name="protocol" type="xs:string" use="optional"/>
-							<xs:attribute name="classification" type="xs:string" use="optional"/>
-							<xs:attribute name="code" type="xs:string" use="optional"/>
-							<xs:attribute name="message" type="xs:string" use="optional"/>
-						</xs:extension>
-					</xs:complexContent>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="AddOpenIntelligence" type="WafActionOpenIntelligence"/>
+			<xs:element name="HasOpenIntelligence" type="WafActionOpenIntelligence"/>
 			<xs:element name="Delay">
 				<xs:complexType>
 					<xs:complexContent>
@@ -261,9 +168,15 @@
 		</xs:complexContent>
 	</xs:complexType>
 
+	<xs:complexType name="WafComparison">
+		<xs:complexContent>
+			<xs:extension base="WafActions"/>
+		</xs:complexContent>
+	</xs:complexType>
+
 	<xs:complexType name="WafCondition">
 		<xs:complexContent>
-			<xs:extension base="WafActions">
+			<xs:extension base="WafComparison">
 				<xs:attribute name="value" type="xs:string" use="required"/>
 				<xs:attribute name="mode" type="ComparisonMode" use="required"/>
 			</xs:extension>
@@ -294,5 +207,49 @@
 			<xs:enumeration value="DatabaseList"/>
 		</xs:restriction>
 	</xs:simpleType>
+
+	<xs:complexType name="LimitComparison">
+		<xs:complexContent>
+			<xs:extension base="WafActions">
+				<xs:attribute name="limit" type="xs:positiveInteger" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="RateLimitComparison">
+		<xs:complexContent>
+			<xs:extension base="LimitComparison">
+				<xs:attribute name="duration" type="xs:duration" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="WafActionWithTags">
+		<xs:complexContent>
+			<xs:extension base="WafAction">
+				<xs:sequence>
+					<xs:element name="Tag" minOccurs="0" maxOccurs="unbounded">
+						<xs:complexType>
+							<xs:attribute name="name" type="xs:string" use="required"/>
+							<xs:attribute name="value" type="xs:string" use="required"/>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="WafActionOpenIntelligence">
+		<xs:complexContent>
+			<xs:extension base="WafActionWithTags">
+				<xs:attribute name="duration" type="xs:duration" use="required"/>
+				<xs:attribute name="vector" type="xs:string" use="optional"/>
+				<xs:attribute name="protocol" type="xs:string" use="optional"/>
+				<xs:attribute name="classification" type="xs:string" use="optional"/>
+				<xs:attribute name="code" type="xs:string" use="optional"/>
+				<xs:attribute name="message" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
 </xs:schema>

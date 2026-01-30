@@ -5,40 +5,33 @@ using Waher.Content.Xml;
 namespace Waher.Security.WAF.Model.Comparisons
 {
 	/// <summary>
-	/// Abstract base class for rate comparisons.
+	/// Abstract base class for rate limit comparisons.
 	/// </summary>
-	public abstract class RateExceeded : WafComparison
+	public abstract class RateLimitComparison : LimitComparison
 	{
 		private readonly Duration duration;
-		private readonly long limit;
 
 		/// <summary>
-		/// Abstract base class for rate comparisons.
+		/// Abstract base class for rate limit comparisons.
 		/// </summary>
-		public RateExceeded()
+		public RateLimitComparison()
 			: base()
 		{
 		}
 
 		/// <summary>
-		/// Abstract base class for rate comparisons.
+		/// Abstract base class for rate limit comparisons.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
-		public RateExceeded(XmlElement Xml)
+		public RateLimitComparison(XmlElement Xml)
 			: base(Xml)
 		{
 			this.duration = XML.Attribute(Xml, "duration", Duration.Zero);
-			this.limit = XML.Attribute(Xml, "limit", 0L);
 		}
 
 		/// <summary>
 		/// Window duration.
 		/// </summary>
 		public Duration Duration => this.duration;
-
-		/// <summary>
-		/// Rate limit during <see cref="Duration"/>.
-		/// </summary>
-		public long Limit => this.limit;
 	}
 }

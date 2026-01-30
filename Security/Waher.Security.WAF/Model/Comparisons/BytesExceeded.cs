@@ -5,7 +5,7 @@ namespace Waher.Security.WAF.Model.Comparisons
 	/// <summary>
 	/// Checks if the remote endpoint has sent too much bytes.
 	/// </summary>
-	public class BytesExceeded : RateExceeded
+	public class BytesExceeded : RateLimitComparison
 	{
 		/// <summary>
 		/// Checks if the remote endpoint has sent too much bytes.

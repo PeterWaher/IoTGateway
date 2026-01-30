@@ -1,27 +1,27 @@
 ﻿using System.Xml;
 
-namespace Waher.Security.WAF.Model.Conditions
+namespace Waher.Security.WAF.Model.Runtime
 {
 	/// <summary>
-	/// Checks for a match against the Resource of the request.
+	/// Goes to another action with a given identity.
 	/// </summary>
-	public class ResourceMatch : WafCondition
+	public class GoTo : WafActionReference
 	{
 		/// <summary>
-		/// Checks for a match against the Resource of the request.
+		/// Goes to another action with a given identity.
 		/// </summary>
-		public ResourceMatch()
+		public GoTo()
 			: base()
 		{
 		}
 
 		/// <summary>
-		/// Checks for a match against the Resource of the request.
+		/// Goes to another action with a given identity.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
 		/// <param name="Parent">Parent node.</param>
 		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
-		public ResourceMatch(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
+		public GoTo(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
 			: base(Xml, Parent, Document)
 		{
 		}
@@ -29,7 +29,7 @@ namespace Waher.Security.WAF.Model.Conditions
 		/// <summary>
 		/// XML Local Name for the XML element defining the action.
 		/// </summary>
-		public override string LocalName => nameof(ResourceMatch);
+		public override string LocalName => nameof(GoTo);
 
 		/// <summary>
 		/// Creates a WAF action from its XML definition.
@@ -38,6 +38,6 @@ namespace Waher.Security.WAF.Model.Conditions
 		/// <param name="Parent">Parent node.</param>
 		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
 		/// <returns>Created action object.</returns>
-		public override WafAction Create(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document) => new ResourceMatch(Xml, Parent, Document);
+		public override WafAction Create(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document) => new GoTo(Xml, Parent, Document);
 	}
 }

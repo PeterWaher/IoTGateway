@@ -23,8 +23,9 @@ namespace Waher.Security.WAF.Model
 		/// Root object of Web Application Firewall rules.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
-		public Root(XmlElement Xml)
-			: base(Xml)
+		/// <param name="Document">Web Application Firewall document.</param>
+		public Root(XmlElement Xml, WebApplicationFirewall Document)
+			: base(Xml, null, Document)
 		{
 			this.defaultResult = XML.Attribute(Xml, "defaultResult", WafResult.Allow);
 		}
@@ -43,7 +44,9 @@ namespace Waher.Security.WAF.Model
 		/// Creates a WAF action from its XML definition.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
+		/// <param name="Parent">Parent node.</param>
+		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
 		/// <returns>Created action object.</returns>
-		public override WafAction Create(XmlElement Xml) => new Root(Xml);
+		public override WafAction Create(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document) => new Root(Xml, Document);
 	}
 }

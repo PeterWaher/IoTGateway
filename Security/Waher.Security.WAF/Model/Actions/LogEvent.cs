@@ -30,8 +30,10 @@ namespace Waher.Security.WAF.Model.Actions
 		/// Logs an event to the event log
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
-		public LogEvent(XmlElement Xml)
-			: base(Xml)
+		/// <param name="Parent">Parent node.</param>
+		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
+		public LogEvent(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
+			: base(Xml, Parent, Document)
 		{
 			this.message = XML.Attribute(Xml, "message");
 			this.type = XML.Attribute(Xml, "type");
@@ -53,7 +55,9 @@ namespace Waher.Security.WAF.Model.Actions
 		/// Creates a WAF action from its XML definition.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
+		/// <param name="Parent">Parent node.</param>
+		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
 		/// <returns>Created action object.</returns>
-		public override WafAction Create(XmlElement Xml) => new LogEvent(Xml);
+		public override WafAction Create(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document) => new LogEvent(Xml, Parent, Document);
 	}
 }

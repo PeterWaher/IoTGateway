@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
@@ -25,6 +26,7 @@ namespace Waher.Security.WAF
 		/// </summary>
 		private static readonly XmlSchema schema = XSL.LoadSchema(typeof(WebApplicationFirewall).Namespace + ".Schema.WAF.xsd");
 
+		private readonly Dictionary<string, WafAction> actionsById = new Dictionary<string, WafAction>();
 		private readonly Root root;
 
 		/// <summary>
@@ -51,7 +53,7 @@ namespace Waher.Security.WAF
 		/// <param name="Xml">XML Definition</param>
 		public WebApplicationFirewall(XmlElement Xml)
 		{
-			this.root = WafAction.Parse(Xml) as Root;
+			this.root = WafAction.Parse(Xml, null, this) as Root;
 			if (this.root is null)
 				throw new Exception("Invalid root element of WAF definition.");	
 		}
@@ -66,6 +68,16 @@ namespace Waher.Security.WAF
 			XmlDocument Doc = XML.LoadFromFile(FileName, true);
 			XSL.Validate(FileName, Doc, nameof(Root), Namespace, schema);
 			return new WebApplicationFirewall(Doc);
+		}
+
+		/// <summary>
+		/// Registers an action by its ID.
+		/// </summary>
+		/// <param name="Action">Action</param>
+		internal void RegisterAction(WafAction Action)
+		{
+			if (!string.IsNullOrEmpty(Action.Id))
+				this.actionsById[Action.Id] = Action;
 		}
 
 		/// <summary>

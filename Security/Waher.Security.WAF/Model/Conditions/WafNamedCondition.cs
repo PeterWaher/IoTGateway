@@ -22,8 +22,10 @@ namespace Waher.Security.WAF.Model.Conditions
 		/// Abstract base class for Web Application Firewall conditions.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
-		public WafNamedCondition(XmlElement Xml)
-			: base(Xml)
+		/// <param name="Parent">Parent node.</param>
+		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
+		public WafNamedCondition(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
+			: base(Xml, Parent, Document)
 		{
 			this.name = XML.Attribute(Xml, "name");
 		}

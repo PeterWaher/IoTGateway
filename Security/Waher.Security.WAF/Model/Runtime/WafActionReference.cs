@@ -1,19 +1,19 @@
 ﻿using System.Xml;
-using Waher.Runtime.Collections;
+using Waher.Content.Xml;
 
-namespace Waher.Security.WAF.Model.Actions
+namespace Waher.Security.WAF.Model.Runtime
 {
 	/// <summary>
 	/// Abstract base class for WAF actions that has tags.
 	/// </summary>
-	public abstract class WafActionWithTags : WafActions
+	public abstract class WafActionReference : WafActions
 	{
-		private readonly Tag[] tags;
+		private readonly string reference;
 
 		/// <summary>
 		/// Abstract base class for WAF actions that has tags.
 		/// </summary>
-		public WafActionWithTags()
+		public WafActionReference()
 			: base()
 		{
 		}
@@ -24,23 +24,15 @@ namespace Waher.Security.WAF.Model.Actions
 		/// <param name="Xml">XML definition.</param>
 		/// <param name="Parent">Parent node.</param>
 		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
-		public WafActionWithTags(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
+		public WafActionReference(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
 			: base(Xml, Parent, Document)
 		{
-			ChunkedList<Tag> Tags = new ChunkedList<Tag>();
-
-			foreach (WafAction Action in this.Actions)
-			{
-				if (Action is Tag Tag)
-					Tags.Add(Tag);
-			}
-
-			this.tags = Tags.ToArray();
+			this.reference = XML.Attribute(Xml, "reference");
 		}
 
 		/// <summary>
-		/// Tags
+		/// Node reference.
 		/// </summary>
-		public Tag[] Tags => this.tags;
+		public string Reference => this.reference;
 	}
 }

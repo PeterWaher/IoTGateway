@@ -28,8 +28,10 @@ namespace Waher.Security.WAF.Model.Actions
 		/// Abstract base class for Web Application Firewall Open Intelligence actions.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
-		public WafActionOpenIntelligence(XmlElement Xml)
-			: base(Xml)
+		/// <param name="Parent">Parent node.</param>
+		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
+		public WafActionOpenIntelligence(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
+			: base(Xml, Parent, Document)
 		{
 			this.duration = XML.Attribute(Xml, "duration", Duration.Zero);
 			this.vector = XML.Attribute(Xml, "vector");

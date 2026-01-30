@@ -16,7 +16,9 @@ namespace Waher.Security.WAF.Model
 		/// Creates a WAF action from its XML definition.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
+		/// <param name="Parent">Parent node.</param>
+		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
 		/// <returns>Created action object.</returns>
-		WafAction Create(XmlElement Xml);
+		WafAction Create(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document);
 	}
 }

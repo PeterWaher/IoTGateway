@@ -23,8 +23,10 @@ namespace Waher.Security.WAF.Model.Comparisons
 		/// Abstract base class for rate limit comparisons.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
-		public RateLimitComparison(XmlElement Xml)
-			: base(Xml)
+		/// <param name="Parent">Parent node.</param>
+		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
+		public RateLimitComparison(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
+			: base(Xml, Parent, Document)
 		{
 			this.duration = XML.Attribute(Xml, "duration", Duration.Zero);
 		}

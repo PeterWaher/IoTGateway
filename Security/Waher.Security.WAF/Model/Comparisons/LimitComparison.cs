@@ -9,7 +9,6 @@ namespace Waher.Security.WAF.Model.Comparisons
 	/// </summary>
 	public abstract class LimitComparison : WafComparison
 	{
-		private readonly Duration duration;
 		private readonly long limit;
 
 		/// <summary>
@@ -24,8 +23,10 @@ namespace Waher.Security.WAF.Model.Comparisons
 		/// Abstract base class for limit comparisons.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
-		public LimitComparison(XmlElement Xml)
-			: base(Xml)
+		/// <param name="Parent">Parent node.</param>
+		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
+		public LimitComparison(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
+			: base(Xml, Parent, Document)
 		{
 			this.limit = XML.Attribute(Xml, "limit", 0L);
 		}

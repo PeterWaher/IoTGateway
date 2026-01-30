@@ -19,8 +19,10 @@ namespace Waher.Security.WAF.Model.Conditions
 		/// Checks for a match against the Header of the request.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
-		public HeaderMatch(XmlElement Xml)
-			: base(Xml)
+		/// <param name="Parent">Parent node.</param>
+		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
+		public HeaderMatch(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
+			: base(Xml, Parent, Document)
 		{
 		}
 
@@ -33,7 +35,9 @@ namespace Waher.Security.WAF.Model.Conditions
 		/// Creates a WAF action from its XML definition.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
+		/// <param name="Parent">Parent node.</param>
+		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
 		/// <returns>Created action object.</returns>
-		public override WafAction Create(XmlElement Xml) => new HeaderMatch(Xml);
+		public override WafAction Create(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document) => new HeaderMatch(Xml, Parent, Document);
 	}
 }

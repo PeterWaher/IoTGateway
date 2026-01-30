@@ -27,15 +27,17 @@ namespace Waher.Security.WAF.Model
 		/// child actions.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
-		public WafActions(XmlElement Xml)
-			: base(Xml)
+		/// <param name="Parent">Parent node.</param>
+		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
+		public WafActions(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
+			: base(Xml, Parent, Document)
 		{
 			ChunkedList<WafAction> Actions = new ChunkedList<WafAction>();
 
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
 				if (N is XmlElement E)
-					Actions.Add(Parse(E));
+					Actions.Add(Parse(E, this, Document));
 			}
 
 			this.actions = Actions.ToArray();

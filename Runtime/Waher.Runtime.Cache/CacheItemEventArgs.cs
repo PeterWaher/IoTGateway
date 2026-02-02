@@ -18,7 +18,7 @@ namespace Waher.Runtime.Cache
         NotUsed,
 
         /// <summary>
-        /// Item is too old.
+        /// Item is too old, or has expired.
         /// </summary>
         Old,
 

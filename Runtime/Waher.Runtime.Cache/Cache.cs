@@ -18,6 +18,7 @@ namespace Waher.Runtime.Cache
 		private readonly Dictionary<KeyType, CacheItem<KeyType, ValueType>> valuesByKey = new Dictionary<KeyType, CacheItem<KeyType, ValueType>>();
 		private readonly SortedDictionary<DateTime, KeyType> keysByLastUsage = new SortedDictionary<DateTime, KeyType>();
 		private readonly SortedDictionary<DateTime, KeyType> keysByCreation = new SortedDictionary<DateTime, KeyType>();
+		private readonly SortedDictionary<DateTime, KeyType> keysByExpiry = new SortedDictionary<DateTime, KeyType>();
 		private readonly Random rnd = new Random();
 		private readonly object synchObject = new object();
 		private readonly int maxItems;
@@ -25,6 +26,9 @@ namespace Waher.Runtime.Cache
 		private TimeSpan maxTimeUsed;
 		private TimeSpan maxTimeUnused;
 		private Timer timer;
+		private int maxTimerIntervalMs = 5000;
+		private int minTimerIntervalMs = 100;
+		private bool hasExplicitExpiry = false;
 
 		/// <summary>
 		/// Implements an in-memory cache.
@@ -57,16 +61,35 @@ namespace Waher.Runtime.Cache
 
 		private void CreateTimerLocked()
 		{
-			if (this.maxTimeUsed < TimeSpan.MaxValue || this.maxTimeUnused < TimeSpan.MaxValue)
+			if (this.maxTimeUsed < TimeSpan.MaxValue ||
+				this.maxTimeUnused < TimeSpan.MaxValue)
 			{
-				int Interval = Math.Min((int)((this.maxTimeUnused.TotalMilliseconds / 2) + 0.5), 5000);
-				if (Interval < 100)
-					Interval = 100;
+				int Interval = Math.Min((int)((this.maxTimeUnused.TotalMilliseconds / 2) + 0.5), this.maxTimerIntervalMs);
+				if (Interval < this.minTimerIntervalMs)
+					Interval = this.minTimerIntervalMs;
 
 				this.timer = new Timer(this.TimerCallback, null, Interval, Interval);
 			}
 			else
 				this.timer = null;
+		}
+
+		/// <summary>
+		/// Minimum expiry timer interval, in milliseconds.
+		/// </summary>
+		public int MinTimerIntervalMs
+		{
+			get => this.minTimerIntervalMs;
+			set => this.minTimerIntervalMs = value;
+		}
+
+		/// <summary>
+		/// Maximum expiry timer interval, in milliseconds.
+		/// </summary>
+		public int MaxTimerIntervalMs
+		{
+			get => this.maxTimerIntervalMs;
+			set => this.maxTimerIntervalMs = value;
 		}
 
 		/// <summary>
@@ -88,8 +111,10 @@ namespace Waher.Runtime.Cache
 		{
 			ChunkedList<CacheItem<KeyType, ValueType>> ToRemoveNotUsed = null;
 			ChunkedList<CacheItem<KeyType, ValueType>> ToRemoveOld = null;
-			DateTime Now = DateTime.Now;
+			ChunkedList<CacheItem<KeyType, ValueType>> ToRemoveExpired = null;
+			DateTime UtcNow = DateTime.UtcNow;
 			DateTime Limit;
+			bool Removed = false;
 
 			try
 			{
@@ -97,7 +122,7 @@ namespace Waher.Runtime.Cache
 				{
 					if (this.maxTimeUnused < TimeSpan.MaxValue)
 					{
-						Limit = Now - this.maxTimeUnused;
+						Limit = UtcNow - this.maxTimeUnused;
 
 						foreach (KeyValuePair<DateTime, KeyType> P in this.keysByLastUsage)
 						{
@@ -124,22 +149,24 @@ namespace Waher.Runtime.Cache
 									this.valuesByKey.Remove(Item.Key);
 									this.keysByCreation.Remove(Item.Created);
 									this.keysByLastUsage.Remove(Item.LastUsed);
+
+									if (Item.Expires.HasValue &&
+										this.keysByExpiry.Remove(Item.Expires.Value))
+									{
+										this.hasExplicitExpiry = this.keysByExpiry.Count > 0;
+									}
 								}
 
 								Loop = Loop.Next;
 							}
 
-							if (this.valuesByKey.Count == 0)
-							{
-								this.timer?.Dispose();
-								this.timer = null;
-							}
+							Removed = true;
 						}
 					}
 
 					if (this.maxTimeUsed < TimeSpan.MaxValue)
 					{
-						Limit = Now - this.maxTimeUsed;
+						Limit = UtcNow - this.maxTimeUsed;
 
 						foreach (KeyValuePair<DateTime, KeyType> P in this.keysByCreation)
 						{
@@ -166,17 +193,63 @@ namespace Waher.Runtime.Cache
 									this.valuesByKey.Remove(Item.Key);
 									this.keysByCreation.Remove(Item.Created);
 									this.keysByLastUsage.Remove(Item.LastUsed);
+
+									if (Item.Expires.HasValue &&
+										this.keysByExpiry.Remove(Item.Expires.Value))
+									{
+										this.hasExplicitExpiry = this.keysByExpiry.Count > 0;
+									}
 								}
 
 								Loop = Loop.Next;
 							}
 
-							if (this.valuesByKey.Count == 0)
-							{
-								this.timer?.Dispose();
-								this.timer = null;
-							}
+							Removed = true;
 						}
+					}
+
+					if (this.hasExplicitExpiry)
+					{
+						foreach (KeyValuePair<DateTime, KeyType> P in this.keysByExpiry)
+						{
+							if (P.Key > UtcNow)
+								break;
+
+							if (ToRemoveExpired is null)
+								ToRemoveExpired = new ChunkedList<CacheItem<KeyType, ValueType>>();
+
+							ToRemoveExpired.Add(this.valuesByKey[P.Value]);
+						}
+
+						if (!(ToRemoveExpired is null))
+						{
+							ChunkNode<CacheItem<KeyType, ValueType>> Loop = ToRemoveExpired.FirstChunk;
+							CacheItem<KeyType, ValueType> Item;
+
+							while (!(Loop is null))
+							{
+								for (int i = Loop.Start, c = Loop.Pos; i < c; i++)
+								{
+									Item = Loop[i];
+
+									this.valuesByKey.Remove(Item.Key);
+									this.keysByCreation.Remove(Item.Created);
+									this.keysByLastUsage.Remove(Item.LastUsed);
+									this.keysByExpiry.Remove(Item.Expires.Value);
+								}
+
+								Loop = Loop.Next;
+							}
+
+							this.hasExplicitExpiry = this.keysByExpiry.Count > 0;
+							Removed = true;
+						}
+					}
+
+					if (Removed && this.valuesByKey.Count == 0)
+					{
+						this.timer?.Dispose();
+						this.timer = null;
 					}
 				}
 
@@ -185,6 +258,9 @@ namespace Waher.Runtime.Cache
 
 				if (!(ToRemoveOld is null))
 					this.OnRemoved(ToRemoveOld, RemovedReason.Old);
+
+				if (!(ToRemoveExpired is null))
+					this.OnRemoved(ToRemoveExpired, RemovedReason.Old);
 			}
 			catch (Exception ex)
 			{
@@ -331,7 +407,7 @@ namespace Waher.Runtime.Cache
 
 		private DateTime GetLastUsageTimeLocked()
 		{
-			DateTime TP = DateTime.Now;
+			DateTime TP = DateTime.UtcNow;
 
 			while (this.keysByLastUsage.ContainsKey(TP))
 				TP = TP.AddTicks(this.rnd.Next(1, 10));
@@ -364,9 +440,43 @@ namespace Waher.Runtime.Cache
 		/// <summary>
 		/// Adds an item to the cache.
 		/// </summary>
-		/// <param name="Key"></param>
-		/// <param name="Value"></param>
+		/// <param name="Key">Key</param>
+		/// <param name="Value">Value</param>
 		public void Add(KeyType Key, ValueType Value)
+		{
+			this.Add(Key, Value, null, null);
+		}
+
+		/// <summary>
+		/// Adds an item to the cache.
+		/// </summary>
+		/// <param name="Key">Key</param>
+		/// <param name="Value">Value</param>
+		/// <param name="Expires">Explicit expiry time, if any.</param>
+		public void Add(KeyType Key, ValueType Value, DateTime? Expires)
+		{
+			this.Add(Key, Value, Expires, null);
+		}
+
+		/// <summary>
+		/// Adds an item to the cache.
+		/// </summary>
+		/// <param name="Key">Key</param>
+		/// <param name="Value">Value</param>
+		/// <param name="Expires">Relative expiry time, if any.</param>
+		public void Add(KeyType Key, ValueType Value, TimeSpan? Expires)
+		{
+			this.Add(Key, Value, null, Expires);
+		}
+
+		/// <summary>
+		/// Adds an item to the cache.
+		/// </summary>
+		/// <param name="Key">Key</param>
+		/// <param name="Value">Value</param>
+		/// <param name="Expires">Explicit expiry time, if any.</param>
+		/// <param name="Expires2">Relative expiry time, if any.</param>
+		private void Add(KeyType Key, ValueType Value, DateTime? Expires, TimeSpan? Expires2)
 		{
 			CacheItem<KeyType, ValueType> Prev;
 			CacheItem<KeyType, ValueType> Item;
@@ -379,6 +489,13 @@ namespace Waher.Runtime.Cache
 					this.valuesByKey.Remove(Key);
 					this.keysByCreation.Remove(Prev.Created);
 					this.keysByLastUsage.Remove(Prev.LastUsed);
+
+					if (Prev.Expires.HasValue &&
+						this.keysByExpiry.Remove(Prev.Expires.Value))
+					{
+						this.hasExplicitExpiry = this.keysByExpiry.Count > 0;
+					}
+
 					Reason = RemovedReason.Replaced;
 				}
 				else
@@ -404,6 +521,12 @@ namespace Waher.Runtime.Cache
 							this.valuesByKey.Remove(OldKey);
 							this.keysByCreation.Remove(Prev.Created);
 							this.keysByLastUsage.Remove(Prev.LastUsed);
+
+							if (Prev.Expires.HasValue &&
+								this.keysByExpiry.Remove(Prev.Expires.Value))
+							{
+								this.hasExplicitExpiry = this.keysByExpiry.Count > 0;
+							}
 						}
 						else
 							Prev = null;
@@ -412,16 +535,34 @@ namespace Waher.Runtime.Cache
 						Prev = null;
 				}
 
-				DateTime TP = DateTime.Now;
+				DateTime TP = DateTime.UtcNow;
 
-				while (this.keysByCreation.ContainsKey(TP) || this.keysByLastUsage.ContainsKey(TP))
+				while (this.keysByCreation.ContainsKey(TP) ||
+					this.keysByLastUsage.ContainsKey(TP))
+				{
 					TP = TP.AddTicks(this.rnd.Next(1, 10));
+				}
 
-				Item = new CacheItem<KeyType, ValueType>(Key, Value, TP);
+				if (Expires2.HasValue)
+					Expires = TP.Add(Expires2.Value);
+
+				if (Expires.HasValue)
+				{
+					while (this.keysByExpiry.ContainsKey(Expires.Value))
+						Expires = Expires.Value.AddTicks(this.rnd.Next(1, 10));
+				}
+
+				Item = new CacheItem<KeyType, ValueType>(Key, Value, TP, Expires);
 
 				this.valuesByKey[Key] = Item;
 				this.keysByCreation[TP] = Key;
 				this.keysByLastUsage[TP] = Key;
+
+				if (Expires.HasValue)
+				{
+					this.keysByExpiry[Expires.Value] = Key;
+					this.hasExplicitExpiry = true;
+				}
 
 				if (this.timer is null)
 					this.CreateTimerLocked();
@@ -481,6 +622,12 @@ namespace Waher.Runtime.Cache
 				this.keysByCreation.Remove(Item.Created);
 				this.keysByLastUsage.Remove(Item.LastUsed);
 
+				if (Item.Expires.HasValue &&
+					this.keysByExpiry.Remove(Item.Expires.Value))
+				{
+					this.hasExplicitExpiry = this.keysByExpiry.Count > 0;
+				}
+
 				if (this.valuesByKey.Count == 0)
 				{
 					this.timer?.Dispose();
@@ -512,6 +659,8 @@ namespace Waher.Runtime.Cache
 				this.valuesByKey.Clear();
 				this.keysByLastUsage.Clear();
 				this.keysByCreation.Clear();
+				this.keysByExpiry.Clear();
+				this.hasExplicitExpiry = false;
 
 				this.timer?.Dispose();
 				this.timer = null;

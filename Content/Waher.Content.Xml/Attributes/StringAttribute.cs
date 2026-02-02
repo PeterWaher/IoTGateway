@@ -13,7 +13,6 @@ namespace Waher.Content.Xml.Attributes
 		/// </summary>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="Value">Attribute value.</param>
-		/// <param name="Document">Document hosting the attribute.</param>
 		public StringAttribute(string AttributeName, string Value)
 			: base(AttributeName, Value)
 		{
@@ -24,7 +23,6 @@ namespace Waher.Content.Xml.Attributes
 		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="AttributeName">Attribute name.</param>
-		/// <param name="Document">Document hosting the attribute.</param>
 		public StringAttribute(XmlElement E, string AttributeName)
 			: base(E, AttributeName, true)
 		{
@@ -35,7 +33,6 @@ namespace Waher.Content.Xml.Attributes
 		/// </summary>
 		/// <param name="AttributeName">Attribute name.</param>
 		/// <param name="Expression">Expression.</param>
-		/// <param name="Document">Document hosting the attribute.</param>
 		public StringAttribute(string AttributeName, Expression Expression)
 			: base(AttributeName, Expression)
 		{

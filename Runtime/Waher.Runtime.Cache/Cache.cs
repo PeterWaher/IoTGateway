@@ -548,6 +548,9 @@ namespace Waher.Runtime.Cache
 
 				if (Expires.HasValue)
 				{
+					if (Expires.Value.Kind != DateTimeKind.Utc)
+						Expires = Expires.Value.ToUniversalTime();
+
 					while (this.keysByExpiry.ContainsKey(Expires.Value))
 						Expires = Expires.Value.AddTicks(this.rnd.Next(1, 10));
 				}

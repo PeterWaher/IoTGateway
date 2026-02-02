@@ -18,6 +18,7 @@ namespace Waher.Content.Xml.Attributes
 		private readonly bool hasPresetValue;
 		private readonly Expression expression;
 		private readonly string name;
+		private readonly bool isEmpty;
 
 		/// <summary>
 		/// Manages an attribute value or expression.
@@ -30,6 +31,7 @@ namespace Waher.Content.Xml.Attributes
 			this.presetValue = Value;
 			this.hasPresetValue = true;
 			this.expression = null;
+			this.isEmpty = false;
 		}
 
 		/// <summary>
@@ -66,6 +68,8 @@ namespace Waher.Content.Xml.Attributes
 					}
 				}
 
+				this.isEmpty = c == 0;
+
 				if (this.TryParse(Value, out T ParsedValue))
 				{
 					this.presetValue = ParsedValue;
@@ -80,6 +84,7 @@ namespace Waher.Content.Xml.Attributes
 				this.presetValue = default;
 				this.expression = null;
 				this.hasPresetValue = false;
+				this.isEmpty = true;
 			}
 		}
 
@@ -120,6 +125,11 @@ namespace Waher.Content.Xml.Attributes
 		/// If the attribute is defined by an expression.
 		/// </summary>
 		public bool HasExpression => !(this.expression is null);
+
+		/// <summary>
+		/// If attribute is empty.
+		/// </summary>
+		public bool IsEmpty => this.isEmpty;
 
 		/// <summary>
 		/// If the attribute is undefined.

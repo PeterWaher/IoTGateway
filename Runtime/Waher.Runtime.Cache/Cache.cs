@@ -86,8 +86,8 @@ namespace Waher.Runtime.Cache
 
 		private void TimerCallback(object state)
 		{
-			ChunkedList<CacheItem<KeyType, ValueType>> ToRemove1 = null;
-			ChunkedList<CacheItem<KeyType, ValueType>> ToRemove2 = null;
+			ChunkedList<CacheItem<KeyType, ValueType>> ToRemoveNotUsed = null;
+			ChunkedList<CacheItem<KeyType, ValueType>> ToRemoveOld = null;
 			DateTime Now = DateTime.Now;
 			DateTime Limit;
 
@@ -104,15 +104,15 @@ namespace Waher.Runtime.Cache
 							if (P.Key > Limit)
 								break;
 
-							if (ToRemove1 is null)
-								ToRemove1 = new ChunkedList<CacheItem<KeyType, ValueType>>();
+							if (ToRemoveNotUsed is null)
+								ToRemoveNotUsed = new ChunkedList<CacheItem<KeyType, ValueType>>();
 
-							ToRemove1.Add(this.valuesByKey[P.Value]);
+							ToRemoveNotUsed.Add(this.valuesByKey[P.Value]);
 						}
 
-						if (!(ToRemove1 is null))
+						if (!(ToRemoveNotUsed is null))
 						{
-							ChunkNode<CacheItem<KeyType, ValueType>> Loop = ToRemove1.FirstChunk;
+							ChunkNode<CacheItem<KeyType, ValueType>> Loop = ToRemoveNotUsed.FirstChunk;
 							CacheItem<KeyType, ValueType> Item;
 
 							while (!(Loop is null))
@@ -146,15 +146,15 @@ namespace Waher.Runtime.Cache
 							if (P.Key > Limit)
 								break;
 
-							if (ToRemove2 is null)
-								ToRemove2 = new ChunkedList<CacheItem<KeyType, ValueType>>();
+							if (ToRemoveOld is null)
+								ToRemoveOld = new ChunkedList<CacheItem<KeyType, ValueType>>();
 
-							ToRemove2.Add(this.valuesByKey[P.Value]);
+							ToRemoveOld.Add(this.valuesByKey[P.Value]);
 						}
 
-						if (!(ToRemove2 is null))
+						if (!(ToRemoveOld is null))
 						{
-							ChunkNode<CacheItem<KeyType, ValueType>> Loop = ToRemove2.FirstChunk;
+							ChunkNode<CacheItem<KeyType, ValueType>> Loop = ToRemoveOld.FirstChunk;
 							CacheItem<KeyType, ValueType> Item;
 
 							while (!(Loop is null))
@@ -180,11 +180,11 @@ namespace Waher.Runtime.Cache
 					}
 				}
 
-				if (!(ToRemove1 is null))
-					this.OnRemoved(ToRemove1, RemovedReason.NotUsed);
+				if (!(ToRemoveNotUsed is null))
+					this.OnRemoved(ToRemoveNotUsed, RemovedReason.NotUsed);
 
-				if (!(ToRemove2 is null))
-					this.OnRemoved(ToRemove2, RemovedReason.Old);
+				if (!(ToRemoveOld is null))
+					this.OnRemoved(ToRemoveOld, RemovedReason.Old);
 			}
 			catch (Exception ex)
 			{

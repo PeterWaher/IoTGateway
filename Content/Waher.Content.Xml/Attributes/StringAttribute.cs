@@ -71,19 +71,5 @@ namespace Waher.Content.Xml.Attributes
 		{
 			return Value;
 		}
-
-		/// <summary>
-		/// Copies the attribute object if undefined, or defined by an expression.
-		/// Returns a reference to itself, if preset (set by a constant value).
-		/// </summary>
-		/// <param name="ForDocument">Document that will host the new attribute.</param>
-		/// <returns>Attribute reference.</returns>
-		public StringAttribute CopyIfNotPreset(Layout2DDocument ForDocument)
-		{
-			if (this.HasPresetValue)
-				return this;
-			else
-				return new StringAttribute(this.Name, this.Expression, ForDocument);
-		}
 	}
 }

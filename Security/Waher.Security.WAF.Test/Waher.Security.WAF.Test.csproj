@@ -12,11 +12,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Data\Test_01_Allow.xml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Data\Test_01_Allow.xml">
+    <Content Include="Data\Test_006_Close.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Test_005_Ignore.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Test_004_RateLimited.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Test_003_NotFound.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Test_002_Forbid.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Test_001_Allow.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

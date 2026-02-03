@@ -128,9 +128,60 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/A/C", 200, false)]
 		[DataRow("/B", 200, false)]
 		[DataRow("/X", 404, false)]
-		public async Task Test_01_Allow(string Resource, int ExpectedStatusCode, bool Encrypted)
+		public async Task Test_001_Allow(string Resource, int ExpectedStatusCode, bool Encrypted)
 		{
 			await Get(Resource, ExpectedStatusCode, Encrypted);
 		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false)]
+		[DataRow("/A/C", 403, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/X", 403, false)]
+		public async Task Test_002_Forbid(string Resource, int ExpectedStatusCode, bool Encrypted)
+		{
+			await Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 404, false)]
+		[DataRow("/A/C", 404, false)]
+		[DataRow("/B", 404, false)]
+		[DataRow("/X", 404, false)]
+		public async Task Test_003_NotFound(string Resource, int ExpectedStatusCode, bool Encrypted)
+		{
+			await Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 429, false)]
+		[DataRow("/A/C", 429, false)]
+		[DataRow("/B", 429, false)]
+		[DataRow("/X", 429, false)]
+		public async Task Test_004_RateLimited(string Resource, int ExpectedStatusCode, bool Encrypted)
+		{
+			await Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 429, false)]
+		[DataRow("/A/C", 429, false)]
+		[DataRow("/B", 429, false)]
+		[DataRow("/X", 429, false)]
+		public async Task Test_005_Ignore(string Resource, int ExpectedStatusCode, bool Encrypted)
+		{
+			await Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 429, false)]
+		[DataRow("/A/C", 429, false)]
+		[DataRow("/B", 429, false)]
+		[DataRow("/X", 429, false)]
+		public async Task Test_006_Close(string Resource, int ExpectedStatusCode, bool Encrypted)
+		{
+			await Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
 	}
 }

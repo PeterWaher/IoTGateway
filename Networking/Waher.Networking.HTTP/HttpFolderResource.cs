@@ -230,6 +230,18 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Executes the OPTIONS method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public override Task OPTIONS(HttpRequest Request, HttpResponse Response)
+		{
+			this.SetDefaultResponseHeaders(Response);
+			return base.OPTIONS(Request, Response);
+		}
+
+		/// <summary>
 		/// Validates the request itself. This method is called prior to processing the request, to see if it is valid in the context of the resource 
 		/// or not. If not, corresponding HTTP Exceptions should be thrown. Implementing validation checks in this method, instead of the corresponding
 		/// execution method, allows the resource to respond correctly to requests using the "Expect: 100-continue" header.

@@ -8,6 +8,7 @@ using Waher.Content;
 using Waher.Content.Binary;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.HTTP2;
+using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.IO;
 using Waher.Security;
 
@@ -328,6 +329,30 @@ namespace Waher.Networking.HTTP
 		{
 			this.dataStream?.Dispose();
 			this.dataStream = null;
+		}
+
+		/// <summary>
+		/// Gets the session variables from the cookie, if available.
+		/// </summary>
+		/// <returns>Session variables, if cookie found. If no session is found, a
+		/// temporary session is created.</returns>
+		public SessionVariables GetSessionFromCookie()
+		{
+			if (this.session is null)
+			{
+				string HttpSessionID = HttpResource.GetSessionId(this, this.response);
+
+				if (!string.IsNullOrEmpty(HttpSessionID))
+					this.session = this.server.GetSession(HttpSessionID);
+
+				if (this.session is null)
+				{
+					this.session = HttpServer.CreateSessionVariables();
+					this.tempSession = true;
+				}
+			}
+
+			return this.session;
 		}
 	}
 }

@@ -55,7 +55,7 @@ namespace Waher.Security.WAF.Model
 		{
 			get
 			{
-				this.variables ??= this.request.Session ?? new Variables();
+				this.variables ??= this.request.GetSessionFromCookie();
 				return this.variables;
 			}
 		}

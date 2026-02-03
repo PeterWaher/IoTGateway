@@ -2265,18 +2265,7 @@ namespace Waher.Networking.HTTP
 					foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 					{
 						if (Scheme.UserSessions && Request.Session is null)
-						{
-							string HttpSessionID = HttpResource.GetSessionId(Request, Request.Response);
-
-							if (!string.IsNullOrEmpty(HttpSessionID))
-								Request.Session = this.server.GetSession(HttpSessionID);
-
-							if (Request.Session is null)
-							{
-								Request.Session = HttpServer.CreateSessionVariables();
-								Request.tempSession = true;
-							}
-						}
+							Request.GetSessionFromCookie();
 
 						IUser User = await Scheme.IsAuthenticated(Request);
 						if (!(User is null))

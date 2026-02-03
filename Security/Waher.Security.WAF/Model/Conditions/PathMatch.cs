@@ -49,7 +49,7 @@ namespace Waher.Security.WAF.Model.Conditions
 		/// <returns>Result to return, if any.</returns>
 		public override Task<WafResult?> Review(ProcessingState State)
 		{
-			return this.Review(State, State.Request.Header.ResourcePart);
+			return this.Review(State, State.Request.Header.Resource);
 		}
 	}
 }

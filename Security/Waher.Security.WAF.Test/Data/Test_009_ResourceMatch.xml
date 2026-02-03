@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<ResourceMatch value="/B" mode="ExactConstant">
+		<Allow/>
+	</ResourceMatch>
+	<Forbid/>
+</Root>

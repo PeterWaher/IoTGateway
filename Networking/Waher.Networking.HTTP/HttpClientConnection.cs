@@ -2181,6 +2181,7 @@ namespace Waher.Networking.HTTP
 
 						case WafResult.Close:
 							Request.Dispose();
+							await this.DisposeAsync();
 							return false;
 					}
 				}

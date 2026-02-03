@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Waher.Content;
 using Waher.Content.Getters;
@@ -101,7 +102,18 @@ namespace Waher.Security.WAF.Test
 			await this.CloseServer();
 		}
 
-		private static async Task Get(string RelativeUrl, int ExpectedStatusCode, bool Encrypted)
+		private static Task Get(string RelativeUrl, int ExpectedStatusCode, bool Encrypted)
+		{
+			return Get(RelativeUrl, ExpectedStatusCode, null, Encrypted);
+		}
+
+		private static Task Get(string RelativeUrl, Type ExpectedException, bool Encrypted)
+		{
+			return Get(RelativeUrl, 0, ExpectedException, Encrypted);
+		}
+
+		private static async Task Get(string RelativeUrl, int ExpectedStatusCode, 
+			Type ExpectedException, bool Encrypted)
 		{
 			Uri Uri;
 
@@ -110,7 +122,17 @@ namespace Waher.Security.WAF.Test
 			else
 				Uri = new Uri("http://localhost:8081" + RelativeUrl);
 
-			ContentResponse Response = await InternetContent.GetAsync(Uri);
+			ContentResponse Response;
+
+
+			try
+			{
+				Response = await InternetContent.GetAsync(Uri);
+			}
+			catch (Exception ex)
+			{
+				Response = new ContentResponse(ex);
+			}
 
 			if (ExpectedStatusCode == 200)
 				Response.AssertOk();
@@ -118,10 +140,15 @@ namespace Waher.Security.WAF.Test
 			{
 				Assert.IsTrue(Response.HasError, "Error response expected.");
 
-				WebException ErrorResponse = Response.Error as WebException;
-				Assert.IsNotNull(ErrorResponse, "Error response not of type WebException.");
+				if (ExpectedException is null)
+				{
+					WebException ErrorResponse = Response.Error as WebException;
+					Assert.IsNotNull(ErrorResponse, "Error response not of type WebException: " + Response.Error.GetType().FullName);
 
-				Assert.AreEqual(ExpectedStatusCode, (int)ErrorResponse.StatusCode, "Unexpected status code in error response.");
+					Assert.AreEqual(ExpectedStatusCode, (int)ErrorResponse.StatusCode, "Unexpected status code in error response.");
+				}
+				else
+					Assert.AreEqual(ExpectedException, Response.Error.GetType());
 			}
 		}
 
@@ -166,23 +193,23 @@ namespace Waher.Security.WAF.Test
 		}
 
 		[TestMethod]
-		[DataRow("/A", 429, false)]
-		[DataRow("/A/C", 429, false)]
-		[DataRow("/B", 429, false)]
-		[DataRow("/X", 429, false)]
-		public async Task Test_005_Ignore(string Resource, int ExpectedStatusCode, bool Encrypted)
+		[DataRow("/A", typeof(TaskCanceledException), false)]
+		[DataRow("/A/C", typeof(TaskCanceledException), false)]
+		[DataRow("/B", typeof(TaskCanceledException), false)]
+		[DataRow("/X", typeof(TaskCanceledException), false)]
+		public async Task Test_005_Ignore(string Resource, Type ExpectedException, bool Encrypted)
 		{
-			await Get(Resource, ExpectedStatusCode, Encrypted);
+			await Get(Resource, ExpectedException, Encrypted);
 		}
 
 		[TestMethod]
-		[DataRow("/A", 429, false)]
-		[DataRow("/A/C", 429, false)]
-		[DataRow("/B", 429, false)]
-		[DataRow("/X", 429, false)]
-		public async Task Test_006_Close(string Resource, int ExpectedStatusCode, bool Encrypted)
+		[DataRow("/A", typeof(HttpRequestException), false)]
+		[DataRow("/A/C", typeof(HttpRequestException), false)]
+		[DataRow("/B", typeof(HttpRequestException), false)]
+		[DataRow("/X", typeof(HttpRequestException), false)]
+		public async Task Test_006_Close(string Resource, Type ExpectedException, bool Encrypted)
 		{
-			await Get(Resource, ExpectedStatusCode, Encrypted);
+			await Get(Resource, ExpectedException, Encrypted);
 		}
 
 	}

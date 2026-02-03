@@ -104,6 +104,7 @@ using Waher.Security.CallStack;
 using Waher.Security.LoginMonitor;
 using Waher.Security.SHA3;
 using Waher.Security.Users;
+using Waher.Security.WAF;
 using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
@@ -1334,6 +1335,20 @@ namespace Waher.IoTGateway
 						Log.Exception(ex);
 					}
 				};
+
+				string WafFile = Path.Combine(appDataFolder, "WAF.xml");
+				if (File.Exists(WafFile))
+				{
+					try
+					{
+						WebApplicationFirewall Waf = WebApplicationFirewall.LoadFromFile(WafFile, loginAuditor, appDataFolder);
+						webServer.WebApplicationFirewall = Waf;
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex, WafFile);
+					}
+				}
 
 				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/Transforms", Path.Combine(appDataFolder, "Transforms"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.

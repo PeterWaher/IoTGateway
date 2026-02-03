@@ -1,5 +1,10 @@
-﻿using System.Xml;
-using Waher.Content.Xml;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Xml;
+using Waher.Content.Xml.Attributes;
+using Waher.Networking.HTTP.Interfaces;
+using Waher.Runtime.Collections;
+using Waher.Script;
 
 namespace Waher.Security.WAF.Model.Actions
 {
@@ -8,8 +13,8 @@ namespace Waher.Security.WAF.Model.Actions
 	/// </summary>
 	public class Tag : WafAction
 	{
-		private readonly string name;
-		private readonly string value;
+		private readonly StringAttribute name;
+		private readonly ObjectAttribute value;
 
 		/// <summary>
 		/// Defines a name-value tag.
@@ -28,8 +33,8 @@ namespace Waher.Security.WAF.Model.Actions
 		public Tag(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
 			: base(Xml, Parent, Document)
 		{
-			this.name = XML.Attribute(Xml, "name");
-			this.value = XML.Attribute(Xml, "value");
+			this.name = new StringAttribute(Xml, "name");
+			this.value = new ObjectAttribute(Xml, "value");
 		}
 
 		/// <summary>
@@ -45,5 +50,30 @@ namespace Waher.Security.WAF.Model.Actions
 		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
 		/// <returns>Created action object.</returns>
 		public override WafAction Create(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document) => new Tag(Xml, Parent, Document);
+
+		/// <summary>
+		/// Reviews the processing state, and returns a WAF result, if any.
+		/// </summary>
+		/// <param name="State">Current state.</param>
+		/// <returns>Result to return, if any.</returns>
+		public override Task<WafResult?> Review(ProcessingState State)
+		{
+			return Task.FromResult<WafResult?>(null);
+		}
+
+		/// <summary>
+		/// Evaluates the tag.
+		/// </summary>
+		/// <param name="State">Current state.</param>
+		/// <returns>Evaluated tag.</returns>
+		public async Task<KeyValuePair<string, object>> EvaluateTag(ProcessingState State)
+		{
+			Variables Variables = State.Variables;
+			string Name = await this.name.EvaluateAsync(Variables, string.Empty);
+			object Value = await this.value.EvaluateAsync(Variables, null);
+
+			return new KeyValuePair<string, object>(Name, Value);
+		}
+
 	}
 }

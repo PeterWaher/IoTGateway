@@ -1,4 +1,7 @@
-﻿using System.Xml;
+﻿using System.Threading.Tasks;
+using System.Xml;
+using Waher.Networking.HTTP;
+using Waher.Networking.HTTP.Interfaces;
 
 namespace Waher.Security.WAF.Model.Conditions
 {
@@ -39,5 +42,18 @@ namespace Waher.Security.WAF.Model.Conditions
 		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
 		/// <returns>Created action object.</returns>
 		public override WafAction Create(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document) => new QueryMatch(Xml, Parent, Document);
+
+		/// <summary>
+		/// Reviews the processing state, and returns a WAF result, if any.
+		/// </summary>
+		/// <param name="State">Current state.</param>
+		/// <returns>Result to return, if any.</returns>
+		public override Task<WafResult?> Review(ProcessingState State)
+		{
+			if (State.Request.Header.TryGetQueryParameter(this.Name, out string Value))
+				return this.Review(State, Value);
+			else
+				return Task.FromResult<WafResult?>(null);
+		}
 	}
 }

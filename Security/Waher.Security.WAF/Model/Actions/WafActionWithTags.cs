@@ -1,4 +1,6 @@
-﻿using System.Xml;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Xml;
 using Waher.Runtime.Collections;
 
 namespace Waher.Security.WAF.Model.Actions
@@ -42,5 +44,20 @@ namespace Waher.Security.WAF.Model.Actions
 		/// Tags
 		/// </summary>
 		public Tag[] Tags => this.tags;
+
+		/// <summary>
+		/// Evaluates available tags.
+		/// </summary>
+		/// <param name="State">Current state.</param>
+		/// <returns>Array of evaluated tags.</returns>
+		public async Task<KeyValuePair<string, object>[]> EvaluateTags(ProcessingState State)
+		{
+			ChunkedList<KeyValuePair<string, object>> Result = new ChunkedList<KeyValuePair<string, object>>();
+
+			foreach (Tag Tag in this.tags)
+				Result.Add(await Tag.EvaluateTag(State));
+
+			return Result.ToArray();
+		}
 	}
 }

@@ -34,7 +34,6 @@
 			<xs:element name="RateLimited" type="WafAction"/>
 			<xs:element name="Ignore" type="WafAction"/>
 			<xs:element name="Close" type="WafAction"/>
-			<xs:element name="BlockEndpoint" type="WafAction"/>
 			<xs:element name="UriMatch" type="WafCondition"/>
 			<xs:element name="PathMatch" type="WafCondition"/>
 			<xs:element name="ResourceMatch" type="WafCondition"/>
@@ -43,6 +42,7 @@
 			<xs:element name="ContentMatch" type="WafCondition"/>
 			<xs:element name="EndpointMatch" type="WafCondition"/>
 			<xs:element name="CertificateSubjectMatch" type="WafCondition"/>
+			<xs:element name="CertificateIssuerMatch" type="WafCondition"/>
 			<xs:element name="CertificateSerialNumberMatch" type="WafCondition"/>
 			<xs:element name="HeaderMatch" type="WafNamedCondition"/>
 			<xs:element name="QueryMatch" type="WafNamedCondition"/>
@@ -79,7 +79,6 @@
 							<xs:attribute name="country" type="xs:string" use="optional"/>
 							<xs:attribute name="region" type="xs:string" use="optional"/>
 							<xs:attribute name="city" type="xs:string" use="optional"/>
-							<xs:attribute name="area" type="xs:string" use="optional"/>
 						</xs:extension>
 					</xs:complexContent>
 				</xs:complexType>
@@ -116,6 +115,7 @@
 						<xs:extension base="WafActionWithTags">
 							<xs:attribute name="collection" type="EventLevel" use="required"/>
 							<xs:attribute name="type" type="xs:string" use="required"/>
+							<xs:attribute name="archivingTimeDays" type="xs:positiveInteger" use="required"/>
 						</xs:extension>
 					</xs:complexContent>
 				</xs:complexType>
@@ -131,9 +131,17 @@
 					</xs:complexContent>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="GoTo" type="WafActionReference"/>
 			<xs:element name="Call" type="WafActionReference"/>
 			<xs:element name="References" type="WafActions"/>
+			<xs:element name="BlockEndpoint">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafAction">
+							<xs:attribute name="reason" type="xs:string" use="required"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
 		</xs:choice>
 	</xs:group>
 
@@ -201,14 +209,25 @@
 			<xs:enumeration value="StartsWithRegex"/>
 			<xs:enumeration value="EndsWithRegex"/>
 			<xs:enumeration value="ExactRegex"/>
+			<xs:enumeration value="ContainsRegexIgnoreCase"/>
+			<xs:enumeration value="StartsWithRegexIgnoreCase"/>
+			<xs:enumeration value="EndsWithRegexIgnoreCase"/>
+			<xs:enumeration value="ExactRegexIgnoreCase"/>
 			<xs:enumeration value="ContainsConstant"/>
 			<xs:enumeration value="StartsWithConstant"/>
 			<xs:enumeration value="EndsWithConstant"/>
 			<xs:enumeration value="ExactConstant"/>
+			<xs:enumeration value="ContainsConstantIgnoreCase"/>
+			<xs:enumeration value="StartsWithConstantIgnoreCase"/>
+			<xs:enumeration value="EndsWithConstantIgnoreCase"/>
+			<xs:enumeration value="ExactConstantIgnoreCase"/>
 			<xs:enumeration value="Script"/>
 			<xs:enumeration value="List"/>
+			<xs:enumeration value="ListIgnoreCase"/>
 			<xs:enumeration value="FileList"/>
+			<xs:enumeration value="FileListIgnoreCase"/>
 			<xs:enumeration value="DatabaseList"/>
+			<xs:enumeration value="DatabaseListIgnoreCase"/>
 		</xs:restriction>
 	</xs:simpleType>
 

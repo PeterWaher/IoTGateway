@@ -1,4 +1,8 @@
-﻿using System.Xml;
+﻿using System.Threading.Tasks;
+using System.Xml;
+using Waher.Networking.HTTP.Interfaces;
+using Waher.Persistence;
+using Waher.Persistence.Serialization;
 
 namespace Waher.Security.WAF.Model.Actions
 {
@@ -39,5 +43,19 @@ namespace Waher.Security.WAF.Model.Actions
 		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
 		/// <returns>Created action object.</returns>
 		public override WafAction Create(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document) => new AddOpenIntelligence(Xml, Parent, Document);
+
+		/// <summary>
+		/// Reviews the processing state, and returns a WAF result, if any.
+		/// </summary>
+		/// <param name="State">Current state.</param>
+		/// <returns>Result to return, if any.</returns>
+		public override async Task<WafResult?> Review(ProcessingState State)
+		{
+			GenericObject Obj = await this.EvaluateObject(State);
+
+			await Database.Insert(Obj);
+
+			return null;
+		}
 	}
 }

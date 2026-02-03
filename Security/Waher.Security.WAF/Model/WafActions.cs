@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
+using Waher.Networking.HTTP.Interfaces;
 using Waher.Runtime.Collections;
 
 namespace Waher.Security.WAF.Model
@@ -52,5 +54,31 @@ namespace Waher.Security.WAF.Model
 		/// If the action contains no child actions.
 		/// </summary>
 		public bool IsEmpty => this.actions.Length == 0;
+
+		/// <summary>
+		/// Prepares the node for processing.
+		/// </summary>
+		public override void Prepare()
+		{
+			foreach (WafAction Action in this.actions)
+				Action.Prepare();
+		}
+
+		/// <summary>
+		/// Reviews the processing state, and returns a WAF result, if any.
+		/// </summary>
+		/// <param name="State">Current state.</param>
+		/// <returns>Result to return, if any.</returns>
+		public async Task<WafResult?> ReviewChildren(ProcessingState State)
+		{
+			foreach (WafAction Action in this.actions)
+			{
+				WafResult? Result = await Action.Review(State);
+				if (Result.HasValue)
+					return Result;
+			}
+
+			return null;
+		}
 	}
 }

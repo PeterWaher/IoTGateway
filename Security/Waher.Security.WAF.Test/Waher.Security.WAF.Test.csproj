@@ -12,4 +12,9 @@
     <TestingPlatformShowTestsFailure>true</TestingPlatformShowTestsFailure>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj" />
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+  </ItemGroup>
+
 </Project>

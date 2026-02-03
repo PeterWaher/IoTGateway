@@ -48,8 +48,7 @@ namespace Waher.Networking.HTTP.Interfaces
 		/// </summary>
 		/// <param name="Request">Current HTTP Request</param>
 		/// <param name="Resource">Corresponding HTTP Resource, if found.</param>
-		/// <param name="SubPath">Sub-path within the resource, if applicable.</param>
 		/// <returns>Action to take.</returns>
-		Task<WafResult> Review(HttpRequest Request, HttpResource Resource, string SubPath);
+		Task<WafResult> Review(HttpRequest Request, HttpResource Resource);
 	}
 }

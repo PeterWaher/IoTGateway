@@ -1,4 +1,7 @@
-﻿using System.Xml;
+﻿using System.Threading.Tasks;
+using System.Xml;
+using Waher.Content.Xml.Attributes;
+using Waher.Networking.HTTP.Interfaces;
 
 namespace Waher.Security.WAF.Model.Actions
 {
@@ -7,6 +10,8 @@ namespace Waher.Security.WAF.Model.Actions
 	/// </summary>
 	public class BlockEndpoint : WafAction
 	{
+		private readonly StringAttribute reason;
+
 		/// <summary>
 		/// Blocks the endpoint.
 		/// </summary>
@@ -24,6 +29,7 @@ namespace Waher.Security.WAF.Model.Actions
 		public BlockEndpoint(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
 			: base(Xml, Parent, Document)
 		{
+			this.reason = new StringAttribute(Xml, "reason");
 		}
 
 		/// <summary>
@@ -39,5 +45,19 @@ namespace Waher.Security.WAF.Model.Actions
 		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
 		/// <returns>Created action object.</returns>
 		public override WafAction Create(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document) => new BlockEndpoint(Xml, Parent, Document);
+
+		/// <summary>
+		/// Reviews the processing state, and returns a WAF result, if any.
+		/// </summary>
+		/// <param name="State">Current state.</param>
+		/// <returns>Result to return, if any.</returns>
+		public override async Task<WafResult?> Review(ProcessingState State)
+		{
+			string Reason = await this.reason.EvaluateAsync(State.Variables, string.Empty);
+
+			await State.Firewall.LoginAuditor.BlockEndpoint(State.Request.RemoteEndPoint, "HTTP", Reason);
+
+			return null;
+		}
 	}
 }

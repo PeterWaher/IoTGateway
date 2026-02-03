@@ -1,5 +1,7 @@
-﻿using System.Xml;
-using Waher.Content.Xml;
+﻿using System.Threading.Tasks;
+using System.Xml;
+using Waher.Content.Xml.Attributes;
+using Waher.Networking.HTTP.Interfaces;
 
 namespace Waher.Security.WAF.Model.Actions
 {
@@ -8,7 +10,7 @@ namespace Waher.Security.WAF.Model.Actions
 	/// </summary>
 	public class Delay : WafAction
 	{
-		private readonly int seconds;
+		private readonly PositiveIntegerAttribute seconds;
 
 		/// <summary>
 		/// Delays processing for a number of seconds.
@@ -27,7 +29,7 @@ namespace Waher.Security.WAF.Model.Actions
 		public Delay(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
 			: base(Xml, Parent, Document)
 		{
-			this.seconds = XML.Attribute(Xml, "seconds", 0);
+			this.seconds = new PositiveIntegerAttribute(Xml, "seconds");
 		}
 
 		/// <summary>
@@ -43,5 +45,19 @@ namespace Waher.Security.WAF.Model.Actions
 		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
 		/// <returns>Created action object.</returns>
 		public override WafAction Create(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document) => new Delay(Xml, Parent, Document);
+
+		/// <summary>
+		/// Reviews the processing state, and returns a WAF result, if any.
+		/// </summary>
+		/// <param name="State">Current state.</param>
+		/// <returns>Result to return, if any.</returns>
+		public override async Task<WafResult?> Review(ProcessingState State)
+		{
+			int Seconds = await this.seconds.EvaluateAsync(State.Variables, 0);
+
+			await Task.Delay(Seconds);
+
+			return null;
+		}
 	}
 }

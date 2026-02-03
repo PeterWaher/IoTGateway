@@ -9,7 +9,6 @@ using Waher.Networking.HTTP.HeaderFields;
 using Waher.Runtime.Temporary;
 using Waher.Script;
 using Waher.Runtime.IO;
-using System.Text;
 
 namespace Waher.Networking.HTTP
 {

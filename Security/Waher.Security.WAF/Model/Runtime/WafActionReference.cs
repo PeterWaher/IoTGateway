@@ -1,5 +1,6 @@
 ﻿using System.Xml;
 using Waher.Content.Xml;
+using Waher.Events;
 
 namespace Waher.Security.WAF.Model.Runtime
 {
@@ -9,6 +10,7 @@ namespace Waher.Security.WAF.Model.Runtime
 	public abstract class WafActionReference : WafActions
 	{
 		private readonly string reference;
+		private WafAction referencedAction = null;
 
 		/// <summary>
 		/// Abstract base class for WAF actions that has tags.
@@ -31,8 +33,25 @@ namespace Waher.Security.WAF.Model.Runtime
 		}
 
 		/// <summary>
+		/// Prepares the node for processing.
+		/// </summary>
+		public override void Prepare()
+		{
+			if (!this.Document.TryGetActionById(this.reference, out this.referencedAction))
+			{
+				this.referencedAction = null;
+				Log.Error("Referenced action not found: " + this.reference, this.Document.FileName);
+			}
+		}
+
+		/// <summary>
 		/// Node reference.
 		/// </summary>
 		public string Reference => this.reference;
+
+		/// <summary>
+		/// Referenced action, if found.
+		/// </summary>
+		public WafAction ReferencedAction => this.referencedAction;
 	}
 }

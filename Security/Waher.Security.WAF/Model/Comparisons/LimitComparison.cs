@@ -1,6 +1,7 @@
-﻿using System.Xml;
-using Waher.Content;
-using Waher.Content.Xml;
+﻿using System.Threading.Tasks;
+using System.Xml;
+using Waher.Content.Xml.Attributes;
+using Waher.Networking.HTTP.Interfaces;
 
 namespace Waher.Security.WAF.Model.Comparisons
 {
@@ -9,7 +10,7 @@ namespace Waher.Security.WAF.Model.Comparisons
 	/// </summary>
 	public abstract class LimitComparison : WafComparison
 	{
-		private readonly long limit;
+		private readonly Int64Attribute limit;
 
 		/// <summary>
 		/// Abstract base class for limit comparisons.
@@ -28,12 +29,23 @@ namespace Waher.Security.WAF.Model.Comparisons
 		public LimitComparison(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
 			: base(Xml, Parent, Document)
 		{
-			this.limit = XML.Attribute(Xml, "limit", 0L);
+			this.limit = new Int64Attribute(Xml, "limit");
 		}
 
 		/// <summary>
-		/// Rate limit during <see cref="Duration"/>.
+		/// Reviews the processing state, and returns a WAF result, if any.
 		/// </summary>
-		public long Limit => this.limit;
+		/// <param name="State">Current state.</param>
+		/// <param name="Value">Value being reviewed.</param>
+		/// <returns>Result to return, if any.</returns>
+		public async Task<WafResult?> Review(ProcessingState State, long Value)
+		{
+			long Limit = await this.limit.EvaluateAsync(State.Variables, 0);
+
+			if (Value > Limit)
+				return await this.ReviewChildren(State);
+			else
+				return null;
+		}
 	}
 }

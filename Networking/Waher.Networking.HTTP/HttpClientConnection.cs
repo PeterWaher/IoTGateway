@@ -2149,9 +2149,12 @@ namespace Waher.Networking.HTTP
 					SubPath = null;
 				}
 
+				Request.Resource = Resource;
+				Request.SubPath = SubPath;
+
 				if (!(this.webApplicationFirewall is null))
 				{
-					switch (await this.webApplicationFirewall.Review(Request, Resource, SubPath))
+					switch (await this.webApplicationFirewall.Review(Request, Resource))
 					{
 						case WafResult.Allow:
 							break;
@@ -2191,9 +2194,6 @@ namespace Waher.Networking.HTTP
 					Request.Dispose();
 					return true;
 				}
-
-				Request.Resource = Resource;
-				Request.SubPath = SubPath;
 
 				this.server.RequestReceived(Request, this.client.RemoteEndPoint, Resource, SubPath);
 

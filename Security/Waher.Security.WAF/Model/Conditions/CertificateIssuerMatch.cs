@@ -2,28 +2,28 @@
 using System.Xml;
 using Waher.Networking.HTTP.Interfaces;
 
-namespace Waher.Security.WAF.Model.Comparisons
+namespace Waher.Security.WAF.Model.Conditions
 {
 	/// <summary>
-	/// Checks if the content size of the current request exceeds a limit.
+	/// Checks for a match against the Certificate Issuer of the request.
 	/// </summary>
-	public class ContentSizeExceeded : LimitComparison
+	public class CertificateIssuerMatch : WafCondition
 	{
 		/// <summary>
-		/// Checks if the content size of the current request exceeds a limit.
+		/// Checks for a match against the Certificate Issuer of the request.
 		/// </summary>
-		public ContentSizeExceeded()
+		public CertificateIssuerMatch()
 			: base()
 		{
 		}
 
 		/// <summary>
-		/// Checks if the content size of the current request exceeds a limit.
+		/// Checks for a match against the Certificate Issuer of the request.
 		/// </summary>
 		/// <param name="Xml">XML definition.</param>
 		/// <param name="Parent">Parent node.</param>
 		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
-		public ContentSizeExceeded(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
+		public CertificateIssuerMatch(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
 			: base(Xml, Parent, Document)
 		{
 		}
@@ -31,7 +31,7 @@ namespace Waher.Security.WAF.Model.Comparisons
 		/// <summary>
 		/// XML Local Name for the XML element defining the action.
 		/// </summary>
-		public override string LocalName => nameof(ContentSizeExceeded);
+		public override string LocalName => nameof(CertificateIssuerMatch);
 
 		/// <summary>
 		/// Creates a WAF action from its XML definition.
@@ -40,7 +40,7 @@ namespace Waher.Security.WAF.Model.Comparisons
 		/// <param name="Parent">Parent node.</param>
 		/// <param name="Document">Document hosting the Web Application Firewall action.</param>
 		/// <returns>Created action object.</returns>
-		public override WafAction Create(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document) => new ContentSizeExceeded(Xml, Parent, Document);
+		public override WafAction Create(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document) => new CertificateIssuerMatch(Xml, Parent, Document);
 
 		/// <summary>
 		/// Reviews the processing state, and returns a WAF result, if any.
@@ -49,11 +49,8 @@ namespace Waher.Security.WAF.Model.Comparisons
 		/// <returns>Result to return, if any.</returns>
 		public override Task<WafResult?> Review(ProcessingState State)
 		{
-			if (State.Request.HasData)
-			{
-				long Size = State.Request.DataStream.Length;
-				return this.Review(State, Size);
-			}
+			if (State.Request.RemoteCertificateValid)
+				return this.Review(State, State.Request.RemoteCertificate?.Issuer);
 			else
 				return Task.FromResult<WafResult?>(null);
 		}

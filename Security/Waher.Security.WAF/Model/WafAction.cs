@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.HTTP.Interfaces;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Security.WAF.Model
@@ -107,5 +109,25 @@ namespace Waher.Security.WAF.Model
 
 			return Action.Create(Xml, Parent, Document);
 		}
+
+		/// <summary>
+		/// Prepares the node for processing.
+		/// </summary>
+		public virtual void Prepare()
+		{
+			// Do nothing by default.
+		}
+
+		/// <summary>
+		/// Reviews the processing state, and returns a WAF result, if any.
+		/// </summary>
+		/// <param name="State">Current state.</param>
+		/// <returns>Result to return, if any.</returns>
+		public abstract Task<WafResult?> Review(ProcessingState State);
+
+		/// <summary>
+		/// Five minutes time span.
+		/// </summary>
+		protected static readonly TimeSpan fiveMinutes = TimeSpan.FromMinutes(5);
 	}
 }

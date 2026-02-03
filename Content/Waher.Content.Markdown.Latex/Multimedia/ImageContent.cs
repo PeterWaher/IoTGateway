@@ -45,7 +45,7 @@ namespace Waher.Content.Markdown.Latex.Multimedia
 
 					if (ParsedUri.IsAbsoluteUri)
 					{
-						ContentStreamResponse P = await InternetContent.GetTempStreamAsync(new Uri(Item.Url), 60000,
+						ContentStreamResponse P = await InternetContent.GetTempStreamAsync(new Uri(Item.Url), InternetContent.DefaultTimeout,
 							new KeyValuePair<string, string>("Accept", "image/png"));
 
 						if (P.HasError)

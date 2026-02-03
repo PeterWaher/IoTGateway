@@ -403,12 +403,12 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (!(this.e2e is null))
 			{
 				await this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, Xml,
-					this.ResponseHandler, ResponseState, 60000, 0, FlagStanzaAsSent);
+					this.ResponseHandler, ResponseState, InternetContent.DefaultTimeout, 0, FlagStanzaAsSent);
 			}
 			else
 			{
 				await this.client.SendIqSet(To, Xml, this.ResponseHandler, ResponseState,
-					60000, 0, FlagStanzaAsSent);
+					InternetContent.DefaultTimeout, 0, FlagStanzaAsSent);
 			}
 
 			Task _ = Task.Delay(10000).ContinueWith((_2) =>
@@ -478,7 +478,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (this.disposed)
 					return;
 
-				if (!await this.synchObj.TryBeginWrite(60000))
+				if (!await this.synchObj.TryBeginWrite(InternetContent.DefaultTimeout))
 				{
 					this.client.Error("Unable to get access to HTTPX client. Dropping posted response.");
 					return;
@@ -519,7 +519,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (this.disposed)
 					return;
 
-				if (!await this.synchObj.TryBeginWrite(60000))
+				if (!await this.synchObj.TryBeginWrite(InternetContent.DefaultTimeout))
 				{
 					this.client.Error("Unable to get access to HTTPX client. Dropping posted response.");
 					return;

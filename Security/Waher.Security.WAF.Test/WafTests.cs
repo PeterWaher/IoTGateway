@@ -42,6 +42,8 @@ namespace Waher.Security.WAF.Test
 				new LoginInterval(2, TimeSpan.FromDays(1)),     // Maximum 2x5 failed login attempts in a day
 				new LoginInterval(2, TimeSpan.FromDays(7)),     // Maximum 2x2x5 failed login attempts in a week
 				new LoginInterval(2, TimeSpan.MaxValue));       // Maximum 2x2x2x5 failed login attempts in total, then blocked.
+
+			InternetContent.SetDefaultTimeout(3000, false);
 		}
 
 		[AssemblyCleanup]

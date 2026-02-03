@@ -46,7 +46,7 @@ namespace Waher.Content
 		/// <param name="Uri">URI</param>
 		/// <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
-		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=<see cref="InternetContent.DefaultTimeout"/>)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded headers object.</returns>
 		Task<ContentResponse> HeadAsync(Uri Uri, X509Certificate Certificate,

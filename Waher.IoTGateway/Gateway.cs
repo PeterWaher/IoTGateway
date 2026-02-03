@@ -1355,6 +1355,8 @@ namespace Waher.IoTGateway
 					}
 				}
 
+				InternetContent.SetDefaultTimeout(60000, true);
+
 				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/Transforms", Path.Combine(appDataFolder, "Transforms"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false, HostDomainOptions.SameForAllDomains));   // Syntax highlighting library, provided by http://highlightjs.org

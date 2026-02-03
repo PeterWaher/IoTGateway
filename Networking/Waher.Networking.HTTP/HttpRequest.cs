@@ -8,7 +8,6 @@ using Waher.Content;
 using Waher.Content.Binary;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.HTTP2;
-using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.IO;
 using Waher.Security;
 

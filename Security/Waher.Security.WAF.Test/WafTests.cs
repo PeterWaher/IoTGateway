@@ -76,7 +76,7 @@ namespace Waher.Security.WAF.Test
 			this.server.Register("/A", (req, resp) => resp.Return("Hello World!"));
 			this.server.Register("/A/C", (req, resp) => resp.Return("Hello again."));
 			this.server.Register("/B", (req, resp) => resp.Return("SubPath: " + req.SubPath), true, true);
-			this.server.Register("/P", null, async (req, resp) => await resp.Return(await req.DecodeDataAsync()));
+			this.server.Register("/P", null, async (req, resp) => await resp.Return((await req.DecodeDataAsync()).Decoded));
 		}
 
 		private async Task CloseServer()
@@ -111,18 +111,11 @@ namespace Waher.Security.WAF.Test
 			return Get(RelativeUrl, 0, ExpectedException, Encrypted);
 		}
 
-		private static async Task Get(string RelativeUrl, int ExpectedStatusCode, 
+		private static async Task Get(string RelativeUrl, int ExpectedStatusCode,
 			Type ExpectedException, bool Encrypted)
 		{
-			Uri Uri;
-
-			if (Encrypted)
-				Uri = new Uri("https://localhost:8088" + RelativeUrl);
-			else
-				Uri = new Uri("http://localhost:8081" + RelativeUrl);
-
+			Uri Uri = GetUri(RelativeUrl, Encrypted);
 			ContentResponse Response;
-
 
 			try
 			{
@@ -133,6 +126,51 @@ namespace Waher.Security.WAF.Test
 				Response = new ContentResponse(ex);
 			}
 
+			CheckResponse(Response, ExpectedStatusCode, ExpectedException);
+		}
+
+		private static Task Post(string RelativeUrl, object Data, int ExpectedStatusCode, 
+			bool Encrypted)
+		{
+			return Post(RelativeUrl, Data, ExpectedStatusCode, null, Encrypted);
+		}
+
+		private static Task Post(string RelativeUrl, object Data, Type ExpectedException, 
+			bool Encrypted)
+		{
+			return Post(RelativeUrl, Data, 0, ExpectedException, Encrypted);
+		}
+
+		private static async Task Post(string RelativeUrl, object Data, 
+			int ExpectedStatusCode, Type ExpectedException, bool Encrypted)
+		{
+			Uri Uri = GetUri(RelativeUrl, Encrypted);
+			ContentResponse Response;
+
+			try
+			{
+				Response = await InternetContent.PostAsync(Uri, Data,
+					new KeyValuePair<string, string>("Accept", "*/*"));
+			}
+			catch (Exception ex)
+			{
+				Response = new ContentResponse(ex);
+			}
+
+			CheckResponse(Response, ExpectedStatusCode, ExpectedException);
+		}
+
+		private static Uri GetUri(string RelativeUrl, bool Encrypted)
+		{
+			if (Encrypted)
+				return new Uri("https://localhost:8088" + RelativeUrl);
+			else
+				return new Uri("http://localhost:8081" + RelativeUrl);
+		}
+
+		private static void CheckResponse(ContentResponse Response, int ExpectedStatusCode,
+			Type ExpectedException)
+		{
 			if (ExpectedStatusCode == 200)
 				Response.AssertOk();
 			else
@@ -264,11 +302,11 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/A/C", 403, false)]
 		[DataRow("/B", 403, false)]
 		[DataRow("/B/C", 403, false)]
-		[DataRow("/P", 405, false)]
+		[DataRow("/P", 200, false)]
 		[DataRow("/X", 403, false)]
 		public async Task Test_010_MethodMatch(string Resource, int ExpectedStatusCode, bool Encrypted)
 		{
-			await Get(Resource, ExpectedStatusCode, Encrypted);
+			await Post(Resource, "Hello", ExpectedStatusCode, Encrypted);
 		}
 
 	}

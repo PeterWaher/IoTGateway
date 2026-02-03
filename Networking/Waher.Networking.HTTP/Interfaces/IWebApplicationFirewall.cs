@@ -50,5 +50,10 @@ namespace Waher.Networking.HTTP.Interfaces
 		/// <param name="Resource">Corresponding HTTP Resource, if found.</param>
 		/// <returns>Action to take.</returns>
 		Task<WafResult> Review(HttpRequest Request, HttpResource Resource);
+
+		/// <summary>
+		/// Reloads the firewall configuration from its original source.
+		/// </summary>
+		Task Reload();
 	}
 }

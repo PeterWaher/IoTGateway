@@ -29,12 +29,12 @@ namespace Waher.Security.WAF
 		/// </summary>
 		private static readonly XmlSchema schema = XSL.LoadSchema(typeof(WebApplicationFirewall).Namespace + ".Schema.WAF.xsd");
 
-		private readonly Dictionary<string, WafAction> actionsById = new Dictionary<string, WafAction>();
 		private readonly Cache<string, object> internalCache;
 		private readonly ILoginAuditor loginAuditor;
-		private readonly Root root;
 		private readonly string fileName;
 		private readonly string appDataFolder;
+		private Dictionary<string, WafAction> actionsById = new Dictionary<string, WafAction>();
+		private Root root;
 
 		/// <summary>
 		/// Web Application Firewall for <see cref="HttpServer"/>.
@@ -172,6 +172,31 @@ namespace Waher.Security.WAF
 				Log.Exception(ex);
 				return this.root.DefaultResult;
 			}
+		}
+
+		/// <summary>
+		/// Reloads the firewall configuration from its original source.
+		/// </summary>
+		public Task Reload()
+		{
+			XmlDocument Doc = XML.LoadFromFile(this.fileName, true);
+			XSL.Validate(this.fileName, Doc, nameof(Root), Namespace, schema);
+
+			Dictionary<string, WafAction> Bak = this.actionsById;;
+			this.actionsById = new Dictionary<string, WafAction>();
+
+			if (!(WafAction.Parse(Doc.DocumentElement, null, this) is Root Root2))
+			{
+				this.actionsById = Bak;
+				throw new Exception("Invalid root element of WAF definition.");
+			}
+
+			this.root = Root2;
+			this.root.Prepare();
+
+			this.internalCache.Clear();
+
+			return Task.CompletedTask;
 		}
 	}
 }

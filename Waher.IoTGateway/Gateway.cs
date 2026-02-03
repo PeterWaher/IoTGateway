@@ -144,6 +144,11 @@ namespace Waher.IoTGateway
 		public const string GatewayConfigLocalFileName = "Gateway.config";
 
 		/// <summary>
+		/// WAF.xml
+		/// </summary>
+		public const string WebApplicationFirewallLocalFileName = "WAF.xml";
+
+		/// <summary>
 		/// GatewayConfiguration
 		/// </summary>
 		public const string GatewayConfigLocalName = "GatewayConfiguration";
@@ -1336,7 +1341,7 @@ namespace Waher.IoTGateway
 					}
 				};
 
-				string WafFile = Path.Combine(appDataFolder, "WAF.xml");
+				string WafFile = Path.Combine(appDataFolder, WebApplicationFirewallLocalFileName);
 				if (File.Exists(WafFile))
 				{
 					try

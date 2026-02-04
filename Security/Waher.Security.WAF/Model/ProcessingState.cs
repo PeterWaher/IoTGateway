@@ -12,7 +12,7 @@ namespace Waher.Security.WAF.Model
 		private readonly HttpRequest request;
 		private readonly HttpResource resource;
 		private readonly WebApplicationFirewall firewall;
-		private Variables variables;
+		private RequestVariables variables;
 
 		/// <summary>
 		/// Contains the current state of a review process.
@@ -55,7 +55,7 @@ namespace Waher.Security.WAF.Model
 		{
 			get
 			{
-				this.variables ??= this.request.GetSessionFromCookie();
+				this.variables ??= new RequestVariables(this.request);
 				return this.variables;
 			}
 		}

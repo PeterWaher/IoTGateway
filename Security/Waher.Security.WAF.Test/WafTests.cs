@@ -971,5 +971,31 @@ namespace Waher.Security.WAF.Test
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);
 		}
 
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/A/C", 200, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/P", 405, false)]
+		[DataRow("/X", 404, false)]
+		public async Task Test_052_Call(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A?N=5", 403, false)]
+		[DataRow("/A/C?N=10", 403, false)]
+		[DataRow("/B?N=15", 403, false)]
+		[DataRow("/B/C?N=20", 200, false)]
+		[DataRow("/P?N=25", 405, false)]
+		[DataRow("/X?N=30", 404, false)]
+		public async Task Test_053_If(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
 	}
 }

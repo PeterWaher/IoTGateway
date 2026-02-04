@@ -12,6 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Data\Test_053_If.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Test_052_Call.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\Test_051_Delay.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

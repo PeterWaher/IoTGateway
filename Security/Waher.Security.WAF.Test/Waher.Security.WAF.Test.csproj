@@ -12,6 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Data\Test_051_Delay.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\Test_050_HasOpenIntelligence9.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

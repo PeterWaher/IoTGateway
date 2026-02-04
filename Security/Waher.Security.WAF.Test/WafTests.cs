@@ -92,12 +92,12 @@ namespace Waher.Security.WAF.Test
 
 		public TestContext TestContext { get; set; }
 
-		private void SetupServer(string FirewallFileName)
+		private Task SetupServer(string FirewallFileName)
 		{
 			WebApplicationFirewall Firewall = WebApplicationFirewall.LoadFromFile(
 				Path.Combine("Data", FirewallFileName), auditor, "Data");
 
-			this.SetupServer(Firewall);
+			return this.SetupServer(Firewall);
 		}
 
 		private async Task SetupServer(WebApplicationFirewall Firewall)
@@ -142,10 +142,10 @@ namespace Waher.Security.WAF.Test
 		}
 
 		[TestInitialize]
-		public void TestInitialize()
+		public async Task TestInitialize()
 		{
 			string TestName = this.TestContext!.TestName;
-			this.SetupServer(TestName + ".xml");
+			await this.SetupServer(TestName + ".xml");
 		}
 
 		[TestCleanup]
@@ -953,6 +953,19 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/A?Vector=V&Protocol=P&Classification=C&Code=123&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
 		[DataRow("/A?Vector=W&Protocol=Q&Classification=D&Code=234&Message=Bye&N1=A&V1=B2&N2=C&V2=D2", 403, false)]
 		public async Task Test_050_HasOpenIntelligence9(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A?S=0", 200, false)]
+		[DataRow("/A/C?S=0.5", 200, false)]
+		[DataRow("/B?S=1", 200, false)]
+		[DataRow("/B/C?S=1.5", 200, false)]
+		[DataRow("/P?S=2", 405, false)]
+		[DataRow("/X?S=2.5", 404, false)]
+		public async Task Test_051_Delay(string Resource, int ExpectedStatusCode,
 			bool Encrypted)
 		{
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);

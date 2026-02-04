@@ -61,17 +61,6 @@ namespace Waher.Security.WAF.Model.Actions
 			Variables Variables = State.Variables;
 			DateTime UtcNow = DateTime.UtcNow;
 			DateTime Expires = UtcNow + await this.duration.EvaluateAsync(Variables, Duration.Zero);
-			ChunkedList<GenericObject> Tags = new ChunkedList<GenericObject>();
-
-			foreach (KeyValuePair<string, object> P in await this.EvaluateTags(State))
-			{
-				Tags.Add(new GenericObject(string.Empty, string.Empty, Guid.Empty,
-					new KeyValuePair<string, object>[]
-					{
-						new KeyValuePair<string, object>("Name", P.Key),
-						new KeyValuePair<string, object>("Value", P.Value)
-					}));
-			}
 
 			KeyValuePair<string, object>[] Properties = new KeyValuePair<string, object>[]
 			{
@@ -84,13 +73,28 @@ namespace Waher.Security.WAF.Model.Actions
 				new KeyValuePair<string, object>("Classification", await this.classification.EvaluateAsync(Variables, string.Empty)),
 				new KeyValuePair<string, object>("Code", await this.code.EvaluateAsync(Variables, string.Empty)),
 				new KeyValuePair<string, object>("Message", await this.message.EvaluateAsync(Variables, string.Empty)),
-				new KeyValuePair<string, object>("AgentJid", new CaseInsensitiveString(State.Request.Host)),
-				new KeyValuePair<string, object>("Tags", Tags.ToArray())
+				new KeyValuePair<string, object>("AgentJid", new CaseInsensitiveString(State.Request.Host))
 			};
 
-			return new GenericObject("OpenIntelligence",
+			GenericObject Result = new GenericObject("OpenIntelligence",
 				"Waher.Service.IoTBroker.WebServices.Agent.Intelligence.Information",
 				Guid.NewGuid(), Properties);
+
+			ChunkedList<GenericObject> Tags = new ChunkedList<GenericObject>();
+
+			foreach (KeyValuePair<string, object> P in await this.EvaluateTags(State))
+			{
+				Tags.Add(new GenericObject(string.Empty, string.Empty, Guid.Empty,
+					new KeyValuePair<string, object>[]
+					{
+						new KeyValuePair<string, object>("Name", P.Key),
+						new KeyValuePair<string, object>("Value", P.Value)
+					}));
+			}
+
+			Result["Tags"] = Tags.ToArray();
+
+			return Result;
 		}
 
 		/// <summary>

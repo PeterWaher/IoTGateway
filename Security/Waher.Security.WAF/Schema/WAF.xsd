@@ -273,7 +273,7 @@
 	<xs:complexType name="WafActionOpenIntelligence">
 		<xs:complexContent>
 			<xs:extension base="WafActionWithTags">
-				<xs:attribute name="duration" type="xs:duration" use="required"/>
+				<xs:attribute name="duration" type="xs:string" use="required"/>
 				<xs:attribute name="vector" type="xs:string" use="optional"/>
 				<xs:attribute name="protocol" type="xs:string" use="optional"/>
 				<xs:attribute name="classification" type="xs:string" use="optional"/>

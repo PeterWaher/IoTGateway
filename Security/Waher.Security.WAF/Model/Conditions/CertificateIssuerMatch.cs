@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.Xml;
+using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Interfaces;
 
 namespace Waher.Security.WAF.Model.Conditions
@@ -7,7 +8,7 @@ namespace Waher.Security.WAF.Model.Conditions
 	/// <summary>
 	/// Checks for a match against the Certificate Issuer of the request.
 	/// </summary>
-	public class CertificateIssuerMatch : WafCondition
+	public class CertificateIssuerMatch : WafCertificateCondition
 	{
 		/// <summary>
 		/// Checks for a match against the Certificate Issuer of the request.
@@ -47,12 +48,14 @@ namespace Waher.Security.WAF.Model.Conditions
 		/// </summary>
 		/// <param name="State">Current state.</param>
 		/// <returns>Result to return, if any.</returns>
-		public override Task<WafResult?> Review(ProcessingState State)
+		public override async Task<WafResult?> Review(ProcessingState State)
 		{
-			if (State.Request.RemoteCertificateValid)
-				return this.Review(State, State.Request.RemoteCertificate?.Issuer);
+			HttpRequest Request = State.Request;
+
+			if (!(Request.RemoteCertificate is null) && (Request.RemoteCertificateValid || await this.GetTrust(State)))
+				return await this.Review(State, Request.RemoteCertificate.Issuer);
 			else
-				return Task.FromResult<WafResult?>(null);
+				return null;
 		}
 	}
 }

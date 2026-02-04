@@ -41,9 +41,9 @@
 			<xs:element name="ContentTypeMatch" type="WafCondition"/>
 			<xs:element name="ContentMatch" type="WafCondition"/>
 			<xs:element name="EndpointMatch" type="WafCondition"/>
-			<xs:element name="CertificateSubjectMatch" type="WafCondition"/>
-			<xs:element name="CertificateIssuerMatch" type="WafCondition"/>
-			<xs:element name="CertificateSerialNumberMatch" type="WafCondition"/>
+			<xs:element name="CertificateSubjectMatch" type="WafCertificateCondition"/>
+			<xs:element name="CertificateIssuerMatch" type="WafCertificateCondition"/>
+			<xs:element name="CertificateSerialNumberMatch" type="WafCertificateCondition"/>
 			<xs:element name="HeaderMatch" type="WafNamedCondition"/>
 			<xs:element name="QueryMatch" type="WafNamedCondition"/>
 			<xs:element name="IsBlocked" type="WafComparison"/>
@@ -199,6 +199,14 @@
 		<xs:complexContent>
 			<xs:extension base="WafCondition">
 				<xs:attribute name="name" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="WafCertificateCondition">
+		<xs:complexContent>
+			<xs:extension base="WafCondition">
+				<xs:attribute name="trust" type="xs:string" use="optional"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

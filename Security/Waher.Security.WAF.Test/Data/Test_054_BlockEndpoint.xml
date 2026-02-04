@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<If condition="Bool(Request.Header.GetQueryParameter('B'))">
+		<BlockEndpoint reason="Blocked by header B"/>
+	</If>
+	<IsBlocked>
+		<Forbid/>
+	</IsBlocked>
+	<Allow/>
+</Root>

@@ -997,5 +997,27 @@ namespace Waher.Security.WAF.Test
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);
 		}
 
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/A/C?B=1", 403, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C?B=1", 403, false)]
+		[DataRow("/P", 405, false)]
+		[DataRow("/X?B=1", 403, false)]
+		public async Task Test_054_BlockEndpoint(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			RemoteEndpoint EP = await auditor.GetAnnotatedStateObject("[::1]", true);
+
+			try
+			{
+				await this.Get(Resource, ExpectedStatusCode, Encrypted);
+			}
+			finally
+			{
+				EP.Blocked = false;
+			}
+		}
+
 	}
 }

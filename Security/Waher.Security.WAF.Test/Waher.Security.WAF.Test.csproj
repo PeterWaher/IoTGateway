@@ -12,6 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Data\Test_054_BlockEndpoint.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\Test_053_If.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

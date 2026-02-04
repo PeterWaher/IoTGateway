@@ -517,8 +517,11 @@ namespace Waher.Networking.XMPP.Contracts
 						if (this.client.TryGetTag("E2E", out object Obj) &&
 							Obj is EndpointSecurity EndpointSecurity)
 						{
-							this.localKeys = EndpointSecurity;
-						}
+							EndpointSecurity.Dispose();
+                            this.localKeys = new EndpointSecurity(this.client, 128, Keys.ToArray());
+                            this.client.SetTag("E2E", this.localKeys);
+                            this.disposeLocalKeys = true;
+                        }
 						else
 						{
 							this.localKeys = new EndpointSecurity(this.client, 128, Keys.ToArray());

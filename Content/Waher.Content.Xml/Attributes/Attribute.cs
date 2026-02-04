@@ -205,7 +205,9 @@ namespace Waher.Content.Xml.Attributes
 		/// <returns>Evaluation result, or default value if not possible to evaluate.</returns>
 		public async Task<T> EvaluateAsync(Variables Session, T DefaultValue)
 		{
-			if (this.hasPresetValue)
+			if (this.IsEmpty)
+				return DefaultValue;
+			else if (this.hasPresetValue)
 				return this.presetValue;
 			else if (this.hasEvaluatedValue)
 				return this.evaluatedValue;
@@ -213,7 +215,7 @@ namespace Waher.Content.Xml.Attributes
 				return DefaultValue;
 			else if (this.expression is null)
 				return DefaultValue;
-			else 
+			else
 			{
 				try
 				{

@@ -97,8 +97,8 @@
 					<xs:complexContent>
 						<xs:extension base="WafActionWithTags">
 							<xs:attribute name="message" type="xs:string" use="required"/>
-							<xs:attribute name="type" type="EventType" use="optional" default="Informational"/>
-							<xs:attribute name="level" type="EventLevel" use="optional" default="Minor"/>
+							<xs:attribute name="type" type="xs:string" use="optional" default="Informational"/>
+							<xs:attribute name="level" type="xs:string" use="optional" default="Minor"/>
 							<xs:attribute name="object" type="xs:string" use="optional"/>
 							<xs:attribute name="actor" type="xs:string" use="optional"/>
 							<xs:attribute name="eventId" type="xs:string" use="optional"/>
@@ -113,7 +113,7 @@
 				<xs:complexType>
 					<xs:complexContent>
 						<xs:extension base="WafActionWithTags">
-							<xs:attribute name="collection" type="EventLevel" use="required"/>
+							<xs:attribute name="collection" type="xs:string" use="required"/>
 							<xs:attribute name="type" type="xs:string" use="required"/>
 							<xs:attribute name="archivingTimeDays" type="xs:positiveInteger" use="required"/>
 						</xs:extension>

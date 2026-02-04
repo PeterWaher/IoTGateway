@@ -4,6 +4,7 @@ using Waher.Content;
 using Waher.Content.Getters;
 using Waher.Networking;
 using Waher.Networking.HTTP;
+using Waher.Networking.Sniffers;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
@@ -21,11 +22,12 @@ namespace Waher.Security.WAF.Test
 		private static LoginAuditor auditor = null;
 		private HttpServer server = null;
 		private X509Certificate2 certificate;
+		private ConsoleOutSniffer sniffer;
 
 		[AssemblyInitialize]
 		public static async Task AssemblyInitialize(TestContext _)
 		{
-			Runtime.Inventory.Types.Initialize(
+			Types.Initialize(
 				typeof(HttpServer).Assembly,
 				typeof(WafTests).Assembly,
 				typeof(Expression).Assembly,
@@ -71,7 +73,7 @@ namespace Waher.Security.WAF.Test
 		private void SetupServer(WebApplicationFirewall Firewall)
 		{
 			this.certificate = Certificates.LoadCertificate("Waher.Security.WAF.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
-			this.server = new([8081], [8088], this.certificate, false, 
+			this.server = new([8081], [8088], this.certificate, false,
 				ClientCertificates.Optional, true, [], false)
 			{
 				WebApplicationFirewall = Firewall
@@ -83,6 +85,9 @@ namespace Waher.Security.WAF.Test
 			this.server.Register("/A/C", (req, resp) => resp.Return("Hello again."));
 			this.server.Register("/B", (req, resp) => resp.Return("SubPath: " + req.SubPath), true, true);
 			this.server.Register("/P", null, async (req, resp) => await resp.Return((await req.DecodeDataAsync()).Decoded));
+
+			this.sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Base64, LineEnding.NewLine);
+			this.server.Add(this.sniffer);
 		}
 
 		private async Task CloseServer()
@@ -91,6 +96,12 @@ namespace Waher.Security.WAF.Test
 			{
 				await this.server?.DisposeAsync();
 				this.server = null;
+			}
+
+			if (this.sniffer is not null)
+			{
+				await this.sniffer.FlushAsync();
+				await this.sniffer.DisposeAsync();
 			}
 		}
 
@@ -125,7 +136,8 @@ namespace Waher.Security.WAF.Test
 
 			try
 			{
-				Response = await InternetContent.GetAsync(Uri, this.certificate);
+				Response = await InternetContent.GetAsync(Uri, this.certificate,
+					new KeyValuePair<string, string>("Accept", "*/*"));
 			}
 			catch (Exception ex)
 			{
@@ -135,19 +147,19 @@ namespace Waher.Security.WAF.Test
 			CheckResponse(Response, ExpectedStatusCode, ExpectedException);
 		}
 
-		private Task Post(string RelativeUrl, object Data, int ExpectedStatusCode, 
+		private Task Post(string RelativeUrl, object Data, int ExpectedStatusCode,
 			bool Encrypted)
 		{
 			return this.Post(RelativeUrl, Data, ExpectedStatusCode, null, Encrypted);
 		}
 
-		private Task Post(string RelativeUrl, object Data, Type ExpectedException, 
-			bool Encrypted)
-		{
-			return this.Post(RelativeUrl, Data, 0, ExpectedException, Encrypted);
-		}
+		//private Task Post(string RelativeUrl, object Data, Type ExpectedException, 
+		//	bool Encrypted)
+		//{
+		//	return this.Post(RelativeUrl, Data, 0, ExpectedException, Encrypted);
+		//}
 
-		private async Task Post(string RelativeUrl, object Data, 
+		private async Task Post(string RelativeUrl, object Data,
 			int ExpectedStatusCode, Type ExpectedException, bool Encrypted)
 		{
 			Uri Uri = GetUri(RelativeUrl, Encrypted);
@@ -293,7 +305,7 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/B/C", 403, false)]
 		[DataRow("/P", 403, false)]
 		[DataRow("/X", 403, false)]
-		public async Task Test_008_PathMatch(string Resource, int ExpectedStatusCode, 
+		public async Task Test_008_PathMatch(string Resource, int ExpectedStatusCode,
 			bool Encrypted)
 		{
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);
@@ -306,7 +318,7 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/B/C", 200, false)]
 		[DataRow("/P", 403, false)]
 		[DataRow("/X", 403, false)]
-		public async Task Test_009_ResourceMatch(string Resource, int ExpectedStatusCode, 
+		public async Task Test_009_ResourceMatch(string Resource, int ExpectedStatusCode,
 			bool Encrypted)
 		{
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);
@@ -319,7 +331,7 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/B/C", "Hello", 403, false)]
 		[DataRow("/P", "Hello", 200, false)]
 		[DataRow("/X", "Hello", 403, false)]
-		public async Task Test_010_MethodMatch(string Resource, object Data, 
+		public async Task Test_010_MethodMatch(string Resource, object Data,
 			int ExpectedStatusCode, bool Encrypted)
 		{
 			await this.Post(Resource, Data, ExpectedStatusCode, Encrypted);
@@ -360,7 +372,7 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/B/C", 200, false)]
 		[DataRow("/P", 405, false)]
 		[DataRow("/X", 404, false)]
-		public async Task Test_013_EndpointMatch1(string Resource, int ExpectedStatusCode, 
+		public async Task Test_013_EndpointMatch1(string Resource, int ExpectedStatusCode,
 			bool Encrypted)
 		{
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);
@@ -413,6 +425,207 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/P", 405, true)]
 		[DataRow("/X", 404, true)]
 		public async Task Test_017_CertificateSerialNumberMatch(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/A/C", 200, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/P", 405, false)]
+		[DataRow("/X", 404, false)]
+		public async Task Test_018_HeaderMatch1(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false)]
+		[DataRow("/A/C", 403, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/P", 403, false)]
+		[DataRow("/X", 403, false)]
+		public async Task Test_019_HeaderMatch2(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false)]
+		[DataRow("/A/C", 403, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/P", 403, false)]
+		[DataRow("/X", 403, false)]
+		[DataRow("/A?x=1", 403, false)]
+		[DataRow("/A/C?x=1", 403, false)]
+		[DataRow("/B?x=1", 403, false)]
+		[DataRow("/B/C?x=1", 403, false)]
+		[DataRow("/P?x=1", 403, false)]
+		[DataRow("/X?x=1", 403, false)]
+		[DataRow("/A?x=2", 200, false)]
+		[DataRow("/A/C?x=2", 200, false)]
+		[DataRow("/B?x=2", 200, false)]
+		[DataRow("/B/C?x=2", 200, false)]
+		[DataRow("/P?x=2", 405, false)]
+		[DataRow("/X?x=2", 404, false)]
+		public async Task Test_020_QueryMatch(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false, false)]
+		[DataRow("/A/C", 200, false, false)]
+		[DataRow("/B", 200, false, false)]
+		[DataRow("/B/C", 200, false, false)]
+		[DataRow("/P", 405, false, false)]
+		[DataRow("/X", 404, false, false)]
+		[DataRow("/A", 403, false, true)]
+		[DataRow("/A/C", 403, false, true)]
+		[DataRow("/B", 403, false, true)]
+		[DataRow("/B/C", 403, false, true)]
+		[DataRow("/P", 403, false, true)]
+		[DataRow("/X", 403, false, true)]
+		public async Task Test_021_IsBlocked(string Resource, int ExpectedStatusCode,
+			bool Encrypted, bool Blocked)
+		{
+			RemoteEndpoint EP = await auditor.GetAnnotatedStateObject("[::1]", true);
+			EP.Blocked = Blocked;
+
+			try
+			{
+				await this.Get(Resource, ExpectedStatusCode, Encrypted);
+			}
+			finally
+			{
+				EP.Blocked = false;
+			}
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false, false)]
+		[DataRow("/A/C", 200, false, false)]
+		[DataRow("/B", 200, false, false)]
+		[DataRow("/B/C", 200, false, false)]
+		[DataRow("/P", 405, false, false)]
+		[DataRow("/X", 404, false, false)]
+		[DataRow("/A", 403, false, true)]
+		[DataRow("/A/C", 403, false, true)]
+		[DataRow("/B", 403, false, true)]
+		[DataRow("/B/C", 403, false, true)]
+		[DataRow("/P", 403, false, true)]
+		[DataRow("/X", 403, false, true)]
+		public async Task Test_022_IsTemporarilyBlocked(string Resource, int ExpectedStatusCode,
+			bool Encrypted, bool Blocked)
+		{
+			RemoteEndpoint EP = await auditor.GetAnnotatedStateObject("[::1]", true);
+
+			if (Blocked)
+			{
+				EP.State[0] = 5;
+				EP.Timestamps[0] = DateTime.Now.AddMinutes(1);
+			}
+
+			try
+			{
+				await this.Get(Resource, ExpectedStatusCode, Encrypted);
+			}
+			finally
+			{
+				EP.State[0] = 0;
+				EP.Timestamps[0] = DateTime.MinValue;
+			}
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false, false)]
+		[DataRow("/A/C", 200, false, false)]
+		[DataRow("/B", 200, false, false)]
+		[DataRow("/B/C", 200, false, false)]
+		[DataRow("/P", 405, false, false)]
+		[DataRow("/X", 404, false, false)]
+		[DataRow("/A", 403, false, true)]
+		[DataRow("/A/C", 403, false, true)]
+		[DataRow("/B", 403, false, true)]
+		[DataRow("/B/C", 403, false, true)]
+		[DataRow("/P", 403, false, true)]
+		[DataRow("/X", 403, false, true)]
+		public async Task Test_023_IsPermanentlyBlocked(string Resource, int ExpectedStatusCode,
+			bool Encrypted, bool Blocked)
+		{
+			RemoteEndpoint EP = await auditor.GetAnnotatedStateObject("[::1]", true);
+			EP.Blocked = Blocked;
+
+			try
+			{
+				await this.Get(Resource, ExpectedStatusCode, Encrypted);
+			}
+			finally
+			{
+				EP.Blocked = false;
+			}
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false)]
+		[DataRow("/A/C", 403, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/P", 403, false)]
+		[DataRow("/X", 403, false)]
+		[DataRow("/A", 200, true)]
+		[DataRow("/A/C", 200, true)]
+		[DataRow("/B", 200, true)]
+		[DataRow("/B/C", 200, true)]
+		[DataRow("/P", 405, true)]
+		[DataRow("/X", 404, true)]
+		public async Task Test_024_IsUnencrypted(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false)]
+		[DataRow("/A/C", 403, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/P", 403, false)]
+		[DataRow("/X", 403, false)]
+		[DataRow("/A", 200, true)]
+		[DataRow("/A/C", 200, true)]
+		[DataRow("/B", 200, true)]
+		[DataRow("/B/C", 200, true)]
+		[DataRow("/P", 405, true)]
+		[DataRow("/X", 404, true)]
+		public async Task Test_025_IsEncrypted1(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false)]
+		[DataRow("/A/C", 403, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/P", 403, false)]
+		[DataRow("/X", 403, false)]
+		[DataRow("/A", 403, true)]
+		[DataRow("/A/C", 403, true)]
+		[DataRow("/B", 403, true)]
+		[DataRow("/B/C", 403, true)]
+		[DataRow("/P", 403, true)]
+		[DataRow("/X", 403, true)]
+		public async Task Test_026_IsEncrypted2(string Resource, int ExpectedStatusCode,
 			bool Encrypted)
 		{
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);

@@ -40,8 +40,11 @@ namespace Waher.Script
 		/// </summary>
 		public Variables(params Variable[] Variables)
 		{
-			foreach (Variable Variable in Variables)
-				this.variables[Variable.Name] = Variable;
+			if ((Variables?.Length ?? 0) > 0)
+			{
+				foreach (Variable Variable in Variables)
+					this.variables[Variable.Name] = Variable;
+			}
 		}
 
 		/// <summary>

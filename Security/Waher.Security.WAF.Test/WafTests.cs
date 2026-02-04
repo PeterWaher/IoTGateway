@@ -10,6 +10,7 @@ using Waher.Networking.Sniffers;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
+using Waher.Persistence.XmlLedger;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Script;
@@ -23,6 +24,7 @@ namespace Waher.Security.WAF.Test
 		private static FilesProvider filesProvider = null;
 		private static LoginAuditor auditor = null;
 		private static ConsoleEventSink eventSink = null;
+		private static XmlFileLedger ledger = null;
 		private HttpServer server = null;
 		private X509Certificate2 certificate;
 		private ConsoleOutSniffer sniffer;
@@ -47,6 +49,10 @@ namespace Waher.Security.WAF.Test
 			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
 			Database.Register(filesProvider);
 
+			ledger = new XmlFileLedger(Console.Out);
+			await ledger.Start();
+			Ledger.Register(ledger);
+
 			auditor = new LoginAuditor("Login Auditor",
 				new LoginInterval(5, TimeSpan.FromHours(1)),    // Maximum 5 failed login attempts in an hour
 				new LoginInterval(2, TimeSpan.FromDays(1)),     // Maximum 2x5 failed login attempts in a day
@@ -70,6 +76,12 @@ namespace Waher.Security.WAF.Test
 				Log.Unregister(eventSink);
 				await eventSink.DisposeAsync();
 				eventSink = null;
+			}
+
+			if (ledger is not null)
+			{
+				await ledger.Stop();
+				ledger = null;
 			}
 		}
 
@@ -117,6 +129,9 @@ namespace Waher.Security.WAF.Test
 				await this.sniffer.FlushAsync();
 				await this.sniffer.DisposeAsync();
 			}
+
+			if (ledger is not null)
+				await ledger.Flush();
 		}
 
 		[TestInitialize]
@@ -822,6 +837,19 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/Y?Type=Emergency&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
 		[DataRow("/Z?Type=Debug&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
 		public async Task Test_039_LogEvent(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/A/C", 200, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/P", 405, false)]
+		[DataRow("/X", 404, false)]
+		public async Task Test_040_LedgerEntry(string Resource, int ExpectedStatusCode,
 			bool Encrypted)
 		{
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);

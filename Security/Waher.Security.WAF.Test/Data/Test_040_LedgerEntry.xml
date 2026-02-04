@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<LedgerEntry archivingTimeDays="1"
+							 collection="A"
+							 type="T">
+		<Tag name="Resource"
+				 value="{Request.Header.Resource}"/>
+		<Tag name="RemoteEndPoint"
+				 value="{Request.RemoteEndPoint}"/>
+	</LedgerEntry>
+	<Allow/>
+</Root>

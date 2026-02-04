@@ -2,6 +2,8 @@
 using System.Text;
 using Waher.Content;
 using Waher.Content.Getters;
+using Waher.Events;
+using Waher.Events.Console;
 using Waher.Networking;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
@@ -20,6 +22,7 @@ namespace Waher.Security.WAF.Test
 	{
 		private static FilesProvider filesProvider = null;
 		private static LoginAuditor auditor = null;
+		private static ConsoleEventSink eventSink = null;
 		private HttpServer server = null;
 		private X509Certificate2 certificate;
 		private ConsoleOutSniffer sniffer;
@@ -37,6 +40,9 @@ namespace Waher.Security.WAF.Test
 				typeof(FilesProvider).Assembly,
 				typeof(ObjectSerializer).Assembly,
 				typeof(LoginAuditor).Assembly);
+
+			eventSink = new ConsoleEventSink(false);
+			Log.Register(eventSink);
 
 			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
 			Database.Register(filesProvider);
@@ -57,6 +63,13 @@ namespace Waher.Security.WAF.Test
 			{
 				await filesProvider.DisposeAsync();
 				filesProvider = null;
+			}
+
+			if (eventSink is not null)
+			{
+				Log.Unregister(eventSink);
+				await eventSink.DisposeAsync();
+				eventSink = null;
 			}
 		}
 
@@ -794,6 +807,21 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/P", 405, false)]
 		[DataRow("/X", 404, false)]
 		public async Task Test_038_FromIp3(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A?Type=Informational&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/A/C?Type=Notice&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/B?Type=Warning&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/B/C?Type=Error&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/P?Type=Critical&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 405, false)]
+		[DataRow("/X?Type=Alert&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
+		[DataRow("/Y?Type=Emergency&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
+		[DataRow("/Z?Type=Debug&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
+		public async Task Test_039_LogEvent(string Resource, int ExpectedStatusCode,
 			bool Encrypted)
 		{
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<LogEvent type="{H:=Request.Header;H.GetQueryParameter('Type')}"
+						level="{H.GetQueryParameter('Level')}"
+						object="{Request.Header.Resource}"
+						actor="{Request.RemoteEndPoint}"
+						eventId="{H.GetQueryParameter('EventId')}"
+						facility="{H.GetQueryParameter('Facility')}"
+						message="{'Logging event of type '+H.GetQueryParameter('Type')}"
+						module="{WebApplicationFirewall}"
+						stackTrace="{Environment.StackTrace}">
+		<Tag name="{H.GetQueryParameter('N1')}" 
+				 value="{H.GetQueryParameter('V1')}"/>
+		<Tag name="{H.GetQueryParameter('N2')}" 
+				 value="{H.GetQueryParameter('V2')}"/>
+	</LogEvent>
+	<Allow/>
+</Root>

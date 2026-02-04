@@ -12,6 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Data\Test_039_LogEvent.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\Test_038_FromIp3.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -139,6 +142,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj" />
     <ProjectReference Include="..\..\Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />
     <ProjectReference Include="..\..\Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj" />
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />

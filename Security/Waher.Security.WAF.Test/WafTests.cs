@@ -85,6 +85,7 @@ namespace Waher.Security.WAF.Test
 			this.server.Register("/A/C", (req, resp) => resp.Return("Hello again."));
 			this.server.Register("/B", (req, resp) => resp.Return("SubPath: " + req.SubPath), true, true);
 			this.server.Register("/P", null, async (req, resp) => await resp.Return((await req.DecodeDataAsync()).Decoded));
+			this.server.Register(new HttpFolderResource(string.Empty, "Data", false, false, true, false));
 
 			this.sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Base64, LineEnding.NewLine);
 			this.server.Add(this.sniffer);
@@ -626,6 +627,17 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/P", 403, true)]
 		[DataRow("/X", 403, true)]
 		public async Task Test_026_IsEncrypted2(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/Test_027_IsContent.xml", 200, false)]
+		[DataRow("/Text/Test_027_IsContent.txt", 200, false)]
+		[DataRow("/Text/Test_027_IsContent.png", 404, false)]
+		[DataRow("/Test_027_IsContent.manifest", 403, false)]
+		public async Task Test_027_IsContent(string Resource, int ExpectedStatusCode,
 			bool Encrypted)
 		{
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);

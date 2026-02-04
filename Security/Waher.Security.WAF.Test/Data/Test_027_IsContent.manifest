@@ -1,0 +1,7 @@
+﻿<Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
+	<Content fileName="Test_027_IsContent.xml"/>
+	<Folder name="Text">
+		<Content fileName="Test_027_IsContent.txt"/>
+		<Content fileName="Test_027_IsContent.png"/>
+	</Folder>
+</Module>

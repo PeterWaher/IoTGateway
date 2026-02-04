@@ -143,6 +143,15 @@
 			</xs:element>
 			<xs:element name="Call" type="WafActionReference"/>
 			<xs:element name="References" type="WafActions"/>
+			<xs:element name="If">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafComparison">
+							<xs:attribute name="condition" type="xs:string" use="required"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="BlockEndpoint">
 				<xs:complexType>
 					<xs:complexContent>

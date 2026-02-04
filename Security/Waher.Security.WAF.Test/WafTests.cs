@@ -114,7 +114,7 @@ namespace Waher.Security.WAF.Test
 			this.server.Register("/A/C", (req, resp) => resp.Return("Hello again."));
 			this.server.Register("/B", (req, resp) => resp.Return("SubPath: " + req.SubPath), true, true);
 			this.server.Register("/P", null, async (req, resp) => await resp.Return((await req.DecodeDataAsync()).Decoded));
-			this.server.Register(new HttpFolderResource(string.Empty, "Data", false, false, true, false));
+			this.server.Register(new HttpFolderResource(string.Empty, "Data", false, false, true, true));
 
 			this.sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Base64, LineEnding.NewLine);
 			this.server.Add(this.sniffer);

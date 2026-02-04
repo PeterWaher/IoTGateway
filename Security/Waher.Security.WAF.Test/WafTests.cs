@@ -41,7 +41,8 @@ namespace Waher.Security.WAF.Test
 				typeof(Database).Assembly,
 				typeof(FilesProvider).Assembly,
 				typeof(ObjectSerializer).Assembly,
-				typeof(LoginAuditor).Assembly);
+				typeof(LoginAuditor).Assembly,
+				typeof(XmlFileLedger).Assembly);
 
 			eventSink = new ConsoleEventSink(false);
 			Log.Register(eventSink);
@@ -52,6 +53,7 @@ namespace Waher.Security.WAF.Test
 			ledger = new XmlFileLedger(Console.Out);
 			await ledger.Start();
 			Ledger.Register(ledger);
+			Ledger.StartListeningToDatabaseEvents();
 
 			auditor = new LoginAuditor("Login Auditor",
 				new LoginInterval(5, TimeSpan.FromHours(1)),    // Maximum 5 failed login attempts in an hour
@@ -77,6 +79,8 @@ namespace Waher.Security.WAF.Test
 				await eventSink.DisposeAsync();
 				eventSink = null;
 			}
+
+			Ledger.StopListeningToDatabaseEvents();
 
 			if (ledger is not null)
 			{
@@ -828,14 +832,14 @@ namespace Waher.Security.WAF.Test
 		}
 
 		[TestMethod]
-		[DataRow("/A?Type=Informational&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
-		[DataRow("/A/C?Type=Notice&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
-		[DataRow("/B?Type=Warning&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
-		[DataRow("/B/C?Type=Error&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
-		[DataRow("/P?Type=Critical&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 405, false)]
-		[DataRow("/X?Type=Alert&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
-		[DataRow("/Y?Type=Emergency&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
-		[DataRow("/Z?Type=Debug&Level=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
+		[DataRow("/A?Type=Informational&Protocol=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/A/C?Type=Notice&Protocol=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/B?Type=Warning&Protocol=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/B/C?Type=Error&Protocol=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/P?Type=Critical&Protocol=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 405, false)]
+		[DataRow("/X?Type=Alert&Protocol=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
+		[DataRow("/Y?Type=Emergency&Protocol=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
+		[DataRow("/Z?Type=Debug&Protocol=Minor&EventId=UnitTest&Facility=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
 		public async Task Test_039_LogEvent(string Resource, int ExpectedStatusCode,
 			bool Encrypted)
 		{
@@ -850,6 +854,21 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/P", 405, false)]
 		[DataRow("/X", 404, false)]
 		public async Task Test_040_LedgerEntry(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A?Vector=Informational&Protocol=Minor&Classification=UnitTest&Code=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/A/C?Vector=Notice&Protocol=Minor&Classification=UnitTest&Code=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/B?Vector=Warning&Protocol=Minor&Classification=UnitTest&Code=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/B/C?Vector=Error&Protocol=Minor&Classification=UnitTest&Code=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/P?Vector=Critical&Protocol=Minor&Classification=UnitTest&Code=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 405, false)]
+		[DataRow("/X?Vector=Alert&Protocol=Minor&Classification=UnitTest&Code=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
+		[DataRow("/Y?Vector=Emergency&Protocol=Minor&Classification=UnitTest&Code=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
+		[DataRow("/Z?Vector=Debug&Protocol=Minor&Classification=UnitTest&Code=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
+		public async Task Test_041_AddOpenIntelligence(string Resource, int ExpectedStatusCode,
 			bool Encrypted)
 		{
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);

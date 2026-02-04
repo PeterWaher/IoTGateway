@@ -10,7 +10,7 @@ namespace Waher.Security.WAF.Model.Actions
 	/// </summary>
 	public class Delay : WafAction
 	{
-		private readonly PositiveIntegerAttribute seconds;
+		private readonly DoubleAttribute seconds;
 
 		/// <summary>
 		/// Delays processing for a number of seconds.
@@ -29,7 +29,7 @@ namespace Waher.Security.WAF.Model.Actions
 		public Delay(XmlElement Xml, WafAction Parent, WebApplicationFirewall Document)
 			: base(Xml, Parent, Document)
 		{
-			this.seconds = new PositiveIntegerAttribute(Xml, "seconds");
+			this.seconds = new DoubleAttribute(Xml, "seconds");
 		}
 
 		/// <summary>
@@ -53,9 +53,11 @@ namespace Waher.Security.WAF.Model.Actions
 		/// <returns>Result to return, if any.</returns>
 		public override async Task<WafResult?> Review(ProcessingState State)
 		{
-			int Seconds = await this.seconds.EvaluateAsync(State.Variables, 0);
+			double Seconds = await this.seconds.EvaluateAsync(State.Variables, 0);
+			int Milliseconds = (int)(Seconds * 1000 + 0.5);
 
-			await Task.Delay(Seconds);
+			if (Milliseconds > 0)
+				await Task.Delay(Milliseconds);
 
 			return null;
 		}

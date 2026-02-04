@@ -121,7 +121,17 @@
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="AddOpenIntelligence" type="WafActionOpenIntelligence"/>
-			<xs:element name="HasOpenIntelligence" type="WafActionOpenIntelligence"/>
+			<xs:element name="HasOpenIntelligence">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafActionOpenIntelligence">
+							<xs:choice minOccurs="0" maxOccurs="unbounded">
+								<xs:group ref="Rule" minOccurs="0" maxOccurs="unbounded"/>
+							</xs:choice>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="Delay">
 				<xs:complexType>
 					<xs:complexContent>

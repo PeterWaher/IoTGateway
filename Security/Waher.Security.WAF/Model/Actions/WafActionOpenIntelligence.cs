@@ -151,7 +151,7 @@ namespace Waher.Security.WAF.Model.Actions
 
 			ChunkedList<GenericObject> Results = new ChunkedList<GenericObject>();
 			KeyValuePair<string, object>[] Tags = await this.EvaluateTags(State);
-			IEnumerable<GenericObject> Objects = await Database.Find<GenericObject>(
+			IEnumerable<GenericObject> Objects = await Database.Find<GenericObject>("OpenIntelligence",
 				new FilterAnd(Filters.ToArray()));
 
 			if (Tags.Length > 0)

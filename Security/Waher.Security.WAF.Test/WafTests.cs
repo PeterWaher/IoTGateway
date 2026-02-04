@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Getters;
 using Waher.Events;
@@ -99,7 +100,7 @@ namespace Waher.Security.WAF.Test
 			this.SetupServer(Firewall);
 		}
 
-		private void SetupServer(WebApplicationFirewall Firewall)
+		private async Task SetupServer(WebApplicationFirewall Firewall)
 		{
 			this.certificate = Certificates.LoadCertificate("Waher.Security.WAF.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
 			this.server = new([8081], [8088], this.certificate, false,
@@ -118,6 +119,8 @@ namespace Waher.Security.WAF.Test
 
 			this.sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Base64, LineEnding.NewLine);
 			this.server.Add(this.sniffer);
+
+			await Database.Clear("OpenIntelligence");
 		}
 
 		private async Task CloseServer()
@@ -869,6 +872,87 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/Y?Vector=Emergency&Protocol=Minor&Classification=UnitTest&Code=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
 		[DataRow("/Z?Vector=Debug&Protocol=Minor&Classification=UnitTest&Code=VS&Message=Hello&N1=A&V1=B&N2=C&V2=D", 404, false)]
 		public async Task Test_041_AddOpenIntelligence(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A?Vector=V&Protocol=P&Classification=C&Code=123&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/A?Vector=W&Protocol=Q&Classification=D&Code=234&Message=Bye&N1=A&V1=B2&N2=C&V2=D2", 403, false)]
+		public async Task Test_042_HasOpenIntelligence1(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A?Vector=V&Protocol=P&Classification=C&Code=123&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/A?Vector=W&Protocol=Q&Classification=D&Code=234&Message=Bye&N1=A&V1=B2&N2=C&V2=D2", 403, false)]
+		public async Task Test_043_HasOpenIntelligence2(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A?Vector=V&Protocol=P&Classification=C&Code=123&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/A?Vector=W&Protocol=Q&Classification=D&Code=234&Message=Bye&N1=A&V1=B2&N2=C&V2=D2", 403, false)]
+		public async Task Test_044_HasOpenIntelligence3(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A?Vector=V&Protocol=P&Classification=C&Code=123&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/A?Vector=W&Protocol=Q&Classification=D&Code=234&Message=Bye&N1=A&V1=B2&N2=C&V2=D2", 403, false)]
+		public async Task Test_045_HasOpenIntelligence4(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A?Vector=V&Protocol=P&Classification=C&Code=123&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/A?Vector=W&Protocol=Q&Classification=D&Code=234&Message=Bye&N1=A&V1=B2&N2=C&V2=D2", 403, false)]
+		public async Task Test_046_HasOpenIntelligence5(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A?Vector=V&Protocol=P&Classification=C&Code=123&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/A?Vector=W&Protocol=Q&Classification=D&Code=234&Message=Bye&N1=A&V1=B2&N2=C&V2=D2", 403, false)]
+		public async Task Test_047_HasOpenIntelligence6(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A?Vector=V&Protocol=P&Classification=C&Code=123&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/A?Vector=W&Protocol=Q&Classification=D&Code=234&Message=Bye&N1=A&V1=B2&N2=C&V2=D2", 403, false)]
+		public async Task Test_048_HasOpenIntelligence7(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A?Vector=V&Protocol=P&Classification=C&Code=123&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/A?Vector=W&Protocol=Q&Classification=D&Code=234&Message=Bye&N1=A&V1=B2&N2=C&V2=D2", 403, false)]
+		public async Task Test_049_HasOpenIntelligence8(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A?Vector=V&Protocol=P&Classification=C&Code=123&Message=Hello&N1=A&V1=B&N2=C&V2=D", 200, false)]
+		[DataRow("/A?Vector=W&Protocol=Q&Classification=D&Code=234&Message=Bye&N1=A&V1=B2&N2=C&V2=D2", 403, false)]
+		public async Task Test_050_HasOpenIntelligence9(string Resource, int ExpectedStatusCode,
 			bool Encrypted)
 		{
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);

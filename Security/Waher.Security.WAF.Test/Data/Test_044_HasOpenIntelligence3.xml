@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<AddOpenIntelligence duration="PT10S"
+											 vector="{H:=Request.Header;H.GetQueryParameter('Vector')}"
+											 protocol="{H:=Request.Header;H.GetQueryParameter('Protocol')}"
+											 classification="{H:=Request.Header;H.GetQueryParameter('Classification')}"
+											 code="{H:=Request.Header;H.GetQueryParameter('Code')}"
+											 message="{H:=Request.Header;H.GetQueryParameter('Message')}">
+		<Tag name="{H.GetQueryParameter('N1')}"
+				 value="{H.GetQueryParameter('V1')}"/>
+		<Tag name="{H.GetQueryParameter('N2')}"
+				 value="{H.GetQueryParameter('V2')}"/>
+	</AddOpenIntelligence>
+	<HasOpenIntelligence duration="PT10S"
+											 classification="C">
+		<Allow/>
+	</HasOpenIntelligence>
+	<Forbid/>
+</Root>

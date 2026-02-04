@@ -57,8 +57,8 @@ namespace Waher.Security.WAF.Model.Comparisons
 		/// <returns>Result to return, if any.</returns>
 		public override async Task<WafResult?> Review(ProcessingState State)
 		{
-			if (!State.Request.TryGetLocalResourceFileName(State.Request.Header.ResourcePart,
-				State.Request.Host, out string ResourceFileName))
+			if (!State.Request.Server.TryGetFileName(State.Request.Header.ResourcePart,
+				false, out string ResourceFileName))
 			{
 				return null;
 			}
@@ -96,16 +96,16 @@ namespace Waher.Security.WAF.Model.Comparisons
 
 				if (Doc.DocumentElement is null ||
 					Doc.DocumentElement.LocalName != "Module" ||
-					Doc.NamespaceURI != "http://waher.se/Schema/ModuleManifest.xsd")
+					Doc.DocumentElement.NamespaceURI != "http://waher.se/Schema/ModuleManifest.xsd")
 				{
 					return false;
 				}
 
 				XmlElement Loop = Doc.DocumentElement;
-				string[] Parts = ContentFileName.Split('/');
+				string[] Parts = ContentFileName.Split(pathSeparators);
 				int i, c = Parts.Length;
 
-				for (i = 0; i < c; i++)
+				for (i = string.IsNullOrEmpty(Parts[0]) ? 1 : 0; i < c; i++)
 				{
 					XmlElement Found = null;
 
@@ -122,7 +122,7 @@ namespace Waher.Security.WAF.Model.Comparisons
 							{
 								Found = E;
 								break;
-							} 
+							}
 						}
 						else
 						{
@@ -150,5 +150,7 @@ namespace Waher.Security.WAF.Model.Comparisons
 				return false;
 			}
 		}
+
+		private static readonly char[] pathSeparators = new char[] { '/', '\\' };
 	}
 }

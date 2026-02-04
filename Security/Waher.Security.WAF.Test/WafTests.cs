@@ -678,7 +678,7 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/P", "Hello", 200, false, 3)]
 		[DataRow("/P", "Hello", 200, false, 4)]
 		[DataRow("/P", "Hello", 429, false, 5)]
-		public async Task Test_030_BytesExceeded1(string Resource, object Data, 
+		public async Task Test_030_BytesExceeded1(string Resource, object Data,
 			int ExpectedStatusCode, bool Encrypted, int NrRequests)
 		{
 			while (NrRequests-- > 0)
@@ -691,8 +691,8 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/P", "Hello", 200, false, 3, 1, 3)]
 		[DataRow("/P", "Hello", 200, false, 4, 1, 4)]
 		[DataRow("/P", "Hello", 429, false, 5, 1, 5)]
-		public async Task Test_031_BytesExceeded2(string Resource, object Data, 
-			int ExpectedStatusCode, bool Encrypted, int NrRequests1, int SecondsDelay, 
+		public async Task Test_031_BytesExceeded2(string Resource, object Data,
+			int ExpectedStatusCode, bool Encrypted, int NrRequests1, int SecondsDelay,
 			int NrRequests2)
 		{
 			while (NrRequests1-- > 0)
@@ -744,6 +744,59 @@ namespace Waher.Security.WAF.Test
 			int ExpectedStatusCode, bool Encrypted)
 		{
 			await this.Post(Resource, Data, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false, "CL", "Chile", "Valparaiso", "Viña del Mar")]
+		[DataRow("/A", 403, false, "SE", "Sweden", "Stockholm", "Värmdö")]
+		[DataRow("/A", 200, false, "AB", "Abcdef", "ABC", "City")]
+		[DataRow("/A", 200, false, "AB", "Abcdef", "ABC", "Town")]
+		[DataRow("/A", 200, false, "AB", "Abcdef", "ABD", "City")]
+		[DataRow("/A", 200, false, "CD", "Cdefgh", "ABC", "City")]
+		public async Task Test_035_FromIpLocation(string Resource, int ExpectedStatusCode,
+			bool Encrypted, string CountryCode, string Country, string Region, string City)
+		{
+			IpLocalizationService.SetLocation(CountryCode, Country, Region, City, 0, 0);
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/A/C", 200, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/P", 405, false)]
+		[DataRow("/X", 404, false)]
+		public async Task Test_036_FromIp1(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false)]
+		[DataRow("/A/C", 403, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/P", 403, false)]
+		[DataRow("/X", 403, false)]
+		public async Task Test_037_FromIp2(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/A/C", 200, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/P", 405, false)]
+		[DataRow("/X", 404, false)]
+		public async Task Test_038_FromIp3(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
 		}
 
 	}

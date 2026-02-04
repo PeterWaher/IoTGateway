@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<FromIpLocation country="AB,CD" region="ABC,ABD,CDE,CDF" city="City,Town">
+		<Allow/>
+	</FromIpLocation>
+	<Forbid/>
+</Root>

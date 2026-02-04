@@ -643,5 +643,108 @@ namespace Waher.Security.WAF.Test
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);
 		}
 
+		[TestMethod]
+		[DataRow("/A", 200, false, 1)]
+		[DataRow("/A", 200, false, 2)]
+		[DataRow("/A", 200, false, 3)]
+		[DataRow("/A", 429, false, 4)]
+		public async Task Test_028_RequestsExceeded1(string Resource, int ExpectedStatusCode,
+			bool Encrypted, int NrRequests)
+		{
+			while (NrRequests-- > 0)
+				await this.Get(Resource, NrRequests == 0 ? ExpectedStatusCode : 200, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false, 1, 1, 1)]
+		[DataRow("/A", 200, false, 2, 1, 2)]
+		[DataRow("/A", 200, false, 3, 1, 3)]
+		[DataRow("/A", 429, false, 4, 1, 4)]
+		public async Task Test_029_RequestsExceeded2(string Resource, int ExpectedStatusCode,
+			bool Encrypted, int NrRequests1, int SecondsDelay, int NrRequests2)
+		{
+			while (NrRequests1-- > 0)
+				await this.Get(Resource, NrRequests1 == 0 ? ExpectedStatusCode : 200, Encrypted);
+
+			await Task.Delay(SecondsDelay * 1000);
+
+			while (NrRequests2-- > 0)
+				await this.Get(Resource, NrRequests2 == 0 ? ExpectedStatusCode : 200, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/P", "Hello", 200, false, 1)]
+		[DataRow("/P", "Hello", 200, false, 2)]
+		[DataRow("/P", "Hello", 200, false, 3)]
+		[DataRow("/P", "Hello", 200, false, 4)]
+		[DataRow("/P", "Hello", 429, false, 5)]
+		public async Task Test_030_BytesExceeded1(string Resource, object Data, 
+			int ExpectedStatusCode, bool Encrypted, int NrRequests)
+		{
+			while (NrRequests-- > 0)
+				await this.Post(Resource, Data, NrRequests == 0 ? ExpectedStatusCode : 200, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/P", "Hello", 200, false, 1, 1, 1)]
+		[DataRow("/P", "Hello", 200, false, 2, 1, 2)]
+		[DataRow("/P", "Hello", 200, false, 3, 1, 3)]
+		[DataRow("/P", "Hello", 200, false, 4, 1, 4)]
+		[DataRow("/P", "Hello", 429, false, 5, 1, 5)]
+		public async Task Test_031_BytesExceeded2(string Resource, object Data, 
+			int ExpectedStatusCode, bool Encrypted, int NrRequests1, int SecondsDelay, 
+			int NrRequests2)
+		{
+			while (NrRequests1-- > 0)
+				await this.Post(Resource, Data, NrRequests1 == 0 ? ExpectedStatusCode : 200, Encrypted);
+
+			await Task.Delay(SecondsDelay * 1000);
+
+			while (NrRequests2-- > 0)
+				await this.Post(Resource, Data, NrRequests2 == 0 ? ExpectedStatusCode : 200, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false, 1)]
+		[DataRow("/A", 200, false, 2)]
+		[DataRow("/A", 200, false, 3)]
+		[DataRow("/A", 429, false, 4)]
+		public async Task Test_032_ConnectionsExceeded1(string Resource, int ExpectedStatusCode,
+			bool Encrypted, int NrConnections)
+		{
+			while (NrConnections-- > 0)
+				await this.Get(Resource, NrConnections == 0 ? ExpectedStatusCode : 200, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false, 1, 1, 1)]
+		[DataRow("/A", 200, false, 2, 1, 2)]
+		[DataRow("/A", 200, false, 3, 1, 3)]
+		[DataRow("/A", 429, false, 4, 1, 4)]
+		public async Task Test_033_ConnectionsExceeded2(string Resource, int ExpectedStatusCode,
+			bool Encrypted, int NrConnections1, int SecondsDelay, int NrConnections2)
+		{
+			while (NrConnections1-- > 0)
+				await this.Get(Resource, NrConnections1 == 0 ? ExpectedStatusCode : 200, Encrypted);
+
+			await Task.Delay(SecondsDelay * 1000);
+
+			while (NrConnections2-- > 0)
+				await this.Get(Resource, NrConnections2 == 0 ? ExpectedStatusCode : 200, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/P", "Hello", 200, false)]
+		[DataRow("/P", "Hello World", 200, false)]
+		[DataRow("/P", "Hello World.", 200, false)]
+		[DataRow("/P", "Kilroy was here.", 200, false)]
+		[DataRow("/P", "Kilroy was here.....", 200, false)]
+		[DataRow("/P", "Kilroy was here......", 429, false)]
+		public async Task Test_034_ContentSizeExceeded(string Resource, object Data,
+			int ExpectedStatusCode, bool Encrypted)
+		{
+			await this.Post(Resource, Data, ExpectedStatusCode, Encrypted);
+		}
+
 	}
 }

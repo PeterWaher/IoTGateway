@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<ConnectionsExceeded duration="PT1S" limit="3">
+		<RateLimited/>
+	</ConnectionsExceeded>
+	<Allow/>
+</Root>

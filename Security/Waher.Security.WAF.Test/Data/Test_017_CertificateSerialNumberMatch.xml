@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<CertificateSerialNumberMatch value="00947FD2F9EF86D010" mode="ExactConstant" trust="true">
+		<Allow/>
+	</CertificateSerialNumberMatch>
+	<Forbid/>
+</Root>

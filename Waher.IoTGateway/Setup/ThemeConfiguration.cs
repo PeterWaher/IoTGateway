@@ -13,6 +13,7 @@ using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Runtime.Settings;
+using Waher.Content.Xml;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -129,11 +130,7 @@ namespace Waher.IoTGateway.Setup
 			{
 				try
 				{
-					XmlDocument Doc = new XmlDocument()
-					{
-						PreserveWhitespace = true
-					};
-					Doc.Load(FileName);
+					XmlDocument Doc = XML.LoadFromFile(FileName, true);
 
 					XSL.Validate(FileName, Doc, "Theme", "http://waher.se/Schema/Theme.xsd", Schema);
 

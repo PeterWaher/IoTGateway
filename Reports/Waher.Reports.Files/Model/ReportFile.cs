@@ -42,11 +42,7 @@ namespace Waher.Reports.Files.Model
 		{
 			this.fileName = FileName;
 
-			XmlDocument Doc = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-			Doc.Load(FileName);
+			XmlDocument Doc = XML.LoadFromFile(FileName, true);
 
 			XSL.Validate(Path.GetFileName(FileName), Doc, ReportFileLocalName, ReportFileNamespace, schema);
 

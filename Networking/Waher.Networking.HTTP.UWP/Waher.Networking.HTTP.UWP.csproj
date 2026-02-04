@@ -159,6 +159,7 @@
     <Compile Include="HTTP2\StreamState.cs" />
     <Compile Include="HttpRedirectionResource.cs" />
     <Compile Include="Interfaces\IHttpConnectMethod.cs" />
+    <Compile Include="Interfaces\IWebApplicationFirewall.cs" />
     <Compile Include="ProfilingEventArgs.cs" />
     <Compile Include="ProxyRequestEventArgs.cs" />
     <Compile Include="CustomErrorEventArgs.cs" />

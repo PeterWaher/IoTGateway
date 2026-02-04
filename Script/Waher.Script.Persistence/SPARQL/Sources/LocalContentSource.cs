@@ -106,13 +106,7 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 				{
 					if (XML.IsValidXml(s))
 					{
-						Xml = new XmlDocument()
-						{
-							PreserveWhitespace = true
-						};
-
-						Xml.LoadXml(XmlString = s);
-
+						Xml = XML.ParseXml(XmlString = s, true);
 						return new RdfDocument(Xml);
 					}
 					else

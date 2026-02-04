@@ -37,6 +37,7 @@ using Waher.Events.MQTT;
 using Waher.Events.Persistence;
 using Waher.Events.Pipe;
 using Waher.Events.Socket;
+using Waher.Events.Syslog;
 using Waher.Events.WebHook;
 using Waher.Events.XMPP;
 using Waher.Groups;
@@ -103,6 +104,7 @@ using Waher.Security.CallStack;
 using Waher.Security.LoginMonitor;
 using Waher.Security.SHA3;
 using Waher.Security.Users;
+using Waher.Security.WAF;
 using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
@@ -140,6 +142,11 @@ namespace Waher.IoTGateway
 		/// Gateway.config
 		/// </summary>
 		public const string GatewayConfigLocalFileName = "Gateway.config";
+
+		/// <summary>
+		/// WAF.xml
+		/// </summary>
+		public const string WebApplicationFirewallLocalFileName = "WAF.xml";
 
 		/// <summary>
 		/// GatewayConfiguration
@@ -375,16 +382,13 @@ namespace Waher.IoTGateway
 					});
 				}
 
-				XmlDocument Config = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
 
 				string GatewayConfigFileName = ConfigFilePath;
 				if (!File.Exists(GatewayConfigFileName))
 					GatewayConfigFileName = GatewayConfigLocalFileName;
 
-				Config.Load(GatewayConfigFileName);
+				XmlDocument Config = XML.LoadFromFile(GatewayConfigFileName, true);
+				
 				XSL.Validate(GatewayConfigLocalFileName, Config, GatewayConfigLocalName, GatewayConfigNamespace,
 					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.GatewayConfiguration.xsd", typeof(Gateway).Assembly));
 
@@ -843,9 +847,38 @@ namespace Waher.IoTGateway
 													Sinks.Add(new SocketEventSink(SinkId, Host, Port, Tls));
 													break;
 
+												case "SyslogEventSink":
+													SinkId = XML.Attribute(E2, "id");
+													string Name = XML.Attribute(E2, "name");
+													Host = XML.Attribute(E2, "host");
+													Port = XML.Attribute(E2, "port", 514);
+													Tls = XML.Attribute(E2, "tls", false);
+													SyslogEventSeparation Separation = XML.Attribute(E2, "separation", SyslogEventSeparation.OctetCounting);
+
+													if (Tls)
+													{
+														if (certificate is null)
+														{
+															Sinks.Add(new SyslogEventSink(Host, Port, true, Name, applicationName,
+																Separation, SinkId));
+														}
+														else
+														{
+															Sinks.Add(new SyslogEventSink(Host, Port, certificate, Name, applicationName,
+																Separation, SinkId));
+														}
+													}
+													else
+													{
+														Sinks.Add(new SyslogEventSink(Host, Port, false, Name, applicationName,
+															Separation, SinkId));
+													}
+													break;
+
 												case "WebHookEventSink":
 													SinkId = XML.Attribute(E2, "id");
 													string Url = XML.Attribute(E2, "url");
+
 													int MaxSecondsUsed = XML.Attribute(E2, "maxSecondsUsed", 0);
 													int MaxSecondsUnused = XML.Attribute(E2, "maxSecondsUnused", 0);
 													bool CollectOnType = XML.Attribute(E2, "collectOnType", false);
@@ -1308,6 +1341,22 @@ namespace Waher.IoTGateway
 					}
 				};
 
+				string WafFile = Path.Combine(appDataFolder, WebApplicationFirewallLocalFileName);
+				if (File.Exists(WafFile))
+				{
+					try
+					{
+						WebApplicationFirewall Waf = WebApplicationFirewall.LoadFromFile(WafFile, loginAuditor, appDataFolder);
+						webServer.WebApplicationFirewall = Waf;
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex, WafFile);
+					}
+				}
+
+				InternetContent.SetDefaultTimeout(60000, true);
+
 				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/Transforms", Path.Combine(appDataFolder, "Transforms"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false, HostDomainOptions.SameForAllDomains));   // Syntax highlighting library, provided by http://highlightjs.org
@@ -1642,11 +1691,7 @@ namespace Waher.IoTGateway
 									Log.Informational("Importing language file.", FileName);
 
 									Xml = await Files.ReadAllTextAsync(LanguageFile);
-									XmlDocument Doc = new XmlDocument()
-									{
-										PreserveWhitespace = true
-									};
-									Doc.LoadXml(Xml);
+									XmlDocument Doc = XML.ParseXml(Xml, true);
 
 									XSL.Validate(FileName, Doc, Translator.SchemaRoot, Translator.SchemaNamespace, Schema);
 
@@ -2022,11 +2067,7 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				XmlDocument Doc = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-				Doc.Load(ManifestFileName);
+				XmlDocument Doc = XML.LoadFromFile(ManifestFileName, true);
 
 				if (!(Doc.DocumentElement is null) &&
 					Doc.DocumentElement.LocalName == "Module" &&
@@ -2115,11 +2156,7 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				XmlDocument Doc = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-				Doc.Load(ManifestFileName);
+				XmlDocument Doc = XML.LoadFromFile(ManifestFileName, true);
 
 				if (!(Doc.DocumentElement is null) &&
 					Doc.DocumentElement.LocalName == "Module" &&
@@ -2212,7 +2249,7 @@ namespace Waher.IoTGateway
 				{
 					Log.Register(new EventFilter("XMPP Event Filter",
 						new XmppEventSink("XMPP Event Sink", xmppClient, xmppCredentials.Events, false),
-						EventType.Error));
+						EventType.Critical));
 				}
 			}
 
@@ -5857,8 +5894,7 @@ namespace Waher.IoTGateway
 				if (!File.Exists(ConfigurationFileName))
 					return false;
 
-				XmlDocument Doc = new XmlDocument();
-				Doc.Load(ConfigurationFileName);
+				XmlDocument Doc = XML.LoadFromFile(ConfigurationFileName);
 
 				if (Doc.DocumentElement.LocalName != ServiceConfigurationRoot || Doc.DocumentElement.NamespaceURI != ServiceConfigurationNamespace)
 					return false;

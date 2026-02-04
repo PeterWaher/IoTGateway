@@ -46,5 +46,14 @@ namespace Waher.Security
 		/// </returns>
 		Task<DateTime?> GetEarliestLoginOpportunity(string RemoteEndPoint, string Protocol);
 
+		/// <summary>
+		/// Blocks and endpoint.
+		/// </summary>
+		/// <param name="RemoteEndPoint">Remote Endpoint to block.</param>
+		/// <param name="Protocol">Protocol used.</param>
+		/// <param name="Reason">Reason for blocking the endpoint.</param>
+		/// <returns>If the endpoint was blocked as a result of the call (true), 
+		/// or if the endpoint was already blocked (false).</returns>
+		Task<bool> BlockEndpoint(string RemoteEndPoint, string Protocol, string Reason);
 	}
 }

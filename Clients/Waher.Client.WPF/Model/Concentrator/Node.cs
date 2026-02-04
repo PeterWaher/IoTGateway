@@ -1148,8 +1148,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 				try
 				{
-					XmlDocument Doc = new();
-					Doc.LoadXml(s);
+					XmlDocument Doc = XML.ParseXml(s);
 
 					return
 						Doc.DocumentElement is not null &&
@@ -1190,8 +1189,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 				if (string.IsNullOrEmpty(s))
 					return;
 
-				XmlDocument Doc = new();
-				Doc.LoadXml(s);
+				XmlDocument Doc = XML.ParseXml(s);
 
 				Mouse.OverrideCursor = Cursors.Wait;
 

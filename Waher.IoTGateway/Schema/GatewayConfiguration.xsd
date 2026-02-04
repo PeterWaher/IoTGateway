@@ -352,6 +352,25 @@
 					<xs:attribute name="tls" type="xs:boolean" use="optional" default="false"/>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="SyslogEventSink">
+				<xs:complexType>
+					<xs:attribute name="id" type="xs:string" use="required"/>
+					<xs:attribute name="name" type="xs:string" use="required"/>
+					<xs:attribute name="host" type="xs:string" use="required"/>
+					<xs:attribute name="port" type="PortNumber" use="optional" default="514"/>
+					<xs:attribute name="tls" type="xs:boolean" use="optional" default="false"/>
+					<xs:attribute name="separation" use="optional" default="OctetCounting">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="OctetCounting"/>
+								<xs:enumeration value="CrLf"/>
+								<xs:enumeration value="Lf"/>
+								<xs:enumeration value="Null"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="WebHookEventSink">
 				<xs:complexType>
 					<xs:attribute name="id" type="xs:string" use="required"/>

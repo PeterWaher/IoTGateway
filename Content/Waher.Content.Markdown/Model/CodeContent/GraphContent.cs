@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Script.Graphs;
 
@@ -60,8 +61,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// <returns>Graph object</returns>
 		public static async Task<Graph> GetGraph(string[] Rows)
 		{
-			XmlDocument Xml = new XmlDocument();
-			Xml.LoadXml(MarkdownDocument.AppendRows(Rows));
+			XmlDocument Xml = XML.ParseXml(MarkdownDocument.AppendRows(Rows));
 
 			return await Graph.Import(Xml.DocumentElement);
 		}

@@ -310,11 +310,7 @@ namespace Waher.Networking.XMPP.BOSH
 				if (this.xmppClient.HasSniffers)
 					this.xmppClient.ReceiveText(XmlResponse);
 
-				ResponseXml = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-				ResponseXml.LoadXml(XmlResponse);
+				ResponseXml = XML.ParseXml(XmlResponse, true);
 
 				if ((Body = ResponseXml.DocumentElement) is null || Body.LocalName != "body" ||
 					Body.NamespaceURI != HttpBindNamespace)
@@ -774,12 +770,9 @@ namespace Waher.Networking.XMPP.BOSH
 					string Version = null;
 					string Language = null;
 					string StreamPrefix = "stream";
-					XmlDocument BodyDoc = new XmlDocument()
-					{
-						PreserveWhitespace = true
-					};
 					LinkedList<KeyValuePair<string, string>> Namespaces = null;
-					BodyDoc.LoadXml(Body);
+					
+					XmlDocument BodyDoc = XML.ParseXml(Body, true);
 
 					foreach (XmlAttribute Attr in BodyDoc.DocumentElement.Attributes)
 					{

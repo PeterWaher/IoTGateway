@@ -9,7 +9,6 @@ using Waher.Networking.HTTP.HeaderFields;
 using Waher.Runtime.Temporary;
 using Waher.Script;
 using Waher.Runtime.IO;
-using System.Text;
 
 namespace Waher.Networking.HTTP
 {
@@ -228,6 +227,18 @@ namespace Waher.Networking.HTTP
 				return null;
 			else
 				return this.authenticationSchemes;
+		}
+
+		/// <summary>
+		/// Executes the OPTIONS method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public override Task OPTIONS(HttpRequest Request, HttpResponse Response)
+		{
+			this.SetDefaultResponseHeaders(Response);
+			return base.OPTIONS(Request, Response);
 		}
 
 		/// <summary>

@@ -30,6 +30,7 @@ namespace Waher.Networking.HTTP
 		private HttpResource resource = null;
 		private HttpResponse response = null;
 		private Guid? requestId = null;
+		private ContentResponse decoded = null;
 		internal HttpClientConnection clientConnection = null;
 		internal bool tempSession = false;
 		internal bool defaultEncrypted = false;
@@ -134,19 +135,28 @@ namespace Waher.Networking.HTTP
 		/// <returns>Decoded data.</returns>
 		public async Task<ContentResponse> DecodeDataAsync()
 		{
+			if (!(this.decoded is null))
+				return this.decoded;
+
 			byte[] Data = await this.ReadDataAsync();
 			if (Data is null)
 			{
 				Data = Array.Empty<byte>();
-				return new ContentResponse(BinaryCodec.DefaultContentType, Data, Data);
+				this.decoded = new ContentResponse(BinaryCodec.DefaultContentType, Data, Data);
+				return this.decoded;
 			}
 
 			HttpFieldContentType ContentType = this.header.ContentType;
 			if (ContentType is null)
-				return new ContentResponse(BinaryCodec.DefaultContentType, Data, Data);
+			{
+				this.decoded = new ContentResponse(BinaryCodec.DefaultContentType, Data, Data);
+				return this.decoded;
+			}
 
-			return await InternetContent.DecodeAsync(ContentType.Type, Data, ContentType.Encoding, ContentType.Fields,
-				new Uri(this.header.GetURL(false, false)));
+			this.decoded = await InternetContent.DecodeAsync(ContentType.Type, Data, 
+				ContentType.Encoding, ContentType.Fields, new Uri(this.header.GetURL(false, false)));
+
+			return this.decoded;
 		}
 
 		/// <summary>
@@ -318,6 +328,30 @@ namespace Waher.Networking.HTTP
 		{
 			this.dataStream?.Dispose();
 			this.dataStream = null;
+		}
+
+		/// <summary>
+		/// Gets the session variables from the cookie, if available.
+		/// </summary>
+		/// <returns>Session variables, if cookie found. If no session is found, a
+		/// temporary session is created.</returns>
+		public SessionVariables GetSessionFromCookie()
+		{
+			if (this.session is null)
+			{
+				string HttpSessionID = HttpResource.GetSessionId(this, this.response);
+
+				if (!string.IsNullOrEmpty(HttpSessionID))
+					this.session = this.server.GetSession(HttpSessionID);
+
+				if (this.session is null)
+				{
+					this.session = HttpServer.CreateSessionVariables();
+					this.tempSession = true;
+				}
+			}
+
+			return this.session;
 		}
 	}
 }

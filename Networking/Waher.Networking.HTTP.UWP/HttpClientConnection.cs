@@ -14,6 +14,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.HTTP2;
+using Waher.Networking.HTTP.Interfaces;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Networking.Sniffers;
@@ -67,6 +68,8 @@ namespace Waher.Networking.HTTP
 		private int http2InitialMaxFrameSize = int.MaxValue;
 		private readonly Profiler http2Profiler;
 		private readonly bool http2Profiling;
+		private readonly ILoginAuditor loginAuditor;
+		private readonly IWebApplicationFirewall webApplicationFirewall;
 		private FrameType http2FrameType = 0;
 		private ConnectionSettings localSettings = null;
 		private ConnectionSettings remoteSettings = null;
@@ -90,6 +93,9 @@ namespace Waher.Networking.HTTP
 			this.client = Client;
 			this.encrypted = Encrypted;
 			this.port = Port;
+
+			this.loginAuditor = Server.LoginAuditor;
+			this.webApplicationFirewall = Server.WebApplicationFirewall;
 
 			if (this.http2Profiling = Profiler)
 			{
@@ -2119,180 +2125,224 @@ namespace Waher.Networking.HTTP
 
 		private async Task<bool?> QueueRequest(HttpRequest Request)
 		{
-			HttpAuthenticationScheme[] AuthenticationSchemes;
 			bool Result;
 
 			try
 			{
 				if (this.client is null)
+				{
+					Request.Dispose();
 					return false;
-				else if (NetworkingModule.Stopping)
+				}
+				
+				if (NetworkingModule.Stopping)
 				{
 					await this.SendResponse(Request, null, new ServiceUnavailableException("Service is shutting down. Please try again later."), true,
 						new KeyValuePair<string, string>("Retry-After", "300"));    // Try again in 5 minutes.
-					Result = false;
+					Request.Dispose();
+					return false;
 				}
-				else if (this.server.TryGetResource(Request, true, out HttpResource Resource, out string SubPath))
+
+				if (!this.server.TryGetResource(Request, true, out HttpResource Resource, out string SubPath))
 				{
-					Request.Resource = Resource;
-					Request.SubPath = SubPath;
+					Resource = null;
+					SubPath = null;
+				}
 
-					this.server.RequestReceived(Request, this.client.RemoteEndPoint, Resource, SubPath);
-
-					AuthenticationSchemes = Resource.GetAuthenticationSchemes(Request);
-					if (!(AuthenticationSchemes is null) && AuthenticationSchemes.Length > 0 && Request.Header.Method != "OPTIONS")
+				if (!(this.webApplicationFirewall is null))
+				{
+					switch (await this.webApplicationFirewall.Review(Request, Resource, SubPath))
 					{
-						ILoginAuditor Auditor = this.server.LoginAuditor;
+						case WafAction.Allow:
+							break;
 
-						if (!(Auditor is null))
+						case WafAction.Forbid:
+						default:
+							await this.SendResponse(Request, null, new ForbiddenException(), true);
+							Request.Dispose();
+							return true;
+
+						case WafAction.NotFound:
+							await this.SendResponse(Request, null, new NotFoundException(), true);
+							Request.Dispose();
+							return true;
+
+						case WafAction.RateLimited:
+							await this.SendResponse(Request, null, new TooManyRequestsException(), true);
+							Request.Dispose();
+							return true;
+						
+						case WafAction.Ignore:
+							Request.Dispose();
+							return true;
+
+						case WafAction.Close:
+							Request.Dispose();
+							return false;
+					}
+				}
+
+				if (Resource is null)
+				{
+					this.server.RequestReceived(Request, this.client.RemoteEndPoint, null, Request.Header.Resource);
+
+					await this.SendResponse(Request, null, new NotFoundException("Resource not found: " + this.server.CheckResourceOverride(Request.Header.Resource)), false);
+					
+					Request.Dispose();
+					return true;
+				}
+
+				Request.Resource = Resource;
+				Request.SubPath = SubPath;
+
+				this.server.RequestReceived(Request, this.client.RemoteEndPoint, Resource, SubPath);
+
+				HttpAuthenticationScheme[] AuthenticationSchemes = Resource.GetAuthenticationSchemes(Request);
+				if (!(AuthenticationSchemes is null) && 
+					AuthenticationSchemes.Length > 0 && 
+					Request.Header.Method != "OPTIONS")
+				{
+					if (!(this.loginAuditor is null))
+					{
+						DateTime? Next = await this.loginAuditor.GetEarliestLoginOpportunity(Request.RemoteEndPoint, "HTTP");
+
+						if (Next.HasValue)
 						{
-							DateTime? Next = await Auditor.GetEarliestLoginOpportunity(Request.RemoteEndPoint, "HTTP");
+							StringBuilder sb = new StringBuilder();
+							DateTime TP = Next.Value;
+							DateTime Today = DateTime.Today;
+							HttpException Error;
 
-							if (Next.HasValue)
+							if (Next.Value == DateTime.MaxValue)
 							{
-								StringBuilder sb = new StringBuilder();
-								DateTime TP = Next.Value;
-								DateTime Today = DateTime.Today;
-								HttpException Error;
+								sb.Append("This endpoint (");
+								sb.Append(Request.RemoteEndPoint);
+								sb.Append(") has been blocked from the system.");
 
-								if (Next.Value == DateTime.MaxValue)
+								Error = new ForbiddenException(sb.ToString());
+							}
+							else
+							{
+								sb.Append("Too many failed login attempts in a row registered. Try again in ");
+
+								TimeSpan Span = TP - DateTime.Now;
+								double d;
+
+								if ((d = Span.TotalDays) >= 1)
 								{
-									sb.Append("This endpoint (");
-									sb.Append(Request.RemoteEndPoint);
-									sb.Append(") has been blocked from the system.");
-
-									Error = new ForbiddenException(sb.ToString());
+									d = Math.Ceiling(d);
+									sb.Append(d.ToString());
+									sb.Append(" day");
+								}
+								else if ((d = Span.TotalHours) >= 1)
+								{
+									d = Math.Ceiling(d);
+									sb.Append(d.ToString());
+									sb.Append(" hour");
 								}
 								else
 								{
-									sb.Append("Too many failed login attempts in a row registered. Try again in ");
-
-									TimeSpan Span = TP - DateTime.Now;
-									double d;
-
-									if ((d = Span.TotalDays) >= 1)
-									{
-										d = Math.Ceiling(d);
-										sb.Append(d.ToString());
-										sb.Append(" day");
-									}
-									else if ((d = Span.TotalHours) >= 1)
-									{
-										d = Math.Ceiling(d);
-										sb.Append(d.ToString());
-										sb.Append(" hour");
-									}
-									else
-									{
-										d = Math.Ceiling(Span.TotalMinutes);
-										sb.Append(d.ToString());
-										sb.Append(" minute");
-									}
-
-									if (d > 1)
-										sb.Append('s');
-
-									sb.Append(". Remote Endpoint: ");
-									sb.Append(Request.RemoteEndPoint);
-
-									Error = new TooManyRequestsException(sb.ToString());
+									d = Math.Ceiling(Span.TotalMinutes);
+									sb.Append(d.ToString());
+									sb.Append(" minute");
 								}
 
-								await this.SendResponse(Request, null, Error, true);
-								Request.Dispose();
-								return true;
-							}
-						}
+								if (d > 1)
+									sb.Append('s');
 
-						foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
-						{
-							if (Scheme.UserSessions && Request.Session is null)
-							{
-								string HttpSessionID = HttpResource.GetSessionId(Request, Request.Response);
+								sb.Append(". Remote Endpoint: ");
+								sb.Append(Request.RemoteEndPoint);
 
-								if (!string.IsNullOrEmpty(HttpSessionID))
-									Request.Session = this.server.GetSession(HttpSessionID);
-
-								if (Request.Session is null)
-								{
-									Request.Session = HttpServer.CreateSessionVariables();
-									Request.tempSession = true;
-								}
+								Error = new TooManyRequestsException(sb.ToString());
 							}
 
-							IUser User = await Scheme.IsAuthenticated(Request);
-							if (!(User is null))
-							{
-								Request.User = User;
-								break;
-							}
-						}
-
-						if (Request.User is null)
-						{
-							List<KeyValuePair<string, string>> Challenges = new List<KeyValuePair<string, string>>();
-							bool Encrypted = this.client.IsEncrypted;
-#if !WINDOWS_UWP
-							int Strength = Encrypted ? Math.Min(
-								this.client.CipherStrength, this.client.KeyExchangeStrength) : 0;
-#endif
-
-							foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
-							{
-								if (Scheme.RequireEncryption)
-								{
-									if (!Encrypted)
-										continue;
-
-#if !WINDOWS_UWP
-									if (Scheme.MinStrength > Strength)
-										continue;
-#endif
-								}
-
-								string Challenge = Scheme.GetChallenge();
-								if (!string.IsNullOrEmpty(Challenge))
-									Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
-							}
-
-							await this.SendResponse(Request, null, new HttpException(401, UnauthorizedException.StatusMessage, Request,
-								(await Resource.DefaultErrorContent(401)) ?? "Unauthorized access prohibited."), false, Challenges.ToArray());
+							await this.SendResponse(Request, null, Error, true);
 							Request.Dispose();
 							return true;
 						}
 					}
 
-					Resource.Validate(Request);
-
-					if (!(Request.Header.Expect is null))
+					foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 					{
-						if (Request.Header.Expect.Continue100)
+						if (Scheme.UserSessions && Request.Session is null)
 						{
-							if (!Request.HasData)
+							string HttpSessionID = HttpResource.GetSessionId(Request, Request.Response);
+
+							if (!string.IsNullOrEmpty(HttpSessionID))
+								Request.Session = this.server.GetSession(HttpSessionID);
+
+							if (Request.Session is null)
 							{
-								await this.SendResponse(Request, null, new HttpException(100, "Continue", Request, null), false);
-								return null;
+								Request.Session = HttpServer.CreateSessionVariables();
+								Request.tempSession = true;
 							}
 						}
-						else
+
+						IUser User = await Scheme.IsAuthenticated(Request);
+						if (!(User is null))
 						{
-							await this.SendResponse(Request, null, new HttpException(417, "Expectation Failed", Request,
-								(await Resource.DefaultErrorContent(417)) ?? "Unable to parse Expect header."), true);
-							Request.Dispose();
-							return false;
+							Request.User = User;
+							break;
 						}
 					}
 
-					Task _ = Task.Run(() => this.ProcessRequest(Request, Resource));
-					return true;
-				}
-				else
-				{
-					this.server.RequestReceived(Request, this.client.RemoteEndPoint, null, Request.Header.Resource);
+					if (Request.User is null)
+					{
+						List<KeyValuePair<string, string>> Challenges = new List<KeyValuePair<string, string>>();
+						bool Encrypted = this.client.IsEncrypted;
+#if !WINDOWS_UWP
+						int Strength = Encrypted ? Math.Min(
+							this.client.CipherStrength, this.client.KeyExchangeStrength) : 0;
+#endif
 
-					await this.SendResponse(Request, null, new NotFoundException("Resource not found: " + this.server.CheckResourceOverride(Request.Header.Resource)), false);
-					Result = true;
+						foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
+						{
+							if (Scheme.RequireEncryption)
+							{
+								if (!Encrypted)
+									continue;
+
+#if !WINDOWS_UWP
+								if (Scheme.MinStrength > Strength)
+									continue;
+#endif
+							}
+
+							string Challenge = Scheme.GetChallenge();
+							if (!string.IsNullOrEmpty(Challenge))
+								Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
+						}
+
+						await this.SendResponse(Request, null, new HttpException(401, UnauthorizedException.StatusMessage, Request,
+							(await Resource.DefaultErrorContent(401)) ?? "Unauthorized access prohibited."), false, Challenges.ToArray());
+						Request.Dispose();
+						return true;
+					}
 				}
+
+				Resource.Validate(Request);
+
+				if (!(Request.Header.Expect is null))
+				{
+					if (Request.Header.Expect.Continue100)
+					{
+						if (!Request.HasData)
+						{
+							await this.SendResponse(Request, null, new HttpException(100, "Continue", Request, null), false);
+							return null;
+						}
+					}
+					else
+					{
+						await this.SendResponse(Request, null, new HttpException(417, "Expectation Failed", Request,
+							(await Resource.DefaultErrorContent(417)) ?? "Unable to parse Expect header."), true);
+						Request.Dispose();
+						return false;
+					}
+				}
+
+				Task _ = Task.Run(() => this.ProcessRequest(Request, Resource));
+				return true;
 			}
 			catch (HttpException ex)
 			{

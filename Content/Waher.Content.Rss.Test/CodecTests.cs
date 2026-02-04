@@ -73,11 +73,8 @@ namespace Waher.Content.Rss.Test
 		[DataRow("sample-rss-2.rss")]
 		public void Test_03_CanEncode(string FileName)
 		{
-			XmlDocument Xml = new()
-			{
-				PreserveWhitespace = true
-			};
-			Xml.Load(Path.Combine(Environment.CurrentDirectory, "Data", FileName));
+			FileName = Path.Combine(Environment.CurrentDirectory, "Data", FileName);
+			XmlDocument Xml = XML.LoadFromFile(FileName, true);
 			RssDocument Doc = new(Xml, null);
 
 			Assert.IsTrue(InternetContent.Encodes(Doc, out Grade Grade, out IContentEncoder Encoder));
@@ -91,11 +88,8 @@ namespace Waher.Content.Rss.Test
 		[DataRow("sample-rss-2.rss")]
 		public async Task Test_04_Encode(string FileName)
 		{
-			XmlDocument Xml = new()
-			{
-				PreserveWhitespace = true
-			};
-			Xml.Load(Path.Combine(Environment.CurrentDirectory, "Data", FileName));
+			FileName = Path.Combine(Environment.CurrentDirectory, "Data", FileName);
+			XmlDocument Xml = XML.LoadFromFile(FileName, true);
 			RssDocument Doc = new(Xml, null);
 
 			ContentResponse P = await InternetContent.EncodeAsync(Doc, Encoding.UTF8);

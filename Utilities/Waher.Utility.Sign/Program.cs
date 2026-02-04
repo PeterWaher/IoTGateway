@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Xml;
+using Waher.Content.Xml;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
@@ -115,11 +116,7 @@ namespace Waher.Utility.Sign
                             if (Endpoint is EllipticCurveEndpoint EC)
                             {
                                 s = EC.Curve.Export();
-                                XmlDocument Doc = new()
-                                {
-                                    PreserveWhitespace = true
-                                };
-                                Doc.LoadXml(s);
+                                XmlDocument Doc = XML.ParseXml(s, true);
                                 s = Doc.DocumentElement.GetAttribute("d");
                             }
                             else if (Endpoint is RsaEndpoint Rsa)

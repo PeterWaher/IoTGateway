@@ -109,7 +109,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		public Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate, EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator,
 			params KeyValuePair<string, string>[] Headers)
 		{
-			return this.GetAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Headers);
+			return this.GetAsync(Uri, Certificate, RemoteCertificateValidator, InternetContent.DefaultTimeout, Headers);
 		}
 
 		/// <summary>
@@ -194,7 +194,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
-			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Headers);
+			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, InternetContent.DefaultTimeout, Headers);
 		}
 
 		/// <summary>
@@ -209,7 +209,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, TemporaryStream Destination, params KeyValuePair<string, string>[] Headers)
 		{
-			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Destination, Headers);
+			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, InternetContent.DefaultTimeout, Destination, Headers);
 		}
 
 		/// <summary>
@@ -218,7 +218,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Uri">URI</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="RemoteCertificateValidator">Optional callback method for validating remote certificates.</param>
-		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=<see cref="InternetContent.DefaultTimeout"/>)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
@@ -233,7 +233,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Uri">URI</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
-		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=<see cref="InternetContent.DefaultTimeout"/>)</param>
 		/// <param name="Destination">Optional destination. Content will be output to this stream. If not provided, a new temporary stream will be created.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>

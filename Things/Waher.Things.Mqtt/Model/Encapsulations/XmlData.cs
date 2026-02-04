@@ -65,11 +65,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 					this.first = false;
 				}
 
-				this.value = new XmlDocument()
-				{
-					PreserveWhitespace = false
-				};
-				this.value.LoadXml(s);
+				this.value = XML.ParseXml(s, true);
 				this.xml = s;
 				this.Timestamp = DateTime.UtcNow;
 				this.QoS = Content.Header.QualityOfService;
@@ -225,11 +221,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 					(n) => Task.FromResult<string>(this.xml),
 					(n, v) =>
 					{
-						XmlDocument Doc = new XmlDocument()
-						{
-							PreserveWhitespace = true
-						};
-						Doc.LoadXml(v);
+						XmlDocument Doc = XML.ParseXml(v, true);
 						this.value = Doc;
 						this.xml = v;
 						this.Topic.MqttClient.PUBLISH(this.Topic.FullTopic, this.QoS, this.Retain, Encoding.UTF8.GetBytes(v));

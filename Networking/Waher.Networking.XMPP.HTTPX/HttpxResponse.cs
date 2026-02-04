@@ -247,7 +247,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				using (HttpClient HttpClient = new HttpClient()
 				{
-					Timeout = TimeSpan.FromMilliseconds(60000)
+					Timeout = TimeSpan.FromMilliseconds(InternetContent.DefaultTimeout)
 				})
 				{
 					long DataLen = File.Length;

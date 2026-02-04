@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<ResourceMatch value="/P" mode="ExactConstant">
+		<MethodMatch value="POST,OPTIONS" mode="List">
+			<Allow/>
+		</MethodMatch>
+		<Forbid/>
+	</ResourceMatch>
+	<MethodMatch value="GET,OPTIONS" mode="List">
+		<Allow/>
+	</MethodMatch>
+	<Forbid/>
+</Root>

@@ -151,8 +151,7 @@ namespace Waher.Content.Markdown.Consolidation
 								for (i = 1, c--; i < c; i++)
 									sb.AppendLine(Result.rows[i]);
 
-								XmlDocument Xml = new XmlDocument();
-								Xml.LoadXml(sb.ToString());
+								XmlDocument Xml = XML.ParseXml(sb.ToString());
 
 								Graph G = await Graph.TryImport(Xml.DocumentElement);
 

@@ -705,6 +705,34 @@ namespace Waher.Content.Xml
 		#region Parsing
 
 		/// <summary>
+		/// Parses an XML Document from its string representation.
+		/// </summary>
+		/// <param name="Xml">XML string</param>
+		/// <returns>Parsed XML Document.</returns>
+		public static XmlDocument ParseXml(string Xml)
+		{
+			return ParseXml(Xml, false);
+		}
+
+		/// <summary>
+		/// Parses an XML Document from its string representation.
+		/// </summary>
+		/// <param name="Xml">XML string</param>
+		/// <param name="PreserveWhitespace">If whitespace should be preserved.</param>
+		/// <returns>Parsed XML Document.</returns>
+		public static XmlDocument ParseXml(string Xml, bool PreserveWhitespace)
+		{
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = PreserveWhitespace
+			};
+
+			Doc.LoadXml(Xml);
+
+			return Doc;
+		}
+
+		/// <summary>
 		/// Decodes a string used in XML.
 		/// </summary>
 		/// <param name="s">String</param>
@@ -1413,8 +1441,7 @@ namespace Waher.Content.Xml
 		/// <returns>Normalized XML</returns>
 		public static string NormalizeXml(string Xml)
 		{
-			XmlDocument Doc = new XmlDocument();
-			Doc.LoadXml(Xml);
+			XmlDocument Doc = ParseXml(Xml);
 			return NormalizeXml(Doc.DocumentElement);
 		}
 
@@ -1587,12 +1614,7 @@ namespace Waher.Content.Xml
 		/// <returns>Reformatted XML.</returns>
 		public static string PrettyXml(string Xml)
 		{
-			XmlDocument Doc = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-
-			Doc.LoadXml(Xml);
+			XmlDocument Doc = ParseXml(Xml, true);
 
 			return PrettyXml(Doc);
 		}
@@ -1653,6 +1675,38 @@ namespace Waher.Content.Xml
 			}
 
 			return new XmlException(sb.ToString(), ex.InnerException, ex.LineNumber, ex.LinePosition);
+		}
+
+		#endregion
+
+		#region Loading
+
+		/// <summary>
+		/// Loads an XML document from a file.
+		/// </summary>
+		/// <param name="FileName">File Name</param>
+		/// <returns>Parsed XML Document.</returns>
+		public static XmlDocument LoadFromFile(string FileName)
+		{
+			return LoadFromFile(FileName, false);
+		}
+
+		/// <summary>
+		/// Loads an XML document from a file.
+		/// </summary>
+		/// <param name="FileName">File Name</param>
+		/// <param name="PreserveWhitespace">If whitespace should be preserved.</param>
+		/// <returns>Parsed XML Document.</returns>
+		public static XmlDocument LoadFromFile(string FileName, bool PreserveWhitespace)
+		{
+			XmlDocument Xml = new XmlDocument()
+			{
+				PreserveWhitespace = PreserveWhitespace
+			};
+
+			Xml.Load(FileName);
+
+			return Xml;
 		}
 
 		#endregion

@@ -438,7 +438,7 @@ namespace Waher.Client.WPF.Controls
 					{
 						using FileStream f = File.Create(Dialog.FileName);
 						using XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false));
-						
+
 						this.SaveAsXml(w);
 					}
 				}
@@ -501,12 +501,7 @@ namespace Waher.Client.WPF.Controls
 
 				if (Result.HasValue && Result.Value)
 				{
-					XmlDocument Xml = new()
-					{
-						PreserveWhitespace = true
-					};
-					Xml.Load(Dialog.FileName);
-
+					XmlDocument Xml = XML.LoadFromFile(Dialog.FileName, true);
 					await this.Load(Xml, Dialog.FileName);
 				}
 			}

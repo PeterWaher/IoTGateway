@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<UriMatch value="http://localhost:8081/A" mode="StartsWithConstant">
+		<Allow/>
+	</UriMatch>
+	<Forbid/>
+</Root>

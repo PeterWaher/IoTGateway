@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
+using Waher.Content.Xml;
 
 namespace Waher.Client.WPF.Dialogs.Xmpp
 {
@@ -27,8 +28,7 @@ namespace Waher.Client.WPF.Dialogs.Xmpp
 
 				if (!string.IsNullOrEmpty(s))
 				{
-					XmlDocument Doc = new XmlDocument();
-					Doc.LoadXml(s);
+					XmlDocument Doc = XML.ParseXml(s);
 
 					this.CustomXml.Background = null;
 					this.xmlOk = true;

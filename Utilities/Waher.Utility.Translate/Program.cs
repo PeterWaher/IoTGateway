@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
@@ -254,11 +255,7 @@ namespace Waher.Utility.Translate
 				else
 					RuntimeSettings.Set("Translation.Key", TranslationKey);
 
-				XmlDocument From = new()
-				{
-					PreserveWhitespace = true
-				};
-				From.Load(ReferenceFileName);
+				XmlDocument From = XML.LoadFromFile(ReferenceFileName, true);
 
 				if (From.DocumentElement is null || From.DocumentElement.LocalName != "root")
 					throw new Exception("Reference file does not point to a resource file.");

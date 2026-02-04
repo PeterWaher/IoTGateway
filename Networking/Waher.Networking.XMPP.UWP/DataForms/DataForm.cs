@@ -388,8 +388,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <exception cref="Exception">Exception thrown if XML does not represent an XMPP Data Form.</exception>
 		public static DataForm Parse(XmppClient Client, string Xml, EventHandlerAsync<DataForm> OnSubmit, EventHandlerAsync<DataForm> OnCancel, string From, string To)
 		{
-			XmlDocument Doc = new XmlDocument();
-			Doc.LoadXml(Xml);
+			XmlDocument Doc = XML.ParseXml(Xml);
 
 			if (Doc.DocumentElement.LocalName != "x")
 				throw new Exception("Not an XMPP Data Form XML document.");

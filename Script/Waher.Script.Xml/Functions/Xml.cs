@@ -5,6 +5,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using System.Collections.Generic;
+using Waher.Content.Xml;
 
 namespace Waher.Script.Xml.Functions
 {
@@ -43,14 +44,7 @@ namespace Waher.Script.Xml.Functions
 
 		private static XmlDocument ToXml(string s)
 		{
-			XmlDocument Doc = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-
-			Doc.LoadXml(s);
-
-			return Doc;
+			return XML.ParseXml(s, true);
 		}
 
 		/// <summary>

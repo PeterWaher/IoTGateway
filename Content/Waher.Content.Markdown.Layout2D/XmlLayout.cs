@@ -282,8 +282,7 @@ namespace Waher.Content.Markdown.Layout2D
 				Result.Converted = true;
 			else
 			{
-				Result.Xml = new XmlDocument();
-				Result.Xml.LoadXml(Xml);
+				Result.Xml = XML.ParseXml(Xml);
 
 				if (Layout2DDocument.IsLayoutXml(Result.Xml))
 				{
@@ -560,8 +559,7 @@ namespace Waher.Content.Markdown.Layout2D
 				else
 					Title = string.Empty;
 
-				XmlDocument Doc = new XmlDocument();
-				Doc.LoadXml(Xml);
+				XmlDocument Doc = XML.ParseXml(Xml);
 
 				Variables Variables = Document.Settings.Variables;
 				Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Doc, Variables);

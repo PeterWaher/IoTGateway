@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
@@ -306,8 +307,7 @@ namespace Waher.Script.Persistence.SQL
 				return ObjectsExported.ToVector();
 			else if (!(XmlOutput is null))
 			{
-				XmlDocument Doc = new XmlDocument();
-				Doc.LoadXml(XmlOutput.ToString());
+				XmlDocument Doc = XML.ParseXml(XmlOutput.ToString());
 				return new ObjectValue(Doc);
 			}
 			else if (!(TableExported is null))

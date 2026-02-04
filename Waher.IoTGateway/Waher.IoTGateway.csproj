@@ -372,6 +372,7 @@
     <ProjectReference Include="..\Events\Waher.Events.Persistence\Waher.Events.Persistence.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.Pipe\Waher.Events.Pipe.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.Socket\Waher.Events.Socket.csproj" />
+    <ProjectReference Include="..\Events\Waher.Events.Syslog\Waher.Events.Syslog.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.WebHook\Waher.Events.WebHook.csproj" />
     <ProjectReference Include="..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj" />
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj" />
@@ -451,6 +452,7 @@
     <ProjectReference Include="..\Security\Waher.Security.SPF\Waher.Security.SPF.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.TOTP\Waher.Security.TOTP.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.Users\Waher.Security.Users.csproj" />
+    <ProjectReference Include="..\Security\Waher.Security.WAF\Waher.Security.WAF.csproj" />
     <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj" />
 		<ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />
 		<ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />

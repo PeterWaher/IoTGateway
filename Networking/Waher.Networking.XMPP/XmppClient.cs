@@ -1037,11 +1037,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append(XML.Encode(this.fullJid));
 			Xml.Append("' type='unavailable'/>");
 
-			XmlDocument Doc = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-			Doc.LoadXml(Xml.ToString());
+			XmlDocument Doc = XML.ParseXml(Xml.ToString(), true);
 
 			return this.ProcessPresence(new PresenceEventArgs(this, Doc.DocumentElement));
 		}
@@ -1231,11 +1227,7 @@ namespace Waher.Networking.XMPP
 							Xml.Append("'><error type='cancel'><service-unavailable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
 							Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Client disposed.</text></error></iq>");
 
-							XmlDocument Doc = new XmlDocument()
-							{
-								PreserveWhitespace = true
-							};
-							Doc.LoadXml(Xml.ToString());
+							XmlDocument Doc = XML.ParseXml(Xml.ToString(), true);
 
 							if (!(Request.IqCallback is null))
 							{
@@ -1882,11 +1874,7 @@ namespace Waher.Networking.XMPP
 				else
 					this.streamFooter = "</" + Xml.Substring(1, i - 1) + ":stream>";
 
-				XmlDocument Doc = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-				Doc.LoadXml(Xml + this.streamFooter);
+				XmlDocument Doc = XML.ParseXml(Xml + this.streamFooter, true);
 
 				if (Doc.DocumentElement.LocalName != "stream")
 					throw new XmppException("Invalid stream.", Doc.DocumentElement);
@@ -1916,11 +1904,7 @@ namespace Waher.Networking.XMPP
 
 			try
 			{
-				Doc = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-				Doc.LoadXml(this.streamHeader + Xml + this.streamFooter);
+				Doc = XML.ParseXml(this.streamHeader + Xml + this.streamFooter, true);
 
 				foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 				{
@@ -7194,11 +7178,7 @@ namespace Waher.Networking.XMPP
 								Xml.Append("'><error type='wait'><recipient-unavailable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
 								Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Timeout.</text></error></iq>");
 
-								XmlDocument Doc = new XmlDocument()
-								{
-									PreserveWhitespace = true
-								};
-								Doc.LoadXml(Xml.ToString());
+								XmlDocument Doc = XML.ParseXml(Xml.ToString(), true);
 								
 								if (!(Request.IqCallback is null))
 								{
@@ -7578,11 +7558,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="ElementXml">XML element to store.</param>
 		public Task SetPrivateXmlElementAsync(string ElementXml)
 		{
-			XmlDocument Doc = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-			Doc.LoadXml(ElementXml);
+			XmlDocument Doc = XML.ParseXml(ElementXml, true);
 
 			return this.SetPrivateXmlElementAsync(Doc.DocumentElement);
 		}
@@ -7616,11 +7592,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
 		public Task SetPrivateXmlElement(string ElementXml, EventHandlerAsync<PrivateXmlEventArgs> Callback, object State)
 		{
-			XmlDocument Doc = new XmlDocument()
-			{
-				PreserveWhitespace = true
-			};
-			Doc.LoadXml(ElementXml);
+			XmlDocument Doc = XML.ParseXml(ElementXml, true);
 
 			return this.SetPrivateXmlElement(Doc.DocumentElement, Callback, State);
 		}

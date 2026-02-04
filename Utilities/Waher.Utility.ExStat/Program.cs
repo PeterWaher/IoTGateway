@@ -277,8 +277,7 @@ namespace Waher.Utility.ExStat
 
 						try
 						{
-							XmlDocument Doc = new();
-							Doc.Load(FileName);
+							XmlDocument Doc = XML.LoadFromFile(FileName);
 
 							foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 							{

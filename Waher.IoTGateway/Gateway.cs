@@ -208,6 +208,7 @@ namespace Waher.IoTGateway
 		private static Dictionary<string, string> defaultPageByHostName = null;
 		private static CommunicationLayer firstChanceExceptions = new CommunicationLayer(true);
 		private static IPersistentDictionary nonceValues;
+		private static DateTime wafTimestamp = DateTime.MinValue;
 		private static string instance;
 		private static string appDataFolder;
 		private static string runtimeFolder;
@@ -1341,19 +1342,7 @@ namespace Waher.IoTGateway
 					}
 				};
 
-				string WafFile = Path.Combine(appDataFolder, WebApplicationFirewallLocalFileName);
-				if (File.Exists(WafFile))
-				{
-					try
-					{
-						WebApplicationFirewall Waf = WebApplicationFirewall.LoadFromFile(WafFile, loginAuditor, appDataFolder);
-						webServer.WebApplicationFirewall = Waf;
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex, WafFile);
-					}
-				}
+				await CheckWAF();
 
 				InternetContent.SetDefaultTimeout(60000, true);
 
@@ -1837,6 +1826,42 @@ namespace Waher.IoTGateway
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Checks the Web Application Firewall file and loads or reloads it if necessary.
+		/// </summary>
+		public static async Task CheckWAF()
+		{
+			string WafFile = Path.Combine(appDataFolder, WebApplicationFirewallLocalFileName);
+			if (File.Exists(WafFile))
+			{
+				try
+				{
+					DateTime LastUpdated = File.GetLastWriteTimeUtc(WafFile);
+
+					if (LastUpdated > wafTimestamp)
+					{
+						if (webServer.WebApplicationFirewall is null)
+						{
+							WebApplicationFirewall Waf = WebApplicationFirewall.LoadFromFile(WafFile, loginAuditor, appDataFolder);
+							webServer.WebApplicationFirewall = Waf;
+							Log.Informational("Web Application Firewall configuration loaded.", WafFile);
+						}
+						else
+						{
+							await webServer.WebApplicationFirewall.Reload();
+							Log.Informational("Web Application Firewall configuration reloaded due to file change.", WafFile);
+						}
+
+						wafTimestamp = LastUpdated;
+					}
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex, WafFile);
+				}
+			}
 		}
 
 		private static void AttemptReopenPorts(object _)

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<PathMatch value="/A" mode="StartsWithConstant">
+		<IncrementCounter name="TestCounter"/>
+	</PathMatch>
+	<PathMatch value="/B" mode="StartsWithConstant">
+		<IncrementCounter name="TestCounter" delta="2"/>
+	</PathMatch>
+	<PathMatch value="/C" mode="StartsWithConstant">
+		<IncrementCounter name="TestCounter" delta="3"/>
+	</PathMatch>
+	<Allow/>
+</Root>

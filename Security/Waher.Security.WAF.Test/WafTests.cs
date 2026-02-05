@@ -11,6 +11,7 @@ using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.XmlLedger;
+using Waher.Runtime.Counters;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Script;
@@ -43,7 +44,8 @@ namespace Waher.Security.WAF.Test
 				typeof(FilesProvider).Assembly,
 				typeof(ObjectSerializer).Assembly,
 				typeof(LoginAuditor).Assembly,
-				typeof(XmlFileLedger).Assembly);
+				typeof(XmlFileLedger).Assembly,
+				typeof(RuntimeCounters).Assembly);
 
 			eventSink = new ConsoleEventSink(false);
 			Log.Register(eventSink);
@@ -1450,6 +1452,108 @@ namespace Waher.Security.WAF.Test
 				EP.State[0] = 0;
 				EP.Timestamps[0] = DateTime.MinValue;
 			}
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false, "TestCounter", 1)]
+		[DataRow("/A/C", 200, false, "TestCounter", 1)]
+		[DataRow("/B", 200, false, "TestCounter", 2)]
+		[DataRow("/B/C", 200, false, "TestCounter", 2)]
+		[DataRow("/C", 404, false, "TestCounter", 3)]
+		[DataRow("/X", 404, false, "TestCounter", 0)]
+		public async Task Test_080_IncrementCounter(string Resource, int ExpectedStatusCode,
+			bool Encrypted, string CounterName, long Delta)
+		{
+			long Counter0 = await RuntimeCounters.GetCount(CounterName);
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+			long Counter1 = await RuntimeCounters.GetCount(CounterName);
+
+			Assert.AreEqual(Delta, Counter1 - Counter0);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false, "TestCounter", -1)]
+		[DataRow("/A/C", 200, false, "TestCounter", -1)]
+		[DataRow("/B", 200, false, "TestCounter", -2)]
+		[DataRow("/B/C", 200, false, "TestCounter", -2)]
+		[DataRow("/C", 404, false, "TestCounter", -3)]
+		[DataRow("/X", 404, false, "TestCounter", 0)]
+		public async Task Test_081_DecrementCounter(string Resource, int ExpectedStatusCode,
+			bool Encrypted, string CounterName, long Delta)
+		{
+			long Counter0 = await RuntimeCounters.GetCount(CounterName);
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+			long Counter1 = await RuntimeCounters.GetCount(CounterName);
+
+			Assert.AreEqual(Delta, Counter1 - Counter0);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false, "TestCounter")]
+		[DataRow("/A/C", 200, false, "TestCounter")]
+		[DataRow("/B", 200, false, "TestCounter")]
+		[DataRow("/B/C", 200, false, "TestCounter")]
+		[DataRow("/C", 404, false, "TestCounter")]
+		[DataRow("/X", 404, false, "TestCounter")]
+		public async Task Test_082_ClearCounter(string Resource, int ExpectedStatusCode,
+			bool Encrypted, string CounterName)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+			long Counter = await RuntimeCounters.GetCount(CounterName);
+
+			Assert.AreEqual(0, Counter);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/A/C", 403, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/X", 404, false)]
+		public async Task Test_083_TestCounter1(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/A/C", 200, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/B/Charlie", 403, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/X", 404, false)]
+		public async Task Test_084_TestCounter2(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false)]
+		[DataRow("/A/C", 200, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/B/Charlie", 403, false)]
+		[DataRow("/C", 403, false)]
+		[DataRow("/X", 403, false)]
+		public async Task Test_085_TestCounter3(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/A/C", 403, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/B/Charlie", 200, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/X", 404, false)]
+		public async Task Test_086_TestCounter4(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
 		}
 
 	}

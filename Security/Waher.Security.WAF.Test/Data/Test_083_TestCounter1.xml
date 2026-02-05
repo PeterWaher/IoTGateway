@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<ClearCounter name="TestCounter"/>
+	<TestCounter name="TestCounter" above="10" delta="{Length(Request.Header.Resource)*5}">
+		<Forbid/>
+	</TestCounter>
+	<Allow/>
+</Root>

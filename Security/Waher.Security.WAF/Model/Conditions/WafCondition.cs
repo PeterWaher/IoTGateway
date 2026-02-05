@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
@@ -148,11 +149,11 @@ namespace Waher.Security.WAF.Model.Conditions
 					return List.ContainsKey(Property);
 
 				case ComparisonMode.FileList:
-					List = await GetFileList(Value, false);
+					List = await this.GetFileList(Value, false);
 					return List.ContainsKey(Property);
 
 				case ComparisonMode.FileListIgnoreCase:
-					List = await GetFileList(Value, true);
+					List = await this.GetFileList(Value, true);
 					return List.ContainsKey(Property);
 
 				case ComparisonMode.DatabaseList:
@@ -245,33 +246,57 @@ namespace Waher.Security.WAF.Model.Conditions
 			}
 		}
 
-		private static async Task<Dictionary<string, bool>> GetFileList(string FileName, bool IgnoreCase)
+		private async Task<Dictionary<string, bool>> GetFileList(string FileName, bool IgnoreCase)
 		{
-			Dictionary<string, Dictionary<string, bool>> Lists = IgnoreCase ?
+			Dictionary<string, FileListInfo> Lists = IgnoreCase ? 
 				fileListsIgnoreCase : fileLists;
 
-			Dictionary<string, bool> Result;
+			FileListInfo Result;
+			DateTime Check = DateTime.UtcNow;
+			DateTime LastWriteTime = DateTime.MinValue;
 
 			lock (Lists)
 			{
 				if (Lists.TryGetValue(FileName, out Result))
-					return Result;
+				{
+					if (Check.Subtract(Result.LastTimeCheckUtc).TotalMinutes <= 1)
+						return Result.Values;
+
+					LastWriteTime = File.GetLastWriteTimeUtc(Result.FullPath);
+					if (LastWriteTime == Result.LastWriteTimeUtc)
+					{
+						Result.LastTimeCheckUtc = Check;
+						return Result.Values;
+					}
+				}
 			}
 
-			Result = new Dictionary<string, bool>(IgnoreCase ?
-				StringComparer.CurrentCultureIgnoreCase : StringComparer.CurrentCulture);
+			string FullFileName = Path.Combine(this.Document.AppDataFolder, FileName);
+			string FileContent = await File.ReadAllTextAsync(FullFileName);
 
-			string FileContent = await System.IO.File.ReadAllTextAsync(FileName);
+			if (LastWriteTime == DateTime.MinValue)
+				LastWriteTime = File.GetLastWriteTimeUtc(FullFileName);
+
+			Dictionary<string, bool> List = new Dictionary<string, bool>(IgnoreCase ?
+					StringComparer.CurrentCultureIgnoreCase : StringComparer.CurrentCulture);
+
+			Result = new FileListInfo()
+			{
+				FullPath = FullFileName,
+				LastWriteTimeUtc = LastWriteTime,
+				LastTimeCheckUtc = Check,
+				Values = List
+			};
 
 			foreach (string Row in FileContent.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries))
-				Result[Row.Trim()] = true;
+				List[Row.Trim()] = true;
 
 			lock (Lists)
 			{
 				Lists[FileName] = Result;
 			}
 
-			return Result;
+			return Result.Values;
 		}
 
 		private static readonly Dictionary<string, Regex> regularExpressions = new Dictionary<string, Regex>();
@@ -279,7 +304,15 @@ namespace Waher.Security.WAF.Model.Conditions
 		private static readonly Dictionary<string, Expression> expressions = new Dictionary<string, Expression>();
 		private static readonly Dictionary<string, Dictionary<string, bool>> lists = new Dictionary<string, Dictionary<string, bool>>();
 		private static readonly Dictionary<string, Dictionary<string, bool>> listsIgnoreCase = new Dictionary<string, Dictionary<string, bool>>();
-		private static readonly Dictionary<string, Dictionary<string, bool>> fileLists = new Dictionary<string, Dictionary<string, bool>>();
-		private static readonly Dictionary<string, Dictionary<string, bool>> fileListsIgnoreCase = new Dictionary<string, Dictionary<string, bool>>();
+		private static readonly Dictionary<string, FileListInfo> fileLists = new Dictionary<string, FileListInfo>();
+		private static readonly Dictionary<string, FileListInfo> fileListsIgnoreCase = new Dictionary<string, FileListInfo>();
+
+		private class FileListInfo
+		{
+			public string FullPath;
+			public Dictionary<string, bool> Values;
+			public DateTime LastWriteTimeUtc;
+			public DateTime LastTimeCheckUtc;
+		}
 	}
 }

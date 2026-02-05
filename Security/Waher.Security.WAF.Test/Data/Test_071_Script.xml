@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<PathMatch value="Length(Request.Header.Resource)=2" mode="Script">
+		<Allow/>
+	</PathMatch>
+	<Forbid/>
+</Root>

@@ -1,6 +1,5 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Getters;
 using Waher.Events;
@@ -1017,6 +1016,321 @@ namespace Waher.Security.WAF.Test
 			{
 				EP.Blocked = false;
 			}
+		}
+
+		[TestMethod]
+		[DataRow("/B/Alpha", 200, false)]
+		[DataRow("/B/Beta", 403, false)]
+		[DataRow("/B/Gamma", 403, false)]
+		[DataRow("/B/Charlie", 200, false)]
+		[DataRow("/b/alpha", 403, false)]
+		[DataRow("/b/beta", 403, false)]
+		[DataRow("/b/gamma", 403, false)]
+		[DataRow("/b/charlie", 403, false)]
+		public async Task Test_055_ContainsRegex(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/b/alpha", 403, false)]
+		[DataRow("/b/beta", 403, false)]
+		[DataRow("/b/gamma", 403, false)]
+		[DataRow("/b/charlie", 403, false)]
+		public async Task Test_056_StartsWithRegex(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/b/alpha", 403, false)]
+		[DataRow("/b/beta", 403, false)]
+		[DataRow("/b/gamma", 403, false)]
+		[DataRow("/b/charlie", 403, false)]
+		public async Task Test_057_EndsWithRegex(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/b/alpha", 403, false)]
+		[DataRow("/b/beta", 403, false)]
+		[DataRow("/b/gamma", 403, false)]
+		[DataRow("/b/charlie", 403, false)]
+		public async Task Test_058_ExactRegex(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/B/Alpha", 200, false)]
+		[DataRow("/B/Beta", 200, false)]
+		[DataRow("/B/Gamma", 200, false)]
+		[DataRow("/B/Charlie", 200, false)]
+		[DataRow("/b/alpha", 200, false)]
+		[DataRow("/b/beta", 200, false)]
+		[DataRow("/b/gamma", 200, false)]
+		[DataRow("/b/charlie", 200, false)]
+		public async Task Test_059_ContainsRegexIgnoreCase(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/a", 200, false)]
+		[DataRow("/b", 403, false)]
+		[DataRow("/b/c", 403, false)]
+		[DataRow("/c", 404, false)]
+		public async Task Test_060_StartsWithRegexIgnoreCase(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/a", 200, false)]
+		[DataRow("/b", 403, false)]
+		[DataRow("/b/c", 200, false)]
+		[DataRow("/c", 404, false)]
+		public async Task Test_061_EndsWithRegexIgnoreCase(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/a", 200, false)]
+		[DataRow("/b", 403, false)]
+		[DataRow("/b/c", 200, false)]
+		[DataRow("/c", 404, false)]
+		public async Task Test_062_ExactRegexIgnoreCase(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/B/Alpha", 200, false)]
+		[DataRow("/B/Beta", 403, false)]
+		[DataRow("/B/Gamma", 403, false)]
+		[DataRow("/B/Charlie", 403, false)]
+		[DataRow("/b/alpha", 403, false)]
+		[DataRow("/b/beta", 403, false)]
+		[DataRow("/b/gamma", 403, false)]
+		[DataRow("/b/charlie", 403, false)]
+		public async Task Test_063_ContainsConstant(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/C", 403, false)]
+		[DataRow("/b/alpha", 403, false)]
+		[DataRow("/b/beta", 403, false)]
+		[DataRow("/b/gamma", 403, false)]
+		[DataRow("/b/charlie", 403, false)]
+		public async Task Test_064_StartsWithConstant(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/b/alpha", 403, false)]
+		[DataRow("/b/beta", 403, false)]
+		[DataRow("/b/gamma", 403, false)]
+		[DataRow("/b/charlie", 403, false)]
+		public async Task Test_065_EndsWithConstant(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/C", 403, false)]
+		[DataRow("/b/alpha", 403, false)]
+		[DataRow("/b/beta", 403, false)]
+		[DataRow("/b/gamma", 403, false)]
+		[DataRow("/b/charlie", 403, false)]
+		public async Task Test_066_ExactConstant(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/B/Alpha", 403, false)]
+		[DataRow("/B/Beta", 403, false)]
+		[DataRow("/B/Gamma", 403, false)]
+		[DataRow("/B/Charlie", 200, false)]
+		[DataRow("/b/alpha", 403, false)]
+		[DataRow("/b/beta", 403, false)]
+		[DataRow("/b/gamma", 403, false)]
+		[DataRow("/b/charlie", 200, false)]
+		public async Task Test_067_ContainsConstantIgnoreCase(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/C", 403, false)]
+		[DataRow("/a", 403, false)]
+		[DataRow("/b", 200, false)]
+		[DataRow("/b/c", 200, false)]
+		[DataRow("/c", 403, false)]
+		public async Task Test_068_StartsWithConstantIgnoreCase(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/a", 403, false)]
+		[DataRow("/b", 403, false)]
+		[DataRow("/b/c", 200, false)]
+		[DataRow("/c", 404, false)]
+		public async Task Test_069_EndsWithConstantIgnoreCase(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false)]
+		[DataRow("/B", 403, false)]
+		[DataRow("/B/C", 200, false)]
+		[DataRow("/C", 403, false)]
+		[DataRow("/a", 403, false)]
+		[DataRow("/b", 403, false)]
+		[DataRow("/b/c", 200, false)]
+		[DataRow("/c", 403, false)]
+		public async Task Test_070_ExactConstantIgnoreCase(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/a", 200, false)]
+		[DataRow("/b", 200, false)]
+		[DataRow("/b/c", 403, false)]
+		[DataRow("/c", 404, false)]
+		public async Task Test_071_Script(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/a", 403, false)]
+		[DataRow("/b", 403, false)]
+		[DataRow("/b/c", 403, false)]
+		[DataRow("/c", 403, false)]
+		public async Task Test_072_List(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/a", 200, false)]
+		[DataRow("/b", 200, false)]
+		[DataRow("/b/c", 403, false)]
+		[DataRow("/c", 404, false)]
+		public async Task Test_073_ListIgnoreCase(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/a", 403, false)]
+		[DataRow("/b", 403, false)]
+		[DataRow("/b/c", 403, false)]
+		[DataRow("/c", 403, false)]
+		public async Task Test_074_FileList(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false)]
+		[DataRow("/B", 200, false)]
+		[DataRow("/B/C", 403, false)]
+		[DataRow("/C", 404, false)]
+		[DataRow("/a", 200, false)]
+		[DataRow("/b", 200, false)]
+		[DataRow("/b/c", 403, false)]
+		[DataRow("/c", 404, false)]
+		public async Task Test_075_FileListIgnoreCase(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
 		}
 
 	}

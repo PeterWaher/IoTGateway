@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Waher.Content;
 using Waher.Content.Getters;
@@ -15,6 +16,7 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Script;
 using Waher.Security.LoginMonitor;
+using Waher.Security.WAF.Model.Conditions;
 
 namespace Waher.Security.WAF.Test
 {
@@ -120,6 +122,8 @@ namespace Waher.Security.WAF.Test
 			this.server.Add(this.sniffer);
 
 			await Database.Clear("OpenIntelligence");
+			await Database.Clear("WafLists");
+			await Database.Clear("WafListsIgnoreCase");
 		}
 
 		private async Task CloseServer()
@@ -1330,6 +1334,60 @@ namespace Waher.Security.WAF.Test
 		public async Task Test_075_FileListIgnoreCase(string Resource, int ExpectedStatusCode,
 			bool Encrypted)
 		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false, "TestList", "/B", "/C")]
+		[DataRow("/B", 200, false, "TestList", "/B", "/C")]
+		[DataRow("/B/C", 403, false, "TestList", "/B", "/C")]
+		[DataRow("/C", 404, false, "TestList", "/B", "/C")]
+		[DataRow("/a", 403, false, "TestList", "/B", "/C")]
+		[DataRow("/b", 403, false, "TestList", "/B", "/C")]
+		[DataRow("/b/c", 403, false, "TestList", "/B", "/C")]
+		[DataRow("/c", 403, false, "TestList", "/B", "/C")]
+		public async Task Test_076_DatabaseList(string Resource, int ExpectedStatusCode,
+			bool Encrypted, string List, string Property1, string Property2)
+		{
+			await Database.Insert(new WafListProperty()
+			{
+				List = List,
+				Property = Property1
+			});
+
+			await Database.Insert(new WafListProperty()
+			{
+				List = List,
+				Property = Property2
+			});
+
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 403, false, "TestList", "/B", "/C")]
+		[DataRow("/B", 200, false, "TestList", "/B", "/C")]
+		[DataRow("/B/C", 403, false, "TestList", "/B", "/C")]
+		[DataRow("/C", 404, false, "TestList", "/B", "/C")]
+		[DataRow("/a", 403, false, "TestList", "/B", "/C")]
+		[DataRow("/b", 200, false, "TestList", "/B", "/C")]
+		[DataRow("/b/c", 403, false, "TestList", "/B", "/C")]
+		[DataRow("/c", 404, false, "TestList", "/B", "/C")]
+		public async Task Test_077_DatabaseListIgnoreCase(string Resource, int ExpectedStatusCode,
+			bool Encrypted, string List, string Property1, string Property2)
+		{
+			await Database.Insert(new WafListPropertyIgnoreCase()
+			{
+				List = List,
+				Property = Property1
+			});
+
+			await Database.Insert(new WafListPropertyIgnoreCase()
+			{
+				List = List,
+				Property = Property2
+			});
+
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);
 		}
 

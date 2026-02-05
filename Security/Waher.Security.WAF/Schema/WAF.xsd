@@ -163,6 +163,21 @@
 			</xs:element>
 			<xs:element name="AuditFailure" type="WafAuditAction"/>
 			<xs:element name="AuditSuccess" type="WafAuditAction"/>
+			<xs:element name="ClearCounter" type="WafActionWithName"/>
+			<xs:element name="IncrementCounter" type="WafActionWithNameAndDelta"/>
+			<xs:element name="DecrementCounter" type="WafActionWithNameAndDelta"/>
+			<xs:element name="TestCounter">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="WafActions">
+							<xs:attribute name="name" type="xs:string" use="required"/>
+							<xs:attribute name="delta" type="xs:string" use="optional"/>
+							<xs:attribute name="above" type="xs:string" use="optional"/>
+							<xs:attribute name="below" type="xs:string" use="optional"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
 		</xs:choice>
 	</xs:group>
 
@@ -318,6 +333,22 @@
 				<xs:attribute name="message" type="xs:string" use="required"/>
 				<xs:attribute name="protocol" type="xs:string" use="optional"/>
 				<xs:attribute name="userName" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="WafActionWithName">
+		<xs:complexContent>
+			<xs:extension base="WafAction">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="WafActionWithNameAndDelta">
+		<xs:complexContent>
+			<xs:extension base="WafActionWithName">
+				<xs:attribute name="delta" type="xs:string" use="optional"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

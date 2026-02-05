@@ -27,7 +27,7 @@ namespace Waher.Security.WAF.Model.Conditions
 		/// <summary>
 		/// List Name
 		/// </summary>
-		public string List { get; set; }
+		public CaseInsensitiveString List { get; set; }
 
 		/// <summary>
 		/// Property Name

@@ -177,7 +177,7 @@ namespace Waher.Security.WAF.Model.Conditions
 
 					WafListPropertyIgnoreCase DbEntry2 = await Database.FindFirstIgnoreRest<WafListPropertyIgnoreCase>(
 						new FilterAnd(
-							new FilterFieldEqualTo("List", Value),
+							new FilterFieldEqualTo("List", new CaseInsensitiveString(Value)),
 							new FilterFieldEqualTo("Property", new CaseInsensitiveString(Property))));
 
 					Included = !(DbEntry2 is null);

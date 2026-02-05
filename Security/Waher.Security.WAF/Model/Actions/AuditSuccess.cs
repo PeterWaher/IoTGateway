@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content.Xml.Attributes;
 using Waher.Networking.HTTP.Interfaces;
 using Waher.Runtime.IO;
 using Waher.Security.LoginMonitor;

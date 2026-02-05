@@ -161,6 +161,8 @@
 					</xs:complexContent>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="AuditFailure" type="WafAuditAction"/>
+			<xs:element name="AuditSuccess" type="WafAuditAction"/>
 		</xs:choice>
 	</xs:group>
 
@@ -306,6 +308,16 @@
 		<xs:complexContent>
 			<xs:extension base="WafAction">
 				<xs:attribute name="reference" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="WafAuditAction">
+		<xs:complexContent>
+			<xs:extension base="WafActionWithTags">
+				<xs:attribute name="message" type="xs:string" use="required"/>
+				<xs:attribute name="protocol" type="xs:string" use="optional"/>
+				<xs:attribute name="userName" type="xs:string" use="optional"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

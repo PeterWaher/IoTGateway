@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<AuditFailure message="Failure registered by unit test."/>
+	<AuditSuccess message="Success registered by unit test."/>
+	<Delay seconds="0.5"/>
+	<IsTemporarilyBlocked>
+		<RateLimited/>
+	</IsTemporarilyBlocked>
+	<Allow/>
+</Root>

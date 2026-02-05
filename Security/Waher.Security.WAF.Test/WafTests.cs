@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
+﻿using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Waher.Content;
 using Waher.Content.Getters;
@@ -58,10 +57,12 @@ namespace Waher.Security.WAF.Test
 			Ledger.StartListeningToDatabaseEvents();
 
 			auditor = new LoginAuditor("Login Auditor",
-				new LoginInterval(5, TimeSpan.FromHours(1)),    // Maximum 5 failed login attempts in an hour
-				new LoginInterval(2, TimeSpan.FromDays(1)),     // Maximum 2x5 failed login attempts in a day
-				new LoginInterval(2, TimeSpan.FromDays(7)),     // Maximum 2x2x5 failed login attempts in a week
-				new LoginInterval(2, TimeSpan.MaxValue));       // Maximum 2x2x2x5 failed login attempts in total, then blocked.
+				new LoginInterval(4, TimeSpan.FromHours(1)),    // Maximum 4 failed login attempts in an hour
+				new LoginInterval(2, TimeSpan.FromDays(1)),     // Maximum 2x4 failed login attempts in a day
+				new LoginInterval(2, TimeSpan.FromDays(7)),     // Maximum 2x2x4 failed login attempts in a week
+				new LoginInterval(2, TimeSpan.MaxValue));       // Maximum 2x2x2x4 failed login attempts in total, then blocked.
+
+			Log.Register(auditor);
 
 			InternetContent.SetDefaultTimeout(3000, false);
 		}
@@ -88,6 +89,13 @@ namespace Waher.Security.WAF.Test
 			{
 				await ledger.Stop();
 				ledger = null;
+			}
+
+			if (auditor is not null)
+			{
+				Log.Unregister(auditor);
+				await auditor.DisposeAsync();
+				auditor = null;
 			}
 		}
 
@@ -1389,6 +1397,59 @@ namespace Waher.Security.WAF.Test
 			});
 
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false, 1)]
+		[DataRow("/A", 200, false, 2)]
+		[DataRow("/A", 200, false, 3)]
+		[DataRow("/A", 429, false, 4)]
+		public async Task Test_078_AuditFailure(string Resource, int ExpectedStatusCode,
+			bool Encrypted, int NrConnections)
+		{
+			RemoteEndpoint EP = await auditor.GetAnnotatedStateObject("[::1]", true);
+			EP.Blocked = false;
+			EP.State[0] = 0;
+			EP.Timestamps[0] = DateTime.MinValue;
+
+			try
+			{
+				while (NrConnections-- > 0)
+					await this.Get(Resource, NrConnections == 0 ? ExpectedStatusCode : 200, Encrypted);
+			}
+			finally
+			{
+				EP.Blocked = false;
+				EP.State[0] = 0;
+				EP.Timestamps[0] = DateTime.MinValue;
+			}
+		}
+
+		[TestMethod]
+		[DataRow("/A", 200, false, 1)]
+		[DataRow("/A", 200, false, 2)]
+		[DataRow("/A", 200, false, 3)]
+		[DataRow("/A", 200, false, 4)]
+		[DataRow("/A", 200, false, 5)]
+		public async Task Test_079_AuditSuccess(string Resource, int ExpectedStatusCode,
+			bool Encrypted, int NrConnections)
+		{
+			RemoteEndpoint EP = await auditor.GetAnnotatedStateObject("[::1]", true);
+			EP.Blocked = false;
+			EP.State[0] = 0;
+			EP.Timestamps[0] = DateTime.MinValue;
+
+			try
+			{
+				while (NrConnections-- > 0)
+					await this.Get(Resource, NrConnections == 0 ? ExpectedStatusCode : 200, Encrypted);
+			}
+			finally
+			{
+				EP.Blocked = false;
+				EP.State[0] = 0;
+				EP.Timestamps[0] = DateTime.MinValue;
+			}
 		}
 
 	}

@@ -551,12 +551,12 @@ namespace Waher.IoTGateway.Setup
 						Added = true;
 					}
 
-					if (All || ID2.State == IdentityState.Approved)
+					if (All || ID2.State == Networking.XMPP.Contracts.IdentityState.Approved)
 						Result.Add(ID2);
 				}
 			}
 
-			if (!Added && !(Changed is null) && (All || Changed.State == IdentityState.Approved))
+			if (!Added && !(Changed is null) && (All || Changed.State == Networking.XMPP.Contracts.IdentityState.Approved))
 				Result.Add(Changed);
 
 			Result.Sort((i1, i2) => Math.Sign((i2.Created - i1.Created).Ticks));

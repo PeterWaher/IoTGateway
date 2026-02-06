@@ -6,6 +6,7 @@ using Waher.Content.Xml;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Persistence;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -43,7 +44,7 @@ namespace Waher.Networking.XMPP.Contracts
 	/// <summary>
 	/// Legal identity
 	/// </summary>
-	public class LegalIdentity
+	public class LegalIdentity : ILegalIdentity
 	{
 		private string id = null;
 		private string provider = null;
@@ -202,6 +203,21 @@ namespace Waher.Networking.XMPP.Contracts
 			get => this.serverSignature;
 			set => this.serverSignature = value;
 		}
+
+		/// <summary>
+		/// Legal Identity abstraction version of the legal identity state.
+		/// </summary>
+		Security.IdentityState ILegalIdentity.State => (Security.IdentityState)(int)this.state;
+
+		/// <summary>
+		/// Properties detailing the legal identity.
+		/// </summary>
+		ILegalIdentityProperty[] ILegalIdentity.Properties => this.properties;
+
+		/// <summary>
+		/// Attachments assigned to the legal identity.
+		/// </summary>
+		ILegalIdentityAttachment[] ILegalIdentity.Attachments => this.attachments;
 
 		/// <summary>
 		/// Parses an identity from its XML representation

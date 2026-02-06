@@ -1,9 +1,11 @@
-﻿namespace Waher.Networking.XMPP.Contracts
+﻿using Waher.Security;
+
+namespace Waher.Networking.XMPP.Contracts
 {
 	/// <summary>
 	/// Named property
 	/// </summary>
-	public class Property
+	public class Property : ILegalIdentityProperty
 	{
 		private string name;
 		private string value;

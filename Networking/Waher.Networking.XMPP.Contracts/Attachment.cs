@@ -1,11 +1,12 @@
 ﻿using System;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.Contracts
 {
 	/// <summary>
 	/// Contains a reference to an attachment assigned to a legal object.
 	/// </summary>
-	public class Attachment
+	public class Attachment : ILegalIdentityAttachmentUrl
 	{
 		private string id = null;
 		private string legalId = null;

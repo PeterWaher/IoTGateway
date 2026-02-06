@@ -2149,35 +2149,39 @@ namespace Waher.Networking.HTTP
 					SubPath = null;
 				}
 
+				Request.Resource = Resource;
+				Request.SubPath = SubPath;
+
 				if (!(this.webApplicationFirewall is null))
 				{
-					switch (await this.webApplicationFirewall.Review(Request, Resource, SubPath))
+					switch (await this.webApplicationFirewall.Review(Request, Resource))
 					{
-						case WafAction.Allow:
+						case WafResult.Allow:
 							break;
 
-						case WafAction.Forbid:
+						case WafResult.Forbid:
 						default:
 							await this.SendResponse(Request, null, new ForbiddenException(), true);
 							Request.Dispose();
 							return true;
 
-						case WafAction.NotFound:
+						case WafResult.NotFound:
 							await this.SendResponse(Request, null, new NotFoundException(), true);
 							Request.Dispose();
 							return true;
 
-						case WafAction.RateLimited:
+						case WafResult.RateLimited:
 							await this.SendResponse(Request, null, new TooManyRequestsException(), true);
 							Request.Dispose();
 							return true;
 						
-						case WafAction.Ignore:
+						case WafResult.Ignore:
 							Request.Dispose();
 							return true;
 
-						case WafAction.Close:
+						case WafResult.Close:
 							Request.Dispose();
+							await this.DisposeAsync();
 							return false;
 					}
 				}
@@ -2191,9 +2195,6 @@ namespace Waher.Networking.HTTP
 					Request.Dispose();
 					return true;
 				}
-
-				Request.Resource = Resource;
-				Request.SubPath = SubPath;
 
 				this.server.RequestReceived(Request, this.client.RemoteEndPoint, Resource, SubPath);
 
@@ -2265,18 +2266,7 @@ namespace Waher.Networking.HTTP
 					foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 					{
 						if (Scheme.UserSessions && Request.Session is null)
-						{
-							string HttpSessionID = HttpResource.GetSessionId(Request, Request.Response);
-
-							if (!string.IsNullOrEmpty(HttpSessionID))
-								Request.Session = this.server.GetSession(HttpSessionID);
-
-							if (Request.Session is null)
-							{
-								Request.Session = HttpServer.CreateSessionVariables();
-								Request.tempSession = true;
-							}
-						}
+							Request.GetSessionFromCookie();
 
 						IUser User = await Scheme.IsAuthenticated(Request);
 						if (!(User is null))

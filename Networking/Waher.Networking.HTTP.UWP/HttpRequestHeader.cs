@@ -229,6 +229,32 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Gets the value of an individual query parameter, or a default value, 
+		/// if not found.
+		/// </summary>
+		/// <param name="QueryParameter">Query parameter name. This parameter is case insensitive.</param>
+		/// <returns>Value of the query parameter if found; otherwise, the empty string.</returns>
+		public string GetQueryParameter(string QueryParameter)
+		{
+			return this.GetQueryParameter(QueryParameter, string.Empty);
+		}
+
+		/// <summary>
+		/// Gets the value of an individual query parameter, or a default value, 
+		/// if not found.
+		/// </summary>
+		/// <param name="QueryParameter">Query parameter name. This parameter is case insensitive.</param>
+		/// <param name="DefaultValue">Default value to return if the query parameter is not found.</param>
+		/// <returns>Value of the query parameter if found; otherwise, the default value.</returns>
+		public string GetQueryParameter(string QueryParameter, string DefaultValue)
+		{
+			if (this.TryGetQueryParameter(QueryParameter, out string Value))
+				return Value;
+			else
+				return DefaultValue;
+		}
+
+		/// <summary>
 		/// All query parameters.
 		/// </summary>
 		public KeyValuePair<string, string>[] QueryParameters => this.queryParameters;

@@ -290,6 +290,7 @@ namespace Waher.Networking.XMPP
 		private bool? checkConnection = null;
 		private bool openBracketReceived = false;
 		private bool monitorContactResourcesAlive = true;
+		private bool autoRespondToDeliveryReceiptRequests = true;
 		private bool upgradeToTls = false;
 		private bool legacyTls = false;
 		private bool performingQuickLogin = false;
@@ -2274,7 +2275,20 @@ namespace Waher.Networking.XMPP
 		{
 			try
 			{
-				EventHandlerAsync<MessageFormEventArgs> FormHandler = null;
+                EventHandlerAsync<MessageEventArgs> Received = this.OnMessageReceived;
+                if (!(Received is null))
+                {
+                    try
+                    {
+                        await Received.Raise(this, e);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Exception(ex);
+                    }
+                }
+
+                EventHandlerAsync<MessageFormEventArgs> FormHandler = null;
 				EventHandlerAsync<MessageEventArgs> MessageHandler = null;
 				DataForm Form = null;
 				string FormType = null;
@@ -2312,6 +2326,9 @@ namespace Waher.Networking.XMPP
 						}
 						else if (E.LocalName == "request" && E.NamespaceURI == NamespaceMessageDeliveryReceipts && !string.IsNullOrEmpty(e.Id))
 						{
+							if (!this.autoRespondToDeliveryReceiptRequests)
+								continue;
+
 							RosterItem Item = this.GetRosterItemLocked(GetBareJID(e.To));
 							if (!(Item is null) && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.From))
 							{
@@ -2395,8 +2412,56 @@ namespace Waher.Networking.XMPP
 				}
 			}
 		}
+        internal async Task RaiseMessageEventAsync(MessageEventArgs e)
+        {
+            if (e is null)
+                return;
 
-		private Task MessageFormSubmitted(object _, DataForm Form)
+            EventHandlerAsync<MessageEventArgs> messageHandler = null;
+
+            switch (e.Type)
+            {
+                case MessageType.Chat:
+                    this.Information("OnChatMessage()");
+                    messageHandler = this.OnChatMessage;
+                    break;
+
+                case MessageType.Error:
+                    this.Information("OnErrorMessage()");
+                    messageHandler = this.OnErrorMessage;
+                    break;
+
+                case MessageType.GroupChat:
+                    this.Information("OnGroupChatMessage()");
+                    messageHandler = this.OnGroupChatMessage;
+                    break;
+
+                case MessageType.Headline:
+                    this.Information("OnHeadlineMessage()");
+                    messageHandler = this.OnHeadlineMessage;
+                    break;
+
+                case MessageType.Normal:
+                default:
+                    this.Information("OnNormalMessage()");
+                    messageHandler = this.OnNormalMessage;
+                    break;
+            }
+
+            if (!(messageHandler is null))
+            {
+                try
+                {
+                    await messageHandler(this, e);
+                }
+                catch (Exception ex)
+                {
+                    this.Exception(ex);
+                }
+            }
+        }
+
+        private Task MessageFormSubmitted(object _, DataForm Form)
 		{
 			MessageEventArgs e = (MessageEventArgs)Form.State;
 			this.SubmitForm(Form, e.Type, e.ThreadID, e.ParentThreadID);
@@ -3165,10 +3230,15 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public event EventHandlerAsync<PresenceEventArgs> OnPresenceUnsubscribed = null;
 
-		/// <summary>
-		/// Raised when a chat message has been received, that is not handled by a specific message handler.
-		/// </summary>
-		public event EventHandlerAsync<MessageEventArgs> OnChatMessage = null;
+        /// <summary>
+        /// Raised when a message stanza has been received, before specific handlers are resolved.
+        /// </summary>
+        public event EventHandlerAsync<MessageEventArgs> OnMessageReceived = null;
+
+        /// <summary>
+        /// Raised when a chat message has been received, that is not handled by a specific message handler.
+        /// </summary>
+        public event EventHandlerAsync<MessageEventArgs> OnChatMessage = null;
 
 		/// <summary>
 		/// Raised when an error message has been received, that is not handled by a specific message handler.
@@ -7326,6 +7396,16 @@ namespace Waher.Networking.XMPP
 		{
 			get => this.sendFromAddress;
 			set => this.sendFromAddress = value;
+		}
+
+		/// <summary>
+		/// If delivery receipt requests (XEP-0184) should be auto-acknowledged.
+		/// Default is true.
+		/// </summary>
+		public bool AutoRespondToDeliveryReceiptRequests
+		{
+			get => this.autoRespondToDeliveryReceiptRequests;
+			set => this.autoRespondToDeliveryReceiptRequests = value;
 		}
 
 		/// <summary>

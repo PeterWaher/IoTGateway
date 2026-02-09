@@ -53,7 +53,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public void Dispose()
 		{
-			throw new NotImplementedException();
+			this.output?.Dispose();
+			this.output = null;
 		}
 
 		/// <summary>

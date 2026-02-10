@@ -101,6 +101,5 @@ namespace Waher.Security
 
 			return true;
 		}
-
 	}
 }

@@ -947,5 +947,63 @@ namespace Waher.Security
 			return Result;
 		}
 
+		/// <summary>
+		/// Converts an enumeration value to a delegate to the corresponding hash function.
+		/// </summary>
+		/// <param name="Function">Hash function enumeration value.</param>
+		/// <returns>Delegate to the corresponding hash function.</returns>
+		public static HashFunctionArray GetHashFunctionArray(HashFunction Function)
+		{
+			switch (Function)
+			{
+				case HashFunction.MD5:
+					return ComputeMD5Hash;
+
+				case HashFunction.SHA1:
+					return ComputeSHA1Hash;
+
+				case HashFunction.SHA256:
+					return ComputeSHA256Hash;
+
+				case HashFunction.SHA384:
+					return ComputeSHA384Hash;
+
+				case HashFunction.SHA512:
+					return ComputeSHA512Hash;
+
+				default:
+					throw new ArgumentException("Unrecognized hash function", nameof(Function));
+			}
+		}
+
+		/// <summary>
+		/// Converts an enumeration value to a delegate to the corresponding hash function.
+		/// </summary>
+		/// <param name="Function">Hash function enumeration value.</param>
+		/// <returns>Delegate to the corresponding hash function.</returns>
+		public static HashFunctionStream GetHashFunctionStream(HashFunction Function)
+		{
+			switch (Function)
+			{
+				case HashFunction.MD5:
+					return ComputeMD5Hash;
+
+				case HashFunction.SHA1:
+					return ComputeSHA1Hash;
+
+				case HashFunction.SHA256:
+					return ComputeSHA256Hash;
+
+				case HashFunction.SHA384:
+					return ComputeSHA384Hash;
+
+				case HashFunction.SHA512:
+					return ComputeSHA512Hash;
+
+				default:
+					throw new ArgumentException("Unrecognized hash function", nameof(Function));
+			}
+		}
+
 	}
 }

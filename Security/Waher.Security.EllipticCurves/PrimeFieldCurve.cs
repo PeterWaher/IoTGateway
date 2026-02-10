@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Security.Cryptography;
-using System.Text;
-using System.Xml;
 
 namespace Waher.Security.EllipticCurves
 {
@@ -65,14 +61,49 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         public BigInteger Prime => this.p;
 
-        /// <summary>
-        /// Performs the scalar multiplication of <paramref name="N"/>*<paramref name="P"/>.
-        /// </summary>
-        /// <param name="N">Scalar, in binary, little-endian form.</param>
-        /// <param name="P">Point</param>
-        /// <param name="Normalize">If normalized output is expected.</param>
-        /// <returns><paramref name="N"/>*<paramref name="P"/></returns>
-        public override PointOnCurve ScalarMultiplication(byte[] N, PointOnCurve P, bool Normalize)
+		/// <summary>
+		/// Hash function to use in signatures.
+		/// </summary>
+		public virtual HashFunction HashFunction => HashFunction.SHA256;
+
+		/// <summary>
+		/// Converts a sequence of unsigned 32-bit integers to a <see cref="BigInteger"/>.
+		/// </summary>
+		/// <param name="BigEndianDWords">Sequence of unsigned 32-bit integers to a <see cref="BigInteger"/>, most significant word first.</param>
+		/// <returns><see cref="BigInteger"/> value.</returns>
+		protected static BigInteger ToBigInteger(uint[] BigEndianDWords)
+		{
+			int i, c = BigEndianDWords.Length;
+			int j = c << 2;
+			byte[] B = new byte[((BigEndianDWords[0] & 0x80000000) != 0) ? j + 1 : j];
+			uint k;
+
+			for (i = 0; i < c; i++)
+			{
+				k = BigEndianDWords[i];
+
+				B[j - 4] = (byte)k;
+				k >>= 8;
+				B[j - 3] = (byte)k;
+				k >>= 8;
+				B[j - 2] = (byte)k;
+				k >>= 8;
+				B[j - 1] = (byte)k;
+
+				j -= 4;
+			}
+
+			return ToInt(B);
+		}
+
+		/// <summary>
+		/// Performs the scalar multiplication of <paramref name="N"/>*<paramref name="P"/>.
+		/// </summary>
+		/// <param name="N">Scalar, in binary, little-endian form.</param>
+		/// <param name="P">Point</param>
+		/// <param name="Normalize">If normalized output is expected.</param>
+		/// <returns><paramref name="N"/>*<paramref name="P"/></returns>
+		public override PointOnCurve ScalarMultiplication(byte[] N, PointOnCurve P, bool Normalize)
         {
             PointOnCurve Result = base.ScalarMultiplication(N, P, Normalize);
 

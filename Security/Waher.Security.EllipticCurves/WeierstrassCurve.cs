@@ -39,11 +39,11 @@ namespace Waher.Security.EllipticCurves
             this.a = a;
 		}
 
-        /// <summary>
-        /// Negates a point on the curve.
-        /// </summary>
-        /// <param name="P">Point</param>
-        public void Negate(ref PointOnCurve P)
+		/// <summary>
+		/// Negates a point on the curve.
+		/// </summary>
+		/// <param name="P">Point</param>
+		public void Negate(ref PointOnCurve P)
         {
             P.Y = this.p - P.Y;
         }

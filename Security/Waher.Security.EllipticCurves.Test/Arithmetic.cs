@@ -11,7 +11,7 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_01_Inverse()
         {
-            PrimeFieldCurve C = new NistP256();
+			NistP256 C = new();
             int i;
 
             for (i = 0; i < 1000; i++)
@@ -30,7 +30,7 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_02_Negate()
         {
-            WeierstrassCurve C = new NistP256();
+			NistP256 C = new();
             int i;
 
             for (i = 0; i < 100; i++)
@@ -47,7 +47,7 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_03_Addition()
         {
-            PrimeFieldCurve C = new NistP256();
+			NistP256 C = new();
             byte[] k1, k2, k3;
             PointOnCurve P1, P2, P3;
             string s1, s2, s3;
@@ -166,7 +166,7 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_07_Coordinates_25519()
         {
-            MontgomeryCurve C = new Curve25519();
+			Curve25519 C = new();
 
             PointOnCurve UV = C.BasePoint;
             PointOnCurve XY = C.ToXY(UV);
@@ -183,7 +183,7 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_08_Coordinates_448()
         {
-            MontgomeryCurve C = new Curve448();
+			Curve448 C = new();
 
             PointOnCurve UV = C.BasePoint;
             PointOnCurve XY = C.ToXY(UV);
@@ -290,7 +290,7 @@ namespace Waher.Security.EllipticCurves.Test
 
         private static void X25519_TestVector_3(int i, string HexResult)
         {
-            MontgomeryCurve C = new Curve25519();
+			Curve25519 C = new();
             BigInteger N = 9;
             BigInteger U = 9;
             BigInteger NU = BigInteger.Zero;
@@ -423,7 +423,7 @@ namespace Waher.Security.EllipticCurves.Test
 
         private static void X448_TestVector_3(int i, string HexResult)
         {
-            MontgomeryCurve C = new Curve448();
+			Curve448 C = new();
             BigInteger N = 5;
             BigInteger U = 5;
             BigInteger NU = BigInteger.Zero;

@@ -32,7 +32,7 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Cofactor">Cofactor of curve.</param>
         public PrimeFieldCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger Order,
             int Cofactor)
-            : this(Prime, BasePoint, Order, Cofactor, null)
+            : this(Prime, BasePoint, Order, Cofactor, (byte[])null)
         {
         }
 
@@ -56,10 +56,24 @@ namespace Waher.Security.EllipticCurves
             this.modN = new ModulusP(Order);
         }
 
-        /// <summary>
-        /// Prime of curve.
-        /// </summary>
-        public BigInteger Prime => this.p;
+		/// <summary>
+		/// Base class of Elliptic curves over a prime field.
+		/// </summary>
+		/// <param name="Prime">Prime base of field.</param>
+		/// <param name="BasePoint">Base-point.</param>
+		/// <param name="Order">Order of base-point.</param>
+		/// <param name="Cofactor">Cofactor of curve.</param>
+		/// <param name="Secret">Secret.</param>
+		public PrimeFieldCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger Order,
+			int Cofactor, uint[] Secret)
+			: this(Prime, BasePoint, Order, Cofactor, ToByteSecret(Secret))
+		{
+		}
+
+		/// <summary>
+		/// Prime of curve.
+		/// </summary>
+		public BigInteger Prime => this.p;
 
 		/// <summary>
 		/// Hash function to use in signatures.
@@ -71,7 +85,19 @@ namespace Waher.Security.EllipticCurves
 		/// </summary>
 		/// <param name="BigEndianDWords">Sequence of unsigned 32-bit integers to a <see cref="BigInteger"/>, most significant word first.</param>
 		/// <returns><see cref="BigInteger"/> value.</returns>
-		protected static BigInteger ToBigInteger(uint[] BigEndianDWords)
+		public static BigInteger ToBigInteger(uint[] BigEndianDWords)
+		{
+			return ToInt(ToByteSecret(BigEndianDWords));
+		}
+
+		/// <summary>
+		/// Converts a sequence of unsigned 32-bit integers to a secret that can be used
+		/// with <see cref="BigInteger"/>
+		/// </summary>
+		/// <param name="BigEndianDWords">Sequence of unsigned 32-bit integers to a 
+		/// <see cref="BigInteger"/>, most significant word first.</param>
+		/// <returns><see cref="BigInteger"/> value.</returns>
+		public static byte[] ToByteSecret(uint[] BigEndianDWords)
 		{
 			int i, c = BigEndianDWords.Length;
 			int j = c << 2;
@@ -93,7 +119,7 @@ namespace Waher.Security.EllipticCurves
 				j -= 4;
 			}
 
-			return ToInt(B);
+			return B;
 		}
 
 		/// <summary>

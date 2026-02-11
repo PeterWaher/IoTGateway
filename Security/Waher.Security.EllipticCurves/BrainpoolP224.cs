@@ -36,6 +36,16 @@ namespace Waher.Security.EllipticCurves
 		}
 
 		/// <summary>
+		/// Brainpool P-224 Elliptic Curve, as defined in RFC5639:
+		/// https://datatracker.ietf.org/doc/html/rfc5639
+		/// </summary>
+		/// <param name="Secret">Secret.</param>
+		public BrainpoolP224(uint[] Secret)
+			: base(p0, new PointOnCurve(x, y), a, q, Secret)
+		{
+		}
+
+		/// <summary>
 		/// Name of curve.
 		/// </summary>
 		public override string CurveName => "Brainpool P-224";

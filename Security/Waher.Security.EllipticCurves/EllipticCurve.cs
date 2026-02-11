@@ -375,6 +375,17 @@ namespace Waher.Security.EllipticCurves
 		public abstract void Double(ref PointOnCurve P);
 
 		/// <summary>
+		/// Gets a shared key, as a point, using the Elliptic Curve Diffie-Hellman (ECDH) 
+		/// algorithm.
+		/// </summary>
+		/// <param name="RemotePublicKey">Public key of the remote party.</param>
+		/// <returns>Shared secret, as a point.</returns>
+		public virtual PointOnCurve GetSharedPoint(byte[] RemotePublicKey)
+		{
+			return ECDH.GetSharedPoint(this.PrivateKey, RemotePublicKey, this);
+		}
+
+		/// <summary>
 		/// Gets a shared key using the Elliptic Curve Diffie-Hellman (ECDH) algorithm.
 		/// </summary>
 		/// <param name="RemotePublicKey">Public key of the remote party.</param>

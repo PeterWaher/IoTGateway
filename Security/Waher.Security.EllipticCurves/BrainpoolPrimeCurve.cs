@@ -35,12 +35,26 @@ namespace Waher.Security.EllipticCurves
 		{
 		}
 
-        /// <summary>
-        /// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
-        /// </summary>
-        /// <param name="Data">Payload to sign.</param>
-        /// <returns>Signature.</returns>
-        public override byte[] Sign(byte[] Data)
+		/// <summary>
+		/// Base class of Elliptic curves over a prime field defined by Brainpool.
+		/// </summary>
+		/// <param name="Prime">Prime base of field.</param>
+		/// <param name="BasePoint">Base-point.</param>
+		/// <param name="A">A coefficient in Elliptic Curve.</param>
+		/// <param name="Order">Order of base-point.</param>
+		/// <param name="Secret">Secret.</param>
+		public BrainpoolPrimeCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger A,
+			BigInteger Order, uint[] Secret)
+			: base(Prime, BasePoint, A, Order, 1, Secret)
+		{
+		}
+
+		/// <summary>
+		/// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
+		/// </summary>
+		/// <param name="Data">Payload to sign.</param>
+		/// <returns>Signature.</returns>
+		public override byte[] Sign(byte[] Data)
         {
             return ECDSA.Sign(Data, this.PrivateKey, 
                 Bin => Hashes.ComputeHash(this.HashFunction, Bin),

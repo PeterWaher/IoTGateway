@@ -19,7 +19,7 @@ namespace Waher.Security.EllipticCurves
         /// <param name="Cofactor">Cofactor of curve.</param>
         public WeierstrassCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger a, 
             BigInteger Order, int Cofactor)
-            : this(Prime, BasePoint, a, Order, Cofactor, null)
+            : this(Prime, BasePoint, a, Order, Cofactor, (byte[])null)
 		{
 		}
 
@@ -37,6 +37,22 @@ namespace Waher.Security.EllipticCurves
 			: base(Prime, BasePoint, Order, Cofactor, Secret)
 		{
             this.a = a;
+		}
+
+		/// <summary>
+		/// Base class of Weierstrass curves (y²=x³+ax+b) over a prime field.
+		/// </summary>
+		/// <param name="Prime">Prime base of field.</param>
+		/// <param name="BasePoint">Base-point.</param>
+		/// <param name="a">Coefficient in the Weierstrass equation.</param>
+		/// <param name="Order">Order of base-point.</param>
+		/// <param name="Cofactor">Cofactor of curve.</param>
+		/// <param name="Secret">Secret.</param>
+		public WeierstrassCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger a,
+			BigInteger Order, int Cofactor, uint[] Secret)
+			: base(Prime, BasePoint, Order, Cofactor, Secret)
+		{
+			this.a = a;
 		}
 
 		/// <summary>

@@ -42,9 +42,9 @@ Brainpool P-512
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>security Elliptic Curve ECC ECDH ECDSA EdDSA NIST P192 P224 P256 P384 P521 Curve25519 Curve448 Ed25519 Ed448 Edwards25519 Edwards448 Goldilocks Branpool BrainpoolP160r1 BrainpoolP192r1 BrainpoolP224r1 BrainpoolP256r1 BrainpoolP320r1 BrainpoolP384r1 BrainpoolP512r1</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
-    <FileVersion>1.1.0</FileVersion>
-    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.1</AssemblyVersion>
+    <FileVersion>1.1.1</FileVersion>
+    <Version>1.1.1</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>

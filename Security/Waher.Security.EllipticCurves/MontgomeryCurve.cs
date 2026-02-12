@@ -303,10 +303,9 @@ namespace Waher.Security.EllipticCurves
         public override byte[] Encode(PointOnCurve Point)
         {
             byte[] Bin = Point.X.ToByteArray();
-            int c = this.orderBytes;
 
-            if (Bin.Length < c)
-                Array.Resize(ref Bin, c);
+            if (Bin.Length != this.orderBytes)
+                Array.Resize(ref Bin, this.orderBytes);
 
             return Bin;
         }

@@ -58,6 +58,11 @@ namespace Waher.Security.EllipticCurves
 		protected readonly int orderBytes;
 
 		/// <summary>
+		/// Number of bytes used for big integers in the curve. 
+		/// </summary>
+		protected readonly int bigIntegerBytes;
+
+		/// <summary>
 		/// Mask for most significant byte of scalars.
 		/// </summary>
 		protected readonly byte msbOrderMask;
@@ -98,13 +103,13 @@ namespace Waher.Security.EllipticCurves
 			this.additionalInfo = null;
 
 			this.orderBits = ModulusP.CalcBits(this.n);
-			this.orderBytes = (this.orderBits + 7) >> 3;
+			this.orderBytes = this.bigIntegerBytes = (this.orderBits + 7) >> 3;
 			this.msbOrderMask = 0xff;
 
 			int MaskBits = (8 - this.orderBits) & 7;
 			if (MaskBits == 0)
 			{
-				this.orderBytes++;
+				this.bigIntegerBytes++;
 				this.msbOrderMask = 0;
 			}
 			else
@@ -202,6 +207,13 @@ namespace Waher.Security.EllipticCurves
 		public int OrderBytes => this.orderBytes;
 
 		/// <summary>
+		/// Number of bytes required to represent coordinates using <see cref="BigInteger"/> of the curve.
+		/// This number may differ from <see cref="OrderBytes"/> by one, if the most significant
+		/// bit is used, to avoid generating negative integers.
+		/// </summary>
+		public int BigIntegerBytes => this.bigIntegerBytes;
+
+		/// <summary>
 		/// Number of bits required to represent the order of the curve.
 		/// </summary>
 		public int OrderBits => this.orderBits;
@@ -257,17 +269,10 @@ namespace Waher.Security.EllipticCurves
 		{
 			byte[] X = Point.X.ToByteArray();
 			byte[] Y = Point.Y.ToByteArray();
-
-			if (X.Length != this.orderBytes)
-				Array.Resize(ref X, this.orderBytes);
-
-			if (Y.Length != this.orderBytes)
-				Array.Resize(ref Y, this.orderBytes);
-
 			byte[] Result = new byte[this.orderBytes << 1];
 
-			Buffer.BlockCopy(X, 0, Result, 0, this.orderBytes);
-			Buffer.BlockCopy(Y, 0, Result, this.orderBytes, this.orderBytes);
+			Buffer.BlockCopy(X, 0, Result, 0, Math.Min(X.Length, this.orderBytes));
+			Buffer.BlockCopy(Y, 0, Result, this.orderBytes, Math.Min(Y.Length, this.orderBytes));
 
 			return Result;
 		}
@@ -282,17 +287,8 @@ namespace Waher.Security.EllipticCurves
 			if (Point.Length != this.orderBytes << 1)
 				throw new ArgumentException("Invalid point.", nameof(Point));
 
-			int XLen = this.orderBytes;
-			int YLen = this.orderBytes;
-
-			if ((Point[this.orderBytes - 1] & 0x80) != 0)
-				XLen++;
-
-			if ((Point[Point.Length - 1] & 0x80) != 0)
-				YLen++;
-
-			byte[] X = new byte[XLen];
-			byte[] Y = new byte[YLen];
+			byte[] X = new byte[this.bigIntegerBytes];
+			byte[] Y = new byte[this.bigIntegerBytes];
 
 			Buffer.BlockCopy(Point, 0, X, 0, this.orderBytes);
 			Buffer.BlockCopy(Point, this.orderBytes, Y, 0, this.orderBytes);

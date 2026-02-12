@@ -145,7 +145,7 @@ namespace Waher.Security.EllipticCurves
         /// <returns>Generated secret.</returns>
         public override byte[] GenerateSecret()
         {
-            byte[] B = new byte[this.orderBytes];
+            byte[] B = new byte[this.bigIntegerBytes];
             BigInteger D;
 
             do
@@ -155,7 +155,7 @@ namespace Waher.Security.EllipticCurves
                     rnd.GetBytes(B);
                 }
 
-                B[this.orderBytes - 1] &= this.msbOrderMask;
+                B[this.bigIntegerBytes - 1] &= this.msbOrderMask;
 
                 D = ToInt(B);
             }

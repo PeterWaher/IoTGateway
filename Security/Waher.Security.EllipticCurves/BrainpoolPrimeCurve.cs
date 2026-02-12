@@ -58,7 +58,7 @@ namespace Waher.Security.EllipticCurves
         {
             return ECDSA.Sign(Data, this.PrivateKey, 
                 Bin => Hashes.ComputeHash(this.HashFunction, Bin),
-                this.orderBytes, this.msbOrderMask, this);
+                this.bigIntegerBytes, this.msbOrderMask, this);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Waher.Security.EllipticCurves
         {
             return ECDSA.Sign(Data, this.PrivateKey,
                 Bin => Hashes.ComputeHash(this.HashFunction, Bin),
-                this.orderBytes, this.msbOrderMask, this);
+                this.bigIntegerBytes, this.msbOrderMask, this);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Waher.Security.EllipticCurves
         {
             return ECDSA.Verify(Data, PublicKey,
                 Bin => Hashes.ComputeHash(this.HashFunction, Bin),
-                this.orderBytes, this.msbOrderMask, this, Signature);
+                this.bigIntegerBytes, this.msbOrderMask, this, Signature);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Waher.Security.EllipticCurves
         {
             return ECDSA.Verify(Data, PublicKey,
                 Bin => Hashes.ComputeHash(this.HashFunction, Bin),
-                this.orderBytes, this.msbOrderMask, this, Signature);
+                this.bigIntegerBytes, this.msbOrderMask, this, Signature);
         }
 
     }

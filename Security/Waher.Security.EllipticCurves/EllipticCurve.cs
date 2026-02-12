@@ -475,5 +475,22 @@ namespace Waher.Security.EllipticCurves
 
 			return new BigInteger(Binary);
 		}
+
+		/// <summary>
+		/// Checks if an encoded point is on the curve.
+		/// </summary>
+		/// <param name="Point">Encoded point</param>
+		/// <returns>If the point is on the curve.</returns>
+		public virtual bool IsPoint(byte[] Point)
+		{
+			return this.IsPoint(this.Decode(Point));
+		}
+
+		/// <summary>
+		/// Checks if a point is on the curve.
+		/// </summary>
+		/// <param name="Point">Point</param>
+		/// <returns>If the point is on the curve.</returns>
+		public abstract bool IsPoint(PointOnCurve Point);
 	}
 }

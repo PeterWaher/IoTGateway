@@ -14,10 +14,11 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="Prime">Prime base of field.</param>
 		/// <param name="BasePoint">Base-point.</param>
 		/// <param name="A">A coefficient in Elliptic Curve.</param>
+		/// <param name="B">B coefficient in Elliptic Curve.</param>
 		/// <param name="Order">Order of base-point.</param>
 		public BrainpoolPrimeCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger A,
-            BigInteger Order)
-			: base(Prime, BasePoint, A, Order, 1)
+			BigInteger B, BigInteger Order)
+			: base(Prime, BasePoint, A, B, Order, 1)
 		{
 		}
 
@@ -27,11 +28,12 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="Prime">Prime base of field.</param>
 		/// <param name="BasePoint">Base-point.</param>
 		/// <param name="A">A coefficient in Elliptic Curve.</param>
+		/// <param name="B">B coefficient in Elliptic Curve.</param>
 		/// <param name="Order">Order of base-point.</param>
 		/// <param name="Secret">Secret.</param>
-		public BrainpoolPrimeCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger A, 
-            BigInteger Order, byte[] Secret)
-			: base(Prime, BasePoint, A, Order, 1, Secret)
+		public BrainpoolPrimeCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger A,
+			BigInteger B, BigInteger Order, byte[] Secret)
+			: base(Prime, BasePoint, A, B, Order, 1, Secret)
 		{
 		}
 
@@ -41,11 +43,12 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="Prime">Prime base of field.</param>
 		/// <param name="BasePoint">Base-point.</param>
 		/// <param name="A">A coefficient in Elliptic Curve.</param>
+		/// <param name="B">B coefficient in Elliptic Curve.</param>
 		/// <param name="Order">Order of base-point.</param>
 		/// <param name="Secret">Secret.</param>
 		public BrainpoolPrimeCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger A,
-			BigInteger Order, uint[] Secret)
-			: base(Prime, BasePoint, A, Order, 1, Secret)
+			BigInteger B, BigInteger Order, uint[] Secret)
+			: base(Prime, BasePoint, A, B, Order, 1, Secret)
 		{
 		}
 

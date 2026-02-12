@@ -10,51 +10,48 @@ namespace Waher.Security.EllipticCurves
     public abstract class MontgomeryCurve : PrimeFieldCurve
     {
         private EdwardsCurveBase pair = null;
+        private BigInteger a;
 
-        /// <summary>
-        /// Base class of Montgomery curves (y²=x³+Ax²+x), with biratinal Edwards equivalent 
-        /// over a prime field.
-        /// </summary>
-        /// <param name="Prime">Prime base of field.</param>
-        /// <param name="BasePoint">Base-point in (U,V) coordinates.</param>
-        /// <param name="Order">Order of base-point.</param>
-        /// <param name="Cofactor">Cofactor of curve.</param>
-        public MontgomeryCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger Order, 
-            int Cofactor)
+		/// <summary>
+		/// Base class of Montgomery curves (y²=x³+Ax²+x), with biratinal Edwards equivalent 
+		/// over a prime field.
+		/// </summary>
+		/// <param name="Prime">Prime base of field.</param>
+		/// <param name="BasePoint">Base-point in (U,V) coordinates.</param>
+		/// <param name="A">Coefficient in the curve equation (y²=x³+Ax²+x)</param>
+		/// <param name="Order">Order of base-point.</param>
+		/// <param name="Cofactor">Cofactor of curve.</param>
+		public MontgomeryCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger A, 
+            BigInteger Order, int Cofactor)
             : base(Prime, BasePoint, Order, Cofactor)
         {
-        }
+            this.a = A;
+		}
 
-        /// <summary>
-        /// Base class of Montgomery curves, with biratinal Edwards equivalent 
-        /// over a prime field.
-        /// </summary>
-        /// <param name="Prime">Prime base of field.</param>
-        /// <param name="BasePoint">Base-point in (U,V) coordinates.</param>
-        /// <param name="Order">Order of base-point.</param>
-        /// <param name="Cofactor">Cofactor of curve.</param>
-        /// <param name="Secret">Secret.</param>
-        public MontgomeryCurve(BigInteger Prime,  PointOnCurve BasePoint, BigInteger Order, 
-            int Cofactor, byte[] Secret)
+		/// <summary>
+		/// Base class of Montgomery curves, with biratinal Edwards equivalent 
+		/// over a prime field.
+		/// </summary>
+		/// <param name="Prime">Prime base of field.</param>
+		/// <param name="BasePoint">Base-point in (U,V) coordinates.</param>
+		/// <param name="A">Coefficient in the curve equation (y²=x³+Ax²+x)</param>
+		/// <param name="Order">Order of base-point.</param>
+		/// <param name="Cofactor">Cofactor of curve.</param>
+		/// <param name="Secret">Secret.</param>
+		public MontgomeryCurve(BigInteger Prime,  PointOnCurve BasePoint, BigInteger A, 
+            BigInteger Order, int Cofactor, byte[] Secret)
             : base(Prime, BasePoint, Order, Cofactor, Secret)
         {
-        }
+            this.a = A;
+		}
 
-        /// <summary>
-        /// a Coefficient in the definition of the curve E:	v²=u³+A*u²+u
-        /// </summary>
-        protected abstract BigInteger A
-        {
-            get;
-        }
-
-        /// <summary>
-        /// Converts a pair of (U,V) coordinates to a pair of (X,Y) coordinates
-        /// in the birational Edwards curve.
-        /// </summary>
-        /// <param name="UV">(U,V) coordinates.</param>
-        /// <returns>(X,Y) coordinates.</returns>
-        public abstract PointOnCurve ToXY(PointOnCurve UV);
+		/// <summary>
+		/// Converts a pair of (U,V) coordinates to a pair of (X,Y) coordinates
+		/// in the birational Edwards curve.
+		/// </summary>
+		/// <param name="UV">(U,V) coordinates.</param>
+		/// <returns>(X,Y) coordinates.</returns>
+		public abstract PointOnCurve ToXY(PointOnCurve UV);
 
         /// <summary>
         /// Converts a pair of (X,Y) coordinates for the birational Edwards curve
@@ -282,7 +279,7 @@ namespace Waher.Security.EllipticCurves
         {
             BigInteger U2 = this.modP.Multiply(U, U);
             BigInteger U3 = this.modP.Multiply(U, U2);
-            BigInteger V2 = BigInteger.Remainder(U3 + this.modP.Multiply(this.A, U2) + U, this.Prime);
+            BigInteger V2 = BigInteger.Remainder(U3 + this.modP.Multiply(this.a, U2) + U, this.Prime);
 
             BigInteger V1 = this.modP.Sqrt(V2);
             if (V1.Sign < 0)
@@ -333,5 +330,28 @@ namespace Waher.Security.EllipticCurves
             this.pair = null;
         }
 
-    }
+		/// <summary>
+		/// Checks if a point is on the curve.
+		/// </summary>
+		/// <param name="Point">Point</param>
+		/// <returns>If the point is on the curve.</returns>
+		public override bool IsPoint(PointOnCurve Point)
+		{
+			// Check if point matches y²=x³+Ax²+x=x(x²+Ax+1)=x(x(x+A)+1)
+
+			BigInteger Left = this.modP.Multiply(Point.Y, Point.Y);
+
+            BigInteger Right = this.modP.Multiply(
+                Point.X,
+                this.modP.Add(
+                    1,
+                    this.modP.Multiply(
+                        Point.X,
+                        this.modP.Add(
+                            Point.X,
+                            this.a))));
+
+			return Left == Right;
+		}
+	}
 }

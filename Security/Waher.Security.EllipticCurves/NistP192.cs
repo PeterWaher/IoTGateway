@@ -10,6 +10,10 @@ namespace Waher.Security.EllipticCurves
 	{
 		private static readonly BigInteger p0 = BigInteger.Pow(2, 192) - BigInteger.Pow(2, 64) - 1;
 		private static readonly BigInteger n0 = BigInteger.Parse("6277101735386680763835789423176059013767194773182842284081");
+		private static readonly BigInteger B = ToBigInteger(new uint[]
+		{
+			0x64210519, 0xe59c80e7, 0x0fa7e9ab, 0x72243049, 0xfeb8deec, 0xc146b9b1
+		});
 		private static readonly BigInteger BasePointX = ToBigInteger(new uint[]
 		{
 			0x188da80e, 0xb03090f6, 0x7cbf20eb, 0x43a18800, 0xf4ff0afd, 0x82ff1012
@@ -24,7 +28,7 @@ namespace Waher.Security.EllipticCurves
 		/// https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
 		/// </summary>
 		public NistP192()
-			: base(p0, new PointOnCurve(BasePointX, BasePointY), n0)
+			: base(p0, new PointOnCurve(BasePointX, BasePointY), B, n0)
 		{
 		}
 
@@ -34,7 +38,7 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="Secret">Secret.</param>
         public NistP192(byte[] Secret)
-			: base(p0, new PointOnCurve(BasePointX, BasePointY), n0, Secret)
+			: base(p0, new PointOnCurve(BasePointX, BasePointY), B, n0, Secret)
 		{
 		}
 

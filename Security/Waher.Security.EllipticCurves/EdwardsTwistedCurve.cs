@@ -58,7 +58,7 @@ namespace Waher.Security.EllipticCurves
 
             BigInteger A = this.modP.Multiply(P.Y - P.X, Q.Y - Q.X);
             BigInteger B = this.modP.Multiply(P.Y + P.X, Q.Y + Q.X);
-            BigInteger C = this.modP.Multiply(this.modP.Multiply(d2, P.T), Q.T);
+            BigInteger C = this.modP.Multiply(this.modP.Multiply(this.d2, P.T), Q.T);
             BigInteger D = this.modP.Multiply(P.Z << 1, Q.Z);
             BigInteger E = this.modP.Subtract(B, A);
             BigInteger F = this.modP.Subtract(D, C);
@@ -86,7 +86,7 @@ namespace Waher.Security.EllipticCurves
             BigInteger B = P.Y + P.X;
             B = this.modP.Multiply(B, B);
 
-            BigInteger C = this.modP.Multiply(this.modP.Multiply(d2, P.T), P.T);
+            BigInteger C = this.modP.Multiply(this.modP.Multiply(this.d2, P.T), P.T);
             BigInteger D = this.modP.Multiply(P.Z << 1, P.Z);
             BigInteger E = this.modP.Subtract(B, A);
             BigInteger F = this.modP.Subtract(D, C);
@@ -148,5 +148,27 @@ namespace Waher.Security.EllipticCurves
             return x;
         }
 
-    }
+		/// <summary>
+		/// Checks if a point is on the curve.
+		/// </summary>
+		/// <param name="Point">Point</param>
+		/// <returns>If the point is on the curve.</returns>
+		public override bool IsPoint(PointOnCurve Point)
+		{
+			// Check if point matches -x²+y²=1+dx²y²
+
+			BigInteger X2 = this.modP.Multiply(Point.X, Point.X);
+			BigInteger Y2 = this.modP.Multiply(Point.Y, Point.Y);
+
+			BigInteger Left = this.modP.Subtract(Y2, X2);
+
+			BigInteger Right = this.modP.Add(
+				1,
+				this.modP.Multiply(
+					this.modP.Multiply(this.d, X2),
+					Y2));
+
+			return Left == Right;
+		}
+	}
 }

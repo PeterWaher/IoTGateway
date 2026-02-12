@@ -17,30 +17,30 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         protected BigInteger d2;
 
-        /// <summary>
-        /// Base class of Twisted Edwards curves (-x²+y²=1+dx²y²) over a prime field.
-        /// </summary>
-        /// <param name="Prime">Prime base of field.</param>
-        /// <param name="BasePoint">Base-point in (X,Y) coordinates.</param>
-        /// <param name="d">Edwards curve coefficient</param>
-        /// <param name="Order">Order of base-point.</param>
-        /// <param name="Cofactor">Cofactor of curve.</param>
-        public EdwardsCurveBase(BigInteger Prime, PointOnCurve BasePoint,
+		/// <summary>
+		/// Base class of different types of Edwards curves over a prime field.
+		/// </summary>
+		/// <param name="Prime">Prime base of field.</param>
+		/// <param name="BasePoint">Base-point in (X,Y) coordinates.</param>
+		/// <param name="d">Edwards curve coefficient</param>
+		/// <param name="Order">Order of base-point.</param>
+		/// <param name="Cofactor">Cofactor of curve.</param>
+		public EdwardsCurveBase(BigInteger Prime, PointOnCurve BasePoint,
             BigInteger d, BigInteger Order, int Cofactor)
             : this(Prime, BasePoint, d, Order, Cofactor, null)
         {
         }
 
-        /// <summary>
-        /// Base class of Twisted Edwards curves (-x²+y²=1+dx²y²) over a prime field.
-        /// </summary>
-        /// <param name="Prime">Prime base of field.</param>
-        /// <param name="BasePoint">Base-point in (X,Y) coordinates.</param>
-        /// <param name="d">Coefficient in the curve equation (-x²+y²=1+dx²y²)</param>
-        /// <param name="Order">Order of base-point.</param>
-        /// <param name="Cofactor">Cofactor of curve.</param>
-        /// <param name="Secret">Secret.</param>
-        public EdwardsCurveBase(BigInteger Prime, PointOnCurve BasePoint, BigInteger d,
+		/// <summary>
+		/// Base class of different types of Edwards curves over a prime field.
+		/// </summary>
+		/// <param name="Prime">Prime base of field.</param>
+		/// <param name="BasePoint">Base-point in (X,Y) coordinates.</param>
+		/// <param name="d">Edwards curve coefficient</param>
+		/// <param name="Order">Order of base-point.</param>
+		/// <param name="Cofactor">Cofactor of curve.</param>
+		/// <param name="Secret">Secret.</param>
+		public EdwardsCurveBase(BigInteger Prime, PointOnCurve BasePoint, BigInteger d,
             BigInteger Order, int Cofactor, byte[] Secret)
             : base(Prime, BasePoint, Order, Cofactor, Secret)
         {
@@ -104,5 +104,6 @@ namespace Waher.Security.EllipticCurves
         {
             P.X = this.p - P.X;
         }
-    }
+
+	}
 }

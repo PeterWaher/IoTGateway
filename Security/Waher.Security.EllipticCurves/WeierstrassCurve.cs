@@ -7,36 +7,22 @@ namespace Waher.Security.EllipticCurves
     /// </summary>
     public abstract class WeierstrassCurve : PrimeFieldCurve
 	{
-        private readonly BigInteger a;
+		private readonly BigInteger a;
+		private readonly BigInteger b;
 
-        /// <summary>
-        /// Base class of Weierstrass curves (y²=x³+ax+b) over a prime field.
-        /// </summary>
-        /// <param name="Prime">Prime base of field.</param>
-        /// <param name="BasePoint">Base-point.</param>
-        /// <param name="a">Coefficient in the Weierstrass equation.</param>
-        /// <param name="Order">Order of base-point.</param>
-        /// <param name="Cofactor">Cofactor of curve.</param>
-        public WeierstrassCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger a, 
-            BigInteger Order, int Cofactor)
-            : this(Prime, BasePoint, a, Order, Cofactor, (byte[])null)
+		/// <summary>
+		/// Base class of Weierstrass curves (y²=x³+ax+b) over a prime field.
+		/// </summary>
+		/// <param name="Prime">Prime base of field.</param>
+		/// <param name="BasePoint">Base-point.</param>
+		/// <param name="a">Coefficient in the Weierstrass equation.</param>
+		/// <param name="b">Coefficient in the Weierstrass equation.</param>
+		/// <param name="Order">Order of base-point.</param>
+		/// <param name="Cofactor">Cofactor of curve.</param>
+		public WeierstrassCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger a, 
+            BigInteger b, BigInteger Order, int Cofactor)
+            : this(Prime, BasePoint, a, b, Order, Cofactor, (byte[])null)
 		{
-		}
-
-        /// <summary>
-        /// Base class of Weierstrass curves (y²=x³+ax+b) over a prime field.
-        /// </summary>
-        /// <param name="Prime">Prime base of field.</param>
-        /// <param name="BasePoint">Base-point.</param>
-        /// <param name="a">Coefficient in the Weierstrass equation.</param>
-        /// <param name="Order">Order of base-point.</param>
-        /// <param name="Cofactor">Cofactor of curve.</param>
-        /// <param name="Secret">Secret.</param>
-        public WeierstrassCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger a,
-            BigInteger Order, int Cofactor, byte[] Secret)
-			: base(Prime, BasePoint, Order, Cofactor, Secret)
-		{
-            this.a = a;
 		}
 
 		/// <summary>
@@ -45,14 +31,34 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="Prime">Prime base of field.</param>
 		/// <param name="BasePoint">Base-point.</param>
 		/// <param name="a">Coefficient in the Weierstrass equation.</param>
+		/// <param name="b">Coefficient in the Weierstrass equation.</param>
 		/// <param name="Order">Order of base-point.</param>
 		/// <param name="Cofactor">Cofactor of curve.</param>
 		/// <param name="Secret">Secret.</param>
 		public WeierstrassCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger a,
-			BigInteger Order, int Cofactor, uint[] Secret)
+			BigInteger b, BigInteger Order, int Cofactor, byte[] Secret)
+			: base(Prime, BasePoint, Order, Cofactor, Secret)
+		{
+            this.a = a;
+            this.b = b;
+		}
+
+		/// <summary>
+		/// Base class of Weierstrass curves (y²=x³+ax+b) over a prime field.
+		/// </summary>
+		/// <param name="Prime">Prime base of field.</param>
+		/// <param name="BasePoint">Base-point.</param>
+		/// <param name="a">Coefficient in the Weierstrass equation.</param>
+		/// <param name="b">Coefficient in the Weierstrass equation.</param>
+		/// <param name="Order">Order of base-point.</param>
+		/// <param name="Cofactor">Cofactor of curve.</param>
+		/// <param name="Secret">Secret.</param>
+		public WeierstrassCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger a,
+			BigInteger b, BigInteger Order, int Cofactor, uint[] Secret)
 			: base(Prime, BasePoint, Order, Cofactor, Secret)
 		{
 			this.a = a;
+            this.b = b;
 		}
 
 		/// <summary>
@@ -122,5 +128,26 @@ namespace Waher.Security.EllipticCurves
             }
         }
 
-    }
+		/// <summary>
+		/// Checks if a point is on the curve.
+		/// </summary>
+		/// <param name="Point">Point</param>
+		/// <returns>If the point is on the curve.</returns>
+		public override bool IsPoint(PointOnCurve Point)
+		{
+			// Check if point matches y²=x³+ax+b=x(x²+a)+b
+
+			BigInteger Left = this.modP.Multiply(Point.Y, Point.Y);
+
+            BigInteger Right = this.modP.Add(
+                this.modP.Multiply(
+                    Point.X,
+                    this.modP.Add(
+                        this.modP.Multiply(Point.X, Point.X),
+                        this.a)),
+                this.b);
+
+			return Left == Right;
+		}
+	}
 }

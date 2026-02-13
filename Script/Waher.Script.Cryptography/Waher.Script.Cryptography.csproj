@@ -20,9 +20,9 @@ https://waher.se/Script.md#cryptographyRelatedFunctionsWaherScriptCryptography</
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing cryptography</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.1.7</AssemblyVersion>
-    <FileVersion>2.1.7</FileVersion>
-    <Version>2.1.7</Version>
+    <AssemblyVersion>2.1.8</AssemblyVersion>
+    <FileVersion>2.1.8</FileVersion>
+    <Version>2.1.8</Version>
   </PropertyGroup>
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>

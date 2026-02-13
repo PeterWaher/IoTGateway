@@ -17,9 +17,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp iot legal smart contracts signatures</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>4.9.7</AssemblyVersion>
-    <FileVersion>4.9.7</FileVersion>
-    <Version>4.9.7</Version>
+    <AssemblyVersion>4.9.8</AssemblyVersion>
+    <FileVersion>4.9.8</FileVersion>
+    <Version>4.9.8</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>

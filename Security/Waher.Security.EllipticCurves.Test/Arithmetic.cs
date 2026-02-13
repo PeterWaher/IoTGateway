@@ -320,7 +320,9 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_15_X25519_ECDH()
         {
-            byte[] A = Hashes.StringToBinary("77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a");
+			// RFC 7748, §6.1
+
+			byte[] A = Hashes.StringToBinary("77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a");
             Curve25519 Alice = new(A);
 
             Assert.AreEqual("8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
@@ -452,6 +454,8 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_21_X448_ECDH()
         {
+            // RFC 7748, §6.2
+
             byte[] A = Hashes.StringToBinary("9a8f4925d1519f5775cf46b04b5800d4ee9ee8bae8bc5565d498c28dd9c9baf574a9419744897391006382a6f127ab1d9ac2d8c0a598726b");
             Curve448 Alice = new(A);
 
@@ -472,7 +476,7 @@ namespace Waher.Security.EllipticCurves.Test
 
             A = Hashes.StringToBinary("07fff4181ac6cc95ec1c16a94a0f74d12da232ce40a77552281d282bb60c0b56fd2464c335543936521c24403085d59a449a5037514a879d");
             if (A.Length != 56)
-                Array.Resize<byte>(ref A, 56);
+                Array.Resize(ref A, 56);
 
             Array.Reverse(A);   // Most significant byte first.
 

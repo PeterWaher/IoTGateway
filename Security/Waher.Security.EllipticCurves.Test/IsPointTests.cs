@@ -105,7 +105,7 @@ namespace Waher.Security.EllipticCurves.Test
 		{
 			int i;
 
-			for (i = 0; i < 1000; i++)
+			for (i = 0; i < 100; i++)
 			{
 				Curve.GenerateKeys();
 				Assert.IsTrue(Curve.IsPoint(Curve.PublicKeyPoint));

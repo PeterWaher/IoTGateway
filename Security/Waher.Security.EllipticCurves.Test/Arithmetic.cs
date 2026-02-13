@@ -334,8 +334,8 @@ namespace Waher.Security.EllipticCurves.Test
             Assert.AreEqual("de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
                 Hashes.BinaryToString(Bob.PublicKey));
 
-            byte[] Key1 = Alice.GetSharedKey(Bob.PublicKey, Hashes.ComputeSHA256Hash);
-            byte[] Key2 = Bob.GetSharedKey(Alice.PublicKey, Hashes.ComputeSHA256Hash);
+            byte[] Key1 = Alice.GetSharedKey(Bob.PublicKey, false, Hashes.ComputeSHA256Hash);
+            byte[] Key2 = Bob.GetSharedKey(Alice.PublicKey, false, Hashes.ComputeSHA256Hash);
 
             string k1 = Hashes.BinaryToString(Key1);
             string k2 = Hashes.BinaryToString(Key2);
@@ -468,8 +468,8 @@ namespace Waher.Security.EllipticCurves.Test
             Assert.AreEqual("3eb7a829b0cd20f5bcfc0b599b6feccf6da4627107bdb0d4f345b43027d8b972fc3e34fb4232a13ca706dcb57aec3dae07bdc1c67bf33609",
                 Hashes.BinaryToString(Bob.PublicKey));
 
-            byte[] Key1 = Alice.GetSharedKey(Bob.PublicKey, Hashes.ComputeSHA256Hash);
-            byte[] Key2 = Bob.GetSharedKey(Alice.PublicKey, Hashes.ComputeSHA256Hash);
+            byte[] Key1 = Alice.GetSharedKey(Bob.PublicKey, false, Hashes.ComputeSHA256Hash);
+            byte[] Key2 = Bob.GetSharedKey(Alice.PublicKey, false, Hashes.ComputeSHA256Hash);
             string k1 = Hashes.BinaryToString(Key1);
             string k2 = Hashes.BinaryToString(Key2);
             Assert.AreEqual(k1, k2);
@@ -554,18 +554,22 @@ namespace Waher.Security.EllipticCurves.Test
         }
 
         [TestMethod]
-        public void Test_28_Ed25519_EncodeDecode()
+        [DataRow(false)]
+        [DataRow(true)]
+        public void Test_28_Ed25519_EncodeDecode(bool BigEndian)
         {
-			TestEncoding(new Edwards25519());
+			TestEncoding(new Edwards25519(), BigEndian);
         }
 
         [TestMethod]
-        public void Test_29_Ed448_EncodeDecode()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_29_Ed448_EncodeDecode(bool BigEndian)
         {
-			TestEncoding(new Edwards448());
+			TestEncoding(new Edwards448(), BigEndian);
         }
 
-        private static void TestEncoding(EdwardsCurveBase Curve)
+        private static void TestEncoding(EdwardsCurveBase Curve, bool BigEndian)
         {
             int i;
             int NrErrors = 0;
@@ -574,8 +578,8 @@ namespace Waher.Security.EllipticCurves.Test
             {
                 PointOnCurve P1 = Curve.PublicKeyPoint;
 
-                byte[] Encoded = EdDSA.Encode(P1, Curve);
-                PointOnCurve P2 = EdDSA.Decode(Encoded, Curve);
+                byte[] Encoded = EdDSA.Encode(P1, BigEndian, Curve);
+                PointOnCurve P2 = EdDSA.Decode(Encoded, BigEndian, Curve);
 
                 if (!P1.Equals(P2))
                     NrErrors++;

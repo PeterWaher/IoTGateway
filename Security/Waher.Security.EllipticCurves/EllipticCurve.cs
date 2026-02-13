@@ -70,6 +70,7 @@ namespace Waher.Security.EllipticCurves
 		private byte[] secret;
 		private byte[] privateKey;
 		private byte[] publicKey;
+		private byte[] publicKeyBigEndian;
 		private byte[] additionalInfo;
 		private PointOnCurve publicKeyPoint;
 
@@ -100,6 +101,7 @@ namespace Waher.Security.EllipticCurves
 			this.secret = Secret;
 			this.privateKey = null;
 			this.publicKey = null;
+			this.publicKeyBigEndian = null;
 			this.additionalInfo = null;
 
 			this.orderBits = ModulusP.CalcBits(this.n);
@@ -152,6 +154,20 @@ namespace Waher.Security.EllipticCurves
 					this.Init();
 
 				return this.publicKey;
+			}
+		}
+
+		/// <summary>
+		/// Returns a big-endian representation of the public key.
+		/// </summary>
+		public virtual byte[] PublicKeyBigEndian
+		{
+			get
+			{
+				if (this.publicKeyBigEndian is null)
+					this.Init();
+
+				return this.publicKeyBigEndian;
 			}
 		}
 
@@ -243,7 +259,8 @@ namespace Waher.Security.EllipticCurves
 			Tuple<byte[], byte[]> Info = this.CalculatePrivateKey(Secret);
 			PointOnCurve P = this.ScalarMultiplication(Info.Item1, this.g, true);
 
-			this.publicKey = this.Encode(P);
+			this.publicKey = this.Encode(P, false);
+			this.publicKeyBigEndian = this.Encode(P, true);
 			this.publicKeyPoint = P;
 			this.privateKey = Info.Item1;
 			this.additionalInfo = Info.Item2;
@@ -265,14 +282,37 @@ namespace Waher.Security.EllipticCurves
 		/// </summary>
 		/// <param name="Point">Normalized point to encode.</param>
 		/// <returns>Encoded point.</returns>
-		public virtual byte[] Encode(PointOnCurve Point)
+		public byte[] Encode(PointOnCurve Point)
 		{
-			byte[] X = Point.X.ToByteArray();
-			byte[] Y = Point.Y.ToByteArray();
+			return this.Encode(Point, false);
+		}
+
+		/// <summary>
+		/// Encodes a point on the curve.
+		/// </summary>
+		/// <param name="Point">Normalized point to encode.</param>
+		/// <param name="BigEndian">If the encoded point should be in big-endian format.</param>
+		/// <returns>Encoded point.</returns>
+		public virtual byte[] Encode(PointOnCurve Point, bool BigEndian)
+		{
+			byte[] X = Point.X.ToByteArray();   // Little endian
+			byte[] Y = Point.Y.ToByteArray();   // Little endian
 			byte[] Result = new byte[this.orderBytes << 1];
 
-			Buffer.BlockCopy(X, 0, Result, 0, Math.Min(X.Length, this.orderBytes));
-			Buffer.BlockCopy(Y, 0, Result, this.orderBytes, Math.Min(Y.Length, this.orderBytes));
+			if (X.Length != this.orderBytes)
+				Array.Resize(ref X, this.orderBytes);
+
+			if (Y.Length != this.orderBytes)
+				Array.Resize(ref Y, this.orderBytes);
+
+			if (BigEndian)
+			{
+				Array.Reverse(X);   // Big endian
+				Array.Reverse(Y);   // Big endian
+			}
+
+			Buffer.BlockCopy(X, 0, Result, 0, this.orderBytes);
+			Buffer.BlockCopy(Y, 0, Result, this.orderBytes, this.orderBytes);
 
 			return Result;
 		}
@@ -282,18 +322,35 @@ namespace Waher.Security.EllipticCurves
 		/// </summary>
 		/// <param name="Point">Encoded point.</param>
 		/// <returns>Decoded point.</returns>
-		public virtual PointOnCurve Decode(byte[] Point)
+		public PointOnCurve Decode(byte[] Point)
+		{
+			return this.Decode(Point, false);
+		}
+
+		/// <summary>
+		/// Decodes an encoded point on the curve.
+		/// </summary>
+		/// <param name="Point">Encoded point.</param>
+		/// <param name="BigEndian">If the point is encoded in big-endian format</param>
+		/// <returns>Decoded point.</returns>
+		public virtual PointOnCurve Decode(byte[] Point, bool BigEndian)
 		{
 			if (Point.Length != this.orderBytes << 1)
 				throw new ArgumentException("Invalid point.", nameof(Point));
 
-			byte[] X = new byte[this.bigIntegerBytes];
-			byte[] Y = new byte[this.bigIntegerBytes];
+			byte[] X = new byte[this.orderBytes];
+			byte[] Y = new byte[this.orderBytes];
 
 			Buffer.BlockCopy(Point, 0, X, 0, this.orderBytes);
 			Buffer.BlockCopy(Point, this.orderBytes, Y, 0, this.orderBytes);
 
-			return new PointOnCurve(new BigInteger(X), new BigInteger(Y));
+			if (BigEndian)
+			{
+				Array.Reverse(X);   // Little endian
+				Array.Reverse(Y);   // Little endian
+			}
+
+			return new PointOnCurve(ToInt(X), ToInt(Y));
 		}
 
 		/// <summary>
@@ -376,9 +433,21 @@ namespace Waher.Security.EllipticCurves
 		/// </summary>
 		/// <param name="RemotePublicKey">Public key of the remote party.</param>
 		/// <returns>Shared secret, as a point.</returns>
-		public virtual PointOnCurve GetSharedPoint(byte[] RemotePublicKey)
+		public PointOnCurve GetSharedPoint(byte[] RemotePublicKey)
 		{
-			return ECDH.GetSharedPoint(this.PrivateKey, RemotePublicKey, this);
+			return this.GetSharedPoint(RemotePublicKey, false);
+		}
+
+		/// <summary>
+		/// Gets a shared key, as a point, using the Elliptic Curve Diffie-Hellman (ECDH) 
+		/// algorithm.
+		/// </summary>
+		/// <param name="RemotePublicKey">Public key of the remote party.</param>
+		/// <param name="BigEndian">Indicates if the remote public key is in big-endian format.</param>
+		/// <returns>Shared secret, as a point.</returns>
+		public virtual PointOnCurve GetSharedPoint(byte[] RemotePublicKey, bool BigEndian)
+		{
+			return ECDH.GetSharedPoint(this.PrivateKey, RemotePublicKey, BigEndian, this);
 		}
 
 		/// <summary>
@@ -391,7 +460,23 @@ namespace Waher.Security.EllipticCurves
 		/// <returns>Shared secret.</returns>
 		public virtual byte[] GetSharedKey(byte[] RemotePublicKey, HashFunctionArray HashFunction)
 		{
-			return ECDH.GetSharedKey(this.PrivateKey, RemotePublicKey, HashFunction, this);
+			return this.GetSharedKey(RemotePublicKey, false, HashFunction);
+		}
+
+		/// <summary>
+		/// Gets a shared key using the Elliptic Curve Diffie-Hellman (ECDH) algorithm.
+		/// </summary>
+		/// <param name="RemotePublicKey">Public key of the remote party.</param>
+		///	<param name="BigEndian">Indicates if the remote public key is in big-endian format.</param>
+		/// <param name="HashFunction">A Hash function is applied to the derived key to generate the shared secret.
+		/// The derived key, as a byte array of equal size as the order of the prime field, ordered by most significant byte first,
+		/// is passed on to the hash function before being returned as the shared key.</param>
+		/// <returns>Shared secret.</returns>
+		public virtual byte[] GetSharedKey(byte[] RemotePublicKey, bool BigEndian,
+			HashFunctionArray HashFunction)
+		{
+			return ECDH.GetSharedKey(this.PrivateKey, RemotePublicKey, BigEndian,
+				HashFunction, this);
 		}
 
 		/// <summary>
@@ -399,14 +484,36 @@ namespace Waher.Security.EllipticCurves
 		/// </summary>
 		/// <param name="Data">Payload to sign.</param>
 		/// <returns>Signature.</returns>
-		public abstract byte[] Sign(byte[] Data);
+		public byte[] Sign(byte[] Data)
+		{
+			return this.Sign(Data, false);
+		}
+
+		/// <summary>
+		/// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
+		/// </summary>
+		/// <param name="Data">Payload to sign.</param>
+		/// <param name="BigEndian">Indicates if the signature should be in big-endian format.</param>
+		/// <returns>Signature.</returns>
+		public abstract byte[] Sign(byte[] Data, bool BigEndian);
 
 		/// <summary>
 		/// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
 		/// </summary>
 		/// <param name="Data">Payload to sign.</param>
 		/// <returns>Signature.</returns>
-		public abstract byte[] Sign(Stream Data);
+		public byte[] Sign(Stream Data)
+		{
+			return this.Sign(Data, false);
+		}
+
+		/// <summary>
+		/// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
+		/// </summary>
+		/// <param name="Data">Payload to sign.</param>
+		/// <param name="BigEndian">Indicates if the signature should be in big-endian format.</param>
+		/// <returns>Signature.</returns>
+		public abstract byte[] Sign(Stream Data, bool BigEndian);
 
 		/// <summary>
 		/// Verifies a signature of <paramref name="Data"/> made by the ECDSA algorithm.
@@ -415,7 +522,21 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
 		/// <param name="Signature">Signature</param>
 		/// <returns>If the signature is valid.</returns>
-		public abstract bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature);
+		public bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
+		{
+			return this.Verify(Data, PublicKey, false, Signature);
+		}
+
+		/// <summary>
+		/// Verifies a signature of <paramref name="Data"/> made by the ECDSA algorithm.
+		/// </summary>
+		/// <param name="Data">Payload to sign.</param>
+		/// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+		/// <param name="BigEndian">If the public key is in big-endian format.</param>
+		/// <param name="Signature">Signature</param>
+		/// <returns>If the signature is valid.</returns>
+		public abstract bool Verify(byte[] Data, byte[] PublicKey, bool BigEndian,
+			byte[] Signature);
 
 		/// <summary>
 		/// Verifies a signature of <paramref name="Data"/> made by the ECDSA algorithm.
@@ -424,7 +545,20 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
 		/// <param name="Signature">Signature</param>
 		/// <returns>If the signature is valid.</returns>
-		public abstract bool Verify(Stream Data, byte[] PublicKey, byte[] Signature);
+		public bool Verify(Stream Data, byte[] PublicKey, byte[] Signature)
+		{
+			return this.Verify(Data, PublicKey, false, Signature);
+		}
+
+		/// <summary>
+		/// Verifies a signature of <paramref name="Data"/> made by the ECDSA algorithm.
+		/// </summary>
+		/// <param name="Data">Payload to sign.</param>
+		/// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+		/// <param name="BigEndian">If the public key is in big-endian format.</param>
+		/// <param name="Signature">Signature</param>
+		/// <returns>If the signature is valid.</returns>
+		public abstract bool Verify(Stream Data, byte[] PublicKey, bool BigEndian, byte[] Signature);
 
 		/// <summary>
 		/// Exports the curve parameters to XML.
@@ -483,7 +617,18 @@ namespace Waher.Security.EllipticCurves
 		/// <returns>If the point is on the curve.</returns>
 		public virtual bool IsPoint(byte[] Point)
 		{
-			return this.IsPoint(this.Decode(Point));
+			return this.IsPoint(Point, false);
+		}
+
+		/// <summary>
+		/// Checks if an encoded point is on the curve.
+		/// </summary>
+		/// <param name="Point">Encoded point</param>
+		/// <param name="BigEndian">If the point is encoded in big-endian format</param>
+		/// <returns>If the point is on the curve.</returns>
+		public virtual bool IsPoint(byte[] Point, bool BigEndian)
+		{
+			return this.IsPoint(this.Decode(Point, BigEndian));
 		}
 
 		/// <summary>

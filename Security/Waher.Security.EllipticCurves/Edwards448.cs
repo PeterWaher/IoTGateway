@@ -66,7 +66,7 @@ namespace Waher.Security.EllipticCurves
         /// <summary>
         /// d coefficient of Edwards curve.
         /// </summary>
-        protected override BigInteger D => d;
+        protected override BigInteger D => this.d;
 
         /// <summary>
         /// Number of bits used to encode the y-coordinate.
@@ -102,10 +102,11 @@ namespace Waher.Security.EllipticCurves
         /// Creates a signature of <paramref name="Data"/> using the EdDSA algorithm.
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
+        /// <param name="BigEndian">Indicates if the signature should be in big-endian format.</param>
         /// <returns>Signature.</returns>
-        public override byte[] Sign(byte[] Data)
+        public override byte[] Sign(byte[] Data, bool BigEndian)
         {
-            return EdDSA.Sign(Data, this.PrivateKey, this.AdditionalInfo, this.H_dom4, this);
+            return EdDSA.Sign(Data, BigEndian, this.PrivateKey, this.AdditionalInfo, this.H_dom4, this);
         }
 
 
@@ -113,10 +114,11 @@ namespace Waher.Security.EllipticCurves
         /// Creates a signature of <paramref name="Data"/> using the EdDSA algorithm.
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
+        /// <param name="BigEndian">Indicates if the signature should be in big-endian format.</param>
         /// <returns>Signature.</returns>
-        public override byte[] Sign(Stream Data)
+        public override byte[] Sign(Stream Data, bool BigEndian)
         {
-            return EdDSA.Sign(Data, this.PrivateKey, this.AdditionalInfo, this.H_dom4, this);
+            return EdDSA.Sign(Data, BigEndian, this.PrivateKey, this.AdditionalInfo, this.H_dom4, this);
         }
 
         /// <summary>
@@ -124,23 +126,25 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
         /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+        /// <param name="BigEndian">Indicates if the public key is in big-endian format.</param>
         /// <param name="Signature">Signature</param>
         /// <returns>If the signature is valid.</returns>
-        public override bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
+        public override bool Verify(byte[] Data, byte[] PublicKey, bool BigEndian, byte[] Signature)
         {
-            return EdDSA.Verify(Data, PublicKey, this.H_dom4, this, Signature);
+            return EdDSA.Verify(Data, PublicKey, BigEndian, this.H_dom4, this, Signature);
         }
 
-        /// <summary>
-        /// Verifies a signature of <paramref name="Data"/> made by the EdDSA algorithm.
-        /// </summary>
-        /// <param name="Data">Payload to sign.</param>
-        /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
-        /// <param name="Signature">Signature</param>
-        /// <returns>If the signature is valid.</returns>
-        public override bool Verify(Stream Data, byte[] PublicKey, byte[] Signature)
+		/// <summary>
+		/// Verifies a signature of <paramref name="Data"/> made by the EdDSA algorithm.
+		/// </summary>
+		/// <param name="Data">Payload to sign.</param>
+		/// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+		/// <param name="BigEndian">Indicates if the public key is in big-endian format.</param>
+		/// <param name="Signature">Signature</param>
+		/// <returns>If the signature is valid.</returns>
+		public override bool Verify(Stream Data, byte[] PublicKey, bool BigEndian, byte[] Signature)
         {
-            return EdDSA.Verify(Data, PublicKey, this.H_dom4, this, Signature);
+            return EdDSA.Verify(Data, PublicKey, BigEndian, this.H_dom4, this, Signature);
         }
 
         private byte[] H_dom4(byte[] Data)

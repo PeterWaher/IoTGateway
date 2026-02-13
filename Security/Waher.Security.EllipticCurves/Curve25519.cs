@@ -135,8 +135,9 @@ namespace Waher.Security.EllipticCurves
         /// Creates a signature of <paramref name="Data"/> using the XEdDSA algorithm.
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
+        /// <param name="BigEndian">Indicates if the signature should be in big-endian format.</param>
         /// <returns>Signature.</returns>
-        public override byte[] Sign(byte[] Data)
+        public override byte[] Sign(byte[] Data, bool BigEndian)
         {
             throw new NotSupportedException("Signatures not supported.");
             // return XEdDSA.Sign(Data, this.PrivateKey, Hashes.ComputeSHA512Hash, this);
@@ -146,8 +147,9 @@ namespace Waher.Security.EllipticCurves
         /// Creates a signature of <paramref name="Data"/> using the XEdDSA algorithm.
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
+        /// <param name="BigEndian">Indicates if the signature should be in big-endian format.</param>
         /// <returns>Signature.</returns>
-        public override byte[] Sign(Stream Data)
+        public override byte[] Sign(Stream Data, bool BigEndian)
         {
             throw new NotSupportedException("Signatures not supported.");
             // return XEdDSA.Sign(Data, this.PrivateKey, Hashes.ComputeSHA512Hash, this);
@@ -170,9 +172,10 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
         /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+        /// <param name="BigEndian">Indicates if the public key is in big-endian format.</param>
         /// <param name="Signature">Signature</param>
         /// <returns>If the signature is valid.</returns>
-        public override bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
+        public override bool Verify(byte[] Data, byte[] PublicKey, bool BigEndian, byte[] Signature)
         {
             throw new NotSupportedException("Signatures not supported.");
             //return XEdDSA.Verify(Data, PublicKey, Hashes.ComputeSHA512Hash, this, 
@@ -184,9 +187,10 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
         /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+        /// <param name="BigEndian">Indicates if the public key is in big-endian format.</param>
         /// <param name="Signature">Signature</param>
         /// <returns>If the signature is valid.</returns>
-        public override bool Verify(Stream Data, byte[] PublicKey, byte[] Signature)
+        public override bool Verify(Stream Data, byte[] PublicKey, bool BigEndian, byte[] Signature)
         {
             throw new NotSupportedException("Signatures not supported.");
             //return XEdDSA.Verify(Data, PublicKey, Hashes.ComputeSHA512Hash, this, 

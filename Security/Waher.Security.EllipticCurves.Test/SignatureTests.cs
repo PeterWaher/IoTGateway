@@ -1,4 +1,3 @@
-using System;
 using System.Security.Cryptography;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -8,138 +7,156 @@ namespace Waher.Security.EllipticCurves.Test
 	public class SignatureTests
 	{
 		[TestMethod]
-		public void Test_01_ECDSA_NIST_P192()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_01_ECDSA_NIST_P192(bool BigEndian)
 		{
-			Test_Signature(new NistP192(), new NistP192());
+			Test_Signature(new NistP192(), new NistP192(), BigEndian);
 		}
 
 		[TestMethod]
-		public void Test_02_ECDSA_NIST_P224()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_02_ECDSA_NIST_P224(bool BigEndian)
 		{
-			Test_Signature(new NistP224(), new NistP224());
+			Test_Signature(new NistP224(), new NistP224(), BigEndian);
 		}
 
 		[TestMethod]
-		public void Test_03_ECDSA_NIST_P256()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_03_ECDSA_NIST_P256(bool BigEndian)
 		{
-			Test_Signature(new NistP256(), new NistP256());
+			Test_Signature(new NistP256(), new NistP256(), BigEndian);
 		}
 
 		[TestMethod]
-		public void Test_04_ECDSA_NIST_P384()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_04_ECDSA_NIST_P384(bool BigEndian)
 		{
-			Test_Signature(new NistP384(), new NistP384());
+			Test_Signature(new NistP384(), new NistP384(), BigEndian);
 		}
 
 		[TestMethod]
-		public void Test_05_ECDSA_NIST_P521()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_05_ECDSA_NIST_P521(bool BigEndian)
 		{
-			Test_Signature(new NistP521(), new NistP521());
+			Test_Signature(new NistP521(), new NistP521(), BigEndian);
 		}
 
 		[TestMethod]
         [Ignore]
-		public void Test_06_XEdDSA_Curve25519()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_06_XEdDSA_Curve25519(bool BigEndian)
 		{
-			Test_Signature(new Curve25519(), new Curve25519());
+			Test_Signature(new Curve25519(), new Curve25519(), BigEndian);
 		}
 
 		[TestMethod]
         [Ignore]
-		public void Test_07_XEdDSA_Curve448()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_07_XEdDSA_Curve448(bool BigEndian)
 		{
-			Test_Signature(new Curve448(), new Curve448());
+			Test_Signature(new Curve448(), new Curve448(), BigEndian);
 		}
 
         [TestMethod]
-        public void Test_08_EdDSA_Ed25519()
-        {
-			Test_Signature(new Edwards25519(), new Edwards25519());
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_08_EdDSA_Ed25519(bool BigEndian)
+		{
+			Test_Signature(new Edwards25519(), new Edwards25519(), BigEndian);
         }
 
         [TestMethod]
-        public void Test_09_EdDSA_Ed448()
-        {
-			Test_Signature(new Edwards448(), new Edwards448());
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_09_EdDSA_Ed448(bool BigEndian)
+		{
+			Test_Signature(new Edwards448(), new Edwards448(), BigEndian);
         }
 
 		[TestMethod]
-		public void Test_10_ECDSA_Brainpool_P160()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_10_ECDSA_Brainpool_P160(bool BigEndian)
 		{
-			Test_Signature(new BrainpoolP160(), new BrainpoolP160());
+			Test_Signature(new BrainpoolP160(), new BrainpoolP160(), BigEndian);
 		}
 
 		[TestMethod]
-		public void Test_11_ECDSA_Brainpool_P192()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_11_ECDSA_Brainpool_P192(bool BigEndian)
 		{
-			Test_Signature(new BrainpoolP192(), new BrainpoolP192());
+			Test_Signature(new BrainpoolP192(), new BrainpoolP192(), BigEndian);
 		}
 
 		[TestMethod]
-		public void Test_12_ECDSA_Brainpool_P224()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_12_ECDSA_Brainpool_P224(bool BigEndian)
 		{
-			Test_Signature(new BrainpoolP224(), new BrainpoolP224());
+			Test_Signature(new BrainpoolP224(), new BrainpoolP224(), BigEndian);
 		}
 
 		[TestMethod]
-		public void Test_13_ECDSA_Brainpool_P256()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_13_ECDSA_Brainpool_P256(bool BigEndian)
 		{
-			Test_Signature(new BrainpoolP256(), new BrainpoolP256());
+			Test_Signature(new BrainpoolP256(), new BrainpoolP256(), BigEndian);
 		}
 
 		[TestMethod]
-		public void Test_14_ECDSA_Brainpool_P320()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_14_ECDSA_Brainpool_P320(bool BigEndian)
 		{
-			Test_Signature(new BrainpoolP320(), new BrainpoolP320());
+			Test_Signature(new BrainpoolP320(), new BrainpoolP320(), BigEndian);
 		}
 
 		[TestMethod]
-		public void Test_15_ECDSA_Brainpool_P384()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_15_ECDSA_Brainpool_P384(bool BigEndian)
 		{
-			Test_Signature(new BrainpoolP384(), new BrainpoolP384());
+			Test_Signature(new BrainpoolP384(), new BrainpoolP384(), BigEndian);
 		}
 
 		[TestMethod]
-		public void Test_16_ECDSA_Brainpool_P512()
+		[DataRow(false)]
+		[DataRow(true)]
+		public void Test_16_ECDSA_Brainpool_P512(bool BigEndian)
 		{
-			Test_Signature(new BrainpoolP512(), new BrainpoolP512());
+			Test_Signature(new BrainpoolP512(), new BrainpoolP512(), BigEndian);
 		}
 
-		public static void Test_Signature(PrimeFieldCurve Curve1, PrimeFieldCurve Curve2)
+		public static void Test_Signature(PrimeFieldCurve Curve1, PrimeFieldCurve Curve2, bool BigEndian)
 		{
+			using RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 			int n;
-            int Ok = 0;
-            int Errors = 0;
-
-			using (RandomNumberGenerator rnd = RandomNumberGenerator.Create())
+			
+			for (n = 0; n < 100; n++)
 			{
-				for (n = 0; n < 100; n++)
-				{
-					byte[] Data = new byte[1024];
+				byte[] Data = new byte[1024];
 
-					rnd.GetBytes(Data);
+				rnd.GetBytes(Data);
 
-                    try
-                    {
-                        byte[] Signature = Curve1.Sign(Data);
-                        bool Valid = Curve2.Verify(Data, Curve1.PublicKey, Signature);
+				byte[] Signature = Curve1.Sign(Data, BigEndian);
+				bool Valid = Curve2.Verify(Data,
+					BigEndian ? Curve1.PublicKeyBigEndian : Curve1.PublicKey,
+					BigEndian, Signature);
 
-                        if (Valid)
-                            Ok++;
-                        else
-                            Errors++;
-                    }
-                    catch (Exception)
-                    {
-                        Errors++;
-                    }
+				Assert.IsTrue(Valid);
 
-					Curve1.GenerateKeys();
-					Curve2.GenerateKeys();
-				}
+				Curve1.GenerateKeys();
+				Curve2.GenerateKeys();
 			}
-
-            Assert.AreEqual(0, Errors);
 		}
 	}
 }

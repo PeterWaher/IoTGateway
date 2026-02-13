@@ -296,13 +296,17 @@ namespace Waher.Security.EllipticCurves
 		/// Encodes a point on the curve.
 		/// </summary>
 		/// <param name="Point">Normalized point to encode.</param>
+		/// <param name="BigEndian">If big-endian encoding is used.</param>
 		/// <returns>Encoded point.</returns>
-		public override byte[] Encode(PointOnCurve Point)
+		public override byte[] Encode(PointOnCurve Point, bool BigEndian)
 		{
-			byte[] Bin = Point.X.ToByteArray();
+			byte[] Bin = Point.X.ToByteArray();		// Little-endian
 
 			if (Bin.Length != this.orderBytes)
 				Array.Resize(ref Bin, this.orderBytes);
+
+			if (BigEndian)
+				Array.Reverse(Bin);                 // Big-endian
 
 			return Bin;
 		}
@@ -311,9 +315,16 @@ namespace Waher.Security.EllipticCurves
 		/// Decodes an encoded point on the curve.
 		/// </summary>
 		/// <param name="Point">Encoded point.</param>
+		/// <param name="BigEndian">If the encoded point is in big-endian format.</param>
 		/// <returns>Decoded point.</returns>
-		public override PointOnCurve Decode(byte[] Point)
+		public override PointOnCurve Decode(byte[] Point, bool BigEndian)
 		{
+			if (BigEndian)
+			{
+				Point = (byte[])Point.Clone();
+				Array.Reverse(Point);	// Little endian
+			}
+
 			BigInteger U = ToInt(Point);
 			PointOnCurve P = new PointOnCurve(U, this.CalcV(U));
 

@@ -39,24 +39,26 @@ namespace Waher.Security.EllipticCurves
         /// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
+        /// <param name="BigEndian">Indicates if the signature should be in big-endian format.</param>
         /// <returns>Signature.</returns>
-        public override byte[] Sign(byte[] Data)
+        public override byte[] Sign(byte[] Data, bool BigEndian)
         {
-            return ECDSA.Sign(Data, this.PrivateKey, 
+            return ECDSA.Sign(Data, BigEndian, this.PrivateKey, 
                 Bin => Hashes.ComputeHash(this.HashFunction, Bin),
-                this.bigIntegerBytes, this.msbOrderMask, this);
+				this.orderBytes, this.bigIntegerBytes, this.msbOrderMask, this);
         }
 
         /// <summary>
         /// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
+        /// <param name="BigEndian">Indicates if the signature should be in big-endian format.</param>
         /// <returns>Signature.</returns>
-        public override byte[] Sign(Stream Data)
+        public override byte[] Sign(Stream Data, bool BigEndian)
         {
-            return ECDSA.Sign(Data, this.PrivateKey,
+            return ECDSA.Sign(Data, BigEndian, this.PrivateKey,
                 Bin => Hashes.ComputeHash(this.HashFunction, Bin),
-                this.bigIntegerBytes, this.msbOrderMask, this);
+				this.orderBytes, this.bigIntegerBytes, this.msbOrderMask, this);
         }
 
         /// <summary>
@@ -64,13 +66,14 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
         /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+        /// <param name="BigEndian">Indicates if the public key is in big-endian format.</param>
         /// <param name="Signature">Signature</param>
         /// <returns>If the signature is valid.</returns>
-        public override bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
+        public override bool Verify(byte[] Data, byte[] PublicKey, bool BigEndian, byte[] Signature)
         {
-            return ECDSA.Verify(Data, PublicKey,
+            return ECDSA.Verify(Data, PublicKey, BigEndian, 
                 Bin => Hashes.ComputeHash(this.HashFunction, Bin),
-                this.bigIntegerBytes, this.msbOrderMask, this, Signature);
+                this.orderBytes, this.bigIntegerBytes, this.msbOrderMask, this, Signature);
         }
 
         /// <summary>
@@ -78,13 +81,14 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         /// <param name="Data">Payload to sign.</param>
         /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+        /// <param name="BigEndian">Indicates if the public key is in big-endian format.</param>
         /// <param name="Signature">Signature</param>
         /// <returns>If the signature is valid.</returns>
-        public override bool Verify(Stream Data, byte[] PublicKey, byte[] Signature)
+        public override bool Verify(Stream Data, byte[] PublicKey, bool BigEndian, byte[] Signature)
         {
-            return ECDSA.Verify(Data, PublicKey,
+            return ECDSA.Verify(Data, PublicKey, BigEndian,
                 Bin => Hashes.ComputeHash(this.HashFunction, Bin),
-                this.bigIntegerBytes, this.msbOrderMask, this, Signature);
+                this.orderBytes, this.bigIntegerBytes, this.msbOrderMask, this, Signature);
         }
 
     }

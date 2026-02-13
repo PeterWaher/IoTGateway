@@ -80,20 +80,22 @@ namespace Waher.Security.EllipticCurves
         /// Encodes a point on the curve.
         /// </summary>
         /// <param name="Point">Normalized point to encode.</param>
+        /// <param name="BigEndian">If the encoded point should be in big-endian format.</param>
         /// <returns>Encoded point.</returns>
-        public override byte[] Encode(PointOnCurve Point)
+        public override byte[] Encode(PointOnCurve Point, bool BigEndian)
         {
-            return EdDSA.Encode(Point, this);
+            return EdDSA.Encode(Point, BigEndian, this);
         }
 
         /// <summary>
         /// Decodes an encoded point on the curve.
         /// </summary>
         /// <param name="Point">Encoded point.</param>
+        /// <param name="BigEndian">If the encoded point is in big-endian format.</param>
         /// <returns>Decoded point.</returns>
-        public override PointOnCurve Decode(byte[] Point)
+        public override PointOnCurve Decode(byte[] Point, bool BigEndian)
         {
-            return EdDSA.Decode(Point, this);
+            return EdDSA.Decode(Point, BigEndian, this);
         }
 
         /// <summary>

@@ -5,301 +5,316 @@ using Waher.Runtime.Temporary;
 
 namespace Waher.Security.EllipticCurves
 {
-    /// <summary>
-    /// Implements the Edwards curve Digital Signature Algorithm (EdDSA), as defined in RFC 8032.
-    /// https://tools.ietf.org/html/rfc8032
-    /// </summary>
-    public static class EdDSA
-    {
-        /// <summary>
-        /// Signs data using the EdDSA algorithm.
-        /// </summary>
-        /// <param name="Data">Data to be signed.</param>
-        /// <param name="PrivateKey">Private key.</param>
-        /// <param name="Prefix">Prefix</param>
-        /// <param name="HashFunction">Hash function to use</param>
-        /// <param name="Curve">Elliptic curve</param>
-        /// <returns>Signature</returns>
-        public static byte[] Sign(byte[] Data, byte[] PrivateKey, byte[] Prefix,
-            HashFunctionArray HashFunction, EdwardsCurveBase Curve)
-        {
-            // 5.1.6 of RFC 8032
+	/// <summary>
+	/// Implements the Edwards curve Digital Signature Algorithm (EdDSA), as defined in RFC 8032.
+	/// https://tools.ietf.org/html/rfc8032
+	/// </summary>
+	public static class EdDSA
+	{
+		/// <summary>
+		/// Signs data using the EdDSA algorithm.
+		/// </summary>
+		/// <param name="Data">Data to be signed.</param>
+		/// <param name="BigEndian">If the encoded point should be in big-endian format.</param>
+		/// <param name="PrivateKey">Private key.</param>
+		/// <param name="Prefix">Prefix</param>
+		/// <param name="HashFunction">Hash function to use</param>
+		/// <param name="Curve">Elliptic curve</param>
+		/// <returns>Signature</returns>
+		public static byte[] Sign(byte[] Data, bool BigEndian, byte[] PrivateKey, byte[] Prefix,
+			HashFunctionArray HashFunction, EdwardsCurveBase Curve)
+		{
+			// 5.1.6 of RFC 8032
 
-            int ScalarBytes = PrivateKey.Length;
+			int ScalarBytes = PrivateKey.Length;
 
-            if (Prefix.Length != ScalarBytes)
-                throw new ArgumentException("Invalid prefix.", nameof(Prefix));
+			if (Prefix.Length != ScalarBytes)
+				throw new ArgumentException("Invalid prefix.", nameof(Prefix));
 
-            BigInteger a = EllipticCurve.ToInt(PrivateKey);
-            PointOnCurve P = Curve.ScalarMultiplication(PrivateKey, Curve.BasePoint, true);
-            byte[] A = Encode(P, Curve);
-            int c = Data.Length;
-            byte[] Bin = new byte[ScalarBytes + c];             // dom2(F, C) = blank string
-            Buffer.BlockCopy(Prefix, 0, Bin, 0, ScalarBytes);         // prefix
+			BigInteger a = EllipticCurve.ToInt(PrivateKey);
+			PointOnCurve P = Curve.ScalarMultiplication(PrivateKey, Curve.BasePoint, true);
+			byte[] A = Encode(P, BigEndian, Curve);
+			int c = Data.Length;
+			byte[] Bin = new byte[ScalarBytes + c];             // dom2(F, C) = blank string
+			Buffer.BlockCopy(Prefix, 0, Bin, 0, ScalarBytes);         // prefix
 			Buffer.BlockCopy(Data, 0, Bin, ScalarBytes, c);           // PH(M)=M
 
-            byte[] h = HashFunction(Bin);
-            BigInteger r = BigInteger.Remainder(EllipticCurve.ToInt(h), Curve.Order);
-            PointOnCurve R = Curve.ScalarMultiplication(r, Curve.BasePoint, true);
-            byte[] Rs = Encode(R, Curve);
+			byte[] h = HashFunction(Bin);
+			BigInteger r = BigInteger.Remainder(EllipticCurve.ToInt(h), Curve.Order);
+			PointOnCurve R = Curve.ScalarMultiplication(r, Curve.BasePoint, true);
+			byte[] Rs = Encode(R, BigEndian, Curve);
 
-            Bin = new byte[(ScalarBytes << 1) + c];             // dom2(F, C) = blank string
-            Buffer.BlockCopy(Rs, 0, Bin, 0, ScalarBytes);
-            Buffer.BlockCopy(A, 0, Bin, ScalarBytes, ScalarBytes);
+			Bin = new byte[(ScalarBytes << 1) + c];             // dom2(F, C) = blank string
+			Buffer.BlockCopy(Rs, 0, Bin, 0, ScalarBytes);
+			Buffer.BlockCopy(A, 0, Bin, ScalarBytes, ScalarBytes);
 			Buffer.BlockCopy(Data, 0, Bin, ScalarBytes << 1, c);      // PH(M)=M
 
-            h = HashFunction(Bin);
+			h = HashFunction(Bin);
 
-            BigInteger k = BigInteger.Remainder(EllipticCurve.ToInt(h), Curve.Order);
-            BigInteger s = Curve.ModulusN.Add(r, Curve.ModulusN.Multiply(k, a));
+			BigInteger k = BigInteger.Remainder(EllipticCurve.ToInt(h), Curve.Order);
+			BigInteger s = Curve.ModulusN.Add(r, Curve.ModulusN.Multiply(k, a));
 
-            Bin = s.ToByteArray();
-            if (Bin.Length != ScalarBytes)
-                Array.Resize(ref Bin, ScalarBytes);
+			Bin = s.ToByteArray();
+			if (Bin.Length != ScalarBytes)
+				Array.Resize(ref Bin, ScalarBytes);
 
-            byte[] Signature = new byte[ScalarBytes << 1];
+			byte[] Signature = new byte[ScalarBytes << 1];
 
-            Buffer.BlockCopy(Rs, 0, Signature, 0, ScalarBytes);
+			Buffer.BlockCopy(Rs, 0, Signature, 0, ScalarBytes);
 			Buffer.BlockCopy(Bin, 0, Signature, ScalarBytes, ScalarBytes);
 
-            return Signature;
-        }
+			return Signature;
+		}
 
-        /// <summary>
-        /// Signs data using the EdDSA algorithm.
-        /// </summary>
-        /// <param name="Data">Data to be signed.</param>
-        /// <param name="PrivateKey">Private key.</param>
-        /// <param name="Prefix">Prefix</param>
-        /// <param name="HashFunction">Hash function to use</param>
-        /// <param name="Curve">Elliptic curve</param>
-        /// <returns>Signature</returns>
-        public static byte[] Sign(Stream Data, byte[] PrivateKey, byte[] Prefix,
-            HashFunctionStream HashFunction, EdwardsCurveBase Curve)
-        {
-            // 5.1.6 of RFC 8032
+		/// <summary>
+		/// Signs data using the EdDSA algorithm.
+		/// </summary>
+		/// <param name="Data">Data to be signed.</param>
+		/// <param name="BigEndian">If the encoded point should be in big-endian format.</param>
+		/// <param name="PrivateKey">Private key.</param>
+		/// <param name="Prefix">Prefix</param>
+		/// <param name="HashFunction">Hash function to use</param>
+		/// <param name="Curve">Elliptic curve</param>
+		/// <returns>Signature</returns>
+		public static byte[] Sign(Stream Data, bool BigEndian, byte[] PrivateKey,
+			byte[] Prefix, HashFunctionStream HashFunction, EdwardsCurveBase Curve)
+		{
+			// 5.1.6 of RFC 8032
 
-            int ScalarBytes = PrivateKey.Length;
+			int ScalarBytes = PrivateKey.Length;
 
-            if (Prefix.Length != ScalarBytes)
-                throw new ArgumentException("Invalid prefix.", nameof(Prefix));
+			if (Prefix.Length != ScalarBytes)
+				throw new ArgumentException("Invalid prefix.", nameof(Prefix));
 
-            BigInteger a = EllipticCurve.ToInt(PrivateKey);
-            PointOnCurve P = Curve.ScalarMultiplication(PrivateKey, Curve.BasePoint, true);
-            byte[] A = Encode(P, Curve);
-            byte[] h;
+			BigInteger a = EllipticCurve.ToInt(PrivateKey);
+			PointOnCurve P = Curve.ScalarMultiplication(PrivateKey, Curve.BasePoint, true);
+			byte[] A = Encode(P, BigEndian, Curve);
+			byte[] h;
 
-            using (TemporaryStream TempFile = new TemporaryStream())    // dom2(F, C) = blank string
-            {
-                TempFile.Write(Prefix, 0, ScalarBytes);             // prefix
-                
-                Data.Position = 0;
-                Data.CopyTo(TempFile);                              // PH(M)=M
+			using (TemporaryStream TempFile = new TemporaryStream())    // dom2(F, C) = blank string
+			{
+				TempFile.Write(Prefix, 0, ScalarBytes);             // prefix
 
-                TempFile.Position = 0;
-                h = HashFunction(TempFile);
-            }
-            
-            BigInteger r = BigInteger.Remainder(EllipticCurve.ToInt(h), Curve.Order);
-            PointOnCurve R = Curve.ScalarMultiplication(r, Curve.BasePoint, true);
-            byte[] Rs = Encode(R, Curve);
+				Data.Position = 0;
+				Data.CopyTo(TempFile);                              // PH(M)=M
 
-            using (TemporaryStream TempFile = new TemporaryStream())    // dom2(F, C) = blank string
-            {
-                TempFile.Write(Rs, 0, ScalarBytes);
-                TempFile.Write(A, 0, ScalarBytes);
+				TempFile.Position = 0;
+				h = HashFunction(TempFile);
+			}
 
-                Data.Position = 0;
-                Data.CopyTo(TempFile);                              // PH(M)=M
+			BigInteger r = BigInteger.Remainder(EllipticCurve.ToInt(h), Curve.Order);
+			PointOnCurve R = Curve.ScalarMultiplication(r, Curve.BasePoint, true);
+			byte[] Rs = Encode(R, BigEndian, Curve);
 
-                TempFile.Position = 0;
-                h = HashFunction(TempFile);
-            }
+			using (TemporaryStream TempFile = new TemporaryStream())    // dom2(F, C) = blank string
+			{
+				TempFile.Write(Rs, 0, ScalarBytes);
+				TempFile.Write(A, 0, ScalarBytes);
 
-            BigInteger k = BigInteger.Remainder(EllipticCurve.ToInt(h), Curve.Order);
-            BigInteger s = Curve.ModulusN.Add(r, Curve.ModulusN.Multiply(k, a));
+				Data.Position = 0;
+				Data.CopyTo(TempFile);                              // PH(M)=M
 
-            byte[] Bin = s.ToByteArray();
-            if (Bin.Length != ScalarBytes)
-                Array.Resize(ref Bin, ScalarBytes);
+				TempFile.Position = 0;
+				h = HashFunction(TempFile);
+			}
 
-            byte[] Signature = new byte[ScalarBytes << 1];
+			BigInteger k = BigInteger.Remainder(EllipticCurve.ToInt(h), Curve.Order);
+			BigInteger s = Curve.ModulusN.Add(r, Curve.ModulusN.Multiply(k, a));
 
-            Buffer.BlockCopy(Rs, 0, Signature, 0, ScalarBytes);
+			byte[] Bin = s.ToByteArray();
+			if (Bin.Length != ScalarBytes)
+				Array.Resize(ref Bin, ScalarBytes);
+
+			byte[] Signature = new byte[ScalarBytes << 1];
+
+			Buffer.BlockCopy(Rs, 0, Signature, 0, ScalarBytes);
 			Buffer.BlockCopy(Bin, 0, Signature, ScalarBytes, ScalarBytes);
 
-            return Signature;
-        }
+			return Signature;
+		}
 
-        /// <summary>
-        /// Encodes a point on the curve in accordance with §5.1.2 of RFC 8032.
-        /// </summary>
-        /// <param name="P">Point</param>
-        /// <param name="Curve">Edwards curve.</param>
-        /// <returns>Encoding</returns>
-        public static byte[] Encode(PointOnCurve P, EdwardsCurveBase Curve)
-        {
-            int ScalarBits = Curve.CoordinateBits;
-            int ScalarBytes = (ScalarBits + 9) >> 3;
+		/// <summary>
+		/// Encodes a point on the curve in accordance with §5.1.2 of RFC 8032.
+		/// </summary>
+		/// <param name="P">Point</param>
+		/// <param name="BigEndian">If the encoded point should be in big-endian format.</param>
+		/// <param name="Curve">Edwards curve.</param>
+		/// <returns>Encoding</returns>
+		public static byte[] Encode(PointOnCurve P, bool BigEndian, EdwardsCurveBase Curve)
+		{
+			int ScalarBits = Curve.CoordinateBits;
+			int ScalarBytes = (ScalarBits + 9) >> 3;
 
-            byte[] y = P.Y.ToByteArray();
-            if (y.Length != ScalarBytes)
-                Array.Resize(ref y, ScalarBytes);
+			byte[] y = P.Y.ToByteArray();		// Little endian
+			if (y.Length != ScalarBytes)
+				Array.Resize(ref y, ScalarBytes);
 
-            byte[] x = P.X.ToByteArray();
-            int Msb = (ScalarBits + 1) & 7;
+			byte[] x = P.X.ToByteArray();		// Little endian
+			int Msb = (ScalarBits + 1) & 7;
 
-            byte Mask = (byte)(0xff >> (8 - Msb));
-            y[ScalarBytes - 1] &= Mask;
+			byte Mask = (byte)(0xff >> (8 - Msb));
+			y[ScalarBytes - 1] &= Mask;
 
-            if ((x[0] & 1) != 0)
-                y[ScalarBytes - 1] |= 0x80;     // Always MSB
+			if ((x[0] & 1) != 0)
+				y[ScalarBytes - 1] |= 0x80;     // Always MSB
 
-            return y;
-        }
+			if (BigEndian)
+				Array.Reverse(y);
 
-        /// <summary>
-        /// Decodes a point on the curve in accordance with §5.1.3 of RFC 8032.
-        /// </summary>
-        /// <param name="Encoded">Encoded point.</param>
-        /// <param name="Curve">Elliptic curve</param>
-        /// <returns>Point on curve.</returns>
-        public static PointOnCurve Decode(byte[] Encoded, EdwardsCurveBase Curve)
-        {
-            int ScalarBits = Curve.CoordinateBits;
-            int ScalarBytes = (ScalarBits + 9) >> 3;
+			return y;
+		}
 
-            if (Encoded.Length != ScalarBytes)
-                throw new ArgumentException("Not encoded properly.", nameof(Encoded));
+		/// <summary>
+		/// Decodes a point on the curve in accordance with §5.1.3 of RFC 8032.
+		/// </summary>
+		/// <param name="Encoded">Encoded point.</param>
+		/// <param name="BigEndian">If the encoded point is in big-endian format.</param>
+		/// <param name="Curve">Elliptic curve</param>
+		/// <returns>Point on curve.</returns>
+		public static PointOnCurve Decode(byte[] Encoded, bool BigEndian, EdwardsCurveBase Curve)
+		{
+			int ScalarBits = Curve.CoordinateBits;
+			int ScalarBytes = (ScalarBits + 9) >> 3;
 
-            bool x0 = (Encoded[ScalarBytes - 1] & 0x80) != 0;
-            if (x0)
-                Encoded[ScalarBytes - 1] &= 0x7f;
+			if (Encoded.Length != ScalarBytes)
+				throw new ArgumentException("Not encoded properly.", nameof(Encoded));
 
-            BigInteger y = EllipticCurve.ToInt(Encoded);
-            if (y >= Curve.Prime)
-                throw new ArgumentException("Not a valid point.", nameof(Encoded));
+			if (BigEndian)
+			{
+				Encoded = (byte[])Encoded.Clone();
+				Array.Reverse(Encoded);
+			}
 
-            if (x0)
-                Encoded[ScalarBytes - 1] |= 0x80;
+			bool x0 = (Encoded[ScalarBytes - 1] & 0x80) != 0;
+			if (x0)
+				Encoded[ScalarBytes - 1] &= 0x7f;
 
-            BigInteger x = Curve.GetX(y, x0);
+			BigInteger y = EllipticCurve.ToInt(Encoded);
+			if (y >= Curve.Prime)
+				throw new ArgumentException("Not a valid point.", nameof(Encoded));
 
-            return new PointOnCurve(x, y);
-        }
+			if (x0)
+				Encoded[ScalarBytes - 1] |= 0x80;
 
-        /// <summary>
-        /// Verifies a signature of <paramref name="Data"/> made by the EdDSA algorithm.
-        /// </summary>
-        /// <param name="Data">Payload to sign.</param>
-        /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
-        /// <param name="HashFunction">Hash function to use.</param>
-        /// <param name="Curve">Elliptic curve</param>
-        /// <param name="Signature">Signature</param>
-        /// <returns>If the signature is valid.</returns>
-        public static bool Verify(byte[] Data, byte[] PublicKey, HashFunctionArray HashFunction,
-            EdwardsCurveBase Curve, byte[] Signature)
-        {
-            try
-            {
-                int ScalarBytes = Signature.Length;
-                if ((ScalarBytes & 1) != 0)
-                    return false;
+			BigInteger x = Curve.GetX(y, x0);
 
-                ScalarBytes >>= 1;
+			return new PointOnCurve(x, y);
+		}
 
-                byte[] R = new byte[ScalarBytes];
+		/// <summary>
+		/// Verifies a signature of <paramref name="Data"/> made by the EdDSA algorithm.
+		/// </summary>
+		/// <param name="Data">Payload to sign.</param>
+		/// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+		/// <param name="BigEndian">If the encoded point is in big-endian format.</param>
+		/// <param name="HashFunction">Hash function to use.</param>
+		/// <param name="Curve">Elliptic curve</param>
+		/// <param name="Signature">Signature</param>
+		/// <returns>If the signature is valid.</returns>
+		public static bool Verify(byte[] Data, byte[] PublicKey, bool BigEndian, HashFunctionArray HashFunction,
+			EdwardsCurveBase Curve, byte[] Signature)
+		{
+			try
+			{
+				int ScalarBytes = Signature.Length;
+				if ((ScalarBytes & 1) != 0)
+					return false;
+
+				ScalarBytes >>= 1;
+
+				byte[] R = new byte[ScalarBytes];
 				Buffer.BlockCopy(Signature, 0, R, 0, ScalarBytes);
-                PointOnCurve r = Decode(R, Curve);
-                byte[] S = new byte[ScalarBytes];
+				PointOnCurve r = Decode(R, BigEndian, Curve);
+				byte[] S = new byte[ScalarBytes];
 				Buffer.BlockCopy(Signature, ScalarBytes, S, 0, ScalarBytes);
-                BigInteger s = EllipticCurve.ToInt(S);
+				BigInteger s = EllipticCurve.ToInt(S);
 
-                if (s >= Curve.Order)
-                    return false;
+				if (s >= Curve.Order)
+					return false;
 
-                int c = Data.Length;
-                byte[] Bin = new byte[(ScalarBytes << 1) + c];              // dom2(F, C) = blank string
-                Buffer.BlockCopy(R, 0, Bin, 0, ScalarBytes);
-                Buffer.BlockCopy(PublicKey, 0, Bin, ScalarBytes, ScalarBytes);
+				int c = Data.Length;
+				byte[] Bin = new byte[(ScalarBytes << 1) + c];              // dom2(F, C) = blank string
+				Buffer.BlockCopy(R, 0, Bin, 0, ScalarBytes);
+				Buffer.BlockCopy(PublicKey, 0, Bin, ScalarBytes, ScalarBytes);
 				Buffer.BlockCopy(Data, 0, Bin, ScalarBytes << 1, c);              // PH(M)=M
 
-                byte[] h = HashFunction(Bin);
+				byte[] h = HashFunction(Bin);
 
-                BigInteger k = BigInteger.Remainder(EllipticCurve.ToInt(h), Curve.Order);
-                PointOnCurve P1 = Curve.ScalarMultiplication(s, Curve.BasePoint, false);
-                PointOnCurve P2 = Curve.ScalarMultiplication(k, Curve.Decode(PublicKey), false);
-                Curve.AddTo(ref P2, r);
+				BigInteger k = BigInteger.Remainder(EllipticCurve.ToInt(h), Curve.Order);
+				PointOnCurve P1 = Curve.ScalarMultiplication(s, Curve.BasePoint, false);
+				PointOnCurve P2 = Curve.ScalarMultiplication(k, Curve.Decode(PublicKey, BigEndian), false);
+				Curve.AddTo(ref P2, r);
 
-                P1.Normalize(Curve);
-                P2.Normalize(Curve);
+				P1.Normalize(Curve);
+				P2.Normalize(Curve);
 
-                return P1.Equals(P2);
-            }
-            catch (ArgumentException)
-            {
-                return false;
-            }
-        }
+				return P1.Equals(P2);
+			}
+			catch (ArgumentException)
+			{
+				return false;
+			}
+		}
 
-        /// <summary>
-        /// Verifies a signature of <paramref name="Data"/> made by the EdDSA algorithm.
-        /// </summary>
-        /// <param name="Data">Payload to sign.</param>
-        /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
-        /// <param name="HashFunction">Hash function to use.</param>
-        /// <param name="Curve">Elliptic curve</param>
-        /// <param name="Signature">Signature</param>
-        /// <returns>If the signature is valid.</returns>
-        public static bool Verify(Stream Data, byte[] PublicKey, HashFunctionStream HashFunction,
-            EdwardsCurveBase Curve, byte[] Signature)
-        {
-            try
-            {
-                int ScalarBytes = Signature.Length;
-                if ((ScalarBytes & 1) != 0)
-                    return false;
+		/// <summary>
+		/// Verifies a signature of <paramref name="Data"/> made by the EdDSA algorithm.
+		/// </summary>
+		/// <param name="Data">Payload to sign.</param>
+		/// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
+		/// <param name="BigEndian">If the encoded point is in big-endian format.</param>
+		/// <param name="HashFunction">Hash function to use.</param>
+		/// <param name="Curve">Elliptic curve</param>
+		/// <param name="Signature">Signature</param>
+		/// <returns>If the signature is valid.</returns>
+		public static bool Verify(Stream Data, byte[] PublicKey, bool BigEndian,
+			HashFunctionStream HashFunction, EdwardsCurveBase Curve, byte[] Signature)
+		{
+			try
+			{
+				int ScalarBytes = Signature.Length;
+				if ((ScalarBytes & 1) != 0)
+					return false;
 
-                ScalarBytes >>= 1;
+				ScalarBytes >>= 1;
 
-                byte[] R = new byte[ScalarBytes];
+				byte[] R = new byte[ScalarBytes];
 				Buffer.BlockCopy(Signature, 0, R, 0, ScalarBytes);
-                PointOnCurve r = Decode(R, Curve);
-                byte[] S = new byte[ScalarBytes];
+				PointOnCurve r = Decode(R, BigEndian, Curve);
+				byte[] S = new byte[ScalarBytes];
 				Buffer.BlockCopy(Signature, ScalarBytes, S, 0, ScalarBytes);
-                BigInteger s = EllipticCurve.ToInt(S);
-                byte[] h;
+				BigInteger s = EllipticCurve.ToInt(S);
+				byte[] h;
 
-                if (s >= Curve.Order)
-                    return false;
+				if (s >= Curve.Order)
+					return false;
 
-                using (TemporaryStream TempFile = new TemporaryStream())        // dom2(F, C) = blank string
-                {
-                    TempFile.Write(R, 0, ScalarBytes);
-                    TempFile.Write(PublicKey, 0, ScalarBytes);
+				using (TemporaryStream TempFile = new TemporaryStream())        // dom2(F, C) = blank string
+				{
+					TempFile.Write(R, 0, ScalarBytes);
+					TempFile.Write(PublicKey, 0, ScalarBytes);
 
-                    Data.Position = 0;
-                    Data.CopyTo(TempFile);                                  // PH(M)=M
+					Data.Position = 0;
+					Data.CopyTo(TempFile);                                  // PH(M)=M
 
-                    TempFile.Position = 0;
-                    h = HashFunction(TempFile);
-                }
+					TempFile.Position = 0;
+					h = HashFunction(TempFile);
+				}
 
-                BigInteger k = BigInteger.Remainder(EllipticCurve.ToInt(h), Curve.Order);
-                PointOnCurve P1 = Curve.ScalarMultiplication(s, Curve.BasePoint, false);
-                PointOnCurve P2 = Curve.ScalarMultiplication(k, Curve.Decode(PublicKey), false);
-                Curve.AddTo(ref P2, r);
+				BigInteger k = BigInteger.Remainder(EllipticCurve.ToInt(h), Curve.Order);
+				PointOnCurve P1 = Curve.ScalarMultiplication(s, Curve.BasePoint, false);
+				PointOnCurve P2 = Curve.ScalarMultiplication(k, Curve.Decode(PublicKey, BigEndian), false);
+				Curve.AddTo(ref P2, r);
 
-                P1.Normalize(Curve);
-                P2.Normalize(Curve);
+				P1.Normalize(Curve);
+				P2.Normalize(Curve);
 
-                return P1.Equals(P2);
-            }
-            catch (ArgumentException)
-            {
-                return false;
-            }
-        }
+				return P1.Equals(P2);
+			}
+			catch (ArgumentException)
+			{
+				return false;
+			}
+		}
 
-    }
+	}
 }

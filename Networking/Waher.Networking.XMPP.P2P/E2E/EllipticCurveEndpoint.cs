@@ -124,7 +124,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				SharedKey = (byte[])SharedKey.Clone();
 			else
 			{
-				SharedKey = LocalKey.curve.GetSharedKey(RemoteKey.PublicKey, Hashes.ComputeSHA256Hash);
+				SharedKey = LocalKey.curve.GetSharedKey(RemoteKey.PublicKey, false, Hashes.ComputeSHA256Hash);
 				sharedSecrets[Key] = (byte[])SharedKey.Clone();
 			}
 
@@ -141,7 +141,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			if (!this.hasPrivateKey)
 				throw new InvalidOperationException("Signing requires private key.");
 
-			byte[] Signature = this.curve.Sign(Data);
+			byte[] Signature = this.curve.Sign(Data, false);
 
 			return Signature;
 		}
@@ -156,7 +156,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			if (!this.hasPrivateKey)
 				throw new InvalidOperationException("Signing requires private key.");
 
-			byte[] Signature = this.curve.Sign(Data);
+			byte[] Signature = this.curve.Sign(Data, false);
 
 			return Signature;
 		}
@@ -170,7 +170,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>If signature is valid.</returns>
 		public bool Verify(byte[] Data, byte[] PublicKey, byte[] Signature)
 		{
-			return this.curve.Verify(Data, PublicKey, Signature);
+			return this.curve.Verify(Data, PublicKey, false, Signature);
 		}
 
 		/// <summary>
@@ -182,7 +182,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>If signature is valid.</returns>
 		public bool Verify(Stream Data, byte[] PublicKey, byte[] Signature)
 		{
-			return this.curve.Verify(Data, PublicKey, Signature);
+			return this.curve.Verify(Data, PublicKey, false, Signature);
 		}
 
 		/// <summary>

@@ -8,7 +8,9 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_01_Ed25519_TestVector_1()
         {
-            byte[] SecretKey = Hashes.StringToBinary("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60");
+			// §7.1, RFC 8032, TEST 1
+
+			byte[] SecretKey = Hashes.StringToBinary("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60");
             Edwards25519 Curve = new(SecretKey);
 
             Assert.AreEqual("d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
@@ -26,7 +28,9 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_02_Ed25519_TestVector_2()
         {
-            byte[] SecretKey = Hashes.StringToBinary("4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb");
+			// §7.1, RFC 8032, TEST 2
+
+			byte[] SecretKey = Hashes.StringToBinary("4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb");
             Edwards25519 Curve = new(SecretKey);
 
             Assert.AreEqual("3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c",
@@ -44,7 +48,9 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_03_Ed25519_TestVector_3()
         {
-            byte[] SecretKey = Hashes.StringToBinary("c5aa8df43f9f837bedb7442f31dcb7b166d38535076f094b85ce3a2e0b4458f7");
+			// §7.1, RFC 8032, TEST 3
+
+			byte[] SecretKey = Hashes.StringToBinary("c5aa8df43f9f837bedb7442f31dcb7b166d38535076f094b85ce3a2e0b4458f7");
             Edwards25519 Curve = new(SecretKey);
 
             Assert.AreEqual("fc51cd8e6218a1a38da47ed00230f0580816ed13ba3303ac5deb911548908025",
@@ -62,7 +68,9 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_04_Ed25519_TestVector_4()
         {
-            byte[] SecretKey = Hashes.StringToBinary("f5e5767cf153319517630f226876b86c8160cc583bc013744c6bf255f5cc0ee5");
+			// §7.1, RFC 8032, TEST 1024
+
+			byte[] SecretKey = Hashes.StringToBinary("f5e5767cf153319517630f226876b86c8160cc583bc013744c6bf255f5cc0ee5");
             Edwards25519 Curve = new(SecretKey);
 
             Assert.AreEqual("278117fc144c72340f67d0f2316e8386ceffbf2b2428c9c51fef7c597f1d426e",
@@ -80,7 +88,9 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_05_Ed25519_TestVector_5()
         {
-            byte[] SecretKey = Hashes.StringToBinary("833fe62409237b9d62ec77587520911e9a759cec1d19755b7da901b96dca3d42");
+			// §7.1, RFC 8032, TEST SHA(abc)
+
+			byte[] SecretKey = Hashes.StringToBinary("833fe62409237b9d62ec77587520911e9a759cec1d19755b7da901b96dca3d42");
             Edwards25519 Curve = new(SecretKey);
 
             Assert.AreEqual("ec172b93ad5e563bf4932c70e1245034c35467ef2efd4d64ebf819683467e2bf",
@@ -98,7 +108,9 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_06_Ed448_TestVector_1()
         {
-            byte[] SecretKey = Hashes.StringToBinary("6c82a562cb808d10d632be89c8513ebf6c929f34ddfa8c9f63c9960ef6e348a3528c8a3fcc2f044e39a3fc5b94492f8f032e7549a20098f95b");
+			// §7.4, RFC 8032, Blank
+
+			byte[] SecretKey = Hashes.StringToBinary("6c82a562cb808d10d632be89c8513ebf6c929f34ddfa8c9f63c9960ef6e348a3528c8a3fcc2f044e39a3fc5b94492f8f032e7549a20098f95b");
             Edwards448 Curve = new(SecretKey);
 
             Assert.AreEqual("5fd7449b59b461fd2ce787ec616ad46a1da1342485a70e1f8a0ea75d80e96778edf124769b46c7061bd6783df1e50f6cd1fa1abeafe8256180",
@@ -116,7 +128,9 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_07_Ed448_TestVector_2()
         {
-            byte[] SecretKey = Hashes.StringToBinary("c4eab05d357007c632f3dbb48489924d552b08fe0c353a0d4a1f00acda2c463afbea67c5e8d2877c5e3bc397a659949ef8021e954e0a12274e");
+			// §7.4, RFC 8032, 1 octet
+
+			byte[] SecretKey = Hashes.StringToBinary("c4eab05d357007c632f3dbb48489924d552b08fe0c353a0d4a1f00acda2c463afbea67c5e8d2877c5e3bc397a659949ef8021e954e0a12274e");
             Edwards448 Curve = new(SecretKey);
 
             Assert.AreEqual("43ba28f430cdff456ae531545f7ecd0ac834a55d9358c0372bfa0c6c6798c0866aea01eb00742802b8438ea4cb82169c235160627b4c3a9480",
@@ -134,7 +148,9 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_08_Ed448_TestVector_3()
         {
-            byte[] SecretKey = Hashes.StringToBinary("cd23d24f714274e744343237b93290f511f6425f98e64459ff203e8985083ffdf60500553abc0e05cd02184bdb89c4ccd67e187951267eb328");
+			// §7.4, RFC 8032, 11 octets
+
+			byte[] SecretKey = Hashes.StringToBinary("cd23d24f714274e744343237b93290f511f6425f98e64459ff203e8985083ffdf60500553abc0e05cd02184bdb89c4ccd67e187951267eb328");
             Edwards448 Curve = new(SecretKey);
 
             Assert.AreEqual("dcea9e78f35a1bf3499a831b10b86c90aac01cd84b67a0109b55a36e9328b1e365fce161d71ce7131a543ea4cb5f7e9f1d8b00696447001400",
@@ -152,7 +168,9 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_09_Ed448_TestVector_4()
         {
-            byte[] SecretKey = Hashes.StringToBinary("258cdd4ada32ed9c9ff54e63756ae582fb8fab2ac721f2c8e676a72768513d939f63dddb55609133f29adf86ec9929dccb52c1c5fd2ff7e21b");
+			// §7.4, RFC 8032, 12 octets
+
+			byte[] SecretKey = Hashes.StringToBinary("258cdd4ada32ed9c9ff54e63756ae582fb8fab2ac721f2c8e676a72768513d939f63dddb55609133f29adf86ec9929dccb52c1c5fd2ff7e21b");
             Edwards448 Curve = new(SecretKey);
 
             Assert.AreEqual("3ba16da0c6f2cc1f30187740756f5e798d6bc5fc015d7c63cc9510ee3fd44adc24d8e968b6e46e6f94d19b945361726bd75e149ef09817f580",
@@ -170,7 +188,9 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_10_Ed448_TestVector_5()
         {
-            byte[] SecretKey = Hashes.StringToBinary("7ef4e84544236752fbb56b8f31a23a10e42814f5f55ca037cdcc11c64c9a3b2949c1bb60700314611732a6c2fea98eebc0266a11a93970100e");
+			// §7.4, RFC 8032, 13 octets
+
+			byte[] SecretKey = Hashes.StringToBinary("7ef4e84544236752fbb56b8f31a23a10e42814f5f55ca037cdcc11c64c9a3b2949c1bb60700314611732a6c2fea98eebc0266a11a93970100e");
             Edwards448 Curve = new(SecretKey);
 
             Assert.AreEqual("b3da079b0aa493a5772029f0467baebee5a8112d9d3a22532361da294f7bb3815c5dc59e176b4d9f381ca0938e13c6c07b174be65dfa578e80",
@@ -188,7 +208,9 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_11_Ed448_TestVector_6()
         {
-            byte[] SecretKey = Hashes.StringToBinary("d65df341ad13e008567688baedda8e9dcdc17dc024974ea5b4227b6530e339bff21f99e68ca6968f3cca6dfe0fb9f4fab4fa135d5542ea3f01");
+			// §7.4, RFC 8032, 64 octets
+
+			byte[] SecretKey = Hashes.StringToBinary("d65df341ad13e008567688baedda8e9dcdc17dc024974ea5b4227b6530e339bff21f99e68ca6968f3cca6dfe0fb9f4fab4fa135d5542ea3f01");
             Edwards448 Curve = new(SecretKey);
 
             Assert.AreEqual("df9705f58edbab802c7f8363cfe5560ab1c6132c20a9f1dd163483a26f8ac53a39d6808bf4a1dfbd261b099bb03b3fb50906cb28bd8a081f00",
@@ -206,7 +228,9 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_12_Ed448_TestVector_7()
         {
-            byte[] SecretKey = Hashes.StringToBinary("2ec5fe3c17045abdb136a5e6a913e32ab75ae68b53d2fc149b77e504132d37569b7e766ba74a19bd6162343a21c8590aa9cebca9014c636df5");
+			// §7.4, RFC 8032, 256 octets
+
+			byte[] SecretKey = Hashes.StringToBinary("2ec5fe3c17045abdb136a5e6a913e32ab75ae68b53d2fc149b77e504132d37569b7e766ba74a19bd6162343a21c8590aa9cebca9014c636df5");
             Edwards448 Curve = new(SecretKey);
 
             Assert.AreEqual("79756f014dcfe2079f5dd9e718be4171e2ef2486a08f25186f6bff43a9936b9bfe12402b08ae65798a3d81e22e9ec80e7690862ef3d4ed3a00",
@@ -224,7 +248,9 @@ namespace Waher.Security.EllipticCurves.Test
         [TestMethod]
         public void Test_13_Ed448_TestVector_8()
         {
-            byte[] SecretKey = Hashes.StringToBinary("872d093780f5d3730df7c212664b37b8a0f24f56810daa8382cd4fa3f77634ec44dc54f1c2ed9bea86fafb7632d8be199ea165f5ad55dd9ce8");
+			// §7.4, RFC 8032, 1023 octets
+
+			byte[] SecretKey = Hashes.StringToBinary("872d093780f5d3730df7c212664b37b8a0f24f56810daa8382cd4fa3f77634ec44dc54f1c2ed9bea86fafb7632d8be199ea165f5ad55dd9ce8");
             Edwards448 Curve = new(SecretKey);
 
             Assert.AreEqual("a81b2e8a70a5ac94ffdbcc9badfc3feb0801f258578bb114ad44ece1ec0e799da08effb81c5d685c0c56f64eecaef8cdf11cc38737838cf400",

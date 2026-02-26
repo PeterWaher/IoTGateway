@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Runtime.Collections;
 
@@ -572,10 +573,10 @@ namespace Waher.Runtime.Cache
 			}
 
 			if (!(Prev is null))
-				this.OnRemoved(Key, Prev.Value, Reason);
+				_ = this.OnRemoved(Key, Prev.Value, Reason);
 		}
 
-		private async void OnRemoved(KeyType Key, ValueType Value, RemovedReason Reason)
+		private async Task OnRemoved(KeyType Key, ValueType Value, RemovedReason Reason)
 		{
 			try
 			{
@@ -614,8 +615,34 @@ namespace Waher.Runtime.Cache
 		/// <returns>If an item with the given key was found and removed.</returns>
 		public bool Remove(KeyType Key)
 		{
-			CacheItem<KeyType, ValueType> Item;
+			if (this.RemoveNoEvent(Key, out CacheItem<KeyType, ValueType> Item))
+			{
+				_ = this.OnRemoved(Key, Item.Value, RemovedReason.Manual);
+				return true;
+			}
+			else
+				return false;
+		}
 
+		/// <summary>
+		/// Removes an item from the cache. Waits for the removal event to complete
+		/// before returning.
+		/// </summary>
+		/// <param name="Key">Key of item to remove.</param>
+		/// <returns>If an item with the given key was found and removed.</returns>
+		public async Task<bool> RemoveAsync(KeyType Key)
+		{
+			if (this.RemoveNoEvent(Key, out CacheItem<KeyType, ValueType> Item))
+			{
+				await this.OnRemoved(Key, Item.Value, RemovedReason.Manual);
+				return true;
+			}
+			else
+				return false;
+		}
+
+		private bool RemoveNoEvent(KeyType Key, out CacheItem<KeyType, ValueType> Item)
+		{
 			lock (this.synchObject)
 			{
 				if (!this.valuesByKey.TryGetValue(Key, out Item))
@@ -637,8 +664,6 @@ namespace Waher.Runtime.Cache
 					this.timer = null;
 				}
 			}
-
-			this.OnRemoved(Key, Item.Value, RemovedReason.Manual);
 
 			return true;
 		}

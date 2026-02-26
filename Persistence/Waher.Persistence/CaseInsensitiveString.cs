@@ -11,6 +11,7 @@ namespace Waher.Persistence
 	{
 		private readonly string value;
 		private readonly string lowerCase;
+		private string upperCase;
 
 		/// <summary>
 		/// Represents a case-insensitive string.
@@ -31,6 +32,20 @@ namespace Waher.Persistence
 		/// Lower-case representation of the case-insensitive string.
 		/// </summary>
 		public string LowerCase => this?.lowerCase;
+
+		/// <summary>
+		/// Upper-case representation of the case-insensitive string.
+		/// </summary>
+		public string UpperCase
+		{
+			get
+			{
+				if (this.upperCase is null)
+					this.upperCase = this.value?.ToUpper();
+
+				return this.upperCase;
+			}
+		}
 
 		/// <inheritdoc/>
 		public override string ToString()

@@ -99,6 +99,8 @@ namespace Waher.Events.Pipe
 		/// Queues XML-encoded information to be output.
 		/// </summary>
 		/// <param name="Xml">XML to queue to the pipe.</param>
+		/// <param name="ValidateXml">If <paramref name="ValidateXml"/> should be validated
+		/// before transmission, in order to ensure it is valid XML.</param>
 		private async Task Queue(string Xml, bool ValidateXml)
 		{
 			if (ValidateXml && !XML.IsValidXml(Xml))

@@ -1897,6 +1897,8 @@ namespace Waher.Networking
 
 		private RemoteCertificateValidationCallback certValidation = null;
 		private X509Certificate remoteCertificate = null;
+		private X509Chain remoteChain = null;
+		private SslPolicyErrors remoteSslPolicyErrors = SslPolicyErrors.None;
 
 		private bool ValidateCertificateRequired(object Sender, X509Certificate Certificate, X509Chain Chain,
 			SslPolicyErrors SslPolicyErrors)
@@ -1923,8 +1925,11 @@ namespace Waher.Networking
 				this.remoteCertificateValid = false;
 				Result = !RequireCertificate;
 			}
-			else if (SslPolicyErrors == SslPolicyErrors.None)
+			else if (SslPolicyErrors == SslPolicyErrors.None ||
+				IsIncompleteRevocationCheck(SslPolicyErrors, Chain))
+			{
 				this.remoteCertificateValid = Result = true;
+			}
 			else
 			{
 				this.remoteCertificateValid = false;
@@ -2037,6 +2042,8 @@ namespace Waher.Networking
 			if (!(Cert is null) && Result)
 			{
 				this.remoteCertificate = new X509Certificate(Cert);
+				this.remoteChain = Chain;
+				this.remoteSslPolicyErrors = SslPolicyErrors;
 				this.SetTcpEndPoints();
 			}
 
@@ -2044,9 +2051,55 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
+		/// Checks if the SSL policy errors are only due to an incomplete revocation check, 
+		/// which can occur on Apple platforms when OCSP or CRL checks fail. In such cases, 
+		/// the certificate may still be valid, and the connection can be allowed if this 
+		/// is the only error.
+		/// </summary>
+		/// <param name="SslPolicyErrors">SSL Policy errors.</param>
+		/// <param name="Chain">Certificate chain.</param>
+		/// <returns>True if the only error is an incomplete revocation check, otherwise 
+		/// false.</returns>
+		public static bool IsIncompleteRevocationCheck(SslPolicyErrors SslPolicyErrors,
+			X509Chain Chain)
+		{
+			if (Chain is null)
+				return false;
+
+			if (!SslPolicyErrors.HasFlag(SslPolicyErrors.RemoteCertificateChainErrors))
+				return false;
+
+			foreach (X509ChainStatus Status in Chain.ChainStatus)
+			{
+				// Apple-specific error code for incomplete revocation check
+
+				if (Status.Status == X509ChainStatusFlags.RevocationStatusUnknown ||
+					Status.Status == X509ChainStatusFlags.OfflineRevocation)
+				{
+					continue; // Ignore this error
+				}
+
+				if (Status.Status != X509ChainStatusFlags.NoError)
+					return false; // Fail on other errors
+			}
+
+			return true; // Only revocation check failed, allow
+		}
+
+		/// <summary>
 		/// Certificate used by the remote endpoint.
 		/// </summary>
 		public X509Certificate RemoteCertificate => this.remoteCertificate;
+
+		/// <summary>
+		/// Certificate chain used by the remote endpoint.
+		/// </summary>
+		public X509Chain RemoteChain => this.remoteChain;
+
+		/// <summary>
+		/// SSL/TLS policy errors encountered by the remote endpoint.
+		/// </summary>
+		public SslPolicyErrors RemoteSslPolicyErrors => this.remoteSslPolicyErrors;
 #endif
 
 		/// <summary>

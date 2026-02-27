@@ -277,7 +277,7 @@ namespace Waher.Content.Getters
 				{
 					// Check for incomplete revocation check in the chain
 
-					if (SslPolicyErrors.HasFlag(SslPolicyErrors.RemoteCertificateChainErrors) && Chain != null)
+					if (SslPolicyErrors.HasFlag(SslPolicyErrors.RemoteCertificateChainErrors) && !(Chain is null))
 					{
 						foreach (X509ChainStatus Status in Chain.ChainStatus)
 						{

@@ -792,7 +792,7 @@ namespace Waher.Networking.Cluster
 		{
 			LinkedListNode<ClusterUdpClient> Loop = this.outgoing.First;
 
-			while (Loop != null)
+			while (!(Loop is null))
 			{
 				if (Endpoint.Equals(Loop.Value.EndPoint))
 					return true;

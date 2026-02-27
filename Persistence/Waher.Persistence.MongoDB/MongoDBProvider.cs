@@ -2005,7 +2005,7 @@ namespace Waher.Persistence.MongoDB
 						break; // Done with this index.
 					}
 
-					if (FieldNames != null && FieldNames.Count > 0)
+					if (!(FieldNames is null) && FieldNames.Count > 0)
 						Result.Add(FieldNames.ToArray());
 				}
 			}

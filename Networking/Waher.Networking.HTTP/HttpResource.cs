@@ -158,6 +158,26 @@ namespace Waher.Networking.HTTP
 		public string[] AllowedMethods => this.allowedMethods;
 
 		/// <summary>
+		/// Servers on which the resource has been registered.
+		/// </summary>
+		public HttpServer[] Servers => this.serversStatic;
+
+		/// <summary>
+		/// First server on which the resource has been registered.
+		/// </summary>
+		public HttpServer FirstServer
+		{
+			get
+			{
+				HttpServer[] Servers = this.Servers;
+				if (Servers?.Length > 0)
+					return Servers[0];
+				else
+					return null;
+			}
+		}
+
+		/// <summary>
 		/// Salt value used when calculating ETag values.
 		/// </summary>
 		public string ETagSalt

@@ -184,7 +184,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ApprovedSources">If access to sensitive methods is only accessible from a set of approved sources.</param>
 		[Obsolete("Use overload with ICallStackCheck[] instead.")]
 		public ContractsClient(XmppClient Client, string ComponentAddress, object[] ApprovedSources)
-			: this(Client,ComponentAddress, Assert.Convert(ApprovedSources))
+			: this(Client, ComponentAddress, Assert.Convert(ApprovedSources))
 		{
 		}
 
@@ -1370,7 +1370,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public Task Apply(Property[] Properties, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
-			return this.Apply(this.componentAddress, Properties, Callback, State);
+			return this.Apply(this.componentAddress, Properties, false, Callback, State);
 		}
 
 		/// <summary>
@@ -1380,7 +1380,35 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Properties">Properties of the legal identity.</param>
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public async Task Apply(string Address, Property[] Properties, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
+		public Task Apply(string Address, Property[] Properties, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
+		{
+			return this.Apply(Address, Properties, false, Callback, State);
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <param name="Preview">If the application is a preview application, and the
+		/// generated identity should not be permanently registered.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public Task Apply(Property[] Properties, bool Preview, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
+		{
+			return this.Apply(this.componentAddress, Properties, Preview, Callback, State);
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <param name="Preview">If the application is a preview application, and the
+		/// generated identity should not be permanently registered.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public async Task Apply(string Address, Property[] Properties, bool Preview,
+			EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
 			this.AssertAllowed();
 
@@ -1392,6 +1420,10 @@ namespace Waher.Networking.XMPP.Contracts
 
 					Xml.Append("<apply xmlns=\"");
 					Xml.Append(NamespaceLegalIdentitiesCurrent);
+
+					if (Preview)
+						Xml.Append("\" preview=\"true");
+
 					Xml.Append("\">");
 
 					StringBuilder Identity = new StringBuilder();

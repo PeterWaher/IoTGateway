@@ -43,6 +43,12 @@
 					</xs:annotation>
 				</xs:element>
 			</xs:sequence>
+			<xs:attribute name='preview' type='xs:boolean' use='optional' default='false'>
+				<xs:annotation>
+					<xs:documentation>If set to true, the application is not persisted, but kept in internal memory only, as a preview of a coming application.</xs:documentation>
+					<xs:documentation>Allows a client to test the creation and verification of a digital identity, without creating a persisted identity.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 

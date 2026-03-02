@@ -1439,7 +1439,7 @@ namespace Waher.Persistence.Files
 			IndexBTreeFile[] Indices = File.Indices;
 			string[] Fields;
 			int i, c;
-			bool Regenerate = (RegenerationOptions == RegenerationOptions.Regenerate);
+			bool Regenerate = RegenerationOptions == RegenerationOptions.Regenerate;
 
 			foreach (IndexBTreeFile I in Indices)
 			{
@@ -1482,9 +1482,12 @@ namespace Waher.Persistence.Files
 			if (!Exists && RegenerationOptions == RegenerationOptions.RegenerateIfFileNotFound)
 				Regenerate = true;
 
+			bool Locked = false;
+
 			await File.BeginWrite();
 			try
 			{
+				Locked = true;
 				IndexFile = await IndexBTreeFile.Create(s, File, this, FieldNames);
 
 				await File.AddIndexLocked(IndexFile, Regenerate);
@@ -1494,11 +1497,18 @@ namespace Waher.Persistence.Files
 				if (!CanRetry)
 					ExceptionDispatchInfo.Capture(ex).Throw();
 
+				if (Locked)
+				{
+					await File.EndWrite();
+					Locked = false;
+				}
+
 				return await this.GetIndexFile(File, false, RegenerationOptions, FieldNames);
 			}
 			finally
 			{
-				await File.EndWrite();
+				if (Locked)
+					await File.EndWrite();
 			}
 
 			sb.Clear();

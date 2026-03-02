@@ -290,7 +290,14 @@ namespace Waher.Content.Getters
 							}
 
 							if (Status.Status != X509ChainStatusFlags.NoError)
-								return false; // Fail on other errors
+							{
+								if (Certificate is X509Certificate2 Certificate2)
+									return Certificate2.Verify();
+
+								Certificate2 = new X509Certificate2(Certificate.GetRawCertData());
+
+								return Certificate2.Verify(); // Check if certificate fails on other errors
+							}
 						}
 
 						return true; // Only revocation check failed, allow

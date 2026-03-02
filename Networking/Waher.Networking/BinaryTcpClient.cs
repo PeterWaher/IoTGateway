@@ -1920,13 +1920,14 @@ namespace Waher.Networking
 			this.remoteCertificate?.Dispose();
 			this.remoteCertificate = null;
 
-			if (SslPolicyErrors == SslPolicyErrors.RemoteCertificateNotAvailable || Certificate is null)
+			if (SslPolicyErrors == SslPolicyErrors.RemoteCertificateNotAvailable ||
+				Certificate is null)
 			{
 				this.remoteCertificateValid = false;
 				Result = !RequireCertificate;
 			}
 			else if (SslPolicyErrors == SslPolicyErrors.None ||
-				IsIncompleteRevocationCheck(SslPolicyErrors, Chain))
+				IsIncompleteRevocationCheck(SslPolicyErrors, Chain, Certificate))
 			{
 				this.remoteCertificateValid = Result = true;
 			}
@@ -2011,6 +2012,8 @@ namespace Waher.Networking
 						SniffMsg.AppendLine();
 						SniffMsg.Append("sslPolicyErrors: ");
 						SniffMsg.AppendLine(SslPolicyErrors.ToString());
+						SniffMsg.Append("ChainStatus: ");
+						SniffMsg.AppendLine(ChainStatus(Chain));
 						SniffMsg.Append("Subject: ");
 						SniffMsg.AppendLine(Certificate?.Subject);
 						SniffMsg.Append("Issuer: ");
@@ -2058,10 +2061,11 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="SslPolicyErrors">SSL Policy errors.</param>
 		/// <param name="Chain">Certificate chain.</param>
+		/// <param name="Certificate">Certificate</param>
 		/// <returns>True if the only error is an incomplete revocation check, otherwise 
 		/// false.</returns>
 		public static bool IsIncompleteRevocationCheck(SslPolicyErrors SslPolicyErrors,
-			X509Chain Chain)
+			X509Chain Chain, X509Certificate Certificate)
 		{
 			if (Chain is null)
 				return false;
@@ -2080,10 +2084,35 @@ namespace Waher.Networking
 				}
 
 				if (Status.Status != X509ChainStatusFlags.NoError)
-					return false; // Fail on other errors
+				{
+					if (Certificate is X509Certificate2 Certificate2)
+						return Certificate2.Verify();
+
+					Certificate2 = new X509Certificate2(Certificate.GetRawCertData());
+
+					return Certificate2.Verify(); // Check if certificate fails on other errors
+				}
 			}
 
 			return true; // Only revocation check failed, allow
+		}
+
+		private static string ChainStatus(X509Chain Chain)
+		{
+			StringBuilder sb = new StringBuilder();
+			bool First = true;
+
+			foreach (X509ChainStatus Status in Chain.ChainStatus)
+			{
+				if (First)
+					First = false;
+				else
+					sb.Append(", ");
+
+				sb.Append(Status.Status.ToString());
+			}
+
+			return sb.ToString();
 		}
 
 		/// <summary>

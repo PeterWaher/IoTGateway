@@ -792,10 +792,13 @@ namespace Waher.Networking.HTTP
 					}
 				}
 #else
-				foreach (KeyValuePair<TcpListener, bool> P in this.listeners)
+				if (!(this.listeners is null))
 				{
-					if (P.Key.LocalEndpoint is IPEndPoint Endpoint)
-						Addresses[Endpoint.Address] = true;
+					foreach (KeyValuePair<TcpListener, bool> P in this.listeners)
+					{
+						if (P.Key.LocalEndpoint is IPEndPoint Endpoint)
+							Addresses[Endpoint.Address] = true;
+					}
 				}
 #endif
 				IPAddress[] Result = new IPAddress[Addresses.Count];
@@ -2423,7 +2426,7 @@ namespace Waher.Networking.HTTP
 
 			HttpFieldHost Host = null;
 
-			if (this.TryGetResource(ref ResourceName, false, out HttpResource Resource, 
+			if (this.TryGetResource(ref ResourceName, false, out HttpResource Resource,
 				out string SubPath, ref Host) && Resource is HttpFolderResource Folder)
 			{
 				this.vanityResources.CheckVanityResource(ref SubPath);

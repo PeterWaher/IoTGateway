@@ -1439,7 +1439,7 @@ namespace Waher.Persistence.Files
 			IndexBTreeFile[] Indices = File.Indices;
 			string[] Fields;
 			int i, c;
-			bool Regenerate = (RegenerationOptions == RegenerationOptions.Regenerate);
+			bool Regenerate = RegenerationOptions == RegenerationOptions.Regenerate;
 
 			foreach (IndexBTreeFile I in Indices)
 			{

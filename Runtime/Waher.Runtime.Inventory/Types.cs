@@ -1254,7 +1254,7 @@ namespace Waher.Runtime.Inventory
 
 			Found.Sort((x, y) =>
 			{
-				int j = x.Value.CompareTo(y.Value);
+				int j = y.Value.CompareTo(x.Value);
 				if (j != 0)
 					return j;
 

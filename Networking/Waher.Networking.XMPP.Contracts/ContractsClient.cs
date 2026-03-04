@@ -1484,7 +1484,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Identity object representing the application.</returns>
 		public Task<LegalIdentity> ApplyAsync(Property[] Properties)
 		{
-			return this.ApplyAsync(this.componentAddress, Properties);
+			return this.ApplyAsync(this.componentAddress, Properties, false);
 		}
 
 		/// <summary>
@@ -1493,11 +1493,36 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Properties">Properties of the legal identity.</param>
 		/// <returns>Identity object representing the application.</returns>
-		public async Task<LegalIdentity> ApplyAsync(string Address, Property[] Properties)
+		public Task<LegalIdentity> ApplyAsync(string Address, Property[] Properties)
+		{
+			return this.ApplyAsync(Address, Properties, false);
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <param name="Preview">If the application is a preview application, and the
+		/// generated identity should not be permanently registered.</param>
+		/// <returns>Identity object representing the application.</returns>
+		public Task<LegalIdentity> ApplyAsync(Property[] Properties, bool Preview)
+		{
+			return this.ApplyAsync(this.componentAddress, Properties, Preview);
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <param name="Preview">If the application is a preview application, and the
+		/// generated identity should not be permanently registered.</param>
+		/// <returns>Identity object representing the application.</returns>
+		public async Task<LegalIdentity> ApplyAsync(string Address, Property[] Properties, bool Preview)
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			await this.Apply(Address, Properties, (Sender, e) =>
+			await this.Apply(Address, Properties, Preview, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Identity);

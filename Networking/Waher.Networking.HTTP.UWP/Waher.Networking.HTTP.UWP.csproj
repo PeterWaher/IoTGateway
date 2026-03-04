@@ -158,6 +158,7 @@
     <Compile Include="HTTP2\StaticRecord.cs" />
     <Compile Include="HTTP2\StreamState.cs" />
     <Compile Include="HttpRedirectionResource.cs" />
+    <Compile Include="Interfaces\IFolderResource.cs" />
     <Compile Include="Interfaces\IHttpConnectMethod.cs" />
     <Compile Include="Interfaces\IWebApplicationFirewall.cs" />
     <Compile Include="ProfilingEventArgs.cs" />

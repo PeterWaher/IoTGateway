@@ -1358,7 +1358,7 @@ namespace Waher.Networking.XMPP
 			else
 			{
 				if (this.textTransportLayer is null)
-					this.client?.SendAsync(Xml, Callback, State);
+					await (this.client?.SendAsync(Xml, Callback, State) ?? Task.FromResult(false));
 				else
 					await this.textTransportLayer.SendAsync(Xml, Callback, State);
 

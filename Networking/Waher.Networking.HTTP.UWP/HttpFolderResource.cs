@@ -9,6 +9,7 @@ using Waher.Networking.HTTP.HeaderFields;
 using Waher.Runtime.Temporary;
 using Waher.Script;
 using Waher.Runtime.IO;
+using Waher.Networking.HTTP.Interfaces;
 
 namespace Waher.Networking.HTTP
 {
@@ -37,8 +38,9 @@ namespace Waher.Networking.HTTP
 	/// Publishes a folder with all its files and subfolders through HTTP GET, with optional support for PUT, PATCH and DELETE.
 	/// If PUT, PATCH and DELETE are allowed, users (if authenticated) can update the contents of the folder.
 	/// </summary>
-	public class HttpFolderResource : HttpAsynchronousResource, IHttpGetMethod, IHttpGetRangesMethod,
-		IHttpPutMethod, IHttpPutRangesMethod, IHttpPatchMethod, IHttpPatchRangesMethod, IHttpDeleteMethod, IHttpPostMethod
+	public class HttpFolderResource : HttpAsynchronousResource, IHttpGetMethod, 
+		IHttpGetRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpPatchMethod, 
+		IHttpPatchRangesMethod, IHttpDeleteMethod, IHttpPostMethod, IFolderResource
 	{
 		private const int BufferSize = 32768;
 
@@ -1570,5 +1572,31 @@ namespace Waher.Networking.HTTP
 
 			await this.GET(Request, Response);
 		}
+
+		/// <summary>
+		/// Tries to get the full path of a file-based resource.
+		/// </summary>
+		/// <param name="SubPath">Sub-path idendifying the local resource</param>
+		/// <param name="Host">Host name used in request.</param>
+		/// <param name="MustExist">If file must exist.</param>
+		/// <param name="FileName">File name, if found.</param>
+		/// <returns>If the resource points to a file.</returns>
+		public bool TryGetFileName(string SubPath, string Host, bool MustExist, out string FileName)
+		{
+			HttpRequestHeader Header = new HttpRequestHeader("GET", this.ResourceName + SubPath,
+				"1.1", "https", this.FirstServer?.VanityResources,
+				new KeyValuePair<string, string>("Host", Host),
+				new KeyValuePair<string, string>("Accept", "*/*"));
+
+			HttpRequest Request = new HttpRequest(this.FirstServer, Header, null, string.Empty, string.Empty)
+			{
+				SubPath = SubPath
+			};
+
+			FileName = this.GetFullPath(Request, false, MustExist, out bool Exists);
+
+			return Exists;
+		}
+
 	}
 }

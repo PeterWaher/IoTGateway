@@ -792,10 +792,13 @@ namespace Waher.Networking.HTTP
 					}
 				}
 #else
-				foreach (KeyValuePair<TcpListener, bool> P in this.listeners)
+				if (!(this.listeners is null))
 				{
-					if (P.Key.LocalEndpoint is IPEndPoint Endpoint)
-						Addresses[Endpoint.Address] = true;
+					foreach (KeyValuePair<TcpListener, bool> P in this.listeners)
+					{
+						if (P.Key.LocalEndpoint is IPEndPoint Endpoint)
+							Addresses[Endpoint.Address] = true;
+					}
 				}
 #endif
 				IPAddress[] Result = new IPAddress[Addresses.Count];
@@ -2421,26 +2424,15 @@ namespace Waher.Networking.HTTP
 			if (i >= 0)
 				ResourceName = ResourceName.Substring(0, i);
 
+			this.vanityResources.CheckVanityResource(ref ResourceName);
+
 			HttpFieldHost Host = null;
 
-			if (this.TryGetResource(ref ResourceName, false, out HttpResource Resource, 
-				out string SubPath, ref Host) && Resource is HttpFolderResource Folder)
+			if (this.TryGetResource(ref ResourceName, false, out HttpResource Resource,
+				out string SubPath, ref Host) && Resource is IFolderResource FolderResource)
 			{
-				this.vanityResources.CheckVanityResource(ref SubPath);
-
-				HttpRequestHeader Header = new HttpRequestHeader("GET", ResourceName,
-					"1.1", "https", this.vanityResources,
-					new KeyValuePair<string, string>("Host", Host?.Value ?? string.Empty),
-					new KeyValuePair<string, string>("Accept", "*/*"));
-
-				HttpRequest Request = new HttpRequest(this, Header, null, string.Empty, string.Empty)
-				{
-					SubPath = SubPath
-				};
-
-				FileName = Folder.GetFullPath(Request, false, MustExist, out bool Exists);
-
-				return Exists;
+				return FolderResource.TryGetFileName(SubPath, Host?.Value ?? string.Empty,
+					MustExist, out FileName);
 			}
 			else
 			{

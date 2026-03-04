@@ -23,6 +23,8 @@ namespace Waher.Content.Getters
 	/// </summary>
 	public class WebGetter : IContentGetter, IContentHeader
 	{
+		private static bool useProxy = true;
+
 		/// <summary>
 		/// Gets resources from the Web (i.e. using HTTP or HTTPS).
 		/// </summary>
@@ -206,7 +208,8 @@ namespace Waher.Content.Getters
 				CheckCertificateRevocationList = true,
 				ClientCertificateOptions = ClientCertificateOption.Automatic,
 				ServerCertificateCustomValidationCallback = Validator.RemoteCertificateValidationCallback,
-				AutomaticDecompression = (DecompressionMethods)(-1)     // All
+				AutomaticDecompression = (DecompressionMethods)(-1),	// All
+				UseProxy = useProxy
 			};
 
 			try
@@ -225,6 +228,16 @@ namespace Waher.Content.Getters
 			}
 
 			return Handler;
+		}
+
+		/// <summary>
+		/// If HTTP proxies should be used when making requests, when available. 
+		/// Default is true.
+		/// </summary>
+		public static bool UseProxy
+		{
+			get => useProxy;
+			set => useProxy = value;
 		}
 
 		/// <summary>

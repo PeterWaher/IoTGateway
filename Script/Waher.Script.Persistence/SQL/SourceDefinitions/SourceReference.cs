@@ -93,7 +93,7 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 
 			if (Obj is IDataSource DataSource)
 				return DataSource;
-			else if(Obj is Type T)
+			else if (Obj is Type T)
 			{
 				if (!typeof(IDataSource).IsAssignableFrom(T))
 					return new TypeSource(T, Alias);

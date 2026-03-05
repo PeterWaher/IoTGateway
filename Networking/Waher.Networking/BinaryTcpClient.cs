@@ -717,7 +717,7 @@ namespace Waher.Networking
 					NetworkingModule.RegisterToken(this.id, this.currentCancelReading);
 					PrevCancel?.Dispose();
 
-					NrRead = await Stream.ReadAsync(this.buffer, 0, BufferSize, this.currentCancelReading.Token);
+					NrRead = await Stream.ReadAsync(this.buffer, 0, BufferSize, this.currentCancelReading?.Token ?? CancellationToken.None);
 #endif
 					if (this.disposing || this.disposed || NetworkingModule.Stopping)
 						break;
@@ -1895,7 +1895,7 @@ namespace Waher.Networking
 				NetworkingModule.RegisterToken(this.id, this.currentCancelReading);
 				PrevCancel?.Dispose();
 
-				await SslStream.AuthenticateAsClientAsync(Options, this.currentCancelReading.Token);
+				await SslStream.AuthenticateAsClientAsync(Options, this.currentCancelReading?.Token ?? CancellationToken.None);
 			}
 			finally
 			{
@@ -2337,7 +2337,7 @@ namespace Waher.Networking
 				NetworkingModule.RegisterToken(this.id, this.currentCancelReading);
 				PrevCancel?.Dispose();
 
-				await SslStream.AuthenticateAsServerAsync(Options, this.currentCancelReading.Token);
+				await SslStream.AuthenticateAsServerAsync(Options, this.currentCancelReading?.Token ?? CancellationToken.None);
 			}
 			finally
 			{

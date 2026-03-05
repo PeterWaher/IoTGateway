@@ -584,6 +584,10 @@ namespace Waher.Networking
 			}
 
 #if !WINDOWS_UWP
+			CancellationTokenSource Cancel = this.currentCancelReading;
+			this.currentCancelReading = null;
+			Cancel?.Dispose();
+
 			NetworkingModule.UnregisterToken(this.id);
 #endif
 			if (DelayedDispose)
@@ -755,6 +759,7 @@ namespace Waher.Networking
 #if !WINDOWS_UWP
 				CancellationTokenSource Cancel = this.currentCancelReading;
 				this.currentCancelReading = null;
+				Cancel?.Cancel();
 				Cancel?.Dispose();
 
 				NetworkingModule.UnregisterToken(this.id);
@@ -1885,7 +1890,12 @@ namespace Waher.Networking
 				SslStream SslStream = new SslStream(this.stream, true, this.ValidateCertificateRequired);
 				this.stream = SslStream;
 
-				await SslStream.AuthenticateAsClientAsync(Options, CancellationToken.None);
+				CancellationTokenSource PrevCancel = this.currentCancelReading;
+				this.currentCancelReading = new CancellationTokenSource();
+				NetworkingModule.RegisterToken(this.id, this.currentCancelReading);
+				PrevCancel?.Dispose();
+
+				await SslStream.AuthenticateAsClientAsync(Options, this.currentCancelReading.Token);
 			}
 			finally
 			{
@@ -2322,7 +2332,12 @@ namespace Waher.Networking
 				SslStream SslStream = new SslStream(this.stream, true, Options.RemoteCertificateValidationCallback);
 				this.stream = SslStream;
 
-				await SslStream.AuthenticateAsServerAsync(Options, CancellationToken.None);
+				CancellationTokenSource PrevCancel = this.currentCancelReading;
+				this.currentCancelReading = new CancellationTokenSource();
+				NetworkingModule.RegisterToken(this.id, this.currentCancelReading);
+				PrevCancel?.Dispose();
+
+				await SslStream.AuthenticateAsServerAsync(Options, this.currentCancelReading.Token);
 			}
 			finally
 			{
@@ -2384,7 +2399,10 @@ namespace Waher.Networking
 #if WINDOWS_UWP
 					IAsyncAction _ = this.client.CancelIOAsync();
 #else
-					this.currentCancelReading?.Cancel();
+					CancellationTokenSource Cancel = this.currentCancelReading;
+					this.currentCancelReading = null;
+					Cancel?.Cancel();
+					Cancel?.Dispose();
 
 					NetworkingModule.UnregisterToken(this.id);
 #endif

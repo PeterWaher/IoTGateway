@@ -78,7 +78,20 @@ namespace Waher.Script.Persistence.SQL.Sources
 			return Find(this.vector, Offset, Top, Generic, Where, Variables, Order, Node);
 		}
 
-		internal static async Task<IResultSetEnumerator> Find(IVector Vector, int Offset, int Top, bool Generic, ScriptNode Where, Variables Variables,
+		/// <summary>
+		/// Finds elements in a vector.
+		/// </summary>
+		/// <param name="Vector">Vector</param>
+		/// <param name="Offset">Offset into vector where to begin search.</param>
+		/// <param name="Top">Do not return more elements than this number.</param>
+		/// <param name="Generic">If generic objects is to be returned.</param>
+		/// <param name="Where">Optional filter.</param>
+		/// <param name="Variables">Current variables collection.</param>
+		/// <param name="Order">Optional order in which to return elements.</param>
+		/// <param name="Node">Script node making the call.</param>
+		/// <returns>Result set enumerator.</returns>
+		public static async Task<IResultSetEnumerator> Find(IVector Vector, int Offset, 
+			int Top, bool Generic, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
 			IResultSetEnumerator e = new SynchEnumerator(Vector.VectorElements.GetEnumerator());

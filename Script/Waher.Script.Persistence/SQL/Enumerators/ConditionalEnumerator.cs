@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Persistence;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;

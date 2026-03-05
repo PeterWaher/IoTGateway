@@ -104,7 +104,14 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 				return (IDataSource)CI.Invoke(Types.NoParameters);
 			}
 			else if (Obj is string s)
-				return new CollectionSource(s, Alias);
+			{
+				INamedDataSource NamedDataSource = GetNamedDataSource(s);
+
+				if (NamedDataSource is null)
+					return new CollectionSource(s, Alias);
+				else
+					return NamedDataSource;
+			}
 			else if (E is ObjectMatrix OM && OM.HasColumnNames)
 				return new VectorSource(Name, Alias, VectorSource.ToGenericObjectVector(OM), Source);
 			else if (E is IVector V)
@@ -116,6 +123,28 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 
 			throw new ScriptRuntimeException("Data source type not supported: " + E.AssociatedObjectValue?.GetType()?.FullName, Source);
 		}
+
+		private static INamedDataSource GetNamedDataSource(string Name)
+		{
+			INamedDataSource Result;
+
+			lock (namedDataSources)
+			{
+				if (namedDataSources.TryGetValue(Name, out Result))
+					return Result;
+			}
+
+			Result = Types.FindBest<INamedDataSource, string>(Name);
+
+			lock (namedDataSources)
+			{
+				namedDataSources[Name] = Result;
+			}
+
+			return Result;
+		}
+
+		private static readonly Dictionary<string, INamedDataSource> namedDataSources = new Dictionary<string, INamedDataSource>();
 
 		private static IDataSource GetDataSource(VariableReference Source, string Alias, Variables Variables)
 		{
@@ -198,7 +227,12 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 				}
 			}
 
-			return new CollectionSource(Name, Alias);
+			INamedDataSource NamedDataSource = GetNamedDataSource(Name);
+
+			if (NamedDataSource is null)
+				return new CollectionSource(Name, Alias);
+			else
+				return NamedDataSource;
 		}
 
 		/// <summary>

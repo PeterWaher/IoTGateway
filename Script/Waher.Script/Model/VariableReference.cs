@@ -61,48 +61,65 @@ namespace Waher.Script.Model
 
 			if (!this.onlyVariables)
 			{
-				if (Expression.TryGetConstant(this.variableName, Variables, out IElement ValueElement))
-					return ValueElement;
-
-				if (Types.IsRootNamespace(this.variableName))
-					return new Namespace(this.variableName);
-
-				ValueElement = Expression.GetFunctionLambdaDefinition(this.variableName, this.Start, this.Length, this.Expression);
+				IElement ValueElement = TryGetConstant(this.variableName, Variables, this);
 				if (!(ValueElement is null))
 					return ValueElement;
-
-				if (Types.TryGetQualifiedNames(this.variableName, out string[] QualifiedNames))
-				{
-					if (QualifiedNames.Length == 1)
-					{
-						Type T = Types.GetType(QualifiedNames[0]);
-
-						if (!(T is null))
-							return new TypeValue(T);
-						else
-							return new Namespace(QualifiedNames[0]);
-					}
-					else
-					{
-						int i, c = QualifiedNames.Length;
-						IElement[] Elements = new IElement[c];
-
-						for (i = 0; i < c; i++)
-							Elements[i] = new StringValue(QualifiedNames[i]);
-
-						return new ObjectVector(Elements);
-					}
-				}
-
-				if (Variables.TryGetVariable("Global", out v) &&
-					v.ValueObject is Variables GlobalVariables &&
-					GlobalVariables.TryGetVariable(this.variableName, out v))
-				{
-					return v.ValueElement;
-				}
 			}
 
 			throw new VariableNotFoundScriptException(this.variableName, this);
+		}
+
+		/// <summary>
+		/// Tries to get a constant value, given a variable name. This method will also 
+		/// check for namespaces and function lambda definitions.
+		/// </summary>
+		/// <param name="VariableName">Variable name</param>
+		/// <param name="Variables">Available variables.</param>
+		/// <param name="Node">Script node being executed.</param>
+		/// <returns>Element if found, null otherwise.</returns>
+		public static IElement TryGetConstant(string VariableName, Variables Variables, ScriptNode Node)
+		{
+			if (Expression.TryGetConstant(VariableName, Variables, out IElement ValueElement))
+				return ValueElement;
+
+			if (Types.IsRootNamespace(VariableName))
+				return new Namespace(VariableName);
+
+			ValueElement = Expression.GetFunctionLambdaDefinition(VariableName, Node.Start, Node.Length, Node.Expression);
+			if (!(ValueElement is null))
+				return ValueElement;
+
+			if (Types.TryGetQualifiedNames(VariableName, out string[] QualifiedNames))
+			{
+				if (QualifiedNames.Length == 1)
+				{
+					Type T = Types.GetType(QualifiedNames[0]);
+
+					if (!(T is null))
+						return new TypeValue(T);
+					else
+						return new Namespace(QualifiedNames[0]);
+				}
+				else
+				{
+					int i, c = QualifiedNames.Length;
+					IElement[] Elements = new IElement[c];
+
+					for (i = 0; i < c; i++)
+						Elements[i] = new StringValue(QualifiedNames[i]);
+
+					return new ObjectVector(Elements);
+				}
+			}
+
+			if (Variables.TryGetVariable("Global", out Variable v) &&
+				v.ValueObject is Variables GlobalVariables &&
+				GlobalVariables.TryGetVariable(VariableName, out v))
+			{
+				return v.ValueElement;
+			}
+
+			return null;
 		}
 
 		/// <summary>

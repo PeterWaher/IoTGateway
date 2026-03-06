@@ -290,6 +290,14 @@ namespace Waher.Persistence.FullTextSearch
 		private static async Task<CollectionInformation> GetCollectionInfoLocked(
 			string IndexCollectionName, string CollectionName, bool CreateIfNotExists)
 		{
+			if (collections is null)
+			{
+				if (CreateIfNotExists)
+					throw new NotSupportedException("Service not initialized or shut down.");
+				else
+					return null;
+			}
+
 			if (collections.TryGetValue(CollectionName, out CollectionInformation Result))
 				return Result;
 

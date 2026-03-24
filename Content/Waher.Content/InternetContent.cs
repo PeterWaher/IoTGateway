@@ -611,10 +611,13 @@ namespace Waher.Content
 		public static Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
 			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
-			if (!Decodes(ContentType, out Grade _, out IContentDecoder Decoder))
-				return Task.FromResult(new ContentResponse(new ArgumentException("No decoder found to decode objects of type " + ContentType + ".", nameof(ContentType))));
-
-			return Decoder.DecodeAsync(ContentType, Data, Encoding, Fields, BaseUri, Progress);
+			if (Decodes(ContentType, out Grade _, out IContentDecoder Decoder))
+				return Decoder.DecodeAsync(ContentType, Data, Encoding, Fields, BaseUri, Progress);
+			else
+			{
+				return Task.FromResult(new ContentResponse(ContentType,
+					new CustomEncoding(ContentType, Data), Data));
+			}
 		}
 
 		/// <summary>

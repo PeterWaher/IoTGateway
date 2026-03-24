@@ -40,7 +40,7 @@ namespace Waher.Networking.CoAP.Transport
 
 					try
 					{
-						await this.Endpoint.Decode(this, Data.Buffer, Data.RemoteEndPoint);
+						await this.Endpoint.Decode(this, Data.Buffer, Data.RemoteEndPoint, null);
 					}
 					catch (Exception ex)
 					{

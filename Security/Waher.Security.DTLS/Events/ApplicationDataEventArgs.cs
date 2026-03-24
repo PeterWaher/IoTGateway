@@ -10,10 +10,10 @@
 		/// <summary>
 		/// Event arguments for application data events.
 		/// </summary>
-		/// <param name="RemoteEndpoint">Remote endpoint.</param>
+		/// <param name="State">Remote endpoint state object.</param>
 		/// <param name="ApplicationData">Application Data.</param>
-		public ApplicationDataEventArgs(object RemoteEndpoint, byte[] ApplicationData)
-			: base(RemoteEndpoint)
+		public ApplicationDataEventArgs(EndpointState State, byte[] ApplicationData)
+			: base(State)
 		{
 			this.applicationData = ApplicationData;
 		}

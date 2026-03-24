@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.CoAP.Options;
+using Waher.Security.DTLS.Events;
 
 namespace Waher.Networking.CoAP
 {
@@ -18,6 +19,7 @@ namespace Waher.Networking.CoAP
 		private readonly CoapMessageType type;
 		private readonly CoapCode code;
 		private readonly IPEndPoint from;
+		private readonly UdpEventArgs e;
 		private Uri baseUri = null;
 		private byte[] payload;
 		private readonly ushort messageId;
@@ -36,8 +38,9 @@ namespace Waher.Networking.CoAP
 		private CoapOptionBlock2 block2 = null;
 		private uint? observe = null;
 
-		internal CoapMessage(CoapMessageType Type, CoapCode Code, ushort MessageId, ulong Token, CoapOption[] Options, byte[] Payload,
-			IPEndPoint From)
+		internal CoapMessage(CoapMessageType Type, CoapCode Code, ushort MessageId,
+			ulong Token, CoapOption[] Options, byte[] Payload, IPEndPoint From,
+			UdpEventArgs e)
 		{
 			this.type = Type;
 			this.code = Code;
@@ -46,6 +49,7 @@ namespace Waher.Networking.CoAP
 			this.options = Options;
 			this.payload = Payload;
 			this.from = From;
+			this.e = e;
 		}
 
 		/// <summary>
@@ -95,6 +99,16 @@ namespace Waher.Networking.CoAP
 		/// From where the message came.
 		/// </summary>
 		public IPEndPoint From => this.from;
+
+		/// <summary>
+		/// UTF-8 encoded authenticated Identity, if available, null otherwise.
+		/// </summary>
+		public byte[] Identity => this.e?.Identity;
+
+		/// <summary>
+		/// Authenticated Identity string, if available, null otherwise.
+		/// </summary>
+		public string IdentityString => this.e?.IdentityString;
 
 		/// <summary>
 		/// Optional accept option.

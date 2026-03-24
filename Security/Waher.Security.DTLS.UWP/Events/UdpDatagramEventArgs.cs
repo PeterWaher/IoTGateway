@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-namespace Waher.Security.DTLS.Events
+﻿namespace Waher.Security.DTLS.Events
 {
 	/// <summary>
 	/// Event arguments for UDP datagram events.
@@ -13,11 +11,11 @@ namespace Waher.Security.DTLS.Events
 		/// Event arguments for UDP datagram events.
 		/// </summary>
 		/// <param name="DtlsOverUdp">DTLS over UDP class.</param>
-		/// <param name="RemoteEndpoint">Remote endpoint.</param>
+		/// <param name="State">Remote endpoint state object.</param>
 		/// <param name="Datagram">Datagram.</param>
-		public UdpDatagramEventArgs(DtlsOverUdp DtlsOverUdp, IPEndPoint RemoteEndpoint,
+		public UdpDatagramEventArgs(DtlsOverUdp DtlsOverUdp, EndpointState State,
 			byte[] Datagram)
-			: base(DtlsOverUdp, RemoteEndpoint)
+			: base(DtlsOverUdp, State)
 		{
 			this.datagram = Datagram;
 		}

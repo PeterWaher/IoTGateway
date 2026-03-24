@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Waher.Security.DTLS.Test
@@ -10,7 +9,7 @@ namespace Waher.Security.DTLS.Test
 
 		public Users(params IUser[] Users)
 		{
-			this.users = new Dictionary<string, IUser>();
+			this.users = [];
 
 			foreach (IUser User in Users)
 				this.users[User.UserName] = User;

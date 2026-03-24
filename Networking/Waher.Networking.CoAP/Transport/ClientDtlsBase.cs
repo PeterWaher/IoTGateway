@@ -30,7 +30,8 @@ namespace Waher.Networking.CoAP.Transport
 		{
 			try
 			{
-				await this.Endpoint.Decode(e.DtlsOverUdp.Tag as ClientBase, e.Datagram, e.RemoteEndpoint);
+				await this.Endpoint.Decode(e.DtlsOverUdp.Tag as ClientBase, e.Datagram, 
+					e.RemoteEndpoint, e);
 			}
 			catch (Exception ex)
 			{

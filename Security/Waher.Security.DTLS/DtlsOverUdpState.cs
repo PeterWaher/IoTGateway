@@ -11,7 +11,8 @@ namespace Waher.Security.DTLS
 	{
 		public IPEndPoint RemoteEndpoint;
 		public LinkedList<Tuple<byte[], EventHandlerAsync<UdpTransmissionEventArgs>, object>> Queue;
-		public DTLS.DtlsState CurrentState;
+		public EndpointState State;
+		public DtlsState CurrentState;
 
 		public void AddToQueue(byte[] Packet, EventHandlerAsync<UdpTransmissionEventArgs> Callback, object State)
 		{
@@ -45,7 +46,7 @@ namespace Waher.Security.DTLS
 						await DtlsOverUdp.DTLS.SendApplicationData(Rec.Item1, this.RemoteEndpoint);
 
 					await Rec.Item2.Raise(this, new UdpTransmissionEventArgs(DtlsOverUdp,
-						this.RemoteEndpoint, Successful, Rec.Item3));
+						this.State, Successful, Rec.Item3));
 				}
 			}
 			while (!(Rec is null));

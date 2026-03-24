@@ -103,6 +103,7 @@ namespace Waher.Security.DTLS
 				{
 					RemoteEndpoint = EP,
 					Queue = new LinkedList<Tuple<byte[], EventHandlerAsync<UdpTransmissionEventArgs>, object>>(),
+					State = e.state,
 					CurrentState = DtlsState.Handshake
 				};
 
@@ -135,6 +136,7 @@ namespace Waher.Security.DTLS
 				{
 					RemoteEndpoint = EP,
 					Queue = new LinkedList<Tuple<byte[], EventHandlerAsync<UdpTransmissionEventArgs>, object>>(),
+					State = e.state,
 					CurrentState = DtlsState.SessionEstablished
 				};
 
@@ -149,7 +151,8 @@ namespace Waher.Security.DTLS
 
 		private Task Dtls_OnApplicationDataReceived(object Sender, ApplicationDataEventArgs e)
 		{
-			return this.OnDatagramReceived.Raise(this, new UdpDatagramEventArgs(this, (IPEndPoint)e.RemoteEndpoint, e.ApplicationData));
+			return this.OnDatagramReceived.Raise(this, new UdpDatagramEventArgs(this, 
+				e.state, e.ApplicationData));
 		}
 
 		/// <summary>
@@ -207,6 +210,7 @@ namespace Waher.Security.DTLS
 				{
 					RemoteEndpoint = RemoteEndpoint,
 					Queue = new LinkedList<Tuple<byte[], EventHandlerAsync<UdpTransmissionEventArgs>, object>>(),
+					State = this.dtls.GetState(RemoteEndpoint, this.dtls.mode == DtlsMode.Client),
 					CurrentState = Security.DTLS.DtlsState.Handshake
 				};
 

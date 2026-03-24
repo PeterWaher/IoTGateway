@@ -25,7 +25,7 @@ namespace Waher.Security.DTLS
 
 		private Cache<object, EndpointState> states;
 		private Scheduler timeouts;
-		private readonly DtlsMode mode;
+		internal readonly DtlsMode mode;
 		private RandomNumberGenerator rnd;
 		private ICommunicationLayer comLayer;
 		private readonly IUserSource users;
@@ -744,7 +744,7 @@ namespace Waher.Security.DTLS
 									this.rnd.GetBytes(State.serverRandom);
 								}
 
-								await this.OnIncomingHandshakeStarted.Raise(this, new RemoteEndpointEventArgs(State.remoteEndpoint), false);
+								await this.OnIncomingHandshakeStarted.Raise(this, new RemoteEndpointEventArgs(State), false);
 
 								this.SetUnixTime(State.serverRandom, 0);
 
@@ -906,7 +906,7 @@ namespace Waher.Security.DTLS
 						if (State.State != DtlsState.SessionEstablished)
 							break;
 
-						await this.OnApplicationDataReceived.Raise(this, new ApplicationDataEventArgs(State.remoteEndpoint, Record.fragment));
+						await this.OnApplicationDataReceived.Raise(this, new ApplicationDataEventArgs(State, Record.fragment));
 						break;
 
 					default:
@@ -958,7 +958,7 @@ namespace Waher.Security.DTLS
 		{
 			await State.SetState(DtlsState.SessionEstablished);
 
-			await this.OnHandshakeSuccessful.Raise(this, new RemoteEndpointEventArgs(State.remoteEndpoint));
+			await this.OnHandshakeSuccessful.Raise(this, new RemoteEndpointEventArgs(State));
 		}
 
 		/// <summary>
@@ -975,7 +975,7 @@ namespace Waher.Security.DTLS
 		{
 			await State.SetState(DtlsState.Failed);
 
-			await this.OnHandshakeFailed.Raise(this, new FailureEventArgs(State.remoteEndpoint, Reason, Descripton));
+			await this.OnHandshakeFailed.Raise(this, new FailureEventArgs(State, Reason, Descripton));
 
 			this.states?.Remove(State.remoteEndpoint);
 		}
@@ -989,7 +989,7 @@ namespace Waher.Security.DTLS
 		{
 			await State.SetState(DtlsState.Failed);
 
-			await this.OnSessionFailed.Raise(this, new FailureEventArgs(State.remoteEndpoint, Reason, Descripton));
+			await this.OnSessionFailed.Raise(this, new FailureEventArgs(State, Reason, Descripton));
 
 			this.states?.Remove(State.remoteEndpoint);
 		}
@@ -1004,9 +1004,9 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		public event EventHandlerAsync<StateChangedEventArgs> OnStateChanged = null;
 
-		internal Task StateChanged(object RemoteEndpoint, DtlsState State)
+		internal Task StateChanged(EndpointState State, DtlsState NewState)
 		{
-			return this.OnStateChanged.Raise(this, new StateChangedEventArgs(RemoteEndpoint, State));
+			return this.OnStateChanged.Raise(this, new StateChangedEventArgs(State, NewState));
 		}
 
 		private static ushort GetUInt16(byte[] Data, int Pos)
@@ -1270,7 +1270,8 @@ namespace Waher.Security.DTLS
 			if (this.mode == DtlsMode.Client)
 				throw new DtlsException("DTLS endpoints in client mode cannot request a party to start handshaking.");
 
-			return this.SendHandshake(HandshakeType.hello_request, Array.Empty<byte>(), false, true, this.GetState(RemoteEndpoint, false));
+			return this.SendHandshake(HandshakeType.hello_request, Array.Empty<byte>(), 
+				false, true, this.GetState(RemoteEndpoint, false));
 		}
 
 		/// <summary>
@@ -1298,7 +1299,7 @@ namespace Waher.Security.DTLS
 			return this.SendClientHello(State);
 		}
 
-		private EndpointState GetState(object RemoteEndpoint, bool IsClient)
+		internal EndpointState GetState(object RemoteEndpoint, bool IsClient)
 		{
 			if (!this.states.TryGetValue(RemoteEndpoint, out EndpointState Result))
 			{

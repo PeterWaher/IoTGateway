@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Net.Sockets;
 
 namespace Waher.Security.DTLS.Events
 {
@@ -10,29 +8,38 @@ namespace Waher.Security.DTLS.Events
 	/// </summary>
     public abstract class UdpEventArgs : EventArgs
     {
-		private readonly IPEndPoint remoteEndpoint;
+		private readonly EndpointState state;
 		private readonly DtlsOverUdp dtlsOverUdp;
 
 		/// <summary>
 		/// Event arguments for UDP datagram events.
 		/// </summary>
 		/// <param name="DtlsOverUdp">DTLS over UDP class.</param>
-		/// <param name="RemoteEndpoint">Remote endpoint.</param>
-		public UdpEventArgs(DtlsOverUdp DtlsOverUdp, IPEndPoint RemoteEndpoint)
+		/// <param name="State">Remote endpoint state object.</param>
+		public UdpEventArgs(DtlsOverUdp DtlsOverUdp, EndpointState State)
 		{
 			this.dtlsOverUdp = DtlsOverUdp;
-			this.remoteEndpoint = RemoteEndpoint;
+			this.state = State;
 		}
 
 		/// <summary>
 		/// Remote endpoint.
 		/// </summary>
-		public IPEndPoint RemoteEndpoint => this.remoteEndpoint;
+		public IPEndPoint RemoteEndpoint => (IPEndPoint)this.state.remoteEndpoint;
 
 		/// <summary>
 		/// DTLS over UDP.
 		/// </summary>
 		public DtlsOverUdp DtlsOverUdp => this.dtlsOverUdp;
 
+		/// <summary>
+		/// UTF-8 encoded authenticated Identity, if available, null otherwise.
+		/// </summary>
+		public byte[] Identity => this.state.credentials?.Identity;
+
+		/// <summary>
+		/// Authenticated Identity string, if available, null otherwise.
+		/// </summary>
+		public string IdentityString => this.state.credentials?.IdentityString;
 	}
 }

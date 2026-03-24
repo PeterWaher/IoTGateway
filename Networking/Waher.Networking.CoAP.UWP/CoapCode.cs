@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.CoAP
+﻿namespace Waher.Networking.CoAP
 {
 	/// <summary>
 	/// CoAP Codes, as defined in §12.1 of RFC 7252:

@@ -125,7 +125,7 @@ namespace Waher.Security.DTLS
 			if (this.state != NewState)
 			{
 				this.state = NewState;
-				await this.localEndpoint.StateChanged(this.remoteEndpoint, NewState);
+				await this.localEndpoint.StateChanged(this, NewState);
 			}
 		}
 

@@ -19,6 +19,7 @@ using Waher.Runtime.Inventory;
 using Waher.Security;
 using Waher.Security.DTLS;
 using Waher.Content.Binary;
+using Waher.Security.DTLS.Events;
 #if WINDOWS_UWP
 using Windows.Networking;
 using Windows.Networking.Connectivity;
@@ -491,7 +492,8 @@ namespace Waher.Networking.CoAP
 			Init();
 		}
 
-		internal async Task Decode(ClientBase Client, byte[] Packet, IPEndPoint From)
+		internal async Task Decode(ClientBase Client, byte[] Packet, IPEndPoint From,
+			UdpEventArgs e)
 		{
 			if (Packet.Length < 4)
 			{
@@ -665,7 +667,7 @@ namespace Waher.Networking.CoAP
 			else
 				Payload = null;
 
-			CoapMessage IncomingMessage = new CoapMessage(Type, Code, MessageId, Token, Options.ToArray(), Payload, From);
+			CoapMessage IncomingMessage = new CoapMessage(Type, Code, MessageId, Token, Options.ToArray(), Payload, From, e);
 
 			foreach (CoapOption Option in Options)
 			{
@@ -1014,26 +1016,26 @@ namespace Waher.Networking.CoAP
 
 						if (!(h is null))
 						{
-							CoapMessageEventArgs e = new CoapMessageEventArgs(Client, this, IncomingMessage, null);
+							CoapMessageEventArgs e2 = new CoapMessageEventArgs(Client, this, IncomingMessage, null);
 							try
 							{
-								await h(this, e);
+								await h(this, e2);
 							}
 							catch (CoapException ex)
 							{
-								if (Type == CoapMessageType.CON && !e.Responded)
-									await e.RST(ex.ErrorCode);
+								if (Type == CoapMessageType.CON && !e2.Responded)
+									await e2.RST(ex.ErrorCode);
 							}
 							catch (Exception ex)
 							{
 								Log.Exception(ex);
 
-								if (Type == CoapMessageType.CON && !e.Responded)
-									await e.RST(CoapCode.InternalServerError);
+								if (Type == CoapMessageType.CON && !e2.Responded)
+									await e2.RST(CoapCode.InternalServerError);
 							}
 
-							if (!e.Responded && Type == CoapMessageType.CON)
-								await e.ACK();
+							if (!e2.Responded && Type == CoapMessageType.CON)
+								await e2.ACK();
 						}
 						else
 						{

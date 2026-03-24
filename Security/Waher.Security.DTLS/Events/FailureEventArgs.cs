@@ -11,11 +11,11 @@
 		/// <summary>
 		/// Event arguments for handshake failure events.
 		/// </summary>
-		/// <param name="RemoteEndpoint">Remote endpoint.</param>
+		/// <param name="State">Remote endpoint state object.</param>
 		/// <param name="Reason">Reason for failing.</param>
 		/// <param name="Descripton">Alert description.</param>
-		public FailureEventArgs(object RemoteEndpoint, string Reason, AlertDescription Descripton)
-			: base(RemoteEndpoint)
+		public FailureEventArgs(EndpointState State, string Reason, AlertDescription Descripton)
+			: base(State)
 		{
 			this.reason = Reason;
 			this.descripton = Descripton;

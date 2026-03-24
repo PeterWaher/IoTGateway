@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace Waher.Security.DTLS
 {
 	/// <summary>
 	/// Pre-shared key.
 	/// </summary>
-    public class PresharedKey : IDtlsCredentials
-    {
+	public class PresharedKey : IDtlsCredentials
+	{
 		private readonly byte[] identity;
 		private readonly byte[] key;
 
@@ -49,8 +47,13 @@ namespace Waher.Security.DTLS
 		public byte[] Identity => this.identity;
 
 		/// <summary>
+		/// Identity string.
+		/// </summary>
+		public string IdentityString => Encoding.UTF8.GetString(this.identity);
+
+		/// <summary>
 		/// Secret binary key.
 		/// </summary>
 		public byte[] Key => this.key;
-    }
+	}
 }

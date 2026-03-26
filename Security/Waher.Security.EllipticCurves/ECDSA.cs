@@ -21,11 +21,11 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="MsbMask">Mask for most significant byte.</param>
 		/// <param name="Curve">Elliptic curve</param>
 		/// <returns>Signature</returns>
-		public static byte[] Sign(byte[] Data, bool BigEndian, byte[] PrivateKey, 
-			HashFunctionArray HashFunction, int OrderBytes, int ScalarBytes, byte MsbMask, 
+		public static byte[] Sign(byte[] Data, bool BigEndian, byte[] PrivateKey,
+			HashFunctionArray HashFunction, int OrderBytes, int ScalarBytes, byte MsbMask,
 			PrimeFieldCurve Curve)
 		{
-			BigInteger e = CalcE(Data, HashFunction, ScalarBytes, MsbMask);
+			BigInteger e = CalcE(Data, HashFunction, OrderBytes, ScalarBytes, MsbMask);
 			BigInteger r, s, PrivateKeyInt = EllipticCurve.ToInt(PrivateKey);
 			PointOnCurve P1;
 			byte[] k;
@@ -61,7 +61,7 @@ namespace Waher.Security.EllipticCurves
 
 			Buffer.BlockCopy(S, 0, Signature, 0, OrderBytes);
 
-			S = s.ToByteArray();		// Little endian
+			S = s.ToByteArray();        // Little endian
 			if (S.Length != OrderBytes)
 				Array.Resize(ref S, OrderBytes);
 
@@ -74,7 +74,7 @@ namespace Waher.Security.EllipticCurves
 		}
 
 		private static BigInteger CalcE(byte[] Data, HashFunctionArray HashFunction,
-			int ScalarBytes, byte MsbMask)
+			int OrderBytes, int ScalarBytes, byte MsbMask)
 		{
 			byte[] Hash = HashFunction(Data);
 			int c = Hash.Length;
@@ -82,9 +82,38 @@ namespace Waher.Security.EllipticCurves
 			if (c != ScalarBytes)
 				Array.Resize(ref Hash, ScalarBytes);
 
-			Hash[ScalarBytes - 1] &= MsbMask;
+			if (MsbMask == 0)
+			{
+				Buffer.BlockCopy(Hash, 0, Hash, 1, OrderBytes);
+				Hash[0] = 0;
+			}
+			else
+			{
+				bool Carry;
+				int i;
+				byte b;
 
-			return EllipticCurve.ToInt(Hash);
+				while (MsbMask != 0xff)
+				{
+					Carry = false;
+
+					for (i = 0; i < c; i++)
+					{
+						b = Hash[i];
+
+						if (Carry)
+							Hash[i] = (byte)((b >> 1) | 0x80);
+						else
+							Hash[i] = (byte)(b >> 1);
+
+						Carry = (b & 1) != 0;
+					}
+
+					MsbMask = (byte)((MsbMask << 1) | 1);
+				}
+			}
+
+			return EllipticCurve.ToInt(Hash, true);
 		}
 
 		/// <summary>
@@ -129,21 +158,21 @@ namespace Waher.Security.EllipticCurves
 
 			byte[] Signature = new byte[OrderBytes << 1];
 
-			byte[] S = r.ToByteArray();		// Little endian
+			byte[] S = r.ToByteArray();     // Little endian
 			if (S.Length != OrderBytes)
 				Array.Resize(ref S, OrderBytes);
 
 			if (BigEndian)
-				Array.Reverse(S);			// Big endian
+				Array.Reverse(S);           // Big endian
 
 			Buffer.BlockCopy(S, 0, Signature, 0, OrderBytes);
 
-			S = s.ToByteArray();			// Little endian
+			S = s.ToByteArray();            // Little endian
 			if (S.Length != OrderBytes)
 				Array.Resize(ref S, OrderBytes);
-			
+
 			if (BigEndian)
-				Array.Reverse(S);			// Big endian
+				Array.Reverse(S);           // Big endian
 
 			Buffer.BlockCopy(S, 0, Signature, OrderBytes, OrderBytes);
 
@@ -207,7 +236,7 @@ namespace Waher.Security.EllipticCurves
 			if (!PublicKeyPoint.NonZero || r.IsZero || s.IsZero || r >= Curve.Order || s >= Curve.Order)
 				return false;
 
-			BigInteger e = CalcE(Data, HashFunction, ScalarBytes, MsbMask);
+			BigInteger e = CalcE(Data, HashFunction, OrderBytes, ScalarBytes, MsbMask);
 			BigInteger w = Curve.ModulusN.Invert(s);
 			BigInteger u1 = Curve.ModulusN.Multiply(e, w);
 			BigInteger u2 = Curve.ModulusN.Multiply(r, w);

@@ -4,7 +4,7 @@ using System.Numerics;
 namespace Waher.Security.EllipticCurves
 {
 	/// <summary>
-	/// Base class of Montgomery curves (y²=x³+Ax²+x), with biratinal Edwards equivalent 
+	/// Base class of Montgomery curves (y²=x³+Ax²+x), with birational Edwards equivalent 
 	/// over a prime field.
 	/// </summary>
 	public abstract class MontgomeryCurve : PrimeFieldCurve
@@ -13,7 +13,7 @@ namespace Waher.Security.EllipticCurves
 		private BigInteger a;
 
 		/// <summary>
-		/// Base class of Montgomery curves (y²=x³+Ax²+x), with biratinal Edwards equivalent 
+		/// Base class of Montgomery curves (y²=x³+Ax²+x), with birational Edwards equivalent 
 		/// over a prime field.
 		/// </summary>
 		/// <param name="Prime">Prime base of field.</param>
@@ -29,7 +29,7 @@ namespace Waher.Security.EllipticCurves
 		}
 
 		/// <summary>
-		/// Base class of Montgomery curves, with biratinal Edwards equivalent 
+		/// Base class of Montgomery curves, with birational Edwards equivalent 
 		/// over a prime field.
 		/// </summary>
 		/// <param name="Prime">Prime base of field.</param>
@@ -44,6 +44,11 @@ namespace Waher.Security.EllipticCurves
 		{
 			this.a = A;
 		}
+
+		/// <summary>
+		/// Coefficient a.
+		/// </summary>
+		public BigInteger A => this.a;
 
 		/// <summary>
 		/// Converts a pair of (U,V) coordinates to a pair of (X,Y) coordinates

@@ -62,6 +62,16 @@ namespace Waher.Security.EllipticCurves
 		}
 
 		/// <summary>
+		/// Coefficient a.
+		/// </summary>
+		public BigInteger A => this.a;
+
+		/// <summary>
+		/// Coefficient b.
+		/// </summary>
+		public BigInteger B => this.b;
+
+		/// <summary>
 		/// Negates a point on the curve.
 		/// </summary>
 		/// <param name="P">Point</param>

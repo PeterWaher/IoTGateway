@@ -606,7 +606,25 @@ namespace Waher.Security.EllipticCurves
 		/// <see cref="BigInteger"/>.
 		/// </summary>
 		/// <param name="Binary">Little-endian binary representation of a big integer</param>
-		/// <returns><see cref="BigInteger"/></returns>
+		/// <param name="BigEndian">If the integer is encoded in big-endian format</param>
+		/// <returns><see cref="BigInteger"/> value</returns>
+		public static BigInteger ToInt(byte[] Binary, bool BigEndian)
+		{
+			if (BigEndian)
+			{
+				Binary = (byte[])Binary.Clone();
+				Array.Reverse(Binary);
+			}
+
+			return ToInt(Binary);
+		}
+
+		/// <summary>
+		/// Converts a little-endian binary representation of a big integer to a 
+		/// <see cref="BigInteger"/>.
+		/// </summary>
+		/// <param name="Binary">Little-endian binary representation of a big integer</param>
+		/// <returns><see cref="BigInteger"/> value</returns>
 		public static BigInteger ToInt(byte[] Binary)
 		{
 			int c = Binary.Length;

@@ -245,6 +245,12 @@ namespace Waher.Security.EllipticCurves
 		public PointOnCurve BasePoint => this.g;
 
 		/// <summary>
+		/// Mask for most significant byte of scalars (as byte arrays of size
+		/// <see cref="BigIntegerBytes"/>).
+		/// </summary>
+		public byte MsbOrderMask => this.msbOrderMask;
+
+		/// <summary>
 		/// Generates a new secret.
 		/// </summary>
 		/// <returns>Generated secret.</returns>

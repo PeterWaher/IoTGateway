@@ -21,8 +21,7 @@ namespace Waher.Security.EllipticCurves.Test
 			byte[] SignatureBin = Convert.FromBase64String(Signature);
 
 			Assert.IsTrue(ECDSA.Verify(DataBin, PublicKeyBin, BigEndian,
-				Hashes.ComputeSHA512Hash, Curve.OrderBytes, Curve.BigIntegerBytes,
-				Curve.MsbOrderMask, Curve, SignatureBin));
+				Hashes.ComputeSHA512Hash, Curve, SignatureBin));
 		}
 	}
 }

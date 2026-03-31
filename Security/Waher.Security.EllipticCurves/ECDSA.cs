@@ -16,18 +16,15 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="BigEndian">Indicates if the signature should be in big-endian format.</param>
 		/// <param name="PrivateKey">Private key.</param>
 		/// <param name="HashFunction">Hash function to use</param>
-		/// <param name="OrderBytes">Number of bytes used to encode an integer.</param>
-		/// <param name="ScalarBytes">Number of bytes to use for scalars.</param>
-		/// <param name="MsbMask">Mask for most significant byte.</param>
 		/// <param name="Curve">Elliptic curve</param>
 		/// <returns>Signature</returns>
 		public static byte[] Sign(byte[] Data, bool BigEndian, byte[] PrivateKey,
-			HashFunctionArray HashFunction, int OrderBytes, int ScalarBytes, byte MsbMask,
-			PrimeFieldCurve Curve)
+			HashFunctionArray HashFunction, PrimeFieldCurve Curve)
 		{
-			BigInteger e = CalcE(Data, HashFunction, OrderBytes, ScalarBytes, MsbMask);
+			BigInteger e = CalcE(Data, HashFunction, Curve);
 			BigInteger r, s, PrivateKeyInt = EllipticCurve.ToInt(PrivateKey);
 			PointOnCurve P1;
+			int OrderBytes = Curve.OrderBytes;
 			byte[] k;
 
 			do
@@ -74,17 +71,27 @@ namespace Waher.Security.EllipticCurves
 		}
 
 		private static BigInteger CalcE(byte[] Data, HashFunctionArray HashFunction,
-			int OrderBytes, int ScalarBytes, byte MsbMask)
+			PrimeFieldCurve Curve)
 		{
-			byte[] Hash = HashFunction(Data);
+			return CalcE(HashFunction(Data), Curve);
+		}
+
+		private static BigInteger CalcE(Stream Data, HashFunctionStream HashFunction,
+			PrimeFieldCurve Curve)
+		{
+			return CalcE(HashFunction(Data), Curve);
+		}
+
+		private static BigInteger CalcE(byte[] Hash, PrimeFieldCurve Curve)
+		{
 			int c = Hash.Length;
 
-			if (c != ScalarBytes)
-				Array.Resize(ref Hash, ScalarBytes);
+			if (c != Curve.BigIntegerBytes)
+				Array.Resize(ref Hash, Curve.BigIntegerBytes);
 
-			if (MsbMask == 0)
+			if (Curve.MsbOrderMask == 0)
 			{
-				Buffer.BlockCopy(Hash, 0, Hash, 1, OrderBytes);
+				Buffer.BlockCopy(Hash, 0, Hash, 1, Curve.OrderBytes);
 				Hash[0] = 0;
 			}
 			else
@@ -92,6 +99,7 @@ namespace Waher.Security.EllipticCurves
 				bool Carry;
 				int i;
 				byte b;
+				byte MsbMask = Curve.MsbOrderMask;
 
 				while (MsbMask != 0xff)
 				{
@@ -123,17 +131,15 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="BigEndian">Indicates if the signature should be in big-endian format.</param>
 		/// <param name="PrivateKey">Private key.</param>
 		/// <param name="HashFunction">Hash function to use</param>
-		/// <param name="OrderBytes">Number of bytes used to encode an integer.</param>
-		/// <param name="ScalarBytes">Number of bytes to use for scalars.</param>
-		/// <param name="MsbMask">Mask for most significant byte.</param>
 		/// <param name="Curve">Elliptic curve</param>
 		/// <returns>Signature</returns>
-		public static byte[] Sign(Stream Data, bool BigEndian, byte[] PrivateKey, HashFunctionStream HashFunction,
-			int OrderBytes, int ScalarBytes, byte MsbMask, PrimeFieldCurve Curve)
+		public static byte[] Sign(Stream Data, bool BigEndian, byte[] PrivateKey,
+			HashFunctionStream HashFunction, PrimeFieldCurve Curve)
 		{
-			BigInteger e = CalcE(Data, HashFunction, ScalarBytes, MsbMask);
+			BigInteger e = CalcE(Data, HashFunction, Curve);
 			BigInteger r, s, PrivateKeyInt = EllipticCurve.ToInt(PrivateKey);
 			PointOnCurve P1;
+			int OrderBytes = Curve.OrderBytes;
 			byte[] k;
 
 			do
@@ -179,20 +185,6 @@ namespace Waher.Security.EllipticCurves
 			return Signature;
 		}
 
-		private static BigInteger CalcE(Stream Data, HashFunctionStream HashFunction,
-			int ScalarBytes, byte MsbMask)
-		{
-			byte[] Hash = HashFunction(Data);
-			int c = Hash.Length;
-
-			if (c != ScalarBytes)
-				Array.Resize(ref Hash, ScalarBytes);
-
-			Hash[ScalarBytes - 1] &= MsbMask;
-
-			return EllipticCurve.ToInt(Hash);
-		}
-
 		/// <summary>
 		/// Verifies a signature of <paramref name="Data"/> made by the ECDSA algorithm.
 		/// </summary>
@@ -201,17 +193,13 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="BigEndian">Indicates if the public key is in big-endian format.</param>
 		/// <param name="HashFunction">Hash function to use.</param>
 		/// <param name="Curve">Elliptic curve</param>
-		/// <param name="OrderBytes">Number of bytes used to encode an integer.</param>
-		/// <param name="ScalarBytes">Number of bytes to use for scalars.</param>
-		/// <param name="MsbMask">Mask for most significant byte.</param>
 		/// <param name="Signature">Signature</param>
 		/// <returns>If the signature is valid.</returns>
 		public static bool Verify(byte[] Data, byte[] PublicKey, bool BigEndian,
-			HashFunctionArray HashFunction, int OrderBytes, int ScalarBytes, byte MsbMask,
-			PrimeFieldCurve Curve, byte[] Signature)
+			HashFunctionArray HashFunction, PrimeFieldCurve Curve, byte[] Signature)
 		{
 			int c = Signature.Length;
-			if (c != OrderBytes << 1)
+			if (c != Curve.OrderBytes << 1)
 				return false;
 
 			c >>= 1;
@@ -233,10 +221,27 @@ namespace Waher.Security.EllipticCurves
 			BigInteger s = EllipticCurve.ToInt(Bin);
 			PointOnCurve PublicKeyPoint = Curve.Decode(PublicKey, BigEndian);
 
+			return Verify(Data, PublicKeyPoint, HashFunction, Curve, r, s);
+		}
+
+		/// <summary>
+		/// Verifies a signature of <paramref name="Data"/> made by the ECDSA algorithm.
+		/// </summary>
+		/// <param name="Data">Payload to sign.</param>
+		/// <param name="PublicKeyPoint">Public Key of the entity that generated the signature.</param>
+		/// <param name="HashFunction">Hash function to use.</param>
+		/// <param name="Curve">Elliptic curve</param>
+		/// <param name="r">r part of signature.</param>
+		/// <param name="s">s part of signature.</param>
+		/// <returns>If the signature is valid.</returns>
+		public static bool Verify(byte[] Data, PointOnCurve PublicKeyPoint,
+			HashFunctionArray HashFunction, PrimeFieldCurve Curve, BigInteger r,
+			BigInteger s)
+		{
 			if (!PublicKeyPoint.NonZero || r.IsZero || s.IsZero || r >= Curve.Order || s >= Curve.Order)
 				return false;
 
-			BigInteger e = CalcE(Data, HashFunction, OrderBytes, ScalarBytes, MsbMask);
+			BigInteger e = CalcE(Data, HashFunction, Curve);
 			BigInteger w = Curve.ModulusN.Invert(s);
 			BigInteger u1 = Curve.ModulusN.Multiply(e, w);
 			BigInteger u2 = Curve.ModulusN.Multiply(r, w);
@@ -264,17 +269,13 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="BigEndian">Indicates if the public key is in big-endian format.</param>
 		/// <param name="HashFunction">Hash function to use.</param>
 		/// <param name="Curve">Elliptic curve</param>
-		/// <param name="OrderBytes">Number of bytes used to encode an integer.</param>
-		/// <param name="ScalarBytes">Number of bytes to use for scalars.</param>
-		/// <param name="MsbMask">Mask for most significant byte.</param>
 		/// <param name="Signature">Signature</param>
 		/// <returns>If the signature is valid.</returns>
 		public static bool Verify(Stream Data, byte[] PublicKey, bool BigEndian,
-			HashFunctionStream HashFunction, int OrderBytes, int ScalarBytes, byte MsbMask,
-			PrimeFieldCurve Curve, byte[] Signature)
+			HashFunctionStream HashFunction, PrimeFieldCurve Curve, byte[] Signature)
 		{
 			int c = Signature.Length;
-			if (c != OrderBytes << 1)
+			if (c != Curve.OrderBytes << 1)
 				return false;
 
 			c >>= 1;
@@ -293,7 +294,7 @@ namespace Waher.Security.EllipticCurves
 			if (!PublicKeyPoint.NonZero || r.IsZero || s.IsZero || r >= Curve.Order || s >= Curve.Order)
 				return false;
 
-			BigInteger e = CalcE(Data, HashFunction, ScalarBytes, MsbMask);
+			BigInteger e = CalcE(Data, HashFunction, Curve);
 			BigInteger w = Curve.ModulusN.Invert(s);
 			BigInteger u1 = Curve.ModulusN.Multiply(e, w);
 			BigInteger u2 = Curve.ModulusN.Multiply(r, w);

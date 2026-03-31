@@ -44,8 +44,7 @@ namespace Waher.Security.EllipticCurves
         public override byte[] Sign(byte[] Data, bool BigEndian)
         {
             return ECDSA.Sign(Data, BigEndian, this.PrivateKey, 
-                Bin => Hashes.ComputeHash(this.HashFunction, Bin),
-				this.orderBytes, this.bigIntegerBytes, this.msbOrderMask, this);
+                Bin => Hashes.ComputeHash(this.HashFunction, Bin), this);
         }
 
         /// <summary>
@@ -57,8 +56,7 @@ namespace Waher.Security.EllipticCurves
         public override byte[] Sign(Stream Data, bool BigEndian)
         {
             return ECDSA.Sign(Data, BigEndian, this.PrivateKey,
-                Bin => Hashes.ComputeHash(this.HashFunction, Bin),
-				this.orderBytes, this.bigIntegerBytes, this.msbOrderMask, this);
+                Bin => Hashes.ComputeHash(this.HashFunction, Bin), this);
         }
 
         /// <summary>
@@ -72,8 +70,7 @@ namespace Waher.Security.EllipticCurves
         public override bool Verify(byte[] Data, byte[] PublicKey, bool BigEndian, byte[] Signature)
         {
             return ECDSA.Verify(Data, PublicKey, BigEndian, 
-                Bin => Hashes.ComputeHash(this.HashFunction, Bin),
-                this.orderBytes, this.bigIntegerBytes, this.msbOrderMask, this, Signature);
+                Bin => Hashes.ComputeHash(this.HashFunction, Bin), this, Signature);
         }
 
         /// <summary>
@@ -87,8 +84,7 @@ namespace Waher.Security.EllipticCurves
         public override bool Verify(Stream Data, byte[] PublicKey, bool BigEndian, byte[] Signature)
         {
             return ECDSA.Verify(Data, PublicKey, BigEndian,
-                Bin => Hashes.ComputeHash(this.HashFunction, Bin),
-                this.orderBytes, this.bigIntegerBytes, this.msbOrderMask, this, Signature);
+                Bin => Hashes.ComputeHash(this.HashFunction, Bin), this, Signature);
         }
 
     }

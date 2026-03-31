@@ -324,13 +324,7 @@ namespace Waher.Security.EllipticCurves
 		/// <returns>Decoded point.</returns>
 		public override PointOnCurve Decode(byte[] Point, bool BigEndian)
 		{
-			if (BigEndian)
-			{
-				Point = (byte[])Point.Clone();
-				Array.Reverse(Point);	// Little endian
-			}
-
-			BigInteger U = ToInt(Point);
+			BigInteger U = ToInt(Point, BigEndian);
 			PointOnCurve P = new PointOnCurve(U, this.CalcV(U));
 
 			return P;

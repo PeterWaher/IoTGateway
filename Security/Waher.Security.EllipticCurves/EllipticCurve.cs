@@ -350,13 +350,7 @@ namespace Waher.Security.EllipticCurves
 			Buffer.BlockCopy(Point, 0, X, 0, this.orderBytes);
 			Buffer.BlockCopy(Point, this.orderBytes, Y, 0, this.orderBytes);
 
-			if (BigEndian)
-			{
-				Array.Reverse(X);   // Little endian
-				Array.Reverse(Y);   // Little endian
-			}
-
-			return new PointOnCurve(ToInt(X), ToInt(Y));
+			return new PointOnCurve(ToInt(X, BigEndian), ToInt(Y, BigEndian));
 		}
 
 		/// <summary>

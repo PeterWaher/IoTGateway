@@ -207,18 +207,12 @@ namespace Waher.Security.EllipticCurves
 			byte[] Bin = new byte[c];
 			Buffer.BlockCopy(Signature, 0, Bin, 0, c);
 
-			if (BigEndian)
-				Array.Reverse(Bin);
-
-			BigInteger r = EllipticCurve.ToInt(Bin);
+			BigInteger r = EllipticCurve.ToInt(Bin, BigEndian);
 
 			Bin = new byte[c];
 			Buffer.BlockCopy(Signature, c, Bin, 0, c);
 
-			if (BigEndian)
-				Array.Reverse(Bin);
-
-			BigInteger s = EllipticCurve.ToInt(Bin);
+			BigInteger s = EllipticCurve.ToInt(Bin, BigEndian);
 			PointOnCurve PublicKeyPoint = Curve.Decode(PublicKey, BigEndian);
 
 			return Verify(Data, PublicKeyPoint, HashFunction, Curve, r, s);

@@ -299,7 +299,7 @@ namespace Waher.Utility.Extract
 							if (r.Depth != 1)
 								throw new Exception("Database element not expected.");
 
-							await Import.StartDatabase();
+							await Import.StartDatabase(null);
 							DatabaseStarted = true;
 							break;
 
@@ -307,7 +307,7 @@ namespace Waher.Utility.Extract
 							if (r.Depth != 1)
 								throw new Exception("Ledger element not expected.");
 
-							await Import.StartLedger();
+							await Import.StartLedger(null);
 							LedgerStarted = true;
 							break;
 
@@ -1057,7 +1057,7 @@ namespace Waher.Utility.Extract
 						string FieldName;
 						bool Ascending;
 
-						await Import.StartDatabase();
+						await Import.StartDatabase(null);
 
 						while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
 						{
@@ -1160,7 +1160,7 @@ namespace Waher.Utility.Extract
 
 					case 6: // Ledger
 
-						await Import.StartLedger();
+						await Import.StartLedger(null);
 
 						while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
 						{

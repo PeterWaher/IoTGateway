@@ -108,8 +108,9 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Is called when export of database is started.
 		/// </summary>
+		/// <param name="Provider">Provider doing the export. Can be null if export is done from outside a provider.</param>
 		/// <returns>If export can continue.</returns>
-		public abstract Task<bool> StartDatabase();
+		public abstract Task<bool> StartDatabase(IDatabaseProvider Provider);
 
 		/// <summary>
 		/// Is called when export of database is finished.
@@ -120,8 +121,9 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Is called when export of ledger is started.
 		/// </summary>
+		/// <param name="Provider">Provider doing the export. Can be null if export is done from outside a provider.</param>
 		/// <returns>If export can continue.</returns>
-		public abstract Task<bool> StartLedger();
+		public abstract Task<bool> StartLedger(ILedgerProvider Provider);
 
 		/// <summary>
 		/// Is called when export of ledger is finished.

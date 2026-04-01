@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
-using Waher.Runtime.Collections;
 using Waher.Runtime.Profiling;
 
 namespace Waher.Persistence

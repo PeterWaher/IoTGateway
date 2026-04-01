@@ -48,10 +48,11 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <summary>
 		/// Is called when export of ledger is started.
 		/// </summary>
+		/// <param name="Provider">Provider doing the export. Can be null if export is done from outside a provider.</param>
 		/// <returns>If export can continue.</returns>
-		public Task<bool> StartLedger()
+		public Task<bool> StartLedger(ILedgerProvider Provider)
 		{
-			return this.output?.StartLedger() ?? Task.FromResult(true);
+			return this.output?.StartLedger(Provider) ?? Task.FromResult(true);
 		}
 
 		/// <summary>

@@ -313,7 +313,8 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Is called when export of database is started.
 		/// </summary>
-		public override Task<bool> StartDatabase()
+		/// <param name="Provider">Provider doing the export. Can be null if export is done from outside a provider.</param>
+		public override Task<bool> StartDatabase(IDatabaseProvider Provider)
 		{
 			this.w.Write((byte)2); // Database
 			return Task.FromResult(true);
@@ -331,8 +332,9 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Is called when export of ledger is started.
 		/// </summary>
+		/// <param name="Provider">Provider doing the export. Can be null if export is done from outside a provider.</param>
 		/// <returns>If export can continue.</returns>
-		public override Task<bool> StartLedger()
+		public override Task<bool> StartLedger(ILedgerProvider Provider)
 		{
 			this.w.Write((byte)6); // Ledger
 			return Task.FromResult(true);

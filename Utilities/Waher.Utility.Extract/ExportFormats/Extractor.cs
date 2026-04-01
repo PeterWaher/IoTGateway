@@ -93,7 +93,7 @@ namespace Waher.Utility.Extract.ExportFormats
 			return Task.CompletedTask;
 		}
 
-		public async Task<bool> StartDatabase()
+		public async Task<bool> StartDatabase(IDatabaseProvider Provider)
 		{
 			ConsoleOut.WriteLine("Processing database section.");
 
@@ -128,7 +128,7 @@ namespace Waher.Utility.Extract.ExportFormats
 			return true;
 		}
 
-		public async Task<bool> StartLedger()
+		public async Task<bool> StartLedger(ILedgerProvider Provider)
 		{
 			ConsoleOut.WriteLine("Processing ledger section.");
 

@@ -3340,7 +3340,7 @@ namespace Waher.Persistence.Files
 			bool Continue;
 
 			Thread?.Start();
-			if (!await Output.StartDatabase())
+			if (!await Output.StartDatabase(this))
 				return false;
 			try
 			{

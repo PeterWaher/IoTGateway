@@ -11,8 +11,9 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Is called when export of ledger is started.
 		/// </summary>
+		/// <param name="Provider">Provider doing the export. Can be null if export is done from outside a provider.</param>
 		/// <returns>If export can continue.</returns>
-		Task<bool> StartLedger();
+		Task<bool> StartLedger(ILedgerProvider Provider);
 
 		/// <summary>
 		/// Is called when export of ledger is finished.

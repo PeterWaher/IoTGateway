@@ -573,7 +573,7 @@ namespace Waher.IoTGateway.Setup
 							else
 								ShowStatus(TabID, "Validating database section.");
 
-							await Import.StartDatabase();
+							await Import.StartDatabase(null);
 							DatabaseStarted = true;
 							break;
 
@@ -590,7 +590,7 @@ namespace Waher.IoTGateway.Setup
 							else
 								ShowStatus(TabID, "Validating ledger section.");
 
-							await Import.StartLedger();
+							await Import.StartLedger(null);
 							LedgerStarted = true;
 							break;
 
@@ -1463,7 +1463,7 @@ namespace Waher.IoTGateway.Setup
 						else
 							ShowStatus(TabID, "Validating database section.");
 
-						await Import.StartDatabase();
+						await Import.StartDatabase(null);
 
 						while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
 						{
@@ -1623,7 +1623,7 @@ namespace Waher.IoTGateway.Setup
 						else
 							ShowStatus(TabID, "Validating ledger section.");
 
-						await Import.StartLedger();
+						await Import.StartLedger(null);
 
 						while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
 						{

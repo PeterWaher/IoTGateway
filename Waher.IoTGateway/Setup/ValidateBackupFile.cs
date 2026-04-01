@@ -158,8 +158,9 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Is called when export of database is started.
 		/// </summary>
+		/// <param name="Provider">Provider doing the export. Can be null if export is done from outside a provider.</param>
 		/// <returns>If export can continue.</returns>
-		public virtual Task<bool> StartDatabase()
+		public virtual Task<bool> StartDatabase(IDatabaseProvider Provider)
 		{
 			return Task.FromResult(true);
 		}
@@ -176,8 +177,9 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Is called when export of ledger is started.
 		/// </summary>
+		/// <param name="Provider">Provider doing the export. Can be null if export is done from outside a provider.</param>
 		/// <returns>If export can continue.</returns>
-		public virtual Task<bool> StartLedger()
+		public virtual Task<bool> StartLedger(ILedgerProvider Provider)
 		{
 			return Task.FromResult(true);
 		}

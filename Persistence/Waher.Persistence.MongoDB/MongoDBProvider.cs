@@ -2228,7 +2228,7 @@ namespace Waher.Persistence.MongoDB
 			bool Continue;
 
 			Thread?.Start();
-			if (!await Output.StartDatabase())
+			if (!await Output.StartDatabase(this))
 				return false;
 			try
 			{

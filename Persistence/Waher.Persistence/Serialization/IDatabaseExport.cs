@@ -11,8 +11,9 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Is called when export of database is started.
 		/// </summary>
+		/// <param name="Provider">Provider doing the export. Can be null if export is done from outside a provider.</param>
 		/// <returns>If export can continue.</returns>
-		Task<bool> StartDatabase();
+		Task<bool> StartDatabase(IDatabaseProvider Provider);
 
 		/// <summary>
 		/// Is called when export of database is finished.

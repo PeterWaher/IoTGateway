@@ -71,17 +71,22 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		{
 			await this.output.WriteEndElementAsync();
 			await this.output.WriteEndDocumentAsync();
-			
+
 			return await this.UpdateClient(true);
 		}
 
 		/// <summary>
 		/// Is called when export of database is started.
 		/// </summary>
+		/// <param name="Provider">Provider doing the export. Can be null if export is done from outside a provider.</param>
 		/// <returns>If export can continue.</returns>
-		public override async Task<bool> StartDatabase()
+		public override async Task<bool> StartDatabase(IDatabaseProvider Provider)
 		{
 			await this.output.WriteStartElementAsync(string.Empty, "Database", XmlFileLedger.Namespace);
+
+			if (!(Provider is null))
+				await this.output.WriteAttributeStringAsync(string.Empty, "provider", string.Empty, Provider.GetType().FullName);
+
 			return true;
 		}
 
@@ -92,17 +97,22 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		public override async Task<bool> EndDatabase()
 		{
 			await this.output.WriteEndElementAsync();
-			
+
 			return await this.UpdateClient(false);
 		}
 
 		/// <summary>
 		/// Is called when export of ledger is started.
 		/// </summary>
+		/// <param name="Provider">Provider doing the export. Can be null if export is done from outside a provider.</param>
 		/// <returns>If export can continue.</returns>
-		public override async Task<bool> StartLedger()
+		public override async Task<bool> StartLedger(ILedgerProvider Provider)
 		{
 			await this.output.WriteStartElementAsync(string.Empty, "Ledger", XmlFileLedger.Namespace);
+
+			if (!(Provider is null))
+				await this.output.WriteAttributeStringAsync(string.Empty, "provider", string.Empty, Provider.GetType().FullName);
+
 			return true;
 		}
 
@@ -142,7 +152,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 			this.inCollection = false;
 			if (this.exportCollection)
 				await this.output.WriteEndElementAsync();
-			
+
 			return true;
 		}
 
@@ -154,7 +164,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		{
 			if (this.exportCollection)
 				await this.output.WriteStartElementAsync(string.Empty, "Index", XmlFileLedger.Namespace);
-			
+
 			return true;
 		}
 
@@ -353,7 +363,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		{
 			if (this.exportCollection)
 				await XmlFileLedger.ReportProperty(this.output, PropertyName, PropertyValue, XmlFileLedger.Namespace);
-			
+
 			return true;
 		}
 
@@ -366,7 +376,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		{
 			if (!this.inCollection || this.exportCollection)
 				await this.output.WriteElementStringAsync(string.Empty, "Error", XmlFileLedger.Namespace, Message);
-			
+
 			return true;
 		}
 

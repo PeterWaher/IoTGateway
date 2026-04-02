@@ -1,0 +1,10 @@
+﻿+ 		<Obj id="31611e45-6966-fddd-dc90-7c762a32687c" type="">
++ 			<DT n="Timestamp" v="2026-04-02T12:32:05.141Z" />
++ 			<S n="Type" v="Informational" />
++ 			<S n="Message" v="Database export performed for the first time." />
++ 			<S n="Object" v="" />
++ 			<S n="Actor" v="" />
++ 			<S n="EventId" v="" />
++ 			<S n="Facility" v="" />
++ 			<Array n="Tags" elementType="System.Object" />
++ 		</Obj>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
@@ -26,12 +27,25 @@ namespace Waher.Content.Html.Test
 		{
 			using HttpClient Client = new();
 			Client.Timeout = TimeSpan.FromMilliseconds(30000);
+			Client.DefaultRequestVersion = HttpVersion.Version20;
 			Client.DefaultRequestHeaders.ExpectContinue = false;
-			Client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36 Edg/94.0.992.31");
-			Client.DefaultRequestHeaders.Add("Referer", "https://www.science.org/");
-			Client.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+			Client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0");
+			//Client.DefaultRequestHeaders.Add("Referer", "https://www.science.org/");
+			Client.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7");
+			//Client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br, zstd");
 			Client.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.5");
-			Client.DefaultRequestHeaders.Add("Connection", "keep-alive");
+			Client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+			//Client.DefaultRequestHeaders.Add("Pragma", "no-cache");
+			//Client.DefaultRequestHeaders.Add("Priority", "u=0,i");
+			Client.DefaultRequestHeaders.Add("Sec-Ch-Ua", "\"Chromium\";v=\"146\", \"Not-A.Brand\";v=\"24\", \"Microsoft Edge\";v=\"146\"");
+			Client.DefaultRequestHeaders.Add("Sec-Ch-Ua-Mobile", "?0");
+			Client.DefaultRequestHeaders.Add("Sec-Ch-Ua-Platform", "\"Windows\"");
+			Client.DefaultRequestHeaders.Add("Sec-Fetch-Dest", "document");
+			Client.DefaultRequestHeaders.Add("Sec-Fetch-Mode", "navigate");
+			Client.DefaultRequestHeaders.Add("Sec-Fetch-Site", "none");
+			Client.DefaultRequestHeaders.Add("Sec-Fetch-User", "?1");
+			Client.DefaultRequestHeaders.Add("Upgrade-Insecure-Requests", "1");
+			//Client.DefaultRequestHeaders.Add("Connection", "keep-alive");
 
 			HttpResponseMessage Response = await Client.GetAsync(Url);
 			if (!Response.IsSuccessStatusCode)
@@ -49,11 +63,11 @@ namespace Waher.Content.Html.Test
 			HtmlDocument Doc = Content.Decoded as HtmlDocument;
 			Assert.IsNotNull(Doc);
 
-			Assert.IsNotNull(Doc.Root);
-			Assert.IsNotNull(Doc.Html);
-			Assert.IsNotNull(Doc.Head);
-			Assert.IsNotNull(Doc.Body);
-			Assert.IsNotNull(Doc.Title);
+			Assert.IsNotNull(Doc.Root, "No document root");
+			Assert.IsNotNull(Doc.Html, "No HTML tag");
+			Assert.IsNotNull(Doc.Head, "No HEAD tag");
+			Assert.IsNotNull(Doc.Body, "No BODY tag");
+			Assert.IsNotNull(Doc.Title, "No title");
 
 			ChunkedList<HtmlNode> Todo =
 			[
@@ -101,7 +115,7 @@ namespace Waher.Content.Html.Test
 
 			XmlWriterSettings Settings = XML.WriterSettings(true, true);
 			using XmlWriter Output = XmlWriter.Create(ConsoleOut.Writer, Settings);
-			
+
 			Doc.Export(Output);
 			Output.Flush();
 		}
@@ -141,5 +155,12 @@ namespace Waher.Content.Html.Test
 		{
 			await LoadAndParse("https://www.science.org/content/article/astronomers-searching-planet-nine-find-possible-hints-different-planet");
 		}
+
+		[TestMethod]
+		public async Task HtmlParseTest_07_Telegraph()
+		{
+			await LoadAndParse("https://www.telegraph.co.uk/world-news/2026/04/04/german-men-must-apply-army-booking-holidays-conscription/");
+		}
+
 	}
 }

@@ -9,6 +9,7 @@ using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
@@ -79,7 +80,78 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public async Task ContractsClient_State_Test_01_ExportKeysSkipsApprovedStatesWithoutMatchingLocalPrivateKey()
+		public async Task ContractsClient_State_Test_01_LegacyApprovedStateBackfillsPrivateKeySnapshot()
+		{
+			byte[] MatchingPublicKey = GetFirstLocalPublicKey(this.contractsClient);
+
+			await InsertStateAsync(this.client.BareJID, "matching-id", IdentityState.Approved, MatchingPublicKey, DateTime.UtcNow);
+
+			Assert.IsTrue(await this.contractsClient.HasPrivateKey("matching-id"));
+
+			LegalIdentityState State = await GetStateAsync(this.client.BareJID, "matching-id");
+			Assert.IsNotNull(State);
+			Assert.IsTrue(State.HasPrivateKey);
+			Assert.IsFalse(string.IsNullOrEmpty(State.KeyName));
+			Assert.IsNotNull(State.PrivateKey);
+			CollectionAssert.AreEqual(MatchingPublicKey, State.PublicKey);
+		}
+
+		[TestMethod]
+		public async Task ContractsClient_State_Test_02_GenerateNewKeysMigratesActiveStateAndSigningStillWorks()
+		{
+			byte[] OldPublicKey = GetFirstLocalPublicKey(this.contractsClient);
+
+			await InsertStateAsync(this.client.BareJID, "approved-id", IdentityState.Approved, OldPublicKey, DateTime.UtcNow);
+			await AwaitOrTimeout(this.contractsClient.GenerateNewKeys(), "GenerateNewKeys");
+
+			byte[] NewPublicKey = GetFirstLocalPublicKey(this.contractsClient);
+			Assert.IsFalse(AreEqual(OldPublicKey, NewPublicKey));
+
+			LegalIdentityState State = await GetStateAsync(this.client.BareJID, "approved-id");
+			Assert.IsNotNull(State);
+			Assert.IsTrue(State.HasPrivateKey);
+			CollectionAssert.AreEqual(OldPublicKey, State.PublicKey);
+			Assert.AreEqual("approved-id", await AwaitOrTimeout(this.contractsClient.GetLatestApprovedLegalId(), "GetLatestApprovedLegalId"));
+			Assert.IsTrue(await AwaitOrTimeout(this.contractsClient.HasPrivateKey("approved-id"), "HasPrivateKey"));
+
+			byte[] Signature = await AwaitOrTimeout(this.contractsClient.SignAsync(Encoding.UTF8.GetBytes("contracts-client-state-test"), SignWith.LatestApprovedId), "SignAsync");
+			Assert.IsNotNull(Signature);
+			Assert.IsTrue(Signature.Length > 0);
+		}
+
+		[TestMethod]
+		public async Task ContractsClient_State_Test_03_GenerateNewKeysStillSucceedsWhenLegacySnapshotCannotBeBackfilled()
+		{
+			byte[] MatchingPublicKey = GetFirstLocalPublicKey(this.contractsClient);
+
+			await InsertStateAsync(this.client.BareJID, "approved-id", IdentityState.Approved, MatchingPublicKey, DateTime.UtcNow);
+			await RuntimeSettings.DeleteWhereKeyLikeAsync(this.contractsClient.KeySettingsPrefix + "*", "*");
+			await AwaitOrTimeout(this.contractsClient.GenerateNewKeys(), "GenerateNewKeys");
+
+			LegalIdentityState State = await GetStateAsync(this.client.BareJID, "approved-id");
+			Assert.IsNotNull(State);
+			Assert.IsFalse(State.HasPrivateKey);
+			Assert.IsFalse(await this.contractsClient.HasPrivateKey("approved-id"));
+		}
+
+		[TestMethod]
+		public async Task ContractsClient_State_Test_04_ExportKeysIncludesPersistedApprovedStateAfterRotation()
+		{
+			byte[] OldPublicKey = GetFirstLocalPublicKey(this.contractsClient);
+
+			await InsertStateAsync(this.client.BareJID, "approved-id", IdentityState.Approved, OldPublicKey, DateTime.UtcNow);
+			await AwaitOrTimeout(this.contractsClient.GenerateNewKeys(), "GenerateNewKeys");
+
+			string Xml = await this.contractsClient.ExportKeys();
+
+			StringAssert.Contains(Xml, "approved-id");
+			StringAssert.Contains(Xml, "privateKey=");
+			StringAssert.Contains(Xml, "keyName=");
+			StringAssert.Contains(Xml, Convert.ToBase64String(OldPublicKey));
+		}
+
+		[TestMethod]
+		public async Task ContractsClient_State_Test_05_LatestApprovedSelectionIgnoresStaleStatesWithoutSnapshots()
 		{
 			byte[] MatchingPublicKey = GetFirstLocalPublicKey(this.contractsClient);
 			byte[] StalePublicKey = CreateStalePublicKey(MatchingPublicKey);
@@ -87,64 +159,17 @@ namespace Waher.Networking.XMPP.Test
 			await InsertStateAsync(this.client.BareJID, "matching-id", IdentityState.Approved, MatchingPublicKey, DateTime.UtcNow.AddMinutes(-1));
 			await InsertStateAsync(this.client.BareJID, "stale-id", IdentityState.Approved, StalePublicKey, DateTime.UtcNow);
 
-			string Xml = await this.contractsClient.ExportKeys();
-
-			StringAssert.Contains(Xml, "matching-id");
-			Assert.IsFalse(Xml.Contains("stale-id", StringComparison.Ordinal));
-		}
-
-		[TestMethod]
-		public async Task ContractsClient_State_Test_02_GetLatestApprovedLegalIdIgnoresNullAndStalePublicKeys()
-		{
-			byte[] MatchingPublicKey = GetFirstLocalPublicKey(this.contractsClient);
-			byte[] StalePublicKey = CreateStalePublicKey(MatchingPublicKey);
-
-			await InsertStateAsync(this.client.BareJID, "matching-id", IdentityState.Approved, MatchingPublicKey, DateTime.UtcNow.AddMinutes(-2));
-			await InsertStateAsync(this.client.BareJID, "null-key-id", IdentityState.Approved, null, DateTime.UtcNow.AddMinutes(-1));
-			await InsertStateAsync(this.client.BareJID, "stale-id", IdentityState.Approved, StalePublicKey, DateTime.UtcNow);
-
-			string LatestApprovedLegalId = await this.contractsClient.GetLatestApprovedLegalId();
-			string LatestApprovedMatchingLegalId = await this.contractsClient.GetLatestApprovedLegalId(MatchingPublicKey);
+			string LatestApprovedLegalId = await AwaitOrTimeout(this.contractsClient.GetLatestApprovedLegalId(), "GetLatestApprovedLegalId");
+			string LatestApprovedMatchingLegalId = await AwaitOrTimeout(this.contractsClient.GetLatestApprovedLegalId(MatchingPublicKey), "GetLatestApprovedLegalId(PublicKey)");
 
 			Assert.AreEqual("matching-id", LatestApprovedLegalId);
 			Assert.AreEqual("matching-id", LatestApprovedMatchingLegalId);
-		}
 
-		[TestMethod]
-		public async Task ContractsClient_State_Test_03_SignWithLatestApprovedIdUsesMatchingApprovedState()
-		{
-			byte[] MatchingPublicKey = GetFirstLocalPublicKey(this.contractsClient);
-			byte[] StalePublicKey = CreateStalePublicKey(MatchingPublicKey);
+			await AwaitOrTimeout(this.contractsClient.GenerateNewKeys(), "GenerateNewKeys");
 
-			await InsertStateAsync(this.client.BareJID, "matching-id", IdentityState.Approved, MatchingPublicKey, DateTime.UtcNow.AddMinutes(-2));
-			await InsertStateAsync(this.client.BareJID, "stale-id", IdentityState.Approved, StalePublicKey, DateTime.UtcNow);
-
-			using MemoryStream Data = new MemoryStream(Encoding.UTF8.GetBytes("contracts-client-state-test"));
-			byte[] Signature = await this.contractsClient.SignAsync(Data, SignWith.LatestApprovedId);
-
+			byte[] Signature = await AwaitOrTimeout(this.contractsClient.SignAsync(Encoding.UTF8.GetBytes("contracts-client-state-test"), SignWith.LatestApprovedId), "SignAsync");
 			Assert.IsNotNull(Signature);
 			Assert.IsTrue(Signature.Length > 0);
-		}
-
-		[TestMethod]
-		public async Task ContractsClient_State_Test_04_CanGenerateNewKeysReturnsTrueWhenActiveStatesHaveMatchingLocalKeys()
-		{
-			byte[] MatchingPublicKey = GetFirstLocalPublicKey(this.contractsClient);
-
-			await InsertStateAsync(this.client.BareJID, "matching-id", IdentityState.Approved, MatchingPublicKey, DateTime.UtcNow);
-
-			Assert.IsTrue(await this.contractsClient.CanGenerateNewKeys());
-		}
-
-		[TestMethod]
-		public async Task ContractsClient_State_Test_05_CanGenerateNewKeysReturnsFalseWhenActiveStatesExistWithoutPersistedPrivateKeys()
-		{
-			byte[] MatchingPublicKey = GetFirstLocalPublicKey(this.contractsClient);
-
-			await InsertStateAsync(this.client.BareJID, "matching-id", IdentityState.Approved, MatchingPublicKey, DateTime.UtcNow);
-			await RuntimeSettings.DeleteWhereKeyLikeAsync(this.contractsClient.KeySettingsPrefix + "*", "*");
-
-			Assert.IsFalse(await this.contractsClient.CanGenerateNewKeys());
 		}
 
 		private static byte[] GetFirstLocalPublicKey(ContractsClient ContractsClient)
@@ -168,6 +193,30 @@ namespace Waher.Networking.XMPP.Test
 			return Result;
 		}
 
+		private static bool AreEqual(byte[] A, byte[] B)
+		{
+			if (ReferenceEquals(A, B))
+				return true;
+
+			if (A is null || B is null || A.Length != B.Length)
+				return false;
+
+			for (int i = 0; i < A.Length; i++)
+			{
+				if (A[i] != B[i])
+					return false;
+			}
+
+			return true;
+		}
+
+		private static async Task<LegalIdentityState> GetStateAsync(string BareJid, string LegalId)
+		{
+			return await Database.FindFirstIgnoreRest<LegalIdentityState>(new FilterAnd(
+				new FilterFieldEqualTo("BareJid", BareJid),
+				new FilterFieldEqualTo("LegalId", LegalId)));
+		}
+
 		private static async Task InsertStateAsync(string BareJid, string LegalId, IdentityState State, byte[] PublicKey, DateTime Timestamp)
 		{
 			await Database.Insert(new LegalIdentityState()
@@ -178,6 +227,22 @@ namespace Waher.Networking.XMPP.Test
 				State = State,
 				Timestamp = Timestamp
 			});
+		}
+
+		private static async Task AwaitOrTimeout(Task OperationTask, string Operation)
+		{
+			if (await Task.WhenAny(OperationTask, Task.Delay(TimeSpan.FromSeconds(5))) != OperationTask)
+				Assert.Fail(Operation + " timed out.");
+
+			await OperationTask;
+		}
+
+		private static async Task<T> AwaitOrTimeout<T>(Task<T> OperationTask, string Operation)
+		{
+			if (await Task.WhenAny(OperationTask, Task.Delay(TimeSpan.FromSeconds(5))) != OperationTask)
+				Assert.Fail(Operation + " timed out.");
+
+			return await OperationTask;
 		}
 	}
 }

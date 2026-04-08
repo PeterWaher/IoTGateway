@@ -150,6 +150,25 @@ namespace Waher.Networking.XMPP.Contracts
 		private RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private Aes aes;
 
+		private sealed class ResolvedLegalIdentityKey : IDisposable
+		{
+			public ResolvedLegalIdentityKey(IE2eEndpoint Endpoint, bool MustDispose)
+			{
+				this.Endpoint = Endpoint;
+				this.MustDispose = MustDispose;
+			}
+
+			public IE2eEndpoint Endpoint { get; }
+
+			public bool MustDispose { get; }
+
+			public void Dispose()
+			{
+				if (this.MustDispose)
+					this.Endpoint?.Dispose();
+			}
+		}
+
 		#region Construction
 
 		/// <summary>
@@ -767,7 +786,7 @@ namespace Waher.Networking.XMPP.Contracts
 			return Updated;
 		}
 
-		private async Task<Tuple<IE2eEndpoint, bool>> TryGetLegalIdentityEndpointAsync(LegalIdentityState State, bool MigrateLegacyState)
+		private async Task<ResolvedLegalIdentityKey> TryGetLegalIdentityEndpointAsync(LegalIdentityState State, bool MigrateLegacyState)
 		{
 			IE2eEndpoint Endpoint = this.TryCreateLegalIdentityEndpoint(State);
 
@@ -779,7 +798,7 @@ namespace Waher.Networking.XMPP.Contracts
 					if (!string.IsNullOrEmpty(State.ObjectId))
 						await Database.Update(State);
 
-					return new Tuple<IE2eEndpoint, bool>(Endpoint, true);
+					return new ResolvedLegalIdentityKey(Endpoint, true);
 				}
 				else if (!AreEqual(State.PublicKey, Endpoint.PublicKey))
 				{
@@ -787,23 +806,23 @@ namespace Waher.Networking.XMPP.Contracts
 					Endpoint = null;
 				}
 				else
-					return new Tuple<IE2eEndpoint, bool>(Endpoint, true);
+					return new ResolvedLegalIdentityKey(Endpoint, true);
 			}
 
 			if (!MigrateLegacyState || State?.PublicKey is null || !await this.LoadKeys(false))
-				return new Tuple<IE2eEndpoint, bool>(null, false);
+				return new ResolvedLegalIdentityKey(null, false);
 
 			Endpoint = this.LocalEndpoint.FindLocalEndpoint(State.PublicKey);
 			if (Endpoint is null || !await this.SetLegalIdentityKeySnapshotAsync(State, Endpoint))
-				return new Tuple<IE2eEndpoint, bool>(Endpoint, false);
+				return new ResolvedLegalIdentityKey(Endpoint, false);
 
 			if (!string.IsNullOrEmpty(State.ObjectId))
 				await Database.Update(State);
 
 			IE2eEndpoint Endpoint2 = this.TryCreateLegalIdentityEndpoint(State);
 			return Endpoint2 is null ?
-				new Tuple<IE2eEndpoint, bool>(Endpoint, false)
-				: new Tuple<IE2eEndpoint, bool>(Endpoint2, true);
+				new ResolvedLegalIdentityKey(Endpoint, false)
+				: new ResolvedLegalIdentityKey(Endpoint2, true);
 		}
 
 		/// <summary>
@@ -859,32 +878,24 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("BareJid", this.client.BareJID),
 				new FilterFieldEqualTo("State", IdentityState.Approved))))
 			{
-				Tuple<IE2eEndpoint, bool> P = await this.TryGetLegalIdentityEndpointAsync(State, true);
-				IE2eEndpoint Endpoint = P.Item1;
+				using ResolvedLegalIdentityKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
+				IE2eEndpoint Endpoint = Key.Endpoint;
 
 				if (Endpoint is null || State.PublicKey is null || !State.HasPrivateKey || string.IsNullOrEmpty(State.KeyName))
 					continue;
 
-				try
-				{
-					Output.WriteStartElement("State");
-					Output.WriteAttributeString("legalId", State.LegalId);
-					Output.WriteAttributeString("publicKey", Convert.ToBase64String(State.PublicKey));
-					Output.WriteAttributeString("timestamp", XML.Encode(State.Timestamp));
-					Output.WriteAttributeString("keyName", State.KeyName);
+				Output.WriteStartElement("State");
+				Output.WriteAttributeString("legalId", State.LegalId);
+				Output.WriteAttributeString("publicKey", Convert.ToBase64String(State.PublicKey));
+				Output.WriteAttributeString("timestamp", XML.Encode(State.Timestamp));
+				Output.WriteAttributeString("keyName", State.KeyName);
 
-					if (!string.IsNullOrEmpty(State.KeyNamespace))
-						Output.WriteAttributeString("keyNamespace", State.KeyNamespace);
+				if (!string.IsNullOrEmpty(State.KeyNamespace))
+					Output.WriteAttributeString("keyNamespace", State.KeyNamespace);
 
-					Output.WriteAttributeString("hasPrivateKey", CommonTypes.Encode(State.HasPrivateKey));
-					Output.WriteAttributeString("privateKey", Convert.ToBase64String(State.PrivateKey));
-					Output.WriteEndElement();
-				}
-				finally
-				{
-					if (P.Item2)
-						Endpoint.Dispose();
-				}
+				Output.WriteAttributeString("hasPrivateKey", CommonTypes.Encode(State.HasPrivateKey));
+				Output.WriteAttributeString("privateKey", Convert.ToBase64String(State.PrivateKey));
+				Output.WriteEndElement();
 			}
 
 			Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.contractKeySettingsPrefix + "*", "*");
@@ -2478,17 +2489,9 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("BareJid", this.client.BareJID),
 				new FilterFieldEqualTo("LegalId", IdentityId)));
 
-			Tuple<IE2eEndpoint, bool> P = await this.TryGetLegalIdentityEndpointAsync(State, true);
+			using ResolvedLegalIdentityKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
 
-			try
-			{
-				return !(P.Item1 is null);
-			}
-			finally
-			{
-				if (P.Item2)
-					P.Item1?.Dispose();
-			}
+			return !(Key.Endpoint is null);
 		}
 
 		/// <summary>
@@ -2513,29 +2516,21 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("BareJid", this.client.BareJID),
 				new FilterFieldEqualTo("State", IdentityState.Approved)), "-Timestamp"))
 			{
-				Tuple<IE2eEndpoint, bool> P = await this.TryGetLegalIdentityEndpointAsync(State, true);
+				using ResolvedLegalIdentityKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
 
-				try
-				{
-					if (P.Item1 is null || State.PublicKey is null)
-						continue;
+				if (Key.Endpoint is null || State.PublicKey is null)
+					continue;
 
-					if (!(PublicKey is null) && Convert.ToBase64String(State.PublicKey) != PublicKeyBase64)
-						continue;
+				if (!(PublicKey is null) && Convert.ToBase64String(State.PublicKey) != PublicKeyBase64)
+					continue;
 
-					return State.LegalId;
-				}
-				finally
-				{
-					if (P.Item2)
-						P.Item1?.Dispose();
-				}
+				return State.LegalId;
 			}
 
 			return null;
 		}
 
-		private async Task<Tuple<IE2eEndpoint, bool>> GetLatestApprovedKey(bool ExceptionIfNone)
+		private async Task<ResolvedLegalIdentityKey> GetLatestApprovedKey(bool ExceptionIfNone)
 		{
 			bool HaveStates = false;
 
@@ -2545,9 +2540,11 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				HaveStates = true;
 
-				Tuple<IE2eEndpoint, bool> P = await this.TryGetLegalIdentityEndpointAsync(State, true);
-				if (!(P.Item1 is null))
-					return P;
+				ResolvedLegalIdentityKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
+				if (!(Key.Endpoint is null))
+					return Key;
+
+				Key.Dispose();
 			}
 
 			if (ExceptionIfNone)
@@ -2561,7 +2558,7 @@ namespace Waher.Networking.XMPP.Contracts
 					throw new Exception("No approved legal identity available on this device (" + this.client.BareJID + ").");
 			}
 
-			return new Tuple<IE2eEndpoint, bool>(null, false);
+			return new ResolvedLegalIdentityKey(null, false);
 		}
 
 		private async Task<LegalIdentityState> FindPreviewStateAsync(byte[] PublicKey, string LegalId)
@@ -3021,16 +3018,18 @@ namespace Waher.Networking.XMPP.Contracts
 			this.AssertAllowed();
 
 			byte[] Signature = null;
-			Tuple<IE2eEndpoint, bool> P = SignWith switch
+			ResolvedLegalIdentityKey KeyInfo = SignWith switch
 			{
-				SignWith.CurrentKeys => new Tuple<IE2eEndpoint, bool>(null, false),
+				SignWith.CurrentKeys => new ResolvedLegalIdentityKey(null, false),
 				SignWith.LatestApprovedId => await this.GetLatestApprovedKey(true),
 				_ => await this.GetLatestApprovedKey(false),
 			};
-			IE2eEndpoint Key = P.Item1;
+			IE2eEndpoint Key = KeyInfo.Endpoint;
 
 			if (Key is null)
 			{
+				KeyInfo.Dispose();
+
 				await this.GetMatchingLocalKey(Address, async (Sender, e) =>
 				{
 					if (e.Ok)
@@ -3042,16 +3041,11 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 			else
 			{
-				try
+				using (KeyInfo)
 				{
 					Signature = Key.Sign(Data);
 
 					await Callback.Raise(this, new SignatureEventArgs(Key, Signature, State));
-				}
-				finally
-				{
-					if (P.Item2)
-						Key.Dispose();
 				}
 			}
 		}
@@ -3116,14 +3110,16 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			this.AssertAllowed();
 
-			Tuple<IE2eEndpoint, bool> P = SignWith == SignWith.CurrentKeys ?
-				new Tuple<IE2eEndpoint, bool>(null, false)
+			ResolvedLegalIdentityKey KeyInfo = SignWith == SignWith.CurrentKeys ?
+				new ResolvedLegalIdentityKey(null, false)
 				: await this.GetLatestApprovedKey(true);
-			IE2eEndpoint Key = P.Item1;
+			IE2eEndpoint Key = KeyInfo.Endpoint;
 			byte[] Signature = null;
 
 			if (Key is null)
 			{
+				KeyInfo.Dispose();
+
 				await this.GetMatchingLocalKey(Address, async (Sender, e) =>
 				{
 					if (e.Ok)
@@ -3135,16 +3131,11 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 			else
 			{
-				try
+				using (KeyInfo)
 				{
 					Signature = Key.Sign(Data);
 
 					await Callback.Raise(this, new SignatureEventArgs(Key, Signature, State));
-				}
-				finally
-				{
-					if (P.Item2)
-						Key.Dispose();
 				}
 			}
 		}

@@ -809,7 +809,9 @@ namespace Waher.Networking.XMPP.Contracts
 					return new ResolvedLegalIdentityKey(Endpoint, true);
 			}
 
-			if (!MigrateLegacyState || State?.PublicKey is null || !await this.LoadKeys(false))
+			bool MissingSnapshot = State?.HasPrivateKey != true || string.IsNullOrEmpty(State.KeyName);
+
+			if (!MigrateLegacyState || !MissingSnapshot || State?.PublicKey is null || !await this.LoadKeys(false))
 				return new ResolvedLegalIdentityKey(null, false);
 
 			Endpoint = this.LocalEndpoint.FindLocalEndpoint(State.PublicKey);
@@ -1050,7 +1052,20 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 			}
 
-			return await this.LoadKeys(false);
+			if (await this.LoadKeys(false))
+				return true;
+
+			foreach (LegalIdentityState State in await Database.Find<LegalIdentityState>(new FilterAnd(
+				new FilterFieldEqualTo("BareJid", this.client.BareJID),
+				new FilterFieldEqualTo("State", IdentityState.Approved))))
+			{
+				using ResolvedLegalIdentityKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
+
+				if (!(Key.Endpoint is null))
+					return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>

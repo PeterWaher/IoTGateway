@@ -568,10 +568,46 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Checks whether new keys can be generated without leaving locally tracked created or approved legal identities
+		/// without matching private keys on the current device.
+		/// </summary>
+		/// <returns>If new keys can be generated safely.</returns>
+		public async Task<bool> CanGenerateNewKeys()
+		{
+			List<LegalIdentityState> ActiveStates = await this.GetActiveLegalIdentityStatesAsync(false);
+			return await this.CanGenerateNewKeysAsync(ActiveStates);
+		}
+
+		/// <summary>
 		/// Generates new keys for the contracts clients.
 		/// </summary>
 		public async Task GenerateNewKeys()
 		{
+			List<LegalIdentityState> ActiveStates = await this.GetActiveLegalIdentityStatesAsync(true);
+
+			if (!await this.CanGenerateNewKeysAsync(ActiveStates))
+			{
+				throw new InvalidOperationException("Cannot generate new keys while created or approved legal identities exist and their private keys are unavailable on this device.");
+			}
+
+			foreach (LegalIdentityState State in ActiveStates)
+			{
+				try
+				{
+					LegalIdentity Identity = await this.ObsoleteLegalIdentityAsync(State.LegalId);
+					await this.UpdateSettings(Identity);
+				}
+				catch (ItemNotFoundException)
+				{
+					await Database.Delete(State);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex, State.LegalId);
+					throw;
+				}
+			}
+
 			await RuntimeSettings.DeleteWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
 			await this.LoadKeys(true);
 
@@ -579,17 +615,20 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				this.matchingKeys.Clear();
 			}
+		}
+
+		private async Task<List<LegalIdentityState>> GetActiveLegalIdentityStatesAsync(bool RefreshStates)
+		{
+			List<LegalIdentityState> ActiveStates = new List<LegalIdentityState>();
 
 			foreach (LegalIdentityState State in await Database.Find<LegalIdentityState>(
 				new FilterFieldEqualTo("BareJid", this.client.BareJID)))
 			{
-				LegalIdentity Identity;
-
-				if (State.State == IdentityState.Created || State.State == IdentityState.Approved)
+				if (RefreshStates && (State.State == IdentityState.Created || State.State == IdentityState.Approved))
 				{
 					try
 					{
-						Identity = await this.GetLegalIdentityAsync(State.LegalId);   // Make sure we have the latest.
+						LegalIdentity Identity = await this.GetLegalIdentityAsync(State.LegalId);   // Make sure we have the latest.
 						if (Identity.State != State.State)
 						{
 							State.State = Identity.State;
@@ -615,6 +654,7 @@ namespace Waher.Networking.XMPP.Contracts
 					catch (Exception ex)
 					{
 						Log.Exception(ex, State.LegalId);
+						throw;
 					}
 				}
 
@@ -622,22 +662,17 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					case IdentityState.Created:
 					case IdentityState.Approved:
-						try
-						{
-							Identity = await this.ObsoleteLegalIdentityAsync(State.LegalId);
-							await this.UpdateSettings(Identity);
-						}
-						catch (ItemNotFoundException)
-						{
-							await Database.Delete(State);
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex, State.LegalId);
-						}
+						ActiveStates.Add(State);
 						break;
 				}
 			}
+
+			return ActiveStates;
+		}
+
+		private async Task<bool> CanGenerateNewKeysAsync(ICollection<LegalIdentityState> ActiveStates)
+		{
+			return ActiveStates.Count == 0 || await this.LoadKeys(false);
 		}
 
 		/// <summary>
@@ -667,6 +702,8 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Output.WriteStartElement("LegalId", NamespaceOnboarding);
 
+			bool KeysLoaded = await this.LoadKeys(false);
+
 			Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
 
 			foreach (KeyValuePair<string, object> Setting in Settings)
@@ -693,6 +730,9 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("BareJid", this.client.BareJID),
 				new FilterFieldEqualTo("State", IdentityState.Approved))))
 			{
+				if (!KeysLoaded || State.PublicKey is null || this.LocalEndpoint.FindLocalEndpoint(State.PublicKey) is null)
+					continue;
+
 				Output.WriteStartElement("State");
 				Output.WriteAttributeString("legalId", State.LegalId);
 				Output.WriteAttributeString("publicKey", Convert.ToBase64String(State.PublicKey));
@@ -2283,6 +2323,9 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("BareJid", this.client.BareJID),
 				new FilterFieldEqualTo("State", IdentityState.Approved)), "-Timestamp"))
 			{
+				if (State.PublicKey is null)
+					continue;
+
 				if (!(PublicKey is null) && Convert.ToBase64String(State.PublicKey) != PublicKeyBase64)
 					continue;
 
@@ -2305,6 +2348,9 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("State", IdentityState.Approved)), "-Timestamp"))
 			{
 				HaveStates = true;
+
+				if (State.PublicKey is null)
+					continue;
 
 				IE2eEndpoint Endpoint = this.LocalEndpoint.FindLocalEndpoint(State.PublicKey);
 				if (Endpoint is null)

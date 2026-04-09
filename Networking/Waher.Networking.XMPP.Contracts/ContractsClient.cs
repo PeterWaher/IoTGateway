@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
@@ -135,6 +136,8 @@ namespace Waher.Networking.XMPP.Contracts
 		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Cache<string, KeyValuePair<byte[], bool>> contentPerPid = new Cache<string, KeyValuePair<byte[], bool>>(int.MaxValue, TimeSpan.FromDays(1), TimeSpan.FromDays(1));
+		private readonly SemaphoreSlim keyMutationLock = new SemaphoreSlim(1, 1);
+		private readonly AsyncLocal<int> keyMutationDepth = new AsyncLocal<int>();
 		private EndpointSecurity localKeys;
 		private EndpointSecurity localE2eEndpoint;
 		private DateTime keysTimestamp = DateTime.MinValue;
@@ -166,6 +169,39 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (this.MustDispose)
 					this.Endpoint?.Dispose();
+			}
+		}
+
+		private sealed class LoadedKeySet : IDisposable
+		{
+			private IE2eEndpoint[] keys;
+			private bool transferred;
+
+			public LoadedKeySet(IE2eEndpoint[] Keys, DateTime Timestamp)
+			{
+				this.keys = Keys;
+				this.Timestamp = Timestamp;
+			}
+
+			public IE2eEndpoint[] Keys => this.keys;
+
+			public DateTime Timestamp { get; }
+
+			public IE2eEndpoint[] TransferKeys()
+			{
+				this.transferred = true;
+				return this.keys;
+			}
+
+			public void Dispose()
+			{
+				if (!this.transferred && !(this.keys is null))
+				{
+					foreach (IE2eEndpoint Key in this.keys)
+						Key.Dispose();
+				}
+
+				this.keys = Array.Empty<IE2eEndpoint>();
 			}
 		}
 
@@ -331,9 +367,13 @@ namespace Waher.Networking.XMPP.Contracts
 			if (this.disposeLocalKeys)
 				this.localKeys?.Dispose();
 
+			if (ReferenceEquals(this.localE2eEndpoint, this.localKeys))
+				this.localE2eEndpoint = null;
+
 			this.localKeys = null;
 			this.disposeLocalKeys = false;
 			this.keysTimestamp = DateTime.MinValue;
+			this.keyMutationLock.Dispose();
 
 			this.rnd?.Dispose();
 			this.rnd = null;
@@ -406,36 +446,101 @@ namespace Waher.Networking.XMPP.Contracts
 			return this.LoadKeys(CreateIfNone, null);
 		}
 
+		private async Task<T> RunKeyMutationAsync<T>(Func<Task<T>> Callback)
+		{
+			if (this.keyMutationDepth.Value > 0)
+			{
+				this.keyMutationDepth.Value++;
+				try
+				{
+					return await Callback();
+				}
+				finally
+				{
+					this.keyMutationDepth.Value--;
+				}
+			}
+
+			await this.keyMutationLock.WaitAsync();
+			this.keyMutationDepth.Value = 1;
+
+			try
+			{
+				return await Callback();
+			}
+			finally
+			{
+				this.keyMutationDepth.Value = 0;
+				this.keyMutationLock.Release();
+			}
+		}
+
+		private Task RunKeyMutationAsync(Func<Task> Callback)
+		{
+			return this.RunKeyMutationAsync(async () =>
+			{
+				await Callback();
+				return true;
+			});
+		}
+
 		/// <summary>
 		/// Loads keys from the underlying persistence layer.
 		/// </summary>
 		/// <param name="CreateIfNone">Allows new keys to be created, if no keys were found in the persistence layer.</param>
 		/// <param name="Thread">Optional thread to use during profiling.</param>
 		/// <returns>If keys were loaded or generated (i.e. can be used) or not.</returns>
-		public async Task<bool> LoadKeys(bool CreateIfNone, ProfilerThread Thread)
+		public Task<bool> LoadKeys(bool CreateIfNone, ProfilerThread Thread)
+		{
+			return this.RunKeyMutationAsync(() => this.LoadKeysInternalAsync(CreateIfNone, Thread));
+		}
+
+		private async Task<bool> LoadKeysInternalAsync(bool CreateIfNone, ProfilerThread Thread)
+		{
+			return await this.LoadKeysInternalAsync(CreateIfNone, Thread, this.localKeysForE2e, this.localE2eEndpoint);
+		}
+
+		private async Task<bool> LoadKeysInternalAsync(bool CreateIfNone, ProfilerThread Thread, bool UseLocalKeysForE2e,
+			EndpointSecurity DesiredLocalE2eEndpoint)
 		{
 			Thread = Thread?.CreateSubThread("Load Keys", ProfilerThreadType.Sequential);
 			Thread?.Start();
 			try
 			{
-				Thread?.NewState("Search");
+				using LoadedKeySet LoadedKeys = await this.LoadPersistedKeysAsync(CreateIfNone, Thread);
+				if (LoadedKeys is null)
+					return false;
 
-				List<IE2eEndpoint> Keys = new List<IE2eEndpoint>();
-				Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
+				await this.ActivateLoadedKeysAsync(LoadedKeys, Thread, UseLocalKeysForE2e, DesiredLocalE2eEndpoint);
+				return true;
+			}
+			finally
+			{
+				Thread?.Stop();
+			}
+		}
 
-				Thread?.NewState("Endpoints");
+		private async Task<LoadedKeySet> LoadPersistedKeysAsync(bool CreateIfNone, ProfilerThread Thread)
+		{
+			Thread?.NewState("Search");
 
-				IE2eEndpoint[] AvailableEndpoints = EndpointSecurity.CreateEndpoints(256, 192,
-					int.MaxValue, new Type[]
-					{
-						typeof(EllipticCurveEndpoint),
-						typeof(ModuleLatticeEndpoint)
-					}, Thread);
+			List<IE2eEndpoint> Keys = new List<IE2eEndpoint>();
+			Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
 
-				DateTime? Timestamp = null;
-				bool DisposeEndpoints = true;
-				byte[] Key;
+			Thread?.NewState("Endpoints");
 
+			IE2eEndpoint[] AvailableEndpoints = EndpointSecurity.CreateEndpoints(256, 192,
+				int.MaxValue, new Type[]
+				{
+					typeof(EllipticCurveEndpoint),
+					typeof(ModuleLatticeEndpoint)
+				}, Thread);
+
+			DateTime? Timestamp = null;
+			byte[] Key;
+
+			try
+			{
 				Thread?.NewState("Select");
 
 				foreach (KeyValuePair<string, object> Setting in Settings)
@@ -479,13 +584,12 @@ namespace Waher.Networking.XMPP.Contracts
 				if (Keys.Count == 0 || (Keys.Count != AvailableEndpoints.Length && CreateIfNone))
 				{
 					if (!CreateIfNone)
-						return false;
+						return null;
 
 					Thread?.NewState("Create");
 
-					DisposeEndpoints = false;
-
-					int i, c = Keys.Count;
+					int i;
+					int c = Keys.Count;
 
 					foreach (IE2eEndpoint Endpoint in AvailableEndpoints)
 					{
@@ -522,64 +626,105 @@ namespace Waher.Networking.XMPP.Contracts
 					await RuntimeSettings.SetAsync(this.keySettingsPrefix + "Timestamp", Timestamp.Value);
 				}
 
-				Thread?.NewState("Sec");
-
-				if (this.disposeLocalKeys)
-					this.localKeys?.Dispose();
-
-				this.disposeLocalKeys = false;
-				this.localKeys = null;
-
-				using (Semaphore Lock = await Semaphores.BeginWrite("XMPP.E2E"))
-				{
-					if (this.localKeysForE2e)
-					{
-						if (this.client.TryGetTag("E2E", out object Obj) &&
-							Obj is EndpointSecurity EndpointSecurity)
-						{
-							if (MatchesLoadedKeys(EndpointSecurity, Keys))
-								this.localKeys = EndpointSecurity;
-							else
-							{
-								this.localKeys = new EndpointSecurity(this.client, 128, Keys.ToArray());
-								this.client.SetTag("E2E", this.localKeys);
-								this.disposeLocalKeys = true;
-								EndpointSecurity.Dispose();
-							}
-						}
-						else
-						{
-							this.localKeys = new EndpointSecurity(this.client, 128, Keys.ToArray());
-							this.client.SetTag("E2E", this.localKeys);
-							this.disposeLocalKeys = true;
-						}
-					}
-					else
-					{
-						this.localKeys = new EndpointSecurity(null, 128, Keys.ToArray());
-						this.disposeLocalKeys = true;
-					}
-				}
-
-				this.keysTimestamp = Timestamp.Value;
-
-				if (this.localKeysForE2e)
-					this.localE2eEndpoint = this.localKeys;
-
-				if (DisposeEndpoints)
-				{
-					Thread?.NewState("Dispose");
-
-					foreach (IE2eEndpoint Curve in AvailableEndpoints)
-						Curve.Dispose();
-				}
+				return new LoadedKeySet(Keys.ToArray(), Timestamp.Value);
 			}
 			finally
 			{
-				Thread?.Stop();
+				Thread?.NewState("Dispose");
+
+				HashSet<IE2eEndpoint> LoadedEndpoints = new HashSet<IE2eEndpoint>(Keys);
+
+				foreach (IE2eEndpoint Curve in AvailableEndpoints)
+				{
+					if (!LoadedEndpoints.Contains(Curve))
+						Curve.Dispose();
+				}
+			}
+		}
+
+		private async Task ActivateLoadedKeysAsync(LoadedKeySet LoadedKeys, ProfilerThread Thread, bool UseLocalKeysForE2e,
+			EndpointSecurity DesiredLocalE2eEndpoint)
+		{
+			Thread?.NewState("Sec");
+
+			EndpointSecurity PreviousLocalKeys = this.localKeys;
+			bool DisposePreviousLocalKeys = this.disposeLocalKeys;
+			EndpointSecurity PreviousLocalE2eEndpoint = this.localE2eEndpoint;
+			bool PreviouslySharedLocalKeys = ReferenceEquals(PreviousLocalKeys, PreviousLocalE2eEndpoint);
+			bool PreviousLocalKeysDisposed = false;
+
+			EndpointSecurity NewLocalKeys;
+			bool DisposeNewLocalKeys;
+			EndpointSecurity NewLocalE2eEndpoint = DesiredLocalE2eEndpoint;
+
+			using (Waher.Runtime.Threading.Semaphore Lock = await Semaphores.BeginWrite("XMPP.E2E"))
+			{
+				if (UseLocalKeysForE2e)
+				{
+					if (PreviouslySharedLocalKeys && MatchesLoadedKeys(PreviousLocalE2eEndpoint, LoadedKeys.Keys))
+					{
+						NewLocalKeys = PreviousLocalE2eEndpoint;
+						DisposeNewLocalKeys = DisposePreviousLocalKeys;
+					}
+					else
+					{
+						if (PreviouslySharedLocalKeys)
+						{
+							if (this.client.TryGetTag("E2E", out object Obj) &&
+								ReferenceEquals(Obj, PreviousLocalE2eEndpoint))
+							{
+								this.client.RemoveTag("E2E");
+							}
+
+							if (DisposePreviousLocalKeys)
+							{
+								PreviousLocalKeys.Dispose();
+								PreviousLocalKeysDisposed = true;
+							}
+						}
+
+						NewLocalKeys = new EndpointSecurity(this.client, 128, LoadedKeys.TransferKeys());
+						DisposeNewLocalKeys = true;
+					}
+
+					NewLocalE2eEndpoint = NewLocalKeys;
+					this.client.SetTag("E2E", NewLocalE2eEndpoint);
+				}
+				else
+				{
+					NewLocalKeys = new EndpointSecurity(null, 128, LoadedKeys.TransferKeys());
+					DisposeNewLocalKeys = true;
+
+					if (PreviouslySharedLocalKeys &&
+						this.client.TryGetTag("E2E", out object Obj) &&
+						ReferenceEquals(Obj, PreviousLocalE2eEndpoint))
+					{
+						this.client.RemoveTag("E2E");
+					}
+
+					if (PreviouslySharedLocalKeys)
+						NewLocalE2eEndpoint = null;
+				}
+
+				this.localKeys = NewLocalKeys;
+				this.disposeLocalKeys = DisposeNewLocalKeys;
+				this.localE2eEndpoint = NewLocalE2eEndpoint;
+				this.localKeysForE2e = UseLocalKeysForE2e;
+				this.keysTimestamp = LoadedKeys.Timestamp;
 			}
 
-			return true;
+			if (DisposePreviousLocalKeys && !PreviousLocalKeysDisposed && !ReferenceEquals(PreviousLocalKeys, this.localKeys))
+				PreviousLocalKeys?.Dispose();
+
+			this.ClearMatchingKeyCache();
+		}
+
+		private void ClearMatchingKeyCache()
+		{
+			lock (this.matchingKeys)
+			{
+				this.matchingKeys.Clear();
+			}
 		}
 
 		private byte[] GetKey(EllipticCurveEndpoint EcEndpoint)
@@ -598,22 +743,20 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Generates new keys for the contracts clients.
 		/// </summary>
-		public async Task GenerateNewKeys()
+		public Task GenerateNewKeys()
 		{
-			List<LegalIdentityState> ActiveStates = await this.GetActiveLegalIdentityStatesAsync(false);
-
-			foreach (LegalIdentityState State in ActiveStates)
+			return this.RunKeyMutationAsync(async () =>
 			{
-				await this.TryGetLegalIdentityEndpointAsync(State, true);
-			}
+				List<LegalIdentityState> ActiveStates = await this.GetActiveLegalIdentityStatesAsync(false);
 
-			await RuntimeSettings.DeleteWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
-			await this.LoadKeys(true);
+				foreach (LegalIdentityState State in ActiveStates)
+				{
+					await this.TryGetLegalIdentityEndpointAsync(State, true);
+				}
 
-			lock (this.matchingKeys)
-			{
-				this.matchingKeys.Clear();
-			}
+				await RuntimeSettings.DeleteWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
+				await this.LoadKeysInternalAsync(true, null);
+			});
 		}
 
 		private async Task<List<LegalIdentityState>> GetActiveLegalIdentityStatesAsync(bool RefreshStates)
@@ -1140,14 +1283,27 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="UseLocalKeys">If local keys should be used in End-to-End encryption.</param>
 		/// <param name="CreateKeysIfNone">If local keys should be created, if none available.</param>
-		public async Task EnableE2eEncryption(bool UseLocalKeys, bool CreateKeysIfNone)
+		public Task EnableE2eEncryption(bool UseLocalKeys, bool CreateKeysIfNone)
 		{
-			bool Reload = !(this.localKeys is null);
+			return this.RunKeyMutationAsync(async () =>
+			{
+				bool Reload = !(this.localKeys is null);
 
-			this.localKeysForE2e = UseLocalKeys;
+				if (Reload)
+				{
+					EndpointSecurity DesiredLocalE2eEndpoint = UseLocalKeys ? this.localE2eEndpoint :
+						ReferenceEquals(this.localE2eEndpoint, this.localKeys) ? null : this.localE2eEndpoint;
 
-			if (Reload)
-				await this.LoadKeys(CreateKeysIfNone);
+					await this.LoadKeysInternalAsync(CreateKeysIfNone, null, UseLocalKeys, DesiredLocalE2eEndpoint);
+				}
+				else
+				{
+					this.localKeysForE2e = UseLocalKeys;
+
+					if (!UseLocalKeys && ReferenceEquals(this.localE2eEndpoint, this.localKeys))
+						this.localE2eEndpoint = null;
+				}
+			});
 		}
 
 		/// <summary>
@@ -1164,15 +1320,20 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="E2eEndpoint">Endpoint managing the keys on the network.</param>
 		/// <param name="CreateKeysIfNone">If local keys should be created, if none available.</param>
-		public async Task EnableE2eEncryption(EndpointSecurity E2eEndpoint, bool CreateKeysIfNone)
+		public Task EnableE2eEncryption(EndpointSecurity E2eEndpoint, bool CreateKeysIfNone)
 		{
-			bool Reload = !(this.localKeys is null);
+			return this.RunKeyMutationAsync(async () =>
+			{
+				bool Reload = !(this.localKeys is null);
 
-			this.localKeysForE2e = false;
-			this.localE2eEndpoint = E2eEndpoint;
-
-			if (Reload)
-				await this.LoadKeys(CreateKeysIfNone);
+				if (Reload)
+					await this.LoadKeysInternalAsync(CreateKeysIfNone, null, false, E2eEndpoint);
+				else
+				{
+					this.localKeysForE2e = false;
+					this.localE2eEndpoint = E2eEndpoint;
+				}
+			});
 		}
 
 		/// <summary>

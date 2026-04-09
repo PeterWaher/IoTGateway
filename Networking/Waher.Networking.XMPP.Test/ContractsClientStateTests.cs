@@ -421,12 +421,14 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task ContractsClient_State_Test_16_GenerateNewKeysRefreshesActiveKeysWhenSharedWithE2e()
 		{
-			byte[] OriginalPublicKey = GetFirstLocalPublicKey(this.contractsClient);
+			IE2eEndpoint OriginalEndpoint = GetLocalEndpoint(this.contractsClient, "ed448");
+			byte[] OriginalPublicKey = (byte[])OriginalEndpoint.PublicKey.Clone();
 
 			await this.contractsClient.EnableE2eEncryption(true, false);
 			await AwaitOrTimeout(this.contractsClient.GenerateNewKeys(), "GenerateNewKeys");
 
-			byte[] RotatedPublicKey = GetFirstLocalPublicKey(this.contractsClient);
+			IE2eEndpoint RotatedEndpoint = GetLocalEndpoint(this.contractsClient, "ed448");
+			byte[] RotatedPublicKey = (byte[])RotatedEndpoint.PublicKey.Clone();
 			byte[] RotatedRuntimePrivateKey = await GetRuntimePrivateKeyAsync(this.contractsClient, "ed448");
 			IE2eEndpoint RotatedRuntimeEndpoint = CreatePrivateEndpoint("ed448", EndpointSecurity.IoTHarmonizationE2ECurrent, RotatedRuntimePrivateKey);
 
@@ -459,6 +461,20 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(Keys.Length > 0);
 
 			return Keys[0];
+		}
+
+		private static IE2eEndpoint GetLocalEndpoint(ContractsClient ContractsClient, string LocalName)
+		{
+			IE2eEndpoint[] Keys = GetLocalKeys(ContractsClient);
+
+			foreach (IE2eEndpoint Key in Keys)
+			{
+				if (Key.LocalName == LocalName)
+					return Key;
+			}
+
+			Assert.Fail("Local endpoint not found: " + LocalName);
+			return null;
 		}
 
 		private static IE2eEndpoint[] GetLocalKeys(ContractsClient ContractsClient)

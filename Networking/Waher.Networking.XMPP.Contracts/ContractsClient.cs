@@ -537,7 +537,15 @@ namespace Waher.Networking.XMPP.Contracts
 						if (this.client.TryGetTag("E2E", out object Obj) &&
 							Obj is EndpointSecurity EndpointSecurity)
 						{
-							this.localKeys = EndpointSecurity;
+							if (MatchesLoadedKeys(EndpointSecurity, Keys))
+								this.localKeys = EndpointSecurity;
+							else
+							{
+								this.localKeys = new EndpointSecurity(this.client, 128, Keys.ToArray());
+								this.client.SetTag("E2E", this.localKeys);
+								this.disposeLocalKeys = true;
+								EndpointSecurity.Dispose();
+							}
 						}
 						else
 						{
@@ -712,6 +720,22 @@ namespace Waher.Networking.XMPP.Contracts
 			return !(PrivateKey is null);
 		}
 
+		private static bool MatchesLoadedKeys(EndpointSecurity EndpointSecurity, IEnumerable<IE2eEndpoint> Keys)
+		{
+			if (EndpointSecurity is null)
+				return false;
+
+			foreach (IE2eEndpoint Key in Keys)
+			{
+				IE2eEndpoint ExistingEndpoint = EndpointSecurity.FindLocalEndpoint(Key.LocalName, Key.Namespace);
+
+				if (ExistingEndpoint is null || !AreEqual(ExistingEndpoint.PublicKey, Key.PublicKey))
+					return false;
+			}
+
+			return true;
+		}
+
 		private async Task<Tuple<string, string, byte[]>> GetPersistablePrivateKeyAsync(IE2eEndpoint Endpoint)
 		{
 			if (Endpoint is null)
@@ -725,11 +749,21 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				try
 				{
-					return new Tuple<string, string, byte[]>(KeyName, KeyNamespace, Convert.FromBase64String(RuntimeValue));
+					byte[] RuntimePrivateKey = Convert.FromBase64String(RuntimeValue);
+
+					if (EndpointSecurity.TryCreateEndpoint(KeyName, KeyNamespace, out IE2eEndpoint Template))
+					{
+						using (Template)
+						using (IE2eEndpoint RuntimeEndpoint = Template.CreatePrivate(RuntimePrivateKey))
+						{
+							if (AreEqual(RuntimeEndpoint.PublicKey, Endpoint.PublicKey))
+								return new Tuple<string, string, byte[]>(KeyName, KeyNamespace, RuntimePrivateKey);
+						}
+					}
 				}
 				catch (Exception)
 				{
-					// Ignore malformed runtime value and fall back to endpoint export.
+					// Ignore malformed or mismatched runtime values and fall back to endpoint export.
 				}
 			}
 

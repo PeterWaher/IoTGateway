@@ -373,6 +373,74 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsFalse(Xml.Contains("malformed-id", StringComparison.Ordinal));
 		}
 
+		[TestMethod]
+		public async Task ContractsClient_State_Test_15_SnapshotUsesPrivateKeyThatMatchesEndpointPublicKeyAfterRotation()
+		{
+			IE2eEndpoint OriginalEndpoint = GetFirstLocalEndpoint(this.contractsClient);
+			byte[] OriginalPublicKey = (byte[])OriginalEndpoint.PublicKey.Clone();
+
+			await AwaitOrTimeout(this.contractsClient.GenerateNewKeys(), "GenerateNewKeys");
+
+			byte[] RotatedRuntimePrivateKey = await GetRuntimePrivateKeyAsync(this.contractsClient, OriginalEndpoint.LocalName);
+			IE2eEndpoint RotatedRuntimeEndpoint = CreatePrivateEndpoint(OriginalEndpoint.LocalName, OriginalEndpoint.Namespace, RotatedRuntimePrivateKey);
+
+			try
+			{
+				Assert.IsFalse(AreEqual(OriginalPublicKey, RotatedRuntimeEndpoint.PublicKey));
+
+				LegalIdentityState State = new LegalIdentityState()
+				{
+					BareJid = this.client.BareJID,
+					LegalId = "snapshot-regression-id",
+					PublicKey = (byte[])OriginalPublicKey.Clone(),
+					State = IdentityState.Approved,
+					Timestamp = DateTime.UtcNow
+				};
+
+				Assert.IsTrue(await InvokeSetLegalIdentityKeySnapshotAsync(this.contractsClient, State, OriginalEndpoint));
+				Assert.IsTrue(State.HasPrivateKey);
+
+				IE2eEndpoint SnapshotEndpoint = CreatePrivateEndpoint(State.KeyName, State.KeyNamespace, State.PrivateKey);
+
+				try
+				{
+					CollectionAssert.AreEqual(OriginalPublicKey, State.PublicKey);
+					CollectionAssert.AreEqual(OriginalPublicKey, SnapshotEndpoint.PublicKey);
+				}
+				finally
+				{
+					SnapshotEndpoint.Dispose();
+				}
+			}
+			finally
+			{
+				RotatedRuntimeEndpoint.Dispose();
+			}
+		}
+
+		[TestMethod]
+		public async Task ContractsClient_State_Test_16_GenerateNewKeysRefreshesActiveKeysWhenSharedWithE2e()
+		{
+			byte[] OriginalPublicKey = GetFirstLocalPublicKey(this.contractsClient);
+
+			await this.contractsClient.EnableE2eEncryption(true, false);
+			await AwaitOrTimeout(this.contractsClient.GenerateNewKeys(), "GenerateNewKeys");
+
+			byte[] RotatedPublicKey = GetFirstLocalPublicKey(this.contractsClient);
+			byte[] RotatedRuntimePrivateKey = await GetRuntimePrivateKeyAsync(this.contractsClient, "ed448");
+			IE2eEndpoint RotatedRuntimeEndpoint = CreatePrivateEndpoint("ed448", EndpointSecurity.IoTHarmonizationE2ECurrent, RotatedRuntimePrivateKey);
+
+			try
+			{
+				Assert.IsFalse(AreEqual(OriginalPublicKey, RotatedPublicKey));
+				CollectionAssert.AreEqual(RotatedRuntimeEndpoint.PublicKey, RotatedPublicKey);
+			}
+			finally
+			{
+				RotatedRuntimeEndpoint.Dispose();
+			}
+		}
+
 		private static byte[] GetFirstLocalPublicKey(ContractsClient ContractsClient)
 		{
 			IE2eEndpoint[] Keys = GetLocalKeys(ContractsClient);
@@ -381,6 +449,16 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(Keys.Length > 0);
 
 			return (byte[])Keys[0].PublicKey.Clone();
+		}
+
+		private static IE2eEndpoint GetFirstLocalEndpoint(ContractsClient ContractsClient)
+		{
+			IE2eEndpoint[] Keys = GetLocalKeys(ContractsClient);
+
+			Assert.IsNotNull(Keys);
+			Assert.IsTrue(Keys.Length > 0);
+
+			return Keys[0];
 		}
 
 		private static IE2eEndpoint[] GetLocalKeys(ContractsClient ContractsClient)
@@ -491,6 +569,27 @@ namespace Waher.Networking.XMPP.Test
 
 			Task Task = (Task)Method.Invoke(ContractsClient, new object[] { Identity, PublicKey });
 			await Task;
+		}
+
+		private static async Task<bool> InvokeSetLegalIdentityKeySnapshotAsync(ContractsClient ContractsClient, LegalIdentityState State, IE2eEndpoint Endpoint)
+		{
+			MethodInfo Method = typeof(ContractsClient).GetMethod("SetLegalIdentityKeySnapshotAsync", BindingFlags.Instance | BindingFlags.NonPublic);
+			Task<bool> Task = (Task<bool>)Method.Invoke(ContractsClient, new object[] { State, Endpoint });
+			return await Task;
+		}
+
+		private static IE2eEndpoint CreatePrivateEndpoint(string KeyName, string KeyNamespace, byte[] PrivateKey)
+		{
+			Assert.IsTrue(EndpointSecurity.TryCreateEndpoint(KeyName, KeyNamespace, out IE2eEndpoint Template));
+
+			try
+			{
+				return Template.CreatePrivate(PrivateKey);
+			}
+			finally
+			{
+				Template.Dispose();
+			}
 		}
 
 		private static async Task InsertStateAsync(string BareJid, string LegalId, IdentityState State, byte[] PublicKey, DateTime Timestamp)

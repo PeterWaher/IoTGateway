@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using Waher.Runtime.Collections;
 
 namespace Waher.Runtime.Text
@@ -26,38 +26,76 @@ namespace Waher.Runtime.Text
 		{
 			int c1 = S1.Length;
 			int c2 = S2.Length;
-			int c1p = c1 + 1;
-			int c2p = c2 + 1;
-			BitArray Processed = new BitArray(c1p * c2p);
+
+			if (c1 == 0 && c2 == 0)
+				return new EditScript<T>(S1, S2, Array.Empty<Step<T>>());
+
+			int StartOffset = 0;
+
+			while (StartOffset < c1 && StartOffset < c2 &&
+				S1[StartOffset].Equals(S2[StartOffset]))
+			{
+				StartOffset++;
+			}
+
+			int EndOffset1 = c1;
+			int EndOffset2 = c2;
+
+			while (EndOffset1 > StartOffset && EndOffset2 > StartOffset &&
+				S1[EndOffset1 - 1].Equals(S2[EndOffset2 - 1]))
+			{
+				EndOffset1--;
+				EndOffset2--;
+			}
+
+			int c1p = EndOffset1 - StartOffset + 1;
+			int c2p = EndOffset2 - StartOffset + 1;
+			long NrBits = ((long)c1p) * c2p;
+			long NrBytes = (NrBits + 7) >> 3;
+
+			if (NrBytes > int.MaxValue)
+				throw new OutOfMemoryException("Unable to allocate enough memory to process the difference between the two sequences.");
+
+			byte[] Processed = new byte[NrBytes];
+
 			ChunkedList<State<T>> Current = new ChunkedList<State<T>>();
 			ChunkedList<State<T>> Next = new ChunkedList<State<T>>();
 			ChunkedList<State<T>> NextNext = new ChunkedList<State<T>>();
 			ChunkedList<State<T>> Temp;
 			State<T> P, Q;
 			bool b1, b2;
-			int i;
+			int i, j, iByte;
+			byte iBit;
 
-			P = new State<T>()
+			P = null;
+			for (i = 0; i <= StartOffset; i++)
 			{
-				Op = EditOperation.Keep,
-				i1 = 0,
-				i2 = 0,
-				Prev = null
-			};
+				P = new State<T>()
+				{
+					Op = EditOperation.Keep,
+					i1 = i,
+					i2 = i,
+					Prev = P
+				};
+			}
 
 			while (true)
 			{
-				if (P.i1 == c1 && P.i2 == c2)
+				if (P.i1 == EndOffset1 && P.i2 == EndOffset2)
 					break;
 
-				i = P.i1 + P.i2 * c1p;
-				if (!Processed[i])
-				{
-					Processed[i] = true;
+				i = P.i1 - StartOffset + (P.i2 - StartOffset) * c1p;
+				iByte = i >> 3;
+				iBit = (byte)(1 << (i & 7));
 
-					if (b2 = P.i2 < c2)
+				if ((Processed[iByte] & iBit) == 0)
+				{
+					Processed[iByte] |= iBit;
+
+					if (b2 = P.i2 < EndOffset2)
 					{
-						if (!Processed[i + c1p])
+						j = i + c1p;
+						if ((Processed[j >> 3] & (byte)(1 << (j & 7))) == 0)
 						{
 							Q = new State<T>()
 							{
@@ -74,9 +112,10 @@ namespace Waher.Runtime.Text
 						}
 					}
 
-					if (b1 = (P.i1 < c1))
+					if (b1 = P.i1 < EndOffset1)
 					{
-						if (!Processed[i + 1])
+						j = i + 1;
+						if ((Processed[j >> 3] & (byte)(1 << (j & 7))) == 0)
 						{
 							Q = new State<T>()
 							{
@@ -95,7 +134,8 @@ namespace Waher.Runtime.Text
 
 					if (b1 && b2 && S1[P.i1].Equals(S2[P.i2]))
 					{
-						if (!Processed[i + 1 + c1p])
+						j = i + 1 + c1p;
+						if ((Processed[j >> 3] & (byte)(1 << (j & 7))) == 0)
 						{
 							Q = new State<T>()
 							{
@@ -107,7 +147,7 @@ namespace Waher.Runtime.Text
 
 							Current.AddLastItem(Q);
 
-							if (Q.i1 == c1 && Q.i2 == c2)
+							if (Q.i1 == EndOffset1 && Q.i2 == EndOffset2)
 							{
 								P = Q;
 								break;
@@ -134,55 +174,57 @@ namespace Waher.Runtime.Text
 				P = Current.RemoveLast();
 			}
 
-			ChunkedList<T> SameOp = new ChunkedList<T>();
-			ChunkedList<Step<T>> Steps = new ChunkedList<Step<T>>();
-			EditOperation Op = P.Op;
-			State<T> First = P;
-			T[] Symbols;
-
-			c1 = 0;
-			c2 = 0;
-
-			while (!((Q = P.Prev) is null))
+			while (EndOffset1 < c1 && EndOffset2 < c2)
 			{
-				if (P.Op != Op)
+				P = new State<T>()
 				{
-					Symbols = new T[c1];
-					SameOp.CopyTo(Symbols, 0);
-					Steps.AddFirstItem(new Step<T>(Symbols, First.i1, First.i2, Op));
-
-					SameOp.Clear();
-					c1 = 0;
-					c2++;
-					Op = P.Op;
-				}
-
-				switch (Op)
-				{
-					case EditOperation.Keep:
-					case EditOperation.Delete:
-						SameOp.AddFirstItem(S1[P.i1 - 1]);
-						break;
-
-					case EditOperation.Insert:
-						SameOp.AddFirstItem(S2[P.i2 - 1]);
-						break;
-				}
-
-				c1++;
-				First = P;
-				P = Q;
+					Op = EditOperation.Keep,
+					i1 = ++EndOffset1,
+					i2 = ++EndOffset2,
+					Prev = P
+				};
 			}
 
-			Symbols = new T[c1];
-			SameOp.CopyTo(Symbols, 0);
-			Steps.AddFirstItem(new Step<T>(Symbols, First.i1, First.i2, Op));
-			c2++;
+			State<T> Loop = P;
+			int NrSteps = 0;
 
-			Step<T>[] Result = new Step<T>[c2];
-			Steps.CopyTo(Result, 0);
+			while (!(Loop.Prev is null))
+			{
+				NrSteps++;
+				Loop = Loop.Prev;
+			}
 
-			return new EditScript<T>(S1, S2, Result);
+			State<T>[] Steps = new State<T>[NrSteps];
+			for (i = NrSteps, Loop = P; i > 0; Loop = Loop.Prev)
+				Steps[--i] = Loop;
+
+			ChunkedList<T> Elements = new ChunkedList<T>();
+			ChunkedList<Step<T>> Operations = new ChunkedList<Step<T>>();
+			EditOperation Op;
+
+			Q = Steps[0];
+			Op = Q.Op;
+
+			for (i = 0; i < NrSteps; i++)
+			{
+				P = Steps[i];
+				if (P.Op != Op)
+				{
+					Operations.Add(new Step<T>(Elements.ToArray(), Q.i1, Q.i2, Op));
+					Q = P;
+					Op = P.Op;
+					Elements.Clear();
+				}
+
+				if (Op == EditOperation.Insert)
+					Elements.Add(S2[P.i2 - 1]);
+				else
+					Elements.Add(S1[P.i1 - 1]);
+			}
+
+			Operations.Add(new Step<T>(Elements.ToArray(), Q.i1, Q.i2, Op));
+
+			return new EditScript<T>(S1, S2, Operations.ToArray());
 		}
 
 		private class State<T>
@@ -191,6 +233,11 @@ namespace Waher.Runtime.Text
 			public int i1;
 			public int i2;
 			public State<T> Prev;
+
+			public override string ToString()
+			{
+				return this.Op.ToString() + " " + this.i1.ToString() + "," + this.i2.ToString();
+			}
 		}
 
 		/// <summary>

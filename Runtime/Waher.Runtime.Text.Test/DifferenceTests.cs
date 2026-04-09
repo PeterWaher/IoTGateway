@@ -10,49 +10,49 @@ namespace Waher.Runtime.Text.Test
 		[TestMethod]
 		public void Difference_Test_01_Insert()
 		{
-			this.TestStrings("HelloWorld", "Hello World", "Hello__ __World");
+			TestStrings("HelloWorld", "Hello World", "Hello__ __World");
 		}
 
 		[TestMethod]
 		public void Difference_Test_02_Delete()
 		{
-			this.TestStrings("Hello World", "Hello", "Hello~~ World~~");
+			TestStrings("Hello World", "Hello", "Hello~~ World~~");
 		}
 
 		[TestMethod]
 		public void Difference_Test_03_Replace()
 		{
-			this.TestStrings("aaaa", "bbbb", "__bbbb__~~aaaa~~");
+			TestStrings("aaaa", "bbbb", "__bbbb__~~aaaa~~");
 		}
 
 		[TestMethod]
 		public void Difference_Test_04_NoChange()
 		{
-			this.TestStrings("aaaa", "aaaa", "aaaa");
+			TestStrings("aaaa", "aaaa", "aaaa");
 		}
 
 		[TestMethod]
 		public void Difference_Test_05_New()
 		{
-			this.TestStrings(string.Empty, "aaaa", "__aaaa__");
+			TestStrings(string.Empty, "aaaa", "__aaaa__");
 		}
 
 		[TestMethod]
 		public void Difference_Test_06_DeleteAll()
 		{
-			this.TestStrings("aaaa", string.Empty, "~~aaaa~~");
+			TestStrings("aaaa", string.Empty, "~~aaaa~~");
 		}
 
 		[TestMethod]
 		public void Difference_Test_07_Empty()
 		{
-			this.TestStrings(string.Empty, string.Empty, string.Empty);
+			TestStrings(string.Empty, string.Empty, string.Empty);
 		}
 
 		[TestMethod]
 		public void Difference_Test_08_Diff2_1()
 		{
-			this.TestStrings("ABCABBA", "CBABA", "~~AB~~C__B__AB~~B~~A");
+			TestStrings("ABCABBA", "CBABA", "~~AB~~C__B__A~~B~~BA");
 		}
 
 		[TestMethod]
@@ -62,68 +62,78 @@ namespace Waher.Runtime.Text.Test
 			string Org = File.ReadAllText("Data\\Test_09_Org.txt");
 			string New = File.ReadAllText("Data\\Test_09_New.txt");
 			string Diff = File.ReadAllText("Data\\Test_09_Diff.txt");
-			this.TestRows(Org, New, Diff);
+			TestRows(Org, New, Diff, true);
 		}
 
-		private void TestStrings(string s1, string s2, string Expected)
+		[TestMethod]
+		public void Difference_Test_10_Rows_Large()
+		{
+			string Org = File.ReadAllText("Data\\Test_10_Org.txt");
+			string New = File.ReadAllText("Data\\Test_10_New.txt");
+			string Diff = File.ReadAllText("Data\\Test_10_Diff.txt");
+			TestRows(Org, New, Diff, false);
+		}
+
+		private static void TestStrings(string s1, string s2, string Expected)
 		{
 			EditScript<char> Script = Difference.AnalyzeStrings(s1, s2);
-			StringBuilder sb = new StringBuilder();
+			StringBuilder sb = new();
 
 			foreach (Step<char> Step in Script.Steps)
 			{
 				switch (Step.Operation)
 				{
 					case EditOperation.Keep:
-						this.Append<char>(sb, Step.Symbols, string.Empty, string.Empty);
+						Append(sb, Step.Symbols, string.Empty, string.Empty);
 						break;
 
 					case EditOperation.Insert:
 						sb.Append("__");
-						this.Append<char>(sb, Step.Symbols, string.Empty, string.Empty);
+						Append(sb, Step.Symbols, string.Empty, string.Empty);
 						sb.Append("__");
 						break;
 
 					case EditOperation.Delete:
 						sb.Append("~~");
-						this.Append<char>(sb, Step.Symbols, string.Empty, string.Empty);
+						Append(sb, Step.Symbols, string.Empty, string.Empty);
 						sb.Append("~~");
 						break;
 				}
 			}
 
 			string Result = sb.ToString();
-			Assert.AreEqual<string>(Expected, Result);
+			Assert.AreEqual(Expected, Result);
 		}
 
-		private void TestRows(string s1, string s2, string Expected)
+		private static void TestRows(string s1, string s2, string Expected, bool ShowKeep)
 		{
 			EditScript<string> Script = Difference.AnalyzeRows(s1, s2);
-			StringBuilder sb = new StringBuilder();
+			StringBuilder sb = new();
 
 			foreach (Step<string> Step in Script.Steps)
 			{
 				switch (Step.Operation)
 				{
 					case EditOperation.Keep:
-						this.Append<string>(sb, Step.Symbols, "  ", "\r\n");
+						if (ShowKeep)
+							Append(sb, Step.Symbols, "  ", "\r\n");
 						break;
 
 					case EditOperation.Insert:
-						this.Append<string>(sb, Step.Symbols, "+ ", "\r\n");
+						Append(sb, Step.Symbols, "+ ", "\r\n");
 						break;
 
 					case EditOperation.Delete:
-						this.Append<string>(sb, Step.Symbols, "- ", "\r\n");
+						Append(sb, Step.Symbols, "- ", "\r\n");
 						break;
 				}
 			}
 
 			string Result = sb.ToString();
-			Assert.AreEqual<string>(Expected, Result);
+			Assert.AreEqual(Expected, Result);
 		}
 
-		private void Append<T>(StringBuilder sb, T[] Symbols, string Pre, string Post)
+		private static void Append<T>(StringBuilder sb, T[] Symbols, string Pre, string Post)
 		{
 			foreach (T Symbol in Symbols)
 			{

@@ -3438,7 +3438,7 @@ namespace Waher.Persistence.Files
 					}
 					finally
 					{
-						Continue = !await Output.EndCollection();
+						Continue = await Output.EndCollection();
 					}
 
 					if (!Continue)

@@ -1004,6 +1004,162 @@ namespace Waher.Networking.XMPP.Contracts
 				: new ResolvedLegalIdentityKey(Endpoint2, true);
 		}
 
+		private static bool TryParseContractSharedSecret(string Value, out SymmetricCipherAlgorithms Algorithm,
+			out string CreatorJid, out byte[] SharedSecret)
+		{
+			Algorithm = DefaultCipherAlgorithm;
+			CreatorJid = string.Empty;
+			SharedSecret = null;
+
+			if (string.IsNullOrEmpty(Value))
+				return false;
+
+			string[] Parts = Value.Split('|');
+			if (Parts.Length != 3 || !Enum.TryParse(Parts[0], out Algorithm))
+				return false;
+
+			CreatorJid = Parts[1];
+
+			try
+			{
+				SharedSecret = Convert.FromBase64String(Parts[2]);
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+		private static Tuple<SymmetricCipherAlgorithms, string, byte[]> CreateContractSharedSecretTuple(
+			SymmetricCipherAlgorithms Algorithm, string CreatorJid, byte[] SharedSecret)
+		{
+			if (SharedSecret is null)
+				return null;
+
+			return new Tuple<SymmetricCipherAlgorithms, string, byte[]>(Algorithm, CreatorJid ?? string.Empty,
+				(byte[])SharedSecret.Clone());
+		}
+
+		private static string EncodeContractSharedSecret(SymmetricCipherAlgorithms Algorithm, string CreatorJid, byte[] SharedSecret)
+		{
+			if (SharedSecret is null)
+				return null;
+
+			return Algorithm.ToString() + "|" + (CreatorJid ?? string.Empty) + "|" + Convert.ToBase64String(SharedSecret);
+		}
+
+		private async Task<ContractSharedSecretState> GetContractStateAsync(string ContractId)
+		{
+			return await Database.FindFirstDeleteRest<ContractSharedSecretState>(new FilterAnd(
+				new FilterFieldEqualTo("BareJid", this.client.BareJID),
+				new FilterFieldEqualTo("ContractId", ContractId)));
+		}
+
+		private async Task<bool> UpsertContractStateAsync(string ContractId, string CreatorJid, byte[] SharedSecret,
+			SymmetricCipherAlgorithms KeyAlgorithm)
+		{
+			if (string.IsNullOrEmpty(ContractId) || SharedSecret is null)
+				return false;
+
+			ContractSharedSecretState State = await this.GetContractStateAsync(ContractId);
+			byte[] SecretCopy = (byte[])SharedSecret.Clone();
+
+			if (State is null)
+			{
+				State = new ContractSharedSecretState(ContractId)
+				{
+					BareJid = this.client.BareJID,
+					CreatorJid = CreatorJid ?? string.Empty,
+					KeyAlgorithm = KeyAlgorithm,
+					SharedSecret = SecretCopy
+				};
+
+				await Database.Insert(State);
+			}
+			else
+			{
+				State.CreatorJid = CreatorJid ?? string.Empty;
+				State.KeyAlgorithm = KeyAlgorithm;
+				State.SharedSecret = SecretCopy;
+
+				await Database.Update(State);
+			}
+
+			return true;
+		}
+
+		private Tuple<SymmetricCipherAlgorithms, string, byte[]> TryLoadContractSharedSecret(ContractSharedSecretState State)
+		{
+			if (State is null || string.IsNullOrEmpty(State.ContractId) || !State.HasSharedSecret)
+				return null;
+
+			return CreateContractSharedSecretTuple(State.KeyAlgorithm, State.CreatorJid, State.SharedSecret);
+		}
+
+		private async Task<Tuple<SymmetricCipherAlgorithms, string, byte[]>> TryLoadLegacyContractSharedSecretAsync(
+			string ContractId, bool MigrateToState)
+		{
+			string Name = this.contractKeySettingsPrefix + ContractId;
+			string Value = await RuntimeSettings.GetAsync(Name, string.Empty);
+
+			if (!TryParseContractSharedSecret(Value, out SymmetricCipherAlgorithms Algorithm, out string CreatorJid,
+				out byte[] SharedSecret))
+			{
+				return null;
+			}
+
+			if (MigrateToState)
+				await this.UpsertContractStateAsync(ContractId, CreatorJid, SharedSecret, Algorithm);
+
+			return CreateContractSharedSecretTuple(Algorithm, CreatorJid, SharedSecret);
+		}
+
+		private async Task<List<ContractSharedSecretState>> GetExportableContractStatesAsync()
+		{
+			Dictionary<string, ContractSharedSecretState> ContractStates = new Dictionary<string, ContractSharedSecretState>(StringComparer.Ordinal);
+			List<ContractSharedSecretState> Result = new List<ContractSharedSecretState>();
+
+			foreach (ContractSharedSecretState State in await Database.Find<ContractSharedSecretState>(new FilterFieldEqualTo("BareJid", this.client.BareJID)))
+			{
+				if (string.IsNullOrEmpty(State.ContractId) || !State.HasSharedSecret)
+					continue;
+
+				ContractStates[State.ContractId] = State;
+			}
+
+			Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.contractKeySettingsPrefix + "*", "*");
+
+			foreach (KeyValuePair<string, object> Setting in Settings)
+			{
+				if (!(Setting.Value is string Value))
+					continue;
+
+				string ContractId = Setting.Key[this.contractKeySettingsPrefix.Length..];
+
+				if (ContractStates.ContainsKey(ContractId) ||
+					!TryParseContractSharedSecret(Value, out SymmetricCipherAlgorithms Algorithm, out string CreatorJid,
+						out byte[] SharedSecret))
+				{
+					continue;
+				}
+
+				if (await this.UpsertContractStateAsync(ContractId, CreatorJid, SharedSecret, Algorithm))
+				{
+					ContractSharedSecretState State = await this.GetContractStateAsync(ContractId);
+
+					if (!(State is null))
+						ContractStates[ContractId] = State;
+				}
+			}
+
+			foreach (ContractSharedSecretState State in ContractStates.Values)
+				Result.Add(State);
+
+			return Result;
+		}
+
 		/// <summary>
 		/// Exports Keys to XML.
 		/// </summary>
@@ -1077,19 +1233,16 @@ namespace Waher.Networking.XMPP.Contracts
 				Output.WriteEndElement();
 			}
 
-			Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.contractKeySettingsPrefix + "*", "*");
-
-			foreach (KeyValuePair<string, object> Setting in Settings)
+			foreach (ContractSharedSecretState ContractState in await this.GetExportableContractStatesAsync())
 			{
-				string Name = Setting.Key[this.contractKeySettingsPrefix.Length..];
+				if (!ContractState.HasSharedSecret)
+					continue;
 
-				if (Setting.Value is string s)
-				{
-					Output.WriteStartElement("C");
-					Output.WriteAttributeString("n", Name);
-					Output.WriteAttributeString("v", s);
-					Output.WriteEndElement();
-				}
+				Output.WriteStartElement("C");
+				Output.WriteAttributeString("n", ContractState.ContractId);
+				Output.WriteAttributeString("v", EncodeContractSharedSecret(ContractState.KeyAlgorithm,
+					ContractState.CreatorJid, ContractState.SharedSecret));
+				Output.WriteEndElement();
 			}
 
 			Output.WriteEndElement();
@@ -1154,11 +1307,46 @@ namespace Waher.Networking.XMPP.Contracts
 						break;
 
 					case "C":
+					{
 						Name = XML.Attribute(E, "n");
 						StringValue = XML.Attribute(E, "v");
 
-						await RuntimeSettings.SetAsync(this.contractKeySettingsPrefix + Name, StringValue);
+						if (!TryParseContractSharedSecret(StringValue, out SymmetricCipherAlgorithms ContractAlgorithm,
+							out string CreatorJid, out byte[] SharedSecret))
+						{
+							return false;
+						}
+
+						if (!await this.UpsertContractStateAsync(Name, CreatorJid, SharedSecret, ContractAlgorithm))
+							return false;
 						break;
+					}
+
+					case "ContractState":
+					{
+						string ContractId = XML.Attribute(E, "contractId");
+						string CreatorJid = XML.Attribute(E, "creatorJid");
+						string KeyAlgorithm = XML.Attribute(E, "keyAlgorithm");
+						string SharedSecretStr = XML.Attribute(E, "sharedSecret");
+						SymmetricCipherAlgorithms ContractAlgorithm;
+						byte[] SharedSecret;
+
+						if (!Enum.TryParse(KeyAlgorithm, out ContractAlgorithm))
+							return false;
+
+						try
+						{
+							SharedSecret = Convert.FromBase64String(SharedSecretStr);
+						}
+						catch (Exception)
+						{
+							return false;
+						}
+
+						if (!await this.UpsertContractStateAsync(ContractId, CreatorJid, SharedSecret, ContractAlgorithm))
+							return false;
+						break;
+					}
 
 					case "State":
 						string LegalId = XML.Attribute(E, "legalId");
@@ -1432,6 +1620,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			this.approvedSources = ApprovedSources;
 			this.SetLegalIdentityStateAllowedSources(ApprovedSources);
+			this.SetContractStateAllowedSources(ApprovedSources);
 		}
 
 		private void AssertAllowed()
@@ -1448,6 +1637,21 @@ namespace Waher.Networking.XMPP.Contracts
 			try
 			{
 				LegalIdentityState.SetAllowedSources(ApprovedSources);
+			}
+			catch (NotSupportedException)
+			{
+				// Sensitive state access has already been configured globally.
+			}
+		}
+
+		private void SetContractStateAllowedSources(ICallStackCheck[] ApprovedSources)
+		{
+			if (ApprovedSources is null)
+				return;
+
+			try
+			{
+				ContractSharedSecretState.SetAllowedSources(ApprovedSources);
 			}
 			catch (NotSupportedException)
 			{
@@ -6368,50 +6572,32 @@ namespace Waher.Networking.XMPP.Contracts
 		internal async Task<bool> SaveContractSharedSecret(string ContractId, string CreatorJid, byte[] Key,
 			SymmetricCipherAlgorithms KeyAlgorithm, bool OnlyIfNew)
 		{
-			string Name = this.contractKeySettingsPrefix + ContractId;
-
 			if (OnlyIfNew)
 			{
-				string s = await RuntimeSettings.GetAsync(Name, string.Empty);
-				if (!string.IsNullOrEmpty(s))
+				ContractSharedSecretState State = await this.GetContractStateAsync(ContractId);
+
+				if (!(State is null) && State.HasSharedSecret)
+					return false;
+
+				if (!(await this.TryLoadLegacyContractSharedSecretAsync(ContractId, true) is null))
 					return false;
 			}
 
-			string Value = KeyAlgorithm.ToString() + "|" + CreatorJid + "|" + Convert.ToBase64String(Key);
-
-			await RuntimeSettings.SetAsync(Name, Value);
-
-			return true;
+			return await this.UpsertContractStateAsync(ContractId, CreatorJid, Key, KeyAlgorithm);
 		}
 
 		internal async Task<Tuple<SymmetricCipherAlgorithms, string, byte[]>> TryLoadContractSharedSecret(string ContractId)
 		{
-			string Name = this.contractKeySettingsPrefix + ContractId;
-			string s = await RuntimeSettings.GetAsync(Name, string.Empty);
+			ContractSharedSecretState State = await this.GetContractStateAsync(ContractId);
+			Tuple<SymmetricCipherAlgorithms, string, byte[]> Result = this.TryLoadContractSharedSecret(State);
 
-			if (string.IsNullOrEmpty(s))
+			if (!(Result is null))
+				return Result;
+
+			if (!(State is null))
 				return null;
 
-			string[] Parts = s.Split('|');
-			if (Parts.Length != 3)
-				return null;
-
-			if (!Enum.TryParse(Parts[0], out SymmetricCipherAlgorithms Algorithm))
-				return null;
-
-			string CreatorJid = Parts[1];
-			byte[] Key;
-
-			try
-			{
-				Key = Convert.FromBase64String(Parts[2]);
-			}
-			catch (Exception)
-			{
-				return null;
-			}
-
-			return new Tuple<SymmetricCipherAlgorithms, string, byte[]>(Algorithm, CreatorJid, Key);
+			return await this.TryLoadLegacyContractSharedSecretAsync(ContractId, true);
 		}
 
 		/// <summary>

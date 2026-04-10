@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
+using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Filters;
@@ -443,6 +444,170 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
+		[TestMethod]
+		public async Task ContractsClient_State_Test_17_SaveContractSharedSecretPersistsContractState()
+		{
+			byte[] SharedSecret = new byte[] { 1, 2, 3, 4, 5, 6 };
+
+			Assert.IsTrue(await InvokeSaveContractSharedSecretAsync(this.contractsClient, "contract-state-id", this.client.BareJID,
+				SharedSecret, SymmetricCipherAlgorithms.Aes256, false));
+
+			ContractSharedSecretState State = await GetContractStateAsync(this.client.BareJID, "contract-state-id");
+			Assert.IsNotNull(State);
+			Assert.AreEqual(this.client.BareJID, State.CreatorJid);
+			Assert.AreEqual(SymmetricCipherAlgorithms.Aes256, State.KeyAlgorithm);
+			CollectionAssert.AreEqual(SharedSecret, State.SharedSecret);
+			Assert.AreEqual(string.Empty, await RuntimeSettings.GetAsync(
+				this.contractsClient.ContractKeySettingsPrefix + "contract-state-id", string.Empty));
+
+			Tuple<SymmetricCipherAlgorithms, string, byte[]> Secret = await InvokeTryLoadContractSharedSecretAsync(this.contractsClient, "contract-state-id");
+			Assert.IsNotNull(Secret);
+			Assert.AreEqual(SymmetricCipherAlgorithms.Aes256, Secret.Item1);
+			Assert.AreEqual(this.client.BareJID, Secret.Item2);
+			CollectionAssert.AreEqual(SharedSecret, Secret.Item3);
+		}
+
+		[TestMethod]
+		public async Task ContractsClient_State_Test_18_LegacyContractSharedSecretBackfillsContractStateOnLoad()
+		{
+			byte[] SharedSecret = new byte[] { 9, 8, 7, 6, 5, 4 };
+			await RuntimeSettings.SetAsync(this.contractsClient.ContractKeySettingsPrefix + "legacy-contract-id",
+				EncodeLegacyContractSharedSecret(SymmetricCipherAlgorithms.AeadChaCha20Poly1305, "creator@example.org", SharedSecret));
+
+			Tuple<SymmetricCipherAlgorithms, string, byte[]> Secret = await InvokeTryLoadContractSharedSecretAsync(this.contractsClient, "legacy-contract-id");
+			Assert.IsNotNull(Secret);
+			Assert.AreEqual(SymmetricCipherAlgorithms.AeadChaCha20Poly1305, Secret.Item1);
+			Assert.AreEqual("creator@example.org", Secret.Item2);
+			CollectionAssert.AreEqual(SharedSecret, Secret.Item3);
+
+			ContractSharedSecretState State = await GetContractStateAsync(this.client.BareJID, "legacy-contract-id");
+			Assert.IsNotNull(State);
+			Assert.AreEqual("creator@example.org", State.CreatorJid);
+			Assert.AreEqual(SymmetricCipherAlgorithms.AeadChaCha20Poly1305, State.KeyAlgorithm);
+			CollectionAssert.AreEqual(SharedSecret, State.SharedSecret);
+		}
+
+		[TestMethod]
+		public async Task ContractsClient_State_Test_19_SaveContractSharedSecretOnlyIfNewRespectsLegacyRuntimeValue()
+		{
+			byte[] ExistingSharedSecret = new byte[] { 3, 3, 3, 3 };
+			byte[] NewSharedSecret = new byte[] { 4, 4, 4, 4 };
+
+			await RuntimeSettings.SetAsync(this.contractsClient.ContractKeySettingsPrefix + "existing-contract-id",
+				EncodeLegacyContractSharedSecret(SymmetricCipherAlgorithms.Aes256, "creator@example.org", ExistingSharedSecret));
+
+			Assert.IsFalse(await InvokeSaveContractSharedSecretAsync(this.contractsClient, "existing-contract-id", this.client.BareJID,
+				NewSharedSecret, SymmetricCipherAlgorithms.AeadChaCha20Poly1305, true));
+
+			ContractSharedSecretState State = await GetContractStateAsync(this.client.BareJID, "existing-contract-id");
+			Assert.IsNotNull(State);
+			Assert.AreEqual("creator@example.org", State.CreatorJid);
+			Assert.AreEqual(SymmetricCipherAlgorithms.Aes256, State.KeyAlgorithm);
+			CollectionAssert.AreEqual(ExistingSharedSecret, State.SharedSecret);
+		}
+
+		[TestMethod]
+		public async Task ContractsClient_State_Test_20_ExportKeysMigratesLegacyContractSecretAndUsesContractStateFormat()
+		{
+			byte[] PersistedSecret = new byte[] { 5, 4, 3, 2 };
+			byte[] LegacySecret = new byte[] { 2, 3, 4, 5 };
+
+			Assert.IsTrue(await InvokeSaveContractSharedSecretAsync(this.contractsClient, "persisted-contract-id", this.client.BareJID,
+				PersistedSecret, SymmetricCipherAlgorithms.Aes256, false));
+			await RuntimeSettings.SetAsync(this.contractsClient.ContractKeySettingsPrefix + "legacy-contract-id",
+				EncodeLegacyContractSharedSecret(SymmetricCipherAlgorithms.AeadChaCha20Poly1305, "creator@example.org", LegacySecret));
+
+			string Xml = await this.contractsClient.ExportKeys();
+
+			Assert.IsTrue(Xml.Contains("<C ", StringComparison.Ordinal));
+			Assert.IsTrue(Xml.Contains("persisted-contract-id", StringComparison.Ordinal));
+			Assert.IsTrue(Xml.Contains("legacy-contract-id", StringComparison.Ordinal));
+			Assert.IsFalse(Xml.Contains("ContractState", StringComparison.Ordinal));
+
+			ContractSharedSecretState State = await GetContractStateAsync(this.client.BareJID, "legacy-contract-id");
+			Assert.IsNotNull(State);
+			Assert.AreEqual("creator@example.org", State.CreatorJid);
+			CollectionAssert.AreEqual(LegacySecret, State.SharedSecret);
+		}
+
+		[TestMethod]
+		public async Task ContractsClient_State_Test_21_ImportKeysRoundTripWithContractStateRestoresSharedSecret()
+		{
+			byte[] SharedSecret = new byte[] { 7, 7, 7, 7, 7 };
+
+			Assert.IsTrue(await InvokeSaveContractSharedSecretAsync(this.contractsClient, "roundtrip-contract-id", this.client.BareJID,
+				SharedSecret, SymmetricCipherAlgorithms.Aes256, false));
+
+			string Xml = await this.contractsClient.ExportKeys();
+
+			await DeleteAllContractStatesAsync(this.client.BareJID);
+			await RuntimeSettings.DeleteWhereKeyLikeAsync(this.contractsClient.ContractKeySettingsPrefix + "*", "*");
+
+			Assert.IsTrue(await this.contractsClient.ImportKeys(Xml));
+
+			Tuple<SymmetricCipherAlgorithms, string, byte[]> Secret = await InvokeTryLoadContractSharedSecretAsync(this.contractsClient, "roundtrip-contract-id");
+			Assert.IsNotNull(Secret);
+			Assert.AreEqual(SymmetricCipherAlgorithms.Aes256, Secret.Item1);
+			Assert.AreEqual(this.client.BareJID, Secret.Item2);
+			CollectionAssert.AreEqual(SharedSecret, Secret.Item3);
+		}
+
+		[TestMethod]
+		public async Task ContractsClient_State_Test_22_ImportKeysBackwardCompatibilityRestoresLegacyContractSharedSecret()
+		{
+			byte[] SharedSecret = new byte[] { 6, 6, 6, 6 };
+			string Xml = "<LegalId xmlns=\"" + ContractsClient.NamespaceOnboarding + "\"><C n=\"legacy-import-contract-id\" v=\"" +
+				EncodeLegacyContractSharedSecret(SymmetricCipherAlgorithms.AeadChaCha20Poly1305, "creator@example.org", SharedSecret) +
+				"\" /></LegalId>";
+
+			Assert.IsTrue(await this.contractsClient.ImportKeys(Xml));
+
+			ContractSharedSecretState State = await GetContractStateAsync(this.client.BareJID, "legacy-import-contract-id");
+			Assert.IsNotNull(State);
+			Assert.AreEqual("creator@example.org", State.CreatorJid);
+			Assert.AreEqual(SymmetricCipherAlgorithms.AeadChaCha20Poly1305, State.KeyAlgorithm);
+			CollectionAssert.AreEqual(SharedSecret, State.SharedSecret);
+		}
+
+		[TestMethod]
+		public async Task ContractsClient_State_Test_23_MalformedLegacyContractSharedSecretIsIgnored()
+		{
+			await RuntimeSettings.SetAsync(this.contractsClient.ContractKeySettingsPrefix + "malformed-contract-id", "not|valid");
+
+			Assert.IsNull(await InvokeTryLoadContractSharedSecretAsync(this.contractsClient, "malformed-contract-id"));
+			Assert.IsNull(await GetContractStateAsync(this.client.BareJID, "malformed-contract-id"));
+		}
+
+		[TestMethod]
+		public async Task ContractsClient_State_Test_24_ContractStateSharedSecretIsProtectedByCallStack()
+		{
+			FieldInfo ApprovedSources = typeof(ContractSharedSecretState).GetField("approvedSources", BindingFlags.Static | BindingFlags.NonPublic);
+			ApprovedSources.SetValue(null, null);
+
+			try
+			{
+				ContractSharedSecretState State = new ContractSharedSecretState()
+				{
+					ContractId = "protected-contract-id"
+				};
+
+				State.SharedSecret = new byte[] { 1, 2, 3 };
+				ContractSharedSecretState.SetAllowedSources(new CallStack.ICallStackCheck[]
+				{
+					new CallStack.ApproveType(typeof(ContractsClient))
+				});
+
+				Assert.ThrowsException<CallStack.UnauthorizedCallstackException>(() =>
+				{
+					byte[] Bin = State.SharedSecret;
+				});
+			}
+			finally
+			{
+				ApprovedSources.SetValue(null, null);
+			}
+		}
+
 		private static byte[] GetFirstLocalPublicKey(ContractsClient ContractsClient)
 		{
 			IE2eEndpoint[] Keys = GetLocalKeys(ContractsClient);
@@ -522,6 +687,18 @@ namespace Waher.Networking.XMPP.Test
 			return (await Database.Find<LegalIdentityState>(new FilterFieldEqualTo("BareJid", BareJid))).ToList();
 		}
 
+		private static async Task<ContractSharedSecretState> GetContractStateAsync(string BareJid, string ContractId)
+		{
+			return await Database.FindFirstIgnoreRest<ContractSharedSecretState>(new FilterAnd(
+				new FilterFieldEqualTo("BareJid", BareJid),
+				new FilterFieldEqualTo("ContractId", ContractId)));
+		}
+
+		private static async Task<List<ContractSharedSecretState>> GetContractStatesAsync(string BareJid)
+		{
+			return (await Database.Find<ContractSharedSecretState>(new FilterFieldEqualTo("BareJid", BareJid))).ToList();
+		}
+
 		private static async Task DeleteAllStatesAsync(string BareJid)
 		{
 			foreach (LegalIdentityState State in await GetStatesAsync(BareJid))
@@ -531,6 +708,17 @@ namespace Waher.Networking.XMPP.Test
 				if (!string.IsNullOrEmpty(State.LegalId))
 					Types.UnregisterSingleton(State, State.LegalId);
 			}
+		}
+
+		private static async Task DeleteAllContractStatesAsync(string BareJid)
+		{
+			foreach (ContractSharedSecretState State in await GetContractStatesAsync(BareJid))
+				await Database.Delete(State);
+		}
+
+		private static string EncodeLegacyContractSharedSecret(SymmetricCipherAlgorithms Algorithm, string CreatorJid, byte[] SharedSecret)
+		{
+			return Algorithm.ToString() + "|" + CreatorJid + "|" + Convert.ToBase64String(SharedSecret);
 		}
 
 		private static string ExtractExportedStateXml(string Xml, bool RemovePrivateStateAttributes, bool KeepRuntimeSettings)
@@ -591,6 +779,25 @@ namespace Waher.Networking.XMPP.Test
 		{
 			MethodInfo Method = typeof(ContractsClient).GetMethod("SetLegalIdentityKeySnapshotAsync", BindingFlags.Instance | BindingFlags.NonPublic);
 			Task<bool> Task = (Task<bool>)Method.Invoke(ContractsClient, new object[] { State, Endpoint });
+			return await Task;
+		}
+
+		private static async Task<bool> InvokeSaveContractSharedSecretAsync(ContractsClient ContractsClient, string ContractId,
+			string CreatorJid, byte[] SharedSecret, SymmetricCipherAlgorithms Algorithm, bool OnlyIfNew)
+		{
+			MethodInfo Method = typeof(ContractsClient).GetMethod("SaveContractSharedSecret", BindingFlags.Instance | BindingFlags.NonPublic, null,
+				new Type[] { typeof(string), typeof(string), typeof(byte[]), typeof(SymmetricCipherAlgorithms), typeof(bool) }, null);
+			Task<bool> Task = (Task<bool>)Method.Invoke(ContractsClient, new object[] { ContractId, CreatorJid, SharedSecret, Algorithm, OnlyIfNew });
+			return await Task;
+		}
+
+		private static async Task<Tuple<SymmetricCipherAlgorithms, string, byte[]>> InvokeTryLoadContractSharedSecretAsync(
+			ContractsClient ContractsClient, string ContractId)
+		{
+			MethodInfo Method = typeof(ContractsClient).GetMethod("TryLoadContractSharedSecret", BindingFlags.Instance | BindingFlags.NonPublic, null,
+				new Type[] { typeof(string) }, null);
+			Task<Tuple<SymmetricCipherAlgorithms, string, byte[]>> Task =
+				(Task<Tuple<SymmetricCipherAlgorithms, string, byte[]>>)Method.Invoke(ContractsClient, new object[] { ContractId });
 			return await Task;
 		}
 

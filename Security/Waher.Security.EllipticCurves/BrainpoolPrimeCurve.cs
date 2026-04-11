@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace Waher.Security.EllipticCurves
 {
@@ -51,58 +50,5 @@ namespace Waher.Security.EllipticCurves
 			: base(Prime, BasePoint, A, B, Order, 1, Secret)
 		{
 		}
-
-		/// <summary>
-		/// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
-		/// </summary>
-		/// <param name="Data">Payload to sign.</param>
-		/// <param name="BigEndian">Indicates if the signature should be in big-endian format.</param>
-		/// <returns>Signature.</returns>
-		public override byte[] Sign(byte[] Data, bool BigEndian)
-        {
-            return ECDSA.Sign(Data, BigEndian, this.PrivateKey, 
-                Bin => Hashes.ComputeHash(this.HashFunction, Bin), this);
-        }
-
-        /// <summary>
-        /// Creates a signature of <paramref name="Data"/> using the ECDSA algorithm.
-        /// </summary>
-        /// <param name="Data">Payload to sign.</param>
-		/// <param name="BigEndian">Indicates if the signature should be in big-endian format.</param>
-        /// <returns>Signature.</returns>
-        public override byte[] Sign(Stream Data, bool BigEndian)
-        {
-            return ECDSA.Sign(Data, BigEndian, this.PrivateKey,
-                Bin => Hashes.ComputeHash(this.HashFunction, Bin), this);
-        }
-
-        /// <summary>
-        /// Verifies a signature of <paramref name="Data"/> made by the ECDSA algorithm.
-        /// </summary>
-        /// <param name="Data">Payload to sign.</param>
-        /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
-		/// <param name="BigEndian">Indicates if the public key is in big-endian format.</param>
-        /// <param name="Signature">Signature</param>
-        /// <returns>If the signature is valid.</returns>
-        public override bool Verify(byte[] Data, byte[] PublicKey, bool BigEndian, byte[] Signature)
-        {
-            return ECDSA.Verify(Data, PublicKey, BigEndian,
-                Bin => Hashes.ComputeHash(this.HashFunction, Bin), this, Signature);
-        }
-
-        /// <summary>
-        /// Verifies a signature of <paramref name="Data"/> made by the ECDSA algorithm.
-        /// </summary>
-        /// <param name="Data">Payload to sign.</param>
-        /// <param name="PublicKey">Public Key of the entity that generated the signature.</param>
-		/// <param name="BigEndian">Indicates if the public key is in big-endian format.</param>
-        /// <param name="Signature">Signature</param>
-        /// <returns>If the signature is valid.</returns>
-        public override bool Verify(Stream Data, byte[] PublicKey, bool BigEndian, byte[] Signature)
-        {
-            return ECDSA.Verify(Data, PublicKey, BigEndian,
-                Bin => Hashes.ComputeHash(this.HashFunction, Bin), this, Signature);
-        }
-
     }
 }

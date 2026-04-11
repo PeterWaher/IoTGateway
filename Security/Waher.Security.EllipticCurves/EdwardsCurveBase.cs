@@ -68,13 +68,18 @@ namespace Waher.Security.EllipticCurves
         }
 
         /// <summary>
-        /// Gets the X-coordinate that corresponds to a given Y-coordainte, and the 
-        /// first bit of the X-coordinate.
+        /// d coefficient of Edwards curve.
         /// </summary>
-        /// <param name="Y">Y-coordinate.</param>
-        /// <param name="X0">First bit of X-coordinate.</param>
-        /// <returns>X-coordinate</returns>
-        public abstract BigInteger GetX(BigInteger Y, bool X0);
+        public BigInteger D => this.d;
+
+		/// <summary>
+		/// Gets the X-coordinate that corresponds to a given Y-coordainte, and the 
+		/// first bit of the X-coordinate.
+		/// </summary>
+		/// <param name="Y">Y-coordinate.</param>
+		/// <param name="X0">First bit of X-coordinate.</param>
+		/// <returns>X-coordinate</returns>
+		public abstract BigInteger GetX(BigInteger Y, bool X0);
 
         /// <summary>
         /// Encodes a point on the curve.

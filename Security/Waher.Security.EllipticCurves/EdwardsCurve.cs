@@ -41,14 +41,6 @@ namespace Waher.Security.EllipticCurves
 		}
 
 		/// <summary>
-		/// d coefficient of Edwards curve.
-		/// </summary>
-		protected abstract BigInteger D
-		{
-			get;
-		}
-
-		/// <summary>
 		/// Neutral point.
 		/// </summary>
 		public override PointOnCurve Zero
@@ -77,7 +69,7 @@ namespace Waher.Security.EllipticCurves
 			BigInteger B = this.modP.Multiply(A, A);
 			BigInteger C = this.modP.Multiply(P.X, Q.X);
 			BigInteger D = this.modP.Multiply(P.Y, Q.Y);
-			BigInteger E = this.modP.Multiply(this.modP.Multiply(this.D, C), D);
+			BigInteger E = this.modP.Multiply(this.modP.Multiply(this.d, C), D);
 			BigInteger F = this.modP.Subtract(B, E);
 			BigInteger G = this.modP.Add(B, E);
 			BigInteger H = this.modP.Multiply(P.X + P.Y, Q.X + Q.Y);
@@ -123,7 +115,7 @@ namespace Waher.Security.EllipticCurves
 			if (u.Sign < 0)
 				u += this.p;
 
-			BigInteger v = this.modP.Multiply(this.D, y2) - BigInteger.One;
+			BigInteger v = this.modP.Multiply(this.d, y2) - BigInteger.One;
 			BigInteger v2 = this.modP.Multiply(v, v);
 			BigInteger v3 = this.modP.Multiply(v, v2);
 			BigInteger u2 = this.modP.Multiply(u, u);

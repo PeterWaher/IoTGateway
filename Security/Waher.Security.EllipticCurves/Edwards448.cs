@@ -63,15 +63,10 @@ namespace Waher.Security.EllipticCurves
         /// </summary>
         public override string CurveName => "Edwards448";
 
-        /// <summary>
-        /// d coefficient of Edwards curve.
-        /// </summary>
-        protected override BigInteger D => this.d;
-
-        /// <summary>
-        /// Number of bits used to encode the y-coordinate.
-        /// </summary>
-        public override int CoordinateBits => 447;
+		/// <summary>
+		/// Number of bits used to encode the y-coordinate.
+		/// </summary>
+		public override int CoordinateBits => 447;
 
         /// <summary>
         /// Calculates a private key from a secret.

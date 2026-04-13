@@ -85,16 +85,23 @@ namespace Waher.Security.EllipticCurves
 		private static BigInteger CalcE(byte[] Hash, PrimeFieldCurve Curve)
 		{
 			int c = Hash.Length;
+			int MaxC = Curve.BigIntegerBytes;
 
-			if (c != Curve.BigIntegerBytes)
-				Array.Resize(ref Hash, Curve.BigIntegerBytes);
-
-			if (Curve.MsbOrderMask == 0)
+			if (c != MaxC)
 			{
-				Buffer.BlockCopy(Hash, 0, Hash, 1, Curve.OrderBytes);
-				Hash[0] = 0;
+				byte[] Hash2 = new byte[MaxC];
+
+				if (c < MaxC)
+					Buffer.BlockCopy(Hash, 0, Hash2, MaxC - c, c);
+				else if (Curve.MsbOrderMask == 0)
+					Buffer.BlockCopy(Hash, 0, Hash2, 1, MaxC - 1);	// c >= MaxC
+				else
+					Buffer.BlockCopy(Hash, 0, Hash2, 0, MaxC);
+
+				Hash = Hash2;
 			}
-			else
+
+			if (Curve.MsbOrderMask != 0)
 			{
 				bool Carry;
 				int i;

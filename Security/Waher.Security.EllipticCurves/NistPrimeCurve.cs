@@ -16,7 +16,7 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="Order">Order of base-point.</param>
 		public NistPrimeCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger B,
             BigInteger Order)
-			: base(Prime, BasePoint, -3, B, Order, 1)
+			: base(Prime, BasePoint, Prime - 3, B, Order, 1)
 		{
 		}
 
@@ -30,7 +30,7 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="Secret">Secret.</param>
 		public NistPrimeCurve(BigInteger Prime, PointOnCurve BasePoint, BigInteger B, 
             BigInteger Order, byte[] Secret)
-			: base(Prime, BasePoint, -3, B, Order, 1, Secret)
+			: base(Prime, BasePoint, Prime - 3, B, Order, 1, Secret)
 		{
 		}
     }

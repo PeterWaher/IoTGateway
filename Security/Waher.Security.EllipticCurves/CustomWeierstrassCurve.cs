@@ -8,6 +8,7 @@ namespace Waher.Security.EllipticCurves
     public class CustomWeierstrassCurve : WeierstrassCurve 
 	{
 		private readonly string curveName;
+		private readonly HashFunction hashFunction;
 
 		/// <summary>
 		/// Custom Weierstrass curves (y²=x³+ax+b) over a prime field.
@@ -19,10 +20,12 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="b">Coefficient in the Weierstrass equation.</param>
 		/// <param name="Order">Order of base-point.</param>
 		/// <param name="Cofactor">Cofactor of curve.</param>
-		public CustomWeierstrassCurve(string CurveName, BigInteger Prime, 
+		/// <param name="HashFunction">Hash function to use in signatures.</param>
+		public CustomWeierstrassCurve(string CurveName, BigInteger Prime,
 			PointOnCurve BasePoint, BigInteger a, BigInteger b, 
-			BigInteger Order, int Cofactor)
-            : this(CurveName, Prime, BasePoint, a, b, Order, Cofactor, (byte[])null)
+			BigInteger Order, int Cofactor, HashFunction HashFunction)
+            : this(CurveName, Prime, BasePoint, a, b, Order, Cofactor, 
+				  (byte[])null, HashFunction)
 		{
 		}
 
@@ -37,12 +40,14 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="Order">Order of base-point.</param>
 		/// <param name="Cofactor">Cofactor of curve.</param>
 		/// <param name="Secret">Secret.</param>
+		/// <param name="HashFunction">Hash function to use in signatures.</param>
 		public CustomWeierstrassCurve(string CurveName, BigInteger Prime, 
 			PointOnCurve BasePoint, BigInteger a, BigInteger b, 
-			BigInteger Order, int Cofactor, byte[] Secret)
+			BigInteger Order, int Cofactor, byte[] Secret, HashFunction HashFunction)
 			: base(Prime, BasePoint, a, b, Order, Cofactor, Secret)
 		{
 			this.curveName = CurveName;
+			this.hashFunction = HashFunction;
 		}
 
 		/// <summary>
@@ -56,17 +61,24 @@ namespace Waher.Security.EllipticCurves
 		/// <param name="Order">Order of base-point.</param>
 		/// <param name="Cofactor">Cofactor of curve.</param>
 		/// <param name="Secret">Secret.</param>
+		/// <param name="HashFunction">Hash function to use in signatures.</param>
 		public CustomWeierstrassCurve(string CurveName, BigInteger Prime, 
 			PointOnCurve BasePoint, BigInteger a, BigInteger b, BigInteger Order, 
-			int Cofactor, uint[] Secret)
+			int Cofactor, uint[] Secret, HashFunction HashFunction)
 			: base(Prime, BasePoint, a, b, Order, Cofactor, Secret)
 		{
 			this.curveName = CurveName;
+			this.hashFunction = HashFunction;
 		}
 
 		/// <summary>
 		/// Name of curve.
 		/// </summary>
 		public override string CurveName => this.curveName;
+
+		/// <summary>
+		/// Hash function to use in signatures.
+		/// </summary>
+		public override HashFunction HashFunction => this.hashFunction;
 	}
 }

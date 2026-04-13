@@ -6,14 +6,14 @@ using Waher.Runtime.Inventory;
 namespace Waher.Content.Json.ReferenceTypes
 {
 	/// <summary>
-	/// Encodes <see cref="Type"/> values.
+	/// Encodes <see cref="Assembly"/> values.
 	/// </summary>
-	public class TypeEncoder : IJsonEncoder
+	public class AssemblyEncoder : IJsonEncoder
 	{
 		/// <summary>
-		/// Encodes <see cref="Type"/> values.
+		/// Encodes <see cref="Assembly"/> values.
 		/// </summary>
-		public TypeEncoder()
+		public AssemblyEncoder()
 		{
 		}
 
@@ -25,10 +25,10 @@ namespace Waher.Content.Json.ReferenceTypes
 		/// <param name="Json">JSON output.</param>
 		public void Encode(object Object, int? Indent, StringBuilder Json)
 		{
-			Type T = (Type)Object;
+			Assembly A = (Assembly)Object;
 
 			Json.Append('"');
-			Json.Append(JSON.Encode(T.FullName));
+			Json.Append(JSON.Encode(A.FullName));
 			Json.Append('"');
 		}
 
@@ -39,7 +39,7 @@ namespace Waher.Content.Json.ReferenceTypes
 		/// <returns>How well objects of the given type are encoded.</returns>
 		public Grade Supports(Type ObjectType)
 		{
-			return typeof(Type).IsAssignableFrom(ObjectType.GetTypeInfo()) ? Grade.Ok : Grade.NotAtAll;
+			return typeof(Assembly).IsAssignableFrom(ObjectType.GetTypeInfo()) ? Grade.Ok : Grade.NotAtAll;
 		}
 	}
 }

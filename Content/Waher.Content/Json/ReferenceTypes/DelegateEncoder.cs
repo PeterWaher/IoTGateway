@@ -6,14 +6,14 @@ using Waher.Runtime.Inventory;
 namespace Waher.Content.Json.ReferenceTypes
 {
 	/// <summary>
-	/// Encodes <see cref="Type"/> values.
+	/// Encodes <see cref="Delegate"/> values.
 	/// </summary>
-	public class TypeEncoder : IJsonEncoder
+	public class DelegateEncoder : IJsonEncoder
 	{
 		/// <summary>
-		/// Encodes <see cref="Type"/> values.
+		/// Encodes <see cref="Delegate"/> values.
 		/// </summary>
-		public TypeEncoder()
+		public DelegateEncoder()
 		{
 		}
 
@@ -25,10 +25,33 @@ namespace Waher.Content.Json.ReferenceTypes
 		/// <param name="Json">JSON output.</param>
 		public void Encode(object Object, int? Indent, StringBuilder Json)
 		{
-			Type T = (Type)Object;
+			Delegate D = (Delegate)Object;
+			StringBuilder sb = new StringBuilder();
+			bool First = true;
+
+			if (!(D.Target is null))
+			{
+				Json.Append(D.Target.ToString());
+				Json.Append('.');
+			}
+			Json.Append(D.Method.Name);
+			Json.Append('(');
+
+			foreach (ParameterInfo Arg in D.Method.GetParameters())
+			{
+				if (First)
+					First = false;
+				else
+					Json.Append(',');
+
+				Json.Append(Arg.Name);
+			}
+
+			Json.Append(')');
+
 
 			Json.Append('"');
-			Json.Append(JSON.Encode(T.FullName));
+			Json.Append(JSON.Encode(sb.ToString()));
 			Json.Append('"');
 		}
 
@@ -39,7 +62,7 @@ namespace Waher.Content.Json.ReferenceTypes
 		/// <returns>How well objects of the given type are encoded.</returns>
 		public Grade Supports(Type ObjectType)
 		{
-			return typeof(Type).IsAssignableFrom(ObjectType.GetTypeInfo()) ? Grade.Ok : Grade.NotAtAll;
+			return typeof(Delegate).IsAssignableFrom(ObjectType.GetTypeInfo()) ? Grade.Ok : Grade.NotAtAll;
 		}
 	}
 }

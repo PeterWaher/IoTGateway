@@ -169,8 +169,7 @@ namespace Waher.Security.EllipticCurves
 		/// <returns>Signature.</returns>
 		public override byte[] Sign(byte[] Data, bool BigEndian)
 		{
-			return ECDSA.Sign(Data, BigEndian, this.PrivateKey,
-				Bin => Hashes.ComputeHash(this.HashFunction, Bin), this);
+			return ECDSA.Sign(Data, BigEndian, this.PrivateKey, this.HashFunction, this);
 		}
 
 		/// <summary>
@@ -181,8 +180,7 @@ namespace Waher.Security.EllipticCurves
 		/// <returns>Signature.</returns>
 		public override byte[] Sign(Stream Data, bool BigEndian)
 		{
-			return ECDSA.Sign(Data, BigEndian, this.PrivateKey,
-				Bin => Hashes.ComputeHash(this.HashFunction, Bin), this);
+			return ECDSA.Sign(Data, BigEndian, this.PrivateKey, this.HashFunctionStream, this);
 		}
 
 		/// <summary>
@@ -195,8 +193,7 @@ namespace Waher.Security.EllipticCurves
 		/// <returns>If the signature is valid.</returns>
 		public override bool Verify(byte[] Data, byte[] PublicKey, bool BigEndian, byte[] Signature)
 		{
-			return ECDSA.Verify(Data, PublicKey, BigEndian,
-				Bin => Hashes.ComputeHash(this.HashFunction, Bin), this, Signature);
+			return ECDSA.Verify(Data, PublicKey, BigEndian, this.HashFunction, this, Signature);
 		}
 
 		/// <summary>
@@ -209,8 +206,7 @@ namespace Waher.Security.EllipticCurves
 		/// <returns>If the signature is valid.</returns>
 		public override bool Verify(Stream Data, byte[] PublicKey, bool BigEndian, byte[] Signature)
 		{
-			return ECDSA.Verify(Data, PublicKey, BigEndian,
-				Bin => Hashes.ComputeHash(this.HashFunction, Bin), this, Signature);
+			return ECDSA.Verify(Data, PublicKey, BigEndian, this.HashFunctionStream, this, Signature);
 		}
 	}
 }

@@ -458,11 +458,11 @@ namespace Waher.Security.EllipticCurves.Test
 			{
 				byte[] Key1 = Curve1.GetSharedKey(
 					BigEndian ? Curve2.PublicKeyBigEndian : Curve2.PublicKey,
-					BigEndian, Hashes.GetHashFunctionArray(Curve2.HashFunction));
+					BigEndian, Curve2.HashFunction);
 
 				byte[] Key2 = Curve2.GetSharedKey(
 					 BigEndian ? Curve1.PublicKeyBigEndian : Curve1.PublicKey,
-					 BigEndian, Hashes.GetHashFunctionArray(Curve1.HashFunction));
+					 BigEndian, Curve1.HashFunction);
 
 				Assert.AreEqual(Hashes.BinaryToString(Key1), Hashes.BinaryToString(Key2));
 

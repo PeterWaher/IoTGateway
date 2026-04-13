@@ -51,9 +51,14 @@ namespace Waher.Security.EllipticCurves
 		public override string CurveName => "Brainpool P-320";
 
 		/// <summary>
-		/// Hash function to use in signatures.
+		/// Hash function to use in signatures for binary blocks of data in memory.
 		/// </summary>
-		public override HashFunction HashFunction => HashFunction.SHA384;
+		public override HashFunctionArray HashFunction => Hashes.ComputeSHA384Hash;
+
+		/// <summary>
+		/// Hash function to use in signatures for data streams.
+		/// </summary>
+		public override HashFunctionStream HashFunctionStream => Hashes.ComputeSHA384Hash;
 
 	}
 }

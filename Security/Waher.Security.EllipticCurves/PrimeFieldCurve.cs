@@ -76,9 +76,14 @@ namespace Waher.Security.EllipticCurves
 		public BigInteger Prime => this.p;
 
 		/// <summary>
-		/// Hash function to use in signatures.
+		/// Hash function to use in signatures for binary blocks of data in memory.
 		/// </summary>
-		public virtual HashFunction HashFunction => HashFunction.SHA256;
+		public virtual HashFunctionArray HashFunction => Hashes.ComputeSHA256Hash;
+
+		/// <summary>
+		/// Hash function to use in signatures for data streams.
+		/// </summary>
+		public virtual HashFunctionStream HashFunctionStream => Hashes.ComputeSHA256Hash;
 
 		/// <summary>
 		/// Converts a sequence of unsigned 32-bit integers to a <see cref="BigInteger"/>.

@@ -52,8 +52,13 @@ namespace Waher.Security.EllipticCurves
 		public override string CurveName => "NIST P-521";
 
         /// <summary>
-        /// Hash function to use in signatures.
+        /// Hash function to use in signatures for binary blocks of data in memory.
         /// </summary>
-        public override HashFunction HashFunction => HashFunction.SHA512;
-    }
+        public override HashFunctionArray HashFunction => Hashes.ComputeSHA512Hash;
+
+		/// <summary>
+		/// Hash function to use in signatures for data streams.
+		/// </summary>
+		public override HashFunctionStream HashFunctionStream => Hashes.ComputeSHA512Hash;
+	}
 }

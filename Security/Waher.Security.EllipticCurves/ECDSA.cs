@@ -84,8 +84,10 @@ namespace Waher.Security.EllipticCurves
 
 		private static BigInteger CalcE(byte[] Hash, PrimeFieldCurve Curve)
 		{
+			//Console.Out.WriteLine("Hash: " + Hashes.BinaryToString(Hash));
+
 			int c = Hash.Length;
-			int MaxC = Curve.BigIntegerBytes;
+			int MaxC = Curve.OrderBytes;
 
 			if (c != MaxC)
 			{
@@ -99,7 +101,13 @@ namespace Waher.Security.EllipticCurves
 				Hash = Hash2;
 			}
 
-			return EllipticCurve.ToInt(Hash, true);
+			//Console.Out.WriteLine("Hash (padded): " + Hashes.BinaryToString(Hash));
+
+			BigInteger e = EllipticCurve.ToInt(Hash, true);
+
+			//Console.Out.WriteLine("e: " + e.ToString());
+
+			return e;
 		}
 
 		/// <summary>

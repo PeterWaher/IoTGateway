@@ -93,39 +93,10 @@ namespace Waher.Security.EllipticCurves
 
 				if (c < MaxC)
 					Buffer.BlockCopy(Hash, 0, Hash2, MaxC - c, c);
-				else if (Curve.MsbOrderMask == 0)
-					Buffer.BlockCopy(Hash, 0, Hash2, 1, MaxC - 1);	// c >= MaxC
 				else
 					Buffer.BlockCopy(Hash, 0, Hash2, 0, MaxC);
 
 				Hash = Hash2;
-			}
-
-			if (Curve.MsbOrderMask != 0)
-			{
-				bool Carry;
-				int i;
-				byte b;
-				byte MsbMask = Curve.MsbOrderMask;
-
-				while (MsbMask != 0xff)
-				{
-					Carry = false;
-
-					for (i = 0; i < c; i++)
-					{
-						b = Hash[i];
-
-						if (Carry)
-							Hash[i] = (byte)((b >> 1) | 0x80);
-						else
-							Hash[i] = (byte)(b >> 1);
-
-						Carry = (b & 1) != 0;
-					}
-
-					MsbMask = (byte)((MsbMask << 1) | 1);
-				}
 			}
 
 			return EllipticCurve.ToInt(Hash, true);

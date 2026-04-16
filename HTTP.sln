@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.Files", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.XmlLedger", "Persistence\Waher.Persistence.XmlLedger\Waher.Persistence.XmlLedger.csproj", "{B5393774-223B-23D2-B46C-E4C861669BC0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP.JsonRpc", "Networking\Waher.Networking.HTTP.JsonRpc\Waher.Networking.HTTP.JsonRpc.csproj", "{5BA7C7ED-4D27-7E58-9BBE-1B4F122D46B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +119,10 @@ Global
 		{B5393774-223B-23D2-B46C-E4C861669BC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5393774-223B-23D2-B46C-E4C861669BC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5393774-223B-23D2-B46C-E4C861669BC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BA7C7ED-4D27-7E58-9BBE-1B4F122D46B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BA7C7ED-4D27-7E58-9BBE-1B4F122D46B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BA7C7ED-4D27-7E58-9BBE-1B4F122D46B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BA7C7ED-4D27-7E58-9BBE-1B4F122D46B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

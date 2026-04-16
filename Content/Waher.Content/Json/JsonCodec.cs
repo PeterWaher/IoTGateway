@@ -19,6 +19,11 @@ namespace Waher.Content.Json
 		/// </summary>
 		public const string DefaultContentType = "application/json";
 
+		/// <summary>
+		/// application/json-rpc
+		/// </summary>
+		public const string JsonRpcContentType = "application/json-rpc";
+
         /// <summary>
         /// json
         /// </summary>
@@ -37,9 +42,9 @@ namespace Waher.Content.Json
         public static readonly string[] JsonContentTypes = new string[]
         {
             DefaultContentType,
-            "text/x-json",
-			"application/json-rpc",
-			"application/jsonrequest"
+			JsonRpcContentType,
+			"application/jsonrequest",
+            "text/x-json"
 		};
 
         /// <summary>

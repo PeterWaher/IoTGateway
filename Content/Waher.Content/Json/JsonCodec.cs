@@ -37,8 +37,10 @@ namespace Waher.Content.Json
         public static readonly string[] JsonContentTypes = new string[]
         {
             DefaultContentType,
-            "text/x-json"
-        };
+            "text/x-json",
+			"application/json-rpc",
+			"application/jsonrequest"
+		};
 
         /// <summary>
         /// JSON file extensions.

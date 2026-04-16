@@ -1,10 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.HTTP.JsonRpc;
+using Waher.Networking.HTTP.JsonRpc.Exceptions;
 using Waher.Networking.Sniffers;
 using Waher.Security;
 
@@ -89,33 +91,187 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1)]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2)]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1)]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2)]
-		public async Task Test_01_RequestDictionaryParameters(JsonRpcHttpMethod Method, JsonRpcVersion Version)
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
+		public async Task Test_01_RequestDictionaryParameters(JsonRpcHttpMethod Method,
+			JsonRpcVersion Version, string MethodName, int A, int B)
 		{
-			object Result = await this.client.Request(Method, Version, "sum",
+			object Result = await this.client.Request(Method, Version, MethodName,
 				new Dictionary<string, object>()
-				{ 
-					{ "a", 3 },
-					{ "b", 4 }
+				{
+					{ "a", A },
+					{ "b", B }
 				});
 
-			Assert.AreEqual(7, Result);
+			Assert.AreEqual(A + B, Result);
 		}
 
 		[TestMethod]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1)]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2)]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1)]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2)]
-		public async Task Test_02_RequestArrayParameters(JsonRpcHttpMethod Method, JsonRpcVersion Version)
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
+		public async Task Test_02_RequestArrayParameters(JsonRpcHttpMethod Method,
+			JsonRpcVersion Version, string MethodName, int A, int B)
 		{
-			object Result = await this.client.Request(Method, Version, "sum",
-				new object[] { 3, 4 });
+			object Result = await this.client.Request(Method, Version, MethodName,
+				new object[] { A, B });
 
-			Assert.AreEqual(7, Result);
+			Assert.AreEqual(A + B, Result);
+		}
+
+		[TestMethod]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
+		public async Task Test_03_NotifyDictionaryParameters(JsonRpcHttpMethod Method,
+			JsonRpcVersion Version, string MethodName, int A, int B)
+		{
+			await this.client.Notify(Method, Version, MethodName,
+				new Dictionary<string, object>()
+				{
+					{ "a", A },
+					{ "b", B }
+				});
+		}
+
+		[TestMethod]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
+		public async Task Test_04_NotifyArrayParameters(JsonRpcHttpMethod Method,
+			JsonRpcVersion Version, string MethodName, int A, int B)
+		{
+			await this.client.Notify(Method, Version, MethodName,
+				new object[] { A, B });
+		}
+
+		[TestMethod]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		public async Task Test_05_RequestDictionaryParameters_Error(JsonRpcHttpMethod Method,
+			JsonRpcVersion Version, string MethodName, object A, object B,
+			Type ExpectedException)
+		{
+			Exception Exception = null;
+
+			try
+			{
+				await this.client.Request(Method, Version, MethodName,
+					new Dictionary<string, object>()
+					{
+						{ "a", A },
+						{ "b", B }
+					});
+			}
+			catch (Exception ex)
+			{
+				Exception = ex;
+			}
+
+			Assert.IsNotNull(Exception, "Exception expected.");
+			Assert.AreEqual(ExpectedException, Exception.GetType());
+		}
+
+		[TestMethod]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		public async Task Test_06_RequestArrayParameters_Error(JsonRpcHttpMethod Method,
+			JsonRpcVersion Version, string MethodName, object A, object B,
+			Type ExpectedException)
+		{
+			Exception Exception = null;
+
+			try
+			{
+				await this.client.Request(Method, Version, MethodName,
+					new object[] { A, B });
+			}
+			catch (Exception ex)
+			{
+				Exception = ex;
+			}
+
+			Assert.IsNotNull(Exception, "Exception expected.");
+			Assert.AreEqual(ExpectedException, Exception.GetType());
+		}
+
+		[TestMethod]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		public async Task Test_07_NotifyDictionaryParameters_Error(JsonRpcHttpMethod Method,
+			JsonRpcVersion Version, string MethodName, object A, object B,
+			Type ExpectedException)
+		{
+			Exception Exception = null;
+
+			try
+			{
+				await this.client.Notify(Method, Version, MethodName,
+					new Dictionary<string, object>()
+					{
+						{ "a", A },
+						{ "b", B }
+					});
+			}
+			catch (Exception ex)
+			{
+				Exception = ex;
+			}
+
+			Assert.IsNotNull(Exception, "Exception expected.");
+			Assert.AreEqual(ExpectedException, Exception.GetType());
+		}
+
+		[TestMethod]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		public async Task Test_08_NotifyArrayParameters_Error(JsonRpcHttpMethod Method,
+			JsonRpcVersion Version, string MethodName, object A, object B,
+			Type ExpectedException)
+		{
+			Exception Exception = null;
+
+			try
+			{
+				await this.client.Notify(Method, Version, MethodName,
+					new object[] { A, B });
+			}
+			catch (Exception ex)
+			{
+				Exception = ex;
+			}
+
+			Assert.IsNotNull(Exception, "Exception expected.");
+			Assert.AreEqual(ExpectedException, Exception.GetType());
 		}
 	}
 }

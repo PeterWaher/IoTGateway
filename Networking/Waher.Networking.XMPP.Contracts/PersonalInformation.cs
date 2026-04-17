@@ -165,6 +165,11 @@ namespace Waher.Networking.XMPP.Contracts
 		public int? BirthDay = null;
 
 		/// <summary>
+		/// Age above the stated number of years
+		/// </summary>
+		public int? AgeAbove = null;
+
+		/// <summary>
 		/// If identity has organization information
 		/// </summary>
 		public bool HasOrg = false;

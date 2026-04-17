@@ -917,6 +917,11 @@ namespace Waher.Networking.XMPP.Contracts
 							Result.BirthYear = i;
 						break;
 
+					case "AGEABOVE":
+						if (int.TryParse(P.Value.ToString(), out i) && i >= 0)
+							Result.AgeAbove = i;
+						break;
+
 					case "PNR":
 						Result.PersonalNumber = P.Value;
 						break;

@@ -92,6 +92,7 @@
 								<xs:documentation>BDAY = Birth Day</xs:documentation>
 								<xs:documentation>BMONTH = Birth Month</xs:documentation>
 								<xs:documentation>BYEAR = Birth Year</xs:documentation>
+								<xs:documentation>AGEABOVE = Age above the stated number of years</xs:documentation>
 								<xs:documentation>GENDER = Gender (M or F)</xs:documentation>
 								<xs:documentation>PHONE = Phone number, international phone number format.</xs:documentation>
 								<xs:documentation>EMAIL = E-mail address.</xs:documentation>

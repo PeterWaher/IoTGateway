@@ -73,7 +73,7 @@ namespace Waher.Content.Json
         /// <returns>If the decoder can decode an object with the given type.</returns>
         public bool Decodes(string ContentType, out Grade Grade)
         {
-            if (ContentType == DefaultContentType || ContentType == "text/x-json")
+            if (Array.IndexOf(JsonContentTypes, ContentType) >= 0)
             {
                 Grade = Grade.Excellent;
                 return true;
@@ -214,7 +214,12 @@ namespace Waher.Content.Json
 			ICodecProgress Progress, params string[] AcceptedContentTypes)
         {
             string Json = JSON.Encode(Object, false);
-            string ContentType = DefaultContentType;
+
+            if (!InternetContent.IsAccepted(JsonContentTypes, out string ContentType,
+                AcceptedContentTypes))
+            {
+                ContentType = DefaultContentType;
+            }
 
             if (Encoding is null)
             {

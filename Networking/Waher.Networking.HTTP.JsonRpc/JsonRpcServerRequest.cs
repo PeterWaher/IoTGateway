@@ -9,11 +9,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 	/// <summary>
 	/// Information about a JSON-RPC request.
 	/// </summary>
-	internal class JsonRpcRequest : IDisposable
+	internal class JsonRpcServerRequest : IDisposable
 	{
 		public Dictionary<string, object?> ResponseObj = new Dictionary<string, object?>();
 		public Dictionary<string, object>? ParametersObj = null;
-		public MethodInfo? MethodInfo = null;
+		public JsonRpcMethodInfo? MethodInfo = null;
 		public Array? ParametersArray = null;
 		public string JsonVersion = string.Empty;
 		public object? Id = null;

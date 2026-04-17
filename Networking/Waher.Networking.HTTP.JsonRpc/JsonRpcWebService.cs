@@ -18,7 +18,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 	{
 		private static readonly JsonCodec jsonCodec = new JsonCodec();
 
-		private readonly Dictionary<string, MethodInfo> methods = new Dictionary<string, MethodInfo>();
+		private readonly Dictionary<string, JsonRpcMethodInfo> methods = new Dictionary<string, JsonRpcMethodInfo>();
 		private readonly bool userSessions;
 
 		/// <summary>
@@ -73,7 +73,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				if (this.methods.ContainsKey(Name))
 					throw new Exception("Method already registered: " + Name);
 
-				this.methods[Name] = new MethodInfo(Method);
+				this.methods[Name] = new JsonRpcMethodInfo(Method);
 			}
 		}
 
@@ -88,7 +88,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			{
 				string Name = Method.Method.Name;
 
-				if (this.methods.TryGetValue(Name, out MethodInfo Prev) &&
+				if (this.methods.TryGetValue(Name, out JsonRpcMethodInfo Prev) &&
 					Prev.Method == Method)
 				{
 					return this.methods.Remove(Name);
@@ -106,7 +106,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
-			using JsonRpcRequest JsonRpcRequest = new JsonRpcRequest();
+			using JsonRpcServerRequest JsonRpcRequest = new JsonRpcServerRequest();
 
 			foreach (KeyValuePair<string, string> P in Request.Header.QueryParameters)
 			{
@@ -143,7 +143,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
-			using JsonRpcRequest JsonRpcRequest = new JsonRpcRequest();
+			using JsonRpcServerRequest JsonRpcRequest = new JsonRpcServerRequest();
 
 			if (!Request.HasData)
 				JsonRpcRequest.SetError(-32600, "No payload.", 400);
@@ -165,7 +165,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			await this.SendResponse(JsonRpcRequest, Response);
 		}
 
-		private async Task SendResponse(JsonRpcRequest Request, HttpResponse Response)
+		private async Task SendResponse(JsonRpcServerRequest Request, HttpResponse Response)
 		{
 			if (Request.StatusCode == 204)
 				Response.StatusCode = Request.StatusCode;
@@ -195,7 +195,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			await Response.SendResponse();
 		}
 
-		private void ProcessQueryParameter(JsonRpcRequest Request, string Key, object Value)
+		private void ProcessQueryParameter(JsonRpcServerRequest Request, string Key, object Value)
 		{
 			switch (Key)
 			{

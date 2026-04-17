@@ -8,14 +8,14 @@ namespace Waher.Networking.HTTP.JsonRpc
 	/// <summary>
 	/// Information about a method published via a JSON-RPC web service.
 	/// </summary>
-	internal class MethodInfo
+	internal class JsonRpcMethodInfo
 	{
 		public Delegate Method;
 		public int NrArguments;
 		public Dictionary<string, int> NamedArguments;
 		public ParameterInfo[] Arguments;
 
-		public MethodInfo(Delegate Method)
+		public JsonRpcMethodInfo(Delegate Method)
 		{
 			this.Method = Method;
 			this.Arguments = Method.Method.GetParameters();

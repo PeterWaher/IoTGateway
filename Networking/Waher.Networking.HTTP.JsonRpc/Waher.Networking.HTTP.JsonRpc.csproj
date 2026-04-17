@@ -34,6 +34,7 @@
 	<ItemGroup>
     <ProjectReference Include="..\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
-  </ItemGroup>
+		<ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
+	</ItemGroup>
 
 </Project>

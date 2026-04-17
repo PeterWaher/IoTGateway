@@ -45,12 +45,22 @@ namespace Waher.Networking.HTTP.Test
 
 			this.server = new HttpServer(8081);
 
-			this.jsonRpcWebService = new JsonRpcWebService("/endpoint", true);
+			this.jsonRpcWebService = new JsonRpcWebService("/endpoint", true, Add, Sub);
 			this.server.Register(this.jsonRpcWebService);
 
 			this.client = new JsonRpcClient("http://localhost:8081/endpoint",
 				new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine),
 				this.xmlSniffer);
+		}
+
+		private static int Add(int a, int b)
+		{
+			return a + b;
+		}
+
+		private static int Sub(int a, int b)
+		{
+			return a - b;
 		}
 
 		[TestCleanup]
@@ -91,12 +101,24 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Add", 3, 4, 7)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "Add", 3, 4, 7)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "Add", 3, 4, 7)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "Add", 3, 4, 7)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Add", 4, 3, 7)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "Add", 4, 3, 7)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "Add", 4, 3, 7)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "Add", 4, 3, 7)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Sub", 3, 4, -1)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "Sub", 3, 4, -1)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "Sub", 3, 4, -1)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "Sub", 3, 4, -1)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Sub", 4, 3, 1)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "Sub", 4, 3, 1)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "Sub", 4, 3, 1)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "Sub", 4, 3, 1)]
 		public async Task Test_01_RequestDictionaryParameters(JsonRpcHttpMethod Method,
-			JsonRpcVersion Version, string MethodName, int A, int B)
+			JsonRpcVersion Version, string MethodName, int A, int B, int ExpectedResult)
 		{
 			object Result = await this.client.Request(Method, Version, MethodName,
 				new Dictionary<string, object>()
@@ -105,28 +127,40 @@ namespace Waher.Networking.HTTP.Test
 					{ "b", B }
 				});
 
-			Assert.AreEqual(A + B, Result);
+			Assert.AreEqual(ExpectedResult, Result);
 		}
 
 		[TestMethod]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Add", 3, 4, 7)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "Add", 3, 4, 7)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "Add", 3, 4, 7)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "Add", 3, 4, 7)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Add", 4, 3, 7)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "Add", 4, 3, 7)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "Add", 4, 3, 7)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "Add", 4, 3, 7)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Sub", 3, 4, -1)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "Sub", 3, 4, -1)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "Sub", 3, 4, -1)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "Sub", 3, 4, -1)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Sub", 4, 3, 1)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "Sub", 4, 3, 1)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "Sub", 4, 3, 1)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "Sub", 4, 3, 1)]
 		public async Task Test_02_RequestArrayParameters(JsonRpcHttpMethod Method,
-			JsonRpcVersion Version, string MethodName, int A, int B)
+			JsonRpcVersion Version, string MethodName, int A, int B, int ExpectedResult)
 		{
 			object Result = await this.client.Request(Method, Version, MethodName,
 				new object[] { A, B });
 
-			Assert.AreEqual(A + B, Result);
+			Assert.AreEqual(ExpectedResult, Result);
 		}
 
 		[TestMethod]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "Add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "Add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "Add", 3, 4)]
 		public async Task Test_03_NotifyDictionaryParameters(JsonRpcHttpMethod Method,
 			JsonRpcVersion Version, string MethodName, int A, int B)
 		{
@@ -139,10 +173,10 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", 3, 4)]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "Add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "Add", 3, 4)]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "Add", 3, 4)]
 		public async Task Test_04_NotifyArrayParameters(JsonRpcHttpMethod Method,
 			JsonRpcVersion Version, string MethodName, int A, int B)
 		{
@@ -155,10 +189,10 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
 		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
 		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
 		public async Task Test_05_RequestDictionaryParameters_Error(JsonRpcHttpMethod Method,
 			JsonRpcVersion Version, string MethodName, object A, object B,
 			Type ExpectedException)
@@ -188,10 +222,10 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
 		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
 		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
 		public async Task Test_06_RequestArrayParameters_Error(JsonRpcHttpMethod Method,
 			JsonRpcVersion Version, string MethodName, object A, object B,
 			Type ExpectedException)
@@ -217,10 +251,10 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
 		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
 		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
 		public async Task Test_07_NotifyDictionaryParameters_Error(JsonRpcHttpMethod Method,
 			JsonRpcVersion Version, string MethodName, object A, object B,
 			Type ExpectedException)
@@ -250,10 +284,10 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
 		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
 		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "X", 3, 4, typeof(JsonRpcMethodNotFoundError))]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
-		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
-		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "add", "3", "4", typeof(JsonRpcInvalidRequestError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV2, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV1, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
+		[DataRow(JsonRpcHttpMethod.POST, JsonRpcVersion.JsonRpcV2, "Add", "a", "b", typeof(JsonRpcInvalidParametersError))]
 		public async Task Test_08_NotifyArrayParameters_Error(JsonRpcHttpMethod Method,
 			JsonRpcVersion Version, string MethodName, object A, object B,
 			Type ExpectedException)

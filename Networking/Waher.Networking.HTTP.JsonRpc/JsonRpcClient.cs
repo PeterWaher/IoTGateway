@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Getters;
 using Waher.Content.Json;
 using Waher.Networking.HTTP.JsonRpc.Exceptions;
 using Waher.Networking.Sniffers;
@@ -14,6 +14,7 @@ using Waher.Security;
 namespace Waher.Networking.HTTP.JsonRpc
 {
 	// TODO: Custom authentication (e.g. Bearer JWT, WWW-Authenticate)
+	// TODO: Batch calls
 
 	/// <summary>
 	/// A JSON-RPC client
@@ -194,20 +195,17 @@ namespace Waher.Networking.HTTP.JsonRpc
 			Dictionary<string, object> Payload)
 		{
 			ContentResponse Response = await this.DoNotification(HttpMethod, Payload);
+			Response.AssertOk();
 
 			if (!(Response.Decoded is Dictionary<string, object> JsonResponse))
 			{
-				Response.AssertOk();
-
 				throw new JsonRpcException("Unexpected response received of type " +
 					Response.Decoded?.GetType().FullName);
 			}
 
 			object? Result = null;
-			object? Error = null;
 			long? Id = null;
 			bool HasResult = false;
-			bool HasError = false;
 
 			foreach (KeyValuePair<string, object> P in JsonResponse)
 			{
@@ -221,9 +219,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 						HasResult = true;
 						break;
 
-					case "error":
-						Error = P.Value;
-						HasError = !(Error is null);
+					case "error":	// Processed in DoNotification
 						break;
 
 					case "id":
@@ -241,77 +237,6 @@ namespace Waher.Networking.HTTP.JsonRpc
 						throw new JsonRpcException("Unexpected response received: Unknown property: " + P.Key);
 				}
 			}
-
-			if (HasError)
-			{
-				if (Error is Dictionary<string, object> ErrorObj)
-				{
-					object? Code = null;
-					object? Message = null;
-					object? Data = null;
-
-					foreach (KeyValuePair<string, object> P in ErrorObj)
-					{
-						switch (P.Key)
-						{
-							case "code":
-								Code = P.Value;
-								break;
-
-							case "message":
-								Message = P.Value;
-								break;
-
-							case "data":
-								Data = P.Value;
-								break;
-
-							default:
-								throw new JsonRpcException("Unexpected response received: Unknown property in error object: " + P.Key);
-						}
-					}
-
-					if (Code is null && Message is null)
-						throw new JsonRpcException("Unknown error");
-
-					if (!(Message is string Msg))
-						throw new JsonRpcException("Unexpected error message returned.");
-
-					if (Code is null)
-						throw new JsonRpcException(Msg);
-
-					if (!(Code is int ErrorCode))
-						throw new JsonRpcException("Unexpected error code returned.");
-
-					switch (ErrorCode)
-					{
-						case -32700:
-							throw new JsonRpcParseError(ErrorCode, Msg, Data);
-
-						case -32600:
-							throw new JsonRpcInvalidRequestError(ErrorCode, Msg, Data);
-
-						case -32601:
-							throw new JsonRpcMethodNotFoundError(ErrorCode, Msg, Data);
-
-						case -32602:
-							throw new JsonRpcInvalidParametersError(ErrorCode, Msg, Data);
-
-						case -32603:
-							throw new JsonRpcInternalError(ErrorCode, Msg, Data);
-
-						default:
-							if (ErrorCode <= -32000 && ErrorCode >= -32099)
-								throw new JsonRpcServerError(ErrorCode, Msg, Data);
-							else
-								throw new JsonRpcError(ErrorCode, Msg, Data);
-					}
-				}
-				else
-					throw new JsonRpcException("Unexpected response received: Error property is not an object.");
-			}
-
-			Response.AssertOk();
 
 			if (!HasResult)
 				throw new JsonRpcException("Unexpected response received: Result property missing.");
@@ -481,7 +406,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 					sb.Append(P.Key);
 					sb.Append('=');
-					sb.Append(WebUtility.UrlEncode(P.Value.ToString()));
+
+					if (P.Value is string s)
+						sb.Append(System.Net.WebUtility.UrlEncode(s));
+					else
+						sb.Append(System.Net.WebUtility.UrlEncode(JSON.Encode(P.Value, false)));
 				}
 
 				Response = await InternetContent.GetAsync(
@@ -495,18 +424,58 @@ namespace Waher.Networking.HTTP.JsonRpc
 					new KeyValuePair<string, string>("Accept", JsonCodec.JsonRpcContentType));
 			}
 
-			if (this.HasSniffers)
+			if (Response.HasError)
 			{
-				if (Response.HasError)
+				if (!(Response.Error is WebException ex) || ex.Content is null)
 				{
-					if (Response.Encoded is null)
+					if (this.HasSniffers)
 						this.Error(Response.Error.Message);
-					else
-						this.Error(JSON.Encode(Response.Decoded, true));
 				}
 				else
-					this.ReceiveText(JSON.Encode(Response.Decoded, true));
+				{
+					if (this.HasSniffers)
+						this.Error(JSON.Encode(ex.Content, true));
+
+					if (ex.Content is Dictionary<string, object> Result &&
+						Result.TryGetValue("error", out object ErrorObj) &&
+						ErrorObj is Dictionary<string, object> Error &&
+						Error.TryGetValue("code", out object Obj) && Obj is int ErrorCode &&
+						Error.TryGetValue("message", out Obj) && Obj is string ErrorMessage)
+					{
+						switch (ErrorCode)
+						{
+							case -32700:
+								Response = new ContentResponse(new JsonRpcParseError(ErrorCode, ErrorMessage, null));
+								break;
+
+							case -32600:
+								Response = new ContentResponse(new JsonRpcInvalidRequestError(ErrorCode, ErrorMessage, null));
+								break;
+
+							case -32601:
+								Response = new ContentResponse(new JsonRpcMethodNotFoundError(ErrorCode, ErrorMessage, null));
+								break;
+
+							case -32602:
+								Response = new ContentResponse(new JsonRpcInvalidParametersError(ErrorCode, ErrorMessage, null));
+								break;
+
+							case -32603:
+								Response = new ContentResponse(new JsonRpcInternalError(ErrorCode, ErrorMessage, null));
+								break;
+
+							default:
+								if (ErrorCode <= -32000 && ErrorCode >= -32099)
+									Response = new ContentResponse(new JsonRpcServerError(ErrorCode, ErrorMessage, null));
+								else
+									Response = new ContentResponse(new JsonRpcError(ErrorCode, ErrorMessage, null));
+								break;
+						}
+					}
+				}
 			}
+			else if (this.HasSniffers)
+				this.ReceiveText(JSON.Encode(Response.Decoded, true));
 
 			return Response;
 		}

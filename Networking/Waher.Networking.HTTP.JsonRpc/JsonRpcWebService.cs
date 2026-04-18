@@ -150,15 +150,41 @@ namespace Waher.Networking.HTTP.JsonRpc
 			else
 			{
 				ContentResponse RequestData = await Request.DecodeDataAsync();
+
 				if (RequestData.HasError)
 					JsonRpcRequest.SetError(-32700, "Unable to parse payload.", 500);
-				else if (!(RequestData.Decoded is Dictionary<string, object> RequestObj))
-					JsonRpcRequest.SetError(-32600, "Expected JSON object in request.", 400);
-				else
+				else if (RequestData.Decoded is Dictionary<string, object> RequestObj)
 				{
 					foreach (KeyValuePair<string, object> P in RequestObj)
 						this.ProcessQueryParameter(JsonRpcRequest, P.Key, P.Value);
 				}
+				else if (RequestData.Decoded is Array Requests)
+				{
+					int i, c = Requests.Length;
+
+					if (c == 0)
+						JsonRpcRequest.SetError(-32600, "Empty request.", 400);
+					else
+					{
+						JsonRpcRequest.BatchRequests = new JsonRpcServerRequest[c];
+
+						for (i = 0; i < c; i++)
+						{
+							JsonRpcServerRequest ItemRequest = new JsonRpcServerRequest();
+							JsonRpcRequest.BatchRequests[i] = ItemRequest;
+
+							if (Requests.GetValue(i) is Dictionary<string, object> ItemRequestObj)
+							{
+								foreach (KeyValuePair<string, object> P in ItemRequestObj)
+									this.ProcessQueryParameter(ItemRequest, P.Key, P.Value);
+							}
+							else
+								ItemRequest.SetError(-32600, "Expected JSON object or array of JSON objects in request.", 400);
+						}
+					}
+				}
+				else
+					JsonRpcRequest.SetError(-32600, "Expected JSON object or array of JSON objects in request.", 400);
 			}
 
 			await JsonRpcRequest.BuildResponse();
@@ -171,7 +197,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				Response.StatusCode = Request.StatusCode;
 			else
 			{
-				ContentResponse Encoded = await jsonCodec.EncodeAsync(Request.ResponseObj,
+				ContentResponse Encoded = await jsonCodec.EncodeAsync(Request.Response,
 					Encoding.UTF8, null, JsonCodec.JsonRpcContentType);
 
 				if (Encoded.HasError)
@@ -227,8 +253,6 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 				case "id":
 					Request.Id = Value;
-					if (Request.StatusCode == 204)
-						Request.StatusCode = 200;
 					break;
 
 				default:

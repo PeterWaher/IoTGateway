@@ -14,7 +14,6 @@ using Waher.Security;
 namespace Waher.Networking.HTTP.JsonRpc
 {
 	// TODO: Custom authentication (e.g. Bearer JWT, WWW-Authenticate)
-	// TODO: Batch calls
 
 	/// <summary>
 	/// A JSON-RPC client
@@ -161,7 +160,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public Task<object?> Request(JsonRpcHttpMethod HttpMethod, JsonRpcVersion Version,
 			string Method, Dictionary<string, object> Parameters)
 		{
-			return this.DoRequest(HttpMethod, this.BuildRequest(Version, Method, Parameters, this.id++));
+			return this.Request(HttpMethod, new JsonRpcRequest(Version, Method, Parameters));
 		}
 
 		/// <summary>
@@ -174,7 +173,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public Task<object?> Request(JsonRpcHttpMethod HttpMethod, JsonRpcVersion Version,
 			string Method)
 		{
-			return this.DoRequest(HttpMethod, this.BuildRequest(Version, Method, null, this.id++));
+			return this.Request(HttpMethod, new JsonRpcRequest(Version, Method));
 		}
 
 		/// <summary>
@@ -188,13 +187,29 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public Task<object?> Request(JsonRpcHttpMethod HttpMethod, JsonRpcVersion Version,
 			string Method, IEnumerable Parameters)
 		{
-			return this.DoRequest(HttpMethod, this.BuildRequest(Version, Method, Parameters, this.id++));
+			return this.Request(HttpMethod, new JsonRpcRequest(Version, Method, Parameters));
 		}
 
-		private async Task<object?> DoRequest(JsonRpcHttpMethod HttpMethod,
-			Dictionary<string, object> Payload)
+		/// <summary>
+		/// Performs a JSON-RPC request.
+		/// </summary>
+		/// <param name="Request">Request object.</param>
+		/// <returns>Result</returns>
+		public Task<object?> Request(JsonRpcRequest Request)
 		{
-			ContentResponse Response = await this.DoNotification(HttpMethod, Payload);
+			return this.Request(JsonRpcHttpMethod.POST, Request);
+		}
+
+		/// <summary>
+		/// Performs a JSON-RPC request.
+		/// </summary>
+		/// <param name="HttpMethod">HTTP Method</param>
+		/// <param name="Request">Request object.</param>
+		/// <returns>Result</returns>
+		public async Task<object?> Request(JsonRpcHttpMethod HttpMethod, JsonRpcRequest Request)
+		{
+			Dictionary<string, object> Payload = Request.BuildRequest(this.id++);
+			ContentResponse Response = await this.SendNotification(HttpMethod, Payload);
 			Response.AssertOk();
 
 			if (!(Response.Decoded is Dictionary<string, object> JsonResponse))
@@ -203,74 +218,22 @@ namespace Waher.Networking.HTTP.JsonRpc
 					Response.Decoded?.GetType().FullName);
 			}
 
-			object? Result = null;
-			long? Id = null;
-			bool HasResult = false;
+			JsonRpcResult Result = new JsonRpcResult(JsonResponse);
 
-			foreach (KeyValuePair<string, object> P in JsonResponse)
-			{
-				switch (P.Key)
-				{
-					case "jsonrpc":
-						break;
-
-					case "result":
-						Result = P.Value;
-						HasResult = true;
-						break;
-
-					case "error":	// Processed in DoNotification
-						break;
-
-					case "id":
-						if (P.Value is long l)
-							Id = l;
-						else if (P.Value is int i)
-							Id = i;
-						else if (P.Value is string s && long.TryParse(s, out l))
-							Id = l;
-						else
-							throw new JsonRpcException("Unexpected response received: Id property is not a valid integer.");
-						break;
-
-					default:
-						throw new JsonRpcException("Unexpected response received: Unknown property: " + P.Key);
-				}
-			}
-
-			if (!HasResult)
+			if (!Result.HasResult)
 				throw new JsonRpcException("Unexpected response received: Result property missing.");
 
-			if (!Id.HasValue)
+			if (!Result.Id.HasValue)
 				throw new JsonRpcException("Unexpected response received: Id property missing.");
 
 			if (Payload.TryGetValue("id", out object PrevIdObj) &&
 				PrevIdObj is long PrevId &&
-				PrevId != Id.Value)
+				PrevId != Result.Id.Value)
 			{
 				throw new JsonRpcException("Response did not match request.");
 			}
 
-			return Result;
-		}
-
-		private Dictionary<string, object> BuildRequest(JsonRpcVersion Version, string Method,
-			object? Parameters, long? Id)
-		{
-			Dictionary<string, object> Request = new Dictionary<string, object>();
-
-			if (Version == JsonRpcVersion.JsonRpcV2)
-				Request["jsonrpc"] = "2.0";
-
-			Request["method"] = Method;
-
-			if (!(Parameters is null))
-				Request["params"] = Parameters;
-
-			if (Id.HasValue)
-				Request["id"] = Id.Value;
-
-			return Request;
+			return Result.Result;
 		}
 
 		/// <summary>
@@ -345,11 +308,10 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="Version">JSON-RPC version</param>
 		/// <param name="Method">Method to call</param>
 		/// <param name="Parameters">Parameters of method call</param>
-		public async Task Notify(JsonRpcHttpMethod HttpMethod, JsonRpcVersion Version,
+		public Task Notify(JsonRpcHttpMethod HttpMethod, JsonRpcVersion Version,
 			string Method, Dictionary<string, object> Parameters)
 		{
-			ContentResponse Response = await this.DoNotification(HttpMethod, this.BuildRequest(Version, Method, Parameters, null));
-			Response.AssertOk();
+			return this.Notify(HttpMethod, new JsonRpcRequest(Version, Method, Parameters));
 		}
 
 		/// <summary>
@@ -358,11 +320,10 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="HttpMethod">HTTP Method</param>
 		/// <param name="Version">JSON-RPC version</param>
 		/// <param name="Method">Method to call</param>
-		public async Task Notify(JsonRpcHttpMethod HttpMethod, JsonRpcVersion Version,
+		public Task Notify(JsonRpcHttpMethod HttpMethod, JsonRpcVersion Version,
 			string Method)
 		{
-			ContentResponse Response = await this.DoNotification(HttpMethod, this.BuildRequest(Version, Method, null, null));
-			Response.AssertOk();
+			return this.Notify(HttpMethod, new JsonRpcRequest(Version, Method));
 		}
 
 		/// <summary>
@@ -372,14 +333,33 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="Version">JSON-RPC version</param>
 		/// <param name="Method">Method to call</param>
 		/// <param name="Parameters">Parameters of method call</param>
-		public async Task Notify(JsonRpcHttpMethod HttpMethod,
+		public Task Notify(JsonRpcHttpMethod HttpMethod,
 			JsonRpcVersion Version, string Method, IEnumerable Parameters)
 		{
-			ContentResponse Response = await this.DoNotification(HttpMethod, this.BuildRequest(Version, Method, Parameters, null));
+			return this.Notify(HttpMethod, new JsonRpcRequest(Version, Method, Parameters));
+		}
+
+		/// <summary>
+		/// Sends a JSON-RPC notification.
+		/// </summary>
+		/// <param name="Request">Request object.</param>
+		public Task Notify(JsonRpcRequest Request)
+		{
+			return this.Notify(JsonRpcHttpMethod.POST, Request);
+		}
+
+		/// <summary>
+		/// Sends a JSON-RPC notification.
+		/// </summary>
+		/// <param name="HttpMethod">HTTP Method</param>
+		/// <param name="Request">Request object.</param>
+		public async Task Notify(JsonRpcHttpMethod HttpMethod, JsonRpcRequest Request)
+		{
+			ContentResponse Response = await this.SendNotification(HttpMethod, Request.BuildRequest(null));
 			Response.AssertOk();
 		}
 
-		private async Task<ContentResponse> DoNotification(JsonRpcHttpMethod HttpMethod,
+		private async Task<ContentResponse> SendNotification(JsonRpcHttpMethod HttpMethod,
 			Dictionary<string, object> Payload)
 		{
 			if (this.HasSniffers)
@@ -436,48 +416,119 @@ namespace Waher.Networking.HTTP.JsonRpc
 					if (this.HasSniffers)
 						this.Error(JSON.Encode(ex.Content, true));
 
-					if (ex.Content is Dictionary<string, object> Result &&
-						Result.TryGetValue("error", out object ErrorObj) &&
-						ErrorObj is Dictionary<string, object> Error &&
-						Error.TryGetValue("code", out object Obj) && Obj is int ErrorCode &&
-						Error.TryGetValue("message", out Obj) && Obj is string ErrorMessage)
-					{
-						switch (ErrorCode)
-						{
-							case -32700:
-								Response = new ContentResponse(new JsonRpcParseError(ErrorCode, ErrorMessage, null));
-								break;
-
-							case -32600:
-								Response = new ContentResponse(new JsonRpcInvalidRequestError(ErrorCode, ErrorMessage, null));
-								break;
-
-							case -32601:
-								Response = new ContentResponse(new JsonRpcMethodNotFoundError(ErrorCode, ErrorMessage, null));
-								break;
-
-							case -32602:
-								Response = new ContentResponse(new JsonRpcInvalidParametersError(ErrorCode, ErrorMessage, null));
-								break;
-
-							case -32603:
-								Response = new ContentResponse(new JsonRpcInternalError(ErrorCode, ErrorMessage, null));
-								break;
-
-							default:
-								if (ErrorCode <= -32000 && ErrorCode >= -32099)
-									Response = new ContentResponse(new JsonRpcServerError(ErrorCode, ErrorMessage, null));
-								else
-									Response = new ContentResponse(new JsonRpcError(ErrorCode, ErrorMessage, null));
-								break;
-						}
-					}
+					Response = this.CheckJsonRpcError(Response);
 				}
 			}
 			else if (this.HasSniffers)
 				this.ReceiveText(JSON.Encode(Response.Decoded, true));
 
 			return Response;
+		}
+
+		private ContentResponse CheckJsonRpcError(ContentResponse Response)
+		{
+			if (Response.HasError &&
+				Response.Error is WebException ex &&
+				ex.Content is Dictionary<string, object> Result &&
+				Result.TryGetValue("error", out object ErrorObj) &&
+				ErrorObj is Dictionary<string, object> Error &&
+				Error.TryGetValue("code", out object Obj) && Obj is int ErrorCode &&
+				Error.TryGetValue("message", out Obj) && Obj is string ErrorMessage)
+			{
+				return new ContentResponse(GetError(ErrorCode, ErrorMessage));
+			}
+			else
+				return Response;
+		}
+
+		internal static JsonRpcError GetError(int ErrorCode, string ErrorMessage)
+		{
+			switch (ErrorCode)
+			{
+				case -32700:
+					return new JsonRpcParseError(ErrorCode, ErrorMessage, null);
+
+				case -32600:
+					return new JsonRpcInvalidRequestError(ErrorCode, ErrorMessage, null);
+
+				case -32601:
+					return new JsonRpcMethodNotFoundError(ErrorCode, ErrorMessage, null);
+
+				case -32602:
+					return new JsonRpcInvalidParametersError(ErrorCode, ErrorMessage, null);
+
+				case -32603:
+					return new JsonRpcInternalError(ErrorCode, ErrorMessage, null);
+
+				default:
+					if (ErrorCode <= -32000 && ErrorCode >= -32099)
+						return new JsonRpcServerError(ErrorCode, ErrorMessage, null);
+					else
+						return new JsonRpcError(ErrorCode, ErrorMessage, null);
+			}
+		}
+
+		/// <summary>
+		/// Processes a batch of requests.
+		/// </summary>
+		/// <param name="Requests">Request objects.</param>
+		/// <returns>Responses to requests. Only requests return responses. Notifications
+		/// do not return responses.</returns>
+		public async Task<JsonRpcResult[]> BatchProcess(params JsonRpcRequest[] Requests)
+		{
+			int i, c = Requests.Length;
+			Dictionary<string, object>[] Payloads = new Dictionary<string, object>[c];
+
+			for (i = 0; i < c; i++)
+			{
+				JsonRpcRequest Request = Requests[i];
+				Payloads[i] = Request.BuildRequest(Request.IsRequest ? this.id++ : (long?)null);
+			}
+
+			if (this.HasSniffers)
+				this.TransmitText(JSON.Encode(Payloads, true));
+
+			ContentResponse Response = await InternetContent.PostAsync(
+				this.endpoint, Payloads, this.certificate,
+				new KeyValuePair<string, string>("Accept", JsonCodec.JsonRpcContentType));
+
+			if (this.HasSniffers)
+			{
+				if (Response.HasError)
+				{
+					if (!(Response.Error is WebException ex) || ex.Content is null)
+						this.Error(Response.Error.Message);
+					else
+						this.Error(JSON.Encode(ex.Content, true));
+				}
+				else
+					this.ReceiveText(JSON.Encode(Response.Decoded, true));
+			}
+
+			Response = this.CheckJsonRpcError(Response);
+			Response.AssertOk();
+
+			if (!(Response.Decoded is Array A))
+			{
+				throw new JsonRpcException("Unexpected response received of type " +
+					Response.Decoded?.GetType().FullName);
+			}
+
+			c = A.Length;
+			JsonRpcResult[] Results = new JsonRpcResult[c];
+
+			for (i = 0; i < c; i++)
+			{
+				if (!(A.GetValue(i) is Dictionary<string, object> ItemResponse))
+				{
+					throw new JsonRpcException("Unexpected item response received of type " +
+						A.GetValue(i)?.GetType().FullName);
+				}
+
+				Results[i] = new JsonRpcResult(ItemResponse);
+			}
+
+			return Results;
 		}
 	}
 }

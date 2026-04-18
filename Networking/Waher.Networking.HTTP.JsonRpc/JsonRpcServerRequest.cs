@@ -7,11 +7,14 @@ using Waher.Script.Model;
 namespace Waher.Networking.HTTP.JsonRpc
 {
 	/// <summary>
-	/// Information about a JSON-RPC request.
+	/// Server-side information about a JSON-RPC request.
 	/// </summary>
 	internal class JsonRpcServerRequest : IDisposable
 	{
-		public Dictionary<string, object?> ResponseObj = new Dictionary<string, object?>();
+		public JsonRpcServerRequest?[]? BatchRequests = null;
+		public Dictionary<string, object?>? ResponseObject = null;
+		public Dictionary<string, object?>[]? ResponseArray = null;
+		public object? Response = null;
 		public Dictionary<string, object>? ParametersObj = null;
 		public JsonRpcMethodInfo? MethodInfo = null;
 		public Array? ParametersArray = null;
@@ -34,118 +37,166 @@ namespace Waher.Networking.HTTP.JsonRpc
 			if (this.Result is IDisposable Disposable)
 				Disposable.Dispose();
 
+			if (!(this.BatchRequests is null))
+			{
+				int i, c = this.BatchRequests.Length;
+
+				for (i = 0; i < c; i++)
+					this.BatchRequests[i]?.Dispose();
+
+				this.BatchRequests = null;
+			}
+
 			this.Result = null;
 		}
 
 		public async Task BuildResponse()
 		{
-			if (!string.IsNullOrEmpty(this.JsonVersion))
-				this.ResponseObj["jsonrpc"] = this.JsonVersion;
-
-			if (!(this.Id is null))
-				this.ResponseObj["id"] = this.Id;
-
-			if (this.MethodInfo is null && !this.ErrorCode.HasValue)
-				this.SetError(-32600, "Missing method.", 400);
-
-			if (!this.ErrorCode.HasValue)
+			if (this.BatchRequests is null)
 			{
-				try
-				{
-					int i, c = this.MethodInfo!.NrArguments;
-					object?[] Parameters = new object?[c];
+				this.ResponseObject = new Dictionary<string, object?>();
 
-					if (!(this.ParametersObj is null))
+				if (!string.IsNullOrEmpty(this.JsonVersion))
+					this.ResponseObject["jsonrpc"] = this.JsonVersion;
+
+				if (!(this.Id is null))
+					this.ResponseObject["id"] = this.Id;
+
+				if (this.MethodInfo is null && !this.ErrorCode.HasValue)
+					this.SetError(-32600, "Missing method.", 400);
+
+				if (!this.ErrorCode.HasValue)
+				{
+					try
 					{
-						if (this.ParametersObj.Count != c)
-							this.SetError(-32602, "Invalid number of parameters.", 400);
-						else
+						int i, c = this.MethodInfo!.NrArguments;
+						object?[] Parameters = new object?[c];
+
+						if (!(this.ParametersObj is null))
 						{
-							foreach (KeyValuePair<string, object> P in this.ParametersObj)
+							if (this.ParametersObj.Count != c)
+								this.SetError(-32602, "Invalid number of parameters.", 400);
+							else
 							{
-								if (!this.MethodInfo.NamedArguments.TryGetValue(P.Key, out i))
+								foreach (KeyValuePair<string, object> P in this.ParametersObj)
 								{
-									this.SetError(-32602, "Invalid parameter name: " + P.Key, 400);
-									break;
+									if (!this.MethodInfo.NamedArguments.TryGetValue(P.Key, out i))
+									{
+										this.SetError(-32602, "Invalid parameter name: " + P.Key, 400);
+										break;
+									}
+									else
+									{
+										Type ExpectedType = this.MethodInfo.Arguments[i].ParameterType;
+										Type ParameterType = P.Value?.GetType() ?? typeof(object);
+
+										if (ParameterType == ExpectedType)
+											Parameters[i] = P.Value;
+										else if (Expression.TryConvert(P.Value, ExpectedType, out object Converted))
+											Parameters[i] = Converted;
+										else
+										{
+											this.SetError(-32602, "Parameter " + P.Key +
+												" has incorrect type: " + ParameterType.FullName +
+												", Expected: " + ExpectedType.FullName, 400);
+											break;
+										}
+									}
 								}
-								else
+
+								if (!this.ErrorCode.HasValue)
 								{
+									this.Result = await ScriptNode.WaitPossibleTask(
+										this.MethodInfo.Method.DynamicInvoke(Parameters));
+								}
+							}
+						}
+						else if (!(this.ParametersArray is null))
+						{
+							if (this.ParametersArray.Length != c)
+								this.SetError(-32602, "Invalid number of parameters.", 400);
+							else
+							{
+								for (i = 0; i < c; i++)
+								{
+									object? Value = this.ParametersArray.GetValue(i);
 									Type ExpectedType = this.MethodInfo.Arguments[i].ParameterType;
-									Type ParameterType = P.Value?.GetType() ?? typeof(object);
+									Type ParameterType = Value?.GetType() ?? typeof(object);
 
 									if (ParameterType == ExpectedType)
-										Parameters[i] = P.Value;
-									else if (Expression.TryConvert(P.Value, ExpectedType, out object Converted))
+										Parameters[i] = Value;
+									else if (Expression.TryConvert(Value, ExpectedType, out object Converted))
 										Parameters[i] = Converted;
 									else
 									{
-										this.SetError(-32602, "Parameter " + P.Key +
+										this.SetError(-32602, "Parameter " + (i + 1).ToString() +
 											" has incorrect type: " + ParameterType.FullName +
 											", Expected: " + ExpectedType.FullName, 400);
 										break;
 									}
 								}
-							}
 
-							if (!this.ErrorCode.HasValue)
-							{
-								this.Result = await ScriptNode.WaitPossibleTask(
-									this.MethodInfo.Method.DynamicInvoke(Parameters));
+								this.Result = this.MethodInfo.Method.DynamicInvoke(Parameters);
 							}
 						}
-					}
-					else if (!(this.ParametersArray is null))
-					{
-						if (this.ParametersArray.Length != c)
-							this.SetError(-32602, "Invalid number of parameters.", 400);
 						else
 						{
-							for (i = 0; i < c; i++)
-							{
-								object? Value = this.ParametersArray.GetValue(i);
-								Type ExpectedType = this.MethodInfo.Arguments[i].ParameterType;
-								Type ParameterType = Value?.GetType() ?? typeof(object);
-
-								if (ParameterType == ExpectedType)
-									Parameters[i] = Value;
-								else if (Expression.TryConvert(Value, ExpectedType, out object Converted))
-									Parameters[i] = Converted;
-								else
-								{
-									this.SetError(-32602, "Parameter " + (i + 1).ToString() +
-										" has incorrect type: " + ParameterType.FullName +
-										", Expected: " + ExpectedType.FullName, 400);
-									break;
-								}
-							}
-
-							this.Result = this.MethodInfo.Method.DynamicInvoke(Parameters);
+							if (this.MethodInfo.NrArguments == 0)
+								this.Result = this.MethodInfo.Method.DynamicInvoke(Parameters);
+							else
+								this.SetError(-32600, "Missing parameters.", 400);
 						}
 					}
-					else
+					catch (Exception ex)
 					{
-						if (this.MethodInfo.NrArguments == 0)
-							this.Result = this.MethodInfo.Method.DynamicInvoke(Parameters);
-						else
-							this.SetError(-32600, "Missing parameters.", 400);
+						this.SetError(-32603, ex.Message, 500);
 					}
 				}
-				catch (Exception ex)
-				{
-					this.SetError(-32603, ex.Message, 500);
-				}
-			}
 
-			if (this.ErrorCode.HasValue)
-			{
-				this.ResponseObj["error"] = new Dictionary<string, object>()
+				if (this.ErrorCode.HasValue)
+				{
+					this.ResponseObject["error"] = new Dictionary<string, object>()
 					{
 						{ "code", this.ErrorCode.Value },
 						{ "message", this.ErrorMessage ?? string.Empty }
 					};
+				}
+				else
+					this.ResponseObject["result"] = this.Result;
+
+				this.Response = this.ResponseObject;
+
+				if (!(this.Id is null) && this.StatusCode == 204)
+					this.StatusCode = 200;
 			}
 			else
-				this.ResponseObj["result"] = this.Result;
+			{
+				int i, c = this.BatchRequests.Length;
+				int j, d = 0;
+
+				for (i = 0; i < c; i++)
+				{
+					if (!(this.BatchRequests[i]!.Id is null))
+						d++;
+				}
+
+				this.ResponseArray = new Dictionary<string, object?>[d];
+
+				for (i = j = 0; i < c; i++)
+				{
+					JsonRpcServerRequest Request = this.BatchRequests[i]!;
+
+					await Request.BuildResponse();
+
+					if (!(Request.Id is null))
+						this.ResponseArray[j++] = Request.ResponseObject!;
+				}
+
+				this.Response = this.ResponseArray;
+
+				if (this.StatusCode == 204)
+					this.StatusCode = 200;
+			}
 		}
 	}
 }

@@ -307,5 +307,52 @@ namespace Waher.Networking.HTTP.Test
 			Assert.IsNotNull(Exception, "Exception expected.");
 			Assert.AreEqual(ExpectedException, Exception.GetType());
 		}
+
+		[TestMethod]
+		public async Task Test_09_BatchRequests()
+		{
+			JsonRpcResult[] Results = await this.client.BatchProcess(
+				new JsonRpcRequest("Add", 3, 4),
+				new JsonRpcRequest("Sub", 3, 4));
+
+			Assert.AreEqual(2, Results.Length);
+			
+			Assert.IsTrue(Results[0].HasResult);
+			Assert.AreEqual(7, Results[0].Result);
+			
+			Assert.IsTrue(Results[1].HasResult);
+			Assert.AreEqual(-1, Results[1].Result);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(JsonRpcInvalidRequestError))]
+		public async Task Test_10_EmptyBatch()
+		{
+			await this.client.BatchProcess();
+		}
+
+		[TestMethod]
+		public async Task Test_11_BatchNotifications()
+		{
+			JsonRpcResult[] Results = await this.client.BatchProcess(
+				new JsonRpcNotification("Add", 3, 4),
+				new JsonRpcNotification("Sub", 3, 4));
+
+			Assert.AreEqual(0, Results.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_12_BatchMixed()
+		{
+			JsonRpcResult[] Results = await this.client.BatchProcess(
+				new JsonRpcNotification("Add", 3, 4),
+				new JsonRpcRequest("Sub", 3, 4));
+
+			Assert.AreEqual(1, Results.Length);
+
+			Assert.IsTrue(Results[0].HasResult);
+			Assert.AreEqual(-1, Results[0].Result);
+		}
+
 	}
 }

@@ -13,6 +13,6 @@
 		/// <summary>
 		/// JSON-RPC v2.0
 		/// </summary>
-		JsonRpcV2,
+		JsonRpcV2
 	}
 }

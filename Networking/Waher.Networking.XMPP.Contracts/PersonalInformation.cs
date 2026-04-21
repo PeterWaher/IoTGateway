@@ -10,6 +10,191 @@ namespace Waher.Networking.XMPP.Contracts
 	public class PersonalInformation
 	{
 		/// <summary>
+		/// FIRST
+		/// </summary>
+		public const string FirstNameTag = "FIRST";
+
+		/// <summary>
+		/// MIDDLE
+		/// </summary>
+		public const string MiddleNamesTag = "MIDDLE";
+
+		/// <summary>
+		/// LAST
+		/// </summary>
+		public const string LastNamesTag = "LAST";
+
+		/// <summary>
+		/// FULLNAME
+		/// </summary>
+		public const string FullNameTag = "FULLNAME";
+
+		/// <summary>
+		/// ADDR
+		/// </summary>
+		public const string AddressTag = "ADDR";
+
+		/// <summary>
+		/// ADDR2
+		/// </summary>
+		public const string Address2Tag = "ADDR2";
+
+		/// <summary>
+		/// FULLADDR
+		/// </summary>
+		public const string FullAddressTag = "FULLADDR";
+
+		/// <summary>
+		/// ZIP
+		/// </summary>
+		public const string PostalCodeTag = "ZIP";
+
+		/// <summary>
+		/// AREA
+		/// </summary>
+		public const string AreaTag = "AREA";
+
+		/// <summary>
+		/// CITY
+		/// </summary>
+		public const string CityTag = "CITY";
+
+		/// <summary>
+		/// REGION
+		/// </summary>
+		public const string RegionTag = "REGION";
+
+		/// <summary>
+		/// COUNTRY
+		/// </summary>
+		public const string CountryTag = "COUNTRY";
+
+		/// <summary>
+		/// NATIONALITY
+		/// </summary>
+		public const string NationalityTag = "NATIONALITY";
+
+		/// <summary>
+		/// GENDER
+		/// </summary>
+		public const string GenderTag = "GENDER";
+
+		/// <summary>
+		/// BDAY
+		/// </summary>
+		public const string BirthDayTag = "BDAY";
+
+		/// <summary>
+		/// BMONTH
+		/// </summary>
+		public const string BirthMonthTag = "BMONTH";
+
+		/// <summary>
+		/// BYEAR
+		/// </summary>
+		public const string BirthYearTag = "BYEAR";
+
+		/// <summary>
+		/// AGEABOVE
+		/// </summary>
+		public const string AgeAboveTag = "AGEABOVE";
+
+		/// <summary>
+		/// PNR
+		/// </summary>
+		public const string PersonalNumberTag = "PNR";
+
+		/// <summary>
+		/// ORGNAME
+		/// </summary>
+		public const string OrganizationNameTag = "ORGNAME";
+
+		/// <summary>
+		/// ORGDEPT
+		/// </summary>
+		public const string OrganizationDepartmentTag = "ORGDEPT";
+
+		/// <summary>
+		/// ORGROLE
+		/// </summary>
+		public const string OrganizationRoleTag = "ORGROLE";
+
+		/// <summary>
+		/// ORGADDR
+		/// </summary>
+		public const string OrganizationAddressTag = "ORGADDR";
+
+		/// <summary>
+		/// ORGADDR2
+		/// </summary>
+		public const string OrganizationAddress2Tag = "ORGADDR2";
+
+		/// <summary>
+		/// ORGZIP
+		/// </summary>
+		public const string OrganizationPostalCodeTag = "ORGZIP";
+
+		/// <summary>
+		/// ORGAREA
+		/// </summary>
+		public const string OrganizationAreaTag = "ORGAREA";
+
+		/// <summary>
+		/// ORGCITY
+		/// </summary>
+		public const string OrganizationCityTag = "ORGCITY";
+
+		/// <summary>
+		/// ORGREGION
+		/// </summary>
+		public const string OrganizationRegionTag = "ORGREGION";
+
+		/// <summary>
+		/// ORGCOUNTRY
+		/// </summary>
+		public const string OrganizationCountryTag = "ORGCOUNTRY";
+
+		/// <summary>
+		/// ORGNR
+		/// </summary>
+		public const string OrganizationNumberTag = "ORGNR";
+
+		/// <summary>
+		/// PHONE
+		/// </summary>
+		public const string PhoneTag = "PHONE";
+
+		/// <summary>
+		/// EMAIL
+		/// </summary>
+		public const string EMailTag = "EMAIL";
+
+		/// <summary>
+		/// JID
+		/// </summary>
+		public const string JidTag = "JID";
+
+		/// <summary>
+		/// AGENT
+		/// </summary>
+		public const string AgentTag = "AGENT";
+
+		/// <summary>
+		/// DOMAIN
+		/// </summary>
+		public const string DomainTag = "DOMAIN";
+
+		/// <summary>
+		/// PREVIEW
+		/// </summary>
+		public const string PreviewTag = "PREVIEW";
+
+		/// <summary>
+		/// DEVICE_ID
+		/// </summary>
+		public const string DeviceIdTag = "DEVICE_ID";
+
+		/// <summary>
 		/// First name
 		/// </summary>
 		public CaseInsensitiveString FirstName = null;

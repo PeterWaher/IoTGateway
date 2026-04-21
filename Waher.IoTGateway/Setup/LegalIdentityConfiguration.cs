@@ -598,40 +598,40 @@ namespace Waher.IoTGateway.Setup
 							{ "From", ID.From },
 							{ "To", ID.To },
 							{ "State", ID.State },
-							{ "ADDR", string.Empty },
-							{ "ADDR2", string.Empty },
-							{ "ZIP", string.Empty },
-							{ "AREA", string.Empty },
-							{ "CITY", string.Empty },
-							{ "REGION", string.Empty },
-							{ "COUNTRY", string.Empty },
-							{ "NATIONALITY", string.Empty },
-							{ "GENDER", string.Empty },
-							{ "BDAY", string.Empty },
-							{ "BMONTH", string.Empty },
-							{ "BYEAR", string.Empty },
-							{ "PNR", string.Empty },
-							{ "ORGADDR", string.Empty },
-							{ "ORGADDR2", string.Empty },
-							{ "ORGZIP", string.Empty },
-							{ "ORGAREA", string.Empty },
-							{ "ORGCITY", string.Empty },
-							{ "ORGREGION", string.Empty },
-							{ "ORGCOUNTRY", string.Empty },
-							{ "ORGNAME", string.Empty },
-							{ "ORGDEPT", string.Empty },
-							{ "ORGROLE", string.Empty },
-							{ "ORGNR", string.Empty },
+							{ PersonalInformation.AddressTag, string.Empty },
+							{ PersonalInformation.Address2Tag, string.Empty },
+							{ PersonalInformation.PostalCodeTag, string.Empty },
+							{ PersonalInformation.AreaTag, string.Empty },
+							{ PersonalInformation.CityTag, string.Empty },
+							{ PersonalInformation.RegionTag, string.Empty },
+							{ PersonalInformation.CountryTag, string.Empty },
+							{ PersonalInformation.NationalityTag, string.Empty },
+							{ PersonalInformation.GenderTag, string.Empty },
+							{ PersonalInformation.BirthDayTag, string.Empty },
+							{ PersonalInformation.BirthMonthTag, string.Empty },
+							{ PersonalInformation.BirthYearTag, string.Empty },
+							{ PersonalInformation.PersonalNumberTag, string.Empty },
+							{ PersonalInformation.OrganizationAddressTag, string.Empty },
+							{ PersonalInformation.OrganizationAddress2Tag, string.Empty },
+							{ PersonalInformation.OrganizationPostalCodeTag, string.Empty },
+							{ PersonalInformation.OrganizationAreaTag, string.Empty },
+							{ PersonalInformation.OrganizationCityTag, string.Empty },
+							{ PersonalInformation.OrganizationRegionTag, string.Empty },
+							{ PersonalInformation.OrganizationCountryTag, string.Empty },
+							{ PersonalInformation.OrganizationNameTag, string.Empty },
+							{ PersonalInformation.OrganizationDepartmentTag, string.Empty },
+							{ PersonalInformation.OrganizationRoleTag, string.Empty },
+							{ PersonalInformation.OrganizationNumberTag, string.Empty },
 							{ "", string.Empty }
 						};
 
 						foreach (Property P in ID.Properties)
 							ID2[P.Name] = P.Value;
 
-						ID2["FIRST"] = ID["FIRST"];
-						ID2["MIDDLE"] = ID["MIDDLE"];
-						ID2["LAST"] = ID["LAST"];
-						ID2["FULLNAME"] = ID["FULLNAME"];
+						ID2[PersonalInformation.FirstNameTag] = ID[PersonalInformation.FirstNameTag];
+						ID2[PersonalInformation.MiddleNamesTag] = ID[PersonalInformation.MiddleNamesTag];
+						ID2[PersonalInformation.LastNamesTag] = ID[PersonalInformation.LastNamesTag];
+						ID2[PersonalInformation.FullNameTag] = ID[PersonalInformation.FullNameTag];
 
 						Result.Add(ID2);
 					}
@@ -957,33 +957,33 @@ namespace Waher.IoTGateway.Setup
 				{
 					switch (P.Key.ToUpper())
 					{
-						case "FIRST":
-						case "MIDDLE":
-						case "LAST":
-						case "PNR":
-						case "ADDR":
-						case "ADDR2":
-						case "ZIP":
-						case "AREA":
-						case "CITY":
-						case "REGION":
-						case "COUNTRY":
-						case "NATIONALITY":
-						case "GENDER":
-						case "BDAY":
-						case "BMONTH":
-						case "BYEAR":
-						case "ORGNAME":
-						case "ORGDEPT":
-						case "ORGROLE":
-						case "ORGNR":
-						case "ORGADDR":
-						case "ORGADDR2":
-						case "ORGZIP":
-						case "ORGAREA":
-						case "ORGCITY":
-						case "ORGREGION":
-						case "ORGCOUNTRY":
+						case PersonalInformation.FirstNameTag:
+						case PersonalInformation.MiddleNamesTag:
+						case PersonalInformation.LastNamesTag:
+						case PersonalInformation.PersonalNumberTag:
+						case PersonalInformation.AddressTag:
+						case PersonalInformation.Address2Tag:
+						case PersonalInformation.PostalCodeTag:
+						case PersonalInformation.AreaTag:
+						case PersonalInformation.CityTag:
+						case PersonalInformation.RegionTag:
+						case PersonalInformation.CountryTag:
+						case PersonalInformation.NationalityTag:
+						case PersonalInformation.GenderTag:
+						case PersonalInformation.BirthDayTag:
+						case PersonalInformation.BirthMonthTag:
+						case PersonalInformation.BirthYearTag:
+						case PersonalInformation.OrganizationNameTag:
+						case PersonalInformation.OrganizationDepartmentTag:
+						case PersonalInformation.OrganizationRoleTag:
+						case PersonalInformation.OrganizationNumberTag:
+						case PersonalInformation.OrganizationAddressTag:
+						case PersonalInformation.OrganizationAddress2Tag:
+						case PersonalInformation.OrganizationPostalCodeTag:
+						case PersonalInformation.OrganizationAreaTag:
+						case PersonalInformation.OrganizationCityTag:
+						case PersonalInformation.OrganizationRegionTag:
+						case PersonalInformation.OrganizationCountryTag:
 							await Response.SendResponse(new BadRequestException("The following alternative field name is not allowed: " + P.Key));
 							return;
 
@@ -1158,83 +1158,83 @@ namespace Waher.IoTGateway.Setup
 			List<Property> Properties = new List<Property>();
 
 			if (!string.IsNullOrEmpty(this.firstName))
-				Properties.Add(new Property("FIRST", this.firstName));
+				Properties.Add(new Property(PersonalInformation.FirstNameTag, this.firstName));
 
 			if (!string.IsNullOrEmpty(this.middleName))
-				Properties.Add(new Property("MIDDLE", this.middleName));
+				Properties.Add(new Property(PersonalInformation.MiddleNamesTag, this.middleName));
 
 			if (!string.IsNullOrEmpty(this.lastName))
-				Properties.Add(new Property("LAST", this.lastName));
+				Properties.Add(new Property(PersonalInformation.LastNamesTag, this.lastName));
 
 			if (!string.IsNullOrEmpty(this.personalNumber))
-				Properties.Add(new Property("PNR", this.personalNumber));
+				Properties.Add(new Property(PersonalInformation.PersonalNumberTag, this.personalNumber));
 
 			if (!string.IsNullOrEmpty(this.address))
-				Properties.Add(new Property("ADDR", this.address));
+				Properties.Add(new Property(PersonalInformation.AddressTag, this.address));
 
 			if (!string.IsNullOrEmpty(this.address2))
-				Properties.Add(new Property("ADDR2", this.address2));
+				Properties.Add(new Property(PersonalInformation.Address2Tag, this.address2));
 
 			if (!string.IsNullOrEmpty(this.postalCode))
-				Properties.Add(new Property("ZIP", this.postalCode));
+				Properties.Add(new Property(PersonalInformation.PostalCodeTag, this.postalCode));
 
 			if (!string.IsNullOrEmpty(this.area))
-				Properties.Add(new Property("AREA", this.area));
+				Properties.Add(new Property(PersonalInformation.AreaTag, this.area));
 
 			if (!string.IsNullOrEmpty(this.city))
-				Properties.Add(new Property("CITY", this.city));
+				Properties.Add(new Property(PersonalInformation.CityTag, this.city));
 
 			if (!string.IsNullOrEmpty(this.region))
-				Properties.Add(new Property("REGION", this.region));
+				Properties.Add(new Property(PersonalInformation.RegionTag, this.region));
 
 			if (!string.IsNullOrEmpty(this.country))
-				Properties.Add(new Property("COUNTRY", this.country));
+				Properties.Add(new Property(PersonalInformation.CountryTag, this.country));
 
 			if (!string.IsNullOrEmpty(this.nationality))
-				Properties.Add(new Property("NATIONALITY", this.nationality));
+				Properties.Add(new Property(PersonalInformation.NationalityTag, this.nationality));
 
 			if (!string.IsNullOrEmpty(this.gender))
-				Properties.Add(new Property("GENDER", this.gender));
+				Properties.Add(new Property(PersonalInformation.GenderTag, this.gender));
 
 			if (!(this.birthDate is null))
 			{
-				Properties.Add(new Property("BDAY", this.birthDate.Value.Day.ToString()));
-				Properties.Add(new Property("BMONTH", this.birthDate.Value.Month.ToString()));
-				Properties.Add(new Property("BYEAR", this.birthDate.Value.Year.ToString()));
+				Properties.Add(new Property(PersonalInformation.BirthDayTag, this.birthDate.Value.Day.ToString()));
+				Properties.Add(new Property(PersonalInformation.BirthMonthTag, this.birthDate.Value.Month.ToString()));
+				Properties.Add(new Property(PersonalInformation.BirthYearTag, this.birthDate.Value.Year.ToString()));
 			}
 
 			if (!string.IsNullOrEmpty(this.orgName))
-				Properties.Add(new Property("ORGNAME", this.orgName));
+				Properties.Add(new Property(PersonalInformation.OrganizationNameTag, this.orgName));
 
 			if (!string.IsNullOrEmpty(this.orgDepartment))
-				Properties.Add(new Property("ORGDEPT", this.orgDepartment));
+				Properties.Add(new Property(PersonalInformation.OrganizationDepartmentTag, this.orgDepartment));
 
 			if (!string.IsNullOrEmpty(this.orgRole))
-				Properties.Add(new Property("ORGROLE", this.orgRole));
+				Properties.Add(new Property(PersonalInformation.OrganizationRoleTag, this.orgRole));
 
 			if (!string.IsNullOrEmpty(this.orgNumber))
-				Properties.Add(new Property("ORGNR", this.orgNumber));
+				Properties.Add(new Property(PersonalInformation.OrganizationNumberTag, this.orgNumber));
 
 			if (!string.IsNullOrEmpty(this.orgAddress))
-				Properties.Add(new Property("ORGADDR", this.orgAddress));
+				Properties.Add(new Property(PersonalInformation.OrganizationAddressTag, this.orgAddress));
 
 			if (!string.IsNullOrEmpty(this.orgAddress2))
-				Properties.Add(new Property("ORGADDR2", this.orgAddress2));
+				Properties.Add(new Property(PersonalInformation.OrganizationAddress2Tag, this.orgAddress2));
 
 			if (!string.IsNullOrEmpty(this.orgPostalCode))
-				Properties.Add(new Property("ORGZIP", this.orgPostalCode));
+				Properties.Add(new Property(PersonalInformation.OrganizationPostalCodeTag, this.orgPostalCode));
 
 			if (!string.IsNullOrEmpty(this.orgArea))
-				Properties.Add(new Property("ORGAREA", this.orgArea));
+				Properties.Add(new Property(PersonalInformation.OrganizationAreaTag, this.orgArea));
 
 			if (!string.IsNullOrEmpty(this.orgCity))
-				Properties.Add(new Property("ORGCITY", this.orgCity));
+				Properties.Add(new Property(PersonalInformation.OrganizationCityTag, this.orgCity));
 
 			if (!string.IsNullOrEmpty(this.orgRegion))
-				Properties.Add(new Property("ORGREGION", this.orgRegion));
+				Properties.Add(new Property(PersonalInformation.OrganizationRegionTag, this.orgRegion));
 
 			if (!string.IsNullOrEmpty(this.orgCountry))
-				Properties.Add(new Property("ORGCOUNTRY", this.orgCountry));
+				Properties.Add(new Property(PersonalInformation.OrganizationCountryTag, this.orgCountry));
 
 			if (!(this.altFields is null))
 			{

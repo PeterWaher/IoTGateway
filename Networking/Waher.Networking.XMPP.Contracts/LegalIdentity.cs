@@ -625,14 +625,14 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					switch (Key.ToUpper())
 					{
-						case "FIRST":
+						case PersonalInformation.FirstNameTag:
 							string FullName = null;
 
 							foreach (Property P in this.properties)
 							{
 								if (P.Name == Key)
 									return P.Value;
-								else if (P.Name == "FULLNAME")
+								else if (P.Name == PersonalInformation.FullNameTag)
 									FullName = P.Value;
 							}
 
@@ -643,14 +643,14 @@ namespace Waher.Networking.XMPP.Contracts
 							}
 							break;
 
-						case "MIDDLE":
+						case PersonalInformation.MiddleNamesTag:
 							FullName = null;
 
 							foreach (Property P in this.properties)
 							{
 								if (P.Name == Key)
 									return P.Value;
-								else if (P.Name == "FULLNAME")
+								else if (P.Name == PersonalInformation.FullNameTag)
 									FullName = P.Value;
 							}
 
@@ -661,14 +661,14 @@ namespace Waher.Networking.XMPP.Contracts
 							}
 							break;
 
-						case "LAST":
+						case PersonalInformation.LastNamesTag:
 							FullName = null;
 
 							foreach (Property P in this.properties)
 							{
 								if (P.Name == Key)
 									return P.Value;
-								else if (P.Name == "FULLNAME")
+								else if (P.Name == PersonalInformation.FullNameTag)
 									FullName = P.Value;
 							}
 
@@ -679,7 +679,7 @@ namespace Waher.Networking.XMPP.Contracts
 							}
 							break;
 
-						case "FULLNAME":
+						case PersonalInformation.FullNameTag:
 							string FirstName = null;
 							string MiddleNames = null;
 							string LastNames = null;
@@ -691,15 +691,15 @@ namespace Waher.Networking.XMPP.Contracts
 
 								switch (P.Name)
 								{
-									case "FIRST":
+									case PersonalInformation.FirstNameTag:
 										FirstName = P.Value;
 										break;
 
-									case "MIDDLE":
+									case PersonalInformation.MiddleNamesTag:
 										MiddleNames = P.Value;
 										break;
 
-									case "LAST":
+									case PersonalInformation.LastNamesTag:
 										LastNames = P.Value;
 										break;
 								}
@@ -837,55 +837,55 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				switch (P.Name)
 				{
-					case "FIRST":
+					case PersonalInformation.FirstNameTag:
 						Result.FirstName = P.Value;
 						break;
 
-					case "MIDDLE":
+					case PersonalInformation.MiddleNamesTag:
 						Result.MiddleNames = P.Value;
 						break;
 
-					case "LAST":
+					case PersonalInformation.LastNamesTag:
 						Result.LastNames = P.Value;
 						break;
 
-					case "FULLNAME":
+					case PersonalInformation.FullNameTag:
 						Result.FullName = P.Value;
 						break;
 
-					case "ADDR":
+					case PersonalInformation.AddressTag:
 						Result.Address = P.Value;
 						break;
 
-					case "ADDR2":
+					case PersonalInformation.Address2Tag:
 						Result.Address2 = P.Value;
 						break;
 
-					case "ZIP":
+					case PersonalInformation.PostalCodeTag:
 						Result.PostalCode = P.Value;
 						break;
 
-					case "AREA":
+					case PersonalInformation.AreaTag:
 						Result.Area = P.Value;
 						break;
 
-					case "CITY":
+					case PersonalInformation.CityTag:
 						Result.City = P.Value;
 						break;
 
-					case "REGION":
+					case PersonalInformation.RegionTag:
 						Result.Region = P.Value;
 						break;
 
-					case "COUNTRY":
+					case PersonalInformation.CountryTag:
 						Result.Country = P.Value;
 						break;
 
-					case "NATIONALITY":
+					case PersonalInformation.NationalityTag:
 						Result.Nationality = P.Value;
 						break;
 
-					case "GENDER":
+					case PersonalInformation.GenderTag:
 						switch (P.Value.ToLower())
 						{
 							case "m":
@@ -902,94 +902,94 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 						break;
 
-					case "BDAY":
+					case PersonalInformation.BirthDayTag:
 						if (int.TryParse(P.Value, out int i) && i >= 1 && i <= 31)
 							Result.BirthDay = i;
 						break;
 
-					case "BMONTH":
+					case PersonalInformation.BirthMonthTag:
 						if (int.TryParse(P.Value, out i) && i >= 1 && i <= 12)
 							Result.BirthMonth = i;
 						break;
 
-					case "BYEAR":
+					case PersonalInformation.BirthYearTag:
 						if (int.TryParse(P.Value, out i) && i >= 1900 && i <= 2100)
 							Result.BirthYear = i;
 						break;
 
-					case "AGEABOVE":
+					case PersonalInformation.AgeAboveTag:
 						if (int.TryParse(P.Value.ToString(), out i) && i >= 0)
 							Result.AgeAbove = i;
 						break;
 
-					case "PNR":
+					case PersonalInformation.PersonalNumberTag:
 						Result.PersonalNumber = P.Value;
 						break;
 
-					case "ORGNAME":
+					case PersonalInformation.OrganizationNameTag:
 						Result.OrgName = P.Value;
 						Result.HasOrg = true;
 						break;
 
-					case "ORGDEPT":
+					case PersonalInformation.OrganizationDepartmentTag:
 						Result.OrgDepartment = P.Value;
 						Result.HasOrg = true;
 						break;
 
-					case "ORGROLE":
+					case PersonalInformation.OrganizationRoleTag:
 						Result.OrgRole = P.Value;
 						Result.HasOrg = true;
 						break;
 
-					case "ORGADDR":
+					case PersonalInformation.OrganizationAddressTag:
 						Result.OrgAddress = P.Value;
 						Result.HasOrg = true;
 						break;
 
-					case "ORGADDR2":
+					case PersonalInformation.OrganizationAddress2Tag:
 						Result.OrgAddress2 = P.Value;
 						Result.HasOrg = true;
 						break;
 
-					case "ORGZIP":
+					case PersonalInformation.OrganizationPostalCodeTag:
 						Result.OrgPostalCode = P.Value;
 						Result.HasOrg = true;
 						break;
 
-					case "ORGAREA":
+					case PersonalInformation.OrganizationAreaTag:
 						Result.OrgArea = P.Value;
 						Result.HasOrg = true;
 						break;
 
-					case "ORGCITY":
+					case PersonalInformation.OrganizationCityTag:
 						Result.OrgCity = P.Value;
 						Result.HasOrg = true;
 						break;
 
-					case "ORGREGION":
+					case PersonalInformation.OrganizationRegionTag:
 						Result.OrgRegion = P.Value;
 						Result.HasOrg = true;
 						break;
 
-					case "ORGCOUNTRY":
+					case PersonalInformation.OrganizationCountryTag:
 						Result.OrgCountry = P.Value;
 						Result.HasOrg = true;
 						break;
 
-					case "ORGNR":
+					case PersonalInformation.OrganizationNumberTag:
 						Result.OrgNumber = P.Value;
 						Result.HasOrg = true;
 						break;
 
-					case "PHONE":
+					case PersonalInformation.PhoneTag:
 						Result.Phone = P.Value;
 						break;
 
-					case "EMAIL":
+					case PersonalInformation.EMailTag:
 						Result.EMail = P.Value;
 						break;
 
-					case "JID":
+					case PersonalInformation.JidTag:
 						Result.Jid = P.Value;
 						break;
 				}

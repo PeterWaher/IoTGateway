@@ -7333,7 +7333,7 @@ namespace Waher.Networking.XMPP.Contracts
 							LegalIdentity TempId = LegalIdentity.Parse(Doc.DocumentElement);
 
 							if (TempId.State == IdentityState.Created &&
-								string.Compare(TempId["JID"], XmppClient.GetBareJID(From), true) == 0)
+								string.Compare(TempId[PersonalInformation.JidTag], XmppClient.GetBareJID(From), true) == 0)
 							{
 								Identity = TempId;
 								PeerReview = true;

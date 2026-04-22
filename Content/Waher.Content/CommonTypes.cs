@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Waher.Runtime.Collections;
@@ -46,7 +47,7 @@ namespace Waher.Content
 		/// <returns>If the value could be decoded.</returns>
 		public static bool TryParse(string s, out double Value)
 		{
-			return double.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
+			return double.TryParse(s.Replace(".", NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
 		}
 
 		/// <summary>
@@ -57,7 +58,7 @@ namespace Waher.Content
 		/// <returns>If the value could be decoded.</returns>
 		public static bool TryParse(string s, out float Value)
 		{
-			return float.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
+			return float.TryParse(s.Replace(".", NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
 		}
 
 		/// <summary>
@@ -68,7 +69,7 @@ namespace Waher.Content
 		/// <returns>If the value could be decoded.</returns>
 		public static bool TryParse(string s, out decimal Value)
 		{
-			return decimal.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
+			return decimal.TryParse(s.Replace(".", NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
 		}
 
 		/// <summary>
@@ -85,7 +86,7 @@ namespace Waher.Content
 
 		private static string Prepare(string s, out byte NrDecimals)
 		{
-			string DecimalSeparator = System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator;
+			string DecimalSeparator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator;
 			s = s.Replace(".", DecimalSeparator);
 
 			int i = s.IndexOf(DecimalSeparator);
@@ -635,7 +636,7 @@ namespace Waher.Content
 		/// <returns>XML-encoded value.</returns>
 		public static string Encode(double x, byte NrDecimals)
 		{
-			return x.ToString("F" + NrDecimals.ToString()).Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return x.ToString("F" + NrDecimals.ToString(), CultureInfo.InvariantCulture);
 		}
 
 		/// <summary>
@@ -646,7 +647,7 @@ namespace Waher.Content
 		/// <returns>XML-encoded value.</returns>
 		public static string Encode(float x, byte NrDecimals)
 		{
-			return x.ToString("F" + NrDecimals.ToString()).Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return x.ToString("F" + NrDecimals.ToString(), CultureInfo.InvariantCulture);
 		}
 
 		/// <summary>
@@ -657,7 +658,7 @@ namespace Waher.Content
 		/// <returns>XML-encoded value.</returns>
 		public static string Encode(decimal x, byte NrDecimals)
 		{
-			return x.ToString("F" + NrDecimals.ToString()).Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return x.ToString("F" + NrDecimals.ToString(), CultureInfo.InvariantCulture);
 		}
 
 		/// <summary>

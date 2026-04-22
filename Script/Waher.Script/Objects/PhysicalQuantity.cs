@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.Reflection;
-using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Units;
 
@@ -319,7 +320,7 @@ namespace Waher.Script.Objects
 
 			if (i < 0 ||
 				!Unit.TryParse(s.Substring(i + 1, j - i), out Unit ParsedUnit) ||
-				!double.TryParse(s.Substring(0, i).Trim().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."), out double ParsedValue))
+				!double.TryParse(s.Substring(0, i).Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out double ParsedValue))
 			{
 				Value = null;
 				return false;

@@ -3682,15 +3682,15 @@ namespace Waher.Persistence.Files.Storage
 							break;
 
 						case ObjectSerializer.TYPE_DECIMAL:
-							Value = Reader.ReadDecimal().ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+							Value = Reader.ReadDecimal().ToString(CultureInfo.InvariantCulture);
 							break;
 
 						case ObjectSerializer.TYPE_DOUBLE:
-							Value = Reader.ReadDouble().ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+							Value = Reader.ReadDouble().ToString(CultureInfo.InvariantCulture);
 							break;
 
 						case ObjectSerializer.TYPE_SINGLE:
-							Value = Reader.ReadSingle().ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+							Value = Reader.ReadSingle().ToString(CultureInfo.InvariantCulture);
 							break;
 
 						case ObjectSerializer.TYPE_DATETIME:

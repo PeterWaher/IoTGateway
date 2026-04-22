@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
@@ -4659,7 +4660,7 @@ namespace Waher.Script
 		/// <returns>String representation of value.</returns>
 		public static string ToString(double Value)
 		{
-			return Value.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return Value.ToString(CultureInfo.InvariantCulture);
 		}
 
 		/// <summary>
@@ -4669,7 +4670,7 @@ namespace Waher.Script
 		/// <returns>String representation of value.</returns>
 		public static string ToString(decimal Value)
 		{
-			return Value.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return Value.ToString(CultureInfo.InvariantCulture);
 		}
 
 		/// <summary>

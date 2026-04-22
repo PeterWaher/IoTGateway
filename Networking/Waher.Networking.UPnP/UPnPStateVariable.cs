@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -175,7 +176,7 @@ namespace Waher.Networking.UPnP
 							d = Convert.ToDouble(Value);
 					}
 
-					return d.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+					return d.ToString(CultureInfo.InvariantCulture);
 
 				case "fixed.14.4":
 
@@ -188,7 +189,7 @@ namespace Waher.Networking.UPnP
 					else
 						d = Convert.ToDouble(Value);
 
-					return d.ToString("F4").Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+					return d.ToString("F4", CultureInfo.InvariantCulture);
 
 				case "date":
 					if (!(Value is DateTime DT))

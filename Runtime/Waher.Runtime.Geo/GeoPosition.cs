@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Waher.Persistence.Attributes;
@@ -228,8 +229,7 @@ namespace Waher.Runtime.Geo
 
 		internal static string ToString(double Value)
 		{
-			string s = Value.ToString();
-			s = s.Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			string s = Value.ToString(CultureInfo.InvariantCulture);
 			return Graph.TrimLabel(s);
 		}
 

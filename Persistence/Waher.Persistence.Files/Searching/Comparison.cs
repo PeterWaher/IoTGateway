@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.Files.Searching
@@ -20,10 +21,10 @@ namespace Waher.Persistence.Files.Searching
 			Type yType = y.GetType();
 
 			if (xType == yType)
-            {
-				if (x is DateTime TPx && 
-					y is DateTime TPy && 
-					TPx.Kind != TPy.Kind && 
+			{
+				if (x is DateTime TPx &&
+					y is DateTime TPy &&
+					TPx.Kind != TPy.Kind &&
 					TPx.Kind != DateTimeKind.Unspecified &&
 					TPy.Kind != DateTimeKind.Unspecified)
 				{
@@ -98,18 +99,29 @@ namespace Waher.Persistence.Files.Searching
 
 		internal static string ToString(object Value, uint TypeCode)
 		{
-			if (TypeCode == ObjectSerializer.TYPE_NULL)
-				return string.Empty;
-			else if (TypeCode == ObjectSerializer.TYPE_DOUBLE || TypeCode == ObjectSerializer.TYPE_DECIMAL)
-				return Value.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
-			else if (TypeCode == ObjectSerializer.TYPE_DATETIME)
-				return ((DateTime)Value).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "z";
-			else if (TypeCode == ObjectSerializer.TYPE_DATETIMEOFFSET)
-				return ((DateTimeOffset)Value).ToUniversalTime().DateTime.ToString("yyyy-MM-ddTHH:mm:ss") + "z";
-			else if (TypeCode == ObjectSerializer.TYPE_BYTEARRAY)
-				return Convert.ToBase64String((byte[])Value);
-			else
-				return Value?.ToString() ?? string.Empty;
+			switch (TypeCode)
+			{
+				case ObjectSerializer.TYPE_NULL:
+					return string.Empty;
+
+				case ObjectSerializer.TYPE_DOUBLE:
+					return ((double)Value).ToString(CultureInfo.InvariantCulture);
+
+				case ObjectSerializer.TYPE_DECIMAL:
+					return ((decimal)Value).ToString(CultureInfo.InvariantCulture);
+
+				case ObjectSerializer.TYPE_DATETIME:
+					return ((DateTime)Value).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "z";
+
+				case ObjectSerializer.TYPE_DATETIMEOFFSET:
+					return ((DateTimeOffset)Value).ToUniversalTime().DateTime.ToString("yyyy-MM-ddTHH:mm:ss") + "z";
+
+				case ObjectSerializer.TYPE_BYTEARRAY:
+					return Convert.ToBase64String((byte[])Value);
+
+				default:
+					return Value?.ToString() ?? string.Empty;
+			}
 		}
 
 		private static void Upgrade(ref object Value, ref uint TypeCode)
@@ -484,7 +496,7 @@ namespace Waher.Persistence.Files.Searching
 					while (--c >= 0)
 					{
 						b = ++Bin[c];
-						if (b!=0)
+						if (b != 0)
 						{
 							Value = Bin;
 							return true;

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Text;
@@ -287,7 +288,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append("' resource='");
 			Xml.Append(XML.Encode(LocalResource));
 			Xml.Append("' version='");
-			Xml.Append(HttpVersion.ToString("F1").Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
+			Xml.Append(HttpVersion.ToString("F1", CultureInfo.InvariantCulture));
 			Xml.Append("' maxChunkSize='");
 			Xml.Append(this.maxChunkSize.ToString());
 

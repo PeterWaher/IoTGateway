@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
@@ -7,15 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
-using Waher.Runtime.Cache;
-using Waher.Runtime.Profiling;
 using Waher.Persistence.Exceptions;
-using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
+using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Cache;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Persistence.Files
 {
@@ -4116,7 +4117,7 @@ namespace Waher.Persistence.Files
 
 		private static string Encode(double d)
 		{
-			return d.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return d.ToString(CultureInfo.InvariantCulture);
 		}
 
 		private static string Encode(string s)

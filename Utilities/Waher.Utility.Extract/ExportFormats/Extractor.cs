@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -411,17 +412,17 @@ namespace Waher.Utility.Extract.ExportFormats
 
 		public static string ToString(double x)
 		{
-			return x.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return x.ToString(CultureInfo.InvariantCulture);
 		}
 
 		public static string ToString(float x)
 		{
-			return x.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return x.ToString(CultureInfo.InvariantCulture);
 		}
 
 		public static string ToString(decimal x)
 		{
-			return x.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return x.ToString(CultureInfo.InvariantCulture);
 		}
 	}
 }

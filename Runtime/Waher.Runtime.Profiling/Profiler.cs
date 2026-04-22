@@ -657,7 +657,7 @@ namespace Waher.Runtime.Profiling
 			{
 				KeyValuePair<double, string> Time = this.ToTime(P.Key, null, TimeUnit);
 				Output.Append('@');
-				Output.AppendLine(Time.Key.ToString("F7").Replace(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, "."));
+				Output.AppendLine(Time.Key.ToString("F7", CultureInfo.InvariantCulture));
 				Output.Append(P.Value.ToString());
 			}
 

@@ -395,12 +395,12 @@ namespace Waher.Runtime.Profiling
 				Output.Append('@');
 
 				Time = this.profiler.ToTime(this.startedAt.Value, this, States.TimeUnit);
-				Output.Append(Time.Key.ToString("F0").Replace(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, "."));
+				Output.Append(Time.Key.ToString("F0", CultureInfo.InvariantCulture));
 
 				Output.Append(" <-> @");
 
 				Time = this.profiler.ToTime(this.stoppedAt.Value, this, States.TimeUnit);
-				Output.Append(Time.Key.ToString("F0").Replace(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, "."));
+				Output.Append(Time.Key.ToString("F0", CultureInfo.InvariantCulture));
 
 				Output.Append(" : ");
 				Output.AppendLine(ElapsedStr);

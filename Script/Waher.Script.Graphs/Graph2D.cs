@@ -1036,7 +1036,7 @@ namespace Waher.Script.Graphs
 		/// <returns>String representation.</returns>
 		public static string ReducedXmlString(double Value)
 		{
-			return ((float)Value).ToString().Replace(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return ((float)Value).ToString(CultureInfo.InvariantCulture);
 		}
 
 		/// <summary>
@@ -1056,7 +1056,7 @@ namespace Waher.Script.Graphs
 				else
 					sb.Append(',');
 
-				sb.Append(((float)d).ToString().Replace(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
+				sb.Append(((float)d).ToString(CultureInfo.InvariantCulture));
 			}
 
 			if (sb is null)

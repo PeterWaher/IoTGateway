@@ -61,12 +61,12 @@ namespace Waher.Runtime.Profiling.Events
 			Output.Append('@');
 
 			KeyValuePair<double, string> Time = this.Thread.Profiler.ToTime(this.Ticks, this.Thread, States.TimeUnit);
-			Output.Append(Time.Key.ToString("F7").Replace(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, "."));
+			Output.Append(Time.Key.ToString("F7", CultureInfo.InvariantCulture));
 
 			Output.Append(" <-> @");
 
 			Time = this.Thread.Profiler.ToTime(this.toTicks, this.Thread, States.TimeUnit);
-			Output.Append(Time.Key.ToString("F7").Replace(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, "."));
+			Output.Append(Time.Key.ToString("F7", CultureInfo.InvariantCulture));
 
 			Output.Append(" : ");
 			Output.AppendLine(this.label);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 
 namespace Waher.Runtime.Profiling
@@ -196,7 +197,7 @@ namespace Waher.Runtime.Profiling
 
 					d = Values[i, j];
 					if (d.HasValue)
-						sb.Append(d.Value.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
+						sb.Append(d.Value.ToString(CultureInfo.InvariantCulture));
 					else
 						sb.Append("null");
 				}

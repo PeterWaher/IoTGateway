@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 using Waher.Runtime.Inventory;
 
@@ -24,7 +25,21 @@ namespace Waher.Content.Json.ValueTypes
 		/// <param name="Json">JSON output.</param>
 		public void Encode(object Object, int? Indent, StringBuilder Json)
 		{
-			Json.Append(CommonTypes.Encode((double)Object));
+			double Value = (double)Object;
+			string s = Value.ToString(CultureInfo.InvariantCulture);
+			int i = s.IndexOf('.');
+
+			if (i < 0)
+			{
+				Json.Append(s);
+				Json.Append(".0");
+			}
+			else
+			{
+				Json.Append(s.Substring(0, i));
+				Json.Append('.');
+				Json.Append(s.Substring(i + 1));
+			}
 		}
 
 		/// <summary>

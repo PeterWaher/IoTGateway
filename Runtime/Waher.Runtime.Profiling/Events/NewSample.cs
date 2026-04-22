@@ -43,7 +43,7 @@ namespace Waher.Runtime.Profiling.Events
 		{
 			get
 			{
-				return this.sample.ToString().Replace(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, ".");
+				return this.sample.ToString(CultureInfo.InvariantCulture);
 			}
 		}
 	}

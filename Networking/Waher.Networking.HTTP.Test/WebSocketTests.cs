@@ -391,21 +391,46 @@ namespace Waher.Networking.HTTP.Test
 			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
-			Task T1 = Task.Run(() => Client.SendAsync(new ArraySegment<byte>(new byte[MaxBinarySize * 2]),
-				WebSocketMessageType.Binary, true, CancellationToken.None), CancellationToken.None);
-
-			Task _ = Task.Delay(5000, CancellationToken.None).ContinueWith((_) =>
+			Task _ = Task.Run(async () =>
 			{
+				await Client.SendAsync(new ArraySegment<byte>(new byte[MaxBinarySize * 2]),
+					WebSocketMessageType.Binary, true, CancellationToken.None);
+
+			}, CancellationToken.None);
+
+			Task _2 = Task.Run(async () =>
+			{
+				try
+				{
+					WebSocketReceiveResult ReadResult = await Client.ReceiveAsync(
+						new ArraySegment<byte>(new byte[MaxBinarySize * 2]), CancellationToken.None);
+
+					if (ReadResult.CloseStatus.HasValue &&
+						ReadResult.CloseStatus.Value == System.Net.WebSockets.WebSocketCloseStatus.MessageTooBig)
+					{
+						Result.TrySetException(new WebSocketException());
+					}
+				}
+				catch (Exception ex)
+				{
+					Result.TrySetException(ex);
+				}
+
+			}, CancellationToken.None);
+
+			Task _3 = Task.Run(async () =>
+			{
+				await Task.Delay(5000, CancellationToken.None);
+
 				if (Client.State == WebSocketState.Aborted)
 					Result.TrySetException(new WebSocketException());
 				else
 					Result.TrySetException(new TimeoutException());
+
 			}, CancellationToken.None);
 
 			await Assert.ThrowsAsync<WebSocketException>(async () =>
-				await Task.WhenAny(Result.Task, T1));
-
-			Assert.Fail("Binary data received, contrary to expectation.");
+				await Result.Task);
 		}
 
 		[TestMethod]

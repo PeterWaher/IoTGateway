@@ -621,7 +621,7 @@ namespace Waher.Layout.Layout2D
 				ImageSize = RenderedImageSize.ResizeImage   // TODO: Theme colors, font, etc.
 			};
 
-			if (this.root is Model.Backgrounds.Layout2D Layout2D)
+			if (this.root is Model.Layout2D Layout2D)
 			{
 				if (Layout2D.WidthAttribute.Defined || Layout2D.HeightAttribute.Defined)
 				{

@@ -378,14 +378,19 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_Index_Test_04_UnlockedChangeEnumeration()
 		{
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));
-			Simple Obj;
 
 			await this.file.BeginRead();
 			try
 			{
 				IndexBTreeFileCursor<Simple> e = await this.index1.GetTypedEnumeratorLocked<Simple>();
 
-				await Assert.ThrowsAsync<TimeoutException>(async () => await e.MoveNextAsyncLocked());
+				Assert.IsTrue(await e.MoveNextAsyncLocked());
+
+				Simple Obj = e.Current;
+				Assert.IsNotNull(Obj);
+
+				Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
+				await Assert.ThrowsAsync<TimeoutException>(async () => await this.file.SaveNewObject(Obj, false, null));
 			}
 			finally
 			{

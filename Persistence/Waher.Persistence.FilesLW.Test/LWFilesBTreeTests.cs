@@ -465,10 +465,9 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
-			await this.file.SaveNewObject(Obj, false, null);
 
 			await Assert.ThrowsAsync<KeyAlreadyExistsException>(async () =>
-				await AssertConsistent(this.file, this.provider, 1, Obj, true));
+				await this.file.SaveNewObject(Obj, false, null));
 		}
 
 		[TestMethod]
@@ -825,12 +824,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			ObjectBTreeFileCursor<Simple> e = await this.file.GetTypedEnumeratorAsyncLocked<Simple>();
 
-			while (await e.MoveNextAsyncLocked())
-			{
-				Simple _ = e.Current;
-				Obj = CreateSimple(this.MaxStringLength);
-				await this.file.SaveNewObject(Obj, false, null);
-			}
+			await Assert.ThrowsAsync<InvalidOperationException>(e.MoveNextAsyncLocked);
 		}
 
 		[TestMethod]

@@ -343,15 +343,15 @@
 		<Resource Include="Graphics\Amitjakhu-Drip-Copy.32.png" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="AvalonEdit" Version="6.3.0.90" />
+		<PackageReference Include="AvalonEdit" Version="6.3.1.120" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.11.0" />
-		<PackageReference Include="SkiaSharp" Version="2.88.9" />
-		<PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.9" />
-		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="2.88.9" />
-		<PackageReference Include="System.ComponentModel.Composition" Version="9.0.0" />
+		<PackageReference Include="SkiaSharp" Version="3.119.2" />
+		<PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="3.119.2" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="3.119.2" />
+		<PackageReference Include="System.ComponentModel.Composition" Version="10.0.7" />
 		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
+		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
 		<PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
 	</ItemGroup>
 </Project>

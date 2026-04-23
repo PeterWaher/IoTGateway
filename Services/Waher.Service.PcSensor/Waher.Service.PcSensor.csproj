@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="9.0.0" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="10.0.7" />
   </ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">

@@ -87,7 +87,6 @@ namespace Waher.Script.Graphs.Canvas2D.Operations
 				{
 					this.pen = new SKPaint()
 					{
-						FilterQuality = SKFilterQuality.High,
 						IsAntialias = true,
 						Style = SKPaintStyle.Stroke,
 						Color = this.fgColor,
@@ -110,7 +109,6 @@ namespace Waher.Script.Graphs.Canvas2D.Operations
 				{
 					this.brush = new SKPaint()
 					{
-						FilterQuality = SKFilterQuality.High,
 						IsAntialias = true,
 						Style = SKPaintStyle.Fill,
 						Color = this.fgColor

@@ -210,7 +210,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 
 			string Name = await this.name.Evaluate(State.Session, State.Font.Typeface.FamilyName);
 			SKFontStyleSlant Slant = await this.slant.Evaluate(State.Session, State.Font.Typeface.FontSlant);
-			SKColor Color = await this.color.Evaluate(State.Session, State.Text.Color);
+			SKColor Color = await this.color.Evaluate(State.Session, State.TextPen.Color);
 
 			this.font = new SKFont()
 			{
@@ -222,21 +222,16 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 					?? SKTypeface.Default
             };
 
-			this.text = new SKPaint()
+			this.textPen = new SKPaint()
 			{
-				FilterQuality = SKFilterQuality.High,
-				HintingLevel = SKPaintHinting.Full,
-				SubpixelText = true,
 				IsAntialias = true,
 				Style = SKPaintStyle.Fill,
-				Color = Color,
-				Typeface = this.font.Typeface,
-				TextSize = this.font.Size
+				Color = Color
 			};
 		}
 
 		private SKFont font;
-		private SKPaint text;
+		private SKPaint textPen;
 		private float lineHeightValue;
 		private bool lineHeightExplicit;
 
@@ -246,9 +241,9 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		public SKFont FontDef => this.font;
 
 		/// <summary>
-		/// Measured Text
+		/// Text Pen
 		/// </summary>
-		public SKPaint Text => this.text;
+		public SKPaint TextPen => this.textPen;
 
 		/// <summary>
 		/// Line height.

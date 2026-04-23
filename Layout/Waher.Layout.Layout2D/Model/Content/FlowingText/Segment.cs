@@ -19,9 +19,9 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		public SKFont Font { get; set; }
 
 		/// <summary>
-		/// Paint state.
+		/// Pen state.
 		/// </summary>
-		public SKPaint Paint { get; set; }
+		public SKPaint Pen { get; set; }
 
 		/// <summary>
 		/// Bounds of segment.
@@ -83,8 +83,8 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// </summary>
 		public void Dispose()
 		{
-			this.Paint?.Dispose();
-			this.Paint = null;
+			this.Pen?.Dispose();
+			this.Pen = null;
 		}
 
 		/// <inheritdoc/>

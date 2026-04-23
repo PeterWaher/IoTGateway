@@ -45,7 +45,6 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 			int i = Segments.Count;
 
 			SKFont Bak = State.Font;
-			SKPaint Bak2 = State.Text;
 
 			State.Font = new SKFont()
 			{
@@ -56,13 +55,9 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 				Typeface = Bak.Typeface
 			};
 
-			State.Text = State.Text.Clone();
-			State.Text.TextSize = Bak.Size * 0.6f;
-
 			await base.MeasureSegments(Segments, State);
 
 			State.Font = Bak;
-			State.Text = Bak2;
 
 			int c = Segments.Count;
 

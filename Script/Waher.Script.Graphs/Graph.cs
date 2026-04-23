@@ -793,7 +793,6 @@ namespace Waher.Script.Graphs
 			{
 				return new SKPaint()
 				{
-					FilterQuality = SKFilterQuality.High,
 					IsAntialias = true,
 					Style = SKPaintStyle.Stroke,
 					Color = Color,

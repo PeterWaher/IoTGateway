@@ -180,7 +180,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			SortedDictionary<Guid, bool> Objects2 = [];
-			SortedDictionary<Guid, bool> Objects3 =	[];
+			SortedDictionary<Guid, bool> Objects3 = [];
 			Simple Prev = null;
 			Simple Obj;
 			ulong Rank = 0;
@@ -375,7 +375,6 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(TimeoutException))]
 		public async Task DBFiles_Index_Test_04_UnlockedChangeEnumeration()
 		{
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));
@@ -386,13 +385,7 @@ namespace Waher.Persistence.FilesLW.Test
 			{
 				IndexBTreeFileCursor<Simple> e = await this.index1.GetTypedEnumeratorLocked<Simple>();
 
-				while (await e.MoveNextAsyncLocked())
-				{
-					Obj = e.Current;
-					Assert.IsNotNull(Obj);
-					Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
-					await this.file.SaveNewObject(Obj, false, null);
-				}
+				await Assert.ThrowsAsync<TimeoutException>(async () => await e.MoveNextAsyncLocked());
 			}
 			finally
 			{
@@ -2312,7 +2305,7 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
-					Assert.IsTrue(s.IndexOf(Obj.CIString[0]) >= 0);
+					Assert.IsGreaterThanOrEqualTo(0, s.IndexOf(Obj.CIString[0]));
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
 			}
@@ -2450,7 +2443,7 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 
 			foreach (Simple Obj in Objects.Values)
-				Assert.IsTrue(Obj.Byte + Obj.SByte <= 0);
+				Assert.IsLessThanOrEqualTo(0, Obj.Byte + Obj.SByte);
 		}
 
 		[TestMethod]
@@ -2757,7 +2750,7 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 
 			foreach (Simple Obj2 in Objects.Values)
-				Assert.IsTrue(Sum(Obj2.ObjectId) < 0x80);
+				Assert.IsLessThan(0x80, Sum(Obj2.ObjectId));
 		}
 
 		// TODO: Tests on searchon on null values (null arguments, and/or null property values)

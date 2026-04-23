@@ -2,10 +2,11 @@
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Layout.Layout2D.Model.Backgrounds;
 using Waher.Layout.Layout2D.Model.Fonts;
 using Waher.Layout.Layout2D.Model.Pens;
 
-namespace Waher.Layout.Layout2D.Model.Backgrounds
+namespace Waher.Layout.Layout2D.Model
 {
 	/// <summary>
 	/// Root node for two-dimensional layouts
@@ -145,7 +146,7 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		public override async Task DoMeasureDimensions(DrawingState State)
 		{
 			SKFont FontBak = null;
-			SKPaint TextBak = null;
+			SKPaint TextPenBak = null;
 			SKPaint PenBak = null;
 			SKPaint BackgroundBak = null;
 
@@ -161,8 +162,8 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				FontBak = State.Font;
 				State.Font = this.fontDef.FontDef;
 
-				TextBak = State.Text;
-				State.Text = this.fontDef.Text;
+				TextPenBak = State.TextPen;
+				State.TextPen = this.fontDef.TextPen;
 			}
 
 			RefId = await this.pen.TryEvaluate(State.Session);
@@ -190,8 +191,8 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 			if (!(FontBak is null))
 				State.Font = FontBak;
 
-			if (!(TextBak is null))
-				State.Text = TextBak;
+			if (!(TextPenBak is null))
+				State.TextPen = TextPenBak;
 
 			if (!(PenBak is null))
 				State.ShapePen = PenBak;
@@ -207,7 +208,7 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		public override void MeasurePositions(DrawingState State)
 		{
 			SKFont FontBak = null;
-			SKPaint TextBak = null;
+			SKPaint TextPenBak = null;
 			SKPaint PenBak = null;
 			SKPaint BackgroundBak = null;
 
@@ -216,8 +217,8 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				FontBak = State.Font;
 				State.Font = this.fontDef.FontDef;
 
-				TextBak = State.Text;
-				State.Text = this.fontDef.Text;
+				TextPenBak = State.TextPen;
+				State.TextPen = this.fontDef.TextPen;
 			}
 
 			if (!(this.penDef is null))
@@ -237,8 +238,8 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 			if (!(FontBak is null))
 				State.Font = FontBak;
 
-			if (!(TextBak is null))
-				State.Text = TextBak;
+			if (!(TextPenBak is null))
+				State.TextPen = TextPenBak;
 
 			if (!(PenBak is null))
 				State.ShapePen = PenBak;
@@ -254,7 +255,7 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		public override async Task Draw(DrawingState State)
 		{
 			SKFont FontBak = null;
-			SKPaint TextBak = null;
+			SKPaint TextPenBak = null;
 			SKPaint PenBak = null;
 			SKPaint BackgroundBak = null;
 
@@ -263,8 +264,8 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				FontBak = State.Font;
 				State.Font = this.fontDef.FontDef;
 
-				TextBak = State.Text;
-				State.Text = this.fontDef.Text;
+				TextPenBak = State.TextPen;
+				State.TextPen = this.fontDef.TextPen;
 			}
 
 			if (!(this.penDef is null))
@@ -287,8 +288,8 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 			if (!(FontBak is null))
 				State.Font = FontBak;
 
-			if (!(TextBak is null))
-				State.Text = TextBak;
+			if (!(TextPenBak is null))
+				State.TextPen = TextPenBak;
 
 			if (!(PenBak is null))
 				State.ShapePen = PenBak;

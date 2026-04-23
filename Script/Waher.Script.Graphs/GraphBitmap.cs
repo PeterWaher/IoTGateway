@@ -81,6 +81,7 @@ namespace Waher.Script.Graphs
 			}
 
 			PixelInformation Pixels = G.CreatePixels(Settings);
+			SKSamplingOptions Options = new SKSamplingOptions(SKCubicResampler.Mitchell);
 
 			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Math.Max(Pixels.Width, this.pixels?.Width ?? 0),
 				Math.Max(Pixels.Height, this.pixels?.Height ?? 0), SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
@@ -89,14 +90,14 @@ namespace Waher.Script.Graphs
 
 				using (SKImage Bmp = Pixels.CreateBitmap())
 				{
-					Canvas.DrawImage(Bmp, 0, 0);
+					Canvas.DrawImage(Bmp, 0, 0, Options);
 				}
 
 				if (!(this.pixels is null))
 				{
 					using (SKImage Image = this.pixels.CreateBitmap())
 					{
-						Canvas.DrawImage(Image, 0, 0);
+						Canvas.DrawImage(Image, 0, 0, Options);
 					}
 				}
 
@@ -125,6 +126,7 @@ namespace Waher.Script.Graphs
 			}
 
 			PixelInformation Pixels = G.CreatePixels(Settings);
+			SKSamplingOptions Options = new SKSamplingOptions(SKCubicResampler.Mitchell);
 
 			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Math.Max(Pixels.Width, this.pixels?.Width ?? 0),
 				Math.Max(Pixels.Height, this.pixels?.Height ?? 0), SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
@@ -135,13 +137,13 @@ namespace Waher.Script.Graphs
 				{
 					using (SKImage Image = this.pixels.CreateBitmap())
 					{
-						Canvas.DrawImage(Image, 0, 0);
+						Canvas.DrawImage(Image, 0, 0, Options);
 					}
 				}
 
 				using (SKImage Bmp = Pixels.CreateBitmap())
 				{
-					Canvas.DrawImage(Bmp, 0, 0);
+					Canvas.DrawImage(Bmp, 0, 0, Options);
 				}
 
 				using (SKImage Result = Surface.Snapshot())

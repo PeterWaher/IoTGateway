@@ -646,17 +646,20 @@ namespace Waher.Script.Graphs
 
 				IVector YLabels = GetLabels(ref this.minY, ref this.maxY, this.y, Settings.ApproxNrLabelsY, out LabelType YLabelType);
 				string[] YLabelStrings = LabelStrings(YLabels, YLabelType);
-				SKPaint Font = new SKPaint()
+				SKPaint Pen = new SKPaint()
 				{
-					FilterQuality = SKFilterQuality.High,
-					HintingLevel = SKPaintHinting.Full,
-					SubpixelText = true,
 					IsAntialias = true,
 					Style = SKPaintStyle.Fill,
-					Color = Settings.AxisColor,
-					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Normal) 
+					Color = Settings.AxisColor
+				};
+				SKFont Font = new SKFont()
+				{
+					Edging = SKFontEdging.SubpixelAntialias,
+					Hinting = SKFontHinting.Full,
+					Subpixel = true,
+					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Normal)
 						?? SKTypeface.Default,
-					TextSize = (float)Settings.LabelFontSize
+					Size = (float)Settings.LabelFontSize
 				};
 				SKRect Bounds = new SKRect();
 				float Size;
@@ -666,7 +669,7 @@ namespace Waher.Script.Graphs
 				{
 					foreach (IElement Label in YLabels.ChildElements)
 					{
-						Font.MeasureText(LabelString(Label, YLabelType), ref Bounds);
+						Font.MeasureText(LabelString(Label, YLabelType), out Bounds, Pen);
 						Size = Bounds.Width;
 						if (Size > MaxSize)
 							MaxSize = Size;
@@ -683,7 +686,7 @@ namespace Waher.Script.Graphs
 				{
 					foreach (IElement Label in XLabels.ChildElements)
 					{
-						Font.MeasureText(LabelString(Label, XLabelType), ref Bounds);
+						Font.MeasureText(LabelString(Label, XLabelType), out Bounds, Pen);
 						Size = Bounds.Height;
 						if (Size > MaxSize)
 							MaxSize = Size;
@@ -696,21 +699,18 @@ namespace Waher.Script.Graphs
 
 				SKPaint AxisBrush = new SKPaint()
 				{
-					FilterQuality = SKFilterQuality.High,
 					IsAntialias = true,
 					Style = SKPaintStyle.Fill,
 					Color = Settings.AxisColor
 				};
 				SKPaint GridBrush = new SKPaint()
 				{
-					FilterQuality = SKFilterQuality.High,
 					IsAntialias = true,
 					Style = SKPaintStyle.Fill,
 					Color = Settings.GridColor
 				};
 				SKPaint AxisPen = new SKPaint()
 				{
-					FilterQuality = SKFilterQuality.High,
 					IsAntialias = true,
 					Style = SKPaintStyle.Stroke,
 					Color = Settings.AxisColor,
@@ -718,7 +718,6 @@ namespace Waher.Script.Graphs
 				};
 				SKPaint GridPen = new SKPaint()
 				{
-					FilterQuality = SKFilterQuality.High,
 					IsAntialias = true,
 					Style = SKPaintStyle.Stroke,
 					Color = Settings.GridColor,
@@ -774,7 +773,7 @@ namespace Waher.Script.Graphs
 				foreach (IElement Label in YLabels.ChildElements)
 				{
 					s = YLabelStrings[i];
-					Font.MeasureText(s, ref Bounds);
+					Font.MeasureText(s, out Bounds, Pen);
 					d = LabelYY[i++];
 					f = (float)d;
 
@@ -792,7 +791,7 @@ namespace Waher.Script.Graphs
 					if (this.showYAxis)
 					{
 						f += Bounds.Height * 0.5f;
-						Canvas.DrawText(s, x3 - Bounds.Width - Settings.MarginLabel, f, Font);
+						Canvas.DrawText(s, x3 - Bounds.Width - Settings.MarginLabel, f, Font, Pen);
 					}
 				}
 
@@ -803,7 +802,7 @@ namespace Waher.Script.Graphs
 				foreach (IElement Label in XLabels.ChildElements)
 				{
 					s = XLabelStrings[i];
-					Font.MeasureText(s, ref Bounds);
+					Font.MeasureText(s, out Bounds, Pen);
 					d = LabelXX[i++];
 					f = (float)d;
 
@@ -827,32 +826,38 @@ namespace Waher.Script.Graphs
 						else if (f + Size > x3 + w)
 							f = x3 + w - Size;
 
-						Canvas.DrawText(s, f, y3 + Settings.MarginLabel + (float)Settings.LabelFontSize, Font);
+						Canvas.DrawText(s, f, y3 + Settings.MarginLabel + (float)Settings.LabelFontSize, Font, Pen);
 					}
 				}
 
 				DrawingArea.XLabelPositions = XLabelPositions;
 				DrawingArea.YLabelPositions = YLabelPositions;
 
+				Pen.Dispose();
+				Pen = null;
+
 				Font.Dispose();
 				Font = null;
 
-				Font = new SKPaint()
+				Pen = new SKPaint()
 				{
-					FilterQuality = SKFilterQuality.High,
-					HintingLevel = SKPaintHinting.Full,
-					SubpixelText = true,
 					IsAntialias = true,
 					Style = SKPaintStyle.Fill,
-					Color = Settings.AxisColor,
-					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Bold) 
+					Color = Settings.AxisColor
+				};
+				Font = new SKFont()
+				{
+					Edging = SKFontEdging.SubpixelAntialias,
+					Hinting = SKFontHinting.Full,
+					Subpixel = true,
+					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Bold)
 						?? SKTypeface.Default,
-					TextSize = (float)(Settings.LabelFontSize * 1.5)
+					Size = (float)(Settings.LabelFontSize * 1.5)
 				};
 
 				if (!string.IsNullOrEmpty(this.title))
 				{
-					Font.MeasureText(this.title, ref Bounds);
+					Font.MeasureText(this.title, out Bounds, Pen);
 					Size = Bounds.Width;
 
 					f = x3 + (x2 - x3 - Size) * 0.5f;
@@ -862,12 +867,12 @@ namespace Waher.Script.Graphs
 					else if (f + Size > x3 + w)
 						f = x3 + w - Size;
 
-					Canvas.DrawText(this.title, f, (float)(Settings.MarginTop + 0.1 * Settings.LabelFontSize - Bounds.Top), Font);
+					Canvas.DrawText(this.title, f, (float)(Settings.MarginTop + 0.1 * Settings.LabelFontSize - Bounds.Top), Font, Pen);
 				}
 
 				if (!string.IsNullOrEmpty(this.labelX))
 				{
-					Font.MeasureText(this.labelX, ref Bounds);
+					Font.MeasureText(this.labelX, out Bounds, Pen);
 					Size = Bounds.Width;
 
 					f = x3 + (x2 - x3 - Size) * 0.5f;
@@ -877,12 +882,12 @@ namespace Waher.Script.Graphs
 					else if (f + Size > x3 + w)
 						f = x3 + w - Size;
 
-					Canvas.DrawText(this.labelX, f, (float)(Settings.Height - Settings.MarginBottom - 0.1 * Settings.LabelFontSize - Bounds.Height - Bounds.Top), Font);
+					Canvas.DrawText(this.labelX, f, (float)(Settings.Height - Settings.MarginBottom - 0.1 * Settings.LabelFontSize - Bounds.Height - Bounds.Top), Font, Pen);
 				}
 
 				if (!string.IsNullOrEmpty(this.labelY))
 				{
-					Font.MeasureText(this.labelY, ref Bounds);
+					Font.MeasureText(this.labelY, out Bounds, Pen);
 					Size = Bounds.Width;
 
 					f = y3 - (y3 - y1 - Size) * 0.5f;
@@ -894,7 +899,7 @@ namespace Waher.Script.Graphs
 
 					Canvas.Translate((float)(Settings.MarginLeft + 0.1 * Settings.LabelFontSize - Bounds.Top), f);
 					Canvas.RotateDegrees(-90);
-					Canvas.DrawText(this.labelY, 0, 0, Font);
+					Canvas.DrawText(this.labelY, 0, 0, Font, Pen);
 					Canvas.ResetMatrix();
 				}
 
@@ -924,6 +929,7 @@ namespace Waher.Script.Graphs
 				using (SKImage Result = Surface.Snapshot())
 				{
 					Font?.Dispose();
+					Pen?.Dispose();
 
 					AxisBrush.Dispose();
 					GridBrush.Dispose();

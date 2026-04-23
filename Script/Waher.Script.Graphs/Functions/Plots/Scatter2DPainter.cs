@@ -24,7 +24,6 @@ namespace Waher.Script.Graphs.Functions.Plots
 			float Size = (float)Expression.ToDouble(Parameters[1]);
 			SKPaint Brush = new SKPaint
 			{
-				FilterQuality = SKFilterQuality.High,
 				IsAntialias = true,
 				Style = SKPaintStyle.Fill,
 				Color = Color

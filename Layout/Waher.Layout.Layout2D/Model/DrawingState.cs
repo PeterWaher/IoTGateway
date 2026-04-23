@@ -18,13 +18,14 @@ namespace Waher.Layout.Layout2D.Model
 	{
 		private Dictionary<ILayoutElement, bool> relativeElements = null;
 		private readonly Variables session;
-		private readonly SKPaint textRoot;
+		private readonly SKPaint textPenRoot;
+		private readonly SKFont fontRoot;
 		private readonly SKPaint defaultPen;
 		private SKCanvas canvas;
 		private SKPaint shapePen;
 		private SKPaint shapeFill;
 		private SKFont font;
-		private SKPaint text;
+		private SKPaint textPen;
 		private float? width_0;
 		private float? height_x;
 		private SKSize areaSize;
@@ -45,7 +46,7 @@ namespace Waher.Layout.Layout2D.Model
 			this.pixelsPerInch = Settings.PixelsPerInch;
 			this.areaSize = this.viewportSize = new SKSize(Settings.Width, Settings.Height);
 
-			this.font = new SKFont()
+			this.font = this.fontRoot = new SKFont()
 			{
 				Edging = SKFontEdging.SubpixelAntialias,
 				Hinting = SKFontHinting.Full,
@@ -55,21 +56,15 @@ namespace Waher.Layout.Layout2D.Model
 					?? SKTypeface.Default
             };
 
-			this.text = this.textRoot = new SKPaint()
+			this.textPen = this.textPenRoot = new SKPaint()
 			{
-				FilterQuality = SKFilterQuality.High,
-				HintingLevel = SKPaintHinting.Full,
-				SubpixelText = true,
 				IsAntialias = true,
 				Style = SKPaintStyle.Fill,
-				Color = Settings.TextColor,
-				Typeface = this.font.Typeface,
-				TextSize = this.font.Size
+				Color = Settings.TextColor
 			};
 
 			this.defaultPen = new SKPaint()
 			{
-				FilterQuality = SKFilterQuality.High,
 				IsAntialias = true,
 				Style = SKPaintStyle.Stroke,
 				Color = Settings.PenColor
@@ -81,8 +76,10 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		public void Dispose()
 		{
-			this.text?.Dispose();
+			this.textPen?.Dispose();
+			this.textPenRoot?.Dispose();
 			this.font?.Dispose();
+			this.fontRoot?.Dispose();
 			this.defaultPen?.Dispose();
 		}
 
@@ -108,10 +105,10 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// Current text paint settings
 		/// </summary>
-		public SKPaint Text
+		public SKPaint TextPen
 		{
-			get => this.text;
-			set => this.text = value;
+			get => this.textPen;
+			set => this.textPen = value;
 		}
 
 		/// <summary>
@@ -199,7 +196,7 @@ namespace Waher.Layout.Layout2D.Model
 
 				// Relative to the font-size of the element (2em means 2 times the size of the current font)
 				case LengthUnit.Em:
-					float Size2 = L.Value * this.text.TextSize;
+					float Size2 = L.Value * this.font.Size;
 					if (Size != Size2)
 					{
 						this.ReportMeasureRelative(Element);
@@ -211,8 +208,7 @@ namespace Waher.Layout.Layout2D.Model
 				case LengthUnit.Ex:
 					if (!this.height_x.HasValue)
 					{
-						SKRect Bounds = new SKRect();
-						this.text.MeasureText("x", ref Bounds);
+						this.font.MeasureText("x", out SKRect Bounds, this.textPen);
 						this.height_x = Bounds.Height;
 					}
 
@@ -227,7 +223,7 @@ namespace Waher.Layout.Layout2D.Model
 				// Relative to the width of the "0" (zero)
 				case LengthUnit.Ch:
 					if (!this.width_0.HasValue)
-						this.width_0 = this.text.MeasureText("0");
+						this.width_0 = this.font.MeasureText("0", this.textPen);
 
 					Size2 = L.Value * this.width_0.Value;
 					if (Size != Size2)
@@ -239,7 +235,7 @@ namespace Waher.Layout.Layout2D.Model
 
 				// Relative to font-size of the root element
 				case LengthUnit.Rem:
-					Size2 = L.Value * this.textRoot.TextSize;
+					Size2 = L.Value * this.fontRoot.Size;
 					if (Size != Size2)
 					{
 						this.ReportMeasureRelative(Element);
@@ -337,7 +333,7 @@ namespace Waher.Layout.Layout2D.Model
 			if (Font is null)
 				return null;
 			else
-				return new FontState(Font.Text, Font.FontDef);
+				return new FontState(Font.TextPen, Font.FontDef);
 		}
 
 		/// <summary>
@@ -348,7 +344,7 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			if (!(FontState is null))
 			{
-				this.text = FontState.Paint;
+				this.textPen = FontState.Pen;
 				this.font = FontState.Font;
 			}
 		}

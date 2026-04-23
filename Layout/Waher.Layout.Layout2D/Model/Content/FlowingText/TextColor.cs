@@ -92,14 +92,14 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 
 			if (Color.Ok)
 			{
-				SKPaint Bak = State.Text;
+				SKPaint Bak = State.TextPen;
 			
-				State.Text = State.Text.Clone();
-				State.Text.Color = Color.Result;
+				State.TextPen = State.TextPen.Clone();
+				State.TextPen.Color = Color.Result;
 
 				await base.MeasureSegments(Segments, State);
 
-				State.Text = Bak;
+				State.TextPen = Bak;
 			}
 			else
 				await base.MeasureSegments(Segments, State);

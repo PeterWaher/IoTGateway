@@ -56,7 +56,6 @@ namespace Waher.Content.Images
 
 				SKPaint IconFill = new SKPaint()
 				{
-					FilterQuality = SKFilterQuality.High,
 					IsAntialias = true,
 					Style = SKPaintStyle.Fill,
 					Color = Foreground

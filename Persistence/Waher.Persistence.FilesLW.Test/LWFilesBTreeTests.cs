@@ -294,7 +294,6 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(Exception))]
 		[Ignore]
 		public async Task DBFiles_BTree_Test_01_X_Repeat_DBFiles_BTree_Test_01()
 		{
@@ -461,7 +460,6 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(KeyAlreadyExistsException))]
 		public async Task DBFiles_BTree_Test_02_SaveOld()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
@@ -469,7 +467,8 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.NotSame(Guid.Empty, ObjectId);
 			await this.file.SaveNewObject(Obj, false, null);
 
-			await AssertConsistent(this.file, this.provider, 1, Obj, true);
+			await Assert.ThrowsAsync<KeyAlreadyExistsException>(async () =>
+				await AssertConsistent(this.file, this.provider, 1, Obj, true));
 		}
 
 		[TestMethod]
@@ -819,7 +818,6 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(InvalidOperationException))]
 		public async Task DBFiles_BTree_Test_20_UnlockedChangeEnumeration()
 		{
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));
@@ -1028,20 +1026,22 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(SerializationException))]
 		public async Task DBFiles_BTree_Test_25_UpdateUnsavedObject()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
-			await this.file.UpdateObject(Obj, false, null);
+
+			await Assert.ThrowsAsync<SerializationException>(async () =>
+				await this.file.UpdateObject(Obj, false, null));
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(KeyNotFoundException))]
 		public async Task DBFiles_BTree_Test_26_UpdateUnexistentObject()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Obj.ObjectId = Guid.NewGuid();
-			await this.file.UpdateObject(Obj, false, null);
+			
+			await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+				await this.file.UpdateObject(Obj, false, null));
 		}
 
 		[TestMethod]

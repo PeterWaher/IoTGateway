@@ -106,12 +106,12 @@ namespace Waher.Networking.HTTP.Test
 			DateTime Start = DateTime.Now;
 			CancellationTokenSource Cancel = new();
 			Cancel.CancelAfter(1000);
-			await Assert.ThrowsExceptionAsync<OperationCanceledException>(async () =>
+			await Assert.ThrowsAsync<OperationCanceledException>(async () =>
 			{
 				await FlowControl.RequestResources(1, 10000, Cancel.Token);
 			});
 
-			Assert.IsTrue(DateTime.Now.Subtract(Start).TotalSeconds >= 1);
+			Assert.IsGreaterThanOrEqualTo(1, DateTime.Now.Subtract(Start).TotalSeconds);
 
 			Assert.IsTrue(FlowControl.TryGetStream(1, out Http2Stream Stream));
 			Assert.AreEqual(1, Stream.StreamId);
@@ -139,12 +139,12 @@ namespace Waher.Networking.HTTP.Test
 			DateTime Start = DateTime.Now;
 			CancellationTokenSource Cancel = new();
 			Cancel.CancelAfter(1000);
-			await Assert.ThrowsExceptionAsync<OperationCanceledException>(async () =>
+			await Assert.ThrowsAsync<OperationCanceledException>(async () =>
 			{
 				await FlowControl.RequestResources(1, 10000, Cancel.Token);
 			});
 
-			Assert.IsTrue(DateTime.Now.Subtract(Start).TotalSeconds >= 1);
+			Assert.IsGreaterThanOrEqualTo(1, DateTime.Now.Subtract(Start).TotalSeconds);
 
 			Assert.IsTrue(FlowControl.TryGetStream(1, out Http2Stream Stream));
 			Assert.AreEqual(1, Stream.StreamId);
@@ -172,12 +172,12 @@ namespace Waher.Networking.HTTP.Test
 			DateTime Start = DateTime.Now;
 			CancellationTokenSource Cancel = new();
 			Cancel.CancelAfter(1000);
-			await Assert.ThrowsExceptionAsync<OperationCanceledException>(async () =>
+			await Assert.ThrowsAsync<OperationCanceledException>(async () =>
 			{
 				await FlowControl.RequestResources(1, 10000, Cancel.Token);
 			});
 
-			Assert.IsTrue(DateTime.Now.Subtract(Start).TotalSeconds >= 1);
+			Assert.IsGreaterThanOrEqualTo(1, DateTime.Now.Subtract(Start).TotalSeconds);
 
 			Assert.IsTrue(FlowControl.TryGetStream(1, out Http2Stream Stream));
 			Assert.AreEqual(1, Stream.StreamId);
@@ -315,11 +315,11 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000, null));
 
 			DateTime Start = DateTime.Now;
-			_ = Task.Delay(1000).ContinueWith((_) => FlowControl.RemoveStream(1));
+			_ = Task.Delay(1000, CancellationToken.None).ContinueWith((_) => FlowControl.RemoveStream(1));
 
 			Assert.AreEqual(-1, await FlowControl.RequestResources(1, 10000, null));
 
-			Assert.IsTrue(DateTime.Now.Subtract(Start).TotalSeconds >= 1);
+			Assert.IsGreaterThanOrEqualTo(1, DateTime.Now.Subtract(Start).TotalSeconds);
 
 			Assert.IsFalse(FlowControl.TryGetStream(1, out _));
 		}

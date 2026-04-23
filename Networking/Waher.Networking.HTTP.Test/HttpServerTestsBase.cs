@@ -38,7 +38,7 @@ namespace Waher.Networking.HTTP.Test
 
 			X509Certificate2 Certificate = Certificates.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
 			this.server = new HttpServer(8081, 8088, Certificate, this.xmlSniffer);
-
+			
 			if (UseConsoleSniffer)
 				this.server.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
 

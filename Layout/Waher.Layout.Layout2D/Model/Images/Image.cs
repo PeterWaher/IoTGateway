@@ -286,8 +286,10 @@ namespace Waher.Layout.Layout2D.Model.Images
 
 			if (!(this.image is null))
 			{
+				SKSamplingOptions Options = new SKSamplingOptions(SKCubicResampler.Mitchell);
+
 				State.Canvas.DrawImage(this.image, this.imageSourcePosition,
-					this.imageDestinationPosition);
+					this.imageDestinationPosition, Options);
 			}
 
 			State.Canvas.Restore();

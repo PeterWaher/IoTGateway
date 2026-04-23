@@ -7,24 +7,24 @@ namespace Waher.Layout.Layout2D.Model
 	/// </summary>
 	public class FontState
 	{
-		private readonly SKPaint paint;
+		private readonly SKPaint pen;
 		private readonly SKFont font;
 
 		/// <summary>
 		/// Drawing state for text.
 		/// </summary>
-		/// <param name="Paint">Paint state</param>
+		/// <param name="Pen">Pen state</param>
 		/// <param name="Font">Font state</param>
-		public FontState(SKPaint Paint, SKFont Font)
+		public FontState(SKPaint Pen, SKFont Font)
 		{
-			this.paint = Paint;
+			this.pen = Pen;
 			this.font = Font;
 		}
 
 		/// <summary>
-		/// Paint state
+		/// Pen state
 		/// </summary>
-		public SKPaint Paint => this.paint;
+		public SKPaint Pen => this.pen;
 
 		/// <summary>
 		/// Font state

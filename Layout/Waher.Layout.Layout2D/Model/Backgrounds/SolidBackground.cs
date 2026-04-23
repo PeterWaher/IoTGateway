@@ -96,7 +96,6 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				{
 					this.paint = new SKPaint()
 					{
-						FilterQuality = SKFilterQuality.High,
 						IsAntialias = true,
 						Style = SKPaintStyle.Fill,
 						Color = Color.Result

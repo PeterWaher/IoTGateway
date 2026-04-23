@@ -42,27 +42,22 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// <param name="State">Current drawing state.</param>
 		public override async Task MeasureSegments(ChunkedList<Segment> Segments, DrawingState State)
 		{
-			SKFont Bak = State.Font;
-			SKPaint Bak2 = State.Text;
+			SKFont FontBak = State.Font;
 
 			State.Font = new SKFont()
 			{
 				Edging = SKFontEdging.SubpixelAntialias,
 				Hinting = SKFontHinting.Full,
 				Subpixel = true,
-				Size = Bak.Size,
-				Typeface = SKTypeface.FromFamilyName(Bak.Typeface.FamilyName,
-					(int)SKFontStyleWeight.Bold, Bak.Typeface.FontWidth, Bak.Typeface.FontSlant) 
-					?? SKTypeface.Default
-            };
-
-			State.Text = State.Text.Clone();
-			State.Text.Typeface = State.Font.Typeface;
+				Size = FontBak.Size,
+				Typeface = SKTypeface.FromFamilyName(FontBak.Typeface.FamilyName,
+					(int)SKFontStyleWeight.Bold, FontBak.Typeface.FontWidth,
+					FontBak.Typeface.FontSlant) ?? FontBak.Typeface
+			};
 
 			await base.MeasureSegments(Segments, State);
 
-			State.Font = Bak;
-			State.Text = Bak2;
+			State.Font = FontBak;
 		}
 	}
 }

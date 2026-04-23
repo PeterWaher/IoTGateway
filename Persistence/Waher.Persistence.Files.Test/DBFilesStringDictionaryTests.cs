@@ -232,17 +232,17 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
 		public async Task DBFiles_StringDictionary_07_Readd()
 		{
-			await this.Test_Readd(100);
+			await Assert.ThrowsAsync<ArgumentException>(async () =>
+				await this.Test_Readd(100));
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
 		public async Task DBFiles_StringDictionary_08_Readd_BLOB()
 		{
-			await this.Test_Readd(100000);
+			await Assert.ThrowsAsync<ArgumentException>(async () =>
+				await this.Test_Readd(100000));
 		}
 
 		private async Task Test_Readd(int MaxLen)

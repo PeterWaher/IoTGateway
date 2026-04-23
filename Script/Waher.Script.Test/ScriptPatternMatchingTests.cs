@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Script.Exceptions;
 
 namespace Waher.Script.Test
@@ -19,11 +19,11 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ScriptRuntimeException))]
 		public async Task Test_02_Mismatch()
 		{
-			await ScriptEvaluationTests.Test("[[A,B],[B,C]]:=[[a,b],[c,b]]", new object[] {
-				ScriptEvaluationTests.a, ScriptEvaluationTests.b, ScriptEvaluationTests.c });
+			await Assert.ThrowsAsync<ScriptRuntimeException>(async () =>
+				await ScriptEvaluationTests.Test("[[A,B],[B,C]]:=[[a,b],[c,b]]", new object[] {
+					ScriptEvaluationTests.a, ScriptEvaluationTests.b, ScriptEvaluationTests.c }));
 		}
 
 		[TestMethod]

@@ -196,7 +196,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 			ChunkedList<Segment> Segments = new ChunkedList<Segment>();
 			SKFont FontBak = State.Font;
-			SKPaint TextBak = State.Text;
+			SKPaint PenBak = State.TextPen;
 			float LineHeight = 0f;
 			float LineHeightRel = Font.DefaultLineHeightRelative;
 			bool LineHeightExplicit = false;
@@ -204,7 +204,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 			if (!(this.fontRef is null))
 			{
 				State.Font = this.fontRef.FontDef;
-				State.Text = this.fontRef.Text;
+				State.TextPen = this.fontRef.TextPen;
 				LineHeight = this.fontRef.LineHeight;
 				LineHeightRel = LineHeight / State.Font.Size;
 				LineHeightExplicit = this.fontRef.LineHeightExplicit;
@@ -223,7 +223,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 			if (!(this.fontRef is null))
 			{
 				State.Font = FontBak;
-				State.Text = TextBak;
+				State.TextPen = PenBak;
 			}
 
 			if (!(this.segments is null))
@@ -446,7 +446,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 						x = this.xCoordinate + dx + Row.Indentation;
 						y = this.yCoordinate + Row.Top - Segment.Top + Segment.DeltaY;
 
-						State.Canvas.DrawText(Segment.Text, x, y, Segment.Font, Segment.Paint);
+						State.Canvas.DrawText(Segment.Text, x, y, Segment.Font, Segment.Pen);
 
 						float x1 = x;
 						x += Segment.Width;
@@ -463,7 +463,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 							if (HorizontalLine is null)
 							{
-								HorizontalLine = State.Text.Clone();
+								HorizontalLine = State.TextPen.Clone();
 								HorizontalLine.StrokeWidth = State.Font.Size / 16;
 							}
 

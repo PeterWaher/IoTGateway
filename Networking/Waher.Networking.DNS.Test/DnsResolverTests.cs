@@ -66,12 +66,12 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(GenericException))]
 		public async Task Test_04_NonexistantName()
 		{
-			IPAddress[] Addresses = await DnsResolver.LookupIP4Addresses("dettanamnfinnsinte.se");
-			foreach (IPAddress Address in Addresses)
-				ConsoleOut.WriteLine(Address);
+			await Assert.ThrowsAsync<GenericException>(async () =>
+			{
+				await DnsResolver.LookupIP4Addresses("dettanamnfinnsinte.se");
+			});
 		}
 
 		[TestMethod]

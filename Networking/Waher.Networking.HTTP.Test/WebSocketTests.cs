@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Events.Console;
+using Waher.Networking.HTTP.JsonRpc.Exceptions;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.IO;
@@ -23,7 +24,6 @@ namespace Waher.Networking.HTTP.Test
 	{
 		private const int MaxTextSize = 64 * 1024;
 		private const int MaxBinarySize = 1024 * 1024;
-		private static TestContext context;
 		private HttpServer server;
 		private ConsoleEventSink sink = null;
 		private XmlFileSniffer xmlSniffer = null;
@@ -32,16 +32,12 @@ namespace Waher.Networking.HTTP.Test
 
 		public abstract Version ProtocolVersion { get; }
 
-		[ClassInitialize]
-		public static void ClassInitialize(TestContext Context)
-		{
-			context = Context;
-		}
+		public TestContext TestContext { get; set; }
 
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			string SnifferFileName = context.TestName;
+			string SnifferFileName = this.TestContext.TestName;
 			if (string.IsNullOrEmpty(SnifferFileName))
 				SnifferFileName = "WebSocket";
 
@@ -126,7 +122,6 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(WebSocketException))]
 		public async Task Test_01_Connect_Reject()
 		{
 			this.webSocketListener.Accept += (Sender, e) =>
@@ -142,8 +137,10 @@ namespace Waher.Networking.HTTP.Test
 
 			using SocketsHttpHandler Handler = new();
 			using ClientWebSocket Client = this.CreateClient();
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
-				new HttpMessageInvoker(Handler), CancellationToken.None);
+
+			await Assert.ThrowsAsync<WebSocketException>(async () =>
+				await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+					new HttpMessageInvoker(Handler), CancellationToken.None));
 		}
 
 		[TestMethod]
@@ -208,7 +205,7 @@ namespace Waher.Networking.HTTP.Test
 			await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("Hello World")),
 				WebSocketMessageType.Text, true, CancellationToken.None);
 
-			if (!Result.Task.Wait(5000))
+			if (!Result.Task.Wait(5000, CancellationToken.None))
 				Assert.Fail("No text delivered.");
 
 			if (!Result.Task.Result)
@@ -249,7 +246,7 @@ namespace Waher.Networking.HTTP.Test
 			await Client.SendAsync(new ArraySegment<byte>([1, 2, 3, 4]),
 				WebSocketMessageType.Binary, true, CancellationToken.None);
 
-			if (!Result.Task.Wait(5000))
+			if (!Result.Task.Wait(5000, CancellationToken.None))
 				Assert.Fail("No binary data delivered.");
 
 			if (!Result.Task.Result)
@@ -287,7 +284,7 @@ namespace Waher.Networking.HTTP.Test
 			await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("World")),
 				WebSocketMessageType.Text, true, CancellationToken.None);
 
-			if (!Result.Task.Wait(5000))
+			if (!Result.Task.Wait(5000, CancellationToken.None))
 				Assert.Fail("No text delivered.");
 
 			if (!Result.Task.Result)
@@ -331,7 +328,7 @@ namespace Waher.Networking.HTTP.Test
 			await Client.SendAsync(new ArraySegment<byte>([3, 4]),
 				WebSocketMessageType.Binary, true, CancellationToken.None);
 
-			if (!Result.Task.Wait(5000))
+			if (!Result.Task.Wait(5000, CancellationToken.None))
 				Assert.Fail("No binary data delivered.");
 
 			if (!Result.Task.Result)
@@ -366,7 +363,7 @@ namespace Waher.Networking.HTTP.Test
 			await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(new string('A', 100000))),
 				WebSocketMessageType.Text, true, CancellationToken.None);
 
-			if (!Result.Task.Wait(5000))
+			if (!Result.Task.Wait(5000, CancellationToken.None))
 				Assert.Fail("No text delivered.");
 
 			if (!Result.Task.Result)
@@ -374,7 +371,6 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(WebSocketException))]
 		public async Task Test_08_ReceiveLargeBinary()
 		{
 			TaskCompletionSource<bool> Result = new();
@@ -396,17 +392,18 @@ namespace Waher.Networking.HTTP.Test
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
 			Task T1 = Task.Run(() => Client.SendAsync(new ArraySegment<byte>(new byte[MaxBinarySize * 2]),
-				WebSocketMessageType.Binary, true, CancellationToken.None));
+				WebSocketMessageType.Binary, true, CancellationToken.None), CancellationToken.None);
 
-			Task _ = Task.Delay(5000).ContinueWith((_) =>
+			Task _ = Task.Delay(5000, CancellationToken.None).ContinueWith((_) =>
 			{
 				if (Client.State == WebSocketState.Aborted)
 					Result.TrySetException(new WebSocketException());
 				else
 					Result.TrySetException(new TimeoutException());
-			});
+			}, CancellationToken.None);
 
-			await Task.WhenAny(Result.Task, T1);
+			await Assert.ThrowsAsync<WebSocketException>(async () =>
+				await Task.WhenAny(Result.Task, T1));
 
 			Assert.Fail("Binary data received, contrary to expectation.");
 		}
@@ -428,7 +425,7 @@ namespace Waher.Networking.HTTP.Test
 			WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
 			Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
-			Assert.AreEqual(true, Result.EndOfMessage);
+			Assert.IsTrue(Result.EndOfMessage);
 
 			string s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
 
@@ -452,7 +449,7 @@ namespace Waher.Networking.HTTP.Test
 			WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
 			Assert.AreEqual(WebSocketMessageType.Binary, Result.MessageType);
-			Assert.AreEqual(true, Result.EndOfMessage);
+			Assert.IsTrue(Result.EndOfMessage);
 
 			byte[] Bin = Buffer.Array;
 			int i;
@@ -481,7 +478,7 @@ namespace Waher.Networking.HTTP.Test
 			WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
 			Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
-			Assert.AreEqual(false, Result.EndOfMessage);
+			Assert.IsFalse(Result.EndOfMessage);
 
 			string s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
 
@@ -490,7 +487,7 @@ namespace Waher.Networking.HTTP.Test
 			Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
 			Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
-			Assert.AreEqual(true, Result.EndOfMessage);
+			Assert.IsTrue(Result.EndOfMessage);
 
 			s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
 
@@ -515,7 +512,7 @@ namespace Waher.Networking.HTTP.Test
 			WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
 			Assert.AreEqual(WebSocketMessageType.Binary, Result.MessageType);
-			Assert.AreEqual(false, Result.EndOfMessage);
+			Assert.IsFalse(Result.EndOfMessage);
 
 			byte[] Bin = Buffer.Array;
 
@@ -526,7 +523,7 @@ namespace Waher.Networking.HTTP.Test
 			Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
 			Assert.AreEqual(WebSocketMessageType.Binary, Result.MessageType);
-			Assert.AreEqual(true, Result.EndOfMessage);
+			Assert.IsTrue(Result.EndOfMessage);
 
 			Bin = Buffer.Array;
 
@@ -564,7 +561,7 @@ namespace Waher.Networking.HTTP.Test
 				WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
 				Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
-				Assert.AreEqual(true, Result.EndOfMessage);
+				Assert.IsTrue(Result.EndOfMessage);
 
 				string s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
 
@@ -601,7 +598,7 @@ namespace Waher.Networking.HTTP.Test
 				WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
 				Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
-				Assert.AreEqual(true, Result.EndOfMessage);
+				Assert.IsTrue(Result.EndOfMessage);
 
 				string s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
 
@@ -635,7 +632,7 @@ namespace Waher.Networking.HTTP.Test
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 			await Client.CloseAsync(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, "Manual", CancellationToken.None);
 
-			if (!Result.Task.Wait(5000))
+			if (!Result.Task.Wait(5000, CancellationToken.None))
 				Assert.Fail("Close event not received.");
 
 			if (!Result.Task.Result)

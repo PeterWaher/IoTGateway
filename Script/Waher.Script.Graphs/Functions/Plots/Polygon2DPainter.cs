@@ -23,7 +23,6 @@ namespace Waher.Script.Graphs.Functions.Plots
 			SKColor Color = Graph.ToColor(Parameters[0]);
 			SKPaint Brush = new SKPaint
 			{
-				FilterQuality = SKFilterQuality.High,
 				IsAntialias = true,
 				Style = SKPaintStyle.Fill,
 				Color = Color

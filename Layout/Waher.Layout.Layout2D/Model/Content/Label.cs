@@ -149,9 +149,10 @@ namespace Waher.Layout.Layout2D.Model.Content
 			{
 				this.textValue = Text.Result;
 
-				SKPaint Paint = this.fontRef?.Text ?? State.Text;
+				SKPaint Pen = this.fontRef?.TextPen ?? State.TextPen;
+				SKFont Font = this.fontRef?.FontDef ?? State.Font;
 
-				Paint.MeasureText(this.textValue, ref this.bounds);
+				Font.MeasureText(this.textValue, out this.bounds, Pen);
 
 				this.Width = this.bounds.Width;
 				this.Height = this.bounds.Height;
@@ -230,7 +231,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 			if (this.defined)
 			{
 				State.Canvas.DrawText(this.textValue, this.xCoordinate, this.yCoordinate, 
-					this.fontRef?.FontDef ?? State.Font, this.fontRef?.Text ?? State.Text);
+					this.fontRef?.FontDef ?? State.Font, this.fontRef?.TextPen ?? State.TextPen);
 			}
 
 			await base.Draw(State);

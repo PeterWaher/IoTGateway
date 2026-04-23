@@ -99,10 +99,9 @@ namespace Waher.Layout.Layout2D.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(InvalidOperationException))]
-		public override Task Test_57_HeightUndefined()
+		public override async Task Test_57_HeightUndefined()
 		{
-			return base.Test_57_HeightUndefined();
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await base.Test_57_HeightUndefined());
 		}
 
 	}

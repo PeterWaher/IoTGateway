@@ -97,15 +97,15 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 				E is Font Font)
 			{
 				SKFont Bak = State.Font;
-				SKPaint Bak2 = State.Text;
+				SKPaint Bak2 = State.TextPen;
 
 				State.Font = Font.FontDef;
-				State.Text = Font.Text;
+				State.TextPen = Font.TextPen;
 
 				await base.MeasureSegments(Segments, State);
 
 				State.Font = Bak;
-				State.Text = Bak2;
+				State.TextPen = Bak2;
 			}
 			else
 				await base.MeasureSegments(Segments, State);

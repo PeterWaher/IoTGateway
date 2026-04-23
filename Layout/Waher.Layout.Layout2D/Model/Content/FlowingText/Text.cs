@@ -134,23 +134,20 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 			Segment Segment = new Segment()
 			{
 				Text = Text,
-				Paint = State.Text,
+				Pen = State.TextPen,
 				Font = State.Font,
 				SpaceAfter = SpaceAfter,
 				DeltaY = 0
 			};
 
-			SKRect Bounds = new SKRect();
-			State.Text.MeasureText(Text, ref Bounds);
+			State.Font.MeasureText(Text, out SKRect Bounds, State.TextPen);
 			Segment.Bounds = Bounds;
 
 			Bounds = new SKRect();
 			if (Segment.SpaceAfter)
 			{
-				State.Text.MeasureText("x x", ref Bounds);
-
-				SKRect Bounds2 = new SKRect();
-				State.Text.MeasureText("xx", ref Bounds2);
+				State.Font.MeasureText("x x", out Bounds, State.TextPen);
+				State.Font.MeasureText("xx", out SKRect Bounds2, State.TextPen);
 
 				Bounds.Left -= Bounds2.Left;
 				Bounds.Right -= Bounds2.Right;

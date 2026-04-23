@@ -312,19 +312,19 @@ namespace Waher.Security.LoginMonitor.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(Exception))]
 		public async Task Test_25_Fail41()
 		{
-			await TestFails(
-				Zero, Zero, Zero, Zero, Zero,
-				OneH, Zero, Zero, Zero, Zero,
-				_23H, Zero, Zero, Zero, Zero,
-				OneH, Zero, Zero, Zero, Zero,
-				_5D23H, Zero, Zero, Zero, Zero,
-				OneH, Zero, Zero, Zero, Zero,
-				_23H, Zero, Zero, Zero, Zero,
-				OneH, Zero, Zero, Zero, Zero,
-				_5D23H);
+			await Assert.ThrowsAsync<Exception>(async () =>
+				await TestFails(
+					Zero, Zero, Zero, Zero, Zero,
+					OneH, Zero, Zero, Zero, Zero,
+					_23H, Zero, Zero, Zero, Zero,
+					OneH, Zero, Zero, Zero, Zero,
+					_5D23H, Zero, Zero, Zero, Zero,
+					OneH, Zero, Zero, Zero, Zero,
+					_23H, Zero, Zero, Zero, Zero,
+					OneH, Zero, Zero, Zero, Zero,
+					_5D23H));
 		}
 
 		private static async Task TestFails(params TimeSpan[] Spans)

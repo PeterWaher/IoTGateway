@@ -96,7 +96,6 @@ namespace Waher.Layout.Layout2D.Model.Pens
 				{
 					this.paint = new SKPaint()
 					{
-						FilterQuality = SKFilterQuality.High,
 						IsAntialias = true,
 						Style = SKPaintStyle.Stroke,
 						Color = Color.Result,

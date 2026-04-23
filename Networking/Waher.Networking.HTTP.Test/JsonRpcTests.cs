@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Events.Console;
@@ -315,7 +316,7 @@ namespace Waher.Networking.HTTP.Test
 				new JsonRpcRequest("Add", 3, 4),
 				new JsonRpcRequest("Sub", 3, 4));
 
-			Assert.AreEqual(2, Results.Length);
+			Assert.HasCount(2, Results);
 			
 			Assert.IsTrue(Results[0].HasResult);
 			Assert.AreEqual(7, Results[0].Result);
@@ -325,10 +326,10 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(JsonRpcInvalidRequestError))]
 		public async Task Test_10_EmptyBatch()
 		{
-			await this.client.BatchProcess();
+			await Assert.ThrowsAsync<JsonRpcInvalidRequestError>(async () =>
+				await this.client.BatchProcess());
 		}
 
 		[TestMethod]
@@ -338,7 +339,7 @@ namespace Waher.Networking.HTTP.Test
 				new JsonRpcNotification("Add", 3, 4),
 				new JsonRpcNotification("Sub", 3, 4));
 
-			Assert.AreEqual(0, Results.Length);
+			Assert.IsEmpty(Results);
 		}
 
 		[TestMethod]
@@ -348,7 +349,7 @@ namespace Waher.Networking.HTTP.Test
 				new JsonRpcNotification("Add", 3, 4),
 				new JsonRpcRequest("Sub", 3, 4));
 
-			Assert.AreEqual(1, Results.Length);
+			Assert.HasCount(1, Results);
 
 			Assert.IsTrue(Results[0].HasResult);
 			Assert.AreEqual(-1, Results[0].Result);

@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content.Text;
 using Waher.Networking.HTTP.Authentication;
@@ -16,7 +17,7 @@ namespace Waher.Networking.HTTP.Test
 	{
 		public abstract Version ProtocolVersion { get; }
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_01_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_01_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_01_gzip_rfc7540.xml", false, false, true, false)]
@@ -28,7 +29,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_01_GET_HTTP_ContentLength(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register("/test01.txt", (req, resp) => resp.Return("hej på dej"));
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
@@ -37,7 +38,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual("hej på dej", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_02_100000_rfc7540.xml", false, false, false, false, 100000)]
 		[DataRow("HTTP_02_1000000_rfc7540.xml", false, false, false, false, 1000000)]
 		[DataRow("HTTP_02_10000000_rfc7540.xml", false, false, false, false, 10000000)]
@@ -81,7 +82,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_02_GET_HTTP_Chunked(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli, int TotalSize)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			HttpResource Resource = this.server.Register("/test02.txt", async (req, resp) =>
 			{
 				int i = 0;
@@ -110,7 +111,7 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_03_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_03_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_03_gzip_rfc7540.xml", false, false, true, false)]
@@ -122,7 +123,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_03_GET_HTTP_Encoding(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register("/test03.png", async (req, resp) =>
 			{
 				await resp.Return(new SKBitmap(320, 200));
@@ -135,7 +136,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(200, Bmp.Height);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_04_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_04_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_04_gzip_rfc7540.xml", false, false, true, false)]
@@ -147,7 +148,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_04_GET_HTTPS(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register("/test04.txt", (req, resp) => resp.Return("hej på dej"));
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
@@ -156,7 +157,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual("hej på dej", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_05_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_05_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_05_gzip_rfc7540.xml", false, false, true, false)]
@@ -168,7 +169,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_05_Authentication_Basic(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register("/test05.txt", (req, resp) => resp.Return("hej på dej"), new BasicAuthentication("Test05", this));
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
@@ -178,7 +179,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual("hej på dej", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_06_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_06_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_06_gzip_rfc7540.xml", false, false, true, false)]
@@ -190,7 +191,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_06_Authentication_Digest(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register("/test06.txt", (req, resp) => resp.Return("hej på dej"), new DigestAuthentication("Test06", this));
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
@@ -200,7 +201,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual("hej på dej", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_07_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_07_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_07_gzip_rfc7540.xml", false, false, true, false)]
@@ -212,7 +213,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_07_EmbeddedResource(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register(new HttpEmbeddedResource("/test07.png", "Waher.Networking.HTTP.Test.Data.Frog-300px.png", typeof(HttpServerTests).Assembly));
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
@@ -222,7 +223,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(184, Bmp.Height);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_08_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_08_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_08_gzip_rfc7540.xml", false, false, true, false)]
@@ -234,7 +235,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_08_FolderResource_GET(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register(new HttpFolderResource("/Test08", "Data", false, false, true, false));
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
@@ -244,7 +245,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(264, Bmp.Height);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_09__10_kB_1024_rfc7540.xml", false, false, false, false, 10 * 1024)]            // 10 kB	(k=1024)
 		[DataRow("HTTP_09_100_kB_1024_rfc7540.xml", false, false, false, false, 100 * 1024)]           // 100 kB	(k=1024)
 		[DataRow("HTTP_09___1_MB_1024_rfc7540.xml", false, false, false, false, 1024 * 1024)]          // 1 MB		(k=1024)
@@ -272,7 +273,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_09_FolderResource_PUT_File(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli, int FileSize)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
 			string Resource = "/Test09";
 			if (!this.server.TryGetResource(ref Resource, false, out _, out _))
@@ -332,7 +333,7 @@ namespace Waher.Networking.HTTP.Test
 				}
 
 				Assert.AreEqual(s1.Length, s2.Length);
-				Assert.AreEqual(Data0.Length, Data.Length);
+				Assert.HasCount(Data0.Length, Data);
 				Assert.AreEqual(s1, s2);
 				Assert.AreEqual(Convert.ToBase64String(Data0), Convert.ToBase64String(Data));
 			}
@@ -354,8 +355,7 @@ namespace Waher.Networking.HTTP.Test
 			return sb.ToString();
 		}
 
-		[DataTestMethod]
-		[ExpectedException(typeof(HttpRequestException))]
+		[TestMethod]
 		[DataRow("HTTP_10_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_10_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_10_gzip_rfc7540.xml", false, false, true, false)]
@@ -367,15 +367,17 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_10_FolderResource_PUT_File_NotAllowed(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register(new HttpFolderResource("/Test10", "Data", false, false, true, false));
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
 			UTF8Encoding Utf8 = new(true);
-			byte[] Data = await Client.UploadData("http://localhost:8081/Test10/string.txt", HttpMethod.Put, Utf8.GetBytes(new string('Ω', 100000)));
+
+			await Assert.ThrowsAsync<HttpRequestException>(async () =>
+				await Client.UploadData("http://localhost:8081/Test10/string.txt", HttpMethod.Put, Utf8.GetBytes(new string('Ω', 100000))));
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_11_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_11_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_11_gzip_rfc7540.xml", false, false, true, false)]
@@ -387,7 +389,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_11_FolderResource_DELETE_File(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register(new HttpFolderResource("/Test11", "Data", true, true, true, false));
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
@@ -397,8 +399,7 @@ namespace Waher.Networking.HTTP.Test
 			await Client.UploadData("http://localhost:8081/Test11/string.txt", HttpMethod.Delete, []);
 		}
 
-		[DataTestMethod]
-		[ExpectedException(typeof(HttpRequestException))]
+		[TestMethod]
 		[DataRow("HTTP_12_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_12_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_12_gzip_rfc7540.xml", false, false, true, false)]
@@ -410,17 +411,18 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_12_FolderResource_DELETE_File_NotAllowed(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register(new HttpFolderResource("/Test12", "Data", true, false, true, false));
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
 			UTF8Encoding Utf8 = new(true);
 			await Client.UploadData("http://localhost:8081/Test12/string.txt", HttpMethod.Put, Utf8.GetBytes(new string('Ω', 100000)));
 
-			await Client.UploadData("http://localhost:8081/Test12/string.txt", HttpMethod.Delete, []);
+			await Assert.ThrowsAsync<HttpRequestException>(async () =>
+				await Client.UploadData("http://localhost:8081/Test12/string.txt", HttpMethod.Delete, []));
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_13_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_13_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_13_gzip_rfc7540.xml", false, false, true, false)]
@@ -432,7 +434,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_13_FolderResource_PUT_CreateFolder(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register(new HttpFolderResource("/Test13", "Data", true, false, true, false));
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
@@ -446,7 +448,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(s1, s2);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_14_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_14_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_14_gzip_rfc7540.xml", false, false, true, false)]
@@ -458,7 +460,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_14_FolderResource_DELETE_Folder(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register(new HttpFolderResource("/Test14", "Data", true, true, true, false));
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
@@ -468,7 +470,7 @@ namespace Waher.Networking.HTTP.Test
 			await Client.UploadData("http://localhost:8081/Test14/Folder", HttpMethod.Delete, []);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_15_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_15_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_15_gzip_rfc7540.xml", false, false, true, false)]
@@ -480,7 +482,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_15_GET_Single_Closed_Range(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register(new HttpFolderResource("/Test15", "Data", false, false, true, false));
 
 			using HttpClient Client = new()
@@ -492,16 +494,16 @@ namespace Waher.Networking.HTTP.Test
 			using HttpRequestMessage Request = new(HttpMethod.Get, "http://localhost:8081/Test15/Text.txt");
 			Request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(100, 119);
 
-			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			using HttpResponseMessage Response = await Client.SendAsync(Request, CancellationToken.None);
 			Response.EnsureSuccessStatusCode();
 
-			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
+			byte[] Data = await Response.Content.ReadAsByteArrayAsync(CancellationToken.None);
 
 			string s = Encoding.UTF8.GetString(Data);
 			Assert.AreEqual("89012345678901234567", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_16_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_16_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_16_gzip_rfc7540.xml", false, false, true, false)]
@@ -513,7 +515,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_16_GET_Single_Open_Range1(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register(new HttpFolderResource("/Test16", "Data", false, false, true, false));
 
 			using HttpClient Client = new()
@@ -525,16 +527,16 @@ namespace Waher.Networking.HTTP.Test
 			using HttpRequestMessage Request = new(HttpMethod.Get, "http://localhost:8081/Test16/Text.txt");
 			Request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(980, null);
 
-			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			using HttpResponseMessage Response = await Client.SendAsync(Request, CancellationToken.None);
 			Response.EnsureSuccessStatusCode();
 
-			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
+			byte[] Data = await Response.Content.ReadAsByteArrayAsync(CancellationToken.None);
 
 			string s = Encoding.UTF8.GetString(Data);
 			Assert.AreEqual("89012345678901234567890", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_17_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_17_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_17_gzip_rfc7540.xml", false, false, true, false)]
@@ -546,7 +548,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_17_GET_Single_Open_Range2(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register(new HttpFolderResource("/Test17", "Data", false, false, true, false));
 
 			using HttpClient Client = new()
@@ -558,16 +560,16 @@ namespace Waher.Networking.HTTP.Test
 			using HttpRequestMessage Request = new(HttpMethod.Get, "http://localhost:8081/Test17/Text.txt");
 			Request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(null, 20);
 
-			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			using HttpResponseMessage Response = await Client.SendAsync(Request, CancellationToken.None);
 			Response.EnsureSuccessStatusCode();
 
-			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
+			byte[] Data = await Response.Content.ReadAsByteArrayAsync(CancellationToken.None);
 
 			string s = Encoding.UTF8.GetString(Data);
 			Assert.AreEqual("12345678901234567890", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_18_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_18_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_18_gzip_rfc7540.xml", false, false, true, false)]
@@ -579,7 +581,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_18_GET_MultipleRanges(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register(new HttpFolderResource("/Test18", "Data", false, false, true, false));
 
 			using HttpClient Client = new()
@@ -592,10 +594,10 @@ namespace Waher.Networking.HTTP.Test
 			Request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(100, 199);
 			Request.Headers.Range.Ranges.Add(new System.Net.Http.Headers.RangeItemHeaderValue(null, 100));
 
-			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			using HttpResponseMessage Response = await Client.SendAsync(Request, CancellationToken.None);
 			Response.EnsureSuccessStatusCode();
 
-			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
+			byte[] Data = await Response.Content.ReadAsByteArrayAsync(CancellationToken.None);
 			string s = Encoding.UTF8.GetString(Data);
 			string s2 = await Files.ReadAllTextAsync("Data/MultiRangeResponse.txt");
 
@@ -606,7 +608,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(s2, s.Replace(Boundary, "463d71b7a34048709e1bb217940feea6"));
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_19_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_19_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_19_gzip_rfc7540.xml", false, false, true, false)]
@@ -618,7 +620,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_19_PUT_Range(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register(new HttpFolderResource("/Test19", "Data", true, false, true, false));
 
 			using HttpClient Client = new()
@@ -638,7 +640,7 @@ namespace Waher.Networking.HTTP.Test
 			Request.Content = new ByteArrayContent(Data);
 			Request.Content.Headers.ContentRange = new System.Net.Http.Headers.ContentRangeHeaderValue(20, 39, 40);
 
-			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			using HttpResponseMessage Response = await Client.SendAsync(Request, CancellationToken.None);
 			Response.EnsureSuccessStatusCode();
 
 			for (i = 0; i < 20; i++)
@@ -649,22 +651,22 @@ namespace Waher.Networking.HTTP.Test
 			Request2.Content = new ByteArrayContent(Data);
 			Request2.Content.Headers.ContentRange = new System.Net.Http.Headers.ContentRangeHeaderValue(0, 19, 40);
 
-			using HttpResponseMessage Response2 = await Client.SendAsync(Request2);
+			using HttpResponseMessage Response2 = await Client.SendAsync(Request2, CancellationToken.None);
 			Response2.EnsureSuccessStatusCode();
 
 			using HttpRequestMessage Request3 = new(HttpMethod.Get, "http://localhost:8081/Test19/String2.txt");
 
-			using HttpResponseMessage Response3 = await Client.SendAsync(Request3);
+			using HttpResponseMessage Response3 = await Client.SendAsync(Request3, CancellationToken.None);
 			Response3.EnsureSuccessStatusCode();
 
-			Data = await Response3.Content.ReadAsByteArrayAsync();
+			Data = await Response3.Content.ReadAsByteArrayAsync(CancellationToken.None);
 
 			string s = Encoding.ASCII.GetString(Data);
 
 			Assert.AreEqual("2222222222222222222211111111111111111111", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_20_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_20_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_20_gzip_rfc7540.xml", false, false, true, false)]
@@ -676,7 +678,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_20_PATCH_Range(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register(new HttpFolderResource("/Test20", "Data", true, false, true, false));
 
 			using HttpClient Client = new()
@@ -696,7 +698,7 @@ namespace Waher.Networking.HTTP.Test
 			Request.Content = new ByteArrayContent(Data);
 			Request.Content.Headers.ContentRange = new System.Net.Http.Headers.ContentRangeHeaderValue(20, 39, 40);
 
-			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			using HttpResponseMessage Response = await Client.SendAsync(Request, CancellationToken.None);
 			Response.EnsureSuccessStatusCode();
 
 			for (i = 0; i < 20; i++)
@@ -707,22 +709,22 @@ namespace Waher.Networking.HTTP.Test
 			Request2.Content = new ByteArrayContent(Data);
 			Request2.Content.Headers.ContentRange = new System.Net.Http.Headers.ContentRangeHeaderValue(0, 19, 40);
 
-			using HttpResponseMessage Response2 = await Client.SendAsync(Request2);
+			using HttpResponseMessage Response2 = await Client.SendAsync(Request2, CancellationToken.None);
 			Response2.EnsureSuccessStatusCode();
 
 			using HttpRequestMessage Request3 = new(HttpMethod.Get, "http://localhost:8081/Test20/String2.txt");
 
-			using HttpResponseMessage Response3 = await Client.SendAsync(Request3);
+			using HttpResponseMessage Response3 = await Client.SendAsync(Request3, CancellationToken.None);
 			Response3.EnsureSuccessStatusCode();
 
-			Data = await Response3.Content.ReadAsByteArrayAsync();
+			Data = await Response3.Content.ReadAsByteArrayAsync(CancellationToken.None);
 
 			string s = Encoding.ASCII.GetString(Data);
 
 			Assert.AreEqual("2222222222222222222211111111111111111111", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_21_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_21_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_21_gzip_rfc7540.xml", false, false, true, false)]
@@ -734,7 +736,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_21_HEAD(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register("/test21.png", async (req, resp) =>
 			{
 				await resp.Return(new SKBitmap(320, 200));
@@ -748,17 +750,17 @@ namespace Waher.Networking.HTTP.Test
 
 			using HttpRequestMessage Request = new(HttpMethod.Head, "http://localhost:8081/test21.png");
 
-			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			using HttpResponseMessage Response = await Client.SendAsync(Request, CancellationToken.None);
 			Response.EnsureSuccessStatusCode();
 
 			Assert.IsTrue(Response.Content.Headers.ContentLength > 0);
 
-			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
+			byte[] Data = await Response.Content.ReadAsByteArrayAsync(CancellationToken.None);
 
-			Assert.AreEqual(0, Data.Length);
+			Assert.IsEmpty(Data);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_22_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_22_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_22_gzip_rfc7540.xml", false, false, true, false)]
@@ -770,7 +772,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_22_Cookies(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register("/test22_1.txt", async (req, resp) =>
 			{
 				resp.SetCookie(new Cookie("word1", "hej", "localhost", "/"));
@@ -795,8 +797,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual("hej på dej", s);
 		}
 
-		[DataTestMethod]
-		[ExpectedException(typeof(HttpRequestException))]
+		[TestMethod]
 		[DataRow("HTTP_23_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_23_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_23_gzip_rfc7540.xml", false, false, true, false)]
@@ -808,7 +809,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_23_Conditional_GET_IfModifiedSince_1(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
 			DateTime LastModified = File.GetLastWriteTime("Data\\BarnSwallowIsolated-300px.png");
 
@@ -816,10 +817,12 @@ namespace Waher.Networking.HTTP.Test
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
 			Client.IfModifiedSince = LastModified.AddMinutes(1);
-			byte[] Data = await Client.DownloadData("http://localhost:8081/Test23/BarnSwallowIsolated-300px.png");
+
+			await Assert.ThrowsAsync<HttpRequestException>(async () =>
+				await Client.DownloadData("http://localhost:8081/Test23/BarnSwallowIsolated-300px.png"));
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_24_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_24_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_24_gzip_rfc7540.xml", false, false, true, false)]
@@ -831,7 +834,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_24_Conditional_GET_IfModifiedSince_2(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
 			DateTime LastModified = File.GetLastWriteTime("Data\\BarnSwallowIsolated-300px.png");
 
@@ -845,8 +848,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(264, Bmp.Height);
 		}
 
-		[DataTestMethod]
-		[ExpectedException(typeof(HttpRequestException))]
+		[TestMethod]
 		[DataRow("HTTP_25_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_25_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_25_gzip_rfc7540.xml", false, false, true, false)]
@@ -858,7 +860,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_25_Conditional_PUT_IfUnmodifiedSince_1(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
 			DateTime LastModified = File.GetLastWriteTime("Data\\Temp.txt");
 
@@ -868,10 +870,12 @@ namespace Waher.Networking.HTTP.Test
 			UTF8Encoding Utf8 = new(true);
 			string s1 = new('Ω', 100000);
 			Client.IfUnmodifiedSince = LastModified.AddMinutes(-1);
-			await Client.UploadData("http://localhost:8081/Test25/Temp.txt", HttpMethod.Put, Utf8.GetBytes(s1));
+
+			await Assert.ThrowsAsync<HttpRequestException>(async () =>
+				await Client.UploadData("http://localhost:8081/Test25/Temp.txt", HttpMethod.Put, Utf8.GetBytes(s1)));
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_26_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_26_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_26_gzip_rfc7540.xml", false, false, true, false)]
@@ -883,7 +887,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_26_Conditional_PUT_IfUnmodifiedSince_2(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
 			DateTime LastModified = File.GetLastWriteTime("Data\\Temp.txt");
 
@@ -896,8 +900,7 @@ namespace Waher.Networking.HTTP.Test
 			await Client.UploadData("http://localhost:8081/Test26/Temp.txt", HttpMethod.Put, Utf8.GetBytes(s1));
 		}
 
-		[DataTestMethod]
-		[ExpectedException(typeof(HttpRequestException))]
+		[TestMethod]
 		[DataRow("HTTP_27_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_27_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_27_gzip_rfc7540.xml", false, false, true, false)]
@@ -909,16 +912,18 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_27_NotAcceptable(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
 			this.server.Register(new HttpFolderResource("/Test27", "Data", false, false, true, false));
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
 			Client.Accept = "text/x-test4";
-			byte[] Data = await Client.DownloadData("http://localhost:8081/Test27/Text.txt");
+
+			await Assert.ThrowsAsync<HttpRequestException>(async () =>
+				await Client.DownloadData("http://localhost:8081/Test27/Text.txt"));
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_28_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_28_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_28_gzip_rfc7540.xml", false, false, true, false)]
@@ -930,7 +935,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_28_Content_Conversion(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
 			HttpFolderResource Resource = new("/Test28", "Data", false, false, true, false);
 			Resource.AllowTypeConversion(PlainTextCodec.DefaultContentType, "text/x-test1", "text/x-test2", "text/x-test3");
@@ -946,7 +951,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\r\nConverter 1 was here.\r\nConverter 2 was here.\r\nConverter 3 was here.", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_29_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_29_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_29_gzip_rfc7540.xml", false, false, true, false)]
@@ -958,7 +963,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_29_ReverseProxy(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
 			this.server.Register("/Remote/test29.txt", (req, resp) => resp.Return("hej på dej"));
 			this.server.Register(new HttpReverseProxyResource("/Proxy29", "localhost", 8081, "/Remote", false, TimeSpan.FromSeconds(10)));
@@ -969,7 +974,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual("hej på dej", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_30_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_30_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_30_gzip_rfc7540.xml", false, false, true, false)]
@@ -981,7 +986,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_30_ReverseProxy_WithQuery(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
 			this.server.Register("/Remote/test30.txt", async (req, resp) =>
 			{
@@ -1007,7 +1012,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual("hej på dej", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_31_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_31_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_31_gzip_rfc7540.xml", false, false, true, false)]
@@ -1019,7 +1024,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_31_ReverseProxy_Cookies(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
 			this.server.Register("/Remote/test31/SetA", null, async (req, resp) =>
 			{
@@ -1053,7 +1058,7 @@ namespace Waher.Networking.HTTP.Test
 				Content = new StringContent("hej")
 			};
 
-			using HttpResponseMessage Response = await Client.SendAsync(Request);
+			using HttpResponseMessage Response = await Client.SendAsync(Request, CancellationToken.None);
 			Response.EnsureSuccessStatusCode();
 
 			using HttpRequestMessage Request2 = new(HttpMethod.Post, "http://localhost:8081/Proxy31/test31/SetB")
@@ -1061,7 +1066,7 @@ namespace Waher.Networking.HTTP.Test
 				Content = new StringContent("på")
 			};
 
-			using HttpResponseMessage Response2 = await Client.SendAsync(Request2);
+			using HttpResponseMessage Response2 = await Client.SendAsync(Request2, CancellationToken.None);
 			Response2.EnsureSuccessStatusCode();
 
 			using HttpRequestMessage Request3 = new(HttpMethod.Post, "http://localhost:8081/Proxy31/test31/SetC")
@@ -1069,20 +1074,20 @@ namespace Waher.Networking.HTTP.Test
 				Content = new StringContent("dej")
 			};
 
-			using HttpResponseMessage Response3 = await Client.SendAsync(Request3);
+			using HttpResponseMessage Response3 = await Client.SendAsync(Request3, CancellationToken.None);
 			Response3.EnsureSuccessStatusCode();
 
 			using HttpRequestMessage Request4 = new(HttpMethod.Get, "http://localhost:8081/Proxy31/test31.txt");
-			using HttpResponseMessage Response4 = await Client.SendAsync(Request4);
+			using HttpResponseMessage Response4 = await Client.SendAsync(Request4, CancellationToken.None);
 			Response4.EnsureSuccessStatusCode();
 
-			byte[] Data = await Response4.Content.ReadAsByteArrayAsync();
+			byte[] Data = await Response4.Content.ReadAsByteArrayAsync(CancellationToken.None);
 			string s = Encoding.UTF8.GetString(Data);
 
 			Assert.AreEqual("hej på dej", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_32_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_32_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_32_gzip_rfc7540.xml", false, false, true, false)]
@@ -1094,7 +1099,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_32_TemporaryRedirect(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
 			this.server.Register("/New32/test.txt", (req, resp) => resp.Return("hej på dej"));
 			this.server.Register(new HttpRedirectionResource("/Old32", "/New32", true, false));
@@ -1105,7 +1110,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual("hej på dej", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_33_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_33_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_33_gzip_rfc7540.xml", false, false, true, false)]
@@ -1117,7 +1122,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_33_PermanentRedirect(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
 			this.server.Register("/New33/test.txt", (req, resp) => resp.Return("hej på dej"));
 			this.server.Register(new HttpRedirectionResource("/Old33", "/New33", true, true));
@@ -1128,7 +1133,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual("hej på dej", s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_01_rfc7540.xml", false, false, false, false)]
 		[DataRow("HTTP_01_deflate_rfc7540.xml", false, true, false, false)]
 		[DataRow("HTTP_01_gzip_rfc7540.xml", false, false, true, false)]
@@ -1143,7 +1148,7 @@ namespace Waher.Networking.HTTP.Test
 			if (this.ProtocolVersion == HttpVersion.Version20)
 				Assert.Inconclusive("WebProxy does not support HTTP/2");
 
-			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 			this.server.Register("/test01.txt", (req, resp) => resp.Return("hej på dej"));
 
 			using CookieWebClient Client = new(this.ProtocolVersion);

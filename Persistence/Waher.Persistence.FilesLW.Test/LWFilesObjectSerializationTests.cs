@@ -165,7 +165,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (Simple)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -379,7 +379,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (Classes.Nullable)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -519,7 +519,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (Classes.Nullable)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -636,7 +636,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (Default)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -780,7 +780,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (Default)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -863,7 +863,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			//Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			//Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			// Note: Enumerations are serialized as strings in the generic object, so serializations will not be equal.
 
 			Reader.Restart(Data2, 0);
@@ -969,7 +969,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			//Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			//Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			// Note: Enumerations are serialized as strings in the generic object, so serializations will not be equal.
 
 			Reader.Restart(Data2, 0);
@@ -1106,7 +1106,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (Container)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1181,7 +1181,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (ObjectIdString)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1237,7 +1237,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (ObjectIdByteArray)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1484,7 +1484,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (CollectionTest)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1574,7 +1574,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			//Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			//Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			// Note: Enumerations are serialized as strings in the generic object, so serializations will not be equal.
 
 			Reader.Restart(Data2, 0);
@@ -1717,7 +1717,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (ObsoleteMethod)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -1971,7 +1971,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Structs Obj2 = (Structs)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
-			Assert.AreEqual(true, Obj2.Duration.Negation);
+			Assert.IsTrue(Obj2.Duration.Negation);
 			Assert.AreEqual(1, Obj2.Duration.Years);
 			Assert.AreEqual(2, Obj2.Duration.Months);
 			Assert.AreEqual(3, Obj2.Duration.Days);
@@ -2041,7 +2041,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -2110,7 +2110,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -2179,7 +2179,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -2248,7 +2248,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -2316,7 +2316,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (NestedClass)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -2517,7 +2517,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (DockerBlob)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -2580,7 +2580,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (DockerBlob)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -2705,7 +2705,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (SimpleEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -2885,7 +2885,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (NullableEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -3027,7 +3027,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (NullableEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -3145,7 +3145,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (DefaultEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -3291,7 +3291,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (DefaultEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -3375,7 +3375,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (SimpleArraysEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -3480,7 +3480,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (NullableArraysEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -3617,7 +3617,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (ContainerEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -3726,7 +3726,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			//Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			//Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			// Note: Enumerations are serialized as strings in the generic object, so serializations will not be equal.
 
 			Reader.Restart(Data2, 0);
@@ -3787,7 +3787,7 @@ namespace Waher.Persistence.FilesLW.Test
 			StructsEncrypted Obj2 = (StructsEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
-			Assert.AreEqual(true, Obj2.Duration.Negation);
+			Assert.IsTrue(Obj2.Duration.Negation);
 			Assert.AreEqual(1, Obj2.Duration.Years);
 			Assert.AreEqual(2, Obj2.Duration.Months);
 			Assert.AreEqual(3, Obj2.Duration.Days);
@@ -3854,7 +3854,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (DockerBlobEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -3917,7 +3917,7 @@ namespace Waher.Persistence.FilesLW.Test
 			byte[] Data2 = Writer.GetSerialization();
 			WriteData(Data2);
 
-			Assert.AreEqual(Data.Length, Data2.Length, "Generic Object serialization length does not match typed object serialization.");
+			Assert.HasCount(Data.Length, Data2, "Generic Object serialization length does not match typed object serialization.");
 			Reader.Restart(Data2, 0);
 			Obj2 = (DockerBlobEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 

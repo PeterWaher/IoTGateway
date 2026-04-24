@@ -10,8 +10,9 @@ namespace Waher.Persistence.XmlLedger.Test
 	public class XmlLedgerTests
 	{
 		private static FilesProvider? provider;
-		private static TestContext? context;
 		private XmlFileLedger? ledger;
+
+		public TestContext TestContext { get; set; }
 
 		[AssemblyInitialize]
 		public static async Task AssemblyInitialize(TestContext _)
@@ -29,13 +30,6 @@ namespace Waher.Persistence.XmlLedger.Test
 			Ledger.StartListeningToDatabaseEvents();
 		}
 
-		[ClassInitialize]
-		public static Task ClassInitialize(TestContext Context)
-		{
-			context = Context;
-			return Task.CompletedTask;
-		}
-
 		[AssemblyCleanup]
 		public static async Task AssemblyCleanup()
 		{
@@ -46,7 +40,7 @@ namespace Waher.Persistence.XmlLedger.Test
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
-			string FileName = Path.Combine("Data", (context?.TestName ?? "Test") + ".xml");
+			string FileName = Path.Combine("Data", (this.TestContext.TestName ?? "Test") + ".xml");
 
 			if (File.Exists(FileName))
 				File.Delete(FileName);
@@ -58,7 +52,7 @@ namespace Waher.Persistence.XmlLedger.Test
 		[TestCleanup]
 		public async Task TestCleanup()
 		{
-			await Task.Delay(1000);
+			await Task.Delay(1000, CancellationToken.None);
 
 			if (this.ledger is not null)
 				await this.ledger.Stop();

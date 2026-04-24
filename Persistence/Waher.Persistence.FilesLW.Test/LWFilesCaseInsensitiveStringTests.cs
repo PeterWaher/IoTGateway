@@ -102,7 +102,7 @@ namespace Waher.Persistence.FilesLW.Test
 			CaseInsensitiveString[] Actual = S.Split(["L", "O"], StringSplitOptions.RemoveEmptyEntries);
 			int i, c;
 
-			Assert.AreEqual(c = Expected.Length, Actual.Length);
+			Assert.HasCount(c = Expected.Length, Actual);
 
 			for (i = 0; i < c; i++)
 				Assert.AreEqual(Expected[i], Actual[i]);

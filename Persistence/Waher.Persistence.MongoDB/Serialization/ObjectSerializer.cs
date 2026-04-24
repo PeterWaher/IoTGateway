@@ -25,12 +25,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 	/// </summary>
 	public class ObjectSerializer : IObjectSerializer, IBsonDocumentSerializer
 	{
-		private static readonly Type[] obsoleteMethodTypes = new Type[] { typeof(Dictionary<string, object>) };
+		private static readonly Type[] obsoleteMethodTypes = [typeof(Dictionary<string, object>)];
 
-		private readonly Dictionary<string, string> shortNamesByFieldName = new Dictionary<string, string>();
-		private readonly Dictionary<string, object> defaultValues = new Dictionary<string, object>();
-		private readonly Dictionary<string, Type> memberTypes = new Dictionary<string, Type>();
-		private readonly Dictionary<string, MemberInfo> members = new Dictionary<string, MemberInfo>();
+		private readonly Dictionary<string, string> shortNamesByFieldName = [];
+		private readonly Dictionary<string, object> defaultValues = [];
+		private readonly Dictionary<string, Type> memberTypes = [];
+		private readonly Dictionary<string, MemberInfo> members = [];
 		private readonly MethodInfo obsoleteMethod;
 		private readonly string collectionName;
 		private readonly string typeFieldName;
@@ -108,7 +108,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			}
 
 			ObsoleteMethodAttribute ObsoleteMethodAttribute = this.typeInfo.GetCustomAttribute<ObsoleteMethodAttribute>(true);
-			if (!(ObsoleteMethodAttribute is null))
+			if (ObsoleteMethodAttribute is not null)
 			{
 				this.obsoleteMethod = this.type.GetRuntimeMethod(ObsoleteMethodAttribute.MethodName, obsoleteMethodTypes);
 				if (this.obsoleteMethod is null)
@@ -175,7 +175,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			else
 				this.isNullable = !this.typeInfo.IsValueType;
 
-			StringBuilder CSharp = new StringBuilder();
+			StringBuilder CSharp = new();
 			Type MemberType;
 			System.Reflection.TypeInfo MemberTypeInfo;
 			FieldInfo FI;
@@ -213,12 +213,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			foreach (MemberInfo Member in this.typeInfo.GetMembers(BindingFlags.Public | BindingFlags.Instance))
 			{
-				if (!((FI = Member as FieldInfo) is null))
+				if ((FI = Member as FieldInfo) is not null)
 				{
 					PI = null;
 					MemberType = FI.FieldType;
 				}
-				else if (!((PI = Member as PropertyInfo) is null))
+				else if ((PI = Member as PropertyInfo) is not null)
 				{
 					if (PI.GetMethod is null || PI.SetMethod is null)
 						continue;
@@ -253,7 +253,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 				foreach (object Item in Member.GetCustomAttributes(true))
 				{
-					if (!(Item is Attribute Attr))
+					if (Item is not Attribute Attr)
 						continue;
 
 					if (Attr is IgnoreMemberAttribute)
@@ -288,9 +288,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 								CSharp.Append("string.Empty");
 							else
 							{
-								CSharp.Append("\"");
+								CSharp.Append('"');
 								CSharp.Append(Escape(s2));
-								CSharp.Append("\"");
+								CSharp.Append('"');
 							}
 						}
 						else if (DefaultValue is DateTime TP)
@@ -305,7 +305,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 								CSharp.Append(TP.Ticks.ToString());
 								CSharp.Append(", DateTimeKind.");
 								CSharp.Append(TP.Kind.ToString());
-								CSharp.Append(")");
+								CSharp.Append(')');
 							}
 						}
 						else if (DefaultValue is TimeSpan TS)
@@ -318,7 +318,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 							{
 								CSharp.Append("new TimeSpan(");
 								CSharp.Append(TS.Ticks.ToString());
-								CSharp.Append(")");
+								CSharp.Append(')');
 							}
 						}
 						else if (DefaultValue is Guid Guid)
@@ -387,7 +387,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 						else if (DefaultValue is long)
 						{
 							CSharp.Append(DefaultValue.ToString());
-							CSharp.Append("L");
+							CSharp.Append('L');
 						}
 						else if (DefaultValue is char ch)
 						{
@@ -448,12 +448,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			foreach (MemberInfo Member in this.typeInfo.GetMembers(BindingFlags.Public | BindingFlags.Instance))
 			{
-				if (!((FI = Member as FieldInfo) is null))
+				if ((FI = Member as FieldInfo) is not null)
 				{
 					PI = null;
 					MemberType = FI.FieldType;
 				}
-				else if (!((PI = Member as PropertyInfo) is null))
+				else if ((PI = Member as PropertyInfo) is not null)
 				{
 					if (PI.GetMethod is null || PI.SetMethod is null)
 						continue;
@@ -484,7 +484,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 				foreach (object Item in Member.GetCustomAttributes(true))
 				{
-					if (!(Item is Attribute Attr))
+					if (Item is not Attribute Attr)
 						continue;
 
 					if (Attr is IgnoreMemberAttribute)
@@ -591,12 +591,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 				foreach (MemberInfo Member in this.typeInfo.GetMembers(BindingFlags.Public | BindingFlags.Instance))
 				{
-					if (!((FI = Member as FieldInfo) is null))
+					if ((FI = Member as FieldInfo) is not null)
 					{
 						PI = null;
 						MemberType = FI.FieldType;
 					}
-					else if (!((PI = Member as PropertyInfo) is null))
+					else if ((PI = Member as PropertyInfo) is not null)
 					{
 						if (PI.GetMethod is null || PI.SetMethod is null)
 							continue;
@@ -629,7 +629,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 					foreach (object Item in Member.GetCustomAttributes(true))
 					{
-						if (!(Item is Attribute Attr))
+						if (Item is not Attribute Attr)
 							continue;
 
 						if (Attr is IgnoreMemberAttribute)
@@ -1579,7 +1579,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				CSharp.AppendLine("\t\t\tReader.ReadEndDocument();");
 				CSharp.AppendLine();
 
-				if (!(this.obsoleteMethod is null))
+				if (this.obsoleteMethod is not null)
 				{
 					CSharp.AppendLine("\t\t\tif (!(Obsolete is null))");
 
@@ -1637,12 +1637,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			foreach (MemberInfo Member in this.typeInfo.GetMembers(BindingFlags.Public | BindingFlags.Instance))
 			{
-				if (!((FI = Member as FieldInfo) is null))
+				if ((FI = Member as FieldInfo) is not null)
 				{
 					PI = null;
 					MemberType = FI.FieldType;
 				}
-				else if (!((PI = Member as PropertyInfo) is null))
+				else if ((PI = Member as PropertyInfo) is not null)
 				{
 					if (PI.GetMethod is null || PI.SetMethod is null)
 						continue;
@@ -1677,7 +1677,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 				foreach (object Item in Member.GetCustomAttributes(true))
 				{
-					if (!(Item is Attribute Attr))
+					if (Item is not Attribute Attr)
 						continue;
 
 					if (Attr is IgnoreMemberAttribute)
@@ -2128,7 +2128,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			string CSharpCode = CSharp.ToString();
 
-			Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
+			Dictionary<string, bool> Dependencies = new()
 			{
 				{ GetLocation(typeof(object)), true },
 				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"), true },
@@ -2152,7 +2152,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			if (File.Exists(s))
 				Dependencies[s] = true;
 
-			while (!(Loop is null))
+			while (Loop is not null)
 			{
 				LoopInfo = Loop.GetTypeInfo();
 				Dependencies[GetLocation(Loop)] = true;
@@ -2166,11 +2166,11 @@ namespace Waher.Persistence.MongoDB.Serialization
 				foreach (MemberInfo MI2 in LoopInfo.DeclaredMembers)
 				{
 					FI = MI2 as FieldInfo;
-					if (!(FI is null) && !((s = GetLocation(FI.FieldType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
+					if (FI is not null && !((s = GetLocation(FI.FieldType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
 						Dependencies[s] = true;
 
 					PI = MI2 as PropertyInfo;
-					if (!(PI is null) && !((s = GetLocation(PI.PropertyType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
+					if (PI is not null && !((s = GetLocation(PI.PropertyType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
 						Dependencies[s] = true;
 				}
 
@@ -2179,7 +2179,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 					break;
 			}
 
-			List<MetadataReference> References = new List<MetadataReference>();
+			List<MetadataReference> References = [];
 
 			foreach (string Location in Dependencies.Keys)
 			{
@@ -2188,17 +2188,17 @@ namespace Waher.Persistence.MongoDB.Serialization
 			}
 
 			CSharpCompilation Compilation = CSharpCompilation.Create("WPMA." + this.type.FullName,
-				new SyntaxTree[] { CSharpSyntaxTree.ParseText(CSharpCode) },
+				[CSharpSyntaxTree.ParseText(CSharpCode)],
 				References, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-			MemoryStream Output = new MemoryStream();
-			MemoryStream PdbOutput = new MemoryStream();
+			MemoryStream Output = new();
+			MemoryStream PdbOutput = new();
 
 			EmitResult CompilerResults = Compilation.Emit(Output, pdbStream: PdbOutput);
 
 			if (!CompilerResults.Success)
 			{
-				StringBuilder sb = new StringBuilder();
+				StringBuilder sb = new();
 
 				foreach (Diagnostic Error in CompilerResults.Diagnostics)
 				{
@@ -2279,15 +2279,15 @@ namespace Waher.Persistence.MongoDB.Serialization
 			{
 				if (NewIndex is null)
 				{
-					if (FieldName.StartsWith("-"))
-						NewIndex = Builders<BsonDocument>.IndexKeys.Descending(Serializer?.ToShortName(FieldName.Substring(1)) ?? FieldName.Substring(1));
+					if (FieldName.StartsWith('-'))
+						NewIndex = Builders<BsonDocument>.IndexKeys.Descending(Serializer?.ToShortName(FieldName[1..]) ?? FieldName[1..]);
 					else
 						NewIndex = Builders<BsonDocument>.IndexKeys.Ascending(Serializer?.ToShortName(FieldName) ?? FieldName);
 				}
 				else
 				{
-					if (FieldName.StartsWith("-"))
-						NewIndex = NewIndex.Descending(Serializer?.ToShortName(FieldName.Substring(1)) ?? FieldName.Substring(1));
+					if (FieldName.StartsWith('-'))
+						NewIndex = NewIndex.Descending(Serializer?.ToShortName(FieldName[1..]) ?? FieldName[1..]);
 					else
 						NewIndex = NewIndex.Ascending(Serializer?.ToShortName(FieldName) ?? FieldName);
 				}
@@ -2381,12 +2381,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 				Replace("\"", "\\\"");
 		}
 
-		private static readonly char[] specialCharacters = new char[] { '\\', '\n', '\r', '\t', '\f', '\b', '\a', '"' };
+		private static readonly char[] specialCharacters = ['\\', '\n', '\r', '\t', '\f', '\b', '\a', '"'];
 
 		/// <summary>
 		/// UNIX Epoch, started at 1970-01-01, 00:00:00 (GMT)
 		/// </summary>
-		public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		public static readonly DateTime UnixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 		/// <summary>
 		/// Gets the type of the value.
@@ -2478,7 +2478,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			if (i < 0)
 				Name = FieldName;
 			else
-				Name = FieldName.Substring(0, i);
+				Name = FieldName[..i];
 
 			if (this.shortNamesByFieldName.TryGetValue(FieldName, out string s))
 				Result = s;
@@ -2504,12 +2504,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 						S2 = this.provider.GetObjectSerializer(T);
 
 					if (S2 is ObjectSerializer S3)
-						Result += "." + S3.ToShortName(FieldName.Substring(i + 1), ref Value);
+						Result += "." + S3.ToShortName(FieldName[(i + 1)..], ref Value);
 					else
-						Result += FieldName.Substring(i);
+						Result += FieldName[i..];
 				}
 				else
-					Result += FieldName.Substring(i);
+					Result += FieldName[i..];
 			}
 
 			return Result;
@@ -2522,9 +2522,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 		{
 			get
 			{
-				if (!(this.objectIdFieldInfo is null))
+				if (this.objectIdFieldInfo is not null)
 					return this.objectIdFieldInfo.Name;
-				else if (!(this.objectIdPropertyInfo is null))
+				else if (this.objectIdPropertyInfo is not null)
 					return this.objectIdPropertyInfo.Name;
 				else
 					return null;
@@ -2538,7 +2538,8 @@ namespace Waher.Persistence.MongoDB.Serialization
 		{
 			get
 			{
-				return !(this.objectIdFieldInfo is null) || !(this.objectIdPropertyInfo is null);
+				return this.objectIdFieldInfo is not null ||
+					this.objectIdPropertyInfo is not null;
 			}
 		}
 
@@ -2555,9 +2556,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 		{
 			object OID;
 
-			if (!(this.objectIdFieldInfo is null))
+			if (this.objectIdFieldInfo is not null)
 				OID = this.objectIdFieldInfo.GetValue(Value);
-			else if (!(this.objectIdPropertyInfo is null))
+			else if (this.objectIdPropertyInfo is not null)
 				OID = this.objectIdPropertyInfo.GetValue(Value);
 			else
 				return false;
@@ -2585,9 +2586,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 		{
 			object Obj;
 
-			if (!(this.objectIdFieldInfo is null))
+			if (this.objectIdFieldInfo is not null)
 				Obj = this.objectIdFieldInfo.GetValue(Value);
-			else if (!(this.objectIdPropertyInfo is null))
+			else if (this.objectIdPropertyInfo is not null)
 				Obj = this.objectIdPropertyInfo.GetValue(Value);
 			else
 				throw new NotSupportedException("No Object ID member found in objects of type " + Value.GetType().FullName + ".");
@@ -2613,7 +2614,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				ObjectId ObjectId = ObjectId.GenerateNewId();
 				Type MemberType;
 
-				if (!(this.objectIdFieldInfo is null))
+				if (this.objectIdFieldInfo is not null)
 					MemberType = this.objectIdFieldInfo.FieldType;
 				else
 					MemberType = this.objectIdPropertyInfo.PropertyType;
@@ -2629,7 +2630,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				else
 					throw new NotSupportedException("Unsupported type for Object ID members: " + MemberType.FullName);
 
-				if (!(this.objectIdFieldInfo is null))
+				if (this.objectIdFieldInfo is not null)
 					this.objectIdFieldInfo.SetValue(Value, Obj);
 				else
 					this.objectIdPropertyInfo.SetValue(Value, Obj);
@@ -2693,10 +2694,10 @@ namespace Waher.Persistence.MongoDB.Serialization
 			if (!this.archive)
 				return 0;
 
-			if (!(this.archiveProperty is null))
+			if (this.archiveProperty is not null)
 				return (int)this.archiveProperty.GetValue(Object);
 
-			if (!(this.archiveField is null))
+			if (this.archiveField is not null)
 				return (int)this.archiveField.GetValue(Object);
 
 			return this.archiveDays;

@@ -286,7 +286,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public void DBFiles_Dec_Test_32_ByteArray()
 		{
-			byte[] Org = new byte[] { 1, 2, 3, 4 };
+			byte[] Org = [1, 2, 3, 4];
 			object Value = Org;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
 			byte[] A = (byte[])Value;
@@ -299,7 +299,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public void DBFiles_Dec_Test_33_ByteArray_2()
 		{
-			byte[] Org = new byte[] { 1, 2, 3, 0 };
+			byte[] Org = [1, 2, 3, 0];
 			object Value = Org;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
 			byte[] A = (byte[])Value;

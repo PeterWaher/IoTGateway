@@ -290,10 +290,10 @@ namespace Waher.Persistence.FilesLW.Test
 			object Value = Org;
 			Assert.IsTrue(Comparison.Increment(ref Value));
 			byte[] A = (byte[])Value;
-			Assert.AreEqual(A[0], 1);
-			Assert.AreEqual(A[1], 2);
-			Assert.AreEqual(A[2], 3);
-			Assert.AreEqual(A[3], 5);
+			Assert.AreEqual(1, A[0]);
+			Assert.AreEqual(2, A[1]);
+			Assert.AreEqual(3, A[2]);
+			Assert.AreEqual(5, A[3]);
 		}
 
 		[TestMethod]
@@ -303,10 +303,10 @@ namespace Waher.Persistence.FilesLW.Test
 			object Value = Org;
 			Assert.IsTrue(Comparison.Increment(ref Value));
 			byte[] A = (byte[])Value;
-			Assert.AreEqual(A[0], 1);
-			Assert.AreEqual(A[1], 2);
-			Assert.AreEqual(A[2], 4);
-			Assert.AreEqual(A[3], 0);
+			Assert.AreEqual(1, A[0]);
+			Assert.AreEqual(2, A[1]);
+			Assert.AreEqual(4, A[2]);
+			Assert.AreEqual(0, A[3]);
 		}
 	}
 }

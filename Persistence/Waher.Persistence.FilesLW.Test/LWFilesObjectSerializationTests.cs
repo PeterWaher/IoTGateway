@@ -1971,7 +1971,6 @@ namespace Waher.Persistence.FilesLW.Test
 			Structs Obj2 = (Structs)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
-			Assert.IsNotNull(Obj2.Duration);
 			Assert.AreEqual(true, Obj2.Duration.Negation);
 			Assert.AreEqual(1, Obj2.Duration.Years);
 			Assert.AreEqual(2, Obj2.Duration.Months);
@@ -3788,7 +3787,6 @@ namespace Waher.Persistence.FilesLW.Test
 			StructsEncrypted Obj2 = (StructsEncrypted)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
-			Assert.IsNotNull(Obj2.Duration);
 			Assert.AreEqual(true, Obj2.Duration.Negation);
 			Assert.AreEqual(1, Obj2.Duration.Years);
 			Assert.AreEqual(2, Obj2.Duration.Months);

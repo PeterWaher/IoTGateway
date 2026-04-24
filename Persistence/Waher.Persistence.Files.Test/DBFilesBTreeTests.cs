@@ -820,7 +820,6 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_BTree_Test_20_UnlockedChangeEnumeration()
 		{
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));
-			Simple Obj;
 
 			ObjectBTreeFileCursor<Simple> e = await this.file.GetTypedEnumeratorAsyncLocked<Simple>();
 

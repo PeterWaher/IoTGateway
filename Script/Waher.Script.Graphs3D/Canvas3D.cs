@@ -2861,7 +2861,7 @@ namespace Waher.Script.Graphs3D
 		public void Text(string Text, Vector4 Start, string FontFamily, SKFontStyleWeight Weight,
 			SKFontStyleWidth Width, SKFontStyleSlant Slant, float TextSize, SKColor Color)
 		{
-			SKPaint Paint = null;
+			SKFont Font = null;
 			SKPath Path = null;
 			SKPath.Iterator e = null;
 			SKPoint[] Points = new SKPoint[4];
@@ -2869,14 +2869,14 @@ namespace Waher.Script.Graphs3D
 
 			try
 			{
-				Paint = new SKPaint()
+				Font = new SKFont()
 				{
 					Typeface = SKTypeface.FromFamilyName(FontFamily, Weight, Width, Slant) 
 						?? SKTypeface.Default,
-					TextSize = TextSize
+					Size = TextSize
 				};
 
-				Path = Paint.GetTextPath(Text, 0, 0);
+				Path = Font.GetTextPath(Text, new SKPoint(0, 0));
 				e = Path.CreateIterator(false);
 
 				ChunkedList<Vector4> P = new ChunkedList<Vector4>();
@@ -3059,7 +3059,7 @@ namespace Waher.Script.Graphs3D
 			}
 			finally
 			{
-				Paint?.Dispose();
+				Font?.Dispose();
 				Path?.Dispose();
 				e?.Dispose();
 			}
@@ -3123,7 +3123,7 @@ namespace Waher.Script.Graphs3D
 		public SKSize TextDimensions(string Text, string FontFamily, SKFontStyleWeight Weight,
 			SKFontStyleWidth Width, SKFontStyleSlant Slant, float TextSize)
 		{
-			SKPaint Paint = null;
+			SKFont Font = null;
 			SKPath Path = null;
 			SKPath.Iterator e = null;
 			SKPoint[] Points = new SKPoint[4];
@@ -3131,14 +3131,14 @@ namespace Waher.Script.Graphs3D
 
 			try
 			{
-				Paint = new SKPaint()
+				Font = new SKFont()
 				{
 					Typeface = SKTypeface.FromFamilyName(FontFamily, Weight, Width, Slant) 
 						?? SKTypeface.Default,
-					TextSize = TextSize
+					Size = TextSize
 				};
 
-				Path = Paint.GetTextPath(Text, 0, 0);
+				Path = Font.GetTextPath(Text, new SKPoint(0, 0));
 				e = Path.CreateIterator(false);
 
 				ChunkedList<Vector4> P = new ChunkedList<Vector4>();
@@ -3223,7 +3223,7 @@ namespace Waher.Script.Graphs3D
 			}
 			finally
 			{
-				Paint?.Dispose();
+				Font?.Dispose();
 				Path?.Dispose();
 				e?.Dispose();
 			}

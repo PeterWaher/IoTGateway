@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using System.Security;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;

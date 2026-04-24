@@ -18,6 +18,7 @@
 	<Assembly fileName='Microsoft.CodeAnalysis.CSharp.dll'/>
 	<Assembly fileName='Microsoft.CodeAnalysis.dll'/>
 	<Assembly fileName='Microsoft.CSharp.dll'/>
+	<Assembly fileName='Microsoft.Data.SqlClient.dll'/>
 	<Assembly fileName='Microsoft.Extensions.DependencyInjection.Abstractions.dll'/>
 	<Assembly fileName='Microsoft.Extensions.Logging.Abstractions.dll'/>
 	<Assembly fileName='Microsoft.VisualBasic.Core.dll'/>
@@ -60,7 +61,6 @@
 	<Assembly fileName='System.Data.dll'/>
 	<Assembly fileName='System.Data.Odbc.dll'/>
 	<Assembly fileName='System.Data.OleDb.dll'/>
-	<Assembly fileName='System.Data.SqlClient.dll'/>
 	<Assembly fileName='System.Diagnostics.Contracts.dll'/>
 	<Assembly fileName='System.Diagnostics.Debug.dll'/>
 	<Assembly fileName='System.Diagnostics.DiagnosticSource.dll'/>

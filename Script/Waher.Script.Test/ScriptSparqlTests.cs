@@ -58,7 +58,7 @@ namespace Waher.Script.Test
 			return new Expression(s);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("Test_001.ttl", "Test_001.rq", null, "Test_001.srx")]
 		[DataRow("Test_002.ttl", "Test_002.rq", null, "Test_002.srx")]
 		[DataRow("Test_003.ttl", "Test_003.rq", "data.n3", "Test_003.srx")]
@@ -266,7 +266,7 @@ namespace Waher.Script.Test
 				Assert.AreEqual(e1, e2);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("Test_001.expression", "Test_001.result")]
 		[DataRow("Test_002.expression", "Test_002.result")]
 		[DataRow("Test_003.expression", "Test_003.result")]

@@ -6,7 +6,7 @@ namespace Waher.Script.Test
 	[TestClass]
 	public class LabelTests
 	{
-		[DataTestMethod]
+		[TestMethod]
 		// Basic cases
 		[DataRow("123", "123")] // No decimal point
 		[DataRow("123.0", "123.0")] // Fewer than 5 trailing zeros

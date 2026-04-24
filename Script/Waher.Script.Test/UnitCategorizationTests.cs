@@ -6,7 +6,7 @@ namespace Waher.Script.Test
 	[TestClass]
 	public class UnitCategorizationTests
 	{
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("A")]
 		[DataRow("mA")]
 		[DataRow("kA")]
@@ -17,7 +17,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Current", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("m")]
 		[DataRow("mm")]
 		[DataRow("km")]
@@ -28,7 +28,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Length", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("kg")]
 		[DataRow("g")]
 		[DataRow("t")]
@@ -39,7 +39,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Mass", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("°C")]
 		[DataRow("°F")]
 		[DataRow("K")]
@@ -50,7 +50,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Temperature", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("h")]
 		[DataRow("min")]
 		[DataRow("s")]
@@ -61,7 +61,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Time", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("J")]
 		[DataRow("kWh")]
 		[DataRow("GJ")]
@@ -74,7 +74,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Energy", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("SM/h")]
 		[DataRow("mph")]
 		[DataRow("m/s")]
@@ -88,7 +88,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Speed", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("F")]
 		[DataRow("mF")]
 		[DataRow("s^4*A²/(g*m²)")]
@@ -99,7 +99,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Capacitance", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("mC")]
 		[DataRow("s*A")]
 		public void Test_09_Charge(string UnitString)
@@ -109,7 +109,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Charge", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("N")]
 		[DataRow("kN")]
 		[DataRow("g*m/s^2")]
@@ -120,7 +120,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Force", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("Hz")]
 		[DataRow("cps")]
 		[DataRow("rpm")]
@@ -131,7 +131,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Frequency", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("W")]
 		[DataRow("kW")]
 		[DataRow("g*m^2/s^3")]
@@ -142,7 +142,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Power", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("Pa")]
 		[DataRow("kPa")]
 		[DataRow("bar")]
@@ -157,7 +157,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Pressure", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("Ω")]
 		[DataRow("kOhm")]
 		[DataRow("m^2*g/(s^3*A^2)")]
@@ -168,7 +168,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Resistance", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("V")]
 		[DataRow("kV")]
 		[DataRow("m^2*g/(s^3*A)")]
@@ -179,7 +179,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Voltage", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("l")]
 		[DataRow("dl")]
 		[DataRow("m^3")]
@@ -190,7 +190,7 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Volume", Category.Name);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("1")]
 		[DataRow("pcs")]
 		[DataRow("dz")]

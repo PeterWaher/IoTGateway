@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -32,6 +33,7 @@ namespace Waher.Script.Lab
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		[SupportedOSPlatform("windows")]
 		internal static readonly string registryKey = Registry.CurrentUser + @"\Software\Waher Data AB\Waher.Script.Lab";
 
 		private readonly Variables variables;
@@ -466,6 +468,7 @@ namespace Waher.Script.Lab
 			this.Dispatcher.Invoke(() => this.AddTextBlock(null, Output, Colors.Blue, FontWeights.Normal, null));
 		}
 
+		[SupportedOSPlatform("windows")]
 		private void Window_Loaded(object Sender, RoutedEventArgs e)
 		{
 			object Value;
@@ -499,6 +502,7 @@ namespace Waher.Script.Lab
 			}
 		}
 
+		[SupportedOSPlatform("windows")]
 		private async void Window_Closing(object Sender, System.ComponentModel.CancelEventArgs e)
 		{
 			Registry.SetValue(registryKey, "WindowLeft", (int)this.Left, RegistryValueKind.DWord);

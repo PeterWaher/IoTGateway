@@ -1,28 +1,30 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Versioning;
 using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Xsl;
-using System.Windows;
-using System.Windows.Controls;
-using Microsoft.Win32;
+using Waher.Client.WPF.Controls.SensorData;
+using Waher.Client.WPF.Model;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things;
 using Waher.Things.SensorData;
-using Waher.Client.WPF.Model;
-using Waher.Client.WPF.Controls.SensorData;
 
 namespace Waher.Client.WPF.Controls
 {
 	/// <summary>
 	/// Interaction logic for SensorDataView.xaml
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public partial class SensorDataView : UserControl, ITabView
 	{
 		private SensorDataClientRequest request;
@@ -39,7 +41,7 @@ namespace Waher.Client.WPF.Controls
 
 			this.InitializeComponent();
 
-			if (!(this.request is null))
+			if (this.request is not null)
 			{
 				this.Request_OnErrorsReceived(this, Request.Errors);
 				this.request.OnErrorsReceived += this.Request_OnErrorsReceived;
@@ -67,7 +69,7 @@ namespace Waher.Client.WPF.Controls
 
 		public async Task DisposeAsync()
 		{ 
-			if (!(this.request is null))
+			if (this.request is not null)
 			{
 				if (this.request is SensorDataSubscriptionRequest Subscription)
 					await Subscription.Unsubscribe();
@@ -225,7 +227,7 @@ namespace Waher.Client.WPF.Controls
 				this.NodesOkLabel.Content = this.nodes.Count - this.failed.Count;
 			}
 
-			if (this.subscription && !(this.request is SensorDataSubscriptionRequest))
+			if (this.subscription && this.request is not SensorDataSubscriptionRequest)
 			{
 				List<FieldSubscriptionRule> Rules = new List<FieldSubscriptionRule>();
 				Field Field;
@@ -403,7 +405,7 @@ namespace Waher.Client.WPF.Controls
 					case "resp":
 						Tuple<List<Field>, List<ThingError>> Response = SensorClient.ParseFields(E, out bool _);
 
-						if (!(Response.Item1 is null))
+						if (Response.Item1 is not null)
 						{
 							foreach (Field Field in Response.Item1)
 							{
@@ -412,7 +414,7 @@ namespace Waher.Client.WPF.Controls
 							}
 						}
 
-						if (!(Response.Item2 is null))
+						if (Response.Item2 is not null)
 						{
 							foreach (ThingError Error in Response.Item2)
 							{

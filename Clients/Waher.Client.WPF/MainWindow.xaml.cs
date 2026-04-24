@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,6 +64,7 @@ namespace Waher.Client.WPF
 	/// <summary>
 	/// Interaction logic for xaml
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public partial class MainWindow : Window
 	{
 		public const string WindowTitle = "Simple XMPP IoT Client";

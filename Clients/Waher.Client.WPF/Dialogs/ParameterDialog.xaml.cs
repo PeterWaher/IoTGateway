@@ -3,6 +3,7 @@ using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,6 +25,7 @@ namespace Waher.Client.WPF.Dialogs
 	/// <summary>
 	/// Interaction logic for ParameterDialog.xaml
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public partial class ParameterDialog : Window
 	{
 		private readonly DataForm form;

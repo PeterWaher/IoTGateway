@@ -3,12 +3,14 @@ using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Runtime.Versioning;
 
 namespace Waher.Client.WPF.Dialogs.AvalonExtensions
 {
 	/// <summary>
 	/// Avalon editor that does not capture mouse wheel (scrolling) events.
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public class NonScrollingTextEditor : ICSharpCode.AvalonEdit.TextEditor
 	{
 		/// <summary>
@@ -41,7 +43,7 @@ namespace Waher.Client.WPF.Dialogs.AvalonExtensions
 				};
 				UIElement Parent = VisualTreeHelper.GetParent(this) as UIElement;
 				
-				while (Parent is not null && !(Parent is ScrollViewer))
+				while (Parent is not null && Parent is not ScrollViewer)
 					Parent = VisualTreeHelper.GetParent(Parent) as UIElement;
 
 				Parent?.RaiseEvent(e2);

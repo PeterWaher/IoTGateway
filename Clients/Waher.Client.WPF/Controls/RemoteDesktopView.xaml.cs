@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,6 +21,7 @@ namespace Waher.Client.WPF.Controls
 	/// <summary>
 	/// Interaction logic for RemoteDesktopView.xaml
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public partial class RemoteDesktopView : UserControl, ITabView
 	{
 		private readonly LinkedList<(Pending, int, int)> queue = new LinkedList<(Pending, int, int)>();
@@ -70,7 +72,7 @@ namespace Waher.Client.WPF.Controls
 			get => this.session;
 			internal set
 			{
-				if (!(this.session is null))
+				if (this.session is not null)
 				{
 					this.session.StateChanged -= this.Session_StateChanged;
 					this.session.TileUpdated -= this.Session_TileUpdated;
@@ -402,7 +404,7 @@ namespace Waher.Client.WPF.Controls
 					this.updateScreenTimer = DateTime.MinValue;
 				}
 
-				if (!(this.session is null) &&
+				if (this.session is not null &&
 					this.session.State != RemoteDesktopSessionState.Stopped &&
 					this.session.State != RemoteDesktopSessionState.Stopping)
 				{
@@ -429,7 +431,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void UserControl_MouseMove(object Sender, MouseEventArgs e)
 		{
-			if (!(this.session is null))
+			if (this.session is not null)
 			{
 				this.GetPosition(e, out int X, out int Y);
 				this.session.MouseMoved(X, Y);
@@ -447,7 +449,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void UserControl_MouseDown(object Sender, MouseButtonEventArgs e)
 		{
-			if (!(this.session is null))
+			if (this.session is not null)
 			{
 				this.GetPosition(e, out int X, out int Y);
 
@@ -477,7 +479,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void UserControl_MouseUp(object Sender, MouseButtonEventArgs e)
 		{
-			if (!(this.session is null))
+			if (this.session is not null)
 			{
 				this.GetPosition(e, out int X, out int Y);
 
@@ -507,7 +509,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void UserControl_MouseWheel(object Sender, MouseWheelEventArgs e)
 		{
-			if (!(this.session is null))
+			if (this.session is not null)
 			{
 				this.GetPosition(e, out int X, out int Y);
 				this.session.MouseWheel(X, Y, e.Delta);
@@ -517,7 +519,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void UserControl_KeyDown(object Sender, KeyEventArgs e)
 		{
-			if (!(this.session is null))
+			if (this.session is not null)
 			{
 				int KeyCode = KeyInterop.VirtualKeyFromKey(e.Key);
 				this.session.KeyDown(KeyCode);
@@ -527,7 +529,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void UserControl_KeyUp(object Sender, KeyEventArgs e)
 		{
-			if (!(this.session is null))
+			if (this.session is not null)
 			{
 				int KeyCode = KeyInterop.VirtualKeyFromKey(e.Key);
 				this.session.KeyUp(KeyCode);

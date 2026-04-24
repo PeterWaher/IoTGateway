@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -28,6 +24,7 @@ namespace Waher.Service.PcSensor
 	/// <summary>
 	/// Application that converts your PC into an IoT sensor, by publishing performace counters as sensor values.
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public class Program
 	{
 		private static XmppCredentials? credentials;

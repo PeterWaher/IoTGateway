@@ -29,8 +29,8 @@ namespace Waher.Client.WPF.Controls
 	{
 		private SensorDataClientRequest request;
 		private readonly TreeNode node;
-		private readonly Dictionary<string, bool> nodes = new Dictionary<string, bool>();
-		private readonly Dictionary<string, bool> failed = new Dictionary<string, bool>();
+		private readonly Dictionary<string, bool> nodes = [];
+		private readonly Dictionary<string, bool> failed = [];
 		private readonly bool subscription;
 
 		public SensorDataView(SensorDataClientRequest Request, TreeNode Node, bool Subscription)
@@ -229,7 +229,7 @@ namespace Waher.Client.WPF.Controls
 
 			if (this.subscription && this.request is not SensorDataSubscriptionRequest)
 			{
-				List<FieldSubscriptionRule> Rules = new List<FieldSubscriptionRule>();
+				List<FieldSubscriptionRule> Rules = [];
 				Field Field;
 
 				foreach (FieldItem FieldItem in this.SensorDataListView.Items)
@@ -253,7 +253,7 @@ namespace Waher.Client.WPF.Controls
 				this.request.OnErrorsReceived -= this.Request_OnErrorsReceived;
 				this.request = null;
 
-				this.request = await this.node.SubscribeSensorDataMomentaryReadout(Rules.ToArray());
+				this.request = await this.node.SubscribeSensorDataMomentaryReadout([.. Rules]);
 
 				this.request.OnStateChanged += this.Request_OnStateChanged;
 				this.request.OnFieldsReceived += this.Request_OnFieldsReceived;
@@ -273,7 +273,7 @@ namespace Waher.Client.WPF.Controls
 
 		public void SaveAsButton_Click(object Sender, RoutedEventArgs e)
 		{
-			SaveFileDialog Dialog = new SaveFileDialog()
+			SaveFileDialog Dialog = new()
 			{
 				AddExtension = true,
 				CheckPathExists = true,
@@ -291,7 +291,7 @@ namespace Waher.Client.WPF.Controls
 				{
 					if (Dialog.FilterIndex == 2)
 					{
-						StringBuilder Xml = new StringBuilder();
+						StringBuilder Xml = new();
 						using (XmlWriter w = XmlWriter.Create(Xml, XML.WriterSettings(true, true)))
 						{
 							this.SaveAsXml(w);
@@ -303,13 +303,10 @@ namespace Waher.Client.WPF.Controls
 					}
 					else
 					{
-						using (FileStream f = File.Create(Dialog.FileName))
-						{
-							using (XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false)))
-							{
-								this.SaveAsXml(w);
-							}
-						}
+						using FileStream f = File.Create(Dialog.FileName);
+						using XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false));
+						
+						this.SaveAsXml(w);
 					}
 				}
 				catch (Exception ex)
@@ -327,7 +324,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void SaveAsXml(XmlWriter w)
 		{
-			List<Field> Fields = new List<Field>();
+			List<Field> Fields = [];
 
 			foreach (FieldItem Item in this.SensorDataListView.Items)
 				Fields.Add(Item.Field);
@@ -351,7 +348,7 @@ namespace Waher.Client.WPF.Controls
 		{
 			try
 			{
-				OpenFileDialog Dialog = new OpenFileDialog()
+				OpenFileDialog Dialog = new()
 				{
 					AddExtension = true,
 					CheckFileExists = true,

@@ -36,7 +36,7 @@ namespace Waher.Client.WPF.Dialogs.AvalonExtensions
 			if (!e.Handled)
 			{
 				e.Handled = true;
-				MouseWheelEventArgs e2 = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+				MouseWheelEventArgs e2 = new(e.MouseDevice, e.Timestamp, e.Delta)
 				{
 					RoutedEvent = UIElement.MouseWheelEvent,
 					Source = this

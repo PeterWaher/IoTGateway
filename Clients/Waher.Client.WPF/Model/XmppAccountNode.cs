@@ -1744,7 +1744,7 @@ namespace Waher.Client.WPF.Model
 					return Task.CompletedTask;
 			}
 
-			e.AcceptStream(View.Socks5DataReceived, View.Socks5StreamClosed, null);
+			e.AcceptStream(View.Socks5DataReceived, RemoteDesktopView.Socks5StreamClosed, null);
 
 			return Task.CompletedTask;
 		}

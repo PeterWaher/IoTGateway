@@ -24,11 +24,11 @@ namespace Waher.Client.WPF.Controls
 	[SupportedOSPlatform("windows")]
 	public partial class RemoteDesktopView : UserControl, ITabView
 	{
-		private readonly LinkedList<(Pending, int, int)> queue = new LinkedList<(Pending, int, int)>();
+		private readonly LinkedList<(Pending, int, int)> queue = new();
 		private readonly XmppContact node;
 		private readonly XmppClient client;
 		private readonly RemoteDesktopClient rdpClient;
-		private readonly object synchObj = new object();
+		private readonly object synchObj = new();
 		private RemoteDesktopSession session;
 		private Pending[,] pendingTiles = null;
 		private WriteableBitmap desktop = null;
@@ -304,7 +304,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		internal Task Socks5StreamClosed(object Sender, StreamEventArgs e)
+		internal static Task Socks5StreamClosed(object Sender, StreamEventArgs e)
 		{
 			return Task.CompletedTask;  // TODO
 		}

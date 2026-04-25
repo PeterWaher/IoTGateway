@@ -12,13 +12,28 @@
 	<Assembly fileName='Microsoft.CodeAnalysis.dll'/>
 	<Assembly fileName='Microsoft.CSharp.dll'/>
 	<Assembly fileName='Microsoft.Data.SqlClient.dll'/>
+	<Assembly fileName='Microsoft.Data.SqlClient.Extensions.Abstractions.dll'/>
+	<Assembly fileName='Microsoft.Data.SqlClient.Internal.Logging.dll'/>
+	<Assembly fileName='Microsoft.Data.SqlClient.SNI.dll'/>
 	<Assembly fileName='Microsoft.DiaSymReader.Native.x86.dll'/>
+	<Assembly fileName='Microsoft.Extensions.Caching.Abstractions.dll'/>
+	<Assembly fileName='Microsoft.Extensions.Caching.Memory.dll'/>
 	<Assembly fileName='Microsoft.Extensions.DependencyInjection.Abstractions.dll'/>
 	<Assembly fileName='Microsoft.Extensions.Logging.Abstractions.dll'/>
+	<Assembly fileName='Microsoft.Extensions.Options.dll'/>
+	<Assembly fileName='Microsoft.Extensions.Primitives.dll'/>
+	<Assembly fileName='Microsoft.IdentityModel.Abstractions.dll'/>
+	<Assembly fileName='Microsoft.IdentityModel.JsonWebTokens.dll'/>
+	<Assembly fileName='Microsoft.IdentityModel.Logging.dll'/>
+	<Assembly fileName='Microsoft.IdentityModel.Protocols.dll'/>
+	<Assembly fileName='Microsoft.IdentityModel.Protocols.OpenIdConnect.dll'/>
+	<Assembly fileName='Microsoft.IdentityModel.Tokens.dll'/>
+	<Assembly fileName='Microsoft.SqlServer.Server.dll'/>
 	<Assembly fileName='Microsoft.VisualBasic.Core.dll'/>
 	<Assembly fileName='Microsoft.VisualBasic.dll'/>
 	<Assembly fileName='Microsoft.Win32.Primitives.dll'/>
 	<Assembly fileName='Microsoft.Win32.Registry.dll'/>
+	<Assembly fileName='mscordaccore.dll'/>
 	<Assembly fileName='mscordaccore_x86_x86_8.0.23.53103.dll'/>
 	<Assembly fileName='mscordbi.dll'/>
 	<Assembly fileName='mscorlib.dll'/>
@@ -29,6 +44,7 @@
 
 	<Assembly fileName='DnsClient.dll'/>
 	<Assembly fileName='libSkiaSharp.dll'/>
+	<Assembly fileName='libSkiaSharp.pdb'/>
 	<Assembly fileName='MongoDB.Bson.dll'/>
 	<Assembly fileName='MongoDB.Driver.dll'/>
 	<Assembly fileName='MySqlConnector.dll'/> 
@@ -36,7 +52,6 @@
 	<Assembly fileName='SharpCompress.dll'/> 
 	<Assembly fileName='SkiaSharp.dll'/>
 	<Assembly fileName='Snappier.dll'/>
-	<Assembly fileName='sni.dll'/>
 	<Assembly fileName='ZstdSharp.dll'/>
 
 	<Assembly fileName='System.AppContext.dll'/>
@@ -83,6 +98,7 @@
 	<Assembly fileName='System.Globalization.Calendars.dll'/>
 	<Assembly fileName='System.Globalization.dll'/>
 	<Assembly fileName='System.Globalization.Extensions.dll'/>
+	<Assembly fileName='System.IdentityModel.Tokens.Jwt.dll'/>
 	<Assembly fileName='System.IO.Compression.Brotli.dll'/>
 	<Assembly fileName='System.IO.Compression.dll'/>
 	<Assembly fileName='System.IO.Compression.FileSystem.dll'/>
@@ -161,10 +177,10 @@
 	<Assembly fileName='System.Runtime.Serialization.Xml.dll'/>
 	<Assembly fileName='System.Security.AccessControl.dll'/>
 	<Assembly fileName='System.Security.Claims.dll'/>
-	<Assembly fileName='System.Security.Cryptography.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Algorithms.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Cng.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Csp.dll'/>
+	<Assembly fileName='System.Security.Cryptography.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Encoding.dll'/>
 	<Assembly fileName='System.Security.Cryptography.OpenSsl.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Pkcs.dll'/>
@@ -185,6 +201,7 @@
 	<Assembly fileName='System.Text.Encodings.Web.dll'/>
 	<Assembly fileName='System.Text.Json.dll'/>
 	<Assembly fileName='System.Text.RegularExpressions.dll'/>
+	<Assembly fileName='System.Threading.AccessControl.dll'/>
 	<Assembly fileName='System.Threading.Channels.dll'/>
 	<Assembly fileName='System.Threading.dll'/>
 	<Assembly fileName='System.Threading.Overlapped.dll'/>

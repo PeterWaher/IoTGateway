@@ -21,6 +21,121 @@ namespace Waher.Networking.HTTP
 		IHttpPostMethod, IHttpPostRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpOptionsMethod,
 		IHttpDeleteMethod, IHttpPatchMethod, IHttpPatchRangesMethod, IHttpTraceMethod
 	{
+		private static readonly SortedDictionary<string,string> httpHeaderFields = new SortedDictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+		{
+			{ "A-IM", "A-IM" },
+			{ "Accept", "Accept" },
+			{ "Accept-CH", "Accept-CH" },
+			{ "Accept-Charset", "Accept-Charset" },
+			{ "Accept-Datetime", "Accept-Datetime" },
+			{ "Accept-Encoding", "Accept-Encoding" },
+			{ "Accept-Language", "Accept-Language" },
+			{ "Accept-Patch", "Accept-Patch" },
+			{ "Accept-Ranges", "Accept-Ranges" },
+			{ "Access-Control-Allow-Credentials", "Access-Control-Allow-Credentials" },
+			{ "Access-Control-Allow-Headers", "Access-Control-Allow-Headers" },
+			{ "Access-Control-Allow-Methods", "Access-Control-Allow-Methods" },
+			{ "Access-Control-Allow-Origin", "Access-Control-Allow-Origin" },
+			{ "Access-Control-Expose-Headers", "Access-Control-Expose-Headers" },
+			{ "Access-Control-Max-Age", "Access-Control-Max-Age" },
+			{ "Access-Control-Request-Headers", "Access-Control-Request-Headers" },
+			{ "Access-Control-Request-Method", "Access-Control-Request-Method" },
+			{ "Age", "Age" },
+			{ "Allow", "Allow" },
+			{ "Alt-Svc", "Alt-Svc" },
+			{ "Authorization", "Authorization" },
+			{ "Cache-Control", "Cache-Control" },
+			{ "Connection", "Connection" },
+			{ "Content-Disposition", "Content-Disposition" },
+			{ "Content-Encoding", "Content-Encoding" },
+			{ "Content-Language", "Content-Language" },
+			{ "Content-Length", "Content-Length" },
+			{ "Content-Location", "Content-Location" },
+			{ "Content-MD5", "Content-MD5" },
+			{ "Content-Range", "Content-Range" },
+			{ "Content-Security-Policy", "Content-Security-Policy" },
+			{ "Content-Type", "Content-Type" },
+			{ "Cookie", "Cookie" },
+			{ "Correlation-ID", "Correlation-ID" },
+			{ "Date", "Date" },
+			{ "Delta-Base", "Delta-Base" },
+			{ "DNT", "DNT" },
+			{ "ETag", "ETag" },
+			{ "Expect", "Expect" },
+			{ "Expect-CT", "Expect-CT" },
+			{ "Expires", "Expires" },
+			{ "Forwarded", "Forwarded" },
+			{ "From", "From" },
+			{ "Front-End-Https", "Front-End-Https" },
+			{ "Host", "Host" },
+			{ "HTTP2-Settings", "HTTP2-Settings" },
+			{ "If-Match", "If-Match" },
+			{ "If-Modified-Since", "If-Modified-Since" },
+			{ "If-None-Match", "If-None-Match" },
+			{ "If-Range", "If-Range" },
+			{ "If-Unmodified-Since", "If-Unmodified-Since" },
+			{ "IM", "IM" },
+			{ "Last-Modified", "Last-Modified" },
+			{ "Link", "Link" },
+			{ "Location", "Location" },
+			{ "Max-Forwards", "Max-Forwards" },
+			{ "NEL", "NEL" },
+			{ "Origin", "Origin" },
+			{ "P3P", "P3P" },
+			{ "Permissions-Policy", "Permissions-Policy" },
+			{ "Pragma", "Pragma" },
+			{ "Prefer", "Prefer" },
+			{ "Preference-Applied", "Preference-Applied" },
+			{ "Proxy-Authenticate", "Proxy-Authenticate" },
+			{ "Proxy-Authorization", "Proxy-Authorization" },
+			{ "Proxy-Connection", "Proxy-Connection" },
+			{ "Public-Key-Pins", "Public-Key-Pins" },
+			{ "Range", "Range" },
+			{ "Referer", "Referer" },
+			{ "Refresh", "Refresh" },
+			{ "Report-To", "Report-To" },
+			{ "Retry-After", "Retry-After" },
+			{ "Save-Data", "Save-Data" },
+			{ "Sec-GPC", "Sec-GPC" },
+			{ "Server", "Server" },
+			{ "Set-Cookie", "Set-Cookie" },
+			{ "Status", "Status" },
+			{ "Strict-Transport-Security", "Strict-Transport-Security" },
+			{ "TE", "TE" },
+			{ "Timing-Allow-Origin", "Timing-Allow-Origin" },
+			{ "Tk", "Tk" },
+			{ "Trailer", "Trailer" },
+			{ "Transfer-Encoding", "Transfer-Encoding" },
+			{ "Upgrade", "Upgrade" },
+			{ "Upgrade-Insecure-Requests", "Upgrade-Insecure-Requests" },
+			{ "User-Agent", "User-Agent" },
+			{ "Vary", "Vary" },
+			{ "Via", "Via" },
+			{ "Warning", "Warning" },
+			{ "WWW-Authenticate", "WWW-Authenticate" },
+			{ "X-ATT-DeviceId", "X-ATT-DeviceId" },
+			{ "X-Content-Duration", "X-Content-Duration" },
+			{ "X-Content-Security-Policy", "X-Content-Security-Policy" },
+			{ "X-Content-Type-Options", "X-Content-Type-Options" },
+			{ "X-Correlation-ID", "X-Correlation-ID" },
+			{ "X-Csrf-Token", "X-Csrf-Token" },
+			{ "X-Forwarded-For", "X-Forwarded-For" },
+			{ "X-Forwarded-Host", "X-Forwarded-Host" },
+			{ "X-Forwarded-Proto", "X-Forwarded-Proto" },
+			{ "X-Frame-Options", "X-Frame-Options" },
+			{ "X-Http-Method-Override", "X-Http-Method-Override" },
+			{ "X-Powered-By", "X-Powered-By" },
+			{ "X-Redirect-By", "X-Redirect-By" },
+			{ "X-Redirect-By: Polylang", "X-Redirect-By: Polylang" },
+			{ "X-Request-ID", "X-Request-ID" },
+			{ "X-Requested-With", "X-Requested-With" },
+			{ "X-UA-Compatible", "X-UA-Compatible" },
+			{ "X-UIDH", "X-UIDH" },
+			{ "X-Wap-Profile", "X-Wap-Profile" },
+			{ "X-WebKit-CSP", "X-WebKit-CSP" },
+			{ "X-XSS-Protection", "X-XSS-Protection" }
+		};
+
 		private readonly TimeSpan timeout;
 		private readonly string baseUri;
 		private readonly bool useSession;
@@ -343,12 +458,20 @@ namespace Waher.Networking.HTTP
 						Method = new HttpMethod(Request.Header.Method)
 					})
 					{
+						bool CheckCase = !(Request.Http2Stream is null);
+						string FieldName, FieldName2;
+
 						if (!(Data is null))
 							ProxyRequest.Content = new ByteArrayContent(Data);
 
 						foreach (HttpField Field in Request.Header)
 						{
-							switch (Field.Key)
+							FieldName = Field.Key;
+
+							if (CheckCase && httpHeaderFields.TryGetValue(FieldName, out FieldName2))
+								FieldName = FieldName2;
+
+							switch (FieldName)
 							{
 								case "Accept":
 									if (!ProxyRequest.Headers.Accept.TryParseAdd(Field.Value))
@@ -395,12 +518,12 @@ namespace Waher.Networking.HTTP
 								case "Content-Range":
 								case "Content-Type":
 								case "Last-Modified":
-									ProxyRequest.Content?.Headers.Add(Field.Key, Field.Value);
+									ProxyRequest.Content?.Headers.Add(FieldName, Field.Value);
 									break;
 
 								default:
-									if (!Field.Key.StartsWith(':'))     // Avoid HTTP/2 pseudo-headers
-										ProxyRequest.Headers.Add(Field.Key, Field.Value);
+									if (!FieldName.StartsWith(':'))     // Avoid HTTP/2 pseudo-headers
+										ProxyRequest.Headers.Add(FieldName, Field.Value);
 									break;
 							}
 						}
@@ -468,7 +591,12 @@ namespace Waher.Networking.HTTP
 
 						foreach (KeyValuePair<string, IEnumerable<string>> Header in ProxyResponse.Headers)
 						{
-							switch (Header.Key)
+							FieldName = Header.Key;
+
+							if (CheckCase && httpHeaderFields.TryGetValue(FieldName, out FieldName2))
+								FieldName = FieldName2;
+
+							switch (FieldName)
 							{
 								case "Transfer-Encoding":
 								case "X-Content-Type-Options":
@@ -504,7 +632,7 @@ namespace Waher.Networking.HTTP
 
 								default:
 									foreach (string Value in Header.Value)
-										Response.SetHeader(Header.Key, Value);
+										Response.SetHeader(FieldName, Value);
 									break;
 							}
 						}
@@ -513,7 +641,12 @@ namespace Waher.Networking.HTTP
 						{
 							foreach (KeyValuePair<string, IEnumerable<string>> Header in ProxyResponse.Content.Headers)
 							{
-								switch (Header.Key)
+								FieldName = Header.Key;
+
+								if (CheckCase && httpHeaderFields.TryGetValue(FieldName, out FieldName2))
+									FieldName = FieldName2;
+
+								switch (FieldName)
 								{
 									case "Content-Length":
 									case "Content-Encoding":
@@ -521,7 +654,7 @@ namespace Waher.Networking.HTTP
 
 									default:
 										foreach (string Value in Header.Value)
-											Response.SetHeader(Header.Key, Value);
+											Response.SetHeader(FieldName, Value);
 										break;
 								}
 							}

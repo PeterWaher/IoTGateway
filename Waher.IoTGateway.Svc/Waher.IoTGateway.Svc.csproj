@@ -189,7 +189,8 @@
     <ProjectReference Include="..\Themes\Waher.Theme.WinterDawn\Waher.Theme.WinterDawn.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Files\Waher.Things.Files.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Ieee1451\Waher.Things.Ieee1451.csproj" />
-    <ProjectReference Include="..\Things\Waher.Things.Ip\Waher.Things.Ip.csproj" />
+		<ProjectReference Include="..\Things\Waher.Things.Http\Waher.Things.Http.csproj" />
+		<ProjectReference Include="..\Things\Waher.Things.Ip\Waher.Things.Ip.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Modbus\Waher.Things.Modbus.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Mqtt\Waher.Things.Mqtt.csproj" />

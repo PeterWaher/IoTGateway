@@ -19,8 +19,21 @@
 	<Assembly fileName='Microsoft.CodeAnalysis.dll'/>
 	<Assembly fileName='Microsoft.CSharp.dll'/>
 	<Assembly fileName='Microsoft.Data.SqlClient.dll'/>
+	<Assembly fileName='Microsoft.Data.SqlClient.Extensions.Abstractions.dll'/>
+	<Assembly fileName='Microsoft.Data.SqlClient.Internal.Logging.dll'/>
+	<Assembly fileName='Microsoft.Extensions.Caching.Abstractions.dll'/>
+	<Assembly fileName='Microsoft.Extensions.Caching.Memory.dll'/>
 	<Assembly fileName='Microsoft.Extensions.DependencyInjection.Abstractions.dll'/>
 	<Assembly fileName='Microsoft.Extensions.Logging.Abstractions.dll'/>
+	<Assembly fileName='Microsoft.Extensions.Options.dll'/>
+	<Assembly fileName='Microsoft.Extensions.Primitives.dll'/>
+	<Assembly fileName='Microsoft.IdentityModel.Abstractions.dll'/>
+	<Assembly fileName='Microsoft.IdentityModel.JsonWebTokens.dll'/>
+	<Assembly fileName='Microsoft.IdentityModel.Logging.dll'/>
+	<Assembly fileName='Microsoft.IdentityModel.Protocols.dll'/>
+	<Assembly fileName='Microsoft.IdentityModel.Protocols.OpenIdConnect.dll'/>
+	<Assembly fileName='Microsoft.IdentityModel.Tokens.dll'/>
+	<Assembly fileName='Microsoft.SqlServer.Server.dll'/>
 	<Assembly fileName='Microsoft.VisualBasic.Core.dll'/>
 	<Assembly fileName='Microsoft.VisualBasic.dll'/>
 	<Assembly fileName='Microsoft.Win32.Primitives.dll'/>
@@ -82,6 +95,7 @@
 	<Assembly fileName='System.Globalization.Calendars.dll'/>
 	<Assembly fileName='System.Globalization.dll'/>
 	<Assembly fileName='System.Globalization.Extensions.dll'/>
+	<Assembly fileName='System.IdentityModel.Tokens.Jwt.dll'/>
 	<Assembly fileName='System.IO.Compression.Brotli.dll'/>
 	<Assembly fileName='System.IO.Compression.dll'/>
 	<Assembly fileName='System.IO.Compression.FileSystem.dll'/>
@@ -183,6 +197,7 @@
 	<Assembly fileName='System.Text.Encodings.Web.dll'/>
 	<Assembly fileName='System.Text.Json.dll'/>
 	<Assembly fileName='System.Text.RegularExpressions.dll'/>
+	<Assembly fileName='System.Threading.AccessControl.dll'/>
 	<Assembly fileName='System.Threading.Channels.dll'/>
 	<Assembly fileName='System.Threading.dll'/>
 	<Assembly fileName='System.Threading.Overlapped.dll'/>

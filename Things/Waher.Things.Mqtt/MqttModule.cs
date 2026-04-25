@@ -9,13 +9,13 @@ using Waher.Things.Metering.NodeTypes;
 namespace Waher.Things.Mqtt
 {
 	/// <summary>
-	/// TODO
+	/// MQTT module
 	/// </summary>
 	[Singleton]
 	public class MqttModule : IModule
 	{
 		/// <summary>
-		/// TODO
+		/// Starts the module.
 		/// </summary>
 		public async Task Start()
 		{
@@ -41,7 +41,7 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
-		/// TODO
+		/// Stops the module.
 		/// </summary>
 		public Task Stop()
 		{

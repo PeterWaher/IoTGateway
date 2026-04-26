@@ -1,15 +1,13 @@
 ﻿using System.Threading.Tasks;
 using System.Web;
-using Waher.Networking.HTTP;
-using Waher.Networking.HTTP.HeaderFields;
 using Waher.Script;
 using Waher.Security;
 
-namespace Waher.IoTGateway.WebResources
+namespace Waher.Networking.HTTP.Authentication
 {
 	/// <summary>
-	/// Authentication mechanism that makes sure the user has an established session with the IoT Gateway, and that the user
-	/// holds a given set of privileges.
+	/// Authentication mechanism that makes sure the user has an established session with the 
+	/// web server, and that the user holds a given set of privileges.
 	/// </summary>
 	public class RequiredUserPrivileges : HttpAuthenticationScheme
 	{
@@ -19,8 +17,8 @@ namespace Waher.IoTGateway.WebResources
 		private readonly string loginPage;
 
 		/// <summary>
-		/// Authentication mechanism that makes sure the user has an established session with the IoT Gateway, and that the user
-		/// holds a given set of privileges.
+		/// Authentication mechanism that makes sure the user has an established session with the 
+		/// web server, and that the user holds a given set of privileges.
 		/// </summary>
 		/// <param name="Server">HTTP Server object.</param>
 		/// <param name="Privileges">Required user privileges.</param>
@@ -30,8 +28,8 @@ namespace Waher.IoTGateway.WebResources
 		}
 
 		/// <summary>
-		/// Authentication mechanism that makes sure the user has an established session with the IoT Gateway, and that the user
-		/// holds a given set of privileges.
+		/// Authentication mechanism that makes sure the user has an established session with the 
+		/// web server, and that the user holds a given set of privileges.
 		/// </summary>
 		/// <param name="UserVariable">Name of user variable.</param>
 		/// <param name="Server">HTTP Server object.</param>
@@ -42,8 +40,8 @@ namespace Waher.IoTGateway.WebResources
 		}
 
 		/// <summary>
-		/// Authentication mechanism that makes sure the user has an established session with the IoT Gateway, and that the user
-		/// holds a given set of privileges.
+		/// Authentication mechanism that makes sure the user has an established session with the 
+		/// web server, and that the user holds a given set of privileges.
 		/// </summary>
 		/// <param name="UserVariable">Name of user variable.</param>
 		/// <param name="LoginPage">Login page.</param>

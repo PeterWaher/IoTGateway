@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Waher.IoTGateway;
 using Waher.IoTGateway.Setup;
-using Waher.IoTGateway.WebResources;
 using Waher.Networking;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Authentication;

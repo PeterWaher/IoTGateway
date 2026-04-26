@@ -52,6 +52,7 @@ using Waher.Jobs;
 using Waher.Networking;
 using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
+using Waher.Networking.HTTP.Authentication;
 using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.MQTT;

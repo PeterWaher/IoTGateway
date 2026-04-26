@@ -25,21 +25,61 @@ of the request.
 If encryption is enabled on the web server (HTTPS), encryption is required for all calls, with
 a minimum of 128 bit security.
 
-The authenticated user account on the receptor must have the `Admin.SensorData.Post[.NODE]` 
-privilege in order to be authorized to post sensor data. The `.NODE` suffix is replaced by the
-ID of the node to which the sensor data is being posted, if posted directly to a specific node.
-If posted to the receptor directly, without specifying a node in the URL, the user account must 
-have the `Admin.SensorData.Post` privilege, and specify the node in the payload of the request.
+The authenticated user account on the receptor must have the `Admin.SensorData.Post[.NODEPATH]` 
+privilege in order to be authorized to post sensor data. The `.NODEPATH` suffix is replaced by 
+the full ID path inside the Metering Topology, omitting the path up to and including the local
+web server node), of the node to which the sensor data is being posted, if posted directly to 
+a specific node. If posted to the receptor directly, without specifying a node in the URL, the 
+user account must have the `Admin.SensorData.Post` privilege, and specify the node in the 
+payload of the request.
 
 Sensor Data
 --------------
 
+The API accepts sensor data in XML format (`Content-Type: text/xml`), as defined by the
+[Neuro-Foundation](https://neuro-foundation.io/SensorData.md). Sensor data can be posted
+directly to a node, providing the node ID in the URL. In this case, the root element of the
+XML payload must be a `<ts/>` element, with the correct namespace. The data can also be posted
+to the receptor directly, with the node ID specified in the XML payload. In this case, the
+root element of the XML payload must be a `<nd/>` element (containing one or more `<ts/>`
+elements), or a `<resp/>` element containing one or more `<nd/>` elements.
 
+Example payload posted directly to the node `Node1` at 
+`https://receptor.example.com/ReportSensorData/ExternalSensors/Node1` (this requires a user to 
+have the privilege `Admin.SensorData.Post.ExternalSensors.Node1`):
+
+```xml
+<ts v="2017-09-22T15:22:33Z" xmlns="urn:nfi:iot:sd:1.0">
+  <q n="Temperature" v="12.3" u="°C" m="true" ar="true"/>
+  <s n="SN" v="12345678" i="true" ar="true"/>
+</ts>
+```
+
+Example payload posted to the sensor data receptor at 
+`https://receptor.example.com/ReportSensorData` (this requires a user to have the
+privilege `Admin.SensorData.Post`):
+
+```xml
+<nd id="Node1" xmlns="urn:nfi:iot:sd:1.0">
+  <ts v="2017-09-22T15:22:33Z">
+    <q n="Temperature" v="12.3" u="°C" m="true" ar="true"/>
+    <s n="SN" v="12345678" i="true" ar="true"/>
+  </ts>
+</nd>
+```
 
 Nodes
 --------
 
-IEEE P1451.99 Bridge
------------------------
+The [Neuro-Foundation](https://neuro-foundation.io/) interfaces define a hierarchical 
+structure of nodes, which can be used to organize and manage sensor data, among other things.
+Each node can represent a physical device, a logical grouping of devices, or any other entity 
+relevant to the application. Nodes can have child nodes, allowing for a flexible and scalable 
+organization of the sensor data.
 
-
+Nodes are organized into data sources. One such data source is the *Metering Topology*, which
+holds the nodes representing the physical and logical structure of the sensors used for 
+metering (or telemetry) purposes. This Sensor Data Receptor API allows for external devices
+to use `HTTP POST` to send Sensor Data to nodes in the system, provided the user has access
+rights to do so, and the node exists and is a node that accepts such input. The system 
+operator must define the nodes before the external party can post sensor data to it.

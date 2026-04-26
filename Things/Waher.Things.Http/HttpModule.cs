@@ -30,7 +30,7 @@ namespace Waher.Things.Http
 		/// <summary>
 		/// Starts the module.
 		/// </summary>
-		public async Task Start()
+		public Task Start()
 		{
 			try
 			{
@@ -38,7 +38,7 @@ namespace Waher.Things.Http
 					!(Obj is HttpServer WebServer))
 				{
 					Log.Error("Local Web Server not found.");
-					return;
+					return Task.CompletedTask;
 				}
 
 				this.webServer = WebServer;
@@ -82,31 +82,39 @@ namespace Waher.Things.Http
 
 				this.api = new SensorDataReceptorResource("/ReportSensorData", Schemes.ToArray());
 				this.webServer.Register(this.api);
-
-				bool HasLocalWebServerNode = false;
-
-				foreach (INode Node in await MeteringTopology.Root.ChildNodes)
-				{
-					if (Node is LocalWebServerNode)
-					{
-						HasLocalWebServerNode = true;
-						break;
-					}
-				}
-
-				if (!HasLocalWebServerNode)
-				{
-					LocalWebServerNode Node = new LocalWebServerNode()
-					{
-						NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(LocalWebServerNode), 1, "Local Web Server")
-					};
-
-					await MeteringTopology.Root.AddAsync(Node);
-				}
 			}
 			catch (Exception ex)
 			{
 				Log.Exception(ex);
+			}
+		
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Checks if the Local Web Server Node has been created.
+		/// </summary>
+		public static async Task CheckLocalWebServerNode()
+		{
+			bool HasLocalWebServerNode = false;
+
+			foreach (INode Node in await MeteringTopology.Root.ChildNodes)
+			{
+				if (Node is LocalWebServerNode)
+				{
+					HasLocalWebServerNode = true;
+					break;
+				}
+			}
+
+			if (!HasLocalWebServerNode)
+			{
+				LocalWebServerNode Node = new LocalWebServerNode()
+				{
+					NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(LocalWebServerNode), 1, "Local Web Server")
+				};
+
+				await MeteringTopology.Root.AddAsync(Node);
 			}
 		}
 

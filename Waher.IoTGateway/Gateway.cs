@@ -107,6 +107,7 @@ using Waher.Security.SHA3;
 using Waher.Security.Users;
 using Waher.Security.WAF;
 using Waher.Things;
+using Waher.Things.Http;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Things.SourceEvents;
@@ -1750,6 +1751,7 @@ namespace Waher.IoTGateway
 						Log.Critical(sb.ToString());
 					}
 
+					await HttpModule.CheckLocalWebServerNode();
 					await ProcessServiceConfigurations(false);
 
 					if (!(NewConfigurations is null))

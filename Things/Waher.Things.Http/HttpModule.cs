@@ -7,8 +7,11 @@ using Waher.Networking;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Language;
+using Waher.Security;
 using Waher.Security.JWT;
 using Waher.Security.Users;
+using Waher.Things.Metering;
 
 namespace Waher.Things.Http
 {
@@ -16,17 +19,18 @@ namespace Waher.Things.Http
 	/// HTTP module
 	/// </summary>
 	[Singleton]
-	public class HttpModule : IModule
+	public class HttpModule : IModule, ITlsCertificateEndpoint
 	{
 		internal const string PostPrivileges = "Admin.SensorData.Post";
 
 		private HttpServer webServer;
 		private SensorDataReceptorResource api;
+		private X509Certificate certificate;
 
 		/// <summary>
 		/// Starts the module.
 		/// </summary>
-		public Task Start()
+		public async Task Start()
 		{
 			try
 			{
@@ -34,7 +38,7 @@ namespace Waher.Things.Http
 					!(Obj is HttpServer WebServer))
 				{
 					Log.Error("Local Web Server not found.");
-					return Task.CompletedTask;
+					return;
 				}
 
 				this.webServer = WebServer;
@@ -53,6 +57,7 @@ namespace Waher.Things.Http
 				}
 				else
 				{
+					this.certificate = Certificate;
 					Encrypted = true;
 					Domain = BinaryTcpClient.GetDomainFromSubject(Certificate.Subject);
 					MinStrength = 128;
@@ -77,13 +82,32 @@ namespace Waher.Things.Http
 
 				this.api = new SensorDataReceptorResource("/ReportSensorData", Schemes.ToArray());
 				this.webServer.Register(this.api);
+
+				bool HasLocalWebServerNode = false;
+
+				foreach (INode Node in await MeteringTopology.Root.ChildNodes)
+				{
+					if (Node is LocalWebServerNode)
+					{
+						HasLocalWebServerNode = true;
+						break;
+					}
+				}
+
+				if (!HasLocalWebServerNode)
+				{
+					LocalWebServerNode Node = new LocalWebServerNode()
+					{
+						NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(LocalWebServerNode), 1, "Local Web Server")
+					};
+
+					await MeteringTopology.Root.AddAsync(Node);
+				}
 			}
 			catch (Exception ex)
 			{
 				Log.Exception(ex);
 			}
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -100,5 +124,20 @@ namespace Waher.Things.Http
 
 			return Task.CompletedTask;
 		}
+
+		/// <summary>
+		/// Updates the certificate used in mTLS negotiation.
+		/// </summary>
+		/// <param name="Certificate">Updated Certificate</param>
+		public void UpdateCertificate(X509Certificate Certificate)
+		{
+			this.certificate = Certificate;
+		}
+
+		/// <summary>
+		/// Current web server certificate.
+		/// </summary>
+		internal X509Certificate Certificate => this.certificate;
+
 	}
 }

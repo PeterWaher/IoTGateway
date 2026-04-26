@@ -1,19 +1,29 @@
-﻿using Waher.Networking.HTTP;
+﻿using System.Text;
+using System.Threading.Tasks;
+using Waher.Content.Markdown;
+using Waher.Networking.HTTP;
+using Waher.Runtime.IO;
 
 namespace Waher.Things.Http
 {
 	/// <summary>
 	/// Web Service REST API that receives sensor data from external sources.
 	/// </summary>
-	public class SensorDataReceptorResource : HttpSynchronousResource
+	public class SensorDataReceptorResource : HttpSynchronousResource, IHttpGetMethod,
+		IHttpPostMethod
 	{
+		private readonly HttpAuthenticationScheme[] authenticationSchemes;
+
 		/// <summary>
 		/// Web Service REST API that receives sensor data from external sources.
 		/// </summary>
-		/// <param name="ResourceName"></param>
-		public SensorDataReceptorResource(string ResourceName)
+		/// <param name="ResourceName">Name of resource.</param>
+		/// <param name="AuthenticationSchemes">Authentication schemes.</param>
+		public SensorDataReceptorResource(string ResourceName,
+			params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName)
 		{
+			this.authenticationSchemes = AuthenticationSchemes;
 		}
 
 		/// <summary>
@@ -25,5 +35,55 @@ namespace Waher.Things.Http
 		/// If the resource uses user sessions.
 		/// </summary>
 		public override bool UserSessions => true;
+
+		/// <summary>
+		/// If the GET method is allowed.
+		/// </summary>
+		public bool AllowsGET => true;
+
+		/// <summary>
+		/// If the POST method is allowed.
+		/// </summary>
+		public bool AllowsPOST => true;
+
+		/// <summary>
+		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
+		/// </summary>
+		/// <param name="Request">Current request</param>
+		public override HttpAuthenticationScheme[] GetAuthenticationSchemes(HttpRequest Request)
+		{
+			if (Request.Header.Method.ToUpper() == "GET")
+				return null;
+			else
+				return this.authenticationSchemes;
+		}
+
+		/// <summary>
+		/// Executes the GET method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public async Task GET(HttpRequest Request, HttpResponse Response)
+		{
+			byte[] Data = Resources.LoadResource(
+				typeof(SensorDataReceptorResource).Namespace + ".Data.ApiDocumentation.md",
+				typeof(SensorDataReceptorResource).Assembly);
+
+			string Markdown = Strings.GetString(Data, Encoding.UTF8);
+
+			await Response.Return(new MarkdownContent(Markdown));
+		}
+
+		/// <summary>
+		/// Executes the POST method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public async Task POST(HttpRequest Request, HttpResponse Response)
+		{
+		}
 	}
+
 }

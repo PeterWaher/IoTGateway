@@ -455,7 +455,7 @@ namespace Waher.Networking.HTTP
 					using (HttpRequestMessage ProxyRequest = new HttpRequestMessage()
 					{
 						RequestUri = RemoteUri,
-						Method = new HttpMethod(Request.Header.Method)
+						Method = new HttpMethod(Request.Header.Method.ToUpper())
 					})
 					{
 						bool CheckCase = !(Request.Http2Stream is null);

@@ -1,5 +1,8 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using Waher.Content;
+using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Networking.HTTP;
 using Waher.Runtime.IO;
@@ -12,6 +15,8 @@ namespace Waher.Things.Http
 	public class SensorDataReceptorResource : HttpSynchronousResource, IHttpGetMethod,
 		IHttpPostMethod
 	{
+		private const string SensorDataNamespace = "urn:nfi:iot:sd:1.0";
+
 		private readonly HttpAuthenticationScheme[] authenticationSchemes;
 
 		/// <summary>
@@ -71,8 +76,13 @@ namespace Waher.Things.Http
 				typeof(SensorDataReceptorResource).Assembly);
 
 			string Markdown = Strings.GetString(Data, Encoding.UTF8);
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown);
+			string Html = await Doc.GenerateHTML();
 
-			await Response.Return(new MarkdownContent(Markdown));
+			Response.ContentType = HtmlCodec.DefaultContentType;
+
+			await Response.Write(Html);
+			await Response.SendResponse();
 		}
 
 		/// <summary>
@@ -83,6 +93,32 @@ namespace Waher.Things.Http
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
+			if (!Request.HasData)
+			{
+				await Response.SendResponse(new BadRequestException("No payload."));
+				return;
+			}
+
+			ContentResponse Payload = await Request.DecodeDataAsync();
+			if (Payload.HasError)
+			{
+				await Response.SendResponse(new BadRequestException("Unable to decode payload: " + Payload.Error.Message));
+				return;
+			}
+
+			if (!(Payload.Decoded is XmlDocument Xml) || Xml.DocumentElement is null)
+			{
+				await Response.SendResponse(new BadRequestException("Expected XML payload."));
+				return;
+			}
+
+			if (Xml.DocumentElement.NamespaceURI != SensorDataNamespace)
+			{
+				await Response.SendResponse(new BadRequestException("Invalid namespace. Expected: " + SensorDataNamespace));
+				return;
+			}
+
+			await Response.SendResponse(new NotImplementedException());
 		}
 	}
 

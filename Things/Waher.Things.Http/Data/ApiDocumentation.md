@@ -81,5 +81,6 @@ Nodes are organized into data sources. One such data source is the *Metering Top
 holds the nodes representing the physical and logical structure of the sensors used for 
 metering (or telemetry) purposes. This Sensor Data Receptor API allows for external devices
 to use `HTTP POST` to send Sensor Data to nodes in the system, provided the user has access
-rights to do so, and the node exists and is a node that accepts such input. The system 
-operator must define the nodes before the external party can post sensor data to it.
+rights to do so, and the node exists (or can be created) and is a node that accepts such input. 
+The system operator must define the nodes and/or users and user privileges before the external 
+party can post sensor data to it.

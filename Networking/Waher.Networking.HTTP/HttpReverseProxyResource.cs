@@ -140,6 +140,7 @@ namespace Waher.Networking.HTTP
 
 		private readonly TimeSpan timeout;
 		private readonly string baseUri;
+		private readonly bool baseUriEndsWithSlash;
 		private readonly bool useSession;
 		private readonly bool encryption;
 		private readonly CommunicationLayer comLayer;
@@ -213,6 +214,7 @@ namespace Waher.Networking.HTTP
 				sb.Append(RemoteFolder);
 
 			this.baseUri = sb.ToString();
+			this.baseUriEndsWithSlash = this.baseUri.EndsWith('/');
 			this.encryption = Encryption;
 			this.comLayer = new CommunicationLayer(true, Sniffers);
 		}
@@ -448,7 +450,11 @@ namespace Waher.Networking.HTTP
 				StringBuilder sb = new StringBuilder();
 
 				sb.Append(this.baseUri);
-				sb.Append(Request.SubPath);
+
+				if (this.baseUriEndsWithSlash && (Request.SubPath?.StartsWith('/') ?? false))
+					sb.Append(Request.SubPath.Substring(1));
+				else
+					sb.Append(Request.SubPath);
 
 				if (!string.IsNullOrEmpty(Request.Header.QueryString))
 				{

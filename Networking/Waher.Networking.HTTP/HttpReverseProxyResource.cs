@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Getters;
 using Waher.Events;
+using Waher.Networking.Sniffers;
 using Waher.Runtime.IO;
 using Waher.Script;
 using Waher.Security;
@@ -19,9 +20,10 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class HttpReverseProxyResource : HttpAsynchronousResource, IHttpGetMethod, IHttpGetRangesMethod,
 		IHttpPostMethod, IHttpPostRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpOptionsMethod,
-		IHttpDeleteMethod, IHttpPatchMethod, IHttpPatchRangesMethod, IHttpTraceMethod
+		IHttpDeleteMethod, IHttpPatchMethod, IHttpPatchRangesMethod, IHttpTraceMethod,
+		ICommunicationLayer
 	{
-		private static readonly SortedDictionary<string,string> httpHeaderFields = new SortedDictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+		private static readonly SortedDictionary<string, string> httpHeaderFields = new SortedDictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
 		{
 			{ "A-IM", "A-IM" },
 			{ "Accept", "Accept" },
@@ -140,6 +142,7 @@ namespace Waher.Networking.HTTP
 		private readonly string baseUri;
 		private readonly bool useSession;
 		private readonly bool encryption;
+		private readonly CommunicationLayer comLayer;
 
 		/// <summary>
 		/// An HTTP Reverse proxy resource. Incoming requests are reverted to a another web server for processing. Responses
@@ -151,9 +154,11 @@ namespace Waher.Networking.HTTP
 		/// <param name="RemoteFolder">Optional remote folder where remote content is hosted.</param>
 		/// <param name="Encryption">If encryption (https) should be used.</param>
 		/// <param name="Timeout">Timeout threshold.</param>
+		/// <param name="Sniffers">Sniffers</param>
 		public HttpReverseProxyResource(string ResourceName, string RemoteHost, int Port,
-			string RemoteFolder, bool Encryption, TimeSpan Timeout)
-			: this(ResourceName, RemoteHost, Port, RemoteFolder, Encryption, Timeout, false)
+			string RemoteFolder, bool Encryption, TimeSpan Timeout, params ISniffer[] Sniffers)
+			: this(ResourceName, RemoteHost, Port, RemoteFolder, Encryption, Timeout,
+				  false, Sniffers)
 		{
 		}
 
@@ -170,12 +175,18 @@ namespace Waher.Networking.HTTP
 		/// <param name="UseProxySession">If the proxy resource should add a session requirement
 		/// as well. This allows the proxy resource to forward user infomration to underlying
 		/// services, etc. (Default=false)</param>
+		/// <param name="Sniffers">Sniffers</param>
 		public HttpReverseProxyResource(string ResourceName, string RemoteHost, int Port,
-			string RemoteFolder, bool Encryption, TimeSpan Timeout, bool UseProxySession)
+			string RemoteFolder, bool Encryption, TimeSpan Timeout, bool UseProxySession,
+			params ISniffer[] Sniffers)
 			: base(ResourceName)
 		{
 			this.timeout = Timeout;
 			this.useSession = UseProxySession;
+
+			this.RemoteHost = RemoteHost;
+			this.RemotePort = Port;
+			this.RemoteFolder = RemoteFolder;
 
 			StringBuilder sb = new StringBuilder();
 			int DefaultPort;
@@ -203,7 +214,23 @@ namespace Waher.Networking.HTTP
 
 			this.baseUri = sb.ToString();
 			this.encryption = Encryption;
+			this.comLayer = new CommunicationLayer(true, Sniffers);
 		}
+
+		/// <summary>
+		/// Host of remote web server.
+		/// </summary>
+		public string RemoteHost { get; }
+
+		/// <summary>
+		/// Port number of remote web server.
+		/// </summary>
+		public int RemotePort { get; }
+
+		/// <summary>
+		/// Optional remote folder where remote content is hosted.
+		/// </summary>
+		public string RemoteFolder { get; }
 
 		/// <summary>
 		/// If the resource uses user sessions.
@@ -394,6 +421,8 @@ namespace Waher.Networking.HTTP
 			try
 			{
 				SessionVariables Session = Request.Session;
+				bool HasSniffers = this.comLayer.HasSniffers;
+				StringBuilder Message = HasSniffers ? new StringBuilder() : null;
 
 				if (this.useSession)
 				{
@@ -452,14 +481,31 @@ namespace Waher.Networking.HTTP
 					Timeout = this.timeout
 				})
 				{
+					string Method = Request.Header.Method.ToUpper();
+
 					using (HttpRequestMessage ProxyRequest = new HttpRequestMessage()
 					{
 						RequestUri = RemoteUri,
-						Method = new HttpMethod(Request.Header.Method.ToUpper())
+						Method = new HttpMethod(Method)
 					})
 					{
 						bool CheckCase = !(Request.Http2Stream is null);
 						string FieldName, FieldName2;
+
+						if (HasSniffers)
+						{
+							Message.Append(Method);
+							Message.Append(' ');
+							Message.Append(RemoteUri.PathAndQuery);
+							Message.Append(" HTTP");
+
+							if (CheckCase)
+								Message.Append("/2");
+							else
+								Message.Append(" 1.1");
+
+							Message.AppendLine();
+						}
 
 						if (!(Data is null))
 							ProxyRequest.Content = new ByteArrayContent(Data);
@@ -584,10 +630,43 @@ namespace Waher.Networking.HTTP
 
 						await this.BeforeForwardRequest.Raise(this, new ProxyRequestEventArgs(ProxyRequest, Request, Response), false);
 
+						if (HasSniffers)
+						{
+							foreach (KeyValuePair<string, IEnumerable<string>> Header in ProxyRequest.Headers)
+							{
+								Message.Append(Header.Key);
+								Message.Append(": ");
+								Message.AppendLine(string.Join(", ", Header.Value));
+							}
+
+							if (!(ProxyRequest.Content is null))
+							{
+								foreach (KeyValuePair<string, IEnumerable<string>> Header in ProxyRequest.Content.Headers)
+								{
+									Message.Append(Header.Key);
+									Message.Append(": ");
+									Message.AppendLine(string.Join(", ", Header.Value));
+								}
+							}
+
+							this.comLayer.TransmitText(Message.ToString());
+							Message.Clear();
+
+							if (!(Data is null))
+								this.comLayer.TransmitBinary(false, Data);
+						}
+
 						HttpResponseMessage ProxyResponse = await HttpClient.SendAsync(ProxyRequest);
 
 						Response.StatusCode = (int)ProxyResponse.StatusCode;
 						Response.StatusMessage = ProxyResponse.ReasonPhrase;
+
+						if (HasSniffers)
+						{
+							Message.Append(Response.StatusCode.ToString());
+							Message.Append(' ');
+							Message.AppendLine(Response.StatusMessage);
+						}
 
 						foreach (KeyValuePair<string, IEnumerable<string>> Header in ProxyResponse.Headers)
 						{
@@ -595,6 +674,13 @@ namespace Waher.Networking.HTTP
 
 							if (CheckCase && httpHeaderFields.TryGetValue(FieldName, out FieldName2))
 								FieldName = FieldName2;
+
+							if (HasSniffers)
+							{
+								Message.Append(FieldName);
+								Message.Append(": ");
+								Message.AppendLine(string.Join(", ", Header.Value));
+							}
 
 							switch (FieldName)
 							{
@@ -646,6 +732,13 @@ namespace Waher.Networking.HTTP
 								if (CheckCase && httpHeaderFields.TryGetValue(FieldName, out FieldName2))
 									FieldName = FieldName2;
 
+								if (HasSniffers)
+								{
+									Message.Append(FieldName);
+									Message.Append(": ");
+									Message.AppendLine(string.Join(", ", Header.Value));
+								}
+
 								switch (FieldName)
 								{
 									case "Content-Length":
@@ -659,7 +752,13 @@ namespace Waher.Networking.HTTP
 								}
 							}
 
+							if (HasSniffers)
+								this.ReceiveText(Message.ToString());
+
 							byte[] Bin = await ProxyResponse.Content.ReadAsByteArrayAsync();
+
+							if (HasSniffers)
+								this.ReceiveBinary(true, Bin);
 
 							Response.ContentLength = Bin.Length;
 
@@ -668,7 +767,12 @@ namespace Waher.Networking.HTTP
 							await Response.Write(true, Bin);
 						}
 						else
+						{
+							if (HasSniffers)
+								this.ReceiveText(Message.ToString());
+
 							await this.BeforeForwardResponse.Raise(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response), false);
+						}
 
 						await Response.SendResponse();
 					}
@@ -707,5 +811,256 @@ namespace Waher.Networking.HTTP
 		/// Event raised before a response is forwarded
 		/// </summary>
 		public event EventHandlerAsync<ProxyResponseEventArgs> BeforeForwardResponse;
+
+		#region ICommunicationLayer
+
+		/// <summary>
+		/// If events raised from the communication layer are decoupled, i.e. executed
+		/// in parallel with the source that raised them.
+		/// </summary>
+		public bool DecoupledEvents => this.comLayer.DecoupledEvents;
+
+		/// <summary>
+		/// Adds a sniffer to the node.
+		/// </summary>
+		/// <param name="Sniffer">Sniffer to add.</param>
+		public void Add(ISniffer Sniffer)
+		{
+			this.comLayer.Add(Sniffer);
+		}
+
+		/// <summary>
+		/// Adds a range of sniffers to the node.
+		/// </summary>
+		/// <param name="Sniffers">Sniffers to add.</param>
+		public void AddRange(IEnumerable<ISniffer> Sniffers)
+		{
+			this.comLayer.AddRange(Sniffers);
+		}
+
+		/// <summary>
+		/// Removes a sniffer, if registered.
+		/// </summary>
+		/// <param name="Sniffer">Sniffer to remove.</param>
+		/// <returns>If the sniffer was found and removed.</returns>
+		public bool Remove(ISniffer Sniffer) => this.comLayer.Remove(Sniffer);
+
+		/// <summary>
+		/// Registered sniffers.
+		/// </summary>
+		public ISniffer[] Sniffers => this.comLayer.Sniffers;
+
+		/// <summary>
+		/// If there are sniffers registered on the object.
+		/// </summary>
+		public bool HasSniffers => this.comLayer.HasSniffers;
+
+		/// <summary>
+		/// Returns an enumerator that iterates through the collection.
+		/// </summary>
+		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
+		public IEnumerator<ISniffer> GetEnumerator() => this.comLayer.GetEnumerator();
+
+		/// <summary>
+		/// Returns an enumerator that iterates through a collection.
+		/// </summary>
+		/// <returns>An System.Collections.IEnumerator object that can be used to iterate through the collection.</returns>
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => this.comLayer.GetEnumerator();
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(int Count) => this.comLayer.ReceiveBinary(Count);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data) => this.comLayer.ReceiveBinary(ConstantBuffer, Data);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.comLayer.ReceiveBinary(ConstantBuffer, Data, Offset, Count);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(int Count) => this.comLayer.TransmitBinary(Count);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data) => this.comLayer.TransmitBinary(ConstantBuffer, Data);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.comLayer.TransmitBinary(ConstantBuffer, Data, Offset, Count);
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Text">Text</param>
+		public void ReceiveText(string Text) => this.comLayer.ReceiveText(Text);
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Text">Text</param>
+		public void TransmitText(string Text) => this.comLayer.TransmitText(Text);
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Comment">Comment.</param>
+		public void Information(string Comment) => this.comLayer.Information(Comment);
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Warning">Warning.</param>
+		public void Warning(string Warning) => this.comLayer.Warning(Warning);
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Error">Error.</param>
+		public void Error(string Error) => this.comLayer.Error(Error);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public void Exception(Exception Exception) => this.comLayer.Exception(Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public void Exception(string Exception) => this.comLayer.Exception(Exception);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(DateTime Timestamp, int Count) => this.comLayer.ReceiveBinary(Timestamp, Count);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data) => this.comLayer.ReceiveBinary(Timestamp, ConstantBuffer, Data);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.comLayer.ReceiveBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(DateTime Timestamp, int Count) => this.comLayer.TransmitBinary(Timestamp, Count);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data) => this.comLayer.TransmitBinary(Timestamp, ConstantBuffer, Data);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.comLayer.TransmitBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public void ReceiveText(DateTime Timestamp, string Text) => this.comLayer.ReceiveText(Timestamp, Text);
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public void TransmitText(DateTime Timestamp, string Text) => this.comLayer.TransmitText(Timestamp, Text);
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Comment">Comment.</param>
+		public void Information(DateTime Timestamp, string Comment) => this.comLayer.Information(Timestamp, Comment);
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Warning">Warning.</param>
+		public void Warning(DateTime Timestamp, string Warning) => this.comLayer.Warning(Timestamp, Warning);
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Error">Error.</param>
+		public void Error(DateTime Timestamp, string Error) => this.comLayer.Error(Timestamp, Error);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public void Exception(DateTime Timestamp, string Exception) => this.comLayer.Exception(Timestamp, Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public void Exception(DateTime Timestamp, Exception Exception) => this.comLayer.Exception(Timestamp, Exception);
+
+		#endregion
+
 	}
 }

@@ -138,12 +138,15 @@ namespace Waher.Networking.HTTP
 			{ "X-XSS-Protection", "X-XSS-Protection" }
 		};
 
+		private readonly HttpAuthenticationScheme[] authenticationSchemes;
 		private readonly TimeSpan timeout;
 		private readonly string baseUri;
+		private readonly string privilege;
 		private readonly bool baseUriEndsWithSlash;
 		private readonly bool useSession;
 		private readonly bool encryption;
 		private readonly CommunicationLayer comLayer;
+		private readonly bool authorization;
 
 		/// <summary>
 		/// An HTTP Reverse proxy resource. Incoming requests are reverted to a another web server for processing. Responses
@@ -159,7 +162,7 @@ namespace Waher.Networking.HTTP
 		public HttpReverseProxyResource(string ResourceName, string RemoteHost, int Port,
 			string RemoteFolder, bool Encryption, TimeSpan Timeout, params ISniffer[] Sniffers)
 			: this(ResourceName, RemoteHost, Port, RemoteFolder, Encryption, Timeout,
-				  false, Sniffers)
+				  false, null, null, Sniffers)
 		{
 		}
 
@@ -180,10 +183,38 @@ namespace Waher.Networking.HTTP
 		public HttpReverseProxyResource(string ResourceName, string RemoteHost, int Port,
 			string RemoteFolder, bool Encryption, TimeSpan Timeout, bool UseProxySession,
 			params ISniffer[] Sniffers)
+			: this(ResourceName, RemoteHost, Port, RemoteFolder, Encryption, Timeout,
+				  UseProxySession, null, null, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// An HTTP Reverse proxy resource. Incoming requests are reverted to a another web server for processing. Responses
+		/// are returned asynchronously as they are received.
+		/// </summary>
+		/// <param name="ResourceName">Name of resource.</param>
+		/// <param name="RemoteHost">Host of remote web server.</param>
+		/// <param name="Port">Port number of remote web server.</param>
+		/// <param name="RemoteFolder">Optional remote folder where remote content is hosted.</param>
+		/// <param name="Encryption">If encryption (https) should be used.</param>
+		/// <param name="Timeout">Timeout threshold.</param>
+		/// <param name="UseProxySession">If the proxy resource should add a session requirement
+		/// as well. This allows the proxy resource to forward user infomration to underlying
+		/// services, etc. (Default=false)</param>
+		/// <param name="AuthenticationSchemes">Optional set of authentication schemes.</param>
+		/// <param name="RequiredPrivilege">Optional required privilege.</param>
+		/// <param name="Sniffers">Sniffers</param>
+		public HttpReverseProxyResource(string ResourceName, string RemoteHost, int Port,
+			string RemoteFolder, bool Encryption, TimeSpan Timeout, bool UseProxySession,
+			HttpAuthenticationScheme[] AuthenticationSchemes, string RequiredPrivilege,
+			params ISniffer[] Sniffers)
 			: base(ResourceName)
 		{
 			this.timeout = Timeout;
 			this.useSession = UseProxySession;
+			this.authenticationSchemes = AuthenticationSchemes;
+			this.privilege = RequiredPrivilege;
+			this.authorization = !string.IsNullOrEmpty(RequiredPrivilege);
 
 			this.RemoteHost = RemoteHost;
 			this.RemotePort = Port;
@@ -278,6 +309,15 @@ namespace Waher.Networking.HTTP
 		/// If the TRACE method is allowed.
 		/// </summary>
 		public bool AllowsTRACE => true;
+
+		/// <summary>
+		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
+		/// </summary>
+		/// <param name="Request">Current request</param>
+		public override HttpAuthenticationScheme[] GetAuthenticationSchemes(HttpRequest Request)
+		{
+			return this.authenticationSchemes;
+		}
 
 		/// <summary>
 		/// Executes the GET method on the resource.
@@ -422,6 +462,16 @@ namespace Waher.Networking.HTTP
 		{
 			try
 			{
+				if (this.authorization)
+				{
+					IUser User = Request.User;
+					if (!(User?.HasPrivilege(this.privilege) ?? false))
+					{
+						await Response.SendResponse(new ForbiddenException("Access denied."));
+						return;
+					}
+				}
+
 				SessionVariables Session = Request.Session;
 				bool HasSniffers = this.comLayer.HasSniffers;
 				StringBuilder Message = HasSniffers ? new StringBuilder() : null;

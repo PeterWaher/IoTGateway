@@ -1490,11 +1490,21 @@ namespace Waher.IoTGateway
 								int RemotePort = XML.Attribute(E, "remotePort", Encrypted ? HttpServer.DefaultHttpsPort : HttpServer.DefaultHttpPort);
 								bool UseSession = XML.Attribute(E, "useSession", false);
 								int TimeoutMs = XML.Attribute(E, "timeoutMs", 10000);
+								string Privilege = XML.Attribute(E, "privilege");
 
 								try
 								{
-									webServer.Register(new HttpReverseProxyResource(LocalResource, RemoteDomain, RemotePort, RemoteFolder, Encrypted,
-										TimeSpan.FromMilliseconds(TimeoutMs), UseSession));
+									if (string.IsNullOrEmpty(Privilege))
+									{
+										webServer.Register(new HttpReverseProxyResource(LocalResource, RemoteDomain, RemotePort, RemoteFolder, Encrypted,
+											TimeSpan.FromMilliseconds(TimeoutMs), UseSession));
+									}
+									else
+									{
+										webServer.Register(new HttpReverseProxyResource(LocalResource, RemoteDomain, RemotePort, RemoteFolder, Encrypted,
+											TimeSpan.FromMilliseconds(TimeoutMs), UseSession, HttpModule.GetAuthenticationSchemes(Privilege),
+											Privilege));
+									}
 								}
 								catch (Exception ex)
 								{
@@ -1517,12 +1527,23 @@ namespace Waher.IoTGateway
 								RemotePort = XML.Attribute(E, "remotePort", Encrypted ? HttpServer.DefaultHttpsPort : HttpServer.DefaultHttpPort);
 								UseSession = XML.Attribute(E, "useSession", false);
 								TimeoutMs = XML.Attribute(E, "timeoutMs", 10000);
+								Privilege = XML.Attribute(E, "privilege");
 
 								try
 								{
-									webServer.RegisterDomainProxy(LocalDomain, new HttpReverseProxyResource(
-										"/", RemoteDomain, RemotePort, RemoteFolder, Encrypted,
-										TimeSpan.FromMilliseconds(TimeoutMs), UseSession));
+									if (string.IsNullOrEmpty(Privilege))
+									{
+										webServer.RegisterDomainProxy(LocalDomain, new HttpReverseProxyResource(
+											"/", RemoteDomain, RemotePort, RemoteFolder, Encrypted,
+											TimeSpan.FromMilliseconds(TimeoutMs), UseSession));
+									}
+									else
+									{
+										webServer.RegisterDomainProxy(LocalDomain, new HttpReverseProxyResource(
+											"/", RemoteDomain, RemotePort, RemoteFolder, Encrypted,
+											TimeSpan.FromMilliseconds(TimeoutMs), UseSession,
+											HttpModule.GetAuthenticationSchemes(Privilege), Privilege));
+									}
 								}
 								catch (Exception ex)
 								{

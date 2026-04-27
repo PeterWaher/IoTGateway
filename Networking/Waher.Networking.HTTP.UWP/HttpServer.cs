@@ -1986,6 +1986,24 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
+		/// <summary>
+		/// Gets all registered domain proxy resources.
+		/// </summary>
+		/// <returns>Array of domain proxy resources.</returns>
+		public KeyValuePair<string, HttpReverseProxyResource>[] GetDomainProxies()
+		{
+			lock (this.resources)
+			{
+				KeyValuePair<string, HttpReverseProxyResource>[] Result = new KeyValuePair<string, HttpReverseProxyResource>[this.domainProxies.Count];
+				int i = 0;
+
+				foreach (KeyValuePair<string, HttpReverseProxyResource> P in this.domainProxies)
+					Result[i++] = P;
+
+				return Result;
+			}
+		}
+
 		internal string CheckResourceOverride(string ResourceName)
 		{
 			if (!string.IsNullOrEmpty(this.resourceOverride))

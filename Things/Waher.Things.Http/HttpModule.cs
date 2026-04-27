@@ -8,6 +8,7 @@ using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
+using Waher.Runtime.Timing;
 using Waher.Security;
 using Waher.Security.JWT;
 using Waher.Security.Users;
@@ -26,6 +27,7 @@ namespace Waher.Things.Http
 		private static HttpServer webServer;
 		private static SensorDataReceptorResource api;
 		private static X509Certificate certificate;
+		private static Scheduler scheduler;
 		private static string rootFolder;
 
 		/// <summary>
@@ -67,11 +69,20 @@ namespace Waher.Things.Http
 				if (!Types.TryGetModuleParameter("Root", out Obj) ||
 					!(Obj is string RootFolder))
 				{
-					Log.Warning("Root folder not specified.");
+					Log.Warning("Root folder not defined.");
 					rootFolder = null;
 				}
 				else
 					rootFolder = RootFolder;
+
+				if (!Types.TryGetModuleParameter("Scheduler", out Obj) ||
+					!(Obj is Scheduler Scheduler))
+				{
+					Log.Warning("Scheduler not available.");
+					scheduler = null;
+				}
+				else
+					scheduler = Scheduler;
 
 				List<HttpAuthenticationScheme> Schemes = new List<HttpAuthenticationScheme>();
 
@@ -166,5 +177,10 @@ namespace Waher.Things.Http
 		/// Web Server instance.
 		/// </summary>
 		internal static HttpServer WebServer => webServer;
+
+		/// <summary>
+		/// Scheduler instance, if available.
+		/// </summary>
+		internal static Scheduler Scheduler => scheduler;
 	}
 }

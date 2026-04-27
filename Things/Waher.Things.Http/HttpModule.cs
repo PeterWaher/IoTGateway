@@ -26,6 +26,7 @@ namespace Waher.Things.Http
 
 		private static HttpServer webServer;
 		private static SensorDataReceptorResource api;
+		private static LocalWebServerNode localWebServerNode;
 		private static X509Certificate certificate;
 		private static Scheduler scheduler;
 		private static string rootFolder;
@@ -117,25 +118,23 @@ namespace Waher.Things.Http
 		/// </summary>
 		public static async Task CheckLocalWebServerNode()
 		{
-			bool HasLocalWebServerNode = false;
-
 			foreach (INode Node in await MeteringTopology.Root.ChildNodes)
 			{
-				if (Node is LocalWebServerNode)
+				if (Node is LocalWebServerNode LocalWebServerNode)
 				{
-					HasLocalWebServerNode = true;
+					localWebServerNode = LocalWebServerNode;
 					break;
 				}
 			}
 
-			if (!HasLocalWebServerNode)
+			if (localWebServerNode is null)
 			{
-				LocalWebServerNode Node = new LocalWebServerNode()
+				localWebServerNode = new LocalWebServerNode()
 				{
 					NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(LocalWebServerNode), 1, "Local Web Server")
 				};
 
-				await MeteringTopology.Root.AddAsync(Node);
+				await MeteringTopology.Root.AddAsync(localWebServerNode);
 			}
 		}
 
@@ -182,5 +181,10 @@ namespace Waher.Things.Http
 		/// Scheduler instance, if available.
 		/// </summary>
 		internal static Scheduler Scheduler => scheduler;
+
+		/// <summary>
+		/// Local web server node.
+		/// </summary>
+		internal static LocalWebServerNode LocalWebServerNode => localWebServerNode;
 	}
 }

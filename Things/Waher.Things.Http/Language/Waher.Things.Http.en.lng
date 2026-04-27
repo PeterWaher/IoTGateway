@@ -3,6 +3,7 @@
 	<Language code="en" name="English">
 		<Namespace name="Waher.Things.Http">
 			<String id="1">Local Web Server</String>
+			<String id="2">External Web Node</String>
 		</Namespace>
 	</Language>
 </Translation>

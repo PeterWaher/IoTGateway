@@ -35,7 +35,7 @@ namespace Waher.Things.Http
 		/// </summary>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(false);
+			return Task.FromResult(Child is ExternalWebNode);
 		}
 
 		/// <summary>

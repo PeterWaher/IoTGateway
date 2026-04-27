@@ -41,11 +41,15 @@ Sensor Data
 
 The API accepts sensor data in XML format (`Content-Type: text/xml`), as defined by the
 [Neuro-Foundation](https://neuro-foundation.io/SensorData.md). Sensor data can be posted
-directly to a node (using HTTP `POST`), providing the node ID in the URL. In this case, the root 
-element of the XML payload must be a `<ts/>` element, with the correct namespace. The data can 
-also be posted to the receptor directly, with the node ID specified in the XML payload. In this 
-case, the root element of the XML payload must be a `<nd/>` element (containing one or more 
-`<ts/>` elements), or a `<resp/>` element containing one or more `<nd/>` elements.
+directly to a node (using HTTP `POST`), providing the node path in the URL. In this case, the 
+root element of the XML payload must be a `<ts/>` element, with the correct namespace. The
+nodes can also be created by the system automatically, if they do not exist.
+
+The data can also be posted to the receptor directly, with the node ID specified in the XML 
+payload. In this case, the root element of the XML payload must be a `<nd/>` element 
+(containing one or more `<ts/>` elements), or a `<resp/>` element containing one or more 
+`<nd/>` elements. The nodes must also exist in the system, as the creator cannot create the 
+nodes since the path is missing.
 
 Example payload posted directly to the node `Node1` at 
 `https://receptor.example.com/ReportSensorData/ExternalSensors/Node1` (this requires a user to 
@@ -70,6 +74,18 @@ privilege `Admin.SensorData.Post`):
   </ts>
 </nd>
 ```
+
+### Response codes
+
+The following table lists the possible response codes that the Sensor Data Receptor API may 
+return:
+
+| Code | Phrase      | Description                                                                 |
+|-----:|:------------|:----------------------------------------------------------------------------|
+| 204  | No Content  | The sensor data was successfully processed and stored.                      |
+| 400  | Bad Request | Invalid or badly formatted payload.                                         |
+| 403  | Forbidden   | The user is not authorized to post sensor data (to the corresponding node). |
+| 404  | Not Found   | The specified node does not exist (and could not be created).               |
 
 Nodes
 --------

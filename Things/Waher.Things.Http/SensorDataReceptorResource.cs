@@ -1,12 +1,16 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Networking.HTTP;
+using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.IO;
 using Waher.Script;
+using Waher.Things.Metering;
+using Waher.Things.SensorData;
 
 namespace Waher.Things.Http
 {
@@ -100,6 +104,12 @@ namespace Waher.Things.Http
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
+			if (Request.User is null)
+			{
+				await Response.SendResponse(new ForbiddenException("Access denied."));
+				return;
+			}
+
 			if (!Request.HasData)
 			{
 				await Response.SendResponse(new BadRequestException("No payload."));
@@ -125,7 +135,198 @@ namespace Waher.Things.Http
 				return;
 			}
 
-			await Response.SendResponse(new NotImplementedException());
+			if (string.IsNullOrEmpty(Request.SubPath))
+			{
+				if (!Request.User.HasPrivilege(HttpModule.PostPrivileges))
+				{
+					await Response.SendResponse(new ForbiddenException("Access denied. User lacks sufficient privileges: " + HttpModule.PostPrivileges));
+					return;
+				}
+
+				if (Xml.DocumentElement.LocalName == "resp")
+				{
+					foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
+					{
+						if (!(N is XmlElement E))
+							continue;
+
+						if (E.NamespaceURI != SensorDataNamespace || E.LocalName != "nd")
+						{
+							await Response.SendResponse(new BadRequestException("Expected <nd> element as child of <resp>."));
+							return;
+						}
+
+						if (!await this.ProcessNode(E, Response))
+							return;
+					}
+				}
+				else if (Xml.DocumentElement.LocalName == "nd")
+				{
+					if (!await this.ProcessNode(Xml.DocumentElement, Response))
+						return;
+				}
+				else
+				{
+					await Response.SendResponse(new BadRequestException("Expected <resp> or <nd> element."));
+					return;
+				}
+			}
+			else
+			{
+				string PrivilegeId = HttpModule.PostPrivileges + Request.SubPath.Replace('/', '.');
+
+				if (!Request.User.HasPrivilege(PrivilegeId))
+				{
+					await Response.SendResponse(new ForbiddenException("Access denied. User lacks sufficient privileges: " + PrivilegeId));
+					return;
+				}
+
+				if (Xml.DocumentElement.LocalName == "ts")
+				{
+					string[] Path = Request.SubPath[1..].Split('/');
+					string NodeId = Path[^1];
+
+					MeteringNode Node = await MeteringTopology.GetNode(NodeId);
+
+					if (Node is ExternalWebNode ExternalWebNode)
+					{
+						if (!await this.ProcessTimestamp(ExternalWebNode, Xml.DocumentElement, Response))
+							return;
+					}
+					else if (Node is null)
+					{
+						MeteringNode Parent = HttpModule.LocalWebServerNode;
+						ExternalWebNode = null;
+
+						foreach (string Part in Path)
+						{
+							ExternalWebNode = null;
+
+							foreach (INode Child in await Parent.ChildNodes)
+							{
+								if (Child.NodeId == Part)
+								{
+									if (Child is ExternalWebNode E)
+									{
+										ExternalWebNode = E;
+										break;
+									}
+									else
+									{
+										await Response.SendResponse(new ForbiddenException("Node not an external web node: " + Part));
+										return;
+									}
+								}
+							}
+
+							if (ExternalWebNode is null)
+							{
+								if (!(MeteringTopology.GetNode(Part) is null))
+								{
+									await Response.SendResponse(new ForbiddenException("Part already exists, or is of incorrect type: " + Part));
+									return;
+								}
+
+								ExternalWebNode = new ExternalWebNode()
+								{
+									NodeId = Part
+								};
+
+								await Parent.AddAsync(ExternalWebNode);
+							}
+						}
+
+						if (ExternalWebNode is null)
+						{
+							await Response.SendResponse(new BadRequestException("Undefined Node path."));
+							return;
+						}
+						else if (!await this.ProcessTimestamp(ExternalWebNode, Xml.DocumentElement, Response))
+							return;
+					}
+					else
+					{
+						await Response.SendResponse(new ForbiddenException("Node not an external web node: " + NodeId));
+						return;
+					}
+				}
+				else
+				{
+					await Response.SendResponse(new BadRequestException("Expected <td> element."));
+					return;
+				}
+			}
+
+			Response.StatusCode = 204; // No content.
+			await Response.SendResponse();
+		}
+
+		private async Task<bool> ProcessNode(XmlElement Xml, HttpResponse Response)
+		{
+			string NodeId = Xml.GetAttribute("id");
+			string SourceId = Xml.GetAttribute("src");
+			string Partition = Xml.GetAttribute("pt");
+
+			if (!string.IsNullOrEmpty(SourceId) &&
+				SourceId != MeteringTopology.SourceID)
+			{
+				await Response.SendResponse(new ForbiddenException("Access to data source forbidden."));
+				return false;
+			}
+
+			if (!string.IsNullOrEmpty(Partition))
+			{
+				await Response.SendResponse(new BadRequestException("Expected no partition."));
+				return false;
+			}
+
+			MeteringNode Node = await MeteringTopology.GetNode(NodeId);
+			if (Node is null)
+			{
+				await Response.SendResponse(new NotFoundException("Node not found: " + NodeId));
+				return false;
+			}
+
+			if (!(Node is ExternalWebNode ExternalWebNode))
+			{
+				await Response.SendResponse(new ForbiddenException("Node not an external web node: " + NodeId));
+				return false;
+			}
+
+			foreach (XmlNode N in Xml.ChildNodes)
+			{
+				if (!(N is XmlElement E))
+					continue;
+
+				if (E.NamespaceURI != SensorDataNamespace || E.LocalName != "ts")
+				{
+					await Response.SendResponse(new BadRequestException("Expected <ts> element as child of <nd>."));
+					return false;
+				}
+
+				if (!await this.ProcessTimestamp(ExternalWebNode, E, Response))
+					return false;
+			}
+
+			return true;
+		}
+
+		private async Task<bool> ProcessTimestamp(ExternalWebNode Node, XmlElement Xml, HttpResponse Response)
+		{
+			List<ThingError> Errors = null;
+			List<Field> Fields = null;
+
+			SensorClient.ParseTimespan(Xml, Node, ref Fields, ref Errors);
+
+			if (Fields is null && Errors is null)
+			{
+				await Response.SendResponse(new BadRequestException("No sensor data in payload."));
+				return false;
+			}
+
+			await Node.NewSensorData(Fields?.ToArray(), Errors?.ToArray());
+
+			return true;
 		}
 	}
 

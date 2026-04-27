@@ -670,12 +670,19 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 		}
 
-		private static void ParseTimespan(XmlElement E2, ThingReference Thing,
+		/// <summary>
+		/// Parses a &lt;ts&gt; element and its corresponding fields and errors.
+		/// </summary>
+		/// <param name="Xml">XML definition.</param>
+		/// <param name="Thing">Thing reference associated with the sensor data.</param>
+		/// <param name="Fields">Parsed fields</param>
+		/// <param name="Errors">Parsed errors</param>
+		public static void ParseTimespan(XmlElement Xml, ThingReference Thing,
 			ref List<Field> Fields, ref List<ThingError> Errors)
 		{
-			DateTime Timestamp = XML.Attribute(E2, "v", DateTime.MinValue);
+			DateTime Timestamp = XML.Attribute(Xml, "v", DateTime.MinValue);
 
-			foreach (XmlNode N3 in E2.ChildNodes)
+			foreach (XmlNode N3 in Xml.ChildNodes)
 			{
 				if (!(N3 is XmlElement E))
 					continue;

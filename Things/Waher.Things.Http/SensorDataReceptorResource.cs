@@ -6,6 +6,7 @@ using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Networking.HTTP;
 using Waher.Runtime.IO;
+using Waher.Script;
 
 namespace Waher.Things.Http
 {
@@ -76,7 +77,13 @@ namespace Waher.Things.Http
 				typeof(SensorDataReceptorResource).Assembly);
 
 			string Markdown = Strings.GetString(Data, Encoding.UTF8);
-			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown);
+			MarkdownSettings Settings = new MarkdownSettings(null, true, new Variables())
+			{
+				RootFolder = HttpModule.RootFolder,
+				ResourceMap = HttpModule.WebServer
+			};
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings,
+				null, Request.Resource.ResourceName, Request.Header.GetURL());
 			string Html = await Doc.GenerateHTML();
 
 			Response.ContentType = HtmlCodec.DefaultContentType;

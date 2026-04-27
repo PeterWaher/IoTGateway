@@ -2,6 +2,9 @@
 Description: This document provides an overview of the Sensor Data Receptor API, including its endpoints, request and response formats, and usage examples.
 Author: Peter Waher
 Date: 2026-04-26
+Master: /Master.md
+
+=============================================================================================
 
 Sensor Data Receptor API
 ===========================
@@ -38,11 +41,11 @@ Sensor Data
 
 The API accepts sensor data in XML format (`Content-Type: text/xml`), as defined by the
 [Neuro-Foundation](https://neuro-foundation.io/SensorData.md). Sensor data can be posted
-directly to a node, providing the node ID in the URL. In this case, the root element of the
-XML payload must be a `<ts/>` element, with the correct namespace. The data can also be posted
-to the receptor directly, with the node ID specified in the XML payload. In this case, the
-root element of the XML payload must be a `<nd/>` element (containing one or more `<ts/>`
-elements), or a `<resp/>` element containing one or more `<nd/>` elements.
+directly to a node (using HTTP `POST`), providing the node ID in the URL. In this case, the root 
+element of the XML payload must be a `<ts/>` element, with the correct namespace. The data can 
+also be posted to the receptor directly, with the node ID specified in the XML payload. In this 
+case, the root element of the XML payload must be a `<nd/>` element (containing one or more 
+`<ts/>` elements), or a `<resp/>` element containing one or more `<nd/>` elements.
 
 Example payload posted directly to the node `Node1` at 
 `https://receptor.example.com/ReportSensorData/ExternalSensors/Node1` (this requires a user to 

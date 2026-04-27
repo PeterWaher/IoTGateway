@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema id="GatewayConfiguration"
+<xs:schema id="WebApplicationFirewall"
            targetNamespace="http://waher.se/Schema/WAF.xsd"
            elementFormDefault="qualified"
            xmlns="http://waher.se/Schema/WAF.xsd"

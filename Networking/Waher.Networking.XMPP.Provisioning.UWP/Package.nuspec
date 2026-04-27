@@ -22,7 +22,7 @@
 			<dependency id="Waher.Networking.XMPP.UWP" version="4.2.9"/>
 			<dependency id="Waher.Persistence" version="1.19.0"/>
 			<dependency id="Waher.Runtime.Collections" version="1.0.3"/>
-			<dependency id="Waher.Things" version="3.2.4"/>
+			<dependency id="Waher.Things" version="3.3.0"/>
 		</dependencies>
 	</metadata>
 	<files>

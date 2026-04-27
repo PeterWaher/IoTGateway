@@ -221,7 +221,7 @@ namespace Waher.Things.Http
 
 							if (ExternalWebNode is null)
 							{
-								if (!(MeteringTopology.GetNode(Part) is null))
+								if (!(await MeteringTopology.GetNode(Part) is null))
 								{
 									await Response.SendResponse(new ForbiddenException("Part already exists, or is of incorrect type: " + Part));
 									return;

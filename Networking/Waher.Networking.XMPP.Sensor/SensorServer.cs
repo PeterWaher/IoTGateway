@@ -11,6 +11,7 @@ using Waher.Networking.XMPP.Provisioning;
 using Waher.Runtime.Timing;
 using Waher.Things;
 using Waher.Things.SensorData;
+using Waher.Things.Authorities;
 
 namespace Waher.Networking.XMPP.Sensor
 {
@@ -397,7 +398,27 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			AuthorityEventArgs e = new AuthorityEventArgs(BareJid);
 			await this.AssignAuthority.Raise(this, e, false);
-			return e.Authority;
+
+			if (!(e.Authority is null))
+				return e.Authority;
+
+			if (!string.IsNullOrEmpty(this.provisioningClient?.OwnerJid) &&
+				this.provisioningClient.OwnerJid == BareJid)
+			{
+				return new MaximumAuthority(BareJid);
+			}
+
+			RosterItem Item = this.client.GetRosterItem(BareJid);
+			if (Item is null)
+				return new NoAuthority(BareJid);
+
+			if (Item.State == SubscriptionState.Both ||
+				Item.State == SubscriptionState.From)
+			{
+				return new ViewOnlyAuthority(BareJid);
+			}
+
+			return new NoAuthority(BareJid);
 		}
 
 		/// <summary>

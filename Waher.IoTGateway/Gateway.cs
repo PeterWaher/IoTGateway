@@ -44,6 +44,7 @@ using Waher.Groups;
 using Waher.IoTGateway.Cssx;
 using Waher.IoTGateway.Events;
 using Waher.IoTGateway.Exceptions;
+using Waher.IoTGateway.ScriptExtensions.Functions;
 using Waher.IoTGateway.Setup;
 using Waher.IoTGateway.Setup.Legal;
 using Waher.IoTGateway.WebResources;
@@ -107,6 +108,7 @@ using Waher.Security.SHA3;
 using Waher.Security.Users;
 using Waher.Security.WAF;
 using Waher.Things;
+using Waher.Things.Authorities;
 using Waher.Things.Http;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
@@ -1669,6 +1671,7 @@ namespace Waher.IoTGateway
 
 				if (FirstStart)
 				{
+					concentratorServer.SensorServer.AssignAuthority += SensorServer_AssignAuthority;
 					MeteringTopology.OnNewMomentaryValues += NewMomentaryValues;
 					ProvisionedMeteringNode.QrCodeUrlRequested += ProvisionedMeteringNode_QrCodeUrlRequested;
 				}
@@ -3790,6 +3793,31 @@ namespace Waher.IoTGateway
 			}
 
 			return User;
+		}
+
+		private static Task SensorServer_AssignAuthority(object Sender, AuthorityEventArgs e)
+		{
+			if (e.Authority is null)
+			{
+				if (!string.IsNullOrEmpty(provisioningClient?.OwnerJid) &&
+					provisioningClient.OwnerJid == e.BareJid)
+				{
+					e.Authority = new MaximumAuthority(e.BareJid);
+				}
+				else
+				{
+					RosterItem Item = xmppClient?.GetRosterItem(e.BareJid);
+				
+					if (!(Item is null) &&
+						(Item.State == SubscriptionState.Both ||
+						Item.State == SubscriptionState.From))
+					{
+						e.Authority = new ViewOnlyAuthority(e.BareJid, MeteringTopology.SourceID);
+					}
+				}
+			}
+
+			return Task.CompletedTask;
 		}
 
 		#endregion

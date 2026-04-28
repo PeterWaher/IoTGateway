@@ -234,6 +234,8 @@ namespace Waher.Things.Http
 
 								await Parent.AddAsync(ExternalWebNode);
 							}
+
+							Parent = ExternalWebNode;
 						}
 
 						if (ExternalWebNode is null)

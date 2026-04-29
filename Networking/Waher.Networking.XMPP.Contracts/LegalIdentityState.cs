@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Text;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
+using Waher.Security.CallStack;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -14,12 +15,17 @@ namespace Waher.Networking.XMPP.Contracts
 	[Index("BareJid", "LegalId")]
 	[Index("BareJid", "State", "Timestamp")]
 	[Singleton]
-	public class LegalIdentityState
+	public class LegalIdentityState : IEncryptedProperties
 	{
+		private static ICallStackCheck[] approvedSources = null;
+
 		private string objectId = null;
 		private CaseInsensitiveString bareJid = CaseInsensitiveString.Empty;
 		private CaseInsensitiveString legalId = CaseInsensitiveString.Empty;
 		private byte[] publicKey = null;
+		private string keyName = null;
+		private string keyNamespace = null;
+		private byte[] privateKey = null;
 		private IdentityState state = IdentityState.Created;
 		private DateTime timestamp = DateTime.MinValue;
 
@@ -78,6 +84,53 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Name of key algorithm used when the identity was created.
+		/// </summary>
+		[DefaultValueNull]
+		public string KeyName
+		{
+			get => this.keyName;
+			set => this.keyName = value;
+		}
+
+		/// <summary>
+		/// Namespace of key algorithm used when the identity was created.
+		/// </summary>
+		[DefaultValueNull]
+		public string KeyNamespace
+		{
+			get => this.keyNamespace;
+			set => this.keyNamespace = value;
+		}
+
+		/// <summary>
+		/// If a private key snapshot is available for the legal identity.
+		/// </summary>
+		public bool HasPrivateKey => !(this.privateKey is null);
+
+		/// <summary>
+		/// Private key snapshot stored with the legal identity.
+		/// </summary>
+		[DefaultValueNull]
+		[Encrypted(32)]
+		public byte[] PrivateKey
+		{
+			get
+			{
+				AssertAllowed();
+				return this.privateKey;
+			}
+
+			set
+			{
+				if (!(this.privateKey is null))
+					AssertAllowed();
+
+				this.privateKey = value;
+			}
+		}
+
+		/// <summary>
 		/// State of the legal identity.
 		/// </summary>
 		public IdentityState State
@@ -93,6 +146,33 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get => this.timestamp;
 			set => this.timestamp = value;
+		}
+
+		/// <summary>
+		/// Array of properties that are encrypted.
+		/// </summary>
+		public string[] EncryptedProperties => new string[]
+		{
+			nameof(this.PrivateKey)
+		};
+
+		/// <summary>
+		/// If access to sensitive properties is only accessible from a set of approved sources.
+		/// </summary>
+		/// <param name="ApprovedSources">Approved sources.</param>
+		/// <exception cref="NotSupportedException">If trying to change previously set sources.</exception>
+		public static void SetAllowedSources(ICallStackCheck[] ApprovedSources)
+		{
+			if (!(approvedSources is null))
+				throw new NotSupportedException("Changing approved sources not permitted.");
+
+			approvedSources = ApprovedSources;
+		}
+
+		private static void AssertAllowed()
+		{
+			if (!(approvedSources is null))
+				Assert.CallFromSource(approvedSources);
 		}
 
 		/// <inheritdoc/>
@@ -112,6 +192,23 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				sb.Append(", ");
 				sb.Append(Convert.ToBase64String(this.publicKey));
+			}
+
+			if (!string.IsNullOrEmpty(this.keyName))
+			{
+				sb.Append(", ");
+				sb.Append(this.keyName);
+			}
+
+			if (!string.IsNullOrEmpty(this.keyNamespace))
+			{
+				sb.Append(", ");
+				sb.Append(this.keyNamespace);
+			}
+
+			if (!(this.privateKey is null))
+			{
+				sb.Append(", PrivateKey");
 			}
 
 			return sb.ToString();

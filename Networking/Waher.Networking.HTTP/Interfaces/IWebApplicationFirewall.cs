@@ -10,32 +10,32 @@ namespace Waher.Networking.HTTP.Interfaces
 		/// <summary>
 		/// Allow request
 		/// </summary>
-		Allow,
+		Allow = 0,
 
 		/// <summary>
 		/// Forbid request (response is returned to client)
 		/// </summary>
-		Forbid,
+		Forbid = 1,
 
 		/// <summary>
 		/// Return a Not Found error to client.
 		/// </summary>
-		NotFound,
+		NotFound = 2,
 
 		/// <summary>
 		/// Return a Rate Limit error to client.
 		/// </summary>
-		RateLimited,
+		RateLimited = 3,
 
 		/// <summary>
 		/// Ignore request (no response is returned to client)
 		/// </summary>
-		Ignore,
+		Ignore = 4,
 
 		/// <summary>
 		/// Close connection
 		/// </summary>
-		Close
+		Close = 5
 	}
 
 	/// <summary>
@@ -55,5 +55,13 @@ namespace Waher.Networking.HTTP.Interfaces
 		/// Reloads the firewall configuration from its original source.
 		/// </summary>
 		Task Reload();
+
+		/// <summary>
+		/// Tries to get a redirection, if the result is a redirection result.
+		/// </summary>
+		/// <param name="Result">Result</param>
+		/// <param name="Redirection">Associated redirection, if found.</param>
+		/// <returns>If result represents a redirection.</returns>
+		bool TryGetRedirection(WafResult Result, out HttpException Redirection);
 	}
 }

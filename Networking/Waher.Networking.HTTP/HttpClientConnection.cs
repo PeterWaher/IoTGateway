@@ -1909,7 +1909,7 @@ namespace Waher.Networking.HTTP
 					this.client.CurrentCancellationToken);
 			}
 #else
-			NrBytes = await this.flowControl.RequestResources(StreamId, Count, 
+			NrBytes = await this.flowControl.RequestResources(StreamId, Count,
 				this.client.CurrentCancellationToken);
 #endif
 			if (NrBytes <= 0)
@@ -2134,7 +2134,7 @@ namespace Waher.Networking.HTTP
 					Request.Dispose();
 					return false;
 				}
-				
+
 				if (NetworkingModule.Stopping)
 				{
 					await this.SendResponse(Request, null, new ServiceUnavailableException("Service is shutting down. Please try again later."), true,
@@ -2154,13 +2154,14 @@ namespace Waher.Networking.HTTP
 
 				if (!(this.webApplicationFirewall is null))
 				{
-					switch (await this.webApplicationFirewall.Review(Request, Resource))
+					WafResult WafResult = await this.webApplicationFirewall.Review(Request, Resource);
+
+					switch (WafResult)
 					{
 						case WafResult.Allow:
 							break;
 
 						case WafResult.Forbid:
-						default:
 							await this.SendResponse(Request, null, new ForbiddenException(), true);
 							Request.Dispose();
 							return true;
@@ -2174,7 +2175,7 @@ namespace Waher.Networking.HTTP
 							await this.SendResponse(Request, null, new TooManyRequestsException(), true);
 							Request.Dispose();
 							return true;
-						
+
 						case WafResult.Ignore:
 							Request.Dispose();
 							return true;
@@ -2183,6 +2184,15 @@ namespace Waher.Networking.HTTP
 							Request.Dispose();
 							await this.DisposeAsync();
 							return false;
+
+						default:
+							if (this.webApplicationFirewall.TryGetRedirection(WafResult, out HttpException Redirection))
+								await this.SendResponse(Request, null, Redirection, false);
+							else
+								await this.SendResponse(Request, null, new ForbiddenException(), true);
+
+							Request.Dispose();
+							return true;
 					}
 				}
 
@@ -2191,7 +2201,7 @@ namespace Waher.Networking.HTTP
 					this.server.RequestReceived(Request, this.client.RemoteEndPoint, null, Request.Header.Resource);
 
 					await this.SendResponse(Request, null, new NotFoundException("Resource not found: " + this.server.CheckResourceOverride(Request.Header.Resource)), false);
-					
+
 					Request.Dispose();
 					return true;
 				}
@@ -2199,8 +2209,8 @@ namespace Waher.Networking.HTTP
 				this.server.RequestReceived(Request, this.client.RemoteEndPoint, Resource, SubPath);
 
 				HttpAuthenticationScheme[] AuthenticationSchemes = Resource.GetAuthenticationSchemes(Request);
-				if (!(AuthenticationSchemes is null) && 
-					AuthenticationSchemes.Length > 0 && 
+				if (!(AuthenticationSchemes is null) &&
+					AuthenticationSchemes.Length > 0 &&
 					Request.Header.Method != "OPTIONS")
 				{
 					if (!(this.loginAuditor is null))

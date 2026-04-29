@@ -1,5 +1,7 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Reflection.PortableExecutable;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
 using Waher.Content;
 using Waher.Content.Getters;
 using Waher.Events;
@@ -185,8 +187,37 @@ namespace Waher.Security.WAF.Test
 
 			try
 			{
-				Response = await InternetContent.GetAsync(Uri, this.certificate,
-					new KeyValuePair<string, string>("Accept", "*/*"));
+				if (ExpectedStatusCode >= 300 && ExpectedStatusCode <= 309)
+				{
+					HttpClientHandler Handler = WebGetter.GetClientHandler(this.certificate,
+						null, Uri);
+
+					Handler.AllowAutoRedirect = false;
+
+					using HttpClient HttpClient = new(Handler, true)
+					{
+						Timeout = TimeSpan.FromMilliseconds(10000)
+					};
+
+					using HttpRequestMessage Request = new()
+					{
+						RequestUri = Uri,
+						Method = HttpMethod.Get
+					};
+
+					WebGetter.PrepareHeaders(Request,
+						[new KeyValuePair<string, string>("Accept", "*/*")],
+						Handler);
+
+					HttpResponseMessage Response2 = await HttpClient.SendAsync(Request);
+
+					Response = await WebGetter.ProcessResponse(Response2, Uri);
+				}
+				else
+				{
+					Response = await InternetContent.GetAsync(Uri, this.certificate,
+						new KeyValuePair<string, string>("Accept", "*/*"));
+				}
 			}
 			catch (Exception ex)
 			{
@@ -1551,6 +1582,45 @@ namespace Waher.Security.WAF.Test
 		[DataRow("/C", 404, false)]
 		[DataRow("/X", 404, false)]
 		public async Task Test_086_TestCounter4(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 307, false)]
+		[DataRow("/A/C", 307, false)]
+		[DataRow("/B", 307, false)]
+		[DataRow("/B/C", 307, false)]
+		[DataRow("/P", 307, false)]
+		[DataRow("/X", 307, false)]
+		public async Task Test_087_TemporaryRedirection(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 308, false)]
+		[DataRow("/A/C", 308, false)]
+		[DataRow("/B", 308, false)]
+		[DataRow("/B/C", 308, false)]
+		[DataRow("/P", 308, false)]
+		[DataRow("/X", 308, false)]
+		public async Task Test_088_PermanentRedirection(string Resource, int ExpectedStatusCode,
+			bool Encrypted)
+		{
+			await this.Get(Resource, ExpectedStatusCode, Encrypted);
+		}
+
+		[TestMethod]
+		[DataRow("/A", 303, false)]
+		[DataRow("/A/C", 303, false)]
+		[DataRow("/B", 303, false)]
+		[DataRow("/B/C", 303, false)]
+		[DataRow("/P", 303, false)]
+		[DataRow("/X", 303, false)]
+		public async Task Test_089_SeeOther(string Resource, int ExpectedStatusCode,
 			bool Encrypted)
 		{
 			await this.Get(Resource, ExpectedStatusCode, Encrypted);

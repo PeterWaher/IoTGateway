@@ -34,7 +34,10 @@ namespace Waher.Security.WAF
 		private readonly string fileName;
 		private readonly string appDataFolder;
 		private Dictionary<string, WafAction> actionsById = new Dictionary<string, WafAction>();
+		private Dictionary<int, RedirectionInfo> redirections = new Dictionary<int, RedirectionInfo>();
+		private LinkedList<RedirectionInfo> pendingRedirections = new LinkedList<RedirectionInfo>();
 		private Root root;
+		private int redirectionCounter = 0;
 
 		/// <summary>
 		/// Web Application Firewall for <see cref="HttpServer"/>.
@@ -182,7 +185,7 @@ namespace Waher.Security.WAF
 			XmlDocument Doc = XML.LoadFromFile(this.fileName, true);
 			XSL.Validate(this.fileName, Doc, nameof(Root), Namespace, schema);
 
-			Dictionary<string, WafAction> Bak = this.actionsById;;
+			Dictionary<string, WafAction> Bak = this.actionsById; ;
 			this.actionsById = new Dictionary<string, WafAction>();
 
 			if (!(WafAction.Parse(Doc.DocumentElement, null, this) is Root Root2))
@@ -197,6 +200,72 @@ namespace Waher.Security.WAF
 			this.internalCache.Clear();
 
 			return Task.CompletedTask;
+		}
+
+		internal WafResult GetRedirectionResult(RedirectionType Type, string Location)
+		{
+			DateTime Limit = DateTime.UtcNow.AddMinutes(-1);
+
+			lock (this.redirections)
+			{
+				RedirectionInfo Info;
+
+				while (!(this.pendingRedirections.First is null) &&
+					(Info = this.pendingRedirections.First.Value).Created <= Limit)
+				{
+					this.redirections.Remove(Info.Index);
+					this.pendingRedirections.RemoveFirst();
+				}
+
+				int Index = --this.redirectionCounter;
+				if (Index > 0)
+					Index = this.redirectionCounter = -1;
+
+				Info = new RedirectionInfo(Type, Location, Index);
+				this.redirections[Index] = Info;
+				Info.Node = this.pendingRedirections.AddLast(Info);
+
+				return (WafResult)Index;
+			}
+		}
+
+		/// <summary>
+		/// Tries to get a redirection, if the result is a redirection result.
+		/// </summary>
+		/// <param name="Result">Result</param>
+		/// <param name="Redirection">Associated redirection, if found.</param>
+		/// <returns>If result represents a redirection.</returns>
+		public bool TryGetRedirection(WafResult Result, out HttpException Redirection)
+		{
+			lock (this.redirections)
+			{
+				if (!this.redirections.TryGetValue((int)Result, out RedirectionInfo Info))
+				{
+					Redirection = null;
+					return false;
+				}
+
+				this.redirections.Remove((int)Result);
+				this.pendingRedirections.Remove(Info.Node);
+
+				switch (Info.Type)
+				{
+					case RedirectionType.TemporaryRedirection:
+					default:
+						Redirection = new TemporaryRedirectException(Info.Location);
+						break;
+
+					case RedirectionType.PermanentRedirection:
+						Redirection = new PermanentRedirectException(Info.Location);
+						break;
+
+					case RedirectionType.SeeOther:
+						Redirection = new SeeOtherException(Info.Location);
+						break;
+				}
+
+				return true;
+			}
 		}
 	}
 }

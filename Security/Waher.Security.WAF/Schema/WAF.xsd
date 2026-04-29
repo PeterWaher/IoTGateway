@@ -34,6 +34,9 @@
 			<xs:element name="RateLimited" type="WafAction"/>
 			<xs:element name="Ignore" type="WafAction"/>
 			<xs:element name="Close" type="WafAction"/>
+			<xs:element name="TemporaryRedirection" type="WafRedirection"/>
+			<xs:element name="PermanentRedirection" type="WafRedirection"/>
+			<xs:element name="SeeOther" type="WafRedirection"/>
 			<xs:element name="UriMatch" type="WafCondition"/>
 			<xs:element name="PathMatch" type="WafCondition"/>
 			<xs:element name="ResourceMatch" type="WafCondition"/>
@@ -204,6 +207,14 @@
 
 	<xs:complexType name="WafAction">
 		<xs:attribute name="id" type="xs:string" use="optional"/>
+	</xs:complexType>
+
+	<xs:complexType name="WafRedirection">
+		<xs:complexContent>
+			<xs:extension base="WafAction">
+				<xs:attribute name="location" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 
 	<xs:complexType name="WafActions">

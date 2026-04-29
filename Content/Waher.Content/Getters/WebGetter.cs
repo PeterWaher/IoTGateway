@@ -378,7 +378,13 @@ namespace Waher.Content.Getters
 			return Decoded;
 		}
 
-		internal static void PrepareHeaders(HttpRequestMessage Request, KeyValuePair<string, string>[] Headers, HttpClientHandler Handler)
+		/// <summary>
+		/// Prepares headers for a HTTP request.
+		/// </summary>
+		/// <param name="Request">Request object.</param>
+		/// <param name="Headers">Headers to be added to the request.</param>
+		/// <param name="Handler">HTTP client handler.</param>
+		public static void PrepareHeaders(HttpRequestMessage Request, KeyValuePair<string, string>[] Headers, HttpClientHandler Handler)
 		{
 			if (!(Headers is null))
 			{

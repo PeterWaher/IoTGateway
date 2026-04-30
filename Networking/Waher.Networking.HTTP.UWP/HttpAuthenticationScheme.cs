@@ -66,10 +66,10 @@ namespace Waher.Networking.HTTP
 		public virtual bool UserSessions => false;
 
 		/// <summary>
-		/// Gets a challenge for the authenticating client to respond to.
+		/// Gets available challenges for the authenticating client to respond to.
 		/// </summary>
-		/// <returns>Challenge string.</returns>
-		public abstract string GetChallenge();
+		/// <returns>Challenge strings.</returns>
+		public abstract string[] GetChallenges();
 
 		/// <summary>
 		/// Checks if the request is authorized.

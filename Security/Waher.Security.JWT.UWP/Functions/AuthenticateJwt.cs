@@ -123,7 +123,7 @@ namespace Waher.Security.JWT.Functions
 				Mechanism = this.last = new JwtAuthentication(Realm, Users, Factory);
 
 			if (Request.Header.Authorization is null)
-				throw new UnauthorizedException("Unauthorized access prohibited.", new string[] { Mechanism.GetChallenge() });
+				throw new UnauthorizedException("Unauthorized access prohibited.", Mechanism.GetChallenges());
 			else
 			{
 				IUser User = await Mechanism.IsAuthenticated(Request)

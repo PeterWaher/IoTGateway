@@ -2308,8 +2308,7 @@ namespace Waher.Networking.HTTP
 #endif
 							}
 
-							string Challenge = Scheme.GetChallenge();
-							if (!string.IsNullOrEmpty(Challenge))
+							foreach (string Challenge in Scheme.GetChallenges())
 								Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
 						}
 

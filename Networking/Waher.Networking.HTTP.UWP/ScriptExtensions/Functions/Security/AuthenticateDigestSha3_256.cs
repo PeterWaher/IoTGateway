@@ -126,7 +126,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 			}
 
 			if (Request.Header.Authorization is null)
-				throw new UnauthorizedException("Unauthorized access prohibited.", new string[] { Mechanism.GetChallenge() });
+				throw new UnauthorizedException("Unauthorized access prohibited.", Mechanism.GetChallenges());
 			else
 			{
 				IUser User = await Mechanism.IsAuthenticated(Request)

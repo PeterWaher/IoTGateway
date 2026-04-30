@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Waher.Content.Html.Elements;
 using Waher.Events;
 using Waher.Networking;
 using Waher.Networking.HTTP;
@@ -82,9 +83,30 @@ namespace Waher.Things.Http
 		/// Gets an array of authentication schemes available to authorize access to a
 		/// web resource.
 		/// </summary>
+		/// <returns>Array of authentication schemes.</returns>
+		public static HttpAuthenticationScheme[] GetAuthenticationSchemes()
+		{
+			return GetAuthenticationSchemes(Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Gets an array of authentication schemes available to authorize access to a
+		/// web resource.
+		/// </summary>
 		/// <param name="RequiredPrivilege">Required privilege.</param>
 		/// <returns>Array of authentication schemes.</returns>
 		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(string RequiredPrivilege)
+		{
+			return GetAuthenticationSchemes(new string[] { RequiredPrivilege });
+		}
+
+		/// <summary>
+		/// Gets an array of authentication schemes available to authorize access to a
+		/// web resource.
+		/// </summary>
+		/// <param name="RequiredPrivileges">Required privileges.</param>
+		/// <returns>Array of authentication schemes.</returns>
+		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(params string[] RequiredPrivileges)
 		{
 			List<HttpAuthenticationScheme> Schemes = new List<HttpAuthenticationScheme>();
 			string Domain;
@@ -126,9 +148,17 @@ namespace Waher.Things.Http
 			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.MD5, Domain, Users.Source));
 			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.SHA256, Domain, Users.Source));
 			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.SHA3_256, Domain, Users.Source));
-			Schemes.Add(new RequiredUserPrivileges("User", "/Login.md", webServer, RequiredPrivilege));
+			Schemes.Add(new SessionAuthentication(webServer));
 
-			return Schemes.ToArray();
+			if (RequiredPrivileges.Length == 0)
+				return Schemes.ToArray();
+			else
+			{
+				return new HttpAuthenticationScheme[]
+				{
+					new RequiredPrivileges(Schemes.ToArray(), RequiredPrivileges)
+				};
+			}
 		}
 
 		/// <summary>

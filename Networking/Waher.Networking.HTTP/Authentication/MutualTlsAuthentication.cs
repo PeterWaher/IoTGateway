@@ -1,5 +1,6 @@
 ﻿#if !WINDOWS_UWP
 
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -41,12 +42,12 @@ namespace Waher.Networking.HTTP.Authentication
 		public IUserSource Users => this.users;
 
 		/// <summary>
-		/// Gets a challenge for the authenticating client to respond to.
+		/// Gets available challenges for the authenticating client to respond to.
 		/// </summary>
-		/// <returns>Challenge string.</returns>
-		public override string GetChallenge()
+		/// <returns>Challenge strings.</returns>
+		public override string[] GetChallenges()
 		{
-			return null;
+			return Array.Empty<string>();
 		}
 
 		/// <summary>

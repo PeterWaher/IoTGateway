@@ -52,12 +52,12 @@ namespace Waher.Networking.HTTP.Authentication
 		public string[] Methods => this.methods;
 
 		/// <summary>
-		/// Gets a challenge for the authenticating client to respond to.
+		/// Gets available challenges for the authenticating client to respond to.
 		/// </summary>
-		/// <returns>Challenge string.</returns>
-		public override string GetChallenge()
+		/// <returns>Challenge strings.</returns>
+		public override string[] GetChallenges()
 		{
-			return null;
+			return Array.Empty<string>();
 		}
 
 		/// <summary>

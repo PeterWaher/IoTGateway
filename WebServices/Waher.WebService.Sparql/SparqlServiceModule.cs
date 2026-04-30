@@ -69,12 +69,14 @@ namespace Waher.WebService.Sparql
 			Schemes.Add(new DigestAuthentication(RequireEncryption, MinSecurityStrength, DigestAlgorithm.SHA3_256, Gateway.Domain, Users.Source));
 
 			if (!(Gateway.HttpServer is null))
-				Schemes.Add(new RequiredUserPrivileges("User", "/Login.md", Gateway.HttpServer, QueryPrivileges));
+				Schemes.Add(new SessionAuthentication(Gateway.HttpServer));
 
-			this.sparqlEndpoint = new SparqlEndpoint("/sparql", Schemes.ToArray());
+			RequiredPrivileges Auth = new RequiredPrivileges(Schemes.ToArray(), QueryPrivileges);
+
+			this.sparqlEndpoint = new SparqlEndpoint("/sparql", Auth);
 			Gateway.HttpServer?.Register(this.sparqlEndpoint);
 
-			this.graphStore = new GraphStore("/rdf-graph-store", Schemes.ToArray());
+			this.graphStore = new GraphStore("/rdf-graph-store", Auth);
 			Gateway.HttpServer?.Register(this.graphStore);
 
 			if (!(Gateway.ConcentratorServer is null))

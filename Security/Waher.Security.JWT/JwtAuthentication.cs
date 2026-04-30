@@ -96,12 +96,12 @@ namespace Waher.Security.JWT
 		public JwtFactory Factory => this.factory;
 
 		/// <summary>
-		/// Gets a challenge for the authenticating client to respond to.
+		/// Gets available challenges for the authenticating client to respond to.
 		/// </summary>
-		/// <returns>Challenge string.</returns>
-		public override string GetChallenge()
+		/// <returns>Challenge strings.</returns>
+		public override string[] GetChallenges()
 		{
-			return "Bearer realm=\"" + this.realm + "\"";
+			return new string[] { "Bearer realm=\"" + this.realm + "\"" };
 		}
 
 		/// <summary>

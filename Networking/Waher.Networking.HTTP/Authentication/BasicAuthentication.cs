@@ -70,12 +70,12 @@ namespace Waher.Networking.HTTP.Authentication
 		public string Realm => this.realm;
 
 		/// <summary>
-		/// Gets a challenge for the authenticating client to respond to.
+		/// Gets available challenges for the authenticating client to respond to.
 		/// </summary>
-		/// <returns>Challenge string.</returns>
-		public override string GetChallenge()
+		/// <returns>Challenge strings.</returns>
+		public override string[] GetChallenges()
 		{
-			return "Basic realm=\"" + this.realm + "\"";
+			return new string[] { "Basic realm=\"" + this.realm + "\"" };
 		}
 
 		/// <summary>

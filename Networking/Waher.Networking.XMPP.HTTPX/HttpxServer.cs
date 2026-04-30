@@ -277,8 +277,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 							{
-								string Challenge = Scheme.GetChallenge();
-								if (!string.IsNullOrEmpty(Challenge))
+								foreach (string Challenge in Scheme.GetChallenges())
 									Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
 							}
 

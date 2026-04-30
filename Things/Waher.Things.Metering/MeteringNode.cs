@@ -1422,18 +1422,18 @@ namespace Waher.Things.Metering
 		/// Reports newly measured values.
 		/// </summary>
 		/// <param name="Values">New momentary values.</param>
-		public void NewMomentaryValues(params Field[] Values)
+		public Task NewMomentaryValues(params Field[] Values)
 		{
-			MeteringTopology.NewMomentaryValues(this, Values);
+			return MeteringTopology.NewMomentaryValues(this, Values);
 		}
 
 		/// <summary>
 		/// Reports newly measured values.
 		/// </summary>
 		/// <param name="Values">New momentary values.</param>
-		public void NewMomentaryValues(IEnumerable<Field> Values)
+		public Task NewMomentaryValues(IEnumerable<Field> Values)
 		{
-			MeteringTopology.NewMomentaryValues(this, Values);
+			return MeteringTopology.NewMomentaryValues(this, Values);
 		}
 
 		#endregion

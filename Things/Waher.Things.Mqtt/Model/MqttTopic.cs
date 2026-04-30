@@ -226,9 +226,9 @@ namespace Waher.Things.Mqtt.Model
 				{
 					InternalReadoutRequest Request = new InternalReadoutRequest(string.Empty,
 						new IThingReference[] { this.node }, FieldType.Momentary, null, DateTime.MinValue, DateTime.MaxValue,
-						(Sender, e) =>
+						async (Sender, e) =>
 						{
-							this.node.NewMomentaryValues(e.Fields);
+							await this.node.NewMomentaryValues(e.Fields);
 
 							MqttTopic Current = this;
 							MqttTopic Parent = this.parent;
@@ -242,14 +242,12 @@ namespace Waher.Things.Mqtt.Model
 									else
 										F.Name = Current.localTopic + ", " + F.Name;
 
-									Parent.node.NewMomentaryValues(F);
+									await Parent.node.NewMomentaryValues(F);
 								}
 
 								Current = Parent;
 								Parent = Parent.parent;
 							}
-
-							return Task.CompletedTask;
 						},
 						(Sender, e) =>
 						{

@@ -480,19 +480,21 @@ namespace Waher.Things.Virtual
 		/// Reports sensor data on the node.
 		/// </summary>
 		/// <param name="Field">Parsed field.</param>
-		public void ReportSensorData(SensorData.Field Field)
+		public Task ReportSensorData(SensorData.Field Field)
 		{
-			this.ReportSensorData(new SensorData.Field[] { Field });
+			return this.ReportSensorData(new SensorData.Field[] { Field });
 		}
 
 		/// <summary>
 		/// Reports sensor data on the node.
 		/// </summary>
 		/// <param name="Fields">Parsed fields.</param>
-		public void ReportSensorData(params SensorData.Field[] Fields)
+		public async Task ReportSensorData(params SensorData.Field[] Fields)
 		{
 			if (scheduler is null && Types.TryGetModuleParameter("Scheduler", out Scheduler Scheduler))
 				scheduler = Scheduler;
+
+			SensorData.Field[] ToReport = null;
 
 			lock (this.fields)
 			{
@@ -512,7 +514,7 @@ namespace Waher.Things.Virtual
 				{
 					if (scheduler is null)
 					{
-						this.NewMomentaryValues(this.toReport.ToArray());
+						ToReport = this.toReport.ToArray();
 						this.toReport.Clear();
 						this.hasReport = false;
 					}
@@ -525,16 +527,23 @@ namespace Waher.Things.Virtual
 					}
 				}
 			}
+
+			if (!(ToReport is null))
+				await this.NewMomentaryValues(ToReport);
 		}
 
-		private void DoReport(object _)
+		private Task DoReport(object _)
 		{
+			SensorData.Field[] ToReport;
+
 			lock (this.fields)
 			{
-				this.NewMomentaryValues(this.toReport.ToArray());
+				ToReport = this.toReport.ToArray();
 				this.toReport.Clear();
 				this.hasReport = false;
 			}
+
+			return this.NewMomentaryValues(ToReport);
 		}
 
 		/// <summary>

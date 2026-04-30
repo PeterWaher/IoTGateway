@@ -135,13 +135,13 @@ namespace Waher.Things.Metering
 		/// Reports newly measured values.
 		/// </summary>
 		/// <param name="Values">New momentary values.</param>
-		void NewMomentaryValues(params Field[] Values);
+		Task NewMomentaryValues(params Field[] Values);
 
 		/// <summary>
 		/// Reports newly measured values.
 		/// </summary>
 		/// <param name="Values">New momentary values.</param>
-		void NewMomentaryValues(IEnumerable<Field> Values);
+		Task NewMomentaryValues(IEnumerable<Field> Values);
 
 		#endregion
 	}

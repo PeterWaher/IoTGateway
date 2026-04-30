@@ -4244,8 +4244,7 @@ namespace Waher.IoTGateway
 		/// <param name="Values">New momentary values.</param>
 		public static Task NewMomentaryValues(params Field[] Values)
 		{
-			concentratorServer?.SensorServer?.NewMomentaryValues(Values);
-			return Task.CompletedTask;
+			return concentratorServer?.SensorServer?.NewMomentaryValues(Values) ?? Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -4255,8 +4254,7 @@ namespace Waher.IoTGateway
 		/// <param name="Values">New momentary values.</param>
 		public static Task NewMomentaryValues(IThingReference Reference, params Field[] Values)
 		{
-			concentratorServer?.SensorServer?.NewMomentaryValues(Reference, Values);
-			return Task.CompletedTask;
+			return concentratorServer?.SensorServer?.NewMomentaryValues(Reference, Values) ?? Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -4265,8 +4263,7 @@ namespace Waher.IoTGateway
 		/// <param name="Values">New momentary values.</param>
 		public static Task NewMomentaryValues(IEnumerable<Field> Values)
 		{
-			concentratorServer?.SensorServer?.NewMomentaryValues(Values);
-			return Task.CompletedTask;
+			return concentratorServer?.SensorServer?.NewMomentaryValues(Values) ?? Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -4276,8 +4273,7 @@ namespace Waher.IoTGateway
 		/// <param name="Values">New momentary values.</param>
 		public static Task NewMomentaryValues(IThingReference Reference, IEnumerable<Field> Values)
 		{
-			concentratorServer?.SensorServer?.NewMomentaryValues(Reference, Values);
-			return Task.CompletedTask;
+			return concentratorServer?.SensorServer?.NewMomentaryValues(Reference, Values) ?? Task.CompletedTask;
 		}
 
 		#endregion

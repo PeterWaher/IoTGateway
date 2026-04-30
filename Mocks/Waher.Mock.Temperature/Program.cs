@@ -335,8 +335,18 @@ namespace Waher.Mock.Temperature
 
 					if (SensorServer.HasSubscriptions(ThingReference.Empty))
 					{
-						SensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, SampleTime, "Temperature",
-							CurrentTemperature, 1, "°C", FieldType.Momentary, FieldQoS.AutomaticReadout));
+						Task.Run(async () =>
+						{
+							try
+							{
+								await SensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, SampleTime, "Temperature",
+									CurrentTemperature, 1, "°C", FieldType.Momentary, FieldQoS.AutomaticReadout));
+							}
+							catch (Exception ex)
+							{
+								Log.Exception(ex);
+							}
+						});
 					}
 
 				}, null, 1000 - PeriodStart.Millisecond, 1000);

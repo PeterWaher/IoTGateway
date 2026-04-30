@@ -78,7 +78,7 @@ namespace Waher.Things.Http
 				}
 
 				if (!(MomentaryValues is null))
-					this.NewMomentaryValues(MomentaryValues.ToArray());
+					await this.NewMomentaryValues(MomentaryValues.ToArray());
 			}
 
 			if (Errors is null)

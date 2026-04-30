@@ -4342,9 +4342,9 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="Reference">Optional node reference</param>
 		/// <param name="Values">New momentary values.</param>
-		public void NewMomentaryValues(ThingReference Reference, params Things.SensorData.Field[] Values)
+		public Task NewMomentaryValues(ThingReference Reference, params Things.SensorData.Field[] Values)
 		{
-			this.sensorServer.NewMomentaryValues(Reference, Values);
+			return this.sensorServer?.NewMomentaryValues(Reference, Values) ?? Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -4352,9 +4352,9 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="Reference">Optional node reference</param>
 		/// <param name="Values">New momentary values.</param>
-		public void NewMomentaryValues(ThingReference Reference, IEnumerable<Things.SensorData.Field> Values)
+		public Task NewMomentaryValues(ThingReference Reference, IEnumerable<Things.SensorData.Field> Values)
 		{
-			this.sensorServer.NewMomentaryValues(Reference, Values);
+			return this.sensorServer?.NewMomentaryValues(Reference, Values) ?? Task.CompletedTask;
 		}
 
 		#endregion

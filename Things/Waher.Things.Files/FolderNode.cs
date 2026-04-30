@@ -576,8 +576,7 @@ namespace Waher.Things.Files
 					SensorData.FieldType.Momentary, null, DateTime.MinValue, DateTime.MaxValue,
 					(Sender, e) =>
 					{
-						ScriptReferenceNode.NewMomentaryValues(e.Fields);
-						return Task.CompletedTask;
+						return ScriptReferenceNode.NewMomentaryValues(e.Fields);
 					},
 					async (Sender, e) =>
 					{

@@ -55,7 +55,7 @@ namespace Waher.WebService.Tesseract.Test
 			}
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("100_pass2-uto.jpg", null, "eng")]
 		[DataRow("MRZ.jpg", PageSegmentationMode.SingleUniformBlockOfText, "mrz")]
 		public async Task Test_002_OcrImage(string FileName, PageSegmentationMode? Mode, string Language)
@@ -78,7 +78,7 @@ namespace Waher.WebService.Tesseract.Test
 			}
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("100_pass2-uto.jpg", null, "eng")]
 		[DataRow("MRZ.jpg", PageSegmentationMode.SingleUniformBlockOfText, "mrz")]
 		public async Task Test_003_ApiTests(string FileName, PageSegmentationMode? Mode, string Language)

@@ -120,7 +120,7 @@ namespace Waher.Things.Http
 			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.MD5, Domain, Users.Source));
 			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.SHA256, Domain, Users.Source));
 			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.SHA3_256, Domain, Users.Source));
-			Schemes.Add(new RequiredUserPrivileges("User", "/Login.md", webServer, PostPrivileges));
+			Schemes.Add(new RequiredUserPrivileges("User", "/Login.md", webServer, RequiredPrivilege));
 
 			return Schemes.ToArray();
 		}

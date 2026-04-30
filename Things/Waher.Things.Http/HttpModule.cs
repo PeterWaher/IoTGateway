@@ -94,8 +94,15 @@ namespace Waher.Things.Http
 			if (!Types.TryGetModuleParameter("X509", out object Obj) ||
 				!(Obj is X509Certificate Certificate))
 			{
+				if (Types.TryGetModuleParameter("Realm", out Obj) &&
+					Obj is string Realm)
+				{
+					Domain = Realm;
+				}
+				else
+					Domain = null;
+
 				Encrypted = false;
-				Domain = null;
 				MinStrength = 0;
 			}
 			else
@@ -105,7 +112,6 @@ namespace Waher.Things.Http
 				Domain = BinaryTcpClient.GetDomainFromSubject(Certificate.Subject);
 				MinStrength = 128;
 			}
-
 
 			if (Types.TryGetModuleParameter("JWT", out JwtFactory JwtFactory) &&
 				!JwtFactory.Disposed)

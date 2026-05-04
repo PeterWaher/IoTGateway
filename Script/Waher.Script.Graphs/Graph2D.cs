@@ -620,6 +620,12 @@ namespace Waher.Script.Graphs
 		/// <returns>Bitmap</returns>
 		public override PixelInformation CreatePixels(GraphSettings Settings, out object[] States)
 		{
+			// TODO: Remove
+			//StringBuilder sb = new StringBuilder();
+
+			//sb.AppendLine("Width: " + Settings.Width);
+			//sb.AppendLine("Height: " + Settings.Height);
+
 			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Settings.Width, Settings.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
 			{
 				SKCanvas Canvas = Surface.Canvas;
@@ -628,21 +634,29 @@ namespace Waher.Script.Graphs
 
 				Canvas.Clear(Settings.BackgroundColor);
 
+				//sb.AppendLine("BackgroundColor: " + Settings.BackgroundColor);
+
 				int x1, y1, x2, y2, x3, y3, w, h;
+				bool DrawText = Settings.LabelFontSize > 0;
 
 				x1 = Settings.MarginLeft;
 				x2 = Settings.Width - Settings.MarginRight;
 				y1 = Settings.MarginTop;
 				y2 = Settings.Height - Settings.MarginBottom;
 
-				if (!string.IsNullOrEmpty(this.labelY))
+				if (DrawText && !string.IsNullOrEmpty(this.labelY))
 					x1 += (int)(Settings.LabelFontSize * 2 + 0.5);
 
-				if (!string.IsNullOrEmpty(this.labelX))
+				if (DrawText && !string.IsNullOrEmpty(this.labelX))
 					y2 -= (int)(Settings.LabelFontSize * 2 + 0.5);
 
-				if (!string.IsNullOrEmpty(this.title))
+				if (DrawText && !string.IsNullOrEmpty(this.title))
 					y1 += (int)(Settings.LabelFontSize * 2 + 0.5);
+
+				//sb.AppendLine("x1: " + x1);
+				//sb.AppendLine("y1: " + y1);
+				//sb.AppendLine("x2: " + x2);
+				//sb.AppendLine("y2: " + y2);
 
 				IVector YLabels = GetLabels(ref this.minY, ref this.maxY, this.y, Settings.ApproxNrLabelsY, out LabelType YLabelType);
 				string[] YLabelStrings = LabelStrings(YLabels, YLabelType);
@@ -652,7 +666,7 @@ namespace Waher.Script.Graphs
 					Style = SKPaintStyle.Fill,
 					Color = Settings.AxisColor
 				};
-				SKFont NormalFont = new SKFont()
+				SKFont NormalFont = DrawText ? new SKFont()
 				{
 					Edging = SKFontEdging.SubpixelAntialias,
 					Hinting = SKFontHinting.Full,
@@ -660,8 +674,8 @@ namespace Waher.Script.Graphs
 					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Normal)
 						?? SKTypeface.Default,
 					Size = (float)Settings.LabelFontSize
-				};
-				SKFont LargeFont = new SKFont()
+				} : null;
+				SKFont LargeFont = DrawText ? new SKFont()
 				{
 					Edging = SKFontEdging.SubpixelAntialias,
 					Hinting = SKFontHinting.Full,
@@ -669,12 +683,12 @@ namespace Waher.Script.Graphs
 					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKFontStyle.Bold)
 						?? SKTypeface.Default,
 					Size = (float)(Settings.LabelFontSize * 1.5)
-				};
+				} : null;
 				SKRect Bounds = new SKRect();
 				float Size;
 				double MaxSize = 0;
 
-				if (this.showYAxis)
+				if (DrawText && this.showYAxis)
 				{
 					foreach (IElement Label in YLabels.ChildElements)
 					{
@@ -691,7 +705,7 @@ namespace Waher.Script.Graphs
 				string[] XLabelStrings = LabelStrings(XLabels, XLabelType);
 				MaxSize = 0;
 
-				if (this.showXAxis)
+				if (DrawText && this.showXAxis)
 				{
 					foreach (IElement Label in XLabels.ChildElements)
 					{
@@ -705,6 +719,18 @@ namespace Waher.Script.Graphs
 				y3 = (int)Math.Floor(y2 - MaxSize) - Settings.MarginLabel;
 				w = x2 - x3;
 				h = y3 - y1;
+
+				//sb.AppendLine("x3: " + x3);
+				//sb.AppendLine("y3: " + y3);
+				//sb.AppendLine("w: " + w);
+				//sb.AppendLine("h: " + h);
+				//sb.AppendLine("Settings.MarginTop: " + Settings.MarginTop);
+				//sb.AppendLine("Settings.MarginBottom: " + Settings.MarginBottom);
+				//sb.AppendLine("Settings.MarginLeft: " + Settings.MarginLeft);
+				//sb.AppendLine("Settings.MarginRight: " + Settings.MarginRight);
+				//sb.AppendLine("Settings.MarginLabel: " + Settings.MarginLabel);
+				//sb.AppendLine("Settings.LabelFontSize: " + Settings.LabelFontSize);
+				//sb.AppendLine("DrawText: " + DrawText);
 
 				SKPaint AxisBrush = new SKPaint()
 				{
@@ -782,7 +808,14 @@ namespace Waher.Script.Graphs
 				foreach (IElement Label in YLabels.ChildElements)
 				{
 					s = YLabelStrings[i];
-					NormalFont.MeasureText(s, out Bounds, Pen);
+
+					if (DrawText)
+					{
+						NormalFont.MeasureText(s, out Bounds, Pen);
+					
+						//sb.AppendLine("Bounds of '" + s + "': " + Bounds);
+					}
+
 					d = LabelYY[i++];
 					f = (float)d;
 
@@ -797,10 +830,12 @@ namespace Waher.Script.Graphs
 							Canvas.DrawLine(x3, f, x2, f, GridPen);
 					}
 
-					if (this.showYAxis)
+					if (DrawText && this.showYAxis)
 					{
 						f += Bounds.Height * 0.5f;
 						Canvas.DrawText(s, x3 - Bounds.Width - Settings.MarginLabel, f, NormalFont, Pen);
+					
+						//sb.AppendLine("DrawText('" + s + "'," + (x3 - Bounds.Width - Settings.MarginLabel) + "," + f + ")");
 					}
 				}
 
@@ -811,7 +846,14 @@ namespace Waher.Script.Graphs
 				foreach (IElement Label in XLabels.ChildElements)
 				{
 					s = XLabelStrings[i];
-					NormalFont.MeasureText(s, out Bounds, Pen);
+
+					if (DrawText)
+					{
+						NormalFont.MeasureText(s, out Bounds, Pen);
+						
+						//sb.AppendLine("Bounds of '" + s + "': " + Bounds);
+					}
+
 					d = LabelXX[i++];
 					f = (float)d;
 
@@ -826,7 +868,7 @@ namespace Waher.Script.Graphs
 							Canvas.DrawLine(f, y1, f, y3, GridPen);
 					}
 
-					if (this.showXAxis)
+					if (DrawText && this.showXAxis)
 					{
 						Size = Bounds.Width;
 						f -= Size * 0.5f;
@@ -836,16 +878,20 @@ namespace Waher.Script.Graphs
 							f = x3 + w - Size;
 
 						Canvas.DrawText(s, f, y3 + Settings.MarginLabel + (float)Settings.LabelFontSize, NormalFont, Pen);
+
+						//sb.AppendLine("DrawText('" + s + "'," + f + "," + (y3 + Settings.MarginLabel + (float)Settings.LabelFontSize) + ")");
 					}
 				}
 
 				DrawingArea.XLabelPositions = XLabelPositions;
 				DrawingArea.YLabelPositions = YLabelPositions;
 
-				if (!string.IsNullOrEmpty(this.title))
+				if (DrawText && !string.IsNullOrEmpty(this.title))
 				{
 					LargeFont.MeasureText(this.title, out Bounds, Pen);
 					Size = Bounds.Width;
+
+					//sb.AppendLine("Bounds of '" + this.title + "': " + Bounds);
 
 					f = x3 + (x2 - x3 - Size) * 0.5f;
 
@@ -855,12 +901,16 @@ namespace Waher.Script.Graphs
 						f = x3 + w - Size;
 
 					Canvas.DrawText(this.title, f, (float)(Settings.MarginTop + 0.1 * Settings.LabelFontSize - Bounds.Top), LargeFont, Pen);
+
+					//sb.AppendLine("DrawText('" + this.title + "'," + f + "," + (Settings.MarginTop + 0.1 * Settings.LabelFontSize - Bounds.Top) + ")");
 				}
 
-				if (!string.IsNullOrEmpty(this.labelX))
+				if (DrawText && !string.IsNullOrEmpty(this.labelX))
 				{
 					LargeFont.MeasureText(this.labelX, out Bounds, Pen);
 					Size = Bounds.Width;
+
+					//sb.AppendLine("Bounds of '" + this.labelX + "': " + Bounds);
 
 					f = x3 + (x2 - x3 - Size) * 0.5f;
 
@@ -870,12 +920,16 @@ namespace Waher.Script.Graphs
 						f = x3 + w - Size;
 
 					Canvas.DrawText(this.labelX, f, (float)(Settings.Height - Settings.MarginBottom - 0.1 * Settings.LabelFontSize - Bounds.Height - Bounds.Top), LargeFont, Pen);
+
+					//sb.AppendLine("DrawText('" + this.labelX + "'," + f + "," + (Settings.Height - Settings.MarginBottom - 0.1 * Settings.LabelFontSize - Bounds.Height - Bounds.Top) + ")");
 				}
 
-				if (!string.IsNullOrEmpty(this.labelY))
+				if (DrawText && !string.IsNullOrEmpty(this.labelY))
 				{
 					LargeFont.MeasureText(this.labelY, out Bounds, Pen);
 					Size = Bounds.Width;
+
+					//sb.AppendLine("Bounds of '" + this.labelY + "': " + Bounds);
 
 					f = y3 - (y3 - y1 - Size) * 0.5f;
 
@@ -888,6 +942,11 @@ namespace Waher.Script.Graphs
 					Canvas.RotateDegrees(-90);
 					Canvas.DrawText(this.labelY, 0, 0, LargeFont, Pen);
 					Canvas.ResetMatrix();
+
+					//sb.AppendLine("Translate(" + (Settings.MarginLeft + 0.1 * Settings.LabelFontSize - Bounds.Top) + "," + f + ")");
+					//sb.AppendLine("Rotate(-90)");
+					//sb.AppendLine("DrawText('" + this.labelY + "',0,0)");
+					//sb.AppendLine("ResetMatrix()");
 				}
 
 				IEnumerator<IVector> ex = this.x.GetEnumerator();
@@ -912,6 +971,8 @@ namespace Waher.Script.Graphs
 					PrevParameters = eParameters.Current;
 					PrevPainter = ePainters.Current;
 				}
+
+				//Log.Debug(sb.ToString());
 
 				using (SKImage Result = Surface.Snapshot())
 				{

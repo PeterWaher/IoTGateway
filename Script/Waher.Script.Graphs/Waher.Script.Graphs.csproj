@@ -18,9 +18,9 @@ https://waher.se/Script.md#colorFunctionsWaherScriptGraphs</Description>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing graphs</PackageTags>
-    <AssemblyVersion>2.5.0</AssemblyVersion>
-    <FileVersion>2.5.0</FileVersion>
-		<Version>2.5.0</Version>
+    <AssemblyVersion>2.5.1</AssemblyVersion>
+    <FileVersion>2.5.1</FileVersion>
+		<Version>2.5.1</Version>
 		<NeutralLanguage>English</NeutralLanguage>
 		<PackageIconUrl />
 		<FileUpgradeFlags>40</FileUpgradeFlags>

@@ -1434,22 +1434,33 @@ namespace Waher.Persistence.Files
 		/// <param name="FieldNames">Field names to build the index on. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
 		/// <returns>Index file.</returns>
-		private async Task<IndexBTreeFile> GetIndexFile(ObjectBTreeFile File, bool CanRetry, RegenerationOptions RegenerationOptions, params string[] FieldNames)
+		private async Task<IndexBTreeFile> GetIndexFile(ObjectBTreeFile File, bool CanRetry, 
+			RegenerationOptions RegenerationOptions, params string[] FieldNames)
 		{
 			IndexBTreeFile IndexFile;
 			IndexBTreeFile[] Indices = File.Indices;
-			string[] Fields;
+			string[] PrefixedFields;
+			string s, s2;
 			int i, c;
 			bool Regenerate = RegenerationOptions == RegenerationOptions.Regenerate;
 
 			foreach (IndexBTreeFile I in Indices)
 			{
-				if ((c = (Fields = I.FieldNames).Length) != FieldNames.Length)
+				if ((c = (PrefixedFields = I.PrefixedFieldNames).Length) != FieldNames.Length)
 					continue;
 
 				for (i = 0; i < c; i++)
 				{
-					if (Fields[i] != FieldNames[i])
+					s = PrefixedFields[i];
+					s2 = FieldNames[i];
+
+					if (s.StartsWith("+"))
+						s = s.Substring(1);
+
+					if (s2.StartsWith("+"))
+						s2 = s2.Substring(1);
+
+					if (s != s2)
 						break;
 				}
 
@@ -1477,7 +1488,7 @@ namespace Waher.Persistence.Files
 
 			StringBuilder sb = new StringBuilder();
 
-			string s = this.GetIndexFileName(File, FieldNames);
+			s = this.GetIndexFileName(File, FieldNames);
 			bool Exists = System.IO.File.Exists(s);
 
 			if (!Exists && RegenerationOptions == RegenerationOptions.RegenerateIfFileNotFound)
@@ -1524,7 +1535,7 @@ namespace Waher.Persistence.Files
 				s = s.Substring(this.folder.Length);
 
 			KeyValuePair<bool, object> P = await this.master.TryGetValueAsync(s);
-			string s2 = sb.ToString();
+			s2 = sb.ToString();
 
 			if (this.NeedsMasterRegistryUpdate(P, s2))
 				await this.master.AddAsync(s, s2, true);

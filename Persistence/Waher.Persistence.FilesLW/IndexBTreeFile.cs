@@ -82,6 +82,11 @@ namespace Waher.Persistence.Files
 		public string[] FieldNames { get { return this.recordHandler.FieldNames; } }
 
 		/// <summary>
+		/// Field names included in the index, including ascending/descending prefixes.
+		/// </summary>
+		public string[] PrefixedFieldNames => this.recordHandler.PrefixedFieldNames;
+
+		/// <summary>
 		/// If the corresponding field name is sorted in ascending order (true) or descending order (false).
 		/// </summary>
 		public bool[] Ascending { get { return this.recordHandler.Ascending; } }
@@ -100,13 +105,20 @@ namespace Waher.Persistence.Files
 			{
 				StringBuilder sb = new StringBuilder();
 				bool First = true;
+				int i, c = this.FieldNames.Length;
+				int d = this.Ascending.Length;
 
-				foreach (string FieldName in this.FieldNames)
+				for (i = 0; i < c; i++)
 				{
+					string FieldName = this.FieldNames[i];
+
 					if (First)
 						First = false;
 					else
 						sb.Append(", ");
+
+					if (i < d && !this.Ascending[i])
+						sb.Append('-');
 
 					sb.Append(FieldName);
 				}

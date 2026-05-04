@@ -41,6 +41,7 @@ namespace Waher.Persistence.Files.Storage
 	{
 		private IndexBTreeFile index;
 		private readonly string[] fieldNames;
+		private readonly string[] prefixedFieldNames;
 		private readonly int fieldCount;
 		private readonly bool[] ascending;
 		private readonly string collectionName;
@@ -61,6 +62,7 @@ namespace Waher.Persistence.Files.Storage
 			this.collectionName = CollectionName;
 			this.encoding = Encoding;
 			this.fieldNames = FieldNames;
+			this.prefixedFieldNames = FieldNames;
 			this.fieldCount = FieldNames.Length;
 			this.keySizeLimit = KeySizeLimit;
 
@@ -104,6 +106,11 @@ namespace Waher.Persistence.Files.Storage
 		/// Field names included in the index.
 		/// </summary>
 		public string[] FieldNames => this.fieldNames;
+
+		/// <summary>
+		/// Field names included in the index, including ascending/descending prefixes.
+		/// </summary>
+		public string[] PrefixedFieldNames => this.prefixedFieldNames;
 
 		/// <summary>
 		/// If the corresponding field name is sorted in ascending order (true) or descending order (false).

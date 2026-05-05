@@ -13,7 +13,7 @@ namespace Waher.Script.Graphs
 		private SKColor backgroundColor = SKColors.White;
 		private SKColor axisColor = SKColors.Black;
 		private SKColor gridColor = SKColors.LightGray;
-		private string fontName = "Segoe UI";
+		private string fontName = SKTypeface.Default.FamilyName;
 		private double labelFontSize = 12;
 		private int axisWidth = 2;
 		private int gridWidth = 1;

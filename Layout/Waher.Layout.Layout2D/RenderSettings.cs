@@ -33,7 +33,7 @@ namespace Waher.Layout.Layout2D
 		private SKColor backgroundColor = SKColors.White;
 		private SKColor penColor = SKColors.Black;
 		private SKColor textColor = SKColors.Black;
-		private string fontName = "Segoe UI";
+		private string fontName = SKTypeface.Default.FamilyName;
 		private float fontSize = 12;
 		private float pixelsPerInch = 96;
 

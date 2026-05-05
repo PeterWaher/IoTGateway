@@ -446,7 +446,8 @@ namespace Waher.Layout.Layout2D.Model.Content
 						x = this.xCoordinate + dx + Row.Indentation;
 						y = this.yCoordinate + Row.Top - Segment.Top + Segment.DeltaY;
 
-						State.Canvas.DrawText(Segment.Text, x, y, Segment.Font, Segment.Pen);
+						State.Canvas.DrawText(Segment.Text, x, y, SKTextAlign.Left, 
+							Segment.Font, Segment.Pen);
 
 						float x1 = x;
 						x += Segment.Width;

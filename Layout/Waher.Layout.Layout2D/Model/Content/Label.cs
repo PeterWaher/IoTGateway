@@ -231,7 +231,8 @@ namespace Waher.Layout.Layout2D.Model.Content
 			if (this.defined)
 			{
 				State.Canvas.DrawText(this.textValue, this.xCoordinate, this.yCoordinate, 
-					this.fontRef?.FontDef ?? State.Font, this.fontRef?.TextPen ?? State.TextPen);
+					SKTextAlign.Left, this.fontRef?.FontDef ?? State.Font, 
+					this.fontRef?.TextPen ?? State.TextPen);
 			}
 
 			await base.Draw(State);

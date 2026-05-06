@@ -37,7 +37,7 @@ namespace Waher.Networking.HTTP
 		internal const byte LF = 10;
 		internal const int MaxHeaderSize = 65536;
 		internal const int MaxInmemoryMessageSize = 1024 * 1024;        // 1 MB
-		internal const long MaxEntitySize = 2L * 1024 * 1024 * 1024;    // 2 GB
+		internal const long MaxEntitySize = 10L * 1024 * 1024 * 1024;   // 10 GB
 
 		private Guid id = Guid.NewGuid();
 		private MemoryStream headerStream = null;

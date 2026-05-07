@@ -254,7 +254,7 @@ namespace Waher.Things.Http
 				}
 				else
 				{
-					await Response.SendResponse(new BadRequestException("Expected <td> element."));
+					await Response.SendResponse(new BadRequestException("Expected <ts> element."));
 					return;
 				}
 			}

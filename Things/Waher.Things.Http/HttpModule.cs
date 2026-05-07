@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Waher.Content.Html.Elements;
 using Waher.Events;
 using Waher.Networking;
 using Waher.Networking.HTTP;
@@ -21,6 +20,7 @@ namespace Waher.Things.Http
 	/// HTTP module
 	/// </summary>
 	[Singleton]
+	[ModuleDependency("Waher.Service.IoTBroker.XmppServerModule")]	// For JWT factory, if available.
 	public class HttpModule : IModule, ITlsCertificateEndpoint
 	{
 		internal const string PostPrivileges = "Admin.SensorData.Post";

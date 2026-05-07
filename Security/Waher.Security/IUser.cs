@@ -3,7 +3,7 @@
 	/// <summary>
 	/// Basic interface for a user.
 	/// </summary>
-	public interface IUser
+	public interface IUser : IHasPrivileges
 	{
 		/// <summary>
 		/// User Name.
@@ -28,12 +28,5 @@
 		{
 			get;
 		}
-
-		/// <summary>
-		/// If the user has a given privilege.
-		/// </summary>
-		/// <param name="Privilege">Privilege.</param>
-		/// <returns>If the user has the corresponding privilege.</returns>
-		bool HasPrivilege(string Privilege);
 	}
 }

@@ -3716,6 +3716,32 @@ namespace Waher.IoTGateway
 		}
 
 		/// <summary>
+		/// Authentication mechanism that makes sure the call is made from a session with a valid authenticated user with
+		/// the given set of privileges.
+		/// </summary>
+		/// <param name="Authorization">Resource authorization</param>
+		public static RequiredPrivileges LoggedIn(IAuthorization<HttpRequest> Authorization)
+		{
+			return LoggedIn(SessionAuthentication.DefaultUserVariable, Authorization);
+		}
+
+		/// <summary>
+		/// Authentication mechanism that makes sure the call is made from a session with a valid authenticated user with
+		/// the given set of privileges.
+		/// </summary>
+		/// <param name="UserVariable">Name of user variable.</param>
+		/// <param name="Authorization">Resource authorization</param>
+		public static RequiredPrivileges LoggedIn(string UserVariable, IAuthorization<HttpRequest> Authorization)
+		{
+			return new RequiredPrivileges(
+				new HttpAuthenticationScheme[]
+				{
+					new SessionAuthentication(UserVariable, webServer)
+				},
+				Authorization);
+		}
+
+		/// <summary>
 		/// Current Login Auditor. Should be used by modules accepting user logins, to protect the system from
 		/// unauthorized access by malicious users.
 		/// </summary>

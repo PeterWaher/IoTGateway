@@ -22,7 +22,7 @@ namespace Waher.Things.Http
 	/// </summary>
 	[Singleton]
 	[ModuleDependency("Waher.Service.IoTBroker.XmppServerModule")]  // For JWT factory, if available.
-	public class HttpModule : IModule, ITlsCertificateEndpoint
+	public class HttpModule : IModule, ITlsCertificateEndpoint, IAuthorization<HttpRequest>
 	{
 		internal const string PostPrivileges = "Admin.SensorData.Post";
 
@@ -67,7 +67,7 @@ namespace Waher.Things.Http
 				else
 					scheduler = Scheduler;
 
-				HttpAuthenticationScheme[] Schemes = GetAuthenticationSchemes(PostPrivileges);
+				HttpAuthenticationScheme[] Schemes = GetAuthenticationSchemes(this);
 
 				api = new SensorDataReceptorResource("/ReportSensorData", Schemes);
 				webServer.Register(api);
@@ -78,6 +78,24 @@ namespace Waher.Things.Http
 			}
 
 			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Checks if an user or object is authorized to perform an action.
+		/// </summary>
+		/// <param name="Request">Resource to authorize access to.</param>
+		/// <param name="User">User or object with access privileges.</param>
+		/// <returns>If authorized access.</returns>
+		public bool IsAuthorized(HttpRequest Request, IHasPrivileges User)
+		{
+			string Privilege;
+
+			if (string.IsNullOrEmpty(Request.SubPath))
+				Privilege = PostPrivileges;
+			else
+				Privilege = PostPrivileges + Request.SubPath.Replace('/', '.');
+
+			return User.HasPrivilege(Privilege);
 		}
 
 		/// <summary>

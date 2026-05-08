@@ -59,10 +59,11 @@ have the privilege `Admin.SensorData.Post.ExternalSensors.Node1`):
 <ts v="2017-09-22T15:22:33Z" xmlns="urn:nfi:iot:sd:1.0">
   <q n="Temperature" v="12.3" u="°C" m="true" ar="true"/>
   <s n="SN" v="12345678" i="true" ar="true"/>
+  <!-- more field elements can be added here, as needed -->
 </ts>
 ```
 
-Example payload posted to the sensor data receptor at 
+Example payload containing data for a single node posted to the sensor data receptor at 
 `https://receptor.example.com/ReportSensorData` (this requires a user to have the
 privilege `Admin.SensorData.Post`):
 
@@ -71,8 +72,28 @@ privilege `Admin.SensorData.Post`):
   <ts v="2017-09-22T15:22:33Z">
     <q n="Temperature" v="12.3" u="°C" m="true" ar="true"/>
     <s n="SN" v="12345678" i="true" ar="true"/>
+    <!-- more field elements can be added here, as needed -->
   </ts>
+  <!-- more <ts/> elements can be added here, as needed -->
 </nd>
+```
+
+Example payload containing data for multiple nodes posted to the sensor data receptor at 
+`https://receptor.example.com/ReportSensorData` (this requires a user to have the
+privilege `Admin.SensorData.Post`):
+
+```xml
+<resp xmlns="urn:nfi:iot:sd:1.0">
+    <nd id="Node1">
+      <ts v="2017-09-22T15:22:33Z">
+        <q n="Temperature" v="12.3" u="°C" m="true" ar="true"/>
+        <s n="SN" v="12345678" i="true" ar="true"/>
+        <!-- more field elements can be added here, as needed -->
+      </ts>
+      <!-- more <ts/> elements can be added here, as needed -->
+    </nd>
+    <!-- more <nd/> elements can be added here, as needed -->
+</resp>
 ```
 
 ### Response codes

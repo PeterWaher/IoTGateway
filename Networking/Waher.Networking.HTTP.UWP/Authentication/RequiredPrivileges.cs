@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Waher.Runtime.Collections;
 using Waher.Security;
+using Waher.Security.Authorization;
 
 namespace Waher.Networking.HTTP.Authentication
 {
@@ -12,9 +13,8 @@ namespace Waher.Networking.HTTP.Authentication
 	public class RequiredPrivileges : HttpAuthenticationScheme
 	{
 		private readonly HttpAuthenticationScheme[] authenticationSchemes;
-		private readonly string[] privileges;
+		private readonly IAuthorization<HttpRequest> authorization;
 		private readonly int nrAuthenticationSchemes;
-		private readonly int nrPrivileges;
 
 		/// <summary>
 		/// Represents an HTTP authentication scheme that embeds a collection of authentication
@@ -25,12 +25,36 @@ namespace Waher.Networking.HTTP.Authentication
 		/// <param name="Privileges">Required privileges.</param>
 		public RequiredPrivileges(HttpAuthenticationScheme[] AuthenticationSchemes,
 			params string[] Privileges)
+			: this(AuthenticationSchemes, GetAuthorization(Privileges))
+		{
+		}
+
+		/// <summary>
+		/// Represents an HTTP authentication scheme that embeds a collection of authentication
+		/// schemes, and adds an additional requirement, that the authenticated user has one or
+		/// more specified privileges.
+		/// </summary>
+		/// <param name="AuthenticationSchemes">Authentication schemes.</param>
+		/// <param name="Authorization">Resource authorization</param>
+		public RequiredPrivileges(HttpAuthenticationScheme[] AuthenticationSchemes,
+			IAuthorization<HttpRequest> Authorization)
 		{
 			this.authenticationSchemes = AuthenticationSchemes;
-			this.privileges = Privileges;
-
+			this.authorization = Authorization;
 			this.nrAuthenticationSchemes = AuthenticationSchemes?.Length ?? 0;
-			this.nrPrivileges = Privileges?.Length ?? 0;
+		}
+
+		/// <summary>
+		/// Gets an authorization object, based on the privileges specified. 
+		/// </summary>
+		/// <param name="Privileges">Privileges to authorize.</param>
+		/// <returns>Authorization object.</returns>
+		public static IAuthorization<HttpRequest> GetAuthorization(string[] Privileges)
+		{
+			if (Privileges.Length == 1)
+				return new SinglePrivilege<HttpRequest>(Privileges[0]);
+			else
+				return new MultiplePrivileges<HttpRequest>(Privileges);
 		}
 
 		/// <summary>
@@ -62,7 +86,7 @@ namespace Waher.Networking.HTTP.Authentication
 		{
 			HttpAuthenticationScheme Scheme;
 			IUser User;
-			int i, j;
+			int i;
 
 			for (i = 0; i < this.nrAuthenticationSchemes; i++)
 			{
@@ -71,16 +95,7 @@ namespace Waher.Networking.HTTP.Authentication
 				if (User is null)
 					continue;
 
-				for (j = 0; j < this.nrPrivileges; j++)
-				{
-					if (!User.HasPrivilege(this.privileges[j]))
-					{
-						User = null;
-						break;
-					}
-				}
-
-				if (!(User is null))
+				if (this.authorization.IsAuthorized(Request, User))
 					return User;
 			}
 

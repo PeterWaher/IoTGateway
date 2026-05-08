@@ -71,7 +71,7 @@ namespace Waher.Content.Posters
 			{
 				using (HttpRequestMessage Request = new HttpRequestMessage()
 				{
-					RequestUri = Uri,
+					RequestUri = WebGetter.CheckUri(Uri),
 					Method = HttpMethod.Post, 
 					Content = new ByteArrayContent(EncodedData),
 				})

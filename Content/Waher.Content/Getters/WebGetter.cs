@@ -24,6 +24,7 @@ namespace Waher.Content.Getters
 	public class WebGetter : IContentGetter, IContentHeader
 	{
 		private static bool useProxy = true;
+		private static bool enforceHttps = false;
 
 		/// <summary>
 		/// Gets resources from the Web (i.e. using HTTP or HTTPS).
@@ -94,7 +95,7 @@ namespace Waher.Content.Getters
 			{
 				using (HttpRequestMessage Request = new HttpRequestMessage()
 				{
-					RequestUri = Uri,
+					RequestUri = CheckUri(Uri),
 					Method = HttpMethod.Get
 				})
 				{
@@ -238,6 +239,38 @@ namespace Waher.Content.Getters
 		{
 			get => useProxy;
 			set => useProxy = value;
+		}
+
+		/// <summary>
+		/// If HTTPS should be enforced, even when accessing unencrypted HTTP resources.
+		/// Default is false.
+		/// </summary>
+		public static bool EnforceHttps
+		{
+			get => enforceHttps;
+			set => enforceHttps = value;
+		}
+
+		/// <summary>
+		/// Checks the URI, if it is suitable for processing, or if it needs to be modified.
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <returns>URI, possibliy modified.</returns>
+		public static Uri CheckUri(Uri Uri)
+		{
+			if (!enforceHttps)
+				return Uri;
+
+			if (Uri.Scheme.ToLower() != "http")
+				return Uri;
+
+			if (Uri.Authority.IndexOf(':') >= 0)
+				return Uri;
+
+			if (Uri.TryCreate(Uri.OriginalString.Replace("http:", "https:"), UriKind.Absolute, out Uri Uri2))
+				return Uri2;
+			else
+				return Uri;
 		}
 
 		/// <summary>
@@ -484,7 +517,7 @@ namespace Waher.Content.Getters
 			{
 				using (HttpRequestMessage Request = new HttpRequestMessage()
 				{
-					RequestUri = Uri,
+					RequestUri = CheckUri(Uri),
 					Method = HttpMethod.Get
 				})
 				{
@@ -574,7 +607,7 @@ namespace Waher.Content.Getters
 			{
 				using (HttpRequestMessage Request = new HttpRequestMessage()
 				{
-					RequestUri = Uri,
+					RequestUri = CheckUri(Uri),
 					Method = HttpMethod.Head
 				})
 				{

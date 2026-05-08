@@ -66,7 +66,7 @@ namespace Waher.Content.Deleters
 			{
 				using (HttpRequestMessage Request = new HttpRequestMessage()
 				{
-					RequestUri = Uri,
+					RequestUri = WebGetter.CheckUri(Uri),
 					Method = HttpMethod.Delete
 				})
 				{

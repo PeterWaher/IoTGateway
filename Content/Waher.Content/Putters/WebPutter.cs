@@ -71,7 +71,7 @@ namespace Waher.Content.Putters
 			{
 				using (HttpRequestMessage Request = new HttpRequestMessage()
 				{
-					RequestUri = Uri,
+					RequestUri = WebGetter.CheckUri(Uri),
 					Method = HttpMethod.Put, 
 					Content = new ByteArrayContent(EncodedData)
 				})

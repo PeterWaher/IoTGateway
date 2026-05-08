@@ -44,7 +44,12 @@ namespace Waher.Networking.HTTP.Authentication
 			this.nrAuthenticationSchemes = AuthenticationSchemes?.Length ?? 0;
 		}
 
-		private static IAuthorization<HttpRequest> GetAuthorization(string[] Privileges)
+		/// <summary>
+		/// Gets an authorization object, based on the privileges specified. 
+		/// </summary>
+		/// <param name="Privileges">Privileges to authorize.</param>
+		/// <returns>Authorization object.</returns>
+		public static IAuthorization<HttpRequest> GetAuthorization(string[] Privileges)
 		{
 			if (Privileges.Length == 1)
 				return new SinglePrivilege<HttpRequest>(Privileges[0]);

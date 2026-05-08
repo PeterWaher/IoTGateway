@@ -10,6 +10,7 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Runtime.Timing;
 using Waher.Security;
+using Waher.Security.Authorization;
 using Waher.Security.JWT;
 using Waher.Security.Users;
 using Waher.Things.Metering;
@@ -20,7 +21,7 @@ namespace Waher.Things.Http
 	/// HTTP module
 	/// </summary>
 	[Singleton]
-	[ModuleDependency("Waher.Service.IoTBroker.XmppServerModule")]	// For JWT factory, if available.
+	[ModuleDependency("Waher.Service.IoTBroker.XmppServerModule")]  // For JWT factory, if available.
 	public class HttpModule : IModule, ITlsCertificateEndpoint
 	{
 		internal const string PostPrivileges = "Admin.SensorData.Post";
@@ -75,7 +76,7 @@ namespace Waher.Things.Http
 			{
 				Log.Exception(ex);
 			}
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -97,7 +98,7 @@ namespace Waher.Things.Http
 		/// <returns>Array of authentication schemes.</returns>
 		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(string RequiredPrivilege)
 		{
-			return GetAuthenticationSchemes(new string[] { RequiredPrivilege });
+			return GetAuthenticationSchemes(new SinglePrivilege<HttpRequest>(RequiredPrivilege));
 		}
 
 		/// <summary>
@@ -107,6 +108,20 @@ namespace Waher.Things.Http
 		/// <param name="RequiredPrivileges">Required privileges.</param>
 		/// <returns>Array of authentication schemes.</returns>
 		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(params string[] RequiredPrivileges)
+		{
+			if ((RequiredPrivileges?.Length ?? 0) == 0)
+				return GetAuthenticationSchemes((IAuthorization<HttpRequest>)null);
+			else
+				return GetAuthenticationSchemes(Networking.HTTP.Authentication.RequiredPrivileges.GetAuthorization(RequiredPrivileges));
+		}
+
+		/// <summary>
+		/// Gets an array of authentication schemes available to authorize access to a
+		/// web resource.
+		/// </summary>
+		/// <param name="Authorization">Resource authorization</param>
+		/// <returns>Array of authentication schemes.</returns>
+		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(IAuthorization<HttpRequest> Authorization)
 		{
 			List<HttpAuthenticationScheme> Schemes = new List<HttpAuthenticationScheme>();
 			string Domain;
@@ -150,13 +165,13 @@ namespace Waher.Things.Http
 			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.SHA3_256, Domain, Users.Source));
 			Schemes.Add(new SessionAuthentication(webServer));
 
-			if (RequiredPrivileges.Length == 0)
+			if (Authorization is null)
 				return Schemes.ToArray();
 			else
 			{
 				return new HttpAuthenticationScheme[]
 				{
-					new RequiredPrivileges(Schemes.ToArray(), RequiredPrivileges)
+					new RequiredPrivileges(Schemes.ToArray(), Authorization)
 				};
 			}
 		}

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Content.Images.Exif
+﻿namespace Waher.Content.Images.Exif
 {
 	/// <summary>
 	/// Class for ASCII-valued EXIF meta-data tags.

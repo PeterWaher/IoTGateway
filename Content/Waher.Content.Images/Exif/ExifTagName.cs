@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Images.Exif
+﻿namespace Waher.Content.Images.Exif
 {
 	/// <summary>
 	/// Defined EXIF Tag names

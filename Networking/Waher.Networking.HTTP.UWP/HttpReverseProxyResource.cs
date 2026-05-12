@@ -772,6 +772,14 @@ namespace Waher.Networking.HTTP
 									}
 									break;
 
+								case "Connection":
+									if (Request.Http2Stream is null)	// Ignore if using HTTP/2
+									{
+										foreach (string Value in Header.Value)
+											Response.SetHeader(FieldName, Value);
+									}
+									break;
+
 								default:
 									foreach (string Value in Header.Value)
 										Response.SetHeader(FieldName, Value);

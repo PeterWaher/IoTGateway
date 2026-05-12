@@ -66,10 +66,10 @@ namespace Waher.Content.Deleters
 			{
 				using (HttpRequestMessage Request = new HttpRequestMessage()
 				{
-					RequestUri = WebGetter.CheckUri(Uri),
 					Method = HttpMethod.Delete
 				})
 				{
+					Request.RequestUri = WebGetter.CheckUri(Uri, Request);
 					WebGetter.PrepareHeaders(Request, Headers, Handler);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);

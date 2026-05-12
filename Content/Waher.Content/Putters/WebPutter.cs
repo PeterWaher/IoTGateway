@@ -71,11 +71,11 @@ namespace Waher.Content.Putters
 			{
 				using (HttpRequestMessage Request = new HttpRequestMessage()
 				{
-					RequestUri = WebGetter.CheckUri(Uri),
 					Method = HttpMethod.Put, 
 					Content = new ByteArrayContent(EncodedData)
 				})
 				{
+					Request.RequestUri = WebGetter.CheckUri(Uri, Request);
 					Request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(ContentType);
 					WebGetter.PrepareHeaders(Request, Headers, Handler);
 

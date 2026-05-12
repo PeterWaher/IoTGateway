@@ -95,10 +95,10 @@ namespace Waher.Content.Getters
 			{
 				using (HttpRequestMessage Request = new HttpRequestMessage()
 				{
-					RequestUri = CheckUri(Uri),
 					Method = HttpMethod.Get
 				})
 				{
+					Request.RequestUri = CheckUri(Uri, Request);
 					PrepareHeaders(Request, Headers, Handler);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
@@ -255,14 +255,29 @@ namespace Waher.Content.Getters
 		/// Checks the URI, if it is suitable for processing, or if it needs to be modified.
 		/// </summary>
 		/// <param name="Uri">URI</param>
+		/// <param name="Request">Request being prepared.</param>
 		/// <returns>URI, possibliy modified.</returns>
-		public static Uri CheckUri(Uri Uri)
+		public static Uri CheckUri(Uri Uri, HttpRequestMessage Request)
 		{
-			if (!enforceHttps)
+			EventHandler<HttpUriEventArgs> h = HttpUriEventHandler;
+
+			if (h is null && !enforceHttps)
 				return Uri;
 
 			if (Uri.Scheme.ToLower() != "http")
 				return Uri;
+
+			if (!(h is null))
+			{
+				HttpUriEventArgs e = new HttpUriEventArgs(Uri, Request);
+				
+				h.Raise(null, e);
+
+				if (e.Uri != Uri)
+					return e.Uri;
+				else if (!enforceHttps)
+					return Uri;
+			}
 
 			if (Uri.Authority.IndexOf(':') >= 0)
 				return Uri;
@@ -272,6 +287,13 @@ namespace Waher.Content.Getters
 			else
 				return Uri;
 		}
+
+		/// <summary>
+		/// Event raised when a HTTP only URI is being processed. Can be used to alter the
+		/// URI, for example, to bypass operating system restrictions and pass the URI via
+		/// a proxy.
+		/// </summary>
+		public static event EventHandler<HttpUriEventArgs> HttpUriEventHandler;
 
 		/// <summary>
 		/// Validator of remote certificate.
@@ -517,10 +539,10 @@ namespace Waher.Content.Getters
 			{
 				using (HttpRequestMessage Request = new HttpRequestMessage()
 				{
-					RequestUri = CheckUri(Uri),
 					Method = HttpMethod.Get
 				})
 				{
+					Request.RequestUri = CheckUri(Uri, Request);
 					PrepareHeaders(Request, Headers, Handler);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request, HttpCompletionOption.ResponseHeadersRead);
@@ -607,10 +629,10 @@ namespace Waher.Content.Getters
 			{
 				using (HttpRequestMessage Request = new HttpRequestMessage()
 				{
-					RequestUri = CheckUri(Uri),
 					Method = HttpMethod.Head
 				})
 				{
+					Request.RequestUri = CheckUri(Uri, Request);
 					PrepareHeaders(Request, Headers, Handler);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);

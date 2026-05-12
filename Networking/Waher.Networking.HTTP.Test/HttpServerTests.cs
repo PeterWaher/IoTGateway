@@ -1156,5 +1156,30 @@ namespace Waher.Networking.HTTP.Test
 			string s = Encoding.UTF8.GetString(Data);
 			Assert.AreEqual("hej på dej", s);
 		}
+
+		[TestMethod]
+		[DataRow("HTTP_35_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_35_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_35_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_35_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_35_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_35_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_35_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_35_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_35_ReverseProxy(string SnifferFileName, bool NoRfc7540Priorities,
+			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
+		{
+			this.Setup(true, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
+
+			this.server.Register("/Remote/test35.txt", (req, resp) => resp.Return("hej på dej"));
+			this.server.Register(new HttpReverseProxyResource("/Proxy35", TimeSpan.FromSeconds(10)));
+
+			using CookieWebClient Client = new(this.ProtocolVersion);
+			byte[] Data = await Client.DownloadData("http://localhost:8081/Proxy35/" + 
+				WebUtility.UrlEncode("http://localhost:8081/Remote/test35.txt"));
+
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("hej på dej", s);
+		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -147,6 +148,21 @@ namespace Waher.Networking.HTTP
 		private readonly bool encryption;
 		private readonly CommunicationLayer comLayer;
 		private readonly bool authorization;
+		private readonly bool onlyAbsoluteUris;
+
+		/// <summary>
+		/// An HTTP Reverse proxy resource (of absolute links). Incoming requests are reverted 
+		/// to a other web servers for processing. Responses are returned asynchronously as 
+		/// they are received.
+		/// </summary>
+		/// <param name="ResourceName">Name of resource.</param>
+		/// <param name="Timeout">Timeout threshold.</param>
+		/// <param name="Sniffers">Sniffers</param>
+		public HttpReverseProxyResource(string ResourceName, TimeSpan Timeout, params ISniffer[] Sniffers)
+			: this(ResourceName, string.Empty, 0, string.Empty, true, Timeout,
+				  false, null, null, Sniffers)
+		{
+		}
 
 		/// <summary>
 		/// An HTTP Reverse proxy resource. Incoming requests are reverted to a another web server for processing. Responses
@@ -215,39 +231,48 @@ namespace Waher.Networking.HTTP
 			this.authenticationSchemes = AuthenticationSchemes;
 			this.privilege = RequiredPrivilege;
 			this.authorization = !string.IsNullOrEmpty(RequiredPrivilege);
+			this.onlyAbsoluteUris = string.IsNullOrEmpty(RemoteHost);
+			this.encryption = Encryption;
+			this.comLayer = new CommunicationLayer(true, Sniffers);
 
 			this.RemoteHost = RemoteHost;
 			this.RemotePort = Port;
 			this.RemoteFolder = RemoteFolder;
 
-			StringBuilder sb = new StringBuilder();
-			int DefaultPort;
-
-			sb.Append("http");
-			if (Encryption)
+			if (this.onlyAbsoluteUris)
 			{
-				sb.Append('s');
-				DefaultPort = HttpServer.DefaultHttpsPort;
+				this.baseUri = string.Empty;
+				this.baseUriEndsWithSlash = false;
 			}
 			else
-				DefaultPort = HttpServer.DefaultHttpPort;
-
-			sb.Append("://");
-			sb.Append(RemoteHost);
-
-			if (Port != DefaultPort)
 			{
-				sb.Append(':');
-				sb.Append(Port.ToString());
+				StringBuilder sb = new StringBuilder();
+				int DefaultPort;
+
+				sb.Append("http");
+				if (Encryption)
+				{
+					sb.Append('s');
+					DefaultPort = HttpServer.DefaultHttpsPort;
+				}
+				else
+					DefaultPort = HttpServer.DefaultHttpPort;
+
+				sb.Append("://");
+				sb.Append(RemoteHost);
+
+				if (Port != DefaultPort)
+				{
+					sb.Append(':');
+					sb.Append(Port.ToString());
+				}
+
+				if (!string.IsNullOrEmpty(RemoteFolder))
+					sb.Append(RemoteFolder);
+
+				this.baseUri = sb.ToString();
+				this.baseUriEndsWithSlash = this.baseUri.EndsWith('/');
 			}
-
-			if (!string.IsNullOrEmpty(RemoteFolder))
-				sb.Append(RemoteFolder);
-
-			this.baseUri = sb.ToString();
-			this.baseUriEndsWithSlash = this.baseUri.EndsWith('/');
-			this.encryption = Encryption;
-			this.comLayer = new CommunicationLayer(true, Sniffers);
 		}
 
 		/// <summary>
@@ -279,6 +304,11 @@ namespace Waher.Networking.HTTP
 		/// If forwarding is encrypted.
 		/// </summary>
 		public bool Encrypted => this.encryption;
+
+		/// <summary>
+		/// If only absolute URIs are allowed.
+		/// </summary>
+		public bool OnlyAbsoluteUris => this.onlyAbsoluteUris;
 
 		/// <summary>
 		/// If the GET method is allowed.
@@ -498,24 +528,46 @@ namespace Waher.Networking.HTTP
 					Session = null;
 
 				StringBuilder sb = new StringBuilder();
+				Uri RemoteUri;
+				string s;
 
-				sb.Append(this.baseUri);
-
-				if (this.baseUriEndsWithSlash && (Request.SubPath?.StartsWith('/') ?? false))
-					sb.Append(Request.SubPath.Substring(1));
-				else
-					sb.Append(Request.SubPath);
-
-				if (!string.IsNullOrEmpty(Request.Header.QueryString))
+				if (this.onlyAbsoluteUris)
 				{
-					sb.Append('?');
-					sb.Append(Request.Header.QueryString);
+					s = Request.SubPath ?? string.Empty;
+
+					if (s.StartsWith('/'))
+						s = s.Substring(1);
+
+					s = WebUtility.UrlDecode(s);
+
+					if (!Uri.TryCreate(s, UriKind.Absolute, out RemoteUri))
+					{
+						await Response.SendResponse(new BadRequestException());
+						return;
+					}
 				}
-
-				if (!Uri.TryCreate(sb.ToString(), UriKind.Absolute, out Uri RemoteUri))
+				else
 				{
-					await Response.SendResponse(new BadRequestException());
-					return;
+					sb.Append(this.baseUri);
+
+					if (this.baseUriEndsWithSlash && (Request.SubPath?.StartsWith('/') ?? false))
+						sb.Append(Request.SubPath.Substring(1));
+					else
+						sb.Append(Request.SubPath);
+
+					if (!string.IsNullOrEmpty(Request.Header.QueryString))
+					{
+						sb.Append('?');
+						sb.Append(Request.Header.QueryString);
+					}
+
+					if (!Uri.TryCreate(sb.ToString(), UriKind.Absolute, out RemoteUri))
+					{
+						await Response.SendResponse(new BadRequestException());
+						return;
+					}
+
+					sb.Clear();
 				}
 
 				byte[] Data;
@@ -530,7 +582,6 @@ namespace Waher.Networking.HTTP
 
 
 				HttpClientHandler Handler = WebGetter.GetClientHandler();
-				string s;
 
 				using (HttpClient HttpClient = new HttpClient(Handler, true)
 				{
@@ -635,8 +686,6 @@ namespace Waher.Networking.HTTP
 						// X-Forwarded-For		https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
 						// X-Forwarded-Proto	https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto
 						// Via					https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Via
-
-						sb.Clear();
 
 						sb.Append("by=");
 						sb.Append(Request.LocalEndPoint);

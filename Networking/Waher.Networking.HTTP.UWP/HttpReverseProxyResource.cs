@@ -165,6 +165,45 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// An HTTP Reverse proxy resource (of absolute links). Incoming requests are reverted 
+		/// to a other web servers for processing. Responses are returned asynchronously as 
+		/// they are received.
+		/// </summary>
+		/// <param name="ResourceName">Name of resource.</param>
+		/// <param name="Timeout">Timeout threshold.</param>
+		/// <param name="UseProxySession">If the proxy resource should add a session requirement
+		/// as well. This allows the proxy resource to forward user infomration to underlying
+		/// services, etc. (Default=false)</param>
+		/// <param name="Sniffers">Sniffers</param>
+		public HttpReverseProxyResource(string ResourceName, TimeSpan Timeout, 
+			bool UseProxySession, params ISniffer[] Sniffers)
+			: this(ResourceName, string.Empty, 0, string.Empty, true, Timeout,
+				  UseProxySession, null, null, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// An HTTP Reverse proxy resource (of absolute links). Incoming requests are reverted 
+		/// to a other web servers for processing. Responses are returned asynchronously as 
+		/// they are received.
+		/// </summary>
+		/// <param name="ResourceName">Name of resource.</param>
+		/// <param name="Timeout">Timeout threshold.</param>
+		/// <param name="UseProxySession">If the proxy resource should add a session requirement
+		/// as well. This allows the proxy resource to forward user infomration to underlying
+		/// services, etc. (Default=false)</param>
+		/// <param name="AuthenticationSchemes">Optional set of authentication schemes.</param>
+		/// <param name="RequiredPrivilege">Optional required privilege.</param>
+		/// <param name="Sniffers">Sniffers</param>
+		public HttpReverseProxyResource(string ResourceName, TimeSpan Timeout, bool UseProxySession,
+			HttpAuthenticationScheme[] AuthenticationSchemes, string RequiredPrivilege,
+			params ISniffer[] Sniffers)
+			: this(ResourceName, string.Empty, 0, string.Empty, true, Timeout,
+				  UseProxySession, AuthenticationSchemes, RequiredPrivilege, Sniffers)
+		{
+		}
+
+		/// <summary>
 		/// An HTTP Reverse proxy resource. Incoming requests are reverted to a another web server for processing. Responses
 		/// are returned asynchronously as they are received.
 		/// </summary>

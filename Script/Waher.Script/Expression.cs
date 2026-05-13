@@ -5195,36 +5195,6 @@ namespace Waher.Script
 		}
 
 		/// <summary>
-		/// Upgrades elements if necessary, to a common semi-field, trying to make them compatible.
-		/// </summary>
-		/// <param name="E1">Element 1.</param>
-		/// <param name="Set1">Set containing element 1.</param>
-		/// <param name="E2">Element 2.</param>
-		/// <param name="Set2">Set containing element 2.</param>
-		/// <returns>If elements have been upgraded to become compatible.</returns>
-		public static bool UpgradeSemiGroup(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2)
-		{
-			if (E1 is StringValue)
-			{
-				E2 = new StringValue(E2.AssociatedObjectValue?.ToString() ?? string.Empty);
-				Set2 = StringValues.Instance;
-				return true;
-			}
-
-			if (E2 is StringValue)
-			{
-				E1 = new StringValue(E1.AssociatedObjectValue?.ToString() ?? string.Empty);
-				Set1 = StringValues.Instance;
-				return true;
-			}
-
-			if (UpgradeField(ref E1, ref Set1, ref E2, ref Set2))
-				return true;
-
-			return false;
-		}
-
-		/// <summary>
 		/// Upgrades elements if necessary, to a common field extension, trying to make them compatible.
 		/// </summary>
 		/// <param name="E1">Element 1.</param>

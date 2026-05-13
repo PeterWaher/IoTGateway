@@ -1,4 +1,8 @@
-﻿using Waher.Script.Abstraction.Elements;
+﻿using System;
+using System.Collections.Generic;
+using Waher.Runtime.Inventory;
+using Waher.Script.Abstraction.CustomOperators;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Operators.Membership;
 
 namespace Waher.Script.Model
@@ -196,27 +200,71 @@ namespace Waher.Script.Model
 		/// <param name="Left">Left operand.</param>
 		/// <param name="Right">Right operad.</param>
 		/// <param name="Node">Node performing the evaluation.</param>
-		/// <returns>Result</returns>
+		/// <returns>Result, if able, null if operation not defined.</returns>
 		public static IElement EvaluateNamedOperator(string Name, IElement Left, IElement Right, ScriptNode Node)
 		{
+			Type LeftType = Left.AssociatedObjectValue?.GetType() ?? typeof(object);
+			Type RightType = Right.AssociatedObjectValue?.GetType() ?? typeof(object);
+			IBinaryOperator CustomOperator = null;
+			bool Found;
+
+			lock (customBinaryOperators)
+			{
+				Found =
+					customBinaryOperators.TryGetValue(Name, out Dictionary<Type, Dictionary<Type, IBinaryOperator>> ByLeftType) &&
+					ByLeftType.TryGetValue(LeftType, out Dictionary<Type, IBinaryOperator> ByRightType) &&
+					ByRightType.TryGetValue(RightType, out CustomOperator);
+			}
+
+			if (!(CustomOperator is null))
+				return CustomOperator.Evaluate(new BinaryOperation(Name, Left, Right), Node);
+
 			ScriptNode[] ArgumentNodes = new ScriptNode[2];
-			NamedMethodCall OperatorMethod = new NamedMethodCall(null, Name, ArgumentNodes, 
+			NamedMethodCall OperatorMethod = new NamedMethodCall(null, Name, ArgumentNodes,
 				false, Node?.Start ?? 0, Node?.Length ?? 0, Node?.Expression);
 
 			IElement[] Arguments = new IElement[] { Left, Right };
-
-			IElement Result = OperatorMethod.EvaluateAsync(
-				Left.AssociatedObjectValue?.GetType() ?? typeof(object),
-				null, Arguments, null).Result;
+			IElement Result = OperatorMethod.EvaluateAsync(LeftType, null, Arguments, null).Result;
 
 			if (!(Result is null))
 				return Result;
 
-			Result = OperatorMethod.EvaluateAsync(
-				Right.AssociatedObjectValue?.GetType() ?? typeof(object),
-				null, Arguments, null).Result;
+			Result = OperatorMethod.EvaluateAsync(RightType, null, Arguments, null).Result;
 
-			return Result;
+			if (!(Result is null))
+				return Result;
+
+			if (!Found)
+			{
+				BinaryOperation BinaryOperation = new BinaryOperation(Name, Left, Right);
+
+				CustomOperator = Types.FindBest<IBinaryOperator, IBinaryOperation>(BinaryOperation);
+
+				lock (customBinaryOperators)
+				{
+					if (!customBinaryOperators.TryGetValue(Name, out Dictionary<Type, Dictionary<Type, IBinaryOperator>> ByLeftType))
+					{
+						ByLeftType = new Dictionary<Type, Dictionary<Type, IBinaryOperator>>();
+						customBinaryOperators[Name] = ByLeftType;
+					}
+
+					if (!ByLeftType.TryGetValue(LeftType, out Dictionary<Type, IBinaryOperator> ByRightType))
+					{
+						ByRightType = new Dictionary<Type, IBinaryOperator>();
+						ByLeftType[LeftType] = ByRightType;
+					}
+
+					ByRightType[RightType] = CustomOperator;
+				}
+
+				if (!(CustomOperator is null))
+					return CustomOperator.Evaluate(BinaryOperation, Node);
+			}
+
+			return null;
 		}
+
+		private static readonly Dictionary<string, Dictionary<Type, Dictionary<Type, IBinaryOperator>>> 
+			customBinaryOperators = new Dictionary<string, Dictionary<Type, Dictionary<Type, IBinaryOperator>>>();
 	}
 }

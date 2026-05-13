@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Script.Abstraction.Sets;
+﻿using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.Objects

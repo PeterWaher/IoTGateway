@@ -86,7 +86,7 @@ namespace Waher.Script.Operators.Arithmetics
 
 					if (!LeftSet.Equals(RightSet))
 					{
-						if (Expression.UpgradeSemiGroup(ref Left, ref LeftSet, ref Right, ref RightSet))
+						if (Expression.UpgradeField(ref Left, ref LeftSet, ref Right, ref RightSet))
 						{
 							LE = Left as ISemiGroupElement;
 							RE = Right as ISemiGroupElement;

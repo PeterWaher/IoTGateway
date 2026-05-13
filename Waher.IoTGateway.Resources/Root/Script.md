@@ -933,6 +933,31 @@ Whitespace is ignored. This includes new-line characters. So Statements can be w
 	Statement3;
 	... 
 
+### Custom operators
+
+The script engine allows different modules to extend the engine by providing custom 
+operators. The priority is as follows:
+
+#.	The elements themselves, and the structures they reside in, define, through object
+inheritence and method overloads, how operators are evaluated.
+
+#.	Corresponding .NET operator definitions can be used via the script code behind 
+integration.
+
+#.	External modules can publish *custom operators* implementing operator interfaces
+defined in `Waher.SCript.Abstraction.CustomOperators`. This allows modules to define
+operator functionality for object types they cannot extend with new methods.
+
+The script engine contains multiple custom operators. These include:
+
+* String addition, left and/or right, with any other type, converted as a string.
+* Dictionary addition between two dictionaries.
+* Dictionary addition between a dictionary and a scalar, or a scalar and a dictionary, left and/or right.
+* Dictionary subtraction between two dictionaries.
+* Dictionary subtraction between a dictionary and a scalar, or a scalar and a dictionary, left and/or right.
+
+Example: `{a:1,b:2}+{b:1,c:2}+{a:1,c:2}` returns `{a:2,b:3,c:4}`.
+
 =========================================================================================================================================================
 
 Functions

@@ -1339,5 +1339,98 @@ namespace Waher.Script.Test
 			await Test("a+/*\r\nc * d\r\n*/b", a + b);
 		}
 
+		[TestMethod]
+		public async Task Evaluation_Test_65_DictionaryAddition()
+		{
+			await Test("{a:1,b:2}+{a:1,c:3}+{b:1,c:2}",
+				new Dictionary<string, IElement> 
+				{ 
+					{ "a", new DoubleNumber(2) }, 
+					{ "b", new DoubleNumber(3) }, 
+					{ "c", new DoubleNumber(5) } 
+				});
+			
+			await Test("{a:1,b:2}+{a:1,c:3}+{b:1,c:2}+4",
+				new Dictionary<string, IElement>
+				{
+					{ "a", new DoubleNumber(6) },
+					{ "b", new DoubleNumber(7) },
+					{ "c", new DoubleNumber(9) }
+				});
+			
+			await Test("4+{a:1,b:2}+{a:1,c:3}+{b:1,c:2}",
+				new Dictionary<string, IElement>
+				{
+					{ "a", new DoubleNumber(6) },
+					{ "b", new DoubleNumber(7) },
+					{ "c", new DoubleNumber(5) }
+				});
+			
+			await Test("4+({a:1,b:2}+{a:1,c:3}+{b:1,c:2})",
+				new Dictionary<string, IElement>
+				{
+					{ "a", new DoubleNumber(6) },
+					{ "b", new DoubleNumber(7) },
+					{ "c", new DoubleNumber(9) }
+				});
+			
+			await Test("{a:'1',b:'2'}+{a:'1',c:'3'}+{b:'1',c:'2'}",
+				new Dictionary<string, IElement> 
+				{ 
+					{ "a", new StringValue("11") }, 
+					{ "b", new StringValue("21") }, 
+					{ "c", new StringValue("32") } 
+				});
+
+			await Test("{a:'1',b:'2'}+{a:'1',c:'3'}+{b:'1',c:'2'}+'4'",
+				new Dictionary<string, IElement>
+				{
+					{ "a", new StringValue("114") },
+					{ "b", new StringValue("214") },
+					{ "c", new StringValue("324") }
+				});
+
+			await Test("'4'+{a:'1',b:'2'}+{a:'1',c:'3'}+{b:'1',c:'2'}",
+				new Dictionary<string, IElement>
+				{
+					{ "a", new StringValue("411") },
+					{ "b", new StringValue("421") },
+					{ "c", new StringValue("32") }
+				});
+
+			await Test("'4'+({a:'1',b:'2'}+{a:'1',c:'3'}+{b:'1',c:'2'})",
+				new Dictionary<string, IElement>
+				{
+					{ "a", new StringValue("411") },
+					{ "b", new StringValue("421") },
+					{ "c", new StringValue("432") }
+				});
+		}
+
+		[TestMethod]
+		public async Task Evaluation_Test_66_DictionarySubtraction()
+		{
+			await Test("{a:1,b:2}-{a:1,c:3}-{b:1,c:2}",
+				new Dictionary<string, IElement>
+				{
+					{ "a", new DoubleNumber(0) },
+					{ "b", new DoubleNumber(1) },
+					{ "c", new DoubleNumber(-5) }
+				});
+
+			await Test("{a:1,b:2}-3",
+				new Dictionary<string, IElement>
+				{
+					{ "a", new DoubleNumber(-2) },
+					{ "b", new DoubleNumber(-1) }
+				});
+
+			await Test("3-{a:1,b:2}",
+				new Dictionary<string, IElement>
+				{
+					{ "a", new DoubleNumber(2) },
+					{ "b", new DoubleNumber(1) }
+				});
+		}
 	}
 }

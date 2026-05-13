@@ -32,45 +32,44 @@ namespace Waher.Things.Semantic
 			return Task.CompletedTask;
 		}
 
-		private Task CheckDynamicGraphs(object Sender, FileNotFoundEventArgs e)
+		private async Task CheckDynamicGraphs(object Sender, FileNotFoundEventArgs e)
 		{
-			if (!(e.Exception is null))
+			if (e.Exception is null)
+				return;     // Already processed.
+
+			RequestOrigin Caller;
+
+			if (e.Request.User is IRequestOrigin Origin)
+				Caller = await Origin.GetOrigin();
+			else
+				Caller = RequestOrigin.Empty;
+
+			IDynamicGraph Graph = await DataSourceGraph.FindDynamicGraph(e.Request.SubPath, Caller);
+			if (Graph is null)
+				return;
+
+			e.Exception = null;
+
+			_ = Task.Run(async () =>
 			{
-				e.Exception = null;
-
-				_ = Task.Run(async () =>
+				try
 				{
-					try
-					{
-						RequestOrigin Caller;
 
-						if (e.Request.User is IRequestOrigin Origin)
-							Caller = await Origin.GetOrigin();
-						else
-							Caller = RequestOrigin.Empty;
+					InMemorySemanticCube Result = new InMemorySemanticCube();
+					Language Language = await Translator.GetDefaultLanguageAsync();  // TODO: Check Accept-Language HTTP header.
 
-						IDynamicGraph Graph = await DataSourceGraph.FindDynamicGraph(e.Request.SubPath, Caller);
-						if (Graph is null)
-							return;
-
-						InMemorySemanticCube Result = new InMemorySemanticCube();
-						Language Language = await Translator.GetDefaultLanguageAsync();  // TODO: Check Accept-Language HTTP header.
-
-						await Graph.GenerateGraph(Result, Language, Caller);
-						await e.Response.Return(Result);
-					}
-					catch (Exception ex)
-					{
-						await e.Response.SendResponse(ex);
-					}
-					finally
-					{
-						await e.Response.DisposeAsync();
-					}
-				});
-			}
-
-			return Task.CompletedTask;
+					await Graph.GenerateGraph(Result, Language, Caller);
+					await e.Response.Return(Result);
+				}
+				catch (Exception ex)
+				{
+					await e.Response.SendResponse(ex);
+				}
+				finally
+				{
+					await e.Response.DisposeAsync();
+				}
+			});
 		}
 	}
 }

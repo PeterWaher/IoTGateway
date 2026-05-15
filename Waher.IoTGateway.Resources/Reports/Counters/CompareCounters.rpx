@@ -108,7 +108,7 @@
 				<Status>Comparing against label...</Status>
 				<Script>
 					<![CDATA[
-					PrevCounters:=select 
+					PrevCounters:=select generic
 						top 1 * 
 					from
 						"CounterLabels" 
@@ -160,7 +160,7 @@
 					<Record>
 						<Element>{s:=Counter.Key}</Element>
 						<Element>{x:=null;Counters.TryGetValue(s,x) ? x : ""}</Element>
-						<Element>{x:=null;PrevCounters.TryGetValue(s,x) ? x : ""}</Element>
+						<Element>{x:=null;Prev.TryGetFieldValue(s,x) ? x : ""}</Element>
 						<Element>{Counter.Value}</Element>
 					</Record>
 				</TableRecords>

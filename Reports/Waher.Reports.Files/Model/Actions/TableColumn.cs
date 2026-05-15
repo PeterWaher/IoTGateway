@@ -47,10 +47,10 @@ namespace Waher.Reports.Files.Model.Actions
 			string Header = await this.header.Evaluate(State.Variables);
 			string DataSourceId = await this.dataSourceId.Evaluate(State.Variables);
 			string Partition = await this.partition.Evaluate(State.Variables);
-			SKColor FgColor = await this.fgColor.Evaluate(State.Variables);
-			SKColor BgColor = await this.bgColor.Evaluate(State.Variables);
-			ColumnAlignment Alignment = await this.alignment.Evaluate(State.Variables);
-			byte NrDecimals = await this.nrDecimals.Evaluate(State.Variables);
+			SKColor? FgColor = this.fgColor.IsEmpty ? null : (SKColor?)await this.fgColor.Evaluate(State.Variables);
+			SKColor? BgColor = this.bgColor.IsEmpty ? null : (SKColor?)await this.bgColor.Evaluate(State.Variables);
+			ColumnAlignment? Alignment = this.alignment.IsEmpty ? null : (ColumnAlignment?)await this.alignment.Evaluate(State.Variables);
+			byte? NrDecimals = this.nrDecimals.IsEmpty ? null : (byte?)await this.nrDecimals.Evaluate(State.Variables);
 
 			return new Column(ColumnId, Header, DataSourceId, Partition, FgColor, BgColor, Alignment, NrDecimals);
 		}

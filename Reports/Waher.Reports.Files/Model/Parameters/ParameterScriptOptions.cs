@@ -55,8 +55,18 @@ namespace Waher.Reports.Files.Model.Parameters
 				while (e.MoveNext())
 				{
 					object Item = e.Current;
-					s = Item?.ToString() ?? string.Empty;
-					Result.Add(new KeyValuePair<string, string>(s, s));
+
+					if (Item is KeyValuePair<string, object> P)
+						Result.Add(new KeyValuePair<string, string>(P.Key, P.Value?.ToString() ?? string.Empty));
+					else if (Item is KeyValuePair<string, string> P2)
+						Result.Add(P2);
+					else if (Item is KeyValuePair<string, IElement> P3)
+						Result.Add(new KeyValuePair<string, string>(P3.Key, P3.Value.AssociatedObjectValue?.ToString() ?? string.Empty));
+					else
+					{
+						s = Item?.ToString() ?? string.Empty;
+						Result.Add(new KeyValuePair<string, string>(s, s));
+					}
 				}
 			}
 			else

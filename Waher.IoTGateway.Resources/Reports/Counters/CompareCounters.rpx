@@ -152,7 +152,7 @@
 			<CreateTable tableId="Counters" name="Counters">
 				<Column columnId="Counter" alignment="Left" header="Counter"/>
 				<Column columnId="CurrentValue" alignment="Right" header="Current" nrDecimals="0"/>
-				<Column columnId="PreviousValue" alignment="Right" header="Previous" nrDecimals="0" bgColor="#20000000"/>
+				<Column columnId="PreviousValue" alignment="Right" header="Previous" nrDecimals="0" bgColor="00000020"/>
 				<Column columnId="Difference" alignment="Right" header="Difference" nrDecimals="0"/>
 			</CreateTable>
 			<ForEach variable="Counter" set="SortedCounters">

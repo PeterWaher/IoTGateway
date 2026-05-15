@@ -160,7 +160,7 @@
 					<Record>
 						<Element>{s:=Counter.Key}</Element>
 						<Element>{x:=null;Counters.TryGetValue(s,x) ? x : ""}</Element>
-						<Element>{x:=null;Prev.TryGetValue(s,x) ? x : ""}</Element>
+						<Element>{x:=null;PrevCounters.TryGetValue(s,x) ? x : ""}</Element>
 						<Element>{Counter.Value}</Element>
 					</Record>
 				</TableRecords>

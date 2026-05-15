@@ -19,6 +19,7 @@ using Waher.Content.Markdown.Wpf;
 using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Inventory.Loader;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -50,7 +51,7 @@ namespace Waher.Script.Lab
 				typeof(AccessViolationException),
 				typeof(InsufficientMemoryException));
 
-			Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
+			Log.RegisterExceptionToUnnest(typeof(ExternalException));
 			Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
 			Initialize();
@@ -84,6 +85,8 @@ namespace Waher.Script.Lab
 				await databaseProvider.RepairIfInproperShutdown(string.Empty);
 				await databaseProvider.Start();
 				Database.Register(databaseProvider);
+
+				await Types.StartAllModules(10000);
 			}
 			catch (Exception ex)
 			{
@@ -511,6 +514,7 @@ namespace Waher.Script.Lab
 			Registry.SetValue(registryKey, "WindowHeight", (int)this.Height, RegistryValueKind.DWord);
 			Registry.SetValue(registryKey, "WindowState", this.WindowState.ToString(), RegistryValueKind.String);
 
+			await Types.StopAllModules();
 			await Log.TerminateAsync();
 		}
 	}

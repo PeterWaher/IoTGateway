@@ -147,6 +147,9 @@
 		</Folder>
 	</Folder>
 	<Folder name="Reports">
+		<Folder name="Counters">
+			<Content fileName="CompareCounters.rpx"/>
+		</Folder>
 		<Folder name="Files">
 			<Content fileName="CompareFolders.rpx"/>
 		</Folder>

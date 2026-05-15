@@ -1,0 +1,171 @@
+<Report xmlns="http://waher.se/Schema/ReportFile.xsd" originVariable="Origin">
+	<Privilege>Admin.Data.Counters</Privilege>
+	<Title>Compare Counters</Title>
+	<Parameters>
+		<String name="KeyPrefix" label="Counter Key Prefix:" description="Only include counters with keys beginning with this value."
+						required="true" page="Counters"
+						default="{GetUserSetting(Origin,'Reports.Counters.CompareCounters.KeyPrefix','')}" />
+		<String name="Wildcard" label="Wildcard:" description="If a wildcard is usd in the Key Prefix, this value represents the wildcard."
+						required="false" page="Counters"
+						default="{GetUserSetting(Origin,'Reports.Counters.CompareCounters.Wildcard','')}" />
+		<String name="Label" label="Label:" description="Name of label to assign to the current state of the counters."
+						required="false" page="Counters"
+						default="{GetUserSetting(Origin,'Reports.Counters.CompareCounters.Label','')}"/>
+		<String name="CompareAgainst" label="Compare Against:" description="Name of label to compare counters against."
+						required="false" page="Counters" restrictToOptions="true"
+						default="{GetUserSetting(Origin,'Reports.Counters.CompareCounters.CompareAgainst','')}">
+			<ScriptOptions>
+				<![CDATA[
+				Labels:=select 
+					Label 
+				from 
+					"CounterLabels"	
+				order by 
+					Label;
+					
+				if count(Labels)=0 then
+				(
+					create index
+						CounterLabels_Label
+					on
+						CounterLabels
+					(
+						Label
+					)
+				);
+				
+				Labels
+				]]>
+			</ScriptOptions>
+		</String>
+	</Parameters>
+	<Content>
+		<Section header="Input">
+			<Script>
+				<![CDATA[
+				SetUserSetting(Origin,'Reports.Counters.CompareCounters.KeyPrefix',KeyPrefix);
+				SetUserSetting(Origin,'Reports.Counters.CompareCounters.Wildcard',Wildcard);
+				SetUserSetting(Origin,'Reports.Counters.CompareCounters.Label',Label);
+				SetUserSetting(Origin,'Reports.Counters.CompareCounters.CompareAgainst',CompareAgainst);
+				]]>
+			</Script>
+			<CreateTable tableId="Input" name="Input Parameters">
+				<Column columnId="Name" alignment="Left" header="Name"/>
+				<Column columnId="Value" alignment="Left" header="Value"/>
+			</CreateTable>
+			<TableRecords tableId="Input">
+				<Record>
+					<Element>Counter Key Prefix</Element>
+					<Element>{KeyPrefix}</Element>
+				</Record>
+				<Record>
+					<Element>Wildcard</Element>
+					<Element>{Wildcard}</Element>
+				</Record>
+				<Record>
+					<Element>Label</Element>
+					<Element>{Label}</Element>
+				</Record>
+				<Record>
+					<Element>Compare Against</Element>
+					<Element>{CompareAgainst}</Element>
+				</Record>
+			</TableRecords>
+			<TableComplete tableId="Input"/>
+		</Section>
+		<Status>Getting counters...</Status>
+		<Script>
+			<![CDATA[
+			FlushCounters();
+			Counters:=GetCounters(KeyPrefix,"",Wildcard);
+			]]>
+		</Script>
+		<Conditional>
+			<If condition="!empty(Label)">
+				<Status>Saving labelled counters...</Status>
+				<Conditional>
+					<If condition="(select count(*) from 'CounterLabels' where Label=Label)>0">
+						<Message type="Error">Label {Label} already exists. Save not performed.</Message>
+					</If>
+					<Else>
+						<Script>
+							<![CDATA[
+							insert into
+								"CounterLabels" 
+							object
+							{
+								"Label": Label,
+								"Counters": Counters
+							}
+							]]>
+						</Script>
+					</Else>
+				</Conditional>
+			</If>
+		</Conditional>
+		<Conditional>
+			<If condition="!empty(CompareAgainst)">
+				<Status>Comparing against label...</Status>
+				<Script>
+					<![CDATA[
+					PrevCounters:=select 
+						top 1 * 
+					from
+						"CounterLabels" 
+					where
+						Label=CompareAgainst;
+					]]>
+				</Script>
+				<Conditional>
+					<If condition="exists(PrevCounters)">
+						<Script>
+							<![CDATA[
+							Prev:=PrevCounters.Counters;
+							]]>	
+						</Script>
+					</If>
+					<Else>
+						<Message type="Error">Label {CompareAgainst} not found. Comparison not performed.</Message>
+						<Script>
+							<![CDATA[
+							Prev:={};
+							]]>
+						</Script>
+					</Else>
+				</Conditional>
+			</If>
+			<Else>
+				<Script>
+					<![CDATA[
+					Prev:={}
+					]]>
+				</Script>
+			</Else>
+		</Conditional>
+		<Script>
+			<![CDATA[
+			Diff:=Counters-Prev;
+			SortedCounters:=sort([foreach P in Diff:P],(r1,r2)->r1.Key.CompareTo(r2.Key));
+			]]>
+		</Script>
+		<Section header="Counters">
+			<CreateTable tableId="Counters" name="Counters">
+				<Column columnId="Counter" alignment="Left" header="Counter"/>
+				<Column columnId="CurrentValue" alignment="Right" header="Current" nrDecimals="0"/>
+				<Column columnId="PreviousValue" alignment="Right" header="Previous" nrDecimals="0" bgColor="#20000000"/>
+				<Column columnId="Difference" alignment="Right" header="Difference" nrDecimals="0"/>
+			</CreateTable>
+			<ForEach variable="Counter" set="SortedCounters">
+				<TableRecords tableId="Counters">
+					<Record>
+						<Element>{s:=Counter.Key}</Element>
+						<Element>{x:=null;Counters.TryGetValue(s,x) ? x : ""}</Element>
+						<Element>{x:=null;Prev.TryGetValue(s,x) ? x : ""}</Element>
+						<Element>{Counter.Value}</Element>
+					</Record>
+				</TableRecords>
+			</ForEach>
+			<TableComplete tableId="Counters"/>
+		</Section>
+	</Content>
+</Report>

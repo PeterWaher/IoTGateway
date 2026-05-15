@@ -698,6 +698,9 @@
 		<Content Include="Highlight\styles\zenburn.css">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+		<Content Include="Reports\Counters\CompareCounters.rpx">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 		<Content Include="Reports\Files\CompareFolders.rpx">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>

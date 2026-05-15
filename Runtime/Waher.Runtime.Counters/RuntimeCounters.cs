@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
@@ -66,13 +67,16 @@ namespace Waher.Runtime.Counters
 		/// <summary>
 		/// Flushes all cached counters to the database.
 		/// </summary>
-		public static async Task FlushAsync()
+		/// <returns>Number of records flushed.</returns>
+		public static async Task<int> FlushAsync()
 		{
 			CounterRec[] Records = counters.GetValues();
 			counters.Clear();
 
 			foreach (CounterRec Rec in Records)
 				await Rec.Stored.Task;
+
+			return Records.Length;
 		}
 
 		/// <summary>
@@ -217,5 +221,110 @@ namespace Waher.Runtime.Counters
 
 			return Counter.Counter;
 		}
+
+		#region Batch Get
+
+		/// <summary>
+		/// Gets available counters.
+		/// </summary>
+		/// <returns>Counters found.</returns>
+		public static Dictionary<string, long> GetWhere()
+		{
+			return GetWhereAsync().Result;
+		}
+
+		/// <summary>
+		/// Gets available counters.
+		/// </summary>
+		/// <returns>Matching counters found.</returns>
+		public static async Task<Dictionary<string, long>> GetWhereAsync()
+		{
+			IEnumerable<RuntimeCounter> Counters = await Database.Find<RuntimeCounter>();
+			return ConvertToDictionary(Counters);
+		}
+
+		/// <summary>
+		/// Gets available counters, matching a search filter.
+		/// </summary>
+		/// <param name="Filter">Search filter.</param>
+		/// <returns>Matching counters found.</returns>
+		public static Dictionary<string, long> GetWhere(Filter Filter)
+		{
+			return GetWhereAsync(Filter).Result;
+		}
+
+		/// <summary>
+		/// Gets available counters, matching a search filter.
+		/// </summary>
+		/// <param name="Filter">Search filter.</param>
+		/// <returns>Matching counters found.</returns>
+		public static async Task<Dictionary<string, long>> GetWhereAsync(Filter Filter)
+		{
+			IEnumerable<RuntimeCounter> Counters = await Database.Find<RuntimeCounter>(Filter);
+			return ConvertToDictionary(Counters);
+		}
+
+		private static Dictionary<string, long> ConvertToDictionary(IEnumerable<RuntimeCounter> Counters)
+		{ 
+			Dictionary<string, long> Result = new Dictionary<string, long>();
+
+			lock (synchObject)
+			{
+				foreach (RuntimeCounter Counter in Counters)
+				{
+					if (counters.TryGetValue(Counter.Key, out CounterRec Rec))
+						Result[Counter.Key] = Rec.Counter.Counter;
+					else
+						Result[Counter.Key] = Counter.Counter;
+				}
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Gets available counters, matching a search filter.
+		/// </summary>
+		/// <param name="KeyPattern">Return counters whose keys match this regular expression.</param>
+		/// <returns>Matching counters found.</returns>
+		public static Dictionary<string, long> GetWhereKeyLikeRegEx(string KeyPattern)
+		{
+			return GetWhere(new FilterFieldLikeRegEx("Key", KeyPattern));
+		}
+
+		/// <summary>
+		/// Gets available counters, matching a search filter.
+		/// </summary>
+		/// <param name="KeyPattern">Return counters whose keys match this regular expression.</param>
+		/// <returns>Matching counters found.</returns>
+		public static Task<Dictionary<string, long>> GetWhereKeyLikeRegExAsync(string KeyPattern)
+		{
+			return GetWhereAsync(new FilterFieldLikeRegEx("Key", KeyPattern));
+		}
+
+		/// <summary>
+		/// Gets available counters, matching a search filter.
+		/// </summary>
+		/// <param name="Key">Return counters whose keys match this wildcard expression.</param>
+		/// <param name="Wildcard">What wildcard has been used.</param>
+		/// <returns>Matching counters found.</returns>
+		public static Dictionary<string, long> GetWhereKeyLike(string Key, string Wildcard)
+		{
+			return GetWhere(new FilterFieldLikeRegEx("Key", Database.WildcardToRegex(Key, Wildcard)));
+		}
+
+		/// <summary>
+		/// Gets available counters, matching a search filter.
+		/// </summary>
+		/// <param name="Key">Return counters whose keys match this wildcard expression.</param>
+		/// <param name="Wildcard">What wildcard has been used.</param>
+		/// <returns>Matching counters found.</returns>
+		public static Task<Dictionary<string, long>> GetWhereKeyLikeAsync(string Key, string Wildcard)
+		{
+			return GetWhereAsync(new FilterFieldLikeRegEx("Key", Database.WildcardToRegex(Key, Wildcard)));
+		}
+
+		#endregion
+
 	}
 }

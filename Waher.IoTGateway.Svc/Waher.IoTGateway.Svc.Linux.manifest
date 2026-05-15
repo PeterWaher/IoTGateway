@@ -962,6 +962,7 @@
 	</Folder>
 	<Folder name="Reports">
 		<Folder name="Counters">
+			<Content fileName="BillableCounters.rpx"/>
 			<Content fileName="CompareCounters.rpx"/>
 		</Folder>
 		<Folder name="Files">

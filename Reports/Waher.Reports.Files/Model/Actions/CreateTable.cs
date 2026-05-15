@@ -31,7 +31,7 @@ namespace Waher.Reports.Files.Model.Actions
 
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
-				if (N is XmlElement E && E.LocalName == "TableColumn")
+				if (N is XmlElement E && E.LocalName == "Column")
 					TableColumns.Add(new TableColumn(E));
 			}
 

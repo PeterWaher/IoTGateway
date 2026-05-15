@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Reports.Model.Attributes;
+using Waher.Runtime.Collections;
 using Waher.Script;
 
 namespace Waher.Reports.Files.Model.Parameters
@@ -12,8 +13,7 @@ namespace Waher.Reports.Files.Model.Parameters
 	public abstract class ReportParameterWithOptions : ReportParameter
 	{
 		private readonly ReportBooleanAttribute restrictToOptions;
-		private readonly ParameterOption[] options;
-		private readonly int nrOptions;
+		private readonly IParameterOptions[] options;
 
 		/// <summary>
 		/// Represents a parameter with possible options on a command.
@@ -24,19 +24,26 @@ namespace Waher.Reports.Files.Model.Parameters
 		{
 			this.restrictToOptions = new ReportBooleanAttribute(Xml, "restrictToOptions");
 
-			List<ParameterOption> Options2 = new List<ParameterOption>();
+			ChunkedList<IParameterOptions> Options2 = new ChunkedList<IParameterOptions>();
 
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
 				if (!(N is XmlElement E2))
 					continue;
 
-				if (E2.LocalName == "Option")
-					Options2.Add(new ParameterOption(E2));
+				switch (E2.LocalName)
+				{
+					case "Option":
+						Options2.Add(new ParameterOption(E2));
+						break;
+
+					case "ScriptOptions":
+						Options2.Add(new ParameterScriptOptions(E2));
+						break;
+				}
 			}
 
 			this.options = Options2.ToArray();
-			this.nrOptions = this.options.Length;
 		}
 
 		/// <summary>
@@ -47,10 +54,10 @@ namespace Waher.Reports.Files.Model.Parameters
 		public async Task<ReportParameterWithOptionsAttributes> GetReportParameterWithOptionsAttributes(Variables Variables)
 		{
 			ReportParameterAttributes Base = await this.GetReportParameterAttributes(Variables);
-			KeyValuePair<string, string>[] Options = new KeyValuePair<string, string>[this.nrOptions];
+			ChunkedList<KeyValuePair<string, string>> Options = new ChunkedList<KeyValuePair<string, string>>();
 
-			for (int i = 0; i < this.nrOptions; i++)
-				Options[i] = await this.options[i].GetTag(Variables);
+			foreach (IParameterOptions Option in this.options)
+				Options.AddRange(await Option.GetOptions(Variables));
 
 			return new ReportParameterWithOptionsAttributes()
 			{
@@ -60,7 +67,7 @@ namespace Waher.Reports.Files.Model.Parameters
 				Description = Base.Description,
 				Required = Base.Required,
 				RestrictToOptions = await this.restrictToOptions.Evaluate(Variables, false),
-				Options = Options 
+				Options = Options.ToArray()
 			};
 		}
 

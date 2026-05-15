@@ -9,7 +9,7 @@ namespace Waher.Reports.Files.Model.Parameters
 	/// <summary>
 	/// Represents a string-valued option.
 	/// </summary>
-	public class ParameterOption
+	public class ParameterOption : IParameterOptions
 	{
 		private readonly ReportStringAttribute label;
 		private readonly ReportStringAttribute value;
@@ -36,5 +36,19 @@ namespace Waher.Reports.Files.Model.Parameters
 				await this.label.Evaluate(Variables),
 				await this.value.Evaluate(Variables));
 		}
+
+		/// <summary>
+		/// Gets the options for the parameter.
+		/// </summary>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <returns>Array of options.</returns>
+		public async Task<KeyValuePair<string, string>[]> GetOptions(Variables Variables)
+		{
+			return new KeyValuePair<string, string>[]
+			{
+				await this.GetTag(Variables)
+			};
+		}
+
 	}
 }

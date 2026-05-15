@@ -99,6 +99,8 @@ namespace Waher.Reports.Model.Attributes
 
 				if (Result is T TypedResult)
 					return TypedResult;
+				else if (Result is null)
+					return default;
 				else
 				{
 					StringBuilder sb = new StringBuilder();
@@ -106,7 +108,7 @@ namespace Waher.Reports.Model.Attributes
 					sb.Append("Expected a value of type ");
 					sb.Append(typeof(T).FullName);
 					sb.Append(" but got a value of type ");
-					sb.Append(Result.GetType().FullName);
+					sb.Append(Result.GetType().FullName ?? "null");
 					sb.Append('.');
 
 					throw new ScriptRuntimeException(sb.ToString(), this.expression.Root);

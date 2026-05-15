@@ -218,9 +218,10 @@
 	<xs:complexType name="ReportParameterWithOptions" abstract="true">
 		<xs:complexContent>
 			<xs:extension base="ReportParameter">
-				<xs:sequence>
-					<xs:element name="Option" type="ParameterOption" minOccurs="0" maxOccurs="unbounded"/>
-				</xs:sequence>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="Option" type="ParameterOption"/>
+					<xs:element name="ScriptOptions" type="ParameterScriptOptions"/>
+				</xs:choice>
 				<xs:attribute name="restrictToOptions" type="xs:boolean" use="optional" default="false"/>
 			</xs:extension>
 		</xs:complexContent>
@@ -241,6 +242,12 @@
 	<xs:complexType name="ParameterOption">
 		<xs:attribute name="value" type="xs:string" use="required"/>
 		<xs:attribute name="label" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="ParameterScriptOptions">
+		<xs:simpleContent>
+			<xs:extension base="xs:string"/>
+		</xs:simpleContent>
 	</xs:complexType>
 
 	<xs:group name="ReportActions">

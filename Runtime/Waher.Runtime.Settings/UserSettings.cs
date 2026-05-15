@@ -760,9 +760,9 @@ namespace Waher.Runtime.Settings
 
                 if (Setting is ObjectUserSetting ObjectSetting)
                 {
-                    if (((ObjectSetting.Value is null) ^ (Value is null)) || !ObjectSetting.Value.Equals(Value))
-                    {
-                        ObjectSetting.Value = Value;
+					if (!RuntimeSettings.AreEqual(ObjectSetting.Value, Value))
+					{
+						ObjectSetting.Value = Value;
                         await Database.Update(ObjectSetting);
 
                         return true;

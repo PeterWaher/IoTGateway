@@ -717,7 +717,7 @@ namespace Waher.Runtime.Settings
 
 				if (Setting is ObjectSetting ObjectSetting)
 				{
-					if (((ObjectSetting.Value is null) ^ (Value is null)) || !ObjectSetting.Value.Equals(Value))
+					if (!AreEqual(ObjectSetting.Value, Value))
 					{
 						ObjectSetting.Value = Value;
 						await Database.Update(ObjectSetting);
@@ -735,6 +735,16 @@ namespace Waher.Runtime.Settings
 					return true;
 				}
 			}
+		}
+
+		internal static bool AreEqual(object Value1, object Value2)
+		{
+			if (Value1 is null)
+				return Value2 is null;
+			else if (Value2 is null)
+				return false;
+			else
+				return Value1.Equals(Value2);
 		}
 
 		#endregion

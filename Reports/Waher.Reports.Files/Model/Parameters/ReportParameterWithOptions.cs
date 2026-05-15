@@ -59,7 +59,7 @@ namespace Waher.Reports.Files.Model.Parameters
 			foreach (IParameterOptions Option in this.options)
 				Options.AddRange(await Option.GetOptions(Variables));
 
-			return new ReportParameterWithOptionsAttributes()
+				return new ReportParameterWithOptionsAttributes()
 			{
 				Page = Base.Page,
 				Name = Base.Name,

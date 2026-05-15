@@ -1,7 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Events;
 using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
@@ -36,6 +36,7 @@ namespace Waher.Reports.Files.Model.Parameters
 		{
 			ChunkedList<KeyValuePair<string, string>> Result = new ChunkedList<KeyValuePair<string, string>>();
 			object Obj = await this.parsed.EvaluateAsync(Variables);
+			string s;
 
 			if (Obj is IEnumerable<KeyValuePair<string, object>> Options)
 			{
@@ -47,8 +48,22 @@ namespace Waher.Reports.Files.Model.Parameters
 				foreach (KeyValuePair<string, IElement> P in Options2)
 					Result.Add(new KeyValuePair<string, string>(P.Key, P.Value.AssociatedObjectValue?.ToString() ?? string.Empty));
 			}
-			else if (!(Obj is null))
-				Log.Error("Parameter options of incompatible type: " + Obj.GetType().FullName);
+			else if (Obj is IEnumerable Enumerable)
+			{
+				IEnumerator e = Enumerable.GetEnumerator();
+
+				while (e.MoveNext())
+				{
+					object Item = e.Current;
+					s = Item?.ToString() ?? string.Empty;
+					Result.Add(new KeyValuePair<string, string>(s, s));
+				}
+			}
+			else
+			{
+				s = Obj?.ToString() ?? string.Empty;
+				Result.Add(new KeyValuePair<string, string>(s, s));
+			}
 
 			return Result.ToArray();
 		}

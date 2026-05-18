@@ -219,7 +219,8 @@ namespace Waher.Content.Multipart
 
 					sb.Append(Uri.EscapeDataString(Pair.Key));
 					sb.Append('=');
-					sb.Append(Uri.EscapeDataString(Pair.Value));
+					if (!(Pair.Value is null))
+						sb.Append(Uri.EscapeDataString(Pair.Value));
 				}
 
 				if (Encoding is null)

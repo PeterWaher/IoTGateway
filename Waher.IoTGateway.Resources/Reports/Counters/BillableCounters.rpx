@@ -64,7 +64,8 @@
 			Counters:=
 				GetCounters("Broker.Accounts.")+
 				GetCounters("Legal.")+
-				GetCounters("KyC.");
+				GetCounters("KyC.")+
+				GetCounters("RemoteLogin.");
 			]]>
 		</Script>
 		<Conditional>

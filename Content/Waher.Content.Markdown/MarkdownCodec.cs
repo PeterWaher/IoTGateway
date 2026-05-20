@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Json;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 
@@ -10,7 +11,7 @@ namespace Waher.Content.Markdown
 	/// <summary>
 	/// Markdown encoder.
 	/// </summary>
-	public class MarkdownCodec : IContentDecoder, IContentEncoder
+	public class MarkdownCodec : IContentDecoder, IContentEncoder, IJsonEncoder
 	{
 		private static bool allowEncoding = true;
 		private static bool locked = false;
@@ -226,6 +227,39 @@ namespace Waher.Content.Markdown
 					FileExtension = string.Empty;
 					return false;
 			}
+		}
+
+		/// <summary>
+		/// How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+		/// </summary>
+		/// <param name="ObjectType">Type of object to encode.</param>
+		/// <returns>How well objects of the given type are encoded.</returns>
+		public Grade Supports(Type ObjectType)
+		{
+			return ObjectType == typeof(MarkdownDocument) || ObjectType == typeof(MarkdownContent) 
+				? Grade.Excellent : Grade.NotAtAll;
+		}
+
+		/// <summary>
+		/// Encodes the <paramref name="Object"/> to JSON.
+		/// </summary>
+		/// <param name="Object">Object to encode.</param>
+		/// <param name="Indent">Any indentation to apply.</param>
+		/// <param name="Json">JSON output.</param>
+		public void Encode(object Object, int? Indent, StringBuilder Json)
+		{
+			string s;
+
+			if (Object is MarkdownDocument MarkdownDocument)
+				s = MarkdownDocument.GenerateMarkdown(false).Result;
+			else if (Object is MarkdownContent MarkdownContent)
+				s = MarkdownContent.Markdown;
+			else
+				s = string.Empty;
+
+			Json.Append('"');
+			Json.Append(JSON.Encode(s));
+			Json.Append('"');
 		}
 
 	}

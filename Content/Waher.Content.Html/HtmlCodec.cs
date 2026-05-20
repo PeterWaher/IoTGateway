@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Json;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 
@@ -10,7 +11,7 @@ namespace Waher.Content.Html
 	/// <summary>
 	/// HTML encoder/decoder.
 	/// </summary>
-	public class HtmlCodec : IContentDecoder, IContentEncoder
+	public class HtmlCodec : IContentDecoder, IContentEncoder, IJsonEncoder
 	{
 		/// <summary>
 		/// HTML encoder/decoder.
@@ -202,5 +203,29 @@ namespace Waher.Content.Html
 
 			return Task.FromResult(new ContentResponse(ContentType, Object, Bin));
 		}
+
+		/// <summary>
+		/// How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+		/// </summary>
+		/// <param name="ObjectType">Type of object to encode.</param>
+		/// <returns>How well objects of the given type are encoded.</returns>
+		public Grade Supports(Type ObjectType)
+		{
+			return ObjectType == typeof(HtmlDocument) ? Grade.Excellent : Grade.NotAtAll;
+		}
+
+		/// <summary>
+		/// Encodes the <paramref name="Object"/> to JSON.
+		/// </summary>
+		/// <param name="Object">Object to encode.</param>
+		/// <param name="Indent">Any indentation to apply.</param>
+		/// <param name="Json">JSON output.</param>
+		public void Encode(object Object, int? Indent, StringBuilder Json)
+		{
+			Json.Append('"');
+			Json.Append(JSON.Encode(((HtmlDocument)Object).HtmlText));
+			Json.Append('"');
+		}
+
 	}
 }

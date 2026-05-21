@@ -100,16 +100,26 @@ namespace Waher.IoTGateway.CodeContent
 			else
 				Title = null;
 
+			SessionVariables SessionVariables = HttpServer.CreateSessionVariables();
 			AsyncState State = new AsyncState()
 			{
 				Id = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Renderer.Output, Title, Document),
 				Script = this.BuildExpression(Rows),
-				Variables = HttpServer.CreateSessionVariables(),
+				Variables = SessionVariables,
 				ImplicitPrint = new StringBuilder()
 			};
 
 			State.Variables.ConsoleOut = new StringWriter(State.ImplicitPrint);
 			Document.Settings.Variables?.CopyTo(State.Variables);
+
+			if (Document.Settings.Variables is SessionVariables CurrentSessionVariables)
+			{
+				SessionVariables.LastPost = CurrentSessionVariables.LastPost;
+				SessionVariables.CurrentRequest = CurrentSessionVariables.CurrentRequest;
+				SessionVariables.CurrentResponse = CurrentSessionVariables.CurrentResponse;
+				SessionVariables.CurrentPageVariables = CurrentSessionVariables.CurrentPageVariables;
+				SessionVariables.CurrentPageUrl = CurrentSessionVariables.CurrentPageUrl;
+			}
 
 			Document.QueueAsyncTask(this.ExecuteScript, State);
 

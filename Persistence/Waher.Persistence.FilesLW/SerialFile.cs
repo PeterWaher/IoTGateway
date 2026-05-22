@@ -364,6 +364,14 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Clears (empties) the file.
+		/// </summary>
+		public Task Clear()
+		{
+			return this.Truncate(0);
+		}
+
+		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		public virtual void Dispose()

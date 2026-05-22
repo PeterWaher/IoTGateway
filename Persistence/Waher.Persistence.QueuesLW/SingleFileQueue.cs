@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
@@ -14,6 +15,7 @@ namespace Waher.Persistence.Queues
 	/// </summary>
 	public class SingleFileQueue : IDisposable
 	{
+		private readonly LinkedList<TaskCompletionSource<object>> waiting = new LinkedList<TaskCompletionSource<object>>();
 		private readonly ISerializerContext context;
 		private readonly string fileName;
 		private readonly int maxFileSize;
@@ -125,6 +127,11 @@ namespace Waher.Persistence.Queues
 				this.disposed = true;
 				this.file.Dispose();
 				this.semaphore.Dispose();
+
+				foreach (TaskCompletionSource<object> T in this.waiting)
+					T.TrySetResult(null);
+
+				this.waiting.Clear();
 			}
 		}
 
@@ -160,7 +167,24 @@ namespace Waher.Persistence.Queues
 			await this.semaphore.WaitAsync();
 			try
 			{
-				await this.file.WriteBlock(Payload);
+				bool Forwarded;
+
+				do
+				{
+					LinkedListNode<TaskCompletionSource<object>> First = this.waiting.First;
+
+					if (First is null)
+					{
+						await this.file.WriteBlock(Payload);
+						Forwarded = true;
+					}
+					else
+					{
+						this.waiting.RemoveFirst();
+						Forwarded = First.Value.TrySetResult(Item);
+					}
+				}
+				while (!Forwarded);
 			}
 			finally
 			{
@@ -169,37 +193,92 @@ namespace Waher.Persistence.Queues
 		}
 
 		/// <summary>
-		/// Tries to dequeue an item from the queue. If the queue is empty, null is 
-		/// returned. If all items have been dequeued, the file is cleared, to conserve
-		/// disk space.
+		/// Dequeue an item from the queue. The task will wait for an item to be dequeued,
+		/// or, if the queue is empty, for an item to be enqueued. If all items have been 
+		/// dequeued, the file is cleared, to conserve disk space.
 		/// </summary>
-		/// <returns>Item if found, null otherwise.</returns>
+		/// <returns>Dequeued item.</returns>
 		/// <exception cref="InvalidOperationException">If file has been corrupted.</exception>
-		public async Task<object> TryDequeue()
+		public Task<object> Dequeue()
 		{
+			return this.Dequeue(int.MaxValue);
+		}
+
+		/// <summary>
+		/// Dequeue an item from the queue. The task will wait for an item to be dequeued,
+		/// or, if the queue is empty, for an item to be enqueued. If an item is not 
+		/// available before the timeout occurs, null is returned. If all items have been 
+		/// dequeued, the file is cleared, to conserve disk space.
+		/// </summary>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+		/// <returns>Dequeued item, or null if no item available within the allotted time.</returns>
+		/// <exception cref="InvalidOperationException">If file has been corrupted.</exception>
+		public async Task<object> Dequeue(int TimeoutMilliseconds)
+		{
+			if (TimeoutMilliseconds < 0)
+				throw new ArgumentOutOfRangeException(nameof(TimeoutMilliseconds), "Value must be non-negative.");
+
 			byte[] Payload;
+			bool Released = false;
 
 			await this.semaphore.WaitAsync();
 			try
 			{
 				if (this.filePosition >= this.fileSize)
-					return null;
-
-				KeyValuePair<byte[], long> Block = await this.file.ReadBlock(this.filePosition);
-				Payload = Block.Key;
-				this.filePosition = Block.Value;
-
-				if (this.filePosition >= this.fileSize)
 				{
-					await this.file.Clear();
+					if (TimeoutMilliseconds == 0)
+						return null;
 
-					this.filePosition = 0;
-					this.fileSize = 0;
+					TaskCompletionSource<object> Waiter = new TaskCompletionSource<object>();
+					LinkedListNode<TaskCompletionSource<object>> Node = this.waiting.AddLast(Waiter);
+
+					this.semaphore.Release();
+					Released = true;
+
+					_ = Task.Delay(TimeoutMilliseconds).ContinueWith(async (_) =>
+					{
+						try
+						{
+							Waiter.TrySetResult(null);
+
+							await this.semaphore.WaitAsync();
+							try
+							{
+								if (!(Node.List is null))
+									this.waiting.Remove(Node);
+							}
+							finally
+							{
+								this.semaphore.Release();
+							}
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
+					});
+
+					return await Waiter.Task;
+				}
+				else
+				{
+					KeyValuePair<byte[], long> Block = await this.file.ReadBlock(this.filePosition);
+					Payload = Block.Key;
+					this.filePosition = Block.Value;
+
+					if (this.filePosition >= this.fileSize)
+					{
+						await this.file.Clear();
+
+						this.filePosition = 0;
+						this.fileSize = 0;
+					}
 				}
 			}
 			finally
 			{
-				this.semaphore.Release();
+				if (!Released)
+					this.semaphore.Release();
 			}
 
 			if (Payload.Length < 16)

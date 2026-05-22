@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,10 +14,10 @@ namespace Waher.Persistence.Queues
 	/// <summary>
 	/// Queue persisted into a single file.
 	/// </summary>
-	public class SingleFileQueue : IDisposable
+	public partial class SingleFileQueue : IDisposable
 	{
 		private readonly LinkedList<TaskCompletionSource<object>> waiting = new LinkedList<TaskCompletionSource<object>>();
-		private readonly ISerializerContext context;
+		private readonly SerializerCollection serializers;
 		private readonly string fileName;
 		private readonly int maxFileSize;
 		private readonly SerialFile file;
@@ -25,26 +26,48 @@ namespace Waher.Persistence.Queues
 		private long filePosition;
 		private bool disposed = false;
 
-		private SingleFileQueue(string FileName, int MaxFileSize,
-			ISerializerContext Context, SerialFile File, long FileSize)
+		private SingleFileQueue(string FileName, int MaxFileSize, SerialFile File,
+			long FileSize, SerializerCollection Serializers)
 		{
 			this.fileName = FileName;
 			this.maxFileSize = MaxFileSize;
-			this.context = Context;
+			this.serializers = Serializers;
 			this.file = File;
 			this.fileSize = FileSize;
 			this.filePosition = 0;
 			this.semaphore = new SemaphoreSlim(1);
 		}
 
+		private SingleFileQueue(string FileName, int MaxFileSize, SerialFile File,
+#if COMPILED
+			long FileSize, ISerializerContext SerializerContext, bool Compiled)
+#else
+			long FileSize, ISerializerContext SerializerContext)
+#endif
+		{
+			this.fileName = FileName;
+			this.maxFileSize = MaxFileSize;
+			this.file = File;
+			this.fileSize = FileSize;
+			this.filePosition = 0;
+			this.semaphore = new SemaphoreSlim(1);
+
+#if COMPILED
+			this.serializers = new SerializerCollection(SerializerContext, Compiled);
+#else
+			this.serializers = new SerializerCollection(SerializerContext);
+#endif
+		}
+
 		/// <summary>
 		/// Queue persisted into a single file.
 		/// </summary>
 		/// <param name="FileName">File name.</param>
-		/// <param name="Context">Serialization context.</param>
-		public static Task<SingleFileQueue> Create(string FileName, ISerializerContext Context)
+		/// <param name="Serializers">Collection of serializers.</param>
+		public static Task<SingleFileQueue> Create(string FileName, 
+			SerializerCollection Serializers)
 		{
-			return Create(FileName, false, int.MaxValue, Context, (GetKeysMethod)null);
+			return Create(FileName, false, int.MaxValue, Serializers, (GetKeysMethod)null);
 		}
 
 		/// <summary>
@@ -52,12 +75,12 @@ namespace Waher.Persistence.Queues
 		/// </summary>
 		/// <param name="FileName">File name.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
-		/// <param name="Context">Serialization context.</param>
+		/// <param name="Serializers">Collection of serializers.</param>
 		/// <param name="GetKeys">Method that provides encryption keys.</param>
-		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted, ISerializerContext Context,
-			GetKeysMethod GetKeys)
+		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+			SerializerCollection Serializers, GetKeysMethod GetKeys)
 		{
-			return Create(FileName, Encrypted, int.MaxValue, Context, GetKeys);
+			return Create(FileName, Encrypted, int.MaxValue, Serializers, GetKeys);
 		}
 
 		/// <summary>
@@ -66,15 +89,15 @@ namespace Waher.Persistence.Queues
 		/// <param name="FileName">File name.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
-		/// <param name="Context">Serialization context.</param>
+		/// <param name="Serializers">Collection of serializers.</param>
 		/// <param name="GetKeys">Method that provides encryption keys.</param>
-		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted, int MaxFileSize,
-			ISerializerContext Context, GetKeysMethod GetKeys)
+		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+			int MaxFileSize, SerializerCollection Serializers, GetKeysMethod GetKeys)
 		{
 			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, GetKeys);
 			long FileSize = await File.GetLength();
 
-			return new SingleFileQueue(FileName, MaxFileSize, Context, File, FileSize);
+			return new SingleFileQueue(FileName, MaxFileSize, File, FileSize, Serializers);
 		}
 
 		/// <summary>
@@ -82,12 +105,11 @@ namespace Waher.Persistence.Queues
 		/// </summary>
 		/// <param name="FileName">File name.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
-		/// <param name="Context">Serialization context.</param>
 		/// <param name="Provider">Files database provider.</param>
-		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted, ISerializerContext Context,
+		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted,
 			FilesProvider Provider)
 		{
-			return Create(FileName, Encrypted, int.MaxValue, Context, Provider);
+			return Create(FileName, Encrypted, int.MaxValue, Provider);
 		}
 
 		/// <summary>
@@ -96,15 +118,33 @@ namespace Waher.Persistence.Queues
 		/// <param name="FileName">File name.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
-		/// <param name="Context">Serialization context.</param>
 		/// <param name="Provider">Files database provider.</param>
-		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted, int MaxFileSize,
-			ISerializerContext Context, FilesProvider Provider)
+		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+			int MaxFileSize, FilesProvider Provider)
 		{
 			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, Provider);
 			long FileSize = await File.GetLength();
 
-			return new SingleFileQueue(FileName, MaxFileSize, Context, File, FileSize);
+#if COMPILED
+			return new SingleFileQueue(FileName, MaxFileSize, File, FileSize, Provider, Provider.Compiled);
+#else
+			return new SingleFileQueue(FileName, MaxFileSize, File, FileSize, Provider);
+#endif
+		}
+
+		/// <summary>
+		/// Queue persisted into a single file.
+		/// </summary>
+		/// <param name="FileName">File name.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="Serializers">Collection of serializers.</param>
+		/// <param name="Provider">Files database provider, used for encryption only.</param>
+		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+			int MaxFileSize, SerializerCollection Serializers, FilesProvider Provider)
+		{
+			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, Provider);
+			return new SingleFileQueue(FileName, MaxFileSize, File, MaxFileSize, Serializers); 
 		}
 
 		/// <summary>
@@ -145,7 +185,7 @@ namespace Waher.Persistence.Queues
 				throw new ArgumentNullException(nameof(Item));
 
 			Type T = Item.GetType();
-			IObjectSerializer Serializer = await this.context.GetObjectSerializer(T);
+			IObjectSerializer Serializer = await this.serializers.GetObjectSerializer(T);
 			BinarySerializer Writer = new BinarySerializer(string.Empty, Encoding.UTF8);
 
 			await Serializer.Serialize(Writer, true, false, Item, null);
@@ -300,7 +340,7 @@ namespace Waher.Persistence.Queues
 			Type T = Types.GetType(TypeName)
 				?? throw new InvalidOperationException("Type not found: " + TypeName);
 
-			IObjectSerializer Serializer = await this.context.GetObjectSerializer(T);
+			IObjectSerializer Serializer = await this.serializers.GetObjectSerializer(T);
 			BinaryDeserializer Reader = new BinaryDeserializer(string.Empty, Encoding.UTF8, ItemBinary, 0);
 
 			object Item = await Serializer.Deserialize(Reader, null, false);

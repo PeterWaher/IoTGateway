@@ -18,6 +18,12 @@ namespace Waher.Persistence.QueuesLW.Test.Classes
 		{
 		}
 
+		public Simple(int Counter, string Message)
+		{
+			this.Counter = Counter;
+			this.Message = Message;
+		}
+
 		public override string ToString()
 		{
 			return this.Counter.ToString() + ": " + this.Message;

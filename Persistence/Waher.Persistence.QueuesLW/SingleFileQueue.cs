@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -64,7 +63,7 @@ namespace Waher.Persistence.Queues
 		/// </summary>
 		/// <param name="FileName">File name.</param>
 		/// <param name="Serializers">Collection of serializers.</param>
-		public static Task<SingleFileQueue> Create(string FileName, 
+		public static Task<SingleFileQueue> Create(string FileName,
 			SerializerCollection Serializers)
 		{
 			return Create(FileName, false, int.MaxValue, Serializers, (GetKeysMethod)null);
@@ -145,8 +144,8 @@ namespace Waher.Persistence.Queues
 		{
 			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, Provider);
 			long FileSize = await File.GetLength();
-		
-			return new SingleFileQueue(FileName, MaxFileSize, File, FileSize, Serializers); 
+
+			return new SingleFileQueue(FileName, MaxFileSize, File, FileSize, Serializers);
 		}
 
 		/// <summary>
@@ -158,6 +157,23 @@ namespace Waher.Persistence.Queues
 		/// Maximum file size, in bytes.
 		/// </summary>
 		public int MaxFileSize => this.maxFileSize;
+
+		/// <summary>
+		/// Gets the current reading position in the file, and file size.
+		/// </summary>
+		/// <returns>File position and file size.</returns>
+		public async Task<KeyValuePair<long, long>> GetFileState()
+		{
+			await this.semaphore.WaitAsync();
+			try
+			{
+				return new KeyValuePair<long, long>(this.filePosition, this.fileSize);
+			}
+			finally
+			{
+				this.semaphore.Release();
+			}
+		}
 
 		/// <summary>
 		/// Disposes the connection

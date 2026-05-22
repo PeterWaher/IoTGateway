@@ -8,6 +8,8 @@ using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using Waher.Script;
+using System.Collections.Generic;
+
 
 #if !LW
 using Waher.Persistence.Queues.Test.Classes;
@@ -62,6 +64,10 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestCleanup]
 		public async Task TestCleanup()
 		{
+			KeyValuePair<long, long> P = await this.queue.GetFileState();
+			long FilePosition = P.Key;
+			long FileSize = P.Value;
+
 			if (this.provider is not null)
 			{
 				await this.provider.DisposeAsync();
@@ -70,6 +76,9 @@ namespace Waher.Persistence.QueuesLW.Test
 				this.queue.Dispose();
 				this.queue = null;
 			}
+
+			Assert.AreEqual(0L, FilePosition);
+			Assert.AreEqual(0L, FileSize);
 		}
 
 		internal static void DeleteFiles()

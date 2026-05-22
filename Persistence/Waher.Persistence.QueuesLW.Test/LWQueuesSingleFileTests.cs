@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Persistence.Files;
@@ -71,8 +72,52 @@ namespace Waher.Persistence.Queues.Test
 		}
 
 		[TestMethod]
-		public void Test_01_EnqueueDequeue()
+		public async Task Test_01_EnqueueDequeue()
 		{
+			await this.queue.Enqueue(1);
+			Assert.AreEqual(1, await this.queue.Dequeue());
 		}
+
+		[TestMethod]
+		public async Task Test_02_EnqueueDequeue_Multiple()
+		{
+			int i;
+
+			for (i = 0; i < 10; i++)
+				await this.queue.Enqueue(i);
+
+			for (i = 0; i < 10; i++)
+				Assert.AreEqual(i, await this.queue.Dequeue());
+		}
+
+		[TestMethod]
+		public async Task Test_03_DequeueEnqueue()
+		{
+			_ = Task.Run(async () =>
+			{
+				await Task.Delay(1000);
+				await this.queue.Enqueue(1);
+			}, CancellationToken.None);
+
+			Assert.AreEqual(1, await this.queue.Dequeue());
+		}
+
+		[TestMethod]
+		public async Task Test_04_DequeueEnqueue_Multiple()
+		{
+			_ = Task.Run(async () =>
+			{
+				for (int i = 0; i < 10; i++)
+				{
+					await Task.Delay(100);
+					await this.queue.Enqueue(i);
+				}
+			}, CancellationToken.None);
+
+			for (int i = 0; i < 10; i++)
+				Assert.AreEqual(i, await this.queue.Dequeue());
+		}
+
+		// TODO: Wait while engueueing if max file size is reached.
 	}
 }

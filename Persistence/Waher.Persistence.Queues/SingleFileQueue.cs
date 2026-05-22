@@ -144,7 +144,9 @@ namespace Waher.Persistence.Queues
 			int MaxFileSize, SerializerCollection Serializers, FilesProvider Provider)
 		{
 			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, Provider);
-			return new SingleFileQueue(FileName, MaxFileSize, File, MaxFileSize, Serializers); 
+			long FileSize = await File.GetLength();
+		
+			return new SingleFileQueue(FileName, MaxFileSize, File, FileSize, Serializers); 
 		}
 
 		/// <summary>
@@ -192,17 +194,17 @@ namespace Waher.Persistence.Queues
 
 			byte[] TypeBinary = Encoding.UTF8.GetBytes(T.FullName);
 			byte[] ItemBinary = Writer.GetSerialization();
-			long TypeLen = TypeBinary.Length;
-			long ItemLen = ItemBinary.Length;
-			long c = (TypeLen + ItemLen + 16) & ~15;
+			int TypeLen = TypeBinary.Length;
+			int ItemLen = ItemBinary.Length;
+			int c = TypeLen + ItemLen;
 
-			byte[] Payload = new byte[16 + c];
+			byte[] Payload = new byte[8 + c];
 
-			Buffer.BlockCopy(BitConverter.GetBytes(TypeLen), 0, Payload, 0, 8);
-			Buffer.BlockCopy(BitConverter.GetBytes(ItemLen), 0, Payload, 8, 8);
+			Buffer.BlockCopy(BitConverter.GetBytes(TypeLen), 0, Payload, 0, 4);
+			Buffer.BlockCopy(BitConverter.GetBytes(ItemLen), 0, Payload, 4, 4);
 
-			Buffer.BlockCopy(TypeBinary, 0, Payload, 16, (int)TypeLen);                 // TODO: 64-bit
-			Buffer.BlockCopy(ItemBinary, 0, Payload, 16 + (int)TypeLen, (int)ItemLen);  // TODO: 64-bit
+			Buffer.BlockCopy(TypeBinary, 0, Payload, 8, TypeLen);
+			Buffer.BlockCopy(ItemBinary, 0, Payload, 8 + TypeLen, ItemLen);
 
 			await this.semaphore.WaitAsync();
 			try
@@ -215,7 +217,7 @@ namespace Waher.Persistence.Queues
 
 					if (First is null)
 					{
-						await this.file.WriteBlock(Payload);
+						this.fileSize = await this.file.WriteBlock(Payload);
 						Forwarded = true;
 					}
 					else
@@ -321,20 +323,20 @@ namespace Waher.Persistence.Queues
 					this.semaphore.Release();
 			}
 
-			if (Payload.Length < 16)
+			if (Payload.Length < 8)
 				throw new InvalidOperationException("Block has been corrupted.");
 
-			long TypeLen = BitConverter.ToInt64(Payload, 0);
-			long ItemLen = BitConverter.ToInt64(Payload, 8);
+			int TypeLen = BitConverter.ToInt32(Payload, 0);
+			int ItemLen = BitConverter.ToInt32(Payload, 4);
 
-			if (16 + TypeLen + ItemLen > Payload.Length)
+			if (8 + TypeLen + ItemLen > Payload.Length)
 				throw new InvalidOperationException("Block has been corrupted.");
 
 			byte[] TypeBinary = new byte[TypeLen];
 			byte[] ItemBinary = new byte[ItemLen];
 
-			Buffer.BlockCopy(Payload, 16, TypeBinary, 0, (int)TypeLen);                 // TODO: 64-bit
-			Buffer.BlockCopy(Payload, 16 + (int)TypeLen, ItemBinary, 0, (int)ItemLen);  // TODO: 64-bit
+			Buffer.BlockCopy(Payload, 8, TypeBinary, 0, TypeLen);
+			Buffer.BlockCopy(Payload, 8 + TypeLen, ItemBinary, 0, ItemLen);
 
 			string TypeName = Encoding.UTF8.GetString(TypeBinary);
 			Type T = Types.GetType(TypeName)

@@ -244,7 +244,7 @@ namespace Waher.Persistence.Files
 		/// Writes a binary block to the end of the file.
 		/// </summary>
 		/// <param name="Data">Binary data to write.</param>
-		/// <returns>Position of data block.</returns>
+		/// <returns>Position after data block.</returns>
 		public async Task<long> WriteBlock(byte[] Data)
 		{
 			await this.fileAccess.BeginWrite();
@@ -262,7 +262,7 @@ namespace Waher.Persistence.Files
 		/// Writes a binary block to the end of the file.
 		/// </summary>
 		/// <param name="Data">Binary data to write.</param>
-		/// <returns>Position of data block.</returns>
+		/// <returns>Position after data block.</returns>
 		protected async Task<long> WriteBlockLocked(byte[] Data)
 		{
 			int c = 0;
@@ -325,7 +325,7 @@ namespace Waher.Persistence.Files
 				this.file.Flush();
 			}
 
-			return Position;
+			return Position + Block.Length;
 		}
 
 		private byte[] GetIV(long Position)

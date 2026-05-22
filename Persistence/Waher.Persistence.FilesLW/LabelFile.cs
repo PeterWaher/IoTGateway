@@ -39,7 +39,7 @@ namespace Waher.Persistence.Files
 		/// Writes a label to the end of the file.
 		/// </summary>
 		/// <param name="Label">New label to save to the file.</param>
-		/// <returns>Position of label.</returns>
+		/// <returns>Position after label.</returns>
 		public Task<long> WriteLabel(string Label)
 		{
 			return this.WriteBlock(Encoding.UTF8.GetBytes(Label));
@@ -49,7 +49,7 @@ namespace Waher.Persistence.Files
 		/// Writes a label to the end of the file.
 		/// </summary>
 		/// <param name="Label">New label to save to the file.</param>
-		/// <returns>Position of label.</returns>
+		/// <returns>Position after label.</returns>
 		protected Task<long> WriteLabelLocked(string Label)
 		{
 			return this.WriteBlockLocked(Encoding.UTF8.GetBytes(Label));

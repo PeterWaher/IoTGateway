@@ -9,6 +9,8 @@ using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using System.Collections.Generic;
+using System;
+
 
 
 #if !LW
@@ -135,7 +137,54 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_05_EnqueueDequeue_ReferenceTypes()
+		public async Task Test_05_DequeueEnqueue_RandomMultiple_ValueTypes()
+		{
+			Random Rnd = new();
+			TaskCompletionSource<bool> EnqueueDone = new TaskCompletionSource<bool>();
+			TaskCompletionSource<bool> DequeueDone = new TaskCompletionSource<bool>();
+
+			_ = Task.Run(async () =>
+			{
+				try
+				{
+					for (int i = 0; i < 100; i++)
+					{
+						await Task.Delay(Rnd.Next(50, 150), CancellationToken.None);
+						await this.queue.Enqueue(i);
+					}
+
+					EnqueueDone.TrySetResult(true);
+				}
+				catch (Exception ex)
+				{
+					EnqueueDone.TrySetException(ex);
+				}
+			}, CancellationToken.None);
+
+			_ = Task.Run(async () =>
+			{
+				try
+				{
+					for (int i = 0; i < 100; i++)
+					{
+						await Task.Delay(Rnd.Next(50, 150), CancellationToken.None);
+						Assert.AreEqual(i, await this.queue.Dequeue(10000));
+					}
+
+					DequeueDone.TrySetResult(true);
+				}
+				catch (Exception ex)
+				{
+					DequeueDone.TrySetException(ex);
+				}
+			}, CancellationToken.None);
+
+			await EnqueueDone.Task;
+			await DequeueDone.Task;
+		}
+
+		[TestMethod]
+		public async Task Test_06_EnqueueDequeue_ReferenceTypes()
 		{
 			await this.queue.Enqueue(new Simple(1, "Object 1"));
 			Simple Item = await this.queue.Dequeue(10000) as Simple;
@@ -145,7 +194,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_06_EnqueueDequeue_Multiple_ReferenceTypes()
+		public async Task Test_07_EnqueueDequeue_Multiple_ReferenceTypes()
 		{
 			int i;
 
@@ -162,7 +211,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_07_DequeueEnqueue_ReferenceTypes()
+		public async Task Test_08_DequeueEnqueue_ReferenceTypes()
 		{
 			_ = Task.Run(async () =>
 			{
@@ -177,7 +226,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_08_DequeueEnqueue_Multiple_ReferenceTypes()
+		public async Task Test_09_DequeueEnqueue_Multiple_ReferenceTypes()
 		{
 			_ = Task.Run(async () =>
 			{
@@ -197,7 +246,58 @@ namespace Waher.Persistence.QueuesLW.Test
 			}
 		}
 
+		[TestMethod]
+		public async Task Test_10_DequeueEnqueue_RandomMultiple_ReferenceTypes()
+		{
+			Random Rnd = new();
+			TaskCompletionSource<bool> EnqueueDone = new TaskCompletionSource<bool>();
+			TaskCompletionSource<bool> DequeueDone = new TaskCompletionSource<bool>();
+
+			_ = Task.Run(async () =>
+			{
+				try
+				{
+					for (int i = 0; i < 100; i++)
+					{
+						await Task.Delay(Rnd.Next(50, 150), CancellationToken.None);
+						await this.queue.Enqueue(new Simple(i, "Object " + i));
+					}
+
+					EnqueueDone.TrySetResult(true);
+				}
+				catch (Exception ex)
+				{
+					EnqueueDone.TrySetException(ex);
+				}
+			}, CancellationToken.None);
+
+			_ = Task.Run(async () =>
+			{
+				try
+				{
+					for (int i = 0; i < 100; i++)
+					{
+						await Task.Delay(Rnd.Next(50, 150), CancellationToken.None);
+						Simple Item = await this.queue.Dequeue(10000) as Simple;
+						Assert.IsNotNull(Item);
+						Assert.AreEqual(i, Item.Counter);
+						Assert.AreEqual("Object " + i, Item.Message);
+					}
+
+					DequeueDone.TrySetResult(true);
+				}
+				catch (Exception ex)
+				{
+					DequeueDone.TrySetException(ex);
+				}
+			}, CancellationToken.None);
+
+			await EnqueueDone.Task;
+			await DequeueDone.Task;
+		}
+
 		// TODO: Wait while enqueueing if max file size is reached.
 		// TODO: Test Timeout
+		// TODO: Test Threshold mode: Ignore, Wait, Exception, Clear, NewFile
 	}
 }

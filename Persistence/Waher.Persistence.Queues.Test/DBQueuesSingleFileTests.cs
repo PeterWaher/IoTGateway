@@ -28,7 +28,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		internal const string Folder = "Data";
 		internal const string CollectionName = "Default";
 		internal const string QueueFileName = "Data\\Test.queue";
-		internal const int MaxFileSize = 10240;
+		internal const int MaxFileSize = 20480;
 
 		private FilesProvider provider;
 		private SingleFileQueue queue;
@@ -96,7 +96,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_01_EnqueueDequeue_ValueTypes()
 		{
-			await this.InitQueue(QueueThresholdMode.Ignore);
+			await this.InitQueue(QueueThresholdMode.Exception);
 
 			Assert.IsTrue(await this.queue.Enqueue(1));
 			Assert.AreEqual(1, await this.queue.Dequeue(10000));
@@ -107,7 +107,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		{
 			int i;
 
-			await this.InitQueue(QueueThresholdMode.Ignore);
+			await this.InitQueue(QueueThresholdMode.Exception);
 
 			for (i = 0; i < 10; i++)
 				Assert.IsTrue(await this.queue.Enqueue(i));
@@ -119,7 +119,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_03_DequeueEnqueue_ValueTypes()
 		{
-			await this.InitQueue(QueueThresholdMode.Ignore);
+			await this.InitQueue(QueueThresholdMode.Exception);
 
 			_ = Task.Run(async () =>
 			{
@@ -133,7 +133,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_04_DequeueEnqueue_Multiple_ValueTypes()
 		{
-			await this.InitQueue(QueueThresholdMode.Ignore);
+			await this.InitQueue(QueueThresholdMode.Exception);
 
 			_ = Task.Run(async () =>
 			{
@@ -151,7 +151,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_05_DequeueEnqueue_RandomMultiple_ValueTypes()
 		{
-			await this.InitQueue(QueueThresholdMode.Ignore);
+			await this.InitQueue(QueueThresholdMode.Exception);
 
 			Random Rnd = new();
 			TaskCompletionSource<bool> EnqueueDone = new TaskCompletionSource<bool>();
@@ -200,7 +200,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_06_EnqueueDequeue_ReferenceTypes()
 		{
-			await this.InitQueue(QueueThresholdMode.Ignore);
+			await this.InitQueue(QueueThresholdMode.Exception);
 
 			Assert.IsTrue(await this.queue.Enqueue(new Simple(1, "Object 1")));
 			Simple Item = await this.queue.Dequeue(10000) as Simple;
@@ -212,7 +212,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_07_EnqueueDequeue_Multiple_ReferenceTypes()
 		{
-			await this.InitQueue(QueueThresholdMode.Ignore);
+			await this.InitQueue(QueueThresholdMode.Exception);
 
 			int i;
 
@@ -231,7 +231,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_08_DequeueEnqueue_ReferenceTypes()
 		{
-			await this.InitQueue(QueueThresholdMode.Ignore);
+			await this.InitQueue(QueueThresholdMode.Exception);
 
 			_ = Task.Run(async () =>
 			{
@@ -248,7 +248,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_09_DequeueEnqueue_Multiple_ReferenceTypes()
 		{
-			await this.InitQueue(QueueThresholdMode.Ignore);
+			await this.InitQueue(QueueThresholdMode.Exception);
 
 			_ = Task.Run(async () =>
 			{
@@ -271,7 +271,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_10_DequeueEnqueue_RandomMultiple_ReferenceTypes()
 		{
-			await this.InitQueue(QueueThresholdMode.Ignore);
+			await this.InitQueue(QueueThresholdMode.Exception);
 
 			Random Rnd = new();
 			TaskCompletionSource<bool> EnqueueDone = new TaskCompletionSource<bool>();
@@ -367,7 +367,8 @@ namespace Waher.Persistence.QueuesLW.Test
 
 			Assert.AreEqual(1000, i);
 
-			int j = 1000 / (this.queue.MaxFileSize / 64) * 160;
+			int MaxBlocks = this.queue.MaxFileSize / 64;
+			int j = 1000 / MaxBlocks * MaxBlocks;
 
 			while (j <= i)
 				Assert.AreEqual(j++, await this.queue.Dequeue(10000));
@@ -376,11 +377,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_14_Timeout()
 		{
-			await this.InitQueue(QueueThresholdMode.Ignore);
+			await this.InitQueue(QueueThresholdMode.Exception);
 
 			Assert.IsNull(await this.queue.Dequeue(2000));
 		}
 
 		// TODO: Test Threshold mode: Wait, NewFile
+		// TODO: Test Close & Resume (half dequeued before close, other half after resume).
 	}
 }

@@ -70,7 +70,7 @@ namespace Waher.Persistence.FilesLW.Test
 				typeof(Script.Persistence.SQL.Select).Assembly,
 				typeof(Duration).Assembly);
 
-			Types.SetModuleParameter("Data", "Data");
+			Types.SetModuleParameter("Data", Folder);
 		}
 
 		[TestInitialize]

@@ -48,6 +48,7 @@
 		<ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />
 		<ProjectReference Include="..\..\Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj" />
 		<ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj" />
+		<ProjectReference Include="..\Waher.Persistence.Files\Waher.Persistence.Files.csproj" />
 		<ProjectReference Include="..\Waher.Persistence.Serialization.Compiled\Waher.Persistence.Serialization.Compiled.csproj" />
 	</ItemGroup>
 	<ItemGroup>

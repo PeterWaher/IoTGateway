@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,27 @@ using Waher.Runtime.Inventory;
 namespace Waher.Persistence.Queues
 {
 	/// <summary>
+	/// How to handle situations where the queue file has reached its maximum size. 
+	/// </summary>
+	public enum QueueThresholdMode
+	{
+		/// <summary>
+		/// Ignore enqueued items when threshold has been reached.
+		/// </summary>
+		Ignore,
+
+		/// <summary>
+		/// Throw an exception when when threshold has been reached.
+		/// </summary>
+		Exception,
+
+		/// <summary>
+		/// Clears the file when threshold has been reached.
+		/// </summary>
+		Clear
+	}
+
+	/// <summary>
 	/// Queue persisted into a single file.
 	/// </summary>
 	public partial class SingleFileQueue : IDisposable
@@ -21,15 +43,18 @@ namespace Waher.Persistence.Queues
 		private readonly int maxFileSize;
 		private readonly SerialFile file;
 		private readonly SemaphoreSlim semaphore;
+		private readonly QueueThresholdMode thresholdMode;
 		private long fileSize;
 		private long filePosition;
 		private bool disposed = false;
 
-		private SingleFileQueue(string FileName, int MaxFileSize, SerialFile File,
+		private SingleFileQueue(string FileName, int MaxFileSize,
+			QueueThresholdMode ThresholdMode, SerialFile File,
 			long FileSize, SerializerCollection Serializers)
 		{
 			this.fileName = FileName;
 			this.maxFileSize = MaxFileSize;
+			this.thresholdMode = ThresholdMode;
 			this.serializers = Serializers;
 			this.file = File;
 			this.fileSize = FileSize;
@@ -37,7 +62,8 @@ namespace Waher.Persistence.Queues
 			this.semaphore = new SemaphoreSlim(1);
 		}
 
-		private SingleFileQueue(string FileName, int MaxFileSize, SerialFile File,
+		private SingleFileQueue(string FileName, int MaxFileSize,
+			QueueThresholdMode ThresholdMode, SerialFile File,
 #if COMPILED
 			long FileSize, ISerializerContext SerializerContext, bool Compiled)
 #else
@@ -46,6 +72,7 @@ namespace Waher.Persistence.Queues
 		{
 			this.fileName = FileName;
 			this.maxFileSize = MaxFileSize;
+			this.thresholdMode = ThresholdMode;
 			this.file = File;
 			this.fileSize = FileSize;
 			this.filePosition = 0;
@@ -62,11 +89,13 @@ namespace Waher.Persistence.Queues
 		/// Queue persisted into a single file.
 		/// </summary>
 		/// <param name="FileName">File name.</param>
+		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
+		/// reached its maximum size.</param>
 		/// <param name="Serializers">Collection of serializers.</param>
 		public static Task<SingleFileQueue> Create(string FileName,
-			SerializerCollection Serializers)
+			QueueThresholdMode ThresholdMode, SerializerCollection Serializers)
 		{
-			return Create(FileName, false, int.MaxValue, Serializers, (GetKeysMethod)null);
+			return Create(FileName, false, int.MaxValue, ThresholdMode, Serializers, (GetKeysMethod)null);
 		}
 
 		/// <summary>
@@ -74,12 +103,15 @@ namespace Waher.Persistence.Queues
 		/// </summary>
 		/// <param name="FileName">File name.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
+		/// reached its maximum size.</param>
 		/// <param name="Serializers">Collection of serializers.</param>
 		/// <param name="GetKeys">Method that provides encryption keys.</param>
 		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted,
-			SerializerCollection Serializers, GetKeysMethod GetKeys)
+			QueueThresholdMode ThresholdMode, SerializerCollection Serializers,
+			GetKeysMethod GetKeys)
 		{
-			return Create(FileName, Encrypted, int.MaxValue, Serializers, GetKeys);
+			return Create(FileName, Encrypted, int.MaxValue, ThresholdMode, Serializers, GetKeys);
 		}
 
 		/// <summary>
@@ -88,15 +120,18 @@ namespace Waher.Persistence.Queues
 		/// <param name="FileName">File name.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
+		/// reached its maximum size.</param>
 		/// <param name="Serializers">Collection of serializers.</param>
 		/// <param name="GetKeys">Method that provides encryption keys.</param>
 		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
-			int MaxFileSize, SerializerCollection Serializers, GetKeysMethod GetKeys)
+			int MaxFileSize, QueueThresholdMode ThresholdMode,
+			SerializerCollection Serializers, GetKeysMethod GetKeys)
 		{
 			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, GetKeys);
 			long FileSize = await File.GetLength();
 
-			return new SingleFileQueue(FileName, MaxFileSize, File, FileSize, Serializers);
+			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Serializers);
 		}
 
 		/// <summary>
@@ -104,11 +139,13 @@ namespace Waher.Persistence.Queues
 		/// </summary>
 		/// <param name="FileName">File name.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
+		/// reached its maximum size.</param>
 		/// <param name="Provider">Files database provider.</param>
 		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted,
-			FilesProvider Provider)
+			QueueThresholdMode ThresholdMode, FilesProvider Provider)
 		{
-			return Create(FileName, Encrypted, int.MaxValue, Provider);
+			return Create(FileName, Encrypted, int.MaxValue, ThresholdMode, Provider);
 		}
 
 		/// <summary>
@@ -117,17 +154,19 @@ namespace Waher.Persistence.Queues
 		/// <param name="FileName">File name.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
+		/// reached its maximum size.</param>
 		/// <param name="Provider">Files database provider.</param>
 		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
-			int MaxFileSize, FilesProvider Provider)
+			int MaxFileSize, QueueThresholdMode ThresholdMode, FilesProvider Provider)
 		{
 			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, Provider);
 			long FileSize = await File.GetLength();
 
 #if COMPILED
-			return new SingleFileQueue(FileName, MaxFileSize, File, FileSize, Provider, Provider.Compiled);
+			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Provider, Provider.Compiled);
 #else
-			return new SingleFileQueue(FileName, MaxFileSize, File, FileSize, Provider);
+			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Provider);
 #endif
 		}
 
@@ -137,15 +176,18 @@ namespace Waher.Persistence.Queues
 		/// <param name="FileName">File name.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
+		/// reached its maximum size.</param>
 		/// <param name="Serializers">Collection of serializers.</param>
 		/// <param name="Provider">Files database provider, used for encryption only.</param>
 		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
-			int MaxFileSize, SerializerCollection Serializers, FilesProvider Provider)
+			int MaxFileSize, QueueThresholdMode ThresholdMode,
+			SerializerCollection Serializers, FilesProvider Provider)
 		{
 			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, Provider);
 			long FileSize = await File.GetLength();
 
-			return new SingleFileQueue(FileName, MaxFileSize, File, FileSize, Serializers);
+			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Serializers);
 		}
 
 		/// <summary>
@@ -197,7 +239,8 @@ namespace Waher.Persistence.Queues
 		/// Enqueues an item into the queue.
 		/// </summary>
 		/// <param name="Item">Item to enqueue</param>
-		public async Task Enqueue(object Item)
+		/// <returns>If item was enqueued</returns>
+		public async Task<bool> Enqueue(object Item)
 		{
 			if (Item is null)
 				throw new ArgumentNullException(nameof(Item));
@@ -233,6 +276,25 @@ namespace Waher.Persistence.Queues
 
 					if (First is null)
 					{
+						if (this.fileSize >= this.maxFileSize)
+						{
+							switch (this.thresholdMode)
+							{
+								case QueueThresholdMode.Ignore:
+									return false;
+
+								case QueueThresholdMode.Clear:
+									await this.file.Clear();
+									this.filePosition = 0;
+									this.fileSize = 0;
+									break;
+
+								case QueueThresholdMode.Exception:
+								default:
+									throw new IOException("Queue file has reached its maximum size.");
+							}
+						}
+
 						this.fileSize = await this.file.WriteBlock(Payload);
 						Forwarded = true;
 					}
@@ -248,6 +310,8 @@ namespace Waher.Persistence.Queues
 			{
 				this.semaphore.Release();
 			}
+
+			return true;
 		}
 
 		/// <summary>

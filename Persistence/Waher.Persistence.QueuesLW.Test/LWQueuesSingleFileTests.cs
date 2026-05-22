@@ -59,8 +59,12 @@ namespace Waher.Persistence.QueuesLW.Test
 			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, 8192, 8192, 4096, Encoding.UTF8, 8192, true);
 #endif
 			this.fullSerialization = new FullSerialization();
+		}
+
+		private async Task InitQueue(QueueThresholdMode Mode)
+		{
 			this.queue = await SingleFileQueue.Create(QueueFileName, true, MaxFileSize,
-				this.fullSerialization.Serializers, this.provider);
+				Mode, this.fullSerialization.Serializers, this.provider);
 		}
 
 		[TestCleanup]
@@ -92,7 +96,9 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_01_EnqueueDequeue_ValueTypes()
 		{
-			await this.queue.Enqueue(1);
+			await this.InitQueue(QueueThresholdMode.Ignore);
+
+			Assert.IsTrue(await this.queue.Enqueue(1));
 			Assert.AreEqual(1, await this.queue.Dequeue(10000));
 		}
 
@@ -101,8 +107,10 @@ namespace Waher.Persistence.QueuesLW.Test
 		{
 			int i;
 
+			await this.InitQueue(QueueThresholdMode.Ignore);
+
 			for (i = 0; i < 10; i++)
-				await this.queue.Enqueue(i);
+				Assert.IsTrue(await this.queue.Enqueue(i));
 
 			for (i = 0; i < 10; i++)
 				Assert.AreEqual(i, await this.queue.Dequeue(10000));
@@ -111,10 +119,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_03_DequeueEnqueue_ValueTypes()
 		{
+			await this.InitQueue(QueueThresholdMode.Ignore);
+
 			_ = Task.Run(async () =>
 			{
 				await Task.Delay(1000, CancellationToken.None);
-				await this.queue.Enqueue(1);
+				Assert.IsTrue(await this.queue.Enqueue(1));
 			}, CancellationToken.None);
 
 			Assert.AreEqual(1, await this.queue.Dequeue(10000));
@@ -123,12 +133,14 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_04_DequeueEnqueue_Multiple_ValueTypes()
 		{
+			await this.InitQueue(QueueThresholdMode.Ignore);
+
 			_ = Task.Run(async () =>
 			{
 				for (int i = 0; i < 10; i++)
 				{
 					await Task.Delay(100, CancellationToken.None);
-					await this.queue.Enqueue(i);
+					Assert.IsTrue(await this.queue.Enqueue(i));
 				}
 			}, CancellationToken.None);
 
@@ -139,6 +151,8 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_05_DequeueEnqueue_RandomMultiple_ValueTypes()
 		{
+			await this.InitQueue(QueueThresholdMode.Ignore);
+
 			Random Rnd = new();
 			TaskCompletionSource<bool> EnqueueDone = new TaskCompletionSource<bool>();
 			TaskCompletionSource<bool> DequeueDone = new TaskCompletionSource<bool>();
@@ -150,7 +164,7 @@ namespace Waher.Persistence.QueuesLW.Test
 					for (int i = 0; i < 100; i++)
 					{
 						await Task.Delay(Rnd.Next(50, 150), CancellationToken.None);
-						await this.queue.Enqueue(i);
+						Assert.IsTrue(await this.queue.Enqueue(i));
 					}
 
 					EnqueueDone.TrySetResult(true);
@@ -186,7 +200,9 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_06_EnqueueDequeue_ReferenceTypes()
 		{
-			await this.queue.Enqueue(new Simple(1, "Object 1"));
+			await this.InitQueue(QueueThresholdMode.Ignore);
+
+			Assert.IsTrue(await this.queue.Enqueue(new Simple(1, "Object 1")));
 			Simple Item = await this.queue.Dequeue(10000) as Simple;
 			Assert.IsNotNull(Item);
 			Assert.AreEqual(1, Item.Counter);
@@ -196,10 +212,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_07_EnqueueDequeue_Multiple_ReferenceTypes()
 		{
+			await this.InitQueue(QueueThresholdMode.Ignore);
+
 			int i;
 
 			for (i = 0; i < 10; i++)
-				await this.queue.Enqueue(new Simple(i, "Object " + i));
+				Assert.IsTrue(await this.queue.Enqueue(new Simple(i, "Object " + i)));
 
 			for (i = 0; i < 10; i++)
 			{
@@ -213,10 +231,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_08_DequeueEnqueue_ReferenceTypes()
 		{
+			await this.InitQueue(QueueThresholdMode.Ignore);
+
 			_ = Task.Run(async () =>
 			{
 				await Task.Delay(1000, CancellationToken.None);
-				await this.queue.Enqueue(new Simple(1, "Object 1"));
+				Assert.IsTrue(await this.queue.Enqueue(new Simple(1, "Object 1")));
 			}, CancellationToken.None);
 
 			Simple Item = await this.queue.Dequeue(10000) as Simple;
@@ -228,12 +248,14 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_09_DequeueEnqueue_Multiple_ReferenceTypes()
 		{
+			await this.InitQueue(QueueThresholdMode.Ignore);
+
 			_ = Task.Run(async () =>
 			{
 				for (int i = 0; i < 10; i++)
 				{
 					await Task.Delay(100, CancellationToken.None);
-					await this.queue.Enqueue(new Simple(i, "Object " + i));
+					Assert.IsTrue(await this.queue.Enqueue(new Simple(i, "Object " + i)));
 				}
 			}, CancellationToken.None);
 
@@ -249,6 +271,8 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestMethod]
 		public async Task Test_10_DequeueEnqueue_RandomMultiple_ReferenceTypes()
 		{
+			await this.InitQueue(QueueThresholdMode.Ignore);
+
 			Random Rnd = new();
 			TaskCompletionSource<bool> EnqueueDone = new TaskCompletionSource<bool>();
 			TaskCompletionSource<bool> DequeueDone = new TaskCompletionSource<bool>();
@@ -260,7 +284,7 @@ namespace Waher.Persistence.QueuesLW.Test
 					for (int i = 0; i < 100; i++)
 					{
 						await Task.Delay(Rnd.Next(50, 150), CancellationToken.None);
-						await this.queue.Enqueue(new Simple(i, "Object " + i));
+						Assert.IsTrue(await this.queue.Enqueue(new Simple(i, "Object " + i)));
 					}
 
 					EnqueueDone.TrySetResult(true);
@@ -296,8 +320,67 @@ namespace Waher.Persistence.QueuesLW.Test
 			await DequeueDone.Task;
 		}
 
-		// TODO: Wait while enqueueing if max file size is reached.
-		// TODO: Test Timeout
-		// TODO: Test Threshold mode: Ignore, Wait, Exception, Clear, NewFile
+		[TestMethod]
+		public async Task Test_11_Threshold_Ignore()
+		{
+			int i = 0;
+
+			await this.InitQueue(QueueThresholdMode.Ignore);
+
+			while (await this.queue.Enqueue(i))
+				i++;
+
+			Assert.AreEqual(this.queue.MaxFileSize / 64, i);    // 64 is the minimum block size used by SerialFile.
+
+			for (int j = 0; j < i; j++)
+				Assert.AreEqual(j, await this.queue.Dequeue(10000));
+		}
+
+		[TestMethod]
+		public async Task Test_12_Threshold_Exception()
+		{
+			int i = 0;
+
+			await this.InitQueue(QueueThresholdMode.Exception);
+
+			await Assert.ThrowsAsync<IOException>(async () =>
+			{
+				while (await this.queue.Enqueue(i))
+					i++;
+			});
+
+			Assert.AreEqual(this.queue.MaxFileSize / 64, i);    // 64 is the minimum block size used by SerialFile.
+
+			for (int j = 0; j < i; j++)
+				Assert.AreEqual(j, await this.queue.Dequeue(10000));
+		}
+
+		[TestMethod]
+		public async Task Test_13_Threshold_Clear()
+		{
+			int i = 0;
+
+			await this.InitQueue(QueueThresholdMode.Clear);
+
+			while (await this.queue.Enqueue(i) && i < 1000)
+				i++;
+
+			Assert.AreEqual(1000, i);
+
+			int j = 1000 / (this.queue.MaxFileSize / 64) * 160;
+
+			while (j <= i)
+				Assert.AreEqual(j++, await this.queue.Dequeue(10000));
+		}
+
+		[TestMethod]
+		public async Task Test_14_Timeout()
+		{
+			await this.InitQueue(QueueThresholdMode.Ignore);
+
+			Assert.IsNull(await this.queue.Dequeue(2000));
+		}
+
+		// TODO: Test Threshold mode: Wait, NewFile
 	}
 }

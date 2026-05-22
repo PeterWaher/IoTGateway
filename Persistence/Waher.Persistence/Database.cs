@@ -2183,27 +2183,32 @@ namespace Waher.Persistence
 		/// <param name="Reason">Reason for flagging collection.</param>
 		public static Exception FlagForRepair(string Collection, string Reason)
 		{
-			InconsistencyException Result = new InconsistencyException(Collection, Reason + " (" + Collection + ")");
-			string StackTrace = Log.CleanStackTrace(Environment.StackTrace);
-			string Key = Reason + " | " + StackTrace;
-
-			lock (toRepair)
+			if (!string.IsNullOrEmpty(Collection))
 			{
-				if (toRepair.TryGetValue(Collection, out Dictionary<string, FlagSource> PerStackTrace))
-				{
-					if (!(PerStackTrace is null))
-					{
-						if (PerStackTrace.TryGetValue(Key, out FlagSource FlagSource))
-							FlagSource.Count++;
-						else
-							PerStackTrace[Key] = new FlagSource(Reason, StackTrace, 1);
-					}
-				}
-				else
-					toRepair[Collection] = new Dictionary<string, FlagSource>() { { Key, new FlagSource(Reason, StackTrace, 1) } };
-			}
+				InconsistencyException Result = new InconsistencyException(Collection, Reason + " (" + Collection + ")");
+				string StackTrace = Log.CleanStackTrace(Environment.StackTrace);
+				string Key = Reason + " | " + StackTrace;
 
-			return Result;
+				lock (toRepair)
+				{
+					if (toRepair.TryGetValue(Collection, out Dictionary<string, FlagSource> PerStackTrace))
+					{
+						if (!(PerStackTrace is null))
+						{
+							if (PerStackTrace.TryGetValue(Key, out FlagSource FlagSource))
+								FlagSource.Count++;
+							else
+								PerStackTrace[Key] = new FlagSource(Reason, StackTrace, 1);
+						}
+					}
+					else
+						toRepair[Collection] = new Dictionary<string, FlagSource>() { { Key, new FlagSource(Reason, StackTrace, 1) } };
+				}
+
+				return Result;
+			}
+			else
+				return new Exception(Reason);
 		}
 
 		/// <summary>

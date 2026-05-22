@@ -9,6 +9,14 @@ using Waher.Runtime.Threading;
 namespace Waher.Persistence.Files
 {
 	/// <summary>
+	/// Delegate for custom key callback methods.
+	/// </summary>
+	/// <param name="FileName">Name of file.</param>
+	/// <param name="FileExists">If file exists.</param>
+	/// <returns>A pair of (Key, IV).</returns>
+	public delegate Task<KeyValuePair<byte[], byte[]>> GetKeysMethod(string FileName, bool FileExists);
+
+	/// <summary>
 	/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
 	/// </summary>
 	public class SerialFile : IDisposable
@@ -65,7 +73,7 @@ namespace Waher.Persistence.Files
 		/// <param name="CollectionName">Collection Name</param>
 		public static Task<SerialFile> Create(string FileName, string CollectionName)
 		{
-			return Create(FileName, CollectionName, false, null);
+			return Create(FileName, CollectionName, false, (GetKeysMethod)null);
 		}
 
 		/// <summary>
@@ -75,11 +83,24 @@ namespace Waher.Persistence.Files
 		/// <param name="CollectionName">Collection Name</param>
 		/// <param name="Encrypted">If file is encrypted.</param>
 		/// <param name="Provider">Provider of encryption keys.</param>
-		public static async Task<SerialFile> Create(string FileName, string CollectionName, bool Encrypted, FilesProvider Provider)
+		public static Task<SerialFile> Create(string FileName, string CollectionName, bool Encrypted, FilesProvider Provider)
+		{
+			return Create(FileName, CollectionName, Encrypted, Provider.GetKeys);
+		}
+
+		/// <summary>
+		/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
+		/// </summary>
+		/// <param name="FileName">Name of file</param>
+		/// <param name="CollectionName">Collection Name</param>
+		/// <param name="Encrypted">If file is encrypted.</param>
+		/// <param name="GetKeysMethod">Method that provides encryption keys.</param>
+		public static async Task<SerialFile> Create(string FileName, string CollectionName,
+			bool Encrypted, GetKeysMethod GetKeysMethod)
 		{
 			SerialFile Result = new SerialFile(FileName, CollectionName, Encrypted);
 
-			await GetKeys(Result, Provider);
+			await GetKeys(Result, GetKeysMethod);
 
 			return Result;
 		}
@@ -89,7 +110,17 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="SerialFile">SerialFile reference, or decendant.</param>
 		/// <param name="Provider">Provider of encryption keys.</param>
-		protected static async Task GetKeys(SerialFile SerialFile, FilesProvider Provider)
+		protected static Task GetKeys(SerialFile SerialFile, FilesProvider Provider)
+		{
+			return GetKeys(SerialFile, Provider.GetKeys);
+		}
+
+		/// <summary>
+		/// Gets keys for the serial file, or decendant.
+		/// </summary>
+		/// <param name="SerialFile">SerialFile reference, or decendant.</param>
+		/// <param name="GetKeysMethod">Method that provides encryption keys.</param>
+		protected static async Task GetKeys(SerialFile SerialFile, GetKeysMethod GetKeysMethod)
 		{
 			if (SerialFile.encrypted)
 			{
@@ -99,7 +130,7 @@ namespace Waher.Persistence.Files
 				SerialFile.aes.Mode = CipherMode.CBC;
 				SerialFile.aes.Padding = PaddingMode.None;
 
-				KeyValuePair<byte[], byte[]> P = await Provider.GetKeys(SerialFile.fileName, SerialFile.fileExists);
+				KeyValuePair<byte[], byte[]> P = await GetKeysMethod(SerialFile.fileName, SerialFile.fileExists);
 				SerialFile.aesKey = P.Key;
 				SerialFile.ivSeed = P.Value;
 				SerialFile.ivSeedLen = SerialFile.ivSeed.Length;
@@ -140,7 +171,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Binary block (decrypted if file is encrypted), and the position of the following block.</returns>
 		public async Task<KeyValuePair<byte[], long>> ReadBlock(long Position)
 		{
-			await this.fileAccess.BeginWrite();	// Unique access required
+			await this.fileAccess.BeginWrite(); // Unique access required
 			try
 			{
 				byte[] Block = await this.ReadBlockLocked(Position, MinBlockSize);

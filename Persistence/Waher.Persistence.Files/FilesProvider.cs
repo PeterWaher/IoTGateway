@@ -525,6 +525,7 @@ namespace Waher.Persistence.Files
 		/// If object serializers should be compiled or not.
 		/// </summary>
 		public bool Compiled => this.compiled;
+#endif
 
 		/// <summary>
 		/// If old keys are to be removed, before a new encrypted file is created. (Default=true).
@@ -534,7 +535,6 @@ namespace Waher.Persistence.Files
 			get => this.deleteObsoleteKeys;
 			set => this.deleteObsoleteKeys = value;
 		}
-#endif
 
 		/// <summary>
 		/// If normalized names are to be used or not. Normalized names reduces the number

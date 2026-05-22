@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<Authors>Peter Waher</Authors>
+		<Company>Waher Data AB</Company>
+		<Product>Waher.IoTGateway</Product>
+		<Description>Library that provides support for persisted First-In-First-Out (FIFO) queues that stores objects temporarily in local AES-256 encrypted files. Storage and retrieval is based solely on meta-data provided through the corresponding class definitions. Object serializers are created dynamically. Dynamic code is compiled.</Description>
+		<Copyright>Copyright © Waher Data AB 2026. All rights reserved.</Copyright>
+		<PackageLicenseUrl />
+		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Persistence/Waher.Persistence.Queues</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+		<RepositoryType>GitHub</RepositoryType>
+		<PackageTags>persistence queue enryption file storage</PackageTags>
+		<NeutralLanguage>English</NeutralLanguage>
+		<AssemblyVersion>1.0.0</AssemblyVersion>
+		<FileVersion>1.0.0</FileVersion>
+		<Version>1.0.0</Version>
+		<PackageIconUrl />
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageIcon>Icon_64x64.png</PackageIcon>
+	</PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DefineConstants>$(DefineConstants);COMPILED</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DefineConstants>$(DefineConstants);COMPILED</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" />
+		<PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
+		<PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+		<PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
+		<PackageReference Include="System.Security.Cryptography.Csp" Version="4.3.0" />
+		<PackageReference Include="System.Security.Cryptography.Primitives" Version="4.3.0" />
+		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+		<PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+		<ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+		<ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />
+		<ProjectReference Include="..\..\Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj" />
+		<ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj" />
+		<ProjectReference Include="..\Waher.Persistence.Serialization.Compiled\Waher.Persistence.Serialization.Compiled.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\Images\Icon_64x64.png">
+			<Pack>True</Pack>
+			<PackagePath />
+		</None>
+		<None Include="..\..\LICENSE.txt">
+			<Pack>True</Pack>
+			<PackagePath />
+		</None>
+	</ItemGroup>
+</Project>

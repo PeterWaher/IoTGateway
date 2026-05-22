@@ -14,7 +14,7 @@
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Persistence/Waher.Persistence.Files</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>persistence object database enryption file storage encryption</PackageTags>
+    <PackageTags>persistence object database enryption file storage</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.20.1</AssemblyVersion>
     <FileVersion>1.20.1</FileVersion>

@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DefineConstants>TRACE;RELEASE;NETCOREAPP2_0;LW</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DefineConstants>TRACE;DEBUG;NETCOREAPP2_0;LW</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.4.0" />
+		<PackageReference Include="MSTest.TestAdapter" Version="4.2.1" />
+		<PackageReference Include="MSTest.TestFramework" Version="4.2.1" />
+		<PackageReference Include="System.Net.Http" Version="4.3.4" />
+		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+		<ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
+		<ProjectReference Include="..\Waher.Persistence.QueuesLW\Waher.Persistence.QueuesLW.csproj" />
+		<ProjectReference Include="..\Waher.Persistence.Serialization\Waher.Persistence.Serialization.csproj" />
+		<ProjectReference Include="..\Waher.Persistence\Waher.Persistence.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Classes\" />
+	</ItemGroup>
+
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="xcopy &quot;C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Queues.Test\DBQueues*.cs&quot; &quot;C:\My Projects\IoTGateway\Persistence\Waher.Persistence.QueuesLW.Test\LWQueues*.cs&quot; /Y" Condition="'$(OS)'=='Windows_NT'" />
+		<Exec Command="xcopy &quot;C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Queues.Test\Classes\*.cs&quot; &quot;C:\My Projects\IoTGateway\Persistence\Waher.Persistence.QueuesLW.Test\Classes&quot; /Y" Condition="'$(OS)'=='Windows_NT'" />
+
+		<Exec Command="for file in /My\ Projects/IoTGateway/Persistence/Waher.Persistence.Queues.Test/DBQueues*.cs; do cp &quot;$file&quot; &quot;/My Projects/IoTGateway/Persistence/Waher.Persistence.QueuesLW.Test/LWQueues${file##*/DBQueues}&quot;; done" Condition="'$(OS)'=='Unix'" />
+		<Exec Command="rsync -avm --include='*.cs' --exclude='*' /My\ Projects/IoTGateway/Persistence/Waher.Persistence.Queues.Test/Classes/ /My\ Projects/IoTGateway/Persistence/Waher.Persistence.QueuesLW.Test/Classes/" Condition="'$(OS)'=='Unix'" />
+	</Target>
+
+</Project>

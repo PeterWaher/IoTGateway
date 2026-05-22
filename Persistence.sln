@@ -57,6 +57,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.XmlLedger
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.XmlLedger.Test", "Persistence\Waher.Persistence.XmlLedger.Test\Waher.Persistence.XmlLedger.Test.csproj", "{93A5CE96-3187-15F8-36F6-7FC4A5F665D7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.Queues", "Persistence\Waher.Persistence.Queues\Waher.Persistence.Queues.csproj", "{C8EBE72C-0939-43C8-8585-DF24F43C79DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.QueuesLW", "Persistence\Waher.Persistence.QueuesLW\Waher.Persistence.QueuesLW.csproj", "{928C93EA-0E2C-44CB-AB26-DD9787C319A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.Queues.Test", "Persistence\Waher.Persistence.Queues.Test\Waher.Persistence.Queues.Test.csproj", "{574F4862-A01B-417C-BEFE-746DFDD4D4EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.QueuesLW.Test", "Persistence\Waher.Persistence.QueuesLW.Test\Waher.Persistence.QueuesLW.Test.csproj", "{8E89BA53-2D24-48DD-99F9-43575B3AD7F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -147,6 +155,22 @@ Global
 		{93A5CE96-3187-15F8-36F6-7FC4A5F665D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93A5CE96-3187-15F8-36F6-7FC4A5F665D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{93A5CE96-3187-15F8-36F6-7FC4A5F665D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8EBE72C-0939-43C8-8585-DF24F43C79DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8EBE72C-0939-43C8-8585-DF24F43C79DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8EBE72C-0939-43C8-8585-DF24F43C79DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8EBE72C-0939-43C8-8585-DF24F43C79DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{928C93EA-0E2C-44CB-AB26-DD9787C319A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{928C93EA-0E2C-44CB-AB26-DD9787C319A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{928C93EA-0E2C-44CB-AB26-DD9787C319A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{928C93EA-0E2C-44CB-AB26-DD9787C319A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{574F4862-A01B-417C-BEFE-746DFDD4D4EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{574F4862-A01B-417C-BEFE-746DFDD4D4EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{574F4862-A01B-417C-BEFE-746DFDD4D4EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{574F4862-A01B-417C-BEFE-746DFDD4D4EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E89BA53-2D24-48DD-99F9-43575B3AD7F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E89BA53-2D24-48DD-99F9-43575B3AD7F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E89BA53-2D24-48DD-99F9-43575B3AD7F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E89BA53-2D24-48DD-99F9-43575B3AD7F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

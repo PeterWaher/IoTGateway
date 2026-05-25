@@ -433,8 +433,27 @@ namespace Waher.Persistence.QueuesLW.Test
 			Assert.IsTrue(await DequeueDone.Task);
 		}
 
+		[TestMethod]
+		public async Task Test_16_CloseAndResume()
+		{
+			int i;
+
+			await this.InitQueue(QueueThresholdMode.Exception);
+
+			for (i = 0; i < 100; i++)
+				Assert.IsTrue(await this.queue.Enqueue(i));
+
+			for (i = 0; i < 50; i++)
+				Assert.AreEqual(i, await this.queue.Dequeue(10000));
+
+			await this.queue.DisposeAsync();
+			await this.InitQueue(QueueThresholdMode.Exception);
+
+			for (; i < 100; i++)
+				Assert.AreEqual(i, await this.queue.Dequeue(10000));
+		}
+
 		// TODO: Test Threshold mode: NewFile
-		// TODO: Test Close & Resume (half dequeued before close, other half after resume).
 		// TODO: Multiple threads enqueueing and dequeuing.
 	}
 }

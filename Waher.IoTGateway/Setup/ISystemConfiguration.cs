@@ -111,5 +111,13 @@ namespace Waher.IoTGateway.Setup
 		/// <returns>If the configuration was changed, and can be considered completed.</returns>
 		Task<bool> EnvironmentConfiguration();
 
+		/// <summary>
+		/// Performs a deferred configuration. Deferred configurations are such that
+		/// could not be performed during the initial configuration, because the system
+		/// had not been completely setup yet. Deferred configurations are performed after
+		/// the system has been completely setup.
+		/// </summary>
+		/// <param name="WebServer">Current Web Server object.</param>
+		Task DeferredConfiguration(HttpServer WebServer);
 	}
 }

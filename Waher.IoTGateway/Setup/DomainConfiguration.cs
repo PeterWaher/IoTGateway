@@ -66,6 +66,7 @@ namespace Waher.IoTGateway.Setup
 		private bool useEncryption = true;
 		private bool customCA = false;
 		private bool acceptToS = false;
+		private bool deferredTest = false;
 
 		private string challenge = string.Empty;
 		private string token = string.Empty;
@@ -814,9 +815,7 @@ namespace Waher.IoTGateway.Setup
 
 					HttpResponseMessage Response = await HttpClient.GetAsync("http://" + DomainName + "/Settings/TestDomainName");
 					if (!Response.IsSuccessStatusCode)
-					{
 						return "Domain name does not point to this machine.";
-					}
 
 					byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 					string Token = System.Text.Encoding.ASCII.GetString(Bin);
@@ -2001,8 +2000,13 @@ namespace Waher.IoTGateway.Setup
 			if (this.localizedDescriptions is null)
 				return false;
 
-			if (!await this.Test(null, true))                                                           // Tests domain names.
-				return false;
+			if (Gateway.HttpServer is null)
+				this.deferredTest = true;
+			else
+			{
+				if (!await this.Test(null, true))                                                           // Tests domain names.
+					return false;
+			}
 
 			if (this.dynamicDns && !await this.CheckDynamicIp(true))                                    // Tests dynamic DNS settings.
 				return false;
@@ -2048,5 +2052,20 @@ namespace Waher.IoTGateway.Setup
 			return Result.ToArray();
 		}
 
+		/// <summary>
+		/// Performs a deferred configuration. Deferred configurations are such that
+		/// could not be performed during the initial configuration, because the system
+		/// had not been completely setup yet. Deferred configurations are performed after
+		/// the system has been completely setup.
+		/// </summary>
+		/// <param name="WebServer">Current Web Server object.</param>
+		public override async Task DeferredConfiguration(HttpServer WebServer)
+		{
+			if (this.deferredTest)
+			{
+				this.deferredTest = false;
+				await this.Test(null, true);
+			}
+		}
 	}
 }

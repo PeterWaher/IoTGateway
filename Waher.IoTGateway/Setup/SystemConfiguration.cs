@@ -503,5 +503,16 @@ namespace Waher.IoTGateway.Setup
 			return true;
 		}
 
+		/// <summary>
+		/// Performs a deferred configuration. Deferred configurations are such that
+		/// could not be performed during the initial configuration, because the system
+		/// had not been completely setup yet. Deferred configurations are performed after
+		/// the system has been completely setup.
+		/// </summary>
+		/// <param name="WebServer">Current Web Server object.</param>
+		public virtual Task DeferredConfiguration(HttpServer WebServer)
+		{
+			return Task.CompletedTask;	// No deferred configuration, by default.
+		}
 	}
 }

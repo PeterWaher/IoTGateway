@@ -393,7 +393,7 @@ namespace Waher.IoTGateway
 					GatewayConfigFileName = GatewayConfigLocalFileName;
 
 				XmlDocument Config = XML.LoadFromFile(GatewayConfigFileName, true);
-				
+
 				XSL.Validate(GatewayConfigLocalFileName, Config, GatewayConfigLocalName, GatewayConfigNamespace,
 					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.GatewayConfiguration.xsd", typeof(Gateway).Assembly));
 
@@ -1013,6 +1013,7 @@ namespace Waher.IoTGateway
 				Dictionary<string, Type> SystemConfigurationTypes = new Dictionary<string, Type>();
 				Dictionary<string, SystemConfiguration> SystemConfigurations = new Dictionary<string, SystemConfiguration>();
 				bool Configured = true;
+				bool CheckDeferredConfigurations = false;
 				bool Simplify = (await ServiceRegistrationClient.GetRegistrationTime()).HasValue;
 
 				foreach (Type SystemConfigurationType in Types.GetTypesImplementingInterface(typeof(ISystemConfiguration)))
@@ -1080,6 +1081,8 @@ namespace Waher.IoTGateway
 
 							NewConfigurations ??= new LinkedList<SystemConfiguration>();
 							NewConfigurations.AddLast(SystemConfiguration);
+
+							CheckDeferredConfigurations = true;
 							continue;
 						}
 
@@ -1315,6 +1318,21 @@ namespace Waher.IoTGateway
 							{
 								Log.Exception(ex);
 							}
+						}
+					}
+				}
+
+				if (CheckDeferredConfigurations)
+				{
+					foreach (SystemConfiguration Configuration in configurations)
+					{
+						try
+						{
+							await Configuration.DeferredConfiguration(webServer);
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
 						}
 					}
 				}
@@ -3708,9 +3726,9 @@ namespace Waher.IoTGateway
 		public static RequiredPrivileges LoggedIn(string UserVariable, string[] Privileges)
 		{
 			return new RequiredPrivileges(
-				new HttpAuthenticationScheme[] 
-				{ 
-					new SessionAuthentication(UserVariable, webServer) 
+				new HttpAuthenticationScheme[]
+				{
+					new SessionAuthentication(UserVariable, webServer)
 				},
 				Privileges);
 		}
@@ -3826,7 +3844,7 @@ namespace Waher.IoTGateway
 				else
 				{
 					RosterItem Item = xmppClient?.GetRosterItem(e.BareJid);
-				
+
 					if (!(Item is null) &&
 						(Item.State == SubscriptionState.Both ||
 						Item.State == SubscriptionState.From))

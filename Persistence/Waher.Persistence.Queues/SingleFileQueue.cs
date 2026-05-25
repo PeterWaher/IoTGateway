@@ -41,7 +41,7 @@ namespace Waher.Persistence.Queues
 	/// <summary>
 	/// Queue persisted into a single file.
 	/// </summary>
-	public partial class SingleFileQueue : IDisposableAsync
+	public class SingleFileQueue : IPersistedQueue
 	{
 		private readonly LinkedList<TaskCompletionSource<object>> waitingDequeuers = new LinkedList<TaskCompletionSource<object>>();
 		private readonly LinkedList<TaskCompletionSource<bool>> waitingEnqueuers = new LinkedList<TaskCompletionSource<bool>>();
@@ -94,12 +94,13 @@ namespace Waher.Persistence.Queues
 		}
 
 		/// <summary>
-		/// Queue persisted into a single file.
+		/// Creates a queue that perisists queued items in a single file.
 		/// </summary>
 		/// <param name="FileName">File name.</param>
 		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
 		/// reached its maximum size.</param>
 		/// <param name="Serializers">Collection of serializers.</param>
+		/// <returns>Queue object instance.</returns>
 		public static Task<SingleFileQueue> Create(string FileName,
 			QueueThresholdMode ThresholdMode, SerializerCollection Serializers)
 		{
@@ -107,7 +108,7 @@ namespace Waher.Persistence.Queues
 		}
 
 		/// <summary>
-		/// Queue persisted into a single file.
+		/// Creates a queue that perisists queued items in a single file.
 		/// </summary>
 		/// <param name="FileName">File name.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
@@ -115,6 +116,7 @@ namespace Waher.Persistence.Queues
 		/// reached its maximum size.</param>
 		/// <param name="Serializers">Collection of serializers.</param>
 		/// <param name="GetKeys">Method that provides encryption keys.</param>
+		/// <returns>Queue object instance.</returns>
 		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted,
 			QueueThresholdMode ThresholdMode, SerializerCollection Serializers,
 			GetKeysMethod GetKeys)
@@ -123,7 +125,7 @@ namespace Waher.Persistence.Queues
 		}
 
 		/// <summary>
-		/// Queue persisted into a single file.
+		/// Creates a queue that perisists queued items in a single file.
 		/// </summary>
 		/// <param name="FileName">File name.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
@@ -132,6 +134,7 @@ namespace Waher.Persistence.Queues
 		/// reached its maximum size.</param>
 		/// <param name="Serializers">Collection of serializers.</param>
 		/// <param name="GetKeys">Method that provides encryption keys.</param>
+		/// <returns>Queue object instance.</returns>
 		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
 			int MaxFileSize, QueueThresholdMode ThresholdMode,
 			SerializerCollection Serializers, GetKeysMethod GetKeys)
@@ -143,13 +146,14 @@ namespace Waher.Persistence.Queues
 		}
 
 		/// <summary>
-		/// Queue persisted into a single file.
+		/// Creates a queue that perisists queued items in a single file.
 		/// </summary>
 		/// <param name="FileName">File name.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
 		/// reached its maximum size.</param>
 		/// <param name="Provider">Files database provider.</param>
+		/// <returns>Queue object instance.</returns>
 		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted,
 			QueueThresholdMode ThresholdMode, FilesProvider Provider)
 		{
@@ -157,7 +161,7 @@ namespace Waher.Persistence.Queues
 		}
 
 		/// <summary>
-		/// Queue persisted into a single file.
+		/// Creates a queue that perisists queued items in a single file.
 		/// </summary>
 		/// <param name="FileName">File name.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
@@ -165,6 +169,7 @@ namespace Waher.Persistence.Queues
 		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
 		/// reached its maximum size.</param>
 		/// <param name="Provider">Files database provider.</param>
+		/// <returns>Queue object instance.</returns>
 		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
 			int MaxFileSize, QueueThresholdMode ThresholdMode, FilesProvider Provider)
 		{
@@ -179,7 +184,7 @@ namespace Waher.Persistence.Queues
 		}
 
 		/// <summary>
-		/// Queue persisted into a single file.
+		/// Creates a queue that perisists queued items in a single file.
 		/// </summary>
 		/// <param name="FileName">File name.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
@@ -188,6 +193,7 @@ namespace Waher.Persistence.Queues
 		/// reached its maximum size.</param>
 		/// <param name="Serializers">Collection of serializers.</param>
 		/// <param name="Provider">Files database provider, used for encryption only.</param>
+		/// <returns>Queue object instance.</returns>
 		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
 			int MaxFileSize, QueueThresholdMode ThresholdMode,
 			SerializerCollection Serializers, FilesProvider Provider)

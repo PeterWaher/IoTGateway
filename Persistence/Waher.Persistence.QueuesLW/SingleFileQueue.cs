@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.Queues
@@ -29,15 +30,21 @@ namespace Waher.Persistence.Queues
 		/// <summary>
 		/// Clears the file when threshold has been reached.
 		/// </summary>
-		Clear
+		Clear,
+
+		/// <summary>
+		/// Enqueuer waits for the queue to have resources to accept the item.
+		/// </summary>
+		Wait
 	}
 
 	/// <summary>
 	/// Queue persisted into a single file.
 	/// </summary>
-	public partial class SingleFileQueue : IDisposable
+	public partial class SingleFileQueue : IDisposableAsync
 	{
-		private readonly LinkedList<TaskCompletionSource<object>> waiting = new LinkedList<TaskCompletionSource<object>>();
+		private readonly LinkedList<TaskCompletionSource<object>> waitingDequeuers = new LinkedList<TaskCompletionSource<object>>();
+		private readonly LinkedList<TaskCompletionSource<bool>> waitingEnqueuers = new LinkedList<TaskCompletionSource<bool>>();
 		private readonly SerializerCollection serializers;
 		private readonly string fileName;
 		private readonly int maxFileSize;
@@ -46,6 +53,7 @@ namespace Waher.Persistence.Queues
 		private readonly QueueThresholdMode thresholdMode;
 		private long fileSize;
 		private long filePosition;
+		private int trimTimeout = 5000;
 		private bool disposed = false;
 
 		private SingleFileQueue(string FileName, int MaxFileSize,
@@ -218,20 +226,90 @@ namespace Waher.Persistence.Queues
 		}
 
 		/// <summary>
+		/// Gets the number of dequeuers waiting for items to be queued.
+		/// </summary>
+		/// <returns>Number of dequeuers waiting for items.</returns>
+		public async Task<int> GetNrDequeuers()
+		{
+			await this.semaphore.WaitAsync();
+			try
+			{
+				return this.waitingDequeuers.Count;
+			}
+			finally
+			{
+				this.semaphore.Release();
+			}
+		}
+
+		/// <summary>
+		/// Gets the number of enqueuers waiting for space to be available to enqueue
+		/// new items.
+		/// </summary>
+		/// <returns>Number of enqueuers waiting for space.</returns>
+		public async Task<int> GetNrEnqueuers()
+		{
+			await this.semaphore.WaitAsync();
+			try
+			{
+				return this.waitingEnqueuers.Count;
+			}
+			finally
+			{
+				this.semaphore.Release();
+			}
+		}
+
+		/// <summary>
+		/// Timeout, in milliseconds, before triggering a trimming of the file, when the 
+		/// file has reached its maximum size. Default is 5000 ms.
+		/// </summary>
+		public int TrimTimeout
+		{
+			get => this.trimTimeout;
+			set
+			{
+				if (value < 0)
+					throw new ArgumentOutOfRangeException(nameof(this.TrimTimeout), "Value must be non-negative.");
+
+				this.trimTimeout = value;
+			}
+		}
+
+		/// <summary>
 		/// Disposes the connection
 		/// </summary>
+		[Obsolete("Use DisposeAsync instead.")]
 		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// Disposes of the object, asynchronously.
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			if (!this.disposed)
 			{
 				this.disposed = true;
+
+				await this.semaphore.WaitAsync();
+
+				if (this.filePosition > 0)
+					await this.TrimLocked();
+
 				this.file.Dispose();
 				this.semaphore.Dispose();
 
-				foreach (TaskCompletionSource<object> T in this.waiting)
+				foreach (TaskCompletionSource<object> T in this.waitingDequeuers)
 					T.TrySetResult(null);
 
-				this.waiting.Clear();
+				foreach (TaskCompletionSource<bool> T in this.waitingEnqueuers)
+					T.TrySetResult(false);
+
+				this.waitingDequeuers.Clear();
+				this.waitingEnqueuers.Clear();
 			}
 		}
 
@@ -240,7 +318,18 @@ namespace Waher.Persistence.Queues
 		/// </summary>
 		/// <param name="Item">Item to enqueue</param>
 		/// <returns>If item was enqueued</returns>
-		public async Task<bool> Enqueue(object Item)
+		public Task<bool> Enqueue(object Item)
+		{
+			return this.Enqueue(Item, int.MaxValue);
+		}
+
+		/// <summary>
+		/// Enqueues an item into the queue.
+		/// </summary>
+		/// <param name="Item">Item to enqueue</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+		/// <returns>If item was enqueued</returns>
+		public async Task<bool> Enqueue(object Item, int TimeoutMilliseconds)
 		{
 			if (Item is null)
 				throw new ArgumentNullException(nameof(Item));
@@ -251,6 +340,7 @@ namespace Waher.Persistence.Queues
 
 			await Serializer.Serialize(Writer, true, false, Item, null);
 
+			DateTime StartUtc = DateTime.UtcNow;
 			byte[] TypeBinary = Encoding.UTF8.GetBytes(T.FullName);
 			byte[] ItemBinary = Writer.GetSerialization();
 			int TypeLen = TypeBinary.Length;
@@ -265,19 +355,72 @@ namespace Waher.Persistence.Queues
 			Buffer.BlockCopy(TypeBinary, 0, Payload, 8, TypeLen);
 			Buffer.BlockCopy(ItemBinary, 0, Payload, 8 + TypeLen, ItemLen);
 
-			await this.semaphore.WaitAsync();
-			try
-			{
-				bool Forwarded;
+			bool Forwarded;
+			bool TrimTimerStarted = false;
+			TaskCompletionSource<bool> Wait = null;
 
-				do
+			do
+			{
+				if (this.disposed)
+					return false;
+
+				if (!(Wait is null))
 				{
-					LinkedListNode<TaskCompletionSource<object>> First = this.waiting.First;
+					int Milliseconds = (int)(TimeoutMilliseconds - DateTime.UtcNow.Subtract(StartUtc).TotalMilliseconds);
+					if (Milliseconds < 0)
+						return false;
+
+					_ = Task.Delay(Milliseconds).ContinueWith((_) =>
+					{
+						Wait?.TrySetResult(false);
+						return Task.CompletedTask;
+					});
+
+					if (!await Wait.Task || this.disposed)
+						return false;
+
+					Wait = null;
+				}
+
+				await this.semaphore.WaitAsync();
+				try
+				{
+					LinkedListNode<TaskCompletionSource<object>> First = this.waitingDequeuers.First;
 
 					if (First is null)
 					{
 						if (this.fileSize >= this.maxFileSize)
 						{
+							if (this.filePosition > 0)
+							{
+								if (TrimTimerStarted)
+								{
+									Wait = new TaskCompletionSource<bool>();
+									this.waitingEnqueuers.AddFirst(Wait);
+								}
+								else if (this.trimTimeout <= 0)
+								{
+									await this.TrimLocked();
+									this.TriggerWaitingEnqueuersLocked();
+								}
+								else
+								{
+									TrimTimerStarted = true;
+									Wait = new TaskCompletionSource<bool>();
+									this.waitingEnqueuers.AddFirst(Wait);
+
+									_ = Task.Delay(this.trimTimeout).ContinueWith(async (_) =>
+									{
+										TrimTimerStarted = false;
+										await this.Trim();
+										this.TriggerWaitingEnqueuersLocked();
+									});
+								}
+
+								Forwarded = false;
+								continue;
+							}
+
 							switch (this.thresholdMode)
 							{
 								case QueueThresholdMode.Ignore:
@@ -287,7 +430,15 @@ namespace Waher.Persistence.Queues
 									await this.file.Clear();
 									this.filePosition = 0;
 									this.fileSize = 0;
+
+									this.TriggerWaitingEnqueuersLocked();
 									break;
+
+								case QueueThresholdMode.Wait:
+									Wait = new TaskCompletionSource<bool>();
+									this.waitingEnqueuers.AddFirst(Wait);
+									Forwarded = false;
+									continue;
 
 								case QueueThresholdMode.Exception:
 								default:
@@ -300,18 +451,68 @@ namespace Waher.Persistence.Queues
 					}
 					else
 					{
-						this.waiting.RemoveFirst();
+						this.waitingDequeuers.RemoveFirst();
 						Forwarded = First.Value.TrySetResult(Item);
 					}
 				}
-				while (!Forwarded);
+				finally
+				{
+					this.semaphore.Release();
+				}
+			}
+			while (!Forwarded);
+
+			return true;
+		}
+
+		private async Task Trim()
+		{
+			await this.semaphore.WaitAsync();
+			try
+			{
+				await this.TrimLocked();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
 			}
 			finally
 			{
 				this.semaphore.Release();
 			}
+		}
 
-			return true;
+		private async Task TrimLocked()
+		{
+			if (this.filePosition > 0)
+			{
+				long Pos = 0;
+
+				while (this.filePosition < this.fileSize)
+				{
+					KeyValuePair<byte[], long> Block = await this.file.ReadBlock(this.filePosition);
+					this.filePosition = Block.Value;
+
+					Pos = await this.file.WriteBlock(Block.Key, Pos);
+				}
+
+				await this.file.Truncate(Pos);
+				this.filePosition = 0;
+				this.fileSize = Pos;
+			}
+		}
+
+		private void TriggerWaitingEnqueuersLocked()
+		{
+			if (this.waitingEnqueuers.First is null)
+				return;
+
+			ChunkedList<TaskCompletionSource<bool>> ToAwait = new ChunkedList<TaskCompletionSource<bool>>();
+			ToAwait.AddRange(this.waitingEnqueuers);
+			this.waitingEnqueuers.Clear();
+
+			foreach (TaskCompletionSource<bool> T in ToAwait)
+				T.TrySetResult(true);
 		}
 
 		/// <summary>
@@ -352,7 +553,7 @@ namespace Waher.Persistence.Queues
 						return null;
 
 					TaskCompletionSource<object> Waiter = new TaskCompletionSource<object>();
-					LinkedListNode<TaskCompletionSource<object>> Node = this.waiting.AddLast(Waiter);
+					LinkedListNode<TaskCompletionSource<object>> Node = this.waitingDequeuers.AddLast(Waiter);
 
 					this.semaphore.Release();
 					Released = true;
@@ -361,18 +562,18 @@ namespace Waher.Persistence.Queues
 					{
 						try
 						{
-							Waiter.TrySetResult(null);
-
 							await this.semaphore.WaitAsync();
 							try
 							{
 								if (!(Node.List is null))
-									this.waiting.Remove(Node);
+									this.waitingDequeuers.Remove(Node);
 							}
 							finally
 							{
 								this.semaphore.Release();
 							}
+
+							Waiter.TrySetResult(null);
 						}
 						catch (Exception ex)
 						{
@@ -395,6 +596,9 @@ namespace Waher.Persistence.Queues
 						this.filePosition = 0;
 						this.fileSize = 0;
 					}
+
+					if (!(this.waitingEnqueuers.First is null))
+						this.TriggerWaitingEnqueuersLocked();
 				}
 			}
 			finally

@@ -71,6 +71,8 @@ namespace Waher.Persistence.QueuesLW.Test
 		public async Task TestCleanup()
 		{
 			KeyValuePair<long, long> P = await this.queue.GetFileState();
+			int NrDequeuers = await this.queue.GetNrDequeuers();
+			int NrEnqueuers = await this.queue.GetNrEnqueuers();
 			long FilePosition = P.Key;
 			long FileSize = P.Value;
 
@@ -79,12 +81,14 @@ namespace Waher.Persistence.QueuesLW.Test
 				await this.provider.DisposeAsync();
 				this.provider = null;
 
-				this.queue.Dispose();
+				await this.queue.DisposeAsync();
 				this.queue = null;
 			}
 
-			Assert.AreEqual(0L, FilePosition);
-			Assert.AreEqual(0L, FileSize);
+			Assert.AreEqual(0L, FilePosition, "Queue not cleared.");
+			Assert.AreEqual(0L, FileSize, "Queue file not empty.");
+			Assert.AreEqual(0, NrDequeuers, "There are still dequeuers waiting for items.");
+			Assert.AreEqual(0, NrEnqueuers, "There are still enqueuers waiting for space.");
 		}
 
 		internal static void DeleteFiles()
@@ -154,8 +158,8 @@ namespace Waher.Persistence.QueuesLW.Test
 			await this.InitQueue(QueueThresholdMode.Exception);
 
 			Random Rnd = new();
-			TaskCompletionSource<bool> EnqueueDone = new TaskCompletionSource<bool>();
-			TaskCompletionSource<bool> DequeueDone = new TaskCompletionSource<bool>();
+			TaskCompletionSource<bool> EnqueueDone = new();
+			TaskCompletionSource<bool> DequeueDone = new();
 
 			_ = Task.Run(async () =>
 			{
@@ -274,8 +278,8 @@ namespace Waher.Persistence.QueuesLW.Test
 			await this.InitQueue(QueueThresholdMode.Exception);
 
 			Random Rnd = new();
-			TaskCompletionSource<bool> EnqueueDone = new TaskCompletionSource<bool>();
-			TaskCompletionSource<bool> DequeueDone = new TaskCompletionSource<bool>();
+			TaskCompletionSource<bool> EnqueueDone = new();
+			TaskCompletionSource<bool> DequeueDone = new();
 
 			_ = Task.Run(async () =>
 			{
@@ -382,7 +386,55 @@ namespace Waher.Persistence.QueuesLW.Test
 			Assert.IsNull(await this.queue.Dequeue(2000));
 		}
 
-		// TODO: Test Threshold mode: Wait, NewFile
+		[TestMethod]
+		public async Task Test_15_Threshold_Wait()
+		{
+			TaskCompletionSource<bool> DequeueDone = new();
+			int i = 0;
+			int j = 0;
+
+			await this.InitQueue(QueueThresholdMode.Wait);
+			this.queue.TrimTimeout = 2000;
+
+			_ = Task.Run(async () =>
+			{
+				while (j < 1000)
+				{
+					await Task.Delay(10, CancellationToken.None);
+					object Item = await this.queue.Dequeue(10000);
+
+					Console.Out.WriteLine(DateTime.UtcNow.ToLongTimeString() +
+						": Dequeued: " + Item?.ToString());
+
+					if (Item is null || !Item.Equals(j++))
+					{
+						DequeueDone.TrySetResult(false);
+						return;
+					}
+				}
+
+				DequeueDone.TrySetResult(true);
+
+			}, CancellationToken.None);
+
+			while (i < 1000 && await this.queue.Enqueue(i, 10000))
+			{
+				Console.Out.WriteLine(DateTime.UtcNow.ToLongTimeString() +
+						": Enqueued: " + i.ToString());
+				i++;
+			}
+
+			_ = Task.Delay(10000, CancellationToken.None).ContinueWith((_) =>
+			{
+				DequeueDone.TrySetResult(false);
+			}, CancellationToken.None);
+
+			Assert.AreEqual(1000, i);
+			Assert.IsTrue(await DequeueDone.Task);
+		}
+
+		// TODO: Test Threshold mode: NewFile
 		// TODO: Test Close & Resume (half dequeued before close, other half after resume).
+		// TODO: Multiple threads enqueueing and dequeuing.
 	}
 }

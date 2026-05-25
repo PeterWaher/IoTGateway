@@ -262,8 +262,38 @@ namespace Waher.Persistence.Files
 		/// Writes a binary block to the end of the file.
 		/// </summary>
 		/// <param name="Data">Binary data to write.</param>
+		/// <param name="Position">Position at which to write the data.</param>
 		/// <returns>Position after data block.</returns>
-		protected async Task<long> WriteBlockLocked(byte[] Data)
+		public async Task<long> WriteBlock(byte[] Data, long Position)
+		{
+			await this.fileAccess.BeginWrite();
+			try
+			{
+				return await this.WriteBlockLocked(Data, Position);
+			}
+			finally
+			{
+				await this.fileAccess.EndWrite();
+			}
+		}
+
+		/// <summary>
+		/// Writes a binary block to the end of the file.
+		/// </summary>
+		/// <param name="Data">Binary data to write.</param>
+		/// <returns>Position after data block.</returns>
+		protected Task<long> WriteBlockLocked(byte[] Data)
+		{
+			return this.WriteBlockLocked(Data, this.file.Length);
+		}
+
+		/// <summary>
+		/// Writes a binary block to the end of the file.
+		/// </summary>
+		/// <param name="Data">Binary data to write.</param>
+		/// <param name="Position">Position at which to write the data.</param>
+		/// <returns>Position after data block.</returns>
+		protected async Task<long> WriteBlockLocked(byte[] Data, long Position)
 		{
 			int c = 0;
 			int i = Data.Length;
@@ -299,10 +329,6 @@ namespace Waher.Persistence.Files
 			}
 
 			Buffer.BlockCopy(Data, 0, Block, c, Data.Length);
-
-			long Position;
-
-			Position = this.file.Length;
 
 			this.file.Position = Position;
 
@@ -349,7 +375,7 @@ namespace Waher.Persistence.Files
 		/// Truncates the file.
 		/// </summary>
 		/// <param name="Length">Length at which the file will be truncated.</param>
-		protected async Task Truncate(long Length)
+		public async Task Truncate(long Length)
 		{
 			await this.fileAccess.BeginWrite();
 			try

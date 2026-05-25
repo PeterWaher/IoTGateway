@@ -575,7 +575,5 @@ namespace Waher.Persistence.QueuesLW.Test
 				}
 			}
 		}
-
-		// TODO: Test Threshold mode: NewFile
 	}
 }

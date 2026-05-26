@@ -533,7 +533,7 @@ namespace Waher.Persistence.QueuesLW.Test
 
 			for (int i = 0; i < 10; i++)
 			{
-				Dequeuers[i] = new(100, Rnd, this.queue, Dequeued);
+				Dequeuers[i] = new(100, 50, 150, Rnd, this.queue, Dequeued);
 				_ = Task.Run(Dequeuers[i].Start, CancellationToken.None);
 			}
 

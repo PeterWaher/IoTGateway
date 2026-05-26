@@ -16,12 +16,16 @@ namespace Waher.Persistence.QueuesLW.Test.Workers
 		private readonly SortedDictionary<int, bool> dequeued;
 		private readonly IPersistedQueue queue;
 		private readonly Random rnd;
+		private readonly int minTime;
+		private readonly int maxTime;
 		private int nr;
 
-		public Dequeuer(int Nr, Random Rnd, IPersistedQueue Queue,
+		public Dequeuer(int Nr, int MinTime, int MaxTime, Random Rnd, IPersistedQueue Queue,
 			SortedDictionary<int, bool> Dequeued)
 		{
 			this.nr = Nr;
+			this.minTime = MinTime;
+			this.maxTime = MaxTime;
 			this.rnd = Rnd;
 			this.queue = Queue;
 			this.dequeued = Dequeued;
@@ -36,7 +40,7 @@ namespace Waher.Persistence.QueuesLW.Test.Workers
 			{
 				while (this.nr-- > 0)
 				{
-					await Task.Delay(this.rnd.Next(50, 150), CancellationToken.None);
+					await Task.Delay(this.rnd.Next(this.minTime, this.maxTime), CancellationToken.None);
 
 					object Item = await this.queue.Dequeue(10000);
 

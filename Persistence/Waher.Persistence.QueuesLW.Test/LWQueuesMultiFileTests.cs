@@ -46,7 +46,7 @@ namespace Waher.Persistence.QueuesLW.Test
 			DeleteFiles();
 
 #if LW
-			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, 8192, 8192, 4096, Encoding.UTF8, 8192);
+			this.provider = await FilesProvider.CreateAsync(DataFolder, CollectionName, 8192, 8192, 4096, Encoding.UTF8, 8192);
 #else
 			this.provider = await FilesProvider.CreateAsync(DataFolder, CollectionName, 8192, 8192, 4096, Encoding.UTF8, 8192, true);
 #endif
@@ -401,7 +401,7 @@ namespace Waher.Persistence.QueuesLW.Test
 
 			for (int i = 0; i < 10; i++)
 			{
-				Dequeuers[i] = new(1000, Rnd, this.queue, Dequeued);
+				Dequeuers[i] = new(1000, 0, 1, Rnd, this.queue, Dequeued);
 				_ = Task.Run(Dequeuers[i].Start, CancellationToken.None);
 			}
 

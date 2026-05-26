@@ -15,10 +15,10 @@ namespace Waher.Persistence.QueuesLW.Test.Workers
 		private readonly TaskCompletionSource<bool> enqueueDone;
 		private readonly IPersistedQueue queue;
 		private readonly Random rnd;
+		private readonly int minTime;
+		private readonly int maxTime;
 		private int start;
 		private int nr;
-		private int minTime;
-		private int maxTime;
 
 		public Enqueuer(int Start, int Nr, int MinTime, int MaxTime, Random Rnd, IPersistedQueue Queue)
 		{

@@ -479,7 +479,7 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine("{");
 				CSharp.Append("\tpublic class Serializer");
 				CSharp.Append(TypeName);
-				CSharp.Append(this.context.Id);
+				CSharp.Append(this.context.Id.Replace('-', '_'));
 				CSharp.AppendLine(" : GeneratedObjectSerializerBase");
 				CSharp.AppendLine("\t{");
 				CSharp.AppendLine("\t\tprivate ISerializerContext context;");
@@ -745,7 +745,7 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine();
 				CSharp.Append("\t\tpublic Serializer");
 				CSharp.Append(TypeName);
-				CSharp.Append(this.context.Id);
+				CSharp.Append(this.context.Id.Replace('-', '_'));
 				CSharp.AppendLine("(ISerializerContext Context)");
 				CSharp.AppendLine("\t\t{");
 				CSharp.AppendLine("\t\t\tthis.context = Context;");
@@ -3549,7 +3549,7 @@ namespace Waher.Persistence.Serialization
 
 				sb.Append("WPSA.");
 				AppendType(this.type, sb);
-				sb.Append(this.context.Id);
+				sb.Append(this.context.Id.Replace('-', '_'));
 
 				string CsFolder;
 				string CsFileName;
@@ -3659,7 +3659,7 @@ namespace Waher.Persistence.Serialization
 					sb.Append(Type.Namespace);
 					sb.Append(".Binary.Serializer");
 					sb.Append(TypeName);
-					sb.Append(this.context.Id);
+					sb.Append(this.context.Id.Replace('-', '_'));
 
 					Type T = A.GetType(sb.ToString());
 					this.customSerializer = (IObjectSerializer)Activator.CreateInstance(T, this.context);

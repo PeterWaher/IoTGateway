@@ -11,14 +11,14 @@ using Waher.Script;
 using System.Collections.Generic;
 using System;
 
-
-
 #if !LW
 using Waher.Persistence.Queues.Test.Classes;
+using Waher.Persistence.Queues.Test.Workers;
 namespace Waher.Persistence.Queues.Test
 #else
 using Waher.Persistence.Queues;
 using Waher.Persistence.QueuesLW.Test.Classes;
+using Waher.Persistence.QueuesLW.Test.Workers;
 namespace Waher.Persistence.QueuesLW.Test
 #endif
 {
@@ -465,7 +465,7 @@ namespace Waher.Persistence.QueuesLW.Test
 
 			for (int i = 0; i < 10; i++)
 			{
-				Enqueuers[i] = new(i * 100, 100, Rnd, this.queue);
+				Enqueuers[i] = new(i * 100, 100, 50, 150, Rnd, this.queue);
 				_ = Task.Run(Enqueuers[i].Start, CancellationToken.None);
 			}
 
@@ -487,92 +487,6 @@ namespace Waher.Persistence.QueuesLW.Test
 			{
 				if (!Dequeued.ContainsKey(i))
 					Assert.Fail("Item " + i.ToString() + " was not dequeued.");
-			}
-		}
-
-		private class Enqueuer
-		{
-			private readonly TaskCompletionSource<bool> enqueueDone;
-			private readonly SingleFileQueue queue;
-			private readonly Random rnd;
-			private int start;
-			private int nr;
-
-			public Enqueuer(int Start, int Nr, Random Rnd, SingleFileQueue Queue)
-			{
-				this.start = Start;
-				this.nr = Nr;
-				this.rnd = Rnd;
-				this.queue = Queue;
-				this.enqueueDone = new TaskCompletionSource<bool>();
-			}
-
-			public Task<bool> Wait() => this.enqueueDone.Task;
-
-			public async Task Start()
-			{
-				try
-				{
-					while (this.nr-- > 0)
-					{
-						await Task.Delay(this.rnd.Next(50, 150), CancellationToken.None);
-						Assert.IsTrue(await this.queue.Enqueue(this.start++));
-					}
-
-					this.enqueueDone.TrySetResult(true);
-				}
-				catch (Exception ex)
-				{
-					this.enqueueDone.TrySetException(ex);
-				}
-			}
-		}
-
-		private class Dequeuer
-		{
-			private readonly TaskCompletionSource<bool> dequeueDone;
-			private readonly SortedDictionary<int, bool> dequeued;
-			private readonly SingleFileQueue queue;
-			private readonly Random rnd;
-			private int nr;
-
-			public Dequeuer(int Nr, Random Rnd, SingleFileQueue Queue,
-				SortedDictionary<int, bool> Dequeued)
-			{
-				this.nr = Nr;
-				this.rnd = Rnd;
-				this.queue = Queue;
-				this.dequeued = Dequeued;
-				this.dequeueDone = new TaskCompletionSource<bool>();
-			}
-
-			public Task<bool> Wait() => this.dequeueDone.Task;
-
-			public async Task Start()
-			{
-				try
-				{
-					while (this.nr-- > 0)
-					{
-						await Task.Delay(this.rnd.Next(50, 150), CancellationToken.None);
-
-						object Item = await this.queue.Dequeue(10000);
-
-						if (Item is not int i)
-							throw new Exception("Invalid item dequeued.");
-
-						lock (this.dequeued)
-						{
-							this.dequeued[i] = true;
-						}
-					}
-
-					this.dequeueDone.TrySetResult(true);
-				}
-				catch (Exception ex)
-				{
-					this.dequeueDone.TrySetException(ex);
-				}
 			}
 		}
 	}

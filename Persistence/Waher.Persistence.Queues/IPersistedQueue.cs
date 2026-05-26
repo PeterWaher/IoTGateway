@@ -34,5 +34,18 @@ namespace Waher.Persistence.Queues
 		/// <returns>Dequeued item, or null if no item available within the allotted time.</returns>
 		/// <exception cref="InvalidOperationException">If file has been corrupted.</exception>
 		Task<object> Dequeue(int TimeoutMilliseconds);
+
+		/// <summary>
+		/// Gets the number of dequeuers waiting for items to be queued.
+		/// </summary>
+		/// <returns>Number of dequeuers waiting for items.</returns>
+		Task<int> GetNrDequeuers();
+
+		/// <summary>
+		/// Gets the number of enqueuers waiting for space to be available to enqueue
+		/// new items.
+		/// </summary>
+		/// <returns>Number of enqueuers waiting for space.</returns>
+		Task<int> GetNrEnqueuers();
 	}
 }

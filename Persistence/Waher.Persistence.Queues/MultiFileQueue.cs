@@ -17,6 +17,7 @@ namespace Waher.Persistence.Queues
 	{
 		private readonly LinkedList<QueuedFile> files = new LinkedList<QueuedFile>();
 		private readonly SerializerCollection serializers;
+		private readonly ISerializerContext context;
 		private readonly GetKeysMethod getKeys;
 		private readonly FilesProvider provider;
 		private readonly SemaphoreSlim semaphore;
@@ -34,18 +35,20 @@ namespace Waher.Persistence.Queues
 			this.encrypted = Encrypted;
 			this.serializers = Serializers;
 			this.getKeys = GetKeys;
+			this.context = null;
 			this.provider = null;
 			this.semaphore = new SemaphoreSlim(1);
 		}
 
 		private MultiFileQueue(string FolderName, int MaxFileSize, bool Encrypted,
-			FilesProvider Provider)
+			ISerializerContext Context, FilesProvider Provider)
 		{
 			this.folderName = FolderName;
 			this.maxFileSize = MaxFileSize;
 			this.encrypted = Encrypted;
 			this.serializers = null;
 			this.getKeys = null;
+			this.context = Context;
 			this.provider = Provider;
 			this.semaphore = new SemaphoreSlim(1);
 		}
@@ -78,11 +81,26 @@ namespace Waher.Persistence.Queues
 		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
 		/// <param name="Provider">Files database provider.</param>
 		/// <returns>Queue object instance.</returns>
-		public static async Task<MultiFileQueue> Create(string FolderName, bool Encrypted,
+		public static Task<MultiFileQueue> Create(string FolderName, bool Encrypted,
 			int MaxFileSize, FilesProvider Provider)
 		{
+			return Create(FolderName, Encrypted, MaxFileSize, Provider, Provider);
+		}
+
+		/// <summary>
+		/// Creates a queue that perisists queued items using multiple files in a folder.
+		/// </summary>
+		/// <param name="FolderName">Folder name</param>
+		/// <param name="Encrypted">If files should be encrypted.</param>
+		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="Context">Serialization context.</param>
+		/// <param name="Provider">Files database provider.</param>
+		/// <returns>Queue object instance.</returns>
+		public static async Task<MultiFileQueue> Create(string FolderName, bool Encrypted,
+			int MaxFileSize, ISerializerContext Context, FilesProvider Provider)
+		{
 			MultiFileQueue Result = new MultiFileQueue(FolderName, MaxFileSize, Encrypted,
-				Provider);
+				Context, Provider);
 
 			try
 			{
@@ -158,7 +176,7 @@ namespace Waher.Persistence.Queues
 			else
 			{
 				return await SingleFileQueue.Create(FileName, this.encrypted, this.maxFileSize,
-					QueueThresholdMode.Ignore, this.provider);
+					QueueThresholdMode.Ignore, this.context, this.provider);
 			}
 		}
 
@@ -233,6 +251,85 @@ namespace Waher.Persistence.Queues
 			try
 			{
 				return this.fileCount;
+			}
+			finally
+			{
+				this.semaphore.Release();
+			}
+		}
+
+		/// <summary>
+		/// Gets the number of dequeuers waiting for items to be queued.
+		/// </summary>
+		/// <returns>Number of dequeuers waiting for items.</returns>
+		public async Task<int> GetNrDequeuers()
+		{
+			await this.semaphore.WaitAsync();
+			try
+			{
+				QueuedFile File = this.files.First.Value;
+
+				if (File.Queue is null)
+					File.Queue = await this.CreateSingleFileQueue(File.FileName);
+
+				return await File.Queue.GetNrDequeuers();
+			}
+			finally
+			{
+				this.semaphore.Release();
+			}
+		}
+
+		/// <summary>
+		/// Gets the number of enqueuers waiting for space to be available to enqueue
+		/// new items.
+		/// </summary>
+		/// <returns>Number of enqueuers waiting for space.</returns>
+		public async Task<int> GetNrEnqueuers()
+		{
+			await this.semaphore.WaitAsync();
+			try
+			{
+				QueuedFile File = this.files.Last.Value;
+
+				if (File.Queue is null)
+					File.Queue = await this.CreateSingleFileQueue(File.FileName);
+
+				return await File.Queue.GetNrEnqueuers();
+			}
+			finally
+			{
+				this.semaphore.Release();
+			}
+		}
+
+		/// <summary>
+		/// Gets the current reading position in the file, and file size.
+		/// </summary>
+		/// <returns>File position and file size of first file, followed by
+		/// File position and file size of last file.</returns>
+		public async Task<Tuple<long, long, long, long>> GetFileState()
+		{
+			await this.semaphore.WaitAsync();
+			try
+			{
+				QueuedFile File = this.files.First.Value;
+
+				if (File.Queue is null)
+					File.Queue = await this.CreateSingleFileQueue(File.FileName);
+
+				KeyValuePair<long, long> FirstFileState = await File.Queue.GetFileState();
+
+				File = this.files.Last.Value;
+
+				if (File.Queue is null)
+					File.Queue = await this.CreateSingleFileQueue(File.FileName);
+
+				KeyValuePair<long, long> LastFileState = await File.Queue.GetFileState();
+
+				return new Tuple<long, long, long, long>(
+					FirstFileState.Key, FirstFileState.Value,
+					LastFileState.Key, LastFileState.Value);
 			}
 			finally
 			{

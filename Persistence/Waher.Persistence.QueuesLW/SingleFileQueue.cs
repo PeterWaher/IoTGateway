@@ -205,6 +205,47 @@ namespace Waher.Persistence.Queues
 		}
 
 		/// <summary>
+		/// Creates a queue that perisists queued items in a single file.
+		/// </summary>
+		/// <param name="FileName">File name.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
+		/// reached its maximum size.</param>
+		/// <param name="Context">Serialization context.</param>
+		/// <param name="Provider">Files database provider.</param>
+		/// <returns>Queue object instance.</returns>
+		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+			QueueThresholdMode ThresholdMode, ISerializerContext Context, FilesProvider Provider)
+		{
+			return Create(FileName, Encrypted, int.MaxValue, ThresholdMode, Context, Provider);
+		}
+
+		/// <summary>
+		/// Creates a queue that perisists queued items in a single file.
+		/// </summary>
+		/// <param name="FileName">File name.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
+		/// reached its maximum size.</param>
+		/// <param name="Context">Serialization context.</param>
+		/// <param name="Provider">Files database provider.</param>
+		/// <returns>Queue object instance.</returns>
+		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+			int MaxFileSize, QueueThresholdMode ThresholdMode, ISerializerContext Context, 
+			FilesProvider Provider)
+		{
+			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, Provider);
+			long FileSize = await File.GetLength();
+
+#if COMPILED
+			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Context, Provider.Compiled);
+#else
+			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Context);
+#endif
+		}
+
+		/// <summary>
 		/// File name.
 		/// </summary>
 		public string FileName => this.fileName;

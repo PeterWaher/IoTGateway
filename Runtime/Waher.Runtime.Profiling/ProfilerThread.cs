@@ -178,7 +178,6 @@ namespace Waher.Runtime.Profiling
 			}
 			else
 				this.events.Add(new NewSample(this.profiler.ElapsedTicks, Sample, this));
-
 		}
 
 		/// <summary>

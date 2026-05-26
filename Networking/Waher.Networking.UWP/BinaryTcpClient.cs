@@ -574,22 +574,16 @@ namespace Waher.Networking
 				if (this.connecting || this.reading || this.sending)
 				{
 					this.disposing = true;
-#if !WINDOWS_UWP
-					this.currentCancelReading?.Cancel();
-#endif
 					DelayedDispose = true;
 				}
 				else
 					DelayedDispose = false;
-			}
 
 #if !WINDOWS_UWP
-			CancellationTokenSource Cancel = this.currentCancelReading;
-			this.currentCancelReading = null;
-			Cancel?.Dispose();
-
-			NetworkingModule.UnregisterToken(this.id);
+				this.currentCancelReading?.Cancel();
 #endif
+			}
+
 			if (DelayedDispose)
 			{
 				Task.Delay(1000).ContinueWith(this.AbortRead);  // Double-check socket gets cancelled. If not, forcefully close.
@@ -635,8 +629,13 @@ namespace Waher.Networking
 
 			this.remoteCertificate?.Dispose();
 			this.remoteCertificate = null;
-#endif
 
+			CancellationTokenSource Cancel = this.currentCancelReading;
+			this.currentCancelReading = null;
+			Cancel?.Dispose();
+
+			NetworkingModule.UnregisterToken(this.id);
+#endif
 			if (this.HasSniffers)
 				await this.RemoveRange(this.Sniffers, true);
 		}

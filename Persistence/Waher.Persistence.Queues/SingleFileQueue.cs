@@ -9,6 +9,7 @@ using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Persistence.Queues
 {
@@ -51,6 +52,13 @@ namespace Waher.Persistence.Queues
 		private readonly SerialFile file;
 		private readonly SemaphoreSlim semaphore;
 		private readonly QueueThresholdMode thresholdMode;
+		private readonly Profiler profiler;
+		private readonly bool profiling;
+		private ProfilerThread positionThread;
+		private ProfilerThread sizeThread;
+		private ProfilerThread trimThread;
+		private ProfilerThread enqueueThread;
+		private ProfilerThread dequeueThread;
 		private long fileSize;
 		private long filePosition;
 		private int trimTimeout = 5000;
@@ -58,7 +66,8 @@ namespace Waher.Persistence.Queues
 
 		private SingleFileQueue(string FileName, int MaxFileSize,
 			QueueThresholdMode ThresholdMode, SerialFile File,
-			long FileSize, SerializerCollection Serializers)
+			long FileSize, SerializerCollection Serializers,
+			Profiler Profiler)
 		{
 			this.fileName = FileName;
 			this.maxFileSize = MaxFileSize;
@@ -67,16 +76,21 @@ namespace Waher.Persistence.Queues
 			this.file = File;
 			this.fileSize = FileSize;
 			this.filePosition = 0;
+			this.profiler = Profiler;
+			this.profiling = !(this.profiler is null);
 			this.semaphore = new SemaphoreSlim(1);
+
+			this.Start();
 		}
 
 		private SingleFileQueue(string FileName, int MaxFileSize,
-			QueueThresholdMode ThresholdMode, SerialFile File,
+			QueueThresholdMode ThresholdMode, SerialFile File, long FileSize,
 #if COMPILED
-			long FileSize, ISerializerContext SerializerContext, bool Compiled)
+			ISerializerContext SerializerContext, bool Compiled,
 #else
-			long FileSize, ISerializerContext SerializerContext)
+			ISerializerContext SerializerContext,
 #endif
+			Profiler Profiler)
 		{
 			this.fileName = FileName;
 			this.maxFileSize = MaxFileSize;
@@ -84,6 +98,8 @@ namespace Waher.Persistence.Queues
 			this.file = File;
 			this.fileSize = FileSize;
 			this.filePosition = 0;
+			this.profiler = Profiler;
+			this.profiling = !(this.profiler is null);
 			this.semaphore = new SemaphoreSlim(1);
 
 #if COMPILED
@@ -91,6 +107,50 @@ namespace Waher.Persistence.Queues
 #else
 			this.serializers = new SerializerCollection(SerializerContext);
 #endif
+			this.Start();
+		}
+
+		private void Start()
+		{
+			if (this.profiling)
+			{
+				string Name = Path.GetFileName(this.fileName);
+
+				this.positionThread = this.profiler.CreateThread("Pos(" + Name + ")", ProfilerThreadType.Analog);
+				this.sizeThread = this.profiler.CreateThread("Size(" + Name + ")", ProfilerThreadType.Analog);
+				this.trimThread = this.profiler.CreateThread("Trim(" + Name + ")", ProfilerThreadType.Binary);
+				this.enqueueThread = this.profiler.CreateThread("Enqueue(" + Name + ")", ProfilerThreadType.Binary);
+				this.dequeueThread = this.profiler.CreateThread("Dequeue(" + Name + ")", ProfilerThreadType.Binary);
+
+				this.positionThread.Start();
+				this.sizeThread.Start();
+				this.trimThread.Start();
+				this.enqueueThread.Start();
+				this.dequeueThread.Start();
+
+				this.positionThread.NewSample(this.filePosition);
+				this.sizeThread.NewSample(this.fileSize);
+			}
+			else
+			{
+				this.positionThread = null;
+				this.sizeThread = null;
+				this.enqueueThread = null;
+				this.dequeueThread = null;
+				this.trimThread = null;
+			}
+		}
+
+		private void Stop()
+		{
+			if (this.profiling)
+			{
+				this.positionThread.Stop();
+				this.sizeThread.Stop();
+				this.trimThread.Stop();
+				this.enqueueThread.Stop();
+				this.dequeueThread.Stop();
+			}
 		}
 
 		/// <summary>
@@ -135,14 +195,35 @@ namespace Waher.Persistence.Queues
 		/// <param name="Serializers">Collection of serializers.</param>
 		/// <param name="GetKeys">Method that provides encryption keys.</param>
 		/// <returns>Queue object instance.</returns>
-		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted,
 			int MaxFileSize, QueueThresholdMode ThresholdMode,
 			SerializerCollection Serializers, GetKeysMethod GetKeys)
+		{
+			return Create(FileName, Encrypted, MaxFileSize, ThresholdMode, Serializers,
+				GetKeys, null);
+		}
+
+		/// <summary>
+		/// Creates a queue that perisists queued items in a single file.
+		/// </summary>
+		/// <param name="FileName">File name.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
+		/// reached its maximum size.</param>
+		/// <param name="Serializers">Collection of serializers.</param>
+		/// <param name="GetKeys">Method that provides encryption keys.</param>
+		/// <param name="Profiler">Optional profiler.</param>
+		/// <returns>Queue object instance.</returns>
+		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+			int MaxFileSize, QueueThresholdMode ThresholdMode,
+			SerializerCollection Serializers, GetKeysMethod GetKeys, Profiler Profiler)
 		{
 			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, GetKeys);
 			long FileSize = await File.GetLength();
 
-			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Serializers);
+			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize,
+				Serializers, Profiler);
 		}
 
 		/// <summary>
@@ -170,16 +251,34 @@ namespace Waher.Persistence.Queues
 		/// reached its maximum size.</param>
 		/// <param name="Provider">Files database provider.</param>
 		/// <returns>Queue object instance.</returns>
-		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted,
 			int MaxFileSize, QueueThresholdMode ThresholdMode, FilesProvider Provider)
+		{
+			return Create(FileName, Encrypted, MaxFileSize, ThresholdMode, Provider, null);
+		}
+
+		/// <summary>
+		/// Creates a queue that perisists queued items in a single file.
+		/// </summary>
+		/// <param name="FileName">File name.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
+		/// reached its maximum size.</param>
+		/// <param name="Provider">Files database provider.</param>
+		/// <param name="Profiler">Optional profiler.</param>
+		/// <returns>Queue object instance.</returns>
+		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+			int MaxFileSize, QueueThresholdMode ThresholdMode, FilesProvider Provider,
+			Profiler Profiler)
 		{
 			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, Provider);
 			long FileSize = await File.GetLength();
 
 #if COMPILED
-			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Provider, Provider.Compiled);
+			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Provider, Provider.Compiled, Profiler);
 #else
-			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Provider);
+			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Provider, Profiler);
 #endif
 		}
 
@@ -194,14 +293,35 @@ namespace Waher.Persistence.Queues
 		/// <param name="Serializers">Collection of serializers.</param>
 		/// <param name="Provider">Files database provider, used for encryption only.</param>
 		/// <returns>Queue object instance.</returns>
-		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted,
 			int MaxFileSize, QueueThresholdMode ThresholdMode,
 			SerializerCollection Serializers, FilesProvider Provider)
+		{
+			return Create(FileName, Encrypted, MaxFileSize, ThresholdMode, Serializers,
+				Provider, null);
+		}
+
+		/// <summary>
+		/// Creates a queue that perisists queued items in a single file.
+		/// </summary>
+		/// <param name="FileName">File name.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
+		/// reached its maximum size.</param>
+		/// <param name="Serializers">Collection of serializers.</param>
+		/// <param name="Provider">Files database provider, used for encryption only.</param>
+		/// <param name="Profiler">Optional profiler.</param>
+		/// <returns>Queue object instance.</returns>
+		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+			int MaxFileSize, QueueThresholdMode ThresholdMode,
+			SerializerCollection Serializers, FilesProvider Provider,
+			Profiler Profiler)
 		{
 			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, Provider);
 			long FileSize = await File.GetLength();
 
-			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Serializers);
+			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Serializers, Profiler);
 		}
 
 		/// <summary>
@@ -231,17 +351,37 @@ namespace Waher.Persistence.Queues
 		/// <param name="Context">Serialization context.</param>
 		/// <param name="Provider">Files database provider.</param>
 		/// <returns>Queue object instance.</returns>
-		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
-			int MaxFileSize, QueueThresholdMode ThresholdMode, ISerializerContext Context, 
+		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+			int MaxFileSize, QueueThresholdMode ThresholdMode, ISerializerContext Context,
 			FilesProvider Provider)
+		{
+			return Create(FileName, Encrypted, MaxFileSize, ThresholdMode, Context,
+				Provider, null);
+		}
+
+		/// <summary>
+		/// Creates a queue that perisists queued items in a single file.
+		/// </summary>
+		/// <param name="FileName">File name.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
+		/// reached its maximum size.</param>
+		/// <param name="Context">Serialization context.</param>
+		/// <param name="Provider">Files database provider.</param>
+		/// <param name="Profiler">Optional profiler.</param>
+		/// <returns>Queue object instance.</returns>
+		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+			int MaxFileSize, QueueThresholdMode ThresholdMode, ISerializerContext Context,
+			FilesProvider Provider, Profiler Profiler)
 		{
 			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, Provider);
 			long FileSize = await File.GetLength();
 
 #if COMPILED
-			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Context, Provider.Compiled);
+			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Context, Provider.Compiled, Profiler);
 #else
-			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Context);
+			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize, Context, Profiler);
 #endif
 		}
 
@@ -357,6 +497,8 @@ namespace Waher.Persistence.Queues
 
 				this.waitingDequeuers.Clear();
 				this.waitingEnqueuers.Clear();
+
+				this.Stop();
 			}
 		}
 
@@ -380,6 +522,9 @@ namespace Waher.Persistence.Queues
 		{
 			if (Item is null)
 				throw new ArgumentNullException(nameof(Item));
+
+			if (this.profiling)
+				this.enqueueThread.High();
 
 			Type T = Item.GetType();
 			IObjectSerializer Serializer = await this.serializers.GetObjectSerializer(T);
@@ -409,13 +554,23 @@ namespace Waher.Persistence.Queues
 			do
 			{
 				if (this.disposed)
+				{
+					if (this.profiling)
+						this.enqueueThread.Low();
+
 					return false;
+				}
 
 				if (!(Wait is null))
 				{
 					int Milliseconds = (int)(TimeoutMilliseconds - DateTime.UtcNow.Subtract(StartUtc).TotalMilliseconds);
 					if (Milliseconds < 0)
+					{
+						if (this.profiling)
+							this.enqueueThread.Low();
+
 						return false;
+					}
 
 					_ = Task.Delay(Milliseconds).ContinueWith((_) =>
 					{
@@ -424,7 +579,12 @@ namespace Waher.Persistence.Queues
 					});
 
 					if (!await Wait.Task || this.disposed)
+					{
+						if (this.profiling)
+							this.enqueueThread.Low();
+
 						return false;
+					}
 
 					Wait = null;
 				}
@@ -471,12 +631,21 @@ namespace Waher.Persistence.Queues
 							switch (this.thresholdMode)
 							{
 								case QueueThresholdMode.Ignore:
+									if (this.profiling)
+										this.enqueueThread.Low();
+
 									return false;
 
 								case QueueThresholdMode.Clear:
 									await this.file.Clear();
 									this.filePosition = 0;
 									this.fileSize = 0;
+
+									if (this.profiling)
+									{
+										this.positionThread.NewSample(0);
+										this.sizeThread.NewSample(0);
+									}
 
 									this.TriggerWaitingEnqueuersLocked();
 									break;
@@ -494,6 +663,10 @@ namespace Waher.Persistence.Queues
 						}
 
 						this.fileSize = await this.file.WriteBlock(Payload);
+
+						if (this.profiling)
+							this.sizeThread.NewSample(this.fileSize);
+
 						Forwarded = true;
 					}
 					else
@@ -509,11 +682,17 @@ namespace Waher.Persistence.Queues
 			}
 			while (!Forwarded);
 
+			if (this.profiling)
+				this.enqueueThread.Low();
+
 			return true;
 		}
 
 		private async Task Trim()
 		{
+			if (this.profiling)
+				this.trimThread.High();
+
 			await this.semaphore.WaitAsync();
 			try
 			{
@@ -526,6 +705,9 @@ namespace Waher.Persistence.Queues
 			finally
 			{
 				this.semaphore.Release();
+
+				if (this.profiling)
+					this.trimThread.Low();
 			}
 		}
 
@@ -540,12 +722,21 @@ namespace Waher.Persistence.Queues
 					KeyValuePair<byte[], long> Block = await this.file.ReadBlock(this.filePosition);
 					this.filePosition = Block.Value;
 
+					if (this.profiling)
+						this.positionThread.NewSample(this.filePosition);
+
 					Pos = await this.file.WriteBlock(Block.Key, Pos);
 				}
 
 				await this.file.Truncate(Pos);
 				this.filePosition = 0;
 				this.fileSize = Pos;
+
+				if (this.profiling)
+				{
+					this.positionThread.NewSample(0);
+					this.sizeThread.NewSample(this.fileSize);
+				}
 			}
 		}
 
@@ -591,6 +782,9 @@ namespace Waher.Persistence.Queues
 			if (this.disposed)
 				return null;
 
+			if (this.profiling)
+				this.dequeueThread.High();
+
 			byte[] Payload;
 			bool Released = false;
 
@@ -600,7 +794,12 @@ namespace Waher.Persistence.Queues
 				if (this.filePosition >= this.fileSize)
 				{
 					if (TimeoutMilliseconds == 0)
+					{
+						if (this.profiling)
+							this.dequeueThread.Low();
+
 						return null;
+					}
 
 					TaskCompletionSource<object> Waiter = new TaskCompletionSource<object>();
 					LinkedListNode<TaskCompletionSource<object>> Node = this.waitingDequeuers.AddLast(Waiter);
@@ -631,7 +830,12 @@ namespace Waher.Persistence.Queues
 						}
 					});
 
-					return await Waiter.Task;
+					object Result = await Waiter.Task;
+
+					if (this.profiling)
+						this.dequeueThread.Low();
+
+					return Result;
 				}
 				else
 				{
@@ -639,12 +843,21 @@ namespace Waher.Persistence.Queues
 					Payload = Block.Key;
 					this.filePosition = Block.Value;
 
+					if (this.profiling)
+						this.positionThread.NewSample(this.filePosition);
+
 					if (this.filePosition >= this.fileSize)
 					{
 						await this.file.Clear();
 
 						this.filePosition = 0;
 						this.fileSize = 0;
+
+						if (this.profiling)
+						{
+							this.positionThread.NewSample(0);
+							this.sizeThread.NewSample(0);
+						}
 					}
 
 					if (!(this.waitingEnqueuers.First is null))
@@ -680,6 +893,9 @@ namespace Waher.Persistence.Queues
 			BinaryDeserializer Reader = new BinaryDeserializer(string.Empty, Encoding.UTF8, ItemBinary, 0);
 
 			object Item = await Serializer.Deserialize(Reader, null, false);
+
+			if (this.profiling)
+				this.dequeueThread.Low();
 
 			return Item;
 		}

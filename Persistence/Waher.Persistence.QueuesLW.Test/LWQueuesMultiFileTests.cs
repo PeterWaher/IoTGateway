@@ -7,6 +7,8 @@ using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
 using System.Collections.Generic;
 using System;
+using Waher.Runtime.Profiling;
+
 
 
 #if !LW
@@ -25,14 +27,18 @@ namespace Waher.Persistence.QueuesLW.Test
 	{
 		// TODO: Cryptographic keys based on folder name, not individual file names.
 
-		internal const string Folder = "Data";
+		internal const string DataFolder = "Data";
+		internal const string QueueFolder = "Data\\Queue";
+		internal const string UmlFolder = "UmlMulti";
 		internal const string CollectionName = "Default";
-		internal const string QueueFolderName = "Data\\Queue";
 		internal const int MaxFileSize = 20480;
 
 		private FilesProvider provider;
 		private MultiFileQueue queue;
 		private FullSerialization fullSerialization;
+		private Profiler profiler;
+
+		public TestContext TestContext { get; set; }
 
 		[TestInitialize]
 		public async Task TestInitialize()
@@ -42,12 +48,14 @@ namespace Waher.Persistence.QueuesLW.Test
 #if LW
 			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, 8192, 8192, 4096, Encoding.UTF8, 8192);
 #else
-			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, 8192, 8192, 4096, Encoding.UTF8, 8192, true);
+			this.provider = await FilesProvider.CreateAsync(DataFolder, CollectionName, 8192, 8192, 4096, Encoding.UTF8, 8192, true);
 #endif
 			this.fullSerialization = new FullSerialization();
+			this.profiler = new Profiler(ProfilerThreadType.Sequential);
+			this.profiler.Start();
 
-			this.queue = await MultiFileQueue.Create(QueueFolderName, true, MaxFileSize,
-				this.fullSerialization, this.provider);
+			this.queue = await MultiFileQueue.Create(QueueFolder, true, MaxFileSize,
+				this.fullSerialization, this.provider, this.profiler);
 		}
 
 		[TestCleanup]
@@ -71,6 +79,17 @@ namespace Waher.Persistence.QueuesLW.Test
 				this.queue = null;
 			}
 
+			this.profiler.Stop();
+
+			if (!Directory.Exists(UmlFolder))
+				Directory.CreateDirectory(UmlFolder);
+
+			string Uml = this.profiler.ExportPlantUml(TimeUnit.Seconds);
+			string FileName = Path.Combine(UmlFolder, this.TestContext.TestName + ".uml");
+
+			File.WriteAllText(FileName, Uml);
+			Console.Out.WriteLine(Uml);
+
 			Assert.AreEqual(0, NrDequeuers, "There are still dequeuers waiting for items.");
 			Assert.AreEqual(0, NrEnqueuers, "There are still enqueuers waiting for space.");
 			Assert.AreEqual(1, NrFiles, "There should only be one file at the end.");
@@ -82,9 +101,9 @@ namespace Waher.Persistence.QueuesLW.Test
 
 		internal static void DeleteFiles()
 		{
-			if (Directory.Exists(QueueFolderName))
+			if (Directory.Exists(QueueFolder))
 			{
-				string[] Files = Directory.GetFiles(QueueFolderName, "*.queue");
+				string[] Files = Directory.GetFiles(QueueFolder, "*.queue");
 
 				foreach (string FileName in Files)
 					File.Delete(FileName);
@@ -359,7 +378,7 @@ namespace Waher.Persistence.QueuesLW.Test
 				Assert.AreEqual(i, await this.queue.Dequeue(10000));
 
 			await this.queue.DisposeAsync();
-			this.queue = await MultiFileQueue.Create(QueueFolderName, true, MaxFileSize,
+			this.queue = await MultiFileQueue.Create(QueueFolder, true, MaxFileSize,
 				this.fullSerialization, this.provider);
 
 			for (; i < 10000; i++)
@@ -376,7 +395,7 @@ namespace Waher.Persistence.QueuesLW.Test
 
 			for (int i = 0; i < 10; i++)
 			{
-				Enqueuers[i] = new(i * 1000, 1000, 5, 15, Rnd, this.queue);
+				Enqueuers[i] = new(i * 1000, 1000, 0, 1, Rnd, this.queue);
 				_ = Task.Run(Enqueuers[i].Start, CancellationToken.None);
 			}
 

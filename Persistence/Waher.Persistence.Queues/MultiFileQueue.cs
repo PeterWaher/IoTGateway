@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Persistence.Queues
 {
@@ -21,6 +22,7 @@ namespace Waher.Persistence.Queues
 		private readonly GetKeysMethod getKeys;
 		private readonly FilesProvider provider;
 		private readonly SemaphoreSlim semaphore;
+		private readonly Profiler profiler;
 		private readonly string folderName;
 		private readonly int maxFileSize;
 		private readonly bool encrypted = false;
@@ -28,7 +30,7 @@ namespace Waher.Persistence.Queues
 		private bool disposed = false;
 
 		private MultiFileQueue(string FolderName, int MaxFileSize, bool Encrypted,
-			SerializerCollection Serializers, GetKeysMethod GetKeys)
+			SerializerCollection Serializers, GetKeysMethod GetKeys, Profiler Profiler)
 		{
 			this.folderName = FolderName;
 			this.maxFileSize = MaxFileSize;
@@ -37,11 +39,12 @@ namespace Waher.Persistence.Queues
 			this.getKeys = GetKeys;
 			this.context = null;
 			this.provider = null;
+			this.profiler = Profiler;
 			this.semaphore = new SemaphoreSlim(1);
 		}
 
 		private MultiFileQueue(string FolderName, int MaxFileSize, bool Encrypted,
-			ISerializerContext Context, FilesProvider Provider)
+			ISerializerContext Context, FilesProvider Provider, Profiler Profiler)
 		{
 			this.folderName = FolderName;
 			this.maxFileSize = MaxFileSize;
@@ -50,6 +53,7 @@ namespace Waher.Persistence.Queues
 			this.getKeys = null;
 			this.context = Context;
 			this.provider = Provider;
+			this.profiler = Profiler;
 			this.semaphore = new SemaphoreSlim(1);
 		}
 
@@ -62,11 +66,28 @@ namespace Waher.Persistence.Queues
 		/// <param name="Serializers">Collection of serializers.</param>
 		/// <param name="GetKeys">Method that provides encryption keys.</param>
 		/// <returns>Queue object instance.</returns>
-		public static async Task<MultiFileQueue> Create(string FolderName, bool Encrypted,
+		public static Task<MultiFileQueue> Create(string FolderName, bool Encrypted,
 			int MaxFileSize, SerializerCollection Serializers, GetKeysMethod GetKeys)
 		{
+			return Create(FolderName, Encrypted, MaxFileSize, Serializers, GetKeys, null);
+		}
+
+		/// <summary>
+		/// Creates a queue that perisists queued items using multiple files in a folder.
+		/// </summary>
+		/// <param name="FolderName">Folder name</param>
+		/// <param name="Encrypted">If files should be encrypted.</param>
+		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="Serializers">Collection of serializers.</param>
+		/// <param name="GetKeys">Method that provides encryption keys.</param>
+		/// <param name="Profiler">Optional profiler.</param>
+		/// <returns>Queue object instance.</returns>
+		public static async Task<MultiFileQueue> Create(string FolderName, bool Encrypted,
+			int MaxFileSize, SerializerCollection Serializers, GetKeysMethod GetKeys,
+			Profiler Profiler)
+		{
 			MultiFileQueue Result = new MultiFileQueue(FolderName, MaxFileSize, Encrypted,
-				Serializers, GetKeys);
+				Serializers, GetKeys, Profiler);
 
 			await Result.PrepareQueue();
 
@@ -84,7 +105,22 @@ namespace Waher.Persistence.Queues
 		public static Task<MultiFileQueue> Create(string FolderName, bool Encrypted,
 			int MaxFileSize, FilesProvider Provider)
 		{
-			return Create(FolderName, Encrypted, MaxFileSize, Provider, Provider);
+			return Create(FolderName, Encrypted, MaxFileSize, Provider, (Profiler)null);
+		}
+
+		/// <summary>
+		/// Creates a queue that perisists queued items using multiple files in a folder.
+		/// </summary>
+		/// <param name="FolderName">Folder name</param>
+		/// <param name="Encrypted">If files should be encrypted.</param>
+		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="Provider">Files database provider.</param>
+		/// <param name="Profiler">Optional profiler.</param>
+		/// <returns>Queue object instance.</returns>
+		public static Task<MultiFileQueue> Create(string FolderName, bool Encrypted,
+			int MaxFileSize, FilesProvider Provider, Profiler Profiler)
+		{
+			return Create(FolderName, Encrypted, MaxFileSize, Provider, Provider, Profiler);
 		}
 
 		/// <summary>
@@ -96,11 +132,28 @@ namespace Waher.Persistence.Queues
 		/// <param name="Context">Serialization context.</param>
 		/// <param name="Provider">Files database provider.</param>
 		/// <returns>Queue object instance.</returns>
-		public static async Task<MultiFileQueue> Create(string FolderName, bool Encrypted,
+		public static Task<MultiFileQueue> Create(string FolderName, bool Encrypted,
 			int MaxFileSize, ISerializerContext Context, FilesProvider Provider)
 		{
+			return Create(FolderName, Encrypted, MaxFileSize, Context, Provider, null);
+		}
+
+		/// <summary>
+		/// Creates a queue that perisists queued items using multiple files in a folder.
+		/// </summary>
+		/// <param name="FolderName">Folder name</param>
+		/// <param name="Encrypted">If files should be encrypted.</param>
+		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="Context">Serialization context.</param>
+		/// <param name="Provider">Files database provider.</param>
+		/// <param name="Profiler">Optional profiler.</param>
+		/// <returns>Queue object instance.</returns>
+		public static async Task<MultiFileQueue> Create(string FolderName, bool Encrypted,
+			int MaxFileSize, ISerializerContext Context, FilesProvider Provider,
+			Profiler Profiler)
+		{
 			MultiFileQueue Result = new MultiFileQueue(FolderName, MaxFileSize, Encrypted,
-				Context, Provider);
+				Context, Provider, Profiler);
 
 			try
 			{
@@ -171,12 +224,12 @@ namespace Waher.Persistence.Queues
 			if (this.provider is null)
 			{
 				return await SingleFileQueue.Create(FileName, this.encrypted, this.maxFileSize,
-					QueueThresholdMode.Ignore, this.serializers, this.getKeys);
+					QueueThresholdMode.Ignore, this.serializers, this.getKeys, this.profiler);
 			}
 			else
 			{
 				return await SingleFileQueue.Create(FileName, this.encrypted, this.maxFileSize,
-					QueueThresholdMode.Ignore, this.context, this.provider);
+					QueueThresholdMode.Ignore, this.context, this.provider, this.profiler);
 			}
 		}
 
@@ -344,6 +397,8 @@ namespace Waher.Persistence.Queues
 		/// <returns>If item was enqueued</returns>
 		public async Task<bool> Enqueue(object Item)
 		{
+			bool Released = false;
+
 			await this.semaphore.WaitAsync();
 			try
 			{
@@ -351,7 +406,7 @@ namespace Waher.Persistence.Queues
 					return false;
 
 				QueuedFile File = this.files.Last.Value;
-				if (await File.Queue.Enqueue(Item))
+				if (await File.Queue.Enqueue(Item, 0))
 					return true;
 
 				string NewFileName = Path.Combine(this.folderName, Guid.NewGuid().ToString() + ".queue");
@@ -365,11 +420,17 @@ namespace Waher.Persistence.Queues
 				this.files.AddLast(File);
 				this.fileCount++;
 
-				return await File.Queue.Enqueue(Item);
+				Task<bool> PendingResult = File.Queue.Enqueue(Item);
+
+				this.semaphore.Release();
+				Released = true;
+
+				return await PendingResult;
 			}
 			finally
 			{
-				this.semaphore.Release();
+				if (!Released)
+					this.semaphore.Release();
 			}
 		}
 

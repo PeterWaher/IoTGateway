@@ -10,6 +10,8 @@ using Waher.Runtime.Inventory;
 using Waher.Script;
 using System.Collections.Generic;
 using System;
+using Waher.Runtime.Profiling;
+
 
 #if !LW
 using Waher.Persistence.Queues.Test.Classes;
@@ -26,13 +28,17 @@ namespace Waher.Persistence.QueuesLW.Test
 	public sealed class DBQueuesSingleFileTests
 	{
 		internal const string Folder = "Data";
-		internal const string CollectionName = "Default";
 		internal const string QueueFileName = "Data\\Test.queue";
+		internal const string UmlFolder = "UmlSingle";
+		internal const string CollectionName = "Default";
 		internal const int MaxFileSize = 20480;
 
 		private FilesProvider provider;
 		private SingleFileQueue queue;
 		private FullSerialization fullSerialization;
+		private Profiler profiler;
+
+		public TestContext TestContext { get; set; }
 
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext _)
@@ -59,12 +65,14 @@ namespace Waher.Persistence.QueuesLW.Test
 			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, 8192, 8192, 4096, Encoding.UTF8, 8192, true);
 #endif
 			this.fullSerialization = new FullSerialization();
+			this.profiler = new Profiler(ProfilerThreadType.Sequential);
+			this.profiler.Start();
 		}
 
 		private async Task InitQueue(QueueThresholdMode Mode)
 		{
 			this.queue = await SingleFileQueue.Create(QueueFileName, true, MaxFileSize,
-				Mode, this.fullSerialization.Serializers, this.provider);
+				Mode, this.fullSerialization.Serializers, this.provider, this.profiler);
 		}
 
 		[TestCleanup]
@@ -84,6 +92,17 @@ namespace Waher.Persistence.QueuesLW.Test
 				await this.queue.DisposeAsync();
 				this.queue = null;
 			}
+
+			this.profiler.Stop();
+
+			if (!Directory.Exists(UmlFolder))
+				Directory.CreateDirectory(UmlFolder);
+
+			string Uml = this.profiler.ExportPlantUml(TimeUnit.Seconds);
+			string FileName = Path.Combine(UmlFolder, this.TestContext.TestName + ".uml");
+
+			File.WriteAllText(FileName, Uml);
+			Console.Out.WriteLine(Uml);
 
 			Assert.AreEqual(0L, FilePosition, "Queue not cleared.");
 			Assert.AreEqual(0L, FileSize, "Queue file not empty.");

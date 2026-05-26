@@ -396,6 +396,11 @@ namespace Waher.Persistence.Queues
 		/// <exception cref="InvalidOperationException">If file has been corrupted.</exception>
 		public async Task<object> Dequeue(int TimeoutMilliseconds)
 		{
+			if (this.disposed)
+				return null;
+
+			bool Released = false;
+
 			await this.semaphore.WaitAsync();
 			try
 			{
@@ -403,7 +408,6 @@ namespace Waher.Persistence.Queues
 					return null;
 
 				QueuedFile File = this.files.First.Value;
-				object Result;
 
 				while (this.fileCount > 1)
 				{
@@ -422,7 +426,7 @@ namespace Waher.Persistence.Queues
 						}
 					}
 
-					Result = await File.Queue.Dequeue(0);
+					object Result = await File.Queue.Dequeue(0);
 					if (!(Result is null))
 						return Result;
 
@@ -441,6 +445,8 @@ namespace Waher.Persistence.Queues
 							Log.Exception(ex);
 						}
 					}
+
+					File = this.files.First.Value;
 				}
 
 				File = this.files.First.Value;
@@ -458,11 +464,17 @@ namespace Waher.Persistence.Queues
 					}
 				}
 
-				return await File.Queue.Dequeue(TimeoutMilliseconds);
+				Task<object> PendingResult = File.Queue.Dequeue(TimeoutMilliseconds);
+
+				this.semaphore.Release();
+				Released = true;
+
+				return await PendingResult;
 			}
 			finally
 			{
-				this.semaphore.Release();
+				if (!Released)
+					this.semaphore.Release();
 			}
 		}
 	}

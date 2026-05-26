@@ -588,6 +588,9 @@ namespace Waher.Persistence.Queues
 			if (TimeoutMilliseconds < 0)
 				throw new ArgumentOutOfRangeException(nameof(TimeoutMilliseconds), "Value must be non-negative.");
 
+			if (this.disposed)
+				return null;
+
 			byte[] Payload;
 			bool Released = false;
 

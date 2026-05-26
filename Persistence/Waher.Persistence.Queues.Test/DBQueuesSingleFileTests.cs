@@ -125,12 +125,15 @@ namespace Waher.Persistence.QueuesLW.Test
 		{
 			await this.InitQueue(QueueThresholdMode.Exception);
 
+			TaskCompletionSource<bool> EnqueueResult = new();
+
 			_ = Task.Run(async () =>
 			{
 				await Task.Delay(1000, CancellationToken.None);
-				Assert.IsTrue(await this.queue.Enqueue(1));
+				EnqueueResult.TrySetResult(await this.queue.Enqueue(1));
 			}, CancellationToken.None);
 
+			Assert.IsTrue(await EnqueueResult.Task);
 			Assert.AreEqual(1, await this.queue.Dequeue(10000));
 		}
 
@@ -139,17 +142,27 @@ namespace Waher.Persistence.QueuesLW.Test
 		{
 			await this.InitQueue(QueueThresholdMode.Exception);
 
+			TaskCompletionSource<bool> EnqueueResult = new();
+
 			_ = Task.Run(async () =>
 			{
-				for (int i = 0; i < 10; i++)
+				for (int j = 0; j < 10; j++)
 				{
 					await Task.Delay(100, CancellationToken.None);
-					Assert.IsTrue(await this.queue.Enqueue(i));
+					if (!await this.queue.Enqueue(j))
+					{
+						EnqueueResult.TrySetResult(false);
+						return;
+					}
 				}
+
+				EnqueueResult.TrySetResult(true);
 			}, CancellationToken.None);
 
 			for (int i = 0; i < 10; i++)
 				Assert.AreEqual(i, await this.queue.Dequeue(10000));
+
+			Assert.IsTrue(await EnqueueResult.Task);
 		}
 
 		[TestMethod]
@@ -168,7 +181,11 @@ namespace Waher.Persistence.QueuesLW.Test
 					for (int i = 0; i < 100; i++)
 					{
 						await Task.Delay(Rnd.Next(50, 150), CancellationToken.None);
-						Assert.IsTrue(await this.queue.Enqueue(i));
+						if (!await this.queue.Enqueue(i))
+						{
+							EnqueueDone.TrySetResult(false);
+							return;
+						}
 					}
 
 					EnqueueDone.TrySetResult(true);
@@ -186,7 +203,11 @@ namespace Waher.Persistence.QueuesLW.Test
 					for (int i = 0; i < 100; i++)
 					{
 						await Task.Delay(Rnd.Next(50, 150), CancellationToken.None);
-						Assert.AreEqual(i, await this.queue.Dequeue(10000));
+						if (await this.queue.Dequeue(10000) is not int j || i != j)
+						{
+							DequeueDone.TrySetResult(false);
+							return;
+						}
 					}
 
 					DequeueDone.TrySetResult(true);
@@ -197,8 +218,8 @@ namespace Waher.Persistence.QueuesLW.Test
 				}
 			}, CancellationToken.None);
 
-			await EnqueueDone.Task;
-			await DequeueDone.Task;
+			Assert.IsTrue(await EnqueueDone.Task);
+			Assert.IsTrue(await DequeueDone.Task);
 		}
 
 		[TestMethod]
@@ -237,11 +258,15 @@ namespace Waher.Persistence.QueuesLW.Test
 		{
 			await this.InitQueue(QueueThresholdMode.Exception);
 
+			TaskCompletionSource<bool> EnqueueResult = new();
+
 			_ = Task.Run(async () =>
 			{
 				await Task.Delay(1000, CancellationToken.None);
-				Assert.IsTrue(await this.queue.Enqueue(new Simple(1, "Object 1")));
+				EnqueueResult.TrySetResult(await this.queue.Enqueue(new Simple(1, "Object 1")));
 			}, CancellationToken.None);
+
+			Assert.IsTrue(await EnqueueResult.Task);
 
 			Simple Item = await this.queue.Dequeue(10000) as Simple;
 			Assert.IsNotNull(Item);
@@ -254,13 +279,21 @@ namespace Waher.Persistence.QueuesLW.Test
 		{
 			await this.InitQueue(QueueThresholdMode.Exception);
 
+			TaskCompletionSource<bool> EnqueueResult = new();
+
 			_ = Task.Run(async () =>
 			{
 				for (int i = 0; i < 10; i++)
 				{
 					await Task.Delay(100, CancellationToken.None);
-					Assert.IsTrue(await this.queue.Enqueue(new Simple(i, "Object " + i)));
+					if (!await this.queue.Enqueue(new Simple(i, "Object " + i)))
+					{
+						EnqueueResult.TrySetResult(false);
+						return;
+					}
 				}
+
+				EnqueueResult.TrySetResult(true);
 			}, CancellationToken.None);
 
 			for (int i = 0; i < 10; i++)
@@ -270,6 +303,8 @@ namespace Waher.Persistence.QueuesLW.Test
 				Assert.AreEqual(i, Item.Counter);
 				Assert.AreEqual("Object " + i, Item.Message);
 			}
+
+			Assert.IsTrue(await EnqueueResult.Task);
 		}
 
 		[TestMethod]
@@ -288,7 +323,11 @@ namespace Waher.Persistence.QueuesLW.Test
 					for (int i = 0; i < 100; i++)
 					{
 						await Task.Delay(Rnd.Next(50, 150), CancellationToken.None);
-						Assert.IsTrue(await this.queue.Enqueue(new Simple(i, "Object " + i)));
+						if (!await this.queue.Enqueue(new Simple(i, "Object " + i)))
+						{
+							EnqueueDone.TrySetResult(false);
+							return;
+						}
 					}
 
 					EnqueueDone.TrySetResult(true);
@@ -306,10 +345,14 @@ namespace Waher.Persistence.QueuesLW.Test
 					for (int i = 0; i < 100; i++)
 					{
 						await Task.Delay(Rnd.Next(50, 150), CancellationToken.None);
-						Simple Item = await this.queue.Dequeue(10000) as Simple;
-						Assert.IsNotNull(Item);
-						Assert.AreEqual(i, Item.Counter);
-						Assert.AreEqual("Object " + i, Item.Message);
+					
+						if (await this.queue.Dequeue(10000) is not Simple Item || 
+							i != Item.Counter || 
+							"Object " + i != Item.Message)
+						{
+							DequeueDone.TrySetResult(false);
+							return;
+						}
 					}
 
 					DequeueDone.TrySetResult(true);
@@ -320,8 +363,8 @@ namespace Waher.Persistence.QueuesLW.Test
 				}
 			}, CancellationToken.None);
 
-			await EnqueueDone.Task;
-			await DequeueDone.Task;
+			Assert.IsTrue(await EnqueueDone.Task);
+			Assert.IsTrue(await DequeueDone.Task);
 		}
 
 		[TestMethod]

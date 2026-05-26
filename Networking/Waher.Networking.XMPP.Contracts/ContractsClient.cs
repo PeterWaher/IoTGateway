@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
@@ -135,6 +136,8 @@ namespace Waher.Networking.XMPP.Contracts
 		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Cache<string, KeyValuePair<byte[], bool>> contentPerPid = new Cache<string, KeyValuePair<byte[], bool>>(int.MaxValue, TimeSpan.FromDays(1), TimeSpan.FromDays(1));
+		private readonly SemaphoreSlim keyMutationLock = new SemaphoreSlim(1, 1);
+		private readonly AsyncLocal<int> keyMutationDepth = new AsyncLocal<int>();
 		private EndpointSecurity localKeys;
 		private EndpointSecurity localE2eEndpoint;
 		private DateTime keysTimestamp = DateTime.MinValue;
@@ -149,6 +152,58 @@ namespace Waher.Networking.XMPP.Contracts
 		private bool disposeLocalKeys = false;
 		private RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private Aes aes;
+
+		private sealed class ResolvedLegalIdentityKey : IDisposable
+		{
+			public ResolvedLegalIdentityKey(IE2eEndpoint Endpoint, bool MustDispose)
+			{
+				this.Endpoint = Endpoint;
+				this.MustDispose = MustDispose;
+			}
+
+			public IE2eEndpoint Endpoint { get; }
+
+			public bool MustDispose { get; }
+
+			public void Dispose()
+			{
+				if (this.MustDispose)
+					this.Endpoint?.Dispose();
+			}
+		}
+
+		private sealed class LoadedKeySet : IDisposable
+		{
+			private IE2eEndpoint[] keys;
+			private bool transferred;
+
+			public LoadedKeySet(IE2eEndpoint[] Keys, DateTime Timestamp)
+			{
+				this.keys = Keys;
+				this.Timestamp = Timestamp;
+			}
+
+			public IE2eEndpoint[] Keys => this.keys;
+
+			public DateTime Timestamp { get; }
+
+			public IE2eEndpoint[] TransferKeys()
+			{
+				this.transferred = true;
+				return this.keys;
+			}
+
+			public void Dispose()
+			{
+				if (!this.transferred && !(this.keys is null))
+				{
+					foreach (IE2eEndpoint Key in this.keys)
+						Key.Dispose();
+				}
+
+				this.keys = Array.Empty<IE2eEndpoint>();
+			}
+		}
 
 		#region Construction
 
@@ -206,6 +261,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			this.componentAddress = ComponentAddress;
 			this.approvedSources = ApprovedSources;
+			this.SetLegalIdentityStateAllowedSources(ApprovedSources);
 			this.localKeys = null;
 			this.disposeLocalKeys = false;
 
@@ -311,9 +367,13 @@ namespace Waher.Networking.XMPP.Contracts
 			if (this.disposeLocalKeys)
 				this.localKeys?.Dispose();
 
+			if (ReferenceEquals(this.localE2eEndpoint, this.localKeys))
+				this.localE2eEndpoint = null;
+
 			this.localKeys = null;
 			this.disposeLocalKeys = false;
 			this.keysTimestamp = DateTime.MinValue;
+			this.keyMutationLock.Dispose();
 
 			this.rnd?.Dispose();
 			this.rnd = null;
@@ -386,36 +446,101 @@ namespace Waher.Networking.XMPP.Contracts
 			return this.LoadKeys(CreateIfNone, null);
 		}
 
+		private async Task<T> RunKeyMutationAsync<T>(Func<Task<T>> Callback)
+		{
+			if (this.keyMutationDepth.Value > 0)
+			{
+				this.keyMutationDepth.Value++;
+				try
+				{
+					return await Callback();
+				}
+				finally
+				{
+					this.keyMutationDepth.Value--;
+				}
+			}
+
+			await this.keyMutationLock.WaitAsync();
+			this.keyMutationDepth.Value = 1;
+
+			try
+			{
+				return await Callback();
+			}
+			finally
+			{
+				this.keyMutationDepth.Value = 0;
+				this.keyMutationLock.Release();
+			}
+		}
+
+		private Task RunKeyMutationAsync(Func<Task> Callback)
+		{
+			return this.RunKeyMutationAsync(async () =>
+			{
+				await Callback();
+				return true;
+			});
+		}
+
 		/// <summary>
 		/// Loads keys from the underlying persistence layer.
 		/// </summary>
 		/// <param name="CreateIfNone">Allows new keys to be created, if no keys were found in the persistence layer.</param>
 		/// <param name="Thread">Optional thread to use during profiling.</param>
 		/// <returns>If keys were loaded or generated (i.e. can be used) or not.</returns>
-		public async Task<bool> LoadKeys(bool CreateIfNone, ProfilerThread Thread)
+		public Task<bool> LoadKeys(bool CreateIfNone, ProfilerThread Thread)
+		{
+			return this.RunKeyMutationAsync(() => this.LoadKeysInternalAsync(CreateIfNone, Thread));
+		}
+
+		private async Task<bool> LoadKeysInternalAsync(bool CreateIfNone, ProfilerThread Thread)
+		{
+			return await this.LoadKeysInternalAsync(CreateIfNone, Thread, this.localKeysForE2e, this.localE2eEndpoint);
+		}
+
+		private async Task<bool> LoadKeysInternalAsync(bool CreateIfNone, ProfilerThread Thread, bool UseLocalKeysForE2e,
+			EndpointSecurity DesiredLocalE2eEndpoint)
 		{
 			Thread = Thread?.CreateSubThread("Load Keys", ProfilerThreadType.Sequential);
 			Thread?.Start();
 			try
 			{
-				Thread?.NewState("Search");
+				using LoadedKeySet LoadedKeys = await this.LoadPersistedKeysAsync(CreateIfNone, Thread);
+				if (LoadedKeys is null)
+					return false;
 
-				List<IE2eEndpoint> Keys = new List<IE2eEndpoint>();
-				Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
+				await this.ActivateLoadedKeysAsync(LoadedKeys, Thread, UseLocalKeysForE2e, DesiredLocalE2eEndpoint);
+				return true;
+			}
+			finally
+			{
+				Thread?.Stop();
+			}
+		}
 
-				Thread?.NewState("Endpoints");
+		private async Task<LoadedKeySet> LoadPersistedKeysAsync(bool CreateIfNone, ProfilerThread Thread)
+		{
+			Thread?.NewState("Search");
 
-				IE2eEndpoint[] AvailableEndpoints = EndpointSecurity.CreateEndpoints(256, 192,
-					int.MaxValue, new Type[]
-					{
-						typeof(EllipticCurveEndpoint),
-						typeof(ModuleLatticeEndpoint)
-					}, Thread);
+			List<IE2eEndpoint> Keys = new List<IE2eEndpoint>();
+			Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
 
-				DateTime? Timestamp = null;
-				bool DisposeEndpoints = true;
-				byte[] Key;
+			Thread?.NewState("Endpoints");
 
+			IE2eEndpoint[] AvailableEndpoints = EndpointSecurity.CreateEndpoints(256, 192,
+				int.MaxValue, new Type[]
+				{
+					typeof(EllipticCurveEndpoint),
+					typeof(ModuleLatticeEndpoint)
+				}, Thread);
+
+			DateTime? Timestamp = null;
+			byte[] Key;
+
+			try
+			{
 				Thread?.NewState("Select");
 
 				foreach (KeyValuePair<string, object> Setting in Settings)
@@ -459,13 +584,12 @@ namespace Waher.Networking.XMPP.Contracts
 				if (Keys.Count == 0 || (Keys.Count != AvailableEndpoints.Length && CreateIfNone))
 				{
 					if (!CreateIfNone)
-						return false;
+						return null;
 
 					Thread?.NewState("Create");
 
-					DisposeEndpoints = false;
-
-					int i, c = Keys.Count;
+					int i;
+					int c = Keys.Count;
 
 					foreach (IE2eEndpoint Endpoint in AvailableEndpoints)
 					{
@@ -502,56 +626,105 @@ namespace Waher.Networking.XMPP.Contracts
 					await RuntimeSettings.SetAsync(this.keySettingsPrefix + "Timestamp", Timestamp.Value);
 				}
 
-				Thread?.NewState("Sec");
-
-				if (this.disposeLocalKeys)
-					this.localKeys?.Dispose();
-
-				this.disposeLocalKeys = false;
-				this.localKeys = null;
-
-				using (Semaphore Lock = await Semaphores.BeginWrite("XMPP.E2E"))
-				{
-					if (this.localKeysForE2e)
-					{
-						if (this.client.TryGetTag("E2E", out object Obj) &&
-							Obj is EndpointSecurity EndpointSecurity)
-						{
-							this.localKeys = EndpointSecurity;
-						}
-						else
-						{
-							this.localKeys = new EndpointSecurity(this.client, 128, Keys.ToArray());
-							this.client.SetTag("E2E", this.localKeys);
-							this.disposeLocalKeys = true;
-						}
-					}
-					else
-					{
-						this.localKeys = new EndpointSecurity(null, 128, Keys.ToArray());
-						this.disposeLocalKeys = true;
-					}
-				}
-
-				this.keysTimestamp = Timestamp.Value;
-
-				if (this.localKeysForE2e)
-					this.localE2eEndpoint = this.localKeys;
-
-				if (DisposeEndpoints)
-				{
-					Thread?.NewState("Dispose");
-
-					foreach (IE2eEndpoint Curve in AvailableEndpoints)
-						Curve.Dispose();
-				}
+				return new LoadedKeySet(Keys.ToArray(), Timestamp.Value);
 			}
 			finally
 			{
-				Thread?.Stop();
+				Thread?.NewState("Dispose");
+
+				HashSet<IE2eEndpoint> LoadedEndpoints = new HashSet<IE2eEndpoint>(Keys);
+
+				foreach (IE2eEndpoint Curve in AvailableEndpoints)
+				{
+					if (!LoadedEndpoints.Contains(Curve))
+						Curve.Dispose();
+				}
+			}
+		}
+
+		private async Task ActivateLoadedKeysAsync(LoadedKeySet LoadedKeys, ProfilerThread Thread, bool UseLocalKeysForE2e,
+			EndpointSecurity DesiredLocalE2eEndpoint)
+		{
+			Thread?.NewState("Sec");
+
+			EndpointSecurity PreviousLocalKeys = this.localKeys;
+			bool DisposePreviousLocalKeys = this.disposeLocalKeys;
+			EndpointSecurity PreviousLocalE2eEndpoint = this.localE2eEndpoint;
+			bool PreviouslySharedLocalKeys = ReferenceEquals(PreviousLocalKeys, PreviousLocalE2eEndpoint);
+			bool PreviousLocalKeysDisposed = false;
+
+			EndpointSecurity NewLocalKeys;
+			bool DisposeNewLocalKeys;
+			EndpointSecurity NewLocalE2eEndpoint = DesiredLocalE2eEndpoint;
+
+			using (Waher.Runtime.Threading.Semaphore Lock = await Semaphores.BeginWrite("XMPP.E2E"))
+			{
+				if (UseLocalKeysForE2e)
+				{
+					if (PreviouslySharedLocalKeys && MatchesLoadedKeys(PreviousLocalE2eEndpoint, LoadedKeys.Keys))
+					{
+						NewLocalKeys = PreviousLocalE2eEndpoint;
+						DisposeNewLocalKeys = DisposePreviousLocalKeys;
+					}
+					else
+					{
+						if (PreviouslySharedLocalKeys)
+						{
+							if (this.client.TryGetTag("E2E", out object Obj) &&
+								ReferenceEquals(Obj, PreviousLocalE2eEndpoint))
+							{
+								this.client.RemoveTag("E2E");
+							}
+
+							if (DisposePreviousLocalKeys)
+							{
+								PreviousLocalKeys.Dispose();
+								PreviousLocalKeysDisposed = true;
+							}
+						}
+
+						NewLocalKeys = new EndpointSecurity(this.client, 128, LoadedKeys.TransferKeys());
+						DisposeNewLocalKeys = true;
+					}
+
+					NewLocalE2eEndpoint = NewLocalKeys;
+					this.client.SetTag("E2E", NewLocalE2eEndpoint);
+				}
+				else
+				{
+					NewLocalKeys = new EndpointSecurity(null, 128, LoadedKeys.TransferKeys());
+					DisposeNewLocalKeys = true;
+
+					if (PreviouslySharedLocalKeys &&
+						this.client.TryGetTag("E2E", out object Obj) &&
+						ReferenceEquals(Obj, PreviousLocalE2eEndpoint))
+					{
+						this.client.RemoveTag("E2E");
+					}
+
+					if (PreviouslySharedLocalKeys)
+						NewLocalE2eEndpoint = null;
+				}
+
+				this.localKeys = NewLocalKeys;
+				this.disposeLocalKeys = DisposeNewLocalKeys;
+				this.localE2eEndpoint = NewLocalE2eEndpoint;
+				this.localKeysForE2e = UseLocalKeysForE2e;
+				this.keysTimestamp = LoadedKeys.Timestamp;
 			}
 
-			return true;
+			if (DisposePreviousLocalKeys && !PreviousLocalKeysDisposed && !ReferenceEquals(PreviousLocalKeys, this.localKeys))
+				PreviousLocalKeys?.Dispose();
+
+			this.ClearMatchingKeyCache();
+		}
+
+		private void ClearMatchingKeyCache()
+		{
+			lock (this.matchingKeys)
+			{
+				this.matchingKeys.Clear();
+			}
 		}
 
 		private byte[] GetKey(EllipticCurveEndpoint EcEndpoint)
@@ -570,26 +743,34 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Generates new keys for the contracts clients.
 		/// </summary>
-		public async Task GenerateNewKeys()
+		public Task GenerateNewKeys()
 		{
-			await RuntimeSettings.DeleteWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
-			await this.LoadKeys(true);
-
-			lock (this.matchingKeys)
+			return this.RunKeyMutationAsync(async () =>
 			{
-				this.matchingKeys.Clear();
-			}
+				List<LegalIdentityState> ActiveStates = await this.GetActiveLegalIdentityStatesAsync(false);
+
+				foreach (LegalIdentityState State in ActiveStates)
+				{
+					await this.TryGetLegalIdentityEndpointAsync(State, true);
+				}
+
+				await RuntimeSettings.DeleteWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
+				await this.LoadKeysInternalAsync(true, null);
+			});
+		}
+
+		private async Task<List<LegalIdentityState>> GetActiveLegalIdentityStatesAsync(bool RefreshStates)
+		{
+			List<LegalIdentityState> ActiveStates = new List<LegalIdentityState>();
 
 			foreach (LegalIdentityState State in await Database.Find<LegalIdentityState>(
 				new FilterFieldEqualTo("BareJid", this.client.BareJID)))
 			{
-				LegalIdentity Identity;
-
-				if (State.State == IdentityState.Created || State.State == IdentityState.Approved)
+				if (RefreshStates && (State.State == IdentityState.Created || State.State == IdentityState.Approved))
 				{
 					try
 					{
-						Identity = await this.GetLegalIdentityAsync(State.LegalId);   // Make sure we have the latest.
+						LegalIdentity Identity = await this.GetLegalIdentityAsync(State.LegalId);   // Make sure we have the latest.
 						if (Identity.State != State.State)
 						{
 							State.State = Identity.State;
@@ -615,6 +796,7 @@ namespace Waher.Networking.XMPP.Contracts
 					catch (Exception ex)
 					{
 						Log.Exception(ex, State.LegalId);
+						throw;
 					}
 				}
 
@@ -622,22 +804,360 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					case IdentityState.Created:
 					case IdentityState.Approved:
-						try
-						{
-							Identity = await this.ObsoleteLegalIdentityAsync(State.LegalId);
-							await this.UpdateSettings(Identity);
-						}
-						catch (ItemNotFoundException)
-						{
-							await Database.Delete(State);
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex, State.LegalId);
-						}
+						ActiveStates.Add(State);
 						break;
 				}
 			}
+
+			return ActiveStates;
+		}
+
+		private static byte[] Clone(byte[] Bin)
+		{
+			return Bin is null ? null : (byte[])Bin.Clone();
+		}
+
+		private static bool AreEqual(byte[] A, byte[] B)
+		{
+			if (ReferenceEquals(A, B))
+				return true;
+
+			if (A is null || B is null || A.Length != B.Length)
+				return false;
+
+			int i, c = A.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				if (A[i] != B[i])
+					return false;
+			}
+
+			return true;
+		}
+
+		private bool TryExportPrivateKey(IE2eEndpoint Endpoint, out string KeyName, out string KeyNamespace, out byte[] PrivateKey)
+		{
+			KeyName = Endpoint?.LocalName;
+			KeyNamespace = Endpoint?.Namespace;
+			PrivateKey = null;
+
+			switch (Endpoint)
+			{
+				case EllipticCurveEndpoint Curve:
+					PrivateKey = this.GetKey(Curve);
+					break;
+
+				case ModuleLatticeEndpoint ModuleLattice:
+					PrivateKey = ModuleLattice.ExportPrivateKey();
+					break;
+
+				case RsaEndpoint Rsa:
+					PrivateKey = Rsa.Export(true);
+					break;
+
+				default:
+					return false;
+			}
+
+			return !(PrivateKey is null);
+		}
+
+		private static bool MatchesLoadedKeys(EndpointSecurity EndpointSecurity, IEnumerable<IE2eEndpoint> Keys)
+		{
+			if (EndpointSecurity is null)
+				return false;
+
+			foreach (IE2eEndpoint Key in Keys)
+			{
+				IE2eEndpoint ExistingEndpoint = EndpointSecurity.FindLocalEndpoint(Key.LocalName, Key.Namespace);
+
+				if (ExistingEndpoint is null || !AreEqual(ExistingEndpoint.PublicKey, Key.PublicKey))
+					return false;
+			}
+
+			return true;
+		}
+
+		private async Task<Tuple<string, string, byte[]>> GetPersistablePrivateKeyAsync(IE2eEndpoint Endpoint)
+		{
+			if (Endpoint is null)
+				return null;
+
+			string KeyName = Endpoint.LocalName;
+			string KeyNamespace = Endpoint.Namespace;
+			string RuntimeValue = await RuntimeSettings.GetAsync(this.keySettingsPrefix + KeyName, string.Empty);
+
+			if (!string.IsNullOrEmpty(RuntimeValue))
+			{
+				try
+				{
+					byte[] RuntimePrivateKey = Convert.FromBase64String(RuntimeValue);
+
+					if (EndpointSecurity.TryCreateEndpoint(KeyName, KeyNamespace, out IE2eEndpoint Template))
+					{
+						using (Template)
+						using (IE2eEndpoint RuntimeEndpoint = Template.CreatePrivate(RuntimePrivateKey))
+						{
+							if (AreEqual(RuntimeEndpoint.PublicKey, Endpoint.PublicKey))
+								return new Tuple<string, string, byte[]>(KeyName, KeyNamespace, RuntimePrivateKey);
+						}
+					}
+				}
+				catch (Exception)
+				{
+					// Ignore malformed or mismatched runtime values and fall back to endpoint export.
+				}
+			}
+
+			return this.TryExportPrivateKey(Endpoint, out KeyName, out KeyNamespace, out byte[] PrivateKey) ?
+				new Tuple<string, string, byte[]>(KeyName, KeyNamespace, PrivateKey)
+				: null;
+		}
+
+		private IE2eEndpoint TryCreateLegalIdentityEndpoint(LegalIdentityState State)
+		{
+			if (State is null || !State.HasPrivateKey || string.IsNullOrEmpty(State.KeyName))
+				return null;
+
+			string KeyNamespace = string.IsNullOrEmpty(State.KeyNamespace) ? EndpointSecurity.IoTHarmonizationE2ECurrent : State.KeyNamespace;
+			byte[] PrivateKey = State.PrivateKey;
+
+			if (PrivateKey is null || !EndpointSecurity.TryCreateEndpoint(State.KeyName, KeyNamespace, out IE2eEndpoint Template))
+				return null;
+
+			try
+			{
+				return Template.CreatePrivate(PrivateKey);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex, State.LegalId);
+				return null;
+			}
+		}
+
+		private async Task<bool> SetLegalIdentityKeySnapshotAsync(LegalIdentityState State, IE2eEndpoint Endpoint)
+		{
+			Tuple<string, string, byte[]> P = State is null ? null : await this.GetPersistablePrivateKeyAsync(Endpoint);
+
+			if (P is null)
+			{
+				return false;
+			}
+
+			string KeyName = P.Item1;
+			string KeyNamespace = P.Item2;
+			byte[] PrivateKey = P.Item3;
+
+			bool Updated = !AreEqual(State.PublicKey, Endpoint.PublicKey) ||
+				State.KeyName != KeyName ||
+				State.KeyNamespace != KeyNamespace ||
+				!AreEqual(State.HasPrivateKey ? State.PrivateKey : null, PrivateKey);
+
+			State.PublicKey = Clone(Endpoint.PublicKey);
+			State.KeyName = KeyName;
+			State.KeyNamespace = KeyNamespace;
+			State.PrivateKey = Clone(PrivateKey);
+
+			return Updated;
+		}
+
+		private async Task<ResolvedLegalIdentityKey> TryGetLegalIdentityEndpointAsync(LegalIdentityState State, bool MigrateLegacyState)
+		{
+			IE2eEndpoint Endpoint = this.TryCreateLegalIdentityEndpoint(State);
+
+			if (!(Endpoint is null))
+			{
+				if (State.PublicKey is null)
+				{
+					State.PublicKey = Clone(Endpoint.PublicKey);
+					if (!string.IsNullOrEmpty(State.ObjectId))
+						await Database.Update(State);
+
+					return new ResolvedLegalIdentityKey(Endpoint, true);
+				}
+				else if (!AreEqual(State.PublicKey, Endpoint.PublicKey))
+				{
+					Endpoint.Dispose();
+					Endpoint = null;
+				}
+				else
+					return new ResolvedLegalIdentityKey(Endpoint, true);
+			}
+
+			bool MissingSnapshot = State?.HasPrivateKey != true || string.IsNullOrEmpty(State.KeyName);
+
+			if (!MigrateLegacyState || !MissingSnapshot || State?.PublicKey is null || !await this.LoadKeys(false))
+				return new ResolvedLegalIdentityKey(null, false);
+
+			Endpoint = this.LocalEndpoint.FindLocalEndpoint(State.PublicKey);
+			if (Endpoint is null || !await this.SetLegalIdentityKeySnapshotAsync(State, Endpoint))
+				return new ResolvedLegalIdentityKey(Endpoint, false);
+
+			if (!string.IsNullOrEmpty(State.ObjectId))
+				await Database.Update(State);
+
+			IE2eEndpoint Endpoint2 = this.TryCreateLegalIdentityEndpoint(State);
+			return Endpoint2 is null ?
+				new ResolvedLegalIdentityKey(Endpoint, false)
+				: new ResolvedLegalIdentityKey(Endpoint2, true);
+		}
+
+		private static bool TryParseContractSharedSecret(string Value, out SymmetricCipherAlgorithms Algorithm,
+			out string CreatorJid, out byte[] SharedSecret)
+		{
+			Algorithm = DefaultCipherAlgorithm;
+			CreatorJid = string.Empty;
+			SharedSecret = null;
+
+			if (string.IsNullOrEmpty(Value))
+				return false;
+
+			string[] Parts = Value.Split('|');
+			if (Parts.Length != 3 || !Enum.TryParse(Parts[0], out Algorithm))
+				return false;
+
+			CreatorJid = Parts[1];
+
+			try
+			{
+				SharedSecret = Convert.FromBase64String(Parts[2]);
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+		private static Tuple<SymmetricCipherAlgorithms, string, byte[]> CreateContractSharedSecretTuple(
+			SymmetricCipherAlgorithms Algorithm, string CreatorJid, byte[] SharedSecret)
+		{
+			if (SharedSecret is null)
+				return null;
+
+			return new Tuple<SymmetricCipherAlgorithms, string, byte[]>(Algorithm, CreatorJid ?? string.Empty,
+				(byte[])SharedSecret.Clone());
+		}
+
+		private static string EncodeContractSharedSecret(SymmetricCipherAlgorithms Algorithm, string CreatorJid, byte[] SharedSecret)
+		{
+			if (SharedSecret is null)
+				return null;
+
+			return Algorithm.ToString() + "|" + (CreatorJid ?? string.Empty) + "|" + Convert.ToBase64String(SharedSecret);
+		}
+
+		private async Task<ContractSharedSecretState> GetContractStateAsync(string ContractId)
+		{
+			return await Database.FindFirstDeleteRest<ContractSharedSecretState>(new FilterAnd(
+				new FilterFieldEqualTo("BareJid", this.client.BareJID),
+				new FilterFieldEqualTo("ContractId", ContractId)));
+		}
+
+		private async Task<bool> UpsertContractStateAsync(string ContractId, string CreatorJid, byte[] SharedSecret,
+			SymmetricCipherAlgorithms KeyAlgorithm)
+		{
+			if (string.IsNullOrEmpty(ContractId) || SharedSecret is null)
+				return false;
+
+			ContractSharedSecretState State = await this.GetContractStateAsync(ContractId);
+			byte[] SecretCopy = (byte[])SharedSecret.Clone();
+
+			if (State is null)
+			{
+				State = new ContractSharedSecretState(ContractId)
+				{
+					BareJid = this.client.BareJID,
+					CreatorJid = CreatorJid ?? string.Empty,
+					KeyAlgorithm = KeyAlgorithm,
+					SharedSecret = SecretCopy
+				};
+
+				await Database.Insert(State);
+			}
+			else
+			{
+				State.CreatorJid = CreatorJid ?? string.Empty;
+				State.KeyAlgorithm = KeyAlgorithm;
+				State.SharedSecret = SecretCopy;
+
+				await Database.Update(State);
+			}
+
+			return true;
+		}
+
+		private Tuple<SymmetricCipherAlgorithms, string, byte[]> TryLoadContractSharedSecret(ContractSharedSecretState State)
+		{
+			if (State is null || string.IsNullOrEmpty(State.ContractId) || !State.HasSharedSecret)
+				return null;
+
+			return CreateContractSharedSecretTuple(State.KeyAlgorithm, State.CreatorJid, State.SharedSecret);
+		}
+
+		private async Task<Tuple<SymmetricCipherAlgorithms, string, byte[]>> TryLoadLegacyContractSharedSecretAsync(
+			string ContractId, bool MigrateToState)
+		{
+			string Name = this.contractKeySettingsPrefix + ContractId;
+			string Value = await RuntimeSettings.GetAsync(Name, string.Empty);
+
+			if (!TryParseContractSharedSecret(Value, out SymmetricCipherAlgorithms Algorithm, out string CreatorJid,
+				out byte[] SharedSecret))
+			{
+				return null;
+			}
+
+			if (MigrateToState)
+				await this.UpsertContractStateAsync(ContractId, CreatorJid, SharedSecret, Algorithm);
+
+			return CreateContractSharedSecretTuple(Algorithm, CreatorJid, SharedSecret);
+		}
+
+		private async Task<List<ContractSharedSecretState>> GetExportableContractStatesAsync()
+		{
+			Dictionary<string, ContractSharedSecretState> ContractStates = new Dictionary<string, ContractSharedSecretState>(StringComparer.Ordinal);
+			List<ContractSharedSecretState> Result = new List<ContractSharedSecretState>();
+
+			foreach (ContractSharedSecretState State in await Database.Find<ContractSharedSecretState>(new FilterFieldEqualTo("BareJid", this.client.BareJID)))
+			{
+				if (string.IsNullOrEmpty(State.ContractId) || !State.HasSharedSecret)
+					continue;
+
+				ContractStates[State.ContractId] = State;
+			}
+
+			Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.contractKeySettingsPrefix + "*", "*");
+
+			foreach (KeyValuePair<string, object> Setting in Settings)
+			{
+				if (!(Setting.Value is string Value))
+					continue;
+
+				string ContractId = Setting.Key[this.contractKeySettingsPrefix.Length..];
+
+				if (ContractStates.ContainsKey(ContractId) ||
+					!TryParseContractSharedSecret(Value, out SymmetricCipherAlgorithms Algorithm, out string CreatorJid,
+						out byte[] SharedSecret))
+				{
+					continue;
+				}
+
+				if (await this.UpsertContractStateAsync(ContractId, CreatorJid, SharedSecret, Algorithm))
+				{
+					ContractSharedSecretState State = await this.GetContractStateAsync(ContractId);
+
+					if (!(State is null))
+						ContractStates[ContractId] = State;
+				}
+			}
+
+			foreach (ContractSharedSecretState State in ContractStates.Values)
+				Result.Add(State);
+
+			return Result;
 		}
 
 		/// <summary>
@@ -693,26 +1213,36 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("BareJid", this.client.BareJID),
 				new FilterFieldEqualTo("State", IdentityState.Approved))))
 			{
+				using ResolvedLegalIdentityKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
+				IE2eEndpoint Endpoint = Key.Endpoint;
+
+				if (Endpoint is null || State.PublicKey is null || !State.HasPrivateKey || string.IsNullOrEmpty(State.KeyName))
+					continue;
+
 				Output.WriteStartElement("State");
 				Output.WriteAttributeString("legalId", State.LegalId);
 				Output.WriteAttributeString("publicKey", Convert.ToBase64String(State.PublicKey));
 				Output.WriteAttributeString("timestamp", XML.Encode(State.Timestamp));
+				Output.WriteAttributeString("keyName", State.KeyName);
+
+				if (!string.IsNullOrEmpty(State.KeyNamespace))
+					Output.WriteAttributeString("keyNamespace", State.KeyNamespace);
+
+				Output.WriteAttributeString("hasPrivateKey", CommonTypes.Encode(State.HasPrivateKey));
+				Output.WriteAttributeString("privateKey", Convert.ToBase64String(State.PrivateKey));
 				Output.WriteEndElement();
 			}
 
-			Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.contractKeySettingsPrefix + "*", "*");
-
-			foreach (KeyValuePair<string, object> Setting in Settings)
+			foreach (ContractSharedSecretState ContractState in await this.GetExportableContractStatesAsync())
 			{
-				string Name = Setting.Key[this.contractKeySettingsPrefix.Length..];
+				if (!ContractState.HasSharedSecret)
+					continue;
 
-				if (Setting.Value is string s)
-				{
-					Output.WriteStartElement("C");
-					Output.WriteAttributeString("n", Name);
-					Output.WriteAttributeString("v", s);
-					Output.WriteEndElement();
-				}
+				Output.WriteStartElement("C");
+				Output.WriteAttributeString("n", ContractState.ContractId);
+				Output.WriteAttributeString("v", EncodeContractSharedSecret(ContractState.KeyAlgorithm,
+					ContractState.CreatorJid, ContractState.SharedSecret));
+				Output.WriteEndElement();
 			}
 
 			Output.WriteEndElement();
@@ -777,16 +1307,55 @@ namespace Waher.Networking.XMPP.Contracts
 						break;
 
 					case "C":
+					{
 						Name = XML.Attribute(E, "n");
 						StringValue = XML.Attribute(E, "v");
 
-						await RuntimeSettings.SetAsync(this.contractKeySettingsPrefix + Name, StringValue);
+						if (!TryParseContractSharedSecret(StringValue, out SymmetricCipherAlgorithms ContractAlgorithm,
+							out string CreatorJid, out byte[] SharedSecret))
+						{
+							return false;
+						}
+
+						if (!await this.UpsertContractStateAsync(Name, CreatorJid, SharedSecret, ContractAlgorithm))
+							return false;
 						break;
+					}
+
+					case "ContractState":
+					{
+						string ContractId = XML.Attribute(E, "contractId");
+						string CreatorJid = XML.Attribute(E, "creatorJid");
+						string KeyAlgorithm = XML.Attribute(E, "keyAlgorithm");
+						string SharedSecretStr = XML.Attribute(E, "sharedSecret");
+						SymmetricCipherAlgorithms ContractAlgorithm;
+						byte[] SharedSecret;
+
+						if (!Enum.TryParse(KeyAlgorithm, out ContractAlgorithm))
+							return false;
+
+						try
+						{
+							SharedSecret = Convert.FromBase64String(SharedSecretStr);
+						}
+						catch (Exception)
+						{
+							return false;
+						}
+
+						if (!await this.UpsertContractStateAsync(ContractId, CreatorJid, SharedSecret, ContractAlgorithm))
+							return false;
+						break;
+					}
 
 					case "State":
 						string LegalId = XML.Attribute(E, "legalId");
 						string PublicKeyStr = XML.Attribute(E, "publicKey");
+						string PrivateKeyStr = XML.Attribute(E, "privateKey");
+						string KeyName = XML.Attribute(E, "keyName");
+						string KeyNamespace = XML.Attribute(E, "keyNamespace");
 						byte[] PublicKey;
+						byte[] PrivateKey = null;
 						DateTimeValue = XML.Attribute(E, "timestamp", DateTime.MinValue);
 
 						try
@@ -796,6 +1365,18 @@ namespace Waher.Networking.XMPP.Contracts
 						catch (Exception)
 						{
 							return false;
+						}
+
+						if (!string.IsNullOrEmpty(PrivateKeyStr))
+						{
+							try
+							{
+								PrivateKey = Convert.FromBase64String(PrivateKeyStr);
+							}
+							catch (Exception)
+							{
+								return false;
+							}
 						}
 
 						LegalIdentityState IdState = await Database.FindFirstDeleteRest<LegalIdentityState>(new FilterAnd(
@@ -810,7 +1391,10 @@ namespace Waher.Networking.XMPP.Contracts
 								LegalId = LegalId,
 								State = IdentityState.Approved,
 								Timestamp = DateTimeValue,
-								PublicKey = PublicKey
+								PublicKey = PublicKey,
+								KeyName = KeyName,
+								KeyNamespace = KeyNamespace,
+								PrivateKey = PrivateKey
 							};
 
 							await Database.Insert(IdState);
@@ -820,6 +1404,9 @@ namespace Waher.Networking.XMPP.Contracts
 							IdState.State = IdentityState.Approved;
 							IdState.Timestamp = DateTimeValue;
 							IdState.PublicKey = PublicKey;
+							IdState.KeyName = KeyName;
+							IdState.KeyNamespace = KeyNamespace;
+							IdState.PrivateKey = PrivateKey;
 
 							await Database.Update(IdState);
 						}
@@ -830,7 +1417,20 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 			}
 
-			return await this.LoadKeys(false);
+			if (await this.LoadKeys(false))
+				return true;
+
+			foreach (LegalIdentityState State in await Database.Find<LegalIdentityState>(new FilterAnd(
+				new FilterFieldEqualTo("BareJid", this.client.BareJID),
+				new FilterFieldEqualTo("State", IdentityState.Approved))))
+			{
+				using ResolvedLegalIdentityKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
+
+				if (!(Key.Endpoint is null))
+					return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -871,14 +1471,27 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="UseLocalKeys">If local keys should be used in End-to-End encryption.</param>
 		/// <param name="CreateKeysIfNone">If local keys should be created, if none available.</param>
-		public async Task EnableE2eEncryption(bool UseLocalKeys, bool CreateKeysIfNone)
+		public Task EnableE2eEncryption(bool UseLocalKeys, bool CreateKeysIfNone)
 		{
-			bool Reload = !(this.localKeys is null);
+			return this.RunKeyMutationAsync(async () =>
+			{
+				bool Reload = !(this.localKeys is null);
 
-			this.localKeysForE2e = UseLocalKeys;
+				if (Reload)
+				{
+					EndpointSecurity DesiredLocalE2eEndpoint = UseLocalKeys ? this.localE2eEndpoint :
+						ReferenceEquals(this.localE2eEndpoint, this.localKeys) ? null : this.localE2eEndpoint;
 
-			if (Reload)
-				await this.LoadKeys(CreateKeysIfNone);
+					await this.LoadKeysInternalAsync(CreateKeysIfNone, null, UseLocalKeys, DesiredLocalE2eEndpoint);
+				}
+				else
+				{
+					this.localKeysForE2e = UseLocalKeys;
+
+					if (!UseLocalKeys && ReferenceEquals(this.localE2eEndpoint, this.localKeys))
+						this.localE2eEndpoint = null;
+				}
+			});
 		}
 
 		/// <summary>
@@ -895,15 +1508,20 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="E2eEndpoint">Endpoint managing the keys on the network.</param>
 		/// <param name="CreateKeysIfNone">If local keys should be created, if none available.</param>
-		public async Task EnableE2eEncryption(EndpointSecurity E2eEndpoint, bool CreateKeysIfNone)
+		public Task EnableE2eEncryption(EndpointSecurity E2eEndpoint, bool CreateKeysIfNone)
 		{
-			bool Reload = !(this.localKeys is null);
+			return this.RunKeyMutationAsync(async () =>
+			{
+				bool Reload = !(this.localKeys is null);
 
-			this.localKeysForE2e = false;
-			this.localE2eEndpoint = E2eEndpoint;
-
-			if (Reload)
-				await this.LoadKeys(CreateKeysIfNone);
+				if (Reload)
+					await this.LoadKeysInternalAsync(CreateKeysIfNone, null, false, E2eEndpoint);
+				else
+				{
+					this.localKeysForE2e = false;
+					this.localE2eEndpoint = E2eEndpoint;
+				}
+			});
 		}
 
 		/// <summary>
@@ -1001,12 +1619,44 @@ namespace Waher.Networking.XMPP.Contracts
 				throw new NotSupportedException("Changing approved sources not permitted.");
 
 			this.approvedSources = ApprovedSources;
+			this.SetLegalIdentityStateAllowedSources(ApprovedSources);
+			this.SetContractStateAllowedSources(ApprovedSources);
 		}
 
 		private void AssertAllowed()
 		{
 			if (!(this.approvedSources is null))
 				Assert.CallFromSource(this.approvedSources);
+		}
+
+		private void SetLegalIdentityStateAllowedSources(ICallStackCheck[] ApprovedSources)
+		{
+			if (ApprovedSources is null)
+				return;
+
+			try
+			{
+				LegalIdentityState.SetAllowedSources(ApprovedSources);
+			}
+			catch (NotSupportedException)
+			{
+				// Sensitive state access has already been configured globally.
+			}
+		}
+
+		private void SetContractStateAllowedSources(ICallStackCheck[] ApprovedSources)
+		{
+			if (ApprovedSources is null)
+				return;
+
+			try
+			{
+				ContractSharedSecretState.SetAllowedSources(ApprovedSources);
+			}
+			catch (NotSupportedException)
+			{
+				// Sensitive state access has already been configured globally.
+			}
 		}
 
 		#endregion
@@ -2253,12 +2903,9 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("BareJid", this.client.BareJID),
 				new FilterFieldEqualTo("LegalId", IdentityId)));
 
-			if (State?.PublicKey is null)
-				return false;
+			using ResolvedLegalIdentityKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
 
-			IE2eEndpoint Endpoint = this.LocalEndpoint.FindLocalEndpoint(State.PublicKey);
-
-			return !(Endpoint is null);
+			return !(Key.Endpoint is null);
 		}
 
 		/// <summary>
@@ -2283,11 +2930,12 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("BareJid", this.client.BareJID),
 				new FilterFieldEqualTo("State", IdentityState.Approved)), "-Timestamp"))
 			{
-				if (!(PublicKey is null) && Convert.ToBase64String(State.PublicKey) != PublicKeyBase64)
+				using ResolvedLegalIdentityKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
+
+				if (Key.Endpoint is null || State.PublicKey is null)
 					continue;
 
-				IE2eEndpoint Endpoint = this.LocalEndpoint.FindLocalEndpoint(State.PublicKey);
-				if (Endpoint is null)
+				if (!(PublicKey is null) && Convert.ToBase64String(State.PublicKey) != PublicKeyBase64)
 					continue;
 
 				return State.LegalId;
@@ -2296,7 +2944,7 @@ namespace Waher.Networking.XMPP.Contracts
 			return null;
 		}
 
-		private async Task<IE2eEndpoint> GetLatestApprovedKey(bool ExceptionIfNone)
+		private async Task<ResolvedLegalIdentityKey> GetLatestApprovedKey(bool ExceptionIfNone)
 		{
 			bool HaveStates = false;
 
@@ -2306,11 +2954,11 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				HaveStates = true;
 
-				IE2eEndpoint Endpoint = this.LocalEndpoint.FindLocalEndpoint(State.PublicKey);
-				if (Endpoint is null)
-					continue;
+				ResolvedLegalIdentityKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
+				if (!(Key.Endpoint is null))
+					return Key;
 
-				return Endpoint;
+				Key.Dispose();
 			}
 
 			if (ExceptionIfNone)
@@ -2322,6 +2970,22 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				else
 					throw new Exception("No approved legal identity available on this device (" + this.client.BareJID + ").");
+			}
+
+			return new ResolvedLegalIdentityKey(null, false);
+		}
+
+		private async Task<LegalIdentityState> FindPreviewStateAsync(byte[] PublicKey, string LegalId)
+		{
+			if (PublicKey is null)
+				return null;
+
+			foreach (LegalIdentityState State in await Database.Find<LegalIdentityState>(new FilterAnd(
+				new FilterFieldEqualTo("BareJid", this.client.BareJID),
+				new FilterFieldEqualTo("State", IdentityState.Created))))
+			{
+				if (State.LegalId != LegalId && AreEqual(State.PublicKey, PublicKey))
+					return State;
 			}
 
 			return null;
@@ -2340,7 +3004,20 @@ namespace Waher.Networking.XMPP.Contracts
 						new FilterFieldEqualTo("LegalId", Identity.Id)));
 
 					if (StateObj2 is null)
-						StateObj.BareJid = this.client.BareJID;
+					{
+						StateObj2 = await this.FindPreviewStateAsync(PublicKey, Identity.Id);
+						if (StateObj2 is null)
+							StateObj.BareJid = this.client.BareJID;
+						else
+						{
+							if (!string.IsNullOrEmpty(StateObj2.LegalId))
+								Types.UnregisterSingleton(StateObj2, StateObj2.LegalId);
+
+							StateObj2.LegalId = Identity.Id;
+							Types.ReplaceSingleton(StateObj2, Identity.Id);
+							StateObj = StateObj2;
+						}
+					}
 					else
 					{
 						Types.ReplaceSingleton(StateObj2, Identity.Id);
@@ -2352,6 +3029,8 @@ namespace Waher.Networking.XMPP.Contracts
 
 				if (Timestamp > StateObj.Timestamp ||
 					(StateObj.PublicKey is null && !(PublicKey is null)) ||
+					(!StateObj.HasPrivateKey && !(PublicKey is null)) ||
+					(string.IsNullOrEmpty(StateObj.KeyName) && !(PublicKey is null)) ||
 					Identity.State > StateObj.State)
 				{
 					StateObj.State = Identity.State;
@@ -2369,7 +3048,19 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 					}
 					else
-						StateObj.PublicKey = PublicKey;
+					{
+						if (await this.LoadKeys(false))
+						{
+							IE2eEndpoint Endpoint = this.LocalEndpoint.FindLocalEndpoint(PublicKey);
+
+							if (!(Endpoint is null))
+								await this.SetLegalIdentityKeySnapshotAsync(StateObj, Endpoint);
+							else
+								StateObj.PublicKey = Clone(PublicKey);
+						}
+						else
+							StateObj.PublicKey = Clone(PublicKey);
+					}
 
 					if (string.IsNullOrEmpty(StateObj.ObjectId))
 						await Database.Insert(StateObj);
@@ -2741,15 +3432,18 @@ namespace Waher.Networking.XMPP.Contracts
 			this.AssertAllowed();
 
 			byte[] Signature = null;
-			IE2eEndpoint Key = SignWith switch
+			ResolvedLegalIdentityKey KeyInfo = SignWith switch
 			{
-				SignWith.CurrentKeys => null,
+				SignWith.CurrentKeys => new ResolvedLegalIdentityKey(null, false),
 				SignWith.LatestApprovedId => await this.GetLatestApprovedKey(true),
 				_ => await this.GetLatestApprovedKey(false),
 			};
+			IE2eEndpoint Key = KeyInfo.Endpoint;
 
 			if (Key is null)
 			{
+				KeyInfo.Dispose();
+
 				await this.GetMatchingLocalKey(Address, async (Sender, e) =>
 				{
 					if (e.Ok)
@@ -2761,9 +3455,12 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 			else
 			{
-				Signature = Key.Sign(Data);
+				using (KeyInfo)
+				{
+					Signature = Key.Sign(Data);
 
-				await Callback.Raise(this, new SignatureEventArgs(Key, Signature, State));
+					await Callback.Raise(this, new SignatureEventArgs(Key, Signature, State));
+				}
 			}
 		}
 
@@ -2827,11 +3524,16 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			this.AssertAllowed();
 
-			IE2eEndpoint Key = SignWith == SignWith.CurrentKeys ? null : await this.GetLatestApprovedKey(true);
+			ResolvedLegalIdentityKey KeyInfo = SignWith == SignWith.CurrentKeys ?
+				new ResolvedLegalIdentityKey(null, false)
+				: await this.GetLatestApprovedKey(true);
+			IE2eEndpoint Key = KeyInfo.Endpoint;
 			byte[] Signature = null;
 
 			if (Key is null)
 			{
+				KeyInfo.Dispose();
+
 				await this.GetMatchingLocalKey(Address, async (Sender, e) =>
 				{
 					if (e.Ok)
@@ -2843,9 +3545,12 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 			else
 			{
-				Signature = Key.Sign(Data);
+				using (KeyInfo)
+				{
+					Signature = Key.Sign(Data);
 
-				await Callback.Raise(this, new SignatureEventArgs(Key, Signature, State));
+					await Callback.Raise(this, new SignatureEventArgs(Key, Signature, State));
+				}
 			}
 		}
 
@@ -5867,50 +6572,32 @@ namespace Waher.Networking.XMPP.Contracts
 		internal async Task<bool> SaveContractSharedSecret(string ContractId, string CreatorJid, byte[] Key,
 			SymmetricCipherAlgorithms KeyAlgorithm, bool OnlyIfNew)
 		{
-			string Name = this.contractKeySettingsPrefix + ContractId;
-
 			if (OnlyIfNew)
 			{
-				string s = await RuntimeSettings.GetAsync(Name, string.Empty);
-				if (!string.IsNullOrEmpty(s))
+				ContractSharedSecretState State = await this.GetContractStateAsync(ContractId);
+
+				if (!(State is null) && State.HasSharedSecret)
+					return false;
+
+				if (!(await this.TryLoadLegacyContractSharedSecretAsync(ContractId, true) is null))
 					return false;
 			}
 
-			string Value = KeyAlgorithm.ToString() + "|" + CreatorJid + "|" + Convert.ToBase64String(Key);
-
-			await RuntimeSettings.SetAsync(Name, Value);
-
-			return true;
+			return await this.UpsertContractStateAsync(ContractId, CreatorJid, Key, KeyAlgorithm);
 		}
 
 		internal async Task<Tuple<SymmetricCipherAlgorithms, string, byte[]>> TryLoadContractSharedSecret(string ContractId)
 		{
-			string Name = this.contractKeySettingsPrefix + ContractId;
-			string s = await RuntimeSettings.GetAsync(Name, string.Empty);
+			ContractSharedSecretState State = await this.GetContractStateAsync(ContractId);
+			Tuple<SymmetricCipherAlgorithms, string, byte[]> Result = this.TryLoadContractSharedSecret(State);
 
-			if (string.IsNullOrEmpty(s))
+			if (!(Result is null))
+				return Result;
+
+			if (!(State is null))
 				return null;
 
-			string[] Parts = s.Split('|');
-			if (Parts.Length != 3)
-				return null;
-
-			if (!Enum.TryParse(Parts[0], out SymmetricCipherAlgorithms Algorithm))
-				return null;
-
-			string CreatorJid = Parts[1];
-			byte[] Key;
-
-			try
-			{
-				Key = Convert.FromBase64String(Parts[2]);
-			}
-			catch (Exception)
-			{
-				return null;
-			}
-
-			return new Tuple<SymmetricCipherAlgorithms, string, byte[]>(Algorithm, CreatorJid, Key);
+			return await this.TryLoadLegacyContractSharedSecretAsync(ContractId, true);
 		}
 
 		/// <summary>

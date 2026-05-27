@@ -328,6 +328,9 @@
 	<Assembly fileName="Waher.Events.Pipe.dll" />
 	<Assembly fileName="Waher.Events.Pipe.pdb" />
 	<Assembly fileName="Waher.Events.Pipe.xml" />
+	<Assembly fileName="Waher.Events.Queue.dll" />
+	<Assembly fileName="Waher.Events.Queue.pdb" />
+	<Assembly fileName="Waher.Events.Queue.xml" />
 	<Assembly fileName="Waher.Events.Socket.dll" />
 	<Assembly fileName="Waher.Events.Socket.pdb" />
 	<Assembly fileName="Waher.Events.Socket.xml" />

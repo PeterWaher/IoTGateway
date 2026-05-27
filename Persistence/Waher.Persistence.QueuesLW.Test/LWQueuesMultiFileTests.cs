@@ -461,7 +461,7 @@ namespace Waher.Persistence.QueuesLW.Test
 				Assert.AreEqual(i, await this.queue.Dequeue(10000));
 
 			await this.queue.DisposeAsync();
-			this.queue = await MultiFileQueue.Create(QueueFolder, true, MaxFileSize,
+			this.queue = await MultiFileQueue.Create(QueueFolder, Encrypted, MaxFileSize,
 				this.fullSerialization, this.provider);
 
 			for (; i < 10000; i++)

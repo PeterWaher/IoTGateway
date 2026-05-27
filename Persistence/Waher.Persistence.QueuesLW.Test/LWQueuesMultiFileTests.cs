@@ -1,14 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
-using System.Collections.Generic;
-using System;
 using Waher.Runtime.Profiling;
-
 
 
 #if !LW
@@ -25,8 +24,6 @@ namespace Waher.Persistence.QueuesLW.Test
 	[TestClass]
 	public sealed class DBQueuesMultiFileTests
 	{
-		// TODO: Cryptographic keys based on folder name, not individual file names.
-
 		internal const string DataFolder = "Data";
 		internal const string QueueFolder = "Data\\Queue";
 		internal const string UmlFolder = "UmlMulti";

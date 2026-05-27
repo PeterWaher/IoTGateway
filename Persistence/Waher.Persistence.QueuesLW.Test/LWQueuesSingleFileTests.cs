@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -7,10 +9,8 @@ using Waher.Content;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
-using Waher.Script;
-using System.Collections.Generic;
-using System;
 using Waher.Runtime.Profiling;
+using Waher.Script;
 
 
 #if !LW

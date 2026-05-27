@@ -940,27 +940,31 @@ namespace Waher.Persistence.Queues
 				{
 					KeyValuePair<byte[], long> Block = await this.file.ReadBlock(this.filePosition);
 					Payload = Block.Key;
-					this.filePosition = Block.Value;
 
-					if (this.profiling)
-						this.positionThread.NewSample(this.filePosition);
-
-					if (this.filePosition >= this.fileSize)
+					if (RemoveItem)
 					{
-						await this.file.Clear();
-
-						this.filePosition = 0;
-						this.fileSize = 0;
+						this.filePosition = Block.Value;
 
 						if (this.profiling)
-						{
-							this.positionThread.NewSample(0);
-							this.sizeThread.NewSample(0);
-						}
-					}
+							this.positionThread.NewSample(this.filePosition);
 
-					if (!(this.waitingEnqueuers.First is null))
-						this.TriggerWaitingEnqueuersLocked();
+						if (this.filePosition >= this.fileSize)
+						{
+							await this.file.Clear();
+
+							this.filePosition = 0;
+							this.fileSize = 0;
+
+							if (this.profiling)
+							{
+								this.positionThread.NewSample(0);
+								this.sizeThread.NewSample(0);
+							}
+						}
+
+						if (!(this.waitingEnqueuers.First is null))
+							this.TriggerWaitingEnqueuersLocked();
+					}
 				}
 			}
 			finally

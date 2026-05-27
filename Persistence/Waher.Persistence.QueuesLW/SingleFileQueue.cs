@@ -979,7 +979,7 @@ namespace Waher.Persistence.Queues
 			int TypeLen = BitConverter.ToInt32(Payload, 0);
 			int ItemLen = BitConverter.ToInt32(Payload, 4);
 
-			if (8 + TypeLen + ItemLen > Payload.Length)
+			if (8 + TypeLen + ItemLen > Payload.Length || TypeLen < 0 || ItemLen < 0)
 				throw new InvalidOperationException("Block has been corrupted.");
 
 			byte[] TypeBinary = new byte[TypeLen];

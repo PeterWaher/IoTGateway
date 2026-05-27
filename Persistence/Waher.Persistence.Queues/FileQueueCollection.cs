@@ -65,8 +65,8 @@ namespace Waher.Persistence.Queues
 				if (fullSerialization is null)
 					fullSerialization = new FullSerialization();
 
-				Result = await MultiFileQueue.Create(FolderName, true, maxFileSize,
-					fullSerialization, FilesProvider);
+				Result = await MultiFileQueue.Create(FolderName, FilesProvider.Encrypted,
+					maxFileSize, fullSerialization, FilesProvider);
 
 				queues[FolderName] = Result;
 

@@ -397,7 +397,18 @@ namespace Waher.Persistence.Queues
 		/// </summary>
 		/// <param name="Item">Item to enqueue</param>
 		/// <returns>If item was enqueued</returns>
-		public async Task<bool> Enqueue(object Item)
+		public Task<bool> Enqueue(object Item)
+		{
+			return this.Enqueue(Item, int.MaxValue);
+		}
+
+		/// <summary>
+		/// Enqueues an item into the queue.
+		/// </summary>
+		/// <param name="Item">Item to enqueue</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+		/// <returns>If item was enqueued</returns>
+		public async Task<bool> Enqueue(object Item, int TimeoutMilliseconds)
 		{
 			bool Released = false;
 
@@ -408,7 +419,7 @@ namespace Waher.Persistence.Queues
 					return false;
 
 				QueuedFile File = this.files.Last.Value;
-				if (await File.Queue.Enqueue(Item, 0))
+				if (await File.Queue.Enqueue(Item, TimeoutMilliseconds))
 					return true;
 
 				string NewFileName = Path.Combine(this.folderName, Guid.NewGuid().ToString() + ".queue");
@@ -422,7 +433,7 @@ namespace Waher.Persistence.Queues
 				this.files.AddLast(File);
 				this.fileCount++;
 
-				Task<bool> PendingResult = File.Queue.Enqueue(Item);
+				Task<bool> PendingResult = File.Queue.Enqueue(Item, TimeoutMilliseconds);
 
 				this.semaphore.Release();
 				Released = true;

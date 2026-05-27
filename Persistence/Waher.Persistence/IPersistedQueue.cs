@@ -17,6 +17,14 @@ namespace Waher.Persistence
 		Task<bool> Enqueue(object Item);
 
 		/// <summary>
+		/// Enqueues an item into the queue.
+		/// </summary>
+		/// <param name="Item">Item to enqueue</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+		/// <returns>If item was enqueued</returns>
+		Task<bool> Enqueue(object Item, int TimeoutMilliseconds);
+
+		/// <summary>
 		/// Dequeue an item from the queue. The task will wait for an item to be dequeued,
 		/// or, if the queue is empty, for an item to be enqueued. If all items have been 
 		/// dequeued, the file is cleared, to conserve disk space.

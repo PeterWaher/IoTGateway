@@ -32,7 +32,7 @@ namespace Waher.Persistence.Queues
 		private MultiFileQueue(string FolderName, int MaxFileSize, bool Encrypted,
 			SerializerCollection Serializers, GetKeysMethod GetKeys, Profiler Profiler)
 		{
-			this.folderName = FolderName;
+			this.folderName = Path.GetFullPath(FolderName);
 			this.maxFileSize = MaxFileSize;
 			this.encrypted = Encrypted;
 			this.serializers = Serializers;
@@ -46,7 +46,7 @@ namespace Waher.Persistence.Queues
 		private MultiFileQueue(string FolderName, int MaxFileSize, bool Encrypted,
 			ISerializerContext Context, FilesProvider Provider, Profiler Profiler)
 		{
-			this.folderName = FolderName;
+			this.folderName = Path.GetFullPath(FolderName);
 			this.maxFileSize = MaxFileSize;
 			this.encrypted = Encrypted;
 			this.serializers = null;
@@ -223,13 +223,15 @@ namespace Waher.Persistence.Queues
 		{
 			if (this.provider is null)
 			{
-				return await SingleFileQueue.Create(FileName, this.encrypted, this.maxFileSize,
-					QueueThresholdMode.Ignore, this.serializers, this.getKeys, this.profiler);
+				return await SingleFileQueue.Create(FileName, this.folderName, this.encrypted, 
+					this.maxFileSize, QueueThresholdMode.Ignore, this.serializers, this.getKeys, 
+					this.profiler);
 			}
 			else
 			{
-				return await SingleFileQueue.Create(FileName, this.encrypted, this.maxFileSize,
-					QueueThresholdMode.Ignore, this.context, this.provider, this.profiler);
+				return await SingleFileQueue.Create(FileName, this.folderName, this.encrypted, 
+					this.maxFileSize, QueueThresholdMode.Ignore, this.context, this.provider, 
+					this.profiler);
 			}
 		}
 

@@ -69,7 +69,7 @@ namespace Waher.Persistence.Queues
 			long FileSize, SerializerCollection Serializers,
 			Profiler Profiler)
 		{
-			this.fileName = FileName;
+			this.fileName = Path.GetFullPath(FileName);
 			this.maxFileSize = MaxFileSize;
 			this.thresholdMode = ThresholdMode;
 			this.serializers = Serializers;
@@ -92,7 +92,7 @@ namespace Waher.Persistence.Queues
 #endif
 			Profiler Profiler)
 		{
-			this.fileName = FileName;
+			this.fileName = Path.GetFullPath(FileName);
 			this.maxFileSize = MaxFileSize;
 			this.thresholdMode = ThresholdMode;
 			this.file = File;
@@ -199,8 +199,8 @@ namespace Waher.Persistence.Queues
 			int MaxFileSize, QueueThresholdMode ThresholdMode,
 			SerializerCollection Serializers, GetKeysMethod GetKeys)
 		{
-			return Create(FileName, Encrypted, MaxFileSize, ThresholdMode, Serializers,
-				GetKeys, null);
+			return Create(FileName, FileName, Encrypted, MaxFileSize, ThresholdMode, 
+				Serializers, GetKeys, null);
 		}
 
 		/// <summary>
@@ -215,11 +215,34 @@ namespace Waher.Persistence.Queues
 		/// <param name="GetKeys">Method that provides encryption keys.</param>
 		/// <param name="Profiler">Optional profiler.</param>
 		/// <returns>Queue object instance.</returns>
-		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted,
 			int MaxFileSize, QueueThresholdMode ThresholdMode,
 			SerializerCollection Serializers, GetKeysMethod GetKeys, Profiler Profiler)
 		{
-			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, GetKeys);
+			return Create(FileName, FileName, Encrypted, MaxFileSize, ThresholdMode,
+				Serializers, GetKeys, Profiler);
+		}
+
+		/// <summary>
+		/// Creates a queue that perisists queued items in a single file.
+		/// </summary>
+		/// <param name="FileName">File name.</param>
+		/// <param name="KeyFileName">File Name key to use when generating encryption keys.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
+		/// reached its maximum size.</param>
+		/// <param name="Serializers">Collection of serializers.</param>
+		/// <param name="GetKeys">Method that provides encryption keys.</param>
+		/// <param name="Profiler">Optional profiler.</param>
+		/// <returns>Queue object instance.</returns>
+		public static async Task<SingleFileQueue> Create(string FileName, string KeyFileName,
+			bool Encrypted, int MaxFileSize, QueueThresholdMode ThresholdMode,
+			SerializerCollection Serializers, GetKeysMethod GetKeys, Profiler Profiler)
+		{
+			SerialFile File = await SerialFile.Create(FileName, KeyFileName, string.Empty, 
+				Encrypted, GetKeys);
+
 			long FileSize = await File.GetLength();
 
 			return new SingleFileQueue(FileName, MaxFileSize, ThresholdMode, File, FileSize,
@@ -355,7 +378,7 @@ namespace Waher.Persistence.Queues
 			int MaxFileSize, QueueThresholdMode ThresholdMode, ISerializerContext Context,
 			FilesProvider Provider)
 		{
-			return Create(FileName, Encrypted, MaxFileSize, ThresholdMode, Context,
+			return Create(FileName, FileName, Encrypted, MaxFileSize, ThresholdMode, Context,
 				Provider, null);
 		}
 
@@ -371,11 +394,34 @@ namespace Waher.Persistence.Queues
 		/// <param name="Provider">Files database provider.</param>
 		/// <param name="Profiler">Optional profiler.</param>
 		/// <returns>Queue object instance.</returns>
-		public static async Task<SingleFileQueue> Create(string FileName, bool Encrypted,
+		public static Task<SingleFileQueue> Create(string FileName, bool Encrypted,
 			int MaxFileSize, QueueThresholdMode ThresholdMode, ISerializerContext Context,
 			FilesProvider Provider, Profiler Profiler)
 		{
-			SerialFile File = await SerialFile.Create(FileName, string.Empty, Encrypted, Provider);
+			return Create(FileName, FileName, Encrypted, MaxFileSize, ThresholdMode,
+				Context, Provider, Profiler);
+		}
+
+		/// <summary>
+		/// Creates a queue that perisists queued items in a single file.
+		/// </summary>
+		/// <param name="FileName">File name.</param>
+		/// <param name="KeyFileName">File Name key to use when generating encryption keys.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="MaxFileSize">Maximum file size, in bytes.</param>
+		/// <param name="ThresholdMode">How to handle enqueued items when the queue file has
+		/// reached its maximum size.</param>
+		/// <param name="Context">Serialization context.</param>
+		/// <param name="Provider">Files database provider.</param>
+		/// <param name="Profiler">Optional profiler.</param>
+		/// <returns>Queue object instance.</returns>
+		public static async Task<SingleFileQueue> Create(string FileName,string KeyFileName,
+			bool Encrypted, int MaxFileSize, QueueThresholdMode ThresholdMode, 
+			ISerializerContext Context, FilesProvider Provider, Profiler Profiler)
+		{
+			SerialFile File = await SerialFile.Create(FileName, KeyFileName, string.Empty, 
+				Encrypted, Provider);
+
 			long FileSize = await File.GetLength();
 
 #if COMPILED

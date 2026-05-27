@@ -29,6 +29,7 @@ namespace Waher.Persistence.Files
 		private readonly string keyFileName;
 		private readonly bool encrypted;
 		private readonly bool fileExists;
+		private readonly bool explicitKeyFileName;
 		private readonly bool asyncFileIo;
 		private Aes aes;
 		private byte[] aesKey;
@@ -68,6 +69,7 @@ namespace Waher.Persistence.Files
 			this.collectionName = CollectionName;
 			this.encrypted = Encrypted;
 			this.fileExists = File.Exists(this.fileName);
+			this.explicitKeyFileName = this.keyFileName != this.fileName;
 			this.asyncFileIo = FilesProvider.AsyncFileIo;
 
 			string Folder = Path.GetDirectoryName(this.fileName);
@@ -185,10 +187,21 @@ namespace Waher.Persistence.Files
 				SerialFile.aes.Mode = CipherMode.CBC;
 				SerialFile.aes.Padding = PaddingMode.None;
 
-				KeyValuePair<byte[], byte[]> P = await GetKeysMethod(SerialFile.keyFileName, SerialFile.fileExists);
+				KeyValuePair<byte[], byte[]> P = await GetKeysMethod(SerialFile.keyFileName, 
+					SerialFile.fileExists || SerialFile.explicitKeyFileName);
+
 				SerialFile.aesKey = P.Key;
 				SerialFile.ivSeed = P.Value;
 				SerialFile.ivSeedLen = SerialFile.ivSeed.Length;
+
+				// TODO: Remove
+				Console.Out.WriteLine("File: " + SerialFile.fileName);
+				Console.Out.WriteLine("Exists: " + SerialFile.fileExists.ToString());
+				Console.Out.WriteLine("Key File: " + SerialFile.keyFileName);
+				Console.Out.WriteLine("Key: " + Convert.ToBase64String(P.Key));
+				Console.Out.WriteLine("IV: " + Convert.ToBase64String(P.Value));
+				Console.Out.WriteLine();
+
 			}
 		}
 

@@ -66,5 +66,16 @@ namespace Waher.Events.Queue
 				Log.Event(Error);
 			}
 		}
+
+		/// <summary>
+		/// Clears the queue.
+		/// </summary>
+		public async Task ClearQueue()
+		{
+			if (this.queue is null)
+				this.queue = await Database.GetQueue(this.queueName);
+
+			await this.queue.Clear();
+		}
 	}
 }

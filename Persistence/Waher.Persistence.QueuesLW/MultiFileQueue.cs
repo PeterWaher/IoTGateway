@@ -584,5 +584,65 @@ namespace Waher.Persistence.Queues
 					this.semaphore.Release();
 			}
 		}
+
+		/// <summary>
+		/// Clears the queue.
+		/// </summary>
+		public async Task Clear()
+		{
+			await this.semaphore.WaitAsync();
+			try
+			{
+				QueuedFile File = this.files.First.Value;
+
+				while (this.fileCount > 1)
+				{
+					if (!(File.Queue is null))
+					{
+						await File.Queue.DisposeAsync();
+						File.Queue = null;
+					}
+
+					this.files.RemoveFirst();
+					this.fileCount--;
+
+					if (System.IO.File.Exists(File.FileName))
+					{
+						try
+						{
+							System.IO.File.Delete(File.FileName);
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
+					}
+
+					File = this.files.First.Value;
+				}
+
+				File = this.files.First.Value;
+
+				if (File.Queue is null)
+				{
+					try
+					{
+						File.Queue = await this.CreateSingleFileQueue(File.FileName);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+						return;
+					}
+				}
+
+				await File.Queue.Clear();
+			}
+			finally
+			{
+				this.semaphore.Release();
+			}
+		}
+
 	}
 }

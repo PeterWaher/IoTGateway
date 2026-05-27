@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Events;
 
 namespace Waher.Persistence
@@ -67,5 +66,10 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <returns>Number of enqueuers waiting for space.</returns>
 		Task<int> GetNrEnqueuers();
+
+		/// <summary>
+		/// Clears the queue.
+		/// </summary>
+		Task Clear();
 	}
 }

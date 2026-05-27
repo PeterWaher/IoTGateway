@@ -386,5 +386,24 @@ namespace Waher.Persistence.Queues
 					this.semaphore.Release();
 			}
 		}
+
+		/// <summary>
+		/// Clears the queue.
+		/// </summary>
+		public async Task Clear()
+		{
+			await this.semaphore.WaitAsync();
+			try
+			{
+				await Database.Delete<QueuedItem>(
+					new FilterFieldEqualTo("QueueName", this.queueName),
+					"CreatedUtc");
+			}
+			finally
+			{
+				this.semaphore.Release();
+			}
+		}
+
 	}
 }

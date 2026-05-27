@@ -1002,5 +1002,30 @@ namespace Waher.Persistence.Queues
 
 			return Item;
 		}
+
+		/// <summary>
+		/// Clears the queue.
+		/// </summary>
+		public async Task Clear()
+		{
+			await this.semaphore.WaitAsync();
+			try
+			{
+				await this.file.Clear();
+
+				this.filePosition = 0;
+				this.fileSize = 0;
+
+				if (this.profiling)
+				{
+					this.positionThread.NewSample(0);
+					this.sizeThread.NewSample(0);
+				}
+			}
+			finally
+			{
+				this.semaphore.Release();
+			}
+		}
 	}
 }

@@ -69,9 +69,9 @@ namespace Waher.Persistence.QueuesLW.Test
 			this.profiler.Start();
 		}
 
-		private async Task InitQueue(QueueThresholdMode Mode)
+		private async Task InitQueue(QueueThresholdMode Mode, bool Encrypted)
 		{
-			this.queue = await SingleFileQueue.Create(QueueFileName, true, MaxFileSize,
+			this.queue = await SingleFileQueue.Create(QueueFileName, Encrypted, MaxFileSize,
 				Mode, this.fullSerialization.Serializers, this.provider, this.profiler);
 		}
 
@@ -117,18 +117,22 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_01_EnqueueDequeue_ValueTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_01_EnqueueDequeue_ValueTypes(bool Encrypted)
 		{
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			Assert.IsTrue(await this.queue.Enqueue(1));
 			Assert.AreEqual(1, await this.queue.Dequeue(10000));
 		}
 
 		[TestMethod]
-		public async Task Test_02_EnqueuePeekTryDequeue_ValueTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_02_EnqueuePeekTryDequeue_ValueTypes(bool Encrypted)
 		{
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			Assert.IsTrue(await this.queue.Enqueue(1));
 			Assert.AreEqual(1, await this.queue.Peek());
@@ -137,11 +141,13 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_03_EnqueueDequeue_Multiple_ValueTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_03_EnqueueDequeue_Multiple_ValueTypes(bool Encrypted)
 		{
 			int i;
 
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			for (i = 0; i < 10; i++)
 				Assert.IsTrue(await this.queue.Enqueue(i));
@@ -151,9 +157,11 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_04_DequeueEnqueue_ValueTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_04_DequeueEnqueue_ValueTypes(bool Encrypted)
 		{
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			TaskCompletionSource<bool> EnqueueResult = new();
 
@@ -168,9 +176,11 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_05_DequeueEnqueue_Multiple_ValueTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_05_DequeueEnqueue_Multiple_ValueTypes(bool Encrypted)
 		{
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			TaskCompletionSource<bool> EnqueueResult = new();
 
@@ -196,9 +206,11 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_06_DequeueEnqueue_RandomMultiple_ValueTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_06_DequeueEnqueue_RandomMultiple_ValueTypes(bool Encrypted)
 		{
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			Random Rnd = new();
 			TaskCompletionSource<bool> EnqueueDone = new();
@@ -253,9 +265,11 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_07_EnqueueDequeue_ReferenceTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_07_EnqueueDequeue_ReferenceTypes(bool Encrypted)
 		{
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			Assert.IsTrue(await this.queue.Enqueue(new Simple(1, "Object 1")));
 			Simple Item = await this.queue.Dequeue(10000) as Simple;
@@ -265,9 +279,11 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_08_EnqueuePeekTryDequeue_ReferenceTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_08_EnqueuePeekTryDequeue_ReferenceTypes(bool Encrypted)
 		{
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			Assert.IsTrue(await this.queue.Enqueue(new Simple(1, "Object 1")));
 			
@@ -285,9 +301,11 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_09_EnqueueDequeue_Multiple_ReferenceTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_09_EnqueueDequeue_Multiple_ReferenceTypes(bool Encrypted)
 		{
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			int i;
 
@@ -304,9 +322,11 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_10_DequeueEnqueue_ReferenceTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_10_DequeueEnqueue_ReferenceTypes(bool Encrypted)
 		{
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			TaskCompletionSource<bool> EnqueueResult = new();
 
@@ -325,9 +345,11 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_11_DequeueEnqueue_Multiple_ReferenceTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_11_DequeueEnqueue_Multiple_ReferenceTypes(bool Encrypted)
 		{
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			TaskCompletionSource<bool> EnqueueResult = new();
 
@@ -358,9 +380,11 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_12_DequeueEnqueue_RandomMultiple_ReferenceTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_12_DequeueEnqueue_RandomMultiple_ReferenceTypes(bool Encrypted)
 		{
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			Random Rnd = new();
 			TaskCompletionSource<bool> EnqueueDone = new();
@@ -418,11 +442,13 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_13_Threshold_Ignore()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_13_Threshold_Ignore(bool Encrypted)
 		{
 			int i = 0;
 
-			await this.InitQueue(QueueThresholdMode.Ignore);
+			await this.InitQueue(QueueThresholdMode.Ignore, Encrypted);
 
 			while (await this.queue.Enqueue(i))
 				i++;
@@ -434,11 +460,13 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_14_Threshold_Exception()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_14_Threshold_Exception(bool Encrypted)
 		{
 			int i = 0;
 
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			await Assert.ThrowsAsync<IOException>(async () =>
 			{
@@ -453,11 +481,13 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_15_Threshold_Clear()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_15_Threshold_Clear(bool Encrypted)
 		{
 			int i = 0;
 
-			await this.InitQueue(QueueThresholdMode.Clear);
+			await this.InitQueue(QueueThresholdMode.Clear, Encrypted);
 
 			while (await this.queue.Enqueue(i) && i < 1000)
 				i++;
@@ -472,21 +502,25 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_16_Timeout()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_16_Timeout(bool Encrypted)
 		{
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			Assert.IsNull(await this.queue.Dequeue(2000));
 		}
 
 		[TestMethod]
-		public async Task Test_17_Threshold_Wait()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_17_Threshold_Wait(bool Encrypted)
 		{
 			TaskCompletionSource<bool> DequeueDone = new();
 			int i = 0;
 			int j = 0;
 
-			await this.InitQueue(QueueThresholdMode.Wait);
+			await this.InitQueue(QueueThresholdMode.Wait, Encrypted);
 			this.queue.TrimTimeout = 2000;
 
 			_ = Task.Run(async () =>
@@ -527,11 +561,13 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_18_CloseAndResume()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_18_CloseAndResume(bool Encrypted)
 		{
 			int i;
 
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			for (i = 0; i < 100; i++)
 				Assert.IsTrue(await this.queue.Enqueue(i));
@@ -540,16 +576,18 @@ namespace Waher.Persistence.QueuesLW.Test
 				Assert.AreEqual(i, await this.queue.Dequeue(10000));
 
 			await this.queue.DisposeAsync();
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			for (; i < 100; i++)
 				Assert.AreEqual(i, await this.queue.Dequeue(10000));
 		}
 
 		[TestMethod]
-		public async Task Test_19_DequeueEnqueue_MultipleThreads_ValueTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_19_DequeueEnqueue_MultipleThreads_ValueTypes(bool Encrypted)
 		{
-			await this.InitQueue(QueueThresholdMode.Exception);
+			await this.InitQueue(QueueThresholdMode.Exception, Encrypted);
 
 			SortedDictionary<int, bool> Dequeued = [];
 			Random Rnd = new();

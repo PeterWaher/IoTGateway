@@ -50,8 +50,11 @@ namespace Waher.Persistence.QueuesLW.Test
 			this.fullSerialization = new FullSerialization();
 			this.profiler = new Profiler(ProfilerThreadType.Sequential);
 			this.profiler.Start();
+		}
 
-			this.queue = await MultiFileQueue.Create(QueueFolder, true, MaxFileSize,
+		private async Task InitQueue(bool Encrypted)
+		{
+			this.queue = await MultiFileQueue.Create(QueueFolder, Encrypted, MaxFileSize,
 				this.fullSerialization, this.provider, this.profiler);
 		}
 
@@ -108,15 +111,23 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_01_EnqueueDequeue_ValueTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_01_EnqueueDequeue_ValueTypes(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			Assert.IsTrue(await this.queue.Enqueue(1));
 			Assert.AreEqual(1, await this.queue.Dequeue(10000));
 		}
 
 		[TestMethod]
-		public async Task Test_02_EnqueuePeekTryDequeue_ValueTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_02_EnqueuePeekTryDequeue_ValueTypes(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			Assert.IsTrue(await this.queue.Enqueue(1));
 			Assert.AreEqual(1, await this.queue.Peek());
 			Assert.AreEqual(1, await this.queue.TryDequeue());
@@ -124,8 +135,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_03_EnqueueDequeue_Multiple_ValueTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_03_EnqueueDequeue_Multiple_ValueTypes(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			int i;
 
 			for (i = 0; i < 10000; i++)
@@ -136,8 +151,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_04_DequeueEnqueue_ValueTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_04_DequeueEnqueue_ValueTypes(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			TaskCompletionSource<bool> EnqueueResult = new();
 
 			_ = Task.Run(async () =>
@@ -151,8 +170,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_05_DequeueEnqueue_Multiple_ValueTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_05_DequeueEnqueue_Multiple_ValueTypes(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			TaskCompletionSource<bool> EnqueueResult = new();
 
 			_ = Task.Run(async () =>
@@ -177,8 +200,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_06_DequeueEnqueue_RandomMultiple_ValueTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_06_DequeueEnqueue_RandomMultiple_ValueTypes(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			Random Rnd = new();
 			TaskCompletionSource<bool> EnqueueDone = new();
 			TaskCompletionSource<bool> DequeueDone = new();
@@ -232,8 +259,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_07_EnqueueDequeue_ReferenceTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_07_EnqueueDequeue_ReferenceTypes(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			Assert.IsTrue(await this.queue.Enqueue(new Simple(1, "Object 1")));
 			Simple Item = await this.queue.Dequeue(10000) as Simple;
 			Assert.IsNotNull(Item);
@@ -242,8 +273,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_08_EnqueuePeekTryDequeue_ReferenceTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_08_EnqueuePeekTryDequeue_ReferenceTypes(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			Assert.IsTrue(await this.queue.Enqueue(new Simple(1, "Object 1")));
 
 			Simple Item = await this.queue.Peek() as Simple;
@@ -260,8 +295,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_09_EnqueueDequeue_Multiple_ReferenceTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_09_EnqueueDequeue_Multiple_ReferenceTypes(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			int i;
 
 			for (i = 0; i < 10000; i++)
@@ -277,8 +316,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_10_DequeueEnqueue_ReferenceTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_10_DequeueEnqueue_ReferenceTypes(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			TaskCompletionSource<bool> EnqueueResult = new();
 
 			_ = Task.Run(async () =>
@@ -296,8 +339,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_11_DequeueEnqueue_Multiple_ReferenceTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_11_DequeueEnqueue_Multiple_ReferenceTypes(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			TaskCompletionSource<bool> EnqueueResult = new();
 
 			_ = Task.Run(async () =>
@@ -327,8 +374,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_12_DequeueEnqueue_RandomMultiple_ReferenceTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_12_DequeueEnqueue_RandomMultiple_ReferenceTypes(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			Random Rnd = new();
 			TaskCompletionSource<bool> EnqueueDone = new();
 			TaskCompletionSource<bool> DequeueDone = new();
@@ -385,14 +436,22 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_13_Timeout()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_13_Timeout(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			Assert.IsNull(await this.queue.Dequeue(2000));
 		}
 
 		[TestMethod]
-		public async Task Test_14_CloseAndResume()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_14_CloseAndResume(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			int i;
 
 			for (i = 0; i < 10000; i++)
@@ -410,8 +469,12 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_15_DequeueEnqueue_MultipleThreads_ValueTypes()
+		[DataRow(true)]
+		[DataRow(false)]
+		public async Task Test_15_DequeueEnqueue_MultipleThreads_ValueTypes(bool Encrypted)
 		{
+			await this.InitQueue(Encrypted);
+
 			SortedDictionary<int, bool> Dequeued = [];
 			Random Rnd = new();
 			Enqueuer[] Enqueuers = new Enqueuer[10];

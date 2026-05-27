@@ -57,11 +57,11 @@ namespace Waher.Things.Script
         /// </summary>
         public string SortKey => this.commandNode.SortKey;
 
-        /// <summary>
-        /// Gets the name of data source.
-        /// </summary>
-        /// <param name="Language">Language to use.</param>
-        public Task<string> GetNameAsync(Language Language) => Task.FromResult(this.commandNode.CommandName);
+		/// <summary>
+		/// Gets the displayable name of the command.
+		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		public Task<string> GetNameAsync(Language Language) => Task.FromResult(this.commandNode.CommandName);
 
         /// <summary>
         /// Gets a confirmation string, if any, of the command. If no confirmation is necessary, null, or the empty string can be returned.

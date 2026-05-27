@@ -29,7 +29,7 @@ namespace Waher.Things.Xmpp.Commands
 		public override CommandType Type => CommandType.Simple;
 
 		/// <summary>
-		/// Gets the name of data source.
+		/// Gets the displayable name of the command.
 		/// </summary>
 		/// <param name="Language">Language to use.</param>
 		public override Task<string> GetNameAsync(Language Language)

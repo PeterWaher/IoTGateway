@@ -63,7 +63,7 @@ namespace Waher.Things.Script
 		public string SortKey => this.queryNode.SortKey;
 
 		/// <summary>
-		/// Gets the name of data source.
+		/// Gets the displayable name of the command.
 		/// </summary>
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetNameAsync(Language Language) => Task.FromResult(this.queryNode.CommandName);

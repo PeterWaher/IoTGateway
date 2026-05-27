@@ -63,7 +63,7 @@ namespace Waher.Things
 		}
 
 		/// <summary>
-		/// Gets the name of data source.
+		/// Gets the displayable name of the command.
 		/// </summary>
 		/// <param name="Language">Language to use.</param>
 		Task<string> GetNameAsync(Language Language);

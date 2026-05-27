@@ -51,7 +51,7 @@ namespace Waher.Things.Xmpp.Commands
 		public string SortKey => this.sortKey;
 
 		/// <summary>
-		/// Gets the name of data source.
+		/// Gets the displayable name of the command.
 		/// </summary>
 		/// <param name="Language">Language to use.</param>
 		public abstract Task<string> GetNameAsync(Language Language);

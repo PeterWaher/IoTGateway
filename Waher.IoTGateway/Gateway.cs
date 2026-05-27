@@ -36,6 +36,7 @@ using Waher.Events.Filter;
 using Waher.Events.MQTT;
 using Waher.Events.Persistence;
 using Waher.Events.Pipe;
+using Waher.Events.Queue;
 using Waher.Events.Socket;
 using Waher.Events.Syslog;
 using Waher.Events.WebHook;
@@ -942,6 +943,13 @@ namespace Waher.IoTGateway
 																Error, Critical, Alert, Emergency, null, EventIds));
 															break;
 													}
+													break;
+
+												case "EventQueue":
+													SinkId = XML.Attribute(E2, "id");
+													string QueueName = XML.Attribute(E2, "name");
+
+													Sinks.Add(new EventQueue(SinkId, QueueName));
 													break;
 											}
 										}

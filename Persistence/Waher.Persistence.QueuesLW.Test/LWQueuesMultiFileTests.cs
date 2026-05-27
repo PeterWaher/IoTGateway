@@ -115,7 +115,16 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_02_EnqueueDequeue_Multiple_ValueTypes()
+		public async Task Test_02_EnqueuePeekTryDequeue_ValueTypes()
+		{
+			Assert.IsTrue(await this.queue.Enqueue(1));
+			Assert.AreEqual(1, await this.queue.Peek());
+			Assert.AreEqual(1, await this.queue.TryDequeue());
+			Assert.IsNull(await this.queue.TryDequeue());
+		}
+
+		[TestMethod]
+		public async Task Test_03_EnqueueDequeue_Multiple_ValueTypes()
 		{
 			int i;
 
@@ -127,7 +136,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_03_DequeueEnqueue_ValueTypes()
+		public async Task Test_04_DequeueEnqueue_ValueTypes()
 		{
 			TaskCompletionSource<bool> EnqueueResult = new();
 
@@ -142,7 +151,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_04_DequeueEnqueue_Multiple_ValueTypes()
+		public async Task Test_05_DequeueEnqueue_Multiple_ValueTypes()
 		{
 			TaskCompletionSource<bool> EnqueueResult = new();
 
@@ -168,7 +177,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_05_DequeueEnqueue_RandomMultiple_ValueTypes()
+		public async Task Test_06_DequeueEnqueue_RandomMultiple_ValueTypes()
 		{
 			Random Rnd = new();
 			TaskCompletionSource<bool> EnqueueDone = new();
@@ -223,7 +232,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_06_EnqueueDequeue_ReferenceTypes()
+		public async Task Test_07_EnqueueDequeue_ReferenceTypes()
 		{
 			Assert.IsTrue(await this.queue.Enqueue(new Simple(1, "Object 1")));
 			Simple Item = await this.queue.Dequeue(10000) as Simple;
@@ -233,7 +242,25 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_07_EnqueueDequeue_Multiple_ReferenceTypes()
+		public async Task Test_08_EnqueuePeekTryDequeue_ReferenceTypes()
+		{
+			Assert.IsTrue(await this.queue.Enqueue(new Simple(1, "Object 1")));
+
+			Simple Item = await this.queue.Peek() as Simple;
+			Assert.IsNotNull(Item);
+			Assert.AreEqual(1, Item.Counter);
+			Assert.AreEqual("Object 1", Item.Message);
+
+			Item = await this.queue.TryDequeue() as Simple;
+			Assert.IsNotNull(Item);
+			Assert.AreEqual(1, Item.Counter);
+			Assert.AreEqual("Object 1", Item.Message);
+
+			Assert.IsNull(await this.queue.TryDequeue());
+		}
+
+		[TestMethod]
+		public async Task Test_09_EnqueueDequeue_Multiple_ReferenceTypes()
 		{
 			int i;
 
@@ -250,7 +277,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_08_DequeueEnqueue_ReferenceTypes()
+		public async Task Test_10_DequeueEnqueue_ReferenceTypes()
 		{
 			TaskCompletionSource<bool> EnqueueResult = new();
 
@@ -269,7 +296,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_09_DequeueEnqueue_Multiple_ReferenceTypes()
+		public async Task Test_11_DequeueEnqueue_Multiple_ReferenceTypes()
 		{
 			TaskCompletionSource<bool> EnqueueResult = new();
 
@@ -300,7 +327,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_10_DequeueEnqueue_RandomMultiple_ReferenceTypes()
+		public async Task Test_12_DequeueEnqueue_RandomMultiple_ReferenceTypes()
 		{
 			Random Rnd = new();
 			TaskCompletionSource<bool> EnqueueDone = new();
@@ -358,13 +385,13 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_11_Timeout()
+		public async Task Test_13_Timeout()
 		{
 			Assert.IsNull(await this.queue.Dequeue(2000));
 		}
 
 		[TestMethod]
-		public async Task Test_12_CloseAndResume()
+		public async Task Test_14_CloseAndResume()
 		{
 			int i;
 
@@ -383,7 +410,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		}
 
 		[TestMethod]
-		public async Task Test_13_DequeueEnqueue_MultipleThreads_ValueTypes()
+		public async Task Test_15_DequeueEnqueue_MultipleThreads_ValueTypes()
 		{
 			SortedDictionary<int, bool> Dequeued = [];
 			Random Rnd = new();

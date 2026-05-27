@@ -11,6 +11,8 @@ Sensor Data Receptor API
 
 This endpoint allows clients to send sensor data to the receptor for processing and storage.
 
+![Table of Contents](ToC)
+
 Authentication
 -----------------
 

@@ -743,6 +743,9 @@
 	<Assembly fileName="Waher.Things.Xmpp.dll" />
 	<Assembly fileName="Waher.Things.Xmpp.pdb" />
 	<Assembly fileName="Waher.Things.Xmpp.xml" />
+	<Assembly fileName="Waher.WebService.Queue.dll" />
+	<Assembly fileName="Waher.WebService.Queue.pdb" />
+	<Assembly fileName="Waher.WebService.Queue.xml" />
 	<Assembly fileName="Waher.WebService.Script.dll" />
 	<Assembly fileName="Waher.WebService.Script.pdb" />
 	<Assembly fileName="Waher.WebService.Script.xml" />

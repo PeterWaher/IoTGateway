@@ -12,6 +12,7 @@ using Waher.Persistence.Exceptions;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
 using Waher.Persistence.Filters;
+using Waher.Persistence.Queues;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Collections;
@@ -77,6 +78,7 @@ namespace Waher.Persistence.Files
 		private readonly Dictionary<string, StringDictionary> dictionaries = new Dictionary<string, StringDictionary>(StringComparer.CurrentCultureIgnoreCase);
 		private StringDictionary master;
 		private Cache<long, byte[]> blocks;
+		private IPersistedQueueCollection queueCollection;
 		private readonly object synchObj = new object();
 		private readonly object synchObjNrFiles = new object();
 
@@ -3165,6 +3167,44 @@ namespace Waher.Persistence.Files
 			}
 
 			return Task.FromResult(Collections.ToArray());
+		}
+
+		/// <summary>
+		/// Gets a persistent dictionary containing objects in a collection.
+		/// </summary>
+		/// <param name="QueueName">Queue Name</param>
+		/// <returns>Persistent queue</returns>
+		public Task<IPersistedQueue> GetQueue(string QueueName)
+		{
+			return this.QueueCollection.GetQueue(this, QueueName);
+		}
+
+		/// <summary>
+		/// Gets an array of available queue names.
+		/// </summary>
+		/// <returns>Array of queue names.</returns>
+		public Task<string[]> GetQueues()
+		{
+			return this.QueueCollection.GetQueues(this);
+		}
+
+		/// <summary>
+		/// Collection of persistent queues.
+		/// </summary>
+		public IPersistedQueueCollection QueueCollection
+		{
+			get
+			{
+				if (this.queueCollection is null)
+				{
+					this.queueCollection = Types.FindBest<IPersistedQueueCollection, IDatabaseProvider>(this);
+
+					if (this.queueCollection is null)
+						throw new NotSupportedException("No queue collection creator found for database provider.");
+				}
+
+				return this.queueCollection;
+			}
 		}
 
 		/// <summary>

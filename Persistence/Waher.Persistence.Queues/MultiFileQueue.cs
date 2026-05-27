@@ -443,9 +443,18 @@ namespace Waher.Persistence.Queues
 		/// <exception cref="InvalidOperationException">If file has been corrupted.</exception>
 		public Task<object> Dequeue()
 		{
-			return this.Dequeue(int.MaxValue);
+			return this.Dequeue(int.MaxValue, true);
 		}
 
+		/// <summary>
+		/// Tries to dequeue an item from the queue, if one exists. If an item is not 
+		/// available, null is returned.
+		/// </summary>
+		/// <returns>Dequeued item, or null if no item available.</returns>
+		public Task<object> TryDequeue()
+		{
+			return this.Dequeue(0, true);
+		}
 
 		/// <summary>
 		/// Dequeue an item from the queue. The task will wait for an item to be dequeued,
@@ -455,7 +464,31 @@ namespace Waher.Persistence.Queues
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
 		/// <returns>Dequeued item, or null if no item available within the allotted time.</returns>
 		/// <exception cref="InvalidOperationException">If file has been corrupted.</exception>
-		public async Task<object> Dequeue(int TimeoutMilliseconds)
+		public Task<object> Dequeue(int TimeoutMilliseconds)
+		{
+			return this.Dequeue(TimeoutMilliseconds, true);
+		}
+
+		/// <summary>
+		/// Returns the next item available to be dequeued, without dequeueing it.
+		/// If an item is not available, null is returned.
+		/// </summary>
+		/// <returns>Dequeued item, or null if no item available.</returns>
+		public Task<object> Peek()
+		{
+			return this.Dequeue(0, false);
+		}
+
+		/// <summary>
+		/// Dequeue an item from the queue. The task will wait for an item to be dequeued,
+		/// or, if the queue is empty, for an item to be enqueued. If an item is not 
+		/// available before the timeout occurs, null is returned.
+		/// </summary>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+		/// <param name="RemoveItem">If the item should be removed from the queue, if found.</param>
+		/// <returns>Dequeued item, or null if no item available within the allotted time.</returns>
+		/// <exception cref="InvalidOperationException">If file has been corrupted.</exception>
+		private async Task<object> Dequeue(int TimeoutMilliseconds, bool RemoveItem)
 		{
 			if (this.disposed)
 				return null;
@@ -487,7 +520,7 @@ namespace Waher.Persistence.Queues
 						}
 					}
 
-					object Result = await File.Queue.Dequeue(0);
+					object Result = await File.Queue.Dequeue(0, RemoveItem);
 					if (!(Result is null))
 						return Result;
 
@@ -525,7 +558,7 @@ namespace Waher.Persistence.Queues
 					}
 				}
 
-				Task<object> PendingResult = File.Queue.Dequeue(TimeoutMilliseconds);
+				Task<object> PendingResult = File.Queue.Dequeue(TimeoutMilliseconds, RemoveItem);
 
 				this.semaphore.Release();
 				Released = true;

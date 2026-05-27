@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Waher.Events;
 
-namespace Waher.Persistence.Queues
+namespace Waher.Persistence
 {
 	/// <summary>
 	/// Inteface for persisted queues.
@@ -22,7 +22,6 @@ namespace Waher.Persistence.Queues
 		/// dequeued, the file is cleared, to conserve disk space.
 		/// </summary>
 		/// <returns>Dequeued item.</returns>
-		/// <exception cref="InvalidOperationException">If file has been corrupted.</exception>
 		Task<object> Dequeue();
 
 		/// <summary>
@@ -32,8 +31,21 @@ namespace Waher.Persistence.Queues
 		/// </summary>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
 		/// <returns>Dequeued item, or null if no item available within the allotted time.</returns>
-		/// <exception cref="InvalidOperationException">If file has been corrupted.</exception>
 		Task<object> Dequeue(int TimeoutMilliseconds);
+
+		/// <summary>
+		/// Tries to dequeue an item from the queue, if one exists. If an item is not 
+		/// available, null is returned.
+		/// </summary>
+		/// <returns>Dequeued item, or null if no item available.</returns>
+		Task<object> TryDequeue();
+
+		/// <summary>
+		/// Returns the next item available to be dequeued, without dequeueing it.
+		/// If an item is not available, null is returned.
+		/// </summary>
+		/// <returns>Dequeued item, or null if no item available.</returns>
+		Task<object> Peek();
 
 		/// <summary>
 		/// Gets the number of dequeuers waiting for items to be queued.

@@ -62,7 +62,7 @@ namespace Waher.Persistence.QueuesLW.Test
 		[TestInitialize]
 		public async Task TestInitialize()
 		{	
-			await Database.Clear("QueuedItems");
+			await Database.Clear(QueuedItem.QueuedItemCollectionName);
 
 			this.profiler = new Profiler(ProfilerThreadType.Sequential);
 			this.profiler.Start();

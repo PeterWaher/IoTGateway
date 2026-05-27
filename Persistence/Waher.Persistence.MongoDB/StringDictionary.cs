@@ -428,7 +428,7 @@ namespace Waher.Persistence.MongoDB
 			{
 				ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(typeof(DictionaryEntry));
 				IMongoCollection<BsonDocument> Collection = this.provider.GetCollection(DictionaryEntry.CollectionName);
-				FilterDefinition<BsonDocument> BsonFilter = this.provider.Convert(new FilterFieldEqualTo("Collection", this.collectionName), Serializer);
+				FilterDefinition<BsonDocument> BsonFilter = MongoDBProvider.Convert(new FilterFieldEqualTo("Collection", this.collectionName), Serializer);
 
 				long Result = Collection.CountDocuments(BsonFilter);
 

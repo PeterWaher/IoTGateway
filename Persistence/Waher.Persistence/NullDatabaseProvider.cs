@@ -766,6 +766,19 @@ namespace Waher.Persistence
 		public Task<string[]> GetDictionaries() => Task.FromResult(Array.Empty<string>());
 
 		/// <summary>
+		/// Gets a persistent dictionary containing objects in a collection.
+		/// </summary>
+		/// <param name="QueueName">Queue Name</param>
+		/// <returns>Persistent queue</returns>
+		public Task<IPersistedQueue> GetQueue(string QueueName) => throw new InvalidOperationException("Server is shutting down.");
+
+		/// <summary>
+		/// Gets an array of available queue names.
+		/// </summary>
+		/// <returns>Array of queue names.</returns>
+		public Task<string[]> GetQueues() => Task.FromResult(Array.Empty<string>());
+
+		/// <summary>
 		/// Gets an array of available collections.
 		/// </summary>
 		/// <returns>Array of collections.</returns>

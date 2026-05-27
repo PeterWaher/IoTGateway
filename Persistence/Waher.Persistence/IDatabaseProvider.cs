@@ -672,6 +672,19 @@ namespace Waher.Persistence
 		Task<string[]> GetDictionaries();
 
 		/// <summary>
+		/// Gets a persistent dictionary containing objects in a collection.
+		/// </summary>
+		/// <param name="QueueName">Queue Name</param>
+		/// <returns>Persistent queue</returns>
+		Task<IPersistedQueue> GetQueue(string QueueName);
+
+		/// <summary>
+		/// Gets an array of available queue names.
+		/// </summary>
+		/// <returns>Array of queue names.</returns>
+		Task<string[]> GetQueues();
+
+		/// <summary>
 		/// Gets an array of available collections.
 		/// </summary>
 		/// <returns>Array of collections.</returns>

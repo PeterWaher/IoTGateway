@@ -509,7 +509,7 @@ namespace Waher.Persistence.Queues
 		/// <returns>If item was enqueued</returns>
 		public Task<bool> Enqueue(object Item)
 		{
-			return this.Enqueue(Item, int.MaxValue);
+			return this.Enqueue(Item, int.MaxValue, true);
 		}
 
 		/// <summary>
@@ -518,7 +518,20 @@ namespace Waher.Persistence.Queues
 		/// <param name="Item">Item to enqueue</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
 		/// <returns>If item was enqueued</returns>
-		public async Task<bool> Enqueue(object Item, int TimeoutMilliseconds)
+		public Task<bool> Enqueue(object Item, int TimeoutMilliseconds)
+		{
+			return this.Enqueue(Item, TimeoutMilliseconds, true);
+		}
+
+		/// <summary>
+		/// Enqueues an item into the queue.
+		/// </summary>
+		/// <param name="Item">Item to enqueue</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+		/// <param name="DoLock">If context should be locked (true), or if it has been
+		/// locked already by the caller (false).</param>
+		/// <returns>If item was enqueued</returns>
+		private async Task<bool> Enqueue(object Item, int TimeoutMilliseconds, bool DoLock)
 		{
 			if (Item is null)
 				throw new ArgumentNullException(nameof(Item));
@@ -589,14 +602,15 @@ namespace Waher.Persistence.Queues
 					Wait = null;
 				}
 
-				await this.semaphore.WaitAsync();
+				if (DoLock)
+					await this.semaphore.WaitAsync();
 				try
 				{
 					LinkedListNode<TaskCompletionSource<object>> First = this.waitingDequeuers.First;
 
 					if (First is null)
 					{
-						if (this.fileSize >= this.maxFileSize)
+						if (this.fileSize >= this.maxFileSize && DoLock)	// Avoid rule if call from Dequeue
 						{
 							if (this.filePosition > 0)
 							{
@@ -677,7 +691,8 @@ namespace Waher.Persistence.Queues
 				}
 				finally
 				{
-					this.semaphore.Release();
+					if (DoLock)
+						this.semaphore.Release();
 				}
 			}
 			while (!Forwarded);
@@ -762,7 +777,17 @@ namespace Waher.Persistence.Queues
 		/// <exception cref="InvalidOperationException">If file has been corrupted.</exception>
 		public Task<object> Dequeue()
 		{
-			return this.Dequeue(int.MaxValue);
+			return this.Dequeue(int.MaxValue, true);
+		}
+
+		/// <summary>
+		/// Tries to dequeue an item from the queue, if one exists. If an item is not 
+		/// available, null is returned.
+		/// </summary>
+		/// <returns>Dequeued item, or null if no item available.</returns>
+		public Task<object> TryDequeue()
+		{
+			return this.Dequeue(0, true);
 		}
 
 		/// <summary>
@@ -774,7 +799,32 @@ namespace Waher.Persistence.Queues
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
 		/// <returns>Dequeued item, or null if no item available within the allotted time.</returns>
 		/// <exception cref="InvalidOperationException">If file has been corrupted.</exception>
-		public async Task<object> Dequeue(int TimeoutMilliseconds)
+		public Task<object> Dequeue(int TimeoutMilliseconds)
+		{
+			return this.Dequeue(TimeoutMilliseconds, true);
+		}
+
+		/// <summary>
+		/// Returns the next item available to be dequeued, without dequeueing it.
+		/// If an item is not available, null is returned.
+		/// </summary>
+		/// <returns>Dequeued item, or null if no item available.</returns>
+		public Task<object> Peek()
+		{
+			return this.Dequeue(0, false);
+		}
+
+		/// <summary>
+		/// Dequeue an item from the queue. The task will wait for an item to be dequeued,
+		/// or, if the queue is empty, for an item to be enqueued. If an item is not 
+		/// available before the timeout occurs, null is returned. If all items have been 
+		/// dequeued, the file is cleared, to conserve disk space.
+		/// </summary>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+		/// <param name="RemoveItem">If the item should be removed from the queue, if found.</param>
+		/// <returns>Dequeued item, or null if no item available within the allotted time.</returns>
+		/// <exception cref="InvalidOperationException">If file has been corrupted.</exception>
+		internal async Task<object> Dequeue(int TimeoutMilliseconds, bool RemoveItem)
 		{
 			if (TimeoutMilliseconds < 0)
 				throw new ArgumentOutOfRangeException(nameof(TimeoutMilliseconds), "Value must be non-negative.");
@@ -831,6 +881,9 @@ namespace Waher.Persistence.Queues
 					});
 
 					object Result = await Waiter.Task;
+
+					if (!RemoveItem)
+						await this.Enqueue(Result, int.MaxValue, false);
 
 					if (this.profiling)
 						this.dequeueThread.Low();

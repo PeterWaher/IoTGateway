@@ -6,11 +6,16 @@ namespace Waher.Persistence.Queues
 	/// <summary>
 	/// Represents one item in a queue.
 	/// </summary>
-	[CollectionName("QueuedItems")]
+	[CollectionName(QueuedItemCollectionName)]
 	[TypeName(TypeNameSerialization.None)]
 	[Index("QueueName", "CreatedUtc")]
 	public class QueuedItem
 	{
+		/// <summary>
+		/// Collection name of queued items: QueuedItems
+		/// </summary>
+		public const string QueuedItemCollectionName = "QueuedItems";
+
 		/// <summary>
 		/// Represents one item in a queue.
 		/// </summary>

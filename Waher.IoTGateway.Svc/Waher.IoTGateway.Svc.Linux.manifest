@@ -490,6 +490,9 @@
 	<Assembly fileName="Waher.Persistence.MongoDB.dll" />
 	<Assembly fileName="Waher.Persistence.MongoDB.pdb" />
 	<Assembly fileName="Waher.Persistence.MongoDB.xml" />
+	<Assembly fileName="Waher.Persistence.Queues.dll" />
+	<Assembly fileName="Waher.Persistence.Queues.pdb" />
+	<Assembly fileName="Waher.Persistence.Queues.xml" />
 	<Assembly fileName="Waher.Persistence.Serialization.Compiled.dll" />
 	<Assembly fileName="Waher.Persistence.Serialization.Compiled.pdb" />
 	<Assembly fileName="Waher.Persistence.Serialization.Compiled.xml" />

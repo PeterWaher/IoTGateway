@@ -139,7 +139,8 @@ namespace Waher.Things.Http
 			{
 				if (!Request.User.HasPrivilege(HttpModule.PostPrivileges))
 				{
-					await Response.SendResponse(new ForbiddenException("Access denied. User lacks sufficient privileges: " + HttpModule.PostPrivileges));
+					await Response.SendResponse(ForbiddenException.AccessDenied(Request, 
+						this.ResourceName, Request.User.UserName, HttpModule.PostPrivileges));
 					return;
 				}
 
@@ -177,7 +178,8 @@ namespace Waher.Things.Http
 
 				if (!Request.User.HasPrivilege(PrivilegeId))
 				{
-					await Response.SendResponse(new ForbiddenException("Access denied. User lacks sufficient privileges: " + PrivilegeId));
+					await Response.SendResponse(ForbiddenException.AccessDenied(Request,
+						this.ResourceName, Request.User.UserName, PrivilegeId));
 					return;
 				}
 

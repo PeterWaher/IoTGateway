@@ -204,7 +204,7 @@ namespace Waher.Networking.HTTP
 
 				if (!(this.header.ContentLength is null) && (this.header.ContentLength.ContentLength > MaxEntitySize))
 				{
-					await this.SendResponse(null, null, new HttpException(413, "Method Not Allowed", "Empty method."), true);
+					await this.SendResponse(null, null, new HttpException(413, "Content Too Large", "Content larger than maximum entity size."), true);
 					return false;
 				}
 

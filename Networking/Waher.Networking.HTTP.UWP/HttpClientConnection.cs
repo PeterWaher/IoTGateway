@@ -79,6 +79,7 @@ namespace Waher.Networking.HTTP
 		private Dictionary<int, PrioritySettings> rfc9218PrioritySettings = null;
 		private byte http2FrameFlags = 0;
 		private byte[] http2Frame = null;
+		private bool http1 = true;
 
 		internal ConnectionSettings LocalSettings => this.localSettings;
 		internal ConnectionSettings RemoteSettings => this.remoteSettings;
@@ -198,28 +199,28 @@ namespace Waher.Networking.HTTP
 				else if (this.header.HttpVersion < 1)
 				{
 					await this.SendResponse(null, null, new HttpException(505, "HTTP Version Not Supported",
-						"At least HTTP Version 1.0 is required."), true);
-					return false;
+						"At least HTTP Version 1.0 is required."), this.http1);
+					return !this.http1; // Closes only if HTTP 1 or 1.1
 				}
 
 				if (!(this.header.ContentLength is null) && (this.header.ContentLength.ContentLength > MaxEntitySize))
 				{
-					await this.SendResponse(null, null, new HttpException(413, "Content Too Large", "Content larger than maximum entity size."), true);
-					return false;
+					await this.SendResponse(null, null, new HttpException(413, "Content Too Large", "Content larger than maximum entity size."), this.http1);
+					return !this.http1; // Closes only if HTTP 1 or 1.1
 				}
 
 				if (string.IsNullOrEmpty(this.header.Method))
 				{
-					await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed", "Empty method."), true);
-					return false;
+					await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed", "Empty method."), this.http1);
+					return !this.http1; // Closes only if HTTP 1 or 1.1
 				}
 
 				foreach (char ch in this.header.Method)
 				{
 					if (!((ch >= 'A' && ch <= 'Z') || ch == '-' || ch == '_'))
 					{
-						await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed", "Invalid method."), true);
-						return false;
+						await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed", "Invalid method."), this.http1);
+						return !this.http1; // Closes only if HTTP 1 or 1.1
 					}
 				}
 
@@ -272,6 +273,8 @@ namespace Waher.Networking.HTTP
 									this.flowControl = new FlowControlRfc9218(this.localSettings, this.remoteSettings, this, this.http2Profiler);
 								else
 									this.flowControl = new FlowControlRfc7540(this.localSettings, this.remoteSettings, this, this.http2Profiler);
+
+								this.http1 = false;
 
 								using (HttpResponse Response = new HttpResponse(this.client, this, this.server, null)
 								{
@@ -329,8 +332,8 @@ namespace Waher.Networking.HTTP
 				}
 
 				await this.SendResponse(null, null, new HttpException(431, "Request Header Fields Too Large",
-					"Max Header Size: " + MaxHeaderSize.ToString()), true);
-				return false;
+					"Max Header Size: " + MaxHeaderSize.ToString()), this.http1);
+				return !this.http1; // Closes only if HTTP 1 or 1.1
 			}
 		}
 
@@ -383,8 +386,8 @@ namespace Waher.Networking.HTTP
 					else
 					{
 						await this.SendResponse(null, null, new HttpException(411, "Length Required",
-							"Content Length required."), true);
-						return false;
+							"Content Length required."), this.http1);
+						return !this.http1; // Closes only if HTTP 1 or 1.1
 					}
 				}
 			}
@@ -435,8 +438,8 @@ namespace Waher.Networking.HTTP
 				this.dataStream = null;
 
 				await this.SendResponse(null, null, new HttpException(413, "Request Entity Too Large",
-					"Maximum Entity Size: " + MaxEntitySize.ToString()), true);
-				return false;
+					"Maximum Entity Size: " + MaxEntitySize.ToString()), this.http1);
+				return !this.http1; // Closes only if HTTP 1 or 1.1
 			}
 			else
 				return true;
@@ -462,8 +465,8 @@ namespace Waher.Networking.HTTP
 						this.ReceiveText(InternetContent.ISO_8859_1.GetString(Buffer, Offset, i - Offset));
 
 					await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed",
-						"Invalid HTTP/2 connection preface."), true);
-					return false;
+						"Invalid HTTP/2 connection preface."), this.http1);
+					return !this.http1;	// Closes only if HTTP 1 or 1.1
 				}
 
 				if (this.localSettings.InitStep == 6)
@@ -2137,7 +2140,7 @@ namespace Waher.Networking.HTTP
 
 				if (NetworkingModule.Stopping)
 				{
-					await this.SendResponse(Request, null, new ServiceUnavailableException("Service is shutting down. Please try again later."), true,
+					await this.SendResponse(Request, null, new ServiceUnavailableException("Service is shutting down. Please try again later."), this.http1,
 						new KeyValuePair<string, string>("Retry-After", "300"));    // Try again in 5 minutes.
 					Request.Dispose();
 					return false;
@@ -2162,17 +2165,17 @@ namespace Waher.Networking.HTTP
 							break;
 
 						case WafResult.Forbid:
-							await this.SendResponse(Request, null, new ForbiddenException(), true);
+							await this.SendResponse(Request, null, new ForbiddenException(), this.http1);
 							Request.Dispose();
 							return true;
 
 						case WafResult.NotFound:
-							await this.SendResponse(Request, null, new NotFoundException(), true);
+							await this.SendResponse(Request, null, new NotFoundException(), this.http1);
 							Request.Dispose();
 							return true;
 
 						case WafResult.RateLimited:
-							await this.SendResponse(Request, null, new TooManyRequestsException(), true);
+							await this.SendResponse(Request, null, new TooManyRequestsException(), this.http1);
 							Request.Dispose();
 							return true;
 
@@ -2189,7 +2192,7 @@ namespace Waher.Networking.HTTP
 							if (this.webApplicationFirewall.TryGetRedirection(WafResult, out HttpException Redirection))
 								await this.SendResponse(Request, null, Redirection, false);
 							else
-								await this.SendResponse(Request, null, new ForbiddenException(), true);
+								await this.SendResponse(Request, null, new ForbiddenException(), this.http1);
 
 							Request.Dispose();
 							return true;
@@ -2267,7 +2270,7 @@ namespace Waher.Networking.HTTP
 								Error = new TooManyRequestsException(sb.ToString());
 							}
 
-							await this.SendResponse(Request, null, Error, true);
+							await this.SendResponse(Request, null, Error, this.http1);
 							Request.Dispose();
 							return true;
 						}
@@ -2334,9 +2337,9 @@ namespace Waher.Networking.HTTP
 					else
 					{
 						await this.SendResponse(Request, null, new HttpException(417, "Expectation Failed", Request,
-							(await Resource.DefaultErrorContent(417)) ?? "Unable to parse Expect header."), true);
+							(await Resource.DefaultErrorContent(417)) ?? "Unable to parse Expect header."), this.http1);
 						Request.Dispose();
-						return false;
+						return !this.http1; // Closes only if HTTP 1 or 1.1
 					}
 				}
 
@@ -2354,7 +2357,7 @@ namespace Waher.Networking.HTTP
 
 				this.Exception(ex);
 
-				await this.SendResponse(Request, null, new NotImplementedException(ex.Message), !Result);
+				await this.SendResponse(Request, null, new NotImplementedException(ex.Message), !Result && this.http1);
 			}
 			catch (IOException ex)
 			{
@@ -2364,10 +2367,10 @@ namespace Waher.Networking.HTTP
 				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
 				{
 					await this.SendResponse(Request, null, new HttpException(InsufficientStorageException.Code,
-						InsufficientStorageException.StatusMessage, Request, "Insufficient space."), true);
+						InsufficientStorageException.StatusMessage, Request, "Insufficient space."), this.http1);
 				}
 				else
-					await this.SendResponse(Request, null, new InternalServerErrorException(ex), true);
+					await this.SendResponse(Request, null, new InternalServerErrorException(ex), this.http1);
 
 				Result = false;
 			}
@@ -2475,7 +2478,7 @@ namespace Waher.Networking.HTTP
 				{
 					try
 					{
-						await this.SendResponse(Request, Response, new NotImplementedException(ex.Message), true);
+						await this.SendResponse(Request, Response, new NotImplementedException(ex.Message), this.http1);
 					}
 					catch (Exception)
 					{
@@ -2497,10 +2500,10 @@ namespace Waher.Networking.HTTP
 						if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
 						{
 							await this.SendResponse(Request, null, new HttpException(InsufficientStorageException.Code,
-								InsufficientStorageException.StatusMessage, Request, "Insufficient space."), true);
+								InsufficientStorageException.StatusMessage, Request, "Insufficient space."), this.http1);
 						}
 						else
-							await this.SendResponse(Request, null, new InternalServerErrorException(ex), true);
+							await this.SendResponse(Request, null, new InternalServerErrorException(ex), this.http1);
 					}
 					catch (Exception)
 					{
@@ -2519,7 +2522,7 @@ namespace Waher.Networking.HTTP
 				{
 					try
 					{
-						await this.SendResponse(Request, Response, new InternalServerErrorException(ex), true);
+						await this.SendResponse(Request, Response, new InternalServerErrorException(ex), this.http1);
 					}
 					catch (Exception)
 					{
@@ -2593,7 +2596,7 @@ namespace Waher.Networking.HTTP
 				foreach (KeyValuePair<string, string> P in HeaderFields)
 					Response.SetHeader(P.Key, P.Value);
 
-				if (CloseAfterTransmission)
+				if (CloseAfterTransmission && this.http1)
 				{
 					Response.CloseAfterResponse = true;
 					Response.SetHeader("Connection", "close");

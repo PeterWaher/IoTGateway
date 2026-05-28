@@ -1,9 +1,14 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Content.Html;
 using Waher.Content.Markdown;
+using Waher.Content.Multipart;
+using Waher.Events;
 using Waher.IoTGateway;
 using Waher.Networking.HTTP;
+using Waher.Persistence;
 using Waher.Runtime.IO;
 using Waher.Script;
 
@@ -12,9 +17,11 @@ namespace Waher.WebService.Queue
 	/// <summary>
 	/// Provides a REST web service interface for access to local queues.
 	/// </summary>
-	public class QueueWebService : HttpAsynchronousResource, 
+	public class QueueWebService : HttpAsynchronousResource,
 		IHttpGetMethod, IHttpPostMethod, IHttpPutMethod, IHttpDeleteMethod
 	{
+		private const string RootPrivilege = "Admin.Queues.";
+
 		private readonly HttpAuthenticationScheme[] authenticationSchemes;
 
 		/// <summary>
@@ -22,7 +29,7 @@ namespace Waher.WebService.Queue
 		/// </summary>
 		/// <param name="ResourceName">Resource name.</param>
 		/// <param name="AuthenticationSchemes">Authentication schemes.</param>
-		public QueueWebService(string ResourceName, 
+		public QueueWebService(string ResourceName,
 			params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName)
 		{
@@ -100,24 +107,123 @@ namespace Waher.WebService.Queue
 		}
 
 		/// <summary>
+		/// Executes the PUT method on the resource. (Enqueue)
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public async Task PUT(HttpRequest Request, HttpResponse Response)
+		{
+			if (Request.User is null)
+			{
+				await Response.SendResponse(new ForbiddenException("Access denied."));
+				return;
+			}
+
+			string QueueName = GetQueueName(Request);
+			if (string.IsNullOrEmpty(QueueName))
+			{
+				await Response.SendResponse(new BadRequestException("Invalid or unspecified Queue Name."));
+				return;
+			}
+
+			string Privilege = RootPrivilege + QueueName + ".Enqueue";
+			if (!Request.User.HasPrivilege(Privilege))
+			{
+				await Response.SendResponse(ForbiddenException.AccessDenied(Request,
+					this.ResourceName, Request.User.UserName, Privilege));
+				return;
+			}
+
+			if (!Request.HasData)
+			{
+				await Response.SendResponse(new BadRequestException("No payload."));
+				return;
+			}
+
+			ContentResponse Payload = await Request.DecodeDataAsync();
+			if (Payload.HasError)
+			{
+				await Response.SendResponse(new BadRequestException("Unable to decode payload: " + Payload.Error.Message));
+				return;
+			}
+
+			int Timeout = 30000;
+
+			if (Request.Header.TryGetQueryParameter("Timeout", out string s) &&
+				int.TryParse(s, out int i) && i >= 0 && i < 90000)
+			{
+				Timeout = i;
+			}
+
+			object Decoded = Payload.Decoded;
+			IPersistedQueue Queue = await Database.GetQueue(QueueName);
+
+			Task _ = Task.Run(async () =>
+			{
+				try
+				{
+					if (Decoded is MultipartContent MultipartContent)
+					{
+						foreach (EmbeddedContent Content in MultipartContent.Content)
+						{
+							if (Content.Decoded is null)
+								continue;
+
+							if (!await Queue.Enqueue(Content.Decoded, Timeout))
+							{
+								await Response.SendResponse(new ServiceUnavailableException(
+									"Unable to enqueue item within timeout period."));
+								return;
+							}
+						}
+
+						Response.StatusCode = 204;
+						await Response.SendResponse();
+					}
+					else if (await Queue.Enqueue(Decoded, Timeout))
+					{
+						Response.StatusCode = 204;
+						await Response.SendResponse();
+					}
+					else
+					{
+						await Response.SendResponse(new ServiceUnavailableException(
+							"Unable to enqueue item within timeout period."));
+					}
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+					await Response.SendResponse(new UnprocessableEntityException());
+				}
+			});
+		}
+
+		private static string GetQueueName(HttpRequest Request)
+		{
+			if (string.IsNullOrEmpty(Request.SubPath))
+				return null;
+
+			string s = Request.SubPath[1..];
+
+			if (s.IndexOf('/') >= 0 ||
+				s.IndexOf('.') >= 0 ||
+				s.IndexOfAny(CommonTypes.ControlCharacters) >= 0)
+			{
+				return null;
+			}
+
+			return s;
+		}
+
+		/// <summary>
 		/// Executes the POST method on the resource.
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
-		{
-			// TODO
-			await this.GET(Request, Response);
-		}
-
-		/// <summary>
-		/// Executes the PUT method on the resource.
-		/// </summary>
-		/// <param name="Request">HTTP Request</param>
-		/// <param name="Response">HTTP Response</param>
-		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public async Task PUT(HttpRequest Request, HttpResponse Response)
 		{
 			// TODO
 			await this.GET(Request, Response);

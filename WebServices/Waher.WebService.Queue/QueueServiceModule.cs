@@ -12,8 +12,6 @@ namespace Waher.WebService.Queue
 	[Singleton]
 	public class QueueServiceModule : IModule
 	{
-		internal const string RootPrivilege = "Admin.Queues.";
-
 		private QueueWebService queueEndpoint;
 
 		/// <summary>

@@ -193,15 +193,6 @@ namespace Waher.Persistence.Files
 				SerialFile.aesKey = P.Key;
 				SerialFile.ivSeed = P.Value;
 				SerialFile.ivSeedLen = SerialFile.ivSeed.Length;
-
-				// TODO: Remove
-				Console.Out.WriteLine("File: " + SerialFile.fileName);
-				Console.Out.WriteLine("Exists: " + SerialFile.fileExists.ToString());
-				Console.Out.WriteLine("Key File: " + SerialFile.keyFileName);
-				Console.Out.WriteLine("Key: " + Convert.ToBase64String(P.Key));
-				Console.Out.WriteLine("IV: " + Convert.ToBase64String(P.Value));
-				Console.Out.WriteLine();
-
 			}
 		}
 

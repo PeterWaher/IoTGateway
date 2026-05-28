@@ -2325,7 +2325,18 @@ namespace Waher.Persistence
 		/// <returns>Persistent queue</returns>
 		public static Task<IPersistedQueue> GetQueue(string QueueName)
 		{
-			return Provider.GetQueue(QueueName);
+			return GetQueue(QueueName, true);
+		}
+
+		/// <summary>
+		/// Gets a persistent dictionary containing objects in a collection.
+		/// </summary>
+		/// <param name="QueueName">Queue Name</param>
+		/// <param name="CanBeNull">Can return null if a queue is not found.</param>
+		/// <returns>Persistent queue</returns>
+		public static Task<IPersistedQueue> GetQueue(string QueueName, bool CanBeNull)
+		{
+			return Provider.GetQueue(QueueName, CanBeNull);
 		}
 
 		/// <summary>

@@ -675,8 +675,9 @@ namespace Waher.Persistence
 		/// Gets a persistent dictionary containing objects in a collection.
 		/// </summary>
 		/// <param name="QueueName">Queue Name</param>
+		/// <param name="CanBeNull">Can return null if a queue is not found.</param>
 		/// <returns>Persistent queue</returns>
-		Task<IPersistedQueue> GetQueue(string QueueName);
+		Task<IPersistedQueue> GetQueue(string QueueName, bool CanBeNull);
 
 		/// <summary>
 		/// Gets an array of available queue names.

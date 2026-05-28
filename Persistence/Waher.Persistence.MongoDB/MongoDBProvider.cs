@@ -2550,13 +2550,14 @@ namespace Waher.Persistence.MongoDB
 		/// Gets a persistent dictionary containing objects in a collection.
 		/// </summary>
 		/// <param name="QueueName">Queue Name</param>
+		/// <param name="CanBeNull">Can return null if a queue is not found.</param>
 		/// <returns>Persistent queue</returns>
-		public Task<IPersistedQueue> GetQueue(string QueueName)
+		public Task<IPersistedQueue> GetQueue(string QueueName, bool CanBeNull)
 		{
 			IPersistedQueueCollection Collection = Types.FindBest<IPersistedQueueCollection, IDatabaseProvider>(this)
 				?? throw new NotSupportedException("No queue collection creator found for database provider.");
 
-			return Collection.GetQueue(this, QueueName);
+			return Collection.GetQueue(this, QueueName, CanBeNull);
 		}
 
 		/// <summary>

@@ -48,8 +48,13 @@ namespace Waher.Persistence.Queues
 		/// </summary>
 		/// <param name="Provider">Database provider.</param>
 		/// <param name="QueueName">Name of the queue.</param>
-		/// <returns>Persisted queue object instance.</returns>
-		public async Task<IPersistedQueue> GetQueue(IDatabaseProvider Provider, string QueueName)
+		/// <param name="CanBeNull">Can return null if a queue is not found.
+		/// If null cannot be returned, and a queue with the given name is not found,
+		/// a queue with the given name is created. (This is the default option.)</param>
+		/// <returns>Persisted queue object instance, or null if no queue with the given name
+		/// has been previously been created, and null can be returned.</returns>
+		public async Task<IPersistedQueue> GetQueue(IDatabaseProvider Provider, 
+			string QueueName, bool CanBeNull)
 		{
 			if (!(Provider is FilesProvider FilesProvider))
 				throw new ArgumentException("The specified database provider is not supported by this queue collection.", nameof(Provider));
@@ -61,6 +66,9 @@ namespace Waher.Persistence.Queues
 			{
 				if (queues.TryGetValue(FolderName, out IPersistedQueue Result))
 					return Result;
+
+				if (CanBeNull && !Directory.Exists(FolderName))
+					return null;
 
 				if (fullSerialization is null)
 					fullSerialization = new FullSerialization();

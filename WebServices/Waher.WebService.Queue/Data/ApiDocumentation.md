@@ -31,7 +31,7 @@ If encryption is enabled on the web server (HTTPS), encryption is required for a
 a minimum of 128 bit security.
 
 The authenticated user account must have the `Admin.Queues[.QUEUE_NAME].[OPERATION]` where 
-`OPERATION` is the Queue operation requested (e.g. `Enqueue`, `Dequeue`, `Peek` and `Clear`). 
+`OPERATION` is the Queue operation requested (e.g. `Enqueue`, `Dequeue` and `Clear`). 
 `QUEUE_NAME` is the name of the queue being accessed. For example, to enqueue an item to a queue
 named `MyQueue`, the user account must have the `Admin.Queues.MyQueue.Enqueue` privilege in order 
 to be authorized to enqueue an item.
@@ -63,9 +63,10 @@ return:
 | Code | Phrase                 | Description                                                          |
 |-----:|:-----------------------|:---------------------------------------------------------------------|
 | 200  | OK                     | Operation performed successfully, with item in the payload.          |
-| 204  | No Content             | No item available to be dequeued.                                    |
+| 204  | No Content             | No item available to be dequeued, or item successfully enqueued.     |
 | 400  | Bad Request            | Invalid or badly formatted payload.                                  |
 | 403  | Forbidden              | The user is not authorized to access the queue as attempted.         |
+| 404  | Not Found              | If an item was not available on the queue. |
 | 406  | Not Acceptable         | The requested item cannot be encoded as requested.                   |
 | 415  | Unsupported Media Type | The content could not be encoded or decoded.                         |
 | 422  | Unprocessable Entity   | An item cannot be serialized, and cannot therefore be enqueued.      |
@@ -88,9 +89,12 @@ Content-types supported for both encoding and decoding on the Neuron include:
 DecodeContentTypes:={};
 EncodeContentTypes:={};
 CodecContentTypes:={};
+
 foreach s in Waher.Content.InternetContent.CanDecodeContentTypes do DecodeContentTypes[s]:=true;
 foreach s in Waher.Content.InternetContent.CanEncodeContentTypes do EncodeContentTypes[s]:=true;
-foreach s in DecodeContentTypes.Keys do if EncodeContentTypes.ContainsKey(s) then CodecContentTypes[s]:=true;
+foreach s in DecodeContentTypes.Keys do if EncodeContentTypes.ContainsKey(s) and 
+	!Waher.Networking.HTTP.HttpFolderResource.IsProtected(s) then CodecContentTypes[s]:=true;
+
 foreach s in Sort(CodecContentTypes.Keys) do ]]
 * `((s))`[[
 }}
@@ -134,6 +138,12 @@ Default parameter values are used if parameters are not provided in the request.
 may also modify the parameter values, if unsuitable or out-of-range. The following table lists
 available query parameters and which operations they apply to:
 
-| Query Parameter | HTTP Methods  | Queue Operations | Valid Range  | Description |
-|:----------------|:--------------|:-----------------|-------------:|:------------|
-| `Timeout`       | `PUT`, `POST` | Enqueue, Dequeue | 0 - 90000 ms | Time, in milliseconds, to wait for an item to be enqueued or dequeued. Default is 30000 (30 seconds). |
+| Query Parameter | HTTP Methods  | Queue Operations | Valid Range      | Description |
+|:----------------|:--------------|:-----------------|-----------------:|:------------|
+| `Timeout`       | `PUT`, `POST` | Enqueue, Dequeue | 0 - 90000 ms     | Time, in milliseconds, to wait for an item to be enqueued or dequeued. Default is 30000 (30 seconds). |
+| `Count`         | `POST`        | Dequeue          | 1 -              | (Maximum) number of items to dequeue. Default is 1. If the `Count` query parameter is used, response will always be multipart/mixed, even if set to `1`. |
+| `MinTimeout`    | `POST`        | Dequeue          | 0 - `Timeout` ms | Minimum time to wait for items, if at least one has been dequeued, but not all items requested. Only has effect if `Count` is provided and is larger than `1`. |
+| `Peek`          | `POST`        | Dequeue          | 0 - 1            | If a Peek operation is to be performed, rather than a Dequeue operation (i.e. item is not removed from queue). Cannot be used together with the `Count` query parameter. |
+
+**Note**: Using a `Timeout` of `0` means the web service will not wait for an item to be 
+enqueued, if no item is available to be dequeued. The web service will respond immediately.

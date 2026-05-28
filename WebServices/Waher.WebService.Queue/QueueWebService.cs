@@ -9,6 +9,7 @@ using Waher.Events;
 using Waher.IoTGateway;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
+using Waher.Runtime.Collections;
 using Waher.Runtime.IO;
 using Waher.Script;
 
@@ -141,6 +142,17 @@ namespace Waher.WebService.Queue
 				return;
 			}
 
+			string s = Request.Header.ContentType?.Value ?? string.Empty;
+			int i = s.IndexOf(';');
+			if (i > 0)
+				s = s[..i].Trim();
+
+			if (HttpFolderResource.IsProtected(s))
+			{
+				await Response.SendResponse(new ForbiddenException("Protected Content Type."));
+				return;
+			}
+
 			ContentResponse Payload = await Request.DecodeDataAsync();
 			if (Payload.HasError)
 			{
@@ -150,10 +162,15 @@ namespace Waher.WebService.Queue
 
 			int Timeout = 30000;
 
-			if (Request.Header.TryGetQueryParameter("Timeout", out string s) &&
-				int.TryParse(s, out int i) && i >= 0 && i < 90000)
+			if (Request.Header.TryGetQueryParameter("Timeout", out s))
 			{
-				Timeout = i;
+				if (int.TryParse(s, out i) && i >= 0 && i < 90000)
+					Timeout = i;
+				else
+				{
+					await Response.SendResponse(new BadRequestException("Invalid Timeout value."));
+					return;
+				}
 			}
 
 			object Decoded = Payload.Decoded;
@@ -225,8 +242,176 @@ namespace Waher.WebService.Queue
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
-			// TODO
-			await this.GET(Request, Response);
+			DateTime Start = DateTime.UtcNow;
+
+			if (Request.User is null)
+			{
+				await Response.SendResponse(new ForbiddenException("Access denied."));
+				return;
+			}
+
+			string QueueName = GetQueueName(Request);
+			if (string.IsNullOrEmpty(QueueName))
+			{
+				await Response.SendResponse(new BadRequestException("Invalid or unspecified Queue Name."));
+				return;
+			}
+
+			string Privilege = RootPrivilege + QueueName + ".Dequeue";
+			if (!Request.User.HasPrivilege(Privilege))
+			{
+				await Response.SendResponse(ForbiddenException.AccessDenied(Request,
+					this.ResourceName, Request.User.UserName, Privilege));
+				return;
+			}
+
+			if (Request.HasData)
+			{
+				await Response.SendResponse(new BadRequestException("Request accepts no payload."));
+				return;
+			}
+
+			int Timeout = 30000;
+			int Count = 1;
+			bool Multipart = false;
+			int i;
+
+			if (Request.Header.TryGetQueryParameter("Timeout", out string s))
+			{
+				if (int.TryParse(s, out i) && i >= 0 && i < 90000)
+					Timeout = i;
+				else
+				{
+					await Response.SendResponse(new BadRequestException("Invalid Timeout value."));
+					return;
+				}
+			}
+
+			if (Request.Header.TryGetQueryParameter("Count", out s))
+			{
+				if (int.TryParse(s, out i) && i > 0)
+				{
+					Count = i;
+					Multipart = true;
+				}
+				else
+				{
+					await Response.SendResponse(new BadRequestException("Invalid Count value."));
+					return;
+				}
+			}
+
+			int MinTimeout = Timeout;
+
+			if (Request.Header.TryGetQueryParameter("MinTimeout", out s))
+			{
+				if (int.TryParse(s, out i) && i > 0)
+					MinTimeout = Math.Min(i, Timeout);
+				else
+				{
+					await Response.SendResponse(new BadRequestException("Invalid MinTimeout value."));
+					return;
+				}
+			}
+
+			bool Peek = false;
+
+			if (Request.Header.TryGetQueryParameter("Peek", out s))
+			{
+				if (int.TryParse(s, out i) && i >= 0 && i <= 1)
+				{
+					Peek = i == 1;
+
+					if (Peek && Multipart)
+					{
+						await Response.SendResponse(new BadRequestException("Peek and Count parameters cannot be used simultanerously."));
+						return;
+					}
+				}
+				else
+				{
+					await Response.SendResponse(new BadRequestException("Invalid Peek value."));
+					return;
+				}
+			}
+
+			// TODO: Create if not exists?
+			IPersistedQueue Queue = await Database.GetQueue(QueueName, true);
+			if (Queue is null)
+			{
+				await Response.SendResponse(new NotFoundException("Queue not found."));
+				return;
+			}
+
+			if (Peek)
+			{
+				object Item = await Queue.Peek();
+
+				if (Item is null)
+				{
+					Response.StatusCode = 204;
+					await Response.SendResponse();
+				}
+				else
+					await Response.Return(Item);
+			}
+
+			Task _ = Task.Run(async () =>
+			{
+				try
+				{
+					if (Multipart)
+					{
+						ChunkedList<EmbeddedContent> Items = new ChunkedList<EmbeddedContent>();
+						int TimeLeft = Timeout;
+
+						while (TimeLeft >= 0 && Count > 0)
+						{
+							DateTime TP = DateTime.UtcNow;
+							TimeLeft = Timeout - (int)(TP - Start).TotalMilliseconds;
+
+							object Item = await Queue.Dequeue(Math.Max(0, TimeLeft));
+							if (Item is null)
+								break;
+
+							ContentResponse Encoded = await InternetContent.EncodeAsync(Item, Encoding.UTF8);
+							if (Encoded.HasError)
+							{
+								await Response.SendResponse(Encoded.Error);
+								return;
+							}
+
+							Count--;
+							Timeout = MinTimeout;
+
+							Items.Add(new EmbeddedContent()
+							{
+								Raw = Encoded.Encoded,
+								ContentType = Encoded.ContentType
+							});
+						}
+
+						await Response.Return(new MixedContent(Items.ToArray()));
+					}
+					else
+					{
+						object Item = await Queue.Dequeue(Timeout);
+
+						if (Item is null)
+						{
+							Response.StatusCode = 204;
+							await Response.SendResponse();
+						}
+						else
+							await Response.Return(Item);
+					}
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+					await Response.SendResponse(ex);
+				}
+			});
 		}
 
 		/// <summary>

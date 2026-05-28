@@ -1,5 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text;
+using System.Threading.Tasks;
+using Waher.Content.Html;
+using Waher.Content.Markdown;
+using Waher.IoTGateway;
 using Waher.Networking.HTTP;
+using Waher.Runtime.IO;
+using Waher.Script;
 
 namespace Waher.WebService.Queue
 {
@@ -39,7 +45,10 @@ namespace Waher.WebService.Queue
 		/// <param name="Request">Current request</param>
 		public override HttpAuthenticationScheme[] GetAuthenticationSchemes(HttpRequest Request)
 		{
-			return this.authenticationSchemes;
+			if (Request.Header.Method.ToUpper() == "GET")
+				return null;
+			else
+				return this.authenticationSchemes;
 		}
 
 		/// <summary>
@@ -70,6 +79,24 @@ namespace Waher.WebService.Queue
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
+			byte[] Data = Resources.LoadResource(
+				typeof(QueueWebService).Namespace + ".Data.ApiDocumentation.md",
+				typeof(QueueWebService).Assembly);
+
+			string Markdown = Strings.GetString(Data, Encoding.UTF8);
+			MarkdownSettings Settings = new MarkdownSettings(null, true, new Variables())
+			{
+				RootFolder = Gateway.RootFolder,
+				ResourceMap = Gateway.HttpServer
+			};
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings,
+				null, Request.Resource.ResourceName, Request.Header.GetURL());
+			string Html = await Doc.GenerateHTML();
+
+			Response.ContentType = HtmlCodec.DefaultContentType;
+
+			await Response.Write(Html);
+			await Response.SendResponse();
 		}
 
 		/// <summary>
@@ -80,6 +107,8 @@ namespace Waher.WebService.Queue
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
+			// TODO
+			await this.GET(Request, Response);
 		}
 
 		/// <summary>
@@ -90,6 +119,8 @@ namespace Waher.WebService.Queue
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task PUT(HttpRequest Request, HttpResponse Response)
 		{
+			// TODO
+			await this.GET(Request, Response);
 		}
 
 		/// <summary>
@@ -100,6 +131,8 @@ namespace Waher.WebService.Queue
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task DELETE(HttpRequest Request, HttpResponse Response)
 		{
+			// TODO
+			await this.GET(Request, Response);
 		}
 
 	}

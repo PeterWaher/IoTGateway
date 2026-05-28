@@ -76,6 +76,7 @@
     <ProjectReference Include="..\Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj" />
     <ProjectReference Include="..\Persistence\Waher.Persistence.FullTextSearch\Waher.Persistence.FullTextSearch.csproj" />
     <ProjectReference Include="..\Persistence\Waher.Persistence.MongoDB\Waher.Persistence.MongoDB.csproj" />
+    <ProjectReference Include="..\Persistence\Waher.Persistence.Queues\Waher.Persistence.Queues.csproj" />
     <ProjectReference Include="..\Processors\Waher.Processors.Metering\Waher.Processors.Metering.csproj" />
     <ProjectReference Include="..\Processors\Waher.Processors\Waher.Processors.csproj" />
     <ProjectReference Include="..\Reports\Waher.Reports.Files\Waher.Reports.Files.csproj" />

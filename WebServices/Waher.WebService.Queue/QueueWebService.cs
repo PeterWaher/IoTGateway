@@ -335,7 +335,6 @@ namespace Waher.WebService.Queue
 				}
 			}
 
-			// TODO: Create if not exists?
 			IPersistedQueue Queue = await Database.GetQueue(QueueName, true);
 			if (Queue is null)
 			{

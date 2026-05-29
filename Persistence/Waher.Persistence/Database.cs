@@ -2325,7 +2325,7 @@ namespace Waher.Persistence
 		/// <returns>Persistent queue</returns>
 		public static Task<IPersistedQueue> GetQueue(string QueueName)
 		{
-			return GetQueue(QueueName, true);
+			return GetQueue(QueueName, false);
 		}
 
 		/// <summary>

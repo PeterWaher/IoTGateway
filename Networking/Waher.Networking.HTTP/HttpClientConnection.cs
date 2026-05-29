@@ -1417,6 +1417,8 @@ namespace Waher.Networking.HTTP
 								this.flowControl = new FlowControlRfc9218(this.localSettings, this.remoteSettings, this, this.http2Profiler);
 							else
 								this.flowControl = new FlowControlRfc7540(this.localSettings, this.remoteSettings, this, this.http2Profiler);
+
+							this.http1 = false;
 						}
 						else
 							this.flowControl.RemoteSettingsUpdated();
@@ -2381,7 +2383,7 @@ namespace Waher.Networking.HTTP
 				ex = XML.AnnotateException(ex);
 				this.Exception(ex);
 
-				await this.SendResponse(Request, null, new InternalServerErrorException(ex), !Result);
+				await this.SendResponse(Request, null, new InternalServerErrorException(ex), !Result && this.http1);
 			}
 			catch (Exception ex)
 			{
@@ -2389,7 +2391,7 @@ namespace Waher.Networking.HTTP
 
 				this.Exception(ex);
 
-				await this.SendResponse(Request, null, new InternalServerErrorException(ex), !Result);
+				await this.SendResponse(Request, null, new InternalServerErrorException(ex), !Result && this.http1);
 			}
 
 			Request.Dispose();
@@ -2540,7 +2542,7 @@ namespace Waher.Networking.HTTP
 				{
 					try
 					{
-						await this.SendResponse(Request, Response, new InternalServerErrorException(ex), true);
+						await this.SendResponse(Request, Response, new InternalServerErrorException(ex), this.http1);
 					}
 					catch (Exception)
 					{

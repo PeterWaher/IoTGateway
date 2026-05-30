@@ -26,11 +26,11 @@ namespace Waher.Persistence.Files
 		private readonly MultiReadSingleWriteObject fileAccess;
 		private readonly FileStream file;
 		private readonly string fileName;
-		private readonly string keyFileName;
+		private readonly string keyFolderName;
 		private readonly bool encrypted;
-		private readonly bool fileExists;
-		private readonly bool explicitKeyFileName;
+		private readonly bool keyExists;
 		private readonly bool asyncFileIo;
+		private readonly bool fileBasedKey;
 		private Aes aes;
 		private byte[] aesKey;
 		private byte[] ivSeed;
@@ -49,7 +49,7 @@ namespace Waher.Persistence.Files
 		/// <param name="CollectionName">Collection Name</param>
 		/// <param name="Encrypted">If file is encrypted.</param>
 		protected SerialFile(string FileName, string CollectionName, bool Encrypted)
-			: this(FileName, FileName, CollectionName, Encrypted)
+			: this(FileName, null, CollectionName, Encrypted)
 		{
 		}
 
@@ -57,26 +57,31 @@ namespace Waher.Persistence.Files
 		/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
-		/// <param name="KeyFileName">File Name key to use when generating encryption keys.</param>
+		/// <param name="KeyFolderName">Folder name to base the encryption keys on.</param>
 		/// <param name="CollectionName">Collection Name</param>
 		/// <param name="Encrypted">If file is encrypted.</param>
-		protected SerialFile(string FileName, string KeyFileName, string CollectionName,
+		protected SerialFile(string FileName, string KeyFolderName, string CollectionName,
 			bool Encrypted)
 		{
+			bool FileExists = File.Exists(FileName);
+
 			this.fileAccess = new MultiReadSingleWriteObject(this, false);
 			this.fileName = FileName;
-			this.keyFileName = KeyFileName;
+			this.keyFolderName = KeyFolderName;
 			this.collectionName = CollectionName;
 			this.encrypted = Encrypted;
-			this.fileExists = File.Exists(this.fileName);
-			this.explicitKeyFileName = this.keyFileName != this.fileName;
+			this.fileBasedKey = string.IsNullOrEmpty(this.keyFolderName);
+			this.keyExists = this.fileBasedKey ? FileExists :
+				Directory.Exists(this.keyFolderName) && 
+				Directory.GetFiles(this.keyFolderName, "*.*", SearchOption.TopDirectoryOnly).Length > 0;
+
 			this.asyncFileIo = FilesProvider.AsyncFileIo;
 
 			string Folder = Path.GetDirectoryName(this.fileName);
 			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
 				Directory.CreateDirectory(Folder);
 
-			if (this.fileExists)
+			if (FileExists)
 				this.file = File.Open(this.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
 			else
 				this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
@@ -90,7 +95,7 @@ namespace Waher.Persistence.Files
 		/// <param name="CollectionName">Collection Name</param>
 		public static Task<SerialFile> Create(string FileName, string CollectionName)
 		{
-			return Create(FileName, FileName, CollectionName, false, (GetKeysMethod)null);
+			return Create(FileName, null, CollectionName, false, (GetKeysMethod)null);
 		}
 
 		/// <summary>
@@ -102,7 +107,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Provider">Provider of encryption keys.</param>
 		public static Task<SerialFile> Create(string FileName, string CollectionName, bool Encrypted, FilesProvider Provider)
 		{
-			return Create(FileName, FileName, CollectionName, Encrypted, Provider.GetKeys);
+			return Create(FileName, null, CollectionName, Encrypted, Provider.GetKeys);
 		}
 
 		/// <summary>
@@ -115,47 +120,47 @@ namespace Waher.Persistence.Files
 		public static Task<SerialFile> Create(string FileName, string CollectionName,
 			bool Encrypted, GetKeysMethod GetKeysMethod)
 		{
-			return Create(FileName, FileName, CollectionName, Encrypted, GetKeysMethod);
+			return Create(FileName, null, CollectionName, Encrypted, GetKeysMethod);
 		}
 
 		/// <summary>
 		/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
-		/// <param name="KeyFileName">File Name key to use when generating encryption keys.</param>
+		/// <param name="KeyFolderName">Folder name to base the encryption keys on.</param>
 		/// <param name="CollectionName">Collection Name</param>
-		public static Task<SerialFile> Create(string FileName, string KeyFileName, 
+		public static Task<SerialFile> Create(string FileName, string KeyFolderName, 
 			string CollectionName)
 		{
-			return Create(FileName, KeyFileName, CollectionName, false, (GetKeysMethod)null);
+			return Create(FileName, KeyFolderName, CollectionName, false, (GetKeysMethod)null);
 		}
 
 		/// <summary>
 		/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
-		/// <param name="KeyFileName">File Name key to use when generating encryption keys.</param>
+		/// <param name="KeyFolderName">Folder name to base the encryption keys on.</param>
 		/// <param name="CollectionName">Collection Name</param>
 		/// <param name="Encrypted">If file is encrypted.</param>
 		/// <param name="Provider">Provider of encryption keys.</param>
-		public static Task<SerialFile> Create(string FileName, string KeyFileName, 
+		public static Task<SerialFile> Create(string FileName, string KeyFolderName, 
 			string CollectionName, bool Encrypted, FilesProvider Provider)
 		{
-			return Create(FileName, KeyFileName, CollectionName, Encrypted, Provider.GetKeys);
+			return Create(FileName, KeyFolderName, CollectionName, Encrypted, Provider.GetKeys);
 		}
 
 		/// <summary>
 		/// Serializes binary blocks into a file, possibly encrypted. Blocks are accessed in the order they were persisted.
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
-		/// <param name="KeyFileName">File Name key to use when generating encryption keys.</param>
+		/// <param name="KeyFolderName">Folder name to base the encryption keys on.</param>
 		/// <param name="CollectionName">Collection Name</param>
 		/// <param name="Encrypted">If file is encrypted.</param>
 		/// <param name="GetKeysMethod">Method that provides encryption keys.</param>
-		public static async Task<SerialFile> Create(string FileName, string KeyFileName, 
+		public static async Task<SerialFile> Create(string FileName, string KeyFolderName, 
 			string CollectionName, bool Encrypted, GetKeysMethod GetKeysMethod)
 		{
-			SerialFile Result = new SerialFile(FileName, KeyFileName, CollectionName, Encrypted);
+			SerialFile Result = new SerialFile(FileName, KeyFolderName, CollectionName, Encrypted);
 
 			await GetKeys(Result, GetKeysMethod);
 
@@ -187,8 +192,9 @@ namespace Waher.Persistence.Files
 				SerialFile.aes.Mode = CipherMode.CBC;
 				SerialFile.aes.Padding = PaddingMode.None;
 
-				KeyValuePair<byte[], byte[]> P = await GetKeysMethod(SerialFile.keyFileName, 
-					SerialFile.fileExists || SerialFile.explicitKeyFileName);
+				KeyValuePair<byte[], byte[]> P = await GetKeysMethod(
+					SerialFile.keyFolderName ?? SerialFile.fileName, 
+					SerialFile.keyExists);
 
 				SerialFile.aesKey = P.Key;
 				SerialFile.ivSeed = P.Value;

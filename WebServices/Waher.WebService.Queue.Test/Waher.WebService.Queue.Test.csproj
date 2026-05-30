@@ -13,6 +13,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Root\Master.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Root\Master.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Html\Waher.Content.Html.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />

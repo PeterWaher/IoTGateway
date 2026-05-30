@@ -1,13 +1,16 @@
 ﻿using System.Text;
 using Waher.Content;
+using Waher.Content.Html;
+using Waher.Content.Markdown;
+using Waher.Content.Markdown.Web;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Files;
-using Waher.Persistence.Queues;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
-using Waher.Runtime.IO;
+using Waher.Script;
 
 namespace Waher.WebService.Queue.Test
 {
@@ -20,19 +23,33 @@ namespace Waher.WebService.Queue.Test
 		[AssemblyInitialize]
 		public static async Task AssemblyInitialize(TestContext _)
 		{
-			Types.Initialize(typeof(QueueWebServiceTests).Assembly,
+			Types.Initialize(
+				typeof(QueueWebServiceTests).Assembly,
 				typeof(InternetContent).Assembly,
 				typeof(Database).Assembly,
 				typeof(FilesProvider).Assembly,
-				typeof(MultiFileQueue).Assembly,
-				typeof(Log).Assembly);
+				typeof(FilesProvider).Assembly,
+				typeof(ObjectSerializer).Assembly,
+				typeof(QueueServiceModule).Assembly,
+				typeof(Log).Assembly,
+				typeof(Expression).Assembly,
+				typeof(MarkdownDocument).Assembly,
+				typeof(MarkdownToHtmlConverter).Assembly,
+				typeof(HttpServer).Assembly,
+				typeof(HtmlDocument).Assembly);
 
 			Log.Register(new ConsoleEventSink());
 
 			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
 			Database.Register(filesProvider);
 
+			string RootFolder = Path.GetFullPath("Root");
+
 			server = new HttpServer(8081);
+			Types.SetModuleParameter("HTTP", server);
+			Types.SetModuleParameter("Root", RootFolder);
+
+			server.Register(new HttpFolderResource(string.Empty, RootFolder, false, false, true, true));
 
 			await Types.StartAllModules(10000);
 		}
@@ -56,8 +73,15 @@ namespace Waher.WebService.Queue.Test
 		}
 
 		[TestMethod]
-		public void TestMethod1()
+		public async Task Test_01_GetApiDocumentation()
 		{
+			ContentResponse Response = await InternetContent.GetAsync(
+				new Uri("http://localhost:8081/Queues"),
+				new KeyValuePair<string, string>("Accept", "text/html"));
+
+			Response.AssertOk();
+
+			Assert.IsTrue(Response.Decoded is HtmlDocument);
 		}
 	}
 }

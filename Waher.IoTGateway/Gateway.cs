@@ -402,6 +402,7 @@ namespace Waher.IoTGateway
 				ClientCertificates ClientCertificates = ClientCertificates.NotUsed;
 				bool TrustClientCertificates = false;
 				Dictionary<int, KeyValuePair<ClientCertificates, bool>> PortSpecificMTlsSettings = null;
+				TimeSpan CleanupTime = new TimeSpan(4, 15, 0);
 				bool Http2Enabled = true;
 				int Http2InitialStreamWindowSize = 2500000;
 				int Http2InitialConnectionWindowSize = 5000000;
@@ -779,7 +780,7 @@ namespace Waher.IoTGateway
 
 							case "EventSinks":
 
-								static IEventSink[] ParseSinks(XmlElement E)
+								static IEventSink[] ParseSinks(XmlElement E, ref TimeSpan CleanupTime)
 								{
 									ChunkedList<IEventSink> Sinks = new ChunkedList<IEventSink>();
 
@@ -926,7 +927,7 @@ namespace Waher.IoTGateway
 													else
 														EventIds = EventIdsString.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
-													IEventSink[] ChildSinks = ParseSinks(E2);
+													IEventSink[] ChildSinks = ParseSinks(E2, ref CleanupTime);
 
 													switch (ChildSinks.Length)
 													{
@@ -948,8 +949,10 @@ namespace Waher.IoTGateway
 												case "EventQueue":
 													SinkId = XML.Attribute(E2, "id");
 													string QueueName = XML.Attribute(E2, "name");
+													DeleteAfterDays = XML.Attribute(E2, "deleteAfterDays", 7);
 
-													Sinks.Add(new EventQueue(SinkId, QueueName));
+													Sinks.Add(new EventQueue(SinkId, QueueName, DeleteAfterDays, CleanupTime));
+													CleanupTime = CleanupTime.Add(TimeSpan.FromMinutes(2));
 													break;
 											}
 										}
@@ -962,7 +965,7 @@ namespace Waher.IoTGateway
 									return Sinks.ToArray();
 								}
 
-								foreach (IEventSink Sink in ParseSinks(E))
+								foreach (IEventSink Sink in ParseSinks(E, ref CleanupTime))
 									Log.Register(Sink);
 
 								break;
@@ -977,7 +980,9 @@ namespace Waher.IoTGateway
 
 				await RepairIfInproperShutdown();
 
-				PersistedEventLog PersistedEventLog = new PersistedEventLog(90, new TimeSpan(4, 15, 0));
+				PersistedEventLog PersistedEventLog = new PersistedEventLog(90, CleanupTime);
+				CleanupTime = CleanupTime.Add(TimeSpan.FromMinutes(2));
+
 				Log.Register(PersistedEventLog);
 				try
 				{

@@ -415,6 +415,7 @@
 				<xs:complexType>
 					<xs:attribute name="id" type="xs:string" use="required"/>
 					<xs:attribute name="name" type="xs:string" use="required"/>
+					<xs:attribute name="deleteAfterDays" type="xs:positiveInteger" use="optional" default="7"/>
 				</xs:complexType>
 			</xs:element>
 		</xs:choice>

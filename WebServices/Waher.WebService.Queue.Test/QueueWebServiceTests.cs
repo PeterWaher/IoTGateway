@@ -131,5 +131,44 @@ namespace Waher.WebService.Queue.Test
 
 			Assert.AreEqual("Test message", Response.Decoded);
 		}
+
+		[TestMethod]
+		public async Task Test_03_DequeueEnqueue()
+		{
+			_ = Task.Delay(2000).ContinueWith(async (_) =>
+			{
+				await InternetContent.PutAsync(
+					new Uri("http://localhost:8081/Queues/Test"),
+					"Test message",
+					new KeyValuePair<string, string>("Accept", "text/html"),
+					new KeyValuePair<string, string>("Authorization", "Basic " +
+					Convert.ToBase64String(Encoding.ASCII.GetBytes("Test:Test"))));
+			});
+
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri("http://localhost:8081/Queues/Test"),
+				null,
+				new KeyValuePair<string, string>("Accept", "*/*"),
+				new KeyValuePair<string, string>("Authorization", "Basic " +
+				Convert.ToBase64String(Encoding.ASCII.GetBytes("Test:Test"))));
+
+			Response.AssertOk();
+
+			Assert.AreEqual("Test message", Response.Decoded);
+		}
+
+		[TestMethod]
+		public async Task Test_04_Clear()
+		{
+			ContentResponse Response = await InternetContent.DeleteAsync(
+				new Uri("http://localhost:8081/Queues/Test"),
+				null,
+				new KeyValuePair<string, string>("Authorization", "Basic " +
+				Convert.ToBase64String(Encoding.ASCII.GetBytes("Test:Test"))));
+
+			Response.AssertOk();
+
+			Assert.IsNull(Response.Decoded);
+		}
 	}
 }

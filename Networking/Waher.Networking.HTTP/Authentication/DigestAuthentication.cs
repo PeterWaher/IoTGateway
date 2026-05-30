@@ -371,21 +371,21 @@ namespace Waher.Networking.HTTP.Authentication
 
 					case "DIGEST-MD5":
 						if (Algorithm == DigestAlgorithm.MD5)
-							HA1 = AssureHex(User.PasswordHash, 16);
+							HA1 = EnsureHex(User.PasswordHash, 16);
 						else
 							return null;
 						break;
 
 					case "DIGEST-SHA-256":
 						if (Algorithm == DigestAlgorithm.SHA256)
-							HA1 = AssureHex(User.PasswordHash, 32);
+							HA1 = EnsureHex(User.PasswordHash, 32);
 						else
 							return null;
 						break;
 
 					case "DIGEST-SHA3-256":
 						if (Algorithm == DigestAlgorithm.SHA3_256)
-							HA1 = AssureHex(User.PasswordHash, 32);
+							HA1 = EnsureHex(User.PasswordHash, 32);
 						else
 							return null;
 						break;
@@ -485,7 +485,7 @@ namespace Waher.Networking.HTTP.Authentication
 		/// <param name="s">String to check.</param>
 		/// <param name="NrBytes">Number of bytes expected.</param>
 		/// <returns>Hexadecimal string.</returns>
-		internal static string AssureHex(string s, byte NrBytes)
+		internal static string EnsureHex(string s, byte NrBytes)
 		{
 			if (IsHex(s, NrBytes))
 				return s;

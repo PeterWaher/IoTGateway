@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Security;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Security;
 using Waher.Security.LoginMonitor;
 
 namespace Waher.Networking.HTTP.Authentication
@@ -111,19 +112,24 @@ namespace Waher.Networking.HTTP.Authentication
 						case "":
 							break;
 
+						case "Internal":
+							Password = DigestAuthentication.ToHex(Hashes.ComputeSHA256Hash(Encoding.UTF8.GetBytes(UserName + ":" + Password)));
+							ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 32);
+							break;
+
 						case "DIGEST-MD5":
 							Password = DigestAuthentication.ToHex(DigestAuthentication.H_MD5(UserName + ":" + this.realm + ":" + Password));
-							ExpectedHash = DigestAuthentication.AssureHex(ExpectedHash, 16);
+							ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 16);
 							break;
 
 						case "DIGEST-SHA-256":
 							Password = DigestAuthentication.ToHex(DigestAuthentication.H_SHA256(UserName + ":" + this.realm + ":" + Password));
-							ExpectedHash = DigestAuthentication.AssureHex(ExpectedHash, 32);
+							ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 32);
 							break;
 
 						case "DIGEST-SHA3-256":
 							Password = DigestAuthentication.ToHex(DigestAuthentication.H_SHA3_256(UserName + ":" + this.realm + ":" + Password));
-							ExpectedHash = DigestAuthentication.AssureHex(ExpectedHash, 32);
+							ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 32);
 							break;
 
 						default:

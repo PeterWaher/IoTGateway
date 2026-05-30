@@ -98,7 +98,7 @@ namespace Waher.Content.Multipart
 		}
 
 		/// <summary>
-		/// Raw, untrasnformed body of embedded object.
+		/// Raw, untransformed body of embedded object.
 		/// </summary>
 		public byte[] Raw
 		{
@@ -202,6 +202,35 @@ namespace Waher.Content.Multipart
 				this.raw = Encoding.ASCII.GetBytes(Convert.ToBase64String(this.transferDecoded));
 				this.transferEncoding = "base64";
 			}
+		}
+
+		/// <summary>
+		/// Encodes an object into an embedded content.
+		/// </summary>
+		/// <param name="Content">Content to encode.</param>
+		/// <returns>Embedded content object instance.</returns>
+		public static Task<EmbeddedContent> Encode(object Content)
+		{
+			return Encode(Content, Encoding.UTF8);
+		}
+
+		/// <summary>
+		/// Encodes an object into an embedded content.
+		/// </summary>
+		/// <param name="Content">Content to encode.</param>
+		/// <param name="Encoding">Text encoding.</param>
+		/// <returns>Embedded content object instance.</returns>
+		public static async Task<EmbeddedContent> Encode(object Content, Encoding Encoding)
+		{
+			ContentResponse Encoded = await InternetContent.EncodeAsync(Content, Encoding);
+			Encoded.AssertOk();
+
+			return new EmbeddedContent()
+			{
+				ContentType = Encoded.ContentType,
+				Decoded = Content,
+				Raw = Encoded.Encoded
+			};
 		}
 	}
 }

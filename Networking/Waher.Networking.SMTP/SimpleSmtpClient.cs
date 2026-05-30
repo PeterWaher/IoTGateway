@@ -659,14 +659,7 @@ namespace Waher.Networking.SMTP
 				};
 
 				foreach (object Attachment in Attachments)
-				{
-					ContentResponse P2 = await InternetContent.EncodeAsync(Attachment, Encoding.UTF8);
-					Parts.Add(new EmbeddedContent()
-					{
-						ContentType = P2.ContentType,
-						Raw = P2.Encoded
-					});
-				}
+					Parts.Add(await EmbeddedContent.Encode(Attachment, Encoding.UTF8));
 
 				MixedContent Mixed = new MixedContent(Parts.ToArray());
 

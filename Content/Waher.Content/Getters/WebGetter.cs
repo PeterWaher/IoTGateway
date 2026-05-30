@@ -389,8 +389,13 @@ namespace Waher.Content.Getters
 			string ContentType;
 			ContentResponse Decoded;
 
-			if (Bin.Length == 0 || Response.Content.Headers.ContentType is null)
-				Decoded = new ContentResponse(BinaryCodec.DefaultContentType, Bin, Bin);
+			if (Response.Content.Headers.ContentType is null)
+			{
+				if (Bin.Length == 0)
+					Decoded = new ContentResponse(string.Empty, null, Bin);
+				else
+					Decoded = new ContentResponse(BinaryCodec.DefaultContentType, Bin, Bin);
+			}
 			else
 			{
 				ContentType = Response.Content.Headers.ContentType.ToString();

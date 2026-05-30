@@ -108,7 +108,9 @@ namespace Waher.Content.Posters
 			}
 
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
-			string ContentType = Response.Content.Headers.ContentType?.ToString() ?? BinaryCodec.DefaultContentType;
+
+			string ContentType = Response.Content.Headers.ContentType?.ToString() 
+				?? (Bin.Length == 0 ? string.Empty : BinaryCodec.DefaultContentType);
 
 			return new ContentBinaryResponse(ContentType, Bin);
 		}

@@ -611,7 +611,17 @@ namespace Waher.Content
 		public static Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
 			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
-			if (Decodes(ContentType, out Grade _, out IContentDecoder Decoder))
+			if (string.IsNullOrEmpty(ContentType))
+			{
+				if ((Data?.Length ?? 0) == 0)
+					return Task.FromResult(new ContentResponse(string.Empty, null, Data));
+				else
+				{
+					return Task.FromResult(new ContentResponse(BinaryCodec.DefaultContentType,
+						new CustomEncoding(BinaryCodec.DefaultContentType, Data), Data));
+				}
+			}
+			else if (Decodes(ContentType, out Grade _, out IContentDecoder Decoder))
 				return Decoder.DecodeAsync(ContentType, Data, Encoding, Fields, BaseUri, Progress);
 			else
 			{

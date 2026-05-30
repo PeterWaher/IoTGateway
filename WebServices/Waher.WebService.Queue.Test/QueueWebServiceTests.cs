@@ -123,7 +123,7 @@ namespace Waher.WebService.Queue.Test
 			Response = await InternetContent.PostAsync(
 				new Uri("http://localhost:8081/Queues/Test"),
 				null,
-				new KeyValuePair<string, string>("Accept", "*.*"),
+				new KeyValuePair<string, string>("Accept", "*/*"),
 				new KeyValuePair<string, string>("Authorization", "Basic " +
 				Convert.ToBase64String(Encoding.ASCII.GetBytes("Test:Test"))));
 

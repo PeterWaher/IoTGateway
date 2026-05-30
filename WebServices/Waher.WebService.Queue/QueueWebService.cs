@@ -423,8 +423,52 @@ namespace Waher.WebService.Queue
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task DELETE(HttpRequest Request, HttpResponse Response)
 		{
-			// TODO
-			await this.GET(Request, Response);
+			if (Request.User is null)
+			{
+				await Response.SendResponse(new ForbiddenException("Access denied."));
+				return;
+			}
+
+			string QueueName = GetQueueName(Request);
+			if (string.IsNullOrEmpty(QueueName))
+			{
+				await Response.SendResponse(new BadRequestException("Invalid or unspecified Queue Name."));
+				return;
+			}
+
+			string Privilege = RootPrivilege + QueueName + ".Clear";
+			if (!Request.User.HasPrivilege(Privilege))
+			{
+				await Response.SendResponse(ForbiddenException.AccessDenied(Request,
+					this.ResourceName, Request.User.UserName, Privilege));
+				return;
+			}
+
+			if (Request.HasData)
+			{
+				await Response.SendResponse(new BadRequestException("Request accepts no payload."));
+				return;
+			}
+
+			IPersistedQueue Queue = await Database.GetQueue(QueueName, true);
+			if (Queue is null)
+			{
+				await Response.SendResponse(new NotFoundException("Queue not found."));
+				return;
+			}
+
+			try
+			{
+				await Queue.Clear();
+
+				Response.StatusCode = 204;
+				await Response.SendResponse();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+				await Response.SendResponse(ex);
+			}
 		}
 
 	}

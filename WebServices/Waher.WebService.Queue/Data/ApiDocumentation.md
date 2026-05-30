@@ -60,17 +60,17 @@ Response codes
 The following table lists the possible response codes that the Sensor Data Receptor API may 
 return:
 
-| Code | Phrase                 | Description                                                          |
-|-----:|:-----------------------|:---------------------------------------------------------------------|
-| 200  | OK                     | Operation performed successfully, with item in the payload.          |
-| 204  | No Content             | No item available to be dequeued, or item successfully enqueued.     |
-| 400  | Bad Request            | Invalid or badly formatted payload.                                  |
-| 403  | Forbidden              | The user is not authorized to access the queue as attempted.         |
-| 404  | Not Found              | If an item was not available on the queue. |
-| 406  | Not Acceptable         | The requested item cannot be encoded as requested.                   |
-| 415  | Unsupported Media Type | The content could not be encoded or decoded.                         |
-| 422  | Unprocessable Entity   | An item cannot be serialized, and cannot therefore be enqueued.      |
-| 503  | Service Unavailable    | The queue is full, and cannot accept more items at the current time. |
+| Code | Phrase                 | Description                                                                                  |
+|-----:|:-----------------------|:---------------------------------------------------------------------------------------------|
+| 200  | OK                     | Operation performed successfully, with item in the payload.                                  |
+| 204  | No Content             | No item available to be dequeued, item successfully enqueued, or queue successfully cleared. |
+| 400  | Bad Request            | Invalid or badly formatted payload.                                                          |
+| 403  | Forbidden              | The user is not authorized to access the queue as attempted.                                 |
+| 404  | Not Found              | If an item was not available on the queue.                                                   |
+| 406  | Not Acceptable         | The requested item cannot be encoded as requested.                                           |
+| 415  | Unsupported Media Type | The content could not be encoded or decoded.                                                 |
+| 422  | Unprocessable Entity   | An item cannot be serialized, and cannot therefore be enqueued.                              |
+| 503  | Service Unavailable    | The queue is full, and cannot accept more items at the current time.                         |
 
 Content encoding and decoding
 --------------------------------

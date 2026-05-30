@@ -11,6 +11,7 @@ using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using Waher.Script;
+using Waher.Security.Users;
 
 namespace Waher.WebService.Queue.Test
 {
@@ -72,6 +73,27 @@ namespace Waher.WebService.Queue.Test
 			}
 		}
 
+		[ClassInitialize]
+		public static async Task ClassInitialize(TestContext _)
+		{
+			Role Role = await Roles.GetRole("Test", true);
+
+			if (!Role.HasPrivilege("Admin.Queues.Test"))
+			{
+				Role.Privileges = [new("Admin\\.Queues\\..*", true)];
+				await Database.Update(Role);
+			}
+			
+			User User = await Users.GetUser("Test", true);
+
+			if (!User.HasPrivilege("Admin.Queues.Test"))
+			{
+				User.RoleIds = ["Test"];
+				User.PasswordHash = Convert.ToBase64String(Users.ComputeHash("Test", "Test"));
+				await Database.Update(User);
+			}
+		}
+
 		[TestMethod]
 		public async Task Test_01_GetApiDocumentation()
 		{
@@ -82,6 +104,32 @@ namespace Waher.WebService.Queue.Test
 			Response.AssertOk();
 
 			Assert.IsTrue(Response.Decoded is HtmlDocument);
+		}
+
+		[TestMethod]
+		public async Task Test_02_EnqueueDequeue()
+		{
+			ContentResponse Response = await InternetContent.PutAsync(
+				new Uri("http://localhost:8081/Queues/Test"),
+				"Test message",
+				new KeyValuePair<string, string>("Accept", "text/html"),
+				new KeyValuePair<string, string>("Authorization", "Basic " +
+				Convert.ToBase64String(Encoding.ASCII.GetBytes("Test:Test"))));
+
+			Response.AssertOk();
+
+			Assert.IsNull(Response.Decoded);
+
+			Response = await InternetContent.PostAsync(
+				new Uri("http://localhost:8081/Queues/Test"),
+				null,
+				new KeyValuePair<string, string>("Accept", "*.*"),
+				new KeyValuePair<string, string>("Authorization", "Basic " +
+				Convert.ToBase64String(Encoding.ASCII.GetBytes("Test:Test"))));
+
+			Response.AssertOk();
+
+			Assert.AreEqual("Test message", Response.Decoded);
 		}
 	}
 }

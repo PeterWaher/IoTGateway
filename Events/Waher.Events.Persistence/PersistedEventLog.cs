@@ -114,7 +114,7 @@ namespace Waher.Events.Persistence
 		{
 			try
 			{
-				await this.DeleteOld(DateTime.Now.AddDays(-this.eventLifetimeDays));
+				await this.DeleteOld(DateTime.UtcNow.AddDays(-this.eventLifetimeDays));
 			}
 			catch (Exception ex)
 			{

@@ -353,6 +353,8 @@ namespace Waher.WebService.Queue
 				}
 				else
 					await Response.Return(Item);
+
+				return;
 			}
 
 			Task _ = Task.Run(async () =>

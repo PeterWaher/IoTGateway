@@ -124,7 +124,7 @@ namespace Waher.Events.Persistence
 
 		/// <summary>
 		/// Deletes old events. This method is called once a day automatically. It can also be called manually to delete events at other intervals
-		/// or used other time limits.
+		/// or using other time limits.
 		/// </summary>
 		/// <param name="Limit">Events older than this time stamp (or equal to it) will be deleted.</param>
 		/// <returns>Number of events deleted.</returns>
@@ -135,7 +135,7 @@ namespace Waher.Events.Persistence
 
 		/// <summary>
 		/// Deletes old events. This method is called once a day automatically. It can also be called manually to delete events at other intervals
-		/// or used other time limits.
+		/// or using other time limits.
 		/// </summary>
 		/// <param name="ObjectId">Log Object ID</param>
 		/// <param name="Limit">Events older than this time stamp (or equal to it) will be deleted.</param>

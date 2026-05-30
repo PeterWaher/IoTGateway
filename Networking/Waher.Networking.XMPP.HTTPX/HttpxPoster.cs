@@ -156,7 +156,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 
-			if (!HasContentType)
+			if (!HasContentType && !string.IsNullOrEmpty(ContentType))
 				Headers2.Add(new HttpField("Content-Type", ContentType));
 
 			if (!HasHost)

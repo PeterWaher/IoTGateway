@@ -71,12 +71,17 @@ namespace Waher.Content.Posters
 			{
 				using (HttpRequestMessage Request = new HttpRequestMessage()
 				{
-					Method = HttpMethod.Post, 
-					Content = new ByteArrayContent(EncodedData),
+					Method = HttpMethod.Post,
 				})
 				{
+					if (EncodedData?.Length > 0)
+						Request.Content = new ByteArrayContent(EncodedData);
+
 					Request.RequestUri = WebGetter.CheckUri(Uri, Request);
-					Request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(ContentType);
+
+					if (!string.IsNullOrEmpty(ContentType))
+						Request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(ContentType);
+
 					WebGetter.PrepareHeaders(Request, Headers, Handler);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);

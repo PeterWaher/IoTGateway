@@ -62,8 +62,16 @@ namespace Waher.Content.Posters
 		public virtual async Task<ContentResponse> PostAsync(Uri Uri, object Data, X509Certificate Certificate,
 			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			ContentResponse P = await InternetContent.EncodeAsync(Data, System.Text.Encoding.UTF8);
-			ContentBinaryResponse Result = await this.PostAsync(Uri, P.Encoded, P.ContentType, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
+			ContentBinaryResponse Result;
+
+			if (Data is null)
+				Result = await this.PostAsync(Uri, Array.Empty<byte>(), string.Empty, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
+			else
+			{
+				ContentResponse P = await InternetContent.EncodeAsync(Data, System.Text.Encoding.UTF8);
+				Result = await this.PostAsync(Uri, P.Encoded, P.ContentType, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
+			}
+			
 			if (Result.HasError)
 				return new ContentResponse(Result.Error);
 			else

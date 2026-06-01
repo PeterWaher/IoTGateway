@@ -327,7 +327,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public async Task ContractsClient_State_Test_13_LegalIdentityStatePrivateKeyIsProtectedByCallStack()
+		public void ContractsClient_State_Test_13_LegalIdentityStatePrivateKeyIsProtectedByCallStack()
 		{
 			FieldInfo ApprovedSources = typeof(LegalIdentityState).GetField("approvedSources", BindingFlags.Static | BindingFlags.NonPublic);
 			ApprovedSources.SetValue(null, null);
@@ -342,10 +342,11 @@ namespace Waher.Networking.XMPP.Test
 				State.PrivateKey = new byte[] { 1, 2, 3 };
 				LegalIdentityState.SetAllowedSources(new CallStack.ICallStackCheck[]
 				{
+					new CallStack.ProhibitType(typeof(ContractsClientStateTests)),
 					new CallStack.ApproveType(typeof(ContractsClient))
 				});
 
-				Assert.ThrowsException<CallStack.UnauthorizedCallstackException>(() =>
+				Assert.Throws<CallStack.UnauthorizedCallstackException>(() =>
 				{
 					byte[] Bin = State.PrivateKey;
 				});
@@ -579,7 +580,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public async Task ContractsClient_State_Test_24_ContractStateSharedSecretIsProtectedByCallStack()
+		public void ContractsClient_State_Test_24_ContractStateSharedSecretIsProtectedByCallStack()
 		{
 			FieldInfo ApprovedSources = typeof(ContractSharedSecretState).GetField("approvedSources", BindingFlags.Static | BindingFlags.NonPublic);
 			ApprovedSources.SetValue(null, null);
@@ -594,10 +595,11 @@ namespace Waher.Networking.XMPP.Test
 				State.SharedSecret = new byte[] { 1, 2, 3 };
 				ContractSharedSecretState.SetAllowedSources(new CallStack.ICallStackCheck[]
 				{
+					new CallStack.ProhibitType(typeof(ContractsClientStateTests)),
 					new CallStack.ApproveType(typeof(ContractsClient))
 				});
 
-				Assert.ThrowsException<CallStack.UnauthorizedCallstackException>(() =>
+				Assert.Throws<CallStack.UnauthorizedCallstackException>(() =>
 				{
 					byte[] Bin = State.SharedSecret;
 				});

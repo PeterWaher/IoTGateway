@@ -30,7 +30,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <EmbeddedResource Include="Data\ApiDocumentation.md">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>

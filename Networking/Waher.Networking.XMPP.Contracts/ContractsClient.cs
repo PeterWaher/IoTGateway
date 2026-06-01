@@ -743,12 +743,18 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Generates new keys for the contracts clients.
 		/// </summary>
-		public Task GenerateNewKeys()
+		public async Task GenerateNewKeys()
 		{
-			return this.RunKeyMutationAsync(async () =>
-			{
-				List<LegalIdentityState> ActiveStates = await this.GetActiveLegalIdentityStatesAsync(false);
+			List<LegalIdentityState> ActiveStates = await this.GetActiveLegalIdentityStatesAsync(false);
 
+			if (ActiveStates.Count == 0 && this.client.State == XmppState.Connected)
+			{
+				await this.TryRefreshLegalIdentityStatesAsync();
+				ActiveStates = await this.GetActiveLegalIdentityStatesAsync(false);
+			}
+
+			await this.RunKeyMutationAsync(async () =>
+			{
 				foreach (LegalIdentityState State in ActiveStates)
 				{
 					await this.TryGetLegalIdentityEndpointAsync(State, true);
@@ -810,6 +816,18 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			return ActiveStates;
+		}
+
+		private async Task TryRefreshLegalIdentityStatesAsync()
+		{
+			try
+			{
+				await this.GetLegalIdentitiesAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
 		private static byte[] Clone(byte[] Bin)
@@ -2877,7 +2895,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private Task UpdateSettings(LegalIdentity Identity)
 		{
-			return this.UpdateSettings(Identity, null);
+			return this.UpdateSettings(Identity, Identity?.ClientPubKey);
 		}
 
 		/// <summary>
@@ -2993,6 +3011,8 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private async Task UpdateSettings(LegalIdentity Identity, byte[] PublicKey)
 		{
+			PublicKey ??= Identity?.ClientPubKey;
+
 			if (!string.IsNullOrEmpty(Identity.Id))
 			{
 				LegalIdentityState StateObj = Types.Instantiate<LegalIdentityState>(false, Identity.Id);
@@ -3116,7 +3136,19 @@ namespace Waher.Networking.XMPP.Contracts
 				foreach (XmlNode N in E.ChildNodes)
 				{
 					if (N is XmlElement E2 && E2.LocalName == "identity")
-						IdentitiesList.Add(LegalIdentity.Parse(E2));
+					{
+						LegalIdentity Identity = LegalIdentity.Parse(E2);
+						IdentitiesList.Add(Identity);
+
+						try
+						{
+							await this.UpdateSettings(Identity);
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex, Identity.Id);
+						}
+					}
 				}
 
 				Identities = IdentitiesList.ToArray();

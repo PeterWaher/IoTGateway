@@ -270,6 +270,31 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
+		public async Task ContractsClient_State_Test_09B_UpdateSettingsUsesIdentityClientPublicKey()
+		{
+			IE2eEndpoint Endpoint = GetFirstLocalEndpoint(this.contractsClient);
+			byte[] PublicKey = (byte[])Endpoint.PublicKey.Clone();
+
+			LegalIdentity Identity = new LegalIdentity()
+			{
+				Id = "provider-returned-id",
+				State = IdentityState.Approved,
+				Created = DateTime.UtcNow.AddMinutes(-1),
+				Updated = DateTime.UtcNow,
+				ClientKeyName = Endpoint.LocalName,
+				ClientPubKey = PublicKey
+			};
+
+			await InvokeUpdateSettingsAsync(this.contractsClient, Identity, null);
+
+			LegalIdentityState State = await GetStateAsync(this.client.BareJID, "provider-returned-id");
+			Assert.IsNotNull(State);
+			CollectionAssert.AreEqual(PublicKey, State.PublicKey);
+			Assert.IsTrue(State.HasPrivateKey);
+			Assert.AreEqual(Endpoint.LocalName, State.KeyName);
+		}
+
+		[TestMethod]
 		public async Task ContractsClient_State_Test_10_MismatchedSnapshotIsIgnored()
 		{
 			IE2eEndpoint[] Keys = GetLocalKeys(this.contractsClient);

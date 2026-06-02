@@ -74,7 +74,7 @@ namespace Waher.Content.Posters
 					Method = HttpMethod.Post,
 				})
 				{
-					if (EncodedData?.Length > 0)
+					if (EncodedData?.Length > 0 || !string.IsNullOrEmpty(ContentType))
 						Request.Content = new ByteArrayContent(EncodedData);
 
 					Request.RequestUri = WebGetter.CheckUri(Uri, Request);

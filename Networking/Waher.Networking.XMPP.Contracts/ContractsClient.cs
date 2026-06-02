@@ -2289,7 +2289,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			string LegalId = XML.Attribute(e.Content, "id");
 			IdentityReviewEventArgs e2 = new IdentityReviewEventArgs(e, LegalId);
-			this.ParseValidationDetails(e.Content, e2);
+			ParseValidationDetails(e.Content, e2);
 
 			if ((e2.IsValid.HasValue && e2.IsValid.Value) ||
 				(!e2.IsValid.HasValue && (e2.HasValidatedClaims || e2.HasValidatedPhotos)))
@@ -2305,7 +2305,14 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public event EventHandlerAsync<IdentityReviewEventArgs> IdentityReview;
 
-		private void ParseValidationDetails(XmlElement Content, IdentityReviewEventArgs e)
+		/// <summary>
+		/// Parses identity review details from an Identity Review message, and fills the 
+		/// corresponding properties of the event arguments.
+		/// </summary>
+		/// <param name="Content">XML content of the Identity Review message.</param>
+		/// <param name="e">Event arguments to fill with parsed details.</param>
+		public static void ParseValidationDetails(XmlElement Content, 
+			IdentityReviewEventArgs e)
 		{
 			ChunkedList<InvalidClaim> InvalidClaims = null;
 			ChunkedList<InvalidPhoto> InvalidPhotos = null;
@@ -2464,7 +2471,7 @@ namespace Waher.Networking.XMPP.Contracts
 			string Code = XML.Attribute(e.Content, "code");
 			ValidationErrorType Type = XML.Attribute(e.Content, "type", ValidationErrorType.Client);
 			ClientMessageEventArgs e2 = new ClientMessageEventArgs(e, LegalId, Code, Type);
-			this.ParseValidationDetails(e.Content, e2);
+			ParseValidationDetails(e.Content, e2);
 
 			await this.ClientMessage.Raise(this, e2);
 		}

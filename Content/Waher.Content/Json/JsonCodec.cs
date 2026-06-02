@@ -115,7 +115,7 @@ namespace Waher.Content.Json
         /// <returns>If the extension was recognized.</returns>
         public bool TryGetContentType(string FileExtension, out string ContentType)
         {
-            if (string.Compare(FileExtension, "json", true) == 0)
+            if (string.Compare(FileExtension, DefaultFileExtension, true) == 0)
             {
                 ContentType = DefaultContentType;
                 return true;
@@ -139,7 +139,7 @@ namespace Waher.Content.Json
 
             if (Array.IndexOf(JsonContentTypes, ContentType) >= 0)
             {
-                FileExtension = "json";
+                FileExtension = DefaultFileExtension;
                 return true;
             }
             else if (ContentType.StartsWith("application/") && ContentType.EndsWith("+json"))

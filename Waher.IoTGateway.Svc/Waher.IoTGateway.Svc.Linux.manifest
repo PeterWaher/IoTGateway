@@ -294,6 +294,9 @@
 	<Assembly fileName="Waher.Content.SystemFiles.dll" />
 	<Assembly fileName="Waher.Content.SystemFiles.pdb" />
 	<Assembly fileName="Waher.Content.SystemFiles.xml" />
+	<Assembly fileName="Waher.Content.Toon.dll" />
+	<Assembly fileName="Waher.Content.Toon.pdb" />
+	<Assembly fileName="Waher.Content.Toon.xml" />
 	<Assembly fileName="Waher.Content.Xml.dll" />
 	<Assembly fileName="Waher.Content.Xml.pdb" />
 	<Assembly fileName="Waher.Content.Xml.xml" />

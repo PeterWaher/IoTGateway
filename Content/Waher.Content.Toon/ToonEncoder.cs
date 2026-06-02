@@ -1,0 +1,180 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using Waher.Content.Json;
+using Waher.Runtime.Inventory;
+using Waher.Script.Abstraction.Elements;
+
+namespace Waher.Content.Toon
+{
+    /// <summary>
+    /// TOON encoder.
+    /// </summary>
+    public class ToonEncoder : IContentEncoder
+    {
+		/// <summary>
+		/// text/toon
+		/// </summary>
+		public const string DefaultContentType = "text/toon";
+
+        /// <summary>
+        /// toon
+        /// </summary>
+        public const string DefaultFileExtension = "toon";
+
+        /// <summary>
+        /// TOON encoder.
+        /// </summary>
+        public ToonEncoder()
+        {
+        }
+
+        /// <summary>
+        /// TOON content types.
+        /// </summary>
+        public static readonly string[] ToonContentTypes = new string[]
+        {
+            DefaultContentType
+		};
+
+        /// <summary>
+        /// TOON file extensions.
+        /// </summary>
+        public static readonly string[] ToonFileExtensions = new string[]
+        {
+            DefaultFileExtension
+        };
+
+        /// <summary>
+        /// Supported content types.
+        /// </summary>
+        public string[] ContentTypes => ToonContentTypes;
+
+        /// <summary>
+        /// Supported file extensions.
+        /// </summary>
+        public string[] FileExtensions => ToonFileExtensions;
+
+        /// <summary>
+        /// Tries to get the content type of an item, given its file extension.
+        /// </summary>
+        /// <param name="FileExtension">File extension.</param>
+        /// <param name="ContentType">Content type.</param>
+        /// <returns>If the extension was recognized.</returns>
+        public bool TryGetContentType(string FileExtension, out string ContentType)
+        {
+            if (string.Compare(FileExtension, DefaultFileExtension, true) == 0)
+            {
+                ContentType = DefaultContentType;
+                return true;
+            }
+            else
+            {
+                ContentType = null;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Tries to get the file extension of an item, given its Content-Type.
+        /// </summary>
+        /// <param name="ContentType">Content type.</param>
+        /// <param name="FileExtension">File extension.</param>
+        /// <returns>If the Content-Type was recognized.</returns>
+        public bool TryGetFileExtension(string ContentType, out string FileExtension)
+        {
+            ContentType = ContentType.ToLower();
+
+            if (Array.IndexOf(ToonContentTypes, ContentType) >= 0)
+            {
+                FileExtension = DefaultFileExtension;
+                return true;
+            }
+            else
+            {
+                FileExtension = string.Empty;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// If the encoder encodes a given object.
+        /// </summary>
+        /// <param name="Object">Object to encode.</param>
+        /// <param name="Grade">How well the encoder encodes the object.</param>
+        /// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+        /// <returns>If the encoder can encode the given object.</returns>
+        public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
+        {
+            if (InternetContent.IsAccepted(ToonContentTypes, AcceptedContentTypes))
+            {
+                if (Object is IEnumerable<KeyValuePair<string, object>>)
+                {
+                    Grade = Grade.Ok;
+                    return true;
+                }
+                else if (Object is IJsonEncodingHint Hint)
+                {
+                    Grade = Hint.CanEncodeJson;
+                    return Grade != Grade.NotAtAll;
+                }
+                else if (Object is null ||
+                    Object is IEnumerable ||
+                    Object is IVector ||
+                    Object is string ||
+                    Object is bool ||
+                    Object is decimal ||
+                    Object is double ||
+                    Object is float ||
+                    Object is int ||
+                    Object is long ||
+                    Object is short ||
+                    Object is byte ||
+                    Object is uint ||
+                    Object is ulong ||
+                    Object is ushort ||
+                    Object is sbyte ||
+                    Object is char)
+                {
+                    Grade = Grade.Barely;
+                    return true;
+                }
+            }
+
+            Grade = Grade.NotAtAll;
+            return false;
+        }
+
+		/// <summary>
+		/// Encodes an object.
+		/// </summary>
+		/// <param name="Object">Object to encode.</param>
+		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
+		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding,
+			ICodecProgress Progress, params string[] AcceptedContentTypes)
+        {
+            string Toon = TOON.Encode(Object, false);
+
+            if (!InternetContent.IsAccepted(ToonContentTypes, out string ContentType,
+                AcceptedContentTypes))
+            {
+                ContentType = DefaultContentType;
+            }
+
+            if (Encoding is null)
+            {
+                Encoding = Encoding.UTF8;
+                ContentType += "; charset=utf-8";
+            }
+            else
+                ContentType += "; charset=" + Encoding.WebName;
+
+            return Task.FromResult(new ContentResponse(ContentType, Object, Encoding.GetBytes(Toon)));
+        }
+    }
+}

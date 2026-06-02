@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<Authors>Peter Waher</Authors>
+		<Company>Waher Data AB</Company>
+		<Product>Waher.IoTGateway</Product>
+		<Description>Contains encoders of information into the TOON format for reducing token count in communication with AI agents.</Description>
+		<Copyright>Copyright © Waher Data AB 2026. All rights reserved.</Copyright>
+		<PackageLicenseUrl />
+		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Toon</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+		<RepositoryType>GitHub</RepositoryType>
+		<PackageTags>internet content data type encoding toon</PackageTags>
+		<NeutralLanguage>English</NeutralLanguage>
+		<AssemblyVersion>1.0.0</AssemblyVersion>
+		<FileVersion>1.0.0</FileVersion>
+		<Version>1.0.0</Version>
+		<PackageIconUrl />
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageIcon>Icon_64x64.png</PackageIcon>
+	</PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\Images\Icon_64x64.png">
+			<Pack>True</Pack>
+			<PackagePath />
+		</None>
+		<None Include="..\..\LICENSE.txt">
+			<Pack>True</Pack>
+			<PackagePath />
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+	  <ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />
+	  <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
+	  <ProjectReference Include="..\Waher.Content.Xml\Waher.Content.Xml.csproj" />
+	  <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
+	</ItemGroup>
+</Project>

@@ -3,12 +3,12 @@ using System.Reflection;
 using System.Text;
 using Waher.Runtime.Inventory;
 
-namespace Waher.Content.Json.ReferenceTypes
+namespace Waher.Content.Toon.ReferenceTypes
 {
 	/// <summary>
 	/// Encodes <see cref="Delegate"/> values.
 	/// </summary>
-	public class DelegateEncoder : IJsonEncoder
+	public class DelegateEncoder : IToonEncoder
 	{
 		/// <summary>
 		/// Encodes <see cref="Delegate"/> values.
@@ -18,12 +18,12 @@ namespace Waher.Content.Json.ReferenceTypes
 		}
 
 		/// <summary>
-		/// Encodes the <paramref name="Object"/> to JSON.
+		/// Encodes the <paramref name="Object"/> to TOON.
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
-		/// <param name="Json">JSON output.</param>
-		public void Encode(object Object, int? Indent, StringBuilder Json)
+		/// <param name="Toon">TOON output.</param>
+		public void Encode(object Object, int? Indent, StringBuilder Toon)
 		{
 			Delegate D = (Delegate)Object;
 			StringBuilder sb = new StringBuilder();
@@ -49,14 +49,11 @@ namespace Waher.Content.Json.ReferenceTypes
 
 			sb.Append(')');
 
-
-			Json.Append('"');
-			Json.Append(JSON.Encode(sb.ToString()));
-			Json.Append('"');
+			Toon.Append(TOON.Encode(sb.ToString()));
 		}
 
 		/// <summary>
-		/// How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+		/// How well the TOON encoder encodes objects of type <paramref name="ObjectType"/>.
 		/// </summary>
 		/// <param name="ObjectType">Type of object to encode.</param>
 		/// <returns>How well objects of the given type are encoded.</returns>

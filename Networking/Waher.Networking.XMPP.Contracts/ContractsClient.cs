@@ -2312,6 +2312,7 @@ namespace Waher.Networking.XMPP.Contracts
 			ChunkedList<ValidationError> ValidationErrors = null;
 			ChunkedList<ValidClaim> ValidClaims = null;
 			ChunkedList<ValidPhoto> ValidPhotos = null;
+			ChunkedList<PotentialClaim> PotentialClaims = null;
 			ChunkedList<string> UnvalidatedClaims = null;
 			ChunkedList<string> UnvalidatedPhotos = null;
 
@@ -2393,6 +2394,15 @@ namespace Waher.Networking.XMPP.Contracts
 						ValidPhotos.Add(new ValidPhoto(FileName, Service));
 						break;
 
+					case "potentialClaim":
+						Claim = XML.Attribute(E, "claim");
+						string Value = XML.Attribute(E, "value");
+						Service = XML.Attribute(E, "service");
+
+						PotentialClaims ??= new ChunkedList<PotentialClaim>();
+						PotentialClaims.Add(new PotentialClaim(Claim, Value, Service));
+						break;
+
 					case "unvalidatedClaim":
 						Claim = XML.Attribute(E, "claim");
 
@@ -2414,6 +2424,7 @@ namespace Waher.Networking.XMPP.Contracts
 			e.ValidationErrors = ValidationErrors?.ToArray();
 			e.ValidClaims = ValidClaims?.ToArray();
 			e.ValidPhotos = ValidPhotos?.ToArray();
+			e.PotentialClaims = PotentialClaims?.ToArray();
 			e.UnvalidatedClaims = UnvalidatedClaims?.ToArray();
 			e.UnvalidatedPhotos = UnvalidatedPhotos?.ToArray();
 		}

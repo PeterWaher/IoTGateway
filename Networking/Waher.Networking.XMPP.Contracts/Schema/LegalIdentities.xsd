@@ -887,6 +887,29 @@
 					</xs:attribute>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name='potentialClaim' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Contains information about a potential claim that the client can make in a subsequent application.</xs:documentation>
+					<xs:documentation>Potential claims should only be provided if in the context of other claims, the potential claims are assumed to be validated, and therefore, do not leak sensitive personal information to the client.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name='claim' type='xs:string' use='required'>
+						<xs:annotation>
+							<xs:documentation>Identity claim key.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name='value' type='xs:string' use='required'>
+						<xs:annotation>
+							<xs:documentation>Value of potential claim.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name='service' type='xs:string' use='optional'>
+						<xs:annotation>
+							<xs:documentation>Reference to service where potential claim originated.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name='unvalidatedClaim' minOccurs='0' maxOccurs='unbounded'>
 				<xs:annotation>
 					<xs:documentation>Contains information about a claim that has not been processed for validation.</xs:documentation>

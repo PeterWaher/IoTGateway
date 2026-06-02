@@ -14,6 +14,7 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		private ValidationError[] validationErrors;
 		private ValidClaim[] validClaims;
 		private ValidPhoto[] validPhotos;
+		private PotentialClaim[] potentialClaims;
 		private string[] unvalidatedClaims;
 		private string[] unvalidatedPhotos;
 
@@ -23,7 +24,7 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		/// <param name="e">Message event arguments.</param>
 		/// <param name="LegalId">Identifier of associated Legal ID.</param>
 		public IdentityReviewEventArgs(MessageEventArgs e, string LegalId)
-			: this(e, LegalId, null, null, null, null, null, null, null)
+			: this(e, LegalId, null, null, null, null, null, null, null, null)
 		{
 		}
 
@@ -39,11 +40,34 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		/// <param name="ValidPhotos">Valid photos.</param>
 		/// <param name="UnvalidatedClaims">Unvalidated claims.</param>
 		/// <param name="UnvalidatedPhotos">Unvalidated photos.</param>
+		public IdentityReviewEventArgs(MessageEventArgs e, string LegalId,
+			InvalidClaim[] InvalidClaims, InvalidPhoto[] InvalidPhotos,
+			ValidationError[] ValidationErrors, ValidClaim[] ValidClaims,
+			ValidPhoto[] ValidPhotos, string[] UnvalidatedClaims, 
+			string[] UnvalidatedPhotos)
+			: this(e, LegalId, InvalidClaims, InvalidPhotos, ValidationErrors,
+				  ValidClaims, ValidPhotos, null, UnvalidatedClaims, UnvalidatedPhotos) 
+		{
+		}
+
+		/// <summary>
+		/// Identity Review event arguments.
+		/// </summary>
+		/// <param name="e">Message event arguments.</param>
+		/// <param name="LegalId">Identifier of associated Legal ID.</param>
+		/// <param name="InvalidClaims">Invalid claims.</param>
+		/// <param name="InvalidPhotos">Invalid photos.</param>
+		/// <param name="ValidationErrors">Validation errors.</param>
+		/// <param name="ValidClaims">Valid claims.</param>
+		/// <param name="ValidPhotos">Valid photos.</param>
+		/// <param name="PotentialClaims">Potential claims.</param>
+		/// <param name="UnvalidatedClaims">Unvalidated claims.</param>
+		/// <param name="UnvalidatedPhotos">Unvalidated photos.</param>
 		public IdentityReviewEventArgs(MessageEventArgs e, string LegalId, 
 			InvalidClaim[] InvalidClaims, InvalidPhoto[] InvalidPhotos, 
 			ValidationError[] ValidationErrors, ValidClaim[] ValidClaims, 
-			ValidPhoto[] ValidPhotos, string[] UnvalidatedClaims,
-			string[] UnvalidatedPhotos)
+			ValidPhoto[] ValidPhotos, PotentialClaim[] PotentialClaims,
+			string[] UnvalidatedClaims, string[] UnvalidatedPhotos)
 			: base(e)
 		{
 			this.legalId = LegalId;
@@ -52,6 +76,7 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 			this.validationErrors = ValidationErrors ?? Array.Empty<ValidationError>();
 			this.validClaims = ValidClaims ?? Array.Empty<ValidClaim>();
 			this.validPhotos = ValidPhotos ?? Array.Empty<ValidPhoto>();
+			this.potentialClaims = PotentialClaims ?? Array.Empty<PotentialClaim>();
 			this.unvalidatedClaims = UnvalidatedClaims ?? Array.Empty<string>();
 			this.unvalidatedPhotos = UnvalidatedPhotos ?? Array.Empty<string>();
 		}
@@ -104,6 +129,15 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		{
 			get => this.validPhotos;
 			internal set => this.validPhotos = value ?? Array.Empty<ValidPhoto>();
+		}
+
+		/// <summary>
+		/// Potential claims.
+		/// </summary>
+		public PotentialClaim[] PotentialClaims
+		{
+			get => this.potentialClaims;
+			internal set => this.potentialClaims = value ?? Array.Empty<PotentialClaim>();
 		}
 
 		/// <summary>
@@ -174,5 +208,10 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		/// If the application has validated photos.
 		/// </summary>
 		public bool HasValidatedPhotos => this.validPhotos.Length > 0;
+
+		/// <summary>
+		/// If potential claims are reported.
+		/// </summary>
+		public bool HasPotentialClaims => this.potentialClaims.Length > 0;
 	}
 }

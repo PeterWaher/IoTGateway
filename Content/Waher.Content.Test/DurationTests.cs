@@ -9,7 +9,7 @@ namespace Waher.Content.Test
 	[TestClass]
 	public class DurationTests
 	{
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("2023-01-01T00:00:00", "2024-01-01T00:00:00", "P1Y")]
 		[DataRow("2023-01-01T00:00:00", "2023-02-01T00:00:00", "P1M")]
 		[DataRow("2023-01-01T00:00:00", "2023-01-02T00:00:00", "P1D")]
@@ -22,7 +22,7 @@ namespace Waher.Content.Test
 			Test(TP1, TP2, Expected);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("2023-12-01T00:00:00", "2025-01-01T00:00:00", "P1Y1M")]
 		[DataRow("2023-01-31T00:00:00", "2023-03-30T00:00:00", "P58D")]
 		[DataRow("2023-01-01T20:00:00", "2023-01-03T10:00:00", "P1DT14H")]
@@ -34,7 +34,7 @@ namespace Waher.Content.Test
 			Test(TP1, TP2, Expected);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("2024-01-01T00:00:00", "2023-01-01T00:00:00", "-P1Y")]
 		[DataRow("2023-02-01T00:00:00", "2023-01-01T00:00:00", "-P1M")]
 		[DataRow("2023-01-02T00:00:00", "2023-01-01T00:00:00", "-P1D")]
@@ -47,7 +47,7 @@ namespace Waher.Content.Test
 			Test(TP1, TP2, Expected);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("2025-01-01T00:00:00", "2023-12-01T00:00:00", "-P1Y1M")]
 		[DataRow("2023-03-30T00:00:00", "2023-01-31T00:00:00", "-P58D")]
 		[DataRow("2023-01-03T10:00:00", "2023-01-01T20:00:00", "-P1DT14H")]
@@ -59,7 +59,7 @@ namespace Waher.Content.Test
 			Test(TP1, TP2, Expected);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("2094-09-12T11:30:12.372", "2094-11-07T23:42:58.571", "P1M26DT12H12M46.199S")]
 		[DataRow("2094-11-07T23:42:58.571", "2094-09-12T11:30:12.372", "-P1M25DT12H12M46.199S")]
 		[DataRow("1910-10-25T15:09:55.645", "1950-07-08T08:12:49.095", "P39Y8M12DT17H2M53.45S")]
@@ -132,7 +132,7 @@ namespace Waher.Content.Test
 			// Round-off errors may result in a 1 ms diff.
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("PT100M", "PT1H", 1)]
 		[DataRow("P1Y", "PT1H", 1)]
 		[DataRow("P1M", "PT1H", 1)]

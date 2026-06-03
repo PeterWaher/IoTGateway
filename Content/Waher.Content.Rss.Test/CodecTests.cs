@@ -1,4 +1,3 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
@@ -20,7 +19,7 @@ namespace Waher.Content.Rss.Test
 				typeof(CodecTests).Assembly);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("sample-rss-091.rss")]
 		[DataRow("sample-rss-092.rss")]
 		[DataRow("sample-rss-2.rss")]
@@ -35,7 +34,7 @@ namespace Waher.Content.Rss.Test
 			Assert.IsTrue(Decoder is RssCodec);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("sample-rss-091.rss", 0.91)]
 		[DataRow("sample-rss-092.rss", 0.92)]
 		[DataRow("sample-rss-2.rss", 2.0)]
@@ -67,7 +66,7 @@ namespace Waher.Content.Rss.Test
 			Assert.AreEqual(0, Doc.Warnings.Length);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("sample-rss-091.rss")]
 		[DataRow("sample-rss-092.rss")]
 		[DataRow("sample-rss-2.rss")]
@@ -82,7 +81,7 @@ namespace Waher.Content.Rss.Test
 			Assert.IsTrue(Encoder is RssCodec);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("sample-rss-091.rss")]
 		[DataRow("sample-rss-092.rss")]
 		[DataRow("sample-rss-2.rss")]

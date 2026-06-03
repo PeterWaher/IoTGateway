@@ -107,7 +107,7 @@ namespace Waher.Content.Images.Test
 		// Sample images used from this repository, downloaded in parallel to the IoT Gateway repository:
 		// https://github.com/ianare/exif-samples
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow(01, true)]
 		[DataRow(02, true)]
 		[DataRow(03, true)]
@@ -196,7 +196,7 @@ namespace Waher.Content.Images.Test
 			TestImage(jpgFiles, Index, ExpectedResult);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow(01)]
 		[DataRow(02)]
 		[DataRow(03)]

@@ -4974,6 +4974,12 @@ namespace Waher.IoTGateway
 		/// <returns>URL</returns>
 		public static string GetUrl(string LocalResource, HttpServer Server)
 		{
+			if (LocalResource.StartsWith("http://") ||
+				LocalResource.StartsWith("https://"))
+			{
+				return LocalResource;
+			}
+
 			StringBuilder sb = new StringBuilder();
 			int DefaultPort;
 			int[] Ports;

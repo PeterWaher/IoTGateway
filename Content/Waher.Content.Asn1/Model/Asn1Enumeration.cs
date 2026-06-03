@@ -48,13 +48,13 @@ namespace Waher.Content.Asn1.Model
 			}
 			else if (Pass == CSharpExportPass.Implicit)
 			{
-				Output.Append(Tabs(Indent));
+				JSON.Indent(Output, Indent);
 				Output.Append("public enum ");
 				Output.Append(ToCSharp(this.Name));
 				if (!this.TypeDefinition)
 					Output.AppendLine("Enum");
 
-				Output.Append(Tabs(Indent));
+				JSON.Indent(Output, Indent);
 				Output.Append("{");
 
 				Indent++;
@@ -69,14 +69,14 @@ namespace Waher.Content.Asn1.Model
 						Output.Append(',');
 
 					Output.AppendLine();
-					Output.Append(Tabs(Indent));
+					JSON.Indent(Output, Indent);
 					await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 				}
 
 				Indent--;
 
 				Output.AppendLine();
-				Output.Append(Tabs(Indent));
+				JSON.Indent(Output, Indent);
 				Output.AppendLine("}");
 				Output.AppendLine();
 			}

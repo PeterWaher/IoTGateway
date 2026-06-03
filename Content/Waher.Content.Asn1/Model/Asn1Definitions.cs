@@ -129,12 +129,12 @@ namespace Waher.Content.Asn1.Model
 				else
 					Output.AppendLine();
 
-				Output.Append(Tabs(Indent));
+				JSON.Indent(Output, Indent);
 				Output.Append("namespace ");
 				Output.Append(State.Settings.BaseNamespace);
 				Output.Append('.');
 				Output.AppendLine(ToCSharp(this.identifier));
-				Output.Append(Tabs(Indent));
+				JSON.Indent(Output, Indent);
 				Output.AppendLine("{");
 				Indent++;
 
@@ -173,7 +173,7 @@ namespace Waher.Content.Asn1.Model
 				State.ClosePending(Output);
 
 				Indent--;
-				Output.Append(Tabs(Indent));
+				JSON.Indent(Output, Indent);
 				Output.AppendLine("}");
 			}
 		}

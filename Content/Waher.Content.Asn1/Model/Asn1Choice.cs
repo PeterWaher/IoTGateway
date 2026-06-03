@@ -80,12 +80,12 @@ namespace Waher.Content.Asn1.Model
 					foreach (Asn1Node Node in this.Nodes)
 						await Node.ExportCSharp(Output, State, Indent, Pass);
 
-					Output.Append(Tabs(Indent));
+					JSON.Indent(Output, Indent);
 					Output.Append("public enum ");
 					Output.Append(ToCSharp(this.Name));
 					Output.AppendLine("Enum");
 
-					Output.Append(Tabs(Indent));
+					JSON.Indent(Output, Indent);
 					Output.Append("{");
 
 					Indent++;
@@ -102,7 +102,7 @@ namespace Waher.Content.Asn1.Model
 								Output.Append(',');
 
 							Output.AppendLine();
-							Output.Append(Tabs(Indent));
+							JSON.Indent(Output, Indent);
 							Output.Append(Field.Name);
 						}
 					}
@@ -110,26 +110,26 @@ namespace Waher.Content.Asn1.Model
 					Indent--;
 
 					Output.AppendLine();
-					Output.Append(Tabs(Indent));
+					JSON.Indent(Output, Indent);
 					Output.AppendLine("}");
 					Output.AppendLine();
 				}
 
 				if (Pass == CSharpExportPass.Implicit || Pass == CSharpExportPass.Explicit)
 				{
-					Output.Append(Tabs(Indent));
+					JSON.Indent(Output, Indent);
 					Output.Append("public class ");
 					Output.Append(ToCSharp(this.Name));
 					if (!this.TypeDefinition)
 						Output.Append("Choice");
 					Output.AppendLine();
 
-					Output.Append(Tabs(Indent));
+					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
 
 					Indent++;
 
-					Output.Append(Tabs(Indent));
+					JSON.Indent(Output, Indent);
 					Output.Append("public ");
 					Output.Append(ToCSharp(this.Name));
 					if (!this.TypeDefinition)
@@ -141,7 +141,7 @@ namespace Waher.Content.Asn1.Model
 
 					Indent--;
 
-					Output.Append(Tabs(Indent));
+					JSON.Indent(Output, Indent);
 					Output.AppendLine("}");
 					Output.AppendLine();
 				}

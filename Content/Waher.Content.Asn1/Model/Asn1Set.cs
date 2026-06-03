@@ -50,13 +50,13 @@ namespace Waher.Content.Asn1.Model
 				foreach (Asn1Node Node in this.Nodes)
 					await Node.ExportCSharp(Output, State, Indent, Pass);
 
-				Output.Append(Tabs(Indent));
+				JSON.Indent(Output, Indent);
 				Output.Append("public class ");
 				Output.Append(ToCSharp(this.Name));
 				if (!this.TypeDefinition)
 					Output.AppendLine("Set");
 
-				Output.Append(Tabs(Indent));
+				JSON.Indent(Output, Indent);
 				Output.AppendLine("{");
 
 				Indent++;
@@ -66,7 +66,7 @@ namespace Waher.Content.Asn1.Model
 
 				Indent--;
 
-				Output.Append(Tabs(Indent));
+				JSON.Indent(Output, Indent);
 				Output.AppendLine("}");
 				Output.AppendLine();
 			}

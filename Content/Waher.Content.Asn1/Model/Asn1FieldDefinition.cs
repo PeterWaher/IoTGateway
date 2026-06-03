@@ -60,7 +60,7 @@ namespace Waher.Content.Asn1.Model
 		{
 			if (Pass == CSharpExportPass.Explicit)
 			{
-				Output.Append(Tabs(Indent));
+				JSON.Indent(Output, Indent);
 				Output.Append("public ");
 				await this.type.ExportCSharp(Output, State, Indent, Pass);
 				Output.Append(' ');

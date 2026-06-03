@@ -35,7 +35,7 @@ namespace Waher.Content.Xml.Text
 			{
 				Indent++;
 				Json.AppendLine();
-				Json.Append(new string('\t', Indent.Value));
+				JSON.Indent(Json, Indent.Value);
 			}
 
 			foreach (XmlNode XmlNode in Xml)
@@ -49,7 +49,7 @@ namespace Waher.Content.Xml.Text
 					if (Indent.HasValue)
 					{
 						Json.AppendLine();
-						Json.Append(new string('\t', Indent.Value));
+						JSON.Indent(Json, Indent.Value);
 					}
 				}
 
@@ -60,7 +60,7 @@ namespace Waher.Content.Xml.Text
 			{
 				Indent--;
 				Json.AppendLine();
-				Json.Append(new string('\t', Indent.Value));
+				JSON.Indent(Json, Indent.Value);
 			}
 
 			Json.Append(']');

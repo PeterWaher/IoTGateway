@@ -55,11 +55,6 @@ namespace Waher.Content.Asn1.Model
 			return Task.CompletedTask;
 		}
 
-		internal static string Tabs(int Indent)
-		{
-			return new string('\t', Indent);
-		}
-
 		internal static string ToCSharp(string Identifier)
 		{
 			switch (Identifier)

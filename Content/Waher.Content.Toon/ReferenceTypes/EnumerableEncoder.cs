@@ -42,10 +42,10 @@ namespace Waher.Content.Toon.ReferenceTypes
 				else
 					Toon.Append(',');
 
-				if (Indent.HasValue)
+				if (Indent.HasValue && Indent.Value > 0)
 				{
-					Toon.AppendLine();
-					Toon.Append(new string('\t', Indent.Value));
+					Toon.Append('\n');
+					JSON.Indent(Toon, Indent.Value);
 				}
 
 				TOON.Encode(e.Current, Indent, Toon);
@@ -55,10 +55,10 @@ namespace Waher.Content.Toon.ReferenceTypes
 			{
 				Indent--;
 
-				if (!First)
+				if (!First && Indent.Value > 0)
 				{
-					Toon.AppendLine();
-					Toon.Append(new string('\t', Indent.Value));
+					Toon.Append('\n');
+					JSON.Indent(Toon, Indent.Value);
 				}
 			}
 

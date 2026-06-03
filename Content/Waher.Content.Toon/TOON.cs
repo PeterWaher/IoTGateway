@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Runtime.Inventory;
@@ -51,6 +52,9 @@ namespace Waher.Content.Toon
 				case "null":
 					return "\"null\"";
 
+				case "-":
+					return "\"-\"";
+
 				default:
 					if (CommonTypes.TryParse(s, out double _))
 						return "\"" + s + "\"";
@@ -58,84 +62,12 @@ namespace Waher.Content.Toon
 					if (JSON.ContainsEscapeCharacters(s))
 						return "\"" + JSON.Encode(s) + "\"";
 
-					return CommonTypes.Escape(s, toonCharactersToEscape, toonCharacterEscapes);
+					if (s.StartsWith("[") || s.StartsWith("- "))
+						return "\"" + s + "\"";
+
+					return s;
 			}
 		}
-
-		private static readonly char[] toonCharactersToEscape = new char[]
-		{
-			'\\',
-			'"',
-			'\x00',
-			'\x01',
-			'\x02',
-			'\x03',
-			'\x04',
-			'\x05',
-			'\x06',
-			'\a',	// 7  - 0x07
-			'\b',	// 8  - 0x08
-			'\t',	// 9  - 0x09
-			'\n',	// 10 - 0x0a
-			'\v',	// 11 - 0x0b
-			'\f',	// 12 - 0x0c
-			'\r',	// 13 - 0x0d
-			'\x0e',
-			'\x0f',
-			'\x10',
-			'\x11',
-			'\x12',
-			'\x13',
-			'\x14',
-			'\x15',
-			'\x16',
-			'\x17',
-			'\x18',
-			'\x19',
-			'\x1a',
-			'\x1b',
-			'\x1c',
-			'\x1d',
-			'\x1e',
-			'\x1f'
-		};
-		private static readonly string[] toonCharacterEscapes = new string[]
-		{
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" ",
-			" "
-		};
 
 		/// <summary>
 		/// Encodes an object as TOON.
@@ -158,7 +90,7 @@ namespace Waher.Content.Toon
 		/// <param name="Indent">If TOON should be indented.</param>
 		public static void Encode(object Object, bool Indent, StringBuilder Toon)
 		{
-			Encode(Object, Indent ? (int?)0 : null, Toon);
+			Encode(Object, Indent ? (int?)-1 : null, Toon);
 		}
 
 		/// <summary>
@@ -200,16 +132,7 @@ namespace Waher.Content.Toon
 					else
 						Toon.Append(',');
 
-					if (Indent.HasValue)
-					{
-						Toon.Append('\n');
-						Toon.Append(new string('\t', Indent.Value));
-					}
-
-					Toon.Append(Encode(Member.Key));
-					Toon.Append(": ");
-
-					Encode(Member.Value, Indent, Toon);
+					EncodeMember(Member.Key, Member.Value, Indent, Toon);
 				}
 			}
 
@@ -222,16 +145,7 @@ namespace Waher.Content.Toon
 					else
 						Toon.Append(',');
 
-					if (Indent.HasValue)
-					{
-						Toon.Append('\n');
-						Toon.Append(new string('\t', Indent.Value));
-					}
-
-					Toon.Append(Encode(Member.Key));
-					Toon.Append(": ");
-
-					Encode(Member.Value, Indent, Toon);
+					EncodeMember(Member.Key, Member.Value, Indent, Toon);
 				}
 			}
 
@@ -239,11 +153,105 @@ namespace Waher.Content.Toon
 			{
 				Indent--;
 
-				if (!First)
+				if (!First && Indent.Value > 0)
 				{
 					Toon.Append('\n');
-					Toon.Append(new string('\t', Indent.Value));
+					JSON.Indent(Toon, Indent.Value);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Encodes a member of an object as TOON.
+		/// </summary>
+		/// <param name="Name">Name of member.</param>
+		/// <param name="Value">Value of member.</param>
+		/// <param name="Indent">Optional indentation.</param>
+		/// <param name="Toon">TOON output.</param>
+		public static void EncodeMember(string Name, object Value, int? Indent,
+			StringBuilder Toon)
+		{
+			bool AppendSpaces = Indent.HasValue;
+
+			if (Indent.HasValue && Indent.Value > 0)
+			{
+				Toon.Append('\n');
+				JSON.Indent(Toon, Indent.Value);
+			}
+
+			Toon.Append(Encode(Name));
+
+			if (Value is Array A)
+			{
+				int i, c = A.Length;
+
+				Toon.Append('[');
+				Toon.Append(c.ToString());
+				Toon.Append("]:");
+
+				if (AppendSpaces)
+					Toon.Append(' ');
+
+				if (Indent.HasValue)
+					Indent++;
+
+				for (i = 0; i < c; i++)
+				{
+					if (i > 0)
+					{
+						if (AppendSpaces)
+							Toon.Append(", ");
+						else
+							Toon.Append(',');
+					}
+
+					Encode(A.GetValue(i), Indent, Toon);
+				}
+			}
+			else if (Value is IEnumerable Enumerable)
+			{
+				int c = 0;
+				bool First = true;
+
+				IEnumerator e = Enumerable.GetEnumerator();
+
+				while (e.MoveNext())
+					c++;
+
+				Toon.Append('[');
+				Toon.Append(c.ToString());
+				Toon.Append("]:");
+
+				if (AppendSpaces)
+					Toon.Append(' ');
+
+				if (Indent.HasValue)
+					Indent++;
+
+				e.Reset();
+				while (e.MoveNext())
+				{
+					if (First)
+						First = false;
+					else
+					{
+						if (AppendSpaces)
+							Toon.Append(", ");
+						else
+							Toon.Append(',');
+					}
+
+					Encode(e.Current, Indent, Toon);
+				}
+			}
+			else
+			{
+				Toon.Append(':');
+
+				if (AppendSpaces)
+					Toon.Append(' ');
+
+				Encode(Value, Indent, Toon);
 			}
 		}
 
@@ -271,20 +279,7 @@ namespace Waher.Content.Toon
 					else
 						Toon.Append(',');
 
-					if (Indent.HasValue)
-					{
-						Toon.Append('\n');
-						Toon.Append(new string('\t', Indent.Value));
-					}
-
-					Toon.Append('"');
-					Toon.Append(Encode(Member.Key));
-					Toon.Append("\": ");
-
-					if (Indent.HasValue)
-						Toon.Append(' ');
-
-					Encode(Member.Value.AssociatedObjectValue, Indent, Toon);
+					EncodeMember(Member.Key, Member.Value.AssociatedObjectValue, Indent, Toon);
 				}
 			}
 
@@ -292,10 +287,10 @@ namespace Waher.Content.Toon
 			{
 				Indent--;
 
-				if (!First)
+				if (!First && Indent.Value > 0)
 				{
 					Toon.Append('\n');
-					Toon.Append(new string('\t', Indent.Value));
+					JSON.Indent(Toon, Indent.Value);
 				}
 			}
 

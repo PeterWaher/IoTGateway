@@ -51,7 +51,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			this.start = Start;
 			this.end = End;
 			this.indent = Indent;
-			this.indentString = this.indent <= 0 ? string.Empty : new string('\t', this.indent);
+			this.indentString = JSON.IndentString(this.indent);
 			this.language = Language;
 		}
 

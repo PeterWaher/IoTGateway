@@ -46,7 +46,7 @@ namespace Waher.Content.Asn1
 			{
 				this.ExportingValues = false;
 
-				Output.Append(Model.Asn1Node.Tabs(this.ExportingValuesIndent - 1));
+				JSON.Indent(Output, this.ExportingValuesIndent - 1);
 				Output.AppendLine("}");
 				Output.AppendLine();
 			}

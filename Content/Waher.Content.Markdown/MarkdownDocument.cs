@@ -639,7 +639,7 @@ namespace Waher.Content.Markdown
 							}
 							else
 							{
-								s = new string('\t', Block.Indent - c);
+								s = JSON.IndentString(Block.Indent - c);
 								for (j = Block.Start; j <= Block.End; j++)
 									CodeBlock.Add(s + Block.Rows[j]);
 							}

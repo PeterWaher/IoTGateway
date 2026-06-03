@@ -54,7 +54,7 @@ namespace Waher.Content.Json.ReferenceTypes
 				if (Indent.HasValue)
 				{
 					Json.AppendLine();
-					Json.Append(new string('\t', Indent.Value));
+					JSON.Indent(Json, Indent.Value);
 					Indent++;
 				}
 
@@ -68,7 +68,7 @@ namespace Waher.Content.Json.ReferenceTypes
 					if (Indent.HasValue)
 					{
 						Json.AppendLine();
-						Json.Append(new string('\t', Indent.Value));
+						JSON.Indent(Json, Indent.Value);
 					}
 
 					Json.Append('"');
@@ -81,7 +81,7 @@ namespace Waher.Content.Json.ReferenceTypes
 				{
 					Indent--;
 					Json.AppendLine();
-					Json.Append(new string('\t', Indent.Value));
+					JSON.Indent(Json, Indent.Value);
 				}
 
 				Json.Append('}');
@@ -95,7 +95,7 @@ namespace Waher.Content.Json.ReferenceTypes
 				if (Rows > 0 && Columns > 0)
 				{
 					Json.AppendLine();
-					Json.Append(new string('\t', Indent.Value));
+					JSON.Indent(Json, Indent.Value);
 				}
 			}
 

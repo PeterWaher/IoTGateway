@@ -68,16 +68,16 @@ namespace Waher.Content.Asn1.Model
 				{
 					State.ExportingValues = true;
 
-					Output.Append(Tabs(Indent));
+					JSON.Indent(Output, Indent);
 					Output.AppendLine("public static partial class Values");
 
-					Output.Append(Tabs(Indent));
+					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
 
 					State.ExportingValuesIndent = Indent + 1;
 				}
 
-				Output.Append(Tabs(State.ExportingValuesIndent));
+				JSON.Indent(Output, State.ExportingValuesIndent);
 				Output.Append("public static readonly ");
 
 				await this.type.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);

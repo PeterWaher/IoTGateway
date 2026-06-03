@@ -51,10 +51,10 @@ namespace Waher.Content.Toon.ReferenceTypes
 				if (y > 0)
 					Toon.Append(',');
 
-				if (Indent.HasValue)
+				if (Indent.HasValue && Indent.Value > 0)
 				{
-					Toon.AppendLine();
-					Toon.Append(new string('\t', Indent.Value));
+					Toon.Append('\n');
+					JSON.Indent(Toon, Indent.Value);
 					Indent++;
 				}
 
@@ -65,10 +65,10 @@ namespace Waher.Content.Toon.ReferenceTypes
 					if (x > 0)
 						Toon.Append(',');
 
-					if (Indent.HasValue)
+					if (Indent.HasValue && Indent.Value > 0)
 					{
-						Toon.AppendLine();
-						Toon.Append(new string('\t', Indent.Value));
+						Toon.Append('\n');
+						JSON.Indent(Toon, Indent.Value);
 					}
 
 					Toon.Append('"');
@@ -80,8 +80,12 @@ namespace Waher.Content.Toon.ReferenceTypes
 				if (Indent.HasValue)
 				{
 					Indent--;
-					Toon.AppendLine();
-					Toon.Append(new string('\t', Indent.Value));
+
+					if (Indent.Value > 0)
+					{
+						Toon.Append('\n');
+						JSON.Indent(Toon, Indent.Value);
+					}
 				}
 
 				Toon.Append('}');
@@ -92,10 +96,10 @@ namespace Waher.Content.Toon.ReferenceTypes
 			{
 				Indent--;
 
-				if (Rows > 0 && Columns > 0)
+				if (Rows > 0 && Columns > 0 && Indent.Value > 0)
 				{
-					Toon.AppendLine();
-					Toon.Append(new string('\t', Indent.Value));
+					Toon.Append('\n');
+					JSON.Indent(Toon, Indent.Value);
 				}
 			}
 

@@ -44,7 +44,7 @@ namespace Waher.Content.Json.ReferenceTypes
 				if (Indent.HasValue)
 				{
 					Json.AppendLine();
-					Json.Append(new string('\t', Indent.Value));
+					JSON.Indent(Json, Indent.Value);
 				}
 
 				JSON.Encode(Element.AssociatedObjectValue, Indent, Json);
@@ -57,7 +57,7 @@ namespace Waher.Content.Json.ReferenceTypes
 				if (!First)
 				{
 					Json.AppendLine();
-					Json.Append(new string('\t', Indent.Value));
+					JSON.Indent(Json, Indent.Value);
 				}
 			}
 

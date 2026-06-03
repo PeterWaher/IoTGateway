@@ -524,9 +524,9 @@ namespace Waher.Content
 		/// <summary>
 		/// Characters to escape when encoding strings for JSON.
 		/// </summary>
-		private static readonly char[] jsonCharactersToEscape = new char[] 
+		private static readonly char[] jsonCharactersToEscape = new char[]
 		{
-			'\\', 
+			'\\',
 			'"',
 			'\x00',
 			'\x01',
@@ -566,8 +566,8 @@ namespace Waher.Content
 		/// Escape sequences for characters to escape when encoding strings for JSON.
 		/// </summary>
 		private static readonly string[] jsonCharacterEscapes = new string[]
-		{ 
-			"\\\\", 
+		{
+			"\\\\",
 			"\\\"",
 			"\\u0000",
 			"\\u0001",
@@ -671,7 +671,7 @@ namespace Waher.Content
 					if (Indent.HasValue)
 					{
 						Json.AppendLine();
-						Json.Append(new string('\t', Indent.Value));
+						JSON.Indent(Json, Indent.Value);
 					}
 
 					Json.Append('"');
@@ -697,7 +697,7 @@ namespace Waher.Content
 					if (Indent.HasValue)
 					{
 						Json.AppendLine();
-						Json.Append(new string('\t', Indent.Value));
+						JSON.Indent(Json, Indent.Value);
 					}
 
 					Json.Append('"');
@@ -718,12 +718,66 @@ namespace Waher.Content
 				if (!First)
 				{
 					Json.AppendLine();
-					Json.Append(new string('\t', Indent.Value));
+					JSON.Indent(Json, Indent.Value);
 				}
 			}
 
 			Json.Append('}');
 		}
+
+		/// <summary>
+		/// Appends an indentation to a string builder using tab characters.
+		/// </summary>
+		/// <param name="Output">String being built.</param>
+		/// <param name="NrTabs">Number of tab characters to append.</param>
+		public static void Indent(StringBuilder Output, int NrTabs)
+		{
+			if (NrTabs > 0)
+			{
+				if (NrTabs > nrIndentationStrings)
+					Output.Append(IndentString(NrTabs));
+				else
+					Output.Append(indentationStrings[NrTabs - 1]);
+			}
+		}
+
+		/// <summary>
+		/// Gets an indentation string consisting of a number of tab characters.
+		/// Strings are caches and reused to minimize memory allocations and 
+		/// garbage collection.
+		/// </summary>
+		/// <param name="NrTabs">Number of tab characters</param>
+		/// <returns>Indentation string</returns>
+		public static string IndentString(int NrTabs)
+		{
+			if (NrTabs > 0)
+			{
+				if (NrTabs > nrIndentationStrings)
+				{
+					string[] Strings = new string[NrTabs];
+
+					for (int i = 0; i < NrTabs; i++)
+						Strings[i] = new string('\t', i + 1);
+
+					lock (indentationStringsSynch)
+					{
+						if (NrTabs > nrIndentationStrings)
+						{
+							nrIndentationStrings = NrTabs;
+							indentationStrings = Strings;
+						}
+					}
+				}
+
+				return indentationStrings[NrTabs - 1];
+			}
+			else
+				return string.Empty;
+		}
+
+		private static int nrIndentationStrings = 0;
+		private static string[] indentationStrings = Array.Empty<string>();
+		private static readonly object indentationStringsSynch = new object();
 
 		/// <summary>
 		/// Encodes an object as JSON.
@@ -752,7 +806,7 @@ namespace Waher.Content
 					if (Indent.HasValue)
 					{
 						Json.AppendLine();
-						Json.Append(new string('\t', Indent.Value));
+						JSON.Indent(Json, Indent.Value);
 					}
 
 					Json.Append('"');
@@ -773,7 +827,7 @@ namespace Waher.Content
 				if (!First)
 				{
 					Json.AppendLine();
-					Json.Append(new string('\t', Indent.Value));
+					JSON.Indent(Json, Indent.Value);
 				}
 			}
 

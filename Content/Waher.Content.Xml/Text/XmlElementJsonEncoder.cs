@@ -112,7 +112,7 @@ namespace Waher.Content.Xml.Text
 				if (!First)
 				{
 					Json.AppendLine();
-					Json.Append(new string('\t', Indent.Value));
+					JSON.Indent(Json, Indent.Value);
 				}
 			}
 
@@ -130,7 +130,7 @@ namespace Waher.Content.Xml.Text
 			if (Indent.HasValue)
 			{
 				Json.AppendLine();
-				Json.Append(new string('\t', Indent.Value));
+				JSON.Indent(Json, Indent.Value);
 			}
 
 			Json.Append('"');

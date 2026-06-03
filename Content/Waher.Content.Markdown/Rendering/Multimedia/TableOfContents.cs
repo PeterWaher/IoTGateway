@@ -145,7 +145,7 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 						{
 							ItemNr++;
 							if (LastLevel > 1)
-								Output.Append(new string('\t', LastLevel - 1));
+								JSON.Indent(Output, LastLevel - 1);
 							Output.Append(ItemNr.ToString());
 							Output.AppendLine(".\t");
 						}
@@ -170,7 +170,7 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 				ItemNr++;
 
 				if (LastLevel > 1)
-					Output.Append(new string('\t', LastLevel - 1));
+					JSON.Indent(Output, LastLevel - 1);
 				Output.Append(ItemNr.ToString());
 				Output.Append(".\t");
 

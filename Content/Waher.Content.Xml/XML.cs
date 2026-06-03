@@ -384,7 +384,7 @@ namespace Waher.Content.Xml
 				{
 					Indent--;
 					Xml.AppendLine();
-					Xml.Append(new string('\t', Indent.Value));
+					JSON.Indent(Xml, Indent.Value);
 				}
 
 				Xml.Append("</");
@@ -503,7 +503,7 @@ namespace Waher.Content.Xml
 			if (Indent.HasValue)
 			{
 				Xml.AppendLine();
-				Xml.Append(new string('\t', Indent.Value));
+				JSON.Indent(Xml, Indent.Value);
 			}
 
 			if (Value is byte[] ByteArray)
@@ -539,7 +539,7 @@ namespace Waher.Content.Xml
 					if (Indent.HasValue)
 					{
 						Xml.AppendLine();
-						Xml.Append(new string('\t', Indent.Value));
+						JSON.Indent(Xml, Indent.Value);
 						Indent++;
 					}
 
@@ -550,7 +550,7 @@ namespace Waher.Content.Xml
 						if (Indent.HasValue)
 						{
 							Xml.AppendLine();
-							Xml.Append(new string('\t', Indent.Value));
+							JSON.Indent(Xml, Indent.Value);
 						}
 
 						EncodeChildElement(Encode(Names[x]), M.GetElement(x, y).AssociatedObjectValue, true, Indent, Xml);
@@ -560,7 +560,7 @@ namespace Waher.Content.Xml
 					{
 						Indent--;
 						Xml.AppendLine();
-						Xml.Append(new string('\t', Indent.Value));
+						JSON.Indent(Xml, Indent.Value);
 					}
 
 					Xml.Append("</Record>");
@@ -573,7 +573,7 @@ namespace Waher.Content.Xml
 					if (Rows > 0 && Columns > 0)
 					{
 						Xml.AppendLine();
-						Xml.Append(new string('\t', Indent.Value));
+						JSON.Indent(Xml, Indent.Value);
 					}
 				}
 
@@ -599,7 +599,7 @@ namespace Waher.Content.Xml
 					if (Indent.HasValue)
 					{
 						Xml.AppendLine();
-						Xml.Append(new string('\t', Indent.Value));
+						JSON.Indent(Xml, Indent.Value);
 					}
 
 					object Obj3 = Element.AssociatedObjectValue;
@@ -614,7 +614,7 @@ namespace Waher.Content.Xml
 				{
 					Indent--;
 					Xml.AppendLine();
-					Xml.Append(new string('\t', Indent.Value));
+					JSON.Indent(Xml, Indent.Value);
 				}
 
 				Xml.Append("</");
@@ -656,7 +656,7 @@ namespace Waher.Content.Xml
 					if (Indent.HasValue)
 					{
 						Xml.AppendLine();
-						Xml.Append(new string('\t', Indent.Value));
+						JSON.Indent(Xml, Indent.Value);
 					}
 
 					object Obj3 = e.Current;
@@ -671,7 +671,7 @@ namespace Waher.Content.Xml
 				{
 					Indent--;
 					Xml.AppendLine();
-					Xml.Append(new string('\t', Indent.Value));
+					JSON.Indent(Xml, Indent.Value);
 				}
 
 				Xml.Append("</");

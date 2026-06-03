@@ -241,7 +241,7 @@ namespace Waher.Content
 						{
 							Pos--;
 							string s = Json.Substring(Start, Pos - Start);
-							else if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out double d))
+							if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out double d))
 								return d;
 							else if (decimal.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal dec))
 								return dec;

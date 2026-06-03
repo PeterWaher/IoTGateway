@@ -13,6 +13,48 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\Encode\arrays-nested.json" />
+    <None Remove="Data\Encode\arrays-objects.json" />
+    <None Remove="Data\Encode\arrays-primitive.json" />
+    <None Remove="Data\Encode\arrays-tabular.json" />
+    <None Remove="Data\Encode\delimiters.json" />
+    <None Remove="Data\Encode\key-folding.json" />
+    <None Remove="Data\Encode\objects.json" />
+    <None Remove="Data\Encode\primitives.json" />
+    <None Remove="Data\Encode\whitespace.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Data\Encode\arrays-nested.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Encode\arrays-objects.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Encode\arrays-primitive.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Encode\arrays-tabular.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Encode\delimiters.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Encode\key-folding.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Encode\objects.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Encode\primitives.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Encode\whitespace.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Waher.Content.Toon\Waher.Content.Toon.csproj" />
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
   </ItemGroup>

@@ -73,7 +73,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 
 					Toon.Append('"');
 					Toon.Append(TOON.Encode(Names[x]));
-					Toon.Append("\":");
+					Toon.Append("\": ");
 					TOON.Encode(M.GetElement(x, y).AssociatedObjectValue, Indent, Toon);
 				}
 

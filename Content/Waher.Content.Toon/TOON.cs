@@ -36,12 +36,35 @@ namespace Waher.Content.Toon
 		/// <returns>Encoded string.</returns>
 		public static string Encode(string s)
 		{
-			return CommonTypes.Escape(s, toonCharactersToEscape, toonCharacterEscapes);
+			switch (s)
+			{
+				case null:
+				case "":
+					return "\"\"";
+
+				case "true":
+					return "\"true\"";
+
+				case "false":
+					return "\"false\"";
+
+				case "null":
+					return "\"null\"";
+
+				default:
+					if (CommonTypes.TryParse(s, out double _))
+						return "\"" + s + "\"";
+
+					if (JSON.ContainsEscapeCharacters(s))
+						return "\"" + JSON.Encode(s) + "\"";
+
+					return CommonTypes.Escape(s, toonCharactersToEscape, toonCharacterEscapes);
+			}
 		}
 
-		private static readonly char[] toonCharactersToEscape = new char[] 
+		private static readonly char[] toonCharactersToEscape = new char[]
 		{
-			'\\', 
+			'\\',
 			'"',
 			'\x00',
 			'\x01',
@@ -77,7 +100,7 @@ namespace Waher.Content.Toon
 			'\x1f'
 		};
 		private static readonly string[] toonCharacterEscapes = new string[]
-		{ 
+		{
 			" ",
 			" ",
 			" ",
@@ -184,7 +207,7 @@ namespace Waher.Content.Toon
 					}
 
 					Toon.Append(Encode(Member.Key));
-					Toon.Append(':');
+					Toon.Append(": ");
 
 					Encode(Member.Value, Indent, Toon);
 				}
@@ -206,7 +229,7 @@ namespace Waher.Content.Toon
 					}
 
 					Toon.Append(Encode(Member.Key));
-					Toon.Append(':');
+					Toon.Append(": ");
 
 					Encode(Member.Value, Indent, Toon);
 				}
@@ -256,7 +279,7 @@ namespace Waher.Content.Toon
 
 					Toon.Append('"');
 					Toon.Append(Encode(Member.Key));
-					Toon.Append("\":");
+					Toon.Append("\": ");
 
 					if (Indent.HasValue)
 						Toon.Append(' ');

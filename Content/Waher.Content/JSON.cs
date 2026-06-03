@@ -510,6 +510,20 @@ namespace Waher.Content
 			return CommonTypes.Escape(s, jsonCharactersToEscape, jsonCharacterEscapes);
 		}
 
+		/// <summary>
+		/// If a string contains characters that need to be escaped to be encoded into
+		/// JSON.
+		/// </summary>
+		/// <param name="s">String to check.</param>
+		/// <returns>If the string contains characters that need escaping.</returns>
+		public static bool ContainsEscapeCharacters(string s)
+		{
+			return (s?.IndexOfAny(jsonCharactersToEscape) ?? -1) >= 0;
+		}
+
+		/// <summary>
+		/// Characters to escape when encoding strings for JSON.
+		/// </summary>
 		private static readonly char[] jsonCharactersToEscape = new char[] 
 		{
 			'\\', 
@@ -547,6 +561,10 @@ namespace Waher.Content
 			'\x1e',
 			'\x1f'
 		};
+
+		/// <summary>
+		/// Escape sequences for characters to escape when encoding strings for JSON.
+		/// </summary>
 		private static readonly string[] jsonCharacterEscapes = new string[]
 		{ 
 			"\\\\", 

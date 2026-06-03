@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
+using Waher.Content.Html.Elements;
 using Waher.Content.Markdown.Rendering;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
@@ -99,7 +101,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 							Name = System.Net.WebUtility.UrlDecode(Part.Substring(0, i));
 							Value = System.Net.WebUtility.UrlDecode(Part.Substring(i + 1));
 
-							if (CommonTypes.TryParse(Value, out double d))
+							if (double.TryParse(Value, NumberStyles.Float, CultureInfo.InvariantCulture, out double d))
 								Variables[Name] = d;
 							else if (bool.TryParse(Value, out bool b))
 								Variables[Name] = b;

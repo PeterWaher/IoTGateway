@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
@@ -56,7 +56,7 @@ namespace Waher.Content.Toon
 					return "\"-\"";
 
 				default:
-					if (CommonTypes.TryParse(s, out double _))
+					if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
 						return "\"" + s + "\"";
 
 					if (JSON.ContainsEscapeCharacters(s))

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -197,7 +198,7 @@ namespace Waher.Content.Markdown.Functions
 				await Element.Render(Renderer2);
 				string s = Renderer2.ToString().Trim();
 
-				if (CommonTypes.TryParse(s, out double d))
+				if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out double d))
 					return new DoubleNumber(d);
 				else if (CommonTypes.TryParse(s, out bool b))
 					return new BooleanValue(b);

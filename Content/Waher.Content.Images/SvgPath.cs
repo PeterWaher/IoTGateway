@@ -1,5 +1,6 @@
 ﻿using SkiaSharp;
 using System;
+using System.Globalization;
 using System.Text;
 
 namespace Waher.Content.Images
@@ -247,7 +248,7 @@ namespace Waher.Content.Images
 								case '\r':
 								case '\n':
 								case ',':
-									if (!CommonTypes.TryParse(sb.ToString(), out float f))
+									if (!float.TryParse(sb.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out float f))
 									{
 										Result.Dispose();
 										throw new Exception("Invalid number: " + sb.ToString());
@@ -283,7 +284,7 @@ namespace Waher.Content.Images
 									break;
 
 								default:
-									if (!CommonTypes.TryParse(sb.ToString(), out f))
+									if (!float.TryParse(sb.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out f))
 									{
 										Result.Dispose();
 										throw new Exception("Invalid number: " + sb.ToString());

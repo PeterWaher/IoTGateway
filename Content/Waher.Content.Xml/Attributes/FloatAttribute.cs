@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Globalization;
+using System.Xml;
 using Waher.Script;
 
 namespace Waher.Content.Xml.Attributes
@@ -63,7 +64,7 @@ namespace Waher.Content.Xml.Attributes
 		/// <returns>If the value could be parsed.</returns>
 		public override bool TryParse(string StringValue, out float Value)
 		{
-			return CommonTypes.TryParse(StringValue, out Value);
+			return float.TryParse(StringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out Value);
 		}
 
 		/// <summary>

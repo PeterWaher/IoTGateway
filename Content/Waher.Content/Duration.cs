@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Waher.Script.Functions.DateAndTime;
@@ -117,7 +118,7 @@ namespace Waher.Content
 		{
 			if (string.IsNullOrEmpty(s))
 				return 0;
-			else if (CommonTypes.TryParse(s, out double Result))
+			else if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out double Result))
 				return Result;
 			else
 				throw new ArgumentException("Invalid double number.", nameof(s));

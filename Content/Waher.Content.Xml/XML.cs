@@ -10,6 +10,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
 using Waher.Runtime.Collections;
+using System.Globalization;
 
 namespace Waher.Content.Xml
 {
@@ -1034,7 +1035,7 @@ namespace Waher.Content.Xml
 		{
 			if (E.HasAttribute(Name))
 			{
-				if (CommonTypes.TryParse(E.GetAttribute(Name), out double Result))
+				if (double.TryParse(E.GetAttribute(Name), NumberStyles.Float, CultureInfo.InvariantCulture, out double Result))
 					return Result;
 				else
 					return DefaultValue;
@@ -1054,7 +1055,7 @@ namespace Waher.Content.Xml
 		{
 			if (E.HasAttribute(Name))
 			{
-				if (CommonTypes.TryParse(E.GetAttribute(Name), out decimal Result))
+				if (decimal.TryParse(E.GetAttribute(Name), NumberStyles.Float, CultureInfo.InvariantCulture, out decimal Result))
 					return Result;
 				else
 					return DefaultValue;

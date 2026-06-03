@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using Waher.Content.Json;
 using Waher.Runtime.Collections;
@@ -222,9 +223,9 @@ namespace Waher.Content
 								return i;
 							else if (long.TryParse(s, out long l))
 								return l;
-							else if (CommonTypes.TryParse(s, out double d))
+							else if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out double d))
 								return d;
-							else if (CommonTypes.TryParse(s, out decimal dec))
+							else if (decimal.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal dec))
 								return dec;
 							else
 								throw new Exception("Invalid JSON.");
@@ -240,9 +241,9 @@ namespace Waher.Content
 						{
 							Pos--;
 							string s = Json.Substring(Start, Pos - Start);
-							if (CommonTypes.TryParse(s, out double d))
+							else if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out double d))
 								return d;
-							else if (CommonTypes.TryParse(s, out decimal dec))
+							else if (decimal.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal dec))
 								return dec;
 							else
 								throw new Exception("Invalid JSON.");
@@ -263,9 +264,9 @@ namespace Waher.Content
 						{
 							Pos--;
 							string s = Json.Substring(Start, Pos - Start);
-							if (CommonTypes.TryParse(s, out double d))
+							if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out double d))
 								return d;
-							else if (CommonTypes.TryParse(s, out decimal dec))
+							else if (decimal.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal dec))
 								return dec;
 							else
 								throw new Exception("Invalid JSON.");
@@ -453,9 +454,9 @@ namespace Waher.Content
 					return i;
 				else if (long.TryParse(s, out long l))
 					return l;
-				else if (CommonTypes.TryParse(s, out double d))
+				else if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out double d))
 					return d;
-				else if (CommonTypes.TryParse(s, out decimal dec))
+				else if (decimal.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal dec))
 					return dec;
 				else
 					throw new Exception("Invalid JSON.");
@@ -463,9 +464,9 @@ namespace Waher.Content
 			else if (State == 2)
 			{
 				string s = Json.Substring(Start, Pos - Start);
-				if (CommonTypes.TryParse(s, out double d))
+				if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out double d))
 					return d;
-				else if (CommonTypes.TryParse(s, out decimal dec))
+				else if (decimal.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal dec))
 					return dec;
 				else
 					throw new Exception("Invalid JSON.");
@@ -473,9 +474,9 @@ namespace Waher.Content
 			else if (State == 4)
 			{
 				string s = Json.Substring(Start, Pos - Start);
-				if (CommonTypes.TryParse(s, out double d))
+				if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out double d))
 					return d;
-				else if (CommonTypes.TryParse(s, out decimal dec))
+				else if (decimal.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal dec))
 					return dec;
 				else
 					throw new Exception("Invalid JSON.");

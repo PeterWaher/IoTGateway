@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Text;
 using Waher.Runtime.Inventory;
-using Waher.Script.Units.DerivedQuantities;
 
 namespace Waher.Content.Toon.ValueTypes
 {

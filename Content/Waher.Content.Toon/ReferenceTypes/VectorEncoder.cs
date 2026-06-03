@@ -9,13 +9,25 @@ namespace Waher.Content.Toon.ReferenceTypes
 	/// <summary>
 	/// Encodes <see cref="IVector"/> values.
 	/// </summary>
-	public class VectorEncoder : IToonEncoder
+	public class VectorEncoder : IToonVectorEncoder
 	{
 		/// <summary>
 		/// Encodes <see cref="IVector"/> values.
 		/// </summary>
 		public VectorEncoder()
 		{
+		}
+
+		/// <summary>
+		/// Gets the number of elements in the vector.
+		/// </summary>
+		/// <param name="Vector">Vector object.</param>
+		/// <returns>Number of elements in the vector. If null is returned, the
+		/// <paramref name="Vector"/> item should not be considered a vector.</returns>
+		public int? GetCount(object Vector)
+		{
+			IVector V = (IVector)Vector;
+			return V.Dimension;
 		}
 
 		/// <summary>
@@ -26,13 +38,28 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Toon">TOON output.</param>
 		public void Encode(object Object, int? Indent, StringBuilder Toon)
 		{
+			this.Encode(Object, Indent, Toon, true);
+		}
+
+		/// <summary>
+		/// Encodes the <paramref name="Object"/> to TOON.
+		/// </summary>
+		/// <param name="Object">Object to encode.</param>
+		/// <param name="Indent">Any indentation to apply.</param>
+		/// <param name="Toon">TOON output.</param>
+		/// <param name="UseBrackets">If brackets should be used around the vector.</param>
+		public void Encode(object Object, int? Indent, StringBuilder Toon, bool UseBrackets)
+		{
 			IVector V = (IVector)Object;
 			bool First = true;
 
-			Toon.Append('[');
+			if (UseBrackets)
+			{
+				Toon.Append('[');
 
-			if (Indent.HasValue)
-				Indent++;
+				if (Indent.HasValue)
+					Indent++;
+			}
 
 			foreach (IElement Element in V.VectorElements)
 			{
@@ -41,27 +68,35 @@ namespace Waher.Content.Toon.ReferenceTypes
 				else
 					Toon.Append(',');
 
-				if (Indent.HasValue && Indent.Value > 0)
+				if (UseBrackets)
 				{
-					Toon.Append('\n');
-					JSON.Indent(Toon, Indent.Value);
-				}
+					if (Indent.HasValue && Indent.Value > 0)
+					{
+						Toon.Append('\n');
+						JSON.Indent(Toon, Indent.Value);
+					}
 
-				TOON.Encode(Element.AssociatedObjectValue, Indent, Toon);
+					TOON.Encode(Element.AssociatedObjectValue, Indent, Toon);
+				}
+				else
+					TOON.Encode(Element.AssociatedObjectValue, null, Toon);
 			}
 
-			if (Indent.HasValue)
+			if (UseBrackets)
 			{
-				Indent--;
-
-				if (!First && Indent.Value > 0)
+				if (Indent.HasValue)
 				{
-					Toon.Append('\n');
-					JSON.Indent(Toon, Indent.Value);
-				}
-			}
+					Indent--;
 
-			Toon.Append(']');
+					if (!First && Indent.Value > 0)
+					{
+						Toon.Append('\n');
+						JSON.Indent(Toon, Indent.Value);
+					}
+				}
+
+				Toon.Append(']');
+			}
 		}
 
 		/// <summary>

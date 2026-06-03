@@ -62,7 +62,7 @@ namespace Waher.Content.Toon
 					if (JSON.ContainsEscapeCharacters(s))
 						return "\"" + JSON.Encode(s) + "\"";
 
-					if (s.StartsWith("[") || s.StartsWith("- "))
+					if (s.StartsWith("[") || s.StartsWith("{") || s.StartsWith("- "))
 						return "\"" + s + "\"";
 
 					return s;
@@ -181,78 +181,55 @@ namespace Waher.Content.Toon
 
 			Toon.Append(Encode(Name));
 
-			if (Value is Array A)
+			if (Value is null)
 			{
-				int i, c = A.Length;
-
-				Toon.Append('[');
-				Toon.Append(c.ToString());
-				Toon.Append("]:");
-
 				if (AppendSpaces)
-					Toon.Append(' ');
+					Toon.Append(": ");
+				else
+					Toon.Append(':');
 
-				if (Indent.HasValue)
-					Indent++;
+				Toon.Append("null");
+				return;
+			}
 
-				for (i = 0; i < c; i++)
+			Type T = Value.GetType();
+			IToonEncoder Encoder;
+
+			lock (encoders)
+			{
+				if (!encoders.TryGetValue(T, out Encoder))
 				{
-					if (i > 0)
-					{
-						if (AppendSpaces)
-							Toon.Append(", ");
-						else
-							Toon.Append(',');
-					}
+					Encoder = Types.FindBest<IToonEncoder, Type>(T)
+						?? throw new ArgumentException("Unable to encode objects of type " + T.FullName, nameof(Object));
 
-					Encode(A.GetValue(i), Indent, Toon);
+					encoders[T] = Encoder;
 				}
 			}
-			else if (Value is IEnumerable Enumerable)
+
+			if (Encoder is IToonVectorEncoder VectorEncoder)
 			{
-				int c = 0;
-				bool First = true;
+				int c = VectorEncoder.GetCount(Value) ?? -1;
 
-				IEnumerator e = Enumerable.GetEnumerator();
-
-				while (e.MoveNext())
-					c++;
-
-				Toon.Append('[');
-				Toon.Append(c.ToString());
-				Toon.Append("]:");
-
-				if (AppendSpaces)
-					Toon.Append(' ');
-
-				if (Indent.HasValue)
-					Indent++;
-
-				e.Reset();
-				while (e.MoveNext())
+				if (c > 0)
 				{
-					if (First)
-						First = false;
-					else
-					{
-						if (AppendSpaces)
-							Toon.Append(", ");
-						else
-							Toon.Append(',');
-					}
+					Toon.Append('[');
+					Toon.Append(c.ToString());
+					Toon.Append("]:");
 
-					Encode(e.Current, Indent, Toon);
+					if (AppendSpaces)
+						Toon.Append(' ');
+
+					VectorEncoder.Encode(Value, Indent, Toon, false);
+					return;
 				}
 			}
+
+			if (AppendSpaces)
+				Toon.Append(": ");
 			else
-			{
 				Toon.Append(':');
 
-				if (AppendSpaces)
-					Toon.Append(' ');
-
-				Encode(Value, Indent, Toon);
-			}
+			Encoder.Encode(Value, Indent, Toon);
 		}
 
 		/// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 using Waher.Runtime.Inventory;
 
@@ -24,7 +25,8 @@ namespace Waher.Content.Toon.ValueTypes
 		/// <param name="Toon">TOON output.</param>
 		public void Encode(object Object, int? Indent, StringBuilder Toon)
 		{
-			Toon.Append(CommonTypes.Encode((decimal)Object));
+			decimal d = (decimal)Object;
+			Toon.Append(d.ToString("0.############################", CultureInfo.InvariantCulture));
 		}
 
 		/// <summary>

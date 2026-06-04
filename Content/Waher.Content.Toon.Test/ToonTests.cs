@@ -21,7 +21,7 @@ namespace Waher.Content.Toon.Test
 		/// <param name="JsonTestsFileName">File name of JSON file containing tests.</param>
 		[TestMethod]
 		[DataRow("Data/Encode/primitives.json")]
-		//[DataRow("Data/Encode/whitespace.json")]
+		[DataRow("Data/Encode/whitespace.json")]
 		//[DataRow("Data/Encode/objects.json")]
 		//[DataRow("Data/Encode/delimiters.json")]
 		//[DataRow("Data/Encode/key-folding.json")]
@@ -51,13 +51,13 @@ namespace Waher.Content.Toon.Test
 				Assert.IsTrue(TestDict.TryGetValue("input", out object? Input));
 				Assert.IsNotNull(Input);
 
-				Assert.IsTrue(TestDict.TryGetValue("expected", out object? Output));
-				Assert.IsNotNull(Output);
-				Assert.IsTrue(Output is string);
+				Assert.IsTrue(TestDict.TryGetValue("expected", out object? Expected));
+				Assert.IsNotNull(Expected);
+				Assert.IsTrue(Expected is string);
 
-				string Encoded = TOON.Encode(Input, true);
+				string Output = TOON.Encode(Input, true);
 
-				Assert.AreEqual(Output, Encoded, "Test: " + JsonTestsFileName + ", " + Name);
+				Assert.AreEqual(Expected, Output, "Test: " + JsonTestsFileName + ", " + Name);
 			}
 		}
 	}

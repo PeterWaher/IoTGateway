@@ -173,7 +173,7 @@ namespace Waher.Content.Toon
 		{
 			bool AppendSpaces = Indent.HasValue;
 
-			if (Indent.HasValue && Indent.Value > 0)
+			if (Indent.HasValue && (Indent.Value > 0 || (Indent.Value == 0 && Toon.Length > 0)))
 			{
 				Toon.Append('\n');
 				JSON.Indent(Toon, Indent.Value);

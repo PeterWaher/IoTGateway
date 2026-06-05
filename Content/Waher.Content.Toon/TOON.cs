@@ -118,21 +118,26 @@ namespace Waher.Content.Toon
 		public static void Encode(IEnumerable<KeyValuePair<string, object>> Object, int? Indent, StringBuilder Toon,
 			params KeyValuePair<string, object>[] AdditionalProperties)
 		{
-			bool AppendSpaces = Indent.HasValue;
-
+			bool MultiRow = Indent.HasValue;
 			bool First = true;
 
-			if (AppendSpaces)
+			if (MultiRow)
 				Indent++;
 
 			if (!(Object is null))
 			{
 				foreach (KeyValuePair<string, object> Member in Object)
 				{
-					if (First)
-						First = false;
-					else
-						Toon.Append(',');
+					if (!MultiRow)
+					{
+						if (!MultiRow)
+						{
+							if (First)
+								First = false;
+							else
+								Toon.Append(',');
+						}
+					}
 
 					EncodeMember(Member.Key, Member.Value, Indent, Toon);
 				}
@@ -142,16 +147,22 @@ namespace Waher.Content.Toon
 			{
 				foreach (KeyValuePair<string, object> Member in AdditionalProperties)
 				{
-					if (First)
-						First = false;
-					else
-						Toon.Append(',');
+					if (!MultiRow)
+					{
+						if (!MultiRow)
+						{
+							if (First)
+								First = false;
+							else
+								Toon.Append(',');
+						}
+					}
 
 					EncodeMember(Member.Key, Member.Value, Indent, Toon);
 				}
 			}
 
-			if (AppendSpaces)
+			if (MultiRow)
 			{
 				Indent--;
 
@@ -241,29 +252,29 @@ namespace Waher.Content.Toon
 		/// <param name="Toon">TOON Output.</param>
 		public static void Encode(IEnumerable<KeyValuePair<string, IElement>> Object, int? Indent, StringBuilder Toon)
 		{
-			bool AppendSpaces = Indent.HasValue;
-
+			bool MultiRow = Indent.HasValue;
 			bool First = true;
 
-			Toon.Append('{');
-
-			if (AppendSpaces)
+			if (MultiRow)
 				Indent++;
 
 			if (!(Object is null))
 			{
 				foreach (KeyValuePair<string, IElement> Member in Object)
 				{
-					if (First)
-						First = false;
-					else
-						Toon.Append(',');
+					if (!MultiRow)
+					{
+						if (First)
+							First = false;
+						else
+							Toon.Append(',');
+					}
 
 					EncodeMember(Member.Key, Member.Value.AssociatedObjectValue, Indent, Toon);
 				}
 			}
 
-			if (AppendSpaces)
+			if (MultiRow)
 			{
 				Indent--;
 
@@ -273,8 +284,6 @@ namespace Waher.Content.Toon
 					JSON.Indent(Toon, Indent.Value);
 				}
 			}
-
-			Toon.Append('}');
 		}
 
 		/// <summary>

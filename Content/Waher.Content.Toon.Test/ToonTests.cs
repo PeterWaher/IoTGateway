@@ -55,7 +55,16 @@ namespace Waher.Content.Toon.Test
 				Assert.IsTrue(Expected is string);
 
 				string Output = TOON.Encode(Input, true);
-				Output = Output.Replace("\t", "  ");
+
+				if (!TestDict.TryGetValue("options", out object? Obj) ||
+					Obj is not Dictionary<string, object> Options ||
+					!Options.TryGetValue("indent", out Obj) ||
+					Obj is not int Indent)
+				{
+					Indent = 2;
+				}
+
+				Output = Output.Replace("\t", new string(' ', Indent));
 
 				Assert.AreEqual(Expected, Output, "Test: " + JsonTestsFileName + ", " + Name);
 			}

@@ -204,6 +204,8 @@ namespace Waher.Content
 							sb.Append(ch);
 							State += 21;
 						}
+						else if (ch == '/')
+							State += 22;
 						else
 							throw new Exception("Invalid JSON.");
 						break;
@@ -443,6 +445,32 @@ namespace Waher.Content
 							Pos--;
 							return sb.ToString();
 						}
+						break;
+
+					case 22:    // First comment character received.
+						if (ch == '/')
+							State++;
+						else if (ch == '*')
+							State += 2;
+						else
+							throw new Exception("Invalid JSON.");
+						break;
+
+					case 23:    // Comment, single line.
+						if (ch== '\r' || ch == '\n')
+							State -= 23;
+						break;
+
+					case 24:    // Comment, multi-line
+						if (ch == '*')
+							State++;
+						break;
+
+					case 25:    // Comment, multi-line, asterisk received.
+						if (ch == '/')
+							State -= 25;
+						else if (ch != '*')
+							State--;
 						break;
 				}
 			}

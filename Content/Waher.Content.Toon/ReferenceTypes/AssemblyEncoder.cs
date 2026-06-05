@@ -28,7 +28,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		{
 			Assembly A = (Assembly)Object;
 
-			Toon.Append(TOON.Encode(A.FullName, false));
+			Toon.AppendEncoded(A.FullName, false);
 		}
 
 		/// <summary>

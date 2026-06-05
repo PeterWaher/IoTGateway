@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Operators.Comparisons;
-using Waher.Script.Units.DerivedQuantities;
 
 namespace Waher.Content.Toon
 {
@@ -32,64 +27,6 @@ namespace Waher.Content.Toon
 		}
 
 		#region Encoding
-
-		/// <summary>
-		/// Encodes a string for inclusion in TOON.
-		/// </summary>
-		/// <param name="s">String to encode.</param>
-		/// <param name="InObject">If the string is part of an object construct.</param>
-		/// <returns>Encoded string.</returns>
-		public static string Encode(string s, bool InObject)
-		{
-			switch (s)
-			{
-				case null:
-				case "":
-					return "\"\"";
-
-				case "true":
-					return "\"true\"";
-
-				case "false":
-					return "\"false\"";
-
-				case "null":
-					return "\"null\"";
-
-				case "-":
-					return "\"-\"";
-
-				default:
-					if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
-						return "\"" + s + "\"";
-
-					if (JSON.ContainsEscapeCharacters(s))
-						return "\"" + JSON.Encode(s) + "\"";
-
-					if (s.StartsWith("[") ||
-						s.StartsWith("{") ||
-						s.StartsWith("-"))
-					{
-						return "\"" + s + "\"";
-					}
-
-					if (InObject)
-					{
-						if (s.IndexOfAny(objectKeyCharacters) >= 0)
-							return "\"" + s + "\"";
-					}
-					else
-					{
-						if (s.IndexOfAny(keyCharacters) >= 0)
-							return "\"" + s + "\"";
-					}
-
-					return s;
-			}
-		}
-
-		private static readonly char[] objectKeyCharacters = new char[] { ':', ',', ' ' };
-		private static readonly char[] keyCharacters = new char[] { ':', ',' };
 
 		/// <summary>
 		/// Encodes an object as TOON.
@@ -214,7 +151,7 @@ namespace Waher.Content.Toon
 				Toon.Indent(Indent.Value);
 			}
 
-			Toon.Append(Encode(Name, true));
+			Toon.AppendEncoded(Name, true);
 
 			if (Value is null)
 			{
@@ -229,114 +166,10 @@ namespace Waher.Content.Toon
 
 			IToonEncoder Encoder = GetEncoder(Value);
 
-			if (Encoder.EncodesVectors)
+			if (Encoder.EncodesAsVector(Value))
 			{
-				int c = Encoder.GetCount(Value) ?? -1;
-
-				if (c > 0)
-				{
-					Toon.Append('[');
-					Toon.Append(c.ToString());
-
-					if (!Toon.StandardDelimiter)
-						Toon.AppendDelimiter();
-
-					Toon.Append(']');
-
-					IEnumerator e = Encoder.GetElements(Value);
-
-					if (!(e is null))
-					{
-						Dictionary<string, object> Parameters = new Dictionary<string, object>();
-						LinkedList<string> ParameterOrder = new LinkedList<string>();
-						LinkedList<Dictionary<string,object>> ParameterSets = new LinkedList<Dictionary<string, object>>();
-
-						while (e.MoveNext())
-						{
-							object Element = e.Current;
-							IToonEncoder ElementEncoder = GetEncoder(Element);
-							IEnumerator<KeyValuePair<string, object>> e2 =
-								ElementEncoder.GetParameters(Element);
-
-							if (e2 is null)
-							{
-								Parameters = null;
-								ParameterOrder = null;
-								ParameterSets = null;
-								break;
-							}
-
-							Dictionary<string,object> ParameterSet = new Dictionary<string, object>();
-
-							while (e2.MoveNext())
-							{
-								KeyValuePair<string, object> P = e2.Current;
-
-								if (!Parameters.ContainsKey(P.Key))
-								{
-									Parameters[P.Key] = P.Value;
-									ParameterOrder.AddLast(P.Key);
-								}
-
-								ParameterSet[P.Key] = P.Value;
-							}
-
-							ParameterSets.AddLast(ParameterSet);
-						}
-
-						if (!(Parameters is null))
-						{
-							bool First = true;
-
-							Toon.Append('{');
-
-							foreach (string ParameterName in ParameterOrder)
-							{
-								if (First)
-									First = false;
-								else
-									Toon.AppendDelimiter();
-
-								Toon.Append(Encode(ParameterName, true));
-							}
-
-							Toon.Append("}:");
-
-							foreach (Dictionary<string, object> ParameterSet in ParameterSets)
-							{
-								Toon.AppendLine();
-								Toon.Indent((Indent ?? 0) + 1);
-
-								First = true;
-
-								foreach (string ParameterName in ParameterOrder)
-								{
-									if (First)
-										First = false;
-									else
-										Toon.AppendDelimiter();
-
-									if (ParameterSet.TryGetValue(ParameterName, out object Element))
-									{
-										IToonEncoder ElementEncoder = GetEncoder(Element);
-										ElementEncoder.Encode(Element, null, Toon);
-									}
-								}
-							}
-
-							return;
-						}
-					}
-
-					Toon.Append(':');
-
-					if (AppendSpaces)
-						Toon.Append(' ');
-
-					Encoder.Encode(Value, Indent, Toon, false);
-
-					return;
-				}
+				Encoder.Encode(Value, Indent, Toon, BracketsMode.Count);
+				return;
 			}
 			else if (Encoder.EncodesMultipleRows || !AppendSpaces)
 				Toon.Append(':');
@@ -346,7 +179,13 @@ namespace Waher.Content.Toon
 			Encoder.Encode(Value, Indent, Toon);
 		}
 
-		private static IToonEncoder GetEncoder(object Value)
+		/// <summary>
+		/// Gets a TOON encoder for a given object, by looking up the best available
+		/// encoder, based on the type of the object.
+		/// </summary>
+		/// <param name="Value">Value to encode.</param>
+		/// <returns>Encoder</returns>
+		public static IToonEncoder GetEncoder(object Value)
 		{
 			Type T = Value?.GetType() ?? typeof(object);
 			IToonEncoder Encoder;

@@ -25,7 +25,7 @@ namespace Waher.Content.Toon.ValueTypes
 		/// <param name="Toon">TOON output.</param>
 		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
-			Toon.Append(TOON.Encode(new string((char)Object, 1), false));
+			Toon.AppendEncoded(new string((char)Object, 1), false);
 		}
 
 		/// <summary>

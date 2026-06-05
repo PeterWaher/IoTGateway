@@ -50,7 +50,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 
 			sb.Append(')');
 
-			Toon.Append(TOON.Encode(sb.ToString(), !Toon.Empty));
+			Toon.AppendEncoded(sb.ToString(), !Toon.Empty);
 		}
 
 		/// <summary>

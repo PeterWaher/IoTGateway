@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
-using Waher.Script.Units.DerivedQuantities;
 
 namespace Waher.Content.Toon
 {
@@ -165,5 +165,74 @@ namespace Waher.Content.Toon
 			this.empty = false;
 			this.output.Append('\n');
 		}
+
+		/// <summary>
+		/// Encodes a string, if necessary, and appends it to the output.
+		/// </summary>
+		/// <param name="s">String to encode.</param>
+		/// <param name="InObject">If the string is part of an object construct.</param>
+		public void AppendEncoded(string s, bool InObject)
+		{
+			this.Append(this.Encode(s, InObject));
+		}
+
+		/// <summary>
+		/// Encodes a string for inclusion in TOON.
+		/// </summary>
+		/// <param name="s">String to encode.</param>
+		/// <param name="InObject">If the string is part of an object construct.</param>
+		/// <returns>Encoded string.</returns>
+		public string Encode(string s, bool InObject)
+		{
+			switch (s)
+			{
+				case null:
+				case "":
+					return "\"\"";
+
+				case "true":
+					return "\"true\"";
+
+				case "false":
+					return "\"false\"";
+
+				case "null":
+					return "\"null\"";
+
+				case "-":
+					return "\"-\"";
+
+				default:
+					if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+						return "\"" + s + "\"";
+
+					if (JSON.ContainsEscapeCharacters(s))
+						return "\"" + JSON.Encode(s) + "\"";
+
+					if (s.StartsWith("[") ||
+						s.StartsWith("{") ||
+						s.StartsWith("-") ||
+						s.IndexOf(this.delimiterCharacter) >= 0)
+					{
+						return "\"" + s + "\"";
+					}
+
+					if (InObject)
+					{
+						if (s.IndexOfAny(objectKeyCharacters) >= 0)
+							return "\"" + s + "\"";
+					}
+					else
+					{
+						if (s.IndexOf(':') >= 0)
+							return "\"" + s + "\"";
+					}
+
+					return s;
+			}
+		}
+
+		private static readonly char[] objectKeyCharacters = new char[] { ':', ' ' };
+
 	}
 }

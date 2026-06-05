@@ -32,17 +32,9 @@ namespace Waher.Content.Toon.Model
 		public abstract bool EncodesMultipleRows { get; }
 
 		/// <summary>
-		/// If the encoder encodes vectors.
+		/// If the encoder encodes a value as a vector.
 		/// </summary>
-		public abstract bool EncodesVectors { get; }
-
-		/// <summary>
-		/// Gets the number of elements in the vector.
-		/// </summary>
-		/// <param name="Vector">Vector object.</param>
-		/// <returns>Number of elements in the vector. If null is returned, the
-		/// <paramref name="Vector"/> item should not be considered a vector.</returns>
-		public abstract int? GetCount(object Vector);
+		public abstract bool EncodesAsVector(object Value);
 
 		/// <summary>
 		/// Encodes the <paramref name="Object"/> to TOON.
@@ -50,8 +42,8 @@ namespace Waher.Content.Toon.Model
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		/// <param name="UseBrackets">If brackets should be used around the vector.</param>
-		public abstract void Encode(object Object, int? Indent, ToonOutput Toon, bool UseBrackets);
+		/// <param name="Brackets">How to manage brackets when encoding vectors.</param>
+		public abstract void Encode(object Object, int? Indent, ToonOutput Toon, BracketsMode Brackets);
 
 		/// <summary>
 		/// Gets an enumerator for the child-elements of an object.

@@ -13,9 +13,9 @@ namespace Waher.Content.Toon.Model
 		public override bool EncodesMultipleRows => false;
 
 		/// <summary>
-		/// If the encoder encodes vectors.
+		/// If the encoder encodes a value as a vector.
 		/// </summary>
-		public override bool EncodesVectors => true;
+		public override bool EncodesAsVector(object Value) => true;
 
 		/// <summary>
 		/// Encodes the <paramref name="Object"/> to TOON.
@@ -25,7 +25,10 @@ namespace Waher.Content.Toon.Model
 		/// <param name="Toon">TOON output.</param>
 		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
-			this.Encode(Object, Indent, Toon, true);	
+			if (Toon.Empty)
+				this.Encode(Object, Indent, Toon, BracketsMode.Count);
+			else
+				this.Encode(Object, Indent, Toon, BracketsMode.Embed);
 		}
 
 		/// <summary>

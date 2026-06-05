@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 using Waher.Content.Toon.Model;
 using Waher.Runtime.Inventory;
@@ -20,35 +21,192 @@ namespace Waher.Content.Toon.ReferenceTypes
 		}
 
 		/// <summary>
-		/// Gets the number of elements in the vector.
-		/// </summary>
-		/// <param name="Vector">Vector object.</param>
-		/// <returns>Number of elements in the vector. If null is returned, the
-		/// <paramref name="Vector"/> item should not be considered a vector.</returns>
-		public override int? GetCount(object Vector)
-		{
-			IVector V = (IVector)Vector;
-			return V.Dimension;
-		}
-
-		/// <summary>
 		/// Encodes the <paramref name="Object"/> to TOON.
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		/// <param name="UseBrackets">If brackets should be used around the vector.</param>
-		public override void Encode(object Object, int? Indent, ToonOutput Toon, bool UseBrackets)
+		/// <param name="Brackets">How to manage brackets when encoding vectors.</param>
+		public override void Encode(object Object, int? Indent, ToonOutput Toon, BracketsMode Brackets)
 		{
 			IVector V = (IVector)Object;
 			bool First = true;
 
-			if (UseBrackets)
+			switch (Brackets)
 			{
-				Toon.Append('[');
+				case BracketsMode.Embed:
+					Toon.Append('[');
 
-				if (Indent.HasValue)
-					Indent++;
+					if (Indent.HasValue)
+						Indent++;
+					break;
+				case BracketsMode.Ignore:
+					break;
+
+				case BracketsMode.Count:
+					
+					Toon.Append('[');
+					Toon.Append(V.Dimension.ToString());
+
+					if (!Toon.StandardDelimiter)
+						Toon.AppendDelimiter();
+
+					Toon.Append(']');
+
+					Dictionary<string, object> Parameters = new Dictionary<string, object>();
+					LinkedList<string> ParameterOrder = new LinkedList<string>();
+					LinkedList<Dictionary<string, object>> ParameterSets = new LinkedList<Dictionary<string, object>>();
+
+					foreach (IElement Element0 in V.VectorElements)
+					{
+						object Element = Element0.AssociatedObjectValue;
+						IToonEncoder ElementEncoder = TOON.GetEncoder(Element);
+						IEnumerator<KeyValuePair<string, object>> e2 =
+							ElementEncoder.GetParameters(Element);
+
+						if (e2 is null)
+						{
+							Parameters = null;
+							ParameterOrder = null;
+							ParameterSets = null;
+							break;
+						}
+
+						Dictionary<string, object> ParameterSet = new Dictionary<string, object>();
+
+						while (e2.MoveNext())
+						{
+							KeyValuePair<string, object> P = e2.Current;
+
+							if (!Parameters.ContainsKey(P.Key))
+							{
+								Parameters[P.Key] = P.Value;
+								ParameterOrder.AddLast(P.Key);
+							}
+
+							ParameterSet[P.Key] = P.Value;
+						}
+
+						ParameterSets.AddLast(ParameterSet);
+					}
+
+					if (!(Parameters is null))
+					{
+						// Arrays of objects
+
+						First = true;
+
+						Toon.Append('{');
+
+						foreach (string ParameterName in ParameterOrder)
+						{
+							if (First)
+								First = false;
+							else
+								Toon.AppendDelimiter();
+
+							Toon.AppendEncoded(ParameterName, true);
+						}
+
+						Toon.Append("}:");
+
+						foreach (Dictionary<string, object> ParameterSet in ParameterSets)
+						{
+							Toon.AppendLine();
+							Toon.Indent((Indent ?? 0) + 1);
+
+							First = true;
+
+							foreach (string ParameterName in ParameterOrder)
+							{
+								if (First)
+									First = false;
+								else
+									Toon.AppendDelimiter();
+
+								if (ParameterSet.TryGetValue(ParameterName, out object Element))
+								{
+									IToonEncoder ElementEncoder = TOON.GetEncoder(Element);
+									ElementEncoder.Encode(Element, null, Toon);
+								}
+							}
+						}
+
+						return;
+					}
+
+					LinkedList<IEnumerator> ElementVectors = new LinkedList<IEnumerator>();
+
+					foreach (IElement Element0 in V.VectorElements)
+					{
+						object Element = Element0.AssociatedObjectValue;
+						IToonEncoder ElementEncoder = TOON.GetEncoder(Element);
+
+						if (!ElementEncoder.EncodesAsVector(Element))
+						{
+							ElementVectors = null;
+							break;
+						}
+
+						IEnumerator e2 = ElementEncoder.GetElements(Element);
+						if (e2 is null)
+						{
+							ElementVectors = null;
+							break;
+						}
+
+						ElementVectors.AddLast(e2);
+					}
+
+					Toon.Append(':');
+
+					if (!(ElementVectors is null))
+					{
+						// Array of arrays
+
+						Indent = Math.Max(Indent ?? 0, 0) + 1;
+
+						foreach (IEnumerator e2 in ElementVectors)
+						{
+							Toon.AppendLine();
+							Toon.Indent(Indent.Value);
+							Toon.Append("- ");
+
+							int Count = 0;
+
+							while (e2.MoveNext())
+								Count++;
+
+							Toon.Append('[');
+							Toon.Append(Count.ToString());
+
+							if (!Toon.StandardDelimiter)
+								Toon.AppendDelimiter();
+
+							Toon.Append("]: ");
+
+							First = true;
+
+							e2.Reset();
+
+							while (e2.MoveNext())
+							{
+								if (First)
+									First = false;
+								else
+									Toon.AppendDelimiter();
+
+								object Element = e2.Current;
+								IToonEncoder ElementEncoder = TOON.GetEncoder(Element);
+								ElementEncoder.Encode(Element, null, Toon);
+							}
+						}
+
+						return;
+					}
+
+					Toon.Append(' ');
+					break;
 			}
 
 			foreach (IElement Element in V.VectorElements)
@@ -58,7 +216,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 				else
 					Toon.AppendDelimiter();
 
-				if (UseBrackets)
+				if (Brackets == BracketsMode.Embed)
 				{
 					if (Indent.HasValue && Indent.Value > 0)
 					{
@@ -72,7 +230,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 					TOON.Encode(Element.AssociatedObjectValue, null, Toon);
 			}
 
-			if (UseBrackets)
+			if (Brackets == BracketsMode.Embed)
 			{
 				if (Indent.HasValue)
 				{

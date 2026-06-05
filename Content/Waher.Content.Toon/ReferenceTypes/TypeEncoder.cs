@@ -27,7 +27,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
 			Type T = (Type)Object;
-			Toon.Append(TOON.Encode(T.FullName, false));
+			Toon.AppendEncoded(T.FullName, false);
 		}
 
 		/// <summary>

@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace Waher.Content.Toon.Model
+﻿namespace Waher.Content.Toon.Model
 {
 	/// <summary>
 	/// Abstract base class for simple TOON encoders.

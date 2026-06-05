@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using Waher.Content.Toon.Model;
 using Waher.Runtime.Inventory;
 
@@ -28,6 +28,16 @@ namespace Waher.Content.Toon.ReferenceTypes
 		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
 			TOON.Encode((IEnumerable<KeyValuePair<string, object>>)Object, Indent, Toon, null);
+		}
+
+		/// <summary>
+		/// Gets available parameters to encode from an object.
+		/// </summary>
+		/// <param name="Object">Object to get parameters from.</param>
+		/// <returns>Enumerator for the parameters, or null if not applicable.</returns>
+		public override IEnumerator<KeyValuePair<string, object>> GetParameters(object Object)
+		{
+			return ((IEnumerable<KeyValuePair<string, object>>)Object).GetEnumerator();
 		}
 
 		/// <summary>

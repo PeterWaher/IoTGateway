@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Operators.Comparisons;
+using Waher.Script.Units.DerivedQuantities;
 
 namespace Waher.Content.Toon
 {
@@ -186,7 +190,7 @@ namespace Waher.Content.Toon
 
 				if (!First && Indent.Value > 0)
 				{
-					Toon.Append('\n');
+					Toon.AppendLine();
 					Toon.Indent(Indent.Value);
 				}
 			}
@@ -206,7 +210,7 @@ namespace Waher.Content.Toon
 
 			if (AppendSpaces && (Indent.Value > 0 || (Indent.Value == 0 && !Toon.Empty)))
 			{
-				Toon.Append('\n');
+				Toon.AppendLine();
 				Toon.Indent(Indent.Value);
 			}
 
@@ -223,19 +227,7 @@ namespace Waher.Content.Toon
 				return;
 			}
 
-			Type T = Value.GetType();
-			IToonEncoder Encoder;
-
-			lock (encoders)
-			{
-				if (!encoders.TryGetValue(T, out Encoder))
-				{
-					Encoder = Types.FindBest<IToonEncoder, Type>(T)
-						?? throw new ArgumentException("Unable to encode objects of type " + T.FullName, nameof(Object));
-
-					encoders[T] = Encoder;
-				}
-			}
+			IToonEncoder Encoder = GetEncoder(Value);
 
 			if (Encoder.EncodesVectors)
 			{
@@ -249,12 +241,100 @@ namespace Waher.Content.Toon
 					if (!Toon.StandardDelimiter)
 						Toon.AppendDelimiter();
 
-					Toon.Append("]:");
+					Toon.Append(']');
+
+					IEnumerator e = Encoder.GetElements(Value);
+
+					if (!(e is null))
+					{
+						Dictionary<string, object> Parameters = new Dictionary<string, object>();
+						LinkedList<string> ParameterOrder = new LinkedList<string>();
+						LinkedList<Dictionary<string,object>> ParameterSets = new LinkedList<Dictionary<string, object>>();
+
+						while (e.MoveNext())
+						{
+							object Element = e.Current;
+							IToonEncoder ElementEncoder = GetEncoder(Element);
+							IEnumerator<KeyValuePair<string, object>> e2 =
+								ElementEncoder.GetParameters(Element);
+
+							if (e2 is null)
+							{
+								Parameters = null;
+								ParameterOrder = null;
+								ParameterSets = null;
+								break;
+							}
+
+							Dictionary<string,object> ParameterSet = new Dictionary<string, object>();
+
+							while (e2.MoveNext())
+							{
+								KeyValuePair<string, object> P = e2.Current;
+
+								if (!Parameters.ContainsKey(P.Key))
+								{
+									Parameters[P.Key] = P.Value;
+									ParameterOrder.AddLast(P.Key);
+								}
+
+								ParameterSet[P.Key] = P.Value;
+							}
+
+							ParameterSets.AddLast(ParameterSet);
+						}
+
+						if (!(Parameters is null))
+						{
+							bool First = true;
+
+							Toon.Append('{');
+
+							foreach (string ParameterName in ParameterOrder)
+							{
+								if (First)
+									First = false;
+								else
+									Toon.AppendDelimiter();
+
+								Toon.Append(Encode(ParameterName, true));
+							}
+
+							Toon.Append("}:");
+
+							foreach (Dictionary<string, object> ParameterSet in ParameterSets)
+							{
+								Toon.AppendLine();
+								Toon.Indent((Indent ?? 0) + 1);
+
+								First = true;
+
+								foreach (string ParameterName in ParameterOrder)
+								{
+									if (First)
+										First = false;
+									else
+										Toon.AppendDelimiter();
+
+									if (ParameterSet.TryGetValue(ParameterName, out object Element))
+									{
+										IToonEncoder ElementEncoder = GetEncoder(Element);
+										ElementEncoder.Encode(Element, null, Toon);
+									}
+								}
+							}
+
+							return;
+						}
+					}
+
+					Toon.Append(':');
 
 					if (AppendSpaces)
 						Toon.Append(' ');
 
 					Encoder.Encode(Value, Indent, Toon, false);
+
 					return;
 				}
 			}
@@ -264,6 +344,25 @@ namespace Waher.Content.Toon
 				Toon.Append(": ");
 
 			Encoder.Encode(Value, Indent, Toon);
+		}
+
+		private static IToonEncoder GetEncoder(object Value)
+		{
+			Type T = Value?.GetType() ?? typeof(object);
+			IToonEncoder Encoder;
+
+			lock (encoders)
+			{
+				if (!encoders.TryGetValue(T, out Encoder))
+				{
+					Encoder = Types.FindBest<IToonEncoder, Type>(T)
+						?? throw new ArgumentException("Unable to encode objects of type " + T.FullName, nameof(Object));
+
+					encoders[T] = Encoder;
+				}
+			}
+
+			return Encoder;
 		}
 
 		/// <summary>
@@ -303,7 +402,7 @@ namespace Waher.Content.Toon
 
 				if (!First && Indent.Value > 0)
 				{
-					Toon.Append('\n');
+					Toon.AppendLine();
 					Toon.Indent(Indent.Value);
 				}
 			}
@@ -322,20 +421,7 @@ namespace Waher.Content.Toon
 				Toon.Append("null");
 			else
 			{
-				Type T = Object.GetType();
-				IToonEncoder Encoder;
-
-				lock (encoders)
-				{
-					if (!encoders.TryGetValue(T, out Encoder))
-					{
-						Encoder = Types.FindBest<IToonEncoder, Type>(T)
-							?? throw new ArgumentException("Unable to encode objects of type " + T.FullName, nameof(Object));
-
-						encoders[T] = Encoder;
-					}
-				}
-
+				IToonEncoder Encoder = GetEncoder(Object);
 				Encoder.Encode(Object, Indent, Toon);
 			}
 		}

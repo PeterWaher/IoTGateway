@@ -31,6 +31,16 @@ namespace Waher.Content.Toon.ReferenceTypes
 		}
 
 		/// <summary>
+		/// Gets available parameters to encode from an object.
+		/// </summary>
+		/// <param name="Object">Object to get parameters from.</param>
+		/// <returns>Enumerator for the parameters, or null if not applicable.</returns>
+		public override IEnumerator<KeyValuePair<string, object>> GetParameters(object Object)
+		{
+			return ((Dictionary<string, object>)Object).GetEnumerator();
+		}
+
+		/// <summary>
 		/// How well the TOON encoder encodes objects of type <paramref name="ObjectType"/>.
 		/// </summary>
 		/// <param name="ObjectType">Type of object to encode.</param>

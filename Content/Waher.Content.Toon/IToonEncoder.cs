@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using Waher.Runtime.Inventory;
 
@@ -43,5 +45,19 @@ namespace Waher.Content.Toon
 		/// <param name="Toon">TOON output.</param>
 		/// <param name="UseBrackets">If brackets should be used around the vector.</param>
 		void Encode(object Object, int? Indent, ToonOutput Toon, bool UseBrackets);
+
+		/// <summary>
+		/// Gets an enumerator for the child-elements of an object.
+		/// </summary>
+		/// <param name="Object">Object to get child-elements from.</param>
+		/// <returns>Enumerator for the child-elements, or null if not a vector.</returns>
+		IEnumerator GetElements(object Object);
+
+		/// <summary>
+		/// Gets available parameters to encode from an object.
+		/// </summary>
+		/// <param name="Object">Object to get parameters from.</param>
+		/// <returns>Enumerator for the parameters, or null if not applicable.</returns>
+		IEnumerator<KeyValuePair<string, object>> GetParameters(object Object);
 	}
 }

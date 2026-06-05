@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using System.Collections;
 
 namespace Waher.Content.Toon.Model
 {
@@ -27,5 +27,12 @@ namespace Waher.Content.Toon.Model
 		{
 			this.Encode(Object, Indent, Toon, true);	
 		}
+
+		/// <summary>
+		/// Gets an enumerator for the child-elements of an object.
+		/// </summary>
+		/// <param name="Object">Object to get child-elements from.</param>
+		/// <returns>Enumerator for the child-elements, or null if not a vector.</returns>
+		public abstract override IEnumerator GetElements(object Object);
 	}
 }

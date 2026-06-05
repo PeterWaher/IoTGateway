@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Waher.Content.Toon.Model
 {
@@ -36,5 +36,12 @@ namespace Waher.Content.Toon.Model
 		{
 			this.Encode(Object, Indent, Toon);
 		}
+
+		/// <summary>
+		/// Gets available parameters to encode from an object.
+		/// </summary>
+		/// <param name="Object">Object to get parameters from.</param>
+		/// <returns>Enumerator for the parameters, or null if not applicable.</returns>
+		public abstract override IEnumerator<KeyValuePair<string, object>> GetParameters(object Object);
 	}
 }

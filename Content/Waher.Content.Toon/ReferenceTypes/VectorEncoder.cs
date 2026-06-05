@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections;
 using System.Reflection;
-using System.Text;
 using Waher.Content.Toon.Model;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
@@ -62,7 +62,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 				{
 					if (Indent.HasValue && Indent.Value > 0)
 					{
-						Toon.Append('\n');
+						Toon.AppendLine();
 						Toon.Indent(Indent.Value);
 					}
 
@@ -80,7 +80,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 
 					if (!First && Indent.Value > 0)
 					{
-						Toon.Append('\n');
+						Toon.AppendLine();
 						Toon.Indent(Indent.Value);
 					}
 				}
@@ -97,6 +97,24 @@ namespace Waher.Content.Toon.ReferenceTypes
 		public override Grade Supports(Type ObjectType)
 		{
 			return typeof(IVector).IsAssignableFrom(ObjectType.GetTypeInfo()) ? Grade.Ok : Grade.NotAtAll;
+		}
+
+		/// <summary>
+		/// Gets an enumerator for the child-elements of an object.
+		/// </summary>
+		/// <param name="Object">Object to get child-elements from.</param>
+		/// <returns>Enumerator for the child-elements, or null if not a vector.</returns>
+		public override IEnumerator GetElements(object Object)
+		{
+			IVector V = (IVector)Object;
+			int i = 0;
+			int c = V.Dimension;
+			object[] Result = new object[c];
+
+			foreach (IElement Element in V.VectorElements)
+				Result[i++] = Element.AssociatedObjectValue;
+
+			return Result.GetEnumerator();
 		}
 	}
 }

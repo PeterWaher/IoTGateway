@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Waher.Script.Units.DerivedQuantities;
 
 namespace Waher.Content.Toon
 {
@@ -154,6 +155,15 @@ namespace Waher.Content.Toon
 		{
 			this.empty = false;
 			this.output.Append(this.delimiterCharacter);
+		}
+
+		/// <summary>
+		/// Appends a new-line character to the output.
+		/// </summary>
+		public void AppendLine()
+		{
+			this.empty = false;
+			this.output.Append('\n');
 		}
 	}
 }

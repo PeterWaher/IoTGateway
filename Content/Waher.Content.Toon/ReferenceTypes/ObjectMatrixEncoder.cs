@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text;
+using System.Collections.Generic;
 using Waher.Content.Toon.Model;
 using Waher.Runtime.Inventory;
 using Waher.Script.Objects.Matrices;
@@ -54,7 +54,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 
 				if (Indent.HasValue && Indent.Value > 0)
 				{
-					Toon.Append('\n');
+					Toon.AppendLine();
 					JSON.Indent(Toon.Output, Indent.Value);
 					Indent++;
 				}
@@ -68,7 +68,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 
 					if (Indent.HasValue && Indent.Value > 0)
 					{
-						Toon.Append('\n');
+						Toon.AppendLine();
 						Toon.Indent(Indent.Value);
 					}
 
@@ -84,7 +84,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 
 					if (Indent.Value > 0)
 					{
-						Toon.Append('\n');
+						Toon.AppendLine();
 						Toon.Indent(Indent.Value);
 					}
 				}
@@ -99,12 +99,22 @@ namespace Waher.Content.Toon.ReferenceTypes
 
 				if (Rows > 0 && Columns > 0 && Indent.Value > 0)
 				{
-					Toon.Append('\n');
+					Toon.AppendLine();
 					Toon.Indent(Indent.Value);
 				}
 			}
 
 			Toon.Append(']');
+		}
+
+		/// <summary>
+		/// Gets available parameters to encode from an object.
+		/// </summary>
+		/// <param name="Object">Object to get parameters from.</param>
+		/// <returns>Enumerator for the parameters, or null if not applicable.</returns>
+		public override IEnumerator<KeyValuePair<string, object>> GetParameters(object Object)
+		{
+			return null;
 		}
 
 		/// <summary>

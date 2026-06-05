@@ -29,14 +29,27 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Toon">TOON output.</param>
 		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
-			IDictionary Dictionary = (IDictionary)Object;
+			TOON.Encode(Prepare((IDictionary)Object), Indent, Toon);
+		}
 
+		private static IEnumerable<KeyValuePair<string, object>> Prepare(IDictionary Dictionary)
+		{
 			ChunkedList<KeyValuePair<string, object>> Properties = new ChunkedList<KeyValuePair<string, object>>();
 
 			foreach (object Key in Dictionary.Keys)
 				Properties.Add(new KeyValuePair<string, object>(Key.ToString(), Dictionary[Key]));
 
-			TOON.Encode(Properties, Indent, Toon);
+			return Properties;
+		}
+
+		/// <summary>
+		/// Gets available parameters to encode from an object.
+		/// </summary>
+		/// <param name="Object">Object to get parameters from.</param>
+		/// <returns>Enumerator for the parameters, or null if not applicable.</returns>
+		public override IEnumerator<KeyValuePair<string, object>> GetParameters(object Object)
+		{
+			return Prepare((IDictionary)Object).GetEnumerator();
 		}
 
 		/// <summary>

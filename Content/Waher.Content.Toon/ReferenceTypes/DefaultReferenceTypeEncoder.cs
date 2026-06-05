@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using Waher.Content.Toon.Model;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
@@ -29,6 +28,21 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Toon">TOON output.</param>
 		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
+			TOON.Encode(Prepare(Object), Indent, Toon);
+		}
+
+		/// <summary>
+		/// Gets available parameters to encode from an object.
+		/// </summary>
+		/// <param name="Object">Object to get parameters from.</param>
+		/// <returns>Enumerator for the parameters, or null if not applicable.</returns>
+		public override IEnumerator<KeyValuePair<string, object>> GetParameters(object Object)
+		{
+			return Prepare(Object).GetEnumerator();
+		}
+
+		private static IEnumerable<KeyValuePair<string, object>> Prepare(object Object)
+		{
 			Type T = Object.GetType();
 			ChunkedList<KeyValuePair<string, object>> Properties = new ChunkedList<KeyValuePair<string, object>>();
 			object Value;
@@ -46,8 +60,8 @@ namespace Waher.Content.Toon.ReferenceTypes
 
 			foreach (PropertyInfo PI in T.GetRuntimeProperties())
 			{
-				if (PI.CanRead && 
-					PI.GetMethod.IsPublic && 
+				if (PI.CanRead &&
+					PI.GetMethod.IsPublic &&
 					PI.GetIndexParameters().Length == 0)
 				{
 					Value = PI.GetValue(Object, null);
@@ -57,7 +71,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 				}
 			}
 
-			TOON.Encode(Properties, Indent, Toon);
+			return Properties;
 		}
 
 		/// <summary>

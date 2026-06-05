@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Waher.Content.Toon.Model;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Toon.ValueTypes
@@ -7,7 +8,7 @@ namespace Waher.Content.Toon.ValueTypes
 	/// <summary>
 	/// Encodes <see cref="bool"/> values.
 	/// </summary>
-	public class BooleanEncoder : IToonEncoder
+	public class BooleanEncoder : SimpleToonEncoder
 	{
 		/// <summary>
 		/// Encodes <see cref="bool"/> values.
@@ -22,7 +23,7 @@ namespace Waher.Content.Toon.ValueTypes
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		public void Encode(object Object, int? Indent, StringBuilder Toon)
+		public override void Encode(object Object, int? Indent, StringBuilder Toon)
 		{
 			Toon.Append(CommonTypes.Encode((bool)Object));
 		}
@@ -32,7 +33,7 @@ namespace Waher.Content.Toon.ValueTypes
 		/// </summary>
 		/// <param name="ObjectType">Type of object to encode.</param>
 		/// <returns>How well objects of the given type are encoded.</returns>
-		public Grade Supports(Type ObjectType)
+		public override Grade Supports(Type ObjectType)
 		{
 			return ObjectType == typeof(bool) ? Grade.Excellent : Grade.NotAtAll;
 		}

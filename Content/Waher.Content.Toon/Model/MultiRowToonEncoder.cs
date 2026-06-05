@@ -1,39 +1,29 @@
-﻿using System;
-using System.Text;
-using Waher.Runtime.Inventory;
+﻿using System.Text;
 
-namespace Waher.Content.Toon
+namespace Waher.Content.Toon.Model
 {
 	/// <summary>
-	/// Interface for encoding objects of certain types to TOON.
+	/// Abstract base class for object TOON encoders.
 	/// </summary>
-	public interface IToonEncoder : IProcessingSupport<Type>
+	public abstract class MultiRowToonEncoder : ToonEncoder 
 	{
-		/// <summary>
-		/// Encodes the <paramref name="Object"/> to TOON.
-		/// </summary>
-		/// <param name="Object">Object to encode.</param>
-		/// <param name="Indent">Any indentation to apply.</param>
-		/// <param name="Toon">TOON output.</param>
-		void Encode(object Object, int? Indent, StringBuilder Toon);
-
 		/// <summary>
 		/// If the encoder encodes values into multiple rows.
 		/// </summary>
-		bool EncodesMultipleRows { get; }
+		public override bool EncodesMultipleRows => true;
 
 		/// <summary>
 		/// If the encoder encodes vectors.
 		/// </summary>
-		bool EncodesVectors { get; }
-		
+		public override bool EncodesVectors => false;
+
 		/// <summary>
 		/// Gets the number of elements in the vector.
 		/// </summary>
 		/// <param name="Vector">Vector object.</param>
 		/// <returns>Number of elements in the vector. If null is returned, the
 		/// <paramref name="Vector"/> item should not be considered a vector.</returns>
-		int? GetCount(object Vector);
+		public override int? GetCount(object Vector) => null;
 
 		/// <summary>
 		/// Encodes the <paramref name="Object"/> to TOON.
@@ -42,6 +32,9 @@ namespace Waher.Content.Toon
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
 		/// <param name="UseBrackets">If brackets should be used around the vector.</param>
-		void Encode(object Object, int? Indent, StringBuilder Toon, bool UseBrackets);
+		public override void Encode(object Object, int? Indent, StringBuilder Toon, bool UseBrackets)
+		{
+			this.Encode(Object, Indent, Toon);
+		}
 	}
 }

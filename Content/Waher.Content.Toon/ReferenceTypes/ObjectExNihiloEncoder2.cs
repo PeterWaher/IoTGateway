@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using Waher.Content.Toon.Model;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 
@@ -10,7 +11,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 	/// <summary>
 	/// Encodes <see cref="IEnumerable{T}"/> values.
 	/// </summary>
-	public class ObjectExNihiloEncoder2 : IToonEncoder
+	public class ObjectExNihiloEncoder2 : MultiRowToonEncoder
 	{
 		/// <summary>
 		/// Encodes <see cref="IEnumerable{T}"/> values.
@@ -25,7 +26,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		public void Encode(object Object, int? Indent, StringBuilder Toon)
+		public override void Encode(object Object, int? Indent, StringBuilder Toon)
 		{
 			TOON.Encode((IEnumerable<KeyValuePair<string, IElement>>)Object, Indent, Toon);
 		}
@@ -35,7 +36,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// </summary>
 		/// <param name="ObjectType">Type of object to encode.</param>
 		/// <returns>How well objects of the given type are encoded.</returns>
-		public Grade Supports(Type ObjectType)
+		public override Grade Supports(Type ObjectType)
 		{
 			return typeof(IEnumerable<KeyValuePair<string, IElement>>).IsAssignableFrom(ObjectType.GetTypeInfo()) ? Grade.Ok : Grade.NotAtAll;
 		}

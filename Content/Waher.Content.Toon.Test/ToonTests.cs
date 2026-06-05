@@ -55,6 +55,7 @@ namespace Waher.Content.Toon.Test
 				Assert.IsTrue(Expected is string);
 
 				string Output = TOON.Encode(Input, true);
+				Output = Output.Replace("\t", "  ");
 
 				Assert.AreEqual(Expected, Output, "Test: " + JsonTestsFileName + ", " + Name);
 			}

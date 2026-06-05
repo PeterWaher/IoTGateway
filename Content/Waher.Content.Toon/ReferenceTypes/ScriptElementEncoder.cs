@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Text;
+using Waher.Content.Toon.Model;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
@@ -10,7 +11,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 	/// <summary>
 	/// Encodes <see cref="IElement"/> values.
 	/// </summary>
-	public class ScriptElementEncoder : IToonEncoder
+	public class ScriptElementEncoder : SimpleToonEncoder
 	{
 		/// <summary>
 		/// Encodes <see cref="IElement"/> values.
@@ -25,7 +26,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		public void Encode(object Object, int? Indent, StringBuilder Toon)
+		public override void Encode(object Object, int? Indent, StringBuilder Toon)
 		{
 			IElement E = (IElement)Object;
 			object Obj = E.AssociatedObjectValue;
@@ -44,7 +45,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// </summary>
 		/// <param name="ObjectType">Type of object to encode.</param>
 		/// <returns>How well objects of the given type are encoded.</returns>
-		public Grade Supports(Type ObjectType)
+		public override Grade Supports(Type ObjectType)
 		{
 			if (typeof(IElement).IsAssignableFrom(ObjectType.GetTypeInfo()) &&
 				!typeof(IVector).IsAssignableFrom(ObjectType.GetTypeInfo()))

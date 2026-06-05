@@ -2,38 +2,45 @@
 using System.Text;
 using Waher.Runtime.Inventory;
 
-namespace Waher.Content.Toon
+namespace Waher.Content.Toon.Model
 {
 	/// <summary>
-	/// Interface for encoding objects of certain types to TOON.
+	/// Abstract base class for TOON encoders.
 	/// </summary>
-	public interface IToonEncoder : IProcessingSupport<Type>
+	public abstract class ToonEncoder : IToonEncoder 
 	{
+		/// <summary>
+		/// How well the TOON encoder encodes objects of type <paramref name="ObjectType"/>.
+		/// </summary>
+		/// <param name="ObjectType">Type of object to encode.</param>
+		/// <returns>How well objects of the given type are encoded.</returns>
+		public abstract Grade Supports(Type ObjectType);
+
 		/// <summary>
 		/// Encodes the <paramref name="Object"/> to TOON.
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		void Encode(object Object, int? Indent, StringBuilder Toon);
+		public abstract void Encode(object Object, int? Indent, StringBuilder Toon);
 
 		/// <summary>
 		/// If the encoder encodes values into multiple rows.
 		/// </summary>
-		bool EncodesMultipleRows { get; }
+		public abstract bool EncodesMultipleRows { get; }
 
 		/// <summary>
 		/// If the encoder encodes vectors.
 		/// </summary>
-		bool EncodesVectors { get; }
-		
+		public abstract bool EncodesVectors { get; }
+
 		/// <summary>
 		/// Gets the number of elements in the vector.
 		/// </summary>
 		/// <param name="Vector">Vector object.</param>
 		/// <returns>Number of elements in the vector. If null is returned, the
 		/// <paramref name="Vector"/> item should not be considered a vector.</returns>
-		int? GetCount(object Vector);
+		public abstract int? GetCount(object Vector);
 
 		/// <summary>
 		/// Encodes the <paramref name="Object"/> to TOON.
@@ -42,6 +49,6 @@ namespace Waher.Content.Toon
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
 		/// <param name="UseBrackets">If brackets should be used around the vector.</param>
-		void Encode(object Object, int? Indent, StringBuilder Toon, bool UseBrackets);
+		public abstract void Encode(object Object, int? Indent, StringBuilder Toon, bool UseBrackets);
 	}
 }

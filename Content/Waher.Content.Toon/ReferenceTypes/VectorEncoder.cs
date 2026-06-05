@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Text;
+using Waher.Content.Toon.Model;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 
@@ -9,7 +10,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 	/// <summary>
 	/// Encodes <see cref="IVector"/> values.
 	/// </summary>
-	public class VectorEncoder : IToonVectorEncoder
+	public class VectorEncoder : VectorToonEncoder
 	{
 		/// <summary>
 		/// Encodes <see cref="IVector"/> values.
@@ -24,7 +25,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Vector">Vector object.</param>
 		/// <returns>Number of elements in the vector. If null is returned, the
 		/// <paramref name="Vector"/> item should not be considered a vector.</returns>
-		public int? GetCount(object Vector)
+		public override int? GetCount(object Vector)
 		{
 			IVector V = (IVector)Vector;
 			return V.Dimension;
@@ -36,19 +37,8 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		public void Encode(object Object, int? Indent, StringBuilder Toon)
-		{
-			this.Encode(Object, Indent, Toon, true);
-		}
-
-		/// <summary>
-		/// Encodes the <paramref name="Object"/> to TOON.
-		/// </summary>
-		/// <param name="Object">Object to encode.</param>
-		/// <param name="Indent">Any indentation to apply.</param>
-		/// <param name="Toon">TOON output.</param>
 		/// <param name="UseBrackets">If brackets should be used around the vector.</param>
-		public void Encode(object Object, int? Indent, StringBuilder Toon, bool UseBrackets)
+		public override void Encode(object Object, int? Indent, StringBuilder Toon, bool UseBrackets)
 		{
 			IVector V = (IVector)Object;
 			bool First = true;
@@ -104,7 +94,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// </summary>
 		/// <param name="ObjectType">Type of object to encode.</param>
 		/// <returns>How well objects of the given type are encoded.</returns>
-		public Grade Supports(Type ObjectType)
+		public override Grade Supports(Type ObjectType)
 		{
 			return typeof(IVector).IsAssignableFrom(ObjectType.GetTypeInfo()) ? Grade.Ok : Grade.NotAtAll;
 		}

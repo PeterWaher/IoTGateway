@@ -118,9 +118,11 @@ namespace Waher.Content.Toon
 		public static void Encode(IEnumerable<KeyValuePair<string, object>> Object, int? Indent, StringBuilder Toon,
 			params KeyValuePair<string, object>[] AdditionalProperties)
 		{
+			bool AppendSpaces = Indent.HasValue;
+
 			bool First = true;
 
-			if (Indent.HasValue)
+			if (AppendSpaces)
 				Indent++;
 
 			if (!(Object is null))
@@ -149,7 +151,7 @@ namespace Waher.Content.Toon
 				}
 			}
 
-			if (Indent.HasValue)
+			if (AppendSpaces)
 			{
 				Indent--;
 
@@ -173,7 +175,7 @@ namespace Waher.Content.Toon
 		{
 			bool AppendSpaces = Indent.HasValue;
 
-			if (Indent.HasValue && (Indent.Value > 0 || (Indent.Value == 0 && Toon.Length > 0)))
+			if (AppendSpaces && (Indent.Value > 0 || (Indent.Value == 0 && Toon.Length > 0)))
 			{
 				Toon.Append('\n');
 				JSON.Indent(Toon, Indent.Value);
@@ -206,9 +208,9 @@ namespace Waher.Content.Toon
 				}
 			}
 
-			if (Encoder is IToonVectorEncoder VectorEncoder)
+			if (Encoder.EncodesVectors)
 			{
-				int c = VectorEncoder.GetCount(Value) ?? -1;
+				int c = Encoder.GetCount(Value) ?? -1;
 
 				if (c > 0)
 				{
@@ -219,15 +221,14 @@ namespace Waher.Content.Toon
 					if (AppendSpaces)
 						Toon.Append(' ');
 
-					VectorEncoder.Encode(Value, Indent, Toon, false);
+					Encoder.Encode(Value, Indent, Toon, false);
 					return;
 				}
 			}
-
-			if (AppendSpaces)
-				Toon.Append(": ");
-			else
+			else if (Encoder.EncodesMultipleRows || !AppendSpaces)
 				Toon.Append(':');
+			else 
+				Toon.Append(": ");
 
 			Encoder.Encode(Value, Indent, Toon);
 		}
@@ -240,11 +241,13 @@ namespace Waher.Content.Toon
 		/// <param name="Toon">TOON Output.</param>
 		public static void Encode(IEnumerable<KeyValuePair<string, IElement>> Object, int? Indent, StringBuilder Toon)
 		{
+			bool AppendSpaces = Indent.HasValue;
+
 			bool First = true;
 
 			Toon.Append('{');
 
-			if (Indent.HasValue)
+			if (AppendSpaces)
 				Indent++;
 
 			if (!(Object is null))
@@ -260,7 +263,7 @@ namespace Waher.Content.Toon
 				}
 			}
 
-			if (Indent.HasValue)
+			if (AppendSpaces)
 			{
 				Indent--;
 

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using Waher.Content.Toon.Model;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
@@ -11,7 +12,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 	/// <summary>
 	/// Encoder used for reference types, if no other encoder is found.
 	/// </summary>
-	public class DefaultReferenceTypeEncoder : IToonEncoder
+	public class DefaultReferenceTypeEncoder : MultiRowToonEncoder
 	{
 		/// <summary>
 		/// Encoder used for reference types, if no other encoder is found.
@@ -26,7 +27,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		public void Encode(object Object, int? Indent, StringBuilder Toon)
+		public override void Encode(object Object, int? Indent, StringBuilder Toon)
 		{
 			Type T = Object.GetType();
 			ChunkedList<KeyValuePair<string, object>> Properties = new ChunkedList<KeyValuePair<string, object>>();
@@ -64,7 +65,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// </summary>
 		/// <param name="ObjectType">Type of object to encode.</param>
 		/// <returns>How well objects of the given type are encoded.</returns>
-		public Grade Supports(Type ObjectType)
+		public override Grade Supports(Type ObjectType)
 		{
 			TypeInfo TI = ObjectType.GetTypeInfo();
 			if (TI.IsValueType)

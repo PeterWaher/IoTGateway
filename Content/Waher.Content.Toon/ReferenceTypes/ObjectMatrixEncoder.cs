@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Waher.Content.Toon.Model;
 using Waher.Runtime.Inventory;
 using Waher.Script.Objects.Matrices;
 
@@ -8,7 +9,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 	/// <summary>
 	/// Encodes <see cref="ObjectMatrix"/> values.
 	/// </summary>
-	public class ObjectMatrixEncoder : IToonEncoder
+	public class ObjectMatrixEncoder : MultiRowToonEncoder
 	{
 		/// <summary>
 		/// Encodes <see cref="ObjectMatrix"/> values.
@@ -23,7 +24,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		public void Encode(object Object, int? Indent, StringBuilder Toon)
+		public override void Encode(object Object, int? Indent, StringBuilder Toon)
 		{
 			ObjectMatrix M = (ObjectMatrix)Object;
 			string[] Names;
@@ -111,7 +112,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// </summary>
 		/// <param name="ObjectType">Type of object to encode.</param>
 		/// <returns>How well objects of the given type are encoded.</returns>
-		public Grade Supports(Type ObjectType)
+		public override Grade Supports(Type ObjectType)
 		{
 			return ObjectType == typeof(ObjectMatrix) ? Grade.Excellent : Grade.NotAtAll;
 		}

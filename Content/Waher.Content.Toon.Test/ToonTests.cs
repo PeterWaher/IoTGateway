@@ -6,7 +6,7 @@ namespace Waher.Content.Toon.Test
 	public sealed class ToonTests
 	{
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(
 				typeof(TOON).Assembly,
@@ -22,8 +22,8 @@ namespace Waher.Content.Toon.Test
 		[TestMethod]
 		[DataRow("Data/Encode/primitives.json")]
 		[DataRow("Data/Encode/whitespace.json")]
-		//[DataRow("Data/Encode/objects.json")]
-		//[DataRow("Data/Encode/delimiters.json")]
+		[DataRow("Data/Encode/objects.json")]
+		[DataRow("Data/Encode/delimiters.json")]
 		//[DataRow("Data/Encode/key-folding.json")]
 		//[DataRow("Data/Encode/arrays-primitive.json")]
 		//[DataRow("Data/Encode/arrays-tabular.json")]
@@ -54,19 +54,33 @@ namespace Waher.Content.Toon.Test
 				Assert.IsNotNull(Expected);
 				Assert.IsTrue(Expected is string);
 
-				string Output = TOON.Encode(Input, true);
-
-				if (!TestDict.TryGetValue("options", out object? Obj) ||
-					Obj is not Dictionary<string, object> Options ||
-					!Options.TryGetValue("indent", out Obj) ||
-					Obj is not int Indent)
+				ToonOutput Output = new()
 				{
-					Indent = 2;
+					DelimiterCharacter = ',',
+					IndentCharacter = ' ',
+					IndentCharacterCount = 2
+				};
+
+				if (TestDict.TryGetValue("options", out object? Obj) &&
+					Obj is Dictionary<string, object> Options)
+				{
+					if (Options.TryGetValue("indent", out Obj) &&
+						Obj is int Indent)
+					{
+						Output.IndentCharacterCount = Indent;
+					}
+
+					if (Options.TryGetValue("delimiter", out Obj) &&
+						Obj is string Delimiter && Delimiter.Length == 1)
+					{
+						Output.DelimiterCharacter = Delimiter[0];
+					}
 				}
 
-				Output = Output.Replace("\t", new string(' ', Indent));
+				TOON.Encode(Input, true, Output);
 
-				Assert.AreEqual(Expected, Output, "Test: " + JsonTestsFileName + ", " + Name);
+				Assert.AreEqual(Expected, Output.ToString(), 
+					"Test: " + JsonTestsFileName + ", " + Name);
 			}
 		}
 	}

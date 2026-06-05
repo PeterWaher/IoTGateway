@@ -24,7 +24,7 @@ namespace Waher.Content.Toon.ValueTypes
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		public override void Encode(object Object, int? Indent, StringBuilder Toon)
+		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
 			float f = (float)Object;
 			Toon.Append(f.ToString("0.############################", CultureInfo.InvariantCulture));

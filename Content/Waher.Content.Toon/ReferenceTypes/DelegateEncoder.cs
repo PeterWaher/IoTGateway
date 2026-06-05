@@ -24,7 +24,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		public override void Encode(object Object, int? Indent, StringBuilder Toon)
+		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
 			Delegate D = (Delegate)Object;
 			StringBuilder sb = new StringBuilder();
@@ -50,7 +50,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 
 			sb.Append(')');
 
-			Toon.Append(TOON.Encode(sb.ToString()));
+			Toon.Append(TOON.Encode(sb.ToString(), !Toon.Empty));
 		}
 
 		/// <summary>

@@ -32,7 +32,7 @@ namespace Waher.Content.Toon.Model
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
 		/// <param name="UseBrackets">If brackets should be used around the vector.</param>
-		public override void Encode(object Object, int? Indent, StringBuilder Toon, bool UseBrackets)
+		public override void Encode(object Object, int? Indent, ToonOutput Toon, bool UseBrackets)
 		{
 			this.Encode(Object, Indent, Toon);
 		}

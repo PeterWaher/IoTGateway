@@ -26,7 +26,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		public override void Encode(object Object, int? Indent, StringBuilder Toon)
+		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
 			IElement E = (IElement)Object;
 			object Obj = E.AssociatedObjectValue;

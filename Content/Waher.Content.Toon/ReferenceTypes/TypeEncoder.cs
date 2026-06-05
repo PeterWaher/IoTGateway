@@ -24,10 +24,10 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		public override void Encode(object Object, int? Indent, StringBuilder Toon)
+		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
 			Type T = (Type)Object;
-			Toon.Append(TOON.Encode(T.FullName));
+			Toon.Append(TOON.Encode(T.FullName, false));
 		}
 
 		/// <summary>

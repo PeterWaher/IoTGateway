@@ -24,7 +24,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		public override void Encode(object Object, int? Indent, StringBuilder Toon)
+		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
 			ObjectMatrix M = (ObjectMatrix)Object;
 			string[] Names;
@@ -50,12 +50,12 @@ namespace Waher.Content.Toon.ReferenceTypes
 			for (y = 0; y < Rows; y++)
 			{
 				if (y > 0)
-					Toon.Append(',');
+					Toon.AppendDelimiter();
 
 				if (Indent.HasValue && Indent.Value > 0)
 				{
 					Toon.Append('\n');
-					JSON.Indent(Toon, Indent.Value);
+					JSON.Indent(Toon.Output, Indent.Value);
 					Indent++;
 				}
 
@@ -64,16 +64,16 @@ namespace Waher.Content.Toon.ReferenceTypes
 				for (x = 0; x < Columns; x++)
 				{
 					if (x > 0)
-						Toon.Append(',');
+						Toon.AppendDelimiter();
 
 					if (Indent.HasValue && Indent.Value > 0)
 					{
 						Toon.Append('\n');
-						JSON.Indent(Toon, Indent.Value);
+						Toon.Indent(Indent.Value);
 					}
 
 					Toon.Append('"');
-					Toon.Append(TOON.Encode(Names[x]));
+					Toon.Append(TOON.Encode(Names[x], true));
 					Toon.Append("\": ");
 					TOON.Encode(M.GetElement(x, y).AssociatedObjectValue, Indent, Toon);
 				}
@@ -85,7 +85,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 					if (Indent.Value > 0)
 					{
 						Toon.Append('\n');
-						JSON.Indent(Toon, Indent.Value);
+						Toon.Indent(Indent.Value);
 					}
 				}
 
@@ -100,7 +100,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 				if (Rows > 0 && Columns > 0 && Indent.Value > 0)
 				{
 					Toon.Append('\n');
-					JSON.Indent(Toon, Indent.Value);
+					Toon.Indent(Indent.Value);
 				}
 			}
 

@@ -51,7 +51,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
 		/// <param name="UseBrackets">If brackets should be used around the vector.</param>
-		public override void Encode(object Object, int? Indent, StringBuilder Toon, bool UseBrackets)
+		public override void Encode(object Object, int? Indent, ToonOutput Toon, bool UseBrackets)
 		{
 			IEnumerable E = (IEnumerable)Object;
 			IEnumerator e = E.GetEnumerator();
@@ -70,14 +70,14 @@ namespace Waher.Content.Toon.ReferenceTypes
 				if (First)
 					First = false;
 				else
-					Toon.Append(',');
+					Toon.AppendDelimiter();
 
 				if (UseBrackets)
 				{
 					if (Indent.HasValue && Indent.Value > 0)
 					{
 						Toon.Append('\n');
-						JSON.Indent(Toon, Indent.Value);
+						Toon.Indent(Indent.Value);
 					}
 
 					TOON.Encode(e.Current, Indent, Toon);
@@ -95,7 +95,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 					if (!First && Indent.Value > 0)
 					{
 						Toon.Append('\n');
-						JSON.Indent(Toon, Indent.Value);
+						Toon.Indent(Indent.Value);
 					}
 				}
 

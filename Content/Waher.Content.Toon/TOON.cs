@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 
@@ -34,8 +33,9 @@ namespace Waher.Content.Toon
 		/// Encodes a string for inclusion in TOON.
 		/// </summary>
 		/// <param name="s">String to encode.</param>
+		/// <param name="InObject">If the string is part of an object construct.</param>
 		/// <returns>Encoded string.</returns>
-		public static string Encode(string s)
+		public static string Encode(string s, bool InObject)
 		{
 			switch (s)
 			{
@@ -62,12 +62,30 @@ namespace Waher.Content.Toon
 					if (JSON.ContainsEscapeCharacters(s))
 						return "\"" + JSON.Encode(s) + "\"";
 
-					if (s.StartsWith("[") || s.StartsWith("{") || s.StartsWith("- "))
+					if (s.StartsWith("[") ||
+						s.StartsWith("{") ||
+						s.StartsWith("-"))
+					{
 						return "\"" + s + "\"";
+					}
+
+					if (InObject)
+					{
+						if (s.IndexOfAny(objectKeyCharacters) >= 0)
+							return "\"" + s + "\"";
+					}
+					else
+					{
+						if (s.IndexOfAny(keyCharacters) >= 0)
+							return "\"" + s + "\"";
+					}
 
 					return s;
 			}
 		}
+
+		private static readonly char[] objectKeyCharacters = new char[] { ':', ',', ' ' };
+		private static readonly char[] keyCharacters = new char[] { ':', ',' };
 
 		/// <summary>
 		/// Encodes an object as TOON.
@@ -77,7 +95,7 @@ namespace Waher.Content.Toon
 		/// <returns>TOON string.</returns>
 		public static string Encode(object Object, bool Indent)
 		{
-			StringBuilder sb = new StringBuilder();
+			ToonOutput sb = new ToonOutput();
 			Encode(Object, Indent, sb);
 			return sb.ToString();
 		}
@@ -86,9 +104,9 @@ namespace Waher.Content.Toon
 		/// Encodes an object as TOON.
 		/// </summary>
 		/// <param name="Object">Object.</param>
-		/// <param name="Toon">TOON Output.</param>
 		/// <param name="Indent">If TOON should be indented.</param>
-		public static void Encode(object Object, bool Indent, StringBuilder Toon)
+		/// <param name="Toon">TOON Output.</param>
+		public static void Encode(object Object, bool Indent, ToonOutput Toon)
 		{
 			Encode(Object, Indent ? (int?)-1 : null, Toon);
 		}
@@ -103,7 +121,7 @@ namespace Waher.Content.Toon
 		public static string Encode(IEnumerable<KeyValuePair<string, object>> Object, int? Indent,
 			params KeyValuePair<string, object>[] AdditionalProperties)
 		{
-			StringBuilder Toon = new StringBuilder();
+			ToonOutput Toon = new ToonOutput();
 			Encode(Object, Indent, Toon, AdditionalProperties);
 			return Toon.ToString();
 		}
@@ -115,8 +133,8 @@ namespace Waher.Content.Toon
 		/// <param name="Indent">If TOON should be indented.</param>
 		/// <param name="Toon">TOON Output.</param>
 		/// <param name="AdditionalProperties">Optional additional properties.</param>
-		public static void Encode(IEnumerable<KeyValuePair<string, object>> Object, int? Indent, StringBuilder Toon,
-			params KeyValuePair<string, object>[] AdditionalProperties)
+		public static void Encode(IEnumerable<KeyValuePair<string, object>> Object, int? Indent,
+			ToonOutput Toon, params KeyValuePair<string, object>[] AdditionalProperties)
 		{
 			bool MultiRow = Indent.HasValue;
 			bool First = true;
@@ -135,7 +153,7 @@ namespace Waher.Content.Toon
 							if (First)
 								First = false;
 							else
-								Toon.Append(',');
+								Toon.AppendDelimiter();
 						}
 					}
 
@@ -154,7 +172,7 @@ namespace Waher.Content.Toon
 							if (First)
 								First = false;
 							else
-								Toon.Append(',');
+								Toon.AppendDelimiter();
 						}
 					}
 
@@ -169,7 +187,7 @@ namespace Waher.Content.Toon
 				if (!First && Indent.Value > 0)
 				{
 					Toon.Append('\n');
-					JSON.Indent(Toon, Indent.Value);
+					Toon.Indent(Indent.Value);
 				}
 			}
 		}
@@ -182,17 +200,17 @@ namespace Waher.Content.Toon
 		/// <param name="Indent">Optional indentation.</param>
 		/// <param name="Toon">TOON output.</param>
 		public static void EncodeMember(string Name, object Value, int? Indent,
-			StringBuilder Toon)
+			ToonOutput Toon)
 		{
 			bool AppendSpaces = Indent.HasValue;
 
-			if (AppendSpaces && (Indent.Value > 0 || (Indent.Value == 0 && Toon.Length > 0)))
+			if (AppendSpaces && (Indent.Value > 0 || (Indent.Value == 0 && !Toon.Empty)))
 			{
 				Toon.Append('\n');
-				JSON.Indent(Toon, Indent.Value);
+				Toon.Indent(Indent.Value);
 			}
 
-			Toon.Append(Encode(Name));
+			Toon.Append(Encode(Name, true));
 
 			if (Value is null)
 			{
@@ -227,6 +245,10 @@ namespace Waher.Content.Toon
 				{
 					Toon.Append('[');
 					Toon.Append(c.ToString());
+
+					if (!Toon.StandardDelimiter)
+						Toon.AppendDelimiter();
+
 					Toon.Append("]:");
 
 					if (AppendSpaces)
@@ -238,7 +260,7 @@ namespace Waher.Content.Toon
 			}
 			else if (Encoder.EncodesMultipleRows || !AppendSpaces)
 				Toon.Append(':');
-			else 
+			else
 				Toon.Append(": ");
 
 			Encoder.Encode(Value, Indent, Toon);
@@ -250,7 +272,8 @@ namespace Waher.Content.Toon
 		/// <param name="Object">Object.</param>
 		/// <param name="Indent">If TOON should be indented.</param>
 		/// <param name="Toon">TOON Output.</param>
-		public static void Encode(IEnumerable<KeyValuePair<string, IElement>> Object, int? Indent, StringBuilder Toon)
+		public static void Encode(IEnumerable<KeyValuePair<string, IElement>> Object, int? Indent,
+			ToonOutput Toon)
 		{
 			bool MultiRow = Indent.HasValue;
 			bool First = true;
@@ -267,7 +290,7 @@ namespace Waher.Content.Toon
 						if (First)
 							First = false;
 						else
-							Toon.Append(',');
+							Toon.AppendDelimiter();
 					}
 
 					EncodeMember(Member.Key, Member.Value.AssociatedObjectValue, Indent, Toon);
@@ -281,7 +304,7 @@ namespace Waher.Content.Toon
 				if (!First && Indent.Value > 0)
 				{
 					Toon.Append('\n');
-					JSON.Indent(Toon, Indent.Value);
+					Toon.Indent(Indent.Value);
 				}
 			}
 		}
@@ -293,7 +316,7 @@ namespace Waher.Content.Toon
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Optional indentation.</param>
 		/// <param name="Toon">TOON output.</param>
-		public static void Encode(object Object, int? Indent, StringBuilder Toon)
+		public static void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
 			if (Object is null)
 				Toon.Append("null");

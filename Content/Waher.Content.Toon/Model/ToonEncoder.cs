@@ -22,7 +22,7 @@ namespace Waher.Content.Toon.Model
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
-		public abstract void Encode(object Object, int? Indent, StringBuilder Toon);
+		public abstract void Encode(object Object, int? Indent, ToonOutput Toon);
 
 		/// <summary>
 		/// If the encoder encodes values into multiple rows.
@@ -49,6 +49,6 @@ namespace Waher.Content.Toon.Model
 		/// <param name="Indent">Any indentation to apply.</param>
 		/// <param name="Toon">TOON output.</param>
 		/// <param name="UseBrackets">If brackets should be used around the vector.</param>
-		public abstract void Encode(object Object, int? Indent, StringBuilder Toon, bool UseBrackets);
+		public abstract void Encode(object Object, int? Indent, ToonOutput Toon, bool UseBrackets);
 	}
 }

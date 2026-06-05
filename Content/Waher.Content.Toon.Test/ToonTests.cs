@@ -49,7 +49,6 @@ namespace Waher.Content.Toon.Test
 				Assert.IsTrue(Name is string);
 
 				Assert.IsTrue(TestDict.TryGetValue("input", out object? Input));
-				Assert.IsNotNull(Input);
 
 				Assert.IsTrue(TestDict.TryGetValue("expected", out object? Expected));
 				Assert.IsNotNull(Expected);

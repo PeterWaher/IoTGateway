@@ -27,8 +27,13 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Toon">TOON output.</param>
 		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
-			Dictionary<string, object> Typed = Prepare((IDictionary)Object);
-			Toon.AppendAsObject(Typed, Indent, Typed.ContainsKey);
+			if (Object is null)
+				Toon.Append("null");
+			else
+			{
+				Dictionary<string, object> Typed = Prepare((IDictionary)Object);
+				Toon.AppendAsObject(Typed, Indent, Typed.ContainsKey);
+			}
 		}
 
 		/// <summary>
@@ -38,13 +43,16 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <returns>Enumerator for the parameters, or null if not applicable.</returns>
 		public override IEnumerator<KeyValuePair<string, object>> GetParameters(object Object)
 		{
-			return Prepare(Object).GetEnumerator();
+			if (Object is null)
+				return new Dictionary<string, object>().GetEnumerator();
+			else
+				return Prepare(Object).GetEnumerator();
 		}
 
 		private static Dictionary<string, object> Prepare(object Object)
 		{
-			Type T = Object.GetType();
 			Dictionary<string, object> Properties = new Dictionary<string, object>();
+			Type T = Object.GetType();
 			object Value;
 
 			foreach (FieldInfo FI in T.GetRuntimeFields())

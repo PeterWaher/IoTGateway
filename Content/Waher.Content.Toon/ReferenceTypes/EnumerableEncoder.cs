@@ -58,7 +58,11 @@ namespace Waher.Content.Toon.ReferenceTypes
 
 					if (Count == 0)
 					{
-						Toon.Append(": []");
+						if (Toon.Empty)
+							Toon.Append("[]");
+						else
+							Toon.Append(": []");
+
 						return;
 					}
 
@@ -88,7 +92,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 						if (!(Parameters is null))
 						{
 							IEnumerator<KeyValuePair<string, object>> e2 =
-							ElementEncoder.GetParameters(Element);
+								ElementEncoder.GetParameters(Element);
 
 							if (e2 is null)
 							{
@@ -122,7 +126,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 								ParameterSet[P.Key] = P.Value;
 								Count++;
 
-								if (SameParameters)
+								if (SameParameters && !(P.Value is null))
 								{
 									ElementEncoder = TOON.GetEncoder(P.Value);
 
@@ -199,7 +203,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 
 							Toon.Append(':');
 
-							Indent = (Indent ?? 0) + 1;
+							Indent = Math.Max(Indent ?? 0, 0) + 1;
 
 							foreach (Dictionary<string, object> ParameterSet in ParameterSets)
 							{
@@ -225,10 +229,10 @@ namespace Waher.Content.Toon.ReferenceTypes
 									if (ElementEncoder.EncodesAsObject(P.Value))
 									{
 										Toon.Append(':');
-										ElementEncoder.Encode(P.Value, Indent + 1, Toon);
+										ElementEncoder.Encode(P.Value, Math.Max(Indent ?? 0, 0) + 1, Toon);
 									}
 									else if (ElementEncoder.EncodesAsVector(P.Value))
-										ElementEncoder.Encode(P.Value, Indent + 1, Toon, BracketsMode.Count);
+										ElementEncoder.Encode(P.Value, Math.Max(Indent ?? 0, 0) + 1, Toon, BracketsMode.Count);
 									else
 									{
 										Toon.Append(": ");
@@ -272,7 +276,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 					{
 						// Array of arrays
 
-						Indent = (Indent ?? 0) + 1;
+						Indent = Math.Max(Indent ?? 0, 0) + 1;
 
 						foreach (IEnumerator e2 in ElementVectors)
 						{
@@ -291,7 +295,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 							if (!Toon.StandardDelimiter)
 								Toon.AppendDelimiter();
 
-							Toon.Append("]: ");
+							Toon.Append("]:");
 
 							First = true;
 
@@ -300,7 +304,10 @@ namespace Waher.Content.Toon.ReferenceTypes
 							while (e2.MoveNext())
 							{
 								if (First)
+								{
 									First = false;
+									Toon.Append(' ');
+								}
 								else
 									Toon.AppendDelimiter();
 
@@ -317,23 +324,28 @@ namespace Waher.Content.Toon.ReferenceTypes
 						// At least one element of the array is/can be encoded using
 						// multiple rows. Use list mode.
 
-						Indent = (Indent ?? 0) + 1;
+						Indent = Math.Max(Indent ?? 0, 0) + 1;
 						e.Reset();
 
 						while (e.MoveNext())
 						{
 							Toon.AppendLine();
 							Toon.Indent(Indent.Value);
-							Toon.Append('-');
+							Toon.AppendListItem();
 
 							IToonEncoder ElementEncoder = TOON.GetEncoder(e.Current);
 
 							if (ElementEncoder.EncodesMultipleRows)
-								ElementEncoder.Encode(e.Current, Indent, Toon);
+							{
+								if (ElementEncoder.EncodesAsVector(e.Current))
+									ElementEncoder.Encode(e.Current, Indent, Toon, BracketsMode.Count);
+								else
+									ElementEncoder.Encode(e.Current, Indent, Toon);
+							}
 							else
 							{
 								Toon.Append(' ');
-								ElementEncoder.Encode(e.Current, null, Toon);
+								ElementEncoder.Encode(e.Current, Indent, Toon);
 							}
 						}
 

@@ -20,6 +20,7 @@ namespace Waher.Content.Toon
 		private bool standardDelimiter = true;
 		private bool keyFolding = true;
 		private bool empty = true;
+		private bool lastIsListItem = false;
 
 		/// <summary>
 		/// TOON Output builder
@@ -155,6 +156,8 @@ namespace Waher.Content.Toon
 				while (Level-- > 0)
 					this.output.Append(this.indentCharacter);
 			}
+
+			this.lastIsListItem = false;
 		}
 
 		/// <inheritdoc/>
@@ -170,6 +173,7 @@ namespace Waher.Content.Toon
 		public void Append(char Value)
 		{
 			this.empty = false;
+			this.lastIsListItem = false;
 			this.output.Append(Value);
 		}
 
@@ -180,6 +184,7 @@ namespace Waher.Content.Toon
 		public void Append(string Value)
 		{
 			this.empty = false;
+			this.lastIsListItem = false;
 			this.output.Append(Value);
 		}
 
@@ -189,7 +194,17 @@ namespace Waher.Content.Toon
 		public void AppendDelimiter()
 		{
 			this.empty = false;
+			this.lastIsListItem = false;
 			this.output.Append(this.delimiterCharacter);
+		}
+
+		/// <summary>
+		/// Appends a list item character to the output (hyphen).
+		/// </summary>
+		public void AppendListItem()
+		{
+			this.output.Append('-');
+			this.lastIsListItem = true;
 		}
 
 		/// <summary>
@@ -198,6 +213,7 @@ namespace Waher.Content.Toon
 		public void AppendLine()
 		{
 			this.empty = false;
+			this.lastIsListItem = false;
 			this.output.Append('\n');
 		}
 
@@ -371,10 +387,18 @@ namespace Waher.Content.Toon
 		{
 			bool AppendSpaces = Indent.HasValue;
 
-			if (AppendSpaces && (Indent.Value > 0 || (Indent.Value == 0 && !this.Empty)))
+			if (AppendSpaces && (Indent.Value > 0 || (Indent.Value == 0 && !this.empty)))
 			{
-				this.AppendLine();
-				this.Indent(Indent.Value);
+				if (this.lastIsListItem)
+				{
+					this.output.Append(' ');
+					this.lastIsListItem = false;
+				}
+				else
+				{
+					this.AppendLine();
+					this.Indent(Indent.Value);
+				}
 			}
 
 			if (Value is null)

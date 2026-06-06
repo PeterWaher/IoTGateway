@@ -30,10 +30,7 @@ namespace Waher.Content.Toon.Model
 		/// <param name="Toon">TOON output.</param>
 		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
-			if (Toon.Empty)
-				this.Encode(Object, Indent, Toon, BracketsMode.Count);
-			else
-				this.Encode(Object, Indent, Toon, BracketsMode.Embed);
+			this.Encode(Object, Indent, Toon, BracketsMode.Count);
 		}
 
 		/// <summary>

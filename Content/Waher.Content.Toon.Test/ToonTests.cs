@@ -27,8 +27,8 @@ namespace Waher.Content.Toon.Test
 		[DataRow("Data/Encode/key-folding.json")]
 		[DataRow("Data/Encode/arrays-primitive.json")]
 		[DataRow("Data/Encode/arrays-objects.json")]
-		//[DataRow("Data/Encode/arrays-tabular.json")]
-		//[DataRow("Data/Encode/arrays-nested.json")]
+		[DataRow("Data/Encode/arrays-nested.json")]
+		[DataRow("Data/Encode/arrays-tabular.json")]
 		public void Test_01_Encode(string JsonTestsFileName)
 		{
 			string Json = File.ReadAllText(JsonTestsFileName);

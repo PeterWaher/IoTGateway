@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Waher.Content.Toon.Model;
-using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Toon.ReferenceTypes
@@ -11,7 +10,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 	/// <summary>
 	/// Encoder used for reference types, if no other encoder is found.
 	/// </summary>
-	public class DefaultReferenceTypeEncoder : MultiRowToonEncoder
+	public class DefaultReferenceTypeEncoder : ObjectToonEncoder
 	{
 		/// <summary>
 		/// Encoder used for reference types, if no other encoder is found.
@@ -28,7 +27,8 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Toon">TOON output.</param>
 		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
-			TOON.Encode(Prepare(Object), Indent, Toon);
+			Dictionary<string, object> Typed = Prepare((IDictionary)Object);
+			Toon.AppendAsObject(Typed, Indent, Typed.ContainsKey);
 		}
 
 		/// <summary>
@@ -41,10 +41,10 @@ namespace Waher.Content.Toon.ReferenceTypes
 			return Prepare(Object).GetEnumerator();
 		}
 
-		private static IEnumerable<KeyValuePair<string, object>> Prepare(object Object)
+		private static Dictionary<string, object> Prepare(object Object)
 		{
 			Type T = Object.GetType();
-			ChunkedList<KeyValuePair<string, object>> Properties = new ChunkedList<KeyValuePair<string, object>>();
+			Dictionary<string, object> Properties = new Dictionary<string, object>();
 			object Value;
 
 			foreach (FieldInfo FI in T.GetRuntimeFields())
@@ -54,7 +54,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 					Value = FI.GetValue(Object);
 
 					if (!Object.Equals(Value))
-						Properties.Add(new KeyValuePair<string, object>(FI.Name, Value));
+						Properties[FI.Name] = Value;
 				}
 			}
 
@@ -67,11 +67,68 @@ namespace Waher.Content.Toon.ReferenceTypes
 					Value = PI.GetValue(Object, null);
 
 					if (!Object.Equals(Value))
-						Properties.Add(new KeyValuePair<string, object>(PI.Name, Value));
+						Properties[PI.Name] = Value;
 				}
 			}
 
 			return Properties;
+		}
+
+		/// <summary>
+		/// Checks if an object can be folded to a shorter representation, and if so, 
+		/// returns the folded name and value.
+		/// </summary>
+		/// <param name="Object">Object to encode</param>
+		/// <param name="FoldedName">Folded name</param>
+		/// <param name="FoldedValue">Folded value.</param>
+		/// <returns>True if the object can be folded, otherwise false.</returns>
+		public override bool CanFold(object Object, out string FoldedName, out object FoldedValue)
+		{
+			bool Found = false;
+
+			FoldedName = null;
+			FoldedValue = null;
+
+			Type T = Object.GetType();
+			object Value;
+
+			foreach (FieldInfo FI in T.GetRuntimeFields())
+			{
+				if (FI.IsPublic && !FI.IsStatic)
+				{
+					Value = FI.GetValue(Object);
+
+					if (!Object.Equals(Value))
+					{
+						if (Found)
+							return false;
+
+						FoldedName = FI.Name;
+						FoldedValue = Value;
+					}
+				}
+			}
+
+			foreach (PropertyInfo PI in T.GetRuntimeProperties())
+			{
+				if (PI.CanRead &&
+					PI.GetMethod.IsPublic &&
+					PI.GetIndexParameters().Length == 0)
+				{
+					Value = PI.GetValue(Object, null);
+
+					if (!Object.Equals(Value))
+					{
+						if (Found)
+							return false;
+
+						FoldedName = PI.Name;
+						FoldedValue = Value;
+					}
+				}
+			}
+
+			return Found;
 		}
 
 		/// <summary>

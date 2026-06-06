@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -10,7 +11,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 	/// <summary>
 	/// Encodes <see cref="Dictionary{String, Object}"/> values.
 	/// </summary>
-	public class TypedDictionaryEncoder : MultiRowToonEncoder
+	public class TypedDictionaryEncoder : ObjectToonEncoder
 	{
 		/// <summary>
 		/// Encodes <see cref="Dictionary{String, Object}"/> values.
@@ -27,7 +28,8 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Toon">TOON output.</param>
 		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
-			TOON.Encode((Dictionary<string, object>)Object, Indent, Toon, null);
+			Dictionary<string, object> Typed = (Dictionary<string, object>)Object;
+			Toon.AppendAsObject(Typed, Indent, Typed.ContainsKey);
 		}
 
 		/// <summary>
@@ -38,6 +40,36 @@ namespace Waher.Content.Toon.ReferenceTypes
 		public override IEnumerator<KeyValuePair<string, object>> GetParameters(object Object)
 		{
 			return ((Dictionary<string, object>)Object).GetEnumerator();
+		}
+
+		/// <summary>
+		/// Checks if an object can be folded to a shorter representation, and if so, 
+		/// returns the folded name and value.
+		/// </summary>
+		/// <param name="Object">Object to encode</param>
+		/// <param name="FoldedName">Folded name</param>
+		/// <param name="FoldedValue">Folded value.</param>
+		/// <returns>True if the object can be folded, otherwise false.</returns>
+		public override bool CanFold(object Object, out string FoldedName, out object FoldedValue)
+		{
+			bool Found = false;
+
+			FoldedName = null;
+			FoldedValue = null;
+
+			foreach (KeyValuePair<string, object> P in (Dictionary<string, object>)Object)
+			{
+				if (Found)
+					return false;
+				else
+				{
+					Found = true;
+					FoldedName = P.Key;
+					FoldedValue = P.Value;
+				}
+			}
+
+			return Found;
 		}
 
 		/// <summary>

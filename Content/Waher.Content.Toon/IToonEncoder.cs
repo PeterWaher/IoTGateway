@@ -50,6 +50,21 @@ namespace Waher.Content.Toon
 		bool EncodesAsVector(object Value);
 
 		/// <summary>
+		/// If the encoder encodes a value as an object.
+		/// </summary>
+		bool EncodesAsObject(object Value);
+
+		/// <summary>
+		/// Checks if an object can be folded to a shorter representation, and if so, 
+		/// returns the folded name and value.
+		/// </summary>
+		/// <param name="Object">Object to encode</param>
+		/// <param name="FoldedName">Folded name</param>
+		/// <param name="FoldedValue">Folded value.</param>
+		/// <returns>True if the object can be folded, otherwise false.</returns>
+		bool CanFold(object Object, out string FoldedName, out object FoldedValue);
+
+		/// <summary>
 		/// Encodes the <paramref name="Object"/> to TOON.
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>

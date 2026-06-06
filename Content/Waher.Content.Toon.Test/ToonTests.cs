@@ -24,7 +24,7 @@ namespace Waher.Content.Toon.Test
 		[DataRow("Data/Encode/whitespace.json")]
 		[DataRow("Data/Encode/objects.json")]
 		[DataRow("Data/Encode/delimiters.json")]
-		//[DataRow("Data/Encode/key-folding.json")]
+		[DataRow("Data/Encode/key-folding.json")]
 		//[DataRow("Data/Encode/arrays-primitive.json")]
 		//[DataRow("Data/Encode/arrays-tabular.json")]
 		//[DataRow("Data/Encode/arrays-objects.json")]
@@ -58,7 +58,8 @@ namespace Waher.Content.Toon.Test
 				{
 					DelimiterCharacter = ',',
 					IndentCharacter = ' ',
-					IndentCharacterCount = 2
+					IndentCharacterCount = 2,
+					KeyFolding = false  // default is off in the unit tests.
 				};
 
 				if (TestDict.TryGetValue("options", out object? Obj) &&
@@ -75,11 +76,23 @@ namespace Waher.Content.Toon.Test
 					{
 						Output.DelimiterCharacter = Delimiter[0];
 					}
+
+					if (Options.TryGetValue("keyFolding", out Obj) &&
+						Obj is string KeyFolding)
+					{
+						Output.KeyFolding = KeyFolding == "safe";
+					}
+
+					if (Options.TryGetValue("flattenDepth", out Obj) &&
+						Obj is int FlattenDepth)
+					{
+						Output.KeyFoldingDepth = FlattenDepth;
+					}
 				}
 
 				TOON.Encode(Input, true, Output);
 
-				Assert.AreEqual(Expected, Output.ToString(), 
+				Assert.AreEqual(Expected, Output.ToString(),
 					"Test: " + JsonTestsFileName + ", " + Name);
 			}
 		}

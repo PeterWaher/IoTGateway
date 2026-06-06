@@ -2,9 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using Waher.Content.Toon.Model;
-using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Toon.ReferenceTypes
@@ -12,7 +10,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 	/// <summary>
 	/// Encodes <see cref="IDictionary"/> values.
 	/// </summary>
-	public class UntypedDictionaryEncoder : MultiRowToonEncoder
+	public class UntypedDictionaryEncoder : ObjectToonEncoder
 	{
 		/// <summary>
 		/// Encodes <see cref="IDictionary"/> values.
@@ -29,15 +27,17 @@ namespace Waher.Content.Toon.ReferenceTypes
 		/// <param name="Toon">TOON output.</param>
 		public override void Encode(object Object, int? Indent, ToonOutput Toon)
 		{
-			TOON.Encode(Prepare((IDictionary)Object), Indent, Toon);
+			Dictionary<string, object> Typed = Prepare((IDictionary)Object);
+			Toon.AppendAsObject(Typed, Indent, Typed.ContainsKey);
 		}
 
-		private static IEnumerable<KeyValuePair<string, object>> Prepare(IDictionary Dictionary)
+		private static Dictionary<string, object> Prepare(IDictionary Dictionary)
 		{
-			ChunkedList<KeyValuePair<string, object>> Properties = new ChunkedList<KeyValuePair<string, object>>();
+			Dictionary<string, object> Properties = new Dictionary<string, object>();
+			IDictionaryEnumerator e = Dictionary.GetEnumerator();
 
-			foreach (object Key in Dictionary.Keys)
-				Properties.Add(new KeyValuePair<string, object>(Key.ToString(), Dictionary[Key]));
+			while (e.MoveNext())
+				Properties[e.Key?.ToString() ?? string.Empty] = e.Value;
 
 			return Properties;
 		}
@@ -50,6 +50,37 @@ namespace Waher.Content.Toon.ReferenceTypes
 		public override IEnumerator<KeyValuePair<string, object>> GetParameters(object Object)
 		{
 			return Prepare((IDictionary)Object).GetEnumerator();
+		}
+
+		/// <summary>
+		/// Checks if an object can be folded to a shorter representation, and if so, 
+		/// returns the folded name and value.
+		/// </summary>
+		/// <param name="Object">Object to encode</param>
+		/// <param name="FoldedName">Folded name</param>
+		/// <param name="FoldedValue">Folded value.</param>
+		/// <returns>True if the object can be folded, otherwise false.</returns>
+		public override bool CanFold(object Object, out string FoldedName, out object FoldedValue)
+		{
+			IDictionaryEnumerator e = ((IDictionary)Object).GetEnumerator();
+			bool Found = false;
+
+			FoldedName = null;
+			FoldedValue = null;
+
+			while (e.MoveNext())
+			{
+				if (Found)
+					return false;
+				else
+				{
+					Found = true;
+					FoldedName = e.Key?.ToString() ?? string.Empty;
+					FoldedValue = e.Value;
+				}
+			}
+
+			return Found;
 		}
 
 		/// <summary>

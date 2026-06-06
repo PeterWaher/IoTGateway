@@ -18,6 +18,11 @@ namespace Waher.Content.Toon.Model
 		public override bool EncodesAsVector(object Value) => true;
 
 		/// <summary>
+		/// If the encoder encodes a value as an object.
+		/// </summary>
+		public override bool EncodesAsObject(object Value) => false;
+
+		/// <summary>
 		/// Encodes the <paramref name="Object"/> to TOON.
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>

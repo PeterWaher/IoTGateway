@@ -3,7 +3,7 @@
 namespace Waher.Content.Toon.Model
 {
 	/// <summary>
-	/// Abstract base class for object TOON encoders.
+	/// Abstract base class for multi-row TOON encoders.
 	/// </summary>
 	public abstract class MultiRowToonEncoder : ToonEncoder 
 	{

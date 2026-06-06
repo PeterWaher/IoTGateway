@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Content.Toon
 {
@@ -13,8 +15,10 @@ namespace Waher.Content.Toon
 		private char delimiterCharacter = ',';
 		private char indentCharacter = '\t';
 		private int indentCharacterCount = 1;
+		private int keyFoldingDepth = int.MaxValue;
 		private bool standardIndentation = true;
 		private bool standardDelimiter = true;
+		private bool keyFolding = true;
 		private bool empty = true;
 
 		/// <summary>
@@ -100,6 +104,37 @@ namespace Waher.Content.Toon
 			{
 				this.delimiterCharacter = value;
 				this.standardDelimiter = this.delimiterCharacter == ',';
+			}
+		}
+
+		/// <summary>
+		/// If key-folding is enabled (safe-mode). Default is true.
+		/// </summary>
+		public bool KeyFolding
+		{
+			get => this.keyFolding;
+			set
+			{
+				this.keyFolding = value;
+
+				if (value && this.keyFoldingDepth <= 1)
+					this.keyFoldingDepth = 2;
+			}
+		}
+
+		/// <summary>
+		/// Maximum depth for key folding. Default is <see cref="int.MaxValue"/>, meaning
+		/// that all keys will be folded, if key folding is enabled.
+		/// </summary>
+		public int KeyFoldingDepth
+		{
+			get => this.keyFoldingDepth;
+			set
+			{
+				if (value < 2)
+					this.keyFolding = false;
+
+				this.keyFoldingDepth = value;
 			}
 		}
 
@@ -211,7 +246,6 @@ namespace Waher.Content.Toon
 
 					if (s.StartsWith("[") ||
 						s.StartsWith("{") ||
-						s.StartsWith("-") ||
 						s.IndexOf(this.delimiterCharacter) >= 0)
 					{
 						return "\"" + s + "\"";
@@ -224,7 +258,7 @@ namespace Waher.Content.Toon
 					}
 					else
 					{
-						if (s.IndexOf(':') >= 0)
+						if (s.IndexOfAny(keyCharacters) >= 0)
 							return "\"" + s + "\"";
 					}
 
@@ -232,7 +266,174 @@ namespace Waher.Content.Toon
 			}
 		}
 
-		private static readonly char[] objectKeyCharacters = new char[] { ':', ' ' };
+		private static readonly char[] objectKeyCharacters = new char[] { ':', '-', ' ' };
+		private static readonly char[] keyCharacters = new char[] { ':', '-' };
+
+		/// <summary>
+		/// Appends an object as a TOON object.
+		/// </summary>
+		/// <param name="Object">Object.</param>
+		/// <param name="Indent">If TOON should be indented.</param>
+		///	<param name="MemberExists">Checks if a member exists</param>
+		public void AppendAsObject(IEnumerable<KeyValuePair<string, object>> Object,
+			int? Indent, Func<string, bool> MemberExists)
+		{
+			bool MultiRow = Indent.HasValue;
+			bool First = true;
+
+			if (MultiRow)
+				Indent++;
+
+			if (!(Object is null))
+			{
+				foreach (KeyValuePair<string, object> Member in Object)
+				{
+					if (!MultiRow)
+					{
+						if (!MultiRow)
+						{
+							if (First)
+								First = false;
+							else
+								this.AppendDelimiter();
+						}
+					}
+
+					this.AppendMember(Member.Key, Member.Value, Indent, MemberExists);
+				}
+			}
+
+			if (MultiRow)
+			{
+				Indent--;
+
+				if (!First && Indent.Value > 0)
+				{
+					this.AppendLine();
+					this.Indent(Indent.Value);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Appends an object as a TOON object.
+		/// </summary>
+		/// <param name="Object">Object.</param>
+		/// <param name="Indent">If TOON should be indented.</param>
+		/// <param name="MemberExists">Checks if a member exists</param>
+		public void AppendAsObject(IEnumerable<KeyValuePair<string, IElement>> Object,
+			int? Indent, Func<string, bool> MemberExists)
+		{
+			bool MultiRow = Indent.HasValue;
+			bool First = true;
+
+			if (MultiRow)
+				Indent++;
+
+			if (!(Object is null))
+			{
+				foreach (KeyValuePair<string, IElement> Member in Object)
+				{
+					if (!MultiRow)
+					{
+						if (First)
+							First = false;
+						else
+							this.AppendDelimiter();
+					}
+
+					this.AppendMember(Member.Key, Member.Value.AssociatedObjectValue, Indent,
+						MemberExists);
+				}
+			}
+
+			if (MultiRow)
+			{
+				Indent--;
+
+				if (!First && Indent.Value > 0)
+				{
+					this.AppendLine();
+					this.Indent(Indent.Value);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Appends a member of an object as TOON.
+		/// </summary>
+		/// <param name="Name">Name of member.</param>
+		/// <param name="Value">Value of member.</param>
+		/// <param name="Indent">Optional indentation.</param>
+		/// <param name="MemberExists">Checks if a member exists</param>
+		public void AppendMember(string Name, object Value, int? Indent,
+			Func<string, bool> MemberExists)
+		{
+			bool AppendSpaces = Indent.HasValue;
+
+			if (AppendSpaces && (Indent.Value > 0 || (Indent.Value == 0 && !this.Empty)))
+			{
+				this.AppendLine();
+				this.Indent(Indent.Value);
+			}
+
+			if (Value is null)
+			{
+				this.AppendEncoded(Name, true);
+
+				if (AppendSpaces)
+					this.Append(": ");
+				else
+					this.Append(':');
+
+				this.Append("null");
+				return;
+			}
+
+			IToonEncoder Encoder = TOON.GetEncoder(Value);
+
+			if (this.keyFolding &&
+				Encoder.EncodesAsObject(Value) &&
+				this.Encode(Name, true) == Name)
+			{
+				string OriginalName = Name;
+				object OriginalValue = Value;
+				int Depth = 1;
+
+				while (Depth < this.keyFoldingDepth &&
+					Encoder.CanFold(Value, out string FoldedName, out object FoldedValue) &&
+					this.Encode(FoldedName, true) == FoldedName)
+				{
+					Name += "." + FoldedName;
+					Value = FoldedValue;
+					Encoder = TOON.GetEncoder(Value);
+					Depth++;
+
+					if (!Encoder.EncodesAsObject(Value))
+						break;
+				}
+
+				if (Depth > 1 && MemberExists(Name))
+				{
+					Name = OriginalName;
+					Value = OriginalValue;
+				}
+			}
+
+			this.AppendEncoded(Name, true);
+
+			if (Encoder.EncodesAsVector(Value))
+			{
+				Encoder.Encode(Value, Indent, this, BracketsMode.Count);
+				return;
+			}
+			else if (Encoder.EncodesMultipleRows || !AppendSpaces)
+				this.Append(':');
+			else
+				this.Append(": ");
+
+			Encoder.Encode(Value, Indent, this);
+		}
 
 	}
 }

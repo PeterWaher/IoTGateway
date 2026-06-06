@@ -44,9 +44,17 @@ namespace Waher.Content.Toon.ReferenceTypes
 					break;
 
 				case BracketsMode.Count:
-					
+
+					int Count = V.Dimension;
+
+					if (Count == 0)
+					{
+						Toon.Append(": []");
+						return;
+					}
+
 					Toon.Append('[');
-					Toon.Append(V.Dimension.ToString());
+					Toon.Append(Count.ToString());
 
 					if (!Toon.StandardDelimiter)
 						Toon.AppendDelimiter();
@@ -56,66 +64,88 @@ namespace Waher.Content.Toon.ReferenceTypes
 					Dictionary<string, object> Parameters = new Dictionary<string, object>();
 					LinkedList<string> ParameterOrder = new LinkedList<string>();
 					LinkedList<Dictionary<string, object>> ParameterSets = new LinkedList<Dictionary<string, object>>();
+					bool SameParameters = true;
+					bool MultiRowElements = false;
+
+					First = true;
 
 					foreach (IElement Element0 in V.VectorElements)
 					{
 						object Element = Element0.AssociatedObjectValue;
 						IToonEncoder ElementEncoder = TOON.GetEncoder(Element);
-						IEnumerator<KeyValuePair<string, object>> e2 =
-							ElementEncoder.GetParameters(Element);
 
-						if (e2 is null)
+						MultiRowElements |= ElementEncoder.EncodesMultipleRows;
+
+						if (!(Parameters is null))
 						{
-							Parameters = null;
-							ParameterOrder = null;
-							ParameterSets = null;
-							break;
-						}
+							IEnumerator<KeyValuePair<string, object>> e2 =
+								ElementEncoder.GetParameters(Element);
 
-						Dictionary<string, object> ParameterSet = new Dictionary<string, object>();
-
-						while (e2.MoveNext())
-						{
-							KeyValuePair<string, object> P = e2.Current;
-
-							if (!Parameters.ContainsKey(P.Key))
+							if (e2 is null)
 							{
-								Parameters[P.Key] = P.Value;
-								ParameterOrder.AddLast(P.Key);
+								Parameters = null;
+								continue;
 							}
 
-							ParameterSet[P.Key] = P.Value;
-						}
+							Dictionary<string, object> ParameterSet = new Dictionary<string, object>();
+							Count = 0;
 
-						ParameterSets.AddLast(ParameterSet);
+							while (e2.MoveNext())
+							{
+								KeyValuePair<string, object> P = e2.Current;
+
+								if (!Parameters.ContainsKey(P.Key))
+								{
+									if (First)
+									{
+										Parameters[P.Key] = P.Value;
+										ParameterOrder.AddLast(P.Key);
+									}
+									else
+										SameParameters = false;
+								}
+								else if (First)
+								{
+									Parameters = null;
+									continue;
+								}
+
+								ParameterSet[P.Key] = P.Value;
+								Count++;
+
+								if (SameParameters)
+								{
+									ElementEncoder = TOON.GetEncoder(P.Value);
+
+									if (ElementEncoder.EncodesAsObject(P.Value) ||
+										ElementEncoder.EncodesAsVector(P.Value))
+									{
+										SameParameters = false;
+									}
+								}
+							}
+
+							if (Parameters is null)
+								continue;
+							else
+								First = false;
+
+							if (Count != Parameters.Count)
+								SameParameters = false;
+
+							ParameterSets.AddLast(ParameterSet);
+						}
 					}
 
-					if (!(Parameters is null))
+					if (!(Parameters is null) && Count > 0)
 					{
-						// Arrays of objects
-
-						First = true;
-
-						Toon.Append('{');
-
-						foreach (string ParameterName in ParameterOrder)
+						if (SameParameters)
 						{
-							if (First)
-								First = false;
-							else
-								Toon.AppendDelimiter();
-
-							Toon.AppendEncoded(ParameterName, true);
-						}
-
-						Toon.Append("}:");
-
-						foreach (Dictionary<string, object> ParameterSet in ParameterSets)
-						{
-							Toon.AppendLine();
-							Toon.Indent((Indent ?? 0) + 1);
+							// Arrays of objects with same parameters.
 
 							First = true;
+
+							Toon.Append('{');
 
 							foreach (string ParameterName in ParameterOrder)
 							{
@@ -124,15 +154,82 @@ namespace Waher.Content.Toon.ReferenceTypes
 								else
 									Toon.AppendDelimiter();
 
-								if (ParameterSet.TryGetValue(ParameterName, out object Element))
+								Toon.AppendEncoded(ParameterName, true);
+							}
+
+							Toon.Append("}:");
+
+							foreach (Dictionary<string, object> ParameterSet in ParameterSets)
+							{
+								Toon.AppendLine();
+								Toon.Indent((Indent ?? 0) + 1);
+
+								First = true;
+
+								foreach (string ParameterName in ParameterOrder)
 								{
-									IToonEncoder ElementEncoder = TOON.GetEncoder(Element);
-									ElementEncoder.Encode(Element, null, Toon);
+									if (First)
+										First = false;
+									else
+										Toon.AppendDelimiter();
+
+									if (ParameterSet.TryGetValue(ParameterName, out object Element))
+									{
+										IToonEncoder ElementEncoder = TOON.GetEncoder(Element);
+										ElementEncoder.Encode(Element, null, Toon);
+									}
 								}
 							}
-						}
 
-						return;
+							return;
+						}
+						else
+						{
+							// Arrays of objects with different parameters,
+							// or encoded using list mode.
+
+							Toon.Append(':');
+
+							Indent = (Indent ?? 0) + 1;
+
+							foreach (Dictionary<string, object> ParameterSet in ParameterSets)
+							{
+								First = true;
+
+								foreach (KeyValuePair<string, object> P in ParameterSet)
+								{
+									Toon.AppendLine();
+									Toon.Indent(Indent.Value);
+
+									if (First)
+									{
+										Toon.Append("- ");
+										First = false;
+									}
+									else
+										Toon.Append("  ");
+
+									Toon.AppendEncoded(P.Key, true);
+
+									IToonEncoder ElementEncoder = TOON.GetEncoder(P.Value);
+
+									if (ElementEncoder.EncodesAsObject(P.Value))
+									{
+										Toon.Append(':');
+										ElementEncoder.Encode(P.Value, Indent + 1, Toon);
+									}
+									else if (ElementEncoder.EncodesAsVector(P.Value))
+										ElementEncoder.Encode(P.Value, Indent + 1, Toon, BracketsMode.Count);
+									else
+									{
+										Toon.Append(": ");
+										ElementEncoder.Encode(P.Value, null, Toon);
+									}
+								}
+							}
+
+							return;
+						}
 					}
 
 					LinkedList<IEnumerator> ElementVectors = new LinkedList<IEnumerator>();
@@ -172,7 +269,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 							Toon.Indent(Indent.Value);
 							Toon.Append("- ");
 
-							int Count = 0;
+							Count = 0;
 
 							while (e2.MoveNext())
 								Count++;
@@ -199,6 +296,32 @@ namespace Waher.Content.Toon.ReferenceTypes
 								object Element = e2.Current;
 								IToonEncoder ElementEncoder = TOON.GetEncoder(Element);
 								ElementEncoder.Encode(Element, null, Toon);
+							}
+						}
+
+						return;
+					}
+					else if (MultiRowElements)
+					{
+						// At least one element of the array is/can be encoded using
+						// multiple rows. Use list mode.
+
+						Indent = (Indent ?? 0) + 1;
+
+						foreach (IElement Element0 in V.VectorElements)
+						{
+							Toon.AppendLine();
+							Toon.Indent(Indent.Value);
+							Toon.Append('-');
+
+							IToonEncoder ElementEncoder = TOON.GetEncoder(Element0.AssociatedObjectValue);
+
+							if (ElementEncoder.EncodesMultipleRows)
+								ElementEncoder.Encode(Element0.AssociatedObjectValue, Indent, Toon);
+							else
+							{
+								Toon.Append(' ');
+								ElementEncoder.Encode(Element0.AssociatedObjectValue, null, Toon);
 							}
 						}
 

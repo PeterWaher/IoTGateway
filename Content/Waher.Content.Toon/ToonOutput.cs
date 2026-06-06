@@ -398,6 +398,7 @@ namespace Waher.Content.Toon
 			{
 				string OriginalName = Name;
 				object OriginalValue = Value;
+				IToonEncoder OriginalEncoder = Encoder;
 				int Depth = 1;
 
 				while (Depth < this.keyFoldingDepth &&
@@ -415,24 +416,61 @@ namespace Waher.Content.Toon
 
 				if (Depth > 1 && MemberExists(Name))
 				{
-					Name = OriginalName;
-					Value = OriginalValue;
+					this.keyFolding = false;
+
+					this.AppendEncoded(OriginalName, true);
+
+					if (OriginalEncoder.EncodesAsVector(OriginalValue))
+						OriginalEncoder.Encode(OriginalValue, Indent, this, BracketsMode.Count);
+					else
+					{
+						if (OriginalEncoder.EncodesMultipleRows || !AppendSpaces)
+							this.Append(':');
+						else
+							this.Append(": ");
+
+						OriginalEncoder.Encode(OriginalValue, Indent, this);
+					}
+
+					this.keyFolding = true;
+					return;
+				}
+				else if (Depth == this.keyFoldingDepth)
+				{
+					this.keyFolding = false;
+
+					this.AppendEncoded(Name, true);
+
+					if (Encoder.EncodesAsVector(Value))
+						Encoder.Encode(Value, Indent, this, BracketsMode.Count);
+					else
+					{
+						if (Encoder.EncodesMultipleRows || !AppendSpaces)
+							this.Append(':');
+						else
+							this.Append(": ");
+
+						Encoder.Encode(Value, Indent, this);
+					}
+
+					this.keyFolding = true;
+					return;
 				}
 			}
 
 			this.AppendEncoded(Name, true);
 
 			if (Encoder.EncodesAsVector(Value))
-			{
 				Encoder.Encode(Value, Indent, this, BracketsMode.Count);
-				return;
-			}
-			else if (Encoder.EncodesMultipleRows || !AppendSpaces)
-				this.Append(':');
 			else
-				this.Append(": ");
+			{
+				if (Encoder.EncodesMultipleRows || !AppendSpaces)
+					this.Append(':');
+				else
+					this.Append(": ");
 
-			Encoder.Encode(Value, Indent, this);
+				Encoder.Encode(Value, Indent, this);
+			}
 		}
 
 	}

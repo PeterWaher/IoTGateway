@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using Waher.Content.Toon.Model;
 using Waher.Runtime.Inventory;
 

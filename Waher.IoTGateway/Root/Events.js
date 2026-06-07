@@ -744,7 +744,8 @@ catch (e)
 }
 
 CheckEvents(TabID);
-const FormDataStore = FormDataStoreHandler();
+
+window.FormDataStore = window.FormDataStore || FormDataStoreHandler();
 
 window.addEventListener("load", () =>
 {

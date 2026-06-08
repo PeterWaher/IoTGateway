@@ -160,13 +160,7 @@ namespace Waher.Networking.XMPP.P2P
 				this.keys[Endpoint.Namespace + "#" + Endpoint.LocalName] = Endpoint;
 
 			if (!(this.client is null))
-			{
 				this.RegisterHandlers(this.client);
-
-				this.client.OnStateChanged += this.Client_OnStateChanged;
-				this.client.OnPresence += this.Client_OnPresence;
-				this.client.CustomPresenceXml += this.Client_CustomPresenceXml;
-			}
 		}
 
 		/// <summary>
@@ -192,6 +186,11 @@ namespace Waher.Networking.XMPP.P2P
 				return this.oldKeysSorted;
 			}
 		}
+
+		/// <summary>
+		/// Associated XMPP client, if any.
+		/// </summary>
+		public XmppClient Client => this.client;
 
 		private Task Client_CustomPresenceXml(object Sender, CustomPresenceEventArgs e)
 		{
@@ -428,10 +427,6 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			if (!(this.client is null))
 			{
-				this.client.OnStateChanged -= this.Client_OnStateChanged;
-				this.client.OnPresence -= this.Client_OnPresence;
-				this.client.CustomPresenceXml -= this.Client_CustomPresenceXml;
-
 				this.UnregisterHandlers(this.client);
 				this.client = null;
 			}
@@ -514,11 +509,48 @@ namespace Waher.Networking.XMPP.P2P
 		}
 
 		/// <summary>
+		/// Tries to get a registered endpoint security manager from an XMPP client.
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="EndpointSecurity">Endpoint security manager, if found.</param>
+		/// <returns>If an endpoint security manager was found.</returns>
+		public static bool TryGetEndpointSecurity(XmppClient Client, out EndpointSecurity EndpointSecurity)
+		{
+			if (Client.TryGetTag("E2E", out object Obj) && Obj is EndpointSecurity Typed)
+			{
+				EndpointSecurity = Typed;
+				return true;
+			}
+			else
+			{
+				EndpointSecurity = null;
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// If End-to-End encryption is enabled on an XMPP client.
+		/// </summary>
+		public static bool IsE2eEncryptionEnabled(XmppClient Client)
+		{
+			return TryGetEndpointSecurity(Client, out _);
+		}
+
+		/// <summary>
 		/// Registers XMPP stanza handlers
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		public virtual void RegisterHandlers(XmppClient Client)
 		{
+			if (!(this.client is null))
+			{
+				this.UnregisterHandlers(this.client);
+				this.client = null;
+			}
+
+			this.client = Client;
+			this.client.SetTag("E2E", this);
+
 			#region Neuro-Foundation V1
 
 			Client?.RegisterMessageHandler("aes", IoTHarmonizationE2ENeuroFoundationV1, this.AesMessageHandler, false);
@@ -548,6 +580,10 @@ namespace Waher.Networking.XMPP.P2P
 			Client?.RegisterIqSetHandler("synchE2e", IoTHarmonizationE2EIeeeV1, this.SynchE2eHandler, false);
 
 			#endregion
+
+			this.client.OnStateChanged += this.Client_OnStateChanged;
+			this.client.OnPresence += this.Client_OnPresence;
+			this.client.CustomPresenceXml += this.Client_CustomPresenceXml;
 		}
 
 		/// <summary>
@@ -556,6 +592,10 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Client">XMPP Client</param>
 		public virtual void UnregisterHandlers(XmppClient Client)
 		{
+			Client.RemoveTag("E2E");
+			if (this.client == Client)
+				this.client = null;
+
 			#region Neuro-Foundation V1
 
 			Client?.UnregisterMessageHandler("aes", IoTHarmonizationE2ENeuroFoundationV1, this.AesMessageHandler, false);
@@ -585,6 +625,10 @@ namespace Waher.Networking.XMPP.P2P
 			Client?.UnregisterIqSetHandler("synchE2e", IoTHarmonizationE2EIeeeV1, this.SynchE2eHandler, false);
 
 			#endregion
+
+			Client.OnStateChanged -= this.Client_OnStateChanged;
+			Client.OnPresence -= this.Client_OnPresence;
+			Client.CustomPresenceXml -= this.Client_CustomPresenceXml;
 		}
 
 		/// <summary>

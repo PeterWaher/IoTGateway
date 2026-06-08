@@ -24,8 +24,8 @@ namespace Waher.Client.WPF.Model.Legal
 		{
 		}
 
-		public static async Task<LegalService> Create(TreeNode Parent, string JID, string Name, 
-			string Node, EndpointSecurity E2eEndpoint,  Dictionary<string, bool> Features)
+		public static async Task<LegalService> Create(TreeNode Parent, string JID, 
+			string Name, string Node, Dictionary<string, bool> Features)
 		{
 			LegalService Result = new(Parent, JID, Name, Node, Features);
 
@@ -34,10 +34,8 @@ namespace Waher.Client.WPF.Model.Legal
 
 			await Result.contractsClient.LoadKeys(true);
 
-			if (E2eEndpoint is null)
-				await Result.contractsClient.EnableE2eEncryption(true, false);
-			else
-				await Result.contractsClient.EnableE2eEncryption(E2eEndpoint, false);
+			if (!EndpointSecurity.IsE2eEncryptionEnabled(Result.Account.Client))
+				await Result.contractsClient.EnableE2eEncryption();
 
 			Result.contractsClient.IdentityUpdated += Result.ContractsClient_IdentityUpdated;
 

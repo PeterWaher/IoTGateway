@@ -451,7 +451,7 @@ namespace Waher.Networking.XMPP.Test
 			IE2eEndpoint OriginalEndpoint = GetLocalEndpoint(this.contractsClient, "ed448");
 			byte[] OriginalPublicKey = (byte[])OriginalEndpoint.PublicKey.Clone();
 
-			await this.contractsClient.EnableE2eEncryption(true, false);
+			await this.contractsClient.EnableE2eEncryption();
 			await AwaitOrTimeout(this.contractsClient.GenerateNewKeys(), "GenerateNewKeys");
 
 			IE2eEndpoint RotatedEndpoint = GetLocalEndpoint(this.contractsClient, "ed448");

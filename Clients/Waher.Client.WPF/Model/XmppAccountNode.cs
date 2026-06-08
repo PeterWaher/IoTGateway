@@ -235,7 +235,6 @@ namespace Waher.Client.WPF.Model
 
 			this.e2eEncryption = new EndpointSecurity(this.client, /*this.p2pNetwork,*/ 128,
 				new Edwards25519Endpoint(), new Edwards448Endpoint());
-			this.client.SetTag("E2E", this.e2eEncryption);
 
 			this.socks5Proxy = new Socks5Proxy(this.client);  //, this.XmppAccountNode.E2E);		TODO
 			this.socks5Proxy.OnOpen += this.Proxy_OnOpen;
@@ -471,8 +470,6 @@ namespace Waher.Client.WPF.Model
 
 			if (this.client is not null)
 			{
-				this.client.RemoveTag("E2E");
-
 				XmppClient Client = this.client;
 				this.client = null;
 				Client.OfflineAndDisposeAsync().Wait();	// TODO: Asynchronous
@@ -1226,8 +1223,8 @@ namespace Waher.Client.WPF.Model
 									return;
 
 								SupportsLegal = true;
-								Component = await LegalService.Create(this, Item.JID, Item.Name, 
-									Item.Node, this.e2eEncryption, e2.Features);
+								Component = await LegalService.Create(this, Item.JID, 
+									Item.Name, Item.Node, e2.Features);
 							}
 							else if (e2.HasFeature(EventLog.NamespaceEventLogging))
 								Component = new EventLog(this, Item.JID, Item.Name, Item.Node, e2.Features);

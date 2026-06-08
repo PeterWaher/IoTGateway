@@ -61,6 +61,7 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Temporary\Waher.Runtime.Temporary.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.CallStack\Waher.Security.CallStack.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj" />

@@ -123,7 +123,7 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public async Task Differentiation_Test_15_ArcTan()
 		{
-			await this.Test("DrawTangent([-5,5],arctan,-10,10)");
+			await this.Test("DrawTangent([-5,5],x->arctan(x),-10,10)");
 		}
 
 		[TestMethod]
@@ -285,7 +285,7 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public async Task Differentiation_Test_40_Inverse()
 		{
-			await this.Test("DrawTangent([2,4],ln',1,5)");
+			await this.Test("DrawTangent([2,4],inv',1,5)");
 		}
 
 		[TestMethod]

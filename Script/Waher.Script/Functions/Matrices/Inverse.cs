@@ -1,15 +1,17 @@
 ﻿using System.Numerics;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Functions.Analytic;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Operators.Arithmetics;
 
 namespace Waher.Script.Functions.Matrices
 {
     /// <summary>
     /// Inverse(x)
     /// </summary>
-    public class Inverse : FunctionOneScalarVariable
-    {
+    public class Inverse : FunctionOneScalarVariable, IDifferentiable
+	{
         /// <summary>
         /// Inverse(x)
         /// </summary>
@@ -53,13 +55,40 @@ namespace Waher.Script.Functions.Matrices
 			return base.Evaluate(Argument, Variables);
         }
 
-        /// <summary>
-        /// Evaluates the function on a scalar argument.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(double Argument, Variables Variables)
+		/// <summary>
+		/// Differentiates a script node, if possible.
+		/// </summary>
+		/// <param name="VariableName">Name of variable to differentiate on.</param>
+		/// <param name="Variables">Collection of variables.</param>
+		/// <returns>Differentiated node.</returns>
+		public ScriptNode Differentiate(string VariableName, Variables Variables)
+		{
+			if (VariableName == this.DefaultVariableName)
+			{
+				int Start = this.Start;
+				int Len = this.Length;
+				Expression Exp = this.Expression;
+
+				return this.DifferentiationChainRule(VariableName, Variables, this.Argument,
+					new Negate(
+                        new Inverse(
+                            new Power(this.Argument, 
+                                new ConstantElement(DoubleNumber.TwoElement, Start, Len, Exp), 
+                                Start, Len, Exp), 
+                            Start, Len, Exp), 
+                        Start, Len, Exp));
+			}
+			else
+				return new ConstantElement(DoubleNumber.ZeroElement, this.Start, this.Length, this.Expression);
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(double Argument, Variables Variables)
         {
             return new DoubleNumber(1.0 / Argument);
         }

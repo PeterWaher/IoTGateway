@@ -60,7 +60,6 @@ namespace Waher.Script
 		/// Class managing a script expression.
 		/// </summary>
 		/// <param name="Script">Script expression.</param>
-		/// an arbitrary object.</param>
 		public Expression(string Script)
 			: this(Script, null, null)
 		{
@@ -93,6 +92,7 @@ namespace Waher.Script
 		/// <param name="Script">Script expression.</param>
 		/// <param name="Source">Source of script.</param>
 		/// <param name="Tag">This property allows the caller to tag the expression with 
+		/// an arbitrary object.</param>
 		public Expression(string Script, string Source, object Tag)
 		{
 			this.script = Script;
@@ -3413,12 +3413,15 @@ namespace Waher.Script
 			if (!F.TryGetValue(FunctionName, out FunctionRef Ref))
 				return null;
 
-			LambdaDefinition CreateLambda(Function Function, ConstructorInfo Constructor)
+			LambdaDefinition CreateLambda(Function Function, ConstructorInfo Constructor,
+				ParameterInfo[] ConstructorParameters)
 			{
-				string[] ArgumentNames = Function.DefaultArgumentNames;
-				int i, c = ArgumentNames.Length;
+				int i, c = ConstructorParameters.Length - 3;
 				ArgumentType[] ArgumentTypes = new ArgumentType[c];
 				object[] Arguments = new object[c + 3];
+				string[] DefaultNames = Function.DefaultArgumentNames;
+				bool UseDefaultNames = DefaultNames.Length == c;
+				string[] Names = UseDefaultNames ? DefaultNames : new string[c];
 
 				Arguments[c] = Start;
 				Arguments[c + 1] = Length;
@@ -3426,31 +3429,31 @@ namespace Waher.Script
 
 				for (i = 0; i < c; i++)
 				{
-					Arguments[i] = new VariableReference(ArgumentNames[i], Start, Length, Expression);
-					ArgumentTypes[i] = ArgumentType.Normal;
-				}
+					if (!UseDefaultNames)
+						Names[i] = ConstructorParameters[i].Name;
 
-				if (Constructor.GetParameters().Length != c + 3)
-				{
-					if (!F.TryGetValue(FunctionName + " " + c.ToString(), out Ref))
-						return null;
+					Arguments[i] = new VariableReference(Names[i], Start, Length, Expression);
+					ArgumentTypes[i] = ArgumentType.Normal;
 				}
 
 				ScriptNode FunctionCall = (ScriptNode)Constructor.Invoke(Arguments);
 
-				return new LambdaDefinition(ArgumentNames, ArgumentTypes, FunctionCall, Start, Length, Expression);
+				return new LambdaDefinition(Names, ArgumentTypes, FunctionCall, Start, Length, Expression);
 			}
 
 			if (!Ref.Multiple)
-				return CreateLambda(Ref.MainFunction, Ref.MainConstructor);
+				return CreateLambda(Ref.MainFunction, Ref.MainConstructor, Ref.MainConstructorParameters);
 
 			ChunkedList<IElement> Lambdas = new ChunkedList<IElement>()
 			{
-				CreateLambda(Ref.MainFunction, Ref.MainConstructor)
+				CreateLambda(Ref.MainFunction, Ref.MainConstructor, Ref.MainConstructorParameters)
 			};
 
 			for (int i = 0; i < Ref.NrAdditional; i++)
-				Lambdas.Add(CreateLambda(Ref.Additional[i], Ref.AdditionalConstructors[i]));
+			{
+				Lambdas.Add(CreateLambda(Ref.Additional[i], Ref.AdditionalConstructors[i],
+					Ref.AdditionalConstructorParameters[i]));
+			}
 
 			return new ObjectVector(Lambdas.ToArray());
 		}
@@ -3473,7 +3476,7 @@ namespace Waher.Script
 					TypeInfo TI;
 
 					void RegisterFunction(string Name, int NrArguments, Type T,
-						ConstructorInfo CI)
+						ConstructorInfo CI, ParameterInfo[] ConstructorParameters)
 					{
 						if (NrArguments < 0)
 							s = Name;
@@ -3487,14 +3490,17 @@ namespace Waher.Script
 								Prev.Multiple = true;
 								Prev.Additional = new Function[] { Function };
 								Prev.AdditionalConstructors = new ConstructorInfo[] { CI };
+								Prev.AdditionalConstructorParameters = new ParameterInfo[][] { ConstructorParameters };
 								Prev.NrAdditional = 1;
 							}
 							else
 							{
 								Array.Resize(ref Prev.Additional, Prev.NrAdditional + 1);
 								Array.Resize(ref Prev.AdditionalConstructors, Prev.NrAdditional + 1);
+								Array.Resize(ref Prev.AdditionalConstructorParameters, Prev.NrAdditional + 1);
 								Prev.Additional[Prev.NrAdditional] = Function;
 								Prev.AdditionalConstructors[Prev.NrAdditional] = CI;
+								Prev.AdditionalConstructorParameters[Prev.NrAdditional] = ConstructorParameters;
 								Prev.NrAdditional++;
 							}
 						}
@@ -3503,11 +3509,13 @@ namespace Waher.Script
 							Ref = new FunctionRef()
 							{
 								MainConstructor = CI,
+								MainConstructorParameters = ConstructorParameters,
 								MainFunction = Function,
 								NrParameters = c - 3,
 								Multiple = false,
 								Additional = null,
 								AdditionalConstructors = null,
+								AdditionalConstructorParameters = null,
 								NrAdditional = 0,
 								Name = Name
 							};
@@ -3516,7 +3524,7 @@ namespace Waher.Script
 						}
 
 						if (NrArguments >= 0)
-							RegisterFunction(Name, -1, T, CI);
+							RegisterFunction(Name, -1, T, CI, ConstructorParameters);
 					}
 
 					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IFunction)))
@@ -3569,13 +3577,13 @@ namespace Waher.Script
 								if (Function is null)
 									continue;
 
-								RegisterFunction(Function.FunctionName, c - 3, T, CI);
+								RegisterFunction(Function.FunctionName, c - 3, T, CI, Parameters);
 
 								Aliases = Function.Aliases;
 								if (!(Aliases is null))
 								{
 									foreach (string Alias in Aliases)
-										RegisterFunction(Alias, c - 3, T, CI);
+										RegisterFunction(Alias, c - 3, T, CI, Parameters);
 								}
 							}
 							catch (Exception ex)
@@ -3705,9 +3713,11 @@ namespace Waher.Script
 		private class FunctionRef
 		{
 			public ConstructorInfo MainConstructor;
+			public ParameterInfo[] MainConstructorParameters;
 			public Function MainFunction;
 			public Function[] Additional;
 			public ConstructorInfo[] AdditionalConstructors;
+			public ParameterInfo[][] AdditionalConstructorParameters;
 			public string Name;
 			public int NrParameters;
 			public int NrAdditional;

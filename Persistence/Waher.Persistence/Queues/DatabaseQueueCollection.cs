@@ -41,7 +41,7 @@ namespace Waher.Persistence.Queues
 		/// <returns>Persisted queue object instance, or null if no queue with the given name
 		/// has been previously been created, and null can be returned.</returns>
 		public Task<IPersistedQueue> GetQueue(IDatabaseProvider Provider, string QueueName, 
-			bool CreateIfNotExists)
+			bool CanBeNull)
 		{
 			lock (queues)
 			{

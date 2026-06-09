@@ -60,11 +60,20 @@ namespace Waher.Script
 		/// Class managing a script expression.
 		/// </summary>
 		/// <param name="Script">Script expression.</param>
+		/// an arbitrary object.</param>
+		public Expression(string Script)
+			: this(Script, null, null)
+		{
+		}
+
+		/// <summary>
+		/// Class managing a script expression.
+		/// </summary>
+		/// <param name="Script">Script expression.</param>
 		/// <param name="Source">Source of script.</param>
 		public Expression(string Script, string Source)
-			: this(Script)
+			: this(Script, Source, null)
 		{
-			this.source = Source;
 		}
 
 		/// <summary>
@@ -84,20 +93,11 @@ namespace Waher.Script
 		/// <param name="Script">Script expression.</param>
 		/// <param name="Source">Source of script.</param>
 		/// <param name="Tag">This property allows the caller to tag the expression with 
-		/// an arbitrary object.</param>
 		public Expression(string Script, string Source, object Tag)
-			: this(Script, Source)
-		{
-			this.tag = Tag;
-		}
-
-		/// <summary>
-		/// Class managing a script expression.
-		/// </summary>
-		/// <param name="Script">Script expression.</param>
-		public Expression(string Script)
 		{
 			this.script = Script;
+			this.source = Source;
+			this.tag = Tag;
 			this.pos = 0;
 			this.len = this.script.Length;
 

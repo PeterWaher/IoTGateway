@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Script.Model
+﻿namespace Waher.Script.Model
 {
 	/// <summary>
 	/// Base class for all funcions.
@@ -54,5 +52,16 @@ namespace Waher.Script.Model
 			}
 		}
 
+		/// <summary>
+		/// If the function is specific to a given context, as apparent from the expression
+		/// object. This is used to triage between context-specific functions if multiple
+		/// are registered with the same name.
+		/// </summary>
+		/// <param name="Expression">Expression being parsed.</param>
+		/// <returns>If the function is specific to a given context.</returns>
+		public virtual bool ContextSpecific(Expression Expression)
+		{
+			return false;
+		}
 	}
 }

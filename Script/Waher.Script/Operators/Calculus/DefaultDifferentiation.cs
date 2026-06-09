@@ -93,7 +93,7 @@ namespace Waher.Script.Operators.Calculus
 				}
 				else
 				{
-					LambdaDefinition f = Expression.GetFunctionLambdaDefinition(VariableReference.VariableName, this.Start, this.Length, this.Expression);
+					IElement f = Expression.GetFunctionLambdaDefinition(VariableReference.VariableName, this.Start, this.Length, this.Expression);
 					if (!(f is null))
 					{
 						if (f is IDifferentiable Differentiable)

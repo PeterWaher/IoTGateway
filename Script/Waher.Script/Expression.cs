@@ -71,6 +71,30 @@ namespace Waher.Script
 		/// Class managing a script expression.
 		/// </summary>
 		/// <param name="Script">Script expression.</param>
+		/// <param name="Tag">This property allows the caller to tag the expression with 
+		/// an arbitrary object.</param>
+		public Expression(string Script, object Tag)
+			: this(Script, null, Tag)
+		{
+		}
+
+		/// <summary>
+		/// Class managing a script expression.
+		/// </summary>
+		/// <param name="Script">Script expression.</param>
+		/// <param name="Source">Source of script.</param>
+		/// <param name="Tag">This property allows the caller to tag the expression with 
+		/// an arbitrary object.</param>
+		public Expression(string Script, string Source, object Tag)
+			: this(Script, Source)
+		{
+			this.tag = Tag;
+		}
+
+		/// <summary>
+		/// Class managing a script expression.
+		/// </summary>
+		/// <param name="Script">Script expression.</param>
 		public Expression(string Script)
 		{
 			this.script = Script;
@@ -2919,7 +2943,7 @@ namespace Waher.Script
 						{
 							this.pos--;
 
-							if (!this.TryParseUnit(ref Node))	// T might be referencing the T prefix.
+							if (!this.TryParseUnit(ref Node))   // T might be referencing the T prefix.
 								return Node;
 						}
 						else
@@ -3297,7 +3321,8 @@ namespace Waher.Script
 			return new Unit(Prefix, Factors);
 		}
 
-		private static ScriptNode GetFunction(string FunctionName, ScriptNode Arguments, bool NullCheck, int Start, int Length, Expression Expression)
+		private static ScriptNode GetFunction(string FunctionName, ScriptNode Arguments,
+			bool NullCheck, int Start, int Length, Expression Expression)
 		{
 			Dictionary<string, FunctionRef> F;
 			int NrParameters;
@@ -3335,7 +3360,7 @@ namespace Waher.Script
 			}
 
 			if (F.TryGetValue(FunctionName + " " + NrParameters.ToString(), out FunctionRef Ref))
-				return (Function)Ref.Constructor.Invoke(P);
+				return Ref.CreateFunction(P, Expression);
 			else
 			{
 				if (!(ElementList is null))
@@ -3373,7 +3398,7 @@ namespace Waher.Script
 			return !(ValueElement is null);
 		}
 
-		internal static LambdaDefinition GetFunctionLambdaDefinition(string FunctionName, int Start, int Length,
+		internal static IElement GetFunctionLambdaDefinition(string FunctionName, int Start, int Length,
 			Expression Expression)
 		{
 			Dictionary<string, FunctionRef> F;
@@ -3385,9 +3410,12 @@ namespace Waher.Script
 				F = functions;
 			}
 
-			if (F.TryGetValue(FunctionName, out FunctionRef Ref))
+			if (!F.TryGetValue(FunctionName, out FunctionRef Ref))
+				return null;
+
+			LambdaDefinition CreateLambda(Function Function, ConstructorInfo Constructor)
 			{
-				string[] ArgumentNames = Ref.Function.DefaultArgumentNames;
+				string[] ArgumentNames = Function.DefaultArgumentNames;
 				int i, c = ArgumentNames.Length;
 				ArgumentType[] ArgumentTypes = new ArgumentType[c];
 				object[] Arguments = new object[c + 3];
@@ -3402,18 +3430,29 @@ namespace Waher.Script
 					ArgumentTypes[i] = ArgumentType.Normal;
 				}
 
-				if (Ref.Constructor.GetParameters().Length != c + 3)
+				if (Constructor.GetParameters().Length != c + 3)
 				{
 					if (!F.TryGetValue(FunctionName + " " + c.ToString(), out Ref))
 						return null;
 				}
 
-				ScriptNode FunctionCall = (ScriptNode)Ref.Constructor.Invoke(Arguments);
+				ScriptNode FunctionCall = (ScriptNode)Constructor.Invoke(Arguments);
 
 				return new LambdaDefinition(ArgumentNames, ArgumentTypes, FunctionCall, Start, Length, Expression);
 			}
-			else
-				return null;
+
+			if (!Ref.Multiple)
+				return CreateLambda(Ref.MainFunction, Ref.MainConstructor);
+
+			ChunkedList<IElement> Lambdas = new ChunkedList<IElement>()
+			{
+				CreateLambda(Ref.MainFunction, Ref.MainConstructor)
+			};
+
+			for (int i = 0; i < Ref.NrAdditional; i++)
+				Lambdas.Add(CreateLambda(Ref.Additional[i], Ref.AdditionalConstructors[i]));
+
+			return new ObjectVector(Lambdas.ToArray());
 		}
 
 		private static void Search()
@@ -3432,6 +3471,53 @@ namespace Waher.Script
 					string s;
 					int i, c;
 					TypeInfo TI;
+
+					void RegisterFunction(string Name, int NrArguments, Type T,
+						ConstructorInfo CI)
+					{
+						if (NrArguments < 0)
+							s = Name;
+						else
+							s = Name + " " + NrArguments.ToString();
+
+						if (Found.TryGetValue(s, out FunctionRef Prev))
+						{
+							if (!Prev.Multiple)
+							{
+								Prev.Multiple = true;
+								Prev.Additional = new Function[] { Function };
+								Prev.AdditionalConstructors = new ConstructorInfo[] { CI };
+								Prev.NrAdditional = 1;
+							}
+							else
+							{
+								Array.Resize(ref Prev.Additional, Prev.NrAdditional + 1);
+								Array.Resize(ref Prev.AdditionalConstructors, Prev.NrAdditional + 1);
+								Prev.Additional[Prev.NrAdditional] = Function;
+								Prev.AdditionalConstructors[Prev.NrAdditional] = CI;
+								Prev.NrAdditional++;
+							}
+						}
+						else
+						{
+							Ref = new FunctionRef()
+							{
+								MainConstructor = CI,
+								MainFunction = Function,
+								NrParameters = c - 3,
+								Multiple = false,
+								Additional = null,
+								AdditionalConstructors = null,
+								NrAdditional = 0,
+								Name = Name
+							};
+
+							Found[s] = Ref;
+						}
+
+						if (NrArguments >= 0)
+							RegisterFunction(Name, -1, T, CI);
+					}
 
 					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IFunction)))
 					{
@@ -3483,55 +3569,13 @@ namespace Waher.Script
 								if (Function is null)
 									continue;
 
-								s = Function.FunctionName + " " + (c - 3).ToString();
-								if (Found.ContainsKey(s))
-								{
-									Log.Warning("Function with name " + Function.FunctionName + " and " + (c - 3).ToString() +
-										" parameters previously registered. Function ignored.",
-										T.FullName, new KeyValuePair<string, object>("Previous", Found[s].Function.GetType().FullName));
-								}
-								else
-								{
-									Ref = new FunctionRef()
-									{
-										Constructor = CI,
-										Function = Function,
-										NrParameters = c - 3
-									};
-
-									Found[s] = Ref;
-
-									if (!Found.ContainsKey(Function.FunctionName))
-										Found[Function.FunctionName] = Ref;
-								}
+								RegisterFunction(Function.FunctionName, c - 3, T, CI);
 
 								Aliases = Function.Aliases;
 								if (!(Aliases is null))
 								{
 									foreach (string Alias in Aliases)
-									{
-										s = Alias + " " + (c - 3).ToString();
-										if (Found.ContainsKey(s))
-										{
-											Log.Warning("Function with name " + Alias + " and " + (c - 3).ToString() +
-												" parameters previously registered. Function ignored.",
-												T.FullName, new KeyValuePair<string, object>("Previous", Found[s].Function.GetType().FullName));
-										}
-										else
-										{
-											Ref = new FunctionRef()
-											{
-												Constructor = CI,
-												Function = Function,
-												NrParameters = c - 3
-											};
-
-											Found[s] = Ref;
-
-											if (!Found.ContainsKey(Alias))
-												Found[Alias] = Ref;
-										}
-									}
+										RegisterFunction(Alias, c - 3, T, CI);
 								}
 							}
 							catch (Exception ex)
@@ -3660,9 +3704,51 @@ namespace Waher.Script
 
 		private class FunctionRef
 		{
-			public ConstructorInfo Constructor;
-			public Function Function;
+			public ConstructorInfo MainConstructor;
+			public Function MainFunction;
+			public Function[] Additional;
+			public ConstructorInfo[] AdditionalConstructors;
+			public string Name;
 			public int NrParameters;
+			public int NrAdditional;
+			public bool Multiple;
+
+			public Function CreateFunction(object[] Parameters, Expression Expression)
+			{
+				if (!this.Multiple)
+					return (Function)this.MainConstructor.Invoke(Parameters);
+
+				Function F;
+
+				if (this.MainFunction.ContextSpecific(Expression))
+					F = (Function)this.MainConstructor.Invoke(Parameters);
+				else
+					F = null;
+
+				for (int i = 0; i < this.NrAdditional; i++)
+				{
+					if (this.Additional[i].ContextSpecific(Expression))
+					{
+						if (F is null)
+							F = (Function)this.AdditionalConstructors[i].Invoke(Parameters);
+						else
+						{
+							throw new SyntaxException("Multiple functions with the same name recognized the same context: " + this.Name,
+								Expression.pos, Expression.script);
+						}
+						break;
+					}
+				}
+
+				if (F is null)
+				{
+					throw new SyntaxException("Multiple functions registered with the name " +
+						this.Name + " but none recognized the current context.", Expression.pos,
+						Expression.script);
+				}
+
+				return F;
+			}
 		}
 
 		internal ScriptNode ParseObject()
@@ -3884,7 +3970,7 @@ namespace Waher.Script
 
 							MembersFound[s] = true;
 							Members.Add(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
-						
+
 							this.SkipWhiteSpace();
 						}
 
@@ -4464,7 +4550,8 @@ namespace Waher.Script
 				}
 
 				return true;
-			};
+			}
+			;
 
 			if (!this.ForAll(CheckFunctionCalls, null, SearchMethod.TreeOrder))
 				return true;

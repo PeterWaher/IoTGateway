@@ -344,7 +344,7 @@ namespace Waher.Script.Functions.Runtime
 						}
 						else
 						{
-							ILambdaExpression Lambda = Expression.GetFunctionLambdaDefinition(this.variableName, this.Start, this.Length, this.Expression);
+							IElement Lambda = Expression.GetFunctionLambdaDefinition(this.variableName, this.Start, this.Length, this.Expression);
 							if (Lambda is null)
 								return BooleanValue.False;
 

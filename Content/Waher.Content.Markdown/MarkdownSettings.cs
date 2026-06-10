@@ -29,6 +29,7 @@ namespace Waher.Content.Markdown
 		private IResourceMap resourceMap = null;
 		private ICodecProgress progress;
 		private bool parseMetaData;
+		private object scriptContext = null;
 		private string httpxProxy = null;
 		private string localHttpxResourcePath = null;
 		private string rootFolder = null;
@@ -236,6 +237,16 @@ namespace Waher.Content.Markdown
 		{
 			get => this.progress;
 			set => this.progress = value;
+		}
+
+		/// <summary>
+		/// Context object to be passed to script expressions. This can be used to ensure
+		/// context-specific functions are only executed in the right context.
+		/// </summary>
+		public object ScriptContext
+		{
+			get => this.scriptContext;
+			set => this.scriptContext = value;
 		}
 
 		/// <summary>

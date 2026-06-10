@@ -383,7 +383,7 @@ namespace Waher.Content.Markdown
 									Variables.Add(MarkdownSettingsVariableName, Settings);
 								}
 
-								Exp = new Expression(Script, FileName2);
+								Exp = new Expression(Script, FileName2, Settings.ScriptContext);
 
 								if (!(Settings.AuthorizeExpression is null))
 								{
@@ -432,7 +432,7 @@ namespace Waher.Content.Markdown
 
 				try
 				{
-					Exp = new Expression(Script, FileName);
+					Exp = new Expression(Script, FileName, Settings.ScriptContext);
 
 					if (!(Settings.AuthorizeExpression is null))
 					{
@@ -2892,7 +2892,9 @@ namespace Waher.Content.Markdown
 						try
 						{
 							State.DiscardBackup();
-							Expression Exp = new Expression(Text.ToString(), this.fileName);
+							Expression Exp = new Expression(Text.ToString(), this.fileName, 
+								this.settings.ScriptContext);
+
 							Elements.Add(new InlineScript(this, Exp, this.settings.Variables,
 								!Elements.HasFirstItem && State.PeekNextChar() == 0, StartPosition, EndPosition));
 							Text.Clear();

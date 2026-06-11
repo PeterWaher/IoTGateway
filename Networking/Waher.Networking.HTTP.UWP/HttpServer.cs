@@ -2395,7 +2395,8 @@ namespace Waher.Networking.HTTP
 				using (MemoryStream ms = new MemoryStream())
 				{
 					HttpRequest Request = new HttpRequest(this,
-						new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", this.vanityResources, "http"), null, "internal", "internal")
+						new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", 
+						this.vanityResources, "http"), null, "internal", "internal")
 					{
 						Session = Session,
 						SubPath = SubPath,

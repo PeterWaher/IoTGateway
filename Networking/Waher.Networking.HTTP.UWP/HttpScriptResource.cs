@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -105,10 +106,10 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
-			SessionVariables v = Request.Session ?? new SessionVariables();
+			SessionVariables v = Request?.Session;
 			bool SessionLocked;
 
-			if (v.Locked)
+			if (v?.Locked ?? false)
 				SessionLocked = false;
 			else
 			{
@@ -326,6 +327,7 @@ namespace Waher.Networking.HTTP
 					v.CurrentResponse = null;
 
 					v.Release();
+					v.Dispose();
 				}
 			}
 		}

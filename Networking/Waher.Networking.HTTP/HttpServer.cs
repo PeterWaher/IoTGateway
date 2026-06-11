@@ -2143,9 +2143,9 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-
 		private Task Sessions_Removed(object Sender, CacheItemEventArgs<string, SessionVariables> e)
 		{
+			e.Value.Dispose();
 			return this.SessionRemoved.Raise(this, e);
 		}
 

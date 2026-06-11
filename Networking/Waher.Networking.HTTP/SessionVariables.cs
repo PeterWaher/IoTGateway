@@ -10,7 +10,7 @@ namespace Waher.Networking.HTTP
 	/// <summary>
 	/// Collection of session variables.
 	/// </summary>
-	public class SessionVariables : Variables
+	public class SessionVariables : Variables, IDisposable
 	{
 		private static readonly Variables globalVariables = new Variables();
 		private static readonly ObjectValue globalVariablesElement = new ObjectValue(globalVariables);
@@ -23,6 +23,7 @@ namespace Waher.Networking.HTTP
 		private ObjectValue currentPageVariablesElement = ObjectValue.Null;
 		private string currentPageUrl = null;
 		private bool locked = false;
+		private bool disposed = false;
 
 		/// <summary>
 		/// Collection of session variables.
@@ -113,6 +114,18 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+			if (!this.disposed)
+			{
+				this.disposed = true;
+				this.semaphore.Dispose();
+			}
+		}
+
+		/// <summary>
 		/// Locks the collection. The collection is by default thread safe. But if longer transactions require unique access,
 		/// this method can be used to aquire such unique access. This works, as long as all callers that affect the corresponding
 		/// state call this method also.
@@ -139,6 +152,9 @@ namespace Waher.Networking.HTTP
 			if (this.Aborted)
 				throw new ScriptAbortedException();
 
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(SessionVariables));
+
 			if (!await this.semaphore.WaitAsync(Timeout))
 				throw new TimeoutException("Unique access to variables connection was not granted.");
 
@@ -150,6 +166,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public void Release()
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(SessionVariables));
+
 			this.semaphore.Release();
 			this.locked = false;
 		}
@@ -162,6 +181,9 @@ namespace Waher.Networking.HTTP
 		/// <returns>If a variable with the corresponding name was found.</returns>
 		public override bool TryGetVariable(string Name, out Variable Variable)
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(SessionVariables));
+
 			if (base.TryGetVariable(Name, out Variable))
 				return true;
 			else
@@ -175,11 +197,13 @@ namespace Waher.Networking.HTTP
 		/// <returns>If a variable with that name exists.</returns>
 		public override bool ContainsVariable(string Name)
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(SessionVariables));
+
 			if (base.ContainsVariable(Name))
 				return true;
 			else
 				return globalVariables.ContainsVariable(Name);
 		}
-
 	}
 }

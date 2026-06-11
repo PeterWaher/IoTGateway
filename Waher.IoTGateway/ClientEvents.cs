@@ -275,7 +275,7 @@ namespace Waher.IoTGateway
 			{
 				string HttpSessionID = GetSessionId(Request, Response);
 
-				TabQueue Queue2 = new TabQueue(TabID, HttpSessionID, Session)
+				TabQueue Queue2 = new TabQueue(TabID, HttpSessionID, Session, false)
 				{
 					WebSocket = Socket,
 					Uri = Uri,
@@ -471,7 +471,7 @@ namespace Waher.IoTGateway
 		{
 			if (!eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
 			{
-				Queue = new TabQueue(TabID, string.Empty, new SessionVariables());
+				Queue = new TabQueue(TabID, string.Empty, new SessionVariables(), true);
 				eventsByTabID[TabID] = Queue;
 			}
 
@@ -1305,13 +1305,15 @@ namespace Waher.IoTGateway
 			public Uri Uri = null;
 			public DateTime KeepAliveUntil = DateTime.MinValue;
 			public (string, string, string)[] Query = null;
+			private bool disposeSession;
 
-			public TabQueue(string ID, string SessionID, SessionVariables Session)
+			public TabQueue(string ID, string SessionID, SessionVariables Session, bool DisposeSession)
 			{
 				this.SyncObj = new MultiReadSingleWriteObject(this);
 				this.TabID = ID;
 				this.SessionID = SessionID;
 				this.Session = Session;
+				this.disposeSession = DisposeSession;
 			}
 
 			public WebSocket WebSocket
@@ -1346,6 +1348,12 @@ namespace Waher.IoTGateway
 
 				this.SyncObj?.Dispose();
 				this.SyncObj = null;
+
+				if (this.disposeSession)
+				{
+					this.Session?.Dispose();
+					this.Session = null;
+				}
 
 				this.Queue?.Clear();
 			}

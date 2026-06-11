@@ -30,7 +30,7 @@ namespace Waher.WebService.Script
 	/// <summary>
 	/// Internal script execution state.
 	/// </summary>
-	internal class State
+	internal class State : IDisposable
 	{
 		private static readonly Dictionary<string, State> expressions = new Dictionary<string, State>();
 
@@ -80,6 +80,14 @@ namespace Waher.WebService.Script
 
 			this.printOutput = new StringBuilder();
 			this.variables.ConsoleOut = new StringWriter(this.printOutput);
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+			this.variables.Dispose();
 		}
 
 		internal static bool TryGetState(string Tag, out State State)
@@ -285,6 +293,8 @@ namespace Waher.WebService.Script
 				Timer Temp = this.watchdog;
 				this.watchdog = null;
 				Temp?.Dispose();
+
+				this.Dispose();
 			}
 		}
 

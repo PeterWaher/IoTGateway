@@ -63,7 +63,8 @@ namespace Waher.IoTGateway
 			if (!IsLocal(Uri) || Gateway.HttpServer is null)
 				return await InternetContent.GetAsync(Uri, Gateway.Certificate, Headers);
 
-			Tuple<int, string, byte[]> T = await Gateway.HttpServer.GET(Uri.AbsolutePath, new SessionVariables());
+			using SessionVariables v = new SessionVariables();
+			Tuple<int, string, byte[]> T = await Gateway.HttpServer.GET(Uri.AbsolutePath, v);
 			int Code = T.Item1;
 			string ContentType = T.Item2;
 			byte[] Bin = T.Item3;
@@ -97,7 +98,8 @@ namespace Waher.IoTGateway
 			if (!IsLocal(Uri) || Gateway.HttpServer is null)
 				return await InternetContent.GetTempStreamAsync(Uri, Gateway.Certificate, Headers);
 
-			Tuple<int, string, byte[]> T = await Gateway.HttpServer.GET(Uri.AbsolutePath, new SessionVariables());
+			using SessionVariables v = new SessionVariables();
+			Tuple<int, string, byte[]> T = await Gateway.HttpServer.GET(Uri.AbsolutePath, v);
 			int Code = T.Item1;
 			string ContentType = T.Item2;
 			byte[] Bin = T.Item3;

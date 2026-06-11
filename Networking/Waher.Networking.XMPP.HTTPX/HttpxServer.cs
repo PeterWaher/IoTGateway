@@ -396,7 +396,8 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		internal async Task<ContentStreamResponse> GetLocalTempStreamAsync(string LocalUrl, TemporaryStream Destination)
 		{
-			Tuple<int, string, byte[]> T = await this.server.GET(LocalUrl, new SessionVariables());
+			using SessionVariables v = new SessionVariables();
+			Tuple<int, string, byte[]> T = await this.server.GET(LocalUrl, v);
 			int Code = T.Item1;
 			string ContentType = T.Item2;
 			byte[] Bin = T.Item3;

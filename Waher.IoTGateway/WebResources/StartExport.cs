@@ -656,22 +656,14 @@ namespace Waher.IoTGateway.WebResources
 							if (UploadClient.HasSupport)
 							{
 								using FileStream fs = File.OpenRead(BackupInfo.FullFileName);
-								
-								BackupInfo.Thread?.NewState("Prepare_" + Recipient);
-
-								StringBuilder Xml = new StringBuilder();
 								long FileSize = fs.Length;
 
-								Xml.Append("<prepare xmlns='http://waher.se/Schema/Backups.xsd' filename='");
-								Xml.Append(XML.Encode(BackupInfo.LocalFileName));
-								Xml.Append("' size='");
-								Xml.Append(FileSize.ToString());
-								Xml.Append("' content-type='application/octet-stream'/>");
+								BackupInfo.Thread?.NewState("Prepare_" + Recipient);
+
+								await UploadClient.PrepareFileUpload(BackupInfo.LocalFileName,
+									FileSize, BinaryCodec.DefaultContentType, FilePurpose.Backup);
 
 								BackupInfo.Thread?.NewState("Get_Slot_" + Recipient);
-
-								await UploadClient.Client.IqSetAsync(UploadClient.FileUploadJid, Xml.ToString());
-								// Empty response expected. Errors cause an exception to be raised.
 
 								HttpFileUploadEventArgs e2 = await UploadClient.RequestUploadSlotAsync(BackupInfo.LocalFileName,
 									BinaryCodec.DefaultContentType, FileSize, false);

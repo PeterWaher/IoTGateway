@@ -306,6 +306,54 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			}, State);
 		}
 
+		/// <summary>
+		/// Prepares a file upload, by letting the broker know that a file will be uploaded,
+		/// and for what purpose.
+		/// </summary>
+		/// <param name="FileName">Name of file.</param>
+		/// <param name="FileSize">Size of file.</param>
+		/// <param name="ContentType">Content-Type of file.</param>
+		/// <param name="Purpose">Purpose of file upload.</param>
+		/// <remarks>
+		/// Not part of XEP-0363: HTTP File Upload
+		/// </remarks>
+		public async Task PrepareFileUpload(string FileName, long FileSize, string ContentType,
+			FilePurpose Purpose)
+		{
+			if (Purpose == FilePurpose.Temporary)
+				return;	// No preparation needed. Default is temporary.
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<prepare xmlns='");
+
+			switch (Purpose)
+			{
+				case FilePurpose.Backup:
+					Xml.Append("http://waher.se/Schema/Backups.xsd");
+					break;
+
+				case FilePurpose.Encrypted:
+					Xml.Append("http://waher.se/Schema/EncryptedStorage.xsd");
+					break;
+
+				case FilePurpose.PubSub:
+					Xml.Append("http://waher.se/Schema/PubSub.xsd");
+					break;
+			}
+
+			Xml.Append("' filename='");
+			Xml.Append(XML.Encode(FileName));
+			Xml.Append("' size='");
+			Xml.Append(FileSize.ToString());
+			Xml.Append("' content-type='");
+			Xml.Append(XML.Encode(ContentType));
+			Xml.Append("'/>");
+
+			await this.client.IqSetAsync(this.fileUploadJid, Xml.ToString());
+			// Empty response expected. Errors cause an exception to be raised.
+		}
+
 		private string CheckEmptyDomain(string Url)
 		{
 			int i;

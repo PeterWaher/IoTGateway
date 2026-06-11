@@ -4438,11 +4438,11 @@ namespace Waher.IoTGateway
 			string ExportFolder = await Export.GetFullExportFolderAsync();
 			string KeyFolder = await Export.GetFullKeyExportFolderAsync();
 
-			DeleteOldFiles(ExportFolder, KeepDays, KeepMonths, KeepYears, Now);
+			DeleteOldFiles(ExportFolder, KeepDays, KeepMonths, KeepYears, Now, true);
 			if (ExportFolder != KeyFolder)
-				DeleteOldFiles(KeyFolder, KeepDays, KeepMonths, KeepYears, Now);
+				DeleteOldFiles(KeyFolder, KeepDays, KeepMonths, KeepYears, Now, true);
 
-			DeleteOldFiles(Path.GetTempPath(), 7, 0, 0, Now);
+			DeleteOldFiles(Path.GetTempPath(), 7, 0, 0, Now, false);
 
 			await OnAfterBackup.Raise(typeof(Gateway), EventArgs.Empty);
 		}
@@ -4455,10 +4455,26 @@ namespace Waher.IoTGateway
 		/// </summary>
 		public static event EventHandlerAsync OnAfterBackup = null;
 
-		private static void DeleteOldFiles(string Path, long KeepDays, long KeepMonths, long KeepYears, DateTime Now)
+		/// <summary>
+		/// Deletes old files in a folder.
+		/// </summary>
+		/// <param name="Path">Folder path.</param>
+		/// <param name="KeepDays">Delete files that are older than this number of days.</param>
+		public static void DeleteOldFiles(string Path, long KeepDays)
 		{
+			DeleteOldFiles(Path, KeepDays, 0, 0, DateTime.Now, false);
+		}
+
+		private static void DeleteOldFiles(string Path, long KeepDays, long KeepMonths, 
+			long KeepYears, DateTime Now, bool LogIndividualFileEvents)
+		{
+			int Count = 0;
+
 			try
 			{
+				if (!Directory.Exists(Path))
+					return;
+
 				string[] Files = Directory.GetFiles(Path, "*.*", SearchOption.AllDirectories);
 				DateTime CreationTime;
 
@@ -4488,7 +4504,10 @@ namespace Waher.IoTGateway
 						}
 
 						File.Delete(FileName);
-						Log.Informational("Backup file deleted.", FileName);
+						Count++;
+
+						if (LogIndividualFileEvents)
+							Log.Informational("File deleted.", FileName);
 
 						ExportFormat.UpdateClientsFileDeleted(System.IO.Path.GetFileName(FileName));
 					}
@@ -4501,6 +4520,16 @@ namespace Waher.IoTGateway
 			catch (Exception ex)
 			{
 				Log.Exception(ex);
+			}
+			finally
+			{
+				if (Count > 0 && !LogIndividualFileEvents)
+				{
+					if (Count==1)
+						Log.Informational("1 file deleted.", Path);
+					else
+						Log.Informational(Count.ToString() + " files deleted.", Path);
+				}
 			}
 		}
 

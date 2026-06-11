@@ -9,7 +9,7 @@
 	public enum FilePurpose
 	{
 		/// <summary>
-		/// Temporary file
+		/// Temporary file.
 		/// </summary>
 		Temporary,
 
@@ -26,6 +26,11 @@
 		/// <summary>
 		/// PubSub Storage
 		/// </summary>
-		PubSub
+		PubSub,
+
+		/// <summary>
+		/// Used for internal transfer of files between client and server.
+		/// </summary>
+		InternalTransfer
 	}
 }

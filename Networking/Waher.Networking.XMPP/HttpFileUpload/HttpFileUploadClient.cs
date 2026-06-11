@@ -311,13 +311,13 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		/// and for what purpose.
 		/// </summary>
 		/// <param name="FileName">Name of file.</param>
-		/// <param name="FileSize">Size of file.</param>
 		/// <param name="ContentType">Content-Type of file.</param>
+		/// <param name="FileSize">Size of file.</param>
 		/// <param name="Purpose">Purpose of file upload.</param>
 		/// <remarks>
 		/// Not part of XEP-0363: HTTP File Upload
 		/// </remarks>
-		public async Task PrepareFileUpload(string FileName, long FileSize, string ContentType,
+		public async Task PrepareFileUpload(string FileName, string ContentType, long FileSize,
 			FilePurpose Purpose)
 		{
 			if (Purpose == FilePurpose.Temporary)
@@ -339,6 +339,10 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 
 				case FilePurpose.PubSub:
 					Xml.Append("http://waher.se/Schema/PubSub.xsd");
+					break;
+
+				case FilePurpose.InternalTransfer:
+					Xml.Append("http://waher.se/Schema/InternalTransfer.xsd");
 					break;
 			}
 

@@ -661,7 +661,7 @@ namespace Waher.IoTGateway.WebResources
 								BackupInfo.Thread?.NewState("Prepare_" + Recipient);
 
 								await UploadClient.PrepareFileUpload(BackupInfo.LocalFileName,
-									FileSize, BinaryCodec.DefaultContentType, FilePurpose.Backup);
+									BinaryCodec.DefaultContentType, FileSize, FilePurpose.Backup);
 
 								BackupInfo.Thread?.NewState("Get_Slot_" + Recipient);
 

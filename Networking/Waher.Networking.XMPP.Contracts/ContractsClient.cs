@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -2293,22 +2294,12 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Updated identity.</returns>
 		private async Task<LegalIdentity> AddIdentityReviewAttachment(IdentityReviewEventArgs e)
 		{
-			if (!this.client.TryGetExtension(out HttpFileUploadClient HttpFileUploadClient))
-				throw new InvalidOperationException("No HTTP File Upload extension added to the XMPP Client.");
-
 			string Xml = e.Content.OuterXml;
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
-			byte[] Signature = await this.SignAsync(Data, SignWith.CurrentKeys);
 			string FileName = "ApplicationReview.xml";
 			string ContentType = XmlCodec.DefaultContentType + "; charset=utf-8";
 
-			HttpFileUploadEventArgs e2 = await HttpFileUploadClient.RequestUploadSlotAsync(FileName, ContentType, Data.Length);
-			if (!e2.Ok)
-				throw new IOException("Unable to upload Application Review attachment to broker.");
-
-			await e2.PUT(Data, ContentType, 10000);
-
-			return await this.AddLegalIdAttachmentAsync(e.LegalId, e2.GetUrl, Signature);
+			return await this.UploadLegalIdAttachmentAsync(e.LegalId, FileName, Data, ContentType);
 		}
 
 		#endregion
@@ -8134,9 +8125,6 @@ namespace Waher.Networking.XMPP.Contracts
 		public async Task<LegalIdentity> AddPeerReviewIDAttachment(LegalIdentity Identity,
 			LegalIdentity ReviewerLegalIdentity, byte[] PeerSignature)
 		{
-			if (!this.client.TryGetExtension(out HttpFileUploadClient HttpFileUploadClient))
-				throw new InvalidOperationException("No HTTP File Upload extension added to the XMPP Client.");
-
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<peerReview s='");
@@ -8152,17 +8140,10 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("</reviewer></peerReview>");
 
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
-			byte[] Signature = await this.SignAsync(Data, SignWith.CurrentKeys);
 			string FileName = ReviewerLegalIdentity.Id + ".xml";
 			string ContentType = "text/xml; charset=utf-8";
 
-			HttpFileUploadEventArgs e2 = await HttpFileUploadClient.RequestUploadSlotAsync(FileName, ContentType, Data.Length);
-			if (!e2.Ok)
-				throw new IOException("Unable to upload Peer Review attachment to broker.");
-
-			await e2.PUT(Data, ContentType, 10000);
-
-			return await this.AddLegalIdAttachmentAsync(Identity.Id, e2.GetUrl, Signature);
+			return await this.UploadLegalIdAttachmentAsync(Identity.Id, FileName, Data, ContentType);
 		}
 
 		#endregion
@@ -8430,7 +8411,13 @@ namespace Waher.Networking.XMPP.Contracts
 		/// creating the legal identity object.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
+		[Obsolete("To avoid security issues, use the UploadLegalIdAttachmentAsync method instead.")]
 		public Task AddLegalIdAttachment(string LegalId, string GetUrl, byte[] Signature, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
+		{
+			return this.AddLegalIdAttachmentPrivate(LegalId, GetUrl, Signature, Callback, State);
+		}
+
+		private Task AddLegalIdAttachmentPrivate(string LegalId, string GetUrl, byte[] Signature, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -8466,11 +8453,17 @@ namespace Waher.Networking.XMPP.Contracts
 		/// The URL is previously provided by the HTTP Upload Service.</param>
 		/// <param name="Signature">Signature of the content of the attachment, made by the same private key used when
 		/// creating the legal identity object.</param>
-		public async Task<LegalIdentity> AddLegalIdAttachmentAsync(string LegalId, string GetUrl, byte[] Signature)
+		[Obsolete("To avoid security issues, use the UploadLegalIdAttachmentAsync method instead.")]
+		public Task<LegalIdentity> AddLegalIdAttachmentAsync(string LegalId, string GetUrl, byte[] Signature)
+		{
+			return this.AddLegalIdAttachmentAsyncPrivate(LegalId, GetUrl, Signature);
+		}
+
+		private async Task<LegalIdentity> AddLegalIdAttachmentAsyncPrivate(string LegalId, string GetUrl, byte[] Signature)
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			await this.AddLegalIdAttachment(LegalId, GetUrl, Signature, (Sender, e) =>
+			await this.AddLegalIdAttachmentPrivate(LegalId, GetUrl, Signature, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Identity);
@@ -8485,6 +8478,63 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Uploads an attachment to a Legal Identity application.
+		/// </summary>
+		/// <param name="LegalId">Identifier of application.</param>
+		/// <param name="FileName">Name of file to upload.</param>
+		/// <param name="Data">Binary data of file to upload.</param>
+		/// <param name="ContentType">Content-Type of file to upload.</param>
+		/// <returns>Updated Legal Identity application.</returns>
+		public async Task<LegalIdentity> UploadLegalIdAttachmentAsync(string LegalId,
+			string FileName, byte[] Data, string ContentType)
+		{
+			using MemoryStream ms = new MemoryStream(Data);
+			return await this.UploadLegalIdAttachmentAsync(LegalId, FileName, ms, ContentType);
+		}
+
+		/// <summary>
+		/// Uploads an attachment to a Legal Identity application.
+		/// </summary>
+		/// <param name="LegalId">Identifier of application.</param>
+		/// <param name="FileName">Name of file to upload.</param>
+		/// <param name="Data">Binary data of file to upload.</param>
+		/// <param name="ContentType">Content-Type of file to upload.</param>
+		/// <returns>Updated Legal Identity application.</returns>
+		public async Task<LegalIdentity> UploadLegalIdAttachmentAsync(string LegalId,
+			string FileName, Stream Data, string ContentType)
+		{
+			if (!this.client.TryGetExtension(out HttpFileUploadClient HttpFileUploadClient))
+				throw new InvalidOperationException("No HTTP File Upload extension added to the XMPP Client.");
+
+			byte[] Signature = await this.SignAsync(Data, SignWith.CurrentKeys);
+
+			try
+			{
+				await HttpFileUploadClient.PrepareFileUpload(FileName, ContentType, Data.Length,
+					FilePurpose.InternalTransfer);
+			}
+			catch (Exception ex)
+			{
+				Log.Warning("File upload preparation failed: " + ex.Message,
+					HttpFileUploadClient.FileUploadJid,
+					new KeyValuePair<string, object>("LegalId", LegalId),
+					new KeyValuePair<string, object>("FileName", FileName),
+					new KeyValuePair<string, object>("ContentType", ContentType),
+					new KeyValuePair<string, object>("Size", Data.Length));
+			}
+
+			HttpFileUploadEventArgs e2 = await HttpFileUploadClient.RequestUploadSlotAsync(FileName,
+				ContentType, Data.Length);
+
+			if (!e2.Ok)
+				throw new IOException("Unable to upload attachment " + FileName + " to broker.");
+
+			await e2.PUT(Data, ContentType, 10000); // Will set position to 0.
+
+			return await this.AddLegalIdAttachmentAsyncPrivate(LegalId, e2.GetUrl, Signature);
+		}
+
+		/// <summary>
 		/// Adds an attachment to a proposed or approved contract before it is being signed.
 		/// </summary>
 		/// <param name="ContractId">ID of Smart Contract.</param>
@@ -8493,7 +8543,13 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Signature">Signature of the content of the attachment, made by an approved legal identity of the sender.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
+		[Obsolete("To avoid security issues, use the UploadContractAttachmentAsync method instead.")]
 		public Task AddContractAttachment(string ContractId, string GetUrl, byte[] Signature, EventHandlerAsync<SmartContractEventArgs> Callback, object State)
+		{
+			return this.AddContractAttachmentPrivate(ContractId, GetUrl, Signature, Callback, State);
+		}
+
+		private Task AddContractAttachmentPrivate(string ContractId, string GetUrl, byte[] Signature, EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -8534,11 +8590,17 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="GetUrl">The GET URL of the attachment to associate with the smart contract.
 		/// The URL might previously have been provided by the HTTP Upload Service.</param>
 		/// <param name="Signature">Signature of the content of the attachment, made by an approved legal identity of the sender.</param>
-		public async Task<Contract> AddContractAttachmentAsync(string ContractId, string GetUrl, byte[] Signature)
+		[Obsolete("To avoid security issues, use the UploadContractAttachmentAsync method instead.")]
+		public Task<Contract> AddContractAttachmentAsync(string ContractId, string GetUrl, byte[] Signature)
+		{
+			return this.AddContractAttachmentAsyncPrivate(ContractId, GetUrl, Signature);
+		}
+
+		private async Task<Contract> AddContractAttachmentAsyncPrivate(string ContractId, string GetUrl, byte[] Signature)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			await this.AddContractAttachment(ContractId, GetUrl, Signature, (Sender, e) =>
+			await this.AddContractAttachmentPrivate(ContractId, GetUrl, Signature, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Contract);
@@ -8550,6 +8612,63 @@ namespace Waher.Networking.XMPP.Contracts
 			}, null);
 
 			return await Result.Task;
+		}
+
+		/// <summary>
+		/// Uploads an attachment to a Smart Contract.
+		/// </summary>
+		/// <param name="ContractId">Identifier of contract.</param>
+		/// <param name="FileName">Name of file to upload.</param>
+		/// <param name="Data">Binary data of file to upload.</param>
+		/// <param name="ContentType">Content-Type of file to upload.</param>
+		/// <returns>Updated Smart Contract.</returns>
+		public async Task<Contract> UploadContractAttachmentAsync(string ContractId,
+			string FileName, byte[] Data, string ContentType)
+		{
+			using MemoryStream ms = new MemoryStream(Data);
+			return await this.UploadContractAttachmentAsync(ContractId, FileName, ms, ContentType);
+		}
+
+		/// <summary>
+		/// Uploads an attachment to a Smart Contract.
+		/// </summary>
+		/// <param name="ContractId">Identifier of contract.</param>
+		/// <param name="FileName">Name of file to upload.</param>
+		/// <param name="Data">Binary data of file to upload.</param>
+		/// <param name="ContentType">Content-Type of file to upload.</param>
+		/// <returns>Updated Smart Contract.</returns>
+		public async Task<Contract> UploadContractAttachmentAsync(string ContractId,
+			string FileName, Stream Data, string ContentType)
+		{
+			if (!this.client.TryGetExtension(out HttpFileUploadClient HttpFileUploadClient))
+				throw new InvalidOperationException("No HTTP File Upload extension added to the XMPP Client.");
+
+			byte[] Signature = await this.SignAsync(Data, SignWith.CurrentKeys);
+
+			try
+			{
+				await HttpFileUploadClient.PrepareFileUpload(FileName, ContentType, Data.Length,
+					FilePurpose.InternalTransfer);
+			}
+			catch (Exception ex)
+			{
+				Log.Warning("File upload preparation failed: " + ex.Message,
+					HttpFileUploadClient.FileUploadJid,
+					new KeyValuePair<string, object>("ContractId", ContractId),
+					new KeyValuePair<string, object>("FileName", FileName),
+					new KeyValuePair<string, object>("ContentType", ContentType),
+					new KeyValuePair<string, object>("Size", Data.Length));
+			}
+
+			HttpFileUploadEventArgs e2 = await HttpFileUploadClient.RequestUploadSlotAsync(FileName,
+				ContentType, Data.Length);
+
+			if (!e2.Ok)
+				throw new IOException("Unable to upload attachment " + FileName + " to broker.");
+
+			await e2.PUT(Data, ContentType, 10000); // Will set position to 0.
+
+			return await this.AddContractAttachmentAsyncPrivate(ContractId, e2.GetUrl, Signature);
 		}
 
 		/// <summary>

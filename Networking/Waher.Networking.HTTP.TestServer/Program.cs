@@ -256,14 +256,12 @@ internal class Program
 				Response.ContentType = "text/html";
 				await Response.Write(Html);
 			}
-			;
 
 			static Task HelloStyles(HttpRequest Request, HttpResponse Response)
 			{
 				Response.ContentType = "text/css";
 				return Response.Write("body\r\n{\r\nbackground-color:yellow\r\n}");
 			}
-			;
 
 			WebServer.Register("/Hello", Hello, Hello);
 			WebServer.Register("/Hello.md", HelloMarkdown, HelloMarkdown);

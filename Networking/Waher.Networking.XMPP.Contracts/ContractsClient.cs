@@ -8527,7 +8527,10 @@ namespace Waher.Networking.XMPP.Contracts
 				ContentType, Data.Length);
 
 			if (!e2.Ok)
-				throw new IOException("Unable to upload attachment " + FileName + " to broker.");
+			{
+				throw new IOException("Unable to upload attachment " + FileName + " to broker: " +
+					e2.ErrorText);
+			}
 
 			await e2.PUT(Data, ContentType, 10000); // Will set position to 0.
 

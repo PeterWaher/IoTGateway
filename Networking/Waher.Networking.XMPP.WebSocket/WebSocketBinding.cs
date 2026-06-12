@@ -317,7 +317,7 @@ namespace Waher.Networking.XMPP.WebSocket
 
 			try
 			{
-				while (!this.terminated)
+				while (!this.terminated && !this.disposed)
 				{
 					string Xml = await this.ReadText();
 
@@ -369,10 +369,10 @@ namespace Waher.Networking.XMPP.WebSocket
 
 							try
 							{
-								if (this.webSocketClient.State == WebSocketState.Open)
+								if (this.webSocketClient?.State == WebSocketState.Open)
 									await this.webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
 
-								this.webSocketClient.Dispose();
+								this.webSocketClient?.Dispose();
 								this.webSocketClient = null;
 							}
 							catch (Exception)
@@ -402,7 +402,7 @@ namespace Waher.Networking.XMPP.WebSocket
 				throw new Exception("No web socket client available.");
 
 			WebSocketReceiveResult Response = await this.webSocketClient.ReceiveAsync(this.inputBuffer, CancellationToken.None);
-			if (Response is null)
+			if (Response is null || this.terminated || this.disposed)
 				return string.Empty;
 
 			this.AssureText(Response);
@@ -413,8 +413,8 @@ namespace Waher.Networking.XMPP.WebSocket
 
 			string s = Encoding.UTF8.GetString(this.inputBuffer.Array, 0, Count);
 
-			if (this.xmppClient.HasSniffers)
-				this.xmppClient.ReceiveText(s);
+			if (this.xmppClient?.HasSniffers ?? false)
+				this.xmppClient?.ReceiveText(s);
 
 			if (Response.EndOfMessage)
 				return s;
@@ -430,8 +430,8 @@ namespace Waher.Networking.XMPP.WebSocket
 				s = Encoding.UTF8.GetString(this.inputBuffer.Array, 0, Count);
 				sb.Append(s);
 
-				if (this.xmppClient.HasSniffers)
-					this.xmppClient.ReceiveText(s);
+				if (this.xmppClient?.HasSniffers ?? false)
+					this.xmppClient?.ReceiveText(s);
 			}
 			while (!Response.EndOfMessage && !this.disposed);
 

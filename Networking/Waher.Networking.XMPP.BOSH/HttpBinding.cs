@@ -661,12 +661,15 @@ namespace Waher.Networking.XMPP.BOSH
 
 					this.bindingInterface.NextPing = DateTime.Now.AddSeconds(this.waitSeconds + 5);
 
-					HttpResponseMessage Response = await this.httpClients[ClientIndex].PostAsync(this.url, Content);
+					HttpResponseMessage Response = await (this.httpClients[ClientIndex]?.PostAsync(this.url, Content) 
+						?? Task.FromResult<HttpResponseMessage>(null));
 
-					if (!Response.IsSuccessStatusCode)
+					if (Response is null)
+						return;
+					else if (!Response.IsSuccessStatusCode)
 					{
 						ContentResponse Temp = await Waher.Content.Getters.WebGetter.ProcessResponse(Response, this.url);
-						await this.bindingInterface?.ConnectionError(Temp.Error);
+						await (this.bindingInterface?.ConnectionError(Temp.Error) ?? Task.CompletedTask);
 						return;
 					}
 
@@ -733,7 +736,7 @@ namespace Waher.Networking.XMPP.BOSH
 			}
 			catch (Exception ex)
 			{
-				await this.bindingInterface?.ConnectionError(ex);
+				await (this.bindingInterface?.ConnectionError(ex) ?? Task.CompletedTask);
 			}
 		}
 

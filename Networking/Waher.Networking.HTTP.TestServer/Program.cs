@@ -7,6 +7,7 @@ using Waher.Events.Console;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Brotli;
 using Waher.Networking.HTTP.ContentEncodings;
+using Waher.Networking.HTTP.Mcp;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
@@ -266,6 +267,7 @@ internal class Program
 			WebServer.Register("/Hello", Hello, Hello);
 			WebServer.Register("/Hello.md", HelloMarkdown, HelloMarkdown);
 			WebServer.Register("/Hello.css", HelloStyles);
+			WebServer.Register(new HttpMcpResource("/MCP/Test"));
 
 			Log.Informational("Press CTRL+C to quit.");
 

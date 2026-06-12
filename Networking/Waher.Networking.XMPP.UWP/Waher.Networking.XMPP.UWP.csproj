@@ -198,6 +198,7 @@
     <Compile Include="Events\PresenceEventArgs.cs" />
     <Compile Include="Events\PrivateXmlEventArgs.cs" />
     <Compile Include="Events\ValidateSenderEventArgs.cs" />
+    <Compile Include="HttpFileUpload\FilePurpose.cs" />
     <Compile Include="HttpFileUpload\HttpFileUploadClient.cs" />
     <Compile Include="HttpFileUpload\HttpFileUploadEventArgs.cs" />
     <Compile Include="IAlternativeTransport.cs" />

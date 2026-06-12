@@ -18,7 +18,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 	{
 		private static readonly JsonCodec jsonCodec = new JsonCodec();
 
-		private readonly Dictionary<string, JsonRpcMethodInfo> methods = new Dictionary<string, JsonRpcMethodInfo>();
+		private readonly Dictionary<string, JsonRpcMethodInfo> methods;
 		private readonly bool userSessions;
 
 		/// <summary>
@@ -29,9 +29,27 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="Methods">Methods to register with the web service interface.</param>
 		public JsonRpcWebService(string ResourceName, bool UserSessions,
 			params Delegate[] Methods)
+			: this(ResourceName, UserSessions, true, Methods)
+		{
+		}
+
+		/// <summary>
+		/// Web Service interface based on JSON-RPC v2.0.
+		/// </summary>
+		/// <param name="ResourceName">Name of resource.</param>
+		/// <param name="UserSessions">If the resource uses user sessions.</param>
+		/// <param name="CaseSensitive">If names are case-sensitive.</param>
+		/// <param name="Methods">Methods to register with the web service interface.</param>
+		public JsonRpcWebService(string ResourceName, bool UserSessions, bool CaseSensitive,
+			params Delegate[] Methods)
 			: base(ResourceName)
 		{
 			this.userSessions = UserSessions;
+
+			if (CaseSensitive)
+				this.methods = new Dictionary<string, JsonRpcMethodInfo>(StringComparer.InvariantCulture);
+			else
+				this.methods = new Dictionary<string, JsonRpcMethodInfo>(StringComparer.InvariantCultureIgnoreCase);
 
 			if (!(Methods is null))
 			{
@@ -108,27 +126,30 @@ namespace Waher.Networking.HTTP.JsonRpc
 		{
 			using JsonRpcServerRequest JsonRpcRequest = new JsonRpcServerRequest();
 
-			foreach (KeyValuePair<string, string> P in Request.Header.QueryParameters)
+			if (!(Request.Header.QueryParameters is null))
 			{
-				string s = System.Net.WebUtility.UrlDecode(P.Value);
-				object? Value;
-
-				if (P.Key == "params")
+				foreach (KeyValuePair<string, string> P in Request.Header.QueryParameters)
 				{
-					try
-					{
-						Value = JSON.Parse(s);
-					}
-					catch (Exception ex)
-					{
-						JsonRpcRequest.SetError(-32700, "Unable to parse parameter: " + P.Key + ": " + ex.Message, 500);
-						continue;
-					}
-				}
-				else
-					Value = P.Value;
+					string s = System.Net.WebUtility.UrlDecode(P.Value);
+					object? Value;
 
-				this.ProcessQueryParameter(JsonRpcRequest, P.Key, Value);
+					if (P.Key == "params")
+					{
+						try
+						{
+							Value = JSON.Parse(s);
+						}
+						catch (Exception ex)
+						{
+							JsonRpcRequest.SetError(-32700, "Unable to parse parameter: " + P.Key + ": " + ex.Message, 500);
+							continue;
+						}
+					}
+					else
+						Value = P.Value;
+
+					this.ProcessQueryParameter(JsonRpcRequest, P.Key, Value);
+				}
 			}
 
 			await JsonRpcRequest.BuildResponse();

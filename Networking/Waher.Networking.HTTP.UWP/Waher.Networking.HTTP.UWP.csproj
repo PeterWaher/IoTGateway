@@ -316,6 +316,7 @@
     <Compile Include="TransferEncoding.cs" />
     <Compile Include="TransferEncodings\ChunkedTransferEncoding.cs" />
     <Compile Include="TransferEncodings\ContentLengthEncoding.cs" />
+    <Compile Include="TransferEncodings\DirectTransfer.cs" />
     <Compile Include="TransferEncodings\Http2TransferEncoding.cs" />
     <Compile Include="TransferEncodings\InternalTransfer.cs" />
     <Compile Include="Vanity\VanityResources.cs" />

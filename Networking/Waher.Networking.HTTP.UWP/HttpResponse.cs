@@ -51,7 +51,7 @@ namespace Waher.Networking.HTTP
 		private TransferEncoding transferEncoding = null;
 		private IBinaryTransmission responseStream;
 		private ICodecProgress progress;
-		private readonly TransferEncoding desiredTransferEncoding = null;
+		private TransferEncoding desiredTransferEncoding = null;
 		private readonly HttpServer httpServer;
 		private readonly HttpRequest httpRequest;
 
@@ -565,6 +565,18 @@ namespace Waher.Networking.HTTP
 		{
 			get => this.transferEncoding ?? this.desiredTransferEncoding;
 			internal set => this.transferEncoding = value;
+		}
+
+		/// <summary>
+		/// Enables direct transfer to output of written data, with no encoding, buffering
+		/// or limit.
+		/// </summary>
+		/// <exception cref="InvalidOperationException">If transfer encoding has already
+		/// been defined.</exception>
+		public void EnableDirectTransfer()
+		{
+			this.desiredTransferEncoding = new DirectOutputTransfer(this.responseStream,
+				this.clientConnection, this.encoding);
 		}
 
 		/// <summary>

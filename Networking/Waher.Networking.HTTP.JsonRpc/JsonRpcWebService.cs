@@ -20,6 +20,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 		private readonly Dictionary<string, JsonRpcMethodInfo> methods;
 		private readonly bool userSessions;
+		private readonly bool caseSensitive;
 
 		/// <summary>
 		/// Web Service interface based on JSON-RPC v2.0.
@@ -45,6 +46,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			: base(ResourceName)
 		{
 			this.userSessions = UserSessions;
+			this.caseSensitive = CaseSensitive;
 
 			if (CaseSensitive)
 				this.methods = new Dictionary<string, JsonRpcMethodInfo>(StringComparer.InvariantCulture);
@@ -91,7 +93,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				if (this.methods.ContainsKey(Name))
 					throw new Exception("Method already registered: " + Name);
 
-				this.methods[Name] = new JsonRpcMethodInfo(Method);
+				this.methods[Name] = new JsonRpcMethodInfo(Method, this.caseSensitive);
 			}
 		}
 
@@ -124,6 +126,15 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
+			if (Request.Header.IsAcceptable("text/event-stream"))
+			{
+				// TODO: Support for Server-Sent Events (SSE) in JSON-RPC.
+
+				Response.StatusCode = 204;  // No content
+				await Response.SendResponse();
+				return;
+			}
+
 			using JsonRpcServerRequest JsonRpcRequest = new JsonRpcServerRequest();
 
 			if (!(Request.Header.QueryParameters is null))
@@ -153,7 +164,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			}
 
 			await JsonRpcRequest.BuildResponse();
-			await this.SendResponse(JsonRpcRequest, Response);
+			await this.SendResponse(Request, JsonRpcRequest, Response);
 		}
 
 		/// <summary>
@@ -209,17 +220,30 @@ namespace Waher.Networking.HTTP.JsonRpc
 			}
 
 			await JsonRpcRequest.BuildResponse();
-			await this.SendResponse(JsonRpcRequest, Response);
+			await this.SendResponse(Request, JsonRpcRequest, Response);
 		}
 
-		private async Task SendResponse(JsonRpcServerRequest Request, HttpResponse Response)
+		private async Task SendResponse(HttpRequest HttpRequest, 
+			JsonRpcServerRequest JsonRequest, HttpResponse Response)
 		{
-			if (Request.StatusCode == 204)
-				Response.StatusCode = Request.StatusCode;
+			if (JsonRequest.StatusCode == 204)
+				Response.StatusCode = JsonRequest.StatusCode;
 			else
 			{
-				ContentResponse Encoded = await jsonCodec.EncodeAsync(Request.Response,
-					Encoding.UTF8, null, JsonCodec.JsonRpcContentType);
+				ContentResponse Encoded;
+
+				if (HttpRequest.Header.Accept.IsAcceptable(JsonCodec.JsonRpcContentType))
+				{
+					Encoded = await jsonCodec.EncodeAsync(JsonRequest.Response,
+						Encoding.UTF8, null, JsonCodec.JsonRpcContentType);
+				}
+				else
+				{
+					string ContentType = HttpRequest.Header.Accept.GetBestAlternative(JsonCodec.JsonContentTypes);
+
+					Encoded = await jsonCodec.EncodeAsync(JsonRequest.Response,
+						Encoding.UTF8, null, ContentType);
+				}
 
 				if (Encoded.HasError)
 				{
@@ -228,11 +252,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 				}
 				else
 				{
-					Response.StatusCode = Request.StatusCode;
+					Response.StatusCode = JsonRequest.StatusCode;
 
-					if (Request.StatusCode != 204)
+					if (JsonRequest.StatusCode != 204)
 					{
-						Response.ContentType = JsonCodec.JsonRpcContentType;
+						Response.ContentType = Encoded.ContentType;
 
 						await Response.Write(true, Encoded.Encoded, 0, Encoded.Encoded.Length);
 					}

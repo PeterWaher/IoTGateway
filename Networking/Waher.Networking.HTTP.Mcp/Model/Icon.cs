@@ -9,6 +9,40 @@ namespace Waher.Networking.HTTP.Mcp
 	public class Icon
 	{
 		/// <summary>
+		/// An optionally-sized icon that can be displayed in a user interface.
+		/// </summary>
+		public Icon()
+		{
+		}
+
+		/// <summary>
+		/// An optionally-sized icon that can be displayed in a user interface.
+		/// </summary>
+		public Icon(Uri Source, string MimeType)
+			: this(Source, MimeType, null, null)
+		{
+		}
+
+		/// <summary>
+		/// An optionally-sized icon that can be displayed in a user interface.
+		/// </summary>
+		public Icon(Uri Source, string MimeType, string[]? Sizes)
+			: this(Source, MimeType, Sizes, null)
+		{
+		}
+
+		/// <summary>
+		/// An optionally-sized icon that can be displayed in a user interface.
+		/// </summary>
+		public Icon(Uri Source, string MimeType, string[]? Sizes, string? Theme)
+		{
+			this.Source = Source;
+			this.MimeType = MimeType;
+			this.Sizes = Sizes;
+			this.Theme = Theme;
+		}
+
+		/// <summary>
 		/// A standard URI pointing to an icon resource. May be an HTTP/HTTPS URL or a
 		/// `data:` URI with Base64-encoded image data.
 		/// 
@@ -79,6 +113,29 @@ namespace Waher.Networking.HTTP.Mcp
 
 			Typed = Result;
 			return true;
+		}
+
+		/// <summary>
+		/// Converts object to a generic representation.
+		/// </summary>
+		/// <returns>Generic representation.</returns>
+		public Dictionary<string, object> ToJson()
+		{
+			Dictionary<string, object> Result = new Dictionary<string, object>();
+
+			if (!(this.Source is null))
+				Result["src"] = this.Source.ToString();
+
+			if (!string.IsNullOrEmpty(this.MimeType))
+				Result["mimeType"] = this.MimeType;
+
+			if (!(this.Sizes is null))
+				Result["sizes"] = this.Sizes;
+
+			if (!string.IsNullOrEmpty(this.Theme))
+				Result["theme"] = this.Theme;
+
+			return Result;
 		}
 	}
 }

@@ -10,6 +10,22 @@ namespace Waher.Networking.HTTP.Mcp
 	public class Icons
 	{
 		/// <summary>
+		/// Base interface to add `icons` property.
+		/// </summary>
+		public Icons()
+		{
+		}
+
+		/// <summary>
+		/// Base interface to add `icons` property.
+		/// </summary>
+		/// <param name="Icons">Icons</param>
+		public Icons(params Icon[] Icons)
+		{
+			this.IconArray = Icons;
+		}
+
+		/// <summary>
 		/// Optional set of sized icons that the client can display in a user interface.
 		/// 
 		/// Clients that support rendering icons MUST support at least the following MIME types:
@@ -51,6 +67,22 @@ namespace Waher.Networking.HTTP.Mcp
 
 			Typed = Result;
 			return true;
+		}
+
+		/// <summary>
+		/// Converts object to a generic representation.
+		/// </summary>
+		/// <returns>Generic representation.</returns>
+		public Dictionary<string, object>[] ToJson()
+		{
+			if (this.IconArray is null)
+				return Array.Empty<Dictionary<string, object>>();
+
+			Dictionary<string, object>[] Result = new Dictionary<string, object>[this.IconArray.Length];
+			for (int i = 0; i < this.IconArray.Length; i++)
+				Result[i] = this.IconArray[i].ToJson();
+
+			return Result;
 		}
 	}
 }

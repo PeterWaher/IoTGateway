@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Waher.Networking.HTTP.JsonRpc;
 
 namespace Waher.Networking.HTTP.Mcp
@@ -8,18 +9,43 @@ namespace Waher.Networking.HTTP.Mcp
 	/// </summary>
 	public class HttpMcpServerResource : JsonRpcWebService
 	{
-		private delegate void InitializeDelegate(
+		private delegate Dictionary<string, object> InitializeDelegate(
 			string ProtocolVersion,
 			Dictionary<string, object> Capabilities,
 			Dictionary<string, object> ClientInfo);
+
+		private string name;
+		private string title;
+		private string version;
+		private string description;
+		private string instructions;
+		private Icons icons;
+		private Uri webSiteUri;
 
 		/// <summary>
 		/// HTTP-based Model Context Protocol (MCP) resource.
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
-		public HttpMcpServerResource(string ResourceName)
+		/// <param name="Name">Name of server.</param>
+		/// <param name="Title">Title of server.</param>
+		/// <param name="Version">Version of server.</param>
+		/// <param name="Description">Description of server.</param>
+		/// <param name="Icons">Icons of server.</param>
+		/// <param name="WebSiteUri">Website URI of server.</param>
+		/// <param name="Instructions">Instructions for server.</param>
+		public HttpMcpServerResource(string ResourceName, string Name, string Title,
+			string Version, string Description, Icon[] Icons, Uri WebSiteUri,
+			string Instructions)
 			: base(ResourceName, true, false)
 		{
+			this.name = Name;
+			this.title = Title;
+			this.version = Version;
+			this.description = Description;
+			this.icons = new Icons(Icons);
+			this.webSiteUri = WebSiteUri;
+			this.instructions = Instructions;
+
 			this.Register((InitializeDelegate)this.Initialize);
 		}
 
@@ -38,7 +64,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// </summary>
 		public Implementation? ClientInformation { get; private set; }
 
-		private void Initialize(
+		private Dictionary<string, object> Initialize(
 			string ProtocolVersion,
 			Dictionary<string, object> Capabilities,
 			Dictionary<string, object> ClientInfo)
@@ -50,6 +76,62 @@ namespace Waher.Networking.HTTP.Mcp
 
 			if (Implementation.TryParse(ClientInfo, out Implementation ClientInfoParsed))
 				this.ClientInformation = ClientInfoParsed;
+
+			Dictionary<string, object> Result = new Dictionary<string, object>()
+			{
+				{ "protocolVersion", "2025-11-25" },
+				{ "capabilities", new Dictionary<string, object>()
+					{
+						{ "experimental", new Dictionary<string, object>() },
+						{ "logging", new Dictionary<string, object>() },
+						{ "completions", new Dictionary<string, object>() },
+						{ "prompts", new Dictionary<string, object>()
+							{
+								{ "listChanged", false }
+							}
+						},
+						{ "resources", new Dictionary<string, object>()
+							{
+								{ "subscribe", false },
+								{ "listChanged", false }
+							}
+						},
+						{ "tools", new Dictionary<string, object>()
+							{
+								{ "listChanged", false }
+							}
+						},
+						{ "tasks", new Dictionary<string, object>()
+							{
+								{ "list", new Dictionary<string, object>() },
+								{ "cancel", new Dictionary<string, object>() },
+								{ "requests", new Dictionary<string, object>()
+									{
+										{ "tools", new Dictionary<string, object>()
+											{
+												{ "call", new Dictionary<string, object>() }
+											}
+										}
+									}
+								}
+							}
+						},
+					}
+				},
+				{ "serverInfo", new Dictionary<string,object>()
+					{
+						{ "name", this.name },
+						{ "title", this.title },
+						{ "version", this.version },
+						{ "description", this.description },
+						{ "icons", this.icons.ToJson() },
+						{ "websiteUrl", this.webSiteUri }
+					}
+				},
+				{ "instructions", this.instructions }
+			};
+
+			return Result;
 		}
 	}
 }

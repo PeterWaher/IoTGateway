@@ -1,0 +1,56 @@
+﻿using System;
+using System.Collections.Generic;
+using Waher.Runtime.Collections;
+
+namespace Waher.Networking.HTTP.Mcp
+{
+	/// <summary>
+	/// Base interface to add `icons` property.
+	/// </summary>
+	public class Icons
+	{
+		/// <summary>
+		/// Optional set of sized icons that the client can display in a user interface.
+		/// 
+		/// Clients that support rendering icons MUST support at least the following MIME types:
+		/// - `image/png` - PNG images(safe, universal compatibility)
+		/// - `image/jpeg` (and `image/jpg`) - JPEG images(safe, universal compatibility)
+		/// 
+		/// Clients that support rendering icons SHOULD also support:
+		/// - `image/svg+xml` - SVG images(scalable but requires security precautions)
+		/// - `image/webp` - WebP images(modern, efficient format)
+		/// </summary>
+		public Icon[]? IconArray { get; internal set; }
+
+		/// <summary>
+		/// Tries to parse a generic structure into a typed structure.
+		/// </summary>
+		/// <param name="Generic">Generic representation.</param>
+		/// <param name="Typed">Typed prepsentation.</param>
+		/// <returns>If successful.</returns>
+		public static bool TryParse(Dictionary<string, object> Generic,
+			out Icons Typed)
+		{
+			Icons Result = new Icons();
+
+			if (Generic.TryGetValue("icons", out object? Obj) && Obj is Array Icons)
+			{
+				ChunkedList<Icon> IconList = new ChunkedList<Icon>();
+
+				foreach (object Item in Icons)
+				{
+					if (Item is Dictionary<string, object> IconObj &&
+						Icon.TryParse(IconObj, out Icon TypedIcon))
+					{
+						IconList.Add(TypedIcon);
+					}
+				}
+
+				Result.IconArray = IconList.ToArray();
+			}
+
+			Typed = Result;
+			return true;
+		}
+	}
+}

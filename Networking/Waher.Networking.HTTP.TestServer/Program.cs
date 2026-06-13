@@ -267,7 +267,7 @@ internal class Program
 			WebServer.Register("/Hello", Hello, Hello);
 			WebServer.Register("/Hello.md", HelloMarkdown, HelloMarkdown);
 			WebServer.Register("/Hello.css", HelloStyles);
-			WebServer.Register(new HttpMcpResource("/MCP/Test"));
+			WebServer.Register(new HttpMcpServerResource("/MCP/Test"));
 
 			Log.Informational("Press CTRL+C to quit.");
 

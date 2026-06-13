@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
+using Waher.Networking.HTTP.HTTP2;
 
 namespace Waher.Networking.HTTP.TransferEncodings
 {
@@ -61,6 +62,29 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		public override Task<bool> FlushAsync(bool EndOfData)
 		{
 			return this.output.FlushAsync();
+		}
+
+		/// <summary>
+		/// Is called when the header is complete, and before content is being transferred.
+		/// </summary>
+		/// <param name="Response">HTTP Response object.</param>
+		/// <param name="ExpectContent">If content is expected.</param>
+		public override async Task BeforeContentAsync(HttpResponse Response, bool ExpectContent)
+		{
+			if (Response.IsHttp1)
+			{
+				byte[] HeaderBin = Response.GenerateHttp11ResponseHeader(ExpectContent);
+
+				await this.output.SendAsync(true, HeaderBin);
+
+				this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
+			}
+			else
+			{
+				byte[] HeaderBin = await Response.GenerateHttp2ResponseHeader(ExpectContent);
+				if (!(HeaderBin is null))
+					this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
+			}
 		}
 	}
 }

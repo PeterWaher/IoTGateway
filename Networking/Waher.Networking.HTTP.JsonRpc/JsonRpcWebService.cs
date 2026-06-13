@@ -4,8 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Json;
-using Waher.Networking.HTTP.ScriptExtensions;
-using Waher.Networking.HTTP.TransferEncodings;
+using Waher.Events;
 using Waher.Runtime.Collections;
 
 namespace Waher.Networking.HTTP.JsonRpc
@@ -130,7 +129,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// Sends an event to clients with open subscriptions.
 		/// </summary>
 		/// <param name="Fields">Fields to emit.</param>
-		public Task SendEvent(IDictionary<string, object> Fields)
+		/// <returns>Number of clients the event was forwarded to.</returns>
+		public Task<int> SendEvent(IDictionary<string, object> Fields)
 		{
 			return this.SendEvent(null, Fields);
 		}
@@ -139,7 +139,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// Sends an event to clients with open subscriptions.
 		/// </summary>
 		/// <param name="Fields">Fields to emit.</param>
-		public Task SendEvent(params KeyValuePair<string, object>[] Fields)
+		/// <returns>Number of clients the event was forwarded to.</returns>
+		public Task<int> SendEvent(params KeyValuePair<string, object>[] Fields)
 		{
 			return this.SendEvent(null, Fields);
 		}
@@ -148,7 +149,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// Sends an event to clients with open subscriptions.
 		/// </summary>
 		/// <param name="Fields">Fields to emit.</param>
-		public Task SendEvent(IEnumerable<KeyValuePair<string, object>> Fields)
+		/// <returns>Number of clients the event was forwarded to.</returns>
+		public Task<int> SendEvent(IEnumerable<KeyValuePair<string, object>> Fields)
 		{
 			return this.SendEvent(null, Fields);
 		}
@@ -158,7 +160,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// </summary>
 		/// <param name="Comment">Optional comment.</param>
 		/// <param name="Fields">Fields to emit.</param>
-		public Task SendEvent(string? Comment, IDictionary<string, object> Fields)
+		/// <returns>Number of clients the event was forwarded to.</returns>
+		public Task<int> SendEvent(string? Comment, IDictionary<string, object> Fields)
 		{
 			return this.SendEvent(Comment, (IEnumerable<KeyValuePair<string, object>>)Fields);
 		}
@@ -168,7 +171,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// </summary>
 		/// <param name="Comment">Optional comment.</param>
 		/// <param name="Fields">Fields to emit.</param>
-		public Task SendEvent(string? Comment, params KeyValuePair<string, object>[] Fields)
+		/// <returns>Number of clients the event was forwarded to.</returns>
+		public Task<int> SendEvent(string? Comment, params KeyValuePair<string, object>[] Fields)
 		{
 			return this.SendEvent(Comment, (IEnumerable<KeyValuePair<string, object>>)Fields);
 		}
@@ -178,7 +182,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// </summary>
 		/// <param name="Comment">Optional comment.</param>
 		/// <param name="Fields">Fields to emit.</param>
-		public async Task SendEvent(string? Comment, IEnumerable<KeyValuePair<string, object>> Fields)
+		/// <returns>Number of clients the event was forwarded to.</returns>
+		public Task<int> SendEvent(string? Comment, IEnumerable<KeyValuePair<string, object>> Fields)
 		{
 			if (!this.SupportsServerSentEvents)
 				throw new InvalidOperationException("Server-Sent Events (SSE) not supported by this resource.");
@@ -230,13 +235,19 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 			sb.Append("\r\n");
 
-			string Event = sb.ToString();
+			return this.SendEvent(sb.ToString());
+		}
+
+		private async Task<int> SendEvent(string Event)
+		{ 
+			int Count = 0;
 
 			foreach (HttpResponse Response in this.eventSubscriptionsStatic)
 			{
 				try
 				{
 					await Response.Write(Event);
+					Count++;
 				}
 				catch (Exception)
 				{
@@ -247,10 +258,33 @@ namespace Waher.Networking.HTTP.JsonRpc
 					}
 				}
 			}
+
+			return Count;
 		}
 
 		private readonly ChunkedList<HttpResponse> eventSubscriptions = new ChunkedList<HttpResponse>();
 		private HttpResponse[] eventSubscriptionsStatic = Array.Empty<HttpResponse>();
+		private bool eventSubscriptionsKeepAliveRunning = false;
+
+		private async void KeepEventSubscrptionsAlive()
+		{
+			try
+			{
+				do
+				{
+					await Task.Delay(15000);    // Keep alive every 15 seconds.
+				}
+				while (await this.SendEvent(":\r\n") > 0);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+			finally
+			{
+				this.eventSubscriptionsKeepAliveRunning = false;
+			}
+		}
 
 		/// <summary>
 		/// Executes the GET method on the resource.
@@ -277,9 +311,14 @@ namespace Waher.Networking.HTTP.JsonRpc
 				{
 					this.eventSubscriptions.Add(Response);
 					this.eventSubscriptionsStatic = this.eventSubscriptions.ToArray();
+
+					if (!this.eventSubscriptionsKeepAliveRunning)
+					{
+						this.eventSubscriptionsKeepAliveRunning = true;
+						this.KeepEventSubscrptionsAlive();
+					}
 				}
 
-				// TODO: regular keep-alive messages (empty comment :CRLF every 15 seconds).
 				return;
 			}
 

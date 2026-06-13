@@ -354,5 +354,8 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(-1, Results[0].Result);
 		}
 
+		// TODO: Server-sent Events (SSE) over HTTP/1
+		// TODO: Server-sent Events (SSE) over HTTP/2
+
 	}
 }

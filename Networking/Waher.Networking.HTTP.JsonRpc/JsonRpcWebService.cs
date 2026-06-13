@@ -4,6 +4,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Json;
+using Waher.Networking.HTTP.ScriptExtensions;
+using Waher.Networking.HTTP.TransferEncodings;
+using Waher.Runtime.Collections;
 
 namespace Waher.Networking.HTTP.JsonRpc
 {
@@ -14,7 +17,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 	/// https://www.jsonrpc.org/specification
 	/// https://www.jsonrpc.org/historical/json-rpc-over-http.html
 	/// </summary>
-	public class JsonRpcWebService : HttpSynchronousResource, IHttpGetMethod, IHttpPostMethod
+	public class JsonRpcWebService : HttpAsynchronousResource, IHttpGetMethod, IHttpPostMethod
 	{
 		private static readonly JsonCodec jsonCodec = new JsonCodec();
 
@@ -81,6 +84,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public override bool UserSessions => this.userSessions;
 
 		/// <summary>
+		/// If Server-Sent Events (SSE) are supported by the resource.
+		/// </summary>
+		public virtual bool SupportsServerSentEvents => false;
+
+		/// <summary>
 		/// Registers a method to be used in the JSON-RPC interface. 
 		/// </summary>
 		/// <param name="Method">Method to register.</param>
@@ -119,6 +127,132 @@ namespace Waher.Networking.HTTP.JsonRpc
 		}
 
 		/// <summary>
+		/// Sends an event to clients with open subscriptions.
+		/// </summary>
+		/// <param name="Fields">Fields to emit.</param>
+		public Task SendEvent(IDictionary<string, object> Fields)
+		{
+			return this.SendEvent(null, Fields);
+		}
+
+		/// <summary>
+		/// Sends an event to clients with open subscriptions.
+		/// </summary>
+		/// <param name="Fields">Fields to emit.</param>
+		public Task SendEvent(params KeyValuePair<string, object>[] Fields)
+		{
+			return this.SendEvent(null, Fields);
+		}
+
+		/// <summary>
+		/// Sends an event to clients with open subscriptions.
+		/// </summary>
+		/// <param name="Fields">Fields to emit.</param>
+		public Task SendEvent(IEnumerable<KeyValuePair<string, object>> Fields)
+		{
+			return this.SendEvent(null, Fields);
+		}
+
+		/// <summary>
+		/// Sends an event to clients with open subscriptions.
+		/// </summary>
+		/// <param name="Comment">Optional comment.</param>
+		/// <param name="Fields">Fields to emit.</param>
+		public Task SendEvent(string? Comment, IDictionary<string, object> Fields)
+		{
+			return this.SendEvent(Comment, (IEnumerable<KeyValuePair<string, object>>)Fields);
+		}
+
+		/// <summary>
+		/// Sends an event to clients with open subscriptions.
+		/// </summary>
+		/// <param name="Comment">Optional comment.</param>
+		/// <param name="Fields">Fields to emit.</param>
+		public Task SendEvent(string? Comment, params KeyValuePair<string, object>[] Fields)
+		{
+			return this.SendEvent(Comment, (IEnumerable<KeyValuePair<string, object>>)Fields);
+		}
+
+		/// <summary>
+		/// Sends an event to clients with open subscriptions.
+		/// </summary>
+		/// <param name="Comment">Optional comment.</param>
+		/// <param name="Fields">Fields to emit.</param>
+		public async Task SendEvent(string? Comment, IEnumerable<KeyValuePair<string, object>> Fields)
+		{
+			if (!this.SupportsServerSentEvents)
+				throw new InvalidOperationException("Server-Sent Events (SSE) not supported by this resource.");
+
+			StringBuilder sb = new StringBuilder();
+
+			if (!string.IsNullOrEmpty(Comment))
+			{
+				if (Comment.IndexOfAny(CommonTypes.CRLF) >= 0)
+				{
+					foreach (string Line in Comment.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
+					{
+						sb.Append(": ");
+						sb.Append(Line);
+						sb.Append("\r\n");
+					}
+				}
+				else
+				{
+					sb.Append(": ");
+					sb.Append(Comment);
+					sb.Append("\r\n");
+				}
+			}
+
+			foreach (KeyValuePair<string, object> P in Fields)
+			{
+				if (!(P.Value is string s))
+					s = JSON.Encode(P.Value, false);
+
+				if (s.IndexOfAny(CommonTypes.CRLF) >= 0)
+				{
+					foreach (string Line in s.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
+					{
+						sb.Append(P.Key);
+						sb.Append(": ");
+						sb.Append(Line);
+						sb.Append("\r\n");
+					}
+				}
+				else
+				{
+					sb.Append(P.Key);
+					sb.Append(": ");
+					sb.Append(s);
+					sb.Append("\r\n");
+				}
+			}
+
+			sb.Append("\r\n");
+
+			string Event = sb.ToString();
+
+			foreach (HttpResponse Response in this.eventSubscriptionsStatic)
+			{
+				try
+				{
+					await Response.Write(Event);
+				}
+				catch (Exception)
+				{
+					lock (this.eventSubscriptions)
+					{
+						this.eventSubscriptions.Remove(Response);
+						this.eventSubscriptionsStatic = this.eventSubscriptions.ToArray();
+					}
+				}
+			}
+		}
+
+		private readonly ChunkedList<HttpResponse> eventSubscriptions = new ChunkedList<HttpResponse>();
+		private HttpResponse[] eventSubscriptionsStatic = Array.Empty<HttpResponse>();
+
+		/// <summary>
 		/// Executes the GET method on the resource.
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
@@ -128,10 +262,24 @@ namespace Waher.Networking.HTTP.JsonRpc
 		{
 			if (Request.Header.IsAcceptable("text/event-stream"))
 			{
-				// TODO: Support for Server-Sent Events (SSE) in JSON-RPC.
+				if (!this.SupportsServerSentEvents)
+				{
+					await Response.SendResponse(new NotAcceptableException("Server-Sent Events (SSE) not supported by this resource."));
+					return;
+				}
 
-				Response.StatusCode = 204;  // No content
-				await Response.SendResponse();
+				Response.StatusCode = 200;
+				Response.ContentType = "text/event-stream";
+				Response.EnableDirectTransfer();
+				await Response.WriteLine(":");
+
+				lock (this.eventSubscriptions)
+				{
+					this.eventSubscriptions.Add(Response);
+					this.eventSubscriptionsStatic = this.eventSubscriptions.ToArray();
+				}
+
+				// TODO: regular keep-alive messages (empty comment :CRLF every 15 seconds).
 				return;
 			}
 
@@ -223,7 +371,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			await this.SendResponse(Request, JsonRpcRequest, Response);
 		}
 
-		private async Task SendResponse(HttpRequest HttpRequest, 
+		private async Task SendResponse(HttpRequest HttpRequest,
 			JsonRpcServerRequest JsonRequest, HttpResponse Response)
 		{
 			if (JsonRequest.StatusCode == 204)

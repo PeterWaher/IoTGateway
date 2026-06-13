@@ -14,13 +14,13 @@ namespace Waher.Networking.HTTP.Mcp
 			Dictionary<string, object> Capabilities,
 			Dictionary<string, object> ClientInfo);
 
-		private string name;
-		private string title;
-		private string version;
-		private string description;
-		private string instructions;
-		private Icons icons;
-		private Uri webSiteUri;
+		private readonly string name;
+		private readonly string title;
+		private readonly string version;
+		private readonly string description;
+		private readonly string instructions;
+		private readonly Icons icons;
+		private readonly Uri webSiteUri;
 
 		/// <summary>
 		/// HTTP-based Model Context Protocol (MCP) resource.
@@ -63,6 +63,11 @@ namespace Waher.Networking.HTTP.Mcp
 		/// Information about client, if available.
 		/// </summary>
 		public Implementation? ClientInformation { get; private set; }
+
+		/// <summary>
+		/// If Server-Sent Events (SSE) are supported by the resource.
+		/// </summary>
+		public override bool SupportsServerSentEvents => true;
 
 		private Dictionary<string, object> Initialize(
 			string ProtocolVersion,

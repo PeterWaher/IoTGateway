@@ -871,7 +871,15 @@ namespace Waher.Networking.HTTP
 			IContentEncoding ContentEncoding = this.httpRequest?.Header?.AcceptEncoding?.TryGetBestContentEncoder(this.contentLength.HasValue ? this.eTag : null);
 			bool TxText = ContentEncoding is null && this.txText;
 
-			if (this.contentLength.HasValue && ContentEncoding is null)
+			if (!(this.transferEncoding is null))
+			{
+				if (this.contentLength.HasValue)
+				{
+					Output.Append("\r\nContent-Length: ");
+					Output.Append(this.contentLength.Value.ToString());
+				}
+			}
+			else if (this.contentLength.HasValue && ContentEncoding is null)
 			{
 				Output.Append("\r\nContent-Length: ");
 				Output.Append(this.contentLength.Value.ToString());

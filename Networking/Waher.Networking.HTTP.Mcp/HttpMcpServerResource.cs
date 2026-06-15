@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc;
 
 namespace Waher.Networking.HTTP.Mcp
@@ -13,6 +14,8 @@ namespace Waher.Networking.HTTP.Mcp
 			string ProtocolVersion,
 			Dictionary<string, object> Capabilities,
 			Dictionary<string, object> ClientInfo);
+
+		private delegate void NotificationInitializedDelegate(HttpRequest Request);
 
 		private readonly string name;
 		private readonly string title;
@@ -47,6 +50,7 @@ namespace Waher.Networking.HTTP.Mcp
 			this.instructions = Instructions;
 
 			this.Register((InitializeDelegate)this.Initialize);
+			this.Register((NotificationInitializedDelegate)this.Notifications_Initialized);
 		}
 
 		/// <summary>
@@ -87,9 +91,6 @@ namespace Waher.Networking.HTTP.Mcp
 				{ "protocolVersion", "2025-11-25" },
 				{ "capabilities", new Dictionary<string, object>()
 					{
-						{ "experimental", new Dictionary<string, object>() },
-						{ "logging", new Dictionary<string, object>() },
-						{ "completions", new Dictionary<string, object>() },
 						{ "prompts", new Dictionary<string, object>()
 							{
 								{ "listChanged", false }
@@ -106,6 +107,8 @@ namespace Waher.Networking.HTTP.Mcp
 								{ "listChanged", false }
 							}
 						},
+						{ "logging", new Dictionary<string, object>() },
+						{ "completions", new Dictionary<string, object>() },
 						{ "tasks", new Dictionary<string, object>()
 							{
 								{ "list", new Dictionary<string, object>() },
@@ -121,6 +124,7 @@ namespace Waher.Networking.HTTP.Mcp
 								}
 							}
 						},
+						{ "experimental", new Dictionary<string, object>() }
 					}
 				},
 				{ "serverInfo", new Dictionary<string,object>()
@@ -137,6 +141,12 @@ namespace Waher.Networking.HTTP.Mcp
 			};
 
 			return Result;
+		}
+
+		private void Notifications_Initialized(HttpRequest Request)
+		{
+			Log.Informational("MCP client initialized: " + Request.RemoteEndPoint,
+				this.ResourceName, Request.RemoteEndPoint, "McpInitialized");
 		}
 	}
 }

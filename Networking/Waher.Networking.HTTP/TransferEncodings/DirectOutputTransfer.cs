@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
-using Waher.Networking.HTTP.HTTP2;
 
 namespace Waher.Networking.HTTP.TransferEncodings
 {

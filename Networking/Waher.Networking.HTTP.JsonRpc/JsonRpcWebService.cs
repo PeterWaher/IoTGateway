@@ -350,7 +350,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				}
 			}
 
-			await JsonRpcRequest.BuildResponse();
+			await JsonRpcRequest.BuildResponse(Request, Response);
 			await this.SendResponse(Request, JsonRpcRequest, Response);
 		}
 
@@ -406,7 +406,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 					JsonRpcRequest.SetError(-32600, "Expected JSON object or array of JSON objects in request.", 400);
 			}
 
-			await JsonRpcRequest.BuildResponse();
+			await JsonRpcRequest.BuildResponse(Request, Response);
 			await this.SendResponse(Request, JsonRpcRequest, Response);
 		}
 
@@ -466,7 +466,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 					{
 						lock (this.methods)
 						{
-							if (!this.methods.TryGetValue(Method, out Request.MethodInfo))
+							if (!this.methods.TryGetValue(Method.Replace('/', '_'), out Request.MethodInfo))
 								Request.SetError(-32601, "Method not found: " + Method, 404);
 						}
 					}

@@ -50,7 +50,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			this.Result = null;
 		}
 
-		public async Task BuildResponse()
+		public async Task BuildResponse(HttpRequest HttpRequest,  HttpResponse HttpResponse)
 		{
 			if (this.BatchRequests is null)
 			{
@@ -74,7 +74,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 						if (!(this.ParametersObj is null))
 						{
-							if (this.ParametersObj.Count != c)
+							if (this.ParametersObj.Count != c - this.MethodInfo.NrSpecialArguments)
 								this.SetError(-32602, "Invalid number of parameters.", 400);
 							else
 							{
@@ -103,17 +103,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 										}
 									}
 								}
-
-								if (!this.ErrorCode.HasValue)
-								{
-									this.Result = await ScriptNode.WaitPossibleTask(
-										this.MethodInfo.Method.DynamicInvoke(Parameters));
-								}
 							}
 						}
 						else if (!(this.ParametersArray is null))
 						{
-							if (this.ParametersArray.Length != c)
+							if (this.ParametersArray.Length != c - this.MethodInfo.NrSpecialArguments)
 								this.SetError(-32602, "Invalid number of parameters.", 400);
 							else
 							{
@@ -135,16 +129,27 @@ namespace Waher.Networking.HTTP.JsonRpc
 										break;
 									}
 								}
-
-								this.Result = this.MethodInfo.Method.DynamicInvoke(Parameters);
 							}
 						}
 						else
 						{
-							if (this.MethodInfo.NrArguments == 0)
-								this.Result = this.MethodInfo.Method.DynamicInvoke(Parameters);
-							else
+							if (c != this.MethodInfo.NrSpecialArguments)
 								this.SetError(-32600, "Missing parameters.", 400);
+						}
+
+						if (!this.ErrorCode.HasValue)
+						{
+							if (this.MethodInfo.NrSpecialArguments > 0)
+							{
+								if (this.MethodInfo.RequestArgument.HasValue)
+									Parameters[this.MethodInfo.RequestArgument.Value] = HttpRequest;
+
+								if (this.MethodInfo.ResponseArgument.HasValue)
+									Parameters[this.MethodInfo.ResponseArgument.Value] = HttpResponse;
+							}
+
+							this.Result = await ScriptNode.WaitPossibleTask(
+								this.MethodInfo.Method.DynamicInvoke(Parameters));
 						}
 					}
 					catch (Exception ex)
@@ -186,7 +191,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				{
 					JsonRpcServerRequest Request = this.BatchRequests[i]!;
 
-					await Request.BuildResponse();
+					await Request.BuildResponse(HttpRequest, HttpResponse);
 
 					if (!(Request.Id is null))
 						this.ResponseArray[j++] = Request.ResponseObject!;

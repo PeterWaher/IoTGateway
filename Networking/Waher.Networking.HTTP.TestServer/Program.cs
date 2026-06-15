@@ -13,6 +13,7 @@ using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Runtime.Profiling;
+using Waher.Script;
 
 internal class Program
 {
@@ -206,6 +207,7 @@ internal class Program
 				typeof(BrotliContentEncoding).Assembly,
 				typeof(Log).Assembly,
 				typeof(InternetContent).Assembly,
+				typeof(Expression).Assembly,
 				typeof(MarkdownDocument).Assembly,
 				typeof(MarkdownToHtmlConverter).Assembly);
 

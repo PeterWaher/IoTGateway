@@ -130,7 +130,7 @@ namespace Waher.Networking.HTTP.Mcp
 						{ "version", this.version },
 						{ "description", this.description },
 						{ "icons", this.icons.ToJson() },
-						{ "websiteUrl", this.webSiteUri }
+						{ "websiteUrl", this.webSiteUri.ToString() }
 					}
 				},
 				{ "instructions", this.instructions }

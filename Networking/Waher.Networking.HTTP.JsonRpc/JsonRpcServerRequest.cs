@@ -50,7 +50,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 			this.Result = null;
 		}
 
-		public async Task BuildResponse(HttpRequest HttpRequest,  HttpResponse HttpResponse)
+		public async Task BuildResponse(JsonRpcWebService WebService, HttpRequest HttpRequest,  
+			HttpResponse HttpResponse)
 		{
 			if (this.BatchRequests is null)
 			{
@@ -149,7 +150,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 							}
 
 							this.Result = await ScriptNode.WaitPossibleTask(
-								this.MethodInfo.Method.DynamicInvoke(Parameters));
+								this.MethodInfo.Method.Invoke(WebService, Parameters));
 						}
 					}
 					catch (Exception ex)
@@ -191,7 +192,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				{
 					JsonRpcServerRequest Request = this.BatchRequests[i]!;
 
-					await Request.BuildResponse(HttpRequest, HttpResponse);
+					await Request.BuildResponse(WebService, HttpRequest, HttpResponse);
 
 					if (!(Request.Id is null))
 						this.ResponseArray[j++] = Request.ResponseObject!;

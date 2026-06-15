@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -10,13 +11,13 @@ using Waher.Runtime.Collections;
 namespace Waher.Networking.HTTP.JsonRpc
 {
 	/// <summary>
-	/// Web Service interface based on JSON-RPC v2.0.
+	/// Abstract base class for Web Services based on JSON-RPC v2.0.
 	/// 
 	/// Ref:
 	/// https://www.jsonrpc.org/specification
 	/// https://www.jsonrpc.org/historical/json-rpc-over-http.html
 	/// </summary>
-	public class JsonRpcWebService : HttpAsynchronousResource, IHttpGetMethod, IHttpPostMethod
+	public abstract class JsonRpcWebService : HttpAsynchronousResource, IHttpGetMethod, IHttpPostMethod
 	{
 		private static readonly JsonCodec jsonCodec = new JsonCodec();
 
@@ -25,26 +26,22 @@ namespace Waher.Networking.HTTP.JsonRpc
 		private readonly bool caseSensitive;
 
 		/// <summary>
-		/// Web Service interface based on JSON-RPC v2.0.
+		/// Abstract base class for Web Services based on JSON-RPC v2.0.
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
-		/// <param name="Methods">Methods to register with the web service interface.</param>
-		public JsonRpcWebService(string ResourceName, bool UserSessions,
-			params Delegate[] Methods)
-			: this(ResourceName, UserSessions, true, Methods)
+		public JsonRpcWebService(string ResourceName, bool UserSessions)
+			: this(ResourceName, UserSessions, true)
 		{
 		}
 
 		/// <summary>
-		/// Web Service interface based on JSON-RPC v2.0.
+		/// Abstract base class for Web Services based on JSON-RPC v2.0.
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
 		/// <param name="CaseSensitive">If names are case-sensitive.</param>
-		/// <param name="Methods">Methods to register with the web service interface.</param>
-		public JsonRpcWebService(string ResourceName, bool UserSessions, bool CaseSensitive,
-			params Delegate[] Methods)
+		public JsonRpcWebService(string ResourceName, bool UserSessions, bool CaseSensitive)
 			: base(ResourceName)
 		{
 			this.userSessions = UserSessions;
@@ -55,10 +52,13 @@ namespace Waher.Networking.HTTP.JsonRpc
 			else
 				this.methods = new Dictionary<string, JsonRpcMethodInfo>(StringComparer.InvariantCultureIgnoreCase);
 
-			if (!(Methods is null))
+			foreach (MethodInfo Method in this.GetType().GetMethods(BindingFlags.Instance | 
+				BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
 			{
-				foreach (Delegate Method in Methods)
-					this.Register(Method);
+				if (Method.GetCustomAttribute<JsonRpcMethodAttribute>() is null)
+					continue;
+
+				this.Register(Method);
 			}
 		}
 
@@ -91,11 +91,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// Registers a method to be used in the JSON-RPC interface. 
 		/// </summary>
 		/// <param name="Method">Method to register.</param>
-		public void Register(Delegate Method)
+		public void Register(MethodInfo Method)
 		{
 			lock (this.methods)
 			{
-				string Name = Method.Method.Name;
+				string Name = Method.Name;
 
 				if (this.methods.ContainsKey(Name))
 					throw new Exception("Method already registered: " + Name);
@@ -109,11 +109,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// </summary>
 		/// <param name="Method">Method to unregister.</param>
 		/// <returns>True if the method was successfully unregistered, false otherwise.</returns>
-		public bool Unregister(Delegate Method)
+		public bool Unregister(MethodInfo Method)
 		{
 			lock (this.methods)
 			{
-				string Name = Method.Method.Name;
+				string Name = Method.Name;
 
 				if (this.methods.TryGetValue(Name, out JsonRpcMethodInfo Prev) &&
 					Prev.Method == Method)
@@ -350,7 +350,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				}
 			}
 
-			await JsonRpcRequest.BuildResponse(Request, Response);
+			await JsonRpcRequest.BuildResponse(this, Request, Response);
 			await this.SendResponse(Request, JsonRpcRequest, Response);
 		}
 
@@ -406,7 +406,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 					JsonRpcRequest.SetError(-32600, "Expected JSON object or array of JSON objects in request.", 400);
 			}
 
-			await JsonRpcRequest.BuildResponse(Request, Response);
+			await JsonRpcRequest.BuildResponse(this, Request, Response);
 			await this.SendResponse(Request, JsonRpcRequest, Response);
 		}
 

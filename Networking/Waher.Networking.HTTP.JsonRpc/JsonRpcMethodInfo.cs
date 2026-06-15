@@ -9,7 +9,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 	/// </summary>
 	internal class JsonRpcMethodInfo
 	{
-		public Delegate Method;
+		public MethodInfo Method;
 		public int NrArguments;
 		public int NrSpecialArguments;
 		public Dictionary<string, int> NamedArguments;
@@ -17,10 +17,10 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public int? ResponseArgument;
 		public ParameterInfo[] Arguments;
 
-		public JsonRpcMethodInfo(Delegate Method, bool CaseSensitive)
+		public JsonRpcMethodInfo(MethodInfo Method, bool CaseSensitive)
 		{
 			this.Method = Method;
-			this.Arguments = Method.Method.GetParameters();
+			this.Arguments = Method.GetParameters();
 			this.NrArguments = this.Arguments.Length;
 			this.NrSpecialArguments = 0;
 

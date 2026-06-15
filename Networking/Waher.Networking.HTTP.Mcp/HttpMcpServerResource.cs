@@ -48,9 +48,6 @@ namespace Waher.Networking.HTTP.Mcp
 			this.icons = new Icons(Icons);
 			this.webSiteUri = WebSiteUri;
 			this.instructions = Instructions;
-
-			this.Register((InitializeDelegate)this.Initialize);
-			this.Register((NotificationInitializedDelegate)this.Notifications_Initialized);
 		}
 
 		/// <summary>
@@ -73,6 +70,15 @@ namespace Waher.Networking.HTTP.Mcp
 		/// </summary>
 		public override bool SupportsServerSentEvents => true;
 
+		/// <summary>
+		/// MCP initialize method. Called by client to initialize connection and exchange 
+		/// information about capabilities.
+		/// </summary>
+		/// <param name="ProtocolVersion">Protocol Version</param>
+		/// <param name="Capabilities">Client capabilities</param>
+		/// <param name="ClientInfo">Client information</param>
+		/// <returns>Server capabilities and information.</returns>
+		[JsonRpcMethod]
 		private Dictionary<string, object> Initialize(
 			string ProtocolVersion,
 			Dictionary<string, object> Capabilities,
@@ -93,18 +99,18 @@ namespace Waher.Networking.HTTP.Mcp
 					{
 						{ "prompts", new Dictionary<string, object>()
 							{
-								{ "listChanged", false }
+								{ "listChanged", false }	// TODO
 							}
 						},
 						{ "resources", new Dictionary<string, object>()
 							{
-								{ "subscribe", false },
-								{ "listChanged", false }
+								{ "subscribe", false },		// TODO
+								{ "listChanged", false }	// TODO
 							}
 						},
 						{ "tools", new Dictionary<string, object>()
 							{
-								{ "listChanged", false }
+								{ "listChanged", false }	// TODO
 							}
 						},
 						{ "logging", new Dictionary<string, object>() },
@@ -143,10 +149,29 @@ namespace Waher.Networking.HTTP.Mcp
 			return Result;
 		}
 
+		[JsonRpcMethod]
 		private void Notifications_Initialized(HttpRequest Request)
 		{
 			Log.Informational("MCP client initialized: " + Request.RemoteEndPoint,
 				this.ResourceName, Request.RemoteEndPoint, "McpInitialized");
+		}
+
+		[JsonRpcMethod]
+		private Dictionary<string, object> Prompts_List(HttpRequest Request)
+		{
+			return new Dictionary<string, object>();
+		}
+
+		[JsonRpcMethod]
+		private Dictionary<string, object> Tools_List(HttpRequest Request)
+		{
+			return new Dictionary<string, object>();
+		}
+
+		[JsonRpcMethod]
+		private Dictionary<string, object> Resources_List(HttpRequest Request)
+		{
+			return new Dictionary<string, object>();
 		}
 	}
 }

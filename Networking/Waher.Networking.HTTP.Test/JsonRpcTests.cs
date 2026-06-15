@@ -45,7 +45,7 @@ namespace Waher.Networking.HTTP.Test
 
 			this.server = new HttpServer(8081);
 
-			this.jsonRpcWebService = new JsonRpcWebService("/endpoint", true, Add, Sub);
+			this.jsonRpcWebService = new JsonRpcTestWebService("/endpoint", true, true);
 			this.server.Register(this.jsonRpcWebService);
 
 			this.client = new JsonRpcClient("http://localhost:8081/endpoint",
@@ -53,14 +53,20 @@ namespace Waher.Networking.HTTP.Test
 				this.xmlSniffer);
 		}
 
-		private static int Add(int a, int b)
+		private class JsonRpcTestWebService(string ResourceName, bool UserSessions, bool CaseSensitive) 
+			: JsonRpcWebService(ResourceName, UserSessions, CaseSensitive)
 		{
-			return a + b;
-		}
+			[JsonRpcMethod]
+			private static int Add(int a, int b)
+			{
+				return a + b;
+			}
 
-		private static int Sub(int a, int b)
-		{
-			return a - b;
+			[JsonRpcMethod]
+			private static int Sub(int a, int b)
+			{
+				return a - b;
+			}
 		}
 
 		[TestCleanup]

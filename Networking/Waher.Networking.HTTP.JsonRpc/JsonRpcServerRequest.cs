@@ -119,7 +119,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 							}
 
 							if (NrParametersSet != c - this.MethodInfo.NrSpecialArguments)
-								this.SetError(-32602, "Invalid number of parameters.", 400);
+								this.SetError(-32602, "Missing required parameters.", 400);
 						}
 						else if (!(this.ParametersArray is null))
 						{

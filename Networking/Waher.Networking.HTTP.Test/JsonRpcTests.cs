@@ -57,13 +57,13 @@ namespace Waher.Networking.HTTP.Test
 			: JsonRpcWebService(ResourceName, UserSessions, CaseSensitive)
 		{
 			[JsonRpcMethod]
-			private static int Add(int a = 1, int b = 2)
+			protected static int Add(int a = 1, int b = 2)
 			{
 				return a + b;
 			}
 
 			[JsonRpcMethod]
-			private static int Sub(int a = 1, int b = 2)
+			protected static int Sub(int a = 1, int b = 2)
 			{
 				return a - b;
 			}
@@ -373,6 +373,17 @@ namespace Waher.Networking.HTTP.Test
 				{
 					{ "a", A }
 				});
+
+			Assert.AreEqual(ExpectedResult, Result);
+		}
+
+		[TestMethod]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Add", 3)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Sub", -1)]
+		public async Task Test_14_RequestAllDefaultArgumentValues(JsonRpcHttpMethod Method,
+			JsonRpcVersion Version, string MethodName, int ExpectedResult)
+		{
+			object Result = await this.client.Request(Method, Version, MethodName);
 
 			Assert.AreEqual(ExpectedResult, Result);
 		}

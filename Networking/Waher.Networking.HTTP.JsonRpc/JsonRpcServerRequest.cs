@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Script;
 using Waher.Script.Model;
@@ -53,6 +54,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public async Task BuildResponse(JsonRpcWebService WebService, HttpRequest HttpRequest,
 			HttpResponse HttpResponse)
 		{
+			bool HasSniffer = HttpRequest.Server.HasSniffers;
+
 			if (this.BatchRequests is null)
 			{
 				this.ResponseObject = new Dictionary<string, object?>();
@@ -149,8 +152,21 @@ namespace Waher.Networking.HTTP.JsonRpc
 						}
 						else
 						{
-							if (c != this.MethodInfo.NrSpecialArguments)
-								this.SetError(-32600, "Missing parameters.", 400);
+							if (NrParametersSet != c - this.MethodInfo.NrSpecialArguments)
+							{
+								foreach (JsonRpcArgumentInfo Argument in this.MethodInfo.Arguments)
+								{
+									if (!Argument.IsSpecialArgument &&
+										Argument.HasDefaultValue)
+									{
+										Parameters[Argument.Parameter.Position] = Argument.DefaultValue;
+										NrParametersSet++;
+									}
+								}
+							}
+
+							if (NrParametersSet != c - this.MethodInfo.NrSpecialArguments)
+								this.SetError(-32600, "Missing required parameters.", 400);
 						}
 
 						if (!this.ErrorCode.HasValue)
@@ -164,12 +180,44 @@ namespace Waher.Networking.HTTP.JsonRpc
 									Parameters[this.MethodInfo.ResponseArgument.Value] = HttpResponse;
 							}
 
+							if (HasSniffer)
+							{
+								StringBuilder sb = new StringBuilder();
+								bool First = true;
+
+								sb.Append(this.MethodInfo.Method.Name);
+								sb.Append('(');
+
+								foreach (object? P in Parameters)
+								{
+									if (First)
+										First = false;
+									else
+										sb.Append(',');
+
+									sb.Append(Expression.ToString(P));
+								}
+
+								sb.Append(')');
+
+								HttpRequest.Server.Information(sb.ToString());
+							}
+
 							this.Result = await ScriptNode.WaitPossibleTask(
 								this.MethodInfo.Method.Invoke(WebService, Parameters));
+
+							if (HasSniffer)
+							{
+								HttpRequest.Server.Information("Result: " + 
+									Expression.ToString(this.Result));
+							}
 						}
 					}
 					catch (Exception ex)
 					{
+						if (HasSniffer)
+							HttpRequest.Server.Exception(ex);
+
 						this.SetError(-32603, ex.Message, 500);
 					}
 				}

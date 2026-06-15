@@ -467,7 +467,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 						lock (this.methods)
 						{
 							if (!this.methods.TryGetValue(Method, out Request.MethodInfo))
-								Request.SetError(-32601, "Method not found.", 404);
+								Request.SetError(-32601, "Method not found: " + Method, 404);
 						}
 					}
 					else

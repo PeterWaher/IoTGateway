@@ -50,7 +50,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			this.Result = null;
 		}
 
-		public async Task BuildResponse(JsonRpcWebService WebService, HttpRequest HttpRequest,  
+		public async Task BuildResponse(JsonRpcWebService WebService, HttpRequest HttpRequest,
 			HttpResponse HttpResponse)
 		{
 			if (this.BatchRequests is null)
@@ -72,39 +72,54 @@ namespace Waher.Networking.HTTP.JsonRpc
 					{
 						int i, c = this.MethodInfo!.NrArguments;
 						object?[] Parameters = new object?[c];
+						int NrParametersSet = 0;
 
 						if (!(this.ParametersObj is null))
 						{
-							if (this.ParametersObj.Count != c - this.MethodInfo.NrSpecialArguments)
-								this.SetError(-32602, "Invalid number of parameters.", 400);
-							else
+							foreach (KeyValuePair<string, object> P in this.ParametersObj)
 							{
-								foreach (KeyValuePair<string, object> P in this.ParametersObj)
+								if (!this.MethodInfo.NamedArguments.TryGetValue(P.Key, out i))
 								{
-									if (!this.MethodInfo.NamedArguments.TryGetValue(P.Key, out i))
-									{
-										this.SetError(-32602, "Invalid parameter name: " + P.Key, 400);
-										break;
-									}
+									this.SetError(-32602, "Invalid parameter name: " + P.Key, 400);
+									break;
+								}
+								else
+								{
+									Type ExpectedType = this.MethodInfo.Arguments[i].Parameter.ParameterType;
+									Type ParameterType = P.Value?.GetType() ?? typeof(object);
+
+									if (ParameterType == ExpectedType)
+										Parameters[i] = P.Value;
+									else if (Expression.TryConvert(P.Value, ExpectedType, out object Converted))
+										Parameters[i] = Converted;
 									else
 									{
-										Type ExpectedType = this.MethodInfo.Arguments[i].ParameterType;
-										Type ParameterType = P.Value?.GetType() ?? typeof(object);
+										this.SetError(-32602, "Parameter " + P.Key +
+											" has incorrect type: " + ParameterType.FullName +
+											", Expected: " + ExpectedType.FullName, 400);
+										break;
+									}
 
-										if (ParameterType == ExpectedType)
-											Parameters[i] = P.Value;
-										else if (Expression.TryConvert(P.Value, ExpectedType, out object Converted))
-											Parameters[i] = Converted;
-										else
-										{
-											this.SetError(-32602, "Parameter " + P.Key +
-												" has incorrect type: " + ParameterType.FullName +
-												", Expected: " + ExpectedType.FullName, 400);
-											break;
-										}
+									NrParametersSet++;
+								}
+							}
+
+							if (NrParametersSet != c - this.MethodInfo.NrSpecialArguments)
+							{
+								foreach (JsonRpcArgumentInfo Argument in this.MethodInfo.Arguments)
+								{
+									if (!Argument.IsSpecialArgument &&
+										Argument.HasDefaultValue &&
+										!this.ParametersObj.ContainsKey(Argument.Parameter.Name))
+									{
+										Parameters[Argument.Parameter.Position] = Argument.DefaultValue;
+										NrParametersSet++;
 									}
 								}
 							}
+
+							if (NrParametersSet != c - this.MethodInfo.NrSpecialArguments)
+								this.SetError(-32602, "Invalid number of parameters.", 400);
 						}
 						else if (!(this.ParametersArray is null))
 						{
@@ -115,7 +130,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 								for (i = 0; i < c; i++)
 								{
 									object? Value = this.ParametersArray.GetValue(i);
-									Type ExpectedType = this.MethodInfo.Arguments[i].ParameterType;
+									Type ExpectedType = this.MethodInfo.Arguments[i].Parameter.ParameterType;
 									Type ParameterType = Value?.GetType() ?? typeof(object);
 
 									if (ParameterType == ExpectedType)

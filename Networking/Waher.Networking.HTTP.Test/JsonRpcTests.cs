@@ -57,13 +57,13 @@ namespace Waher.Networking.HTTP.Test
 			: JsonRpcWebService(ResourceName, UserSessions, CaseSensitive)
 		{
 			[JsonRpcMethod]
-			private static int Add(int a, int b)
+			private static int Add(int a = 1, int b = 2)
 			{
 				return a + b;
 			}
 
 			[JsonRpcMethod]
-			private static int Sub(int a, int b)
+			private static int Sub(int a = 1, int b = 2)
 			{
 				return a - b;
 			}
@@ -358,6 +358,23 @@ namespace Waher.Networking.HTTP.Test
 
 			Assert.IsTrue(Results[0].HasResult);
 			Assert.AreEqual(-1, Results[0].Result);
+		}
+
+		[TestMethod]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Add", 3, 5)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Add", 4, 6)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Sub", 3, 1)]
+		[DataRow(JsonRpcHttpMethod.GET, JsonRpcVersion.JsonRpcV1, "Sub", 4, 2)]
+		public async Task Test_13_RequestDefaultArgumentValues(JsonRpcHttpMethod Method,
+			JsonRpcVersion Version, string MethodName, int A, int ExpectedResult)
+		{
+			object Result = await this.client.Request(Method, Version, MethodName,
+				new Dictionary<string, object>()
+				{
+					{ "a", A }
+				});
+
+			Assert.AreEqual(ExpectedResult, Result);
 		}
 
 		// TODO: Server-sent Events (SSE) over HTTP/1

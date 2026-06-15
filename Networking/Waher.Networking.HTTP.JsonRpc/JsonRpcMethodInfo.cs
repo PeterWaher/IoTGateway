@@ -15,21 +15,24 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public Dictionary<string, int> NamedArguments;
 		public int? RequestArgument;
 		public int? ResponseArgument;
-		public ParameterInfo[] Arguments;
+		public JsonRpcArgumentInfo[] Arguments;
 
 		public JsonRpcMethodInfo(MethodInfo Method, bool CaseSensitive)
 		{
+			ParameterInfo[] Arguments = Method.GetParameters();
+			bool IsSpecialArgument;
 			this.Method = Method;
-			this.Arguments = Method.GetParameters();
-			this.NrArguments = this.Arguments.Length;
+			this.NrArguments = Arguments.Length;
 			this.NrSpecialArguments = 0;
+
+			this.Arguments = new JsonRpcArgumentInfo[this.NrArguments];
 
 			if (CaseSensitive)
 				this.NamedArguments = new Dictionary<string, int>(StringComparer.InvariantCulture);
 			else
 				this.NamedArguments = new Dictionary<string, int>(StringComparer.InvariantCultureIgnoreCase);
 
-			foreach (ParameterInfo P in this.Arguments)
+			foreach (ParameterInfo P in Arguments)
 			{
 				if (P.ParameterType == typeof(HttpRequest))
 				{
@@ -37,6 +40,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 					{
 						this.RequestArgument = P.Position;
 						this.NrSpecialArguments++;
+						IsSpecialArgument = true;
 					}
 					else
 						throw new ArgumentException("Only one argument of type HttpRequest is allowed.", nameof(Method));
@@ -47,12 +51,19 @@ namespace Waher.Networking.HTTP.JsonRpc
 					{
 						this.ResponseArgument = P.Position;
 						this.NrSpecialArguments++;
+						IsSpecialArgument = true;
 					}
 					else
 						throw new ArgumentException("Only one argument of type HttpResponse is allowed.", nameof(Method));
 				}
 				else
+				{
 					this.NamedArguments[P.Name] = P.Position;
+					IsSpecialArgument = false;
+				}
+				
+				this.Arguments[P.Position] = new JsonRpcArgumentInfo(P, IsSpecialArgument,
+					P.HasDefaultValue, P.HasDefaultValue ? P.DefaultValue : null);
 			}
 		}
 	}

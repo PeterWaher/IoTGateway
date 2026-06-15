@@ -79,7 +79,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="ClientInfo">Client information</param>
 		/// <returns>Server capabilities and information.</returns>
 		[JsonRpcMethod]
-		private Dictionary<string, object> Initialize(
+		protected Dictionary<string, object> Initialize(
 			string ProtocolVersion,
 			Dictionary<string, object> Capabilities,
 			Dictionary<string, object> ClientInfo)
@@ -150,28 +150,40 @@ namespace Waher.Networking.HTTP.Mcp
 		}
 
 		[JsonRpcMethod]
-		private void Notifications_Initialized(HttpRequest Request)
+		protected void Notifications_Initialized(HttpRequest Request)
 		{
 			Log.Informational("MCP client initialized: " + Request.RemoteEndPoint,
 				this.ResourceName, Request.RemoteEndPoint, "McpInitialized");
 		}
 
 		[JsonRpcMethod]
-		private Dictionary<string, object> Prompts_List(HttpRequest Request)
+		protected Dictionary<string, object> Prompts_List(HttpRequest Request,
+			string? Cursor = null)
 		{
-			return new Dictionary<string, object>();
+			return new Dictionary<string, object>()
+			{
+				{ "prompts", Array.Empty<Dictionary<string, object>>() }
+			};
 		}
 
 		[JsonRpcMethod]
-		private Dictionary<string, object> Tools_List(HttpRequest Request)
+		protected Dictionary<string, object> Tools_List(HttpRequest Request,
+			string? Cursor = null)
 		{
-			return new Dictionary<string, object>();
+			return new Dictionary<string, object>()
+			{
+				{ "tools", Array.Empty<Dictionary<string, object>>() }
+			};
 		}
 
 		[JsonRpcMethod]
-		private Dictionary<string, object> Resources_List(HttpRequest Request)
+		protected Dictionary<string, object> Resources_List(HttpRequest Request,
+			string? Cursor = null)
 		{
-			return new Dictionary<string, object>();
+			return new Dictionary<string, object>()
+			{
+				{ "resources", Array.Empty<Dictionary<string, object>>() }
+			};
 		}
 	}
 }

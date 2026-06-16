@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using Waher.Content;
+using Waher.Content.Images;
 using Waher.Content.Markdown;
 using Waher.Content.Markdown.Web;
 using Waher.Events;
@@ -207,6 +208,7 @@ internal class Program
 				typeof(BrotliContentEncoding).Assembly,
 				typeof(Log).Assembly,
 				typeof(InternetContent).Assembly,
+				typeof(ImageCodec).Assembly,
 				typeof(Expression).Assembly,
 				typeof(MarkdownDocument).Assembly,
 				typeof(MarkdownToHtmlConverter).Assembly);

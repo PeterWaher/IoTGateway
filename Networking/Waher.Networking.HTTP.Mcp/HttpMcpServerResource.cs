@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using Waher.Content.Images;
 using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.HTTP.Mcp
 {
 	/// <summary>
-	/// HTTP-based Model Context Protocol (MCP) server resource.
+	/// Abstract base class for HTTP-based Model Context Protocol (MCP) server resource.
 	/// </summary>
-	public class HttpMcpServerResource : JsonRpcWebService
+	public abstract class HttpMcpServerResource : JsonRpcWebService
 	{
-		private delegate Dictionary<string, object> InitializeDelegate(
-			string ProtocolVersion,
-			Dictionary<string, object> Capabilities,
-			Dictionary<string, object> ClientInfo);
-
-		private delegate void NotificationInitializedDelegate(HttpRequest Request);
-
 		private readonly string name;
 		private readonly string title;
 		private readonly string version;
@@ -26,7 +21,7 @@ namespace Waher.Networking.HTTP.Mcp
 		private readonly Uri webSiteUri;
 
 		/// <summary>
-		/// HTTP-based Model Context Protocol (MCP) resource.
+		/// Abstract base class for HTTP-based Model Context Protocol (MCP) server resource.
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="Name">Name of server.</param>
@@ -71,6 +66,38 @@ namespace Waher.Networking.HTTP.Mcp
 		public override bool SupportsServerSentEvents => true;
 
 		/// <summary>
+		/// Gets default icons, if any.
+		/// </summary>
+		/// <returns>Array of default icons. Empty, if none found.</returns>
+		protected static Icon[] GetDefaultIcons()
+		{
+			if (Types.TryGetModuleParameter("FavIcon", out string Url))
+			{
+				return new Icon[]
+				{
+					new Icon(new Uri(Url), ImageCodec.ContentTypeIcon, null, null)
+				};
+			}
+			else
+				return Array.Empty<Icon>();
+		}
+
+		/// <summary>
+		/// Gets a URI to the default web site, if any.
+		/// </summary>
+		/// <returns>URI, if available, null if not.</returns>
+		protected static Uri? GetDefaultWebSite()
+		{
+			if (Types.TryGetModuleParameter("HomePage", out string Url) &&
+				Uri.TryCreate(Url, UriKind.Absolute, out Uri WebSiteUri))
+			{
+				return WebSiteUri;
+			}
+			else
+				return null;
+		}
+
+		/// <summary>
 		/// MCP initialize method. Called by client to initialize connection and exchange 
 		/// information about capabilities.
 		/// </summary>
@@ -99,18 +126,18 @@ namespace Waher.Networking.HTTP.Mcp
 					{
 						{ "prompts", new Dictionary<string, object>()
 							{
-								{ "listChanged", false }	// TODO
+								{ "listChanged", false }	// TODO (for instance, when configuring or editing what prompts are available)
 							}
 						},
 						{ "resources", new Dictionary<string, object>()
 							{
-								{ "subscribe", false },		// TODO
-								{ "listChanged", false }	// TODO
+								{ "subscribe", false },
+								{ "listChanged", false }	// TODO (for instance, when available resource change)
 							}
 						},
 						{ "tools", new Dictionary<string, object>()
 							{
-								{ "listChanged", false }	// TODO
+								{ "listChanged", false }	// TODO (for instance, when configuring what tools are available)
 							}
 						},
 						{ "logging", new Dictionary<string, object>() },
@@ -157,19 +184,11 @@ namespace Waher.Networking.HTTP.Mcp
 		}
 
 		[JsonRpcMethod]
-		protected Dictionary<string, object> Prompts_List(HttpRequest Request,
-			string? Cursor = null)
-		{
-			return new Dictionary<string, object>()
-			{
-				{ "prompts", Array.Empty<Dictionary<string, object>>() }
-			};
-		}
-
-		[JsonRpcMethod]
 		protected Dictionary<string, object> Tools_List(HttpRequest Request,
 			string? Cursor = null)
 		{
+			// TODO 
+
 			return new Dictionary<string, object>()
 			{
 				{ "tools", Array.Empty<Dictionary<string, object>>() }
@@ -177,9 +196,23 @@ namespace Waher.Networking.HTTP.Mcp
 		}
 
 		[JsonRpcMethod]
+		protected Dictionary<string, object> Prompts_List(HttpRequest Request,
+			string? Cursor = null)
+		{
+			// TODO 
+
+			return new Dictionary<string, object>()
+			{
+				{ "prompts", Array.Empty<Dictionary<string, object>>() }
+			};
+		}
+
+		[JsonRpcMethod]
 		protected Dictionary<string, object> Resources_List(HttpRequest Request,
 			string? Cursor = null)
 		{
+			// TODO 
+
 			return new Dictionary<string, object>()
 			{
 				{ "resources", Array.Empty<Dictionary<string, object>>() }

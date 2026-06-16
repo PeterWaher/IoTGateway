@@ -1699,6 +1699,11 @@ namespace Waher.IoTGateway
 				Types.SetModuleParameter("Contracts", contractsClient);
 				Types.SetModuleParameter("Avatar", avatarClient);
 				Types.SetModuleParameter("Scheduler", scheduler);
+				Types.SetModuleParameter("FavIcon", GetUrl("/favicon.ico"));
+				Types.SetModuleParameter("HomePage", GetUrl("/"));
+
+				if (HasDomain)
+					Types.SetModuleParameter("Domain", Domain.Value);
 
 				if (FirstStart)
 				{

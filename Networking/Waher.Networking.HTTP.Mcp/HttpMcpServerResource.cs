@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Threading.Tasks;
 using Waher.Content.Images;
 using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc;
+using Waher.Networking.HTTP.Mcp.Model;
+using Waher.Networking.HTTP.Mcp.Model.Client;
+using Waher.Networking.HTTP.Mcp.Model.Server;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.HTTP.Mcp
@@ -12,13 +18,8 @@ namespace Waher.Networking.HTTP.Mcp
 	/// </summary>
 	public abstract class HttpMcpServerResource : JsonRpcWebService
 	{
-		private readonly string name;
-		private readonly string title;
-		private readonly string version;
-		private readonly string description;
-		private readonly string instructions;
-		private readonly Icons icons;
-		private readonly Uri webSiteUri;
+		private const int PageSize = 20;
+		private readonly Dictionary<string, Tool> tools = new Dictionary<string, Tool>();
 
 		/// <summary>
 		/// Abstract base class for HTTP-based Model Context Protocol (MCP) server resource.
@@ -36,13 +37,30 @@ namespace Waher.Networking.HTTP.Mcp
 			string Instructions)
 			: base(ResourceName, true, false)
 		{
-			this.name = Name;
-			this.title = Title;
-			this.version = Version;
-			this.description = Description;
-			this.icons = new Icons(Icons);
-			this.webSiteUri = WebSiteUri;
-			this.instructions = Instructions;
+			this.Name = Name;
+			this.Title = Title;
+			this.Version = Version;
+			this.Description = Description;
+			this.Icons = new Icons(Icons);
+			this.WebSiteUri = WebSiteUri;
+			this.Instructions = Instructions;
+
+			if (this.Icons.Empty)
+			{
+				Icon[] DefaultIcons = GetDefaultIcons();
+				if (DefaultIcons.Length > 0)
+					this.Icons = new Icons(DefaultIcons);
+			}
+
+			foreach (MethodInfo Method in this.GetType().GetMethods(BindingFlags.Instance |
+				BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+			{
+				if (Method.GetCustomAttribute<McpServerToolAttribute>() is
+					McpServerToolAttribute McpServerToolAttribute)
+				{
+					this.RegisterTool(Method, McpServerToolAttribute);
+				}
+			}
 		}
 
 		/// <summary>
@@ -66,10 +84,70 @@ namespace Waher.Networking.HTTP.Mcp
 		public override bool SupportsServerSentEvents => true;
 
 		/// <summary>
+		/// Name of server.
+		/// </summary>
+		public string Name { get; private set; }
+
+		/// <summary>
+		/// Title of server.
+		/// </summary>
+		public string Title { get; private set; }
+
+		/// <summary>
+		/// Version of server.
+		/// </summary>
+		public string Version { get; private set; }
+
+		/// <summary>
+		/// Description of server.
+		/// </summary>
+		public string Description { get; private set; }
+
+		/// <summary>
+		/// Icons of server.
+		/// </summary>
+		public Icons Icons { get; private set; }
+
+		/// <summary>
+		/// Website URI of server.
+		/// </summary>
+		public Uri WebSiteUri { get; private set; }
+
+		/// <summary>
+		/// Instructions for server.
+		/// </summary>
+		public string Instructions { get; private set; }
+
+		/// <summary>
+		/// Registers a MCP Server tool.
+		/// </summary>
+		/// <param name="Method"></param>
+		/// <param name="Attributes"></param>
+		/// <exception cref="Exception"></exception>
+		public void RegisterTool(MethodInfo Method, McpServerToolAttribute Attributes)
+		{
+			lock (this.tools)
+			{
+				string Name = Method.Name;
+
+				if (this.tools.ContainsKey(Name))
+					throw new Exception("Tool already registered: " + Name);
+
+				this.tools[Name] = new Tool(Method, Attributes.Title,
+					Attributes.Description, Attributes.IconsMethod,
+					Attributes.CanModifyEnvironment, Attributes.CanDestroyEnvironment,
+					Attributes.Idempotent, Attributes.OpenWorldAccess);
+			}
+
+			// TODO: Send notification to clients about new tool.
+			// TODO: Declare tool notification in capabilities.
+		}
+
+		/// <summary>
 		/// Gets default icons, if any.
 		/// </summary>
 		/// <returns>Array of default icons. Empty, if none found.</returns>
-		protected static Icon[] GetDefaultIcons()
+		public static Icon[] GetDefaultIcons()
 		{
 			if (Types.TryGetModuleParameter("FavIcon", out string Url))
 			{
@@ -86,7 +164,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// Gets a URI to the default web site, if any.
 		/// </summary>
 		/// <returns>URI, if available, null if not.</returns>
-		protected static Uri? GetDefaultWebSite()
+		public static Uri? GetDefaultWebSite()
 		{
 			if (Types.TryGetModuleParameter("HomePage", out string Url) &&
 				Uri.TryCreate(Url, UriKind.Absolute, out Uri WebSiteUri))
@@ -162,15 +240,15 @@ namespace Waher.Networking.HTTP.Mcp
 				},
 				{ "serverInfo", new Dictionary<string,object>()
 					{
-						{ "name", this.name },
-						{ "title", this.title },
-						{ "version", this.version },
-						{ "description", this.description },
-						{ "icons", this.icons.ToJson() },
-						{ "websiteUrl", this.webSiteUri.ToString() }
+						{ "name", this.Name },
+						{ "title", this.Title },
+						{ "version", this.Version },
+						{ "description", this.Description },
+						{ "icons", this.Icons.ToJson() },
+						{ "websiteUrl", this.WebSiteUri.ToString() }
 					}
 				},
-				{ "instructions", this.instructions }
+				{ "instructions", this.Instructions }
 			};
 
 			return Result;
@@ -184,22 +262,63 @@ namespace Waher.Networking.HTTP.Mcp
 		}
 
 		[JsonRpcMethod]
-		protected Dictionary<string, object> Tools_List(HttpRequest Request,
+		protected async Task<Dictionary<string, object>> Tools_List(HttpRequest Request,
 			string? Cursor = null)
 		{
-			// TODO 
+			int Offset = 0;
+			int MaxCount = PageSize;
 
-			return new Dictionary<string, object>()
+			if (!string.IsNullOrEmpty(Cursor))
 			{
-				{ "tools", Array.Empty<Dictionary<string, object>>() }
-			};
+				if (!int.TryParse(Cursor, out Offset) || Offset < 0)
+					throw new Exception("Invalid cursor.");
+			}
+
+			ChunkedList<Tool> Tools = new ChunkedList<Tool>();
+			Dictionary<string, object>[] ToolsJson;
+			int Next = Offset + MaxCount;
+
+			Dictionary<string, object> Result = new Dictionary<string, object>();
+
+			lock (this.tools)
+			{
+				foreach (Tool Tool in this.tools.Values)
+				{
+					if (MaxCount <= 0)
+					{
+						Result["nextCursor"] = Next.ToString();
+						break;
+					}
+
+					if (Offset > 0)
+					{
+						Offset--;
+						continue;
+					}
+
+					Tools.Add(Tool);
+					MaxCount--;
+				}
+			}
+
+			int i = 0;
+			int c = Tools.Count;
+
+			ToolsJson = new Dictionary<string, object>[c];
+
+			foreach (Tool Tool in Tools)
+				ToolsJson[i++] = await Tool.ToJson(this);
+
+			Result["tools"] = ToolsJson;
+
+			return Result;
 		}
 
 		[JsonRpcMethod]
 		protected Dictionary<string, object> Prompts_List(HttpRequest Request,
 			string? Cursor = null)
 		{
-			// TODO 
+			// TODO: prompts/list
 
 			return new Dictionary<string, object>()
 			{
@@ -211,7 +330,7 @@ namespace Waher.Networking.HTTP.Mcp
 		protected Dictionary<string, object> Resources_List(HttpRequest Request,
 			string? Cursor = null)
 		{
-			// TODO 
+			// TODO: resources/list
 
 			return new Dictionary<string, object>()
 			{

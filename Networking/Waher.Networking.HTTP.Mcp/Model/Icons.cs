@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Waher.Runtime.Collections;
 
-namespace Waher.Networking.HTTP.Mcp
+namespace Waher.Networking.HTTP.Mcp.Model
 {
 	/// <summary>
 	/// Base interface to add `icons` property.
@@ -37,6 +37,11 @@ namespace Waher.Networking.HTTP.Mcp
 		/// - `image/webp` - WebP images(modern, efficient format)
 		/// </summary>
 		public Icon[]? IconArray { get; internal set; }
+
+		/// <summary>
+		/// If there are icons defined.
+		/// </summary>
+		public bool Empty => (this.IconArray?.Length ?? 0) == 0;
 
 		/// <summary>
 		/// Tries to parse a generic structure into a typed structure.

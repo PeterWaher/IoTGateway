@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Waher.Networking.HTTP.Mcp
+namespace Waher.Networking.HTTP.Mcp.Model.Client
 {
 	/// <summary>
 	/// Capabilities of the client.

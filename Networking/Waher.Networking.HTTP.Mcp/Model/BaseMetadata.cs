@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Waher.Networking.HTTP.Mcp
+namespace Waher.Networking.HTTP.Mcp.Model
 {
 	/// <summary>
 	/// Base interface for metadata with name (identifier) and title (display name) 

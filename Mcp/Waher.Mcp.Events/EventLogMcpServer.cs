@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Waher.Events;
 using Waher.Networking.HTTP.Mcp;
+using Waher.Networking.HTTP.Mcp.Model;
 
 namespace Waher.Mcp.Events
 {
@@ -61,6 +62,7 @@ namespace Waher.Mcp.Events
 		[McpServerTool(
 			"Log Debug Event",  // Title
 			"Logs an event for debug purposes to the event log.",   // Description
+			"",     // IconsMethod, use default icons
 			true,   // CanModifyEnvironment
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent

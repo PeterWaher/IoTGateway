@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Waher.Networking.HTTP.Mcp
+namespace Waher.Networking.HTTP.Mcp.Model
 {
 	/// <summary>
 	/// An optionally-sized icon that can be displayed in a user interface.

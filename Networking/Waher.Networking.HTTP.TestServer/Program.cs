@@ -5,10 +5,10 @@ using Waher.Content.Markdown;
 using Waher.Content.Markdown.Web;
 using Waher.Events;
 using Waher.Events.Console;
+using Waher.Mcp.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Brotli;
 using Waher.Networking.HTTP.ContentEncodings;
-using Waher.Networking.HTTP.Mcp;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
@@ -271,7 +271,7 @@ internal class Program
 			WebServer.Register("/Hello", Hello, Hello);
 			WebServer.Register("/Hello.md", HelloMarkdown, HelloMarkdown);
 			WebServer.Register("/Hello.css", HelloStyles);
-			WebServer.Register(new HttpMcpServerResource("/MCP/Test", "TestServer", 
+			WebServer.Register(new EventLogMcpServer("/MCP/Test", "TestServer", 
 				"Test Server", "1.0.0", "This is a test server.", [], 
 				new Uri("https://example.org/"), "These are the instructions."));
 

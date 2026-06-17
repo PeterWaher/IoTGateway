@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Net.Security;
 using System.Net.WebSockets;
@@ -11,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Events.Console;
-using Waher.Networking.HTTP.JsonRpc.Exceptions;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.IO;
@@ -20,7 +18,8 @@ using Waher.Security;
 
 namespace Waher.Networking.HTTP.Test
 {
-	public abstract class WebSocketTests : IUserSource
+	[TestClass]
+	public class WebSocketTests : IUserSource
 	{
 		private const int MaxTextSize = 64 * 1024;
 		private const int MaxBinarySize = 1024 * 1024;
@@ -29,8 +28,6 @@ namespace Waher.Networking.HTTP.Test
 		private XmlFileSniffer xmlSniffer = null;
 
 		private WebSocketListener webSocketListener;
-
-		public abstract Version ProtocolVersion { get; }
 
 		public TestContext TestContext { get; set; }
 
@@ -62,11 +59,6 @@ namespace Waher.Networking.HTTP.Test
 			{
 				string Uml = e.Profiler.ExportPlantUml(TimeUnit.MilliSeconds);
 				await Files.WriteAllTextAsync(Path.ChangeExtension(SnifferFileName, "uml"), Uml);
-			};
-
-			ServicePointManager.ServerCertificateValidationCallback = delegate (Object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
-			{
-				return true;
 			};
 
 			this.webSocketListener = new WebSocketListener("/ws", false, MaxTextSize, MaxBinarySize, "chat");
@@ -111,18 +103,22 @@ namespace Waher.Networking.HTTP.Test
 				return Task.FromResult<IUser>(null);
 		}
 
-		private ClientWebSocket CreateClient()
+		private ClientWebSocket CreateClient(string ProtocolVersion)
 		{
 			ClientWebSocket Client = new();
 
-			Client.Options.HttpVersion = this.ProtocolVersion;
+			Client.Options.HttpVersion = new Version(ProtocolVersion);
 			Client.Options.HttpVersionPolicy = HttpVersionPolicy.RequestVersionExact;
 			
 			return Client;
 		}
 
 		[TestMethod]
-		public async Task Test_01_Connect_Reject()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_01_Connect_Reject(string ProtocolVersion, bool Encryption)
 		{
 			this.webSocketListener.Accept += (Sender, e) =>
 			{
@@ -135,16 +131,40 @@ namespace Waher.Networking.HTTP.Test
 				return Task.CompletedTask;
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
 
 			await Assert.ThrowsAsync<WebSocketException>(async () =>
-				await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+				await Client.ConnectAsync(GetUri(Encryption),
 					new HttpMessageInvoker(Handler), CancellationToken.None));
 		}
 
+		private static SocketsHttpHandler PrepareHandler()
+		{
+			SocketsHttpHandler Handler = new();
+
+			Handler.SslOptions.RemoteCertificateValidationCallback = delegate (object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
+			{
+				return true;
+			};
+
+			return Handler;
+		}
+
+		private static Uri GetUri(bool Encryption)
+		{
+			if (Encryption)
+				return new Uri("wss://localhost:8088/ws");
+			else
+				return new Uri("ws://localhost:8081/ws");
+		}
+
 		[TestMethod]
-		public async Task Test_02_Connect_Accept()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_02_Connect_Accept(string ProtocolVersion, bool Encryption)
 		{
 			this.webSocketListener.Accept += (Sender, e) =>
 			{
@@ -168,17 +188,22 @@ namespace Waher.Networking.HTTP.Test
 				return Task.CompletedTask;
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
 			Client.Options.SetRequestHeader("Origin", "UnitTest");
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+
+			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
 			Assert.AreEqual(WebSocketState.Open, Client.State);
 		}
 
 		[TestMethod]
-		public async Task Test_03_ReceiveText()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_03_ReceiveText(string ProtocolVersion, bool Encryption)
 		{
 			TaskCompletionSource<bool> Result = new();
 
@@ -197,9 +222,9 @@ namespace Waher.Networking.HTTP.Test
 				return Task.CompletedTask;
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
 			await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("Hello World")),
@@ -213,7 +238,11 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_04_ReceiveBinary()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_04_ReceiveBinary(string ProtocolVersion, bool Encryption)
 		{
 			TaskCompletionSource<bool> Result = new();
 
@@ -238,9 +267,10 @@ namespace Waher.Networking.HTTP.Test
 				return Task.CompletedTask;
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			
+			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
 			await Client.SendAsync(new ArraySegment<byte>([1, 2, 3, 4]),
@@ -254,7 +284,11 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_05_ReceiveTextFragmented()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_05_ReceiveTextFragmented(string ProtocolVersion, bool Encryption)
 		{
 			TaskCompletionSource<bool> Result = new();
 
@@ -273,9 +307,9 @@ namespace Waher.Networking.HTTP.Test
 				return Task.CompletedTask;
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
 			await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("Hello ")),
@@ -292,7 +326,11 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_06_ReceiveFragmented()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_06_ReceiveFragmented(string ProtocolVersion, bool Encryption)
 		{
 			TaskCompletionSource<bool> Result = new();
 
@@ -317,9 +355,9 @@ namespace Waher.Networking.HTTP.Test
 				return Task.CompletedTask;
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
 			await Client.SendAsync(new ArraySegment<byte>([1, 2]),
@@ -336,7 +374,11 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_07_ReceiveLargeText()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_07_ReceiveLargeText(string ProtocolVersion, bool Encryption)
 		{
 			TaskCompletionSource<bool> Result = new();
 
@@ -355,9 +397,9 @@ namespace Waher.Networking.HTTP.Test
 				return Task.CompletedTask;
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
 			await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(new string('A', 100000))),
@@ -371,7 +413,11 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_08_ReceiveLargeBinary()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_08_ReceiveLargeBinary(string ProtocolVersion, bool Encryption)
 		{
 			TaskCompletionSource<bool> Result = new();
 
@@ -386,9 +432,9 @@ namespace Waher.Networking.HTTP.Test
 				return Task.CompletedTask;
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
 			Task _ = Task.Run(async () =>
@@ -434,16 +480,20 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_09_SendText()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_09_SendText(string ProtocolVersion, bool Encryption)
 		{
 			this.webSocketListener.Connected += (Sender, e) =>
 			{
 				return e.Socket.Send("Hello World");
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
 			ArraySegment<byte> Buffer = new(new byte[1024]);
@@ -458,16 +508,20 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_10_SendBinary()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_10_SendBinary(string ProtocolVersion, bool Encryption)
 		{
 			this.webSocketListener.Connected += (Sender, e) =>
 			{
 				return e.Socket.Send([1, 2, 3, 4]);
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
 			ArraySegment<byte> Buffer = new(new byte[1024]);
@@ -486,7 +540,11 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_11_SendTextFragmented()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_11_SendTextFragmented(string ProtocolVersion, bool Encryption)
 		{
 			this.webSocketListener.Connected += async (Sender, e) =>
 			{
@@ -494,9 +552,9 @@ namespace Waher.Networking.HTTP.Test
 				await e.Socket.Send("World", false);
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
 			ArraySegment<byte> Buffer = new(new byte[1024]);
@@ -520,7 +578,11 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_12_SendBinaryFragmented()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_12_SendBinaryFragmented(string ProtocolVersion, bool Encryption)
 		{
 			this.webSocketListener.Connected += async (Sender, e) =>
 			{
@@ -528,9 +590,9 @@ namespace Waher.Networking.HTTP.Test
 				await e.Socket.Send([3, 4], false);
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
 			ArraySegment<byte> Buffer = new(new byte[1024]);
@@ -558,7 +620,11 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_13_Work()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_13_Work(string ProtocolVersion, bool Encryption)
 		{
 			this.webSocketListener.Connected += (Sender, e) =>
 			{
@@ -570,9 +636,9 @@ namespace Waher.Networking.HTTP.Test
 				return Task.CompletedTask;
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
 			int i;
@@ -595,7 +661,11 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_14_Pong()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_14_Pong(string ProtocolVersion, bool Encryption)
 		{
 			this.webSocketListener.Connected += (Sender, e) =>
 			{
@@ -607,9 +677,9 @@ namespace Waher.Networking.HTTP.Test
 				return Task.CompletedTask;
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
 			int i;
@@ -634,7 +704,11 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_15_Close()
+		[DataRow("1.1", false)]
+		[DataRow("2.0", false)]
+		[DataRow("1.1", true)]
+		[DataRow("2.0", true)]
+		public async Task Test_15_Close(string ProtocolVersion, bool Encryption)
 		{
 			TaskCompletionSource<bool> Result = new();
 
@@ -651,9 +725,9 @@ namespace Waher.Networking.HTTP.Test
 				return Task.CompletedTask;
 			};
 
-			using SocketsHttpHandler Handler = new();
-			using ClientWebSocket Client = this.CreateClient();
-			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
+			using SocketsHttpHandler Handler = PrepareHandler();
+			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 			await Client.CloseAsync(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, "Manual", CancellationToken.None);
 

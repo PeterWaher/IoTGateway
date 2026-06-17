@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root xmlns="http://waher.se/Schema/WAF.xsd">
+	<LogEvent type="Debug" message="1" object="{Request.Header.Resource}" actor="{Request.RemoteEndPoint}"/>
+	<FromIp value="127.0.0.1,[::1],90.226.161.130,151.236.203.187,81.234.198.116,62.169.229.246,139.162.147.59,94.237.84.237,85.9.206.166">
+		<LogEvent type="Debug" message="1.1"/>
+		<Allow/>
+		<LogEvent type="Debug" message="Que?"/>
+	</FromIp>
+	<LogEvent type="Debug" message="2"/>
+	<PathMatch mode="EndsWithConstantIgnoreCase" value=".md">
+		<LogEvent type="Debug" message="2.1"/>
+		<ResourceMatch mode="ExactConstantIgnoreCase" value="/QuickLogin.md">
+			<LogEvent type="Debug" message="2.1.1"/>
+			<Allow/>
+			<LogEvent type="Debug" message="Que?"/>
+		</ResourceMatch>
+		<Forbid/>
+		<LogEvent type="Debug" message="Que?"/>
+	</PathMatch>
+	<LogEvent type="Debug" message="3"/>
+	<PathMatch mode="EndsWithConstantIgnoreCase" value=".ws">
+		<LogEvent type="Debug" message="3.1"/>
+		<ResourceMatch mode="ExactConstantIgnoreCase" value="/Alert.ws">
+			<LogEvent type="Debug" message="3.1.1"/>
+			<Allow/>
+			<LogEvent type="Debug" message="Que?"/>
+		</ResourceMatch>
+		<LogEvent type="Debug" message="3.2"/>
+		<Forbid/>
+		<LogEvent type="Debug" message="Que?"/>
+	</PathMatch>
+	<LogEvent type="Debug" message="4"/>
+	<MethodMatch mode="List" value="GET,HEAD">
+		<LogEvent type="Debug" message="4.1"/>
+		<PathMatch mode="StartsWithConstantIgnoreCase" value="/HttpUpload/">
+			<LogEvent type="Debug" message="4.1.1"/>
+			<Forbid/>
+			<LogEvent type="Debug" message="Que?"/>
+		</PathMatch>
+		<LogEvent type="Debug" message="4.2"/>
+		<Allow/>
+		<LogEvent type="Debug" message="Que?"/>
+	</MethodMatch>
+	<LogEvent type="Debug" message="5"/>
+	<MethodMatch mode="List" value="OPTIONS,PUT,POST">
+		<LogEvent type="Debug" message="5.1"/>
+		<Allow/>
+		<LogEvent type="Debug" message="Que?"/>
+	</MethodMatch>
+	<LogEvent type="Debug" message="6"/>
+	<Forbid/>
+	<LogEvent type="Debug" message="Que?"/>
+</Root>

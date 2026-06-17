@@ -1,7 +1,5 @@
-﻿using System.Reflection.PortableExecutable;
-using System.Security.Cryptography.X509Certificates;
+﻿using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading;
 using Waher.Content;
 using Waher.Content.Getters;
 using Waher.Events;
@@ -25,8 +23,8 @@ namespace Waher.Security.WAF.Test
 	[TestClass]
 	public sealed class WafTests
 	{
+		internal static LoginAuditor auditor = null;
 		private static FilesProvider filesProvider = null;
-		private static LoginAuditor auditor = null;
 		private static ConsoleEventSink eventSink = null;
 		private static XmlFileLedger ledger = null;
 		private HttpServer server = null;

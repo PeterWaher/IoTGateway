@@ -666,9 +666,29 @@ namespace Waher.Content
 		public static Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Uri BaseUri,
 			ICodecProgress Progress)
 		{
-			Encoding Encoding = null;
-			KeyValuePair<string, string>[] Fields;
+			ParseContentType(ref ContentType, out Encoding Encoding,
+				out KeyValuePair<string, string>[] Fields);
+
+			return DecodeAsync(ContentType, Data, Encoding, Fields, BaseUri, Progress);
+		}
+
+		/// <summary>
+		/// Parses a Content-Type, providing the base Content-Type, character encoding,
+		/// if any, and other field parameters available.
+		/// </summary>
+		/// <param name="ContentType">Content type string to parse.</param>
+		/// <param name="Encoding">Encoding, if found, null otherwise.</param>
+		/// <param name="Fields">Array of fields.</param>
+		/// <returns>If there was any information available apart from the base
+		/// Content-Type to parse. If true, <paramref name="ContentType"/> has been
+		/// changed to the base Content-Type and <paramref name="Encoding"/> and 
+		/// <paramref name="Fields"/> reflect the information parsed.</returns>
+		public static bool ParseContentType(ref string ContentType, out Encoding Encoding,
+			out KeyValuePair<string, string>[] Fields)
+		{
 			int i;
+			
+			Encoding = null;
 
 			i = ContentType.IndexOf(';');
 			if (i > 0)
@@ -681,11 +701,14 @@ namespace Waher.Content
 					if (string.Compare(Field.Key, "CHARSET", true) == 0)
 						Encoding = GetEncoding(Field.Value);
 				}
+
+				return true;
 			}
 			else
+			{
 				Fields = Array.Empty<KeyValuePair<string, string>>();
-
-			return DecodeAsync(ContentType, Data, Encoding, Fields, BaseUri, Progress);
+				return false;
+			}
 		}
 
 		/// <summary>

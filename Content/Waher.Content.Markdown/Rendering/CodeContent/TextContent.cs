@@ -39,32 +39,14 @@ namespace Waher.Content.Markdown.Rendering.CodeContent
 		/// <returns>Decoded string.</returns>
 		public static string DecodeBase64EncodedText(string[] Rows, ref string ContentType)
 		{
-			Encoding Encoding = Encoding.UTF8;
 			int i = ContentType.IndexOf(':');
 
 			if (i > 0)
 				ContentType = ContentType.Substring(0, i).TrimEnd();
 
-			i = ContentType.IndexOf(';');
+			InternetContent.ParseContentType(ref ContentType, out Encoding Encoding, out _);
 
-			if (i > 0)
-			{
-				KeyValuePair<string, string>[] ContentTypeFields = CommonTypes.ParseFieldValues(
-					ContentType.Substring(i + 1).TrimStart());
-
-				ContentType = ContentType.Substring(0, i).TrimEnd();
-
-				foreach (KeyValuePair<string, string> P in ContentTypeFields)
-				{
-					if (string.Compare(P.Key, "charset", true) == 0)
-					{
-						Encoding = Encoding.GetEncoding(P.Value);
-						break;
-					}
-				}
-			}
-
-			return DecodeBase64EncodedText(Rows, Encoding);
+			return DecodeBase64EncodedText(Rows, Encoding ?? Encoding.UTF8);
 		}
 
 		/// <summary>

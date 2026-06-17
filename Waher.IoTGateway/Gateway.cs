@@ -5652,19 +5652,8 @@ namespace Waher.IoTGateway
 							Detail = null;
 						else
 						{
-							System.Text.Encoding Encoding = null;
-							int i = ContentType.IndexOf(';');
-
-							if (i > 0)
-							{
-								KeyValuePair<string, string>[] Fields = CommonTypes.ParseFieldValues(ContentType[(i + 1)..].TrimStart());
-
-								foreach (KeyValuePair<string, string> Field in Fields)
-								{
-									if (string.Compare(Field.Key, "CHARSET", true) == 0)
-										Encoding = InternetContent.GetEncoding(Field.Value);
-								}
-							}
+							InternetContent.ParseContentType(ref ContentType,
+								out System.Text.Encoding Encoding, out _);
 
 							Encoding ??= System.Text.Encoding.UTF8;
 

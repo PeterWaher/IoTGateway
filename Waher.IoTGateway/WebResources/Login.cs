@@ -161,7 +161,7 @@ namespace Waher.IoTGateway.WebResources
 			}
 		}
 
-		private static async Task LoginError(HttpResponse Response, 
+		private static async Task LoginError(HttpResponse Response,
 			string Error)
 		{
 			await Response.Return(new Dictionary<string, object>()
@@ -208,9 +208,21 @@ namespace Waher.IoTGateway.WebResources
 			Request.Session[AutoLoginVariableName] = AutoLogin;
 		}
 
-		internal static async Task RedirectBackToFrom(HttpResponse Response, string From, 
+		internal static async Task RedirectBackToFrom(HttpResponse Response, string From,
 			bool ThrowRedirection)
 		{
+			if (From.Length > 256 ||
+				!Uri.TryCreate(From, UriKind.Absolute, out Uri FromUri) ||
+				!LocalContent.IsLocal(FromUri, true))
+			{
+				Response.Request.Session.Remove(UserVariableName);
+
+				await Gateway.LoginAuditor.ProcessLoginFailure(Response.Request.RemoteEndPoint,
+					"HTTP", DateTime.Now, "Invalid From attribute: " + From);
+
+				throw new BadRequestException();
+			}
+
 			if (ThrowRedirection)
 				throw new SeeOtherException(From);
 			else

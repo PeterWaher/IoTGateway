@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Temporary;
 
@@ -19,37 +20,104 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Uri">The <see cref="Uri"/> to check.</param>
 		/// <returns>True if the <see cref="Uri"/> is local, false otherwise.</returns>
+		public static bool IsLocal(string Uri)
+		{
+			return IsLocal(Uri, false);
+		}
+
+		/// <summary>
+		/// Checks if a <see cref="Uri"/> is local to the gateway.
+		/// </summary>
+		/// <param name="Uri">The <see cref="Uri"/> to check.</param>
+		/// <param name="CheckExists">Checks if the local resource exists.</param>
+		/// <returns>True if the <see cref="Uri"/> is local, false otherwise.</returns>
+		public static bool IsLocal(string Uri, bool CheckExists)
+		{
+			if (!System.Uri.TryCreate(Uri, UriKind.RelativeOrAbsolute, out Uri Parsed))
+				return false;
+
+			return IsLocal(Parsed, CheckExists);
+		}
+
+		/// <summary>
+		/// Checks if a <see cref="Uri"/> is local to the gateway.
+		/// </summary>
+		/// <param name="Uri">The <see cref="Uri"/> to check.</param>
+		/// <returns>True if the <see cref="Uri"/> is local, false otherwise.</returns>
 		public static bool IsLocal(Uri Uri)
 		{
-			if (!Uri.IsAbsoluteUri)
-				return true;
+			return IsLocal(Uri, false);
+		}
 
-			int[] Ports;
-
-			switch (Uri.Scheme.ToLower())
+		/// <summary>
+		/// Checks if a <see cref="Uri"/> is local to the gateway.
+		/// </summary>
+		/// <param name="Uri">The <see cref="Uri"/> to check.</param>
+		/// <param name="CheckExists">Checks if the local resource exists.</param>
+		/// <returns>True if the <see cref="Uri"/> is local, false otherwise.</returns>
+		public static bool IsLocal(Uri Uri, bool CheckExists)
+		{
+			if (Uri.IsAbsoluteUri)
 			{
-				case "http":
-					Ports = Gateway.HttpServer.OpenHttpPorts;
-					break;
+				int[] Ports;
 
-				case "https":
-					Ports = Gateway.HttpServer.OpenHttpsPorts;
-					break;
+				switch (Uri.Scheme.ToLower())
+				{
+					case "http":
+						Ports = Gateway.HttpServer.OpenHttpPorts;
+						break;
 
-				default:
+					case "https":
+						Ports = Gateway.HttpServer.OpenHttpsPorts;
+						break;
+
+					default:
+						return false;
+				}
+
+				if (Ports is null)
+					return false;
+
+				if (string.Compare(Uri.Host, "localhost", true) != 0 &&
+					!Gateway.IsDomain(Uri.Host, true))
+				{
+					return false;
+				}
+
+				if (Array.IndexOf(Ports, Uri.Port) < 0)
 					return false;
 			}
 
-			if (Ports is null)
-				return false;
-
-			if (string.Compare(Uri.Host, "localhost", true) != 0 &&
-				!Gateway.IsDomain(Uri.Host, true))
+			if (CheckExists)
 			{
-				return false;
+				HttpResource Resource;
+				string SubPath;
+				string s;
+
+				try
+				{
+					s = Uri.AbsolutePath;
+
+					if (!Gateway.HttpServer.TryGetResource(ref s, out Resource, out SubPath))
+						return false;
+				}
+				catch (Exception ex)
+				{
+					Log.Error("Attempt to check local resource failed with exception: " + ex.Message);
+					return false;
+				}
+
+				if (!string.IsNullOrEmpty(SubPath))
+				{
+					if (!Resource.HandlesSubPaths)
+						return false;
+
+					if (!Gateway.HttpServer.TryGetFileName(Uri.AbsolutePath, true, out _))
+						return false;
+				}
 			}
 
-			return Array.IndexOf(Ports, Uri.Port) >= 0;
+			return true;
 		}
 
 		/// <summary>

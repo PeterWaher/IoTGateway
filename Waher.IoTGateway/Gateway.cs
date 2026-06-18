@@ -45,7 +45,6 @@ using Waher.Groups;
 using Waher.IoTGateway.Cssx;
 using Waher.IoTGateway.Events;
 using Waher.IoTGateway.Exceptions;
-using Waher.IoTGateway.ScriptExtensions.Functions;
 using Waher.IoTGateway.Setup;
 using Waher.IoTGateway.Setup.Legal;
 using Waher.IoTGateway.WebResources;

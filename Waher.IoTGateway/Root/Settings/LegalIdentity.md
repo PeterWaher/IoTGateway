@@ -301,7 +301,7 @@ more information about their approval procedure.
 	   {"code":"SE", "name":"SWEDEN"},
 	   {"code":"CH", "name":"SWITZERLAND"},
 	   {"code":"SY", "name":"SYRIAN ARAB REPUBLIC"},
-	   {"code":"TW", "name":"TAIWAN, PROVINCE OF CHINA"},
+	   {"code":"TW", "name":"TAIWAN"},
 	   {"code":"TJ", "name":"TAJIKISTAN"},
 	   {"code":"TZ", "name":"TANZANIA, UNITED REPUBLIC OF"},
 	   {"code":"TH", "name":"THAILAND"},

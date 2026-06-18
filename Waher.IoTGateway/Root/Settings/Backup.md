@@ -141,7 +141,7 @@ the Analyze button to analyze the database and generate a report.
 
 <p>
 <input id="((CategoryId:=Rec.CategoryId))" name="((CategoryId))" type="checkbox" ((Export.GetExportFolderAsync(CategoryId) ? "checked" : ""))/>
-<label for="((CategoryId))">((Rec.DisplayName))</label>
+<label for="((CategoryId))">((MarkdownEncode(Rec.DisplayName) ))</label>
 </p>
 
 [[}}

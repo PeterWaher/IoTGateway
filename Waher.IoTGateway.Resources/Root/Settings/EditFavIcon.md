@@ -59,7 +59,7 @@ Decode(Bin,"image/x-icon")
 
 {{
 if !empty(ErrorMsg) then
-    ]]<p class="error">((ErrorMsg))</p>[[
+    ]]<p class="error">((MarkdownEncode(ErrorMsg) ))</p>[[
 }}
 
 <button type="submit" class="posButton">Apply</button>

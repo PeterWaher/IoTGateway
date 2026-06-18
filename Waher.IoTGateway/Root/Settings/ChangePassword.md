@@ -105,7 +105,7 @@ if exists(Posted) then
 			)
 			catch
 			(
-				]]<div class='error'>((Exception.Message))</div>[[
+				]]<div class='error'>((MarkdownEncode(Exception.Message) ))</div>[[
 			)
 		)
 	)

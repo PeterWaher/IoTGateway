@@ -36,7 +36,7 @@ foreach Role in Roles do
 (
 	]]<tr><td><a target="_blank" href="Role.md?RoleId=((Role.Id))">`((Role.Id))`</a></td><td>
 
-((Role.Description))
+((MarkdownEncode(Role.Description) ))
 
 </td><td>
 

@@ -37,7 +37,9 @@ namespace Waher.Content.Binary
 		/// </summary>
 		public static readonly string[] BinaryFileExtensions = new string[]
 		{
-			"bin"
+			"bin",
+			"key",
+			"bak"
 		};
 
 		/// <summary>

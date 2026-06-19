@@ -11,6 +11,7 @@ using Waher.Content.Binary;
 using Waher.Content.Markdown;
 using Waher.Content.Text;
 using Waher.Content.Xml;
+using Waher.Content.Xml.Text;
 using Waher.Events;
 using Waher.IoTGateway.WebResources.ExportFormats;
 using Waher.Networking.HTTP;
@@ -181,6 +182,7 @@ namespace Waher.IoTGateway.WebResources
 
 				Response.StatusCode = 200;
 				Response.ContentType = PlainTextCodec.DefaultContentType;
+
 				await Response.Write(ExportInfo.LocalBackupFileName);
 			}
 			catch (Exception ex)
@@ -198,6 +200,7 @@ namespace Waher.IoTGateway.WebResources
 			public string LocalKeyFileName;
 			public string FullBackupFileName;
 			public string FullKeyFileName;
+			public string ContentType;
 			public IExportFormat Exporter;
 		}
 
@@ -217,6 +220,7 @@ namespace Waher.IoTGateway.WebResources
 			{
 				case "XML":
 					Result.FullBackupFileName = await GetUniqueFileName(Result.FullBackupFileName, ".xml");
+					Result.ContentType = XmlCodec.DefaultContentType;
 					FileStream fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
 					DateTime Created = File.GetCreationTime(Result.FullBackupFileName);
 					XmlWriterSettings Settings = XML.WriterSettings(true, false);
@@ -228,6 +232,7 @@ namespace Waher.IoTGateway.WebResources
 
 				case "Binary":
 					Result.FullBackupFileName = await GetUniqueFileName(Result.FullBackupFileName, ".bin");
+					Result.ContentType = BinaryCodec.DefaultContentType;
 					fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
 					Created = File.GetCreationTime(Result.FullBackupFileName);
 					Result.LocalBackupFileName = Result.FullBackupFileName[BasePath.Length..];
@@ -236,6 +241,7 @@ namespace Waher.IoTGateway.WebResources
 
 				case "Compressed":
 					Result.FullBackupFileName = await GetUniqueFileName(Result.FullBackupFileName, ".gz");
+					Result.ContentType = "application/gzip";
 					fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
 					Created = File.GetCreationTime(Result.FullBackupFileName);
 					Result.LocalBackupFileName = Result.FullBackupFileName[BasePath.Length..];
@@ -245,6 +251,7 @@ namespace Waher.IoTGateway.WebResources
 
 				case "Encrypted":
 					Result.FullBackupFileName = await GetUniqueFileName(Result.FullBackupFileName, ".bak");
+					Result.ContentType = BinaryCodec.DefaultContentType;
 					fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
 					Created = File.GetCreationTime(Result.FullBackupFileName);
 					Result.LocalBackupFileName = Result.FullBackupFileName[BasePath.Length..];
@@ -520,9 +527,16 @@ namespace Waher.IoTGateway.WebResources
 
 				ProfilerThread Thread = Profiler.CreateThread("Upload", ProfilerThreadType.StateMachine);
 
-				await UploadBackupFile(ExportInfo.LocalBackupFileName, ExportInfo.FullBackupFileName, false, Thread);
+				await UploadBackupFile(ExportInfo.LocalBackupFileName, 
+					ExportInfo.FullBackupFileName, ExportInfo.ContentType,
+					false, Thread);
+
 				if (!string.IsNullOrEmpty(ExportInfo.FullKeyFileName))
-					await UploadBackupFile(ExportInfo.LocalKeyFileName, ExportInfo.FullKeyFileName, true, Thread);
+				{
+					await UploadBackupFile(ExportInfo.LocalKeyFileName,
+						ExportInfo.FullKeyFileName, ExportInfo.ContentType,
+						true, Thread);
+				}
 
 				Profiler.Stop();
 
@@ -555,12 +569,14 @@ namespace Waher.IoTGateway.WebResources
 			return await Output.UpdateClient(false);
 		}
 
-		private static Task UploadBackupFile(string LocalFileName, string FullFileName, bool IsKey, ProfilerThread Thread)
+		private static Task UploadBackupFile(string LocalFileName, string FullFileName, 
+			string ContentType, bool IsKey, ProfilerThread Thread)
 		{
 			return UploadBackupFile(new BackupInfo()
 			{
 				LocalFileName = LocalFileName,
 				FullFileName = FullFileName,
+				ContentType = ContentType,
 				IsKey = IsKey,
 				Thread = Thread,
 				Rescheduled = false
@@ -571,6 +587,7 @@ namespace Waher.IoTGateway.WebResources
 		{
 			public string LocalFileName;
 			public string FullFileName;
+			public string ContentType;
 			public bool IsKey;
 			public bool Rescheduled;
 			public Dictionary<string, bool> Recipients = null;
@@ -661,12 +678,12 @@ namespace Waher.IoTGateway.WebResources
 								BackupInfo.Thread?.NewState("Prepare_" + Recipient);
 
 								await UploadClient.PrepareFileUpload(BackupInfo.LocalFileName,
-									BinaryCodec.DefaultContentType, FileSize, FilePurpose.Backup);
+									BackupInfo.ContentType, FileSize, FilePurpose.Backup);
 
 								BackupInfo.Thread?.NewState("Get_Slot_" + Recipient);
 
 								HttpFileUploadEventArgs e2 = await UploadClient.RequestUploadSlotAsync(BackupInfo.LocalFileName,
-									BinaryCodec.DefaultContentType, FileSize, false);
+									BackupInfo.ContentType, FileSize, false);
 
 								if (!e2.Ok)
 									throw e2.StanzaError ?? new XmppException("Unable to get HTTP upload slot for backup file.");
@@ -678,7 +695,7 @@ namespace Waher.IoTGateway.WebResources
 								else
 									Log.Informational("Uploading backup file to " + Recipient + ".", BackupInfo.LocalFileName);
 
-								await e2.PUT(fs, BinaryCodec.DefaultContentType, 60 * 60 * 1000);   // 1h timeout
+								await e2.PUT(fs, BackupInfo.ContentType, 60 * 60 * 1000);   // 1h timeout
 
 								if (BackupInfo.IsKey)
 									Log.Informational("Key file uploaded to " + Recipient + ".", BackupInfo.LocalFileName);

@@ -728,7 +728,8 @@ namespace Waher.Content.Xml
 				PreserveWhitespace = PreserveWhitespace
 			};
 
-			Doc.LoadXml(Xml);
+			if (!(Xml is null))
+				Doc.LoadXml(Xml);
 
 			return Doc;
 		}

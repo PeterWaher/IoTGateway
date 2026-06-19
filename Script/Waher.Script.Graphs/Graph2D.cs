@@ -467,7 +467,7 @@ namespace Waher.Script.Graphs
 				eY = Y.ChildElements.GetEnumerator();
 
 				while (eX.MoveNext() && eY.MoveNext())
-					Values[eX.Current.AssociatedObjectValue?.ToString() ?? string.Empty] = eY.Current;
+					Values[ScriptNode.ToString(eX.Current) ?? string.Empty] = eY.Current;
 			}
 
 			vX = AddFixed.GetEnumerator();
@@ -484,7 +484,7 @@ namespace Waher.Script.Graphs
 
 				while (eX.MoveNext() && eY.MoveNext())
 				{
-					if (Values.TryGetValue(eX.Current.AssociatedObjectValue?.ToString() ?? string.Empty, out IElement Value))
+					if (Values.TryGetValue(ScriptNode.ToString(eX.Current) ?? string.Empty, out IElement Value))
 						Y2.Add(Operators.Arithmetics.Add.EvaluateAddition(Value, eY.Current, null));
 					else
 						Y2.Add(eY.Current);
@@ -520,7 +520,7 @@ namespace Waher.Script.Graphs
 				eY = Y.ChildElements.GetEnumerator();
 
 				while (eX.MoveNext() && eY.MoveNext())
-					Sorted[eX.Current.AssociatedObjectValue?.ToString() ?? string.Empty] = eY.Current;
+					Sorted[ScriptNode.ToString(eX.Current) ?? string.Empty] = eY.Current;
 
 				foreach (string s in Strings)
 				{

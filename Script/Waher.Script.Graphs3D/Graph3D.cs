@@ -1080,7 +1080,7 @@ namespace Waher.Script.Graphs3D
 				{
 					foreach (IElement E in Matrix.ChildElements)
 					{
-						s = E.AssociatedObjectValue.ToString();
+						s = ScriptNode.ToString(E) ?? string.Empty;
 						if (Indices.ContainsKey(s))
 							continue;
 
@@ -1106,7 +1106,7 @@ namespace Waher.Script.Graphs3D
 				foreach (IMatrix Matrix in Series)
 				{
 					foreach (IElement E in Matrix.ChildElements)
-						Labels[E.AssociatedObjectValue.ToString()] = true;
+						Labels[ScriptNode.ToString(E) ?? string.Empty] = true;
 				}
 
 				string[] Labels2 = new string[Labels.Count];

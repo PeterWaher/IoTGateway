@@ -255,7 +255,7 @@ namespace Waher.Script.Functions.DateAndTime
 					TS = new System.TimeSpan((long)d);
 				else
 				{
-					string s = CheckAgainst.AssociatedObjectValue?.ToString() ?? string.Empty;
+					string s = ToString(CheckAgainst) ?? string.Empty;
 
 					if (!System.TimeSpan.TryParse(s, out TS))
 					{

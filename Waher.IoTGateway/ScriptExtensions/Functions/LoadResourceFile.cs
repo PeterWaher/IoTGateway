@@ -75,14 +75,14 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			string LocalResource = Arguments[0].AssociatedObjectValue?.ToString();
+			string LocalResource = ToString(Arguments[0]);
 			string ContentType;
 
 			if (!Gateway.HttpServer.TryGetFileName(LocalResource, true, out string FileName))
 				throw new ScriptRuntimeException("Unable to convert local resource to file name.", this);
 
 			if (Arguments.Length > 1)
-				ContentType = Arguments[1].AssociatedObjectValue?.ToString();
+				ContentType = ToString(Arguments[1]);
 			else
 				ContentType = InternetContent.GetContentType(Path.GetExtension(FileName));
 

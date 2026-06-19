@@ -102,7 +102,7 @@ namespace Waher.Script.Data.Functions
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			string ConnectionString = Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty;
+			string ConnectionString = ToString(Arguments[0]) ?? string.Empty;
 			SqlConnection Connection;
 
 			switch (Arguments.Length)
@@ -113,14 +113,14 @@ namespace Waher.Script.Data.Functions
 					break;
 
 				case 2:
-					string Database = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
+					string Database = ToString(Arguments[1]) ?? string.Empty;
 
 					ConnectionString = "Data Source=" + ConnectionString + ";Initial Catalog=" + Database + ";Integrated Security=true";
 					Connection = new SqlConnection(ConnectionString);
 					break;
 				case 3:
-					string UserName = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
-					string Password = Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty;
+					string UserName = ToString(Arguments[1]) ?? string.Empty;
+					string Password = ToString(Arguments[2]) ?? string.Empty;
 					SecureString Password2 = new SecureString();
 
 					foreach (char ch in Password)
@@ -131,9 +131,9 @@ namespace Waher.Script.Data.Functions
 					break;
 
 				case 4:
-					Database = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
-					UserName = Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty;
-					Password = Arguments[3].AssociatedObjectValue?.ToString() ?? string.Empty;
+					Database = ToString(Arguments[1]) ?? string.Empty;
+					UserName = ToString(Arguments[2]) ?? string.Empty;
+					Password = ToString(Arguments[3]) ?? string.Empty;
 					Password2 = new SecureString();
 
 					foreach (char ch in Password)

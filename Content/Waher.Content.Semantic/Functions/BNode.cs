@@ -56,7 +56,7 @@ namespace Waher.Content.Semantic.Functions
 			if (Arguments.Length == 0)
 				return new BlankNode(Guid.NewGuid().ToString());
 
-			string Label = Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty;
+			string Label = ToString(Arguments[0]) ?? string.Empty;
 
 			return new BlankNode(Label);
 		}

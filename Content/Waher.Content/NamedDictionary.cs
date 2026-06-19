@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Model;
 
 namespace Waher.Content
 {
@@ -92,12 +93,12 @@ namespace Waher.Content
 				{
 					case "__name":
 					case "__local":
-						Result.LocalName = P.Value.AssociatedObjectValue?.ToString() ?? string.Empty;
+						Result.LocalName = ScriptNode.ToString(P.Value) ?? string.Empty;
 						break;
 
 					case "__namespace":
 					case "__xmlns":
-						Result.Namespace = P.Value.AssociatedObjectValue?.ToString() ?? string.Empty;
+						Result.Namespace = ScriptNode.ToString(P.Value) ?? string.Empty;
 						break;
 
 					default:

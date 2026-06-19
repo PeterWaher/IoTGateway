@@ -372,7 +372,7 @@ namespace Waher.Script.Model
 		/// </summary>
 		/// <param name="Value">Element value.</param>
 		/// <returns>Boolean, if successful.</returns>
-		protected static bool? ToBoolean(IElement Value)
+		public static bool? ToBoolean(IElement Value)
 		{
 			object Obj = Value.AssociatedObjectValue;
 
@@ -382,8 +382,32 @@ namespace Waher.Script.Model
 				return d != 0;
 			else if (Obj is string s)
 				return Functions.Scalar.Boolean.ToBoolean(s);
+			else if (Expression.TryConvert(Value, typeof(bool), out IElement Converted) &&
+				Converted is BooleanValue BooleanValue)
+			{
+				return BooleanValue.Value;
+			}
 			else
 				return null;
+		}
+
+		/// <summary>
+		/// Gets a string value from an element.
+		/// </summary>
+		/// <param name="Value">Element value.</param>
+		/// <returns>String value derived from the element value.</returns>
+		public static string ToString(IElement Value)
+		{
+			object Obj = Value?.AssociatedObjectValue;
+
+			if (Obj is string s)
+				return s;
+			else if (Obj is null)
+				return null;
+			else if (Expression.TryConvert(Value, typeof(string), out IElement Converted))
+				return Converted.AssociatedObjectValue?.ToString();
+			else
+				return Obj.ToString();
 		}
 
 		/// <summary>
@@ -391,7 +415,7 @@ namespace Waher.Script.Model
 		/// </summary>
 		/// <param name="Value">Element value.</param>
 		/// <returns>Enumeration value, if successful.</returns>
-		protected T ToEnum<T>(IElement Value)
+		public T ToEnum<T>(IElement Value)
 			where T : struct
 		{
 			object Obj = Value.AssociatedObjectValue;

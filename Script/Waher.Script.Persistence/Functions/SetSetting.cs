@@ -76,7 +76,7 @@ namespace Waher.Script.Persistence.Functions
 			int i = 0;
 			int c = Arguments.Length;
 			string Host = c < 3 ? null : GetSetting.GetHost(Arguments[i++].AssociatedObjectValue, this);
-			string Name = Arguments[i++].AssociatedObjectValue?.ToString();
+			string Name = ToString(Arguments[i++]);
 			object Value = Arguments[i].AssociatedObjectValue;
 			bool Result;
 

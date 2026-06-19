@@ -68,7 +68,7 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			else if (this.alias is VariableReference Ref)
 				Alias = Ref.VariableName;
 			else
-				Alias = (await this.alias.EvaluateAsync(Variables)).AssociatedObjectValue?.ToString();
+				Alias = ToString(await this.alias.EvaluateAsync(Variables));
 
 			if (this.source is VariableReference Ref2)
 				return GetDataSource(Ref2, Alias, Variables);

@@ -141,8 +141,8 @@ namespace Waher.Script.FullTextSearch.Functions
 			int i = 0;
 			int c = Arguments.Length;
 
-			string IndexCollection = Arguments[i++].AssociatedObjectValue?.ToString() ?? string.Empty;
-			string Query = Arguments[i++].AssociatedObjectValue?.ToString() ?? string.Empty;
+			string IndexCollection = ToString(Arguments[i++]) ?? string.Empty;
+			string Query = ToString(Arguments[i++]) ?? string.Empty;
 			bool? Strict = ToBoolean(Arguments[i++]);
 
 			if (!Strict.HasValue)

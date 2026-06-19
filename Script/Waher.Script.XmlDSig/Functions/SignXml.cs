@@ -52,7 +52,7 @@ namespace Waher.Script.XmlDSig.Functions
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			string KeyName = Arguments[0].AssociatedObjectValue.ToString();
+			string KeyName = ToString(Arguments[0]);
 			int KeySize = (int)Expression.ToDouble(Arguments[1].AssociatedObjectValue);
 
 			if (KeySize <= 0)

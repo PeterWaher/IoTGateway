@@ -86,7 +86,7 @@ namespace Waher.Script.Networking.Functions
 		public override async Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
 		{
 			if (Argument.AssociatedObjectValue is IPAddress IP ||
-				IPAddress.TryParse(Argument.AssociatedObjectValue?.ToString() ?? string.Empty, out IP))
+				IPAddress.TryParse(ToString(Argument) ?? string.Empty, out IP))
 			{
 				return new ObjectVector(await DnsResolver.ReverseDns(IP));
 			}

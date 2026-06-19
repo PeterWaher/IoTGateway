@@ -67,7 +67,7 @@ namespace Waher.Script.Persistence.Functions
 			if (string.IsNullOrEmpty(Host))
 				throw new ScriptRuntimeException("Host not defined.", this);
 
-			string Name = Arguments[1].AssociatedObjectValue?.ToString();
+			string Name = ToString(Arguments[1]);
 			object DefaultValue = Arguments[2].AssociatedObjectValue;
 			object Result;
 			Result = await HostSettings.GetAsync(Host, Name, DefaultValue);

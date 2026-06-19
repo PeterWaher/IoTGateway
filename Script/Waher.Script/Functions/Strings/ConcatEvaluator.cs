@@ -23,7 +23,7 @@ namespace Waher.Script.Functions.Strings
 		{
 			if (Node.Arguments.Length == 2 && Node.Arguments[1] is ConstantElement C)
 			{
-				this.delimiter = C.Constant.AssociatedObjectValue?.ToString();
+				this.delimiter = ScriptNode.ToString(C.Constant);
 				this.hasDelimiter = !string.IsNullOrEmpty(this.delimiter);
 			}
 			else
@@ -52,7 +52,7 @@ namespace Waher.Script.Functions.Strings
 			else if (this.hasDelimiter)
 				this.sb.Append(this.delimiter);
 
-			this.sb.Append(Element.AssociatedObjectValue?.ToString());
+			this.sb.Append(ScriptNode.ToString(Element));
 		}
 
 		/// <summary>

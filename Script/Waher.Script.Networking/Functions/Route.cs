@@ -134,7 +134,7 @@ namespace Waher.Script.Networking.Functions
 		/// <returns>Function result.</returns>
 		public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
 		{
-			return this.EvaluateScalarAsync(Argument.AssociatedObjectValue?.ToString() ?? string.Empty, Variables);
+			return this.EvaluateScalarAsync(ToString(Argument) ?? string.Empty, Variables);
 		}
 	}
 }

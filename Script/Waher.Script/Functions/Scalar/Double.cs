@@ -94,7 +94,7 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(IElement Argument, Variables Variables)
         {
-            return this.EvaluateScalar(Expression.ToStringValue(Argument), Variables);
+            return this.EvaluateScalar(ToString(Argument), Variables);
         }
 
         /// <summary>

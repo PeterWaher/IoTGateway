@@ -92,7 +92,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// <returns>Result.</returns>
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			Uri Url = new Uri(Arguments[0].AssociatedObjectValue?.ToString());
+			Uri Url = new Uri(ToString(Arguments[0]));
 			object Data = Arguments[1].AssociatedObjectValue;
 			ChunkedList<KeyValuePair<string, string>> HeaderList = null;
 			ContentResponse Content;

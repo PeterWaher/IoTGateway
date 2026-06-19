@@ -84,9 +84,9 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 				object Data = Arguments[c - 1].AssociatedObjectValue;
 
 				if (Data is string s)
-					ClientEvents.PushEvent(TabIDs, Arguments[c - 2].AssociatedObjectValue?.ToString(), s, false);
+					ClientEvents.PushEvent(TabIDs, ToString(Arguments[c - 2]), s, false);
 				else
-					ClientEvents.PushEvent(TabIDs, Arguments[c - 2].AssociatedObjectValue?.ToString(), JSON.Encode(Data, false), true);
+					ClientEvents.PushEvent(TabIDs, ToString(Arguments[c - 2]), JSON.Encode(Data, false), true);
 			}
 
 			return new ObjectVector(TabIDs);

@@ -121,7 +121,7 @@ namespace Waher.Script.Persistence.Functions
 			string[] SortOrder = new string[c];
 
 			for (i = 0; i < c; i++)
-				SortOrder[i] = V.GetElement(i).AssociatedObjectValue.ToString();
+				SortOrder[i] = ToString(V.GetElement(i)) ?? string.Empty;
 
 			if (Filter is null && !(FilterObj is null))
 			{

@@ -99,8 +99,8 @@ namespace Waher.Script.FullTextSearch.Functions
 		{
 			int i = 0;
 			int c = Arguments.Length;
-			string Index = Arguments[i++].AssociatedObjectValue?.ToString() ?? string.Empty;
-			string Folder = Arguments[i++].AssociatedObjectValue?.ToString() ?? string.Empty;
+			string Index = ToString(Arguments[i++]) ?? string.Empty;
+			string Folder = ToString(Arguments[i++]) ?? string.Empty;
 			bool? Recursive = i < c ? ToBoolean(Arguments[i++]) : false;
 
 			if (!Recursive.HasValue)
@@ -117,10 +117,10 @@ namespace Waher.Script.FullTextSearch.Functions
 					SubFoldersToExclude = new string[d];
 
 					for (j = 0; j < d; j++)
-						SubFoldersToExclude[j] = V.GetElement(j).AssociatedObjectValue?.ToString();
+						SubFoldersToExclude[j] = ToString(V.GetElement(j));
 				}
 				else
-					SubFoldersToExclude = new string[] { Arguments[i].AssociatedObjectValue?.ToString() };
+					SubFoldersToExclude = new string[] { ToString(Arguments[i]) };
 			}
 			else
 				SubFoldersToExclude = Array.Empty<string>();

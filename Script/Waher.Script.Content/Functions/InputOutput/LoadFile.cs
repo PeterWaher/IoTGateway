@@ -74,13 +74,13 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			string FileName = Arguments[0].AssociatedObjectValue?.ToString();
+			string FileName = ToString(Arguments[0]);
 			string ContentType;
 
 			FileName = Path.Combine(Directory.GetCurrentDirectory(), FileName);
 
 			if (Arguments.Length > 1)
-				ContentType = Arguments[1].AssociatedObjectValue?.ToString();
+				ContentType = ToString(Arguments[1]);
 			else
 				ContentType = InternetContent.GetContentType(Path.GetExtension(FileName));
 

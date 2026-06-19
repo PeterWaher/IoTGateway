@@ -90,7 +90,7 @@ namespace Waher.Script.Networking.Functions
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			string Name = Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty;
+			string Name = ToString(Arguments[0]) ?? string.Empty;
 			int c = Arguments.Length;
 			QTYPE TYPE = c < 2 ? QTYPE.A : this.ToEnum<QTYPE>(Arguments[1]);
 			QCLASS CLASS = c < 3 ? QCLASS.IN : this.ToEnum<QCLASS>(Arguments[2]);

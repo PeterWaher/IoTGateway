@@ -49,7 +49,7 @@ namespace Waher.Script.Persistence.SQL.Groups
 				else
 				{
 					E = Node.Evaluate(Variables);	// TODO: Async
-					Name = E.AssociatedObjectValue?.ToString();
+					Name = ScriptNode.ToString(E);
 				}
 
 				if (!string.IsNullOrEmpty(Name))

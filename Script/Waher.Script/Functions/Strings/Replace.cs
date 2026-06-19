@@ -78,9 +78,9 @@ namespace Waher.Script.Functions.Strings
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			string s = Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty;
-			string From = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
-			string To = Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty;
+			string s = ToString(Arguments[0]) ?? string.Empty;
+			string From = ToString(Arguments[1]) ?? string.Empty;
+			string To = ToString(Arguments[2]) ?? string.Empty;
 
 			if (!this.useRegex)
 				return new StringValue(s.Replace(From, To));
@@ -88,7 +88,7 @@ namespace Waher.Script.Functions.Strings
 			RegexOptions Options;
 
 			if (Arguments.Length > 3)
-				Options = GetOptions(Arguments[3].AssociatedObjectValue?.ToString(), this);
+				Options = GetOptions(ToString(Arguments[3]), this);
 			else
 				Options = RegexOptions.Singleline;
 

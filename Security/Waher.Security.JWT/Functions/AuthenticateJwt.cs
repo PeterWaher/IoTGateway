@@ -87,7 +87,7 @@ namespace Waher.Security.JWT.Functions
 			if (!(Arguments[i++].AssociatedObjectValue is HttpRequest Request))
 				throw new ScriptRuntimeException("Expected an HTTP Request in the first argument.", this);
 
-			string Realm = Arguments[i++].AssociatedObjectValue?.ToString() ?? string.Empty;
+			string Realm = ToString(Arguments[i++]) ?? string.Empty;
 
 			if (!(Arguments[i++].AssociatedObjectValue is IUserSource Users))
 				throw new ScriptRuntimeException("Expected a users collection as the third argument.", this);

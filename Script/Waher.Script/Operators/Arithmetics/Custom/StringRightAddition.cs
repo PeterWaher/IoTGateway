@@ -45,8 +45,8 @@ namespace Waher.Script.Operators.Arithmetics.Custom
 		/// <returns>Result of the evaluation.</returns>
 		public IElement Evaluate(IBinaryOperation Operation, ScriptNode Node)
 		{
-			string Left = Operation.Left.AssociatedObjectValue?.ToString() ?? string.Empty;
-			string Right = Operation.Right.AssociatedObjectValue?.ToString() ?? string.Empty;
+			string Left = ScriptNode.ToString(Operation.Left) ?? string.Empty;
+			string Right = ScriptNode.ToString(Operation.Right) ?? string.Empty;
 
 			return new StringValue(Left + Right);
 		}

@@ -67,7 +67,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		public override async Task<IElement> EvaluateAsync(IElement Argument1, IElement Argument2, Variables Variables)
 		{
 			object Obj = Argument1.AssociatedObjectValue;
-			string FileName = Argument2.AssociatedObjectValue.ToString();
+			string FileName = ToString(Argument2);
 
 			if (Obj is Graph G)
 				Obj = G.CreatePixels();

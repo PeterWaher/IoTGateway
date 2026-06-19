@@ -85,19 +85,19 @@ namespace Waher.Things.ScriptExtensions
 					return new ObjectValue(Things.ThingReference.Empty);
 
 				case 1:
-					return new ObjectValue(new Things.ThingReference(Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty));
+					return new ObjectValue(new Things.ThingReference(ToString(Arguments[0]) ?? string.Empty));
 
 				case 2:
 					return new ObjectValue(new Things.ThingReference(
-						Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty,
-						Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty));
+						ToString(Arguments[0]) ?? string.Empty,
+						ToString(Arguments[1]) ?? string.Empty));
 
 				case 3:
 				default:
 					return new ObjectValue(new Things.ThingReference(
-						Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty,
-						Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty,
-						Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty));
+						ToString(Arguments[0]) ?? string.Empty,
+						ToString(Arguments[1]) ?? string.Empty,
+						ToString(Arguments[2]) ?? string.Empty));
 
 			}
 		}

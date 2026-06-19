@@ -2,6 +2,7 @@
 using System.Text;
 using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Model;
 using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content
@@ -295,7 +296,7 @@ namespace Waher.Content
 				else if (E.AssociatedObjectValue is double d)
 					return CommonTypes.Encode(d);
 				else
-					return E.AssociatedObjectValue?.ToString();
+					return ScriptNode.ToString(E);
 			}, true);
 		}
 

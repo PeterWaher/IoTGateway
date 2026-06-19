@@ -102,14 +102,14 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
             int i = 0;
             int c = Arguments.Length;
 
-            string UserName = Arguments[i++].AssociatedObjectValue?.ToString() ?? string.Empty;
+            string UserName = ToString(Arguments[i++]) ?? string.Empty;
             if (string.IsNullOrEmpty(UserName))
                 throw new ScriptRuntimeException("Missing user name.", this);
 
             string Jid;
 
             if (i < c)
-                Jid = Arguments[i++].AssociatedObjectValue?.ToString() ?? string.Empty;
+                Jid = ToString(Arguments[i++]) ?? string.Empty;
             else
                 Jid = string.Empty;
 
@@ -121,7 +121,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
                     throw new ScriptRuntimeException("Expected an array of privileges as third argument.", this);
 
                 foreach (IElement E in V.VectorElements)
-                    Privileges.AddLast(E.AssociatedObjectValue?.ToString() ?? string.Empty);
+                    Privileges.AddLast(ToString(E) ?? string.Empty);
             }
 
             IDictionary<string, object> Properties;

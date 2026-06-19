@@ -41,7 +41,7 @@ namespace Waher.Script.Functions.Strings
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
 		{
-			string s = Argument1.AssociatedObjectValue?.ToString() ?? string.Empty;
+			string s = ToString(Argument1) ?? string.Empty;
 			int N = (int)(Expression.ToDouble(Argument2.AssociatedObjectValue) + 0.5);
 
 			return new StringValue(s.PadLeft(N));

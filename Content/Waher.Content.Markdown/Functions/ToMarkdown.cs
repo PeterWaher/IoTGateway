@@ -75,7 +75,7 @@ namespace Waher.Content.Markdown.Functions
 			else if (Argument is SKImage Image)
 				return ImageToMarkdown(Image);
 			else
-				return Argument.AssociatedObjectValue?.ToString();
+				return ToString(Argument) ?? string.Empty;
 		}
 
 		/// <summary>
@@ -293,7 +293,7 @@ namespace Waher.Content.Markdown.Functions
 
 			foreach (IElement E in Elements)
 			{
-				Markdown.AppendLine(E.AssociatedObjectValue?.ToString() ?? string.Empty);
+				Markdown.AppendLine(ToString(E) ?? string.Empty);
 				Markdown.AppendLine();
 			}
 

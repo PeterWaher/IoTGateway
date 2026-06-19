@@ -341,7 +341,7 @@ namespace Waher.Script.Persistence.SPARQL
 								if (this.columnNames[i] is VariableReference Ref2)
 									Name = Ref2.VariableName;
 								else
-									Name = (await this.columnNames[i].EvaluateAsync(Variables)).AssociatedObjectValue?.ToString();
+									Name = ToString(await this.columnNames[i].EvaluateAsync(Variables));
 
 								ColumnVariables[Name] = i;
 								ColumnNames.Add(Name);

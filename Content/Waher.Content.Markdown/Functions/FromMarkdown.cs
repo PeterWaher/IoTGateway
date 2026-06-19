@@ -133,7 +133,7 @@ namespace Waher.Content.Markdown.Functions
 					int j, d;
 
 					for (i = 0; i < Columns; i++)
-						Headers2[i] = (await Evaluate(Headers[i])).AssociatedObjectValue?.ToString() ?? string.Empty;
+						Headers2[i] = ToString(await Evaluate(Headers[i])) ?? string.Empty;
 
 					foreach (MarkdownElement[] Row in Table.Rows)
 					{

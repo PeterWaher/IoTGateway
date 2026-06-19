@@ -3,6 +3,7 @@ using System.Reflection;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
 using Waher.Runtime.Collections;
+using Waher.Script.Model;
 
 namespace Waher.Script.Objects
 {
@@ -90,7 +91,7 @@ namespace Waher.Script.Objects
 		public override ISemiGroupElement AddLeft(ISemiGroupElement Element)
 		{
 			if (Element.IsScalar)
-				return new StringValue(Element.AssociatedObjectValue.ToString() + this.value, this.caseInsensitive);
+				return new StringValue(ScriptNode.ToString(Element) + this.value, this.caseInsensitive);
 			else
 			{
 				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
@@ -100,7 +101,7 @@ namespace Waher.Script.Objects
 				{
 					SE = E as ISemiGroupElement;
 					if (SE is null)
-						Elements.Add(new StringValue(E.AssociatedObjectValue.ToString() + this.value, this.caseInsensitive));
+						Elements.Add(new StringValue(ScriptNode.ToString(E) + this.value, this.caseInsensitive));
 					else
 						Elements.Add(this.AddLeft(SE));
 				}
@@ -117,7 +118,7 @@ namespace Waher.Script.Objects
 		public override ISemiGroupElement AddRight(ISemiGroupElement Element)
 		{
 			if (Element.IsScalar)
-				return new StringValue(this.value + Element.AssociatedObjectValue.ToString(), this.caseInsensitive);
+				return new StringValue(this.value + ScriptNode.ToString(Element), this.caseInsensitive);
 			else
 			{
 				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
@@ -127,7 +128,7 @@ namespace Waher.Script.Objects
 				{
 					SE = E as ISemiGroupElement;
 					if (SE is null)
-						Elements.Add(new StringValue(this.value + E.AssociatedObjectValue.ToString(), this.caseInsensitive));
+						Elements.Add(new StringValue(this.value + ScriptNode.ToString(E), this.caseInsensitive));
 					else
 						Elements.Add(this.AddRight(SE));
 				}

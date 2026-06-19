@@ -71,7 +71,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 
 			for (i = 0; i < c; i++)
 			{
-				Privilege = v.GetElement(i).AssociatedObjectValue?.ToString() ?? string.Empty;
+				Privilege = ToString(v.GetElement(i)) ?? string.Empty;
 				if (string.IsNullOrEmpty(Privilege))
 					continue;
 
@@ -80,7 +80,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 					string Message;
 
 					if (Arguments.Length > 2)
-						Message = Arguments[2].AssociatedObjectValue?.ToString() ?? "Access denied. Insufficient privileges.";
+						Message = ToString(Arguments[2]) ?? "Access denied. Insufficient privileges.";
 					else
 						Message = "Access denied. Insufficient privileges.";
 

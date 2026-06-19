@@ -56,7 +56,7 @@ namespace Waher.Script.Functions.Strings
 			if (!(Arguments[0] is IVector Vector))
 				return Arguments[0];
 
-			string Delimiter = Arguments.Length > 1 ? Arguments[1].AssociatedObjectValue?.ToString() : null;
+			string Delimiter = Arguments.Length > 1 ? ToString(Arguments[1]) : null;
 
 			StringBuilder Result = new StringBuilder();
 			bool First = true;
@@ -64,7 +64,7 @@ namespace Waher.Script.Functions.Strings
 			foreach (IElement Item in Vector.VectorElements)
 			{
 				if (!(Item.AssociatedObjectValue is string s))
-					s = Item.AssociatedObjectValue?.ToString() ?? string.Empty;
+					s = ToString(Item) ?? string.Empty;
 
 				if (First)
 					First = false;

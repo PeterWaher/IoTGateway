@@ -62,15 +62,15 @@ namespace Waher.IoTGateway.Svc.ScriptExtensions.Functions
             if (Arguments.Length == 2)
             {
                 Result = Svc.PerformanceCounters.GetCounter(
-                    Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty,
-                    Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty);
+                    ToString(Arguments[0]) ?? string.Empty,
+                    ToString(Arguments[1]) ?? string.Empty);
             }
             else
             {
                 Result = Svc.PerformanceCounters.GetCounter(
-                    Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty,
-                    Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty,
-                    Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty);
+                    ToString(Arguments[0]) ?? string.Empty,
+                    ToString(Arguments[1]) ?? string.Empty,
+                    ToString(Arguments[2]) ?? string.Empty);
             }
 
             if (Result is null)

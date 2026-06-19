@@ -48,7 +48,7 @@ namespace Waher.Content.Markdown.Functions
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
-			return new StringValue(EscapeText(Argument.AssociatedObjectValue?.ToString() ?? string.Empty));
+			return new StringValue(EscapeText(ToString(Argument) ?? string.Empty));
 		}
 
 		/// <summary>

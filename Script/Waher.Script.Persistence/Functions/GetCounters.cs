@@ -113,9 +113,9 @@ namespace Waher.Script.Persistence.Functions
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			string KeyPrefix = Arguments.Length > 0 ? Arguments[0].AssociatedObjectValue?.ToString() : null;
-			string Delimiter = Arguments.Length > 1 ? Arguments[1].AssociatedObjectValue?.ToString() : null;
-			string Wildcard = Arguments.Length > 2 ? Arguments[2].AssociatedObjectValue?.ToString() : null;
+			string KeyPrefix = Arguments.Length > 0 ? ToString(Arguments[0]) : null;
+			string Delimiter = Arguments.Length > 1 ? ToString(Arguments[1]) : null;
+			string Wildcard = Arguments.Length > 2 ? ToString(Arguments[2]) : null;
 			Dictionary<string, long> Counters;
 
 			if (string.IsNullOrEmpty(KeyPrefix))

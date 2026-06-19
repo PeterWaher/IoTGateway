@@ -57,12 +57,12 @@ namespace Waher.IoTGateway.Svc.ScriptExtensions.Functions
             System.Diagnostics.PerformanceCounter[] Result;
 
             if (Arguments.Length == 1)
-                Result = Svc.PerformanceCounters.GetCounters(Arguments[0].AssociatedObjectValue.ToString());
+                Result = Svc.PerformanceCounters.GetCounters(ToString(Arguments[0]) ?? string.Empty);
             else
             {
                 Result = Svc.PerformanceCounters.GetCounters(
-                    Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty,
-                    Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty);
+                    ToString(Arguments[0]) ?? string.Empty,
+                    ToString(Arguments[1]) ?? string.Empty);
             }
 
             return new ObjectVector(Result);

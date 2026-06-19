@@ -115,7 +115,7 @@ namespace Waher.Script.Content.Functions
 		{
 			if (!(CheckAgainst.AssociatedObjectValue is Waher.Content.Duration D))
 			{
-				string s = CheckAgainst.AssociatedObjectValue?.ToString() ?? string.Empty;
+				string s = ToString(CheckAgainst) ?? string.Empty;
 
 				if (!Waher.Content.Duration.TryParse(s, out D))
 					return PatternMatchResult.NoMatch;

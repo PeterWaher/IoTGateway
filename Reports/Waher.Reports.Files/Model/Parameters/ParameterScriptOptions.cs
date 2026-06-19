@@ -5,6 +5,7 @@ using System.Xml;
 using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Model;
 
 namespace Waher.Reports.Files.Model.Parameters
 {
@@ -46,7 +47,7 @@ namespace Waher.Reports.Files.Model.Parameters
 			else if (Obj is IEnumerable<KeyValuePair<string, IElement>> Options2)
 			{
 				foreach (KeyValuePair<string, IElement> P in Options2)
-					Result.Add(new KeyValuePair<string, string>(P.Key, P.Value.AssociatedObjectValue?.ToString() ?? string.Empty));
+					Result.Add(new KeyValuePair<string, string>(P.Key, ScriptNode.ToString(P.Value) ?? string.Empty));
 			}
 			else if (Obj is IEnumerable Enumerable)
 			{
@@ -61,7 +62,7 @@ namespace Waher.Reports.Files.Model.Parameters
 					else if (Item is KeyValuePair<string, string> P2)
 						Result.Add(P2);
 					else if (Item is KeyValuePair<string, IElement> P3)
-						Result.Add(new KeyValuePair<string, string>(P3.Key, P3.Value.AssociatedObjectValue?.ToString() ?? string.Empty));
+						Result.Add(new KeyValuePair<string, string>(P3.Key, ScriptNode.ToString(P3.Value) ?? string.Empty));
 					else
 					{
 						s = Item?.ToString() ?? string.Empty;

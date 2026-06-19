@@ -90,7 +90,7 @@ namespace Waher.Layout.Layout2D.Functions
 
 			for (i = 0; i < c; i++)
 			{
-				Labels2[i] = Labels.GetElement(i).AssociatedObjectValue?.ToString() ?? string.Empty;
+				Labels2[i] = ToString(Labels.GetElement(i)) ?? string.Empty;
 				Colors2[i] = Graph.ToColor(Colors.GetElement(i).AssociatedObjectValue);
 			}
 

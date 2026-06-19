@@ -141,7 +141,7 @@ namespace Waher.Things.ScriptExtensions.SensorData
 				i = 1;
 			}
 
-			string FieldName = Arguments[i++].AssociatedObjectValue?.ToString() ?? string.Empty;
+			string FieldName = ToString(Arguments[i++]) ?? string.Empty;
 			object ValueObject = Arguments[i++].AssociatedObjectValue;
 			FieldType Type = FieldType.Momentary;
 			FieldQoS QoS = FieldQoS.AutomaticReadout;

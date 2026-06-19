@@ -76,7 +76,7 @@ namespace Waher.Script.Operators.Assignments
 					?? throw new ScriptRuntimeException("Vector is null.", this);
 
 				if (Object is IDictionary<string, IElement> ObjExNihilo)
-					ObjExNihilo[Index.AssociatedObjectValue?.ToString()] = Value;
+					ObjExNihilo[ToString(Index)] = Value;
 				else
 				{
 					Type T = Object.GetType();

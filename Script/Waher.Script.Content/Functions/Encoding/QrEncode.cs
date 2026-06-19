@@ -76,7 +76,7 @@ namespace Waher.Script.Content.Functions.Encoding
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			string Text = Arguments[0].AssociatedObjectValue?.ToString();
+			string Text = ToString(Arguments[0]);
 			CorrectionLevel Level = this.ToEnum<CorrectionLevel>(Arguments[1]);
 
 			if (Arguments.Length == 2)

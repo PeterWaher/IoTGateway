@@ -85,7 +85,7 @@ namespace Waher.Script.Model
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
-			return this.EvaluateScalar(Expression.ToStringValue(Argument), Variables);
+			return this.EvaluateScalar(ToString(Argument), Variables);
 		}
 
 		/// <summary>
@@ -162,7 +162,7 @@ namespace Waher.Script.Model
 		/// <returns>Function result.</returns>
 		public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
 		{
-			return this.EvaluateScalarAsync(Expression.ToStringValue(Argument), Variables);
+			return this.EvaluateScalarAsync(ToString(Argument), Variables);
 		}
 
 	}

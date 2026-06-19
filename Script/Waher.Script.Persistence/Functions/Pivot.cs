@@ -55,7 +55,7 @@ namespace Waher.Script.Persistence.Functions
 
 				Names[0] = Names0[0];
 				for (Column = 1; Column < Columns; Column++)
-					Names[Column] = Elements0[Column - 1, 0].AssociatedObjectValue?.ToString();
+					Names[Column] = ToString(Elements0[Column - 1, 0]) ?? string.Empty;
 
 				for (Row = 0; Row < Rows; Row++)
 					Elements[Row, 0] = new StringValue(Names0[Row + 1]);

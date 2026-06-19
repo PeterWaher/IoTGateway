@@ -89,7 +89,7 @@ namespace Waher.Script.FullTextSearch.Functions
 			}
 			else
 			{
-				string Collection = Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty;
+				string Collection = ToString(Arguments[0]) ?? string.Empty;
 				PropertyDefinition[] Properties = await Waher.Persistence.FullTextSearch.Search.GetFullTextSearchIndexedProperties(Collection);
 
 				return new ObjectVector(Properties);

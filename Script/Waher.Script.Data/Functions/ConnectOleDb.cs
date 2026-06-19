@@ -74,7 +74,7 @@ namespace Waher.Script.Data.Functions
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			string ConnectionString = Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty;
+			string ConnectionString = ToString(Arguments[0]) ?? string.Empty;
 			OleDbConnection Connection;
 
 			switch (Arguments.Length)
@@ -85,8 +85,8 @@ namespace Waher.Script.Data.Functions
 					break;
 
 				case 3:
-					string UserName = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
-					string Password = Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty;
+					string UserName = ToString(Arguments[1]) ?? string.Empty;
+					string Password = ToString(Arguments[2]) ?? string.Empty;
 
 					ConnectionString = ConnectionString.Trim();
 					if (!ConnectionString.EndsWith(";"))

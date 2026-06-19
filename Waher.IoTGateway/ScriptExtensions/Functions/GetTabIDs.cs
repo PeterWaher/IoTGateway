@@ -101,7 +101,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 						return ClientEvents.GetTabIDsForLocation(Obj?.ToString());
 
 				case 2:
-					return ClientEvents.GetTabIDsForLocation(Arguments[0].AssociatedObjectValue?.ToString(),
+					return ClientEvents.GetTabIDsForLocation(ToString(Arguments[0]) ?? string.Empty,
 						GetQueryFilter(Arguments[1], Node));
 
 				default:
@@ -117,7 +117,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			List<KeyValuePair<string, string>> Result = new List<KeyValuePair<string, string>>();
 
 			foreach (KeyValuePair<string, IElement> P in Obj)
-				Result.Add(new KeyValuePair<string, string>(P.Key, P.Value.AssociatedObjectValue?.ToString()));
+				Result.Add(new KeyValuePair<string, string>(P.Key, ToString(P.Value) ?? string.Empty));
 
 			return Result.ToArray();
 		}

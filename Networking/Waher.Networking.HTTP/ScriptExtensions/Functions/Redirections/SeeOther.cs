@@ -37,7 +37,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Redirections
 			if (Variables is SessionVariables SessionVariables)
 				SessionVariables.LastPost = null;	// To allow the PRG pattern, where a POST temporary redirects to the same resource.
 
-			throw new SeeOtherException(Argument.AssociatedObjectValue?.ToString() ?? string.Empty);
+			throw new SeeOtherException(ToString(Argument) ?? string.Empty);
 		}
 	}
 }

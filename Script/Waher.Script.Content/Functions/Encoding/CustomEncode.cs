@@ -48,7 +48,7 @@ namespace Waher.Script.Content.Functions.Encoding
 		public override IElement Evaluate(IElement Argument1, IElement Argument2, Variables Variables)
 		{
 			object Obj = Argument1.AssociatedObjectValue;
-			string ContentType = Argument2.AssociatedObjectValue?.ToString() ?? string.Empty;
+			string ContentType = ToString(Argument2) ?? string.Empty;
 
 			if (!(Obj is byte[] Bin))
 			{

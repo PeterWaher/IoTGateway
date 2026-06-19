@@ -714,7 +714,7 @@ namespace Waher.Script.Graphs
 			{
 				for (i = 0; i < c; i++)
 				{
-					string s = Vector[i].AssociatedObjectValue?.ToString() ?? string.Empty;
+					string s = ScriptNode.ToString(Vector[i]) ?? string.Empty;
 
 					if (LabelPositions.TryGetValue(s, out double d))
 						Result[i] = d;
@@ -970,7 +970,7 @@ namespace Waher.Script.Graphs
 				{
 					foreach (IElement E in Vector.ChildElements)
 					{
-						s = E.AssociatedObjectValue.ToString();
+						s = ScriptNode.ToString(E) ?? string.Empty;
 						if (Indices.ContainsKey(s))
 							continue;
 
@@ -996,7 +996,7 @@ namespace Waher.Script.Graphs
 				foreach (IVector Vector in Series)
 				{
 					foreach (IElement E in Vector.ChildElements)
-						Labels[E.AssociatedObjectValue.ToString()] = true;
+						Labels[ScriptNode.ToString(E) ?? string.Empty] = true;
 				}
 
 				string[] Labels2 = new string[Labels.Count];
@@ -1461,7 +1461,7 @@ namespace Waher.Script.Graphs
 				case LabelType.PhysicalQuantity:
 				case LabelType.String:
 				default:
-					return Label.AssociatedObjectValue.ToString();
+					return ScriptNode.ToString(Label) ?? string.Empty;
 			}
 		}
 

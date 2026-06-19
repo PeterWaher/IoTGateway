@@ -51,7 +51,7 @@ namespace Waher.Script.Xml.Functions
 			if (Obj is null)
 				return ObjectValue.Null;
 			else if (Obj is XmlNode N)
-				Result = SelectXml.Evaluate(N, Argument2.AssociatedObjectValue?.ToString() ?? string.Empty);
+				Result = SelectXml.Evaluate(N, ToString(Argument2) ?? string.Empty);
 			else
 				throw new ScriptRuntimeException("XPath expression only operate on XML.", this);
 

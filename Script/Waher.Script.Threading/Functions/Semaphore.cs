@@ -69,7 +69,7 @@ namespace Waher.Script.Threading.Functions
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IElement Argument1 = await this.Argument1.EvaluateAsync(Variables);
-			string Name = Argument1.AssociatedObjectValue.ToString();
+			string Name = ToString(Argument1);
 			IElement Argument2;
 
 			await Semaphores.BeginWrite(Name);

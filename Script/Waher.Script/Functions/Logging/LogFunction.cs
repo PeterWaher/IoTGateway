@@ -101,32 +101,32 @@ namespace Waher.Script.Functions.Logging
 					switch (P.Key.ToUpper())
 					{
 						case "OBJECT":
-							Object = P.Value.AssociatedObjectValue?.ToString() ?? string.Empty;
+							Object = ToString(P.Value) ?? string.Empty;
 							break;
 
 						case "ACTOR":
-							Actor = P.Value.AssociatedObjectValue?.ToString() ?? string.Empty;
+							Actor = ToString(P.Value) ?? string.Empty;
 							break;
 
 						case "EVENTID":
-							EventId = P.Value.AssociatedObjectValue?.ToString() ?? string.Empty;
+							EventId = ToString(P.Value) ?? string.Empty;
 							break;
 
 						case "FACILITY":
-							Facility = P.Value.AssociatedObjectValue?.ToString() ?? string.Empty;
+							Facility = ToString(P.Value) ?? string.Empty;
 							break;
 
 						case "MODULE":
-							Module = P.Value.AssociatedObjectValue?.ToString() ?? string.Empty;
+							Module = ToString(P.Value) ?? string.Empty;
 							break;
 
 						case "STACKTRACE":
-							StackTrace = P.Value.AssociatedObjectValue?.ToString() ?? string.Empty;
+							StackTrace = ToString(P.Value) ?? string.Empty;
 							break;
 
 						case "LEVEL":
 							if (P.Value.AssociatedObjectValue is EventLevel L ||
-								Enum.TryParse(P.Value.AssociatedObjectValue?.ToString() ?? string.Empty, out L))
+								Enum.TryParse(ToString(P.Value) ?? string.Empty, out L))
 							{
 								Level = L;
 							}

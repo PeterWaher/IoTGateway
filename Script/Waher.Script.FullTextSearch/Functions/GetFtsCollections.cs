@@ -88,7 +88,7 @@ namespace Waher.Script.FullTextSearch.Functions
 			}
 			else
 			{
-				string Index = Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty;
+				string Index = ToString(Arguments[0]) ?? string.Empty;
 				string[] Collections = await Waher.Persistence.FullTextSearch.Search.GetCollectionNames(Index);
 
 				return new ObjectVector(Collections);

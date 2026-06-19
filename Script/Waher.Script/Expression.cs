@@ -4977,25 +4977,6 @@ namespace Waher.Script
 		}
 
 		/// <summary>
-		/// Gets a string value from an element.
-		/// </summary>
-		/// <param name="Value">Element value.</param>
-		/// <returns>String value derived from the element value.</returns>
-		public static string ToStringValue(IElement Value)
-		{
-			object Obj = Value?.AssociatedObjectValue;
-
-			if (Obj is string s)
-				return s;
-			else if (Obj is null)
-				return null;
-			else if (TryConvert(Value, typeof(string), out IElement Converted))
-				return Converted.AssociatedObjectValue?.ToString();
-			else
-				return Obj.ToString();
-		}
-
-		/// <summary>
 		/// Converts a string value to a parsable expression string.
 		/// </summary>
 		/// <param name="s">Value</param>

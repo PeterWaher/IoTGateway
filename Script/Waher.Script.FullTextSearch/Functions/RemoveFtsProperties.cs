@@ -65,7 +65,7 @@ namespace Waher.Script.FullTextSearch.Functions
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			string Collection = Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty;
+			string Collection = ToString(Arguments[0]) ?? string.Empty;
 			PropertyDefinition[] Properties = AddFtsProperties.GetPropertyDefinitions(Arguments[1], this);
 
 			bool Result = await Waher.Persistence.FullTextSearch.Search.RemoveFullTextSearch(Collection, Properties);

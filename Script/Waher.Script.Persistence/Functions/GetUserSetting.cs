@@ -68,7 +68,7 @@ namespace Waher.Script.Persistence.Functions
 			if (string.IsNullOrEmpty(User))
 				throw new ScriptRuntimeException("User not defined.", this);
 
-			string Name = Arguments[1].AssociatedObjectValue?.ToString();
+			string Name = ToString(Arguments[1]);
 			object DefaultValue = Arguments[2].AssociatedObjectValue;
 			object Result;
 

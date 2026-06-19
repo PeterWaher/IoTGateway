@@ -62,8 +62,8 @@ namespace Waher.Script.FullTextSearch.Functions
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
 			int i = 0;
-			string Index = Arguments[i++].AssociatedObjectValue?.ToString() ?? string.Empty;
-			string FileName = Arguments[i++].AssociatedObjectValue?.ToString() ?? string.Empty;
+			string Index = ToString(Arguments[i++]) ?? string.Empty;
+			string FileName = ToString(Arguments[i++]) ?? string.Empty;
 
 			if (string.IsNullOrEmpty(FileName))
 				throw new ScriptRuntimeException("Empty filename.", this);

@@ -171,7 +171,7 @@ namespace Waher.Script.Functions.DateAndTime
 					TP = DateTime.FromInteger((long)d, DateTimeKind.Utc);
 				else
 				{
-					string s = CheckAgainst.AssociatedObjectValue?.ToString() ?? string.Empty;
+					string s = ToString(CheckAgainst) ?? string.Empty;
 
 					if (!DateTime.TryParse(s, out TP))
 					{

@@ -48,7 +48,7 @@ namespace Waher.Script.Xml.Functions
 			if (Obj is null)
 				return Argument1;
 
-			string Name = Argument2.AssociatedObjectValue?.ToString() ?? string.Empty;
+			string Name = ToString(Argument2) ?? string.Empty;
 			XmlElement Response;
 
 			if (Obj is XmlElement E)

@@ -18,7 +18,10 @@ namespace Waher.Networking.Sniffers.Model
 		public SnifferTextEvent(DateTime Timestamp, string Text, ISniffEventProcessor Processor)
 			: base(Timestamp, Processor)
 		{
-			this.text = Text;
+			if ((Text?.IndexOf("password", StringComparison.InvariantCultureIgnoreCase) ?? -1) >= 0)
+				this.text = "******** MASKED ********";
+			else
+				this.text = Text;
 		}
 
 		/// <summary>

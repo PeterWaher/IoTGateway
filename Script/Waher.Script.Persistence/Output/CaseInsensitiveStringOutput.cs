@@ -27,7 +27,7 @@ namespace Waher.Script.Persistence.Output
 			if (Value is null)
 				return "null";
 			else if (Value is CaseInsensitiveString cs)
-				return Expression.ToString(cs.Value);
+				return Expression.EncodeString(cs.Value);
 			else
 				return Value.ToString();
 		}

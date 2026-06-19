@@ -60,7 +60,7 @@ namespace Waher.Script.Objects
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			return Expression.ToString(this.value);
+			return Expression.EncodeString(this.value);
 		}
 
 		/// <summary>

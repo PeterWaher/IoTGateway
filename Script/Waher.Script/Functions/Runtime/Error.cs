@@ -39,7 +39,7 @@ namespace Waher.Script.Functions.Runtime
         /// <returns>Function result.</returns>
         public override IElement Evaluate(IElement Argument, Variables Variables)
         {
-            string Msg = Argument.ToString();
+            string Msg = Expression.ToStringValue(Argument);
             throw new ScriptRuntimeErrorException(Msg, this);
         }
     }

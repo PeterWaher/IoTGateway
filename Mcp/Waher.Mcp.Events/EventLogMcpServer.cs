@@ -68,7 +68,7 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
-		public void LogDebug(
+		public Dictionary<string, object?> LogDebug(
 			[McpStringParameter("Event Message", "The body text of the event to log.")]
 			string Message,
 
@@ -82,7 +82,10 @@ namespace Waher.Mcp.Events
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
-			EventLevel Level = EventLevel.Minor, 
+			EventLevel Level = EventLevel.Minor,
+
+			[McpStringParameter("Event ID", "Optional Event ID for the event. Event IDs are used to identify a specific type of event, and is used collect related information in reports.", 32)]
+			string EventId = "McpEvent",
 
 			[McpStringParameter("Facility", "The subsystem or external component that is the source of the event.")]
 			string Facility = "", 
@@ -92,6 +95,17 @@ namespace Waher.Mcp.Events
 
 			[McpStringParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
 			Dictionary<string, object>? MetaData = null)
+		{
+			Log.Debug(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
+			return LogResponse();
+		}
+
+		private static Dictionary<string, object?> LogResponse()
+		{
+			return new Dictionary<string, object?>() { { "logged", true } };
+		}
+
+		private static KeyValuePair<string, object>[] GetTags(Dictionary<string, object>? MetaData)
 		{
 			int c = MetaData?.Count ?? 0;
 			KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[c];
@@ -104,7 +118,7 @@ namespace Waher.Mcp.Events
 					Tags[i++] = P;
 			}
 
-			Log.Debug(Message, Object, Actor, "McpEvent", Level, Facility, Module, Tags);
+			return Tags;
 		}
 	}
 }

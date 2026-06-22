@@ -9,6 +9,8 @@ using Waher.Mcp.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Brotli;
 using Waher.Networking.HTTP.ContentEncodings;
+using Waher.Networking.HTTP.JsonRpc;
+using Waher.Networking.HTTP.Mcp;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
@@ -215,7 +217,9 @@ internal class Program
 				typeof(MarkdownDocument).Assembly,
 				typeof(MarkdownToHtmlConverter).Assembly,
 				typeof(Graph).Assembly,
-				typeof(GraphEncoder).Assembly);
+				typeof(GraphEncoder).Assembly,
+				typeof(JsonRpcWebService).Assembly,
+				typeof(HttpMcpServerResource).Assembly);
 
 			Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.PadWithSpaces);
 

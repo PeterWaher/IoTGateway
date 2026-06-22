@@ -7,7 +7,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 	/// <summary>
 	/// Abstract base class for an MCP Content Block.
 	/// </summary>
-	public abstract class ContentBlock : Annotations
+	public abstract class ContentBlock : Annotations, IContentBlock
 	{
 		/// <summary>
 		/// Abstract base class for an MCP Content Block.

@@ -35,8 +35,9 @@ namespace Waher.Networking.HTTP.Mcp
 		private static Dictionary<Type, IContentBlock> GetContentBlocks()
 		{
 			Dictionary<Type, IContentBlock> Result = new Dictionary<Type, IContentBlock>();
+			Type[] ContentBlockTypes = Types.GetTypesImplementingInterface(typeof(IContentBlock));
 
-			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IContentBlock)))
+			foreach (Type T in ContentBlockTypes)
 			{
 				if (T.IsAbstract)
 					continue;
@@ -47,7 +48,10 @@ namespace Waher.Networking.HTTP.Mcp
 
 				try
 				{
-					Result[T] = (IContentBlock)CI.Invoke(Array.Empty<object>());
+					IContentBlock Encoder = (IContentBlock)CI.Invoke(Array.Empty<object>());
+
+					foreach (Type T2 in Encoder.Encodes)
+						Result[T2] = Encoder;
 				}
 				catch (Exception ex)
 				{
@@ -409,13 +413,16 @@ namespace Waher.Networking.HTTP.Mcp
 			if (ToolResult is null)
 				Result["content"] = Array.Empty<object>();
 			else if (ToolResult is Dictionary<string, object?> StructuredContent)
+			{
+				Result["content"] = Array.Empty<object>();
 				Result["structuredContent"] = StructuredContent;
+			}
 			else
 			{
 				Type T = ToolResult.GetType();
 
 				if (contentBlocks.TryGetValue(T, out IContentBlock Encoder))
-					Result["content"] = new object[] { Encoder.Encode(ToolResult) };
+					Result["content"] = new object[] { await Encoder.Encode(ToolResult) };
 				else if (T.IsArray && ToolResult is IEnumerable Enumerable)
 				{
 					ChunkedList<object> Content = new ChunkedList<object>();
@@ -429,13 +436,13 @@ namespace Waher.Networking.HTTP.Mcp
 
 						Type T2 = Item.GetType();
 						if (contentBlocks.TryGetValue(T2, out IContentBlock Encoder2))
-							Content.Add(Encoder2.Encode(Item));
+							Content.Add(await Encoder2.Encode(Item));
 						else
 						{
 							Log.Warning("No content block encoder found for type: " + T2.FullName,
 								this.ResourceName, Request.User?.UserName ?? Request.RemoteEndPoint);
 
-							Content.Add(defaultTextEncoder.Encode(Item.ToString()));
+							Content.Add(await defaultTextEncoder.Encode(Item.ToString()));
 						}
 					}
 
@@ -446,9 +453,9 @@ namespace Waher.Networking.HTTP.Mcp
 					Log.Warning("No content block encoder found for type: " + T.FullName,
 						this.ResourceName, Request.User?.UserName ?? Request.RemoteEndPoint);
 
-					Result["content"] = new object[] 
-					{ 
-						defaultTextEncoder.Encode(ToolResult.ToString()) 
+					Result["content"] = new object[]
+					{
+						await defaultTextEncoder.Encode(ToolResult.ToString())
 					};
 				}
 			}

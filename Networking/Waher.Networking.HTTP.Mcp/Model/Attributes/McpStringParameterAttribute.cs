@@ -26,10 +26,24 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// </summary>
 		/// <param name="Title">Title of parameter.</param>
 		/// <param name="Description">Description of parameter.</param>
+		/// <param name="MaxLength">Maximum length of string.</param>
+		public McpStringParameterAttribute(string? Title, string? Description,
+			int MaxLength)
+			: base(Title, Description)
+		{
+			this.MinLength = null;
+			this.MaxLength = MaxLength;
+		}
+
+		/// <summary>
+		/// Provides meta-data about a string-valued parameter.
+		/// </summary>
+		/// <param name="Title">Title of parameter.</param>
+		/// <param name="Description">Description of parameter.</param>
 		/// <param name="MinLength">Minimum length of string.</param>
 		/// <param name="MaxLength">Maximum length of string.</param>
 		public McpStringParameterAttribute(string? Title, string? Description,
-			int? MinLength, int? MaxLength)
+			int MinLength, int MaxLength)
 			: base(Title, Description)
 		{
 			this.MinLength = MinLength;

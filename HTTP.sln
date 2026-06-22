@@ -49,6 +49,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Mcp.Events", "Mcp\Wah
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Images", "Content\Waher.Content.Images\Waher.Content.Images.csproj", "{833805AB-391B-8C50-9220-A1AE78B9016A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script", "Script\Waher.Script\Waher.Script.csproj", "{D2B49A6C-CE7D-215C-F4B0-77D0CAF34DA9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Graphs", "Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj", "{3AED242C-3D58-6688-3BFC-F1AA0D32E948}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Content", "Script\Waher.Script.Content\Waher.Script.Content.csproj", "{22039BEF-EA49-48B4-E202-643453D3DCD1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -147,6 +153,18 @@ Global
 		{833805AB-391B-8C50-9220-A1AE78B9016A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{833805AB-391B-8C50-9220-A1AE78B9016A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{833805AB-391B-8C50-9220-A1AE78B9016A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2B49A6C-CE7D-215C-F4B0-77D0CAF34DA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2B49A6C-CE7D-215C-F4B0-77D0CAF34DA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2B49A6C-CE7D-215C-F4B0-77D0CAF34DA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2B49A6C-CE7D-215C-F4B0-77D0CAF34DA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AED242C-3D58-6688-3BFC-F1AA0D32E948}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AED242C-3D58-6688-3BFC-F1AA0D32E948}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AED242C-3D58-6688-3BFC-F1AA0D32E948}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AED242C-3D58-6688-3BFC-F1AA0D32E948}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22039BEF-EA49-48B4-E202-643453D3DCD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22039BEF-EA49-48B4-E202-643453D3DCD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22039BEF-EA49-48B4-E202-643453D3DCD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22039BEF-EA49-48B4-E202-643453D3DCD1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

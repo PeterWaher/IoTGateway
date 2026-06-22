@@ -15,6 +15,8 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Runtime.Profiling;
 using Waher.Script;
+using Waher.Script.Content;
+using Waher.Script.Graphs;
 
 internal class Program
 {
@@ -211,7 +213,9 @@ internal class Program
 				typeof(ImageCodec).Assembly,
 				typeof(Expression).Assembly,
 				typeof(MarkdownDocument).Assembly,
-				typeof(MarkdownToHtmlConverter).Assembly);
+				typeof(MarkdownToHtmlConverter).Assembly,
+				typeof(Graph).Assembly,
+				typeof(GraphEncoder).Assembly);
 
 			Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.PadWithSpaces);
 

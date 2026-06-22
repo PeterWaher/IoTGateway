@@ -17,6 +17,9 @@
     <ProjectReference Include="..\..\Mcp\Waher.Mcp.Events\Waher.Mcp.Events.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script.Content\Waher.Script.Content.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\Waher.Networking.HTTP.Brotli\Waher.Networking.HTTP.Brotli.csproj" />
     <ProjectReference Include="..\Waher.Networking.HTTP.Mcp\Waher.Networking.HTTP.Mcp.csproj" />
     <ProjectReference Include="..\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />

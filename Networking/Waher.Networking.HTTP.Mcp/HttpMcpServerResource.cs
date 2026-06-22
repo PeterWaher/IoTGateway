@@ -315,6 +315,28 @@ namespace Waher.Networking.HTTP.Mcp
 		}
 
 		[JsonRpcMethod]
+		protected async Task<Dictionary<string, object?>> Tools_Call(HttpRequest Request,
+			string Name, Dictionary<string, object?> Arguments, object? Task)
+		{
+			Dictionary<string, object?> Result = new Dictionary<string, object?>();
+
+			try
+			{
+				if (!this.tools.TryGetValue(Name, out Tool? Tool))
+					throw new NotFoundException("Tool not found: " + Name);
+
+
+
+			}
+			catch (Exception ex)
+			{
+				Result["isError"] = true;
+			}
+
+			return Result;
+		}
+
+		[JsonRpcMethod]
 		protected Dictionary<string, object> Prompts_List(HttpRequest Request,
 			string? Cursor = null)
 		{

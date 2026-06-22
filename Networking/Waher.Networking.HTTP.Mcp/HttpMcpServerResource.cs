@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -7,9 +8,11 @@ using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp.Model;
 using Waher.Networking.HTTP.Mcp.Model.Client;
+using Waher.Networking.HTTP.Mcp.Model.ContentBlocks;
 using Waher.Networking.HTTP.Mcp.Model.Server;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
+using Waher.Script.Model;
 
 namespace Waher.Networking.HTTP.Mcp
 {
@@ -18,8 +21,42 @@ namespace Waher.Networking.HTTP.Mcp
 	/// </summary>
 	public abstract class HttpMcpServerResource : JsonRpcWebService
 	{
+		private static readonly TextContent defaultTextEncoder = new TextContent();
+		private static Dictionary<Type, IContentBlock> contentBlocks = GetContentBlocksFirstTime();
 		private const int PageSize = 20;
 		private readonly Dictionary<string, Tool> tools = new Dictionary<string, Tool>();
+
+		private static Dictionary<Type, IContentBlock> GetContentBlocksFirstTime()
+		{
+			Types.OnInvalidated += (_, e) => contentBlocks = GetContentBlocks();
+			return GetContentBlocks();
+		}
+
+		private static Dictionary<Type, IContentBlock> GetContentBlocks()
+		{
+			Dictionary<Type, IContentBlock> Result = new Dictionary<Type, IContentBlock>();
+
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IContentBlock)))
+			{
+				if (T.IsAbstract)
+					continue;
+
+				ConstructorInfo? CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
+					continue;
+
+				try
+				{
+					Result[T] = (IContentBlock)CI.Invoke(Array.Empty<object>());
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+			}
+
+			return Result;
+		}
 
 		/// <summary>
 		/// Abstract base class for HTTP-based Model Context Protocol (MCP) server resource.
@@ -254,6 +291,10 @@ namespace Waher.Networking.HTTP.Mcp
 			return Result;
 		}
 
+		/// <summary>
+		/// Notification that the client has completed its initialization.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
 		[JsonRpcMethod]
 		protected void Notifications_Initialized(HttpRequest Request)
 		{
@@ -261,6 +302,12 @@ namespace Waher.Networking.HTTP.Mcp
 				this.ResourceName, Request.RemoteEndPoint, "McpInitialized");
 		}
 
+		/// <summary>
+		/// Lists available MCP server tools.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Cursor">Cursor for pagination.</param>
+		/// <returns>Dictionary containing the list of tools.</returns>
 		[JsonRpcMethod]
 		protected async Task<Dictionary<string, object>> Tools_List(HttpRequest Request,
 			string? Cursor = null)
@@ -314,23 +361,96 @@ namespace Waher.Networking.HTTP.Mcp
 			return Result;
 		}
 
+		/// <summary>
+		/// Calls an MCP server tool.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Name">Name of the tool to call.</param>
+		/// <param name="Arguments">Arguments for the tool.</param>
+		/// <param name="Task">If specified, the caller is requesting task-augmented 
+		/// execution for this request. The request will return a CreateTaskResult 
+		/// immediately, and the actual result can be retrieved later via tasks/result.
+		/// 
+		/// Task augmentation is subject to capability negotiation - receivers MUST declare 
+		/// support for task augmentation of specific request types in their capabilities.</param>
+		/// <param name="_Meta">Associated meta-data, if available.</param>
+		/// <returns>Dictionary containing the result of the tool call.</returns>
 		[JsonRpcMethod]
 		protected async Task<Dictionary<string, object?>> Tools_Call(HttpRequest Request,
-			string Name, Dictionary<string, object?> Arguments, object? Task)
+			string Name, Dictionary<string, object?> Arguments, object? Task = null,
+			object? _Meta = null)
 		{
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
+			object? ToolResult;
 
 			try
 			{
 				if (!this.tools.TryGetValue(Name, out Tool? Tool))
 					throw new NotFoundException("Tool not found: " + Name);
 
-
-
+				if (Tool.TryBuildRequest(Arguments, out string? Reason,
+					out object?[]? Arguments2))
+				{
+					ToolResult = await ScriptNode.WaitPossibleTask(
+						Tool.Method.Invoke(this, Arguments2));
+				}
+				else
+				{
+					ToolResult = Reason;
+					Result["isError"] = true;
+				}
 			}
 			catch (Exception ex)
 			{
+				ToolResult = ex.Message;
 				Result["isError"] = true;
+			}
+
+			if (ToolResult is null)
+				Result["content"] = Array.Empty<object>();
+			else if (ToolResult is Dictionary<string, object?> StructuredContent)
+				Result["structuredContent"] = StructuredContent;
+			else
+			{
+				Type T = ToolResult.GetType();
+
+				if (contentBlocks.TryGetValue(T, out IContentBlock Encoder))
+					Result["content"] = new object[] { Encoder.Encode(ToolResult) };
+				else if (T.IsArray && ToolResult is IEnumerable Enumerable)
+				{
+					ChunkedList<object> Content = new ChunkedList<object>();
+					IEnumerator e = Enumerable.GetEnumerator();
+
+					while (e.MoveNext())
+					{
+						object? Item = e.Current;
+						if (Item is null)
+							continue;
+
+						Type T2 = Item.GetType();
+						if (contentBlocks.TryGetValue(T2, out IContentBlock Encoder2))
+							Content.Add(Encoder2.Encode(Item));
+						else
+						{
+							Log.Warning("No content block encoder found for type: " + T2.FullName,
+								this.ResourceName, Request.User?.UserName ?? Request.RemoteEndPoint);
+
+							Content.Add(defaultTextEncoder.Encode(Item.ToString()));
+						}
+					}
+
+					Result["content"] = Content.ToArray();
+				}
+				else
+				{
+					Log.Warning("No content block encoder found for type: " + T.FullName,
+						this.ResourceName, Request.User?.UserName ?? Request.RemoteEndPoint);
+
+					Result["content"] = new object[] 
+					{ 
+						defaultTextEncoder.Encode(ToolResult.ToString()) 
+					};
+				}
 			}
 
 			return Result;

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Persistence;
 using Waher.Runtime.Collections;
-using Waher.Script.Functions.ComplexNumbers;
 using Waher.Script.Model;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Server
@@ -17,6 +16,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 	/// </summary>
 	public class Tool
 	{
+		private readonly JsonRpcMethodInfo methodInfo;
 		private Icons? icons = null;
 
 		/// <summary>
@@ -54,6 +54,8 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			this.Idempotent = Idempotent;
 			this.OpenWorldAccess = OpenWorldAccess;
 			this.MetaData = MetaData;
+
+			this.methodInfo = new JsonRpcMethodInfo(Method, false);
 		}
 
 		/// <summary>
@@ -244,6 +246,15 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			return Result;
 		}
 
+		/// <summary>
+		/// Generates an Input/Output Schema element for a given type.
+		/// </summary>
+		/// <param name="T">Type to generate information about.</param>
+		/// <param name="HasDefault">Indicates if the type is associated with a default value.</param>
+		/// <param name="Default">The default value.</param>
+		/// <param name="ParameterInfo">Parameter information.</param>
+		/// <param name="EnumValues">Enumeration values.</param>
+		/// <returns>Schema element.</returns>
 		private static object GenerateSchema(Type T, bool HasDefault, object? Default,
 			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute>? EnumValues)
 		{
@@ -410,5 +421,21 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 
 			return Result;
 		}
+
+		/// <summary>
+		/// Tries to build a request for the method, based on the provided named parameters.
+		/// </summary>
+		/// <param name="Parameters">Named parameters.</param>
+		/// <param name="Reason">Reason for not being able to create request.</param>
+		/// <param name="Arguments">Ordered set of typed arguments, to be used in a
+		/// call to the method.</param>
+		/// <returns>If able to prepare a request to the method.</returns>
+		public bool TryBuildRequest(Dictionary<string, object?> Parameters,
+			[NotNullWhen(false)] out string? Reason,
+			[NotNullWhen(true)] out object?[]? Arguments)
+		{
+			return this.methodInfo.TryBuildRequest(Parameters, out Reason, out Arguments);
+		}
+
 	}
 }

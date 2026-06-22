@@ -475,7 +475,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 					break;
 
 				case "params":
-					if (Value is Dictionary<string, object> Obj)
+					if (Value is Dictionary<string, object?> Obj)
 						Request.ParametersObj = Obj;
 					else if (Value is Array A)
 						Request.ParametersArray = A;

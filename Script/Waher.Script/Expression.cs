@@ -5521,11 +5521,147 @@ namespace Waher.Script
 				Result = Converter.Convert(Value);
 				return !(Result is null) || (Value is null);
 			}
-			else
+
+			if (DesiredType.IsEnum)
 			{
-				Result = null;
-				return false;
+				switch (Type.GetTypeCode(Value.GetType()))
+				{
+					case TypeCode.Empty:
+					case TypeCode.DBNull:
+					case TypeCode.Boolean:
+					case TypeCode.DateTime:
+						Result = null;
+						return false;
+
+					case TypeCode.String:
+					case TypeCode.Char:
+						string s = Value.ToString();
+						string[] Names = Enum.GetNames(DesiredType);
+						int i = Array.IndexOf(Names, s);
+
+						if (i < 0)
+						{
+							Result = null;
+							return false;
+						}
+						else
+						{
+							Array Values = Enum.GetValues(DesiredType);
+							Result = Values.GetValue(i);
+							return true;
+						}
+
+					case TypeCode.Object:
+						if (TryConvert(Value, typeof(string), out object Obj) &&
+							Obj is string s2)
+						{
+							s = s2;
+						}
+						else
+							s = Value.ToString();
+
+						Names = Enum.GetNames(DesiredType);
+						i = Array.IndexOf(Names, s);
+
+						if (i < 0)
+						{
+							Result = null;
+							return false;
+						}
+						else
+						{
+							Array Values = Enum.GetValues(DesiredType);
+							Result = Values.GetValue(i);
+							return true;
+						}
+
+					case TypeCode.SByte:
+						Result = Enum.ToObject(DesiredType, (sbyte)Value);
+						return true;
+
+					case TypeCode.Byte:
+						Result = Enum.ToObject(DesiredType, (byte)Value);
+						return true;
+
+					case TypeCode.Int16:
+						Result = Enum.ToObject(DesiredType, (short)Value);
+						return true;
+
+					case TypeCode.UInt16:
+						Result = Enum.ToObject(DesiredType, (ushort)Value);
+						return true;
+
+					case TypeCode.Int32:
+						Result = Enum.ToObject(DesiredType, (int)Value);
+						return true;
+
+					case TypeCode.UInt32:
+						Result = Enum.ToObject(DesiredType, (uint)Value);
+						return true;
+
+					case TypeCode.Int64:
+						Result = Enum.ToObject(DesiredType, (long)Value);
+						return true;
+
+					case TypeCode.UInt64:
+						Result = Enum.ToObject(DesiredType, (ulong)Value);
+						return true;
+
+					case TypeCode.Single:
+						float f = (float)Value;
+
+						if (f >= int.MinValue && f <= int.MaxValue)
+							Result = Enum.ToObject(DesiredType, (int)f);
+						else if (f >= long.MinValue && f <= long.MaxValue)
+							Result = Enum.ToObject(DesiredType, (long)f);
+						else if (f >= ulong.MinValue && f <= ulong.MaxValue)
+							Result = Enum.ToObject(DesiredType, (ulong)f);
+						else
+						{
+							Result = null;
+							return false;
+						}
+
+						return true;
+
+					case TypeCode.Double:
+						double d = (double)Value;
+
+						if (d >= int.MinValue && d <= int.MaxValue)
+							Result = Enum.ToObject(DesiredType, (int)d);
+						else if (d >= long.MinValue && d <= long.MaxValue)
+							Result = Enum.ToObject(DesiredType, (long)d);
+						else if (d >= ulong.MinValue && d <= ulong.MaxValue)
+							Result = Enum.ToObject(DesiredType, (ulong)d);
+						else
+						{
+							Result = null;
+							return false;
+						}
+
+						return true;
+
+					case TypeCode.Decimal:
+						decimal dec = (decimal)Value;
+
+						if (dec >= int.MinValue && dec <= int.MaxValue)
+							Result = Enum.ToObject(DesiredType, (int)dec);
+						else if (dec >= long.MinValue && dec <= long.MaxValue)
+							Result = Enum.ToObject(DesiredType, (long)dec);
+						else if (dec >= ulong.MinValue && dec <= ulong.MaxValue)
+							Result = Enum.ToObject(DesiredType, (ulong)dec);
+						else
+						{
+							Result = null;
+							return false;
+						}
+
+						return true;
+				}
 			}
+
+			Result = null;
+			return false;
 		}
 
 		/// <summary>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Waher.Events;
 using Waher.Networking.HTTP.Mcp;
 using Waher.Networking.HTTP.Mcp.Model;
+using Waher.Networking.HTTP.Mcp.Model.Attributes;
 
 namespace Waher.Mcp.Events
 {
@@ -68,12 +69,28 @@ namespace Waher.Mcp.Events
 			false,  // Idempotent
 			false)] // OpenWorldAccess
 		public void LogDebug(
-			string Message, 
-			string Object = "", 
+			[McpStringParameter("Event Message", "The body text of the event to log.")]
+			string Message,
+
+			[McpStringParameter("Object", "The object associated with the event, if any.")]
+			string Object = "",
+
+			[McpStringParameter("Actor", "The subject, or actor, performing the action resulting in the event being logged.")]
 			string Actor = "",
+
+			[McpStringParameter("Event Level", "The level of the event being logged. Minor events occur frequently, Medium events update something, or reports something could cause a major event, Major events adds or destroys something, or reports something important is out of order.")]
+			[McpEnumValue(EventLevel.Minor, "Minor Event")]
+			[McpEnumValue(EventLevel.Medium, "Medium Event")]
+			[McpEnumValue(EventLevel.Major, "Major Event")]
 			EventLevel Level = EventLevel.Minor, 
+
+			[McpStringParameter("Facility", "The subsystem or external component that is the source of the event.")]
 			string Facility = "", 
+
+			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
 			string Module = "",
+
+			[McpStringParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
 			Dictionary<string, object>? MetaData = null)
 		{
 			int c = MetaData?.Count ?? 0;

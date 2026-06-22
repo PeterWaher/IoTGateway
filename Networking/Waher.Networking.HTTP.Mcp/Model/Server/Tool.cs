@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
+using System.Data.Common;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Waher.Networking.HTTP.Mcp.Model.Attributes;
+using Waher.Persistence;
+using Waher.Runtime.Collections;
+using Waher.Script.Functions.ComplexNumbers;
 using Waher.Script.Model;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Server
@@ -124,8 +129,8 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 					this.icons = new Icons();
 				else
 				{
-					MethodInfo? MI = Resource.GetType().GetMethod(this.IconsMethod, 
-						BindingFlags.Static | BindingFlags.Instance | 
+					MethodInfo? MI = Resource.GetType().GetMethod(this.IconsMethod,
+						BindingFlags.Static | BindingFlags.Instance |
 						BindingFlags.Public | BindingFlags.NonPublic);
 
 					if (MI is null)
@@ -170,6 +175,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 						{ "taskSupport", "optional" }
 					}
 				},
+				{ "inputSchema", GenerateSchema(this.Method) },
 				{ "annotations", Annotations }
 			};
 
@@ -182,8 +188,14 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			if (!this.icons.Empty)
 				Result.Add("icons", this.icons.ToJson());
 
-			// TODO: inputSchema
-			// TODO: outputSchema
+			if (this.Method.ReturnType != typeof(void))
+			{
+				McpParameterAttribute ReturnInfo = this.Method.ReturnParameter.GetCustomAttribute<McpParameterAttribute>(true);
+				IEnumerable<McpEnumValueAttribute>? EnumValues = this.Method.ReturnType.IsEnum ?
+					this.Method.ReturnParameter.GetCustomAttributes<McpEnumValueAttribute>(true) : null;
+
+				Result.Add("outputSchema", GenerateSchema(this.Method.ReturnType, false, null, ReturnInfo, EnumValues));
+			}
 
 			if ((this.MetaData?.Length ?? 0) > 0)
 			{
@@ -197,5 +209,206 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 
 			return Result;
 		}
-}
+
+		/// <summary>
+		/// Generates an Input Schema for a method, based on its parameters.
+		/// </summary>
+		/// <param name="Method">Method information.</param>
+		/// <returns>Input Schema</returns>
+		private static Dictionary<string, object> GenerateSchema(MethodInfo Method)
+		{
+			Dictionary<string, object> Properties = new Dictionary<string, object>();
+			ChunkedList<string> Required = new ChunkedList<string>();
+			ParameterInfo[] Parameters = Method.GetParameters();
+
+			foreach (ParameterInfo Parameter in Parameters)
+			{
+				if (!Parameter.IsOptional && !Parameter.HasDefaultValue)
+					Required.Add(Parameter.Name);
+
+				McpParameterAttribute ParameterInfo = Parameter.GetCustomAttribute<McpParameterAttribute>(true);
+				IEnumerable<McpEnumValueAttribute>? EnumValues = Parameter.ParameterType.IsEnum ?
+					Parameter.GetCustomAttributes<McpEnumValueAttribute>(true) : null;
+
+				Properties[Parameter.Name] = GenerateSchema(Parameter.ParameterType,
+					Parameter.HasDefaultValue, Parameter.DefaultValue, ParameterInfo, EnumValues);
+			}
+
+			Dictionary<string, object> Result = new Dictionary<string, object>()
+			{
+				{ "type", "object" },
+				{ "properties", Properties },
+				{ "required", Required.ToArray() }
+			};
+
+			return Result;
+		}
+
+		private static object GenerateSchema(Type T, bool HasDefault, object? Default,
+			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute>? EnumValues)
+		{
+			Dictionary<string, object?> Result = new Dictionary<string, object?>();
+
+			if (T.IsEnum)
+			{
+				ChunkedList<Dictionary<string, object>>? EnumValuesList;
+
+				if (EnumValues is null)
+					EnumValuesList = null;
+				else
+				{
+					EnumValuesList = new ChunkedList<Dictionary<string, object>>();
+
+					foreach (McpEnumValueAttribute EnumValue in EnumValues)
+					{
+						EnumValuesList.Add(new Dictionary<string, object>()
+						{
+							{ "const", EnumValue.Value.ToString() },
+							{ "title", EnumValue.Title ?? EnumValue.Value.ToString() }
+						});
+					}
+				}
+
+				if (Attribute.IsDefined(T, typeof(FlagsAttribute)))
+				{
+					Result["type"] = "array";
+
+					if (EnumValuesList is null)
+					{
+						Result["items"] = new Dictionary<string, object>()
+						{
+							{ "type", "string" },
+							{ "enum", Enum.GetNames(T) }
+						};
+					}
+					else
+					{
+						Result["items"] = new Dictionary<string, object>()
+						{
+							{ "anyOf", EnumValuesList.ToArray() }
+						};
+					}
+				}
+				else
+				{
+					Result["type"] = "string";
+
+					if (EnumValuesList is null)
+						Result["enum"] = Enum.GetNames(T);
+					else
+						Result["oneOf"] = EnumValuesList.ToArray();
+				}
+			}
+			else
+			{
+				switch (Type.GetTypeCode(T))
+				{
+					case TypeCode.Empty:
+						Result["type"] = "null";
+						break;
+
+					case TypeCode.Object:
+						if (T == typeof(CaseInsensitiveString))
+							Result["type"] = "string";
+						else if (T == typeof(Uri))
+						{
+							Result["type"] = "string";
+							Result["format"] = "uri";
+						}
+						else if (T.IsArray)
+						{
+							Result["type"] = "array";
+							Result["items"] = GenerateSchema(T.GetElementType()!, false, null, null, null);
+						}
+						else
+							Result["type"] = "object";
+						break;
+
+					case TypeCode.DBNull:
+						Result["type"] = "null";
+						break;
+
+					case TypeCode.Boolean:
+						Result["type"] = "boolean";
+						break;
+
+					case TypeCode.Char:
+						Result["type"] = "string";
+						break;
+
+					case TypeCode.SByte:
+						Result["type"] = "integer";
+						Result["minimum"] = sbyte.MinValue;
+						Result["maximum"] = sbyte.MaxValue;
+						break;
+
+					case TypeCode.Byte:
+						Result["type"] = "integer";
+						Result["minimum"] = byte.MinValue;
+						Result["maximum"] = byte.MaxValue;
+						break;
+
+					case TypeCode.Int16:
+						Result["type"] = "integer";
+						Result["minimum"] = short.MinValue;
+						Result["maximum"] = short.MaxValue;
+						break;
+
+					case TypeCode.UInt16:
+						Result["type"] = "integer";
+						Result["minimum"] = ushort.MinValue;
+						Result["maximum"] = ushort.MaxValue;
+						break;
+
+					case TypeCode.Int32:
+						Result["type"] = "integer";
+						Result["minimum"] = int.MinValue;
+						Result["maximum"] = int.MaxValue;
+						break;
+
+					case TypeCode.UInt32:
+						Result["type"] = "integer";
+						Result["minimum"] = uint.MinValue;
+						Result["maximum"] = uint.MaxValue;
+						break;
+
+					case TypeCode.Int64:
+						Result["type"] = "integer";
+						Result["minimum"] = long.MinValue;
+						Result["maximum"] = long.MaxValue;
+						break;
+
+					case TypeCode.UInt64:
+						Result["type"] = "integer";
+						Result["minimum"] = ulong.MinValue;
+						Result["maximum"] = ulong.MaxValue;
+						break;
+
+					case TypeCode.Single:
+					case TypeCode.Double:
+					case TypeCode.Decimal:
+						Result["type"] = "number";
+						break;
+
+					case TypeCode.DateTime:
+						{
+							Result["type"] = "string";
+							Result["format"] = "date-time";
+						}
+						break;
+
+					case TypeCode.String:
+						Result["type"] = "string";
+						break;
+				}
+			}
+
+			if (HasDefault)
+				Result["default"] = Default;
+
+			ParameterInfo?.Annotate(Result);
+
+			return Result;
+		}
+	}
 }

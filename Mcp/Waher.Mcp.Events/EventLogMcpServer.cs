@@ -93,7 +93,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
 			string Module = "",
 
-			[McpStringParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Debug(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
@@ -133,7 +133,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
 			string Module = "",
 
-			[McpStringParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Informational(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
@@ -173,7 +173,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
 			string Module = "",
 
-			[McpStringParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Notice(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
@@ -213,7 +213,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
 			string Module = "",
 
-			[McpStringParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Warning(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
@@ -253,7 +253,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
 			string Module = "",
 
-			[McpStringParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Error(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
@@ -293,7 +293,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
 			string Module = "",
 
-			[McpStringParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Critical(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
@@ -333,7 +333,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
 			string Module = "",
 
-			[McpStringParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Alert(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
@@ -373,7 +373,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
 			string Module = "",
 
-			[McpStringParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Emergency(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));

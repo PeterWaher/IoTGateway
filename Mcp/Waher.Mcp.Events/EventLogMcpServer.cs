@@ -60,6 +60,23 @@ namespace Waher.Mcp.Events
 		{
 		}
 
+		private const string MessageTitle = "Event Message";
+		private const string MessageDescription = "The body text of the event to log.";
+		private const string ObjectTitle = "Object";
+		private const string ObjectDescription = "The object associated with the event, if any.";
+		private const string ActorTitle = "Actor";
+		private const string ActorDescription = "The subject, or actor, performing the action resulting in the event being logged.";
+		private const string EventLevelTitle = "Event Level";
+		private const string EventLevelDescription = "The level of the event being logged. Minor events occur frequently, Medium events update something, or reports something could cause a major event, Major events adds or destroys something, or reports something important is out of order.";
+		private const string EventIdTitle = "Event ID";
+		private const string EventIdDescription = "Optional Event ID for the event. Event IDs are used to identify a specific type of event, and is used collect related information in reports.";
+		private const string FacilityTitle = "Facility";
+		private const string FacilityDescription = "The subsystem or external component that is the source of the event.";
+		private const string ModuleTitle = "Module";
+		private const string ModuleDescription = "The module or component within the source that is the source of the event.";
+		private const string IsLoggedTitle = "Is Logged";
+		private const string IsLoggedDescription = "Indicates whether the event was successfully logged.";
+
 		[McpServerTool(
 			"Log Debug Event",  // Title
 			"Logs an event for debug purposes to the event log. The purpose of debug events is to highlight technical information to developers, for troubleshooting.",   // Description
@@ -68,36 +85,36 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
-		public Dictionary<string, object?> LogDebug(
-			[McpStringParameter("Event Message", "The body text of the event to log.")]
+		public void LogDebug(
+			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
 
-			[McpStringParameter("Object", "The object associated with the event, if any.")]
+			[McpStringParameter(ObjectTitle, ObjectDescription, 0, 128)]
 			string Object = "",
 
-			[McpStringParameter("Actor", "The subject, or actor, performing the action resulting in the event being logged.")]
+			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter("Event Level", "The level of the event being logged. Minor events occur frequently, Medium events update something, or reports something could cause a major event, Major events adds or destroys something, or reports something important is out of order.")]
+			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
 			EventLevel Level = EventLevel.Minor,
 
-			[McpStringParameter("Event ID", "Optional Event ID for the event. Event IDs are used to identify a specific type of event, and is used collect related information in reports.", 32)]
+			[McpStringParameter(EventIdTitle, EventIdDescription, 0, 32)]
 			string EventId = "McpEvent",
 
-			[McpStringParameter("Facility", "The subsystem or external component that is the source of the event.")]
-			string Facility = "", 
+			[McpStringParameter(FacilityTitle, FacilityDescription, 0, 256)]
+			string Facility = "",
 
-			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
+			[McpStringParameter(ModuleTitle, ModuleDescription, 0, 256)]
 			string Module = "",
 
 			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpMetaDataArgument]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Debug(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
-			return LogResponse();
 		}
 
 		[McpServerTool(
@@ -108,36 +125,36 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
-		public Dictionary<string, object?> LogInformational(
-			[McpStringParameter("Event Message", "The body text of the event to log.")]
+		public void LogInformational(
+			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
 
-			[McpStringParameter("Object", "The object associated with the event, if any.")]
+			[McpStringParameter(ObjectTitle, ObjectDescription, 0, 128)]
 			string Object = "",
 
-			[McpStringParameter("Actor", "The subject, or actor, performing the action resulting in the event being logged.")]
+			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter("Event Level", "The level of the event being logged. Minor events occur frequently, Medium events update something, or reports something could cause a major event, Major events adds or destroys something, or reports something important is out of order.")]
+			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
 			EventLevel Level = EventLevel.Minor,
 
-			[McpStringParameter("Event ID", "Optional Event ID for the event. Event IDs are used to identify a specific type of event, and is used collect related information in reports.", 32)]
+			[McpStringParameter(EventIdTitle, EventIdDescription, 0, 32)]
 			string EventId = "McpEvent",
 
-			[McpStringParameter("Facility", "The subsystem or external component that is the source of the event.")]
+			[McpStringParameter(FacilityTitle, FacilityDescription, 0, 256)]
 			string Facility = "",
 
-			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
+			[McpStringParameter(ModuleTitle, ModuleDescription, 0, 256)]
 			string Module = "",
 
 			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpMetaDataArgument]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Informational(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
-			return LogResponse();
 		}
 
 		[McpServerTool(
@@ -148,36 +165,36 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
-		public Dictionary<string, object?> LogNotice(
-			[McpStringParameter("Event Message", "The body text of the event to log.")]
+		public void LogNotice(
+			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
 
-			[McpStringParameter("Object", "The object associated with the event, if any.")]
+			[McpStringParameter(ObjectTitle, ObjectDescription, 0, 128)]
 			string Object = "",
 
-			[McpStringParameter("Actor", "The subject, or actor, performing the action resulting in the event being logged.")]
+			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter("Event Level", "The level of the event being logged. Minor events occur frequently, Medium events update something, or reports something could cause a major event, Major events adds or destroys something, or reports something important is out of order.")]
+			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
 			EventLevel Level = EventLevel.Minor,
 
-			[McpStringParameter("Event ID", "Optional Event ID for the event. Event IDs are used to identify a specific type of event, and is used collect related information in reports.", 32)]
+			[McpStringParameter(EventIdTitle, EventIdDescription, 0, 32)]
 			string EventId = "McpEvent",
 
-			[McpStringParameter("Facility", "The subsystem or external component that is the source of the event.")]
+			[McpStringParameter(FacilityTitle, FacilityDescription, 0, 256)]
 			string Facility = "",
 
-			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
+			[McpStringParameter(ModuleTitle, ModuleDescription, 0, 256)]
 			string Module = "",
 
 			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpMetaDataArgument]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Notice(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
-			return LogResponse();
 		}
 
 		[McpServerTool(
@@ -188,36 +205,36 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
-		public Dictionary<string, object?> LogWarning(
-			[McpStringParameter("Event Message", "The body text of the event to log.")]
+		public void LogWarning(
+			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
 
-			[McpStringParameter("Object", "The object associated with the event, if any.")]
+			[McpStringParameter(ObjectTitle, ObjectDescription, 0, 128)]
 			string Object = "",
 
-			[McpStringParameter("Actor", "The subject, or actor, performing the action resulting in the event being logged.")]
+			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter("Event Level", "The level of the event being logged. Minor events occur frequently, Medium events update something, or reports something could cause a major event, Major events adds or destroys something, or reports something important is out of order.")]
+			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
 			EventLevel Level = EventLevel.Minor,
 
-			[McpStringParameter("Event ID", "Optional Event ID for the event. Event IDs are used to identify a specific type of event, and is used collect related information in reports.", 32)]
+			[McpStringParameter(EventIdTitle, EventIdDescription, 0, 32)]
 			string EventId = "McpEvent",
 
-			[McpStringParameter("Facility", "The subsystem or external component that is the source of the event.")]
+			[McpStringParameter(FacilityTitle, FacilityDescription, 0, 256)]
 			string Facility = "",
 
-			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
+			[McpStringParameter(ModuleTitle, ModuleDescription, 0, 256)]
 			string Module = "",
 
 			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpMetaDataArgument]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Warning(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
-			return LogResponse();
 		}
 
 		[McpServerTool(
@@ -228,36 +245,36 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
-		public Dictionary<string, object?> LogError(
-			[McpStringParameter("Event Message", "The body text of the event to log.")]
+		public void LogError(
+			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
 
-			[McpStringParameter("Object", "The object associated with the event, if any.")]
+			[McpStringParameter(ObjectTitle, ObjectDescription, 0, 128)]
 			string Object = "",
 
-			[McpStringParameter("Actor", "The subject, or actor, performing the action resulting in the event being logged.")]
+			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter("Event Level", "The level of the event being logged. Minor events occur frequently, Medium events update something, or reports something could cause a major event, Major events adds or destroys something, or reports something important is out of order.")]
+			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
 			EventLevel Level = EventLevel.Minor,
 
-			[McpStringParameter("Event ID", "Optional Event ID for the event. Event IDs are used to identify a specific type of event, and is used collect related information in reports.", 32)]
+			[McpStringParameter(EventIdTitle, EventIdDescription, 0, 32)]
 			string EventId = "McpEvent",
 
-			[McpStringParameter("Facility", "The subsystem or external component that is the source of the event.")]
+			[McpStringParameter(FacilityTitle, FacilityDescription, 0, 256)]
 			string Facility = "",
 
-			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
+			[McpStringParameter(ModuleTitle, ModuleDescription, 0, 256)]
 			string Module = "",
 
 			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpMetaDataArgument]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Error(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
-			return LogResponse();
 		}
 
 		[McpServerTool(
@@ -268,36 +285,36 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
-		public Dictionary<string, object?> LogCritical(
-			[McpStringParameter("Event Message", "The body text of the event to log.")]
+		public void LogCritical(
+			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
 
-			[McpStringParameter("Object", "The object associated with the event, if any.")]
+			[McpStringParameter(ObjectTitle, ObjectDescription, 0, 128)]
 			string Object = "",
 
-			[McpStringParameter("Actor", "The subject, or actor, performing the action resulting in the event being logged.")]
+			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter("Event Level", "The level of the event being logged. Minor events occur frequently, Medium events update something, or reports something could cause a major event, Major events adds or destroys something, or reports something important is out of order.")]
+			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
 			EventLevel Level = EventLevel.Minor,
 
-			[McpStringParameter("Event ID", "Optional Event ID for the event. Event IDs are used to identify a specific type of event, and is used collect related information in reports.", 32)]
+			[McpStringParameter(EventIdTitle, EventIdDescription, 0, 32)]
 			string EventId = "McpEvent",
 
-			[McpStringParameter("Facility", "The subsystem or external component that is the source of the event.")]
+			[McpStringParameter(FacilityTitle, FacilityDescription, 0, 256)]
 			string Facility = "",
 
-			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
+			[McpStringParameter(ModuleTitle, ModuleDescription, 0, 256)]
 			string Module = "",
 
 			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpMetaDataArgument]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Critical(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
-			return LogResponse();
 		}
 
 		[McpServerTool(
@@ -308,36 +325,36 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
-		public Dictionary<string, object?> LogAlert(
-			[McpStringParameter("Event Message", "The body text of the event to log.")]
+		public void LogAlert(
+			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
 
-			[McpStringParameter("Object", "The object associated with the event, if any.")]
+			[McpStringParameter(ObjectTitle, ObjectDescription, 0, 128)]
 			string Object = "",
 
-			[McpStringParameter("Actor", "The subject, or actor, performing the action resulting in the event being logged.")]
+			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter("Event Level", "The level of the event being logged. Minor events occur frequently, Medium events update something, or reports something could cause a major event, Major events adds or destroys something, or reports something important is out of order.")]
+			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
 			EventLevel Level = EventLevel.Minor,
 
-			[McpStringParameter("Event ID", "Optional Event ID for the event. Event IDs are used to identify a specific type of event, and is used collect related information in reports.", 32)]
+			[McpStringParameter(EventIdTitle, EventIdDescription, 0, 32)]
 			string EventId = "McpEvent",
 
-			[McpStringParameter("Facility", "The subsystem or external component that is the source of the event.")]
+			[McpStringParameter(FacilityTitle, FacilityDescription, 0, 256)]
 			string Facility = "",
 
-			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
+			[McpStringParameter(ModuleTitle, ModuleDescription, 0, 256)]
 			string Module = "",
 
 			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpMetaDataArgument]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Alert(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
-			return LogResponse();
 		}
 
 		[McpServerTool(
@@ -348,41 +365,36 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
-		public Dictionary<string, object?> LogEmergency(
-			[McpStringParameter("Event Message", "The body text of the event to log.")]
+		public void LogEmergency(
+			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
 
-			[McpStringParameter("Object", "The object associated with the event, if any.")]
+			[McpStringParameter(ObjectTitle, ObjectDescription, 0, 128)]
 			string Object = "",
 
-			[McpStringParameter("Actor", "The subject, or actor, performing the action resulting in the event being logged.")]
+			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter("Event Level", "The level of the event being logged. Minor events occur frequently, Medium events update something, or reports something could cause a major event, Major events adds or destroys something, or reports something important is out of order.")]
+			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
 			EventLevel Level = EventLevel.Minor,
 
-			[McpStringParameter("Event ID", "Optional Event ID for the event. Event IDs are used to identify a specific type of event, and is used collect related information in reports.", 32)]
+			[McpStringParameter(EventIdTitle, EventIdDescription, 0, 32)]
 			string EventId = "McpEvent",
 
-			[McpStringParameter("Facility", "The subsystem or external component that is the source of the event.")]
+			[McpStringParameter(FacilityTitle, FacilityDescription, 0, 256)]
 			string Facility = "",
 
-			[McpStringParameter("Module", "The module or component within the source that is the source of the event.")]
+			[McpStringParameter(ModuleTitle, ModuleDescription, 0, 256)]
 			string Module = "",
 
 			[McpParameter("Meta Data", "Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.")]
+			[McpMetaDataArgument]
 			Dictionary<string, object>? MetaData = null)
 		{
 			Log.Emergency(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
-			return LogResponse();
-		}
-
-		private static Dictionary<string, object?> LogResponse()
-		{
-			return new Dictionary<string, object?>() { { "logged", true } };
 		}
 
 		private static KeyValuePair<string, object>[] GetTags(Dictionary<string, object>? MetaData)

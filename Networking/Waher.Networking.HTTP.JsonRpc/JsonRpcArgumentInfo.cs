@@ -14,13 +14,15 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="IsSpecialArgument">If the argument represents a special argument.</param>
 		/// <param name="HasDefaultValue">If the argument has a default value.</param>
 		/// <param name="DefaultValue">Default value of argument, if defined.</param>
+		/// <param name="IsMetaDataArgument">If the argument represents a meta-data argument.</param>
 		public JsonRpcArgumentInfo(ParameterInfo Parameter, bool IsSpecialArgument, 
-			bool HasDefaultValue, object? DefaultValue)
+			bool HasDefaultValue, object? DefaultValue, bool IsMetaDataArgument)
 		{
 			this.Parameter = Parameter;
 			this.IsSpecialArgument = IsSpecialArgument;
 			this.HasDefaultValue = HasDefaultValue;
 			this.DefaultValue = DefaultValue;
+			this.IsMetaDataArgument = IsMetaDataArgument;
 		}
 
 		/// <summary>
@@ -42,5 +44,10 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// If the argument represents a special argument.
 		/// </summary>
 		public bool IsSpecialArgument { get; private set; }
+
+		/// <summary>
+		/// If the argument represents a meta-data argument.
+		/// </summary>
+		public bool IsMetaDataArgument { get; private set; }
 	}
 }

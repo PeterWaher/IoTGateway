@@ -331,6 +331,11 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 							Result["type"] = "array";
 							Result["items"] = GenerateSchema(T.GetElementType()!, false, null, null, null);
 						}
+						else if (T == typeof(Dictionary<string, object?>))
+						{
+							Result["type"] = "object";
+							//Result["additionalProperties"] = true;// new Dictionary<string, object>();
+						}
 						else
 							Result["type"] = "object";
 						break;
@@ -426,15 +431,17 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// Tries to build a request for the method, based on the provided named parameters.
 		/// </summary>
 		/// <param name="Parameters">Named parameters.</param>
+		/// <param name="MetaData">Additional Meta-Data available for the request.</param>
 		/// <param name="Reason">Reason for not being able to create request.</param>
 		/// <param name="Arguments">Ordered set of typed arguments, to be used in a
 		/// call to the method.</param>
 		/// <returns>If able to prepare a request to the method.</returns>
 		public bool TryBuildRequest(Dictionary<string, object?> Parameters,
+			Dictionary<string, object?>? MetaData,
 			[NotNullWhen(false)] out string? Reason,
 			[NotNullWhen(true)] out object?[]? Arguments)
 		{
-			return this.methodInfo.TryBuildRequest(Parameters, out Reason, out Arguments);
+			return this.methodInfo.TryBuildRequest(Parameters, MetaData, out Reason, out Arguments);
 		}
 
 	}

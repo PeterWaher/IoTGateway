@@ -382,7 +382,7 @@ namespace Waher.Networking.HTTP.Mcp
 		[JsonRpcMethod]
 		protected async Task<Dictionary<string, object?>> Tools_Call(HttpRequest Request,
 			string Name, Dictionary<string, object?> Arguments, object? Task = null,
-			object? _Meta = null)
+			[JsonRpcMetaDataArgument] object? _Meta = null)
 		{
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
 			object? ToolResult;
@@ -392,7 +392,9 @@ namespace Waher.Networking.HTTP.Mcp
 				if (!this.tools.TryGetValue(Name, out Tool? Tool))
 					throw new NotFoundException("Tool not found: " + Name);
 
-				if (Tool.TryBuildRequest(Arguments, out string? Reason,
+				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
+
+				if (Tool.TryBuildRequest(Arguments, MetaData, out string? Reason,
 					out object?[]? Arguments2))
 				{
 					ToolResult = await ScriptNode.WaitPossibleTask(

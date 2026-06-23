@@ -79,7 +79,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 						if (!(this.ParametersObj is null))
 						{
-							if (!this.MethodInfo.TryBuildRequest(this.ParametersObj,
+							if (!this.MethodInfo.TryBuildRequest(this.ParametersObj, null,
 								out string? Reason, out Parameters))
 							{
 								this.SetError(-32602, Reason, 400);

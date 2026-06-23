@@ -20,6 +20,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		{
 			ParameterInfo[] Arguments = Method.GetParameters();
 			bool IsSpecialArgument;
+			bool IsMetaDataArgument;
 			this.Method = Method;
 			this.NrArguments = Arguments.Length;
 			this.NrSpecialArguments = 0;
@@ -33,6 +34,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 			foreach (ParameterInfo P in Arguments)
 			{
+				IsMetaDataArgument = false;
+
 				if (P.ParameterType == typeof(HttpRequest))
 				{
 					if (this.RequestArgument is null)
@@ -55,6 +58,19 @@ namespace Waher.Networking.HTTP.JsonRpc
 					else
 						throw new ArgumentException("Only one argument of type HttpResponse is allowed.", nameof(Method));
 				}
+				else if (P.ParameterType == typeof(Dictionary<string, object?>) &&
+					!(P.GetCustomAttribute<JsonRpcMetaDataArgumentAttribute>(true) is null))
+				{
+					if (this.MetaDataArgument is null)
+					{
+						this.MetaDataArgument = P.Position;
+						this.NrSpecialArguments++;
+						IsSpecialArgument = true;
+						IsMetaDataArgument = true;
+					}
+					else
+						throw new ArgumentException("Only one meta-data argument is allowed.", nameof(Method));
+				}
 				else
 				{
 					this.NamedArguments[P.Name] = P.Position;
@@ -62,7 +78,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 				}
 
 				this.Arguments[P.Position] = new JsonRpcArgumentInfo(P, IsSpecialArgument,
-					P.HasDefaultValue, P.HasDefaultValue ? P.DefaultValue : null);
+					P.HasDefaultValue, P.HasDefaultValue ? P.DefaultValue : null,
+					IsMetaDataArgument);
 			}
 		}
 
@@ -97,6 +114,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public int? ResponseArgument { get; private set; }
 
 		/// <summary>
+		/// Meta-data argument index
+		/// </summary>
+		public int? MetaDataArgument { get; private set; }
+
+		/// <summary>
 		/// Arguments
 		/// </summary>
 		public JsonRpcArgumentInfo[] Arguments { get; private set; }
@@ -105,11 +127,13 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// Tries to build a request for the method, based on the provided named parameters.
 		/// </summary>
 		/// <param name="Parameters">Named parameters.</param>
+		/// <param name="MetaData">Additional Meta-Data available for the request.</param>
 		/// <param name="Reason">Reason for not being able to create request.</param>
 		/// <param name="Arguments">Ordered set of typed arguments, to be used in a
 		/// call to the method.</param>
 		/// <returns>If able to prepare a request to the method.</returns>
-		public bool TryBuildRequest(Dictionary<string, object?> Parameters, 
+		public bool TryBuildRequest(Dictionary<string, object?> Parameters,
+			Dictionary<string, object?>? MetaData,
 			[NotNullWhen(false)] out string? Reason,
 			[NotNullWhen(true)] out object?[]? Arguments)
 		{
@@ -122,30 +146,59 @@ namespace Waher.Networking.HTTP.JsonRpc
 			{
 				if (!this.NamedArguments.TryGetValue(P.Key, out int i))
 				{
-					Reason = "Invalid parameter name: " + P.Key;
-					Arguments = null;
-					return false;
-				}
-				else
-				{
-					Type ExpectedType = this.Arguments[i].Parameter.ParameterType;
-					Type ParameterType = P.Value?.GetType() ?? typeof(object);
-
-					if (ParameterType == ExpectedType)
-						Arguments[i] = P.Value;
-					else if (Expression.TryConvert(P.Value, ExpectedType, out object Converted))
-						Arguments[i] = Converted;
+					if (this.MetaDataArgument.HasValue &&
+						P.Key == this.Arguments[this.MetaDataArgument.Value].Parameter.Name)
+					{
+						i = this.MetaDataArgument.Value;
+					}
 					else
 					{
+						Reason = "Invalid parameter name: " + P.Key;
 						Arguments = null;
-						Reason = "Parameter " + P.Key +
-							" has incorrect type: " + ParameterType.FullName +
-							", Expected: " + ExpectedType.FullName;
 						return false;
 					}
-
-					NrParametersSet++;
 				}
+
+				object? Value = P.Value;
+				JsonRpcArgumentInfo ArgumentInfo = this.Arguments[i];
+				Type ExpectedType = ArgumentInfo.Parameter.ParameterType;
+				Type ParameterType = Value?.GetType() ?? typeof(object);
+
+				if (ArgumentInfo.IsMetaDataArgument && !(MetaData is null))
+				{
+					Dictionary<string, object?>? MetaDataValue = Value as Dictionary<string, object?>;
+
+					if (Value is null || !(MetaDataValue is null))
+					{
+						if (MetaDataValue is null)
+							MetaDataValue = MetaData;
+						else
+						{
+							foreach (KeyValuePair<string, object?> P2 in MetaData)
+							{
+								if (!MetaDataValue.ContainsKey(P2.Key))
+									MetaDataValue[P2.Key] = P2.Value;
+							}
+						}
+
+						Value = MetaDataValue;
+					}
+				}
+
+				if (ParameterType == ExpectedType)
+					Arguments[i] = Value;
+				else if (Expression.TryConvert(Value, ExpectedType, out object Converted))
+					Arguments[i] = Converted;
+				else
+				{
+					Arguments = null;
+					Reason = "Parameter " + P.Key +
+						" has incorrect type: " + ParameterType.FullName +
+						", Expected: " + ExpectedType.FullName;
+					return false;
+				}
+
+				NrParametersSet++;
 			}
 
 			if (NrParametersSet != c - this.NrSpecialArguments)
@@ -162,7 +215,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				}
 			}
 
-			if (NrParametersSet != c - this.NrSpecialArguments)
+			if (NrParametersSet < c - this.NrSpecialArguments)
 			{
 				Reason = "Missing required parameters.";
 				Arguments = null;

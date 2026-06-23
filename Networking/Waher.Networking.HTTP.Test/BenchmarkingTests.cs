@@ -20,7 +20,7 @@ namespace Waher.Networking.HTTP.Test
 			return this.Cleanup();
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_Benchmark_01_100000_rfc7540.xml", false, false, false, false, 100000)]
 		[DataRow("HTTP_Benchmark_01_1000000_rfc7540.xml", false, false, false, false, 1000000)]
 		[DataRow("HTTP_Benchmark_01_10000000_rfc7540.xml", false, false, false, false, 10000000)]
@@ -147,7 +147,7 @@ namespace Waher.Networking.HTTP.Test
 			return DateTime.Now.Subtract(Start);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("HTTP_Benchmark_02_100000_rfc7540.xml", false, false, false, false, 100000)]
 		[DataRow("HTTP_Benchmark_02_1000000_rfc7540.xml", false, false, false, false, 1000000)]
 		[DataRow("HTTP_Benchmark_02_10000000_rfc7540.xml", false, false, false, false, 10000000)]

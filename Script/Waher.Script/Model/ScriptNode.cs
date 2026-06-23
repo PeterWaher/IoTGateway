@@ -440,13 +440,13 @@ namespace Waher.Script.Model
 		/// <returns>Finished result</returns>
 		public static async Task<object> WaitPossibleTask(object Result)
 		{
-			if (Result is Task Task)
-			{
-				await Task;
+			if (!(Result is Task Task))
+				return Result;
 
-				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
-				Result = PI?.GetMethod?.Invoke(Task, null);
-			}
+			await Task;
+
+			PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
+			Result = PI?.GetMethod?.Invoke(Task, null);
 
 			return Result;
 		}

@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Script;
 using Waher.Script.Model;
+using Waher.Script.Units.DerivedQuantities;
 
 namespace Waher.Networking.HTTP.JsonRpc
 {
@@ -96,13 +97,20 @@ namespace Waher.Networking.HTTP.JsonRpc
 								for (i = 0; i < c; i++)
 								{
 									object? Value = this.ParametersArray.GetValue(i);
-									Type ExpectedType = this.MethodInfo.Arguments[i].Parameter.ParameterType;
+									JsonRpcArgumentInfo ArgumentInfo = this.MethodInfo.Arguments[i];
+									Type ExpectedType = ArgumentInfo.Parameter.ParameterType;
 									Type ParameterType = Value?.GetType() ?? typeof(object);
 
 									if (ParameterType == ExpectedType)
 										Parameters[i] = Value;
 									else if (Expression.TryConvert(Value, ExpectedType, out object Converted))
 										Parameters[i] = Converted;
+									else if (ArgumentInfo.HasDefaultValue &&
+										Value is Dictionary<string, object?> Dictionary &&
+										Dictionary.Count == 0)
+									{
+										Parameters[i] = ArgumentInfo.DefaultValue;
+									}
 									else
 									{
 										this.SetError(-32602, "Parameter " + (i + 1).ToString() +

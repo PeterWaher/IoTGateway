@@ -6,7 +6,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 	/// <summary>
 	/// Provides meta-data about a date-valued parameter.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue, Inherited = true, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue |
+		AttributeTargets.Property | AttributeTargets.Field, 
+		Inherited = true, AllowMultiple = false)]
 	public class McpDateParameterAttribute : McpStringParameterAttribute
 	{
 		/// <summary>

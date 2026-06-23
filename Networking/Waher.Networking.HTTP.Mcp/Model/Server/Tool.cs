@@ -16,6 +16,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 	/// </summary>
 	public class Tool
 	{
+		private const string McpToolResultTitle = "Result";
+		private const string McpToolResultDescription = "Result returned after executing the tool.";
+
 		private readonly JsonRpcMethodInfo methodInfo;
 		private Icons? icons = null;
 
@@ -196,7 +199,8 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 				IEnumerable<McpEnumValueAttribute>? EnumValues = this.Method.ReturnType.IsEnum ?
 					this.Method.ReturnParameter.GetCustomAttributes<McpEnumValueAttribute>(true) : null;
 
-				Result.Add("outputSchema", GenerateSchema(this.Method.ReturnType, false, null, ReturnInfo, EnumValues));
+				Result.Add("outputSchema", GenerateOutputSchema(this.Method.ReturnType,
+					ReturnInfo, EnumValues));
 			}
 
 			if ((this.MetaData?.Length ?? 0) > 0)
@@ -225,15 +229,24 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 
 			foreach (ParameterInfo Parameter in Parameters)
 			{
+				Type ParameterType = Parameter.ParameterType;
+
+				if (ParameterType == typeof(HttpRequest) ||
+					ParameterType == typeof(HttpResponse))
+				{
+					continue;
+				}
+
 				if (!Parameter.IsOptional && !Parameter.HasDefaultValue)
 					Required.Add(Parameter.Name);
 
 				McpParameterAttribute ParameterInfo = Parameter.GetCustomAttribute<McpParameterAttribute>(true);
-				IEnumerable<McpEnumValueAttribute>? EnumValues = Parameter.ParameterType.IsEnum ?
+				IEnumerable<McpEnumValueAttribute>? EnumValues = ParameterType.IsEnum ?
 					Parameter.GetCustomAttributes<McpEnumValueAttribute>(true) : null;
 
-				Properties[Parameter.Name] = GenerateSchema(Parameter.ParameterType,
-					Parameter.HasDefaultValue, Parameter.DefaultValue, ParameterInfo, EnumValues);
+				Properties[Parameter.Name] = GenerateSchema(ParameterType,
+					Parameter.HasDefaultValue, Parameter.DefaultValue, ParameterInfo,
+					EnumValues);
 			}
 
 			Dictionary<string, object> Result = new Dictionary<string, object>()
@@ -242,6 +255,25 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 				{ "properties", Properties },
 				{ "required", Required.ToArray() }
 			};
+
+			return Result;
+		}
+
+		private static Dictionary<string, object?> GenerateOutputSchema(Type ReturnType,
+			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute>? EnumValues)
+		{
+			Dictionary<string, object?> Result = new Dictionary<string, object?>()
+			{
+				{ "type", "object" },
+				{ "result", GenerateSchema(ReturnType, false, null, ParameterInfo, EnumValues) },
+				{ "title", McpToolResultTitle },
+				{ "description", McpToolResultDescription },
+			};
+
+			if (ReturnType == typeof(void))
+				Result["required"] = Array.Empty<string>();
+			else
+				Result["required"] = new string[] { "result" };
 
 			return Result;
 		}
@@ -337,7 +369,44 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 							//Result["additionalProperties"] = true;// new Dictionary<string, object>();
 						}
 						else
+						{
+							if (T.IsGenericType)
+							{
+								Type GenericType = T.GetGenericTypeDefinition();
+
+								if (GenericType == typeof(Nullable<>) ||
+									GenericType == typeof(Task<>))
+								{
+									return GenerateSchema(T.GenericTypeArguments[0], true, Default,
+										ParameterInfo, EnumValues);
+								}
+							}
+
+							Dictionary<string, object?> Properties = new Dictionary<string, object?>();
+
 							Result["type"] = "object";
+							Result["properties"] = Properties;
+
+							foreach (FieldInfo FI in T.GetFields(BindingFlags.Public | BindingFlags.Instance))
+							{
+								Type FieldType = FI.FieldType;
+								McpParameterAttribute FieldInfo = FI.GetCustomAttribute<McpParameterAttribute>(true);
+								IEnumerable<McpEnumValueAttribute>? EnumValues2 = FieldType.IsEnum ?
+									FI.GetCustomAttributes<McpEnumValueAttribute>(true) : null;
+
+								Properties[FI.Name] = GenerateSchema(FieldType, false, null, FieldInfo, EnumValues2);
+							}
+
+							foreach (PropertyInfo PI in T.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+							{
+								Type PropertyType = PI.PropertyType;
+								McpParameterAttribute PropertyInfo = PI.GetCustomAttribute<McpParameterAttribute>(true);
+								IEnumerable<McpEnumValueAttribute>? EnumValues2 = PropertyType.IsEnum ?
+									PI.GetCustomAttributes<McpEnumValueAttribute>(true) : null;
+
+								Properties[PI.Name] = GenerateSchema(PropertyType, false, null, PropertyInfo, EnumValues2);
+							}
+						}
 						break;
 
 					case TypeCode.DBNull:
@@ -431,17 +500,29 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// Tries to build a request for the method, based on the provided named parameters.
 		/// </summary>
 		/// <param name="Parameters">Named parameters.</param>
+		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Response">HTTP Response object.</param>
 		/// <param name="MetaData">Additional Meta-Data available for the request.</param>
 		/// <param name="Reason">Reason for not being able to create request.</param>
 		/// <param name="Arguments">Ordered set of typed arguments, to be used in a
 		/// call to the method.</param>
 		/// <returns>If able to prepare a request to the method.</returns>
 		public bool TryBuildRequest(Dictionary<string, object?> Parameters,
+			HttpRequest Request, HttpResponse Response,
 			Dictionary<string, object?>? MetaData,
 			[NotNullWhen(false)] out string? Reason,
 			[NotNullWhen(true)] out object?[]? Arguments)
 		{
-			return this.methodInfo.TryBuildRequest(Parameters, MetaData, out Reason, out Arguments);
+			if (!this.methodInfo.TryBuildRequest(Parameters, MetaData, out Reason, out Arguments))
+				return false;
+
+			if (this.methodInfo.RequestArgument.HasValue)
+				Arguments[this.methodInfo.RequestArgument.Value] = Request;
+
+			if (this.methodInfo.ResponseArgument.HasValue)
+				Arguments[this.methodInfo.ResponseArgument.Value] = Response;
+
+			return true;
 		}
 
 	}

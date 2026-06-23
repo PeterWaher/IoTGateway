@@ -369,6 +369,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// Calls an MCP server tool.
 		/// </summary>
 		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
 		/// <param name="Name">Name of the tool to call.</param>
 		/// <param name="Arguments">Arguments for the tool.</param>
 		/// <param name="Task">If specified, the caller is requesting task-augmented 
@@ -381,8 +382,8 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <returns>Dictionary containing the result of the tool call.</returns>
 		[JsonRpcMethod]
 		protected async Task<Dictionary<string, object?>> Tools_Call(HttpRequest Request,
-			string Name, Dictionary<string, object?> Arguments, object? Task = null,
-			[JsonRpcMetaDataArgument] object? _Meta = null)
+			HttpResponse Response, string Name, Dictionary<string, object?> Arguments, 
+			object? Task = null, [JsonRpcMetaDataArgument] object? _Meta = null)
 		{
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
 			object? ToolResult;
@@ -394,8 +395,8 @@ namespace Waher.Networking.HTTP.Mcp
 
 				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 
-				if (Tool.TryBuildRequest(Arguments, MetaData, out string? Reason,
-					out object?[]? Arguments2))
+				if (Tool.TryBuildRequest(Arguments, Request, Response, MetaData, 
+					out string? Reason, out object?[]? Arguments2))
 				{
 					ToolResult = await ScriptNode.WaitPossibleTask(
 						Tool.Method.Invoke(this, Arguments2));

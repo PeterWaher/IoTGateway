@@ -5,7 +5,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 	/// <summary>
 	/// Provides a title to an enumeration value.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue, Inherited = true, AllowMultiple = true)]
+	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue |
+		AttributeTargets.Property | AttributeTargets.Field,
+		Inherited = true, AllowMultiple = true)]
 	public class McpEnumValueAttribute : Attribute
 	{
 		/// <summary>

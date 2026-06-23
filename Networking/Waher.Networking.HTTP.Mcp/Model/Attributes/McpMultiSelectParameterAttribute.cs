@@ -7,7 +7,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 	/// Provides meta-data about a multi-select parameter (Enumeration value with 
 	/// <see cref="FlagsAttribute"> defined.)
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue, Inherited = true, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue |
+		AttributeTargets.Property | AttributeTargets.Field, 
+		Inherited = true, AllowMultiple = false)]
 	public class McpMultiSelectParameterAttribute : McpParameterAttribute
 	{
 		/// <summary>

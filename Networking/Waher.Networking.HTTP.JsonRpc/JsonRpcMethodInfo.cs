@@ -189,6 +189,12 @@ namespace Waher.Networking.HTTP.JsonRpc
 					Arguments[i] = Value;
 				else if (Expression.TryConvert(Value, ExpectedType, out object Converted))
 					Arguments[i] = Converted;
+				else if (ArgumentInfo.HasDefaultValue &&
+					Value is Dictionary<string, object?> Dictionary &&
+					Dictionary.Count == 0)
+				{
+					Arguments[i] = ArgumentInfo.DefaultValue;
+				}
 				else
 				{
 					Arguments = null;

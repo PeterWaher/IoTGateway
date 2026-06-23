@@ -55,6 +55,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Graphs", "Scri
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Content", "Script\Waher.Script.Content\Waher.Script.Content.csproj", "{22039BEF-EA49-48B4-E202-643453D3DCD1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Events.Persistence", "Events\Waher.Events.Persistence\Waher.Events.Persistence.csproj", "{DD1905D3-4F51-5AAC-6C5C-531127D46623}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.Serialization.Compiled", "Persistence\Waher.Persistence.Serialization.Compiled\Waher.Persistence.Serialization.Compiled.csproj", "{E7073CEF-3C7C-A259-1F5A-026FA47D1469}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,6 +169,14 @@ Global
 		{22039BEF-EA49-48B4-E202-643453D3DCD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22039BEF-EA49-48B4-E202-643453D3DCD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22039BEF-EA49-48B4-E202-643453D3DCD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD1905D3-4F51-5AAC-6C5C-531127D46623}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD1905D3-4F51-5AAC-6C5C-531127D46623}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD1905D3-4F51-5AAC-6C5C-531127D46623}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD1905D3-4F51-5AAC-6C5C-531127D46623}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7073CEF-3C7C-A259-1F5A-026FA47D1469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7073CEF-3C7C-A259-1F5A-026FA47D1469}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7073CEF-3C7C-A259-1F5A-026FA47D1469}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7073CEF-3C7C-A259-1F5A-026FA47D1469}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

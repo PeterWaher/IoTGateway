@@ -1,10 +1,12 @@
 ﻿using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using Waher.Content;
 using Waher.Content.Images;
 using Waher.Content.Markdown;
 using Waher.Content.Markdown.Web;
 using Waher.Events;
 using Waher.Events.Console;
+using Waher.Events.Persistence;
 using Waher.Mcp.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Brotli;
@@ -12,6 +14,10 @@ using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp;
 using Waher.Networking.Sniffers;
+using Waher.Persistence;
+using Waher.Persistence.Files;
+using Waher.Persistence.Serialization;
+using Waher.Persistence.XmlLedger;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
@@ -86,6 +92,8 @@ internal class Program
 		X509Certificate2? Certificate = null;
 		HttpServer? WebServer = null;
 		ConsoleOutSniffer? Sniffer = null;
+		FilesProvider? filesProvider = null;
+		XmlFileLedger? ledger = null;
 		string s;
 		string? CertFileName = null;
 		string? CertPassword = null;
@@ -219,7 +227,29 @@ internal class Program
 				typeof(Graph).Assembly,
 				typeof(GraphEncoder).Assembly,
 				typeof(JsonRpcWebService).Assembly,
-				typeof(HttpMcpServerResource).Assembly);
+				typeof(HttpMcpServerResource).Assembly,
+				typeof(ObjectSerializer).Assembly,
+				typeof(FilesProvider).Assembly,
+				typeof(Database).Assembly,
+				typeof(XmlFileLedger).Assembly,
+				typeof(PersistedEventLog).Assembly);
+
+			filesProvider = FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true).Result;
+			Database.Register(filesProvider);
+
+			Log.Informational("Database initialized");
+
+			Log.Register(new PersistedEventLog(90));
+
+			Log.Informational("Persistent Event Log initialized");
+
+			ledger = new XmlFileLedger(Console.Out);
+			ledger.Start().Wait();
+
+			Ledger.Register(ledger);
+			Ledger.StartListeningToDatabaseEvents();
+
+			Log.Informational("Console Ledger initialized");
 
 			Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.PadWithSpaces);
 
@@ -283,6 +313,7 @@ internal class Program
 				"Test Server", "1.0.0", "This is a test server.", [], 
 				new Uri("https://example.org/"), "These are the instructions."));
 
+			Log.Informational("Web Server initialized.");
 			Log.Informational("Press CTRL+C to quit.");
 
 			Console.CancelKeyPress += (_, e) =>

@@ -13,8 +13,13 @@
     <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj" />
+    <ProjectReference Include="..\..\Events\Waher.Events.Persistence\Waher.Events.Persistence.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\..\Mcp\Waher.Mcp.Events\Waher.Mcp.Events.csproj" />
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj" />
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence.Serialization.Compiled\Waher.Persistence.Serialization.Compiled.csproj" />
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence.XmlLedger\Waher.Persistence.XmlLedger.csproj" />
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script.Content\Waher.Script.Content.csproj" />

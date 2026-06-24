@@ -25,12 +25,12 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// <summary>
 		/// Title of parameter.
 		/// </summary>
-		public string? Title { get; private set; }
+		public string? Title { get; }
 
 		/// <summary>
 		/// Description of parameter.
 		/// </summary>
-		public string? Description { get; private set; }
+		public string? Description { get; }
 
 		/// <summary>
 		/// Annotates a schema object with information in the attribute.

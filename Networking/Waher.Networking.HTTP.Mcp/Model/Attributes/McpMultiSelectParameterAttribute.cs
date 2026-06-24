@@ -43,12 +43,12 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// <summary>
 		/// Minimum number of items.
 		/// </summary>
-		public int? MinItems { get; private set; }
+		public int? MinItems { get; }
 
 		/// <summary>
 		/// Maximum number of items.
 		/// </summary>
-		public int? MaxItems { get; private set; }
+		public int? MaxItems { get; }
 
 		/// <summary>
 		/// Annotates a schema object with information in the attribute.

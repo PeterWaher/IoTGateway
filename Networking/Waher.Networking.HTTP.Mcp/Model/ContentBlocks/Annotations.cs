@@ -31,7 +31,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		///  
 		///  It can include multiple entries to indicate content useful for multiple audiences.
 		/// </summary>
-		public McpRole[]? Audience { get; private set; }
+		public McpRole[]? Audience { get; }
 
 		/// <summary>
 		/// Describes how important this data is for operating the server.
@@ -40,7 +40,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		/// effectively required, while 0 means "least important," and indicates that
 		/// the data is entirely optional.
 		/// </summary>
-		public double? Priority { get; private set; }
+		public double? Priority { get; }
 
 		/// <summary>
 		/// The moment the resource was last modified, as an ISO 8601 formatted string.
@@ -48,7 +48,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		/// Examples: last activity timestamp in an open file, timestamp when the resource
 		/// was attached, etc.
 		/// </summary>
-		public DateTime? LastModified { get; private set; }
+		public DateTime? LastModified { get; }
 
 		/// <summary>
 		/// Annotates an object.

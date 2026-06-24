@@ -278,7 +278,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// <summary>
 		/// A human-readable title for the tool.
 		/// </summary>
-		public string Title { get; private set; }
+		public string Title { get; }
 
 		/// <summary>
 		/// A human-readable description of the tool.
@@ -286,20 +286,20 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// This can be used by clients to improve the LLM's understanding of available tools. 
 		/// It can be thought of like a "hint" to the model.
 		/// </summary>
-		public string Description { get; private set; }
+		public string Description { get; }
 
 		/// <summary>
 		/// Name of method that returns an <see cref="Icon?"/>, an an <see cref="Icon[]?"/>
 		/// or an <see cref="Icons?"/> resource representing the tool. If null or empty, the 
 		/// icon of the MCP server will be used.
 		/// </summary>
-		public string IconsMethod { get; private set; }
+		public string IconsMethod { get; }
 
 		/// <summary>
 		/// If the tool can modify the environment. If false, the tool is expected to be 
 		/// read-only and not cause any side effects.
 		/// </summary>
-		public bool CanModifyEnvironment { get; private set; }
+		public bool CanModifyEnvironment { get; }
 
 		/// <summary>
 		/// If true, the tool may perform destructive updates to its environment.
@@ -308,7 +308,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// <remarks>
 		/// This property is meaningful only when <see cref="CanModifyEnvironment"/> is true.
 		/// </remarks>
-		public bool CanDestroyEnvironment { get; private set; }
+		public bool CanDestroyEnvironment { get; }
 
 		/// <summary>
 		/// If true, calling the tool repeatedly with the same arguments
@@ -317,17 +317,17 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// <remarks>
 		/// This property is meaningful only when <see cref="CanModifyEnvironment"/> is true.
 		/// </remarks>
-		public bool Idempotent { get; private set; }
+		public bool Idempotent { get; }
 
 		/// <summary>
 		/// If true, this tool may interact with an "open world" of external
 		/// entities.If false, the tool's domain of interaction is closed.
 		/// </summary>
-		public bool OpenWorldAccess { get; private set; }
+		public bool OpenWorldAccess { get; }
 
 		/// <summary>
 		/// Meta-data associated with tool.
 		/// </summary>
-		public KeyValuePair<string, object>[] MetaData { get; private set; }
+		public KeyValuePair<string, object>[] MetaData { get; }
 	}
 }

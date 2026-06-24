@@ -27,11 +27,11 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// <summary>
 		/// Enumeration value
 		/// </summary>
-		public Enum Value { get; private set; }
+		public Enum Value { get; }
 
 		/// <summary>
 		/// Title of enumeration value.
 		/// </summary>
-		public string? Title { get; private set; }
+		public string? Title { get; }
 	}
 }

@@ -30,7 +30,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		/// <summary>
 		/// 
 		/// </summary>
-		public Dictionary<string, object>? MetaData { get; private set; }
+		public Dictionary<string, object>? MetaData { get; }
 
 		/// <summary>
 		/// What types the content block encodes.

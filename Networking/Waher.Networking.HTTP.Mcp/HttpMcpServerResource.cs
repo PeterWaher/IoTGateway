@@ -137,37 +137,37 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Name of server.
 		/// </summary>
-		public string Name { get; private set; }
+		public string Name { get; }
 
 		/// <summary>
 		/// Title of server.
 		/// </summary>
-		public string Title { get; private set; }
+		public string Title { get; }
 
 		/// <summary>
 		/// Version of server.
 		/// </summary>
-		public string Version { get; private set; }
+		public string Version { get; }
 
 		/// <summary>
 		/// Description of server.
 		/// </summary>
-		public string Description { get; private set; }
+		public string Description { get; }
 
 		/// <summary>
 		/// Icons of server.
 		/// </summary>
-		public Icons Icons { get; private set; }
+		public Icons Icons { get; }
 
 		/// <summary>
 		/// Website URI of server.
 		/// </summary>
-		public Uri WebSiteUri { get; private set; }
+		public Uri WebSiteUri { get; }
 
 		/// <summary>
 		/// Instructions for server.
 		/// </summary>
-		public string Instructions { get; private set; }
+		public string Instructions { get; }
 
 		/// <summary>
 		/// Registers a MCP Server tool.

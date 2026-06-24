@@ -86,42 +86,42 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <summary>
 		/// Method information.
 		/// </summary>
-		public MethodInfo Method { get; private set; }
+		public MethodInfo Method { get; }
 
 		/// <summary>
 		/// Number of arguments
 		/// </summary>
-		public int NrArguments { get; private set; }
+		public int NrArguments { get; }
 
 		/// <summary>
 		/// Number of special arguments
 		/// </summary>
-		public int NrSpecialArguments { get; private set; }
+		public int NrSpecialArguments { get; }
 
 		/// <summary>
 		/// Named arguments
 		/// </summary>
-		public Dictionary<string, int> NamedArguments { get; private set; }
+		public Dictionary<string, int> NamedArguments { get; }
 
 		/// <summary>
 		/// Request argument index
 		/// </summary>
-		public int? RequestArgument { get; private set; }
+		public int? RequestArgument { get; }
 
 		/// <summary>
 		/// Response argument index
 		/// </summary>
-		public int? ResponseArgument { get; private set; }
+		public int? ResponseArgument { get; }
 
 		/// <summary>
 		/// Meta-data argument index
 		/// </summary>
-		public int? MetaDataArgument { get; private set; }
+		public int? MetaDataArgument { get; }
 
 		/// <summary>
 		/// Arguments
 		/// </summary>
-		public JsonRpcArgumentInfo[] Arguments { get; private set; }
+		public JsonRpcArgumentInfo[] Arguments { get; }
 
 		/// <summary>
 		/// Tries to build a request for the method, based on the provided named parameters.

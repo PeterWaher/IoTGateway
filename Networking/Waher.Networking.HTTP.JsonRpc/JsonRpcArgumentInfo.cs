@@ -28,26 +28,26 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <summary>
 		/// Parameter information.
 		/// </summary>
-		public ParameterInfo Parameter { get; private set; }
+		public ParameterInfo Parameter { get; }
 
 		/// <summary>
 		/// If the argument has a default value.
 		/// </summary>
-		public bool HasDefaultValue { get; private set; }
+		public bool HasDefaultValue { get; }
 
 		/// <summary>
 		/// Default value of argument, if defined.
 		/// </summary>
-		public object? DefaultValue { get; private set; }
+		public object? DefaultValue { get; }
 
 		/// <summary>
 		/// If the argument represents a special argument.
 		/// </summary>
-		public bool IsSpecialArgument { get; private set; }
+		public bool IsSpecialArgument { get; }
 
 		/// <summary>
 		/// If the argument represents a meta-data argument.
 		/// </summary>
-		public bool IsMetaDataArgument { get; private set; }
+		public bool IsMetaDataArgument { get; }
 	}
 }

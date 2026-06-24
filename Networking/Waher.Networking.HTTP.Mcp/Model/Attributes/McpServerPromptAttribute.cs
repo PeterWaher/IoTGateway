@@ -197,23 +197,23 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// <summary>
 		/// A human-readable title for the prompt.
 		/// </summary>
-		public string Title { get; private set; }
+		public string Title { get; }
 
 		/// <summary>
 		/// A human-readable description of the prompt.
 		/// </summary>
-		public string Description { get; private set; }
+		public string Description { get; }
 
 		/// <summary>
 		/// Name of method that returns an <see cref="Icon?"/>, an an <see cref="Icon[]?"/>
 		/// or an <see cref="Icons?"/> resource representing the prompt. If null or empty, the 
 		/// icon of the MCP server will be used.
 		/// </summary>
-		public string IconsMethod { get; private set; }
+		public string IconsMethod { get; }
 
 		/// <summary>
 		/// Meta-data associated with prompt.
 		/// </summary>
-		public KeyValuePair<string, object>[] MetaData { get; private set; }
+		public KeyValuePair<string, object>[] MetaData { get; }
 	}
 }

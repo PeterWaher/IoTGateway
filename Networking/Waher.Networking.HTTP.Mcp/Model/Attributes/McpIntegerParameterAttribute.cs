@@ -69,12 +69,12 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// <summary>
 		/// Minimum value of integer.
 		/// </summary>
-		public object? MinValue { get; private set; }
+		public object? MinValue { get; }
 
 		/// <summary>
 		/// Maximum value of integer.
 		/// </summary>
-		public object? MaxValue { get; private set; }
+		public object? MaxValue { get; }
 
 		/// <summary>
 		/// Annotates a schema object with information in the attribute.

@@ -55,12 +55,12 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// <summary>
 		/// Minimum length of string.
 		/// </summary>
-		public int? MinLength { get; private set; }
+		public int? MinLength { get; }
 
 		/// <summary>
 		/// Maximum length of string.
 		/// </summary>
-		public int? MaxLength { get; private set; }
+		public int? MaxLength { get; }
 
 		/// <summary>
 		/// Annotates a schema object with information in the attribute.

@@ -500,26 +500,43 @@ namespace Waher.Mcp.Events
 				From = Temp;
 			}
 
-			bool AllTypes =
-				(!Debug.HasValue || Debug.Value) &&
-				(!Informational.HasValue || Informational.Value) &&
-				(!Notice.HasValue || Notice.Value) &&
-				(!Warning.HasValue || Warning.Value) &&
-				(!Error.HasValue || Error.Value) &&
-				(!Critical.HasValue || Critical.Value) &&
-				(!Alert.HasValue || Alert.Value) &&
-				(!Emergency.HasValue || Emergency.Value);
+			bool TypesNotSpecified =
+				!Debug.HasValue &&
+				!Informational.HasValue &&
+				!Notice.HasValue &&
+				!Warning.HasValue &&
+				!Error.HasValue &&
+				!Critical.HasValue &&
+				!Alert.HasValue &&
+				!Emergency.HasValue;
 
-			bool AllLevels =
-				(!Minor.HasValue || Minor.Value) &&
-				(!Medium.HasValue || Medium.Value) &&
-				(!Major.HasValue || Major.Value);
+			bool AllTypes = TypesNotSpecified || (
+				Debug.HasValue && Debug.Value &&
+				Informational.HasValue && Informational.Value &&
+				Notice.HasValue && Notice.Value &&
+				Warning.HasValue && Warning.Value &&
+				Error.HasValue && Error.Value &&
+				Critical.HasValue && Critical.Value &&
+				Alert.HasValue && Alert.Value &&
+				Emergency.HasValue && Emergency.Value);
 
-			ChunkedList<KeyValuePair<string, object>> Tags = new ChunkedList<KeyValuePair<string, object>>()
-					{
-						new KeyValuePair<string, object>("From", From.ToString()),
-						new KeyValuePair<string, object>("To", To.ToString()),
-					};
+			bool LevelsNotSpecified =
+				!Minor.HasValue &&
+				!Medium.HasValue &&
+				!Major.HasValue;
+
+			bool AllLevels = LevelsNotSpecified || (
+				Minor.HasValue && Minor.Value &&
+				Medium.HasValue && Medium.Value &&
+				Major.HasValue && Major.Value);
+
+			ChunkedList<KeyValuePair<string, object>> Tags = new ChunkedList<KeyValuePair<string, object>>();
+
+			if (From.HasValue)
+				Tags.Add(new KeyValuePair<string, object>("From", From.Value));
+
+			if (To.HasValue)
+				Tags.Add(new KeyValuePair<string, object>("To", To.Value));
 
 			if (!string.IsNullOrEmpty(Object))
 				Tags.Add(new KeyValuePair<string, object>("Object", Object));
@@ -623,7 +640,7 @@ namespace Waher.Mcp.Events
 
 			if (!string.IsNullOrEmpty(Message))
 			{
-				Filters.Add(new FilterCustom<PersistedEvent>(e => 
+				Filters.Add(new FilterCustom<PersistedEvent>(e =>
 					e.Message.Contains(Message, StringComparison.CurrentCultureIgnoreCase)));
 			}
 

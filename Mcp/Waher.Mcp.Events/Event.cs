@@ -16,6 +16,7 @@ namespace Waher.Mcp.Events
 		/// <param name="Event">Persisted event.</param>
 		public Event(PersistedEvent Event)
 		{
+			this.ObjectId = Event.ObjectId.ToString();
 			this.Timestamp = Event.Timestamp;
 			this.Type = Event.Type;
 			this.Level = Event.Level;
@@ -33,6 +34,9 @@ namespace Waher.Mcp.Events
 			for (i = 0; i < c; i++)
 				this.Tags[i] = new Tag(Event.Tags![i]);
 		}
+
+		[McpStringParameter("Object ID", "ID of event object in persistent storage.")]
+		public string ObjectId { get; }
 
 		[McpDateTimeParameter("Timestamp", "Timestamp of event, in UTC.")]
 		public DateTime Timestamp { get; }

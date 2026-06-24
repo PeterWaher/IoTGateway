@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.TypeConversion
@@ -11,35 +12,35 @@ namespace Waher.Script.TypeConversion
 		/// <summary>
 		/// Converter converts objects of this type.
 		/// </summary>
-		Type From
-		{
-			get;
-		}
+		Type From { get; }
 
 		/// <summary>
 		/// Converter converts objects to this type.
 		/// </summary>
-		Type To
-		{
-			get;
-		}
+		Type To { get; }
+
+		/// <summary>
+		/// Weight of the converter. An estimate of how well the converter performs, or
+		/// how much information is retained in the conversion. 1 = lossless conversion,
+		/// 0 = information lost.
+		/// </summary>
+		double Weight { get; }
 
 		/// <summary>
 		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="To"/>.
 		/// </summary>
 		/// <param name="Value">Object to be converted.</param>
-		/// <returns>Object of type <see cref="To"/>. If conversion not possible, null is returned.</returns>
-		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
-		object Convert(object Value);
+		/// <param name="Result">Converted object value.</param>
+		/// <returns>If conversion was possible.</returns>
+		bool TryConvert(object Value, out object Result);
 
 		/// <summary>
 		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="To"/>, encapsulated in an
 		/// <see cref="IElement"/>.
 		/// </summary>
 		/// <param name="Value">Object to be converted.</param>
-		/// <returns>Object of type <see cref="To"/>, encapsulated in an <see cref="IElement"/>.
-		/// If conversion not possible, null is returned.</returns>
-		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
-		IElement ConvertToElement(object Value);
+		/// <param name="Result">Converted object value.</param>
+		/// <returns>If conversion was possible.</returns>
+		bool TryConvertToElement(object Value, out IElement Result);
 	}
 }

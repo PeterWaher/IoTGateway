@@ -26,20 +26,33 @@ namespace Waher.Things.TypeConverters
 		/// <summary>
 		/// Converter converts objects to this type.
 		/// </summary>
-		public Type To => typeof(Int32);
+		public Type To => typeof(int);
+
+		/// <summary>
+		/// Weight of the converter. An estimate of how well the converter performs, or
+		/// how much information is retained in the conversion. 1 = lossless conversion,
+		/// 0 = information lost.
+		/// </summary>
+		public double Weight => 0.5;
 
 		/// <summary>
 		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="To"/>.
 		/// </summary>
 		/// <param name="Value">Object to be converted.</param>
-		/// <returns>Object of type <see cref="To"/>.</returns>
-		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
-		public object Convert(object Value)
+		/// <param name="Result">Converted object value.</param>
+		/// <returns>If conversion was possible.</returns>
+		public bool TryConvert(object Value, out object Result)
 		{
 			if (Value is Int32Field Field)
-				return Field.Value;
+			{
+				Result = Field.Value;
+				return true;
+			}
 			else
-				throw new ArgumentException("Not a Int32Field.", nameof(Value));
+			{
+				Result = null;
+				return false;
+			}
 		}
 
 		/// <summary>
@@ -47,14 +60,20 @@ namespace Waher.Things.TypeConverters
 		/// <see cref="IElement"/>.
 		/// </summary>
 		/// <param name="Value">Object to be converted.</param>
-		/// <returns>Object of type <see cref="To"/>, encapsulated in an <see cref="IElement"/>.</returns>
-		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
-		public IElement ConvertToElement(object Value)
+		/// <param name="Result">Converted object value.</param>
+		/// <returns>If conversion was possible.</returns>
+		public bool TryConvertToElement(object Value, out IElement Result)
 		{
 			if (Value is Int32Field Field)
-				return new ObjectValue(Field.Value);
+			{
+				Result = new ObjectValue(Field.Value);
+				return true;
+			}
 			else
-				throw new ArgumentException("Not a Int32Field.", nameof(Value));
+			{
+				Result = null;
+				return false;
+			}
 		}
 	}
 }

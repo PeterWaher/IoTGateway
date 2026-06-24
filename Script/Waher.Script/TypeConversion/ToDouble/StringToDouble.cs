@@ -20,17 +20,30 @@ namespace Waher.Script.TypeConversion.ToDouble
 		public Type To => typeof(double);
 
 		/// <summary>
+		/// Weight of the converter. An estimate of how well the converter performs, or
+		/// how much information is retained in the conversion. 1 = lossless conversion,
+		/// 0 = information lost.
+		/// </summary>
+		public double Weight => 0.9;
+
+		/// <summary>
 		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="To"/>.
 		/// </summary>
 		/// <param name="Value">Object to be converted.</param>
-		/// <returns>Object of type <see cref="To"/>.</returns>
-		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
-		public object Convert(object Value)
+		/// <param name="Result">Converted object value.</param>
+		/// <returns>If conversion was possible.</returns>
+		public bool TryConvert(object Value, out object Result)
 		{
 			if (Value is string s && Expression.TryParse(s, out double d))
-				return d;
+			{
+				Result = d;
+				return true;
+			}
 			else
-				throw new ArgumentException("Expected double-precision floating-point value.", nameof(Value));
+			{
+				Result = null;
+				return false;
+			}
 		}
 
 		/// <summary>
@@ -38,14 +51,20 @@ namespace Waher.Script.TypeConversion.ToDouble
 		/// <see cref="IElement"/>.
 		/// </summary>
 		/// <param name="Value">Object to be converted.</param>
-		/// <returns>Object of type <see cref="To"/>, encapsulated in an <see cref="IElement"/>.</returns>
-		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
-		public IElement ConvertToElement(object Value)
+		/// <param name="Result">Converted object value.</param>
+		/// <returns>If conversion was possible.</returns>
+		public bool TryConvertToElement(object Value, out IElement Result)
 		{
 			if (Value is string s && Expression.TryParse(s, out double d))
-				return new DoubleNumber(d);
+			{
+				Result = new DoubleNumber(d);
+				return true;
+			}
 			else
-				throw new ArgumentException("Expected double-precision floating-point value.", nameof(Value));
+			{
+				Result = null;
+				return false;
+			}
 		}
 	}
 }

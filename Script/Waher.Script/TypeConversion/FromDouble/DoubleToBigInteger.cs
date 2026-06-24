@@ -21,23 +21,30 @@ namespace Waher.Script.TypeConversion.FromDouble
 		public Type To => typeof(BigInteger);
 
 		/// <summary>
+		/// Weight of the converter. An estimate of how well the converter performs, or
+		/// how much information is retained in the conversion. 1 = lossless conversion,
+		/// 0 = information lost.
+		/// </summary>
+		public double Weight => 0.5;
+
+		/// <summary>
 		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="To"/>.
 		/// </summary>
 		/// <param name="Value">Object to be converted.</param>
-		/// <returns>Object of type <see cref="To"/>.</returns>
-		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
-		public object Convert(object Value)
+		/// <param name="Result">Converted object value.</param>
+		/// <returns>If conversion was possible.</returns>
+		public bool TryConvert(object Value, out object Result)
 		{
-			if (Value is double d)
+			if (Value is double d && Math.Round(d) == d)
 			{
-				BigInteger i = (BigInteger)d;
-				if ((double)i == d)
-					return i;
-				else
-					return null;
+				Result = (BigInteger)d;
+				return true;
 			}
 			else
-				throw new ArgumentException("Expected BigInteger value.", nameof(Value));
+			{
+				Result = null;
+				return false;
+			}
 		}
 
 		/// <summary>
@@ -45,20 +52,20 @@ namespace Waher.Script.TypeConversion.FromDouble
 		/// <see cref="IElement"/>.
 		/// </summary>
 		/// <param name="Value">Object to be converted.</param>
-		/// <returns>Object of type <see cref="To"/>, encapsulated in an <see cref="IElement"/>.</returns>
-		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
-		public IElement ConvertToElement(object Value)
+		/// <param name="Result">Converted object value.</param>
+		/// <returns>If conversion was possible.</returns>
+		public bool TryConvertToElement(object Value, out IElement Result)
 		{
-			if (Value is double d)
+			if (Value is double d && Math.Round(d) == d)
 			{
-				BigInteger i = (BigInteger)d;
-				if ((double)i == d)
-					return new Integer(i);
-				else
-					return null;
+				Result = new Integer((BigInteger)d);
+				return true;
 			}
 			else
-				throw new ArgumentException("Expected double value.", nameof(Value));
+			{
+				Result = null;
+				return false;
+			}
 		}
 	}
 }

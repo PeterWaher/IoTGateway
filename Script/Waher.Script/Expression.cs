@@ -5516,10 +5516,10 @@ namespace Waher.Script
 				return true;
 			}
 
-			if (TryGetTypeConverter(T, DesiredType, out ITypeConverter Converter))
+			if (TryGetTypeConverter(T, DesiredType, out ITypeConverter Converter) &&
+				Converter.TryConvert(Value, out Result))
 			{
-				Result = Converter.Convert(Value);
-				return !(Result is null) || (Value is null);
+				return true;
 			}
 
 			if (DesiredType.IsEnum)
@@ -5683,10 +5683,10 @@ namespace Waher.Script
 
 			Type T = Obj.GetType();
 
-			if (TryGetTypeConverter(T, DesiredType, out ITypeConverter Converter))
+			if (TryGetTypeConverter(T, DesiredType, out ITypeConverter Converter) &&
+				Converter.TryConvertToElement(Obj, out Result))
 			{
-				Result = Converter.ConvertToElement(Obj);
-				return !(Result is null);
+				return true;
 			}
 			else
 			{
@@ -5728,15 +5728,18 @@ namespace Waher.Script
 				if (Converters.TryGetValue(To, out Converter))
 					return !(Converter is null);
 
-				Dictionary<Type, bool> Explored = new Dictionary<Type, bool>() { { From, true } };
+				Dictionary<Type, double> Explored = new Dictionary<Type, double>() { { From, 1.0 } };
 				ChunkedList<ITypeConverter> Search = new ChunkedList<ITypeConverter>();
+				ITypeConverter Best = null;
+				double BestWeight = 0;
+				double Weight;
 
 				foreach (ITypeConverter Converter3 in Converters.Values)
 				{
 					if (!(Converter3 is null))
 					{
 						Search.Add(Converter3);
-						Explored[Converter3.To] = true;
+						Explored[Converter3.To] = Converter3.Weight;
 					}
 				}
 
@@ -5744,9 +5747,11 @@ namespace Waher.Script
 				{
 					ITypeConverter C = Search.RemoveFirst();
 
-					if (converters.TryGetValue(C.To, out Dictionary<Type, ITypeConverter> Converters2) && !(Converters2 is null))
+					if (converters.TryGetValue(C.To, out Dictionary<Type, ITypeConverter> Converters2) &&
+						!(Converters2 is null))
 					{
-						if (Converters2.TryGetValue(To, out ITypeConverter Converter2) && !(Converter2 is null))
+						if (Converters2.TryGetValue(To, out ITypeConverter Converter2) &&
+							!(Converter2 is null))
 						{
 							ConversionSequence ConversionSequence;
 
@@ -5762,27 +5767,46 @@ namespace Waher.Script
 							else
 								ConversionSequence = new ConversionSequence(C, Converter2);
 
-							Converters[To] = ConversionSequence;
-							return true;
+							Weight = ConversionSequence.Weight;
+
+							if (!Converters.TryGetValue(To, out ITypeConverter Converter3) ||
+								Weight > Converter3.Weight)
+							{
+								Converters[To] = ConversionSequence;
+							}
+
+							if (Weight == 1)
+							{
+								Converter = ConversionSequence;
+								return true;
+							}
+							else if (Weight > BestWeight)
+							{
+								Best = ConversionSequence;
+								BestWeight = Weight;
+							}
 						}
 
 						foreach (ITypeConverter Converter3 in Converters2.Values)
 						{
 							if (!(Converter3 is null))
 							{
-								if (!Explored.ContainsKey(Converter3.To))
+								Weight = C.Weight * Converter3.Weight;
+
+								if (!Explored.TryGetValue(Converter3.To, out double Weight2) ||
+									Weight > Weight2)
 								{
 									Search.Add(Converter3);
-									Explored[Converter3.To] = true;
+									Explored[Converter3.To] = Weight;
 								}
 							}
 						}
 					}
 				}
 
-				Converters[To] = null;
-				Converter = null;
-				return false;
+				Converters[To] = Best;
+				Converter = Best;
+				return !(Best is null);
 			}
 		}
 

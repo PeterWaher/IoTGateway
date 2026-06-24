@@ -8,6 +8,7 @@ using Waher.Content.Images;
 using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp.Model;
+using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Networking.HTTP.Mcp.Model.Client;
 using Waher.Networking.HTTP.Mcp.Model.ContentBlocks;
 using Waher.Networking.HTTP.Mcp.Model.Server;

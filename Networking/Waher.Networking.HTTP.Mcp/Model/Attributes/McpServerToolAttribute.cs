@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Waher.Networking.HTTP.Mcp.Model;
 
-namespace Waher.Networking.HTTP.Mcp
+namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 {
 	/// <summary>
 	/// Defines a method in an <see cref="HttpMcpServerResource"/> implementation as a

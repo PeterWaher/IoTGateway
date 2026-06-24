@@ -7,7 +7,6 @@ using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Persistence;
 using Waher.Runtime.Collections;
-using Waher.Script.Functions.Runtime;
 using Waher.Script.Model;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Server

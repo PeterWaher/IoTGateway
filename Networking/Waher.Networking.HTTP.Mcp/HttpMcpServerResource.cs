@@ -21,7 +21,7 @@ namespace Waher.Networking.HTTP.Mcp
 	/// </summary>
 	public abstract class HttpMcpServerResource : JsonRpcWebService
 	{
-		private static readonly TextContent defaultTextEncoder = new TextContent();
+		private static readonly ObjectContent defaultObjectEncoder = new ObjectContent();
 		private static Dictionary<Type, IContentBlock> contentBlocks = GetContentBlocksFirstTime();
 		private const int PageSize = 20;
 		private readonly Dictionary<string, Tool> tools = new Dictionary<string, Tool>();
@@ -382,7 +382,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <returns>Dictionary containing the result of the tool call.</returns>
 		[JsonRpcMethod]
 		protected async Task<Dictionary<string, object?>> Tools_Call(HttpRequest Request,
-			HttpResponse Response, string Name, Dictionary<string, object?> Arguments, 
+			HttpResponse Response, string Name, Dictionary<string, object?> Arguments,
 			object? Task = null, [JsonRpcMetaDataArgument] object? _Meta = null)
 		{
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
@@ -395,7 +395,7 @@ namespace Waher.Networking.HTTP.Mcp
 
 				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 
-				if (Tool.TryBuildRequest(Arguments, Request, Response, MetaData, 
+				if (Tool.TryBuildRequest(Arguments, Request, Response, MetaData,
 					out string? Reason, out object?[]? Arguments2))
 				{
 					ToolResult = await ScriptNode.WaitPossibleTask(
@@ -418,14 +418,28 @@ namespace Waher.Networking.HTTP.Mcp
 			else if (ToolResult is Dictionary<string, object?> StructuredContent)
 			{
 				Result["content"] = Array.Empty<object>();
-				Result["structuredContent"] = StructuredContent;
+				Result["structuredContent"] = new Dictionary<string, object?>()
+				{
+					{ "result", StructuredContent }
+				};
 			}
 			else
 			{
 				Type T = ToolResult.GetType();
 
 				if (contentBlocks.TryGetValue(T, out IContentBlock Encoder))
-					Result["content"] = new object[] { await Encoder.Encode(ToolResult) };
+				{
+					if (Encoder.IsStructuredContent)
+					{
+						Result["content"] = Array.Empty<object>();
+						Result["structuredContent"] = new Dictionary<string, object?>()
+						{
+							{ "result", await Encoder.Encode(ToolResult) }
+						};
+					}
+					else
+						Result["content"] = new object[] { await Encoder.Encode(ToolResult) };
+				}
 				else if (T.IsArray && ToolResult is IEnumerable Enumerable)
 				{
 					ChunkedList<object> Content = new ChunkedList<object>();
@@ -441,24 +455,17 @@ namespace Waher.Networking.HTTP.Mcp
 						if (contentBlocks.TryGetValue(T2, out IContentBlock Encoder2))
 							Content.Add(await Encoder2.Encode(Item));
 						else
-						{
-							Log.Warning("No content block encoder found for type: " + T2.FullName,
-								this.ResourceName, Request.User?.UserName ?? Request.RemoteEndPoint);
-
-							Content.Add(await defaultTextEncoder.Encode(Item.ToString()));
-						}
+							Content.Add(await defaultObjectEncoder.Encode(Item));
 					}
 
 					Result["content"] = Content.ToArray();
 				}
 				else
 				{
-					Log.Warning("No content block encoder found for type: " + T.FullName,
-						this.ResourceName, Request.User?.UserName ?? Request.RemoteEndPoint);
-
-					Result["content"] = new object[]
+					Result["content"] = Array.Empty<object>();
+					Result["structuredContent"] = new Dictionary<string, object?>()
 					{
-						await defaultTextEncoder.Encode(ToolResult.ToString())
+						{ "result", await defaultObjectEncoder.Encode(ToolResult) }
 					};
 				}
 			}

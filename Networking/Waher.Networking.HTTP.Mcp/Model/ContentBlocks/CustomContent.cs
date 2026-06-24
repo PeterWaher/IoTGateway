@@ -38,6 +38,11 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		};
 
 		/// <summary>
+		/// If the content block is encoded as structured content.
+		/// </summary>
+		public override bool IsStructuredContent => false;
+
+		/// <summary>
 		/// Encodes a content block, given the content to encode and available
 		/// annotations and meta-data.
 		/// </summary>

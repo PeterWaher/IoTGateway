@@ -15,6 +15,11 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		public abstract Type[] Encodes { get; }
 
 		/// <summary>
+		/// If the content block is encoded as structured content.
+		/// </summary>
+		public bool IsStructuredContent { get; }
+
+		/// <summary>
 		/// Encodes a content block, given the content to encode and available
 		/// annotations and meta-data.
 		/// </summary>

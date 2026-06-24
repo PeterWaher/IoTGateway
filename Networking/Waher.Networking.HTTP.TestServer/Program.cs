@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Images;
 using Waher.Content.Markdown;
@@ -87,7 +88,7 @@ internal class Program
 	/// h2spec.exe generic -h 127.0.0.1 -p 8081 -P /Hello.md --strict
 	/// </example>
 	/// <param name="args">Command-line arguments.</param>
-	private static void Main(string[] args)
+	private static async Task Main(string[] args)
 	{
 		X509Certificate2? Certificate = null;
 		HttpServer? WebServer = null;
@@ -237,6 +238,8 @@ internal class Program
 			filesProvider = FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true).Result;
 			Database.Register(filesProvider);
 
+			filesProvider.RepairIfInproperShutdown(null).Wait();
+
 			Log.Informational("Database initialized");
 
 			Log.Register(new PersistedEventLog(90));
@@ -332,6 +335,9 @@ internal class Program
 		finally
 		{
 			Log.Informational("Shutting down.");
+			Log.TerminateAsync().Wait();
+
+			filesProvider?.DisposeAsync().Wait();
 
 			WebServer?.DisposeAsync().Wait();
 			Sniffer?.DisposeAsync().Wait();

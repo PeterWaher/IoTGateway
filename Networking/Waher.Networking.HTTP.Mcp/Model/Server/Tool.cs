@@ -57,6 +57,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			this.Idempotent = Idempotent;
 			this.OpenWorldAccess = OpenWorldAccess;
 			this.MetaData = MetaData;
+			this.HasReturnValue = Method.ReturnType != typeof(void);
 
 			this.methodInfo = new JsonRpcMethodInfo(Method, false);
 		}
@@ -120,6 +121,11 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// Meta-data associated with tool.
 		/// </summary>
 		public KeyValuePair<string, object>[] MetaData { get; private set; }
+
+		/// <summary>
+		/// If the tool returns a value.
+		/// </summary>
+		public bool HasReturnValue { get; private set; }
 
 		/// <summary>
 		/// Converts object to a generic representation.
@@ -193,7 +199,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			if (!this.icons.Empty)
 				Result.Add("icons", this.icons.ToJson());
 
-			if (this.Method.ReturnType != typeof(void))
+			if (this.HasReturnValue)
 			{
 				McpParameterAttribute ReturnInfo = this.Method.ReturnParameter.GetCustomAttribute<McpParameterAttribute>(true);
 				IEnumerable<McpEnumValueAttribute>? EnumValues = this.Method.ReturnType.IsEnum ?

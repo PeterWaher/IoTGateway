@@ -1,33 +1,21 @@
-﻿using SkiaSharp;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
-using Waher.Content;
-using Waher.Content.Images;
-using Waher.Script.Graphs;
+using Waher.Script.Model;
 
 namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 {
 	/// <summary>
-	/// Image Content Block
+	/// Object Content Block
 	/// </summary>
-	public class ImageContent : ContentBlock 
+	public class ObjectContent : ContentBlock 
 	{
 		/// <summary>
-		/// Image Content Block
+		/// Object Content Block
 		/// </summary>
-		public ImageContent()
+		public ObjectContent()
 			: base()
-		{
-		}
-
-		/// <summary>
-		/// Image Content Block
-		/// </summary>
-		public ImageContent(McpRole[]? Audience, double? Priority, DateTime? LastModified,
-			Dictionary<string, object>? MetaData)
-			: base(Audience, Priority, LastModified, MetaData)
 		{
 		}
 
@@ -36,16 +24,13 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		/// </summary>
 		public override Type[] Encodes => new Type[] 
 		{ 
-			typeof(SKImage),
-			typeof(SKBitmap),
-			typeof(Graph),
-			typeof(PixelInformation)
+			typeof(object)
 		};
 
 		/// <summary>
 		/// If the content block is encoded as structured content.
 		/// </summary>
-		public override bool IsStructuredContent => false;
+		public override bool IsStructuredContent => true;
 
 		/// <summary>
 		/// Encodes a content block, given the content to encode and available
@@ -55,19 +40,22 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		/// <returns>MCP-encoded content block.</returns>
 		public override async Task<Dictionary<string, object?>> Encode(object Content)
 		{
-			ContentResponse Encoded = await InternetContent.EncodeAsync(Content, 
-				Encoding.UTF8, ImageCodec.ImageContentTypes);
-
-			Encoded.AssertOk();
-
+			Dictionary<string, object?> Properties = new Dictionary<string, object?>();
 			Dictionary<string, object?> Result = new Dictionary<string, object?>()
 			{
-				{ "type", "image" },
-				{ "data", Convert.ToBase64String(Encoded.Encoded) },
-				{ "mimeType", Encoded.ContentType }
+				{ "type", "object" },
+				{ "properties", Properties }
 			};
 
 			this.Annotate(Result);
+
+			Type T = Content?.GetType() ?? typeof(object);
+
+			foreach (FieldInfo FI in T.GetFields(BindingFlags.Public | BindingFlags.Instance))
+				Properties[FI.Name] = await ScriptNode.WaitPossibleTask(FI.GetValue(Content));
+
+			foreach (PropertyInfo PI in T.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+				Properties[PI.Name] = await ScriptNode.WaitPossibleTask(PI.GetValue(Content));
 
 			return Result;
 		}

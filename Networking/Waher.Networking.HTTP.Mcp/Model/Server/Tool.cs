@@ -134,42 +134,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <returns>Generic representation.</returns>
 		public async Task<Dictionary<string, object>> ToJson(HttpMcpServerResource Resource)
 		{
-			if (this.icons is null)
-			{
-				if (string.IsNullOrEmpty(this.IconsMethod))
-					this.icons = new Icons();
-				else
-				{
-					MethodInfo? MI = Resource.GetType().GetMethod(this.IconsMethod,
-						BindingFlags.Static | BindingFlags.Instance |
-						BindingFlags.Public | BindingFlags.NonPublic);
-
-					if (MI is null)
-						this.icons = new Icons();
-					else
-					{
-						object? Obj = await ScriptNode.WaitPossibleTask(MI.Invoke(Resource, null));
-
-						if (Obj is Icons Typed)
-							this.icons = Typed;
-						else if (Obj is Icon[] IconArray)
-							this.icons = new Icons(IconArray);
-						else if (Obj is Icon SingleIcon)
-							this.icons = new Icons(SingleIcon);
-						else if (Obj is null)
-							this.icons = new Icons();
-						else
-						{
-							throw new ArgumentException("Method " + this.IconsMethod +
-								"returned an invalid type: " + Obj.GetType().FullName,
-								nameof(this.IconsMethod));
-						}
-					}
-				}
-
-				if (this.icons.Empty)
-					this.icons = Resource.Icons;
-			}
+			this.icons ??= await GetIcons(Resource, this.IconsMethod);
 
 			Dictionary<string, object> Annotations = new Dictionary<string, object>()
 			{
@@ -220,6 +185,47 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			}
 
 			return Result;
+		}
+
+		internal static async Task<Icons> GetIcons(HttpMcpServerResource Resource, string IconsMethod)
+		{
+			Icons Icons;
+
+			if (string.IsNullOrEmpty(IconsMethod))
+				Icons = new Icons();
+			else
+			{
+				MethodInfo? MI = Resource.GetType().GetMethod(IconsMethod,
+					BindingFlags.Static | BindingFlags.Instance |
+					BindingFlags.Public | BindingFlags.NonPublic);
+
+				if (MI is null)
+					Icons = new Icons();
+				else
+				{
+					object? Obj = await ScriptNode.WaitPossibleTask(MI.Invoke(Resource, null));
+
+					if (Obj is Icons Typed)
+						Icons = Typed;
+					else if (Obj is Icon[] IconArray)
+						Icons = new Icons(IconArray);
+					else if (Obj is Icon SingleIcon)
+						Icons = new Icons(SingleIcon);
+					else if (Obj is null)
+						Icons = new Icons();
+					else
+					{
+						throw new ArgumentException("Method " + IconsMethod +
+							"returned an invalid type: " + Obj.GetType().FullName,
+							nameof(IconsMethod));
+					}
+				}
+			}
+
+			if (Icons.Empty)
+				Icons = Resource.Icons;
+
+			return Icons;
 		}
 
 		/// <summary>

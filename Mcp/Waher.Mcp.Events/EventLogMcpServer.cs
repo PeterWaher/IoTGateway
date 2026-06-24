@@ -682,5 +682,14 @@ namespace Waher.Mcp.Events
 				Filters.Add(new FilterFieldEqualTo(ParameterName, EnumValue));
 		}
 
+		[McpServerPrompt(
+			"Find Credentials",		// Title
+			"Search for events in the event log containing credentials that should never have been logged.",
+			"")]					// IconsMethod, use default icons
+		public void FindCredentials(
+			[McpDateTimeParameter("Number of Days", "Number of days back in time the search should be performed.")]
+			int NrDays = 7)
+		{
+		}
 	}
 }

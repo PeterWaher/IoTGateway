@@ -27,6 +27,7 @@ namespace Waher.Networking.HTTP.Mcp
 		private static Dictionary<Type, IContentBlock> contentBlocks = GetContentBlocksFirstTime();
 		private const int PageSize = 20;
 		private readonly Dictionary<string, Tool> tools = new Dictionary<string, Tool>();
+		private readonly Dictionary<string, Prompt> prompts = new Dictionary<string, Prompt>();
 
 		private static Dictionary<Type, IContentBlock> GetContentBlocksFirstTime()
 		{
@@ -103,6 +104,12 @@ namespace Waher.Networking.HTTP.Mcp
 				{
 					this.RegisterTool(Method, McpServerToolAttribute);
 				}
+				
+				if (Method.GetCustomAttribute<McpServerPromptAttribute>() is
+					McpServerPromptAttribute McpServerPromptAttribute)
+				{
+					this.RegisterPrompt(Method, McpServerPromptAttribute);
+				}
 			}
 		}
 
@@ -164,9 +171,8 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Registers a MCP Server tool.
 		/// </summary>
-		/// <param name="Method"></param>
-		/// <param name="Attributes"></param>
-		/// <exception cref="Exception"></exception>
+		/// <param name="Method">Method to call when tool is invoked.</param>
+		/// <param name="Attributes">Attributes associated with tool</param>
 		public void RegisterTool(MethodInfo Method, McpServerToolAttribute Attributes)
 		{
 			lock (this.tools)
@@ -184,6 +190,28 @@ namespace Waher.Networking.HTTP.Mcp
 
 			// TODO: Send notification to clients about new tool.
 			// TODO: Declare tool notification in capabilities.
+		}
+
+		/// <summary>
+		/// Registers a MCP Server prompt.
+		/// </summary>
+		/// <param name="Method">Method to call when prompt is invoked.</param>
+		/// <param name="Attributes">Attributes associated with prompt</param>
+		public void RegisterPrompt(MethodInfo Method, McpServerPromptAttribute Attributes)
+		{
+			lock (this.prompts)
+			{
+				string Name = Method.Name;
+
+				if (this.prompts.ContainsKey(Name))
+					throw new Exception("Prompt already registered: " + Name);
+
+				this.prompts[Name] = new Prompt(Method, Attributes.Title,
+					Attributes.Description, Attributes.IconsMethod);
+			}
+
+			// TODO: Send notification to clients about new prompt.
+			// TODO: Declare prompt notification in capabilities.
 		}
 
 		/// <summary>
@@ -500,16 +528,63 @@ namespace Waher.Networking.HTTP.Mcp
 			return Result;
 		}
 
+		/// <summary>
+		/// Lists available MCP server prompts.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Cursor">Cursor for pagination.</param>
+		/// <returns>Dictionary containing the list of prompts.</returns>
 		[JsonRpcMethod]
-		protected Dictionary<string, object> Prompts_List(HttpRequest Request,
+		protected async Task<Dictionary<string, object>> Prompts_List(HttpRequest Request,
 			string? Cursor = null)
 		{
-			// TODO: prompts/list
+			int Offset = 0;
+			int MaxCount = PageSize;
 
-			return new Dictionary<string, object>()
+			if (!string.IsNullOrEmpty(Cursor))
 			{
-				{ "prompts", Array.Empty<Dictionary<string, object>>() }
-			};
+				if (!int.TryParse(Cursor, out Offset) || Offset < 0)
+					throw new Exception("Invalid cursor.");
+			}
+
+			ChunkedList<Prompt> Prompts = new ChunkedList<Prompt>();
+			Dictionary<string, object>[] PromptsJson;
+			int Next = Offset + MaxCount;
+
+			Dictionary<string, object> Result = new Dictionary<string, object>();
+
+			lock (this.prompts)
+			{
+				foreach (Prompt Prompt in this.prompts.Values)
+				{
+					if (MaxCount <= 0)
+					{
+						Result["nextCursor"] = Next.ToString();
+						break;
+					}
+
+					if (Offset > 0)
+					{
+						Offset--;
+						continue;
+					}
+
+					Prompts.Add(Prompt);
+					MaxCount--;
+				}
+			}
+
+			int i = 0;
+			int c = Prompts.Count;
+
+			PromptsJson = new Dictionary<string, object>[c];
+
+			foreach (Prompt Prompt in Prompts)
+				PromptsJson[i++] = await Prompt.ToJson(this);
+
+			Result["prompts"] = PromptsJson;
+
+			return Result;
 		}
 
 		[JsonRpcMethod]

@@ -291,7 +291,7 @@ namespace Waher.Script.Objects
 				return true;
 			}
 
-			return Expression.TryConvert(this.value, DesiredType, out Value);
+			return Expression.TryConvert(this.value, DesiredType, true, out Value);
 		}
 
 		/// <summary>

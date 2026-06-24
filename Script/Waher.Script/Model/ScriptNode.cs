@@ -382,7 +382,7 @@ namespace Waher.Script.Model
 				return d != 0;
 			else if (Obj is string s)
 				return Functions.Scalar.Boolean.ToBoolean(s);
-			else if (Expression.TryConvert(Value, typeof(bool), out IElement Converted) &&
+			else if (Expression.TryConvert(Value, typeof(bool), true, out IElement Converted) &&
 				Converted is BooleanValue BooleanValue)
 			{
 				return BooleanValue.Value;
@@ -404,7 +404,7 @@ namespace Waher.Script.Model
 				return s;
 			else if (Obj is null)
 				return null;
-			else if (Expression.TryConvert(Value, typeof(string), out IElement Converted))
+			else if (Expression.TryConvert(Value, typeof(string), true, out IElement Converted))
 				return Converted.AssociatedObjectValue?.ToString();
 			else
 				return Obj.ToString();

@@ -5292,14 +5292,16 @@ namespace Waher.Script
 		}
 
 		/// <summary>
-		/// Upgrades elements if necessary, to a common field extension, trying to make them compatible.
+		/// Upgrades elements if necessary, to a common field extension, trying to make 
+		/// them compatible. Information loss is not accepted in type conversions.
 		/// </summary>
 		/// <param name="E1">Element 1.</param>
 		/// <param name="Set1">Set containing element 1.</param>
 		/// <param name="E2">Element 2.</param>
 		/// <param name="Set2">Set containing element 2.</param>
 		/// <returns>If elements have been upgraded to become compatible.</returns>
-		public static bool UpgradeField(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2)
+		public static bool UpgradeField(ref IElement E1, ref ISet Set1, 
+			ref IElement E2, ref ISet Set2)
 		{
 			object O1 = E1?.AssociatedObjectValue;
 			object O2 = E2?.AssociatedObjectValue;
@@ -5309,14 +5311,14 @@ namespace Waher.Script
 			if (T1 == T2)
 				return true;
 
-			if (TryConvert(E1, T2, out IElement E1asT2))
+			if (TryConvert(E1, T2, false, out IElement E1asT2))
 			{
 				E1 = E1asT2;
 				Set1 = E1asT2.AssociatedSet;
 				return true;
 			}
 
-			if (TryConvert(E2, T1, out IElement E2asT1))
+			if (TryConvert(E2, T1, false, out IElement E2asT1))
 			{
 				E2 = E2asT1;
 				Set2 = E2asT1.AssociatedSet;
@@ -5373,7 +5375,7 @@ namespace Waher.Script
 			if (Obj is null)
 				return null;
 
-			if (TryConvert(Obj, DesiredType, out object Result))
+			if (TryConvert(Obj, DesiredType, true, out object Result))
 				return Result;
 
 			Type T = Obj.GetType();
@@ -5474,7 +5476,7 @@ namespace Waher.Script
 		/// <returns>If conversion was successful.</returns>
 		public static bool TryConvert<T>(object Value, out T Result)
 		{
-			if (TryConvert(Value, typeof(T), out object Obj))
+			if (TryConvert(Value, typeof(T), true, out object Obj))
 			{
 				if (Obj is T Result2)
 				{
@@ -5497,9 +5499,27 @@ namespace Waher.Script
 		/// </summary>
 		/// <param name="Value">Value to convert.</param>
 		/// <param name="DesiredType">Desired type.</param>
-		/// <param name="Result">Conversion result.</param>
+		/// <param name="AcceptInformationLoss">If information loss is acceptable in the 
+		/// conversion.</param>
+		/// <param name="Result">Converted object value, if successful.</param>
 		/// <returns>If conversion was successful.</returns>
-		public static bool TryConvert(object Value, Type DesiredType, out object Result)
+		public static bool TryConvert(object Value, Type DesiredType,
+			bool AcceptInformationLoss, out object Result)
+		{
+			return TryConvert(Value, DesiredType, AcceptInformationLoss ? 0 : 1, out Result);
+		}
+
+		/// <summary>
+		/// Tries to convert an object <paramref name="Value"/> to an object of type <paramref name="DesiredType"/>.
+		/// </summary>
+		/// <param name="Value">Value to convert.</param>
+		/// <param name="DesiredType">Desired type.</param>
+		/// <param name="WeightThreshold">Minimum weight threshold for acceptance of 
+		/// conversion. 1 = no loss acceptable, 0 = loss of everything acceptable.</param>
+		/// <param name="Result">Converted object value, if successful.</param>
+		/// <returns>If conversion was successful.</returns>
+		public static bool TryConvert(object Value, Type DesiredType, 
+			double WeightThreshold, out object Result)
 		{
 			if (Value is null)
 			{
@@ -5517,6 +5537,7 @@ namespace Waher.Script
 			}
 
 			if (TryGetTypeConverter(T, DesiredType, out ITypeConverter Converter) &&
+				Converter.Weight >= WeightThreshold &&
 				Converter.TryConvert(Value, out Result))
 			{
 				return true;
@@ -5552,7 +5573,7 @@ namespace Waher.Script
 						}
 
 					case TypeCode.Object:
-						if (TryConvert(Value, typeof(string), out object Obj) &&
+						if (TryConvert(Value, typeof(string), WeightThreshold, out object Obj) &&
 							Obj is string s2)
 						{
 							s = s2;
@@ -5670,9 +5691,28 @@ namespace Waher.Script
 		/// </summary>
 		/// <param name="Value">Element to convert.</param>
 		/// <param name="DesiredType">Desired type of associated object.</param>
-		/// <param name="Result">Conversion result.</param>
+		/// <param name="AcceptInformationLoss">If information loss is acceptable in the 
+		/// conversion.</param>
+		/// <param name="Result">Conversion result, if successful.</param>
 		/// <returns>If conversion was successful.</returns>
-		public static bool TryConvert(IElement Value, Type DesiredType, out IElement Result)
+		public static bool TryConvert(IElement Value, Type DesiredType,
+			bool AcceptInformationLoss, out IElement Result)
+		{
+			return TryConvert(Value, DesiredType, AcceptInformationLoss ? 0 : 1, out Result);
+		}
+
+		/// <summary>
+		/// Tries to convert an element <paramref name="Value"/> to an element whose associated object is of type 
+		/// <paramref name="DesiredType"/>.
+		/// </summary>
+		/// <param name="Value">Element to convert.</param>
+		/// <param name="DesiredType">Desired type of associated object.</param>
+		/// <param name="WeightThreshold">Minimum weight threshold for acceptance of 
+		/// conversion. 1 = no loss acceptable, 0 = loss of everything acceptable.</param>
+		/// <param name="Result">Conversion result, if successful.</param>
+		/// <returns>If conversion was successful.</returns>
+		public static bool TryConvert(IElement Value, Type DesiredType,
+			double WeightThreshold, out IElement Result)
 		{
 			object Obj = Value?.AssociatedObjectValue;
 			if (Obj is null)
@@ -5684,6 +5724,7 @@ namespace Waher.Script
 			Type T = Obj.GetType();
 
 			if (TryGetTypeConverter(T, DesiredType, out ITypeConverter Converter) &&
+				Converter.Weight >= WeightThreshold &&
 				Converter.TryConvertToElement(Obj, out Result))
 			{
 				return true;

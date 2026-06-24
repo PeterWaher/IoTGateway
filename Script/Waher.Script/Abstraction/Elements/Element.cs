@@ -98,7 +98,8 @@ namespace Waher.Script.Abstraction.Elements
 				return true;
 			}
 
-			return Expression.TryConvert(this.AssociatedObjectValue, DesiredType, out Value);
+			return Expression.TryConvert(this.AssociatedObjectValue, DesiredType, 
+				true, out Value);
 		}
 	}
 }

@@ -103,7 +103,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 									if (ParameterType == ExpectedType)
 										Parameters[i] = Value;
-									else if (Expression.TryConvert(Value, ExpectedType, out object Converted))
+									else if (Expression.TryConvert(Value, ExpectedType, true, out object Converted))
 										Parameters[i] = Converted;
 									else if (ArgumentInfo.HasDefaultValue &&
 										Value is Dictionary<string, object?> Dictionary &&

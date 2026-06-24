@@ -7,6 +7,7 @@ using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Persistence;
 using Waher.Runtime.Collections;
+using Waher.Script.Functions.Runtime;
 using Waher.Script.Model;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Server
@@ -229,38 +230,44 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <returns>Input Schema</returns>
 		private static Dictionary<string, object> GenerateSchema(MethodInfo Method)
 		{
-			Dictionary<string, object> Properties = new Dictionary<string, object>();
-			ChunkedList<string> Required = new ChunkedList<string>();
 			ParameterInfo[] Parameters = Method.GetParameters();
-
-			foreach (ParameterInfo Parameter in Parameters)
-			{
-				Type ParameterType = Parameter.ParameterType;
-
-				if (ParameterType == typeof(HttpRequest) ||
-					ParameterType == typeof(HttpResponse))
-				{
-					continue;
-				}
-
-				if (!Parameter.IsOptional && !Parameter.HasDefaultValue)
-					Required.Add(Parameter.Name);
-
-				McpParameterAttribute ParameterInfo = Parameter.GetCustomAttribute<McpParameterAttribute>(true);
-				IEnumerable<McpEnumValueAttribute>? EnumValues = ParameterType.IsEnum ?
-					Parameter.GetCustomAttributes<McpEnumValueAttribute>(true) : null;
-
-				Properties[Parameter.Name] = GenerateSchema(ParameterType,
-					Parameter.HasDefaultValue, Parameter.DefaultValue, ParameterInfo,
-					EnumValues);
-			}
-
 			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
-				{ "type", "object" },
-				{ "properties", Properties },
-				{ "required", Required.ToArray() }
+				{ "type", "object" }
 			};
+
+			if (Parameters.Length == 0)
+				Result["additionalProperties"] = false;
+			else
+			{
+				Dictionary<string, object> Properties = new Dictionary<string, object>();
+				ChunkedList<string> Required = new ChunkedList<string>();
+
+				foreach (ParameterInfo Parameter in Parameters)
+				{
+					Type ParameterType = Parameter.ParameterType;
+
+					if (ParameterType == typeof(HttpRequest) ||
+						ParameterType == typeof(HttpResponse))
+					{
+						continue;
+					}
+
+					if (!Parameter.IsOptional && !Parameter.HasDefaultValue)
+						Required.Add(Parameter.Name);
+
+					McpParameterAttribute ParameterInfo = Parameter.GetCustomAttribute<McpParameterAttribute>(true);
+					IEnumerable<McpEnumValueAttribute>? EnumValues = ParameterType.IsEnum ?
+						Parameter.GetCustomAttributes<McpEnumValueAttribute>(true) : null;
+
+					Properties[Parameter.Name] = GenerateSchema(ParameterType,
+						Parameter.HasDefaultValue, Parameter.DefaultValue, ParameterInfo,
+						EnumValues);
+				}
+
+				Result["properties"] = Properties;
+				Result["required"] = Required.ToArray();
+			}
 
 			return Result;
 		}

@@ -312,7 +312,7 @@ internal class Program
 			WebServer.Register("/Hello", Hello, Hello);
 			WebServer.Register("/Hello.md", HelloMarkdown, HelloMarkdown);
 			WebServer.Register("/Hello.css", HelloStyles);
-			WebServer.Register(new EventLogMcpServer("/MCP/Test", "TestServer",
+			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", "TestServer",
 				"Test Server", "1.0.0", "This is a test server.", [], 
 				new Uri("https://example.org/"), "These are the instructions."));
 

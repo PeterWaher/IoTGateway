@@ -24,6 +24,7 @@ namespace Waher.Networking.HTTP.Mcp
 	public abstract class HttpMcpServerResource : JsonRpcWebService
 	{
 		private static readonly ObjectContent defaultObjectEncoder = new ObjectContent();
+		private static readonly TextContent defaultTextEncoder = new TextContent();
 		private static Dictionary<Type, IContentBlock> contentBlocks = GetContentBlocksFirstTime();
 		private const int PageSize = 20;
 		private readonly Dictionary<string, Tool> tools = new Dictionary<string, Tool>();
@@ -104,7 +105,7 @@ namespace Waher.Networking.HTTP.Mcp
 				{
 					this.RegisterTool(Method, McpServerToolAttribute);
 				}
-				
+
 				if (Method.GetCustomAttribute<McpServerPromptAttribute>() is
 					McpServerPromptAttribute McpServerPromptAttribute)
 				{
@@ -583,6 +584,90 @@ namespace Waher.Networking.HTTP.Mcp
 				PromptsJson[i++] = await Prompt.ToJson(this);
 
 			Result["prompts"] = PromptsJson;
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Gets an MCP server prompt.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Name">Name of the prompt to call.</param>
+		/// <param name="Arguments">Arguments for the prompt.</param>
+		/// <param name="_Meta">Associated meta-data, if available.</param>
+		/// <returns>Dictionary containing the result of the tool call.</returns>
+		[JsonRpcMethod]
+		protected async Task<Dictionary<string, object?>> Prompts_Get(HttpRequest Request,
+			HttpResponse Response, string Name, Dictionary<string, object?> Arguments,
+			[JsonRpcMetaDataArgument] object? _Meta = null)
+		{
+			Dictionary<string, object?> Result = new Dictionary<string, object?>();
+			object? PromptResult;
+
+			try
+			{
+				if (!this.prompts.TryGetValue(Name, out Prompt? Prompt))
+					throw new NotFoundException("Prompt not found: " + Name);
+
+				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
+
+				if (Prompt.TryBuildRequest(Arguments, Request, Response, MetaData,
+					out string? Reason, out object?[]? Arguments2))
+				{
+					PromptResult = await ScriptNode.WaitPossibleTask(
+						Prompt.Method.Invoke(this, Arguments2));
+				}
+				else
+				{
+					PromptResult = Reason;
+					Result["isError"] = true;
+				}
+
+				Prompt.ReturnAttributes?.Annotate(Result);
+			}
+			catch (Exception ex)
+			{
+				PromptResult = ex.Message;
+				Result["isError"] = true;
+			}
+
+			if (PromptResult is null)
+				Result["messages"] = Array.Empty<object>();
+			else
+			{
+				Type T = PromptResult.GetType();
+
+				if (contentBlocks.TryGetValue(T, out IContentBlock Encoder))
+					Result["messages"] = new object[] { await Encoder.Encode(PromptResult) };
+				else if (T.IsArray && PromptResult is IEnumerable Enumerable)
+				{
+					ChunkedList<object> Content = new ChunkedList<object>();
+					IEnumerator e = Enumerable.GetEnumerator();
+
+					while (e.MoveNext())
+					{
+						object? Item = e.Current;
+						if (Item is null)
+							continue;
+
+						Type T2 = Item.GetType();
+						if (contentBlocks.TryGetValue(T2, out IContentBlock Encoder2))
+							Content.Add(await Encoder2.Encode(Item));
+						else
+							Content.Add(await defaultObjectEncoder.Encode(Item));
+					}
+
+					Result["messages"] = Content.ToArray();
+				}
+				else
+				{
+					Result["messages"] = new object[]
+					{
+						await defaultTextEncoder.Encode(PromptResult)                   
+					};
+				}
+			}
 
 			return Result;
 		}

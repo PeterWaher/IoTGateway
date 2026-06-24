@@ -13,9 +13,6 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 	/// </summary>
 	public class Prompt
 	{
-		private const string McpPromptResultTitle = "Result";
-		private const string McpPromptResultDescription = "Result returned after executing the prompt.";
-
 		private readonly JsonRpcMethodInfo methodInfo;
 		private Icons? icons = null;
 
@@ -41,6 +38,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			this.IconsMethod = IconsMethod;
 			this.MetaData = MetaData;
 			this.HasReturnValue = Method.ReturnType != typeof(void);
+			this.ReturnAttributes = Method.ReturnParameter?.GetCustomAttribute<McpParameterAttribute>();
 
 			this.methodInfo = new JsonRpcMethodInfo(Method, false);
 		}
@@ -79,6 +77,11 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// If the prompt returns a value.
 		/// </summary>
 		public bool HasReturnValue { get; private set; }
+
+		/// <summary>
+		/// Any MCP attributes declared for the return value.
+		/// </summary>
+		public McpParameterAttribute? ReturnAttributes { get; private set; }
 
 		/// <summary>
 		/// Converts object to a generic representation.

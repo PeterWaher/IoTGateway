@@ -191,7 +191,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			};
 
 			if (!string.IsNullOrEmpty(this.Title))
-				Annotations.Add("title", this.Title);
+				Result.Add("title", this.Title);
 
 			if (!string.IsNullOrEmpty(this.Title))
 				Result.Add("description", this.Description);

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Xsl;
@@ -33,6 +32,11 @@ namespace Waher.Content.Xsl.Functions
 		/// Name of the function
 		/// </summary>
 		public override string FunctionName => nameof(Transform);
+
+		/// <summary>
+		/// If scalars should be upgraded to the same set before evaluation.
+		/// </summary>
+		public override bool UpgradeScalarsToSameSet => false;
 
 		/// <summary>
 		/// Evaluates the function on two scalar arguments.

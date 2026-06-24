@@ -28,6 +28,11 @@ namespace Waher.Script.Model
 		}
 
 		/// <summary>
+		/// If scalars should be upgraded to the same set before evaluation.
+		/// </summary>
+		public abstract bool UpgradeScalarsToSameSet { get; }
+
+		/// <summary>
 		/// Evaluates the function.
 		/// </summary>
 		/// <param name="Argument1">Function argument 1.</param>
@@ -45,8 +50,11 @@ namespace Waher.Script.Model
 
 					if (Set1 != Set2)
 					{
-						if (!Expression.UpgradeField(ref Argument1, ref Set1, ref Argument2, ref Set2))
+						if (!this.UpgradeScalarsToSameSet ||
+							!Expression.UpgradeField(ref Argument1, ref Set1, ref Argument2, ref Set2))
+						{
 							return this.EvaluateScalar(Argument1, Argument2, Variables);
+						}
 					}
 
 					object x = Argument1.AssociatedObjectValue;
@@ -247,8 +255,11 @@ namespace Waher.Script.Model
 
 					if (Set1 != Set2)
 					{
-						if (!Expression.UpgradeField(ref Argument1, ref Set1, ref Argument2, ref Set2))
+						if (!this.UpgradeScalarsToSameSet ||
+							!Expression.UpgradeField(ref Argument1, ref Set1, ref Argument2, ref Set2))
+						{
 							return await this.EvaluateScalarAsync(Argument1, Argument2, Variables);
+						}
 					}
 
 					object x = Argument1.AssociatedObjectValue;

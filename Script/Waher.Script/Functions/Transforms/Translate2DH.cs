@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects.Matrices;
@@ -27,24 +26,17 @@ namespace Waher.Script.Functions.Transforms
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get
-			{
-				return "Translate2DH";
-			}
-		}
+		public override string FunctionName => nameof(Translate2DH);
 
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames
-		{
-			get
-			{
-				return new string[] { "dx", "dy" };
-			}
-		}
+		public override string[] DefaultArgumentNames => new string[] { "dx", "dy" };
+
+		/// <summary>
+		/// If scalars should be upgraded to the same set before evaluation.
+		/// </summary>
+		public override bool UpgradeScalarsToSameSet => true;
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

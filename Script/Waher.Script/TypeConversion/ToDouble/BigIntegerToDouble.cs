@@ -1,18 +1,19 @@
 ﻿using System;
+using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 
-namespace Waher.Script.TypeConversion
+namespace Waher.Script.TypeConversion.ToDouble
 {
 	/// <summary>
-	/// Converts a Boolean value to a double number.
+	/// Converts a <see cref="BigInteger"/> to a double number, if possible.
 	/// </summary>
-	public class BooleanToDouble : ITypeConverter
+	public class BigIntegerToDouble : ITypeConverter
 	{
 		/// <summary>
 		/// Converter converts objects of this type.
 		/// </summary>
-		public Type From => typeof(bool);
+		public Type From => typeof(BigInteger);
 
 		/// <summary>
 		/// Converter converts objects to this type.
@@ -27,10 +28,16 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public object Convert(object Value)
 		{
-			if (Value is bool b)
-				return b ? 1 : 0;
+			if (Value is BigInteger i)
+			{
+				double d = (double)i;
+				if ((BigInteger)d == i)
+					return d;
+				else
+					return null;
+			}
 			else
-				throw new ArgumentException("Expected Boolean value.", nameof(Value));
+				throw new ArgumentException("Expected BigInteger value.", nameof(Value));
 		}
 
 		/// <summary>
@@ -42,10 +49,16 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public IElement ConvertToElement(object Value)
 		{
-			if (Value is bool b)
-				return new DoubleNumber(b ? 1 : 0);
+			if (Value is BigInteger i)
+			{
+				double d = (double)i;
+				if ((BigInteger)d == i)
+					return new DoubleNumber(d);
+				else
+					return null;
+			}
 			else
-				throw new ArgumentException("Expected Boolean value.", nameof(Value));
+				throw new ArgumentException("Expected BigInteger value.", nameof(Value));
 		}
 	}
 }

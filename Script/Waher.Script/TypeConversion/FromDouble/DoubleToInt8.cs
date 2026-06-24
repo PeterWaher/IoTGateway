@@ -2,22 +2,22 @@
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 
-namespace Waher.Script.TypeConversion
+namespace Waher.Script.TypeConversion.FromDouble
 {
 	/// <summary>
-	/// Converts a <see cref="PhysicalQuantity"/> to a double number.
+	/// Converts double numbers to 8-bit integer values.
 	/// </summary>
-	public class PhysicalQuantityToDouble : ITypeConverter
+	public class DoubleToInt8 : ITypeConverter
 	{
 		/// <summary>
-		/// Converter converts objects of this type.
+		/// Converts double numbers to 8-bit integer values.
 		/// </summary>
-		public Type From => typeof(PhysicalQuantity);
+		public Type From => typeof(double);
 
 		/// <summary>
 		/// Converter converts objects to this type.
 		/// </summary>
-		public Type To => typeof(double);
+		public Type To => typeof(sbyte);
 
 		/// <summary>
 		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="To"/>.
@@ -27,10 +27,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public object Convert(object Value)
 		{
-			if (Value is PhysicalQuantity Q)
-				return Q.Magnitude;
-			else
-				throw new ArgumentException("Expected PhysicalQuantity value.", nameof(Value));
+			if (Value is double d && d >= sbyte.MinValue && d <= sbyte.MaxValue && Math.Round(d) == d)
+				return (sbyte)d;
+			else 
+				throw new ArgumentException("Expected 8-bit integer value.", nameof(Value));
 		}
 
 		/// <summary>
@@ -42,10 +42,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public IElement ConvertToElement(object Value)
 		{
-			if (Value is PhysicalQuantity Q)
-				return new DoubleNumber(Q.Magnitude);
+			if (Value is double d && d >= sbyte.MinValue && d <= sbyte.MaxValue && Math.Round(d) == d)
+				return new ObjectValue((sbyte)d);
 			else
-				throw new ArgumentException("Expected PhysicalQuantity value.", nameof(Value));
+				throw new ArgumentException("Expected 8-bit integer value.", nameof(Value));
 		}
 	}
 }

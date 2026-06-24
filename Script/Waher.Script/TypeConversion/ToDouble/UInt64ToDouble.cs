@@ -2,17 +2,17 @@
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 
-namespace Waher.Script.TypeConversion
+namespace Waher.Script.TypeConversion.ToDouble
 {
 	/// <summary>
-	/// Converts sbyte numbers to double numbers.
+	/// Converts ulong numbers to double numbers.
 	/// </summary>
-	public class Int8ToDouble : ITypeConverter
+	public class UInt64ToDouble : ITypeConverter
 	{
 		/// <summary>
-		/// Converts double numbers to sbyte numbers.
+		/// Converts double numbers to ulong numbers.
 		/// </summary>
-		public Type From => typeof(sbyte);
+		public Type From => typeof(ulong);
 
 		/// <summary>
 		/// Converter converts objects to this type.
@@ -27,10 +27,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public object Convert(object Value)
 		{
-			if (Value is sbyte d)
+			if (Value is ulong d)
 				return (double)d;
 			else
-				throw new ArgumentException("Expected sbyte value.", nameof(Value));
+				throw new ArgumentException("Expected ulong value.", nameof(Value));
 		}
 
 		/// <summary>
@@ -42,10 +42,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public IElement ConvertToElement(object Value)
 		{
-			if (Value is sbyte d)
+			if (Value is ulong d)
 				return new ObjectValue((double)d);
 			else
-				throw new ArgumentException("Expected sbyte value.", nameof(Value));
+				throw new ArgumentException("Expected ulong value.", nameof(Value));
 		}
 	}
 }

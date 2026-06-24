@@ -1,9 +1,8 @@
 ﻿using System;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
-using Waher.Script.TypeConversion;
 
-namespace Waher.Script.TypeConversion
+namespace Waher.Script.TypeConversion.FromDouble
 {
 	/// <summary>
 	/// Converts double numbers to decimal numbers.

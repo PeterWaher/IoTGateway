@@ -33,10 +33,15 @@ namespace Waher.Script.Functions.Strings
 		public override string[] DefaultArgumentNames => new string[] { "s", "Delimiter" };
 
 		/// <summary>
+		/// If scalars should be upgraded to the same set before evaluation.
+		/// </summary>
+		public override bool UpgradeScalarsToSameSet => true;
+
+		/// <summary>
 		/// Evaluates the function on a scalar argument.
 		/// </summary>
 		/// <param name="Argument1">String.</param>
-        /// <param name="Argument2">Delimiter</param>
+		/// <param name="Argument2">Delimiter</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(string Argument1, string Argument2, Variables Variables)

@@ -32,6 +32,11 @@ namespace Waher.Script.Functions.Scalar
         public override string FunctionName => nameof(Max);
 
 		/// <summary>
+		/// If scalars should be upgraded to the same set before evaluation.
+		/// </summary>
+		public override bool UpgradeScalarsToSameSet => true;
+
+		/// <summary>
 		/// Evaluates the function on a scalar argument.
 		/// </summary>
 		/// <param name="Argument1">Function argument 1.</param>

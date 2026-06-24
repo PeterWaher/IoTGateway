@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -35,6 +34,11 @@ namespace Waher.Script.Xml.Functions
 		/// Default Argument names
 		/// </summary>
 		public override string[] DefaultArgumentNames => new string[] { "XML", "XPath" };
+
+		/// <summary>
+		/// If scalars should be upgraded to the same set before evaluation.
+		/// </summary>
+		public override bool UpgradeScalarsToSameSet => false;
 
 		/// <summary>
 		/// Evaluates the function on two scalar arguments.

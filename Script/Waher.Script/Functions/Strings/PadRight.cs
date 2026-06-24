@@ -33,6 +33,11 @@ namespace Waher.Script.Functions.Strings
 		public override string[] DefaultArgumentNames => new string[] { "s", "N" };
 
 		/// <summary>
+		/// If scalars should be upgraded to the same set before evaluation.
+		/// </summary>
+		public override bool UpgradeScalarsToSameSet => false;
+
+		/// <summary>
 		/// Evaluates the function on a scalar argument.
 		/// </summary>
 		/// <param name="Argument1">String.</param>

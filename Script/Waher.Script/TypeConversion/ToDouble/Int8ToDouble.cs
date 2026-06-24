@@ -2,17 +2,17 @@
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 
-namespace Waher.Script.TypeConversion
+namespace Waher.Script.TypeConversion.ToDouble
 {
 	/// <summary>
-	/// Converts decimal numbers to double numbers.
+	/// Converts sbyte numbers to double numbers.
 	/// </summary>
-	public class DecimalToDouble : ITypeConverter
+	public class Int8ToDouble : ITypeConverter
 	{
 		/// <summary>
-		/// Converts double numbers to decimal numbers.
+		/// Converts double numbers to sbyte numbers.
 		/// </summary>
-		public Type From => typeof(decimal);
+		public Type From => typeof(sbyte);
 
 		/// <summary>
 		/// Converter converts objects to this type.
@@ -27,10 +27,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public object Convert(object Value)
 		{
-			if (Value is decimal d)
+			if (Value is sbyte d)
 				return (double)d;
 			else
-				throw new ArgumentException("Expected decimal value.", nameof(Value));
+				throw new ArgumentException("Expected sbyte value.", nameof(Value));
 		}
 
 		/// <summary>
@@ -42,10 +42,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public IElement ConvertToElement(object Value)
 		{
-			if (Value is decimal d)
+			if (Value is sbyte d)
 				return new ObjectValue((double)d);
 			else
-				throw new ArgumentException("Expected decimal value.", nameof(Value));
+				throw new ArgumentException("Expected sbyte value.", nameof(Value));
 		}
 	}
 }

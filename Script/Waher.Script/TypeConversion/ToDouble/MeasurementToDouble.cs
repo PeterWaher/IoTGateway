@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 
-namespace Waher.Script.TypeConversion
+namespace Waher.Script.TypeConversion.ToDouble
 {
 	/// <summary>
-	/// Converts a <see cref="BigInteger"/> to a double number, if possible.
+	/// Converts a <see cref="Measurement"/> to a double number.
 	/// </summary>
-	public class BigIntegerToDouble : ITypeConverter
+	public class MeasurementToDouble : ITypeConverter
 	{
 		/// <summary>
 		/// Converter converts objects of this type.
 		/// </summary>
-		public Type From => typeof(BigInteger);
+		public Type From => typeof(Measurement);
 
 		/// <summary>
 		/// Converter converts objects to this type.
@@ -28,16 +27,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public object Convert(object Value)
 		{
-			if (Value is BigInteger i)
-			{
-				double d = (double)i;
-				if (((BigInteger)d) == i)
-					return d;
-				else
-					return null;
-			}
+			if (Value is Measurement Q)
+				return Q.Magnitude;
 			else
-				throw new ArgumentException("Expected BigInteger value.", nameof(Value));
+				throw new ArgumentException("Expected Measurement value.", nameof(Value));
 		}
 
 		/// <summary>
@@ -49,16 +42,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public IElement ConvertToElement(object Value)
 		{
-			if (Value is BigInteger i)
-			{
-				double d = (double)i;
-				if (((BigInteger)d) == i)
-					return new DoubleNumber(d);
-				else
-					return null;
-			}
+			if (Value is Measurement Q)
+				return new DoubleNumber(Q.Magnitude);
 			else
-				throw new ArgumentException("Expected BigInteger value.", nameof(Value));
+				throw new ArgumentException("Expected Measurement value.", nameof(Value));
 		}
 	}
 }

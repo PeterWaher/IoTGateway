@@ -4130,7 +4130,7 @@ namespace Waher.Script
 				}
 
 				if (!double.TryParse(this.script.Substring(Start, this.pos - Start).
-					Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out double d))
+					Replace(".", NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out double d))
 				{
 					throw new SyntaxException("Invalid double number.", this.pos, this.script);
 				}
@@ -4778,7 +4778,7 @@ namespace Waher.Script
 		/// <returns>If parsing was successful.</returns>
 		public static bool TryParse(string s, out double Value)
 		{
-			return double.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
+			return double.TryParse(s.Replace(".", NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
 		}
 
 		/// <summary>
@@ -4789,7 +4789,7 @@ namespace Waher.Script
 		/// <returns>If parsing was successful.</returns>
 		public static bool TryParse(string s, out float Value)
 		{
-			return float.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
+			return float.TryParse(s.Replace(".", NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
 		}
 
 		/// <summary>
@@ -4800,7 +4800,7 @@ namespace Waher.Script
 		/// <returns>If parsing was successful.</returns>
 		public static bool TryParse(string s, out decimal Value)
 		{
-			return decimal.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
+			return decimal.TryParse(s.Replace(".", NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
 		}
 
 		/// <summary>
@@ -5127,8 +5127,8 @@ namespace Waher.Script
 				if (double.TryParse(s, out double d))
 					return d;
 
-				if (System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator != "." &&
-					double.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
+				if (NumberFormatInfo.CurrentInfo.NumberDecimalSeparator != "." &&
+					double.TryParse(s.Replace(".", NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
 				{
 					return d;
 				}
@@ -5186,8 +5186,8 @@ namespace Waher.Script
 				if (decimal.TryParse(s, out decimal d))
 					return d;
 
-				if (System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator != "." &&
-					decimal.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
+				if (NumberFormatInfo.CurrentInfo.NumberDecimalSeparator != "." &&
+					decimal.TryParse(s.Replace(".", NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
 				{
 					return d;
 				}

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -30,24 +27,17 @@ namespace Waher.Script.Graphs.Functions.Colors
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames
-		{
-			get
-			{
-				return new string[] { "Color", "Alpha" };
-			}
-		}
+		public override string[] DefaultArgumentNames => new string[] { "Color", "Alpha" };
 
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get
-			{
-				return "Alpha";
-			}
-		}
+		public override string FunctionName => nameof(Alpha);
+
+		/// <summary>
+		/// If scalars should be upgraded to the same set before evaluation.
+		/// </summary>
+		public override bool UpgradeScalarsToSameSet => false;
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

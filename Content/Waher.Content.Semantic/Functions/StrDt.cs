@@ -35,6 +35,11 @@ namespace Waher.Content.Semantic.Functions
 		public override string[] DefaultArgumentNames => new string[] { "Value", "Type" };
 
 		/// <summary>
+		/// If scalars should be upgraded to the same set before evaluation.
+		/// </summary>
+		public override bool UpgradeScalarsToSameSet => true;
+
+		/// <summary>
 		/// Evaluates the function on two scalar arguments.
 		/// </summary>
 		/// <param name="Argument1">Function argument 1.</param>

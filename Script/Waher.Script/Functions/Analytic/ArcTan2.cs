@@ -31,19 +31,21 @@ namespace Waher.Script.Functions.Analytic
         /// <summary>
         /// Optional aliases. If there are no aliases for the function, null is returned.
         /// </summary>
-        public override string[] Aliases
-        {
-            get { return new string[] { "atan" }; }
-        }
+        public override string[] Aliases => new string[] { "atan" };
 
-        /// <summary>
-        /// Evaluates the function on two scalar arguments.
-        /// </summary>
-        /// <param name="Argument1">Function argument 1.</param>
-        /// <param name="Argument2">Function argument 2.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(double Argument1, double Argument2, Variables Variables)
+		/// <summary>
+		/// If scalars should be upgraded to the same set before evaluation.
+		/// </summary>
+		public override bool UpgradeScalarsToSameSet => true;
+
+		/// <summary>
+		/// Evaluates the function on two scalar arguments.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(double Argument1, double Argument2, Variables Variables)
         {
             return new DoubleNumber(Math.Atan2(Argument2, Argument1));
         }

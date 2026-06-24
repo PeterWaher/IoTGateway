@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Script.Abstraction.Elements;
+﻿using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects.Matrices;
@@ -33,6 +32,11 @@ namespace Waher.Script.Functions.Matrices
 		/// Default Argument names
 		/// </summary>
 		public override string[] DefaultArgumentNames => new string[] { "Rows", "Columns" };
+
+		/// <summary>
+		/// If scalars should be upgraded to the same set before evaluation.
+		/// </summary>
+		public override bool UpgradeScalarsToSameSet => true;
 
 		/// <summary>
 		/// Evaluates the function on two scalar arguments.

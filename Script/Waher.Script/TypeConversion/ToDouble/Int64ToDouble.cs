@@ -2,17 +2,17 @@
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 
-namespace Waher.Script.TypeConversion
+namespace Waher.Script.TypeConversion.ToDouble
 {
 	/// <summary>
-	/// Converts enumerated values to double numbers.
+	/// Converts long numbers to double numbers.
 	/// </summary>
-	public class EnumToDouble : ITypeConverter
+	public class Int64ToDouble : ITypeConverter
 	{
 		/// <summary>
-		/// Converts enumerated values to short numbers.
+		/// Converts double numbers to long numbers.
 		/// </summary>
-		public Type From => typeof(Enum);
+		public Type From => typeof(long);
 
 		/// <summary>
 		/// Converter converts objects to this type.
@@ -27,10 +27,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public object Convert(object Value)
 		{
-			if (Value is Enum e)
-				return (double)System.Convert.ToInt32(e);
+			if (Value is long d)
+				return (double)d;
 			else
-				throw new ArgumentException("Expected enumeration value.", nameof(Value));
+				throw new ArgumentException("Expected long value.", nameof(Value));
 		}
 
 		/// <summary>
@@ -42,10 +42,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public IElement ConvertToElement(object Value)
 		{
-			if (Value is Enum e)
-				return new DoubleNumber(System.Convert.ToInt32(e));
+			if (Value is long d)
+				return new ObjectValue((double)d);
 			else
-				throw new ArgumentException("Expected enumeration value.", nameof(Value));
+				throw new ArgumentException("Expected long value.", nameof(Value));
 		}
 	}
 }

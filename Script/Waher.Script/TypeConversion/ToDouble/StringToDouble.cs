@@ -1,24 +1,23 @@
 ﻿using System;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 
-namespace Waher.Script.TypeConversion
+namespace Waher.Script.TypeConversion.ToDouble
 {
 	/// <summary>
-	/// Converts double numbers to complex numbers
+	/// Converts strings to double numbers.
 	/// </summary>
-	public class DoubleToComplex : ITypeConverter
+	public class StringToDouble : ITypeConverter
 	{
 		/// <summary>
-		/// Converter converts objects of this type.
+		/// Converts string numbers to double numbers.
 		/// </summary>
-		public Type From => typeof(double);
+		public Type From => typeof(string);
 
 		/// <summary>
 		/// Converter converts objects to this type.
 		/// </summary>
-		public Type To => typeof(Complex);
+		public Type To => typeof(double);
 
 		/// <summary>
 		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="To"/>.
@@ -28,10 +27,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public object Convert(object Value)
 		{
-			if (Value is double d)
-				return new Complex(d, 0);
+			if (Value is string s && Expression.TryParse(s, out double d))
+				return d;
 			else
-				throw new ArgumentException("Expected double value.", nameof(Value));
+				throw new ArgumentException("Expected double-precision floating-point value.", nameof(Value));
 		}
 
 		/// <summary>
@@ -43,10 +42,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public IElement ConvertToElement(object Value)
 		{
-			if (Value is double d)
-				return new ComplexNumber(d, 0);
+			if (Value is string s && Expression.TryParse(s, out double d))
+				return new DoubleNumber(d);
 			else
-				throw new ArgumentException("Expected double value.", nameof(Value));
+				throw new ArgumentException("Expected double-precision floating-point value.", nameof(Value));
 		}
 	}
 }

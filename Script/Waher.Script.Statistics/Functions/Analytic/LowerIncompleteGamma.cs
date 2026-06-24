@@ -42,6 +42,11 @@ namespace Waher.Script.Statistics.Functions.Analytic
 		public override string[] DefaultArgumentNames => new string[] { "a", "z" };
 
 		/// <summary>
+		/// If scalars should be upgraded to the same set before evaluation.
+		/// </summary>
+		public override bool UpgradeScalarsToSameSet => true;
+
+		/// <summary>
 		/// Evaluates the function on two scalar arguments.
 		/// </summary>
 		/// <param name="Argument1">Function argument 1.</param>

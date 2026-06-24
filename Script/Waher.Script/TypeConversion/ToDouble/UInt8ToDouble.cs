@@ -2,17 +2,17 @@
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 
-namespace Waher.Script.TypeConversion
+namespace Waher.Script.TypeConversion.ToDouble
 {
 	/// <summary>
-	/// Converts ulong numbers to double numbers.
+	/// Converts byte numbers to double numbers.
 	/// </summary>
-	public class UInt64ToDouble : ITypeConverter
+	public class UInt8ToDouble : ITypeConverter
 	{
 		/// <summary>
-		/// Converts double numbers to ulong numbers.
+		/// Converts double numbers to byte numbers.
 		/// </summary>
-		public Type From => typeof(ulong);
+		public Type From => typeof(byte);
 
 		/// <summary>
 		/// Converter converts objects to this type.
@@ -27,10 +27,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public object Convert(object Value)
 		{
-			if (Value is ulong d)
+			if (Value is byte d)
 				return (double)d;
 			else
-				throw new ArgumentException("Expected ulong value.", nameof(Value));
+				throw new ArgumentException("Expected byte value.", nameof(Value));
 		}
 
 		/// <summary>
@@ -42,10 +42,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public IElement ConvertToElement(object Value)
 		{
-			if (Value is ulong d)
+			if (Value is byte d)
 				return new ObjectValue((double)d);
 			else
-				throw new ArgumentException("Expected ulong value.", nameof(Value));
+				throw new ArgumentException("Expected byte value.", nameof(Value));
 		}
 	}
 }

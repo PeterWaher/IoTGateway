@@ -1,24 +1,23 @@
 ﻿using System;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 
-namespace Waher.Script.TypeConversion
+namespace Waher.Script.TypeConversion.ToDouble
 {
 	/// <summary>
-	/// Converts a double number to a <see cref="BigInteger"/>, if possible.
+	/// Converts enumerated values to double numbers.
 	/// </summary>
-	public class DoubleToBigInteger : ITypeConverter
+	public class EnumToDouble : ITypeConverter
 	{
 		/// <summary>
-		/// Converter converts objects of this type.
+		/// Converts enumerated values to short numbers.
 		/// </summary>
-		public Type From => typeof(double);
+		public Type From => typeof(Enum);
 
 		/// <summary>
 		/// Converter converts objects to this type.
 		/// </summary>
-		public Type To => typeof(BigInteger);
+		public Type To => typeof(double);
 
 		/// <summary>
 		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="To"/>.
@@ -28,16 +27,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public object Convert(object Value)
 		{
-			if (Value is double d)
-			{
-				BigInteger i = (BigInteger)d;
-				if (((double)i) == d)
-					return i;
-				else
-					return null;
-			}
+			if (Value is Enum e)
+				return (double)System.Convert.ToInt32(e);
 			else
-				throw new ArgumentException("Expected BigInteger value.", nameof(Value));
+				throw new ArgumentException("Expected enumeration value.", nameof(Value));
 		}
 
 		/// <summary>
@@ -49,16 +42,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public IElement ConvertToElement(object Value)
 		{
-			if (Value is double d)
-			{
-				BigInteger i = (BigInteger)d;
-				if (((double)i) == d)
-					return new Integer(i);
-				else
-					return null;
-			}
+			if (Value is Enum e)
+				return new DoubleNumber(System.Convert.ToInt32(e));
 			else
-				throw new ArgumentException("Expected double value.", nameof(Value));
+				throw new ArgumentException("Expected enumeration value.", nameof(Value));
 		}
 	}
 }

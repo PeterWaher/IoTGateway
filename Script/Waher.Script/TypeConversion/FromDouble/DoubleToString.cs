@@ -2,22 +2,22 @@
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 
-namespace Waher.Script.TypeConversion
+namespace Waher.Script.TypeConversion.FromDouble
 {
 	/// <summary>
-	/// Converts ushort numbers to double numbers.
+	/// Converts double numbers to string values.
 	/// </summary>
-	public class UInt16ToDouble : ITypeConverter
+	public class DoubleToString : ITypeConverter
 	{
 		/// <summary>
-		/// Converts double numbers to ushort numbers.
+		/// Converts double numbers to string values.
 		/// </summary>
-		public Type From => typeof(ushort);
+		public Type From => typeof(double);
 
 		/// <summary>
 		/// Converter converts objects to this type.
 		/// </summary>
-		public Type To => typeof(double);
+		public Type To => typeof(string);
 
 		/// <summary>
 		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="To"/>.
@@ -27,10 +27,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public object Convert(object Value)
 		{
-			if (Value is ushort d)
-				return (double)d;
+			if (Value is double d)
+				return Expression.ToString(d);
 			else
-				throw new ArgumentException("Expected ushort value.", nameof(Value));
+				throw new ArgumentException("Expected double-precision floating-point value.", nameof(Value));
 		}
 
 		/// <summary>
@@ -42,10 +42,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public IElement ConvertToElement(object Value)
 		{
-			if (Value is ushort d)
-				return new ObjectValue((double)d);
+			if (Value is double d)
+				return new StringValue(Expression.ToString(d));
 			else
-				throw new ArgumentException("Expected ushort value.", nameof(Value));
+				throw new ArgumentException("Expected double-precision floating-point value.", nameof(Value));
 		}
 	}
 }

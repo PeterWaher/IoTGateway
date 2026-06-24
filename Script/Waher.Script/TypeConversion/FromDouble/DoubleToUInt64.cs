@@ -2,22 +2,22 @@
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 
-namespace Waher.Script.TypeConversion
+namespace Waher.Script.TypeConversion.FromDouble
 {
 	/// <summary>
-	/// Converts a <see cref="Measurement"/> to a double number.
+	/// Converts double numbers to 64-bit unsigned integer values.
 	/// </summary>
-	public class MeasurementToDouble : ITypeConverter
+	public class DoubleToUInt64 : ITypeConverter
 	{
 		/// <summary>
-		/// Converter converts objects of this type.
+		/// Converts double numbers to 64-bit unsigned integer values.
 		/// </summary>
-		public Type From => typeof(Measurement);
+		public Type From => typeof(double);
 
 		/// <summary>
 		/// Converter converts objects to this type.
 		/// </summary>
-		public Type To => typeof(double);
+		public Type To => typeof(ulong);
 
 		/// <summary>
 		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="To"/>.
@@ -27,10 +27,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public object Convert(object Value)
 		{
-			if (Value is Measurement Q)
-				return Q.Magnitude;
-			else
-				throw new ArgumentException("Expected Measurement value.", nameof(Value));
+			if (Value is double d && d >= ulong.MinValue && d <= ulong.MaxValue && Math.Round(d) == d)
+				return (ulong)d;
+			else 
+				throw new ArgumentException("Expected 64-bit unsigned integer value.", nameof(Value));
 		}
 
 		/// <summary>
@@ -42,10 +42,10 @@ namespace Waher.Script.TypeConversion
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public IElement ConvertToElement(object Value)
 		{
-			if (Value is Measurement Q)
-				return new DoubleNumber(Q.Magnitude);
+			if (Value is double d && d >= ulong.MinValue && d <= ulong.MaxValue && Math.Round(d) == d)
+				return new ObjectValue((ulong)d);
 			else
-				throw new ArgumentException("Expected Measurement value.", nameof(Value));
+				throw new ArgumentException("Expected 64-bit unsigned integer value.", nameof(Value));
 		}
 	}
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Content.Images;
 using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc;
@@ -417,7 +418,14 @@ namespace Waher.Networking.HTTP.Mcp
 				Result["content"] = Array.Empty<object>();
 			else if (ToolResult is Dictionary<string, object?> StructuredContent)
 			{
-				Result["content"] = Array.Empty<object>();
+				Result["content"] = new object[]
+				{
+					new Dictionary<string, object?>()
+					{
+						{ "type", "text" },
+						{ "text", JSON.Encode(StructuredContent, false) }
+					}
+				};
 				Result["structuredContent"] = new Dictionary<string, object?>()
 				{
 					{ "result", StructuredContent }
@@ -431,10 +439,19 @@ namespace Waher.Networking.HTTP.Mcp
 				{
 					if (Encoder.IsStructuredContent)
 					{
-						Result["content"] = Array.Empty<object>();
+						StructuredContent = await Encoder.Encode(ToolResult);
+
+						Result["content"] = new object[]
+						{
+							new Dictionary<string, object?>()
+							{
+								{ "type", "text" },
+								{ "text", JSON.Encode(StructuredContent, false) }
+							}
+						};
 						Result["structuredContent"] = new Dictionary<string, object?>()
 						{
-							{ "result", await Encoder.Encode(ToolResult) }
+							{ "result", StructuredContent }
 						};
 					}
 					else
@@ -462,10 +479,19 @@ namespace Waher.Networking.HTTP.Mcp
 				}
 				else
 				{
-					Result["content"] = Array.Empty<object>();
+					StructuredContent = await defaultObjectEncoder.Encode(ToolResult);
+
+					Result["content"] = new object[]
+					{
+						new Dictionary<string, object?>()
+						{
+							{ "type", "text" },
+							{ "text", JSON.Encode(StructuredContent, false) }
+						}
+					};
 					Result["structuredContent"] = new Dictionary<string, object?>()
 					{
-						{ "result", await defaultObjectEncoder.Encode(ToolResult) }
+						{ "result", StructuredContent }
 					};
 				}
 			}

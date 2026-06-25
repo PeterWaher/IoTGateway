@@ -169,7 +169,7 @@ namespace Waher.IoTGateway.Cssx
 					else if (Value is string s)
 						Result.Append(s);
 					else
-						Result.Append(Expression.ToString(Value));
+						Result.Append(Expression.ToExpressionString(Value));
 
 					i = k + 1;
 				}

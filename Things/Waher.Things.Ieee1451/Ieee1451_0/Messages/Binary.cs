@@ -570,7 +570,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Result[i] = this.NextString(null);
 
 			if (this.hasSniffer && !string.IsNullOrEmpty(Name))
-				this.SniffValue(Name, Expression.ToString(Expression.Encapsulate(Result)));
+				this.SniffValue(Name, Expression.ToExpressionString(Expression.Encapsulate(Result)));
 
 			return Result;
 		}
@@ -600,7 +600,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Result[i] = this.NextBoolean(null);
 
 			if (this.hasSniffer && !string.IsNullOrEmpty(Name))
-				this.SniffValue(Name, Expression.ToString(Expression.Encapsulate(Result)));
+				this.SniffValue(Name, Expression.ToExpressionString(Expression.Encapsulate(Result)));
 
 			return Result;
 		}
@@ -630,7 +630,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Result[i] = this.NextInt8(null);
 
 			if (this.hasSniffer && !string.IsNullOrEmpty(Name))
-				this.SniffValue(Name, Expression.ToString(Expression.Encapsulate(Result)));
+				this.SniffValue(Name, Expression.ToExpressionString(Expression.Encapsulate(Result)));
 
 			return Result;
 		}
@@ -660,7 +660,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Result[i] = this.NextInt16(null);
 
 			if (this.hasSniffer && !string.IsNullOrEmpty(Name))
-				this.SniffValue(Name, Expression.ToString(Expression.Encapsulate(Result)));
+				this.SniffValue(Name, Expression.ToExpressionString(Expression.Encapsulate(Result)));
 
 			return Result;
 		}
@@ -690,7 +690,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Result[i] = this.NextInt32(null);
 
 			if (this.hasSniffer && !string.IsNullOrEmpty(Name))
-				this.SniffValue(Name, Expression.ToString(Expression.Encapsulate(Result)));
+				this.SniffValue(Name, Expression.ToExpressionString(Expression.Encapsulate(Result)));
 
 			return Result;
 		}
@@ -720,7 +720,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Result[i] = this.NextUInt16(null);
 
 			if (this.hasSniffer && !string.IsNullOrEmpty(Name))
-				this.SniffValue(Name, Expression.ToString(Expression.Encapsulate(Result)));
+				this.SniffValue(Name, Expression.ToExpressionString(Expression.Encapsulate(Result)));
 
 			return Result;
 		}
@@ -750,7 +750,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Result[i] = this.NextUInt32(null);
 
 			if (this.hasSniffer && !string.IsNullOrEmpty(Name))
-				this.SniffValue(Name, Expression.ToString(Expression.Encapsulate(Result)));
+				this.SniffValue(Name, Expression.ToExpressionString(Expression.Encapsulate(Result)));
 
 			return Result;
 		}
@@ -780,7 +780,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Result[i] = this.NextSingle(null);
 
 			if (this.hasSniffer && !string.IsNullOrEmpty(Name))
-				this.SniffValue(Name, Expression.ToString(Expression.Encapsulate(Result)));
+				this.SniffValue(Name, Expression.ToExpressionString(Expression.Encapsulate(Result)));
 
 			return Result;
 		}
@@ -810,7 +810,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Result[i] = this.NextDouble(null);
 
 			if (this.hasSniffer && !string.IsNullOrEmpty(Name))
-				this.SniffValue(Name, Expression.ToString(Expression.Encapsulate(Result)));
+				this.SniffValue(Name, Expression.ToExpressionString(Expression.Encapsulate(Result)));
 
 			return Result;
 		}
@@ -840,7 +840,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Result[i] = this.NextTimeDurationSeconds(null);
 
 			if (this.hasSniffer && !string.IsNullOrEmpty(Name))
-				this.SniffValue(Name, Expression.ToString(Expression.Encapsulate(Result)));
+				this.SniffValue(Name, Expression.ToExpressionString(Expression.Encapsulate(Result)));
 
 			return Result;
 		}
@@ -870,7 +870,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Result[i] = this.NextTime(null);
 
 			if (this.hasSniffer && !string.IsNullOrEmpty(Name))
-				this.SniffValue(Name, Expression.ToString(Expression.Encapsulate(Result)));
+				this.SniffValue(Name, Expression.ToExpressionString(Expression.Encapsulate(Result)));
 
 			return Result;
 		}
@@ -910,7 +910,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Result[i] = this.NextUuid(null);
 
 			if (this.hasSniffer && !string.IsNullOrEmpty(Name))
-				this.SniffValue(Name, Expression.ToString(Expression.Encapsulate(Result)));
+				this.SniffValue(Name, Expression.ToExpressionString(Expression.Encapsulate(Result)));
 
 			return Result;
 		}

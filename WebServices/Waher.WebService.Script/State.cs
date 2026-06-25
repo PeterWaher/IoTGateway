@@ -515,7 +515,7 @@ namespace Waher.WebService.Script
 									await Element.Render(Renderer);
 								}
 								else
-									Html.Append(this.FormatText(XML.HtmlValueEncode(Expression.ToString(Item))));
+									Html.Append(this.FormatText(XML.HtmlValueEncode(Expression.ToExpressionString(Item))));
 							}
 
 							Html.Append("</td>");

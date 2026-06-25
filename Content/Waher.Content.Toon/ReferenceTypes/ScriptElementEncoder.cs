@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using System.Text;
 using Waher.Content.Toon.Model;
 using Waher.Runtime.Inventory;
 using Waher.Script;
@@ -33,7 +32,7 @@ namespace Waher.Content.Toon.ReferenceTypes
 
 			if (E.Equals(Obj))
 			{
-				string s = Expression.ToString(Obj);
+				string s = Expression.ToExpressionString(Obj);
 				TOON.Encode(s, Indent, Toon);
 			}
 			else

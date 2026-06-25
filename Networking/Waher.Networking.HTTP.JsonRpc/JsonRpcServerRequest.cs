@@ -170,7 +170,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 									else
 										sb.Append(',');
 
-									sb.Append(Expression.ToString(P));
+									sb.Append(Expression.ToExpressionString(P));
 								}
 
 								sb.Append(')');
@@ -184,7 +184,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 							if (HasSniffer)
 							{
 								HttpRequest.Server.Information("Result: " + 
-									Expression.ToString(this.Result));
+									Expression.ToExpressionString(this.Result));
 							}
 						}
 					}

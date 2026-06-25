@@ -2380,7 +2380,7 @@ namespace Waher.Content.Markdown.Latex
 							else
 							{
 								this.Output.Append('{');
-								this.Output.Append(EscapeLaTeX(Expression.ToString(Item)));
+								this.Output.Append(EscapeLaTeX(Expression.ToExpressionString(Item)));
 								this.Output.Append('}');
 							}
 						}

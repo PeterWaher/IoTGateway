@@ -167,7 +167,7 @@ namespace Waher.Script.Test
 				IMatrix M = ResultSet.ToMatrix();
 				Assert.IsNotNull(M);
 
-				ConsoleOut.WriteLine(Expression.ToString(M));
+				ConsoleOut.WriteLine(Expression.ToExpressionString(M));
 				ConsoleOut.WriteLine();
 				ConsoleOut.WriteLine(Query);
 
@@ -224,7 +224,7 @@ namespace Waher.Script.Test
 				IMatrix M = Model.ToMatrix();
 				Assert.IsNotNull(M);
 
-				ConsoleOut.WriteLine(Expression.ToString(M));
+				ConsoleOut.WriteLine(Expression.ToExpressionString(M));
 
 				if (!string.IsNullOrEmpty(ResultName))
 				{

@@ -75,7 +75,7 @@ namespace Waher.Script.Persistence.Output
 			}
 
 			sb.Append(": ");
-			sb.Append(Expression.ToString(Value));
+			sb.Append(Expression.ToExpressionString(Value));
 		}
 	}
 }

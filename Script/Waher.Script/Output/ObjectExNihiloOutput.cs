@@ -57,7 +57,7 @@ namespace Waher.Script.Output
 				}
 
 				sb.Append(':');
-				sb.Append(Expression.ToString(P.Value.AssociatedObjectValue));
+				sb.Append(Expression.ToExpressionString(P.Value.AssociatedObjectValue));
 			}
 
 			sb.Append('}');

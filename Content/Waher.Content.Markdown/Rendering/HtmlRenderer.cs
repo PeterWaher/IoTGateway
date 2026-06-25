@@ -938,7 +938,7 @@ namespace Waher.Content.Markdown.Rendering
 							else if (Item is MarkdownElement Element)
 								await Element.Render(this);
 							else
-								this.Output.Append(FormatText(XML.HtmlValueEncode(Expression.ToString(Item))));
+								this.Output.Append(FormatText(XML.HtmlValueEncode(Expression.ToExpressionString(Item))));
 						}
 
 						this.Output.Append("</td>");

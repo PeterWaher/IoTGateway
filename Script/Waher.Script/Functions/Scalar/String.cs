@@ -30,10 +30,7 @@ namespace Waher.Script.Functions.Scalar
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the function, null is returned.
 		/// </summary>
-		public override string[] Aliases
-		{
-			get { return new string[] { "str" }; }
-		}
+		public override string[] Aliases=> new string[] { "str" };
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.
@@ -61,7 +58,7 @@ namespace Waher.Script.Functions.Scalar
 			else if (CheckAgainst.AssociatedObjectValue is null)
 				return this.Argument.PatternMatch(new StringValue(null), AlreadyFound);
 			else
-				return this.Argument.PatternMatch(new StringValue(Expression.ToString(CheckAgainst.AssociatedObjectValue)), AlreadyFound);
+				return this.Argument.PatternMatch(new StringValue(Expression.ToExpressionString(CheckAgainst.AssociatedObjectValue)), AlreadyFound);
 		}
 	}
 }

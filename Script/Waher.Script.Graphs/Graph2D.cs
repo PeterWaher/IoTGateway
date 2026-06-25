@@ -1018,7 +1018,7 @@ namespace Waher.Script.Graphs
 
 			foreach (object[] v in this.parameters)
 			{
-				s = Expression.ToString(new ObjectVector(v));
+				s = Expression.ToExpressionString(new ObjectVector(v));
 				if (Series.TryGetValue(s, out Label))
 					Output.WriteElementString("Parameters", Label);
 				else
@@ -1283,7 +1283,7 @@ namespace Waher.Script.Graphs
 			else if (Value is ObjectVector ov && IsTimeSpanVector(ov))
 				return ReducedXmlStringTimeSpans(ov);
 			else
-				return Expression.ToString(Value);
+				return Expression.ToExpressionString(Value);
 		}
 
 		private static bool IsTimeSpanVector(ObjectVector v)

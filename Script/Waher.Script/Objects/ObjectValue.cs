@@ -40,7 +40,7 @@ namespace Waher.Script.Objects
 			if (this.value is null)
 				return "null";
 			else
-				return Expression.ToString(this.value);
+				return Expression.ToExpressionString(this.value);
         }
 
         /// <summary>

@@ -106,7 +106,7 @@ namespace Waher.Script.Xml.Model
 				else if (Obj is CaseInsensitiveString cis)
 					return cis.Value;
 				else
-					return Expression.ToString(Obj);
+					return Expression.ToExpressionString(Obj);
 			}
 		}
 

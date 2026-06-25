@@ -36,7 +36,7 @@ namespace Waher.Script.Functions.Strings
         /// <returns>Function result.</returns>
         public override IElement Evaluate(IElement Argument, Variables Variables)
         {
-            return new StringValue(Expression.ToString(Argument.AssociatedObjectValue));
+            return new StringValue(Expression.ToExpressionString(Argument.AssociatedObjectValue));
         }
     }
 }

@@ -28,11 +28,11 @@ namespace Waher.Script.Graphs3D.Output
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append("PhongShader(");
-			sb.Append(Expression.ToString(Shader.Material));
+			sb.Append(Expression.ToExpressionString(Shader.Material));
 			sb.Append(',');
-			sb.Append(Expression.ToString(Shader.Ambient));
+			sb.Append(Expression.ToExpressionString(Shader.Ambient));
 			sb.Append(',');
-			sb.Append(Expression.ToString(Shader.Sources));
+			sb.Append(Expression.ToExpressionString(Shader.Sources));
 			sb.Append(')');
 
 			return sb.ToString();

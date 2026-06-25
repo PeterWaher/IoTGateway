@@ -32,7 +32,7 @@ namespace Waher.Content.Json.ReferenceTypes
 
 			if (E.Equals(Obj))
 			{
-				string s = Expression.ToString(Obj);
+				string s = Expression.ToExpressionString(Obj);
 				JSON.Encode(s, Indent, Json);
 			}
 			else

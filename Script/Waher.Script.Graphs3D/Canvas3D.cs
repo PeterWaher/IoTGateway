@@ -3450,13 +3450,13 @@ namespace Waher.Script.Graphs3D
 			Output.WriteAttributeString("height", this.height.ToString());
 			Output.WriteAttributeString("overSampling", this.overSampling.ToString());
 			Output.WriteAttributeString("distance", Expression.ToString(this.distance));
-			Output.WriteAttributeString("bgColor", Expression.ToString(this.backgroundColor));
-			Output.WriteAttributeString("pos", Expression.ToString(this.viewerPosition));
+			Output.WriteAttributeString("bgColor", Expression.ToExpressionString(this.backgroundColor));
+			Output.WriteAttributeString("pos", Expression.ToExpressionString(this.viewerPosition));
 
-			Output.WriteElementString("Projection", Expression.ToString(this.projectionTransformation));
-			Output.WriteElementString("Model", Expression.ToString(this.modelTransformation));
+			Output.WriteElementString("Projection", Expression.ToExpressionString(this.projectionTransformation));
+			Output.WriteElementString("Model", Expression.ToExpressionString(this.modelTransformation));
 			Output.WriteElementString("Pixels", Convert.ToBase64String(this.pixels));
-			Output.WriteElementString("ZBuffer", Expression.ToString(this.zBuffer));
+			Output.WriteElementString("ZBuffer", Expression.ToExpressionString(this.zBuffer));
 
 			foreach (KeyValuePair<float, ChunkedList<PolyRec>> P in this.transparentPolygons)
 			{
@@ -3473,7 +3473,7 @@ namespace Waher.Script.Graphs3D
 
 					if (!(Rec.FrontShader is null))
 					{
-						s = Expression.ToString(Rec.FrontShader);
+						s = Expression.ToExpressionString(Rec.FrontShader);
 						if (!Shaders.TryGetValue(s, out int i))
 						{
 							i = NrShaders++;
@@ -3485,7 +3485,7 @@ namespace Waher.Script.Graphs3D
 
 					if (!(Rec.BackShader is null))
 					{
-						s = Expression.ToString(Rec.BackShader);
+						s = Expression.ToExpressionString(Rec.BackShader);
 						if (!Shaders.TryGetValue(s, out int i))
 						{
 							i = NrShaders++;
@@ -3495,9 +3495,9 @@ namespace Waher.Script.Graphs3D
 						Output.WriteAttributeString("bs", i.ToString());
 					}
 
-					Output.WriteElementString("World", Expression.ToString(Rec.World));
-					Output.WriteElementString("Screen", Expression.ToString(Rec.Screen));
-					Output.WriteElementString("Normals", Expression.ToString(Rec.Normals));
+					Output.WriteElementString("World", Expression.ToExpressionString(Rec.World));
+					Output.WriteElementString("Screen", Expression.ToExpressionString(Rec.Screen));
+					Output.WriteElementString("Normals", Expression.ToExpressionString(Rec.Normals));
 
 					Output.WriteEndElement();
 				}

@@ -28,7 +28,7 @@ namespace Waher.Script.Graphs3D.Output
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append("ConstantColor(");
-			sb.Append(Expression.ToString(Shader.Color));
+			sb.Append(Expression.ToExpressionString(Shader.Color));
 			sb.Append(')');
 
 			return sb.ToString();

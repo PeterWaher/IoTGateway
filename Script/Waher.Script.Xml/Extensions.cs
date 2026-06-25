@@ -75,7 +75,7 @@ namespace Waher.Script.Xml
 						}
 
 						Xml.Append("='");
-						Xml.Append(XML.Encode(Expression.ToString(Element.AssociatedObjectValue)));
+						Xml.Append(XML.Encode(Expression.ToExpressionString(Element.AssociatedObjectValue)));
 						Xml.Append('\'');
 					}
 
@@ -206,7 +206,7 @@ namespace Waher.Script.Xml
 					else if (Value is bool b)
 						Xml.WriteAttributeString(PI.Name, CommonTypes.Encode(b));
 					else
-						Xml.WriteAttributeString(PI.Name, Expression.ToString(Value));
+						Xml.WriteAttributeString(PI.Name, Expression.ToExpressionString(Value));
 				}
 
 				Stack.Add(Node);

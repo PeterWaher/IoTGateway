@@ -1559,7 +1559,7 @@ namespace Waher.Script.Graphs3D
 							if (j > 0)
 								sb.Append(',');
 
-							sb.Append(Expression.ToString(M[i, j]));
+							sb.Append(Expression.ToExpressionString(M[i, j]));
 						}
 
 						sb.Append(']');
@@ -1583,7 +1583,7 @@ namespace Waher.Script.Graphs3D
 
 			foreach (object[] v in this.parameters)
 			{
-				s = Expression.ToString(new ObjectVector(v));
+				s = Expression.ToExpressionString(new ObjectVector(v));
 				if (Series.TryGetValue(s, out Label))
 					Output.WriteElementString("Parameters", Label);
 				else

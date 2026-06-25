@@ -49,7 +49,7 @@ namespace Waher.Script.Graphs.Canvas2D.Operations
 		/// <inheritdoc/>
 		public override void ExportGraph(XmlWriter Output)
 		{
-			Output.WriteAttributeString("p", Expression.ToString(this.parameter));
+			Output.WriteAttributeString("p", Expression.ToExpressionString(this.parameter));
 		}
 
 		/// <inheritdoc/>

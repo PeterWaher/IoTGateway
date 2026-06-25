@@ -420,7 +420,7 @@ namespace Waher.Script.Persistence.SQL
 						else if (E.AssociatedObjectValue is string s)
 							Names[i] = s;
 						else
-							Names[i] = Expression.ToString(E.AssociatedObjectValue);
+							Names[i] = Expression.ToExpressionString(E.AssociatedObjectValue);
 
 						i++;
 					}

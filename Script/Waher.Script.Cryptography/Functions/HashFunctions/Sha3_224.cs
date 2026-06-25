@@ -42,7 +42,7 @@ namespace Waher.Script.Cryptography.Functions.HashFunctions
 			if (!(Argument.AssociatedObjectValue is byte[] Bin))
 			{
 				if (!(Argument.AssociatedObjectValue is string s))
-					s = Expression.ToString(Argument.AssociatedObjectValue);
+					s = Expression.ToExpressionString(Argument.AssociatedObjectValue);
 
 				return this.EvaluateScalar(s, Variables);
 			}

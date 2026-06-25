@@ -230,7 +230,7 @@ namespace Waher.Script.Objects.Matrices
 					else
 						sb.Append(", ");
 
-					sb.Append(Expression.ToString(v[y, x]));
+					sb.Append(Expression.ToExpressionString(v[y, x]));
 				}
 
 				sb.Append(']');

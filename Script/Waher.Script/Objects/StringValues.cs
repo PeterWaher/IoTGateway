@@ -53,10 +53,10 @@ namespace Waher.Script.Objects
 		public int Compare(IElement x, IElement y)
 		{
 			if (!(x.AssociatedObjectValue is string s1))
-				s1 = Expression.ToString(x.AssociatedObjectValue);
+				s1 = Expression.ToExpressionString(x.AssociatedObjectValue);
 
 			if (!(y.AssociatedObjectValue is string s2))
-				s2 = Expression.ToString(y.AssociatedObjectValue);
+				s2 = Expression.ToExpressionString(y.AssociatedObjectValue);
 
 			return string.Compare(s1, s2, false);
 		}

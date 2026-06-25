@@ -48,7 +48,7 @@ namespace Waher.Script.Output
 
 				sb.Append(Variable.Name);
 				sb.Append(":=");
-				sb.Append(Expression.ToString(Variable.ValueObject));
+				sb.Append(Expression.ToExpressionString(Variable.ValueObject));
 			}
 
 			sb.Append(')');

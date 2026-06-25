@@ -5021,11 +5021,11 @@ namespace Waher.Script
 		private static readonly string[] stringEscapeSequences = new string[] { "\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f", "\\a", "\\v" };
 
 		/// <summary>
-		/// Converts an object to a string.
+		/// Converts an object to a string, that can be parsed as part of an expression.
 		/// </summary>
 		/// <param name="Value">Value</param>
-		/// <returns>String representation of value.</returns>
-		public static string ToString(object Value)
+		/// <returns>Expression string representation of value.</returns>
+		public static string ToExpressionString(object Value)
 		{
 			if (Value is null)
 				return "null";
@@ -5066,7 +5066,7 @@ namespace Waher.Script
 						else
 							sb.Append(',');
 
-						sb.Append(ToString(Element));
+						sb.Append(ToExpressionString(Element));
 					}
 
 					sb.Append(']');

@@ -557,13 +557,13 @@ namespace Waher.Script.Persistence.SQL.Sources
 							return new FilterFieldLesserOrEqualTo(FieldName, Value);
 						else if (Conditions is Operators.Comparisons.Like Like)
 						{
-							string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+							string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToExpressionString(Value), "%");
 							Like.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
 							return new FilterFieldLikeRegEx(FieldName, RegEx);
 						}
 						else if (Conditions is Operators.Comparisons.NotLike NotLike)
 						{
-							string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+							string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToExpressionString(Value), "%");
 							NotLike.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
 							return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
 						}
@@ -595,13 +595,13 @@ namespace Waher.Script.Persistence.SQL.Sources
 							return new FilterFieldGreaterOrEqualTo(FieldName, Value);
 						else if (Conditions is Operators.Comparisons.Like Like)
 						{
-							string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+							string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToExpressionString(Value), "%");
 							Like.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
 							return new FilterFieldLikeRegEx(FieldName, RegEx);
 						}
 						else if (Conditions is Operators.Comparisons.NotLike NotLike)
 						{
-							string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "%");
+							string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToExpressionString(Value), "%");
 							NotLike.TransformExpression += (Expression) => Database.WildcardToRegex(Expression, "%");
 							return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
 						}

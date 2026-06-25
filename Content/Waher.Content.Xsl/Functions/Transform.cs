@@ -52,7 +52,7 @@ namespace Waher.Content.Xsl.Functions
 				if (Argument1.AssociatedObjectValue is XmlDocument Xml)
 					s = Xml.OuterXml;
 				else
-					s = Expression.ToString(Argument1.AssociatedObjectValue);
+					s = Expression.ToExpressionString(Argument1.AssociatedObjectValue);
 			}
 
 			if (!(Argument2.AssociatedObjectValue is XslCompiledTransform Xslt))

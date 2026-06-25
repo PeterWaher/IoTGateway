@@ -22,7 +22,7 @@ namespace Waher.Script.Output
 		/// <returns>Expression string.</returns>
 		public string GetString(object Value)
 		{
-			return Expression.ToString((Exception)Value);
+			return Expression.ToExpressionString((Exception)Value);
 		}
 	}
 }

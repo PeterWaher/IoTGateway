@@ -477,7 +477,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			}
 
-			Variables.ConsoleOut.WriteLine(Expression.ToString(Counts));
+			Variables.ConsoleOut.WriteLine(Expression.ToExpressionString(Counts));
 
 			PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
 			return new FractalGraph(Variables, Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);

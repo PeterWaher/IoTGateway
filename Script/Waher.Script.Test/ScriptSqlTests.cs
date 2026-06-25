@@ -123,7 +123,7 @@ namespace Waher.Script.Test
 			Variables v = [];
 			Expression Exp = new(Script);
 			object Obj = await Exp.EvaluateAsync(v);
-			ConsoleOut.WriteLine(Expression.ToString(Obj));
+			ConsoleOut.WriteLine(Expression.ToExpressionString(Obj));
 
 			ObjectMatrix M = Obj as ObjectMatrix;
 			int NrRows, RowIndex;
@@ -174,7 +174,7 @@ namespace Waher.Script.Test
 			Variables v = [];
 			Expression Exp = new(Script);
 			object Obj = await Exp.EvaluateAsync(v);
-			ConsoleOut.WriteLine(Expression.ToString(Obj));
+			ConsoleOut.WriteLine(Expression.ToExpressionString(Obj));
 
 			Array V = Obj as Array;
 			int Count, Index;

@@ -248,10 +248,10 @@ namespace Waher.Script.Graphs.Canvas2D
 			Output.WriteAttributeString("height", this.height.ToString());
 
 			if (this.bgColor.HasValue)
-				Output.WriteAttributeString("bgColor", Expression.ToString(this.bgColor.Value));
+				Output.WriteAttributeString("bgColor", Expression.ToExpressionString(this.bgColor.Value));
 
 			if (this.defaultColor.HasValue)
-				Output.WriteAttributeString("defaultColor", Expression.ToString(this.defaultColor.Value));
+				Output.WriteAttributeString("defaultColor", Expression.ToExpressionString(this.defaultColor.Value));
 
 			foreach (CanvasOperation Op in this.operations)
 			{

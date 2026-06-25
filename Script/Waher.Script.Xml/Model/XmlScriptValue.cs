@@ -162,7 +162,7 @@ namespace Waher.Script.Xml.Model
 					this.AppendChild(Document, Parent, e.Current);
 			}
 			else
-				Parent.AppendChild(Document.CreateTextNode(Expression.ToString(Value)));
+				Parent.AppendChild(Document.CreateTextNode(Expression.ToExpressionString(Value)));
 		}
 
 		/// <summary>

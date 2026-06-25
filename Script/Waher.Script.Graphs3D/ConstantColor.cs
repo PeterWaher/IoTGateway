@@ -69,7 +69,7 @@ namespace Waher.Script.Graphs3D
 		/// <returns>Exports the shader to parsable script.</returns>
 		public string ToScript()
 		{
-			return "ConstantColor(" + Expression.ToString(this.color) + ")";
+			return "ConstantColor(" + Expression.ToExpressionString(this.color) + ")";
 		}
 	}
 }

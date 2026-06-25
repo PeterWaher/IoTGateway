@@ -28,11 +28,11 @@ namespace Waher.Script.Graphs3D.Output
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append("PhongLightSource(");
-			sb.Append(Expression.ToString(Source.Diffuse));
+			sb.Append(Expression.ToExpressionString(Source.Diffuse));
 			sb.Append(',');
-			sb.Append(Expression.ToString(Source.Specular));
+			sb.Append(Expression.ToExpressionString(Source.Specular));
 			sb.Append(',');
-			sb.Append(Expression.ToString(Source.Position));
+			sb.Append(Expression.ToExpressionString(Source.Position));
 			sb.Append(')');
 
 			return sb.ToString();

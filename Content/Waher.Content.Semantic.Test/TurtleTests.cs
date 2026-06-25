@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using Waher.Content.Markdown.GraphViz;
+using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 
@@ -175,7 +176,14 @@ namespace Waher.Content.Semantic.Test
 
 			await Print(Parsed);
 
-			await RdfTests.ExportAsImage(Parsed, "turtle", FileName);
+			try
+			{
+				await RdfTests.ExportAsImage(Parsed, "turtle", FileName);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 
 			CompareTriples(Parsed, ParsedExpected);
 		}

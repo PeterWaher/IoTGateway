@@ -177,7 +177,7 @@ namespace Waher.Utility.RunScript
 
 				object Result = Parsed.EvaluateAsync(Variables).Result;
 
-				ConsoleOut.WriteLine(Expression.ToString(Result));
+				ConsoleOut.WriteLine(Expression.ToExpressionString(Result));
 
 				return 0;
 			}

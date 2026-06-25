@@ -499,10 +499,10 @@ namespace Waher.Networking.HTTP.Mcp
 							continue;
 
 						Type T2 = Item.GetType();
-						if (contentBlocks.TryGetValue(T2, out IContentBlock Encoder2))
-							Content.Add(await Encoder2.Encode(Item));
-						else
-							Content.Add(await defaultObjectEncoder.Encode(Item));
+						if (!contentBlocks.TryGetValue(T2, out IContentBlock Encoder2))
+							Encoder2 = defaultObjectEncoder;
+
+						Content.Add(await Encoder2.Encode(Item));
 					}
 
 					Result["content"] = Content.ToArray();
@@ -632,42 +632,65 @@ namespace Waher.Networking.HTTP.Mcp
 				Result["isError"] = true;
 			}
 
-			if (PromptResult is null)
-				Result["messages"] = Array.Empty<object>();
-			else
-			{
-				Type T = PromptResult.GetType();
+			ChunkedList<PromptMessage> Messages = new ChunkedList<PromptMessage>();
 
-				if (contentBlocks.TryGetValue(T, out IContentBlock Encoder))
-					Result["messages"] = new object[] { await Encoder.Encode(PromptResult) };
-				else if (T.IsArray && PromptResult is IEnumerable Enumerable)
-				{
-					ChunkedList<object> Content = new ChunkedList<object>();
-					IEnumerator e = Enumerable.GetEnumerator();
-
-					while (e.MoveNext())
-					{
-						object? Item = e.Current;
-						if (Item is null)
-							continue;
-
-						Type T2 = Item.GetType();
-						if (contentBlocks.TryGetValue(T2, out IContentBlock Encoder2))
-							Content.Add(await Encoder2.Encode(Item));
-						else
-							Content.Add(await defaultObjectEncoder.Encode(Item));
-					}
-
-					Result["messages"] = Content.ToArray();
-				}
+			if (!(PromptResult is null))
+			{ 
+				if (PromptResult is PromptMessage PromptMessage)
+					Messages.Add(PromptMessage);
+				else if (PromptResult is IEnumerable<PromptMessage> PromptMessages)
+					Messages.AddRange(PromptMessages);
 				else
 				{
-					Result["messages"] = new object[]
+					Type T = PromptResult.GetType();
+
+					if (contentBlocks.TryGetValue(T, out IContentBlock Encoder))
 					{
-						await defaultTextEncoder.Encode(PromptResult)                   
-					};
+						Messages.Add(new PromptMessage(McpRole.Assistant,
+							await Encoder.Encode(PromptResult)));
+					}
+					else if (T.IsArray && PromptResult is IEnumerable Enumerable)
+					{
+						IEnumerator e = Enumerable.GetEnumerator();
+
+						while (e.MoveNext())
+						{
+							object? Item = e.Current;
+							if (Item is null)
+								continue;
+
+							if (e.Current is PromptMessage PromptMessage2)
+								Messages.Add(PromptMessage2);
+							else if (e.Current is IEnumerable<PromptMessage> PromptMessages2)
+								Messages.AddRange(PromptMessages2);
+							else
+								Messages.Add(new PromptMessage(McpRole.Assistant, e.Current));
+						}
+					}
+					else
+						Messages.Add(new PromptMessage(McpRole.Assistant, PromptResult));
 				}
 			}
+
+			int i = 0;
+			int c = Messages.Count;
+			Dictionary<string, object?>[] EncodedMessages = new Dictionary<string, object?>[c];
+
+			foreach (PromptMessage Message in Messages)
+			{
+				if (Message.IsEncoded)
+					EncodedMessages[i++] = Message.Encoded!;
+				else
+				{
+					Type T = Message.Content.GetType();
+					if (!contentBlocks.TryGetValue(T, out IContentBlock Encoder))
+						Encoder = defaultObjectEncoder;
+
+					EncodedMessages[i++] = await Encoder.Encode(Message.Content);
+				}
+			}
+
+			Result["messages"] = EncodedMessages;
 
 			return Result;
 		}

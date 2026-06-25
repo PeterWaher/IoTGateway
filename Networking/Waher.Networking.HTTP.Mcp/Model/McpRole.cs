@@ -1,4 +1,4 @@
-﻿namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
+﻿namespace Waher.Networking.HTTP.Mcp.Model
 {
 	/// <summary>
 	/// Identifies a Role in a Model Context Protocol (MCP) context.

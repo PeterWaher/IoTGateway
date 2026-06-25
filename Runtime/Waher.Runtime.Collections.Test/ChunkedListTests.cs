@@ -1562,10 +1562,10 @@ namespace Waher.Runtime.Collections.Test
 			for (int i = 4; i < 8; i++)
 				List.Add(i);
 
-			int[] NewElements = [ 0, 1, 2, 3 ];
+			int[] NewElements = [0, 1, 2, 3];
 			List.AddRangeFirst(NewElements);
 
-			int[] Expected = [ 0, 1, 2, 3, 4, 5, 6, 7 ];
+			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7];
 			int[] Result = [.. List];
 
 			for (int i = 0; i < Expected.Length; i++)
@@ -1612,7 +1612,7 @@ namespace Waher.Runtime.Collections.Test
 		public void Test_107_AddRangeFirst_MultipleChunks_Enumerable()
 		{
 			ChunkedList<int> List = new(4);
-		
+
 			for (int i = 8; i < 16; i++)
 				List.Add(i);
 
@@ -1690,6 +1690,263 @@ namespace Waher.Runtime.Collections.Test
 
 			for (int i = 0; i < Expected.Length; i++)
 				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_112_InsertRange_EmptyCollection_DoesNotChangeCountOrIndexedValues()
+		{
+			ChunkedList<int> List = new(4);
+			for (int i = 0; i < 8; i++)
+				List.Add(i);
+
+			int InitialChunkCount = CountChunks(List);
+			int[] NewElements = [];
+			List.InsertRange(4, NewElements);
+
+			Assert.AreEqual(InitialChunkCount, CountChunks(List));
+			AssertListByIndexer(List, [0, 1, 2, 3, 4, 5, 6, 7]);
+		}
+
+		[TestMethod]
+		public void Test_113_InsertRange_FullInternalChunk_AtChunkStart_SplitsAndKeepsIndexedOrder()
+		{
+			ChunkedList<int> List = CreateList(12, 4);
+			int InitialChunkCount = CountChunks(List);
+
+			List.InsertRange(4, [100, 101]);
+
+			Assert.IsTrue(CountChunks(List) > InitialChunkCount, "Expected InsertRange to split an internal chunk.");
+			AssertListByIndexer(List, [0, 1, 2, 3, 100, 101, 4, 5, 6, 7, 8, 9, 10, 11]);
+		}
+
+		[TestMethod]
+		public void Test_114_InsertRange_FullInternalChunk_BeforeMidpoint_SplitsAndKeepsIndexedOrder()
+		{
+			ChunkedList<int> List = CreateList(12, 4);
+			int InitialChunkCount = CountChunks(List);
+
+			List.InsertRange(5, [100, 101, 102]);
+
+			Assert.IsTrue(CountChunks(List) > InitialChunkCount, "Expected InsertRange to split an internal chunk.");
+			AssertListByIndexer(List, [0, 1, 2, 3, 4, 100, 101, 102, 5, 6, 7, 8, 9, 10, 11]);
+		}
+
+		[TestMethod]
+		public void Test_115_InsertRange_FullInternalChunk_AfterMidpoint_SplitsAndKeepsIndexedOrder()
+		{
+			ChunkedList<int> List = CreateList(12, 4);
+			int InitialChunkCount = CountChunks(List);
+
+			List.InsertRange(7, [100, 101, 102]);
+
+			Assert.IsTrue(CountChunks(List) > InitialChunkCount, "Expected InsertRange to split an internal chunk.");
+			AssertListByIndexer(List, [0, 1, 2, 3, 4, 5, 6, 100, 101, 102, 7, 8, 9, 10, 11]);
+		}
+
+		[TestMethod]
+		public void Test_116_InsertRange_LongRange_InsideFullInternalChunk_CausesRepeatedSplits()
+		{
+			ChunkedList<int> List = CreateList(16, 4);
+			int InitialChunkCount = CountChunks(List);
+
+			List.InsertRange(6, [200, 201, 202, 203, 204, 205, 206, 207, 208, 209]);
+
+			Assert.IsTrue(CountChunks(List) > InitialChunkCount, "Expected a long InsertRange into an internal chunk to create additional chunks.");
+			AssertListByIndexer(List,
+			[
+				0, 1, 2, 3, 4, 5,
+				200, 201, 202, 203, 204, 205, 206, 207, 208, 209,
+				6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+			]);
+		}
+
+		[TestMethod]
+		public void Test_117_InsertRange_InternalChunkSplit_WhenEarlierChunkHasStartOffset()
+		{
+			ChunkedList<int> List = CreateList(12, 4);
+			List.RemoveAt(0);
+			List.RemoveAt(0);
+			int InitialChunkCount = CountChunks(List);
+
+			List.InsertRange(3, [100, 101, 102]);
+
+			Assert.IsTrue(CountChunks(List) > InitialChunkCount, "Expected InsertRange to split an internal chunk after traversing a chunk with Start > 0.");
+			AssertListByIndexer(List, [2, 3, 4, 100, 101, 102, 5, 6, 7, 8, 9, 10, 11]);
+		}
+
+		[TestMethod]
+		public void Test_118_InsertRange_SplitLastChunkThenAppend_DoesNotLoseSplitOffChunk()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				0,
+				1,
+				2,
+				3
+			};
+
+			// This InsertRange splits the current last chunk. The split-off chunk must
+			// become the new last chunk, otherwise later appends use a stale tail pointer.
+			List.InsertRange(2, [100]);
+			AssertCountEqualsChunkElementCount(List);
+			AssertListByIndexer(List, [0, 1, 100, 2, 3]);
+
+			// Appending enough items after the stale-tail split used to overwrite the
+			// old last chunk's Next pointer, orphaning the split-off chunk.
+			List.InsertRange(List.Count, [200, 201, 202]);
+
+			AssertCountEqualsChunkElementCount(List);
+			AssertListByIndexer(List, [0, 1, 100, 2, 3, 200, 201, 202]);
+		}
+
+		[TestMethod]
+		public void Test_119_InsertRange_ParserLikeIndexedTraversal_DoesNotLoseChunksAfterTailSplit()
+		{
+			ParserNode Root = new(0);
+			ParserNode A = new(1);
+			ParserNode B = new(2);
+			ParserNode C = new(3);
+			ParserNode D = new(4);
+			ParserNode E = new(5);
+			ParserNode F = new(6);
+			ParserNode G = new(7);
+			ParserNode X = new(8);
+			ParserNode Y = new(9);
+			ParserNode Z = new(10);
+
+			// Root's children fill the first chunk and the second chunk exactly:
+			// [Root, A, B, C] [D, E, F, G]
+			Root.Children = [A, B, C, D, E, F, G];
+
+			// Processing D inserts X before E/F/G and splits the current last chunk.
+			D.Children = [X];
+
+			// Processing G appends enough nodes to reuse the stale lastChunk pointer if
+			// Insert did not update lastChunk when D split the tail chunk.
+			G.Children = [Y, Z];
+
+			ChunkedList<ParserNode> Todo = new(4)
+			{
+				Root
+			};
+
+			int i = 0;
+			while (i < Todo.Count)
+			{
+				ParserNode N = Todo[i++];
+
+				if (N.Children.Length > 0)
+				{
+					Todo.InsertRange(i, N.Children);
+					AssertCountEqualsChunkElementCount(Todo);
+				}
+			}
+
+			AssertNodeListByIndexer(Todo, [0, 1, 2, 3, 4, 8, 5, 6, 7, 9, 10]);
+		}
+
+		[TestMethod]
+		public void Test_120_InsertRange_SplitLastChunkThenAppend_AllCountedIndexesRemainReadable()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				0,
+				1,
+				2,
+				3
+			};
+
+			List.InsertRange(2, [100]);
+			List.InsertRange(List.Count, [200, 201, 202]);
+
+			AssertAllCountedIndexesCanBeRead(List);
+			AssertListByIndexer(List, [0, 1, 100, 2, 3, 200, 201, 202]);
+		}
+
+		private sealed class ParserNode
+		{
+			public ParserNode(int Id)
+			{
+				this.Id = Id;
+				this.Children = [];
+			}
+
+			public int Id { get; }
+
+			public ParserNode[] Children { get; set; }
+
+			public override string ToString()
+			{
+				return this.Id.ToString();
+			}
+		}
+
+		private static ChunkedList<int> CreateList(int Count, int ChunkSize)
+		{
+			ChunkedList<int> List = new(ChunkSize);
+
+			for (int i = 0; i < Count; i++)
+				List.Add(i);
+
+			return List;
+		}
+
+		private static void AssertListByIndexer(ChunkedList<int> List, params int[] Expected)
+		{
+			Assert.AreEqual(Expected.Length, List.Count, "Unexpected list count.");
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], List[i], "Unexpected value at index " + i.ToString() + ".");
+		}
+
+		private static void AssertNodeListByIndexer(ChunkedList<ParserNode> List, params int[] ExpectedIds)
+		{
+			Assert.AreEqual(ExpectedIds.Length, List.Count, "Unexpected list count.");
+
+			for (int i = 0; i < ExpectedIds.Length; i++)
+				Assert.AreEqual(ExpectedIds[i], List[i].Id, "Unexpected node at index " + i.ToString() + ".");
+		}
+
+		private static void AssertCountEqualsChunkElementCount<T>(ChunkedList<T> List)
+		{
+			int ChunkElementCount = 0;
+
+			List.ForEachChunk((Chunk, Offset, Count) =>
+			{
+				ChunkElementCount += Count;
+				return true;
+			});
+
+			Assert.AreEqual(List.Count, ChunkElementCount, "ChunkedList.Count does not match the number of elements reachable through the chunk chain.");
+		}
+
+		private static void AssertAllCountedIndexesCanBeRead<T>(ChunkedList<T> List)
+		{
+			for (int i = 0; i < List.Count; i++)
+			{
+				try
+				{
+					_ = List[i];
+				}
+				catch (ArgumentOutOfRangeException ex)
+				{
+					Assert.Fail("Indexer threw " + ex.GetType().Name + " for index " + i.ToString() + " even though Count is " + List.Count.ToString() + ". " + ex.Message);
+				}
+			}
+		}
+
+		private static int CountChunks(ChunkedList<int> List)
+		{
+			int Result = 0;
+
+			List.ForEachChunk((Chunk, Offset, Count) =>
+			{
+				Result++;
+				Assert.IsTrue(Count > 0, "ForEachChunk should only report non-empty chunks.");
+				return true;
+			});
+
+			return Result;
 		}
 
 	}

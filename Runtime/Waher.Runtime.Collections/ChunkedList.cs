@@ -1201,6 +1201,11 @@ namespace Waher.Runtime.Collections
 							Next = Temp
 						};
 
+						if (!(Temp is null))
+							Temp.Prev = NewChunk;
+						else
+							this.lastChunk = NewChunk;
+
 						c = Loop.Size >> 1;
 
 						if (Index < c)

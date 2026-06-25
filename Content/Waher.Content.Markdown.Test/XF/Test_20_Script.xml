@@ -5,5 +5,5 @@
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[Result of execution: <strong>some text</strong>.]]></Label>
 	</ContentView>
-	<Image Source="C:\Users\peter\AppData\Local\Temp\tmpToG69kmo_XQYV3vYYbWW5Y7rQ36_FpS6Mk2iycRlN58.tmp" WidthRequest="640" HeightRequest="480" />
+	<Image Source="C:\Users\peter\AppData\Local\Temp\tmpM2dUG0_pJjknB3zpjaxa7rgpxYhRkC87E6fRWsaF1kg.tmp" WidthRequest="640" HeightRequest="480" />
 </StackLayout>

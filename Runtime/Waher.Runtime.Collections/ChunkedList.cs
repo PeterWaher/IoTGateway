@@ -132,9 +132,17 @@ namespace Waher.Runtime.Collections
 		/// <param name="MaxChunkSize">Maximum Chunk Size.</param>
 		public ChunkedList(T[] InitialElements, int MaxChunkSize)
 		{
+			Chunk Chunk;
+
 			this.chunkSize = this.count = InitialElements.Length;
+
 			if (this.chunkSize == 0)
+			{
 				this.chunkSize = initialChunkSize;
+				Chunk = new Chunk(this.chunkSize);
+			}
+			else
+				Chunk = new Chunk(InitialElements);
 
 			if (MaxChunkSize < this.chunkSize)
 				throw new ArgumentException("Max chunk size must be greater than or equal to initial chunk size.", nameof(MaxChunkSize));
@@ -142,7 +150,7 @@ namespace Waher.Runtime.Collections
 			this.maxChunkSize = MaxChunkSize;
 			this.minChunkSize = this.chunkSize;
 
-			this.firstChunk = this.lastChunk = new Chunk(InitialElements);
+			this.firstChunk = this.lastChunk = Chunk;
 
 			this.chunkSize <<= 1;
 			if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
@@ -250,7 +258,7 @@ namespace Waher.Runtime.Collections
 		/// <summary>
 		/// Last chunk
 		/// </summary>
-		public ChunkNode<T> LastChunk => this.firstChunk.Node;
+		public ChunkNode<T> LastChunk => this.lastChunk.Node;
 
 		#region ICollection<T>
 
@@ -794,7 +802,7 @@ namespace Waher.Runtime.Collections
 					this.count++;
 				}
 				else
-					this.firstChunk.Elements[0] = value;
+					this.firstChunk.Elements[this.firstChunk.Start] = value;
 			}
 		}
 
@@ -1005,50 +1013,38 @@ namespace Waher.Runtime.Collections
 		/// <returns>The index of item if found in the list; otherwise, -1.</returns>
 		public int IndexOf(T Item, int Index, int Count)
 		{
-			if (Index < 0 || Index >= this.count)
+			if (Index < 0 || Index > this.count)
 				throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
 
 			if (Count < 0 || Index + Count > this.count)
 				throw new ArgumentOutOfRangeException("Count out of bounds.", nameof(Count));
 
 			Chunk Loop = this.firstChunk;
-			int i, c, Result = 0;
+			int i, c, c0, Result = 0;
 
-			while (!(Loop is null) && Count >= 0)
+			while (!(Loop is null) && Count > 0)
 			{
-				c = Loop.Pos - Loop.Start;
+				c = c0 = Loop.Pos - Loop.Start;
 
 				if (c > 0)
 				{
-					if (Index > 0)
-					{
-						if (Index >= c)
-							Index -= c;
-						else
-						{
-							c -= Index;
-
-							if (Count < c)
-								c = Count;
-
-							if ((i = Array.IndexOf(Loop.Elements, Item, Loop.Start + Index, c)) >= 0)
-								return Result + i;
-
-							Count -= c;
-						}
-					}
+					if (Index >= c)
+						Index -= c;
 					else
 					{
+						c -= Index;
+
 						if (Count < c)
 							c = Count;
 
-						if ((i = Array.IndexOf(Loop.Elements, Item, Loop.Start, c)) >= 0)
-							return Result + i;
+						if ((i = Array.IndexOf(Loop.Elements, Item, Loop.Start + Index, c)) >= 0)
+							return Result + i - Loop.Start;
 
 						Count -= c;
+						Index = 0;
 					}
 
-					Result += c;
+					Result += c0;
 				}
 
 				Loop = Loop.Next;
@@ -1064,7 +1060,7 @@ namespace Waher.Runtime.Collections
 		/// <returns>The index of item if found in the list; otherwise, -1.</returns>
 		public int LastIndexOf(T Item)
 		{
-			return this.LastIndexOf(Item, this.count - 1, this.count);
+			return this.LastIndexOf(Item, Math.Max(this.count - 1, 0), this.count);
 		}
 
 		/// <summary>
@@ -1075,7 +1071,7 @@ namespace Waher.Runtime.Collections
 		/// <returns>The index of item if found in the list; otherwise, -1.</returns>
 		public int LastIndexOf(T Item, int Index)
 		{
-			return this.LastIndexOf(Item, Index, Index + 1);
+			return this.LastIndexOf(Item, Index, Math.Min(this.count, Index + 1));
 		}
 
 		/// <summary>
@@ -1087,7 +1083,7 @@ namespace Waher.Runtime.Collections
 		/// <returns>The index of item if found in the list; otherwise, -1.</returns>
 		public int LastIndexOf(T Item, int Index, int Count)
 		{
-			if (Index < 0 || Index >= this.count)
+			if (Index < 0 || Index > this.count)
 				throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
 
 			if (Count < 0 || Count > Index + 1)
@@ -1135,10 +1131,15 @@ namespace Waher.Runtime.Collections
 					if (i < 0)
 						i = Array.LastIndexOf(Loop.Elements, Item, Loop.Pos - 1, c);
 					else
+					{
+						if (c > i + 1)
+							c = i + 1;
+
 						i = Array.LastIndexOf(Loop.Elements, Item, Loop.Start + i, c);
+					}
 
 					if (i >= 0)
-						return j + i;
+						return j + i - Loop.Start;
 
 					Count -= c;
 				}
@@ -1208,7 +1209,15 @@ namespace Waher.Runtime.Collections
 
 						c = Loop.Size >> 1;
 
-						if (Index < c)
+						if (c == 0) // Chunk of size 1; cannot be split.
+						{
+							Loop.Size <<= 1;
+							Array.Resize(ref Loop.Elements, Loop.Size);
+							Loop.Elements[1] = Loop.Elements[0];
+							Loop.Elements[0] = Item;
+							Loop.Pos = 2;
+						}
+						else if (Index < c)
 						{
 							NewChunk.Pos = Loop.Size - c;
 							Array.Copy(Loop.Elements, c, NewChunk.Elements, 0, NewChunk.Pos);
@@ -1397,7 +1406,7 @@ namespace Waher.Runtime.Collections
 			int d;
 
 			Count += Index;
-			
+
 			if (this.lastChunk.Start > 0)
 			{
 				if (this.lastChunk.Start < this.lastChunk.Pos)
@@ -1534,7 +1543,14 @@ namespace Waher.Runtime.Collections
 			if (!(this.firstChunk.Next is null) ||
 				(Trimmed && this.firstChunk.Start > 0 || this.firstChunk.Pos < this.firstChunk.Size))
 			{
-				this.firstChunk = this.lastChunk = new Chunk(this.ToArray());
+				Chunk Chunk;
+
+				if (this.count == 0)
+					Chunk = new Chunk(this.chunkSize);
+				else
+					Chunk = new Chunk(this.ToArray());
+
+				this.firstChunk = this.lastChunk = Chunk;
 			}
 		}
 

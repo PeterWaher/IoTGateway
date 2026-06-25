@@ -23,9 +23,9 @@ namespace Waher.Content.Semantic.Test
 				{
 					ISemanticTriple T2 = Triples[i];
 
-					if (Matches(Triples[i], T, NodeIdMap, false))
+					if (Matches(T2, T, NodeIdMap, false))
 					{
-						Assert.IsTrue(Matches(Triples[i], T, NodeIdMap, true), "Blank node inconsistency.");
+						Assert.IsTrue(Matches(T2, T, NodeIdMap, true), "Blank node inconsistency.");
 
 						Match = true;
 						Triples.RemoveAt(i);

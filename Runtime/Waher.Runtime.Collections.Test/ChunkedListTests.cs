@@ -1863,6 +1863,211 @@ namespace Waher.Runtime.Collections.Test
 			AssertListByIndexer(List, [0, 1, 100, 2, 3, 200, 201, 202]);
 		}
 
+		[TestMethod]
+		public void Test_121_LastChunk_ReturnsTailChunkNodeAfterListSpansMultipleChunks()
+		{
+			ChunkedList<int> List = CreateList(8, 4);
+
+			Assert.IsTrue(CountChunks(List) > 1, "Test setup requires more than one chunk.");
+			Assert.AreNotSame(List.FirstChunk, List.LastChunk, "FirstChunk and LastChunk must not expose the same node when the list spans multiple chunks.");
+			AssertCountEqualsChunkElementCount(List);
+			AssertListByIndexer(List, [0, 1, 2, 3, 4, 5, 6, 7]);
+		}
+
+		[TestMethod]
+		public void Test_122_FirstItemSetter_WhenFirstChunkHasStartOffset_UpdatesLogicalFirstItem()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				0,
+				1,
+				2,
+				3
+			};
+
+			List.RemoveFirst();
+			Assert.AreEqual(1, List.FirstItem);
+
+			List.FirstItem = 100;
+
+			Assert.AreEqual(100, List.FirstItem, "FirstItem setter must write to firstChunk.Start, not to physical index zero.");
+			AssertListByIndexer(List, [100, 2, 3]);
+			AssertCountEqualsChunkElementCount(List);
+		}
+
+		[TestMethod]
+		public void Test_123_Insert_FullChunkOfSizeOne_SplitsWithoutCorruptingList()
+		{
+			ChunkedList<int> List = new(1)
+			{
+				1
+			};
+
+			List.Insert(0, 0);
+
+			AssertListByIndexer(List, [0, 1]);
+			AssertCountEqualsChunkElementCount(List);
+			AssertAllCountedIndexesCanBeRead(List);
+		}
+
+		[TestMethod]
+		public void Test_124_IndexOf_WhenFirstChunkHasStartOffset_ReturnsLogicalIndex()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				0,
+				1,
+				2,
+				3
+			};
+
+			List.RemoveFirst();
+
+			AssertListByIndexer(List, [1, 2, 3]);
+			Assert.AreEqual(0, List.IndexOf(1), "IndexOf must return the logical list index, not the physical array slot.");
+			Assert.AreEqual(1, List.IndexOf(2), "IndexOf must subtract the chunk Start offset from the physical array index.");
+			Assert.AreEqual(2, List.IndexOf(3), "IndexOf must subtract the chunk Start offset from the physical array index.");
+		}
+
+		[TestMethod]
+		public void Test_125_IndexOf_WithStartIndexInsideEarlierChunk_SearchesFollowingChunks()
+		{
+			ChunkedList<int> List = CreateList(8, 4);
+
+			AssertListByIndexer(List, [0, 1, 2, 3, 4, 5, 6, 7]);
+			Assert.AreEqual(4, List.IndexOf(4, 2), "IndexOf must reset the per-chunk offset after searching the tail of the starting chunk.");
+			Assert.AreEqual(5, List.IndexOf(5, 2, 4), "IndexOf with a start index and count must search across following chunks using logical indexes.");
+			Assert.AreEqual(-1, List.IndexOf(6, 2, 4), "IndexOf must honor Count while searching across following chunks.");
+		}
+
+		[TestMethod]
+		public void Test_126_LastIndexOf_WhenFirstChunkHasStartOffset_ReturnsLogicalIndex()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				0,
+				1,
+				2,
+				3
+			};
+
+			List.RemoveFirst();
+
+			AssertListByIndexer(List, [1, 2, 3]);
+			Assert.AreEqual(2, List.LastIndexOf(3), "LastIndexOf must return logical indexes when the chunk Start offset is non-zero.");
+			Assert.AreEqual(1, List.LastIndexOf(2), "LastIndexOf must subtract the chunk Start offset from the physical array index.");
+			Assert.AreEqual(0, List.LastIndexOf(1), "LastIndexOf must subtract the chunk Start offset from the physical array index.");
+		}
+
+		[TestMethod]
+		public void Test_127_LastIndexOf_StartingAtFirstElementOfLaterChunk_ReturnsBoundaryIndex()
+		{
+			ChunkedList<int> List = CreateList(8, 4);
+
+			AssertListByIndexer(List, [0, 1, 2, 3, 4, 5, 6, 7]);
+			Assert.AreEqual(4, List.LastIndexOf(4, 4));
+		}
+
+		[TestMethod]
+		public void Test_128_EmptyInitialArrayConstructor_AddFirstMaintainsFirstAndLastInvariants()
+		{
+			ChunkedList<int> List = new(Array.Empty<int>());
+
+			List.AddFirstItem(10);
+
+			Assert.AreEqual(1, List.Count);
+			Assert.IsTrue(List.HasFirstItem);
+			Assert.IsTrue(List.HasLastItem);
+			Assert.AreEqual(10, List.FirstItem);
+			Assert.AreEqual(10, List.LastItem);
+			Assert.AreEqual(10, List.RemoveFirst());
+			Assert.AreEqual(0, List.Count);
+		}
+
+		[TestMethod]
+		public void Test_129_EmptyInitialArrayConstructor_AddLastAllowsRemoveFirst()
+		{
+			ChunkedList<int> List = new(Array.Empty<int>());
+
+			List.AddLastItem(10);
+
+			Assert.AreEqual(1, List.Count);
+			AssertCountEqualsChunkElementCount(List);
+			Assert.IsTrue(List.HasFirstItem);
+			Assert.IsTrue(List.HasLastItem);
+			Assert.AreEqual(10, List.FirstItem);
+			Assert.AreEqual(10, List.RemoveFirst());
+			Assert.AreEqual(0, List.Count);
+		}
+
+		[TestMethod]
+		public void Test_130_SortEmptyThenAdd_PreservesFirstAndLastItemInvariants()
+		{
+			ChunkedList<int> List = new(4);
+
+			List.Sort();
+			List.Add(1);
+
+			Assert.AreEqual(1, List.Count);
+			Assert.IsTrue(List.HasFirstItem, "Adding to a sorted empty list must leave firstChunk pointing at a non-empty chunk.");
+			Assert.IsTrue(List.HasLastItem);
+			Assert.AreEqual(1, List.FirstItem);
+			Assert.AreEqual(1, List.LastItem);
+			AssertListByIndexer(List, [1]);
+			AssertCountEqualsChunkElementCount(List);
+		}
+
+		[TestMethod]
+		public void Test_131_ReverseEmptyThenAdd_PreservesFirstAndLastItemInvariants()
+		{
+			ChunkedList<int> List = new(4);
+
+			List.Reverse();
+			List.Add(1);
+
+			Assert.AreEqual(1, List.Count);
+			Assert.IsTrue(List.HasFirstItem, "Adding to a reversed empty list must leave firstChunk pointing at a non-empty chunk.");
+			Assert.IsTrue(List.HasLastItem);
+			Assert.AreEqual(1, List.FirstItem);
+			Assert.AreEqual(1, List.LastItem);
+			AssertListByIndexer(List, [1]);
+			AssertCountEqualsChunkElementCount(List);
+		}
+
+		[TestMethod]
+		public void Test_132_ClearAfterSortEmptyThenAdd_DoesNotCreateZeroSizedAppendChunk()
+		{
+			ChunkedList<int> List = new(4);
+
+			List.Sort();
+			List.Clear();
+			List.Add(1);
+
+			AssertListByIndexer(List, [1]);
+			Assert.IsTrue(List.HasFirstItem);
+			Assert.IsTrue(List.HasLastItem);
+			Assert.AreEqual(1, List.FirstItem);
+			Assert.AreEqual(1, List.LastItem);
+			AssertCountEqualsChunkElementCount(List);
+		}
+
+		[TestMethod]
+		public void Test_133_IndexOf_EmptyList_ReturnsMinusOne()
+		{
+			ChunkedList<int> List = [];
+
+			Assert.AreEqual(-1, List.IndexOf(123));
+		}
+
+		[TestMethod]
+		public void Test_134_LastIndexOf_EmptyList_ReturnsMinusOne()
+		{
+			ChunkedList<int> List = [];
+
+			Assert.AreEqual(-1, List.LastIndexOf(123));
+		}
+
+
 		private sealed class ParserNode
 		{
 			public ParserNode(int Id)

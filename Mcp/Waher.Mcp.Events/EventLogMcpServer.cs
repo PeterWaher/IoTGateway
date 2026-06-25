@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
@@ -433,8 +434,8 @@ namespace Waher.Mcp.Events
 			[McpIntegerParameter("Offset", "Offset into search result set where returned events begin.", 0, int.MaxValue)]
 			int Offset = 0,
 
-			[McpIntegerParameter("Max Count", "Maximum number of results to return.", 1, 100)]
-			int MaxCount = 20,
+			[McpIntegerParameter("Max Count", "Maximum number of results to return.", 1, 1000)]
+			int MaxCount = 100,
 
 			[McpDateTimeParameter("From", "Start date/time for search, in UTC. If provided, only events newer than or equal to this point in time will be returned.")]
 			DateTime? From = null,
@@ -683,13 +684,177 @@ namespace Waher.Mcp.Events
 		}
 
 		[McpServerPrompt(
-			"Find Credentials",		// Title
-			"Search for events in the event log containing credentials that should never have been logged.",
+			"Find Sensitive Information",		// Title
+			"Search for events in the event log containing sensitive information that should never have been logged.",
 			"")]					// IconsMethod, use default icons
-		public void FindCredentials(
-			[McpDateTimeParameter("Number of Days", "Number of days back in time the search should be performed.")]
-			int NrDays = 7)
+		public PromptMessage[] FindSensitiveInformation(
+			[McpDateTimeParameter("Number of Days", "Number of days back in time the search for events should be performed.")]
+			int NrDays = 7,
+
+			[McpParameter("Find Suspect Activity", "If true, the search will look for activity that is suspicious.")]
+			bool FindSuspectActivity = true,
+
+			[McpParameter("Find Intrusions", "If true, the search will look for evidence of intrusions.")]
+			bool FindIntrusions = true,
+
+			[McpParameter("Find Resource Depletion", "If true, the search will look for evidence of resources being depleted, or being close to be depleted.")]
+			bool FindResourceDepletion = true,
+
+			[McpParameter("Find Credentials", "If true, the search will look for credentials in the events.")]
+			bool FindCredentials = true,
+
+			[McpParameter("Find Keys", "If true, the search will look for keys in the events.")]
+			bool FindKeys = true,
+
+			[McpParameter("Find Sensitive Personal Information", "If true, the search will look for sensitive personal information in the events.")]
+			bool FindSensitivePersonalInformation = true,
+
+			[McpParameter("Report Events Found", "If true, the search will generate a report of all events containing sensitive information found during the search.")]
+			bool ReportEventsFound = true,
+
+			[McpParameter("Edit Events", "If true, the events found will be edited accordingly, to remove the sensitive information.")]
+			bool EditEvents = false,
+
+			[McpParameter("Delete Events", "If true, the events found that cannot be edited, will be deleted accordingly, to remove the sensitive information and associated information in the associated event.")]
+			bool DeleteEvents = false)
 		{
+			ChunkedList<PromptMessage> Prompts = new ChunkedList<PromptMessage>();
+			StringBuilder Prompt = new StringBuilder();
+
+			Prompt.Append("Search for sensitive information in events logged during the ");
+			Prompt.Append("last ");
+			Prompt.Append(NrDays);
+			Prompt.Append(" days. The search must look for the following types of ");
+			Prompt.AppendLine("sensitive information:");
+
+			if (FindSuspectActivity)
+			{
+				Prompt.AppendLine();
+				Prompt.Append("* Look for any type of suspicious activity, outside of ");
+				Prompt.Append("what should be considered normal behaviour during normal ");
+				Prompt.AppendLine("operation.");
+			}
+
+			if (FindIntrusions)
+			{
+				Prompt.AppendLine();
+				Prompt.Append("* Look for evidence of any type of intrusion. An intrusion ");
+				Prompt.Append("may be identified either by a drastic change in activity or ");
+				Prompt.AppendLine("type of activity, either from specific users, or overall.");
+			}
+
+			if (FindResourceDepletion)
+			{
+				Prompt.AppendLine();
+				Prompt.Append("* Look for evidence of any type of resource depletion. ");
+				Prompt.Append("This can include CPU-depletion, as things are executed ");
+				Prompt.Append("slower, disk depletion, as resources cannot be persisted ");
+				Prompt.Append("network depletion as network errors occur, or internal locks ");
+				Prompt.AppendLine("indicating that internal resources are being strained.");
+			}
+
+			if (FindCredentials)
+			{
+				Prompt.AppendLine();
+				Prompt.Append("* Look for any type of credential that could potentially ");
+				Prompt.Append("be used to gain unauthorized access to resources, servers ");
+				Prompt.Append("or systems. It is sufficient that the information looks ");
+				Prompt.AppendLine("like a credential, for it to be considered a credential.");
+			}
+
+			if (FindKeys)
+			{
+				Prompt.AppendLine();
+				Prompt.Append("* Look for anything that looks like a key that can be used ");
+				Prompt.Append("either to gain unauthorized access to resources, servers ");
+				Prompt.Append("or systems, or be used in encryption or decryption of ");
+				Prompt.Append("information. It is sufficient that the information looks ");
+				Prompt.Append("like a key, for it to be considered a key. GUIDs are ");
+				Prompt.AppendLine("typically not keys.");
+			}
+
+			if (FindSensitivePersonalInformation)
+			{
+				Prompt.AppendLine();
+				Prompt.Append("* Detect any form of sensitive personal information that ");
+				Prompt.Append("should not be available in an event log. Especially ");
+				Prompt.Append("important are detecting the special categories of personal ");
+				Prompt.Append("data, as defined by the GDPR, as well as any other personal ");
+				Prompt.Append("or financial information that can be used to commit fraud or ");
+				Prompt.Append("impersonate another person. This includes digital information ");
+				Prompt.AppendLine("directly identifying a person.");
+			}
+
+			if (ReportEventsFound)
+			{
+				Prompt.AppendLine();
+				Prompt.Append("Collect all event objects found during the search, and ");
+				Prompt.Append("generate a report at the end of processing, documenting ");
+				Prompt.AppendLine("events found.");
+			}
+
+			if (EditEvents)
+			{
+				Prompt.AppendLine();
+				Prompt.Append("If the identified events contain grave issues, edit the ");
+				Prompt.Append("corresponding event objects and censor the sensitive ");
+				Prompt.Append("information to ensure it is removed from the event log.");
+				Prompt.Append("There must be no sensitive information left in the event ");
+				Prompt.AppendLine("object after editing.");
+			}
+
+			if (DeleteEvents)
+			{
+				Prompt.AppendLine();
+				Prompt.Append("If the identified events contain grave issues, and it is ");
+				Prompt.Append("not sufficient to just censor parts of the event, delete ");
+				Prompt.Append("the entire corresponding event object to ensure the ");
+				Prompt.Append("sensitive information is removed from the event log.");
+			}
+
+			Prompts.Add(new PromptMessage(McpRole.User, Prompt.ToString()));
+			Prompt.Clear();
+
+			Prompt.Append("You are an assistant helping users with operational tasks of ");
+			Prompt.Append("a web server. Specifically, you help operators in identifying ");
+			Prompt.Append("threats, and potential threats to the safe operation of the ");
+			Prompt.AppendLine("server.");
+			Prompt.AppendLine();
+			Prompt.Append("During the search, use the 'Search for Events' Tool. If ");
+			Prompt.Append("more events are available than can be fitted in one paged ");
+			Prompt.Append("response (seen in the 'More' property in the search result), ");
+			Prompt.Append("use the 'Next Offset' property in the search result, as the ");
+			Prompt.Append("'Offset' argument in the next call to the search tool, until ");
+			Prompt.AppendLine("all events in the range have been read and analyzed.");
+
+			if (EditEvents)
+			{
+				Prompt.AppendLine();
+				Prompt.Append("When editing events, use the 'Edit Events' tool. When ");
+				Prompt.Append("censoring information, replace the censored information ");
+				Prompt.Append("with wildcard characters, so it is evident that information ");
+				Prompt.Append("has been removed. Also log a Warning event to the event log ");
+				Prompt.Append("indicating that sensitive information was found in the event, ");
+				Prompt.Append("and that the event was edited to remove the sensitive ");
+				Prompt.Append("information. Do not include such events generated, in ");
+				Prompt.AppendLine("subsequent reports when executing the prompt again.");
+			}
+
+			if (DeleteEvents)
+			{
+				Prompt.AppendLine();
+				Prompt.Append("When deleting events, use the 'Delete Events' tool. Log ");
+				Prompt.Append("a Warning event to the event log indicating that ");
+				Prompt.Append("sensitive information was found in the event, ");
+				Prompt.Append("and that the event was deleted to remove the sensitive ");
+				Prompt.Append("information from the event log. Do not include such ");
+				Prompt.Append("events generated, in subsequent reports when executing ");
+				Prompt.AppendLine("the prompt again.");
+			}
+
+			Prompts.Add(new PromptMessage(McpRole.Assistant, Prompt.ToString()));
+
+			return Prompts.ToArray();
 		}
 	}
 }

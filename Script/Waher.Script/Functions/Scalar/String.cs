@@ -57,6 +57,8 @@ namespace Waher.Script.Functions.Scalar
 				return this.Argument.PatternMatch(new StringValue(s), AlreadyFound);
 			else if (CheckAgainst.AssociatedObjectValue is null)
 				return this.Argument.PatternMatch(new StringValue(null), AlreadyFound);
+			else if (Expression.TryConvert(CheckAgainst, typeof(string), true, out IElement Result))
+				return this.Argument.PatternMatch(Result, AlreadyFound);
 			else
 				return this.Argument.PatternMatch(new StringValue(Expression.ToExpressionString(CheckAgainst.AssociatedObjectValue)), AlreadyFound);
 		}

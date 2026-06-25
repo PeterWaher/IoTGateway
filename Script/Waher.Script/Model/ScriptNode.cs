@@ -407,7 +407,7 @@ namespace Waher.Script.Model
 			else if (Expression.TryConvert(Value, typeof(string), true, out IElement Converted))
 				return Converted.AssociatedObjectValue?.ToString();
 			else
-				return Obj.ToString();
+				return Expression.ToExpressionString(Obj);
 		}
 
 		/// <summary>

@@ -22,7 +22,7 @@ namespace Waher.Script.Test
 		private static readonly Measurement TestMeasurementNoError = new(1.234, new Unit("m"), 0);
 		private static readonly PhysicalQuantity TestQuantity = new(1.234, new Unit("m"));
 		private static readonly ComplexNumber TestComplexNumber = new(1.234);
-		private static readonly CaseInsensitiveString TestCaseInsensitiveString = new CaseInsensitiveString("Hello World.");
+		private static readonly CaseInsensitiveString TestCaseInsensitiveString = new("Hello World.");
 
 		[TestMethod]
 		[DataRow("TestBigInteger", 123.0)]
@@ -72,8 +72,8 @@ namespace Waher.Script.Test
 		[TestMethod]
 		[DataRow("TestQuantity", "TestMeasurementNoError")]
 		[DataRow("TestMeasurement", "TestQuantity")]
-		[DataRow("TestCaseInsensitiveString", "Hello World")]
-		[DataRow("Hello World", "TestCaseInsensitiveString")]
+		[DataRow("TestCaseInsensitiveString", "Hello World.")]
+		[DataRow("Hello World.", "TestCaseInsensitiveString")]
 		public void Test_03_ObjectTypes(object From, object To)
 		{
 			From = CheckValue(From);

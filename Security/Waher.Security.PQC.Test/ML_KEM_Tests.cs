@@ -1272,10 +1272,7 @@ namespace Waher.Security.PQC.Test
 
 			Console.Out.WriteLine("K: " + Hashes.BinaryToString(Result));
 
-			bool ValidExpected = Reason.StartsWith("valid");
-			bool Valid = string.Compare(k, Hashes.BinaryToString(Result), true) == 0;
-
-			Assert.AreEqual(ValidExpected, Valid, Reason);
+			Assert.AreEqual(0, string.Compare(k, Hashes.BinaryToString(Result), true), Reason);
 		}
 
 		/// <summary>

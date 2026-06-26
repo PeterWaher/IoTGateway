@@ -513,6 +513,9 @@ namespace Waher.Runtime.Collections
 		/// <returns>If the loop was completed (true) or terminated early (false).</returns>
 		public bool ForEach(Predicate<T> Callback)
 		{
+			if (Callback is null)
+				throw new ArgumentNullException(nameof(Callback));
+
 			Chunk Loop = this.firstChunk;
 			int i, c;
 
@@ -539,6 +542,9 @@ namespace Waher.Runtime.Collections
 		/// <returns>If the loop was completed (true) or terminated early (false).</returns>
 		public async Task<bool> ForEachAsync(PredicateAsync<T> Callback)
 		{
+			if (Callback is null)
+				throw new ArgumentNullException(nameof(Callback));
+
 			Chunk Loop = this.firstChunk;
 			int i, c;
 
@@ -565,6 +571,9 @@ namespace Waher.Runtime.Collections
 		/// <returns>If the loop was completed (true) or terminated early (false).</returns>
 		public bool ForEachChunk(ForEachChunkCallback<T> Callback)
 		{
+			if (Callback is null)
+				throw new ArgumentNullException(nameof(Callback));
+
 			Chunk Loop = this.firstChunk;
 			int i, c;
 
@@ -593,6 +602,9 @@ namespace Waher.Runtime.Collections
 		/// <returns>If the loop was completed (true) or terminated early (false).</returns>
 		public async Task<bool> ForEachChunkAsync(ForEachChunkAsyncCallback<T> Callback)
 		{
+			if (Callback is null)
+				throw new ArgumentNullException(nameof(Callback));
+
 			Chunk Loop = this.firstChunk;
 			int i, c;
 
@@ -627,6 +639,9 @@ namespace Waher.Runtime.Collections
 		/// <returns>If the loop was completed (true) or terminated early (false).</returns>
 		public bool Update(UpdateCallback<T> Callback)
 		{
+			if (Callback is null)
+				throw new ArgumentNullException(nameof(Callback));
+
 			Chunk Loop = this.firstChunk;
 			Chunk Next;
 			int i, c, d;
@@ -1077,6 +1092,14 @@ namespace Waher.Runtime.Collections
 		/// <returns>The index of item if found in the list; otherwise, -1.</returns>
 		public int LastIndexOf(T Item, int Index)
 		{
+			if (this.count == 0)
+			{
+				if (Index == -1)
+					return -1;
+
+				throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
+			}
+
 			return this.LastIndexOf(Item, Index, Math.Min(this.count, Index + 1));
 		}
 
@@ -1089,6 +1112,17 @@ namespace Waher.Runtime.Collections
 		/// <returns>The index of item if found in the list; otherwise, -1.</returns>
 		public int LastIndexOf(T Item, int Index, int Count)
 		{
+			if (this.count == 0)
+			{
+				if (Index == -1 && Count == 0)
+					return -1;
+
+				if (Index < 0 || Index >= this.count)
+					throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
+
+				throw new ArgumentOutOfRangeException("Count out of bounds.", nameof(Count));
+			}
+
 			if (Index < 0 || Index >= this.count)
 				throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
 
@@ -1587,9 +1621,6 @@ namespace Waher.Runtime.Collections
 		/// <param name="Comparer">Comparer to use during sort.</param>
 		public void Sort(IComparer<T> Comparer)
 		{
-			if (Comparer is null)
-				throw new ArgumentNullException(nameof(Comparer));
-
 			if (this.count <= 1)
 				return;
 
@@ -1712,11 +1743,10 @@ namespace Waher.Runtime.Collections
 			}
 			else
 			{
-				IEnumerator<T> e = Collection.GetEnumerator();
 				ChunkedList<T> Temp = new ChunkedList<T>();
 
-				while (e.MoveNext())
-					Temp.AddLastItem(e.Current);
+				foreach (T Item in Collection)
+					Temp.AddLastItem(Item);
 
 				this.AddRangeFirst(Temp.ToArray());
 			}

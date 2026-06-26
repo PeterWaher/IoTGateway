@@ -2448,6 +2448,121 @@ namespace Waher.Runtime.Collections.Test
 				_ = new ChunkedList<int>((int[]?)null));
 		}
 
+		[TestMethod]
+		public void Test_164_Constructor_ArrayInput_IsCopiedNotAliased()
+		{
+			int[] Source = [1, 2, 3];
+
+			ChunkedList<int> List = [.. Source];
+
+			Source[1] = 99;
+
+			Assert.AreEqual(3, List.Count);
+			Assert.AreEqual(1, List[0]);
+			Assert.AreEqual(2, List[1]);
+			Assert.AreEqual(3, List[2]);
+		}
+
+		[TestMethod]
+		public void Test_165_LastIndexOf_EmptyList_IndexMinusOne_ReturnsMinusOne()
+		{
+			ChunkedList<int> List = [];
+
+			Assert.AreEqual(-1, List.LastIndexOf(123, -1));
+		}
+
+		[TestMethod]
+		public void Test_166_LastIndexOf_EmptyList_IndexMinusOneCountZero_ReturnsMinusOne()
+		{
+			ChunkedList<int> List = [];
+
+			Assert.AreEqual(-1, List.LastIndexOf(123, -1, 0));
+		}
+
+		[TestMethod]
+		public void Test_167_SortComparer_NullComparer_UsesDefaultComparer()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				3,
+				1,
+				2
+			};
+
+			List.Sort((IComparer<int>?)null);
+
+			AssertListByIndexer(List, [1, 2, 3]);
+		}
+
+		[TestMethod]
+		public void Test_168_SortComparer_NullComparer_MultipleChunks_UsesDefaultComparer()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 9; i >= 0; i--)
+				List.Add(i);
+
+			List.Sort((IComparer<int>?)null);
+
+			AssertListByIndexer(List, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+		}
+
+		[TestMethod]
+		public void Test_169_AddRangeFirst_NonCollectionEnumerable_DisposesEnumerator()
+		{
+			ChunkedList<int> List = [];
+			DisposableEnumerable Source = new(1, 2, 3);
+
+			List.AddRangeFirst(Source);
+
+			Assert.IsTrue(Source.Disposed);
+			AssertListByIndexer(List, [1, 2, 3]);
+		}
+
+		[TestMethod]
+		public void Test_170_ForEach_NullCallback_ThrowsArgumentNullException()
+		{
+			ChunkedList<int> List = [1, 2, 3];
+
+			Assert.ThrowsException<ArgumentNullException>(() =>
+				List.ForEach(null));
+		}
+
+		[TestMethod]
+		public void Test_171_ForEachChunk_NullCallback_ThrowsArgumentNullException()
+		{
+			ChunkedList<int> List = [1, 2, 3];
+
+			Assert.ThrowsException<ArgumentNullException>(() =>
+				List.ForEachChunk(null));
+		}
+
+		[TestMethod]
+		public void Test_172_Update_NullCallback_ThrowsArgumentNullException()
+		{
+			ChunkedList<int> List = [1, 2, 3];
+
+			Assert.ThrowsException<ArgumentNullException>(() =>
+				List.Update(null));
+		}
+
+		[TestMethod]
+		public async Task Test_173_ForEachAsync_NullCallback_ThrowsArgumentNullException()
+		{
+			ChunkedList<int> List = [1, 2, 3];
+
+			await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () =>
+				await List.ForEachAsync(null));
+		}
+
+		[TestMethod]
+		public async Task Test_174_ForEachChunkAsync_NullCallback_ThrowsArgumentNullException()
+		{
+			ChunkedList<int> List = [1, 2, 3];
+
+			await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () =>
+				await List.ForEachChunkAsync(null));
+		}
 		private sealed class ParserNode
 		{
 			public ParserNode(int Id)

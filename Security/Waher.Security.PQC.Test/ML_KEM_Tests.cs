@@ -1265,6 +1265,7 @@ namespace Waher.Security.PQC.Test
 			Console.Out.WriteLine("dk: " + Hashes.BinaryToString(dkBin));
 			Console.Out.WriteLine("c: " + Hashes.BinaryToString(cBin));
 			Console.Out.WriteLine("k: " + Hashes.BinaryToString(kBin));
+			Console.Out.WriteLine(Reason);
 
 			ML_KEM Model = ML_KEM.GetModel(ModelName);
 			byte[] Result = Model.Decapsulate(dkBin, cBin);

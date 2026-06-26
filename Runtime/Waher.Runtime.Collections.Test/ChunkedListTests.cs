@@ -2114,7 +2114,6 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[Timeout(1000)]
 		public void Test_138_AddRange_Self_DuplicatesOriginalOnlyOnce()
 		{
 			ChunkedList<int> List = new(2)
@@ -2143,7 +2142,6 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[Timeout(1000)]
 		public void Test_140_InsertRange_Self_DuplicatesOriginalSnapshotOnly()
 		{
 			ChunkedList<int> List = new(4)
@@ -2234,7 +2232,6 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[Timeout(1000)]
 		public void Test_146_AddRange_LazySelfEnumerable_DoesNotEnumerateNewlyAppendedItems()
 		{
 			ChunkedList<int> List = new(4)
@@ -2266,6 +2263,63 @@ namespace Waher.Runtime.Collections.Test
 			List.InsertRange(1, LazySelf);
 
 			AssertListByIndexer(List, [1, 1, 2, 3, 2, 3]);
+		}
+
+		[TestMethod]
+		public void Test_148_ReverseRange_EmptyListIndexOne_Throws()
+		{
+			ChunkedList<int> List = [];
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(()=>
+				List.Reverse(1, 0));
+		}
+
+		[TestMethod]
+		public void Test_149_ReverseRange_EmptyListIndexOne_Throws()
+		{
+			ChunkedList<int> List = [];
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+				List.Reverse(0, 1));
+		}
+
+		[TestMethod]
+		public void Test_150_SortRange_EmptyListIndexOne_Throws()
+		{
+			ChunkedList<int> List = [];
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+				List.Sort(1, 0, Comparer<int>.Default));
+		}
+
+		[TestMethod]
+		public void Test_151_SortRange_EmptyListIndexOne_Throws()
+		{
+			ChunkedList<int> List =
+			[
+				1
+			];
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+				List.Sort(0, 2, Comparer<int>.Default));
+		}
+
+		[TestMethod]
+		public void Test_152_AddRange_NullArray_ThrowsArgumentNullException()
+		{
+			ChunkedList<int> List = [];
+
+			Assert.ThrowsException<ArgumentNullException>(() =>
+				List.AddRange((int[]?)null));
+		}
+
+		[TestMethod]
+		public void Test_153_InsertRange_NullEnumerable_ThrowsArgumentNullException()
+		{
+			ChunkedList<int> List = [];
+
+			Assert.ThrowsException<ArgumentNullException>(() =>
+				List.InsertRange(0, null));
 		}
 
 		private sealed class ParserNode

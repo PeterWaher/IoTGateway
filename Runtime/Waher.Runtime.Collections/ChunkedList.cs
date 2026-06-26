@@ -1383,6 +1383,9 @@ namespace Waher.Runtime.Collections
 		/// <param name="Collection">Collection of elements to add.</param>
 		public void AddRange(T[] Collection)
 		{
+			if (Collection is null)
+				throw new ArgumentNullException(nameof(Collection));
+
 			this.AddRange(Collection, 0, Collection.Length);
 		}
 
@@ -1555,8 +1558,8 @@ namespace Waher.Runtime.Collections
 		private void MakeOneChunk(bool Trimmed)
 		{
 			if (!(this.firstChunk.Next is null) ||
-				(Trimmed && this.firstChunk.Start > 0) || 
-				this.firstChunk.Pos < this.firstChunk.Size)
+				Trimmed && (this.firstChunk.Start > 0 || 
+				this.firstChunk.Pos < this.firstChunk.Size))
 			{
 				Chunk Chunk;
 
@@ -1620,7 +1623,13 @@ namespace Waher.Runtime.Collections
 		/// <param name="Comparer">Comparer to use during sort.</param>
 		public void Sort(int Index, int Count, IComparer<T> Comparer)
 		{
-			if (this.count <= 1)
+			if (Index < 0 || Index > this.count)
+				throw new ArgumentOutOfRangeException(nameof(Index));
+
+			if (Count < 0 || Count > this.count - Index)
+				throw new ArgumentOutOfRangeException(nameof(Count));
+
+			if (Count <= 1)
 				return;
 
 			// TODO: Can be optimized
@@ -1647,6 +1656,15 @@ namespace Waher.Runtime.Collections
 		/// <param name="Count">Number of elements.</param>
 		public void Reverse(int Index, int Count)
 		{
+			if (Index < 0 || Index > this.count)
+				throw new ArgumentOutOfRangeException(nameof(Index));
+
+			if (Count < 0 || Count > this.count - Index)
+				throw new ArgumentOutOfRangeException(nameof(Count));
+
+			if (Count <= 1)
+				return;
+
 			// TODO: Can be optimized
 			this.MakeOneChunk(false);
 			Array.Reverse(this.firstChunk.Elements, this.firstChunk.Start + Index, Count);
@@ -1759,15 +1777,36 @@ namespace Waher.Runtime.Collections
 		/// <param name="Collection">Collection of elements.</param>
 		public void InsertRange(int Index, IEnumerable<T> Collection)
 		{
+			if (Collection is null)
+				throw new ArgumentNullException(nameof(Collection));
+
 			if (Index < 0 || Index > this.count)
 				throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
 
 			// TODO: Can be optimized
 
-			if (ReferenceEquals(Collection, this))
-				Collection = this.ToArray();
+			if (!(Collection is T[] A))
+			{
+				if (ReferenceEquals(Collection, this))
+					A = this.ToArray();
+				else if (Collection is ChunkedList<T> B)
+					A = B.ToArray();
+				else if (Collection is ICollection<T> C)
+				{
+					A = new T[C.Count];
+					C.CopyTo(A, 0);
+				}
+				else
+				{
+					ChunkedList<T> Temp = new ChunkedList<T>();
+					foreach (T Item in Collection)
+						Temp.Add(Item);
 
-			foreach (T Item in Collection)
+					A = Temp.ToArray();
+				}
+			}
+
+			foreach (T Item in A)
 				this.Insert(Index++, Item);
 		}
 

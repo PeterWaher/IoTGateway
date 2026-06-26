@@ -132,6 +132,9 @@ namespace Waher.Runtime.Collections
 		/// <param name="MaxChunkSize">Maximum Chunk Size.</param>
 		public ChunkedList(T[] InitialElements, int MaxChunkSize)
 		{
+			if (InitialElements is null)
+				throw new ArgumentNullException(nameof(InitialElements));
+
 			Chunk Chunk;
 
 			this.chunkSize = this.count = InitialElements.Length;
@@ -1363,6 +1366,9 @@ namespace Waher.Runtime.Collections
 		/// <param name="Collection">Collection of elements to add.</param>
 		public void AddRange(ChunkedList<T> Collection)
 		{
+			if (Collection is null)
+				throw new ArgumentNullException(nameof(Collection));
+
 			if (ReferenceEquals(Collection, this))
 				this.AddRange(this.ToArray());
 			else
@@ -1407,7 +1413,6 @@ namespace Waher.Runtime.Collections
 				throw new ArgumentOutOfRangeException(nameof(Count));
 
 			int End = Index + Count;
-			int d;
 
 			if (this.lastChunk.Start > 0)
 			{
@@ -1421,34 +1426,24 @@ namespace Waher.Runtime.Collections
 				this.lastChunk.Start = 0;
 			}
 
-			while (this.lastChunk.Pos < this.lastChunk.Size && Index < End)
+			while (Index < End)
 			{
-				d = Math.Min(this.lastChunk.Size - this.lastChunk.Pos, Count);
+				if (this.lastChunk.Pos >= this.lastChunk.Size)
+				{
+					this.lastChunk = new Chunk(this.chunkSize, this.lastChunk);
+
+					this.chunkSize <<= 1;
+					if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
+						this.chunkSize = this.maxChunkSize;
+				}
+
+				int d = Math.Min(this.lastChunk.Size - this.lastChunk.Pos, End - Index);
+
 				Array.Copy(Collection, Index, this.lastChunk.Elements, this.lastChunk.Pos, d);
+
 				Index += d;
 				this.count += d;
 				this.lastChunk.Pos += d;
-			}
-
-			while (Index < End)
-			{
-				this.lastChunk = new Chunk(this.chunkSize, this.lastChunk);
-
-				this.chunkSize <<= 1;
-				if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
-					this.chunkSize = this.maxChunkSize;
-
-				this.lastChunk.Elements[this.lastChunk.Pos++] = Collection[Index++];
-				this.count++;
-
-				while (this.lastChunk.Pos < this.lastChunk.Size && Index < End)
-				{
-					d = Math.Min(this.lastChunk.Size - this.lastChunk.Pos, Count);
-					Array.Copy(Collection, Index, this.lastChunk.Elements, this.lastChunk.Pos, d);
-					Index += d;
-					this.count += d;
-					this.lastChunk.Pos += d;
-				}
 			}
 		}
 
@@ -1592,6 +1587,9 @@ namespace Waher.Runtime.Collections
 		/// <param name="Comparer">Comparer to use during sort.</param>
 		public void Sort(IComparer<T> Comparer)
 		{
+			if (Comparer is null)
+				throw new ArgumentNullException(nameof(Comparer));
+
 			if (this.count <= 1)
 				return;
 
@@ -1607,6 +1605,9 @@ namespace Waher.Runtime.Collections
 		/// <param name="Comparison">Comparisong to use during sort.</param>
 		public void Sort(Comparison<T> Comparison)
 		{
+			if (Comparison is null)
+				throw new ArgumentNullException(nameof(Comparison));
+
 			if (this.count <= 1)
 				return;
 
@@ -1698,6 +1699,9 @@ namespace Waher.Runtime.Collections
 		/// <param name="Collection">Collection of elements to add.</param>
 		public void AddRangeFirst(IEnumerable<T> Collection)
 		{
+			if (Collection is null)
+				throw new ArgumentNullException(nameof(Collection));
+
 			if (Collection is T[] A)
 				this.AddRangeFirst(A);
 			else if (Collection is ICollection<T> C)
@@ -1724,6 +1728,9 @@ namespace Waher.Runtime.Collections
 		/// <param name="Collection">Collection of elements to add.</param>
 		public void AddRangeFirst(T[] Collection)
 		{
+			if (Collection is null)
+				throw new ArgumentNullException(nameof(Collection));
+
 			int c = Collection.Length;
 			int d;
 

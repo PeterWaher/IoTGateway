@@ -2321,6 +2321,132 @@ namespace Waher.Runtime.Collections.Test
 			Assert.ThrowsException<ArgumentNullException>(() =>
 				List.InsertRange(0, null));
 		}
+		[TestMethod]
+		public void Test_154_AddRange_ArraySegmentAcrossChunks_DoesNotCopyPastRequestedCount()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				10
+			};
+
+			int[] Source = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+			List.AddRange(Source, 2, 5);
+
+			AssertListByIndexer(List, [10, 2, 3, 4, 5, 6]);
+		}
+
+		[TestMethod]
+		public void Test_155_AddRange_ArraySegmentEndingAtArrayEnd_DoesNotThrowOrOverCopy()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				10
+			};
+
+			int[] Source = [0, 1, 2, 3, 4, 5, 6];
+
+			List.AddRange(Source, 2, 5);
+
+			AssertListByIndexer(List, [10, 2, 3, 4, 5, 6]);
+		}
+
+		[TestMethod]
+		public void Test_156_AddRange_ChunkedListSourceWithStartOffsetAndFullDestination_DoesNotOverCopy()
+		{
+			ChunkedList<int> Source = new(4)
+			{
+				1,
+				2,
+				3,
+				4
+			};
+
+			Source.RemoveFirst();
+			Source.RemoveFirst();
+
+			ChunkedList<int> Destination = new(4)
+			{
+				10,
+				11,
+				12,
+				13
+			};
+
+			Destination.AddRange(Source);
+
+			AssertListByIndexer(Destination, [10, 11, 12, 13, 3, 4]);
+		}
+
+		[TestMethod]
+		public void Test_157_AddRange_NullChunkedList_ThrowsArgumentNullException()
+		{
+			ChunkedList<int> List = [];
+
+			Assert.ThrowsException<ArgumentNullException>(() =>
+				List.AddRange((ChunkedList<int>?)null));
+		}
+
+		[TestMethod]
+		public void Test_158_AddRangeFirst_NullArray_ThrowsArgumentNullException()
+		{
+			ChunkedList<int> List = [];
+
+			Assert.ThrowsException<ArgumentNullException>(() =>
+				List.AddRangeFirst((int[]?)null));
+		}
+
+		[TestMethod]
+		public void Test_159_AddRangeFirst_NullEnumerable_ThrowsArgumentNullException()
+		{
+			ChunkedList<int> List = [];
+
+			Assert.ThrowsException<ArgumentNullException>(() =>
+				List.AddRangeFirst((IEnumerable<int>?)null));
+		}
+
+		[TestMethod]
+		public void Test_160_AddRangeFirst_EmptyArray_DoesNotChangeList()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2,
+				3
+			};
+
+			List.AddRangeFirst([]);
+
+			AssertListByIndexer(List, [1, 2, 3]);
+		}
+
+		[TestMethod]
+		public void Test_161_SortComparison_NullComparisonOnEmptyList_ThrowsArgumentNullException()
+		{
+			ChunkedList<int> List = [];
+
+			Assert.ThrowsException<ArgumentNullException>(() =>
+				List.Sort((Comparison<int>?)null));
+		}
+
+		[TestMethod]
+		public void Test_162_SortComparison_NullComparisonOnSingleItemList_ThrowsArgumentNullException()
+		{
+			ChunkedList<int> List =
+			[
+				1
+			];
+
+			Assert.ThrowsException<ArgumentNullException>(() =>
+				List.Sort((Comparison<int>?)null));
+		}
+
+		[TestMethod]
+		public void Test_163_Constructor_NullInitialElements_ThrowsArgumentNullException()
+		{
+			Assert.ThrowsException<ArgumentNullException>(() =>
+				_ = new ChunkedList<int>((int[]?)null));
+		}
 
 		private sealed class ParserNode
 		{

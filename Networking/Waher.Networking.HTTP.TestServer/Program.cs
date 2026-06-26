@@ -1,6 +1,5 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Images;
 using Waher.Content.Markdown;
@@ -235,10 +234,10 @@ internal class Program
 				typeof(XmlFileLedger).Assembly,
 				typeof(PersistedEventLog).Assembly);
 
-			filesProvider = FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true).Result;
+			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
 			Database.Register(filesProvider);
 
-			filesProvider.RepairIfInproperShutdown(null).Wait();
+			await filesProvider.RepairIfInproperShutdown(null);
 
 			Log.Informational("Database initialized");
 
@@ -247,7 +246,7 @@ internal class Program
 			Log.Informational("Persistent Event Log initialized");
 
 			ledger = new XmlFileLedger(Console.Out);
-			ledger.Start().Wait();
+			await ledger.Start();
 
 			Ledger.Register(ledger);
 			Ledger.StartListeningToDatabaseEvents();
@@ -335,12 +334,16 @@ internal class Program
 		finally
 		{
 			Log.Informational("Shutting down.");
-			Log.TerminateAsync().Wait();
+			await Log.TerminateAsync();
 
-			filesProvider?.DisposeAsync().Wait();
+			if (filesProvider is not null)
+				await filesProvider.DisposeAsync();
 
-			WebServer?.DisposeAsync().Wait();
-			Sniffer?.DisposeAsync().Wait();
+			if (WebServer is not null)
+				await WebServer.DisposeAsync();
+
+			if (Sniffer is not null)
+				await Sniffer.DisposeAsync();
 
 			Log.TerminateAsync().Wait();
 		}

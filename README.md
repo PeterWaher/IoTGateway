@@ -87,6 +87,28 @@ The **IoT Gateway** is &copy; [Waher Data AB](http://waher.se/) 2016-2026. All r
  
 [![](/Images/logo-WaherDataAB-300x58.png)](http://waher.se/)
 
+Special Contributions
+------------------------
+
+While many have contributed in different ways to the development and maintencance of the
+software available in this repository, special thanks goes to the following contributors,
+who have provided significant contributions to the improvement of the cybersecurity of the
+software:
+
+* Angelique Dawnbringer, for providing security reviews, suggestions for improvements,
+documentation, communication and risk assessment and damage evaluations.
+
+* Frank van der Loos, with invaluable insights and suggestions for improvements for the
+Post-Quantum Cryptography implementation (ML-KEM).
+
+* Maximiliam Berggren, who proposed a better way to manage and migrate keys over time in the
+Contracts Client, to ensure digital identities and smart contracts can be properly validated
+after new keys have been generated.
+
+* Riccardo Brama, who has spent innumerable hours reviewing, questioning and perfecting every 
+aspect of the harmonized communiaction interfaces for IoT.
+
+
 Mastering Internet of Things
 -----------------------------------
 

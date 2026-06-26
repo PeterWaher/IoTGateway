@@ -1325,9 +1325,6 @@ namespace Waher.Security.PQC
 			byte[] h = new byte[32];
 			Buffer.BlockCopy(DecapsulationKey, Pos, h, 0, 32);
 
-			//byte[] z = new byte[32];
-			//Buffer.BlockCopy(DecapsulationKey, Pos + 32, z, 0, 32);
-
 			byte[] m = this.K_PKE_Decrypt(DecryptionKey, c);
 
 			byte[] Bin = new byte[64];
@@ -1344,36 +1341,39 @@ namespace Waher.Security.PQC
 
 			Clear(Bin2);
 
-			Buffer.BlockCopy(DecapsulationKey, Pos + 32, Bin, 0, 32);  // z
-			Buffer.BlockCopy(c, 0, Bin, 32, 32);
+			// Fix of the decapsulation method to comply with FIPS-203 (Algorithm 18) and
+			// to avoid a weakened IND-CCA2 attack, and a constant-time comparison check,
+			// provided and republished, with permission, by Frank von der Loos.
 
-			byte[] K2 = J(Bin);
-			Clear(Bin);
+			byte[] zc = new byte[32 + c.Length];                       // z ‖ full c (32 + cipherTextLength)
+            Buffer.BlockCopy(DecapsulationKey, Pos + 32, zc, 0, 32);   // z
+            Buffer.BlockCopy(c, 0, zc, 32, c.Length);                  // full c
+            byte[] K2 = J(zc);
+            Clear(zc);
 
-			byte[] c2 = this.K_PKE_Encrypt(EncryptionKey, m, r);
+            byte[] c2 = this.K_PKE_Encrypt(EncryptionKey, m, r);
 			Clear(m);
 			Clear(r);
 
-			int i;
-			bool b = true;
+            int diff = 0;
 
-			for (i = 0; i < 32; i++)
-			{
-				if (c[i] != c2[i])
-					b = false;
-			}
+            for (int i = 0; i < c.Length; i++)   // full ciphertext, no early break, time constant
+                diff |= c[i] ^ c2[i];
 
-			if (b)
-			{
-				Clear(K2);
-				return K;
-			}
-			else
-			{
-				Clear(K);
-				return K2;
-			}
-		}
+            Clear(c2);
 
+            // diff == 0  -> ciphertext valid    -> K  (real secret)
+            // diff != 0  -> implicit rejection   -> K2 (pseudo-random)
+            byte mask = (byte)((diff | -diff) >> 31);   // 0x00 for equal, 0xFF is different
+
+            byte[] Result = new byte[32];
+            for (int i = 0; i < 32; i++)
+                Result[i] = (byte)((K[i] & ~mask) | (K2[i] & mask));
+
+            Clear(K);
+            Clear(K2);
+
+            return Result;
+        }
 	}
 }

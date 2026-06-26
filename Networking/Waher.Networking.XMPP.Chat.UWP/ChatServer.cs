@@ -1468,7 +1468,7 @@ namespace Waher.Networking.XMPP.Chat
 								if (!(Item is null))
 								{
 									if (!(Item is string s2))
-										s2 = Expression.ToString(Item);
+										s2 = Expression.ToExpressionString(Item);
 
 									s2 = s2.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
 									Markdown.Append(MarkdownDocument.Encode(s2));

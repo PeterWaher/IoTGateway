@@ -269,18 +269,20 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="NrNodes">Number of nodes output.</param>
 		public void ExportPlantUml(StringBuilder Output, out int NrNodes)
 		{
-			IEnumerator<IPriorityNode> e = this.GetEnumerator();
-			NrNodes = 0;
-
-			this.ExportPlantUmlHeader(Output);
-
-			while (e.MoveNext())
+			using (IEnumerator<IPriorityNode> e = this.GetEnumerator())
 			{
-				NrNodes++;
-				e.Current.ExportPlantUml(Output);
-			}
+				NrNodes = 0;
 
-			this.ExportPlantUmlFooter(Output);
+				this.ExportPlantUmlHeader(Output);
+
+				while (e.MoveNext())
+				{
+					NrNodes++;
+					e.Current.ExportPlantUml(Output);
+				}
+
+				this.ExportPlantUmlFooter(Output);
+			}
 		}
 
 		/// <summary>

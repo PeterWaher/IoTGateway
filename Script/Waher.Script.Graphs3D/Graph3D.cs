@@ -516,25 +516,36 @@ namespace Waher.Script.Graphs3D
 
 		private bool Equals(IEnumerator e1, IEnumerator e2)
 		{
-			if ((e1 is null) ^ (e2 is null))
-				return false;
-
-			if (e1 is null)
-				return true;
-
-			bool b1 = e1.MoveNext();
-			bool b2 = e2.MoveNext();
-
-			while (b1 && b2)
+			try
 			{
-				if (!e1.Current.Equals(e2.Current))
+				if ((e1 is null) ^ (e2 is null))
 					return false;
 
-				b1 = e1.MoveNext();
-				b2 = e2.MoveNext();
-			}
+				if (e1 is null)
+					return true;
 
-			return !(b1 || b2);
+				bool b1 = e1.MoveNext();
+				bool b2 = e2.MoveNext();
+
+				while (b1 && b2)
+				{
+					if (!e1.Current.Equals(e2.Current))
+						return false;
+
+					b1 = e1.MoveNext();
+					b2 = e2.MoveNext();
+				}
+
+				return !(b1 || b2);
+			}
+			finally
+			{
+				if (e1 is IDisposable Disposable1)
+					Disposable1.Dispose();
+
+				if (e2 is IDisposable Disposable2)
+					Disposable2.Dispose();
+			}
 		}
 
 		/// <inheritdoc/>
@@ -744,21 +755,33 @@ namespace Waher.Script.Graphs3D
 			object[] PrevParameters = null;
 			IPainter3D PrevPainter = null;
 
-			while (ex.MoveNext() && ey.MoveNext() && ez.MoveNext() &&
-				eN.MoveNext() && eParameters.MoveNext() && ePainters.MoveNext())
+			try
 			{
-				Points = DrawingVolume.Scale(ex.Current, ey.Current, ez.Current);
-				Normals = eN.Current;
+				while (ex.MoveNext() && ey.MoveNext() && ez.MoveNext() &&
+					eN.MoveNext() && eParameters.MoveNext() && ePainters.MoveNext())
+				{
+					Points = DrawingVolume.Scale(ex.Current, ey.Current, ez.Current);
+					Normals = eN.Current;
 
-				if (!(PrevPainter is null) && ePainters.Current.GetType() == PrevPainter.GetType())
-					ePainters.Current.DrawGraph(Canvas, Points, Normals, eParameters.Current, PrevPoints, PrevNormals, PrevParameters, DrawingVolume);
-				else
-					ePainters.Current.DrawGraph(Canvas, Points, Normals, eParameters.Current, null, null, null, DrawingVolume);
+					if (!(PrevPainter is null) && ePainters.Current.GetType() == PrevPainter.GetType())
+						ePainters.Current.DrawGraph(Canvas, Points, Normals, eParameters.Current, PrevPoints, PrevNormals, PrevParameters, DrawingVolume);
+					else
+						ePainters.Current.DrawGraph(Canvas, Points, Normals, eParameters.Current, null, null, null, DrawingVolume);
 
-				PrevPoints = Points;
-				PrevNormals = Normals;
-				PrevParameters = eParameters.Current;
-				PrevPainter = ePainters.Current;
+					PrevPoints = Points;
+					PrevNormals = Normals;
+					PrevParameters = eParameters.Current;
+					PrevPainter = ePainters.Current;
+				}
+			}
+			finally
+			{
+				ex.Dispose();
+				ey.Dispose();
+				ez.Dispose();
+				eN.Dispose();
+				eParameters.Dispose();
+				ePainters.Dispose();
 			}
 
 			Matrix4x4 M = Canvas.ModelTransformation;
@@ -1064,7 +1087,7 @@ namespace Waher.Script.Graphs3D
 			{
 				return new DateTimeVector(GetLabels(DTMin, DTMax, ApproxNrLabels, out LabelType));
 			}
-			else if (Min.AssociatedObjectValue is IPhysicalQuantity PQMin && 
+			else if (Min.AssociatedObjectValue is IPhysicalQuantity PQMin &&
 				Max.AssociatedObjectValue is IPhysicalQuantity PQMax)
 			{
 				LabelType = LabelType.PhysicalQuantity;
@@ -1200,7 +1223,7 @@ namespace Waher.Script.Graphs3D
 				int r = OM.Rows;
 				int i, j;
 
-				if (Min.AssociatedObjectValue is IPhysicalQuantity PMinQ && 
+				if (Min.AssociatedObjectValue is IPhysicalQuantity PMinQ &&
 					Max.AssociatedObjectValue is IPhysicalQuantity PMaxQ)
 				{
 					PhysicalQuantity MinQ = PMinQ.ToPhysicalQuantity();
@@ -1231,7 +1254,7 @@ namespace Waher.Script.Graphs3D
 				}
 				else
 				{
-					if (Min.AssociatedObjectValue is double MinD && 
+					if (Min.AssociatedObjectValue is double MinD &&
 						Max.AssociatedObjectValue is double MaxD)
 					{
 						double[,] Matrix2 = new double[c, r];
@@ -1251,7 +1274,7 @@ namespace Waher.Script.Graphs3D
 					}
 					else
 					{
-						if (Min.AssociatedObjectValue is DateTime MinDT && 
+						if (Min.AssociatedObjectValue is DateTime MinDT &&
 							Max.AssociatedObjectValue is DateTime MaxDT)
 						{
 							DateTime[,] Matrix2 = new DateTime[c, r];
@@ -1488,7 +1511,7 @@ namespace Waher.Script.Graphs3D
 			string Label;
 			string s;
 			int i = 1;
-			
+
 			foreach (IVector v in this.x)
 			{
 				s = Graph2D.ReducedXmlString(v);
@@ -1501,7 +1524,7 @@ namespace Waher.Script.Graphs3D
 					Output.WriteElementString("X", Label + ":=" + s);
 				}
 			}
-			
+
 			i = 1;
 
 			foreach (IVector v in this.y)
@@ -1578,7 +1601,7 @@ namespace Waher.Script.Graphs3D
 					Output.WriteElementString("Normals", Label + ":=" + s);
 				}
 			}
-			
+
 			i = 1;
 
 			foreach (object[] v in this.parameters)
@@ -1760,13 +1783,21 @@ namespace Waher.Script.Graphs3D
 				IEnumerator<object[]> eParameters = this.parameters.GetEnumerator();
 				IEnumerator<IPainter3D> ePainter = this.painters.GetEnumerator();
 
-				while (eParameters.MoveNext() && ePainter.MoveNext())
+				try
 				{
-					if (!ePainter.Current.UsesDefaultColor(eParameters.Current))
-						return false;
-				}
+					while (eParameters.MoveNext() && ePainter.MoveNext())
+					{
+						if (!ePainter.Current.UsesDefaultColor(eParameters.Current))
+							return false;
+					}
 
-				return true;
+					return true;
+				}
+				finally
+				{
+					eParameters.Dispose();
+					ePainter.Dispose();
+				}
 			}
 		}
 
@@ -1784,14 +1815,21 @@ namespace Waher.Script.Graphs3D
 			IEnumerator<IPainter3D> ePainter = this.painters.GetEnumerator();
 			bool Result = true;
 
-			while (eParameters.MoveNext() && ePainter.MoveNext())
+			try
 			{
-				if (!ePainter.Current.TrySetDefaultColor(Color, eParameters.Current))
-					Result = false;
+				while (eParameters.MoveNext() && ePainter.MoveNext())
+				{
+					if (!ePainter.Current.TrySetDefaultColor(Color, eParameters.Current))
+						Result = false;
+				}
+
+				return Result;
 			}
-
-			return Result;
+			finally
+			{
+				eParameters.Dispose();
+				ePainter.Dispose();
+			}
 		}
-
 	}
 }

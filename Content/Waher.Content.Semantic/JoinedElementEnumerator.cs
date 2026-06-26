@@ -46,6 +46,9 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		public void Dispose()
 		{
+			this.e?.Dispose();
+			this.e = null;
+
 			foreach (IEnumerator<ISemanticElement> Enumerator in this.enumerators)
 				Enumerator.Dispose();
 		}
@@ -94,6 +97,8 @@ namespace Waher.Content.Semantic
 		public void Reset()
 		{
 			this.current = null;
+
+			this.e?.Dispose();
 			this.e = null;
 		}
 	}

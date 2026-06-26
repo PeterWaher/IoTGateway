@@ -55,17 +55,18 @@ namespace Waher.Content.Semantic
 		/// <param name="Model">Semantic model.</param>
 		public virtual async Task Add(ISemanticModel Model)
 		{
-			IEnumerator<ISemanticTriple> e = Model.GetEnumerator();
-
-			if (e is IAsyncEnumerator eAsync)
+			using (IEnumerator<ISemanticTriple> e = Model.GetEnumerator())
 			{
-				while (await eAsync.MoveNextAsync())
-					this.Add(e.Current);
-			}
-			else
-			{
-				while (e.MoveNext())
-					this.Add(e.Current);
+				if (e is IAsyncEnumerator eAsync)
+				{
+					while (await eAsync.MoveNextAsync())
+						this.Add(e.Current);
+				}
+				else
+				{
+					while (e.MoveNext())
+						this.Add(e.Current);
+				}
 			}
 		}
 

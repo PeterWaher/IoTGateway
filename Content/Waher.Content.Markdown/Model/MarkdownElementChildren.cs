@@ -144,23 +144,35 @@ namespace Waher.Content.Markdown.Model
 			if (!(obj is MarkdownElementChildren x) || !base.Equals(obj))
 				return false;
 
-			IEnumerator<MarkdownElement> e1 = this.children.GetEnumerator();
-			IEnumerator<MarkdownElement> e2 = x.children.GetEnumerator();
-			bool b1, b2;
+			IEnumerator<MarkdownElement> e1 = null;
+			IEnumerator<MarkdownElement> e2 = null;
 
-			while (true)
+			try
 			{
-				b1 = e1.MoveNext();
-				b2 = e2.MoveNext();
+				e1 = this.children.GetEnumerator();
+				e2 = x.children.GetEnumerator();
 
-				if (b1 ^ b2)
-					return false;
+				bool b1, b2;
 
-				if (!b1)
-					return true;
+				while (true)
+				{
+					b1 = e1.MoveNext();
+					b2 = e2.MoveNext();
 
-				if (!e1.Current.Equals(e2.Current))
-					return false;
+					if (b1 ^ b2)
+						return false;
+
+					if (!b1)
+						return true;
+
+					if (!e1.Current.Equals(e2.Current))
+						return false;
+				}
+			}
+			finally
+			{
+				e1?.Dispose();
+				e2?.Dispose();
 			}
 		}
 

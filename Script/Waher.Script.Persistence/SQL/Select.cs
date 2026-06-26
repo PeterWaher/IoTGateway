@@ -14,10 +14,10 @@ using Waher.Script.Persistence.SQL.Processors;
 
 namespace Waher.Script.Persistence.SQL
 {
-    /// <summary>
-    /// Executes a SELECT statement against the object database.
-    /// </summary>
-    public class Select : ScriptNode, IEvaluateAsync
+	/// <summary>
+	/// Executes a SELECT statement against the object database.
+	/// </summary>
+	public class Select : ScriptNode, IEvaluateAsync
 	{
 		private readonly ScriptNode[] columns;
 		private readonly ScriptNode[] columnNames;
@@ -51,8 +51,8 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Select(ScriptNode[] Columns, ScriptNode[] ColumnNames, SourceDefinition Source, 
-			ScriptNode Where, ScriptNode[] GroupBy, ScriptNode[] GroupByNames, ScriptNode Having, 
+		public Select(ScriptNode[] Columns, ScriptNode[] ColumnNames, SourceDefinition Source,
+			ScriptNode Where, ScriptNode[] GroupBy, ScriptNode[] GroupByNames, ScriptNode Having,
 			KeyValuePair<ScriptNode, bool>[] OrderBy, ScriptNode Top, ScriptNode Offset,
 			bool Distinct, bool Generic, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
@@ -286,7 +286,7 @@ namespace Waher.Script.Persistence.SQL
 				c = 0;
 
 			IDataSource Source = await this.source.GetSource(Variables);
-			
+
 			IProcessor<object> Processor;
 			RecordProcessor Records;
 
@@ -294,7 +294,7 @@ namespace Waher.Script.Persistence.SQL
 				Records = new DistinctRecordProcessor(Columns2, Variables);
 			else
 				Records = new RecordProcessor(Columns2, Variables);
-			
+
 			Processor = Records;
 
 			if (!(this.groupBy is null))

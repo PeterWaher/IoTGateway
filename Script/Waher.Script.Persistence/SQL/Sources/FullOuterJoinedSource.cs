@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
@@ -90,6 +91,12 @@ namespace Waher.Script.Persistence.SQL.Sources
 			}
 
 			public object Current => this.current;
+
+			public void Dispose()
+			{
+				this.leftEnum.Dispose();
+				this.rightEnum.Dispose();
+			}
 
 			public bool MoveNext()
 			{

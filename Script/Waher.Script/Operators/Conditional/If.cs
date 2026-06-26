@@ -116,10 +116,19 @@ namespace Waher.Script.Operators.Conditional
                 IEnumerator<IElement> e2 = IfTrueElements?.GetEnumerator();
                 IEnumerator<IElement> e3 = IfFalseElements?.GetEnumerator();
 
-                while (e1.MoveNext() && (e2 is null || e2.MoveNext()) && (e3 is null || e3.MoveNext()))
-                    Elements.Add(this.Evaluate(e1.Current, e2 is null ? IfTrue : e2.Current, e3 is null ? IfFalse : e3.Current));
+                try
+                {
+                    while (e1.MoveNext() && (e2 is null || e2.MoveNext()) && (e3 is null || e3.MoveNext()))
+                        Elements.Add(this.Evaluate(e1.Current, e2 is null ? IfTrue : e2.Current, e3 is null ? IfFalse : e3.Current));
 
-                return Condition.Encapsulate(Elements, this);
+                    return Condition.Encapsulate(Elements, this);
+                }
+                finally
+                {
+                    e1.Dispose();
+                    e2?.Dispose();
+                    e3?.Dispose();
+				}
             }
         }
 

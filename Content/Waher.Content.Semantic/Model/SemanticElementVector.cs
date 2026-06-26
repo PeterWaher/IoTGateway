@@ -108,13 +108,24 @@ namespace Waher.Content.Semantic.Model
 				return false;
 			}
 
-			IEnumerator<IElement> e1 = this.elements.GetEnumerator();
-			IEnumerator<IElement> e2 = Typed.elements.GetEnumerator();
+			IEnumerator<IElement> e1 = null;
+			IEnumerator<IElement> e2 = null;
 
-			while (e1.MoveNext() && e2.MoveNext())
+			try
 			{
-				if (!e1.Current.Equals(e2.Current))
-					return false;
+				e1 = this.elements.GetEnumerator();
+				e2 = Typed.elements.GetEnumerator();
+
+				while (e1.MoveNext() && e2.MoveNext())
+				{
+					if (!e1.Current.Equals(e2.Current))
+						return false;
+				}
+			}
+			finally
+			{
+				e1?.Dispose();
+				e2?.Dispose();
 			}
 
 			return true;

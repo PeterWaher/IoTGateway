@@ -70,7 +70,10 @@ namespace Waher.Script.Persistence.SPARQL.Filters
 			if (Possibilities is null)
 				return BooleanValue.False;
 
-			return Possibilities.GetEnumerator().MoveNext() ? BooleanValue.True : BooleanValue.False;
+			using (IEnumerator<Possibility> e = Possibilities.GetEnumerator())
+			{
+				return e.MoveNext() ? BooleanValue.True : BooleanValue.False;
+			}
 		}
 
 		/// <summary>

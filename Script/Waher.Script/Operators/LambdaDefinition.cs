@@ -265,52 +265,60 @@ namespace Waher.Script.Operators
 
 			this.Prepare(Arguments, out Encapsulation Encapsulation, out int Dimension, out IEnumerator<IElement>[] e);
 
-			if (!(Encapsulation is null))
+			try
 			{
-				ChunkedList<IElement> Result = new ChunkedList<IElement>();
-				IElement[] Arguments2 = new IElement[this.nrArguments];
-
-				for (j = 0; j < Dimension; j++)
+				if (!(Encapsulation is null))
 				{
-					for (i = 0; i < this.nrArguments; i++)
+					ChunkedList<IElement> Result = new ChunkedList<IElement>();
+					IElement[] Arguments2 = new IElement[this.nrArguments];
+
+					for (j = 0; j < Dimension; j++)
 					{
-						if (e[i] is null || !e[i].MoveNext())
-							Arguments2[i] = Arguments[i];
-						else
-							Arguments2[i] = e[i].Current;
+						for (i = 0; i < this.nrArguments; i++)
+						{
+							if (e[i] is null || !e[i].MoveNext())
+								Arguments2[i] = Arguments[i];
+							else
+								Arguments2[i] = e[i].Current;
+						}
+
+						Result.Add(this.EvaluateCanonicalExtension(Arguments2, Variables));
 					}
 
-					Result.Add(this.EvaluateCanonicalExtension(Arguments2, Variables));
+					return Encapsulation(Result, this);
 				}
+				else
+				{
+					for (i = 0; i < this.nrArguments; i++)
+						Variables[this.argumentNames[i]] = Arguments[i];
 
-				return Encapsulation(Result, this);
+					try
+					{
+						return this.op.Evaluate(Variables);
+					}
+					catch (ScriptReturnValueException ex)
+					{
+						return ex.ReturnValue;
+						//IElement Returnvalue = ex.ReturnValue;
+						//ScriptReturnValueException.Reuse(ex);
+						//return Returnvalue;
+					}
+					catch (ScriptBreakLoopException ex)
+					{
+						return ex.LoopValue ?? ObjectValue.Null;
+						//ScriptBreakLoopException.Reuse(ex);
+					}
+					catch (ScriptContinueLoopException ex)
+					{
+						return ex.LoopValue ?? ObjectValue.Null;
+						//ScriptContinueLoopException.Reuse(ex);
+					}
+				}
 			}
-			else
+			finally
 			{
-				for (i = 0; i < this.nrArguments; i++)
-					Variables[this.argumentNames[i]] = Arguments[i];
-
-				try
-				{
-					return this.op.Evaluate(Variables);
-				}
-				catch (ScriptReturnValueException ex)
-				{
-					return ex.ReturnValue;
-					//IElement Returnvalue = ex.ReturnValue;
-					//ScriptReturnValueException.Reuse(ex);
-					//return Returnvalue;
-				}
-				catch (ScriptBreakLoopException ex)
-				{
-					return ex.LoopValue ?? ObjectValue.Null;
-					//ScriptBreakLoopException.Reuse(ex);
-				}
-				catch (ScriptContinueLoopException ex)
-				{
-					return ex.LoopValue ?? ObjectValue.Null;
-					//ScriptContinueLoopException.Reuse(ex);
-				}
+				for (i = 0; i < Dimension; i++)
+					e[i]?.Dispose();
 			}
 		}
 
@@ -320,52 +328,60 @@ namespace Waher.Script.Operators
 
 			this.Prepare(Arguments, out Encapsulation Encapsulation, out int Dimension, out IEnumerator<IElement>[] e);
 
-			if (!(Encapsulation is null))
+			try
 			{
-				ChunkedList<IElement> Result = new ChunkedList<IElement>();
-				IElement[] Arguments2 = new IElement[this.nrArguments];
-
-				for (j = 0; j < Dimension; j++)
+				if (!(Encapsulation is null))
 				{
-					for (i = 0; i < this.nrArguments; i++)
+					ChunkedList<IElement> Result = new ChunkedList<IElement>();
+					IElement[] Arguments2 = new IElement[this.nrArguments];
+
+					for (j = 0; j < Dimension; j++)
 					{
-						if (e[i] is null || !e[i].MoveNext())
-							Arguments2[i] = Arguments[i];
-						else
-							Arguments2[i] = e[i].Current;
+						for (i = 0; i < this.nrArguments; i++)
+						{
+							if (e[i] is null || !e[i].MoveNext())
+								Arguments2[i] = Arguments[i];
+							else
+								Arguments2[i] = e[i].Current;
+						}
+
+						Result.Add(await this.EvaluateCanonicalExtensionAsync(Arguments2, Variables));
 					}
 
-					Result.Add(await this.EvaluateCanonicalExtensionAsync(Arguments2, Variables));
+					return Encapsulation(Result, this);
 				}
+				else
+				{
+					for (i = 0; i < this.nrArguments; i++)
+						Variables[this.argumentNames[i]] = Arguments[i];
 
-				return Encapsulation(Result, this);
+					try
+					{
+						return await this.op.EvaluateAsync(Variables);
+					}
+					catch (ScriptReturnValueException ex)
+					{
+						return ex.ReturnValue;
+						//IElement Returnvalue = ex.ReturnValue;
+						//ScriptReturnValueException.Reuse(ex);
+						//return Returnvalue;
+					}
+					catch (ScriptBreakLoopException ex)
+					{
+						return ex.LoopValue ?? ObjectValue.Null;
+						//ScriptBreakLoopException.Reuse(ex);
+					}
+					catch (ScriptContinueLoopException ex)
+					{
+						return ex.LoopValue ?? ObjectValue.Null;
+						//ScriptContinueLoopException.Reuse(ex);
+					}
+				}
 			}
-			else
+			finally
 			{
-				for (i = 0; i < this.nrArguments; i++)
-					Variables[this.argumentNames[i]] = Arguments[i];
-
-				try
-				{
-					return await this.op.EvaluateAsync(Variables);
-				}
-				catch (ScriptReturnValueException ex)
-				{
-					return ex.ReturnValue;
-					//IElement Returnvalue = ex.ReturnValue;
-					//ScriptReturnValueException.Reuse(ex);
-					//return Returnvalue;
-				}
-				catch (ScriptBreakLoopException ex)
-				{
-					return ex.LoopValue ?? ObjectValue.Null;
-					//ScriptBreakLoopException.Reuse(ex);
-				}
-				catch (ScriptContinueLoopException ex)
-				{
-					return ex.LoopValue ?? ObjectValue.Null;
-					//ScriptContinueLoopException.Reuse(ex);
-				}
+				for (i = 0; i < Dimension; i++)
+					e[i]?.Dispose();
 			}
 		}
 

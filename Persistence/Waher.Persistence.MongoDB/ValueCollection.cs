@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Persistence.MongoDB
 {
@@ -15,21 +13,8 @@ namespace Waher.Persistence.MongoDB
 			this.dictionary = Dictionary;
 		}
 
-		public int Count
-		{
-			get
-			{
-				return this.dictionary.Count;
-			}
-		}
-
-		public bool IsReadOnly
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public int Count => this.dictionary.Count;
+		public bool IsReadOnly => true;
 
 		public void Add(object item)
 		{
@@ -48,10 +33,8 @@ namespace Waher.Persistence.MongoDB
 
 		public void CopyTo(object[] array, int arrayIndex)
 		{
-			IEnumerator<KeyValuePair<string, object>> e = this.dictionary.GetEnumerator();
-
-			while (e.MoveNext())
-				array[arrayIndex++] = e.Current.Value;
+			foreach (object Value in this.dictionary.Values)
+				array[arrayIndex++] = Value;
 		}
 
 		public IEnumerator<object> GetEnumerator()
@@ -71,13 +54,12 @@ namespace Waher.Persistence.MongoDB
 
 		public object[] GetAllValues()
 		{
-			List<object> Result = new List<object>();
-			IEnumerator<KeyValuePair<string, object>> e = this.dictionary.GetEnumerator();
+			List<object> Result = [];
 
-			while (e.MoveNext())
-				Result.Add(e.Current.Value);
+			foreach (object Value in this.dictionary.Values)
+				Result.Add(Value);
 
-			return Result.ToArray();
+			return [.. Result];
 		}
 	}
 }

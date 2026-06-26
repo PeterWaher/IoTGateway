@@ -452,90 +452,115 @@ namespace Waher.Script.Graphs
 			Dictionary<string, IElement> Values = new Dictionary<string, IElement>();
 			IEnumerator<IVector> vX = DestFixed.GetEnumerator();
 			IEnumerator<IVector> vY = DestValues.GetEnumerator();
-			IEnumerator<IElement> eX;
-			IEnumerator<IElement> eY;
+			IEnumerator<IElement> eX = null;
+			IEnumerator<IElement> eY = null;
 			IVector X;
 			IVector Y;
 			ChunkedList<IElement> Y2;
 
-			while (vX.MoveNext() && vY.MoveNext())
+			try
 			{
-				X = vX.Current;
-				Y = vY.Current;
-
-				eX = X.ChildElements.GetEnumerator();
-				eY = Y.ChildElements.GetEnumerator();
-
-				while (eX.MoveNext() && eY.MoveNext())
-					Values[ScriptNode.ToString(eX.Current) ?? string.Empty] = eY.Current;
-			}
-
-			vX = AddFixed.GetEnumerator();
-			vY = AddValues.GetEnumerator();
-
-			while (vX.MoveNext() && vY.MoveNext())
-			{
-				X = vX.Current;
-				Y = vY.Current;
-				Y2 = new ChunkedList<IElement>();
-
-				eX = X.ChildElements.GetEnumerator();
-				eY = Y.ChildElements.GetEnumerator();
-
-				while (eX.MoveNext() && eY.MoveNext())
+				while (vX.MoveNext() && vY.MoveNext())
 				{
-					if (Values.TryGetValue(ScriptNode.ToString(eX.Current) ?? string.Empty, out IElement Value))
-						Y2.Add(Operators.Arithmetics.Add.EvaluateAddition(Value, eY.Current, null));
-					else
-						Y2.Add(eY.Current);
+					X = vX.Current;
+					Y = vY.Current;
+
+					eX?.Dispose();
+					eX = X.ChildElements.GetEnumerator();
+				
+					eY?.Dispose();
+					eY = Y.ChildElements.GetEnumerator();
+
+					while (eX.MoveNext() && eY.MoveNext())
+						Values[ScriptNode.ToString(eX.Current) ?? string.Empty] = eY.Current;
 				}
 
-				DestFixed.Add(X);
-				DestValues.Add(Y = (IVector)Y.Encapsulate(Y2, null));
+				vX.Dispose();
+				vX = AddFixed.GetEnumerator();
+				
+				vY.Dispose();
+				vY = AddValues.GetEnumerator();
 
-				MinValues = Min.CalcMin((IVector)VectorDefinition.Encapsulate(new IElement[] { MinValues, Min.CalcMin(Y, null) }, false, null), null);
-				MaxValues = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { MaxValues, Max.CalcMax(Y, null) }, false, null), null);
-			}
-
-			MinFixed = Min.CalcMin((IVector)VectorDefinition.Encapsulate(new IElement[] { MinFixed, AddMinFixed }, false, null), null);
-			MaxFixed = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { MaxFixed, AddMaxFixed }, false, null), null);
-
-			IVector Labels = GetLabels(ref MinFixed, ref MaxFixed, DestFixed, 2, out LabelType LabelType);
-			string[] Strings = LabelStrings(Labels, LabelType);
-			ChunkedList<IVector> NormalizedX = new ChunkedList<IVector>();
-			ChunkedList<IVector> NormalizedY = new ChunkedList<IVector>();
-			Dictionary<string, IElement> Sorted = new Dictionary<string, IElement>();
-			IElement Zero = (MinValues.AssociatedSet as Group)?.AdditiveIdentity ?? DoubleNumber.ZeroElement;
-
-			vX = DestFixed.GetEnumerator();
-			vY = DestValues.GetEnumerator();
-
-			while (vX.MoveNext() && vY.MoveNext())
-			{
-				X = vX.Current;
-				Y = vY.Current;
-				Y2 = new ChunkedList<IElement>();
-
-				eX = X.ChildElements.GetEnumerator();
-				eY = Y.ChildElements.GetEnumerator();
-
-				while (eX.MoveNext() && eY.MoveNext())
-					Sorted[ScriptNode.ToString(eX.Current) ?? string.Empty] = eY.Current;
-
-				foreach (string s in Strings)
+				while (vX.MoveNext() && vY.MoveNext())
 				{
-					if (Sorted.TryGetValue(s, out IElement E))
-						Y2.Add(E);
-					else
-						Y2.Add(Zero);
+					X = vX.Current;
+					Y = vY.Current;
+					Y2 = new ChunkedList<IElement>();
+
+					eX?.Dispose();
+					eX = X.ChildElements.GetEnumerator();
+				
+					eY?.Dispose();
+					eY = Y.ChildElements.GetEnumerator();
+
+					while (eX.MoveNext() && eY.MoveNext())
+					{
+						if (Values.TryGetValue(ScriptNode.ToString(eX.Current) ?? string.Empty, out IElement Value))
+							Y2.Add(Operators.Arithmetics.Add.EvaluateAddition(Value, eY.Current, null));
+						else
+							Y2.Add(eY.Current);
+					}
+
+					DestFixed.Add(X);
+					DestValues.Add(Y = (IVector)Y.Encapsulate(Y2, null));
+
+					MinValues = Min.CalcMin((IVector)VectorDefinition.Encapsulate(new IElement[] { MinValues, Min.CalcMin(Y, null) }, false, null), null);
+					MaxValues = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { MaxValues, Max.CalcMax(Y, null) }, false, null), null);
 				}
 
-				NormalizedX.Add(Labels);
-				NormalizedY.Add((IVector)Y.Encapsulate(Y2, null));
-			}
+				MinFixed = Min.CalcMin((IVector)VectorDefinition.Encapsulate(new IElement[] { MinFixed, AddMinFixed }, false, null), null);
+				MaxFixed = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { MaxFixed, AddMaxFixed }, false, null), null);
 
-			DestFixed = NormalizedX;
-			DestValues = NormalizedY;
+				IVector Labels = GetLabels(ref MinFixed, ref MaxFixed, DestFixed, 2, out LabelType LabelType);
+				string[] Strings = LabelStrings(Labels, LabelType);
+				ChunkedList<IVector> NormalizedX = new ChunkedList<IVector>();
+				ChunkedList<IVector> NormalizedY = new ChunkedList<IVector>();
+				Dictionary<string, IElement> Sorted = new Dictionary<string, IElement>();
+				IElement Zero = (MinValues.AssociatedSet as Group)?.AdditiveIdentity ?? DoubleNumber.ZeroElement;
+
+				vX.Dispose();
+				vX = DestFixed.GetEnumerator();
+
+				vY.Dispose();
+				vY = DestValues.GetEnumerator();
+
+				while (vX.MoveNext() && vY.MoveNext())
+				{
+					X = vX.Current;
+					Y = vY.Current;
+					Y2 = new ChunkedList<IElement>();
+
+					eX?.Dispose();
+					eX = X.ChildElements.GetEnumerator();
+
+					eY?.Dispose();
+					eY = Y.ChildElements.GetEnumerator();
+
+					while (eX.MoveNext() && eY.MoveNext())
+						Sorted[ScriptNode.ToString(eX.Current) ?? string.Empty] = eY.Current;
+
+					foreach (string s in Strings)
+					{
+						if (Sorted.TryGetValue(s, out IElement E))
+							Y2.Add(E);
+						else
+							Y2.Add(Zero);
+					}
+
+					NormalizedX.Add(Labels);
+					NormalizedY.Add((IVector)Y.Encapsulate(Y2, null));
+				}
+
+				DestFixed = NormalizedX;
+				DestValues = NormalizedY;
+			}
+			finally
+			{
+				vX.Dispose();
+				vY.Dispose();
+				eX?.Dispose();
+				eY?.Dispose();
+			}
 		}
 
 		/// <inheritdoc/>
@@ -565,19 +590,30 @@ namespace Waher.Script.Graphs
 
 		private bool Equals(IEnumerator e1, IEnumerator e2)
 		{
-			bool b1 = e1.MoveNext();
-			bool b2 = e2.MoveNext();
-
-			while (b1 && b2)
+			try
 			{
-				if (!e1.Current.Equals(e2.Current))
-					return false;
+				bool b1 = e1.MoveNext();
+				bool b2 = e2.MoveNext();
 
-				b1 = e1.MoveNext();
-				b2 = e2.MoveNext();
+				while (b1 && b2)
+				{
+					if (!e1.Current.Equals(e2.Current))
+						return false;
+
+					b1 = e1.MoveNext();
+					b2 = e2.MoveNext();
+				}
+
+				return !(b1 || b2);
 			}
+			finally
+			{
+				if (e1 is IDisposable Disposable1)
+					Disposable1.Dispose();
 
-			return !(b1 || b2);
+				if (e2 is IDisposable Disposable2)
+					Disposable2.Dispose();
+			}
 		}
 
 		/// <inheritdoc/>
@@ -912,34 +948,44 @@ namespace Waher.Script.Graphs
 				object[] PrevParameters = null;
 				IPainter2D PrevPainter = null;
 
-				while (ex.MoveNext() && ey.MoveNext() && eParameters.MoveNext() && ePainters.MoveNext())
+				try
 				{
-					Points = DrawingArea.Scale(ex.Current, ey.Current);
+					while (ex.MoveNext() && ey.MoveNext() && eParameters.MoveNext() && ePainters.MoveNext())
+					{
+						Points = DrawingArea.Scale(ex.Current, ey.Current);
 
-					if (!(PrevPainter is null) && ePainters.Current.GetType() == PrevPainter.GetType())
-						ePainters.Current.DrawGraph(Canvas, Points, eParameters.Current, PrevPoints, PrevParameters, DrawingArea);
-					else
-						ePainters.Current.DrawGraph(Canvas, Points, eParameters.Current, null, null, DrawingArea);
+						if (!(PrevPainter is null) && ePainters.Current.GetType() == PrevPainter.GetType())
+							ePainters.Current.DrawGraph(Canvas, Points, eParameters.Current, PrevPoints, PrevParameters, DrawingArea);
+						else
+							ePainters.Current.DrawGraph(Canvas, Points, eParameters.Current, null, null, DrawingArea);
 
-					PrevPoints = Points;
-					PrevParameters = eParameters.Current;
-					PrevPainter = ePainters.Current;
+						PrevPoints = Points;
+						PrevParameters = eParameters.Current;
+						PrevPainter = ePainters.Current;
+					}
+
+					using (SKImage Result = Surface.Snapshot())
+					{
+						NormalFont?.Dispose();
+						LargeFont?.Dispose();
+						Pen?.Dispose();
+
+						AxisBrush.Dispose();
+						GridBrush.Dispose();
+						GridPen.Dispose();
+						AxisPen.Dispose();
+
+						States = new object[] { DrawingArea };
+
+						return PixelInformation.FromImage(Result);
+					}
 				}
-
-				using (SKImage Result = Surface.Snapshot())
+				finally
 				{
-					NormalFont?.Dispose();
-					LargeFont?.Dispose();
-					Pen?.Dispose();
-
-					AxisBrush.Dispose();
-					GridBrush.Dispose();
-					GridPen.Dispose();
-					AxisPen.Dispose();
-
-					States = new object[] { DrawingArea };
-
-					return PixelInformation.FromImage(Result);
+					ex.Dispose();
+					ey.Dispose();
+					eParameters.Dispose();
+					ePainters.Dispose();
 				}
 			}
 		}
@@ -1396,13 +1442,21 @@ namespace Waher.Script.Graphs
 				IEnumerator<object[]> eParameters = this.parameters.GetEnumerator();
 				IEnumerator<IPainter2D> ePainter = this.painters.GetEnumerator();
 
-				while (eParameters.MoveNext() && ePainter.MoveNext())
+				try
 				{
-					if (!ePainter.Current.UsesDefaultColor(eParameters.Current))
-						return false;
-				}
+					while (eParameters.MoveNext() && ePainter.MoveNext())
+					{
+						if (!ePainter.Current.UsesDefaultColor(eParameters.Current))
+							return false;
+					}
 
-				return true;
+					return true;
+				}
+				finally
+				{
+					eParameters.Dispose();
+					ePainter.Dispose();
+				}
 			}
 		}
 
@@ -1420,13 +1474,21 @@ namespace Waher.Script.Graphs
 			IEnumerator<IPainter2D> ePainter = this.painters.GetEnumerator();
 			bool Result = true;
 
-			while (eParameters.MoveNext() && ePainter.MoveNext())
+			try
 			{
-				if (!ePainter.Current.TrySetDefaultColor(Color, eParameters.Current))
-					Result = false;
-			}
+				while (eParameters.MoveNext() && ePainter.MoveNext())
+				{
+					if (!ePainter.Current.TrySetDefaultColor(Color, eParameters.Current))
+						Result = false;
+				}
 
-			return Result;
+				return Result;
+			}
+			finally
+			{
+				eParameters.Dispose();
+				ePainter.Dispose();
+			}
 		}
 
 	}

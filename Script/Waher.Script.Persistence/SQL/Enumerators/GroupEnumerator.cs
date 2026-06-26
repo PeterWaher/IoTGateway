@@ -80,6 +80,14 @@ namespace Waher.Script.Persistence.SQL.Enumerators
 		/// <see cref="IEnumerator.Current"/>
 		/// </summary>
 		public object Current => this.current;
+		
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>"/>
+		/// </summary>
+		public void Dispose()
+		{
+			this.e.Dispose();
+		}
 
 		/// <summary>
 		/// <see cref="IEnumerator.MoveNext"/>

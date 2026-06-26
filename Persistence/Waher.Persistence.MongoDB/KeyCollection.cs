@@ -48,10 +48,8 @@ namespace Waher.Persistence.MongoDB
 
 		public void CopyTo(string[] array, int arrayIndex)
 		{
-			IEnumerator<KeyValuePair<string, object>> e = this.dictionary.GetEnumerator();
-
-			while (e.MoveNext())
-				array[arrayIndex++] = e.Current.Key;
+			foreach (string Key in this.dictionary.Keys)
+				array[arrayIndex++] = Key;
 		}
 
 		public IEnumerator<string> GetEnumerator()
@@ -71,13 +69,12 @@ namespace Waher.Persistence.MongoDB
 
 		public string[] GetAllKeys()
 		{
-			List<string> Result = new List<string>();
-			IEnumerator<KeyValuePair<string, object>> e = this.dictionary.GetEnumerator();
+			List<string> Result = [];
 
-			while (e.MoveNext())
-				Result.Add(e.Current.Key);
+			foreach (string Key in this.dictionary.Keys)
+				Result.Add(Key);
 
-			return Result.ToArray();
+			return [.. Result];
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Threading.Tasks;
 
 namespace Waher.Script.Persistence.SQL.Enumerators
@@ -24,11 +25,20 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// </summary>
         public object Current => this.e.Current;
 
-        /// <summary>
-        /// Tries to move to next item.
-        /// </summary>
-        /// <returns>If successful</returns>
-        public bool MoveNext()
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+            if (this.e is IDisposable Disposable)
+                Disposable.Dispose();
+		}
+
+		/// <summary>
+		/// Tries to move to next item.
+		/// </summary>
+		/// <returns>If successful</returns>
+		public bool MoveNext()
         {
             return this.e.MoveNext();
         }

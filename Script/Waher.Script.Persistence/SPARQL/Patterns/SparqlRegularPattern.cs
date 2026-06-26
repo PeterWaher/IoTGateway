@@ -169,8 +169,14 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 							break;
 					}
 
-					if (ExistingMatches is null || !ExistingMatches.GetEnumerator().MoveNext())
+					if (ExistingMatches is null)
 						return null;
+
+					using (IEnumerator<Possibility> e = ExistingMatches.GetEnumerator())
+					{
+						if (!e.MoveNext())
+							return null;
+					}
 				}
 			}
 
@@ -863,40 +869,58 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 			{
 				IEnumerator<KeyValuePair<ScriptNode, ScriptNode>> e1 = this.boundVariables.GetEnumerator();
 				IEnumerator<KeyValuePair<ScriptNode, ScriptNode>> e2 = Typed.boundVariables.GetEnumerator();
-				bool b1 = e1.MoveNext();
-				bool b2 = e2.MoveNext();
 
-				while (b1 && b2)
+				try
 				{
-					if (!e1.Current.Equals(e2.Current))
+					bool b1 = e1.MoveNext();
+					bool b2 = e2.MoveNext();
+
+					while (b1 && b2)
+					{
+						if (!e1.Current.Equals(e2.Current))
+							return false;
+
+						b1 = e1.MoveNext();
+						b2 = e2.MoveNext();
+					}
+
+					if (b1 || b2)
 						return false;
-
-					b1 = e1.MoveNext();
-					b2 = e2.MoveNext();
 				}
-
-				if (b1 || b2)
-					return false;
+				finally
+				{
+					e1.Dispose();
+					e2.Dispose();
+				}
 			}
 
 			if (!(this.filter is null))
 			{
 				IEnumerator<IFilterNode> e1 = this.filter.GetEnumerator();
 				IEnumerator<IFilterNode> e2 = Typed.filter.GetEnumerator();
-				bool b1 = e1.MoveNext();
-				bool b2 = e2.MoveNext();
 
-				while (b1 && b2)
+				try
 				{
-					if (!e1.Current.Equals(e2.Current))
+					bool b1 = e1.MoveNext();
+					bool b2 = e2.MoveNext();
+
+					while (b1 && b2)
+					{
+						if (!e1.Current.Equals(e2.Current))
+							return false;
+
+						b1 = e1.MoveNext();
+						b2 = e2.MoveNext();
+					}
+
+					if (b1 || b2)
 						return false;
-
-					b1 = e1.MoveNext();
-					b2 = e2.MoveNext();
 				}
-
-				if (b1 || b2)
-					return false;
+				finally
+				{
+					e1.Dispose();
+					e2.Dispose();
+				}
 			}
 
 			return true;

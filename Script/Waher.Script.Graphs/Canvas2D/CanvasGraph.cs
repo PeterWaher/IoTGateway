@@ -176,19 +176,27 @@ namespace Waher.Script.Graphs.Canvas2D
 			IEnumerator<CanvasOperation> e2 = G.operations.GetEnumerator();
 			bool b1, b2;
 
-			while (true)
+			try
 			{
-				b1 = e1.MoveNext();
-				b2 = e2.MoveNext();
+				while (true)
+				{
+					b1 = e1.MoveNext();
+					b2 = e2.MoveNext();
 
-				if (b1 ^ b2)
-					return false;
+					if (b1 ^ b2)
+						return false;
 
-				if (!b1)
-					return true;
+					if (!b1)
+						return true;
 
-				if (!e1.Current.Equals(e2.Current))
-					return false;
+					if (!e1.Current.Equals(e2.Current))
+						return false;
+				}
+			}
+			finally
+			{
+				e1.Dispose();
+				e2.Dispose();
 			}
 		}
 

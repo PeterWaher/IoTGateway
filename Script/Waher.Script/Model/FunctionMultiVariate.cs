@@ -256,28 +256,36 @@ namespace Waher.Script.Model
 
 			this.Prepare(Arguments, out Encapsulation Encapsulation, out int Dimension, out IEnumerator<IElement>[] e);
 
-			if (!(Encapsulation is null))
+			try
 			{
-				ChunkedList<IElement> Result = new ChunkedList<IElement>();
-				IElement[] Arguments2 = new IElement[this.nrArguments];
-
-				for (j = 0; j < Dimension; j++)
+				if (!(Encapsulation is null))
 				{
-					for (i = 0; i < this.nrArguments; i++)
+					ChunkedList<IElement> Result = new ChunkedList<IElement>();
+					IElement[] Arguments2 = new IElement[this.nrArguments];
+
+					for (j = 0; j < Dimension; j++)
 					{
-						if (e[i] is null || !e[i].MoveNext())
-							Arguments2[i] = Arguments[i];
-						else
-							Arguments2[i] = e[i].Current;
+						for (i = 0; i < this.nrArguments; i++)
+						{
+							if (e[i] is null || !e[i].MoveNext())
+								Arguments2[i] = Arguments[i];
+							else
+								Arguments2[i] = e[i].Current;
+						}
+
+						Result.Add(this.EvaluateCanonicalExtension(Arguments2, Variables));
 					}
 
-					Result.Add(this.EvaluateCanonicalExtension(Arguments2, Variables));
+					return Encapsulation(Result, this);
 				}
-
-				return Encapsulation(Result, this);
+				else
+					return this.Evaluate(Arguments, Variables);
 			}
-			else
-				return this.Evaluate(Arguments, Variables);
+			finally
+			{
+				for (i = 0; i < Dimension; i++)
+					e[i]?.Dispose();
+			}
 		}
 
 		private void Prepare(IElement[] Arguments, out Encapsulation Encapsulation, out int Dimension, out IEnumerator<IElement>[] e)
@@ -454,28 +462,36 @@ namespace Waher.Script.Model
 
 			this.Prepare(Arguments, out Encapsulation Encapsulation, out int Dimension, out IEnumerator<IElement>[] e);
 
-			if (!(Encapsulation is null))
+			try
 			{
-				ChunkedList<IElement> Result = new ChunkedList<IElement>();
-				IElement[] Arguments2 = new IElement[this.nrArguments];
-
-				for (j = 0; j < Dimension; j++)
+				if (!(Encapsulation is null))
 				{
-					for (i = 0; i < this.nrArguments; i++)
+					ChunkedList<IElement> Result = new ChunkedList<IElement>();
+					IElement[] Arguments2 = new IElement[this.nrArguments];
+
+					for (j = 0; j < Dimension; j++)
 					{
-						if (e[i] is null || !e[i].MoveNext())
-							Arguments2[i] = Arguments[i];
-						else
-							Arguments2[i] = e[i].Current;
+						for (i = 0; i < this.nrArguments; i++)
+						{
+							if (e[i] is null || !e[i].MoveNext())
+								Arguments2[i] = Arguments[i];
+							else
+								Arguments2[i] = e[i].Current;
+						}
+
+						Result.Add(await this.EvaluateCanonicalExtensionAsync(Arguments2, Variables));
 					}
 
-					Result.Add(await this.EvaluateCanonicalExtensionAsync(Arguments2, Variables));
+					return Encapsulation(Result, this);
 				}
-
-				return Encapsulation(Result, this);
+				else
+					return await this.EvaluateAsync(Arguments, Variables);
 			}
-			else
-				return await this.EvaluateAsync(Arguments, Variables);
+			finally
+			{
+				for (i = 0; i < Dimension; i++)
+					e[i]?.Dispose();
+			}
 		}
 
 		/// <summary>

@@ -19,7 +19,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         private readonly KeyValuePair<ScriptNode, bool>[] order;
         private readonly IResultSetEnumerator items;
         private readonly Variables variables;
-        private IEnumerator e = null;
+        private IEnumerator<object> e = null;
 
         /// <summary>
         /// Enumerator that reorders a sequence of items.
@@ -38,6 +38,15 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <see cref="IEnumerator.Current"/>
         /// </summary>
         public object Current => this.e.Current;
+
+        /// <summary>
+        /// <see cref="IDisposable.Dispose"/>
+        /// </summary>
+        public void Dispose()
+        {
+            this.e?.Dispose();
+            this.e = null;
+        }
 
         /// <summary>
         /// <see cref="IEnumerator.MoveNext"/>

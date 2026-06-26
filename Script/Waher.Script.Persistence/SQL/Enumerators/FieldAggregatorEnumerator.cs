@@ -56,6 +56,14 @@ namespace Waher.Script.Persistence.SQL.Enumerators
 		public object Current => this.current;
 
 		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>"/>
+		/// </summary>
+		public void Dispose()
+		{
+			this.e.Dispose();
+		}
+
+		/// <summary>
 		/// <see cref="IEnumerator.MoveNext"/>
 		/// </summary>
 		public bool MoveNext()

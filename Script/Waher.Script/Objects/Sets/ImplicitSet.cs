@@ -33,7 +33,7 @@ namespace Waher.Script.Objects.Sets
 		/// <param name="OtherConditions">Other condition subset members must fulfill.</param>
 		/// <param name="Variables">Refernce to variables.</param>
 		/// <param name="DoubleColon">If double-colon was used to create subset.</param>
-		public ImplicitSet(ScriptNode Pattern, ISet SuperSet, In[] SetConditions, ScriptNode[] OtherConditions, 
+		public ImplicitSet(ScriptNode Pattern, ISet SuperSet, In[] SetConditions, ScriptNode[] OtherConditions,
 			Variables Variables, bool DoubleColon)
 		{
 			this.pattern = Pattern;
@@ -275,21 +275,24 @@ namespace Waher.Script.Objects.Sets
 				int i, c = SetConditions.Length;
 				IEnumerator<IElement>[] Enumerators = new IEnumerator<IElement>[c];
 				string[][] AffectedVariables = new string[c][];
+				bool Pushed = false;
 
-				for (i = 0; i < c; i++)
-				{
-					IEnumerable<IElement> Members = GetSetMembers(SetConditions[i].RightOperand.Evaluate(Variables));
-					if (Members is null)
-						return null;
-
-					Enumerators[i] = Members.GetEnumerator();
-					if (!Enumerators[i].MoveNext())
-						return null;
-				}
-
-				Variables.Push();
 				try
 				{
+					for (i = 0; i < c; i++)
+					{
+						IEnumerable<IElement> Members = GetSetMembers(SetConditions[i].RightOperand.Evaluate(Variables));
+						if (Members is null)
+							return null;
+
+						Enumerators[i] = Members.GetEnumerator();
+						if (!Enumerators[i].MoveNext())
+							return null;
+					}
+
+					Variables.Push();
+					Pushed = true;
+
 					ChunkedList<IElement> Items = new ChunkedList<IElement>();
 					Dictionary<string, IElement> LocalVariables = new Dictionary<string, IElement>();
 					IEnumerator<IElement> e;
@@ -396,7 +399,11 @@ namespace Waher.Script.Objects.Sets
 				}
 				finally
 				{
-					Variables.Pop();
+					if (Pushed)
+						Variables.Pop();
+
+					for (i = 0; i < c; i++)
+						Enumerators[i]?.Dispose();
 				}
 
 			}
@@ -468,21 +475,24 @@ namespace Waher.Script.Objects.Sets
 				int i, c = SetConditions.Length;
 				IEnumerator<IElement>[] Enumerators = new IEnumerator<IElement>[c];
 				string[][] AffectedVariables = new string[c][];
+				bool Pushed = false;
 
-				for (i = 0; i < c; i++)
-				{
-					IEnumerable<IElement> Members = GetSetMembers(await SetConditions[i].RightOperand.EvaluateAsync(Variables));
-					if (Members is null)
-						return null;
-
-					Enumerators[i] = Members.GetEnumerator();
-					if (!Enumerators[i].MoveNext())
-						return null;
-				}
-
-				Variables.Push();
 				try
 				{
+					for (i = 0; i < c; i++)
+					{
+						IEnumerable<IElement> Members = GetSetMembers(await SetConditions[i].RightOperand.EvaluateAsync(Variables));
+						if (Members is null)
+							return null;
+
+						Enumerators[i] = Members.GetEnumerator();
+						if (!Enumerators[i].MoveNext())
+							return null;
+					}
+
+					Variables.Push();
+					Pushed = true;
+
 					ChunkedList<IElement> Items = new ChunkedList<IElement>();
 					Dictionary<string, IElement> LocalVariables = new Dictionary<string, IElement>();
 					IEnumerator<IElement> e;
@@ -589,7 +599,11 @@ namespace Waher.Script.Objects.Sets
 				}
 				finally
 				{
-					Variables.Pop();
+					if (Pushed)
+						Variables.Pop();
+
+					for (i = 0; i < c; i++)
+						Enumerators[i]?.Dispose();
 				}
 
 			}

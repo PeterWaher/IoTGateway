@@ -212,25 +212,33 @@ namespace Waher.Script.Operators
 			IEnumerator<KeyValuePair<string, ScriptNode>> e1 = this.members.GetEnumerator();
 			IEnumerator<KeyValuePair<string, ScriptNode>> e2 = O.members.GetEnumerator();
 
-			while (true)
+			try
 			{
-				bool b1 = e1.MoveNext();
-				bool b2 = e2.MoveNext();
-
-				if (b1 ^ b2)
-					return false;
-
-				if (!b1)
-					return true;
-
-				KeyValuePair<string, ScriptNode> Item1 = e1.Current;
-				KeyValuePair<string, ScriptNode> Item2 = e2.Current;
-
-				if (!Item1.Key.Equals(Item2.Key) ||
-					!Item1.Value.Equals(Item2.Value))
+				while (true)
 				{
-					return false;
+					bool b1 = e1.MoveNext();
+					bool b2 = e2.MoveNext();
+
+					if (b1 ^ b2)
+						return false;
+
+					if (!b1)
+						return true;
+
+					KeyValuePair<string, ScriptNode> Item1 = e1.Current;
+					KeyValuePair<string, ScriptNode> Item2 = e2.Current;
+
+					if (!Item1.Key.Equals(Item2.Key) ||
+						!Item1.Value.Equals(Item2.Value))
+					{
+						return false;
+					}
 				}
+			}
+			finally
+			{
+				e1.Dispose();
+				e2.Dispose();
 			}
 		}
 

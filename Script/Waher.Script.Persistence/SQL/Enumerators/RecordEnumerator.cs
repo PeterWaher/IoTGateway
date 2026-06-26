@@ -49,6 +49,14 @@ namespace Waher.Script.Persistence.SQL.Enumerators
 		public IElement[] CurrentRecord => this.record;
 
 		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>"/>
+		/// </summary>
+		public void Dispose()
+		{
+			this.e.Dispose();
+		}
+
+		/// <summary>
 		/// <see cref="IEnumerator.MoveNext"/>
 		/// </summary>
 		public virtual bool MoveNext()

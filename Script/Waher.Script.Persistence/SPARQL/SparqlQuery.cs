@@ -312,7 +312,12 @@ namespace Waher.Script.Persistence.SPARQL
 			{
 				case QueryType.Ask:
 					if (!(Possibilities is null))
-						return new ObjectValue(new SparqlResultSet(Possibilities.GetEnumerator().MoveNext()));
+					{
+						using (IEnumerator<ISparqlResultRecord> e = Possibilities.GetEnumerator())
+						{
+							return new ObjectValue(new SparqlResultSet(e.MoveNext()));
+						}
+					}
 
 					return new ObjectValue(new SparqlResultSet(false));
 

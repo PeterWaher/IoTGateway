@@ -34,8 +34,8 @@ namespace Waher.Script.Persistence.Functions
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public FindObjects(ScriptNode Type, ScriptNode Offset, ScriptNode MaxCount, ScriptNode Filter, ScriptNode SortOrder, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { Type, Offset, MaxCount, Filter, SortOrder }, 
-				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Vector }, 
+			: base(new ScriptNode[] { Type, Offset, MaxCount, Filter, SortOrder },
+				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Vector },
 				  Start, Length, Expression)
 		{
 		}
@@ -136,10 +136,9 @@ namespace Waher.Script.Persistence.Functions
 			if (Result is IEnumerable E)
 			{
 				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
-				IEnumerator e = E.GetEnumerator();
 
-				while (e.MoveNext())
-					Elements.Add(Expression.Encapsulate(e.Current));
+				foreach (object Element in E)
+					Elements.Add(Expression.Encapsulate(Element));
 
 				return new ObjectVector(Elements);
 			}

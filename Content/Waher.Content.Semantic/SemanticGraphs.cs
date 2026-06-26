@@ -42,17 +42,18 @@ namespace Waher.Content.Semantic
 		public static async Task<SemanticGraph> GetGraph(ISemanticModel Model)
 		{
 			SemanticGraph Result = new SemanticGraph();
-			IEnumerator<ISemanticTriple> e = Model.GetEnumerator();
-
-			if (e is IAsyncEnumerator eAsync)
+			using (IEnumerator<ISemanticTriple> e = Model.GetEnumerator())
 			{
-				while (await eAsync.MoveNextAsync())
-					Result.Add(e.Current);
-			}
-			else
-			{
-				while (e.MoveNext())
-					Result.Add(e.Current);
+				if (e is IAsyncEnumerator eAsync)
+				{
+					while (await eAsync.MoveNextAsync())
+						Result.Add(e.Current);
+				}
+				else
+				{
+					while (e.MoveNext())
+						Result.Add(e.Current);
+				}
 			}
 
 			return Result;

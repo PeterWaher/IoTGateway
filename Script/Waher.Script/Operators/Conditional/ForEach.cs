@@ -53,11 +53,9 @@ namespace Waher.Script.Operators.Conditional
 					Elements = S.ChildElements;
 				else if (S.AssociatedObjectValue is IEnumerable Enumerable)
 				{
-					IEnumerator e = Enumerable.GetEnumerator();
-
-					while (e.MoveNext())
+					foreach (object Item in Enumerable)
 					{
-						Variables[this.variableName] = e.Current;
+						Variables[this.variableName] = Item;
 						S = this.right.Evaluate(Variables);
 					}
 
@@ -115,11 +113,9 @@ namespace Waher.Script.Operators.Conditional
 					Elements = S.ChildElements;
 				else if (S.AssociatedObjectValue is IEnumerable Enumerable)
 				{
-					IEnumerator e = Enumerable.GetEnumerator();
-
-					while (e.MoveNext())
+					foreach (object Item in Enumerable)
 					{
-						Variables[this.variableName] = e.Current;
+						Variables[this.variableName] = Item;
 						S = await this.right.EvaluateAsync(Variables);
 					}
 

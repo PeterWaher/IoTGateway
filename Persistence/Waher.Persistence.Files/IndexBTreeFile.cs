@@ -236,19 +236,30 @@ namespace Waher.Persistence.Files
 		/// <returns>If the object was saved in the index (true), or if the index property values of the object did not exist, or were too big to fit in an index record.</returns>
 		internal async Task<bool> SaveNewObjectsLocked(IEnumerable<Guid> ObjectIds, IEnumerable<object> Objects, IObjectSerializer Serializer)
 		{
-			IEnumerator<Guid> e1 = ObjectIds.GetEnumerator();
-			IEnumerator<object> e2 = Objects.GetEnumerator();
+			IEnumerator<Guid> e1 = null;
+			IEnumerator<object> e2 = null;
 
-			while (e1.MoveNext() && e2.MoveNext())
+			try
 			{
-				byte[] Bin = await this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
-				if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
-					return false;
+				e1 = ObjectIds.GetEnumerator();
+				e2 = Objects.GetEnumerator();
 
-				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin)
-					?? throw new FileException("Object is already available in index.", this.indexFile.FileName, this.collectionName);
+				while (e1.MoveNext() && e2.MoveNext())
+				{
+					byte[] Bin = await this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
+					if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
+						return false;
 
-				await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+					BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin)
+						?? throw new FileException("Object is already available in index.", this.indexFile.FileName, this.collectionName);
+
+					await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+				}
+			}
+			finally
+			{
+				e1?.Dispose();
+				e2?.Dispose();
 			}
 
 			return true;
@@ -288,23 +299,34 @@ namespace Waher.Persistence.Files
 		/// <returns>If the object was deleted from the index (true), or if the object did not exist in the index.</returns>
 		internal async Task DeleteObjectsLocked(IEnumerable<Guid> ObjectIds, IEnumerable<object> Objects, IObjectSerializer Serializer)
 		{
-			IEnumerator<Guid> e1 = ObjectIds.GetEnumerator();
-			IEnumerator<object> e2 = Objects.GetEnumerator();
+			IEnumerator<Guid> e1 = null;
+			IEnumerator<object> e2 = null;
 
-			while (e1.MoveNext() && e2.MoveNext())
+			try
 			{
-				try
-				{
-					byte[] Bin = await this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
-					if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
-						continue;
+				e1 = ObjectIds.GetEnumerator();
+				e2 = Objects.GetEnumerator();
 
-					await this.indexFile.DeleteObjectLocked(Bin, false, true, Serializer, null, 0);
-				}
-				catch (KeyNotFoundException)
+				while (e1.MoveNext() && e2.MoveNext())
 				{
-					continue;
+					try
+					{
+						byte[] Bin = await this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
+						if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
+							continue;
+
+						await this.indexFile.DeleteObjectLocked(Bin, false, true, Serializer, null, 0);
+					}
+					catch (KeyNotFoundException)
+					{
+						continue;
+					}
 				}
+			}
+			finally
+			{
+				e1?.Dispose();
+				e2?.Dispose();
 			}
 		}
 
@@ -378,54 +400,67 @@ namespace Waher.Persistence.Files
 		internal async Task UpdateObjectsLocked(IEnumerable<Guid> ObjectIds, IEnumerable<object> OldObjects, IEnumerable<object> NewObjects,
 			IObjectSerializer Serializer)
 		{
-			IEnumerator<Guid> e1 = ObjectIds.GetEnumerator();
-			IEnumerator<object> e2 = OldObjects.GetEnumerator();
-			IEnumerator<object> e3 = NewObjects.GetEnumerator();
+			IEnumerator<Guid> e1 = null;
+			IEnumerator<object> e2 = null;
+			IEnumerator<object> e3 = null;
 
-			while (e1.MoveNext() && e2.MoveNext() && e3.MoveNext())
+			try
 			{
-				byte[] OldBin = await this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
-				if (!(OldBin is null) && OldBin.Length > this.indexFile.InlineObjectSizeLimit)
-					continue;
+				e1 = ObjectIds.GetEnumerator();
+				e2 = OldObjects.GetEnumerator();
+				e3 = NewObjects.GetEnumerator();
 
-				byte[] NewBin = await this.recordHandler.Serialize(e1.Current, e3.Current, Serializer, MissingFieldAction.Null);
-				if (!(NewBin is null) && NewBin.Length > this.indexFile.InlineObjectSizeLimit)
-					continue;
-
-				if (OldBin is null && NewBin is null)
-					continue;
-
-				int i, c;
-
-				if ((c = OldBin.Length) == NewBin.Length)
+				while (e1.MoveNext() && e2.MoveNext() && e3.MoveNext())
 				{
-					for (i = 0; i < c; i++)
-					{
-						if (OldBin[i] != NewBin[i])
-							break;
-					}
-
-					if (i == c)
+					byte[] OldBin = await this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
+					if (!(OldBin is null) && OldBin.Length > this.indexFile.InlineObjectSizeLimit)
 						continue;
-				}
 
-				if (!(OldBin is null))
-				{
-					try
-					{
-						await this.indexFile.DeleteObjectLocked(OldBin, false, true, Serializer, null, 0);
-					}
-					catch (KeyNotFoundException)
-					{
-						// Ignore.
-					}
-				}
+					byte[] NewBin = await this.recordHandler.Serialize(e1.Current, e3.Current, Serializer, MissingFieldAction.Null);
+					if (!(NewBin is null) && NewBin.Length > this.indexFile.InlineObjectSizeLimit)
+						continue;
 
-				if (!(NewBin is null))
-				{
-					BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(NewBin);
-					await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, NewBin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+					if (OldBin is null && NewBin is null)
+						continue;
+
+					int i, c;
+
+					if ((c = OldBin.Length) == NewBin.Length)
+					{
+						for (i = 0; i < c; i++)
+						{
+							if (OldBin[i] != NewBin[i])
+								break;
+						}
+
+						if (i == c)
+							continue;
+					}
+
+					if (!(OldBin is null))
+					{
+						try
+						{
+							await this.indexFile.DeleteObjectLocked(OldBin, false, true, Serializer, null, 0);
+						}
+						catch (KeyNotFoundException)
+						{
+							// Ignore.
+						}
+					}
+
+					if (!(NewBin is null))
+					{
+						BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(NewBin);
+						await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, NewBin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+					}
 				}
+			}
+			finally
+			{
+				e1?.Dispose();
+				e2?.Dispose();
+				e3?.Dispose();
 			}
 		}
 

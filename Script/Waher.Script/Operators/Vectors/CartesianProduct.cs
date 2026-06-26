@@ -41,16 +41,24 @@ namespace Waher.Script.Operators.Vectors
 			IEnumerator<IElement> e2 = Right.VectorElements.GetEnumerator();
 			IElement v1;
 
-			while (e1.MoveNext())
+			try
 			{
-				v1 = e1.Current;
-				while (e2.MoveNext())
-					Elements.Add(VectorDefinition.Encapsulate(new IElement[] { v1, e2.Current }, false, this));
+				while (e1.MoveNext())
+				{
+					v1 = e1.Current;
+					while (e2.MoveNext())
+						Elements.Add(VectorDefinition.Encapsulate(new IElement[] { v1, e2.Current }, false, this));
 
-				e2.Reset();
+					e2.Reset();
+				}
+
+				return VectorDefinition.Encapsulate(Elements, false, this);
 			}
-
-			return VectorDefinition.Encapsulate(Elements, false, this);
+			finally
+			{
+				e1.Dispose();
+				e2.Dispose();
+			}
 		}
 	}
 }

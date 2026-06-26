@@ -2255,7 +2255,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				if (Key.ElementCount != FieldNames.Length)
 					continue;
 
-				IEnumerator<BsonElement> e1 = Key.Elements.GetEnumerator();
+				using IEnumerator<BsonElement> e1 = Key.Elements.GetEnumerator();
 				IEnumerator e2 = FieldNames.GetEnumerator();
 
 				bool Found = true;
@@ -2307,7 +2307,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				if (Key.ElementCount != FieldNames.Length)
 					continue;
 
-				IEnumerator<BsonElement> e1 = Key.Elements.GetEnumerator();
+				using IEnumerator<BsonElement> e1 = Key.Elements.GetEnumerator();
 				IEnumerator e2 = FieldNames.GetEnumerator();
 
 				Found = true;

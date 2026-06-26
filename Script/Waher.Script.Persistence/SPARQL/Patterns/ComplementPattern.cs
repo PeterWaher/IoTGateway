@@ -41,8 +41,18 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 			{
 				IEnumerable<Possibility> NewMatches = await this.Right.Search(Cube, Variables,
 					new Possibility[] { P }, Query);
+				bool Empty = NewMatches is null;
 
-				if (NewMatches is null || !NewMatches.GetEnumerator().MoveNext())
+				if (!Empty)
+				{
+					using (IEnumerator<Possibility> e = NewMatches.GetEnumerator())
+					{
+						if (!e.MoveNext())
+							Empty = true;
+					}
+				}
+
+				if (Empty)
 				{
 					if (Result is null)
 						Result = new ChunkedList<Possibility>();

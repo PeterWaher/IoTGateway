@@ -97,6 +97,11 @@ namespace Waher.Script.Persistence.SQL.Sources
 			}
 
 			public object Current => this.current;
+		
+			public void Dispose()
+			{
+				this.left.Dispose();
+			}
 
 			public bool MoveNext()
 			{

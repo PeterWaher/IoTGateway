@@ -206,8 +206,16 @@ namespace Waher.Script.Objects.VectorSpaces
 			IEnumerator<IElement> e1 = this.elements.GetEnumerator();
 			IEnumerator<IElement> e2 = ChildElements.GetEnumerator();
 
-			while (e1.MoveNext() && e2.MoveNext())
-				Elements.Add(Operators.Arithmetics.Add.EvaluateAddition(e1.Current, e2.Current, null));
+			try
+			{
+				while (e1.MoveNext() && e2.MoveNext())
+					Elements.Add(Operators.Arithmetics.Add.EvaluateAddition(e1.Current, e2.Current, null));
+			}
+			finally
+			{
+				e1.Dispose();
+				e2.Dispose();
+			}
 
 			return new ObjectVector(Elements);
 		}
@@ -243,10 +251,18 @@ namespace Waher.Script.Objects.VectorSpaces
 			IEnumerator<IElement> e1 = this.elements.GetEnumerator();
 			IEnumerator<IElement> e2 = ObjectVector.elements.GetEnumerator();
 
-			while (e1.MoveNext() && e2.MoveNext())
+			try
 			{
-				if (!e1.Current.Equals(e2.Current))
-					return false;
+				while (e1.MoveNext() && e2.MoveNext())
+				{
+					if (!e1.Current.Equals(e2.Current))
+						return false;
+				}
+			}
+			finally
+			{
+				e1.Dispose();
+				e2.Dispose();
 			}
 
 			return true;

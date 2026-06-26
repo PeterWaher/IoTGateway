@@ -39,21 +39,29 @@ namespace Waher.Script.Operators.Vectors
 			IEnumerator<IElement> e2 = Right.VectorElements.GetEnumerator();
 			IElement Result = null;
 
-			while (e1.MoveNext() && e2.MoveNext())
+			try
 			{
-				if (Result is null)
-					Result = Arithmetics.Multiply.EvaluateMultiplication(e1.Current, e2.Current, this);
-				else
+				while (e1.MoveNext() && e2.MoveNext())
 				{
-					Result = Arithmetics.Add.EvaluateAddition(Result,
-						Arithmetics.Multiply.EvaluateMultiplication(e1.Current, e2.Current, this), this);
+					if (Result is null)
+						Result = Arithmetics.Multiply.EvaluateMultiplication(e1.Current, e2.Current, this);
+					else
+					{
+						Result = Arithmetics.Add.EvaluateAddition(Result,
+							Arithmetics.Multiply.EvaluateMultiplication(e1.Current, e2.Current, this), this);
+					}
 				}
+
+				if (Result is null)
+					throw new ScriptRuntimeException("Cannot operate on zero-dimension vectors.", this);
+
+				return Result;
 			}
-
-			if (Result is null)
-				throw new ScriptRuntimeException("Cannot operate on zero-dimension vectors.", this);
-
-			return Result;
+			finally
+			{
+				e1.Dispose();
+				e2.Dispose();
+			}
 		}
 
 	}

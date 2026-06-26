@@ -156,10 +156,8 @@ namespace Waher.Script.Xml.Model
 				Parent.AppendChild(Document.ImportNode(E, true));
 			else if (Value is IEnumerable A)
 			{
-				IEnumerator e = A.GetEnumerator();
-
-				while (e.MoveNext())
-					this.AppendChild(Document, Parent, e.Current);
+				foreach (object Item in A)
+					this.AppendChild(Document, Parent, Item);
 			}
 			else
 				Parent.AppendChild(Document.CreateTextNode(Expression.ToExpressionString(Value)));

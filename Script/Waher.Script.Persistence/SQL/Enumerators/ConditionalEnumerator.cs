@@ -35,10 +35,18 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// </summary>
         public object Current => this.e.Current;
 
-        /// <summary>
-        /// <see cref="IEnumerator.MoveNext"/>
-        /// </summary>
-        public bool MoveNext()
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>"/>
+		/// </summary>
+		public void Dispose()
+		{
+			this.e.Dispose();
+		}
+
+		/// <summary>
+		/// <see cref="IEnumerator.MoveNext"/>
+		/// </summary>
+		public bool MoveNext()
         {
             while (this.e.MoveNext())
             {

@@ -82,6 +82,25 @@ namespace Waher.Script.Test
 			Assert.AreEqual(To, Result);
 		}
 
+		[TestMethod]
+		[DataRow("123", "TestBigInteger")]
+		[DataRow("1.234", "TestDecimal")]
+		[DataRow("123", (sbyte)123)]
+		[DataRow("123", (short)123)]
+		[DataRow("123", 123)]
+		[DataRow("123", (long)123)]
+		[DataRow("123", (byte)123)]
+		[DataRow("123", (ushort)123)]
+		[DataRow("123", (uint)123)]
+		[DataRow("123", (ulong)123)]
+		[DataRow("1.234", 1.234)]
+		public void Test_04_FromString(object From, object To)
+		{
+			To = CheckValue(To);
+			Assert.IsTrue(Expression.TryConvert(From, To.GetType(), true, out object Result));
+			Assert.AreEqual(To, Result);
+		}
+
 		private static object CheckValue(object From)
 		{
 			if (From is not string s)

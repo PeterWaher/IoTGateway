@@ -2067,6 +2067,206 @@ namespace Waher.Runtime.Collections.Test
 			Assert.AreEqual(-1, List.LastIndexOf(123));
 		}
 
+		[TestMethod]
+		public void Test_135_Insert_FullSizeOneChunk_DoesNotLeaveEmptyTail()
+		{
+			ChunkedList<int> List = new(1)
+			{
+				10
+			};
+
+			List.Insert(0, 5);
+
+			Assert.AreEqual(2, List.Count);
+			Assert.AreEqual(5, List[0]);
+			Assert.AreEqual(10, List[1]);
+
+			Assert.IsTrue(List.HasLastItem);
+			Assert.AreEqual(10, List.LastItem);
+		}
+
+		[TestMethod]
+		public void Test_136_LastIndexOf_IndexEqualToCount_Throws()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2,
+				3
+			};
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() => 
+				List.LastIndexOf(3, List.Count));
+		}
+
+		[TestMethod]
+		public void Test_137_LastIndexOf_IndexEqualToCountWithZeroCount_Throws()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2,
+				3
+			};
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+				List.LastIndexOf(3, List.Count, 0));
+		}
+
+		[TestMethod]
+		[Timeout(1000)]
+		public void Test_138_AddRange_Self_DuplicatesOriginalOnlyOnce()
+		{
+			ChunkedList<int> List = new(2)
+			{
+				1,
+				2
+			};
+
+			List.AddRange(List);
+
+			AssertListByIndexer(List, [1, 2, 1, 2]);
+		}
+
+		[TestMethod]
+		public void Test_139_InsertRange_EmptyCollection_IndexGreaterThanCount_Throws()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2,
+				3
+			};
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+				List.InsertRange(4, Array.Empty<int>()));
+		}
+
+		[TestMethod]
+		[Timeout(1000)]
+		public void Test_140_InsertRange_Self_DuplicatesOriginalSnapshotOnly()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2,
+				3
+			};
+
+			List.InsertRange(1, List);
+
+			AssertListByIndexer(List, [1, 1, 2, 3, 2, 3]);
+		}
+
+		[TestMethod]
+		public void Test_141_SortSingleItemThenClearThenInsert_DoesNotCreateBrokenSizeOneChunk()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				10
+			};
+
+			List.Sort();
+			List.Clear();
+			List.Add(10);
+
+			List.Insert(0, 5);
+
+			Assert.AreEqual(2, List.Count);
+			Assert.AreEqual(5, List[0]);
+			Assert.AreEqual(10, List[1]);
+			Assert.AreEqual(10, List.LastItem);
+		}
+
+		[TestMethod]
+		public void Test_142_SortComparison_EmptyList_DoesNotCallComparison()
+		{
+			ChunkedList<string> List = [];
+			int Comparisons = 0;
+
+			List.Sort((x, y) =>
+			{
+				Comparisons++;
+				throw new InvalidOperationException("Empty list should not compare elements.");
+			});
+
+			Assert.AreEqual(0, Comparisons);
+		}
+
+		[TestMethod]
+		public void Test_143_CopyTo_NegativeSourceIndex_Throws()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2,
+				3
+			};
+
+			int[] Destination = new int[3];
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+				List.CopyTo(-1, Destination, 0, 1));
+		}
+
+		[TestMethod]
+		public void Test_144_AddRange_ArrayNegativeCount_Throws()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				10
+			};
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+				List.AddRange([1, 2, 3], 1, -1));
+		}
+
+		[TestMethod]
+		public void Test_145_AddRange_ArrayIndexEqualLengthPlusOneWithZeroCount_Throws()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				10
+			};
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+				List.AddRange([1, 2, 3], 4, 0));
+		}
+
+		[TestMethod]
+		[Timeout(1000)]
+		public void Test_146_AddRange_LazySelfEnumerable_DoesNotEnumerateNewlyAppendedItems()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2
+			};
+
+			IEnumerable<int> LazySelf = Enumerable.Select(List, x => x);
+
+			List.AddRange(LazySelf);
+
+			AssertListByIndexer(List, [1, 2, 1, 2]);
+		}
+
+		[TestMethod]
+		[Timeout(1000)]
+		public void Test_147_InsertRange_LazySelfEnumerable_DoesNotEnumerateNewlyInsertedItems()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2,
+				3
+			};
+
+			IEnumerable<int> LazySelf = Enumerable.Select(List, x => x);
+
+			List.InsertRange(1, LazySelf);
+
+			AssertListByIndexer(List, [1, 1, 2, 3, 2, 3]);
+		}
 
 		private sealed class ParserNode
 		{

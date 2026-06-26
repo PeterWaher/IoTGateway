@@ -24,7 +24,6 @@ namespace Waher.Networking.HTTP.Mcp
 	public abstract class HttpMcpServerResource : JsonRpcWebService
 	{
 		private static readonly ObjectContent defaultObjectEncoder = new ObjectContent();
-		private static readonly TextContent defaultTextEncoder = new TextContent();
 		private static Dictionary<Type, IContentBlock> contentBlocks = GetContentBlocksFirstTime();
 		private const int PageSize = 20;
 		private readonly Dictionary<string, Tool> tools = new Dictionary<string, Tool>();

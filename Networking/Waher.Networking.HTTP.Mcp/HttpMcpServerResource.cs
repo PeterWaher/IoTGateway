@@ -678,16 +678,24 @@ namespace Waher.Networking.HTTP.Mcp
 
 			foreach (PromptMessage Message in Messages)
 			{
+				Dictionary<string, object?> Content;
+
 				if (Message.IsEncoded)
-					EncodedMessages[i++] = Message.Encoded!;
+					Content = Message.Encoded!;
 				else
 				{
 					Type T = Message.Content.GetType();
 					if (!contentBlocks.TryGetValue(T, out IContentBlock Encoder))
 						Encoder = defaultObjectEncoder;
 
-					EncodedMessages[i++] = await Encoder.Encode(Message.Content);
+					Content = await Encoder.Encode(Message.Content);
 				}
+
+				EncodedMessages[i++] = new Dictionary<string, object?>()
+				{
+					{ "role", Message.Role.ToString().ToLower() },
+					{ "content", Content }
+				};
 			}
 
 			Result["messages"] = EncodedMessages;

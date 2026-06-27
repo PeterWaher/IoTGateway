@@ -1579,7 +1579,7 @@ namespace Waher.Security.PQC
 			int i;
 
 			for (i = 0; i < n; i++)
-				f[i] = (uint)((f[i] + g[i]) % q);
+				f[i] = (f[i] + g[i]) % q;
 		}
 
 		/// <summary>
@@ -1937,7 +1937,11 @@ namespace Waher.Security.PQC
 
 				if (MakeSigned)
 				{
-					Value %= q;
+					Value = Value % q;
+					
+					if (Value < 0)
+						Value += q;
+
 					if (q - Value < Value)
 						Value -= q;
 				}
@@ -2096,7 +2100,7 @@ namespace Waher.Security.PQC
 				}
 
 				Value &= intBitMask[d];
-				j = (int)(b - Value) % q;
+				j = Mod((int)(b - Value), q);
 				if (MakeUnsigned)
 				{
 					if (j < 0)
@@ -2838,7 +2842,7 @@ namespace Waher.Security.PQC
 						if (r0 > 0)
 							f[j] = (short)((r1 + 1) % m);
 						else
-							f[j] = (short)((r1 - 1) % m);
+							f[j] = (short)((r1 + m - 1) % m);
 					}
 					else
 						f[j] = r1;
@@ -2978,5 +2982,18 @@ namespace Waher.Security.PQC
 			return h;
 		}
 
+		/// <summary>
+		/// Mathematical modulo operation, returning x MOD y.
+		/// </summary>
+		/// <param name="x">Dumerator</param>
+		/// <param name="y"></param>
+		/// <returns></returns>
+		private static int Mod(int x, int y)
+		{
+			x %= y;
+			if (x < 0)
+				x += y;
+			return x;
+		}
 	}
 }

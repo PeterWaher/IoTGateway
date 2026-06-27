@@ -105,8 +105,8 @@ Post-Quantum Cryptography implementation (ML-KEM).
 Contracts Client, to ensure digital identities and smart contracts can be properly validated
 after new keys have been generated.
 
-* Riccardo Brama, who has spent innumerable hours reviewing, questioning and perfecting every 
-aspect of the harmonized communiaction interfaces for IoT.
+* Riccardo Brama, who has spent innumerable hours reviewing, questioning, contriuting and
+and perfecting every aspect of the harmonized communiaction interfaces for IoT.
 
 
 Mastering Internet of Things

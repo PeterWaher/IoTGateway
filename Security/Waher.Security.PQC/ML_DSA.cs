@@ -1937,8 +1937,7 @@ namespace Waher.Security.PQC
 
 				if (MakeSigned)
 				{
-					Value = Value % q;
-					
+					Value %= q;
 					if (Value < 0)
 						Value += q;
 
@@ -2240,9 +2239,13 @@ namespace Waher.Security.PQC
 
 			byte[] μ;
 			byte[] Bin;
+			bool Clearμ;
 
 			if (μPrecomputed)
+			{
 				μ = Message;
+				Clearμ = false;
+			}
 			else
 			{
 				int MessageLen = Message.Length;
@@ -2253,6 +2256,7 @@ namespace Waher.Security.PQC
 
 				μ = H(Bin, 64);
 				Clear(Bin);
+				Clearμ = true;
 			}
 
 			Bin = new byte[128];
@@ -2263,7 +2267,7 @@ namespace Waher.Security.PQC
 			byte[] ρ2 = H(Bin, 64);
 			Clear(Bin);
 
-			ushort κ = 0;
+			uint κ = 0;
 			byte[] h = null;
 			byte[] cSeed = null;
 			uint[][] z = null;
@@ -2272,10 +2276,10 @@ namespace Waher.Security.PQC
 
 			while (!Found)
 			{
-				if (--IterationLimit <= 0)
+				if (--IterationLimit <= 0 || κ > ushort.MaxValue)
 					throw new InvalidOperationException("Unable to calculate signature.");
 
-				uint[][] y = this.ExpandMask(ρ2, κ);
+				uint[][] y = this.ExpandMask(ρ2, (ushort)κ);
 
 				if (!(z is null))
 					Clear(z);
@@ -2368,7 +2372,9 @@ namespace Waher.Security.PQC
 				κ += this.l;
 			}
 
-			Clear(μ);
+			if (Clearμ)
+				Clear(μ);
+
 			Clear(tr);
 			Clear(ρ);
 			Clear(K);

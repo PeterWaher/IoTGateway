@@ -671,7 +671,7 @@ namespace Waher.Security.PQC
 				case "SHAKE256":
 				case "SHAKE-256":
 					Oid = oidShake256;
-					H = new SHAKE256(256).ComputeVariable;
+					H = new SHAKE256(512).ComputeVariable;
 					return true;
 
 				default:
@@ -735,7 +735,7 @@ namespace Waher.Security.PQC
 				case "SHAKE256":
 				case "SHAKE-256":
 					Oid = oidShake256;
-					H = new SHAKE256(256).ComputeVariable;
+					H = new SHAKE256(512).ComputeVariable;
 					return true;
 
 				default:

@@ -243,6 +243,7 @@ internal class Program
 				typeof(JwtToken).Assembly);
 
 			Types.SetModuleParameter("JWT", JwtFactory.CreateHmacSha256());
+			Types.SetModuleParameter("Realm", "TestServer");
 
 			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
 			Database.Register(filesProvider);

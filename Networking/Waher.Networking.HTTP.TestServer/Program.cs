@@ -25,6 +25,8 @@ using Waher.Runtime.Profiling;
 using Waher.Script;
 using Waher.Script.Content;
 using Waher.Script.Graphs;
+using Waher.Things;
+using Waher.Things.Http;
 
 internal class Program
 {
@@ -232,7 +234,9 @@ internal class Program
 				typeof(FilesProvider).Assembly,
 				typeof(Database).Assembly,
 				typeof(XmlFileLedger).Assembly,
-				typeof(PersistedEventLog).Assembly);
+				typeof(PersistedEventLog).Assembly,
+				typeof(IThingReference).Assembly,
+				typeof(HttpModule).Assembly);
 
 			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
 			Database.Register(filesProvider);

@@ -30,6 +30,7 @@
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj" />
     <ProjectReference Include="..\Waher.Networking.HTTP.Brotli\Waher.Networking.HTTP.Brotli.csproj" />
     <ProjectReference Include="..\Waher.Networking.HTTP.Mcp\Waher.Networking.HTTP.Mcp.csproj" />
+    <ProjectReference Include="..\Waher.Networking.HTTP.OAuth\Waher.Networking.HTTP.OAuth.csproj" />
     <ProjectReference Include="..\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
   </ItemGroup>

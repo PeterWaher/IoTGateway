@@ -13,6 +13,7 @@ using Waher.Networking.HTTP.Brotli;
 using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp;
+using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.Sniffers;
 using Waher.Persistence;
 using Waher.Persistence.Files;
@@ -322,6 +323,7 @@ internal class Program
 			WebServer.Register("/Hello", Hello, Hello);
 			WebServer.Register("/Hello.md", HelloMarkdown, HelloMarkdown);
 			WebServer.Register("/Hello.css", HelloStyles);
+			WebServer.Register(new ResourceMetaDataResource());
 			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", "TestServer",
 				"Test Server", "1.0.0", "This is a test server.", [], 
 				new Uri("https://example.org/"), "These are the instructions."));

@@ -12,6 +12,7 @@ using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Networking.HTTP.Mcp.Model.Client;
 using Waher.Networking.HTTP.Mcp.Model.ContentBlocks;
 using Waher.Networking.HTTP.Mcp.Model.Server;
+using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Model;
@@ -23,6 +24,7 @@ namespace Waher.Networking.HTTP.Mcp
 	/// <summary>
 	/// Abstract base class for HTTP-based Model Context Protocol (MCP) server resource.
 	/// </summary>
+	[OAuthScopesSupported(true, "McpScopesSupported")]
 	public abstract class HttpMcpServerResource : JsonRpcWebService
 	{
 		private static readonly ObjectContent defaultObjectEncoder = new ObjectContent();
@@ -174,6 +176,26 @@ namespace Waher.Networking.HTTP.Mcp
 		/// Instructions for server.
 		/// </summary>
 		public string Instructions { get; }
+
+		/// <summary>
+		/// OAUTH scopes supported by resource.
+		/// </summary>
+		/// <returns>Array of scopes supported.</returns>
+		public string[] McpScopesSupported()
+		{
+			ChunkedList<string> Scopes = new ChunkedList<string>();
+
+			if (this.supportsTools)
+				Scopes.Add("mcp:tools");
+
+			if (this.supportsPrompts)
+				Scopes.Add("mcp:prompts");
+
+			if (this.supportsResources)
+				Scopes.Add("mcp:resources");
+
+			return Scopes.ToArray();
+		}
 
 		/// <summary>
 		/// Registers a MCP Server tool.
@@ -734,7 +756,7 @@ namespace Waher.Networking.HTTP.Mcp
 			ChunkedList<PromptMessage> Messages = new ChunkedList<PromptMessage>();
 
 			if (!(PromptResult is null))
-			{ 
+			{
 				if (PromptResult is PromptMessage PromptMessage)
 					Messages.Add(PromptMessage);
 				else if (PromptResult is IEnumerable<PromptMessage> PromptMessages)

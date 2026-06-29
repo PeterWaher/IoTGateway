@@ -67,6 +67,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.JWT", "Secur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.JWS", "Security\Waher.Security.JWS\Waher.Security.JWS.csproj", "{A69097D8-60E5-71DA-B81E-68ADAC475D9A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP.OAuth", "Networking\Waher.Networking.HTTP.OAuth\Waher.Networking.HTTP.OAuth.csproj", "{B0DA23C6-D3C8-4D66-845A-0EC63FE6A002}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -201,6 +203,10 @@ Global
 		{A69097D8-60E5-71DA-B81E-68ADAC475D9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A69097D8-60E5-71DA-B81E-68ADAC475D9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A69097D8-60E5-71DA-B81E-68ADAC475D9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0DA23C6-D3C8-4D66-845A-0EC63FE6A002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0DA23C6-D3C8-4D66-845A-0EC63FE6A002}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0DA23C6-D3C8-4D66-845A-0EC63FE6A002}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0DA23C6-D3C8-4D66-845A-0EC63FE6A002}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

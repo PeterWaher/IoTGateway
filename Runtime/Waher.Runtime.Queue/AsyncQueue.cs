@@ -385,11 +385,11 @@ namespace Waher.Runtime.Queue
 
 			lock (this.synchObj)
 			{
-				if (this.disposed)
-					return Task.FromResult<T>(null);
-
 				if (this.queue.First is null)
 				{
+					if (this.disposed)
+						return Task.FromResult<T>(null);
+
 					TaskCompletionSource<T> Item = new TaskCompletionSource<T>();
 
 					if (Cancel.CanBeCanceled)
@@ -452,10 +452,10 @@ namespace Waher.Runtime.Queue
 					if (this.terminated && this.queue.First is null)
 					{
 						this.disposed = true;
-						Result = Task.FromResult<T>(default);
+						this.terminatedTask.TrySetResult(true);
 					}
-					else
-						Result = Task.FromResult(Record.Value);
+					
+					Result = Task.FromResult(Record.Value);
 				}
 			}
 

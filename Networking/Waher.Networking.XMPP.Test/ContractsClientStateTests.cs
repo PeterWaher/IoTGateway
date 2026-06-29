@@ -671,7 +671,7 @@ namespace Waher.Networking.XMPP.Test
 
 		private static IE2eEndpoint[] GetLocalKeys(ContractsClient ContractsClient)
 		{
-			FieldInfo LocalKeysField = typeof(ContractsClient).GetField("localKeys", BindingFlags.Instance | BindingFlags.NonPublic);
+			FieldInfo LocalKeysField = typeof(ContractsClient).GetField("keys", BindingFlags.Instance | BindingFlags.NonPublic);
 			EndpointSecurity LocalKeys = (EndpointSecurity)LocalKeysField.GetValue(ContractsClient);
 
 			PropertyInfo KeysProperty = typeof(EndpointSecurity).GetProperty("Keys", BindingFlags.Instance | BindingFlags.NonPublic);

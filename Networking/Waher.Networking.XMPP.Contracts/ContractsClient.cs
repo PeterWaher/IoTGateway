@@ -657,7 +657,7 @@ namespace Waher.Networking.XMPP.Contracts
 			using Semaphore Lock = await LockKeys();
 
 			foreach (LegalIdentityState State in ActiveStates)
-				await this.TryGetLegalIdentityEndpointAsync(State, true);
+				await this.TryGetLegalIdentityEndpointAsync(State, true, true);
 
 			await RuntimeSettings.DeleteWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
 			await this.LoadKeysLocked(true, null);
@@ -879,7 +879,8 @@ namespace Waher.Networking.XMPP.Contracts
 			return Updated;
 		}
 
-		private async Task<LoadedKey> TryGetLegalIdentityEndpointAsync(LegalIdentityState State, bool MigrateLegacyState)
+		private async Task<LoadedKey> TryGetLegalIdentityEndpointAsync(LegalIdentityState State, 
+			bool MigrateLegacyState, bool Locked)
 		{
 			IE2eEndpoint Endpoint = this.TryCreateLegalIdentityEndpoint(State);
 
@@ -904,8 +905,13 @@ namespace Waher.Networking.XMPP.Contracts
 
 			bool MissingSnapshot = State?.HasPrivateKey != true || string.IsNullOrEmpty(State.KeyName);
 
-			if (!MigrateLegacyState || !MissingSnapshot || State?.PublicKey is null || !await this.LoadKeys(false))
+			if (!MigrateLegacyState ||
+				!MissingSnapshot ||
+				State?.PublicKey is null ||
+				!(Locked ? await this.LoadKeysLocked(false, null) : await this.LoadKeys(false)))
+			{
 				return new LoadedKey(null, false);
+			}
 
 			Endpoint = this.LocalEndpoint.FindLocalEndpoint(State.PublicKey);
 			if (Endpoint is null || !await this.SetLegalIdentityKeySnapshotAsync(State, Endpoint))
@@ -915,8 +921,8 @@ namespace Waher.Networking.XMPP.Contracts
 				await Database.Update(State);
 
 			IE2eEndpoint Endpoint2 = this.TryCreateLegalIdentityEndpoint(State);
-			return Endpoint2 is null ?
-				new LoadedKey(Endpoint, false)
+			return Endpoint2 is null 
+				? new LoadedKey(Endpoint, false)
 				: new LoadedKey(Endpoint2, true);
 		}
 
@@ -1129,7 +1135,7 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("BareJid", this.client.BareJID),
 				new FilterFieldEqualTo("State", IdentityState.Approved))))
 			{
-				using LoadedKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
+				using LoadedKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true, false);
 				IE2eEndpoint Endpoint = Key.Endpoint;
 
 				if (Endpoint is null || State.PublicKey is null || !State.HasPrivateKey || string.IsNullOrEmpty(State.KeyName))
@@ -1339,7 +1345,7 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("BareJid", this.client.BareJID),
 				new FilterFieldEqualTo("State", IdentityState.Approved))))
 			{
-				using LoadedKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
+				using LoadedKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true, false);
 
 				if (!(Key.Endpoint is null))
 					return true;
@@ -2780,7 +2786,7 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("BareJid", this.client.BareJID),
 				new FilterFieldEqualTo("LegalId", IdentityId)));
 
-			using LoadedKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
+			using LoadedKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true, false);
 
 			return !(Key.Endpoint is null);
 		}
@@ -2807,7 +2813,7 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("BareJid", this.client.BareJID),
 				new FilterFieldEqualTo("State", IdentityState.Approved)), "-Timestamp"))
 			{
-				using LoadedKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
+				using LoadedKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true, false);
 
 				if (Key.Endpoint is null || State.PublicKey is null)
 					continue;
@@ -2831,7 +2837,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				HaveStates = true;
 
-				LoadedKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true);
+				LoadedKey Key = await this.TryGetLegalIdentityEndpointAsync(State, true, false);
 				if (!(Key.Endpoint is null))
 					return Key;
 

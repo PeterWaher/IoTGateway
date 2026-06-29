@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Script;
 using Waher.Script.Model;
-using Waher.Script.Units.DerivedQuantities;
 
 namespace Waher.Networking.HTTP.JsonRpc
 {

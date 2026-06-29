@@ -52,14 +52,34 @@ namespace Waher.Networking.HTTP.JsonRpc
 			else
 				this.methods = new Dictionary<string, JsonRpcMethodInfo>(StringComparer.InvariantCultureIgnoreCase);
 
-			foreach (MethodInfo Method in this.GetType().GetMethods(BindingFlags.Instance | 
+			foreach (MethodInfo Method in this.GetType().GetMethods(BindingFlags.Instance |
 				BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
 			{
 				if (Method.GetCustomAttribute<JsonRpcMethodAttribute>() is null)
 					continue;
 
-				this.Register(Method);
+				this.Register(Method, GetRequiredPrivileges(Method));
 			}
+		}
+
+		/// <summary>
+		/// Gets required privileges for the user calling the method, if any.
+		/// If no privilege requirements are found, null is returned.
+		/// </summary>
+		/// <param name="Method">Method information.</param>
+		/// <returns>Array of required privileges, or null if none.</returns>
+		public static string[]? GetRequiredPrivileges(MethodInfo Method)
+		{
+			ChunkedList<string>? RequiredPrivileges = null;
+
+			foreach (RequiredPrivilegeAttribute Attribute in
+				Method.GetCustomAttributes<RequiredPrivilegeAttribute>(true))
+			{
+				RequiredPrivileges ??= new ChunkedList<string>();
+				RequiredPrivileges.Add(Attribute.Privilege);
+			}
+
+			return RequiredPrivileges?.ToArray();
 		}
 
 		/// <summary>
@@ -91,7 +111,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// Registers a method to be used in the JSON-RPC interface. 
 		/// </summary>
 		/// <param name="Method">Method to register.</param>
-		public void Register(MethodInfo Method)
+		/// <param name="RequiredPrivileges">Required privileges for accessing the method.</param>
+		public void Register(MethodInfo Method, params string[]? RequiredPrivileges)
 		{
 			lock (this.methods)
 			{
@@ -100,7 +121,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 				if (this.methods.ContainsKey(Name))
 					throw new Exception("Method already registered: " + Name);
 
-				this.methods[Name] = new JsonRpcMethodInfo(Method, this.caseSensitive);
+				this.methods[Name] = new JsonRpcMethodInfo(Method, this.caseSensitive,
+					RequiredPrivileges);
 			}
 		}
 
@@ -239,7 +261,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		}
 
 		private async Task<int> SendEvent(string Event)
-		{ 
+		{
 			int Count = 0;
 
 			foreach (HttpResponse Response in this.eventSubscriptionsStatic)
@@ -350,8 +372,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 				}
 			}
 
-			await JsonRpcRequest.BuildResponse(this, Request, Response);
-			await this.SendResponse(Request, JsonRpcRequest, Response);
+			if (!await JsonRpcRequest.BuildResponse(this, Request, Response))
+				await this.SendResponse(Request, JsonRpcRequest, Response);
 		}
 
 		/// <summary>
@@ -406,8 +428,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 					JsonRpcRequest.SetError(-32600, "Expected JSON object or array of JSON objects in request.", 400);
 			}
 
-			await JsonRpcRequest.BuildResponse(this, Request, Response);
-			await this.SendResponse(Request, JsonRpcRequest, Response);
+			if (!await JsonRpcRequest.BuildResponse(this, Request, Response))
+				await this.SendResponse(Request, JsonRpcRequest, Response);
 		}
 
 		private async Task SendResponse(HttpRequest HttpRequest,

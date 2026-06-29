@@ -6,6 +6,7 @@ using Waher.Content;
 using Waher.Events;
 using Waher.Events.Persistence;
 using Waher.Networking.HTTP;
+using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp;
 using Waher.Networking.HTTP.Mcp.Model;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
@@ -17,6 +18,21 @@ namespace Waher.Mcp.Events
 {
 	public class EventLogMcpServer : HttpMcpServerResource
 	{
+		public const string BasePrivilege = "MCP.Events";
+		public const string ToolsPrivilege = BasePrivilege + ".Tools";
+		public const string PromptsPrivilege = BasePrivilege + ".Prompts";
+		public const string LogPrivilege = ToolsPrivilege + ".Log";
+		public const string LogDebugPrivilege = LogPrivilege + ".Debug";
+		public const string LogInformationPrivilege = LogPrivilege + ".Information";
+		public const string LogNoticePrivilege = LogPrivilege + ".Notice";
+		public const string LogWarningPrivilege = LogPrivilege + ".Warning";
+		public const string LogErrorPrivilege = LogPrivilege + ".Error";
+		public const string LogCriticalPrivilege = LogPrivilege + ".Critical";
+		public const string LogAlertPrivilege = LogPrivilege + ".Alert";
+		public const string LogEmergencyPrivilege = LogPrivilege + ".Emergency";
+		public const string SearchPrivilege = ToolsPrivilege + ".Search";
+		public const string FindSensitiveInfoPrivilege = PromptsPrivilege + ".FindSensitiveInfo";
+
 		/// <summary>
 		/// Model Context Protocol (MCP) server resource for the Event Log.
 		/// </summary>
@@ -92,6 +108,7 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
+		[RequiredPrivilege(LogDebugPrivilege)]
 		public void LogDebug(
 			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
@@ -132,6 +149,7 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
+		[RequiredPrivilege(LogInformationPrivilege)]
 		public void LogInformational(
 			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
@@ -172,6 +190,7 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
+		[RequiredPrivilege(LogNoticePrivilege)]
 		public void LogNotice(
 			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
@@ -212,6 +231,7 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
+		[RequiredPrivilege(LogWarningPrivilege)]
 		public void LogWarning(
 			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
@@ -252,6 +272,7 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
+		[RequiredPrivilege(LogErrorPrivilege)]
 		public void LogError(
 			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
@@ -292,6 +313,7 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
+		[RequiredPrivilege(LogCriticalPrivilege)]
 		public void LogCritical(
 			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
@@ -332,6 +354,7 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
+		[RequiredPrivilege(LogAlertPrivilege)]
 		public void LogAlert(
 			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
@@ -372,6 +395,7 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
+		[RequiredPrivilege(LogEmergencyPrivilege)]
 		public void LogEmergency(
 			[McpStringParameter(MessageTitle, MessageDescription)]
 			string Message,
@@ -428,6 +452,7 @@ namespace Waher.Mcp.Events
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
+		[RequiredPrivilege(SearchPrivilege)]
 		[return: McpParameter("Search Result", "Result set of the search for events, as well as information about if more events are available, and the offset to the next set of events.")]
 		public async Task<SearchResult> Search(HttpRequest Request,
 
@@ -687,6 +712,7 @@ namespace Waher.Mcp.Events
 			"Find Sensitive Information",		// Title
 			"Search for events in the event log containing sensitive information that should never have been logged.",
 			"")]					// IconsMethod, use default icons
+		[RequiredPrivilege(FindSensitiveInfoPrivilege)]
 		public PromptMessage[] FindSensitiveInformation(
 			[McpDateTimeParameter("Number of Days", "Number of days back in time the search for events should be performed.")]
 			int NrDays = 7,

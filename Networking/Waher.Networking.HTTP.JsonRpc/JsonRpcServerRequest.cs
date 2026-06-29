@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Script;
 using Waher.Script.Model;
+using Waher.Security;
 
 namespace Waher.Networking.HTTP.JsonRpc
 {
@@ -51,8 +52,15 @@ namespace Waher.Networking.HTTP.JsonRpc
 			this.Result = null;
 		}
 
-		public async Task BuildResponse(JsonRpcWebService WebService, HttpRequest HttpRequest,
-			HttpResponse HttpResponse)
+		/// <summary>
+		/// Prepares a response to the request.
+		/// </summary>
+		/// <param name="WebService">JSON-RPC web service object reference.</param>
+		/// <param name="HttpRequest">HTTP Request object.</param>
+		/// <param name="HttpResponse">HTTP Response object.</param>
+		/// <returns>If a response has been returned</returns>
+		public async Task<bool> BuildResponse(JsonRpcWebService WebService, 
+			HttpRequest HttpRequest, HttpResponse HttpResponse)
 		{
 			bool HasSniffer = HttpRequest.Server.HasSniffers;
 
@@ -177,6 +185,66 @@ namespace Waher.Networking.HTTP.JsonRpc
 								HttpRequest.Server.Information(sb.ToString());
 							}
 
+							IUser User = HttpRequest.User;
+							bool Encrypted = HttpRequest.Encrypted;
+							int Strength = HttpRequest.CipherStrength;
+
+							if (this.MethodInfo.RequiresAuthentication && User is null)
+							{
+								HttpAuthenticationScheme[] Schemes = this.MethodInfo.AuthenticationMechanisms ?? Array.Empty<HttpAuthenticationScheme>();
+
+								foreach (HttpAuthenticationScheme Scheme in Schemes)
+								{
+									if (Scheme.RequireEncryption &&
+										(!Encrypted || Strength < Scheme.MinStrength))
+									{
+										continue;
+									}
+
+									if (Scheme.UserSessions && HttpRequest.Session is null)
+										HttpRequest.GetSessionFromCookie();
+
+									User = await Scheme.IsAuthenticated(HttpRequest);
+									if (!(User is null))
+									{
+										HttpRequest.User = User;
+										break;
+									}
+								}
+
+								if (User is null)
+								{
+									List<string> Challenges = new List<string>();
+
+									foreach (HttpAuthenticationScheme Scheme in Schemes)
+									{
+										if (Scheme.RequireEncryption &&
+											(!Encrypted || Strength < Scheme.MinStrength))
+										{
+											continue;
+										}
+
+										foreach (string Challenge in Scheme.GetChallenges())
+											Challenges.Add(Challenge);
+									}
+
+									await HttpResponse.SendResponse(new UnauthorizedException(
+										Challenges.ToArray()));
+									return true;
+								}
+
+								foreach (string Privilege in this.MethodInfo.RequiredPrivileges)
+								{
+									if(!User.HasPrivilege(Privilege))
+									{
+										await HttpResponse.SendResponse(ForbiddenException.AccessDenied(
+											HttpRequest.Resource.ResourceName,
+											User.UserName, Privilege));
+										return true;
+									}
+								}
+							}
+
 							this.Result = await ScriptNode.WaitPossibleTask(
 								this.MethodInfo.Method.Invoke(WebService, Parameters));
 
@@ -185,6 +253,9 @@ namespace Waher.Networking.HTTP.JsonRpc
 								HttpRequest.Server.Information("Result: " + 
 									Expression.ToExpressionString(this.Result));
 							}
+
+							if (HttpResponse.ResponseSent)
+								return true;
 						}
 					}
 					catch (Exception ex)
@@ -229,7 +300,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 				{
 					JsonRpcServerRequest Request = this.BatchRequests[i]!;
 
-					await Request.BuildResponse(WebService, HttpRequest, HttpResponse);
+					if (await Request.BuildResponse(WebService, HttpRequest, HttpResponse))
+						return true;
 
 					if (!(Request.Id is null))
 						this.ResponseArray[j++] = Request.ResponseObject!;
@@ -240,6 +312,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 				if (this.StatusCode == 204)
 					this.StatusCode = 200;
 			}
+
+			return false;
 		}
 	}
 }

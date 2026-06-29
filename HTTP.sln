@@ -63,6 +63,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Things", "Things\Wahe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Things.Http", "Things\Waher.Things.Http\Waher.Things.Http.csproj", "{22ECDB2E-100B-6F93-504C-F6679B0B9FC4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.JWT", "Security\Waher.Security.JWT\Waher.Security.JWT.csproj", "{AA27D912-5213-4207-5758-905AC2663AB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.JWS", "Security\Waher.Security.JWS\Waher.Security.JWS.csproj", "{A69097D8-60E5-71DA-B81E-68ADAC475D9A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -189,6 +193,14 @@ Global
 		{22ECDB2E-100B-6F93-504C-F6679B0B9FC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22ECDB2E-100B-6F93-504C-F6679B0B9FC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22ECDB2E-100B-6F93-504C-F6679B0B9FC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA27D912-5213-4207-5758-905AC2663AB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA27D912-5213-4207-5758-905AC2663AB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA27D912-5213-4207-5758-905AC2663AB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA27D912-5213-4207-5758-905AC2663AB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A69097D8-60E5-71DA-B81E-68ADAC475D9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A69097D8-60E5-71DA-B81E-68ADAC475D9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A69097D8-60E5-71DA-B81E-68ADAC475D9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A69097D8-60E5-71DA-B81E-68ADAC475D9A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

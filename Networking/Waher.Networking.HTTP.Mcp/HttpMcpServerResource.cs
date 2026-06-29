@@ -15,6 +15,8 @@ using Waher.Networking.HTTP.Mcp.Model.Server;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Model;
+using Waher.Security;
+using Waher.Things.Http;
 
 namespace Waher.Networking.HTTP.Mcp
 {
@@ -28,6 +30,8 @@ namespace Waher.Networking.HTTP.Mcp
 		private const int PageSize = 20;
 		private readonly Dictionary<string, Tool> tools = new Dictionary<string, Tool>();
 		private readonly Dictionary<string, Prompt> prompts = new Dictionary<string, Prompt>();
+		private bool requiresAuthentication = false;
+		private HttpAuthenticationScheme[]? authenticationSchemes = null;
 
 		private static Dictionary<Type, IContentBlock> GetContentBlocksFirstTime()
 		{
@@ -182,10 +186,14 @@ namespace Waher.Networking.HTTP.Mcp
 				if (this.tools.ContainsKey(Name))
 					throw new Exception("Tool already registered: " + Name);
 
-				this.tools[Name] = new Tool(Method, Attributes.Title,
+				Tool Tool = new Tool(Method, Attributes.Title,
 					Attributes.Description, Attributes.IconsMethod,
 					Attributes.CanModifyEnvironment, Attributes.CanDestroyEnvironment,
 					Attributes.Idempotent, Attributes.OpenWorldAccess);
+
+				this.tools[Name] = Tool;
+
+				this.requiresAuthentication |= Tool.RequiresAuthentication;
 			}
 
 			// TODO: Send notification to clients about new tool.
@@ -206,8 +214,12 @@ namespace Waher.Networking.HTTP.Mcp
 				if (this.prompts.ContainsKey(Name))
 					throw new Exception("Prompt already registered: " + Name);
 
-				this.prompts[Name] = new Prompt(Method, Attributes.Title,
+				Prompt Prompt = new Prompt(Method, Attributes.Title,
 					Attributes.Description, Attributes.IconsMethod);
+
+				this.prompts[Name] = Prompt;
+
+				this.requiresAuthentication |= Prompt.RequiresAuthentication;
 			}
 
 			// TODO: Send notification to clients about new prompt.
@@ -340,12 +352,17 @@ namespace Waher.Networking.HTTP.Mcp
 		/// Lists available MCP server tools.
 		/// </summary>
 		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
 		/// <param name="Cursor">Cursor for pagination.</param>
 		/// <returns>Dictionary containing the list of tools.</returns>
 		[JsonRpcMethod]
-		protected async Task<Dictionary<string, object>> Tools_List(HttpRequest Request,
-			string? Cursor = null)
+		protected async Task<Dictionary<string, object>?> Tools_List(HttpRequest Request,
+			HttpResponse Response, string? Cursor = null)
 		{
+			IUser? User = await this.GetAuthenticatedUser(Request, Response);
+			if (Response.ResponseSent)
+				return null;
+
 			int Offset = 0;
 			int MaxCount = PageSize;
 
@@ -365,6 +382,9 @@ namespace Waher.Networking.HTTP.Mcp
 			{
 				foreach (Tool Tool in this.tools.Values)
 				{
+					if (!Tool.IsAuthorized(User))
+						continue;
+
 					if (MaxCount <= 0)
 					{
 						Result["nextCursor"] = Next.ToString();
@@ -395,6 +415,61 @@ namespace Waher.Networking.HTTP.Mcp
 			return Result;
 		}
 
+		private async Task<IUser?> GetAuthenticatedUser(HttpRequest Request, HttpResponse Response)
+		{
+			IUser User = Request.User;
+			bool Encrypted = Request.Encrypted;
+			int Strength = Request.CipherStrength;
+
+			if (this.requiresAuthentication && User is null)
+			{
+				this.authenticationSchemes ??= HttpModule.GetAuthenticationSchemes();
+
+				foreach (HttpAuthenticationScheme Scheme in this.authenticationSchemes)
+				{
+					if (Scheme.RequireEncryption &&
+						(!Encrypted || Strength < Scheme.MinStrength))
+					{
+						continue;
+					}
+
+					if (Scheme.UserSessions && Request.Session is null)
+						Request.GetSessionFromCookie();
+
+					User = await Scheme.IsAuthenticated(Request);
+					if (!(User is null))
+					{
+						Request.User = User;
+						break;
+					}
+				}
+
+				if (User is null)
+				{
+					List<string> Challenges = new List<string>();
+
+					foreach (HttpAuthenticationScheme Scheme in this.authenticationSchemes
+						?? Array.Empty<HttpAuthenticationScheme>())
+					{
+						if (Scheme.RequireEncryption &&
+							(!Encrypted || Strength < Scheme.MinStrength))
+						{
+							continue;
+						}
+
+						foreach (string Challenge in Scheme.GetChallenges())
+							Challenges.Add(Challenge);
+					}
+
+					await Response.SendResponse(new UnauthorizedException(
+						Challenges.ToArray()));
+					return null;
+				}
+			}
+
+			return User;
+		}
+
 		/// <summary>
 		/// Calls an MCP server tool.
 		/// </summary>
@@ -411,10 +486,14 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="_Meta">Associated meta-data, if available.</param>
 		/// <returns>Dictionary containing the result of the tool call.</returns>
 		[JsonRpcMethod]
-		protected async Task<Dictionary<string, object?>> Tools_Call(HttpRequest Request,
+		protected async Task<Dictionary<string, object?>?> Tools_Call(HttpRequest Request,
 			HttpResponse Response, string Name, Dictionary<string, object?> Arguments,
 			object? Task = null, [JsonRpcMetaDataArgument] object? _Meta = null)
 		{
+			IUser? User = await this.GetAuthenticatedUser(Request, Response);
+			if (Response.ResponseSent)
+				return null;
+
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
 			object? ToolResult;
 
@@ -422,6 +501,8 @@ namespace Waher.Networking.HTTP.Mcp
 			{
 				if (!this.tools.TryGetValue(Name, out Tool? Tool))
 					throw new NotFoundException("Tool not found: " + Name);
+
+				Tool.AssertAuthorized(this.ResourceName, User);
 
 				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 
@@ -532,12 +613,17 @@ namespace Waher.Networking.HTTP.Mcp
 		/// Lists available MCP server prompts.
 		/// </summary>
 		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
 		/// <param name="Cursor">Cursor for pagination.</param>
 		/// <returns>Dictionary containing the list of prompts.</returns>
 		[JsonRpcMethod]
-		protected async Task<Dictionary<string, object>> Prompts_List(HttpRequest Request,
-			string? Cursor = null)
+		protected async Task<Dictionary<string, object>?> Prompts_List(HttpRequest Request,
+			HttpResponse Response, string? Cursor = null)
 		{
+			IUser? User = await this.GetAuthenticatedUser(Request, Response);
+			if (Response.ResponseSent)
+				return null;
+
 			int Offset = 0;
 			int MaxCount = PageSize;
 
@@ -557,6 +643,9 @@ namespace Waher.Networking.HTTP.Mcp
 			{
 				foreach (Prompt Prompt in this.prompts.Values)
 				{
+					if (!Prompt.IsAuthorized(User))
+						continue;
+
 					if (MaxCount <= 0)
 					{
 						Result["nextCursor"] = Next.ToString();
@@ -597,10 +686,14 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="_Meta">Associated meta-data, if available.</param>
 		/// <returns>Dictionary containing the result of the tool call.</returns>
 		[JsonRpcMethod]
-		protected async Task<Dictionary<string, object?>> Prompts_Get(HttpRequest Request,
+		protected async Task<Dictionary<string, object?>?> Prompts_Get(HttpRequest Request,
 			HttpResponse Response, string Name, Dictionary<string, object?> Arguments,
 			[JsonRpcMetaDataArgument] object? _Meta = null)
 		{
+			IUser? User = await this.GetAuthenticatedUser(Request, Response);
+			if (Response.ResponseSent)
+				return null;
+
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
 			object? PromptResult;
 
@@ -608,6 +701,8 @@ namespace Waher.Networking.HTTP.Mcp
 			{
 				if (!this.prompts.TryGetValue(Name, out Prompt? Prompt))
 					throw new NotFoundException("Prompt not found: " + Name);
+
+				Prompt.AssertAuthorized(this.ResourceName, User);
 
 				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 
@@ -703,9 +798,13 @@ namespace Waher.Networking.HTTP.Mcp
 		}
 
 		[JsonRpcMethod]
-		protected Dictionary<string, object> Resources_List(HttpRequest Request,
-			string? Cursor = null)
+		protected async Task<Dictionary<string, object>?> Resources_List(HttpRequest Request,
+			HttpResponse Response, string? Cursor = null)
 		{
+			IUser? User = await this.GetAuthenticatedUser(Request, Response);
+			if (Response.ResponseSent)
+				return null;
+
 			// TODO: resources/list
 
 			return new Dictionary<string, object>()

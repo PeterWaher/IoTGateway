@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Waher.Script;
+using Waher.Security;
+using Waher.Things.Http;
 
 namespace Waher.Networking.HTTP.JsonRpc
 {
@@ -16,7 +18,9 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// </summary>
 		/// <param name="Method">Method information.</param>
 		/// <param name="CaseSensitive">If names are case sensitive.</param>
-		public JsonRpcMethodInfo(MethodInfo Method, bool CaseSensitive)
+		/// <param name="RequiredPrivileges">Required privileges</param>
+		public JsonRpcMethodInfo(MethodInfo Method, bool CaseSensitive,
+			string[]? RequiredPrivileges)
 		{
 			ParameterInfo[] Arguments = Method.GetParameters();
 			bool IsSpecialArgument;
@@ -24,6 +28,13 @@ namespace Waher.Networking.HTTP.JsonRpc
 			this.Method = Method;
 			this.NrArguments = Arguments.Length;
 			this.NrSpecialArguments = 0;
+			this.RequiredPrivileges = RequiredPrivileges ?? Array.Empty<string>();
+			this.RequiresAuthentication = (RequiredPrivileges?.Length ?? 0) > 0;
+
+			if (this.RequiresAuthentication)
+				this.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(RequiredPrivileges);
+			else
+				this.AuthenticationMechanisms = null;
 
 			this.Arguments = new JsonRpcArgumentInfo[this.NrArguments];
 
@@ -84,6 +95,12 @@ namespace Waher.Networking.HTTP.JsonRpc
 		}
 
 		/// <summary>
+		/// Authentication mechanisms available to authenticate users, if
+		/// authentication is required.
+		/// </summary>
+		public HttpAuthenticationScheme[]? AuthenticationMechanisms { get; }
+
+		/// <summary>
 		/// Method information.
 		/// </summary>
 		public MethodInfo Method { get; }
@@ -122,6 +139,70 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// Arguments
 		/// </summary>
 		public JsonRpcArgumentInfo[] Arguments { get; }
+
+		/// <summary>
+		/// If authentication of the user is required.
+		/// </summary>
+		public bool RequiresAuthentication { get; }
+
+		/// <summary>
+		/// Privileges required by the user that calls the method.
+		/// </summary>
+		public string[] RequiredPrivileges { get; }
+
+		/// <summary>
+		/// Checks if a user is authorized to call the method.
+		/// </summary>
+		/// <param name="User">User to check.</param>
+		/// <returns>True if the user is authorized, false otherwise.</returns>
+		public bool IsAuthorized(IUser? User)
+		{
+			return this.IsAuthorized(User, out _);
+		}
+
+		/// <summary>
+		/// Checks if a user is authorized to call the method.
+		/// </summary>
+		/// <param name="User">User to check.</param>
+		/// <param name="MissingPrivilege">Missing privilege, if any.</param>
+		/// <returns>True if the user is authorized, false otherwise.</returns>
+		public bool IsAuthorized(IUser? User, out string? MissingPrivilege)
+		{
+			MissingPrivilege = null;
+
+			if (!this.RequiresAuthentication)
+				return true;
+
+			if (User is null)
+				return false;
+
+			foreach (string Privilege in this.RequiredPrivileges)
+			{
+				if (!User.HasPrivilege(Privilege))
+				{
+					MissingPrivilege = Privilege;
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Asserts user is authorized to call the method. If not, a 
+		/// <see cref="ForbiddenException"/> is thrown.
+		/// </summary>
+		/// <param name="ObjectId">Object ID to use in log events.</param>
+		/// <param name="User">User accessing method.</param>
+		public void AssertAuthorized(string ObjectId, IUser? User)
+		{
+			if (!this.IsAuthorized(User, out string? MissingPrivilege))
+			{
+				throw ForbiddenException.AccessDenied(ObjectId,
+					User?.UserName ?? string.Empty,
+					MissingPrivilege ?? string.Empty);
+			}
+		}
 
 		/// <summary>
 		/// Tries to build a request for the method, based on the provided named parameters.

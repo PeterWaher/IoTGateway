@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Runtime.Collections;
+using Waher.Security;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Server
 {
@@ -40,7 +41,11 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			this.HasReturnValue = Method.ReturnType != typeof(void);
 			this.ReturnAttributes = Method.ReturnParameter?.GetCustomAttribute<McpParameterAttribute>();
 
-			this.methodInfo = new JsonRpcMethodInfo(Method, false);
+			this.methodInfo = new JsonRpcMethodInfo(Method, false, 
+				JsonRpcWebService.GetRequiredPrivileges(Method));
+
+			this.RequiresAuthentication = this.methodInfo.RequiresAuthentication;
+			this.RequiredPrivileges = this.methodInfo.RequiredPrivileges;
 		}
 
 		/// <summary>
@@ -82,6 +87,37 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// Any MCP attributes declared for the return value.
 		/// </summary>
 		public McpParameterAttribute? ReturnAttributes { get; }
+
+		/// <summary>
+		/// If authentication of the user is required.
+		/// </summary>
+		public bool RequiresAuthentication { get; }
+
+		/// <summary>
+		/// Privileges required by the user that calls the method.
+		/// </summary>
+		public string[] RequiredPrivileges { get; }
+
+		/// <summary>
+		/// Checks if a user is authorized to call the method.
+		/// </summary>
+		/// <param name="User">User to check.</param>
+		/// <returns>True if the user is authorized, false otherwise.</returns>
+		public bool IsAuthorized(IUser? User)
+		{
+			return this.methodInfo.IsAuthorized(User);
+		}
+
+		/// <summary>
+		/// Asserts user is authorized to call the method. If not, a 
+		/// <see cref="ForbiddenException"/> is thrown.
+		/// </summary>
+		/// <param name="ObjectId">Object ID to use in log events.</param>
+		/// <param name="User">User accessing method.</param>
+		public void AssertAuthorized(string ObjectId, IUser? User)
+		{
+			this.methodInfo.AssertAuthorized(ObjectId, User);
+		}
 
 		/// <summary>
 		/// Converts object to a generic representation.

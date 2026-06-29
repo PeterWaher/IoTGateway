@@ -25,6 +25,8 @@ using Waher.Runtime.Profiling;
 using Waher.Script;
 using Waher.Script.Content;
 using Waher.Script.Graphs;
+using Waher.Security.JWS;
+using Waher.Security.JWT;
 using Waher.Things;
 using Waher.Things.Http;
 
@@ -236,7 +238,11 @@ internal class Program
 				typeof(XmlFileLedger).Assembly,
 				typeof(PersistedEventLog).Assembly,
 				typeof(IThingReference).Assembly,
-				typeof(HttpModule).Assembly);
+				typeof(HttpModule).Assembly,
+				typeof(JwsAlgorithm).Assembly,
+				typeof(JwtToken).Assembly);
+
+			Types.SetModuleParameter("JWT", JwtFactory.CreateHmacSha256());
 
 			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
 			Database.Register(filesProvider);

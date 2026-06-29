@@ -17,6 +17,7 @@
     <ProjectReference Include="..\..\Script\Waher.Script.Content\Waher.Script.Content.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
+    <ProjectReference Include="..\..\Things\Waher.Things.Http\Waher.Things.Http.csproj" />
     <ProjectReference Include="..\Waher.Networking.HTTP.JsonRpc\Waher.Networking.HTTP.JsonRpc.csproj" />
     <ProjectReference Include="..\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />
   </ItemGroup>

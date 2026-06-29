@@ -317,7 +317,7 @@ namespace Waher.Script.Operators
 			}
 			finally
 			{
-				for (i = 0; i < Dimension; i++)
+				for (i = 0, j = e?.Length ?? 0; i < j; i++)
 					e[i]?.Dispose();
 			}
 		}
@@ -380,7 +380,7 @@ namespace Waher.Script.Operators
 			}
 			finally
 			{
-				for (i = 0; i < Dimension; i++)
+				for (i = 0, j = e?.Length ?? 0; i < j; i++)
 					e[i]?.Dispose();
 			}
 		}

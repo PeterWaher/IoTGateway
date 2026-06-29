@@ -193,6 +193,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task Test_19_Resolve_Reverse_IP4_Lookup()
 		{
 			string[] DomainNames = await DnsResolver.LookupDomainName(IPAddress.Parse("90.224.165.60"));

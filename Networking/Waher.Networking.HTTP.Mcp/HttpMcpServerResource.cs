@@ -31,6 +31,9 @@ namespace Waher.Networking.HTTP.Mcp
 		private readonly Dictionary<string, Tool> tools = new Dictionary<string, Tool>();
 		private readonly Dictionary<string, Prompt> prompts = new Dictionary<string, Prompt>();
 		private bool requiresAuthentication = false;
+		private bool supportsTools = false;
+		private bool supportsPrompts = false;
+		private bool supportsResources = false;
 		private HttpAuthenticationScheme[]? authenticationSchemes = null;
 
 		private static Dictionary<Type, IContentBlock> GetContentBlocksFirstTime()
@@ -194,6 +197,7 @@ namespace Waher.Networking.HTTP.Mcp
 				this.tools[Name] = Tool;
 
 				this.requiresAuthentication |= Tool.RequiresAuthentication;
+				this.supportsTools = true;
 			}
 
 			// TODO: Send notification to clients about new tool.
@@ -220,6 +224,7 @@ namespace Waher.Networking.HTTP.Mcp
 				this.prompts[Name] = Prompt;
 
 				this.requiresAuthentication |= Prompt.RequiresAuthentication;
+				this.supportsPrompts = true;
 			}
 
 			// TODO: Send notification to clients about new prompt.

@@ -12,6 +12,7 @@ using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Networking.HTTP.Mcp.Model.Client;
 using Waher.Networking.HTTP.Mcp.Model.ContentBlocks;
 using Waher.Networking.HTTP.Mcp.Model.Server;
+using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
@@ -268,6 +269,61 @@ namespace Waher.Networking.HTTP.Mcp
 			}
 			else
 				return Array.Empty<Icon>();
+		}
+
+		/// <summary>
+		/// Method called when a resource has been registered on a server.
+		/// </summary>
+		/// <param name="Server">Server</param>
+		public override void AddReference(HttpServer Server)
+		{
+			base.AddReference(Server);
+
+			bool HasMetaDataResource = this.TryGetResourceMetaDataResource(Server,
+				out ResourceMetaDataResource? MetaDataResource);
+			bool HasDomain = Types.TryGetModuleParameter("Domain", out string Domain);
+
+			lock (this.tools)
+			{
+				foreach (Tool Tool in this.tools.Values)
+				{
+					if (Tool.RequiresAuthentication)
+					{
+						if (HasMetaDataResource && HasDomain)
+						{
+							Tool.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(
+								new Uri(MetaDataResource!.GetResourceMetaDataUri(true, Domain, this.ResourceName)),
+								Tool.RequiredPrivileges);
+						}
+						else
+						{
+							Tool.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(
+								Tool.RequiredPrivileges);
+						}
+					}
+				}
+			}
+
+			lock (this.prompts)
+			{
+				foreach (Prompt Prompt in this.prompts.Values)
+				{
+					if (Prompt.RequiresAuthentication)
+					{
+						if (HasMetaDataResource && HasDomain)
+						{
+							Prompt.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(
+								new Uri(MetaDataResource!.GetResourceMetaDataUri(true, Domain, this.ResourceName)),
+								Prompt.RequiredPrivileges);
+						}
+						else
+						{
+							Prompt.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(
+								Prompt.RequiredPrivileges);
+						}
+					}
+				}
+			}
 		}
 
 		/// <summary>

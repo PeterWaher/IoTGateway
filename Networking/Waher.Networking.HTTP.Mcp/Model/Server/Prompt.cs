@@ -50,6 +50,12 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		}
 
 		/// <summary>
+		/// Authentication mechanisms available to authenticate users, if
+		/// authentication is required.
+		/// </summary>
+		public HttpAuthenticationScheme[]? AuthenticationMechanisms { get; internal set; }
+
+		/// <summary>
 		/// Method to invoke when prompt is executed.
 		/// </summary>
 		public MethodInfo Method { get; }

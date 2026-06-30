@@ -26,6 +26,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <summary>
 		/// Contains information about an MCP Server Tool
 		/// </summary>
+		/// <param name="McpServer">MCP Server reference.</param>
 		/// <param name="Method">Method to invoke when tool is executed.</param>
 		/// <param name="Title">A human-readable title for the tool.</param>
 		/// <param name="Description">A human-readable description of the tool.
@@ -45,9 +46,10 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// "open world" of external entities. If false, the tool's domain of interaction 
 		/// is closed.</param>
 		/// <param name="MetaData">Meta-data associated with tool.</param>
-		public Tool(MethodInfo Method, string Title, string Description, string IconsMethod,
-			bool CanModifyEnvironment, bool CanDestroyEnvironment, bool Idempotent,
-			bool OpenWorldAccess, params KeyValuePair<string, object>[] MetaData)
+		public Tool(HttpMcpServerResource McpServer, MethodInfo Method, string Title, 
+			string Description, string IconsMethod, bool CanModifyEnvironment, 
+			bool CanDestroyEnvironment, bool Idempotent, bool OpenWorldAccess, 
+			params KeyValuePair<string, object>[] MetaData)
 		{
 			this.Method = Method;
 			this.Title = Title;
@@ -60,7 +62,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			this.MetaData = MetaData;
 			this.HasReturnValue = Method.ReturnType != typeof(void);
 
-			this.methodInfo = new JsonRpcMethodInfo(Method, false,
+			this.methodInfo = new JsonRpcMethodInfo(McpServer, Method, false,
 				JsonRpcWebService.GetRequiredPrivileges(Method));
 
 			this.RequiresAuthentication = this.methodInfo.RequiresAuthentication;

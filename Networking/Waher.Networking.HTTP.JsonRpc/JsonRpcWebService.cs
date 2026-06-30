@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Json;
 using Waher.Events;
+using Waher.Networking.HTTP.OAuth;
 using Waher.Runtime.Collections;
 
 namespace Waher.Networking.HTTP.JsonRpc
@@ -24,6 +26,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		private readonly Dictionary<string, JsonRpcMethodInfo> methods;
 		private readonly bool userSessions;
 		private readonly bool caseSensitive;
+		private ResourceMetaDataResource? resourceMetaData = null;
 
 		/// <summary>
 		/// Abstract base class for Web Services based on JSON-RPC v2.0.
@@ -121,7 +124,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				if (this.methods.ContainsKey(Name))
 					throw new Exception("Method already registered: " + Name);
 
-				this.methods[Name] = new JsonRpcMethodInfo(Method, this.caseSensitive,
+				this.methods[Name] = new JsonRpcMethodInfo(this, Method, this.caseSensitive,
 					RequiredPrivileges);
 			}
 		}
@@ -145,6 +148,29 @@ namespace Waher.Networking.HTTP.JsonRpc
 				else
 					return false;
 			}
+		}
+
+		/// <summary>
+		/// Tries to get the resource meta-data resource, if any registered.
+		/// </summary>
+		/// <param name="Resource">The resource meta-data resource, if found.</param>
+		/// <returns>True if a resource meta-data resource is found, false otherwise.</returns>
+		public bool TryGetResourceMetaDataResource(
+			[NotNullWhen(true)] out ResourceMetaDataResource? Resource)
+		{
+			if (this.resourceMetaData is null && !(this.FirstServer is null))
+			{
+				string s = ResourceMetaDataResource.WellKnowResourcePath;
+
+				if (this.FirstServer.TryGetResource(ref s, out HttpResource HttpResource, out _) &&
+					HttpResource is ResourceMetaDataResource MetaDataResource)
+				{
+					this.resourceMetaData = MetaDataResource;
+				}
+			}
+
+			Resource = this.resourceMetaData;
+			return !(Resource is null);
 		}
 
 		/// <summary>

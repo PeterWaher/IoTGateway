@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Waher.Networking.HTTP.OAuth;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Security;
 using Waher.Things.Http;
@@ -16,11 +18,12 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <summary>
 		/// Information about a method published via a JSON-RPC web service.
 		/// </summary>
+		/// <param name="WebService">JSON-RPC Web Service reference.</param>
 		/// <param name="Method">Method information.</param>
 		/// <param name="CaseSensitive">If names are case sensitive.</param>
 		/// <param name="RequiredPrivileges">Required privileges</param>
-		public JsonRpcMethodInfo(MethodInfo Method, bool CaseSensitive,
-			string[]? RequiredPrivileges)
+		public JsonRpcMethodInfo(JsonRpcWebService WebService, MethodInfo Method, 
+			bool CaseSensitive, string[]? RequiredPrivileges)
 		{
 			ParameterInfo[] Arguments = Method.GetParameters();
 			bool IsSpecialArgument;
@@ -32,7 +35,18 @@ namespace Waher.Networking.HTTP.JsonRpc
 			this.RequiresAuthentication = (RequiredPrivileges?.Length ?? 0) > 0;
 
 			if (this.RequiresAuthentication)
-				this.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(RequiredPrivileges);
+			{
+				if (WebService.TryGetResourceMetaDataResource(
+					out ResourceMetaDataResource? MetaDataResource) &&
+					Types.TryGetModuleParameter("Domain", out string Domain))
+				{
+					this.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(
+						new Uri(MetaDataResource.GetResourceMetaDataUri(true, Domain, WebService.ResourceName)),
+						RequiredPrivileges);
+				}
+				else
+					this.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(RequiredPrivileges);
+			}
 			else
 				this.AuthenticationMechanisms = null;
 

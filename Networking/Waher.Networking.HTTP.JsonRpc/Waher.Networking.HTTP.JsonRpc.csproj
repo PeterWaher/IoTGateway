@@ -33,6 +33,7 @@
 
 	<ItemGroup>
     <ProjectReference Include="..\..\Things\Waher.Things.Http\Waher.Things.Http.csproj" />
+    <ProjectReference Include="..\Waher.Networking.HTTP.OAuth\Waher.Networking.HTTP.OAuth.csproj" />
     <ProjectReference Include="..\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
 		<ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />

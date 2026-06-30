@@ -211,7 +211,7 @@ namespace Waher.Networking.HTTP.Mcp
 				if (this.tools.ContainsKey(Name))
 					throw new Exception("Tool already registered: " + Name);
 
-				Tool Tool = new Tool(Method, Attributes.Title,
+				Tool Tool = new Tool(this, Method, Attributes.Title,
 					Attributes.Description, Attributes.IconsMethod,
 					Attributes.CanModifyEnvironment, Attributes.CanDestroyEnvironment,
 					Attributes.Idempotent, Attributes.OpenWorldAccess);
@@ -240,7 +240,7 @@ namespace Waher.Networking.HTTP.Mcp
 				if (this.prompts.ContainsKey(Name))
 					throw new Exception("Prompt already registered: " + Name);
 
-				Prompt Prompt = new Prompt(Method, Attributes.Title,
+				Prompt Prompt = new Prompt(this, Method, Attributes.Title,
 					Attributes.Description, Attributes.IconsMethod);
 
 				this.prompts[Name] = Prompt;

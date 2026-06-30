@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Json;
 using Waher.Events;
-using Waher.Networking.HTTP.Authentication;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;

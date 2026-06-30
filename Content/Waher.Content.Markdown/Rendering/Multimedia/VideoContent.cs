@@ -51,14 +51,14 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 					{
 						Output.Append(" width=\"");
 						Output.Append(Item.Width.Value.ToString());
-						Output.Append("\"");
+						Output.Append('"');
 					}
 
 					if (Item.Height.HasValue)
 					{
 						Output.Append(" height=\"");
 						Output.Append(Item.Height.Value.ToString());
-						Output.Append("\"");
+						Output.Append('"');
 					}
 
 					Output.AppendLine(">");

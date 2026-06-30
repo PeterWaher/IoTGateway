@@ -522,7 +522,7 @@ namespace Waher.Content.Multipart
 					{
 						Header.Append("; name=\"");
 						Header.Append(Alternative.Name.Replace("\"", "\\\""));
-						Header.Append("\"");
+						Header.Append('"');
 					}
 
 					if (Alternative.Disposition != ContentDisposition.Unknown ||
@@ -539,7 +539,7 @@ namespace Waher.Content.Multipart
 								{
 									Header.Append("; name=\"");
 									Header.Append(Alternative.Name.Replace("\"", "\\\""));
-									Header.Append("\"");
+									Header.Append('"');
 								}
 								break;
 
@@ -557,7 +557,7 @@ namespace Waher.Content.Multipart
 						{
 							Header.Append("; filename=\"");
 							Header.Append(Alternative.FileName.Replace("\"", "\\\""));
-							Header.Append("\"");
+							Header.Append('"');
 						}
 					}
 

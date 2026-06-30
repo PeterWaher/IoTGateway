@@ -309,18 +309,18 @@ namespace Waher.Networking.SASL
 
 			sb.Append("username=\"");
 			sb.Append(UserName.Replace("\"", "\\\""));
-			sb.Append("\"");
+			sb.Append('"');
 
 			if (!string.IsNullOrEmpty(Realm))
 			{
 				sb.Append(",realm=\"");
 				sb.Append(Realm.Replace("\"", "\\\""));
-				sb.Append("\"");
+				sb.Append('"');
 			}
 
 			sb.Append(",nonce=\"");
 			sb.Append(Nonce.Replace("\"", "\\\""));
-			sb.Append("\"");
+			sb.Append('"');
 
 			string DigestUri = "xmpp/" + Connection.Domain;
 
@@ -344,7 +344,7 @@ namespace Waher.Networking.SASL
 
 			sb.Append(",digest-uri=\"");
 			sb.Append(DigestUri);
-			sb.Append("\"");
+			sb.Append('"');
 
 			byte[] HPass = this.H(CONCAT(UserName, ":", Realm, ":", Password));
 			string AuthId = UserName + "@" + Connection.Domain;
@@ -365,7 +365,7 @@ namespace Waher.Networking.SASL
 
 			sb.Append(",authzid=\"");
 			sb.Append(AuthId);
-			sb.Append("\"");
+			sb.Append('"');
 
 			await Connection.FinalResponse(this, Convert.ToBase64String(Encoding.UTF8.GetBytes(sb.ToString())));
 			return true;

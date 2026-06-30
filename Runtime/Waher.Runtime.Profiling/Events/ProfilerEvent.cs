@@ -88,7 +88,7 @@ namespace Waher.Runtime.Profiling.Events
 				Output.AppendLine(s);
 			else
 			{
-				Output.Append("\"");
+				Output.Append('"');
 				Output.Append(s.Replace("\"", "'"));
 				Output.AppendLine("\"");
 			}

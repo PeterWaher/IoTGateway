@@ -1380,7 +1380,7 @@ namespace Waher.Content.Markdown.Rendering
 			{
 				this.Output.Append(" id=\"");
 				this.Output.Append(XML.HtmlAttributeEncode(Id));
-				this.Output.Append("\"");
+				this.Output.Append('"');
 			}
 
 			if (Element.Document.IncludesTableOfContents)
@@ -1745,7 +1745,7 @@ namespace Waher.Content.Markdown.Rendering
 			{
 				this.Output.Append(" for=\"item");
 				this.Output.Append(Element.CheckPosition.ToString());
-				this.Output.Append("\"");
+				this.Output.Append('"');
 			}
 
 			this.Output.Append('>');

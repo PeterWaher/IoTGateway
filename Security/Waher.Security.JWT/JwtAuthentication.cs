@@ -196,9 +196,9 @@ namespace Waher.Security.JWT
 
 			sb.Append("Bearer realm=\"");
 			sb.Append(this.realm);
-			sb.Append("\"");
+			sb.Append('"');
 
-			if(!(this.resourceMetaData is null))
+			if (!(this.resourceMetaData is null))
 			{
 				sb.Append(", resource_metadata=\"");
 				sb.Append(this.resourceMetaData.ToString());
@@ -270,7 +270,7 @@ namespace Waher.Security.JWT
 						LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
 					else
 						await LoginAuditor.SilentSuccess("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
-			
+
 					return User;
 				}
 			}

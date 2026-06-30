@@ -595,9 +595,9 @@ namespace Waher.Persistence.Serialization
 										}
 										else
 										{
-											CSharp.Append("\"");
+											CSharp.Append('"');
 											CSharp.Append(Escape(DefaultValue.ToString()));
-											CSharp.Append("\"");
+											CSharp.Append('"');
 										}
 									}
 									else if (DefaultValue is DateTime TP)

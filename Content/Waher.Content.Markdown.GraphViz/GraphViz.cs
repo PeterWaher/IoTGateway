@@ -691,7 +691,7 @@ namespace Waher.Content.Markdown.GraphViz
 					Arguments.Append(this.graphFgColor);
 					Arguments.Append("\" -Epencolor=\"");
 					Arguments.Append(this.graphFgColor);
-					Arguments.Append("\"");
+					Arguments.Append('"');
 				}
 
 				Arguments.Append(" -q -o\"");

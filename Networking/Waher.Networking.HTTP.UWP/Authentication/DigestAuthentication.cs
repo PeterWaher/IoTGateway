@@ -193,7 +193,7 @@ namespace Waher.Networking.HTTP.Authentication
 			sb.Append(Nonce);
 			sb.Append("\", opaque=\"");
 			sb.Append(this.opaque);
-			sb.Append("\"");
+			sb.Append('"');
 
 			return new string[] { sb.ToString() };
 		}

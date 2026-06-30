@@ -8757,7 +8757,7 @@ namespace Waher.Networking.XMPP.Contracts
 								sb.Append(NonceStr);
 								sb.Append("\", s=\"");
 								sb.Append(Convert.ToBase64String(Signature));
-								sb.Append("\"");
+								sb.Append('"');
 
 								Request.Dispose();
 								Request = new HttpRequestMessage()

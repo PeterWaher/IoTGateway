@@ -126,7 +126,7 @@ namespace Waher.Networking.CoAP.CoRE
 				{
 					sb.Append(";title=\"");
 					sb.Append(s.Replace("\"", "\\\""));
-					sb.Append("\"");
+					sb.Append('"');
 				}
 
 				this.Append(sb, "rt", Resource.ResourceTypes);
@@ -218,7 +218,7 @@ namespace Waher.Networking.CoAP.CoRE
 					sb.Append(Strings[i].Replace("\"", "\\\""));
 				}
 
-				sb.Append("\"");
+				sb.Append('"');
 			}
 		}
 

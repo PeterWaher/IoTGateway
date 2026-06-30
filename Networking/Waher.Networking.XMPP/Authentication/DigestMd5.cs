@@ -100,18 +100,18 @@ namespace Waher.Networking.XMPP.Authentication
 
 				sb.Append("username=\"");
 				sb.Append(Client.UserName.Replace("\"", "\\\""));
-				sb.Append("\"");
+				sb.Append('"');
 
 				if (!string.IsNullOrEmpty(Realm))
 				{
 					sb.Append(",realm=\"");
 					sb.Append(Realm.Replace("\"", "\\\""));
-					sb.Append("\"");
+					sb.Append('"');
 				}
 
 				sb.Append(",nonce=\"");
 				sb.Append(Nonce.Replace("\"", "\\\""));
-				sb.Append("\"");
+				sb.Append('"');
 
 				string DigestUri = "xmpp/" + Client.Domain;
 
@@ -135,7 +135,7 @@ namespace Waher.Networking.XMPP.Authentication
 
 				sb.Append(",digest-uri=\"");
 				sb.Append(DigestUri);
-				sb.Append("\"");
+				sb.Append('"');
 
 				byte[] HPass;
 
@@ -178,7 +178,7 @@ namespace Waher.Networking.XMPP.Authentication
 				{
 					sb.Append(",authzid=\"");
 					sb.Append(Client.BareJID);
-					sb.Append("\"");
+					sb.Append('"');
 				}
 
 				return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(sb.ToString()));

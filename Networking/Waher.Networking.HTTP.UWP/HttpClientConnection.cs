@@ -2278,8 +2278,23 @@ namespace Waher.Networking.HTTP
 						}
 					}
 
+					bool Encrypted = this.client.IsEncrypted;
+#if !WINDOWS_UWP
+					int Strength = Encrypted ? Math.Min(
+						this.client.CipherStrength, this.client.KeyExchangeStrength) : 0;
+#endif
 					foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 					{
+						if (Scheme.RequireEncryption)
+						{
+							if (!Encrypted)
+								continue;
+#if !WINDOWS_UWP
+							if (Scheme.MinStrength > Strength)
+								continue;
+#endif
+						}
+
 						if (Scheme.UserSessions && Request.Session is null)
 							Request.GetSessionFromCookie();
 
@@ -2294,11 +2309,6 @@ namespace Waher.Networking.HTTP
 					if (Request.User is null)
 					{
 						List<KeyValuePair<string, string>> Challenges = new List<KeyValuePair<string, string>>();
-						bool Encrypted = this.client.IsEncrypted;
-#if !WINDOWS_UWP
-						int Strength = Encrypted ? Math.Min(
-							this.client.CipherStrength, this.client.KeyExchangeStrength) : 0;
-#endif
 
 						foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 						{
@@ -2306,7 +2316,6 @@ namespace Waher.Networking.HTTP
 							{
 								if (!Encrypted)
 									continue;
-
 #if !WINDOWS_UWP
 								if (Scheme.MinStrength > Strength)
 									continue;

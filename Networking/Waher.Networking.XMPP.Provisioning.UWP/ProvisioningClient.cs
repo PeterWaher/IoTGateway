@@ -1220,7 +1220,11 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			if (e.From == this.provisioningServerAddress)
 			{
-				await this.ClearInternalCache();
+				string NodeId = XML.Attribute(e.Query, "id");
+				string SourceId = XML.Attribute(e.Query, "src");
+				string Partition = XML.Attribute(e.Query, "pt");
+
+				await this.ClearInternalCache(NodeId, SourceId, Partition);
 				await e.IqResult(string.Empty);
 			}
 			else
@@ -1230,12 +1234,26 @@ namespace Waher.Networking.XMPP.Provisioning
 		private async Task ClearCacheHandler(object Sender, MessageEventArgs e)
 		{
 			if (e.From == this.provisioningServerAddress)
-				await this.ClearInternalCache();
+			{
+				string NodeId = XML.Attribute(e.Content, "id");
+				string SourceId = XML.Attribute(e.Content, "src");
+				string Partition = XML.Attribute(e.Content, "pt");
+
+				await this.ClearInternalCache(NodeId, SourceId, Partition);
+			}
 		}
 
-		private async Task ClearInternalCache()
+		private async Task ClearInternalCache(string NodeId, string SourceId, string Partition)
 		{
-			await Database.Clear("CachedProvisioningQueries");
+			if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition))
+				await Database.Clear("CachedProvisioningQueries");
+			else
+			{
+				// TODO: Only delete rules related to specific node.
+
+				await Database.Clear("CachedProvisioningQueries");
+			}
+
 			await this.CacheCleared.Raise(this, EventArgs.Empty);
 		}
 
@@ -1967,7 +1985,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		public Task ClearDeviceCaches()
 		{
-			return this.ClearDeviceCache(null, null, null);
+			return this.ClearDeviceCache(null, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
 		/// <summary>
@@ -1977,7 +1995,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object to pass on to callback method.</param>
 		public Task ClearDeviceCaches(EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			return this.ClearDeviceCache(null, Callback, State);
+			return this.ClearDeviceCache(null, string.Empty, string.Empty, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -1987,7 +2005,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// If null, all owned devices will get their rule caches cleared.</param>
 		public Task ClearDeviceCache(string DeviceJID)
 		{
-			return this.ClearDeviceCache(DeviceJID, null, null);
+			return this.ClearDeviceCache(DeviceJID, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
 		/// <summary>
@@ -1999,7 +2017,22 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object to pass on to callback method.</param>
 		public Task ClearDeviceCache(string DeviceJID, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			return this.ClearDeviceCache(this.provisioningServerAddress, DeviceJID, Callback, State);
+			return this.ClearDeviceCache(DeviceJID, string.Empty, string.Empty, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Clears the rule cache of a device.
+		/// </summary>
+		/// <param name="DeviceJID">Bare JID of device whose rule cache is to be cleared.
+		/// If null, all owned devices will get their rule caches cleared.</param>
+		/// <param name="NodeId">Optional Node ID of device.</param>
+		/// <param name="SourceId">Optional Source ID of device.</param>
+		/// <param name="Partition">Optional Partition of device.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public Task ClearDeviceCache(string DeviceJID, string NodeId, string SourceId, string Partition, EventHandlerAsync<IqResultEventArgs> Callback, object State)
+		{
+			return this.ClearDeviceCache(this.provisioningServerAddress, DeviceJID, NodeId, SourceId, Partition, Callback, State);
 		}
 
 		/// <summary>
@@ -2012,6 +2045,23 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object to pass on to callback method.</param>
 		public Task ClearDeviceCache(string ServiceJID, string DeviceJID, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
+			return this.ClearDeviceCache(ServiceJID,DeviceJID,string.Empty, string.Empty, 
+				string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Deletes the rules of a device.
+		/// </summary>
+		/// <param name="ServiceJID">JID of provisioning service.</param>
+		/// <param name="DeviceJID">Bare JID of device whose rules are to be deleted.
+		/// If null, all owned devices will get their rules deleted.</param>
+		/// <param name="NodeId">Optional Node ID of device.</param>
+		/// <param name="SourceId">Optional Source ID of device.</param>
+		/// <param name="Partition">Optional Partition of device.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public Task ClearDeviceCache(string ServiceJID, string DeviceJID, string NodeId, string SourceId, string Partition, EventHandlerAsync<IqResultEventArgs> Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<clearCache xmlns='");
@@ -2021,9 +2071,11 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				Xml.Append("' jid='");
 				Xml.Append(XML.Encode(DeviceJID));
+				Xml.Append('\'');
 			}
 
-			Xml.Append("'/>");
+			this.AppendNodeInfo(Xml, NodeId, SourceId, Partition);
+			Xml.Append("/>");
 
 			return this.client.SendIqSet(ServiceJID, Xml.ToString(), Callback, State);
 		}

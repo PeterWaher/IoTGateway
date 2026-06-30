@@ -5036,6 +5036,17 @@ namespace Waher.Script
 		/// </summary>
 		/// <param name="Value">Value</param>
 		/// <returns>Expression string representation of value.</returns>
+		[Obsolete("Use the ToExpressionString method instead.")]
+		public static string ToString(string Value)
+		{
+			return ToExpressionString(Value);
+		}
+
+		/// <summary>
+		/// Converts an object to a string, that can be parsed as part of an expression.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>Expression string representation of value.</returns>
 		public static string ToExpressionString(object Value)
 		{
 			if (Value is null)

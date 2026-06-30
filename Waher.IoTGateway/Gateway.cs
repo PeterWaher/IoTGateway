@@ -56,6 +56,7 @@ using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.MQTT;
 using Waher.Networking.PeerToPeer;
 using Waher.Networking.Sniffers;
@@ -1380,6 +1381,7 @@ namespace Waher.IoTGateway
 
 				InternetContent.SetDefaultTimeout(60000, true);
 
+				webServer.Register(new ResourceMetaDataResource());
 				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/Transforms", Path.Combine(appDataFolder, "Transforms"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false, HostDomainOptions.SameForAllDomains));   // Syntax highlighting library, provided by http://highlightjs.org

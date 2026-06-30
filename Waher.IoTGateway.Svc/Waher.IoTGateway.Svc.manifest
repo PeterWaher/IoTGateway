@@ -407,6 +407,9 @@
 	<Assembly fileName="Waher.Networking.HTTP.JsonRpc.dll" />
 	<Assembly fileName="Waher.Networking.HTTP.JsonRpc.pdb" />
 	<Assembly fileName="Waher.Networking.HTTP.JsonRpc.xml" />
+	<Assembly fileName="Waher.Networking.HTTP.OAuth.dll" />
+	<Assembly fileName="Waher.Networking.HTTP.OAuth.pdb" />
+	<Assembly fileName="Waher.Networking.HTTP.OAuth.xml" />
 	<Assembly fileName="Waher.Networking.Modbus.dll" />
 	<Assembly fileName="Waher.Networking.Modbus.pdb" />
 	<Assembly fileName="Waher.Networking.Modbus.xml" />

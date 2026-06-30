@@ -20,7 +20,6 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <summary>
 		/// Contains information about an MCP Server Prompt
 		/// </summary>
-		/// <param name="McpServer">MCP Server reference.</param>
 		/// <param name="Method">Method to invoke when prompt is executed.</param>
 		/// <param name="Title">A human-readable title for the prompt.</param>
 		/// <param name="Description">A human-readable description of the prompt.
@@ -31,7 +30,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// an an <see cref="Icon[]?"/> or an <see cref="Icons?"/> resource representing 
 		/// the prompt. If null or empty, the icon of the MCP server will be used.</param>
 		/// <param name="MetaData">Meta-data associated with prompt.</param>
-		public Prompt(HttpMcpServerResource McpServer, MethodInfo Method, string Title, 
+		public Prompt(MethodInfo Method, string Title, 
 			string Description, string IconsMethod, 
 			params KeyValuePair<string, object>[] MetaData)
 		{
@@ -43,7 +42,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			this.HasReturnValue = Method.ReturnType != typeof(void);
 			this.ReturnAttributes = Method.ReturnParameter?.GetCustomAttribute<McpParameterAttribute>();
 
-			this.methodInfo = new JsonRpcMethodInfo(McpServer, Method, false, 
+			this.methodInfo = new JsonRpcMethodInfo(Method, false, 
 				JsonRpcWebService.GetRequiredPrivileges(Method));
 
 			this.RequiresAuthentication = this.methodInfo.RequiresAuthentication;

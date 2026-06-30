@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Json;
 using Waher.Events;
+using Waher.Networking.HTTP.Authentication;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Runtime.Collections;
+using Waher.Runtime.Inventory;
+using Waher.Things.Http;
 
 namespace Waher.Networking.HTTP.JsonRpc
 {
@@ -124,7 +127,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				if (this.methods.ContainsKey(Name))
 					throw new Exception("Method already registered: " + Name);
 
-				this.methods[Name] = new JsonRpcMethodInfo(this, Method, this.caseSensitive,
+				this.methods[Name] = new JsonRpcMethodInfo(Method, this.caseSensitive,
 					RequiredPrivileges);
 			}
 		}
@@ -153,16 +156,17 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <summary>
 		/// Tries to get the resource meta-data resource, if any registered.
 		/// </summary>
+		/// <param name="Server">HTTP Server whose resources are being queried.</param>
 		/// <param name="Resource">The resource meta-data resource, if found.</param>
 		/// <returns>True if a resource meta-data resource is found, false otherwise.</returns>
-		public bool TryGetResourceMetaDataResource(
+		public bool TryGetResourceMetaDataResource(HttpServer Server,
 			[NotNullWhen(true)] out ResourceMetaDataResource? Resource)
 		{
-			if (this.resourceMetaData is null && !(this.FirstServer is null))
+			if (this.resourceMetaData is null)
 			{
 				string s = ResourceMetaDataResource.WellKnowResourcePath;
 
-				if (this.FirstServer.TryGetResource(ref s, out HttpResource HttpResource, out _) &&
+				if (Server.TryGetResource(ref s, out HttpResource HttpResource, out _) &&
 					HttpResource is ResourceMetaDataResource MetaDataResource)
 				{
 					this.resourceMetaData = MetaDataResource;
@@ -171,6 +175,40 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 			Resource = this.resourceMetaData;
 			return !(Resource is null);
+		}
+
+		/// <summary>
+		/// Method called when a resource has been registered on a server.
+		/// </summary>
+		/// <param name="Server">Server</param>
+		public override void AddReference(HttpServer Server)
+		{
+			base.AddReference(Server);
+
+			bool HasMetaDataResource = this.TryGetResourceMetaDataResource(Server,
+				out ResourceMetaDataResource? MetaDataResource);
+			bool HasDomain = Types.TryGetModuleParameter("Domain", out string Domain);
+
+			lock (this.methods)
+			{
+				foreach (JsonRpcMethodInfo MethodInfo in this.methods.Values)
+				{
+					if (MethodInfo.RequiresAuthentication)
+					{
+						if (HasMetaDataResource && HasDomain)
+						{
+							MethodInfo.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(
+								new Uri(MetaDataResource!.GetResourceMetaDataUri(true, Domain, this.ResourceName)),
+								MethodInfo.RequiredPrivileges);
+						}
+						else
+						{
+							MethodInfo.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(
+								MethodInfo.RequiredPrivileges);
+						}
+					}
+				}
+			}
 		}
 
 		/// <summary>

@@ -154,6 +154,13 @@ namespace Waher.Networking.HTTP.OAuth
 				return Ports[0];
 		}
 
+		/// <summary>
+		/// Gets the resource meta-data URI for a given resource.
+		/// </summary>
+		/// <param name="Encrypted">If access is encrypted.</param>
+		/// <param name="Domain">Domain used to access the resource.</param>
+		/// <param name="ResourceName">Name of the resource.</param>
+		/// <returns>Resource meta-data URI.</returns>
 		public string GetResourceMetaDataUri(bool Encrypted, string Domain, string ResourceName)
 		{
 			StringBuilder sb = this.GenerateServerUrl(Encrypted, Domain, out _);

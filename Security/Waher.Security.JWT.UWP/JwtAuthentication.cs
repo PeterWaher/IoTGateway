@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
@@ -15,6 +16,7 @@ namespace Waher.Security.JWT
 		private readonly IUserSource users;
 		private readonly JwtFactory factory;
 		private readonly string realm;
+		private readonly Uri resourceMetaData;
 
 		/// <summary>
 		/// Use JWT tokens for authentication. The Bearer scheme defined in RFC 6750 is used:
@@ -42,6 +44,7 @@ namespace Waher.Security.JWT
 			this.realm = Realm;
 			this.users = Users;
 			this.factory = Factory;
+			this.resourceMetaData = null;
 		}
 
 #if WINDOWS_UWP
@@ -78,6 +81,88 @@ namespace Waher.Security.JWT
 			this.realm = Realm;
 			this.users = Users;
 			this.factory = Factory;
+			this.resourceMetaData = null;
+		}
+
+		/// <summary>
+		/// Use JWT tokens for authentication. The Bearer scheme defined in RFC 6750 is used:
+		/// https://tools.ietf.org/html/rfc6750
+		/// </summary>
+		/// <param name="Realm">Realm.</param>
+		/// <param name="Factory">JWT token factory.</param>
+		/// <param name="ResourceMetaData">URI pointing to resource meta-data the
+		/// client can read to understand how it can authenticate itself to gain
+		/// access.</param>
+		public JwtAuthentication(string Realm, JwtFactory Factory, Uri ResourceMetaData)
+			: this(Realm, null, Factory, ResourceMetaData)
+		{
+		}
+
+		/// <summary>
+		/// Use JWT tokens for authentication. The Bearer scheme defined in RFC 6750 is used:
+		/// https://tools.ietf.org/html/rfc6750
+		/// </summary>
+		/// <param name="Realm">Realm.</param>
+		/// <param name="Users">Optional Collection of users to authenticate against.
+		/// If no collection is provided, any JWT token created by the factory will
+		/// be accepted.</param>
+		/// <param name="Factory">JWT token factory.</param>
+		/// <param name="ResourceMetaData">URI pointing to resource meta-data the
+		/// client can read to understand how it can authenticate itself to gain
+		/// access.</param>
+		public JwtAuthentication(string Realm, IUserSource Users, JwtFactory Factory,
+			Uri ResourceMetaData)
+			: base()
+		{
+			this.realm = Realm;
+			this.users = Users;
+			this.factory = Factory;
+			this.resourceMetaData = ResourceMetaData;
+		}
+
+#if WINDOWS_UWP
+		/// <summary>
+		/// Use JWT tokens for authentication. The Bearer scheme defined in RFC 6750 is used:
+		/// https://tools.ietf.org/html/rfc6750
+		/// </summary>
+		/// <param name="RequireEncryption">If encryption is required.</param>
+		/// <param name="Realm">Realm.</param>
+		/// <param name="Users">Optional Collection of users to authenticate against.
+		/// If no collection is provided, any JWT token created by the factory will
+		/// be accepted.</param>
+		/// <param name="Factory">JWT token factory.</param>
+		/// <param name="ResourceMetaData">URI pointing to resource meta-data the
+		/// client can read to understand how it can authenticate itself to gain
+		/// access.</param>
+		public JwtAuthentication(bool RequireEncryption, 
+			string Realm, IUserSource Users, JwtFactory Factory,
+			Uri ResourceMetaData)
+			: base(RequireEncryption)
+#else
+		/// <summary>
+		/// Use JWT tokens for authentication. The Bearer scheme defined in RFC 6750 is used:
+		/// https://tools.ietf.org/html/rfc6750
+		/// </summary>
+		/// <param name="RequireEncryption">If encryption is required.</param>
+		/// <param name="MinStrength">Minimum security strength of algorithms used.</param>
+		/// <param name="Realm">Realm.</param>
+		/// <param name="Users">Optional Collection of users to authenticate against.
+		/// If no collection is provided, any JWT token created by the factory will
+		/// be accepted.</param>
+		/// <param name="Factory">JWT token factory.</param>
+		/// <param name="ResourceMetaData">URI pointing to resource meta-data the
+		/// client can read to understand how it can authenticate itself to gain
+		/// access.</param>
+		public JwtAuthentication(bool RequireEncryption, int MinStrength,
+			string Realm, IUserSource Users, JwtFactory Factory,
+			Uri ResourceMetaData)
+			: base(RequireEncryption, MinStrength)
+#endif
+		{
+			this.realm = Realm;
+			this.users = Users;
+			this.factory = Factory;
+			this.resourceMetaData = ResourceMetaData;
 		}
 
 		/// <summary>
@@ -96,12 +181,31 @@ namespace Waher.Security.JWT
 		public JwtFactory Factory => this.factory;
 
 		/// <summary>
+		/// URI pointing to resource meta-data the client can read to understand how it 
+		/// can authenticate itself to gain access.
+		/// </summary>
+		public Uri ResourceMetaData => this.resourceMetaData;
+
+		/// <summary>
 		/// Gets available challenges for the authenticating client to respond to.
 		/// </summary>
 		/// <returns>Challenge strings.</returns>
 		public override string[] GetChallenges()
 		{
-			return new string[] { "Bearer realm=\"" + this.realm + "\"" };
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("Bearer realm=\"");
+			sb.Append(this.realm);
+			sb.Append("\"");
+
+			if(!(this.resourceMetaData is null))
+			{
+				sb.Append(", resource_metadata=\"");
+				sb.Append(this.resourceMetaData.ToString());
+				sb.Append('"');
+			}
+
+			return new string[] { sb.ToString() };
 		}
 
 		/// <summary>

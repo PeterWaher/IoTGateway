@@ -102,7 +102,9 @@ namespace Waher.Things.Http
 		/// Gets an array of authentication schemes available to authorize access to a
 		/// web resource.
 		/// </summary>
-		/// <returns>Array of authentication schemes.</returns>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
 		public static HttpAuthenticationScheme[] GetAuthenticationSchemes()
 		{
 			return GetAuthenticationSchemes(Array.Empty<string>());
@@ -113,7 +115,9 @@ namespace Waher.Things.Http
 		/// web resource.
 		/// </summary>
 		/// <param name="RequiredPrivilege">Required privilege.</param>
-		/// <returns>Array of authentication schemes.</returns>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
 		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(string RequiredPrivilege)
 		{
 			return GetAuthenticationSchemes(new SinglePrivilege<HttpRequest>(RequiredPrivilege));
@@ -124,7 +128,9 @@ namespace Waher.Things.Http
 		/// web resource.
 		/// </summary>
 		/// <param name="RequiredPrivileges">Required privileges.</param>
-		/// <returns>Array of authentication schemes.</returns>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
 		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(params string[] RequiredPrivileges)
 		{
 			if ((RequiredPrivileges?.Length ?? 0) == 0)
@@ -138,7 +144,9 @@ namespace Waher.Things.Http
 		/// web resource.
 		/// </summary>
 		/// <param name="Authorization">Resource authorization</param>
-		/// <returns>Array of authentication schemes.</returns>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
 		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(IAuthorization<HttpRequest> Authorization)
 		{
 			return GetAuthenticationSchemes(null, Authorization);
@@ -151,7 +159,9 @@ namespace Waher.Things.Http
 		/// <param name="ResourceMetaData">URI pointing to resource meta-data the
 		/// client can read to understand how it can authenticate itself to gain
 		/// access.</param>
-		/// <returns>Array of authentication schemes.</returns>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
 		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(Uri ResourceMetaData)
 		{
 			return GetAuthenticationSchemes(ResourceMetaData, Array.Empty<string>());
@@ -165,7 +175,9 @@ namespace Waher.Things.Http
 		/// client can read to understand how it can authenticate itself to gain
 		/// access.</param>
 		/// <param name="RequiredPrivilege">Required privilege.</param>
-		/// <returns>Array of authentication schemes.</returns>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
 		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(
 			Uri ResourceMetaData, string RequiredPrivilege)
 		{
@@ -181,7 +193,9 @@ namespace Waher.Things.Http
 		/// client can read to understand how it can authenticate itself to gain
 		/// access.</param>
 		/// <param name="RequiredPrivileges">Required privileges.</param>
-		/// <returns>Array of authentication schemes.</returns>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
 		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(
 			Uri ResourceMetaData, params string[] RequiredPrivileges)
 		{
@@ -202,7 +216,9 @@ namespace Waher.Things.Http
 		/// client can read to understand how it can authenticate itself to gain
 		/// access.</param>
 		/// <param name="Authorization">Resource authorization</param>
-		/// <returns>Array of authentication schemes.</returns>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
 		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(
 			Uri ResourceMetaData, IAuthorization<HttpRequest> Authorization)
 		{

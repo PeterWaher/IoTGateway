@@ -51,6 +51,9 @@ namespace Waher.WebService.Queue
 		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
 		/// </summary>
 		/// <param name="Request">Current request</param>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
 		public override HttpAuthenticationScheme[] GetAuthenticationSchemes(HttpRequest Request)
 		{
 			if (Request.Header.Method.ToUpper() == "GET")

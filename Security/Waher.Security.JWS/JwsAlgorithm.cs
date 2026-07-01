@@ -121,39 +121,81 @@ namespace Waher.Security.JWS
 			lock (algorithms)
 			{
 				if (!initialized)
-				{
-					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IJwsAlgorithm)))
-					{
-						ConstructorInfo CI = Types.GetDefaultConstructor(T);
-						if (CI is null)
-							continue;
-
-						try
-						{
-							Algorithm = (IJwsAlgorithm)CI.Invoke(Types.NoParameters);
-
-							if (algorithms.ContainsKey(Algorithm.Name))
-								Log.Warning("JWS algorithm with name " + Algorithm.Name + " already registered.");
-							else
-								algorithms[Algorithm.Name] = Algorithm;
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
-
-					if (!registered)
-					{
-						Types.OnInvalidated += Types_OnInvalidated;
-						registered = true;
-					}
-
-					initialized = true;
-				}
+					InitializeLocked();
 
 				return algorithms.TryGetValue(Name, out Algorithm);
 			}
+		}
+
+		/// <summary>
+		/// Gets available JWS algorithms.
+		/// </summary>
+		/// <returns>Array of JWS algorithms.</returns>
+		public static IJwsAlgorithm[] GetAlgorithms()
+		{
+			lock (algorithms)
+			{
+				if (!initialized)
+					InitializeLocked();
+
+				IJwsAlgorithm[] Result = new IJwsAlgorithm[algorithms.Count];
+				algorithms.Values.CopyTo(Result, 0);
+				return Result;
+			}
+		}
+
+		/// <summary>
+		/// Gets the names of available JWS algorithms.
+		/// </summary>
+		/// <returns>Array of JWS algorithm names.</returns>
+		public static string[] GetAlgorithmNames()
+		{
+			lock (algorithms)
+			{
+				if (!initialized)
+					InitializeLocked();
+
+				int i = 0;
+				int c = algorithms.Count;
+				string[] Result = new string[c];
+
+				foreach (IJwsAlgorithm Algorithm in algorithms.Values)
+					Result[i++] = Algorithm.Name;
+
+				return Result;
+			}
+		}
+
+		private static void InitializeLocked()
+		{
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IJwsAlgorithm)))
+			{
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
+					continue;
+
+				try
+				{
+					IJwsAlgorithm Algorithm = (IJwsAlgorithm)CI.Invoke(Types.NoParameters);
+
+					if (algorithms.ContainsKey(Algorithm.Name))
+						Log.Warning("JWS algorithm with name " + Algorithm.Name + " already registered.");
+					else
+						algorithms[Algorithm.Name] = Algorithm;
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+			}
+
+			if (!registered)
+			{
+				Types.OnInvalidated += Types_OnInvalidated;
+				registered = true;
+			}
+
+			initialized = true;
 		}
 
 		private static void Types_OnInvalidated(object Sender, EventArgs e)

@@ -7,6 +7,12 @@ namespace Waher.Networking.Sniffers.Model
 	/// </summary>
 	public abstract class SnifferTextEvent : SnifferEvent
 	{
+		private static readonly string[] sensitiveWords = new string[]
+		{
+			"password",
+			"secret",
+			"key"
+		};
 		private readonly string text;
 
 		/// <summary>
@@ -18,10 +24,18 @@ namespace Waher.Networking.Sniffers.Model
 		public SnifferTextEvent(DateTime Timestamp, string Text, ISniffEventProcessor Processor)
 			: base(Timestamp, Processor)
 		{
-			if ((Text?.IndexOf("password", StringComparison.InvariantCultureIgnoreCase) ?? -1) >= 0)
-				this.text = "******** MASKED ********";
-			else
-				this.text = Text;
+			string s = Text?.ToLower() ?? string.Empty;
+
+			foreach (string SensitiveWord in sensitiveWords)
+			{
+				if (s.Contains(SensitiveWord))
+				{
+					this.text = "******** MASKED ********";
+					return;
+				}
+			}
+
+			this.text = Text;
 		}
 
 		/// <summary>

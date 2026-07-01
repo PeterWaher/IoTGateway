@@ -104,7 +104,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 								for (i = 0; i < c; i++)
 								{
 									object? Value = this.ParametersArray.GetValue(i);
-									JsonRpcArgumentInfo ArgumentInfo = this.MethodInfo.Arguments[i];
+									ProtectedMethodArgumentInfo ArgumentInfo = this.MethodInfo.Arguments[i];
 									Type ExpectedType = ArgumentInfo.Parameter.ParameterType;
 									Type ParameterType = Value?.GetType() ?? typeof(object);
 
@@ -134,7 +134,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 							if (NrParametersSet != c - this.MethodInfo.NrSpecialArguments)
 							{
-								foreach (JsonRpcArgumentInfo Argument in this.MethodInfo.Arguments)
+								foreach (ProtectedMethodArgumentInfo Argument in this.MethodInfo.Arguments)
 								{
 									if (!Argument.IsSpecialArgument &&
 										Argument.HasDefaultValue)

@@ -5,16 +5,14 @@ using System.Threading.Tasks;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Runtime.Collections;
-using Waher.Security;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Server
 {
 	/// <summary>
 	/// Contains information about an MCP Server Prompt
 	/// </summary>
-	public class Prompt
+	public class Prompt : ProtectedMethod
 	{
-		private readonly JsonRpcMethodInfo methodInfo;
 		private Icons? icons = null;
 
 		/// <summary>
@@ -33,32 +31,15 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		public Prompt(MethodInfo Method, string Title, 
 			string Description, string IconsMethod, 
 			params KeyValuePair<string, object>[] MetaData)
+			: base(Method, false)
 		{
-			this.Method = Method;
 			this.Title = Title;
 			this.Description = Description;
 			this.IconsMethod = IconsMethod;
 			this.MetaData = MetaData;
 			this.HasReturnValue = Method.ReturnType != typeof(void);
 			this.ReturnAttributes = Method.ReturnParameter?.GetCustomAttribute<McpParameterAttribute>();
-
-			this.methodInfo = new JsonRpcMethodInfo(Method, false, 
-				JsonRpcWebService.GetRequiredPrivileges(Method));
-
-			this.RequiresAuthentication = this.methodInfo.RequiresAuthentication;
-			this.RequiredPrivileges = this.methodInfo.RequiredPrivileges;
 		}
-
-		/// <summary>
-		/// Authentication mechanisms available to authenticate users, if
-		/// authentication is required.
-		/// </summary>
-		public HttpAuthenticationScheme[]? AuthenticationMechanisms { get; internal set; }
-
-		/// <summary>
-		/// Method to invoke when prompt is executed.
-		/// </summary>
-		public MethodInfo Method { get; }
 
 		/// <summary>
 		/// A human-readable title for the prompt.
@@ -94,37 +75,6 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// Any MCP attributes declared for the return value.
 		/// </summary>
 		public McpParameterAttribute? ReturnAttributes { get; }
-
-		/// <summary>
-		/// If authentication of the user is required.
-		/// </summary>
-		public bool RequiresAuthentication { get; }
-
-		/// <summary>
-		/// Privileges required by the user that calls the method.
-		/// </summary>
-		public string[] RequiredPrivileges { get; }
-
-		/// <summary>
-		/// Checks if a user is authorized to call the method.
-		/// </summary>
-		/// <param name="User">User to check.</param>
-		/// <returns>True if the user is authorized, false otherwise.</returns>
-		public bool IsAuthorized(IUser? User)
-		{
-			return this.methodInfo.IsAuthorized(User);
-		}
-
-		/// <summary>
-		/// Asserts user is authorized to call the method. If not, a 
-		/// <see cref="ForbiddenException"/> is thrown.
-		/// </summary>
-		/// <param name="ObjectId">Object ID to use in log events.</param>
-		/// <param name="User">User accessing method.</param>
-		public void AssertAuthorized(string ObjectId, IUser? User)
-		{
-			this.methodInfo.AssertAuthorized(ObjectId, User);
-		}
 
 		/// <summary>
 		/// Converts object to a generic representation.
@@ -207,14 +157,14 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			[NotNullWhen(false)] out string? Reason,
 			[NotNullWhen(true)] out object?[]? Arguments)
 		{
-			if (!this.methodInfo.TryBuildRequest(Parameters, MetaData, out Reason, out Arguments))
+			if (!this.TryBuildRequest(Parameters, MetaData, out Reason, out Arguments))
 				return false;
 
-			if (this.methodInfo.RequestArgument.HasValue)
-				Arguments[this.methodInfo.RequestArgument.Value] = Request;
+			if (this.RequestArgument.HasValue)
+				Arguments[this.RequestArgument.Value] = Request;
 
-			if (this.methodInfo.ResponseArgument.HasValue)
-				Arguments[this.methodInfo.ResponseArgument.Value] = Response;
+			if (this.ResponseArgument.HasValue)
+				Arguments[this.ResponseArgument.Value] = Response;
 
 			return true;
 		}

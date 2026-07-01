@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.OAuth.MetaData
 {
@@ -28,10 +29,11 @@ namespace Waher.Networking.HTTP.OAuth.MetaData
 		/// </summary>
 		/// <param name="Resource">Resource to add meta-data for.</param>
 		/// <param name="MetaData">Dictionary to add meta-data to.</param>
-		public override void AddMetaData(HttpResource Resource, 
+		public override Task AddMetaData(HttpResource Resource, 
 			Dictionary<string, object> MetaData)
 		{
 			MetaData["resource_policy_uri"] = this.ResourcePolicyUri;
+			return Task.CompletedTask;
 		}
 	}
 }

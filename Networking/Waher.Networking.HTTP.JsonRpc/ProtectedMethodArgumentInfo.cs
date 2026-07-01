@@ -3,19 +3,19 @@
 namespace Waher.Networking.HTTP.JsonRpc
 {
 	/// <summary>
-	/// Information about an argument in a method published via a JSON-RPC web service.
+	/// Information about an argument in a protected method.
 	/// </summary>
-	public class JsonRpcArgumentInfo
+	public class ProtectedMethodArgumentInfo
 	{
 		/// <summary>
-		/// Information about an argument in a method published via a JSON-RPC web service.
+		/// Information about an argument in a protected method.
 		/// </summary>
 		/// <param name="Parameter">Parameter information.</param>
 		/// <param name="IsSpecialArgument">If the argument represents a special argument.</param>
 		/// <param name="HasDefaultValue">If the argument has a default value.</param>
 		/// <param name="DefaultValue">Default value of argument, if defined.</param>
 		/// <param name="IsMetaDataArgument">If the argument represents a meta-data argument.</param>
-		public JsonRpcArgumentInfo(ParameterInfo Parameter, bool IsSpecialArgument, 
+		public ProtectedMethodArgumentInfo(ParameterInfo Parameter, bool IsSpecialArgument, 
 			bool HasDefaultValue, object? DefaultValue, bool IsMetaDataArgument)
 		{
 			this.Parameter = Parameter;

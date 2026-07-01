@@ -12,13 +12,11 @@ using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Networking.HTTP.Mcp.Model.Client;
 using Waher.Networking.HTTP.Mcp.Model.ContentBlocks;
 using Waher.Networking.HTTP.Mcp.Model.Server;
-using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Model;
 using Waher.Security;
-using Waher.Things.Http;
 
 namespace Waher.Networking.HTTP.Mcp
 {
@@ -37,7 +35,6 @@ namespace Waher.Networking.HTTP.Mcp
 		private bool supportsTools = false;
 		private bool supportsPrompts = false;
 		private bool supportsResources = false;
-		private HttpAuthenticationScheme[]? authenticationSchemes = null;
 
 		private static Dictionary<Type, IContentBlock> GetContentBlocksFirstTime()
 		{
@@ -279,51 +276,30 @@ namespace Waher.Networking.HTTP.Mcp
 		{
 			base.AddReference(Server);
 
-			bool HasMetaDataResource = this.TryGetResourceMetaDataResource(Server,
-				out ResourceMetaDataResource? MetaDataResource);
-			bool HasDomain = Types.TryGetModuleParameter("Domain", out string Domain);
+			Tool[] Tools;
+			Prompt[] Prompts;
+			int c, d;
 
 			lock (this.tools)
 			{
-				foreach (Tool Tool in this.tools.Values)
-				{
-					if (Tool.RequiresAuthentication)
-					{
-						if (HasMetaDataResource && HasDomain)
-						{
-							Tool.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(
-								new Uri(MetaDataResource!.GetResourceMetaDataUri(true, Domain, this.ResourceName)),
-								Tool.RequiredPrivileges);
-						}
-						else
-						{
-							Tool.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(
-								Tool.RequiredPrivileges);
-						}
-					}
-				}
+				c = this.tools.Count;
+				Tools = new Tool[c];
+				this.tools.Values.CopyTo(Tools, 0);
 			}
 
 			lock (this.prompts)
 			{
-				foreach (Prompt Prompt in this.prompts.Values)
-				{
-					if (Prompt.RequiresAuthentication)
-					{
-						if (HasMetaDataResource && HasDomain)
-						{
-							Prompt.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(
-								new Uri(MetaDataResource!.GetResourceMetaDataUri(true, Domain, this.ResourceName)),
-								Prompt.RequiredPrivileges);
-						}
-						else
-						{
-							Prompt.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(
-								Prompt.RequiredPrivileges);
-						}
-					}
-				}
+				d = this.prompts.Count;
+				Prompts = new Prompt[d];
+				this.prompts.Values.CopyTo(Prompts, 0);
 			}
+
+			ProtectedMethod[] Methods = new ProtectedMethod[c + d];
+			Array.Copy(Tools, 0, Methods, 0, c);
+			Array.Copy(Prompts, 0, Methods, c, d);
+
+			foreach (ProtectedMethod Method in Methods)
+				this.AddAuthenticationMechanisms(Method);
 		}
 
 		/// <summary>
@@ -506,9 +482,13 @@ namespace Waher.Networking.HTTP.Mcp
 
 			if (this.requiresAuthentication && User is null)
 			{
-				this.authenticationSchemes ??= HttpModule.GetAuthenticationSchemes();
+				if (this.AuthenticationSchemes is null)
+				{
+					await Response.SendResponse(new ForbiddenException());
+					return null;
+				}
 
-				foreach (HttpAuthenticationScheme Scheme in this.authenticationSchemes)
+				foreach (HttpAuthenticationScheme Scheme in this.AuthenticationSchemes)
 				{
 					if (Scheme.RequireEncryption &&
 						(!Encrypted || Strength < Scheme.MinStrength))
@@ -531,7 +511,7 @@ namespace Waher.Networking.HTTP.Mcp
 				{
 					List<string> Challenges = new List<string>();
 
-					foreach (HttpAuthenticationScheme Scheme in this.authenticationSchemes
+					foreach (HttpAuthenticationScheme Scheme in this.AuthenticationSchemes
 						?? Array.Empty<HttpAuthenticationScheme>())
 					{
 						if (Scheme.RequireEncryption &&

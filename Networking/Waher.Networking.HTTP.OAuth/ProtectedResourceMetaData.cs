@@ -4,24 +4,23 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP.OAuth.MetaData;
-using Waher.Networking.HTTP.ScriptExtensions;
 
 namespace Waher.Networking.HTTP.OAuth
 {
 	/// <summary>
 	/// Provides OAUTH resource meta-data, as defined in RFC 9728.
 	/// </summary>
-	public class ResourceMetaDataResource : HttpSynchronousResource, IHttpGetMethod
+	public class ProtectedResourceMetaData : HttpSynchronousResource, IHttpGetMethod
 	{
 		/// <summary>
 		/// /.well-known
 		/// </summary>
-		public const string WellKnowResourcePath = "/.well-known";
+		public const string WellKnowResourcePath = "/.well-known/oauth-protected-resource";
 
 		/// <summary>
 		/// Provides OAUTH resource meta-data, as defined in RFC 9728.
 		/// </summary>
-		public ResourceMetaDataResource()
+		public ProtectedResourceMetaData()
 			: base(WellKnowResourcePath)
 		{
 		}
@@ -52,14 +51,14 @@ namespace Waher.Networking.HTTP.OAuth
 			string ResourceName = Request.SubPath;
 
 			if (string.IsNullOrEmpty(ResourceName) ||
-				!(this.FirstServer?.TryGetResource(ref ResourceName, false, out HttpResource Resource, out string SubPath) ?? false) ||
+				!(Request.Server?.TryGetResource(ref ResourceName, false, out HttpResource Resource, out string SubPath) ?? false) ||
 				!string.IsNullOrEmpty(SubPath))
 			{
 				await Response.SendResponse(new NotFoundException());
 				return;
 			}
 
-			StringBuilder sb = this.GenerateServerUrl(Request, out int Port);
+			StringBuilder sb = GenerateServerUrl(Request, out int Port);
 			string ServerUrl = sb.ToString();
 
 			sb.Append(ResourceName);
@@ -67,10 +66,10 @@ namespace Waher.Networking.HTTP.OAuth
 
 			ClientCertificates ClientCertificatesConfig;
 
-			if (this.FirstServer is null)
+			if (Request.Server is null)
 				ClientCertificatesConfig = ClientCertificates.NotUsed;
 			else
-				this.FirstServer.GetMTlsSettings(Port, out ClientCertificatesConfig, out _);
+				Request.Server.GetMTlsSettings(Port, out ClientCertificatesConfig, out _);
 
 			Dictionary<string, object> MetaData = new Dictionary<string, object>()
 			{
@@ -83,7 +82,7 @@ namespace Waher.Networking.HTTP.OAuth
 			OAuthMetaDataAttribute[] OAuthMetaDAtaAttributes = Resource.GetType().GetCustomAttributes<OAuthMetaDataAttribute>(true) as OAuthMetaDataAttribute[] ?? Array.Empty<OAuthMetaDataAttribute>();
 
 			foreach (OAuthMetaDataAttribute Attribute in OAuthMetaDAtaAttributes)
-				Attribute.AddMetaData(Resource, MetaData);
+				await Attribute.AddMetaData(Resource, MetaData);
 
 			await Response.Return(MetaData);
 		}
@@ -94,9 +93,9 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="Request">HTTP Request object.</param>
 		/// <param name="Port">Port used in server URL.</param>
 		/// <returns>Built URL</returns>
-		public StringBuilder GenerateServerUrl(HttpRequest Request, out int Port)
+		public static StringBuilder GenerateServerUrl(HttpRequest Request, out int Port)
 		{
-			return this.GenerateServerUrl(Request.Encrypted, Request.Host, out Port);
+			return GenerateServerUrl(Request.Server, Request.Encrypted, Request.Host, out Port);
 		}
 
 		/// <summary>
@@ -106,36 +105,50 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="Host">Host used to access server.</param>
 		/// <param name="Port">Port used in server URL.</param>
 		/// <returns>Built URL</returns>
-		public StringBuilder GenerateServerUrl(bool Encrypted, string Host, out int Port)
+		public StringBuilder GenerateServerUrl(bool Encrypted, string? Host, out int Port)
 		{
+			return GenerateServerUrl(this.FirstServer, Encrypted, Host, out Port);
+		}
+
+		/// <summary>
+		/// Generates a server URL, based on the request.
+		/// </summary>
+		/// <param name="Server">HTTP Server hosting the resource.</param>
+		/// <param name="Encrypted">If access is encrypted.</param>
+		/// <param name="Host">Host used to access server.</param>
+		/// <param name="Port">Port used in server URL.</param>
+		/// <returns>Built URL</returns>
+		public static StringBuilder GenerateServerUrl(HttpServer Server, bool Encrypted, 
+			string? Host, out int Port)
+		{ 
 			StringBuilder sb = new StringBuilder();
 			bool DefaultPort;
 
 			sb.Append("http");
 			if (Encrypted)
 			{
-				int[]? Ports = this.FirstServer?.OpenHttpsPorts;
+				int[]? Ports = Server?.OpenHttpsPorts;
 
 				if ((Ports?.Length ?? 0) > 0)
 				{
 					sb.Append('s');
-					Port = GetPort(this.FirstServer?.OpenHttpsPorts, HttpServer.DefaultHttpsPort);
+					Port = GetPort(Server?.OpenHttpsPorts, HttpServer.DefaultHttpsPort);
 					DefaultPort = Port == HttpServer.DefaultHttpsPort;
 				}
 				else
 				{
-					Port = GetPort(this.FirstServer?.OpenHttpsPorts, HttpServer.DefaultHttpPort);
+					Port = GetPort(Server?.OpenHttpPorts, HttpServer.DefaultHttpPort);
 					DefaultPort = Port == HttpServer.DefaultHttpPort;
 				}
 			}
 			else
 			{
-				Port = GetPort(this.FirstServer?.OpenHttpsPorts, HttpServer.DefaultHttpPort);
+				Port = GetPort(Server?.OpenHttpPorts, HttpServer.DefaultHttpPort);
 				DefaultPort = Port == HttpServer.DefaultHttpPort;
 			}
 
 			sb.Append("://");
-			sb.Append(Host);
+			sb.Append(Host ?? "localhost");	// TODO: Public IP, if available, instead of localhost.
 
 			if (!DefaultPort)
 			{
@@ -161,9 +174,10 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="Domain">Domain used to access the resource.</param>
 		/// <param name="ResourceName">Name of the resource.</param>
 		/// <returns>Resource meta-data URI.</returns>
-		public string GetResourceMetaDataUri(bool Encrypted, string Domain, string ResourceName)
+		public string GetResourceMetaDataUri(bool Encrypted, string? Domain, string ResourceName)
 		{
 			StringBuilder sb = this.GenerateServerUrl(Encrypted, Domain, out _);
+			sb.Append(this.ResourceName);
 			sb.Append(ResourceName);
 			return sb.ToString();
 		}

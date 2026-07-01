@@ -21,14 +21,19 @@ namespace Waher.Networking.HTTP.JsonRpc
 	/// https://www.jsonrpc.org/specification
 	/// https://www.jsonrpc.org/historical/json-rpc-over-http.html
 	/// </summary>
-	public abstract class JsonRpcWebService : HttpAsynchronousResource, IHttpGetMethod, IHttpPostMethod
+	public abstract class JsonRpcWebService : HttpProtectedResource, IHttpGetMethod, IHttpPostMethod
 	{
 		private static readonly JsonCodec jsonCodec = new JsonCodec();
 
 		private readonly Dictionary<string, JsonRpcMethodInfo> methods;
 		private readonly bool userSessions;
 		private readonly bool caseSensitive;
-		private ResourceMetaDataResource? resourceMetaData = null;
+		private HttpAuthenticationScheme[]? authenticationSchemes = null;
+		private ProtectedResourceMetaData? resourceMetaData = null;
+		private ProtectedResourceMetaData? metaDataResource = null;
+		private string? domain = null;
+		private bool hasMetaDataResource = false;
+		private bool hasDomain = false;
 
 		/// <summary>
 		/// Abstract base class for Web Services based on JSON-RPC v2.0.
@@ -88,6 +93,12 @@ namespace Waher.Networking.HTTP.JsonRpc
 		}
 
 		/// <summary>
+		/// If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
+		/// (i.e. sends the response from another thread).
+		/// </summary>
+		public override bool Synchronous => false;
+
+		/// <summary>
 		/// If the GET method is allowed.
 		/// </summary>
 		public bool AllowsGET => true;
@@ -113,12 +124,39 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public virtual bool SupportsServerSentEvents => false;
 
 		/// <summary>
+		/// OAUTH resource meta-data resource, if any registered.
+		/// </summary>
+		public ProtectedResourceMetaData? MetaDataResource => this.metaDataResource;
+
+		/// <summary>
+		/// Domain name of the server, if any registered.
+		/// </summary>
+		public string? Domain => this.domain;
+
+		/// <summary>
+		/// If an OAUTH resource meta-data resource is registered on the server.
+		/// </summary>
+		public bool HasMetaDataResource => this.hasMetaDataResource;
+
+		/// <summary>
+		/// If a domain name is registered on the server.
+		/// </summary>
+		public bool HasDomain => this.hasDomain;
+
+		/// <summary>
+		/// Generic authentication schemes for the resource.
+		/// </summary>
+		public HttpAuthenticationScheme[]? AuthenticationSchemes => this.authenticationSchemes;
+
+		/// <summary>
 		/// Registers a method to be used in the JSON-RPC interface. 
 		/// </summary>
 		/// <param name="Method">Method to register.</param>
 		/// <param name="RequiredPrivileges">Required privileges for accessing the method.</param>
 		public void Register(MethodInfo Method, params string[]? RequiredPrivileges)
 		{
+			JsonRpcMethodInfo MethodInfo;
+
 			lock (this.methods)
 			{
 				string Name = Method.Name;
@@ -126,9 +164,12 @@ namespace Waher.Networking.HTTP.JsonRpc
 				if (this.methods.ContainsKey(Name))
 					throw new Exception("Method already registered: " + Name);
 
-				this.methods[Name] = new JsonRpcMethodInfo(Method, this.caseSensitive,
-					RequiredPrivileges);
+				this.methods[Name] = MethodInfo = new JsonRpcMethodInfo(Method, 
+					this.caseSensitive, RequiredPrivileges);
 			}
+
+			if (!(this.FirstServer is null))
+				this.AddAuthenticationMechanisms(MethodInfo);
 		}
 
 		/// <summary>
@@ -159,14 +200,14 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="Resource">The resource meta-data resource, if found.</param>
 		/// <returns>True if a resource meta-data resource is found, false otherwise.</returns>
 		public bool TryGetResourceMetaDataResource(HttpServer Server,
-			[NotNullWhen(true)] out ResourceMetaDataResource? Resource)
+			[NotNullWhen(true)] out ProtectedResourceMetaData? Resource)
 		{
 			if (this.resourceMetaData is null)
 			{
-				string s = ResourceMetaDataResource.WellKnowResourcePath;
+				string s = ProtectedResourceMetaData.WellKnowResourcePath;
 
 				if (Server.TryGetResource(ref s, out HttpResource HttpResource, out _) &&
-					HttpResource is ResourceMetaDataResource MetaDataResource)
+					HttpResource is ProtectedResourceMetaData MetaDataResource)
 				{
 					this.resourceMetaData = MetaDataResource;
 				}
@@ -184,29 +225,50 @@ namespace Waher.Networking.HTTP.JsonRpc
 		{
 			base.AddReference(Server);
 
-			bool HasMetaDataResource = this.TryGetResourceMetaDataResource(Server,
-				out ResourceMetaDataResource? MetaDataResource);
-			bool HasDomain = Types.TryGetModuleParameter("Domain", out string Domain);
+			this.hasMetaDataResource = this.TryGetResourceMetaDataResource(Server,
+				out this.metaDataResource);
+			this.hasDomain = Types.TryGetModuleParameter("Domain", out this.domain);
+
+			JsonRpcMethodInfo[] Methods;
+			int c;
 
 			lock (this.methods)
 			{
-				foreach (JsonRpcMethodInfo MethodInfo in this.methods.Values)
+				c = this.methods.Count;
+				Methods = new JsonRpcMethodInfo[c];
+				this.methods.Values.CopyTo(Methods, 0);
+			}
+
+			foreach (JsonRpcMethodInfo MethodInfo in Methods)
+				this.AddAuthenticationMechanisms(MethodInfo);
+
+			if (this.HasMetaDataResource)
+			{
+				string ResourceMetaData = this.metaDataResource!.GetResourceMetaDataUri(
+					this.hasDomain, this.domain, this.ResourceName);
+
+				this.authenticationSchemes = HttpModule.GetAuthenticationSchemes(
+					new Uri(ResourceMetaData));
+			}
+			else
+				this.authenticationSchemes = HttpModule.GetAuthenticationSchemes();
+		}
+
+		/// <summary>
+		/// Adds authentication mechanisms to a method, if required.
+		/// </summary>
+		/// <param name="Method">Method to add authentication mechanisms to.</param>
+		public void AddAuthenticationMechanisms(ProtectedMethod Method)
+		{
+			if (Method.RequiresAuthentication)
+			{
+				if (this.hasMetaDataResource && this.hasDomain)
 				{
-					if (MethodInfo.RequiresAuthentication)
-					{
-						if (HasMetaDataResource && HasDomain)
-						{
-							MethodInfo.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(
-								new Uri(MetaDataResource!.GetResourceMetaDataUri(true, Domain, this.ResourceName)),
-								MethodInfo.RequiredPrivileges);
-						}
-						else
-						{
-							MethodInfo.AuthenticationMechanisms = HttpModule.GetAuthenticationSchemes(
-								MethodInfo.RequiredPrivileges);
-						}
-					}
+					Method.UpdateAuthenticationMechanisms(
+						this.metaDataResource!.GetResourceMetaDataUri(true, this.domain, this.ResourceName));
 				}
+				else
+					Method.UpdateAuthenticationMechanisms();
 			}
 		}
 

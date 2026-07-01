@@ -28,7 +28,9 @@ using Waher.Script.Content;
 using Waher.Script.Graphs;
 using Waher.Security.JWS;
 using Waher.Security.JWT;
+using Waher.Security.Users;
 using Waher.Things;
+using Waher.Things.ControlParameters;
 using Waher.Things.Http;
 
 internal class Program
@@ -52,6 +54,7 @@ internal class Program
 	/// -deflate            Permit deflate encoding
 	/// -gzip               Permit gzip encoding
 	/// -br                 Permit br encoding
+	/// -lfn FILENAME       Ledger file name. Default: LedgerOutput.xml
 	/// 
 	/// Example:
 	/// Waher.Networking.HTTP.TestServer.exe -http 8081 -https 8088 -cert CERTIFICATE_FILENAME -deflate
@@ -102,6 +105,7 @@ internal class Program
 		string s;
 		string? CertFileName = null;
 		string? CertPassword = null;
+		string? LedgerFileName = null;
 		int HttpPort = 0;
 		int HttpsPort = 0;
 		int i = 0;
@@ -162,6 +166,16 @@ internal class Program
 						CertPassword = args[i++];
 						break;
 
+					case "-lfn":
+						if (i >= c)
+							throw new Exception("Missing Ledger file name.");
+
+						if (!string.IsNullOrEmpty(LedgerFileName))
+							throw new Exception("Ledger file name already defined.");
+
+						LedgerFileName = args[i++];
+						break;
+
 					case "-no7540prio":
 						No7540prio = true;
 						break;
@@ -200,6 +214,7 @@ internal class Program
 				ConsoleOut.WriteLine("-deflate             Permit deflate encoding");
 				ConsoleOut.WriteLine("-gzip                Permit gzip encoding");
 				ConsoleOut.WriteLine("-br                  Permit br encoding");
+				ConsoleOut.WriteLine("-lfn FILENAME       Ledger file name. Default: LedgerOutput.xml");
 				ConsoleOut.WriteLine("-?                   Help.");
 				return;
 			}
@@ -241,9 +256,12 @@ internal class Program
 				typeof(IThingReference).Assembly,
 				typeof(HttpModule).Assembly,
 				typeof(JwsAlgorithm).Assembly,
-				typeof(JwtToken).Assembly);
+				typeof(JwtToken).Assembly,
+				typeof(User).Assembly);
 
-			Types.SetModuleParameter("JWT", JwtFactory.CreateHmacSha256());
+			JwtFactory JwtFactory = JwtFactory.CreateHmacSha256();
+
+			Types.SetModuleParameter("JWT", JwtFactory);
 			Types.SetModuleParameter("Domain", "localhost");
 			Types.SetModuleParameter("Realm", "TestServer");
 
@@ -258,13 +276,26 @@ internal class Program
 
 			Log.Informational("Persistent Event Log initialized");
 
-			ledger = new XmlFileLedger(Console.Out);
+			if (string.IsNullOrEmpty(LedgerFileName))
+				LedgerFileName = "LedgerOutput.xml";
+
+			if (File.Exists(LedgerFileName))
+				File.Delete(LedgerFileName);
+
+			ledger = new XmlFileLedger(LedgerFileName);
 			await ledger.Start();
 
 			Ledger.Register(ledger);
 			Ledger.StartListeningToDatabaseEvents();
 
 			Log.Informational("Console Ledger initialized");
+
+			User TestUser = await Users.GetUser("Postman", true);
+			if (string.IsNullOrEmpty(TestUser.PasswordHash))
+			{
+				TestUser.PasswordHash = Convert.ToBase64String(Users.ComputeHash(TestUser.UserName, "Test"));
+				await Database.Update(TestUser);
+			}
 
 			Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.PadWithSpaces);
 
@@ -321,10 +352,15 @@ internal class Program
 				return Response.Write("body\r\n{\r\nbackground-color:yellow\r\n}");
 			}
 
+			OAuthAuthorizeResource AuthorizeResource;
+
 			WebServer.Register("/Hello", Hello, Hello);
 			WebServer.Register("/Hello.md", HelloMarkdown, HelloMarkdown);
 			WebServer.Register("/Hello.css", HelloStyles);
-			WebServer.Register(new ResourceMetaDataResource());
+			WebServer.Register(new ProtectedResourceMetaData());
+			WebServer.Register(AuthorizeResource = new OAuthAuthorizeResource());
+			WebServer.Register(new AuthorizationServerMetaData(AuthorizeResource));
+			WebServer.Register(new OAuthAccessTokenResource(JwtFactory));
 			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", "TestServer",
 				"Test Server", "1.0.0", "This is a test server.", [], 
 				new Uri("https://example.org/"), "These are the instructions."));

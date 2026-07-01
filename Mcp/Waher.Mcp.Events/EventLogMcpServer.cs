@@ -21,6 +21,7 @@ namespace Waher.Mcp.Events
 	/// MCP Server resource for the Event Log.
 	/// </summary>
 	[OAuthResourceName("Event Log MCP Server")]
+	[OAuthScopesSupported("mcp:eventlog")]
 	public class EventLogMcpServer : HttpMcpServerResource
 	{
 		public const string BasePrivilege = "MCP.Events";

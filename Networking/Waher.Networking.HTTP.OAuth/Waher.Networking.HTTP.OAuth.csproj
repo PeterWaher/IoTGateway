@@ -32,6 +32,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.JWS\Waher.Security.JWS.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.JWT\Waher.Security.JWT.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.Users\Waher.Security.Users.csproj" />

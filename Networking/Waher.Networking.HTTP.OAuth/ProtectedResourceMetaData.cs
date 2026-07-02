@@ -75,7 +75,7 @@ namespace Waher.Networking.HTTP.OAuth
 			{
 				{ "resource", ResourceUrl },
 				{ "authorization_servers", new string[] { ServerUrl } },
-				{ "bearer_methods_supported", new string[] { "header" } },
+				{ "bearer_methods_supported", new string[] { "header", "body" } },
 				{ "tls_client_certificate_bound_access_tokens", ClientCertificatesConfig != ClientCertificates.NotUsed }
 			};
 

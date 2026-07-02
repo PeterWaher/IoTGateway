@@ -55,7 +55,9 @@ namespace Waher.Networking.HTTP.OAuth
 
 			sb.Append(this.authorizeResource.ResourceName);
 			string AuthorizeUri = sb.ToString();
-			string TokenUri = ServerUrl + "/oauth/token"; // TODO
+			string TokenUri = ServerUrl + "/oauth/token";
+
+			// TODO: Dynamic Client Registration resource
 
 			Dictionary<string, object> MetaData = new Dictionary<string, object>()
 			{
@@ -65,12 +67,20 @@ namespace Waher.Networking.HTTP.OAuth
 				{ "scopes_supported", OAuthScopesSupportedAttribute.RegisteredScopes },
 				{ "token_endpoint_auth_methods_supported", new string[]	// TODO: Dynamic
 					{
-						"client_secret_basic"	// TODO
+						"client_secret_basic"
 					} 
 				},
 				{ "token_endpoint_auth_signing_alg_values_supported", JwsAlgorithm.GetAlgorithmNames() },
-				{ "response_types_supported", new string[] { "code" } },
-				{ "grant_types_supported", new string[] { "client_credentials", "password" } }
+				{ "response_types_supported", new string[] { "code", "token" } },
+				{ "code_challenge_methods_supported", new string[] { "plain", "S256" } },
+				{ "grant_types_supported", new string[] 
+					{ 
+						"authorization_code", 
+						"implicit", 
+						"client_credentials", 
+						"password" 
+					} 
+				}
 			};
 
 			await Response.Return(MetaData);

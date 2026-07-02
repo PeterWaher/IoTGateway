@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Waher.Content;
+using Waher.Content.Html;
 using Waher.Content.Images;
 using Waher.Content.Markdown;
 using Waher.Content.Markdown.Web;
@@ -243,6 +244,7 @@ internal class Program
 				typeof(ImageCodec).Assembly,
 				typeof(Expression).Assembly,
 				typeof(MarkdownDocument).Assembly,
+				typeof(HtmlDocument).Assembly,
 				typeof(MarkdownToHtmlConverter).Assembly,
 				typeof(Graph).Assembly,
 				typeof(GraphEncoder).Assembly,
@@ -352,15 +354,18 @@ internal class Program
 				return Response.Write("body\r\n{\r\nbackground-color:yellow\r\n}");
 			}
 
+			new BrotliContentEncoding().ConfigureSupport(false, false);	// Do not use Brotli
+
+			OAuthTokenResource TokenResource;
 			OAuthAuthorizeResource AuthorizeResource;
 
 			WebServer.Register("/Hello", Hello, Hello);
 			WebServer.Register("/Hello.md", HelloMarkdown, HelloMarkdown);
 			WebServer.Register("/Hello.css", HelloStyles);
 			WebServer.Register(new ProtectedResourceMetaData());
-			WebServer.Register(AuthorizeResource = new OAuthAuthorizeResource());
+			WebServer.Register(TokenResource = new OAuthTokenResource(JwtFactory));
+			WebServer.Register(AuthorizeResource = new OAuthAuthorizeResource(TokenResource, JwtFactory));
 			WebServer.Register(new AuthorizationServerMetaData(AuthorizeResource));
-			WebServer.Register(new OAuthAccessTokenResource(JwtFactory));
 			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", "TestServer",
 				"Test Server", "1.0.0", "This is a test server.", [], 
 				new Uri("https://example.org/"), "These are the instructions."));

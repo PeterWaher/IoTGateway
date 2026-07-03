@@ -10,6 +10,7 @@ using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
 using Waher.Security;
 using Waher.Security.JWT;
+using Waher.Security.LoginMonitor;
 using Waher.Security.Users;
 
 namespace Waher.Networking.HTTP.OAuth
@@ -20,16 +21,23 @@ namespace Waher.Networking.HTTP.OAuth
 	public class OAuthTokenResource : HttpSynchronousResource,
 		IHttpGetMethod, IHttpPostMethod
 	{
+		/// <summary>
+		/// Default token resource path: /oauth/token
+		/// </summary>
+		public const string DefaultTokenResourcePath = "/oauth/token";
+
 		private static readonly Cache<string, TokenRef> tokenCache = new Cache<string, TokenRef>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+		private readonly IUserSource userSource;
 		private HttpAuthenticationScheme[]? authenticationSchemes = null;
 		private JwtFactory? jwtFactory;
+		private string? realm;
 
 		/// <summary>
 		/// OAUTH token resource.
 		/// </summary>
 		public OAuthTokenResource()
-			: this(null, "/oauth/token")
+			: this(null, null, DefaultTokenResourcePath)
 		{
 		}
 
@@ -38,7 +46,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// </summary>
 		/// <param name="JwtFactory">JWT Factory</param>
 		public OAuthTokenResource(JwtFactory? JwtFactory)
-			: this(JwtFactory, "/oauth/token")
+			: this(null, JwtFactory, DefaultTokenResourcePath)
 		{
 		}
 
@@ -47,7 +55,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// </summary>
 		/// <param name="ResourceName">Resource name.</param>
 		public OAuthTokenResource(string ResourceName)
-			: this(null, ResourceName)
+			: this(null, null, ResourceName)
 		{
 		}
 
@@ -57,9 +65,51 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="JwtFactory">JWT Factory</param>
 		/// <param name="ResourceName">Resource name.</param>
 		public OAuthTokenResource(JwtFactory? JwtFactory, string ResourceName)
+			: this(null, JwtFactory, ResourceName)
+		{
+		}
+
+		/// <summary>
+		/// OAUTH token resource.
+		/// </summary>
+		/// <param name="UserSource">Users data source.</param>
+		public OAuthTokenResource(IUserSource? UserSource)
+			: this(UserSource, null, DefaultTokenResourcePath)
+		{
+		}
+
+		/// <summary>
+		/// OAUTH token resource.
+		/// </summary>
+		/// <param name="UserSource">Users data source.</param>
+		/// <param name="JwtFactory">JWT Factory</param>
+		public OAuthTokenResource(IUserSource? UserSource, JwtFactory? JwtFactory)
+			: this(UserSource, JwtFactory, DefaultTokenResourcePath)
+		{
+		}
+
+		/// <summary>
+		/// OAUTH token resource.
+		/// </summary>
+		/// <param name="UserSource">Users data source.</param>
+		/// <param name="ResourceName">Resource name.</param>
+		public OAuthTokenResource(IUserSource? UserSource, string ResourceName)
+			: this(UserSource, null, ResourceName)
+		{
+		}
+
+		/// <summary>
+		/// OAUTH token resource.
+		/// </summary>
+		/// <param name="UserSource">Users data source.</param>
+		/// <param name="JwtFactory">JWT Factory</param>
+		/// <param name="ResourceName">Resource name.</param>
+		public OAuthTokenResource(IUserSource? UserSource, JwtFactory? JwtFactory,
+			string ResourceName)
 			: base(ResourceName)
 		{
 			this.jwtFactory = JwtFactory;
+			this.userSource = UserSource ?? Security.Users.Users.Source;
 		}
 
 		/// <summary>
@@ -81,6 +131,11 @@ namespace Waher.Networking.HTTP.OAuth
 		/// If the POST method is allowed.
 		/// </summary>
 		public bool AllowsPOST => true;
+
+		/// <summary>
+		/// Data source for users, used to authenticate clients.
+		/// </summary>
+		public IUserSource Users => this.userSource;
 
 		internal async Task<string> GenerateTokenCode(IUserWithClaims User, bool Encrypted,
 			string CodeChallenge, string CodeChallengeMethod)
@@ -218,22 +273,14 @@ namespace Waher.Networking.HTTP.OAuth
 			if (Request.Header.Authorization is null)
 				return null;
 
-			this.authenticationSchemes ??= CreateAuthenticationSchemes(this.jwtFactory);
+			this.authenticationSchemes ??= CreateAuthenticationSchemes(this.jwtFactory, this.userSource);
 
 			return this.authenticationSchemes;
 		}
 
-		internal static HttpAuthenticationScheme[] CreateAuthenticationSchemes(
-			JwtFactory? JwtFactory)
+		internal static void GetDomainParameters(out string? Domain, out int MinStrength,
+			out bool Encrypted)
 		{
-			// Note: Restricted set of authentication schemes, as compared to
-			// HttpModule.GetAuthenticationSchemes().
-
-			List<HttpAuthenticationScheme> Schemes = new List<HttpAuthenticationScheme>();
-			string? Domain;
-			int MinStrength;
-			bool Encrypted;
-
 			if (!Types.TryGetModuleParameter("X509", out object Obj) ||
 				!(Obj is X509Certificate Certificate))
 			{
@@ -254,22 +301,33 @@ namespace Waher.Networking.HTTP.OAuth
 				Domain = BinaryTcpClient.GetDomainFromSubject(Certificate.Subject);
 				MinStrength = 128;
 			}
+		}
+
+		internal static HttpAuthenticationScheme[] CreateAuthenticationSchemes(
+			JwtFactory? JwtFactory, IUserSource Users)
+		{
+			// Note: Restricted set of authentication schemes, as compared to
+			// HttpModule.GetAuthenticationSchemes().
+
+			List<HttpAuthenticationScheme> Schemes = new List<HttpAuthenticationScheme>();
+
+			GetDomainParameters(out string? Domain, out int MinStrength, out bool Encrypted);
 
 			if (!(JwtFactory is null))
 			{
-				Schemes.Add(new JwtAuthentication(Encrypted, MinStrength, Domain, null,
+				Schemes.Add(new JwtAuthentication(Encrypted, MinStrength, Domain, Users,
 					JwtFactory));
 			}
 
 			HttpServer Server = Types.TryGetModuleParameter<HttpServer>("HTTP");
 
 			if (!(Server is null) && Server.ClientCertificates != ClientCertificates.NotUsed)
-				Schemes.Add(new MutualTlsAuthentication(Users.Source));
+				Schemes.Add(new MutualTlsAuthentication(Users));
 
-			Schemes.Add(new BasicAuthentication(Encrypted, MinStrength, Domain, Users.Source));
-			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.MD5, Domain, Users.Source));
-			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.SHA256, Domain, Users.Source));
-			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.SHA3_256, Domain, Users.Source));
+			Schemes.Add(new BasicAuthentication(Encrypted, MinStrength, Domain, Users));
+			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.MD5, Domain, Users));
+			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.SHA256, Domain, Users));
+			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.SHA3_256, Domain, Users));
 
 			if (!(Server is null))
 				Schemes.Add(new SessionAuthentication(Server));
@@ -365,14 +423,18 @@ namespace Waher.Networking.HTTP.OAuth
 							return;
 						}
 
-						string Nonce = Guid.NewGuid().ToString();
-						byte[] PasswordHash = Users.ComputeHash(ClientId, ClientSecret);
-						string PasswordNonceHash = Convert.ToBase64String(
-							Hashes.ComputeHMACSHA256Hash(Encoding.UTF8.GetBytes(Nonce),
-							PasswordHash));
+						if (string.IsNullOrEmpty(this.realm))
+							GetDomainParameters(out this.realm, out _, out _);
 
-						LoginResult LoginResult = await Users.Login(ClientId, PasswordNonceHash,
-							Nonce, Request.RemoteEndPoint, "OAuth2");
+						LoginResult? LoginResult = await DoLogin(ClientId, ClientSecret,
+							this.userSource, Request, this.realm ?? string.Empty);
+
+						if (LoginResult is null)
+						{
+							await Response.SendResponse(new ForbiddenException(
+								"User cannot authenticate via this interface."));
+							return;
+						}
 
 						switch (LoginResult.Type)
 						{
@@ -426,6 +488,72 @@ namespace Waher.Networking.HTTP.OAuth
 			}
 
 			await Response.Return(TokenResponse(Token));
+		}
+
+		internal static async Task<LoginResult?> DoLogin(string UserName, string Password,
+			IUserSource Users, HttpRequest Request, string Realm)
+		{
+			if (string.IsNullOrEmpty(Password))
+				return new LoginResult();
+
+			if (!(Request.Server.LoginAuditor is null))
+			{
+				DateTime? Next = await Request.Server.LoginAuditor.GetEarliestLoginOpportunity(
+					Request.RemoteEndPoint, "OAUTH");
+
+				if (Next.HasValue)
+					return new LoginResult(Next.Value);
+			}
+
+			IUser User = await Users.TryGetUser(UserName);
+			if (User is null)
+			{
+				LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Request.RemoteEndPoint, "OAUTH",
+					new KeyValuePair<string, object>("UserName", UserName));
+				return new LoginResult(User);
+			}
+
+			string ExpectedHash = User.PasswordHash;
+
+			switch (User.PasswordHashType)
+			{
+				case "":
+					break;
+
+				case "Internal":
+					Password = DigestAuthentication.ToHex(Hashes.ComputeSHA256Hash(Encoding.UTF8.GetBytes(UserName + ":" + Password)));
+					ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 32);
+					break;
+
+				case "DIGEST-MD5":
+					Password = DigestAuthentication.ToHex(DigestAuthentication.H_MD5(UserName + ":" + Realm + ":" + Password));
+					ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 16);
+					break;
+
+				case "DIGEST-SHA-256":
+					Password = DigestAuthentication.ToHex(DigestAuthentication.H_SHA256(UserName + ":" + Realm + ":" + Password));
+					ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 32);
+					break;
+
+				case "DIGEST-SHA3-256":
+					Password = DigestAuthentication.ToHex(DigestAuthentication.H_SHA3_256(UserName + ":" + Realm + ":" + Password));
+					ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 32);
+					break;
+
+				default:
+					return null;
+			}
+
+			if (Password == ExpectedHash)
+			{
+				LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
+				return new LoginResult(User);
+			}
+			else
+			{
+				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
+				return new LoginResult((IUser?)null);
+			}
 		}
 
 		internal static Dictionary<string, object> TokenResponse(string Token)

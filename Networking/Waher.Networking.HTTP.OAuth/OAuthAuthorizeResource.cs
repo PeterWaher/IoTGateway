@@ -23,8 +23,10 @@ namespace Waher.Networking.HTTP.OAuth
 		IHttpGetMethod, IHttpPostMethod
 	{
 		private readonly OAuthTokenResource tokenResource;
+		private readonly IUserSource userSource;
 		private HttpAuthenticationScheme[]? authenticationSchemes = null;
 		private JwtFactory? jwtFactory;
+		private string? realm;
 
 		/// <summary>
 		/// OAUTH authorize resource.
@@ -57,6 +59,7 @@ namespace Waher.Networking.HTTP.OAuth
 		{
 			this.tokenResource = TokenResource;
 			this.jwtFactory = JwtFactory;
+			this.userSource = TokenResource.Users;
 		}
 
 		/// <summary>
@@ -101,7 +104,8 @@ namespace Waher.Networking.HTTP.OAuth
 			if (Request.Header.Authorization is null)
 				return null;
 
-			this.authenticationSchemes ??= OAuthTokenResource.CreateAuthenticationSchemes(this.jwtFactory);
+			this.authenticationSchemes ??= OAuthTokenResource.CreateAuthenticationSchemes(
+				this.jwtFactory, this.userSource);
 
 			return this.authenticationSchemes;
 		}
@@ -164,7 +168,8 @@ namespace Waher.Networking.HTTP.OAuth
 						return;
 					}
 
-					this.authenticationSchemes ??= OAuthTokenResource.CreateAuthenticationSchemes(this.jwtFactory);
+					this.authenticationSchemes ??= OAuthTokenResource.CreateAuthenticationSchemes(
+						this.jwtFactory, this.userSource);
 
 					if ((this.authenticationSchemes?.Length ?? 0) == 0)
 						await Response.SendResponse(new ForbiddenException());
@@ -306,14 +311,18 @@ namespace Waher.Networking.HTTP.OAuth
 				return;
 			}
 
-			string Nonce = Guid.NewGuid().ToString();
-			byte[] PasswordHash = Users.ComputeHash(UserName, Password);
-			string PasswordNonceHash = Convert.ToBase64String(
-				Hashes.ComputeHMACSHA256Hash(Encoding.UTF8.GetBytes(Nonce),
-				PasswordHash));
+			if (string.IsNullOrEmpty(this.realm))
+				OAuthTokenResource.GetDomainParameters(out this.realm, out _, out _);
 
-			LoginResult LoginResult = await Users.Login(UserName, PasswordNonceHash,
-				Nonce, Request.RemoteEndPoint, "OAuth2");
+			LoginResult? LoginResult = await OAuthTokenResource.DoLogin(UserName, Password,
+				this.userSource, Request, this.realm ?? string.Empty);
+
+			if (LoginResult is null)
+			{
+				await Response.SendResponse(new ForbiddenException(
+					"User cannot authenticate via this interface."));
+				return;
+			}
 
 			switch (LoginResult.Type)
 			{

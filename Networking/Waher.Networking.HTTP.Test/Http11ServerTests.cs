@@ -3,7 +3,10 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Html;
 using Waher.Networking.HTTP.Brotli;
+using Waher.Security.JWS;
+using Waher.Security.JWT;
 
 namespace Waher.Networking.HTTP.Test
 {
@@ -19,7 +22,10 @@ namespace Waher.Networking.HTTP.Test
 				typeof(HttpServerTests).Assembly,
 				typeof(Script.Expression).Assembly,
 				typeof(Content.Images.ImageCodec).Assembly,
-				typeof(CommonTypes).Assembly);
+				typeof(InternetContent).Assembly,
+				typeof(HtmlDocument).Assembly,
+				typeof(IJwsAlgorithm).Assembly,
+				typeof(JwtToken).Assembly);
 		}
 
 		[TestCleanup]

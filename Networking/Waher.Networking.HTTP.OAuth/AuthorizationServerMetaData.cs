@@ -11,7 +11,7 @@ namespace Waher.Networking.HTTP.OAuth
 	/// </summary>
 	public class AuthorizationServerMetaData : HttpSynchronousResource, IHttpGetMethod
 	{
-		private OAuthAuthorizeResource authorizeResource;
+		private readonly OAuthAuthorizeResource authorizeResource;
 
 		/// <summary>
 		/// /.well-known
@@ -50,7 +50,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
-			StringBuilder sb = ProtectedResourceMetaData.GenerateServerUrl(Request, out int Port);
+			StringBuilder sb = ProtectedResourceMetaData.GenerateServerUrl(Request, out _);
 			string ServerUrl = sb.ToString();
 
 			sb.Append(this.authorizeResource.ResourceName);

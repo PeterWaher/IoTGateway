@@ -1,8 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.HTTP.OAuth;
@@ -15,6 +19,13 @@ namespace Waher.Networking.HTTP.Test
 	[TestClass]
 	public class OAuthTests : IUserSource
 	{
+		private const string BaseUrl = "http://localhost:8081";
+		private const string CallbackResource = "/Callback";
+		private const string ProtectedResource = "/Hello";
+		private const string TestUserName = "User";
+		private const string TestPassword = "Password";
+		private const string TestClientId = "UnitTestClient";
+
 		private HttpServer server;
 		private ConsoleEventSink sink = null;
 		private XmlFileSniffer xmlSniffer = null;
@@ -43,23 +54,42 @@ namespace Waher.Networking.HTTP.Test
 				int.MaxValue, BinaryPresentationMethod.ByteCount);
 
 			this.jwtFactory = JwtFactory.CreateHmacSha256();
-			this.server = new HttpServer(8081);
+			this.server = new HttpServer(8081, this.xmlSniffer);
 
 			OAuthTokenResource TokenResource;
 			OAuthAuthorizeResource AuthorizeResource;
 			JwtAuthentication JwtAuthentication = new("Test", this, this.jwtFactory,
-				new Uri("http://localhost:8081" + ProtectedResourceMetaData.WellKnowResourcePath));
+				new Uri(BaseUrl + ProtectedResourceMetaData.WellKnowResourcePath));
 
 			this.server.Register(new ProtectedResourceMetaData());
-			this.server.Register(TokenResource = new OAuthTokenResource(this.jwtFactory));
+			this.server.Register(TokenResource = new OAuthTokenResource(this, this.jwtFactory));
 			this.server.Register(AuthorizeResource = new OAuthAuthorizeResource(TokenResource, this.jwtFactory));
 			this.server.Register(new AuthorizationServerMetaData(AuthorizeResource));
 
-			this.server.Register("/Hello", this.Hello, 
-				new JwtAuthentication("Test", this, this.jwtFactory));
+			this.server.Register(CallbackResource, Callback);
+			this.server.Register(ProtectedResource, Hello, JwtAuthentication);
 		}
 
-		private async Task Hello(HttpRequest Request, HttpResponse Response)
+		private static async Task Callback(HttpRequest Request, HttpResponse Response)
+		{
+			if (!Request.Header.TryGetQueryParameter("code", out string Code) ||
+				string.IsNullOrEmpty(Code))
+			{
+				await Response.SendResponse(new BadRequestException("Missing code."));
+				return;
+			}
+
+			if (!Request.Header.TryGetQueryParameter("state", out string State))
+				State = string.Empty;
+
+			await Response.Return(new Dictionary<string, object>()
+			{
+				{ "code", Code },
+				{ "state", State }
+			});
+		}
+
+		private static async Task Hello(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.User is null)
 			{
@@ -97,6 +127,12 @@ namespace Waher.Networking.HTTP.Test
 				await this.sink.DisposeAsync();
 				this.sink = null;
 			}
+
+			if (this.jwtFactory is not null)
+			{
+				this.jwtFactory.Dispose();
+				this.jwtFactory = null;
+			}
 		}
 
 		public Task<IUser> TryGetUser(string UserName)
@@ -107,10 +143,297 @@ namespace Waher.Networking.HTTP.Test
 				return Task.FromResult<IUser>(null);
 		}
 
+
 		[TestMethod]
-		public async Task Test_01_()
+		public async Task Test_01_Metadata_Discovery()
 		{
+			ContentResponse MetaDataResponse = await InternetContent.GetAsync(
+				new Uri(BaseUrl + ProtectedResourceMetaData.WellKnowResourcePath + ProtectedResource));
+			MetaDataResponse.AssertOk();
+
+			object MetaData = MetaDataResponse.Decoded;
+			Assert.AreEqual(BaseUrl + ProtectedResource, Required<string>(MetaData, "resource"));
+			Assert.Contains(BaseUrl, Required<object[]>(MetaData, "authorization_servers"));
+			Assert.Contains("header", Required<object[]>(MetaData, "bearer_methods_supported"));
+
+			ContentResponse ServerMetaDataResponse = await InternetContent.GetAsync(
+				new Uri(BaseUrl + AuthorizationServerMetaData.WellKnowResourcePath));
+			ServerMetaDataResponse.AssertOk();
+
+			object ServerMetaData = ServerMetaDataResponse.Decoded;
+			Assert.AreEqual(BaseUrl, Required<string>(ServerMetaData, "issuer"));
+			Assert.AreEqual(BaseUrl + "/oauth/authorize", Required<string>(ServerMetaData, "authorization_endpoint"));
+			Assert.AreEqual(BaseUrl + "/oauth/token", Required<string>(ServerMetaData, "token_endpoint"));
+			Assert.Contains("code", Required<object[]>(ServerMetaData, "response_types_supported"));
+			Assert.Contains("authorization_code", Required<object[]>(ServerMetaData, "grant_types_supported"));
+			Assert.Contains("S256", Required<object[]>(ServerMetaData, "code_challenge_methods_supported"));
 		}
 
+		[TestMethod]
+		public async Task Test_02_AuthorizationCodeWithPkce()
+		{
+			string AccessToken = await GetAccessTokenWithAuthorizationCode();
+
+			ContentResponse HelloResponse = await InternetContent.GetAsync(
+				new Uri(BaseUrl + ProtectedResource),
+				new KeyValuePair<string, string>("Authorization", "Bearer " + AccessToken));
+
+			HelloResponse.AssertOk();
+			Assert.AreEqual("Hello " + TestUserName + "." + Environment.NewLine, HelloResponse.Decoded);
+		}
+
+		[TestMethod]
+		public async Task Test_03_HelloWithoutBearerToken_ReturnsUnauthorizedChallenge()
+		{
+			ContentResponse Response = await InternetContent.GetAsync(new Uri(BaseUrl + ProtectedResource));
+			UnauthorizedException Error = AssertException<UnauthorizedException>(Response);
+			bool FoundChallenge = false;
+
+			foreach (KeyValuePair<string, string> Header in Error.HeaderFields)
+			{
+				if (Header.Key == "WWW-Authenticate")
+				{
+					FoundChallenge = true;
+					Assert.Contains(Header.Value, "Bearer");
+					Assert.Contains(Header.Value, "resource_metadata=\"" + BaseUrl + ProtectedResourceMetaData.WellKnowResourcePath + ProtectedResource + "\"");
+				}
+			}
+
+			Assert.IsTrue(FoundChallenge);
+		}
+
+		[TestMethod]
+		public async Task Test_04_HelloWithInvalidBearerToken_ReturnsUnauthorized()
+		{
+			ContentResponse Response = await InternetContent.GetAsync(
+				new Uri(BaseUrl + ProtectedResource),
+				new KeyValuePair<string, string>("Authorization", "Bearer this-is-not-a-jwt"));
+
+			AssertException<UnauthorizedException>(Response);
+		}
+
+		[TestMethod]
+		public async Task Test_05_TokenEndpointWithInvalidAuthorizationCode_ReturnsForbidden()
+		{
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + "/oauth/token"),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "authorization_code" },
+					{ "code", "invalid-code" },
+					{ "code_verifier", "not-used" }
+				});
+
+			ForbiddenException Error = AssertException<ForbiddenException>(Response);
+			Assert.Contains(Error.Message, "Invalid code");
+		}
+
+		[TestMethod]
+		public async Task Test_06_TokenEndpointMissingPkceVerifier_ReturnsBadRequest()
+		{
+			string CodeVerifier = CreatePkceCodeVerifier();
+			string CodeChallenge = CreateS256CodeChallenge(CodeVerifier);
+			string Code = await GetAuthorizationCode(CodeChallenge, "S256");
+
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + "/oauth/token"),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "authorization_code" },
+					{ "code", Code }
+				});
+
+			BadRequestException Error = AssertException<BadRequestException>(Response);
+			Assert.Contains(Error.Message, "Missing code_verifier");
+		}
+
+		[TestMethod]
+		public async Task Test_07_TokenEndpointWrongPkceVerifier_ReturnsForbidden()
+		{
+			string CodeVerifier = CreatePkceCodeVerifier();
+			string CodeChallenge = CreateS256CodeChallenge(CodeVerifier);
+			string Code = await GetAuthorizationCode(CodeChallenge, "S256");
+
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + "/oauth/token"),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "authorization_code" },
+					{ "code", Code },
+					{ "code_verifier", CreatePkceCodeVerifier() }
+				});
+
+			ForbiddenException Error = AssertException<ForbiddenException>(Response);
+			Assert.Contains(Error.Message, "Invalid code_verifier");
+		}
+
+		[TestMethod]
+		public async Task Test_08_TokenEndpointReusedAuthorizationCode_ReturnsForbidden()
+		{
+			string CodeVerifier = CreatePkceCodeVerifier();
+			string CodeChallenge = CreateS256CodeChallenge(CodeVerifier);
+			string Code = await GetAuthorizationCode(CodeChallenge, "S256");
+
+			ContentResponse FirstResponse = await InternetContent.PostAsync(
+				new Uri(BaseUrl + "/oauth/token"),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "authorization_code" },
+					{ "code", Code },
+					{ "code_verifier", CodeVerifier }
+				});
+			FirstResponse.AssertOk();
+
+			ContentResponse SecondResponse = await InternetContent.PostAsync(
+				new Uri(BaseUrl + "/oauth/token"),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "authorization_code" },
+					{ "code", Code },
+					{ "code_verifier", CodeVerifier }
+				});
+
+			Assert.IsTrue(SecondResponse.HasError);
+			Assert.IsTrue(SecondResponse.Error is ForbiddenException);
+			Assert.Contains(SecondResponse.Error.Message, "Invalid code");
+		}
+
+		[TestMethod]
+		public async Task Test_09_AuthorizeEndpointInvalidLogin_ReturnsLoginFormWithError()
+		{
+			string CodeVerifier = CreatePkceCodeVerifier();
+			string CodeChallenge = CreateS256CodeChallenge(CodeVerifier);
+			string State = Guid.NewGuid().ToString("N");
+
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + "/oauth/authorize"),
+				new Dictionary<string, string>()
+				{
+					{ "UserName", TestUserName },
+					{ "Password", "wrong-password" },
+					{ "From", BaseUrl + CallbackResource },
+					{ "State", State },
+					{ "CodeChallenge", CodeChallenge },
+					{ "CodeChallengeMethod", "S256" }
+				});
+
+			Response.AssertOk();
+			string Body = Encoding.UTF8.GetString(Response.Encoded);
+			Assert.Contains(Body, "Invalid user name or password");
+		}
+
+		private static T AssertException<T>(ContentResponse Response)
+			where T : Exception
+		{
+			Assert.IsTrue(Response.HasError);
+			Assert.IsTrue(Response.Error is T);
+			return (T)Response.Error;
+		}
+
+		private static async Task<string> GetAccessTokenWithAuthorizationCode()
+		{
+			string CodeVerifier = CreatePkceCodeVerifier();
+			string CodeChallenge = CreateS256CodeChallenge(CodeVerifier);
+			string Code = await GetAuthorizationCode(CodeChallenge, "S256");
+
+			ContentResponse TokenResponse = await InternetContent.PostAsync(
+				new Uri(BaseUrl + "/oauth/token"),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "authorization_code" },
+					{ "code", Code },
+					{ "client_id", TestClientId },
+					{ "code_verifier", CodeVerifier }
+				});
+
+			TokenResponse.AssertOk();
+			object Parsed = JSON.Parse(Encoding.UTF8.GetString(TokenResponse.Encoded));
+			Assert.AreEqual("Bearer", Required<string>(Parsed, "token_type"));
+
+			string AccessToken = Required<string>(Parsed, "access_token");
+			Assert.IsFalse(string.IsNullOrEmpty(AccessToken));
+
+			return AccessToken;
+		}
+
+		private static async Task<string> GetAuthorizationCode(string CodeChallenge, string CodeChallengeMethod)
+		{
+			string State = Guid.NewGuid().ToString();
+			string RedirectUri = BaseUrl + CallbackResource;
+			string AuthorizeUri = BaseUrl + "/oauth/authorize" +
+				"?response_type=code" +
+				"&client_id=" + Uri.EscapeDataString(TestClientId) +
+				"&state=" + Uri.EscapeDataString(State) +
+				"&redirect_uri=" + Uri.EscapeDataString(RedirectUri) +
+				"&code_challenge=" + Uri.EscapeDataString(CodeChallenge) +
+				"&code_challenge_method=" + Uri.EscapeDataString(CodeChallengeMethod);
+
+			ContentResponse LoginForm = await InternetContent.GetAsync(new Uri(AuthorizeUri));
+			LoginForm.AssertOk();
+
+			ContentResponse LoginResponse = await InternetContent.PostAsync(
+				new Uri(BaseUrl + "/oauth/authorize"),
+				new Dictionary<string, string>()
+				{
+					{ "UserName", TestUserName },
+					{ "Password", TestPassword },
+					{ "From", RedirectUri },
+					{ "State", State },
+					{ "CodeChallenge", CodeChallenge },
+					{ "CodeChallengeMethod", CodeChallengeMethod }
+				});
+
+			LoginResponse.AssertOk();
+
+			Dictionary<string, object> CallbackValues = LoginResponse.Decoded as Dictionary<string, object>;
+			Assert.IsNotNull(CallbackValues);
+
+			Assert.IsTrue(CallbackValues.TryGetValue("state", out object ReturnedState), "Callback response did not contain state.");
+			Assert.AreEqual(State, ReturnedState);
+			Assert.IsTrue(CallbackValues.TryGetValue("code", out object Code), "Callback response did not contain code.");
+			string s = Code as string;
+			Assert.IsFalse(string.IsNullOrEmpty(s));
+
+			return s;
+		}
+
+		private static string CreatePkceCodeVerifier()
+		{
+			byte[] RandomBytes = new byte[32];
+			using RandomNumberGenerator Rnd = RandomNumberGenerator.Create();
+			Rnd.GetBytes(RandomBytes);
+			return Base64Url.Encode(RandomBytes);
+		}
+
+		private static string CreateS256CodeChallenge(string CodeVerifier)
+		{
+			return Base64Url.Encode(Hashes.ComputeSHA256Hash(Encoding.UTF8.GetBytes(CodeVerifier)));
+		}
+
+		private static T Required<T>(object Dictionary, string Key)
+		{
+			object Result;
+
+			if (Dictionary is IDictionary<string, object> Typed &&
+				Typed.TryGetValue(Key, out object GenericValue))
+			{
+				Result = GenericValue;
+			}
+			else if (Dictionary is IDictionary Untyped && Untyped.Contains(Key))
+				Result = Untyped[Key];
+			else
+				throw new Exception("Expected JSON object to contain key: " + Key);
+
+			if (Result is null)
+				throw new Exception("Property value is null: " + Key);
+
+			if (Result is not T TypedResult)
+			{
+				throw new Exception("Property value not of expected type: " + Key +
+					" (" + Result.GetType().FullName + ")");
+			}
+
+			return TypedResult;
+		}
 	}
 }

@@ -24,7 +24,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <summary>
 		/// Default token resource path: /oauth/token
 		/// </summary>
-		public const string DefaultTokenResourcePath = "/oauth/token";
+		public const string DefaultResourcePath = "/oauth/token";
 
 		private static readonly Cache<string, TokenRef> tokenCache = new Cache<string, TokenRef>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
@@ -37,7 +37,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// OAUTH token resource.
 		/// </summary>
 		public OAuthTokenResource()
-			: this(null, null, DefaultTokenResourcePath)
+			: this(null, null, DefaultResourcePath)
 		{
 		}
 
@@ -46,7 +46,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// </summary>
 		/// <param name="JwtFactory">JWT Factory</param>
 		public OAuthTokenResource(JwtFactory? JwtFactory)
-			: this(null, JwtFactory, DefaultTokenResourcePath)
+			: this(null, JwtFactory, DefaultResourcePath)
 		{
 		}
 
@@ -74,7 +74,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// </summary>
 		/// <param name="UserSource">Users data source.</param>
 		public OAuthTokenResource(IUserSource? UserSource)
-			: this(UserSource, null, DefaultTokenResourcePath)
+			: this(UserSource, null, DefaultResourcePath)
 		{
 		}
 
@@ -84,7 +84,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="UserSource">Users data source.</param>
 		/// <param name="JwtFactory">JWT Factory</param>
 		public OAuthTokenResource(IUserSource? UserSource, JwtFactory? JwtFactory)
-			: this(UserSource, JwtFactory, DefaultTokenResourcePath)
+			: this(UserSource, JwtFactory, DefaultResourcePath)
 		{
 		}
 

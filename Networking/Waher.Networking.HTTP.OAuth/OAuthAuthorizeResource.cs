@@ -8,6 +8,7 @@ using Waher.Content;
 using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
+using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Security;
@@ -22,6 +23,11 @@ namespace Waher.Networking.HTTP.OAuth
 	public class OAuthAuthorizeResource : HttpSynchronousResource,
 		IHttpGetMethod, IHttpPostMethod
 	{
+		/// <summary>
+		/// Default authorize resource path: /oauth/authorize
+		/// </summary>
+		public const string DefaultResourcePath = "/oauth/authorize";
+
 		private readonly OAuthTokenResource tokenResource;
 		private readonly IUserSource userSource;
 		private HttpAuthenticationScheme[]? authenticationSchemes = null;
@@ -43,7 +49,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="TokenResource">OAuth token resource.</param>
 		/// <param name="JwtFactory">JWT Factory</param>
 		public OAuthAuthorizeResource(OAuthTokenResource TokenResource, JwtFactory? JwtFactory)
-			: this(TokenResource, JwtFactory, "/oauth/authorize")
+			: this(TokenResource, JwtFactory, DefaultResourcePath)
 		{
 		}
 
@@ -124,33 +130,40 @@ namespace Waher.Networking.HTTP.OAuth
 				return;
 			}
 
+			await this.PrepareForm(ResponseType, Request.Header.QueryParametersPerName,
+				Request, Response);
+		}
+
+		private async Task PrepareForm(string ResponseType, IDictionary<string, string> Form,
+			HttpRequest Request, HttpResponse Response)
+		{
 			switch (ResponseType)
 			{
 				case "code":
-					if (!Request.Header.TryGetQueryParameter("client_id", out string ClientId))
+					if (!Form.TryGetValue("client_id", out string ClientId))
 						ClientId = string.Empty;
 
-					if (!Request.Header.TryGetQueryParameter("redirect_uri", out string RedirectUri) ||
+					if (!Form.TryGetValue("redirect_uri", out string RedirectUri) ||
 						string.IsNullOrEmpty(RedirectUri))
 					{
 						await Response.SendResponse(new BadRequestException("Missing or empty redirect_uri parameter."));
 						return;
 					}
 
-					if (!Request.Header.TryGetQueryParameter("state", out string State))
+					if (!Form.TryGetValue("state", out string State))
 						State = string.Empty;
 
-					if (!Request.Header.TryGetQueryParameter("code_challenge", out string CodeChallenge))
+					if (!Form.TryGetValue("code_challenge", out string CodeChallenge))
 						CodeChallenge = string.Empty;
 
-					if (!Request.Header.TryGetQueryParameter("code_challenge_method", out string CodeChallengeMethod))
+					if (!Form.TryGetValue("code_challenge_method", out string CodeChallengeMethod))
 						CodeChallengeMethod = string.Empty;
 
 					await Response.Return(await this.GenerateLoginForm(Request, ClientId,
-						HttpUtility.UrlDecode(RedirectUri), 
-						HttpUtility.UrlDecode(State), 
-						HttpUtility.UrlDecode(CodeChallenge), 
-						HttpUtility.UrlDecode(CodeChallengeMethod), 
+						HttpUtility.UrlDecode(RedirectUri),
+						HttpUtility.UrlDecode(State),
+						HttpUtility.UrlDecode(CodeChallenge),
+						HttpUtility.UrlDecode(CodeChallengeMethod),
 						string.Empty));
 					return;
 
@@ -218,23 +231,23 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.Append("<form id='LoginForm' action='");
 			Markdown.Append(this.ResourceName);
 			Markdown.Append("' method='post'>");
-			Markdown.Append("<input type='hidden' name='From' value='");
+			Markdown.Append("<input type='hidden' name='redirect_uri' value='");
 			Markdown.Append(XML.HtmlAttributeEncode(From));
 			Markdown.AppendLine("'/>");
-			Markdown.Append("<input type='hidden' name='State' value='");
+			Markdown.Append("<input type='hidden' name='state' value='");
 			Markdown.Append(XML.HtmlAttributeEncode(State));
 			Markdown.AppendLine("'/>");
-			Markdown.Append("<input type='hidden' name='CodeChallenge' value='");
+			Markdown.Append("<input type='hidden' name='code_challenge' value='");
 			Markdown.Append(XML.HtmlAttributeEncode(CodeChallenge));
 			Markdown.AppendLine("'/>");
-			Markdown.Append("<input type='hidden' name='CodeChallengeMethod' value='");
+			Markdown.Append("<input type='hidden' name='code_challenge_method' value='");
 			Markdown.Append(XML.HtmlAttributeEncode(CodeChallengeMethod));
 			Markdown.AppendLine("'/>");
 			Markdown.AppendLine();
 
 			Markdown.AppendLine("<p>");
-			Markdown.AppendLine("<label for='UserName'>User Name:</label>  ");
-			Markdown.Append("<input name='UserName' type='text' autocomplete='username");
+			Markdown.AppendLine("<label for='client_id'>User Name:</label>  ");
+			Markdown.Append("<input name='client_id' type='text' autocomplete='username");
 
 			if (!string.IsNullOrEmpty(UserName))
 			{
@@ -247,8 +260,8 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine();
 
 			Markdown.AppendLine("<p>");
-			Markdown.AppendLine("<label for='Password'>Password:</label>  ");
-			Markdown.Append("<input name='Password' type='password' ");
+			Markdown.AppendLine("<label for='client_secret'>Password:</label>  ");
+			Markdown.Append("<input name='client_secret' type='password' ");
 			Markdown.AppendLine("autocomplete='current-password' autofocus/>");
 			Markdown.AppendLine("</p>");
 			Markdown.AppendLine();
@@ -256,7 +269,7 @@ namespace Waher.Networking.HTTP.OAuth
 			if (!string.IsNullOrEmpty(ErrorMessage))
 			{
 				Markdown.AppendLine("<p>");
-				Markdown.Append("<strong>");
+				Markdown.Append("<strong id='errorMessage'>");
 				Markdown.Append(XML.HtmlValueEncode(ErrorMessage));
 				Markdown.AppendLine("</strong>");
 				Markdown.AppendLine("</p>");
@@ -293,13 +306,19 @@ namespace Waher.Networking.HTTP.OAuth
 				return;
 			}
 
+			if (Form.TryGetValue("response_type", out string ResponseType))
+			{
+				await this.PrepareForm(ResponseType, Form, Request, Response);
+				return;
+			}
+
 			if (Form.Count != 6 ||
-				!Form.TryGetValue("UserName", out string UserName) ||
-				!Form.TryGetValue("Password", out string Password) ||
-				!Form.TryGetValue("From", out string From) ||
-				!Form.TryGetValue("State", out string State) ||
-				!Form.TryGetValue("CodeChallenge", out string CodeChallenge) ||
-				!Form.TryGetValue("CodeChallengeMethod", out string CodeChallengeMethod))
+				!Form.TryGetValue("client_id", out string UserName) ||
+				!Form.TryGetValue("client_secret", out string Password) ||
+				!Form.TryGetValue("redirect_uri", out string From) ||
+				!Form.TryGetValue("state", out string State) ||
+				!Form.TryGetValue("code_challenge", out string CodeChallenge) ||
+				!Form.TryGetValue("code_challenge_method", out string CodeChallengeMethod))
 			{
 				await Response.SendResponse(new BadRequestException("Invalid form."));
 				return;
@@ -354,7 +373,7 @@ namespace Waher.Networking.HTTP.OAuth
 				case LoginResultType.InvalidCredentials:
 				default:
 					await Response.Return(await this.GenerateLoginForm(Request, UserName,
-						From, State, CodeChallenge, CodeChallengeMethod, 
+						From, State, CodeChallenge, CodeChallengeMethod,
 						"Invalid user name or password."));
 					return;
 
@@ -365,14 +384,14 @@ namespace Waher.Networking.HTTP.OAuth
 
 				case LoginResultType.TemporarilyBlocked:
 					await Response.Return(await this.GenerateLoginForm(Request, UserName,
-						From, State, CodeChallenge, CodeChallengeMethod, 
+						From, State, CodeChallenge, CodeChallengeMethod,
 						"You are temporarily blocked. Try again after: " +
 						LoginResult.Next?.ToString()));
 					return;
 
 				case LoginResultType.PermanentlyBlocked:
 					await Response.Return(await this.GenerateLoginForm(Request, UserName,
-						From, State, CodeChallenge, CodeChallengeMethod, 
+						From, State, CodeChallenge, CodeChallengeMethod,
 						"You are permanently blocked."));
 					return;
 			}

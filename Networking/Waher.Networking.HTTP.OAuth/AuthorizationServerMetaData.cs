@@ -55,7 +55,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 			sb.Append(this.authorizeResource.ResourceName);
 			string AuthorizeUri = sb.ToString();
-			string TokenUri = ServerUrl + "/oauth/token";
+			string TokenUri = ServerUrl + OAuthTokenResource.DefaultResourcePath;
 
 			// TODO: Dynamic Client Registration resource
 

@@ -260,6 +260,12 @@ namespace Waher.Networking.HTTP
 		public KeyValuePair<string, string>[] QueryParameters => this.queryParameters;
 
 		/// <summary>
+		/// Query parameters per name. If multiple query parameters with the same name are 
+		/// present, only the last one is returned.
+		/// </summary>
+		public IDictionary<string, string> QueryParametersPerName => this.query;
+
+		/// <summary>
 		/// Parses a specific HTTP header field.
 		/// </summary>
 		/// <param name="KeyLower">Lower-case version of field name.</param>

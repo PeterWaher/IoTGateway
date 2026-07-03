@@ -38,7 +38,7 @@ namespace Waher.Security.Users
 	/// </summary>
 	public class LoginResult
 	{
-		private readonly User user;
+		private readonly IUser user;
 		private readonly DateTime? next;
 		private readonly LoginResultType type;
 
@@ -57,7 +57,7 @@ namespace Waher.Security.Users
 		/// Login attempt has been made.
 		/// </summary>
 		/// <param name="User">User object found and authenticated.</param>
-		public LoginResult(User User)
+		public LoginResult(IUser User)
 		{
 			this.user = User;
 			this.next = null;
@@ -77,7 +77,7 @@ namespace Waher.Security.Users
 		/// <summary>
 		/// User object corresponding to the successfully logged in user.
 		/// </summary>
-		public User User => this.user;
+		public IUser User => this.user;
 
 		/// <summary>
 		/// Time when a new login can be attempted.

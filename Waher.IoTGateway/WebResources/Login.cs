@@ -171,7 +171,7 @@ namespace Waher.IoTGateway.WebResources
 			});
 		}
 
-		internal static Task DoLogin(HttpRequest Request, User User)
+		internal static Task DoLogin(HttpRequest Request, IUser User)
 		{
 			return DoLogin(Request, false, User);
 		}

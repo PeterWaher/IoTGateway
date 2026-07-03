@@ -417,17 +417,32 @@ namespace Waher.Networking.HTTP.Authentication
 			return null;
 		}
 
-		internal static byte[] H_MD5(string s)
+		/// <summary>
+		/// Computes the MD5 hash of a string, using ISO-8859-1 encoding.
+		/// </summary>
+		/// <param name="s">String to hash.</param>
+		/// <returns>MD5 hash of the string.</returns>
+		public static byte[] H_MD5(string s)
 		{
 			return Hashes.ComputeMD5Hash(InternetContent.ISO_8859_1.GetBytes(s));
 		}
 
-		internal static byte[] H_SHA256(string s)
+		/// <summary>
+		/// Computes the SHA-256 hash of a string, using ISO-8859-1 encoding.
+		/// </summary>
+		/// <param name="s">String to hash.</param>
+		/// <returns>SHA-256 hash of the string.</returns>
+		public static byte[] H_SHA256(string s)
 		{
 			return Hashes.ComputeSHA256Hash(InternetContent.ISO_8859_1.GetBytes(s));
 		}
 
-		internal static byte[] H_SHA3_256(string s)
+		/// <summary>
+		/// Computes the SHA-3-256 hash of a string, using UTF-8 encoding.
+		/// </summary>
+		/// <param name="s">String to hash.</param>
+		/// <returns>SHA-3-256 hash of the string.</returns>
+		public static byte[] H_SHA3_256(string s)
 		{
 			SHA3_256 SHA3_256 = new SHA3_256();
 			byte[] Result = SHA3_256.ComputeVariable(Encoding.UTF8.GetBytes(s));
@@ -440,7 +455,7 @@ namespace Waher.Networking.HTTP.Authentication
 		/// </summary>
 		/// <param name="Hash">Array of bytes</param>
 		/// <returns>Hexadecimal string</returns>
-		internal static string ToHex(byte[] Hash)
+		public static string ToHex(byte[] Hash)
 		{
 			StringBuilder Result = new StringBuilder();
 
@@ -456,7 +471,7 @@ namespace Waher.Networking.HTTP.Authentication
 		/// <param name="s">String to check.</param>
 		/// <param name="NrBytes">Expected number of bytes</param>
 		/// <returns>If the string is a hexadecimal string of the specified size.</returns>
-		internal static bool IsHex(string s, byte NrBytes)
+		public static bool IsHex(string s, byte NrBytes)
 		{
 			if (s.Length != (NrBytes << 1))
 				return false;
@@ -485,7 +500,7 @@ namespace Waher.Networking.HTTP.Authentication
 		/// <param name="s">String to check.</param>
 		/// <param name="NrBytes">Number of bytes expected.</param>
 		/// <returns>Hexadecimal string.</returns>
-		internal static string EnsureHex(string s, byte NrBytes)
+		public static string EnsureHex(string s, byte NrBytes)
 		{
 			if (IsHex(s, NrBytes))
 				return s;

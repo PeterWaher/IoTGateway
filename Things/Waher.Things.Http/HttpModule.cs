@@ -209,24 +209,14 @@ namespace Waher.Things.Http
 		}
 
 		/// <summary>
-		/// Gets an array of authentication schemes available to authorize access to a
-		/// web resource.
+		/// Gets domain parameters used in authentication.
 		/// </summary>
-		/// <param name="ResourceMetaData">URI pointing to resource meta-data the
-		/// client can read to understand how it can authenticate itself to gain
-		/// access.</param>
-		/// <param name="Authorization">Resource authorization</param>
-		/// <returns>Array of authentication schemes (possibly empty) available for
-		/// authenticating the user making the request. If no default authentication
-		/// is to be performed, null can be returned.</returns>
-		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(
-			Uri ResourceMetaData, IAuthorization<HttpRequest> Authorization)
+		/// <param name="Domain">Domain name, or realm.</param>
+		/// <param name="MinStrength">Minimum cipher strength.</param>
+		/// <param name="Encrypted">If encryption should be used.</param>
+		public static void GetDomainParameters(out string Domain, out int MinStrength,
+			out bool Encrypted)
 		{
-			List<HttpAuthenticationScheme> Schemes = new List<HttpAuthenticationScheme>();
-			string Domain;
-			int MinStrength;
-			bool Encrypted;
-
 			if (!Types.TryGetModuleParameter("X509", out object Obj) ||
 				!(Obj is X509Certificate Certificate))
 			{
@@ -248,6 +238,25 @@ namespace Waher.Things.Http
 				Domain = BinaryTcpClient.GetDomainFromSubject(Certificate.Subject);
 				MinStrength = 128;
 			}
+		}
+
+		/// <summary>
+		/// Gets an array of authentication schemes available to authorize access to a
+		/// web resource.
+		/// </summary>
+		/// <param name="ResourceMetaData">URI pointing to resource meta-data the
+		/// client can read to understand how it can authenticate itself to gain
+		/// access.</param>
+		/// <param name="Authorization">Resource authorization</param>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
+		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(
+			Uri ResourceMetaData, IAuthorization<HttpRequest> Authorization)
+		{
+			List<HttpAuthenticationScheme> Schemes = new List<HttpAuthenticationScheme>();
+
+			GetDomainParameters(out string Domain, out int MinStrength, out bool Encrypted);
 
 			if (Types.TryGetModuleParameter("JWT", out JwtFactory JwtFactory) &&
 				!JwtFactory.Disposed)

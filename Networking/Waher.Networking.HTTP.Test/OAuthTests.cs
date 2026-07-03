@@ -7,9 +7,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Getters;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.HTTP.OAuth;
+using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Networking.Sniffers;
 using Waher.Security;
 using Waher.Security.JWT;
@@ -22,6 +24,7 @@ namespace Waher.Networking.HTTP.Test
 		private const string BaseUrl = "http://localhost:8081";
 		private const string CallbackResource = "/Callback";
 		private const string ProtectedResource = "/Hello";
+		private const string Realm = "Test";
 		private const string TestUserName = "User";
 		private const string TestPassword = "Password";
 		private const string TestClientId = "UnitTestClient";
@@ -58,8 +61,6 @@ namespace Waher.Networking.HTTP.Test
 
 			OAuthTokenResource TokenResource;
 			OAuthAuthorizeResource AuthorizeResource;
-			JwtAuthentication JwtAuthentication = new("Test", this, this.jwtFactory,
-				new Uri(BaseUrl + ProtectedResourceMetaData.WellKnowResourcePath));
 
 			this.server.Register(new ProtectedResourceMetaData());
 			this.server.Register(TokenResource = new OAuthTokenResource(this, this.jwtFactory));
@@ -67,7 +68,7 @@ namespace Waher.Networking.HTTP.Test
 			this.server.Register(new AuthorizationServerMetaData(AuthorizeResource));
 
 			this.server.Register(CallbackResource, Callback);
-			this.server.Register(ProtectedResource, Hello, JwtAuthentication);
+			this.server.Register(new Hello(this.jwtFactory, this));
 		}
 
 		private static async Task Callback(HttpRequest Request, HttpResponse Response)
@@ -89,21 +90,42 @@ namespace Waher.Networking.HTTP.Test
 			});
 		}
 
-		private static async Task Hello(HttpRequest Request, HttpResponse Response)
+		[OAuthResourceName("Hello Test Web Service")]
+		private class Hello(JwtFactory JwtFactory, IUserSource Users) 
+			: HttpProtectedResource(ProtectedResource), IHttpGetMethod
 		{
-			if (Request.User is null)
+			private readonly HttpAuthenticationScheme[] authenticationSchemes =
+				[
+					new JwtAuthentication(Realm, Users, JwtFactory,
+						new Uri(BaseUrl + ProtectedResourceMetaData.WellKnowResourcePath + ProtectedResource))
+				];
+
+			public bool AllowsGET => true;
+			public override bool Synchronous => true;
+			public override bool HandlesSubPaths => false;
+			public override bool UserSessions => false;
+
+			public override HttpAuthenticationScheme[] GetAuthenticationSchemes(HttpRequest Request)
 			{
-				await Response.SendResponse(new ForbiddenException());
-				return;
+				return this.authenticationSchemes;
 			}
 
-			StringBuilder sb = new();
+			public async Task GET(HttpRequest Request, HttpResponse Response)
+			{
+				if (Request.User is null)
+				{
+					await Response.SendResponse(new ForbiddenException());
+					return;
+				}
 
-			sb.Append("Hello ");
-			sb.Append(Request.User.UserName);
-			sb.AppendLine(".");
+				StringBuilder sb = new();
 
-			await Response.Return(sb.ToString());
+				sb.Append("Hello ");
+				sb.Append(Request.User.UserName);
+				sb.AppendLine(".");
+
+				await Response.Return(sb.ToString());
+			}
 		}
 
 		[TestCleanup]
@@ -186,16 +208,22 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_03_HelloWithoutBearerToken_ReturnsUnauthorizedChallenge()
 		{
 			ContentResponse Response = await InternetContent.GetAsync(new Uri(BaseUrl + ProtectedResource));
-			UnauthorizedException Error = AssertException<UnauthorizedException>(Response);
+			WebException Error = AssertWebException(Response, UnauthorizedException.Code);
 			bool FoundChallenge = false;
 
-			foreach (KeyValuePair<string, string> Header in Error.HeaderFields)
+			foreach (KeyValuePair<string, IEnumerable<string>> Header in Error.Headers)
 			{
 				if (Header.Key == "WWW-Authenticate")
 				{
-					FoundChallenge = true;
-					Assert.Contains(Header.Value, "Bearer");
-					Assert.Contains(Header.Value, "resource_metadata=\"" + BaseUrl + ProtectedResourceMetaData.WellKnowResourcePath + ProtectedResource + "\"");
+					foreach (string Value in Header.Value)
+					{
+						if (Value.StartsWith("Bearer "))
+						{
+							FoundChallenge = true;
+							string Expected = "resource_metadata=\"" + BaseUrl + ProtectedResourceMetaData.WellKnowResourcePath + ProtectedResource + "\"";
+							Assert.Contains(Expected, Value);
+						}
+					}
 				}
 			}
 
@@ -209,7 +237,7 @@ namespace Waher.Networking.HTTP.Test
 				new Uri(BaseUrl + ProtectedResource),
 				new KeyValuePair<string, string>("Authorization", "Bearer this-is-not-a-jwt"));
 
-			AssertException<UnauthorizedException>(Response);
+			AssertWebException(Response, UnauthorizedException.Code);
 		}
 
 		[TestMethod]
@@ -224,8 +252,8 @@ namespace Waher.Networking.HTTP.Test
 					{ "code_verifier", "not-used" }
 				});
 
-			ForbiddenException Error = AssertException<ForbiddenException>(Response);
-			Assert.Contains(Error.Message, "Invalid code");
+			WebException Error = AssertWebException(Response, ForbiddenException.Code);
+			Assert.Contains("Invalid code", Error.Message);
 		}
 
 		[TestMethod]
@@ -243,8 +271,8 @@ namespace Waher.Networking.HTTP.Test
 					{ "code", Code }
 				});
 
-			BadRequestException Error = AssertException<BadRequestException>(Response);
-			Assert.Contains(Error.Message, "Missing code_verifier");
+			WebException Error = AssertWebException(Response, BadRequestException.Code);
+			Assert.Contains("Missing code_verifier", Error.Message);
 		}
 
 		[TestMethod]
@@ -263,8 +291,8 @@ namespace Waher.Networking.HTTP.Test
 					{ "code_verifier", CreatePkceCodeVerifier() }
 				});
 
-			ForbiddenException Error = AssertException<ForbiddenException>(Response);
-			Assert.Contains(Error.Message, "Invalid code_verifier");
+			WebException Error = AssertWebException(Response, ForbiddenException.Code);
+			Assert.Contains("Invalid code_verifier", Error.Message);
 		}
 
 		[TestMethod]
@@ -294,8 +322,8 @@ namespace Waher.Networking.HTTP.Test
 				});
 
 			Assert.IsTrue(SecondResponse.HasError);
-			Assert.IsTrue(SecondResponse.Error is ForbiddenException);
-			Assert.Contains(SecondResponse.Error.Message, "Invalid code");
+			WebException Error = AssertWebException(SecondResponse, ForbiddenException.Code);
+			Assert.Contains("Invalid code", Error.Message);
 		}
 
 		[TestMethod]
@@ -319,15 +347,17 @@ namespace Waher.Networking.HTTP.Test
 
 			Response.AssertOk();
 			string Body = Encoding.UTF8.GetString(Response.Encoded);
-			Assert.Contains(Body, "Invalid user name or password");
+			Assert.Contains("Invalid user name or password", Body);
 		}
 
-		private static T AssertException<T>(ContentResponse Response)
-			where T : Exception
+		private static WebException AssertWebException(
+			ContentResponse Response, int ExpectedStatusCode)
 		{
 			Assert.IsTrue(Response.HasError);
-			Assert.IsTrue(Response.Error is T);
-			return (T)Response.Error;
+			WebException Result = Response.Error as WebException;
+			Assert.IsNotNull(Result);
+			Assert.AreEqual(ExpectedStatusCode, (int)Result.StatusCode);
+			return Result;
 		}
 
 		private static async Task<string> GetAccessTokenWithAuthorizationCode()

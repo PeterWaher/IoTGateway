@@ -406,8 +406,10 @@ namespace Waher.Networking.HTTP.OAuth
 
 				case "client_credentials":
 				case "password":
-					if (Form.TryGetValue("client_id", out string ClientId) &&
-						Form.TryGetValue("client_secret", out string ClientSecret))
+					if ((Form.TryGetValue("client_id", out string ClientId) ||
+						Form.TryGetValue("username", out ClientId)) &&
+						(Form.TryGetValue("client_secret", out string ClientSecret) ||
+						Form.TryGetValue("password", out ClientSecret)))
 					{
 						if (!Request.Encrypted && (Request.Server.OpenHttpsPorts?.Length ?? 0) > 0)
 						{

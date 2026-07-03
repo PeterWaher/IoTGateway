@@ -21,14 +21,16 @@ using Waher.Security.JWT;
 
 namespace Waher.Networking.HTTP.Test
 {
-	public enum CodeMethod
+	public enum LoginMethod
 	{
 		CodeForm,
 		CodePost,
 		CodeFormWithPkcePlain,
 		CodeFormWithPkceS256,
 		CodePostWithPkcePlain,
-		CodePostWithPkceS256
+		CodePostWithPkceS256,
+		ImplicitGet,
+		ImplicitPost
 	}
 
 	[TestClass]
@@ -40,7 +42,6 @@ namespace Waher.Networking.HTTP.Test
 		private const string Realm = "Test";
 		private const string TestUserName = "User";
 		private const string TestPassword = "Password";
-		private const string TestClientId = "UnitTestClient";
 
 		private HttpServer server;
 		private ConsoleEventSink sink = null;
@@ -82,25 +83,51 @@ namespace Waher.Networking.HTTP.Test
 
 			this.server.Register(CallbackResource, Callback);
 			this.server.Register(new Hello(this.jwtFactory, this));
+
+			AuthorizeResource.ImplicitAuthenticationRequest += async (_, e) =>
+			{
+				if (e.Request.Header.TryGetHeaderField("X-Context", out HttpField Context))
+					e.User = await this.TryGetUser(Context.Value) as IUserWithClaims;
+			};
 		}
 
 		private static async Task Callback(HttpRequest Request, HttpResponse Response)
 		{
-			if (!Request.Header.TryGetQueryParameter("code", out string Code) ||
-				string.IsNullOrEmpty(Code))
-			{
-				await Response.SendResponse(new BadRequestException("Missing code."));
-				return;
-			}
-
 			if (!Request.Header.TryGetQueryParameter("state", out string State))
 				State = string.Empty;
 
-			await Response.Return(new Dictionary<string, object>()
+			if (Request.Header.TryGetQueryParameter("code", out string Code) &&
+				!string.IsNullOrEmpty(Code))
 			{
-				{ "code", Code },
-				{ "state", State }
-			});
+				await Response.Return(new Dictionary<string, object>()
+				{
+					{ "code", Code },
+					{ "state", State }
+				});
+				return;
+			}
+
+			if (Request.Header.TryGetQueryParameter("access_token", out string AccessToken) &&
+				!string.IsNullOrEmpty(AccessToken))
+			{
+				Dictionary<string, object> Result = new()
+				{
+					{ "access_token", AccessToken },
+					{ "state", State }
+				};
+
+				if (Request.Header.TryGetQueryParameter("token_type", out string TokenType))
+					Result["token_type"] = TokenType;
+
+				if (Request.Header.TryGetQueryParameter("expires_in", out string ExpiresIn))
+					Result["expires_in"] = ExpiresIn;
+
+				await Response.Return(Result);
+				return;
+			}
+
+			await Response.SendResponse(new BadRequestException("Missing code or access_token."));
+			return;
 		}
 
 		[OAuthResourceName("Hello Test Web Service")]
@@ -200,21 +227,24 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(BaseUrl + OAuthAuthorizeResource.DefaultResourcePath, Required<string>(ServerMetaData, "authorization_endpoint"));
 			Assert.AreEqual(BaseUrl + OAuthTokenResource.DefaultResourcePath, Required<string>(ServerMetaData, "token_endpoint"));
 			Assert.Contains("code", Required<object[]>(ServerMetaData, "response_types_supported"));
+			Assert.Contains("token", Required<object[]>(ServerMetaData, "response_types_supported"));
 			Assert.Contains("authorization_code", Required<object[]>(ServerMetaData, "grant_types_supported"));
 			Assert.Contains("plain", Required<object[]>(ServerMetaData, "code_challenge_methods_supported"));
 			Assert.Contains("S256", Required<object[]>(ServerMetaData, "code_challenge_methods_supported"));
 		}
 
 		[TestMethod]
-		[DataRow(CodeMethod.CodeForm)]
-		[DataRow(CodeMethod.CodePost)]
-		[DataRow(CodeMethod.CodeFormWithPkcePlain)]
-		[DataRow(CodeMethod.CodeFormWithPkceS256)]
-		[DataRow(CodeMethod.CodePostWithPkcePlain)]
-		[DataRow(CodeMethod.CodePostWithPkceS256)]
-		public async Task Test_02_AuthorizationCodeWithPkce(CodeMethod Method)
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		[DataRow(LoginMethod.ImplicitGet)]
+		[DataRow(LoginMethod.ImplicitPost)]
+		public async Task Test_02_Login(LoginMethod Method)
 		{
-			string AccessToken = await LoginAuthorizationCode(Method);
+			string AccessToken = await Login(Method);
 
 			ContentResponse HelloResponse = await InternetContent.GetAsync(
 				new Uri(BaseUrl + ProtectedResource),
@@ -225,7 +255,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_03_HelloWithoutBearerToken_ReturnsUnauthorizedChallenge()
+		public async Task Test_03_NoBearerToken()
 		{
 			ContentResponse Response = await InternetContent.GetAsync(new Uri(BaseUrl + ProtectedResource));
 			WebException Error = AssertWebException(Response, UnauthorizedException.Code);
@@ -251,7 +281,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_04_HelloWithInvalidBearerToken_ReturnsUnauthorized()
+		public async Task Test_04_InvalidBearerToken()
 		{
 			ContentResponse Response = await InternetContent.GetAsync(
 				new Uri(BaseUrl + ProtectedResource),
@@ -261,7 +291,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_05_TokenEndpointWithInvalidAuthorizationCode_ReturnsForbidden()
+		public async Task Test_05_InvalidAuthorizationCode()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -277,13 +307,13 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[DataRow(CodeMethod.CodeFormWithPkcePlain)]
-		[DataRow(CodeMethod.CodeFormWithPkceS256)]
-		[DataRow(CodeMethod.CodePostWithPkcePlain)]
-		[DataRow(CodeMethod.CodePostWithPkceS256)]
-		public async Task Test_06_TokenEndpointMissingPkceVerifier_ReturnsBadRequest(CodeMethod Method)
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		public async Task Test_06_MissingPkceVerifier(LoginMethod Method)
 		{
-			AuthorizationCode AuthorizationCode = await GetAuthorizationCode(Method);
+			AuthorizationResult AuthorizationCode = await Authorize(Method);
 
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -298,13 +328,13 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[DataRow(CodeMethod.CodeFormWithPkcePlain)]
-		[DataRow(CodeMethod.CodeFormWithPkceS256)]
-		[DataRow(CodeMethod.CodePostWithPkcePlain)]
-		[DataRow(CodeMethod.CodePostWithPkceS256)]
-		public async Task Test_07_TokenEndpointWrongPkceVerifier_ReturnsForbidden(CodeMethod Method)
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		public async Task Test_07_InvalidPkceVerifier(LoginMethod Method)
 		{
-			AuthorizationCode AuthorizationCode = await GetAuthorizationCode(Method);
+			AuthorizationResult AuthorizationCode = await Authorize(Method);
 
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -320,15 +350,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[DataRow(CodeMethod.CodeForm)]
-		[DataRow(CodeMethod.CodePost)]
-		[DataRow(CodeMethod.CodeFormWithPkcePlain)]
-		[DataRow(CodeMethod.CodeFormWithPkceS256)]
-		[DataRow(CodeMethod.CodePostWithPkcePlain)]
-		[DataRow(CodeMethod.CodePostWithPkceS256)]
-		public async Task Test_08_TokenEndpointReusedAuthorizationCode_ReturnsForbidden(CodeMethod Method)
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		public async Task Test_08_ReusedAuthorizationCode(LoginMethod Method)
 		{
-			AuthorizationCode AuthorizationCode = await GetAuthorizationCode(Method);
+			AuthorizationResult AuthorizationCode = await Authorize(Method);
 
 			ContentResponse FirstResponse = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -355,17 +385,31 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[DataRow(CodeMethod.CodeForm)]
-		[DataRow(CodeMethod.CodePost)]
-		[DataRow(CodeMethod.CodeFormWithPkcePlain)]
-		[DataRow(CodeMethod.CodeFormWithPkceS256)]
-		[DataRow(CodeMethod.CodePostWithPkcePlain)]
-		[DataRow(CodeMethod.CodePostWithPkceS256)]
-		public async Task Test_09_AuthorizeEndpointInvalidLogin_ReturnsLoginFormWithError(
-			CodeMethod Method)
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		[DataRow(LoginMethod.ImplicitGet)]
+		[DataRow(LoginMethod.ImplicitPost)]
+		public async Task Test_09_InvalidUserName(LoginMethod Method)
 		{
-			await Assert.ThrowsAsync<LoginError>(async () => await LoginAuthorizationCode(
-				Method, "Incorrect Password"));
+			await Assert.ThrowsAsync<LoginError>(async () => await Login(
+				Method, "Invalid User", TestPassword));
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		public async Task Test_10_InvalidPassword(LoginMethod Method)
+		{
+			await Assert.ThrowsAsync<LoginError>(async () => await Login(
+				Method, TestUserName, "Invalid Password"));
 		}
 
 		private static WebException AssertWebException(
@@ -378,15 +422,19 @@ namespace Waher.Networking.HTTP.Test
 			return Result;
 		}
 
-		private static Task<string> LoginAuthorizationCode(CodeMethod Method)
+		private static Task<string> Login(LoginMethod Method)
 		{
-			return LoginAuthorizationCode(Method, TestPassword);
+			return Login(Method, TestUserName, TestPassword);
 		}
 
-		private static async Task<string> LoginAuthorizationCode(CodeMethod Method,
-			string Password)
+		private static async Task<string> Login(LoginMethod Method,
+			string UserName, string Password)
 		{
-			AuthorizationCode AuthorizationCode = await GetAuthorizationCode(Method, Password);
+			AuthorizationResult AuthorizationCode = await Authorize(Method, UserName, Password);
+			if (AuthorizationCode.HasToken)
+				return AuthorizationCode.Token;
+
+			Assert.IsTrue(AuthorizationCode.HasCode);
 
 			ContentResponse TokenResponse = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -394,7 +442,7 @@ namespace Waher.Networking.HTTP.Test
 				{
 					{ "grant_type", "authorization_code" },
 					{ "code", AuthorizationCode.Code },
-					{ "client_id", TestClientId },
+					{ "client_id", TestUserName },
 					{ "code_verifier", AuthorizationCode.CodeVerifier }
 				});
 
@@ -408,30 +456,37 @@ namespace Waher.Networking.HTTP.Test
 			return AccessToken;
 		}
 
-		private class AuthorizationCode
+		private class AuthorizationResult
 		{
+			public bool HasCode => !string.IsNullOrEmpty(this.Code);
+			public bool HasToken => !string.IsNullOrEmpty(this.Token);
+			public bool HasState => !string.IsNullOrEmpty(this.State);
 			public string Code;
 			public string CodeVerifier;
+			public string Token;
+			public string State;
 		}
 
-		private static Task<AuthorizationCode> GetAuthorizationCode(CodeMethod Method)
+		private static Task<AuthorizationResult> Authorize(LoginMethod Method)
 		{
-			return GetAuthorizationCode(Method, TestPassword);
+			return Authorize(Method, TestUserName, TestPassword);
 		}
 
-		private static async Task<AuthorizationCode> GetAuthorizationCode(CodeMethod Method,
-			string Password)
+		private static async Task<AuthorizationResult> Authorize(LoginMethod Method,
+			string UserName, string Password)
 		{
 			string State = Guid.NewGuid().ToString();
 			string RedirectUri = BaseUrl + CallbackResource;
 			string AuthorizeUri = BaseUrl + OAuthAuthorizeResource.DefaultResourcePath;
 			string CodeVerifier = null;
 			string CodeChallenge;
+			bool ExpectCode = false;
+			bool ExpectToken = false;
 			ContentResponse AuthorizeResponse;
 			ContentResponse LoginResponse;
 			Dictionary<string, string> FormPostback = new()
 			{
-				{ "client_id", TestUserName },
+				{ "client_id", UserName },
 				{ "client_secret", Password },
 				{ "redirect_uri", RedirectUri },
 				{ "state", State }
@@ -439,32 +494,34 @@ namespace Waher.Networking.HTTP.Test
 
 			switch (Method)
 			{
-				case CodeMethod.CodeForm:
+				case LoginMethod.CodeForm:
 					AuthorizeResponse = await InternetContent.GetAsync(new Uri(AuthorizeUri +
 						"?response_type=code" +
-						"&client_id=" + Uri.EscapeDataString(TestClientId) +
+						"&client_id=" + Uri.EscapeDataString(UserName) +
 						"&state=" + Uri.EscapeDataString(State) +
 						"&redirect_uri=" + Uri.EscapeDataString(RedirectUri)));
+					ExpectCode = true;
 					break;
 
-				case CodeMethod.CodePost:
+				case LoginMethod.CodePost:
 					AuthorizeResponse = await InternetContent.PostAsync(new Uri(AuthorizeUri),
 						new Dictionary<string, string>()
 						{
 							{ "response_type", "code" },
 							{ "state", State },
 							{ "redirect_uri", RedirectUri },
-							{ "client_id", TestClientId }
+							{ "client_id", UserName }
 						});
+					ExpectCode = true;
 					break;
 
-				case CodeMethod.CodeFormWithPkcePlain:
+				case LoginMethod.CodeFormWithPkcePlain:
 					CodeVerifier = CreatePkceCodeVerifier();
 					CodeChallenge = CreateCodeChallenge(CodeVerifier, "plain");
 
 					AuthorizeResponse = await InternetContent.GetAsync(new Uri(AuthorizeUri +
 						"?response_type=code" +
-						"&client_id=" + Uri.EscapeDataString(TestClientId) +
+						"&client_id=" + Uri.EscapeDataString(UserName) +
 						"&state=" + Uri.EscapeDataString(State) +
 						"&redirect_uri=" + Uri.EscapeDataString(RedirectUri) +
 						"&code_challenge=" + Uri.EscapeDataString(CodeChallenge) +
@@ -472,15 +529,16 @@ namespace Waher.Networking.HTTP.Test
 
 					FormPostback["code_challenge"] = CodeChallenge;
 					FormPostback["code_challenge_method"] = "plain";
+					ExpectCode = true;
 					break;
 
-				case CodeMethod.CodeFormWithPkceS256:
+				case LoginMethod.CodeFormWithPkceS256:
 					CodeVerifier = CreatePkceCodeVerifier();
 					CodeChallenge = CreateCodeChallenge(CodeVerifier, "S256");
 
 					AuthorizeResponse = await InternetContent.GetAsync(new Uri(AuthorizeUri +
 						"?response_type=code" +
-						"&client_id=" + Uri.EscapeDataString(TestClientId) +
+						"&client_id=" + Uri.EscapeDataString(UserName) +
 						"&state=" + Uri.EscapeDataString(State) +
 						"&redirect_uri=" + Uri.EscapeDataString(RedirectUri) +
 						"&code_challenge=" + Uri.EscapeDataString(CodeChallenge) +
@@ -488,9 +546,10 @@ namespace Waher.Networking.HTTP.Test
 
 					FormPostback["code_challenge"] = CodeChallenge;
 					FormPostback["code_challenge_method"] = "S256";
+					ExpectCode = true;
 					break;
 
-				case CodeMethod.CodePostWithPkcePlain:
+				case LoginMethod.CodePostWithPkcePlain:
 					CodeVerifier = CreatePkceCodeVerifier();
 					CodeChallenge = CreateCodeChallenge(CodeVerifier, "plain");
 
@@ -500,16 +559,17 @@ namespace Waher.Networking.HTTP.Test
 							{ "response_type", "code" },
 							{ "state", State },
 							{ "redirect_uri", RedirectUri },
-							{ "client_id", TestClientId },
+							{ "client_id", UserName },
 							{ "code_challenge", CodeChallenge },
 							{ "code_challenge_method", "plain" }
 						});
 
 					FormPostback["code_challenge"] = CodeChallenge;
 					FormPostback["code_challenge_method"] = "plain";
+					ExpectCode = true;
 					break;
 
-				case CodeMethod.CodePostWithPkceS256:
+				case LoginMethod.CodePostWithPkceS256:
 					CodeVerifier = CreatePkceCodeVerifier();
 					CodeChallenge = CreateCodeChallenge(CodeVerifier, "S256");
 
@@ -519,13 +579,47 @@ namespace Waher.Networking.HTTP.Test
 							{ "response_type", "code" },
 							{ "state", State },
 							{ "redirect_uri", RedirectUri },
-							{ "client_id", TestClientId },
+							{ "client_id", UserName },
 							{ "code_challenge", CodeChallenge },
 							{ "code_challenge_method", "S256" }
 						});
 
 					FormPostback["code_challenge"] = CodeChallenge;
 					FormPostback["code_challenge_method"] = "S256";
+					ExpectCode = true;
+					break;
+
+				case LoginMethod.ImplicitGet:
+					AuthorizeResponse = await InternetContent.GetAsync(new Uri(AuthorizeUri +
+						"?response_type=token" +
+						"&client_id=" + Uri.EscapeDataString(UserName) +
+						"&state=" + Uri.EscapeDataString(State) +
+						"&redirect_uri=" + Uri.EscapeDataString(RedirectUri)),
+						new KeyValuePair<string, string>("X-Context", UserName));
+
+					if (AuthorizeResponse.HasError)
+						throw new LoginError(AuthorizeResponse.Error.Message);
+
+					FormPostback = null;
+					ExpectToken = true;
+					break;
+
+				case LoginMethod.ImplicitPost:
+					AuthorizeResponse = await InternetContent.PostAsync(new Uri(AuthorizeUri),
+						new Dictionary<string, string>()
+						{
+							{ "response_type", "token" },
+							{ "state", State },
+							{ "redirect_uri", RedirectUri },
+							{ "client_id", UserName }
+						},
+						new KeyValuePair<string, string>("X-Context", UserName));
+
+					if (AuthorizeResponse.HasError)
+						throw new LoginError(AuthorizeResponse.Error.Message);
+
+					FormPostback = null;
+					ExpectToken = true;
 					break;
 
 				default:
@@ -567,7 +661,7 @@ namespace Waher.Networking.HTTP.Test
 						int j = htmlDocumentResponse.HtmlText.IndexOf("</", i);
 						if (j > i)
 						{
-							string ErrorMessage = XML.DecodeString(htmlDocumentResponse.HtmlText.Substring(i, j - i).Trim());
+							string ErrorMessage = XML.DecodeString(htmlDocumentResponse.HtmlText[i..j].Trim());
 							throw new LoginError(ErrorMessage);
 						}
 					}
@@ -579,20 +673,34 @@ namespace Waher.Networking.HTTP.Test
 				LoginResponse = AuthorizeResponse;
 			}
 
-			Dictionary<string, object> CallbackValues = LoginResponse.Decoded as Dictionary<string, object>;
-			Assert.IsNotNull(CallbackValues);
+			Dictionary<string, object> Response = LoginResponse.Decoded as Dictionary<string, object>;
+			Assert.IsNotNull(Response);
 
-			Assert.IsTrue(CallbackValues.TryGetValue("state", out object ReturnedState), "Callback response did not contain state.");
+			Assert.IsTrue(Response.TryGetValue("state", out object ReturnedState), "Missing state in response.");
+			Assert.IsTrue(ReturnedState is string, "Returned state not a string.");
 			Assert.AreEqual(State, ReturnedState);
-			Assert.IsTrue(CallbackValues.TryGetValue("code", out object Code), "Callback response did not contain code.");
-			string s = Code as string;
-			Assert.IsFalse(string.IsNullOrEmpty(s));
 
-			return new AuthorizationCode()
+			AuthorizationResult Result = new()
 			{
-				Code = s,
-				CodeVerifier = CodeVerifier
+				CodeVerifier = CodeVerifier,
+				State = (string)ReturnedState
 			};
+
+			if (ExpectCode)
+			{
+				Assert.IsTrue(Response.TryGetValue("code", out object Code), "Response did not contain code.");
+				Result.Code = Code as string;
+				Assert.IsFalse(string.IsNullOrEmpty(Result.Code));
+			}
+
+			if (ExpectToken)
+			{
+				Assert.IsTrue(Response.TryGetValue("access_token", out object Token), "Response did not contain token.");
+				Result.Token = Token as string;
+				Assert.IsFalse(string.IsNullOrEmpty(Result.Token));
+			}
+
+			return Result;
 		}
 
 		private class LoginError(string Message) : Exception(Message)

@@ -8,7 +8,9 @@ using Waher.Content;
 using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
-using Waher.Networking.HTTP.ScriptExtensions;
+using Waher.Events;
+using Waher.Networking.HTTP.Authentication;
+using Waher.Networking.HTTP.OAuth.Events;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Security;
@@ -137,9 +139,12 @@ namespace Waher.Networking.HTTP.OAuth
 		private async Task PrepareForm(string ResponseType, IDictionary<string, string> Form,
 			HttpRequest Request, HttpResponse Response)
 		{
+			if (!Form.TryGetValue("state", out string State))
+				State = string.Empty;
+
 			switch (ResponseType)
 			{
-				case "code":
+				case "code":        // Authorization Code
 					if (!Form.TryGetValue("client_id", out string ClientId))
 						ClientId = string.Empty;
 
@@ -149,9 +154,6 @@ namespace Waher.Networking.HTTP.OAuth
 						await Response.SendResponse(new BadRequestException("Missing or empty redirect_uri parameter."));
 						return;
 					}
-
-					if (!Form.TryGetValue("state", out string State))
-						State = string.Empty;
 
 					if (!Form.TryGetValue("code_challenge", out string CodeChallenge))
 						CodeChallenge = string.Empty;
@@ -167,17 +169,36 @@ namespace Waher.Networking.HTTP.OAuth
 						string.Empty));
 					return;
 
-				case "token":
+				case "token":       // Implicit
 					if (this.jwtFactory is null)
 					{
 						await Response.SendResponse(new ServiceUnavailableException("No JWT factory configured."));
 						return;
 					}
 
-					if (Request.User is IUserWithClaims UserWithClaims)
+					ImplicitAuthenticationEventArgs e = new ImplicitAuthenticationEventArgs(Request);
+					await this.ImplicitAuthenticationRequest.Raise(this, e);
+
+					IUserWithClaims? User = e.User;
+
+					if (User is null &&
+						(e.PermitWwwAuthentication || e.PermitMtlsAuthentication) &&
+						Request.User is IUserWithClaims UserWithClaims)
 					{
-						string Token = await UserWithClaims.CreateToken(this.jwtFactory, Request.Encrypted);
-						await Response.Return(OAuthTokenResource.TokenResponse(Token));
+						User = UserWithClaims;
+					}
+
+					if (!(User is null))
+					{
+						if (Form.TryGetValue("client_id", out ClientId) &&
+							ClientId != User.UserName)
+						{
+							await Response.SendResponse(new ForbiddenException());
+							return;
+						}
+
+						string Token = await User.CreateToken(this.jwtFactory, Request.Encrypted);
+						await Response.Return(OAuthTokenResource.TokenResponse(Token, State));
 						return;
 					}
 
@@ -188,12 +209,29 @@ namespace Waher.Networking.HTTP.OAuth
 						await Response.SendResponse(new ForbiddenException());
 					else
 					{
-						ChunkedList<string> Challenges = new ChunkedList<string>();
+						ChunkedList<string>? Challenges = null;
 
 						foreach (HttpAuthenticationScheme AuthenticationScheme in this.authenticationSchemes!)
-							Challenges.AddRange(AuthenticationScheme.GetChallenges());
+						{
+							if (AuthenticationScheme is MutualTlsAuthentication)
+							{
+								if (!e.PermitMtlsAuthentication)
+									continue;
+							}
+							else
+							{
+								if (!e.PermitWwwAuthentication)
+									continue;
+							}
 
-						await Response.SendResponse(new UnauthorizedException(Challenges.ToArray()));
+							Challenges ??= new ChunkedList<string>();
+							Challenges.AddRange(AuthenticationScheme.GetChallenges());
+						}
+
+						if (Challenges is null)
+							await Response.SendResponse(new ForbiddenException());
+						else
+							await Response.SendResponse(new UnauthorizedException(Challenges.ToArray()));
 					}
 					return;
 
@@ -202,6 +240,11 @@ namespace Waher.Networking.HTTP.OAuth
 					return;
 			}
 		}
+
+		/// <summary>
+		/// Event raised when an implicit authentication request is received.
+		/// </summary>
+		public event EventHandlerAsync<ImplicitAuthenticationEventArgs>? ImplicitAuthenticationRequest = null;
 
 		private async Task<HtmlDocument> GenerateLoginForm(HttpRequest Request,
 			string UserName, string From, string State, string CodeChallenge,

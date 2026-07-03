@@ -558,13 +558,23 @@ namespace Waher.Networking.HTTP.OAuth
 
 		internal static Dictionary<string, object> TokenResponse(string Token)
 		{
-			return new Dictionary<string, object>()
+			return TokenResponse(Token, null);
+		}
+
+		internal static Dictionary<string, object> TokenResponse(string Token, string? State)
+		{
+			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
 				{ "access_token", Token },
 				{ "token_type", "Bearer" },
 				{ "expires_in", 3600 },
 				{ "scope", string.Empty }
 			};
+
+			if (!string.IsNullOrEmpty(State))
+				Result["state"] = State;
+
+			return Result;
 		}
 	}
 }

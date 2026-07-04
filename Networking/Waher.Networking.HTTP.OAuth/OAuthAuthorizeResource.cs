@@ -99,23 +99,34 @@ namespace Waher.Networking.HTTP.OAuth
 		/// is to be performed, null can be returned.</returns>
 		public override HttpAuthenticationScheme[]? GetAuthenticationSchemes(HttpRequest Request)
 		{
-			if (this.jwtFactory is null)
-			{
-				if (Types.TryGetModuleParameter("JWT", out JwtFactory JwtFactory) &&
-					!JwtFactory.Disposed)
-				{
-					this.jwtFactory = JwtFactory;
-					this.authenticationSchemes = null;
-				}
-			}
-
 			if (Request.Header.Authorization is null)
 				return null;
 
 			this.authenticationSchemes ??= OAuthTokenResource.CreateAuthenticationSchemes(
-				this.jwtFactory, this.userSource);
+				this.JwtFactory, this.userSource);
 
 			return this.authenticationSchemes;
+		}
+
+		/// <summary>
+		/// Associated JWT factory object instance, if any is defined.
+		/// </summary>
+		internal JwtFactory? JwtFactory
+		{
+			get
+			{
+				if (this.jwtFactory is null)
+				{
+					if (Types.TryGetModuleParameter("JWT", out JwtFactory JwtFactory) &&
+						!JwtFactory.Disposed)
+					{
+						this.jwtFactory = JwtFactory;
+						this.authenticationSchemes = null;
+					}
+				}
+
+				return this.jwtFactory;
+			}
 		}
 
 		/// <summary>
@@ -195,15 +206,11 @@ namespace Waher.Networking.HTTP.OAuth
 					Response.SetHeader("Pragma", "no-cache");
 
 					await Response.Return(await this.GenerateLoginForm(Request, ClientId,
-						HttpUtility.UrlDecode(RedirectUri),
-						HttpUtility.UrlDecode(State),
-						HttpUtility.UrlDecode(CodeChallenge),
-						HttpUtility.UrlDecode(CodeChallengeMethod),
-						string.Empty));
+						RedirectUri, State, CodeChallenge, CodeChallengeMethod, string.Empty));
 					return;
 
 				case "token":       // Implicit
-					if (this.jwtFactory is null)
+					if (this.JwtFactory is null)
 					{
 						await Response.SendResponse(new ServiceUnavailableException("No JWT factory configured."));
 						return;
@@ -233,13 +240,14 @@ namespace Waher.Networking.HTTP.OAuth
 						Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 						Response.SetHeader("Pragma", "no-cache");
 
-						string Token = await User.CreateToken(this.jwtFactory, Request.Encrypted);
-						await Response.Return(OAuthTokenResource.TokenResponse(Token, State));
+						string Token = await User.CreateToken(this.JwtFactory, Request.Encrypted);
+						await Response.Return(OAuthTokenResource.TokenResponse(Token, State,
+							3600, string.Empty, this.jwtFactory?.Issuer));
 						return;
 					}
 
 					this.authenticationSchemes ??= OAuthTokenResource.CreateAuthenticationSchemes(
-						this.jwtFactory, this.userSource);
+						this.JwtFactory, this.userSource);
 
 					if ((this.authenticationSchemes?.Length ?? 0) == 0)
 						await Response.SendResponse(new ForbiddenException());
@@ -455,6 +463,9 @@ namespace Waher.Networking.HTTP.OAuth
 
 					if (!string.IsNullOrEmpty(State))
 						RedirectUri += "&state=" + HttpUtility.UrlEncode(State);
+
+					if (this.jwtFactory?.HasIssuer ?? false)
+						RedirectUri += "&iss=" + HttpUtility.UrlEncode(this.jwtFactory.Issuer);
 
 					await Response.SendResponse(new SeeOtherException(RedirectUri));
 					break;

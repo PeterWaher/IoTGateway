@@ -159,7 +159,7 @@ namespace Waher.Networking.HTTP.OAuth
 			while (tokenCache.ContainsKey(Code));
 
 			tokenCache[Code] = new TokenRef(Token, User.UserName, CodeChallenge,
-				CodeChallengeMethod, RedirectUri);
+				CodeChallengeMethod, RedirectUri, 3600);
 
 			return Code;
 		}
@@ -167,13 +167,14 @@ namespace Waher.Networking.HTTP.OAuth
 		private class TokenRef
 		{
 			public TokenRef(string Token, string ClientId, string CodeChallenge,
-				string CodeChallengeMethod, string RedirectUri)
+				string CodeChallengeMethod, string RedirectUri, int ExpiresIn)
 			{
 				this.Token = Token;
 				this.ClientId = ClientId;
 				this.CodeChallenge = CodeChallenge;
 				this.CodeChallengeMethod = CodeChallengeMethod;
 				this.RedirectUri = RedirectUri;
+				this.ExpiresIn = ExpiresIn;
 			}
 
 			public string Token;
@@ -181,6 +182,7 @@ namespace Waher.Networking.HTTP.OAuth
 			public string CodeChallenge;
 			public string CodeChallengeMethod;
 			public string RedirectUri;
+			public int ExpiresIn;
 
 			public async Task<bool> Check(string CodeVerifier, HttpResponse Response)
 			{
@@ -257,13 +259,8 @@ namespace Waher.Networking.HTTP.OAuth
 			Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 			Response.SetHeader("Pragma", "no-cache");
 
-			await Response.Return(new Dictionary<string, object>()
-			{
-				{ "access_token", Ref.Token },
-				{ "token_type", "Bearer" },
-				{ "expires_in", 3600 },
-				{ "scope", string.Empty }
-			});
+			await Response.Return(TokenResponse(Ref.Token, null, Ref.ExpiresIn,
+				string.Empty, this.jwtFactory?.Issuer));
 		}
 
 		/// <summary>
@@ -451,6 +448,19 @@ namespace Waher.Networking.HTTP.OAuth
 					{
 						HasCredentials = Form.TryGetValue("client_id", out ClientId) &&
 							Form.TryGetValue("client_secret", out ClientSecret);
+
+						if (!HasCredentials && !(Request.User is null))
+						{
+							if (!(Request.User is IUserWithClaims UserWithClaims))
+							{
+								await Response.SendResponse(ForbiddenException.AccessDenied(
+									this.ResourceName, Request.RemoteEndPoint));
+								return;
+							}
+
+							Token = await UserWithClaims.CreateToken(this.jwtFactory, Request.Encrypted);
+							break;
+						}
 					}
 
 					if (HasCredentials)
@@ -535,7 +545,8 @@ namespace Waher.Networking.HTTP.OAuth
 			Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 			Response.SetHeader("Pragma", "no-cache");
 
-			await Response.Return(TokenResponse(Token));
+			await Response.Return(TokenResponse(Token, null, 3600, string.Empty, 
+				this.jwtFactory?.Issuer));
 		}
 
 		internal static async Task<LoginResult?> DoLogin(string UserName, string Password,
@@ -604,23 +615,22 @@ namespace Waher.Networking.HTTP.OAuth
 			}
 		}
 
-		internal static Dictionary<string, object> TokenResponse(string Token)
-		{
-			return TokenResponse(Token, null);
-		}
-
-		internal static Dictionary<string, object> TokenResponse(string Token, string? State)
+		internal static Dictionary<string, object> TokenResponse(string Token, 
+			string? State, int ExpiresIn, string Scope, string? Issuer)
 		{
 			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
 				{ "access_token", Token },
 				{ "token_type", "Bearer" },
-				{ "expires_in", 3600 },
-				{ "scope", string.Empty }
+				{ "expires_in", ExpiresIn },
+				{ "scope", Scope }
 			};
 
 			if (!string.IsNullOrEmpty(State))
 				Result["state"] = State;
+
+			if (!string.IsNullOrEmpty(Issuer))
+				Result["iss"] = Issuer;
 
 			return Result;
 		}

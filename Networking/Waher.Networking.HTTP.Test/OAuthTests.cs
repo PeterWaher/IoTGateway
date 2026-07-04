@@ -17,6 +17,8 @@ using Waher.Events.Console;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Networking.Sniffers;
+using Waher.Script.Functions.Runtime;
+using Waher.Script.Objects.Sets;
 using Waher.Security;
 using Waher.Security.JWT;
 
@@ -34,7 +36,8 @@ namespace Waher.Networking.HTTP.Test
 		ImplicitGet,
 		ImplicitPost,
 		Password,
-		ClientCredentials
+		ClientCredentials,
+		ClientCredentialsBasicAuth
 	}
 
 	[TestClass]
@@ -74,7 +77,7 @@ namespace Waher.Networking.HTTP.Test
 				@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
 				int.MaxValue, BinaryPresentationMethod.ByteCount);
 
-			this.jwtFactory = JwtFactory.CreateHmacSha256();
+			this.jwtFactory = JwtFactory.CreateHmacSha256(BaseUrl);
 			this.server = new HttpServer(8081, this.xmlSniffer);
 
 			OAuthTokenResource TokenResource;
@@ -115,6 +118,9 @@ namespace Waher.Networking.HTTP.Test
 				if (Request.Header.TryGetQueryParameter("error_uri", out string ErrorUri))
 					Result["error_uri"] = ErrorUri;
 
+				if (Request.Header.TryGetQueryParameter("iss", out string Issuer))
+					Result["iss"] = Issuer;
+
 				await Response.Return(Result);
 				return;
 			}
@@ -122,11 +128,16 @@ namespace Waher.Networking.HTTP.Test
 			if (Request.Header.TryGetQueryParameter("code", out string Code) &&
 				!string.IsNullOrEmpty(Code))
 			{
-				await Response.Return(new Dictionary<string, object>()
+				Dictionary<string, object> Result = new()
 				{
 					{ "code", Code },
 					{ "state", State }
-				});
+				};
+
+				if (Request.Header.TryGetQueryParameter("iss", out string Issuer))
+					Result["iss"] = Issuer;
+
+				await Response.Return(Result);
 				return;
 			}
 
@@ -147,6 +158,9 @@ namespace Waher.Networking.HTTP.Test
 
 				if (Request.Header.TryGetQueryParameter("refresh_token", out string RefreshToken))
 					Result["refresh_token"] = RefreshToken;
+
+				if (Request.Header.TryGetQueryParameter("iss", out string Issuer))
+					Result["iss"] = Issuer;
 
 				await Response.Return(Result);
 				return;
@@ -259,6 +273,12 @@ namespace Waher.Networking.HTTP.Test
 			Assert.Contains("client_credentials", Required<object[]>(ServerMetaData, "grant_types_supported"));
 			Assert.Contains("plain", Required<object[]>(ServerMetaData, "code_challenge_methods_supported"));
 			Assert.Contains("S256", Required<object[]>(ServerMetaData, "code_challenge_methods_supported"));
+			Assert.Contains("client_secret_basic",
+				Required<object[]>(ServerMetaData, "token_endpoint_auth_methods_supported"));
+			Assert.Contains("client_secret_post",
+				Required<object[]>(ServerMetaData, "token_endpoint_auth_methods_supported"));
+			Assert.IsTrue(Required<bool>(ServerMetaData, "authorization_response_iss_parameter_supported"));
+
 		}
 
 		[TestMethod]
@@ -273,6 +293,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.ImplicitPost)]
 		[DataRow(LoginMethod.Password)]
 		[DataRow(LoginMethod.ClientCredentials)]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
 		public async Task Test_02_Login(LoginMethod Method)
 		{
 			string AccessToken = await Login(Method);
@@ -318,6 +339,29 @@ namespace Waher.Networking.HTTP.Test
 			}
 
 			Assert.IsTrue(FoundChallenge);
+		}
+
+		private static void AssertBearerChallenge(WebException Error, string ErrorCode)
+		{
+			bool FoundChallenge = false;
+
+			foreach (KeyValuePair<string, IEnumerable<string>> Header in Error.Headers)
+			{
+				if (Header.Key == "WWW-Authenticate")
+				{
+					foreach (string Value in Header.Value)
+					{
+						if (Value.StartsWith("Bearer ") &&
+							Value.Contains("error=\"" + ErrorCode + "\""))
+						{
+							FoundChallenge = true;
+							break;
+						}
+					}
+				}
+			}
+
+			Assert.IsTrue(FoundChallenge, "Expected Bearer challenge with error=\"" + ErrorCode + "\".");
 		}
 
 		[TestMethod]
@@ -451,6 +495,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.ImplicitPost)]
 		[DataRow(LoginMethod.Password)]
 		[DataRow(LoginMethod.ClientCredentials)]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
 		public async Task Test_09_InvalidUserName(LoginMethod Method)
 		{
 			await Assert.ThrowsAsync<LoginError>(async () => await Login(
@@ -467,6 +512,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
 		[DataRow(LoginMethod.Password)]
 		[DataRow(LoginMethod.ClientCredentials)]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
 		public async Task Test_10_InvalidPassword(LoginMethod Method)
 		{
 			await Assert.ThrowsAsync<LoginError>(async () => await Login(
@@ -485,6 +531,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.ImplicitPost)]
 		[DataRow(LoginMethod.Password)]
 		[DataRow(LoginMethod.ClientCredentials)]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
 		public async Task Test_11_MissingUserName(LoginMethod Method)
 		{
 			await Assert.ThrowsAsync<LoginError>(async () => await Login(
@@ -501,6 +548,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
 		[DataRow(LoginMethod.Password)]
 		[DataRow(LoginMethod.ClientCredentials)]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
 		public async Task Test_12_MissingPassword(LoginMethod Method)
 		{
 			await Assert.ThrowsAsync<LoginError>(async () => await Login(
@@ -937,13 +985,13 @@ namespace Waher.Networking.HTTP.Test
 			});
 		}
 
-		private static async Task AssertAuthorizationError(ContentResponse Response,
+		private static async Task<Dictionary<string, object>> AssertAuthorizationError(ContentResponse Response,
 			Dictionary<string, string> FormPostback)
 		{
 			if (Response.HasError)
 			{
 				AssertWebException(Response, BadRequestException.Code);
-				return;
+				return null;
 			}
 
 			Dictionary<string, object> Values;
@@ -966,6 +1014,8 @@ namespace Waher.Networking.HTTP.Test
 
 				Assert.AreEqual(ExpectedState, ReturnedState);
 			}
+
+			return Values;
 		}
 
 		[TestMethod]
@@ -986,13 +1036,227 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(System.Net.HttpStatusCode.BadRequest, Response.StatusCode);
 		}
 
+		[TestMethod]
+		public async Task Test_34_TokenEndpointRejectsMultipleClientAuthenticationMethods()
+		{
+			using System.Net.Http.HttpClient Client = new();
+			Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(
+				"Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes(TestUserName + ":" + TestPassword)));
+
+			using System.Net.Http.FormUrlEncodedContent Content = new(new Dictionary<string, string>()
+			{
+				{ "grant_type", "client_credentials" },
+				{ "client_id", TestUserName },
+				{ "client_secret", TestPassword }
+			});
+
+			using System.Net.Http.HttpResponseMessage Response = await Client.PostAsync(
+				BaseUrl + OAuthTokenResource.DefaultResourcePath, Content,
+				CancellationToken.None);
+
+			Assert.AreEqual(System.Net.HttpStatusCode.BadRequest, Response.StatusCode);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.CodeFormWithPkceS256, "S256")]
+		[DataRow(LoginMethod.CodePostWithPkceS256, "S256")]
+		public async Task Test_35_S256PkceDowngradeProtection(LoginMethod Method, string MethodName)
+		{
+			AuthorizationResult AuthorizationCode = await Authorize(Method);
+			string CodeChallenge = CreateCodeChallenge(AuthorizationCode.CodeVerifier, MethodName);
+
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "authorization_code" },
+					{ "code", AuthorizationCode.Code },
+					{ "client_id", TestUserName },
+					{ "redirect_uri", AuthorizationCode.RedirectUri },
+					{ "code_verifier", CodeChallenge }
+				});
+
+			WebException Error = AssertWebException(Response, ForbiddenException.Code);
+			Assert.Contains("Invalid code_verifier", Error.Message);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		public async Task Test_36_CodeVerifierWithoutChallengeIsRejected(LoginMethod Method)
+		{
+			AuthorizationResult AuthorizationCode = await Authorize(Method);
+
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "authorization_code" },
+					{ "code", AuthorizationCode.Code },
+					{ "client_id", TestUserName },
+					{ "redirect_uri", AuthorizationCode.RedirectUri },
+					{ "code_verifier", CreatePkceCodeVerifier() }
+				});
+
+			AssertWebException(Response, BadRequestException.Code, ForbiddenException.Code);
+		}
+
+		[TestMethod]
+		public async Task Test_37_InvalidBearerTokenChallengeIncludesInvalidTokenError()
+		{
+			ContentResponse Response = await InternetContent.GetAsync(
+				new Uri(BaseUrl + ProtectedResource),
+				new KeyValuePair<string, string>("Authorization", "Bearer this-is-not-a-jwt"));
+
+			WebException Error = AssertWebException(Response, UnauthorizedException.Code);
+			AssertBearerChallenge(Error, "invalid_token");
+		}
+
+		[TestMethod]
+		public async Task Test_38_BearerTokenInQueryStringIsRejected()
+		{
+			string AccessToken = await Login(LoginMethod.CodeFormWithPkceS256);
+
+			ContentResponse Response = await InternetContent.GetAsync(new Uri(
+				BaseUrl + ProtectedResource + "?access_token=" + Uri.EscapeDataString(AccessToken)));
+
+			WebException Error = AssertWebException(Response, UnauthorizedException.Code);
+			AssertBearerChallenge(Error);
+		}
+
+		[TestMethod]
+		public async Task Test_39_AuthorizationEndpointHasClickjackingProtection()
+		{
+			string State = Guid.NewGuid().ToString();
+			string RedirectUri = BaseUrl + CallbackResource;
+
+			using System.Net.Http.HttpClient Client = new();
+			using System.Net.Http.HttpResponseMessage Response = await Client.GetAsync(
+				BaseUrl + OAuthAuthorizeResource.DefaultResourcePath +
+				"?response_type=code" +
+				"&client_id=" + Uri.EscapeDataString(TestUserName) +
+				"&state=" + Uri.EscapeDataString(State) +
+				"&redirect_uri=" + Uri.EscapeDataString(RedirectUri),
+				CancellationToken.None);
+
+			string ResponseText = await Response.Content.ReadAsStringAsync(CancellationToken.None);
+			Assert.IsTrue(Response.IsSuccessStatusCode, ResponseText);
+
+			bool FoundProtection = false;
+			if (Response.Headers.TryGetValues("X-Frame-Options", out IEnumerable<string> XFrameOptions))
+			{
+				foreach (string Value in XFrameOptions)
+				{
+					if (!string.IsNullOrEmpty(Value))
+						FoundProtection = true;
+				}
+			}
+
+			if (Response.Headers.TryGetValues("Content-Security-Policy", out IEnumerable<string> CspValues))
+			{
+				foreach (string Value in CspValues)
+				{
+					if (Value.Contains("frame-ancestors", StringComparison.OrdinalIgnoreCase))
+						FoundProtection = true;
+				}
+			}
+
+			Assert.IsTrue(FoundProtection,
+				"Expected X-Frame-Options or Content-Security-Policy frame-ancestors on the authorization page.");
+		}
+
+		[TestMethod]
+		public async Task Test_40_AccessTokenIsSignedJwtWithExpiration()
+		{
+			string AccessToken = await Login(LoginMethod.CodeFormWithPkceS256);
+
+			IDictionary<string, object> Header = DecodeJwtPart(AccessToken, 0);
+			Assert.IsTrue(Header.TryGetValue("alg", out object Algorithm),
+				"Expected JWT header to contain alg.");
+			Assert.IsFalse(string.Equals("none", Algorithm as string, StringComparison.OrdinalIgnoreCase),
+				"Expected signed JWT access token.");
+
+			IDictionary<string, object> Payload = DecodeJwtPart(AccessToken, 1);
+			Assert.IsTrue(Payload.ContainsKey("sub"), "Expected JWT access token to contain sub.");
+			AssertPositiveUnixTime(Required<object>(Payload, "exp"), "exp");
+		}
+
 		private static WebException AssertWebException(
-			ContentResponse Response, int ExpectedStatusCode)
+			ContentResponse Response, params int[] ExpectedStatusCodes)
 		{
 			Assert.IsTrue(Response.HasError);
 			WebException Result = Response.Error as WebException;
 			Assert.IsNotNull(Result);
-			Assert.AreEqual(ExpectedStatusCode, (int)Result.StatusCode);
+
+			foreach (int ExpectedStatusCode in ExpectedStatusCodes)
+			{
+				if ((int)Result.StatusCode == ExpectedStatusCode)
+					return Result;
+			}
+
+			Assert.Fail("Unexpected status code: " + (int)Result.StatusCode);
+			return Result;
+		}
+
+		private static void AssertPositiveUnixTime(object Value, string ClaimName)
+		{
+			long Timestamp = ToInt64(Value, ClaimName);
+			long Now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+			Assert.IsGreaterThan(Now, Timestamp, "Expected " + ClaimName + " to be a future UNIX timestamp.");
+		}
+
+		private static long ToInt64(object Value, string Name)
+		{
+			Assert.IsNotNull(Value, "Missing " + Name + ".");
+
+			if (Value is string s)
+			{
+				Assert.IsTrue(long.TryParse(s, out long Parsed),
+					"Expected numeric " + Name + ".");
+				return Parsed;
+			}
+
+			string Error;
+
+			try
+			{
+				return Convert.ToInt64(Value);
+			}
+			catch (Exception ex)
+			{
+				Error = ex.Message;
+			}
+
+			Assert.Fail("Expected numeric " + Name + ": " + Error);
+			return 0;
+		}
+
+		private static IDictionary<string, object> DecodeJwtPart(string Token, int Part)
+		{
+			Assert.IsFalse(string.IsNullOrEmpty(Token), "Missing JWT.");
+			string[] Parts = Token.Split('.');
+			Assert.HasCount(3, Parts, "Expected JWT to contain three parts.");
+
+			string Encoded = Parts[Part].Replace('-', '+').Replace('_', '/');
+			switch (Encoded.Length % 4)
+			{
+				case 2:
+					Encoded += "==";
+					break;
+
+				case 3:
+					Encoded += "=";
+					break;
+			}
+
+			byte[] Decoded = Convert.FromBase64String(Encoded);
+			object Parsed = JSON.Parse(Encoding.UTF8.GetString(Decoded));
+			IDictionary<string, object> Result = Parsed as IDictionary<string, object>;
+			Assert.IsNotNull(Result);
 			return Result;
 		}
 
@@ -1005,6 +1269,9 @@ namespace Waher.Networking.HTTP.Test
 			string UserName, string Password)
 		{
 			AuthorizationResult AuthorizationCode = await Authorize(Method, UserName, Password);
+			
+			Assert.AreEqual(BaseUrl, AuthorizationCode.Issuer);
+
 			if (AuthorizationCode.HasToken)
 				return AuthorizationCode.Token;
 
@@ -1028,6 +1295,9 @@ namespace Waher.Networking.HTTP.Test
 			string AccessToken = Required<string>(Parsed, "access_token");
 			Assert.IsFalse(string.IsNullOrEmpty(AccessToken));
 
+			int ExpiresIn = Required<int>(Parsed, "expires_in");
+			Assert.IsGreaterThan(0, ExpiresIn, "Expected positive expires_in.");
+
 			return AccessToken;
 		}
 
@@ -1040,6 +1310,8 @@ namespace Waher.Networking.HTTP.Test
 			public string RedirectUri;
 			public string Token;
 			public string RefreshToken;
+			public string Issuer;
+			public int ExpiresIn;
 		}
 
 		private static Task<AuthorizationResult> Authorize(LoginMethod Method)
@@ -1274,6 +1546,22 @@ namespace Waher.Networking.HTTP.Test
 					ExpectState = false;
 					break;
 
+				case LoginMethod.ClientCredentialsBasicAuth:
+					Request = new Dictionary<string, string>()
+					{
+						{ "grant_type", "client_credentials" }
+					};
+
+					AuthorizeResponse = await InternetContent.PostAsync(
+						new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath), Request,
+						new KeyValuePair<string, string>("Authorization", "Basic " + 
+							Convert.ToBase64String(Encoding.UTF8.GetBytes(UserName + ":" + Password))));
+
+					FormPostback = null;
+					ExpectToken = true;
+					ExpectState = false;
+					break;
+
 				default:
 					throw new Exception("Unknown code method: " + Method);
 			}
@@ -1306,6 +1594,9 @@ namespace Waher.Networking.HTTP.Test
 				RedirectUri = RedirectUri
 			};
 
+			if (Response.TryGetValue("iss", out object Issuer))
+				Result.Issuer = Issuer as string;
+
 			if (ExpectCode)
 			{
 				Assert.IsTrue(Response.TryGetValue("code", out object Code), "Response did not contain code.");
@@ -1324,6 +1615,18 @@ namespace Waher.Networking.HTTP.Test
 
 				if (Response.TryGetValue("refresh_token", out object RefreshToken))
 					Result.RefreshToken = RefreshToken as string;
+
+				if (Response.TryGetValue("expires_in", out object ExpiresIn))
+				{
+					if (ExpiresIn is int i ||
+						ExpiresIn is string s && int.TryParse(s, out i))
+					{
+						Assert.IsGreaterThan(0, i);
+						Result.ExpiresIn = i;
+					}
+					else
+						Assert.Fail("Invalid expires_in");
+				}
 			}
 
 			return Result;

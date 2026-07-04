@@ -65,14 +65,16 @@ namespace Waher.Networking.HTTP.OAuth
 				{ "authorization_endpoint", AuthorizeUri },
 				{ "token_endpoint", TokenUri },
 				{ "scopes_supported", OAuthScopesSupportedAttribute.RegisteredScopes },
-				{ "token_endpoint_auth_methods_supported", new string[]	// TODO: Dynamic
+				{ "token_endpoint_auth_methods_supported", new string[]
 					{
-						"client_secret_basic"
+						"client_secret_basic",
+						"client_secret_post"
 					} 
 				},
 				{ "token_endpoint_auth_signing_alg_values_supported", JwsAlgorithm.GetAlgorithmNames() },
 				{ "response_types_supported", new string[] { "code", "token" } },
 				{ "code_challenge_methods_supported", new string[] { "plain", "S256" } },
+				{ "authorization_response_iss_parameter_supported", this.authorizeResource.JwtFactory?.HasIssuer ?? false },
 				{ "grant_types_supported", new string[] 
 					{ 
 						"authorization_code", 

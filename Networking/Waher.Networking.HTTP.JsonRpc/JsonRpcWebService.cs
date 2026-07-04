@@ -475,7 +475,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			{
 				foreach (KeyValuePair<string, string> P in Request.Header.QueryParameters)
 				{
-					string s = System.Net.WebUtility.UrlDecode(P.Value);
+					string s = P.Value;
 					object? Value;
 
 					if (P.Key == "params")

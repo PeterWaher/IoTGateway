@@ -222,8 +222,6 @@ namespace Waher.WebService.Sparql
 			if (!Request.Header.TryGetQueryParameter("graph", out string GraphUri))
 				throw new SeeOtherException("/GraphStore.md");
 
-			GraphUri = HttpUtility.UrlDecode(GraphUri);
-
 			if (!Uri.TryCreate(GraphUri, UriKind.RelativeOrAbsolute, out Uri ParsedUri))
 				throw new BadRequestException("Invalid graph URI.");
 

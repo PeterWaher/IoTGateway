@@ -999,8 +999,7 @@ namespace Waher.Networking.HTTP.Test
 				if (!req.Header.TryGetQueryParameter("C", out string C))
 					throw new BadRequestException();
 
-				await resp.Return(WebUtility.UrlDecode(A) + " " + WebUtility.UrlDecode(B) + " " +
-					WebUtility.UrlDecode(C));
+				await resp.Return(A + " " + B + " " + C);
 			});
 			this.server.Register(new HttpReverseProxyResource("/Proxy30", "localhost", 8081, "/Remote", false, TimeSpan.FromSeconds(10)));
 

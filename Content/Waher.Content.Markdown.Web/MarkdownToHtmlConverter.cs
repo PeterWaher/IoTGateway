@@ -129,7 +129,6 @@ namespace Waher.Content.Markdown.Web
 						Parameter = Row.Substring(10).Trim();
 						if (RequestHeader.TryGetQueryParameter(Parameter, out string Value))
 						{
-							Value = System.Net.WebUtility.UrlDecode(Value);
 							if (CommonTypes.TryParse(Value, out double d))
 								Variables[Parameter] = d;
 							else if (bool.TryParse(Value, out b))

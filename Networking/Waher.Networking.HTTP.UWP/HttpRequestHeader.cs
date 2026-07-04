@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Web;
 using Waher.Content;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.Vanity;
@@ -139,13 +140,14 @@ namespace Waher.Networking.HTTP
 					i = Part.IndexOf('=');
 					if (i < 0)
 					{
-						this.query[Part] = string.Empty;
-						Parameters.Add(new KeyValuePair<string, string>(Part, string.Empty));
+						Key = HttpUtility.UrlDecode(Part);
+						this.query[Key] = string.Empty;
+						Parameters.Add(new KeyValuePair<string, string>(Key, string.Empty));
 					}
 					else
 					{
-						Key = Part.Substring(0, i);
-						Name = Part.Substring(i + 1);
+						Key = HttpUtility.UrlDecode(Part.Substring(0, i));
+						Name = HttpUtility.UrlDecode(Part.Substring(i + 1));
 						this.query[Key] = Name;
 						Parameters.Add(new KeyValuePair<string, string>(Key, Name));
 					}

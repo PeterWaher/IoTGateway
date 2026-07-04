@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using Waher.Runtime.Collections;
 using Waher.Security.JWS;
@@ -62,6 +61,8 @@ namespace Waher.Security.JWT
 
 		private IJwsAlgorithm algorithm;
 		private TimeSpan timeMargin = TimeSpan.Zero;
+		private readonly string issuer;
+		private readonly bool hasIssuer;
 		private readonly KeyValuePair<string, object>[] header = new KeyValuePair<string, object>[]
 		{
 			new KeyValuePair<string, object>("typ", "JWT")
@@ -71,9 +72,22 @@ namespace Waher.Security.JWT
 		/// A factory that can create and validate JWT tokens.
 		/// </summary>
 		/// <param name="Algorithm">JWS Algorithm to use for signatures</param>
+		[Obsolete("Use the constructor that defines the default issuer claim to use in tokens created by the factory.")]
 		public JwtFactory(IJwsAlgorithm Algorithm)
+			: this(Algorithm, null)
+		{
+		}
+
+		/// <summary>
+		/// A factory that can create and validate JWT tokens.
+		/// </summary>
+		/// <param name="Algorithm">JWS Algorithm to use for signatures</param>
+		/// <param name="Issuer">Issuer identifier of the token factory.</param>
+		public JwtFactory(IJwsAlgorithm Algorithm, string Issuer)
 		{
 			this.algorithm = Algorithm;
+			this.issuer = Issuer;
+			this.hasIssuer = !string.IsNullOrEmpty(Issuer);
 		}
 
 		/// <summary>
@@ -98,6 +112,7 @@ namespace Waher.Security.JWT
 		/// <summary>
 		/// Creates a JWT factory that can create and validate JWT tokens using the HMAC-SHA256 algorithm.
 		/// </summary>
+		[Obsolete("Use an overload that defines the default issuer claim to use in tokens created by the factory.")]
 		public static JwtFactory CreateHmacSha256()
 		{
 			return new JwtFactory(new HmacSha256());
@@ -107,14 +122,35 @@ namespace Waher.Security.JWT
 		/// Creates a JWT factory that can create and validate JWT tokens using the HMAC-SHA256 algorithm.
 		/// </summary>
 		/// <param name="Secret">Secret used for creating and validating signatures.</param>
+		[Obsolete("Use an overload that defines the default issuer claim to use in tokens created by the factory.")]
 		public static JwtFactory CreateHmacSha256(byte[] Secret)
 		{
 			return new JwtFactory(new HmacSha256(Secret));
 		}
 
 		/// <summary>
+		/// Creates a JWT factory that can create and validate JWT tokens using the HMAC-SHA256 algorithm.
+		/// </summary>
+		/// <param name="Issuer">Issuer identifier of the token factory.</param>
+		public static JwtFactory CreateHmacSha256(string Issuer)
+		{
+			return new JwtFactory(new HmacSha256(), Issuer);
+		}
+
+		/// <summary>
+		/// Creates a JWT factory that can create and validate JWT tokens using the HMAC-SHA256 algorithm.
+		/// </summary>
+		/// <param name="Secret">Secret used for creating and validating signatures.</param>
+		/// <param name="Issuer">Issuer identifier of the token factory.</param>
+		public static JwtFactory CreateHmacSha256(byte[] Secret, string Issuer)
+		{
+			return new JwtFactory(new HmacSha256(Secret), Issuer);
+		}
+
+		/// <summary>
 		/// Creates a JWT factory that can create and validate JWT tokens using the RSA256 algorithm.
 		/// </summary>
+		[Obsolete("Use an overload that defines the default issuer claim to use in tokens created by the factory.")]
 		public static JwtFactory CreateRsa256()
 		{
 			return new JwtFactory(new RsaSsaPkcsSha256());
@@ -124,6 +160,7 @@ namespace Waher.Security.JWT
 		/// Creates a JWT factory that can create and validate JWT tokens using the RSA256 algorithm.
 		/// </summary>
 		/// <param name="KeySize">Key size.</param>
+		[Obsolete("Use an overload that defines the default issuer claim to use in tokens created by the factory.")]
 		public static JwtFactory CreateRsa256(int KeySize)
 		{
 			return new JwtFactory(new RsaSsaPkcsSha256(KeySize));
@@ -133,6 +170,7 @@ namespace Waher.Security.JWT
 		/// Creates a JWT factory that can create and validate JWT tokens using the RSA256 algorithm.
 		/// </summary>
 		/// <param name="Algorithm">RSA Algorithm used for creating and validating signatures.</param>
+		[Obsolete("Use an overload that defines the default issuer claim to use in tokens created by the factory.")]
 		public static JwtFactory CreatRsa256(RSA Algorithm)
 		{
 			return new JwtFactory(new RsaSsaPkcsSha256(Algorithm));
@@ -142,9 +180,48 @@ namespace Waher.Security.JWT
 		/// Creates a JWT factory that can create and validate JWT tokens using the RSA256 algorithm.
 		/// </summary>
 		/// <param name="Parameters">RSA Parameters</param>
+		[Obsolete("Use an overload that defines the default issuer claim to use in tokens created by the factory.")]
 		public static JwtFactory CreateRsa256(RSAParameters Parameters)
 		{
 			return new JwtFactory(new RsaSsaPkcsSha256(Parameters));
+		}
+
+		/// <summary>
+		/// Creates a JWT factory that can create and validate JWT tokens using the RSA256 algorithm.
+		/// </summary>
+		public static JwtFactory CreateRsa256(string Issuer)
+		{
+			return new JwtFactory(new RsaSsaPkcsSha256(), Issuer);
+		}
+
+		/// <summary>
+		/// Creates a JWT factory that can create and validate JWT tokens using the RSA256 algorithm.
+		/// </summary>
+		/// <param name="KeySize">Key size.</param>
+		/// <param name="Issuer">Issuer identifier of the token factory.</param>
+		public static JwtFactory CreateRsa256(int KeySize, string Issuer)
+		{
+			return new JwtFactory(new RsaSsaPkcsSha256(KeySize), Issuer);
+		}
+
+		/// <summary>
+		/// Creates a JWT factory that can create and validate JWT tokens using the RSA256 algorithm.
+		/// </summary>
+		/// <param name="Algorithm">RSA Algorithm used for creating and validating signatures.</param>
+		/// <param name="Issuer">Issuer identifier of the token factory.</param>
+		public static JwtFactory CreatRsa256(RSA Algorithm, string Issuer)
+		{
+			return new JwtFactory(new RsaSsaPkcsSha256(Algorithm), Issuer);
+		}
+
+		/// <summary>
+		/// Creates a JWT factory that can create and validate JWT tokens using the RSA256 algorithm.
+		/// </summary>
+		/// <param name="Parameters">RSA Parameters</param>
+		/// <param name="Issuer">Issuer identifier of the token factory.</param>
+		public static JwtFactory CreateRsa256(RSAParameters Parameters, string Issuer)
+		{
+			return new JwtFactory(new RsaSsaPkcsSha256(Parameters), Issuer);
 		}
 
 		/// <summary>
@@ -162,6 +239,16 @@ namespace Waher.Security.JWT
 				this.timeMargin = value;
 			}
 		}
+
+		/// <summary>
+		/// Issuer identifier of the token factory, if available.
+		/// </summary>
+		public string Issuer => this.issuer;
+
+		/// <summary>
+		/// If the factory has an issuer identifier.
+		/// </summary>
+		public bool HasIssuer => this.hasIssuer;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -303,23 +390,42 @@ namespace Waher.Security.JWT
 		/// <returns>JWT token.</returns>
 		public string Create(IEnumerable<KeyValuePair<string, object>> Headers, IEnumerable<KeyValuePair<string, object>> Claims)
 		{
-			IEnumerable<KeyValuePair<string, object>> Headers2;
-
 			if (Headers is null)
-				Headers2 = this.header;
+				Headers = this.header;
 			else
 			{
 				ChunkedList<KeyValuePair<string, object>> Union = new ChunkedList<KeyValuePair<string, object>>();
-
 				Union.AddRange(this.header);
 
 				foreach (KeyValuePair<string, object> P in Headers)
 					Union.Add(P);
 
-				Headers2 = Union.ToArray();
+				Headers = Union.ToArray();
 			}
 
-			this.algorithm.Sign(Headers2, Claims, out string Header, out string Payload,
+			if (this.hasIssuer)
+			{
+				ChunkedList<KeyValuePair<string, object>> NewClaims = new ChunkedList<KeyValuePair<string, object>>();
+				bool IssuerAdded = false;
+
+				foreach (KeyValuePair<string,object> P in Claims)
+				{
+					if (P.Key == JwtClaims.Issuer)
+					{
+						NewClaims.Add(new KeyValuePair<string, object>(JwtClaims.Issuer, this.issuer));
+						IssuerAdded = true;
+					}
+					else
+						NewClaims.Add(P);
+				}
+
+				if (!IssuerAdded)
+					NewClaims.Add(new KeyValuePair<string, object>(JwtClaims.Issuer, this.issuer));
+
+				Claims = NewClaims.ToArray();
+			}
+
+			this.algorithm.Sign(Headers, Claims, out string Header, out string Payload,
 				out string Signature);
 
 			return Header + "." + Payload + "." + Signature;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Security.LoginMonitor;
@@ -13,6 +14,8 @@ namespace Waher.Security.JWT
 	/// </summary>
 	public class JwtAuthentication : HttpAuthenticationScheme
 	{
+		private static bool permitAccessTokenInQueryString = false;
+
 		private readonly IUserSource users;
 		private readonly JwtFactory factory;
 		private readonly string realm;
@@ -219,10 +222,32 @@ namespace Waher.Security.JWT
 			if (!(Authorization is null) && Authorization.Value.StartsWith("Bearer ", StringComparison.CurrentCultureIgnoreCase))
 				return Authorization.Value.Substring(7).Trim();
 
-			if (Request.Header.TryGetQueryParameter("access_token", out string Token))      // RFC 6750, §2.3: https://www.rfc-editor.org/rfc/rfc6750#section-2.3
-				return Token;
+			if (permitAccessTokenInQueryString)
+			{
+				if (Request.Header.TryGetQueryParameter("access_token", out string Token))      // RFC 6750, §2.3: https://www.rfc-editor.org/rfc/rfc6750#section-2.3
+					return Token;
+			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// If true, access tokens are permitted in query strings. Default is false, since
+		/// this is not recommended.
+		/// </summary>
+		public bool PermitAccessTokenInQueryString
+		{
+			get => permitAccessTokenInQueryString;
+			set
+			{
+				if (permitAccessTokenInQueryString != value)
+				{
+					if (value)
+						Log.Warning("Access tokens should not be used in query strings by default.");
+
+					permitAccessTokenInQueryString = value;
+				}
+			}
 		}
 
 		/// <summary>

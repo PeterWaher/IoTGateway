@@ -46,7 +46,9 @@ namespace Waher.Security.JWT.Functions
 			if (!(Argument.AssociatedObjectValue is IJwsAlgorithm Algorithm))
 				throw new ScriptRuntimeException("Expected a JWS Algorithm argument.", this);
 
-			return new ObjectValue(new JwtFactory(Algorithm));
+			// TODO: Issuer
+
+			return new ObjectValue(new JwtFactory(Algorithm, string.Empty));
         }
 
 		/// <summary>

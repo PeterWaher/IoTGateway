@@ -138,7 +138,7 @@ namespace Waher.Networking.HTTP.OAuth
 		public IUserSource Users => this.userSource;
 
 		internal async Task<string> GenerateTokenCode(IUserWithClaims User, bool Encrypted,
-			string CodeChallenge, string CodeChallengeMethod)
+			string CodeChallenge, string CodeChallengeMethod, string RedirectUri)
 		{
 			if (this.jwtFactory is null)
 				throw new ServiceUnavailableException("No JWT factory configured.");
@@ -158,23 +158,29 @@ namespace Waher.Networking.HTTP.OAuth
 			}
 			while (tokenCache.ContainsKey(Code));
 
-			tokenCache[Code] = new TokenRef(Token, CodeChallenge, CodeChallengeMethod);
+			tokenCache[Code] = new TokenRef(Token, User.UserName, CodeChallenge,
+				CodeChallengeMethod, RedirectUri);
 
 			return Code;
 		}
 
 		private class TokenRef
 		{
-			public TokenRef(string Token, string CodeChallenge, string CodeChallengeMethod)
+			public TokenRef(string Token, string ClientId, string CodeChallenge,
+				string CodeChallengeMethod, string RedirectUri)
 			{
 				this.Token = Token;
+				this.ClientId = ClientId;
 				this.CodeChallenge = CodeChallenge;
 				this.CodeChallengeMethod = CodeChallengeMethod;
+				this.RedirectUri = RedirectUri;
 			}
 
 			public string Token;
+			public string ClientId;
 			public string CodeChallenge;
 			public string CodeChallengeMethod;
+			public string RedirectUri;
 
 			public async Task<bool> Check(string CodeVerifier, HttpResponse Response)
 			{
@@ -216,6 +222,12 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
+			if (OAuthAuthorizeResource.HasDuplicateQueryParameters(Request))
+			{
+				await Response.SendResponse(new BadRequestException("Duplicate query parameters."));
+				return;
+			}
+
 			if (!Request.Header.TryGetQueryParameter("code", out string Code))
 			{
 				await Response.SendResponse(new BadRequestException("Missing code."));
@@ -241,6 +253,9 @@ namespace Waher.Networking.HTTP.OAuth
 			}
 
 			tokenCache.Remove(Code);
+
+			Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
+			Response.SetHeader("Pragma", "no-cache");
 
 			await Response.Return(new Dictionary<string, object>()
 			{
@@ -373,43 +388,72 @@ namespace Waher.Networking.HTTP.OAuth
 			switch (GrantType)
 			{
 				case "authorization_code":
-					if (Form.TryGetValue("code", out string Code))
+					string ClientId;
+
+					if (!Form.TryGetValue("code", out string Code))
 					{
-						if (!tokenCache.TryGetValue(Code, out TokenRef Ref))
-						{
-							await Response.SendResponse(new ForbiddenException("Invalid code."));
-							return;
-						}
-
-						if (!string.IsNullOrEmpty(Ref.CodeChallenge))
-						{
-							if (!Form.TryGetValue("code_verifier", out string CodeVerifier))
-							{
-								await Response.SendResponse(new BadRequestException("Missing code_verifier."));
-								return;
-							}
-
-							if (!await Ref.Check(CodeVerifier, Response))
-								return;
-						}
-
-						tokenCache.Remove(Code);
-						Token = Ref.Token;
-						break;
-					}
-					else
-					{
-						await Response.SendResponse(ForbiddenException.AccessDenied(
-							this.ResourceName, Request.RemoteEndPoint));
+						await Response.SendResponse(new BadRequestException());
 						return;
 					}
 
+					if (!tokenCache.TryGetValue(Code, out TokenRef Ref))
+					{
+						await Response.SendResponse(new ForbiddenException("Invalid code."));
+						return;
+					}
+
+					if (!Form.TryGetValue("redirect_uri", out string RedirectUri) ||
+						!Form.TryGetValue("client_id", out ClientId))
+					{
+						await Response.SendResponse(new BadRequestException("Missing client_id."));
+						return;
+					}
+
+					if (ClientId != Ref.ClientId)
+					{
+						await Response.SendResponse(new ForbiddenException());
+						return;
+					}
+
+					if (Ref.RedirectUri != RedirectUri)
+					{
+						await Response.SendResponse(new ForbiddenException());
+						return;
+					}
+
+					if (!string.IsNullOrEmpty(Ref.CodeChallenge))
+					{
+						if (!Form.TryGetValue("code_verifier", out string CodeVerifier))
+						{
+							await Response.SendResponse(new BadRequestException("Missing code_verifier."));
+							return;
+						}
+
+						if (!await Ref.Check(CodeVerifier, Response))
+							return;
+					}
+
+					tokenCache.Remove(Code);
+					Token = Ref.Token;
+					break;
+
 				case "client_credentials":
 				case "password":
-					if ((Form.TryGetValue("client_id", out string ClientId) ||
-						Form.TryGetValue("username", out ClientId)) &&
-						(Form.TryGetValue("client_secret", out string ClientSecret) ||
-						Form.TryGetValue("password", out ClientSecret)))
+					string ClientSecret = string.Empty;
+					bool HasCredentials;
+
+					if (GrantType == "password")
+					{
+						HasCredentials = Form.TryGetValue("username", out ClientId) &&
+							Form.TryGetValue("password", out ClientSecret);
+					}
+					else
+					{
+						HasCredentials = Form.TryGetValue("client_id", out ClientId) &&
+							Form.TryGetValue("client_secret", out ClientSecret);
+					}
+
+					if (HasCredentials)
 					{
 						if (!Request.Encrypted && (Request.Server.OpenHttpsPorts?.Length ?? 0) > 0)
 						{
@@ -478,8 +522,7 @@ namespace Waher.Networking.HTTP.OAuth
 					}
 					else
 					{
-						await Response.SendResponse(ForbiddenException.AccessDenied(
-								this.ResourceName, Request.RemoteEndPoint));
+						await Response.SendResponse(new BadRequestException());
 						return;
 					}
 					break;
@@ -488,6 +531,9 @@ namespace Waher.Networking.HTTP.OAuth
 					await Response.SendResponse(new BadRequestException("Unsupported grant_type: " + GrantType));
 					return;
 			}
+
+			Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
+			Response.SetHeader("Pragma", "no-cache");
 
 			await Response.Return(TokenResponse(Token));
 		}

@@ -126,6 +126,12 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
+			if (HasDuplicateQueryParameters(Request))
+			{
+				await Response.SendResponse(new BadRequestException("Duplicate query parameters."));
+				return;
+			}
+
 			if (!Request.Header.TryGetQueryParameter("response_type", out string ResponseType))
 			{
 				await Response.SendResponse(new BadRequestException("Missing response_type parameter."));
@@ -134,6 +140,21 @@ namespace Waher.Networking.HTTP.OAuth
 
 			await this.PrepareForm(ResponseType, Request.Header.QueryParametersPerName,
 				Request, Response);
+		}
+
+		internal static bool HasDuplicateQueryParameters(HttpRequest Request)
+		{
+			HashSet<string> Parameters = new HashSet<string>();
+
+			foreach (KeyValuePair<string, string> P in Request.Header.QueryParameters)
+			{
+				if (Parameters.Contains(P.Key))
+					return true;
+				else
+					Parameters.Add(P.Key);
+			}
+
+			return false;
 		}
 
 		private async Task PrepareForm(string ResponseType, IDictionary<string, string> Form,
@@ -158,8 +179,20 @@ namespace Waher.Networking.HTTP.OAuth
 					if (!Form.TryGetValue("code_challenge", out string CodeChallenge))
 						CodeChallenge = string.Empty;
 
-					if (!Form.TryGetValue("code_challenge_method", out string CodeChallengeMethod))
-						CodeChallengeMethod = string.Empty;
+					if (!Form.TryGetValue("code_challenge_method", out string CodeChallengeMethod) ||
+						string.IsNullOrEmpty(CodeChallengeMethod))
+					{
+						CodeChallengeMethod = "plain";
+					}
+
+					if (CodeChallengeMethod != "plain" && CodeChallengeMethod != "S256")
+					{
+						await Response.SendResponse(new BadRequestException("Unsupported code_challenge_method: " + CodeChallengeMethod));
+						return;
+					}
+
+					Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
+					Response.SetHeader("Pragma", "no-cache");
 
 					await Response.Return(await this.GenerateLoginForm(Request, ClientId,
 						HttpUtility.UrlDecode(RedirectUri),
@@ -196,6 +229,9 @@ namespace Waher.Networking.HTTP.OAuth
 							await Response.SendResponse(new ForbiddenException());
 							return;
 						}
+
+						Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
+						Response.SetHeader("Pragma", "no-cache");
 
 						string Token = await User.CreateToken(this.jwtFactory, Request.Encrypted);
 						await Response.Return(OAuthTokenResource.TokenResponse(Token, State));
@@ -355,21 +391,31 @@ namespace Waher.Networking.HTTP.OAuth
 				return;
 			}
 
-			if (Form.Count != 6 ||
-				!Form.TryGetValue("client_id", out string UserName) ||
+			if (!Form.TryGetValue("client_id", out string UserName) ||
 				!Form.TryGetValue("client_secret", out string Password) ||
-				!Form.TryGetValue("redirect_uri", out string From) ||
+				!Form.TryGetValue("redirect_uri", out string RedirectUri) ||
 				!Form.TryGetValue("state", out string State) ||
-				!Form.TryGetValue("code_challenge", out string CodeChallenge) ||
-				!Form.TryGetValue("code_challenge_method", out string CodeChallengeMethod))
+				!Form.TryGetValue("code_challenge", out string CodeChallenge))
 			{
 				await Response.SendResponse(new BadRequestException("Invalid form."));
 				return;
 			}
 
-			if (string.IsNullOrEmpty(From))
+			if (!Form.TryGetValue("code_challenge_method", out string CodeChallengeMethod) ||
+				string.IsNullOrWhiteSpace(CodeChallengeMethod))
 			{
-				await Response.SendResponse(new BadRequestException("Missing or empty From parameter."));
+				CodeChallengeMethod = "plain";
+			}
+
+			if (CodeChallengeMethod != "plain" && CodeChallengeMethod != "S256")
+			{
+				await Response.SendResponse(new BadRequestException("Unsupported code_challenge_method: " + CodeChallengeMethod));
+				return;
+			}
+
+			if (string.IsNullOrEmpty(RedirectUri))
+			{
+				await Response.SendResponse(new BadRequestException("Missing or empty redirect_uri parameter."));
 				return;
 			}
 
@@ -394,29 +440,29 @@ namespace Waher.Networking.HTTP.OAuth
 					if (!(LoginResult.User is IUserWithClaims UserWithClaims))
 					{
 						await Response.Return(await this.GenerateLoginForm(Request, UserName,
-							From, State, CodeChallenge, CodeChallengeMethod,
+							RedirectUri, State, CodeChallenge, CodeChallengeMethod,
 							"User cannot be used with OAUTH login."));
 						return;
 					}
 
 					string Code = await this.tokenResource.GenerateTokenCode(UserWithClaims,
-						Request.Encrypted, CodeChallenge, CodeChallengeMethod);
+						Request.Encrypted, CodeChallenge, CodeChallengeMethod, RedirectUri);
 
-					if (From.Contains('?'))
-						From += "&code=" + HttpUtility.UrlEncode(Code);
+					if (RedirectUri.Contains('?'))
+						RedirectUri += "&code=" + HttpUtility.UrlEncode(Code);
 					else
-						From += "?code=" + HttpUtility.UrlEncode(Code);
+						RedirectUri += "?code=" + HttpUtility.UrlEncode(Code);
 
 					if (!string.IsNullOrEmpty(State))
-						From += "&state=" + HttpUtility.UrlEncode(State);
+						RedirectUri += "&state=" + HttpUtility.UrlEncode(State);
 
-					await Response.SendResponse(new SeeOtherException(From));
+					await Response.SendResponse(new SeeOtherException(RedirectUri));
 					break;
 
 				case LoginResultType.InvalidCredentials:
 				default:
 					await Response.Return(await this.GenerateLoginForm(Request, UserName,
-						From, State, CodeChallenge, CodeChallengeMethod,
+						RedirectUri, State, CodeChallenge, CodeChallengeMethod,
 						"Invalid user name or password."));
 					return;
 
@@ -427,14 +473,14 @@ namespace Waher.Networking.HTTP.OAuth
 
 				case LoginResultType.TemporarilyBlocked:
 					await Response.Return(await this.GenerateLoginForm(Request, UserName,
-						From, State, CodeChallenge, CodeChallengeMethod,
+						RedirectUri, State, CodeChallenge, CodeChallengeMethod,
 						"You are temporarily blocked. Try again after: " +
 						LoginResult.Next?.ToString()));
 					return;
 
 				case LoginResultType.PermanentlyBlocked:
 					await Response.Return(await this.GenerateLoginForm(Request, UserName,
-						From, State, CodeChallenge, CodeChallengeMethod,
+						RedirectUri, State, CodeChallenge, CodeChallengeMethod,
 						"You are permanently blocked."));
 					return;
 			}

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Getters;
@@ -25,6 +26,7 @@ namespace Waher.Networking.HTTP.Test
 	{
 		CodeForm,
 		CodePost,
+		CodeFormWithPkceDefault,
 		CodeFormWithPkcePlain,
 		CodeFormWithPkceS256,
 		CodePostWithPkcePlain,
@@ -98,6 +100,25 @@ namespace Waher.Networking.HTTP.Test
 			if (!Request.Header.TryGetQueryParameter("state", out string State))
 				State = string.Empty;
 
+			if (Request.Header.TryGetQueryParameter("error", out string Error) &&
+				!string.IsNullOrEmpty(Error))
+			{
+				Dictionary<string, object> Result = new()
+				{
+					{ "error", Error },
+					{ "state", State }
+				};
+
+				if (Request.Header.TryGetQueryParameter("error_description", out string ErrorDescription))
+					Result["error_description"] = ErrorDescription;
+
+				if (Request.Header.TryGetQueryParameter("error_uri", out string ErrorUri))
+					Result["error_uri"] = ErrorUri;
+
+				await Response.Return(Result);
+				return;
+			}
+
 			if (Request.Header.TryGetQueryParameter("code", out string Code) &&
 				!string.IsNullOrEmpty(Code))
 			{
@@ -123,6 +144,9 @@ namespace Waher.Networking.HTTP.Test
 
 				if (Request.Header.TryGetQueryParameter("expires_in", out string ExpiresIn))
 					Result["expires_in"] = ExpiresIn;
+
+				if (Request.Header.TryGetQueryParameter("refresh_token", out string RefreshToken))
+					Result["refresh_token"] = RefreshToken;
 
 				await Response.Return(Result);
 				return;
@@ -240,6 +264,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		[DataRow(LoginMethod.CodeForm)]
 		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
 		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
@@ -251,7 +276,11 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_02_Login(LoginMethod Method)
 		{
 			string AccessToken = await Login(Method);
+			await AssertHello(AccessToken);
+		}
 
+		private static async Task AssertHello(string AccessToken)
+		{
 			ContentResponse HelloResponse = await InternetContent.GetAsync(
 				new Uri(BaseUrl + ProtectedResource),
 				new KeyValuePair<string, string>("Authorization", "Bearer " + AccessToken));
@@ -265,6 +294,11 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ContentResponse Response = await InternetContent.GetAsync(new Uri(BaseUrl + ProtectedResource));
 			WebException Error = AssertWebException(Response, UnauthorizedException.Code);
+			AssertBearerChallenge(Error);
+		}
+
+		private static void AssertBearerChallenge(WebException Error)
+		{
 			bool FoundChallenge = false;
 
 			foreach (KeyValuePair<string, IEnumerable<string>> Header in Error.Headers)
@@ -293,7 +327,8 @@ namespace Waher.Networking.HTTP.Test
 				new Uri(BaseUrl + ProtectedResource),
 				new KeyValuePair<string, string>("Authorization", "Bearer this-is-not-a-jwt"));
 
-			AssertWebException(Response, UnauthorizedException.Code);
+			WebException Error = AssertWebException(Response, UnauthorizedException.Code);
+			AssertBearerChallenge(Error);
 		}
 
 		[TestMethod]
@@ -313,6 +348,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
 		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
@@ -326,7 +362,9 @@ namespace Waher.Networking.HTTP.Test
 				new Dictionary<string, string>()
 				{
 					{ "grant_type", "authorization_code" },
-					{ "code", AuthorizationCode.Code }
+					{ "code", AuthorizationCode.Code },
+					{ "client_id", TestUserName },
+					{ "redirect_uri", AuthorizationCode.RedirectUri }
 				});
 
 			WebException Error = AssertWebException(Response, BadRequestException.Code);
@@ -334,6 +372,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
 		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
@@ -348,7 +387,9 @@ namespace Waher.Networking.HTTP.Test
 				{
 					{ "grant_type", "authorization_code" },
 					{ "code", AuthorizationCode.Code },
-					{ "code_verifier", CreatePkceCodeVerifier() }
+					{ "code_verifier", CreatePkceCodeVerifier() },
+					{ "client_id", TestUserName },
+					{ "redirect_uri", AuthorizationCode.RedirectUri }
 				});
 
 			WebException Error = AssertWebException(Response, ForbiddenException.Code);
@@ -358,6 +399,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		[DataRow(LoginMethod.CodeForm)]
 		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
 		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
@@ -368,31 +410,39 @@ namespace Waher.Networking.HTTP.Test
 
 			ContentResponse FirstResponse = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
-				new Dictionary<string, string>()
-				{
-					{ "grant_type", "authorization_code" },
-					{ "code", AuthorizationCode.Code },
-					{ "code_verifier", AuthorizationCode.CodeVerifier }
-				});
+				CreateAuthorizationCodeTokenRequest(AuthorizationCode, TestUserName));
 			FirstResponse.AssertOk();
 
 			ContentResponse SecondResponse = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
-				new Dictionary<string, string>()
-				{
-					{ "grant_type", "authorization_code" },
-					{ "code", AuthorizationCode.Code },
-					{ "code_verifier", AuthorizationCode.CodeVerifier }
-				});
+				CreateAuthorizationCodeTokenRequest(AuthorizationCode, TestUserName));
 
 			Assert.IsTrue(SecondResponse.HasError);
 			WebException Error = AssertWebException(SecondResponse, ForbiddenException.Code);
 			Assert.Contains("Invalid code", Error.Message);
 		}
 
+		private static Dictionary<string, string> CreateAuthorizationCodeTokenRequest(
+			AuthorizationResult AuthorizationCode, string ClientId)
+		{
+			Dictionary<string, string> Request = new()
+			{
+				{ "grant_type", "authorization_code" },
+				{ "code", AuthorizationCode.Code },
+				{ "client_id", ClientId },
+				{ "redirect_uri", AuthorizationCode.RedirectUri }
+			};
+
+			if (!string.IsNullOrEmpty(AuthorizationCode.CodeVerifier))
+				Request["code_verifier"] = AuthorizationCode.CodeVerifier;
+
+			return Request;
+		}
+
 		[TestMethod]
 		[DataRow(LoginMethod.CodeForm)]
 		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
 		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
@@ -410,6 +460,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		[DataRow(LoginMethod.CodeForm)]
 		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
 		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
@@ -425,6 +476,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		[DataRow(LoginMethod.CodeForm)]
 		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
 		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
@@ -442,6 +494,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		[DataRow(LoginMethod.CodeForm)]
 		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
 		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
@@ -452,6 +505,485 @@ namespace Waher.Networking.HTTP.Test
 		{
 			await Assert.ThrowsAsync<LoginError>(async () => await Login(
 				Method, TestUserName, null));
+		}
+
+		[TestMethod]
+		public async Task Test_13_MissingResponseType()
+		{
+			string State = Guid.NewGuid().ToString();
+			string RedirectUri = BaseUrl + CallbackResource;
+
+			ContentResponse Response = await InternetContent.GetAsync(new Uri(
+				BaseUrl + OAuthAuthorizeResource.DefaultResourcePath +
+				"?client_id=" + Uri.EscapeDataString(TestUserName) +
+				"&state=" + Uri.EscapeDataString(State) +
+				"&redirect_uri=" + Uri.EscapeDataString(RedirectUri)));
+
+			await AssertAuthorizationError(Response, new Dictionary<string, string>()
+			{
+				{ "client_id", TestUserName },
+				{ "client_secret", TestPassword },
+				{ "redirect_uri", RedirectUri },
+				{ "state", State }
+			});
+		}
+
+		[TestMethod]
+		public async Task Test_14_UnsupportedResponseType()
+		{
+			string State = Guid.NewGuid().ToString();
+			string RedirectUri = BaseUrl + CallbackResource;
+
+			ContentResponse Response = await InternetContent.GetAsync(new Uri(
+				BaseUrl + OAuthAuthorizeResource.DefaultResourcePath +
+				"?response_type=unsupported" +
+				"&client_id=" + Uri.EscapeDataString(TestUserName) +
+				"&state=" + Uri.EscapeDataString(State) +
+				"&redirect_uri=" + Uri.EscapeDataString(RedirectUri)));
+
+			await AssertAuthorizationError(Response, new Dictionary<string, string>()
+			{
+				{ "client_id", TestUserName },
+				{ "client_secret", TestPassword },
+				{ "redirect_uri", RedirectUri },
+				{ "state", State },
+				{ "response_type", "unsupported" }
+			});
+		}
+
+		[TestMethod]
+		public async Task Test_15_AuthorizationEndpointIgnoresUnknownParameter()
+		{
+			string State = Guid.NewGuid().ToString();
+			string RedirectUri = BaseUrl + CallbackResource;
+			Dictionary<string, string> FormPostback = new()
+			{
+				{ "client_id", TestUserName },
+				{ "client_secret", TestPassword },
+				{ "redirect_uri", RedirectUri },
+				{ "state", State }
+			};
+
+			ContentResponse AuthorizeResponse = await InternetContent.GetAsync(new Uri(
+				BaseUrl + OAuthAuthorizeResource.DefaultResourcePath +
+				"?response_type=code" +
+				"&client_id=" + Uri.EscapeDataString(TestUserName) +
+				"&state=" + Uri.EscapeDataString(State) +
+				"&redirect_uri=" + Uri.EscapeDataString(RedirectUri) +
+				"&unknown_parameter=ignored"));
+
+			AuthorizeResponse.AssertOk();
+
+			HtmlDocument Form = AuthorizeResponse.Decoded as HtmlDocument;
+			Assert.IsNotNull(Form);
+
+			Dictionary<string, object> Response = await CompleteAuthorizationForm(
+				Form, FormPostback);
+
+			Assert.AreEqual(State, Required<string>(Response, "state"));
+			Assert.IsFalse(string.IsNullOrEmpty(Required<string>(Response, "code")));
+		}
+
+		[TestMethod]
+		public async Task Test_16_MissingGrantType()
+		{
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				new Dictionary<string, string>()
+				{
+					{ "code", "not-used" }
+				});
+
+			AssertWebException(Response, BadRequestException.Code);
+		}
+
+		[TestMethod]
+		public async Task Test_17_UnsupportedGrantType()
+		{
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "unsupported_grant_type" }
+				});
+
+			AssertWebException(Response, BadRequestException.Code);
+		}
+
+		[TestMethod]
+		public async Task Test_18_MissingAuthorizationCode()
+		{
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "authorization_code" },
+					{ "client_id", TestUserName },
+					{ "code_verifier", "not-used" }
+				});
+
+			AssertWebException(Response, BadRequestException.Code);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		public async Task Test_19_TokenEndpointIgnoresUnknownParameter(LoginMethod Method)
+		{
+			AuthorizationResult AuthorizationCode = await Authorize(Method);
+
+			ContentResponse TokenResponse = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "authorization_code" },
+					{ "code", AuthorizationCode.Code },
+					{ "client_id", TestUserName },
+					{ "redirect_uri", AuthorizationCode.RedirectUri },
+					{ "code_verifier", AuthorizationCode.CodeVerifier },
+					{ "unknown_parameter", "ignored" }
+				});
+
+			string AccessToken = AssertAccessTokenResponse(TokenResponse);
+			await AssertHello(AccessToken);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		public async Task Test_20_AuthorizationCodeBoundToClientId(LoginMethod Method)
+		{
+			AuthorizationResult AuthorizationCode = await Authorize(Method);
+
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "authorization_code" },
+					{ "code", AuthorizationCode.Code },
+					{ "client_id", "Invalid User" },
+					{ "redirect_uri", AuthorizationCode.RedirectUri },
+					{ "code_verifier", AuthorizationCode.CodeVerifier }
+				});
+
+			AssertWebException(Response, ForbiddenException.Code);
+		}
+
+		[TestMethod]
+		public async Task Test_21_UnsupportedPkceCodeChallengeMethod()
+		{
+			string State = Guid.NewGuid().ToString();
+			string RedirectUri = BaseUrl + CallbackResource;
+			string CodeVerifier = CreatePkceCodeVerifier();
+
+			ContentResponse Response = await InternetContent.GetAsync(new Uri(
+				BaseUrl + OAuthAuthorizeResource.DefaultResourcePath +
+				"?response_type=code" +
+				"&client_id=" + Uri.EscapeDataString(TestUserName) +
+				"&state=" + Uri.EscapeDataString(State) +
+				"&redirect_uri=" + Uri.EscapeDataString(RedirectUri) +
+				"&code_challenge=" + Uri.EscapeDataString(CodeVerifier) +
+				"&code_challenge_method=unsupported"));
+
+			await AssertAuthorizationError(Response, new Dictionary<string, string>()
+			{
+				{ "client_id", TestUserName },
+				{ "client_secret", TestPassword },
+				{ "redirect_uri", RedirectUri },
+				{ "state", State },
+				{ "response_type", "code" },
+				{ "code_challenge", CodeVerifier },
+				{ "code_challenge_method", "unsupported" }
+			});
+		}
+
+		[TestMethod]
+		public async Task Test_22_PasswordGrantRejectsClientCredentialParameters()
+		{
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "password" },
+					{ "client_id", TestUserName },
+					{ "client_secret", TestPassword }
+				});
+
+			AssertWebException(Response, BadRequestException.Code);
+		}
+
+		[TestMethod]
+		public async Task Test_23_ClientCredentialsGrantRejectsPasswordParameters()
+		{
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "client_credentials" },
+					{ "username", TestUserName },
+					{ "password", TestPassword }
+				});
+
+			AssertWebException(Response, BadRequestException.Code);
+		}
+
+		[TestMethod]
+		public async Task Test_24_TokenEndpointGetIsRejected()
+		{
+			ContentResponse Response = await InternetContent.GetAsync(new Uri(
+				BaseUrl + OAuthTokenResource.DefaultResourcePath +
+				"?grant_type=password" +
+				"&username=" + Uri.EscapeDataString(TestUserName) +
+				"&password=" + Uri.EscapeDataString(TestPassword)));
+
+			Assert.IsTrue(Response.HasError);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		public async Task Test_25_AuthorizationCodeRequiresRedirectUri(LoginMethod Method)
+		{
+			AuthorizationResult AuthorizationCode = await Authorize(Method);
+
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "authorization_code" },
+					{ "code", AuthorizationCode.Code },
+					{ "client_id", TestUserName },
+					{ "code_verifier", AuthorizationCode.CodeVerifier }
+				});
+
+			AssertWebException(Response, BadRequestException.Code);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		public async Task Test_26_AuthorizationCodeBoundToRedirectUri(LoginMethod Method)
+		{
+			AuthorizationResult AuthorizationCode = await Authorize(Method);
+
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "authorization_code" },
+					{ "code", AuthorizationCode.Code },
+					{ "client_id", TestUserName },
+					{ "redirect_uri", BaseUrl + "/WrongCallback" },
+					{ "code_verifier", AuthorizationCode.CodeVerifier }
+				});
+
+			AssertWebException(Response, ForbiddenException.Code);
+		}
+
+		[TestMethod]
+		public async Task Test_27_EmptyResponseTypeIsTreatedAsMissing()
+		{
+			string State = Guid.NewGuid().ToString();
+			string RedirectUri = BaseUrl + CallbackResource;
+
+			ContentResponse Response = await InternetContent.GetAsync(new Uri(
+				BaseUrl + OAuthAuthorizeResource.DefaultResourcePath +
+				"?response_type=" +
+				"&client_id=" + Uri.EscapeDataString(TestUserName) +
+				"&state=" + Uri.EscapeDataString(State) +
+				"&redirect_uri=" + Uri.EscapeDataString(RedirectUri)));
+
+			await AssertAuthorizationError(Response, new Dictionary<string, string>()
+			{
+				{ "client_id", TestUserName },
+				{ "client_secret", TestPassword },
+				{ "redirect_uri", RedirectUri },
+				{ "state", State }
+			});
+		}
+
+		[TestMethod]
+		public async Task Test_28_EmptyGrantTypeIsTreatedAsMissing()
+		{
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", string.Empty },
+					{ "code", "not-used" }
+				});
+
+			AssertWebException(Response, BadRequestException.Code);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		public async Task Test_29_AuthorizationCodeRequiresClientId(LoginMethod Method)
+		{
+			AuthorizationResult AuthorizationCode = await Authorize(Method);
+
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				new Dictionary<string, string>()
+				{
+					{ "grant_type", "authorization_code" },
+					{ "code", AuthorizationCode.Code },
+					{ "redirect_uri", AuthorizationCode.RedirectUri },
+					{ "code_verifier", AuthorizationCode.CodeVerifier }
+				});
+
+			AssertWebException(Response, BadRequestException.Code);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.ImplicitGet)]
+		[DataRow(LoginMethod.ImplicitPost)]
+		public async Task Test_30_ImplicitGrantDoesNotIssueRefreshToken(LoginMethod Method)
+		{
+			AuthorizationResult Result = await Authorize(Method);
+
+			Assert.IsTrue(Result.HasToken);
+			Assert.IsTrue(string.IsNullOrEmpty(Result.RefreshToken));
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		public async Task Test_31_TokenEndpointSuccessfulResponseIsNotCacheable(LoginMethod Method)
+		{
+			AuthorizationResult AuthorizationCode = await Authorize(Method);
+			Dictionary<string, string> Request = CreateAuthorizationCodeTokenRequest(
+				AuthorizationCode, TestUserName);
+
+			using System.Net.Http.HttpClient Client = new();
+			using System.Net.Http.FormUrlEncodedContent Content = new(Request);
+			using System.Net.Http.HttpResponseMessage Response = await Client.PostAsync(
+				BaseUrl + OAuthTokenResource.DefaultResourcePath, Content,
+				CancellationToken.None);
+
+			string ResponseText = await Response.Content.ReadAsStringAsync(CancellationToken.None);
+			Assert.IsTrue(Response.IsSuccessStatusCode, ResponseText);
+			AssertNoStoreHeaders(Response);
+
+			object Parsed = JSON.Parse(ResponseText);
+			Assert.IsFalse(string.IsNullOrEmpty(Required<string>(Parsed, "access_token")));
+			Assert.AreEqual("Bearer", Required<string>(Parsed, "token_type"));
+		}
+
+		private static void AssertNoStoreHeaders(System.Net.Http.HttpResponseMessage Response)
+		{
+			Assert.IsNotNull(Response.Headers.CacheControl, "Missing Cache-Control header.");
+			Assert.IsTrue(Response.Headers.CacheControl.NoStore, "Expected Cache-Control: no-store.");
+
+			bool FoundPragmaNoCache = false;
+			foreach (System.Net.Http.Headers.NameValueHeaderValue Header in Response.Headers.Pragma)
+			{
+				if (string.Equals(Header.Name, "no-cache", StringComparison.OrdinalIgnoreCase))
+				{
+					FoundPragmaNoCache = true;
+					break;
+				}
+			}
+
+			Assert.IsTrue(FoundPragmaNoCache, "Expected Pragma: no-cache.");
+		}
+
+		[TestMethod]
+		public async Task Test_32_DuplicateAuthorizationParameterIsRejected()
+		{
+			string State = Guid.NewGuid().ToString();
+			string RedirectUri = BaseUrl + CallbackResource;
+
+			ContentResponse Response = await InternetContent.GetAsync(new Uri(
+				BaseUrl + OAuthAuthorizeResource.DefaultResourcePath +
+				"?response_type=code" +
+				"&response_type=token" +
+				"&client_id=" + Uri.EscapeDataString(TestUserName) +
+				"&state=" + Uri.EscapeDataString(State) +
+				"&redirect_uri=" + Uri.EscapeDataString(RedirectUri)));
+
+			await AssertAuthorizationError(Response, new Dictionary<string, string>()
+			{
+				{ "client_id", TestUserName },
+				{ "client_secret", TestPassword },
+				{ "redirect_uri", RedirectUri },
+				{ "state", State },
+				{ "response_type", "code" }
+			});
+		}
+
+		private static async Task AssertAuthorizationError(ContentResponse Response,
+			Dictionary<string, string> FormPostback)
+		{
+			if (Response.HasError)
+			{
+				AssertWebException(Response, BadRequestException.Code);
+				return;
+			}
+
+			Dictionary<string, object> Values;
+
+			if (Response.Decoded is HtmlDocument HtmlDocument)
+				Values = await CompleteAuthorizationForm(HtmlDocument, FormPostback);
+			else
+			{
+				Values = Response.Decoded as Dictionary<string, object>;
+				Assert.IsNotNull(Values);
+			}
+
+			Assert.IsTrue(Values.ContainsKey("error"), "Expected OAuth authorization error response.");
+
+			if (FormPostback is not null &&
+				FormPostback.TryGetValue("state", out string ExpectedState))
+			{
+				Assert.IsTrue(Values.TryGetValue("state", out object ReturnedState),
+					"Expected state in OAuth authorization error response.");
+
+				Assert.AreEqual(ExpectedState, ReturnedState);
+			}
+		}
+
+		[TestMethod]
+		public async Task Test_33_DuplicateTokenParameterIsRejected()
+		{
+			using System.Net.Http.HttpClient Client = new();
+			using System.Net.Http.StringContent Content = new(
+				"grant_type=password" +
+				"&grant_type=client_credentials" +
+				"&username=" + Uri.EscapeDataString(TestUserName) +
+				"&password=" + Uri.EscapeDataString(TestPassword),
+				Encoding.UTF8, "application/x-www-form-urlencoded");
+
+			using System.Net.Http.HttpResponseMessage Response = await Client.PostAsync(
+				BaseUrl + OAuthTokenResource.DefaultResourcePath, Content,
+				CancellationToken.None);
+
+			Assert.AreEqual(System.Net.HttpStatusCode.BadRequest, Response.StatusCode);
 		}
 
 		private static WebException AssertWebException(
@@ -480,14 +1012,13 @@ namespace Waher.Networking.HTTP.Test
 
 			ContentResponse TokenResponse = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
-				new Dictionary<string, string>()
-				{
-					{ "grant_type", "authorization_code" },
-					{ "code", AuthorizationCode.Code },
-					{ "client_id", UserName },
-					{ "code_verifier", AuthorizationCode.CodeVerifier }
-				});
+				CreateAuthorizationCodeTokenRequest(AuthorizationCode, UserName));
 
+			return AssertAccessTokenResponse(TokenResponse);
+		}
+
+		private static string AssertAccessTokenResponse(ContentResponse TokenResponse)
+		{
 			if (TokenResponse.HasError)
 				throw new LoginError(TokenResponse.Error.Message);
 
@@ -506,7 +1037,9 @@ namespace Waher.Networking.HTTP.Test
 			public bool HasToken => !string.IsNullOrEmpty(this.Token);
 			public string Code;
 			public string CodeVerifier;
+			public string RedirectUri;
 			public string Token;
+			public string RefreshToken;
 		}
 
 		private static Task<AuthorizationResult> Authorize(LoginMethod Method)
@@ -563,6 +1096,21 @@ namespace Waher.Networking.HTTP.Test
 
 					AuthorizeResponse = await InternetContent.PostAsync(
 						new Uri(AuthorizeUri), Request);
+					ExpectCode = true;
+					break;
+
+				case LoginMethod.CodeFormWithPkceDefault:
+					CodeVerifier = CreatePkceCodeVerifier();
+					CodeChallenge = CreateCodeChallenge(CodeVerifier, "plain");
+
+					AuthorizeResponse = await InternetContent.GetAsync(new Uri(AuthorizeUri +
+						"?response_type=code" +
+						(string.IsNullOrEmpty(UserName) ? "" : "&client_id=" + Uri.EscapeDataString(UserName)) +
+						"&state=" + Uri.EscapeDataString(State) +
+						"&redirect_uri=" + Uri.EscapeDataString(RedirectUri) +
+						"&code_challenge=" + Uri.EscapeDataString(CodeChallenge)));
+
+					FormPostback["code_challenge"] = CodeChallenge;
 					ExpectCode = true;
 					break;
 
@@ -733,54 +1281,17 @@ namespace Waher.Networking.HTTP.Test
 			if (AuthorizeResponse.HasError)
 				throw new LoginError(AuthorizeResponse.Error.Message);
 
+			Dictionary<string, object> Response;
+
 			if (AuthorizeResponse.Decoded is HtmlDocument HtmlDocument)
-			{
-				Assert.IsNotNull(FormPostback);
-
-				foreach (Form Form in HtmlDocument.Form)
-				{
-					foreach (HtmlNode N in Form.Children)
-					{
-						if (N is not Input Input)
-							continue;
-
-						if (Input["type"] != "hidden")
-							continue;
-
-						if (!FormPostback.ContainsKey(Input["name"]))
-							FormPostback[Input["name"]] = Input["value"];
-					}
-				}
-
-				LoginResponse = await InternetContent.PostAsync(
-					new Uri(BaseUrl + OAuthAuthorizeResource.DefaultResourcePath), FormPostback);
-
-				if (LoginResponse.HasError)
-					throw new LoginError(LoginResponse.Error.Message);
-
-				if (LoginResponse.Decoded is HtmlDocument htmlDocumentResponse)
-				{
-					int i = htmlDocumentResponse.HtmlText.IndexOf("id='errorMessage'>");
-					if (i > 0)
-					{
-						i += 18;
-						int j = htmlDocumentResponse.HtmlText.IndexOf("</", i);
-						if (j > i)
-						{
-							string ErrorMessage = XML.DecodeString(htmlDocumentResponse.HtmlText[i..j].Trim());
-							throw new LoginError(ErrorMessage);
-						}
-					}
-				}
-			}
+				Response = await CompleteAuthorizationForm(HtmlDocument, FormPostback);
 			else
 			{
 				Assert.IsNull(FormPostback);
 				LoginResponse = AuthorizeResponse;
+				Response = LoginResponse.Decoded as Dictionary<string, object>;
+				Assert.IsNotNull(Response);
 			}
-
-			Dictionary<string, object> Response = LoginResponse.Decoded as Dictionary<string, object>;
-			Assert.IsNotNull(Response);
 
 			if (ExpectState)
 			{
@@ -791,7 +1302,8 @@ namespace Waher.Networking.HTTP.Test
 
 			AuthorizationResult Result = new()
 			{
-				CodeVerifier = CodeVerifier
+				CodeVerifier = CodeVerifier,
+				RedirectUri = RedirectUri
 			};
 
 			if (ExpectCode)
@@ -806,9 +1318,71 @@ namespace Waher.Networking.HTTP.Test
 				Assert.IsTrue(Response.TryGetValue("access_token", out object Token), "Response did not contain token.");
 				Result.Token = Token as string;
 				Assert.IsFalse(string.IsNullOrEmpty(Result.Token));
+
+				Assert.IsTrue(Response.TryGetValue("token_type", out object TokenType), "Response did not contain token_type.");
+				Assert.AreEqual("Bearer", TokenType as string);
+
+				if (Response.TryGetValue("refresh_token", out object RefreshToken))
+					Result.RefreshToken = RefreshToken as string;
 			}
 
 			return Result;
+		}
+
+		private static async Task<Dictionary<string, object>> CompleteAuthorizationForm(
+			HtmlDocument HtmlDocument, Dictionary<string, string> FormPostback)
+		{
+			Assert.IsNotNull(FormPostback);
+
+			foreach (Form Form in HtmlDocument.Form)
+			{
+				foreach (HtmlNode N in Form.Children)
+				{
+					if (N is not Input Input)
+						continue;
+
+					if (Input["type"] != "hidden")
+						continue;
+
+					if (!FormPostback.ContainsKey(Input["name"]))
+						FormPostback[Input["name"]] = Input["value"];
+				}
+			}
+
+			ContentResponse LoginResponse = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthAuthorizeResource.DefaultResourcePath), FormPostback);
+
+			if (LoginResponse.HasError)
+				throw new LoginError(LoginResponse.Error.Message);
+
+			if (LoginResponse.Decoded is HtmlDocument HtmlDocumentResponse &&
+				TryGetErrorMessage(HtmlDocumentResponse, out string ErrorMessage))
+			{
+				throw new LoginError(ErrorMessage);
+			}
+
+			Dictionary<string, object> Response = LoginResponse.Decoded as Dictionary<string, object>;
+			Assert.IsNotNull(Response);
+
+			return Response;
+		}
+
+		private static bool TryGetErrorMessage(HtmlDocument HtmlDocument, out string ErrorMessage)
+		{
+			int i = HtmlDocument.HtmlText.IndexOf("id='errorMessage'>");
+			if (i > 0)
+			{
+				i += 18;
+				int j = HtmlDocument.HtmlText.IndexOf("</", i);
+				if (j > i)
+				{
+					ErrorMessage = XML.DecodeString(HtmlDocument.HtmlText[i..j].Trim());
+					return true;
+				}
+			}
+
+			ErrorMessage = null;
+			return false;
 		}
 
 		private class LoginError(string Message) : Exception(Message)

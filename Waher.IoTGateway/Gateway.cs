@@ -3355,8 +3355,11 @@ namespace Waher.IoTGateway
 				int i;
 				bool DoLog = false;
 
-				if (Request.Header.TryGetQueryParameter("debug", out string s) && CommonTypes.TryParse(s, out bool b))
+				if (Request.Header.TryGetQueryParameter("debug", out string s) &&
+					CommonTypes.TryParse(s, out bool b))
+				{
 					DoLog = b;
+				}
 
 				if (Request.Session is null)
 				{

@@ -446,11 +446,20 @@ namespace Waher.Networking.HTTP.OAuth
 					}
 					else
 					{
-						HasCredentials = Form.TryGetValue("client_id", out ClientId) &&
-							Form.TryGetValue("client_secret", out ClientSecret);
-
-						if (!HasCredentials && !(Request.User is null))
+						if (Request.User is null)
 						{
+							HasCredentials = Form.TryGetValue("client_id", out ClientId) &&
+								Form.TryGetValue("client_secret", out ClientSecret);
+						}
+						else
+						{
+							if (Form.ContainsKey("client_id") || 
+								Form.ContainsKey("client_secret"))
+							{
+								await Response.SendResponse(new BadRequestException());
+								return;
+							}
+
 							if (!(Request.User is IUserWithClaims UserWithClaims))
 							{
 								await Response.SendResponse(ForbiddenException.AccessDenied(

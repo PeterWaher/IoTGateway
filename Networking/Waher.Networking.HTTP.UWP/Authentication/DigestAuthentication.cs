@@ -145,8 +145,9 @@ namespace Waher.Networking.HTTP.Authentication
 		/// <summary>
 		/// Gets available challenges for the authenticating client to respond to.
 		/// </summary>
+		/// <param name="Request">Request object.</param>
 		/// <returns>Challenge strings.</returns>
-		public override string[] GetChallenges()
+		public override string[] GetChallenges(HttpRequest Request)
 		{
 			string Nonce = this.NextRandomString(this.digestBytes);
 			DateTime Expires = DateTime.Now.AddMinutes(1);

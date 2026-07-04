@@ -68,8 +68,9 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Gets available challenges for the authenticating client to respond to.
 		/// </summary>
+		/// <param name="Request">Request object.</param>
 		/// <returns>Challenge strings.</returns>
-		public abstract string[] GetChallenges();
+		public abstract string[] GetChallenges(HttpRequest Request);
 
 		/// <summary>
 		/// Checks if the request is authorized.

@@ -73,8 +73,9 @@ namespace Waher.Networking.HTTP.Authentication
 		/// <summary>
 		/// Gets available challenges for the authenticating client to respond to.
 		/// </summary>
+		/// <param name="Request">Request object.</param>
 		/// <returns>Challenge strings.</returns>
-		public override string[] GetChallenges()
+		public override string[] GetChallenges(HttpRequest Request)
 		{
 			return new string[] { "Basic realm=\"" + this.realm + "\"" };
 		}

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Networking.HTTP.ScriptExtensions.Functions.ClientError;
 using Waher.Security.LoginMonitor;
 
 namespace Waher.Security.JWT
@@ -192,14 +194,25 @@ namespace Waher.Security.JWT
 		/// <summary>
 		/// Gets available challenges for the authenticating client to respond to.
 		/// </summary>
+		/// <param name="Request">HTTP Request object.</param>
 		/// <returns>Challenge strings.</returns>
-		public override string[] GetChallenges()
+		public override string[] GetChallenges(HttpRequest Request)
 		{
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append("Bearer realm=\"");
 			sb.Append(this.realm);
 			sb.Append('"');
+
+			if (Request.TryGetMetaData("BearerError", out object Value) &&
+				Value is KeyValuePair<string, string> Error)
+			{
+				sb.Append(", error=\"");
+				sb.Append(Error.Key);
+				sb.Append("\", error_description=\"");
+				sb.Append(Error.Value);
+				sb.Append('"');
+			}
 
 			if (!(this.resourceMetaData is null))
 			{
@@ -264,12 +277,32 @@ namespace Waher.Security.JWT
 			try
 			{
 				if (!JwtToken.TryParse(TokenStr, out JwtToken Token))
+				{
+					Request.AddMetaData("BearerError", new KeyValuePair<string, string>(
+						"invalid_token", "Unable to parse token."));
+
 					return null;
+				}
 
 				string UserName = Token.Subject;
 
 				if (!this.factory.IsValid(Token, out Reason Reason))
 				{
+					string Description = Reason switch
+					{
+						Reason.NoAlgorithm => "No algorithm specified in token.",
+						Reason.UnsupportedAlgorithm => "Unsupported algorithm specified in token.",
+						Reason.NoSignature => "No signature found in token.",
+						Reason.Expired => "Token has expired.",
+						Reason.TooEarly => "Token is not yet valid.",
+						Reason.InvalidSignature => "Invalid signature in token.",
+						Reason.Deprecated => "Token uses deprecated algorithm.",
+						_ => "Reason: " + Reason.ToString()
+					};
+
+					Request.AddMetaData("BearerError", new KeyValuePair<string, string>(
+						"invalid_token", Description));
+
 					LoginAuditor.Fail("Login attempt failed. Reason: " + Reason.ToString(), UserName ?? string.Empty, Request.RemoteEndPoint, "HTTP");
 					return null;
 				}
@@ -285,14 +318,22 @@ namespace Waher.Security.JWT
 				{
 					if (UserName is null)
 					{
-						LoginAuditor.Fail("Login attempt failed. No user defined.", UserName ?? string.Empty, Request.RemoteEndPoint, "HTTP");
+						Request.AddMetaData("BearerError", new KeyValuePair<string, string>(
+							"invalid_token", "No used defined."));
+
+						LoginAuditor.Fail("Login attempt failed. No user defined.", string.Empty, Request.RemoteEndPoint, "HTTP");
 						return null;
 					}
 
 					IUser User = await this.users.TryGetUser(UserName);
 
 					if (User is null)
+					{
+						Request.AddMetaData("BearerError", new KeyValuePair<string, string>(
+							"invalid_token", "User not valid in this context."));
+
 						LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
+					}
 					else
 						await LoginAuditor.SilentSuccess("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
 

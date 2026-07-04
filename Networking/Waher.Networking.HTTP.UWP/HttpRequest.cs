@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 #if !WINDOWS_UWP
 using System.Security.Cryptography.X509Certificates;
@@ -18,15 +20,16 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class HttpRequest : IDisposable, IHostReference
 	{
+		private Dictionary<string, object> metaData = null;
 		private readonly HttpRequestHeader header;
-		private Stream dataStream;
 		private readonly HttpServer server;
 		private readonly string remoteEndPoint;
 		private readonly string localEndPoint;
 		private readonly Http2Stream http2Stream;
+		private string subPath = string.Empty;
+		private Stream dataStream;
 		private IUser user = null;
 		private SessionVariables session = null;
-		private string subPath = string.Empty;
 		private HttpResource resource = null;
 		private HttpResponse response = null;
 		private Guid? requestId = null;
@@ -352,6 +355,46 @@ namespace Waher.Networking.HTTP
 			}
 
 			return this.session;
+		}
+
+		/// <summary>
+		/// Adds meta-data to a request for later use.
+		/// </summary>
+		/// <param name="Key">Meta-data key.</param>
+		/// <param name="Value">Meta-data value.</param>
+		public void AddMetaData(string Key, object Value)
+		{
+			if (this.metaData is null)
+				this.metaData = new Dictionary<string, object>();
+
+			this.metaData[Key] = Value;
+		}
+
+		/// <summary>
+		/// Checks if meta-data has been added to the request.
+		/// </summary>
+		/// <param name="Key">Meta-data key.</param>
+		/// <returns>If meta-data with the given key has been added.</returns>
+		public bool HasMetaData(string Key)
+		{
+			return this.metaData?.ContainsKey(Key) ?? false;
+		}
+
+		/// <summary>
+		/// Tries to get meta-data from the request.
+		/// </summary>
+		/// <param name="Key">Meta-data key.</param>
+		/// <param name="Value">Meta-data value, if found, null otherwise.</param>
+		/// <returns>If meta-data was found having the given key.</returns>
+		public bool TryGetMetaData(string Key, [NotNullWhen(true)] out object Value)
+		{
+			if (this.metaData is null)
+			{
+				Value = null;
+				return false;
+			}
+			else
+				return this.metaData.TryGetValue(Key, out Value);
 		}
 	}
 }

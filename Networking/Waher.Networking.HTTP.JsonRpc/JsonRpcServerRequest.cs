@@ -224,7 +224,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 											continue;
 										}
 
-										foreach (string Challenge in Scheme.GetChallenges())
+										foreach (string Challenge in Scheme.GetChallenges(HttpRequest))
 											Challenges.Add(Challenge);
 									}
 

@@ -2322,7 +2322,7 @@ namespace Waher.Networking.HTTP
 #endif
 							}
 
-							foreach (string Challenge in Scheme.GetChallenges())
+							foreach (string Challenge in Scheme.GetChallenges(Request))
 								Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
 						}
 

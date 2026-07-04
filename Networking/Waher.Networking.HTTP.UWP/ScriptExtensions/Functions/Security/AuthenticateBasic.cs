@@ -117,7 +117,10 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 				Mechanism = this.last = new BasicAuthentication(Realm, Users);
 
 			if (Request.Header.Authorization is null)
-				throw new UnauthorizedException("Unauthorized access prohibited.", Mechanism.GetChallenges());
+			{
+				throw new UnauthorizedException("Unauthorized access prohibited.",
+					Mechanism.GetChallenges(Request));
+			}
 			else
 			{
 				IUser User = await Mechanism.IsAuthenticated(Request)

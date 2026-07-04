@@ -269,7 +269,7 @@ namespace Waher.Networking.HTTP.OAuth
 							}
 
 							Challenges ??= new ChunkedList<string>();
-							Challenges.AddRange(AuthenticationScheme.GetChallenges());
+							Challenges.AddRange(AuthenticationScheme.GetChallenges(Request));
 						}
 
 						if (Challenges is null)

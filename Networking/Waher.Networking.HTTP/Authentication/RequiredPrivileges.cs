@@ -60,8 +60,9 @@ namespace Waher.Networking.HTTP.Authentication
 		/// <summary>
 		/// Gets available challenges for the authenticating client to respond to.
 		/// </summary>
+		/// <param name="Request">Request object.</param>
 		/// <returns>Challenge strings.</returns>
-		public override string[] GetChallenges()
+		public override string[] GetChallenges(HttpRequest Request)
 		{
 			ChunkedList<string> Result = new ChunkedList<string>();
 			string[] Challenges;
@@ -69,7 +70,7 @@ namespace Waher.Networking.HTTP.Authentication
 
 			for (i = 0; i < this.nrAuthenticationSchemes; i++)
 			{
-				Challenges = this.authenticationSchemes[i].GetChallenges();
+				Challenges = this.authenticationSchemes[i].GetChallenges(Request);
 				if (!(Challenges is null))
 					Result.AddRange(Challenges);
 			}

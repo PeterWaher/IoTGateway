@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using Waher.Runtime.Collections;
 using Waher.Security.JWS;

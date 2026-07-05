@@ -261,7 +261,7 @@ internal class Program
 				typeof(JwtToken).Assembly,
 				typeof(User).Assembly);
 
-			JwtFactory JwtFactory = JwtFactory.CreateHmacSha256();
+			JwtFactory JwtFactory = JwtFactory.CreateHmacSha256("http://localhost:8081");
 
 			Types.SetModuleParameter("JWT", JwtFactory);
 			Types.SetModuleParameter("Domain", "localhost");
@@ -357,6 +357,8 @@ internal class Program
 			new BrotliContentEncoding().ConfigureSupport(false, false);	// Do not use Brotli
 
 			OAuthTokenResource TokenResource;
+			OAuthRegistrationResource RegistrationResource;
+			OAuthDeviceAuthorizationResource DeviceAuthorizationResource;
 			OAuthAuthorizeResource AuthorizeResource;
 
 			WebServer.Register("/Hello", Hello, Hello);
@@ -364,7 +366,10 @@ internal class Program
 			WebServer.Register("/Hello.css", HelloStyles);
 			WebServer.Register(new ProtectedResourceMetaData());
 			WebServer.Register(TokenResource = new OAuthTokenResource(JwtFactory));
-			WebServer.Register(AuthorizeResource = new OAuthAuthorizeResource(TokenResource, JwtFactory));
+			WebServer.Register(RegistrationResource = new OAuthRegistrationResource(JwtFactory));
+			WebServer.Register(DeviceAuthorizationResource = new OAuthDeviceAuthorizationResource(JwtFactory));
+			WebServer.Register(AuthorizeResource = new OAuthAuthorizeResource(TokenResource, 
+				RegistrationResource, DeviceAuthorizationResource, JwtFactory));
 			WebServer.Register(new AuthorizationServerMetaData(AuthorizeResource));
 			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", "TestServer",
 				"Test Server", "1.0.0", "This is a test server.", [], 

@@ -31,6 +31,8 @@ namespace Waher.Networking.HTTP.OAuth
 		public const string DefaultResourcePath = "/oauth/authorize";
 
 		private readonly OAuthTokenResource tokenResource;
+		private readonly OAuthRegistrationResource? registrationResource;
+		private readonly OAuthDeviceAuthorizationResource? deviceAuthorizationResource;
 		private readonly IUserSource userSource;
 		private HttpAuthenticationScheme[]? authenticationSchemes = null;
 		private JwtFactory? jwtFactory;
@@ -40,18 +42,15 @@ namespace Waher.Networking.HTTP.OAuth
 		/// OAUTH authorize resource.
 		/// </summary>
 		/// <param name="TokenResource">OAuth token resource.</param>
-		public OAuthAuthorizeResource(OAuthTokenResource TokenResource)
-			: this(TokenResource, null)
-		{
-		}
-
-		/// <summary>
-		/// OAUTH authorize resource.
-		/// </summary>
-		/// <param name="TokenResource">OAuth token resource.</param>
+		/// <param name="RegistrationResource">Optional OAuth registration resource.</param>
+		/// <param name="DeviceAuthorizationResource">Optional OAuth device authorization resource.</param>
 		/// <param name="JwtFactory">JWT Factory</param>
-		public OAuthAuthorizeResource(OAuthTokenResource TokenResource, JwtFactory? JwtFactory)
-			: this(TokenResource, JwtFactory, DefaultResourcePath)
+		public OAuthAuthorizeResource(OAuthTokenResource TokenResource,
+			OAuthRegistrationResource? RegistrationResource,
+			OAuthDeviceAuthorizationResource? DeviceAuthorizationResource,
+			JwtFactory? JwtFactory)
+			: this(TokenResource, RegistrationResource, DeviceAuthorizationResource, 
+				  JwtFactory, DefaultResourcePath)
 		{
 		}
 
@@ -59,13 +58,20 @@ namespace Waher.Networking.HTTP.OAuth
 		/// OAUTH authorize resource.
 		/// </summary>
 		/// <param name="TokenResource">OAuth token resource.</param>
+		/// <param name="RegistrationResource">Optional OAuth registration resource.</param>
+		/// <param name="DeviceAuthorizationResource">Optional OAuth device authorization resource.</param>
 		/// <param name="JwtFactory">JWT Factory</param>
 		/// <param name="ResourceName">Resource name.</param>
-		public OAuthAuthorizeResource(OAuthTokenResource TokenResource, JwtFactory? JwtFactory,
+		public OAuthAuthorizeResource(OAuthTokenResource TokenResource, 
+			OAuthRegistrationResource? RegistrationResource,
+			OAuthDeviceAuthorizationResource? DeviceAuthorizationResource,
+			JwtFactory? JwtFactory,
 			string ResourceName)
 			: base(ResourceName)
 		{
 			this.tokenResource = TokenResource;
+			this.registrationResource = RegistrationResource;
+			this.deviceAuthorizationResource = DeviceAuthorizationResource;
 			this.jwtFactory = JwtFactory;
 			this.userSource = TokenResource.Users;
 		}
@@ -89,6 +95,21 @@ namespace Waher.Networking.HTTP.OAuth
 		/// If the POST method is allowed.
 		/// </summary>
 		public bool AllowsPOST => true;
+
+		/// <summary>
+		/// Reference to token resource.
+		/// </summary>
+		internal OAuthTokenResource TokenResource => this.tokenResource;
+
+		/// <summary>
+		/// Reference to registration resource.
+		/// </summary>
+		internal OAuthRegistrationResource? OAuthRegistrationResource => this.registrationResource;
+
+		/// <summary>
+		/// Reference to device authorization resource.
+		/// </summary>
+		internal OAuthDeviceAuthorizationResource? OAuthDeviceAuthorizationResource => this.deviceAuthorizationResource;
 
 		/// <summary>
 		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
@@ -243,7 +264,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 						string Token = await User.CreateToken(this.JwtFactory, Request.Encrypted);
 						await Response.Return(OAuthTokenResource.TokenResponse(Token, State,
-							3600, string.Empty, this.jwtFactory?.Issuer));
+							3600, string.Empty, this.jwtFactory?.Issuer, false, User, Request));
 						return;
 					}
 

@@ -1382,11 +1382,16 @@ namespace Waher.IoTGateway
 				InternetContent.SetDefaultTimeout(60000, true);
 
 				OAuthTokenResource TokenResource;
+				OAuthRegistrationResource RegistrationResource;
+				OAuthDeviceAuthorizationResource DeviceAuthorizationResource;
 				OAuthAuthorizeResource AuthorizeResource;
 
 				webServer.Register(new ProtectedResourceMetaData());
 				webServer.Register(TokenResource = new OAuthTokenResource());
-				webServer.Register(AuthorizeResource = new OAuthAuthorizeResource(TokenResource));
+				webServer.Register(RegistrationResource = new OAuthRegistrationResource());
+				webServer.Register(DeviceAuthorizationResource = new OAuthDeviceAuthorizationResource());
+				webServer.Register(AuthorizeResource = new OAuthAuthorizeResource(TokenResource, 
+					RegistrationResource, DeviceAuthorizationResource, null));
 				webServer.Register(new AuthorizationServerMetaData(AuthorizeResource));
 				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/Transforms", Path.Combine(appDataFolder, "Transforms"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.

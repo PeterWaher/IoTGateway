@@ -5,9 +5,12 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Runtime.Cache;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Security;
 using Waher.Security.JWT;
 using Waher.Security.LoginMonitor;
@@ -26,7 +29,9 @@ namespace Waher.Networking.HTTP.OAuth
 		/// </summary>
 		public const string DefaultResourcePath = "/oauth/token";
 
-		private static readonly Cache<string, TokenRef> tokenCache = new Cache<string, TokenRef>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+		private static readonly Cache<string, TokenRef> codes = new Cache<string, TokenRef>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+		private static readonly Cache<string, TokenFamily> refreshTokens = new Cache<string, TokenFamily>(int.MaxValue, TimeSpan.FromHours(1), TimeSpan.FromHours(1));
+		private static readonly Cache<string, TokenFamily> usedRefreshTokens = new Cache<string, TokenFamily>(int.MaxValue, TimeSpan.FromHours(1), TimeSpan.FromHours(1));
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private readonly IUserSource userSource;
 		private HttpAuthenticationScheme[]? authenticationSchemes = null;
@@ -144,6 +149,20 @@ namespace Waher.Networking.HTTP.OAuth
 				throw new ServiceUnavailableException("No JWT factory configured.");
 
 			string Token = await User.CreateToken(this.jwtFactory, Encrypted);
+			string Code = GenerateRandomCode();
+
+			codes[Code] = new TokenRef(Token, User, CodeChallenge, CodeChallengeMethod,
+				RedirectUri, 3600);
+
+			return Code;
+		}
+
+		/// <summary>
+		/// Generates a random unique code.
+		/// </summary>
+		/// <returns>Random unique code.</returns>
+		public static string GenerateRandomCode()
+		{
 			byte[] Bin = new byte[64];
 			string Code;
 
@@ -156,21 +175,21 @@ namespace Waher.Networking.HTTP.OAuth
 
 				Code = Base64Url.Encode(Bin);
 			}
-			while (tokenCache.ContainsKey(Code));
-
-			tokenCache[Code] = new TokenRef(Token, User.UserName, CodeChallenge,
-				CodeChallengeMethod, RedirectUri, 3600);
+			while (
+				codes.ContainsKey(Code) ||
+				refreshTokens.ContainsKey(Code) ||
+				usedRefreshTokens.ContainsKey(Code));
 
 			return Code;
 		}
 
 		private class TokenRef
 		{
-			public TokenRef(string Token, string ClientId, string CodeChallenge,
+			public TokenRef(string Token, IUserWithClaims User, string CodeChallenge,
 				string CodeChallengeMethod, string RedirectUri, int ExpiresIn)
 			{
 				this.Token = Token;
-				this.ClientId = ClientId;
+				this.User = User;
 				this.CodeChallenge = CodeChallenge;
 				this.CodeChallengeMethod = CodeChallengeMethod;
 				this.RedirectUri = RedirectUri;
@@ -178,10 +197,10 @@ namespace Waher.Networking.HTTP.OAuth
 			}
 
 			public string Token;
-			public string ClientId;
 			public string CodeChallenge;
 			public string CodeChallengeMethod;
 			public string RedirectUri;
+			public IUserWithClaims User;
 			public int ExpiresIn;
 
 			public async Task<bool> Check(string CodeVerifier, HttpResponse Response)
@@ -236,7 +255,7 @@ namespace Waher.Networking.HTTP.OAuth
 				return;
 			}
 
-			if (!tokenCache.TryGetValue(Code, out TokenRef Ref))
+			if (!codes.TryGetValue(Code, out TokenRef Ref))
 			{
 				await Response.SendResponse(new ForbiddenException("Invalid code."));
 				return;
@@ -254,13 +273,13 @@ namespace Waher.Networking.HTTP.OAuth
 					return;
 			}
 
-			tokenCache.Remove(Code);
+			codes.Remove(Code);
 
 			Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 			Response.SetHeader("Pragma", "no-cache");
 
 			await Response.Return(TokenResponse(Ref.Token, null, Ref.ExpiresIn,
-				string.Empty, this.jwtFactory?.Issuer));
+				string.Empty, this.jwtFactory?.Issuer, true, Ref.User, Request));
 		}
 
 		/// <summary>
@@ -380,20 +399,22 @@ namespace Waher.Networking.HTTP.OAuth
 				return;
 			}
 
+			string ClientId;
 			string Token;
+			IUserWithClaims User;
+			TokenFamily? TokenFamily = null;
+			bool IssueRefreshToken = true;
 
 			switch (GrantType)
 			{
 				case "authorization_code":
-					string ClientId;
-
 					if (!Form.TryGetValue("code", out string Code))
 					{
 						await Response.SendResponse(new BadRequestException());
 						return;
 					}
 
-					if (!tokenCache.TryGetValue(Code, out TokenRef Ref))
+					if (!codes.TryGetValue(Code, out TokenRef Ref))
 					{
 						await Response.SendResponse(new ForbiddenException("Invalid code."));
 						return;
@@ -406,7 +427,7 @@ namespace Waher.Networking.HTTP.OAuth
 						return;
 					}
 
-					if (ClientId != Ref.ClientId)
+					if (ClientId != Ref.User.UserName)
 					{
 						await Response.SendResponse(new ForbiddenException());
 						return;
@@ -430,8 +451,9 @@ namespace Waher.Networking.HTTP.OAuth
 							return;
 					}
 
-					tokenCache.Remove(Code);
+					codes.Remove(Code);
 					Token = Ref.Token;
+					User = Ref.User;
 					break;
 
 				case "client_credentials":
@@ -446,6 +468,8 @@ namespace Waher.Networking.HTTP.OAuth
 					}
 					else
 					{
+						IssueRefreshToken = false;
+
 						if (Request.User is null)
 						{
 							HasCredentials = Form.TryGetValue("client_id", out ClientId) &&
@@ -453,7 +477,7 @@ namespace Waher.Networking.HTTP.OAuth
 						}
 						else
 						{
-							if (Form.ContainsKey("client_id") || 
+							if (Form.ContainsKey("client_id") ||
 								Form.ContainsKey("client_secret"))
 							{
 								await Response.SendResponse(new BadRequestException());
@@ -467,6 +491,7 @@ namespace Waher.Networking.HTTP.OAuth
 								return;
 							}
 
+							User = UserWithClaims;
 							Token = await UserWithClaims.CreateToken(this.jwtFactory, Request.Encrypted);
 							break;
 						}
@@ -537,6 +562,7 @@ namespace Waher.Networking.HTTP.OAuth
 							return;
 						}
 
+						User = UserWithClaims;
 						Token = await UserWithClaims.CreateToken(this.jwtFactory, Request.Encrypted);
 					}
 					else
@@ -544,6 +570,58 @@ namespace Waher.Networking.HTTP.OAuth
 						await Response.SendResponse(new BadRequestException());
 						return;
 					}
+					break;
+
+				case "refresh_token":
+					if (!Form.TryGetValue("refresh_token", out string RefreshToken))
+					{
+						await Response.SendResponse(new BadRequestException());
+						return;
+					}
+
+					if (!refreshTokens.TryGetValue(RefreshToken, out TokenFamily))
+					{
+						if (usedRefreshTokens.TryGetValue(RefreshToken, out TokenFamily))
+						{
+							string Message = "Attempt to reuse refresh token. Has the token leaked? Deprecating all associated tokens.";
+
+							LoginAuditor.Fail(Message, TokenFamily.User.UserName,
+								Request.RemoteEndPoint, "OAUTH");
+
+							Log.Alert(Message, TokenFamily.User.UserName,
+								Request.RemoteEndPoint, "TokenLeakage",
+								await LoginAuditor.Annotate(Request.RemoteEndPoint));
+
+							foreach (string Token2 in TokenFamily.Tokens)
+							{
+								if (JwtToken.TryParse(Token2, out JwtToken ParsedToken))
+									JwtFactory.Deprecate(ParsedToken);
+							}
+
+							usedRefreshTokens.Remove(RefreshToken);
+						}
+
+						await Response.SendResponse(new ForbiddenException("Invalid refresh_token."));
+						return;
+					}
+
+					if (!Form.TryGetValue("client_id", out ClientId))
+					{
+						await Response.SendResponse(new BadRequestException("Missing client_id."));
+						return;
+					}
+
+					if (!TokenFamily.CanUseRefreshToken(ClientId, Request))
+					{
+						await Response.SendResponse(new ForbiddenException());
+						return;
+					}
+
+					refreshTokens.Remove(RefreshToken);
+					usedRefreshTokens.Add(RefreshToken, TokenFamily);
+
+					User = TokenFamily.User;
+					Token = await User.CreateToken(this.jwtFactory, Request.Encrypted);
 					break;
 
 				default:
@@ -554,8 +632,8 @@ namespace Waher.Networking.HTTP.OAuth
 			Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 			Response.SetHeader("Pragma", "no-cache");
 
-			await Response.Return(TokenResponse(Token, null, 3600, string.Empty, 
-				this.jwtFactory?.Issuer));
+			await Response.Return(TokenResponse(Token, null, 3600, string.Empty,
+				this.jwtFactory?.Issuer, IssueRefreshToken, User, Request, TokenFamily));
 		}
 
 		internal static async Task<LoginResult?> DoLogin(string UserName, string Password,
@@ -620,12 +698,22 @@ namespace Waher.Networking.HTTP.OAuth
 			else
 			{
 				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
-				return new LoginResult((IUser?)null);
+				return new LoginResult(null);
 			}
 		}
 
-		internal static Dictionary<string, object> TokenResponse(string Token, 
-			string? State, int ExpiresIn, string Scope, string? Issuer)
+		internal static Dictionary<string, object> TokenResponse(string Token,
+			string? State, int ExpiresIn, string Scope, string? Issuer,
+			bool IssueRefreshToken, IUserWithClaims User, HttpRequest Request)
+		{
+			return TokenResponse(Token, State, ExpiresIn, Scope, Issuer,
+				IssueRefreshToken, User, Request, null);
+		}
+
+		private static Dictionary<string, object> TokenResponse(string Token,
+			string? State, int ExpiresIn, string Scope, string? Issuer,
+			bool IssueRefreshToken, IUserWithClaims User, HttpRequest Request,
+			TokenFamily? TokenFamily)
 		{
 			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
@@ -641,7 +729,73 @@ namespace Waher.Networking.HTTP.OAuth
 			if (!string.IsNullOrEmpty(Issuer))
 				Result["iss"] = Issuer;
 
+			if (IssueRefreshToken)
+			{
+				if (TokenFamily is null)
+					TokenFamily = new TokenFamily(Token, User, Request);
+				else if (!TokenFamily.CanUseRefreshToken(User.UserName, Request))
+					throw new ForbiddenException();
+				else
+					TokenFamily.Add(Token);
+
+				string RefreshToken = GenerateRandomCode();
+				refreshTokens[RefreshToken] = TokenFamily;
+
+				Result["refresh_token"] = RefreshToken;
+			}
+
 			return Result;
+		}
+
+		private class TokenFamily
+		{
+			private readonly ChunkedList<string> tokens;
+
+			public IEnumerable<string> Tokens => this.tokens;
+			public IUserWithClaims User { get; }
+			public HttpRequest FirstRequest { get; }
+			public bool HasRemoteCertificate { get; }
+			public string RemoteEndpoint { get; }
+			public string RemoteCertificateSerialNumber { get; }
+
+			public TokenFamily(string Token, IUserWithClaims User, HttpRequest FirstRequest)
+			{
+				this.User = User;
+				this.tokens = new ChunkedList<string>() { Token };
+				this.FirstRequest = FirstRequest;
+				this.HasRemoteCertificate = !(this.FirstRequest.RemoteCertificate is null);
+				this.RemoteEndpoint = this.FirstRequest.RemoteEndPoint.RemovePortNumber();
+				this.RemoteCertificateSerialNumber = 
+					this.FirstRequest.RemoteCertificate?.GetSerialNumberString()
+					?? string.Empty;
+			}
+
+			public void Add(string Token) => this.tokens.Add(Token);
+
+			public bool CanUseRefreshToken(string ClientId, HttpRequest Request)
+			{
+				if (ClientId != this.User.UserName)
+					return false;
+
+				if (this.HasRemoteCertificate)
+				{
+					if (Request.RemoteCertificate is null)
+						return false;
+
+					if (Request.RemoteCertificate.GetSerialNumberString() !=
+						this.RemoteCertificateSerialNumber)
+					{
+						return false;
+					}
+				}
+				else
+				{
+					if (this.RemoteEndpoint != Request.RemoteEndPoint.RemovePortNumber())
+						return false;
+				}
+
+				return true;
+			}
 		}
 	}
 }

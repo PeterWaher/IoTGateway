@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP.OAuth.MetaData;
+using Waher.Runtime.Collections;
 using Waher.Security.JWS;
 
 namespace Waher.Networking.HTTP.OAuth
@@ -57,7 +58,17 @@ namespace Waher.Networking.HTTP.OAuth
 			string AuthorizeUri = sb.ToString();
 			string TokenUri = ServerUrl + OAuthTokenResource.DefaultResourcePath;
 
-			// TODO: Dynamic Client Registration resource
+			ChunkedList<string> GrantTypesSupported = new ChunkedList<string>(6)
+			{
+				"authorization_code",
+				"implicit",
+				"client_credentials",
+				"password",
+				"refresh_token"
+			};
+
+			if (!(this.authorizeResource.OAuthDeviceAuthorizationResource is null))
+				GrantTypesSupported.Add(OAuthDeviceAuthorizationResource.GrantType);
 
 			Dictionary<string, object> MetaData = new Dictionary<string, object>()
 			{
@@ -75,15 +86,14 @@ namespace Waher.Networking.HTTP.OAuth
 				{ "response_types_supported", new string[] { "code", "token" } },
 				{ "code_challenge_methods_supported", new string[] { "plain", "S256" } },
 				{ "authorization_response_iss_parameter_supported", this.authorizeResource.JwtFactory?.HasIssuer ?? false },
-				{ "grant_types_supported", new string[] 
-					{ 
-						"authorization_code", 
-						"implicit", 
-						"client_credentials", 
-						"password" 
-					} 
-				}
+				{ "grant_types_supported", GrantTypesSupported.ToArray() }
 			};
+
+			if (!(this.authorizeResource.OAuthRegistrationResource is null))
+				MetaData["registration_endpoint"] = ServerUrl + this.authorizeResource.OAuthRegistrationResource.ResourceName;
+
+			if (!(this.authorizeResource.OAuthDeviceAuthorizationResource is null))
+				MetaData["device_authorization_endpoint"] = ServerUrl + this.authorizeResource.OAuthDeviceAuthorizationResource.ResourceName;
 
 			await Response.Return(MetaData);
 		}

@@ -17,6 +17,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.HTTP.OAuth;
+using Waher.Networking.HTTP.OAuth.Interfaces;
 using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Networking.Sniffers;
 using Waher.Security;
@@ -41,7 +42,7 @@ namespace Waher.Networking.HTTP.Test
 	}
 
 	[TestClass]
-	public class OAuthTests : IUserSource
+	public class OAuthTests : IDynamicUserSource
 	{
 		private const string BaseUrl = "http://localhost:8081";
 		private const string CallbackResource = "/Callback";
@@ -50,6 +51,7 @@ namespace Waher.Networking.HTTP.Test
 		private const string TestUserName = "User";
 		private const string TestPassword = "Password";
 
+		private Dictionary<string, User> users;
 		private HttpServer server;
 		private ConsoleEventSink sink = null;
 		private XmlFileSniffer xmlSniffer = null;
@@ -87,7 +89,7 @@ namespace Waher.Networking.HTTP.Test
 
 			this.server.Register(new ProtectedResourceMetaData());
 			this.server.Register(TokenResource = new OAuthTokenResource(this, this.jwtFactory));
-			this.server.Register(RegistrationResource = new OAuthRegistrationResource(this.jwtFactory));
+			this.server.Register(RegistrationResource = new OAuthRegistrationResource(this, this.jwtFactory));
 			this.server.Register(DeviceAuthorizationResource = new OAuthDeviceAuthorizationResource(this.jwtFactory));
 			this.server.Register(AuthorizeResource = new OAuthAuthorizeResource(TokenResource,
 				RegistrationResource, DeviceAuthorizationResource, this.jwtFactory));
@@ -95,6 +97,11 @@ namespace Waher.Networking.HTTP.Test
 
 			this.server.Register(CallbackResource, Callback);
 			this.server.Register(new Hello(this.jwtFactory, this));
+
+			this.users = new Dictionary<string, User>()
+			{
+				{ TestUserName, new User(TestUserName, TestPassword) }
+			};
 
 			AuthorizeResource.ImplicitAuthenticationRequest += async (_, e) =>
 			{
@@ -244,12 +251,40 @@ namespace Waher.Networking.HTTP.Test
 
 		public Task<IUser> TryGetUser(string UserName)
 		{
-			if (UserName == "User")
-				return Task.FromResult<IUser>(new User());
+			if (this.users.TryGetValue(UserName, out User User))
+				return Task.FromResult<IUser>(User);
 			else
 				return Task.FromResult<IUser>(null);
 		}
 
+		public Task<IRegistration> RegisterUser(IRegistrationRequest RegistrationRequest)
+		{
+			string UserName;
+			string Password;
+
+			do
+			{
+				UserName = Guid.NewGuid().ToString();
+			}
+			while (this.users.ContainsKey(UserName));
+
+			Password = Guid.NewGuid().ToString();
+
+			User User = new(UserName, Password);
+			this.users[User.UserName] = User;
+
+			return Task.FromResult<IRegistration>(
+				new Registration(UserName, Password, RegistrationRequest));
+		}
+
+		private class Registration(string UserName, string Password,
+			IRegistrationRequest Request) : IRegistration
+		{
+			public string ClientId { get; } = UserName;
+			public string ClientSecret { get; } = Password;
+			public DateTime? ClientSecretExpiresAt => null;
+			public IRegistrationRequest Request { get; } = Request;
+		}
 
 		[TestMethod]
 		public async Task Test_01_Metadata_Discovery()

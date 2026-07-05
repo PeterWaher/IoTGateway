@@ -98,12 +98,12 @@ namespace Waher.Networking.HTTP.Test
 		public Task<IUser> TryGetUser(string UserName)
 		{
 			if (UserName == "User")
-				return Task.FromResult<IUser>(new User());
+				return Task.FromResult<IUser>(new User("User", "Password"));
 			else
 				return Task.FromResult<IUser>(null);
 		}
 
-		private ClientWebSocket CreateClient(string ProtocolVersion)
+		private static ClientWebSocket CreateClient(string ProtocolVersion)
 		{
 			ClientWebSocket Client = new();
 
@@ -132,7 +132,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 
 			await Assert.ThrowsAsync<WebSocketException>(async () =>
 				await Client.ConnectAsync(GetUri(Encryption),
@@ -189,7 +189,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 			Client.Options.SetRequestHeader("Origin", "UnitTest");
 
 			await Client.ConnectAsync(GetUri(Encryption),
@@ -223,7 +223,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
@@ -268,7 +268,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 			
 			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
@@ -308,7 +308,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
@@ -356,7 +356,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
@@ -398,7 +398,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
@@ -433,7 +433,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
@@ -492,7 +492,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
@@ -520,7 +520,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
@@ -553,7 +553,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
@@ -591,7 +591,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
@@ -637,7 +637,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
@@ -678,7 +678,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
@@ -726,7 +726,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 
 			using SocketsHttpHandler Handler = PrepareHandler();
-			using ClientWebSocket Client = this.CreateClient(ProtocolVersion);
+			using ClientWebSocket Client = CreateClient(ProtocolVersion);
 			await Client.ConnectAsync(GetUri(Encryption),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 			await Client.CloseAsync(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, "Manual", CancellationToken.None);

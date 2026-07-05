@@ -357,7 +357,6 @@ internal class Program
 			new BrotliContentEncoding().ConfigureSupport(false, false);	// Do not use Brotli
 
 			OAuthTokenResource TokenResource;
-			OAuthRegistrationResource RegistrationResource;
 			OAuthDeviceAuthorizationResource DeviceAuthorizationResource;
 			OAuthAuthorizeResource AuthorizeResource;
 
@@ -366,10 +365,9 @@ internal class Program
 			WebServer.Register("/Hello.css", HelloStyles);
 			WebServer.Register(new ProtectedResourceMetaData());
 			WebServer.Register(TokenResource = new OAuthTokenResource(JwtFactory));
-			WebServer.Register(RegistrationResource = new OAuthRegistrationResource(JwtFactory));
 			WebServer.Register(DeviceAuthorizationResource = new OAuthDeviceAuthorizationResource(JwtFactory));
 			WebServer.Register(AuthorizeResource = new OAuthAuthorizeResource(TokenResource, 
-				RegistrationResource, DeviceAuthorizationResource, JwtFactory));
+				null, DeviceAuthorizationResource, JwtFactory));
 			WebServer.Register(new AuthorizationServerMetaData(AuthorizeResource));
 			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", "TestServer",
 				"Test Server", "1.0.0", "This is a test server.", [], 

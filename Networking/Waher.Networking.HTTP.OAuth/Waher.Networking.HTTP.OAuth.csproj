@@ -12,7 +12,7 @@
 		<Authors>Peter Waher</Authors>
 		<Company>Waher Data AB</Company>
 		<Product>Waher.IoTGateway</Product>
-		<Description>Library that adds OAUTH authentication capabilities to the HTTP server defined in the HTTP server defined in the Waher.Networking.HTTP Library.</Description>
+		<Description>Library that adds OAUTH 2.0 and 2.1 authentication capabilities to the HTTP server defined in the HTTP server defined in the Waher.Networking.HTTP Library.</Description>
 		<Copyright>Copyright © Waher Data AB 2026. All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.HTTP.OAuth</PackageProjectUrl>
 		<PackageIcon>Icon_64x64.png</PackageIcon>

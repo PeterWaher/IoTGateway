@@ -520,7 +520,7 @@ namespace Waher.Networking.HTTP.Mcp
 							continue;
 						}
 
-						foreach (string Challenge in Scheme.GetChallenges())
+						foreach (string Challenge in Scheme.GetChallenges(Request))
 							Challenges.Add(Challenge);
 					}
 

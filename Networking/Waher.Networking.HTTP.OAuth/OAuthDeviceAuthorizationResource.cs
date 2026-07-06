@@ -5,7 +5,8 @@ using Waher.Security.JWT;
 namespace Waher.Networking.HTTP.OAuth
 {
 	/// <summary>
-	/// OAUTH device authorization resource.
+	/// OAUTH device authorization resource, as defined in RFC 8628.
+	/// https://datatracker.ietf.org/doc/html/rfc8628
 	/// </summary>
 	public class OAuthDeviceAuthorizationResource : OAuthResource, IHttpGetMethod, 
 		IHttpPostMethod
@@ -21,7 +22,7 @@ namespace Waher.Networking.HTTP.OAuth
 		public const string GrantType = "urn:ietf:params:oauth:grant-type:device_code";
 
 		/// <summary>
-		/// OAUTH device authorization resource.
+		/// OAUTH device authorization resource, as defined in RFC 8628.
 		/// </summary>
 		public OAuthDeviceAuthorizationResource()
 			: this(null, null, DefaultResourcePath)
@@ -29,7 +30,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH device authorization resource.
+		/// OAUTH device authorization resource, as defined in RFC 8628.
 		/// </summary>
 		/// <param name="JwtFactory">JWT Factory</param>
 		public OAuthDeviceAuthorizationResource(JwtFactory? JwtFactory)
@@ -38,7 +39,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH device authorization resource.
+		/// OAUTH device authorization resource, as defined in RFC 8628.
 		/// </summary>
 		/// <param name="ResourceName">Resource name.</param>
 		public OAuthDeviceAuthorizationResource(string ResourceName)
@@ -47,7 +48,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH device authorization resource.
+		/// OAUTH device authorization resource, as defined in RFC 8628.
 		/// </summary>
 		/// <param name="JwtFactory">JWT Factory</param>
 		/// <param name="ResourceName">Resource name.</param>
@@ -57,7 +58,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH device authorization resource.
+		/// OAUTH device authorization resource, as defined in RFC 8628.
 		/// </summary>
 		/// <param name="UserSource">Users data source.</param>
 		public OAuthDeviceAuthorizationResource(IUserSource? UserSource)
@@ -66,7 +67,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH device authorization resource.
+		/// OAUTH device authorization resource, as defined in RFC 8628.
 		/// </summary>
 		/// <param name="UserSource">Users data source.</param>
 		/// <param name="JwtFactory">JWT Factory</param>
@@ -76,7 +77,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH device authorization resource.
+		/// OAUTH device authorization resource, as defined in RFC 8628.
 		/// </summary>
 		/// <param name="UserSource">Users data source.</param>
 		/// <param name="ResourceName">Resource name.</param>
@@ -86,7 +87,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH device authorization resource.
+		/// OAUTH device authorization resource, as defined in RFC 8628.
 		/// </summary>
 		/// <param name="UserSource">Users data source.</param>
 		/// <param name="JwtFactory">JWT Factory</param>

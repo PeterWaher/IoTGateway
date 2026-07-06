@@ -204,10 +204,11 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <summary>
 		/// Generates a random unique code.
 		/// </summary>
+		/// <param name="NrBytes">Number of bytes of random.</param>
 		/// <returns>Random unique code.</returns>
-		protected virtual string GenerateRandomCode()
+		protected virtual string GenerateRandomCode(int NrBytes)
 		{
-			byte[] Bin = new byte[64];
+			byte[] Bin = new byte[NrBytes];
 
 			lock (rnd)
 			{

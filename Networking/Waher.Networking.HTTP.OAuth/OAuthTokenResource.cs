@@ -124,7 +124,7 @@ namespace Waher.Networking.HTTP.OAuth
 				throw new ServiceUnavailableException("No JWT factory configured.");
 
 			string Token = await User.CreateToken(this.JwtFactory, Encrypted);
-			string Code = this.GenerateRandomCode();
+			string Code = this.GenerateRandomCode(64);
 
 			codes[Code] = new TokenRef(Token, User, CodeChallenge, CodeChallengeMethod,
 				RedirectUri, 3600);
@@ -135,14 +135,15 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <summary>
 		/// Generates a random unique code.
 		/// </summary>
+		/// <param name="NrBytes">Number of bytes of random.</param>
 		/// <returns>Random unique code.</returns>
-		protected override string GenerateRandomCode()
+		protected override string GenerateRandomCode(int NrBytes)
 		{
 			string Code;
 
 			do
 			{
-				Code = base.GenerateRandomCode();
+				Code = base.GenerateRandomCode(NrBytes);
 			}
 			while (
 				codes.ContainsKey(Code) ||
@@ -633,7 +634,7 @@ namespace Waher.Networking.HTTP.OAuth
 				else
 					TokenFamily.Add(Token);
 
-				string RefreshToken = this.GenerateRandomCode();
+				string RefreshToken = this.GenerateRandomCode(64);
 				refreshTokens[RefreshToken] = TokenFamily;
 
 				Result["refresh_token"] = RefreshToken;

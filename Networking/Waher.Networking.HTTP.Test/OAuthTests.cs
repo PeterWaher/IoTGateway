@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -357,11 +358,11 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_03_NoBearerToken()
 		{
 			ContentResponse Response = await InternetContent.GetAsync(new Uri(BaseUrl + ProtectedResource));
-			WebException Error = AssertWebException(Response, UnauthorizedException.Code);
+			OAuthError Error = AssertOAuthError(Response, false, UnauthorizedException.Code);
 			AssertBearerChallenge(Error);
 		}
 
-		private static void AssertBearerChallenge(WebException Error)
+		private static void AssertBearerChallenge(OAuthError Error)
 		{
 			bool FoundChallenge = false;
 
@@ -384,7 +385,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.IsTrue(FoundChallenge);
 		}
 
-		private static void AssertBearerChallenge(WebException Error, string ErrorCode)
+		private static void AssertBearerChallenge(OAuthError Error, string ErrorCode)
 		{
 			bool FoundChallenge = false;
 
@@ -414,7 +415,7 @@ namespace Waher.Networking.HTTP.Test
 				new Uri(BaseUrl + ProtectedResource),
 				new KeyValuePair<string, string>("Authorization", "Bearer this-is-not-a-jwt"));
 
-			WebException Error = AssertWebException(Response, UnauthorizedException.Code);
+			OAuthError Error = AssertOAuthError(Response, false, UnauthorizedException.Code);
 			AssertBearerChallenge(Error);
 		}
 
@@ -430,8 +431,8 @@ namespace Waher.Networking.HTTP.Test
 					{ "code_verifier", "not-used" }
 				});
 
-			WebException Error = AssertWebException(Response, ForbiddenException.Code);
-			Assert.Contains("Invalid code", Error.Message);
+			OAuthError Error = AssertOAuthError(Response, ForbiddenException.Code);
+			Assert.Contains("Invalid code", Error.Description);
 		}
 
 		[TestMethod]
@@ -454,8 +455,8 @@ namespace Waher.Networking.HTTP.Test
 					{ "redirect_uri", AuthorizationCode.RedirectUri }
 				});
 
-			WebException Error = AssertWebException(Response, BadRequestException.Code);
-			Assert.Contains("Missing code_verifier", Error.Message);
+			OAuthError Error = AssertOAuthError(Response, BadRequestException.Code);
+			Assert.Contains("Missing code_verifier", Error.Description);
 		}
 
 		[TestMethod]
@@ -479,8 +480,8 @@ namespace Waher.Networking.HTTP.Test
 					{ "redirect_uri", AuthorizationCode.RedirectUri }
 				});
 
-			WebException Error = AssertWebException(Response, ForbiddenException.Code);
-			Assert.Contains("Invalid code_verifier", Error.Message);
+			OAuthError Error = AssertOAuthError(Response, ForbiddenException.Code);
+			Assert.Contains("Invalid code_verifier", Error.Description);
 		}
 
 		[TestMethod]
@@ -505,8 +506,8 @@ namespace Waher.Networking.HTTP.Test
 				CreateAuthorizationCodeTokenRequest(AuthorizationCode, TestUserName));
 
 			Assert.IsTrue(SecondResponse.HasError);
-			WebException Error = AssertWebException(SecondResponse, ForbiddenException.Code);
-			Assert.Contains("Invalid code", Error.Message);
+			OAuthError Error = AssertOAuthError(SecondResponse, ForbiddenException.Code);
+			Assert.Contains("Invalid code", Error.Description);
 		}
 
 		private static Dictionary<string, string> CreateAuthorizationCodeTokenRequest(
@@ -685,7 +686,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "code", "not-used" }
 				});
 
-			AssertWebException(Response, BadRequestException.Code);
+			AssertOAuthError(Response, BadRequestException.Code);
 		}
 
 		[TestMethod]
@@ -698,7 +699,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "grant_type", "unsupported_grant_type" }
 				});
 
-			AssertWebException(Response, BadRequestException.Code);
+			AssertOAuthError(Response, BadRequestException.Code);
 		}
 
 		[TestMethod]
@@ -713,7 +714,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "code_verifier", "not-used" }
 				});
 
-			AssertWebException(Response, BadRequestException.Code);
+			AssertOAuthError(Response, BadRequestException.Code);
 		}
 
 		[TestMethod]
@@ -765,7 +766,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "code_verifier", AuthorizationCode.CodeVerifier }
 				});
 
-			AssertWebException(Response, ForbiddenException.Code);
+			AssertOAuthError(Response, ForbiddenException.Code);
 		}
 
 		[TestMethod]
@@ -808,7 +809,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "client_secret", TestPassword }
 				});
 
-			AssertWebException(Response, BadRequestException.Code);
+			AssertOAuthError(Response, BadRequestException.Code);
 		}
 
 		[TestMethod]
@@ -823,7 +824,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "password", TestPassword }
 				});
 
-			AssertWebException(Response, BadRequestException.Code);
+			AssertOAuthError(Response, BadRequestException.Code);
 		}
 
 		[TestMethod]
@@ -859,7 +860,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "code_verifier", AuthorizationCode.CodeVerifier }
 				});
 
-			AssertWebException(Response, BadRequestException.Code);
+			AssertOAuthError(Response, BadRequestException.Code);
 		}
 
 		[TestMethod]
@@ -884,7 +885,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "code_verifier", AuthorizationCode.CodeVerifier }
 				});
 
-			AssertWebException(Response, ForbiddenException.Code);
+			AssertOAuthError(Response, ForbiddenException.Code);
 		}
 
 		[TestMethod]
@@ -920,7 +921,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "code", "not-used" }
 				});
 
-			AssertWebException(Response, BadRequestException.Code);
+			AssertOAuthError(Response, BadRequestException.Code);
 		}
 
 		[TestMethod]
@@ -944,7 +945,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "code_verifier", AuthorizationCode.CodeVerifier }
 				});
 
-			AssertWebException(Response, BadRequestException.Code);
+			AssertOAuthError(Response, BadRequestException.Code);
 		}
 
 		[TestMethod]
@@ -1035,7 +1036,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			if (Response.HasError)
 			{
-				AssertWebException(Response, BadRequestException.Code);
+				AssertOAuthError(Response, BadRequestException.Code);
 				return null;
 			}
 
@@ -1121,8 +1122,8 @@ namespace Waher.Networking.HTTP.Test
 					{ "code_verifier", CodeChallenge }
 				});
 
-			WebException Error = AssertWebException(Response, ForbiddenException.Code);
-			Assert.Contains("Invalid code_verifier", Error.Message);
+			OAuthError Error = AssertOAuthError(Response, ForbiddenException.Code);
+			Assert.Contains("Invalid code_verifier", Error.Description);
 		}
 
 		[TestMethod]
@@ -1146,7 +1147,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "code_verifier", CreatePkceCodeVerifier() }
 				});
 
-			AssertWebException(Response, BadRequestException.Code, ForbiddenException.Code);
+			AssertOAuthError(Response, BadRequestException.Code, ForbiddenException.Code);
 		}
 
 		[TestMethod]
@@ -1156,7 +1157,7 @@ namespace Waher.Networking.HTTP.Test
 				new Uri(BaseUrl + ProtectedResource),
 				new KeyValuePair<string, string>("Authorization", "Bearer this-is-not-a-jwt"));
 
-			WebException Error = AssertWebException(Response, UnauthorizedException.Code);
+			OAuthError Error = AssertOAuthError(Response, false, UnauthorizedException.Code);
 			AssertBearerChallenge(Error, "invalid_token");
 		}
 
@@ -1168,7 +1169,7 @@ namespace Waher.Networking.HTTP.Test
 			ContentResponse Response = await InternetContent.GetAsync(new Uri(
 				BaseUrl + ProtectedResource + "?access_token=" + Uri.EscapeDataString(Token.AccessToken)));
 
-			WebException Error = AssertWebException(Response, UnauthorizedException.Code);
+			OAuthError Error = AssertOAuthError(Response, false, UnauthorizedException.Code);
 			AssertBearerChallenge(Error);
 		}
 
@@ -1288,7 +1289,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "client_id", TestUserName }
 				});
 
-			AssertWebException(Response, BadRequestException.Code);
+			AssertOAuthError(Response, BadRequestException.Code);
 		}
 
 		[TestMethod]
@@ -1298,7 +1299,7 @@ namespace Waher.Networking.HTTP.Test
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
 				CreateRefreshTokenRequest("invalid-refresh-token", TestUserName));
 
-			AssertWebException(Response, BadRequestException.Code, ForbiddenException.Code);
+			AssertOAuthError(Response, BadRequestException.Code, ForbiddenException.Code);
 		}
 
 		[TestMethod]
@@ -1311,7 +1312,7 @@ namespace Waher.Networking.HTTP.Test
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
 				CreateRefreshTokenRequest(InitialToken.RefreshToken, "Invalid User"));
 
-			AssertWebException(Response, BadRequestException.Code, ForbiddenException.Code);
+			AssertOAuthError(Response, BadRequestException.Code, ForbiddenException.Code);
 		}
 
 		[TestMethod]
@@ -1330,7 +1331,7 @@ namespace Waher.Networking.HTTP.Test
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
 				CreateRefreshTokenRequest(InitialToken.RefreshToken, TestUserName));
 
-			AssertWebException(ReuseResponse, BadRequestException.Code, ForbiddenException.Code);
+			AssertOAuthError(ReuseResponse, BadRequestException.Code, ForbiddenException.Code);
 		}
 
 		[TestMethod]
@@ -1600,7 +1601,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "client_id", TestUserName }
 				});
 
-			AssertWebException(Response, BadRequestException.Code);
+			AssertOAuthError(Response, BadRequestException.Code);
 		}
 
 		[TestMethod]
@@ -1610,7 +1611,7 @@ namespace Waher.Networking.HTTP.Test
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
 				CreateDeviceTokenRequest("invalid-device-code", TestUserName));
 
-			AssertWebException(Response, BadRequestException.Code, ForbiddenException.Code);
+			AssertOAuthError(Response, BadRequestException.Code, ForbiddenException.Code);
 		}
 
 		[TestMethod]
@@ -1626,7 +1627,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "device_code", Device.DeviceCode }
 				});
 
-			AssertWebException(Response, BadRequestException.Code, ForbiddenException.Code);
+			AssertOAuthError(Response, BadRequestException.Code, ForbiddenException.Code);
 		}
 
 		[TestMethod]
@@ -1636,7 +1637,7 @@ namespace Waher.Networking.HTTP.Test
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
 				new Dictionary<string, string>());
 
-			AssertWebException(Response, BadRequestException.Code);
+			AssertOAuthError(Response, BadRequestException.Code);
 		}
 
 		[TestMethod]
@@ -1848,7 +1849,7 @@ namespace Waher.Networking.HTTP.Test
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
 				Request);
 
-			AssertWebException(Response, BadRequestException.Code, ForbiddenException.Code);
+			AssertOAuthError(Response, BadRequestException.Code, ForbiddenException.Code);
 		}
 
 		[TestMethod]
@@ -1878,7 +1879,7 @@ namespace Waher.Networking.HTTP.Test
 					{ "client_id", string.Empty }
 				});
 
-			AssertWebException(Response, BadRequestException.Code);
+			AssertOAuthError(Response, BadRequestException.Code);
 		}
 
 		[TestMethod]
@@ -1897,21 +1898,71 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(System.Net.HttpStatusCode.BadRequest, Response.StatusCode);
 		}
 
-		private static WebException AssertWebException(
-			ContentResponse Response, params int[] ExpectedStatusCodes)
+		private static OAuthError AssertOAuthError(ContentResponse Response,
+			params int[] ExpectedStatusCodes)
+		{
+			return AssertOAuthError(Response, true, ExpectedStatusCodes);
+		}
+
+		private static OAuthError AssertOAuthError(ContentResponse Response,
+			bool CheckBody, params int[] ExpectedStatusCodes)
 		{
 			Assert.IsTrue(Response.HasError);
 			WebException Result = Response.Error as WebException;
 			Assert.IsNotNull(Result);
 
+			bool IsExpectedCode = false;
+
 			foreach (int ExpectedStatusCode in ExpectedStatusCodes)
 			{
 				if ((int)Result.StatusCode == ExpectedStatusCode)
-					return Result;
+				{
+					IsExpectedCode = true;
+					break;
+				}
 			}
 
-			Assert.Fail("Unexpected status code: " + (int)Result.StatusCode);
-			return Result;
+			Assert.IsTrue(IsExpectedCode, "Unexpected status code: " + (int)Result.StatusCode);
+
+			OAuthError Error = new()
+			{
+				Headers = Result.Headers
+			};
+
+			if (Result.Content is Dictionary<string, object> ErrorObj)
+			{
+				if (!ErrorObj.TryGetValue("error", out object Obj))
+					throw new Exception("Error code missing in response.");
+
+				if (Obj is not string ErrorCode)
+					throw new Exception("Error code is not a string.");
+				else
+					Error.Code = ErrorCode;
+
+				if (!ErrorObj.TryGetValue("error_description", out Obj))
+					throw new Exception("Error description missing in response.");
+
+				if (Obj is not string ErrorDescription)
+					throw new Exception("Error description is not a string.");
+				else
+					Error.Description = ErrorDescription;
+			}
+			else if (CheckBody)
+			{
+				if (Result.Content is not null)
+					throw new Exception("Invalid error response.");
+				else
+					throw new Exception("Missing error object body.");
+			}
+
+			return Error;
+		}
+
+		private class OAuthError
+		{
+			public string Code;
+			public string Description;
+			public HttpHeaders Headers;
 		}
 
 		private static void AssertPositiveUnixTime(object Value, string ClaimName)

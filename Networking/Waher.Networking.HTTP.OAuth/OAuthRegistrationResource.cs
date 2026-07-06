@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.HTTP.OAuth.Interfaces;
 using Waher.Runtime.Collections;
-using Waher.Runtime.Inventory;
-using Waher.Security;
 using Waher.Security.JWT;
 
 namespace Waher.Networking.HTTP.OAuth
@@ -14,16 +12,12 @@ namespace Waher.Networking.HTTP.OAuth
 	/// <summary>
 	/// OAUTH registration resource.
 	/// </summary>
-	public class OAuthRegistrationResource : HttpSynchronousResource, IHttpPostMethod
+	public class OAuthRegistrationResource : OAuthResource, IHttpPostMethod
 	{
 		/// <summary>
 		/// Default registration resource path: /oauth/register
 		/// </summary>
 		public const string DefaultResourcePath = "/oauth/register";
-
-		private readonly IDynamicUserSource userSource;
-		private HttpAuthenticationScheme[]? authenticationSchemes = null;
-		private JwtFactory? jwtFactory;
 
 		/// <summary>
 		/// OAUTH registration resource.
@@ -62,59 +56,14 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="ResourceName">Resource name.</param>
 		public OAuthRegistrationResource(IDynamicUserSource UserSource, JwtFactory? JwtFactory,
 			string ResourceName)
-			: base(ResourceName)
+			: base(UserSource, JwtFactory, ResourceName)
 		{
-			this.jwtFactory = JwtFactory;
-			this.userSource = UserSource;
 		}
-
-		/// <summary>
-		/// If the resource uses user sessions.
-		/// </summary>
-		public override bool UserSessions => false;
-
-		/// <summary>
-		/// If the resource handles sub-paths.
-		/// </summary>
-		public override bool HandlesSubPaths => false;
 
 		/// <summary>
 		/// If the POST method is allowed.
 		/// </summary>
 		public bool AllowsPOST => true;
-
-		/// <summary>
-		/// Data source for users, used to authenticate clients.
-		/// </summary>
-		public IUserSource Users => this.userSource;
-
-		/// <summary>
-		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
-		/// </summary>
-		/// <param name="Request">Current request</param>
-		/// <returns>Array of authentication schemes (possibly empty) available for
-		/// authenticating the user making the request. If no default authentication
-		/// is to be performed, null can be returned.</returns>
-		public override HttpAuthenticationScheme[]? GetAuthenticationSchemes(HttpRequest Request)
-		{
-			if (this.jwtFactory is null)
-			{
-				if (Types.TryGetModuleParameter("JWT", out JwtFactory JwtFactory) &&
-					!JwtFactory.Disposed)
-				{
-					this.jwtFactory = JwtFactory;
-					this.authenticationSchemes = null;
-				}
-			}
-
-			if (Request.Header.Authorization is null)
-				return null;
-
-			this.authenticationSchemes ??= OAuthTokenResource.CreateAuthenticationSchemes(
-				this.jwtFactory, this.userSource);
-
-			return this.authenticationSchemes;
-		}
 
 		/// <summary>
 		/// Executes the POST method on the resource.
@@ -126,7 +75,7 @@ namespace Waher.Networking.HTTP.OAuth
 		{
 			if (!Request.HasData)
 			{
-				await Response.SendResponse(new BadRequestException());
+				await BadRequest(Response, "invalid_request", "Missing payload.");
 				return;
 			}
 
@@ -134,7 +83,7 @@ namespace Waher.Networking.HTTP.OAuth
 			if (Decoded.HasError ||
 				!(Decoded.Decoded is Dictionary<string, object> RequestObj))
 			{
-				await Response.SendResponse(new BadRequestException());
+				await BadRequest(Response, "invalid_request", "Invalid form.");
 				return;
 			}
 
@@ -154,6 +103,7 @@ namespace Waher.Networking.HTTP.OAuth
 			string[]? Contacts = null;
 			Dictionary<string, object?>? Jwks = null;
 			Dictionary<string, object?>? MetaData = null;
+			bool ReturnClientSecret = false;
 
 			foreach (KeyValuePair<string, object> P in RequestObj)
 			{
@@ -161,6 +111,20 @@ namespace Waher.Networking.HTTP.OAuth
 				{
 					case "redirect_uris":
 						RedirectUris = ToStrings(P.Value);
+
+						if (!(RedirectUris is null))
+						{
+							foreach (string RedirectUri in RedirectUris)
+							{
+								if (!Uri.TryCreate(RedirectUri, UriKind.Absolute, out Uri Parsed) ||
+									!string.IsNullOrEmpty(Parsed.Fragment) ||
+									!string.IsNullOrEmpty(Parsed.Query))
+								{
+									await BadRequest(Response, "invalid_request", "Invalid redirection URI.");
+									return;
+								}
+							}
+						}
 						break;
 
 					case "grant_types":
@@ -177,6 +141,14 @@ namespace Waher.Networking.HTTP.OAuth
 
 					case "token_endpoint_auth_method":
 						TokenEndpointAuthMethod = P.Value?.ToString();
+
+						switch (TokenEndpointAuthMethod)
+						{
+							case "client_secret_post":
+							case "client_secret_basic":
+								ReturnClientSecret = true;
+								break;
+						}
 						break;
 
 					case "client_name":
@@ -194,7 +166,7 @@ namespace Waher.Networking.HTTP.OAuth
 					case "client_uri":
 						if (!Uri.TryCreate(P.Value?.ToString(), UriKind.Absolute, out ClientUri))
 						{
-							await Response.SendResponse(new BadRequestException("Invalid client_uri"));
+							await BadRequest(Response, "invalid_request", "Invalid client_uri");
 							return;
 						}
 						break;
@@ -202,7 +174,7 @@ namespace Waher.Networking.HTTP.OAuth
 					case "logo_uri":
 						if (!Uri.TryCreate(P.Value?.ToString(), UriKind.Absolute, out LogoUri))
 						{
-							await Response.SendResponse(new BadRequestException("Invalid logo_uri"));
+							await BadRequest(Response, "invalid_request", "Invalid logo_uri");
 							return;
 						}
 						break;
@@ -210,7 +182,7 @@ namespace Waher.Networking.HTTP.OAuth
 					case "tos_uri":
 						if (!Uri.TryCreate(P.Value?.ToString(), UriKind.Absolute, out TosUri))
 						{
-							await Response.SendResponse(new BadRequestException("Invalid tos_uri"));
+							await BadRequest(Response, "invalid_request", "Invalid tos_uri");
 							return;
 						}
 						break;
@@ -218,7 +190,7 @@ namespace Waher.Networking.HTTP.OAuth
 					case "policy_uri":
 						if (!Uri.TryCreate(P.Value?.ToString(), UriKind.Absolute, out PolicyUri))
 						{
-							await Response.SendResponse(new BadRequestException("Invalid policy_uri"));
+							await BadRequest(Response, "invalid_request", "Invalid policy_uri");
 							return;
 						}
 						break;
@@ -226,7 +198,7 @@ namespace Waher.Networking.HTTP.OAuth
 					case "jwks_uri":
 						if (!Uri.TryCreate(P.Value?.ToString(), UriKind.Absolute, out JwksUri))
 						{
-							await Response.SendResponse(new BadRequestException("Invalid jwks_uri"));
+							await BadRequest(Response, "invalid_request", "Invalid jwks_uri");
 							return;
 						}
 						break;
@@ -240,7 +212,7 @@ namespace Waher.Networking.HTTP.OAuth
 							Jwks = Jwks2;
 						else
 						{
-							await Response.SendResponse(new BadRequestException("Invalid jwks"));
+							await BadRequest(Response, "invalid_request", "Invalid jwks");
 							return;
 						}
 						break;
@@ -249,7 +221,7 @@ namespace Waher.Networking.HTTP.OAuth
 					case "client_secret":
 					case "client_id_issued_at":
 					case "client_secret_expires_at":
-						await Response.SendResponse(new BadRequestException("Invalid request parameter: " + P.Key));
+						await BadRequest(Response, "invalid_request", "Invalid request parameter: " + P.Key);
 						return;
 
 					default:
@@ -259,7 +231,24 @@ namespace Waher.Networking.HTTP.OAuth
 				}
 			}
 
-			IRegistration? Registration = await this.userSource.RegisterUser(
+			if (!(GrantTypes is null) &&
+				Array.IndexOf(GrantTypes, "implicit") >= 0 &&
+				!(ResponseTypes is null) &&
+				Array.IndexOf(ResponseTypes, "token") < 0)
+			{
+				await BadRequest(Response, "invalid_client_metadata",
+					"Implicit grant_type requires token response_type.");
+				return;
+			}
+
+			if (!(this.Users is IDynamicUserSource DynamicUserSource))
+			{
+				await ServiceUnavailable(Response, "server_error",
+					"Client registration service not available.");
+				return;
+			}
+
+			IRegistration? Registration = await DynamicUserSource.RegisterUser(
 				new RegistrationRequest(Request.RemoteEndPoint, RedirectUris,
 				GrantTypes, ResponseTypes, TokenEndpointAuthMethod, ClientName, SoftwareId,
 				SoftwareVersion, ClientUri, LogoUri, TosUri, PolicyUri, JwksUri, Scopes,
@@ -267,7 +256,8 @@ namespace Waher.Networking.HTTP.OAuth
 
 			if (Registration is null)
 			{
-				await Response.SendResponse(new ForbiddenException("Not permitted to register new client."));
+				await Forbidden(Response, "access_denied", 
+					"Not permitted to register new client.");
 				return;
 			}
 
@@ -278,12 +268,17 @@ namespace Waher.Networking.HTTP.OAuth
 				ResponseObj[P.Key] = P.Value;
 
 			ResponseObj["client_id"] = Registration.ClientId;
-			ResponseObj["client_secret"] = Registration.ClientSecret;
 			ResponseObj["client_id_issued_at"] = (long)DateTime.UtcNow.Subtract(JSON.UnixEpoch).TotalSeconds;
-			ResponseObj["client_secret_expires_at"] = Registration.ClientSecretExpiresAt.HasValue ?
-					(long)Registration.ClientSecretExpiresAt.Value.Subtract(JSON.UnixEpoch).TotalSeconds : 0L;
 
-			Response.StatusCode = 201;  // Created
+			if (ReturnClientSecret)
+			{
+				ResponseObj["client_secret"] = Registration.ClientSecret;
+				ResponseObj["client_secret_expires_at"] = Registration.ClientSecretExpiresAt.HasValue ?
+						(long)Registration.ClientSecretExpiresAt.Value.Subtract(JSON.UnixEpoch).TotalSeconds : 0L;
+			}
+
+			Response.StatusCode = 201;
+			Response.StatusMessage = "Created";
 			Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 			Response.SetHeader("Pragma", "no-cache");
 

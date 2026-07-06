@@ -10,7 +10,7 @@ namespace Waher.Networking.HTTP.OAuth
 	/// <summary>
 	/// Provides OAUTH authorization server meta-data, as defined in RFC 8414.
 	/// </summary>
-	public class AuthorizationServerMetaData : HttpSynchronousResource, IHttpGetMethod
+	public class AuthorizationServerMetaData : OAuthResource, IHttpGetMethod
 	{
 		private readonly OAuthAuthorizeResource authorizeResource;
 
@@ -23,20 +23,10 @@ namespace Waher.Networking.HTTP.OAuth
 		/// Provides OAUTH authorization server meta-data, as defined in RFC 8414.
 		/// </summary>
 		public AuthorizationServerMetaData(OAuthAuthorizeResource AuthorizeResource)
-			: base(WellKnowResourcePath)
+			: base(AuthorizeResource.Users, AuthorizeResource.JwtFactory, WellKnowResourcePath)
 		{
 			this.authorizeResource = AuthorizeResource;
 		}
-
-		/// <summary>
-		/// If the resource handles sub-paths.
-		/// </summary>
-		public override bool HandlesSubPaths => false;
-
-		/// <summary>
-		/// If the resource uses user sessions.
-		/// </summary>
-		public override bool UserSessions => false;
 
 		/// <summary>
 		/// If the GET method is allowed.
@@ -85,7 +75,7 @@ namespace Waher.Networking.HTTP.OAuth
 				{ "token_endpoint_auth_signing_alg_values_supported", JwsAlgorithm.GetAlgorithmNames() },
 				{ "response_types_supported", new string[] { "code", "token" } },
 				{ "code_challenge_methods_supported", new string[] { "plain", "S256" } },
-				{ "authorization_response_iss_parameter_supported", this.authorizeResource.JwtFactory?.HasIssuer ?? false },
+				{ "authorization_response_iss_parameter_supported", this.JwtFactory?.HasIssuer ?? false },
 				{ "grant_types_supported", GrantTypesSupported.ToArray() }
 			};
 

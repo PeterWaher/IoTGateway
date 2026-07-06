@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -9,7 +7,6 @@ using Waher.Events;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Collections;
-using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Security;
 using Waher.Security.JWT;
@@ -21,8 +18,7 @@ namespace Waher.Networking.HTTP.OAuth
 	/// <summary>
 	/// OAUTH token resource.
 	/// </summary>
-	public class OAuthTokenResource : HttpSynchronousResource,
-		IHttpGetMethod, IHttpPostMethod
+	public class OAuthTokenResource : OAuthResource, IHttpGetMethod, IHttpPostMethod
 	{
 		/// <summary>
 		/// Default token resource path: /oauth/token
@@ -32,11 +28,6 @@ namespace Waher.Networking.HTTP.OAuth
 		private static readonly Cache<string, TokenRef> codes = new Cache<string, TokenRef>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
 		private static readonly Cache<string, TokenFamily> refreshTokens = new Cache<string, TokenFamily>(int.MaxValue, TimeSpan.FromHours(1), TimeSpan.FromHours(1));
 		private static readonly Cache<string, TokenFamily> usedRefreshTokens = new Cache<string, TokenFamily>(int.MaxValue, TimeSpan.FromHours(1), TimeSpan.FromHours(1));
-		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
-		private readonly IUserSource userSource;
-		private HttpAuthenticationScheme[]? authenticationSchemes = null;
-		private JwtFactory? jwtFactory;
-		private string? realm;
 
 		/// <summary>
 		/// OAUTH token resource.
@@ -111,21 +102,9 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="ResourceName">Resource name.</param>
 		public OAuthTokenResource(IUserSource? UserSource, JwtFactory? JwtFactory,
 			string ResourceName)
-			: base(ResourceName)
+			: base(UserSource, JwtFactory, ResourceName)
 		{
-			this.jwtFactory = JwtFactory;
-			this.userSource = UserSource ?? Security.Users.Users.Source;
 		}
-
-		/// <summary>
-		/// If the resource uses user sessions.
-		/// </summary>
-		public override bool UserSessions => false;
-
-		/// <summary>
-		/// If the resource handles sub-paths.
-		/// </summary>
-		public override bool HandlesSubPaths => false;
 
 		/// <summary>
 		/// If the GET method is allowed.
@@ -137,19 +116,14 @@ namespace Waher.Networking.HTTP.OAuth
 		/// </summary>
 		public bool AllowsPOST => true;
 
-		/// <summary>
-		/// Data source for users, used to authenticate clients.
-		/// </summary>
-		public IUserSource Users => this.userSource;
-
 		internal async Task<string> GenerateTokenCode(IUserWithClaims User, bool Encrypted,
 			string CodeChallenge, string CodeChallengeMethod, string RedirectUri)
 		{
-			if (this.jwtFactory is null)
+			if (this.JwtFactory is null)
 				throw new ServiceUnavailableException("No JWT factory configured.");
 
-			string Token = await User.CreateToken(this.jwtFactory, Encrypted);
-			string Code = GenerateRandomCode();
+			string Token = await User.CreateToken(this.JwtFactory, Encrypted);
+			string Code = this.GenerateRandomCode();
 
 			codes[Code] = new TokenRef(Token, User, CodeChallenge, CodeChallengeMethod,
 				RedirectUri, 3600);
@@ -161,19 +135,13 @@ namespace Waher.Networking.HTTP.OAuth
 		/// Generates a random unique code.
 		/// </summary>
 		/// <returns>Random unique code.</returns>
-		public static string GenerateRandomCode()
+		protected override string GenerateRandomCode()
 		{
-			byte[] Bin = new byte[64];
 			string Code;
 
 			do
 			{
-				lock (rnd)
-				{
-					rnd.GetBytes(Bin);
-				}
-
-				Code = Base64Url.Encode(Bin);
+				Code = base.GenerateRandomCode();
 			}
 			while (
 				codes.ContainsKey(Code) ||
@@ -210,7 +178,8 @@ namespace Waher.Networking.HTTP.OAuth
 					case "plain":
 						if (CodeVerifier != this.CodeChallenge)
 						{
-							await Response.SendResponse(new ForbiddenException("Invalid code_verifier."));
+							await Forbidden(Response, "access_denied", 
+								"Invalid code_verifier.");
 							return false;
 						}
 						break;
@@ -221,13 +190,15 @@ namespace Waher.Networking.HTTP.OAuth
 
 						if (ExpectedCodeChallenge != this.CodeChallenge)
 						{
-							await Response.SendResponse(new ForbiddenException("Invalid code_verifier."));
+							await Forbidden(Response, "access_denied", 
+								"Invalid code_verifier.");
 							return false;
 						}
 						break;
 
 					default:
-						await Response.SendResponse(new BadRequestException("Unsupported code_challenge_method: " + this.CodeChallengeMethod));
+						await BadRequest(Response, "invalid_request", 
+							"Unsupported code_challenge_method: " + this.CodeChallengeMethod);
 						return false;
 				}
 
@@ -245,19 +216,20 @@ namespace Waher.Networking.HTTP.OAuth
 		{
 			if (OAuthAuthorizeResource.HasDuplicateQueryParameters(Request))
 			{
-				await Response.SendResponse(new BadRequestException("Duplicate query parameters."));
+				await BadRequest(Response, "invalid_request",
+					"Duplicate query parameters.");
 				return;
 			}
 
 			if (!Request.Header.TryGetQueryParameter("code", out string Code))
 			{
-				await Response.SendResponse(new BadRequestException("Missing code."));
+				await BadRequest(Response, "invalid_request", "Missing code.");
 				return;
 			}
 
 			if (!codes.TryGetValue(Code, out TokenRef Ref))
 			{
-				await Response.SendResponse(new ForbiddenException("Invalid code."));
+				await Forbidden(Response, "access_denied", "Invalid code.");
 				return;
 			}
 
@@ -265,7 +237,7 @@ namespace Waher.Networking.HTTP.OAuth
 			{
 				if (!Request.Header.TryGetQueryParameter("code_verifier", out string CodeVerifier))
 				{
-					await Response.SendResponse(new BadRequestException("Missing code_verifier."));
+					await BadRequest(Response, "invalid_request", "Missing code_verifier.");
 					return;
 				}
 
@@ -278,92 +250,8 @@ namespace Waher.Networking.HTTP.OAuth
 			Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 			Response.SetHeader("Pragma", "no-cache");
 
-			await Response.Return(TokenResponse(Ref.Token, null, Ref.ExpiresIn,
-				string.Empty, this.jwtFactory?.Issuer, true, Ref.User, Request));
-		}
-
-		/// <summary>
-		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
-		/// </summary>
-		/// <param name="Request">Current request</param>
-		/// <returns>Array of authentication schemes (possibly empty) available for
-		/// authenticating the user making the request. If no default authentication
-		/// is to be performed, null can be returned.</returns>
-		public override HttpAuthenticationScheme[]? GetAuthenticationSchemes(HttpRequest Request)
-		{
-			if (this.jwtFactory is null)
-			{
-				if (Types.TryGetModuleParameter("JWT", out JwtFactory JwtFactory) &&
-					!JwtFactory.Disposed)
-				{
-					this.jwtFactory = JwtFactory;
-					this.authenticationSchemes = null;
-				}
-			}
-
-			if (Request.Header.Authorization is null)
-				return null;
-
-			this.authenticationSchemes ??= CreateAuthenticationSchemes(this.jwtFactory, this.userSource);
-
-			return this.authenticationSchemes;
-		}
-
-		internal static void GetDomainParameters(out string? Domain, out int MinStrength,
-			out bool Encrypted)
-		{
-			if (!Types.TryGetModuleParameter("X509", out object Obj) ||
-				!(Obj is X509Certificate Certificate))
-			{
-				if (Types.TryGetModuleParameter("Realm", out Obj) &&
-					Obj is string Realm)
-				{
-					Domain = Realm;
-				}
-				else
-					Domain = null;
-
-				Encrypted = false;
-				MinStrength = 0;
-			}
-			else
-			{
-				Encrypted = true;
-				Domain = BinaryTcpClient.GetDomainFromSubject(Certificate.Subject);
-				MinStrength = 128;
-			}
-		}
-
-		internal static HttpAuthenticationScheme[] CreateAuthenticationSchemes(
-			JwtFactory? JwtFactory, IUserSource Users)
-		{
-			// Note: Restricted set of authentication schemes, as compared to
-			// HttpModule.GetAuthenticationSchemes().
-
-			List<HttpAuthenticationScheme> Schemes = new List<HttpAuthenticationScheme>();
-
-			GetDomainParameters(out string? Domain, out int MinStrength, out bool Encrypted);
-
-			if (!(JwtFactory is null))
-			{
-				Schemes.Add(new JwtAuthentication(Encrypted, MinStrength, Domain, Users,
-					JwtFactory));
-			}
-
-			HttpServer Server = Types.TryGetModuleParameter<HttpServer>("HTTP");
-
-			if (!(Server is null) && Server.ClientCertificates != ClientCertificates.NotUsed)
-				Schemes.Add(new MutualTlsAuthentication(Users));
-
-			Schemes.Add(new BasicAuthentication(Encrypted, MinStrength, Domain, Users));
-			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.MD5, Domain, Users));
-			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.SHA256, Domain, Users));
-			Schemes.Add(new DigestAuthentication(Encrypted, MinStrength, DigestAlgorithm.SHA3_256, Domain, Users));
-
-			if (!(Server is null))
-				Schemes.Add(new SessionAuthentication(Server));
-
-			return Schemes.ToArray();
+			await Response.Return(this.TokenResponse(Ref.Token, null, Ref.ExpiresIn,
+				string.Empty, this.JwtFactory?.Issuer, true, Ref.User, Request));
 		}
 
 		/// <summary>
@@ -374,28 +262,30 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
-			if (this.jwtFactory is null)
+			if (this.JwtFactory is null)
 			{
-				await Response.SendResponse(new ServiceUnavailableException("No JWT factory configured."));
+				await ServiceUnavailable(Response, "server_error",
+					"No JWT factory configured.");
 				return;
 			}
 
 			if (!Request.HasData)
 			{
-				await Response.SendResponse(new BadRequestException("No payload in request."));
+				await BadRequest(Response, "invalid_request", "No payload in request.");
 				return;
 			}
 
 			ContentResponse Content = await Request.DecodeDataAsync();
 			if (Content.HasError || !(Content.Decoded is Dictionary<string, string> Form))
 			{
-				await Response.SendResponse(new BadRequestException("Expected URL-encoded WWW form."));
+				await BadRequest(Response, "invalid_request", 
+					"Expected URL-encoded WWW form.");
 				return;
 			}
 
 			if (!Form.TryGetValue("grant_type", out string GrantType))
 			{
-				await Response.SendResponse(new BadRequestException("Missing grant_type."));
+				await BadRequest(Response, "invalid_request", "Missing grant_type.");
 				return;
 			}
 
@@ -410,32 +300,32 @@ namespace Waher.Networking.HTTP.OAuth
 				case "authorization_code":
 					if (!Form.TryGetValue("code", out string Code))
 					{
-						await Response.SendResponse(new BadRequestException());
+						await BadRequest(Response, "invalid_request", "Missing code.");
 						return;
 					}
 
 					if (!codes.TryGetValue(Code, out TokenRef Ref))
 					{
-						await Response.SendResponse(new ForbiddenException("Invalid code."));
+						await Forbidden(Response, "access_denied", "Invalid code.");
 						return;
 					}
 
 					if (!Form.TryGetValue("redirect_uri", out string RedirectUri) ||
 						!Form.TryGetValue("client_id", out ClientId))
 					{
-						await Response.SendResponse(new BadRequestException("Missing client_id."));
+						await BadRequest(Response, "invalid_request", "Missing client_id.");
 						return;
 					}
 
 					if (ClientId != Ref.User.UserName)
 					{
-						await Response.SendResponse(new ForbiddenException());
+						await Forbidden(Response, "access_denied", "Access denied");
 						return;
 					}
 
 					if (Ref.RedirectUri != RedirectUri)
 					{
-						await Response.SendResponse(new ForbiddenException());
+						await Forbidden(Response, "access_denied", "Access denied");
 						return;
 					}
 
@@ -443,7 +333,7 @@ namespace Waher.Networking.HTTP.OAuth
 					{
 						if (!Form.TryGetValue("code_verifier", out string CodeVerifier))
 						{
-							await Response.SendResponse(new BadRequestException("Missing code_verifier."));
+							await BadRequest(Response, "invalid_request", "Missing code_verifier.");
 							return;
 						}
 
@@ -480,7 +370,8 @@ namespace Waher.Networking.HTTP.OAuth
 							if (Form.ContainsKey("client_id") ||
 								Form.ContainsKey("client_secret"))
 							{
-								await Response.SendResponse(new BadRequestException());
+								await BadRequest(Response, "invalid_request", 
+									"Invalid request parameters.");
 								return;
 							}
 
@@ -492,7 +383,7 @@ namespace Waher.Networking.HTTP.OAuth
 							}
 
 							User = UserWithClaims;
-							Token = await UserWithClaims.CreateToken(this.jwtFactory, Request.Encrypted);
+							Token = await UserWithClaims.CreateToken(this.JwtFactory, Request.Encrypted);
 							break;
 						}
 					}
@@ -501,28 +392,27 @@ namespace Waher.Networking.HTTP.OAuth
 					{
 						if (!Request.Encrypted && (Request.Server.OpenHttpsPorts?.Length ?? 0) > 0)
 						{
-							await Response.SendResponse(new BadRequestException(
-								"Request must be performed over an encrypted connection."));
+							await Forbidden(Response, "invalid_request", 
+								"Request must be performed over an encrypted connection.");
 							return;
 						}
 
 						if (Request.Encrypted && Request.CipherStrength < 128)
 						{
-							await Response.SendResponse(new BadRequestException(
-								"Cipher strength too weak."));
+							await Forbidden(Response, "invalid_request", 
+								"Cipher strength too weak.");
 							return;
 						}
 
-						if (string.IsNullOrEmpty(this.realm))
-							GetDomainParameters(out this.realm, out _, out _);
+						this.InitAuthentication();
 
 						LoginResult? LoginResult = await DoLogin(ClientId, ClientSecret,
-							this.userSource, Request, this.realm ?? string.Empty);
+							this.Users!, Request, this.Realm ?? string.Empty);
 
 						if (LoginResult is null)
 						{
-							await Response.SendResponse(new ForbiddenException(
-								"User cannot authenticate via this interface."));
+							await Forbidden(Response, "access_denied", 
+								"User cannot authenticate via this interface.");
 							return;
 						}
 
@@ -534,24 +424,24 @@ namespace Waher.Networking.HTTP.OAuth
 
 							case LoginResultType.InvalidCredentials:
 							default:
-								await Response.SendResponse(new ForbiddenException(
-									"Invalid client_id or client_secret."));
+								await Forbidden(Response, "access_denied",
+									"Invalid client_id or client_secret.");
 								return;
 
 							case LoginResultType.NoPassword:
-								await Response.SendResponse(new ForbiddenException(
-									"No or empty client_secret."));
+								await Forbidden(Response, "access_denied",
+									"No or empty client_secret.");
 								return;
 
 							case LoginResultType.TemporarilyBlocked:
-								await Response.SendResponse(new ForbiddenException(
+								await Forbidden(Response, "access_denied",
 									"Temporarily blocked. Try again after: " +
-									LoginResult.Next?.ToString()));
+									LoginResult.Next?.ToString());
 								return;
 
 							case LoginResultType.PermanentlyBlocked:
-								await Response.SendResponse(new ForbiddenException(
-									"Permanently blocked."));
+								await Forbidden(Response, "access_denied",
+									"Permanently blocked.");
 								return;
 						}
 
@@ -563,11 +453,12 @@ namespace Waher.Networking.HTTP.OAuth
 						}
 
 						User = UserWithClaims;
-						Token = await UserWithClaims.CreateToken(this.jwtFactory, Request.Encrypted);
+						Token = await UserWithClaims.CreateToken(this.JwtFactory, Request.Encrypted);
 					}
 					else
 					{
-						await Response.SendResponse(new BadRequestException());
+						await BadRequest(Response, "invalid_request", 
+							"Missing credentials.");
 						return;
 					}
 					break;
@@ -575,7 +466,8 @@ namespace Waher.Networking.HTTP.OAuth
 				case "refresh_token":
 					if (!Form.TryGetValue("refresh_token", out string RefreshToken))
 					{
-						await Response.SendResponse(new BadRequestException());
+						await BadRequest(Response, "invalid_request", 
+							"Missing refresh_token.");
 						return;
 					}
 
@@ -601,19 +493,20 @@ namespace Waher.Networking.HTTP.OAuth
 							usedRefreshTokens.Remove(RefreshToken);
 						}
 
-						await Response.SendResponse(new ForbiddenException("Invalid refresh_token."));
+						await Forbidden(Response, "access_denied", 
+							"Invalid refresh_token.");
 						return;
 					}
 
 					if (!Form.TryGetValue("client_id", out ClientId))
 					{
-						await Response.SendResponse(new BadRequestException("Missing client_id."));
+						await BadRequest(Response, "invalid_request", "Missing client_id.");
 						return;
 					}
 
 					if (!TokenFamily.CanUseRefreshToken(ClientId, Request))
 					{
-						await Response.SendResponse(new ForbiddenException());
+						await Forbidden(Response, "access_denied", "Access denied");
 						return;
 					}
 
@@ -621,19 +514,20 @@ namespace Waher.Networking.HTTP.OAuth
 					usedRefreshTokens.Add(RefreshToken, TokenFamily);
 
 					User = TokenFamily.User;
-					Token = await User.CreateToken(this.jwtFactory, Request.Encrypted);
+					Token = await User.CreateToken(this.JwtFactory, Request.Encrypted);
 					break;
 
 				default:
-					await Response.SendResponse(new BadRequestException("Unsupported grant_type: " + GrantType));
+					await BadRequest(Response, "invalid_request", 
+						"Unsupported grant_type: " + GrantType);
 					return;
 			}
 
 			Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 			Response.SetHeader("Pragma", "no-cache");
 
-			await Response.Return(TokenResponse(Token, null, 3600, string.Empty,
-				this.jwtFactory?.Issuer, IssueRefreshToken, User, Request, TokenFamily));
+			await Response.Return(this.TokenResponse(Token, null, 3600, string.Empty,
+				this.JwtFactory?.Issuer, IssueRefreshToken, User, Request, TokenFamily));
 		}
 
 		internal static async Task<LoginResult?> DoLogin(string UserName, string Password,
@@ -702,15 +596,15 @@ namespace Waher.Networking.HTTP.OAuth
 			}
 		}
 
-		internal static Dictionary<string, object> TokenResponse(string Token,
+		internal Dictionary<string, object> TokenResponse(string Token,
 			string? State, int ExpiresIn, string Scope, string? Issuer,
 			bool IssueRefreshToken, IUserWithClaims User, HttpRequest Request)
 		{
-			return TokenResponse(Token, State, ExpiresIn, Scope, Issuer,
+			return this.TokenResponse(Token, State, ExpiresIn, Scope, Issuer,
 				IssueRefreshToken, User, Request, null);
 		}
 
-		private static Dictionary<string, object> TokenResponse(string Token,
+		private Dictionary<string, object> TokenResponse(string Token,
 			string? State, int ExpiresIn, string Scope, string? Issuer,
 			bool IssueRefreshToken, IUserWithClaims User, HttpRequest Request,
 			TokenFamily? TokenFamily)
@@ -738,7 +632,7 @@ namespace Waher.Networking.HTTP.OAuth
 				else
 					TokenFamily.Add(Token);
 
-				string RefreshToken = GenerateRandomCode();
+				string RefreshToken = this.GenerateRandomCode();
 				refreshTokens[RefreshToken] = TokenFamily;
 
 				Result["refresh_token"] = RefreshToken;

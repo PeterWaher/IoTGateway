@@ -10,7 +10,7 @@ namespace Waher.Networking.HTTP.OAuth
 	/// <summary>
 	/// Provides OAUTH resource meta-data, as defined in RFC 9728.
 	/// </summary>
-	public class ProtectedResourceMetaData : HttpSynchronousResource, IHttpGetMethod
+	public class ProtectedResourceMetaData : OAuthResource, IHttpGetMethod
 	{
 		/// <summary>
 		/// /.well-known
@@ -21,7 +21,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// Provides OAUTH resource meta-data, as defined in RFC 9728.
 		/// </summary>
 		public ProtectedResourceMetaData()
-			: base(WellKnowResourcePath)
+			: base(null, null, WellKnowResourcePath)
 		{
 		}
 
@@ -29,11 +29,6 @@ namespace Waher.Networking.HTTP.OAuth
 		/// If the resource handles sub-paths.
 		/// </summary>
 		public override bool HandlesSubPaths => true;
-
-		/// <summary>
-		/// If the resource uses user sessions.
-		/// </summary>
-		public override bool UserSessions => false;
 
 		/// <summary>
 		/// If the GET method is allowed.
@@ -50,11 +45,17 @@ namespace Waher.Networking.HTTP.OAuth
 		{
 			string ResourceName = Request.SubPath;
 
-			if (string.IsNullOrEmpty(ResourceName) ||
-				!(Request.Server?.TryGetResource(ref ResourceName, false, out HttpResource Resource, out string SubPath) ?? false) ||
+			if (string.IsNullOrEmpty(ResourceName))
+			{
+				await BadRequest(Response, "invalid_request", "No resource subpath provided.");
+				return;
+			}
+			
+			if (!(Request.Server?.TryGetResource(ref ResourceName, false, 
+				out HttpResource Resource, out string SubPath) ?? false) ||
 				!string.IsNullOrEmpty(SubPath))
 			{
-				await Response.SendResponse(new NotFoundException());
+				await NotFound(Response, "invalid_request", "Resource not found: " + ResourceName);
 				return;
 			}
 

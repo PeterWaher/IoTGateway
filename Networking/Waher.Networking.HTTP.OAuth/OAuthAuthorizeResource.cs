@@ -12,9 +12,8 @@ using Waher.Events;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Networking.HTTP.OAuth.Events;
 using Waher.Runtime.Collections;
-using Waher.Runtime.Inventory;
-using Waher.Security;
 using Waher.Security.JWT;
+using Waher.Security.LoginMonitor;
 using Waher.Security.Users;
 
 namespace Waher.Networking.HTTP.OAuth
@@ -22,8 +21,7 @@ namespace Waher.Networking.HTTP.OAuth
 	/// <summary>
 	/// OAUTH authorize resource.
 	/// </summary>
-	public class OAuthAuthorizeResource : HttpSynchronousResource,
-		IHttpGetMethod, IHttpPostMethod
+	public class OAuthAuthorizeResource : OAuthResource, IHttpGetMethod, IHttpPostMethod
 	{
 		/// <summary>
 		/// Default authorize resource path: /oauth/authorize
@@ -33,10 +31,6 @@ namespace Waher.Networking.HTTP.OAuth
 		private readonly OAuthTokenResource tokenResource;
 		private readonly OAuthRegistrationResource? registrationResource;
 		private readonly OAuthDeviceAuthorizationResource? deviceAuthorizationResource;
-		private readonly IUserSource userSource;
-		private HttpAuthenticationScheme[]? authenticationSchemes = null;
-		private JwtFactory? jwtFactory;
-		private string? realm;
 
 		/// <summary>
 		/// OAUTH authorize resource.
@@ -67,24 +61,12 @@ namespace Waher.Networking.HTTP.OAuth
 			OAuthDeviceAuthorizationResource? DeviceAuthorizationResource,
 			JwtFactory? JwtFactory,
 			string ResourceName)
-			: base(ResourceName)
+			: base(TokenResource.Users, JwtFactory, ResourceName)
 		{
 			this.tokenResource = TokenResource;
 			this.registrationResource = RegistrationResource;
 			this.deviceAuthorizationResource = DeviceAuthorizationResource;
-			this.jwtFactory = JwtFactory;
-			this.userSource = TokenResource.Users;
 		}
-
-		/// <summary>
-		/// If the resource uses user sessions.
-		/// </summary>
-		public override bool UserSessions => false;
-
-		/// <summary>
-		/// If the resource handles sub-paths.
-		/// </summary>
-		public override bool HandlesSubPaths => false;
 
 		/// <summary>
 		/// If the GET method is allowed.
@@ -112,45 +94,6 @@ namespace Waher.Networking.HTTP.OAuth
 		internal OAuthDeviceAuthorizationResource? OAuthDeviceAuthorizationResource => this.deviceAuthorizationResource;
 
 		/// <summary>
-		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
-		/// </summary>
-		/// <param name="Request">Current request</param>
-		/// <returns>Array of authentication schemes (possibly empty) available for
-		/// authenticating the user making the request. If no default authentication
-		/// is to be performed, null can be returned.</returns>
-		public override HttpAuthenticationScheme[]? GetAuthenticationSchemes(HttpRequest Request)
-		{
-			if (Request.Header.Authorization is null)
-				return null;
-
-			this.authenticationSchemes ??= OAuthTokenResource.CreateAuthenticationSchemes(
-				this.JwtFactory, this.userSource);
-
-			return this.authenticationSchemes;
-		}
-
-		/// <summary>
-		/// Associated JWT factory object instance, if any is defined.
-		/// </summary>
-		internal JwtFactory? JwtFactory
-		{
-			get
-			{
-				if (this.jwtFactory is null)
-				{
-					if (Types.TryGetModuleParameter("JWT", out JwtFactory JwtFactory) &&
-						!JwtFactory.Disposed)
-					{
-						this.jwtFactory = JwtFactory;
-						this.authenticationSchemes = null;
-					}
-				}
-
-				return this.jwtFactory;
-			}
-		}
-
-		/// <summary>
 		/// Executes the GET method on the resource.
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
@@ -160,13 +103,15 @@ namespace Waher.Networking.HTTP.OAuth
 		{
 			if (HasDuplicateQueryParameters(Request))
 			{
-				await Response.SendResponse(new BadRequestException("Duplicate query parameters."));
+				await BadRequest(Response, "invalid_request",
+						"Duplicate query parameters.");
 				return;
 			}
 
 			if (!Request.Header.TryGetQueryParameter("response_type", out string ResponseType))
 			{
-				await Response.SendResponse(new BadRequestException("Missing response_type parameter."));
+				await BadRequest(Response, "invalid_request",
+						"Missing response_type parameter.");
 				return;
 			}
 
@@ -204,7 +149,8 @@ namespace Waher.Networking.HTTP.OAuth
 					if (!Form.TryGetValue("redirect_uri", out string RedirectUri) ||
 						string.IsNullOrEmpty(RedirectUri))
 					{
-						await Response.SendResponse(new BadRequestException("Missing or empty redirect_uri parameter."));
+						await BadRequest(Response, "invalid_request",
+							"Missing or empty redirect_uri parameter.");
 						return;
 					}
 
@@ -219,7 +165,8 @@ namespace Waher.Networking.HTTP.OAuth
 
 					if (CodeChallengeMethod != "plain" && CodeChallengeMethod != "S256")
 					{
-						await Response.SendResponse(new BadRequestException("Unsupported code_challenge_method: " + CodeChallengeMethod));
+						await BadRequest(Response, "invalid_request",
+							"Unsupported code_challenge_method: " + CodeChallengeMethod);
 						return;
 					}
 
@@ -234,7 +181,8 @@ namespace Waher.Networking.HTTP.OAuth
 				case "token":       // Implicit
 					if (this.JwtFactory is null)
 					{
-						await Response.SendResponse(new ServiceUnavailableException("No JWT factory configured."));
+						await ServiceUnavailable(Response, "server_error",
+							"JWT Factory not available.");
 						return;
 					}
 
@@ -255,7 +203,11 @@ namespace Waher.Networking.HTTP.OAuth
 						if (Form.TryGetValue("client_id", out ClientId) &&
 							ClientId != User.UserName)
 						{
-							await Response.SendResponse(new ForbiddenException());
+							LoginAuditor.Fail("Credentials mismatch. User name in request: " +
+								ClientId + ", user name in authenticated user: " + User.UserName,
+								User.UserName, Request.RemoteEndPoint, "OAUTH");
+							
+							await Forbidden(Response, "invalid_request", "Invalid credentials.");
 							return;
 						}
 
@@ -263,21 +215,21 @@ namespace Waher.Networking.HTTP.OAuth
 						Response.SetHeader("Pragma", "no-cache");
 
 						string Token = await User.CreateToken(this.JwtFactory, Request.Encrypted);
-						await Response.Return(OAuthTokenResource.TokenResponse(Token, State,
-							3600, string.Empty, this.jwtFactory?.Issuer, false, User, Request));
+						await Response.Return(this.tokenResource.TokenResponse(Token, State,
+							3600, string.Empty, this.JwtFactory?.Issuer, false, User, Request));
 						return;
 					}
 
-					this.authenticationSchemes ??= OAuthTokenResource.CreateAuthenticationSchemes(
-						this.JwtFactory, this.userSource);
-
-					if ((this.authenticationSchemes?.Length ?? 0) == 0)
-						await Response.SendResponse(new ForbiddenException());
+					if (!this.InitAuthentication())
+					{
+						await ServiceUnavailable(Response, "server_error",
+							"Authentication not enabled.");
+					}
 					else
 					{
 						ChunkedList<string>? Challenges = null;
 
-						foreach (HttpAuthenticationScheme AuthenticationScheme in this.authenticationSchemes!)
+						foreach (HttpAuthenticationScheme AuthenticationScheme in this.AuthenticationSchemes!)
 						{
 							if (AuthenticationScheme is MutualTlsAuthentication)
 							{
@@ -295,14 +247,18 @@ namespace Waher.Networking.HTTP.OAuth
 						}
 
 						if (Challenges is null)
-							await Response.SendResponse(new ForbiddenException());
+							await Forbidden(Response, "access_denied", "Access denied");
 						else
-							await Response.SendResponse(new UnauthorizedException(Challenges.ToArray()));
+						{
+							await Unauthorized(Response, "access_denied", "Access denied",
+								Challenges.ToArray());
+						}
 					}
 					return;
 
 				default:
-					await Response.SendResponse(new BadRequestException("Unsupported response_type parameter: " + ResponseType));
+					await BadRequest(Response, "invalid_request", 
+						"Unsupported response_type parameter: " + ResponseType);
 					return;
 			}
 		}
@@ -407,14 +363,15 @@ namespace Waher.Networking.HTTP.OAuth
 		{
 			if (!Request.HasData)
 			{
-				await Response.SendResponse(new BadRequestException("Missing payload."));
+				await BadRequest(Response, "invalid_request", "Missing payload.");
 				return;
 			}
 
 			ContentResponse Content = await Request.DecodeDataAsync();
 			if (Content.HasError || !(Content.Decoded is Dictionary<string, string> Form))
 			{
-				await Response.SendResponse(new BadRequestException("Expected URL-encoded WWW form."));
+				await BadRequest(Response, "invalid_request",
+					"Expected URL-encoded WWW form.");
 				return;
 			}
 
@@ -430,7 +387,7 @@ namespace Waher.Networking.HTTP.OAuth
 				!Form.TryGetValue("state", out string State) ||
 				!Form.TryGetValue("code_challenge", out string CodeChallenge))
 			{
-				await Response.SendResponse(new BadRequestException("Invalid form."));
+				await BadRequest(Response, "invalid_request", "Invalid form.");
 				return;
 			}
 
@@ -442,26 +399,27 @@ namespace Waher.Networking.HTTP.OAuth
 
 			if (CodeChallengeMethod != "plain" && CodeChallengeMethod != "S256")
 			{
-				await Response.SendResponse(new BadRequestException("Unsupported code_challenge_method: " + CodeChallengeMethod));
+				await BadRequest(Response, "invalid_request", 
+					"Unsupported code_challenge_method: " + CodeChallengeMethod);
 				return;
 			}
 
 			if (string.IsNullOrEmpty(RedirectUri))
 			{
-				await Response.SendResponse(new BadRequestException("Missing or empty redirect_uri parameter."));
+				await BadRequest(Response, "invalid_request",
+					"Missing or empty redirect_uri parameter.");
 				return;
 			}
 
-			if (string.IsNullOrEmpty(this.realm))
-				OAuthTokenResource.GetDomainParameters(out this.realm, out _, out _);
+			this.InitAuthentication();
 
 			LoginResult? LoginResult = await OAuthTokenResource.DoLogin(UserName, Password,
-				this.userSource, Request, this.realm ?? string.Empty);
+				this.Users!, Request, this.Realm ?? string.Empty);
 
 			if (LoginResult is null)
 			{
-				await Response.SendResponse(new ForbiddenException(
-					"User cannot authenticate via this interface."));
+				await Forbidden(Response, "access_denied", 
+					"User cannot authenticate via this interface.");
 				return;
 			}
 
@@ -489,8 +447,8 @@ namespace Waher.Networking.HTTP.OAuth
 					if (!string.IsNullOrEmpty(State))
 						RedirectUri += "&state=" + HttpUtility.UrlEncode(State);
 
-					if (this.jwtFactory?.HasIssuer ?? false)
-						RedirectUri += "&iss=" + HttpUtility.UrlEncode(this.jwtFactory.Issuer);
+					if (this.JwtFactory?.HasIssuer ?? false)
+						RedirectUri += "&iss=" + HttpUtility.UrlEncode(this.JwtFactory.Issuer);
 
 					await Response.SendResponse(new SeeOtherException(RedirectUri));
 					break;
@@ -503,8 +461,7 @@ namespace Waher.Networking.HTTP.OAuth
 					return;
 
 				case LoginResultType.NoPassword:
-					await Response.SendResponse(new ForbiddenException(
-						"Password empty."));
+					await Forbidden(Response, "access_denied", "Password empty.");
 					return;
 
 				case LoginResultType.TemporarilyBlocked:

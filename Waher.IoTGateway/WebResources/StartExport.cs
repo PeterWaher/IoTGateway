@@ -181,6 +181,7 @@ namespace Waher.IoTGateway.WebResources
 				Task _ = DoExport(ExportInfo, Database, Ledger, WebContent, Folders.ToArray());
 
 				Response.StatusCode = 200;
+				Response.StatusMessage = "OK";
 				Response.ContentType = PlainTextCodec.DefaultContentType;
 
 				await Response.Write(ExportInfo.LocalBackupFileName);

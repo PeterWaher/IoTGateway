@@ -529,6 +529,7 @@ namespace Waher.IoTGateway.Setup
 			this.useDomainName = true;
 
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 
 			Task _ = Task.Run(async () => await this.Test(TabID, false));
 		}
@@ -536,6 +537,7 @@ namespace Waher.IoTGateway.Setup
 		private Task TestDomainName(HttpRequest Request, HttpResponse Response)
 		{
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 			Response.ContentType = PlainTextCodec.DefaultContentType;
 			return Response.Write(this.token);
 		}
@@ -934,6 +936,7 @@ namespace Waher.IoTGateway.Setup
 			this.acceptToS = AcceptToS;
 
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 
 			if (!this.inProgress)
 			{
@@ -1625,6 +1628,7 @@ namespace Waher.IoTGateway.Setup
 			}
 
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 			Response.ContentType = BinaryCodec.DefaultContentType;
 			
 			await Response.Write(true, System.Text.Encoding.ASCII.GetBytes(this.token));

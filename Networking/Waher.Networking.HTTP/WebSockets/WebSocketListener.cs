@@ -232,6 +232,7 @@ namespace Waher.Networking.HTTP.WebSockets
 				await Accept.Invoke(this, new WebSocketEventArgs(Socket));  // Allow event handler to throw exception
 
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 
 			if (!(WebSocketProtocol is null))
 				Response.SetHeader("Sec-WebSocket-Protocol", WebSocketProtocol);

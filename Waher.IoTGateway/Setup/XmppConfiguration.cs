@@ -615,11 +615,13 @@ namespace Waher.IoTGateway.Setup
 			this.Connect(TabID);
 
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 		}
 
 		private Task RandomizePassword(HttpRequest Request, HttpResponse Response)
 		{
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 			Response.ContentType = PlainTextCodec.DefaultContentType;
 
 			return Response.Write(RandomPassword.CreateRandomPassword());

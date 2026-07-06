@@ -1219,6 +1219,7 @@ namespace Waher.Networking.HTTP
 					!LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
 				{
 					Response.StatusCode = 200;
+					Response.StatusMessage = "OK";
 					await this.GET(Request, Response);    // No ranged request.
 					return;
 				}

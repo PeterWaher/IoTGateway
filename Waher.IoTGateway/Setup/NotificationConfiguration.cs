@@ -148,6 +148,7 @@ namespace Waher.IoTGateway.Setup
 			List<CaseInsensitiveString> WebHooks = new List<CaseInsensitiveString>();
 
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 
 			try
 			{

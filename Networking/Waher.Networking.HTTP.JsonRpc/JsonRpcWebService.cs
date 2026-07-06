@@ -450,6 +450,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				}
 
 				Response.StatusCode = 200;
+				Response.StatusMessage = "OK";
 				Response.ContentType = "text/event-stream";
 				Response.EnableDirectTransfer();
 				await Response.WriteLine(":");
@@ -486,7 +487,9 @@ namespace Waher.Networking.HTTP.JsonRpc
 						}
 						catch (Exception ex)
 						{
-							JsonRpcRequest.SetError(-32700, "Unable to parse parameter: " + P.Key + ": " + ex.Message, 500);
+							JsonRpcRequest.SetError(-32700, "Unable to parse parameter: " + 
+								P.Key + ": " + ex.Message,
+								InternalServerErrorException.Code, InternalServerErrorException.StatusMessage);
 							continue;
 						}
 					}
@@ -512,13 +515,19 @@ namespace Waher.Networking.HTTP.JsonRpc
 			using JsonRpcServerRequest JsonRpcRequest = new JsonRpcServerRequest();
 
 			if (!Request.HasData)
-				JsonRpcRequest.SetError(-32600, "No payload.", 400);
+			{
+				JsonRpcRequest.SetError(-32600, "No payload.",
+					BadRequestException.Code, BadRequestException.StatusMessage);
+			}
 			else
 			{
 				ContentResponse RequestData = await Request.DecodeDataAsync();
 
 				if (RequestData.HasError)
-					JsonRpcRequest.SetError(-32700, "Unable to parse payload.", 500);
+				{
+					JsonRpcRequest.SetError(-32700, "Unable to parse payload.",
+						InternalServerErrorException.Code, InternalServerErrorException.StatusMessage);
+				}
 				else if (RequestData.Decoded is Dictionary<string, object> RequestObj)
 				{
 					foreach (KeyValuePair<string, object> P in RequestObj)
@@ -529,7 +538,10 @@ namespace Waher.Networking.HTTP.JsonRpc
 					int i, c = Requests.Length;
 
 					if (c == 0)
-						JsonRpcRequest.SetError(-32600, "Empty request.", 400);
+					{
+						JsonRpcRequest.SetError(-32600, "Empty request.",
+							BadRequestException.Code, BadRequestException.StatusMessage);
+					}
 					else
 					{
 						JsonRpcRequest.BatchRequests = new JsonRpcServerRequest[c];
@@ -545,12 +557,18 @@ namespace Waher.Networking.HTTP.JsonRpc
 									this.ProcessQueryParameter(ItemRequest, P.Key, P.Value);
 							}
 							else
-								ItemRequest.SetError(-32600, "Expected JSON object or array of JSON objects in request.", 400);
+							{
+								ItemRequest.SetError(-32600, "Expected JSON object or array of JSON objects in request.",
+									BadRequestException.Code, BadRequestException.StatusMessage);
+							}
 						}
 					}
 				}
 				else
-					JsonRpcRequest.SetError(-32600, "Expected JSON object or array of JSON objects in request.", 400);
+				{
+					JsonRpcRequest.SetError(-32600, "Expected JSON object or array of JSON objects in request.",
+						BadRequestException.Code, BadRequestException.StatusMessage);
+				}
 			}
 
 			if (!await JsonRpcRequest.BuildResponse(this, Request, Response))
@@ -561,7 +579,10 @@ namespace Waher.Networking.HTTP.JsonRpc
 			JsonRpcServerRequest JsonRequest, HttpResponse Response)
 		{
 			if (JsonRequest.StatusCode == 204)
+			{
 				Response.StatusCode = JsonRequest.StatusCode;
+				Response.StatusMessage = JsonRequest.StatusMessage;
+			}
 			else
 			{
 				ContentResponse Encoded;
@@ -587,6 +608,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				else
 				{
 					Response.StatusCode = JsonRequest.StatusCode;
+					Response.StatusMessage = JsonRequest.StatusMessage;
 
 					if (JsonRequest.StatusCode != 204)
 					{
@@ -614,11 +636,15 @@ namespace Waher.Networking.HTTP.JsonRpc
 						lock (this.methods)
 						{
 							if (!this.methods.TryGetValue(Method.Replace('/', '_'), out Request.MethodInfo))
-								Request.SetError(-32601, "Method not found: " + Method, 404);
+								Request.SetError(-32601, "Method not found: " + Method,
+									NotFoundException.Code, NotFoundException.StatusMessage);
 						}
 					}
 					else
-						Request.SetError(-32600, "Invalid method name.", 400);
+					{
+						Request.SetError(-32600, "Invalid method name.",
+							BadRequestException.Code, BadRequestException.StatusMessage);
+					}
 					break;
 
 				case "params":
@@ -627,7 +653,10 @@ namespace Waher.Networking.HTTP.JsonRpc
 					else if (Value is Array A)
 						Request.ParametersArray = A;
 					else
-						Request.SetError(-32600, "Invalid parameters.", 400);
+					{
+						Request.SetError(-32600, "Invalid parameters.",
+							BadRequestException.Code, BadRequestException.StatusMessage);
+					}
 					break;
 
 				case "id":
@@ -635,7 +664,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 					break;
 
 				default:
-					Request.SetError(-32600, "Unexpected request received: Unknown property: " + Key, 400);
+					Request.SetError(-32600, "Unexpected request received: Unknown property: " + Key,
+						BadRequestException.Code, BadRequestException.StatusMessage);
 					break;
 			}
 		}

@@ -1044,6 +1044,7 @@ namespace Waher.IoTGateway.Setup
 			await Database.Update(this);
 
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 
 			await this.ApplyId(Password, TabID, ProtectWithPassword, false, null);
 		}
@@ -1330,6 +1331,7 @@ namespace Waher.IoTGateway.Setup
 				await Database.Delete(SignatureRequest);
 
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 			Response.ContentType = JsonCodec.DefaultContentType;
 			await Response.Write(JSON.Encode(Sign, false));
 			await Response.SendResponse();

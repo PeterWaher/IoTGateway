@@ -23,15 +23,18 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public string JsonVersion = string.Empty;
 		public object? Id = null;
 		public int? ErrorCode = null;
-		public int StatusCode = 204;   // No Content
+		public int StatusCode = 204;
+		public string StatusMessage = "No Content";
 		public string? ErrorMessage = null;
 		public object? Result = null;
 
-		public void SetError(int ErrorCode, string ErrorMessage, int StatusCode)
+		public void SetError(int ErrorCode, string ErrorMessage, int StatusCode, 
+			string StatusMessage)
 		{
 			this.ErrorCode = ErrorCode;
 			this.ErrorMessage = ErrorMessage;
 			this.StatusCode = StatusCode;
+			this.StatusMessage = StatusMessage;
 		}
 
 		public void Dispose()
@@ -75,7 +78,10 @@ namespace Waher.Networking.HTTP.JsonRpc
 					this.ResponseObject["id"] = this.Id;
 
 				if (this.MethodInfo is null && !this.ErrorCode.HasValue)
-					this.SetError(-32600, "Missing method.", 400);
+				{
+					this.SetError(-32600, "Missing method.",
+						BadRequestException.Code, BadRequestException.StatusMessage);
+				}
 
 				if (!this.ErrorCode.HasValue)
 				{
@@ -90,13 +96,17 @@ namespace Waher.Networking.HTTP.JsonRpc
 							if (!this.MethodInfo.TryBuildRequest(this.ParametersObj, null,
 								out string? Reason, out Parameters))
 							{
-								this.SetError(-32602, Reason, 400);
+								this.SetError(-32602, Reason,
+									BadRequestException.Code, BadRequestException.StatusMessage);
 							}
 						}
 						else if (!(this.ParametersArray is null))
 						{
 							if (this.ParametersArray.Length != c - this.MethodInfo.NrSpecialArguments)
-								this.SetError(-32602, "Invalid number of parameters.", 400);
+							{
+								this.SetError(-32602, "Invalid number of parameters.",
+									BadRequestException.Code, BadRequestException.StatusMessage);
+							}
 							else
 							{
 								Parameters = new object?[c];
@@ -122,7 +132,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 									{
 										this.SetError(-32602, "Parameter " + (i + 1).ToString() +
 											" has incorrect type: " + ParameterType.FullName +
-											", Expected: " + ExpectedType.FullName, 400);
+											", Expected: " + ExpectedType.FullName,
+											BadRequestException.Code, BadRequestException.StatusMessage);
 										break;
 									}
 								}
@@ -146,7 +157,10 @@ namespace Waher.Networking.HTTP.JsonRpc
 							}
 
 							if (NrParametersSet != c - this.MethodInfo.NrSpecialArguments)
-								this.SetError(-32600, "Missing required parameters.", 400);
+							{
+								this.SetError(-32600, "Missing required parameters.",
+									BadRequestException.Code, BadRequestException.StatusMessage);
+							}
 						}
 
 						if (!this.ErrorCode.HasValue)
@@ -263,7 +277,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 						if (HasSniffer)
 							HttpRequest.Server.Exception(ex);
 
-						this.SetError(-32603, ex.Message, 500);
+						this.SetError(-32603, ex.Message,
+							InternalServerErrorException.Code, InternalServerErrorException.StatusMessage);
 					}
 				}
 
@@ -281,7 +296,10 @@ namespace Waher.Networking.HTTP.JsonRpc
 				this.Response = this.ResponseObject;
 
 				if (!(this.Id is null) && this.StatusCode == 204)
+				{
 					this.StatusCode = 200;
+					this.StatusMessage = "OK";
+				}
 			}
 			else
 			{
@@ -310,7 +328,10 @@ namespace Waher.Networking.HTTP.JsonRpc
 				this.Response = this.ResponseArray;
 
 				if (this.StatusCode == 204)
+				{
 					this.StatusCode = 200;
+					this.StatusMessage = "OK";
+				}
 			}
 
 			return false;

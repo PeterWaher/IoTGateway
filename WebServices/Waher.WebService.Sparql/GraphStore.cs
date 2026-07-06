@@ -113,6 +113,7 @@ namespace Waher.WebService.Sparql
 				(GraphReference Reference, Uri GraphUri) = await GetGraphReference(Request, false);
 
 				Response.StatusCode = 200;
+				Response.StatusMessage = "OK";
 
 				if (Request.Header.Method == "HEAD")
 					return;
@@ -432,6 +433,7 @@ namespace Waher.WebService.Sparql
 				await Database.Update(Reference);
 
 				Response.StatusCode = 200;  // OK
+				Response.StatusMessage = "OK";
 			}
 
 			await Reference.ModelsAdded(Models);
@@ -494,7 +496,10 @@ namespace Waher.WebService.Sparql
 			await Database.Delete(Reference);
 
 			if (FilesDeleted)
+			{
 				Response.StatusCode = 200;
+				Response.StatusMessage = "OK";
+			}
 			else
 			{
 				Response.StatusCode = 204;

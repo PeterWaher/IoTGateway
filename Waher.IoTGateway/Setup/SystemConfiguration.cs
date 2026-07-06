@@ -170,6 +170,7 @@ namespace Waher.IoTGateway.Setup
 			await this.MakeCompleted();
 
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 		}
 
 		/// <summary>

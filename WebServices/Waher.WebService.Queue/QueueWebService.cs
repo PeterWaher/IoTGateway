@@ -199,11 +199,13 @@ namespace Waher.WebService.Queue
 						}
 
 						Response.StatusCode = 204;
+						Response.StatusMessage = "No Content";
 						await Response.SendResponse();
 					}
 					else if (await Queue.Enqueue(Decoded, Timeout))
 					{
 						Response.StatusCode = 204;
+						Response.StatusMessage = "No Content";
 						await Response.SendResponse();
 					}
 					else
@@ -352,6 +354,7 @@ namespace Waher.WebService.Queue
 				if (Item is null)
 				{
 					Response.StatusCode = 204;
+					Response.StatusMessage = "No Content";
 					await Response.SendResponse();
 				}
 				else
@@ -404,6 +407,7 @@ namespace Waher.WebService.Queue
 						if (Item is null)
 						{
 							Response.StatusCode = 204;
+							Response.StatusMessage = "No Content";
 							await Response.SendResponse();
 						}
 						else
@@ -465,6 +469,7 @@ namespace Waher.WebService.Queue
 				await Queue.Clear();
 
 				Response.StatusCode = 204;
+				Response.StatusMessage = "No Content";
 				await Response.SendResponse();
 			}
 			catch (Exception ex)

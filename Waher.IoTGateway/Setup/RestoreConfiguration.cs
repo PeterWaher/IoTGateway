@@ -208,6 +208,7 @@ namespace Waher.IoTGateway.Setup
 			ShowStatus(TabID, Name + "Bytes", Export.FormatBytes(File.Length) + " received of " + Name + " file.");
 
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 
 			return ExpectedBlockNr;
 		}
@@ -280,6 +281,7 @@ namespace Waher.IoTGateway.Setup
 				Overwrite, OnlySelectedCollections, SelectedCollections, SelectedParts));
 
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 		}
 
 		private static TemporaryFile GetAndRemoveFile(string SessionID, Dictionary<string, TemporaryFile> Files)

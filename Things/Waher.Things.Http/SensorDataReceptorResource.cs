@@ -264,7 +264,9 @@ namespace Waher.Things.Http
 				}
 			}
 
-			Response.StatusCode = 204; // No content.
+			Response.StatusCode = 204;
+			Response.StatusMessage = "No content";
+
 			await Response.SendResponse();
 		}
 

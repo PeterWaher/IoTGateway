@@ -296,6 +296,7 @@ namespace Waher.IoTGateway.Setup
 			}, false), true, "User");
 
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 		}
 
 		/// <summary>

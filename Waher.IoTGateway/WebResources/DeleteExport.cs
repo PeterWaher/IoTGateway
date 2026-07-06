@@ -85,6 +85,7 @@ namespace Waher.IoTGateway.WebResources
 			Log.Informational("Export deleted.", FileName);
 
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 			Response.ContentType = PlainTextCodec.DefaultContentType;
 			await Response.Write("1");
 

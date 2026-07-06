@@ -112,6 +112,7 @@ namespace Waher.IoTGateway.WebResources
 				Task _ = Task.Run(() => DoAnalyze(FullFileName, FileName, Created, XmlOutput, fs, Repair));
 
 				Response.StatusCode = 200;
+				Response.StatusMessage = "OK";
 				Response.ContentType = PlainTextCodec.DefaultContentType;
 				await Response.Write(FileName);
 				await Response.SendResponse();

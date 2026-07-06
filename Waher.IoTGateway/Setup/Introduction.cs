@@ -92,6 +92,7 @@ namespace Waher.IoTGateway.Setup
 			await Gateway.SimplifiedConfiguration();
 
 			Response.StatusCode = 200;
+			Response.StatusMessage = "OK";
 			await this.MakeCompleted();
 
 			await Response.SendResponse();

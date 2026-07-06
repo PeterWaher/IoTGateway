@@ -9,6 +9,7 @@ namespace Waher.Networking.HTTP.OAuth
 {
 	/// <summary>
 	/// Provides OAUTH resource meta-data, as defined in RFC 9728.
+	/// https://datatracker.ietf.org/doc/html/rfc9728
 	/// </summary>
 	public class ProtectedResourceMetaData : OAuthResource, IHttpGetMethod
 	{

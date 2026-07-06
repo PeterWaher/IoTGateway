@@ -16,7 +16,8 @@ using Waher.Security.Users;
 namespace Waher.Networking.HTTP.OAuth
 {
 	/// <summary>
-	/// OAUTH token resource.
+	/// OAUTH token resource, as defined in RFC 6749.
+	/// https://datatracker.ietf.org/doc/html/rfc6749
 	/// </summary>
 	public class OAuthTokenResource : OAuthResource, IHttpGetMethod, IHttpPostMethod
 	{
@@ -30,7 +31,7 @@ namespace Waher.Networking.HTTP.OAuth
 		private static readonly Cache<string, TokenFamily> usedRefreshTokens = new Cache<string, TokenFamily>(int.MaxValue, TimeSpan.FromHours(1), TimeSpan.FromHours(1));
 
 		/// <summary>
-		/// OAUTH token resource.
+		/// OAUTH token resource, as defined in RFC 6749.
 		/// </summary>
 		public OAuthTokenResource()
 			: this(null, null, DefaultResourcePath)
@@ -38,7 +39,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH token resource.
+		/// OAUTH token resource, as defined in RFC 6749.
 		/// </summary>
 		/// <param name="JwtFactory">JWT Factory</param>
 		public OAuthTokenResource(JwtFactory? JwtFactory)
@@ -47,7 +48,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH token resource.
+		/// OAUTH token resource, as defined in RFC 6749.
 		/// </summary>
 		/// <param name="ResourceName">Resource name.</param>
 		public OAuthTokenResource(string ResourceName)
@@ -56,7 +57,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH token resource.
+		/// OAUTH token resource, as defined in RFC 6749.
 		/// </summary>
 		/// <param name="JwtFactory">JWT Factory</param>
 		/// <param name="ResourceName">Resource name.</param>
@@ -66,7 +67,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH token resource.
+		/// OAUTH token resource, as defined in RFC 6749.
 		/// </summary>
 		/// <param name="UserSource">Users data source.</param>
 		public OAuthTokenResource(IUserSource? UserSource)
@@ -75,7 +76,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH token resource.
+		/// OAUTH token resource, as defined in RFC 6749.
 		/// </summary>
 		/// <param name="UserSource">Users data source.</param>
 		/// <param name="JwtFactory">JWT Factory</param>
@@ -85,7 +86,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH token resource.
+		/// OAUTH token resource, as defined in RFC 6749.
 		/// </summary>
 		/// <param name="UserSource">Users data source.</param>
 		/// <param name="ResourceName">Resource name.</param>
@@ -95,7 +96,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH token resource.
+		/// OAUTH token resource, as defined in RFC 6749.
 		/// </summary>
 		/// <param name="UserSource">Users data source.</param>
 		/// <param name="JwtFactory">JWT Factory</param>

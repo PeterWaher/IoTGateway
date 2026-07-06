@@ -19,7 +19,8 @@ using Waher.Security.Users;
 namespace Waher.Networking.HTTP.OAuth
 {
 	/// <summary>
-	/// OAUTH authorize resource.
+	/// OAUTH authorize resource, as defined in RFC 6749.
+	/// https://datatracker.ietf.org/doc/html/rfc6749
 	/// </summary>
 	public class OAuthAuthorizeResource : OAuthResource, IHttpGetMethod, IHttpPostMethod
 	{
@@ -33,7 +34,7 @@ namespace Waher.Networking.HTTP.OAuth
 		private readonly OAuthDeviceAuthorizationResource? deviceAuthorizationResource;
 
 		/// <summary>
-		/// OAUTH authorize resource.
+		/// OAUTH authorize resource, as defined in RFC 6749.
 		/// </summary>
 		/// <param name="TokenResource">OAuth token resource.</param>
 		/// <param name="RegistrationResource">Optional OAuth registration resource.</param>
@@ -49,7 +50,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH authorize resource.
+		/// OAUTH authorize resource, as defined in RFC 6749.
 		/// </summary>
 		/// <param name="TokenResource">OAuth token resource.</param>
 		/// <param name="RegistrationResource">Optional OAuth registration resource.</param>

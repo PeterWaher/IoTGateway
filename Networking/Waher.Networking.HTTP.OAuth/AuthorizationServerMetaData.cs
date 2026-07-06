@@ -9,6 +9,7 @@ namespace Waher.Networking.HTTP.OAuth
 {
 	/// <summary>
 	/// Provides OAUTH authorization server meta-data, as defined in RFC 8414.
+	/// https://datatracker.ietf.org/doc/html/rfc8414
 	/// </summary>
 	public class AuthorizationServerMetaData : OAuthResource, IHttpGetMethod
 	{

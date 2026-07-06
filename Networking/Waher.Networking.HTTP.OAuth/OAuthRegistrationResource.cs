@@ -10,7 +10,9 @@ using Waher.Security.JWT;
 namespace Waher.Networking.HTTP.OAuth
 {
 	/// <summary>
-	/// OAUTH registration resource.
+	/// OAUTH dynamic registration resource, as defined in RFCs 7591 and 7592.
+	/// https://datatracker.ietf.org/doc/html/rfc7591
+	/// https://datatracker.ietf.org/doc/html/rfc7592
 	/// </summary>
 	public class OAuthRegistrationResource : OAuthResource, IHttpPostMethod
 	{
@@ -20,7 +22,7 @@ namespace Waher.Networking.HTTP.OAuth
 		public const string DefaultResourcePath = "/oauth/register";
 
 		/// <summary>
-		/// OAUTH registration resource.
+		/// OAUTH dynamic registration resource, as defined in RFCs 7591 and 7592.
 		/// </summary>
 		/// <param name="UserSource">Users data source.</param>
 		public OAuthRegistrationResource(IDynamicUserSource UserSource)
@@ -29,7 +31,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH registration resource.
+		/// OAUTH dynamic registration resource, as defined in RFCs 7591 and 7592.
 		/// </summary>
 		/// <param name="UserSource">Users data source.</param>
 		/// <param name="JwtFactory">JWT Factory</param>
@@ -39,7 +41,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH registration resource.
+		/// OAUTH dynamic registration resource, as defined in RFCs 7591 and 7592.
 		/// </summary>
 		/// <param name="UserSource">Users data source.</param>
 		/// <param name="ResourceName">Resource name.</param>
@@ -49,7 +51,7 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
-		/// OAUTH registration resource.
+		/// OAUTH dynamic registration resource, as defined in RFCs 7591 and 7592.
 		/// </summary>
 		/// <param name="UserSource">Users data source.</param>
 		/// <param name="JwtFactory">JWT Factory</param>

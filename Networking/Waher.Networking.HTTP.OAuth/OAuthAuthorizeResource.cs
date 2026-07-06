@@ -313,7 +313,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 			Markdown.AppendLine("<p>");
 			Markdown.AppendLine("<label for='client_id'>User Name:</label>  ");
-			Markdown.Append("<input name='client_id' type='text' autocomplete='username");
+			Markdown.Append("<input name='client_id' type='text' autofocus autocomplete='username");
 
 			if (!string.IsNullOrEmpty(UserName))
 			{

@@ -43,7 +43,7 @@ namespace Waher.Networking.HTTP.Test
 	}
 
 	[TestClass]
-	public class OAuthTests : IDynamicUserSource
+	public class OAuthTests : IDynamicUserSource, IThingRegistryUserSource
 	{
 		private const string BaseUrl = "http://localhost:8081";
 		private const string CallbackResource = "/Callback";
@@ -51,6 +51,8 @@ namespace Waher.Networking.HTTP.Test
 		private const string Realm = "Test";
 		private const string TestUserName = "User";
 		private const string TestPassword = "Password";
+		private const string DeviceUserName = "Device";
+		private const string DevicePassword = "Password2";
 
 		private Dictionary<string, User> users;
 		private HttpServer server;
@@ -91,7 +93,7 @@ namespace Waher.Networking.HTTP.Test
 			this.server.Register(new ProtectedResourceMetaData());
 			this.server.Register(TokenResource = new OAuthTokenResource(this, this.jwtFactory));
 			this.server.Register(RegistrationResource = new OAuthRegistrationResource(this, this.jwtFactory));
-			this.server.Register(DeviceAuthorizationResource = new OAuthDeviceAuthorizationResource(this.jwtFactory));
+			this.server.Register(DeviceAuthorizationResource = new OAuthDeviceAuthorizationResource(this, this.jwtFactory));
 			this.server.Register(AuthorizeResource = new OAuthAuthorizeResource(TokenResource,
 				RegistrationResource, DeviceAuthorizationResource, this.jwtFactory));
 			this.server.Register(new AuthorizationServerMetaData(AuthorizeResource));
@@ -101,7 +103,8 @@ namespace Waher.Networking.HTTP.Test
 
 			this.users = new Dictionary<string, User>()
 			{
-				{ TestUserName, new User(TestUserName, TestPassword) }
+				{ TestUserName, new User(TestUserName, TestPassword) },
+				{ DeviceUserName, new User(DeviceUserName, DevicePassword, TestUserName) }
 			};
 
 			AuthorizeResource.ImplicitAuthenticationRequest += async (_, e) =>
@@ -276,6 +279,15 @@ namespace Waher.Networking.HTTP.Test
 
 			return Task.FromResult<IRegistration>(
 				new Registration(UserName, Password, RegistrationRequest));
+		}
+		
+		public Task<IUser> TryGetOwner(IUser Device)
+		{
+			string OwnerId = (Device as User)?.Owner;
+			if (string.IsNullOrEmpty(OwnerId))
+				return Task.FromResult<IUser>(null);
+
+			return TryGetUser(OwnerId);
 		}
 
 		private class Registration(string UserName, string Password,
@@ -1499,7 +1511,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_54_DeviceAuthorizationResponseContainsRequiredValues()
 		{
-			DeviceAuthorizationResult Device = await StartDeviceAuthorization(TestUserName);
+			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
 			Assert.IsFalse(string.IsNullOrEmpty(Device.DeviceCode));
 			Assert.IsFalse(string.IsNullOrEmpty(Device.UserCode));
@@ -1563,7 +1575,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_55_DeviceTokenPollingBeforeAuthorizationReturnsAuthorizationPending()
 		{
-			DeviceAuthorizationResult Device = await StartDeviceAuthorization(TestUserName);
+			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
 			Dictionary<string, object> Error = await DoPost(
 				BaseUrl + OAuthTokenResource.DefaultResourcePath,
@@ -1617,7 +1629,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_58_DeviceTokenGrantRequiresClientIdForPublicClient()
 		{
-			DeviceAuthorizationResult Device = await StartDeviceAuthorization(TestUserName);
+			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -1643,7 +1655,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_60_DeviceFlowCompletesAfterUserVerification()
 		{
-			DeviceAuthorizationResult Device = await StartDeviceAuthorization(TestUserName);
+			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 			await CompleteDeviceVerification(Device, TestUserName, TestPassword);
 
 			ContentResponse TokenResponse = await InternetContent.PostAsync(
@@ -1715,7 +1727,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_61_DeviceTokenPollingTooFastReturnsSlowDown()
 		{
-			DeviceAuthorizationResult Device = await StartDeviceAuthorization(TestUserName);
+			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
 			await DoPost(
 				BaseUrl + OAuthTokenResource.DefaultResourcePath,
@@ -1733,7 +1745,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_62_DeviceUserCodeIsSingleUse()
 		{
-			DeviceAuthorizationResult Device = await StartDeviceAuthorization(TestUserName);
+			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 			await CompleteDeviceVerification(Device, TestUserName, TestPassword);
 
 			ContentResponse SecondVerificationResponse = await VerifyDeviceUserCode(
@@ -1796,7 +1808,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_65_DeviceVerificationRequiresUserCode()
 		{
-			DeviceAuthorizationResult Device = await StartDeviceAuthorization(TestUserName);
+			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(Device.VerificationUri),
@@ -1812,7 +1824,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_66_DeviceVerificationRejectsInvalidUserCode()
 		{
-			DeviceAuthorizationResult Device = await StartDeviceAuthorization(TestUserName);
+			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(Device.VerificationUri),
@@ -1829,7 +1841,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_67_DeviceVerificationRejectsInvalidLogin()
 		{
-			DeviceAuthorizationResult Device = await StartDeviceAuthorization(TestUserName);
+			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
 			ContentResponse Response = await VerifyDeviceUserCode(
 				Device, TestUserName, "Invalid Password");

@@ -6,11 +6,17 @@ using Waher.Security.JWT;
 
 namespace Waher.Networking.HTTP.Test
 {
-	public class User(string UserName, string Password) : IUserWithClaims
+	public class User(string UserName, string Password, string Owner) : IUserWithClaims
 	{
+		public User(string UserName, string Password)
+			: this(UserName, Password, string.Empty)
+		{
+		}
+
 		public string UserName { get; } = UserName;
 		public string PasswordHash { get; } = Password;
 		public string PasswordHashType { get; } = string.Empty;
+		public string Owner { get; } = Owner;
 
 		public Task<IEnumerable<KeyValuePair<string, object>>> CreateClaims(bool Encrypted)
 		{

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.HTTP.OAuth.Interfaces;
 using Waher.Runtime.Collections;
-using Waher.Security.JWT;
 
 namespace Waher.Networking.HTTP.OAuth
 {
@@ -24,42 +23,22 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <summary>
 		/// OAUTH dynamic registration resource, as defined in RFCs 7591 and 7592.
 		/// </summary>
-		/// <param name="UserSource">Users data source.</param>
-		public OAuthRegistrationResource(IDynamicUserSource UserSource)
-			: this(UserSource, null, DefaultResourcePath)
+		/// <param name="Environment">OAuth2 environment.</param>
+		public OAuthRegistrationResource(OAuth2Environment Environment)
+			: this(Environment, DefaultResourcePath)
 		{
 		}
 
 		/// <summary>
 		/// OAUTH dynamic registration resource, as defined in RFCs 7591 and 7592.
 		/// </summary>
-		/// <param name="UserSource">Users data source.</param>
-		/// <param name="JwtFactory">JWT Factory</param>
-		public OAuthRegistrationResource(IDynamicUserSource UserSource, JwtFactory? JwtFactory)
-			: this(UserSource, JwtFactory, DefaultResourcePath)
-		{
-		}
-
-		/// <summary>
-		/// OAUTH dynamic registration resource, as defined in RFCs 7591 and 7592.
-		/// </summary>
-		/// <param name="UserSource">Users data source.</param>
+		/// <param name="Environment">OAuth2 environment.</param>
 		/// <param name="ResourceName">Resource name.</param>
-		public OAuthRegistrationResource(IDynamicUserSource UserSource, string ResourceName)
-			: this(UserSource, null, ResourceName)
-		{
-		}
-
-		/// <summary>
-		/// OAUTH dynamic registration resource, as defined in RFCs 7591 and 7592.
-		/// </summary>
-		/// <param name="UserSource">Users data source.</param>
-		/// <param name="JwtFactory">JWT Factory</param>
-		/// <param name="ResourceName">Resource name.</param>
-		public OAuthRegistrationResource(IDynamicUserSource UserSource, JwtFactory? JwtFactory,
+		public OAuthRegistrationResource(OAuth2Environment Environment,
 			string ResourceName)
-			: base(UserSource, JwtFactory, ResourceName)
+			: base(Environment, ResourceName)
 		{
+			Environment.Register(this);
 		}
 
 		/// <summary>

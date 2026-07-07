@@ -33,78 +33,21 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <summary>
 		/// OAUTH token resource, as defined in RFC 6749.
 		/// </summary>
-		public OAuthTokenResource()
-			: this(null, null, DefaultResourcePath)
+		/// <param name="Environment">OAuth2 environment.</param>
+		public OAuthTokenResource(OAuth2Environment Environment)
+			: this(Environment, DefaultResourcePath)
 		{
 		}
 
 		/// <summary>
 		/// OAUTH token resource, as defined in RFC 6749.
 		/// </summary>
-		/// <param name="JwtFactory">JWT Factory</param>
-		public OAuthTokenResource(JwtFactory? JwtFactory)
-			: this(null, JwtFactory, DefaultResourcePath)
-		{
-		}
-
-		/// <summary>
-		/// OAUTH token resource, as defined in RFC 6749.
-		/// </summary>
+		/// <param name="Environment">OAuth2 environment.</param>
 		/// <param name="ResourceName">Resource name.</param>
-		public OAuthTokenResource(string ResourceName)
-			: this(null, null, ResourceName)
+		public OAuthTokenResource(OAuth2Environment Environment, string ResourceName)
+			: base(Environment, ResourceName)
 		{
-		}
-
-		/// <summary>
-		/// OAUTH token resource, as defined in RFC 6749.
-		/// </summary>
-		/// <param name="JwtFactory">JWT Factory</param>
-		/// <param name="ResourceName">Resource name.</param>
-		public OAuthTokenResource(JwtFactory? JwtFactory, string ResourceName)
-			: this(null, JwtFactory, ResourceName)
-		{
-		}
-
-		/// <summary>
-		/// OAUTH token resource, as defined in RFC 6749.
-		/// </summary>
-		/// <param name="UserSource">Users data source.</param>
-		public OAuthTokenResource(IUserSource? UserSource)
-			: this(UserSource, null, DefaultResourcePath)
-		{
-		}
-
-		/// <summary>
-		/// OAUTH token resource, as defined in RFC 6749.
-		/// </summary>
-		/// <param name="UserSource">Users data source.</param>
-		/// <param name="JwtFactory">JWT Factory</param>
-		public OAuthTokenResource(IUserSource? UserSource, JwtFactory? JwtFactory)
-			: this(UserSource, JwtFactory, DefaultResourcePath)
-		{
-		}
-
-		/// <summary>
-		/// OAUTH token resource, as defined in RFC 6749.
-		/// </summary>
-		/// <param name="UserSource">Users data source.</param>
-		/// <param name="ResourceName">Resource name.</param>
-		public OAuthTokenResource(IUserSource? UserSource, string ResourceName)
-			: this(UserSource, null, ResourceName)
-		{
-		}
-
-		/// <summary>
-		/// OAUTH token resource, as defined in RFC 6749.
-		/// </summary>
-		/// <param name="UserSource">Users data source.</param>
-		/// <param name="JwtFactory">JWT Factory</param>
-		/// <param name="ResourceName">Resource name.</param>
-		public OAuthTokenResource(IUserSource? UserSource, JwtFactory? JwtFactory,
-			string ResourceName)
-			: base(UserSource, JwtFactory, ResourceName)
-		{
+			Environment.Register(this);
 		}
 
 		/// <summary>
@@ -124,7 +67,7 @@ namespace Waher.Networking.HTTP.OAuth
 				throw new ServiceUnavailableException("No JWT factory configured.");
 
 			string Token = await User.CreateToken(this.JwtFactory, Encrypted);
-			string Code = this.GenerateRandomCode(64);
+			string Code = this.GenerateRandomCode();
 
 			codes[Code] = new TokenRef(Token, User, CodeChallenge, CodeChallengeMethod,
 				RedirectUri, 3600);
@@ -135,15 +78,14 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <summary>
 		/// Generates a random unique code.
 		/// </summary>
-		/// <param name="NrBytes">Number of bytes of random.</param>
 		/// <returns>Random unique code.</returns>
-		protected override string GenerateRandomCode(int NrBytes)
+		private string GenerateRandomCode()
 		{
 			string Code;
 
 			do
 			{
-				Code = base.GenerateRandomCode(NrBytes);
+				Code = this.Environment.GenerateRandomCode(64);
 			}
 			while (
 				codes.ContainsKey(Code) ||
@@ -634,7 +576,7 @@ namespace Waher.Networking.HTTP.OAuth
 				else
 					TokenFamily.Add(Token);
 
-				string RefreshToken = this.GenerateRandomCode(64);
+				string RefreshToken = this.GenerateRandomCode();
 				refreshTokens[RefreshToken] = TokenFamily;
 
 				Result["refresh_token"] = RefreshToken;

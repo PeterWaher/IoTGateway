@@ -10,7 +10,6 @@ using Waher.Content.Xml;
 using Waher.Networking.HTTP.OAuth.Interfaces;
 using Waher.Runtime.Cache;
 using Waher.Security;
-using Waher.Security.JWT;
 using Waher.Security.SHA3;
 
 namespace Waher.Networking.HTTP.OAuth
@@ -37,78 +36,22 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <summary>
 		/// OAUTH device authorization resource, as defined in RFC 8628.
 		/// </summary>
-		public OAuthDeviceAuthorizationResource()
-			: this(null, null, DefaultResourcePath)
+		/// <param name="Environment">OAuth2 environment.</param>
+		public OAuthDeviceAuthorizationResource(OAuth2Environment Environment)
+			: this(Environment, DefaultResourcePath)
 		{
 		}
 
 		/// <summary>
 		/// OAUTH device authorization resource, as defined in RFC 8628.
 		/// </summary>
-		/// <param name="JwtFactory">JWT Factory</param>
-		public OAuthDeviceAuthorizationResource(JwtFactory? JwtFactory)
-			: this(null, JwtFactory, DefaultResourcePath)
-		{
-		}
-
-		/// <summary>
-		/// OAUTH device authorization resource, as defined in RFC 8628.
-		/// </summary>
+		/// <param name="Environment">OAuth2 environment.</param>
 		/// <param name="ResourceName">Resource name.</param>
-		public OAuthDeviceAuthorizationResource(string ResourceName)
-			: this(null, null, ResourceName)
-		{
-		}
-
-		/// <summary>
-		/// OAUTH device authorization resource, as defined in RFC 8628.
-		/// </summary>
-		/// <param name="JwtFactory">JWT Factory</param>
-		/// <param name="ResourceName">Resource name.</param>
-		public OAuthDeviceAuthorizationResource(JwtFactory? JwtFactory, string ResourceName)
-			: this(null, JwtFactory, ResourceName)
-		{
-		}
-
-		/// <summary>
-		/// OAUTH device authorization resource, as defined in RFC 8628.
-		/// </summary>
-		/// <param name="UserSource">Users data source.</param>
-		public OAuthDeviceAuthorizationResource(IUserSource? UserSource)
-			: this(UserSource, null, DefaultResourcePath)
-		{
-		}
-
-		/// <summary>
-		/// OAUTH device authorization resource, as defined in RFC 8628.
-		/// </summary>
-		/// <param name="UserSource">Users data source.</param>
-		/// <param name="JwtFactory">JWT Factory</param>
-		public OAuthDeviceAuthorizationResource(IUserSource? UserSource, JwtFactory? JwtFactory)
-			: this(UserSource, JwtFactory, DefaultResourcePath)
-		{
-		}
-
-		/// <summary>
-		/// OAUTH device authorization resource, as defined in RFC 8628.
-		/// </summary>
-		/// <param name="UserSource">Users data source.</param>
-		/// <param name="ResourceName">Resource name.</param>
-		public OAuthDeviceAuthorizationResource(IUserSource? UserSource, string ResourceName)
-			: this(UserSource, null, ResourceName)
-		{
-		}
-
-		/// <summary>
-		/// OAUTH device authorization resource, as defined in RFC 8628.
-		/// </summary>
-		/// <param name="UserSource">Users data source.</param>
-		/// <param name="JwtFactory">JWT Factory</param>
-		/// <param name="ResourceName">Resource name.</param>
-		public OAuthDeviceAuthorizationResource(IUserSource? UserSource, JwtFactory? JwtFactory,
+		public OAuthDeviceAuthorizationResource(OAuth2Environment Environment,
 			string ResourceName)
-			: base(UserSource, JwtFactory, ResourceName)
+			: base(Environment, ResourceName)
 		{
+			Environment.Register(this);
 		}
 
 		/// <summary>
@@ -132,8 +75,11 @@ namespace Waher.Networking.HTTP.OAuth
 			if (!Request.Header.TryGetQueryParameter("user_code", out string UserCode))
 				UserCode = string.Empty;
 
+			if (!Request.Header.TryGetQueryParameter("client_id", out string ClientId))
+				ClientId = string.Empty;
+
 			await Response.Return(await this.GenerateAuthorizationForm(Request, Response,
-				UserCode, string.Empty, false, false, string.Empty));
+				ClientId, UserCode, string.Empty, false, false, string.Empty));
 		}
 
 		/// <summary>
@@ -207,7 +153,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 				do
 				{
-					DeviceCode = this.GenerateRandomCode(32);
+					DeviceCode = this.Environment.GenerateRandomCode(32);
 					UserCode = ComputeUserCode(DeviceCode, ClientId, Owner);
 				}
 				while (codes.ContainsKey(UserCode));
@@ -225,6 +171,9 @@ namespace Waher.Networking.HTTP.OAuth
 				sb.Append("?user_code=");
 				sb.Append(UserCode);
 
+				sb.Append("&client_id=");
+				sb.Append(ClientId);
+
 				string VerificationUrlComplete = sb.ToString();
 
 				await Response.Return(new Dictionary<string, object>()
@@ -239,6 +188,9 @@ namespace Waher.Networking.HTTP.OAuth
 			}
 			else if (Form.TryGetValue("user_code", out string UserCode))
 			{
+				if (!Form.TryGetValue("client_id", out ClientId))
+					ClientId = string.Empty;
+
 				if (!Form.TryGetValue("UserName", out string UserName))
 					UserName = string.Empty;
 
@@ -289,7 +241,7 @@ namespace Waher.Networking.HTTP.OAuth
 				}
 
 				await Response.Return(await this.GenerateAuthorizationForm(Request, Response,
-					UserCode, UserName, Accept, Decline, s));
+					ClientId, UserCode, UserName, Accept, Decline, s));
 			}
 			else
 				await BadRequest(Response, "invalid_request", "Missing client_id or user_code.");
@@ -329,8 +281,8 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		private async Task<HtmlDocument> GenerateAuthorizationForm(HttpRequest Request,
-			HttpResponse Response, string UserCode, string UserName, bool Accept,
-			bool Decline, string ErrorMessage)
+			HttpResponse Response, string ClientId, string UserCode, string UserName, 
+			bool Accept, bool Decline, string ErrorMessage)
 		{
 			StringBuilder Markdown = new StringBuilder();
 
@@ -352,11 +304,27 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine("Device Authorization");
 			Markdown.AppendLine("=======================");
 			Markdown.AppendLine();
+			Markdown.Append("A Device");
+
+			if (!string.IsNullOrEmpty(ClientId))
+			{
+				Markdown.Append(" with ID `");
+				Markdown.Append(ClientId);
+				Markdown.Append("`");
+			}
+			
+			Markdown.Append(" is requesting authorization to connect. As its registered ");
+			Markdown.Append("owner, you can either accept or decline this request, by ");
+			Markdown.Append("providing your credentials below, selecting the appropriate ");
+			Markdown.Append("option, and submit the form.");
 
 			Markdown.Append("<form id='AuthorizationForm' action='");
 			Markdown.Append(this.ResourceName);
 			Markdown.Append("' method='post'>");
 			Markdown.AppendLine();
+			Markdown.Append("<input type='hidden' name='client_id' value='");
+			Markdown.Append(XML.HtmlAttributeEncode(ClientId));
+			Markdown.AppendLine("'/>");
 
 			Markdown.AppendLine("<p>");
 			Markdown.AppendLine("<label for='user_code'>User Code:</label>  ");

@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Runtime.Inventory;
 using Waher.Security;
@@ -15,26 +12,18 @@ namespace Waher.Networking.HTTP.OAuth
 	/// </summary>
 	public abstract class OAuthResource : HttpSynchronousResource
 	{
-		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
-		private readonly IUserSource? userSource;
 		private HttpAuthenticationScheme[]? authenticationSchemes = null;
-		private JwtFactory? jwtFactory;
-		private string? realm;
-		private int minStrength;
-		private bool encrypted;
+		private OAuth2Environment environment;
 
 		/// <summary>
 		/// OAUTH authorize resource.
 		/// </summary>
-		/// <param name="UserSource">Users data source.</param>
-		/// <param name="JwtFactory">JWT Factory</param>
+		/// <param name="Environment">OAuth2 environment.</param>
 		/// <param name="ResourceName">Resource name.</param>
-		public OAuthResource(IUserSource? UserSource, JwtFactory? JwtFactory,
-			string ResourceName)
+		public OAuthResource(OAuth2Environment Environment, string ResourceName)
 			: base(ResourceName)
 		{
-			this.jwtFactory = JwtFactory;
-			this.userSource = UserSource ?? Security.Users.Users.Source;
+			this.environment = Environment;
 		}
 
 		/// <summary>
@@ -48,29 +37,39 @@ namespace Waher.Networking.HTTP.OAuth
 		public override bool HandlesSubPaths => false;
 
 		/// <summary>
+		/// OAUTH2 environment, used to access clients, tokens, and other resources.
+		/// </summary>
+		public OAuth2Environment Environment => this.environment;
+
+		/// <summary>
 		/// Data source for users, used to authenticate clients.
 		/// </summary>
-		public IUserSource? Users => this.userSource;
+		public IUserSource? Users => this.environment.UserSource;
 
 		/// <summary>
 		/// Realm name, if any, used for authentication. Null if no realm is defined.
 		/// </summary>
-		public string? Realm => this.realm;
+		public string? Realm => this.environment.Realm;
 
 		/// <summary>
 		/// Minimum strength of ciphers used in encryption, if any. 0 if no encryption is used.
 		/// </summary>
-		public int MinStrength => this.minStrength;
+		public int MinStrength => this.environment.MinStrength;
 
 		/// <summary>
 		/// If TLS-encryption is enabled.
 		/// </summary>
-		public bool Encrypted => this.encrypted;
+		public bool Encrypted => this.environment.Encrypted;
 
 		/// <summary>
 		/// Available authentication schemes, if initialized.
 		/// </summary>
 		public HttpAuthenticationScheme[]? AuthenticationSchemes => this.authenticationSchemes;
+
+		/// <summary>
+		/// Associated JWT factory object instance, if any is defined.
+		/// </summary>
+		protected JwtFactory? JwtFactory => this.environment.JwtFactory;
 
 		/// <summary>
 		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
@@ -95,10 +94,10 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <returns>If authentication mechanisms have been initialized.</returns>
 		protected bool InitAuthentication()
 		{
-			if (!(this.userSource is null))
+			if (!(this.Users is null))
 			{
 				this.authenticationSchemes ??= this.CreateAuthenticationSchemes(
-					this.JwtFactory, this.userSource);
+					this.JwtFactory, this.Users);
 			}
 
 			return !(this.authenticationSchemes is null);
@@ -118,12 +117,10 @@ namespace Waher.Networking.HTTP.OAuth
 
 			List<HttpAuthenticationScheme> Schemes = new List<HttpAuthenticationScheme>();
 
-			GetDomainParameters(out this.realm, out this.minStrength, out this.encrypted);
-
 			if (!(JwtFactory is null))
 			{
-				Schemes.Add(new JwtAuthentication(this.encrypted, this.minStrength,
-					this.realm, Users, JwtFactory));
+				Schemes.Add(new JwtAuthentication(this.Encrypted, this.MinStrength,
+					this.Realm, Users, JwtFactory));
 			}
 
 			HttpServer Server = Types.TryGetModuleParameter<HttpServer>("HTTP");
@@ -131,91 +128,22 @@ namespace Waher.Networking.HTTP.OAuth
 			if (!(Server is null) && Server.ClientCertificates != ClientCertificates.NotUsed)
 				Schemes.Add(new MutualTlsAuthentication(Users));
 
-			Schemes.Add(new BasicAuthentication(this.encrypted, this.minStrength,
-				this.realm, Users));
+			Schemes.Add(new BasicAuthentication(this.Encrypted, this.MinStrength,
+				this.Realm, Users));
 
-			Schemes.Add(new DigestAuthentication(this.encrypted, this.minStrength,
-				DigestAlgorithm.MD5, this.realm, Users));
+			Schemes.Add(new DigestAuthentication(this.Encrypted, this.MinStrength,
+				DigestAlgorithm.MD5, this.Realm, Users));
 
-			Schemes.Add(new DigestAuthentication(this.encrypted, this.minStrength,
-				DigestAlgorithm.SHA256, this.realm, Users));
+			Schemes.Add(new DigestAuthentication(this.Encrypted, this.MinStrength,
+				DigestAlgorithm.SHA256, this.Realm, Users));
 
-			Schemes.Add(new DigestAuthentication(this.encrypted, this.minStrength,
-				DigestAlgorithm.SHA3_256, this.realm, Users));
+			Schemes.Add(new DigestAuthentication(this.Encrypted, this.MinStrength,
+				DigestAlgorithm.SHA3_256, this.Realm, Users));
 
 			if (!(Server is null))
 				Schemes.Add(new SessionAuthentication(Server));
 
 			return Schemes.ToArray();
-		}
-
-		/// <summary>
-		/// Gets domain parameters, based on module parameters defined in the system.
-		/// </summary>
-		/// <param name="Domain">Domain name</param>
-		/// <param name="MinStrength">Minimum strength of ciphers used in encryption.</param>
-		/// <param name="Encrypted">If TLS-encryption is enabled.</param>
-		protected static void GetDomainParameters(out string? Domain, out int MinStrength,
-			out bool Encrypted)
-		{
-			if (!Types.TryGetModuleParameter("X509", out object Obj) ||
-				!(Obj is X509Certificate Certificate))
-			{
-				if (Types.TryGetModuleParameter("Realm", out Obj) &&
-					Obj is string Realm)
-				{
-					Domain = Realm;
-				}
-				else
-					Domain = null;
-
-				Encrypted = false;
-				MinStrength = 0;
-			}
-			else
-			{
-				Encrypted = true;
-				Domain = BinaryTcpClient.GetDomainFromSubject(Certificate.Subject);
-				MinStrength = 128;
-			}
-		}
-
-		/// <summary>
-		/// Associated JWT factory object instance, if any is defined.
-		/// </summary>
-		internal JwtFactory? JwtFactory
-		{
-			get
-			{
-				if (this.jwtFactory is null)
-				{
-					if (Types.TryGetModuleParameter("JWT", out JwtFactory JwtFactory) &&
-						!JwtFactory.Disposed)
-					{
-						this.jwtFactory = JwtFactory;
-						this.authenticationSchemes = null;
-					}
-				}
-
-				return this.jwtFactory;
-			}
-		}
-
-		/// <summary>
-		/// Generates a random unique code.
-		/// </summary>
-		/// <param name="NrBytes">Number of bytes of random.</param>
-		/// <returns>Random unique code.</returns>
-		protected virtual string GenerateRandomCode(int NrBytes)
-		{
-			byte[] Bin = new byte[NrBytes];
-
-			lock (rnd)
-			{
-				rnd.GetBytes(Bin);
-			}
-
-			return Base64Url.Encode(Bin);
 		}
 
 		/// <summary>

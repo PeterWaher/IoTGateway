@@ -354,19 +354,18 @@ internal class Program
 				return Response.Write("body\r\n{\r\nbackground-color:yellow\r\n}");
 			}
 
-			new BrotliContentEncoding().ConfigureSupport(false, false);	// Do not use Brotli
+			new BrotliContentEncoding().ConfigureSupport(false, false); // Do not use Brotli
 
-			OAuthTokenResource TokenResource;
-			OAuthAuthorizeResource AuthorizeResource;
+			OAuth2Environment Environment = new();
+			Environment.Register(JwtFactory);
 
 			WebServer.Register("/Hello", Hello, Hello);
 			WebServer.Register("/Hello.md", HelloMarkdown, HelloMarkdown);
 			WebServer.Register("/Hello.css", HelloStyles);
-			WebServer.Register(new ProtectedResourceMetaData());
-			WebServer.Register(TokenResource = new OAuthTokenResource(JwtFactory));
-			WebServer.Register(AuthorizeResource = new OAuthAuthorizeResource(TokenResource, 
-				null, null, JwtFactory));
-			WebServer.Register(new AuthorizationServerMetaData(AuthorizeResource));
+			WebServer.Register(new ProtectedResourceMetaData(Environment));
+			WebServer.Register(new OAuthTokenResource(Environment));
+			WebServer.Register(new OAuthAuthorizeResource(Environment));
+			WebServer.Register(new AuthorizationServerMetaData(Environment));
 			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", "TestServer",
 				"Test Server", "1.0.0", "This is a test server.", [], 
 				new Uri("https://example.org/"), "These are the instructions."));

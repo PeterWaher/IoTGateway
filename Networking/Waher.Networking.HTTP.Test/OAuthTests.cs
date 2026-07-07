@@ -85,18 +85,16 @@ namespace Waher.Networking.HTTP.Test
 			this.jwtFactory = JwtFactory.CreateHmacSha256(BaseUrl);
 			this.server = new HttpServer(8081, this.xmlSniffer);
 
-			OAuthTokenResource TokenResource;
-			OAuthRegistrationResource RegistrationResource;
-			OAuthDeviceAuthorizationResource DeviceAuthorizationResource;
-			OAuthAuthorizeResource AuthorizeResource;
+			OAuth2Environment Environment = new();
+			Environment.Register(this.jwtFactory);
+			Environment.Register(this);
 
-			this.server.Register(new ProtectedResourceMetaData());
-			this.server.Register(TokenResource = new OAuthTokenResource(this, this.jwtFactory));
-			this.server.Register(RegistrationResource = new OAuthRegistrationResource(this, this.jwtFactory));
-			this.server.Register(DeviceAuthorizationResource = new OAuthDeviceAuthorizationResource(this, this.jwtFactory));
-			this.server.Register(AuthorizeResource = new OAuthAuthorizeResource(TokenResource,
-				RegistrationResource, DeviceAuthorizationResource, this.jwtFactory));
-			this.server.Register(new AuthorizationServerMetaData(AuthorizeResource));
+			this.server.Register(new ProtectedResourceMetaData(Environment));
+			this.server.Register(new OAuthTokenResource(Environment));
+			this.server.Register(new OAuthRegistrationResource(Environment));
+			this.server.Register(new OAuthDeviceAuthorizationResource(Environment));
+			this.server.Register(new OAuthAuthorizeResource(Environment));
+			this.server.Register(new AuthorizationServerMetaData(Environment));
 
 			this.server.Register(CallbackResource, Callback);
 			this.server.Register(new Hello(this.jwtFactory, this));
@@ -107,7 +105,7 @@ namespace Waher.Networking.HTTP.Test
 				{ DeviceUserName, new User(DeviceUserName, DevicePassword, TestUserName) }
 			};
 
-			AuthorizeResource.ImplicitAuthenticationRequest += async (_, e) =>
+			Environment.AuthorizeResource.ImplicitAuthenticationRequest += async (_, e) =>
 			{
 				if (e.Request.Header.TryGetHeaderField("X-Context", out HttpField Context))
 					e.User = await this.TryGetUser(Context.Value) as IUserWithClaims;

@@ -29,44 +29,24 @@ namespace Waher.Networking.HTTP.OAuth
 		/// </summary>
 		public const string DefaultResourcePath = "/oauth/authorize";
 
-		private readonly OAuthTokenResource tokenResource;
-		private readonly OAuthRegistrationResource? registrationResource;
-		private readonly OAuthDeviceAuthorizationResource? deviceAuthorizationResource;
-
 		/// <summary>
 		/// OAUTH authorize resource, as defined in RFC 6749.
 		/// </summary>
-		/// <param name="TokenResource">OAuth token resource.</param>
-		/// <param name="RegistrationResource">Optional OAuth registration resource.</param>
-		/// <param name="DeviceAuthorizationResource">Optional OAuth device authorization resource.</param>
-		/// <param name="JwtFactory">JWT Factory</param>
-		public OAuthAuthorizeResource(OAuthTokenResource TokenResource,
-			OAuthRegistrationResource? RegistrationResource,
-			OAuthDeviceAuthorizationResource? DeviceAuthorizationResource,
-			JwtFactory? JwtFactory)
-			: this(TokenResource, RegistrationResource, DeviceAuthorizationResource, 
-				  JwtFactory, DefaultResourcePath)
+		/// <param name="Environment">OAuth2 environment.</param>
+		public OAuthAuthorizeResource(OAuth2Environment Environment)
+			: this(Environment, DefaultResourcePath)
 		{
 		}
 
 		/// <summary>
 		/// OAUTH authorize resource, as defined in RFC 6749.
 		/// </summary>
-		/// <param name="TokenResource">OAuth token resource.</param>
-		/// <param name="RegistrationResource">Optional OAuth registration resource.</param>
-		/// <param name="DeviceAuthorizationResource">Optional OAuth device authorization resource.</param>
-		/// <param name="JwtFactory">JWT Factory</param>
+		/// <param name="Environment">OAuth2 environment.</param>
 		/// <param name="ResourceName">Resource name.</param>
-		public OAuthAuthorizeResource(OAuthTokenResource TokenResource, 
-			OAuthRegistrationResource? RegistrationResource,
-			OAuthDeviceAuthorizationResource? DeviceAuthorizationResource,
-			JwtFactory? JwtFactory,
-			string ResourceName)
-			: base(TokenResource.Users, JwtFactory, ResourceName)
+		public OAuthAuthorizeResource(OAuth2Environment Environment, string ResourceName)
+			: base(Environment, ResourceName)
 		{
-			this.tokenResource = TokenResource;
-			this.registrationResource = RegistrationResource;
-			this.deviceAuthorizationResource = DeviceAuthorizationResource;
+			Environment.Register(this);
 		}
 
 		/// <summary>
@@ -82,17 +62,17 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <summary>
 		/// Reference to token resource.
 		/// </summary>
-		internal OAuthTokenResource TokenResource => this.tokenResource;
+		internal OAuthTokenResource TokenResource => this.Environment.TokenResource;
 
 		/// <summary>
 		/// Reference to registration resource.
 		/// </summary>
-		internal OAuthRegistrationResource? OAuthRegistrationResource => this.registrationResource;
+		internal OAuthRegistrationResource OAuthRegistrationResource => this.Environment.RegistrationResource;
 
 		/// <summary>
 		/// Reference to device authorization resource.
 		/// </summary>
-		internal OAuthDeviceAuthorizationResource? OAuthDeviceAuthorizationResource => this.deviceAuthorizationResource;
+		internal OAuthDeviceAuthorizationResource OAuthDeviceAuthorizationResource => this.Environment.DeviceAuthorizationResource;
 
 		/// <summary>
 		/// Executes the GET method on the resource.
@@ -180,7 +160,7 @@ namespace Waher.Networking.HTTP.OAuth
 					return;
 
 				case "token":       // Implicit
-					if (this.JwtFactory is null)
+					if (!this.Environment.HasJwtFactory)
 					{
 						await ServiceUnavailable(Response, "server_error",
 							"JWT Factory not available.");
@@ -216,7 +196,7 @@ namespace Waher.Networking.HTTP.OAuth
 						Response.SetHeader("Pragma", "no-cache");
 
 						string Token = await User.CreateToken(this.JwtFactory, Request.Encrypted);
-						await Response.Return(this.tokenResource.TokenResponse(Token, State,
+						await Response.Return(this.TokenResource.TokenResponse(Token, State,
 							3600, string.Empty, this.JwtFactory?.Issuer, false, User, Request));
 						return;
 					}
@@ -437,7 +417,7 @@ namespace Waher.Networking.HTTP.OAuth
 						return;
 					}
 
-					string Code = await this.tokenResource.GenerateTokenCode(UserWithClaims,
+					string Code = await this.TokenResource.GenerateTokenCode(UserWithClaims,
 						Request.Encrypted, CodeChallenge, CodeChallengeMethod, RedirectUri);
 
 					if (RedirectUri.Contains('?'))

@@ -21,9 +21,11 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <summary>
 		/// Provides OAUTH resource meta-data, as defined in RFC 9728.
 		/// </summary>
-		public ProtectedResourceMetaData()
-			: base(null, null, WellKnowResourcePath)
+		/// <param name="Environment">OAuth2 environment.</param>
+		public ProtectedResourceMetaData(OAuth2Environment Environment)
+			: base(Environment, WellKnowResourcePath)
 		{
+			Environment.Register(this);
 		}
 
 		/// <summary>

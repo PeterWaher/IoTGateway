@@ -194,6 +194,7 @@ namespace Waher.IoTGateway
 		private static X509Certificate2 certificate = null;
 		private static DateTime checkCertificate = DateTime.MinValue;
 		private static DateTime checkIp = DateTime.MinValue;
+		private static OAuth2Environment oauthEnvironment = null;
 		private static HttpServer webServer = null;
 		private static HttpFolderResource root = null;
 		private static HttpxProxy httpxProxy = null;
@@ -1381,16 +1382,13 @@ namespace Waher.IoTGateway
 
 				InternetContent.SetDefaultTimeout(60000, true);
 
-				OAuthTokenResource TokenResource;
-				OAuthDeviceAuthorizationResource DeviceAuthorizationResource;
-				OAuthAuthorizeResource AuthorizeResource;
+				oauthEnvironment = new OAuth2Environment();
 
-				webServer.Register(new ProtectedResourceMetaData());
-				webServer.Register(TokenResource = new OAuthTokenResource());
-				webServer.Register(DeviceAuthorizationResource = new OAuthDeviceAuthorizationResource());
-				webServer.Register(AuthorizeResource = new OAuthAuthorizeResource(TokenResource, 
-					null, DeviceAuthorizationResource, null));
-				webServer.Register(new AuthorizationServerMetaData(AuthorizeResource));
+				webServer.Register(new ProtectedResourceMetaData(oauthEnvironment));
+				webServer.Register(new OAuthTokenResource(oauthEnvironment));
+				webServer.Register(new OAuthDeviceAuthorizationResource(oauthEnvironment));
+				webServer.Register(new OAuthAuthorizeResource(oauthEnvironment));
+				webServer.Register(new AuthorizationServerMetaData(oauthEnvironment));
 				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/Transforms", Path.Combine(appDataFolder, "Transforms"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false, HostDomainOptions.SameForAllDomains));   // Syntax highlighting library, provided by http://highlightjs.org
@@ -4045,6 +4043,11 @@ namespace Waher.IoTGateway
 		public static MailClient MailClient => mailClient;
 
 		/// <summary>
+		/// OAUTH2 environment reference.
+		/// </summary>
+		public static OAuth2Environment OAuthEnvironment => oauthEnvironment;
+
+		/// <summary>
 		/// HTTP Server
 		/// </summary>
 		public static HttpServer HttpServer => webServer ?? Types.TryGetModuleParameter<HttpServer>("HTTP");
@@ -4483,7 +4486,7 @@ namespace Waher.IoTGateway
 			DeleteOldFiles(Path, KeepDays, 0, 0, DateTime.Now, false);
 		}
 
-		private static void DeleteOldFiles(string Path, long KeepDays, long KeepMonths, 
+		private static void DeleteOldFiles(string Path, long KeepDays, long KeepMonths,
 			long KeepYears, DateTime Now, bool LogIndividualFileEvents)
 		{
 			int Count = 0;
@@ -4543,7 +4546,7 @@ namespace Waher.IoTGateway
 			{
 				if (Count > 0 && !LogIndividualFileEvents)
 				{
-					if (Count==1)
+					if (Count == 1)
 						Log.Informational("1 file deleted.", Path);
 					else
 						Log.Informational(Count.ToString() + " files deleted.", Path);

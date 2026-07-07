@@ -13,8 +13,6 @@ namespace Waher.Networking.HTTP.OAuth
 	/// </summary>
 	public class AuthorizationServerMetaData : OAuthResource, IHttpGetMethod
 	{
-		private readonly OAuthAuthorizeResource authorizeResource;
-
 		/// <summary>
 		/// /.well-known
 		/// </summary>
@@ -23,16 +21,22 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <summary>
 		/// Provides OAUTH authorization server meta-data, as defined in RFC 8414.
 		/// </summary>
-		public AuthorizationServerMetaData(OAuthAuthorizeResource AuthorizeResource)
-			: base(AuthorizeResource.Users, AuthorizeResource.JwtFactory, WellKnowResourcePath)
+		/// <param name="Environment">OAuth2 environment.</param>
+		public AuthorizationServerMetaData(OAuth2Environment Environment)
+			: base(Environment, WellKnowResourcePath)
 		{
-			this.authorizeResource = AuthorizeResource;
+			Environment.Register(this);
 		}
 
 		/// <summary>
 		/// If the GET method is allowed.
 		/// </summary>
 		public bool AllowsGET => true;
+
+		/// <summary>
+		/// Registered authorize resource.
+		/// </summary>
+		public OAuthAuthorizeResource AuthorizeResource => this.Environment.AuthorizeResource;
 
 		/// <summary>
 		/// Executes the GET method on the resource.
@@ -45,7 +49,7 @@ namespace Waher.Networking.HTTP.OAuth
 			StringBuilder sb = ProtectedResourceMetaData.GenerateServerUrl(Request, out _);
 			string ServerUrl = sb.ToString();
 
-			sb.Append(this.authorizeResource.ResourceName);
+			sb.Append(this.AuthorizeResource.ResourceName);
 			string AuthorizeUri = sb.ToString();
 			string TokenUri = ServerUrl + OAuthTokenResource.DefaultResourcePath;
 
@@ -58,7 +62,7 @@ namespace Waher.Networking.HTTP.OAuth
 				"refresh_token"
 			};
 
-			if (!(this.authorizeResource.OAuthDeviceAuthorizationResource is null))
+			if (!(this.AuthorizeResource.OAuthDeviceAuthorizationResource is null))
 				GrantTypesSupported.Add(OAuthDeviceAuthorizationResource.GrantType);
 
 			Dictionary<string, object> MetaData = new Dictionary<string, object>()
@@ -80,11 +84,11 @@ namespace Waher.Networking.HTTP.OAuth
 				{ "grant_types_supported", GrantTypesSupported.ToArray() }
 			};
 
-			if (!(this.authorizeResource.OAuthRegistrationResource is null))
-				MetaData["registration_endpoint"] = ServerUrl + this.authorizeResource.OAuthRegistrationResource.ResourceName;
+			if (!(this.AuthorizeResource.OAuthRegistrationResource is null))
+				MetaData["registration_endpoint"] = ServerUrl + this.AuthorizeResource.OAuthRegistrationResource.ResourceName;
 
-			if (!(this.authorizeResource.OAuthDeviceAuthorizationResource is null))
-				MetaData["device_authorization_endpoint"] = ServerUrl + this.authorizeResource.OAuthDeviceAuthorizationResource.ResourceName;
+			if (!(this.AuthorizeResource.OAuthDeviceAuthorizationResource is null))
+				MetaData["device_authorization_endpoint"] = ServerUrl + this.AuthorizeResource.OAuthDeviceAuthorizationResource.ResourceName;
 
 			await Response.Return(MetaData);
 		}

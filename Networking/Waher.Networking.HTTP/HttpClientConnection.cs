@@ -348,13 +348,18 @@ namespace Waher.Networking.HTTP
 					return true;
 				}
 
+				bool IsText = false;
+
+				if (this.HasSniffers)
+					IsText = IsSniffableTextType(this.header.ContentType?.Value);
+
 				HttpFieldTransferEncoding TransferEncoding = this.header.TransferEncoding;
 				if (!(TransferEncoding is null))
 				{
 					if (TransferEncoding.Value == "chunked")
 					{
 						this.dataStream = new TemporaryStream();
-						this.transferEncoding = new ChunkedTransferEncoding(new BinaryOutputStream(this.dataStream), null, false, null);
+						this.transferEncoding = new ChunkedTransferEncoding(new BinaryOutputStream(this.dataStream), null, IsText, null);
 					}
 					else
 					{
@@ -381,7 +386,7 @@ namespace Waher.Networking.HTTP
 						else
 							this.dataStream = new TemporaryStream();
 
-						this.transferEncoding = new ContentLengthEncoding(new BinaryOutputStream(this.dataStream), l, null, false, null);
+						this.transferEncoding = new ContentLengthEncoding(new BinaryOutputStream(this.dataStream), l, null, IsText, null);
 					}
 					else
 					{
@@ -2046,6 +2051,10 @@ namespace Waher.Networking.HTTP
 				return false;
 
 			string s = ContentType.Substring(0, j);
+
+			int i = ContentType.IndexOf(';', j + 1);
+			if (i > j)
+				ContentType = ContentType.Substring(0, i).TrimEnd();
 
 			// TODO: Customizable.
 

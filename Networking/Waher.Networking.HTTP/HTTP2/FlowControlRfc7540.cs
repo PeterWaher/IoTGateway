@@ -33,7 +33,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		public FlowControlRfc7540(ConnectionSettings LocalSettings, ConnectionSettings RemoteSettings,
 			Profiler Profiler)
 			: this(LocalSettings, RemoteSettings, null, Profiler)
-		{ 
+		{
 		}
 
 		/// <summary>
@@ -165,7 +165,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		public int AddStreamForTest(int StreamId, byte Weight, int StreamIdDependency,
 			bool Exclusive)
 		{
-			return this.AddStreamForTest(StreamId, this.LocalSettings, Weight, 
+			return this.AddStreamForTest(StreamId, this.LocalSettings, Weight,
 				StreamIdDependency, Exclusive);
 		}
 
@@ -196,6 +196,9 @@ namespace Waher.Networking.HTTP.HTTP2
 		public override int AddStream(Http2Stream Stream, byte Weight, int StreamIdDependency, bool Exclusive)
 		{
 			if (this.disposed)
+				return -1;
+
+			if (Stream.StreamId == StreamIdDependency)
 				return -1;
 
 			lock (this.synchObj)
@@ -278,13 +281,17 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (this.disposed)
 				return false;
 
+			if (Stream.StreamId == StreamIdDependency)
+				return false;
+
 			lock (this.synchObj)
 			{
-				if (StreamIdDependency == 0 ||
-					!this.nodes.TryGetValue(StreamIdDependency, out PriorityNodeRfc7540 DependentOn))
-				{
+				PriorityNodeRfc7540 DependentOn;
+
+				if (StreamIdDependency == 0)
+					DependentOn = this.root;
+				else if (!this.nodes.TryGetValue(StreamIdDependency, out DependentOn))
 					DependentOn = null;
-				}
 
 				PriorityNodeRfc7540 Parent = DependentOn ?? this.root;
 
@@ -368,12 +375,14 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				Parent.RemoveChildDependency(Node);
 
-				double Scale = Parent.TotalChildWeights == 0 ? 1 : ((double)Node.Weight) / Parent.TotalChildWeights;
+				int TotalChildWeights = Node.TotalChildWeights;
+				double Scale = TotalChildWeights == 0 ? 1 : ((double)Node.Weight) / TotalChildWeights;
 
 				while (Node.HasChildren)
 				{
 					PriorityNodeRfc7540 Child = Node.FirstChild.Value;
 					int ScaledWeight = (int)Math.Ceiling(Child.Weight * Scale);
+
 					if (ScaledWeight > 255)
 						ScaledWeight = 255;
 

@@ -484,15 +484,128 @@ namespace Waher.Networking.HTTP.Test
 			Assert.IsTrue(FlowControl.RemoveStream(3));
 		}
 
+		[TestMethod]
+		public async Task Test_16_ExclusiveReprioritize()
+		{
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+
+			FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
+
+			FlowControl.AddStreamForTest(1, 16, 0, false);
+			FlowControl.AddStreamForTest(3, 16, 0, false);
+
+			// Exclusive root dependency: stream 5 becomes sole root child, and
+			// streams 1 and 3 must become children of 5.
+			FlowControl.AddStreamForTest(5, 16, 0, true);
+
+			Assert.IsTrue(FlowControl.TryGetStream(5, out Http2Stream Stream5));
+
+			// Legal RFC 7540 reprioritization: 5 is made dependent on one of its
+			// dependencies. Correct behavior is tree reordering.
+			Assert.IsTrue(FlowControl.UpdatePriority(Stream5, 16, 1, false));
+
+			Task<bool> RemoveTask = Task.Run(() => FlowControl.RemoveStream(5));
+			Task Completed = await Task.WhenAny(RemoveTask, Task.Delay(TimeSpan.FromSeconds(2)));
+
+			Assert.AreSame(RemoveTask, Completed,
+				"RemoveStream(5) did not finish. This reproduces the CPU spin in RemoveStreamLocked/AddChildDependency.");
+
+			Assert.IsTrue(await RemoveTask);
+
+			Assert.IsTrue(FlowControl.TryGetPriorityNode(1, out PriorityNodeRfc7540 Node1));
+			Assert.IsTrue(FlowControl.TryGetPriorityNode(3, out PriorityNodeRfc7540 Node3));
+
+			Assert.AreSame(FlowControl.Root, Node1.Parent);
+			Assert.AreSame(Node1, Node3.Parent);
+
+			FlowControl.Dispose();
+		}
+
+		[TestMethod]
+		public void Test_17_ExclusiveAddMovesParentPointers()
+		{
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
+
+			FlowControl.AddStreamForTest(1, 16, 0, false);
+			FlowControl.AddStreamForTest(3, 16, 0, false);
+			FlowControl.AddStreamForTest(5, 16, 0, true);
+
+			Assert.IsTrue(FlowControl.TryGetPriorityNode(1, out PriorityNodeRfc7540 Node1));
+			Assert.IsTrue(FlowControl.TryGetPriorityNode(3, out PriorityNodeRfc7540 Node3));
+			Assert.IsTrue(FlowControl.TryGetPriorityNode(5, out PriorityNodeRfc7540 Node5));
+
+			Assert.AreSame(FlowControl.Root, Node5.Parent);
+			Assert.AreSame(Node5, Node1.Parent);
+			Assert.AreSame(Node5, Node3.Parent);
+
+			Assert.IsTrue(FlowControl.RemoveStream(5));
+
+			Assert.AreSame(FlowControl.Root, Node1.Parent);
+			Assert.AreSame(FlowControl.Root, Node3.Parent);
+		}
+
+		[TestMethod]
+		public void Test_18_UpdatePriorityExclusiveRootMovesSiblings()
+		{
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
+
+			FlowControl.AddStreamForTest(1, 16, 0, false);
+			FlowControl.AddStreamForTest(3, 16, 0, false);
+			FlowControl.AddStreamForTest(5, 16, 0, false);
+
+			Assert.IsTrue(FlowControl.TryGetStream(3, out Http2Stream Stream3));
+			Assert.IsTrue(FlowControl.UpdatePriority(Stream3, 16, 0, true));
+
+			Assert.IsTrue(FlowControl.TryGetPriorityNode(1, out PriorityNodeRfc7540 Node1));
+			Assert.IsTrue(FlowControl.TryGetPriorityNode(3, out PriorityNodeRfc7540 Node3));
+			Assert.IsTrue(FlowControl.TryGetPriorityNode(5, out PriorityNodeRfc7540 Node5));
+
+			Assert.AreSame(FlowControl.Root, Node3.Parent);
+			Assert.AreSame(Node3, Node1.Parent);
+			Assert.AreSame(Node3, Node5.Parent);
+		}
+
+		[TestMethod]
+		public void Test_19_UpdatePrioritySelfDependencyIsRejected()
+		{
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
+
+			FlowControl.AddStreamForTest(1, 16, 0, false);
+
+			Assert.IsTrue(FlowControl.TryGetStream(1, out Http2Stream Stream1));
+			Assert.IsFalse(FlowControl.UpdatePriority(Stream1, 16, 1, false));
+
+			Assert.IsTrue(FlowControl.RemoveStream(1));
+		}
+
+		[TestMethod]
+		public void Test_20_AddStreamSelfDependencyIsRejected()
+		{
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
+
+			Assert.IsTrue(FlowControl.AddStreamForTest(1, 16, 1, false) < 0);
+			Assert.IsFalse(FlowControl.TryGetPriorityNode(1, out _));
+		}
+
 		/* 
 		 * delayed release stream resources => trigger
 		 * delayed release connection resources => trigger
 		 * trigger sibling resources if sibling removed
 		 * UpdatePriority + trigger
 		 * UpdateSettings + trigger
-		 * Exclusive reorder + trigger
-		 * Changing priority to exclusive + trigger
-		 * changing dependency and solve circular references
 		 * changing window sizes if sibling removed + trigger
 		 */
 	}

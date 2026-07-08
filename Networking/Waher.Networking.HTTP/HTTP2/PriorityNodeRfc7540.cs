@@ -121,6 +121,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				foreach (PriorityNodeRfc7540 Child in Children)
 				{
 					this.childNodes.AddLast(Child);
+					Child.dependentOn = this;
 					this.totalChildWeights += Child.Weight;
 				}
 
@@ -214,14 +215,13 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>If the child node was not found.</returns>
 		public bool RemoveChildDependency(PriorityNodeRfc7540 Child)
 		{
-			Child.DependentOn = null;
-
 			if (this.childNodes is null)
 				return false;
 
 			if (!this.childNodes.Remove(Child))
 				return false;
 
+			Child.dependentOn = null;
 			this.totalChildWeights -= Child.Weight;
 
 			if (this.childNodes?.First is null)

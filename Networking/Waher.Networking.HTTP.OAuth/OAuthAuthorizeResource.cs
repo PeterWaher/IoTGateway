@@ -121,6 +121,9 @@ namespace Waher.Networking.HTTP.OAuth
 			if (!Form.TryGetValue("state", out string State))
 				State = string.Empty;
 
+			if (!Form.TryGetValue("scope", out string Scope))
+				Scope = string.Empty;
+
 			switch (ResponseType)
 			{
 				case "code":        // Authorization Code
@@ -155,7 +158,7 @@ namespace Waher.Networking.HTTP.OAuth
 					Response.SetHeader("Pragma", "no-cache");
 
 					await Response.Return(await this.GenerateLoginForm(Request, Response,
-						ClientId, RedirectUri, State, CodeChallenge, CodeChallengeMethod,
+						ClientId, RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
 						string.Empty));
 					return;
 
@@ -187,8 +190,16 @@ namespace Waher.Networking.HTTP.OAuth
 							LoginAuditor.Fail("Credentials mismatch. User name in request: " +
 								ClientId + ", user name in authenticated user: " + User.UserName,
 								User.UserName, Request.RemoteEndPoint, "OAUTH");
-							
+
 							await Forbidden(Response, "invalid_request", "Invalid credentials.");
+							return;
+						}
+
+						string[] Scopes = Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+						if (!OAuthTokenResource.HasScopePrivileges(Scopes, User, out string? MissingPrivilege))
+						{
+							await Forbidden(Response, "access_denied",
+								"User lacks privilege: " + MissingPrivilege);
 							return;
 						}
 
@@ -196,8 +207,9 @@ namespace Waher.Networking.HTTP.OAuth
 						Response.SetHeader("Pragma", "no-cache");
 
 						string Token = await User.CreateToken(this.JwtFactory, Request.Encrypted);
+
 						await Response.Return(this.TokenResource.TokenResponse(Token, State,
-							3600, string.Empty, this.JwtFactory?.Issuer, false, User, Request));
+							3600, Scopes, this.JwtFactory?.Issuer, false, User, Request));
 						return;
 					}
 
@@ -238,7 +250,7 @@ namespace Waher.Networking.HTTP.OAuth
 					return;
 
 				default:
-					await BadRequest(Response, "invalid_request", 
+					await BadRequest(Response, "invalid_request",
 						"Unsupported response_type parameter: " + ResponseType);
 					return;
 			}
@@ -250,8 +262,9 @@ namespace Waher.Networking.HTTP.OAuth
 		public event EventHandlerAsync<ImplicitAuthenticationEventArgs>? ImplicitAuthenticationRequest = null;
 
 		private async Task<HtmlDocument> GenerateLoginForm(HttpRequest Request,
-			HttpResponse Response, string UserName, string From, string State, 
-			string CodeChallenge, string CodeChallengeMethod, string ErrorMessage)
+			HttpResponse Response, string UserName, string From, string State,
+			string Scope, string CodeChallenge, string CodeChallengeMethod,
+			string ErrorMessage)
 		{
 			StringBuilder Markdown = new StringBuilder();
 
@@ -283,6 +296,9 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.Append("<input type='hidden' name='state' value='");
 			Markdown.Append(XML.HtmlAttributeEncode(State));
 			Markdown.AppendLine("'/>");
+			Markdown.Append("<input type='hidden' name='scope' value='");
+			Markdown.Append(XML.HtmlAttributeEncode(Scope));
+			Markdown.AppendLine("'/>");
 			Markdown.Append("<input type='hidden' name='code_challenge' value='");
 			Markdown.Append(XML.HtmlAttributeEncode(CodeChallenge));
 			Markdown.AppendLine("'/>");
@@ -293,7 +309,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 			Markdown.AppendLine("<p>");
 			Markdown.AppendLine("<label for='client_id'>User Name:</label>  ");
-			Markdown.Append("<input name='client_id' type='text' autofocus autocomplete='username");
+			Markdown.Append("<input id='client_id' name='client_id' type='text' autofocus autocomplete='username");
 
 			if (!string.IsNullOrEmpty(UserName))
 			{
@@ -307,8 +323,8 @@ namespace Waher.Networking.HTTP.OAuth
 
 			Markdown.AppendLine("<p>");
 			Markdown.AppendLine("<label for='client_secret'>Password:</label>  ");
-			Markdown.Append("<input name='client_secret' type='password' ");
-			Markdown.AppendLine("autocomplete='current-password' autofocus/>");
+			Markdown.Append("<input id='client_secret' name='client_secret' type='password' ");
+			Markdown.AppendLine("autocomplete='current-password'/>");
 			Markdown.AppendLine("</p>");
 			Markdown.AppendLine();
 
@@ -366,6 +382,7 @@ namespace Waher.Networking.HTTP.OAuth
 				!Form.TryGetValue("client_secret", out string Password) ||
 				!Form.TryGetValue("redirect_uri", out string RedirectUri) ||
 				!Form.TryGetValue("state", out string State) ||
+				!Form.TryGetValue("scope", out string Scope) ||
 				!Form.TryGetValue("code_challenge", out string CodeChallenge))
 			{
 				await BadRequest(Response, "invalid_request", "Invalid form.");
@@ -380,7 +397,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 			if (CodeChallengeMethod != "plain" && CodeChallengeMethod != "S256")
 			{
-				await BadRequest(Response, "invalid_request", 
+				await BadRequest(Response, "invalid_request",
 					"Unsupported code_challenge_method: " + CodeChallengeMethod);
 				return;
 			}
@@ -399,7 +416,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 			if (LoginResult is null)
 			{
-				await Forbidden(Response, "access_denied", 
+				await Forbidden(Response, "access_denied",
 					"User cannot authenticate via this interface.");
 				return;
 			}
@@ -411,14 +428,15 @@ namespace Waher.Networking.HTTP.OAuth
 
 					if (!(LoginResult.User is IUserWithClaims UserWithClaims))
 					{
-						await Response.Return(await this.GenerateLoginForm(Request, 
-							Response, UserName, RedirectUri, State, CodeChallenge, 
+						await Response.Return(await this.GenerateLoginForm(Request,
+							Response, UserName, RedirectUri, State, Scope, CodeChallenge,
 							CodeChallengeMethod, "User cannot be used with OAUTH login."));
 						return;
 					}
 
 					string Code = await this.TokenResource.GenerateTokenCode(UserWithClaims,
-						Request.Encrypted, CodeChallenge, CodeChallengeMethod, RedirectUri);
+						Request.Encrypted, CodeChallenge, CodeChallengeMethod, RedirectUri,
+						Scope);
 
 					if (RedirectUri.Contains('?'))
 						RedirectUri += "&code=" + HttpUtility.UrlEncode(Code);
@@ -437,7 +455,7 @@ namespace Waher.Networking.HTTP.OAuth
 				case LoginResultType.InvalidCredentials:
 				default:
 					await Response.Return(await this.GenerateLoginForm(Request, Response,
-						UserName, RedirectUri, State, CodeChallenge, CodeChallengeMethod,
+						UserName, RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
 						"Invalid user name or password."));
 					return;
 
@@ -447,14 +465,14 @@ namespace Waher.Networking.HTTP.OAuth
 
 				case LoginResultType.TemporarilyBlocked:
 					await Response.Return(await this.GenerateLoginForm(Request, Response,
-						UserName, RedirectUri, State, CodeChallenge, CodeChallengeMethod,
+						UserName, RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
 						"You are temporarily blocked. Try again after: " +
 						LoginResult.Next?.ToString()));
 					return;
 
 				case LoginResultType.PermanentlyBlocked:
 					await Response.Return(await this.GenerateLoginForm(Request, Response,
-						UserName, RedirectUri, State, CodeChallenge, CodeChallengeMethod,
+						UserName, RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
 						"You are permanently blocked."));
 					return;
 			}

@@ -13,7 +13,6 @@ using Waher.Content;
 using Waher.Content.Getters;
 using Waher.Content.Html;
 using Waher.Content.Html.Elements;
-using Waher.Content.Json;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Events.Console;
@@ -21,6 +20,7 @@ using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.Interfaces;
 using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Collections;
 using Waher.Security;
 using Waher.Security.JWT;
 
@@ -278,7 +278,7 @@ namespace Waher.Networking.HTTP.Test
 			return Task.FromResult<IRegistration>(
 				new Registration(UserName, Password, RegistrationRequest));
 		}
-		
+
 		public Task<IUser> TryGetOwner(IUser Device)
 		{
 			string OwnerId = (Device as User)?.Owner;
@@ -351,17 +351,17 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_02_Login(LoginMethod Method)
 		{
 			TokenResult Token = await Login(Method);
-			await AssertHello(Token.AccessToken);
+			await AssertHello(Token.AccessToken, TestUserName);
 		}
 
-		private static async Task AssertHello(string AccessToken)
+		private static async Task AssertHello(string AccessToken, string UserName)
 		{
 			ContentResponse HelloResponse = await InternetContent.GetAsync(
 				new Uri(BaseUrl + ProtectedResource),
 				new KeyValuePair<string, string>("Authorization", "Bearer " + AccessToken));
 
 			HelloResponse.AssertOk();
-			Assert.AreEqual("Hello " + TestUserName + "." + Environment.NewLine, HelloResponse.Decoded);
+			Assert.AreEqual("Hello " + UserName + "." + Environment.NewLine, HelloResponse.Decoded);
 		}
 
 		[TestMethod]
@@ -751,7 +751,7 @@ namespace Waher.Networking.HTTP.Test
 				});
 
 			TokenResult Token = AssertAccessTokenResponse(TokenResponse);
-			await AssertHello(Token.AccessToken);
+			await AssertHello(Token.AccessToken, TestUserName);
 		}
 
 		[TestMethod]
@@ -1005,7 +1005,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.IsTrue(Response.Headers.CacheControl.NoStore, "Expected Cache-Control: no-store.");
 
 			bool FoundPragmaNoCache = false;
-			foreach (System.Net.Http.Headers.NameValueHeaderValue Header in Response.Headers.Pragma)
+			foreach (NameValueHeaderValue Header in Response.Headers.Pragma)
 			{
 				if (string.Equals(Header.Name, "no-cache", StringComparison.OrdinalIgnoreCase))
 				{
@@ -1096,7 +1096,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_34_TokenEndpointRejectsMultipleClientAuthenticationMethods()
 		{
 			using HttpClient Client = new();
-			Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(
+			Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
 				"Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes(TestUserName + ":" + TestPassword)));
 
 			using FormUrlEncodedContent Content = new(new Dictionary<string, string>()
@@ -1172,9 +1172,21 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_38_BearerTokenInQueryStringIsRejected()
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		[DataRow(LoginMethod.ImplicitGet)]
+		[DataRow(LoginMethod.ImplicitPost)]
+		[DataRow(LoginMethod.Password)]
+		[DataRow(LoginMethod.ClientCredentials)]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		public async Task Test_38_BearerTokenInQueryStringIsRejected(LoginMethod Method)
 		{
-			TokenResult Token = await Login(LoginMethod.CodeFormWithPkceS256);
+			TokenResult Token = await Login(Method);
 
 			ContentResponse Response = await InternetContent.GetAsync(new Uri(
 				BaseUrl + ProtectedResource + "?access_token=" + Uri.EscapeDataString(Token.AccessToken)));
@@ -1225,9 +1237,21 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_40_AccessTokenIsSignedJwtWithExpiration()
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		[DataRow(LoginMethod.ImplicitGet)]
+		[DataRow(LoginMethod.ImplicitPost)]
+		[DataRow(LoginMethod.Password)]
+		[DataRow(LoginMethod.ClientCredentials)]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		public async Task Test_40_AccessTokenIsSignedJwtWithExpiration(LoginMethod Method)
 		{
-			TokenResult Token = await Login(LoginMethod.CodeFormWithPkceS256);
+			TokenResult Token = await Login(Method);
 
 			IDictionary<string, object> Header = DecodeJwtPart(Token.AccessToken, 0);
 			Assert.IsTrue(Header.TryGetValue("alg", out object Algorithm),
@@ -1241,8 +1265,14 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		[DataRow(LoginMethod.Password)]
 		public async Task Test_41_AuthorizationCodeIssuesRefreshToken(LoginMethod Method)
 		{
 			TokenResult Token = await Login(Method);
@@ -1252,14 +1282,22 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_42_RefreshTokenGrantReturnsAccessToken()
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		[DataRow(LoginMethod.Password)]
+		public async Task Test_42_RefreshTokenGrantReturnsAccessToken(LoginMethod Method)
 		{
-			TokenResult InitialToken = await Login(LoginMethod.CodeFormWithPkceS256);
+			TokenResult InitialToken = await Login(Method);
 			Assert.IsFalse(string.IsNullOrEmpty(InitialToken.RefreshToken));
 
 			TokenResult RefreshedToken = await RefreshAccessToken(InitialToken.RefreshToken, TestUserName);
 			Assert.IsFalse(string.IsNullOrEmpty(RefreshedToken.AccessToken));
-			await AssertHello(RefreshedToken.AccessToken);
+			await AssertHello(RefreshedToken.AccessToken, TestUserName);
 		}
 
 		private static async Task<TokenResult> RefreshAccessToken(string RefreshToken, string ClientId)
@@ -1313,9 +1351,17 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_45_RefreshTokenIsBoundToClientId()
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		[DataRow(LoginMethod.Password)]
+		public async Task Test_45_RefreshTokenIsBoundToClientId(LoginMethod Method)
 		{
-			TokenResult InitialToken = await Login(LoginMethod.CodeFormWithPkceS256);
+			TokenResult InitialToken = await Login(Method);
 			Assert.IsFalse(string.IsNullOrEmpty(InitialToken.RefreshToken));
 
 			ContentResponse Response = await InternetContent.PostAsync(
@@ -1326,9 +1372,17 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_46_RefreshTokenRotationInvalidatesPreviousToken()
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		[DataRow(LoginMethod.Password)]
+		public async Task Test_46_RefreshTokenRotationInvalidatesPreviousToken(LoginMethod Method)
 		{
-			TokenResult InitialToken = await Login(LoginMethod.CodeFormWithPkceS256);
+			TokenResult InitialToken = await Login(Method);
 			Assert.IsFalse(string.IsNullOrEmpty(InitialToken.RefreshToken));
 
 			TokenResult RefreshedToken = await RefreshAccessToken(InitialToken.RefreshToken, TestUserName);
@@ -1358,7 +1412,62 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_48_DynamicClientRegistrationCreatesPublicClient()
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		[DataRow(LoginMethod.Password)]
+		public async Task Test_48_RefreshTokenGrantSuccessfulResponseIsNotCacheable(LoginMethod Method)
+		{
+			TokenResult InitialToken = await Login(Method);
+			Dictionary<string, string> Request = CreateRefreshTokenRequest(
+				InitialToken.RefreshToken, TestUserName);
+
+			using HttpClient Client = new();
+			using FormUrlEncodedContent Content = new(Request);
+			using HttpResponseMessage Response = await Client.PostAsync(
+				BaseUrl + OAuthTokenResource.DefaultResourcePath, Content,
+				CancellationToken.None);
+
+			string ResponseText = await Response.Content.ReadAsStringAsync(CancellationToken.None);
+			Assert.IsTrue(Response.IsSuccessStatusCode, ResponseText);
+			AssertNoStoreHeaders(Response);
+
+			Dictionary<string, object> Parsed = JSON.Parse(ResponseText) as Dictionary<string, object>;
+			Assert.IsNotNull(Parsed);
+
+			Assert.AreEqual("Bearer", Required<string>(Parsed, "token_type"));
+			Assert.IsFalse(string.IsNullOrEmpty(Required<string>(Parsed, "access_token")));
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		[DataRow(LoginMethod.Password)]
+		public async Task Test_49_RefreshTokenGrantRejectsScopeEscalation(LoginMethod Method)
+		{
+			TokenResult InitialToken = await Login(Method);
+			Dictionary<string, string> Request = CreateRefreshTokenRequest(
+				InitialToken.RefreshToken, TestUserName);
+			Request["scope"] = "scope-not-originally-granted";
+
+			ContentResponse Response = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				Request);
+
+			AssertOAuthError(Response, BadRequestException.Code, ForbiddenException.Code);
+		}
+
+		[TestMethod]
+		public async Task Test_50_DynamicClientRegistrationCreatesPublicClient()
 		{
 			Dictionary<string, object> Response = await DoPost(
 				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
@@ -1385,8 +1494,7 @@ namespace Waher.Networking.HTTP.Test
 		private static async Task<Dictionary<string, object>> DoPost(string Uri,
 			object Body, System.Net.HttpStatusCode ExpectedStatusCode)
 		{
-			ContentResponse Encoded = await InternetContent.EncodeAsync(Body,
-				Encoding.UTF8, JsonCodec.DefaultContentType);
+			ContentResponse Encoded = await InternetContent.EncodeAsync(Body, Encoding.UTF8);
 
 			Encoded.AssertOk();
 
@@ -1399,7 +1507,7 @@ namespace Waher.Networking.HTTP.Test
 				RequestUri = new Uri(Uri)
 			};
 
-			Request.Content.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(Encoded.ContentType);
+			Request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(Encoded.ContentType);
 
 			using HttpResponseMessage Response = await Client.SendAsync(Request);
 
@@ -1415,7 +1523,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_49_DynamicClientRegistrationCreatesConfidentialClient()
+		public async Task Test_51_DynamicClientRegistrationCreatesConfidentialClient()
 		{
 			IDictionary<string, object> Response = await DoPost(
 				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
@@ -1444,7 +1552,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_50_DynamicClientRegistrationRejectsInvalidRedirectUri()
+		public async Task Test_52_DynamicClientRegistrationRejectsInvalidRedirectUri()
 		{
 			Dictionary<string, object> Error = await DoPost(
 				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
@@ -1460,7 +1568,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_51_DynamicClientRegistrationRejectsInconsistentGrantAndResponseTypes()
+		public async Task Test_53_DynamicClientRegistrationRejectsInconsistentGrantAndResponseTypes()
 		{
 			IDictionary<string, object> Error = await DoPost(
 				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
@@ -1476,7 +1584,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_52_DynamicClientRegistrationRequiresJsonRequest()
+		public async Task Test_54_DynamicClientRegistrationRequiresJsonRequest()
 		{
 			await DoPost(
 				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
@@ -1488,7 +1596,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_53_DynamicClientRegistrationAcceptsUnknownMetadata()
+		public async Task Test_55_DynamicClientRegistrationAcceptsUnknownMetadata()
 		{
 			IDictionary<string, object> Response = await DoPost(
 				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
@@ -1507,7 +1615,24 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_54_DeviceAuthorizationResponseContainsRequiredValues()
+		public async Task Test_56_DynamicClientRegistrationSuccessfulResponseIsNotCacheable()
+		{
+			Dictionary<string, object> Response = await DoPost(
+				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
+				new Dictionary<string, object>()
+				{
+					{ "redirect_uris", new string[] { BaseUrl + CallbackResource } },
+					{ "client_name", "Unit Test Cache Client" },
+					{ "grant_types", new string[] { "authorization_code" } },
+					{ "response_types", new string[] { "code" } }
+				},
+				System.Net.HttpStatusCode.Created);
+
+			Assert.IsFalse(string.IsNullOrEmpty(Required<string>(Response, "client_id")));
+		}
+
+		[TestMethod]
+		public async Task Test_57_DeviceAuthorizationResponseContainsRequiredValues()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
@@ -1571,22 +1696,22 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_55_DeviceTokenPollingBeforeAuthorizationReturnsAuthorizationPending()
+		public async Task Test_58_DeviceTokenPollingBeforeAuthorizationReturnsAuthorizationPending()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
 			Dictionary<string, object> Error = await DoPost(
 				BaseUrl + OAuthTokenResource.DefaultResourcePath,
-				CreateDeviceTokenRequest(Device.DeviceCode, TestUserName),
+				CreateDeviceTokenRequest(Device.DeviceCode, DeviceUserName),
 				System.Net.HttpStatusCode.BadRequest);
 
 			Assert.AreEqual("authorization_pending", Required<string>(Error, "error"));
 		}
 
-		private static Dictionary<string, object> CreateDeviceTokenRequest(string DeviceCode,
+		private static Dictionary<string, string> CreateDeviceTokenRequest(string DeviceCode,
 			string ClientId)
 		{
-			Dictionary<string, object> Request = new()
+			Dictionary<string, string> Request = new()
 			{
 				{ "grant_type", OAuthDeviceAuthorizationResource.GrantType }
 			};
@@ -1601,7 +1726,20 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_56_DeviceTokenGrantRequiresDeviceCode()
+		public async Task Test_59_DeviceTokenPollingRejectsInvalidClientId()
+		{
+			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
+
+			Dictionary<string, object> Error = await DoPost(
+				BaseUrl + OAuthTokenResource.DefaultResourcePath,
+				CreateDeviceTokenRequest(Device.DeviceCode, TestUserName),
+				System.Net.HttpStatusCode.Forbidden);
+
+			Assert.AreEqual("access_denied", Required<string>(Error, "error"));
+		}
+
+		[TestMethod]
+		public async Task Test_60_DeviceTokenGrantRequiresDeviceCode()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -1615,17 +1753,17 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_57_DeviceTokenGrantRejectsInvalidDeviceCode()
+		public async Task Test_61_DeviceTokenGrantRejectsInvalidDeviceCode()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
-				CreateDeviceTokenRequest("invalid-device-code", TestUserName));
+				CreateDeviceTokenRequest("invalid-device-code", DeviceUserName));
 
 			AssertOAuthError(Response, BadRequestException.Code, ForbiddenException.Code);
 		}
 
 		[TestMethod]
-		public async Task Test_58_DeviceTokenGrantRequiresClientIdForPublicClient()
+		public async Task Test_62_DeviceTokenGrantRequiresClientIdForPublicClient()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
@@ -1641,7 +1779,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_59_DeviceAuthorizationRejectsMissingClientId()
+		public async Task Test_63_DeviceAuthorizationRejectsMissingClientId()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -1651,103 +1789,161 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_60_DeviceFlowCompletesAfterUserVerification()
+		public async Task Test_64_DeviceFlowCompletesAfterUserVerification()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
-			await CompleteDeviceVerification(Device, TestUserName, TestPassword);
+			await CompleteDeviceAuthorizationForm(Device, true, false, false, TestUserName, TestPassword);
 
 			ContentResponse TokenResponse = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
-				CreateDeviceTokenRequest(Device.DeviceCode, TestUserName));
+				CreateDeviceTokenRequest(Device.DeviceCode, DeviceUserName));
 
 			TokenResult TokenResult = AssertAccessTokenResponse(TokenResponse);
-			await AssertHello(TokenResult.AccessToken);
+			await AssertHello(TokenResult.AccessToken, DeviceUserName);
 		}
 
-		private static async Task CompleteDeviceVerification(DeviceAuthorizationResult Device,
-			string UserName, string Password)
-		{
-			ContentResponse Response = await VerifyDeviceUserCode(Device, UserName, Password);
-
-			if (Response.HasError)
-				throw new LoginError(Response.Error.Message);
-
-			if (Response.Decoded is HtmlDocument HtmlDocument &&
-				TryGetErrorMessage(HtmlDocument, out string ErrorMessage))
-			{
-				throw new LoginError(ErrorMessage);
-			}
-		}
-
-		private static async Task<ContentResponse> VerifyDeviceUserCode(DeviceAuthorizationResult Device,
+		private static async Task<ContentResponse> CompleteDeviceAuthorizationForm(
+			DeviceAuthorizationResult Device, bool Accept, bool Decline, bool AlreadyResponded,
 			string UserName, string Password)
 		{
 			string VerificationUri = string.IsNullOrEmpty(Device.VerificationUriComplete) ?
 				Device.VerificationUri : Device.VerificationUriComplete;
 
-			Dictionary<string, string> FormPostback = new()
-			{
-				{ "user_code", Device.UserCode }
-			};
-
-			if (!string.IsNullOrEmpty(UserName))
-				FormPostback["client_id"] = UserName;
-
-			if (!string.IsNullOrEmpty(Password))
-				FormPostback["client_secret"] = Password;
-
 			ContentResponse VerificationResponse = await InternetContent.GetAsync(new Uri(VerificationUri));
+			VerificationResponse.AssertOk();
 
-			if (VerificationResponse.HasError)
-				return VerificationResponse;
+			HtmlDocument HtmlDocument = VerificationResponse.Decoded as HtmlDocument;
+			Assert.IsNotNull(HtmlDocument);
 
-			if (VerificationResponse.Decoded is HtmlDocument HtmlDocument)
+			Dictionary<string, string> FormPostback = [];
+			Input[] InputFields = GetHtmlElements<Input>(HtmlDocument.Form);
+			bool UserNameFieldFound = false;
+			bool PasswordFieldFound = false;
+			bool UserCodeFieldFound = false;
+			bool AcceptFieldFound = false;
+			bool DeclineFieldFound = false;
+
+			foreach (Input Input in InputFields)
 			{
-				foreach (Form Form in HtmlDocument.Form)
+				switch (Input["name"])
 				{
-					foreach (HtmlNode N in Form.Children)
-					{
-						if (N is not Input Input)
-							continue;
+					case "user_code":
+						FormPostback["user_code"] = Device.UserCode;
+						UserCodeFieldFound = true;
+						break;
 
-						if (Input["type"] != "hidden")
-							continue;
+					case "Accept":
+						FormPostback["Accept"] = CommonTypes.Encode(Accept);
+						AcceptFieldFound = true;
+						break;
 
+					case "Decline":
+						FormPostback["Decline"] = CommonTypes.Encode(Decline);
+						DeclineFieldFound = true;
+						break;
+
+					case "UserName":
+						FormPostback["UserName"] = UserName;
+						UserNameFieldFound = true;
+						break;
+
+					case "Password":
+						FormPostback["Password"] = Password;
+						PasswordFieldFound = true;
+						break;
+
+					default:
 						if (!FormPostback.ContainsKey(Input["name"]))
 							FormPostback[Input["name"]] = Input["value"];
-					}
+						break;
 				}
 			}
 
-			return await InternetContent.PostAsync(new Uri(Device.VerificationUri), FormPostback);
+			if (AlreadyResponded)
+			{
+				Assert.IsFalse(AcceptFieldFound, "Expected Accept checkbox to be absent after user has already responded.");
+				Assert.IsFalse(DeclineFieldFound, "Expected Decline checkbox to be absent after user has already responded.");
+				Assert.IsFalse(UserNameFieldFound, "Expected UserName field to be absent after user has already responded.");
+				Assert.IsFalse(PasswordFieldFound, "Expected Password field to be absent after user has already responded.");
+				Assert.IsFalse(UserCodeFieldFound, "Expected UserCode field to be absent after user has already responded.");
+				Assert.IsTrue(TryGetErrorMessage(HtmlDocument, out _), "Expected error message in form when user has already responded.");
+
+				return VerificationResponse;
+			}
+			else
+			{
+				Assert.IsTrue(AcceptFieldFound, "Expected Accept checkbox to be present when user has not already responded.");
+				Assert.IsTrue(DeclineFieldFound, "Expected Decline checkbox to be present when user has not already responded.");
+				Assert.IsTrue(UserNameFieldFound, "Expected UserName field to be present when user has not already responded.");
+				Assert.IsTrue(PasswordFieldFound, "Expected Password field to be present when user has not already responded.");
+				Assert.IsTrue(UserCodeFieldFound, "Expected UserCode field to be present when user has not already responded.");
+			}
+
+			ContentResponse LoginResponse = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthDeviceAuthorizationResource.DefaultResourcePath),
+				FormPostback);
+
+			if (LoginResponse.HasError)
+				throw new LoginError(LoginResponse.Error.Message);
+
+			if (LoginResponse.Decoded is HtmlDocument HtmlDocument2 &&
+				TryGetErrorMessage(HtmlDocument2, out string ErrorMessage))
+			{
+				throw new LoginError(ErrorMessage);
+			}
+
+			return LoginResponse;
+		}
+
+		private static T[] GetHtmlElements<T>(IEnumerable<HtmlNode> HtmlNodes)
+			where T : HtmlElement
+		{
+			ChunkedList<T> Found = [];
+			ChunkedList<HtmlNode> ToProcess = [];
+			ToProcess.AddRange(HtmlNodes);
+
+			while (ToProcess.HasFirstItem)
+			{
+				HtmlNode N = ToProcess.RemoveFirst();
+				if (N is not HtmlElement E)
+					continue;
+
+				if (N is T OfInterest)
+					Found.Add(OfInterest);
+
+				if (E.HasChildren)
+					ToProcess.AddRange(E.Children);
+			}
+
+			return [.. Found];
 		}
 
 		[TestMethod]
-		public async Task Test_61_DeviceTokenPollingTooFastReturnsSlowDown()
+		public async Task Test_65_DeviceTokenPollingTooFastReturnsSlowDown()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
 			await DoPost(
 				BaseUrl + OAuthTokenResource.DefaultResourcePath,
-				CreateDeviceTokenRequest(Device.DeviceCode, TestUserName),
+				CreateDeviceTokenRequest(Device.DeviceCode, DeviceUserName),
 				System.Net.HttpStatusCode.BadRequest);
 
 			IDictionary<string, object> Error = await DoPost(
 				BaseUrl + OAuthTokenResource.DefaultResourcePath,
-				CreateDeviceTokenRequest(Device.DeviceCode, TestUserName),
+				CreateDeviceTokenRequest(Device.DeviceCode, DeviceUserName),
 				System.Net.HttpStatusCode.BadRequest);
 
 			Assert.AreEqual("slow_down", Required<string>(Error, "error"));
 		}
 
 		[TestMethod]
-		public async Task Test_62_DeviceUserCodeIsSingleUse()
+		public async Task Test_66_DeviceUserCodeIsSingleUse()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
-			await CompleteDeviceVerification(Device, TestUserName, TestPassword);
+			await CompleteDeviceAuthorizationForm(Device, true, false, false, TestUserName, TestPassword);
 
-			ContentResponse SecondVerificationResponse = await VerifyDeviceUserCode(
-				Device, TestUserName, TestPassword);
+			ContentResponse SecondVerificationResponse = await CompleteDeviceAuthorizationForm(
+				Device, true, false, true, TestUserName, TestPassword);
 
 			if (SecondVerificationResponse.HasError)
 				return;
@@ -1763,48 +1959,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_63_RefreshTokenGrantSuccessfulResponseIsNotCacheable()
-		{
-			TokenResult InitialToken = await Login(LoginMethod.CodeFormWithPkceS256);
-			Dictionary<string, string> Request = CreateRefreshTokenRequest(
-				InitialToken.RefreshToken, TestUserName);
-
-			using HttpClient Client = new();
-			using FormUrlEncodedContent Content = new(Request);
-			using HttpResponseMessage Response = await Client.PostAsync(
-				BaseUrl + OAuthTokenResource.DefaultResourcePath, Content,
-				CancellationToken.None);
-
-			string ResponseText = await Response.Content.ReadAsStringAsync(CancellationToken.None);
-			Assert.IsTrue(Response.IsSuccessStatusCode, ResponseText);
-			AssertNoStoreHeaders(Response);
-
-			Dictionary<string, object> Parsed = JSON.Parse(ResponseText) as Dictionary<string, object>;
-			Assert.IsNotNull(Parsed);
-
-			Assert.AreEqual("Bearer", Required<string>(Parsed, "token_type"));
-			Assert.IsFalse(string.IsNullOrEmpty(Required<string>(Parsed, "access_token")));
-		}
-
-		[TestMethod]
-		public async Task Test_64_DynamicClientRegistrationSuccessfulResponseIsNotCacheable()
-		{
-			Dictionary<string, object> Response = await DoPost(
-				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
-				new Dictionary<string, object>()
-				{
-					{ "redirect_uris", new string[] { BaseUrl + CallbackResource } },
-					{ "client_name", "Unit Test Cache Client" },
-					{ "grant_types", new string[] { "authorization_code" } },
-					{ "response_types", new string[] { "code" } }
-				},
-				System.Net.HttpStatusCode.Created);
-
-			Assert.IsFalse(string.IsNullOrEmpty(Required<string>(Response, "client_id")));
-		}
-
-		[TestMethod]
-		public async Task Test_65_DeviceVerificationRequiresUserCode()
+		public async Task Test_67_DeviceVerificationRequiresUserCode()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
@@ -1820,7 +1975,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_66_DeviceVerificationRejectsInvalidUserCode()
+		public async Task Test_68_DeviceVerificationRejectsInvalidUserCode()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
@@ -1837,39 +1992,22 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_67_DeviceVerificationRejectsInvalidLogin()
+		public async Task Test_69_DeviceVerificationRejectsInvalidLogin()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
-			ContentResponse Response = await VerifyDeviceUserCode(
-				Device, TestUserName, "Invalid Password");
-
-			AssertVerificationError(Response);
+			await Assert.ThrowsAsync<LoginError>(async () => await CompleteDeviceAuthorizationForm(
+				Device, true, false, false, TestUserName, "Invalid Password"));
 		}
 
 		[TestMethod]
-		public async Task Test_68_RefreshTokenGrantRejectsScopeEscalation()
-		{
-			TokenResult InitialToken = await Login(LoginMethod.CodeFormWithPkceS256);
-			Dictionary<string, string> Request = CreateRefreshTokenRequest(
-				InitialToken.RefreshToken, TestUserName);
-			Request["scope"] = "scope-not-originally-granted";
-
-			ContentResponse Response = await InternetContent.PostAsync(
-				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
-				Request);
-
-			AssertOAuthError(Response, BadRequestException.Code, ForbiddenException.Code);
-		}
-
-		[TestMethod]
-		public async Task Test_69_DeviceAuthorizationIgnoresUnknownParameter()
+		public async Task Test_70_DeviceAuthorizationIgnoresUnknownParameter()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthDeviceAuthorizationResource.DefaultResourcePath),
 				new Dictionary<string, string>()
 				{
-					{ "client_id", TestUserName },
+					{ "client_id", DeviceUserName },
 					{ "unknown_parameter", "ignored" }
 				});
 
@@ -1880,7 +2018,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_70_DeviceAuthorizationEmptyClientIdIsTreatedAsMissing()
+		public async Task Test_71_DeviceAuthorizationEmptyClientIdIsTreatedAsMissing()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthDeviceAuthorizationResource.DefaultResourcePath),
@@ -1893,7 +2031,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_71_DuplicateDeviceAuthorizationParameterIsRejected()
+		public async Task Test_72_DuplicateDeviceAuthorizationParameterIsRejected()
 		{
 			using HttpClient Client = new();
 			using StringContent Content = new(
@@ -2443,19 +2581,13 @@ namespace Waher.Networking.HTTP.Test
 		{
 			Assert.IsNotNull(FormPostback);
 
-			foreach (Form Form in HtmlDocument.Form)
+			foreach (Input Input in GetHtmlElements<Input>(HtmlDocument.Form))
 			{
-				foreach (HtmlNode N in Form.Children)
-				{
-					if (N is not Input Input)
-						continue;
+				if (Input["type"] != "hidden")
+					continue;
 
-					if (Input["type"] != "hidden")
-						continue;
-
-					if (!FormPostback.ContainsKey(Input["name"]))
-						FormPostback[Input["name"]] = Input["value"];
-				}
+				if (!FormPostback.ContainsKey(Input["name"]))
+					FormPostback[Input["name"]] = Input["value"];
 			}
 
 			ContentResponse LoginResponse = await InternetContent.PostAsync(

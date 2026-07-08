@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -61,7 +62,8 @@ namespace Waher.Networking.HTTP.OAuth
 		public bool AllowsPOST => true;
 
 		internal async Task<string> GenerateTokenCode(IUserWithClaims User, bool Encrypted,
-			string CodeChallenge, string CodeChallengeMethod, string RedirectUri)
+			string CodeChallenge, string CodeChallengeMethod, string RedirectUri,
+			string Scope)
 		{
 			if (this.JwtFactory is null)
 				throw new ServiceUnavailableException("No JWT factory configured.");
@@ -70,7 +72,7 @@ namespace Waher.Networking.HTTP.OAuth
 			string Code = this.GenerateRandomCode();
 
 			codes[Code] = new TokenRef(Token, User, CodeChallenge, CodeChallengeMethod,
-				RedirectUri, 3600);
+				RedirectUri, 3600, Scope);
 
 			return Code;
 		}
@@ -98,7 +100,7 @@ namespace Waher.Networking.HTTP.OAuth
 		private class TokenRef
 		{
 			public TokenRef(string Token, IUserWithClaims User, string CodeChallenge,
-				string CodeChallengeMethod, string RedirectUri, int ExpiresIn)
+				string CodeChallengeMethod, string RedirectUri, int ExpiresIn, string Scope)
 			{
 				this.Token = Token;
 				this.User = User;
@@ -106,12 +108,14 @@ namespace Waher.Networking.HTTP.OAuth
 				this.CodeChallengeMethod = CodeChallengeMethod;
 				this.RedirectUri = RedirectUri;
 				this.ExpiresIn = ExpiresIn;
+				this.Scope = Scope;
 			}
 
 			public string Token;
 			public string CodeChallenge;
 			public string CodeChallengeMethod;
 			public string RedirectUri;
+			public string Scope;
 			public IUserWithClaims User;
 			public int ExpiresIn;
 
@@ -122,7 +126,7 @@ namespace Waher.Networking.HTTP.OAuth
 					case "plain":
 						if (CodeVerifier != this.CodeChallenge)
 						{
-							await Forbidden(Response, "access_denied", 
+							await Forbidden(Response, "access_denied",
 								"Invalid code_verifier.");
 							return false;
 						}
@@ -134,14 +138,14 @@ namespace Waher.Networking.HTTP.OAuth
 
 						if (ExpectedCodeChallenge != this.CodeChallenge)
 						{
-							await Forbidden(Response, "access_denied", 
+							await Forbidden(Response, "access_denied",
 								"Invalid code_verifier.");
 							return false;
 						}
 						break;
 
 					default:
-						await BadRequest(Response, "invalid_request", 
+						await BadRequest(Response, "invalid_request",
 							"Unsupported code_challenge_method: " + this.CodeChallengeMethod);
 						return false;
 				}
@@ -195,7 +199,8 @@ namespace Waher.Networking.HTTP.OAuth
 			Response.SetHeader("Pragma", "no-cache");
 
 			await Response.Return(this.TokenResponse(Ref.Token, null, Ref.ExpiresIn,
-				string.Empty, this.JwtFactory?.Issuer, true, Ref.User, Request));
+				Ref.Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries),
+				this.JwtFactory?.Issuer, true, Ref.User, Request));
 		}
 
 		/// <summary>
@@ -222,7 +227,7 @@ namespace Waher.Networking.HTTP.OAuth
 			ContentResponse Content = await Request.DecodeDataAsync();
 			if (Content.HasError || !(Content.Decoded is Dictionary<string, string> Form))
 			{
-				await BadRequest(Response, "invalid_request", 
+				await BadRequest(Response, "invalid_request",
 					"Expected URL-encoded WWW form.");
 				return;
 			}
@@ -232,6 +237,9 @@ namespace Waher.Networking.HTTP.OAuth
 				await BadRequest(Response, "invalid_request", "Missing grant_type.");
 				return;
 			}
+
+			if (!Form.TryGetValue("scope", out string Scope))
+				Scope = string.Empty;
 
 			string ClientId;
 			string Token;
@@ -288,6 +296,7 @@ namespace Waher.Networking.HTTP.OAuth
 					codes.Remove(Code);
 					Token = Ref.Token;
 					User = Ref.User;
+					Scope = Ref.Scope;
 					break;
 
 				case "client_credentials":
@@ -314,7 +323,7 @@ namespace Waher.Networking.HTTP.OAuth
 							if (Form.ContainsKey("client_id") ||
 								Form.ContainsKey("client_secret"))
 							{
-								await BadRequest(Response, "invalid_request", 
+								await BadRequest(Response, "invalid_request",
 									"Invalid request parameters.");
 								return;
 							}
@@ -336,14 +345,14 @@ namespace Waher.Networking.HTTP.OAuth
 					{
 						if (!Request.Encrypted && (Request.Server.OpenHttpsPorts?.Length ?? 0) > 0)
 						{
-							await Forbidden(Response, "invalid_request", 
+							await Forbidden(Response, "invalid_request",
 								"Request must be performed over an encrypted connection.");
 							return;
 						}
 
 						if (Request.Encrypted && Request.CipherStrength < 128)
 						{
-							await Forbidden(Response, "invalid_request", 
+							await Forbidden(Response, "invalid_request",
 								"Cipher strength too weak.");
 							return;
 						}
@@ -355,7 +364,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 						if (LoginResult is null)
 						{
-							await Forbidden(Response, "access_denied", 
+							await Forbidden(Response, "access_denied",
 								"User cannot authenticate via this interface.");
 							return;
 						}
@@ -401,8 +410,15 @@ namespace Waher.Networking.HTTP.OAuth
 					}
 					else
 					{
-						await BadRequest(Response, "invalid_request", 
+						await BadRequest(Response, "invalid_request",
 							"Missing credentials.");
+						return;
+					}
+
+					if (!HasScopePrivileges(Scope, User, out string? MissingPrivilege))
+					{
+						await Forbidden(Response, "access_denied",
+							"User lacks privilege: " + MissingPrivilege);
 						return;
 					}
 					break;
@@ -410,7 +426,7 @@ namespace Waher.Networking.HTTP.OAuth
 				case "refresh_token":
 					if (!Form.TryGetValue("refresh_token", out string RefreshToken))
 					{
-						await BadRequest(Response, "invalid_request", 
+						await BadRequest(Response, "invalid_request",
 							"Missing refresh_token.");
 						return;
 					}
@@ -437,7 +453,7 @@ namespace Waher.Networking.HTTP.OAuth
 							usedRefreshTokens.Remove(RefreshToken);
 						}
 
-						await Forbidden(Response, "access_denied", 
+						await Forbidden(Response, "access_denied",
 							"Invalid refresh_token.");
 						return;
 					}
@@ -454,6 +470,16 @@ namespace Waher.Networking.HTTP.OAuth
 						return;
 					}
 
+					foreach (string Scope2 in Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+					{
+						if (Array.IndexOf(TokenFamily.Scopes, Scope2) < 0)
+						{
+							await Forbidden(Response, "invalid_scope",
+								"Not permitted to escalate scope.");
+							return;
+						}
+					}
+
 					refreshTokens.Remove(RefreshToken);
 					usedRefreshTokens.Add(RefreshToken, TokenFamily);
 
@@ -461,8 +487,78 @@ namespace Waher.Networking.HTTP.OAuth
 					Token = await User.CreateToken(this.JwtFactory, Request.Encrypted);
 					break;
 
+				case OAuthDeviceAuthorizationResource.GrantType:
+					if (!this.Environment.HasDeviceAuthorizationResource)
+					{
+						await ServiceUnavailable(Response, "server_error",
+							"Device authorization not configured.");
+						return;
+					}
+
+					if (!Form.TryGetValue("device_code", out string DeviceCode))
+					{
+						await BadRequest(Response, "invalid_request", "Missing device_code.");
+						return;
+					}
+
+					if (!Form.TryGetValue("client_id", out ClientId))
+					{
+						await BadRequest(Response, "invalid_request", "Missing client_id.");
+						return;
+					}
+
+					if (!this.Environment.DeviceAuthorizationResource.TryGetDeviceReference(
+						DeviceCode, out OAuthDeviceAuthorizationResource.DeviceRef? DeviceReference))
+					{
+						await Forbidden(Response, "expired_token", "Invalid device_code, or token has expired.");
+						return;
+					}
+
+					if (ClientId != DeviceReference.Device.UserName)
+					{
+						await Forbidden(Response, "access_denied", "Invalid client_id.");
+						return;
+					}
+
+					DateTime TP = DateTime.UtcNow;
+
+					if (DeviceReference.LastPoll.HasValue &&
+						TP.Subtract(DeviceReference.LastPoll.Value).TotalSeconds <
+						OAuthDeviceAuthorizationResource.MinimumIntervalSeconds)
+					{
+						await BadRequest(Response, "slow_down", "Polling too fast. Slow down.");
+						return;
+					}
+
+					DeviceReference.LastPoll = TP;
+
+					if (!DeviceReference.Result.HasValue)
+					{
+						await BadRequest(Response, "authorization_pending", "Authorization has not yet been granted by owner.");
+						return;
+					}
+
+					if (!DeviceReference.Result.Value)
+					{
+						await Forbidden(Response, "access_denied", "Access has been denied by owner.");
+						return;
+					}
+
+					if (!HasScopePrivileges(Scope, DeviceReference.Owner, out MissingPrivilege))
+					{
+						await Forbidden(Response, "access_denied",
+							"Owner lacks privilege: " + MissingPrivilege);
+						return;
+					}
+
+					User = DeviceReference.Device;
+					Token = await User.CreateToken(this.JwtFactory, Request.Encrypted);
+
+					DeviceReference.Remove();
+					break;
+
 				default:
-					await BadRequest(Response, "invalid_request", 
+					await BadRequest(Response, "invalid_request",
 						"Unsupported grant_type: " + GrantType);
 					return;
 			}
@@ -470,7 +566,8 @@ namespace Waher.Networking.HTTP.OAuth
 			Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 			Response.SetHeader("Pragma", "no-cache");
 
-			await Response.Return(this.TokenResponse(Token, null, 3600, string.Empty,
+			await Response.Return(this.TokenResponse(Token, null, 3600,
+				Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries),
 				this.JwtFactory?.Issuer, IssueRefreshToken, User, Request, TokenFamily));
 		}
 
@@ -497,38 +594,14 @@ namespace Waher.Networking.HTTP.OAuth
 				return new LoginResult(User);
 			}
 
+			string PasswordHash = BasicAuthentication.ComputePasswordHash(UserName,
+				Realm, Password, User.PasswordHashType, out byte? HashBytes);
+
 			string ExpectedHash = User.PasswordHash;
+			if (HashBytes.HasValue)
+				ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, HashBytes.Value);
 
-			switch (User.PasswordHashType)
-			{
-				case "":
-					break;
-
-				case "Internal":
-					Password = DigestAuthentication.ToHex(Hashes.ComputeSHA256Hash(Encoding.UTF8.GetBytes(UserName + ":" + Password)));
-					ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 32);
-					break;
-
-				case "DIGEST-MD5":
-					Password = DigestAuthentication.ToHex(DigestAuthentication.H_MD5(UserName + ":" + Realm + ":" + Password));
-					ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 16);
-					break;
-
-				case "DIGEST-SHA-256":
-					Password = DigestAuthentication.ToHex(DigestAuthentication.H_SHA256(UserName + ":" + Realm + ":" + Password));
-					ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 32);
-					break;
-
-				case "DIGEST-SHA3-256":
-					Password = DigestAuthentication.ToHex(DigestAuthentication.H_SHA3_256(UserName + ":" + Realm + ":" + Password));
-					ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 32);
-					break;
-
-				default:
-					return null;
-			}
-
-			if (Password == ExpectedHash)
+			if (PasswordHash == ExpectedHash)
 			{
 				LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
 				return new LoginResult(User);
@@ -541,15 +614,15 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		internal Dictionary<string, object> TokenResponse(string Token,
-			string? State, int ExpiresIn, string Scope, string? Issuer,
+			string? State, int ExpiresIn, string[] Scopes, string? Issuer,
 			bool IssueRefreshToken, IUserWithClaims User, HttpRequest Request)
 		{
-			return this.TokenResponse(Token, State, ExpiresIn, Scope, Issuer,
+			return this.TokenResponse(Token, State, ExpiresIn, Scopes, Issuer,
 				IssueRefreshToken, User, Request, null);
 		}
 
 		private Dictionary<string, object> TokenResponse(string Token,
-			string? State, int ExpiresIn, string Scope, string? Issuer,
+			string? State, int ExpiresIn, string[] Scopes, string? Issuer,
 			bool IssueRefreshToken, IUserWithClaims User, HttpRequest Request,
 			TokenFamily? TokenFamily)
 		{
@@ -558,7 +631,7 @@ namespace Waher.Networking.HTTP.OAuth
 				{ "access_token", Token },
 				{ "token_type", "Bearer" },
 				{ "expires_in", ExpiresIn },
-				{ "scope", Scope }
+				{ "scope", string.Join(' ', Scopes) }
 			};
 
 			if (!string.IsNullOrEmpty(State))
@@ -570,7 +643,7 @@ namespace Waher.Networking.HTTP.OAuth
 			if (IssueRefreshToken)
 			{
 				if (TokenFamily is null)
-					TokenFamily = new TokenFamily(Token, User, Request);
+					TokenFamily = new TokenFamily(Token, Scopes, User, Request);
 				else if (!TokenFamily.CanUseRefreshToken(User.UserName, Request))
 					throw new ForbiddenException();
 				else
@@ -592,18 +665,21 @@ namespace Waher.Networking.HTTP.OAuth
 			public IEnumerable<string> Tokens => this.tokens;
 			public IUserWithClaims User { get; }
 			public HttpRequest FirstRequest { get; }
+			public string[] Scopes { get; }
 			public bool HasRemoteCertificate { get; }
 			public string RemoteEndpoint { get; }
 			public string RemoteCertificateSerialNumber { get; }
 
-			public TokenFamily(string Token, IUserWithClaims User, HttpRequest FirstRequest)
+			public TokenFamily(string Token, string[] Scopes, IUserWithClaims User,
+				HttpRequest FirstRequest)
 			{
 				this.User = User;
 				this.tokens = new ChunkedList<string>() { Token };
 				this.FirstRequest = FirstRequest;
+				this.Scopes = Scopes;
 				this.HasRemoteCertificate = !(this.FirstRequest.RemoteCertificate is null);
 				this.RemoteEndpoint = this.FirstRequest.RemoteEndPoint.RemovePortNumber();
-				this.RemoteCertificateSerialNumber = 
+				this.RemoteCertificateSerialNumber =
 					this.FirstRequest.RemoteCertificate?.GetSerialNumberString()
 					?? string.Empty;
 			}
@@ -634,6 +710,47 @@ namespace Waher.Networking.HTTP.OAuth
 
 				return true;
 			}
+		}
+
+		/// <summary>
+		/// Checks if a user has the privileges associated with a set of scopes.
+		/// </summary>
+		/// <param name="Scopes">A space-separated list of scopes.</param>
+		/// <param name="User">The user to check privileges for.</param>
+		/// <param name="MissingPrivilege">Priviliege missing from user.</param>
+		/// <returns>True if the user has all the privileges associated with the scopes, 
+		/// otherwise false.</returns>
+		public static bool HasScopePrivileges(string Scopes, IUser User,
+			[NotNullWhen(false)] out string? MissingPrivilege)
+		{
+			return HasScopePrivileges(
+				Scopes.Split(' ', StringSplitOptions.RemoveEmptyEntries),
+				User, out MissingPrivilege);
+		}
+
+		/// <summary>
+		/// Checks if a user has the privileges associated with a set of scopes.
+		/// </summary>
+		/// <param name="Scopes">An array of scopes.</param>
+		/// <param name="User">The user to check privileges for.</param>
+		/// <param name="MissingPrivilege">Priviliege missing from user.</param>
+		/// <returns>True if the user has all the privileges associated with the scopes, 
+		/// otherwise false.</returns>
+		public static bool HasScopePrivileges(string[] Scopes, IUser User, 
+			[NotNullWhen(false)] out string? MissingPrivilege)
+		{
+			foreach (string Scope in Scopes)
+			{
+				string Privilege = "OAUTH.Scope." + Scope.Replace(':', '.');
+				if (!User.HasPrivilege(Privilege))
+				{
+					MissingPrivilege = Privilege;
+					return false;
+				}
+			}
+
+			MissingPrivilege = null;
+			return true;
 		}
 	}
 }

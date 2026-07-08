@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,9 +8,11 @@ using Waher.Content;
 using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
+using Waher.Networking.HTTP.Authentication;
 using Waher.Networking.HTTP.OAuth.Interfaces;
 using Waher.Runtime.Cache;
 using Waher.Security;
+using Waher.Security.JWT;
 using Waher.Security.SHA3;
 
 namespace Waher.Networking.HTTP.OAuth
@@ -30,6 +33,12 @@ namespace Waher.Networking.HTTP.OAuth
 		/// Grant Type for device authorization flow.
 		/// </summary>
 		public const string GrantType = "urn:ietf:params:oauth:grant-type:device_code";
+
+		/// <summary>
+		/// Minimum time between polling requests, in seconds. The device should not poll 
+		/// more frequently than this.
+		/// </summary>
+		public const int MinimumIntervalSeconds = 5;
 
 		private static readonly Cache<string, DeviceRef> codes = new Cache<string, DeviceRef>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
 
@@ -78,8 +87,27 @@ namespace Waher.Networking.HTTP.OAuth
 			if (!Request.Header.TryGetQueryParameter("client_id", out string ClientId))
 				ClientId = string.Empty;
 
+			string ErrorMessage = string.Empty;
+			bool AlreadyResponded = false;
+
+			if (!string.IsNullOrEmpty(UserCode))
+			{
+				if (!codes.TryGetValue(UserCode, out DeviceRef DeviceRef))
+					ErrorMessage = "Invalid User Code";
+				else if (DeviceRef.Result.HasValue)
+				{
+					AlreadyResponded = true;
+
+					if (DeviceRef.Result.Value)
+						ErrorMessage = "Authorization request has already been accepted.";
+					else
+						ErrorMessage = "Authorization request has already been declined.";
+				}
+			}
+
 			await Response.Return(await this.GenerateAuthorizationForm(Request, Response,
-				ClientId, UserCode, string.Empty, false, false, string.Empty));
+				ClientId, UserCode, string.Empty, false, false, AlreadyResponded,
+				ErrorMessage));
 		}
 
 		/// <summary>
@@ -118,7 +146,79 @@ namespace Waher.Networking.HTTP.OAuth
 				return;
 			}
 
-			if (Form.TryGetValue("client_id", out string ClientId))
+			if (Form.TryGetValue("user_code", out string UserCode))
+			{
+				if (!Form.TryGetValue("client_id", out string ClientId))
+					ClientId = string.Empty;
+
+				if (!Form.TryGetValue("UserName", out string UserName))
+					UserName = string.Empty;
+
+				if (!Form.TryGetValue("Password", out string Password))
+					Password = string.Empty;
+
+				if (!Form.TryGetValue("Accept", out string s) ||
+					!CommonTypes.TryParse(s, out bool Accept))
+				{
+					Accept = false;
+				}
+
+				if (!Form.TryGetValue("Decline", out s) ||
+					!CommonTypes.TryParse(s, out bool Decline))
+				{
+					Decline = false;
+				}
+
+				IUserWithClaims? Device;
+				IUser? Owner;
+				bool AlreadyResponded = false;
+
+				if (string.IsNullOrEmpty(UserCode))
+					s = "Missing User Code";
+				else if (!codes.TryGetValue(UserCode, out DeviceRef DeviceRef) ||
+					DeviceRef.UserCode != UserCode) // If attempting to use the device_code
+				{
+					s = "Invalid User Code";
+				}
+				else if (string.IsNullOrEmpty(UserName))
+					s = "Missing user name.";
+				else if (string.IsNullOrEmpty(Password))
+					s = "Missing password.";
+				else if (!Accept && !Decline)
+					s = "You must either accept or decline the authorization request.";
+				else if (Accept && Decline)
+					s = "You cannot both accept and decline the authorization request.";
+				else if ((Device = await this.Users.TryGetUser(DeviceRef.Device.UserName) as IUserWithClaims) is null)
+					s = "Device no longer registered.";
+				else if ((Owner = await ThingRegistry.TryGetOwner(Device)) is null)
+					s = "Device no longer has owner registered.";
+				else if (Owner.UserName != UserName || 
+					UserCode != ComputeUserCode(DeviceRef.DeviceCode, DeviceRef.Device.UserName, 
+					UserName, BasicAuthentication.ComputePasswordHash(UserName, 
+					this.Environment.Realm, Password, Owner.PasswordHashType)))
+				{
+					s = "Invalid user name, password, or owner.";
+				}
+				else if (DeviceRef.Result.HasValue)
+				{
+					AlreadyResponded = true;
+
+					if (DeviceRef.Result.Value)
+						s = "Authorization request has already been accepted.";
+					else
+						s = "Authorization request has already been declined.";
+				}
+				else
+				{
+					DeviceRef.Result = Accept;
+					await Response.Return(await this.GenerateResult(Request, Response, Accept));
+					return;
+				}
+
+				await Response.Return(await this.GenerateAuthorizationForm(Request, Response,
+					ClientId, UserCode, UserName, Accept, Decline, AlreadyResponded, s));
+			}
+			else if (Form.TryGetValue("client_id", out string ClientId))
 			{
 				if (string.IsNullOrEmpty(ClientId))
 				{
@@ -130,6 +230,12 @@ namespace Waher.Networking.HTTP.OAuth
 				if (Device is null)
 				{
 					await ServiceUnavailable(Response, "access_denied", "Device or owner not registered.");
+					return;
+				}
+
+				if (!(Device is IUserWithClaims DeviceClaims))
+				{
+					await ServiceUnavailable(Response, "access_denied", "Device cannot be used in this interface.");
 					return;
 				}
 
@@ -149,17 +255,19 @@ namespace Waher.Networking.HTTP.OAuth
 
 				StringBuilder sb;
 				string DeviceCode;
-				string UserCode;
 
 				do
 				{
 					DeviceCode = this.Environment.GenerateRandomCode(32);
-					UserCode = ComputeUserCode(DeviceCode, ClientId, Owner);
+					UserCode = ComputeUserCode(DeviceCode, ClientId, Owner.UserName, Owner.PasswordHash);
 				}
-				while (codes.ContainsKey(UserCode));
+				while (
+					codes.ContainsKey(UserCode) ||
+					codes.ContainsKey(DeviceCode));
 
-				DeviceRef Ref = new DeviceRef(ClientId, Scopes, DeviceCode, UserCode);
+				DeviceRef Ref = new DeviceRef(DeviceClaims, Owner, Scopes, DeviceCode, UserCode);
 				codes.Add(UserCode, Ref);
+				codes.Add(DeviceCode, Ref);
 
 				Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 				Response.SetHeader("Pragma", "no-cache");
@@ -183,97 +291,65 @@ namespace Waher.Networking.HTTP.OAuth
 					{ "verification_uri", VerificationUrl },
 					{ "verification_uri_complete", VerificationUrlComplete },
 					{ "expires_in", 3600 },
-					{ "interval", 5 }
+					{ "interval", MinimumIntervalSeconds }
 				});
-			}
-			else if (Form.TryGetValue("user_code", out string UserCode))
-			{
-				if (!Form.TryGetValue("client_id", out ClientId))
-					ClientId = string.Empty;
-
-				if (!Form.TryGetValue("UserName", out string UserName))
-					UserName = string.Empty;
-
-				if (!Form.TryGetValue("Password", out string Password))
-					Password = string.Empty;
-
-				if (!Form.TryGetValue("Accept", out string s) ||
-					!CommonTypes.TryParse(s, out bool Accept))
-				{
-					Accept = false;
-				}
-
-				if (!Form.TryGetValue("Decline", out s) ||
-					!CommonTypes.TryParse(s, out bool Decline))
-				{
-					Decline = false;
-				}
-
-				IUser? Device;
-				IUser? Owner;
-
-				if (string.IsNullOrEmpty(UserCode))
-					s = "Missing User Code";
-				else if (!codes.TryGetValue(UserCode, out DeviceRef DeviceRef))
-					s = "Invalid User Code";
-				else if (string.IsNullOrEmpty(UserName))
-					s = "Missing user name.";
-				else if (string.IsNullOrEmpty(Password))
-					s = "Missing password.";
-				else if (!Accept || !Decline)
-					s = "You must either accept or decline the authorization request.";
-				else if (Accept && Decline)
-					s = "You cannot both accept and decline the authorization request.";
-				else if ((Device = await this.Users.TryGetUser(DeviceRef.ClientId)) is null)
-					s = "Device no longer registered.";
-				else if ((Owner = await ThingRegistry.TryGetOwner(Device)) is null)
-					s = "Device no longer has owner registered.";
-				else if (Owner.UserName != UserName || UserCode != ComputeUserCode(
-					DeviceRef.DeviceCode, DeviceRef.ClientId, Owner))
-				{
-					s = "Invalid user name, password, or owner.";
-				}
-				else
-				{
-					DeviceRef.Result = Accept;
-					await Response.Return(await this.GenerateResult(Request, Response, Accept));
-					return;
-				}
-
-				await Response.Return(await this.GenerateAuthorizationForm(Request, Response,
-					ClientId, UserCode, UserName, Accept, Decline, s));
 			}
 			else
 				await BadRequest(Response, "invalid_request", "Missing client_id or user_code.");
 		}
 
-		private static string ComputeUserCode(string DeviceCode, string ClientId, IUser Owner)
+		private static string ComputeUserCode(string DeviceCode, string ClientId, 
+			string OwnerUserName, string OwnerPasswordHash)
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.Append(DeviceCode);
 			sb.Append('|');
 			sb.Append(ClientId);
 			sb.Append('|');
-			sb.Append(Owner.UserName);
+			sb.Append(OwnerUserName);
 			sb.Append('|');
-			sb.Append(Owner.PasswordHash);
+			sb.Append(OwnerPasswordHash);
 
 			SHAKE256 H = new SHAKE256(64);
 			return Base64Url.Encode(H.ComputeVariable(Encoding.UTF8.GetBytes(sb.ToString())));
 		}
 
-		private class DeviceRef
+		internal bool TryGetDeviceReference(string DeviceCode,
+			[NotNullWhen(true)] out DeviceRef? Reference)
 		{
-			public DeviceRef(string ClientId, string[] Scopes, string DeviceCode,
-				string UserCode)
+			if (!codes.TryGetValue(DeviceCode, out Reference))
+				return false;
+
+			if (Reference.DeviceCode != DeviceCode) // if attempting to use the user_code
 			{
-				this.ClientId = ClientId;
+				Reference = null;
+				return false;
+			}
+
+			return true;
+		}
+
+		internal class DeviceRef
+		{
+			public DeviceRef(IUserWithClaims Device, IUser Owner, string[] Scopes,
+				string DeviceCode, string UserCode)
+			{
+				this.Device = Device;
+				this.Owner = Owner;
 				this.Scopes = Scopes;
 				this.DeviceCode = DeviceCode;
 				this.UserCode = UserCode;
 			}
 
-			public string ClientId;
+			public void Remove()
+			{
+				codes.Remove(this.DeviceCode);
+				codes.Remove(this.UserCode);
+			}
+
+			public IUserWithClaims Device;
+			public DateTime? LastPoll = null;
+			public IUser Owner;
 			public string[] Scopes;
 			public string DeviceCode;
 			public string UserCode;
@@ -281,8 +357,8 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		private async Task<HtmlDocument> GenerateAuthorizationForm(HttpRequest Request,
-			HttpResponse Response, string ClientId, string UserCode, string UserName, 
-			bool Accept, bool Decline, string ErrorMessage)
+			HttpResponse Response, string ClientId, string UserCode, string UserName,
+			bool Accept, bool Decline, bool AlreadyResponded, string ErrorMessage)
 		{
 			StringBuilder Markdown = new StringBuilder();
 
@@ -312,11 +388,12 @@ namespace Waher.Networking.HTTP.OAuth
 				Markdown.Append(ClientId);
 				Markdown.Append("`");
 			}
-			
+
 			Markdown.Append(" is requesting authorization to connect. As its registered ");
 			Markdown.Append("owner, you can either accept or decline this request, by ");
 			Markdown.Append("providing your credentials below, selecting the appropriate ");
-			Markdown.Append("option, and submit the form.");
+			Markdown.AppendLine("option, and submit the form.");
+			Markdown.AppendLine();
 
 			Markdown.Append("<form id='AuthorizationForm' action='");
 			Markdown.Append(this.ResourceName);
@@ -325,59 +402,63 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.Append("<input type='hidden' name='client_id' value='");
 			Markdown.Append(XML.HtmlAttributeEncode(ClientId));
 			Markdown.AppendLine("'/>");
+			Markdown.AppendLine();
 
-			Markdown.AppendLine("<p>");
-			Markdown.AppendLine("<label for='user_code'>User Code:</label>  ");
-			Markdown.Append("<input name='user_code' type='text' autofocus autocomplete='off");
-
-			if (!string.IsNullOrEmpty(UserCode))
+			if (!AlreadyResponded)
 			{
-				Markdown.Append("' value='");
-				Markdown.Append(XML.HtmlAttributeEncode(UserCode));
+				Markdown.AppendLine("<p>");
+				Markdown.AppendLine("<label for='user_code'>User Code:</label>  ");
+				Markdown.Append("<input id='user_code' name='user_code' type='text' autofocus autocomplete='off");
+
+				if (!string.IsNullOrEmpty(UserCode))
+				{
+					Markdown.Append("' value='");
+					Markdown.Append(XML.HtmlAttributeEncode(UserCode));
+				}
+
+				Markdown.AppendLine("'/>");
+				Markdown.AppendLine("</p>");
+				Markdown.AppendLine();
+
+				Markdown.AppendLine("<p>");
+				Markdown.Append("<input id='Accept' name='Accept' type='checkbox' ");
+				Markdown.Append("title='Check this box to authorize the device access.'");
+				if (Accept)
+					Markdown.Append(" checked");
+				Markdown.AppendLine("/>");
+				Markdown.AppendLine("<label for='Accept'>Accept authorization.</label>  ");
+				Markdown.AppendLine("</p>");
+				Markdown.AppendLine();
+
+				Markdown.AppendLine("<p>");
+				Markdown.Append("<input id='Decline' name='Decline' type='checkbox' ");
+				Markdown.Append("title='Check this box to decline the authorization request.'");
+				if (Decline)
+					Markdown.Append(" checked");
+				Markdown.AppendLine("/>");
+				Markdown.AppendLine("<label for='Decline'>Decline authorization.</label>  ");
+				Markdown.AppendLine("</p>");
+				Markdown.AppendLine();
+
+				Markdown.AppendLine("<p>");
+				Markdown.AppendLine("<label for='UserName'>User Name:</label>  ");
+				Markdown.Append("<input id='UserName' name='UserName' type='text' autocomplete='username");
+				if (!string.IsNullOrEmpty(UserName))
+				{
+					Markdown.Append("' value='");
+					Markdown.Append(XML.HtmlAttributeEncode(UserName));
+				}
+				Markdown.AppendLine("'/>");
+				Markdown.AppendLine("</p>");
+				Markdown.AppendLine();
+
+				Markdown.AppendLine("<p>");
+				Markdown.AppendLine("<label for='Password'>Password:</label>  ");
+				Markdown.Append("<input id='Password' name='Password' type='password' ");
+				Markdown.AppendLine("autocomplete='current-password'/>");
+				Markdown.AppendLine("</p>");
+				Markdown.AppendLine();
 			}
-
-			Markdown.AppendLine("'/>");
-			Markdown.AppendLine("</p>");
-			Markdown.AppendLine();
-
-			Markdown.AppendLine("<p>");
-			Markdown.Append("<input name='Accept' type='checkbox' ");
-			Markdown.Append("title='Check this box to authorize the device access.'");
-			if (Accept)
-				Markdown.Append(" checked");
-			Markdown.AppendLine("/>");
-			Markdown.AppendLine("<label for='Accept'>Accept authorization.</label>  ");
-			Markdown.AppendLine("</p>");
-			Markdown.AppendLine();
-
-			Markdown.AppendLine("<p>");
-			Markdown.Append("<input name='Decline' type='checkbox' ");
-			Markdown.Append("title='Check this box to decline the authorization request.'");
-			if (Decline)
-				Markdown.Append(" checked");
-			Markdown.AppendLine("/>");
-			Markdown.AppendLine("<label for='Decline'>Decline authorization.</label>  ");
-			Markdown.AppendLine("</p>");
-			Markdown.AppendLine();
-
-			Markdown.AppendLine("<p>");
-			Markdown.AppendLine("<label for='UserName'>User Name:</label>  ");
-			Markdown.Append("<input name='UserName' type='text' autocomplete='username");
-			if (!string.IsNullOrEmpty(UserName))
-			{
-				Markdown.Append("' value='");
-				Markdown.Append(XML.HtmlAttributeEncode(UserName));
-			}
-			Markdown.AppendLine("'/>");
-			Markdown.AppendLine("</p>");
-			Markdown.AppendLine();
-
-			Markdown.AppendLine("<p>");
-			Markdown.AppendLine("<label for='Password'>Password:</label>  ");
-			Markdown.Append("<input name='Password' type='password' ");
-			Markdown.AppendLine("autocomplete='current-password' autofocus/>");
-			Markdown.AppendLine("</p>");
-			Markdown.AppendLine();
 
 			if (!string.IsNullOrEmpty(ErrorMessage))
 			{
@@ -389,7 +470,9 @@ namespace Waher.Networking.HTTP.OAuth
 				Markdown.AppendLine();
 			}
 
-			Markdown.AppendLine("<button type='submit'>Submit</button>");
+			if (!AlreadyResponded)
+				Markdown.AppendLine("<button type='submit'>Submit</button>");
+
 			Markdown.AppendLine("</form>");
 
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString());

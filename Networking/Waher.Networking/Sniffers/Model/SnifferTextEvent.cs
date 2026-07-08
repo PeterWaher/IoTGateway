@@ -11,7 +11,8 @@ namespace Waher.Networking.Sniffers.Model
 		{
 			"password",
 			"secret",
-			"key"
+			"key",
+			"authorization"
 		};
 		private readonly string text;
 

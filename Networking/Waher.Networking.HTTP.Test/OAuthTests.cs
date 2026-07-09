@@ -977,7 +977,9 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		[DataRow(LoginMethod.ImplicitGet)]
 		[DataRow(LoginMethod.ImplicitPost)]
-		public async Task Test_30_ImplicitGrantDoesNotIssueRefreshToken(LoginMethod Method)
+		[DataRow(LoginMethod.ClientCredentials)]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		public async Task Test_30_ImplicitAndClientGrantsDoesNotIssueRefreshToken(LoginMethod Method)
 		{
 			AuthorizationResult Result = await Authorize(Method);
 
@@ -2172,11 +2174,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
-		[DataRow(LoginMethod.ImplicitGet)]
-		[DataRow(LoginMethod.ImplicitPost)]
 		[DataRow(LoginMethod.Password)]
-		[DataRow(LoginMethod.ClientCredentials)]
-		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
 		public async Task Test_76_RefreshTokenPreserveScope(LoginMethod Method)
 		{
 			TokenResult InitialToken = await Login(Method, TestScopeReadWrite);
@@ -2195,11 +2193,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
-		[DataRow(LoginMethod.ImplicitGet)]
-		[DataRow(LoginMethod.ImplicitPost)]
 		[DataRow(LoginMethod.Password)]
-		[DataRow(LoginMethod.ClientCredentials)]
-		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
 		public async Task Test_77_RefreshTokenGrantCanReduceScope(LoginMethod Method)
 		{
 			TokenResult InitialToken = await Login(Method, TestScopeReadWrite);

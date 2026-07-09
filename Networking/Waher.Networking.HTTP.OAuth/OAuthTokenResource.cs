@@ -471,14 +471,23 @@ namespace Waher.Networking.HTTP.OAuth
 						return;
 					}
 
-					foreach (string Scope2 in Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+					if (string.IsNullOrEmpty(Scope))
+						Scope = (TokenFamily.Scopes?.Length ?? 0) == 0 ? string.Empty : string.Join(' ', TokenFamily.Scopes);
+					else
 					{
-						if (Array.IndexOf(TokenFamily.Scopes, Scope2) < 0)
+						string[] NewScopes = Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+						foreach (string Scope2 in NewScopes)
 						{
-							await Forbidden(Response, "invalid_scope",
-								"Not permitted to escalate scope.");
-							return;
+							if (Array.IndexOf(TokenFamily.Scopes, Scope2) < 0)
+							{
+								await Forbidden(Response, "invalid_scope",
+									"Not permitted to escalate scope.");
+								return;
+							}
 						}
+
+						TokenFamily.Scopes = NewScopes;
 					}
 
 					refreshTokens.Remove(RefreshToken);
@@ -687,7 +696,7 @@ namespace Waher.Networking.HTTP.OAuth
 			public IEnumerable<string> Tokens => this.tokens;
 			public IUserWithClaims User { get; }
 			public HttpRequest FirstRequest { get; }
-			public string[] Scopes { get; }
+			public string[] Scopes { get; set; }
 			public bool HasRemoteCertificate { get; }
 			public string RemoteEndpoint { get; }
 			public string RemoteCertificateSerialNumber { get; }

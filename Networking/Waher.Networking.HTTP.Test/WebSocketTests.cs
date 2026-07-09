@@ -98,7 +98,7 @@ namespace Waher.Networking.HTTP.Test
 		public Task<IUser> TryGetUser(string UserName)
 		{
 			if (UserName == "User")
-				return Task.FromResult<IUser>(new User("User", "Password"));
+				return Task.FromResult<IUser>(new User("User", "Password", []));
 			else
 				return Task.FromResult<IUser>(null);
 		}

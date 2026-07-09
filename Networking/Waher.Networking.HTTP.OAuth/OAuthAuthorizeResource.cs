@@ -163,7 +163,7 @@ namespace Waher.Networking.HTTP.OAuth
 					return;
 
 				case "token":       // Implicit
-					if (!this.Environment.HasJwtFactory)
+					if (this.JwtFactory is null)
 					{
 						await ServiceUnavailable(Response, "server_error",
 							"JWT Factory not available.");
@@ -206,7 +206,8 @@ namespace Waher.Networking.HTTP.OAuth
 						Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 						Response.SetHeader("Pragma", "no-cache");
 
-						string Token = await User.CreateToken(this.JwtFactory, Request.Encrypted);
+						string Token = await OAuthTokenResource.CreateToken(User, 
+							Request.Encrypted, this.JwtFactory, Scope);
 
 						await Response.Return(this.TokenResource.TokenResponse(Token, State,
 							3600, Scopes, this.JwtFactory?.Issuer, false, User, Request));
@@ -250,8 +251,17 @@ namespace Waher.Networking.HTTP.OAuth
 					return;
 
 				default:
-					await BadRequest(Response, "invalid_request",
-						"Unsupported response_type parameter: " + ResponseType);
+					if (string.IsNullOrEmpty(ResponseType))
+					{
+						await BadRequest(Response, "invalid_request",
+							"Empty response_type.");
+						return;
+					}
+					else
+					{
+						await BadRequest(Response, "unsupported_response_type",
+							"Unsupported response_type parameter: " + ResponseType);
+					}
 					return;
 			}
 		}

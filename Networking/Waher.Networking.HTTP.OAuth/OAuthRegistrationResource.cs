@@ -101,7 +101,7 @@ namespace Waher.Networking.HTTP.OAuth
 									!string.IsNullOrEmpty(Parsed.Fragment) ||
 									!string.IsNullOrEmpty(Parsed.Query))
 								{
-									await BadRequest(Response, "invalid_request", "Invalid redirection URI.");
+									await BadRequest(Response, "invalid_redirect_uri", "Invalid redirection URI.");
 									return;
 								}
 							}

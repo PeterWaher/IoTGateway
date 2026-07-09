@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.HTTP.Authentication;
+using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Collections;
 using Waher.Runtime.IO;
@@ -68,7 +69,7 @@ namespace Waher.Networking.HTTP.OAuth
 			if (this.JwtFactory is null)
 				throw new ServiceUnavailableException("No JWT factory configured.");
 
-			string Token = await User.CreateToken(this.JwtFactory, Encrypted);
+			string Token = await this.CreateToken(User, Encrypted, Scope);
 			string Code = this.GenerateRandomCode();
 
 			codes[Code] = new TokenRef(Token, User, CodeChallenge, CodeChallengeMethod,
@@ -126,7 +127,7 @@ namespace Waher.Networking.HTTP.OAuth
 					case "plain":
 						if (CodeVerifier != this.CodeChallenge)
 						{
-							await Forbidden(Response, "access_denied",
+							await Forbidden(Response, "invalid_grant",
 								"Invalid code_verifier.");
 							return false;
 						}
@@ -138,7 +139,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 						if (ExpectedCodeChallenge != this.CodeChallenge)
 						{
-							await Forbidden(Response, "access_denied",
+							await Forbidden(Response, "invalid_grant",
 								"Invalid code_verifier.");
 							return false;
 						}
@@ -177,7 +178,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 			if (!codes.TryGetValue(Code, out TokenRef Ref))
 			{
-				await Forbidden(Response, "access_denied", "Invalid code.");
+				await Forbidden(Response, "invalid_grant", "Invalid code.");
 				return;
 			}
 
@@ -258,7 +259,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 					if (!codes.TryGetValue(Code, out TokenRef Ref))
 					{
-						await Forbidden(Response, "access_denied", "Invalid code.");
+						await Forbidden(Response, "invalid_grant", "Invalid code.");
 						return;
 					}
 
@@ -336,7 +337,7 @@ namespace Waher.Networking.HTTP.OAuth
 							}
 
 							User = UserWithClaims;
-							Token = await UserWithClaims.CreateToken(this.JwtFactory, Request.Encrypted);
+							Token = await this.CreateToken(UserWithClaims, Request.Encrypted, Scope);
 							break;
 						}
 					}
@@ -364,7 +365,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 						if (LoginResult is null)
 						{
-							await Forbidden(Response, "access_denied",
+							await Forbidden(Response, "invalid_client",
 								"User cannot authenticate via this interface.");
 							return;
 						}
@@ -377,23 +378,23 @@ namespace Waher.Networking.HTTP.OAuth
 
 							case LoginResultType.InvalidCredentials:
 							default:
-								await Forbidden(Response, "access_denied",
+								await Forbidden(Response, "invalid_grant",
 									"Invalid client_id or client_secret.");
 								return;
 
 							case LoginResultType.NoPassword:
-								await Forbidden(Response, "access_denied",
+								await Forbidden(Response, "invalid_grant",
 									"No or empty client_secret.");
 								return;
 
 							case LoginResultType.TemporarilyBlocked:
-								await Forbidden(Response, "access_denied",
+								await Forbidden(Response, "invalid_grant",
 									"Temporarily blocked. Try again after: " +
 									LoginResult.Next?.ToString());
 								return;
 
 							case LoginResultType.PermanentlyBlocked:
-								await Forbidden(Response, "access_denied",
+								await Forbidden(Response, "invalid_client",
 									"Permanently blocked.");
 								return;
 						}
@@ -406,7 +407,7 @@ namespace Waher.Networking.HTTP.OAuth
 						}
 
 						User = UserWithClaims;
-						Token = await UserWithClaims.CreateToken(this.JwtFactory, Request.Encrypted);
+						Token = await this.CreateToken(UserWithClaims, Request.Encrypted, Scope);
 					}
 					else
 					{
@@ -484,7 +485,7 @@ namespace Waher.Networking.HTTP.OAuth
 					usedRefreshTokens.Add(RefreshToken, TokenFamily);
 
 					User = TokenFamily.User;
-					Token = await User.CreateToken(this.JwtFactory, Request.Encrypted);
+					Token = await this.CreateToken(User, Request.Encrypted, Scope);
 					break;
 
 				case OAuthDeviceAuthorizationResource.GrantType:
@@ -552,13 +553,13 @@ namespace Waher.Networking.HTTP.OAuth
 					}
 
 					User = DeviceReference.Device;
-					Token = await User.CreateToken(this.JwtFactory, Request.Encrypted);
+					Token = await this.CreateToken(User, Request.Encrypted, Scope);
 
 					DeviceReference.Remove();
 					break;
 
 				default:
-					await BadRequest(Response, "invalid_request",
+					await BadRequest(Response, "unsupported_grant_type",
 						"Unsupported grant_type: " + GrantType);
 					return;
 			}
@@ -569,6 +570,27 @@ namespace Waher.Networking.HTTP.OAuth
 			await Response.Return(this.TokenResponse(Token, null, 3600,
 				Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries),
 				this.JwtFactory?.Issuer, IssueRefreshToken, User, Request, TokenFamily));
+		}
+
+		private async Task<string> CreateToken(IUserWithClaims User, bool Encrypted, 
+			string Scope)
+		{
+			if (this.JwtFactory is null)
+				throw new ServiceUnavailableException("No JWT factory configured.");
+
+			return await CreateToken(User, Encrypted, this.JwtFactory, Scope);
+		}
+
+		internal static async Task<string> CreateToken(IUserWithClaims User, bool Encrypted, 
+			JwtFactory JwtFactory, string Scope)
+		{
+			if (string.IsNullOrEmpty(Scope))
+				return await User.CreateToken(JwtFactory, Encrypted);
+			else
+			{
+				return await User.CreateToken(JwtFactory, Encrypted,
+					new KeyValuePair<string, object>(JwtClaims.Scope, Scope));
+			}
 		}
 
 		internal static async Task<LoginResult?> DoLogin(string UserName, string Password,
@@ -741,7 +763,7 @@ namespace Waher.Networking.HTTP.OAuth
 		{
 			foreach (string Scope in Scopes)
 			{
-				string Privilege = "OAUTH.Scope." + Scope.Replace(':', '.');
+				string Privilege = OAuthScopePrivilegePrefix + Scope.Replace(':', '.');
 				if (!User.HasPrivilege(Privilege))
 				{
 					MissingPrivilege = Privilege;

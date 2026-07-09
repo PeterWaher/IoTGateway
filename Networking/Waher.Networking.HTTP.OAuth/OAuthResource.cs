@@ -12,6 +12,11 @@ namespace Waher.Networking.HTTP.OAuth
 	/// </summary>
 	public abstract class OAuthResource : HttpSynchronousResource
 	{
+		/// <summary>
+		/// Privilege prefix for OAUTH scopes.
+		/// </summary>
+		public const string OAuthScopePrivilegePrefix = "OAUTH.Scope.";
+
 		private HttpAuthenticationScheme[]? authenticationSchemes = null;
 		private OAuth2Environment environment;
 
@@ -147,6 +152,20 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		/// <summary>
+		/// Returns default content for an error, for the resource. If returning null, server will choose default content.
+		/// </summary>
+		/// <param name="StatusCode">Status code.</param>
+		/// <returns>Default content, or null if resource lets server choose.</returns>
+		public override Task<object> DefaultErrorContent(int StatusCode)
+		{
+			return Task.FromResult<object>(new Dictionary<string, object>()
+			{
+				{ "error", "invalid_client" },
+				{ "error_description", "Unauthorized access prohibited." }
+			});
+		}
+
+		/// <summary>
 		/// Returns an error back to the client.
 		/// </summary>
 		/// <param name="Response">HTTP response object.</param>
@@ -154,7 +173,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="ErrorDescription">Error description.</param>
 		/// <param name="StatusCode">HTTP status code.</param>
 		/// <param name="StatusMessage">HTTP status message.</param>
-		protected static Task ReturnError(HttpResponse Response, string ErrorCode, 
+		protected static Task ReturnError(HttpResponse Response, string ErrorCode,
 			string ErrorDescription, int StatusCode, string StatusMessage)
 		{
 			Response.StatusCode = StatusCode;
@@ -183,10 +202,10 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="ErrorCode">Error code.</param>
 		/// <param name="ErrorDescription">Error description.</param>
-		protected static Task BadRequest(HttpResponse Response, string ErrorCode, 
+		protected static Task BadRequest(HttpResponse Response, string ErrorCode,
 			string ErrorDescription)
 		{
-			return ReturnError(Response, ErrorCode, ErrorDescription, 
+			return ReturnError(Response, ErrorCode, ErrorDescription,
 				BadRequestException.Code, BadRequestException.StatusMessage);
 		}
 
@@ -196,7 +215,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="ErrorCode">Error code.</param>
 		/// <param name="ErrorDescription">Error description.</param>
-		protected static Task Forbidden(HttpResponse Response, string ErrorCode, 
+		protected static Task Forbidden(HttpResponse Response, string ErrorCode,
 			string ErrorDescription)
 		{
 			return ReturnError(Response, ErrorCode, ErrorDescription,
@@ -210,7 +229,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="ErrorCode">Error code.</param>
 		/// <param name="ErrorDescription">Error description.</param>
 		/// <param name="Challenges">Authorization challenges.</param>
-		protected static Task Unauthorized(HttpResponse Response, string ErrorCode, 
+		protected static Task Unauthorized(HttpResponse Response, string ErrorCode,
 			string ErrorDescription, string[] Challenges)
 		{
 			Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
@@ -226,7 +245,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="ErrorCode">Error code.</param>
 		/// <param name="ErrorDescription">Error description.</param>
-		protected static Task NotFound(HttpResponse Response, string ErrorCode, 
+		protected static Task NotFound(HttpResponse Response, string ErrorCode,
 			string ErrorDescription)
 		{
 			return ReturnError(Response, ErrorCode, ErrorDescription,
@@ -239,7 +258,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="ErrorCode">Error code.</param>
 		/// <param name="ErrorDescription">Error description.</param>
-		protected static Task ServiceUnavailable(HttpResponse Response, string ErrorCode, 
+		protected static Task ServiceUnavailable(HttpResponse Response, string ErrorCode,
 			string ErrorDescription)
 		{
 			return ReturnError(Response, ErrorCode, ErrorDescription,

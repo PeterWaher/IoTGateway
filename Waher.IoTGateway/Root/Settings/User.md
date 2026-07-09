@@ -70,7 +70,7 @@ if exists(Posted) then
 	else
 		Item.MetaData:=null;
 
-	Item.RoleIds:=[foreach RoleId in (Posted.Roles???"").Split(Waher.Content.CommonTypes.CRLF,System.StringSplitOptions.RemoveEmptyEntries) : Trim(RoleId)];
+	Item.RoleIds:=[RoleId in [foreach RoleId in (Posted.Roles???"").Split(Waher.Content.CommonTypes.CRLF,System.StringSplitOptions.RemoveEmptyEntries) : Trim(RoleId)] : !empty(RoleId)];
 	
 	if empty(Item.ObjectId) then
 	(

@@ -290,10 +290,14 @@ namespace Waher.Security.Users
 		/// </summary>
 		/// <param name="Factory">JWT Factory.</param>
 		/// <param name="Encrypted">If communication is encrypted.</param>
+		/// <param name="AdditionalClaims">Additional claims to include in the token.</param>
 		/// <returns>Token, if able to create a token, null otherwise.</returns>
-		public async Task<string> CreateToken(JwtFactory Factory, bool Encrypted)
+		public async Task<string> CreateToken(JwtFactory Factory, bool Encrypted,
+			params KeyValuePair<string, object>[] AdditionalClaims)
 		{
-			return Factory.Create(await this.CreateClaims(Encrypted));
+			IEnumerable<KeyValuePair<string, object>> Claims = await this.CreateClaims(Encrypted);
+			Claims = JwtFactory.JoinClaims(Claims, AdditionalClaims);
+			return Factory.Create(Claims);
 		}
 
 		/// <summary>

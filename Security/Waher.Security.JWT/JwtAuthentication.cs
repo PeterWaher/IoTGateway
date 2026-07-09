@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
-using Waher.Networking.HTTP.ScriptExtensions.Functions.ClientError;
 using Waher.Security.LoginMonitor;
 
 namespace Waher.Security.JWT

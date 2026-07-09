@@ -61,8 +61,10 @@ namespace Waher.Security.JWT
 		/// </summary>
 		/// <param name="Factory">JWT Factory.</param>
 		/// <param name="Encrypted">If communication is encrypted.</param>
+		/// <param name="AdditionalClaims">Additional claims to include in the token.</param>
 		/// <returns>Token, if able to create a token, null otherwise.</returns>
-		public Task<string> CreateToken(JwtFactory Factory, bool Encrypted)
+		public Task<string> CreateToken(JwtFactory Factory, bool Encrypted,
+			params KeyValuePair<string, object>[] AdditionalClaims)
 		{
 			return Task.FromResult(this.Token.Token);
 		}

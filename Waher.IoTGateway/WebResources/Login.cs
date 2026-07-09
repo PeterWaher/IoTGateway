@@ -272,9 +272,12 @@ namespace Waher.IoTGateway.WebResources
 				return Task.FromResult<IEnumerable<KeyValuePair<string, object>>>(Claims);
 			}
 
-			public async Task<string> CreateToken(JwtFactory Factory, bool Encrypted)
+			public async Task<string> CreateToken(JwtFactory Factory, bool Encrypted,
+				params KeyValuePair<string, object>[] AdditionalClaims)
 			{
-				return Factory.Create(await this.CreateClaims(Encrypted));
+				IEnumerable<KeyValuePair<string, object>> Claims = await this.CreateClaims(Encrypted);
+				Claims = JwtFactory.JoinClaims(Claims, AdditionalClaims);
+				return Factory.Create(Claims);
 			}
 		}
 

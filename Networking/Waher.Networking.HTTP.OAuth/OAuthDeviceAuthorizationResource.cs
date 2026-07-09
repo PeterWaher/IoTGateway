@@ -246,12 +246,8 @@ namespace Waher.Networking.HTTP.OAuth
 					return;
 				}
 
-				string[] Scopes;
-
-				if (Form.TryGetValue("scope", out string Scope))
-					Scopes = Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-				else
-					Scopes = Array.Empty<string>();
+				if (!Form.TryGetValue("scope", out string Scope))
+					Scope = string.Empty;
 
 				StringBuilder sb;
 				string DeviceCode;
@@ -265,7 +261,7 @@ namespace Waher.Networking.HTTP.OAuth
 					codes.ContainsKey(UserCode) ||
 					codes.ContainsKey(DeviceCode));
 
-				DeviceRef Ref = new DeviceRef(DeviceClaims, Owner, Scopes, DeviceCode, UserCode);
+				DeviceRef Ref = new DeviceRef(DeviceClaims, Owner, Scope, DeviceCode, UserCode);
 				codes.Add(UserCode, Ref);
 				codes.Add(DeviceCode, Ref);
 
@@ -331,12 +327,12 @@ namespace Waher.Networking.HTTP.OAuth
 
 		internal class DeviceRef
 		{
-			public DeviceRef(IUserWithClaims Device, IUser Owner, string[] Scopes,
+			public DeviceRef(IUserWithClaims Device, IUser Owner, string Scope,
 				string DeviceCode, string UserCode)
 			{
 				this.Device = Device;
 				this.Owner = Owner;
-				this.Scopes = Scopes;
+				this.Scope = Scope;
 				this.DeviceCode = DeviceCode;
 				this.UserCode = UserCode;
 			}
@@ -350,7 +346,7 @@ namespace Waher.Networking.HTTP.OAuth
 			public IUserWithClaims Device;
 			public DateTime? LastPoll = null;
 			public IUser Owner;
-			public string[] Scopes;
+			public string Scope;
 			public string DeviceCode;
 			public string UserCode;
 			public bool? Result;

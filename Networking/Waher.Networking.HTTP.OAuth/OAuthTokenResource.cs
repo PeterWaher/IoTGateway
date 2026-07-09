@@ -562,6 +562,8 @@ namespace Waher.Networking.HTTP.OAuth
 					}
 
 					User = DeviceReference.Device;
+					Scope = DeviceReference.Scope;
+
 					Token = await this.CreateToken(User, Request.Encrypted, Scope);
 
 					DeviceReference.Remove();

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Html;
+using Waher.Content.Html.Elements;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Networking.HTTP.Authentication;
@@ -148,8 +149,16 @@ namespace Waher.Networking.HTTP.OAuth
 
 			if (Form.TryGetValue("user_code", out string UserCode))
 			{
-				if (!Form.TryGetValue("client_id", out string ClientId))
-					ClientId = string.Empty;
+				if (!Form.TryGetValue("p", out string ParametersToken) ||
+					string.IsNullOrEmpty(ParametersToken) ||
+					!JwtToken.TryParse(ParametersToken, out JwtToken? Parameters) ||
+					!(this.JwtFactory?.IsValid(Parameters) ?? false) ||
+					!Parameters.TryGetClaim("client_id", out object Obj) ||
+					!(Obj is string ClientId))
+				{
+					await BadRequest(Response, "invalid_request", "Missing or invalid parameters provided.");
+					return;
+				}
 
 				if (!Form.TryGetValue("UserName", out string UserName))
 					UserName = string.Empty;
@@ -192,9 +201,9 @@ namespace Waher.Networking.HTTP.OAuth
 					s = "Device no longer registered.";
 				else if ((Owner = await ThingRegistry.TryGetOwner(Device)) is null)
 					s = "Device no longer has owner registered.";
-				else if (Owner.UserName != UserName || 
-					UserCode != ComputeUserCode(DeviceRef.DeviceCode, DeviceRef.Device.UserName, 
-					UserName, BasicAuthentication.ComputePasswordHash(UserName, 
+				else if (Owner.UserName != UserName ||
+					UserCode != ComputeUserCode(DeviceRef.DeviceCode, DeviceRef.Device.UserName,
+					UserName, BasicAuthentication.ComputePasswordHash(UserName,
 					this.Environment.Realm, Password, Owner.PasswordHashType)))
 				{
 					s = "Invalid user name, password, or owner.";
@@ -219,7 +228,7 @@ namespace Waher.Networking.HTTP.OAuth
 					ClientId, UserCode, UserName, Accept, Decline, AlreadyResponded, s));
 			}
 			else if (Form.TryGetValue("client_id", out string ClientId))
-			{
+			{ 
 				if (string.IsNullOrEmpty(ClientId))
 				{
 					await BadRequest(Response, "invalid_request", "Empty client_id.");
@@ -248,6 +257,11 @@ namespace Waher.Networking.HTTP.OAuth
 
 				if (!Form.TryGetValue("scope", out string Scope))
 					Scope = string.Empty;
+				else if (!IsValidScope(Scope))
+				{
+					await BadRequest(Response, "invalid_scope", "Invalid scope parameter.");
+					return;
+				}
 
 				StringBuilder sb;
 				string DeviceCode;
@@ -291,7 +305,7 @@ namespace Waher.Networking.HTTP.OAuth
 				});
 			}
 			else
-				await BadRequest(Response, "invalid_request", "Missing client_id or user_code.");
+				await BadRequest(Response, "invalid_request", "Missing or invalid parameters provided.");
 		}
 
 		private static string ComputeUserCode(string DeviceCode, string ClientId, 
@@ -395,13 +409,16 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.Append(this.ResourceName);
 			Markdown.Append("' method='post'>");
 			Markdown.AppendLine();
-			Markdown.Append("<input type='hidden' name='client_id' value='");
-			Markdown.Append(XML.HtmlAttributeEncode(ClientId));
-			Markdown.AppendLine("'/>");
-			Markdown.AppendLine();
 
 			if (!AlreadyResponded)
 			{
+				string? ParametersToken = this.JwtFactory?.Create(
+					new KeyValuePair<string, object>("client_id", ClientId));
+
+				Markdown.Append("<input type='hidden' name='p' value='");
+				Markdown.Append(XML.HtmlAttributeEncode(ParametersToken));
+				Markdown.AppendLine("'/>");
+				Markdown.AppendLine();
 				Markdown.AppendLine("<p>");
 				Markdown.AppendLine("<label for='user_code'>User Code:</label>  ");
 				Markdown.Append("<input id='user_code' name='user_code' type='text' autofocus autocomplete='off");

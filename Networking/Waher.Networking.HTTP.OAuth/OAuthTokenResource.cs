@@ -200,8 +200,7 @@ namespace Waher.Networking.HTTP.OAuth
 			Response.SetHeader("Pragma", "no-cache");
 
 			await Response.Return(this.TokenResponse(Ref.Token, null, Ref.ExpiresIn,
-				Ref.Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries),
-				this.JwtFactory?.Issuer, true, Ref.User, Request));
+				Ref.Scope, this.JwtFactory?.Issuer, true, Ref.User, Request));
 		}
 
 		/// <summary>
@@ -241,6 +240,11 @@ namespace Waher.Networking.HTTP.OAuth
 
 			if (!Form.TryGetValue("scope", out string Scope))
 				Scope = string.Empty;
+			else if (!IsValidScope(Scope))
+			{
+				await BadRequest(Response, "invalid_scope", "Invalid scope parameter.");
+				return;
+			}
 
 			string ClientId;
 			string Token;
@@ -303,15 +307,18 @@ namespace Waher.Networking.HTTP.OAuth
 				case "client_credentials":
 				case "password":
 					string ClientSecret = string.Empty;
+					string InvalidGrantCode;
 					bool HasCredentials;
 
 					if (GrantType == "password")
 					{
+						InvalidGrantCode = "invalid_grant";
 						HasCredentials = Form.TryGetValue("username", out ClientId) &&
 							Form.TryGetValue("password", out ClientSecret);
 					}
 					else
 					{
+						InvalidGrantCode = "invalid_client";
 						IssueRefreshToken = false;
 
 						if (Request.User is null)
@@ -365,7 +372,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 						if (LoginResult is null)
 						{
-							await Forbidden(Response, "invalid_client",
+							await Forbidden(Response, InvalidGrantCode,
 								"User cannot authenticate via this interface.");
 							return;
 						}
@@ -378,23 +385,23 @@ namespace Waher.Networking.HTTP.OAuth
 
 							case LoginResultType.InvalidCredentials:
 							default:
-								await Forbidden(Response, "invalid_grant",
+								await Forbidden(Response, InvalidGrantCode,
 									"Invalid client_id or client_secret.");
 								return;
 
 							case LoginResultType.NoPassword:
-								await Forbidden(Response, "invalid_grant",
+								await Forbidden(Response, InvalidGrantCode,
 									"No or empty client_secret.");
 								return;
 
 							case LoginResultType.TemporarilyBlocked:
-								await Forbidden(Response, "invalid_grant",
+								await Forbidden(Response, InvalidGrantCode,
 									"Temporarily blocked. Try again after: " +
 									LoginResult.Next?.ToString());
 								return;
 
 							case LoginResultType.PermanentlyBlocked:
-								await Forbidden(Response, "invalid_client",
+								await Forbidden(Response, InvalidGrantCode,
 									"Permanently blocked.");
 								return;
 						}
@@ -579,8 +586,8 @@ namespace Waher.Networking.HTTP.OAuth
 			Response.SetHeader("Pragma", "no-cache");
 
 			await Response.Return(this.TokenResponse(Token, null, 3600,
-				Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries),
-				this.JwtFactory?.Issuer, IssueRefreshToken, User, Request, TokenFamily));
+				Scope, this.JwtFactory?.Issuer, IssueRefreshToken, User, 
+				Request, TokenFamily));
 		}
 
 		private async Task<string> CreateToken(IUserWithClaims User, bool Encrypted, 
@@ -647,15 +654,15 @@ namespace Waher.Networking.HTTP.OAuth
 		}
 
 		internal Dictionary<string, object> TokenResponse(string Token,
-			string? State, int ExpiresIn, string[] Scopes, string? Issuer,
+			string? State, int ExpiresIn, string Scope, string? Issuer,
 			bool IssueRefreshToken, IUserWithClaims User, HttpRequest Request)
 		{
-			return this.TokenResponse(Token, State, ExpiresIn, Scopes, Issuer,
+			return this.TokenResponse(Token, State, ExpiresIn, Scope, Issuer,
 				IssueRefreshToken, User, Request, null);
 		}
 
 		private Dictionary<string, object> TokenResponse(string Token,
-			string? State, int ExpiresIn, string[] Scopes, string? Issuer,
+			string? State, int ExpiresIn, string Scope, string? Issuer,
 			bool IssueRefreshToken, IUserWithClaims User, HttpRequest Request,
 			TokenFamily? TokenFamily)
 		{
@@ -663,8 +670,7 @@ namespace Waher.Networking.HTTP.OAuth
 			{
 				{ "access_token", Token },
 				{ "token_type", "Bearer" },
-				{ "expires_in", ExpiresIn },
-				{ "scope", string.Join(' ', Scopes) }
+				{ "expires_in", ExpiresIn }
 			};
 
 			if (!string.IsNullOrEmpty(State))
@@ -672,6 +678,16 @@ namespace Waher.Networking.HTTP.OAuth
 
 			if (!string.IsNullOrEmpty(Issuer))
 				Result["iss"] = Issuer;
+
+			string[] Scopes;
+
+			if (string.IsNullOrEmpty(Scope))
+				Scopes = Array.Empty<string>();
+			else
+			{
+				Result["scope"] = Scope;
+				Scopes = Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+			}
 
 			if (IssueRefreshToken)
 			{
@@ -745,45 +761,5 @@ namespace Waher.Networking.HTTP.OAuth
 			}
 		}
 
-		/// <summary>
-		/// Checks if a user has the privileges associated with a set of scopes.
-		/// </summary>
-		/// <param name="Scopes">A space-separated list of scopes.</param>
-		/// <param name="User">The user to check privileges for.</param>
-		/// <param name="MissingPrivilege">Priviliege missing from user.</param>
-		/// <returns>True if the user has all the privileges associated with the scopes, 
-		/// otherwise false.</returns>
-		public static bool HasScopePrivileges(string Scopes, IUser User,
-			[NotNullWhen(false)] out string? MissingPrivilege)
-		{
-			return HasScopePrivileges(
-				Scopes.Split(' ', StringSplitOptions.RemoveEmptyEntries),
-				User, out MissingPrivilege);
-		}
-
-		/// <summary>
-		/// Checks if a user has the privileges associated with a set of scopes.
-		/// </summary>
-		/// <param name="Scopes">An array of scopes.</param>
-		/// <param name="User">The user to check privileges for.</param>
-		/// <param name="MissingPrivilege">Priviliege missing from user.</param>
-		/// <returns>True if the user has all the privileges associated with the scopes, 
-		/// otherwise false.</returns>
-		public static bool HasScopePrivileges(string[] Scopes, IUser User, 
-			[NotNullWhen(false)] out string? MissingPrivilege)
-		{
-			foreach (string Scope in Scopes)
-			{
-				string Privilege = OAuthScopePrivilegePrefix + Scope.Replace(':', '.');
-				if (!User.HasPrivilege(Privilege))
-				{
-					MissingPrivilege = Privilege;
-					return false;
-				}
-			}
-
-			MissingPrivilege = null;
-			return true;
-		}
 	}
 }

@@ -2227,23 +2227,18 @@ namespace Waher.Networking.HTTP.Test
 			string RedirectUri = BaseUrl + CallbackResource;
 			string Scope = "read\"write";
 
+			string ScopeParameter = string.IsNullOrEmpty(Scope) ? string.Empty :
+				"&scope=" + Uri.EscapeDataString(Scope);
+
 			ContentResponse Response = await InternetContent.GetAsync(new Uri(
 				BaseUrl + OAuthAuthorizeResource.DefaultResourcePath +
 				"?response_type=code" +
 				"&client_id=" + Uri.EscapeDataString(TestUserName) +
 				"&state=" + Uri.EscapeDataString(State) +
 				"&redirect_uri=" + Uri.EscapeDataString(RedirectUri) +
-				"&scope=" + Uri.EscapeDataString(Scope)));
+				ScopeParameter));
 
-			await AssertAuthorizationError(Response, new Dictionary<string, string>()
-			{
-				{ "client_id", TestUserName },
-				{ "client_secret", TestPassword },
-				{ "redirect_uri", RedirectUri },
-				{ "state", State },
-				{ "response_type", "code" },
-				{ "scope", Scope }
-			}, "invalid_scope");
+			AssertOAuthError(Response, "invalid_scope", BadRequestException.Code, ForbiddenException.Code);
 		}
 
 		[TestMethod]
@@ -2595,12 +2590,14 @@ namespace Waher.Networking.HTTP.Test
 					{
 						{ "response_type", "code" },
 						{ "state", State },
-						{ "scope", Scope },
 						{ "redirect_uri", RedirectUri }
 					};
 
 					if (!string.IsNullOrEmpty(UserName))
 						Request["client_id"] = UserName;
+
+					if (!string.IsNullOrEmpty(Scope))
+						Request["scope"] = Scope;
 
 					AuthorizeResponse = await InternetContent.PostAsync(
 						new Uri(AuthorizeUri), Request);

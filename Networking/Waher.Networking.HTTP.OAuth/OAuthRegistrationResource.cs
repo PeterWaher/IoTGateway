@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Html.Elements;
 using Waher.Networking.HTTP.OAuth.Interfaces;
 using Waher.Runtime.Collections;
 
@@ -185,7 +186,14 @@ namespace Waher.Networking.HTTP.OAuth
 						break;
 
 					case "scope":
-						Scopes = P.Value?.ToString().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+						string Scope = P.Value?.ToString() ?? string.Empty;
+						if (!IsValidScope(Scope))
+						{
+							await BadRequest(Response, "invalid_scope", "Invalid scope parameter.");
+							return;
+						}
+
+						Scopes = Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 						break;
 
 					case "jwks":

@@ -123,6 +123,11 @@ namespace Waher.Networking.HTTP.OAuth
 
 			if (!Form.TryGetValue("scope", out string Scope))
 				Scope = string.Empty;
+			else if (!IsValidScope(Scope))
+			{
+				await BadRequest(Response, "invalid_scope", "Invalid scope parameter.");
+				return;
+			}
 
 			switch (ResponseType)
 			{
@@ -195,8 +200,7 @@ namespace Waher.Networking.HTTP.OAuth
 							return;
 						}
 
-						string[] Scopes = Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-						if (!OAuthTokenResource.HasScopePrivileges(Scopes, User, out string? MissingPrivilege))
+						if (!HasScopePrivileges(Scope, User, out string? MissingPrivilege))
 						{
 							await Forbidden(Response, "access_denied",
 								"User lacks privilege: " + MissingPrivilege);
@@ -206,11 +210,11 @@ namespace Waher.Networking.HTTP.OAuth
 						Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 						Response.SetHeader("Pragma", "no-cache");
 
-						string Token = await OAuthTokenResource.CreateToken(User, 
+						string Token = await OAuthTokenResource.CreateToken(User,
 							Request.Encrypted, this.JwtFactory, Scope);
 
 						await Response.Return(this.TokenResource.TokenResponse(Token, State,
-							3600, Scopes, this.JwtFactory?.Issuer, false, User, Request));
+							3600, Scope, this.JwtFactory?.Issuer, false, User, Request));
 						return;
 					}
 
@@ -297,23 +301,18 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine("========");
 			Markdown.AppendLine();
 
+			string? ParametersToken = this.JwtFactory?.Create(
+				new KeyValuePair<string, object>("redirect_uri", From),
+				new KeyValuePair<string, object>("state", State),
+				new KeyValuePair<string, object>("scope", Scope),
+				new KeyValuePair<string, object>("code_challenge", CodeChallenge),
+				new KeyValuePair<string, object>("code_challenge_method", CodeChallengeMethod));
+
 			Markdown.Append("<form id='LoginForm' action='");
 			Markdown.Append(this.ResourceName);
 			Markdown.Append("' method='post'>");
-			Markdown.Append("<input type='hidden' name='redirect_uri' value='");
-			Markdown.Append(XML.HtmlAttributeEncode(From));
-			Markdown.AppendLine("'/>");
-			Markdown.Append("<input type='hidden' name='state' value='");
-			Markdown.Append(XML.HtmlAttributeEncode(State));
-			Markdown.AppendLine("'/>");
-			Markdown.Append("<input type='hidden' name='scope' value='");
-			Markdown.Append(XML.HtmlAttributeEncode(Scope));
-			Markdown.AppendLine("'/>");
-			Markdown.Append("<input type='hidden' name='code_challenge' value='");
-			Markdown.Append(XML.HtmlAttributeEncode(CodeChallenge));
-			Markdown.AppendLine("'/>");
-			Markdown.Append("<input type='hidden' name='code_challenge_method' value='");
-			Markdown.Append(XML.HtmlAttributeEncode(CodeChallengeMethod));
+			Markdown.Append("<input type='hidden' name='p' value='");
+			Markdown.Append(XML.HtmlAttributeEncode(ParametersToken));
 			Markdown.AppendLine("'/>");
 			Markdown.AppendLine();
 
@@ -390,16 +389,21 @@ namespace Waher.Networking.HTTP.OAuth
 
 			if (!Form.TryGetValue("client_id", out string UserName) ||
 				!Form.TryGetValue("client_secret", out string Password) ||
-				!Form.TryGetValue("redirect_uri", out string RedirectUri) ||
-				!Form.TryGetValue("state", out string State) ||
-				!Form.TryGetValue("scope", out string Scope) ||
-				!Form.TryGetValue("code_challenge", out string CodeChallenge))
+				!Form.TryGetValue("p", out string ParametersToken) ||
+				string.IsNullOrEmpty(ParametersToken) ||
+				!JwtToken.TryParse(ParametersToken, out JwtToken? Parameters) ||
+				!(this.JwtFactory?.IsValid(Parameters) ?? false) ||
+				!Parameters.TryGetClaim("redirect_uri", out object Obj) || !(Obj is string RedirectUri) ||
+				!Parameters.TryGetClaim("state", out Obj) || !(Obj is string State) ||
+				!Parameters.TryGetClaim("scope", out Obj) || !(Obj is string Scope) ||
+				!Parameters.TryGetClaim("code_challenge", out Obj) || !(Obj is string CodeChallenge))
 			{
 				await BadRequest(Response, "invalid_request", "Invalid form.");
 				return;
 			}
 
-			if (!Form.TryGetValue("code_challenge_method", out string CodeChallengeMethod) ||
+			if (!Parameters.TryGetClaim("code_challenge_method", out Obj) ||
+				!(Obj is string CodeChallengeMethod) ||
 				string.IsNullOrWhiteSpace(CodeChallengeMethod))
 			{
 				CodeChallengeMethod = "plain";
@@ -441,6 +445,15 @@ namespace Waher.Networking.HTTP.OAuth
 						await Response.Return(await this.GenerateLoginForm(Request,
 							Response, UserName, RedirectUri, State, Scope, CodeChallenge,
 							CodeChallengeMethod, "User cannot be used with OAUTH login."));
+						return;
+					}
+
+					if (!string.IsNullOrEmpty(Scope) &&
+						!HasScopePrivileges(Scope, LoginResult.User, out string? _))
+					{
+						await Response.Return(await this.GenerateLoginForm(Request,
+							Response, UserName, RedirectUri, State, Scope, CodeChallenge,
+							CodeChallengeMethod, "User does not have sufficient privileges to complete the request."));
 						return;
 					}
 

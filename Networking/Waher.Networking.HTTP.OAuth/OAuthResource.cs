@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Runtime.Inventory;
@@ -263,6 +265,82 @@ namespace Waher.Networking.HTTP.OAuth
 		{
 			return ReturnError(Response, ErrorCode, ErrorDescription,
 				ServiceUnavailableException.Code, ServiceUnavailableException.StatusMessage);
+		}
+
+		/// <summary>
+		/// Checks if a scope value is valid, according to the OAUTH2 specification.
+		/// </summary>
+		/// <param name="Scope"></param>
+		/// <returns></returns>
+		protected static bool IsValidScope(string Scope)
+		{
+			if (string.IsNullOrEmpty(Scope))
+				return false; // For an individual supplied value. Omitted scope is different.
+
+			string[] Tokens = Scope.Split(' ');
+
+			foreach (string Token in Tokens)
+			{
+				if (Token.Length == 0)
+					return false;
+
+				foreach (char ch in Token)
+				{
+					if (ch == 0x21)
+						continue;
+
+					if (ch >= 0x23 && ch <= 0x5B)
+						continue;
+
+					if (ch >= 0x5D && ch <= 0x7E)
+						continue;
+
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Checks if a user has the privileges associated with a set of scopes.
+		/// </summary>
+		/// <param name="Scopes">A space-separated list of scopes.</param>
+		/// <param name="User">The user to check privileges for.</param>
+		/// <param name="MissingPrivilege">Priviliege missing from user.</param>
+		/// <returns>True if the user has all the privileges associated with the scopes, 
+		/// otherwise false.</returns>
+		protected static bool HasScopePrivileges(string Scopes, IUser User,
+			[NotNullWhen(false)] out string? MissingPrivilege)
+		{
+			return HasScopePrivileges(
+				Scopes.Split(' ', StringSplitOptions.RemoveEmptyEntries),
+				User, out MissingPrivilege);
+		}
+
+		/// <summary>
+		/// Checks if a user has the privileges associated with a set of scopes.
+		/// </summary>
+		/// <param name="Scopes">An array of scopes.</param>
+		/// <param name="User">The user to check privileges for.</param>
+		/// <param name="MissingPrivilege">Priviliege missing from user.</param>
+		/// <returns>True if the user has all the privileges associated with the scopes, 
+		/// otherwise false.</returns>
+		protected static bool HasScopePrivileges(string[] Scopes, IUser User,
+			[NotNullWhen(false)] out string? MissingPrivilege)
+		{
+			foreach (string Scope in Scopes)
+			{
+				string Privilege = OAuthScopePrivilegePrefix + Scope.Replace(':', '.');
+				if (!User.HasPrivilege(Privilege))
+				{
+					MissingPrivilege = Privilege;
+					return false;
+				}
+			}
+
+			MissingPrivilege = null;
+			return true;
 		}
 	}
 }

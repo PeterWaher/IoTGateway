@@ -408,7 +408,7 @@ namespace Waher.Security.JWT
 				ChunkedList<KeyValuePair<string, object>> NewClaims = new ChunkedList<KeyValuePair<string, object>>();
 				bool IssuerAdded = false;
 
-				foreach (KeyValuePair<string,object> P in Claims)
+				foreach (KeyValuePair<string, object> P in Claims)
 				{
 					if (P.Key == JwtClaims.Issuer)
 					{
@@ -488,6 +488,38 @@ namespace Waher.Security.JWT
 
 				return List.Contains(Token.Token);
 			}
+		}
+
+		/// <summary>
+		/// Joins two sets of claims into one.
+		/// </summary>
+		/// <param name="Claims1">First set of claims.</param>
+		/// <param name="Claims2">Second set of claims, possibly empty or null.</param>
+		/// <returns>Joined set.</returns>
+		public static IEnumerable<KeyValuePair<string, object>> JoinClaims(
+			IEnumerable<KeyValuePair<string, object>> Claims1,
+			params KeyValuePair<string, object>[] Claims2)
+		{
+			if ((Claims2?.Length ?? 0) > 0)
+				return JoinClaims(Claims1, (IEnumerable<KeyValuePair<string, object>>)Claims2);
+			else
+				return Claims1;
+		}
+
+		/// <summary>
+		/// Joins two sets of claims into one.
+		/// </summary>
+		/// <param name="Claims1">First set of claims.</param>
+		/// <param name="Claims2">Second set of claims.</param>
+		/// <returns>Joined set.</returns>
+		public static IEnumerable<KeyValuePair<string, object>> JoinClaims(
+			IEnumerable<KeyValuePair<string, object>> Claims1,
+			IEnumerable<KeyValuePair<string, object>> Claims2)
+		{
+			ChunkedList<KeyValuePair<string, object>> Result = new ChunkedList<KeyValuePair<string, object>>();
+			Result.AddRange(Claims1);
+			Result.AddRange(Claims2);
+			return Result.ToArray();
 		}
 	}
 }

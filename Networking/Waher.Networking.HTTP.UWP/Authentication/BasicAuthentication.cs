@@ -106,38 +106,17 @@ namespace Waher.Networking.HTTP.Authentication
 						return null;
 					}
 
+					string PasswordHash = ComputePasswordHash(UserName, this.realm, Password, User.PasswordHashType,
+						out byte? HashBytes);
+
+					if (PasswordHash is null)
+						return null;
+
 					string ExpectedHash = User.PasswordHash;
+					if (HashBytes.HasValue)
+						ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, HashBytes.Value);
 
-					switch (User.PasswordHashType)
-					{
-						case "":
-							break;
-
-						case "Internal":
-							Password = DigestAuthentication.ToHex(Hashes.ComputeSHA256Hash(Encoding.UTF8.GetBytes(UserName + ":" + Password)));
-							ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 32);
-							break;
-
-						case "DIGEST-MD5":
-							Password = DigestAuthentication.ToHex(DigestAuthentication.H_MD5(UserName + ":" + this.realm + ":" + Password));
-							ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 16);
-							break;
-
-						case "DIGEST-SHA-256":
-							Password = DigestAuthentication.ToHex(DigestAuthentication.H_SHA256(UserName + ":" + this.realm + ":" + Password));
-							ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 32);
-							break;
-
-						case "DIGEST-SHA3-256":
-							Password = DigestAuthentication.ToHex(DigestAuthentication.H_SHA3_256(UserName + ":" + this.realm + ":" + Password));
-							ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, 32);
-							break;
-
-						default:
-							return null;
-					}
-
-					if (Password == ExpectedHash)
+					if (PasswordHash == ExpectedHash)
 					{
 						LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
 						return User;
@@ -151,6 +130,64 @@ namespace Waher.Networking.HTTP.Authentication
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Computs a password hash.
+		/// </summary>
+		/// <param name="UserName">User name.</param>
+		/// <param name="Realm">Authentication realm.</param>
+		/// <param name="Password">Password.</param>
+		/// <param name="PasswordHashType">Type of password hash.</param>
+		/// <returns>Computed password hash.</returns>
+		public static string ComputePasswordHash(string UserName, string Realm,
+			string Password, string PasswordHashType)
+		{
+			return ComputePasswordHash(UserName, Realm, Password, PasswordHashType, out _);
+		}
+
+		/// <summary>
+		/// Computs a password hash.
+		/// </summary>
+		/// <param name="UserName">User name.</param>
+		/// <param name="Realm">Authentication realm.</param>
+		/// <param name="Password">Password.</param>
+		/// <param name="PasswordHashType">Type of password hash.</param>
+		/// <param name="HashBytes">Number of bytes in the hash.</param>
+		/// <returns>Computed password hash.</returns>
+		public static string ComputePasswordHash(string UserName, string Realm, 
+			string Password, string PasswordHashType, out byte? HashBytes)
+		{
+			HashBytes = null;
+
+			switch (PasswordHashType)
+			{
+				case "": 
+					return Password;
+				
+				case "Internal":
+					HashBytes = 32;
+					return DigestAuthentication.ToHex(Hashes.ComputeSHA256Hash(
+						Encoding.UTF8.GetBytes(UserName + ":" + Password)));
+
+				case "DIGEST-MD5":
+					HashBytes = 16;
+					return DigestAuthentication.ToHex(DigestAuthentication.H_MD5(
+						UserName + ":" + Realm + ":" + Password));
+
+				case "DIGEST-SHA-256":
+					HashBytes = 32;
+					return DigestAuthentication.ToHex(DigestAuthentication.H_SHA256(
+						UserName + ":" + Realm + ":" + Password));
+
+				case "DIGEST-SHA3-256":
+					HashBytes = 32;
+					return DigestAuthentication.ToHex(DigestAuthentication.H_SHA3_256(
+						UserName + ":" + Realm + ":" + Password));
+
+				default:
+					return null;
+			}
 		}
 	}
 }

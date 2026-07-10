@@ -375,11 +375,16 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine("Title: Device Authorization");
 			Markdown.AppendLine("Description: OAUTH device authorization page.");
 
+			string LoginFormFileName;   // Hypothetical file name, so renderer finds the Master.md file.
+
 			if (Request.Server.TryGetLocalResourceFileName("/Master.md", Request.Host, out string FileName) &&
 				File.Exists(FileName))
 			{
-				Markdown.AppendLine("Master: /Master.md");
+				Markdown.AppendLine("Master: Master.md");
+				LoginFormFileName = Path.Combine(Path.GetDirectoryName(FileName), "LoginForm.md");
 			}
+			else
+				LoginFormFileName = string.Empty;
 
 			Markdown.Append("Date: ");
 			Markdown.AppendLine(CommonTypes.EncodeRfc822(DateTime.UtcNow));
@@ -488,7 +493,9 @@ namespace Waher.Networking.HTTP.OAuth
 
 			Markdown.AppendLine("</form>");
 
-			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString());
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(),
+				new MarkdownSettings(), LoginFormFileName, string.Empty, string.Empty);
+			
 			string Html = await Doc.GenerateHTML();
 
 			Response.SetHeader("X-Frame-Options", "DENY");
@@ -505,11 +512,16 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine("Title: Accepted");
 			Markdown.AppendLine("Description: OAUTH device authorization has been accepted.");
 
+			string LoginFormFileName;   // Hypothetical file name, so renderer finds the Master.md file.
+
 			if (Request.Server.TryGetLocalResourceFileName("/Master.md", Request.Host, out string FileName) &&
 				File.Exists(FileName))
 			{
-				Markdown.AppendLine("Master: /Master.md");
+				Markdown.AppendLine("Master: Master.md");
+				LoginFormFileName = Path.Combine(Path.GetDirectoryName(FileName), "LoginForm.md");
 			}
+			else
+				LoginFormFileName = string.Empty;
 
 			Markdown.Append("Date: ");
 			Markdown.AppendLine(CommonTypes.EncodeRfc822(DateTime.UtcNow));
@@ -540,7 +552,9 @@ namespace Waher.Networking.HTTP.OAuth
 
 			Markdown.AppendLine("You can safely close this tab.");
 
-			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString());
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(),
+				new MarkdownSettings(), LoginFormFileName, string.Empty, string.Empty);
+			
 			string Html = await Doc.GenerateHTML();
 
 			Response.SetHeader("X-Frame-Options", "DENY");

@@ -285,11 +285,16 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine("Title: Login");
 			Markdown.AppendLine("Description: OAUTH login page.");
 
+			string LoginFormFileName;	// Hypothetical file name, so renderer finds the Master.md file.
+
 			if (Request.Server.TryGetLocalResourceFileName("/Master.md", Request.Host, out string FileName) &&
 				File.Exists(FileName))
 			{
-				Markdown.AppendLine("Master: /Master.md");
+				Markdown.AppendLine("Master: Master.md");
+				LoginFormFileName = Path.Combine(Path.GetDirectoryName(FileName), "LoginForm.md");
 			}
+			else
+				LoginFormFileName = string.Empty;
 
 			Markdown.Append("Date: ");
 			Markdown.AppendLine(CommonTypes.EncodeRfc822(DateTime.UtcNow));
@@ -350,7 +355,9 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine("<button type='submit'>Login</button>");
 			Markdown.AppendLine("</form>");
 
-			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString());
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(),
+				new MarkdownSettings(), LoginFormFileName, string.Empty, string.Empty);
+			
 			string Html = await Doc.GenerateHTML();
 
 			Response.SetHeader("X-Frame-Options", "DENY");

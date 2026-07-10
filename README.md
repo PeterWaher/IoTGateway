@@ -298,6 +298,17 @@ The folder also contains the following unit test projects:
 |------------------------------------|----------|---------------------|
 | **Waher.Layout.Layout2D.Test**     | .NET 8.0 | The [Waher.Layout.Layout2D.Test](Layout/Waher.Layout.Layout2D.Test) project contains unit tests for the **Waher.Layout.Layout2D** project. |
 
+MCP
+----------------------
+
+The [Mcp](Mcp) folder contains projects that implement different Model Context Protocol (MCP)
+servers and services. These can be used to automate different features published on the gateway
+using A.I. agents.
+
+| Project                        | Type         | Link                                                    | Project description |
+|--------------------------------|--------------|---------------------------------------------------------|---------------------|
+| **Waher.Mcp.Events**           | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mock/)     | The [Waher.Mock](Mocks/Waher.Mock) project is a class library that provides support for simple mock applications. This includes simple network configuration. |
+
 Mocks
 ----------------------
 
@@ -329,6 +340,7 @@ The [Networking](Networking) folder contains libraries that manage different asp
 | **Waher.Networking.HTTP**                      | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Networking.HTTP/)                     | The [Waher.Networking.HTTP](Networking/Waher.Networking.HTTP) project provides a simple HTTP server for publishing dynamic content and managing user authentication based on a customizable set of users and privileges. Supports the WebSocket protocol. |
 | **Waher.Networking.HTTP.Brotli**               | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Networking.HTTP.Brotli/)              | The [Waher.Networking.HTTP.Brotli](Networking/Waher.Networking.HTTP.Brotli) project adds Brotli-compression capabilities to the HTTP server defined in the **Waher.Networking.HTTP** Library. |
 | **Waher.Networking.HTTP.JsonRpc**              | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Networking.HTTP.JsonRpc/)             | The [Waher.Networking.HTTP.JsonRpc](Networking/Waher.Networking.HTTP.JsonRpc) project adds web-services capabilities based on [JSON-RPC v2.0](https://www.jsonrpc.org/) to the HTTP server defined in the **Waher.Networking.HTTP** Library. |
+| **Waher.Networking.HTTP.Mcp**                  | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Networking.HTTP.Mcp/)                 | The [Waher.Networking.HTTP.Mcp](Networking/Waher.Networking.HTTP.Mcp) project adds [Model Context Protocol](https://modelcontextprotocol.io/specification/2025-11-25) (MCP) server capabilities to the HTTP server defined in the HTTP server defined in the Waher.Networking.HTTP Library. |
 | **Waher.Networking.HTTP.OAuth**                | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Networking.HTTP.OAuth/)               | The [Waher.Networking.HTTP.OAuth](Networking/Waher.Networking.HTTP.OAuth) project adds OAUTH 2.0 and 2.1 authentication capabilities to the HTTP server defined in the **Waher.Networking.HTTP** Library. OAUTH extensions supported include server and resource meta-data, refreshing tokens, dynamic client registration and device authorization flow. |
 | **Waher.Networking.HTTP.UWP**                  | UWP           | [NuGet](https://www.nuget.org/packages/Waher.Networking.HTTP.UWP/)                 | The [Waher.Networking.HTTP.UWP](Networking/Waher.Networking.HTTP.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Networking.HTTP** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Networking.LWM2M**                     | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Networking.LWM2M/)                    | The [Waher.Networking.LWM2M](Networking/Waher.Networking.LWM2M) project provides LWM2M interfaces for your application, using the CoAP library defined in [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP). |

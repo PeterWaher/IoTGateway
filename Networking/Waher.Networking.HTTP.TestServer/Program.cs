@@ -344,7 +344,6 @@ internal class Program
 				Response.ContentType = "text/plain";
 				return Response.Write("Hello World.");
 			}
-			;
 
 			static async Task HelloMarkdown(HttpRequest Request, HttpResponse Response)
 			{
@@ -379,9 +378,8 @@ internal class Program
 			WebServer.Register(new OAuthTokenResource(Environment));
 			WebServer.Register(new OAuthAuthorizeResource(Environment));
 			WebServer.Register(new AuthorizationServerMetaData(Environment));
-			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", "TestServer",
-				"Test Server", "1.0.0", "This is a test server.", [],
-				new Uri("https://example.org/"), "These are the instructions."));
+			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", [],
+				new Uri("https://example.org/")));
 
 			Log.Informational("Web Server initialized.");
 			Log.Informational("Press CTRL+C to quit.");

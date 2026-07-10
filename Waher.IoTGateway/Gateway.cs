@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
+using Waher.Content.Emoji;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Html;
 using Waher.Content.Images;
@@ -56,6 +57,7 @@ using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Networking.HTTP.Mcp.Model;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.MQTT;
 using Waher.Networking.PeerToPeer;
@@ -1406,6 +1408,13 @@ namespace Waher.IoTGateway
 				webServer.Register(new WebResources.Ping());
 				webServer.Register(new ProposeContract());
 				webServer.Register(new UrlShortener());
+
+				Icon FavIcon = new Icon(new Uri(GetUrl("/favicon.ico")),
+					ImageCodec.ContentTypeIcon);
+				Icon[] Icons = new Icon[] { FavIcon };
+				Uri WebSite = new Uri(GetUrl("/"));
+
+				webServer.Register(new Mcp.Events.EventLogMcpServer("/MCP/EventLog", Icons, WebSite));
 
 				if (emoji1_24x24 is null)
 				{

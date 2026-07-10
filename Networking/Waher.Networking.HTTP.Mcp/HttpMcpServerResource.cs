@@ -56,9 +56,6 @@ namespace Waher.Networking.HTTP.Mcp
 		private readonly string[] scopesSupported;
 		private readonly bool hasScopes;
 		private bool requiresAuthentication = false;
-		private bool supportsTools = false;
-		private bool supportsPrompts = false;
-		private bool supportsResources = false;
 
 		private static Dictionary<Type, IContentBlock> GetContentBlocksFirstTime()
 		{
@@ -252,7 +249,6 @@ namespace Waher.Networking.HTTP.Mcp
 				this.tools[Name] = Tool;
 
 				this.requiresAuthentication |= Tool.RequiresAuthentication;
-				this.supportsTools = true;
 			}
 
 			// TODO: Send notification to clients about new tool.
@@ -279,7 +275,6 @@ namespace Waher.Networking.HTTP.Mcp
 				this.prompts[Name] = Prompt;
 
 				this.requiresAuthentication |= Prompt.RequiresAuthentication;
-				this.supportsPrompts = true;
 			}
 
 			// TODO: Send notification to clients about new prompt.
@@ -930,6 +925,13 @@ namespace Waher.Networking.HTTP.Mcp
 			return Result;
 		}
 
+		/// <summary>
+		/// Lists available MCP server resources.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Cursor">Cursor for pagination.</param>
+		/// <returns>Dictionary containing the list of resources.</returns>
 		[JsonRpcMethod]
 		protected async Task<Dictionary<string, object>?> Resources_List(HttpRequest Request,
 			HttpResponse Response, string? Cursor = null)

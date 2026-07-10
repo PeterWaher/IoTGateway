@@ -18,9 +18,15 @@ namespace Waher.Mcp.Events
 			this.Value = Tag.Value;
 		}
 
+		/// <summary>
+		/// Name of tag.
+		/// </summary>
 		[McpParameter("Name", "Name of tag")]
 		public string Name { get; }
 
+		/// <summary>
+		/// Value of tag.
+		/// </summary>
 		[McpParameter("Value", "Value of tag")]
 		public object Value { get; }
 	}

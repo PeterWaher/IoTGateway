@@ -4,8 +4,8 @@ using System.Collections.Generic;
 namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 {
 	/// <summary>
-	/// Provides meta-data about a multi-select parameter (Enumeration value with 
-	/// <see cref="FlagsAttribute"> defined.)
+	/// Provides meta-data about a multi-select parameter (Enumeration value with
+	/// <see cref="FlagsAttribute"/> defined.)
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue |
 		AttributeTargets.Property | AttributeTargets.Field, 
@@ -14,7 +14,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 	{
 		/// <summary>
 		/// Provides meta-data about a multi-select parameter (Enumeration value with 
-		/// <see cref="FlagsAttribute"> defined.)
+		/// <see cref="FlagsAttribute"/> defined.)
 		/// </summary>
 		/// <param name="Title">Title of parameter.</param>
 		/// <param name="Description">Description of parameter.</param>

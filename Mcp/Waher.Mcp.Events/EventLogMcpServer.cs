@@ -25,20 +25,20 @@ namespace Waher.Mcp.Events
 	[McpScopeRoot("MCP:EventLog")]
 	public class EventLogMcpServer : HttpMcpServerResource
 	{
-		public const string BasePrivilege = OAuthResource.OAuthScopePrivilegePrefix + "MCP.EventLog";
-		public const string ToolsPrivilege = BasePrivilege + ".Tools";
-		public const string PromptsPrivilege = BasePrivilege + ".Prompts";
-		public const string LogPrivilege = ToolsPrivilege + ".Log";
-		public const string LogDebugPrivilege = LogPrivilege + ".Debug";
-		public const string LogInformationPrivilege = LogPrivilege + ".Information";
-		public const string LogNoticePrivilege = LogPrivilege + ".Notice";
-		public const string LogWarningPrivilege = LogPrivilege + ".Warning";
-		public const string LogErrorPrivilege = LogPrivilege + ".Error";
-		public const string LogCriticalPrivilege = LogPrivilege + ".Critical";
-		public const string LogAlertPrivilege = LogPrivilege + ".Alert";
-		public const string LogEmergencyPrivilege = LogPrivilege + ".Emergency";
-		public const string SearchPrivilege = ToolsPrivilege + ".Search";
-		public const string FindSensitiveInfoPrivilege = PromptsPrivilege + ".FindSensitiveInfo";
+		internal const string BasePrivilege = OAuthResource.OAuthScopePrivilegePrefix + "MCP.EventLog";
+		internal const string ToolsPrivilege = BasePrivilege + ".Tools";
+		internal const string PromptsPrivilege = BasePrivilege + ".Prompts";
+		internal const string LogPrivilege = ToolsPrivilege + ".Log";
+		internal const string LogDebugPrivilege = LogPrivilege + ".Debug";
+		internal const string LogInformationPrivilege = LogPrivilege + ".Information";
+		internal const string LogNoticePrivilege = LogPrivilege + ".Notice";
+		internal const string LogWarningPrivilege = LogPrivilege + ".Warning";
+		internal const string LogErrorPrivilege = LogPrivilege + ".Error";
+		internal const string LogCriticalPrivilege = LogPrivilege + ".Critical";
+		internal const string LogAlertPrivilege = LogPrivilege + ".Alert";
+		internal const string LogEmergencyPrivilege = LogPrivilege + ".Emergency";
+		internal const string SearchPrivilege = ToolsPrivilege + ".Search";
+		internal const string FindSensitiveInfoPrivilege = PromptsPrivilege + ".FindSensitiveInfo";
 
 		/// <summary>
 		/// Model Context Protocol (MCP) server resource for the Event Log.
@@ -107,6 +107,17 @@ namespace Waher.Mcp.Events
 		internal const string ModuleTitle = "Module";
 		internal const string ModuleDescription = "The module or component within the source that is the source of the event.";
 
+		/// <summary>
+		/// Logs an event for debug purposes to the event log. The purpose of debug events is to highlight technical information to developers, for troubleshooting.
+		/// </summary>
+		/// <param name="Message">The message describing the event.</param>
+		/// <param name="Object">The object associated with the event.</param>
+		/// <param name="Actor">The actor responsible for the event.</param>
+		/// <param name="Level">The level of the event.</param>
+		/// <param name="EventId">The unique identifier of the event.</param>
+		/// <param name="Facility">The facility associated with the event.</param>
+		/// <param name="Module">The module associated with the event.</param>
+		/// <param name="MetaData">Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.</param>
 		[McpServerTool(
 			"Log Debug Event",  // Title
 			"Logs an event for debug purposes to the event log. The purpose of debug events is to highlight technical information to developers, for troubleshooting.",   // Description
@@ -148,6 +159,17 @@ namespace Waher.Mcp.Events
 			Log.Debug(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
 		}
 
+		/// <summary>
+		/// Logs an informational event to the event log. The purpose of informational events is to provide a record of normal operational tasks being performed or events occurring.
+		/// </summary>
+		/// <param name="Message">The message describing the event.</param>
+		/// <param name="Object">The object associated with the event.</param>
+		/// <param name="Actor">The actor responsible for the event.</param>
+		/// <param name="Level">The level of the event.</param>
+		/// <param name="EventId">The unique identifier of the event.</param>
+		/// <param name="Facility">The facility associated with the event.</param>
+		/// <param name="Module">The module associated with the event.</param>
+		/// <param name="MetaData">Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.</param>
 		[McpServerTool(
 			"Log Informational Event",  // Title
 			"Logs an informational event to the event log. The purpose of informational events is to provide a record of normal operational tasks being performed or events occurring.",   // Description
@@ -189,6 +211,17 @@ namespace Waher.Mcp.Events
 			Log.Informational(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
 		}
 
+		/// <summary>
+		/// Logs a notice event to the event log. A Notice represents a significant condition or change that administrators should be aware of.
+		/// </summary>
+		/// <param name="Message">The message describing the event.</param>
+		/// <param name="Object">The object associated with the event.</param>
+		/// <param name="Actor">The actor responsible for the event.</param>
+		/// <param name="Level">The level of the event.</param>
+		/// <param name="EventId">The unique identifier of the event.</param>
+		/// <param name="Facility">The facility associated with the event.</param>
+		/// <param name="Module">The module associated with the event.</param>
+		/// <param name="MetaData">Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.</param>
 		[McpServerTool(
 			"Log Notice Event",  // Title
 			"Logs an notice event to the event log. A Notice represents a significant condition or change that administrators should be aware of.",   // Description
@@ -230,6 +263,17 @@ namespace Waher.Mcp.Events
 			Log.Notice(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
 		}
 
+		/// <summary>
+		/// Logs a warning event to the event log. Warning events warn operators of conditions that may lead to errors if they are not properly managed.
+		/// </summary>
+		/// <param name="Message">The message describing the event.</param>
+		/// <param name="Object">The object associated with the event.</param>
+		/// <param name="Actor">The actor responsible for the event.</param>
+		/// <param name="Level">The level of the event.</param>
+		/// <param name="EventId">The unique identifier of the event.</param>
+		/// <param name="Facility">The facility associated with the event.</param>
+		/// <param name="Module">The module associated with the event.</param>
+		/// <param name="MetaData">Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.</param>
 		[McpServerTool(
 			"Log Warning Event",  // Title
 			"Logs a warning event to the event log. Warning events warn operators of conditions that may lead to errors if they are not properly managed.",   // Description
@@ -271,6 +315,17 @@ namespace Waher.Mcp.Events
 			Log.Warning(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
 		}
 
+		/// <summary>
+		/// Logs an error event to the event log. Error events inform operators of normal error conditions. A normal error condition is typically an expected error.
+		/// </summary>
+		/// <param name="Message">The message describing the event.</param>
+		/// <param name="Object">The object associated with the event.</param>
+		/// <param name="Actor">The actor responsible for the event.</param>
+		/// <param name="Level">The level of the event.</param>
+		/// <param name="EventId">The unique identifier of the event.</param>
+		/// <param name="Facility">The facility associated with the event.</param>
+		/// <param name="Module">The module associated with the event.</param>
+		/// <param name="MetaData">Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.</param>
 		[McpServerTool(
 			"Log Error Event",  // Title
 			"Logs an error event to the event log. Error events inform operators of normal error conditions. A normal error condition is typically an expected error.",   // Description
@@ -312,6 +367,17 @@ namespace Waher.Mcp.Events
 			Log.Error(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
 		}
 
+		/// <summary>
+		/// Logs a critical error event to the event log. A critical error is an error so great that it could escalate into something graver if not addressed. Typically, a Critical error is typically an unexpected error.
+		/// </summary>
+		/// <param name="Message">The message describing the event.</param>
+		/// <param name="Object">The object associated with the event.</param>
+		/// <param name="Actor">The actor responsible for the event.</param>
+		/// <param name="Level">The level of the event.</param>
+		/// <param name="EventId">The unique identifier of the event.</param>
+		/// <param name="Facility">The facility associated with the event.</param>
+		/// <param name="Module">The module associated with the event.</param>
+		/// <param name="MetaData">Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.</param>
 		[McpServerTool(
 			"Log Critical Error Event",  // Title
 			"Logs a critical error event to the event log. A critical error is an error so great that it could escalate into something graver if not addressed. Typically, a Critical error is typically an unexpected error.",   // Description
@@ -353,6 +419,17 @@ namespace Waher.Mcp.Events
 			Log.Critical(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
 		}
 
+		/// <summary>
+		/// Logs an alert event to the event log. An alert error is so grave, that action must be taken immediately.
+		/// </summary>
+		/// <param name="Message">The message describing the event.</param>
+		/// <param name="Object">The object associated with the event.</param>
+		/// <param name="Actor">The actor responsible for the event.</param>
+		/// <param name="Level">The level of the event.</param>
+		/// <param name="EventId">The unique identifier of the event.</param>
+		/// <param name="Facility">The facility associated with the event.</param>
+		/// <param name="Module">The module associated with the event.</param>
+		/// <param name="MetaData">Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.</param>
 		[McpServerTool(
 			"Log Alert Event",  // Title
 			"Logs an alert event to the event log. An alert error is so grave, that action must be taken immediately.",   // Description
@@ -394,6 +471,17 @@ namespace Waher.Mcp.Events
 			Log.Alert(Message, Object, Actor, EventId, Level, Facility, Module, GetTags(MetaData));
 		}
 
+		/// <summary>
+		/// Logs an emergency event to the event log. An emergency error signals the system is unusable, or will become unusable if action is not taken immediately.
+		/// </summary>
+		/// <param name="Message">The message describing the event.</param>
+		/// <param name="Object">The object associated with the event.</param>
+		/// <param name="Actor">The actor responsible for the event.</param>
+		/// <param name="Level">The level of the event.</param>
+		/// <param name="EventId">The unique identifier of the event.</param>
+		/// <param name="Facility">The facility associated with the event.</param>
+		/// <param name="Module">The module associated with the event.</param>
+		/// <param name="MetaData">Additional meta data that may be of interest to an observer, to log with the event, as key-value pairs.</param>
 		[McpServerTool(
 			"Log Emergency Event",  // Title
 			"Logs an emergency event to the event log. An emergency error signals the system is unusable, or will become unusable if action is not taken immediately.",   // Description
@@ -451,6 +539,32 @@ namespace Waher.Mcp.Events
 			return Tags;
 		}
 
+		/// <summary>
+		/// Performs a search for events in the event log.
+		/// </summary>
+		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Offset">Offset into search result set where returned events begin.</param>
+		/// <param name="MaxCount">Maximum number of results to return.</param>
+		/// <param name="From">Start date/time for search, in UTC. If provided, only events newer than or equal to this point in time will be returned.</param>
+		/// <param name="To">End date/time for search, in UTC. If provided, only events older than or equal to this point in time will be returned.</param>
+		/// <param name="Message">Message to search for. If provided, only events containing this message text will be returned.</param>
+		/// <param name="Object">Object to search for. If provided, only events with this object will be returned. This property represents the object associated with the events.</param>
+		/// <param name="Actor">Actor to search for. If provided, only events with this actor will be returned. This property represents the subject, or actor, performing the action resulting in the events being logged.</param>
+		/// <param name="EventId">Event ID to search for. If provided, only events with this ID will be returned.</param>
+		/// <param name="Module">Module to search for. If provided, only events from this module will be returned.</param>
+		/// <param name="Facility">Facility to search for. If provided, only events from this facility will be returned.</param>
+		/// <param name="Debug">If true, include debug level events in the search results.</param>
+		/// <param name="Informational">If true, include informational level events in the search results.</param>
+		/// <param name="Notice">If true, include notice level events in the search results.</param>
+		/// <param name="Warning">If true, include warning level events in the search results.</param>
+		/// <param name="Error">If true, include error level events in the search results.</param>
+		/// <param name="Critical">If true, include critical level events in the search results.</param>
+		/// <param name="Alert">If true, include alert level events in the search results.</param>
+		/// <param name="Emergency">If true, include emergency level events in the search results.</param>
+		/// <param name="Minor">If true, include minor level events in the search results.</param>
+		/// <param name="Medium">If true, include medium level events in the search results.</param>
+		/// <param name="Major">If true, include major level events in the search results.</param>
+		/// <returns>Result set of the search for events, as well as information about if more events are available, and the offset to the next set of events.</returns>
 		[McpServerTool(
 			"Search for Events",  // Title
 			"Performs a search for events in the event log.",   // Description
@@ -715,6 +829,20 @@ namespace Waher.Mcp.Events
 				Filters.Add(new FilterFieldEqualTo(ParameterName, EnumValue));
 		}
 
+		/// <summary>
+		/// Search for events in the event log containing sensitive information that should never have been logged.
+		/// </summary>
+		/// <param name="NrDays">The number of days back in time the search for events should be performed.</param>
+		/// <param name="FindSuspectActivity">If true, the search will look for activity that is suspicious.</param>
+		/// <param name="FindIntrusions">If true, the search will look for evidence of intrusions.</param>
+		/// <param name="FindResourceDepletion">If true, the search will look for evidence of resources being depleted, or being close to be depleted.</param>
+		/// <param name="FindCredentials">If true, the search will look for credentials in the events.</param>
+		/// <param name="FindKeys">If true, the search will look for keys in the events.</param>
+		/// <param name="FindSensitivePersonalInformation">If true, the search will look for sensitive personal information in the events.</param>
+		/// <param name="ReportEventsFound">If true, the search will generate a report of all events containing sensitive information found during the search.</param>
+		/// <param name="EditEvents">If true, the events found will be edited accordingly, to remove the sensitive information.</param>
+		/// <param name="DeleteEvents">If true, the events found that cannot be edited, will be deleted accordingly, to remove the sensitive information and associated information in the associated event.</param>
+		/// <returns>Prompt messages</returns>
 		[McpServerPrompt(
 			"Find Sensitive Information",		// Title
 			"Search for events in the event log containing sensitive information that should never have been logged.",

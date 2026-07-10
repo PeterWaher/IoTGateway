@@ -20,12 +20,21 @@ namespace Waher.Mcp.Events
 			this.Events = Events;
 		}
 
+		/// <summary>
+		/// If more events are available.
+		/// </summary>
 		[McpParameter("More", "If more events are available.")]
 		public bool More { get; }
 
+		/// <summary>
+		/// Offset into search result set where the next page of events begin, if the More parameter is true.
+		/// </summary>
 		[McpIntegerParameter("Next Offset", "Offset into search result set where the next page of events begin, if the More parameter is true.", 0, int.MaxValue)]
 		public int? NextOffset { get; }
 
+		/// <summary>
+		/// Array of events returned by the search.
+		/// </summary>
 		[McpParameter("Events", "Array of events returned by the search.")]
 		public Event[] Events { get; }
 	}

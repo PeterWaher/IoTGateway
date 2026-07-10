@@ -19,9 +19,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// 
 		/// This can be used by clients to improve the LLM's understanding of available tools. 
 		/// It can be thought of like a "hint" to the model.</param>
-		/// <param name="IconsMethod">Name of method that returns an <see cref="Icon?"/>, 
-		/// an an <see cref="Icon[]?"/> or an <see cref="Icons?"/> resource representing 
-		/// the tool. If null or empty, the icon of the MCP server will be used.</param>
+		/// <param name="IconsMethod">Name of method that returns an Icon?, an an Icon[]? 
+		/// or an Icons? resource representing the prompt. If null or empty, the icon of the 
+		/// MCP server will be used.</param>
 		/// <param name="CanModifyEnvironment">If the tool can modify the environment. If false, 
 		/// the tool is expected to be read-only and not cause any side effects.</param>
 		/// <param name="CanDestroyEnvironment">If true, the tool may perform destructive 
@@ -48,9 +48,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// 
 		/// This can be used by clients to improve the LLM's understanding of available tools. 
 		/// It can be thought of like a "hint" to the model.</param>
-		/// <param name="IconsMethod">Name of method that returns an <see cref="Icon?"/>, 
-		/// an an <see cref="Icon[]?"/> or an <see cref="Icons?"/> resource representing 
-		/// the tool. If null or empty, the icon of the MCP server will be used.</param>
+		/// <param name="IconsMethod">Name of method that returns an Icon?, an an Icon[]? 
+		/// or an Icons? resource representing the prompt. If null or empty, the icon of the 
+		/// MCP server will be used.</param>
 		/// <param name="CanModifyEnvironment">If the tool can modify the environment. If false, 
 		/// the tool is expected to be read-only and not cause any side effects.</param>
 		/// <param name="CanDestroyEnvironment">If true, the tool may perform destructive 
@@ -80,9 +80,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// 
 		/// This can be used by clients to improve the LLM's understanding of available tools. 
 		/// It can be thought of like a "hint" to the model.</param>
-		/// <param name="IconsMethod">Name of method that returns an <see cref="Icon?"/>, 
-		/// an an <see cref="Icon[]?"/> or an <see cref="Icons?"/> resource representing 
-		/// the tool. If null or empty, the icon of the MCP server will be used.</param>
+		/// <param name="IconsMethod">Name of method that returns an Icon?, an an Icon[]? 
+		/// or an Icons? resource representing the prompt. If null or empty, the icon of the 
+		/// MCP server will be used.</param>
 		/// <param name="CanModifyEnvironment">If the tool can modify the environment. If false, 
 		/// the tool is expected to be read-only and not cause any side effects.</param>
 		/// <param name="CanDestroyEnvironment">If true, the tool may perform destructive 
@@ -116,9 +116,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// 
 		/// This can be used by clients to improve the LLM's understanding of available tools. 
 		/// It can be thought of like a "hint" to the model.</param>
-		/// <param name="IconsMethod">Name of method that returns an <see cref="Icon?"/>, 
-		/// an an <see cref="Icon[]?"/> or an <see cref="Icons?"/> resource representing 
-		/// the tool. If null or empty, the icon of the MCP server will be used.</param>
+		/// <param name="IconsMethod">Name of method that returns an Icon?, an an Icon[]? 
+		/// or an Icons? resource representing the prompt. If null or empty, the icon of the 
+		/// MCP server will be used.</param>
 		/// <param name="CanModifyEnvironment">If the tool can modify the environment. If false, 
 		/// the tool is expected to be read-only and not cause any side effects.</param>
 		/// <param name="CanDestroyEnvironment">If true, the tool may perform destructive 
@@ -156,9 +156,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// 
 		/// This can be used by clients to improve the LLM's understanding of available tools. 
 		/// It can be thought of like a "hint" to the model.</param>
-		/// <param name="IconsMethod">Name of method that returns an <see cref="Icon?"/>, 
-		/// an an <see cref="Icon[]?"/> or an <see cref="Icons?"/> resource representing 
-		/// the tool. If null or empty, the icon of the MCP server will be used.</param>
+		/// <param name="IconsMethod">Name of method that returns an Icon?, an an Icon[]? 
+		/// or an Icons? resource representing the prompt. If null or empty, the icon of the 
+		/// MCP server will be used.</param>
 		/// <param name="CanModifyEnvironment">If the tool can modify the environment. If false, 
 		/// the tool is expected to be read-only and not cause any side effects.</param>
 		/// <param name="CanDestroyEnvironment">If true, the tool may perform destructive 
@@ -200,9 +200,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// 
 		/// This can be used by clients to improve the LLM's understanding of available tools. 
 		/// It can be thought of like a "hint" to the model.</param>
-		/// <param name="IconsMethod">Name of method that returns an <see cref="Icon?"/>, 
-		/// an an <see cref="Icon[]?"/> or an <see cref="Icons?"/> resource representing 
-		/// the tool. If null or empty, the icon of the MCP server will be used.</param>
+		/// <param name="IconsMethod">Name of method that returns an Icon?, an an Icon[]? 
+		/// or an Icons? resource representing the prompt. If null or empty, the icon of the 
+		/// MCP server will be used.</param>
 		/// <param name="CanModifyEnvironment">If the tool can modify the environment. If false, 
 		/// the tool is expected to be read-only and not cause any side effects.</param>
 		/// <param name="CanDestroyEnvironment">If true, the tool may perform destructive 
@@ -248,9 +248,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// 
 		/// This can be used by clients to improve the LLM's understanding of available tools. 
 		/// It can be thought of like a "hint" to the model.</param>
-		/// <param name="IconsMethod">Name of method that returns an <see cref="Icon?"/>, 
-		/// an an <see cref="Icon[]?"/> or an <see cref="Icons?"/> resource representing 
-		/// the tool. If null or empty, the icon of the MCP server will be used.</param>
+		/// <param name="IconsMethod">Name of method that returns an Icon?, an an Icon[]? 
+		/// or an Icons? resource representing the prompt. If null or empty, the icon of the 
+		/// MCP server will be used.</param>
 		/// <param name="CanModifyEnvironment">If the tool can modify the environment. If false, 
 		/// the tool is expected to be read-only and not cause any side effects.</param>
 		/// <param name="CanDestroyEnvironment">If true, the tool may perform destructive 
@@ -289,9 +289,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		public string Description { get; }
 
 		/// <summary>
-		/// Name of method that returns an <see cref="Icon?"/>, an an <see cref="Icon[]?"/>
-		/// or an <see cref="Icons?"/> resource representing the tool. If null or empty, the 
-		/// icon of the MCP server will be used.
+		/// Name of method that returns an Icon?, an an Icon[]? or an Icons? resource 
+		/// representing the prompt. If null or empty, the icon of the MCP server will 
+		/// be used.
 		/// </summary>
 		public string IconsMethod { get; }
 

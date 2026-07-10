@@ -54,6 +54,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// </summary>
 		/// <param name="Title">Title of parameter.</param>
 		/// <param name="Description">Description of parameter.</param>
+		/// <param name="ContentType">Content-Type of the content the URI points to.</param>
 		public McpUriParameterAttribute(string? Title, string? Description, string ContentType)
 			: base(Title, Description)
 		{
@@ -66,6 +67,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// <param name="Title">Title of parameter.</param>
 		/// <param name="Description">Description of parameter.</param>
 		/// <param name="MaxLength">Maximum length of string.</param>
+		/// <param name="ContentType">Content-Type of the content the URI points to.</param>
 		public McpUriParameterAttribute(string? Title, string? Description,
 			int MaxLength, string ContentType)
 			: base(Title, Description, MaxLength)
@@ -80,6 +82,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// <param name="Description">Description of parameter.</param>
 		/// <param name="MinLength">Minimum length of string.</param>
 		/// <param name="MaxLength">Maximum length of string.</param>
+		/// <param name="ContentType">Content-Type of the content the URI points to.</param>
 		public McpUriParameterAttribute(string? Title, string? Description,
 			int MinLength, int MaxLength, string ContentType)
 			: base(Title, Description, MinLength, MaxLength)

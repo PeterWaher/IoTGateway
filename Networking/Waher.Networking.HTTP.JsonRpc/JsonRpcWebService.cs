@@ -246,7 +246,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			{
 				string ResourceMetaData = this.metaDataResource!.GetResourceMetaDataUri(
 					this.hasDomain, this.domain, this.ResourceName);
-
+				
 				this.authenticationSchemes = HttpModule.GetAuthenticationSchemes(
 					new Uri(ResourceMetaData));
 			}

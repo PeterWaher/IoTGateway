@@ -10,6 +10,7 @@ using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp;
 using Waher.Networking.HTTP.Mcp.Model;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
+using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
@@ -21,10 +22,10 @@ namespace Waher.Mcp.Events
 	/// MCP Server resource for the Event Log.
 	/// </summary>
 	[OAuthResourceName("Event Log MCP Server")]
-	[OAuthScopesSupported("mcp:eventlog")]
+	[McpScopeRoot("MCP:EventLog")]
 	public class EventLogMcpServer : HttpMcpServerResource
 	{
-		public const string BasePrivilege = "MCP.Events";
+		public const string BasePrivilege = OAuthResource.OAuthScopePrivilegePrefix + "MCP.EventLog";
 		public const string ToolsPrivilege = BasePrivilege + ".Tools";
 		public const string PromptsPrivilege = BasePrivilege + ".Prompts";
 		public const string LogPrivilege = ToolsPrivilege + ".Log";

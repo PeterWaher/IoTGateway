@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Html.Elements;
 using Waher.Content.Images;
 using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc;
@@ -12,6 +14,7 @@ using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Networking.HTTP.Mcp.Model.Client;
 using Waher.Networking.HTTP.Mcp.Model.ContentBlocks;
 using Waher.Networking.HTTP.Mcp.Model.Server;
+using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
@@ -26,11 +29,32 @@ namespace Waher.Networking.HTTP.Mcp
 	[OAuthScopesSupported(true, "McpScopesSupported")]
 	public abstract class HttpMcpServerResource : JsonRpcWebService
 	{
+		/// <summary>
+		/// Scope suffix for MCP server tools is ":tools".
+		/// </summary>
+		public const string ToolsScopeSuffix = ":Tools";
+
+		/// <summary>
+		/// Scope suffix for MCP server prompts is ":prompts".
+		/// </summary>
+		public const string PromptsScopeSuffix = ":Prompts";
+
+		/// <summary>
+		/// Scope suffix for MCP server resources is ":resources".
+		/// </summary>
+		public const string ResourcesScopeSuffix = ":Resources";
+
 		private static readonly ObjectContent defaultObjectEncoder = new ObjectContent();
 		private static Dictionary<Type, IContentBlock> contentBlocks = GetContentBlocksFirstTime();
 		private const int PageSize = 20;
 		private readonly Dictionary<string, Tool> tools = new Dictionary<string, Tool>();
 		private readonly Dictionary<string, Prompt> prompts = new Dictionary<string, Prompt>();
+		private readonly string[] rootScopes;
+		private readonly string[] toolScopes;
+		private readonly string[] promptScopes;
+		private readonly string[] resourceScopes;
+		private readonly string[] scopesSupported;
+		private readonly bool hasScopes;
 		private bool requiresAuthentication = false;
 		private bool supportsTools = false;
 		private bool supportsPrompts = false;
@@ -101,6 +125,28 @@ namespace Waher.Networking.HTTP.Mcp
 				Icon[] DefaultIcons = GetDefaultIcons();
 				if (DefaultIcons.Length > 0)
 					this.Icons = new Icons(DefaultIcons);
+			}
+
+			ChunkedList<string> ScopeRoots = new ChunkedList<string>();
+
+			foreach (McpScopeRootAttribute ScopeRoot in this.GetType().GetCustomAttributes<McpScopeRootAttribute>())
+				ScopeRoots.Add(ScopeRoot.ScopeRoot);
+
+			this.hasScopes = ScopeRoots.Count > 0;
+			this.rootScopes = ScopeRoots.ToArray();
+
+			int i, j, c = this.rootScopes.Length;
+
+			this.toolScopes = new string[c];
+			this.promptScopes = new string[c];
+			this.resourceScopes = new string[c];
+			this.scopesSupported = new string[c * 3];
+
+			for (i = j = 0; i < c; i++)
+			{
+				this.toolScopes[i] = this.scopesSupported[j++] = this.rootScopes[i] + ToolsScopeSuffix;
+				this.promptScopes[i] = this.scopesSupported[j++] = this.rootScopes[i] + PromptsScopeSuffix;
+				this.resourceScopes[i] = this.scopesSupported[j++] = this.rootScopes[i] + ResourcesScopeSuffix;
 			}
 
 			foreach (MethodInfo Method in this.GetType().GetMethods(BindingFlags.Instance |
@@ -181,18 +227,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <returns>Array of scopes supported.</returns>
 		public string[] McpScopesSupported()
 		{
-			ChunkedList<string> Scopes = new ChunkedList<string>();
-
-			if (this.supportsTools)
-				Scopes.Add("mcp:tools");
-
-			if (this.supportsPrompts)
-				Scopes.Add("mcp:prompts");
-
-			if (this.supportsResources)
-				Scopes.Add("mcp:resources");
-
-			return Scopes.ToArray();
+			return this.scopesSupported;
 		}
 
 		/// <summary>
@@ -444,6 +479,9 @@ namespace Waher.Networking.HTTP.Mcp
 					if (!Tool.IsAuthorized(User))
 						continue;
 
+					if (!this.CheckScopes(User, this.toolScopes, out _))
+						continue;
+
 					if (MaxCount <= 0)
 					{
 						Result["nextCursor"] = Next.ToString();
@@ -472,6 +510,23 @@ namespace Waher.Networking.HTTP.Mcp
 			Result["tools"] = ToolsJson;
 
 			return Result;
+		}
+
+		private bool CheckScopes(IUser? User, string[] Scopes, out string? MissingPrivilege)
+		{
+			if (!this.hasScopes)
+			{
+				MissingPrivilege = null;
+				return true;
+			}
+
+			if (User is null)
+			{
+				MissingPrivilege = null;
+				return false;
+			}
+
+			return OAuthResource.HasScopePrivileges(Scopes, User, out MissingPrivilege);
 		}
 
 		private async Task<IUser?> GetAuthenticatedUser(HttpRequest Request, HttpResponse Response)
@@ -566,6 +621,12 @@ namespace Waher.Networking.HTTP.Mcp
 					throw new NotFoundException("Tool not found: " + Name);
 
 				Tool.AssertAuthorized(this.ResourceName, User);
+
+				if (!this.CheckScopes(User, this.toolScopes, out string? MissingPrivilege))
+				{
+					throw ForbiddenException.AccessDenied(this.ResourceName,
+						User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty);
+				}
 
 				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 
@@ -709,6 +770,9 @@ namespace Waher.Networking.HTTP.Mcp
 					if (!Prompt.IsAuthorized(User))
 						continue;
 
+					if (!this.CheckScopes(User, this.promptScopes, out _))
+						continue;
+
 					if (MaxCount <= 0)
 					{
 						Result["nextCursor"] = Next.ToString();
@@ -766,6 +830,12 @@ namespace Waher.Networking.HTTP.Mcp
 					throw new NotFoundException("Prompt not found: " + Name);
 
 				Prompt.AssertAuthorized(this.ResourceName, User);
+
+				if (!this.CheckScopes(User, this.promptScopes, out string? MissingPrivilege))
+				{
+					throw ForbiddenException.AccessDenied(this.ResourceName,
+						User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty);
+				}
 
 				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 

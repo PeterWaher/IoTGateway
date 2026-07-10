@@ -310,7 +310,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="MissingPrivilege">Priviliege missing from user.</param>
 		/// <returns>True if the user has all the privileges associated with the scopes, 
 		/// otherwise false.</returns>
-		protected static bool HasScopePrivileges(string Scopes, IUser User,
+		public static bool HasScopePrivileges(string Scopes, IUser User,
 			[NotNullWhen(false)] out string? MissingPrivilege)
 		{
 			return HasScopePrivileges(
@@ -326,7 +326,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="MissingPrivilege">Priviliege missing from user.</param>
 		/// <returns>True if the user has all the privileges associated with the scopes, 
 		/// otherwise false.</returns>
-		protected static bool HasScopePrivileges(string[] Scopes, IUser User,
+		public static bool HasScopePrivileges(string[] Scopes, IUser User,
 			[NotNullWhen(false)] out string? MissingPrivilege)
 		{
 			foreach (string Scope in Scopes)

@@ -292,10 +292,22 @@ internal class Program
 
 			Log.Informational("Console Ledger initialized");
 
+			Role McpRole = await Roles.GetRole("MCP", true);
+			if ((McpRole.Privileges?.Length ?? 0) == 0)
+			{
+				McpRole.Description = "MCP Role";
+				McpRole.Privileges = [new PrivilegePattern("OAUTH\\.Scope\\..*", true)];
+
+				await Database.Update(McpRole);
+			}
+
 			User TestUser = await Users.GetUser("Postman", true);
-			if (string.IsNullOrEmpty(TestUser.PasswordHash))
+			if (string.IsNullOrEmpty(TestUser.PasswordHash) || 
+				(TestUser.RoleIds?.Length ?? 0) == 0)
 			{
 				TestUser.PasswordHash = Convert.ToBase64String(Users.ComputeHash(TestUser.UserName, "Test"));
+				TestUser.RoleIds = ["MCP"];
+
 				await Database.Update(TestUser);
 			}
 
@@ -331,7 +343,8 @@ internal class Program
 			{
 				Response.ContentType = "text/plain";
 				return Response.Write("Hello World.");
-			};
+			}
+			;
 
 			static async Task HelloMarkdown(HttpRequest Request, HttpResponse Response)
 			{
@@ -367,7 +380,7 @@ internal class Program
 			WebServer.Register(new OAuthAuthorizeResource(Environment));
 			WebServer.Register(new AuthorizationServerMetaData(Environment));
 			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", "TestServer",
-				"Test Server", "1.0.0", "This is a test server.", [], 
+				"Test Server", "1.0.0", "This is a test server.", [],
 				new Uri("https://example.org/"), "These are the instructions."));
 
 			Log.Informational("Web Server initialized.");

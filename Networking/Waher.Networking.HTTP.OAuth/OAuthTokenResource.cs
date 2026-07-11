@@ -66,9 +66,6 @@ namespace Waher.Networking.HTTP.OAuth
 			string CodeChallenge, string CodeChallengeMethod, string RedirectUri,
 			string Scope)
 		{
-			if (this.JwtFactory is null)
-				throw new ServiceUnavailableException("No JWT factory configured.");
-
 			string Token = await this.CreateToken(User, Encrypted, Scope);
 			string Code = this.GenerateRandomCode();
 
@@ -200,7 +197,7 @@ namespace Waher.Networking.HTTP.OAuth
 			Response.SetHeader("Pragma", "no-cache");
 
 			await Response.Return(this.TokenResponse(Ref.Token, null, Ref.ExpiresIn,
-				Ref.Scope, this.JwtFactory?.Issuer, true, Ref.User, Request));
+				Ref.Scope, this.JwtFactory.Issuer, true, Ref.User, Request));
 		}
 
 		/// <summary>
@@ -211,13 +208,6 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
-			if (this.JwtFactory is null)
-			{
-				await ServiceUnavailable(Response, "server_error",
-					"No JWT factory configured.");
-				return;
-			}
-
 			if (!Request.HasData)
 			{
 				await BadRequest(Response, "invalid_request", "No payload in request.");
@@ -586,20 +576,17 @@ namespace Waher.Networking.HTTP.OAuth
 			Response.SetHeader("Pragma", "no-cache");
 
 			await Response.Return(this.TokenResponse(Token, null, 3600,
-				Scope, this.JwtFactory?.Issuer, IssueRefreshToken, User, 
+				Scope, this.JwtFactory.Issuer, IssueRefreshToken, User, 
 				Request, TokenFamily));
 		}
 
 		private async Task<string> CreateToken(IUserWithClaims User, bool Encrypted, 
 			string Scope)
 		{
-			if (this.JwtFactory is null)
-				throw new ServiceUnavailableException("No JWT factory configured.");
-
 			return await CreateToken(User, Encrypted, this.JwtFactory, Scope);
 		}
 
-		internal static async Task<string> CreateToken(IUserWithClaims User, bool Encrypted, 
+		internal static async Task<string> CreateToken(IUserWithClaims User, bool Encrypted,
 			JwtFactory JwtFactory, string Scope)
 		{
 			if (string.IsNullOrEmpty(Scope))

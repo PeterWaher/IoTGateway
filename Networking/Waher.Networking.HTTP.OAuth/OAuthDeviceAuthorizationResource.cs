@@ -12,6 +12,7 @@ using Waher.Content.Xml;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Networking.HTTP.OAuth.Interfaces;
 using Waher.Runtime.Cache;
+using Waher.Script;
 using Waher.Security;
 using Waher.Security.JWT;
 using Waher.Security.SHA3;
@@ -119,13 +120,6 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
-			if (this.JwtFactory is null)
-			{
-				await ServiceUnavailable(Response, "server_error",
-					"No JWT factory configured.");
-				return;
-			}
-
 			if (!Request.HasData)
 			{
 				await BadRequest(Response, "invalid_request", "No payload in request.");
@@ -152,7 +146,7 @@ namespace Waher.Networking.HTTP.OAuth
 				if (!Form.TryGetValue("p", out string ParametersToken) ||
 					string.IsNullOrEmpty(ParametersToken) ||
 					!JwtToken.TryParse(ParametersToken, out JwtToken? Parameters) ||
-					!(this.JwtFactory?.IsValid(Parameters) ?? false) ||
+					!this.JwtFactory.IsValid(Parameters) ||
 					!Parameters.TryGetClaim("client_id", out object Obj) ||
 					!(Obj is string ClientId))
 				{
@@ -375,10 +369,10 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine("Title: Device Authorization");
 			Markdown.AppendLine("Description: OAUTH device authorization page.");
 
-			if (Request.Server.TryGetLocalResourceFileName("/Master.md", Request.Host, out string FileName) &&
-				File.Exists(FileName))
+			if (this.Environment.HasLoginMasterFileName)
 			{
-				Markdown.AppendLine("Master: /Master.md");
+				Markdown.Append("Master: ");
+				Markdown.AppendLine(this.Environment.LoginMasterFileName);
 			}
 
 			Markdown.Append("Date: ");
@@ -412,7 +406,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 			if (!AlreadyResponded)
 			{
-				string? ParametersToken = this.JwtFactory?.Create(
+				string ParametersToken = this.JwtFactory.Create(
 					new KeyValuePair<string, object>("client_id", ClientId));
 
 				Markdown.Append("<input type='hidden' name='p' value='");
@@ -489,8 +483,10 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine("</form>");
 
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(),
-				new MarkdownSettings(), string.Empty, this.ResourceName,
-				Request.Header.GetURL(false, false));
+				new MarkdownSettings()
+				{
+					Variables = new Variables()
+				});
 
 			string Html = await Doc.GenerateHTML();
 
@@ -508,10 +504,10 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine("Title: Accepted");
 			Markdown.AppendLine("Description: OAUTH device authorization has been accepted.");
 
-			if (Request.Server.TryGetLocalResourceFileName("/Master.md", Request.Host, out string FileName) &&
-				File.Exists(FileName))
+			if (this.Environment.HasLoginMasterFileName)
 			{
-				Markdown.AppendLine("Master: /Master.md");
+				Markdown.Append("Master: ");
+				Markdown.AppendLine(this.Environment.LoginMasterFileName);
 			}
 
 			Markdown.Append("Date: ");
@@ -544,8 +540,10 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine("You can safely close this tab.");
 
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(),
-				new MarkdownSettings(), string.Empty, this.ResourceName,
-				Request.Header.GetURL(false, false));
+				new MarkdownSettings()
+				{
+					Variables = new Variables()
+				});
 
 			string Html = await Doc.GenerateHTML();
 

@@ -80,7 +80,7 @@ namespace Waher.Networking.HTTP.OAuth
 				{ "token_endpoint_auth_signing_alg_values_supported", JwsAlgorithm.GetAlgorithmNames() },
 				{ "response_types_supported", new string[] { "code", "token" } },
 				{ "code_challenge_methods_supported", new string[] { "plain", "S256" } },
-				{ "authorization_response_iss_parameter_supported", this.JwtFactory?.HasIssuer ?? false },
+				{ "authorization_response_iss_parameter_supported", this.JwtFactory.HasIssuer },
 				{ "grant_types_supported", GrantTypesSupported.ToArray() }
 			};
 

@@ -12,6 +12,7 @@ using Waher.Events;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Networking.HTTP.OAuth.Events;
 using Waher.Runtime.Collections;
+using Waher.Script;
 using Waher.Security.JWT;
 using Waher.Security.LoginMonitor;
 using Waher.Security.Users;
@@ -168,13 +169,6 @@ namespace Waher.Networking.HTTP.OAuth
 					return;
 
 				case "token":       // Implicit
-					if (this.JwtFactory is null)
-					{
-						await ServiceUnavailable(Response, "server_error",
-							"JWT Factory not available.");
-						return;
-					}
-
 					ImplicitAuthenticationEventArgs e = new ImplicitAuthenticationEventArgs(Request);
 					await this.ImplicitAuthenticationRequest.Raise(this, e);
 
@@ -214,7 +208,7 @@ namespace Waher.Networking.HTTP.OAuth
 							Request.Encrypted, this.JwtFactory, Scope);
 
 						await Response.Return(this.TokenResource.TokenResponse(Token, State,
-							3600, Scope, this.JwtFactory?.Issuer, false, User, Request));
+							3600, Scope, this.JwtFactory.Issuer, false, User, Request));
 						return;
 					}
 
@@ -285,10 +279,10 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine("Title: Login");
 			Markdown.AppendLine("Description: OAUTH login page.");
 
-			if (Request.Server.TryGetLocalResourceFileName("/Master.md", Request.Host, out string FileName) &&
-				File.Exists(FileName))
+			if (this.Environment.HasLoginMasterFileName)
 			{
-				Markdown.AppendLine("Master: /Master.md");
+				Markdown.Append("Master: ");
+				Markdown.AppendLine(this.Environment.LoginMasterFileName);
 			}
 
 			Markdown.Append("Date: ");
@@ -301,7 +295,7 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine("========");
 			Markdown.AppendLine();
 
-			string? ParametersToken = this.JwtFactory?.Create(
+			string ParametersToken = this.JwtFactory.Create(
 				new KeyValuePair<string, object>("redirect_uri", From),
 				new KeyValuePair<string, object>("state", State),
 				new KeyValuePair<string, object>("scope", Scope),
@@ -351,8 +345,10 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine("</form>");
 
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(),
-				new MarkdownSettings(), string.Empty, this.ResourceName,
-				Request.Header.GetURL(false, false));
+				new MarkdownSettings()
+				{
+					Variables = new Variables()
+				});
 			
 			string Html = await Doc.GenerateHTML();
 
@@ -395,7 +391,7 @@ namespace Waher.Networking.HTTP.OAuth
 				!Form.TryGetValue("p", out string ParametersToken) ||
 				string.IsNullOrEmpty(ParametersToken) ||
 				!JwtToken.TryParse(ParametersToken, out JwtToken? Parameters) ||
-				!(this.JwtFactory?.IsValid(Parameters) ?? false) ||
+				!this.JwtFactory.IsValid(Parameters) ||
 				!Parameters.TryGetClaim("redirect_uri", out object Obj) || !(Obj is string RedirectUri) ||
 				!Parameters.TryGetClaim("state", out Obj) || !(Obj is string State) ||
 				!Parameters.TryGetClaim("scope", out Obj) || !(Obj is string Scope) ||
@@ -472,7 +468,7 @@ namespace Waher.Networking.HTTP.OAuth
 					if (!string.IsNullOrEmpty(State))
 						RedirectUri += "&state=" + HttpUtility.UrlEncode(State);
 
-					if (this.JwtFactory?.HasIssuer ?? false)
+					if (this.JwtFactory.HasIssuer)
 						RedirectUri += "&iss=" + HttpUtility.UrlEncode(this.JwtFactory.Issuer);
 
 					await Response.SendResponse(new SeeOtherException(RedirectUri));

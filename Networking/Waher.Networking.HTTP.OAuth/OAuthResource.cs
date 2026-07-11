@@ -76,7 +76,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <summary>
 		/// Associated JWT factory object instance, if any is defined.
 		/// </summary>
-		protected JwtFactory? JwtFactory => this.environment.JwtFactory;
+		protected JwtFactory JwtFactory => this.environment.JwtFactory;
 
 		/// <summary>
 		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
@@ -117,7 +117,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <param name="Users">User source used for authentication.</param>
 		/// <returns>Set of authentication scheme object references.</returns>
 		protected HttpAuthenticationScheme[] CreateAuthenticationSchemes(
-			JwtFactory? JwtFactory, IUserSource Users)
+			JwtFactory JwtFactory, IUserSource Users)
 		{
 			// Note: Restricted set of authentication schemes, as compared to
 			// HttpModule.GetAuthenticationSchemes().

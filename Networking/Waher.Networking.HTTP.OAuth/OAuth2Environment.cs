@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Waher.Content;
@@ -26,6 +27,7 @@ namespace Waher.Networking.HTTP.OAuth
 		private IDynamicUserSource? dynamicUserSource = null;
 		private IThingRegistryUserSource? thingRegistryUserSource = null;
 		private JwtFactory? jwtFactory;
+		private string? loginMasterFileName;
 		private string? realm;
 		private int minStrength;
 		private bool encrypted;
@@ -36,7 +38,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// </summary>
 		public OAuth2Environment()
 		{
-			this.Register(Security.Users.Users.Source);	// Default users source
+			this.Register(Security.Users.Users.Source); // Default users source
 		}
 
 		/// <summary>
@@ -85,9 +87,9 @@ namespace Waher.Networking.HTTP.OAuth
 		public bool HasThingRegistryUserSource => !(this.thingRegistryUserSource is null);
 
 		/// <summary>
-		/// If the environment has a registered JWT factory
+		/// If a login master file name has been registered
 		/// </summary>
-		public bool HasJwtFactory => !(this.JwtFactory is null);
+		public bool HasLoginMasterFileName => !string.IsNullOrEmpty(this.loginMasterFileName);
 
 		/// <summary>
 		/// Registered authorization resource
@@ -218,7 +220,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <summary>
 		/// Registered JWT factory
 		/// </summary>
-		public JwtFactory? JwtFactory
+		public JwtFactory JwtFactory
 		{
 			get
 			{
@@ -229,9 +231,28 @@ namespace Waher.Networking.HTTP.OAuth
 					{
 						this.jwtFactory = JwtFactory;
 					}
+					else
+						this.jwtFactory = JwtFactory.CreateHmacSha256(this.realm);
 				}
 
 				return this.jwtFactory;
+			}
+		}
+
+		/// <summary>
+		/// File name to master file to use in generated login pages.
+		/// </summary>
+		public string? LoginMasterFileName
+		{
+			get => this.loginMasterFileName;
+			set
+			{
+				this.AssertUnlocked();
+
+				if (!string.IsNullOrEmpty(value) && !File.Exists(value))
+					throw new FileNotFoundException("Login master file not found.", value);
+
+				this.loginMasterFileName = value;
 			}
 		}
 
@@ -367,7 +388,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// Registers a JWT factory.
 		/// </summary>
 		/// <param name="JwtFactory">JWT factory to register.</param>
-		public void Register(JwtFactory? JwtFactory)
+		public void Register(JwtFactory JwtFactory)
 		{
 			this.AssertUnlocked();
 			this.jwtFactory = JwtFactory;

@@ -175,6 +175,7 @@
 		<Content fileName="MarkdownEditor.md"/>
 		<Content fileName="GlobalComponents.js"/>
 		<Content fileName="Master.md"/>
+		<Content fileName="MasterOAuth.md"/>
 		<Content fileName="Prompt.js"/>
 		<Content fileName="Prompt.md"/>
 		<Content fileName="PromptPopup.md"/>

@@ -785,6 +785,9 @@
 		<Content Include="Root\MarkdownLab\MarkdownLabXaml.ws">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+		<Content Include="Root\MasterOAuth.md">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 		<Content Include="Root\PlantUmlLab\Examples\Activity.uml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>

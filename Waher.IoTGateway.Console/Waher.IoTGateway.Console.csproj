@@ -67,8 +67,11 @@
     <ProjectReference Include="..\Jobs\Waher.Jobs.Metering\Waher.Jobs.Metering.csproj" />
     <ProjectReference Include="..\Jobs\Waher.Jobs.Script\Waher.Jobs.Script.csproj" />
     <ProjectReference Include="..\Jobs\Waher.Jobs\Waher.Jobs.csproj" />
+    <ProjectReference Include="..\Mcp\Waher.Mcp.Events\Waher.Mcp.Events.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.HTTP.Brotli\Waher.Networking.HTTP.Brotli.csproj" />
 		<ProjectReference Include="..\Networking\Waher.Networking.HTTP.JsonRpc\Waher.Networking.HTTP.JsonRpc.csproj" />
+		<ProjectReference Include="..\Networking\Waher.Networking.HTTP.Mcp\Waher.Networking.HTTP.Mcp.csproj" />
+		<ProjectReference Include="..\Networking\Waher.Networking.HTTP.OAuth\Waher.Networking.HTTP.OAuth.csproj" />
 		<ProjectReference Include="..\Networking\Waher.Networking.PeerToPeer\Waher.Networking.PeerToPeer.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.SASL\Waher.Networking.SASL.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.SMTP\Waher.Networking.SMTP.csproj" />

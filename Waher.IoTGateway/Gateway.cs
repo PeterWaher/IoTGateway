@@ -1384,7 +1384,10 @@ namespace Waher.IoTGateway
 
 				InternetContent.SetDefaultTimeout(60000, true);
 
-				oauthEnvironment = new OAuth2Environment();
+				oauthEnvironment = new OAuth2Environment
+				{
+					LoginMasterFileName = Path.Combine(rootFolder, "MasterOAuth.md")
+				};
 
 				webServer.Register(new ProtectedResourceMetaData(oauthEnvironment));
 				webServer.Register(new OAuthTokenResource(oauthEnvironment));

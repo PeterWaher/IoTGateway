@@ -17,9 +17,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Markdown GraphViz</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>4.2.4</AssemblyVersion>
-    <FileVersion>4.2.4</FileVersion>
-    <Version>4.2.4</Version>
+    <AssemblyVersion>4.2.5</AssemblyVersion>
+    <FileVersion>4.2.5</FileVersion>
+    <Version>4.2.5</Version>
   </PropertyGroup>
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>

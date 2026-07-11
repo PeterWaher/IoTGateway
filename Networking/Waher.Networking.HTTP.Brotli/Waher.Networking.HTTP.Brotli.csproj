@@ -6,9 +6,9 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<AssemblyVersion>3.0.2</AssemblyVersion>
-		<FileVersion>3.0.2</FileVersion>
-		<Version>3.0.2</Version>
+		<AssemblyVersion>3.0.3</AssemblyVersion>
+		<FileVersion>3.0.3</FileVersion>
+		<Version>3.0.3</Version>
 		<Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>

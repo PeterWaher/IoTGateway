@@ -19,8 +19,8 @@
 			<dependency id="Waher.Content.Images" version="3.1.1"/>
 			<dependency id="Waher.Content.Xml" version="3.1.6"/>
       <dependency id="Waher.Events" version="1.4.7"/>
-      <dependency id="Waher.Networking.UWP" version="4.6.6"/>
-      <dependency id="Waher.Networking.XMPP.UWP" version="4.2.10"/>
+      <dependency id="Waher.Networking.UWP" version="4.6.7"/>
+      <dependency id="Waher.Networking.XMPP.UWP" version="4.2.11"/>
       <dependency id="Waher.Networking.XMPP.PEP.UWP" version="3.1.1"/>
       <dependency id="Waher.Networking.XMPP.PubSub.UWP" version="3.1.1"/>
       <dependency id="Waher.Persistence" version="2.0.1"/>

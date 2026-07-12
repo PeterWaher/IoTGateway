@@ -234,8 +234,8 @@ namespace Waher.Things.Http
 			else
 			{
 				certificate = Certificate;
-				Encrypted = true;
 				Domain = BinaryTcpClient.GetDomainFromSubject(Certificate.Subject);
+				Encrypted = Domain != "localhost";
 				MinStrength = 128;
 			}
 		}

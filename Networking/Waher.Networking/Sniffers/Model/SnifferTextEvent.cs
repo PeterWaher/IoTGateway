@@ -12,7 +12,9 @@ namespace Waher.Networking.Sniffers.Model
 			"password",
 			"secret",
 			"key",
-			"authorization"
+			"authorization",
+			"access_token",
+			"refresh_token"
 		};
 		private readonly string text;
 

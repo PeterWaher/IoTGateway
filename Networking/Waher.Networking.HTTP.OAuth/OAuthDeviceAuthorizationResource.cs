@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Html;
-using Waher.Content.Html.Elements;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Networking.HTTP.Authentication;

@@ -34,11 +34,6 @@ namespace Waher.Networking.HTTP.OAuth
 		public bool AllowsGET => true;
 
 		/// <summary>
-		/// Registered authorize resource.
-		/// </summary>
-		public OAuthAuthorizeResource AuthorizeResource => this.Environment.AuthorizeResource;
-
-		/// <summary>
 		/// Executes the GET method on the resource.
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
@@ -49,7 +44,7 @@ namespace Waher.Networking.HTTP.OAuth
 			StringBuilder sb = ProtectedResourceMetaData.GenerateServerUrl(Request, out _);
 			string ServerUrl = sb.ToString();
 
-			sb.Append(this.AuthorizeResource.ResourceName);
+			sb.Append(this.Environment.AuthorizeResource.ResourceName);
 			string AuthorizeUri = sb.ToString();
 			string TokenUri = ServerUrl + OAuthTokenResource.DefaultResourcePath;
 
@@ -62,7 +57,7 @@ namespace Waher.Networking.HTTP.OAuth
 				"refresh_token"
 			};
 
-			if (!(this.AuthorizeResource.OAuthDeviceAuthorizationResource is null))
+			if (this.Environment.HasDeviceAuthorizationResource)
 				GrantTypesSupported.Add(OAuthDeviceAuthorizationResource.GrantType);
 
 			Dictionary<string, object> MetaData = new Dictionary<string, object>()
@@ -84,11 +79,11 @@ namespace Waher.Networking.HTTP.OAuth
 				{ "grant_types_supported", GrantTypesSupported.ToArray() }
 			};
 
-			if (!(this.AuthorizeResource.OAuthRegistrationResource is null))
-				MetaData["registration_endpoint"] = ServerUrl + this.AuthorizeResource.OAuthRegistrationResource.ResourceName;
+			if (this.Environment.HasRegistrationResource)
+				MetaData["registration_endpoint"] = ServerUrl + this.Environment.RegistrationResource.ResourceName;
 
-			if (!(this.AuthorizeResource.OAuthDeviceAuthorizationResource is null))
-				MetaData["device_authorization_endpoint"] = ServerUrl + this.AuthorizeResource.OAuthDeviceAuthorizationResource.ResourceName;
+			if (this.Environment.HasDeviceAuthorizationResource)
+				MetaData["device_authorization_endpoint"] = ServerUrl + this.Environment.DeviceAuthorizationResource.ResourceName;
 
 			await Response.Return(MetaData);
 		}

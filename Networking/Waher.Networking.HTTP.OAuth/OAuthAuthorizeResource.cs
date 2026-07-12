@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -59,21 +58,6 @@ namespace Waher.Networking.HTTP.OAuth
 		/// If the POST method is allowed.
 		/// </summary>
 		public bool AllowsPOST => true;
-
-		/// <summary>
-		/// Reference to token resource.
-		/// </summary>
-		internal OAuthTokenResource TokenResource => this.Environment.TokenResource;
-
-		/// <summary>
-		/// Reference to registration resource.
-		/// </summary>
-		internal OAuthRegistrationResource OAuthRegistrationResource => this.Environment.RegistrationResource;
-
-		/// <summary>
-		/// Reference to device authorization resource.
-		/// </summary>
-		internal OAuthDeviceAuthorizationResource OAuthDeviceAuthorizationResource => this.Environment.DeviceAuthorizationResource;
 
 		/// <summary>
 		/// Executes the GET method on the resource.
@@ -207,7 +191,7 @@ namespace Waher.Networking.HTTP.OAuth
 						string Token = await OAuthTokenResource.CreateToken(User,
 							Request.Encrypted, this.JwtFactory, Scope);
 
-						await Response.Return(this.TokenResource.TokenResponse(Token, State,
+						await Response.Return(this.Environment.TokenResource.TokenResponse(Token, State,
 							3600, Scope, this.JwtFactory.Issuer, false, User, Request));
 						return;
 					}
@@ -456,7 +440,7 @@ namespace Waher.Networking.HTTP.OAuth
 						return;
 					}
 
-					string Code = await this.TokenResource.GenerateTokenCode(UserWithClaims,
+					string Code = await this.Environment.TokenResource.GenerateTokenCode(UserWithClaims,
 						Request.Encrypted, CodeChallenge, CodeChallengeMethod, RedirectUri,
 						Scope);
 

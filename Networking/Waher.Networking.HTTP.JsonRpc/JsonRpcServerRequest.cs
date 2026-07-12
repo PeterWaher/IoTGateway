@@ -28,7 +28,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public string? ErrorMessage = null;
 		public object? Result = null;
 
-		public void SetError(int ErrorCode, string ErrorMessage, int StatusCode, 
+		public void SetError(int ErrorCode, string ErrorMessage, int StatusCode,
 			string StatusMessage)
 		{
 			this.ErrorCode = ErrorCode;
@@ -62,7 +62,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="HttpRequest">HTTP Request object.</param>
 		/// <param name="HttpResponse">HTTP Response object.</param>
 		/// <returns>If a response has been returned</returns>
-		public async Task<bool> BuildResponse(JsonRpcWebService WebService, 
+		public async Task<bool> BuildResponse(JsonRpcWebService WebService,
 			HttpRequest HttpRequest, HttpResponse HttpResponse)
 		{
 			bool HasSniffer = HttpRequest.Server.HasSniffers;
@@ -249,7 +249,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 								foreach (string Privilege in this.MethodInfo.RequiredPrivileges)
 								{
-									if(!User.HasPrivilege(Privilege))
+									if (!User.HasPrivilege(Privilege))
 									{
 										await HttpResponse.SendResponse(ForbiddenException.AccessDenied(
 											HttpRequest.Resource.ResourceName,
@@ -264,7 +264,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 							if (HasSniffer)
 							{
-								HttpRequest.Server.Information("Result: " + 
+								HttpRequest.Server.Information("Result: " +
 									Expression.ToExpressionString(this.Result));
 							}
 

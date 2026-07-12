@@ -128,6 +128,13 @@ namespace Waher.Networking.HTTP.OAuth
 						return;
 					}
 
+					if (!RedirectUri.StartsWith("https://"))
+					{
+						await BadRequest(Response, "invalid_request",
+							"Callback URIs must use HTTPS URI scheme to ensure secure communication.");
+						return;
+					}
+
 					if (!Form.TryGetValue("code_challenge", out string CodeChallenge))
 						CodeChallenge = string.Empty;
 
@@ -149,7 +156,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 					await Response.Return(await this.GenerateLoginForm(Request, Response,
 						ClientId, RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
-						string.Empty));
+						string.Empty, RedirectUri));
 					return;
 
 				case "token":       // Implicit
@@ -256,7 +263,7 @@ namespace Waher.Networking.HTTP.OAuth
 		private async Task<HtmlDocument> GenerateLoginForm(HttpRequest Request,
 			HttpResponse Response, string UserName, string From, string State,
 			string Scope, string CodeChallenge, string CodeChallengeMethod,
-			string ErrorMessage)
+			string ErrorMessage, string RedirectUri)
 		{
 			StringBuilder Markdown = new StringBuilder();
 
@@ -277,6 +284,34 @@ namespace Waher.Networking.HTTP.OAuth
 
 			Markdown.AppendLine("Login");
 			Markdown.AppendLine("========");
+			Markdown.AppendLine();
+
+			int i = RedirectUri.IndexOf("://");
+			string? Host = null;
+			string? Origin = null;
+
+			if (i > 0)
+			{
+				int j = RedirectUri.IndexOf('/', i + 3);
+				if (j > i)
+				{
+					Host = RedirectUri.Substring(i + 3, j - i - 3);
+					Origin = RedirectUri[..j];
+				}
+			}
+
+			if (string.IsNullOrEmpty(Host))
+			{
+				Markdown.Append("You have been requested to log in by a remote service. ");
+				Markdown.AppendLine("If you trust this service, please log in below.");
+			}
+			else
+			{
+				Markdown.Append("You have been requested to log in by a remote service at `");
+				Markdown.Append(Host);
+				Markdown.AppendLine("`. If you trust this service, please log in below.");
+			}
+
 			Markdown.AppendLine();
 
 			string ParametersToken = this.JwtFactory.Create(
@@ -333,11 +368,14 @@ namespace Waher.Networking.HTTP.OAuth
 				{
 					Variables = new Variables()
 				});
-			
+
 			string Html = await Doc.GenerateHTML();
 
 			Response.SetHeader("X-Frame-Options", "DENY");
-			Response.SetHeader("Content-Security-Policy", "frame-ancestors 'none'; default-src 'self'; script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'");
+			Response.SetHeader("Content-Security-Policy", "frame-ancestors 'none'; " +
+				"default-src 'self'; script-src 'self'; object-src 'none'; " +
+				"base-uri 'none'; form-action 'self'" +
+				(string.IsNullOrEmpty(Origin) ? string.Empty : " " + Origin));
 
 			return new HtmlDocument(Html);
 		}
@@ -427,7 +465,8 @@ namespace Waher.Networking.HTTP.OAuth
 					{
 						await Response.Return(await this.GenerateLoginForm(Request,
 							Response, UserName, RedirectUri, State, Scope, CodeChallenge,
-							CodeChallengeMethod, "User cannot be used with OAUTH login."));
+							CodeChallengeMethod, "User cannot be used with OAUTH login.",
+							RedirectUri));
 						return;
 					}
 
@@ -436,7 +475,8 @@ namespace Waher.Networking.HTTP.OAuth
 					{
 						await Response.Return(await this.GenerateLoginForm(Request,
 							Response, UserName, RedirectUri, State, Scope, CodeChallenge,
-							CodeChallengeMethod, "User does not have sufficient privileges to complete the request."));
+							CodeChallengeMethod, "User does not have sufficient privileges to complete the request.",
+							RedirectUri));
 						return;
 					}
 
@@ -462,7 +502,7 @@ namespace Waher.Networking.HTTP.OAuth
 				default:
 					await Response.Return(await this.GenerateLoginForm(Request, Response,
 						UserName, RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
-						"Invalid user name or password."));
+						"Invalid user name or password.", RedirectUri));
 					return;
 
 				case LoginResultType.NoPassword:
@@ -473,13 +513,13 @@ namespace Waher.Networking.HTTP.OAuth
 					await Response.Return(await this.GenerateLoginForm(Request, Response,
 						UserName, RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
 						"You are temporarily blocked. Try again after: " +
-						LoginResult.Next?.ToString()));
+						LoginResult.Next?.ToString(), RedirectUri));
 					return;
 
 				case LoginResultType.PermanentlyBlocked:
 					await Response.Return(await this.GenerateLoginForm(Request, Response,
 						UserName, RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
-						"You are permanently blocked."));
+						"You are permanently blocked.", RedirectUri));
 					return;
 			}
 		}

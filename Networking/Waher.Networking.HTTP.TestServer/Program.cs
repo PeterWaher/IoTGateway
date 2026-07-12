@@ -31,7 +31,6 @@ using Waher.Security.JWS;
 using Waher.Security.JWT;
 using Waher.Security.Users;
 using Waher.Things;
-using Waher.Things.ControlParameters;
 using Waher.Things.Http;
 
 internal class Program

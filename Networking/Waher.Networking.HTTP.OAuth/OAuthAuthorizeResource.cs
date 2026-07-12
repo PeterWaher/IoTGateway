@@ -363,7 +363,9 @@ namespace Waher.Networking.HTTP.OAuth
 			Markdown.AppendLine("<button type='submit'>Login</button>");
 			Markdown.AppendLine("</form>");
 
-			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(),
+			string Markdown2 = await this.Environment.RaiseCustomizeLoginForm(Markdown.ToString());
+
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown2,
 				new MarkdownSettings()
 				{
 					Variables = new Variables()

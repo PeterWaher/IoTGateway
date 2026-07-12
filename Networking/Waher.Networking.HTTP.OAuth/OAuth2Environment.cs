@@ -2,7 +2,10 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
+using Waher.Networking.HTTP.OAuth.Events;
 using Waher.Networking.HTTP.OAuth.Interfaces;
 using Waher.Runtime.Inventory;
 using Waher.Security;
@@ -27,6 +30,9 @@ namespace Waher.Networking.HTTP.OAuth
 		private IDynamicUserSource? dynamicUserSource = null;
 		private IThingRegistryUserSource? thingRegistryUserSource = null;
 		private JwtFactory? jwtFactory;
+		private event EventHandlerAsync<CustomizeMarkdownEventArgs>? customizeLoginForm;
+		private event EventHandlerAsync<CustomizeMarkdownEventArgs>? customizeDeviceLoginForm;
+		private event EventHandlerAsync<CustomizeMarkdownEventArgs>? customizeDeviceLoginReceipt;
 		private string? loginMasterFileName;
 		private string? realm;
 		private int minStrength;
@@ -467,5 +473,103 @@ namespace Waher.Networking.HTTP.OAuth
 			return Base64Url.Encode(Bin);
 		}
 
+		/// <summary>
+		/// Event raised when the login form is to be customized.
+		/// </summary>
+		public event EventHandlerAsync<CustomizeMarkdownEventArgs>? CustomizeLoginForm
+		{
+			add
+			{
+				this.AssertUnlocked();
+				this.customizeLoginForm += value;
+			}
+			remove
+			{
+				this.AssertUnlocked();
+				this.customizeLoginForm -= value;
+			}
+		}
+
+		/// <summary>
+		/// Raises the <see cref="CustomizeLoginForm"/> event to customize a login form
+		/// before being returned to the client.
+		/// </summary>
+		/// <param name="Markdown">Markdown of login form.</param>
+		/// <returns></returns>
+		public async Task<string> RaiseCustomizeLoginForm(string Markdown)
+		{
+			if (this.customizeLoginForm is null)
+				return Markdown;
+
+			CustomizeMarkdownEventArgs e = new CustomizeMarkdownEventArgs(Markdown);
+			await this.customizeLoginForm.Raise(this, e);
+			return e.Markdown;
+		}
+
+		/// <summary>
+		/// Event raised when the device login form is to be customized.
+		/// </summary>
+		public event EventHandlerAsync<CustomizeMarkdownEventArgs>? CustomizeDeviceLoginForm
+		{
+			add
+			{
+				this.AssertUnlocked();
+				this.customizeDeviceLoginForm += value;
+			}
+			remove
+			{
+				this.AssertUnlocked();
+				this.customizeDeviceLoginForm -= value;
+			}
+		}
+
+		/// <summary>
+		/// Raises the <see cref="CustomizeDeviceLoginForm"/> event to customize a device
+		/// login form before being returned to the client.
+		/// </summary>
+		/// <param name="Markdown">Markdown of device login form.</param>
+		/// <returns>Customized Markdown of device login form.</returns>
+		public async Task<string> RaiseCustomizeDeviceLoginForm(string Markdown)
+		{
+			if (this.customizeDeviceLoginForm is null)
+				return Markdown;
+
+			CustomizeMarkdownEventArgs e = new CustomizeMarkdownEventArgs(Markdown);
+			await this.customizeDeviceLoginForm.Raise(this, e);
+			return e.Markdown;
+		}
+
+		/// <summary>
+		/// Event raised when the device login receipt is to be customized.
+		/// </summary>
+		public event EventHandlerAsync<CustomizeMarkdownEventArgs>? CustomizeDeviceLoginReceipt
+		{
+			add
+			{
+				this.AssertUnlocked();
+				this.customizeDeviceLoginReceipt += value;
+			}
+			remove
+			{
+				this.AssertUnlocked();
+				this.customizeDeviceLoginReceipt -= value;
+			}
+		}
+
+		/// <summary>
+		/// Raises the <see cref="CustomizeDeviceLoginReceipt"/> event to customize a device
+		/// login receipt before being returned to the client.
+		/// </summary>
+		/// <param name="Markdown">Markdown of device login receipt.</param>
+		/// <returns>Customized Markdown of device login receipt.</returns>
+		public async Task<string> RaiseCustomizeDeviceLoginReceipt(string Markdown)
+		{
+			if (this.customizeDeviceLoginReceipt is null)
+				return Markdown;
+
+			CustomizeMarkdownEventArgs e = new CustomizeMarkdownEventArgs(Markdown);
+			await this.customizeDeviceLoginReceipt.Raise(this, e);
+			return e.Markdown;
+		}
 	}
 }

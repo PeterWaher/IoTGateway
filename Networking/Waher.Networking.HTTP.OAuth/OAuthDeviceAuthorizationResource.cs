@@ -480,7 +480,9 @@ namespace Waher.Networking.HTTP.OAuth
 
 			Markdown.AppendLine("</form>");
 
-			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(),
+			string Markdown2 = await this.Environment.RaiseCustomizeDeviceLoginForm(Markdown.ToString());
+
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown2,
 				new MarkdownSettings()
 				{
 					Variables = new Variables()
@@ -537,7 +539,9 @@ namespace Waher.Networking.HTTP.OAuth
 
 			Markdown.AppendLine("You can safely close this tab.");
 
-			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(),
+			string Markdown2 = await this.Environment.RaiseCustomizeDeviceLoginReceipt(Markdown.ToString());
+
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown2,
 				new MarkdownSettings()
 				{
 					Variables = new Variables()

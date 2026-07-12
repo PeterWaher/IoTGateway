@@ -386,7 +386,11 @@ namespace Waher.Networking.HTTP
 		/// <param name="Key">Meta-data key.</param>
 		/// <param name="Value">Meta-data value, if found, null otherwise.</param>
 		/// <returns>If meta-data was found having the given key.</returns>
-		public bool TryGetMetaData(string Key, [NotNullWhen(true)] out object Value)
+		public bool TryGetMetaData(string Key,
+#if !WINDOWS_UWP
+			[NotNullWhen(true)]
+#endif
+			out object Value)
 		{
 			if (this.metaData is null)
 			{

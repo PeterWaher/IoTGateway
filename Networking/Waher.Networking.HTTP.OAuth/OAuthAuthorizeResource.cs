@@ -9,7 +9,10 @@ using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP.Authentication;
+using Waher.Networking.HTTP.OAuth.Clients;
 using Waher.Networking.HTTP.OAuth.Events;
+using Waher.Persistence;
+using Waher.Persistence.Filters;
 using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Security.JWT;
@@ -307,18 +310,60 @@ namespace Waher.Networking.HTTP.OAuth
 				}
 			}
 
-			if (string.IsNullOrEmpty(Host))
+			i = RedirectUri.IndexOf('?');
+			OAuthRedirectUri? RegisteredUri = await Database.FindFirstIgnoreRest<OAuthRedirectUri>(
+				new FilterFieldEqualTo("Uri", i > 0 ? RedirectUri[..i] : RedirectUri));
+			OAuthClientInformation? ClientInfo = RegisteredUri is null ? null :
+				await Database.FindFirstIgnoreRest<OAuthClientInformation>(
+					new FilterFieldEqualTo("ClientId", RegisteredUri.ClientId));
+
+			if (!(ClientInfo is null))
 			{
-				Markdown.Append("You have been requested to log in by a remote service. ");
-				Markdown.AppendLine("If you trust this service, please log in below.");
+				if (!string.IsNullOrEmpty(ClientInfo.LogoUri))
+				{
+					Markdown.Append("![](");
+					Markdown.Append(ClientInfo.LogoUri);
+					Markdown.AppendLine(")");
+				}
+
+				Markdown.AppendLine();
+
+				if (!string.IsNullOrEmpty(ClientInfo.ClientName))
+				{
+					if (!string.IsNullOrEmpty(ClientInfo.ClientUri))
+					{
+						Markdown.Append("You have been requested to log in by [*");
+						Markdown.Append(ClientInfo.ClientName);
+						Markdown.Append("*](");
+						Markdown.Append(ClientInfo.ClientUri);
+						Markdown.Append("). ");
+					}
+					else
+					{
+						Markdown.Append("You have been requested to log in by *");
+						Markdown.Append(ClientInfo.ClientName);
+						Markdown.Append("*. ");
+					}
+				}
+				else
+				{
+				}
+			}
+			else if (!string.IsNullOrEmpty(Host))
+			{
+				Markdown.Append("You have been requested to log in by an **unregistered** ");
+				Markdown.Append("remote service at `");
+				Markdown.Append(Host);
+				Markdown.Append("`. ");
 			}
 			else
 			{
-				Markdown.Append("You have been requested to log in by a remote service at `");
-				Markdown.Append(Host);
-				Markdown.AppendLine("`. If you trust this service, please log in below.");
+				Markdown.Append("You have been requested to log in to an **unregistered** ");
+				Markdown.Append("remote service. ");
 			}
 
+			Markdown.Append("If you trust this service, please log in below. ");
+			Markdown.AppendLine("Otherwise, close the window and ignore the request.");
 			Markdown.AppendLine();
 
 			string ParametersToken = this.JwtFactory.Create(
@@ -369,6 +414,43 @@ namespace Waher.Networking.HTTP.OAuth
 
 			Markdown.AppendLine("<button type='submit'>Login</button>");
 			Markdown.AppendLine("</form>");
+			Markdown.AppendLine();
+
+			if (!string.IsNullOrEmpty(ClientInfo?.TosUri))
+			{
+				Markdown.Append("[Terms of Service](");
+				Markdown.Append(ClientInfo.TosUri);
+				Markdown.AppendLine(")");
+			}
+
+			if (!string.IsNullOrEmpty(ClientInfo?.PolicyUri))
+			{
+				Markdown.Append("[Privacy Policy](");
+				Markdown.Append(ClientInfo.PolicyUri);
+				Markdown.AppendLine(")");
+			}
+
+			if ((ClientInfo?.Contacts?.Length ?? 0) > 0)
+			{
+				foreach (string Contact in ClientInfo?.Contacts ?? Array.Empty<string>())
+				{
+					if (!string.IsNullOrEmpty(Contact))
+					{
+						Markdown.Append("[Contact](");
+
+						if (Contact.IndexOf(':') < 0)
+						{
+							if (Contact.Contains('@'))
+								Markdown.Append("mailto:");
+							else
+								Markdown.Append("tel:");
+						}
+
+						Markdown.Append(Contact);
+						Markdown.AppendLine(")");
+					}
+				}
+			}
 
 			string Markdown2 = await this.Environment.RaiseCustomizeLoginForm(Markdown.ToString());
 

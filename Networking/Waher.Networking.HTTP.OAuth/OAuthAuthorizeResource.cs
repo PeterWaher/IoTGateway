@@ -128,10 +128,17 @@ namespace Waher.Networking.HTTP.OAuth
 						return;
 					}
 
-					if (!RedirectUri.StartsWith("https://"))
+					if (!Uri.TryCreate(RedirectUri, UriKind.Absolute, out Uri? RedirectUri2))
+					{
+						await BadRequest(Response, "invalid_redirect_uri",
+							"Invalid redirection URI.");
+						return;
+					}
+
+					if (!RedirectUri.StartsWith("https://") && RedirectUri2.Host != "localhost")
 					{
 						await BadRequest(Response, "invalid_request",
-							"Callback URIs must use HTTPS URI scheme to ensure secure communication.");
+							"Callback URIs must use HTTPS URI scheme (unless localhost) to ensure secure communication.");
 						return;
 					}
 

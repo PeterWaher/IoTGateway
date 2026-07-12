@@ -3,8 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Networking.HTTP.OAuth.Clients;
 using Waher.Networking.HTTP.OAuth.Interfaces;
+using Waher.Persistence;
+using Waher.Persistence.Filters;
 using Waher.Runtime.Collections;
+using Waher.Security.LoginMonitor;
 
 namespace Waher.Networking.HTTP.OAuth
 {
@@ -102,6 +106,15 @@ namespace Waher.Networking.HTTP.OAuth
 									!string.IsNullOrEmpty(Parsed.Query))
 								{
 									await BadRequest(Response, "invalid_redirect_uri", "Invalid redirection URI.");
+									return;
+								}
+
+								OAuthRedirectUri? UriObj = await Database.FindFirstIgnoreRest<OAuthRedirectUri>(
+									new FilterFieldEqualTo("Uri", RedirectUri));
+
+								if (!(UriObj is null))
+								{
+									await Forbidden(Response, "invalid_redirect_uri", "URI already registered.");
 									return;
 								}
 							}
@@ -236,19 +249,62 @@ namespace Waher.Networking.HTTP.OAuth
 				return;
 			}
 
+			RegistrationRequest RegistrationRequest = new RegistrationRequest(
+				Request.RemoteEndPoint, RedirectUris, GrantTypes, ResponseTypes,
+				TokenEndpointAuthMethod, ClientName, SoftwareId, SoftwareVersion,
+				ClientUri, LogoUri, TosUri, PolicyUri, JwksUri, Scopes, Contacts,
+				Jwks, MetaData);
+
 			IRegistration? Registration = await DynamicUserSource.RegisterUser(
-				new RegistrationRequest(Request.RemoteEndPoint, RedirectUris,
-				GrantTypes, ResponseTypes, TokenEndpointAuthMethod, ClientName, SoftwareId,
-				SoftwareVersion, ClientUri, LogoUri, TosUri, PolicyUri, JwksUri, Scopes,
-				Contacts, Jwks, MetaData));
+				RegistrationRequest);
 
 			if (Registration is null)
 			{
-				await Forbidden(Response, "access_denied", 
+				await Forbidden(Response, "access_denied",
 					"Not permitted to register new client.");
 				return;
 			}
 
+			DateTime TP = DateTime.UtcNow;
+			OAuthClientInformation ClientInfo = new OAuthClientInformation()
+			{
+				ClientId = Registration.ClientId,
+				Created = TP,
+				Updated = TP,
+				RemoteEndPoint = RegistrationRequest.RemoteEndPoint,
+				RedirectUris = RegistrationRequest.RedirectUris,
+				GrantTypes = RegistrationRequest.GrantTypes,
+				ResponseTypes = RegistrationRequest.ResponseTypes,
+				TokenEndpointAuthMethod = RegistrationRequest.TokenEndpointAuthMethod,
+				ClientName = RegistrationRequest.ClientName,
+				SoftwareId = RegistrationRequest.SoftwareId,
+				SoftwareVersion = RegistrationRequest.SoftwareVersion,
+				ClientUri = RegistrationRequest.ClientUri?.ToString(),
+				LogoUri = RegistrationRequest.LogoUri?.ToString(),
+				TosUri = RegistrationRequest.TosUri?.ToString(),
+				PolicyUri = RegistrationRequest.PolicyUri?.ToString(),
+				JwksUri = RegistrationRequest.JwksUri?.ToString(),
+				Scopes = RegistrationRequest.Scopes,
+				Contacts = RegistrationRequest.Contacts,
+				Jwks = RegistrationRequest.Jwks,
+				MetaData = RegistrationRequest.MetaData
+			};
+
+			await Database.Insert(ClientInfo);
+
+			if (!(RedirectUris is null))
+			{
+				foreach (string RedirectUri in RedirectUris)
+				{
+					OAuthRedirectUri? UriObj = new OAuthRedirectUri()
+					{
+						ClientId = Registration.ClientId,
+						Uri = RedirectUri
+					};
+
+					await Database.Insert(UriObj);
+				}
+			}
 
 			Dictionary<string, object> ResponseObj = new Dictionary<string, object>();
 

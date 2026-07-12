@@ -20,8 +20,8 @@ using Waher.Events.Console;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.Interfaces;
 using Waher.Networking.HTTP.OAuth.MetaData;
-using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Networking.Sniffers;
+using Waher.Persistence;
 using Waher.Runtime.Collections;
 using Waher.Security;
 using Waher.Security.JWT;
@@ -72,7 +72,7 @@ namespace Waher.Networking.HTTP.Test
 		public TestContext TestContext { get; set; }
 
 		[TestInitialize]
-		public void TestInitialize()
+		public async Task TestInitialize()
 		{
 			string SnifferFileName = this.TestContext.TestName;
 			if (string.IsNullOrEmpty(SnifferFileName))
@@ -90,6 +90,9 @@ namespace Waher.Networking.HTTP.Test
 
 			this.jwtFactory = JwtFactory.CreateHmacSha256(BaseUrl);
 			this.server = new HttpServer(8081, this.xmlSniffer);
+
+			await Database.Clear("OAuthRedirectUris");
+			await Database.Clear("OAuthClients");
 
 			OAuth2Environment Environment = new();
 			Environment.Register(this.jwtFactory);
@@ -298,7 +301,7 @@ namespace Waher.Networking.HTTP.Test
 			if (string.IsNullOrEmpty(OwnerId))
 				return Task.FromResult<IUser>(null);
 
-			return TryGetUser(OwnerId);
+			return this.TryGetUser(OwnerId);
 		}
 
 		private class Registration(string UserName, string Password,
@@ -2144,10 +2147,10 @@ namespace Waher.Networking.HTTP.Test
 			HashSet<string> Expected = SplitScope(ExpectedScope);
 			HashSet<string> Actual = SplitScope(ActualScope);
 
-			Assert.AreEqual(Expected.Count, Actual.Count, "Unexpected number of scopes.");
+			Assert.HasCount(Expected.Count, Actual, "Unexpected number of scopes.");
 
 			foreach (string Scope in Expected)
-				Assert.IsTrue(Actual.Contains(Scope), "Missing scope: " + Scope);
+				Assert.Contains(Scope, Actual, "Missing scope: " + Scope);
 		}
 
 		private static void AssertJwtScope(string AccessToken, string ExpectedScope)

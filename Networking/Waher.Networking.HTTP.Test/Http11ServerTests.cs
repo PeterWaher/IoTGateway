@@ -1,10 +1,16 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Html;
 using Waher.Networking.HTTP.Brotli;
+using Waher.Networking.HTTP.OAuth.Clients;
+using Waher.Persistence;
+using Waher.Persistence.Files;
+using Waher.Persistence.Serialization;
+using Waher.Runtime.Inventory;
 using Waher.Security.JWS;
 using Waher.Security.JWT;
 
@@ -13,10 +19,12 @@ namespace Waher.Networking.HTTP.Test
 	[TestClass]
 	public class Http11ServerTests : HttpServerTests
 	{
+		private static FilesProvider filesProvider = null;
+
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext _)
+		public static async Task AssemblyInitialize(TestContext _)
 		{
-			Runtime.Inventory.Types.Initialize(
+			Types.Initialize(
 				typeof(HttpServer).Assembly,
 				typeof(BrotliContentEncoding).Assembly,
 				typeof(HttpServerTests).Assembly,
@@ -25,7 +33,28 @@ namespace Waher.Networking.HTTP.Test
 				typeof(InternetContent).Assembly,
 				typeof(HtmlDocument).Assembly,
 				typeof(IJwsAlgorithm).Assembly,
-				typeof(JwtToken).Assembly);
+				typeof(JwtToken).Assembly,
+				typeof(Database).Assembly,
+				typeof(FilesProvider).Assembly,
+				typeof(ObjectSerializer).Assembly,
+				typeof(OAuthClientInformation).Assembly);
+
+			filesProvider = await FilesProvider.CreateAsync("DB", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, false);
+			Database.Register(filesProvider);
+
+			await Types.StartAllModules(10000);
+		}
+
+		[AssemblyCleanup]
+		public static async Task AssemblyCleanup()
+		{
+			await Types.StopAllModules();
+
+			if (filesProvider is not null)
+			{
+				await filesProvider.DisposeAsync();
+				filesProvider = null;
+			}
 		}
 
 		[TestCleanup]

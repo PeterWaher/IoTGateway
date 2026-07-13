@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
-using Waher.Content.Emoji;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Html;
 using Waher.Content.Images;
@@ -106,6 +105,7 @@ using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Security;
 using Waher.Security.CallStack;
+using Waher.Security.JWT;
 using Waher.Security.LoginMonitor;
 using Waher.Security.SHA3;
 using Waher.Security.Users;
@@ -216,6 +216,7 @@ namespace Waher.IoTGateway
 		private static Dictionary<string, string> defaultPageByHostName = null;
 		private static CommunicationLayer firstChanceExceptions = new CommunicationLayer(true);
 		private static IPersistentDictionary nonceValues;
+		private static JwtFactory jwtFactory = null;
 		private static DateTime wafTimestamp = DateTime.MinValue;
 		private static string instance;
 		private static string appDataFolder;
@@ -1383,6 +1384,18 @@ namespace Waher.IoTGateway
 				await CheckWAF();
 
 				InternetContent.SetDefaultTimeout(60000, true);
+
+				if (HasDomain)
+				{
+					if (DomainConfiguration.Instance.UseEncryption)
+						jwtFactory = JwtFactory.CreateHmacSha256("https://" + Domain);
+					else
+						jwtFactory = JwtFactory.CreateHmacSha256("http://" + Domain);
+				}
+				else
+					jwtFactory = JwtFactory.CreateHmacSha256(string.Empty);
+
+				Types.SetModuleParameter("JWT", jwtFactory);
 
 				oauthEnvironment = new OAuth2Environment
 				{
@@ -2967,6 +2980,9 @@ namespace Waher.IoTGateway
 				SafeDispose(xmlFileSnifferCache);
 				xmlFileSnifferCache = null;
 
+				SafeDispose(jwtFactory);
+				jwtFactory = null;
+
 				root = null;
 
 				if (exportExceptions)
@@ -3137,6 +3153,11 @@ namespace Waher.IoTGateway
 		/// Full path to Gateway.config file.
 		/// </summary>
 		public static string ConfigFilePath => Path.Combine(appDataFolder, GatewayConfigLocalFileName);
+
+		/// <summary>
+		/// JWT Factory, used to create and validate JWT tokens.
+		/// </summary>
+		public static JwtFactory JwtFactory => jwtFactory;
 
 		/// <summary>
 		/// Gets the port numbers defined for a given protocol in the configuration file.

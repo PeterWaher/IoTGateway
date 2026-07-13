@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Html;
+using Waher.Content.Images;
+using Waher.Content.Json;
 using Waher.Networking.HTTP.OAuth.Clients;
 using Waher.Networking.HTTP.OAuth.Interfaces;
 using Waher.Persistence;
@@ -111,7 +114,7 @@ namespace Waher.Networking.HTTP.OAuth
 			await Database.Insert(ClientInfo);
 			await AddRedirectUrls(Registration.ClientId, RegistrationRequest.RedirectUris);
 
-			Dictionary<string, object> ResponseObj = this.RegistrationResponse(Request, 
+			Dictionary<string, object> ResponseObj = this.RegistrationResponse(Request,
 				Response, Parsed, ClientInfo, Registration);
 
 			Response.StatusCode = 201;
@@ -120,8 +123,8 @@ namespace Waher.Networking.HTTP.OAuth
 			await Response.Return(ResponseObj);
 		}
 
-		internal Dictionary<string, object> RegistrationResponse(HttpRequest Request, 
-			HttpResponse Response, ParsedRegistrationRequest? Parsed, 
+		internal Dictionary<string, object> RegistrationResponse(HttpRequest Request,
+			HttpResponse Response, ParsedRegistrationRequest? Parsed,
 			OAuthClientInformation ClientInfo, IRegistration? Registration)
 		{
 			Dictionary<string, object> ResponseObj = new Dictionary<string, object>();
@@ -292,10 +295,24 @@ namespace Waher.Networking.HTTP.OAuth
 							await BadRequest(Response, "invalid_request", "Invalid client_uri");
 							return null;
 						}
+
+						if (!await IsValidUri(ClientUri, 
+							string.Join(", ", HtmlCodec.HtmlContentTypes)))
+						{
+							await BadRequest(Response, "invalid_request", "Invalid client_uri");
+							return null;
+						}
 						break;
 
 					case "logo_uri":
 						if (!Uri.TryCreate(P.Value?.ToString(), UriKind.Absolute, out LogoUri))
+						{
+							await BadRequest(Response, "invalid_request", "Invalid logo_uri");
+							return null;
+						}
+
+						if (!await IsValidUri(LogoUri,
+							string.Join(", ", ImageCodec.ImageContentTypes)))
 						{
 							await BadRequest(Response, "invalid_request", "Invalid logo_uri");
 							return null;
@@ -308,6 +325,13 @@ namespace Waher.Networking.HTTP.OAuth
 							await BadRequest(Response, "invalid_request", "Invalid tos_uri");
 							return null;
 						}
+
+						if (!await IsValidUri(TosUri,
+							string.Join(", ", HtmlCodec.HtmlContentTypes)))
+						{
+							await BadRequest(Response, "invalid_request", "Invalid tos_uri");
+							return null;
+						}
 						break;
 
 					case "policy_uri":
@@ -316,10 +340,23 @@ namespace Waher.Networking.HTTP.OAuth
 							await BadRequest(Response, "invalid_request", "Invalid policy_uri");
 							return null;
 						}
+
+						if (!await IsValidUri(PolicyUri,
+							string.Join(", ", HtmlCodec.HtmlContentTypes)))
+						{
+							await BadRequest(Response, "invalid_request", "Invalid policy_uri");
+							return null;
+						}
 						break;
 
 					case "jwks_uri":
 						if (!Uri.TryCreate(P.Value?.ToString(), UriKind.Absolute, out JwksUri))
+						{
+							await BadRequest(Response, "invalid_request", "Invalid jwks_uri");
+							return null;
+						}
+
+						if (!await IsValidUri(JwksUri, JsonCodec.DefaultContentType))
 						{
 							await BadRequest(Response, "invalid_request", "Invalid jwks_uri");
 							return null;
@@ -373,6 +410,15 @@ namespace Waher.Networking.HTTP.OAuth
 						return null;
 
 					default:
+						if (P.Key.EndsWith("_uri") && (
+							!(P.Value is string s) ||
+							!Uri.TryCreate(s, UriKind.Absolute, out Uri MetaUri) ||
+							!await IsValidUri(MetaUri, "*/*")))
+						{
+							await BadRequest(Response, "invalid_request", "Invalid URI: " + P.Key);
+							return null;
+						}
+
 						MetaData ??= new Dictionary<string, object?>();
 						MetaData[P.Key] = P.Value;
 						break;
@@ -397,19 +443,34 @@ namespace Waher.Networking.HTTP.OAuth
 			}
 
 			RegistrationRequest RegistrationRequest = new RegistrationRequest(
-				Request.RemoteEndPoint, RedirectUris, GrantTypes, ResponseTypes, 
-				TokenEndpointAuthMethod, ClientName, SoftwareId, SoftwareVersion, 
-				ClientUri, LogoUri, TosUri, PolicyUri, JwksUri, Scopes, Contacts, 
+				Request.RemoteEndPoint, RedirectUris, GrantTypes, ResponseTypes,
+				TokenEndpointAuthMethod, ClientName, SoftwareId, SoftwareVersion,
+				ClientUri, LogoUri, TosUri, PolicyUri, JwksUri, Scopes, Contacts,
 				Jwks, MetaData, ClientId, ClientSecret);
 
 			return new ParsedRegistrationRequest(RegistrationRequest, RequestObj,
 				DynamicUserSource, ReturnClientSecret);
 		}
 
+		private static async Task<bool> IsValidUri(Uri Uri, string Accept)
+		{
+			try
+			{
+				ContentResponse Response = await InternetContent.GetAsync(Uri,
+					new KeyValuePair<string, string>("Accept", Accept));
+
+				return !Response.HasError;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+		}
+
 		internal class ParsedRegistrationRequest
 		{
 			public ParsedRegistrationRequest(RegistrationRequest Request,
-				Dictionary<string, object> RequestObj, IDynamicUserSource DynamicUserSource, 
+				Dictionary<string, object> RequestObj, IDynamicUserSource DynamicUserSource,
 				bool ReturnClientSecret)
 			{
 				this.Request = Request;

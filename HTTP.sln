@@ -75,6 +75,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security", "Security\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Cache", "Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj", "{FA95ED7C-7AA0-6C39-A9DA-39509FC3B1C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Html", "Content\Waher.Content.Html\Waher.Content.Html.csproj", "{E919DC8A-3311-644A-F14B-3E1C007A7DAC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -225,6 +227,10 @@ Global
 		{FA95ED7C-7AA0-6C39-A9DA-39509FC3B1C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA95ED7C-7AA0-6C39-A9DA-39509FC3B1C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA95ED7C-7AA0-6C39-A9DA-39509FC3B1C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E919DC8A-3311-644A-F14B-3E1C007A7DAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E919DC8A-3311-644A-F14B-3E1C007A7DAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E919DC8A-3311-644A-F14B-3E1C007A7DAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E919DC8A-3311-644A-F14B-3E1C007A7DAC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

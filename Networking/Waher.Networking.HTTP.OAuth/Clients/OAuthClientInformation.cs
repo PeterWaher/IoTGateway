@@ -10,6 +10,7 @@ namespace Waher.Networking.HTTP.OAuth.Clients
 	[CollectionName("OAuthClients")]
 	[TypeName(TypeNameSerialization.None)]
 	[Index("ClientId")]
+	[Index("RemoteEndPoint")]
 	public class OAuthClientInformation
 	{
 		/// <summary>
@@ -53,7 +54,7 @@ namespace Waher.Networking.HTTP.OAuth.Clients
 		/// <summary>
 		/// Remote endpoint of client making the registration request.
 		/// </summary>
-		public string? RemoteEndPoint { get; set; }
+		public string RemoteEndPoint { get; set; } = string.Empty;
 
 		/// <summary>
 		/// Array of redirection URI strings for use in redirect-based flows

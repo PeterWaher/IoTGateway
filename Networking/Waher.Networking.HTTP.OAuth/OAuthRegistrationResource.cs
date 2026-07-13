@@ -11,6 +11,7 @@ using Waher.Networking.HTTP.OAuth.Interfaces;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Collections;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.HTTP.OAuth
 {
@@ -443,10 +444,10 @@ namespace Waher.Networking.HTTP.OAuth
 			}
 
 			RegistrationRequest RegistrationRequest = new RegistrationRequest(
-				Request.RemoteEndPoint, RedirectUris, GrantTypes, ResponseTypes,
-				TokenEndpointAuthMethod, ClientName, SoftwareId, SoftwareVersion,
-				ClientUri, LogoUri, TosUri, PolicyUri, JwksUri, Scopes, Contacts,
-				Jwks, MetaData, ClientId, ClientSecret);
+				Request.RemoteEndPoint.RemovePortNumber(), RedirectUris, GrantTypes, 
+				ResponseTypes, TokenEndpointAuthMethod, ClientName, SoftwareId,
+				SoftwareVersion, ClientUri, LogoUri, TosUri, PolicyUri, JwksUri,
+				Scopes, Contacts, Jwks, MetaData, ClientId, ClientSecret);
 
 			return new ParsedRegistrationRequest(RegistrationRequest, RequestObj,
 				DynamicUserSource, ReturnClientSecret);

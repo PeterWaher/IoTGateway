@@ -29,7 +29,8 @@ namespace Waher.Networking.HTTP.OAuth.Interfaces
 		/// Deletes an existing user.
 		/// </summary>
 		/// <param name="UserName">Name of the user to delete.</param>
+		/// <param name="RemoteEndPoint">Remote endpoint of client deleting the account.</param>
 		/// <returns>True if the user was successfully deleted, false otherwise.</returns>
-		Task<bool> DeleteUser(string UserName);
+		Task<bool> DeleteUser(string UserName, string RemoteEndPoint);
 	}
 }

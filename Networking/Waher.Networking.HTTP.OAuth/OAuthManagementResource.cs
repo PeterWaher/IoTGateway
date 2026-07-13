@@ -334,7 +334,7 @@ namespace Waher.Networking.HTTP.OAuth
 			}
 
 			if (ClientInfo.ClientId is null ||
-				!await DynamicUserSource.DeleteUser(ClientInfo.ClientId))
+				!await DynamicUserSource.DeleteUser(ClientInfo.ClientId, Request.RemoteEndPoint))
 			{
 				await Forbidden(Response, "access_denied",
 					"Not permitted to delete client.");

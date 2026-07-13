@@ -318,7 +318,7 @@ namespace Waher.Networking.HTTP.Test
 				RegistrationRequest);
 		}
 
-		public Task<bool> DeleteUser(string UserName)
+		public Task<bool> DeleteUser(string UserName, string RemoteEndPoint)
 		{
 			return Task.FromResult(this.users.Remove(UserName));
 		}

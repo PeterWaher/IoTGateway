@@ -110,5 +110,16 @@ namespace Waher.Networking.HTTP.OAuth.Interfaces
 		/// Additional meta-data available in the request.
 		/// </summary>
 		Dictionary<string, object?>? MetaData { get; }
+
+		/// <summary>
+		/// OAuth 2.0 client identifier string.
+		/// </summary>
+		string? ClientId { get; }
+
+		/// <summary>
+		/// OAuth 2.0 client secret string.
+		/// </summary>
+		string? ClientSecret { get; }
+
 	}
 }

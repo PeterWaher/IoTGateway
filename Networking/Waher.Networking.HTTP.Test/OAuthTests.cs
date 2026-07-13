@@ -101,6 +101,7 @@ namespace Waher.Networking.HTTP.Test
 			this.server.Register(new ProtectedResourceMetaData(Environment));
 			this.server.Register(new OAuthTokenResource(Environment));
 			this.server.Register(new OAuthRegistrationResource(Environment));
+			this.server.Register(new OAuthManagementResource(Environment));
 			this.server.Register(new OAuthDeviceAuthorizationResource(Environment));
 			this.server.Register(new OAuthAuthorizeResource(Environment));
 			this.server.Register(new AuthorizationServerMetaData(Environment));
@@ -295,6 +296,31 @@ namespace Waher.Networking.HTTP.Test
 				new Registration(UserName, Password, RegistrationRequest));
 		}
 
+		public async Task<IRegistration> UpdateUser(string UserName, IRegistrationRequest RegistrationRequest)
+		{
+			IUser User = await this.TryGetUser(UserName);
+			if (User is null)
+				return null;
+
+			if (!string.IsNullOrEmpty(RegistrationRequest.ClientSecret))
+			{
+				if (User is not User TypedUser)
+					return null;
+
+				this.users[User.UserName]=new User(TypedUser.UserName, 
+					RegistrationRequest.ClientSecret, TypedUser.Owner, 
+					TypedUser.Privileges);
+			}
+
+			return new Registration(UserName, RegistrationRequest.ClientSecret ?? string.Empty, 
+				RegistrationRequest);
+		}
+
+		public Task<bool> DeleteUser(string UserName)
+		{
+			return Task.FromResult(this.users.Remove(UserName));
+		}
+
 		public Task<IUser> TryGetOwner(IUser Device)
 		{
 			string OwnerId = (Device as User)?.Owner;
@@ -322,8 +348,8 @@ namespace Waher.Networking.HTTP.Test
 
 			object MetaData = MetaDataResponse.Decoded;
 			Assert.AreEqual(BaseUrl + ProtectedResource, Required<string>(MetaData, "resource"));
-			Assert.Contains(BaseUrl, Required<object[]>(MetaData, "authorization_servers"));
-			Assert.Contains("header", Required<object[]>(MetaData, "bearer_methods_supported"));
+			Assert.Contains(BaseUrl, Required<string[]>(MetaData, "authorization_servers"));
+			Assert.Contains("header", Required<string[]>(MetaData, "bearer_methods_supported"));
 
 			ContentResponse ServerMetaDataResponse = await InternetContent.GetAsync(
 				new Uri(BaseUrl + AuthorizationServerMetaData.WellKnowResourcePath));
@@ -335,19 +361,19 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(BaseUrl + OAuthTokenResource.DefaultResourcePath, Required<string>(ServerMetaData, "token_endpoint"));
 			Assert.AreEqual(BaseUrl + OAuthRegistrationResource.DefaultResourcePath, Required<string>(ServerMetaData, "registration_endpoint"));
 			Assert.AreEqual(BaseUrl + OAuthDeviceAuthorizationResource.DefaultResourcePath, Required<string>(ServerMetaData, "device_authorization_endpoint"));
-			Assert.Contains("code", Required<object[]>(ServerMetaData, "response_types_supported"));
-			Assert.Contains("token", Required<object[]>(ServerMetaData, "response_types_supported"));
-			Assert.Contains("authorization_code", Required<object[]>(ServerMetaData, "grant_types_supported"));
-			Assert.Contains("password", Required<object[]>(ServerMetaData, "grant_types_supported"));
-			Assert.Contains("client_credentials", Required<object[]>(ServerMetaData, "grant_types_supported"));
-			Assert.Contains("refresh_token", Required<object[]>(ServerMetaData, "grant_types_supported"));
-			Assert.Contains(OAuthDeviceAuthorizationResource.GrantType, Required<object[]>(ServerMetaData, "grant_types_supported"));
-			Assert.Contains("plain", Required<object[]>(ServerMetaData, "code_challenge_methods_supported"));
-			Assert.Contains("S256", Required<object[]>(ServerMetaData, "code_challenge_methods_supported"));
+			Assert.Contains("code", Required<string[]>(ServerMetaData, "response_types_supported"));
+			Assert.Contains("token", Required<string[]>(ServerMetaData, "response_types_supported"));
+			Assert.Contains("authorization_code", Required<string[]>(ServerMetaData, "grant_types_supported"));
+			Assert.Contains("password", Required<string[]>(ServerMetaData, "grant_types_supported"));
+			Assert.Contains("client_credentials", Required<string[]>(ServerMetaData, "grant_types_supported"));
+			Assert.Contains("refresh_token", Required<string[]>(ServerMetaData, "grant_types_supported"));
+			Assert.Contains(OAuthDeviceAuthorizationResource.GrantType, Required<string[]>(ServerMetaData, "grant_types_supported"));
+			Assert.Contains("plain", Required<string[]>(ServerMetaData, "code_challenge_methods_supported"));
+			Assert.Contains("S256", Required<string[]>(ServerMetaData, "code_challenge_methods_supported"));
 			Assert.Contains("client_secret_basic",
-				Required<object[]>(ServerMetaData, "token_endpoint_auth_methods_supported"));
+				Required<string[]>(ServerMetaData, "token_endpoint_auth_methods_supported"));
 			Assert.Contains("client_secret_post",
-				Required<object[]>(ServerMetaData, "token_endpoint_auth_methods_supported"));
+				Required<string[]>(ServerMetaData, "token_endpoint_auth_methods_supported"));
 			Assert.IsTrue(Required<bool>(ServerMetaData, "authorization_response_iss_parameter_supported"));
 		}
 
@@ -1500,66 +1526,193 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_49_DynamicClientRegistrationCreatesPublicClient()
+		public async Task Test_49_DynamicClientRegistration_PublicClient()
 		{
-			Dictionary<string, object> Response = await DoPost(
-				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
-				new Dictionary<string, object>()
-				{
-					{ "redirect_uris", new string[] { BaseUrl + CallbackResource } },
-					{ "client_name", "Unit Test Public Client" },
-					{ "grant_types", new string[] { "authorization_code", "refresh_token" } },
-					{ "response_types", new string[] { "code" } },
-					{ "token_endpoint_auth_method", "none" }
-				},
-				System.Net.HttpStatusCode.Created);
+			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
+				"Unit Test Client", BaseUrl + CallbackResource);
 
-			Assert.IsFalse(string.IsNullOrEmpty(Required<string>(Response, "client_id")));
-			Assert.Contains(BaseUrl + CallbackResource, Required<object[]>(Response, "redirect_uris"));
-			Assert.Contains("authorization_code", Required<object[]>(Response, "grant_types"));
-			Assert.Contains("refresh_token", Required<object[]>(Response, "grant_types"));
-			Assert.Contains("code", Required<object[]>(Response, "response_types"));
-			Assert.AreEqual("none", Required<string>(Response, "token_endpoint_auth_method"));
-			Assert.IsFalse(Response.ContainsKey("client_secret"),
-				"A public client using token_endpoint_auth_method=none must not receive a client_secret.");
+			Assert.IsFalse(string.IsNullOrEmpty(Registration.ClientId));
+			Assert.IsFalse(string.IsNullOrEmpty(Registration.RegistrationAccessToken));
+			Assert.IsFalse(string.IsNullOrEmpty(Registration.RegistrationClientUri));
+			Assert.IsTrue(Uri.TryCreate(Registration.RegistrationClientUri, UriKind.Absolute, out _),
+				"Expected registration_client_uri to be an absolute URI.");
 		}
 
-		private static async Task<Dictionary<string, object>> DoPost(string Uri,
-			object Body, System.Net.HttpStatusCode ExpectedStatusCode)
+		private class DynamicClientRegistrationResult
 		{
-			ContentResponse Encoded = await InternetContent.EncodeAsync(Body, Encoding.UTF8);
+			public string ClientId;
+			public string? ClientSecret;
+			public string RegistrationAccessToken;
+			public string RegistrationClientUri;
+		}
 
-			Encoded.AssertOk();
+		private static async Task<DynamicClientRegistrationResult> RegisterPublicClient(
+			string ClientName, string RedirectUri)
+		{
+			Dictionary<string, object> Response = await DoPost(
+				BaseUrl + OAuthRegistrationResource.DefaultResourcePath, null,
+				CreatePublicClientRegistrationRequest(ClientName, RedirectUri),
+				System.Net.HttpStatusCode.Created);
 
+			return AssertClientRegistrationResponse(Response, null,
+				ClientName, RedirectUri, "none", false);
+		}
+
+		private static Dictionary<string, object> CreatePublicClientRegistrationRequest(
+			string ClientName, string RedirectUri)
+		{
+			return new Dictionary<string, object>()
+			{
+				{ "redirect_uris", new string[] { RedirectUri } },
+				{ "client_name", ClientName },
+				{ "grant_types", new string[] { "authorization_code", "refresh_token" } },
+				{ "response_types", new string[] { "code" } },
+				{ "token_endpoint_auth_method", "none" }
+			};
+		}
+
+		private static DynamicClientRegistrationResult AssertClientRegistrationResponse(
+			IDictionary<string, object> Response, string ExpectedClientId,
+			string ExpectedClientName, string ExpectedRedirectUri,
+			string ExpectedTokenEndpointAuthMethod, bool ExpectClientSecret)
+		{
+			string ClientId = Required<string>(Response, "client_id");
+			Assert.IsFalse(string.IsNullOrEmpty(ClientId));
+
+			string? ClientSecret;
+
+			if (ExpectClientSecret)
+			{
+				ClientSecret = Required<string>(Response, "client_secret");
+				Assert.IsNotEmpty(ClientSecret, "Client secret cannot be empty.");
+			}
+			else
+			{
+				Assert.IsFalse(Response.ContainsKey("client_secret"),
+					"A public client using token_endpoint_auth_method=none must not receive a client_secret.");
+
+				ClientSecret = null;
+			}
+
+			if (!string.IsNullOrEmpty(ExpectedClientId))
+				Assert.AreEqual(ExpectedClientId, ClientId);
+
+			if (!string.IsNullOrEmpty(ExpectedClientName))
+				Assert.AreEqual(ExpectedClientName, Required<string>(Response, "client_name"));
+
+			if (!string.IsNullOrEmpty(ExpectedRedirectUri))
+			{
+				object[] RedirectUris = Required<string[]>(Response, "redirect_uris");
+				Assert.Contains(ExpectedRedirectUri, RedirectUris);
+			}
+
+			Assert.Contains("authorization_code", Required<string[]>(Response, "grant_types"));
+			Assert.Contains("refresh_token", Required<string[]>(Response, "grant_types"));
+			Assert.Contains("code", Required<string[]>(Response, "response_types"));
+
+			if (!string.IsNullOrEmpty(ExpectedTokenEndpointAuthMethod))
+			{
+				Assert.AreEqual(ExpectedTokenEndpointAuthMethod,
+					Required<string>(Response, "token_endpoint_auth_method"));
+			}
+
+			string RegistrationAccessToken = Required<string>(Response,
+				"registration_access_token");
+			string RegistrationClientUri = Required<string>(Response,
+				"registration_client_uri");
+
+			Assert.IsFalse(string.IsNullOrEmpty(RegistrationAccessToken));
+			Assert.IsFalse(string.IsNullOrEmpty(RegistrationClientUri));
+			Assert.IsTrue(Uri.TryCreate(RegistrationClientUri, UriKind.Absolute, out _),
+				"Expected registration_client_uri to be an absolute URI.");
+
+			return new DynamicClientRegistrationResult()
+			{
+				ClientId = ClientId,
+				ClientSecret = ClientSecret,
+				RegistrationAccessToken = RegistrationAccessToken,
+				RegistrationClientUri = RegistrationClientUri
+			};
+		}
+
+		private static Task<Dictionary<string, object>> DoGet(string Uri,
+			string? AccessToken, System.Net.HttpStatusCode ExpectedStatusCode)
+		{
+			return DoRequest(HttpMethod.Get, Uri, AccessToken, null, ExpectedStatusCode, true);
+		}
+
+		private static Task<Dictionary<string, object>> DoPost(string Uri,
+			string? AccessToken, object Body, System.Net.HttpStatusCode ExpectedStatusCode)
+		{
+			return DoRequest(HttpMethod.Post, Uri, AccessToken, Body, ExpectedStatusCode, true);
+		}
+
+		private static Task<Dictionary<string, object>> DoPut(string Uri,
+			string? AccessToken, object Body, System.Net.HttpStatusCode ExpectedStatusCode)
+		{
+			return DoRequest(HttpMethod.Put, Uri, AccessToken, Body, ExpectedStatusCode, true);
+		}
+
+		private static async Task DoDelete(string Uri, string? AccessToken,
+			System.Net.HttpStatusCode ExpectedStatusCode)
+		{
+			await DoRequest(HttpMethod.Delete, Uri, AccessToken, null, ExpectedStatusCode, false);
+		}
+
+		private static async Task<Dictionary<string, object>> DoRequest(HttpMethod Method,
+			string Uri, string? AccessToken, object Body, System.Net.HttpStatusCode ExpectedStatusCode,
+			bool ExpectResponse)
+		{
 			using HttpClient Client = new();
-			using ByteArrayContent Content = new(Encoded.Encoded);
 			using HttpRequestMessage Request = new()
 			{
-				Method = HttpMethod.Post,
-				Content = Content,
+				Method = Method,
 				RequestUri = new Uri(Uri)
 			};
 
-			Request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(Encoded.ContentType);
+			if (Body is not null)
+			{
+				ContentResponse Encoded = await InternetContent.EncodeAsync(Body, Encoding.UTF8);
+				Encoded.AssertOk();
+
+				Request.Content = new ByteArrayContent(Encoded.Encoded);
+				Request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(Encoded.ContentType);
+			}
+
+			if (!string.IsNullOrEmpty(AccessToken))
+				Request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 
 			using HttpResponseMessage Response = await Client.SendAsync(Request);
 
-			string ResponseText = await Response.Content.ReadAsStringAsync(CancellationToken.None);
-			Assert.AreEqual(ExpectedStatusCode, Response.StatusCode, ResponseText);
-
+			Assert.AreEqual(ExpectedStatusCode, Response.StatusCode);
 			AssertNoStoreHeaders(Response);
 
-			Dictionary<string, object> Parsed = JSON.Parse(ResponseText) as Dictionary<string, object>;
-			Assert.IsNotNull(Parsed);
+			if (!Response.IsSuccessStatusCode)
+				ExpectResponse = true;
 
-			return Parsed;
+			string ResponseText = await Response.Content.ReadAsStringAsync(CancellationToken.None);
+
+			if (ExpectResponse)
+			{
+				Assert.IsNotEmpty(ResponseText, "Expected response body.");
+
+				Dictionary<string, object> Parsed = JSON.Parse(ResponseText) as Dictionary<string, object>;
+				Assert.IsNotNull(Parsed);
+
+				return Parsed;
+			}
+			else
+			{
+				Assert.IsEmpty(ResponseText, "Expected no response body.");
+				return null;
+			}
 		}
 
 		[TestMethod]
 		public async Task Test_50_DynamicClientRegistrationCreatesConfidentialClient()
 		{
 			IDictionary<string, object> Response = await DoPost(
-				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
+				BaseUrl + OAuthRegistrationResource.DefaultResourcePath, null,
 				new Dictionary<string, object>()
 				{
 					{ "redirect_uris", new string[] { BaseUrl + CallbackResource } },
@@ -1588,7 +1741,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_51_DynamicClientRegistrationRejectsInvalidRedirectUri()
 		{
 			Dictionary<string, object> Error = await DoPost(
-				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
+				BaseUrl + OAuthRegistrationResource.DefaultResourcePath, null,
 				new Dictionary<string, object>()
 				{
 					{ "redirect_uris", new string[] { BaseUrl + CallbackResource + "#fragment" } },
@@ -1604,7 +1757,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_52_DynamicClientRegistrationRejectsInconsistentGrantAndResponseTypes()
 		{
 			IDictionary<string, object> Error = await DoPost(
-				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
+				BaseUrl + OAuthRegistrationResource.DefaultResourcePath, null,
 				new Dictionary<string, object>()
 				{
 					{ "redirect_uris", new string[] { BaseUrl + CallbackResource } },
@@ -1620,7 +1773,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_53_DynamicClientRegistrationRequiresJsonRequest()
 		{
 			await DoPost(
-				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
+				BaseUrl + OAuthRegistrationResource.DefaultResourcePath, null,
 				new Dictionary<string, string>()
 				{
 					{ "redirect_uris", BaseUrl + CallbackResource },
@@ -1632,7 +1785,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_54_DynamicClientRegistrationAcceptsUnknownMetadata()
 		{
 			IDictionary<string, object> Response = await DoPost(
-				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
+				BaseUrl + OAuthRegistrationResource.DefaultResourcePath, null,
 				new Dictionary<string, object>()
 				{
 					{ "redirect_uris", new string[] { BaseUrl + CallbackResource } },
@@ -1644,14 +1797,14 @@ namespace Waher.Networking.HTTP.Test
 				System.Net.HttpStatusCode.Created);
 
 			Assert.IsFalse(string.IsNullOrEmpty(Required<string>(Response, "client_id")));
-			Assert.Contains(BaseUrl + CallbackResource, Required<object[]>(Response, "redirect_uris"));
+			Assert.Contains(BaseUrl + CallbackResource, Required<string[]>(Response, "redirect_uris"));
 		}
 
 		[TestMethod]
 		public async Task Test_55_DynamicClientRegistrationSuccessfulResponseIsNotCacheable()
 		{
 			Dictionary<string, object> Response = await DoPost(
-				BaseUrl + OAuthRegistrationResource.DefaultResourcePath,
+				BaseUrl + OAuthRegistrationResource.DefaultResourcePath, null,
 				new Dictionary<string, object>()
 				{
 					{ "redirect_uris", new string[] { BaseUrl + CallbackResource } },
@@ -1744,7 +1897,7 @@ namespace Waher.Networking.HTTP.Test
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
 			Dictionary<string, object> Error = await DoPost(
-				BaseUrl + OAuthTokenResource.DefaultResourcePath,
+				BaseUrl + OAuthTokenResource.DefaultResourcePath, null,
 				CreateDeviceTokenRequest(Device.DeviceCode, DeviceUserName),
 				System.Net.HttpStatusCode.BadRequest);
 
@@ -1774,7 +1927,7 @@ namespace Waher.Networking.HTTP.Test
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
 			Dictionary<string, object> Error = await DoPost(
-				BaseUrl + OAuthTokenResource.DefaultResourcePath,
+				BaseUrl + OAuthTokenResource.DefaultResourcePath, null,
 				CreateDeviceTokenRequest(Device.DeviceCode, TestUserName),
 				System.Net.HttpStatusCode.Forbidden);
 
@@ -1967,12 +2120,12 @@ namespace Waher.Networking.HTTP.Test
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
 			await DoPost(
-				BaseUrl + OAuthTokenResource.DefaultResourcePath,
+				BaseUrl + OAuthTokenResource.DefaultResourcePath, null,
 				CreateDeviceTokenRequest(Device.DeviceCode, DeviceUserName),
 				System.Net.HttpStatusCode.BadRequest);
 
 			IDictionary<string, object> Error = await DoPost(
-				BaseUrl + OAuthTokenResource.DefaultResourcePath,
+				BaseUrl + OAuthTokenResource.DefaultResourcePath, null,
 				CreateDeviceTokenRequest(Device.DeviceCode, DeviceUserName),
 				System.Net.HttpStatusCode.BadRequest);
 
@@ -2283,11 +2436,266 @@ namespace Waher.Networking.HTTP.Test
 			await CompleteDeviceAuthorizationForm(Device, false, true, false, TestUserName, TestPassword);
 
 			IDictionary<string, object> Error = await DoPost(
-				BaseUrl + OAuthTokenResource.DefaultResourcePath,
+				BaseUrl + OAuthTokenResource.DefaultResourcePath, null,
 				CreateDeviceTokenRequest(Device.DeviceCode, DeviceUserName),
 				System.Net.HttpStatusCode.Forbidden);
 
 			Assert.AreEqual("access_denied", Required<string>(Error, "error"));
+		}
+
+		[TestMethod]
+		public async Task Test_83_ReadDynamicClientRegistration()
+		{
+			string RedirectUri = BaseUrl + CallbackResource;
+			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
+				"Unit Test Read Client", RedirectUri);
+
+			IDictionary<string, object> Response = await DoGet(
+				Registration.RegistrationClientUri,
+				Registration.RegistrationAccessToken,
+				System.Net.HttpStatusCode.OK);
+
+			DynamicClientRegistration Read = AssertDynamicClientRegistration(Response);
+
+			Assert.AreEqual(Registration.ClientId, Read.ClientId);
+			Assert.AreEqual("Unit Test Read Client", Read.ClientName);
+			Assert.Contains(RedirectUri, Read.RedirectUris);
+			Assert.AreEqual("none", Read.TokenEndpointAuthMethod);
+		}
+
+		private static DynamicClientRegistration AssertDynamicClientRegistration(
+			IDictionary<string, object> Response)
+		{
+			string ClientId = Required<string>(Response, "client_id");
+			string ClientName = Required<string>(Response, "client_name");
+			string[] RedirectUris = Required<string[]>(Response, "redirect_uris");
+			string[] GrantTypes = Required<string[]>(Response, "grant_types");
+			string[] ResponseTypes = Required<string[]>(Response, "response_types");
+			string TokenEndpointAuthMethod = Required<string>(Response, "token_endpoint_auth_method");
+
+			Assert.Contains("authorization_code", GrantTypes);
+			Assert.Contains("refresh_token", GrantTypes);
+			Assert.Contains("code", ResponseTypes);
+
+			string RegistrationAccessToken = Required<string>(Response,
+				"registration_access_token");
+			string RegistrationClientUri = Required<string>(Response,
+				"registration_client_uri");
+
+			Assert.IsFalse(string.IsNullOrEmpty(RegistrationAccessToken));
+			Assert.IsFalse(string.IsNullOrEmpty(RegistrationClientUri));
+			Assert.IsTrue(Uri.TryCreate(RegistrationClientUri, UriKind.Absolute, out _),
+				"Expected registration_client_uri to be an absolute URI.");
+
+			return new DynamicClientRegistration()
+			{
+				ClientId = ClientId,
+				ClientName = ClientName,
+				RedirectUris = RedirectUris,
+				GrantTypes = GrantTypes,
+				ResponseTypes = ResponseTypes,
+				TokenEndpointAuthMethod = TokenEndpointAuthMethod,
+				RegistrationAccessToken = RegistrationAccessToken,
+				RegistrationClientUri = RegistrationClientUri
+			};
+		}
+
+		private class DynamicClientRegistration
+		{
+			public string ClientId;
+			public string ClientName;
+			public string[] RedirectUris;
+			public string[] GrantTypes;
+			public string[] ResponseTypes;
+			public string TokenEndpointAuthMethod;
+			public string RegistrationAccessToken;
+			public string RegistrationClientUri;
+		}
+
+		[TestMethod]
+		public async Task Test_84_UpdateDynamicClientRegistration()
+		{
+			string OriginalRedirectUri = BaseUrl + CallbackResource;
+			string UpdatedRedirectUri = BaseUrl + "/UpdatedCallback";
+			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
+				"Unit Test Update Client", OriginalRedirectUri);
+
+			IDictionary<string, object> CurrentResponse = await DoGet(
+				Registration.RegistrationClientUri,
+				Registration.RegistrationAccessToken,
+				System.Net.HttpStatusCode.OK);
+			DynamicClientRegistration Current = AssertDynamicClientRegistration(
+				CurrentResponse);
+
+			Assert.AreEqual(Registration.ClientId, Current.ClientId);
+			Assert.AreEqual("Unit Test Update Client", Current.ClientName);
+			Assert.Contains(OriginalRedirectUri, Current.RedirectUris);
+			Assert.AreEqual("none", Current.TokenEndpointAuthMethod);
+
+			Dictionary<string, object> UpdateRequest = CreatePublicClientRegistrationRequest(
+				"Unit Test Updated Client", UpdatedRedirectUri);
+			UpdateRequest["client_id"] = Registration.ClientId;
+
+			IDictionary<string, object> UpdateResponse = await DoPut(
+				Current.RegistrationClientUri, Current.RegistrationAccessToken,
+				UpdateRequest, System.Net.HttpStatusCode.OK);
+
+			DynamicClientRegistrationResult Updated = AssertClientRegistrationResponse(
+				UpdateResponse, Registration.ClientId, "Unit Test Updated Client",
+				UpdatedRedirectUri, "none", false);
+
+			foreach (object RedirectUri in Required<string[]>(UpdateResponse, "redirect_uris"))
+				Assert.AreNotEqual(OriginalRedirectUri, RedirectUri as string);
+
+			IDictionary<string, object> RereadResponse = await DoGet(
+				Updated.RegistrationClientUri, Updated.RegistrationAccessToken,
+				System.Net.HttpStatusCode.OK);
+
+			Current = AssertDynamicClientRegistration(RereadResponse);
+
+			Assert.AreEqual(Registration.ClientId, Current.ClientId);
+			Assert.AreEqual("Unit Test Updated Client", Current.ClientName);
+			Assert.Contains(UpdatedRedirectUri, Current.RedirectUris);
+			Assert.AreEqual("none", Current.TokenEndpointAuthMethod);
+		}
+
+		[TestMethod]
+		public async Task Test_85_RegistrationUpdateRequiresAccessToken()
+		{
+			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
+				"Unit Test Update Auth Client", BaseUrl + CallbackResource);
+			Dictionary<string, object> UpdateRequest = CreatePublicClientRegistrationRequest(
+				"Unit Test Update Auth Client", BaseUrl + CallbackResource);
+			UpdateRequest["client_id"] = Registration.ClientId;
+			
+			await DoPut(Registration.RegistrationClientUri, null, UpdateRequest,
+				System.Net.HttpStatusCode.Unauthorized);
+
+			await DoGet(Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
+				System.Net.HttpStatusCode.OK);
+		}
+
+		[TestMethod]
+		public async Task Test_86_RegistrationUpdateRequiresClientId()
+		{
+			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
+				"Unit Test Update Requires Client Id", BaseUrl + CallbackResource);
+
+			Dictionary<string, object> UpdateRequest = CreatePublicClientRegistrationRequest(
+				"Unit Test Update Requires Client Id", BaseUrl + CallbackResource);
+
+			IDictionary<string, object> Error = await DoPut(
+				Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
+				UpdateRequest, System.Net.HttpStatusCode.BadRequest);
+
+			Assert.AreEqual("invalid_client_metadata", Required<string>(Error, "error"));
+		}
+
+		[TestMethod]
+		public async Task Test_87_RegistrationUpdateRejectsMismatchedClientId()
+		{
+			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
+				"Unit Test Mismatched Client Id", BaseUrl + CallbackResource);
+
+			Dictionary<string, object> UpdateRequest = CreatePublicClientRegistrationRequest(
+				"Unit Test Mismatched Client Id", BaseUrl + CallbackResource);
+			UpdateRequest["client_id"] = "different-client-id";
+
+			IDictionary<string, object> Error = await DoPut(
+				Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
+				UpdateRequest, System.Net.HttpStatusCode.BadRequest);
+
+			Assert.AreEqual("invalid_client_metadata", Required<string>(Error, "error"));
+		}
+
+		[TestMethod]
+		public async Task Test_88_RegistrationUpdateRejectsInvalidRedirectUri()
+		{
+			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
+				"Unit Test Invalid Redirect", BaseUrl + CallbackResource);
+
+			Dictionary<string, object> UpdateRequest = CreatePublicClientRegistrationRequest(
+				"Unit Test Invalid Redirect", BaseUrl + CallbackResource + "#fragment");
+			UpdateRequest["client_id"] = Registration.ClientId;
+
+			IDictionary<string, object> Error = await DoPut(
+				Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
+				UpdateRequest, System.Net.HttpStatusCode.BadRequest);
+
+			Assert.AreEqual("invalid_redirect_uri", Required<string>(Error, "error"));
+		}
+
+		[TestMethod]
+		public async Task Test_89_RegistrationUpdateRequiresJsonRequest()
+		{
+			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
+				"Unit Test Update Json", BaseUrl + CallbackResource);
+
+			Dictionary<string, object> Error = await DoPut(
+				Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
+				new Dictionary<string, string>()
+				{
+					{ "client_id", Registration.ClientId },
+					{ "redirect_uris", BaseUrl + CallbackResource }
+				},
+				System.Net.HttpStatusCode.BadRequest);
+
+			Assert.IsTrue(Error.ContainsKey("error"));
+		}
+
+		[TestMethod]
+		public async Task Test_90_RegistrationDeleteRequiresAccessToken()
+		{
+			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
+				"Unit Test Delete Auth Client", BaseUrl + CallbackResource);
+
+			await DoDelete(Registration.RegistrationClientUri, null,
+				System.Net.HttpStatusCode.Unauthorized);
+
+			await DoGet(Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
+				System.Net.HttpStatusCode.OK);
+		}
+
+		[TestMethod]
+		public async Task Test_91_RegistrationDeleteRejectsInvalidAccessToken()
+		{
+			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
+				"Unit Test Delete Invalid Token", BaseUrl + CallbackResource);
+
+			await DoDelete(Registration.RegistrationClientUri, "invalid-registration-access-token",
+				System.Net.HttpStatusCode.Unauthorized);
+
+			await DoGet(Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
+				System.Net.HttpStatusCode.OK);
+		}
+
+		[TestMethod]
+		public async Task Test_92_DeleteRegistration()
+		{
+			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
+				"Unit Test Delete Client", BaseUrl + CallbackResource);
+
+			await DoDelete(Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
+				System.Net.HttpStatusCode.NoContent);
+
+			await DoGet(Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
+				System.Net.HttpStatusCode.Unauthorized);
+		}
+
+		[TestMethod]
+		public async Task Test_93_RegistrationDeletedCannotBeUpdated()
+		{
+			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
+				"Unit Test Deleted Update Client", BaseUrl + CallbackResource);
+			Dictionary<string, object> UpdateRequest = CreatePublicClientRegistrationRequest(
+				"Unit Test Deleted Update Client", BaseUrl + CallbackResource);
+			UpdateRequest["client_id"] = Registration.ClientId;
+
+			await DoDelete(Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
+				System.Net.HttpStatusCode.NoContent);
+
+			await DoPut(Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
+				UpdateRequest, System.Net.HttpStatusCode.Unauthorized);
 		}
 
 		private static OAuthError AssertOAuthError(ContentResponse Response,
@@ -3005,6 +3413,34 @@ namespace Waher.Networking.HTTP.Test
 
 			if (Result is not T TypedResult)
 			{
+				Type ExpectedType = typeof(T);
+				Type ResultType = Result.GetType();
+				Type ExpectedElementType;
+				Type ResultElementType;
+
+				if (ExpectedType.IsArray && ResultType.IsArray &&
+					(ExpectedElementType = ExpectedType.GetElementType()) != 
+					(ResultElementType = ResultType.GetElementType()))
+				{
+					Array ResultArray = (Array)Result;
+					int i, c = ResultArray.Length;
+					Array TypedResultArray = Array.CreateInstance(ExpectedElementType, c);
+
+					for (i = 0; i < c; i++)
+					{
+						object Element = ResultArray.GetValue(i) 
+							?? throw new Exception("Property value is null: " + Key + "[" + i.ToString() + "]");
+
+						if (!ExpectedElementType.IsAssignableFrom(Element.GetType()))
+							throw new Exception("Property value not of expected type: " + Key +
+								"[" + i.ToString() + "] (" + Element.GetType().FullName + ")");
+
+						TypedResultArray.SetValue(Element, i);
+					}
+
+					return (T)(object)TypedResultArray;
+				}
+
 				throw new Exception("Property value not of expected type: " + Key +
 					" (" + Result.GetType().FullName + ")");
 			}

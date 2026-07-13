@@ -23,6 +23,7 @@ namespace Waher.Networking.HTTP.OAuth
 		private OAuthAuthorizeResource? authorizeResource = null;
 		private OAuthTokenResource? tokenResource = null;
 		private OAuthRegistrationResource? registrationResource = null;
+		private OAuthManagementResource? managementResource = null;
 		private OAuthDeviceAuthorizationResource? deviceAuthorizationResource = null;
 		private AuthorizationServerMetaData? serverMetaDataResource = null;
 		private ProtectedResourceMetaData? resourceMetaData = null;
@@ -61,6 +62,11 @@ namespace Waher.Networking.HTTP.OAuth
 		/// If the environment has a registered registration resource
 		/// </summary>
 		public bool HasRegistrationResource => !(this.registrationResource is null);
+
+		/// <summary>
+		/// If the environment has a registered client management resource
+		/// </summary>
+		public bool HasManagementResource => !(this.managementResource is null);
 
 		/// <summary>
 		/// If the environment has a registered device authorization resource
@@ -136,6 +142,20 @@ namespace Waher.Networking.HTTP.OAuth
 					throw new InvalidOperationException("No registration resource has been registered.");
 
 				return this.registrationResource;
+			}
+		}
+
+		/// <summary>
+		/// Registered registration resource
+		/// </summary>
+		public OAuthManagementResource ManagementResource
+		{
+			get
+			{
+				if (this.managementResource is null)
+					throw new InvalidOperationException("No management resource has been registered.");
+
+				return this.managementResource;
 			}
 		}
 
@@ -346,6 +366,16 @@ namespace Waher.Networking.HTTP.OAuth
 		{
 			this.AssertUnlocked();
 			this.registrationResource = RegistrationResource;
+		}
+
+		/// <summary>
+		/// Registers a management resource.
+		/// </summary>
+		/// <param name="ManagementResource">Management resource to register.</param>
+		public void Register(OAuthManagementResource? ManagementResource)
+		{
+			this.AssertUnlocked();
+			this.managementResource = ManagementResource;
 		}
 
 		/// <summary>

@@ -31,6 +31,16 @@ namespace Waher.Networking.HTTP.OAuth.Clients
 		public string? ClientId { get; set; } = null;
 
 		/// <summary>
+		/// When the client secret expires, if one is defined.
+		/// </summary>
+		public DateTime? ClientSecretExpiresAt { get; set; } = null;
+
+		/// <summary>
+		/// Access token required to update or delete the client information object.
+		/// </summary>
+		public string? AccessToken { get; set; } = null;
+
+		/// <summary>
 		/// When the client information was created.
 		/// </summary>
 		public DateTime Created { get; set; } = DateTime.MinValue;

@@ -8,7 +8,6 @@ using Waher.Networking.HTTP.OAuth.Interfaces;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Collections;
-using Waher.Security.LoginMonitor;
 
 namespace Waher.Networking.HTTP.OAuth
 {
@@ -64,12 +63,130 @@ namespace Waher.Networking.HTTP.OAuth
 				return;
 			}
 
+			ParsedRegistrationRequest? Parsed = await this.ParseRegistrationRequest(
+				Request, Response, false);
+
+			if (Parsed is null)
+				return;
+
+			RegistrationRequest RegistrationRequest = Parsed.Request;
+
+			IRegistration? Registration = await Parsed.DynamicUserSource.RegisterUser(
+				RegistrationRequest);
+
+			if (Registration is null)
+			{
+				await Forbidden(Response, "access_denied",
+					"Not permitted to register new client.");
+				return;
+			}
+
+			DateTime TP = DateTime.UtcNow;
+			OAuthClientInformation ClientInfo = new OAuthClientInformation()
+			{
+				ClientId = Registration.ClientId,
+				ClientSecretExpiresAt = Registration.ClientSecretExpiresAt,
+				AccessToken = this.Environment.GenerateRandomCode(64),
+				Created = TP,
+				Updated = TP,
+				RemoteEndPoint = RegistrationRequest.RemoteEndPoint,
+				RedirectUris = RegistrationRequest.RedirectUris,
+				GrantTypes = RegistrationRequest.GrantTypes,
+				ResponseTypes = RegistrationRequest.ResponseTypes,
+				TokenEndpointAuthMethod = RegistrationRequest.TokenEndpointAuthMethod,
+				ClientName = RegistrationRequest.ClientName,
+				SoftwareId = RegistrationRequest.SoftwareId,
+				SoftwareVersion = RegistrationRequest.SoftwareVersion,
+				ClientUri = RegistrationRequest.ClientUri?.ToString(),
+				LogoUri = RegistrationRequest.LogoUri?.ToString(),
+				TosUri = RegistrationRequest.TosUri?.ToString(),
+				PolicyUri = RegistrationRequest.PolicyUri?.ToString(),
+				JwksUri = RegistrationRequest.JwksUri?.ToString(),
+				Scopes = RegistrationRequest.Scopes,
+				Contacts = RegistrationRequest.Contacts,
+				Jwks = RegistrationRequest.Jwks,
+				MetaData = RegistrationRequest.MetaData
+			};
+
+			await Database.Insert(ClientInfo);
+			await AddRedirectUrls(Registration.ClientId, RegistrationRequest.RedirectUris);
+
+			Dictionary<string, object> ResponseObj = this.RegistrationResponse(Request, 
+				Response, Parsed, ClientInfo, Registration);
+
+			Response.StatusCode = 201;
+			Response.StatusMessage = "Created";
+
+			await Response.Return(ResponseObj);
+		}
+
+		internal Dictionary<string, object> RegistrationResponse(HttpRequest Request, 
+			HttpResponse Response, ParsedRegistrationRequest? Parsed, 
+			OAuthClientInformation ClientInfo, IRegistration? Registration)
+		{
+			Dictionary<string, object> ResponseObj = new Dictionary<string, object>();
+
+			if (!(Parsed is null))
+			{
+				foreach (KeyValuePair<string, object> P in Parsed.RequestObj)
+					ResponseObj[P.Key] = P.Value;
+			}
+
+			ResponseObj["client_id"] = ClientInfo.ClientId!;
+			ResponseObj["client_id_issued_at"] = (long)ClientInfo.Created.Subtract(JSON.UnixEpoch).TotalSeconds;
+
+			if (this.Environment.HasManagementResource)
+			{
+				string RegistrationClientUri = Request.Header.GetURL(false, false).
+					Replace(DefaultResourcePath, OAuthManagementResource.DefaultResourcePath) +
+					"/" + ClientInfo.ObjectId;
+
+				ResponseObj["registration_access_token"] = ClientInfo.AccessToken!;
+				ResponseObj["registration_client_uri"] = RegistrationClientUri;
+			}
+
+			if (!(Registration is null) && (Parsed?.ReturnClientSecret ?? false))
+				ResponseObj["client_secret"] = Registration.ClientSecret;
+
+			if ((!(Registration is null) && (Parsed?.ReturnClientSecret ?? false)) ||
+				ClientInfo.ClientSecretExpiresAt.HasValue)
+			{
+				ResponseObj["client_secret_expires_at"] = ClientInfo.ClientSecretExpiresAt.HasValue ?
+					(long)ClientInfo.ClientSecretExpiresAt.Value.Subtract(JSON.UnixEpoch).TotalSeconds : 0L;
+			}
+
+			Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
+			Response.SetHeader("Pragma", "no-cache");
+
+			return ResponseObj;
+		}
+
+		internal static async Task AddRedirectUrls(string ClientId, string[]? RedirectUris)
+		{
+			if (!(RedirectUris is null))
+			{
+				foreach (string RedirectUri in RedirectUris)
+				{
+					OAuthRedirectUri? UriObj = new OAuthRedirectUri()
+					{
+						ClientId = ClientId,
+						Uri = RedirectUri
+					};
+
+					await Database.Insert(UriObj);
+				}
+			}
+		}
+
+		internal async Task<ParsedRegistrationRequest?> ParseRegistrationRequest(HttpRequest Request,
+			HttpResponse Response, bool PermitClientCredentials)
+		{
 			ContentResponse Decoded = await Request.DecodeDataAsync();
 			if (Decoded.HasError ||
 				!(Decoded.Decoded is Dictionary<string, object> RequestObj))
 			{
 				await BadRequest(Response, "invalid_request", "Invalid form.");
-				return;
+				return null;
 			}
 
 			string[]? RedirectUris = null;
@@ -79,6 +196,8 @@ namespace Waher.Networking.HTTP.OAuth
 			string? ClientName = null;
 			string? SoftwareId = null;
 			string? SoftwareVersion = null;
+			string? ClientId = null;
+			string? ClientSecret = null;
 			Uri? ClientUri = null;
 			Uri? LogoUri = null;
 			Uri? TosUri = null;
@@ -106,7 +225,7 @@ namespace Waher.Networking.HTTP.OAuth
 									!string.IsNullOrEmpty(Parsed.Query))
 								{
 									await BadRequest(Response, "invalid_redirect_uri", "Invalid redirection URI.");
-									return;
+									return null;
 								}
 
 								OAuthRedirectUri? UriObj = await Database.FindFirstIgnoreRest<OAuthRedirectUri>(
@@ -114,8 +233,18 @@ namespace Waher.Networking.HTTP.OAuth
 
 								if (!(UriObj is null))
 								{
-									await Forbidden(Response, "invalid_redirect_uri", "URI already registered.");
-									return;
+									if (ClientId is null &&
+										RequestObj.TryGetValue("client_id", out object Obj) &&
+										Obj is string ClientId3)
+									{
+										ClientId = ClientId3;
+									}
+
+									if (UriObj.ClientId != ClientId)
+									{
+										await BadRequest(Response, "invalid_client_metadata", "URI already registered.");
+										return null;
+									}
 								}
 							}
 						}
@@ -161,7 +290,7 @@ namespace Waher.Networking.HTTP.OAuth
 						if (!Uri.TryCreate(P.Value?.ToString(), UriKind.Absolute, out ClientUri))
 						{
 							await BadRequest(Response, "invalid_request", "Invalid client_uri");
-							return;
+							return null;
 						}
 						break;
 
@@ -169,7 +298,7 @@ namespace Waher.Networking.HTTP.OAuth
 						if (!Uri.TryCreate(P.Value?.ToString(), UriKind.Absolute, out LogoUri))
 						{
 							await BadRequest(Response, "invalid_request", "Invalid logo_uri");
-							return;
+							return null;
 						}
 						break;
 
@@ -177,7 +306,7 @@ namespace Waher.Networking.HTTP.OAuth
 						if (!Uri.TryCreate(P.Value?.ToString(), UriKind.Absolute, out TosUri))
 						{
 							await BadRequest(Response, "invalid_request", "Invalid tos_uri");
-							return;
+							return null;
 						}
 						break;
 
@@ -185,7 +314,7 @@ namespace Waher.Networking.HTTP.OAuth
 						if (!Uri.TryCreate(P.Value?.ToString(), UriKind.Absolute, out PolicyUri))
 						{
 							await BadRequest(Response, "invalid_request", "Invalid policy_uri");
-							return;
+							return null;
 						}
 						break;
 
@@ -193,7 +322,7 @@ namespace Waher.Networking.HTTP.OAuth
 						if (!Uri.TryCreate(P.Value?.ToString(), UriKind.Absolute, out JwksUri))
 						{
 							await BadRequest(Response, "invalid_request", "Invalid jwks_uri");
-							return;
+							return null;
 						}
 						break;
 
@@ -202,7 +331,7 @@ namespace Waher.Networking.HTTP.OAuth
 						if (!IsValidScope(Scope))
 						{
 							await BadRequest(Response, "invalid_scope", "Invalid scope parameter.");
-							return;
+							return null;
 						}
 
 						Scopes = Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -214,16 +343,34 @@ namespace Waher.Networking.HTTP.OAuth
 						else
 						{
 							await BadRequest(Response, "invalid_request", "Invalid jwks");
-							return;
+							return null;
 						}
 						break;
 
 					case "client_id":
+						if (!PermitClientCredentials || !(P.Value is string ClientId2))
+						{
+							await BadRequest(Response, "invalid_request", "Invalid request parameter: " + P.Key);
+							return null;
+						}
+
+						ClientId = ClientId2;
+						break;
+
 					case "client_secret":
+						if (!PermitClientCredentials || !(P.Value is string ClientSecret2))
+						{
+							await BadRequest(Response, "invalid_request", "Invalid request parameter: " + P.Key);
+							return null;
+						}
+
+						ClientSecret = ClientSecret2;
+						break;
+
 					case "client_id_issued_at":
 					case "client_secret_expires_at":
 						await BadRequest(Response, "invalid_request", "Invalid request parameter: " + P.Key);
-						return;
+						return null;
 
 					default:
 						MetaData ??= new Dictionary<string, object?>();
@@ -239,104 +386,53 @@ namespace Waher.Networking.HTTP.OAuth
 			{
 				await BadRequest(Response, "invalid_client_metadata",
 					"Implicit grant_type requires token response_type.");
-				return;
+				return null;
 			}
 
 			if (!(this.Users is IDynamicUserSource DynamicUserSource))
 			{
 				await ServiceUnavailable(Response, "server_error",
 					"Client registration service not available.");
-				return;
+				return null;
 			}
 
 			RegistrationRequest RegistrationRequest = new RegistrationRequest(
-				Request.RemoteEndPoint, RedirectUris, GrantTypes, ResponseTypes,
-				TokenEndpointAuthMethod, ClientName, SoftwareId, SoftwareVersion,
-				ClientUri, LogoUri, TosUri, PolicyUri, JwksUri, Scopes, Contacts,
-				Jwks, MetaData);
+				Request.RemoteEndPoint, RedirectUris, GrantTypes, ResponseTypes, 
+				TokenEndpointAuthMethod, ClientName, SoftwareId, SoftwareVersion, 
+				ClientUri, LogoUri, TosUri, PolicyUri, JwksUri, Scopes, Contacts, 
+				Jwks, MetaData, ClientId, ClientSecret);
 
-			IRegistration? Registration = await DynamicUserSource.RegisterUser(
-				RegistrationRequest);
-
-			if (Registration is null)
-			{
-				await Forbidden(Response, "access_denied",
-					"Not permitted to register new client.");
-				return;
-			}
-
-			DateTime TP = DateTime.UtcNow;
-			OAuthClientInformation ClientInfo = new OAuthClientInformation()
-			{
-				ClientId = Registration.ClientId,
-				Created = TP,
-				Updated = TP,
-				RemoteEndPoint = RegistrationRequest.RemoteEndPoint,
-				RedirectUris = RegistrationRequest.RedirectUris,
-				GrantTypes = RegistrationRequest.GrantTypes,
-				ResponseTypes = RegistrationRequest.ResponseTypes,
-				TokenEndpointAuthMethod = RegistrationRequest.TokenEndpointAuthMethod,
-				ClientName = RegistrationRequest.ClientName,
-				SoftwareId = RegistrationRequest.SoftwareId,
-				SoftwareVersion = RegistrationRequest.SoftwareVersion,
-				ClientUri = RegistrationRequest.ClientUri?.ToString(),
-				LogoUri = RegistrationRequest.LogoUri?.ToString(),
-				TosUri = RegistrationRequest.TosUri?.ToString(),
-				PolicyUri = RegistrationRequest.PolicyUri?.ToString(),
-				JwksUri = RegistrationRequest.JwksUri?.ToString(),
-				Scopes = RegistrationRequest.Scopes,
-				Contacts = RegistrationRequest.Contacts,
-				Jwks = RegistrationRequest.Jwks,
-				MetaData = RegistrationRequest.MetaData
-			};
-
-			await Database.Insert(ClientInfo);
-
-			if (!(RedirectUris is null))
-			{
-				foreach (string RedirectUri in RedirectUris)
-				{
-					OAuthRedirectUri? UriObj = new OAuthRedirectUri()
-					{
-						ClientId = Registration.ClientId,
-						Uri = RedirectUri
-					};
-
-					await Database.Insert(UriObj);
-				}
-			}
-
-			Dictionary<string, object> ResponseObj = new Dictionary<string, object>();
-
-			foreach (KeyValuePair<string, object> P in RequestObj)
-				ResponseObj[P.Key] = P.Value;
-
-			ResponseObj["client_id"] = Registration.ClientId;
-			ResponseObj["client_id_issued_at"] = (long)DateTime.UtcNow.Subtract(JSON.UnixEpoch).TotalSeconds;
-
-			if (ReturnClientSecret)
-			{
-				ResponseObj["client_secret"] = Registration.ClientSecret;
-				ResponseObj["client_secret_expires_at"] = Registration.ClientSecretExpiresAt.HasValue ?
-						(long)Registration.ClientSecretExpiresAt.Value.Subtract(JSON.UnixEpoch).TotalSeconds : 0L;
-			}
-
-			Response.StatusCode = 201;
-			Response.StatusMessage = "Created";
-			Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
-			Response.SetHeader("Pragma", "no-cache");
-
-			await Response.Return(ResponseObj);
+			return new ParsedRegistrationRequest(RegistrationRequest, RequestObj,
+				DynamicUserSource, ReturnClientSecret);
 		}
 
-		private class RegistrationRequest : IRegistrationRequest
+		internal class ParsedRegistrationRequest
+		{
+			public ParsedRegistrationRequest(RegistrationRequest Request,
+				Dictionary<string, object> RequestObj, IDynamicUserSource DynamicUserSource, 
+				bool ReturnClientSecret)
+			{
+				this.Request = Request;
+				this.RequestObj = RequestObj;
+				this.DynamicUserSource = DynamicUserSource;
+				this.ReturnClientSecret = ReturnClientSecret;
+			}
+
+			public RegistrationRequest Request;
+			public Dictionary<string, object> RequestObj;
+			public IDynamicUserSource DynamicUserSource;
+			public bool ReturnClientSecret;
+		}
+
+		internal class RegistrationRequest : IRegistrationRequest
 		{
 			public RegistrationRequest(string RemoteEndPoint, string[]? RedirectUris,
 				string[]? GrantTypes, string[]? ResponseTypes,
 				string? TokenEndpointAuthMethod, string? ClientName, string? SoftwareId,
 				string? SoftwareVersion, Uri? ClientUri, Uri? LogoUri, Uri? TosUri,
 				Uri? PolicyUri, Uri? JwksUri, string[]? Scopes, string[]? Contacts,
-				Dictionary<string, object?>? Jwks, Dictionary<string, object?>? MetaData)
+				Dictionary<string, object?>? Jwks, Dictionary<string, object?>? MetaData,
+				string? ClientId, string? ClientSecret)
 			{
 				this.RemoteEndPoint = RemoteEndPoint;
 				this.RedirectUris = RedirectUris;
@@ -355,6 +451,8 @@ namespace Waher.Networking.HTTP.OAuth
 				this.Contacts = Contacts;
 				this.Jwks = Jwks;
 				this.MetaData = MetaData;
+				this.ClientId = ClientId;
+				this.ClientSecret = ClientSecret;
 			}
 
 			public string RemoteEndPoint { get; }
@@ -365,6 +463,8 @@ namespace Waher.Networking.HTTP.OAuth
 			public string? ClientName { get; }
 			public string? SoftwareId { get; }
 			public string? SoftwareVersion { get; }
+			public string? ClientId { get; }
+			public string? ClientSecret { get; }
 			public Uri? ClientUri { get; }
 			public Uri? LogoUri { get; }
 			public Uri? TosUri { get; }

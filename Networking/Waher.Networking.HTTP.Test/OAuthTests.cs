@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,6 +26,7 @@ using Waher.Persistence;
 using Waher.Runtime.Collections;
 using Waher.Security;
 using Waher.Security.JWT;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Waher.Networking.HTTP.Test
 {
@@ -114,8 +116,8 @@ namespace Waher.Networking.HTTP.Test
 				{ TestUserName, new User(TestUserName, TestPassword,
 					[OAuthResource.OAuthScopePrivilegePrefix + TestScopeRead,
 					OAuthResource.OAuthScopePrivilegePrefix + TestScopeWrite]) },
-				{ DeviceUserName, new User(DeviceUserName, DevicePassword, TestUserName, 
-					[OAuthResource.OAuthScopePrivilegePrefix + TestScopeRead, 
+				{ DeviceUserName, new User(DeviceUserName, DevicePassword, TestUserName,
+					[OAuthResource.OAuthScopePrivilegePrefix + TestScopeRead,
 					OAuthResource.OAuthScopePrivilegePrefix + TestScopeWrite]) }
 			};
 
@@ -307,12 +309,12 @@ namespace Waher.Networking.HTTP.Test
 				if (User is not User TypedUser)
 					return null;
 
-				this.users[User.UserName]=new User(TypedUser.UserName, 
-					RegistrationRequest.ClientSecret, TypedUser.Owner, 
+				this.users[User.UserName] = new User(TypedUser.UserName,
+					RegistrationRequest.ClientSecret, TypedUser.Owner,
 					TypedUser.Privileges);
 			}
 
-			return new Registration(UserName, RegistrationRequest.ClientSecret ?? string.Empty, 
+			return new Registration(UserName, RegistrationRequest.ClientSecret ?? string.Empty,
 				RegistrationRequest);
 		}
 
@@ -1541,7 +1543,7 @@ namespace Waher.Networking.HTTP.Test
 		private class DynamicClientRegistrationResult
 		{
 			public string ClientId;
-			public string? ClientSecret;
+			public string ClientSecret;
 			public string RegistrationAccessToken;
 			public string RegistrationClientUri;
 		}
@@ -1579,7 +1581,7 @@ namespace Waher.Networking.HTTP.Test
 			string ClientId = Required<string>(Response, "client_id");
 			Assert.IsFalse(string.IsNullOrEmpty(ClientId));
 
-			string? ClientSecret;
+			string ClientSecret;
 
 			if (ExpectClientSecret)
 			{
@@ -1636,31 +1638,31 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		private static Task<Dictionary<string, object>> DoGet(string Uri,
-			string? AccessToken, System.Net.HttpStatusCode ExpectedStatusCode)
+			string AccessToken, System.Net.HttpStatusCode ExpectedStatusCode)
 		{
 			return DoRequest(HttpMethod.Get, Uri, AccessToken, null, ExpectedStatusCode, true);
 		}
 
 		private static Task<Dictionary<string, object>> DoPost(string Uri,
-			string? AccessToken, object Body, System.Net.HttpStatusCode ExpectedStatusCode)
+			string AccessToken, object Body, System.Net.HttpStatusCode ExpectedStatusCode)
 		{
 			return DoRequest(HttpMethod.Post, Uri, AccessToken, Body, ExpectedStatusCode, true);
 		}
 
 		private static Task<Dictionary<string, object>> DoPut(string Uri,
-			string? AccessToken, object Body, System.Net.HttpStatusCode ExpectedStatusCode)
+			string AccessToken, object Body, System.Net.HttpStatusCode ExpectedStatusCode)
 		{
 			return DoRequest(HttpMethod.Put, Uri, AccessToken, Body, ExpectedStatusCode, true);
 		}
 
-		private static async Task DoDelete(string Uri, string? AccessToken,
+		private static async Task DoDelete(string Uri, string AccessToken,
 			System.Net.HttpStatusCode ExpectedStatusCode)
 		{
 			await DoRequest(HttpMethod.Delete, Uri, AccessToken, null, ExpectedStatusCode, false);
 		}
 
 		private static async Task<Dictionary<string, object>> DoRequest(HttpMethod Method,
-			string Uri, string? AccessToken, object Body, System.Net.HttpStatusCode ExpectedStatusCode,
+			string Uri, string AccessToken, object Body, System.Net.HttpStatusCode ExpectedStatusCode,
 			bool ExpectResponse)
 		{
 			using HttpClient Client = new();
@@ -2080,7 +2082,7 @@ namespace Waher.Networking.HTTP.Test
 				FormPostback);
 
 			if (LoginResponse.HasError)
-				throw new LoginError(LoginResponse.Error.Message);
+				throw new LoginError(LoginResponse);
 
 			if (LoginResponse.Decoded is HtmlDocument HtmlDocument2 &&
 				TryGetErrorMessage(HtmlDocument2, out string ErrorMessage))
@@ -2567,7 +2569,7 @@ namespace Waher.Networking.HTTP.Test
 			Dictionary<string, object> UpdateRequest = CreatePublicClientRegistrationRequest(
 				"Unit Test Update Auth Client", BaseUrl + CallbackResource);
 			UpdateRequest["client_id"] = Registration.ClientId;
-			
+
 			await DoPut(Registration.RegistrationClientUri, null, UpdateRequest,
 				System.Net.HttpStatusCode.Unauthorized);
 
@@ -2696,6 +2698,220 @@ namespace Waher.Networking.HTTP.Test
 
 			await DoPut(Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
 				UpdateRequest, System.Net.HttpStatusCode.Unauthorized);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		[DataRow(LoginMethod.ClientCredentials)]
+		public async Task Test_94_CreateConfidentialClient(LoginMethod Method)
+		{
+			string RedirectUri = BaseUrl + CallbackResource;
+			string TokenEndpointAuthMethod = GetTokenEdnpointAuthMethod(Method);
+			DynamicClientRegistrationResult Registration = await RegisterConfidentialClient(
+				"Unit Test Confidential Client", RedirectUri, TokenEndpointAuthMethod);
+
+			Assert.IsFalse(string.IsNullOrEmpty(Registration.ClientId));
+			Assert.IsFalse(string.IsNullOrEmpty(Registration.ClientSecret));
+
+			IDictionary<string, object> Response = await DoGet(
+				Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
+				System.Net.HttpStatusCode.OK);
+			DynamicClientRegistration Current = AssertDynamicClientRegistration(Response);
+
+			Assert.AreEqual(Registration.ClientId, Current.ClientId);
+			Assert.AreEqual("Unit Test Confidential Client", Current.ClientName);
+			Assert.Contains(RedirectUri, Current.RedirectUris);
+			Assert.Contains("client_credentials", Current.GrantTypes);
+			Assert.AreEqual(TokenEndpointAuthMethod, Current.TokenEndpointAuthMethod);
+
+			TokenResult Token = await Login(Method, Registration.ClientId,
+				Registration.ClientSecret!);
+
+			await AssertHello(Token.AccessToken, Registration.ClientId);
+		}
+
+		private static string GetTokenEdnpointAuthMethod(LoginMethod Method)
+		{
+			return Method switch
+			{
+				LoginMethod.ClientCredentials => "client_secret_post",
+				LoginMethod.ClientCredentialsBasicAuth => "client_secret_basic",
+				_ => throw new ArgumentException("Invalid login method for confidential client registration: " + Method.ToString(), nameof(Method))
+			};
+		}
+
+		private static async Task<DynamicClientRegistrationResult> RegisterConfidentialClient(
+			string ClientName, string RedirectUri, string TokenEndpointAuthMethod)
+		{
+			Dictionary<string, object> Response = await DoPost(
+				BaseUrl + OAuthRegistrationResource.DefaultResourcePath, null,
+				CreateConfidentialClientRegistrationRequest(ClientName, RedirectUri,
+					TokenEndpointAuthMethod),
+				System.Net.HttpStatusCode.Created);
+
+			DynamicClientRegistrationResult Result = AssertClientRegistrationResponse(
+				Response, null, ClientName, RedirectUri, TokenEndpointAuthMethod, true);
+
+			Assert.Contains("client_credentials", Required<string[]>(Response, "grant_types"));
+
+			int ExpiresAt = Required<int>(Response, "client_secret_expires_at");
+
+			if (ExpiresAt != 0)
+			{
+				int Now = (int)DateTime.UtcNow.Subtract(JSON.UnixEpoch).TotalSeconds;
+				Assert.IsGreaterThan(Now, ExpiresAt);
+			}
+
+			return Result;
+		}
+
+		private static Dictionary<string, object> CreateConfidentialClientRegistrationRequest(
+			string ClientName, string RedirectUri, string TokenEndpointAuthMethod)
+		{
+			return new Dictionary<string, object>()
+			{
+				{ "redirect_uris", new string[] { RedirectUri } },
+				{ "client_name", ClientName },
+				{ "grant_types", new string[]
+					{ "authorization_code", "refresh_token", "client_credentials" } },
+				{ "response_types", new string[] { "code" } },
+				{ "token_endpoint_auth_method", TokenEndpointAuthMethod }
+			};
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		[DataRow(LoginMethod.ClientCredentials)]
+		public async Task Test_95_UpdateConfidentialClient(LoginMethod Method)
+		{
+			string TokenEndpointAuthMethod = GetTokenEdnpointAuthMethod(Method);
+			string OriginalRedirectUri = BaseUrl + CallbackResource;
+			string UpdatedRedirectUri = BaseUrl + "/UpdatedConfidentialCallback";
+			DynamicClientRegistrationResult Registration = await RegisterConfidentialClient(
+				"Unit Test Confidential Update Client", OriginalRedirectUri,
+				TokenEndpointAuthMethod);
+			string ClientSecret = Registration.ClientSecret!;
+
+			Dictionary<string, object> UpdateRequest =
+				CreateConfidentialClientRegistrationRequest(
+					"Unit Test Updated Confidential Client", UpdatedRedirectUri,
+					TokenEndpointAuthMethod);
+			UpdateRequest["client_id"] = Registration.ClientId;
+
+			IDictionary<string, object> UpdateResponse = await DoPut(
+				Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
+				UpdateRequest, System.Net.HttpStatusCode.OK);
+			DynamicClientRegistration Updated = AssertDynamicClientRegistration(UpdateResponse);
+
+			Assert.AreEqual(Registration.ClientId, Updated.ClientId);
+			Assert.AreEqual("Unit Test Updated Confidential Client", Updated.ClientName);
+			Assert.Contains(UpdatedRedirectUri, Updated.RedirectUris);
+			Assert.Contains("client_credentials", Updated.GrantTypes);
+			Assert.AreEqual(TokenEndpointAuthMethod, Updated.TokenEndpointAuthMethod);
+
+			foreach (string RedirectUri in Updated.RedirectUris)
+				Assert.AreNotEqual(OriginalRedirectUri, RedirectUri);
+
+			IDictionary<string, object> RereadResponse = await DoGet(
+				Updated.RegistrationClientUri, Updated.RegistrationAccessToken,
+				System.Net.HttpStatusCode.OK);
+			DynamicClientRegistration Reread = AssertDynamicClientRegistration(RereadResponse);
+
+			Assert.AreEqual(Registration.ClientId, Reread.ClientId);
+			Assert.AreEqual("Unit Test Updated Confidential Client", Reread.ClientName);
+			Assert.Contains(UpdatedRedirectUri, Reread.RedirectUris);
+			Assert.AreEqual(TokenEndpointAuthMethod, Reread.TokenEndpointAuthMethod);
+
+			TokenResult Token = await Login(Method, Registration.ClientId, ClientSecret);
+
+			await AssertHello(Token.AccessToken, Registration.ClientId);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		[DataRow(LoginMethod.ClientCredentials)]
+		public async Task Test_96_ChangeConfidentialClientPassword(LoginMethod Method)
+		{
+			string TokenEndpointAuthMethod = GetTokenEdnpointAuthMethod(Method);
+			string RedirectUri = BaseUrl + CallbackResource;
+			DynamicClientRegistrationResult Registration = await RegisterConfidentialClient(
+				"Unit Test Confidential Password Client", RedirectUri,
+				TokenEndpointAuthMethod);
+			string PreviousClientSecret = Registration.ClientSecret!;
+			string NewClientSecret = Guid.NewGuid().ToString();
+
+			TokenResult InitialToken = await Login(Method,
+				Registration.ClientId, PreviousClientSecret);
+
+			await AssertHello(InitialToken.AccessToken, Registration.ClientId);
+
+			Dictionary<string, object> UpdateRequest =
+				CreateConfidentialClientRegistrationRequest(
+					"Unit Test Confidential Password Client", RedirectUri,
+					TokenEndpointAuthMethod);
+			UpdateRequest["client_id"] = Registration.ClientId;
+			UpdateRequest["client_secret"] = NewClientSecret;
+
+			IDictionary<string, object> UpdateResponse = await DoPut(
+				Registration.RegistrationClientUri, Registration.RegistrationAccessToken,
+				UpdateRequest, System.Net.HttpStatusCode.OK);
+			DynamicClientRegistration Updated = AssertDynamicClientRegistration(UpdateResponse);
+
+			Assert.AreEqual(Registration.ClientId, Updated.ClientId);
+			Assert.AreEqual(TokenEndpointAuthMethod, Updated.TokenEndpointAuthMethod);
+
+			TokenResult Token = await Login(Method, Registration.ClientId, NewClientSecret);
+
+			await AssertHello(Token.AccessToken, Registration.ClientId);
+
+			LoginError Error = await Assert.ThrowsAsync<LoginError>(async () =>
+				await Authorize(Method, Registration.ClientId, PreviousClientSecret,
+				string.Empty));
+
+			Assert.AreEqual("invalid_client", Error.ErrorCode, "Expected invalid_client error code.");
+			Assert.IsTrue(
+				Error.StatusCode == System.Net.HttpStatusCode.BadRequest ||
+				Error.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
+				Error.StatusCode == System.Net.HttpStatusCode.Forbidden);
+
+			await DoGet(Updated.RegistrationClientUri, Updated.RegistrationAccessToken,
+				System.Net.HttpStatusCode.OK);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		[DataRow(LoginMethod.ClientCredentials)]
+		public async Task Test_97_DeleteConfidentialClient(LoginMethod Method)
+		{
+			string TokenEndpointAuthMethod = GetTokenEdnpointAuthMethod(Method);
+			DynamicClientRegistrationResult Registration = await RegisterConfidentialClient(
+				"Unit Test Confidential Delete Client", BaseUrl + CallbackResource,
+				TokenEndpointAuthMethod);
+			string ClientSecret = Registration.ClientSecret!;
+
+			TokenResult Token = await Login(Method, Registration.ClientId, ClientSecret);
+			await AssertHello(Token.AccessToken, Registration.ClientId);
+
+			await DoDelete(Registration.RegistrationClientUri,
+				Registration.RegistrationAccessToken, System.Net.HttpStatusCode.NoContent);
+
+			await DoGet(Registration.RegistrationClientUri,
+				Registration.RegistrationAccessToken, System.Net.HttpStatusCode.Unauthorized);
+
+			LoginError Error = await Assert.ThrowsAsync<LoginError>(async () =>
+				await Authorize(Method, Registration.ClientId, ClientSecret, string.Empty));
+
+			Assert.AreEqual("invalid_client", Error.ErrorCode, "Expected invalid_client error code.");
+			Assert.IsTrue(
+				Error.StatusCode == System.Net.HttpStatusCode.BadRequest ||
+				Error.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
+				Error.StatusCode == System.Net.HttpStatusCode.Forbidden);
+
+			ContentResponse HelloResponse = await InternetContent.GetAsync(
+				new Uri(BaseUrl + ProtectedResource),
+				new KeyValuePair<string, string>("Authorization", "Bearer " + Token.AccessToken));
+			
+			AssertOAuthError(HelloResponse, null, UnauthorizedException.Code);
 		}
 
 		private static OAuthError AssertOAuthError(ContentResponse Response,
@@ -2874,7 +3090,7 @@ namespace Waher.Networking.HTTP.Test
 		private static TokenResult AssertAccessTokenResponse(ContentResponse TokenResponse)
 		{
 			if (TokenResponse.HasError)
-				throw new LoginError(TokenResponse.Error.Message);
+				throw new LoginError(TokenResponse);
 
 			object Parsed = JSON.Parse(Encoding.UTF8.GetString(TokenResponse.Encoded));
 			Assert.AreEqual("Bearer", Required<string>(Parsed, "token_type"));
@@ -3130,7 +3346,7 @@ namespace Waher.Networking.HTTP.Test
 						new KeyValuePair<string, string>("X-Context", UserName));
 
 					if (AuthorizeResponse.HasError)
-						throw new LoginError(AuthorizeResponse.Error.Message);
+						throw new LoginError(AuthorizeResponse);
 
 					FormPostback = null;
 					ExpectToken = true;
@@ -3155,7 +3371,7 @@ namespace Waher.Networking.HTTP.Test
 						new KeyValuePair<string, string>("X-Context", UserName));
 
 					if (AuthorizeResponse.HasError)
-						throw new LoginError(AuthorizeResponse.Error.Message);
+						throw new LoginError(AuthorizeResponse);
 
 					FormPostback = null;
 					ExpectToken = true;
@@ -3233,7 +3449,7 @@ namespace Waher.Networking.HTTP.Test
 			}
 
 			if (AuthorizeResponse.HasError)
-				throw new LoginError(AuthorizeResponse.Error.Message);
+				throw new LoginError(AuthorizeResponse);
 
 			Dictionary<string, object> Response;
 
@@ -3319,7 +3535,7 @@ namespace Waher.Networking.HTTP.Test
 				new Uri(BaseUrl + OAuthAuthorizeResource.DefaultResourcePath), FormPostback);
 
 			if (LoginResponse.HasError)
-				throw new LoginError(LoginResponse.Error.Message);
+				throw new LoginError(LoginResponse);
 
 			if (LoginResponse.Decoded is HtmlDocument HtmlDocumentResponse &&
 				TryGetErrorMessage(HtmlDocumentResponse, out string ErrorMessage))
@@ -3372,8 +3588,75 @@ namespace Waher.Networking.HTTP.Test
 			Assert.Fail("Expected device verification to return an error.");
 		}
 
-		private class LoginError(string Message) : Exception(Message)
+		private class LoginError : Exception
 		{
+			public LoginError(ContentResponse Response)
+				: base(GetMessage(Response, out string ErrorCode2, out string Description2,
+					out System.Net.HttpStatusCode? StatusCode2))
+			{
+				this.ErrorCode = ErrorCode2;
+				this.Description = Description2;
+				this.StatusCode = StatusCode2;
+			}
+
+			public LoginError(string Error)
+				: base(Error)
+			{
+				this.ErrorCode = null;
+				this.Description = null;
+				this.StatusCode = null;
+			}
+
+			public string ErrorCode;
+			public string Description;
+			public System.Net.HttpStatusCode? StatusCode;
+
+			private static string GetMessage(ContentResponse Response,
+				out string ErrorCode, out string Description, out System.Net.HttpStatusCode? StatusCode)
+			{
+				if (!Response.HasError)
+				{
+					ErrorCode = null;
+					Description = null;
+					StatusCode = null;
+					return "Unknown login error.";
+				}
+
+				if (Response.Error is not WebException Error)
+				{
+					ErrorCode = null;
+					Description = null;
+					StatusCode = null;
+					return Response.Error.Message;
+				}
+
+				StatusCode = Error.StatusCode;
+
+				if (Error.Content is HtmlDocument HtmlDocument &&
+					TryGetErrorMessage(HtmlDocument, out string ErrorMessage))
+				{
+					ErrorCode = null;
+					Description = null;
+					return ErrorMessage;
+				}
+
+				if (Error.Content is IDictionary<string, object> Values &&
+					Values.TryGetValue("error", out object Obj) &&
+					Obj is string ErrorCode2 &&
+					Values.TryGetValue("error_description", out Obj) &&
+					Obj is string Description2)
+				{
+					ErrorCode = ErrorCode2;
+					Description = Description2;
+				}
+				else
+				{
+					ErrorCode = null;
+					Description = null;
+				}
+
+				return Response.Error.Message;
+			}
 		}
 
 		private static string CreatePkceCodeVerifier()
@@ -3419,7 +3702,7 @@ namespace Waher.Networking.HTTP.Test
 				Type ResultElementType;
 
 				if (ExpectedType.IsArray && ResultType.IsArray &&
-					(ExpectedElementType = ExpectedType.GetElementType()) != 
+					(ExpectedElementType = ExpectedType.GetElementType()) !=
 					(ResultElementType = ResultType.GetElementType()))
 				{
 					Array ResultArray = (Array)Result;
@@ -3428,7 +3711,7 @@ namespace Waher.Networking.HTTP.Test
 
 					for (i = 0; i < c; i++)
 					{
-						object Element = ResultArray.GetValue(i) 
+						object Element = ResultArray.GetValue(i)
 							?? throw new Exception("Property value is null: " + Key + "[" + i.ToString() + "]");
 
 						if (!ExpectedElementType.IsAssignableFrom(Element.GetType()))

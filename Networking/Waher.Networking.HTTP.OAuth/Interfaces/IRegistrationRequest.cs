@@ -14,6 +14,16 @@ namespace Waher.Networking.HTTP.OAuth.Interfaces
 		string RemoteEndPoint { get; }
 
 		/// <summary>
+		/// If the client is a public client.
+		/// </summary>
+		bool PublicClient { get; }
+
+		/// <summary>
+		/// If the client is a confidential client.
+		/// </summary>
+		bool ConfidentialClient { get; }
+
+		/// <summary>
 		/// Array of redirection URI strings for use in redirect-based flows
 		/// such as the authorization code and implicit flows.
 		/// </summary>

@@ -435,6 +435,8 @@ namespace Waher.Networking.HTTP.OAuth
 				string? ClientId, string? ClientSecret)
 			{
 				this.RemoteEndPoint = RemoteEndPoint;
+				this.PublicClient = TokenEndpointAuthMethod == "none";
+				this.ConfidentialClient = !this.PublicClient;
 				this.RedirectUris = RedirectUris;
 				this.GrantTypes = GrantTypes;
 				this.ResponseTypes = ResponseTypes;
@@ -456,6 +458,8 @@ namespace Waher.Networking.HTTP.OAuth
 			}
 
 			public string RemoteEndPoint { get; }
+			public bool PublicClient { get; }
+			public bool ConfidentialClient { get; }
 			public string[]? RedirectUris { get; }
 			public string[]? GrantTypes { get; }
 			public string[]? ResponseTypes { get; }

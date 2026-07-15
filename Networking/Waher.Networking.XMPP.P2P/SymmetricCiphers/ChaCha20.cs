@@ -3,6 +3,8 @@ using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using Waher.Content.Xml;
 using Waher.Runtime.Temporary;
 using Waher.Security;
 
@@ -25,11 +27,21 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         /// </summary>
         public override string LocalName => "cha";
 
-        /// <summary>
-        /// Creates a new symmetric cipher object with the same settings as the current object.
-        /// </summary>
-        /// <returns>New instance</returns>
-        public override IE2eSymmetricCipher CreteNew()
+		/// <summary>
+		/// If the symmetric cipher is supported by a remote endpoint.
+		/// </summary>
+		/// <param name="E2e">XML e2e element defining symmetric cipher support.</param>
+		/// <returns>If support is provided.</returns>
+		public override bool Supported(XmlElement E2e)
+		{
+			return XML.Attribute(E2e, "cha", false);
+		}
+
+		/// <summary>
+		/// Creates a new symmetric cipher object with the same settings as the current object.
+		/// </summary>
+		/// <returns>New instance</returns>
+		public override IE2eSymmetricCipher CreteNew()
         {
             return new ChaCha20();
         }

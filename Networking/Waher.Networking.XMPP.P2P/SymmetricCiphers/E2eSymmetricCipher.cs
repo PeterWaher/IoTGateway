@@ -23,10 +23,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		/// <summary>
 		/// Local name of the E2E symmetric cipher
 		/// </summary>
-		public abstract string LocalName
-		{
-			get;
-		}
+		public abstract string LocalName { get; }
 
 		/// <summary>
 		/// Namespace of the E2E symmetric cipher
@@ -61,6 +58,13 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 				_ => throw new ArgumentException("Unrecognized algorithm: " + Algorithm.ToString(), nameof(Algorithm)),
 			};
 		}
+
+		/// <summary>
+		/// If the symmetric cipher is supported by a remote endpoint.
+		/// </summary>
+		/// <param name="E2e">XML e2e element defining symmetric cipher support.</param>
+		/// <returns>If support is provided.</returns>
+		public abstract bool Supported(XmlElement E2e);
 
 		/// <summary>
 		/// Creates a new symmetric cipher object with the same settings as the current object.

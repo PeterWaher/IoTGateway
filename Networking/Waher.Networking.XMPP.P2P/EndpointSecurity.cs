@@ -22,6 +22,8 @@ namespace Waher.Networking.XMPP.P2P
 	/// </summary>
 	public class EndpointSecurity : IEndToEndEncryption
 	{
+		private static readonly Random rnd = new Random();
+
 		/// <summary>
 		/// urn:ieee:iot:e2e:1.0
 		/// </summary>
@@ -95,6 +97,9 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			public Dictionary<string, IE2eEndpoint> ByFqn;
 			public IE2eEndpoint Default;
+			public bool Aes;
+			public bool Cha;
+			public bool Acp;
 		}
 
 		/// <summary>
@@ -682,6 +687,25 @@ namespace Waher.Networking.XMPP.P2P
 			try
 			{
 				Dictionary<string, IE2eEndpoint> Endpoints = null;
+				bool Aes = XML.Attribute(E2E, "aes", false);
+				bool Cha = XML.Attribute(E2E, "cha", false);
+				bool Acp = XML.Attribute(E2E, "acp", false);
+				bool HasSymmetricAttributes = !(Aes || Cha || Acp);
+
+				if (!HasSymmetricAttributes)
+				{
+					if (!E2E.HasAttribute("aes") &&
+						!E2E.HasAttribute("cha") &&
+						!E2E.HasAttribute("acp"))
+					{
+						Aes = Cha = Acp = true;
+					}
+					else
+					{
+						this.RemovePeerPkiInfo(FullJID);
+						return false;
+					}
+				}
 
 				if (!(E2E is null))
 					Endpoints = ParseE2eKeys(E2E, this.securityStrength);
@@ -690,6 +714,45 @@ namespace Waher.Networking.XMPP.P2P
 				{
 					this.RemovePeerPkiInfo(FullJID);
 					return false;
+				}
+
+				bool SymmetricCiphersSupported = true;
+
+				foreach (IE2eEndpoint Endpoint in Endpoints.Values)
+				{
+					if (!Endpoint.DefaultSymmetricCipher.Supported(E2E))
+					{
+						SymmetricCiphersSupported = false;
+						break;
+					}
+				}
+
+				if (!SymmetricCiphersSupported)
+				{
+					ChunkedList<IE2eSymmetricCipher> SymmetricCiphers = new ChunkedList<IE2eSymmetricCipher>(3);
+					IE2eSymmetricCipher SymmetricCipher;
+
+					if (Aes)
+						SymmetricCiphers.Add(new Aes256());
+
+					if (Cha)
+						SymmetricCiphers.Add(new ChaCha20());
+
+					if (Acp)
+						SymmetricCiphers.Add(new AeadChaCha20Poly1305());
+
+					if (SymmetricCiphers.Count == 1)
+						SymmetricCipher = SymmetricCiphers.FirstItem;
+					else
+					{
+						lock (rnd)
+						{
+							SymmetricCipher = SymmetricCiphers[rnd.Next(SymmetricCiphers.Count)];
+						}
+					}
+
+					foreach (IE2eEndpoint Endpoint in Endpoints.Values)
+						Endpoint.DefaultSymmetricCipher = SymmetricCipher;
 				}
 
 				RemoteEndPoints OldEndpoints;
@@ -701,7 +764,10 @@ namespace Waher.Networking.XMPP.P2P
 
 					this.contacts[FullJID] = new RemoteEndPoints()
 					{
-						ByFqn = Endpoints
+						ByFqn = Endpoints,
+						Aes = Aes,
+						Cha = Cha,
+						Acp = Acp
 					};
 				}
 
@@ -2257,7 +2323,7 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				Xml.Append("<e2e xmlns=\"");
 				Xml.Append(IoTHarmonizationE2ECurrent);
-				Xml.Append("\">");
+				Xml.Append("\" aes=\"true\" cha=\"true\" acp=\"true\">");
 
 				foreach (IE2eEndpoint E2e in this.Keys)
 					E2e.ToXml(Xml, IoTHarmonizationE2ECurrent);

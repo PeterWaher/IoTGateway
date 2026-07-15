@@ -35,10 +35,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <summary>
 		/// Security strength of End-to-End encryption scheme.
 		/// </summary>
-		public abstract int SecurityStrength
-		{
-			get;
-		}
+		public abstract int SecurityStrength { get; }
 
 		/// <summary>
 		/// Previous keys.
@@ -52,10 +49,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <summary>
 		/// Local name of the E2E encryption scheme
 		/// </summary>
-		public abstract string LocalName
-		{
-			get;
-		}
+		public abstract string LocalName { get; }
 
 		/// <summary>
 		/// Namespace of the E2E encryption scheme
@@ -65,18 +59,12 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <summary>
 		/// Remote public key.
 		/// </summary>
-		public abstract byte[] PublicKey
-		{
-			get;
-		}
+		public abstract byte[] PublicKey { get; }
 
 		/// <summary>
 		/// Remote public key, as a Base64 string.
 		/// </summary>
-		public abstract string PublicKeyBase64
-		{
-			get;
-		}
+		public abstract string PublicKeyBase64 { get; }
 
 		/// <summary>
 		/// Creates a new key.
@@ -278,7 +266,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 					Result++;
 
 				if (this.PostQuantumCryptography)
-					Result += 2;	// To overcome requirement of using cipher texts to derive shared secrets.
+					Result += 2;    // To overcome requirement of using cipher texts to derive shared secrets.
 
 				return Result;
 			}
@@ -287,7 +275,11 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <summary>
 		/// Default symmetric cipher.
 		/// </summary>
-		public virtual IE2eSymmetricCipher DefaultSymmetricCipher => this.defaultSymmetricCipher;
+		public virtual IE2eSymmetricCipher DefaultSymmetricCipher
+		{
+			get => this.defaultSymmetricCipher;
+			set => this.defaultSymmetricCipher = value ?? this.defaultSymmetricCipher;
+		}
 
 		/// <summary>
 		/// Gets the next counter value.

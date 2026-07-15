@@ -31,6 +31,20 @@ NIST P-384
 
 NIST P-521
 
+Brainpool P-160
+
+Brainpool P-192
+
+Brainpool P-224
+
+Brainpool P-256
+
+Brainpool P-320
+
+Brainpool P-384
+
+Brainpool P-512
+
 ECDSA
 
 EdDSA
@@ -53,7 +67,7 @@ Poly1305</Description>
     <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>networking communication xmpp socks5 serverless peer-to-peer p2p e2e End-to-End ECDH ECDSA EdDSA NIST P192 P224 P256 P384 P521 Curve25519 Curve448 Ed25519 Ed448 Edwards25519 Edwards448 Goldilocks AES ChaCha20 Poly1305 PQC ML-KEM ML-DSA</PackageTags>
+    <PackageTags>networking communication xmpp socks5 serverless peer-to-peer p2p e2e End-to-End ECDH ECDSA EdDSA NIST Brainpool P160 P192 P224 P256 P320 P384 P512 P521 Curve25519 Curve448 Ed25519 Ed448 Edwards25519 Edwards448 Goldilocks AES ChaCha20 Poly1305 PQC ML-KEM ML-DSA</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>4.3.0</AssemblyVersion>
     <FileVersion>4.3.0</FileVersion>

@@ -32,6 +32,13 @@
 			<xs:element ref="p256"/>
 			<xs:element ref="p384"/>
 			<xs:element ref="p521"/>
+			<xs:element ref="bp160"/>
+			<xs:element ref="bp192"/>
+			<xs:element ref="bp224"/>
+			<xs:element ref="bp256"/>
+			<xs:element ref="bp320"/>
+			<xs:element ref="bp384"/>
+			<xs:element ref="bp512"/>
 			<xs:element ref="x25519"/>
 			<xs:element ref="x448"/>
 			<xs:element ref="rsa"/>
@@ -202,6 +209,90 @@
 	<xs:element name="p192">
 		<xs:annotation>
 			<xs:documentation>End-to-End encryption using the NIST P-192 curve, ECDH key exchange (to generate symmetric keys for encryption) and ECDSA signatues.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="EllipticCurve">
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="bp512">
+		<xs:annotation>
+			<xs:documentation>End-to-End encryption using the Brainpool P-512 curve, ECDH key exchange (to generate symmetric keys for encryption) and ECDSA signatues.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="EllipticCurve">
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="bp384">
+		<xs:annotation>
+			<xs:documentation>End-to-End encryption using the Brainpool P-384 curve, ECDH key exchange (to generate symmetric keys for encryption) and ECDSA signatues.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="EllipticCurve">
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="bp320">
+		<xs:annotation>
+			<xs:documentation>End-to-End encryption using the Brainpool P-320 curve, ECDH key exchange (to generate symmetric keys for encryption) and ECDSA signatues.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="EllipticCurve">
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="bp256">
+		<xs:annotation>
+			<xs:documentation>End-to-End encryption using the Brainpool P-256 curve, ECDH key exchange (to generate symmetric keys for encryption) and ECDSA signatues.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="EllipticCurve">
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="bp224">
+		<xs:annotation>
+			<xs:documentation>End-to-End encryption using the Brainpool P-224 curve, ECDH key exchange (to generate symmetric keys for encryption) and ECDSA signatues.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="EllipticCurve">
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="bp192">
+		<xs:annotation>
+			<xs:documentation>End-to-End encryption using the Brainpool P-192 curve, ECDH key exchange (to generate symmetric keys for encryption) and ECDSA signatues.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="EllipticCurve">
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="bp160">
+		<xs:annotation>
+			<xs:documentation>End-to-End encryption using the Brainpool P-160 curve, ECDH key exchange (to generate symmetric keys for encryption) and ECDSA signatues.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>

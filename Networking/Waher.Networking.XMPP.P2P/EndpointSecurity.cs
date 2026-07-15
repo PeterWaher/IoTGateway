@@ -690,7 +690,7 @@ namespace Waher.Networking.XMPP.P2P
 				bool Aes = XML.Attribute(E2E, "aes", false);
 				bool Cha = XML.Attribute(E2E, "cha", false);
 				bool Acp = XML.Attribute(E2E, "acp", false);
-				bool HasSymmetricAttributes = !(Aes || Cha || Acp);
+				bool HasSymmetricAttributes = Aes || Cha || Acp;
 
 				if (!HasSymmetricAttributes)
 				{

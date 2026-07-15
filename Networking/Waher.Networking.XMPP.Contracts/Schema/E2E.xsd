@@ -24,11 +24,14 @@
 		<xs:choice>
 			<xs:element ref="ed25519"/>
 			<xs:element ref="ed448"/>
-			<xs:element ref="p521"/>
-			<xs:element ref="p384"/>
-			<xs:element ref="p256"/>
-			<xs:element ref="p224"/>
+			<xs:element ref="ml128"/>
+			<xs:element ref="ml192"/>
+			<xs:element ref="ml256"/>
 			<xs:element ref="p192"/>
+			<xs:element ref="p224"/>
+			<xs:element ref="p256"/>
+			<xs:element ref="p384"/>
+			<xs:element ref="p521"/>
 			<xs:element ref="x25519"/>
 			<xs:element ref="x448"/>
 			<xs:element ref="rsa"/>
@@ -45,6 +48,51 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
+
+	<xs:complexType name="ModuleLattice" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Base class for hybrid algorithms using Module Lattice cryptography.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="Endpoint"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:element name="ml128">
+		<xs:annotation>
+			<xs:documentation>End-to-End encryption hybrid cipher using the Module Lattice algorithms ML-KEM-512 and ML-DSA-44 with pre-hash SHAKE-256.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ModuleLattice">
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="ml192">
+		<xs:annotation>
+			<xs:documentation>End-to-End encryption hybrid cipher using the Module Lattice algorithms ML-KEM-768 and ML-DSA-65 with pre-hash SHAKE-256.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ModuleLattice">
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="ml256">
+		<xs:annotation>
+			<xs:documentation>End-to-End encryption hybrid cipher using the Module Lattice algorithms ML-KEM-1024 and ML-DSA-87 with pre-hash SHAKE-256.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ModuleLattice">
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
 
 	<xs:complexType name="EllipticCurve" abstract="true">
 		<xs:annotation>

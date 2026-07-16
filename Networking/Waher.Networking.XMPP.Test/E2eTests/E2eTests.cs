@@ -1,7 +1,12 @@
-﻿using System.Threading;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.XMPP.P2P;
+using Waher.Networking.XMPP.P2P.E2E;
+using Waher.Networking.XMPP.P2P.SymmetricCiphers;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.XMPP.Test.E2eTests
 {
@@ -12,23 +17,92 @@ namespace Waher.Networking.XMPP.Test.E2eTests
         protected EndpointSecurity endpointSecurity1;
         protected EndpointSecurity endpointSecurity2;
 
-		public override void PrepareClient1(XmppClient Client)
+		public override void PrepareClient1(XmppClient Client, int SecurityStrength)
         {
-            base.PrepareClient1(Client);
-            this.endpointSecurity1 = new EndpointSecurity(this.client1, this.SecurityStrength, this.endpoints1);
+            base.PrepareClient1(Client, SecurityStrength);
+            this.endpointSecurity1 = new EndpointSecurity(this.client1, SecurityStrength, this.endpoints1);
         }
 
-        public override void PrepareClient2(XmppClient Client)
+        public override void PrepareClient2(XmppClient Client, int SecurityStrength)
         {
-            base.PrepareClient2(Client);
-            this.endpointSecurity2 = new EndpointSecurity(this.client2, this.SecurityStrength, this.endpoints2);
+            base.PrepareClient2(Client, SecurityStrength);
+            this.endpointSecurity2 = new EndpointSecurity(this.client2, SecurityStrength, this.endpoints2);
         }
 
-        public abstract int SecurityStrength { get; }
+		protected void PrepareEndpoints(AsymmetricCipher AsymmetricCipherType, 
+            int SecurityStrength, SymmetricCipher SymmetricCipherType)
+		{
+			if (AsymmetricCipherType == AsymmetricCipher.Ephemeral)
+			{
+				this.endpoints1 = null;
+				this.endpoints2 = null;
+			}
+			else
+			{
+				PrepareEndpoint(AsymmetricCipherType, SecurityStrength, SymmetricCipherType, out IE2eEndpoint Endpoint1);
+				PrepareEndpoint(AsymmetricCipherType, SecurityStrength, SymmetricCipherType, out IE2eEndpoint Endpoint2);
 
-        public override async Task ConnectClients()
+				this.endpoints1 = [Endpoint1];
+				this.endpoints2 = [Endpoint2];
+			}
+		}
+
+		private static void PrepareEndpoint(AsymmetricCipher AsymmetricCipherType, 
+            int SecurityStrength, SymmetricCipher SymmetricCipherType, 
+            out IE2eEndpoint Endpoint)
+		{
+            IE2eSymmetricCipher SymmetricCipher2 = SymmetricCipherType switch
+            {
+                SymmetricCipher.Aes256 => new Aes256(),
+                SymmetricCipher.ChaCha20 => new ChaCha20(),
+                SymmetricCipher.AeadChaCha20Poly1305 => new AeadChaCha20Poly1305(),
+                _ => throw new ArgumentException("Invalid symmetric cipher type.", nameof(SymmetricCipherType)),
+			};
+
+            if (AsymmetricCipherType == AsymmetricCipher.Rsa)
+            {
+                RSA RSA = RSA.Create();
+                RSA.KeySize = SecurityStrength switch
+                {
+                    96 => 1024,
+                    112 => 2048,
+                    140 => 4096,
+                    _ => throw new ArgumentException("Invalid security strength.", nameof(SecurityStrength)),
+                };
+
+                Endpoint = new RsaEndpoint(RSA, SymmetricCipher2);
+            }
+            else
+            {
+                Endpoint = AsymmetricCipherType switch
+                {
+                    AsymmetricCipher.BrainpoolP160 => new BrainpoolP160Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.BrainpoolP192 => new BrainpoolP192Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.BrainpoolP224 => new BrainpoolP224Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.BrainpoolP256 => new BrainpoolP256Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.BrainpoolP320 => new BrainpoolP320Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.BrainpoolP384 => new BrainpoolP384Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.BrainpoolP512 => new BrainpoolP512Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.NistP192 => new NistP192Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.NistP224 => new NistP224Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.NistP256 => new NistP256Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.NistP384 => new NistP384Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.NistP521 => new NistP521Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.Edwards25519 => new Edwards25519Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.Edwards448 => new Edwards448Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.Curve25519 => new Curve25519Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.Curve448 => new Curve448Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.ModuleLattice128 => new ModuleLattice128Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.ModuleLattice192 => new ModuleLattice192Endpoint(SymmetricCipher2),
+                    AsymmetricCipher.ModuleLattice256 => new ModuleLattice256Endpoint(SymmetricCipher2),
+                    _ => throw new ArgumentException("Invalid asymmetric cipher type.", nameof(AsymmetricCipherType)),
+                };
+            }
+		}
+
+		public override async Task ConnectClients(int SecurityStrength)
         {
-            await base.ConnectClients();
+            await base.ConnectClients(SecurityStrength);
 
 			SubscribedTo(this.client1, this.client2);
 			SubscribedTo(this.client2, this.client1);
@@ -64,7 +138,5 @@ namespace Waher.Networking.XMPP.Test.E2eTests
                 Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 10000));
             }
         }
-
-        public abstract IE2eEndpoint[] GenerateEndpoints(IE2eSymmetricCipher Cipher);
     }
 }

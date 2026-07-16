@@ -3,8 +3,15 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.Control;
+using Waher.Networking.XMPP.P2P;
+using Waher.Persistence;
+using Waher.Persistence.Files;
+using Waher.Persistence.Serialization;
+using Waher.Runtime.Counters;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Settings;
 using Waher.Things.ControlParameters;
 
 namespace Waher.Networking.XMPP.Test
@@ -34,7 +41,14 @@ namespace Waher.Networking.XMPP.Test
 				typeof(InternetContent).Assembly,
 				typeof(BOSH.HttpBinding).Assembly,
 				typeof(WebSocket.WebSocketBinding).Assembly,
-				typeof(P2P.EndpointSecurity).Assembly);
+				typeof(EndpointSecurity).Assembly,
+				typeof(FilesProvider).Assembly,
+				typeof(ObjectSerializer).Assembly,
+				typeof(ContractsClientStateTests).Assembly,
+				typeof(ContractsClient).Assembly,
+				typeof(RuntimeSettings).Assembly,
+				typeof(RuntimeCounters).Assembly,
+				typeof(CaseInsensitiveString).Assembly);
 		}
 
 		[ClassInitialize]
@@ -49,9 +63,9 @@ namespace Waher.Networking.XMPP.Test
 			await DisposeSnifferAndLog();
 		}
 
-		public override async Task ConnectClients()
+		public override async Task ConnectClients(int SecurityStrength)
 		{
-			await base.ConnectClients();
+			await base.ConnectClients(SecurityStrength);
 
 			Assert.AreEqual(XmppState.Connected, this.client1.State);
 			Assert.AreEqual(XmppState.Connected, this.client2.State);
@@ -62,7 +76,7 @@ namespace Waher.Networking.XMPP.Test
 					(sender) => Task.FromResult<bool?>(this.b),
 					(sender, value) => { this.b = value; return Task.CompletedTask; }),
 				new ColorControlParameter("Color", "Page1", "Color:", "Color value",
-					(sender) => Task.FromResult<ColorReference>(this.cl),
+					(sender) => Task.FromResult(this.cl),
 					(sender, value) => { this.cl = value; return Task.CompletedTask; }),
 				new DateControlParameter("Date", "Page1", "Date:", "Date value", DateTime.MinValue, DateTime.MaxValue,
 					(sender) => Task.FromResult<DateTime?>(this.d),
@@ -74,7 +88,7 @@ namespace Waher.Networking.XMPP.Test
 					(sender) => Task.FromResult<double?>(this.db),
 					(sender, value) => { this.db = value; return Task.CompletedTask; }),
 				new DurationControlParameter("Duration", "Page1", "Duration:", "Duration value",
-					(sender) => Task.FromResult<Duration>(this.dr),
+					(sender) => Task.FromResult(this.dr),
 					(sender, value) => { this.dr = value; return Task.CompletedTask; }),
 				new EnumControlParameter("Enum", "Page1", "Enum:", "Enum value", typeof(TypeCode),
 					(sender) => Task.FromResult<Enum>(this.e),
@@ -86,7 +100,7 @@ namespace Waher.Networking.XMPP.Test
 					(sender) => Task.FromResult<long?>(this.l),
 					(sender, value) => { this.l = value; return Task.CompletedTask; }),
 				new StringControlParameter("String", "Page1", "String:", "String value",
-					(sender) => Task.FromResult<string>(this.s),
+					(sender) => Task.FromResult(this.s),
 					(sender, value) => { this.s = value; return Task.CompletedTask; }),
 				new TimeControlParameter("Time", "Page1", "Time:", "Time value",
 					(sender) => Task.FromResult<TimeSpan?>(this.t),
@@ -113,7 +127,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_01_Bool()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -131,8 +145,8 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
-				Assert.AreEqual(true, this.b);
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
+				Assert.IsTrue(this.b);
 			}
 			finally
 			{
@@ -143,7 +157,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_02_Color()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -161,7 +175,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
 				Assert.AreEqual(1, this.cl.Red);
 				Assert.AreEqual(2, this.cl.Green);
 				Assert.AreEqual(3, this.cl.Blue);
@@ -175,7 +189,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_03_Date()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -193,7 +207,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
 				Assert.AreEqual(DateTime.Today, this.d);
 			}
 			finally
@@ -205,7 +219,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_04_DateTime()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -226,7 +240,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
 				Assert.AreEqual(Now.ToUniversalTime().Ticks, this.dt.ToUniversalTime().Ticks);
 			}
 			finally
@@ -238,7 +252,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_05_Double()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -256,7 +270,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
 				Assert.AreEqual(3.1415927, this.db);
 			}
 			finally
@@ -268,7 +282,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_06_Duration()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -286,7 +300,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
 				Assert.AreEqual(new Duration(true, 1, 2, 3, 4, 5, 6), this.dr);
 			}
 			finally
@@ -298,7 +312,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_07_Enum()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -316,7 +330,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
 				Assert.AreEqual(TypeCode.Int16, this.e);
 			}
 			finally
@@ -328,7 +342,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_08_Int32()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -346,7 +360,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
 				Assert.AreEqual(int.MinValue, this.i);
 			}
 			finally
@@ -358,7 +372,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_09_Int64()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -376,7 +390,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
 				Assert.AreEqual(long.MinValue, this.l);
 			}
 			finally
@@ -388,7 +402,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_10_String()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -406,7 +420,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
 				Assert.AreEqual("ABC", this.s);
 			}
 			finally
@@ -418,7 +432,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_11_Time()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -437,7 +451,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
 				Assert.AreEqual(Time, this.t);
 			}
 			finally

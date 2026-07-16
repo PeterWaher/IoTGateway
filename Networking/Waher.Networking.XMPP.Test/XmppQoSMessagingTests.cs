@@ -40,7 +40,7 @@ namespace Waher.Networking.XMPP.Test
 
 		private async Task QoSTest(QoSLevel Level)
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 
 			ManualResetEvent Received = new(false);
 			ManualResetEvent Delivered = new(false);
@@ -60,7 +60,7 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Done = new(false);
 			IqResultEventArgs e2 = null;
 
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 
 			this.client2.RegisterIqGetHandler("test", "test", (Sender, e) =>
 			{

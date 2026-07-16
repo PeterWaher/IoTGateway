@@ -23,7 +23,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task ServiceDiscovery_Test_01_Server()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client1.Domain, 10000);
@@ -53,7 +53,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task ServiceDiscovery_Test_02_Account()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client2.BareJID, 10000);
@@ -68,7 +68,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task ServiceDiscovery_Test_03_Client()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client2.FullJID, 10000);
@@ -83,7 +83,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task ServiceDiscovery_Test_04_ServerItems()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client1.Domain, 10000);
@@ -107,7 +107,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task ServiceDiscovery_Test_05_ServerItemFeatures()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client1.Domain, 10000);
@@ -132,7 +132,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task ServiceDiscovery_Test_06_AccountItems()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client2.BareJID, 10000);

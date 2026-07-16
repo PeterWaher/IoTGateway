@@ -1,87 +1,116 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Waher.Persistence;
-using Waher.Persistence.Files;
-
-[assembly: TestDataSourceDiscovery(TestDataSourceDiscoveryOption.DuringDiscovery)]
+using Waher.Content;
+using Waher.Content.Text;
+using Waher.Networking.HTTP;
+using Waher.Networking.Sniffers;
+using Waher.Networking.XMPP.HTTPX;
+using Waher.Networking.XMPP.P2P.E2E;
+using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 
 namespace Waher.Networking.XMPP.Test.E2eTests
 {
-	public enum AsymmetricCipher
-	{
-		BrainpoolP160,
-		BrainpoolP192,
-		BrainpoolP224,
-		BrainpoolP256,
-		BrainpoolP320,
-		BrainpoolP384,
-		BrainpoolP512,
-		NistP192,
-		NistP224,
-		NistP256,
-		NistP384,
-		NistP521,
-		Edwards25519,
-		Edwards448,
-		Curve25519,
-		Curve448,
-		Rsa,
-		ModuleLattice128,
-		ModuleLattice192,
-		ModuleLattice256,
-		Ephemeral
-	}
-
-	public enum SymmetricCipher
-	{
-		Aes256,
-		ChaCha20,
-		AeadChaCha20Poly1305
-	}
-
 	[TestClass]
-	public class XmppE2eTests : E2eTests
+	public class XmppHttpxTests : E2eTests
 	{
-		private static FilesProvider provider;
-		private static string dataFolder;
+		private HttpServer webServer;
+		private HttpxClient httpxClient1;
+		private HttpxClient httpxClient2;
+		private HttpxServer httpxServer;
 
-		[ClassInitialize]
-		public static async Task ClassInitialize(TestContext _)
+		[TestInitialize]
+		public void TestInitialize()
 		{
-			dataFolder = Path.Combine("Data", "XmppE2eTests");
+			this.webServer = new HttpServer(8083);
 
-			provider = await FilesProvider.CreateAsync(dataFolder, "Default", 8192, 1000, 8192, Encoding.UTF8, 10000, false);
-			Database.Register(provider, false);
+			this.webServer.Register("/Hello", (Request, Response) =>
+			{
+				if (!Request.Encrypted)
+					throw new BadRequestException("Request must be encrypted.");
 
-			SetupSnifferAndLog();
+				Response.ContentType = PlainTextCodec.DefaultContentType;
+				Response.Write("World");
+				return Response.SendResponse();
+			});
+
+			this.webServer.Register("/Echo", null, async (Request, Response) =>
+			{
+				if (!Request.Encrypted)
+					throw new BadRequestException("Request must be encrypted.");
+
+				if (!Request.HasData)
+					throw new BadRequestException("No data.");
+
+				Response.StatusCode = 200;
+				Response.ContentType = Request.Header.ContentType.Value;
+
+				long c = Request.DataStream.Length;
+				int BufSize = (int)Math.Min(65536, c);
+				byte[] Buf = new byte[BufSize];
+				int i;
+
+				while (c > 0)
+				{
+					i = (int)Math.Min(c, BufSize);
+
+					if (i != await Request.DataStream.ReadAsync(Buf, 0, BufSize, CancellationToken.None))
+						throw new IOException("Unexpected end of file.");
+
+					await Response.Write(false, Buf, 0, i);
+					c -= i;
+				}
+
+				await Response.SendResponse();
+			});
 		}
 
-		[ClassCleanup]
-		public static async Task ClassCleanup()
+		[TestCleanup]
+		public async Task TestCleanup()
 		{
-			await DisposeSnifferAndLog();
-
-			if (provider is not null)
+			if (this.webServer is not null)
 			{
-				Database.Register(new NullDatabaseProvider(), false);
-				await provider.DisposeAsync();
-				provider = null;
+				await this.webServer.DisposeAsync();
+				this.webServer = null;
 			}
 
-			if (!string.IsNullOrEmpty(dataFolder) && Directory.Exists(dataFolder))
-				Directory.Delete(dataFolder, true);
+			await this.DisposeClients();
 		}
 
-		public override async Task DisposeClients()
+		public override void PrepareClient1(XmppClient Client, int SecurityStrength)
 		{
-			this.endpointSecurity1?.Dispose();
-			this.endpointSecurity2?.Dispose();
+			base.PrepareClient1(Client, SecurityStrength);
+			this.httpxClient1 = new HttpxClient(Client, this.endpointSecurity1, 8192);
 
-			await base.DisposeClients();
+			foreach (ISniffer Sniffer in Client.Sniffers)
+				this.webServer.Add(Sniffer);
+		}
+
+		public override void PrepareClient2(XmppClient Client, int SecurityStrength)
+		{
+			base.PrepareClient2(Client, SecurityStrength);
+			this.httpxClient2 = new HttpxClient(Client, this.endpointSecurity2, 8192);
+			this.httpxServer = new HttpxServer(Client, this.webServer, 8192)
+			{
+				RequiresE2e = true
+			};
+		}
+
+		public override Task DisposeClients()
+		{
+			this.httpxServer?.Dispose();
+			this.httpxServer = null;
+
+			this.httpxClient1?.Dispose();
+			this.httpxClient1 = null;
+
+			this.httpxClient2?.Dispose();
+			this.httpxClient2 = null;
+
+			return base.DisposeClients();
 		}
 
 		[TestMethod]
@@ -154,172 +183,58 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.Aes256)]
 		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.ChaCha20)]
 		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		public async Task Test_01_Message_AES(AsymmetricCipher AsymmetricCipherType, 
-			int SecurityStrength, SymmetricCipher SymmetricCipherType)
+		public async Task HTTPX_Test_01_GET(AsymmetricCipher EccType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
 		{
-			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);
-
+			this.PrepareEndpoints(EccType, SecurityStrength, SymmetricCipherType);
 			await this.ConnectClients(SecurityStrength);
-			try
-			{
-				ManualResetEvent Done = new(false);
-				ManualResetEvent Error = new(false);
 
-				this.client2.OnNormalMessage += (Sender, e) =>
+			this.DoGet(1);
+		}
+
+		private void DoGet(int Nr)
+		{
+			ManualResetEvent Done1 = new(false);
+			ManualResetEvent Error1 = new(false);
+			ManualResetEvent Done2 = new(false);
+			ManualResetEvent Error2 = new(false);
+			MemoryStream ms = null;
+			string ContentType = null;
+
+			this.httpxClient1.GET(this.client2.FullJID, "/Hello",
+				(Sender, e) =>
 				{
-					if (e.UsesE2eEncryption && e.Body == "Test message" && e.Subject == "Subject" && e.Id == "1")
-						Done.Set();
+					if (e.Ok && e.HasData && e.State.Equals(Nr))
+					{
+						ms = new MemoryStream();
+
+						if (e.Data is not null)
+							ms.Write(e.Data, 0, e.Data.Length);
+
+						ContentType = e.HttpResponse.ContentType;
+						Done1.Set();
+					}
 					else
-						Error.Set();
+						Error1.Set();
 
 					return Task.CompletedTask;
-				};
-
-				await this.endpointSecurity1.SendMessage(this.client1, E2ETransmission.AssertE2E,
-					QoSLevel.Unacknowledged, MessageType.Normal, "1", this.client2.FullJID,
-					"<test/>", "Test message", "Subject", "en", string.Empty, string.Empty,
-					null, null);
-
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000));
-			}
-			finally
-			{
-				this.endpointSecurity1?.Dispose();
-				this.endpointSecurity2?.Dispose();
-
-				await this.DisposeClients();
-			}
-		}
-
-		[TestMethod]
-		[DataRow(AsymmetricCipher.BrainpoolP160, 80, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP160, 80, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP160, 80, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP192, 96, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP192, 96, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP192, 96, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP224, 112, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP224, 112, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP224, 112, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP256, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP256, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP256, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP320, 160, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP320, 160, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP320, 160, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP384, 192, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP384, 192, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP384, 192, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP512, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP512, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP512, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP192, 96, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP192, 96, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP192, 96, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP224, 112, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP224, 112, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP224, 112, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP256, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP256, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP256, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP384, 192, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP384, 192, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP384, 192, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP521, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP521, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP521, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Edwards25519, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Edwards25519, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Edwards25519, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Edwards448, 224, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Edwards448, 224, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Edwards448, 224, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Curve25519, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Curve25519, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Curve25519, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Curve448, 224, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Curve448, 224, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Curve448, 224, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Rsa, 96, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Rsa, 96, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Rsa, 96, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Rsa, 112, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Rsa, 112, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Rsa, 112, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Rsa, 140, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Rsa, 140, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Rsa, 140, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.ModuleLattice128, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.ModuleLattice128, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.ModuleLattice128, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.ModuleLattice192, 192, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.ModuleLattice192, 192, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.ModuleLattice192, 192, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(null, 256, SymmetricCipher.Aes256)]
-		[DataRow(null, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(null, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		public Task Test_02_IQ_Get(AsymmetricCipher AsymmetricCipherType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
-		{
-			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);
-
-			return this.Test_IQ_Get("Hello", "Hello", true, SecurityStrength);
-		}
-
-		private async Task Test_IQ_Get(string Send, string Check, bool ExpectOk, int SecurityStrength)
-		{
-			await this.ConnectClients(SecurityStrength);
-			try
-			{
-				ManualResetEvent Done = new(false);
-				ManualResetEvent Error = new(false);
-
-				this.client2.RegisterIqGetHandler("test", "testns", async (Sender, e) =>
+				},
+				async (Sender, e) =>
 				{
-					if (e.UsesE2eEncryption &&
-						e.E2eEncryption is not null &&
-						!string.IsNullOrEmpty(e.E2eReference) &&
-						e.E2eSymmetricCipher is not null &&
-						e.Query.InnerText == Check)
-					{
-						await e.IqResult("<test xmlns='testns'>World</test>");
-					}
-					else
-						await e.IqError(new StanzaErrors.BadRequestException("Bad request", e.IQ));
-				}, true);
+					ms?.Write(e.Data, 0, e.Data.Length);
 
-				await this.endpointSecurity1.SendIqGet(this.client1, E2ETransmission.AssertE2E,
-					this.client2.FullJID, "<test xmlns='testns'>" + Send + "</test>", (Sender, e) =>
+					if (e.Last)
 					{
-						if (e.UsesE2eEncryption &&
-							e.E2eEncryption is not null &&
-							!string.IsNullOrEmpty(e.E2eReference) &&
-							e.E2eSymmetricCipher is not null &&
-							e.Ok == ExpectOk &&
-							(!ExpectOk || (e.FirstElement is not null &&
-							e.FirstElement.LocalName == "test" &&
-							e.FirstElement.NamespaceURI == "testns" &&
-							e.FirstElement.InnerText == "World")))
-						{
-							Done.Set();
-						}
+						ContentResponse Decoded = await InternetContent.DecodeAsync(ContentType, ms.ToArray(), null);
+
+						if (!Decoded.HasError && Decoded.Decoded is string s && s == "World" && e.State.Equals(Nr))
+							Done2.Set();
 						else
-							Error.Set();
+							Error2.Set();
+					}
+				}, Nr);
 
-						return Task.CompletedTask;
-					}, null);
-
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000));
-			}
-			finally
-			{
-				this.endpointSecurity1?.Dispose();
-				this.endpointSecurity2?.Dispose();
-
-				await this.DisposeClients();
-			}
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 5000), "Response not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 5000), "Data not returned.");
 		}
 
 		[TestMethod]
@@ -389,62 +304,20 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(null, 256, SymmetricCipher.Aes256)]
-		[DataRow(null, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(null, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		public async Task Test_03_IQ_Set(AsymmetricCipher AsymmetricCipherType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
+		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		public async Task HTTPX_Test_02_GET_PostBack(AsymmetricCipher EccType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
 		{
-			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);
-
+			this.PrepareEndpoints(EccType, SecurityStrength, SymmetricCipherType);
 			await this.ConnectClients(SecurityStrength);
-			try
-			{
-				ManualResetEvent Done = new(false);
-				ManualResetEvent Error = new(false);
 
-				this.client2.RegisterIqSetHandler("test", "testns", async (Sender, e) =>
-				{
-					if (e.UsesE2eEncryption &&
-						e.E2eEncryption is not null &&
-						!string.IsNullOrEmpty(e.E2eReference) &&
-						e.E2eSymmetricCipher is not null &&
-						e.Query.InnerText == "Hello")
-					{
-						await e.IqResult("<test xmlns='testns'>World</test>");
-					}
-					else
-						await e.IqError(new StanzaErrors.BadRequestException("Bad request", e.IQ));
-				}, true);
+			PostBack PostBack = new();
 
-				await this.endpointSecurity1.SendIqSet(this.client1, E2ETransmission.AssertE2E,
-					this.client2.FullJID, "<test xmlns='testns'>Hello</test>", (Sender, e) =>
-					{
-						if (e.E2eEncryption is not null &&
-							!string.IsNullOrEmpty(e.E2eReference) &&
-							e.E2eSymmetricCipher is not null &&
-							e.Ok &&
-							e.FirstElement is not null &&
-							e.FirstElement.LocalName == "test" &&
-							e.FirstElement.NamespaceURI == "testns" &&
-							e.FirstElement.InnerText == "World")
-						{
-							Done.Set();
-						}
-						else
-							Error.Set();
+			this.webServer.Register(PostBack);
+			this.httpxClient1.PostResource = PostBack;
 
-						return Task.CompletedTask;
-					}, null);
-
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000));
-			}
-			finally
-			{
-				this.endpointSecurity1?.Dispose();
-				this.endpointSecurity2?.Dispose();
-
-				await this.DisposeClients();
-			}
+			this.DoGet(2);
 		}
 
 		[TestMethod]
@@ -514,237 +387,153 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(null, 256, SymmetricCipher.Aes256)]
-		[DataRow(null, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(null, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		public Task Test_04_IQ_Error(AsymmetricCipher AsymmetricCipherType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
+		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		public async Task HTTPX_Test_03_POST(AsymmetricCipher EccType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
 		{
-			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);
+			this.PrepareEndpoints(EccType, SecurityStrength, SymmetricCipherType);
+			await this.ConnectClients(SecurityStrength);
 
-			return this.Test_IQ_Get("Hello", "Bye", false, SecurityStrength);
+			await this.DoPost(3);
 		}
 
-		[TestMethod]
-		[DataRow(AsymmetricCipher.BrainpoolP160, 80, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP160, 80, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP160, 80, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP192, 96, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP192, 96, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP192, 96, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP224, 112, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP224, 112, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP224, 112, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP256, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP256, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP256, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP320, 160, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP320, 160, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP320, 160, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP384, 192, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP384, 192, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP384, 192, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP512, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP512, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP512, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP192, 96, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP192, 96, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP192, 96, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP224, 112, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP224, 112, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP224, 112, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP256, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP256, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP256, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP384, 192, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP384, 192, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP384, 192, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP521, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP521, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP521, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Edwards25519, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Edwards25519, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Edwards25519, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Edwards448, 224, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Edwards448, 224, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Edwards448, 224, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Curve25519, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Curve25519, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Curve25519, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Curve448, 224, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Curve448, 224, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Curve448, 224, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Rsa, 96, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Rsa, 96, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Rsa, 96, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Rsa, 112, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Rsa, 112, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Rsa, 112, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Rsa, 140, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Rsa, 140, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Rsa, 140, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.ModuleLattice128, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.ModuleLattice128, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.ModuleLattice128, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.ModuleLattice192, 192, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.ModuleLattice192, 192, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.ModuleLattice192, 192, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(null, 256, SymmetricCipher.Aes256)]
-		[DataRow(null, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(null, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		public void Test_05_Binary(AsymmetricCipher AsymmetricCipherType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
+		private async Task DoPost(int Nr)
 		{
-			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);
-		
-			IE2eEndpoint Endpoint1 = this.endpoints1[0];
-			IE2eEndpoint Endpoint2 = this.endpoints2[0];
-
-			byte[] Data = new byte[1024];
-			using (RandomNumberGenerator Rnd = RandomNumberGenerator.Create())
-			{
-				Rnd.GetBytes(Data);
-			}
-
-			byte[] Encrypted = Endpoint1.DefaultSymmetricCipher.Encrypt(
-				"ID", "Type", "From", "To", 1, Data, Endpoint1, Endpoint2);
-			byte[] Decrypted = Endpoint2.DefaultSymmetricCipher.Decrypt(
-				"ID", "Type", "From", "To", Encrypted, Endpoint1, Endpoint2);
-
-			Assert.IsNotNull(Decrypted, "Decryption failed.");
-
-			int i, c = Data.Length;
-			Assert.HasCount(c, Decrypted, "Length mismatch.");
-
-			for (i = 0; i < c; i++)
-				Assert.AreEqual(Data[i], Decrypted[i], "Encryption/Decryption failed.");
-		}
-
-		[TestMethod]
-		[DataRow(AsymmetricCipher.BrainpoolP160, 80, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP160, 80, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP160, 80, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP192, 96, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP192, 96, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP192, 96, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP224, 112, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP224, 112, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP224, 112, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP256, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP256, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP256, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP320, 160, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP320, 160, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP320, 160, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP384, 192, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP384, 192, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP384, 192, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.BrainpoolP512, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.BrainpoolP512, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.BrainpoolP512, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP192, 96, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP192, 96, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP192, 96, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP224, 112, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP224, 112, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP224, 112, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP256, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP256, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP256, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP384, 192, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP384, 192, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP384, 192, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.NistP521, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.NistP521, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.NistP521, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Edwards25519, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Edwards25519, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Edwards25519, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Edwards448, 224, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Edwards448, 224, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Edwards448, 224, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Curve25519, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Curve25519, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Curve25519, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Curve448, 224, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Curve448, 224, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Curve448, 224, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Rsa, 96, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Rsa, 96, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Rsa, 96, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Rsa, 112, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Rsa, 112, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Rsa, 112, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Rsa, 140, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Rsa, 140, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Rsa, 140, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.ModuleLattice128, 128, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.ModuleLattice128, 128, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.ModuleLattice128, 128, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.ModuleLattice192, 192, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.ModuleLattice192, 192, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.ModuleLattice192, 192, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(null, 256, SymmetricCipher.Aes256)]
-		[DataRow(null, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(null, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		public async Task Test_06_Stream_AES(AsymmetricCipher AsymmetricCipherType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
-		{
-			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);
-
-			IE2eEndpoint Endpoint1 = this.endpoints1[0];
-			IE2eEndpoint Endpoint2 = this.endpoints2[0];
-
-			MemoryStream Data = new();
-			byte[] Temp = new byte[1024];
-			byte[] Temp2 = new byte[1024];
-			int i;
+			ManualResetEvent Done1 = new(false);
+			ManualResetEvent Error1 = new(false);
+			ManualResetEvent Done2 = new(false);
+			ManualResetEvent Error2 = new(false);
+			MemoryStream ms = null;
+			string ContentType = null;
+			byte[] Bin = new byte[1024 * 1024];
+			string Message;
 
 			using (RandomNumberGenerator Rnd = RandomNumberGenerator.Create())
 			{
-				for (i = 0; i < 1024; i++)
-				{
-					Rnd.GetBytes(Temp);
-					Data.Write(Temp, 0, Temp.Length);
-				}
+				Rnd.GetBytes(Bin);
 			}
 
-			MemoryStream Encrypted = new();
+			Message = Convert.ToBase64String(Bin);
 
-			Data.Position = 0;
-			await Endpoint1.DefaultSymmetricCipher.Encrypt(
-				"ID", "Type", "From", "To", 1, Data, Encrypted, Endpoint1, Endpoint2);
-
-			Encrypted.Position = 0;
-			Stream Decrypted = await Endpoint2.DefaultSymmetricCipher.Decrypt(
-				"ID", "Type", "From", "To", Encrypted, Endpoint1, Endpoint2);
-
-			Assert.IsNotNull(Decrypted, "Decryption failed.");
-
-			long c = Data.Length;
-			Assert.AreEqual(c, Decrypted.Length, "Length mismatch.");
-
-			Decrypted.Position = 0;
-			Data.Position = 0;
-
-			while (true)
-			{
-				i = await Data.ReadAsync(Temp, 0, Temp.Length, CancellationToken.None);
-				Assert.AreEqual(i, await Decrypted.ReadAsync(Temp2, 0, Temp2.Length,
-					CancellationToken.None));
-
-				if (i <= 0)
-					break;
-
-				while (i > 0)
+			await this.httpxClient1.POST(this.client2.FullJID, "/Echo", Message,
+				(Sender, e) =>
 				{
-					i--;
-					Assert.AreEqual(Temp[i], Temp2[i], "Encryption/Decryption failed.");
-				}
-			}
+					if (e.Ok && e.HasData && e.State.Equals(Nr))
+					{
+						ms = new MemoryStream();
+
+						if (e.Data is not null)
+							ms.Write(e.Data, 0, e.Data.Length);
+
+						ContentType = e.HttpResponse.ContentType;
+						Done1.Set();
+					}
+					else
+						Error1.Set();
+
+					return Task.CompletedTask;
+				},
+				async (Sender, e) =>
+				{
+					ms?.Write(e.Data, 0, e.Data.Length);
+
+					if (e.Last)
+					{
+						ContentResponse Decoded = await InternetContent.DecodeAsync(ContentType, ms.ToArray(), null);
+
+						if (!Decoded.HasError && Decoded.Decoded is string s && s == Message && e.State.Equals(Nr))
+							Done2.Set();
+						else
+							Error2.Set();
+					}
+				}, Nr);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 120000), "Response not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 120000), "Data not returned.");
+		}
+
+		[TestMethod]
+		[DataRow(AsymmetricCipher.BrainpoolP160, 80, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.BrainpoolP160, 80, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.BrainpoolP160, 80, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.BrainpoolP192, 96, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.BrainpoolP192, 96, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.BrainpoolP192, 96, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.BrainpoolP224, 112, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.BrainpoolP224, 112, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.BrainpoolP224, 112, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.BrainpoolP256, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.BrainpoolP256, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.BrainpoolP256, 128, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.BrainpoolP320, 160, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.BrainpoolP320, 160, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.BrainpoolP320, 160, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.BrainpoolP384, 192, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.BrainpoolP384, 192, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.BrainpoolP384, 192, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.BrainpoolP512, 256, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.BrainpoolP512, 256, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.BrainpoolP512, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.NistP192, 96, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.NistP192, 96, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.NistP192, 96, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.NistP224, 112, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.NistP224, 112, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.NistP224, 112, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.NistP256, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.NistP256, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.NistP256, 128, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.NistP384, 192, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.NistP384, 192, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.NistP384, 192, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.NistP521, 256, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.NistP521, 256, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.NistP521, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Edwards25519, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Edwards25519, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Edwards25519, 128, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Edwards448, 224, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Edwards448, 224, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Edwards448, 224, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Curve25519, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Curve25519, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Curve25519, 128, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Curve448, 224, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Curve448, 224, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Curve448, 224, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Rsa, 96, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Rsa, 96, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Rsa, 96, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Rsa, 112, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Rsa, 112, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Rsa, 112, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Rsa, 140, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Rsa, 140, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Rsa, 140, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.ModuleLattice128, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.ModuleLattice128, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.ModuleLattice128, 128, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.ModuleLattice192, 192, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.ModuleLattice192, 192, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.ModuleLattice192, 192, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		public async Task HTTPX_Test_04_POST_PostBack(AsymmetricCipher EccType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
+		{
+			this.PrepareEndpoints(EccType, SecurityStrength, SymmetricCipherType);
+			await this.ConnectClients(SecurityStrength);
+
+			PostBack PostBack = new();
+
+			this.webServer.Register(PostBack);
+			this.httpxClient1.PostResource = PostBack;
+
+			await this.DoPost(4);
 		}
 
 	}

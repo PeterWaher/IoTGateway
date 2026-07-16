@@ -34,7 +34,7 @@ namespace Waher.Networking.XMPP.Test
 
 		private async Task<string[]> SearchJIDs()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			List<string> SupportsSearch = new();
 
 			ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client1.Domain, 10000);

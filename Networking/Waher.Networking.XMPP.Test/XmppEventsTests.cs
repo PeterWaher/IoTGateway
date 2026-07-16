@@ -26,9 +26,9 @@ namespace Waher.Networking.XMPP.Test
 			await DisposeSnifferAndLog();
 		}
 
-		public override async Task ConnectClients()
+		public override async Task ConnectClients(int SecurityStrength)
 		{
-			await base.ConnectClients();
+			await base.ConnectClients(SecurityStrength);
 
 			Assert.AreEqual(XmppState.Connected, this.client1.State);
 			Assert.AreEqual(XmppState.Connected, this.client2.State);
@@ -60,7 +60,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Events_Test_01_LogEvent()
 		{
-			await this.ConnectClients();
+			await this.ConnectClients(256);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -103,10 +103,10 @@ namespace Waher.Networking.XMPP.Test
 				Assert.AreEqual("Test Facility", Event.Facility);
 				Assert.AreEqual("Test Module", Event.Module);
 				Assert.AreEqual("Test Stack Trace", Event.StackTrace);
-				Assert.AreEqual(18, Event.Tags.Length);
+				Assert.HasCount(18, Event.Tags);
 
 				Assert.AreEqual("Boolean", Event.Tags[0].Key);
-				Assert.AreEqual(true, Event.Tags[0].Value);
+				Assert.IsTrue((bool?)Event.Tags[0].Value);
 
 				Assert.AreEqual("Byte", Event.Tags[1].Key);
 				Assert.AreEqual((byte)2, Event.Tags[1].Value);

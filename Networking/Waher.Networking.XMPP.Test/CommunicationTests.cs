@@ -12,7 +12,6 @@ using Waher.Runtime.Console;
 
 namespace Waher.Networking.XMPP.Test
 {
-	[TestClass]
 	public abstract class CommunicationTests
 	{
 		private static ConsoleEventSink sink = null;
@@ -77,7 +76,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		public virtual async Task ConnectClients()
+		public virtual async Task ConnectClients(int SecurityStrength)
 		{
 			this.connected1.Reset();
 			this.error1.Reset();
@@ -106,7 +105,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client1.OnStateChanged += this.Client_OnStateChanged1;
 			this.client1.Information("Starting test, client 1...");
 
-			this.PrepareClient1(this.client1);
+			this.PrepareClient1(this.client1, SecurityStrength);
 
 			await this.client1.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Live and well"));
 			await this.client1.Connect();
@@ -128,7 +127,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client2.OnStateChanged += this.Client_OnStateChanged2;
 			this.client2.Information("Starting test, client 2...");
 
-			this.PrepareClient2(this.client2);
+			this.PrepareClient2(this.client2, SecurityStrength);
 			
 			await this.client2.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Ready to chat."));
 			await this.client2.Connect();
@@ -136,11 +135,11 @@ namespace Waher.Networking.XMPP.Test
 			this.WaitConnected2(5000);
         }
 
-        public virtual void PrepareClient1(XmppClient Client)
+        public virtual void PrepareClient1(XmppClient Client, int SecurityStrength)
         {
         }
 
-        public virtual void PrepareClient2(XmppClient Client)
+        public virtual void PrepareClient2(XmppClient Client, int SecurityStrength)
         {
         }
 

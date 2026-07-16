@@ -8,7 +8,7 @@ using Waher.Networking.HTTP;
 using Waher.Networking.XMPP.HTTPX;
 using Waher.Runtime.Cache;
 
-namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
+namespace Waher.Networking.XMPP.Test.E2eTests
 {
 	internal class PostBack : HttpSynchronousResource, IPostResource, IHttpPostMethod
 	{

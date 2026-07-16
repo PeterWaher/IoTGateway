@@ -9,13 +9,10 @@ using System.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.P2P;
-using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Filters;
-using Waher.Persistence.Serialization;
-using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Settings;
 using CallStack = Waher.Security.CallStack;
@@ -30,26 +27,12 @@ namespace Waher.Networking.XMPP.Test
 		private ContractsClient contractsClient;
 		private string dataFolder;
 
-		[ClassInitialize]
-		public static void ClassInitialize(TestContext _)
-		{
-			Types.Initialize(
-				typeof(FilesProvider).Assembly,
-				typeof(ObjectSerializer).Assembly,
-				typeof(ContractsClientStateTests).Assembly,
-				typeof(ContractsClient).Assembly,
-				typeof(EndpointSecurity).Assembly,
-				typeof(RuntimeSettings).Assembly,
-				typeof(CaseInsensitiveString).Assembly);
-		}
-
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
-			this.dataFolder = Path.Combine(Path.GetTempPath(), "ContractsClientStateTests", Guid.NewGuid().ToString("N"));
-			Directory.CreateDirectory(this.dataFolder);
+			this.dataFolder = Path.Combine("Data", "ContractsClientStateTests");
 
-			this.provider = await FilesProvider.CreateAsync(this.dataFolder, "Default", 8192, 1000, 8192, Encoding.UTF8, 10000, true);
+			this.provider = await FilesProvider.CreateAsync(this.dataFolder, "Default", 8192, 1000, 8192, Encoding.UTF8, 10000, false);
 			Database.Register(this.provider, false);
 
 			this.client = new XmppClient(new XmppCredentials()
@@ -98,7 +81,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(State.HasPrivateKey);
 			Assert.IsFalse(string.IsNullOrEmpty(State.KeyName));
 			Assert.IsNotNull(State.PrivateKey);
-			CollectionAssert.AreEqual(MatchingPublicKey, State.PublicKey);
+			Assert.AreSequenceEqual(MatchingPublicKey, State.PublicKey);
 		}
 
 		[TestMethod]
@@ -115,13 +98,13 @@ namespace Waher.Networking.XMPP.Test
 			LegalIdentityState State = await GetStateAsync(this.client.BareJID, "approved-id");
 			Assert.IsNotNull(State);
 			Assert.IsTrue(State.HasPrivateKey);
-			CollectionAssert.AreEqual(OldPublicKey, State.PublicKey);
+			Assert.AreSequenceEqual(OldPublicKey, State.PublicKey);
 			Assert.AreEqual("approved-id", await AwaitOrTimeout(this.contractsClient.GetLatestApprovedLegalId(), "GetLatestApprovedLegalId"));
 			Assert.IsTrue(await AwaitOrTimeout(this.contractsClient.HasPrivateKey("approved-id"), "HasPrivateKey"));
 
 			byte[] Signature = await AwaitOrTimeout(this.contractsClient.SignAsync(Encoding.UTF8.GetBytes("contracts-client-state-test"), SignWith.LatestApprovedId), "SignAsync");
 			Assert.IsNotNull(Signature);
-			Assert.IsTrue(Signature.Length > 0);
+			Assert.IsNotEmpty(Signature);
 		}
 
 		[TestMethod]
@@ -149,10 +132,10 @@ namespace Waher.Networking.XMPP.Test
 
 			string Xml = await this.contractsClient.ExportKeys();
 
-			StringAssert.Contains(Xml, "approved-id");
-			StringAssert.Contains(Xml, "privateKey=");
-			StringAssert.Contains(Xml, "keyName=");
-			StringAssert.Contains(Xml, Convert.ToBase64String(OldPublicKey));
+			Assert.Contains("approved-id", Xml);
+			Assert.Contains("privateKey=", Xml);
+			Assert.Contains("keyName=", Xml);
+			Assert.Contains(Convert.ToBase64String(OldPublicKey), Xml);
 		}
 
 		[TestMethod]
@@ -174,7 +157,7 @@ namespace Waher.Networking.XMPP.Test
 
 			byte[] Signature = await AwaitOrTimeout(this.contractsClient.SignAsync(Encoding.UTF8.GetBytes("contracts-client-state-test"), SignWith.LatestApprovedId), "SignAsync");
 			Assert.IsNotNull(Signature);
-			Assert.IsTrue(Signature.Length > 0);
+			Assert.IsNotEmpty(Signature);
 		}
 
 		[TestMethod]
@@ -196,7 +179,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(await AwaitOrTimeout(this.contractsClient.HasPrivateKey("approved-id"), "HasPrivateKey"));
 
 			byte[] Signature = await AwaitOrTimeout(this.contractsClient.SignAsync(Encoding.UTF8.GetBytes("roundtrip"), SignWith.LatestApprovedId), "SignAsync");
-			Assert.IsTrue(Signature.Length > 0);
+			Assert.IsNotEmpty(Signature);
 		}
 
 		[TestMethod]
@@ -243,7 +226,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(await AwaitOrTimeout(this.contractsClient.HasPrivateKey("approved-id"), "HasPrivateKey"));
 
 			byte[] Signature = await AwaitOrTimeout(this.contractsClient.SignAsync(Encoding.UTF8.GetBytes("snapshot-only"), SignWith.LatestApprovedId), "SignAsync");
-			Assert.IsTrue(Signature.Length > 0);
+			Assert.IsNotEmpty(Signature);
 		}
 
 		[TestMethod]
@@ -253,7 +236,7 @@ namespace Waher.Networking.XMPP.Test
 
 			await InsertStateAsync(this.client.BareJID, "preview-id", IdentityState.Created, PublicKey, DateTime.UtcNow.AddMinutes(-1));
 
-			LegalIdentity Identity = new LegalIdentity()
+			LegalIdentity Identity = new()
 			{
 				Id = "real-id",
 				State = IdentityState.Approved,
@@ -264,7 +247,7 @@ namespace Waher.Networking.XMPP.Test
 			await InvokeUpdateSettingsAsync(this.contractsClient, Identity, PublicKey);
 
 			List<LegalIdentityState> States = await GetStatesAsync(this.client.BareJID);
-			Assert.AreEqual(1, States.Count);
+			Assert.HasCount(1, States);
 			Assert.AreEqual("real-id", (string)States[0].LegalId);
 			Assert.AreEqual(IdentityState.Approved, States[0].State);
 		}
@@ -275,7 +258,7 @@ namespace Waher.Networking.XMPP.Test
 			IE2eEndpoint Endpoint = GetFirstLocalEndpoint(this.contractsClient);
 			byte[] PublicKey = (byte[])Endpoint.PublicKey.Clone();
 
-			LegalIdentity Identity = new LegalIdentity()
+			LegalIdentity Identity = new()
 			{
 				Id = "provider-returned-id",
 				State = IdentityState.Approved,
@@ -289,7 +272,7 @@ namespace Waher.Networking.XMPP.Test
 
 			LegalIdentityState State = await GetStateAsync(this.client.BareJID, "provider-returned-id");
 			Assert.IsNotNull(State);
-			CollectionAssert.AreEqual(PublicKey, State.PublicKey);
+			Assert.AreSequenceEqual(PublicKey, State.PublicKey);
 			Assert.IsTrue(State.HasPrivateKey);
 			Assert.AreEqual(Endpoint.LocalName, State.KeyName);
 		}
@@ -298,7 +281,7 @@ namespace Waher.Networking.XMPP.Test
 		public async Task ContractsClient_State_Test_10_MismatchedSnapshotIsIgnored()
 		{
 			IE2eEndpoint[] Keys = GetLocalKeys(this.contractsClient);
-			Assert.IsTrue(Keys.Length >= 2);
+			Assert.IsGreaterThanOrEqualTo(2, Keys.Length);
 
 			await InsertStateAsync(this.client.BareJID, "approved-id", IdentityState.Approved, Keys[0].PublicKey, DateTime.UtcNow);
 			LegalIdentityState State = await GetStateAsync(this.client.BareJID, "approved-id");
@@ -315,7 +298,7 @@ namespace Waher.Networking.XMPP.Test
 		public async Task ContractsClient_State_Test_11_NewerUnusableApprovedStateIsSkippedInFavorOfOlderUsableState()
 		{
 			IE2eEndpoint[] Keys = GetLocalKeys(this.contractsClient);
-			Assert.IsTrue(Keys.Length >= 2);
+			Assert.IsGreaterThanOrEqualTo(2, Keys.Length);
 
 			await InsertStateAsync(this.client.BareJID, "usable-id", IdentityState.Approved, Keys[0].PublicKey, DateTime.UtcNow.AddMinutes(-1));
 			Assert.IsTrue(await this.contractsClient.HasPrivateKey("usable-id"));
@@ -359,17 +342,16 @@ namespace Waher.Networking.XMPP.Test
 
 			try
 			{
-				LegalIdentityState State = new LegalIdentityState()
+				LegalIdentityState State = new()
 				{
-					LegalId = "protected-id"
+					LegalId = "protected-id",
+					PrivateKey = [1, 2, 3]
 				};
-
-				State.PrivateKey = new byte[] { 1, 2, 3 };
-				LegalIdentityState.SetAllowedSources(new CallStack.ICallStackCheck[]
-				{
+				LegalIdentityState.SetAllowedSources(
+				[
 					new CallStack.ProhibitType(typeof(ContractsClientStateTests)),
 					new CallStack.ApproveType(typeof(ContractsClient))
-				});
+				]);
 
 				Assert.Throws<CallStack.UnauthorizedCallstackException>(() =>
 				{
@@ -393,7 +375,7 @@ namespace Waher.Networking.XMPP.Test
 			LegalIdentityState State = await GetStateAsync(this.client.BareJID, "malformed-id");
 			State.KeyName = Keys[0].LocalName;
 			State.KeyNamespace = Keys[0].Namespace;
-			State.PrivateKey = new byte[] { 1, 2, 3, 4 };
+			State.PrivateKey = [1, 2, 3, 4];
 			await Database.Update(State);
 
 			string Xml = await this.contractsClient.ExportKeys();
@@ -415,7 +397,7 @@ namespace Waher.Networking.XMPP.Test
 			{
 				Assert.IsFalse(AreEqual(OriginalPublicKey, RotatedRuntimeEndpoint.PublicKey));
 
-				LegalIdentityState State = new LegalIdentityState()
+				LegalIdentityState State = new()
 				{
 					BareJid = this.client.BareJID,
 					LegalId = "snapshot-regression-id",
@@ -431,8 +413,8 @@ namespace Waher.Networking.XMPP.Test
 
 				try
 				{
-					CollectionAssert.AreEqual(OriginalPublicKey, State.PublicKey);
-					CollectionAssert.AreEqual(OriginalPublicKey, SnapshotEndpoint.PublicKey);
+					Assert.AreSequenceEqual(OriginalPublicKey, State.PublicKey);
+					Assert.AreSequenceEqual(OriginalPublicKey, SnapshotEndpoint.PublicKey);
 				}
 				finally
 				{
@@ -462,7 +444,7 @@ namespace Waher.Networking.XMPP.Test
 			try
 			{
 				Assert.IsFalse(AreEqual(OriginalPublicKey, RotatedPublicKey));
-				CollectionAssert.AreEqual(RotatedRuntimeEndpoint.PublicKey, RotatedPublicKey);
+				Assert.AreSequenceEqual(RotatedRuntimeEndpoint.PublicKey, RotatedPublicKey);
 			}
 			finally
 			{
@@ -473,7 +455,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task ContractsClient_State_Test_17_SaveContractSharedSecretPersistsContractState()
 		{
-			byte[] SharedSecret = new byte[] { 1, 2, 3, 4, 5, 6 };
+			byte[] SharedSecret = [1, 2, 3, 4, 5, 6];
 
 			Assert.IsTrue(await InvokeSaveContractSharedSecretAsync(this.contractsClient, "contract-state-id", this.client.BareJID,
 				SharedSecret, SymmetricCipherAlgorithms.Aes256, false));
@@ -482,7 +464,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsNotNull(State);
 			Assert.AreEqual(this.client.BareJID, State.CreatorJid);
 			Assert.AreEqual(SymmetricCipherAlgorithms.Aes256, State.KeyAlgorithm);
-			CollectionAssert.AreEqual(SharedSecret, State.SharedSecret);
+			Assert.AreSequenceEqual(SharedSecret, State.SharedSecret);
 			Assert.AreEqual(string.Empty, await RuntimeSettings.GetAsync(
 				this.contractsClient.ContractKeySettingsPrefix + "contract-state-id", string.Empty));
 
@@ -490,13 +472,13 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsNotNull(Secret);
 			Assert.AreEqual(SymmetricCipherAlgorithms.Aes256, Secret.Item1);
 			Assert.AreEqual(this.client.BareJID, Secret.Item2);
-			CollectionAssert.AreEqual(SharedSecret, Secret.Item3);
+			Assert.AreSequenceEqual(SharedSecret, Secret.Item3);
 		}
 
 		[TestMethod]
 		public async Task ContractsClient_State_Test_18_LegacyContractSharedSecretBackfillsContractStateOnLoad()
 		{
-			byte[] SharedSecret = new byte[] { 9, 8, 7, 6, 5, 4 };
+			byte[] SharedSecret = [9, 8, 7, 6, 5, 4];
 			await RuntimeSettings.SetAsync(this.contractsClient.ContractKeySettingsPrefix + "legacy-contract-id",
 				EncodeLegacyContractSharedSecret(SymmetricCipherAlgorithms.AeadChaCha20Poly1305, "creator@example.org", SharedSecret));
 
@@ -504,20 +486,20 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsNotNull(Secret);
 			Assert.AreEqual(SymmetricCipherAlgorithms.AeadChaCha20Poly1305, Secret.Item1);
 			Assert.AreEqual("creator@example.org", Secret.Item2);
-			CollectionAssert.AreEqual(SharedSecret, Secret.Item3);
+			Assert.AreSequenceEqual(SharedSecret, Secret.Item3);
 
 			ContractSharedSecretState State = await GetContractStateAsync(this.client.BareJID, "legacy-contract-id");
 			Assert.IsNotNull(State);
 			Assert.AreEqual("creator@example.org", State.CreatorJid);
 			Assert.AreEqual(SymmetricCipherAlgorithms.AeadChaCha20Poly1305, State.KeyAlgorithm);
-			CollectionAssert.AreEqual(SharedSecret, State.SharedSecret);
+			Assert.AreSequenceEqual(SharedSecret, State.SharedSecret);
 		}
 
 		[TestMethod]
 		public async Task ContractsClient_State_Test_19_SaveContractSharedSecretOnlyIfNewRespectsLegacyRuntimeValue()
 		{
-			byte[] ExistingSharedSecret = new byte[] { 3, 3, 3, 3 };
-			byte[] NewSharedSecret = new byte[] { 4, 4, 4, 4 };
+			byte[] ExistingSharedSecret = [3, 3, 3, 3];
+			byte[] NewSharedSecret = [4, 4, 4, 4];
 
 			await RuntimeSettings.SetAsync(this.contractsClient.ContractKeySettingsPrefix + "existing-contract-id",
 				EncodeLegacyContractSharedSecret(SymmetricCipherAlgorithms.Aes256, "creator@example.org", ExistingSharedSecret));
@@ -529,14 +511,14 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsNotNull(State);
 			Assert.AreEqual("creator@example.org", State.CreatorJid);
 			Assert.AreEqual(SymmetricCipherAlgorithms.Aes256, State.KeyAlgorithm);
-			CollectionAssert.AreEqual(ExistingSharedSecret, State.SharedSecret);
+			Assert.AreSequenceEqual(ExistingSharedSecret, State.SharedSecret);
 		}
 
 		[TestMethod]
 		public async Task ContractsClient_State_Test_20_ExportKeysMigratesLegacyContractSecretAndUsesContractStateFormat()
 		{
-			byte[] PersistedSecret = new byte[] { 5, 4, 3, 2 };
-			byte[] LegacySecret = new byte[] { 2, 3, 4, 5 };
+			byte[] PersistedSecret = [5, 4, 3, 2];
+			byte[] LegacySecret = [2, 3, 4, 5];
 
 			Assert.IsTrue(await InvokeSaveContractSharedSecretAsync(this.contractsClient, "persisted-contract-id", this.client.BareJID,
 				PersistedSecret, SymmetricCipherAlgorithms.Aes256, false));
@@ -553,13 +535,13 @@ namespace Waher.Networking.XMPP.Test
 			ContractSharedSecretState State = await GetContractStateAsync(this.client.BareJID, "legacy-contract-id");
 			Assert.IsNotNull(State);
 			Assert.AreEqual("creator@example.org", State.CreatorJid);
-			CollectionAssert.AreEqual(LegacySecret, State.SharedSecret);
+			Assert.AreSequenceEqual(LegacySecret, State.SharedSecret);
 		}
 
 		[TestMethod]
 		public async Task ContractsClient_State_Test_21_ImportKeysRoundTripWithContractStateRestoresSharedSecret()
 		{
-			byte[] SharedSecret = new byte[] { 7, 7, 7, 7, 7 };
+			byte[] SharedSecret = [7, 7, 7, 7, 7];
 
 			Assert.IsTrue(await InvokeSaveContractSharedSecretAsync(this.contractsClient, "roundtrip-contract-id", this.client.BareJID,
 				SharedSecret, SymmetricCipherAlgorithms.Aes256, false));
@@ -575,13 +557,13 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsNotNull(Secret);
 			Assert.AreEqual(SymmetricCipherAlgorithms.Aes256, Secret.Item1);
 			Assert.AreEqual(this.client.BareJID, Secret.Item2);
-			CollectionAssert.AreEqual(SharedSecret, Secret.Item3);
+			Assert.AreSequenceEqual(SharedSecret, Secret.Item3);
 		}
 
 		[TestMethod]
 		public async Task ContractsClient_State_Test_22_ImportKeysBackwardCompatibilityRestoresLegacyContractSharedSecret()
 		{
-			byte[] SharedSecret = new byte[] { 6, 6, 6, 6 };
+			byte[] SharedSecret = [6, 6, 6, 6];
 			string Xml = "<LegalId xmlns=\"" + ContractsClient.NamespaceOnboarding + "\"><C n=\"legacy-import-contract-id\" v=\"" +
 				EncodeLegacyContractSharedSecret(SymmetricCipherAlgorithms.AeadChaCha20Poly1305, "creator@example.org", SharedSecret) +
 				"\" /></LegalId>";
@@ -592,7 +574,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsNotNull(State);
 			Assert.AreEqual("creator@example.org", State.CreatorJid);
 			Assert.AreEqual(SymmetricCipherAlgorithms.AeadChaCha20Poly1305, State.KeyAlgorithm);
-			CollectionAssert.AreEqual(SharedSecret, State.SharedSecret);
+			Assert.AreSequenceEqual(SharedSecret, State.SharedSecret);
 		}
 
 		[TestMethod]
@@ -612,17 +594,16 @@ namespace Waher.Networking.XMPP.Test
 
 			try
 			{
-				ContractSharedSecretState State = new ContractSharedSecretState()
+				ContractSharedSecretState State = new()
 				{
-					ContractId = "protected-contract-id"
+					ContractId = "protected-contract-id",
+					SharedSecret = [1, 2, 3]
 				};
-
-				State.SharedSecret = new byte[] { 1, 2, 3 };
-				ContractSharedSecretState.SetAllowedSources(new CallStack.ICallStackCheck[]
-				{
+				ContractSharedSecretState.SetAllowedSources(
+				[
 					new CallStack.ProhibitType(typeof(ContractsClientStateTests)),
 					new CallStack.ApproveType(typeof(ContractsClient))
-				});
+				]);
 
 				Assert.Throws<CallStack.UnauthorizedCallstackException>(() =>
 				{
@@ -640,7 +621,7 @@ namespace Waher.Networking.XMPP.Test
 			IE2eEndpoint[] Keys = GetLocalKeys(ContractsClient);
 
 			Assert.IsNotNull(Keys);
-			Assert.IsTrue(Keys.Length > 0);
+			Assert.IsNotEmpty(Keys);
 
 			return (byte[])Keys[0].PublicKey.Clone();
 		}
@@ -650,7 +631,7 @@ namespace Waher.Networking.XMPP.Test
 			IE2eEndpoint[] Keys = GetLocalKeys(ContractsClient);
 
 			Assert.IsNotNull(Keys);
-			Assert.IsTrue(Keys.Length > 0);
+			Assert.IsNotEmpty(Keys);
 
 			return Keys[0];
 		}
@@ -711,7 +692,7 @@ namespace Waher.Networking.XMPP.Test
 
 		private static async Task<List<LegalIdentityState>> GetStatesAsync(string BareJid)
 		{
-			return (await Database.Find<LegalIdentityState>(new FilterFieldEqualTo("BareJid", BareJid))).ToList();
+			return [.. await Database.Find<LegalIdentityState>(new FilterFieldEqualTo("BareJid", BareJid))];
 		}
 
 		private static async Task<ContractSharedSecretState> GetContractStateAsync(string BareJid, string ContractId)
@@ -723,7 +704,7 @@ namespace Waher.Networking.XMPP.Test
 
 		private static async Task<List<ContractSharedSecretState>> GetContractStatesAsync(string BareJid)
 		{
-			return (await Database.Find<ContractSharedSecretState>(new FilterFieldEqualTo("BareJid", BareJid))).ToList();
+			return [.. await Database.Find<ContractSharedSecretState>(new FilterFieldEqualTo("BareJid", BareJid))];
 		}
 
 		private static async Task DeleteAllStatesAsync(string BareJid)
@@ -750,10 +731,10 @@ namespace Waher.Networking.XMPP.Test
 
 		private static string ExtractExportedStateXml(string Xml, bool RemovePrivateStateAttributes, bool KeepRuntimeSettings)
 		{
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new();
 			Doc.LoadXml(Xml);
 
-			List<XmlNode> ToRemove = new List<XmlNode>();
+			List<XmlNode> ToRemove = [];
 
 			foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 			{
@@ -796,16 +777,16 @@ namespace Waher.Networking.XMPP.Test
 		private static async Task InvokeUpdateSettingsAsync(ContractsClient ContractsClient, LegalIdentity Identity, byte[] PublicKey)
 		{
 			MethodInfo Method = typeof(ContractsClient).GetMethod("UpdateSettings", BindingFlags.Instance | BindingFlags.NonPublic, null,
-				new Type[] { typeof(LegalIdentity), typeof(byte[]) }, null);
+				[typeof(LegalIdentity), typeof(byte[])], null);
 
-			Task Task = (Task)Method.Invoke(ContractsClient, new object[] { Identity, PublicKey });
+			Task Task = (Task)Method.Invoke(ContractsClient, [Identity, PublicKey]);
 			await Task;
 		}
 
 		private static async Task<bool> InvokeSetLegalIdentityKeySnapshotAsync(ContractsClient ContractsClient, LegalIdentityState State, IE2eEndpoint Endpoint)
 		{
 			MethodInfo Method = typeof(ContractsClient).GetMethod("SetLegalIdentityKeySnapshotAsync", BindingFlags.Instance | BindingFlags.NonPublic);
-			Task<bool> Task = (Task<bool>)Method.Invoke(ContractsClient, new object[] { State, Endpoint });
+			Task<bool> Task = (Task<bool>)Method.Invoke(ContractsClient, [State, Endpoint]);
 			return await Task;
 		}
 
@@ -813,8 +794,8 @@ namespace Waher.Networking.XMPP.Test
 			string CreatorJid, byte[] SharedSecret, SymmetricCipherAlgorithms Algorithm, bool OnlyIfNew)
 		{
 			MethodInfo Method = typeof(ContractsClient).GetMethod("SaveContractSharedSecret", BindingFlags.Instance | BindingFlags.NonPublic, null,
-				new Type[] { typeof(string), typeof(string), typeof(byte[]), typeof(SymmetricCipherAlgorithms), typeof(bool) }, null);
-			Task<bool> Task = (Task<bool>)Method.Invoke(ContractsClient, new object[] { ContractId, CreatorJid, SharedSecret, Algorithm, OnlyIfNew });
+				[typeof(string), typeof(string), typeof(byte[]), typeof(SymmetricCipherAlgorithms), typeof(bool)], null);
+			Task<bool> Task = (Task<bool>)Method.Invoke(ContractsClient, [ContractId, CreatorJid, SharedSecret, Algorithm, OnlyIfNew]);
 			return await Task;
 		}
 
@@ -822,9 +803,10 @@ namespace Waher.Networking.XMPP.Test
 			ContractsClient ContractsClient, string ContractId)
 		{
 			MethodInfo Method = typeof(ContractsClient).GetMethod("TryLoadContractSharedSecret", BindingFlags.Instance | BindingFlags.NonPublic, null,
-				new Type[] { typeof(string) }, null);
+				[typeof(string)], null);
 			Task<Tuple<SymmetricCipherAlgorithms, string, byte[]>> Task =
-				(Task<Tuple<SymmetricCipherAlgorithms, string, byte[]>>)Method.Invoke(ContractsClient, new object[] { ContractId });
+				(Task<Tuple<SymmetricCipherAlgorithms, string, byte[]>>)Method.Invoke(ContractsClient, 
+				[ContractId]);
 			return await Task;
 		}
 

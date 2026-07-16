@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,9 +64,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="From">From attribute.</param>
 		/// <param name="To">To attribute.</param>
 		/// <param name="Data">Data to encrypt.</param>
-		/// <param name="EndpointReference">Endpoint used for encryption.</param>
-		/// <returns>Encrypted data, if encryption was possible to the recipient, or null if not.</returns>
-		Task<byte[]> Encrypt(string Id, string Type, string From, string To, byte[] Data, out IE2eEndpoint EndpointReference);
+		/// <returns>Encrypted data (or null if no E2E information is found for endpoint)
+		/// together with a reference to the endpoint used for encryption (or null if not found).</returns>
+		Task<KeyValuePair<byte[], IE2eEndpoint>> Encrypt(string Id, string Type, string From, string To, byte[] Data);
 
 		/// <summary>
 		/// Decrypts binary data received from an XMPP client out of band.
@@ -118,7 +119,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="DataXml">Data to encrypt.</param>
 		/// <param name="Xml">XML containing the encrypted data will be output here.</param>
 		/// <returns>If encryption was possible to the recipient, or not.</returns>
-		bool Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml);
+		Task<bool> Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml);
 
 		/// <summary>
 		/// Decrypts data from XML that has been received over XMPP.

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Networking.XMPP
@@ -175,6 +176,6 @@ namespace Waher.Networking.XMPP
 		/// Gets the next counter value.
 		/// </summary>
 		/// <returns>Counter value.</returns>
-		uint GetNextCounter();
+		Task<uint> GetNextCounter();
 	}
 }

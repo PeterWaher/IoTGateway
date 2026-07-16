@@ -895,11 +895,12 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="From">From attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="Data">Binary data</param>
-		/// <param name="EndpointReference">Endpoint used for encryption.</param>
-		/// <returns>Encrypted data, or null if no E2E information is found for endpoint.</returns>
-		public Task<byte[]> Encrypt(string Id, string Type, string From, string To, byte[] Data, out IE2eEndpoint EndpointReference)
+		/// <returns>Encrypted data (or null if no E2E information is found for endpoint)
+		/// together with a reference to the endpoint used for encryption (or null if not found).</returns>
+		public Task<KeyValuePair<byte[], IE2eEndpoint>> Encrypt(string Id, string Type, 
+			string From, string To, byte[] Data)
 		{
-			return this.Encrypt(Id, Type, From, To, false, 0, Data, out EndpointReference);
+			return this.Encrypt(Id, Type, From, To, false, 0, Data);
 		}
 
 		/// <summary>
@@ -912,26 +913,23 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Pqc">If Post-Quantum Cryptography (PQC) is required.</param>
 		/// <param name="MinSecurityStrength">Minimum security strength of encryption.</param>
 		/// <param name="Data">Binary data</param>
-		/// <param name="EndpointReference">Endpoint used for encryption.</param>
-		/// <returns>Encrypted data, or null if no E2E information is found for endpoint.</returns>
-		public virtual Task<byte[]> Encrypt(string Id, string Type, string From, string To,
-			bool Pqc, int MinSecurityStrength, byte[] Data, out IE2eEndpoint EndpointReference)
+		/// <returns>Encrypted data (or null if no E2E information is found for endpoint)
+		/// together with a reference to the endpoint used for encryption (or null if not found).</returns>
+		public virtual async Task<KeyValuePair<byte[], IE2eEndpoint>> Encrypt(string Id, string Type, string From, string To,
+			bool Pqc, int MinSecurityStrength, byte[] Data)
 		{
 			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(To, Pqc, MinSecurityStrength);
 			if (RemoteEndpoint is null)
-			{
-				EndpointReference = null;
-				return null;
-			}
+				return new KeyValuePair<byte[], IE2eEndpoint>(null, null);
 
-			EndpointReference = this.FindLocalEndpoint(RemoteEndpoint);
+			IE2eEndpoint EndpointReference = this.FindLocalEndpoint(RemoteEndpoint);
 			if (EndpointReference is null)
-				return null;
+				return new KeyValuePair<byte[], IE2eEndpoint>(null, null);
 
-			uint Counter = EndpointReference.GetNextCounter();
+			uint Counter = await EndpointReference.GetNextCounter();
 			byte[] Encrypted = EndpointReference.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, EndpointReference, RemoteEndpoint);
 
-			return Task.FromResult(Encrypted);
+			return new KeyValuePair<byte[], IE2eEndpoint>(Encrypted, EndpointReference);
 		}
 
 		/// <summary>
@@ -1091,7 +1089,7 @@ namespace Waher.Networking.XMPP.P2P
 			if (LocalEndpoint is null)
 				return null;
 
-			uint Counter = LocalEndpoint.GetNextCounter();
+			uint Counter = await LocalEndpoint.GetNextCounter();
 			await LocalEndpoint.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, Encrypted, LocalEndpoint, RemoteEndpoint);
 
 			return LocalEndpoint;
@@ -1137,7 +1135,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="DataXml">XML data</param>
 		/// <param name="Xml">Output</param>
 		/// <returns>If E2E information was available and encryption was possible.</returns>
-		public bool Encrypt(XmppClient Client, string Id, string Type, string From, string To,
+		public Task<bool> Encrypt(XmppClient Client, string Id, string Type, string From, string To,
 			string DataXml, StringBuilder Xml)
 		{
 			return this.Encrypt(Client, Id, Type, From, To, false, 0, DataXml, Xml);
@@ -1156,7 +1154,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="DataXml">XML data</param>
 		/// <param name="Xml">Output</param>
 		/// <returns>If E2E information was available and encryption was possible.</returns>
-		public virtual bool Encrypt(XmppClient Client, string Id, string Type, string From,
+		public virtual async Task<bool> Encrypt(XmppClient Client, string Id, string Type, string From,
 			string To, bool Pqc, int MinSecurityStrength, string DataXml, StringBuilder Xml)
 		{
 			bool SniffE2eInfo = Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b;
@@ -1179,7 +1177,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 
 			byte[] Data = this.encoding.GetBytes(DataXml);
-			uint Counter = LocalEndpoint.GetNextCounter();
+			uint Counter = await LocalEndpoint.GetNextCounter();
 			bool Result = LocalEndpoint.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, Xml, LocalEndpoint, RemoteEndpoint);
 
 			if (SniffE2eInfo)
@@ -1741,7 +1739,7 @@ namespace Waher.Networking.XMPP.P2P
 			StringBuilder Encrypted = new StringBuilder();
 
 			// TODO: Custom signal strength
-			if (this.Encrypt(Client, Id, string.Empty, this.client.FullJID, To,
+			if (await this.Encrypt(Client, Id, string.Empty, this.client.FullJID, To,
 				E2ETransmission == E2ETransmission.AssertE2EPQC, 128, MessageXml, Encrypted))
 			{
 				MessageXml = Encrypted.ToString();
@@ -1762,7 +1760,7 @@ namespace Waher.Networking.XMPP.P2P
 					{
 						Encrypted.Clear();
 
-						if (this.Encrypt(Client, Id, string.Empty, this.client.FullJID, e.From,
+						if (await this.Encrypt(Client, Id, string.Empty, this.client.FullJID, e.From,
 							E2ETransmission == E2ETransmission.AssertE2EPQC, 128, MessageXml, Encrypted))
 						{
 							await Client.SendMessage(QoS, MessageType.Normal, Id, e.From, Encrypted.ToString(), string.Empty,
@@ -2157,7 +2155,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			StringBuilder Encrypted = new StringBuilder();
 
-			if (this.Encrypt(Client, Id, Type, this.client.FullJID, To,
+			if (await this.Encrypt(Client, Id, Type, this.client.FullJID, To,
 				E2ETransmission == E2ETransmission.AssertE2EPQC, 128, Xml, Encrypted))
 			{
 				string XmlEnc = Encrypted.ToString();

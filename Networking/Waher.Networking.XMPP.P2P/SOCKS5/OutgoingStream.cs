@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Events;
@@ -201,7 +202,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 				if (!(this.e2e is null))
 				{
-					byte[] Encrypted = await this.e2e.Encrypt(this.id.ToString(), this.sid, this.from, this.to, Block, out _);
+					KeyValuePair<byte[], IE2eEndpoint> P = await this.e2e.Encrypt(this.id.ToString(), this.sid, this.from, this.to, Block);
+					byte[] Encrypted = P.Key;
+
 					this.id++;
 
 					if (Encrypted is null)

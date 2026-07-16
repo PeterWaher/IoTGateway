@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
+using Waher.Runtime.Counters;
 
 namespace Waher.Networking.XMPP.P2P.E2E
 {
@@ -10,9 +12,10 @@ namespace Waher.Networking.XMPP.P2P.E2E
 	/// </summary>
 	public abstract class E2eEndpoint : IE2eEndpoint
 	{
+		private const string E2eCounterName = "E2EE.Counter";
+
 		private IE2eSymmetricCipher defaultSymmetricCipher;
 		private IE2eEndpoint prev = null;
-		private uint counter = 0;
 
 		/// <summary>
 		/// Abstract base class for End-to-End encryption schemes.
@@ -285,9 +288,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// Gets the next counter value.
 		/// </summary>
 		/// <returns>Counter value.</returns>
-		public uint GetNextCounter()
+		public async Task<uint> GetNextCounter()
 		{
-			return ++this.counter;
+			return (uint)await RuntimeCounters.IncrementCounter(E2eCounterName);
 		}
 	}
 }

@@ -69,6 +69,9 @@ namespace Waher.Content.Posters
 			else
 			{
 				ContentResponse P = await InternetContent.EncodeAsync(Data, System.Text.Encoding.UTF8);
+				if (P.HasError)
+					return P;
+
 				Result = await this.PostAsync(Uri, P.Encoded, P.ContentType, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 			}
 			

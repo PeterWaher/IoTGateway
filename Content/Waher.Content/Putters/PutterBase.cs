@@ -63,6 +63,9 @@ namespace Waher.Content.Putters
 			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			ContentResponse P = await InternetContent.EncodeAsync(Data, System.Text.Encoding.UTF8);
+			if (P.HasError)
+				return P;
+
 			ContentBinaryResponse Result = await this.PutAsync(Uri, P.Encoded, P.ContentType, Certificate,
 				RemoteCertificateValidator, TimeoutMs, Headers);
 

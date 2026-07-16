@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter;
+using System.Text;
 using Waher.Content;
 using Waher.Content.Html;
 using Waher.Content.Markdown;
@@ -6,6 +7,7 @@ using Waher.Content.Markdown.Web;
 using Waher.Content.Multipart;
 using Waher.Events;
 using Waher.Events.Console;
+using Waher.Events.Queue;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Files;
@@ -38,7 +40,8 @@ namespace Waher.WebService.Queue.Test
 				typeof(MarkdownDocument).Assembly,
 				typeof(MarkdownToHtmlConverter).Assembly,
 				typeof(HttpServer).Assembly,
-				typeof(HtmlDocument).Assembly);
+				typeof(HtmlDocument).Assembly,
+				typeof(QueuedEvent).Assembly);
 
 			Log.Register(new ConsoleEventSink());
 
@@ -290,6 +293,89 @@ namespace Waher.WebService.Queue.Test
 			Response.AssertOk();
 
 			Assert.IsNull(Response.Decoded);
+		}
+
+		[TestMethod]
+		public async Task Test_09_Object()
+		{
+			QueuedEvent Event = new QueuedEvent()
+			{
+				Timestamp = DateTime.Now,
+				Type = EventType.Notice,
+				Level = EventLevel.Medium,
+				Message = nameof(QueueWebServiceTests),
+				Object = nameof(Test_09_Object),
+				Actor = nameof(MSTestExecutor),
+				EventId = "Test",
+				Facility = typeof(QueueWebServiceTests).Namespace,
+				Module = typeof(QueueWebServiceTests).Assembly.FullName,
+				StackTrace = Environment.StackTrace,
+				Tags =
+				[
+					new QueuedTag()
+					{
+						Name= "Tag1",
+						Value= "Value1"
+					},
+					new QueuedTag()
+					{
+						Name= "Tag2",
+						Value= 2
+					},
+					new QueuedTag()
+					{
+						Name= "Tag3",
+						Value= Math.PI
+					},
+				]
+			};
+
+			ContentResponse Response = await InternetContent.PutAsync(
+				new Uri("http://localhost:8081/Queues/Test"),
+				Event,
+				new KeyValuePair<string, string>("Authorization", "Basic " +
+				Convert.ToBase64String(Encoding.ASCII.GetBytes("Test:Test"))));
+
+			Response.AssertOk();
+
+			Assert.IsNull(Response.Decoded);
+
+			Response = await InternetContent.PostAsync(
+				new Uri("http://localhost:8081/Queues/Test"),
+				null,
+				new KeyValuePair<string, string>("Accept", "*/*"),
+				new KeyValuePair<string, string>("Authorization", "Basic " +
+				Convert.ToBase64String(Encoding.ASCII.GetBytes("Test:Test"))));
+
+			Response.AssertOk();
+
+			Dictionary<string, object>? Event2 = Response.Decoded as Dictionary<string, object>;
+			Assert.IsNotNull(Event2);
+
+			Assert.AreEqual((int)Event.Timestamp.ToUniversalTime().Subtract(JSON.UnixEpoch).TotalSeconds, Event2["Timestamp"]);
+			Assert.AreEqual(Event.Type.ToString(), Event2["Type"]);
+			Assert.AreEqual(Event.Level.ToString(), Event2["Level"]);
+			Assert.AreEqual(Event.Message, Event2["Message"]);
+			Assert.AreEqual(Event.Object, Event2["Object"]);
+			Assert.AreEqual(Event.Actor, Event2["Actor"]);
+			Assert.AreEqual(Event.EventId, Event2["EventId"]);
+			Assert.AreEqual(Event.Facility, Event2["Facility"]);
+			Assert.AreEqual(Event.Module, Event2["Module"]);
+			Assert.AreEqual(Event.StackTrace, Event2["StackTrace"]);
+
+			Array? Tags = Event2["Tags"] as Array;
+			Assert.IsNotNull(Tags);
+
+			Assert.AreEqual(Event.Tags.Length, Tags.Length);
+
+			for (int i = 0; i < Event.Tags.Length; i++)
+			{
+				Dictionary<string, object>? Tag = Tags.GetValue(i) as Dictionary<string, object>;
+				Assert.IsNotNull(Tag);
+
+				Assert.AreEqual(Event.Tags[i].Name, Tag!["Name"]);
+				Assert.AreEqual(Event.Tags[i].Value, Tag!["Value"]);
+			}
 		}
 
 	}

@@ -1,12 +1,14 @@
 ﻿using System;
+using Waher.Content.Json;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Events.Queue
 {
 	/// <summary>
 	/// Class representing a queued event.
 	/// </summary>
-	public class QueuedEvent
+	public class QueuedEvent : IJsonEncodingHint
 	{
 		private DateTime timestamp = DateTime.MinValue;
 		private EventType type = EventType.Informational;
@@ -62,6 +64,11 @@ namespace Waher.Events.Queue
 				}
 			}
 		}
+
+		/// <summary>
+		/// To what extent the object supports JSON encoding.
+		/// </summary>
+		public Grade CanEncodeJson => Grade.Ok;
 
 		/// <summary>
 		/// Timestamp of event.

@@ -94,7 +94,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Takes time.")]
 		public async Task Control_Test_04_Monitor_1000()
 		{
 			await this.ConnectClients(256);
@@ -194,7 +194,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }));
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000));
 			}
 			finally
 			{
@@ -261,7 +261,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Takes time.")]
 		public async Task Control_Test_09_Monitor_1000_Server()
 		{
 			await this.ConnectClients(256);
@@ -290,7 +290,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Takes time.")]
 		public async Task Control_Test_13_Monitor_1000_Federated_Server()
 		{
 			await this.ConnectClients(256);

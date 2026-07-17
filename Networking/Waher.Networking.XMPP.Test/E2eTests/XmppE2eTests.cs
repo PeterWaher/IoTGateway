@@ -598,8 +598,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		{
 			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);
 		
-			IE2eEndpoint Endpoint1 = this.endpoints1[0];
-			IE2eEndpoint Endpoint2 = this.endpoints2[0];
+			IE2eEndpoint Endpoint1 = this.endpoints1?[0];
+			IE2eEndpoint Endpoint2 = this.endpoints2?[0];
 
 			byte[] Data = new byte[1024];
 			using (RandomNumberGenerator Rnd = RandomNumberGenerator.Create())
@@ -695,8 +695,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		{
 			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);
 
-			IE2eEndpoint Endpoint1 = this.endpoints1[0];
-			IE2eEndpoint Endpoint2 = this.endpoints2[0];
+			IE2eEndpoint Endpoint1 = this.endpoints1?[0];
+			IE2eEndpoint Endpoint2 = this.endpoints2?[0];
 
 			MemoryStream Data = new();
 			byte[] Temp = new byte[1024];

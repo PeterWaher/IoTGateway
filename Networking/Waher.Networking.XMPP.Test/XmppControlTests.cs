@@ -145,7 +145,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000), "Configuration not performed correctly");
 				Assert.IsTrue(this.b);
 			}
 			finally
@@ -175,7 +175,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000), "Configuration not performed correctly");
 				Assert.AreEqual(1, this.cl.Red);
 				Assert.AreEqual(2, this.cl.Green);
 				Assert.AreEqual(3, this.cl.Blue);
@@ -207,7 +207,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000), "Configuration not performed correctly");
 				Assert.AreEqual(DateTime.Today, this.d);
 			}
 			finally
@@ -240,7 +240,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000), "Configuration not performed correctly");
 				Assert.AreEqual(Now.ToUniversalTime().Ticks, this.dt.ToUniversalTime().Ticks);
 			}
 			finally
@@ -270,7 +270,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000), "Configuration not performed correctly");
 				Assert.AreEqual(3.1415927, this.db);
 			}
 			finally
@@ -300,7 +300,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000), "Configuration not performed correctly");
 				Assert.AreEqual(new Duration(true, 1, 2, 3, 4, 5, 6), this.dr);
 			}
 			finally
@@ -330,7 +330,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000), "Configuration not performed correctly");
 				Assert.AreEqual(TypeCode.Int16, this.e);
 			}
 			finally
@@ -360,7 +360,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000), "Configuration not performed correctly");
 				Assert.AreEqual(int.MinValue, this.i);
 			}
 			finally
@@ -390,7 +390,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000), "Configuration not performed correctly");
 				Assert.AreEqual(long.MinValue, this.l);
 			}
 			finally
@@ -420,7 +420,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000), "Configuration not performed correctly");
 				Assert.AreEqual("ABC", this.s);
 			}
 			finally
@@ -451,7 +451,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 10000), "Configuration not performed correctly");
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000), "Configuration not performed correctly");
 				Assert.AreEqual(Time, this.t);
 			}
 			finally

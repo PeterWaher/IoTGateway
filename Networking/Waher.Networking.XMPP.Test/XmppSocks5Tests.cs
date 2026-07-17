@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP.Test
 				return Task.CompletedTask;
 			};
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Unable to connect.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000), "Unable to connect.");
 		}
 
 		[TestMethod]
@@ -103,7 +103,7 @@ namespace Waher.Networking.XMPP.Test
 				return Task.CompletedTask;
 			};
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Unable to connect.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000), "Unable to connect.");
 		}
 
 		[TestMethod]
@@ -162,8 +162,8 @@ namespace Waher.Networking.XMPP.Test
 				return Task.CompletedTask;
 			};
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 10000), "Unable to connect.");
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000), "Unable to connect.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 5000), "Unable to connect.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 5000), "Unable to connect.");
 
 			ManualResetEvent Done = new(false);
 			ManualResetEvent Error = new(false);
@@ -211,9 +211,9 @@ namespace Waher.Networking.XMPP.Test
 
 			}, null);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Unable to activate stream.");
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 10000), "Did not receive message.");
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000), "Did not receive message.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000), "Unable to activate stream.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 5000), "Did not receive message.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 5000), "Did not receive message.");
 		}
 
 		[TestMethod]
@@ -312,10 +312,10 @@ namespace Waher.Networking.XMPP.Test
 				return Task.CompletedTask;
 			}, null);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 10000), "Did not receive message 1.");
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000), "Did not receive message 2.");
-			Assert.IsTrue(Closed1.WaitOne(10000), "Client 1 did not close properly.");
-			Assert.IsTrue(Closed2.WaitOne(10000), "Client 2 did not close properly.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 5000), "Did not receive message 1.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 5000), "Did not receive message 2.");
+			Assert.IsTrue(Closed1.WaitOne(5000), "Client 1 did not close properly.");
+			Assert.IsTrue(Closed2.WaitOne(5000), "Client 2 did not close properly.");
 		}
 
 	}

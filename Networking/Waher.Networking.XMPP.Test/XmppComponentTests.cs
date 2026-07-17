@@ -163,12 +163,12 @@ namespace Waher.Networking.XMPP.Test
 
 		private int WaitClient(int Timeout)
 		{
-			return WaitHandle.WaitAny(new WaitHandle[] { this.clientConnected, this.clientError, this.clientOffline }, Timeout);
+			return WaitHandle.WaitAny([this.clientConnected, this.clientError, this.clientOffline], Timeout);
 		}
 
 		private int WaitComponent(int Timeout)
 		{
-			return WaitHandle.WaitAny(new WaitHandle[] { this.componentConnected, this.componentError, this.componentOffline }, Timeout);
+			return WaitHandle.WaitAny([this.componentConnected, this.componentError, this.componentOffline], Timeout);
 		}
 
 		private void WaitClientConnected(int Timeout)

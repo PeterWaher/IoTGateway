@@ -135,7 +135,7 @@ namespace Waher.Networking.XMPP.Test
 
 					await this.client1.RequestPresenceSubscription(this.client2.BareJID);
 
-					Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000));
+					Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 5000));
 				}
 
 				Thread.Sleep(500);

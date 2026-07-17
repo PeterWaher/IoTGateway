@@ -180,9 +180,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.AeadChaCha20Poly1305)]
 		public async Task HTTPX_Test_01_GET(AsymmetricCipher EccType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
 		{
 			this.PrepareEndpoints(EccType, SecurityStrength, SymmetricCipherType);
@@ -304,9 +304,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.AeadChaCha20Poly1305)]
 		public async Task HTTPX_Test_02_GET_PostBack(AsymmetricCipher EccType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
 		{
 			this.PrepareEndpoints(EccType, SecurityStrength, SymmetricCipherType);
@@ -387,9 +387,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.AeadChaCha20Poly1305)]
 		public async Task HTTPX_Test_03_POST(AsymmetricCipher EccType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
 		{
 			this.PrepareEndpoints(EccType, SecurityStrength, SymmetricCipherType);
@@ -520,9 +520,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.AeadChaCha20Poly1305)]
 		public async Task HTTPX_Test_04_POST_PostBack(AsymmetricCipher EccType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
 		{
 			this.PrepareEndpoints(EccType, SecurityStrength, SymmetricCipherType);

@@ -208,11 +208,15 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			int KeySize;
 
 			if (SecurityStrength <= 80)
+				KeySize = 768;
+			else if (SecurityStrength <= 96)
 				KeySize = 1024;
 			else if (SecurityStrength <= 112)
 				KeySize = 2048;
 			else if (SecurityStrength <= 128)
 				KeySize = 3072;
+			else if (SecurityStrength <= 140)
+				KeySize = 4096;
 			else if (SecurityStrength <= 192)
 				KeySize = 7680;
 			else if (SecurityStrength <= 256)

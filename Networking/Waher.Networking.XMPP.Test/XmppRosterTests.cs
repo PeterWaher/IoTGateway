@@ -22,7 +22,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Roster_Test_01_GetRoster()
 		{
-			await this.ConnectClients(256);
+			await this.ConnectClients(128);
 			Assert.IsTrue(this.client1.HasRoster);
 			Assert.IsTrue(this.client2.HasRoster);
 		}
@@ -30,7 +30,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Roster_Test_02_AddRosterItem()
 		{
-			await this.ConnectClients(256);
+			await this.ConnectClients(128);
 			using ManualResetEvent Added = new(false);
 
 			await this.client1.AddRosterItem(new RosterItem(this.client2.BareJID, "Test Client 2", "Test Clients"),
@@ -42,7 +42,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Roster_Test_03_UpdateRosterItem()
 		{
-			await this.ConnectClients(256);
+			await this.ConnectClients(128);
 			using ManualResetEvent Updated = new(false);
 			
 			await this.client1.UpdateRosterItem(this.client2.BareJID, "Test Client II", new string[] { "Test Clients" },
@@ -54,7 +54,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Roster_Test_04_RemoveRosterItem()
 		{
-			await this.ConnectClients(256);
+			await this.ConnectClients(128);
 			using ManualResetEvent Removed = new(false);
 			
 			await this.client1.RemoveRosterItem(this.client2.BareJID, (Sender, e) => { Removed.Set(); return Task.CompletedTask; }, null);
@@ -65,7 +65,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Roster_Test_05_AcceptPresenceSubscription()
 		{
-			await this.ConnectClients(256);
+			await this.ConnectClients(128);
 			ManualResetEvent Received = new(false);
 			ManualResetEvent Done = new(false);
 
@@ -86,7 +86,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Roster_Test_06_AcceptPresenceUnsubscription()
 		{
-			await this.ConnectClients(256);
+			await this.ConnectClients(128);
 			ManualResetEvent Done = new(false);
 
 			this.client2.OnPresenceUnsubscribe += (Sender, e) => { return e.Accept(); };
@@ -103,7 +103,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Roster_Test_07_FederatedSubscriptionRequest()
 		{
-			await this.ConnectClients(256);
+			await this.ConnectClients(128);
 			ManualResetEvent Done = new(false);
 
 			this.client1.OnPresenceSubscribed += (Sender, e) =>

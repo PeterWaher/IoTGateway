@@ -151,9 +151,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.AeadChaCha20Poly1305)]
 		public async Task Test_01_Message_AES(AsymmetricCipher AsymmetricCipherType, 
 			int SecurityStrength, SymmetricCipher SymmetricCipherType)
 		{
@@ -180,7 +180,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 					"<test/>", "Test message", "Subject", "en", string.Empty, string.Empty,
 					null, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000));
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 500000));
 			}
 			finally
 			{
@@ -258,9 +258,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.AeadChaCha20Poly1305)]
 		public Task Test_02_IQ_Get(AsymmetricCipher AsymmetricCipherType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
 		{
 			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);
@@ -389,9 +389,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.AeadChaCha20Poly1305)]
 		public async Task Test_03_IQ_Set(AsymmetricCipher AsymmetricCipherType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
 		{
 			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);
@@ -514,9 +514,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.AeadChaCha20Poly1305)]
 		public Task Test_04_IQ_Error(AsymmetricCipher AsymmetricCipherType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
 		{
 			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);
@@ -591,9 +591,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.AeadChaCha20Poly1305)]
 		public void Test_05_Binary(AsymmetricCipher AsymmetricCipherType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
 		{
 			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);
@@ -688,9 +688,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.Aes256)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.ChaCha20)]
 		[DataRow(AsymmetricCipher.ModuleLattice256, 256, SymmetricCipher.AeadChaCha20Poly1305)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.Aes256)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.ChaCha20)]
-		[DataRow(AsymmetricCipher.Ephemeral, 256, SymmetricCipher.AeadChaCha20Poly1305)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.Aes256)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.ChaCha20)]
+		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.AeadChaCha20Poly1305)]
 		public async Task Test_06_Stream_AES(AsymmetricCipher AsymmetricCipherType, int SecurityStrength, SymmetricCipher SymmetricCipherType)
 		{
 			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);

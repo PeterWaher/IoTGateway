@@ -664,16 +664,22 @@ namespace Waher.Networking.XMPP.P2P
 				string Header = "<?xml version='1.0'?><stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' from='" +
 					this.parentFullJid + "' to='" + this.remoteFullJid + "' version='1.0'>";
 
+				string Error;
+
 				try
 				{
-					this.parent.AuthenticatePeer(this.peer, this.remoteFullJid);
+					Error = this.parent.AuthenticatePeer(this.peer, this.remoteFullJid);
 				}
 				catch (Exception ex)
 				{
 					this.parent.Exception(ex);
+					Error = ex.Message;
+				}
 
+				if (!string.IsNullOrEmpty(Error))
+				{
 					Header += "<stream:error><invalid-from xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
-						"<text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>" + XML.Encode(ex.Message) +
+						"<text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>" + XML.Encode(Error) +
 						"</text></stream:error></stream:stream>";
 
 					this.headerSent = true;
@@ -695,7 +701,8 @@ namespace Waher.Networking.XMPP.P2P
 				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parentFullJid,
 					typeof(XmppServerlessMessaging).Assembly)
 				{
-					SendFromAddress = true
+					SendFromAddress = true,
+					EnforceE2ee = true
 				};
 
 				this.parent.PeerAuthenticated(this);

@@ -222,34 +222,36 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		public event EventHandlerAsync<PeerAddressEventArgs> PeerAddressReceived = null;
 
-		internal void AuthenticatePeer(PeerConnection Peer, string FullJID)
+		internal string AuthenticatePeer(PeerConnection Peer, string FullJID)
 		{
 			AddressInfo Info;
 
 			lock (this.addressesByFullJid)
 			{
 				if (!this.addressesByFullJid.TryGetValue(FullJID, out Info))
-					throw new XmppException("Peer JID " + FullJID + " not recognized.");
+					return "Peer JID " + FullJID + " not recognized.";
 			}
 
 			if (Info.ExternalIp == this.p2pNetwork.ExternalAddress.ToString())
 			{
 				if (Peer.RemoteEndpoint.Address.ToString() != Info.LocalIp)
 				{
-					throw new XmppException("Expected connection from " + Info.LocalIp + ", but was from " +
-						Peer.RemoteEndpoint.Address.ToString());
+					return "Expected connection from " + Info.LocalIp + ", but was from " +
+						Peer.RemoteEndpoint.Address.ToString();
 				}
 			}
 			else
 			{
 				if (Peer.RemoteEndpoint.Address.ToString() != Info.ExternalIp)
 				{
-					throw new XmppException("Expected connection from " + Info.ExternalIp + ", but was from " +
-						Peer.RemoteEndpoint.ToString());
+					return "Expected connection from " + Info.ExternalIp + ", but was from " +
+						Peer.RemoteEndpoint.ToString();
 				}
 			}
 
-			// End-to-end encryption will asure communication is only read by the indended receiver.
+			// End-to-end encryption will ensure communication is only read by the indended receiver.
+
+			return null;
 		}
 
 		internal void PeerAuthenticated(PeerState State)

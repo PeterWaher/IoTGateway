@@ -10,13 +10,14 @@ using Waher.Content.Text;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.HTTPX;
+using Waher.Networking.XMPP.Test.E2eTests;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 
-namespace Waher.Networking.XMPP.Test.E2eTests
+namespace Waher.Networking.XMPP.Test
 {
 	[TestClass]
-	public class XmppHttpxTests : E2eTests
+	public class XmppHttpxTests : E2eTests.E2eTests
 	{
 		private static FilesProvider provider;
 		private static string dataFolder;

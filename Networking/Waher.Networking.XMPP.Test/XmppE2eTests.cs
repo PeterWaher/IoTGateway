@@ -9,7 +9,7 @@ using Waher.Persistence.Files;
 
 [assembly: TestDataSourceDiscovery(TestDataSourceDiscoveryOption.DuringDiscovery)]
 
-namespace Waher.Networking.XMPP.Test.E2eTests
+namespace Waher.Networking.XMPP.Test
 {
 	public enum AsymmetricCipher
 	{
@@ -44,7 +44,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 	}
 
 	[TestClass]
-	public class XmppE2eTests : E2eTests
+	public class XmppE2eTests : E2eTests.E2eTests
 	{
 		private static FilesProvider provider;
 		private static string dataFolder;
@@ -298,10 +298,10 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 							!string.IsNullOrEmpty(e.E2eReference) &&
 							e.E2eSymmetricCipher is not null &&
 							e.Ok == ExpectOk &&
-							(!ExpectOk || (e.FirstElement is not null &&
+							(!ExpectOk || e.FirstElement is not null &&
 							e.FirstElement.LocalName == "test" &&
 							e.FirstElement.NamespaceURI == "testns" &&
-							e.FirstElement.InnerText == "World")))
+							e.FirstElement.InnerText == "World"))
 						{
 							Done.Set();
 						}

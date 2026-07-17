@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -109,7 +110,20 @@ namespace Waher.Content.Xml.Text
 
 				using (MemoryStream ms = new MemoryStream(Data))
 				{
-					Doc.Load(ms);
+					XmlReaderSettings Settings = new XmlReaderSettings()
+					{
+						CheckCharacters = true,
+						ConformanceLevel = ConformanceLevel.Document,
+						DtdProcessing = DtdProcessing.Ignore,
+						IgnoreComments = true,
+						IgnoreProcessingInstructions = true,
+						IgnoreWhitespace = false
+					};
+
+					using (XmlReader xr = XmlReader.Create(ms, Settings))
+					{
+						Doc.Load(xr);
+					}
 				}
 			}
 			else

@@ -1,16 +1,16 @@
 ﻿using System;
-using System.IO;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Xml;
-using System.Reflection;
-using System.Collections;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
-using Waher.Runtime.Collections;
-using System.Globalization;
 
 namespace Waher.Content.Xml
 {
@@ -728,8 +728,26 @@ namespace Waher.Content.Xml
 				PreserveWhitespace = PreserveWhitespace
 			};
 
-			if (!(Xml is null))
-				Doc.LoadXml(Xml);
+			if (!string.IsNullOrEmpty(Xml))
+			{
+				using (StringReader r = new StringReader(Xml))
+				{
+					XmlReaderSettings Settings = new XmlReaderSettings()
+					{
+						CheckCharacters = true,
+						ConformanceLevel = ConformanceLevel.Document,
+						DtdProcessing = DtdProcessing.Ignore,
+						IgnoreComments = true,
+						IgnoreProcessingInstructions = true,
+						IgnoreWhitespace = !PreserveWhitespace
+					};
+
+					using (XmlReader xr = XmlReader.Create(r, Settings))
+					{
+						Doc.Load(xr);
+					}
+				}
+			}
 
 			return Doc;
 		}

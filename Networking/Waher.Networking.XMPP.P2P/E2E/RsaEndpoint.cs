@@ -179,14 +179,18 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		{
 			get
 			{
-				if (this.keySize < 1024)
+				if (this.keySize < 768)
 					return 0;
-				else if (this.keySize < 2048)
+				else if (this.keySize < 1024)
 					return 80;
+				else if (this.keySize < 2048)
+					return 96;
 				else if (this.keySize < 3072)
 					return 112;
-				else if (this.keySize < 7680)
+				else if (this.keySize < 4096)
 					return 128;
+				else if (this.keySize < 7680)
+					return 140;
 				else if (this.keySize < 15360)
 					return 192;
 				else

@@ -119,6 +119,8 @@ namespace Waher.Networking.XMPP.Test
 
 			this.WaitConnected1(5000);
 
+			TaskCompletionSource<bool> Client2PeerInfoReceived = new();
+
 			if (P2p)
 			{
 				this.serverless1 = new XmppServerlessMessaging("Client1", this.client1.FullJID,
@@ -141,6 +143,17 @@ namespace Waher.Networking.XMPP.Test
 							Serverless1Ready.TrySetResult(false);
 							break;
 					}
+
+					return Task.CompletedTask;
+				};
+
+				this.serverless1.PeerAddressReceived += (sender, e) =>
+				{
+					this.client1.Information("Serveless 1 received peer address for " +
+						e.FullJID + ": " + e.ExternalIp + ":" + e.ExternalPort.ToString() +
+						" / " + e.LocalIp + ":" + e.LocalPort.ToString());
+
+					Client2PeerInfoReceived.TrySetResult(e.FullJID == this.client2.FullJID);
 
 					return Task.CompletedTask;
 				};
@@ -181,6 +194,7 @@ namespace Waher.Networking.XMPP.Test
 					5002, 8002, this.client2.Sniffers);
 
 				TaskCompletionSource<bool> Serverless2Ready = new();
+				TaskCompletionSource<bool> Client1PeerInfoReceived = new();
 
 				this.serverless2.Network.OnStateChange += (sender, NewState) =>
 				{
@@ -201,10 +215,34 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				};
 
+				this.serverless2.PeerAddressReceived += (sender, e) =>
+				{
+					this.client2.Information("Serveless 2 received peer address for " +
+						e.FullJID + ": " + e.ExternalIp + ":" + e.ExternalPort.ToString() +
+						" / " + e.LocalIp + ":" + e.LocalPort.ToString());
+
+					Client1PeerInfoReceived.TrySetResult(e.FullJID == this.client1.FullJID);
+
+					return Task.CompletedTask;
+				};
+
 				_ = Task.Delay(10000).ContinueWith(_ => Serverless2Ready.TrySetResult(false));
 
 				if (!await Serverless2Ready.Task)
 					throw new Exception("Unable to establish a P2P network for client 2.");
+
+				_ = Task.Delay(5000).ContinueWith((_) =>
+				{
+					Client1PeerInfoReceived.TrySetException(new TimeoutException());
+					Client2PeerInfoReceived.TrySetException(new TimeoutException());
+					return Task.CompletedTask;
+				});
+
+				await (this.client01 ?? this.client1).SetPresence();
+				await (this.client02 ?? this.client2).SetPresence();
+
+				Assert.IsTrue(await Client1PeerInfoReceived.Task, "Client 1 Peer information not received by Client 2.");
+				Assert.IsTrue(await Client2PeerInfoReceived.Task, "Client 2 Peer information not received by Client 1.");
 
 				PeerConnectionEventArgs e = await this.serverless1.GetPeerConnectionAsync(this.client2.FullJID);
 				if (e.Client is null)

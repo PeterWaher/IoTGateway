@@ -112,7 +112,7 @@ namespace Waher.Content.Xml.Text
 				{
 					XmlReaderSettings Settings = new XmlReaderSettings()
 					{
-						CheckCharacters = true,
+						CheckCharacters = false,
 						ConformanceLevel = ConformanceLevel.Document,
 						DtdProcessing = DtdProcessing.Ignore,
 						IgnoreComments = true,

@@ -70,14 +70,17 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="Backlog">Connection backlog.</param>
 		/// <param name="Sniffers">Sniffers</param>
 		public PeerToPeerNetwork(string ApplicationName, ushort LocalPort, ushort ExternalPort, int Backlog, params ISniffer[] Sniffers)
-			: base(new InternetGatewayRegistration[] { new InternetGatewayRegistration()
-			{
-				ApplicationName = ApplicationName,
-				LocalPort = LocalPort,
-				ExternalPort = ExternalPort,
-				Tcp = true,
-				Udp = true
-			} }, Sniffers)
+			: base(new InternetGatewayRegistration[] 
+			{ 
+				new InternetGatewayRegistration()
+				{
+					ApplicationName = ApplicationName,
+					LocalPort = LocalPort,
+					ExternalPort = ExternalPort,
+					Tcp = true,
+					Udp = true
+				} 
+			}, Sniffers)
 		{
 			this.backlog = Backlog;
 

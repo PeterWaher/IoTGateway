@@ -8,10 +8,10 @@
     <xsl:output method="text" indent="no"/>
 
     <xsl:template match="/">
-		<xsl:text><![CDATA[System;
+		<xsl:text><![CDATA[using System;
 using System.Collections.Generic;
 
-namespace RetroSharp.Networking.UPnP.Services
+namespace Waher.Networking.UPnP.Services
 {
 #pragma warning disable
 	/// <summary>

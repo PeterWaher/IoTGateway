@@ -1,20 +1,14 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Waher.Networking.UPnP.Services
 {
-//#pragma warning disable
+#pragma warning disable
 	/// <summary>
 	/// Generated from SCPD
 	/// </summary>
-	public class WANIPConnectionV1 : IInternetGateway
+	public class WANPPPConnectionV1 : IInternetGateway
 	{
-		/// <summary>
-		/// Generated from SCPD
-		/// </summary>
-		protected ServiceDescriptionDocument service;
-		private UPnPAction actionAddPortMapping = null;
-		private UPnPAction actionGetExternalIPAddress = null;
-		private UPnPAction actionDeletePortMapping = null;
+		private ServiceDescriptionDocument service;
 		private UPnPAction actionSetConnectionType = null;
 		private UPnPAction actionGetConnectionTypeInfo = null;
 		private UPnPAction actionRequestConnection = null;
@@ -23,65 +17,16 @@ namespace Waher.Networking.UPnP.Services
 		private UPnPAction actionGetNATRSIPStatus = null;
 		private UPnPAction actionGetGenericPortMappingEntry = null;
 		private UPnPAction actionGetSpecificPortMappingEntry = null;
+		private UPnPAction actionAddPortMapping = null;
+		private UPnPAction actionDeletePortMapping = null;
+		private UPnPAction actionGetExternalIPAddress = null;
 
 		/// <summary>
 		/// Generated from SCPD
 		/// </summary>
-		public WANIPConnectionV1(ServiceDescriptionDocument Service)
+		public WANPPPConnectionV1(ServiceDescriptionDocument Service)
 		{
 			this.service = Service;
-		}
-
-		/// <summary>
-		/// Generated from SCPD
-		/// </summary>
-		public void AddPortMapping(string NewRemoteHost, ushort NewExternalPort, string NewProtocol, ushort NewInternalPort, string NewInternalClient, bool NewEnabled, string NewPortMappingDescription, uint NewLeaseDuration)
-		{
-			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
-			
-			if (actionAddPortMapping is null)
-				actionAddPortMapping = this.service.GetAction("AddPortMapping");
-
-			this.actionAddPortMapping.Invoke(out OutputValues,
-				new KeyValuePair<string, object>("NewRemoteHost", NewRemoteHost),
-				new KeyValuePair<string, object>("NewExternalPort", NewExternalPort),
-				new KeyValuePair<string, object>("NewProtocol", NewProtocol),
-				new KeyValuePair<string, object>("NewInternalPort", NewInternalPort),
-				new KeyValuePair<string, object>("NewInternalClient", NewInternalClient),
-				new KeyValuePair<string, object>("NewEnabled", NewEnabled),
-				new KeyValuePair<string, object>("NewPortMappingDescription", NewPortMappingDescription),
-				new KeyValuePair<string, object>("NewLeaseDuration", NewLeaseDuration));
-		}
-
-		/// <summary>
-		/// Generated from SCPD
-		/// </summary>
-		public void GetExternalIPAddress(out string NewExternalIPAddress)
-		{
-			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
-			
-			if (actionGetExternalIPAddress is null)
-				actionGetExternalIPAddress = this.service.GetAction("GetExternalIPAddress");
-
-			this.actionGetExternalIPAddress.Invoke(out OutputValues);
-
-			NewExternalIPAddress = (string)OutputValues["NewExternalIPAddress"];
-		}
-
-		/// <summary>
-		/// Generated from SCPD
-		/// </summary>
-		public void DeletePortMapping(string NewRemoteHost, ushort NewExternalPort, string NewProtocol)
-		{
-			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
-			
-			if (actionDeletePortMapping is null)
-				actionDeletePortMapping = this.service.GetAction("DeletePortMapping");
-
-			this.actionDeletePortMapping.Invoke(out OutputValues,
-				new KeyValuePair<string, object>("NewRemoteHost", NewRemoteHost),
-				new KeyValuePair<string, object>("NewExternalPort", NewExternalPort),
-				new KeyValuePair<string, object>("NewProtocol", NewProtocol));
 		}
 
 		/// <summary>
@@ -91,7 +36,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionSetConnectionType is null)
+			if (actionSetConnectionType == null)
 				actionSetConnectionType = this.service.GetAction("SetConnectionType");
 
 			this.actionSetConnectionType.Invoke(out OutputValues,
@@ -105,7 +50,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetConnectionTypeInfo is null)
+			if (actionGetConnectionTypeInfo == null)
 				actionGetConnectionTypeInfo = this.service.GetAction("GetConnectionTypeInfo");
 
 			this.actionGetConnectionTypeInfo.Invoke(out OutputValues);
@@ -121,7 +66,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionRequestConnection is null)
+			if (actionRequestConnection == null)
 				actionRequestConnection = this.service.GetAction("RequestConnection");
 
 			this.actionRequestConnection.Invoke(out OutputValues);
@@ -134,7 +79,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionForceTermination is null)
+			if (actionForceTermination == null)
 				actionForceTermination = this.service.GetAction("ForceTermination");
 
 			this.actionForceTermination.Invoke(out OutputValues);
@@ -147,7 +92,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetStatusInfo is null)
+			if (actionGetStatusInfo == null)
 				actionGetStatusInfo = this.service.GetAction("GetStatusInfo");
 
 			this.actionGetStatusInfo.Invoke(out OutputValues);
@@ -164,7 +109,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetNATRSIPStatus is null)
+			if (actionGetNATRSIPStatus == null)
 				actionGetNATRSIPStatus = this.service.GetAction("GetNATRSIPStatus");
 
 			this.actionGetNATRSIPStatus.Invoke(out OutputValues);
@@ -180,7 +125,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetGenericPortMappingEntry is null)
+			if (actionGetGenericPortMappingEntry == null)
 				actionGetGenericPortMappingEntry = this.service.GetAction("GetGenericPortMappingEntry");
 
 			this.actionGetGenericPortMappingEntry.Invoke(out OutputValues,
@@ -203,7 +148,7 @@ namespace Waher.Networking.UPnP.Services
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
 			
-			if (actionGetSpecificPortMappingEntry is null)
+			if (actionGetSpecificPortMappingEntry == null)
 				actionGetSpecificPortMappingEntry = this.service.GetAction("GetSpecificPortMappingEntry");
 
 			this.actionGetSpecificPortMappingEntry.Invoke(out OutputValues,
@@ -217,6 +162,58 @@ namespace Waher.Networking.UPnP.Services
 			NewPortMappingDescription = (string)OutputValues["NewPortMappingDescription"];
 			NewLeaseDuration = (uint)OutputValues["NewLeaseDuration"];
 		}
+
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
+		public void AddPortMapping(string NewRemoteHost, ushort NewExternalPort, string NewProtocol, ushort NewInternalPort, string NewInternalClient, bool NewEnabled, string NewPortMappingDescription, uint NewLeaseDuration)
+		{
+			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
+			
+			if (actionAddPortMapping == null)
+				actionAddPortMapping = this.service.GetAction("AddPortMapping");
+
+			this.actionAddPortMapping.Invoke(out OutputValues,
+				new KeyValuePair<string, object>("NewRemoteHost", NewRemoteHost),
+				new KeyValuePair<string, object>("NewExternalPort", NewExternalPort),
+				new KeyValuePair<string, object>("NewProtocol", NewProtocol),
+				new KeyValuePair<string, object>("NewInternalPort", NewInternalPort),
+				new KeyValuePair<string, object>("NewInternalClient", NewInternalClient),
+				new KeyValuePair<string, object>("NewEnabled", NewEnabled),
+				new KeyValuePair<string, object>("NewPortMappingDescription", NewPortMappingDescription),
+				new KeyValuePair<string, object>("NewLeaseDuration", NewLeaseDuration));
+		}
+
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
+		public void DeletePortMapping(string NewRemoteHost, ushort NewExternalPort, string NewProtocol)
+		{
+			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
+			
+			if (actionDeletePortMapping == null)
+				actionDeletePortMapping = this.service.GetAction("DeletePortMapping");
+
+			this.actionDeletePortMapping.Invoke(out OutputValues,
+				new KeyValuePair<string, object>("NewRemoteHost", NewRemoteHost),
+				new KeyValuePair<string, object>("NewExternalPort", NewExternalPort),
+				new KeyValuePair<string, object>("NewProtocol", NewProtocol));
+		}
+
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
+		public void GetExternalIPAddress(out string NewExternalIPAddress)
+		{
+			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
+			
+			if (actionGetExternalIPAddress == null)
+				actionGetExternalIPAddress = this.service.GetAction("GetExternalIPAddress");
+
+			this.actionGetExternalIPAddress.Invoke(out OutputValues);
+
+			NewExternalIPAddress = (string)OutputValues["NewExternalIPAddress"];
+		}
 	}
-//#pragma warning restore
+#pragma warning enable
 }

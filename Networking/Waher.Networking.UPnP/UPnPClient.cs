@@ -315,11 +315,19 @@ namespace Waher.Networking.UPnP
 		{
 			foreach (KeyValuePair<UdpClient, IPEndPoint> P in this.GetOutgoing())
 			{
-				string MSearch = "M-SEARCH * HTTP/1.1\r\n" +
-					"HOST: " + P.Value.ToString() + "\r\n" +
-					"MAN:\"ssdp:discover\"\r\n" +
-					"ST: " + SearchTarget + "\r\n" +
-					"MX:" + MaximumWaitTimeSeconds.ToString() + "\r\n\r\n";
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("M-SEARCH * HTTP/1.1\r\n");
+				sb.Append("HOST: ");
+				sb.Append(P.Value.ToString());
+				sb.Append("\r\nMAN:\"ssdp:discover\"");
+				sb.Append("\r\nST: ");
+				sb.Append(SearchTarget);
+				sb.Append("\r\nMX:");
+				sb.Append(MaximumWaitTimeSeconds.ToString());
+				sb.Append("\r\n\r\n");
+
+				string MSearch = sb.ToString();
 				byte[] Packet = Encoding.ASCII.GetBytes(MSearch);
 
 				await this.SendPacket(P.Key, P.Value, Packet, MSearch);

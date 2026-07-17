@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -9,18 +10,48 @@ using Waher.Content.Text;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.HTTPX;
-using Waher.Networking.XMPP.P2P.E2E;
-using Waher.Networking.XMPP.P2P.SymmetricCiphers;
+using Waher.Persistence;
+using Waher.Persistence.Files;
 
 namespace Waher.Networking.XMPP.Test.E2eTests
 {
 	[TestClass]
 	public class XmppHttpxTests : E2eTests
 	{
+		private static FilesProvider provider;
+		private static string dataFolder;
+
 		private HttpServer webServer;
 		private HttpxClient httpxClient1;
 		private HttpxClient httpxClient2;
 		private HttpxServer httpxServer;
+
+		[ClassInitialize]
+		public static async Task ClassInitialize(TestContext _)
+		{
+			dataFolder = Path.Combine("Data", "XmppE2eTests");
+
+			provider = await FilesProvider.CreateAsync(dataFolder, "Default", 8192, 1000, 8192, Encoding.UTF8, 10000, false);
+			Database.Register(provider, false);
+
+			SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public static async Task ClassCleanup()
+		{
+			await DisposeSnifferAndLog();
+
+			if (provider is not null)
+			{
+				Database.Register(new NullDatabaseProvider(), false);
+				await provider.DisposeAsync();
+				provider = null;
+			}
+
+			if (!string.IsNullOrEmpty(dataFolder) && Directory.Exists(dataFolder))
+				Directory.Delete(dataFolder, true);
+		}
 
 		[TestInitialize]
 		public void TestInitialize()

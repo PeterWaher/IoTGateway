@@ -19,13 +19,15 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		public override void PrepareClient1(XmppClient Client, int SecurityStrength, bool P2p)
 		{
 			base.PrepareClient1(Client, SecurityStrength, P2p);
-			this.endpointSecurity1 = new EndpointSecurity(this.client1, SecurityStrength, this.endpoints1);
+			this.endpointSecurity1 = new EndpointSecurity(this.client1, this.serverless1,
+				SecurityStrength, this.endpoints1);
 		}
 
 		public override void PrepareClient2(XmppClient Client, int SecurityStrength, bool P2p)
 		{
 			base.PrepareClient2(Client, SecurityStrength, P2p);
-			this.endpointSecurity2 = new EndpointSecurity(this.client2, SecurityStrength, this.endpoints2);
+			this.endpointSecurity2 = new EndpointSecurity(this.client2, this.serverless2,
+				SecurityStrength, this.endpoints2);
 		}
 
 		protected void PrepareEndpoints(AsymmetricCipher AsymmetricCipherType,

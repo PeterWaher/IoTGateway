@@ -11,7 +11,6 @@ using Waher.Networking.PeerToPeer;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.P2P;
 using Waher.Runtime.Console;
-using Waher.Script.Operators.Comparisons;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -32,6 +31,10 @@ namespace Waher.Networking.XMPP.Test
 		protected XmppClient client2;
 		protected XmppServerlessMessaging serverless1;
 		protected XmppServerlessMessaging serverless2;
+		protected TaskCompletionSource<bool> serverless1Ready;
+		protected TaskCompletionSource<bool> serverless2Ready;
+		protected TaskCompletionSource<bool> client1PeerInfoReceived;
+		protected TaskCompletionSource<bool> client2PeerInfoReceived;
 		protected Exception ex1 = null;
 		protected Exception ex2 = null;
 
@@ -119,49 +122,10 @@ namespace Waher.Networking.XMPP.Test
 
 			this.WaitConnected1(5000);
 
-			TaskCompletionSource<bool> Client2PeerInfoReceived = new();
-
 			if (P2p)
 			{
-				this.serverless1 = new XmppServerlessMessaging("Client1", this.client1.FullJID,
-					5001, 8001, this.client1.Sniffers);
-
-				TaskCompletionSource<bool> Serverless1Ready = new();
-
-				this.serverless1.Network.OnStateChange += (sender, NewState) =>
-				{
-					this.client1.Information("Serveless 1 state: " + NewState.ToString());
-
-					switch (NewState)
-					{
-						case PeerToPeerNetworkState.Ready:
-							Serverless1Ready.TrySetResult(true);
-							break;
-
-						case PeerToPeerNetworkState.Error:
-						case PeerToPeerNetworkState.Closed:
-							Serverless1Ready.TrySetResult(false);
-							break;
-					}
-
-					return Task.CompletedTask;
-				};
-
-				this.serverless1.PeerAddressReceived += (sender, e) =>
-				{
-					this.client1.Information("Serveless 1 received peer address for " +
-						e.FullJID + ": " + e.ExternalIp + ":" + e.ExternalPort.ToString() +
-						" / " + e.LocalIp + ":" + e.LocalPort.ToString());
-
-					Client2PeerInfoReceived.TrySetResult(e.FullJID == this.client2.FullJID);
-
-					return Task.CompletedTask;
-				};
-
-				_ = Task.Delay(10000).ContinueWith(_ => Serverless1Ready.TrySetResult(false));
-
-				if (!await Serverless1Ready.Task)
-					throw new Exception("Unable to establish a P2P network for client 1.");
+				Assert.IsTrue(await this.serverless1Ready.Task,
+					"Unable to establish a P2P network for client 1.");
 			}
 			else
 				this.serverless1 = null;
@@ -190,59 +154,14 @@ namespace Waher.Networking.XMPP.Test
 
 			if (P2p)
 			{
-				this.serverless2 = new XmppServerlessMessaging("Client2", this.client2.FullJID,
-					5002, 8002, this.client2.Sniffers);
-
-				TaskCompletionSource<bool> Serverless2Ready = new();
-				TaskCompletionSource<bool> Client1PeerInfoReceived = new();
-
-				this.serverless2.Network.OnStateChange += (sender, NewState) =>
-				{
-					this.client2.Information("Serveless 2 state: " + NewState.ToString());
-
-					switch (NewState)
-					{
-						case PeerToPeerNetworkState.Ready:
-							Serverless2Ready.TrySetResult(true);
-							break;
-
-						case PeerToPeerNetworkState.Error:
-						case PeerToPeerNetworkState.Closed:
-							Serverless2Ready.TrySetResult(false);
-							break;
-					}
-
-					return Task.CompletedTask;
-				};
-
-				this.serverless2.PeerAddressReceived += (sender, e) =>
-				{
-					this.client2.Information("Serveless 2 received peer address for " +
-						e.FullJID + ": " + e.ExternalIp + ":" + e.ExternalPort.ToString() +
-						" / " + e.LocalIp + ":" + e.LocalPort.ToString());
-
-					Client1PeerInfoReceived.TrySetResult(e.FullJID == this.client1.FullJID);
-
-					return Task.CompletedTask;
-				};
-
-				_ = Task.Delay(10000).ContinueWith(_ => Serverless2Ready.TrySetResult(false));
-
-				if (!await Serverless2Ready.Task)
-					throw new Exception("Unable to establish a P2P network for client 2.");
-
-				_ = Task.Delay(5000).ContinueWith((_) =>
-				{
-					Client1PeerInfoReceived.TrySetException(new TimeoutException());
-					Client2PeerInfoReceived.TrySetException(new TimeoutException());
-					return Task.CompletedTask;
-				});
+				Assert.IsTrue(await this.serverless2Ready.Task, 
+					"Unable to establish a P2P network for client 2.");
 
 				await (this.client01 ?? this.client1).SetPresence();
 				await (this.client02 ?? this.client2).SetPresence();
 
-				Assert.IsTrue(await Client1PeerInfoReceived.Task, "Client 1 Peer information not received by Client 2.");
-				Assert.IsTrue(await Client2PeerInfoReceived.Task, "Client 2 Peer information not received by Client 1.");
+				Assert.IsTrue(await this.client1PeerInfoReceived.Task, "Client 1 Peer information not received by Client 2.");
+				Assert.IsTrue(await this.client2PeerInfoReceived.Task, "Client 2 Peer information not received by Client 1.");
 
 				PeerConnectionEventArgs e = await this.serverless1.GetPeerConnectionAsync(this.client2.FullJID);
 				if (e.Client is null)
@@ -264,10 +183,100 @@ namespace Waher.Networking.XMPP.Test
 
 		public virtual void PrepareClient1(XmppClient Client, int SecurityStrength, bool P2p)
 		{
+			if (P2p)
+			{
+				this.serverless1 = new XmppServerlessMessaging("Client1", this.client1.FullJID,
+					5001, 8001, this.client1.Sniffers);
+
+				this.serverless1Ready = new();
+				this.client2PeerInfoReceived = new TaskCompletionSource<bool>();
+
+				this.serverless1.Network.OnStateChange += (sender, NewState) =>
+				{
+					this.client1.Information("Serveless 1 state: " + NewState.ToString());
+
+					switch (NewState)
+					{
+						case PeerToPeerNetworkState.Ready:
+							this.serverless1Ready.TrySetResult(true);
+							break;
+
+						case PeerToPeerNetworkState.Error:
+						case PeerToPeerNetworkState.Closed:
+							this.serverless1Ready.TrySetResult(false);
+							break;
+					}
+
+					return Task.CompletedTask;
+				};
+
+				this.serverless1.PeerAddressReceived += (sender, e) =>
+				{
+					this.client1.Information("Serveless 1 received peer address for " +
+						e.FullJID + ": " + e.ExternalIp + ":" + e.ExternalPort.ToString() +
+						" / " + e.LocalIp + ":" + e.LocalPort.ToString());
+
+					if (e.FullJID != this.client1.FullJID && this.client2 is not null)
+						this.client2PeerInfoReceived?.TrySetResult(e.FullJID == this.client2.FullJID);
+
+					return Task.CompletedTask;
+				};
+
+				_ = Task.Delay(10000).ContinueWith((_) =>
+				{
+					this.serverless1Ready.TrySetException(new TimeoutException());
+					this.client2PeerInfoReceived.TrySetException(new TimeoutException());
+				});
+			}
 		}
 
 		public virtual void PrepareClient2(XmppClient Client, int SecurityStrength, bool P2p)
 		{
+			if (P2p)
+			{
+				this.serverless2 = new XmppServerlessMessaging("Client2", this.client2.FullJID,
+					5002, 8002, this.client2.Sniffers);
+
+				this.serverless2Ready = new();
+				this.client1PeerInfoReceived = new TaskCompletionSource<bool>();
+
+				this.serverless2.Network.OnStateChange += (sender, NewState) =>
+				{
+					this.client2.Information("Serveless 2 state: " + NewState.ToString());
+
+					switch (NewState)
+					{
+						case PeerToPeerNetworkState.Ready:
+							this.serverless2Ready.TrySetResult(true);
+							break;
+
+						case PeerToPeerNetworkState.Error:
+						case PeerToPeerNetworkState.Closed:
+							this.serverless2Ready.TrySetResult(false);
+							break;
+					}
+
+					return Task.CompletedTask;
+				};
+
+				this.serverless1.PeerAddressReceived += (sender, e) =>
+				{
+					this.client2.Information("Serveless 2 received peer address for " +
+						e.FullJID + ": " + e.ExternalIp + ":" + e.ExternalPort.ToString() +
+						" / " + e.LocalIp + ":" + e.LocalPort.ToString());
+
+					if (e.FullJID != this.client2.FullJID && this.client1 is not null)
+						this.client1PeerInfoReceived?.TrySetResult(e.FullJID == this.client1.FullJID);
+
+					return Task.CompletedTask;
+				};
+
+				_ = Task.Delay(10000).ContinueWith((_) =>
+				{
+					this.serverless2Ready.TrySetException(new TimeoutException());
+					this.client1PeerInfoReceived.TrySetException(new TimeoutException());
+				});
+			}
 		}
 
 		public virtual XmppCredentials GetCredentials1()

@@ -26,7 +26,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Socks5_Test_01_FindProxy()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			ManualResetEvent Done = new(false);
 			Socks5Proxy Proxy = new(this.client1);
 			
@@ -47,7 +47,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Socks5_Test_02_ConnectSOCKS5()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			ManualResetEvent Error = new(false);
 			ManualResetEvent Done = new(false);
 			Socks5Client Client = new("waher.se", 1080, "socks5.waher.se",
@@ -76,7 +76,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Socks5_Test_03_ConnectStream()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			ManualResetEvent Error = new(false);
 			ManualResetEvent Done = new(false);
 			Socks5Client Client = new("waher.se", 1080, "socks5.waher.se",
@@ -109,7 +109,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Socks5_Test_04_ActivateStream()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			ManualResetEvent Error1 = new(false);
 			ManualResetEvent Done1 = new(false);
 			Socks5Client Client1 = new("waher.se", 1080, "socks5.waher.se",
@@ -219,7 +219,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Socks5_Test_05_InitiateSession()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 
 			ConsoleOut.WriteLine();
 			ConsoleOut.WriteLine("Searching for SOCKS5 proxy.");

@@ -23,7 +23,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SoftwareVersion_Test_01_Server()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			SoftwareVersionEventArgs e = this.client1.SoftwareVersion(this.client1.Domain, 10000);
 			Print(e);
 		}
@@ -39,7 +39,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SoftwareVersion_Test_02_Client()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			SoftwareVersionEventArgs e = this.client1.SoftwareVersion(this.client1.FullJID, 10000);
 			Print(e);
 		}

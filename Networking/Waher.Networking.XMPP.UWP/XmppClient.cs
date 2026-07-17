@@ -287,6 +287,7 @@ namespace Waher.Networking.XMPP
 		private bool pingResponse = true;
 		private bool allowEncryption = true;
 		private bool sendFromAddress = false;
+		private bool enforceE2ee = false;
 		private bool? checkConnection = null;
 		private bool openBracketReceived = false;
 		private bool monitorContactResourcesAlive = true;
@@ -1959,18 +1960,16 @@ namespace Waher.Networking.XMPP
 
 								case "result":
 								case "error":
-									uint SeqNr;
 									EventHandlerAsync<IqResultEventArgs> Callback;
 									object State;
-									PendingRequest Rec;
-
+									
 									Ok = (Type == "result");
 
-									if (uint.TryParse(Id, out SeqNr))
+									if (uint.TryParse(Id, out uint SeqNr))
 									{
 										lock (this.synchObject)
 										{
-											if (this.pendingRequestsBySeqNr.TryGetValue(SeqNr, out Rec))
+											if (this.pendingRequestsBySeqNr.TryGetValue(SeqNr, out PendingRequest Rec))
 											{
 												Callback = Rec.IqCallback;
 												State = Rec.State;
@@ -7326,6 +7325,16 @@ namespace Waher.Networking.XMPP
 		{
 			get => this.sendFromAddress;
 			set => this.sendFromAddress = value;
+		}
+
+		/// <summary>
+		/// If the from address attribute should be send on stanzas. Default is false. Set this to true, if using the client in
+		/// serverless messaging.
+		/// </summary>
+		public bool EnforceE2ee
+		{
+			get => this.enforceE2ee;
+			set => this.enforceE2ee = value;
 		}
 
 		/// <summary>

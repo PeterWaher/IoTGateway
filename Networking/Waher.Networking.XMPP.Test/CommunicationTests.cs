@@ -7,8 +7,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Events.Console;
+using Waher.Networking.PeerToPeer;
 using Waher.Networking.Sniffers;
+using Waher.Networking.XMPP.P2P;
 using Waher.Runtime.Console;
+using Waher.Script.Operators.Comparisons;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -23,8 +26,12 @@ namespace Waher.Networking.XMPP.Test
 		protected ManualResetEvent connected2 = new(false);
 		protected ManualResetEvent error2 = new(false);
 		protected ManualResetEvent offline2 = new(false);
+		protected XmppClient client01;
+		protected XmppClient client02;
 		protected XmppClient client1;
 		protected XmppClient client2;
+		protected XmppServerlessMessaging serverless1;
+		protected XmppServerlessMessaging serverless2;
 		protected Exception ex1 = null;
 		protected Exception ex2 = null;
 
@@ -76,7 +83,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		public virtual async Task ConnectClients(int SecurityStrength)
+		public virtual async Task ConnectClients(int SecurityStrength, bool P2p)
 		{
 			this.connected1.Reset();
 			this.error1.Reset();
@@ -100,17 +107,51 @@ namespace Waher.Networking.XMPP.Test
 			this.client1.SetTag("ShowE2E", true);
 			this.client1.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
 			this.client1.Add(xmlSniffer1);
-            this.client1.OnConnectionError += this.Client_OnConnectionError1;
+			this.client1.OnConnectionError += this.Client_OnConnectionError1;
 			this.client1.OnError += this.Client_OnError1;
 			this.client1.OnStateChanged += this.Client_OnStateChanged1;
 			this.client1.Information("Starting test, client 1...");
 
-			this.PrepareClient1(this.client1, SecurityStrength);
+			this.PrepareClient1(this.client1, SecurityStrength, P2p);
 
 			await this.client1.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Live and well"));
 			await this.client1.Connect();
 
 			this.WaitConnected1(5000);
+
+			if (P2p)
+			{
+				this.serverless1 = new XmppServerlessMessaging("Client1", this.client1.FullJID,
+					5001, 8001, this.client1.Sniffers);
+
+				TaskCompletionSource<bool> Serverless1Ready = new();
+
+				this.serverless1.Network.OnStateChange += (sender, NewState) =>
+				{
+					this.client1.Information("Serveless 1 state: " + NewState.ToString());
+
+					switch (NewState)
+					{
+						case PeerToPeerNetworkState.Ready:
+							Serverless1Ready.TrySetResult(true);
+							break;
+
+						case PeerToPeerNetworkState.Error:
+						case PeerToPeerNetworkState.Closed:
+							Serverless1Ready.TrySetResult(false);
+							break;
+					}
+
+					return Task.CompletedTask;
+				};
+
+				_ = Task.Delay(10000).ContinueWith(_ => Serverless1Ready.TrySetResult(false));
+
+				if (!await Serverless1Ready.Task)
+					throw new Exception("Unable to establish a P2P network for client 1.");
+			}
+			else
+				this.serverless1 = null;
 
 			this.client2 = new XmppClient(this.GetCredentials2(), "en", typeof(CommunicationTests).Assembly)
 			{
@@ -127,23 +168,71 @@ namespace Waher.Networking.XMPP.Test
 			this.client2.OnStateChanged += this.Client_OnStateChanged2;
 			this.client2.Information("Starting test, client 2...");
 
-			this.PrepareClient2(this.client2, SecurityStrength);
-			
+			this.PrepareClient2(this.client2, SecurityStrength, P2p);
+
 			await this.client2.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Ready to chat."));
 			await this.client2.Connect();
 
 			this.WaitConnected2(5000);
-        }
 
-        public virtual void PrepareClient1(XmppClient Client, int SecurityStrength)
-        {
-        }
+			if (P2p)
+			{
+				this.serverless2 = new XmppServerlessMessaging("Client2", this.client2.FullJID,
+					5002, 8002, this.client2.Sniffers);
 
-        public virtual void PrepareClient2(XmppClient Client, int SecurityStrength)
-        {
-        }
+				TaskCompletionSource<bool> Serverless2Ready = new();
 
-        public virtual XmppCredentials GetCredentials1()
+				this.serverless2.Network.OnStateChange += (sender, NewState) =>
+				{
+					this.client2.Information("Serveless 2 state: " + NewState.ToString());
+
+					switch (NewState)
+					{
+						case PeerToPeerNetworkState.Ready:
+							Serverless2Ready.TrySetResult(true);
+							break;
+
+						case PeerToPeerNetworkState.Error:
+						case PeerToPeerNetworkState.Closed:
+							Serverless2Ready.TrySetResult(false);
+							break;
+					}
+
+					return Task.CompletedTask;
+				};
+
+				_ = Task.Delay(10000).ContinueWith(_ => Serverless2Ready.TrySetResult(false));
+
+				if (!await Serverless2Ready.Task)
+					throw new Exception("Unable to establish a P2P network for client 2.");
+
+				PeerConnectionEventArgs e = await this.serverless1.GetPeerConnectionAsync(this.client2.FullJID);
+				if (e.Client is null)
+					throw new Exception("Client 1 could not connect to client 2 in serverless mode.");
+
+				this.client01 = this.client1;
+				this.client1 = e.Client;
+
+				e = await this.serverless2.GetPeerConnectionAsync(this.client1.FullJID);
+				if (e.Client is null)
+					throw new Exception("Client 2 could not connect to client 1 in serverless mode.");
+
+				this.client02 = this.client2;
+				this.client2 = e.Client;
+			}
+			else
+				this.serverless2 = null;
+		}
+
+		public virtual void PrepareClient1(XmppClient Client, int SecurityStrength, bool P2p)
+		{
+		}
+
+		public virtual void PrepareClient2(XmppClient Client, int SecurityStrength, bool P2p)
+		{
+		}
+
+		public virtual XmppCredentials GetCredentials1()
 		{
 			return new XmppCredentials()
 			{
@@ -289,11 +378,37 @@ namespace Waher.Networking.XMPP.Test
 		{
 			await ConsoleOut.FlushAsync();
 
+			if (this.client01 is not null)
+			{
+				this.client01.Information("Stopping test, client 01...");
+				await this.client01.OfflineAndDisposeAsync(false);
+				this.client01 = null;
+			}
+
+			if (this.serverless1 is not null)
+			{
+				await this.serverless1.DisposeAsync();
+				this.serverless1 = null;
+			}
+
 			if (this.client1 is not null)
 			{
 				this.client1.Information("Stopping test, client 1...");
 				await this.client1.OfflineAndDisposeAsync(false);
 				this.client1 = null;
+			}
+
+			if (this.client02 is not null)
+			{
+				this.client02.Information("Stopping test, client 02...");
+				await this.client02.OfflineAndDisposeAsync(false);
+				this.client02 = null;
+			}
+
+			if (this.serverless2 is not null)
+			{
+				await this.serverless2.DisposeAsync();
+				this.serverless2 = null;
 			}
 
 			if (this.client2 is not null)

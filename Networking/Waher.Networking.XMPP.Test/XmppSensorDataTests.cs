@@ -30,9 +30,9 @@ namespace Waher.Networking.XMPP.Test
 			await DisposeSnifferAndLog();
 		}
 
-		public override async Task ConnectClients(int SecurityStrength)
+		public override async Task ConnectClients(int SecurityStrength, bool P2p)
 		{
-			await base.ConnectClients(SecurityStrength);
+			await base.ConnectClients(SecurityStrength, P2p);
 
 			Assert.AreEqual(XmppState.Connected, this.client1.State);
 			Assert.AreEqual(XmppState.Connected, this.client2.State);
@@ -80,7 +80,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_01_ReadAll()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -119,7 +119,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_02_Subscribe_MaxInterval()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				TaskCompletionSource<bool> Result = new();
@@ -163,7 +163,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_03_Subscribe_ChangeBy()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -227,7 +227,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_04_Subscribe_ChangeUp()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -280,7 +280,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_05_Subscribe_ChangeDown()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -333,7 +333,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_06_Subscribe_MinInterval()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -400,7 +400,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_07_Unsubscribe()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				ManualResetEvent Done = new(false);

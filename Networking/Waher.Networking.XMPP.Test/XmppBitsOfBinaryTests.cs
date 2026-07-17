@@ -26,9 +26,9 @@ namespace Waher.Networking.XMPP.Test
 			await DisposeSnifferAndLog();
 		}
 
-		public override async Task ConnectClients(int SecurityStrength)
+		public override async Task ConnectClients(int SecurityStrength, bool P2p)
 		{
-			await base.ConnectClients(SecurityStrength);
+			await base.ConnectClients(SecurityStrength, P2p);
 
 			Assert.AreEqual(XmppState.Connected, this.client1.State);
 			Assert.AreEqual(XmppState.Connected, this.client2.State);
@@ -57,7 +57,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task BitsOfBinary_Test_01_GetData()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -88,7 +88,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task BitsOfBinary_Test_02_GetData_Expires()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				ManualResetEvent Done = new(false);

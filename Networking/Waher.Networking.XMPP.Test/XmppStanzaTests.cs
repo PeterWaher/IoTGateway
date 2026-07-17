@@ -24,7 +24,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Stanza_Test_01_ChatMessage()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				TaskCompletionSource<bool> Done = new();
@@ -49,7 +49,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Stanza_Test_02_ChatMessageWithSubject()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				TaskCompletionSource<bool> Done = new();
@@ -74,7 +74,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Stanza_Test_03_ChatMessageWithSubjectAndLanguage()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				TaskCompletionSource<bool> Done = new();
@@ -99,7 +99,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Stanza_Test_04_Presence()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				TaskCompletionSource<bool> Done = new();
@@ -169,7 +169,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Stanza_Test_05_IQ_Get()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				this.client1.RegisterIqGetHandler("query", "test", (Sender, e) =>
@@ -188,7 +188,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Stanza_Test_06_IQ_Set()
 		{
-			await this.ConnectClients(128);
+			await this.ConnectClients(128, false);
 			try
 			{
 				this.client1.RegisterIqSetHandler("query", "test", (Sender, e) =>

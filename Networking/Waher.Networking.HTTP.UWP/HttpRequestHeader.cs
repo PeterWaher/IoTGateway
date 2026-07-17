@@ -455,6 +455,7 @@ namespace Waher.Networking.HTTP
 					case "REPORT":
 					case "SEARCH":
 					case "TRACE":
+					case "QUERY":
 						return true;
 
 					default:

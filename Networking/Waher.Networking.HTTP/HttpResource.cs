@@ -45,6 +45,20 @@ namespace Waher.Networking.HTTP
 		private readonly IHttpOptionsMethod options;
 		private readonly IHttpTraceMethod trace;
 		private readonly IHttpConnectMethod connect;
+		private readonly IHttpQueryMethod query;
+		private readonly bool hasGet;
+		private readonly bool hasGetRanges;
+		private readonly bool hasPost;
+		private readonly bool hasPostRanges;
+		private readonly bool hasPut;
+		private readonly bool hasPutRanges;
+		private readonly bool hasPatch;
+		private readonly bool hasPatchRanges;
+		private readonly bool hasDelete;
+		private readonly bool hasOptions;
+		private readonly bool hasTrace;
+		private readonly bool hasConnect;
+		private readonly bool hasQuery;
 		private readonly string resourceName;
 		private HttpServer[] serversStatic = Array.Empty<HttpServer>();
 
@@ -67,34 +81,60 @@ namespace Waher.Networking.HTTP
 			this.options = this;
 			this.trace = this as IHttpTraceMethod;
 			this.connect = this as IHttpConnectMethod;
+			this.query = this as IHttpQueryMethod;
+
+			this.hasGet = !(this.get is null);
+			this.hasGetRanges = !(this.getRanges is null);
+			this.hasPost = !(this.post is null);
+			this.hasPostRanges = !(this.postRanges is null);
+			this.hasPut = !(this.put is null);
+			this.hasPutRanges = !(this.putRanges is null);
+			this.hasPatch = !(this.patch is null);
+			this.hasPatchRanges = !(this.patchRanges is null);
+			this.hasDelete = !(this.delete is null);
+			this.hasOptions = !(this.options is null);
+			this.hasTrace = !(this.trace is null);
+			this.hasConnect = !(this.connect is null);
+			this.hasQuery = !(this.query is null);
 
 			List<string> Methods = new List<string>();
+			bool IncludeHead = false;
 
-			if ((!(this.get is null) && this.get.AllowsGET) || (!(this.getRanges is null) && this.getRanges.AllowsGET))
+			if ((this.hasGet && this.get.AllowsGET) || 
+				(this.hasGetRanges && this.getRanges.AllowsGET))
 			{
 				Methods.Add("GET");
-				Methods.Add("HEAD");
+				IncludeHead = true;
 			}
 
-			if ((!(this.post is null) && this.post.AllowsPOST) || (!(this.postRanges is null) && this.postRanges.AllowsPOST))
+			if (this.hasQuery && this.query.AllowsQUERY)
+			{
+				Methods.Add("QUERY");
+				IncludeHead = true;
+			}
+
+			if (IncludeHead)
+				Methods.Add("HEAD");
+
+			if ((this.hasPost && this.post.AllowsPOST) || (this.hasPostRanges && this.postRanges.AllowsPOST))
 				Methods.Add("POST");
 
-			if ((!(this.put is null) && this.put.AllowsPUT) || (!(this.putRanges is null) && this.putRanges.AllowsPUT))
+			if ((this.hasPut && this.put.AllowsPUT) || (this.hasPutRanges && this.putRanges.AllowsPUT))
 				Methods.Add("PUT");
 
-			if ((!(this.patch is null) && this.patch.AllowsPATCH) || (!(this.patchRanges is null) && this.patchRanges.AllowsPATCH))
+			if ((this.hasPatch && this.patch.AllowsPATCH) || (this.hasPatchRanges && this.patchRanges.AllowsPATCH))
 				Methods.Add("PATCH");
 
-			if (!(this.delete is null) && this.delete.AllowsDELETE)
+			if (this.hasDelete && this.delete.AllowsDELETE)
 				Methods.Add("DELETE");
 
-			if (!(this.options is null) && this.options.AllowsOPTIONS)
+			if (this.hasOptions && this.options.AllowsOPTIONS)
 				Methods.Add("OPTIONS");
 
-			if (!(this.trace is null) && this.trace.AllowsTRACE)
+			if (this.hasTrace && this.trace.AllowsTRACE)
 				Methods.Add("TRACE");
 
-			if (!(this.connect is null) && this.connect.AllowsCONNECT)
+			if (this.hasConnect && this.connect.AllowsCONNECT)
 				Methods.Add("CONNECT");
 
 			this.allowedMethods = Methods.ToArray();
@@ -340,7 +380,13 @@ namespace Waher.Networking.HTTP
 				{
 					case "GET":
 					case "HEAD":
-						if (!(this.getRanges is null))
+						if (this.hasQuery)
+						{
+							Response.SetHeader("Accept-Query", 
+								string.Join(", ", this.query.AcceptableQueryTypes));
+						}
+
+						if (this.hasGetRanges)
 						{
 							Response.SetHeader("Accept-Ranges", "bytes");
 
@@ -359,20 +405,20 @@ namespace Waher.Networking.HTTP
 							}
 							else
 							{
-								if (!(this.get is null))
+								if (this.hasGet)
 									await this.get.GET(Request, Response);
 								else
 									await this.getRanges.GET(Request, Response, new ByteRangeInterval(0, null));
 							}
 						}
-						else if (!(this.get is null))
+						else if (this.hasGet)
 							await this.get.GET(Request, Response);
 						else
 							throw new MethodNotAllowedException(this.allowedMethods, Request);
 						break;
 
 					case "POST":
-						if (!(this.postRanges is null))
+						if (this.hasPostRanges)
 						{
 							if (!(Header.ContentRange is null))
 							{
@@ -384,7 +430,7 @@ namespace Waher.Networking.HTTP
 							}
 							else
 							{
-								if (!(this.post is null))
+								if (this.hasPost)
 									await this.post.POST(Request, Response);
 								else
 								{
@@ -401,14 +447,14 @@ namespace Waher.Networking.HTTP
 								}
 							}
 						}
-						else if (!(this.post is null))
+						else if (this.hasPost)
 							await this.post.POST(Request, Response);
 						else
 							throw new MethodNotAllowedException(this.allowedMethods, Request);
 						break;
 
 					case "PUT":
-						if (!(this.putRanges is null))
+						if (this.hasPutRanges)
 						{
 							if (!(Header.ContentRange is null))
 							{
@@ -420,7 +466,7 @@ namespace Waher.Networking.HTTP
 							}
 							else
 							{
-								if (!(this.put is null))
+								if (this.hasPut)
 									await this.put.PUT(Request, Response);
 								else
 								{
@@ -437,14 +483,14 @@ namespace Waher.Networking.HTTP
 								}
 							}
 						}
-						else if (!(this.put is null))
+						else if (this.hasPut)
 							await this.put.PUT(Request, Response);
 						else
 							throw new MethodNotAllowedException(this.allowedMethods, Request);
 						break;
 
 					case "PATCH":
-						if (!(this.patchRanges is null))
+						if (this.hasPatchRanges)
 						{
 							if (!(Header.ContentRange is null))
 							{
@@ -456,7 +502,7 @@ namespace Waher.Networking.HTTP
 							}
 							else
 							{
-								if (!(this.patch is null))
+								if (this.hasPatch)
 									await this.patch.PATCH(Request, Response);
 								else
 								{
@@ -473,38 +519,50 @@ namespace Waher.Networking.HTTP
 								}
 							}
 						}
-						else if (!(this.patch is null))
+						else if (this.hasPatch)
 							await this.patch.PATCH(Request, Response);
 						else
 							throw new MethodNotAllowedException(this.allowedMethods, Request);
 						break;
 
 					case "DELETE":
-						if (this.delete is null)
+						if (!this.hasDelete)
 							throw new MethodNotAllowedException(this.allowedMethods, Request);
 						else
 							await this.delete.DELETE(Request, Response);
 						break;
 
 					case "OPTIONS":
-						if (this.options is null)
+						if (!this.hasOptions)
 							throw new MethodNotAllowedException(this.allowedMethods, Request);
 						else
 							await this.options.OPTIONS(Request, Response);
 						break;
 
 					case "TRACE":
-						if (this.trace is null)
+						if (!this.hasTrace)
 							throw new MethodNotAllowedException(this.allowedMethods, Request);
 						else
 							await this.trace.TRACE(Request, Response);
 						break;
 
 					case "CONNECT":
-						if (this.connect is null)
+						if (!this.hasConnect)
 							throw new MethodNotAllowedException(this.allowedMethods, Request);
 						else
 							await this.connect.CONNECT(Request, Response);
+						break;
+
+					case "QUERY":
+						if (this.hasQuery)
+						{
+							Response.SetHeader("Accept-Query",
+								string.Join(", ", this.query.AcceptableQueryTypes));
+
+							await this.query.QUERY(Request, Response);
+						}
+						else
+							throw new MethodNotAllowedException(this.allowedMethods, Request);
 						break;
 
 					default:

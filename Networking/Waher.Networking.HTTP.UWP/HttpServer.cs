@@ -1672,7 +1672,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ResourceName">Resource Name.</param>
 		/// <param name="GET">GET method handler.</param>
-		/// <param name="POST">PSOT method handler.</param>
+		/// <param name="POST">POST method handler.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
 		/// <returns>Reference to generated HTTP resource object.</returns>
 		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
@@ -1686,7 +1686,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ResourceName">Resource Name.</param>
 		/// <param name="GET">GET method handler.</param>
-		/// <param name="POST">PSOT method handler.</param>
+		/// <param name="POST">POST method handler.</param>
 		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
 		/// (i.e. sends the response from another thread).</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
@@ -1703,7 +1703,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ResourceName">Resource Name.</param>
 		/// <param name="GET">GET method handler.</param>
-		/// <param name="POST">PSOT method handler.</param>
+		/// <param name="POST">POST method handler.</param>
 		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
 		/// (i.e. sends the response from another thread).</param>
 		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
@@ -1721,7 +1721,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ResourceName">Resource Name.</param>
 		/// <param name="GET">GET method handler.</param>
-		/// <param name="POST">PSOT method handler.</param>
+		/// <param name="POST">POST method handler.</param>
 		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
 		/// (i.e. sends the response from another thread).</param>
 		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>

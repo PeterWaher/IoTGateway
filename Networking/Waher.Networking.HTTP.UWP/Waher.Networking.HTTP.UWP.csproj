@@ -161,6 +161,7 @@
     <Compile Include="HttpRedirectionResource.cs" />
     <Compile Include="Interfaces\IFolderResource.cs" />
     <Compile Include="Interfaces\IHttpConnectMethod.cs" />
+    <Compile Include="Interfaces\IHttpQueryMethod.cs" />
     <Compile Include="Interfaces\IWebApplicationFirewall.cs" />
     <Compile Include="ProfilingEventArgs.cs" />
     <Compile Include="ProxyRequestEventArgs.cs" />

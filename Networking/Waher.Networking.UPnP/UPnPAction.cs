@@ -5,6 +5,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Runtime.IO;
+using Waher.Content;
+using Waher.Content.Xml.Text;
 
 namespace Waher.Networking.UPnP
 {
@@ -197,22 +200,24 @@ namespace Waher.Networking.UPnP
 				HttpContent Body = new StringContent(Soap.ToString(), Encoding.UTF8, "text/xml");
 				Body.Headers.Add("SOAPACTION", "\"" + this.parent.Service.ServiceType + "#" + this.name + "\"");
 
-				XmlDocument ResponseXml;
-
 				HttpResponseMessage Response = await HttpClient.PostAsync(this.parent.Service.ControlURI, Body);
 				Stream Stream = await Response.Content.ReadAsStreamAsync(); // Regardless of status code, we check for XML content.
+				byte[] Bin = await Stream.ReadAllAsync();
 
-				ResponseXml = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-				ResponseXml.Load(Stream);
+				ContentResponse Decoded = await InternetContent.DecodeAsync(
+					Response.Content.Headers.ContentType?.ToString() ?? XmlCodec.DefaultContentType,
+					Bin, this.parent.Service.ControlURI);
+
+				Decoded.AssertOk();
+
+				XmlDocument ResponseXml = Decoded.Decoded as XmlDocument
+					?? throw new Exception("Expected XML response to UPnP action request.");
 
 				if (ResponseXml.DocumentElement is null ||
 					ResponseXml.DocumentElement.LocalName != "Envelope" ||
 					ResponseXml.DocumentElement.NamespaceURI != "http://schemas.xmlsoap.org/soap/envelope/")
 				{
-					throw new Exception("Unexpected response returned.");
+					throw new Exception("Unexpected XML response returned.");
 				}
 
 				XmlElement ResponseBody = GetChildElement(ResponseXml.DocumentElement, "Body", "http://schemas.xmlsoap.org/soap/envelope/")

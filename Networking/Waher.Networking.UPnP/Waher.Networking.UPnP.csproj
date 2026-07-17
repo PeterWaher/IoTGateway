@@ -50,4 +50,9 @@
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Waher.Content.Xml">
+      <HintPath>..\..\Content\Waher.Content.Xml\bin\Debug\netstandard2.0\Waher.Content.Xml.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

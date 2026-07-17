@@ -53,6 +53,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.UPnP", "Ne
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.PeerToPeer", "Networking\Waher.Networking.PeerToPeer\Waher.Networking.PeerToPeer.csproj", "{4F6F5727-CCDC-0AB5-EDB2-8C08718C103D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content", "Content\Waher.Content\Waher.Content.csproj", "{D0A782FE-0EBF-467F-A016-8F6C5A7DB4FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Xml", "Content\Waher.Content.Xml\Waher.Content.Xml.csproj", "{30234736-574D-4E57-0222-946BC96BDEE1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,6 +163,14 @@ Global
 		{4F6F5727-CCDC-0AB5-EDB2-8C08718C103D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F6F5727-CCDC-0AB5-EDB2-8C08718C103D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F6F5727-CCDC-0AB5-EDB2-8C08718C103D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0A782FE-0EBF-467F-A016-8F6C5A7DB4FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0A782FE-0EBF-467F-A016-8F6C5A7DB4FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0A782FE-0EBF-467F-A016-8F6C5A7DB4FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0A782FE-0EBF-467F-A016-8F6C5A7DB4FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30234736-574D-4E57-0222-946BC96BDEE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30234736-574D-4E57-0222-946BC96BDEE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30234736-574D-4E57-0222-946BC96BDEE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30234736-574D-4E57-0222-946BC96BDEE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

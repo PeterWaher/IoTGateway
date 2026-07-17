@@ -3,6 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Xml.Text;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.P2P;
@@ -39,6 +40,7 @@ namespace Waher.Networking.XMPP.Test
 			Types.Initialize(
 				typeof(XmppClient).Assembly,
 				typeof(InternetContent).Assembly,
+				typeof(XmlCodec).Assembly,
 				typeof(BOSH.HttpBinding).Assembly,
 				typeof(WebSocket.WebSocketBinding).Assembly,
 				typeof(EndpointSecurity).Assembly,

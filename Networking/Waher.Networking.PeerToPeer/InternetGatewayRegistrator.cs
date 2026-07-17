@@ -17,18 +17,22 @@ namespace Waher.Networking.PeerToPeer
 	/// </summary>
 	public class InternetGatewayRegistrator : IDisposableAsync
 	{
+		private static UPnPClient upnpClient = null;
+		private static object upnpClientLock = new object();
+		private static int upnpClientRefCount = 0;
+
 		internal readonly InternetGatewayRegistration[] ports;
 		internal IPAddress localAddress;
 		internal IPAddress externalAddress;
 		internal Exception exception = null;
 		private readonly ISniffer[] sniffers;
 		private HashSet<string> deviceUrlsProcessed = new HashSet<string>();
-		private UPnPClient upnpClient = null;
 		private IInternetGateway internetGateway;
 		private PeerToPeerNetworkState state = PeerToPeerNetworkState.Created;
 		private ManualResetEvent ready = new ManualResetEvent(false);
 		private ManualResetEvent error = new ManualResetEvent(false);
 		private Timer searchTimer = null;
+		private bool upnpHandlerRegistered = false;
 		internal bool disposed = false;
 
 		/// <summary>
@@ -178,10 +182,16 @@ namespace Waher.Networking.PeerToPeer
 				this.searchTimer?.Dispose();
 				this.searchTimer = null;
 
-				if (this.upnpClient is null)
+				if (!this.upnpHandlerRegistered)
 				{
-					this.upnpClient = new UPnPClient(this.sniffers);
-					this.upnpClient.OnDeviceFound += this.UpnpClient_OnDeviceFound;
+					lock (upnpClientLock)
+					{
+						upnpClientRefCount++;
+						upnpClient ??= new UPnPClient(this.sniffers);
+
+						upnpClient.OnDeviceFound += this.UpnpClient_OnDeviceFound;
+						this.upnpHandlerRegistered = true;
+					}
 				}
 
 				lock (this.deviceUrlsProcessed)
@@ -191,9 +201,9 @@ namespace Waher.Networking.PeerToPeer
 
 				await this.SetState(PeerToPeerNetworkState.SearchingForGateway);
 
-				await this.upnpClient.StartSearch("urn:schemas-upnp-org:service:WANIPConnection:1", 1);
-				await this.upnpClient.StartSearch("urn:schemas-upnp-org:service:WANIPConnection:2", 1);
-				await this.upnpClient.StartSearch("urn:schemas-upnp-org:service:WANPPPConnection:1", 1);
+				await upnpClient.StartSearch("urn:schemas-upnp-org:service:WANIPConnection:1", 1);
+				await upnpClient.StartSearch("urn:schemas-upnp-org:service:WANIPConnection:2", 1);
+				await upnpClient.StartSearch("urn:schemas-upnp-org:service:WANPPPConnection:1", 1);
 
 				this.searchTimer = new Timer(this.SearchTimeout, null, 10000, Timeout.Infinite);
 			}
@@ -211,12 +221,36 @@ namespace Waher.Networking.PeerToPeer
 				this.searchTimer?.Dispose();
 				this.searchTimer = null;
 
+				await this.UnregisterUPnPClient();
 				await this.SetState(PeerToPeerNetworkState.Error);
 			}
 			catch (Exception ex)
 			{
 				Log.Exception(ex);
 			}
+		}
+
+		private async Task UnregisterUPnPClient()
+		{
+			UPnPClient ToDispose = null;
+
+			lock (upnpClientLock)
+			{
+				if (this.upnpHandlerRegistered)
+				{
+					upnpClient.OnDeviceFound -= this.UpnpClient_OnDeviceFound;
+					this.upnpHandlerRegistered = false;
+
+					if (--upnpClientRefCount == 0)
+					{
+						ToDispose = upnpClient;
+						upnpClient = null;
+					}
+				}
+			}
+
+			if (!(ToDispose is null))
+				await ToDispose.DisposeAsync();
 		}
 
 		private void Reinitialize(object State)
@@ -579,6 +613,8 @@ namespace Waher.Networking.PeerToPeer
 			this.searchTimer?.Dispose();
 			this.searchTimer = null;
 
+			await this.UnregisterUPnPClient();
+
 			foreach (InternetGatewayRegistration Registration in this.ports)
 			{
 				if (Registration.TcpRegistered)
@@ -623,12 +659,6 @@ namespace Waher.Networking.PeerToPeer
 			}
 
 			this.internetGateway = null;
-
-			if (!(this.upnpClient is null))
-			{
-				await this.upnpClient.DisposeAsync();
-				this.upnpClient = null;
-			}
 
 			this.deviceUrlsProcessed?.Clear();
 			this.deviceUrlsProcessed = null;

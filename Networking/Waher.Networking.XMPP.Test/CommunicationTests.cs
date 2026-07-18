@@ -99,6 +99,7 @@ namespace Waher.Networking.XMPP.Test
 			this.ex1 = null;
 			this.ex2 = null;
 
+			this.client01 = null;
 			this.client1 = new XmppClient(this.GetCredentials1(), "en", typeof(CommunicationTests).Assembly)
 			{
 				DefaultNrRetries = 2,
@@ -130,6 +131,7 @@ namespace Waher.Networking.XMPP.Test
 			else
 				this.serverless1 = null;
 
+			this.client02 = null;
 			this.client2 = new XmppClient(this.GetCredentials2(), "en", typeof(CommunicationTests).Assembly)
 			{
 				DefaultNrRetries = 2,
@@ -154,7 +156,7 @@ namespace Waher.Networking.XMPP.Test
 
 			if (P2p)
 			{
-				Assert.IsTrue(await this.serverless2Ready.Task, 
+				Assert.IsTrue(await this.serverless2Ready.Task,
 					"Unable to establish a P2P network for client 2.");
 
 				await (this.client01 ?? this.client1).SetPresence();
@@ -162,6 +164,8 @@ namespace Waher.Networking.XMPP.Test
 
 				Assert.IsTrue(await this.client1PeerInfoReceived.Task, "Client 1 Peer information not received by Client 2.");
 				Assert.IsTrue(await this.client2PeerInfoReceived.Task, "Client 2 Peer information not received by Client 1.");
+
+				this.client1.Information("Client 1 connection P2P to client 2.");
 
 				PeerConnectionEventArgs e = await this.serverless1.GetPeerConnectionAsync(this.client2.FullJID);
 				if (e.Client is null)
@@ -190,6 +194,14 @@ namespace Waher.Networking.XMPP.Test
 
 				this.serverless1Ready = new();
 				this.client2PeerInfoReceived = new TaskCompletionSource<bool>();
+
+				this.client1.OnStateChanged += (Sender, NewState) =>
+				{
+					if (NewState == XmppState.Connected)
+						this.serverless1.FullJid = this.client1.FullJID;
+
+					return Task.CompletedTask;
+				};
 
 				this.serverless1.Network.OnStateChange += (sender, NewState) =>
 				{
@@ -236,6 +248,14 @@ namespace Waher.Networking.XMPP.Test
 			{
 				this.serverless2 = new XmppServerlessMessaging("Client2", this.client2.FullJID,
 					5002, 8002, this.client2.Sniffers);
+
+				this.client2.OnStateChanged += (Sender, NewState) =>
+				{
+					if (NewState == XmppState.Connected)
+						this.serverless2.FullJid = this.client2.FullJID;
+
+					return Task.CompletedTask;
+				};
 
 				this.serverless2Ready = new();
 				this.client1PeerInfoReceived = new TaskCompletionSource<bool>();

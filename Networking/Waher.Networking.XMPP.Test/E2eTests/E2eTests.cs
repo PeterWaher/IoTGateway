@@ -21,6 +21,22 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 			base.PrepareClient1(Client, SecurityStrength, P2p);
 			this.endpointSecurity1 = new EndpointSecurity(this.client1, this.serverless1,
 				SecurityStrength, this.endpoints1);
+
+			if (P2p)
+			{
+				this.serverless1.OnResynch += (sender, e) =>
+				{
+					this.client1.Information("Serveless 1 resynch: " + e.RemoteFullJid);
+
+					this.endpointSecurity1?.SynchronizeE2e(e.RemoteFullJid, (Sender2, e2) =>
+					{
+						e.Done(e2.Ok);
+						return Task.CompletedTask;
+					});
+
+					return Task.CompletedTask;
+				};
+			}
 		}
 
 		public override void PrepareClient2(XmppClient Client, int SecurityStrength, bool P2p)
@@ -28,6 +44,22 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 			base.PrepareClient2(Client, SecurityStrength, P2p);
 			this.endpointSecurity2 = new EndpointSecurity(this.client2, this.serverless2,
 				SecurityStrength, this.endpoints2);
+
+			if (P2p)
+			{
+				this.serverless2.OnResynch += (sender, e) =>
+				{
+					this.client2.Information("Serveless 2 resynch: " + e.RemoteFullJid);
+
+					this.endpointSecurity2?.SynchronizeE2e(e.RemoteFullJid, (Sender2, e2) =>
+					{
+						e.Done(e2.Ok);
+						return Task.CompletedTask;
+					});
+
+					return Task.CompletedTask;
+				};
+			}
 		}
 
 		protected void PrepareEndpoints(AsymmetricCipher AsymmetricCipherType,
@@ -40,7 +72,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 			}
 			else
 			{
-				PrepareEndpoint(AsymmetricCipherType, SecurityStrength, SymmetricCipherType, 
+				PrepareEndpoint(AsymmetricCipherType, SecurityStrength, SymmetricCipherType,
 					out IE2eEndpoint Endpoint1);
 				PrepareEndpoint(AsymmetricCipherType, SecurityStrength, SymmetricCipherType,
 					out IE2eEndpoint Endpoint2);
@@ -51,7 +83,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		}
 
 		private static void PrepareEndpoint(AsymmetricCipher AsymmetricCipherType,
-			int SecurityStrength, SymmetricCipher SymmetricCipherType, 
+			int SecurityStrength, SymmetricCipher SymmetricCipherType,
 			out IE2eEndpoint Endpoint)
 		{
 			IE2eSymmetricCipher SymmetricCipher2 = SymmetricCipherType switch
@@ -107,8 +139,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		{
 			await base.ConnectClients(SecurityStrength, P2p);
 
-			SubscribedTo(this.client1, this.client2);
-			SubscribedTo(this.client2, this.client1);
+			SubscribedTo(this.client01 ?? this.client1, this.client02 ?? this.client2);
+			SubscribedTo(this.client02 ?? this.client2, this.client01 ?? this.client1);
 		}
 
 		private static void SubscribedTo(XmppClient From, XmppClient To)

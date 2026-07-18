@@ -5,6 +5,7 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Script.Abstraction.Elements;
@@ -129,7 +130,19 @@ namespace Waher.Content.Xml.Text
 			else
 			{
 				string s = Strings.GetString(Data, Encoding);
-				Doc = XML.ParseXml(s, true);
+
+				try
+				{
+					Doc = XML.ParseXml(s, true);
+				}
+				catch (XmlException ex)
+				{
+					Doc = XML.ParseXml(XML.RepairXml(s), true);
+					
+					Log.Warning("Invalid XML was received and repaired.",
+						new KeyValuePair<string, object>("BaseUri", BaseUri?.OriginalString),
+						new KeyValuePair<string, object>("Error", ex.Message));
+				}
 			}
 
 			return Task.FromResult(new ContentResponse(ContentType, Doc, Data));

@@ -31,12 +31,12 @@ namespace Waher.Content.Xml
 			return CommonTypes.Escape(s, specialCharacters, specialCharacterEncodings);
 		}
 
-		private static readonly char[] specialCharacters = new char[] 
-		{ 
-			'<', 
-			'>', 
-			'&', 
-			'"', 
+		private static readonly char[] specialCharacters = new char[]
+		{
+			'<',
+			'>',
+			'&',
+			'"',
 			'\'',
 			'\x00',
 			'\x01',
@@ -72,11 +72,11 @@ namespace Waher.Content.Xml
 			'\x1f'
 		};
 
-		private static readonly string[] specialCharacterEncodings = new string[] 
+		private static readonly string[] specialCharacterEncodings = new string[]
 		{
-			"&lt;", 
-			"&gt;", 
-			"&amp;", 
+			"&lt;",
+			"&gt;",
+			"&amp;",
 			"&quot;",
 			"&apos;",
 			"&#00;",
@@ -123,12 +123,12 @@ namespace Waher.Content.Xml
 			return CommonTypes.Escape(s, specialAttributeCharacters, specialAttributeEncodings);
 		}
 
-		private static readonly char[] specialAttributeCharacters = new char[] 
+		private static readonly char[] specialAttributeCharacters = new char[]
 		{
-			'<', 
-			'>', 
-			'&', 
-			'"', 
+			'<',
+			'>',
+			'&',
+			'"',
 			'\x00',
 			'\x01',
 			'\x02',
@@ -213,11 +213,11 @@ namespace Waher.Content.Xml
 			return CommonTypes.Escape(s, specialValueCharacters, specialValueEncodings);
 		}
 
-		private static readonly char[] specialValueCharacters = new char[] 
-		{ 
-			'<', 
-			'>', 
-			'&' 
+		private static readonly char[] specialValueCharacters = new char[]
+		{
+			'<',
+			'>',
+			'&'
 		};
 
 		private static readonly string[] specialValueEncodings = new string[]
@@ -759,15 +759,88 @@ namespace Waher.Content.Xml
 		/// <returns>XML-decoded string.</returns>
 		public static string DecodeString(string s)
 		{
-			if (s.IndexOf('&') < 0)
+			int i = s.IndexOf('&');
+			if (i < 0)
 				return s;
 
-			return s.
-				Replace("&apos;", "'").
-				Replace("&qout;", "\"").
-				Replace("&lt;", "<").
-				Replace("&gt;", ">").
-				Replace("&amp;", "&");
+			int j = s.IndexOf(';', i + 1);
+			if (j < 0)
+				return s;
+
+			StringBuilder Result = new StringBuilder();
+			int Pos = 0;
+			string Entity;
+
+			while (i >= 0 && j > i)
+			{
+				Entity = s.Substring(i + 1, j - i - 1);
+
+				Result.Append(s.Substring(Pos, i - Pos));
+
+				switch (Entity.ToLower())
+				{
+					case "apos":
+						Result.Append('\'');
+						break;
+
+					case "quot":
+						Result.Append('"');
+						break;
+
+					case "lt":
+						Result.Append('<');
+						break;
+
+					case "gt":
+						Result.Append('>');
+						break;
+
+					case "amp":
+						Result.Append('&');
+						break;
+
+					default:
+						if (Entity.StartsWith("#x") && int.TryParse(Entity.Substring(2), NumberStyles.HexNumber,
+							NumberFormatInfo.InvariantInfo, out i))
+						{
+							Result.Append((char)i);
+						}
+						else if (Entity.StartsWith("#") && int.TryParse(Entity.Substring(1),
+							NumberStyles.Number, NumberFormatInfo.InvariantInfo, out i))
+						{
+							Result.Append((char)i);
+						}
+						else
+						{
+							Result.Append('&');
+							Result.Append(Entity);
+							Result.Append(';');
+						}
+						break;
+				}
+
+				Pos = j + 1;
+				i = s.IndexOf('&', Pos);
+				if (i < 0)
+					break;
+
+				j = s.IndexOf(';', i + 1);
+			}
+
+			if (Pos < s.Length)
+				Result.Append(s.Substring(Pos));
+
+			return Result.ToString();
+		}
+
+		/// <summary>
+		/// Reencodes an encoded string.
+		/// </summary>
+		/// <param name="Encoded">Encoded string.</param>
+		/// <returns>Reencoded string.</returns>
+		public static string Reencode(string Encoded)
+		{
+			return Encode(DecodeString(Encoded));
 		}
 
 		/// <summary>
@@ -1674,7 +1747,7 @@ namespace Waher.Content.Xml
 		{
 			if (ex.LineNumber == 0 && ex.LinePosition == 0)
 				return ex;
-				
+
 			StringBuilder sb = new StringBuilder();
 
 			sb.AppendLine(ex.Message);
@@ -1727,6 +1800,336 @@ namespace Waher.Content.Xml
 			Xml.Load(FileName);
 
 			return Xml;
+		}
+
+		#endregion
+
+		#region Repairing XML
+
+		/// <summary>
+		/// Repairs broker XML by reencoding any illegal characters.
+		/// </summary>
+		/// <param name="Xml">Broker XML</param>
+		/// <returns>Repaired XML</returns>
+		public static string RepairXml(string Xml)
+		{
+			if (string.IsNullOrEmpty(Xml))
+				return Xml;
+
+			StringBuilder Output = new StringBuilder();
+			StringBuilder Value = new StringBuilder();
+			int State = 0;
+			int Depth = 0;
+			bool HasValue = false;
+
+			foreach (char ch in Xml)
+			{
+				switch (State)
+				{
+					case 0:     // Waiting for first <
+						if (ch == '<')
+						{
+							Output.Append(ch);
+							State++;
+						}
+						break;
+
+					case 1:     // Waiting for ? or >
+						Output.Append(ch);
+						if (ch == '?')
+							State++;
+						else if (ch == '>')
+						{
+							State = 5;
+							Depth = 1;
+						}
+						break;
+
+					case 2:     // In processing instruction. Waiting for ?>
+						Output.Append(ch);
+						if (ch == '>')
+							State++;
+						break;
+
+					case 3:     // Waiting for <stream
+						if (ch == '<')
+						{
+							Output.Append(ch);
+							State++;
+						}
+						else if (char.IsWhiteSpace(ch))
+							Output.Append(ch);
+						break;
+
+					case 4:     // Waiting for >
+						Output.Append(ch);
+						if (ch == '>')
+						{
+							State++;
+							Depth = 1;
+						}
+						break;
+
+					case 5: // Waiting for start element.
+						if (ch == '<')
+						{
+							if (HasValue)
+							{
+								Output.Append(Reencode(Value.ToString()));
+								Value.Clear();
+								HasValue = false;
+							}
+
+							Output.Append(ch);
+							State++;
+						}
+						else if (Depth > 1)
+						{
+							Value.Append(ch);
+							HasValue = true;
+						}
+						else if (char.IsWhiteSpace(ch))
+							Output.Append(ch);
+						break;
+
+					case 6: // Second character in tag
+						Output.Append(ch);
+						if (ch == '/')
+							State++;
+						else if (ch == '!')
+							State = 13;
+						else
+							State += 2;
+						break;
+
+					case 7: // Waiting for end of closing tag
+						Output.Append(ch);
+						if (ch == '>')
+						{
+							Depth--;
+							if (Depth < 1)
+								return Output.ToString();
+
+							State = 5;
+						}
+						break;
+
+					case 8: // Wait for end of start tag
+						Output.Append(ch);
+						if (ch == '>')
+						{
+							Depth++;
+							State = 5;
+						}
+						else if (ch == '/')
+							State++;
+						else if (ch <= ' ')
+							State += 2;
+						break;
+
+					case 9: // Check for end of childless tag.
+						Output.Append(ch);
+						if (ch == '>')
+							State = 5;
+						else
+							State--;
+						break;
+
+					case 10:    // Check for attributes.
+						Output.Append(ch);
+						if (ch == '>')
+						{
+							Depth++;
+							State = 5;
+						}
+						else if (ch == '/')
+							State--;
+						else if (ch == '"')
+							State++;
+						else if (ch == '\'')
+							State += 2;
+						break;
+
+					case 11:    // Double quote attribute.
+						if (ch == '"')
+						{
+							if (HasValue)
+							{
+								Output.Append(Reencode(Value.ToString()));
+								Value.Clear();
+								HasValue = false;
+							}
+
+							Output.Append('"');
+							State--;
+						}
+						else
+						{
+							Value.Append(ch);
+							HasValue = true;
+						}
+						break;
+
+					case 12:    // Single quote attribute.
+						if (ch == '\'')
+						{
+							if (HasValue)
+							{
+								Output.Append(Reencode(Value.ToString()));
+								Value.Clear();
+								HasValue = false;
+							}
+
+							Output.Append('\'');
+							State -= 2;
+						}
+						else
+						{
+							Value.Append(ch);
+							HasValue = true;
+						}
+						break;
+
+					case 13:    // Third character in start of comment
+						Output.Append(ch);
+						if (ch == '-')
+							State++;
+						else if (ch == '[')
+							State = 18;
+						else
+						{
+							Output.Append("-- -->");
+							State = 5;
+						}
+						break;
+
+					case 14:    // Fourth character in start of comment
+						Output.Append(ch);
+						if (ch == '-')
+							State++;
+						else
+						{
+							Output.Append("- -->");
+							State = 5;
+						}
+						break;
+
+					case 15:    // In comment
+						Output.Append(ch);
+						if (ch == '-')
+							State++;
+						break;
+
+					case 16:    // Second character in end of comment
+						Output.Append(ch);
+						if (ch == '-')
+							State++;
+						else
+							State--;
+						break;
+
+					case 17:    // Third character in end of comment
+						Output.Append(ch);
+						if (ch == '>')
+							State = 5;
+						else
+							State -= 2;
+						break;
+
+					case 18:    // Fourth character in start of CDATA
+						Output.Append(ch);
+						if (ch == 'C')
+							State++;
+						else
+						{
+							Output.Append("CDATA[]]>");
+							State = 5;
+						}
+						break;
+
+					case 19:    // Fifth character in start of CDATA
+						Output.Append(ch);
+						if (ch == 'D')
+							State++;
+						else
+						{
+							Output.Append("DATA[]]>");
+							State = 5;
+						}
+						break;
+
+					case 20:    // Sixth character in start of CDATA
+						Output.Append(ch);
+						if (ch == 'A')
+							State++;
+						else
+						{
+							Output.Append("ATA[]]>");
+							State = 5;
+						}
+						break;
+
+					case 21:    // Seventh character in start of CDATA
+						Output.Append(ch);
+						if (ch == 'T')
+							State++;
+						else
+						{
+							Output.Append("TA[]]>");
+							State = 5;
+						}
+						break;
+
+					case 22:    // Eighth character in start of CDATA
+						Output.Append(ch);
+						if (ch == 'A')
+							State++;
+						else
+						{
+							Output.Append("A[]]>");
+							State = 5;
+						}
+						break;
+
+					case 23:    // Ninth character in start of CDATA
+						Output.Append(ch);
+						if (ch == '[')
+							State++;
+						else
+						{
+							Output.Append("[]]>");
+							State = 5;
+						}
+						break;
+
+					case 24:    // In CDATA
+						Output.Append(ch);
+						if (ch == ']')
+							State++;
+						break;
+
+					case 25:    // Second character in end of CDATA
+						Output.Append(ch);
+						if (ch == ']')
+							State++;
+						else
+							State--;
+						break;
+
+					case 26:    // Third character in end of CDATA
+						Output.Append(ch);
+						if (ch == '>')
+							State = 5;
+						else if (ch != ']')
+							State -= 2;
+						break;
+
+					default:
+						break;
+				}
+			}
+
+			return Output.ToString();
 		}
 
 		#endregion

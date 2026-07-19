@@ -20,6 +20,12 @@ namespace Waher.Networking.XMPP.Test
 			await DisposeSnifferAndLog();
 		}
 
+		[TestCleanup]
+		public async Task TestCleanup()
+		{
+			await this.DisposeClients();
+		}
+
 		[TestMethod]
 		public async Task SoftwareVersion_Test_01_Server()
 		{

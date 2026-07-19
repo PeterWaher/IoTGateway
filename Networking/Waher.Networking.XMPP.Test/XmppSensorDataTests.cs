@@ -80,9 +80,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_01_ReadAll()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 				IEnumerable<Field> Fields = null;
@@ -119,9 +120,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_02_Subscribe_MaxInterval()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				TaskCompletionSource<bool> Result = new();
 				IEnumerable<Field> Fields = null;
 
@@ -163,9 +165,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_03_Subscribe_ChangeBy()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 				IEnumerable<Field> Fields = null;
@@ -227,9 +230,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_04_Subscribe_ChangeUp()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 				IEnumerable<Field> Fields = null;
@@ -280,9 +284,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_05_Subscribe_ChangeDown()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 				IEnumerable<Field> Fields = null;
@@ -333,9 +338,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_06_Subscribe_MinInterval()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 				IEnumerable<Field> Fields = null;
@@ -400,9 +406,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_07_Unsubscribe()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 				IEnumerable<Field> Fields = null;

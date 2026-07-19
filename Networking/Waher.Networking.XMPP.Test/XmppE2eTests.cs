@@ -228,9 +228,10 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);
 
-			await this.ConnectClients(SecurityStrength, P2p);
 			try
 			{
+				await this.ConnectClients(SecurityStrength, P2p);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
@@ -249,13 +250,10 @@ namespace Waher.Networking.XMPP.Test
 					"<test/>", "Test message", "Subject", "en", string.Empty, string.Empty,
 					null, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 500000));
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000));
 			}
 			finally
 			{
-				this.endpointSecurity1?.Dispose();
-				this.endpointSecurity2?.Dispose();
-
 				await this.DisposeClients();
 			}
 		}
@@ -409,9 +407,10 @@ namespace Waher.Networking.XMPP.Test
 
 		private async Task Test_IQ_Get(string Send, string Check, bool ExpectOk, int SecurityStrength, bool P2p)
 		{
-			await this.ConnectClients(SecurityStrength, P2p);
 			try
 			{
+				await this.ConnectClients(SecurityStrength, P2p);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
@@ -454,9 +453,6 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.endpointSecurity1?.Dispose();
-				this.endpointSecurity2?.Dispose();
-
 				await this.DisposeClients();
 			}
 		}
@@ -605,9 +601,10 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.PrepareEndpoints(AsymmetricCipherType, SecurityStrength, SymmetricCipherType);
 
-			await this.ConnectClients(SecurityStrength, P2p);
 			try
 			{
+				await this.ConnectClients(SecurityStrength, P2p);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
@@ -649,9 +646,6 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.endpointSecurity1?.Dispose();
-				this.endpointSecurity2?.Dispose();
-
 				await this.DisposeClients();
 			}
 		}

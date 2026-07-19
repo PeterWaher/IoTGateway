@@ -60,9 +60,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Events_Test_01_LogEvent()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				Event Event = null;
 

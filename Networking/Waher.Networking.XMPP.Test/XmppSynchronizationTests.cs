@@ -27,6 +27,12 @@ namespace Waher.Networking.XMPP.Test
 			await DisposeSnifferAndLog();
 		}
 
+		[TestCleanup]
+		public async Task TestCleanup()
+		{
+			await this.DisposeClients();
+		}
+
 		private SynchronizationClient synchronizationClient1;
 		private SynchronizationClient synchronizationClient2;
 

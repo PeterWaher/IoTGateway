@@ -19,10 +19,17 @@ namespace Waher.Networking.XMPP.Test
 			await DisposeSnifferAndLog();
 		}
 
+		[TestCleanup]
+		public async Task TestCleanup()
+		{
+			await this.DisposeClients();
+		}
+
 		[TestMethod]
 		public async Task Roster_Test_01_GetRoster()
 		{
 			await this.ConnectClients(128, false);
+
 			Assert.IsTrue(this.client1.HasRoster);
 			Assert.IsTrue(this.client2.HasRoster);
 		}
@@ -44,7 +51,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			await this.ConnectClients(128, false);
 			using ManualResetEvent Updated = new(false);
-			
+
 			await this.client1.UpdateRosterItem(this.client2.BareJID, "Test Client II", new string[] { "Test Clients" },
 				(Sender, e) => { Updated.Set(); return Task.CompletedTask; }, null);
 
@@ -56,7 +63,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			await this.ConnectClients(128, false);
 			using ManualResetEvent Removed = new(false);
-			
+
 			await this.client1.RemoveRosterItem(this.client2.BareJID, (Sender, e) => { Removed.Set(); return Task.CompletedTask; }, null);
 
 			Assert.IsTrue(Removed.WaitOne(10000), "Roster item not properly removed.");
@@ -107,9 +114,9 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Done = new(false);
 
 			this.client1.OnPresenceSubscribed += (Sender, e) =>
-			{ 
-				Done.Set(); 
-				return Task.CompletedTask; 
+			{
+				Done.Set();
+				return Task.CompletedTask;
 			};
 
 			await this.client1.RequestPresenceSubscription("wpfclient@cybercity.online");

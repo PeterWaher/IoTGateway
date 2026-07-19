@@ -129,9 +129,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_01_Bool()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
@@ -159,9 +160,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_02_Color()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
@@ -191,9 +193,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_03_Date()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
@@ -221,9 +224,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_04_DateTime()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
@@ -254,9 +258,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_05_Double()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
@@ -284,9 +289,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_06_Duration()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
@@ -314,9 +320,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_07_Enum()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
@@ -344,9 +351,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_08_Int32()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
@@ -374,9 +382,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_09_Int64()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
@@ -404,9 +413,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_10_String()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
@@ -434,9 +444,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_11_Time()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 

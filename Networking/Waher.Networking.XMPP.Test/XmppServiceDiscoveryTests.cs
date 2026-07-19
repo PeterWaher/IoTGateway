@@ -23,9 +23,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task ServiceDiscovery_Test_01_Server()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client1.Domain, 10000);
 				Print(e);
 			}
@@ -53,9 +54,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task ServiceDiscovery_Test_02_Account()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client2.BareJID, 10000);
 				Print(e);
 			}
@@ -68,9 +70,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task ServiceDiscovery_Test_03_Client()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client2.FullJID, 10000);
 				Print(e);
 			}
@@ -83,9 +86,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task ServiceDiscovery_Test_04_ServerItems()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client1.Domain, 10000);
 				Print(e);
 			}
@@ -107,9 +111,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task ServiceDiscovery_Test_05_ServerItemFeatures()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client1.Domain, 10000);
 
 				foreach (Item Item in e.Items)
@@ -132,9 +137,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task ServiceDiscovery_Test_06_AccountItems()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client2.BareJID, 10000);
 				Print(e);
 			}

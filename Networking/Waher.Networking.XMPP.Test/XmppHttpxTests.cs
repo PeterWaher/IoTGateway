@@ -284,7 +284,7 @@ namespace Waher.Networking.XMPP.Test
 		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.Aes256, true)]
 		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.ChaCha20, true)]
 		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.AeadChaCha20Poly1305, true)]
-		public async Task HTTPX_Test_01_GET(AsymmetricCipher EccType, 
+		public async Task HTTPX_Test_01_GET(AsymmetricCipher EccType,
 			int SecurityStrength, SymmetricCipher SymmetricCipherType, bool P2p)
 		{
 			this.PrepareEndpoints(EccType, SecurityStrength, SymmetricCipherType);
@@ -478,7 +478,7 @@ namespace Waher.Networking.XMPP.Test
 		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.Aes256, true)]
 		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.ChaCha20, true)]
 		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.AeadChaCha20Poly1305, true)]
-		public async Task HTTPX_Test_02_GET_PostBack(AsymmetricCipher EccType, 
+		public async Task HTTPX_Test_02_GET_PostBack(AsymmetricCipher EccType,
 			int SecurityStrength, SymmetricCipher SymmetricCipherType, bool P2p)
 		{
 			this.PrepareEndpoints(EccType, SecurityStrength, SymmetricCipherType);
@@ -631,7 +631,7 @@ namespace Waher.Networking.XMPP.Test
 		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.Aes256, true)]
 		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.ChaCha20, true)]
 		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.AeadChaCha20Poly1305, true)]
-		public async Task HTTPX_Test_03_POST(AsymmetricCipher EccType, 
+		public async Task HTTPX_Test_03_POST(AsymmetricCipher EccType,
 			int SecurityStrength, SymmetricCipher SymmetricCipherType, bool P2p)
 		{
 			this.PrepareEndpoints(EccType, SecurityStrength, SymmetricCipherType);
@@ -834,7 +834,7 @@ namespace Waher.Networking.XMPP.Test
 		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.Aes256, true)]
 		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.ChaCha20, true)]
 		[DataRow(AsymmetricCipher.Ephemeral, 128, SymmetricCipher.AeadChaCha20Poly1305, true)]
-		public async Task HTTPX_Test_04_POST_PostBack(AsymmetricCipher EccType, 
+		public async Task HTTPX_Test_04_POST_PostBack(AsymmetricCipher EccType,
 			int SecurityStrength, SymmetricCipher SymmetricCipherType, bool P2p)
 		{
 			this.PrepareEndpoints(EccType, SecurityStrength, SymmetricCipherType);

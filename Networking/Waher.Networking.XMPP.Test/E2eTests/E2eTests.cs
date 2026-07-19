@@ -36,6 +36,16 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 
 					return Task.CompletedTask;
 				};
+
+				this.serverless1.OnNewXmppClient += (sender, e) =>
+				{
+					this.client1.Information("Serveless 1 received new XMPP client for " +
+						e.RemoteJid + " from " + e.LocalJid);
+
+					this.endpointSecurity1?.RegisterHandlers(e.Client);
+
+					return Task.CompletedTask;
+				};
 			}
 		}
 
@@ -56,6 +66,16 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 						e.Done(e2.Ok);
 						return Task.CompletedTask;
 					});
+
+					return Task.CompletedTask;
+				};
+
+				this.serverless2.OnNewXmppClient += (sender, e) =>
+				{
+					this.client2.Information("Serveless 2 received new XMPP client for " +
+						e.RemoteJid + " from " + e.LocalJid);
+
+					this.endpointSecurity2?.RegisterHandlers(e.Client);
 
 					return Task.CompletedTask;
 				};

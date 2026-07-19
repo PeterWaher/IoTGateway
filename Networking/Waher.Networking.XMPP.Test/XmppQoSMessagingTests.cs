@@ -40,18 +40,25 @@ namespace Waher.Networking.XMPP.Test
 
 		private async Task QoSTest(QoSLevel Level)
 		{
-			await this.ConnectClients(128, false);
+			try
+			{
+				await this.ConnectClients(128, false);
 
-			ManualResetEvent Received = new(false);
-			ManualResetEvent Delivered = new(false);
+				ManualResetEvent Received = new(false);
+				ManualResetEvent Delivered = new(false);
 
-			this.client2.OnNormalMessage += (Sender, e) => { Received.Set(); return Task.CompletedTask; };
+				this.client2.OnNormalMessage += (Sender, e) => { Received.Set(); return Task.CompletedTask; };
 
-			await this.client1.SendMessage(Level, MessageType.Normal, this.client2.FullJID, string.Empty, "Hello", string.Empty, "en",
-				string.Empty, string.Empty, (Sender, e) => { Delivered.Set(); return Task.CompletedTask; }, null);
+				await this.client1.SendMessage(Level, MessageType.Normal, this.client2.FullJID, string.Empty, "Hello", string.Empty, "en",
+					string.Empty, string.Empty, (Sender, e) => { Delivered.Set(); return Task.CompletedTask; }, null);
 
-			Assert.IsTrue(Delivered.WaitOne(10000), "Message not delivered properly.");
-			Assert.IsTrue(Received.WaitOne(10000), "Message not received properly.");
+				Assert.IsTrue(Delivered.WaitOne(10000), "Message not delivered properly.");
+				Assert.IsTrue(Received.WaitOne(10000), "Message not received properly.");
+			}
+			finally
+			{
+				await this.DisposeClients();
+			}
 		}
 
 		[TestMethod]
@@ -60,23 +67,30 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Done = new(false);
 			IqResultEventArgs e2 = null;
 
-			await this.ConnectClients(128, false);
-
-			this.client2.RegisterIqGetHandler("test", "test", (Sender, e) =>
+			try
 			{
-				// Do nothing. Do not return result or error.
-				return Task.CompletedTask;
-			}, false);
+				await this.ConnectClients(128, false);
 
-			await this.client1.SendIqGet(this.client2.FullJID, "<test:test xmlns:test='test'/>", (Sender, e) =>
+				this.client2.RegisterIqGetHandler("test", "test", (Sender, e) =>
+				{
+					// Do nothing. Do not return result or error.
+					return Task.CompletedTask;
+				}, false);
+
+				await this.client1.SendIqGet(this.client2.FullJID, "<test:test xmlns:test='test'/>", (Sender, e) =>
+				{
+					e2 = e;
+					Done.Set();
+					return Task.CompletedTask;
+				}, null, 1000, 3, true, int.MaxValue);
+
+				Assert.IsTrue(Done.WaitOne(20000), "Retry function not working properly.");
+				Assert.IsFalse(e2.Ok, "Request not properly cancelled.");
+			}
+			finally
 			{
-				e2 = e;
-				Done.Set();
-				return Task.CompletedTask;
-			}, null, 1000, 3, true, int.MaxValue);
-
-			Assert.IsTrue(Done.WaitOne(20000), "Retry function not working properly.");
-			Assert.IsFalse(e2.Ok, "Request not properly cancelled.");
+				await this.DisposeClients();
+			}
 		}
 	}
 }

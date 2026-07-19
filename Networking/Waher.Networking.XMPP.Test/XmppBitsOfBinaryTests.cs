@@ -57,9 +57,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task BitsOfBinary_Test_01_GetData()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
@@ -88,9 +89,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task BitsOfBinary_Test_02_GetData_Expires()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 

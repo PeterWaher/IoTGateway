@@ -445,6 +445,9 @@ namespace Waher.Networking.XMPP.Test
 		{
 			await ConsoleOut.FlushAsync();
 
+			Exception Ex1 = this.ex1;
+			Exception Ex2 = this.ex2;
+
 			if (this.client01 is not null)
 			{
 				this.client01.Information("Stopping test, client 01...");
@@ -485,11 +488,11 @@ namespace Waher.Networking.XMPP.Test
 				this.client2 = null;
 			}
 
-			if (this.ex1 is not null)
-				throw new TargetInvocationException(this.ex1);
+			if (Ex1 is not null)
+				throw new TargetInvocationException(Ex1);
 
-			if (this.ex2 is not null)
-				throw new TargetInvocationException(this.ex2);
+			if (Ex2 is not null)
+				throw new TargetInvocationException(Ex2);
 		}
 	}
 }

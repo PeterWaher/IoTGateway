@@ -53,9 +53,10 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Interoperability_Test_01_GetInterfaces()
 		{
-			await this.ConnectClients(128, false);
 			try
 			{
+				await this.ConnectClients(128, false);
+				
 				string[] Interfaces = this.interopClient.GetInterfaces(this.client2.FullJID, 10000);
 
 				Assert.HasCount(4, Interfaces);

@@ -17,8 +17,8 @@ namespace Waher.Networking.PeerToPeer
 	/// </summary>
 	public class InternetGatewayRegistrator : IDisposableAsync
 	{
+		private static readonly object upnpClientLock = new object();
 		private static UPnPClient upnpClient = null;
-		private static object upnpClientLock = new object();
 		private static int upnpClientRefCount = 0;
 
 		internal readonly InternetGatewayRegistration[] ports;

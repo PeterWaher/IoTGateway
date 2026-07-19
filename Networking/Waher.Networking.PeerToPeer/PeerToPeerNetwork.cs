@@ -95,7 +95,8 @@ namespace Waher.Networking.PeerToPeer
 				}
 				catch (Exception ex)
 				{
-					Log.Exception(ex);
+					if (!this.disposed)
+						Log.Exception(ex);
 				}
 			});
 		}
@@ -211,16 +212,15 @@ namespace Waher.Networking.PeerToPeer
 					}
 					catch (Exception ex)
 					{
-						Log.Exception(ex);
+						if (!this.disposed)
+							Log.Exception(ex);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				if (this.disposed)
-					return;
-
-				Log.Exception(ex);
+				if (!this.disposed)
+					Log.Exception(ex);
 			}
 		}
 
@@ -405,7 +405,8 @@ namespace Waher.Networking.PeerToPeer
 			}
 			catch (Exception ex)
 			{
-				Log.Exception(ex);
+				if (!this.disposed)
+					Log.Exception(ex);
 			}
 		}
 
@@ -466,7 +467,8 @@ namespace Waher.Networking.PeerToPeer
 					this.writeQueue.Clear();
 				}
 
-				Log.Exception(ex);
+				if (!this.disposed)
+					Log.Exception(ex);
 			}
 		}
 

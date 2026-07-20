@@ -54,7 +54,8 @@ namespace Waher.Mcp.Content
 				  typeof(InternetContentMcpServer).Assembly.GetName().Version.ToString(),
 				  "A Model Context Protocol (MCP) server resource permitting MCP clients " +
 				  "to access Internet Content using GET, POST, PUT, DELETE and QUERY methods, " +
-				  "as well as encoding and decoding Internet Content.",
+				  "as well as encoding and decoding Internet Content. Requests use the " +
+				  "server's certificate for mTLS, if such is available.",
 				  Icons,
 				  WebSiteUri,
 				  "Use the tools provided to access Internet Content securely. " +

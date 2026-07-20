@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Binary;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp;
 using Waher.Networking.HTTP.Mcp.Model;
@@ -100,8 +101,8 @@ namespace Waher.Mcp.Content
 			true,	// Idempotent
 			true)]	// OpenWorldAccess
 		[RequiredPrivilege(GetPrivilege)]
-		[return: McpParameter("Result", "Content received and decoded.")]
-		public async Task<object> Get(
+		[return: McpParameter("Result", "Internet content received.")]
+		public async Task<CustomEncoding> Get(
 			[McpUriParameter("URI", "URI of the resource to access.")]
 			Uri Uri,
 
@@ -111,19 +112,18 @@ namespace Waher.Mcp.Content
 			[McpStringParameter("Accept-Language", "Optional Accept-Language header to use when accessing the resource. It informs the web server what language you expect human-readable content to be written in.")]
 			string AcceptLanguage = "",
 
-			[McpIntegerParameter("Timeout", "Optional timeout in milliseconds for the request.", 1, 60000)]
-			int? Timeout = null,
+			[McpIntegerParameter("Timeout", "Timeout in milliseconds for the request.", 1, 60000)]
+			int Timeout = 30000,
 
 			[McpParameter("AdditionalHeaders", "Additional headers to include in the request.")]
-			Dictionary<string, string>? AdditionalHeaders = null)
+			Dictionary<string, object>? AdditionalHeaders = null)
 		{
 			ContentResponse Content = await InternetContent.GetAsync(Uri, Certificate,
-				Timeout ?? InternetContent.DefaultTimeout, 
-				GetHeaders(Accept, AcceptLanguage, AdditionalHeaders));
+				Timeout, GetHeaders(Accept, AcceptLanguage, AdditionalHeaders));
 
 			Content.AssertOk();
 
-			return Content.Decoded;
+			return new CustomEncoding(Content.ContentType, Content.Encoded, Uri);
 		}
 
 		private static X509Certificate? Certificate
@@ -141,7 +141,7 @@ namespace Waher.Mcp.Content
 		}
 
 		private static KeyValuePair<string, string>[] GetHeaders(string Accept,
-			string AcceptLanguage, Dictionary<string, string>? AdditionalHeaders)
+			string AcceptLanguage, Dictionary<string, object>? AdditionalHeaders)
 		{
 			ChunkedList<KeyValuePair<string, string>> Headers =
 				new ChunkedList<KeyValuePair<string, string>>(2 + (AdditionalHeaders?.Count ?? 0));
@@ -153,7 +153,13 @@ namespace Waher.Mcp.Content
 				Headers.Add(new KeyValuePair<string, string>("Accept-Language", AcceptLanguage));
 
 			if (!(AdditionalHeaders is null))
-				Headers.AddRange(AdditionalHeaders);
+			{
+				foreach (KeyValuePair<string, object> Header in AdditionalHeaders)
+				{
+					Headers.Add(new KeyValuePair<string, string>(Header.Key,
+						Header.Value?.ToString() ?? string.Empty));
+				}
+			}
 
 			return Headers.ToArray();
 		}
@@ -178,8 +184,8 @@ namespace Waher.Mcp.Content
 			false,  // Idempotent
 			true)]	// OpenWorldAccess
 		[RequiredPrivilege(PostPrivilege)]
-		[return: McpParameter("Result", "Content response received and decoded.")]
-		public async Task<object> Post(
+		[return: McpParameter("Result", "Internet content response received.")]
+		public async Task<CustomEncoding> Post(
 			[McpUriParameter("URI", "URI of the resource to access.")]
 			Uri Uri,
 
@@ -192,19 +198,18 @@ namespace Waher.Mcp.Content
 			[McpStringParameter("Accept-Language", "Optional Accept-Language header to use when accessing the resource. It informs the web server what language you expect human-readable content to be written in.")]
 			string AcceptLanguage = "",
 
-			[McpIntegerParameter("Timeout", "Optional timeout in milliseconds for the request.", 1, 60000)]
-			int? Timeout = null,
+			[McpIntegerParameter("Timeout", "Timeout in milliseconds for the request.", 1, 60000)]
+			int Timeout = 30000,
 
 			[McpParameter("AdditionalHeaders", "Additional headers to include in the request.")]
-			Dictionary<string, string>? AdditionalHeaders = null)
+			Dictionary<string, object>? AdditionalHeaders = null)
 		{
 			ContentResponse Content = await InternetContent.PostAsync(Uri, Payload,
-				Certificate, Timeout ?? InternetContent.DefaultTimeout,
-				GetHeaders(Accept, AcceptLanguage, AdditionalHeaders));
+				Certificate, Timeout, GetHeaders(Accept, AcceptLanguage, AdditionalHeaders));
 
 			Content.AssertOk();
 
-			return Content.Decoded;
+			return new CustomEncoding(Content.ContentType, Content.Encoded, Uri);
 		}
 
 		/// <summary>
@@ -227,8 +232,8 @@ namespace Waher.Mcp.Content
 			true,	// Idempotent
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(PutPrivilege)]
-		[return: McpParameter("Result", "Content response received and decoded.")]
-		public async Task<object> Put(
+		[return: McpParameter("Result", "Internet content response received.")]
+		public async Task<CustomEncoding> Put(
 			[McpUriParameter("URI", "URI of the resource to access.")]
 			Uri Uri,
 
@@ -241,19 +246,18 @@ namespace Waher.Mcp.Content
 			[McpStringParameter("Accept-Language", "Optional Accept-Language header to use when accessing the resource. It informs the web server what language you expect human-readable content to be written in.")]
 			string AcceptLanguage = "",
 
-			[McpIntegerParameter("Timeout", "Optional timeout in milliseconds for the request.", 1, 60000)]
-			int? Timeout = null,
+			[McpIntegerParameter("Timeout", "Timeout in milliseconds for the request.", 1, 60000)]
+			int Timeout = 30000,
 
 			[McpParameter("AdditionalHeaders", "Additional headers to include in the request.")]
-			Dictionary<string, string>? AdditionalHeaders = null)
+			Dictionary<string, object>? AdditionalHeaders = null)
 		{
 			ContentResponse Content = await InternetContent.PutAsync(Uri, Payload,
-				Certificate, Timeout ?? InternetContent.DefaultTimeout,
-				GetHeaders(Accept, AcceptLanguage, AdditionalHeaders));
+				Certificate, Timeout, GetHeaders(Accept, AcceptLanguage, AdditionalHeaders));
 
 			Content.AssertOk();
 
-			return Content.Decoded;
+			return new CustomEncoding(Content.ContentType, Content.Encoded, Uri);
 		}
 
 		/// <summary>
@@ -274,8 +278,8 @@ namespace Waher.Mcp.Content
 			false,  // Idempotent
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(DeletePrivilege)]
-		[return: McpParameter("Result", "Content received and decoded.")]
-		public async Task<object> Delete(
+		[return: McpParameter("Result", "Internet content received.")]
+		public async Task<CustomEncoding> Delete(
 			[McpUriParameter("URI", "URI of the resource to access.")]
 			Uri Uri,
 
@@ -285,19 +289,18 @@ namespace Waher.Mcp.Content
 			[McpStringParameter("Accept-Language", "Optional Accept-Language header to use when accessing the resource. It informs the web server what language you expect human-readable content to be written in.")]
 			string AcceptLanguage = "",
 
-			[McpIntegerParameter("Timeout", "Optional timeout in milliseconds for the request.", 1, 60000)]
-			int? Timeout = null,
+			[McpIntegerParameter("Timeout", "Timeout in milliseconds for the request.", 1, 60000)]
+			int Timeout = 30000,
 
 			[McpParameter("AdditionalHeaders", "Additional headers to include in the request.")]
-			Dictionary<string, string>? AdditionalHeaders = null)
+			Dictionary<string, object>? AdditionalHeaders = null)
 		{
 			ContentResponse Content = await InternetContent.DeleteAsync(Uri, Certificate,
-				Timeout ?? InternetContent.DefaultTimeout,
-				GetHeaders(Accept, AcceptLanguage, AdditionalHeaders));
+				Timeout, GetHeaders(Accept, AcceptLanguage, AdditionalHeaders));
 
 			Content.AssertOk();
 
-			return Content.Decoded;
+			return new CustomEncoding(Content.ContentType, Content.Encoded, Uri);
 		}
 
 		/// <summary>
@@ -320,8 +323,8 @@ namespace Waher.Mcp.Content
 			true,	// Idempotent
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(QueryPrivilege)]
-		[return: McpParameter("Result", "Content response received and decoded.")]
-		public async Task<object> Query(
+		[return: McpParameter("Result", "Internet content response received.")]
+		public async Task<CustomEncoding> Query(
 			[McpUriParameter("URI", "URI of the resource to access.")]
 			Uri Uri,
 
@@ -334,19 +337,18 @@ namespace Waher.Mcp.Content
 			[McpStringParameter("Accept-Language", "Optional Accept-Language header to use when accessing the resource. It informs the web server what language you expect human-readable content to be written in.")]
 			string AcceptLanguage = "",
 
-			[McpIntegerParameter("Timeout", "Optional timeout in milliseconds for the request.", 1, 60000)]
-			int? Timeout = null,
+			[McpIntegerParameter("Timeout", "Timeout in milliseconds for the request.", 1, 60000)]
+			int Timeout = 30000,
 
 			[McpParameter("AdditionalHeaders", "Additional headers to include in the request.")]
-			Dictionary<string, string>? AdditionalHeaders = null)
+			Dictionary<string, object>? AdditionalHeaders = null)
 		{
 			ContentResponse Content = await InternetContent.QueryAsync(Uri, Payload,
-				Certificate, Timeout ?? InternetContent.DefaultTimeout,
-				GetHeaders(Accept, AcceptLanguage, AdditionalHeaders));
+				Certificate, Timeout, GetHeaders(Accept, AcceptLanguage, AdditionalHeaders));
 
 			Content.AssertOk();
 
-			return Content.Decoded;
+			return new CustomEncoding(Content.ContentType, Content.Encoded, Uri);
 		}
 
 	}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Binary;
+using Waher.Content.Html;
 using Waher.Runtime.IO;
 
 namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
@@ -53,26 +54,34 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
 			CustomEncoding Encoded = (CustomEncoding)Content;
 
-			if (Encoded.ContentType.StartsWith("audio/", StringComparison.InvariantCultureIgnoreCase))
-			{
-				Result["type"] = "audio";
-				Result["data"] = Convert.ToBase64String(Encoded.Encoded);
-				Result["mimeType"] = Encoded.ContentType;
-			}
-			else if (Encoded.ContentType.StartsWith("image/", StringComparison.InvariantCultureIgnoreCase))
-			{
-				Result["type"] = "image";
-				Result["data"] = Convert.ToBase64String(Encoded.Encoded);
-				Result["mimeType"] = Encoded.ContentType;
-			}
-			else if (Encoded.ContentType.StartsWith("text/", StringComparison.InvariantCultureIgnoreCase))
+			if (Encoded.ContentType.StartsWith("text/plain", StringComparison.InvariantCultureIgnoreCase))
 			{
 				Result["type"] = "text";
 				Result["text"] = Strings.GetString(Encoded.Encoded, Encoding.UTF8);
 			}
+			else if (Encoded.ContentType.StartsWith("image/", StringComparison.InvariantCultureIgnoreCase))
+			{
+				Result["type"] = "image";
+				Result["mimeType"] = Encoded.ContentType;
+				Result["data"] = Convert.ToBase64String(Encoded.Encoded);
+			}
+			else if (Encoded.ContentType.StartsWith("audio/", StringComparison.InvariantCultureIgnoreCase))
+			{
+				Result["type"] = "audio";
+				Result["mimeType"] = Encoded.ContentType;
+				Result["data"] = Convert.ToBase64String(Encoded.Encoded);
+			}
 			else
-				throw new ArgumentException("Content type not supported.", nameof(Content));
-			
+			{
+				Result["type"] = "resource";
+				Result["resource"] = new Dictionary<string, object>()
+				{
+					{ "uri", Encoded.Uri?.OriginalString ?? string.Empty },
+					{ "mimeType", Encoded.ContentType },
+					{ "blob", Convert.ToBase64String(Encoded.Encoded) }
+				};
+			}
+
 			this.Annotate(Result);
 
 			return Task.FromResult(Result);

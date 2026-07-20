@@ -5,8 +5,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
+using Waher.Networking.HTTP.Mcp.Model.ContentBlocks;
 using Waher.Persistence;
 using Waher.Runtime.Collections;
+using Waher.Runtime.Inventory;
 using Waher.Script.Model;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Server
@@ -43,9 +45,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// "open world" of external entities. If false, the tool's domain of interaction 
 		/// is closed.</param>
 		/// <param name="MetaData">Meta-data associated with tool.</param>
-		public Tool(MethodInfo Method, string Title, string Description, 
-			string IconsMethod, bool CanModifyEnvironment, bool CanDestroyEnvironment, 
-			bool Idempotent, bool OpenWorldAccess, 
+		public Tool(MethodInfo Method, string Title, string Description,
+			string IconsMethod, bool CanModifyEnvironment, bool CanDestroyEnvironment,
+			bool Idempotent, bool OpenWorldAccess,
 			params KeyValuePair<string, object>[] MetaData)
 			: base(Method, false)
 		{
@@ -57,7 +59,37 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			this.Idempotent = Idempotent;
 			this.OpenWorldAccess = OpenWorldAccess;
 			this.MetaData = MetaData;
-			this.HasReturnValue = Method.ReturnType != typeof(void);
+			this.HasReturnValue = this.HasStructuredReturnValue = Method.ReturnType != typeof(void);
+
+			Type ReturnType = this.Method.ReturnType;
+
+			while (this.HasStructuredReturnValue)
+			{
+				if (HttpMcpServerResource.TryGetEncodingContentBlock(ReturnType,
+					out IContentBlock ContentBlock))
+				{
+					this.HasStructuredReturnValue = ContentBlock.IsStructuredContent;
+					break;
+				}
+				else if (typeof(IContentBlock).IsAssignableFrom(Method.ReturnType))
+				{
+					ContentBlock = (ContentBlock)Types.Instantiate(ReturnType);
+					if (!ContentBlock.IsStructuredContent)
+						this.HasStructuredReturnValue = false;
+					break;
+				}
+				else if (ReturnType.IsGenericType &&
+					ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+				{
+					Type[] TypeArguments = ReturnType.GetGenericArguments();
+					if (TypeArguments.Length == 1)
+						ReturnType = TypeArguments[0];
+					else
+						break;
+				}
+				else
+					break;
+			}
 		}
 
 		/// <summary>
@@ -121,6 +153,11 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		public bool HasReturnValue { get; }
 
 		/// <summary>
+		/// If the tool returns a structured return value.
+		/// </summary>
+		public bool HasStructuredReturnValue { get; }
+
+		/// <summary>
 		/// Converts object to a generic representation.
 		/// </summary>
 		/// <param name="Resource">MCP Server reference.</param>
@@ -157,7 +194,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			if (!this.icons.Empty)
 				Result.Add("icons", this.icons.ToJson());
 
-			if (this.HasReturnValue)
+			if (this.HasStructuredReturnValue)
 			{
 				McpParameterAttribute ReturnInfo = this.Method.ReturnParameter.GetCustomAttribute<McpParameterAttribute>(true);
 				IEnumerable<McpEnumValueAttribute>? EnumValues = this.Method.ReturnType.IsEnum ?

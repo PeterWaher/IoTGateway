@@ -92,6 +92,11 @@ namespace Waher.Networking.HTTP.Mcp
 			return Result;
 		}
 
+		internal static bool TryGetEncodingContentBlock(Type Type, out IContentBlock ContentBlock)
+		{
+			return contentBlocks.TryGetValue(Type, out ContentBlock);
+		}
+
 		/// <summary>
 		/// Abstract base class for HTTP-based Model Context Protocol (MCP) server resource.
 		/// </summary>

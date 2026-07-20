@@ -382,6 +382,9 @@
 	<Assembly fileName="Waher.Layout.Layout2D.dll" />
 	<Assembly fileName="Waher.Layout.Layout2D.pdb" />
 	<Assembly fileName="Waher.Layout.Layout2D.xml" />
+	<Assembly fileName="Waher.Mcp.Content.dll" />
+	<Assembly fileName="Waher.Mcp.Content.pdb" />
+	<Assembly fileName="Waher.Mcp.Content.xml" />
 	<Assembly fileName="Waher.Mcp.Events.dll" />
 	<Assembly fileName="Waher.Mcp.Events.pdb" />
 	<Assembly fileName="Waher.Mcp.Events.xml" />

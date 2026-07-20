@@ -1432,6 +1432,7 @@ namespace Waher.IoTGateway
 				Icon[] Icons = new Icon[] { FavIcon };
 				Uri WebSite = new Uri(GetUrl("/"));
 
+				webServer.Register(new Mcp.Content.InternetContentMcpServer("/MCP/Content", Icons, WebSite));
 				webServer.Register(new Mcp.Events.EventLogMcpServer("/MCP/EventLog", Icons, WebSite));
 
 				if (emoji1_24x24 is null)

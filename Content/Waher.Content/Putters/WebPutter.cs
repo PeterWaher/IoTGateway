@@ -52,7 +52,7 @@ namespace Waher.Content.Putters
 		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
 		/// </summary>
 		/// <param name="Uri">URI</param>
-		/// <param name="EncodedData">Encoded data to be puted.</param>
+		/// <param name="EncodedData">Encoded data to be put.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>

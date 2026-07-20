@@ -177,8 +177,8 @@ namespace Waher.Mcp.Content
 			true,	// CanDestroyEnvironment
 			false,  // Idempotent
 			true)]	// OpenWorldAccess
-		[RequiredPrivilege(GetPrivilege)]
-		[return: McpParameter("Result", "Content received and decoded.")]
+		[RequiredPrivilege(PostPrivilege)]
+		[return: McpParameter("Result", "Content response received and decoded.")]
 		public async Task<object> Post(
 			[McpUriParameter("URI", "URI of the resource to access.")]
 			Uri Uri,
@@ -199,6 +199,148 @@ namespace Waher.Mcp.Content
 			Dictionary<string, string>? AdditionalHeaders = null)
 		{
 			ContentResponse Content = await InternetContent.PostAsync(Uri, Payload,
+				Certificate, Timeout ?? InternetContent.DefaultTimeout,
+				GetHeaders(Accept, AcceptLanguage, AdditionalHeaders));
+
+			Content.AssertOk();
+
+			return Content.Decoded;
+		}
+
+		/// <summary>
+		/// Puts information to a resource on the Internet using the PUT method, and returns 
+		/// the content that is returned.
+		/// </summary>
+		/// <param name="Uri">The URI of the resource to access.</param>
+		/// <param name="Payload">The payload to put to the resource.</param>
+		/// <param name="Accept">The Accept header to use when retrieving the resource.</param>
+		/// <param name="AcceptLanguage">The Accept-Language header to use when retrieving the resource.</param>
+		/// <param name="Timeout">Optional timeout in milliseconds for the request.</param>
+		/// <param name="AdditionalHeaders">Additional headers to include in the request.</param>
+		/// <returns>The content received and decoded.</returns>
+		[McpServerTool(
+			"Put",  // Title
+			"Puts information to a resource on the Internet using the PUT method, and returns the content that is returned.",   // Description
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			true,   // CanDestroyEnvironment
+			true,	// Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(PutPrivilege)]
+		[return: McpParameter("Result", "Content response received and decoded.")]
+		public async Task<object> Put(
+			[McpUriParameter("URI", "URI of the resource to access.")]
+			Uri Uri,
+
+			[McpParameter("Payload", "The payload to put to the resource.")]
+			object? Payload = null,
+
+			[McpStringParameter("Accept", "Accept header to use when accessing the resource. It informs the web server what Internet Content-Type you are expecting the content of the response to be encoded with.")]
+			string Accept = "*/*",
+
+			[McpStringParameter("Accept-Language", "Optional Accept-Language header to use when accessing the resource. It informs the web server what language you expect human-readable content to be written in.")]
+			string AcceptLanguage = "",
+
+			[McpIntegerParameter("Timeout", "Optional timeout in milliseconds for the request.", 1, 60000)]
+			int? Timeout = null,
+
+			[McpParameter("AdditionalHeaders", "Additional headers to include in the request.")]
+			Dictionary<string, string>? AdditionalHeaders = null)
+		{
+			ContentResponse Content = await InternetContent.PutAsync(Uri, Payload,
+				Certificate, Timeout ?? InternetContent.DefaultTimeout,
+				GetHeaders(Accept, AcceptLanguage, AdditionalHeaders));
+
+			Content.AssertOk();
+
+			return Content.Decoded;
+		}
+
+		/// <summary>
+		/// Deletes content from the Internet, by accessing a resource using the DELETE method.
+		/// </summary>
+		/// <param name="Uri">The URI of the resource to access.</param>
+		/// <param name="Accept">The Accept header to use when retrieving the resource.</param>
+		/// <param name="AcceptLanguage">The Accept-Language header to use when retrieving the resource.</param>
+		/// <param name="Timeout">Optional timeout in milliseconds for the request.</param>
+		/// <param name="AdditionalHeaders">Additional headers to include in the request.</param>
+		/// <returns>The content received and decoded.</returns>
+		[McpServerTool(
+			"Delete",  // Title
+			"Deletes content from the Internet, by accessing a resource using the DELETE method.",   // Description
+			"",     // IconsMethod, use default icons
+			true,	// CanModifyEnvironment
+			true,	// CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(DeletePrivilege)]
+		[return: McpParameter("Result", "Content received and decoded.")]
+		public async Task<object> Delete(
+			[McpUriParameter("URI", "URI of the resource to access.")]
+			Uri Uri,
+
+			[McpStringParameter("Accept", "Accept header to use when accessing the resource. It informs the web server what Internet Content-Type you are expecting the content of the response to be encoded with.")]
+			string Accept = "*/*",
+
+			[McpStringParameter("Accept-Language", "Optional Accept-Language header to use when accessing the resource. It informs the web server what language you expect human-readable content to be written in.")]
+			string AcceptLanguage = "",
+
+			[McpIntegerParameter("Timeout", "Optional timeout in milliseconds for the request.", 1, 60000)]
+			int? Timeout = null,
+
+			[McpParameter("AdditionalHeaders", "Additional headers to include in the request.")]
+			Dictionary<string, string>? AdditionalHeaders = null)
+		{
+			ContentResponse Content = await InternetContent.DeleteAsync(Uri, Certificate,
+				Timeout ?? InternetContent.DefaultTimeout,
+				GetHeaders(Accept, AcceptLanguage, AdditionalHeaders));
+
+			Content.AssertOk();
+
+			return Content.Decoded;
+		}
+
+		/// <summary>
+		/// Queries information from a resource on the Internet using the QUERY method, and returns 
+		/// the content that is returned.
+		/// </summary>
+		/// <param name="Uri">The URI of the resource to access.</param>
+		/// <param name="Payload">The payload to send in the query to the resource.</param>
+		/// <param name="Accept">The Accept header to use when retrieving the resource.</param>
+		/// <param name="AcceptLanguage">The Accept-Language header to use when retrieving the resource.</param>
+		/// <param name="Timeout">Optional timeout in milliseconds for the request.</param>
+		/// <param name="AdditionalHeaders">Additional headers to include in the request.</param>
+		/// <returns>The content received and decoded.</returns>
+		[McpServerTool(
+			"Query",  // Title
+			"Queries information from a resource on the Internet using the QUERY method, and returns the content that is returned.",   // Description
+			"",     // IconsMethod, use default icons
+			false,  // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			true,	// Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(QueryPrivilege)]
+		[return: McpParameter("Result", "Content response received and decoded.")]
+		public async Task<object> Query(
+			[McpUriParameter("URI", "URI of the resource to access.")]
+			Uri Uri,
+
+			[McpParameter("Payload", "The payload to send in the query to the resource.")]
+			object? Payload = null,
+
+			[McpStringParameter("Accept", "Accept header to use when accessing the resource. It informs the web server what Internet Content-Type you are expecting the content of the response to be encoded with.")]
+			string Accept = "*/*",
+
+			[McpStringParameter("Accept-Language", "Optional Accept-Language header to use when accessing the resource. It informs the web server what language you expect human-readable content to be written in.")]
+			string AcceptLanguage = "",
+
+			[McpIntegerParameter("Timeout", "Optional timeout in milliseconds for the request.", 1, 60000)]
+			int? Timeout = null,
+
+			[McpParameter("AdditionalHeaders", "Additional headers to include in the request.")]
+			Dictionary<string, string>? AdditionalHeaders = null)
+		{
+			ContentResponse Content = await InternetContent.QueryAsync(Uri, Payload,
 				Certificate, Timeout ?? InternetContent.DefaultTimeout,
 				GetHeaders(Accept, AcceptLanguage, AdditionalHeaders));
 

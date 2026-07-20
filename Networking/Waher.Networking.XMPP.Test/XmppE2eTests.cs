@@ -78,10 +78,10 @@ namespace Waher.Networking.XMPP.Test
 
 		public override async Task DisposeClients()
 		{
+			await base.DisposeClients();
+			
 			this.endpointSecurity1?.Dispose();
 			this.endpointSecurity2?.Dispose();
-
-			await base.DisposeClients();
 		}
 
 		[TestMethod]

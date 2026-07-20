@@ -356,27 +356,30 @@ namespace Waher.Networking.HTTP.JsonRpc
 				}
 			}
 
-			foreach (KeyValuePair<string, object> P in Fields)
+			if (!(Fields is null))
 			{
-				if (!(P.Value is string s))
-					s = JSON.Encode(P.Value, false);
-
-				if (s.IndexOfAny(CommonTypes.CRLF) >= 0)
+				foreach (KeyValuePair<string, object> P in Fields)
 				{
-					foreach (string Line in s.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
+					if (!(P.Value is string s))
+						s = JSON.Encode(P.Value, false);
+
+					if (s.IndexOfAny(CommonTypes.CRLF) >= 0)
+					{
+						foreach (string Line in s.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
+						{
+							sb.Append(P.Key);
+							sb.Append(": ");
+							sb.Append(Line);
+							sb.Append("\r\n");
+						}
+					}
+					else
 					{
 						sb.Append(P.Key);
 						sb.Append(": ");
-						sb.Append(Line);
+						sb.Append(s);
 						sb.Append("\r\n");
 					}
-				}
-				else
-				{
-					sb.Append(P.Key);
-					sb.Append(": ");
-					sb.Append(s);
-					sb.Append("\r\n");
 				}
 			}
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Runtime.Inventory;
@@ -87,8 +88,21 @@ namespace Waher.Networking.HTTP.OAuth
 		/// is to be performed, null can be returned.</returns>
 		public override HttpAuthenticationScheme[]? GetAuthenticationSchemes(HttpRequest Request)
 		{
+			string s;
+
 			if (Request.Header.Authorization is null)
 				return null;
+
+			// If empty client_id is sent in a Basic Authorization header, do not consider
+			// it an authentication attempt.
+			if (!(Request.Header.Authorization is null) &&
+				(s = Request.Header.Authorization.Value).StartsWith("Basic "))
+			{
+				s = Encoding.UTF8.GetString(Convert.FromBase64String(s[6..]));
+				int i = s.IndexOf(':');
+				if (i == s.Length - 1)
+					return null;
+			}
 
 			this.InitAuthentication();
 

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Html.Elements;
 using Waher.Events;
 using Waher.Networking.HTTP.Authentication;
+using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Collections;
 using Waher.Runtime.IO;
@@ -255,8 +258,13 @@ namespace Waher.Networking.HTTP.OAuth
 						return;
 					}
 
-					if (!Form.TryGetValue("redirect_uri", out string RedirectUri) ||
-						!Form.TryGetValue("client_id", out ClientId))
+					if (!Form.TryGetValue("redirect_uri", out string RedirectUri))
+					{
+						await BadRequest(Response, "invalid_request", "Missing redirect_uri.");
+						return;
+					}
+
+					if (!TryGetClientId(Request, Form, out ClientId))
 					{
 						await BadRequest(Response, "invalid_request", "Missing client_id.");
 						return;
@@ -454,7 +462,7 @@ namespace Waher.Networking.HTTP.OAuth
 						return;
 					}
 
-					if (!Form.TryGetValue("client_id", out ClientId))
+					if (!TryGetClientId(Request, Form, out ClientId))
 					{
 						await BadRequest(Response, "invalid_request", "Missing client_id.");
 						return;
@@ -506,7 +514,7 @@ namespace Waher.Networking.HTTP.OAuth
 						return;
 					}
 
-					if (!Form.TryGetValue("client_id", out ClientId))
+					if (!TryGetClientId(Request, Form, out ClientId))
 					{
 						await BadRequest(Response, "invalid_request", "Missing client_id.");
 						return;
@@ -574,11 +582,35 @@ namespace Waher.Networking.HTTP.OAuth
 			Response.SetHeader("Pragma", "no-cache");
 
 			await Response.Return(this.TokenResponse(Token, null, 3600,
-				Scope, this.JwtFactory.Issuer, IssueRefreshToken, User, 
+				Scope, this.JwtFactory.Issuer, IssueRefreshToken, User,
 				Request, TokenFamily));
 		}
 
-		private async Task<string> CreateToken(IUserWithClaims User, bool Encrypted, 
+		private static bool TryGetClientId(HttpRequest Request, Dictionary<string, string> Form,
+			out string ClientId)
+		{
+			if (Form.TryGetValue("client_id", out ClientId))
+				return true;
+
+			string s;
+
+			if (!(Request.Header.Authorization is null) &&
+				(s = Request.Header.Authorization.Value).StartsWith("Basic "))
+			{
+				s = Encoding.UTF8.GetString(Convert.FromBase64String(s[6..]));
+				int i = s.IndexOf(':');
+				if (i > 0)
+				{
+					ClientId = s.Substring(0, i);
+					return true;
+				}
+			}
+
+			ClientId = string.Empty;
+			return false;
+		}
+
+		private async Task<string> CreateToken(IUserWithClaims User, bool Encrypted,
 			string Scope)
 		{
 			return await CreateToken(User, Encrypted, this.JwtFactory, Scope);

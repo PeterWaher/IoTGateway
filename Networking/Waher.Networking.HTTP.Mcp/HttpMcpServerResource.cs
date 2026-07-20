@@ -397,8 +397,8 @@ namespace Waher.Networking.HTTP.Mcp
 						},
 						{ "resources", new Dictionary<string, object>()
 							{
-								{ "subscribe", false },
-								{ "listChanged", false }	// TODO (for instance, when available resource change)
+								{ "subscribe", false },		// TODO (for instance, when available resources change)
+								{ "listChanged", false }	// TODO (for instance, when configuring what resources are available)
 							}
 						},
 						{ "tools", new Dictionary<string, object>()

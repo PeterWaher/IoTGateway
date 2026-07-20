@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Binary;
-using Waher.Content.Html;
 using Waher.Runtime.IO;
 
 namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks

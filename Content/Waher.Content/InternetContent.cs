@@ -31,6 +31,7 @@ namespace Waher.Content
 		private static string[] canPutToUriSchemes = null;
 		private static string[] canDeleteToUriSchemes = null;
 		private static string[] canHeadUriSchemes = null;
+		private static string[] canQueryUriSchemes = null;
 		private static IContentEncoder[] encoders = null;
 		private static IContentDecoder[] decoders = null;
 		private static IContentConverter[] converters = null;
@@ -39,6 +40,7 @@ namespace Waher.Content
 		private static IContentPutter[] putters = null;
 		private static IContentDeleter[] deleters = null;
 		private static IContentHeader[] headers = null;
+		private static IContentQuery[] queries = null;
 		private readonly static Dictionary<string, KeyValuePair<Grade, IContentDecoder>> decoderByContentType =
 			new Dictionary<string, KeyValuePair<Grade, IContentDecoder>>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, KeyValuePair<Grade, IContentEncoder>> encodersByType =
@@ -52,6 +54,7 @@ namespace Waher.Content
 		private readonly static Dictionary<string, IContentPutter[]> puttersByScheme = new Dictionary<string, IContentPutter[]>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, IContentDeleter[]> deletersByScheme = new Dictionary<string, IContentDeleter[]>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, IContentHeader[]> headersByScheme = new Dictionary<string, IContentHeader[]>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly static Dictionary<string, IContentQuery[]> queriesByScheme = new Dictionary<string, IContentQuery[]>(StringComparer.CurrentCultureIgnoreCase);
 		private static int defaultTimeout = 60000;
 		private static bool defaultTimeoutLocked = false;
 
@@ -1820,7 +1823,7 @@ namespace Waher.Content
 		#region Putting to resources
 
 		/// <summary>
-		/// Internet URI Schemes that can be putted to.
+		/// Internet URI Schemes that can be put to.
 		/// </summary>
 		public static string[] CanPutToUriSchemes
 		{
@@ -1906,12 +1909,12 @@ namespace Waher.Content
 		}
 
 		/// <summary>
-		/// If a resource can be putted to, given its URI.
+		/// If a resource can be put to, given its URI.
 		/// </summary>
 		/// <param name="Uri">URI of resource.</param>
 		/// <param name="Grade">How well the putted can put to the resource.</param>
 		/// <param name="Putter">Best putter for the URI.</param>
-		/// <returns>If a resource with the given URI can be putted to.</returns>
+		/// <returns>If a resource with the given URI can be put to.</returns>
 		public static bool CanPut(Uri Uri, out Grade Grade, out IContentPutter Putter)
 		{
 			if (Uri is null)
@@ -2044,7 +2047,7 @@ namespace Waher.Content
 		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
 		/// </summary>
 		/// <param name="Uri">URI</param>
-		/// <param name="EncodedData">Encoded data to be putted.</param>
+		/// <param name="EncodedData">Encoded data to be put.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
@@ -2057,7 +2060,7 @@ namespace Waher.Content
 		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
 		/// </summary>
 		/// <param name="Uri">URI</param>
-		/// <param name="EncodedData">Encoded data to be putted.</param>
+		/// <param name="EncodedData">Encoded data to be put.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
@@ -2071,7 +2074,7 @@ namespace Waher.Content
 		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
 		/// </summary>
 		/// <param name="Uri">URI</param>
-		/// <param name="EncodedData">Encoded data to be putted.</param>
+		/// <param name="EncodedData">Encoded data to be put.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
@@ -2090,7 +2093,7 @@ namespace Waher.Content
 		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
 		/// </summary>
 		/// <param name="Uri">URI</param>
-		/// <param name="EncodedData">Encoded data to be putted.</param>
+		/// <param name="EncodedData">Encoded data to be put.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=<see cref="InternetContent.DefaultTimeout"/>)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
@@ -2104,7 +2107,7 @@ namespace Waher.Content
 		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
 		/// </summary>
 		/// <param name="Uri">URI</param>
-		/// <param name="EncodedData">Encoded data to be putted.</param>
+		/// <param name="EncodedData">Encoded data to be put.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=<see cref="InternetContent.DefaultTimeout"/>)</param>
@@ -2119,7 +2122,7 @@ namespace Waher.Content
 		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
 		/// </summary>
 		/// <param name="Uri">URI</param>
-		/// <param name="EncodedData">Encoded data to be putted.</param>
+		/// <param name="EncodedData">Encoded data to be put.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
@@ -2572,6 +2575,326 @@ namespace Waher.Content
 				return Task.FromResult(new ContentResponse(new ArgumentException("URI Scheme not recognized (HEAD): " + Uri.Scheme, nameof(Uri))));
 
 			return Header.HeadAsync(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
+		}
+
+		#endregion
+
+		#region Querying resources
+
+		/// <summary>
+		/// Internet URI Schemes that can be queried.
+		/// </summary>
+		public static string[] CanQueryToUriSchemes
+		{
+			get
+			{
+				if (canQueryUriSchemes is null)
+				{
+					SortedDictionary<string, bool> UriSchemes = new SortedDictionary<string, bool>();
+
+					foreach (IContentQuery Query in Queries)
+					{
+						foreach (string Scheme in Query.UriSchemes)
+							UriSchemes[Scheme] = true;
+					}
+
+					string[] Schemes = new string[UriSchemes.Count];
+					UriSchemes.Keys.CopyTo(Schemes, 0);
+
+					canQueryUriSchemes = Schemes;
+				}
+
+				return canQueryUriSchemes;
+			}
+		}
+
+		/// <summary>
+		/// Available Internet Content Queries.
+		/// </summary>
+		public static IContentQuery[] Queries
+		{
+			get
+			{
+				if (queries is null)
+					BuildQueries();
+
+				return queries;
+			}
+		}
+
+		private static void BuildQueries()
+		{
+			ChunkedList<IContentQuery> Queries = new ChunkedList<IContentQuery>();
+			Type[] QueryTypes = Types.GetTypesImplementingInterface(typeof(IContentQuery));
+			Dictionary<string, ChunkedList<IContentQuery>> ByScheme = new Dictionary<string, ChunkedList<IContentQuery>>();
+			IContentQuery Query;
+
+			foreach (Type T in QueryTypes)
+			{
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
+					continue;
+
+				try
+				{
+					Query = (IContentQuery)CI.Invoke(Types.NoParameters);
+				}
+				catch (Exception)
+				{
+					continue;
+				}
+
+				Queries.Add(Query);
+
+				foreach (string Schema in Query.UriSchemes)
+				{
+					if (!ByScheme.TryGetValue(Schema, out ChunkedList<IContentQuery> List))
+					{
+						List = new ChunkedList<IContentQuery>();
+						ByScheme[Schema] = List;
+					}
+
+					List.Add(Query);
+				}
+			}
+
+			lock (queriesByScheme)
+			{
+				foreach (KeyValuePair<string, ChunkedList<IContentQuery>> P in ByScheme)
+					queriesByScheme[P.Key] = P.Value.ToArray();
+			}
+
+			queries = Queries.ToArray();
+		}
+
+		/// <summary>
+		/// If a resource can be queried, given its URI.
+		/// </summary>
+		/// <param name="Uri">URI of resource.</param>
+		/// <param name="Grade">How well the queried can query to the resource.</param>
+		/// <param name="Query">Best queryter for the URI.</param>
+		/// <returns>If a resource with the given URI can be queried.</returns>
+		public static bool CanQuery(Uri Uri, out Grade Grade, out IContentQuery Query)
+		{
+			if (Uri is null)
+			{
+				Grade = Grade.NotAtAll;
+				Query = null;
+				return false;
+			}
+
+			if (queries is null)
+				BuildQueries();
+
+			IContentQuery[] Queries;
+
+			lock (queriesByScheme)
+			{
+				if (Uri is null || !queriesByScheme.TryGetValue(Uri.Scheme, out Queries))
+				{
+					Query = null;
+					Grade = Grade.NotAtAll;
+					return false;
+				}
+			}
+
+			Grade = Grade.NotAtAll;
+			Query = null;
+
+			foreach (IContentQuery Query2 in Queries)
+			{
+				if (Query2.CanQuery(Uri, out Grade Grade2) && Grade2 > Grade)
+				{
+					Grade = Grade2;
+					Query = Query2;
+				}
+			}
+
+			return !(Query is null);
+		}
+
+		/// <summary>
+		/// Queries a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to query.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<ContentResponse> QueryAsync(Uri Uri, object Data, params KeyValuePair<string, string>[] Headers)
+		{
+			return QueryAsync(Uri, Data, null, null, Headers);
+		}
+
+		/// <summary>
+		/// Queries a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to query.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<ContentResponse> QueryAsync(Uri Uri, object Data, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		{
+			return QueryAsync(Uri, Data, Certificate, null, Headers);
+		}
+
+		/// <summary>
+		/// Queries a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to query.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<ContentResponse> QueryAsync(Uri Uri, object Data, X509Certificate Certificate,
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanQuery(Uri, out Grade _, out IContentQuery Query))
+				return Task.FromResult(new ContentResponse(new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri))));
+
+			return Query.QueryAsync(Uri, Data, Certificate, RemoteCertificateValidator, Headers);
+		}
+
+		/// <summary>
+		/// Queries a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to query.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=<see cref="InternetContent.DefaultTimeout"/>)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<ContentResponse> QueryAsync(Uri Uri, object Data, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			return QueryAsync(Uri, Data, null, null, TimeoutMs, Headers);
+		}
+
+		/// <summary>
+		/// Queries a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to query.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=<see cref="InternetContent.DefaultTimeout"/>)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<ContentResponse> QueryAsync(Uri Uri, object Data, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			return QueryAsync(Uri, Data, Certificate, null, TimeoutMs, Headers);
+		}
+
+		/// <summary>
+		/// Queries a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to query.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=<see cref="InternetContent.DefaultTimeout"/>)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<ContentResponse> QueryAsync(Uri Uri, object Data, X509Certificate Certificate,
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanQuery(Uri, out Grade _, out IContentQuery Query))
+				return Task.FromResult(new ContentResponse(new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri))));
+
+			return Query.QueryAsync(Uri, Data, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
+		}
+
+		/// <summary>
+		/// Queries a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="EncodedData">Encoded data to be queried.</param>
+		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Encoded response.</returns>
+		public static Task<ContentBinaryResponse> QueryAsync(Uri Uri, byte[] EncodedData, string ContentType, params KeyValuePair<string, string>[] Headers)
+		{
+			return QueryAsync(Uri, EncodedData, ContentType, null, null, Headers);
+		}
+
+		/// <summary>
+		/// Queries a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="EncodedData">Encoded data to be queried.</param>
+		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Encoded response.</returns>
+		public static Task<ContentBinaryResponse> QueryAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		{
+			return QueryAsync(Uri, EncodedData, ContentType, Certificate, null, Headers);
+		}
+
+		/// <summary>
+		/// Queries a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="EncodedData">Encoded data to be queried.</param>
+		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Encoded response.</returns>
+		public static Task<ContentBinaryResponse> QueryAsync(Uri Uri, byte[] EncodedData, string ContentType,
+			X509Certificate Certificate, EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanQuery(Uri, out Grade _, out IContentQuery Query))
+				return Task.FromResult(new ContentBinaryResponse(new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri))));
+
+			return Query.QueryAsync(Uri, EncodedData, ContentType, Certificate, RemoteCertificateValidator, Headers);
+		}
+
+		/// <summary>
+		/// Queries a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="EncodedData">Encoded data to be queried.</param>
+		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=<see cref="InternetContent.DefaultTimeout"/>)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Encoded response.</returns>
+		public static Task<ContentBinaryResponse> QueryAsync(Uri Uri, byte[] EncodedData, string ContentType, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			return QueryAsync(Uri, EncodedData, ContentType, null, null, TimeoutMs, Headers);
+		}
+
+		/// <summary>
+		/// Queries a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="EncodedData">Encoded data to be queried.</param>
+		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=<see cref="InternetContent.DefaultTimeout"/>)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Encoded response.</returns>
+		public static Task<ContentBinaryResponse> QueryAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			return QueryAsync(Uri, EncodedData, ContentType, Certificate, null, TimeoutMs, Headers);
+		}
+
+		/// <summary>
+		/// Queries a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="EncodedData">Encoded data to be queried.</param>
+		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=<see cref="InternetContent.DefaultTimeout"/>)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Encoded response.</returns>
+		public static Task<ContentBinaryResponse> QueryAsync(Uri Uri, byte[] EncodedData, string ContentType,
+			X509Certificate Certificate, EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanQuery(Uri, out Grade _, out IContentQuery Query))
+				return Task.FromResult(new ContentBinaryResponse(new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri))));
+
+			return Query.QueryAsync(Uri, EncodedData, ContentType, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 		}
 
 		#endregion

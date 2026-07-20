@@ -307,7 +307,7 @@ using A.I. agents.
 
 | Project                        | Type         | Link                                                       | Project description |
 |--------------------------------|--------------|------------------------------------------------------------|---------------------|
-| **Waher.Mcp.Content**          | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mcp.Content/) | The [Waher.Mcp.Content](Mcp/Waher.Mcp.Content) project provides an MCP Server for access to Internet Content. It contains tools for Getting, Posting, Putting, Deleting and Querying Internet resources. |
+| **Waher.Mcp.Content**          | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mcp.Content/) | The [Waher.Mcp.Content](Mcp/Waher.Mcp.Content) project provides an MCP Server for access to Internet Content. It contains tools for Getting, Posting, Putting, Deleting and Querying Internet resources, as well as encoding and decoding Internet Content. |
 | **Waher.Mcp.Events**           | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mcp.Events/)  | The [Waher.Mcp.Events](Mcp/Waher.Mcp.Events) project provides an MCP Server for the Event Log. It contains tools for logging and searching for events, as well as prompts to identify sensitive information in the log. |
 
 Mocks

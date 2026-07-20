@@ -8,6 +8,7 @@ using Waher.Content.Markdown.Web;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Events.Persistence;
+using Waher.Mcp.Content;
 using Waher.Mcp.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Brotli;
@@ -249,6 +250,8 @@ internal class Program
 				typeof(GraphEncoder).Assembly,
 				typeof(JsonRpcWebService).Assembly,
 				typeof(HttpMcpServerResource).Assembly,
+				typeof(InternetContentMcpServer).Assembly,
+				typeof(EventLogMcpServer).Assembly,
 				typeof(ObjectSerializer).Assembly,
 				typeof(FilesProvider).Assembly,
 				typeof(Database).Assembly,
@@ -378,6 +381,8 @@ internal class Program
 			WebServer.Register(new OAuthAuthorizeResource(Environment));
 			WebServer.Register(new AuthorizationServerMetaData(Environment));
 			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", [],
+				new Uri("https://example.org/")));
+			WebServer.Register(new InternetContentMcpServer("/MCP/Content", [],
 				new Uri("https://example.org/")));
 
 			Log.Informational("Web Server initialized.");

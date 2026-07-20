@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Html;
 using Waher.Content.Json;
 using Waher.Events;
 using Waher.Networking.HTTP.OAuth;
@@ -122,6 +123,17 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// If Server-Sent Events (SSE) are supported by the resource.
 		/// </summary>
 		public virtual bool SupportsServerSentEvents => false;
+
+		/// <summary>
+		/// If a Server-Sent Events (SSE) welcome message should be sent to clients 
+		/// with open subscriptions.
+		/// </summary>
+		public virtual bool SendSseWelcomeMessage => false;
+
+		/// <summary>
+		/// Server-Sent Events (SSE) welcome message, if one should be sent.
+		/// </summary>
+		public virtual string SseWelcomeMessage => string.Empty;
 
 		/// <summary>
 		/// OAUTH resource meta-data resource, if any registered.
@@ -456,7 +468,31 @@ namespace Waher.Networking.HTTP.JsonRpc
 				Response.StatusMessage = "OK";
 				Response.ContentType = "text/event-stream";
 				Response.EnableDirectTransfer();
-				await Response.WriteLine(":");
+
+				if (this.SendSseWelcomeMessage)
+				{
+					string s = this.SseWelcomeMessage;
+
+					if (string.IsNullOrEmpty(s))
+						await Response.Write(":\r\n");
+					else
+					{
+						StringBuilder sb = new StringBuilder();
+
+						foreach (string Line in s.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
+						{
+							sb.Append(": ");
+							sb.Append(Line);
+							sb.Append("\r\n");
+						}
+
+						sb.Append("\r\n");
+
+						await Response.Write(sb.ToString());
+					}
+				}
+				else
+					await Response.Write(":\r\n");
 
 				lock (this.eventSubscriptions)
 				{

@@ -188,6 +188,18 @@ namespace Waher.Networking.HTTP.Mcp
 		public override bool SupportsServerSentEvents => true;
 
 		/// <summary>
+		/// If a Server-Sent Events (SSE) welcome message should be sent to clients 
+		/// with open subscriptions.
+		/// </summary>
+		public override bool SendSseWelcomeMessage => true;
+
+		/// <summary>
+		/// Server-Sent Events (SSE) welcome message, if one should be sent.
+		/// </summary>
+		public override string SseWelcomeMessage => "Connected to MCP Server at " + 
+			this.ResourceName + ". This connection should be made using an MCP Client.";
+
+		/// <summary>
 		/// Name of server.
 		/// </summary>
 		public string Name { get; }

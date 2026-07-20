@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Content.Html.Elements;
 using Waher.Content.Images;
 using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc;
@@ -17,6 +15,7 @@ using Waher.Networking.HTTP.Mcp.Model.Server;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Runtime.Collections;
+using Waher.Runtime.Counters;
 using Waher.Runtime.Inventory;
 using Waher.Script.Model;
 using Waher.Security;
@@ -623,6 +622,11 @@ namespace Waher.Networking.HTTP.Mcp
 						User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty);
 				}
 
+				string UserName = User?.UserName ?? "N/A";
+
+				await RuntimeCounters.IncrementCounter("MCP.Tool." + Name);
+				await RuntimeCounters.IncrementCounter("MCP.User.Tool." + UserName);
+
 				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 
 				if (Tool.TryBuildRequest(Arguments, Request, Response, MetaData,
@@ -831,6 +835,11 @@ namespace Waher.Networking.HTTP.Mcp
 					throw ForbiddenException.AccessDenied(this.ResourceName,
 						User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty);
 				}
+
+				string UserName = User?.UserName ?? "N/A";
+
+				await RuntimeCounters.IncrementCounter("MCP.Prompt." + Name);
+				await RuntimeCounters.IncrementCounter("MCP.User.Prompt." + UserName);
 
 				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 

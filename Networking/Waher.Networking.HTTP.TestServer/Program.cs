@@ -22,6 +22,7 @@ using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.XmlLedger;
 using Waher.Runtime.Console;
+using Waher.Runtime.Counters;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Runtime.Profiling;
@@ -255,6 +256,7 @@ internal class Program
 				typeof(ObjectSerializer).Assembly,
 				typeof(FilesProvider).Assembly,
 				typeof(Database).Assembly,
+				typeof(RuntimeCounters).Assembly,
 				typeof(XmlFileLedger).Assembly,
 				typeof(PersistedEventLog).Assembly,
 				typeof(IThingReference).Assembly,

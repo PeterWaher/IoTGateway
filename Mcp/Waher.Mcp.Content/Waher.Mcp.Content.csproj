@@ -12,13 +12,13 @@
 		<Authors>Peter Waher</Authors>
 		<Company>Waher Data AB</Company>
 		<Product>Waher.IoTGateway</Product>
-		<Description>Provides an MCP Server for the Event Log. It contains tools for logging and searching for events, as well as prompts to identify sensitive information in the log.</Description>
+		<Description>Provides an MCP Server for access to Internet Content. It contains tools for Getting, Posting, Putting, Deleting and Querying Internet resources.</Description>
 		<Copyright>Copyright © Waher Data AB 2026. All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.HTTP.Mcp</PackageProjectUrl>
 		<PackageIcon>Icon_64x64.png</PackageIcon>
 		<RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
 		<RepositoryType>GitHub</RepositoryType>
-		<PackageTags>networking communication http MCP event log</PackageTags>
+		<PackageTags>networking communication http MCP internet content</PackageTags>
 	</PropertyGroup>
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -32,8 +32,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-    <ProjectReference Include="..\..\Events\Waher.Events.Persistence\Waher.Events.Persistence.csproj" />
-    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\..\Networking\Waher.Networking.HTTP.Mcp\Waher.Networking.HTTP.Mcp.csproj" />
     <ProjectReference Include="..\..\Networking\Waher.Networking.HTTP.OAuth\Waher.Networking.HTTP.OAuth.csproj" />
     <ProjectReference Include="..\..\Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />

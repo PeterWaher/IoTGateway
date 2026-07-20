@@ -305,9 +305,10 @@ The [Mcp](Mcp) folder contains projects that implement different Model Context P
 servers and services. These can be used to automate different features published on the gateway
 using A.I. agents.
 
-| Project                        | Type         | Link                                                    | Project description |
-|--------------------------------|--------------|---------------------------------------------------------|---------------------|
-| **Waher.Mcp.Events**           | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mock/)     | The [Waher.Mock](Mocks/Waher.Mock) project is a class library that provides support for simple mock applications. This includes simple network configuration. |
+| Project                        | Type         | Link                                                       | Project description |
+|--------------------------------|--------------|------------------------------------------------------------|---------------------|
+| **Waher.Mcp.Content**          | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mcp.Content/) | The [Waher.Mcp.Content](Mcp/Waher.Mcp.Content) project provides an MCP Server for access to Internet Content. It contains tools for Getting, Posting, Putting, Deleting and Querying Internet resources. |
+| **Waher.Mcp.Events**           | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mcp.Events/)  | The [Waher.Mcp.Events](Mcp/Waher.Mcp.Events) project provides an MCP Server for the Event Log. It contains tools for logging and searching for events, as well as prompts to identify sensitive information in the log. |
 
 Mocks
 ----------------------

@@ -25,7 +25,7 @@ namespace Waher.Content.Markdown.Web
 			{
 				return new string[]
 				{
-					"application/xml+iotsc"
+					"application/iotsc+xml"
 				};
 			}
 		}

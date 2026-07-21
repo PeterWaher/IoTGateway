@@ -25,7 +25,7 @@ namespace Waher.Content.Markdown.Web
 			{
 				return new string[]
 				{
-					"application/xml+xamarin"
+					"application/xamarin+xml"
 				};
 			}
 		}

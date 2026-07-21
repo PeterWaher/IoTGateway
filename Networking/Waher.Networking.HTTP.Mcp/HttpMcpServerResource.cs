@@ -27,7 +27,7 @@ namespace Waher.Networking.HTTP.Mcp
 	/// Abstract base class for HTTP-based Model Context Protocol (MCP) server resource.
 	/// </summary>
 	[OAuthScopesSupported(true, "McpScopesSupported")]
-	public abstract class HttpMcpServerResource : JsonRpcWebService, IDisposable
+	public abstract class HttpMcpServerResource : JsonRpcWebService
 	{
 		/// <summary>
 		/// Scope suffix for MCP server tools is ":tools".
@@ -55,8 +55,7 @@ namespace Waher.Networking.HTTP.Mcp
 		private readonly string[] resourceScopes;
 		private readonly string[] scopesSupported;
 		private readonly bool hasScopes;
-		private bool requiresAuthentication = false;
-		private bool disposed = false;
+		private bool requiresAuthentication;
 
 		private static Dictionary<Type, IContentBlock> GetContentBlocksFirstTime()
 		{
@@ -144,6 +143,7 @@ namespace Waher.Networking.HTTP.Mcp
 			this.promptScopes = new string[c];
 			this.resourceScopes = new string[c];
 			this.scopesSupported = new string[c * 3];
+			this.requiresAuthentication = this.ResourcesRequireAuthentication;
 
 			for (i = j = 0; i < c; i++)
 			{
@@ -243,18 +243,6 @@ namespace Waher.Networking.HTTP.Mcp
 		public string[] McpScopesSupported()
 		{
 			return this.scopesSupported;
-		}
-
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
-		public void Dispose()
-		{
-			if (!this.disposed)
-			{
-				this.disposed = true;
-				this.Dispose();
-			}
 		}
 
 		/// <summary>
@@ -990,6 +978,12 @@ namespace Waher.Networking.HTTP.Mcp
 		}
 
 		/// <summary>
+		/// If resources published by the MCP Server require authentication. If true, 
+		/// the client must authenticate before resources can be listed or read.
+		/// </summary>
+		public virtual bool ResourcesRequireAuthentication => false;
+
+		/// <summary>
 		/// Lists available MCP server resources.
 		/// </summary>
 		/// <param name="Request">HTTP request object.</param>
@@ -1121,7 +1115,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="User">MCP Client user requesting resources.</param>
 		/// <param name="Uri">URI of resource.</param>
 		/// <returns>Resource, if found (and user has access rights to it), null otherwise.</returns>
-		public virtual Task<Resource?> TryGetResource(HttpRequest Request, IUser? User, 
+		public virtual Task<Resource?> TryGetResource(HttpRequest Request, IUser? User,
 			Uri Uri)
 		{
 			return Task.FromResult<Resource?>(null);
@@ -1134,15 +1128,22 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="User">MCP Client user whose resources have been updated.</param>
 		/// <remarks>If multiple updates are done simultaneously, only call this
 		/// method once at the end, not for each update.</remarks>
-		public virtual async Task ResourcesUpdated(IUser User)
+		public virtual async void ResourcesUpdated(IUser User)
 		{
-			// TODO: Only to clients who has resources that have been updated.
-
-			await this.SendNotification(new Dictionary<string, object>()
+			try
 			{
-				{ "jsonrpc", "2.0" },
-				{ "method", "notifications/resources/list_changed" }
-			});
+				// TODO: Only to clients who has resources that have been updated.
+
+				await this.SendNotification(new Dictionary<string, object>()
+				{
+					{ "jsonrpc", "2.0" },
+					{ "method", "notifications/resources/list_changed" }
+				});
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
 		private Task SendNotification(Dictionary<string, object> Notification)
@@ -1157,20 +1158,27 @@ namespace Waher.Networking.HTTP.Mcp
 		/// </summary>
 		/// <param name="User">MCP Client user whose resource has been updated.</param>
 		/// <param name="Uri">The URI of the updated resource.</param>
-		public virtual Task ResourceUpdated(IUser User, Uri Uri)
+		public virtual async void ResourceUpdated(IUser User, Uri Uri)
 		{
-			// TODO: Only to subscribers
-
-			return this.SendNotification(new Dictionary<string, object>()
+			try
 			{
-				{ "jsonrpc", "2.0" },
-				{ "method", "notifications/resources/updated" },
-				{ "params", new Dictionary<string, object>()
-					{
-						{ "uri", Uri.OriginalString }
-					}
-				},
-			});
+				// TODO: Only to subscribers
+
+				await this.SendNotification(new Dictionary<string, object>()
+				{
+					{ "jsonrpc", "2.0" },
+					{ "method", "notifications/resources/updated" },
+					{ "params", new Dictionary<string, object>()
+						{
+							{ "uri", Uri.OriginalString }
+						}
+					},
+				});
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 	}
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP;
@@ -18,7 +20,7 @@ namespace Waher.Mcp.Files
 	/// </summary>
 	[OAuthResourceName("Account-Specific File Storage MCP Server")]
 	[McpScopeRoot("MCP:Files")]
-	public class FileStorageMcpServer : HttpMcpServerResource
+	public class FileStorageMcpServer : HttpMcpServerResource, IDisposable
 	{
 		internal const string BasePrivilege = OAuthResource.OAuthScopePrivilegePrefix + "MCP.Files";
 		internal const string ToolsPrivilege = BasePrivilege + ".Tools";
@@ -27,7 +29,11 @@ namespace Waher.Mcp.Files
 		internal const string WritePrivilege = ToolsPrivilege + ".Write";
 		internal const string DeletePrivilege = ToolsPrivilege + ".Delete";
 
+		private readonly Dictionary<string, UsageRec> users;
 		private readonly string rootFolder;
+		private readonly FileSystemWatcher watcher;
+		private readonly int userNameStart;
+		private bool disposed = false;
 
 		/// <summary>
 		/// MCP Server resource for access to account-specific file storage.
@@ -91,7 +97,60 @@ namespace Waher.Mcp.Files
 
 			if (!Directory.Exists(this.rootFolder))
 				Directory.CreateDirectory(this.rootFolder);
+
+			this.users = new Dictionary<string, UsageRec>();
+			this.userNameStart = this.rootFolder.Length;
+
+			if (!this.rootFolder.EndsWith(Path.DirectorySeparatorChar) &&
+				!this.rootFolder.EndsWith('/'))
+			{
+				this.userNameStart++;
+			}
+
+			this.watcher = new FileSystemWatcher(this.rootFolder, "*.*")
+			{
+				IncludeSubdirectories = true,
+				EnableRaisingEvents = true,
+				InternalBufferSize = 65536,
+				NotifyFilter =
+					NotifyFilters.Attributes |
+					NotifyFilters.CreationTime |
+					NotifyFilters.DirectoryName |
+					NotifyFilters.FileName |
+					NotifyFilters.LastAccess |
+					NotifyFilters.LastWrite |
+					NotifyFilters.Security |
+					NotifyFilters.Size
+			};
+			this.watcher.Created += this.UpdateResourceList;
+			this.watcher.Renamed += this.UpdateResourceList;
+			this.watcher.Deleted += this.UpdateResourceList;
+			this.watcher.Changed += this.UpdateResource;
 		}
+
+		private class UsageRec
+		{
+			public IUser? User;
+			public string? Url;
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+			if (!this.disposed)
+			{
+				this.disposed = true;
+				this.watcher.Dispose();
+			}
+		}
+
+		/// <summary>
+		/// If resources published by the MCP Server require authentication. If true, 
+		/// the client must authenticate before resources can be listed or read.
+		/// </summary>
+		public override bool ResourcesRequireAuthentication => true;
 
 		/// <summary>
 		/// Gets available resources.
@@ -104,20 +163,33 @@ namespace Waher.Mcp.Files
 			if (User is null)
 				return Task.FromResult(Array.Empty<Resource>());
 
-			string Folder = Path.Combine(this.rootFolder, User.UserName);
+			string UserName = User.UserName;
+			string Folder = Path.Combine(this.rootFolder, UserName);
 			if (!Directory.Exists(Folder))
+			{
+				Directory.CreateDirectory(Folder);
 				return Task.FromResult(Array.Empty<Resource>());
+			}
 
 			string[] Files = Directory.GetFiles(Folder, "*.*", SearchOption.AllDirectories);
 			int i, c = Files.Length;
 			Resource[] Resources = new Resource[c];
 			string ResourceName = Request.Header.GetURL(false, false);
 
+			lock (this.users)
+			{
+				this.users[UserName] = new UsageRec()
+				{
+					User = User,
+					Url = ResourceName
+				};
+			}
+
 			for (i = 0; i < c; i++)
 			{
 				string FullFileName = Files[i];
-				string FileName = FullFileName[Folder.Length..];
-				string Uri = ResourceName + FileName.Replace(Path.DirectorySeparatorChar, '/');
+				string FileName = FullFileName[(Folder.Length + 1)..];
+				string Uri = ResourceName + '/' + FileName.Replace(Path.DirectorySeparatorChar, '/');
 				FileInfo FileInfo = new FileInfo(FullFileName);
 
 				Resources[i] = new FileResource(FileName, string.Empty, string.Empty,
@@ -126,5 +198,99 @@ namespace Waher.Mcp.Files
 
 			return Task.FromResult(Resources);
 		}
+
+		/// <summary>
+		/// Tries to get a resource, given its URI.
+		/// </summary>
+		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="User">MCP Client user requesting resources.</param>
+		/// <param name="Uri">URI of resource.</param>
+		/// <returns>Resource, if found (and user has access rights to it), null otherwise.</returns>
+		public override Task<Resource?> TryGetResource(HttpRequest Request, IUser? User,
+			Uri Uri)
+		{
+			if (User is null)
+				return Task.FromResult<Resource?>(null);
+
+			string UserName = User.UserName;
+			string FileName = Uri.OriginalString;
+			string ResourceName = Request.Header.GetURL(false, false);
+
+			if (!FileName.StartsWith(ResourceName))
+				return Task.FromResult<Resource?>(null);
+
+			int c = ResourceName.Length;
+			if (!ResourceName.EndsWith('/'))
+				c++;
+
+			FileName = FileName[c..].Replace('/', Path.DirectorySeparatorChar);
+
+			lock (this.users)
+			{
+				this.users[UserName] = new UsageRec()
+				{
+					User = User,
+					Url = ResourceName
+				};
+			}
+
+			string Folder = Path.Combine(this.rootFolder, UserName);
+			if (!Directory.Exists(Folder))
+			{
+				Directory.CreateDirectory(Folder);
+				return Task.FromResult<Resource?>(null);
+			}
+
+			FileName = Path.Combine(Folder, FileName);
+			if (!File.Exists(FileName))
+				return Task.FromResult<Resource?>(null);
+
+			FileInfo FileInfo = new FileInfo(FileName);
+
+			return Task.FromResult<Resource?>(new FileResource(FileName, string.Empty,
+				string.Empty, Uri, FileName, null, FileInfo.Length));
+		}
+
+		private void UpdateResourceList(object sender, FileSystemEventArgs e)
+		{
+			if (this.TryGetUser(e.FullPath, out UsageRec? Usage, out _))
+				this.ResourcesUpdated(Usage.User!);
+		}
+
+		private bool TryGetUser(string FileName, [NotNullWhen(true)] out UsageRec? Rec,
+			[NotNullWhen(true)] out string? LocalFileName)
+		{
+			Rec = null;
+			LocalFileName = null;
+
+			if (!FileName.StartsWith(this.rootFolder))
+				return false;
+
+			int i = FileName.IndexOf(Path.DirectorySeparatorChar, this.userNameStart);
+			if (i < 0)
+				return false;
+
+			string UserName = FileName[this.userNameStart..i];
+			LocalFileName = FileName[(i + 1)..];
+
+			lock (this.users)
+			{
+				if (!this.users.TryGetValue(UserName, out Rec))
+					return false;
+			}
+
+			return true;
+		}
+
+		private void UpdateResource(object sender, FileSystemEventArgs e)
+		{
+			if (this.TryGetUser(e.FullPath, out UsageRec? Rec, out string? LocalFileName))
+			{
+				string Url = Rec.Url + '/' + LocalFileName.Replace(Path.DirectorySeparatorChar, '/');
+
+				this.ResourceUpdated(Rec.User!, new Uri(Url));
+			}
+		}
+
 	}
 }

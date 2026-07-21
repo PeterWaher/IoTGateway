@@ -383,7 +383,6 @@ namespace Waher.Networking.HTTP.Mcp.Model.Resources
 			this.readBinary = Read;
 		}
 
-
 		/// <summary>
 		/// Reads the resource.
 		/// </summary>

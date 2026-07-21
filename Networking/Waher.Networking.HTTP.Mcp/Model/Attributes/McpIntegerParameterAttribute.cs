@@ -80,7 +80,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// Annotates a schema object with information in the attribute.
 		/// </summary>
 		/// <param name="Schema">Schema object being built.</param>
-		public override void Annotate(Dictionary<string, object?> Schema)
+		public override void Annotate(Dictionary<string, object> Schema)
 		{
 			base.Annotate(Schema);
 

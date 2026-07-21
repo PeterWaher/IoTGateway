@@ -307,10 +307,10 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			return Result;
 		}
 
-		private static Dictionary<string, object?> GenerateOutputSchema(Type ReturnType,
+		private static Dictionary<string, object> GenerateOutputSchema(Type ReturnType,
 			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute>? EnumValues)
 		{
-			Dictionary<string, object?> Result = new Dictionary<string, object?>()
+			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
 				{ "type", "object" },
 				{ "result", GenerateSchema(ReturnType, false, null, ParameterInfo, EnumValues) },
@@ -338,7 +338,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		private static object GenerateSchema(Type T, bool HasDefault, object? Default,
 			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute>? EnumValues)
 		{
-			Dictionary<string, object?> Result = new Dictionary<string, object?>();
+			Dictionary<string, object> Result = new Dictionary<string, object>();
 
 			if (T.IsEnum)
 			{
@@ -411,7 +411,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 							Result["type"] = "array";
 							Result["items"] = GenerateSchema(T.GetElementType()!, false, null, null, null);
 						}
-						else if (T == typeof(Dictionary<string, object?>))
+						else if (T == typeof(Dictionary<string, object>))
 						{
 							Result["type"] = "object";
 							//Result["additionalProperties"] = true;// new Dictionary<string, object>();
@@ -430,7 +430,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 								}
 							}
 
-							Dictionary<string, object?> Properties = new Dictionary<string, object?>();
+							Dictionary<string, object> Properties = new Dictionary<string, object>();
 
 							Result["type"] = "object";
 							Result["properties"] = Properties;
@@ -555,9 +555,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <param name="Arguments">Ordered set of typed arguments, to be used in a
 		/// call to the method.</param>
 		/// <returns>If able to prepare a request to the method.</returns>
-		public bool TryBuildRequest(Dictionary<string, object?> Parameters,
+		public bool TryBuildRequest(Dictionary<string, object> Parameters,
 			HttpRequest Request, HttpResponse Response,
-			Dictionary<string, object?>? MetaData,
+			Dictionary<string, object>? MetaData,
 			[NotNullWhen(false)] out string? Reason,
 			[NotNullWhen(true)] out object?[]? Arguments)
 		{

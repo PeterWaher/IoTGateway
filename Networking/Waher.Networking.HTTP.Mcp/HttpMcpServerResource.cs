@@ -12,6 +12,7 @@ using Waher.Networking.HTTP.Mcp.Model;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Networking.HTTP.Mcp.Model.Client;
 using Waher.Networking.HTTP.Mcp.Model.ContentBlocks;
+using Waher.Networking.HTTP.Mcp.Model.Resources;
 using Waher.Networking.HTTP.Mcp.Model.Server;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
@@ -56,7 +57,7 @@ namespace Waher.Networking.HTTP.Mcp
 		private readonly string[] resourceScopes;
 		private readonly string[] scopesSupported;
 		private readonly bool hasScopes;
-		private Resource[]? resources = null;
+		private Dictionary<Uri, Resource>? resources = null;
 		private bool requiresAuthentication = false;
 		private bool disposed = false;
 
@@ -656,15 +657,15 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="_Meta">Associated meta-data, if available.</param>
 		/// <returns>Dictionary containing the result of the tool call.</returns>
 		[JsonRpcMethod]
-		protected async Task<Dictionary<string, object?>?> Tools_Call(HttpRequest Request,
-			HttpResponse Response, string Name, Dictionary<string, object?> Arguments,
+		protected async Task<Dictionary<string, object>?> Tools_Call(HttpRequest Request,
+			HttpResponse Response, string Name, Dictionary<string, object> Arguments,
 			object? Task = null, [JsonRpcMetaDataArgument] object? _Meta = null)
 		{
 			IUser? User = await this.GetAuthenticatedUser(Request, Response);
 			if (Response.ResponseSent)
 				return null;
 
-			Dictionary<string, object?> Result = new Dictionary<string, object?>();
+			Dictionary<string, object> Result = new Dictionary<string, object>();
 			object? ToolResult;
 
 			try
@@ -685,7 +686,7 @@ namespace Waher.Networking.HTTP.Mcp
 				await RuntimeCounters.IncrementCounter("MCP.Tool." + Name);
 				await RuntimeCounters.IncrementCounter("MCP.User.Tool." + UserName);
 
-				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
+				Dictionary<string, object>? MetaData = _Meta as Dictionary<string, object>;
 
 				if (Tool.TryBuildRequest(Arguments, Request, Response, MetaData,
 					out string? Reason, out object?[]? Arguments2))
@@ -707,17 +708,17 @@ namespace Waher.Networking.HTTP.Mcp
 
 			if (ToolResult is null)
 				Result["content"] = Array.Empty<object>();
-			else if (ToolResult is Dictionary<string, object?> StructuredContent)
+			else if (ToolResult is Dictionary<string, object> StructuredContent)
 			{
 				Result["content"] = new object[]
 				{
-					new Dictionary<string, object?>()
+					new Dictionary<string, object>()
 					{
 						{ "type", "text" },
 						{ "text", JSON.Encode(StructuredContent, false) }
 					}
 				};
-				Result["structuredContent"] = new Dictionary<string, object?>()
+				Result["structuredContent"] = new Dictionary<string, object>()
 				{
 					{ "result", StructuredContent }
 				};
@@ -734,13 +735,13 @@ namespace Waher.Networking.HTTP.Mcp
 
 						Result["content"] = new object[]
 						{
-							new Dictionary<string, object?>()
+							new Dictionary<string, object>()
 							{
 								{ "type", "text" },
 								{ "text", JSON.Encode(StructuredContent, false) }
 							}
 						};
-						Result["structuredContent"] = new Dictionary<string, object?>()
+						Result["structuredContent"] = new Dictionary<string, object>()
 						{
 							{ "result", StructuredContent }
 						};
@@ -774,13 +775,13 @@ namespace Waher.Networking.HTTP.Mcp
 
 					Result["content"] = new object[]
 					{
-						new Dictionary<string, object?>()
+						new Dictionary<string, object>()
 						{
 							{ "type", "text" },
 							{ "text", JSON.Encode(StructuredContent, false) }
 						}
 					};
-					Result["structuredContent"] = new Dictionary<string, object?>()
+					Result["structuredContent"] = new Dictionary<string, object>()
 					{
 						{ "result", StructuredContent }
 					};
@@ -869,15 +870,15 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="_Meta">Associated meta-data, if available.</param>
 		/// <returns>Dictionary containing the result of the tool call.</returns>
 		[JsonRpcMethod]
-		protected async Task<Dictionary<string, object?>?> Prompts_Get(HttpRequest Request,
-			HttpResponse Response, string Name, Dictionary<string, object?> Arguments,
+		protected async Task<Dictionary<string, object>?> Prompts_Get(HttpRequest Request,
+			HttpResponse Response, string Name, Dictionary<string, object> Arguments,
 			[JsonRpcMetaDataArgument] object? _Meta = null)
 		{
 			IUser? User = await this.GetAuthenticatedUser(Request, Response);
 			if (Response.ResponseSent)
 				return null;
 
-			Dictionary<string, object?> Result = new Dictionary<string, object?>();
+			Dictionary<string, object> Result = new Dictionary<string, object>();
 			object? PromptResult;
 
 			try
@@ -898,7 +899,7 @@ namespace Waher.Networking.HTTP.Mcp
 				await RuntimeCounters.IncrementCounter("MCP.Prompt." + Name);
 				await RuntimeCounters.IncrementCounter("MCP.User.Prompt." + UserName);
 
-				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
+				Dictionary<string, object>? MetaData = _Meta as Dictionary<string, object>;
 
 				if (Prompt.TryBuildRequest(Arguments, Request, Response, MetaData,
 					out string? Reason, out object?[]? Arguments2))
@@ -962,11 +963,11 @@ namespace Waher.Networking.HTTP.Mcp
 
 			int i = 0;
 			int c = Messages.Count;
-			Dictionary<string, object?>[] EncodedMessages = new Dictionary<string, object?>[c];
+			Dictionary<string, object>[] EncodedMessages = new Dictionary<string, object>[c];
 
 			foreach (PromptMessage Message in Messages)
 			{
-				Dictionary<string, object?> Content;
+				Dictionary<string, object> Content;
 
 				if (Message.IsEncoded)
 					Content = Message.Encoded!;
@@ -979,7 +980,7 @@ namespace Waher.Networking.HTTP.Mcp
 					Content = await Encoder.Encode(Message.Content);
 				}
 
-				EncodedMessages[i++] = new Dictionary<string, object?>()
+				EncodedMessages[i++] = new Dictionary<string, object>()
 				{
 					{ "role", Message.Role.ToString().ToLower() },
 					{ "content", Content }
@@ -1022,9 +1023,10 @@ namespace Waher.Networking.HTTP.Mcp
 			await this.syncObj.WaitAsync();
 			try
 			{
-				this.resources ??= await this.GetResources();
+				if (this.resources is null)
+					await this.InitResourcesLocked();
 
-				foreach (Resource Resource in this.resources)
+				foreach (Resource Resource in this.resources!.Values)
 				{
 					if (!Resource.IsAuthorized(User))
 						continue;
@@ -1064,7 +1066,75 @@ namespace Waher.Networking.HTTP.Mcp
 			Result["resources"] = ResourcesJson;
 
 			return Result;
+		}
 
+		private async Task InitResourcesLocked()
+		{
+			this.resources = new Dictionary<Uri, Resource>();
+
+			foreach (Resource Resource in await this.GetResources())
+				this.resources[Resource.Uri] = Resource;
+		}
+
+		/// <summary>
+		/// Reads an MCP server resource.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Uri">URI of the resource to read.</param>
+		/// <param name="_Meta">Associated meta-data, if available.</param>
+		/// <returns>Dictionary containing the result of the tool call.</returns>
+		[JsonRpcMethod]
+		protected async Task<Dictionary<string, object>?> Resources_Read(HttpRequest Request,
+			HttpResponse Response, Uri Uri, [JsonRpcMetaDataArgument] object? _Meta = null)
+		{
+			IUser? User = await this.GetAuthenticatedUser(Request, Response);
+			if (Response.ResponseSent)
+				return null;
+
+			Resource? Resource;
+
+			await this.syncObj.WaitAsync();
+			try
+			{
+				if (this.resources is null)
+					await this.InitResourcesLocked();
+
+				if (!this.resources!.TryGetValue(Uri, out Resource))
+					throw new NotFoundException("Resource not found: " + Uri);
+			}
+			finally
+			{
+				this.syncObj.Release();
+			}
+
+			Resource.AssertAuthorized(this.ResourceName, User);
+
+			if (!this.CheckScopes(User, this.resourceScopes, out string? MissingPrivilege))
+			{
+				throw ForbiddenException.AccessDenied(this.ResourceName,
+					User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty);
+			}
+
+			string UserName = User?.UserName ?? "N/A";
+
+			await RuntimeCounters.IncrementCounter("MCP.Resource." + Resource.Name);
+			await RuntimeCounters.IncrementCounter("MCP.User.Resource." + UserName);
+
+			Dictionary<string, object>? MetaData = _Meta as Dictionary<string, object>;
+
+			IResourceContent[] Content = await Resource.Read(MetaData);
+			int i, c = Content.Length;
+
+			Dictionary<string, object>[] Contents = new Dictionary<string, object>[c];
+
+			for (i = 0; i < c; i++)
+				Contents[i] = Content[i].Encode();
+
+			return new Dictionary<string, object>()
+			{
+				{ "contents",Contents }
+			};
 		}
 
 		/// <summary>
@@ -1087,7 +1157,7 @@ namespace Waher.Networking.HTTP.Mcp
 			await this.syncObj.WaitAsync();
 			try
 			{
-				this.resources = await this.GetResources();
+				await this.InitResourcesLocked();
 			}
 			finally
 			{
@@ -1126,7 +1196,6 @@ namespace Waher.Networking.HTTP.Mcp
 					}
 				},
 			});
-
 		}
 	}
 }

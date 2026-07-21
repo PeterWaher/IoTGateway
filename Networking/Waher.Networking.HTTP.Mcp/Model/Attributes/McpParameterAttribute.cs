@@ -36,7 +36,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// Annotates a schema object with information in the attribute.
 		/// </summary>
 		/// <param name="Schema">Schema object being built.</param>
-		public virtual void Annotate(Dictionary<string, object?> Schema)
+		public virtual void Annotate(Dictionary<string, object> Schema)
 		{
 			if (!string.IsNullOrEmpty(this.Title))
 				Schema["title"] = this.Title;

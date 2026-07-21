@@ -46,13 +46,13 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		/// </summary>
 		/// <param name="Content">Content to encode.</param>
 		/// <returns>MCP-encoded content block.</returns>
-		public override Task<Dictionary<string, object?>> Encode(object Content)
+		public override Task<Dictionary<string, object>> Encode(object Content)
 		{
 			// TODO: Resource-object
 			// TODO: EmbeddedResource
 
 			Uri Uri = (Uri)Content;
-			Dictionary<string, object?> Result = new Dictionary<string, object?>()
+			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
 				{ "type", "resource_link" },
 				{ "uri", Uri.ToString() }

@@ -38,10 +38,10 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		/// </summary>
 		/// <param name="Content">Content to encode.</param>
 		/// <returns>MCP-encoded content block.</returns>
-		public override async Task<Dictionary<string, object?>> Encode(object Content)
+		public override async Task<Dictionary<string, object>> Encode(object Content)
 		{
-			Dictionary<string, object?> Properties = new Dictionary<string, object?>();
-			Dictionary<string, object?> Result = new Dictionary<string, object?>()
+			Dictionary<string, object> Properties = new Dictionary<string, object>();
+			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
 				{ "type", "object" },
 				{ "properties", Properties }

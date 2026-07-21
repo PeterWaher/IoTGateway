@@ -12,12 +12,12 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		/// <summary>
 		/// What types the content block encodes.
 		/// </summary>
-		public abstract Type[] Encodes { get; }
+		Type[] Encodes { get; }
 
 		/// <summary>
 		/// If the content block is encoded as structured content.
 		/// </summary>
-		public bool IsStructuredContent { get; }
+		bool IsStructuredContent { get; }
 
 		/// <summary>
 		/// Encodes a content block, given the content to encode and available
@@ -25,6 +25,6 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		/// </summary>
 		/// <param name="Content">Content to encode.</param>
 		/// <returns>MCP-encoded content block.</returns>
-		public abstract Task<Dictionary<string, object?>> Encode(object Content);
+		Task<Dictionary<string, object>> Encode(object Content);
 	}
 }

@@ -17,7 +17,7 @@ namespace Waher.Networking.HTTP.Mcp.Model
 			this.Role = Role;
 			this.Content = Content;
 
-			if (Content is Dictionary<string, object?> Encoded)
+			if (Content is Dictionary<string, object> Encoded)
 			{
 				this.Encoded = Encoded;
 				this.IsEncoded = true;
@@ -34,7 +34,7 @@ namespace Waher.Networking.HTTP.Mcp.Model
 		/// </summary>
 		/// <param name="Role">Role of recipient of message.</param>
 		/// <param name="Content">Encoded content of the message.</param>
-		public PromptMessage(McpRole Role, Dictionary<string, object?> Content)
+		public PromptMessage(McpRole Role, Dictionary<string, object> Content)
 		{
 			this.Role = Role;
 			this.Content = Content;
@@ -60,6 +60,6 @@ namespace Waher.Networking.HTTP.Mcp.Model
 		/// <summary>
 		/// Encoded content.
 		/// </summary>
-		public Dictionary<string, object?>? Encoded { get; }
+		public Dictionary<string, object>? Encoded { get; }
 	}
 }

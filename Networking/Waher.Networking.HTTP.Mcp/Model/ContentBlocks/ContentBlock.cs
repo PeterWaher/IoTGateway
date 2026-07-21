@@ -48,13 +48,13 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		/// </summary>
 		/// <param name="Content">Content to encode.</param>
 		/// <returns>MCP-encoded content block.</returns>
-		public abstract Task<Dictionary<string, object?>> Encode(object Content);
+		public abstract Task<Dictionary<string, object>> Encode(object Content);
 
 		/// <summary>
 		/// Annotates an object.
 		/// </summary>
 		/// <param name="Object">Object to annotate.</param>
-		public override void Annotate(Dictionary<string, object?> Object)
+		public override void Annotate(Dictionary<string, object> Object)
 		{
 			base.Annotate(Object);
 

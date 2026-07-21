@@ -216,40 +216,8 @@ namespace Waher.Networking.HTTP.Mcp.Model.Resources
 
 			return new IResourceContent[]
 			{
-				new TextContent(s, this.ContentType, MetaData)
+				new TextContent(this.Uri, s, this.ContentType, MetaData)
 			};
-		}
-
-		private class TextContent : IResourceContent
-		{
-			private readonly string text;
-			private readonly string? contentType;
-			private readonly Dictionary<string, object>? metaData;
-
-			public TextContent(string Text, string? ContentType,
-				Dictionary<string, object>? MetaData)
-			{
-				this.text = Text;
-				this.contentType = ContentType;
-				this.metaData = MetaData;
-			}
-
-			public Dictionary<string, object> Encode()
-			{
-				Dictionary<string, object> Result = new Dictionary<string, object>
-				{
-					{ "type", "text" },
-					{ "text", this.text }
-				};
-
-				if (!string.IsNullOrEmpty(this.contentType))
-					Result["mimeType"] = this.contentType;
-
-				if (!(this.metaData is null))
-					Result["_meta"] = this.metaData;
-
-				return Result;
-			}
 		}
 	}
 }

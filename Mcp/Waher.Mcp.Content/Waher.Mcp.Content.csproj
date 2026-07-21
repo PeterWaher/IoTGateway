@@ -14,7 +14,7 @@
 		<Product>Waher.IoTGateway</Product>
 		<Description>Provides an MCP Server for access to Internet Content. It contains tools for Getting, Posting, Putting, Deleting and Querying Internet resources, as well as encoding and decoding Internet Content.</Description>
 		<Copyright>Copyright © Waher Data AB 2026. All rights reserved.</Copyright>
-		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.HTTP.Mcp</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Mcp.Content</PackageProjectUrl>
 		<PackageIcon>Icon_64x64.png</PackageIcon>
 		<RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
 		<RepositoryType>GitHub</RepositoryType>

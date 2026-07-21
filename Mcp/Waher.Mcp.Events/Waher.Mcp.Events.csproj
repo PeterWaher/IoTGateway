@@ -14,7 +14,7 @@
 		<Product>Waher.IoTGateway</Product>
 		<Description>Provides an MCP Server for the Event Log. It contains tools for logging and searching for events, as well as prompts to identify sensitive information in the log.</Description>
 		<Copyright>Copyright © Waher Data AB 2026. All rights reserved.</Copyright>
-		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.HTTP.Mcp</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Mcp.Events</PackageProjectUrl>
 		<PackageIcon>Icon_64x64.png</PackageIcon>
 		<RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
 		<RepositoryType>GitHub</RepositoryType>

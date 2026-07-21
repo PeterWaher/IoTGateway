@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Waher.Content.Xml;
 
-namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
+namespace Waher.Networking.HTTP.Mcp.Model
 {
 	/// <summary>
 	/// Abstract base class for annotated objects.
@@ -19,6 +19,16 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		/// <summary>
 		/// Abstract base class for annotated objects.
 		/// </summary>
+		/// <param name="Audience">Describes who the intended audience of this object or 
+		/// data is. It can include multiple entries to indicate content useful for multiple 
+		/// audiences(e.g., `["user", "assistant"]`).</param>
+		/// <param name="Priority">Describes how important this data is for operating the 
+		/// server. A value of 1 means "most important," and indicates that the data is
+		/// effectively required, while 0 means "least important," and indicates that
+		/// the data is entirely optional.</param>
+		/// <param name="LastModified">The moment the resource was last modified.
+		/// Examples: last activity timestamp in an open file timestamp when the resource 
+		/// was attached, etc.</param>
 		public Annotations(McpRole[]? Audience, double? Priority, DateTime? LastModified)
 		{
 			this.Audience = Audience;
@@ -51,10 +61,18 @@ namespace Waher.Networking.HTTP.Mcp.Model.ContentBlocks
 		public DateTime? LastModified { get; }
 
 		/// <summary>
+		/// If the object has annotations.
+		/// </summary>
+		public bool HasAnnotations => 
+			!(this.Audience is null) || 
+			this.Priority.HasValue || 
+			this.LastModified.HasValue;
+
+		/// <summary>
 		/// Annotates an object.
 		/// </summary>
 		/// <param name="Object">Object to annotate.</param>
-		public virtual void Annotate(Dictionary<string, object?> Object)
+		public virtual void Annotate(Dictionary<string, object> Object)
 		{
 			if (!(this.Audience is null))
 			{

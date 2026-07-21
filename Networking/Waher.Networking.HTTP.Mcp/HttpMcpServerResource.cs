@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Images;
@@ -26,7 +27,7 @@ namespace Waher.Networking.HTTP.Mcp
 	/// Abstract base class for HTTP-based Model Context Protocol (MCP) server resource.
 	/// </summary>
 	[OAuthScopesSupported(true, "McpScopesSupported")]
-	public abstract class HttpMcpServerResource : JsonRpcWebService
+	public abstract class HttpMcpServerResource : JsonRpcWebService, IDisposable
 	{
 		/// <summary>
 		/// Scope suffix for MCP server tools is ":tools".
@@ -48,13 +49,16 @@ namespace Waher.Networking.HTTP.Mcp
 		private const int PageSize = 20;
 		private readonly Dictionary<string, Tool> tools = new Dictionary<string, Tool>();
 		private readonly Dictionary<string, Prompt> prompts = new Dictionary<string, Prompt>();
+		private readonly SemaphoreSlim syncObj = new SemaphoreSlim(1);
 		private readonly string[] rootScopes;
 		private readonly string[] toolScopes;
 		private readonly string[] promptScopes;
 		private readonly string[] resourceScopes;
 		private readonly string[] scopesSupported;
 		private readonly bool hasScopes;
+		private Resource[]? resources = null;
 		private bool requiresAuthentication = false;
+		private bool disposed = false;
 
 		private static Dictionary<Type, IContentBlock> GetContentBlocksFirstTime()
 		{
@@ -156,13 +160,13 @@ namespace Waher.Networking.HTTP.Mcp
 				if (Method.GetCustomAttribute<McpServerToolAttribute>() is
 					McpServerToolAttribute McpServerToolAttribute)
 				{
-					this.RegisterTool(Method, McpServerToolAttribute);
+					this.RegisterToolNoNotification(Method, McpServerToolAttribute);
 				}
 
 				if (Method.GetCustomAttribute<McpServerPromptAttribute>() is
 					McpServerPromptAttribute McpServerPromptAttribute)
 				{
-					this.RegisterPrompt(Method, McpServerPromptAttribute);
+					this.RegisterPromptNoNotification(Method, McpServerPromptAttribute);
 				}
 			}
 		}
@@ -196,7 +200,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Server-Sent Events (SSE) welcome message, if one should be sent.
 		/// </summary>
-		public override string SseWelcomeMessage => "Connected to MCP Server at " + 
+		public override string SseWelcomeMessage => "Connected to MCP Server at " +
 			this.ResourceName + ". This connection should be made using an MCP Client.";
 
 		/// <summary>
@@ -244,11 +248,23 @@ namespace Waher.Networking.HTTP.Mcp
 		}
 
 		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+			if (!this.disposed)
+			{
+				this.disposed = true;
+				this.Dispose();
+			}
+		}
+
+		/// <summary>
 		/// Registers a MCP Server tool.
 		/// </summary>
 		/// <param name="Method">Method to call when tool is invoked.</param>
 		/// <param name="Attributes">Attributes associated with tool</param>
-		public void RegisterTool(MethodInfo Method, McpServerToolAttribute Attributes)
+		private void RegisterToolNoNotification(MethodInfo Method, McpServerToolAttribute Attributes)
 		{
 			lock (this.tools)
 			{
@@ -266,9 +282,22 @@ namespace Waher.Networking.HTTP.Mcp
 
 				this.requiresAuthentication |= Tool.RequiresAuthentication;
 			}
+		}
 
-			// TODO: Send notification to clients about new tool.
-			// TODO: Declare tool notification in capabilities.
+		/// <summary>
+		/// Registers a MCP Server tool.
+		/// </summary>
+		/// <param name="Method">Method to call when tool is invoked.</param>
+		/// <param name="Attributes">Attributes associated with tool</param>
+		public Task RegisterTool(MethodInfo Method, McpServerToolAttribute Attributes)
+		{
+			this.RegisterToolNoNotification(Method, Attributes);
+
+			return this.SendNotification(new Dictionary<string, object>()
+			{
+				{ "jsonrpc", "2.0" },
+				{ "method", "notifications/tools/list_changed" }
+			});
 		}
 
 		/// <summary>
@@ -276,7 +305,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// </summary>
 		/// <param name="Method">Method to call when prompt is invoked.</param>
 		/// <param name="Attributes">Attributes associated with prompt</param>
-		public void RegisterPrompt(MethodInfo Method, McpServerPromptAttribute Attributes)
+		private void RegisterPromptNoNotification(MethodInfo Method, McpServerPromptAttribute Attributes)
 		{
 			lock (this.prompts)
 			{
@@ -292,9 +321,22 @@ namespace Waher.Networking.HTTP.Mcp
 
 				this.requiresAuthentication |= Prompt.RequiresAuthentication;
 			}
+		}
 
-			// TODO: Send notification to clients about new prompt.
-			// TODO: Declare prompt notification in capabilities.
+		/// <summary>
+		/// Registers a MCP Server prompt.
+		/// </summary>
+		/// <param name="Method">Method to call when prompt is invoked.</param>
+		/// <param name="Attributes">Attributes associated with prompt</param>
+		public Task RegisterPrompt(MethodInfo Method, McpServerPromptAttribute Attributes)
+		{
+			this.RegisterPromptNoNotification(Method, Attributes);
+
+			return this.SendNotification(new Dictionary<string, object>()
+			{
+				{ "jsonrpc", "2.0" },
+				{ "method", "notifications/prompts/list_changed" }
+			});
 		}
 
 		/// <summary>
@@ -392,18 +434,18 @@ namespace Waher.Networking.HTTP.Mcp
 					{
 						{ "prompts", new Dictionary<string, object>()
 							{
-								{ "listChanged", false }	// TODO (for instance, when configuring or editing what prompts are available)
+								{ "listChanged", true }
 							}
 						},
 						{ "resources", new Dictionary<string, object>()
 							{
 								{ "subscribe", false },		// TODO (for instance, when available resources change)
-								{ "listChanged", false }	// TODO (for instance, when configuring what resources are available)
+								{ "listChanged", true }
 							}
 						},
 						{ "tools", new Dictionary<string, object>()
 							{
-								{ "listChanged", false }	// TODO (for instance, when configuring what tools are available)
+								{ "listChanged", true }
 							}
 						},
 						{ "logging", new Dictionary<string, object>() },
@@ -478,7 +520,6 @@ namespace Waher.Networking.HTTP.Mcp
 			}
 
 			ChunkedList<Tool> Tools = new ChunkedList<Tool>();
-			Dictionary<string, object>[] ToolsJson;
 			int Next = Offset + MaxCount;
 
 			Dictionary<string, object> Result = new Dictionary<string, object>();
@@ -513,7 +554,7 @@ namespace Waher.Networking.HTTP.Mcp
 			int i = 0;
 			int c = Tools.Count;
 
-			ToolsJson = new Dictionary<string, object>[c];
+			Dictionary<string, object>[] ToolsJson = new Dictionary<string, object>[c];
 
 			foreach (Tool Tool in Tools)
 				ToolsJson[i++] = await Tool.ToJson(this);
@@ -774,7 +815,6 @@ namespace Waher.Networking.HTTP.Mcp
 			}
 
 			ChunkedList<Prompt> Prompts = new ChunkedList<Prompt>();
-			Dictionary<string, object>[] PromptsJson;
 			int Next = Offset + MaxCount;
 
 			Dictionary<string, object> Result = new Dictionary<string, object>();
@@ -809,7 +849,7 @@ namespace Waher.Networking.HTTP.Mcp
 			int i = 0;
 			int c = Prompts.Count;
 
-			PromptsJson = new Dictionary<string, object>[c];
+			Dictionary<string, object>[] PromptsJson = new Dictionary<string, object>[c];
 
 			foreach (Prompt Prompt in Prompts)
 				PromptsJson[i++] = await Prompt.ToJson(this);
@@ -966,12 +1006,127 @@ namespace Waher.Networking.HTTP.Mcp
 			if (Response.ResponseSent)
 				return null;
 
-			// TODO: resources/list
+			int Offset = 0;
+			int MaxCount = PageSize;
 
-			return new Dictionary<string, object>()
+			if (!string.IsNullOrEmpty(Cursor))
 			{
-				{ "resources", Array.Empty<Dictionary<string, object>>() }
-			};
+				if (!int.TryParse(Cursor, out Offset) || Offset < 0)
+					throw new Exception("Invalid cursor.");
+			}
+
+			ChunkedList<Resource> Resources = new ChunkedList<Resource>();
+			Dictionary<string, object> Result = new Dictionary<string, object>();
+			int Next = Offset + MaxCount;
+
+			await this.syncObj.WaitAsync();
+			try
+			{
+				this.resources ??= await this.GetResources();
+
+				foreach (Resource Resource in this.resources)
+				{
+					if (!Resource.IsAuthorized(User))
+						continue;
+
+					if (!this.CheckScopes(User, this.resourceScopes, out _))
+						continue;
+
+					if (MaxCount <= 0)
+					{
+						Result["nextCursor"] = Next.ToString();
+						break;
+					}
+
+					if (Offset > 0)
+					{
+						Offset--;
+						continue;
+					}
+
+					Resources.Add(Resource);
+					MaxCount--;
+				}
+			}
+			finally
+			{
+				this.syncObj.Release();
+			}
+
+			int i = 0;
+			int c = Resources.Count;
+
+			Dictionary<string, object>[] ResourcesJson = new Dictionary<string, object>[c];
+
+			foreach (Resource Resource in Resources)
+				ResourcesJson[i++] = Resource.ToJson();
+
+			Result["resources"] = ResourcesJson;
+
+			return Result;
+
+		}
+
+		/// <summary>
+		/// Gets available resources.
+		/// </summary>
+		/// <returns>Array of resources.</returns>
+		public virtual Task<Resource[]> GetResources()
+		{
+			return Task.FromResult(Array.Empty<Resource>());
+		}
+
+		/// <summary>
+		/// Called when the resources have been updated (new resources added,
+		/// existing resources updated or removed.)
+		/// </summary>
+		/// <remarks>If multiple updates are done simultaneously, only call this
+		/// method once at the end, not for each update.</remarks>
+		public virtual async Task ResourcesUpdated()
+		{
+			await this.syncObj.WaitAsync();
+			try
+			{
+				this.resources = await this.GetResources();
+			}
+			finally
+			{
+				this.syncObj.Release();
+			}
+
+			await this.SendNotification(new Dictionary<string, object>()
+			{
+				{ "jsonrpc", "2.0" },
+				{ "method", "notifications/resources/list_changed" }
+			});
+		}
+
+		private Task SendNotification(Dictionary<string, object> Notification)
+		{
+			return this.SendEvent(
+				new KeyValuePair<string, object>("event", "message"),
+				new KeyValuePair<string, object>("data", JSON.Encode(Notification, false)));
+		}
+
+		/// <summary>
+		/// Called when a single resource has been updated.
+		/// </summary>
+		/// <param name="Uri">The URI of the updated resource.</param>
+		public virtual Task ResourceUpdated(Uri Uri)
+		{
+			// TODO: Only to subscribers
+
+			return this.SendNotification(new Dictionary<string, object>()
+			{
+				{ "jsonrpc", "2.0" },
+				{ "method", "notifications/resources/updated" },
+				{ "params", new Dictionary<string, object>()
+					{
+						{ "uri", Uri.OriginalString }
+					}
+				},
+			});
+
 		}
 	}
 }

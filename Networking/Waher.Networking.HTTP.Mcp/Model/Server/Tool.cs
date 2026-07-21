@@ -188,7 +188,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			if (!string.IsNullOrEmpty(this.Title))
 				Result.Add("title", this.Title);
 
-			if (!string.IsNullOrEmpty(this.Title))
+			if (!string.IsNullOrEmpty(this.Description))
 				Result.Add("description", this.Description);
 
 			if (!this.icons.Empty)

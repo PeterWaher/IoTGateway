@@ -338,7 +338,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		private static object GenerateSchema(Type T, bool HasDefault, object? Default,
 			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute>? EnumValues)
 		{
-			Dictionary<string, object> Result = new Dictionary<string, object>();
+			Dictionary<string, object?> Result = new Dictionary<string, object?>();
 
 			if (T.IsEnum)
 			{
@@ -555,9 +555,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <param name="Arguments">Ordered set of typed arguments, to be used in a
 		/// call to the method.</param>
 		/// <returns>If able to prepare a request to the method.</returns>
-		public bool TryBuildRequest(Dictionary<string, object> Parameters,
+		public bool TryBuildRequest(Dictionary<string, object?> Parameters,
 			HttpRequest Request, HttpResponse Response,
-			Dictionary<string, object>? MetaData,
+			Dictionary<string, object?>? MetaData,
 			[NotNullWhen(false)] out string? Reason,
 			[NotNullWhen(true)] out object?[]? Arguments)
 		{

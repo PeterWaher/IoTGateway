@@ -654,15 +654,15 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="_Meta">Associated meta-data, if available.</param>
 		/// <returns>Dictionary containing the result of the tool call.</returns>
 		[JsonRpcMethod]
-		protected async Task<Dictionary<string, object>?> Tools_Call(HttpRequest Request,
-			HttpResponse Response, string Name, Dictionary<string, object> Arguments,
+		protected async Task<Dictionary<string, object?>?> Tools_Call(HttpRequest Request,
+			HttpResponse Response, string Name, Dictionary<string, object?> Arguments,
 			object? Task = null, [JsonRpcMetaDataArgument] object? _Meta = null)
 		{
 			IUser? User = await this.GetAuthenticatedUser(Request, Response);
 			if (Response.ResponseSent)
 				return null;
 
-			Dictionary<string, object> Result = new Dictionary<string, object>();
+			Dictionary<string, object?> Result = new Dictionary<string, object?>();
 			object? ToolResult;
 
 			try
@@ -683,7 +683,7 @@ namespace Waher.Networking.HTTP.Mcp
 				await RuntimeCounters.IncrementCounter("MCP.Tool." + Name);
 				await RuntimeCounters.IncrementCounter("MCP.User.Tool." + UserName);
 
-				Dictionary<string, object>? MetaData = _Meta as Dictionary<string, object>;
+				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 
 				if (Tool.TryBuildRequest(Arguments, Request, Response, MetaData,
 					out string? Reason, out object?[]? Arguments2))
@@ -867,15 +867,15 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="_Meta">Associated meta-data, if available.</param>
 		/// <returns>Dictionary containing the result of the tool call.</returns>
 		[JsonRpcMethod]
-		protected async Task<Dictionary<string, object>?> Prompts_Get(HttpRequest Request,
-			HttpResponse Response, string Name, Dictionary<string, object> Arguments,
+		protected async Task<Dictionary<string, object?>?> Prompts_Get(HttpRequest Request,
+			HttpResponse Response, string Name, Dictionary<string, object?> Arguments,
 			[JsonRpcMetaDataArgument] object? _Meta = null)
 		{
 			IUser? User = await this.GetAuthenticatedUser(Request, Response);
 			if (Response.ResponseSent)
 				return null;
 
-			Dictionary<string, object> Result = new Dictionary<string, object>();
+			Dictionary<string, object?> Result = new Dictionary<string, object?>();
 			object? PromptResult;
 
 			try
@@ -896,7 +896,7 @@ namespace Waher.Networking.HTTP.Mcp
 				await RuntimeCounters.IncrementCounter("MCP.Prompt." + Name);
 				await RuntimeCounters.IncrementCounter("MCP.User.Prompt." + UserName);
 
-				Dictionary<string, object>? MetaData = _Meta as Dictionary<string, object>;
+				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 
 				if (Prompt.TryBuildRequest(Arguments, Request, Response, MetaData,
 					out string? Reason, out object?[]? Arguments2))

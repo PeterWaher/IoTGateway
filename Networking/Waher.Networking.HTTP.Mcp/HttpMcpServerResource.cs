@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Images;
@@ -50,14 +49,12 @@ namespace Waher.Networking.HTTP.Mcp
 		private const int PageSize = 20;
 		private readonly Dictionary<string, Tool> tools = new Dictionary<string, Tool>();
 		private readonly Dictionary<string, Prompt> prompts = new Dictionary<string, Prompt>();
-		private readonly SemaphoreSlim syncObj = new SemaphoreSlim(1);
 		private readonly string[] rootScopes;
 		private readonly string[] toolScopes;
 		private readonly string[] promptScopes;
 		private readonly string[] resourceScopes;
 		private readonly string[] scopesSupported;
 		private readonly bool hasScopes;
-		private Dictionary<Uri, Resource>? resources = null;
 		private bool requiresAuthentication = false;
 		private bool disposed = false;
 
@@ -1016,43 +1013,33 @@ namespace Waher.Networking.HTTP.Mcp
 					throw new Exception("Invalid cursor.");
 			}
 
+			Resource[] AllResources = await this.GetResources(Request, User);
 			ChunkedList<Resource> Resources = new ChunkedList<Resource>();
 			Dictionary<string, object> Result = new Dictionary<string, object>();
 			int Next = Offset + MaxCount;
 
-			await this.syncObj.WaitAsync();
-			try
+			foreach (Resource Resource in AllResources)
 			{
-				if (this.resources is null)
-					await this.InitResourcesLocked();
+				if (!Resource.IsAuthorized(User))
+					continue;
 
-				foreach (Resource Resource in this.resources!.Values)
+				if (!this.CheckScopes(User, this.resourceScopes, out _))
+					continue;
+
+				if (MaxCount <= 0)
 				{
-					if (!Resource.IsAuthorized(User))
-						continue;
-
-					if (!this.CheckScopes(User, this.resourceScopes, out _))
-						continue;
-
-					if (MaxCount <= 0)
-					{
-						Result["nextCursor"] = Next.ToString();
-						break;
-					}
-
-					if (Offset > 0)
-					{
-						Offset--;
-						continue;
-					}
-
-					Resources.Add(Resource);
-					MaxCount--;
+					Result["nextCursor"] = Next.ToString();
+					break;
 				}
-			}
-			finally
-			{
-				this.syncObj.Release();
+
+				if (Offset > 0)
+				{
+					Offset--;
+					continue;
+				}
+
+				Resources.Add(Resource);
+				MaxCount--;
 			}
 
 			int i = 0;
@@ -1066,14 +1053,6 @@ namespace Waher.Networking.HTTP.Mcp
 			Result["resources"] = ResourcesJson;
 
 			return Result;
-		}
-
-		private async Task InitResourcesLocked()
-		{
-			this.resources = new Dictionary<Uri, Resource>();
-
-			foreach (Resource Resource in await this.GetResources())
-				this.resources[Resource.Uri] = Resource;
 		}
 
 		/// <summary>
@@ -1092,21 +1071,8 @@ namespace Waher.Networking.HTTP.Mcp
 			if (Response.ResponseSent)
 				return null;
 
-			Resource? Resource;
-
-			await this.syncObj.WaitAsync();
-			try
-			{
-				if (this.resources is null)
-					await this.InitResourcesLocked();
-
-				if (!this.resources!.TryGetValue(Uri, out Resource))
-					throw new NotFoundException("Resource not found: " + Uri);
-			}
-			finally
-			{
-				this.syncObj.Release();
-			}
+			Resource Resource = await this.TryGetResource(Request, User, Uri)
+				?? throw new NotFoundException("Resource not found: " + Uri);
 
 			Resource.AssertAuthorized(this.ResourceName, User);
 
@@ -1140,29 +1106,37 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Gets available resources.
 		/// </summary>
+		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="User">MCP Client user requesting resources.</param>
 		/// <returns>Array of resources.</returns>
-		public virtual Task<Resource[]> GetResources()
+		public virtual Task<Resource[]> GetResources(HttpRequest Request, IUser? User)
 		{
 			return Task.FromResult(Array.Empty<Resource>());
+		}
+
+		/// <summary>
+		/// Tries to get a resource, given its URI.
+		/// </summary>
+		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="User">MCP Client user requesting resources.</param>
+		/// <param name="Uri">URI of resource.</param>
+		/// <returns>Resource, if found (and user has access rights to it), null otherwise.</returns>
+		public virtual Task<Resource?> TryGetResource(HttpRequest Request, IUser? User, 
+			Uri Uri)
+		{
+			return Task.FromResult<Resource?>(null);
 		}
 
 		/// <summary>
 		/// Called when the resources have been updated (new resources added,
 		/// existing resources updated or removed.)
 		/// </summary>
+		/// <param name="User">MCP Client user whose resources have been updated.</param>
 		/// <remarks>If multiple updates are done simultaneously, only call this
 		/// method once at the end, not for each update.</remarks>
-		public virtual async Task ResourcesUpdated()
+		public virtual async Task ResourcesUpdated(IUser User)
 		{
-			await this.syncObj.WaitAsync();
-			try
-			{
-				await this.InitResourcesLocked();
-			}
-			finally
-			{
-				this.syncObj.Release();
-			}
+			// TODO: Only to clients who has resources that have been updated.
 
 			await this.SendNotification(new Dictionary<string, object>()
 			{
@@ -1181,8 +1155,9 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Called when a single resource has been updated.
 		/// </summary>
+		/// <param name="User">MCP Client user whose resource has been updated.</param>
 		/// <param name="Uri">The URI of the updated resource.</param>
-		public virtual Task ResourceUpdated(Uri Uri)
+		public virtual Task ResourceUpdated(IUser User, Uri Uri)
 		{
 			// TODO: Only to subscribers
 

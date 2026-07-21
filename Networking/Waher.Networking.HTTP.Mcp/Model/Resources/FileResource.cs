@@ -18,7 +18,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Resources
 		private readonly bool isTextFile;
 
 		/// <summary>
-		/// Contains information about an MCP Text Server Resource
+		/// Contains information about an MCP Server File Resource
 		/// </summary>
 		/// <param name="Name">Name of resource.</param>
 		/// <param name="Title">A human-readable title for the resource.</param>
@@ -90,7 +90,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Resources
 		}
 
 		/// <summary>
-		/// Contains information about an MCP Text Server Resource
+		/// Contains information about an MCP Server File Resource
 		/// </summary>
 		/// <param name="Name">Name of resource.</param>
 		/// <param name="Title">A human-readable title for the resource.</param>

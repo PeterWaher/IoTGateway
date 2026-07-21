@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Content.Html;
 using Waher.Content.Json;
 using Waher.Events;
 using Waher.Networking.HTTP.OAuth;

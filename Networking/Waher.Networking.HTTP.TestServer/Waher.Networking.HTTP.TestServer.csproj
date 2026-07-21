@@ -17,6 +17,7 @@
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\..\Mcp\Waher.Mcp.Content\Waher.Mcp.Content.csproj" />
     <ProjectReference Include="..\..\Mcp\Waher.Mcp.Events\Waher.Mcp.Events.csproj" />
+    <ProjectReference Include="..\..\Mcp\Waher.Mcp.Files\Waher.Mcp.Files.csproj" />
     <ProjectReference Include="..\..\Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj" />
     <ProjectReference Include="..\..\Persistence\Waher.Persistence.Serialization.Compiled\Waher.Persistence.Serialization.Compiled.csproj" />
     <ProjectReference Include="..\..\Persistence\Waher.Persistence.XmlLedger\Waher.Persistence.XmlLedger.csproj" />

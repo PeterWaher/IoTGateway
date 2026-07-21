@@ -392,6 +392,9 @@
 	<Assembly fileName="Waher.Mcp.Events.dll" />
 	<Assembly fileName="Waher.Mcp.Events.pdb" />
 	<Assembly fileName="Waher.Mcp.Events.xml" />
+	<Assembly fileName="Waher.Mcp.Files.dll" />
+	<Assembly fileName="Waher.Mcp.Files.pdb" />
+	<Assembly fileName="Waher.Mcp.Files.xml" />
 	<Assembly fileName="Waher.Networking.Cluster.dll" />
 	<Assembly fileName="Waher.Networking.Cluster.pdb" />
 	<Assembly fileName="Waher.Networking.Cluster.xml" />

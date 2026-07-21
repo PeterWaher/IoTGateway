@@ -10,6 +10,7 @@ using Waher.Events.Console;
 using Waher.Events.Persistence;
 using Waher.Mcp.Content;
 using Waher.Mcp.Events;
+using Waher.Mcp.Files;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Brotli;
 using Waher.Networking.HTTP.ContentEncodings;
@@ -385,6 +386,8 @@ internal class Program
 			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", [],
 				new Uri("https://example.org/")));
 			WebServer.Register(new InternetContentMcpServer("/MCP/Content", [],
+				new Uri("https://example.org/")));
+			WebServer.Register(new FileStorageMcpServer("/MCP/Files", "MCP", [],
 				new Uri("https://example.org/")));
 
 			Log.Informational("Web Server initialized.");

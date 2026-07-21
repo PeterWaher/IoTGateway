@@ -2084,6 +2084,7 @@ namespace Waher.Networking.HTTP
 					{
 						case "application/x-www-form-urlencoded":
 						case JsonCodec.DefaultContentType:
+						case JsonCodec.JsonRpcContentType:
 						case "application/xml":
 						case "application/link-format":
 						case "application/vnd.oma.lwm2m+json":

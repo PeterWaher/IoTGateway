@@ -7,7 +7,7 @@ namespace Waher.Networking.Sniffers
 	/// <summary>
 	/// Maintains a set of sniffers.
 	/// </summary>
-	public class SnifferSet<T> : IDisposable
+	public class SnifferSet<T> : ISnifferSet, IDisposable
 		where T : ISniffer
 	{
 		private readonly Cache<string, T> sniffers;

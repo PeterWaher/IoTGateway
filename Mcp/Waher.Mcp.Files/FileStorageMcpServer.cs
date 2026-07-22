@@ -70,7 +70,8 @@ namespace Waher.Mcp.Files
 				  "Use the resource list to get access to all files associated with the " +
 				  "account. Files may be organized in folders. Tools are available to " +
 				  "read, update and delete files and folders. No executable files must " +
-				  "be stored in file storage.")
+				  "be stored in file storage. Resource URIs are all local and unique to " +
+				  "the agent. They cannot and must not be shared.")
 		{
 		}
 

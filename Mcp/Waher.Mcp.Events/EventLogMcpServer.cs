@@ -12,6 +12,7 @@ using Waher.Networking.HTTP.Mcp.Model;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
+using Waher.Networking.Sniffers;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Collections;
@@ -44,10 +45,13 @@ namespace Waher.Mcp.Events
 		/// Model Context Protocol (MCP) server resource for the Event Log.
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
-		public EventLogMcpServer(string ResourceName)
+		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
+		/// with MCP service.</param>
+		public EventLogMcpServer(string ResourceName, ISnifferSet? SnifferSet)
 			: this(ResourceName,
 				  GetDefaultIcons(), GetDefaultWebSite()
-				  ?? new Uri("https://www.nuget.org/packages/Waher.Events/"))
+				  ?? new Uri("https://www.nuget.org/packages/Waher.Events/"),
+				  SnifferSet)
 		{
 		}
 
@@ -57,7 +61,10 @@ namespace Waher.Mcp.Events
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="Icons">Icons of server.</param>
 		/// <param name="WebSiteUri">Website URI of server.</param>
-		public EventLogMcpServer(string ResourceName, Icon[] Icons, Uri WebSiteUri)
+		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
+		/// with MCP service.</param>
+		public EventLogMcpServer(string ResourceName, Icon[] Icons, Uri WebSiteUri, 
+			ISnifferSet? SnifferSet)
 			: this(ResourceName,
 				  "EventLog",   // Name
 				  "Event Log",  // Title
@@ -69,7 +76,8 @@ namespace Waher.Mcp.Events
 				  WebSiteUri,
 				  "Significant events should be logged to the Event Log to facilitate " +
 				  "troubleshooting. Personal information should be removed from events " +
-				  "if not necessary for cybersecurity reasons, depending on context.")
+				  "if not necessary for cybersecurity reasons, depending on context.", 
+				  SnifferSet)
 		{
 		}
 
@@ -84,11 +92,13 @@ namespace Waher.Mcp.Events
 		/// <param name="Icons">Icons of server.</param>
 		/// <param name="WebSiteUri">Website URI of server.</param>
 		/// <param name="Instructions">Instructions for server.</param>
+		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
+		/// with MCP service.</param>
 		public EventLogMcpServer(string ResourceName, string Name, string Title,
 			string Version, string Description, Icon[] Icons, Uri WebSiteUri,
-			string Instructions)
+			string Instructions, ISnifferSet? SnifferSet)
 			: base(ResourceName, Name, Title, Version, Description, Icons, WebSiteUri,
-				Instructions)
+				Instructions, SnifferSet)
 		{
 		}
 

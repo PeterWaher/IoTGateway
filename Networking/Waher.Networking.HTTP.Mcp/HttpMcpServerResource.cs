@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Images;
@@ -15,6 +16,7 @@ using Waher.Networking.HTTP.Mcp.Model.Resources;
 using Waher.Networking.HTTP.Mcp.Model.Server;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
+using Waher.Networking.Sniffers;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Counters;
 using Waher.Runtime.Inventory;
@@ -29,6 +31,11 @@ namespace Waher.Networking.HTTP.Mcp
 	[OAuthScopesSupported(true, "McpScopesSupported")]
 	public abstract class HttpMcpServerResource : JsonRpcWebService
 	{
+		/// <summary>
+		/// User name used in sniffers for unauthenticated requests.
+		/// </summary>
+		private const string NotAuthenticated = "Not authenticated";
+
 		/// <summary>
 		/// Scope suffix for MCP server tools is ":tools".
 		/// </summary>
@@ -49,6 +56,7 @@ namespace Waher.Networking.HTTP.Mcp
 		private const int PageSize = 20;
 		private readonly Dictionary<string, Tool> tools = new Dictionary<string, Tool>();
 		private readonly Dictionary<string, Prompt> prompts = new Dictionary<string, Prompt>();
+		private readonly ISnifferSet? snifferSet;
 		private readonly string[] rootScopes;
 		private readonly string[] toolScopes;
 		private readonly string[] promptScopes;
@@ -56,6 +64,7 @@ namespace Waher.Networking.HTTP.Mcp
 		private readonly string[] scopesSupported;
 		private readonly bool hasScopes;
 		private bool requiresAuthentication;
+		private bool hasSnifferSet;
 
 		private static Dictionary<Type, IContentBlock> GetContentBlocksFirstTime()
 		{
@@ -112,6 +121,27 @@ namespace Waher.Networking.HTTP.Mcp
 		public HttpMcpServerResource(string ResourceName, string Name, string Title,
 			string Version, string Description, Icon[] Icons, Uri WebSiteUri,
 			string Instructions)
+			: this(ResourceName, Name, Title, Version, Description, Icons, WebSiteUri,
+				  Instructions, null)
+		{
+		}
+
+		/// <summary>
+		/// Abstract base class for HTTP-based Model Context Protocol (MCP) server resource.
+		/// </summary>
+		/// <param name="ResourceName">Name of resource.</param>
+		/// <param name="Name">Name of server.</param>
+		/// <param name="Title">Title of server.</param>
+		/// <param name="Version">Version of server.</param>
+		/// <param name="Description">Description of server.</param>
+		/// <param name="Icons">Icons of server.</param>
+		/// <param name="WebSiteUri">Website URI of server.</param>
+		/// <param name="Instructions">Instructions for server.</param>
+		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
+		/// with MCP service.</param>
+		public HttpMcpServerResource(string ResourceName, string Name, string Title,
+			string Version, string Description, Icon[] Icons, Uri WebSiteUri,
+			string Instructions, ISnifferSet? SnifferSet)
 			: base(ResourceName, true, false)
 		{
 			this.Name = Name;
@@ -121,6 +151,8 @@ namespace Waher.Networking.HTTP.Mcp
 			this.Icons = new Icons(Icons);
 			this.WebSiteUri = WebSiteUri;
 			this.Instructions = Instructions;
+			this.snifferSet = SnifferSet;
+			this.hasSnifferSet = !(SnifferSet is null);
 
 			if (this.Icons.Empty)
 			{
@@ -395,16 +427,34 @@ namespace Waher.Networking.HTTP.Mcp
 		/// MCP initialize method. Called by client to initialize connection and exchange 
 		/// information about capabilities.
 		/// </summary>
+		/// <param name="Request">HTTP Request object.</param>
 		/// <param name="ProtocolVersion">Protocol Version</param>
 		/// <param name="Capabilities">Client capabilities</param>
 		/// <param name="ClientInfo">Client information</param>
 		/// <returns>Server capabilities and information.</returns>
 		[JsonRpcMethod]
 		protected Dictionary<string, object> Initialize(
-			string ProtocolVersion,
+			HttpRequest Request, string ProtocolVersion,
 			Dictionary<string, object> Capabilities,
 			Dictionary<string, object> ClientInfo)
 		{
+			if (this.hasSnifferSet)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append(this.Name);
+				sb.Append(".Initialize(");
+				sb.Append(ProtocolVersion);
+				sb.AppendLine(",");
+				sb.Append(JSON.Encode(Capabilities, 1));
+				sb.AppendLine(",");
+				sb.Append(JSON.Encode(ClientInfo, 1));
+				sb.Append(')');
+
+				this.snifferSet!.ReceiveText(Request.User?.UserName ?? NotAuthenticated,
+					sb.ToString());
+			}
+
 			this.ClientProtocolVersion = ProtocolVersion;
 
 			if (ClientCapabilities.TryParse(Capabilities, out ClientCapabilities CapabilitiesParsed))
@@ -467,6 +517,12 @@ namespace Waher.Networking.HTTP.Mcp
 				{ "instructions", this.Instructions }
 			};
 
+			if (this.hasSnifferSet)
+			{
+				this.snifferSet!.TransmitText(Request.User?.UserName ?? NotAuthenticated,
+					JSON.Encode(Result, true));
+			}
+
 			return Result;
 		}
 
@@ -477,6 +533,12 @@ namespace Waher.Networking.HTTP.Mcp
 		[JsonRpcMethod]
 		protected void Notifications_Initialized(HttpRequest Request)
 		{
+			if (this.hasSnifferSet)
+			{
+				this.snifferSet!.ReceiveText(Request.User?.UserName ?? NotAuthenticated,
+					this.Name + ".Initialized()");
+			}
+
 			Log.Informational("MCP client initialized: " + Request.RemoteEndPoint,
 				this.ResourceName, Request.RemoteEndPoint, "McpInitialized");
 		}
@@ -495,6 +557,19 @@ namespace Waher.Networking.HTTP.Mcp
 			IUser? User = await this.GetAuthenticatedUser(Request, Response);
 			if (Response.ResponseSent)
 				return null;
+
+			if (this.hasSnifferSet)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append(this.Name);
+				sb.Append(".tools/list(");
+				sb.Append(Cursor);
+				sb.Append(')');
+
+				this.snifferSet!.ReceiveText(User?.UserName ?? NotAuthenticated,
+					sb.ToString());
+			}
 
 			int Offset = 0;
 			int MaxCount = PageSize;
@@ -546,6 +621,12 @@ namespace Waher.Networking.HTTP.Mcp
 				ToolsJson[i++] = await Tool.ToJson(this);
 
 			Result["tools"] = ToolsJson;
+
+			if (this.hasSnifferSet)
+			{
+				this.snifferSet!.TransmitText(User?.UserName ?? NotAuthenticated,
+					JSON.Encode(Result, true));
+			}
 
 			return Result;
 		}
@@ -649,6 +730,34 @@ namespace Waher.Networking.HTTP.Mcp
 			IUser? User = await this.GetAuthenticatedUser(Request, Response);
 			if (Response.ResponseSent)
 				return null;
+
+			if (this.hasSnifferSet)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append(this.Name);
+				sb.Append(".tools/call(");
+				sb.Append(Name);
+				sb.AppendLine(",");
+				sb.Append(JSON.Encode(Arguments, 1));
+
+				if (!(Task is null))
+				{
+					sb.AppendLine(",");
+					JSON.Encode(Task, 1, sb);
+				}
+
+				if (!(_Meta is null))
+				{
+					sb.AppendLine(",");
+					JSON.Encode(_Meta, 1, sb);
+				}
+
+				sb.Append(')');
+
+				this.snifferSet!.ReceiveText(User?.UserName ?? NotAuthenticated,
+					sb.ToString());
+			}
 
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
 			object? ToolResult;
@@ -773,6 +882,12 @@ namespace Waher.Networking.HTTP.Mcp
 				}
 			}
 
+			if (this.hasSnifferSet)
+			{
+				this.snifferSet!.TransmitText(User?.UserName ?? NotAuthenticated,
+					JSON.Encode(Result, true));
+			}
+
 			return Result;
 		}
 
@@ -790,6 +905,19 @@ namespace Waher.Networking.HTTP.Mcp
 			IUser? User = await this.GetAuthenticatedUser(Request, Response);
 			if (Response.ResponseSent)
 				return null;
+
+			if (this.hasSnifferSet)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append(this.Name);
+				sb.Append(".prompts/list(");
+				sb.Append(Cursor);
+				sb.Append(')');
+
+				this.snifferSet!.ReceiveText(User?.UserName ?? NotAuthenticated,
+					sb.ToString());
+			}
 
 			int Offset = 0;
 			int MaxCount = PageSize;
@@ -842,6 +970,12 @@ namespace Waher.Networking.HTTP.Mcp
 
 			Result["prompts"] = PromptsJson;
 
+			if (this.hasSnifferSet)
+			{
+				this.snifferSet!.TransmitText(User?.UserName ?? NotAuthenticated,
+					JSON.Encode(Result, true));
+			}
+
 			return Result;
 		}
 
@@ -862,6 +996,28 @@ namespace Waher.Networking.HTTP.Mcp
 			IUser? User = await this.GetAuthenticatedUser(Request, Response);
 			if (Response.ResponseSent)
 				return null;
+
+			if (this.hasSnifferSet)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append(this.Name);
+				sb.Append(".prompts/get(");
+				sb.Append(Name);
+				sb.AppendLine(",");
+				sb.Append(JSON.Encode(Arguments, 1));
+
+				if (!(_Meta is null))
+				{
+					sb.AppendLine(",");
+					JSON.Encode(_Meta, 1, sb);
+				}
+
+				sb.Append(')');
+
+				this.snifferSet!.ReceiveText(User?.UserName ?? NotAuthenticated,
+					sb.ToString());
+			}
 
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
 			object? PromptResult;
@@ -974,6 +1130,12 @@ namespace Waher.Networking.HTTP.Mcp
 
 			Result["messages"] = EncodedMessages;
 
+			if (this.hasSnifferSet)
+			{
+				this.snifferSet!.TransmitText(User?.UserName ?? NotAuthenticated,
+					JSON.Encode(Result, true));
+			}
+
 			return Result;
 		}
 
@@ -997,6 +1159,19 @@ namespace Waher.Networking.HTTP.Mcp
 			IUser? User = await this.GetAuthenticatedUser(Request, Response);
 			if (Response.ResponseSent)
 				return null;
+
+			if (this.hasSnifferSet)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append(this.Name);
+				sb.Append(".resources/list(");
+				sb.Append(Cursor);
+				sb.Append(')');
+
+				this.snifferSet!.ReceiveText(User?.UserName ?? NotAuthenticated,
+					sb.ToString());
+			}
 
 			int Offset = 0;
 			int MaxCount = PageSize;
@@ -1046,6 +1221,12 @@ namespace Waher.Networking.HTTP.Mcp
 
 			Result["resources"] = ResourcesJson;
 
+			if (this.hasSnifferSet)
+			{
+				this.snifferSet!.TransmitText(User?.UserName ?? NotAuthenticated,
+					JSON.Encode(Result, true));
+			}
+
 			return Result;
 		}
 
@@ -1064,6 +1245,26 @@ namespace Waher.Networking.HTTP.Mcp
 			IUser? User = await this.GetAuthenticatedUser(Request, Response);
 			if (Response.ResponseSent)
 				return null;
+
+			if (this.hasSnifferSet)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append(this.Name);
+				sb.Append(".resources/read(");
+				sb.Append(Uri);
+
+				if (!(_Meta is null))
+				{
+					sb.AppendLine(",");
+					JSON.Encode(_Meta, 1, sb);
+				}
+
+				sb.Append(')');
+
+				this.snifferSet!.ReceiveText(User?.UserName ?? NotAuthenticated,
+					sb.ToString());
+			}
 
 			Resource Resource = await this.TryGetResource(Request, User, Uri)
 				?? throw new NotFoundException("Resource not found: " + Uri);
@@ -1091,10 +1292,18 @@ namespace Waher.Networking.HTTP.Mcp
 			for (i = 0; i < c; i++)
 				Contents[i] = Content[i].Encode();
 
-			return new Dictionary<string, object>()
+			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
 				{ "contents",Contents }
 			};
+
+			if (this.hasSnifferSet)
+			{
+				this.snifferSet!.TransmitText(User?.UserName ?? NotAuthenticated,
+					JSON.Encode(Result, true));
+			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -1148,6 +1357,8 @@ namespace Waher.Networking.HTTP.Mcp
 
 		private Task SendNotification(Dictionary<string, object> Notification)
 		{
+			// TODO: Sniffers
+		
 			return this.SendEvent(
 				new KeyValuePair<string, object>("event", "message"),
 				new KeyValuePair<string, object>("data", JSON.Encode(Notification, false)));
@@ -1163,6 +1374,7 @@ namespace Waher.Networking.HTTP.Mcp
 			try
 			{
 				// TODO: Only to subscribers
+				// TODO: Sniffers
 
 				await this.SendNotification(new Dictionary<string, object>()
 				{

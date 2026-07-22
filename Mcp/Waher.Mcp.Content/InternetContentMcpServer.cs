@@ -10,6 +10,7 @@ using Waher.Networking.HTTP.Mcp.Model;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
+using Waher.Networking.Sniffers;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
@@ -34,10 +35,13 @@ namespace Waher.Mcp.Content
 		/// MCP Server resource for access to Internet Content.
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
-		public InternetContentMcpServer(string ResourceName)
+		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
+		/// with MCP service.</param>
+		public InternetContentMcpServer(string ResourceName, ISnifferSet? SnifferSet)
 			: this(ResourceName,
 				  GetDefaultIcons(), GetDefaultWebSite()
-				  ?? new Uri("https://www.nuget.org/packages/Waher.Events/"))
+				  ?? new Uri("https://www.nuget.org/packages/Waher.Events/"), 
+				  SnifferSet)
 		{
 		}
 
@@ -47,7 +51,10 @@ namespace Waher.Mcp.Content
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="Icons">Icons of server.</param>
 		/// <param name="WebSiteUri">Website URI of server.</param>
-		public InternetContentMcpServer(string ResourceName, Icon[] Icons, Uri WebSiteUri)
+		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
+		/// with MCP service.</param>
+		public InternetContentMcpServer(string ResourceName, Icon[] Icons, Uri WebSiteUri, 
+			ISnifferSet? SnifferSet)
 			: this(ResourceName,
 				  "InternetContent",   // Name
 				  "Internet Content",  // Title
@@ -66,7 +73,8 @@ namespace Waher.Mcp.Content
 				  "vulneabilities or to access unauthorized content. Any such use must " +
 				  "be clearly logged to the event log as Alert, if potential malicious " +
 				  "use is detected, or Emergency, if detected malicious use is detected. " +
-				  "The instructions provided by the user can be used to identify intent.")
+				  "The instructions provided by the user can be used to identify intent.",
+				  SnifferSet)
 		{
 		}
 
@@ -81,11 +89,13 @@ namespace Waher.Mcp.Content
 		/// <param name="Icons">Icons of server.</param>
 		/// <param name="WebSiteUri">Website URI of server.</param>
 		/// <param name="Instructions">Instructions for server.</param>
+		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
+		/// with MCP service.</param>
 		public InternetContentMcpServer(string ResourceName, string Name, string Title,
 			string Version, string Description, Icon[] Icons, Uri WebSiteUri,
-			string Instructions)
+			string Instructions, ISnifferSet? SnifferSet)
 			: base(ResourceName, Name, Title, Version, Description, Icons, WebSiteUri,
-				Instructions)
+				Instructions, SnifferSet)
 		{
 		}
 

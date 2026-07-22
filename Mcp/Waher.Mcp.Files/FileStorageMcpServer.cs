@@ -11,6 +11,7 @@ using Waher.Networking.HTTP.Mcp.Model.Resources;
 using Waher.Networking.HTTP.Mcp.Model.Server;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
+using Waher.Networking.Sniffers;
 using Waher.Security;
 
 namespace Waher.Mcp.Files
@@ -41,10 +42,14 @@ namespace Waher.Mcp.Files
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="RootFolder">Root folder that will host the account-specific 
 		/// files and folders.</param>
-		public FileStorageMcpServer(string ResourceName, string RootFolder)
+		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
+		/// with MCP service.</param>
+		public FileStorageMcpServer(string ResourceName, string RootFolder, 
+			ISnifferSet? SnifferSet)
 			: this(ResourceName, RootFolder,
 				  GetDefaultIcons(), GetDefaultWebSite()
-				  ?? new Uri("https://www.nuget.org/packages/Waher.Events/"))
+				  ?? new Uri("https://www.nuget.org/packages/Waher.Events/"), 
+				  SnifferSet)
 		{
 		}
 
@@ -56,8 +61,10 @@ namespace Waher.Mcp.Files
 		/// files and folders.</param>
 		/// <param name="Icons">Icons of server.</param>
 		/// <param name="WebSiteUri">Website URI of server.</param>
+		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
+		/// with MCP service.</param>
 		public FileStorageMcpServer(string ResourceName, string RootFolder, Icon[] Icons,
-			Uri WebSiteUri)
+			Uri WebSiteUri, ISnifferSet? SnifferSet)
 			: this(ResourceName,
 				  RootFolder,
 				  "FileStorage",   // Name
@@ -71,7 +78,8 @@ namespace Waher.Mcp.Files
 				  "account. Files may be organized in folders. Tools are available to " +
 				  "read, update and delete files and folders. No executable files must " +
 				  "be stored in file storage. Resource URIs are all local and unique to " +
-				  "the agent. They cannot and must not be shared.")
+				  "the agent. They cannot and must not be shared.", 
+				  SnifferSet)
 		{
 		}
 
@@ -88,11 +96,13 @@ namespace Waher.Mcp.Files
 		/// <param name="Icons">Icons of server.</param>
 		/// <param name="WebSiteUri">Website URI of server.</param>
 		/// <param name="Instructions">Instructions for server.</param>
+		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
+		/// with MCP service.</param>
 		public FileStorageMcpServer(string ResourceName, string RootFolder, string Name,
 			string Title, string Version, string Description, Icon[] Icons, Uri WebSiteUri,
-			string Instructions)
+			string Instructions, ISnifferSet? SnifferSet)
 			: base(ResourceName, Name, Title, Version, Description, Icons, WebSiteUri,
-				Instructions)
+				Instructions, SnifferSet)
 		{
 			this.rootFolder = Path.GetFullPath(RootFolder);
 

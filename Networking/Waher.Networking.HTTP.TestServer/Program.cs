@@ -105,6 +105,7 @@ internal class Program
 		ConsoleOutSniffer? Sniffer = null;
 		FilesProvider? filesProvider = null;
 		XmlFileLedger? ledger = null;
+		XmlFileSnifferSet? mcpSniffers = null;
 		string s;
 		string? CertFileName = null;
 		string? CertPassword = null;
@@ -307,7 +308,7 @@ internal class Program
 			}
 
 			User TestUser = await Users.GetUser("Postman", true);
-			if (string.IsNullOrEmpty(TestUser.PasswordHash) || 
+			if (string.IsNullOrEmpty(TestUser.PasswordHash) ||
 				(TestUser.RoleIds?.Length ?? 0) == 0)
 			{
 				TestUser.PasswordHash = Convert.ToBase64String(Users.ComputeHash(TestUser.UserName, "Test"));
@@ -376,6 +377,11 @@ internal class Program
 			OAuth2Environment Environment = new();
 			Environment.Register(JwtFactory);
 
+			mcpSniffers = new XmlFileSnifferSet(Path.Combine("MCP", "Sniffers"),
+				"MCP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
+				TimeSpan.FromHours(8), "SnifferXmlToHtml.xslt", 7,
+				BinaryPresentationMethod.ByteCount);
+
 			WebServer.Register("/Hello", Hello, Hello);
 			WebServer.Register("/Hello.md", HelloMarkdown, HelloMarkdown);
 			WebServer.Register("/Hello.css", HelloStyles);
@@ -384,11 +390,12 @@ internal class Program
 			WebServer.Register(new OAuthAuthorizeResource(Environment));
 			WebServer.Register(new AuthorizationServerMetaData(Environment));
 			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", [],
-				new Uri("https://example.org/")));
+				new Uri("https://example.org/"), mcpSniffers));
 			WebServer.Register(new InternetContentMcpServer("/MCP/Content", [],
-				new Uri("https://example.org/")));
-			WebServer.Register(new FileStorageMcpServer("/MCP/Files", 
-				Path.Combine("MCP", "Files"), [], new Uri("https://example.org/")));
+				new Uri("https://example.org/"), mcpSniffers));
+			WebServer.Register(new FileStorageMcpServer("/MCP/Files",
+				Path.Combine("MCP", "Files"), [], new Uri("https://example.org/"), 
+				mcpSniffers));
 
 			Log.Informational("Web Server initialized.");
 			Log.Informational("Press CTRL+C to quit.");
@@ -419,6 +426,8 @@ internal class Program
 
 			if (Sniffer is not null)
 				await Sniffer.DisposeAsync();
+
+			mcpSniffers?.Dispose();
 
 			Log.TerminateAsync().Wait();
 		}

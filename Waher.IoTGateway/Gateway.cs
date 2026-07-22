@@ -217,6 +217,7 @@ namespace Waher.IoTGateway
 		private static CommunicationLayer firstChanceExceptions = new CommunicationLayer(true);
 		private static IPersistentDictionary nonceValues;
 		private static JwtFactory jwtFactory = null;
+		private static XmlFileSnifferSet mcpSniffers = null;
 		private static DateTime wafTimestamp = DateTime.MinValue;
 		private static string instance;
 		private static string appDataFolder;
@@ -1432,10 +1433,15 @@ namespace Waher.IoTGateway
 				Icon[] Icons = new Icon[] { FavIcon };
 				Uri WebSite = new Uri(GetUrl("/"));
 
-				webServer.Register(new Mcp.Content.InternetContentMcpServer("/MCP/Content", Icons, WebSite));
-				webServer.Register(new Mcp.Events.EventLogMcpServer("/MCP/EventLog", Icons, WebSite));
+				mcpSniffers = new XmlFileSnifferSet(appDataFolder + "MCP" + Path.DirectorySeparatorChar +
+					"Sniffers", "MCP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml", TimeSpan.FromHours(8),
+					appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
+					7, BinaryPresentationMethod.ByteCount);
+
+				webServer.Register(new Mcp.Content.InternetContentMcpServer("/MCP/Content", Icons, WebSite, mcpSniffers));
+				webServer.Register(new Mcp.Events.EventLogMcpServer("/MCP/EventLog", Icons, WebSite, mcpSniffers));
 				webServer.Register(new Mcp.Files.FileStorageMcpServer("/MCP/Files", 
-					Path.Combine(appDataFolder, "MCP", "Files"), Icons, WebSite));
+					Path.Combine(appDataFolder, "MCP", "Files"), Icons, WebSite, mcpSniffers));
 
 				if (emoji1_24x24 is null)
 				{
@@ -2987,6 +2993,9 @@ namespace Waher.IoTGateway
 				SafeDispose(jwtFactory);
 				jwtFactory = null;
 
+				SafeDispose(mcpSniffers);
+				mcpSniffers = null;
+
 				root = null;
 
 				if (exportExceptions)
@@ -3162,6 +3171,11 @@ namespace Waher.IoTGateway
 		/// JWT Factory, used to create and validate JWT tokens.
 		/// </summary>
 		public static JwtFactory JwtFactory => jwtFactory;
+
+		/// <summary>
+		/// Sniffer set used to monitor Agent activity on the MCP protocol.
+		/// </summary>
+		public static ISnifferSet McpSniffers => mcpSniffers;
 
 		/// <summary>
 		/// Gets the port numbers defined for a given protocol in the configuration file.

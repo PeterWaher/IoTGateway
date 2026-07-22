@@ -125,7 +125,9 @@
     <Compile Include="Sniffers\Model\ISniffEventProcessor.cs" />
     <Compile Include="Sniffers\SnifferBase.cs" />
     <Compile Include="Sniffers\SnifferProxy.cs" />
+    <Compile Include="Sniffers\SnifferSet.cs" />
     <Compile Include="Sniffers\TextSnifferBase.cs" />
+    <Compile Include="Sniffers\XmlFileSnifferSet.cs" />
     <Compile Include="TextTcpClient.cs" />
     <Compile Include="BinaryTcpClient.cs" />
     <Compile Include="IBinaryTransportLayer.cs" />

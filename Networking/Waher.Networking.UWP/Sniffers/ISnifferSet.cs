@@ -5,7 +5,7 @@ namespace Waher.Networking.Sniffers
 	/// <summary>
 	/// Interface for sets of sniffers.
 	/// </summary>
-	interface ISnifferSet : IDisposable
+	public interface ISnifferSet : IDisposable
 	{
 		/// <summary>
 		/// Called when binary data has been received.

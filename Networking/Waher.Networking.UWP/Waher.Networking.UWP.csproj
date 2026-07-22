@@ -121,6 +121,7 @@
     <Compile Include="ServerTlsErrorEventArgs.cs" />
     <Compile Include="Sniffers\BinaryPresentationMethod.cs" />
     <Compile Include="Sniffers\DebugSniffer.cs" />
+    <Compile Include="Sniffers\ISnifferSet.cs" />
     <Compile Include="Sniffers\LineEnding.cs" />
     <Compile Include="Sniffers\Model\ISniffEventProcessor.cs" />
     <Compile Include="Sniffers\SnifferBase.cs" />

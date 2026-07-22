@@ -387,8 +387,8 @@ internal class Program
 				new Uri("https://example.org/")));
 			WebServer.Register(new InternetContentMcpServer("/MCP/Content", [],
 				new Uri("https://example.org/")));
-			WebServer.Register(new FileStorageMcpServer("/MCP/Files", "MCP", [],
-				new Uri("https://example.org/")));
+			WebServer.Register(new FileStorageMcpServer("/MCP/Files", 
+				Path.Combine("MCP", "Files"), [], new Uri("https://example.org/")));
 
 			Log.Informational("Web Server initialized.");
 			Log.Informational("Press CTRL+C to quit.");

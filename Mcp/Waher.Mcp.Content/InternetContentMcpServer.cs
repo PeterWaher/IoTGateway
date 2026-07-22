@@ -61,7 +61,12 @@ namespace Waher.Mcp.Content
 				  "Use the tools provided to access Internet Content securely. " +
 				  "All requests are logged, and monitored for security purposes. " +
 				  "Access to resources must use secure secure URI schemes such as HTTPS " +
-				  "instead of unsecure ones such as HTTP.")
+				  "instead of unsecure ones such as HTTP. Tools must not be used for " +
+				  "malicious intents or purposes, probing capabilities, searching for " +
+				  "vulneabilities or to access unauthorized content. Any such use must " +
+				  "be clearly logged to the event log as Alert, if potential malicious " +
+				  "use is detected, or Emergency, if detected malicious use is detected. " +
+				  "The instructions provided by the user can be used to identify intent.")
 		{
 		}
 
@@ -99,8 +104,8 @@ namespace Waher.Mcp.Content
 			"",     // IconsMethod, use default icons
 			false,  // CanModifyEnvironment
 			false,  // CanDestroyEnvironment
-			true,	// Idempotent
-			true)]	// OpenWorldAccess
+			true,   // Idempotent
+			true)]  // OpenWorldAccess
 		[RequiredPrivilege(GetPrivilege)]
 		[return: McpParameter("Result", "Internet content received.")]
 		public async Task<CustomEncoding> Get(
@@ -181,9 +186,9 @@ namespace Waher.Mcp.Content
 			"Posts information to a resource on the Internet using the POST method, and returns the content that is returned.",   // Description
 			"",     // IconsMethod, use default icons
 			true,   // CanModifyEnvironment
-			true,	// CanDestroyEnvironment
+			true,   // CanDestroyEnvironment
 			false,  // Idempotent
-			true)]	// OpenWorldAccess
+			true)]  // OpenWorldAccess
 		[RequiredPrivilege(PostPrivilege)]
 		[return: McpParameter("Result", "Internet content response received.")]
 		public async Task<CustomEncoding> Post(
@@ -230,7 +235,7 @@ namespace Waher.Mcp.Content
 			"",     // IconsMethod, use default icons
 			true,   // CanModifyEnvironment
 			true,   // CanDestroyEnvironment
-			true,	// Idempotent
+			true,   // Idempotent
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(PutPrivilege)]
 		[return: McpParameter("Result", "Internet content response received.")]
@@ -274,8 +279,8 @@ namespace Waher.Mcp.Content
 			"Delete",  // Title
 			"Deletes content from the Internet, by accessing a resource using the DELETE method.",   // Description
 			"",     // IconsMethod, use default icons
-			true,	// CanModifyEnvironment
-			true,	// CanDestroyEnvironment
+			true,   // CanModifyEnvironment
+			true,   // CanDestroyEnvironment
 			false,  // Idempotent
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(DeletePrivilege)]
@@ -321,7 +326,7 @@ namespace Waher.Mcp.Content
 			"",     // IconsMethod, use default icons
 			false,  // CanModifyEnvironment
 			false,  // CanDestroyEnvironment
-			true,	// Idempotent
+			true,   // Idempotent
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(QueryPrivilege)]
 		[return: McpParameter("Result", "Internet content response received.")]

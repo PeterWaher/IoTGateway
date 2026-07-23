@@ -11,7 +11,6 @@ using Waher.Networking.HTTP.OAuth;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Security.JWT;
-using Waher.Security.Users;
 using Waher.Things.Http;
 
 namespace Waher.Networking.HTTP.JsonRpc

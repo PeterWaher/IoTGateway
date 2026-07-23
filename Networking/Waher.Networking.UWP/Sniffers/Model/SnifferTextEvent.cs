@@ -15,7 +15,9 @@ namespace Waher.Networking.Sniffers.Model
 			"key",
 			"authorization",
 			"access_token",
-			"refresh_token"
+			"refresh_token",
+			"session",
+			"code"
 		};
 		private static readonly int nrSensitiveWords = sensitiveWords.Length;
 

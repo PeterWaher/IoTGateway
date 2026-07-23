@@ -32,7 +32,7 @@ namespace Waher.Networking.HTTP.Mcp
 	/// Abstract base class for HTTP-based Model Context Protocol (MCP) server resource.
 	/// </summary>
 	[OAuthScopesSupported(true, "McpScopesSupported")]
-	public abstract class HttpMcpServerResource : JsonRpcWebService
+	public abstract class HttpMcpServerResource : JsonRpcWebService, IHttpDeleteMethod
 	{
 		private static readonly Cache<string, Session> sessions = GetCache();
 
@@ -262,6 +262,11 @@ namespace Waher.Networking.HTTP.Mcp
 		/// Instructions for server.
 		/// </summary>
 		public string Instructions { get; }
+
+		/// <summary>
+		/// If the DELETE method is allowed.
+		/// </summary>
+		public bool AllowsDELETE => true;
 
 		/// <summary>
 		/// OAUTH scopes supported by resource.
@@ -1710,5 +1715,26 @@ namespace Waher.Networking.HTTP.Mcp
 				Log.Exception(ex);
 			}
 		}
+
+		/// <summary>
+		/// Executes the DELETE method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public async Task DELETE(HttpRequest Request, HttpResponse Response)
+		{
+			Session? Session = await this.TryGetMcpSession(Request, Response);
+			if (Session is null)
+				return;
+
+			sessions.Remove(Session.SessionId);
+
+			Response.StatusCode = 204;
+			Response.StatusMessage = "No Content";
+
+			await Response.SendResponse();
+		}
+
 	}
 }

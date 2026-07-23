@@ -491,7 +491,7 @@ namespace Waher.Networking.HTTP.OAuth
 		/// </summary>
 		/// <param name="NrBytes">Number of bytes of random.</param>
 		/// <returns>Random unique code.</returns>
-		public string GenerateRandomCode(int NrBytes)
+		public static string GenerateRandomCode(int NrBytes)
 		{
 			byte[] Bin = new byte[NrBytes];
 

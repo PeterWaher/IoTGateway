@@ -260,7 +260,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 				do
 				{
-					DeviceCode = this.Environment.GenerateRandomCode(32);
+					DeviceCode = OAuth2Environment.GenerateRandomCode(32);
 					UserCode = ComputeUserCode(DeviceCode, ClientId, Owner.UserName, Owner.PasswordHash);
 				}
 				while (

@@ -90,7 +90,7 @@ namespace Waher.Networking.HTTP.OAuth
 			{
 				ClientId = Registration.ClientId,
 				ClientSecretExpiresAt = Registration.ClientSecretExpiresAt,
-				AccessToken = this.Environment.GenerateRandomCode(64),
+				AccessToken = OAuth2Environment.GenerateRandomCode(64),
 				Created = TP,
 				Updated = TP,
 				RemoteEndPoint = RegistrationRequest.RemoteEndPoint,

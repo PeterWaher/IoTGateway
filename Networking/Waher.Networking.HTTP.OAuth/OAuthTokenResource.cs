@@ -86,7 +86,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 			do
 			{
-				Code = this.Environment.GenerateRandomCode(64);
+				Code = OAuth2Environment.GenerateRandomCode(64);
 			}
 			while (
 				codes.ContainsKey(Code) ||

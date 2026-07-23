@@ -290,6 +290,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 						{ "message", this.ErrorMessage ?? string.Empty }
 					};
 				}
+				else if (Expression.IsNullOrVoid(this.Result))
+					this.ResponseObject["result"] = new Dictionary<string, object>();
 				else
 					this.ResponseObject["result"] = this.Result;
 

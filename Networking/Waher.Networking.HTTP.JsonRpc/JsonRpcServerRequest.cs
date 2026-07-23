@@ -264,8 +264,15 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 							if (HasSniffer)
 							{
-								HttpRequest.Server.Information("Result: " +
-									Expression.ToExpressionString(this.Result));
+								if (this.Result is null)
+									HttpRequest.Server.Information("Result: null");
+								else if (Expression.IsVoid(this.Result.GetType()))
+									HttpRequest.Server.Information("Result: void");
+								else
+								{
+									HttpRequest.Server.Information("Result: " +
+										Expression.ToExpressionString(this.Result));
+								}
 							}
 
 							if (HttpResponse.ResponseSent)

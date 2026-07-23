@@ -9,10 +9,15 @@ namespace Waher.Networking.HTTP.TransferEncodings
 	/// </summary>
 	public class DirectOutputTransfer : TransferEncoding
 	{
+		private readonly Encoding textEncoding;
+		private readonly bool txText;
+
 		internal DirectOutputTransfer(IBinaryTransmission Output, HttpClientConnection ClientConnection,
-			Encoding TextEncoding)
+			bool TxText, Encoding TextEncoding)
 			: base(Output, ClientConnection)
 		{
+			this.textEncoding = TextEncoding;
+			this.txText = TxText;
 		}
 
 		/// <summary>
@@ -44,6 +49,19 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="LastData">If no more data is expected.</param>
 		public override Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes, bool LastData)
 		{
+			if (!(this.clientConnection is null))
+			{
+				if (this.clientConnection.HasSniffers)
+				{
+					if (this.txText && NrBytes <= ContentLengthEncoding.MaxTextLength)
+						this.clientConnection.TransmitText(this.textEncoding.GetString(Data, Offset, NrBytes));
+					else
+						this.clientConnection.TransmitBinary(NrBytes);
+				}
+
+				this.clientConnection.Server.DataTransmitted(NrBytes);
+			}
+
 			return this.output.SendAsync(ConstantBuffer, Data, Offset, NrBytes);
 		}
 

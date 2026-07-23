@@ -466,9 +466,12 @@ namespace Waher.Networking.HTTP.JsonRpc
 				throw new InvalidOperationException("Server-Sent Events (SSE) not supported by this resource.");
 
 			StringBuilder sb = new StringBuilder();
+			bool Empty = true;
 
 			if (!string.IsNullOrEmpty(Comment))
 			{
+				Empty = false;
+				sb.Append(Comment);
 				if (Comment.IndexOfAny(CommonTypes.CRLF) >= 0)
 				{
 					foreach (string Line in Comment.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
@@ -490,6 +493,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 			{
 				foreach (KeyValuePair<string, object> P in Fields)
 				{
+					Empty = false;
+
 					if (!(P.Value is string s))
 						s = JSON.Encode(P.Value, false);
 
@@ -512,6 +517,9 @@ namespace Waher.Networking.HTTP.JsonRpc
 					}
 				}
 			}
+
+			if (Empty)
+				sb.Append(":\r\n");
 
 			sb.Append("\r\n");
 
@@ -569,7 +577,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				{
 					await Task.Delay(15000);    // Keep alive every 15 seconds.
 				}
-				while (await this.SendEvent(":\r\n") > 0);
+				while (await this.SendEvent(string.Empty) > 0);
 			}
 			catch (Exception ex)
 			{

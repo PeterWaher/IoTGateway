@@ -236,11 +236,11 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 				if (this.clientConnection.HasSniffers)
 				{
-					if (this.txText && this.pos < 1000)
+					if (this.txText && this.pos <= ContentLengthEncoding.MaxTextLength)
 						this.clientConnection.TransmitText(this.textEncoding.GetString(this.chunk, 0, this.pos));
 					else
 					{
-						this.clientConnection.TransmitBinary(true, Chunk);
+						this.clientConnection.TransmitBinary(Chunk.Length);
 						this.txText = false;
 					}
 				}

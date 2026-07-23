@@ -641,6 +641,17 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 				lock (this.eventSubscriptions)
 				{
+					foreach (Subscription Subscription in this.eventSubscriptions)
+					{
+						if (!(Subscription.Session is null) &&
+							!(Session is null) &&
+							Subscription.Session.SessionId == Session.SessionId)
+						{
+							this.eventSubscriptions.Remove(Subscription);
+							break;
+						}
+					}
+
 					this.eventSubscriptions.Add(new Subscription(Response, Session));
 					this.eventSubscriptionsStatic = this.eventSubscriptions.ToArray();
 

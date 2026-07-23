@@ -5,5 +5,9 @@
 	/// </summary>
 	public interface IJsonRpcSession
 	{
+		/// <summary>
+		/// Session ID
+		/// </summary>
+		string SessionId { get; }
 	}
 }

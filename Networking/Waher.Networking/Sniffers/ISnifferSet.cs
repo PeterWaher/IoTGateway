@@ -8,6 +8,24 @@ namespace Waher.Networking.Sniffers
 	public interface ISnifferSet : IDisposable
 	{
 		/// <summary>
+		/// Tries to get a sniffer from the set of registered sniffers.
+		/// </summary>
+		/// <param name="Discriminator">Discriminator of the sniffer.</param>
+		/// <param name="Sniffer">Retrieved sniffer, if found.</param>
+		/// <returns>True if the sniffer was found, false otherwise.</returns>
+		bool TryGetSniffer(string Discriminator, out ISniffer Sniffer);
+		
+		/// <summary>
+		/// Tries to get a sniffer from the set of registered sniffers.
+		/// </summary>
+		/// <param name="Discriminator">Discriminator of the sniffer.</param>
+		/// <param name="CreateIfNot">If a sniffer should be creaed, if one does
+		/// not exist.</param>
+		/// <param name="Sniffer">Retrieved sniffer, if found.</param>
+		/// <returns>True if the sniffer was found, false otherwise.</returns>
+		bool TryGetSniffer(string Discriminator, bool CreateIfNot, out ISniffer Sniffer);
+
+		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Discriminator">Discriminator of the sniffer.</param>

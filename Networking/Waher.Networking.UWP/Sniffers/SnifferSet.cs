@@ -80,6 +80,39 @@ namespace Waher.Networking.Sniffers
 			return true;
 		}
 
+		/// <summary>
+		/// Tries to get a sniffer from the set of registered sniffers.
+		/// </summary>
+		/// <param name="Discriminator">Discriminator of the sniffer.</param>
+		/// <param name="Sniffer">Retrieved sniffer, if found.</param>
+		/// <returns>True if the sniffer was found, false otherwise.</returns>
+		public bool TryGetSniffer(string Discriminator, out ISniffer Sniffer)
+		{
+			return this.TryGetSniffer(Discriminator, false, out Sniffer);
+		}
+
+		/// <summary>
+		/// Tries to get a sniffer from the set of registered sniffers.
+		/// </summary>
+		/// <param name="Discriminator">Discriminator of the sniffer.</param>
+		/// <param name="CreateIfNot">If a sniffer should be creaed, if one does
+		/// not exist.</param>
+		/// <param name="Sniffer">Retrieved sniffer, if found.</param>
+		/// <returns>True if the sniffer was found, false otherwise.</returns>
+		public bool TryGetSniffer(string Discriminator, bool CreateIfNot, out ISniffer Sniffer)
+		{
+			if (this.TryGetSniffer(Discriminator, CreateIfNot, out T TypedSniffer))
+			{
+				Sniffer = TypedSniffer;
+				return true;
+			}
+			else
+			{
+				Sniffer = null;
+				return false;
+			}
+		}
+
 		private T GetSniffer(string Discriminator)
 		{
 			this.TryGetSniffer(Discriminator, true, out T Sniffer);

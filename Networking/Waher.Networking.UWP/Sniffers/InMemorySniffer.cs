@@ -206,6 +206,19 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Replays sniffer events.
 		/// </summary>
+		/// <param name="Discriminator">Discriminator of the sniffer.</param>
+		/// <param name="CreateIfNot">If a sniffer should be creaed, if one does
+		/// not exist.</param>
+		/// <param name="SnifferSet">Set of sniffers to receive the events.</param>
+		public void Replay(string Discriminator, bool CreateIfNot, ISnifferSet SnifferSet)
+		{
+			if (SnifferSet.TryGetSniffer(Discriminator, CreateIfNot, out ISniffer Sniffer))
+				this.Replay(Sniffer);
+		}
+
+		/// <summary>
+		/// Replays sniffer events.
+		/// </summary>
 		/// <param name="Sniffers">Receiver of sniffer events.</param>
 		public void Replay(params ISniffer[] Sniffers)
 		{

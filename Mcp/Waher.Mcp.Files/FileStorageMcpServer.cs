@@ -73,7 +73,7 @@ namespace Waher.Mcp.Files
 				  "File Storage",  // Title
 				  typeof(FileStorageMcpServer).Assembly.GetName().Version.ToString(),
 				  "A Model Context Protocol (MCP) server resource permitting MCP clients " +
-				  "to store and manage persistant files in an account-specific file storage.",
+				  "to store and manage persistent files in an account-specific file storage.",
 				  Icons,
 				  WebSiteUri,
 				  "Use the resource list to get access to all files associated with the " +

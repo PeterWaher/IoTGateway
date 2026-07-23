@@ -537,6 +537,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 					if (Filter(Subscription.Session))
 					{
 						await Subscription.Response.Write(Event);
+						await Subscription.Response.Flush(false);
 						Count++;
 					}
 				}
@@ -638,6 +639,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 				}
 				else
 					await Response.Write(":\r\n");
+
+				await Response.Flush(false);
 
 				lock (this.eventSubscriptions)
 				{

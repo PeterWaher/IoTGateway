@@ -10,6 +10,8 @@ using Waher.Events;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
+using Waher.Security.JWT;
+using Waher.Security.Users;
 using Waher.Things.Http;
 
 namespace Waher.Networking.HTTP.JsonRpc
@@ -31,9 +33,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 		private HttpAuthenticationScheme[]? authenticationSchemes = null;
 		private ProtectedResourceMetaData? resourceMetaData = null;
 		private ProtectedResourceMetaData? metaDataResource = null;
+		private JwtFactory? jwtFactory = null;
 		private string? domain = null;
 		private bool hasMetaDataResource = false;
 		private bool hasDomain = false;
+		private bool hasJwtFactory = false;
 
 		/// <summary>
 		/// Abstract base class for Web Services based on JSON-RPC v2.0.
@@ -155,6 +159,16 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public bool HasDomain => this.hasDomain;
 
 		/// <summary>
+		/// JWT Factory, if available.
+		/// </summary>
+		protected JwtFactory? JwtFactory => this.jwtFactory;
+
+		/// <summary>
+		/// If a JWT Factory is available.
+		/// </summary>
+		protected bool HasJwtFactory => this.hasJwtFactory;
+
+		/// <summary>
 		/// Generic authentication schemes for the resource.
 		/// </summary>
 		public HttpAuthenticationScheme[]? AuthenticationSchemes => this.authenticationSchemes;
@@ -239,6 +253,18 @@ namespace Waher.Networking.HTTP.JsonRpc
 			this.hasMetaDataResource = this.TryGetResourceMetaDataResource(Server,
 				out this.metaDataResource);
 			this.hasDomain = Types.TryGetModuleParameter("Domain", out this.domain);
+
+			if (Types.TryGetModuleParameter("JWT", out JwtFactory JwtFactory) &&
+				!JwtFactory.Disposed)
+			{
+				this.jwtFactory = JwtFactory;
+				this.hasJwtFactory = true;
+			}
+			else
+			{
+				this.jwtFactory = null;
+				this.hasJwtFactory = false;
+			}
 
 			JsonRpcMethodInfo[] Methods;
 			int c;

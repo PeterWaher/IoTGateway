@@ -152,7 +152,7 @@ namespace Waher.Networking.HTTP.Mcp
 		public HttpMcpServerResource(string ResourceName, string Name, string Title,
 			string Version, string Description, Icon[] Icons, Uri WebSiteUri,
 			string Instructions, ISnifferSet? SnifferSet)
-			: base(ResourceName, true, false)
+			: base(ResourceName, false, false)
 		{
 			this.Name = Name;
 			this.Title = Title;

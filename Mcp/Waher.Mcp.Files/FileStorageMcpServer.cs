@@ -133,15 +133,16 @@ namespace Waher.Mcp.Files
 					NotifyFilters.Security |
 					NotifyFilters.Size
 			};
-			this.watcher.Created += this.UpdateResourceList;
-			this.watcher.Renamed += this.UpdateResourceList;
-			this.watcher.Deleted += this.UpdateResourceList;
-			this.watcher.Changed += this.UpdateResource;
+			this.watcher.Created += this.FileCreated;
+			this.watcher.Renamed += this.FileRenamed;
+			this.watcher.Deleted += this.FileDeleted;
+			this.watcher.Changed += this.FileUpdated;
 		}
 
 		private class UsageRec
 		{
 			public IUser? User;
+			public Session? Session;
 			public string? Url;
 		}
 
@@ -168,8 +169,10 @@ namespace Waher.Mcp.Files
 		/// </summary>
 		/// <param name="Request">HTTP Request object.</param>
 		/// <param name="User">MCP Client user requesting resources.</param>
+		/// <param name="Session">MCP Session, if available.</param>
 		/// <returns>Array of resources.</returns>
-		public override Task<Resource[]> GetResources(HttpRequest Request, IUser? User)
+		public override Task<Resource[]> GetResources(HttpRequest Request, IUser? User,
+			Session? Session)
 		{
 			if (User is null)
 				return Task.FromResult(Array.Empty<Resource>());
@@ -192,7 +195,8 @@ namespace Waher.Mcp.Files
 				this.users[UserName] = new UsageRec()
 				{
 					User = User,
-					Url = ResourceName
+					Url = ResourceName,
+					Session = Session
 				};
 			}
 
@@ -216,9 +220,10 @@ namespace Waher.Mcp.Files
 		/// <param name="Request">HTTP Request object.</param>
 		/// <param name="User">MCP Client user requesting resources.</param>
 		/// <param name="Uri">URI of resource.</param>
+		/// <param name="Session">MCP Session, if available.</param>
 		/// <returns>Resource, if found (and user has access rights to it), null otherwise.</returns>
 		public override Task<Resource?> TryGetResource(HttpRequest Request, IUser? User,
-			Uri Uri)
+			Uri Uri, Session? Session)
 		{
 			if (User is null)
 				return Task.FromResult<Resource?>(null);
@@ -241,7 +246,8 @@ namespace Waher.Mcp.Files
 				this.users[UserName] = new UsageRec()
 				{
 					User = User,
-					Url = ResourceName
+					Url = ResourceName,
+					Session = Session
 				};
 			}
 
@@ -262,10 +268,30 @@ namespace Waher.Mcp.Files
 				string.Empty, Uri, FileName, null, FileInfo.Length));
 		}
 
-		private void UpdateResourceList(object sender, FileSystemEventArgs e)
+		private void FileCreated(object sender, FileSystemEventArgs e)
 		{
 			if (this.TryGetUser(e.FullPath, out UsageRec? Usage, out _))
 				this.ResourcesUpdated(Usage.User!);
+		}
+
+		private void FileDeleted(object sender, FileSystemEventArgs e)
+		{
+			if (this.TryGetUser(e.FullPath, out UsageRec? Usage, out string? LocalFileName))
+			{
+				string Url = Usage.Url + '/' + LocalFileName.Replace(Path.DirectorySeparatorChar, '/');
+				Usage.Session?.Unsubscribe(Url);
+				this.ResourcesUpdated(Usage.User!);
+			}
+		}
+
+		private void FileRenamed(object sender, RenamedEventArgs e)
+		{
+			if (this.TryGetUser(e.OldFullPath, out UsageRec? Usage, out string? LocalFileName))
+			{
+				string Url = Usage.Url + '/' + LocalFileName.Replace(Path.DirectorySeparatorChar, '/');
+				Usage.Session?.Unsubscribe(Url);
+				this.ResourcesUpdated(Usage.User!);
+			}
 		}
 
 		private bool TryGetUser(string FileName, [NotNullWhen(true)] out UsageRec? Rec,
@@ -293,7 +319,7 @@ namespace Waher.Mcp.Files
 			return true;
 		}
 
-		private void UpdateResource(object sender, FileSystemEventArgs e)
+		private void FileUpdated(object sender, FileSystemEventArgs e)
 		{
 			if (this.TryGetUser(e.FullPath, out UsageRec? Rec, out string? LocalFileName))
 			{

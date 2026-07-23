@@ -306,11 +306,24 @@ namespace Waher.Networking.HTTP.Mcp
 		{
 			this.RegisterToolNoNotification(Method, Attributes);
 
-			return this.SendNotification(new Dictionary<string, object>()
+			Dictionary<string, object> Notification = new Dictionary<string, object>()
 			{
 				{ "jsonrpc", "2.0" },
 				{ "method", "notifications/tools/list_changed" }
-			});
+			};
+
+			return this.SendNotification(
+				Session =>
+				{
+					if (!(Session is Session McpSession))
+						return false;
+
+					if (this.hasSnifferSet)
+						McpSession.TransmitText(JSON.Encode(Notification, false));
+
+					return true;
+				},
+				Notification);
 		}
 
 		/// <summary>
@@ -345,11 +358,24 @@ namespace Waher.Networking.HTTP.Mcp
 		{
 			this.RegisterPromptNoNotification(Method, Attributes);
 
-			return this.SendNotification(new Dictionary<string, object>()
+			Dictionary<string, object> Notification = new Dictionary<string, object>()
 			{
 				{ "jsonrpc", "2.0" },
 				{ "method", "notifications/prompts/list_changed" }
-			});
+			};
+
+			return this.SendNotification(
+				Session =>
+				{
+					if (!(Session is Session McpSession))
+						return false;
+
+					if (this.hasSnifferSet)
+						McpSession.TransmitText(JSON.Encode(Notification, false));
+
+					return true;
+				},
+				Notification);
 		}
 
 		/// <summary>
@@ -469,10 +495,10 @@ namespace Waher.Networking.HTTP.Mcp
 				sb.Append(this.Name);
 				sb.Append(".Initialize(");
 				sb.Append(ProtocolVersion);
-				sb.AppendLine(",");
-				sb.Append(JSON.Encode(Capabilities, 1));
-				sb.AppendLine(",");
-				sb.Append(JSON.Encode(ClientInfo, 1));
+				sb.Append(',');
+				sb.Append(JSON.Encode(Capabilities, false));
+				sb.Append(',');
+				sb.Append(JSON.Encode(ClientInfo, false));
 				sb.Append(')');
 
 				Session.ReceiveText(sb.ToString());
@@ -490,7 +516,7 @@ namespace Waher.Networking.HTTP.Mcp
 						},
 						{ "resources", new Dictionary<string, object>()
 							{
-								{ "subscribe", false },		// TODO (for instance, when available resources change)
+								{ "subscribe", true },
 								{ "listChanged", true }
 							}
 						},
@@ -533,7 +559,7 @@ namespace Waher.Networking.HTTP.Mcp
 			};
 
 			if (this.hasSnifferSet)
-				Session.TransmitText(JSON.Encode(Result, true));
+				Session.TransmitText(JSON.Encode(Result, false));
 
 			return Result;
 		}
@@ -547,7 +573,7 @@ namespace Waher.Networking.HTTP.Mcp
 		protected async Task Notifications_Initialized(HttpRequest Request,
 			HttpResponse Response)
 		{
-			Session? Session = await this.TryGetSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
 				return;
 
@@ -556,9 +582,25 @@ namespace Waher.Networking.HTTP.Mcp
 
 			Log.Informational("MCP client initialized: " + Request.RemoteEndPoint,
 				this.ResourceName, Request.RemoteEndPoint, "McpInitialized");
+
+			Response.StatusCode = 202;
+			Response.StatusMessage = "Accepted";
+
+			await Response.SendResponse();
 		}
 
-		private async Task<Session?> TryGetSession(HttpRequest Request, HttpResponse Response)
+		private async Task<Session?> TryGetMcpSession(HttpRequest Request, HttpResponse Response)
+		{
+			return await this.TryGetSession(Request, Response) as Session;
+		}
+
+		/// <summary>
+		/// Tries to get a session object for the resource, if any.
+		/// </summary>
+		/// <param name="Request">HTTP Request object</param>
+		/// <param name="Response">HTTP Response object</param>
+		/// <returns>Session object, if any.</returns>
+		protected override async Task<IJsonRpcSession?> TryGetSession(HttpRequest Request, HttpResponse Response)
 		{
 			if (!Request.Header.TryGetHeaderField("MCP-Session-Id", out HttpField SessionHeader))
 			{
@@ -609,7 +651,7 @@ namespace Waher.Networking.HTTP.Mcp
 		protected async Task<Dictionary<string, object>?> Tools_List(HttpRequest Request,
 			HttpResponse Response, string? Cursor = null)
 		{
-			Session? Session = await this.TryGetSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
 				return null;
 
@@ -687,7 +729,7 @@ namespace Waher.Networking.HTTP.Mcp
 			Result["tools"] = ToolsJson;
 
 			if (this.hasSnifferSet)
-				Session.TransmitText(JSON.Encode(Result, true));
+				Session.TransmitText(JSON.Encode(Result, false));
 
 			return Result;
 		}
@@ -801,7 +843,7 @@ namespace Waher.Networking.HTTP.Mcp
 			HttpResponse Response, string Name, Dictionary<string, object?> Arguments,
 			object? Task = null, [JsonRpcMetaDataArgument] object? _Meta = null)
 		{
-			Session? Session = await this.TryGetSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
 				return null;
 
@@ -816,19 +858,19 @@ namespace Waher.Networking.HTTP.Mcp
 				sb.Append(this.Name);
 				sb.Append(".tools/call(");
 				sb.Append(Name);
-				sb.AppendLine(",");
-				sb.Append(JSON.Encode(Arguments, 1));
+				sb.Append(',');
+				sb.Append(JSON.Encode(Arguments, false));
 
 				if (!(Task is null))
 				{
-					sb.AppendLine(",");
-					JSON.Encode(Task, 1, sb);
+					sb.Append(',');
+					JSON.Encode(Task, false, sb);
 				}
 
 				if (!(_Meta is null))
 				{
-					sb.AppendLine(",");
-					JSON.Encode(_Meta, 1, sb);
+					sb.Append(',');
+					JSON.Encode(_Meta, false, sb);
 				}
 
 				sb.Append(')');
@@ -973,7 +1015,7 @@ namespace Waher.Networking.HTTP.Mcp
 			}
 
 			if (this.hasSnifferSet)
-				Session.TransmitText(JSON.Encode(Result, true));
+				Session.TransmitText(JSON.Encode(Result, false));
 
 			return Result;
 		}
@@ -989,7 +1031,7 @@ namespace Waher.Networking.HTTP.Mcp
 		protected async Task<Dictionary<string, object>?> Prompts_List(HttpRequest Request,
 			HttpResponse Response, string? Cursor = null)
 		{
-			Session? Session = await this.TryGetSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
 				return null;
 
@@ -1067,7 +1109,7 @@ namespace Waher.Networking.HTTP.Mcp
 			Result["prompts"] = PromptsJson;
 
 			if (this.hasSnifferSet)
-				Session.TransmitText(JSON.Encode(Result, true));
+				Session.TransmitText(JSON.Encode(Result, false));
 
 			return Result;
 		}
@@ -1086,7 +1128,7 @@ namespace Waher.Networking.HTTP.Mcp
 			HttpResponse Response, string Name, Dictionary<string, object?> Arguments,
 			[JsonRpcMetaDataArgument] object? _Meta = null)
 		{
-			Session? Session = await this.TryGetSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
 				return null;
 
@@ -1101,13 +1143,13 @@ namespace Waher.Networking.HTTP.Mcp
 				sb.Append(this.Name);
 				sb.Append(".prompts/get(");
 				sb.Append(Name);
-				sb.AppendLine(",");
-				sb.Append(JSON.Encode(Arguments, 1));
+				sb.Append(',');
+				sb.Append(JSON.Encode(Arguments, false));
 
 				if (!(_Meta is null))
 				{
-					sb.AppendLine(",");
-					JSON.Encode(_Meta, 1, sb);
+					sb.Append(',');
+					JSON.Encode(_Meta, false, sb);
 				}
 
 				sb.Append(')');
@@ -1240,7 +1282,7 @@ namespace Waher.Networking.HTTP.Mcp
 			Result["messages"] = EncodedMessages;
 
 			if (this.hasSnifferSet)
-				Session.TransmitText(JSON.Encode(Result, true));
+				Session.TransmitText(JSON.Encode(Result, false));
 
 			return Result;
 		}
@@ -1262,7 +1304,7 @@ namespace Waher.Networking.HTTP.Mcp
 		protected async Task<Dictionary<string, object>?> Resources_List(HttpRequest Request,
 			HttpResponse Response, string? Cursor = null)
 		{
-			Session? Session = await this.TryGetSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
 				return null;
 
@@ -1297,7 +1339,7 @@ namespace Waher.Networking.HTTP.Mcp
 				}
 			}
 
-			Resource[] AllResources = await this.GetResources(Request, User);
+			Resource[] AllResources = await this.GetResources(Request, User, Session);
 			ChunkedList<Resource> Resources = new ChunkedList<Resource>();
 			Dictionary<string, object> Result = new Dictionary<string, object>();
 			int Next = Offset + MaxCount;
@@ -1337,7 +1379,7 @@ namespace Waher.Networking.HTTP.Mcp
 			Result["resources"] = ResourcesJson;
 
 			if (this.hasSnifferSet)
-				Session.TransmitText(JSON.Encode(Result, true));
+				Session.TransmitText(JSON.Encode(Result, false));
 
 			return Result;
 		}
@@ -1354,7 +1396,7 @@ namespace Waher.Networking.HTTP.Mcp
 		protected async Task<Dictionary<string, object>?> Resources_Read(HttpRequest Request,
 			HttpResponse Response, Uri Uri, [JsonRpcMetaDataArgument] object? _Meta = null)
 		{
-			Session? Session = await this.TryGetSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
 				return null;
 
@@ -1372,8 +1414,8 @@ namespace Waher.Networking.HTTP.Mcp
 
 				if (!(_Meta is null))
 				{
-					sb.AppendLine(",");
-					JSON.Encode(_Meta, 1, sb);
+					sb.Append(',');
+					JSON.Encode(_Meta, false, sb);
 				}
 
 				sb.Append(')');
@@ -1381,7 +1423,7 @@ namespace Waher.Networking.HTTP.Mcp
 				Session.ReceiveText(sb.ToString());
 			}
 
-			Resource? Resource = await this.TryGetResource(Request, User, Uri);
+			Resource? Resource = await this.TryGetResource(Request, User, Uri, Session);
 
 			if (Resource is null)
 			{
@@ -1422,9 +1464,135 @@ namespace Waher.Networking.HTTP.Mcp
 			};
 
 			if (this.hasSnifferSet)
-				Session.TransmitText(JSON.Encode(Result, true));
+				Session.TransmitText(JSON.Encode(Result, false));
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Subscribes to an MCP server resource.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Uri">URI of the resource to subscribe to.</param>
+		[JsonRpcMethod]
+		protected async Task Resources_Subscribe(HttpRequest Request, HttpResponse Response, 
+			Uri Uri)
+		{
+			Session? Session = await this.TryGetMcpSession(Request, Response);
+			if (Session is null)
+				return;
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
+			if (Response.ResponseSent)
+				return;
+
+			if (this.hasSnifferSet)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append(this.Name);
+				sb.Append(".resources/subscribe(");
+				sb.Append(Uri);
+				sb.Append(')');
+
+				Session.ReceiveText(sb.ToString());
+			}
+
+			Resource? Resource = await this.TryGetResource(Request, User, Uri, Session);
+
+			if (Resource is null)
+			{
+				if (this.hasSnifferSet)
+					Session.Error("Resource not found: " + Uri);
+
+				await Response.SendResponse(new NotFoundException("Resource not found."));
+				return;
+			}
+
+			if (!Resource.IsAuthorized(User, out string? MissingPrivilege) ||
+				!this.CheckScopes(User, this.resourceScopes, out MissingPrivilege))
+			{
+				if (this.hasSnifferSet)
+					Session.Error("Access denied. Missing privilege: " + MissingPrivilege);
+
+				await Response.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
+					User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty));
+				return;
+			}
+
+			bool Result = Session.Subscribe(Uri.ToString());
+
+			if (this.hasSnifferSet)
+			{
+				if (Result)
+					Session.Information("Subscription to resource successful: " + Uri);
+				else
+					Session.Information("Subscription already exists for: " + Uri);
+			}
+		}
+
+		/// <summary>
+		/// Unsubscribes from an MCP server resource.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Uri">URI of the resource to unsubscribe from.</param>
+		[JsonRpcMethod]
+		protected async Task Resources_Unsubscribe(HttpRequest Request, HttpResponse Response,
+			Uri Uri)
+		{
+			Session? Session = await this.TryGetMcpSession(Request, Response);
+			if (Session is null)
+				return;
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
+			if (Response.ResponseSent)
+				return;
+
+			if (this.hasSnifferSet)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append(this.Name);
+				sb.Append(".resources/unsubscribe(");
+				sb.Append(Uri);
+				sb.Append(')');
+
+				Session.ReceiveText(sb.ToString());
+			}
+
+			Resource? Resource = await this.TryGetResource(Request, User, Uri, Session);
+
+			if (Resource is null)
+			{
+				if (this.hasSnifferSet)
+					Session.Error("Resource not found: " + Uri);
+
+				await Response.SendResponse(new NotFoundException("Resource not found."));
+				return;
+			}
+
+			if (!Resource.IsAuthorized(User, out string? MissingPrivilege) ||
+				!this.CheckScopes(User, this.resourceScopes, out MissingPrivilege))
+			{
+				if (this.hasSnifferSet)
+					Session.Error("Access denied. Missing privilege: " + MissingPrivilege);
+
+				await Response.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
+					User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty));
+				return;
+			}
+
+			bool Result = Session.Unsubscribe(Uri.ToString());
+
+			if (this.hasSnifferSet)
+			{
+				if (Result)
+					Session.Information("Unsubscription from resource successful: " + Uri);
+				else
+					Session.Information("No subscription found for: " + Uri);
+			}
 		}
 
 		/// <summary>
@@ -1432,8 +1600,10 @@ namespace Waher.Networking.HTTP.Mcp
 		/// </summary>
 		/// <param name="Request">HTTP Request object.</param>
 		/// <param name="User">MCP Client user requesting resources.</param>
+		/// <param name="Session">MCP Session, if available.</param>
 		/// <returns>Array of resources.</returns>
-		public virtual Task<Resource[]> GetResources(HttpRequest Request, IUser? User)
+		public virtual Task<Resource[]> GetResources(HttpRequest Request, IUser? User,
+			Session? Session)
 		{
 			return Task.FromResult(Array.Empty<Resource>());
 		}
@@ -1444,9 +1614,10 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Request">HTTP Request object.</param>
 		/// <param name="User">MCP Client user requesting resources.</param>
 		/// <param name="Uri">URI of resource.</param>
+		/// <param name="Session">MCP Session, if available.</param>
 		/// <returns>Resource, if found (and user has access rights to it), null otherwise.</returns>
 		public virtual Task<Resource?> TryGetResource(HttpRequest Request, IUser? User,
-			Uri Uri)
+			Uri Uri, Session? Session)
 		{
 			return Task.FromResult<Resource?>(null);
 		}
@@ -1462,13 +1633,24 @@ namespace Waher.Networking.HTTP.Mcp
 		{
 			try
 			{
-				// TODO: Only to clients who has resources that have been updated.
-
-				await this.SendNotification(new Dictionary<string, object>()
+				Dictionary<string, object> Notification = new Dictionary<string, object>()
 				{
 					{ "jsonrpc", "2.0" },
 					{ "method", "notifications/resources/list_changed" }
-				});
+				};
+
+				await this.SendNotification(
+					Session =>
+					{
+						if (!(Session is Session McpSession))
+							return false;
+
+						if (this.hasSnifferSet)
+							McpSession.TransmitText(JSON.Encode(Notification, false));
+
+						return true;
+					},
+					Notification);
 			}
 			catch (Exception ex)
 			{
@@ -1476,11 +1658,11 @@ namespace Waher.Networking.HTTP.Mcp
 			}
 		}
 
-		private Task SendNotification(Dictionary<string, object> Notification)
+		private Task SendNotification(Predicate<IJsonRpcSession?> Filter,
+			Dictionary<string, object> Notification)
 		{
-			// TODO: Sniffers
-
 			return this.SendEvent(
+				Filter,
 				new KeyValuePair<string, object>("event", "message"),
 				new KeyValuePair<string, object>("data", JSON.Encode(Notification, false)));
 		}
@@ -1494,10 +1676,7 @@ namespace Waher.Networking.HTTP.Mcp
 		{
 			try
 			{
-				// TODO: Only to subscribers
-				// TODO: Sniffers
-
-				await this.SendNotification(new Dictionary<string, object>()
+				Dictionary<string, object> Notification = new Dictionary<string, object>()
 				{
 					{ "jsonrpc", "2.0" },
 					{ "method", "notifications/resources/updated" },
@@ -1505,8 +1684,26 @@ namespace Waher.Networking.HTTP.Mcp
 						{
 							{ "uri", Uri.OriginalString }
 						}
+					}
+				};
+
+				string s = Uri.ToString();
+
+				await this.SendNotification(
+					Session =>
+					{
+						if (!(Session is Session McpSession))
+							return false;
+
+						if (!McpSession.IsSubscribed(s))
+							return false;
+
+						if (this.hasSnifferSet)
+							McpSession.TransmitText(JSON.Encode(Notification, false));
+
+						return true;
 					},
-				});
+					Notification);
 			}
 			catch (Exception ex)
 			{

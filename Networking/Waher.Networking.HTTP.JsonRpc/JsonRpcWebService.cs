@@ -309,6 +309,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			}
 		}
 
+
 		/// <summary>
 		/// Sends an event to clients with open subscriptions.
 		/// </summary>
@@ -316,7 +317,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <returns>Number of clients the event was forwarded to.</returns>
 		public Task<int> SendEvent(IDictionary<string, object> Fields)
 		{
-			return this.SendEvent(null, Fields);
+			return this.SendEvent(All, null, Fields);
 		}
 
 		/// <summary>
@@ -326,7 +327,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <returns>Number of clients the event was forwarded to.</returns>
 		public Task<int> SendEvent(params KeyValuePair<string, object>[] Fields)
 		{
-			return this.SendEvent(null, Fields);
+			return this.SendEvent(All, null, Fields);
 		}
 
 		/// <summary>
@@ -336,7 +337,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <returns>Number of clients the event was forwarded to.</returns>
 		public Task<int> SendEvent(IEnumerable<KeyValuePair<string, object>> Fields)
 		{
-			return this.SendEvent(null, Fields);
+			return this.SendEvent(All, null, Fields);
 		}
 
 		/// <summary>
@@ -347,7 +348,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <returns>Number of clients the event was forwarded to.</returns>
 		public Task<int> SendEvent(string? Comment, IDictionary<string, object> Fields)
 		{
-			return this.SendEvent(Comment, (IEnumerable<KeyValuePair<string, object>>)Fields);
+			return this.SendEvent(All, Comment,
+				(IEnumerable<KeyValuePair<string, object>>)Fields);
 		}
 
 		/// <summary>
@@ -358,7 +360,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <returns>Number of clients the event was forwarded to.</returns>
 		public Task<int> SendEvent(string? Comment, params KeyValuePair<string, object>[] Fields)
 		{
-			return this.SendEvent(Comment, (IEnumerable<KeyValuePair<string, object>>)Fields);
+			return this.SendEvent(All, Comment, (IEnumerable<KeyValuePair<string, object>>)Fields);
 		}
 
 		/// <summary>
@@ -368,6 +370,98 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="Fields">Fields to emit.</param>
 		/// <returns>Number of clients the event was forwarded to.</returns>
 		public Task<int> SendEvent(string? Comment, IEnumerable<KeyValuePair<string, object>> Fields)
+		{
+			return this.SendEvent(All, Comment, Fields);
+		}
+
+		/// <summary>
+		/// Filter function that selects all sessions.
+		/// </summary>
+		/// <param name="Session">Session</param>
+		/// <returns>Always returns true.</returns>
+		public static bool All(IJsonRpcSession? Session)
+		{
+			return true;
+		}
+
+		/// <summary>
+		/// Sends an event to clients with open subscriptions.
+		/// </summary>
+		/// <param name="Filter">Session filter, selecting the subscriptions that will
+		/// receive the event.</param>
+		/// <param name="Fields">Fields to emit.</param>
+		/// <returns>Number of clients the event was forwarded to.</returns>
+		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, 
+			IDictionary<string, object> Fields)
+		{
+			return this.SendEvent(Filter, null, Fields);
+		}
+
+		/// <summary>
+		/// Sends an event to clients with open subscriptions.
+		/// </summary>
+		/// <param name="Filter">Session filter, selecting the subscriptions that will
+		/// receive the event.</param>
+		/// <param name="Fields">Fields to emit.</param>
+		/// <returns>Number of clients the event was forwarded to.</returns>
+		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, 
+			params KeyValuePair<string, object>[] Fields)
+		{
+			return this.SendEvent(Filter, null, Fields);
+		}
+
+		/// <summary>
+		/// Sends an event to clients with open subscriptions.
+		/// </summary>
+		/// <param name="Filter">Session filter, selecting the subscriptions that will
+		/// receive the event.</param>
+		/// <param name="Fields">Fields to emit.</param>
+		/// <returns>Number of clients the event was forwarded to.</returns>
+		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, 
+			IEnumerable<KeyValuePair<string, object>> Fields)
+		{
+			return this.SendEvent(Filter, null, Fields);
+		}
+
+		/// <summary>
+		/// Sends an event to clients with open subscriptions.
+		/// </summary>
+		/// <param name="Filter">Session filter, selecting the subscriptions that will
+		/// receive the event.</param>
+		/// <param name="Comment">Optional comment.</param>
+		/// <param name="Fields">Fields to emit.</param>
+		/// <returns>Number of clients the event was forwarded to.</returns>
+		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, string? Comment, 
+			IDictionary<string, object> Fields)
+		{
+			return this.SendEvent(Filter, Comment, 
+				(IEnumerable<KeyValuePair<string, object>>)Fields);
+		}
+
+		/// <summary>
+		/// Sends an event to clients with open subscriptions.
+		/// </summary>
+		/// <param name="Filter">Session filter, selecting the subscriptions that will
+		/// receive the event.</param>
+		/// <param name="Comment">Optional comment.</param>
+		/// <param name="Fields">Fields to emit.</param>
+		/// <returns>Number of clients the event was forwarded to.</returns>
+		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, string? Comment, 
+			params KeyValuePair<string, object>[] Fields)
+		{
+			return this.SendEvent(Filter, Comment, (IEnumerable<KeyValuePair<string, object>>)Fields);
+		}
+
+		/// <summary>
+		/// Sends an event to clients with open subscriptions.
+		/// </summary>
+		/// <param name="Filter">Session filter, selecting the subscriptions that will
+		/// receive the event.</param>
+		/// <param name="Comment">Optional comment.</param>
+		/// <param name="Fields">Fields to emit.</param>
+		/// <returns>Number of clients the event was forwarded to.</returns>
+		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, string? Comment, 
+			IEnumerable<KeyValuePair<string, object>> Fields)
 		{
 			if (!this.SupportsServerSentEvents)
 				throw new InvalidOperationException("Server-Sent Events (SSE) not supported by this resource.");
@@ -422,25 +516,28 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 			sb.Append("\r\n");
 
-			return this.SendEvent(sb.ToString());
+			return this.SendEvent(Filter, sb.ToString());
 		}
 
-		private async Task<int> SendEvent(string Event)
+		private async Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, string Event)
 		{
 			int Count = 0;
 
-			foreach (HttpResponse Response in this.eventSubscriptionsStatic)
+			foreach (Subscription Subscription in this.eventSubscriptionsStatic)
 			{
 				try
 				{
-					await Response.Write(Event);
-					Count++;
+					if (Filter(Subscription.Session))
+					{
+						await Subscription.Response.Write(Event);
+						Count++;
+					}
 				}
 				catch (Exception)
 				{
 					lock (this.eventSubscriptions)
 					{
-						this.eventSubscriptions.Remove(Response);
+						this.eventSubscriptions.Remove(Subscription);
 						this.eventSubscriptionsStatic = this.eventSubscriptions.ToArray();
 					}
 				}
@@ -449,9 +546,21 @@ namespace Waher.Networking.HTTP.JsonRpc
 			return Count;
 		}
 
-		private readonly ChunkedList<HttpResponse> eventSubscriptions = new ChunkedList<HttpResponse>();
-		private HttpResponse[] eventSubscriptionsStatic = Array.Empty<HttpResponse>();
+		private readonly ChunkedList<Subscription> eventSubscriptions = new ChunkedList<Subscription>();
+		private Subscription[] eventSubscriptionsStatic = Array.Empty<Subscription>();
 		private bool eventSubscriptionsKeepAliveRunning = false;
+
+		private class Subscription
+		{
+			public readonly HttpResponse Response;
+			public readonly IJsonRpcSession? Session;
+
+			public Subscription(HttpResponse Response, IJsonRpcSession? Session)
+			{
+				this.Response = Response;
+				this.Session = Session;
+			}
+		}
 
 		private async void KeepEventSubscrptionsAlive()
 		{
@@ -489,6 +598,10 @@ namespace Waher.Networking.HTTP.JsonRpc
 					return;
 				}
 
+				IJsonRpcSession? Session = await this.TryGetSession(Request, Response);
+				if (Response.ResponseSent)
+					return;
+
 				Response.StatusCode = 200;
 				Response.StatusMessage = "OK";
 				Response.ContentType = "text/event-stream";
@@ -521,7 +634,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 				lock (this.eventSubscriptions)
 				{
-					this.eventSubscriptions.Add(Response);
+					this.eventSubscriptions.Add(new Subscription(Response, Session));
 					this.eventSubscriptionsStatic = this.eventSubscriptions.ToArray();
 
 					if (!this.eventSubscriptionsKeepAliveRunning)
@@ -566,6 +679,17 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 			if (!await JsonRpcRequest.BuildResponse(this, Request, Response))
 				await this.SendResponse(Request, JsonRpcRequest, Response);
+		}
+
+		/// <summary>
+		/// Tries to get a session object for the resource, if any.
+		/// </summary>
+		/// <param name="Request">HTTP Request object</param>
+		/// <param name="Response">HTTP Response object</param>
+		/// <returns>Session object, if any.</returns>
+		protected virtual Task<IJsonRpcSession?> TryGetSession(HttpRequest Request, HttpResponse Response)
+		{
+			return Task.FromResult<IJsonRpcSession?>(null);
 		}
 
 		/// <summary>

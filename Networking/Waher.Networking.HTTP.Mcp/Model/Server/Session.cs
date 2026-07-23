@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp.Model.Client;
 using Waher.Networking.Sniffers;
 
@@ -9,8 +11,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 	/// <summary>
 	/// MCP Session information.
 	/// </summary>
-	public class Session : IDisposableAsync
+	public class Session : IDisposableAsync, IJsonRpcSession
 	{
+		private readonly HashSet<string> subscriptions = new HashSet<string>();
 		private readonly ISnifferSet? snifferSet;
 		private readonly bool hasSnifferSet;
 		private InMemorySniffer? unauthenticatedSniffer;
@@ -95,7 +98,12 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			{
 				await this.unauthenticatedSniffer.DisposeAsync();
 				this.unauthenticatedSniffer = null;
-			}	
+			}
+
+			lock (this.subscriptions)
+			{
+				this.subscriptions.Clear();
+			}
 		}
 
 		/// <summary>
@@ -140,7 +148,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <summary>
 		/// Text has been transmitted to the client.
 		/// </summary>
-		/// <param name="Text">Received text.</param>
+		/// <param name="Text">Transmitted text.</param>
 		internal void TransmitText(string Text)
 		{
 			if (this.hasSnifferSet)
@@ -153,9 +161,24 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		}
 
 		/// <summary>
+		/// An information message has been logged.
+		/// </summary>
+		/// <param name="Text">Information text.</param>
+		internal void Information(string Text)
+		{
+			if (this.hasSnifferSet)
+			{
+				if (this.isAuthenticated)
+					this.snifferSet!.Information(this.userName, Text);
+				else
+					this.unauthenticatedSniffer?.Information(Text);
+			}
+		}
+
+		/// <summary>
 		/// A warning message has been logged.
 		/// </summary>
-		/// <param name="Text">Received text.</param>
+		/// <param name="Text">Warning text.</param>
 		internal void Warning(string Text)
 		{
 			if (this.hasSnifferSet)
@@ -170,7 +193,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <summary>
 		/// A error message has been logged.
 		/// </summary>
-		/// <param name="Text">Received text.</param>
+		/// <param name="Text">Error text.</param>
 		internal void Error(string Text)
 		{
 			if (this.hasSnifferSet)
@@ -194,6 +217,45 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 					this.snifferSet!.Exception(this.userName, Exception);
 				else
 					this.unauthenticatedSniffer?.Exception(Exception);
+			}
+		}
+
+		/// <summary>
+		/// Checks if a subscription to a resource exists.
+		/// </summary>
+		/// <param name="Uri">URI of resource.</param>
+		/// <returns>If a subscription exists.</returns>
+		public bool IsSubscribed(string Uri)
+		{
+			lock (this.subscriptions)
+			{
+				return this.subscriptions.Contains(Uri);
+			}
+		}
+
+		/// <summary>
+		/// Subscribes to a resource.
+		/// </summary>
+		/// <param name="Uri">URI of resource.</param>
+		/// <returns>If a subscription was added (true), or if one already existed(false).</returns>
+		public bool Subscribe(string Uri)
+		{
+			lock (this.subscriptions)
+			{
+				return this.subscriptions.Add(Uri);
+			}
+		}
+
+		/// <summary>
+		/// Unsubscribes from a resource.
+		/// </summary>
+		/// <param name="Uri">URI of resource.</param>
+		/// <returns>If a subscription was removed (true), or if one was not found (false).</returns>
+		public bool Unsubscribe(string Uri)
+		{
+			lock (this.subscriptions)
+			{
+				return this.subscriptions.Remove(Uri);
 			}
 		}
 	}

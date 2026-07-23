@@ -17,11 +17,14 @@ using Waher.Networking.HTTP.Mcp.Model.Server;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Cache;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Counters;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script.Model;
 using Waher.Security;
+using Waher.Security.JWT;
 
 namespace Waher.Networking.HTTP.Mcp
 {
@@ -31,10 +34,7 @@ namespace Waher.Networking.HTTP.Mcp
 	[OAuthScopesSupported(true, "McpScopesSupported")]
 	public abstract class HttpMcpServerResource : JsonRpcWebService
 	{
-		/// <summary>
-		/// User name used in sniffers for unauthenticated requests.
-		/// </summary>
-		private const string NotAuthenticated = "Not authenticated";
+		private static readonly Cache<string, Session> sessions = GetCache();
 
 		/// <summary>
 		/// Scope suffix for MCP server tools is ":tools".
@@ -63,8 +63,18 @@ namespace Waher.Networking.HTTP.Mcp
 		private readonly string[] resourceScopes;
 		private readonly string[] scopesSupported;
 		private readonly bool hasScopes;
+		private readonly bool hasSnifferSet;
 		private bool requiresAuthentication;
-		private bool hasSnifferSet;
+
+		private static Cache<string, Session> GetCache()
+		{
+			Cache<string, Session> Result = new Cache<string, Session>(int.MaxValue,
+				TimeSpan.MaxValue, TimeSpan.FromHours(1));
+
+			Result.Removed += (sender, e) => e.Value.DisposeAsync();
+
+			return Result;
+		}
 
 		private static Dictionary<Type, IContentBlock> GetContentBlocksFirstTime()
 		{
@@ -200,21 +210,6 @@ namespace Waher.Networking.HTTP.Mcp
 				}
 			}
 		}
-
-		/// <summary>
-		/// Protocol version of client, if available.
-		/// </summary>
-		public string? ClientProtocolVersion { get; private set; }
-
-		/// <summary>
-		/// Client capabilities, if available.
-		/// </summary>
-		public ClientCapabilities? ClientCapabilities { get; private set; }
-
-		/// <summary>
-		/// Information about client, if available.
-		/// </summary>
-		public Implementation? ClientInformation { get; private set; }
 
 		/// <summary>
 		/// If Server-Sent Events (SSE) are supported by the resource.
@@ -428,16 +423,45 @@ namespace Waher.Networking.HTTP.Mcp
 		/// information about capabilities.
 		/// </summary>
 		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Response">HTTP Response object.</param>
 		/// <param name="ProtocolVersion">Protocol Version</param>
 		/// <param name="Capabilities">Client capabilities</param>
 		/// <param name="ClientInfo">Client information</param>
 		/// <returns>Server capabilities and information.</returns>
 		[JsonRpcMethod]
-		protected Dictionary<string, object> Initialize(
-			HttpRequest Request, string ProtocolVersion,
+		protected Dictionary<string, object> Initialize(HttpRequest Request,
+			HttpResponse Response, string ProtocolVersion,
 			Dictionary<string, object> Capabilities,
 			Dictionary<string, object> ClientInfo)
 		{
+			if (!ClientCapabilities.TryParse(Capabilities, out ClientCapabilities? CapabilitiesParsed))
+				CapabilitiesParsed = null;
+
+			if (!Implementation.TryParse(ClientInfo, out Implementation? ClientInfoParsed))
+				ClientInfoParsed = null;
+
+			string RemoteEndpoint = Request.RemoteEndPoint.RemovePortNumber();
+			string SessionId;
+
+			do
+			{
+				SessionId = OAuth2Environment.GenerateRandomCode(32);
+
+				if (this.HasJwtFactory)
+				{
+					SessionId = this.JwtFactory!.Create(
+						new KeyValuePair<string, object>(JwtClaims.JwtId, SessionId),
+						new KeyValuePair<string, object>(JwtClaims.ClientId, RemoteEndpoint));
+				}
+			}
+			while (sessions.ContainsKey(SessionId));
+
+			Session Session = new Session(SessionId, ProtocolVersion,
+				CapabilitiesParsed, ClientInfoParsed, RemoteEndpoint, this.snifferSet);
+
+			sessions[SessionId] = Session;
+			Response.SetHeader("MCP-Session-Id", SessionId);
+
 			if (this.hasSnifferSet)
 			{
 				StringBuilder sb = new StringBuilder();
@@ -451,17 +475,8 @@ namespace Waher.Networking.HTTP.Mcp
 				sb.Append(JSON.Encode(ClientInfo, 1));
 				sb.Append(')');
 
-				this.snifferSet!.ReceiveText(Request.User?.UserName ?? NotAuthenticated,
-					sb.ToString());
+				Session.ReceiveText(sb.ToString());
 			}
-
-			this.ClientProtocolVersion = ProtocolVersion;
-
-			if (ClientCapabilities.TryParse(Capabilities, out ClientCapabilities CapabilitiesParsed))
-				this.ClientCapabilities = CapabilitiesParsed;
-
-			if (Implementation.TryParse(ClientInfo, out Implementation ClientInfoParsed))
-				this.ClientInformation = ClientInfoParsed;
 
 			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
@@ -518,10 +533,7 @@ namespace Waher.Networking.HTTP.Mcp
 			};
 
 			if (this.hasSnifferSet)
-			{
-				this.snifferSet!.TransmitText(Request.User?.UserName ?? NotAuthenticated,
-					JSON.Encode(Result, true));
-			}
+				Session.TransmitText(JSON.Encode(Result, true));
 
 			return Result;
 		}
@@ -530,17 +542,60 @@ namespace Waher.Networking.HTTP.Mcp
 		/// Notification that the client has completed its initialization.
 		/// </summary>
 		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
 		[JsonRpcMethod]
-		protected void Notifications_Initialized(HttpRequest Request)
+		protected async Task Notifications_Initialized(HttpRequest Request,
+			HttpResponse Response)
 		{
+			Session? Session = await this.TryGetSession(Request, Response);
+			if (Session is null)
+				return;
+
 			if (this.hasSnifferSet)
-			{
-				this.snifferSet!.ReceiveText(Request.User?.UserName ?? NotAuthenticated,
-					this.Name + ".Initialized()");
-			}
+				Session.ReceiveText(this.Name + ".Initialized()");
 
 			Log.Informational("MCP client initialized: " + Request.RemoteEndPoint,
 				this.ResourceName, Request.RemoteEndPoint, "McpInitialized");
+		}
+
+		private async Task<Session?> TryGetSession(HttpRequest Request, HttpResponse Response)
+		{
+			if (!Request.Header.TryGetHeaderField("MCP-Session-Id", out HttpField SessionHeader))
+			{
+				await Response.SendResponse(new BadRequestException("Missing MCP-Session-Id header."));
+				return null;
+			}
+
+			string SessionId = SessionHeader.Value;
+
+			if (this.HasJwtFactory)
+			{
+				if (!JwtToken.TryParse(SessionId, out JwtToken Token))
+				{
+					await Response.SendResponse(new NotFoundException("Invalid MCP-Session-Id."));
+					return null;
+				}
+
+				if (!this.JwtFactory!.IsValid(Token))
+				{
+					await Response.SendResponse(new NotFoundException("MCP-Session-Id invalid or expired."));
+					return null;
+				}
+			}
+
+			if (!sessions.TryGetValue(SessionId, out Session? Session))
+			{
+				await Response.SendResponse(new NotFoundException("MCP-Session-Id expired or not found."));
+				return null;
+			}
+
+			if (Session.RemoteEndpoint != Request.RemoteEndPoint.RemovePortNumber())
+			{
+				await Response.SendResponse(new NotFoundException("MCP-Session-Id not found for this endpoint."));
+				return null;
+			}
+
+			return Session;
 		}
 
 		/// <summary>
@@ -554,7 +609,11 @@ namespace Waher.Networking.HTTP.Mcp
 		protected async Task<Dictionary<string, object>?> Tools_List(HttpRequest Request,
 			HttpResponse Response, string? Cursor = null)
 		{
-			IUser? User = await this.GetAuthenticatedUser(Request, Response);
+			Session? Session = await this.TryGetSession(Request, Response);
+			if (Session is null)
+				return null;
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
 			if (Response.ResponseSent)
 				return null;
 
@@ -567,8 +626,7 @@ namespace Waher.Networking.HTTP.Mcp
 				sb.Append(Cursor);
 				sb.Append(')');
 
-				this.snifferSet!.ReceiveText(User?.UserName ?? NotAuthenticated,
-					sb.ToString());
+				Session.ReceiveText(sb.ToString());
 			}
 
 			int Offset = 0;
@@ -577,7 +635,13 @@ namespace Waher.Networking.HTTP.Mcp
 			if (!string.IsNullOrEmpty(Cursor))
 			{
 				if (!int.TryParse(Cursor, out Offset) || Offset < 0)
-					throw new Exception("Invalid cursor.");
+				{
+					if (!this.hasSnifferSet)
+						Session.Error("Invalid cursor: " + Cursor);
+
+					await Response.SendResponse(new BadRequestException("Invalid cursor."));
+					return null;
+				}
 			}
 
 			ChunkedList<Tool> Tools = new ChunkedList<Tool>();
@@ -623,10 +687,7 @@ namespace Waher.Networking.HTTP.Mcp
 			Result["tools"] = ToolsJson;
 
 			if (this.hasSnifferSet)
-			{
-				this.snifferSet!.TransmitText(User?.UserName ?? NotAuthenticated,
-					JSON.Encode(Result, true));
-			}
+				Session.TransmitText(JSON.Encode(Result, true));
 
 			return Result;
 		}
@@ -648,17 +709,23 @@ namespace Waher.Networking.HTTP.Mcp
 			return OAuthResource.HasScopePrivileges(Scopes, User, out MissingPrivilege);
 		}
 
-		private async Task<IUser?> GetAuthenticatedUser(HttpRequest Request, HttpResponse Response)
+		private async Task<IUser?> GetAuthenticatedUser(HttpRequest Request,
+			HttpResponse Response, Session Session)
 		{
 			IUser User = Request.User;
 			bool Encrypted = Request.Encrypted;
 			int Strength = Request.CipherStrength;
 
-			if (this.requiresAuthentication && User is null)
+			if ((this.requiresAuthentication || !(Request.Header.Authorization is null)) &&
+				User is null)
 			{
 				if (this.AuthenticationSchemes is null)
 				{
 					await Response.SendResponse(new ForbiddenException());
+
+					if (this.hasSnifferSet)
+						Session.Error("Access denied. No authentication schemes available.");
+
 					return null;
 				}
 
@@ -700,9 +767,16 @@ namespace Waher.Networking.HTTP.Mcp
 
 					await Response.SendResponse(new UnauthorizedException(
 						Challenges.ToArray()));
+
+					if (this.hasSnifferSet)
+						Session.Error("Access denied. Unauthorized.");
+
 					return null;
 				}
 			}
+
+			if (!Session.IsAuthenticated && !(User is null))
+				await Session.SetUserName(User.UserName);
 
 			return User;
 		}
@@ -727,7 +801,11 @@ namespace Waher.Networking.HTTP.Mcp
 			HttpResponse Response, string Name, Dictionary<string, object?> Arguments,
 			object? Task = null, [JsonRpcMetaDataArgument] object? _Meta = null)
 		{
-			IUser? User = await this.GetAuthenticatedUser(Request, Response);
+			Session? Session = await this.TryGetSession(Request, Response);
+			if (Session is null)
+				return null;
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
 			if (Response.ResponseSent)
 				return null;
 
@@ -755,8 +833,7 @@ namespace Waher.Networking.HTTP.Mcp
 
 				sb.Append(')');
 
-				this.snifferSet!.ReceiveText(User?.UserName ?? NotAuthenticated,
-					sb.ToString());
+				Session.ReceiveText(sb.ToString());
 			}
 
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
@@ -765,20 +842,27 @@ namespace Waher.Networking.HTTP.Mcp
 			try
 			{
 				if (!this.tools.TryGetValue(Name, out Tool? Tool))
-					throw new NotFoundException("Tool not found: " + Name);
-
-				Tool.AssertAuthorized(this.ResourceName, User);
-
-				if (!this.CheckScopes(User, this.toolScopes, out string? MissingPrivilege))
 				{
-					throw ForbiddenException.AccessDenied(this.ResourceName,
-						User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty);
+					if (this.hasSnifferSet)
+						Session.Error("Tool not found: " + Name);
+
+					await Response.SendResponse(new NotFoundException("Tool not found."));
+					return null;
 				}
 
-				string UserName = User?.UserName ?? "N/A";
+				if (!Tool.IsAuthorized(User, out string? MissingPrivilege) ||
+					!this.CheckScopes(User, this.toolScopes, out MissingPrivilege))
+				{
+					if (this.hasSnifferSet)
+						Session.Error("Access denied. Missing privilege: " + MissingPrivilege);
+
+					await Response.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
+						User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty));
+					return null;
+				}
 
 				await RuntimeCounters.IncrementCounter("MCP.Tool." + Name);
-				await RuntimeCounters.IncrementCounter("MCP.User.Tool." + UserName);
+				await RuntimeCounters.IncrementCounter("MCP.User.Tool." + Session.UserName);
 
 				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 
@@ -790,12 +874,18 @@ namespace Waher.Networking.HTTP.Mcp
 				}
 				else
 				{
+					if (this.hasSnifferSet)
+						Session.Error(Reason);
+
 					ToolResult = Reason;
 					Result["isError"] = true;
 				}
 			}
 			catch (Exception ex)
 			{
+				if (this.hasSnifferSet)
+					Session.Exception(ex);
+
 				ToolResult = ex.Message;
 				Result["isError"] = true;
 			}
@@ -883,10 +973,7 @@ namespace Waher.Networking.HTTP.Mcp
 			}
 
 			if (this.hasSnifferSet)
-			{
-				this.snifferSet!.TransmitText(User?.UserName ?? NotAuthenticated,
-					JSON.Encode(Result, true));
-			}
+				Session.TransmitText(JSON.Encode(Result, true));
 
 			return Result;
 		}
@@ -902,7 +989,11 @@ namespace Waher.Networking.HTTP.Mcp
 		protected async Task<Dictionary<string, object>?> Prompts_List(HttpRequest Request,
 			HttpResponse Response, string? Cursor = null)
 		{
-			IUser? User = await this.GetAuthenticatedUser(Request, Response);
+			Session? Session = await this.TryGetSession(Request, Response);
+			if (Session is null)
+				return null;
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
 			if (Response.ResponseSent)
 				return null;
 
@@ -915,8 +1006,7 @@ namespace Waher.Networking.HTTP.Mcp
 				sb.Append(Cursor);
 				sb.Append(')');
 
-				this.snifferSet!.ReceiveText(User?.UserName ?? NotAuthenticated,
-					sb.ToString());
+				Session.ReceiveText(sb.ToString());
 			}
 
 			int Offset = 0;
@@ -925,7 +1015,13 @@ namespace Waher.Networking.HTTP.Mcp
 			if (!string.IsNullOrEmpty(Cursor))
 			{
 				if (!int.TryParse(Cursor, out Offset) || Offset < 0)
-					throw new Exception("Invalid cursor.");
+				{
+					if (!this.hasSnifferSet)
+						Session.Error("Invalid cursor: " + Cursor);
+
+					await Response.SendResponse(new BadRequestException("Invalid cursor."));
+					return null;
+				}
 			}
 
 			ChunkedList<Prompt> Prompts = new ChunkedList<Prompt>();
@@ -971,10 +1067,7 @@ namespace Waher.Networking.HTTP.Mcp
 			Result["prompts"] = PromptsJson;
 
 			if (this.hasSnifferSet)
-			{
-				this.snifferSet!.TransmitText(User?.UserName ?? NotAuthenticated,
-					JSON.Encode(Result, true));
-			}
+				Session.TransmitText(JSON.Encode(Result, true));
 
 			return Result;
 		}
@@ -993,7 +1086,11 @@ namespace Waher.Networking.HTTP.Mcp
 			HttpResponse Response, string Name, Dictionary<string, object?> Arguments,
 			[JsonRpcMetaDataArgument] object? _Meta = null)
 		{
-			IUser? User = await this.GetAuthenticatedUser(Request, Response);
+			Session? Session = await this.TryGetSession(Request, Response);
+			if (Session is null)
+				return null;
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
 			if (Response.ResponseSent)
 				return null;
 
@@ -1015,8 +1112,7 @@ namespace Waher.Networking.HTTP.Mcp
 
 				sb.Append(')');
 
-				this.snifferSet!.ReceiveText(User?.UserName ?? NotAuthenticated,
-					sb.ToString());
+				Session.ReceiveText(sb.ToString());
 			}
 
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
@@ -1025,20 +1121,27 @@ namespace Waher.Networking.HTTP.Mcp
 			try
 			{
 				if (!this.prompts.TryGetValue(Name, out Prompt? Prompt))
-					throw new NotFoundException("Prompt not found: " + Name);
-
-				Prompt.AssertAuthorized(this.ResourceName, User);
-
-				if (!this.CheckScopes(User, this.promptScopes, out string? MissingPrivilege))
 				{
-					throw ForbiddenException.AccessDenied(this.ResourceName,
-						User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty);
+					if (this.hasSnifferSet)
+						Session.Error("Prompt not found: " + Name);
+
+					await Response.SendResponse(new NotFoundException("Prompt not found."));
+					return null;
 				}
 
-				string UserName = User?.UserName ?? "N/A";
+				if (!Prompt.IsAuthorized(User, out string? MissingPrivilege) ||
+					!this.CheckScopes(User, this.promptScopes, out MissingPrivilege))
+				{
+					if (this.hasSnifferSet)
+						Session.Error("Access denied. Missing privilege: " + MissingPrivilege);
+
+					await Response.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
+						User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty));
+					return null;
+				}
 
 				await RuntimeCounters.IncrementCounter("MCP.Prompt." + Name);
-				await RuntimeCounters.IncrementCounter("MCP.User.Prompt." + UserName);
+				await RuntimeCounters.IncrementCounter("MCP.User.Prompt." + Session.UserName);
 
 				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 
@@ -1050,6 +1153,9 @@ namespace Waher.Networking.HTTP.Mcp
 				}
 				else
 				{
+					if (this.hasSnifferSet)
+						Session.Error(Reason);
+
 					PromptResult = Reason;
 					Result["isError"] = true;
 				}
@@ -1058,6 +1164,9 @@ namespace Waher.Networking.HTTP.Mcp
 			}
 			catch (Exception ex)
 			{
+				if (this.hasSnifferSet)
+					Session.Exception(ex);
+
 				PromptResult = ex.Message;
 				Result["isError"] = true;
 			}
@@ -1131,10 +1240,7 @@ namespace Waher.Networking.HTTP.Mcp
 			Result["messages"] = EncodedMessages;
 
 			if (this.hasSnifferSet)
-			{
-				this.snifferSet!.TransmitText(User?.UserName ?? NotAuthenticated,
-					JSON.Encode(Result, true));
-			}
+				Session.TransmitText(JSON.Encode(Result, true));
 
 			return Result;
 		}
@@ -1156,7 +1262,11 @@ namespace Waher.Networking.HTTP.Mcp
 		protected async Task<Dictionary<string, object>?> Resources_List(HttpRequest Request,
 			HttpResponse Response, string? Cursor = null)
 		{
-			IUser? User = await this.GetAuthenticatedUser(Request, Response);
+			Session? Session = await this.TryGetSession(Request, Response);
+			if (Session is null)
+				return null;
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
 			if (Response.ResponseSent)
 				return null;
 
@@ -1169,8 +1279,7 @@ namespace Waher.Networking.HTTP.Mcp
 				sb.Append(Cursor);
 				sb.Append(')');
 
-				this.snifferSet!.ReceiveText(User?.UserName ?? NotAuthenticated,
-					sb.ToString());
+				Session.ReceiveText(sb.ToString());
 			}
 
 			int Offset = 0;
@@ -1179,7 +1288,13 @@ namespace Waher.Networking.HTTP.Mcp
 			if (!string.IsNullOrEmpty(Cursor))
 			{
 				if (!int.TryParse(Cursor, out Offset) || Offset < 0)
-					throw new Exception("Invalid cursor.");
+				{
+					if (!this.hasSnifferSet)
+						Session.Error("Invalid cursor: " + Cursor);
+
+					await Response.SendResponse(new BadRequestException("Invalid cursor."));
+					return null;
+				}
 			}
 
 			Resource[] AllResources = await this.GetResources(Request, User);
@@ -1189,7 +1304,7 @@ namespace Waher.Networking.HTTP.Mcp
 
 			foreach (Resource Resource in AllResources)
 			{
-				if (!Resource.IsAuthorized(User))
+				if (!Resource.IsAuthorized(User, out _))
 					continue;
 
 				if (!this.CheckScopes(User, this.resourceScopes, out _))
@@ -1222,10 +1337,7 @@ namespace Waher.Networking.HTTP.Mcp
 			Result["resources"] = ResourcesJson;
 
 			if (this.hasSnifferSet)
-			{
-				this.snifferSet!.TransmitText(User?.UserName ?? NotAuthenticated,
-					JSON.Encode(Result, true));
-			}
+				Session.TransmitText(JSON.Encode(Result, true));
 
 			return Result;
 		}
@@ -1242,7 +1354,11 @@ namespace Waher.Networking.HTTP.Mcp
 		protected async Task<Dictionary<string, object>?> Resources_Read(HttpRequest Request,
 			HttpResponse Response, Uri Uri, [JsonRpcMetaDataArgument] object? _Meta = null)
 		{
-			IUser? User = await this.GetAuthenticatedUser(Request, Response);
+			Session? Session = await this.TryGetSession(Request, Response);
+			if (Session is null)
+				return null;
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
 			if (Response.ResponseSent)
 				return null;
 
@@ -1262,25 +1378,33 @@ namespace Waher.Networking.HTTP.Mcp
 
 				sb.Append(')');
 
-				this.snifferSet!.ReceiveText(User?.UserName ?? NotAuthenticated,
-					sb.ToString());
+				Session.ReceiveText(sb.ToString());
 			}
 
-			Resource Resource = await this.TryGetResource(Request, User, Uri)
-				?? throw new NotFoundException("Resource not found: " + Uri);
+			Resource? Resource = await this.TryGetResource(Request, User, Uri);
 
-			Resource.AssertAuthorized(this.ResourceName, User);
-
-			if (!this.CheckScopes(User, this.resourceScopes, out string? MissingPrivilege))
+			if (Resource is null)
 			{
-				throw ForbiddenException.AccessDenied(this.ResourceName,
-					User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty);
+				if (this.hasSnifferSet)
+					Session.Error("Resource not found: " + Uri);
+
+				await Response.SendResponse(new NotFoundException("Resource not found."));
+				return null;
 			}
 
-			string UserName = User?.UserName ?? "N/A";
+			if (!Resource.IsAuthorized(User, out string? MissingPrivilege) ||
+				!this.CheckScopes(User, this.resourceScopes, out MissingPrivilege))
+			{
+				if (this.hasSnifferSet)
+					Session.Error("Access denied. Missing privilege: " + MissingPrivilege);
+
+				await Response.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
+					User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty));
+				return null;
+			}
 
 			await RuntimeCounters.IncrementCounter("MCP.Resource." + Resource.Name);
-			await RuntimeCounters.IncrementCounter("MCP.User.Resource." + UserName);
+			await RuntimeCounters.IncrementCounter("MCP.User.Resource." + Session.UserName);
 
 			Dictionary<string, object>? MetaData = _Meta as Dictionary<string, object>;
 
@@ -1298,10 +1422,7 @@ namespace Waher.Networking.HTTP.Mcp
 			};
 
 			if (this.hasSnifferSet)
-			{
-				this.snifferSet!.TransmitText(User?.UserName ?? NotAuthenticated,
-					JSON.Encode(Result, true));
-			}
+				Session.TransmitText(JSON.Encode(Result, true));
 
 			return Result;
 		}
@@ -1358,7 +1479,7 @@ namespace Waher.Networking.HTTP.Mcp
 		private Task SendNotification(Dictionary<string, object> Notification)
 		{
 			// TODO: Sniffers
-		
+
 			return this.SendEvent(
 				new KeyValuePair<string, object>("event", "message"),
 				new KeyValuePair<string, object>("data", JSON.Encode(Notification, false)));

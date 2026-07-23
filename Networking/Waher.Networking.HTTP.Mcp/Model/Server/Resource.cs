@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP.Mcp.Model.Resources;
 using Waher.Security;
@@ -254,32 +255,24 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// Checks if a user is authorized to call the method.
 		/// </summary>
 		/// <param name="User">User to check.</param>
+		/// <param name="MissingPrivilege">Missing privilege, if not authorized.</param>
 		/// <returns>True if the user is authorized, false otherwise.</returns>
-		public bool IsAuthorized(IUser? User)
+		public bool IsAuthorized(IUser? User, [NotNullWhen(false)] out string? MissingPrivilege)
 		{
 			if (string.IsNullOrEmpty(this.RequiredPrivilege))
-				return true;
-
-			if (User is null)
-				return false;
-
-			return User.HasPrivilege(this.RequiredPrivilege);
-		}
-
-		/// <summary>
-		/// Asserts user is authorized to read the resource. If not, a 
-		/// <see cref="ForbiddenException"/> is thrown.
-		/// </summary>
-		/// <param name="ObjectId">Object ID to use in log events.</param>
-		/// <param name="User">User accessing method.</param>
-		public void AssertAuthorized(string ObjectId, IUser? User)
-		{
-			if (!this.IsAuthorized(User))
 			{
-				throw ForbiddenException.AccessDenied(ObjectId,
-					User?.UserName ?? string.Empty,
-					this.RequiredPrivilege ?? string.Empty);
+				MissingPrivilege = null;
+				return true;
 			}
+
+			if (!(User?.HasPrivilege(this.RequiredPrivilege) ?? false))
+			{
+				MissingPrivilege = this.RequiredPrivilege;
+				return false;
+			}
+
+			MissingPrivilege = null;
+			return true;
 		}
 
 		/// <summary>

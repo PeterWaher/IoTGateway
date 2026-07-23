@@ -102,10 +102,11 @@ internal class Program
 	{
 		X509Certificate2? Certificate = null;
 		HttpServer? WebServer = null;
-		ConsoleOutSniffer? Sniffer = null;
-		FilesProvider? filesProvider = null;
-		XmlFileLedger? ledger = null;
-		XmlFileSnifferSet? mcpSniffers = null;
+		ConsoleOutSniffer? ConsoleSniffer = null;
+		XmlFileSniffer? FileSniffer = null;
+		XmlFileSnifferSet? McpSniffers = null;
+		FilesProvider? FilesProvider = null;
+		XmlFileLedger? Ledger = null;
 		string s;
 		string? CertFileName = null;
 		string? CertPassword = null;
@@ -273,10 +274,10 @@ internal class Program
 			Types.SetModuleParameter("Domain", "localhost");
 			Types.SetModuleParameter("Realm", "TestServer");
 
-			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
-			Database.Register(filesProvider);
+			FilesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+			Database.Register(FilesProvider);
 
-			await filesProvider.RepairIfInproperShutdown(null);
+			await FilesProvider.RepairIfInproperShutdown(null);
 
 			Log.Informational("Database initialized");
 
@@ -290,11 +291,11 @@ internal class Program
 			if (File.Exists(LedgerFileName))
 				File.Delete(LedgerFileName);
 
-			ledger = new XmlFileLedger(LedgerFileName);
-			await ledger.Start();
+			Ledger = new XmlFileLedger(LedgerFileName);
+			await Ledger.Start();
 
-			Ledger.Register(ledger);
-			Ledger.StartListeningToDatabaseEvents();
+			Waher.Persistence.Ledger.Register(Ledger);
+			Waher.Persistence.Ledger.StartListeningToDatabaseEvents();
 
 			Log.Informational("Console Ledger initialized");
 
@@ -317,19 +318,22 @@ internal class Program
 				await Database.Update(TestUser);
 			}
 
-			Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.PadWithSpaces);
+			ConsoleSniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.PadWithSpaces);
+			FileSniffer = new XmlFileSniffer(Path.Combine("HTTP", "HTTP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml"),
+				"SnifferXmlToHtml.xslt", 7, BinaryPresentationMethod.ByteCount);
 
 			if (Certificate is null)
 			{
 				Log.Informational("Starting unencrypted web-server.");
 
-				WebServer = new HttpServer(HttpPort, Sniffer);
+				WebServer = new HttpServer(HttpPort, ConsoleSniffer, FileSniffer);
 			}
 			else
 			{
 				Log.Informational("Starting encrypted web-server.");
 
-				WebServer = new HttpServer([HttpPort], [HttpsPort], Certificate, Sniffer);
+				WebServer = new HttpServer([HttpPort], [HttpsPort], Certificate, 
+					ConsoleSniffer, FileSniffer);
 			}
 
 			int ProfilerIndex = 0;
@@ -377,7 +381,7 @@ internal class Program
 			OAuth2Environment Environment = new();
 			Environment.Register(JwtFactory);
 
-			mcpSniffers = new XmlFileSnifferSet(Path.Combine("MCP", "Sniffers"),
+			McpSniffers = new XmlFileSnifferSet(Path.Combine("MCP", "Sniffers"),
 				"MCP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
 				TimeSpan.FromHours(8), "SnifferXmlToHtml.xslt", 7,
 				BinaryPresentationMethod.ByteCount);
@@ -390,12 +394,12 @@ internal class Program
 			WebServer.Register(new OAuthAuthorizeResource(Environment));
 			WebServer.Register(new AuthorizationServerMetaData(Environment));
 			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", [],
-				new Uri("https://example.org/"), mcpSniffers));
+				new Uri("https://example.org/"), McpSniffers));
 			WebServer.Register(new InternetContentMcpServer("/MCP/Content", [],
-				new Uri("https://example.org/"), mcpSniffers));
+				new Uri("https://example.org/"), McpSniffers));
 			WebServer.Register(new FileStorageMcpServer("/MCP/Files",
 				Path.Combine("MCP", "Files"), [], new Uri("https://example.org/"), 
-				mcpSniffers));
+				McpSniffers));
 
 			Log.Informational("Web Server initialized.");
 			Log.Informational("Press CTRL+C to quit.");
@@ -418,16 +422,19 @@ internal class Program
 			Log.Informational("Shutting down.");
 			await Log.TerminateAsync();
 
-			if (filesProvider is not null)
-				await filesProvider.DisposeAsync();
+			if (FilesProvider is not null)
+				await FilesProvider.DisposeAsync();
 
 			if (WebServer is not null)
 				await WebServer.DisposeAsync();
 
-			if (Sniffer is not null)
-				await Sniffer.DisposeAsync();
+			if (ConsoleSniffer is not null)
+				await ConsoleSniffer.DisposeAsync();
 
-			mcpSniffers?.Dispose();
+			if (FileSniffer is not null)
+				await FileSniffer.DisposeAsync();
+
+			McpSniffers?.Dispose();
 
 			Log.TerminateAsync().Wait();
 		}

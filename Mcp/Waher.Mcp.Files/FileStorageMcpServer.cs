@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Mcp;
 using Waher.Networking.HTTP.Mcp.Model;
@@ -165,6 +167,11 @@ namespace Waher.Mcp.Files
 		public override bool ResourcesRequireAuthentication => true;
 
 		/// <summary>
+		/// If the MCP server has resource capabilities.
+		/// </summary>
+		public override bool HasResources => true;
+
+		/// <summary>
 		/// Gets available resources.
 		/// </summary>
 		/// <param name="Request">HTTP Request object.</param>
@@ -204,7 +211,7 @@ namespace Waher.Mcp.Files
 			{
 				string FullFileName = Files[i];
 				string FileName = FullFileName[(Folder.Length + 1)..];
-				string Uri = ResourceName + '/' + FileName.Replace(Path.DirectorySeparatorChar, '/');
+				string Uri = CreateFileUrl(ResourceName, FileName);
 				FileInfo FileInfo = new FileInfo(FullFileName);
 
 				Resources[i] = new FileResource(FileName, string.Empty, string.Empty,
@@ -239,7 +246,7 @@ namespace Waher.Mcp.Files
 			if (!ResourceName.EndsWith('/'))
 				c++;
 
-			FileName = FileName[c..].Replace('/', Path.DirectorySeparatorChar);
+			FileName = HttpUtility.UrlDecode(FileName[c..]).Replace('/', Path.DirectorySeparatorChar);
 
 			lock (this.users)
 			{
@@ -278,18 +285,33 @@ namespace Waher.Mcp.Files
 		{
 			if (this.TryGetUser(e.FullPath, out UsageRec? Usage, out string? LocalFileName))
 			{
-				string Url = Usage.Url + '/' + LocalFileName.Replace(Path.DirectorySeparatorChar, '/');
-				Usage.Session?.Unsubscribe(Url);
+				Usage.Session?.Unsubscribe(CreateFileUrl(Usage.Url, LocalFileName));
 				this.ResourcesUpdated(Usage.User!);
 			}
+		}
+
+		private static string CreateFileUrl(string? BaseUrl, string LocalFileName)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(BaseUrl);
+
+			LocalFileName = LocalFileName.Replace(Path.DirectorySeparatorChar, '/');
+
+			foreach (string Part in LocalFileName.Split('/'))
+			{
+				sb.Append('/');
+				sb.Append(HttpUtility.UrlEncode(Part));
+			}
+
+			return sb.ToString();
 		}
 
 		private void FileRenamed(object sender, RenamedEventArgs e)
 		{
 			if (this.TryGetUser(e.OldFullPath, out UsageRec? Usage, out string? LocalFileName))
 			{
-				string Url = Usage.Url + '/' + LocalFileName.Replace(Path.DirectorySeparatorChar, '/');
-				Usage.Session?.Unsubscribe(Url);
+				Usage.Session?.Unsubscribe(CreateFileUrl(Usage.Url, LocalFileName));
 				this.ResourcesUpdated(Usage.User!);
 			}
 		}

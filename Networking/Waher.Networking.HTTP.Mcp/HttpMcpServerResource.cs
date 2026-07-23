@@ -64,6 +64,8 @@ namespace Waher.Networking.HTTP.Mcp
 		private readonly string[] scopesSupported;
 		private readonly bool hasScopes;
 		private readonly bool hasSnifferSet;
+		private bool hasPrompts;
+		private bool hasTools;
 		private bool requiresAuthentication;
 
 		private static Cache<string, Session> GetCache()
@@ -299,6 +301,7 @@ namespace Waher.Networking.HTTP.Mcp
 				this.tools[Name] = Tool;
 
 				this.requiresAuthentication |= Tool.RequiresAuthentication;
+				this.hasTools = true;
 			}
 		}
 
@@ -351,6 +354,7 @@ namespace Waher.Networking.HTTP.Mcp
 				this.prompts[Name] = Prompt;
 
 				this.requiresAuthentication |= Prompt.RequiresAuthentication;
+				this.hasPrompts = true;
 			}
 		}
 
@@ -509,27 +513,29 @@ namespace Waher.Networking.HTTP.Mcp
 				Session.ReceiveText(sb.ToString());
 			}
 
+			Dictionary<string, object> Prompts = new Dictionary<string, object>();
+			if (this.hasPrompts)
+				Prompts["listChanged"] = true;
+
+			Dictionary<string, object> Tools = new Dictionary<string, object>();
+			if (this.hasTools)
+				Tools["listChanged"] = true;
+
+			Dictionary<string, object> Resources = new Dictionary<string, object>();
+			if (this.HasResources)
+			{
+				Resources["subscribe"] = true;
+				Resources["listChanged"] = true;
+			}
+
 			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
 				{ "protocolVersion", "2025-11-25" },
 				{ "capabilities", new Dictionary<string, object>()
 					{
-						{ "prompts", new Dictionary<string, object>()
-							{
-								{ "listChanged", true }
-							}
-						},
-						{ "resources", new Dictionary<string, object>()
-							{
-								{ "subscribe", true },
-								{ "listChanged", true }
-							}
-						},
-						{ "tools", new Dictionary<string, object>()
-							{
-								{ "listChanged", true }
-							}
-						},
+						{ "prompts", Prompts },
+						{ "resources", Resources },
+						{ "tools", Tools },
 						{ "logging", new Dictionary<string, object>() },
 						{ "completions", new Dictionary<string, object>() },
 						{ "tasks", new Dictionary<string, object>()
@@ -1612,6 +1618,11 @@ namespace Waher.Networking.HTTP.Mcp
 		{
 			return Task.FromResult(Array.Empty<Resource>());
 		}
+
+		/// <summary>
+		/// If the MCP server has resource capabilities.
+		/// </summary>
+		public virtual bool HasResources => false;
 
 		/// <summary>
 		/// Tries to get a resource, given its URI.

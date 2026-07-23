@@ -1481,7 +1481,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="Uri">URI of the resource to subscribe to.</param>
 		[JsonRpcMethod]
-		protected async Task Resources_Subscribe(HttpRequest Request, HttpResponse Response, 
+		protected async Task Resources_Subscribe(HttpRequest Request, HttpResponse Response,
 			Uri Uri)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);
@@ -1730,10 +1730,20 @@ namespace Waher.Networking.HTTP.Mcp
 
 			sessions.Remove(Session.SessionId);
 
-			Response.StatusCode = 204;
-			Response.StatusMessage = "No Content";
+			try
+			{
+				Response.StatusCode = 204;
+				Response.StatusMessage = "No Content";
 
-			await Response.SendResponse();
+				await Response.SendResponse();
+			}
+			finally
+			{
+				await this.SendEvent(
+					Loop => Session == Loop,
+					"Terminating session.");
+				this.Unregister(Session);
+			}
 		}
 
 	}

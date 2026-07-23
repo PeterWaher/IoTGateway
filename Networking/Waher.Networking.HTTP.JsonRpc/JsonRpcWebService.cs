@@ -188,7 +188,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				if (this.methods.ContainsKey(Name))
 					throw new Exception("Method already registered: " + Name);
 
-				this.methods[Name] = MethodInfo = new JsonRpcMethodInfo(Method, 
+				this.methods[Name] = MethodInfo = new JsonRpcMethodInfo(Method,
 					this.caseSensitive, RequiredPrivileges);
 			}
 
@@ -282,7 +282,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			{
 				string ResourceMetaData = this.metaDataResource!.GetResourceMetaDataUri(
 					this.hasDomain, this.domain, this.ResourceName);
-				
+
 				this.authenticationSchemes = HttpModule.GetAuthenticationSchemes(
 					new Uri(ResourceMetaData));
 			}
@@ -390,7 +390,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// receive the event.</param>
 		/// <param name="Fields">Fields to emit.</param>
 		/// <returns>Number of clients the event was forwarded to.</returns>
-		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, 
+		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter,
 			IDictionary<string, object> Fields)
 		{
 			return this.SendEvent(Filter, null, Fields);
@@ -403,7 +403,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// receive the event.</param>
 		/// <param name="Fields">Fields to emit.</param>
 		/// <returns>Number of clients the event was forwarded to.</returns>
-		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, 
+		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter,
 			params KeyValuePair<string, object>[] Fields)
 		{
 			return this.SendEvent(Filter, null, Fields);
@@ -416,7 +416,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// receive the event.</param>
 		/// <param name="Fields">Fields to emit.</param>
 		/// <returns>Number of clients the event was forwarded to.</returns>
-		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, 
+		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter,
 			IEnumerable<KeyValuePair<string, object>> Fields)
 		{
 			return this.SendEvent(Filter, null, Fields);
@@ -430,10 +430,10 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="Comment">Optional comment.</param>
 		/// <param name="Fields">Fields to emit.</param>
 		/// <returns>Number of clients the event was forwarded to.</returns>
-		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, string? Comment, 
+		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, string? Comment,
 			IDictionary<string, object> Fields)
 		{
-			return this.SendEvent(Filter, Comment, 
+			return this.SendEvent(Filter, Comment,
 				(IEnumerable<KeyValuePair<string, object>>)Fields);
 		}
 
@@ -445,7 +445,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="Comment">Optional comment.</param>
 		/// <param name="Fields">Fields to emit.</param>
 		/// <returns>Number of clients the event was forwarded to.</returns>
-		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, string? Comment, 
+		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, string? Comment,
 			params KeyValuePair<string, object>[] Fields)
 		{
 			return this.SendEvent(Filter, Comment, (IEnumerable<KeyValuePair<string, object>>)Fields);
@@ -459,7 +459,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="Comment">Optional comment.</param>
 		/// <param name="Fields">Fields to emit.</param>
 		/// <returns>Number of clients the event was forwarded to.</returns>
-		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, string? Comment, 
+		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, string? Comment,
 			IEnumerable<KeyValuePair<string, object>> Fields)
 		{
 			if (!this.SupportsServerSentEvents)
@@ -671,7 +671,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 						}
 						catch (Exception ex)
 						{
-							JsonRpcRequest.SetError(-32700, "Unable to parse parameter: " + 
+							JsonRpcRequest.SetError(-32700, "Unable to parse parameter: " +
 								P.Key + ": " + ex.Message,
 								InternalServerErrorException.Code, InternalServerErrorException.StatusMessage);
 							continue;
@@ -686,6 +686,31 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 			if (!await JsonRpcRequest.BuildResponse(this, Request, Response))
 				await this.SendResponse(Request, JsonRpcRequest, Response);
+		}
+
+		/// <summary>
+		/// Unregisters an existing SSE subscription for a session, if any.
+		/// </summary>
+		/// <param name="Session">Session object to unregister.</param>
+		protected bool Unregister(IJsonRpcSession? Session)
+		{
+			if (Session is null)
+				return false;
+
+			lock (this.eventSubscriptions)
+			{
+				foreach (Subscription Subscription in this.eventSubscriptions)
+				{
+					if (Subscription.Session == Session)
+					{
+						this.eventSubscriptions.Remove(Subscription);
+						this.eventSubscriptionsStatic = this.eventSubscriptions.ToArray();
+						return true;
+					}
+				}
+			}
+
+			return false;
 		}
 
 		/// <summary>

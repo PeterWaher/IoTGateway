@@ -345,8 +345,7 @@ namespace Waher.Mcp.Files
 		{
 			if (this.TryGetUser(e.FullPath, out UsageRec? Rec, out string? LocalFileName))
 			{
-				string Url = Rec.Url + '/' + LocalFileName.Replace(Path.DirectorySeparatorChar, '/');
-
+				string Url = CreateFileUrl(Rec.Url, LocalFileName);
 				this.ResourceUpdated(Rec.User!, new Uri(Url));
 			}
 		}

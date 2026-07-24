@@ -287,17 +287,42 @@ namespace Waher.Security.JWT
 
 				if (!this.factory.IsValid(Token, out Reason Reason))
 				{
-					string Description = Reason switch
+					string Description;
+
+					switch (Reason)
 					{
-						Reason.NoAlgorithm => "No algorithm specified in token.",
-						Reason.UnsupportedAlgorithm => "Unsupported algorithm specified in token.",
-						Reason.NoSignature => "No signature found in token.",
-						Reason.Expired => "Token has expired.",
-						Reason.TooEarly => "Token is not yet valid.",
-						Reason.InvalidSignature => "Invalid signature in token.",
-						Reason.Deprecated => "Token uses deprecated algorithm.",
-						_ => "Reason: " + Reason.ToString()
-					};
+						case Reason.NoAlgorithm:
+							Description = "No algorithm specified in token.";
+							break;
+
+						case Reason.UnsupportedAlgorithm:
+							Description = "Unsupported algorithm specified in token.";
+							break;
+
+						case Reason.NoSignature:
+							Description = "No signature found in token.";
+							break;
+
+						case Reason.Expired:
+							Description = "Token has expired.";
+							break;
+
+						case Reason.TooEarly:
+							Description = "Token is not yet valid.";
+							break;
+
+						case Reason.InvalidSignature:
+							Description = "Invalid signature in token.";
+							break;
+
+						case Reason.Deprecated:
+							Description = "Token uses deprecated algorithm.";
+							break;
+
+						default:
+							Description = "Reason: " + Reason.ToString();
+							break;
+					}
 
 					Request.AddMetaData("BearerError", new KeyValuePair<string, string>(
 						"invalid_token", Description));

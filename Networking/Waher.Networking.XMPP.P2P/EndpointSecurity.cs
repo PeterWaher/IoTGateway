@@ -684,6 +684,12 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>If information was found and added.</returns>
 		public bool AddPeerPkiInfo(string FullJID, XmlElement E2E)
 		{
+			if (E2E is null)
+			{
+				this.RemovePeerPkiInfo(FullJID);
+				return false;
+			}
+
 			try
 			{
 				Dictionary<string, IE2eEndpoint> Endpoints = null;

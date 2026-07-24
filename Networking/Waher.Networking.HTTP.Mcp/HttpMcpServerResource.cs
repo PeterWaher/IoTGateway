@@ -6,8 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Images;
+using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc;
+using Waher.Networking.HTTP.JsonRpc.MetaData;
 using Waher.Networking.HTTP.Mcp.Model;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Networking.HTTP.Mcp.Model.Client;
@@ -66,6 +68,8 @@ namespace Waher.Networking.HTTP.Mcp
 		private readonly string[] promptScopes;
 		private readonly string[] resourceScopes;
 		private readonly string[] scopesSupported;
+		private readonly string title;
+		private readonly string description;
 		private readonly bool hasScopes;
 		private readonly bool hasSnifferSet;
 		private bool hasPrompts;
@@ -135,7 +139,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="WebSiteUri">Website URI of server.</param>
 		/// <param name="Instructions">Instructions for server.</param>
 		public HttpMcpServerResource(string ResourceName, string Name, string Title,
-			string Version, string Description, Icon[] Icons, Uri WebSiteUri,
+			string Version, string Description, Icon[] Icons, Uri? WebSiteUri,
 			string Instructions)
 			: this(ResourceName, Name, Title, Version, Description, Icons, WebSiteUri,
 				  Instructions, null)
@@ -156,14 +160,14 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
 		/// with MCP service.</param>
 		public HttpMcpServerResource(string ResourceName, string Name, string Title,
-			string Version, string Description, Icon[] Icons, Uri WebSiteUri,
+			string Version, string Description, Icon[] Icons, Uri? WebSiteUri,
 			string Instructions, ISnifferSet? SnifferSet)
 			: base(ResourceName, false, false)
 		{
 			this.Name = Name;
-			this.Title = Title;
+			this.title = Title;
+			this.description = Description;
 			this.Version = Version;
-			this.Description = Description;
 			this.Icons = new Icons(Icons);
 			this.WebSiteUri = WebSiteUri;
 			this.Instructions = Instructions;
@@ -240,19 +244,14 @@ namespace Waher.Networking.HTTP.Mcp
 		public string Name { get; }
 
 		/// <summary>
-		/// Title of server.
+		/// Title of MCP server.
 		/// </summary>
-		public string Title { get; }
+		public override string Title => this.title;
 
 		/// <summary>
 		/// Version of server.
 		/// </summary>
 		public string Version { get; }
-
-		/// <summary>
-		/// Description of server.
-		/// </summary>
-		public string Description { get; }
 
 		/// <summary>
 		/// Icons of server.
@@ -262,7 +261,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Website URI of server.
 		/// </summary>
-		public Uri WebSiteUri { get; }
+		public Uri? WebSiteUri { get; }
 
 		/// <summary>
 		/// Instructions for server.
@@ -409,6 +408,23 @@ namespace Waher.Networking.HTTP.Mcp
 		}
 
 		/// <summary>
+		/// Description of MCP server.
+		/// </summary>
+		public override string ShortDescription
+		{
+			get
+			{
+				OAuthResourceNameAttribute? Attribute = this.GetType().GetCustomAttribute<OAuthResourceNameAttribute>();
+				return Attribute?.ResourceName ?? "MCP Server: " + this.Name;
+			}
+		}
+
+		/// <summary>
+		/// Markdown description of web service.
+		/// </summary>
+		public override string MarkdownDescription => MarkdownDocument.Encode(this.description);
+
+		/// <summary>
 		/// Method called when a resource has been registered on a server.
 		/// </summary>
 		/// <param name="Server">Server</param>
@@ -443,21 +459,6 @@ namespace Waher.Networking.HTTP.Mcp
 		}
 
 		/// <summary>
-		/// Gets a URI to the default web site, if any.
-		/// </summary>
-		/// <returns>URI, if available, null if not.</returns>
-		public static Uri? GetDefaultWebSite()
-		{
-			if (Types.TryGetModuleParameter("HomePage", out string Url) &&
-				Uri.TryCreate(Url, UriKind.Absolute, out Uri WebSiteUri))
-			{
-				return WebSiteUri;
-			}
-			else
-				return null;
-		}
-
-		/// <summary>
 		/// MCP initialize method. Called by client to initialize connection and exchange 
 		/// information about capabilities.
 		/// </summary>
@@ -468,9 +469,20 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="ClientInfo">Client information</param>
 		/// <returns>Server capabilities and information.</returns>
 		[JsonRpcMethod]
-		protected Dictionary<string, object> Initialize(HttpRequest Request,
-			HttpResponse Response, string ProtocolVersion,
+		[JsonRpcDocumentation("MCP `initialize` method. Called by client to initialize " +
+			"connection and exchange information about capabilities.", true)]
+		[JsonRpcDocName("initialize")]
+		[return: JsonRpcDocumentation("Server capabilities and information.")]
+		protected Dictionary<string, object> Initialize(
+			HttpRequest Request, HttpResponse Response,
+
+			[JsonRpcDocumentation("Protocol Version")]
+			string ProtocolVersion,
+
+			[JsonRpcDocumentation("Client capabilities")]
 			Dictionary<string, object> Capabilities,
+
+			[JsonRpcDocumentation("Client information")]
 			Dictionary<string, object> ClientInfo)
 		{
 			if (!ClientCapabilities.TryParse(Capabilities, out ClientCapabilities? CapabilitiesParsed))
@@ -566,6 +578,10 @@ namespace Waher.Networking.HTTP.Mcp
 				};
 			}
 
+			string? WebSite=this.WebSiteUri?.ToString();
+			if (string.IsNullOrEmpty(WebSite))
+				WebSite = Request.Header.GetURL(false, false);
+
 			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
 				{ "protocolVersion", "2025-11-25" },
@@ -573,11 +589,11 @@ namespace Waher.Networking.HTTP.Mcp
 				{ "serverInfo", new Dictionary<string,object>()
 					{
 						{ "name", this.Name },
-						{ "title", this.Title },
+						{ "title", this.title },
 						{ "version", this.Version },
-						{ "description", this.Description },
+						{ "description", this.description },
 						{ "icons", this.Icons.ToJson() },
-						{ "websiteUrl", this.WebSiteUri.ToString() }
+						{ "websiteUrl", WebSite }
 					}
 				},
 				{ "instructions", this.Instructions }
@@ -595,8 +611,11 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Request">HTTP request object.</param>
 		/// <param name="Response">HTTP response object.</param>
 		[JsonRpcMethod]
-		protected async Task Notifications_Initialized(HttpRequest Request,
-			HttpResponse Response)
+		[JsonRpcDocumentation("Notification that the client has completed its " +
+			"initialization.")]
+		[JsonRpcDocName("notifications/initialized")]
+		protected async Task Notifications_Initialized(
+			HttpRequest Request, HttpResponse Response)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
@@ -673,8 +692,14 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Cursor">Cursor for pagination.</param>
 		/// <returns>Dictionary containing the list of tools.</returns>
 		[JsonRpcMethod]
-		protected async Task<Dictionary<string, object>?> Tools_List(HttpRequest Request,
-			HttpResponse Response, string? Cursor = null)
+		[JsonRpcDocumentation("Lists available MCP server tools.")]
+		[JsonRpcDocName("tools/list")]
+		[return: JsonRpcDocumentation("Dictionary containing the list of tools.")]
+		protected async Task<Dictionary<string, object>?> Tools_List(
+			HttpRequest Request, HttpResponse Response,
+
+			[JsonRpcDocumentation("Cursor for pagination.")]
+			string? Cursor = null)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
@@ -864,9 +889,28 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="_Meta">Associated meta-data, if available.</param>
 		/// <returns>Dictionary containing the result of the tool call.</returns>
 		[JsonRpcMethod]
-		protected async Task<Dictionary<string, object?>?> Tools_Call(HttpRequest Request,
-			HttpResponse Response, string Name, Dictionary<string, object?> Arguments,
-			object? Task = null, [JsonRpcMetaDataArgument] object? _Meta = null)
+		[JsonRpcDocumentation("Calls an MCP server tool.")]
+		[JsonRpcDocName("tools/call")]
+		[return: JsonRpcDocumentation("Dictionary containing the result of the tool call.")]
+		protected async Task<Dictionary<string, object?>?> Tools_Call(
+			HttpRequest Request, HttpResponse Response,
+
+			[JsonRpcDocumentation("Name of the tool to call.")]
+			string Name,
+
+			[JsonRpcDocumentation("Arguments for the tool.")]
+			Dictionary<string, object?> Arguments,
+
+			[JsonRpcDocumentation("If specified, the caller is requesting task-augmented " +
+				"execution for this request. The request will return a `CreateTaskResult` " +
+				"immediately, and the actual result can be retrieved later via tasks/result.\r\n\r\n" +
+				"Task augmentation is subject to capability negotiation - receivers MUST declare " +
+				"support for task augmentation of specific request types in their capabilities.", true)]
+			object? Task = null, 
+
+			[JsonRpcMetaDataArgument]
+			[JsonRpcDocumentation("Associated meta-data, if available.")]
+			object? _Meta = null)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
@@ -1053,8 +1097,14 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Cursor">Cursor for pagination.</param>
 		/// <returns>Dictionary containing the list of prompts.</returns>
 		[JsonRpcMethod]
-		protected async Task<Dictionary<string, object>?> Prompts_List(HttpRequest Request,
-			HttpResponse Response, string? Cursor = null)
+		[JsonRpcDocumentation("Lists available MCP server prompts.")]
+		[JsonRpcDocName("prompts/list")]
+		[return: JsonRpcDocumentation("Dictionary containing the list of prompts.")]
+		protected async Task<Dictionary<string, object>?> Prompts_List(
+			HttpRequest Request, HttpResponse Response,
+
+			[JsonRpcDocumentation("Cursor for pagination.")]
+			string? Cursor = null)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
@@ -1147,11 +1197,23 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Name">Name of the prompt to call.</param>
 		/// <param name="Arguments">Arguments for the prompt.</param>
 		/// <param name="_Meta">Associated meta-data, if available.</param>
-		/// <returns>Dictionary containing the result of the tool call.</returns>
+		/// <returns>Dictionary containing the prompt.</returns>
 		[JsonRpcMethod]
-		protected async Task<Dictionary<string, object?>?> Prompts_Get(HttpRequest Request,
-			HttpResponse Response, string Name, Dictionary<string, object?> Arguments,
-			[JsonRpcMetaDataArgument] object? _Meta = null)
+		[JsonRpcDocumentation("Gets an MCP server prompt.")]
+		[JsonRpcDocName("prompts/get")]
+		[return: JsonRpcDocumentation("Dictionary containing the prompt.")]
+		protected async Task<Dictionary<string, object?>?> Prompts_Get(
+			HttpRequest Request, HttpResponse Response,
+
+			[JsonRpcDocumentation("Name of the prompt to call.")]
+			string Name,
+
+			[JsonRpcDocumentation("Arguments for the prompt.")]
+			Dictionary<string, object?> Arguments,
+
+			[JsonRpcMetaDataArgument]
+			[JsonRpcDocumentation("Associated meta-data, if available.")]
+			object? _Meta = null)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
@@ -1326,8 +1388,14 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Cursor">Cursor for pagination.</param>
 		/// <returns>Dictionary containing the list of resources.</returns>
 		[JsonRpcMethod]
-		protected virtual async Task<Dictionary<string, object>?> Resources_List(HttpRequest Request,
-			HttpResponse Response, string? Cursor = null)
+		[JsonRpcDocumentation("Lists available MCP server resources.")]
+		[JsonRpcDocName("resources/list")]
+		[return: JsonRpcDocumentation("Dictionary containing the list of resources.")]
+		protected virtual async Task<Dictionary<string, object>?> Resources_List(
+			HttpRequest Request, HttpResponse Response,
+
+			[JsonRpcDocumentation("Cursor for pagination.")]
+			string? Cursor = null)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
@@ -1416,10 +1484,20 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="Uri">URI of the resource to read.</param>
 		/// <param name="_Meta">Associated meta-data, if available.</param>
-		/// <returns>Dictionary containing the result of the tool call.</returns>
+		/// <returns>Dictionary containing the contents of the resource.</returns>
 		[JsonRpcMethod]
-		protected virtual async Task<Dictionary<string, object>?> Resources_Read(HttpRequest Request,
-			HttpResponse Response, Uri Uri, [JsonRpcMetaDataArgument] object? _Meta = null)
+		[JsonRpcDocumentation("Reads an MCP server resource.")]
+		[JsonRpcDocName("resources/read")]
+		[return: JsonRpcDocumentation("Dictionary containing the contents of the resource.")]
+		protected virtual async Task<Dictionary<string, object>?> Resources_Read(
+			HttpRequest Request, HttpResponse Response,
+
+			[JsonRpcDocumentation("URI of the resource to read.")]
+			Uri Uri, 
+
+			[JsonRpcMetaDataArgument] 
+			[JsonRpcDocumentation("Associated meta-data, if available.")] 
+			object? _Meta = null)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
@@ -1501,7 +1579,12 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="Uri">URI of the resource to subscribe to.</param>
 		[JsonRpcMethod]
-		protected virtual async Task Resources_Subscribe(HttpRequest Request, HttpResponse Response,
+		[JsonRpcDocumentation("Subscribes to an MCP server resource.")]
+		[JsonRpcDocName("resources/subscribe")]
+		protected virtual async Task Resources_Subscribe(
+			HttpRequest Request, HttpResponse Response,
+
+			[JsonRpcDocumentation("URI of the resource to subscribe to.")]
 			Uri Uri)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);
@@ -1564,7 +1647,12 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="Uri">URI of the resource to unsubscribe from.</param>
 		[JsonRpcMethod]
-		protected virtual async Task Resources_Unsubscribe(HttpRequest Request, HttpResponse Response,
+		[JsonRpcDocumentation("Unsubscribes from an MCP server resource.")]
+		[JsonRpcDocName("resources/unsubscribe")]
+		protected virtual async Task Resources_Unsubscribe(
+			HttpRequest Request, HttpResponse Response,
+
+			[JsonRpcDocumentation("URI of the resource to unsubscribe from.")]
 			Uri Uri)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);

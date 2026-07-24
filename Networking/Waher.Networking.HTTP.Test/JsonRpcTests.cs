@@ -56,6 +56,10 @@ namespace Waher.Networking.HTTP.Test
 		private class JsonRpcTestWebService(string ResourceName, bool UserSessions, bool CaseSensitive) 
 			: JsonRpcWebService(ResourceName, UserSessions, CaseSensitive)
 		{
+			public override string Title => "Test WS";
+			public override string ShortDescription => "Test Web Service";
+			public override string MarkdownDescription => "This web service is used for testing JSON-RPC functionality.";
+			
 			[JsonRpcMethod]
 			protected static int Add(int a = 1, int b = 2)
 			{

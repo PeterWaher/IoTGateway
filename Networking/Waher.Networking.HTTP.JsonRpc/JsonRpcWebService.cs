@@ -1,16 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Html;
 using Waher.Content.Json;
+using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.HTTP.OAuth;
+using Waher.Networking.HTTP.OAuth.MetaData;
+using Waher.Networking.XMPP.Authentication;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
+using Waher.Script;
+using Waher.Script.Functions.Runtime;
+using Waher.Script.Functions.Vectors;
 using Waher.Security.JWT;
+using Waher.Security.Users;
+using Waher.Things.DisplayableParameters;
 using Waher.Things.Http;
 
 namespace Waher.Networking.HTTP.JsonRpc
@@ -598,7 +608,12 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
-			if (Request.Header.IsAcceptable("text/event-stream"))
+			if (Request.Header.IsAcceptable(HtmlCodec.DefaultContentType))
+			{
+				await this.GenerateDocumentation(Request, Response);
+				return;
+			}
+			else if (Request.Header.IsAcceptable("text/event-stream"))
 			{
 				if (!this.SupportsServerSentEvents)
 				{
@@ -701,6 +716,424 @@ namespace Waher.Networking.HTTP.JsonRpc
 			if (!await JsonRpcRequest.BuildResponse(this, Request, Response))
 				await this.SendResponse(Request, JsonRpcRequest, Response);
 		}
+
+		/// <summary>
+		/// Generates a documentation page for the resource, if supported.
+		/// </summary>
+		/// <param name="Request">HTTP Request object</param>
+		/// <param name="Response">HTTP Response object</param>	
+		protected virtual async Task GenerateDocumentation(HttpRequest Request, HttpResponse Response)
+		{
+			StringBuilder Markdown = new StringBuilder();
+
+			await this.GenerateDocumentationHeader(Request, Markdown);
+			await this.GenerateDocumentationIntroduction(Request, Markdown);
+			await this.GenerateDocumentationApiDescription(Request, Markdown);
+
+			MarkdownSettings Settings = new MarkdownSettings(null, true, new Variables());
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(), Settings);
+			string Html = await Doc.GenerateHTML();
+
+			await Response.Return(new HtmlDocument(Html));
+		}
+
+		/// <summary>
+		/// Generates the Markdown header for the documentation page.
+		/// </summary>
+		/// <param name="Request">HTTP Request object</param>
+		/// <param name="Markdown">Markdown output.</param>
+		protected virtual Task GenerateDocumentationHeader(HttpRequest Request, StringBuilder Markdown)
+		{
+			Markdown.Append("Title: ");
+			Markdown.AppendLine(this.Title);
+			Markdown.Append("Description: ");
+			Markdown.AppendLine(this.ShortDescription);
+
+			if (Types.TryGetModuleParameter<OAuth2Environment>("OAUTH2", out OAuth2Environment? Environment) &&
+				Environment.HasLoginMasterFileName)
+			{
+				Markdown.Append("Master: ");
+				Markdown.AppendLine(Environment.LoginMasterFileName);
+			}
+
+			Markdown.Append("Date: ");
+			Markdown.AppendLine(CommonTypes.EncodeRfc822(DateTime.UtcNow));
+			Markdown.AppendLine();
+			Markdown.AppendLine(new string('=', 40));
+			Markdown.AppendLine();
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Generates the Markdown introduction for the documentation page.
+		/// </summary>
+		/// <param name="Request">HTTP Request object</param>
+		/// <param name="Markdown">Markdown output.</param>
+		protected virtual Task GenerateDocumentationIntroduction(HttpRequest Request, StringBuilder Markdown)
+		{
+			Markdown.AppendLine(this.Title);
+			Markdown.AppendLine("========");
+			Markdown.AppendLine();
+			Markdown.AppendLine(this.MarkdownDescription);
+			Markdown.AppendLine();
+			Markdown.AppendLine("![Table of Contents](ToC)");
+			Markdown.AppendLine();
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Generates the Markdown ApiDescription for the documentation page.
+		/// </summary>
+		/// <param name="Request">HTTP Request object</param>
+		/// <param name="Markdown">Markdown output.</param>
+		protected virtual Task GenerateDocumentationApiDescription(HttpRequest Request, StringBuilder Markdown)
+		{
+			Markdown.AppendLine("JSON-RPC Interface");
+			Markdown.AppendLine("---------------------");
+			Markdown.AppendLine();
+			Markdown.Append("This JSON-RPC Web Service is accessible on this endpoint: `");
+			Markdown.Append(Request.Header.GetURL(false, false));
+			Markdown.AppendLine("`");
+
+			Markdown.AppendLine("The following subsections list JSON-RPC methods that are available on this resource.");
+			Markdown.AppendLine("`");
+			Markdown.AppendLine();
+
+			ChunkedList<string>? Notes = null;
+			JsonRpcMethodInfo[] Methods;
+
+			lock (this.methods)
+			{
+				Methods = new JsonRpcMethodInfo[this.methods.Count];
+				this.methods.Values.CopyTo(Methods, 0);
+			}
+
+			foreach (JsonRpcMethodInfo Method in Methods)
+			{
+				Markdown.Append("### `");
+				Markdown.Append(Method.Name);
+				Markdown.Append('(');
+
+				bool First = true;
+				int NrArguments = 0;
+
+				foreach (ProtectedMethodArgumentInfo Parameter in Method.Arguments)
+				{
+					if (Parameter.IsSpecialArgument)
+						continue;
+
+					if (First)
+						First = false;
+					else
+						Markdown.Append(", ");
+
+					Markdown.Append(Parameter.Parameter.Name);
+					NrArguments++;
+				}
+
+				Markdown.AppendLine(")`");
+				Markdown.AppendLine();
+
+				foreach (KeyValuePair<bool, string> P in Method.Documentation)
+				{
+					Markdown.AppendLine();
+
+					if (P.Key)
+						Markdown.AppendLine(P.Value);
+					else
+						Markdown.AppendLine(MarkdownDocument.Encode(P.Value));
+
+					Markdown.AppendLine();
+				}
+
+				Markdown.AppendLine("| Authentication ||");
+				Markdown.AppendLine("|:-------|:-------|");
+				Markdown.Append("| Required:  | ");
+				Markdown.Append(Method.RequiresAuthentication ? "Yes" : "No");
+				Markdown.AppendLine(" |");
+
+				if (Method.RequiresAuthentication && Method.RequiredPrivileges.Length > 0)
+				{
+					Markdown.Append("| Privileges Required:  | ");
+					First = true;
+
+					foreach (string Privilege in Method.RequiredPrivileges)
+					{
+						if (First)
+							First = false;
+						else
+							Markdown.Append(", ");
+
+						Markdown.Append('`');
+						Markdown.Append(Privilege);
+						Markdown.Append('`');
+					}
+
+					Markdown.AppendLine(" |");
+				}
+
+				if ((Method.AuthenticationMechanisms?.Length ?? 0) > 0)
+				{
+					Markdown.Append("| Authentication Mechanisms:  | ");
+					First = true;
+
+					foreach (HttpAuthenticationScheme Mechanism in Method.AuthenticationMechanisms!)
+					{
+						if (First)
+							First = false;
+						else
+							Markdown.Append(", ");
+
+						Markdown.Append('`');
+						Markdown.Append(Mechanism.GetType().Name);
+						Markdown.Append('`');
+					}
+
+					Markdown.AppendLine(" |");
+				}
+
+				Markdown.AppendLine();
+
+				if (NrArguments > 0)
+				{
+					Markdown.AppendLine("| Arguments |||||");
+					Markdown.AppendLine("| Name | Type | Use | Default Value | Description |");
+					Markdown.AppendLine("|:-----|:-----|:---:|:-------------:|:------------|");
+
+					foreach (ProtectedMethodArgumentInfo Parameter in Method.Arguments)
+					{
+						if (Parameter.IsSpecialArgument)
+							continue;
+
+						Markdown.Append("| `");
+						Markdown.Append(Parameter.Parameter.Name);
+						Markdown.Append("` | ");
+						AppendType(Parameter.Parameter.ParameterType, Markdown);
+						Markdown.Append(" | ");
+
+						if (Parameter.HasDefaultValue)
+						{
+							Markdown.Append("Optional | `");
+							Markdown.Append(Expression.ToExpressionString(Parameter.DefaultValue));
+							Markdown.Append('`');
+						}
+						else
+							Markdown.Append("Required | -");
+
+						Markdown.Append(" | ");
+						AppendCell(ref Notes, Parameter.Documentation, Markdown);
+						Markdown.AppendLine(" |");
+					}
+
+					Markdown.AppendLine();
+				}
+
+				if (Method.HasReturnValue)
+				{
+					Markdown.AppendLine("| Return Value ||");
+					Markdown.AppendLine("| Type | Description |");
+					Markdown.AppendLine("|:-----|:------------|");
+
+					Markdown.Append("| ");
+					AppendType(Method.Method.ReturnType, Markdown);
+					Markdown.Append(" | ");
+					AppendCell(ref Notes, Method.ReturnValueDocumentation, Markdown);
+					Markdown.AppendLine(" |");
+					Markdown.AppendLine();
+				}
+			}
+
+			if (!(Notes is null))
+			{
+				int i = 0;
+
+				foreach (string Note in Notes)
+				{
+					Markdown.Append("[^n");
+					Markdown.Append(i++);
+					Markdown.Append("]: ");
+					Markdown.AppendLine(Note);
+					Markdown.AppendLine();
+				}
+			}
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Appends a cell to the Markdown table.
+		/// </summary>
+		/// <param name="Notes">List of notes for the Markdown table.</param>
+		/// <param name="Documentation">Documentation array for the cell.</param>
+		/// <param name="Markdown">Markdown builder.</param>
+		protected static void AppendCell(ref ChunkedList<string>? Notes,
+			KeyValuePair<bool, string>[] Documentation, StringBuilder Markdown)
+		{
+			if (IsOneRow(Documentation))
+			{
+				foreach (KeyValuePair<bool, string> P in Documentation)
+				{
+					if (P.Key)
+						Markdown.Append(P.Value);
+					else
+						Markdown.Append(MarkdownDocument.Encode(P.Value));
+				}
+			}
+			else
+			{
+				StringBuilder sb = new StringBuilder();
+				bool First = true;
+
+				Notes ??= new ChunkedList<string>();
+
+				foreach (KeyValuePair<bool, string> P in Documentation)
+				{
+					foreach (string Row in P.Value.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
+					{
+						if (First)
+							First = false;
+						else
+						{
+							sb.AppendLine();
+							sb.Append('\t');
+						}
+
+						if (P.Key)
+							sb.Append(Row);
+						else
+							sb.Append(MarkdownDocument.Encode(Row));
+					}
+				}
+
+				Markdown.Append("[^n");
+				Markdown.Append(Notes.Count);
+				Markdown.Append(']');
+
+				Notes.Add(sb.ToString());
+			}
+		}
+
+		/// <summary>
+		/// Outputs a type in Markdown format.
+		/// </summary>
+		/// <param name="Type">Type to output.</param>
+		/// <param name="Markdown">Markdown builder.</param>
+		protected static void AppendType(Type Type, StringBuilder Markdown)
+		{
+			if (Type.IsGenericType)
+			{
+				Type GenericType = Type.GetGenericTypeDefinition();
+				Type[] TypeArguments;
+
+				if (GenericType == typeof(Task<>))
+				{
+					TypeArguments = Type.GetGenericArguments();
+					if (TypeArguments.Length == 1)
+						Type = TypeArguments[0];
+				}
+				else if (GenericType == typeof(Nullable<>))
+				{
+					TypeArguments = Type.GetGenericArguments();
+					if (TypeArguments.Length == 1)
+					{
+						Markdown.Append("Nullable ");
+						Type = TypeArguments[0];
+					}
+				}
+			}
+
+			if (Type == typeof(Dictionary<string, object>))
+				Markdown.Append("Dictionary");
+			else if (Type == typeof(string))
+				Markdown.Append("String");
+			else if (Type == typeof(object))
+				Markdown.Append("Object");
+			else if (Type == typeof(Uri))
+				Markdown.Append("URI");
+			else if (Type == typeof(int))
+				Markdown.Append("32-bit signed integer");
+			else if (Type == typeof(long))
+				Markdown.Append("64-bit signed integer");
+			else if (Type == typeof(short))
+				Markdown.Append("16-bit signed integer");
+			else if (Type == typeof(sbyte))
+				Markdown.Append("8-bit signed integer");
+			else if (Type == typeof(uint))
+				Markdown.Append("32-bit unsigned integer");
+			else if (Type == typeof(ulong))
+				Markdown.Append("64-bit unsigned integer");
+			else if (Type == typeof(ushort))
+				Markdown.Append("16-bit unsigned integer");
+			else if (Type == typeof(byte))
+				Markdown.Append("8-bit unsigned integer");
+			else if (Type == typeof(char))
+				Markdown.Append("Character");
+			else if (Type == typeof(double))
+				Markdown.Append("Double-precision floating-point");
+			else if (Type == typeof(float))
+				Markdown.Append("Single-precision floating-point");
+			else if (Type == typeof(decimal))
+				Markdown.Append("Decimal-precision floating-point");
+			else if (Type == typeof(BigInteger))
+				Markdown.Append("Big Integer");
+			else if (Type == typeof(DateTime))
+				Markdown.Append("Date & Time");
+			else if (Type == typeof(DateTimeOffset))
+				Markdown.Append("Date & Time & Time Zone");
+			else if (Type == typeof(TimeSpan))
+				Markdown.Append("Time span");
+			else if (Expression.IsVoid(Type))
+				Markdown.Append("`void`");
+			else
+			{
+				Markdown.Append("`");
+				Markdown.Append(Type.FullName);
+				Markdown.Append('`');
+			}
+		}
+
+		/// <summary>
+		/// Checks if a documentation array is one row or multiple rows.
+		/// </summary>
+		/// <param name="Documentation">Documentation array to check.</param>
+		/// <returns>True if the documentation array is one row, false otherwise.</returns>
+		protected static bool IsOneRow(KeyValuePair<bool, string>[] Documentation)
+		{
+			if (Documentation.Length > 1)
+				return false;
+
+			if (Documentation.Length == 0)
+				return true;
+
+			if (Documentation[0].Value.IndexOfAny(CommonTypes.CRLF) >= 0)
+				return false;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Title of JSON-RPC web service.
+		/// </summary>
+		public abstract string Title { get; }
+
+		/// <summary>
+		/// Short Description of JSON-RPC web service.
+		/// </summary>
+		public virtual string ShortDescription
+		{
+			get
+			{
+				OAuthResourceNameAttribute? Attribute = this.GetType().GetCustomAttribute<OAuthResourceNameAttribute>();
+				return Attribute?.ResourceName ?? "JSON-RPC Web Service: " + this.ResourceName;
+			}
+		}
+
+		/// <summary>
+		/// Markdown description of web service.
+		/// </summary>
+		public abstract string MarkdownDescription { get; }
 
 		/// <summary>
 		/// Unregisters an existing SSE subscription for a session, if any.

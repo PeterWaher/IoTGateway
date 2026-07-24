@@ -394,12 +394,11 @@ internal class Program
 			WebServer.Register(new OAuthAuthorizeResource(Environment));
 			WebServer.Register(new AuthorizationServerMetaData(Environment));
 			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", [],
-				new Uri("https://example.org/"), McpSniffers));
+				null, McpSniffers));
 			WebServer.Register(new InternetContentMcpServer("/MCP/Content", [],
-				new Uri("https://example.org/"), McpSniffers));
+				null, McpSniffers));
 			WebServer.Register(new FileStorageMcpServer("/MCP/Files",
-				Path.Combine("MCP", "Files"), [], new Uri("https://example.org/"), 
-				McpSniffers));
+				Path.Combine("MCP", "Files"), [], null, McpSniffers));
 
 			Log.Informational("Web Server initialized.");
 			Log.Informational("Press CTRL+C to quit.");

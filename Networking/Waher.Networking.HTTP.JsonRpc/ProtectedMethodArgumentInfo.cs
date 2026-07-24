@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 
 namespace Waher.Networking.HTTP.JsonRpc
 {
@@ -23,6 +24,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			this.HasDefaultValue = HasDefaultValue;
 			this.DefaultValue = DefaultValue;
 			this.IsMetaDataArgument = IsMetaDataArgument;
+			this.Documentation = ProtectedMethod.GetDocumentation(Parameter);
 		}
 
 		/// <summary>
@@ -49,5 +51,12 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// If the argument represents a meta-data argument.
 		/// </summary>
 		public bool IsMetaDataArgument { get; }
+
+		/// <summary>
+		/// Available documentation for the method. Value represents documentation text,
+		/// and Key represents if the documentation is in Markdown format (true) or 
+		/// plain text (false).
+		/// </summary>
+		public KeyValuePair<bool, string>[] Documentation { get; }
 	}
 }

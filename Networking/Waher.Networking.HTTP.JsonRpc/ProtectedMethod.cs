@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Threading.Tasks;
+using Waher.Networking.HTTP.JsonRpc.MetaData;
+using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Security;
 using Waher.Things.Http;
@@ -96,6 +99,39 @@ namespace Waher.Networking.HTTP.JsonRpc
 					P.HasDefaultValue, P.HasDefaultValue ? P.DefaultValue : null,
 					IsMetaDataArgument);
 			}
+
+			this.Documentation = GetDocumentation(Method);
+
+			this.HasReturnValue = Method.ReturnType != typeof(Task) &&
+				!Expression.IsVoid(Method.ReturnType);
+
+			if (this.HasReturnValue)
+				this.ReturnValueDocumentation = GetDocumentation(Method.ReturnParameter);
+			else
+				this.ReturnValueDocumentation = Array.Empty<KeyValuePair<bool, string>>();
+
+			JsonRpcDocNameAttribute? DocName = Method.GetCustomAttribute<JsonRpcDocNameAttribute>(true);
+			this.Name = DocName?.Name ?? this.Method.Name;
+		}
+
+		/// <summary>
+		/// Gets available documentation for a member. Value represents documentation text,
+		/// and Key represents if the documentation is in Markdown format (true) or 
+		/// plain text (false).
+		/// </summary>
+		/// <param name="Object">Member information.</param>
+		/// <returns>Array of documentation entries.</returns>
+		public static KeyValuePair<bool, string>[] GetDocumentation(ICustomAttributeProvider Object)
+		{
+			ChunkedList<KeyValuePair<bool, string>> Documentation = new ChunkedList<KeyValuePair<bool, string>>();
+
+			foreach (object Attribute in Object.GetCustomAttributes(typeof(JsonRpcDocumentationAttribute), true))
+			{
+				if (Attribute is JsonRpcDocumentationAttribute DocAttribute)
+				Documentation.Add(new KeyValuePair<bool, string>(DocAttribute.IsMarkdown, DocAttribute.Documentation));
+			}
+
+			return Documentation.ToArray();
 		}
 
 		/// <summary>
@@ -153,6 +189,30 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// Privileges required by the user that calls the method.
 		/// </summary>
 		public string[] RequiredPrivileges { get; }
+
+		/// <summary>
+		/// Available documentation for the method. Value represents documentation text,
+		/// and Key represents if the documentation is in Markdown format (true) or 
+		/// plain text (false).
+		/// </summary>
+		public KeyValuePair<bool, string>[] Documentation { get; }
+
+		/// <summary>
+		/// Available documentation for the return value. Value represents documentation 
+		/// text, and Key represents if the documentation is in Markdown format (true) or 
+		/// plain text (false).
+		/// </summary>
+		public KeyValuePair<bool, string>[] ReturnValueDocumentation { get; }
+
+		/// <summary>
+		/// If the method has a return value.
+		/// </summary>
+		public bool HasReturnValue { get; }
+
+		/// <summary>
+		/// Name to use in documentation.
+		/// </summary>
+		public string Name { get; }
 
 		/// <summary>
 		/// Checks if a user is authorized to call the method.

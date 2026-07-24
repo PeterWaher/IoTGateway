@@ -1432,17 +1432,16 @@ namespace Waher.IoTGateway
 				Icon FavIcon = new Icon(new Uri(GetUrl("/favicon.ico")),
 					ImageCodec.ContentTypeIcon);
 				Icon[] Icons = new Icon[] { FavIcon };
-				Uri WebSite = new Uri(GetUrl("/"));
 
 				mcpSniffers = new XmlFileSnifferSet(appDataFolder + "MCP" + Path.DirectorySeparatorChar +
 					"Sniffers", "MCP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml", TimeSpan.FromHours(8),
 					appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
 					7, BinaryPresentationMethod.ByteCount);
 
-				webServer.Register(new Mcp.Content.InternetContentMcpServer("/MCP/Content", Icons, WebSite, mcpSniffers));
-				webServer.Register(new Mcp.Events.EventLogMcpServer("/MCP/EventLog", Icons, WebSite, mcpSniffers));
+				webServer.Register(new Mcp.Content.InternetContentMcpServer("/MCP/Content", Icons, null, mcpSniffers));
+				webServer.Register(new Mcp.Events.EventLogMcpServer("/MCP/EventLog", Icons, null, mcpSniffers));
 				webServer.Register(new Mcp.Files.FileStorageMcpServer("/MCP/Files", 
-					Path.Combine(appDataFolder, "MCP", "Files"), Icons, WebSite, mcpSniffers));
+					Path.Combine(appDataFolder, "MCP", "Files"), Icons, null, mcpSniffers));
 
 				if (emoji1_24x24 is null)
 				{
@@ -1745,7 +1744,6 @@ namespace Waher.IoTGateway
 				Types.SetModuleParameter("Avatar", avatarClient);
 				Types.SetModuleParameter("Scheduler", scheduler);
 				Types.SetModuleParameter("FavIcon", GetUrl("/favicon.ico"));
-				Types.SetModuleParameter("HomePage", GetUrl("/"));
 
 				if (HasDomain)
 					Types.SetModuleParameter("Domain", Domain.Value);

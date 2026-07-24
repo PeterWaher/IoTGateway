@@ -48,10 +48,7 @@ namespace Waher.Mcp.Events
 		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
 		/// with MCP service.</param>
 		public EventLogMcpServer(string ResourceName, ISnifferSet? SnifferSet)
-			: this(ResourceName,
-				  GetDefaultIcons(), GetDefaultWebSite()
-				  ?? new Uri("https://www.nuget.org/packages/Waher.Events/"),
-				  SnifferSet)
+			: this(ResourceName, GetDefaultIcons(), null, SnifferSet)
 		{
 		}
 
@@ -63,7 +60,7 @@ namespace Waher.Mcp.Events
 		/// <param name="WebSiteUri">Website URI of server.</param>
 		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
 		/// with MCP service.</param>
-		public EventLogMcpServer(string ResourceName, Icon[] Icons, Uri WebSiteUri, 
+		public EventLogMcpServer(string ResourceName, Icon[] Icons, Uri? WebSiteUri, 
 			ISnifferSet? SnifferSet)
 			: this(ResourceName,
 				  "EventLog",   // Name
@@ -95,7 +92,7 @@ namespace Waher.Mcp.Events
 		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
 		/// with MCP service.</param>
 		public EventLogMcpServer(string ResourceName, string Name, string Title,
-			string Version, string Description, Icon[] Icons, Uri WebSiteUri,
+			string Version, string Description, Icon[] Icons, Uri? WebSiteUri,
 			string Instructions, ISnifferSet? SnifferSet)
 			: base(ResourceName, Name, Title, Version, Description, Icons, WebSiteUri,
 				Instructions, SnifferSet)

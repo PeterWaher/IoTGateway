@@ -55,10 +55,7 @@ namespace Waher.Mcp.Files
 		/// with MCP service.</param>
 		public FileStorageMcpServer(string ResourceName, string RootFolder,
 			ISnifferSet? SnifferSet)
-			: this(ResourceName, RootFolder,
-				  GetDefaultIcons(), GetDefaultWebSite()
-				  ?? new Uri("https://www.nuget.org/packages/Waher.Events/"),
-				  SnifferSet)
+			: this(ResourceName, RootFolder, GetDefaultIcons(), null, SnifferSet)
 		{
 		}
 
@@ -73,7 +70,7 @@ namespace Waher.Mcp.Files
 		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
 		/// with MCP service.</param>
 		public FileStorageMcpServer(string ResourceName, string RootFolder, Icon[] Icons,
-			Uri WebSiteUri, ISnifferSet? SnifferSet)
+			Uri? WebSiteUri, ISnifferSet? SnifferSet)
 			: this(ResourceName,
 				  RootFolder,
 				  "FileStorage",   // Name
@@ -108,7 +105,7 @@ namespace Waher.Mcp.Files
 		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
 		/// with MCP service.</param>
 		public FileStorageMcpServer(string ResourceName, string RootFolder, string Name,
-			string Title, string Version, string Description, Icon[] Icons, Uri WebSiteUri,
+			string Title, string Version, string Description, Icon[] Icons, Uri? WebSiteUri,
 			string Instructions, ISnifferSet? SnifferSet)
 			: base(ResourceName, Name, Title, Version, Description, Icons, WebSiteUri,
 				Instructions, SnifferSet)

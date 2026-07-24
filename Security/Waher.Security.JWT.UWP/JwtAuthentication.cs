@@ -62,7 +62,7 @@ namespace Waher.Security.JWT
 		/// If no collection is provided, any JWT token created by the factory will
 		/// be accepted.</param>
 		/// <param name="Factory">JWT token factory.</param>
-		public JwtAuthentication(bool RequireEncryption,
+		public JwtAuthentication(bool RequireEncryption, 
 			string Realm, IUserSource Users, JwtFactory Factory)
 			: base(RequireEncryption)
 #else
@@ -138,7 +138,7 @@ namespace Waher.Security.JWT
 		/// <param name="ResourceMetaData">URI pointing to resource meta-data the
 		/// client can read to understand how it can authenticate itself to gain
 		/// access.</param>
-		public JwtAuthentication(bool RequireEncryption,
+		public JwtAuthentication(bool RequireEncryption, 
 			string Realm, IUserSource Users, JwtFactory Factory,
 			Uri ResourceMetaData)
 			: base(RequireEncryption)

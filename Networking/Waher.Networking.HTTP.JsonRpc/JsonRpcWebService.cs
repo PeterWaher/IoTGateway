@@ -686,7 +686,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 						catch (Exception ex)
 						{
 							JsonRpcRequest.SetError(-32700, "Unable to parse parameter: " +
-								P.Key + ": " + ex.Message,
+								P.Key + ": " + Log.UnnestException(ex).Message,
 								InternalServerErrorException.Code, InternalServerErrorException.StatusMessage);
 							continue;
 						}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Script;
 using Waher.Script.Model;
 using Waher.Security;
@@ -284,7 +285,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 						if (HasSniffer)
 							HttpRequest.Server.Exception(ex);
 
-						this.SetError(-32603, ex.Message,
+						this.SetError(-32603, Log.UnnestException(ex).Message,
 							InternalServerErrorException.Code, InternalServerErrorException.StatusMessage);
 					}
 				}

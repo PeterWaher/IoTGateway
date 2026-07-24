@@ -29,7 +29,11 @@ using Waher.Security.JWT;
 namespace Waher.Networking.HTTP.Mcp
 {
 	/// <summary>
-	/// Abstract base class for HTTP-based Model Context Protocol (MCP) server resource.
+	/// Abstract base class for HTTP-based Model Context Protocol (MCP) server resource,
+	/// as defined in:
+	/// 
+	/// https://modelcontextprotocol.io/
+	/// https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/schema/2025-11-25/schema.ts
 	/// </summary>
 	[OAuthScopesSupported(true, "McpScopesSupported")]
 	public abstract class HttpMcpServerResource : JsonRpcWebService, IHttpDeleteMethod
@@ -939,7 +943,7 @@ namespace Waher.Networking.HTTP.Mcp
 				if (this.hasSnifferSet)
 					Session.Exception(ex);
 
-				ToolResult = ex.Message;
+				ToolResult = Log.UnnestException(ex).Message;
 				Result["isError"] = true;
 			}
 
@@ -1220,7 +1224,7 @@ namespace Waher.Networking.HTTP.Mcp
 				if (this.hasSnifferSet)
 					Session.Exception(ex);
 
-				PromptResult = ex.Message;
+				PromptResult = Log.UnnestException(ex).Message;
 				Result["isError"] = true;
 			}
 
@@ -1312,7 +1316,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Cursor">Cursor for pagination.</param>
 		/// <returns>Dictionary containing the list of resources.</returns>
 		[JsonRpcMethod]
-		protected async Task<Dictionary<string, object>?> Resources_List(HttpRequest Request,
+		protected virtual async Task<Dictionary<string, object>?> Resources_List(HttpRequest Request,
 			HttpResponse Response, string? Cursor = null)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);
@@ -1404,7 +1408,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="_Meta">Associated meta-data, if available.</param>
 		/// <returns>Dictionary containing the result of the tool call.</returns>
 		[JsonRpcMethod]
-		protected async Task<Dictionary<string, object>?> Resources_Read(HttpRequest Request,
+		protected virtual async Task<Dictionary<string, object>?> Resources_Read(HttpRequest Request,
 			HttpResponse Response, Uri Uri, [JsonRpcMetaDataArgument] object? _Meta = null)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);
@@ -1487,7 +1491,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="Uri">URI of the resource to subscribe to.</param>
 		[JsonRpcMethod]
-		protected async Task Resources_Subscribe(HttpRequest Request, HttpResponse Response,
+		protected virtual async Task Resources_Subscribe(HttpRequest Request, HttpResponse Response,
 			Uri Uri)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);
@@ -1550,7 +1554,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="Uri">URI of the resource to unsubscribe from.</param>
 		[JsonRpcMethod]
-		protected async Task Resources_Unsubscribe(HttpRequest Request, HttpResponse Response,
+		protected virtual async Task Resources_Unsubscribe(HttpRequest Request, HttpResponse Response,
 			Uri Uri)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);

@@ -583,8 +583,11 @@ namespace Waher.Networking.HTTP
 		/// been defined.</exception>
 		public void EnableDirectTransfer()
 		{
+			if (!string.IsNullOrEmpty(this.contentType))
+				this.txText = HttpClientConnection.IsSniffableTextType(this.contentType);
+
 			this.desiredTransferEncoding = new DirectOutputTransfer(this.responseStream,
-				this.clientConnection, this.encoding);
+				this.clientConnection, this.txText, this.encoding);
 		}
 
 		/// <summary>

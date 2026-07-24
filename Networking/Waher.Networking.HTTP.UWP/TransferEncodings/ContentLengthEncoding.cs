@@ -9,6 +9,11 @@ namespace Waher.Networking.HTTP.TransferEncodings
 	/// </summary>
 	public class ContentLengthEncoding : TransferEncoding
 	{
+		/// <summary>
+		/// Maximum text length to transmit to sniffers as text.
+		/// </summary>
+		internal const int MaxTextLength = 2048;
+
 		private readonly Encoding textEncoding;
 		private long bytesLeft;
 		private bool txText;
@@ -84,11 +89,11 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 				if (this.clientConnection.HasSniffers)
 				{
-					if (this.txText && c < 1000)
+					if (this.txText && c <= MaxTextLength)
 						this.clientConnection.TransmitText(this.textEncoding.GetString(Data, Offset, c));
 					else
 					{
-						this.clientConnection.TransmitBinary(ConstantBuffer, Data, Offset, c);
+						this.clientConnection.TransmitBinary(c);
 						this.txText = false;
 					}
 				}

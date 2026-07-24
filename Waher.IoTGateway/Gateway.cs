@@ -1396,12 +1396,13 @@ namespace Waher.IoTGateway
 				else
 					jwtFactory = JwtFactory.CreateHmacSha256(string.Empty);
 
-				Types.SetModuleParameter("JWT", jwtFactory);
-
 				oauthEnvironment = new OAuth2Environment
 				{
 					LoginMasterFileName = Path.Combine(rootFolder, "MasterOAuth.md")
 				};
+
+				Types.SetModuleParameter("JWT", jwtFactory);
+				Types.SetModuleParameter("OAUTH2", oauthEnvironment);
 
 				webServer.Register(new ProtectedResourceMetaData(oauthEnvironment));
 				webServer.Register(new OAuthTokenResource(oauthEnvironment));

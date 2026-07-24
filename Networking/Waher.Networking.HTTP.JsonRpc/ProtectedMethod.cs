@@ -128,7 +128,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			foreach (object Attribute in Object.GetCustomAttributes(typeof(JsonRpcDocumentationAttribute), true))
 			{
 				if (Attribute is JsonRpcDocumentationAttribute DocAttribute)
-				Documentation.Add(new KeyValuePair<bool, string>(DocAttribute.IsMarkdown, DocAttribute.Documentation));
+					Documentation.Add(new KeyValuePair<bool, string>(DocAttribute.IsMarkdown, DocAttribute.Documentation));
 			}
 
 			return Documentation.ToArray();

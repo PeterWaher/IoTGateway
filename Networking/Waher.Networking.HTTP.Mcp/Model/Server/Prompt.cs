@@ -28,16 +28,14 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// or an Icons? resource representing the prompt. If null or empty, the icon of the 
 		/// MCP server will be used.</param>
 		/// <param name="MetaData">Meta-data associated with prompt.</param>
-		public Prompt(MethodInfo Method, string Title, 
-			string Description, string IconsMethod, 
-			params KeyValuePair<string, object>[] MetaData)
+		public Prompt(MethodInfo Method, string Title, string Description, 
+			string IconsMethod, params KeyValuePair<string, object>[] MetaData)
 			: base(Method, false)
 		{
 			this.Title = Title;
 			this.Description = Description;
 			this.IconsMethod = IconsMethod;
 			this.MetaData = MetaData;
-			this.HasReturnValue = Method.ReturnType != typeof(void);
 			this.ReturnAttributes = Method.ReturnParameter?.GetCustomAttribute<McpParameterAttribute>();
 		}
 
@@ -65,11 +63,6 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// Meta-data associated with prompt.
 		/// </summary>
 		public KeyValuePair<string, object>[] MetaData { get; }
-
-		/// <summary>
-		/// If the prompt returns a value.
-		/// </summary>
-		public bool HasReturnValue { get; }
 
 		/// <summary>
 		/// Any MCP attributes declared for the return value.

@@ -17,10 +17,10 @@ namespace Waher.Security.JWT
 	{
 		private static bool permitAccessTokenInQueryString = false;
 
+		private readonly Uri resourceMetaData;
 		private readonly IUserSource users;
 		private readonly JwtFactory factory;
 		private readonly string realm;
-		private readonly Uri resourceMetaData;
 
 		/// <summary>
 		/// Use JWT tokens for authentication. The Bearer scheme defined in RFC 6750 is used:
@@ -189,6 +189,22 @@ namespace Waher.Security.JWT
 		/// can authenticate itself to gain access.
 		/// </summary>
 		public Uri ResourceMetaData => this.resourceMetaData;
+
+		/// <summary>
+		/// Display name for authentication scheme.
+		/// </summary>
+		public override string DisplayName
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("Bearer JWT");
+				this.AppendEncryptionRequirement(sb);
+
+				return sb.ToString();
+			}
+		}
 
 		/// <summary>
 		/// Gets available challenges for the authenticating client to respond to.

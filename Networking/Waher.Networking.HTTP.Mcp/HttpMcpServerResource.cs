@@ -27,6 +27,7 @@ using Waher.Runtime.IO;
 using Waher.Script.Model;
 using Waher.Security;
 using Waher.Security.JWT;
+using Waher.Things.DisplayableParameters;
 
 namespace Waher.Networking.HTTP.Mcp
 {
@@ -578,7 +579,7 @@ namespace Waher.Networking.HTTP.Mcp
 				};
 			}
 
-			string? WebSite=this.WebSiteUri?.ToString();
+			string? WebSite = this.WebSiteUri?.ToString();
 			if (string.IsNullOrEmpty(WebSite))
 				WebSite = Request.Header.GetURL(false, false);
 
@@ -906,7 +907,7 @@ namespace Waher.Networking.HTTP.Mcp
 				"immediately, and the actual result can be retrieved later via tasks/result.\r\n\r\n" +
 				"Task augmentation is subject to capability negotiation - receivers MUST declare " +
 				"support for task augmentation of specific request types in their capabilities.", true)]
-			object? Task = null, 
+			object? Task = null,
 
 			[JsonRpcMetaDataArgument]
 			[JsonRpcDocumentation("Associated meta-data, if available.")]
@@ -1493,10 +1494,10 @@ namespace Waher.Networking.HTTP.Mcp
 			HttpRequest Request, HttpResponse Response,
 
 			[JsonRpcDocumentation("URI of the resource to read.")]
-			Uri Uri, 
+			Uri Uri,
 
-			[JsonRpcMetaDataArgument] 
-			[JsonRpcDocumentation("Associated meta-data, if available.")] 
+			[JsonRpcMetaDataArgument]
+			[JsonRpcDocumentation("Associated meta-data, if available.")]
 			object? _Meta = null)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);
@@ -1727,6 +1728,15 @@ namespace Waher.Networking.HTTP.Mcp
 		public virtual bool HasResources => false;
 
 		/// <summary>
+		/// MCP server resource documentation, as an array of key-value pairs.
+		/// The Key represents Markdown (true) or plain text (false), and the Value
+		/// represents the documentation text. Each entry in the array represents a
+		/// paragraph.
+		/// </summary>
+		public virtual KeyValuePair<bool, string>[] ResourceDocumentation =>
+			Array.Empty<KeyValuePair<bool, string>>();
+
+		/// <summary>
 		/// Tries to get a resource, given its URI.
 		/// </summary>
 		/// <param name="Request">HTTP Request object.</param>
@@ -1859,5 +1869,310 @@ namespace Waher.Networking.HTTP.Mcp
 			}
 		}
 
+		/// <summary>
+		/// Gets parameter documentation for a method parameter.
+		/// </summary>
+		/// <param name="Parameter">The method parameter.</param>
+		/// <returns>The documentation for the parameter.</returns>
+		protected override KeyValuePair<bool, string>[] GetParameterDocumentation(
+			ProtectedMethodArgumentInfo Parameter)
+		{
+			Parameter.AdditionalDocumentation ??= GetAdditionalParameterDocumentation(Parameter);
+			return base.GetParameterDocumentation(Parameter);
+		}
+
+		/// <summary>
+		/// Gets documentation for a member.
+		/// </summary>
+		/// <returns>The documentation for the member.</returns>
+		protected override KeyValuePair<bool, string>[] GetMemberDocumentation(
+			ICustomAttributeProvider Member)
+		{
+			ChunkedList<KeyValuePair<bool, string>>? PropertyDoc = null;
+
+			foreach (object Attribute in
+				Member.GetCustomAttributes(typeof(McpParameterAttribute), true))
+			{
+				if (Attribute is McpParameterAttribute TypedAttribute)
+				{
+					PropertyDoc ??= new ChunkedList<KeyValuePair<bool, string>>();
+					PropertyDoc.Add(new KeyValuePair<bool, string>(
+						true, TypedAttribute.AnnotatedDescription));
+				}
+			}
+
+			StringBuilder? Values = null;
+
+			foreach (object Attribute in
+				Member.GetCustomAttributes(typeof(McpEnumValueAttribute), true))
+			{
+				if (Attribute is McpEnumValueAttribute TypedAttribute)
+				{
+					if (Values is null)
+					{
+						Values = new StringBuilder();
+						Values.AppendLine("Possible values:");
+						Values.AppendLine();
+					}
+
+					Values.Append("* `\"");
+					Values.Append(TypedAttribute.Value.ToString());
+					Values.Append("\"` - ");
+					Values.AppendLine(TypedAttribute.Title);
+				}
+			}
+
+			if (!(Values is null))
+			{
+				PropertyDoc ??= new ChunkedList<KeyValuePair<bool, string>>();
+				PropertyDoc.Add(new KeyValuePair<bool, string>(true, Values.ToString()));
+			}
+
+			return (PropertyDoc?.ToArray() ?? Array.Empty<KeyValuePair<bool, string>>()).Join(
+				base.GetMemberDocumentation(Member));
+		}
+
+		/// <summary>
+		/// Gets parameter documentation for a method parameter.
+		/// </summary>
+		/// <param name="Parameter">The method parameter.</param>
+		/// <returns>The documentation for the parameter.</returns>
+		private static KeyValuePair<bool, string>[] GetAdditionalParameterDocumentation(
+			ProtectedMethodArgumentInfo Parameter)
+		{
+			ChunkedList<KeyValuePair<bool, string>>? Result = null;
+
+			foreach (object Attribute in Parameter.Parameter.
+				GetCustomAttributes(typeof(McpParameterAttribute), true))
+			{
+				if (Attribute is McpParameterAttribute McpParameterAttribute)
+				{
+					Result ??= new ChunkedList<KeyValuePair<bool, string>>();
+					Result.Add(new KeyValuePair<bool, string>(true,
+						McpParameterAttribute.AnnotatedDescription));
+				}
+			}
+
+			StringBuilder? Values = null;
+
+			foreach (object Attribute in Parameter.Parameter.
+				GetCustomAttributes(typeof(McpEnumValueAttribute), true))
+			{
+				if (Attribute is McpEnumValueAttribute McpEnumValueAttribute)
+				{
+					if (Values is null)
+					{
+						Values = new StringBuilder();
+						Values.AppendLine("Possible values:");
+						Values.AppendLine();
+					}
+
+					Values.Append("* `\"");
+					Values.Append(McpEnumValueAttribute.Value.ToString());
+					Values.Append("\"` - ");
+					Values.AppendLine(McpEnumValueAttribute.Title);
+				}
+			}
+
+			if (!(Values is null))
+			{
+				Result ??= new ChunkedList<KeyValuePair<bool, string>>();
+				Result.Add(new KeyValuePair<bool, string>(true, Values.ToString()));
+			}
+
+			return Result?.ToArray() ?? Array.Empty<KeyValuePair<bool, string>>();
+		}
+
+		/// <summary>
+		/// Generates the Markdown ApiDescription for the documentation page.
+		/// </summary>
+		/// <param name="Notes">List of notes for the Markdown table.</param>
+		/// <param name="TypesToDocument">Types that need documenting.</param>
+		/// <param name="Request">HTTP Request object</param>
+		/// <param name="Markdown">Markdown output.</param>
+		protected override async Task GenerateDocumentationApiDescription(
+			ChunkedList<string> Notes, HashSet<Type> TypesToDocument,
+			HttpRequest Request, StringBuilder Markdown)
+		{
+			Markdown.AppendLine(new string('=', 80));
+			Markdown.AppendLine();
+			Markdown.AppendLine("MCP Server Interface");
+			Markdown.AppendLine("-----------------------");
+			Markdown.AppendLine();
+			Markdown.Append("This [MCP Server](https://modelcontextprotocol.io/specification/2025-11-25) ");
+			Markdown.AppendLine("is accessible on this endpoint: `");
+			Markdown.Append(Request.Header.GetURL(false, false));
+			Markdown.AppendLine("`");
+			Markdown.AppendLine();
+
+			if (this.hasScopes)
+			{
+				Markdown.AppendLine("Scopes supported:");
+				Markdown.AppendLine();
+
+				foreach (string Scope in this.scopesSupported)
+				{
+					Markdown.Append("* `");
+					Markdown.Append(Scope);
+					Markdown.AppendLine("`");
+				}
+
+				Markdown.AppendLine();
+			}
+
+			Markdown.Append("The following subsections list MCP Server interfaces that are ");
+			Markdown.Append("available on this resource. The MCP protocol is built on ");
+			Markdown.Append("top of the [JSON-RPC protocol](#jsonRpcInterface). You find ");
+			Markdown.AppendLine("JSON-RPC interface below.");
+			Markdown.AppendLine();
+
+			if (this.hasTools)
+			{
+				await this.GenerateToolDocumentation(Notes, TypesToDocument,
+					Request, Markdown);
+			}
+
+			if (this.hasPrompts)
+			{
+				await this.GeneratePromptDocumentation(Notes, TypesToDocument,
+					Request, Markdown);
+			}
+
+			if (this.HasResources)
+				await this.GenerateResourceDocumentation(Notes, Request, Markdown);
+
+			await base.GenerateDocumentationApiDescription(Notes, TypesToDocument,
+				Request, Markdown);
+		}
+
+		/// <summary>
+		/// Generates documentation for MCP Server tools.
+		/// </summary>
+		/// <param name="Notes">List of notes for the Markdown table.</param>
+		/// <param name="TypesToDocument">Types that need documenting.</param>
+		/// <param name="Request">HTTP Request object</param>
+		/// <param name="Markdown">Markdown output.</param>
+		protected virtual Task GenerateToolDocumentation(ChunkedList<string> Notes,
+			HashSet<Type> TypesToDocument, HttpRequest Request, StringBuilder Markdown)
+		{
+			Markdown.AppendLine(new string('=', 80));
+			Markdown.AppendLine();
+			Markdown.AppendLine("MCP Server Tools");
+			Markdown.AppendLine("-------------------");
+			Markdown.AppendLine();
+			Markdown.Append("Following subsections list ");
+			Markdown.Append("[MCP Server Tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools) ");
+			Markdown.AppendLine("that can be used to interact with the MCP Server.");
+			Markdown.AppendLine();
+
+			Tool[] Tools;
+
+			lock (this.tools)
+			{
+				Tools = new Tool[this.tools.Count];
+				this.tools.Values.CopyTo(Tools, 0);
+			}
+
+			foreach (Tool Tool in Tools)
+			{
+				Markdown.AppendLine("<section>");
+				Markdown.AppendLine();
+				Markdown.Append("### ");
+				Markdown.AppendLine(Tool.Title);
+				Markdown.AppendLine();
+
+				Markdown.AppendLine(MarkdownDocument.Encode(Tool.Description));
+				Markdown.AppendLine();
+
+				Markdown.AppendLine("| Properties ||");
+				Markdown.AppendLine("|:-------|:------:|");
+				Markdown.Append("| Can Modify:  | ");
+				Markdown.Append(YesNo(Tool.CanModifyEnvironment));
+				Markdown.AppendLine(" |");
+				Markdown.Append("| Can Destroy:  | ");
+				Markdown.Append(YesNo(Tool.CanDestroyEnvironment));
+				Markdown.AppendLine(" |");
+				Markdown.Append("| Is Idempotent:  | ");
+				Markdown.Append(YesNo(Tool.Idempotent));
+				Markdown.AppendLine(" |");
+				Markdown.Append("| Open World Access:  | ");
+				Markdown.Append(YesNo(Tool.OpenWorldAccess));
+				Markdown.AppendLine(" |");
+				Markdown.AppendLine();
+
+				this.AppendDocumentation(Notes, TypesToDocument, Tool, Markdown);
+			}
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Generates documentation for MCP Server prompts.
+		/// </summary>
+		/// <param name="Notes">List of notes for the Markdown table.</param>
+		/// <param name="TypesToDocument">Types that need documenting.</param>
+		/// <param name="Request">HTTP Request object</param>
+		/// <param name="Markdown">Markdown output.</param>
+		protected virtual Task GeneratePromptDocumentation(ChunkedList<string> Notes,
+			HashSet<Type> TypesToDocument, HttpRequest Request, StringBuilder Markdown)
+		{
+			Markdown.AppendLine(new string('=', 80));
+			Markdown.AppendLine();
+			Markdown.AppendLine("MCP Server Prompts");
+			Markdown.AppendLine("---------------------");
+			Markdown.AppendLine();
+			Markdown.Append("Following subsections list ");
+			Markdown.Append("[MCP Server Prompts](https://modelcontextprotocol.io/specification/2025-11-25/server/prompts) ");
+			Markdown.AppendLine("that can be used to interact with the MCP Server.");
+			Markdown.AppendLine();
+
+			Prompt[] Prompts;
+
+			lock (this.prompts)
+			{
+				Prompts = new Prompt[this.prompts.Count];
+				this.prompts.Values.CopyTo(Prompts, 0);
+			}
+
+			foreach (Prompt Prompt in Prompts)
+			{
+				Markdown.AppendLine("<section>");
+				Markdown.AppendLine();
+				Markdown.Append("### ");
+				Markdown.AppendLine(Prompt.Title);
+				Markdown.AppendLine();
+
+				Markdown.AppendLine(MarkdownDocument.Encode(Prompt.Description));
+				Markdown.AppendLine();
+
+				this.AppendDocumentation(Notes, TypesToDocument, Prompt, Markdown);
+			}
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Generates documentation for MCP Server resources.
+		/// </summary>
+		/// <param name="Notes">List of notes for the Markdown table.</param>
+		/// <param name="Request">HTTP Request object</param>
+		/// <param name="Markdown">Markdown output.</param>
+		protected virtual Task GenerateResourceDocumentation(ChunkedList<string> Notes,
+			HttpRequest Request, StringBuilder Markdown)
+		{
+			Markdown.AppendLine(new string('=', 80));
+			Markdown.AppendLine();
+			Markdown.AppendLine("MCP Server Resources");
+			Markdown.AppendLine("-----------------------");
+			Markdown.AppendLine();
+
+			Markdown.Append("This MCP Server supports [MCP Server Resources]");
+			Markdown.Append("(https://modelcontextprotocol.io/specification/2025-11-25/server/resources).");
+			Markdown.AppendLine();
+
+			AppendDocumentation(this.ResourceDocumentation, Markdown);
+
+			return Task.CompletedTask;
+		}
 	}
 }

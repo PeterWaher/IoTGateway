@@ -53,10 +53,18 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public bool IsMetaDataArgument { get; }
 
 		/// <summary>
-		/// Available documentation for the method. Value represents documentation text,
-		/// and Key represents if the documentation is in Markdown format (true) or 
+		/// Available documentation for the method argument. Value represents documentation 
+		/// text, and Key represents if the documentation is in Markdown format (true) or 
 		/// plain text (false).
 		/// </summary>
 		public KeyValuePair<bool, string>[] Documentation { get; }
+
+		/// <summary>
+		/// Additional documentation for the method argument. Value represents documentation 
+		/// text, and Key represents if the documentation is in Markdown format (true) or 
+		/// plain text (false).
+		/// </summary>
+		public KeyValuePair<bool, string>[]? AdditionalDocumentation { get; set; }
+
 	}
 }

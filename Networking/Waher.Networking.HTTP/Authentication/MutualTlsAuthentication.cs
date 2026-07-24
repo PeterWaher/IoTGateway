@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Security;
 using Waher.Security.LoginMonitor;
@@ -40,6 +41,22 @@ namespace Waher.Networking.HTTP.Authentication
 		/// Collection of users to authenticate against.
 		/// </summary>
 		public IUserSource Users => this.users;
+
+		/// <summary>
+		/// Display name for authentication scheme.
+		/// </summary>
+		public override string DisplayName
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("mTLS");
+				this.AppendEncryptionRequirement(sb);
+
+				return sb.ToString();
+			}
+		}
 
 		/// <summary>
 		/// Gets available challenges for the authenticating client to respond to.

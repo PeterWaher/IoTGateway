@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text;
+using System.Threading.Tasks;
 using Waher.Runtime.Collections;
 using Waher.Security;
 using Waher.Security.Authorization;
@@ -42,6 +43,37 @@ namespace Waher.Networking.HTTP.Authentication
 			this.authenticationSchemes = AuthenticationSchemes;
 			this.authorization = Authorization;
 			this.nrAuthenticationSchemes = AuthenticationSchemes?.Length ?? 0;
+		}
+
+		/// <summary>
+		/// Embedded authentication schemes.
+		/// </summary>
+		public HttpAuthenticationScheme[] EmbeddedSchemes => this.authenticationSchemes;
+
+		/// <summary>
+		/// Display name for authentication scheme.
+		/// </summary>
+		public override string DisplayName
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+				bool First = true;
+
+				foreach (HttpAuthenticationScheme Scheme in this.authenticationSchemes)
+				{
+					if (First)
+						First = false;
+					else
+						sb.Append(", ");
+
+					sb.Append(Scheme.DisplayName);
+				}
+
+				this.AppendEncryptionRequirement(sb);
+
+				return sb.ToString();
+			}
 		}
 
 		/// <summary>

@@ -9,6 +9,7 @@ using Waher.Networking.HTTP.Mcp.Model.ContentBlocks;
 using Waher.Persistence;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
+using Waher.Script;
 using Waher.Script.Model;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Server
@@ -59,7 +60,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			this.Idempotent = Idempotent;
 			this.OpenWorldAccess = OpenWorldAccess;
 			this.MetaData = MetaData;
-			this.HasReturnValue = this.HasStructuredReturnValue = Method.ReturnType != typeof(void);
+			this.HasStructuredReturnValue = this.HasReturnValue;
 
 			Type ReturnType = this.Method.ReturnType;
 
@@ -146,11 +147,6 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// Meta-data associated with tool.
 		/// </summary>
 		public KeyValuePair<string, object>[] MetaData { get; }
-
-		/// <summary>
-		/// If the tool returns a value.
-		/// </summary>
-		public bool HasReturnValue { get; }
 
 		/// <summary>
 		/// If the tool returns a structured return value.
@@ -318,7 +314,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 				{ "description", McpToolResultDescription },
 			};
 
-			if (ReturnType == typeof(void))
+			if (Expression.IsVoid(ReturnType))
 				Result["required"] = Array.Empty<string>();
 			else
 				Result["required"] = new string[] { "result" };

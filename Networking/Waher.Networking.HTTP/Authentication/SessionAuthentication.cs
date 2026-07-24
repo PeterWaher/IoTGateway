@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Script;
 using Waher.Security;
@@ -39,6 +40,22 @@ namespace Waher.Networking.HTTP.Authentication
 		{
 			this.userVariable = UserVariable;
 			this.server = Server;
+		}
+
+		/// <summary>
+		/// Display name for authentication scheme.
+		/// </summary>
+		public override string DisplayName
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("Session");
+				this.AppendEncryptionRequirement(sb);
+
+				return sb.ToString();
+			}
 		}
 
 		/// <summary>

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text;
+using System.Threading.Tasks;
 using Waher.Security;
 
 namespace Waher.Networking.HTTP
@@ -64,6 +65,31 @@ namespace Waher.Networking.HTTP
 		/// If the authentication scheme uses user sessions.
 		/// </summary>
 		public virtual bool UserSessions => false;
+
+		/// <summary>
+		/// Display name for authentication scheme.
+		/// </summary>
+		public abstract string DisplayName { get; }
+
+		/// <summary>
+		/// Appends any encryption requirement to the display name.
+		/// </summary>
+		/// <param name="DisplayName">Display name being build.</param>
+		protected virtual void AppendEncryptionRequirement(StringBuilder DisplayName)
+		{
+			if (this.requireEncryption)
+			{
+				DisplayName.Append(" (");
+
+				if (this.minStrength > 0)
+				{
+					DisplayName.Append(this.minStrength.ToString());
+					DisplayName.Append("+ bit ");
+				}
+
+				DisplayName.Append("Encryption)");
+			}
+		}
 
 		/// <summary>
 		/// Gets available challenges for the authenticating client to respond to.

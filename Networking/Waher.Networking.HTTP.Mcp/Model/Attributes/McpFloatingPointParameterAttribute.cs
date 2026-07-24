@@ -9,7 +9,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue |
 		AttributeTargets.Property | AttributeTargets.Field,
 		Inherited = true, AllowMultiple = false)]
-	public class McpFloatingPointParameterAttribute : McpParameterAttribute
+	public class McpFloatingPointParameterAttribute : McpRangeParameterAttribute
 	{
 		/// <summary>
 		/// Provides meta-data about a floating-point-valued parameter.
@@ -19,8 +19,6 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		public McpFloatingPointParameterAttribute(string? Title, string? Description)
 			: base(Title, Description)
 		{
-			this.MinValue = null;
-			this.MaxValue = null;
 		}
 
 		/// <summary>
@@ -32,16 +30,13 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// <param name="MaxValue">Maximum value of integer, using the correct integer type.</param>
 		public McpFloatingPointParameterAttribute(string? Title, string? Description,
 			object? MinValue, object? MaxValue)
-			: base(Title, Description)
+			: base(Title, Description, MinValue, MaxValue)
 		{
 			if (!IsFloatingPointType(MinValue))
 				throw new ArgumentException("MinValue is not a float-point type.", nameof(MinValue));
 
 			if (!IsFloatingPointType(MaxValue))
 				throw new ArgumentException("MaxValue is not a float-point type.", nameof(MaxValue));
-
-			this.MinValue = MinValue;
-			this.MaxValue = MaxValue;
 		}
 
 		private static bool IsFloatingPointType(object? Value)
@@ -62,16 +57,6 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		}
 
 		/// <summary>
-		/// Minimum value of floating-point value.
-		/// </summary>
-		public object? MinValue { get; }
-
-		/// <summary>
-		/// Minimum value of floating-point value.
-		/// </summary>
-		public object? MaxValue { get; }
-
-		/// <summary>
 		/// Annotates a schema object with information in the attribute.
 		/// </summary>
 		/// <param name="Schema">Schema object being built.</param>
@@ -80,12 +65,6 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 			base.Annotate(Schema);
 
 			Schema["type"] = "number";
-
-			if (!(this.MinValue is null))
-				Schema["minimum"] = this.MinValue;
-
-			if (!(this.MaxValue is null))
-				Schema["maximum"] = this.MaxValue;
 		}
 	}
 }

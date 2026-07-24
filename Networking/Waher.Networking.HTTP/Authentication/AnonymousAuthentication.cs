@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Security;
 
@@ -50,6 +51,40 @@ namespace Waher.Networking.HTTP.Authentication
 		/// Methods for which to use anonymous authentication.
 		/// </summary>
 		public string[] Methods => this.methods;
+
+		/// <summary>
+		/// Display name for authentication scheme.
+		/// </summary>
+		public override string DisplayName 
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+				bool First = true;
+
+				sb.Append("Anonymous");
+
+				foreach (string Method in this.methods)
+				{
+					if (First)
+					{
+						First = false;
+						sb.Append(" (");
+					}
+					else
+						sb.Append(", ");
+
+					sb.Append(Method);
+				}
+
+				if(!First)
+					sb.Append(')');
+
+				this.AppendEncryptionRequirement(sb);
+
+				return sb.ToString();
+			}
+		}
 
 		/// <summary>
 		/// Gets available challenges for the authenticating client to respond to.

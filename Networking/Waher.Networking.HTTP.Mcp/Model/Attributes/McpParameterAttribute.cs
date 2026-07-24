@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Waher.Content.Markdown;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 {
@@ -44,5 +45,11 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 			if (!string.IsNullOrEmpty(this.Description))
 				Schema["description"] = this.Description;
 		}
+
+		/// <summary>
+		/// Annotated description of parameter.
+		/// </summary>
+		public virtual string AnnotatedDescription => MarkdownDocument.Encode(
+			this.Description ?? this.Title ?? string.Empty);
 	}
 }

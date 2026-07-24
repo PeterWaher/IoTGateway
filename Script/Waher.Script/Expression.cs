@@ -4734,7 +4734,9 @@ namespace Waher.Script
 		/// <returns>If type is void.</returns>
 		public static bool IsVoid(Type ResultType)
 		{
-			if (VoidTaskResultType is null)
+			if (ResultType == typeof(void))
+				return true;
+			else if (VoidTaskResultType is null)
 			{
 				if (ResultType.FullName == "System.Threading.Tasks.VoidTaskResult")
 				{

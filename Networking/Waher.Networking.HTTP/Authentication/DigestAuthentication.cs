@@ -143,6 +143,38 @@ namespace Waher.Networking.HTTP.Authentication
 		public string Realm => this.realm;
 
 		/// <summary>
+		/// Display name for authentication scheme.
+		/// </summary>
+		public override string DisplayName
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("Digest");
+				
+				switch (this.algorithm)
+				{
+					case DigestAlgorithm.MD5:
+						sb.Append("-MD5");
+						break;
+
+					case DigestAlgorithm.SHA256:
+						sb.Append("-SHA-256");
+						break;
+
+					case DigestAlgorithm.SHA3_256:
+						sb.Append("-SHA-3-256");
+						break;
+				}
+
+				this.AppendEncryptionRequirement(sb);
+
+				return sb.ToString();
+			}
+		}
+
+		/// <summary>
 		/// Gets available challenges for the authenticating client to respond to.
 		/// </summary>
 		/// <param name="Request">Request object.</param>

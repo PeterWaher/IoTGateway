@@ -176,6 +176,35 @@ namespace Waher.Mcp.Files
 		public override bool HasResources => true;
 
 		/// <summary>
+		/// MCP server resource documentation, as an array of key-value pairs.
+		/// The Key represents Markdown (true) or plain text (false), and the Value
+		/// represents the documentation text. Each entry in the array represents a
+		/// paragraph.
+		/// </summary>
+		public override KeyValuePair<bool, string>[] ResourceDocumentation
+		{
+			get
+			{
+				return new KeyValuePair<bool, string>[]
+				{
+					new KeyValuePair<bool, string>(true,
+						"Each resource represents a file in the account-specific file " +
+						"storage. As files are created, modified, renamed or deleted, " +
+						"resource events are propagated to clients that receive " +
+						"notifications (new, renamed or deleted files) or have resource " +
+						"subscriptions active (modifed files)."),
+					new KeyValuePair<bool, string>(true,
+						"**Note**: Files are account-specific. This means that other " +
+						"clients have different sets of files. This means that URIs " +
+						"cannot be meaningfully shared, as they point to different " +
+						"files in each account-specific storage. The purpose of the " +
+						"account-specific storage is to store information for later " +
+						"processing or reference.")
+				};
+			}
+		}
+
+		/// <summary>
 		/// Lists available MCP server resources.
 		/// </summary>
 		/// <param name="Request">HTTP request object.</param>

@@ -9,7 +9,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue | 
 		AttributeTargets.Property | AttributeTargets.Field, 
 		Inherited = true, AllowMultiple = false)]
-	public class McpIntegerParameterAttribute : McpParameterAttribute
+	public class McpIntegerParameterAttribute : McpRangeParameterAttribute
 	{
 		/// <summary>
 		/// Provides meta-data about an integer-valued parameter.
@@ -19,8 +19,6 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		public McpIntegerParameterAttribute(string? Title, string? Description)
 			: base(Title, Description)
 		{
-			this.MinValue = null;
-			this.MaxValue = null;
 		}
 
 		/// <summary>
@@ -32,16 +30,13 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// <param name="MaxValue">Maximum value of integer, using the correct integer type.</param>
 		public McpIntegerParameterAttribute(string? Title, string? Description,
 			object? MinValue, object? MaxValue)
-			: base(Title, Description)
+			: base(Title, Description, MinValue, MaxValue)
 		{
 			if (!IsIntegerType(MinValue))
 				throw new ArgumentException("MinValue is not an integer type.", nameof(MinValue));
 
 			if (!IsIntegerType(MaxValue))
 				throw new ArgumentException("MaxValue is not an integer type.", nameof(MaxValue));
-
-			this.MinValue = MinValue;
-			this.MaxValue = MaxValue;
 		}
 
 		private static bool IsIntegerType(object? Value)
@@ -67,16 +62,6 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		}
 
 		/// <summary>
-		/// Minimum value of integer.
-		/// </summary>
-		public object? MinValue { get; }
-
-		/// <summary>
-		/// Maximum value of integer.
-		/// </summary>
-		public object? MaxValue { get; }
-
-		/// <summary>
 		/// Annotates a schema object with information in the attribute.
 		/// </summary>
 		/// <param name="Schema">Schema object being built.</param>
@@ -85,12 +70,6 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 			base.Annotate(Schema);
 
 			Schema["type"] = "integer";
-
-			if (!(this.MinValue is null))
-				Schema["minimum"] = this.MinValue;
-
-			if (!(this.MaxValue is null))
-				Schema["maximum"] = this.MaxValue;
 		}
 	}
 }

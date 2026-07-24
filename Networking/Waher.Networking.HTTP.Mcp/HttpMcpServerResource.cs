@@ -517,49 +517,59 @@ namespace Waher.Networking.HTTP.Mcp
 				Session.ReceiveText(sb.ToString());
 			}
 
-			Dictionary<string, object> Prompts = new Dictionary<string, object>();
+			Dictionary<string, object> ServerCapabilities = new Dictionary<string, object>();
+
+			// TODO:
+			//{
+			//	{ "logging", new Dictionary<string, object>() },
+			//	{ "completions", new Dictionary<string, object>() },
+			//	{ "tasks", new Dictionary<string, object>()
+			//		{
+			//			{ "list", new Dictionary<string, object>() },
+			//			{ "cancel", new Dictionary<string, object>() },
+			//			{ "requests", new Dictionary<string, object>()
+			//				{
+			//					{ "tools", new Dictionary<string, object>()
+			//						{
+			//							{ "call", new Dictionary<string, object>() }
+			//						}
+			//					}
+			//				}
+			//			}
+			//		}
+			//	},
+			//	{ "experimental", new Dictionary<string, object>() }
+			//};
+
 			if (this.hasPrompts)
-				Prompts["listChanged"] = true;
+			{
+				ServerCapabilities["prompts"] = new Dictionary<string, object>()
+				{
+					{ "listChanged", true }
+				};
+			}
 
-			Dictionary<string, object> Tools = new Dictionary<string, object>();
 			if (this.hasTools)
-				Tools["listChanged"] = true;
+			{
+				ServerCapabilities["tools"] = new Dictionary<string, object>()
+				{
+					{ "listChanged", true }
+				};
+			}
 
-			Dictionary<string, object> Resources = new Dictionary<string, object>();
 			if (this.HasResources)
 			{
-				Resources["subscribe"] = true;
-				Resources["listChanged"] = true;
+				ServerCapabilities["resources"] = new Dictionary<string, object>()
+				{
+					{ "subscribe", true },
+					{ "listChanged", true }
+				};
 			}
 
 			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
 				{ "protocolVersion", "2025-11-25" },
-				{ "capabilities", new Dictionary<string, object>()
-					{
-						{ "prompts", Prompts },
-						{ "resources", Resources },
-						{ "tools", Tools },
-						{ "logging", new Dictionary<string, object>() },
-						{ "completions", new Dictionary<string, object>() },
-						{ "tasks", new Dictionary<string, object>()
-							{
-								{ "list", new Dictionary<string, object>() },
-								{ "cancel", new Dictionary<string, object>() },
-								{ "requests", new Dictionary<string, object>()
-									{
-										{ "tools", new Dictionary<string, object>()
-											{
-												{ "call", new Dictionary<string, object>() }
-											}
-										}
-									}
-								}
-							}
-						},
-						{ "experimental", new Dictionary<string, object>() }
-					}
-				},
+				{ "capabilities", ServerCapabilities },
 				{ "serverInfo", new Dictionary<string,object>()
 					{
 						{ "name", this.Name },

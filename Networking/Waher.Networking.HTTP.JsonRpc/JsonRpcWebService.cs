@@ -908,6 +908,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 					}
 
 					Markdown.AppendLine();
+					Markdown.AppendLine("</section>");
+					Markdown.AppendLine();
 				}
 
 				TypesToDocument2 = TypesToDocument;

@@ -188,7 +188,17 @@ namespace Waher.Security.Users
 				this.privileges[Privilege] = HasPrivilege;
 			}
 
-			Task.Run(() => Privileges.GetPrivilege(Privilege));
+			Task.Run(async () =>
+			{
+				try
+				{
+					await Privileges.GetPrivilege(Privilege);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+			});
 
 			return HasPrivilege;
 		}
@@ -230,7 +240,7 @@ namespace Waher.Security.Users
 
 			if (Encrypted)
 			{
-				if (!(this.roleIds is null))
+				if ((this.roleIds?.Length ?? 0) > 0)
 				{
 					StringBuilder sb = null;
 

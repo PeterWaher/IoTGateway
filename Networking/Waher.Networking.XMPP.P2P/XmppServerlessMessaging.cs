@@ -612,7 +612,8 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			if (!(this.p2pNetwork is null) &&
 				this.p2pNetwork.State == PeerToPeerNetworkState.Ready &&
-				!(this.p2pNetwork.ExternalEndpoint is null))
+				!(this.p2pNetwork.ExternalEndpoint is null) &&
+				!this.p2pNetwork.OnPublicNetwork())
 			{
 				Xml.Append("<p2p xmlns='");
 				Xml.Append(EndpointSecurity.IoTHarmonizationP2PCurrent);

@@ -648,8 +648,11 @@ namespace Waher.Networking.XMPP.P2P
 					switch (Attr.Name)
 					{
 						case "extIp":
-							if (IPAddress.TryParse(Attr.Value, out IPAddress Addr) && InternetGatewayRegistrator.IsPublicAddress(Addr))
+							if (IPAddress.TryParse(Attr.Value, out IPAddress Addr) &&
+								InternetGatewayRegistrator.IsPublicAddress(Addr))
+							{
 								ExtIp = Attr.Value;
+							}
 							break;
 
 						case "extPort":

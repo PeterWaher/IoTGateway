@@ -27,7 +27,6 @@ using Waher.Runtime.IO;
 using Waher.Script.Model;
 using Waher.Security;
 using Waher.Security.JWT;
-using Waher.Things.DisplayableParameters;
 
 namespace Waher.Networking.HTTP.Mcp
 {
@@ -61,8 +60,8 @@ namespace Waher.Networking.HTTP.Mcp
 		private static readonly ObjectContent defaultObjectEncoder = new ObjectContent();
 		private static Dictionary<Type, IContentBlock> contentBlocks = GetContentBlocksFirstTime();
 		private const int PageSize = 20;
-		private readonly Dictionary<string, Tool> tools = new Dictionary<string, Tool>();
-		private readonly Dictionary<string, Prompt> prompts = new Dictionary<string, Prompt>();
+		private readonly SortedDictionary<string, Tool> tools = new SortedDictionary<string, Tool>();
+		private readonly SortedDictionary<string, Prompt> prompts = new SortedDictionary<string, Prompt>();
 		private readonly ISnifferSet? snifferSet;
 		private readonly string[] rootScopes;
 		private readonly string[] toolScopes;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -11,7 +10,6 @@ using Waher.Content.Binary;
 using Waher.Content.Html;
 using Waher.Content.Json;
 using Waher.Content.Markdown;
-using Waher.Content.Markdown.Functions;
 using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc.MetaData;
 using Waher.Networking.HTTP.OAuth;
@@ -19,7 +17,6 @@ using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script;
-using Waher.Script.Functions.Runtime;
 using Waher.Security.JWT;
 using Waher.Things.Http;
 
@@ -36,7 +33,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 	{
 		private static readonly JsonCodec jsonCodec = new JsonCodec();
 
-		private readonly Dictionary<string, JsonRpcMethodInfo> methods;
+		private readonly SortedDictionary<string, JsonRpcMethodInfo> methods;
 		private readonly bool userSessions;
 		private readonly bool caseSensitive;
 		private HttpAuthenticationScheme[]? authenticationSchemes = null;
@@ -71,9 +68,9 @@ namespace Waher.Networking.HTTP.JsonRpc
 			this.caseSensitive = CaseSensitive;
 
 			if (CaseSensitive)
-				this.methods = new Dictionary<string, JsonRpcMethodInfo>(StringComparer.InvariantCulture);
+				this.methods = new SortedDictionary<string, JsonRpcMethodInfo>(StringComparer.InvariantCulture);
 			else
-				this.methods = new Dictionary<string, JsonRpcMethodInfo>(StringComparer.InvariantCultureIgnoreCase);
+				this.methods = new SortedDictionary<string, JsonRpcMethodInfo>(StringComparer.InvariantCultureIgnoreCase);
 
 			foreach (MethodInfo Method in this.GetType().GetMethods(BindingFlags.Instance |
 				BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))

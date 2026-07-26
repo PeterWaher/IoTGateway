@@ -80,13 +80,13 @@ namespace Waher.Networking.HTTP
 			if (this.requireEncryption)
 			{
 				DisplayName.Append(" (");
-
+#if !WINDOWS_UWP
 				if (this.minStrength > 0)
 				{
 					DisplayName.Append(this.minStrength.ToString());
 					DisplayName.Append("+ bit ");
 				}
-
+#endif
 				DisplayName.Append("Encryption)");
 			}
 		}

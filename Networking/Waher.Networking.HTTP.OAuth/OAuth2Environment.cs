@@ -25,6 +25,7 @@ namespace Waher.Networking.HTTP.OAuth
 		private OAuthRegistrationResource? registrationResource = null;
 		private OAuthManagementResource? managementResource = null;
 		private OAuthDeviceAuthorizationResource? deviceAuthorizationResource = null;
+		private OAuthIntrospectionResource? introspectionResource = null;
 		private AuthorizationServerMetaData? serverMetaDataResource = null;
 		private ProtectedResourceMetaData? resourceMetaData = null;
 		private IUserSource? userSource = null;
@@ -72,6 +73,11 @@ namespace Waher.Networking.HTTP.OAuth
 		/// If the environment has a registered device authorization resource
 		/// </summary>
 		public bool HasDeviceAuthorizationResource => !(this.deviceAuthorizationResource is null);
+
+		/// <summary>
+		/// If the environment has a registered introspection resource
+		/// </summary>
+		public bool HasIntrospectionResource => !(this.introspectionResource is null);
 
 		/// <summary>
 		/// If the environment has a registered server meta-data resource
@@ -170,6 +176,20 @@ namespace Waher.Networking.HTTP.OAuth
 					throw new InvalidOperationException("No device authorization resource has been registered.");
 
 				return this.deviceAuthorizationResource;
+			}
+		}
+
+		/// <summary>
+		/// Registered introspection resource
+		/// </summary>
+		public OAuthIntrospectionResource IntrospectionResource
+		{
+			get
+			{
+				if (this.introspectionResource is null)
+					throw new InvalidOperationException("No introspection resource has been registered.");
+
+				return this.introspectionResource;
 			}
 		}
 
@@ -386,6 +406,16 @@ namespace Waher.Networking.HTTP.OAuth
 		{
 			this.AssertUnlocked();
 			this.deviceAuthorizationResource = DeviceAuthorizationResource;
+		}
+
+		/// <summary>
+		/// Registers an introspection resource.
+		/// </summary>
+		/// <param name="IntrospectionResource">Introspection resource to register.</param>
+		public void Register(OAuthIntrospectionResource? IntrospectionResource)
+		{
+			this.AssertUnlocked();
+			this.introspectionResource = IntrospectionResource;
 		}
 
 		/// <summary>

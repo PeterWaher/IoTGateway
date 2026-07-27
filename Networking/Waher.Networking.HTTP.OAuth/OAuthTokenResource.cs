@@ -4,10 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Content.Html.Elements;
 using Waher.Events;
 using Waher.Networking.HTTP.Authentication;
-using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Collections;
 using Waher.Runtime.IO;
@@ -778,5 +776,67 @@ namespace Waher.Networking.HTTP.OAuth
 			}
 		}
 
+		/// <summary>
+		/// Tries to get the type of a token.
+		/// </summary>
+		/// <param name="Token">Token</param>
+		/// <param name="TokenType">Type of token, if found.</param>
+		/// <returns>If the type of token could be found.</returns>
+		public bool TryGetTokenType(string Token, [NotNullWhen(true)] out OAuthTokenType? TokenType)
+		{
+			return this.TryGetTokenType(Token, out _, out TokenType);
+		}
+
+		/// <summary>
+		/// Tries to get the type of a token.
+		/// </summary>
+		/// <param name="Token">Token</param>
+		/// <param name="ParsedToken">Parsed JWT Token, if available.</param>
+		/// <param name="TokenType">Type of token, if found.</param>
+		/// <returns>If the type of token could be found.</returns>
+		public bool TryGetTokenType(string Token, out JwtToken? ParsedToken,
+			[NotNullWhen(true)] out OAuthTokenType? TokenType)
+		{
+			ParsedToken = null;
+
+			if (refreshTokens.ContainsKey(Token))
+			{
+				TokenType = OAuthTokenType.RefreshToken;
+				return true;
+			}
+			else if (usedRefreshTokens.ContainsKey(Token))
+			{
+				TokenType = OAuthTokenType.ExpiredRefreshToken;
+				return true;
+			}
+			else if (codes.ContainsKey(Token))
+			{
+				TokenType = OAuthTokenType.AccessCode;
+				return true;
+			}
+			else if (JwtToken.TryParse(Token, out ParsedToken))
+			{
+				if (this.Environment.JwtFactory.IsValid(ParsedToken, out Reason Reason))
+				{
+					TokenType = OAuthTokenType.AccessToken;
+					return true;
+				}
+				else if (Reason == Reason.Expired || Reason == Reason.Deprecated)
+				{
+					TokenType = OAuthTokenType.ExpiredAccessToken;
+					return true;
+				}
+				else
+				{
+					TokenType = null;
+					return false;
+				}
+			}
+			else
+			{
+				TokenType = null;
+				return false;
+			}
+		}
 	}
 }

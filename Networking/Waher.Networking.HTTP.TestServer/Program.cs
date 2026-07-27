@@ -392,6 +392,7 @@ internal class Program
 			WebServer.Register(new ProtectedResourceMetaData(Environment));
 			WebServer.Register(new OAuthTokenResource(Environment));
 			WebServer.Register(new OAuthAuthorizeResource(Environment));
+			WebServer.Register(new OAuthIntrospectionResource(Environment));
 			WebServer.Register(new AuthorizationServerMetaData(Environment));
 			WebServer.Register(new EventLogMcpServer("/MCP/EventLog", [],
 				null, McpSniffers));

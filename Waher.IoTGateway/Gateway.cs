@@ -1408,6 +1408,7 @@ namespace Waher.IoTGateway
 				webServer.Register(new OAuthTokenResource(oauthEnvironment));
 				webServer.Register(new OAuthDeviceAuthorizationResource(oauthEnvironment));
 				webServer.Register(new OAuthAuthorizeResource(oauthEnvironment));
+				webServer.Register(new OAuthIntrospectionResource(oauthEnvironment));
 				webServer.Register(new AuthorizationServerMetaData(oauthEnvironment));
 				webServer.Register(new OAuthRegistrationResource(oauthEnvironment));
 				webServer.Register(new OAuthManagementResource(oauthEnvironment));

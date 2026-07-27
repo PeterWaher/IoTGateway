@@ -20,8 +20,8 @@ namespace Waher.Networking.HTTP.OAuth
 		/// </summary>
 		public const string OAuthScopePrivilegePrefix = "OAUTH.Scope.";
 
+		private readonly OAuth2Environment environment;
 		private HttpAuthenticationScheme[]? authenticationSchemes = null;
-		private OAuth2Environment environment;
 
 		/// <summary>
 		/// OAUTH authorize resource.

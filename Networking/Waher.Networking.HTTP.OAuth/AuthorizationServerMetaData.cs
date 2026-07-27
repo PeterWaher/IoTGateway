@@ -85,6 +85,9 @@ namespace Waher.Networking.HTTP.OAuth
 			if (this.Environment.HasDeviceAuthorizationResource)
 				MetaData["device_authorization_endpoint"] = ServerUrl + this.Environment.DeviceAuthorizationResource.ResourceName;
 
+			if (this.Environment.HasIntrospectionResource)
+				MetaData["introspection_endpoint"] = ServerUrl + this.Environment.IntrospectionResource.ResourceName;
+
 			await Response.Return(MetaData);
 		}
 	}

@@ -114,38 +114,53 @@ namespace Waher.Networking.HTTP.Authentication
 					string UserName = s.Substring(0, i);
 					string Password = s.Substring(i + 1);
 
-					IUser User = await this.users.TryGetUser(UserName);
-					if (User is null)
-					{
-						LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Request.RemoteEndPoint, "HTTP",
-							new KeyValuePair<string, object>("UserName", UserName));
-						return null;
-					}
-
-					string PasswordHash = ComputePasswordHash(UserName, this.realm, Password, User.PasswordHashType,
-						out byte? HashBytes);
-
-					if (PasswordHash is null)
-						return null;
-
-					string ExpectedHash = User.PasswordHash;
-					if (HashBytes.HasValue)
-						ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, HashBytes.Value);
-
-					if (PasswordHash == ExpectedHash)
-					{
-						LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
-						return User;
-					}
-					else
-					{
-						LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
-						return null;
-					}
+					return await IsAuthenticated(UserName, Password, this.realm, this.users, Request);
 				}
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Checks if the request is authorized.
+		/// </summary>
+		/// <param name="UserName">User name.</param>
+		/// <param name="Password">Password.</param>
+		/// <param name="Realm">Authentication realm.</param>
+		/// <param name="Users">Collection of users to authenticate against.</param>
+		/// <param name="Request">Request object.</param>
+		/// <returns>User object, if authenticated, or null otherwise.</returns>
+		public static async Task<IUser> IsAuthenticated(string UserName, string Password,
+			string Realm, IUserSource Users, HttpRequest Request)
+		{
+			IUser User = await Users.TryGetUser(UserName);
+			if (User is null)
+			{
+				LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Request.RemoteEndPoint, "HTTP",
+					new KeyValuePair<string, object>("UserName", UserName));
+				return null;
+			}
+
+			string PasswordHash = ComputePasswordHash(UserName, Realm, Password, User.PasswordHashType,
+				out byte? HashBytes);
+
+			if (PasswordHash is null)
+				return null;
+
+			string ExpectedHash = User.PasswordHash;
+			if (HashBytes.HasValue)
+				ExpectedHash = DigestAuthentication.EnsureHex(ExpectedHash, HashBytes.Value);
+
+			if (PasswordHash == ExpectedHash)
+			{
+				LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
+				return User;
+			}
+			else
+			{
+				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
+				return null;
+			}
 		}
 
 		/// <summary>

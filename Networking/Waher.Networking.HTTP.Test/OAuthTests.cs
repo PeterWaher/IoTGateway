@@ -89,6 +89,18 @@ namespace Waher.Networking.HTTP.Test
 				int.MaxValue, BinaryPresentationMethod.ByteCount);
 
 			this.jwtFactory = JwtFactory.CreateHmacSha256(BaseUrl);
+			JwtFactory.ValidateAudience += (sender, e) => 
+			{
+				foreach (string Audience in e.Audience)
+				{
+					if (Audience == TestUserName)
+					{
+						e.Acceptable = true;
+						break;
+					}
+				}
+			};
+
 			this.server = new HttpServer(8081, this.xmlSniffer);
 
 			await Database.Clear("OAuthRedirectUris");

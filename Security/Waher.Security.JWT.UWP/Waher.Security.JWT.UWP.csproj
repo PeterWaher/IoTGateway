@@ -115,6 +115,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AudienceEventArgs.cs" />
     <Compile Include="ExternalUser.cs" />
     <Compile Include="Functions\AuthenticateJwt.cs" />
     <Compile Include="Functions\CreateJwt.cs" />

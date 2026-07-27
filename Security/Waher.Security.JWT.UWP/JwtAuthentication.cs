@@ -335,6 +335,10 @@ namespace Waher.Security.JWT
 							Description = "Token uses deprecated algorithm.";
 							break;
 
+						case Reason.InvalidAudience:
+							Description = "Token has an invalid audience.";
+							break;
+
 						default:
 							Description = "Reason: " + Reason.ToString();
 							break;

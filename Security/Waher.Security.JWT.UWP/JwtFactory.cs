@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Runtime.Collections;
 using Waher.Security.JWS;
 
@@ -49,7 +51,12 @@ namespace Waher.Security.JWT
 		/// <summary>
 		/// Token has been deprecated
 		/// </summary>
-		Deprecated
+		Deprecated,
+
+		/// <summary>
+		/// Token has an invalid audience
+		/// </summary>
+		InvalidAudience
 	}
 
 	/// <summary>
@@ -335,9 +342,31 @@ namespace Waher.Security.JWT
 				return false;
 			}
 
+			if ((Token.Audience?.Length ?? 0) > 0)
+			{
+				EventHandler<AudienceEventArgs> h = ValidateAudience;
+				if (!(h is null))
+				{
+					AudienceEventArgs e = new AudienceEventArgs(Token.Audience);
+
+					h.Raise(this, e);
+
+					if (!e.Acceptable)
+					{
+						Reason = Reason.InvalidAudience;
+						return false;
+					}
+				}
+			}
+
 			Reason = Reason.None;
 			return true;
 		}
+
+		/// <summary>
+		/// Event raised when the audience of a token is to be validated.
+		/// </summary>
+		public static event EventHandler<AudienceEventArgs> ValidateAudience;
 
 		/// <summary>
 		/// Creates a new JWT token.

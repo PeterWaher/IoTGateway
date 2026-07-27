@@ -1392,6 +1392,18 @@ namespace Waher.IoTGateway
 						jwtFactory = JwtFactory.CreateHmacSha256("https://" + Domain);
 					else
 						jwtFactory = JwtFactory.CreateHmacSha256("http://" + Domain);
+
+					JwtFactory.ValidateAudience += (sender, e) =>
+					{
+						foreach (string Audience in e.Audience)
+						{
+							if (IsDomain(Audience, true))
+							{
+								e.Acceptable = true;
+								return;
+							}
+						}
+					};
 				}
 				else
 					jwtFactory = JwtFactory.CreateHmacSha256(string.Empty);
@@ -1441,7 +1453,7 @@ namespace Waher.IoTGateway
 
 				webServer.Register(new Mcp.Content.InternetContentMcpServer("/MCP/Content", Icons, null, mcpSniffers));
 				webServer.Register(new Mcp.Events.EventLogMcpServer("/MCP/EventLog", Icons, null, mcpSniffers));
-				webServer.Register(new Mcp.Files.FileStorageMcpServer("/MCP/Files", 
+				webServer.Register(new Mcp.Files.FileStorageMcpServer("/MCP/Files",
 					Path.Combine(appDataFolder, "MCP", "Files"), Icons, null, mcpSniffers));
 
 				if (emoji1_24x24 is null)

@@ -32,7 +32,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="Method">bMethod information.</param>
 		/// <param name="CaseSensitive">If names are case sensitive.</param>
 		/// <param name="RequiredPrivileges">Required privileges</param>
-		public ProtectedMethod(MethodInfo Method, 
+		public ProtectedMethod(MethodInfo Method,
 			bool CaseSensitive, string[]? RequiredPrivileges)
 		{
 			ParameterInfo[] Arguments = Method.GetParameters();
@@ -292,10 +292,13 @@ namespace Waher.Networking.HTTP.JsonRpc
 				if (!this.NamedArguments.TryGetValue(P.Key, out int i))
 				{
 					if (this.MetaDataArgument.HasValue &&
-						P.Key == this.Arguments[this.MetaDataArgument.Value].Parameter.Name)
+						(P.Key == this.Arguments[this.MetaDataArgument.Value].Parameter.Name ||
+						P.Key == "_meta"))
 					{
 						i = this.MetaDataArgument.Value;
 					}
+					else if (P.Key == "_meta")
+						continue;
 					else
 					{
 						Reason = "Invalid parameter name: " + P.Key;

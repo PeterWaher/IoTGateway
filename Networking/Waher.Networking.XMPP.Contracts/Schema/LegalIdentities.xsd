@@ -13,6 +13,13 @@
 			<xs:documentation>Sent by one entity to another when it needs to get the public key of the other.</xs:documentation>
 			<xs:documentation>Expected response element: publicKey</xs:documentation>
 		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='ts' type='xs:dateTime' use='optional'>
+				<xs:annotation>
+					<xs:documentation>Timestamp indicating a time when the public key was used, in UTC.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
 	</xs:element>
 
 	<xs:element name='publicKey'>
@@ -25,6 +32,16 @@
 					<xs:documentation>Public keys corresponding to available methods to create signatures.</xs:documentation>
 				</xs:annotation>
 			</xs:group>
+			<xs:attribute name='from' type='xs:dateTime' use='required'>
+				<xs:annotation>
+					<xs:documentation>Timestamp indicating when the public key was created, in UTC.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='to' type='xs:dateTime' use='optional'>
+				<xs:annotation>
+					<xs:documentation>Timestamp indicating when the public key was replaced or changed, and no longer used for creating signatures, in UTC.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 

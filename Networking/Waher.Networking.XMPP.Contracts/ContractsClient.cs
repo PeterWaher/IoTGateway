@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -19,6 +18,7 @@ using Waher.Events;
 using Waher.Events.XMPP;
 using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
+using Waher.Networking.XMPP.Contracts.PublicKeys;
 using Waher.Networking.XMPP.Contracts.Search;
 using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.HttpFileUpload;
@@ -139,7 +139,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private const int CacheSchemaDays = 7;
 
 
-		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
+		private readonly PublicKeyRecords publicKeys = new PublicKeyRecords();
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Cache<string, KeyValuePair<byte[], bool>> contentPerPid = new Cache<string, KeyValuePair<byte[], bool>>(int.MaxValue, TimeSpan.FromDays(1), TimeSpan.FromDays(1));
 		private EndpointSecurity keys;
@@ -157,14 +157,16 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private sealed class LoadedKey : IDisposable
 		{
-			public LoadedKey(IE2eEndpoint Endpoint, bool MustDispose)
+			public LoadedKey(IE2eEndpoint Endpoint, bool MustDispose, DateTime Timestamp)
 			{
 				this.Endpoint = Endpoint;
 				this.MustDispose = MustDispose;
+				this.Timestamp = Timestamp;
 			}
 
 			public IE2eEndpoint Endpoint { get; }
 			public bool MustDispose { get; }
+			public DateTime Timestamp { get; }
 
 			public void Dispose()
 			{
@@ -570,7 +572,7 @@ namespace Waher.Networking.XMPP.Contracts
 						Keys.Add(Endpoint);
 					}
 
-					Timestamp = DateTime.Now;
+					Timestamp = DateTime.UtcNow;
 					await RuntimeSettings.SetAsync(this.keySettingsPrefix + "Timestamp", Timestamp.Value);
 
 					Log.Notice("Private keys for contracts client created.", this.client.BareJID, string.Empty, "NewKeys");
@@ -579,7 +581,7 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					Thread?.NewState("Time");
 
-					Timestamp = DateTime.Now;
+					Timestamp = DateTime.UtcNow;
 					await RuntimeSettings.SetAsync(this.keySettingsPrefix + "Timestamp", Timestamp.Value);
 				}
 
@@ -833,14 +835,24 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private IE2eEndpoint TryCreateLegalIdentityEndpoint(LegalIdentityState State)
 		{
-			if (State is null || !State.HasPrivateKey || string.IsNullOrEmpty(State.KeyName))
+			if (State is null ||
+				!State.HasPrivateKey ||
+				string.IsNullOrEmpty(State.KeyName))
+			{
 				return null;
+			}
 
-			string KeyNamespace = string.IsNullOrEmpty(State.KeyNamespace) ? EndpointSecurity.IoTHarmonizationE2ECurrent : State.KeyNamespace;
+			string KeyNamespace = string.IsNullOrEmpty(State.KeyNamespace) 
+				? EndpointSecurity.IoTHarmonizationE2ECurrent 
+				: State.KeyNamespace;
+
 			byte[] PrivateKey = State.PrivateKey;
 
-			if (PrivateKey is null || !EndpointSecurity.TryCreateEndpoint(State.KeyName, KeyNamespace, out IE2eEndpoint Template))
+			if (PrivateKey is null || !EndpointSecurity.TryCreateEndpoint(State.KeyName,
+				KeyNamespace, out IE2eEndpoint Template))
+			{
 				return null;
+			}
 
 			try
 			{
@@ -892,7 +904,7 @@ namespace Waher.Networking.XMPP.Contracts
 					if (!string.IsNullOrEmpty(State.ObjectId))
 						await Database.Update(State);
 
-					return new LoadedKey(Endpoint, true);
+					return new LoadedKey(Endpoint, true, State.Timestamp);
 				}
 				else if (!AreEqual(State.PublicKey, Endpoint.PublicKey))
 				{
@@ -900,30 +912,34 @@ namespace Waher.Networking.XMPP.Contracts
 					Endpoint = null;
 				}
 				else
-					return new LoadedKey(Endpoint, true);
+					return new LoadedKey(Endpoint, true, State.Timestamp);
 			}
 
-			bool MissingSnapshot = State?.HasPrivateKey != true || string.IsNullOrEmpty(State.KeyName);
+			bool MissingSnapshot = State?.HasPrivateKey != true || 
+				string.IsNullOrEmpty(State.KeyName);
 
 			if (!MigrateLegacyState ||
 				!MissingSnapshot ||
 				State?.PublicKey is null ||
 				!(Locked ? await this.LoadKeysLocked(false, null) : await this.LoadKeys(false)))
 			{
-				return new LoadedKey(null, false);
+				return new LoadedKey(null, false, DateTime.MinValue);
 			}
 
 			Endpoint = this.LocalEndpoint.FindLocalEndpoint(State.PublicKey);
-			if (Endpoint is null || !await this.SetLegalIdentityKeySnapshotAsync(State, Endpoint))
-				return new LoadedKey(Endpoint, false);
+			if (Endpoint is null ||
+				!await this.SetLegalIdentityKeySnapshotAsync(State, Endpoint))
+			{
+				return new LoadedKey(Endpoint, false, State.Timestamp);
+			}
 
 			if (!string.IsNullOrEmpty(State.ObjectId))
 				await Database.Update(State);
 
 			IE2eEndpoint Endpoint2 = this.TryCreateLegalIdentityEndpoint(State);
 			return Endpoint2 is null 
-				? new LoadedKey(Endpoint, false)
-				: new LoadedKey(Endpoint2, true);
+				? new LoadedKey(Endpoint, false, State.Timestamp)
+				: new LoadedKey(Endpoint2, true, State.Timestamp);
 		}
 
 		private static bool TryParseContractSharedSecret(string Value, out SymmetricCipherAlgorithms Algorithm,
@@ -1603,7 +1619,19 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
 		public Task GetServerPublicKey(EventHandlerAsync<KeyEventArgs> Callback, object State)
 		{
-			return this.GetServerPublicKey(this.componentAddress, Callback, State);
+			return this.GetServerPublicKey(this.componentAddress, null, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets the server public key.
+		/// </summary>
+		/// <param name="Timestamp">Optional Timestamp for when the public key was used, in UTC.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public Task GetServerPublicKey(DateTime? Timestamp, 
+			EventHandlerAsync<KeyEventArgs> Callback, object State)
+		{
+			return this.GetServerPublicKey(this.componentAddress, Timestamp, Callback, State);
 		}
 
 		/// <summary>
@@ -1612,19 +1640,25 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of entity whose public key is requested.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public async Task GetServerPublicKey(string Address, EventHandlerAsync<KeyEventArgs> Callback, object State)
+		public Task GetServerPublicKey(string Address, EventHandlerAsync<KeyEventArgs> Callback, object State)
 		{
-			KeyEventArgs e0;
+			return this.GetServerPublicKey(Address, null, Callback, State);
+		}
 
-			lock (this.publicKeys)
+		/// <summary>
+		/// Gets the server public key.
+		/// </summary>
+		/// <param name="Address">Address of entity whose public key is requested.</param>
+		/// <param name="Timestamp">Optional Timestamp for when the public key was used, in UTC.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		public async Task GetServerPublicKey(string Address, DateTime? Timestamp,
+			EventHandlerAsync<KeyEventArgs> Callback, object State)
+		{
+			if (this.publicKeys.TryGetRecord(Address, Timestamp ?? DateTime.UtcNow,
+				out KeyEventArgs e0))
 			{
-				if (!this.publicKeys.TryGetValue(Address, out e0))
-					e0 = null;
-			}
-
-			if (!(e0 is null))
-			{
-				e0 = new KeyEventArgs(e0, e0.Key)
+				e0 = new KeyEventArgs(e0)
 				{
 					State = State
 				};
@@ -1636,10 +1670,10 @@ namespace Waher.Networking.XMPP.Contracts
 				EventHandlerAsync<PublicKeyEventArgs> h = GetLocalPublicKey;
 				if (!(h is null))
 				{
-					PublicKeyEventArgs e = new PublicKeyEventArgs(Address);
+					PublicKeyEventArgs e = new PublicKeyEventArgs(Address, Timestamp);
 					await h.Raise(this, e, false);
 
-					if (!(e.Key is null))
+					if (!(e.Key is null) && e.ValidFrom.HasValue)
 					{
 						if (!(Callback is null))
 						{
@@ -1647,7 +1681,7 @@ namespace Waher.Networking.XMPP.Contracts
 							XmlElement Empty = Doc.CreateElement("Local");
 
 							IqResultEventArgs e1 = new IqResultEventArgs(Empty, string.Empty, string.Empty, string.Empty, true, State);
-							KeyEventArgs e2 = new KeyEventArgs(e1, e.Key);
+							KeyEventArgs e2 = new KeyEventArgs(e1, e.Key, e.ValidFrom.Value, e.ValidTo);
 							await Callback.Raise(this, e2);
 						}
 
@@ -1655,13 +1689,34 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 				}
 
-				await this.client.SendIqGet(Address, "<getPublicKey xmlns=\"" + NamespaceLegalIdentitiesCurrent + "\"/>", async (Sender, e) =>
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("<getPublicKey xmlns=\"");
+				sb.Append(NamespaceLegalIdentitiesCurrent);
+
+				if (Timestamp.HasValue)
+				{
+					sb.Append("\" ts=\"");
+					sb.Append(XML.Encode(Timestamp.Value.ToUniversalTime()));
+				}
+
+				sb.Append("\"/>");
+
+				await this.client.SendIqGet(Address, sb.ToString(), async (Sender, e) =>
 				{
 					IE2eEndpoint ServerKey = null;
 					XmlElement E;
+					DateTime? From = null;
+					DateTime? To = null;
 
-					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "publicKey")
+					if (e.Ok && 
+						!((E = e.FirstElement) is null) && 
+						E.LocalName == "publicKey")
 					{
+						From = XML.Attribute(E, "from", DateTime.MinValue);
+						To = E.HasAttribute("to") ? 
+							XML.Attribute(E, "to", DateTime.MaxValue) : (DateTime?)null;
+
 						foreach (XmlNode N in E.ChildNodes)
 						{
 							if (N is XmlElement E2)
@@ -1677,14 +1732,12 @@ namespace Waher.Networking.XMPP.Contracts
 					else
 						e.Ok = false;
 
-					e0 = new KeyEventArgs(e, ServerKey);
+					e0 = new KeyEventArgs(e, ServerKey, From ?? DateTime.MinValue, To);
 
 					if (e0.Ok)
 					{
-						lock (this.publicKeys)
-						{
-							this.publicKeys[Address] = e0;
-						}
+						this.publicKeys.Add(Address, From ?? DateTime.MinValue,
+							To ?? DateTime.UtcNow, e0);
 					}
 
 					await Callback.Raise(this, e0);
@@ -1776,7 +1829,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (!(e0 is null))
 			{
-				e0 = new KeyEventArgs(e0, e0.Key)
+				e0 = new KeyEventArgs(e0)
 				{
 					State = State
 				};
@@ -1796,7 +1849,7 @@ namespace Waher.Networking.XMPP.Contracts
 							e.Ok = false;
 					}
 
-					e0 = new KeyEventArgs(e, LocalKey);
+					e0 = new KeyEventArgs(e, LocalKey, e.ValidFrom, e.ValidTo);
 
 					if (e0.Ok)
 					{
@@ -2510,14 +2563,10 @@ namespace Waher.Networking.XMPP.Contracts
 			Identity.Serialize(Xml, false, true, true, true, true, false, false);
 			Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
-			bool HasOldPublicKey;
+			bool HasOldPublicKey = this.publicKeys.TryGetRecord(Identity.Provider, 
+				Identity.Updated, out _);
 
-			lock (this.publicKeys)
-			{
-				HasOldPublicKey = this.publicKeys.ContainsKey(Identity.Provider);
-			}
-
-			await this.GetServerPublicKey(Identity.Provider, async (Sender, e) =>
+			await this.GetServerPublicKey(Identity.Provider, Identity.Updated, async (Sender, e) =>
 			{
 				if (e.Ok && !(e.Key is null))
 				{
@@ -2541,48 +2590,46 @@ namespace Waher.Networking.XMPP.Contracts
 						return;
 					}
 
-					lock (this.publicKeys)
-					{
-						this.publicKeys.Remove(Identity.Provider);
-					}
+					this.publicKeys.Remove(Identity.Provider);
 
-					await this.GetServerPublicKey(Identity.Provider, (sender2, e2) =>
-					{
-						if (e2.Ok && !(e2.Key is null))
+					await this.GetServerPublicKey(Identity.Provider, Identity.Updated,
+						(sender2, e2) =>
 						{
-							if (e.Key.Equals(e2.Key))
+							if (e2.Ok && !(e2.Key is null))
 							{
-								return this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State,
-									new KeyValuePair<string, object>("Provider", Identity.Provider),
-									new KeyValuePair<string, object>("LocalName", e.Key.LocalName),
-									new KeyValuePair<string, object>("Namespace", e.Key.Namespace),
-									new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
-									new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
-									new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Identity.ServerSignature)));
+								if (e.Key.Equals(e2.Key))
+								{
+									return this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State,
+										new KeyValuePair<string, object>("Provider", Identity.Provider),
+										new KeyValuePair<string, object>("LocalName", e.Key.LocalName),
+										new KeyValuePair<string, object>("Namespace", e.Key.Namespace),
+										new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
+										new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
+										new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Identity.ServerSignature)));
+								}
+
+								Valid = e2.Key.Verify(Data, Identity.ServerSignature);
+
+								if (Valid)
+									return this.ReturnStatus(IdentityStatus.Valid, Callback, State);
+								else
+								{
+									return this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State,
+										new KeyValuePair<string, object>("Provider", Identity.Provider),
+										new KeyValuePair<string, object>("LocalName", e2.Key.LocalName),
+										new KeyValuePair<string, object>("Namespace", e2.Key.Namespace),
+										new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
+										new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
+										new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Identity.ServerSignature)));
+								}
 							}
-
-							Valid = e2.Key.Verify(Data, Identity.ServerSignature);
-
-							if (Valid)
-								return this.ReturnStatus(IdentityStatus.Valid, Callback, State);
 							else
 							{
-								return this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State,
-									new KeyValuePair<string, object>("Provider", Identity.Provider),
-									new KeyValuePair<string, object>("LocalName", e2.Key.LocalName),
-									new KeyValuePair<string, object>("Namespace", e2.Key.Namespace),
-									new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
-									new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
-									new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Identity.ServerSignature)));
+								return this.ReturnStatus(IdentityStatus.NoProviderPublicKey, Callback, State,
+									new KeyValuePair<string, object>("Provider", Identity.Provider));
 							}
-						}
-						else
-						{
-							return this.ReturnStatus(IdentityStatus.NoProviderPublicKey, Callback, State,
-								new KeyValuePair<string, object>("Provider", Identity.Provider));
-						}
 
-					}, State);
+						}, State);
 				}
 				else if (e.StanzaError is RecipientUnavailableException)
 				{
@@ -2855,7 +2902,7 @@ namespace Waher.Networking.XMPP.Contracts
 					throw new Exception("No approved legal identity available on this device (" + this.client.BareJID + ").");
 			}
 
-			return new LoadedKey(null, false);
+			return new LoadedKey(null, false, DateTime.MinValue);
 		}
 
 		private async Task<LegalIdentityState> FindPreviewStateAsync(byte[] PublicKey, string LegalId)
@@ -3331,7 +3378,7 @@ namespace Waher.Networking.XMPP.Contracts
 			byte[] Signature = null;
 			LoadedKey KeyInfo = SignWith switch
 			{
-				SignWith.CurrentKeys => new LoadedKey(null, false),
+				SignWith.CurrentKeys => new LoadedKey(null, false, DateTime.MinValue),
 				SignWith.LatestApprovedId => await this.GetLatestApprovedKey(true),
 				_ => await this.GetLatestApprovedKey(false),
 			};
@@ -3356,7 +3403,8 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					Signature = Key.Sign(Data);
 
-					await Callback.Raise(this, new SignatureEventArgs(Key, Signature, State));
+					await Callback.Raise(this, new SignatureEventArgs(Key, Signature, 
+						State, KeyInfo.Timestamp));
 				}
 			}
 		}
@@ -3422,7 +3470,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.AssertAllowed();
 
 			LoadedKey KeyInfo = SignWith == SignWith.CurrentKeys ?
-				new LoadedKey(null, false)
+				new LoadedKey(null, false, DateTime.MinValue)
 				: await this.GetLatestApprovedKey(true);
 			IE2eEndpoint Key = KeyInfo.Endpoint;
 			byte[] Signature = null;
@@ -3446,7 +3494,8 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					Signature = Key.Sign(Data);
 
-					await Callback.Raise(this, new SignatureEventArgs(Key, Signature, State));
+					await Callback.Raise(this, new SignatureEventArgs(Key, Signature, 
+						State, KeyInfo.Timestamp));
 				}
 			}
 		}
@@ -5970,14 +6019,10 @@ namespace Waher.Networking.XMPP.Contracts
 			Contract.Serialize(Xml, false, true, true, true, true, false, false);
 			Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
-			bool HasOldPublicKey;
+			bool HasOldPublicKey = this.publicKeys.TryGetRecord(Contract.Provider,
+				Contract.Updated, out _);
 
-			lock (this.publicKeys)
-			{
-				HasOldPublicKey = this.publicKeys.ContainsKey(Contract.Provider);
-			}
-
-			await this.GetServerPublicKey(Contract.Provider, async (Sender, e) =>
+			await this.GetServerPublicKey(Contract.Provider, Contract.Updated, async (Sender, e) =>
 			{
 				if (e.Ok && !(e.Key is null))
 				{
@@ -6001,41 +6046,39 @@ namespace Waher.Networking.XMPP.Contracts
 						return;
 					}
 
-					lock (this.publicKeys)
-					{
-						this.publicKeys.Remove(Contract.Provider);
-					}
+					this.publicKeys.Remove(Contract.Provider);
 
-					await this.GetServerPublicKey(Contract.Provider, (sender2, e2) =>
-					{
-						if (e2.Ok && !(e2.Key is null))
+					await this.GetServerPublicKey(Contract.Provider, Contract.Updated,
+						(sender2, e2) =>
 						{
-							if (e.Key.Equals(e2.Key))
+							if (e2.Ok && !(e2.Key is null))
 							{
-								return this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State,
+								if (e.Key.Equals(e2.Key))
+								{
+									return this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State,
+										new KeyValuePair<string, object>("Provider", Contract.Provider),
+										new KeyValuePair<string, object>("LocalName", e.Key.LocalName),
+										new KeyValuePair<string, object>("Namespace", e.Key.Namespace),
+										new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
+										new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
+										new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Contract.ServerSignature.DigitalSignature)));
+								}
+
+								Valid = e2.Key.Verify(Data, Contract.ServerSignature.DigitalSignature);
+
+								if (Valid)
+									return this.ReturnStatus(ContractStatus.Valid, Callback, State);
+								else
+									return this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State);
+							}
+							else
+							{
+								return this.ReturnStatus(ContractStatus.NoProviderPublicKey, Callback, State,
 									new KeyValuePair<string, object>("Provider", Contract.Provider),
-									new KeyValuePair<string, object>("LocalName", e.Key.LocalName),
-									new KeyValuePair<string, object>("Namespace", e.Key.Namespace),
-									new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
-									new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
-									new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Contract.ServerSignature.DigitalSignature)));
+									new KeyValuePair<string, object>("ErrorText", e2.ErrorText));
 							}
 
-							Valid = e2.Key.Verify(Data, Contract.ServerSignature.DigitalSignature);
-
-							if (Valid)
-								return this.ReturnStatus(ContractStatus.Valid, Callback, State);
-							else
-								return this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State);
-						}
-						else
-						{
-							return this.ReturnStatus(ContractStatus.NoProviderPublicKey, Callback, State,
-								new KeyValuePair<string, object>("Provider", Contract.Provider),
-								new KeyValuePair<string, object>("ErrorText", e2.ErrorText));
-						}
-
-					}, State);
+						}, State);
 				}
 				else
 				{

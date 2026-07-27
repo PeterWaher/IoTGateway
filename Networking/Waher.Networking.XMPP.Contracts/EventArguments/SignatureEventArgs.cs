@@ -1,4 +1,6 @@
-﻿namespace Waher.Networking.XMPP.Contracts.EventArguments
+﻿using System;
+
+namespace Waher.Networking.XMPP.Contracts.EventArguments
 {
 	/// <summary>
 	/// Event arguments for signature responses
@@ -13,8 +15,10 @@
 		/// <param name="Key">Key algorithm used.</param>
 		/// <param name="Signature">Digital signature</param>
 		/// <param name="State">State object.</param>
-		public SignatureEventArgs(IE2eEndpoint Key, byte[] Signature, object State)
-			: base(new KeyEventArgs(Key, State))
+		/// <param name="KeyValidFrom">From when key was valid.</param>
+		public SignatureEventArgs(IE2eEndpoint Key, byte[] Signature, object State,
+			DateTime KeyValidFrom)
+			: base(new KeyEventArgs(Key, State, KeyValidFrom, null))
 		{
 			this.signature = Signature;
 		}

@@ -96,6 +96,13 @@ namespace Waher.Networking.HTTP.OAuth
 				return;
 			}
 
+			if (!(Request.Header.Authorization is null) &&
+				Form.ContainsKey("client_secret") || Form.ContainsKey("password"))
+			{
+				await BadRequest(Response, "invalid_request", "Multiple client credentials provided.");
+				return;
+			}
+
 			if (!Form.TryGetValue("token", out string Token) || string.IsNullOrEmpty(Token))
 			{
 				await BadRequest(Response, "invalid_request", "Missing token.");

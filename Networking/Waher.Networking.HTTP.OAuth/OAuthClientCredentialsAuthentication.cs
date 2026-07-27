@@ -75,6 +75,9 @@ namespace Waher.Networking.HTTP.OAuth
 		/// <returns>User object, if authenticated, or null otherwise.</returns>
 		public override async Task<IUser?> IsAuthenticated(HttpRequest Request)
 		{
+			if (!(Request.Header.Authorization is null))
+				return null;
+
 			IUser? User;
 
 			if (Request.Header.TryGetQueryParameter("client_id", out string ClientId) &&

@@ -780,63 +780,38 @@ namespace Waher.Networking.HTTP.OAuth
 		/// Tries to get the type of a token.
 		/// </summary>
 		/// <param name="Token">Token</param>
-		/// <param name="TokenType">Type of token, if found.</param>
-		/// <returns>If the type of token could be found.</returns>
-		public bool TryGetTokenType(string Token, [NotNullWhen(true)] out OAuthTokenType? TokenType)
+		/// <returns>The type of token, if it could be found, and the parsed JWT Token,
+		/// if applicable.</returns>
+		public async Task<KeyValuePair<OAuthTokenType?, JwtToken?>> TryGetTokenType(string Token)
 		{
-			return this.TryGetTokenType(Token, out _, out TokenType);
-		}
-
-		/// <summary>
-		/// Tries to get the type of a token.
-		/// </summary>
-		/// <param name="Token">Token</param>
-		/// <param name="ParsedToken">Parsed JWT Token, if available.</param>
-		/// <param name="TokenType">Type of token, if found.</param>
-		/// <returns>If the type of token could be found.</returns>
-		public bool TryGetTokenType(string Token, out JwtToken? ParsedToken,
-			[NotNullWhen(true)] out OAuthTokenType? TokenType)
-		{
-			ParsedToken = null;
-
 			if (refreshTokens.ContainsKey(Token))
-			{
-				TokenType = OAuthTokenType.RefreshToken;
-				return true;
-			}
+				return new KeyValuePair<OAuthTokenType?, JwtToken?>(OAuthTokenType.RefreshToken, null);
 			else if (usedRefreshTokens.ContainsKey(Token))
-			{
-				TokenType = OAuthTokenType.ExpiredRefreshToken;
-				return true;
-			}
+				return new KeyValuePair<OAuthTokenType?, JwtToken?>(OAuthTokenType.ExpiredRefreshToken, null);
 			else if (codes.ContainsKey(Token))
-			{
-				TokenType = OAuthTokenType.AccessCode;
-				return true;
-			}
-			else if (JwtToken.TryParse(Token, out ParsedToken))
+				return new KeyValuePair<OAuthTokenType?, JwtToken?>(OAuthTokenType.AccessCode, null);
+			else if (JwtToken.TryParse(Token, out JwtToken ParsedToken))
 			{
 				if (this.Environment.JwtFactory.IsValid(ParsedToken, out Reason Reason))
 				{
-					TokenType = OAuthTokenType.AccessToken;
-					return true;
+					if (!string.IsNullOrEmpty(ParsedToken.Subject) &&
+						!(this.Users is null) &&
+						await this.Users.TryGetUser(ParsedToken.Subject) is null)
+					{
+						return new KeyValuePair<OAuthTokenType?, JwtToken?>(OAuthTokenType.ExpiredAccessToken, null);
+					}
+					else
+						return new KeyValuePair<OAuthTokenType?, JwtToken?>(OAuthTokenType.AccessToken, ParsedToken);
 				}
 				else if (Reason == Reason.Expired || Reason == Reason.Deprecated)
 				{
-					TokenType = OAuthTokenType.ExpiredAccessToken;
-					return true;
+					return new KeyValuePair<OAuthTokenType?, JwtToken?>(OAuthTokenType.ExpiredAccessToken, null);
 				}
 				else
-				{
-					TokenType = null;
-					return false;
-				}
+					return new KeyValuePair<OAuthTokenType?, JwtToken?>(null, null);
 			}
 			else
-			{
-				TokenType = null;
-				return false;
-			}
+				return new KeyValuePair<OAuthTokenType?, JwtToken?>(null, null);
 		}
 	}
 }

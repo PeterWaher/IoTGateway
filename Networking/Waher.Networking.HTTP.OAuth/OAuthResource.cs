@@ -164,6 +164,9 @@ namespace Waher.Networking.HTTP.OAuth
 			if (!(Server is null))
 				Schemes.Add(new SessionAuthentication(Server));
 
+			Schemes.Add(new OAuthClientCredentialsAuthentication(this.Encrypted, 
+				this.MinStrength, Users));
+
 			return Schemes.ToArray();
 		}
 

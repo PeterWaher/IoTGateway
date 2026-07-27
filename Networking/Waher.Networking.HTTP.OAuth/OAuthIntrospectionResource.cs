@@ -96,51 +96,69 @@ namespace Waher.Networking.HTTP.OAuth
 				return;
 			}
 
-			if (!Form.TryGetValue("token", out string Token))
+			if (!Form.TryGetValue("token", out string Token) || string.IsNullOrEmpty(Token))
 			{
 				await BadRequest(Response, "invalid_request", "Missing token.");
 				return;
 			}
 
-			if (!this.Environment.HasTokenResource ||
-				!this.Environment.TokenResource.TryGetTokenType(Token, out JwtToken? ParsedToken,
-				out OAuthTokenType? TokenType))
+			OAuthTokenType? TokenType;
+			JwtToken? ParsedToken;
+			bool Active;
+
+			if (!this.Environment.HasTokenResource)
 			{
+				Active = false;
 				ParsedToken = null;
 				TokenType = null;
 			}
-
-			Dictionary<string, object> Result = new Dictionary<string, object>();
-
-			if (!(ParsedToken is null))
+			else
 			{
-				foreach (KeyValuePair<string, object> P in ParsedToken.Claims)
-				{
-					Result[P.Key] = P.Value;
+				KeyValuePair<OAuthTokenType?, JwtToken?> P = await this.Environment.
+					TokenResource.TryGetTokenType(Token);
 
-					if (P.Key == JwtClaims.Subject)
+				TokenType = P.Key;
+				ParsedToken = P.Value;
+
+				Active = TokenType.HasValue && (
+					TokenType == OAuthTokenType.AccessToken ||
+					TokenType == OAuthTokenType.RefreshToken);
+			}
+
+			Dictionary<string, object> Result = new Dictionary<string, object>()
+			{
+				{ "active", Active }
+			};
+
+			if (Active)
+			{
+				if (!(ParsedToken is null))
+				{
+					foreach (KeyValuePair<string, object> P in ParsedToken.Claims)
 					{
-						if (P.Value is string UserName &&
-							!(await this.Environment.UserSource.TryGetUser(UserName) is null))
+						Result[P.Key] = P.Value;
+
+						if (P.Key == JwtClaims.Subject)
 						{
-							Result["username"] = UserName;
+							if (P.Value is string UserName &&
+								!(await this.Environment.UserSource.TryGetUser(UserName) is null))
+							{
+								Result["username"] = UserName;
+							}
 						}
 					}
 				}
+
+				if (TokenType == OAuthTokenType.AccessToken ||
+					TokenType == OAuthTokenType.ExpiredAccessToken)
+				{
+					Result["token_type"] = "Bearer";
+				}
+				else
+					Result["token_type"] = "N_A";
 			}
 
-			if (TokenType == OAuthTokenType.AccessToken ||
-				TokenType == OAuthTokenType.ExpiredAccessToken)
-			{
-				Result["token_type"] = "Bearer";
-			}
-			else
-				Result["token_type"] = "N_A";
-
-			Result["active"] = TokenType.HasValue && (
-				TokenType == OAuthTokenType.AccessToken ||
-				TokenType == OAuthTokenType.RefreshToken);
-
+			await Response.Return(Result);
 		}
 	}
 }

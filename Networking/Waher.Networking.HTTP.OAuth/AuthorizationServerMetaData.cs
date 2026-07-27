@@ -86,7 +86,14 @@ namespace Waher.Networking.HTTP.OAuth
 				MetaData["device_authorization_endpoint"] = ServerUrl + this.Environment.DeviceAuthorizationResource.ResourceName;
 
 			if (this.Environment.HasIntrospectionResource)
+			{
 				MetaData["introspection_endpoint"] = ServerUrl + this.Environment.IntrospectionResource.ResourceName;
+				MetaData["introspection_endpoint_auth_methods_supported"] = new string[]
+				{
+					"client_secret_basic",
+					"client_secret_post"
+				};
+			}
 
 			await Response.Return(MetaData);
 		}

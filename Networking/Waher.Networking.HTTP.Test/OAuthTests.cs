@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,7 +25,6 @@ using Waher.Persistence;
 using Waher.Runtime.Collections;
 using Waher.Security;
 using Waher.Security.JWT;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Waher.Networking.HTTP.Test
 {
@@ -102,6 +100,7 @@ namespace Waher.Networking.HTTP.Test
 
 			this.server.Register(new ProtectedResourceMetaData(Environment));
 			this.server.Register(new OAuthTokenResource(Environment));
+			this.server.Register(new OAuthIntrospectionResource(Environment));
 			this.server.Register(new OAuthRegistrationResource(Environment));
 			this.server.Register(new OAuthManagementResource(Environment));
 			this.server.Register(new OAuthDeviceAuthorizationResource(Environment));
@@ -115,10 +114,12 @@ namespace Waher.Networking.HTTP.Test
 			{
 				{ TestUserName, new User(TestUserName, TestPassword,
 					[OAuthResource.OAuthScopePrivilegePrefix + TestScopeRead,
-					OAuthResource.OAuthScopePrivilegePrefix + TestScopeWrite]) },
+					OAuthResource.OAuthScopePrivilegePrefix + TestScopeWrite,
+					OAuthIntrospectionResource.OAuthIntrospectionPrivilege]) },
 				{ DeviceUserName, new User(DeviceUserName, DevicePassword, TestUserName,
 					[OAuthResource.OAuthScopePrivilegePrefix + TestScopeRead,
-					OAuthResource.OAuthScopePrivilegePrefix + TestScopeWrite]) }
+					OAuthResource.OAuthScopePrivilegePrefix + TestScopeWrite,
+					OAuthIntrospectionResource.OAuthIntrospectionPrivilege]) }
 			};
 
 			Environment.AuthorizeResource.ImplicitAuthenticationRequest += async (_, e) =>
@@ -342,7 +343,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_01_Metadata_Discovery()
+		public async Task Test_001_Metadata_Discovery()
 		{
 			ContentResponse MetaDataResponse = await InternetContent.GetAsync(
 				new Uri(BaseUrl + ProtectedResourceMetaData.WellKnowResourcePath + ProtectedResource));
@@ -361,6 +362,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(BaseUrl, Required<string>(ServerMetaData, "issuer"));
 			Assert.AreEqual(BaseUrl + OAuthAuthorizeResource.DefaultResourcePath, Required<string>(ServerMetaData, "authorization_endpoint"));
 			Assert.AreEqual(BaseUrl + OAuthTokenResource.DefaultResourcePath, Required<string>(ServerMetaData, "token_endpoint"));
+			Assert.AreEqual(BaseUrl + OAuthIntrospectionResource.DefaultResourcePath, Required<string>(ServerMetaData, "introspection_endpoint"));
 			Assert.AreEqual(BaseUrl + OAuthRegistrationResource.DefaultResourcePath, Required<string>(ServerMetaData, "registration_endpoint"));
 			Assert.AreEqual(BaseUrl + OAuthDeviceAuthorizationResource.DefaultResourcePath, Required<string>(ServerMetaData, "device_authorization_endpoint"));
 			Assert.Contains("code", Required<string[]>(ServerMetaData, "response_types_supported"));
@@ -377,6 +379,13 @@ namespace Waher.Networking.HTTP.Test
 			Assert.Contains("client_secret_post",
 				Required<string[]>(ServerMetaData, "token_endpoint_auth_methods_supported"));
 			Assert.IsTrue(Required<bool>(ServerMetaData, "authorization_response_iss_parameter_supported"));
+
+			string[] IntrospectionAuthenticationMethods = Required<string[]>(ServerMetaData,
+				"introspection_endpoint_auth_methods_supported");
+			Assert.Contains("client_secret_basic", IntrospectionAuthenticationMethods);
+			Assert.Contains("client_secret_post", IntrospectionAuthenticationMethods);
+			Assert.IsTrue(Array.IndexOf(IntrospectionAuthenticationMethods, "none") < 0,
+				"The introspection endpoint must require authentication.");
 		}
 
 		[TestMethod]
@@ -392,7 +401,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.Password)]
 		[DataRow(LoginMethod.ClientCredentials)]
 		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
-		public async Task Test_02_Login(LoginMethod Method)
+		public async Task Test_002_Login(LoginMethod Method)
 		{
 			TokenResult Token = await Login(Method);
 			await AssertHello(Token.AccessToken, TestUserName);
@@ -409,7 +418,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_03_NoBearerToken()
+		public async Task Test_003_NoBearerToken()
 		{
 			ContentResponse Response = await InternetContent.GetAsync(new Uri(BaseUrl + ProtectedResource));
 			OAuthError Error = AssertOAuthError(Response, null, UnauthorizedException.Code);
@@ -463,7 +472,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_04_InvalidBearerToken()
+		public async Task Test_004_InvalidBearerToken()
 		{
 			ContentResponse Response = await InternetContent.GetAsync(
 				new Uri(BaseUrl + ProtectedResource),
@@ -475,7 +484,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_05_InvalidAuthorizationCode()
+		public async Task Test_005_InvalidAuthorizationCode()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -498,7 +507,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
-		public async Task Test_06_MissingPkceVerifier(LoginMethod Method)
+		public async Task Test_006_MissingPkceVerifier(LoginMethod Method)
 		{
 			AuthorizationResult AuthorizationCode = await Authorize(Method);
 
@@ -522,7 +531,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
-		public async Task Test_07_InvalidPkceVerifier(LoginMethod Method)
+		public async Task Test_007_InvalidPkceVerifier(LoginMethod Method)
 		{
 			AuthorizationResult AuthorizationCode = await Authorize(Method);
 
@@ -549,7 +558,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
-		public async Task Test_08_ReusedAuthorizationCode(LoginMethod Method)
+		public async Task Test_008_ReusedAuthorizationCode(LoginMethod Method)
 		{
 			AuthorizationResult AuthorizationCode = await Authorize(Method);
 
@@ -597,7 +606,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.Password)]
 		[DataRow(LoginMethod.ClientCredentials)]
 		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
-		public async Task Test_09_InvalidUserName(LoginMethod Method)
+		public async Task Test_009_InvalidUserName(LoginMethod Method)
 		{
 			await Assert.ThrowsAsync<LoginError>(async () => await Login(
 				Method, "Invalid User", TestPassword));
@@ -614,7 +623,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.Password)]
 		[DataRow(LoginMethod.ClientCredentials)]
 		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
-		public async Task Test_10_InvalidPassword(LoginMethod Method)
+		public async Task Test_010_InvalidPassword(LoginMethod Method)
 		{
 			await Assert.ThrowsAsync<LoginError>(async () => await Login(
 				Method, TestUserName, "Invalid Password"));
@@ -633,7 +642,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.Password)]
 		[DataRow(LoginMethod.ClientCredentials)]
 		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
-		public async Task Test_11_MissingUserName(LoginMethod Method)
+		public async Task Test_011_MissingUserName(LoginMethod Method)
 		{
 			await Assert.ThrowsAsync<LoginError>(async () => await Login(
 				Method, null, TestPassword));
@@ -650,14 +659,14 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.Password)]
 		[DataRow(LoginMethod.ClientCredentials)]
 		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
-		public async Task Test_12_MissingPassword(LoginMethod Method)
+		public async Task Test_012_MissingPassword(LoginMethod Method)
 		{
 			await Assert.ThrowsAsync<LoginError>(async () => await Login(
 				Method, TestUserName, null));
 		}
 
 		[TestMethod]
-		public async Task Test_13_MissingResponseType()
+		public async Task Test_013_MissingResponseType()
 		{
 			string State = Guid.NewGuid().ToString();
 			string RedirectUri = BaseUrl + CallbackResource;
@@ -678,7 +687,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_14_UnsupportedResponseType()
+		public async Task Test_014_UnsupportedResponseType()
 		{
 			string State = Guid.NewGuid().ToString();
 			string RedirectUri = BaseUrl + CallbackResource;
@@ -701,7 +710,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_15_AuthorizationEndpointIgnoresUnknownParameter()
+		public async Task Test_015_AuthorizationEndpointIgnoresUnknownParameter()
 		{
 			string State = Guid.NewGuid().ToString();
 			string RedirectUri = BaseUrl + CallbackResource;
@@ -734,7 +743,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_16_MissingGrantType()
+		public async Task Test_016_MissingGrantType()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -747,7 +756,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_17_UnsupportedGrantType()
+		public async Task Test_017_UnsupportedGrantType()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -760,7 +769,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_18_MissingAuthorizationCode()
+		public async Task Test_018_MissingAuthorizationCode()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -781,7 +790,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
-		public async Task Test_19_TokenEndpointIgnoresUnknownParameter(LoginMethod Method)
+		public async Task Test_019_TokenEndpointIgnoresUnknownParameter(LoginMethod Method)
 		{
 			AuthorizationResult AuthorizationCode = await Authorize(Method);
 
@@ -808,7 +817,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
-		public async Task Test_20_AuthorizationCodeBoundToClientId(LoginMethod Method)
+		public async Task Test_020_AuthorizationCodeBoundToClientId(LoginMethod Method)
 		{
 			AuthorizationResult AuthorizationCode = await Authorize(Method);
 
@@ -827,7 +836,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_21_UnsupportedPkceCodeChallengeMethod()
+		public async Task Test_021_UnsupportedPkceCodeChallengeMethod()
 		{
 			string State = Guid.NewGuid().ToString();
 			string RedirectUri = BaseUrl + CallbackResource;
@@ -855,7 +864,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_22_PasswordGrantRejectsClientCredentialParameters()
+		public async Task Test_022_PasswordGrantRejectsClientCredentialParameters()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -870,7 +879,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_23_ClientCredentialsGrantRejectsPasswordParameters()
+		public async Task Test_023_ClientCredentialsGrantRejectsPasswordParameters()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -885,7 +894,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_24_TokenEndpointGetIsRejected()
+		public async Task Test_024_TokenEndpointGetIsRejected()
 		{
 			ContentResponse Response = await InternetContent.GetAsync(new Uri(
 				BaseUrl + OAuthTokenResource.DefaultResourcePath +
@@ -903,7 +912,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
-		public async Task Test_25_AuthorizationCodeRequiresRedirectUri(LoginMethod Method)
+		public async Task Test_025_AuthorizationCodeRequiresRedirectUri(LoginMethod Method)
 		{
 			AuthorizationResult AuthorizationCode = await Authorize(Method);
 
@@ -927,7 +936,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
-		public async Task Test_26_AuthorizationCodeBoundToRedirectUri(LoginMethod Method)
+		public async Task Test_026_AuthorizationCodeBoundToRedirectUri(LoginMethod Method)
 		{
 			AuthorizationResult AuthorizationCode = await Authorize(Method);
 
@@ -946,7 +955,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_27_EmptyResponseTypeIsTreatedAsMissing()
+		public async Task Test_027_EmptyResponseTypeIsTreatedAsMissing()
 		{
 			string State = Guid.NewGuid().ToString();
 			string RedirectUri = BaseUrl + CallbackResource;
@@ -968,7 +977,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_28_EmptyGrantTypeIsTreatedAsMissing()
+		public async Task Test_028_EmptyGrantTypeIsTreatedAsMissing()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -988,7 +997,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
-		public async Task Test_29_AuthorizationCodeRequiresClientId(LoginMethod Method)
+		public async Task Test_029_AuthorizationCodeRequiresClientId(LoginMethod Method)
 		{
 			AuthorizationResult AuthorizationCode = await Authorize(Method);
 
@@ -1010,7 +1019,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.ImplicitPost)]
 		[DataRow(LoginMethod.ClientCredentials)]
 		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
-		public async Task Test_30_ImplicitAndClientGrantsDoesNotIssueRefreshToken(LoginMethod Method)
+		public async Task Test_030_ImplicitAndClientGrantsDoesNotIssueRefreshToken(LoginMethod Method)
 		{
 			AuthorizationResult Result = await Authorize(Method);
 
@@ -1025,7 +1034,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
-		public async Task Test_31_TokenEndpointSuccessfulResponseIsNotCacheable(LoginMethod Method)
+		public async Task Test_031_TokenEndpointSuccessfulResponseIsNotCacheable(LoginMethod Method)
 		{
 			AuthorizationResult AuthorizationCode = await Authorize(Method);
 			Dictionary<string, string> Request = CreateAuthorizationCodeTokenRequest(
@@ -1067,7 +1076,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_32_DuplicateAuthorizationParameterIsRejected()
+		public async Task Test_032_DuplicateAuthorizationParameterIsRejected()
 		{
 			string State = Guid.NewGuid().ToString();
 			string RedirectUri = BaseUrl + CallbackResource;
@@ -1132,7 +1141,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_33_DuplicateTokenParameterIsRejected()
+		public async Task Test_033_DuplicateTokenParameterIsRejected()
 		{
 			byte[] Encoded = Encoding.UTF8.GetBytes(
 				"grant_type=password" +
@@ -1149,7 +1158,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_34_TokenEndpointRejectsMultipleClientAuthenticationMethods()
+		public async Task Test_034_TokenEndpointRejectsMultipleClientAuthenticationMethods()
 		{
 			using HttpClient Client = new();
 			Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
@@ -1172,7 +1181,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		[DataRow(LoginMethod.CodeFormWithPkceS256, "S256")]
 		[DataRow(LoginMethod.CodePostWithPkceS256, "S256")]
-		public async Task Test_35_S256PkceDowngradeProtection(LoginMethod Method, string MethodName)
+		public async Task Test_035_S256PkceDowngradeProtection(LoginMethod Method, string MethodName)
 		{
 			AuthorizationResult AuthorizationCode = await Authorize(Method);
 			string CodeChallenge = CreateCodeChallenge(AuthorizationCode.CodeVerifier, MethodName);
@@ -1198,7 +1207,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodeFormWithPkceS256)]
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
-		public async Task Test_36_CodeVerifierWithoutChallengeIsRejected(LoginMethod Method)
+		public async Task Test_036_CodeVerifierWithoutChallengeIsRejected(LoginMethod Method)
 		{
 			AuthorizationResult AuthorizationCode = await Authorize(Method);
 
@@ -1229,7 +1238,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.Password)]
 		[DataRow(LoginMethod.ClientCredentials)]
 		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
-		public async Task Test_37_BearerTokenInQueryStringIsRejected(LoginMethod Method)
+		public async Task Test_037_BearerTokenInQueryStringIsRejected(LoginMethod Method)
 		{
 			TokenResult Token = await Login(Method);
 
@@ -1241,7 +1250,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_38_AuthorizationEndpointHasClickjackingProtection()
+		public async Task Test_038_AuthorizationEndpointHasClickjackingProtection()
 		{
 			string State = Guid.NewGuid().ToString();
 			string RedirectUri = BaseUrl + CallbackResource;
@@ -1294,7 +1303,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.Password)]
 		[DataRow(LoginMethod.ClientCredentials)]
 		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
-		public async Task Test_39_AccessTokenIsSignedJwtWithExpiration(LoginMethod Method)
+		public async Task Test_039_AccessTokenIsSignedJwtWithExpiration(LoginMethod Method)
 		{
 			TokenResult Token = await Login(Method);
 
@@ -1318,7 +1327,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
 		[DataRow(LoginMethod.Password)]
-		public async Task Test_40_AuthorizationCodeIssuesRefreshToken(LoginMethod Method)
+		public async Task Test_040_AuthorizationCodeIssuesRefreshToken(LoginMethod Method)
 		{
 			TokenResult Token = await Login(Method);
 
@@ -1335,7 +1344,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
 		[DataRow(LoginMethod.Password)]
-		public async Task Test_41_RefreshTokenGrantReturnsAccessToken(LoginMethod Method)
+		public async Task Test_041_RefreshTokenGrantReturnsAccessToken(LoginMethod Method)
 		{
 			TokenResult InitialToken = await Login(Method);
 			Assert.IsFalse(string.IsNullOrEmpty(InitialToken.RefreshToken));
@@ -1388,7 +1397,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_42_RefreshTokenGrantRequiresRefreshToken()
+		public async Task Test_042_RefreshTokenGrantRequiresRefreshToken()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -1402,7 +1411,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_43_InvalidRefreshTokenIsRejected()
+		public async Task Test_043_InvalidRefreshTokenIsRejected()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -1420,7 +1429,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
 		[DataRow(LoginMethod.Password)]
-		public async Task Test_44_RefreshTokenIsBoundToClientId(LoginMethod Method)
+		public async Task Test_044_RefreshTokenIsBoundToClientId(LoginMethod Method)
 		{
 			TokenResult InitialToken = await Login(Method);
 			Assert.IsFalse(string.IsNullOrEmpty(InitialToken.RefreshToken));
@@ -1441,7 +1450,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
 		[DataRow(LoginMethod.Password)]
-		public async Task Test_45_RefreshTokenRotationInvalidatesPreviousToken(LoginMethod Method)
+		public async Task Test_045_RefreshTokenRotationInvalidatesPreviousToken(LoginMethod Method)
 		{
 			TokenResult InitialToken = await Login(Method);
 			Assert.IsFalse(string.IsNullOrEmpty(InitialToken.RefreshToken));
@@ -1464,7 +1473,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.ImplicitPost)]
 		[DataRow(LoginMethod.ClientCredentials)]
 		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
-		public async Task Test_46_GrantsThatShouldNotIssueRefreshTokens(LoginMethod Method)
+		public async Task Test_046_GrantsThatShouldNotIssueRefreshTokens(LoginMethod Method)
 		{
 			AuthorizationResult Result = await Authorize(Method);
 
@@ -1481,7 +1490,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
 		[DataRow(LoginMethod.Password)]
-		public async Task Test_47_RefreshTokenGrantSuccessfulResponseIsNotCacheable(LoginMethod Method)
+		public async Task Test_047_RefreshTokenGrantSuccessfulResponseIsNotCacheable(LoginMethod Method)
 		{
 			TokenResult InitialToken = await Login(Method);
 			Dictionary<string, string> Request = CreateRefreshTokenRequest(
@@ -1513,7 +1522,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
 		[DataRow(LoginMethod.Password)]
-		public async Task Test_48_RefreshTokenGrantRejectsScopeEscalation(LoginMethod Method)
+		public async Task Test_048_RefreshTokenGrantRejectsScopeEscalation(LoginMethod Method)
 		{
 			TokenResult InitialToken = await Login(Method);
 			Dictionary<string, string> Request = CreateRefreshTokenRequest(
@@ -1528,7 +1537,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_49_DynamicClientRegistration_PublicClient()
+		public async Task Test_049_DynamicClientRegistration_PublicClient()
 		{
 			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
 				"Unit Test Client", BaseUrl + CallbackResource);
@@ -1711,7 +1720,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_50_DynamicClientRegistrationCreatesConfidentialClient()
+		public async Task Test_050_DynamicClientRegistrationCreatesConfidentialClient()
 		{
 			IDictionary<string, object> Response = await DoPost(
 				BaseUrl + OAuthRegistrationResource.DefaultResourcePath, null,
@@ -1740,7 +1749,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_51_DynamicClientRegistrationRejectsInvalidRedirectUri()
+		public async Task Test_051_DynamicClientRegistrationRejectsInvalidRedirectUri()
 		{
 			Dictionary<string, object> Error = await DoPost(
 				BaseUrl + OAuthRegistrationResource.DefaultResourcePath, null,
@@ -1756,7 +1765,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_52_DynamicClientRegistrationRejectsInconsistentGrantAndResponseTypes()
+		public async Task Test_052_DynamicClientRegistrationRejectsInconsistentGrantAndResponseTypes()
 		{
 			IDictionary<string, object> Error = await DoPost(
 				BaseUrl + OAuthRegistrationResource.DefaultResourcePath, null,
@@ -1772,7 +1781,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_53_DynamicClientRegistrationRequiresJsonRequest()
+		public async Task Test_053_DynamicClientRegistrationRequiresJsonRequest()
 		{
 			await DoPost(
 				BaseUrl + OAuthRegistrationResource.DefaultResourcePath, null,
@@ -1784,7 +1793,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_54_DynamicClientRegistrationAcceptsUnknownMetadata()
+		public async Task Test_054_DynamicClientRegistrationAcceptsUnknownMetadata()
 		{
 			IDictionary<string, object> Response = await DoPost(
 				BaseUrl + OAuthRegistrationResource.DefaultResourcePath, null,
@@ -1803,7 +1812,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_55_DynamicClientRegistrationSuccessfulResponseIsNotCacheable()
+		public async Task Test_055_DynamicClientRegistrationSuccessfulResponseIsNotCacheable()
 		{
 			Dictionary<string, object> Response = await DoPost(
 				BaseUrl + OAuthRegistrationResource.DefaultResourcePath, null,
@@ -1820,7 +1829,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_56_DeviceAuthorizationResponseContainsRequiredValues()
+		public async Task Test_056_DeviceAuthorizationResponseContainsRequiredValues()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
@@ -1894,7 +1903,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_57_DeviceTokenPollingBeforeAuthorizationReturnsAuthorizationPending()
+		public async Task Test_057_DeviceTokenPollingBeforeAuthorizationReturnsAuthorizationPending()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
@@ -1924,7 +1933,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_58_DeviceTokenPollingRejectsInvalidClientId()
+		public async Task Test_058_DeviceTokenPollingRejectsInvalidClientId()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
@@ -1937,7 +1946,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_59_DeviceTokenGrantRequiresDeviceCode()
+		public async Task Test_059_DeviceTokenGrantRequiresDeviceCode()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -1951,7 +1960,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_60_DeviceTokenGrantRejectsInvalidDeviceCode()
+		public async Task Test_060_DeviceTokenGrantRejectsInvalidDeviceCode()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -1961,7 +1970,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_61_DeviceTokenGrantRequiresClientIdForPublicClient()
+		public async Task Test_061_DeviceTokenGrantRequiresClientIdForPublicClient()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
@@ -1977,7 +1986,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_62_DeviceAuthorizationRejectsMissingClientId()
+		public async Task Test_062_DeviceAuthorizationRejectsMissingClientId()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -1987,7 +1996,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_63_DeviceFlowCompletesAfterUserVerification()
+		public async Task Test_063_DeviceFlowCompletesAfterUserVerification()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 			await CompleteDeviceAuthorizationForm(Device, true, false, false, TestUserName, TestPassword);
@@ -2117,7 +2126,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_64_DeviceTokenPollingTooFastReturnsSlowDown()
+		public async Task Test_064_DeviceTokenPollingTooFastReturnsSlowDown()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
@@ -2135,7 +2144,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_65_DeviceUserCodeIsSingleUse()
+		public async Task Test_065_DeviceUserCodeIsSingleUse()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 			await CompleteDeviceAuthorizationForm(Device, true, false, false, TestUserName, TestPassword);
@@ -2157,7 +2166,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_66_DeviceVerificationRequiresUserCode()
+		public async Task Test_066_DeviceVerificationRequiresUserCode()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
@@ -2173,7 +2182,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_67_DeviceVerificationRejectsInvalidUserCode()
+		public async Task Test_067_DeviceVerificationRejectsInvalidUserCode()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
@@ -2190,7 +2199,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_68_DeviceVerificationRejectsInvalidLogin()
+		public async Task Test_068_DeviceVerificationRejectsInvalidLogin()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 
@@ -2199,7 +2208,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_69_DeviceAuthorizationIgnoresUnknownParameter()
+		public async Task Test_069_DeviceAuthorizationIgnoresUnknownParameter()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthDeviceAuthorizationResource.DefaultResourcePath),
@@ -2216,7 +2225,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_70_DeviceAuthorizationEmptyClientIdIsTreatedAsMissing()
+		public async Task Test_070_DeviceAuthorizationEmptyClientIdIsTreatedAsMissing()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthDeviceAuthorizationResource.DefaultResourcePath),
@@ -2229,7 +2238,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_71_DuplicateDeviceAuthorizationParameterIsRejected()
+		public async Task Test_071_DuplicateDeviceAuthorizationParameterIsRejected()
 		{
 			using HttpClient Client = new();
 			using StringContent Content = new(
@@ -2245,7 +2254,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_72_PasswordInvalidCredentials()
+		public async Task Test_072_PasswordInvalidCredentials()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -2260,7 +2269,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_73_BasicAuthenticationInvalidCredentials()
+		public async Task Test_073_BasicAuthenticationInvalidCredentials()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -2288,7 +2297,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.Password)]
 		[DataRow(LoginMethod.ClientCredentials)]
 		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
-		public async Task Test_75_TokenPreservesScope(LoginMethod Method)
+		public async Task Test_075_TokenPreservesScope(LoginMethod Method)
 		{
 			TokenResult Token = await Login(Method, TestScopeReadWrite);
 			AssertScope(TestScopeReadWrite, Token.Scope);
@@ -2333,7 +2342,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
 		[DataRow(LoginMethod.Password)]
-		public async Task Test_76_RefreshTokenPreserveScope(LoginMethod Method)
+		public async Task Test_076_RefreshTokenPreserveScope(LoginMethod Method)
 		{
 			TokenResult InitialToken = await Login(Method, TestScopeReadWrite);
 			TokenResult RefreshedToken = await RefreshAccessToken(
@@ -2352,7 +2361,7 @@ namespace Waher.Networking.HTTP.Test
 		[DataRow(LoginMethod.CodePostWithPkcePlain)]
 		[DataRow(LoginMethod.CodePostWithPkceS256)]
 		[DataRow(LoginMethod.Password)]
-		public async Task Test_77_RefreshTokenGrantCanReduceScope(LoginMethod Method)
+		public async Task Test_077_RefreshTokenGrantCanReduceScope(LoginMethod Method)
 		{
 			TokenResult InitialToken = await Login(Method, TestScopeReadWrite);
 			TokenResult RefreshedToken = await RefreshAccessToken(
@@ -2363,7 +2372,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_78_DeviceAuthorizationGrantPreservesScope()
+		public async Task Test_078_DeviceAuthorizationGrantPreservesScope()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(
 				DeviceUserName, TestScopeReadWrite);
@@ -2379,7 +2388,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_79_AuthorizationMalformedScope()
+		public async Task Test_079_AuthorizationMalformedScope()
 		{
 			string State = Guid.NewGuid().ToString();
 			string RedirectUri = BaseUrl + CallbackResource;
@@ -2400,7 +2409,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_80_TokenMalformedScope()
+		public async Task Test_080_TokenMalformedScope()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -2416,7 +2425,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_81_ClientCredentialsInvalid()
+		public async Task Test_081_ClientCredentialsInvalid()
 		{
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
@@ -2432,7 +2441,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_82_DeviceAuthorizationDeclineReportsAccessDenied()
+		public async Task Test_082_DeviceAuthorizationDeclineReportsAccessDenied()
 		{
 			DeviceAuthorizationResult Device = await StartDeviceAuthorization(DeviceUserName);
 			await CompleteDeviceAuthorizationForm(Device, false, true, false, TestUserName, TestPassword);
@@ -2446,7 +2455,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_83_ReadDynamicClientRegistration()
+		public async Task Test_083_ReadDynamicClientRegistration()
 		{
 			string RedirectUri = BaseUrl + CallbackResource;
 			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
@@ -2515,7 +2524,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_84_UpdateDynamicClientRegistration()
+		public async Task Test_084_UpdateDynamicClientRegistration()
 		{
 			string OriginalRedirectUri = BaseUrl + CallbackResource;
 			string UpdatedRedirectUri = BaseUrl + "/UpdatedCallback";
@@ -2562,7 +2571,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_85_RegistrationUpdateRequiresAccessToken()
+		public async Task Test_085_RegistrationUpdateRequiresAccessToken()
 		{
 			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
 				"Unit Test Update Auth Client", BaseUrl + CallbackResource);
@@ -2578,7 +2587,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_86_RegistrationUpdateRequiresClientId()
+		public async Task Test_086_RegistrationUpdateRequiresClientId()
 		{
 			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
 				"Unit Test Update Requires Client Id", BaseUrl + CallbackResource);
@@ -2594,7 +2603,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_87_RegistrationUpdateRejectsMismatchedClientId()
+		public async Task Test_087_RegistrationUpdateRejectsMismatchedClientId()
 		{
 			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
 				"Unit Test Mismatched Client Id", BaseUrl + CallbackResource);
@@ -2611,7 +2620,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_88_RegistrationUpdateRejectsInvalidRedirectUri()
+		public async Task Test_088_RegistrationUpdateRejectsInvalidRedirectUri()
 		{
 			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
 				"Unit Test Invalid Redirect", BaseUrl + CallbackResource);
@@ -2628,7 +2637,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_89_RegistrationUpdateRequiresJsonRequest()
+		public async Task Test_089_RegistrationUpdateRequiresJsonRequest()
 		{
 			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
 				"Unit Test Update Json", BaseUrl + CallbackResource);
@@ -2646,7 +2655,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_90_RegistrationDeleteRequiresAccessToken()
+		public async Task Test_090_RegistrationDeleteRequiresAccessToken()
 		{
 			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
 				"Unit Test Delete Auth Client", BaseUrl + CallbackResource);
@@ -2659,7 +2668,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_91_RegistrationDeleteRejectsInvalidAccessToken()
+		public async Task Test_091_RegistrationDeleteRejectsInvalidAccessToken()
 		{
 			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
 				"Unit Test Delete Invalid Token", BaseUrl + CallbackResource);
@@ -2672,7 +2681,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_92_DeleteRegistration()
+		public async Task Test_092_DeleteRegistration()
 		{
 			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
 				"Unit Test Delete Client", BaseUrl + CallbackResource);
@@ -2685,7 +2694,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_93_RegistrationDeletedCannotBeUpdated()
+		public async Task Test_093_RegistrationDeletedCannotBeUpdated()
 		{
 			DynamicClientRegistrationResult Registration = await RegisterPublicClient(
 				"Unit Test Deleted Update Client", BaseUrl + CallbackResource);
@@ -2703,7 +2712,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
 		[DataRow(LoginMethod.ClientCredentials)]
-		public async Task Test_94_CreateConfidentialClient(LoginMethod Method)
+		public async Task Test_094_CreateConfidentialClient(LoginMethod Method)
 		{
 			string RedirectUri = BaseUrl + CallbackResource;
 			string TokenEndpointAuthMethod = GetTokenEdnpointAuthMethod(Method);
@@ -2782,7 +2791,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
 		[DataRow(LoginMethod.ClientCredentials)]
-		public async Task Test_95_UpdateConfidentialClient(LoginMethod Method)
+		public async Task Test_095_UpdateConfidentialClient(LoginMethod Method)
 		{
 			string TokenEndpointAuthMethod = GetTokenEdnpointAuthMethod(Method);
 			string OriginalRedirectUri = BaseUrl + CallbackResource;
@@ -2830,7 +2839,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
 		[DataRow(LoginMethod.ClientCredentials)]
-		public async Task Test_96_ChangeConfidentialClientPassword(LoginMethod Method)
+		public async Task Test_096_ChangeConfidentialClientPassword(LoginMethod Method)
 		{
 			string TokenEndpointAuthMethod = GetTokenEdnpointAuthMethod(Method);
 			string RedirectUri = BaseUrl + CallbackResource;
@@ -2881,7 +2890,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
 		[DataRow(LoginMethod.ClientCredentials)]
-		public async Task Test_97_DeleteConfidentialClient(LoginMethod Method)
+		public async Task Test_097_DeleteConfidentialClient(LoginMethod Method)
 		{
 			string TokenEndpointAuthMethod = GetTokenEdnpointAuthMethod(Method);
 			DynamicClientRegistrationResult Registration = await RegisterConfidentialClient(
@@ -2912,6 +2921,675 @@ namespace Waher.Networking.HTTP.Test
 				new KeyValuePair<string, string>("Authorization", "Bearer " + Token.AccessToken));
 			
 			AssertOAuthError(HelloResponse, null, UnauthorizedException.Code);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.CodeForm)]
+		[DataRow(LoginMethod.CodePost)]
+		[DataRow(LoginMethod.CodeFormWithPkceDefault)]
+		[DataRow(LoginMethod.CodeFormWithPkcePlain)]
+		[DataRow(LoginMethod.CodeFormWithPkceS256)]
+		[DataRow(LoginMethod.CodePostWithPkcePlain)]
+		[DataRow(LoginMethod.CodePostWithPkceS256)]
+		[DataRow(LoginMethod.ImplicitGet)]
+		[DataRow(LoginMethod.ImplicitPost)]
+		[DataRow(LoginMethod.Password)]
+		[DataRow(LoginMethod.ClientCredentials)]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		public async Task Test_098_IntrospectionActiveAccessToken(LoginMethod Method)
+		{
+			TokenResult Token = await Login(Method, TestScopeReadWrite);
+
+			IntrospectionHttpResponse Response = await IntrospectToken(
+				Token.AccessToken, "access_token", LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+
+			AssertActiveIntrospectionResponse(Response, Token.AccessToken,
+				TestUserName, TestScopeReadWrite, true);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		[DataRow(LoginMethod.ClientCredentials)]
+		public async Task Test_099_IntrospectionSupportsAdvertisedAuthenticationMethods(
+			LoginMethod Method)
+		{
+			TokenResult Token = await Login(LoginMethod.CodeFormWithPkceS256,
+				TestScopeRead);
+
+			IntrospectionHttpResponse Response = await IntrospectToken(
+				Token.AccessToken, "access_token", Method, TestUserName, TestPassword);
+
+			AssertActiveIntrospectionResponse(Response, Token.AccessToken,
+				TestUserName, TestScopeRead, true);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		[DataRow(LoginMethod.ClientCredentials)]
+		public async Task Test_100_IntrospectionActiveRefreshToken(LoginMethod Method)
+		{
+			TokenResult Token = await Login(LoginMethod.CodeFormWithPkceS256,
+				TestScopeReadWrite);
+
+			IntrospectionHttpResponse Response = await IntrospectToken(
+				Token.RefreshToken, "refresh_token", Method, TestUserName, TestPassword);
+
+			AssertActiveIntrospectionResponse(Response, null,
+				TestUserName, TestScopeReadWrite, false);
+		}
+
+		[TestMethod]
+		public async Task Test_101_IntrospectionTokenTypeHintIsOptional()
+		{
+			TokenResult Token = await Login(LoginMethod.CodeFormWithPkceS256,
+				TestScopeReadWrite);
+
+			IntrospectionHttpResponse AccessTokenResponse = await IntrospectToken(
+				Token.AccessToken, null, LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+			AssertActiveIntrospectionResponse(AccessTokenResponse, Token.AccessToken,
+				TestUserName, TestScopeReadWrite, true);
+
+			IntrospectionHttpResponse RefreshTokenResponse = await IntrospectToken(
+				Token.RefreshToken, null, LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+			AssertActiveIntrospectionResponse(RefreshTokenResponse, null,
+				TestUserName, TestScopeReadWrite, false);
+		}
+
+		[TestMethod]
+		public async Task Test_102_IntrospectionWrongTokenTypeHintSearchesAllTokenTypes()
+		{
+			TokenResult Token = await Login(LoginMethod.CodeFormWithPkceS256,
+				TestScopeReadWrite);
+
+			IntrospectionHttpResponse AccessTokenResponse = await IntrospectToken(
+				Token.AccessToken, "refresh_token", LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+			AssertActiveIntrospectionResponse(AccessTokenResponse, Token.AccessToken,
+				TestUserName, TestScopeReadWrite, true);
+
+			IntrospectionHttpResponse RefreshTokenResponse = await IntrospectToken(
+				Token.RefreshToken, "access_token", LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+			AssertActiveIntrospectionResponse(RefreshTokenResponse, null,
+				TestUserName, TestScopeReadWrite, false);
+
+			IntrospectionHttpResponse UnknownHintResponse = await IntrospectToken(
+				Token.AccessToken, "unknown_token_type", LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+			AssertActiveIntrospectionResponse(UnknownHintResponse, Token.AccessToken,
+				TestUserName, TestScopeReadWrite, true);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		[DataRow(LoginMethod.ClientCredentials)]
+		public async Task Test_103_IntrospectionUnknownTokenReturnsInactive(LoginMethod Method)
+		{
+			IntrospectionHttpResponse Response = await IntrospectToken(
+				"unknown-token-" + Guid.NewGuid().ToString(), "access_token", Method,
+				TestUserName, TestPassword);
+
+			AssertInactiveIntrospectionResponse(Response);
+		}
+
+		[TestMethod]
+		public async Task Test_104_IntrospectionRequiresAuthentication()
+		{
+			TokenResult Token = await Login(LoginMethod.CodeFormWithPkceS256,
+				TestScopeRead);
+
+			IntrospectionHttpResponse Response = await IntrospectToken(
+				Token.AccessToken, "access_token", null, null, null);
+
+			Assert.AreEqual(System.Net.HttpStatusCode.Unauthorized, Response.StatusCode);
+			AssertAuthenticationChallenge(Response, "Basic");
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		[DataRow(LoginMethod.ClientCredentials)]
+		public async Task Test_105_IntrospectionRejectsInvalidClientCredentials(
+			LoginMethod Method)
+		{
+			TokenResult Token = await Login(LoginMethod.CodeFormWithPkceS256,
+				TestScopeRead);
+
+			IntrospectionHttpResponse Response = await IntrospectToken(
+				Token.AccessToken, "access_token", Method, TestUserName,
+				"Invalid Password");
+
+			Assert.AreEqual(System.Net.HttpStatusCode.Unauthorized, Response.StatusCode);
+
+			if (Response.Body is not null)
+				Assert.AreEqual("invalid_client", Required<string>(Response.Body, "error"));
+
+			if (Method == LoginMethod.ClientCredentialsBasicAuth)
+				AssertAuthenticationChallenge(Response, "Basic");
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		[DataRow(LoginMethod.ClientCredentials)]
+		public async Task Test_106_IntrospectionRequiresTokenParameter(LoginMethod Method)
+		{
+			IntrospectionHttpResponse Response = await IntrospectToken(
+				null, "access_token", Method, TestUserName, TestPassword);
+
+			AssertIntrospectionError(Response, System.Net.HttpStatusCode.BadRequest,
+				"invalid_request");
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		[DataRow(LoginMethod.ClientCredentials)]
+		public async Task Test_107_IntrospectionEmptyTokenIsTreatedAsMissing(
+			LoginMethod Method)
+		{
+			IntrospectionHttpResponse Response = await IntrospectToken(
+				string.Empty, "access_token", Method, TestUserName, TestPassword);
+
+			AssertIntrospectionError(Response, System.Net.HttpStatusCode.BadRequest,
+				"invalid_request");
+		}
+
+		[TestMethod]
+		public async Task Test_108_IntrospectionRejectsDuplicateTokenParameter()
+		{
+			TokenResult Token = await Login(LoginMethod.CodeFormWithPkceS256,
+				TestScopeRead);
+			string Form = "token=" + Uri.EscapeDataString(Token.AccessToken) +
+				"&token=" + Uri.EscapeDataString("another-token") +
+				"&token_type_hint=access_token";
+
+			IntrospectionHttpResponse Response = await SendIntrospectionRequest(
+				HttpMethod.Post,
+				new StringContent(Form, Encoding.UTF8,
+					"application/x-www-form-urlencoded"),
+				null, LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+
+			AssertIntrospectionError(Response, System.Net.HttpStatusCode.BadRequest,
+				"invalid_request");
+		}
+
+		[TestMethod]
+		public async Task Test_109_IntrospectionRequiresFormEncodedPost()
+		{
+			TokenResult Token = await Login(LoginMethod.CodeFormWithPkceS256,
+				TestScopeRead);
+			string Json = "{\"token\":\"" + Token.AccessToken + "\"}";
+
+			IntrospectionHttpResponse Response = await SendIntrospectionRequest(
+				HttpMethod.Post, new StringContent(Json, Encoding.UTF8, "application/json"),
+				null, LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+
+			Assert.IsTrue(
+				Response.StatusCode == System.Net.HttpStatusCode.BadRequest ||
+				Response.StatusCode == System.Net.HttpStatusCode.UnsupportedMediaType,
+				"Expected a non-form introspection request to be rejected.");
+		}
+
+		[TestMethod]
+		public async Task Test_110_IntrospectionValidatesTokenTimeWindow()
+		{
+			DateTime Now = DateTime.UtcNow;
+			string ValidToken = this.CreateIntrospectionTestToken(
+				Now.AddHours(1), Now.AddMinutes(-1));
+			string ExpiredToken = this.CreateIntrospectionTestToken(
+				Now.AddMinutes(-1), Now.AddHours(-1));
+			string NotYetValidToken = this.CreateIntrospectionTestToken(
+				Now.AddHours(1), Now.AddMinutes(10));
+
+			IntrospectionHttpResponse ValidResponse = await IntrospectToken(
+				ValidToken, "access_token", LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+			AssertActiveIntrospectionResponse(ValidResponse, ValidToken,
+				TestUserName, TestScopeRead, true);
+
+			IntrospectionHttpResponse ExpiredResponse = await IntrospectToken(
+				ExpiredToken, "access_token", LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+			AssertInactiveIntrospectionResponse(ExpiredResponse);
+
+			IntrospectionHttpResponse NotYetValidResponse = await IntrospectToken(
+				NotYetValidToken, "access_token", LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+			AssertInactiveIntrospectionResponse(NotYetValidResponse);
+		}
+
+		[TestMethod]
+		public async Task Test_111_IntrospectionRejectsInvalidTokenSignature()
+		{
+			TokenResult Token = await Login(LoginMethod.CodeFormWithPkceS256,
+				TestScopeRead);
+			string TamperedToken = TamperJwtSignature(Token.AccessToken);
+
+			IntrospectionHttpResponse Response = await IntrospectToken(
+				TamperedToken, "access_token", LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+
+			AssertInactiveIntrospectionResponse(Response);
+		}
+
+		[TestMethod]
+		public async Task Test_112_IntrospectionReportsDeprecatedAccessTokenInactive()
+		{
+			TokenResult Token = await Login(LoginMethod.CodeFormWithPkceS256,
+				TestScopeRead);
+			Assert.IsTrue(JwtToken.TryParse(Token.AccessToken, out JwtToken ParsedToken));
+
+			JwtFactory.Deprecate(ParsedToken);
+
+			IntrospectionHttpResponse Response = await IntrospectToken(
+				Token.AccessToken, "access_token", LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+
+			AssertInactiveIntrospectionResponse(Response);
+		}
+
+		[TestMethod]
+		public async Task Test_113_IntrospectionReportsRotatedRefreshTokenInactive()
+		{
+			TokenResult InitialToken = await Login(LoginMethod.CodeFormWithPkceS256,
+				TestScopeReadWrite);
+
+			IntrospectionHttpResponse InitialResponse = await IntrospectToken(
+				InitialToken.RefreshToken, "refresh_token",
+				LoginMethod.ClientCredentialsBasicAuth, TestUserName, TestPassword);
+			AssertActiveIntrospectionResponse(InitialResponse, null,
+				TestUserName, TestScopeReadWrite, false);
+
+			TokenResult RefreshedToken = await RefreshAccessToken(
+				InitialToken.RefreshToken, TestUserName);
+
+			IntrospectionHttpResponse PreviousResponse = await IntrospectToken(
+				InitialToken.RefreshToken, "refresh_token",
+				LoginMethod.ClientCredentialsBasicAuth, TestUserName, TestPassword);
+			AssertInactiveIntrospectionResponse(PreviousResponse);
+
+			IntrospectionHttpResponse ReplacementResponse = await IntrospectToken(
+				RefreshedToken.RefreshToken, "refresh_token",
+				LoginMethod.ClientCredentialsBasicAuth, TestUserName, TestPassword);
+			AssertActiveIntrospectionResponse(ReplacementResponse, null,
+				TestUserName, TestScopeReadWrite, false);
+		}
+
+		[TestMethod]
+		[DataRow(LoginMethod.ClientCredentialsBasicAuth)]
+		[DataRow(LoginMethod.ClientCredentials)]
+		public async Task Test_114_IntrospectionReportsDeletedClientTokenInactive(
+			LoginMethod Method)
+		{
+			string TokenEndpointAuthMethod = GetTokenEdnpointAuthMethod(Method);
+			DynamicClientRegistrationResult Registration = await RegisterConfidentialClient(
+				"Unit Test Introspection Delete Client", BaseUrl + CallbackResource,
+				TokenEndpointAuthMethod);
+
+			TokenResult Token = await Login(Method, Registration.ClientId,
+				Registration.ClientSecret!);
+
+			IntrospectionHttpResponse ActiveResponse = await IntrospectToken(
+				Token.AccessToken, "access_token", LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+			AssertActiveIntrospectionResponse(ActiveResponse, Token.AccessToken,
+				Registration.ClientId, null, true);
+
+			await DoDelete(Registration.RegistrationClientUri,
+				Registration.RegistrationAccessToken, System.Net.HttpStatusCode.NoContent);
+
+			IntrospectionHttpResponse InactiveResponse = await IntrospectToken(
+				Token.AccessToken, "access_token", LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+			AssertInactiveIntrospectionResponse(InactiveResponse);
+		}
+
+		[TestMethod]
+		public async Task Test_115_IntrospectionValidatesTokenAudience()
+		{
+			DateTime Now = DateTime.UtcNow;
+			string MatchingAudienceToken = this.CreateIntrospectionTestToken(
+				Now.AddHours(1), Now.AddMinutes(-1), TestUserName);
+			string OtherAudienceToken = this.CreateIntrospectionTestToken(
+				Now.AddHours(1), Now.AddMinutes(-1), "other-resource-server");
+
+			IntrospectionHttpResponse MatchingResponse = await IntrospectToken(
+				MatchingAudienceToken, "access_token",
+				LoginMethod.ClientCredentialsBasicAuth, TestUserName, TestPassword);
+			AssertActiveIntrospectionResponse(MatchingResponse, MatchingAudienceToken,
+				TestUserName, TestScopeRead, true);
+
+			IntrospectionHttpResponse OtherResponse = await IntrospectToken(
+				OtherAudienceToken, "access_token",
+				LoginMethod.ClientCredentialsBasicAuth, TestUserName, TestPassword);
+			AssertInactiveIntrospectionResponse(OtherResponse);
+		}
+
+		[TestMethod]
+		public async Task Test_116_IntrospectionDeviceFlowAccessToken()
+		{
+			DeviceAuthorizationResult Device = await StartDeviceAuthorization(
+				DeviceUserName, TestScopeReadWrite);
+			await CompleteDeviceAuthorizationForm(Device, true, false, false,
+				TestUserName, TestPassword);
+
+			ContentResponse TokenResponse = await InternetContent.PostAsync(
+				new Uri(BaseUrl + OAuthTokenResource.DefaultResourcePath),
+				CreateDeviceTokenRequest(Device.DeviceCode, DeviceUserName));
+			TokenResult Token = AssertAccessTokenResponse(TokenResponse);
+
+			IntrospectionHttpResponse Response = await IntrospectToken(
+				Token.AccessToken, "access_token", LoginMethod.ClientCredentialsBasicAuth,
+				TestUserName, TestPassword);
+
+			AssertActiveIntrospectionResponse(Response, Token.AccessToken,
+				DeviceUserName, TestScopeReadWrite, true);
+		}
+
+		[TestMethod]
+		public async Task Test_117_IntrospectionRejectsMultipleClientAuthenticationMethods()
+		{
+			TokenResult Token = await Login(LoginMethod.CodeFormWithPkceS256,
+				TestScopeRead);
+			Dictionary<string, string> Form = new()
+			{
+				{ "token", Token.AccessToken },
+				{ "token_type_hint", "access_token" },
+				{ "client_id", TestUserName },
+				{ "client_secret", TestPassword }
+			};
+
+			IntrospectionHttpResponse Response = await SendIntrospectionRequest(
+				HttpMethod.Post, new FormUrlEncodedContent(Form), null,
+				LoginMethod.ClientCredentialsBasicAuth, TestUserName, TestPassword);
+
+			AssertIntrospectionError(Response, System.Net.HttpStatusCode.BadRequest,
+				"invalid_request");
+		}
+		private class IntrospectionHttpResponse
+		{
+			public System.Net.HttpStatusCode StatusCode;
+			public Dictionary<string, object> Body;
+			public string ContentType;
+			public string[] AuthenticationChallenges;
+		}
+
+		private static Task<IntrospectionHttpResponse> IntrospectToken(
+			string Token, string TokenTypeHint, LoginMethod? AuthenticationMethod,
+			string ClientId, string ClientSecret)
+		{
+			Dictionary<string, string> Form = [];
+
+			if (Token is not null)
+				Form["token"] = Token;
+
+			if (!string.IsNullOrEmpty(TokenTypeHint))
+				Form["token_type_hint"] = TokenTypeHint;
+
+			if (AuthenticationMethod == LoginMethod.ClientCredentials)
+			{
+				if (ClientId is not null)
+					Form["client_id"] = ClientId;
+
+				if (ClientSecret is not null)
+					Form["client_secret"] = ClientSecret;
+			}
+			else if (AuthenticationMethod.HasValue &&
+				AuthenticationMethod.Value != LoginMethod.ClientCredentialsBasicAuth)
+			{
+				throw new ArgumentException("Unsupported introspection authentication method: " +
+					AuthenticationMethod.Value.ToString(), nameof(AuthenticationMethod));
+			}
+
+			return SendIntrospectionRequest(HttpMethod.Post,
+				new FormUrlEncodedContent(Form), null, AuthenticationMethod,
+				ClientId, ClientSecret);
+		}
+
+		private static async Task<IntrospectionHttpResponse> SendIntrospectionRequest(
+			HttpMethod Method, HttpContent Content, string QueryString,
+			LoginMethod? AuthenticationMethod, string ClientId, string ClientSecret)
+		{
+			using HttpClient Client = new();
+			using HttpRequestMessage Request = new()
+			{
+				Method = Method,
+				RequestUri = new Uri(BaseUrl + OAuthIntrospectionResource.DefaultResourcePath +
+					(QueryString ?? string.Empty)),
+				Content = Content
+			};
+
+			Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+			if (AuthenticationMethod == LoginMethod.ClientCredentialsBasicAuth)
+			{
+				Request.Headers.Authorization = new AuthenticationHeaderValue("Basic",
+					Convert.ToBase64String(Encoding.UTF8.GetBytes(
+						(ClientId ?? string.Empty) + ":" + (ClientSecret ?? string.Empty))));
+			}
+
+			using HttpResponseMessage Response = await Client.SendAsync(Request,
+				CancellationToken.None);
+			string ResponseText = await Response.Content.ReadAsStringAsync(
+				CancellationToken.None);
+			Dictionary<string, object> Parsed = null;
+
+			if (!string.IsNullOrEmpty(ResponseText))
+			{
+				Parsed = JSON.Parse(ResponseText) as Dictionary<string, object>;
+				Assert.IsNotNull(Parsed, ResponseText);
+			}
+
+			List<string> Challenges = [];
+			foreach (AuthenticationHeaderValue Challenge in Response.Headers.WwwAuthenticate)
+				Challenges.Add(Challenge.ToString());
+
+			return new IntrospectionHttpResponse()
+			{
+				StatusCode = Response.StatusCode,
+				Body = Parsed,
+				ContentType = Response.Content.Headers.ContentType?.MediaType,
+				AuthenticationChallenges = [.. Challenges]
+			};
+		}
+
+		private static IDictionary<string, object> AssertActiveIntrospectionResponse(
+			IntrospectionHttpResponse Response, string AccessToken, string ExpectedClientId,
+			string ExpectedScope, bool IsAccessToken)
+		{
+			Assert.AreEqual(System.Net.HttpStatusCode.OK, Response.StatusCode);
+			Assert.AreEqual("application/json", Response.ContentType);
+			Assert.IsNotNull(Response.Body);
+			Assert.IsTrue(Required<bool>(Response.Body, "active"));
+
+			if (!string.IsNullOrEmpty(ExpectedScope) &&
+				Response.Body.TryGetValue("scope", out object Scope))
+			{
+				Assert.IsTrue(Scope is string, "Introspection scope is not a string.");
+				AssertScope(ExpectedScope, (string)Scope);
+			}
+
+			if (!string.IsNullOrEmpty(ExpectedClientId) &&
+				Response.Body.TryGetValue("client_id", out object ClientId))
+			{
+				Assert.AreEqual(ExpectedClientId, ClientId as string);
+			}
+
+			if (Response.Body.TryGetValue("username", out object UserName))
+			{
+				Assert.IsTrue(UserName is string);
+				Assert.IsFalse(string.IsNullOrEmpty((string)UserName));
+			}
+
+			if (IsAccessToken && Response.Body.TryGetValue("token_type", out object TokenType))
+				Assert.AreEqual("Bearer", TokenType as string);
+
+			if (!string.IsNullOrEmpty(AccessToken))
+			{
+				IDictionary<string, object> Payload = DecodeJwtPart(AccessToken, 1);
+
+				AssertIntrospectionClaimMatchesJwt(Response.Body, Payload, JwtClaims.Scope);
+				AssertIntrospectionClaimMatchesJwt(Response.Body, Payload, JwtClaims.ClientId);
+				AssertIntrospectionClaimMatchesJwt(Response.Body, Payload, JwtClaims.Subject);
+				AssertIntrospectionClaimMatchesJwt(Response.Body, Payload, JwtClaims.Audience);
+				AssertIntrospectionClaimMatchesJwt(Response.Body, Payload, JwtClaims.Issuer);
+				AssertIntrospectionClaimMatchesJwt(Response.Body, Payload, JwtClaims.ExpirationTime);
+				AssertIntrospectionClaimMatchesJwt(Response.Body, Payload, JwtClaims.IssueTime);
+				AssertIntrospectionClaimMatchesJwt(Response.Body, Payload, JwtClaims.NotBeforeTime);
+				AssertIntrospectionClaimMatchesJwt(Response.Body, Payload, JwtClaims.JwtId);
+			}
+
+			return Response.Body;
+		}
+
+		private static void AssertIntrospectionClaimMatchesJwt(
+			IDictionary<string, object> IntrospectionResponse,
+			IDictionary<string, object> JwtPayload, string ClaimName)
+		{
+			if (!IntrospectionResponse.TryGetValue(ClaimName, out object Actual) ||
+				!JwtPayload.TryGetValue(ClaimName, out object Expected))
+			{
+				return;
+			}
+
+			switch (ClaimName)
+			{
+				case JwtClaims.ExpirationTime:
+				case JwtClaims.IssueTime:
+				case JwtClaims.NotBeforeTime:
+					Assert.AreEqual(ToInt64(Expected, ClaimName), ToInt64(Actual, ClaimName));
+					break;
+
+				case JwtClaims.Audience:
+					AssertStringValuesEqual(Expected, Actual, ClaimName);
+					break;
+
+				case JwtClaims.Scope:
+					AssertScope(Expected as string, Actual as string);
+					break;
+
+				default:
+					Assert.AreEqual(Expected?.ToString(), Actual?.ToString(),
+						"Unexpected introspection claim value: " + ClaimName);
+					break;
+			}
+		}
+
+		private static void AssertStringValuesEqual(object ExpectedValue,
+			object ActualValue, string Name)
+		{
+			HashSet<string> Expected = ToStringValues(ExpectedValue);
+			HashSet<string> Actual = ToStringValues(ActualValue);
+
+			Assert.HasCount(Expected.Count, Actual,
+				"Unexpected number of values in " + Name + ".");
+
+			foreach (string Value in Expected)
+				Assert.Contains(Value, Actual, "Missing value in " + Name + ": " + Value);
+		}
+
+		private static HashSet<string> ToStringValues(object Value)
+		{
+			HashSet<string> Result = new(StringComparer.Ordinal);
+
+			if (Value is string s)
+				Result.Add(s);
+			else if (Value is IEnumerable Values)
+			{
+				foreach (object Item in Values)
+				{
+					if (Item is not null)
+						Result.Add(Item.ToString());
+				}
+			}
+			else if (Value is not null)
+				Result.Add(Value.ToString());
+
+			return Result;
+		}
+
+		private static void AssertInactiveIntrospectionResponse(
+			IntrospectionHttpResponse Response)
+		{
+			Assert.AreEqual(System.Net.HttpStatusCode.OK, Response.StatusCode);
+			Assert.AreEqual("application/json", Response.ContentType);
+			Assert.IsNotNull(Response.Body);
+			Assert.HasCount(1, Response.Body,
+				"An inactive introspection response should not disclose token metadata.");
+			Assert.IsFalse(Required<bool>(Response.Body, "active"));
+		}
+
+		private static void AssertIntrospectionError(IntrospectionHttpResponse Response,
+			System.Net.HttpStatusCode ExpectedStatusCode, string ExpectedErrorCode)
+		{
+			Assert.AreEqual(ExpectedStatusCode, Response.StatusCode);
+			Assert.AreEqual("application/json", Response.ContentType);
+			Assert.IsNotNull(Response.Body);
+			Assert.AreEqual(ExpectedErrorCode, Required<string>(Response.Body, "error"));
+
+			if (Response.Body.TryGetValue("error_description", out object Description))
+			{
+				Assert.IsTrue(Description is string);
+				Assert.IsFalse(string.IsNullOrEmpty((string)Description));
+			}
+		}
+
+		private static void AssertAuthenticationChallenge(IntrospectionHttpResponse Response,
+			string Scheme)
+		{
+			bool Found = false;
+
+			foreach (string Challenge in Response.AuthenticationChallenges)
+			{
+				if (Challenge.StartsWith(Scheme, StringComparison.OrdinalIgnoreCase))
+				{
+					Found = true;
+					break;
+				}
+			}
+
+			Assert.IsTrue(Found, "Expected " + Scheme + " authentication challenge.");
+		}
+
+		private string CreateIntrospectionTestToken(DateTime Expiration,
+			DateTime NotBefore)
+		{
+			return this.CreateIntrospectionTestToken(Expiration, NotBefore, null);
+		}
+
+		private string CreateIntrospectionTestToken(DateTime Expiration,
+			DateTime NotBefore, string Audience)
+		{
+			List<KeyValuePair<string, object>> Claims =
+			[
+				new KeyValuePair<string, object>(JwtClaims.Issuer, BaseUrl),
+				new KeyValuePair<string, object>(JwtClaims.Subject, TestUserName),
+				new KeyValuePair<string, object>(JwtClaims.ClientId, TestUserName),
+				new KeyValuePair<string, object>(JwtClaims.ExpirationTime, Expiration),
+				new KeyValuePair<string, object>(JwtClaims.NotBeforeTime, NotBefore),
+				new KeyValuePair<string, object>(JwtClaims.IssueTime, DateTime.UtcNow.AddMinutes(-1)),
+				new KeyValuePair<string, object>(JwtClaims.JwtId, Guid.NewGuid().ToString()),
+				new KeyValuePair<string, object>(JwtClaims.Scope, TestScopeRead)
+			];
+
+			if (!string.IsNullOrEmpty(Audience))
+				Claims.Add(new KeyValuePair<string, object>(JwtClaims.Audience, Audience));
+
+			return this.jwtFactory.Create(Claims);
+		}
+
+		private static string TamperJwtSignature(string Token)
+		{
+			string[] Parts = Token.Split('.');
+			Assert.HasCount(3, Parts);
+			Assert.IsFalse(string.IsNullOrEmpty(Parts[2]));
+
+			char First = Parts[2][0];
+			Parts[2] = (First == 'A' ? 'B' : 'A') + Parts[2][1..];
+			return string.Join('.', Parts);
 		}
 
 		private static OAuthError AssertOAuthError(ContentResponse Response,

@@ -10,12 +10,12 @@ namespace Waher.Networking.HTTP.Mcp.Model.Client
 		/// <summary>
 		/// Form
 		/// </summary>
-		public object? Form { get; internal set; }
+		public bool Form { get; internal set; }
 
 		/// <summary>
 		/// URL
 		/// </summary>
-		public object? Url { get; internal set; }
+		public bool Url { get; internal set; }
 
 		/// <summary>
 		/// Tries to parse a generic structure into a typed structure.
@@ -29,10 +29,13 @@ namespace Waher.Networking.HTTP.Mcp.Model.Client
 			ElicitationCapabilities Result = new ElicitationCapabilities();
 
 			if (Generic.TryGetValue("form", out object? Obj))
-				Result.Form = Obj;
+				Result.Form = !(Obj is null);
 
 			if (Generic.TryGetValue("url", out Obj))
-				Result.Url = Obj;
+				Result.Url = !(Obj is null);
+
+			if (!Result.Form && !Result.Url)
+				Result.Form = true;
 
 			Typed = Result;
 			return true;

@@ -957,6 +957,9 @@ namespace Waher.Mcp.Files
 		/// characters or begin with a path character, to attempt to escape file 
 		/// storage area. File extension must match Internet Content-Type of file 
 		/// contents.</param>
+		/// <param name="Sensitive">If the contents of the file are sensitive, set this to
+		/// true. Sensitive information will be edited in a separate protected window and
+		/// not inline.</param>
 		/// <returns>URI of updated file resource.</returns>
 		[McpServerTool(
 			"Edit",  // Title
@@ -975,7 +978,12 @@ namespace Waher.Mcp.Files
 			"double period characters or begin with a path character, to attempt to " +
 			"escape file storage area. File extension must match Internet Content-Type " +
 			"of file contents.", 3, 256)]
-			string LocalFileName)
+			string LocalFileName,
+
+			[McpParameter("Sensitive", "If the contents of the file are sensitive, set " +
+			"this to true. Sensitive information will be edited in a separate protected " +
+			"window and not inline.")]
+			bool Sensitive)
 		{
 			string? UserName = Request.User?.UserName;
 			if (string.IsNullOrEmpty(UserName))
@@ -1001,8 +1009,9 @@ namespace Waher.Mcp.Files
 					FileContents = await Runtime.IO.Files.ReadAllTextAsync(FullFileName)
 				};
 
-				bool? Result = await this.ElicitUserInput("Edit the contents of the following text file.",
-					Contents, false, Session, 5 * 60 * 1000);
+				bool? Result = await this.ElicitUserInput(Request,
+					"Edit the contents of the following text file.",
+					Contents, Sensitive, Session, 5 * 60 * 1000);
 
 				if (!Result.HasValue)
 					throw new Exception("User input expected.");
@@ -1021,8 +1030,9 @@ namespace Waher.Mcp.Files
 						await Runtime.IO.Files.ReadAllBytesAsync(FullFileName))
 				};
 
-				bool? Result = await this.ElicitUserInput("Edit the BASE64-encoded contents of the following binary file.",
-					Contents, false, Session, 5 * 60 * 1000);
+				bool? Result = await this.ElicitUserInput(Request,
+					"Edit the BASE64-encoded contents of the following binary file.",
+					Contents, Sensitive, Session, 5 * 60 * 1000);
 
 				if (!Result.HasValue)
 					throw new Exception("User input expected.");

@@ -164,8 +164,8 @@ namespace Waher.Networking.HTTP.OAuth
 					Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 					Response.SetHeader("Pragma", "no-cache");
 
-					await Response.Return(await this.GenerateLoginForm(Request, Response,
-						ClientId, RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
+					await Response.Return(await this.GenerateLoginForm(Response, ClientId, 
+						RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
 						string.Empty, RedirectUri));
 					return;
 
@@ -270,10 +270,9 @@ namespace Waher.Networking.HTTP.OAuth
 		/// </summary>
 		public event EventHandlerAsync<ImplicitAuthenticationEventArgs>? ImplicitAuthenticationRequest = null;
 
-		private async Task<HtmlDocument> GenerateLoginForm(HttpRequest Request,
-			HttpResponse Response, string UserName, string From, string State,
-			string Scope, string CodeChallenge, string CodeChallengeMethod,
-			string ErrorMessage, string RedirectUri)
+		private async Task<HtmlDocument> GenerateLoginForm(HttpResponse Response, 
+			string UserName, string From, string State, string Scope, string CodeChallenge, 
+			string CodeChallengeMethod, string ErrorMessage, string RedirectUri)
 		{
 			StringBuilder Markdown = new StringBuilder();
 
@@ -554,8 +553,8 @@ namespace Waher.Networking.HTTP.OAuth
 
 					if (!(LoginResult.User is IUserWithClaims UserWithClaims))
 					{
-						await Response.Return(await this.GenerateLoginForm(Request,
-							Response, UserName, RedirectUri, State, Scope, CodeChallenge,
+						await Response.Return(await this.GenerateLoginForm(Response, 
+							UserName, RedirectUri, State, Scope, CodeChallenge, 
 							CodeChallengeMethod, "User cannot be used with OAUTH login.",
 							RedirectUri));
 						return;
@@ -564,8 +563,8 @@ namespace Waher.Networking.HTTP.OAuth
 					if (!string.IsNullOrEmpty(Scope) &&
 						!HasScopePrivileges(Scope, LoginResult.User, out string? _))
 					{
-						await Response.Return(await this.GenerateLoginForm(Request,
-							Response, UserName, RedirectUri, State, Scope, CodeChallenge,
+						await Response.Return(await this.GenerateLoginForm(Response, 
+							UserName, RedirectUri, State, Scope, CodeChallenge,
 							CodeChallengeMethod, "User does not have sufficient privileges to complete the request.",
 							RedirectUri));
 						return;
@@ -591,8 +590,8 @@ namespace Waher.Networking.HTTP.OAuth
 
 				case LoginResultType.InvalidCredentials:
 				default:
-					await Response.Return(await this.GenerateLoginForm(Request, Response,
-						UserName, RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
+					await Response.Return(await this.GenerateLoginForm(Response, UserName, 
+						RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
 						"Invalid user name or password.", RedirectUri));
 					return;
 
@@ -601,15 +600,15 @@ namespace Waher.Networking.HTTP.OAuth
 					return;
 
 				case LoginResultType.TemporarilyBlocked:
-					await Response.Return(await this.GenerateLoginForm(Request, Response,
-						UserName, RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
+					await Response.Return(await this.GenerateLoginForm(Response, UserName, 
+						RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
 						"You are temporarily blocked. Try again after: " +
 						LoginResult.Next?.ToString(), RedirectUri));
 					return;
 
 				case LoginResultType.PermanentlyBlocked:
-					await Response.Return(await this.GenerateLoginForm(Request, Response,
-						UserName, RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
+					await Response.Return(await this.GenerateLoginForm(Response, UserName, 
+						RedirectUri, State, Scope, CodeChallenge, CodeChallengeMethod,
 						"You are permanently blocked.", RedirectUri));
 					return;
 			}

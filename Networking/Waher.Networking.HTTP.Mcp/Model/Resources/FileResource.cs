@@ -50,13 +50,23 @@ namespace Waher.Networking.HTTP.Mcp.Model.Resources
 
 		private bool IsTextFile()
 		{
-			if (this.ContentType is null)
+			return IsTextFile(this.ContentType);
+		}
+
+		/// <summary>
+		/// Checks if a Content-Type represents a text file.
+		/// </summary>
+		/// <param name="ContentType">Internet Content-Type</param>
+		/// <returns>If the Content-Type represents a text file.</returns>
+		public static bool IsTextFile(string? ContentType)
+		{ 
+			if (ContentType is null)
 				return false;
-			else if (this.ContentType.StartsWith("text/"))
+			else if (ContentType.StartsWith("text/"))
 				return true;
-			else if (this.ContentType.StartsWith("application/"))
+			else if (ContentType.StartsWith("application/"))
 			{
-				string s = this.ContentType;
+				string s = ContentType;
 				int i = s.IndexOf(';', 12);
 				if (i > 0)
 					s = s[..i].TrimEnd();

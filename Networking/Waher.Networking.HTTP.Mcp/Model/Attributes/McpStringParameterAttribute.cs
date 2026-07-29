@@ -76,5 +76,18 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 			if (this.MaxLength.HasValue)
 				Schema["maxLength"] = this.MaxLength.Value;
 		}
+
+		/// <summary>
+		/// Gets HTML input attributes for the parameter, if any.
+		/// </summary>
+		/// <param name="Attributes">Set of attributes.</param>
+		public override void GetHtmlInputAttributes(Dictionary<string, string> Attributes)
+		{
+			if (this.MinLength.HasValue)
+				Attributes["minlength"] = this.MinLength.ToString();
+
+			if (this.MaxLength.HasValue)
+				Attributes["maxlength"] = this.MaxLength.ToString();
+		}
 	}
 }

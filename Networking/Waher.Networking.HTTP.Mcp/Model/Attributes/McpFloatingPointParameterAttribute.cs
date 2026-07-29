@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Waher.Content.Xml;
+using Waher.Script;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 {
@@ -65,6 +67,27 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 			base.Annotate(Schema);
 
 			Schema["type"] = "number";
+		}
+
+		/// <summary>
+		/// Gets HTML input attributes for the parameter, if any.
+		/// </summary>
+		/// <param name="Attributes">Set of attributes.</param>
+		public override void GetHtmlInputAttributes(Dictionary<string, string> Attributes)
+		{
+			base.GetHtmlInputAttributes(Attributes);
+			Attributes["type"] = "number";
+			Attributes["step"] = "any";
+		}
+
+		/// <summary>
+		/// Gets the HTML attribute value for a parameter, if any.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>HTML attribute value</returns>
+		public override string GetHtmlAttributeValue(object Value)
+		{
+			return Expression.ToExpressionString(Value);
 		}
 	}
 }

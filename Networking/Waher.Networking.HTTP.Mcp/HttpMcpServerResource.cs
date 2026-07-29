@@ -1,12 +1,18 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Html;
+using Waher.Content.Html.Elements;
+using Waher.Content.Html.JavaScript;
 using Waher.Content.Images;
 using Waher.Content.Markdown;
+using Waher.Content.Markdown.Functions;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.JsonRpc.MetaData;
@@ -25,6 +31,7 @@ using Waher.Runtime.Counters;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Script;
+using Waher.Script.Functions.Runtime;
 using Waher.Script.Model;
 using Waher.Security;
 using Waher.Security.JWT;
@@ -275,6 +282,406 @@ namespace Waher.Networking.HTTP.Mcp
 		public string[] McpScopesSupported()
 		{
 			return this.scopesSupported;
+		}
+
+		/// <summary>
+		/// If the resource handles sub-paths.
+		/// </summary>
+		public override bool HandlesSubPaths => true;
+
+		/// <summary>
+		/// Executes the GET method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public override async Task GET(HttpRequest Request, HttpResponse Response)
+		{
+			if (string.IsNullOrEmpty(Request.SubPath))
+			{
+				await base.GET(Request, Response);
+				return;
+			}
+
+			string FormId = Request.SubPath[1..];
+
+			if (FormId == "UserInput.js")
+			{
+				StringBuilder Javascript = new StringBuilder();
+
+				Javascript.AppendLine("function Ok() { PostForm('true'); }");
+				Javascript.AppendLine("function Cancel() { PostForm('false'); }");
+				Javascript.AppendLine("function PostForm(Response)");
+				Javascript.AppendLine("{");
+				Javascript.AppendLine("\tdocument.getElementById('_r_').value=Response;");
+				Javascript.AppendLine("\tdocument.getElementById('InputForm').submit();");
+				Javascript.AppendLine("\twindow.close();");
+				Javascript.AppendLine("}");
+				Javascript.AppendLine("function Loaded()");
+				Javascript.AppendLine("{");
+				Javascript.AppendLine("\tdocument.getElementById('OkButton').addEventListener('click', Ok);");
+				Javascript.AppendLine("\tdocument.getElementById('CancelButton').addEventListener('click', Cancel);");
+				Javascript.AppendLine("}");
+				Javascript.AppendLine("window.addEventListener('load', Loaded);");
+
+				Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
+				Response.SetHeader("Pragma", "no-cache");
+
+				await Response.Return(new JavaScriptDocument(Javascript.ToString()));
+			}
+			else
+			{
+				if (!this.TryGetRequest(FormId, out IJsonRpcClientRequest? ClientRequest))
+				{
+					await Response.SendResponse(new NotFoundException("Request not found: " + FormId));
+					return;
+				}
+
+				if (ClientRequest.Tag is null)
+				{
+					await Response.SendResponse(new BadRequestException("Invalid input request."));
+					return;
+				}
+
+				await Response.Return(await this.GenerateInputForm(Request, Response,
+					ClientRequest));
+			}
+		}
+
+		private async Task<HtmlDocument> GenerateInputForm(HttpRequest Request,
+			HttpResponse Response, IJsonRpcClientRequest ClientRequest)
+		{
+			StringBuilder Markdown = new StringBuilder();
+
+			Markdown.AppendLine("Title: User Input");
+			Markdown.AppendLine("Description: Form allowing a user to input elicited information.");
+			Markdown.AppendLine("Javascript: UserInput.js");
+
+			if (Types.TryGetModuleParameter<OAuth2Environment>("OAUTH2", out OAuth2Environment? Environment) &&
+				Environment.HasLoginMasterFileName)
+			{
+				Markdown.Append("Master: ");
+				Markdown.AppendLine(Environment.LoginMasterFileName);
+			}
+
+			Markdown.Append("Date: ");
+			Markdown.AppendLine(CommonTypes.EncodeRfc822(DateTime.UtcNow));
+			Markdown.AppendLine();
+			Markdown.AppendLine(new string('=', 40));
+			Markdown.AppendLine();
+
+			Markdown.AppendLine("Requested Information");
+			Markdown.AppendLine("========================");
+			Markdown.AppendLine();
+
+			Markdown.AppendLine(MarkdownDocument.Encode(ClientRequest.Message));
+			Markdown.AppendLine();
+
+			string ParametersToken = this.JwtFactory?.Create(
+				new KeyValuePair<string, object>(JwtClaims.JwtId, ClientRequest.Id?.ToString() ?? string.Empty),
+				new KeyValuePair<string, object>(JwtClaims.Subject, Request.RemoteEndPoint.RemovePortNumber()))
+				?? string.Empty;
+
+			Markdown.Append("<form id='InputForm' action='");
+			Markdown.Append(Request.Header.GetURL(false, false));
+			Markdown.AppendLine("' method='post' enctype='multipart/form-data'>");
+			Markdown.Append("<input type='hidden' name='_p_' value='");
+			Markdown.Append(XML.HtmlAttributeEncode(ParametersToken));
+			Markdown.AppendLine("'/>");
+			Markdown.AppendLine("<input type='hidden' id='_r_' name='_r_' value=''/>");
+			Markdown.AppendLine();
+
+			Type T = ClientRequest.Tag!.GetType();
+			McpParameterAttribute? ParameterInfo;
+			Dictionary<string, string> InputAttributes = new Dictionary<string, string>();
+			object Value;
+			bool Password;
+			StringBuilder Label = new StringBuilder();
+			StringBuilder Input = new StringBuilder();
+			bool LabelFirst;
+
+			foreach (MemberInfo MI in T.GetMembers(BindingFlags.Instance | BindingFlags.Public))
+			{
+				if (MI is FieldInfo FI)
+					Value = FI.GetValue(ClientRequest.Tag);
+				else if (MI is PropertyInfo PI)
+					Value = PI.GetValue(ClientRequest.Tag);
+				else
+					continue;
+
+				ParameterInfo = MI.GetCustomAttribute<McpParameterAttribute>(true);
+				Password = ParameterInfo is McpPasswordParameterAttribute;
+				InputAttributes.Clear();
+				LabelFirst = true;
+
+				if (MI.Name == "_p_" ||
+					MI.Name == "_r_" ||
+					MI.Name.EndsWith("_Binary") ||
+					MI.Name.EndsWith("_ContentType"))
+				{
+					throw new Exception("Reserved name: " + MI.Name);
+				}
+
+				InputAttributes["id"] = MI.Name;
+				InputAttributes["name"] = MI.Name;
+				InputAttributes["value"] = ParameterInfo?.GetHtmlAttributeValue(Value)
+					?? Value?.ToString() ?? string.Empty;
+
+				if (Value is double || Value is float || Value is decimal ||
+					Value is int || Value is long || Value is short || Value is sbyte ||
+					Value is uint || Value is ulong || Value is ushort || Value is byte)
+				{
+					InputAttributes["type"] = "number";
+					InputAttributes["step"] = "any";
+				}
+				else if (Value is bool)
+				{
+					InputAttributes.Remove("value");
+					InputAttributes["type"] = "checkbox";
+
+					if (Value is bool b && b)
+						InputAttributes["checked"] = "checked";
+
+					LabelFirst = false;
+				}
+				else if (Value is string s)
+					InputAttributes["type"] = "text";
+				else if (Value is TimeSpan)
+					InputAttributes["type"] = "time";
+				else if (Value is DateTime)
+					InputAttributes["type"] = "datetime-local";
+				else if (Value is Uri)
+					InputAttributes["type"] = "url";
+				else if (Value is SKColor)
+					InputAttributes["type"] = "color";
+				else
+					InputAttributes["type"] = "text";
+
+				ParameterInfo?.GetHtmlInputAttributes(InputAttributes);
+
+				Label.Clear();
+				Input.Clear();
+
+				Label.Append("<label for=\"");
+				Label.Append(MI.Name);
+				Label.Append("\">");
+				Label.Append(ParameterInfo?.Title ?? MI.Name);
+				Label.Append("</label>");
+
+				if (Value is Enum EnumValue)
+				{
+					Type EnumType = EnumValue.GetType();
+					IEnumerable<McpEnumValueAttribute> Options = MI.GetCustomAttributes<McpEnumValueAttribute>(true);
+
+					if (EnumType.IsDefined(typeof(FlagsAttribute)))
+						throw new NotImplementedException("Flagged enumerations are not yet supported in input forms."); // TODO:
+					else
+					{
+						InputAttributes.Remove("value");
+						Input.Append("<select");
+
+						foreach (KeyValuePair<string, string> P in InputAttributes)
+						{
+							Input.Append(' ');
+							Input.Append(P.Key);
+							Input.Append("=\"");
+							Input.Append(XML.HtmlAttributeEncode(P.Value));
+							Input.Append('"');
+						}
+
+						Input.AppendLine(">");
+
+						foreach (McpEnumValueAttribute Option in Options)
+						{
+							Input.Append("<option value=\"");
+							Input.Append(XML.HtmlAttributeEncode(Option.Value.ToString()));
+
+							if (Option.Value.Equals(EnumValue))
+								Input.Append("\" selected=\"selected");
+
+							Input.Append("\">");
+							Input.Append(XML.HtmlValueEncode(Option.Title));
+							Input.AppendLine("</option>");
+						}
+
+						Input.Append("</select>");
+					}
+				}
+				else if (Value is string[] ||
+					(Value is string s && s.IndexOfAny(CommonTypes.CRLF) >= 0))
+				{
+					InputAttributes.Remove("value");
+					Input.Append("<textarea");
+
+					foreach (KeyValuePair<string, string> P in InputAttributes)
+					{
+						Input.Append(' ');
+						Input.Append(P.Key);
+						Input.Append("=\"");
+						Input.Append(XML.HtmlAttributeEncode(P.Value));
+						Input.Append('"');
+					}
+
+					Input.Append(">");
+
+					if (Value is string[] Rows)
+					{
+						bool First = true;
+
+						foreach (string Row in Rows)
+						{
+							if (First)
+								First = false;
+							else
+								Input.AppendLine();
+
+							Input.Append(Row);
+						}
+					}
+					else
+						Input.Append(Value.ToString());
+
+					Input.AppendLine("</textarea>");
+				}
+				else
+				{
+					Input.Append("<input");
+
+					foreach (KeyValuePair<string, string> P in InputAttributes)
+					{
+						Input.Append(' ');
+						Input.Append(P.Key);
+						Input.Append("=\"");
+						Input.Append(XML.HtmlAttributeEncode(P.Value));
+						Input.Append('"');
+					}
+
+					Input.Append("/>");
+				}
+
+				Markdown.Append("<p>");
+
+				if (LabelFirst)
+				{
+					Markdown.Append(Label.ToString());
+					Markdown.AppendLine("  ");
+					Markdown.AppendLine(Input.ToString());
+				}
+				else
+				{
+					Markdown.AppendLine(Input.ToString());
+					Markdown.AppendLine(Label.ToString());
+				}
+
+				Markdown.AppendLine("</p>");
+				Markdown.AppendLine();
+			}
+
+			Markdown.AppendLine("<button id='OkButton' type='button'>OK</button>");
+			Markdown.AppendLine("<button id='CancelButton' type='button'>Cancel</button>");
+			Markdown.AppendLine("</form>");
+			Markdown.AppendLine();
+
+			string MarkdownForm = Markdown.ToString();
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(MarkdownForm,
+				new MarkdownSettings()
+				{
+					Variables = new Variables()
+				});
+
+			string Html = await Doc.GenerateHTML();
+
+			Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
+			Response.SetHeader("Pragma", "no-cache");
+			Response.SetHeader("X-Frame-Options", "DENY");
+			Response.SetHeader("Content-Security-Policy", "frame-ancestors 'none'; " +
+				"default-src 'self'; script-src 'self'; object-src 'none'; " +
+				"base-uri 'none'; form-action 'self'");
+
+			return new HtmlDocument(Html);
+		}
+
+		/// <summary>
+		/// Executes the POST method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public override async Task POST(HttpRequest Request, HttpResponse Response)
+		{
+			if (string.IsNullOrEmpty(Request.SubPath))
+			{
+				await base.POST(Request, Response);
+				return;
+			}
+
+			if (!Request.HasData)
+			{
+				await Response.SendResponse(new BadRequestException("Missing data."));
+				return;
+			}
+
+			string FormId = Request.SubPath[1..];
+			if (!this.TryGetRequest(FormId, out IJsonRpcClientRequest? ClientRequest))
+			{
+				await Response.SendResponse(new NotFoundException("Request not found: " + FormId));
+				return;
+			}
+
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError)
+			{
+				await Response.SendResponse(Content.Error);
+				return;
+			}
+
+			if (!(Content.Decoded is Dictionary<string, object> Form))
+			{
+				await Response.SendResponse(new BadRequestException("Expected form data."));
+				return;
+			}
+
+			if (!Form.TryGetValue("_p_", out object Obj) ||
+				!(Obj is string ParametersToken) ||
+				!JwtToken.TryParse(ParametersToken, out JwtToken ParsedToken) ||
+				!this.JwtFactory!.IsValid(ParsedToken) ||
+				ParsedToken.Id != ClientRequest.Id?.ToString() ||
+				ParsedToken.Subject != Request.RemoteEndPoint.RemovePortNumber())
+			{
+				await Response.SendResponse(new BadRequestException("Invalid parameters token."));
+				return;
+			}
+
+			if (!Form.TryGetValue("_r_", out Obj) ||
+				!(Obj is string ResponseString) ||
+				!CommonTypes.TryParse(ResponseString, out bool ResponseValue))
+			{
+				await Response.SendResponse(new BadRequestException("Invalid response."));
+				return;
+			}
+
+			string[] Keys = new string[Form.Count];
+			Form.Keys.CopyTo(Keys, 0);
+
+			foreach (string Key in Keys)
+			{
+				Form.Remove(Key + "_Binary");
+				Form.Remove(Key + "_ContentType");
+			}
+
+			Form.Remove("_p_");
+			Form.Remove("_r_");
+
+			if (ResponseValue)
+			{
+				await SetProperties(ClientRequest.Tag!, Form);
+				await ClientRequest.ReportResult(ClientRequest.Tag);
+			}
+			else
+				await ClientRequest.Cancel();
+
+			Response.StatusCode = 204;
+			Response.StatusMessage = "No Content";
 		}
 
 		/// <summary>
@@ -2181,6 +2588,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Elicits input from the user, if the client supports elicitation.
 		/// </summary>
+		/// <param name="HttpRequest">HTTP Request object.</param>
 		/// <param name="Message">Message to display to the user.</param>
 		/// <param name="InputRequest">Input request object.</param>
 		/// <param name="Sensitive">If information is sensitive.</param>
@@ -2189,77 +2597,122 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <returns>Returns true if used provided input (which will be stored in
 		/// <paramref name="InputRequest"/>, false if user declined to provide user
 		/// input, or null if request was cancelled or timed out.</returns>
-		public async Task<bool?> ElicitUserInput<T>(string Message, T InputRequest,
-			bool Sensitive, Session Session, int Timeout)
+		public async Task<bool?> ElicitUserInput<T>(HttpRequest HttpRequest,
+			string Message, T InputRequest, bool Sensitive, Session Session, int Timeout)
 			where T : class
 		{
 			if (Session.ClientCapabilities?.Elicitation is null)
 				throw new ServiceUnavailableException("MCP Client does not support elication of user input.");
 
+			Type InputType = typeof(T);
+			McpParameterAttribute? ParameterInfo = InputType.GetCustomAttribute<McpParameterAttribute>();
+			IEnumerable<McpEnumValueAttribute> EnumValues = InputType.GetCustomAttributes<McpEnumValueAttribute>();
+			object InputSchema = Tool.GenerateSchema(InputType, true, InputRequest,
+				ParameterInfo, EnumValues);
+			Dictionary<string, object?> ElicitationRequest;
+
 			if (Session.ClientCapabilities.Elicitation.Form && !Sensitive)
 			{
-				Type InputType = typeof(T);
-				McpParameterAttribute? ParameterInfo = InputType.GetCustomAttribute<McpParameterAttribute>();
-				IEnumerable<McpEnumValueAttribute> EnumValues = InputType.GetCustomAttributes<McpEnumValueAttribute>();
-				object InputSchema = Tool.GenerateSchema(InputType, true, InputRequest,
-					ParameterInfo, EnumValues);
-
-				JsonRpcClientRequest<bool?> Request = this.CreateRequest<bool?>(
-					"elicitation/create",
-					new Dictionary<string, object>()
-					{
-						{ "mode", "form" },
-						{ "message", Message },
-						{ "requestedSchema", InputSchema }
-					},
-					Session,
-					async Result =>
-					{
-						if (!(Result is Dictionary<string, object> ResultObj))
-							throw new BadRequestException("Invalid response.");
-
-						if (!ResultObj.TryGetValue("action", out object Obj) ||
-							!(Obj is string Action))
-						{
-							throw new BadRequestException("Expected action.");
-						}
-
-						switch (Action)
-						{
-							case "decline": return false;
-							case "cancel": return null;
-
-							case "accept":
-								if (!ResultObj.TryGetValue("content", out Obj))
-									throw new BadRequestException("Missing content.");
-
-								if (!(Obj is Dictionary<string, object> Properties))
-									throw new BadRequestException("Invalid content.");
-
-								await SetProperties(InputRequest, Properties);
-
-								return true;
-
-							default:
-								throw new Exception("Unexpected action: " + Action);
-						}
-					});
-
-				try
+				ElicitationRequest = new Dictionary<string, object?>()
 				{
-					return await Request.WaitForResultAsync(Timeout);
-				}
-				finally
-				{
-					Request.Dispose();
-				}
+					{ "mode", "form" },
+					{ "message", Message },
+					{ "requestedSchema", InputSchema }
+				};
 			}
-
-			if (Session.ClientCapabilities.Elicitation.Url)
+			else if (Session.ClientCapabilities.Elicitation.Url)
 			{
+				ElicitationRequest = new Dictionary<string, object?>()
+				{
+					{ "mode", "url" },
+					{ "message", Message }
+				};
+			}
+			else
+				throw new ServiceUnavailableException("Unable to elicit user input via URL.");
+
+			using JsonRpcClientRequest<bool?> Request = this.CreateRequest<bool?>(
+				Message, "elicitation/create", ElicitationRequest, Session,
+				async Result =>
+				{
+					if (!(Result is Dictionary<string, object> ResultObj))
+						throw new BadRequestException("Invalid response.");
+
+					if (!ResultObj.TryGetValue("action", out object Obj) ||
+						!(Obj is string Action))
+					{
+						throw new BadRequestException("Expected action.");
+					}
+
+					switch (Action)
+					{
+						case "decline": return false;
+						case "cancel": return null;
+
+						case "accept":
+							if (!ResultObj.TryGetValue("content", out Obj))
+								throw new BadRequestException("Missing content.");
+
+							if (!(Obj is Dictionary<string, object> Properties))
+								throw new BadRequestException("Invalid content.");
+
+							await SetProperties(InputRequest, Properties);
+
+							return true;
+
+						default:
+							throw new Exception("Unexpected action: " + Action);
+					}
+				},
+				HttpRequest);
+
+			Request.Tag = InputRequest;
+
+			if (!Session.ClientCapabilities.Elicitation.Form || Sensitive)
+			{
+				string Url = HttpRequest.Header.GetURL(false, false) + "/" + Request.Id;
+
+				ElicitationRequest["elicitationId"] = Request.Id;
+				ElicitationRequest["url"] = Url;
+
+				async Task Completed(object _, EventArgs e)
+				{
+					Dictionary<string, object> Notification = new Dictionary<string, object>()
+					{
+						{ "jsonrpc", "2.0" },
+						{ "method", "notifications/elicitation/complete" },
+						{ "params", new Dictionary<string, object?>()
+							{
+								{ "elicitationId", Request.Id }
+							}
+						}
+					};
+
+					await this.SendNotification(
+						Session2 =>
+						{
+							if (Session.SessionId != Session2?.SessionId)
+								return false;
+
+							Session2.TransmitText(JSON.Encode(Notification, false));
+
+							return true;
+						},
+						Notification);
+				}
+
+				Request.ResultReturned += Completed;
+				Request.ErrorReturned += Completed;
+				Request.Cancelled += Completed;
 			}
 
-			throw new ServiceUnavailableException("Unable to elicit user input.");
+			await Request.SendRequest();
+			return await Request.WaitForResultAsync(Timeout);
+		}
+
+		private void Request_ResultReturned(object sender, EventArgs e)
+		{
+			throw new System.NotImplementedException();
 		}
 
 		internal static async Task SetProperties(object Object, Dictionary<string, object> Properties)
@@ -2272,7 +2725,7 @@ namespace Waher.Networking.HTTP.Mcp
 				Dictionary<string, object>? SubProperties = Value as Dictionary<string, object>;
 				bool IsSubProperties = !(SubProperties is null);
 
-				FieldInfo? FI = T.GetField(P.Key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+				FieldInfo? FI = T.GetField(P.Key, BindingFlags.Public | BindingFlags.Instance);
 				if (!(FI is null))
 				{
 					if (IsSubProperties)
@@ -2301,7 +2754,7 @@ namespace Waher.Networking.HTTP.Mcp
 					continue;
 				}
 
-				PropertyInfo? PI = T.GetProperty(P.Key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+				PropertyInfo? PI = T.GetProperty(P.Key, BindingFlags.Public | BindingFlags.Instance);
 				if (!(PI is null))
 				{
 					if (IsSubProperties)

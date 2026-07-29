@@ -76,7 +76,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			foreach (MethodInfo Method in this.GetType().GetMethods(BindingFlags.Instance |
 				BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
 			{
-				if (Method.GetCustomAttribute<JsonRpcMethodAttribute>() is null)
+				if (!Method.IsDefined(typeof(JsonRpcMethodAttribute), true))
 					continue;
 					
 				this.RegisterMethod(Method, GetRequiredPrivileges(Method));
@@ -601,13 +601,16 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <summary>
 		/// Sends a request to the client, and waits for a response.
 		/// </summary>
+		/// <param name="Message">Message to user.</param>
 		/// <param name="Method">Method to call.</param>
 		/// <param name="Parameters">Parameters for the method.</param>
 		/// <param name="Session">Session to receive the request.</param>
 		/// <param name="ParseResult">Function to parse incoming results.</param>
+		/// <param name="HttpRequest">HTTP Request object.</param>
 		/// <returns>Request object.</returns>
-		public JsonRpcClientRequest<T> CreateRequest<T>(string Method, object? Parameters,
-			IJsonRpcSession Session, Func<object?, Task<T>> ParseResult)
+		public JsonRpcClientRequest<T> CreateRequest<T>(string Message, string Method, 
+			object? Parameters, IJsonRpcSession Session, Func<object?, Task<T>> ParseResult,
+			HttpRequest HttpRequest)
 		{
 			JsonRpcClientRequest<T> Request;
 			string Id;
@@ -620,13 +623,28 @@ namespace Waher.Networking.HTTP.JsonRpc
 				}
 				while (this.requests.ContainsKey(Id));
 
-				Request = new JsonRpcClientRequest<T>(Id, Method, Parameters, Session,
-					ParseResult, this);
+				Request = new JsonRpcClientRequest<T>(Message, Id, Method, Parameters, 
+					Session, ParseResult, this, HttpRequest);
 
 				this.requests[Id] = Request;
 			}
 
 			return Request;
+		}
+
+		/// <summary>
+		/// Tries to get a pending client request, given its ID.
+		/// </summary>
+		/// <param name="Id">ID of the request.</param>
+		/// <param name="Request">The request object, if found.</param>
+		/// <returns>True if the request was found; otherwise, false.</returns>
+		public bool TryGetRequest(string Id, 
+			[NotNullWhen(true)] out IJsonRpcClientRequest? Request)
+		{
+			lock (this.requests)
+			{
+				return this.requests.TryGetValue(Id, out Request);
+			}
 		}
 
 		/// <summary>
@@ -667,7 +685,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public async Task GET(HttpRequest Request, HttpResponse Response)
+		public virtual async Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.Header.IsAcceptable(HtmlCodec.DefaultContentType))
 			{
@@ -1442,7 +1460,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public async Task POST(HttpRequest Request, HttpResponse Response)
+		public virtual async Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			using JsonRpcServerRequest JsonRpcRequest = new JsonRpcServerRequest();
 
@@ -1603,6 +1621,27 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 				case "id":
 					Request.Id = Value;
+					break;
+
+				case "error":
+					Request.IsError = true;
+
+					if (Value is Dictionary<string, object> Error &&
+						Error.TryGetValue("code", out object Obj2) &&
+						Obj2 is int ErrorCode &&
+						Error.TryGetValue("message", out Obj2) &&
+						Obj2 is string ErrorMessage)
+					{
+						Request.SetError(ErrorCode, ErrorMessage,
+							ServiceUnavailableException.Code,
+							ServiceUnavailableException.StatusMessage);
+					}
+					else
+					{
+						Request.SetError(-32600, Value.ToString(),
+							ServiceUnavailableException.Code,
+							ServiceUnavailableException.StatusMessage);
+					}
 					break;
 
 				default:

@@ -108,5 +108,15 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 			if (!string.IsNullOrEmpty(this.ContentType))
 				Schema["mimeType"] = this.ContentType;
 		}
+
+		/// <summary>
+		/// Gets HTML input attributes for the parameter, if any.
+		/// </summary>
+		/// <param name="Attributes">Set of attributes.</param>
+		public override void GetHtmlInputAttributes(Dictionary<string, string> Attributes)
+		{
+			base.GetHtmlInputAttributes(Attributes);
+			Attributes["type"] = "url";
+		}
 	}
 }

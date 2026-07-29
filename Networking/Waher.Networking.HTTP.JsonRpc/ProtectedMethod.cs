@@ -79,7 +79,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 						throw new ArgumentException("Only one argument of type HttpResponse is allowed.", nameof(Method));
 				}
 				else if (P.ParameterType == typeof(Dictionary<string, object?>) &&
-					!(P.GetCustomAttribute<JsonRpcMetaDataArgumentAttribute>(true) is null))
+					P.IsDefined(typeof(JsonRpcMetaDataArgumentAttribute), true))
 				{
 					if (this.MetaDataArgument is null)
 					{
@@ -91,7 +91,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 					else
 						throw new ArgumentException("Only one meta-data argument is allowed.", nameof(Method));
 				}
-				else if (!(P.GetCustomAttribute<JsonRpcIdAttribute>(true) is null))
+				else if (P.IsDefined(typeof(JsonRpcIdAttribute), true))
 				{
 					if (this.IdArgument is null)
 					{

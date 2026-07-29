@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using Waher.Script;
 
@@ -95,6 +94,19 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 
 				return sb.ToString();
 			}
+		}
+
+		/// <summary>
+		/// Gets HTML input attributes for the parameter, if any.
+		/// </summary>
+		/// <param name="Attributes">Set of attributes.</param>
+		public override void GetHtmlInputAttributes(Dictionary<string, string> Attributes)
+		{
+			if (!(this.MinValue is null))
+				Attributes["min"] = this.GetHtmlAttributeValue(this.MinValue);
+
+			if (!(this.MaxValue is null))
+				Attributes["max"] = this.GetHtmlAttributeValue(this.MaxValue);
 		}
 	}
 }

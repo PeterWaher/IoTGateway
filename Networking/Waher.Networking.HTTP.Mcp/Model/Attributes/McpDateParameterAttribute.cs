@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Waher.Content.Xml;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 {
@@ -30,6 +31,29 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 			base.Annotate(Schema);
 
 			Schema["format"] = "date";
+		}
+
+		/// <summary>
+		/// Gets HTML input attributes for the parameter, if any.
+		/// </summary>
+		/// <param name="Attributes">Set of attributes.</param>
+		public override void GetHtmlInputAttributes(Dictionary<string, string> Attributes)
+		{
+			base.GetHtmlInputAttributes(Attributes);
+			Attributes["type"] = "date";
+		}
+
+		/// <summary>
+		/// Gets the HTML attribute value for a parameter, if any.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>HTML attribute value</returns>
+		public override string GetHtmlAttributeValue(object Value)
+		{
+			if (Value is DateTime TP)
+				return XML.Encode(TP, true);
+			else
+				return base.GetHtmlAttributeValue(Value);
 		}
 	}
 }

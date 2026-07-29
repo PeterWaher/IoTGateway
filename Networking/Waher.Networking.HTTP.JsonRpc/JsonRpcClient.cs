@@ -13,8 +13,6 @@ using Waher.Security;
 
 namespace Waher.Networking.HTTP.JsonRpc
 {
-	// TODO: Custom authentication (e.g. Bearer JWT, WWW-Authenticate)
-
 	/// <summary>
 	/// A JSON-RPC client
 	/// </summary>

@@ -51,5 +51,25 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// </summary>
 		public virtual string AnnotatedDescription => MarkdownDocument.Encode(
 			this.Description ?? this.Title ?? string.Empty);
+
+		/// <summary>
+		/// Gets HTML input attributes for the parameter, if any.
+		/// </summary>
+		/// <param name="Attributes">Set of attributes.</param>
+		public virtual void GetHtmlInputAttributes(Dictionary<string, string> Attributes)
+		{
+			if (!string.IsNullOrEmpty(this.Description))
+				Attributes["title"] = this.Description;
+		}
+
+		/// <summary>
+		/// Gets the HTML attribute value for a parameter, if any.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>HTML attribute value</returns>
+		public virtual string GetHtmlAttributeValue(object Value)
+		{
+			return Value?.ToString() ?? string.Empty;
+		}
 	}
 }

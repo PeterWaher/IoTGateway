@@ -29,6 +29,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public string? ErrorMessage = null;
 		public object? Result = null;
 		public bool IsResult = false;
+		public bool IsError = false;
 
 		public void SetError(int ErrorCode, string ErrorMessage, int StatusCode,
 			string StatusMessage)
@@ -89,7 +90,20 @@ namespace Waher.Networking.HTTP.JsonRpc
 				await Request.ReportResult(this.Result);
 				return false;
 			}
-			
+			else if (this.IsError && !(this.Id is null))
+			{
+				IJsonRpcClientRequest? Request = WebService.PopClientRequest(this.Id.ToString());
+				if (Request is null)
+				{
+					this.SetError(-32600, "Id attribute not recognized or obsolete.",
+						NotFoundException.Code, NotFoundException.StatusMessage);
+					return false;
+				}
+
+				await Request.ReportError(this.ErrorCode, this.ErrorMessage ?? "Unable to perform request.");
+				return false;
+			}
+
 			if (this.BatchRequests is null)
 			{
 				this.ResponseObject = new Dictionary<string, object?>();

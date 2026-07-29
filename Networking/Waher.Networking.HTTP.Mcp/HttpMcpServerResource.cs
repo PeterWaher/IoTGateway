@@ -25,7 +25,6 @@ using Waher.Runtime.Counters;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Script;
-using Waher.Script.Functions.ComplexNumbers;
 using Waher.Script.Model;
 using Waher.Security;
 using Waher.Security.JWT;
@@ -232,13 +231,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// If a Server-Sent Events (SSE) welcome message should be sent to clients 
 		/// with open subscriptions.
 		/// </summary>
-		public override bool SendSseWelcomeMessage => true;
-
-		/// <summary>
-		/// Server-Sent Events (SSE) welcome message, if one should be sent.
-		/// </summary>
-		public override string SseWelcomeMessage => "Connected to MCP Server at " +
-			this.ResourceName + ". This connection should be made using an MCP Client.";
+		public override bool SendSseWelcomeMessage => false;
 
 		/// <summary>
 		/// Name of server.

@@ -14,13 +14,13 @@ namespace Waher.Networking.HTTP.JsonRpc
 		private readonly JsonRpcWebService webService;
 		private readonly IJsonRpcSession session;
 		private readonly TaskCompletionSource<T> result;
-		private readonly Func<object?, T> parseResult;
+		private readonly Func<object?, Task<T>> parseResult;
 		private readonly string method;
 		private readonly object? parameters;
 		private bool processed = false;
 
 		internal JsonRpcClientRequest(object? Id, string Method, object? Parameters,
-			IJsonRpcSession Session, Func<object?, T> ParseResult,
+			IJsonRpcSession Session, Func<object?, Task<T>> ParseResult,
 			JsonRpcWebService WebService)
 		{
 			this.Id = Id;
@@ -41,11 +41,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// Called when a result is received for the request.
 		/// </summary>
 		/// <param name="Result">Result of the request.</param>
-		public void ReportResult(object? Result)
+		public async Task ReportResult(object? Result)
 		{
 			try
 			{
-				T ParsedResult = this.parseResult(Result);
+				T ParsedResult = await this.parseResult(Result);
 				this.Return(ParsedResult);
 			}
 			catch (Exception ex)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.JsonRpc
 {
@@ -16,6 +17,6 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// Called when a result is received for the request.
 		/// </summary>
 		/// <param name="Result">Result of the request.</param>
-		void ReportResult(object? Result);
+		Task ReportResult(object? Result);
 	}
 }

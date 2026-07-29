@@ -86,7 +86,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 					return false;
 				}
 
-				Request.ReportResult(this.Result);
+				await Request.ReportResult(this.Result);
 				return false;
 			}
 			

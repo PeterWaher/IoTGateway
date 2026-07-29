@@ -607,7 +607,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="ParseResult">Function to parse incoming results.</param>
 		/// <returns>Request object.</returns>
 		public JsonRpcClientRequest<T> CreateRequest<T>(string Method, object? Parameters,
-			IJsonRpcSession Session, Func<object?, T> ParseResult)
+			IJsonRpcSession Session, Func<object?, Task<T>> ParseResult)
 		{
 			JsonRpcClientRequest<T> Request;
 			string Id;

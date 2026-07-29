@@ -999,10 +999,10 @@ namespace Waher.Mcp.Files
 				Contents, false, Session, 5 * 60 * 1000);
 
 			if (!Result.HasValue)
-				throw new RequestTimeoutException("User input expected.");
+				throw new Exception("User input expected.");
 
 			if (!Result.Value)
-				throw new FailedDependencyException("User declined to provide input.");
+				throw new Exception("User declined to provide input.");
 
 			string BaseUri = Request.Header.GetURL(false, false);
 			string Uri = CreateFileUrl(BaseUri, LocalFileName);

@@ -24,6 +24,8 @@ using Waher.Runtime.Collections;
 using Waher.Runtime.Counters;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
+using Waher.Script;
+using Waher.Script.Functions.ComplexNumbers;
 using Waher.Script.Model;
 using Waher.Security;
 using Waher.Security.JWT;
@@ -2218,7 +2220,7 @@ namespace Waher.Networking.HTTP.Mcp
 						{ "requestedSchema", InputSchema }
 					},
 					Session,
-					Result =>
+					async Result =>
 					{
 						if (!(Result is Dictionary<string, object> ResultObj))
 							throw new BadRequestException("Invalid response.");
@@ -2238,7 +2240,11 @@ namespace Waher.Networking.HTTP.Mcp
 								if (!ResultObj.TryGetValue("content", out Obj))
 									throw new BadRequestException("Missing content.");
 
-								throw new NotImplementedException();
+								if (!(Obj is Dictionary<string, object> Properties))
+									throw new BadRequestException("Invalid content.");
+
+								await SetProperties(InputRequest, Properties);
+
 								return true;
 
 							default:
@@ -2263,5 +2269,76 @@ namespace Waher.Networking.HTTP.Mcp
 			throw new ServiceUnavailableException("Unable to elicit user input.");
 		}
 
+		internal static async Task SetProperties(object Object, Dictionary<string, object> Properties)
+		{
+			Type T = Object.GetType();
+
+			foreach (KeyValuePair<string, object> P in Properties)
+			{
+				object Value = P.Value;
+				Dictionary<string, object>? SubProperties = Value as Dictionary<string, object>;
+				bool IsSubProperties = !(SubProperties is null);
+
+				FieldInfo? FI = T.GetField(P.Key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+				if (!(FI is null))
+				{
+					if (IsSubProperties)
+					{
+						object? Item = FI.GetValue(Object);
+
+						if (Item is null)
+						{
+							Item = Types.Create(false, FI.FieldType);
+							FI.SetValue(Object, Item);
+						}
+
+						await SetProperties(Item, SubProperties!);
+					}
+					else if (Value is null || FI.FieldType.IsAssignableFrom(Value.GetType()))
+						FI.SetValue(Object, Value);
+					else if (Expression.TryConvert(Value, FI.FieldType, true, out object Value2))
+						FI.SetValue(Object, Value2);
+					else
+					{
+						throw new InvalidCastException("Unable to convert value of type " +
+							Value.GetType().FullName + " to " +
+							FI.FieldType.FullName + ".");
+					}
+
+					continue;
+				}
+
+				PropertyInfo? PI = T.GetProperty(P.Key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+				if (!(PI is null))
+				{
+					if (IsSubProperties)
+					{
+						object? Item = PI.GetValue(Object);
+
+						if (Item is null)
+						{
+							Item = Types.Create(false, PI.PropertyType);
+							PI.SetValue(Object, Item);
+						}
+
+						await SetProperties(Item, SubProperties!);
+					}
+					else if (Value is null || PI.PropertyType.IsAssignableFrom(Value.GetType()))
+						PI.SetValue(Object, Value);
+					else if (Expression.TryConvert(Value, PI.PropertyType, true, out object Value2))
+						PI.SetValue(Object, Value2);
+					else
+					{
+						throw new InvalidCastException("Unable to convert value of type " +
+							Value.GetType().FullName + " to " +
+							PI.PropertyType.FullName + ".");
+					}
+
+					continue;
+				}
+
+				throw new InvalidOperationException("Unrecognized field ro property name: " + P.Key);
+			}
+		}
 	}
 }

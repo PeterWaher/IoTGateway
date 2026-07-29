@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Waher.Content;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp;
@@ -14,7 +15,6 @@ using Waher.Networking.HTTP.Mcp.Model.Resources;
 using Waher.Networking.HTTP.Mcp.Model.Server;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
-using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Collections;
 using Waher.Runtime.IO;
@@ -983,6 +983,8 @@ namespace Waher.Mcp.Files
 
 			AssertLocalFileNameOk(LocalFileName);
 
+			string BaseUri = Request.Header.GetURL(false, false);
+			string Uri = CreateFileUrl(BaseUri, LocalFileName);
 			string FullFileName = Path.Combine(this.rootFolder, UserName, LocalFileName);
 			if (!File.Exists(FullFileName))
 				throw new NotFoundException("File not found.");
@@ -990,25 +992,47 @@ namespace Waher.Mcp.Files
 			Session? Session = await this.TryGetMcpSession(Request, Response)
 				?? throw new ForbiddenException("No MCP session active.");
 
-			TextContents Contents = new TextContents()
+			InternetContent.TryGetContentType(Path.GetExtension(LocalFileName), out string? ContentType);
+
+			if (FileResource.IsTextFile(ContentType))
 			{
-				FileContents = await Runtime.IO.Files.ReadAllTextAsync(FullFileName)
-			};
+				TextContents Contents = new TextContents()
+				{
+					FileContents = await Runtime.IO.Files.ReadAllTextAsync(FullFileName)
+				};
 
-			bool? Result = await this.ElicitUserInput("Edit the contents of the following file.",
-				Contents, false, Session, 5 * 60 * 1000);
+				bool? Result = await this.ElicitUserInput("Edit the contents of the following text file.",
+					Contents, false, Session, 5 * 60 * 1000);
 
-			if (!Result.HasValue)
-				throw new Exception("User input expected.");
+				if (!Result.HasValue)
+					throw new Exception("User input expected.");
 
-			if (!Result.Value)
-				throw new Exception("User declined to provide input.");
+				if (!Result.Value)
+					throw new Exception("User declined to provide input.");
 
-			string BaseUri = Request.Header.GetURL(false, false);
-			string Uri = CreateFileUrl(BaseUri, LocalFileName);
+				await Runtime.IO.Files.WriteAllTextAsync(FullFileName, Contents.FileContents,
+					Strings.Utf8WithBom);
+			}
+			else
+			{
+				BinaryContents Contents = new BinaryContents()
+				{
+					FileContents = Convert.ToBase64String(
+						await Runtime.IO.Files.ReadAllBytesAsync(FullFileName))
+				};
 
-			await Runtime.IO.Files.WriteAllTextAsync(FullFileName, Contents.FileContents,
-				Strings.Utf8WithBom);
+				bool? Result = await this.ElicitUserInput("Edit the BASE64-encoded contents of the following binary file.",
+					Contents, false, Session, 5 * 60 * 1000);
+
+				if (!Result.HasValue)
+					throw new Exception("User input expected.");
+
+				if (!Result.Value)
+					throw new Exception("User declined to provide input.");
+
+				await Runtime.IO.Files.WriteAllBytesAsync(FullFileName,
+					Convert.FromBase64String(Contents.FileContents));
+			}
 
 			return Uri;
 		}
@@ -1016,6 +1040,12 @@ namespace Waher.Mcp.Files
 		private class TextContents
 		{
 			[McpStringParameter("Text", "Text contents of the file being edited.")]
+			public string? FileContents;
+		}
+
+		private class BinaryContents
+		{
+			[McpStringParameter("Binary", "BASE-64-encoded Binary contents of the file being edited.")]
 			public string? FileContents;
 		}
 

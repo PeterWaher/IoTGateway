@@ -3,6 +3,7 @@
 namespace Waher.Networking.HTTP.JsonRpc.MetaData
 {
 	/// <summary>
+	/// Provides a name to be used in documentation.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 	public class JsonRpcDocNameAttribute : Attribute

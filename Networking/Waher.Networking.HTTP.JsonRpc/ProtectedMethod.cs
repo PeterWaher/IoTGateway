@@ -38,6 +38,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			ParameterInfo[] Arguments = Method.GetParameters();
 			bool IsSpecialArgument;
 			bool IsMetaDataArgument;
+			bool IsIdArgument;
 			this.Method = Method;
 			this.NrArguments = Arguments.Length;
 			this.NrSpecialArguments = 0;
@@ -53,6 +54,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			foreach (ParameterInfo P in Arguments)
 			{
 				IsMetaDataArgument = false;
+				IsIdArgument = false;
 
 				if (P.ParameterType == typeof(HttpRequest))
 				{
@@ -89,6 +91,18 @@ namespace Waher.Networking.HTTP.JsonRpc
 					else
 						throw new ArgumentException("Only one meta-data argument is allowed.", nameof(Method));
 				}
+				else if (!(P.GetCustomAttribute<JsonRpcIdAttribute>(true) is null))
+				{
+					if (this.IdArgument is null)
+					{
+						this.IdArgument = P.Position;
+						this.NrSpecialArguments++;
+						IsSpecialArgument = true;
+						IsIdArgument = true;
+					}
+					else
+						throw new ArgumentException("Only one ID argument is allowed.", nameof(Method));
+				}
 				else
 				{
 					this.NamedArguments[P.Name] = P.Position;
@@ -97,7 +111,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 				this.Arguments[P.Position] = new ProtectedMethodArgumentInfo(P, IsSpecialArgument,
 					P.HasDefaultValue, P.HasDefaultValue ? P.DefaultValue : null,
-					IsMetaDataArgument);
+					IsMetaDataArgument, IsIdArgument);
 			}
 
 			this.Documentation = GetDocumentation(Method);
@@ -174,6 +188,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// Meta-data argument index
 		/// </summary>
 		public int? MetaDataArgument { get; }
+
+		/// <summary>
+		/// ID argument index
+		/// </summary>
+		public int? IdArgument { get; }
 
 		/// <summary>
 		/// Arguments
@@ -271,13 +290,14 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <summary>
 		/// Tries to build a request for the method, based on the provided named parameters.
 		/// </summary>
+		/// <param name="Id">ID of request.</param>
 		/// <param name="Parameters">Named parameters.</param>
 		/// <param name="MetaData">Additional Meta-Data available for the request.</param>
 		/// <param name="Reason">Reason for not being able to create request.</param>
 		/// <param name="Arguments">Ordered set of typed arguments, to be used in a
 		/// call to the method.</param>
 		/// <returns>If able to prepare a request to the method.</returns>
-		public bool TryBuildRequest(Dictionary<string, object?> Parameters,
+		public bool TryBuildRequest(object? Id, Dictionary<string, object?> Parameters,
 			Dictionary<string, object?>? MetaData,
 			[NotNullWhen(false)] out string? Reason,
 			[NotNullWhen(true)] out object?[]? Arguments)
@@ -332,6 +352,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 						Value = MetaDataValue;
 					}
 				}
+				else if (ArgumentInfo.IsIdArgument)
+					Value = Id;
 
 				if (ParameterType == ExpectedType)
 					Arguments[i] = Value;

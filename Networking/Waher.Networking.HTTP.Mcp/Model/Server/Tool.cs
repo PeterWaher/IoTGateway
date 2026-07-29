@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP.JsonRpc;
+using Waher.Networking.HTTP.JsonRpc.MetaData;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Networking.HTTP.Mcp.Model.ContentBlocks;
 using Waher.Persistence;
@@ -259,7 +260,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// </summary>
 		/// <param name="Method">Method information.</param>
 		/// <returns>Input Schema</returns>
-		private static Dictionary<string, object> GenerateSchema(MethodInfo Method)
+		internal static Dictionary<string, object> GenerateSchema(MethodInfo Method)
 		{
 			ParameterInfo[] Parameters = Method.GetParameters();
 			Dictionary<string, object> Result = new Dictionary<string, object>()
@@ -303,7 +304,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			return Result;
 		}
 
-		private static Dictionary<string, object> GenerateOutputSchema(Type ReturnType,
+		internal static Dictionary<string, object> GenerateOutputSchema(Type ReturnType,
 			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute>? EnumValues)
 		{
 			Dictionary<string, object> Result = new Dictionary<string, object>()
@@ -331,7 +332,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <param name="ParameterInfo">Parameter information.</param>
 		/// <param name="EnumValues">Enumeration values.</param>
 		/// <returns>Schema element.</returns>
-		private static object GenerateSchema(Type T, bool HasDefault, object? Default,
+		internal static object GenerateSchema(Type T, bool HasDefault, object? Default,
 			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute>? EnumValues)
 		{
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
@@ -438,7 +439,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 								IEnumerable<McpEnumValueAttribute>? EnumValues2 = FieldType.IsEnum ?
 									FI.GetCustomAttributes<McpEnumValueAttribute>(true) : null;
 
-								Properties[FI.Name] = GenerateSchema(FieldType, false, null, FieldInfo, EnumValues2);
+								object? FieldDefault = Default is null ? null : FI.GetValue(Default);
+								Properties[FI.Name] = GenerateSchema(FieldType, !(Default is null), 
+									FieldDefault, FieldInfo, EnumValues2);
 							}
 
 							foreach (PropertyInfo PI in T.GetProperties(BindingFlags.Public | BindingFlags.Instance))
@@ -448,7 +451,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 								IEnumerable<McpEnumValueAttribute>? EnumValues2 = PropertyType.IsEnum ?
 									PI.GetCustomAttributes<McpEnumValueAttribute>(true) : null;
 
-								Properties[PI.Name] = GenerateSchema(PropertyType, false, null, PropertyInfo, EnumValues2);
+								object? PropertyDefault = Default is null ? null : PI.GetValue(Default);
+								Properties[PI.Name] = GenerateSchema(PropertyType, !(Default is null), 
+									PropertyDefault, PropertyInfo, EnumValues2);
 							}
 						}
 						break;
@@ -543,6 +548,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <summary>
 		/// Tries to build a request for the method, based on the provided named parameters.
 		/// </summary>
+		/// <param name="Id">ID of request.</param>
 		/// <param name="Parameters">Named parameters.</param>
 		/// <param name="Request">HTTP Request object.</param>
 		/// <param name="Response">HTTP Response object.</param>
@@ -551,13 +557,13 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <param name="Arguments">Ordered set of typed arguments, to be used in a
 		/// call to the method.</param>
 		/// <returns>If able to prepare a request to the method.</returns>
-		public bool TryBuildRequest(Dictionary<string, object?> Parameters,
+		public bool TryBuildRequest(object? Id, Dictionary<string, object?> Parameters,
 			HttpRequest Request, HttpResponse Response,
 			Dictionary<string, object?>? MetaData,
 			[NotNullWhen(false)] out string? Reason,
 			[NotNullWhen(true)] out object?[]? Arguments)
 		{
-			if (!this.TryBuildRequest(Parameters, MetaData, out Reason, out Arguments))
+			if (!this.TryBuildRequest(Id, Parameters, MetaData, out Reason, out Arguments))
 				return false;
 
 			if (this.RequestArgument.HasValue)
@@ -565,6 +571,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 
 			if (this.ResponseArgument.HasValue)
 				Arguments[this.ResponseArgument.Value] = Response;
+
+			if (this.IdArgument.HasValue)
+				Arguments[this.IdArgument.Value] = Id;
 
 			return true;
 		}

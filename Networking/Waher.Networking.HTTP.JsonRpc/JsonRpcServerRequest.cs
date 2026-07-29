@@ -28,6 +28,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public string StatusMessage = "No Content";
 		public string? ErrorMessage = null;
 		public object? Result = null;
+		public bool IsResult = false;
 
 		public void SetError(int ErrorCode, string ErrorMessage, int StatusCode,
 			string StatusMessage)
@@ -68,6 +69,27 @@ namespace Waher.Networking.HTTP.JsonRpc
 		{
 			bool HasSniffer = HttpRequest.Server.HasSniffers;
 
+			if (this.IsResult)
+			{
+				if (this.Id is null)
+				{
+					this.SetError(-32600, "Missing id attribute.",
+						BadRequestException.Code, BadRequestException.StatusMessage);
+					return false;
+				}
+
+				IJsonRpcClientRequest? Request = WebService.PopClientRequest(this.Id.ToString());
+				if (Request is null)
+				{
+					this.SetError(-32600, "Id attribute not recognized or obsolete.",
+						NotFoundException.Code, NotFoundException.StatusMessage);
+					return false;
+				}
+
+				Request.ReportResult(this.Result);
+				return false;
+			}
+			
 			if (this.BatchRequests is null)
 			{
 				this.ResponseObject = new Dictionary<string, object?>();
@@ -94,8 +116,10 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 						if (!(this.ParametersObj is null))
 						{
-							if (!this.MethodInfo.TryBuildRequest(this.ParametersObj, null,
-								out string? Reason, out Parameters))
+							if (!this.MethodInfo.TryBuildRequest(
+								this.Id?.ToString() ?? string.Empty,
+								this.ParametersObj, null, out string? Reason,
+								out Parameters))
 							{
 								this.SetError(-32602, Reason,
 									BadRequestException.Code, BadRequestException.StatusMessage);
@@ -175,6 +199,9 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 								if (this.MethodInfo.ResponseArgument.HasValue)
 									Parameters[this.MethodInfo.ResponseArgument.Value] = HttpResponse;
+
+								if (this.MethodInfo.IdArgument.HasValue)
+									Parameters[this.MethodInfo.IdArgument.Value] = this.Id;
 							}
 
 							if (HasSniffer)

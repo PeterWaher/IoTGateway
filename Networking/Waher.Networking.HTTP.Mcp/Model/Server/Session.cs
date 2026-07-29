@@ -149,7 +149,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// Text has been transmitted to the client.
 		/// </summary>
 		/// <param name="Text">Transmitted text.</param>
-		internal void TransmitText(string Text)
+		public void TransmitText(string Text)
 		{
 			if (this.hasSnifferSet)
 			{

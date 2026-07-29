@@ -9,5 +9,11 @@
 		/// Session ID
 		/// </summary>
 		string SessionId { get; }
+
+		/// <summary>
+		/// Is called when text has been transmitted.
+		/// </summary>
+		/// <param name="Text">Transmitted text.</param>
+		void TransmitText(string Text);
 	}
 }

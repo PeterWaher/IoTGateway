@@ -16,14 +16,17 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="HasDefaultValue">If the argument has a default value.</param>
 		/// <param name="DefaultValue">Default value of argument, if defined.</param>
 		/// <param name="IsMetaDataArgument">If the argument represents a meta-data argument.</param>
+		/// <param name="IsIdArgument">If the argument represents an ID argument.</param>
 		public ProtectedMethodArgumentInfo(ParameterInfo Parameter, bool IsSpecialArgument, 
-			bool HasDefaultValue, object? DefaultValue, bool IsMetaDataArgument)
+			bool HasDefaultValue, object? DefaultValue, bool IsMetaDataArgument,
+			bool IsIdArgument)
 		{
 			this.Parameter = Parameter;
 			this.IsSpecialArgument = IsSpecialArgument;
 			this.HasDefaultValue = HasDefaultValue;
 			this.DefaultValue = DefaultValue;
 			this.IsMetaDataArgument = IsMetaDataArgument;
+			this.IsIdArgument = IsIdArgument;
 			this.Documentation = ProtectedMethod.GetDocumentation(Parameter);
 		}
 
@@ -53,6 +56,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public bool IsMetaDataArgument { get; }
 
 		/// <summary>
+		/// If the argument represents an ID argument.
+		/// </summary>
+		public bool IsIdArgument { get; }
+
+		/// <summary>
 		/// Available documentation for the method argument. Value represents documentation 
 		/// text, and Key represents if the documentation is in Markdown format (true) or 
 		/// plain text (false).
@@ -65,6 +73,5 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// plain text (false).
 		/// </summary>
 		public KeyValuePair<bool, string>[]? AdditionalDocumentation { get; set; }
-
 	}
 }

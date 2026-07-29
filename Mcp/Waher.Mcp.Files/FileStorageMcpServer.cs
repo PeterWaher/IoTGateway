@@ -14,6 +14,7 @@ using Waher.Networking.HTTP.Mcp.Model.Resources;
 using Waher.Networking.HTTP.Mcp.Model.Server;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
+using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Collections;
 using Waher.Runtime.IO;
@@ -38,6 +39,7 @@ namespace Waher.Mcp.Files
 		internal const string UpdatePrivilege = ToolsPrivilege + ".Update";
 		internal const string DeletePrivilege = ToolsPrivilege + ".Delete";
 		internal const string SearchPrivilege = ToolsPrivilege + ".Search";
+		internal const string EditPrivilege = ToolsPrivilege + ".Edit";
 
 		private readonly Dictionary<string, UsageRec> users;
 		private readonly string rootFolder;
@@ -944,6 +946,77 @@ namespace Waher.Mcp.Files
 			}
 
 			return new SearchResult(c, AllFiles.Length, Pattern, Files, ResourceUris);
+		}
+
+		/// <summary>
+		/// Edits a file in account-specific file storage.
+		/// </summary>
+		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Response">HTTP Response object.</param>
+		/// <param name="LocalFileName">Local file name. Must not contain double period 
+		/// characters or begin with a path character, to attempt to escape file 
+		/// storage area. File extension must match Internet Content-Type of file 
+		/// contents.</param>
+		/// <returns>URI of updated file resource.</returns>
+		[McpServerTool(
+			"Edit",  // Title
+			"Edits a file in account-specific file storage.",   // Description
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			true,   // CanDestroyEnvironment
+			false,  // Idempotent
+			false)] // OpenWorldAccess
+		[RequiredPrivilege(EditPrivilege)]
+		[return: McpParameter("Result", "URI of updated file resource.")]
+		public async Task<string> EditFile(
+			HttpRequest Request, HttpResponse Response,
+
+			[McpStringParameter("Local File Name", "Local file name. Must not contain " +
+			"double period characters or begin with a path character, to attempt to " +
+			"escape file storage area. File extension must match Internet Content-Type " +
+			"of file contents.", 3, 256)]
+			string LocalFileName)
+		{
+			string? UserName = Request.User?.UserName;
+			if (string.IsNullOrEmpty(UserName))
+				throw new ForbiddenException("User not authenticated.");
+
+			AssertLocalFileNameOk(LocalFileName);
+
+			string FullFileName = Path.Combine(this.rootFolder, UserName, LocalFileName);
+			if (!File.Exists(FullFileName))
+				throw new NotFoundException("File not found.");
+
+			Session? Session = await this.TryGetMcpSession(Request, Response)
+				?? throw new ForbiddenException("No MCP session active.");
+
+			TextContents Contents = new TextContents()
+			{
+				FileContents = await Runtime.IO.Files.ReadAllTextAsync(FullFileName)
+			};
+
+			bool? Result = await this.ElicitUserInput("Edit the contents of the following file.",
+				Contents, false, Session, 5 * 60 * 1000);
+
+			if (!Result.HasValue)
+				throw new RequestTimeoutException("User input expected.");
+
+			if (!Result.Value)
+				throw new FailedDependencyException("User declined to provide input.");
+
+			string BaseUri = Request.Header.GetURL(false, false);
+			string Uri = CreateFileUrl(BaseUri, LocalFileName);
+
+			await Runtime.IO.Files.WriteAllTextAsync(FullFileName, Contents.FileContents,
+				Strings.Utf8WithBom);
+
+			return Uri;
+		}
+
+		private class TextContents
+		{
+			[McpStringParameter("Text", "Text contents of the file being edited.")]
+			public string? FileContents;
 		}
 
 	}

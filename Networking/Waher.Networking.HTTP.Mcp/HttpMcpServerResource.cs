@@ -633,7 +633,13 @@ namespace Waher.Networking.HTTP.Mcp
 			await Response.SendResponse();
 		}
 
-		private async Task<Session?> TryGetMcpSession(HttpRequest Request, HttpResponse Response)
+		/// <summary>
+		/// Tries to get an MCP session object for the resource, if any.
+		/// </summary>
+		/// <param name="Request">HTTP Request object</param>
+		/// <param name="Response">HTTP Response object</param>
+		/// <returns>Session object, if any.</returns>
+		protected async Task<Session?> TryGetMcpSession(HttpRequest Request, HttpResponse Response)
 		{
 			return await this.TryGetSession(Request, Response) as Session;
 		}
@@ -876,6 +882,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Calls an MCP server tool.
 		/// </summary>
+		/// <param name="Id">ID of request.</param>
 		/// <param name="Request">HTTP request object.</param>
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="Name">Name of the tool to call.</param>
@@ -893,7 +900,7 @@ namespace Waher.Networking.HTTP.Mcp
 		[JsonRpcDocName("tools/call")]
 		[return: JsonRpcDocumentation("Dictionary containing the result of the tool call.")]
 		protected async Task<Dictionary<string, object?>?> Tools_Call(
-			HttpRequest Request, HttpResponse Response,
+			[JsonRpcId] object? Id, HttpRequest Request, HttpResponse Response,
 
 			[JsonRpcDocumentation("Name of the tool to call.")]
 			string Name,
@@ -977,7 +984,7 @@ namespace Waher.Networking.HTTP.Mcp
 
 				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 
-				if (Tool.TryBuildRequest(Arguments, Request, Response, MetaData,
+				if (Tool.TryBuildRequest(Id, Arguments, Request, Response, MetaData,
 					out string? Reason, out object?[]? Arguments2))
 				{
 					ToolResult = await ScriptNode.WaitPossibleTask(
@@ -1192,6 +1199,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Gets an MCP server prompt.
 		/// </summary>
+		/// <param name="Id">ID of request.</param>
 		/// <param name="Request">HTTP request object.</param>
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="Name">Name of the prompt to call.</param>
@@ -1203,7 +1211,7 @@ namespace Waher.Networking.HTTP.Mcp
 		[JsonRpcDocName("prompts/get")]
 		[return: JsonRpcDocumentation("Dictionary containing the prompt.")]
 		protected async Task<Dictionary<string, object?>?> Prompts_Get(
-			HttpRequest Request, HttpResponse Response,
+			[JsonRpcId] object? Id, HttpRequest Request, HttpResponse Response,
 
 			[JsonRpcDocumentation("Name of the prompt to call.")]
 			string Name,
@@ -1274,7 +1282,7 @@ namespace Waher.Networking.HTTP.Mcp
 
 				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 
-				if (Prompt.TryBuildRequest(Arguments, Request, Response, MetaData,
+				if (Prompt.TryBuildRequest(Id, Arguments, Request, Response, MetaData,
 					out string? Reason, out object?[]? Arguments2))
 				{
 					PromptResult = await ScriptNode.WaitPossibleTask(
@@ -2173,5 +2181,87 @@ namespace Waher.Networking.HTTP.Mcp
 
 			return Task.CompletedTask;
 		}
+
+
+		/// <summary>
+		/// Elicits input from the user, if the client supports elicitation.
+		/// </summary>
+		/// <param name="Message">Message to display to the user.</param>
+		/// <param name="InputRequest">Input request object.</param>
+		/// <param name="Sensitive">If information is sensitive.</param>
+		/// <param name="Session">MCP session object.</param>
+		/// <param name="Timeout">Timeout in milliseconds.</param>
+		/// <returns>Returns true if used provided input (which will be stored in
+		/// <paramref name="InputRequest"/>, false if user declined to provide user
+		/// input, or null if request was cancelled or timed out.</returns>
+		public async Task<bool?> ElicitUserInput<T>(string Message, T InputRequest,
+			bool Sensitive, Session Session, int Timeout)
+			where T : class
+		{
+			if (Session.ClientCapabilities?.Elicitation is null)
+				throw new ServiceUnavailableException("MCP Client does not support elication of user input.");
+
+			if (Session.ClientCapabilities.Elicitation.Form && !Sensitive)
+			{
+				Type InputType = typeof(T);
+				McpParameterAttribute? ParameterInfo = InputType.GetCustomAttribute<McpParameterAttribute>();
+				IEnumerable<McpEnumValueAttribute> EnumValues = InputType.GetCustomAttributes<McpEnumValueAttribute>();
+				object InputSchema = Tool.GenerateSchema(InputType, true, InputRequest,
+					ParameterInfo, EnumValues);
+
+				JsonRpcClientRequest<bool?> Request = this.CreateRequest<bool?>(
+					"elicitation/create",
+					new Dictionary<string, object>()
+					{
+						{ "mode", "form" },
+						{ "message", Message },
+						{ "requestedSchema", InputSchema }
+					},
+					Session,
+					Result =>
+					{
+						if (!(Result is Dictionary<string, object> ResultObj))
+							throw new BadRequestException("Invalid response.");
+
+						if (!ResultObj.TryGetValue("action", out object Obj) ||
+							!(Obj is string Action))
+						{
+							throw new BadRequestException("Expected action.");
+						}
+
+						switch (Action)
+						{
+							case "decline": return false;
+							case "cancel": return null;
+
+							case "accept":
+								if (!ResultObj.TryGetValue("content", out Obj))
+									throw new BadRequestException("Missing content.");
+
+								throw new NotImplementedException();
+								return true;
+
+							default:
+								throw new Exception("Unexpected action: " + Action);
+						}
+					});
+
+				try
+				{
+					return await Request.WaitForResultAsync(Timeout);
+				}
+				finally
+				{
+					Request.Dispose();
+				}
+			}
+
+			if (Session.ClientCapabilities.Elicitation.Url)
+			{
+			}
+
+			throw new ServiceUnavailableException("Unable to elicit user input.");
+		}
+
 	}
 }

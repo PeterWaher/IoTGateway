@@ -136,6 +136,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <summary>
 		/// Tries to build a request for the method, based on the provided named parameters.
 		/// </summary>
+		/// <param name="Id">ID of request.</param>
 		/// <param name="Parameters">Named parameters.</param>
 		/// <param name="Request">HTTP Request object.</param>
 		/// <param name="Response">HTTP Response object.</param>
@@ -144,13 +145,13 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <param name="Arguments">Ordered set of typed arguments, to be used in a
 		/// call to the method.</param>
 		/// <returns>If able to prepare a request to the method.</returns>
-		public bool TryBuildRequest(Dictionary<string, object?> Parameters,
+		public bool TryBuildRequest(object? Id, Dictionary<string, object?> Parameters,
 			HttpRequest Request, HttpResponse Response,
 			Dictionary<string, object?>? MetaData,
 			[NotNullWhen(false)] out string? Reason,
 			[NotNullWhen(true)] out object?[]? Arguments)
 		{
-			if (!this.TryBuildRequest(Parameters, MetaData, out Reason, out Arguments))
+			if (!this.TryBuildRequest(Id, Parameters, MetaData, out Reason, out Arguments))
 				return false;
 
 			if (this.RequestArgument.HasValue)
@@ -158,6 +159,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 
 			if (this.ResponseArgument.HasValue)
 				Arguments[this.ResponseArgument.Value] = Response;
+
+			if (this.IdArgument.HasValue)
+				Arguments[this.IdArgument.Value] = Id;
 
 			return true;
 		}

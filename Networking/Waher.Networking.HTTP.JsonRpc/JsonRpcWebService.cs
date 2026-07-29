@@ -33,6 +33,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 	{
 		private static readonly JsonCodec jsonCodec = new JsonCodec();
 
+		private readonly Dictionary<string, IJsonRpcClientRequest> requests = new Dictionary<string, IJsonRpcClientRequest>();
 		private readonly SortedDictionary<string, JsonRpcMethodInfo> methods;
 		private readonly bool userSessions;
 		private readonly bool caseSensitive;
@@ -77,8 +78,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 			{
 				if (Method.GetCustomAttribute<JsonRpcMethodAttribute>() is null)
 					continue;
-
-				this.Register(Method, GetRequiredPrivileges(Method));
+					
+				this.RegisterMethod(Method, GetRequiredPrivileges(Method));
 			}
 		}
 
@@ -184,7 +185,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// </summary>
 		/// <param name="Method">Method to register.</param>
 		/// <param name="RequiredPrivileges">Required privileges for accessing the method.</param>
-		public void Register(MethodInfo Method, params string[]? RequiredPrivileges)
+		public void RegisterMethod(MethodInfo Method, params string[]? RequiredPrivileges)
 		{
 			JsonRpcMethodInfo MethodInfo;
 
@@ -594,6 +595,69 @@ namespace Waher.Networking.HTTP.JsonRpc
 			finally
 			{
 				this.eventSubscriptionsKeepAliveRunning = false;
+			}
+		}
+
+		/// <summary>
+		/// Sends a request to the client, and waits for a response.
+		/// </summary>
+		/// <param name="Method">Method to call.</param>
+		/// <param name="Parameters">Parameters for the method.</param>
+		/// <param name="Session">Session to receive the request.</param>
+		/// <param name="ParseResult">Function to parse incoming results.</param>
+		/// <returns>Request object.</returns>
+		public JsonRpcClientRequest<T> CreateRequest<T>(string Method, object? Parameters,
+			IJsonRpcSession Session, Func<object?, T> ParseResult)
+		{
+			JsonRpcClientRequest<T> Request;
+			string Id;
+
+			lock (this.requests)
+			{
+				do
+				{
+					Id = OAuth2Environment.GenerateRandomCode(32);
+				}
+				while (this.requests.ContainsKey(Id));
+
+				Request = new JsonRpcClientRequest<T>(Id, Method, Parameters, Session,
+					ParseResult, this);
+
+				this.requests[Id] = Request;
+			}
+
+			return Request;
+		}
+
+		/// <summary>
+		/// Removes a client request.
+		/// </summary>
+		/// <param name="Id">Request ID</param>
+		/// <returns>True if the request was successfully removed; otherwise, false.</returns>
+		internal bool RemoveClientRequest(string Id)
+		{
+			lock (this.requests)
+			{
+				return this.requests.Remove(Id);
+			}
+		}
+
+		/// <summary>
+		/// Gets and removes a client request from the list of pending requests.
+		/// </summary>
+		/// <param name="Id">ID of request.</param>
+		/// <returns>If a request object matching the ID was found.</returns>
+		internal IJsonRpcClientRequest? PopClientRequest(string Id)
+		{
+			lock (this.requests)
+			{
+				if (this.requests.TryGetValue(Id, out IJsonRpcClientRequest? Request))
+				{
+					this.requests.Remove(Id);
+					return Request;
+				}
+				else
+					return null;
 			}
 		}
 
@@ -1451,6 +1515,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 				Response.StatusCode = JsonRequest.StatusCode;
 				Response.StatusMessage = JsonRequest.StatusMessage;
 			}
+			else if (JsonRequest.IsResult)
+			{
+				Response.StatusCode = 200;
+				Response.StatusMessage = "OK";
+			}
 			else
 			{
 				ContentResponse Encoded;
@@ -1513,6 +1582,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 						Request.SetError(-32600, "Invalid method name.",
 							BadRequestException.Code, BadRequestException.StatusMessage);
 					}
+					break;
+
+				case "result":
+					Request.IsResult = true;
+					Request.Result = Value;
 					break;
 
 				case "params":

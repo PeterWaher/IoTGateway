@@ -21,7 +21,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		private readonly object? parameters;
 		private bool processed = false;
 
-		internal JsonRpcClientRequest(string Message, object? Id, string Method, 
+		internal JsonRpcClientRequest(string Message, object? Id, string Method,
 			object? Parameters, IJsonRpcSession Session, Func<object?, Task<T>> ParseResult,
 			JsonRpcWebService WebService, HttpRequest HttpRequest)
 		{
@@ -60,7 +60,9 @@ namespace Waher.Networking.HTTP.JsonRpc
 		{
 			try
 			{
-				T ParsedResult = await this.parseResult(Result);
+				if (!(Result is T ParsedResult))
+					ParsedResult = await this.parseResult(Result);
+
 				await this.Return(ParsedResult);
 			}
 			catch (Exception ex)

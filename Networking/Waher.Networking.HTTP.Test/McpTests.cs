@@ -899,11 +899,14 @@ namespace Waher.Networking.HTTP.Test
 			string ParametersToken = ExtractHiddenInput(Form.Body, "_p_");
 
 			await Connection.PostInputFormAsync(Url, ParametersToken, false,
-				[]);
+				new Dictionary<string, string>()
+				{
+					{ "FileContents", string.Empty }
+				});
 
 			Dictionary<string, object> Result = await ToolTask;
 			Assert.IsTrue(Required<bool>(Result, "isError"));
-			Assert.Contains("expected", GetSingleTextContent(Result));
+			Assert.Contains("declined", GetSingleTextContent(Result));
 			Assert.AreEqual("Original contents.", this.ReadEditableFile());
 
 			Dictionary<string, object> Complete = await Sse.WaitForMethodAsync(
@@ -965,7 +968,7 @@ namespace Waher.Networking.HTTP.Test
 
 			Assert.IsTrue(Required<bool>(Result, "isError"));
 			string ErrorText = GetSingleTextContent(Result);
-			Assert.IsTrue(ErrorText.Contains("support", StringComparison.OrdinalIgnoreCase),
+			Assert.IsTrue(ErrorText.Contains("Unavailable", StringComparison.OrdinalIgnoreCase),
 				ErrorText);
 			Assert.AreEqual("Original contents.", this.ReadEditableFile());
 		}
@@ -1363,7 +1366,7 @@ namespace Waher.Networking.HTTP.Test
 
 			public async Task<SseConnection> OpenSseAsync()
 			{
-				HttpRequestMessage Request = new(System.Net.Http.HttpMethod.Get, this.endpoint);
+				HttpRequestMessage Request = new(HttpMethod.Get, this.endpoint);
 				this.SetCommonHeaders(Request, true);
 				Request.Headers.Accept.Clear();
 				Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
@@ -1391,7 +1394,7 @@ namespace Waher.Networking.HTTP.Test
 
 			public async Task<HtmlFormResponse> GetInputFormAsync(string Url)
 			{
-				using HttpRequestMessage Request = new(System.Net.Http.HttpMethod.Get, Url);
+				using HttpRequestMessage Request = new(HttpMethod.Get, Url);
 				this.SetCommonHeaders(Request, true);
 				Request.Headers.Accept.Clear();
 				Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/html"));
@@ -1416,7 +1419,7 @@ namespace Waher.Networking.HTTP.Test
 				foreach (KeyValuePair<string, string> Field in Fields)
 					Content.Add(new StringContent(Field.Value ?? string.Empty), Field.Key);
 
-				using HttpRequestMessage Request = new(System.Net.Http.HttpMethod.Post, Url)
+				using HttpRequestMessage Request = new(HttpMethod.Post, Url)
 				{
 					Content = Content
 				};
@@ -1430,7 +1433,7 @@ namespace Waher.Networking.HTTP.Test
 			private async Task<JsonRpcHttpResponse> SendJsonAsync(
 				Dictionary<string, object> Payload, bool IncludeSession)
 			{
-				using HttpRequestMessage Request = new(System.Net.Http.HttpMethod.Post,
+				using HttpRequestMessage Request = new(HttpMethod.Post,
 					this.endpoint)
 				{
 					Content = new StringContent(JSON.Encode(Payload, false), Encoding.UTF8,
@@ -1523,7 +1526,7 @@ namespace Waher.Networking.HTTP.Test
 				{
 					try
 					{
-						using HttpRequestMessage Request = new(System.Net.Http.HttpMethod.Delete,
+						using HttpRequestMessage Request = new(HttpMethod.Delete,
 							this.endpoint);
 						this.SetCommonHeaders(Request, true);
 						using HttpResponseMessage Response = await this.client.SendAsync(Request);

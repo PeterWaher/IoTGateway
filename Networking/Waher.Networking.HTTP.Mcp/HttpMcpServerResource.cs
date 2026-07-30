@@ -671,15 +671,13 @@ namespace Waher.Networking.HTTP.Mcp
 			Form.Remove("_r_");
 
 			if (ResponseValue)
-			{
 				await SetProperties(ClientRequest.Tag!, Form);
-				await ClientRequest.ReportResult(ClientRequest.Tag);
-			}
-			else
-				await ClientRequest.Cancel();
 
-			Response.StatusCode = 202;
-			Response.StatusMessage = "Accepted";
+			Response.StatusCode = 204;
+			Response.StatusMessage = "No Content";
+
+			await Response.SendResponse();
+			await ClientRequest.ReportResult(ResponseValue);
 		}
 
 		/// <summary>

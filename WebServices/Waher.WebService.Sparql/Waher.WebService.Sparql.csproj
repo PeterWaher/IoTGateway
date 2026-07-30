@@ -15,9 +15,9 @@
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>SPARQL query federated query semantic web</PackageTags>
-    <AssemblyVersion>2.2.6</AssemblyVersion>
-    <FileVersion>2.2.6</FileVersion>
-		<Version>2.2.6</Version>
+    <AssemblyVersion>2.2.7</AssemblyVersion>
+    <FileVersion>2.2.7</FileVersion>
+		<Version>2.2.7</Version>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>

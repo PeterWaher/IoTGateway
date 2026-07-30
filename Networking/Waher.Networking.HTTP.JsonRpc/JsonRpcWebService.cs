@@ -1605,6 +1605,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 				case "result":
 					Request.IsResult = true;
 					Request.Result = Value;
+					Request.StatusCode = 202;
+					Request.StatusMessage = "Accepted";
 					break;
 
 				case "params":

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Html;
 using Waher.Networking.HTTP.Brotli;
+using Waher.Networking.HTTP.Mcp;
 using Waher.Networking.HTTP.OAuth.Clients;
 using Waher.Persistence;
 using Waher.Persistence.Files;
@@ -37,7 +38,8 @@ namespace Waher.Networking.HTTP.Test
 				typeof(Database).Assembly,
 				typeof(FilesProvider).Assembly,
 				typeof(ObjectSerializer).Assembly,
-				typeof(OAuthClientInformation).Assembly);
+				typeof(OAuthClientInformation).Assembly,
+				typeof(HttpMcpServerResource).Assembly);
 
 			filesProvider = await FilesProvider.CreateAsync("DB", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, false);
 			Database.Register(filesProvider);

@@ -24,7 +24,6 @@ using Waher.Persistence;
 using Waher.Runtime.Inventory;
 using Waher.Security;
 using Waher.Security.JWT;
-using Waher.Security.Users;
 
 namespace Waher.Networking.HTTP.Test
 {
@@ -554,7 +553,7 @@ namespace Waher.Networking.HTTP.Test
 
 			Assert.IsTrue(Required<bool>(Result, "isError"));
 			string ErrorText = GetSingleTextContent(Result);
-			Assert.IsTrue(ErrorText.Contains("Message", StringComparison.OrdinalIgnoreCase),
+			Assert.IsTrue(ErrorText.Contains("Missing", StringComparison.OrdinalIgnoreCase),
 				ErrorText);
 		}
 
@@ -638,14 +637,14 @@ namespace Waher.Networking.HTTP.Test
 			Dictionary<string, object> UserMessage = AsDictionary(Messages[0], "messages[0]");
 			Assert.AreEqual("user", Required<string>(UserMessage, "role"));
 			string UserText = GetTextBlock(RequiredDictionary(UserMessage, "content"));
-			Assert.Contains(UserText, "last 3 days");
-			Assert.Contains(UserText, "sensitive information");
+			Assert.Contains("last 3 days", UserText);
+			Assert.Contains("sensitive information", UserText);
 
 			Dictionary<string, object> AssistantMessage = AsDictionary(Messages[1], "messages[1]");
 			Assert.AreEqual("assistant", Required<string>(AssistantMessage, "role"));
 			string AssistantText = GetTextBlock(RequiredDictionary(AssistantMessage, "content"));
-			Assert.Contains(AssistantText, "Search for Events");
-			Assert.Contains(AssistantText, "Edit Events");
+			Assert.Contains("Search for Events", AssistantText);
+			Assert.Contains("Edit Events", AssistantText);
 		}
 
 		[TestMethod]
@@ -839,6 +838,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
+		[Timeout(10000)]
 		public async Task Test_025_Url_Elicitation_Uses_Protected_Form_For_Sensitive_Input()
 		{
 			await using McpConnection Connection = await this.Connect(FilesResource);
@@ -862,9 +862,9 @@ namespace Waher.Networking.HTTP.Test
 			AssertHeaderContains(Form.Headers, "Content-Security-Policy", "form-action 'self'");
 			AssertHeaderContains(Form.Headers, "Cache-Control", "no-store");
 			AssertHeaderContains(Form.Headers, "Pragma", "no-cache");
-			Assert.Contains(Form.Body, "InputForm");
-			Assert.Contains(Form.Body, "FileContents");
-			Assert.Contains(Form.Body, "Original contents.");
+			Assert.Contains("InputForm", Form.Body);
+			Assert.Contains("FileContents", Form.Body);
+			Assert.Contains("Original contents.", Form.Body);
 
 			string ParametersToken = ExtractHiddenInput(Form.Body, "_p_");
 			await Connection.PostInputFormAsync(Url, ParametersToken, true,
@@ -884,6 +884,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
+		[Timeout(10000)]
 		public async Task Test_026_Url_Elicitation_Can_Be_Cancelled_From_Protected_Form()
 		{
 			await using McpConnection Connection = await this.Connect(FilesResource);
@@ -902,7 +903,7 @@ namespace Waher.Networking.HTTP.Test
 
 			Dictionary<string, object> Result = await ToolTask;
 			Assert.IsTrue(Required<bool>(Result, "isError"));
-			Assert.Contains(GetSingleTextContent(Result), "expected");
+			Assert.Contains("expected", GetSingleTextContent(Result));
 			Assert.AreEqual("Original contents.", this.ReadEditableFile());
 
 			Dictionary<string, object> Complete = await Sse.WaitForMethodAsync(
@@ -912,6 +913,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
+		[Timeout(10000)]
 		public async Task Test_027_NonSensitive_Elicitation_Falls_Back_To_Url_When_Form_Is_Unsupported()
 		{
 			Dictionary<string, object> UrlOnlyCapabilities = CreateElicitationCapabilities(false, true);

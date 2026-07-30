@@ -678,8 +678,8 @@ namespace Waher.Networking.HTTP.Mcp
 			else
 				await ClientRequest.Cancel();
 
-			Response.StatusCode = 204;
-			Response.StatusMessage = "No Content";
+			Response.StatusCode = 202;
+			Response.StatusMessage = "Accepted";
 		}
 
 		/// <summary>

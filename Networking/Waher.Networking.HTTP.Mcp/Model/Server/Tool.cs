@@ -336,6 +336,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute>? EnumValues)
 		{
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
+			bool EmitDefault = HasDefault;
 
 			if (T.IsEnum)
 			{
@@ -410,6 +411,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 						}
 						else if (T == typeof(Dictionary<string, object>))
 						{
+							EmitDefault = false;
 							Result["type"] = "object";
 							//Result["additionalProperties"] = true;// new Dictionary<string, object>();
 						}
@@ -429,6 +431,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 
 							Dictionary<string, object> Properties = new Dictionary<string, object>();
 
+							EmitDefault = false;
 							Result["type"] = "object";
 							Result["properties"] = Properties;
 
@@ -537,7 +540,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 				}
 			}
 
-			if (HasDefault)
+			if (EmitDefault)
 				Result["default"] = Default;
 
 			ParameterInfo?.Annotate(Result);

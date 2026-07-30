@@ -531,7 +531,7 @@ namespace Waher.Mcp.Files
 			"contents must not be harmful or contain illegal information.")]
 			string Content,
 
-			[McpStringParameter("Append CRLF", "If true, a carriage-return/line-feed " +
+			[McpParameter("Append CRLF", "If true, a carriage-return/line-feed " +
 			"(CRLF) is appended to the text content before creating the file.")]
 			bool AppendCrLf)
 		{
@@ -647,7 +647,7 @@ namespace Waher.Mcp.Files
 			"contents must not be harmful or contain illegal information.")]
 			string Content,
 
-			[McpStringParameter("Append CRLF", "If true, a carriage-return/line-feed " +
+			[McpParameter("Append CRLF", "If true, a carriage-return/line-feed " +
 			"(CRLF) is appended to the text content before appending it to the file.")]
 			bool AppendCrLf)
 		{
@@ -768,7 +768,7 @@ namespace Waher.Mcp.Files
 			"contents must not be harmful or contain illegal information.")]
 			string Content,
 
-			[McpStringParameter("Append CRLF", "If true, a carriage-return/line-feed " +
+			[McpParameter("Append CRLF", "If true, a carriage-return/line-feed " +
 			"(CRLF) is appended to the text content before updating the file.")]
 			bool AppendCrLf)
 		{

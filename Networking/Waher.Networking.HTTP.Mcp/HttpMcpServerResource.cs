@@ -313,7 +313,6 @@ namespace Waher.Networking.HTTP.Mcp
 				Javascript.AppendLine("{");
 				Javascript.AppendLine("\tdocument.getElementById('_r_').value=Response;");
 				Javascript.AppendLine("\tdocument.getElementById('InputForm').submit();");
-				Javascript.AppendLine("\twindow.close();");
 				Javascript.AppendLine("}");
 				Javascript.AppendLine("function Loaded()");
 				Javascript.AppendLine("{");
@@ -327,22 +326,29 @@ namespace Waher.Networking.HTTP.Mcp
 
 				await Response.Return(new JavaScriptDocument(Javascript.ToString()));
 			}
+			else if (FormId == "CloseInput.js")
+			{
+				StringBuilder Javascript = new StringBuilder();
+
+				Javascript.AppendLine("window.close();");
+
+				Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
+				Response.SetHeader("Pragma", "no-cache");
+
+				await Response.Return(new JavaScriptDocument(Javascript.ToString()));
+			}
 			else
 			{
-				if (!this.TryGetRequest(FormId, out IJsonRpcClientRequest? ClientRequest))
+				if (!this.TryGetRequest(FormId, out IJsonRpcClientRequest? ClientRequest) ||
+					ClientRequest.Tag is null)
 				{
-					await Response.SendResponse(new NotFoundException("Request not found: " + FormId));
-					return;
+					await Response.Return(await CloseForm(Response));
 				}
-
-				if (ClientRequest.Tag is null)
+				else
 				{
-					await Response.SendResponse(new BadRequestException("Invalid input request."));
-					return;
+					await Response.Return(await this.GenerateInputForm(Request, Response,
+						ClientRequest));
 				}
-
-				await Response.Return(await this.GenerateInputForm(Request, Response,
-					ClientRequest));
 			}
 		}
 
@@ -580,8 +586,43 @@ namespace Waher.Networking.HTTP.Mcp
 			Markdown.AppendLine("</form>");
 			Markdown.AppendLine();
 
-			string MarkdownForm = Markdown.ToString();
-			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(MarkdownForm,
+			return await ReturnHtml(Response, Markdown.ToString());
+		}
+
+		private static async Task<HtmlDocument> CloseForm(HttpResponse Response)
+		{
+			StringBuilder Markdown = new StringBuilder();
+
+			Markdown.AppendLine("Title: User Input");
+			Markdown.AppendLine("Description: Form allowing a user to input elicited information.");
+			Markdown.AppendLine("Javascript: CloseInput.js");
+
+			if (Types.TryGetModuleParameter<OAuth2Environment>("OAUTH2", out OAuth2Environment? Environment) &&
+				Environment.HasLoginMasterFileName)
+			{
+				Markdown.Append("Master: ");
+				Markdown.AppendLine(Environment.LoginMasterFileName);
+			}
+
+			Markdown.Append("Date: ");
+			Markdown.AppendLine(CommonTypes.EncodeRfc822(DateTime.UtcNow));
+			Markdown.AppendLine();
+			Markdown.AppendLine(new string('=', 40));
+			Markdown.AppendLine();
+
+			Markdown.AppendLine("Close Form");
+			Markdown.AppendLine("=============");
+			Markdown.AppendLine();
+
+			Markdown.Append("You can now safely close the form, if it does not close ");
+			Markdown.AppendLine("automatically by itself.");
+
+			return await ReturnHtml(Response, Markdown.ToString());
+		}
+
+		private static async Task<HtmlDocument> ReturnHtml(HttpResponse Response, string Markdown)
+		{
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown,
 				new MarkdownSettings()
 				{
 					Variables = new Variables()
@@ -673,11 +714,18 @@ namespace Waher.Networking.HTTP.Mcp
 			if (ResponseValue)
 				await SetProperties(ClientRequest.Tag!, Form);
 
-			Response.StatusCode = 204;
-			Response.StatusMessage = "No Content";
-
-			await Response.SendResponse();
-			await ClientRequest.ReportResult(ResponseValue);
+			try
+			{
+				await Response.Return(await CloseForm(Response));
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+			finally
+			{
+				await ClientRequest.ReportResult(ResponseValue);
+			}
 		}
 
 		/// <summary>

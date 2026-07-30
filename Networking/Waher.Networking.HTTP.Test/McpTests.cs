@@ -1423,11 +1423,12 @@ namespace Waher.Networking.HTTP.Test
 				{
 					Content = Content
 				};
+				Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/html"));
 				this.SetCommonHeaders(Request, true);
 
 				using HttpResponseMessage Response = await this.client.SendAsync(Request);
 				string Body = await Response.Content.ReadAsStringAsync();
-				Assert.AreEqual(HttpStatusCode.NoContent, Response.StatusCode, Body);
+				Assert.AreEqual(HttpStatusCode.OK, Response.StatusCode, Body);
 			}
 
 			private async Task<JsonRpcHttpResponse> SendJsonAsync(

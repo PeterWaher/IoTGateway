@@ -145,7 +145,7 @@ namespace Waher.Content.Markdown.Web
 			MarkdownSettings Settings = new MarkdownSettings(emojiSource, true, State.Session)
 			{
 				RootFolder = rootFolder,
-				ResourceMap = Request.Server,
+				ResourceMap = State.ResourceMap,
 				Progress = State.Progress
 			};
 

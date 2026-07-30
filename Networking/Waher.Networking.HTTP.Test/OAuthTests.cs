@@ -65,6 +65,7 @@ namespace Waher.Networking.HTTP.Test
 		private ConsoleEventSink sink = null;
 		private XmlFileSniffer xmlSniffer = null;
 		private JwtFactory jwtFactory = null;
+		private OAuth2Environment environment = null;
 
 		/// <summary>
 		/// Test context
@@ -106,18 +107,18 @@ namespace Waher.Networking.HTTP.Test
 			await Database.Clear("OAuthRedirectUris");
 			await Database.Clear("OAuthClients");
 
-			OAuth2Environment Environment = new();
-			Environment.Register(this.jwtFactory);
-			Environment.Register(this);
+			this.environment = new();
+			this.environment.Register(this.jwtFactory);
+			this.environment.Register(this);
 
-			this.server.Register(new ProtectedResourceMetaData(Environment));
-			this.server.Register(new OAuthTokenResource(Environment));
-			this.server.Register(new OAuthIntrospectionResource(Environment));
-			this.server.Register(new OAuthRegistrationResource(Environment));
-			this.server.Register(new OAuthManagementResource(Environment));
-			this.server.Register(new OAuthDeviceAuthorizationResource(Environment));
-			this.server.Register(new OAuthAuthorizeResource(Environment));
-			this.server.Register(new AuthorizationServerMetaData(Environment));
+			this.server.Register(new ProtectedResourceMetaData(this.environment));
+			this.server.Register(new OAuthTokenResource(this.environment));
+			this.server.Register(new OAuthIntrospectionResource(this.environment));
+			this.server.Register(new OAuthRegistrationResource(this.environment));
+			this.server.Register(new OAuthManagementResource(this.environment));
+			this.server.Register(new OAuthDeviceAuthorizationResource(this.environment));
+			this.server.Register(new OAuthAuthorizeResource(this.environment));
+			this.server.Register(new AuthorizationServerMetaData(this.environment));
 
 			this.server.Register(CallbackResource, Callback);
 			this.server.Register(new Hello(this.jwtFactory, this));
@@ -134,7 +135,7 @@ namespace Waher.Networking.HTTP.Test
 					OAuthIntrospectionResource.OAuthIntrospectionPrivilege]) }
 			};
 
-			Environment.AuthorizeResource.ImplicitAuthenticationRequest += async (_, e) =>
+			this.environment.AuthorizeResource.ImplicitAuthenticationRequest += async (_, e) =>
 			{
 				if (e.Request.Header.TryGetHeaderField("X-Context", out HttpField Context))
 					e.User = await this.TryGetUser(Context.Value) as IUserWithClaims;
@@ -281,6 +282,12 @@ namespace Waher.Networking.HTTP.Test
 				this.jwtFactory.Dispose();
 				this.jwtFactory = null;
 			}
+
+			if (this.environment is not null)
+			{
+				this.environment.Dispose();
+				this.environment = null;
+			}
 		}
 
 		public Task<IUser> TryGetUser(string UserName)
@@ -396,7 +403,7 @@ namespace Waher.Networking.HTTP.Test
 				"introspection_endpoint_auth_methods_supported");
 			Assert.Contains("client_secret_basic", IntrospectionAuthenticationMethods);
 			Assert.Contains("client_secret_post", IntrospectionAuthenticationMethods);
-			Assert.IsTrue(Array.IndexOf(IntrospectionAuthenticationMethods, "none") < 0,
+			Assert.IsLessThan(0, Array.IndexOf(IntrospectionAuthenticationMethods, "none"),
 				"The introspection endpoint must require authentication.");
 		}
 
@@ -3408,7 +3415,7 @@ namespace Waher.Networking.HTTP.Test
 			};
 		}
 
-		private static IDictionary<string, object> AssertActiveIntrospectionResponse(
+		private static Dictionary<string, object> AssertActiveIntrospectionResponse(
 			IntrospectionHttpResponse Response, string AccessToken, string ExpectedClientId,
 			string ExpectedScope, bool IsAccessToken)
 		{
@@ -3458,7 +3465,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		private static void AssertIntrospectionClaimMatchesJwt(
-			IDictionary<string, object> IntrospectionResponse,
+			Dictionary<string, object> IntrospectionResponse,
 			IDictionary<string, object> JwtPayload, string ClaimName)
 		{
 			if (!IntrospectionResponse.TryGetValue(ClaimName, out object Actual) ||

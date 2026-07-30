@@ -271,6 +271,7 @@ internal class Program
 			JwtFactory JwtFactory = JwtFactory.CreateHmacSha256("http://localhost:8081");
 
 			Types.SetModuleParameter("JWT", JwtFactory);
+			Types.SetModuleParameter("Users", Users.Source);
 			Types.SetModuleParameter("Domain", "localhost");
 			Types.SetModuleParameter("Realm", "TestServer");
 

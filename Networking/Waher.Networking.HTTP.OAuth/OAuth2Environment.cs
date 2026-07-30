@@ -16,7 +16,7 @@ namespace Waher.Networking.HTTP.OAuth
 	/// <summary>
 	/// Manages the OAuth 2 environment.
 	/// </summary>
-	public class OAuth2Environment
+	public class OAuth2Environment : IDisposable
 	{
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 
@@ -40,13 +40,30 @@ namespace Waher.Networking.HTTP.OAuth
 		private int minStrength;
 		private bool encrypted;
 		private bool locked = false;
+		private bool disposed = false;
 
 		/// <summary>
 		/// Manages the OAuth 2.0 environment.
 		/// </summary>
 		public OAuth2Environment()
 		{
-			this.Register(Security.Users.Users.Source); // Default users source
+			if (!Types.TryGetModuleParameter("Users", out IUserSource UserSource))
+				UserSource = Security.Users.Users.Source; // Default users source
+
+			this.Register(UserSource);
+		}
+
+		/// <summary>
+		/// If the object has been disposed.
+		/// </summary>
+		public bool Disposed => this.disposed;
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+			this.disposed = true;
 		}
 
 		/// <summary>

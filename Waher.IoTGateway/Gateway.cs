@@ -1414,6 +1414,7 @@ namespace Waher.IoTGateway
 				};
 
 				Types.SetModuleParameter("JWT", jwtFactory);
+				Types.SetModuleParameter("Users", Users.Source);
 				Types.SetModuleParameter("OAUTH2", oauthEnvironment);
 
 				webServer.Register(new ProtectedResourceMetaData(oauthEnvironment));

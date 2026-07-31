@@ -115,7 +115,9 @@ namespace Waher.Networking.HTTP.Authentication
 			{
 			}
 
-			public string UserName => " Anonymous ";
+			public string UserName => " " + this.FriendlyName + " ";
+			public string FederatedUserName => this.UserName;
+			public string FriendlyName => "Anonymous";
 			public string PasswordHash => string.Empty;
 			public string PasswordHashType => string.Empty;
 			public bool HasPrivilege(string Privilege) => false;

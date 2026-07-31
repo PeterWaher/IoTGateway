@@ -14,6 +14,22 @@
 		}
 
 		/// <summary>
+		/// Full Federated User Name.
+		/// </summary>
+		string FederatedUserName
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Friendly name of the user, for display purposes.
+		/// </summary>
+		string FriendlyName
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Password Hash
 		/// </summary>
 		string PasswordHash

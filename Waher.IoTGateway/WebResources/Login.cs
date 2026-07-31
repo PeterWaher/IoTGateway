@@ -234,7 +234,8 @@ namespace Waher.IoTGateway.WebResources
 			public string PasswordHash => string.Empty;
 			public string PasswordHashType => string.Empty;
 			public string UserName => Gateway.XmppClient?.UserName;
-
+			public string FederatedUserName => Gateway.XmppClient?.BareJID;
+			public string FriendlyName => Gateway.XmppClient?.UserName;
 			public bool HasPrivilege(string Privilege)
 			{
 				return true;

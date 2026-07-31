@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Waher.Security.JWT
@@ -28,6 +30,73 @@ namespace Waher.Security.JWT
 		/// JWT Token
 		/// </summary>
 		public JwtToken Token { get; }
+
+		/// <summary>
+		/// Full Federated User Name.
+		/// </summary>
+		public string FederatedUserName
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+				string s;
+
+				sb.Append(this.UserName);
+
+				if (!string.IsNullOrEmpty(s = this.Token.Issuer))
+				{
+					int i = s.IndexOf("://");
+					if (i > 0)
+						s = s.Substring(i + 3);
+
+					i = s.IndexOf('/');
+					if (i > 0)
+						s = s.Substring(0, i);
+
+					sb.Append('@');
+					sb.Append(s);
+				}
+
+				return sb.ToString();
+			}
+		}
+
+		/// <summary>
+		/// Friendly name of the user, for display purposes.
+		/// </summary>
+		public string FriendlyName
+		{
+			get
+			{
+				if (this.Token.TryGetClaim(JwtClaims.NickName, out object Value))
+					return Value?.ToString() ?? this.UserName;
+
+				if (this.Token.TryGetClaim(JwtClaims.Name, out Value))
+					return Value?.ToString() ?? this.UserName;
+
+				if (this.Token.TryGetClaim(JwtClaims.GivenName, out Value))
+				{
+					StringBuilder sb = new StringBuilder();
+					sb.Append(Value?.ToString() ?? string.Empty);
+
+					if (this.Token.TryGetClaim(JwtClaims.MiddleName, out Value))
+					{
+						sb.Append(' ');
+						sb.Append(Value?.ToString() ?? string.Empty);
+					}
+
+					if (this.Token.TryGetClaim(JwtClaims.FamilyName, out Value))
+					{
+						sb.Append(' ');
+						sb.Append(Value?.ToString() ?? string.Empty);
+					}
+
+					return sb.ToString();
+				}
+
+				return this.UserName;
+			}
+		}
 
 		/// <summary>
 		/// Password Hash

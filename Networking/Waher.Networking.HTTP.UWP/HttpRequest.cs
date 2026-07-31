@@ -334,6 +334,15 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Keeps the request alive, without timing out
+		/// </summary>
+		/// <returns>If request found among current requests.</returns>
+		public bool Ping()
+		{
+			return this.server?.PingRequest(this) ?? false;
+		}
+
+		/// <summary>
 		/// Gets the session variables from the cookie, if available.
 		/// </summary>
 		/// <returns>Session variables, if cookie found. If no session is found, a

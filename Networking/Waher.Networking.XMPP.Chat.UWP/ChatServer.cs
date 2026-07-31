@@ -1617,7 +1617,7 @@ namespace Waher.Networking.XMPP.Chat
 		{
 			if (!this.sessions.TryGetValue(Address, out Variables Variables))
 			{
-				User User = new User(Address);
+				User User = new User(Address, this.client);
 
 				User.SetPrivilege(typeof(Expression).Namespace, true);
 				User.SetPrivilege(typeof(Expression).Namespace + ".Persistence", false);

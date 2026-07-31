@@ -15,6 +15,8 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		public string UserName { get; } = UserName;
+		public string FederatedUserName { get; } = UserName;
+		public string FriendlyName { get; } = UserName;
 		public string PasswordHash { get; } = Password;
 		public string PasswordHashType { get; } = string.Empty;
 		public string Owner { get; } = Owner;

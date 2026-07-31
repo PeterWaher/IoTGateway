@@ -145,7 +145,8 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
             else
                 Properties = null;
 
-            return new ObjectValue(new EphemeralUserObject(UserName, Jid, Privileges, Properties));
+            return new ObjectValue(new EphemeralUserObject(UserName, UserName, UserName,
+                Jid, Privileges, Properties));
         }
 
         private class EphemeralUserObject : IUser
@@ -153,10 +154,14 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
             private readonly KeyValuePair<Regex, bool>[] privileges;
             private readonly IDictionary<string, object> properties;
 
-            public EphemeralUserObject(string UserName, string Jid, IEnumerable<string> Privileges, IDictionary<string, object> Properties)
+            public EphemeralUserObject(string UserName, string FederatedUserName,
+                string FriendlyName, string Jid, IEnumerable<string> Privileges, 
+                IDictionary<string, object> Properties)
             {
                 this.UserName = UserName;
-                this.Jid = Jid ?? string.Empty;
+                this.FederatedUserName = FederatedUserName;
+                this.FriendlyName = FriendlyName;
+				this.Jid = Jid ?? string.Empty;
                 this.properties = Properties;
 
                 if (Privileges is null)
@@ -201,9 +206,11 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
             public string PasswordHash => string.Empty;
             public string PasswordHashType => string.Empty;
             public string UserName { get; }
+            public string FederatedUserName { get; }
+            public string FriendlyName { get; }
             public string Jid { get; }
 
-            public bool HasPrivilege(string Privilege)
+			public bool HasPrivilege(string Privilege)
             {
                 int c = Privilege.Length;
 

@@ -9,21 +9,46 @@ namespace Waher.Networking.XMPP.Chat
 	public class User : IUser
 	{
 		private readonly Dictionary<string, bool> privileges = new Dictionary<string, bool>();
+		private readonly XmppClient client;
 		private readonly string fullJid;
+		private readonly string bareJid;
 
 		/// <summary>
 		/// Chat user
 		/// </summary>
 		/// <param name="FullJID">Full JID</param>
-		public User(string FullJID)
+		/// <param name="Client">XMPP Client used for communication.</param>
+		public User(string FullJID, XmppClient Client)
 		{
 			this.fullJid = FullJID;
+			this.bareJid = XmppClient.GetBareJID(FullJID);
+			this.client = Client;
 		}
 
 		/// <summary>
 		/// User Name.
 		/// </summary>
 		public string UserName => this.fullJid;
+
+		/// <summary>
+		/// Full Federated User Name.
+		/// </summary>
+		public string FederatedUserName => this.fullJid;
+
+		/// <summary>
+		/// Friendly name of the user, for display purposes.
+		/// </summary>
+		public string FriendlyName
+		{
+			get
+			{
+				RosterItem Item = this.client[this.bareJid];
+				if (string.IsNullOrEmpty(Item?.Name))
+					return this.bareJid;
+				else
+					return Item.Name;
+			}
+		}
 
 		/// <summary>
 		/// Password Hash

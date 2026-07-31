@@ -1,21 +1,14 @@
-﻿using System;
-
-namespace Waher.Security.DTLS.Test
+﻿namespace Waher.Security.DTLS.Test
 {
-	public class User : IUser
+	public class User(string UserName, string PasswordHash, string PasswordHashType) : IUser
 	{
-		private readonly string userName;
-		private readonly string passwordHash;
-		private readonly string passwordHashType;
-
-		public User(string UserName, string PasswordHash, string PasswordHashType)
-		{
-			this.userName = UserName;
-			this.passwordHash = PasswordHash;
-			this.passwordHashType = PasswordHashType;
-		}
+		private readonly string userName = UserName;
+		private readonly string passwordHash = PasswordHash;
+		private readonly string passwordHashType = PasswordHashType;
 
 		public string UserName => this.userName;
+		public string FederatedUserName => this.userName;
+		public string FriendlyName => this.userName;
 		public string PasswordHash => this.passwordHash;
 		public string PasswordHashType => this.passwordHashType;
 

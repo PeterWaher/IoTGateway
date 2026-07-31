@@ -27,6 +27,7 @@ namespace Waher.Security.Users
 		private readonly Dictionary<string, bool> privileges = new Dictionary<string, bool>();
 		private string objectId = null;
 		private string userName = string.Empty;
+		private string friendlyName = string.Empty;
 		private string passwordHash = string.Empty;
 		private string[] roleIds = null;
 		private string legalId = string.Empty;
@@ -59,6 +60,30 @@ namespace Waher.Security.Users
 		{
 			get => this.userName;
 			set => this.userName = value;
+		}
+
+
+		/// <summary>
+		/// Full Federated User Name.
+		/// </summary>
+		public string FederatedUserName
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(Users.Domain))
+					return this.userName;
+				else
+					return this.userName + "@" + Users.Domain;
+			}
+		}
+
+		/// <summary>
+		/// Friendly name of the user, for display purposes.
+		/// </summary>
+		public string FriendlyName
+		{
+			get => string.IsNullOrEmpty(this.friendlyName) ? this.userName : this.friendlyName;
+			set => this.friendlyName = value;
 		}
 
 		/// <summary>

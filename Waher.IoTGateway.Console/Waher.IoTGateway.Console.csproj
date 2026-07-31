@@ -70,6 +70,7 @@
     <ProjectReference Include="..\Mcp\Waher.Mcp.Content\Waher.Mcp.Content.csproj" />
     <ProjectReference Include="..\Mcp\Waher.Mcp.Events\Waher.Mcp.Events.csproj" />
     <ProjectReference Include="..\Mcp\Waher.Mcp.Files\Waher.Mcp.Files.csproj" />
+    <ProjectReference Include="..\Mcp\Waher.Mcp.Xmpp\Waher.Mcp.Xmpp.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.HTTP.Brotli\Waher.Networking.HTTP.Brotli.csproj" />
 		<ProjectReference Include="..\Networking\Waher.Networking.HTTP.JsonRpc\Waher.Networking.HTTP.JsonRpc.csproj" />
 		<ProjectReference Include="..\Networking\Waher.Networking.HTTP.Mcp\Waher.Networking.HTTP.Mcp.csproj" />

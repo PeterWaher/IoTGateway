@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<AssemblyVersion>1.0.1</AssemblyVersion>
+		<FileVersion>1.0.1</FileVersion>
+		<Version>1.0.1</Version>
+		<Authors>Peter Waher</Authors>
+		<Company>Waher Data AB</Company>
+		<Product>Waher.IoTGateway</Product>
+		<Description>Provides an MCP Server that allows agents to communicate using the XMPP protocol.</Description>
+		<Copyright>Copyright © Waher Data AB 2026. All rights reserved.</Copyright>
+		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Mcp/Waher.Mcp.Xmpp</PackageProjectUrl>
+		<PackageIcon>Icon_64x64.png</PackageIcon>
+		<RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+		<RepositoryType>GitHub</RepositoryType>
+		<PackageTags>networking communication http MCP XMPP</PackageTags>
+	</PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\Images\Icon_64x64.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Toon\Waher.Content.Toon.csproj" />
+    <ProjectReference Include="..\..\Networking\Waher.Networking.DNS\Waher.Networking.DNS.csproj" />
+    <ProjectReference Include="..\..\Networking\Waher.Networking.HTTP.Mcp\Waher.Networking.HTTP.Mcp.csproj" />
+    <ProjectReference Include="..\..\Networking\Waher.Networking.HTTP.OAuth\Waher.Networking.HTTP.OAuth.csproj" />
+    <ProjectReference Include="..\..\Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj" />
+    <ProjectReference Include="..\..\Security\Waher.Security.CallStack\Waher.Security.CallStack.csproj" />
+  </ItemGroup>
+
+</Project>

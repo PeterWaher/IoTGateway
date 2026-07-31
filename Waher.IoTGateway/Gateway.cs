@@ -1456,6 +1456,7 @@ namespace Waher.IoTGateway
 				webServer.Register(new Mcp.Events.EventLogMcpServer("/MCP/EventLog", Icons, null, mcpSniffers));
 				webServer.Register(new Mcp.Files.FileStorageMcpServer("/MCP/Files",
 					Path.Combine(appDataFolder, "MCP", "Files"), Icons, null, mcpSniffers));
+				webServer.Register(new Mcp.Xmpp.XmppMcpServer("/MCP/XMPP", Icons, null, mcpSniffers));
 
 				if (emoji1_24x24 is null)
 				{

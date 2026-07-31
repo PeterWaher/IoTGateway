@@ -20,7 +20,7 @@
 			<dependency id="Waher.Content.Images" version="3.1.1"/>
 			<dependency id="Waher.Content.Html" version="3.2.2"/>
 			<dependency id="Waher.Content.Markdown" version="6.3.3"/>
-			<dependency id="Waher.Content.Xml" version="3.1.6"/>
+			<dependency id="Waher.Content.Xml" version="3.1.7"/>
 			<dependency id="Waher.Networking.UWP" version="4.6.7"/>
 			<dependency id="Waher.Networking.XMPP.UWP" version="4.3.0"/>
 			<dependency id="Waher.Networking.XMPP.Concentrator.UWP" version="4.4.0"/>

@@ -728,20 +728,46 @@ namespace Waher.Content.Xml
 				PreserveWhitespace = PreserveWhitespace
 			};
 
-			if (!string.IsNullOrEmpty(Xml))
-			{
-				using (StringReader r = new StringReader(Xml))
-				{
-					XmlReaderSettings Settings = new XmlReaderSettings()
-					{
-						CheckCharacters = false,
-						ConformanceLevel = ConformanceLevel.Document,
-						DtdProcessing = DtdProcessing.Ignore,
-						IgnoreComments = true,
-						IgnoreProcessingInstructions = true,
-						IgnoreWhitespace = !PreserveWhitespace
-					};
+			Doc.XmlResolver = null;
 
+			if (string.IsNullOrEmpty(Xml))
+				return Doc;
+
+			using (StringReader r = new StringReader(Xml))
+			{
+				XmlReaderSettings Settings = new XmlReaderSettings()
+				{
+					CheckCharacters = false,
+					ConformanceLevel = ConformanceLevel.Document,
+					DtdProcessing = DtdProcessing.Ignore,
+					IgnoreComments = true,
+					IgnoreProcessingInstructions = true,
+					IgnoreWhitespace = !PreserveWhitespace
+				};
+
+				if (PreserveWhitespace)
+				{
+					// XmlReader over StringReader normalizes CRLF and CR to LF.
+					// If we want to preserve whitespace properly, we need to use
+					// XmlTextReader instead, and disable normalization.
+
+					using (XmlTextReader r2 = new XmlTextReader(r)
+					{
+						Normalization = false,
+						WhitespaceHandling = WhitespaceHandling.All,
+						DtdProcessing = DtdProcessing.Ignore
+					})
+					{
+						r2.XmlResolver = null;
+
+						using (XmlReader xr = XmlReader.Create(r2, Settings))
+						{
+							Doc.Load(xr);
+						}
+					}
+				}
+				else
+				{
 					using (XmlReader xr = XmlReader.Create(r, Settings))
 					{
 						Doc.Load(xr);

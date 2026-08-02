@@ -16,6 +16,7 @@ using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Events;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Cache;
@@ -49,14 +50,14 @@ namespace Waher.Mcp.Xmpp
 
 		private static Cache<string, XmppClient> CreateCache()
 		{
-			Cache<string, XmppClient> Result = new Cache<string, XmppClient>(int.MaxValue, 
+			Cache<string, XmppClient> Result = new Cache<string, XmppClient>(int.MaxValue,
 				TimeSpan.MaxValue, TimeSpan.FromHours(1));
 			Result.Removed += Clients_Removed;
-			
+
 			return Result;
 		}
 
-		private static async Task Clients_Removed(object Sender, 
+		private static async Task Clients_Removed(object Sender,
 			CacheItemEventArgs<string, XmppClient> e)
 		{
 			await e.Value.DisposeAsync();
@@ -84,21 +85,23 @@ namespace Waher.Mcp.Xmpp
 		public XmppMcpServer(string ResourceName, Icon[] Icons,
 			Uri? WebSiteUri, ISnifferSet? SnifferSet)
 			: this(ResourceName,
-				  "XmppMcpServer",      // Name
-				  "XMPP MCP Server",    // Title
-				  typeof(XmppMcpServer).Assembly.GetName().Version.ToString(),
-				  "A Model Context Protocol (MCP) server resource permitting MCP clients " +
-				  "to access the federated XMPP network and send messages, perform " +
-				  "information queries and publish their presence.",
-				  Icons,
-				  WebSiteUri,
-				  "Each MCP Client gets associated with an XMPP account. If no user " +
-				  "account has been defined for the client, the user will be elicited " +
-				  "to input credentials for an XMPP account. Once connected, resources " +
-				  "show which items are available in the roster. Tools can be used to " +
-				  "send messages, information queries and presence stanzas, as well as " +
-				  "manipulate the roster.",
-				  SnifferSet)
+				"XmppMcpServer",      // Name
+				"XMPP MCP Server",    // Title
+				typeof(XmppMcpServer).Assembly.GetName().Version.ToString(),
+				"A Model Context Protocol (MCP) server resource permitting MCP clients " +
+				"to access the federated XMPP network and send and receive messages, " +
+				"perform information queries and publish their presence.",
+				Icons,
+				WebSiteUri,
+				"Each MCP Client gets associated with an XMPP account. If no user " +
+				"account has been defined for the client, the user will be elicited " +
+				"to input credentials for an XMPP account. Once connected, resources " +
+				"show which items are available in the roster, or messages that have " +
+				"been received. Tools can be used to send messages, information " +
+				"queries and presence stanzas, as well as manipulate the roster.It is " +
+				"the responsability of the MCP Client to read incoming messages and " +
+				"store them if necessary.",
+				SnifferSet)
 		{
 		}
 
@@ -147,11 +150,14 @@ namespace Waher.Mcp.Xmpp
 				return new KeyValuePair<bool, string>[]
 				{
 					new KeyValuePair<bool, string>(true,
-						"Each resource represents a contact in the account-specific " +
-						"roster. All contact resources use the xmpp URI scheme. Read " +
-						"the resource to gain information about what groups the contact " +
-						"belongs to, and the status of presence subscriptions, as well " +
-						"as nick names and last published presence information."),
+						"There are different types of resources published by the XMPP " +
+						"MCP Server. The type of resource is identified by the URI scheme " +
+						"of each resource."),
+					new KeyValuePair<bool, string>(true,
+						"The `xmpp` URI scheme represents a contact in the account-specific " +
+						"roster. Read the resource to gain information about what groups " +
+						"the contact belongs to, and the status of presence subscriptions, " +
+						"as well as nick names and last published presence information."),
 					new KeyValuePair<bool, string>(true,
 						"**Note**: Rosters are account-specific. When working with XMPP " +
 						"each MCP Client gets associated with an XMPP account. The roster " +
@@ -159,7 +165,17 @@ namespace Waher.Mcp.Xmpp
 						"separate rosters. Resources can be shared between MCP clients " +
 						"however, as they only point to the different contacts. When " +
 						"different clients read the resources however, different responses " +
-						"are expected.")
+						"are expected."),
+					new KeyValuePair<bool, string>(true,
+						"The `mid` URI scheme represents a message stanza that has been " +
+						"received. Read the resource, pop the message from the queue, and " +
+						"read it. Once the message has been read, it will be removed from " +
+						"the resource list. If the MCP client needs to store it, it can "+
+						"use file persistence to store the contents of the resource."),
+					new KeyValuePair<bool, string>(true,
+						"**Note**: Messages are not persisted by the MCP Server. It is " +
+						"the responsability of the MCP Client to read incoming messages " +
+						"and store them if necessary.")
 				};
 			}
 		}
@@ -232,13 +248,11 @@ namespace Waher.Mcp.Xmpp
 			if (User is null || Session is null)
 				return Array.Empty<Resource>();
 
-			string UserName = User.UserName;
 			XmppClient Client = await this.GetClient(Request, User, Session);
 			ChunkedList<Resource> Resources = new ChunkedList<Resource>();
 
 			foreach (RosterItem Item in Client.Roster)
-			{
-			}
+				Resources.Add(new RosterItemResource(Item));
 
 			return Resources.ToArray();
 		}
@@ -322,7 +336,7 @@ namespace Waher.Mcp.Xmpp
 						AllowEncryption = true,
 						AllowPlain = Credentials.AllowInsecureMechanisms,
 						AllowScramSHA1 = true,
-						AllowScramSHA256 = true, 
+						AllowScramSHA256 = true,
 						AllowQuickLogin = true
 					};
 
@@ -331,7 +345,7 @@ namespace Waher.Mcp.Xmpp
 
 					if (ConnectionResult == 0)
 					{
-						this.Setup(Client);
+						this.Setup(Client, User);
 						clients[User.UserName] = Client;
 						return Client;
 					}
@@ -419,7 +433,7 @@ namespace Waher.Mcp.Xmpp
 			}
 			while (Client is null);
 
-			this.Setup(Client);
+			this.Setup(Client, User);
 			clients[User.UserName] = Client;
 
 			Credentials = new ClientCredentials()
@@ -436,9 +450,35 @@ namespace Waher.Mcp.Xmpp
 			return Client;
 		}
 
-		private void Setup(XmppClient Client)
+		private void Setup(XmppClient Client, IUser User)
 		{
+			Client.SetTag("User", User);
+			Client.SetTag("Messages", new ChunkedList<MessageEventArgs>());
+
+			Client.OnNormalMessage += this.Client_OnNormalMessage;
+			Client.OnGroupChatMessage += this.Client_OnGroupChatMessage;
+			Client.OnChatMessage += this.Client_OnChatMessage;
+			Client.OnError += this.Client_OnError;
 		}
 
+		private Task Client_OnError(object Sender, Exception e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task Client_OnNormalMessage(object Sender, MessageEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task Client_OnChatMessage(object Sender, MessageEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task Client_OnGroupChatMessage(object Sender, MessageEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
 	}
 }

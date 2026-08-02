@@ -18,20 +18,13 @@ namespace Waher.Mcp.Xmpp
 		/// <summary>
 		/// Contains information about a Roster Item.
 		/// </summary>
-		/// <param name="Name">Name of resource.</param>
-		/// <param name="Title">A human-readable title for the resource.</param>
-		/// <param name="Description">A human-readable description of the resource.
-		/// 
-		/// This can be used by clients to improve the LLM's understanding of available resources. 
-		/// It can be thought of like a "hint" to the model.</param>
-		/// <param name="Uri">URI of the resource.</param>
-		/// <param name="RosterItem">Roster item.</param>
+		/// <param name="Item">Roster item.</param>
 		/// <param name="MetaData">Meta-data associated with resource.</param>
-		public RosterItemResource(string Name, string Title, string Description, Uri Uri,
-			RosterItem RosterItem, params KeyValuePair<string, object>[] MetaData)
-			: base(Name, Title, Description, Uri, MetaData)
+		public RosterItemResource(RosterItem Item, params KeyValuePair<string, object>[] MetaData)
+			: base(Item.BareJid, Item.NameOrBareJid, "Roster item for " + Item.BareJid,
+				  new Uri("xmpp:" + Item.BareJid), MetaData)
 		{
-			this.rosterItem = RosterItem;
+			this.rosterItem = Item;
 		}
 
 		/// <summary>

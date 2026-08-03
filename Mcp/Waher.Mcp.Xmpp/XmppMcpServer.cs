@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Mcp.Xmpp.UserInput;
 using Waher.Networking.DNS;
@@ -24,7 +23,6 @@ using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
 using Waher.Security;
-using Waher.Security.CallStack;
 
 namespace Waher.Mcp.Xmpp
 {
@@ -33,7 +31,7 @@ namespace Waher.Mcp.Xmpp
 	/// </summary>
 	[OAuthResourceName("MCP Server for XMPP communication")]
 	[McpScopeRoot("MCP:XMPP")]
-	public class XmppMcpServer : HttpMcpServerResource, IModule
+	public class XmppMcpServer : HttpMcpServerResource
 	{
 		internal const string BasePrivilege = OAuthResource.OAuthScopePrivilegePrefix + "MCP.XMPP";
 		internal const string ToolsPrivilege = BasePrivilege + ".Tools";
@@ -255,35 +253,6 @@ namespace Waher.Mcp.Xmpp
 				Resources.Add(new RosterItemResource(Item));
 
 			return Resources.ToArray();
-		}
-
-		/// <summary>
-		/// Starts the module.
-		/// </summary>
-		public Task Start()
-		{
-			ClientCredentials.SetAllowedSources(approvedSources);
-			return Task.CompletedTask;
-		}
-
-		internal static readonly Regex FromSaveUnsavedRegex = new Regex(@"Waher[.]Persistence[.]Files[.]ObjectBTreeFile[.+]((<SaveUnsaved>\w*[.]\w*)|(SaveUnsavedLocked))",
-			RegexOptions.Compiled | RegexOptions.Singleline);
-		internal static readonly Regex FromUpdateObjectRegex = new Regex(@"Waher[.]Persistence[.]Files[.]ObjectBTreeFile[.+]((<UpdateObject>\w*[.]\w*)|(UpdateObjectLocked))",
-			RegexOptions.Compiled | RegexOptions.Singleline);
-
-		private static readonly ICallStackCheck[] approvedSources = Assert.Convert(new object[]
-		{
-			typeof(XmppMcpServer),
-			FromSaveUnsavedRegex,
-			FromUpdateObjectRegex
-		});
-
-		/// <summary>
-		/// Stops the module.
-		/// </summary>
-		public Task Stop()
-		{
-			return Task.CompletedTask;
 		}
 
 		/// <summary>

@@ -66,6 +66,11 @@
 					<xs:documentation>Allows a client to test the creation and verification of a digital identity, without creating a persisted identity.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
+			<xs:attribute name='days' type='xs:positiveInteger' use='optional'>
+				<xs:annotation>
+					<xs:documentation>Requested number of days the resulting identity object should be valid. The Broker may reduce this number or set its own limit.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 

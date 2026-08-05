@@ -1985,7 +1985,66 @@ namespace Waher.Networking.XMPP.Contracts
 		/// generated identity should not be permanently registered.</param>
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public async Task Apply(string Address, Property[] Properties, bool Preview,
+		public Task Apply(string Address, Property[] Properties, bool Preview,
+			EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
+		{
+			return this.Apply(Address, Properties, null, Preview, Callback, State);
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <param name="Days">Requested number of days the resulting identity object 
+		/// should be valid. The Broker may reduce this number or set its own limit.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public Task Apply(Property[] Properties, int Days, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
+		{
+			return this.Apply(this.componentAddress, Properties, Days, false, Callback, State);
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <param name="Days">Requested number of days the resulting identity object 
+		/// should be valid. The Broker may reduce this number or set its own limit.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public Task Apply(string Address, Property[] Properties, int Days, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
+		{
+			return this.Apply(Address, Properties, Days, false, Callback, State);
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <param name="Days">Requested number of days the resulting identity object 
+		/// should be valid. The Broker may reduce this number or set its own limit.</param>
+		/// <param name="Preview">If the application is a preview application, and the
+		/// generated identity should not be permanently registered.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public Task Apply(Property[] Properties, int Days, bool Preview, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
+		{
+			return this.Apply(this.componentAddress, Properties, Days, Preview, Callback, State);
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <param name="Days">Requested number of days the resulting identity object 
+		/// should be valid. The Broker may reduce this number or set its own limit.</param>
+		/// <param name="Preview">If the application is a preview application, and the
+		/// generated identity should not be permanently registered.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public async Task Apply(string Address, Property[] Properties, int? Days, bool Preview,
 			EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
 			this.AssertAllowed();
@@ -2001,6 +2060,12 @@ namespace Waher.Networking.XMPP.Contracts
 
 					if (Preview)
 						Xml.Append("\" preview=\"true");
+
+					if (Days.HasValue && Days.Value > 0)
+					{
+						Xml.Append("\" days=\"");
+						Xml.Append(Days.Value.ToString());
+					}
 
 					Xml.Append("\">");
 
@@ -2096,11 +2161,66 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Preview">If the application is a preview application, and the
 		/// generated identity should not be permanently registered.</param>
 		/// <returns>Identity object representing the application.</returns>
-		public async Task<LegalIdentity> ApplyAsync(string Address, Property[] Properties, bool Preview)
+		public Task<LegalIdentity> ApplyAsync(string Address, Property[] Properties, bool Preview)
+		{
+			return this.ApplyAsync(Address, Properties, null, Preview);
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <param name="Days">Requested number of days the resulting identity object 
+		/// should be valid. The Broker may reduce this number or set its own limit.</param>
+		/// <returns>Identity object representing the application.</returns>
+		public Task<LegalIdentity> ApplyAsync(Property[] Properties, int Days)
+		{
+			return this.ApplyAsync(this.componentAddress, Properties, Days, false);
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <param name="Days">Requested number of days the resulting identity object 
+		/// should be valid. The Broker may reduce this number or set its own limit.</param>
+		/// <returns>Identity object representing the application.</returns>
+		public Task<LegalIdentity> ApplyAsync(string Address, Property[] Properties, int Days)
+		{
+			return this.ApplyAsync(Address, Properties, Days, false);
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <param name="Days">Requested number of days the resulting identity object 
+		/// should be valid. The Broker may reduce this number or set its own limit.</param>
+		/// <param name="Preview">If the application is a preview application, and the
+		/// generated identity should not be permanently registered.</param>
+		/// <returns>Identity object representing the application.</returns>
+		public Task<LegalIdentity> ApplyAsync(Property[] Properties, int Days, bool Preview)
+		{
+			return this.ApplyAsync(this.componentAddress, Properties, Days, Preview);
+		}
+
+		/// <summary>
+		/// Applies for a legal identity to be registered.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Properties">Properties of the legal identity.</param>
+		/// <param name="Days">Requested number of days the resulting identity object 
+		/// should be valid. The Broker may reduce this number or set its own limit.</param>
+		/// <param name="Preview">If the application is a preview application, and the
+		/// generated identity should not be permanently registered.</param>
+		/// <returns>Identity object representing the application.</returns>
+		public async Task<LegalIdentity> ApplyAsync(string Address, Property[] Properties, 
+			int? Days, bool Preview)
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			await this.Apply(Address, Properties, Preview, (Sender, e) =>
+			await this.Apply(Address, Properties, Days, Preview, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Identity);

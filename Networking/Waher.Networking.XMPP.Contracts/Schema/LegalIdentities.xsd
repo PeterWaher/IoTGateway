@@ -62,7 +62,7 @@
 			</xs:sequence>
 			<xs:attribute name='preview' type='xs:boolean' use='optional' default='false'>
 				<xs:annotation>
-					<xs:documentation>If set to true, the application is not persisted, but kept in internal memory only, as a preview of a coming application.</xs:documentation>
+					<xs:documentation>If set to true, the application is a preview of a coming application, and is not persisted as a normal application, but kept in short-lived protected memory only, and are removed once validation of the following identity application concludes.</xs:documentation>
 					<xs:documentation>Allows a client to test the creation and verification of a digital identity, without creating a persisted identity.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
@@ -115,7 +115,10 @@
 								<xs:documentation>EMAIL = E-mail address.</xs:documentation>
 								<xs:documentation>JID = XMPP address (Jabber ID).</xs:documentation>
 								<xs:documentation>DOMAIN = If the ID represents the legal representative of a domain.</xs:documentation>
+								<xs:documentation>PREVIEW = A reference to a preview of the identity application.</xs:documentation>
 								<xs:documentation>PSEUDONYM = Lists which properties are pseudonymous. Comma-separated list.</xs:documentation>
+								<xs:documentation>PROFILE = Name of Identity Profile or Identity Profiles (Comma-separated list).</xs:documentation>
+								<xs:documentation>DEVICE_ID = Device-specific identifier of the device.</xs:documentation>
 								<xs:documentation>ORGNAME = Name of organization</xs:documentation>
 								<xs:documentation>ORGNR = Organization number</xs:documentation>
 								<xs:documentation>ORGDEPT = Organization department, where person works.</xs:documentation>

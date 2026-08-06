@@ -259,7 +259,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 			this.hasMetaDataResource = this.TryGetResourceMetaDataResource(Server,
 				out this.metaDataResource);
-			this.hasDomain = Types.TryGetModuleParameter("Domain", out this.domain);
+			this.hasDomain = Types.TryGetModuleParameter("Domain", out this.domain) &&
+				!string.IsNullOrEmpty(this.domain);
 
 			if (Types.TryGetModuleParameter("JWT", out JwtFactory JwtFactory) &&
 				!JwtFactory.Disposed)

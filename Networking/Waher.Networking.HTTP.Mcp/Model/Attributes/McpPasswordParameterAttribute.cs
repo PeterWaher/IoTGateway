@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Waher.Events;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 {
@@ -52,7 +54,15 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// <param name="Schema">Schema object being built.</param>
 		public override void Annotate(Dictionary<string, object?> Schema)
 		{
-			throw new ServiceUnavailableException("Passwords not permitted in schema. User input via URL is required.");
+			Log.Warning("Passwords in MCP forms should not be used. Use a better MCP Client.");
+
+			base.Annotate(Schema);
+
+			if (this.MinLength.HasValue)
+				Schema["minLength"] = this.MinLength.Value;
+
+			if (this.MaxLength.HasValue)
+				Schema["maxLength"] = this.MaxLength.Value;
 		}
 
 		/// <summary>

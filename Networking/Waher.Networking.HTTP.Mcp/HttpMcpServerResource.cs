@@ -2628,7 +2628,6 @@ namespace Waher.Networking.HTTP.Mcp
 			return Task.CompletedTask;
 		}
 
-
 		/// <summary>
 		/// Elicits input from the user, if the client supports elicitation.
 		/// </summary>
@@ -2651,18 +2650,34 @@ namespace Waher.Networking.HTTP.Mcp
 			Type InputType = typeof(T);
 			McpParameterAttribute? ParameterInfo = InputType.GetCustomAttribute<McpParameterAttribute>();
 			IEnumerable<McpEnumValueAttribute> EnumValues = InputType.GetCustomAttributes<McpEnumValueAttribute>();
-			object InputSchema = Tool.GenerateSchema(InputType, true, InputRequest,
-				ParameterInfo, EnumValues);
 			Dictionary<string, object?> ElicitationRequest;
+			bool UrlMode;
 
-			if (Session.ClientCapabilities.Elicitation.Form && !Sensitive)
+			if (Session.ClientCapabilities.Elicitation.Form &&
+				(!Sensitive || !Session.ClientCapabilities.Elicitation.Url))
 			{
+				object InputSchema = Tool.GenerateSchema(InputType, true, InputRequest,
+					ParameterInfo, EnumValues);
+
+				if (Sensitive)
+				{
+					Message += "\n\nNOTE: The information you provide is marked as " +
+						"sensitive, and should be input using a separate form. Your " +
+						"MCP client does not support opening such separate forms. " +
+						"DO NOT enter sensitive information unless you know your " +
+						"agent manages sensitive information correctly. Consider using " +
+						"an MCP client that supports opening input forms in separate " +
+						"windows or tabs.";
+				}
+
 				ElicitationRequest = new Dictionary<string, object?>()
 				{
 					{ "mode", "form" },
 					{ "message", Message },
 					{ "requestedSchema", InputSchema }
 				};
+
+				UrlMode = false;
 			}
 			else if (Session.ClientCapabilities.Elicitation.Url)
 			{
@@ -2671,6 +2686,8 @@ namespace Waher.Networking.HTTP.Mcp
 					{ "mode", "url" },
 					{ "message", Message }
 				};
+
+				UrlMode = true;
 			}
 			else
 				throw new ServiceUnavailableException("Unable to elicit user input via URL.");
@@ -2712,7 +2729,7 @@ namespace Waher.Networking.HTTP.Mcp
 
 			Request.Tag = InputRequest;
 
-			if (!Session.ClientCapabilities.Elicitation.Form || Sensitive)
+			if (UrlMode)
 			{
 				string Url = HttpRequest.Header.GetURL(false, false) + "/" + Request.Id;
 

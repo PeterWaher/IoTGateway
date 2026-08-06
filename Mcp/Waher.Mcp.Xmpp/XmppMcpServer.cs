@@ -341,11 +341,19 @@ namespace Waher.Mcp.Xmpp
 			if (Types.TryGetModuleParameter("Domain", out string Domain))
 				NewCredentials.Domain = Domain;
 
+			string Error = string.Empty;
+			bool HasError = false;
+
 			do
 			{
-				bool? Result = await this.ElicitUserInput(Request,
-					"Please provide credentials to your XMPP account you want to use, " +
-					"or an API key if you want to create an account on a server.",
+				string Message = "Please provide credentials to your XMPP account you " +
+					"want to use, or an API key if you want to create an account on a " +
+					"server.";
+
+				if (HasError)
+					Message = "Error: " + Error + "\r\n\r\n" + Message;
+
+				bool? Result = await this.ElicitUserInput(Request, Message,
 					NewCredentials, true, Session, 5 * 60 * 1000);
 
 				if (!Result.HasValue)
@@ -368,6 +376,10 @@ namespace Waher.Mcp.Xmpp
 
 				try
 				{
+					TaskCompletionSource<bool> ErrorReceived = new TaskCompletionSource<bool>();
+					Error = string.Empty;
+					HasError = false;
+
 					Client = new XmppClient(Host, Port, NewCredentials.UserName,
 						NewCredentials.Password, string.Empty,
 						typeof(XmppMcpServer).Assembly)
@@ -382,13 +394,43 @@ namespace Waher.Mcp.Xmpp
 						AllowQuickLogin = true
 					};
 
+					Client.OnError += (sender, e) =>
+					{
+						Error = e.Message;
+						HasError = true;
+						ErrorReceived.TrySetResult(true);
+						return Task.CompletedTask;
+					};
+
+					Client.OnConnectionError += (sender, e) =>
+					{
+						Error = e.Message;
+						HasError = true;
+						ErrorReceived.TrySetResult(true);
+						return Task.CompletedTask;
+					};
+
+					await Client.Connect();
 					int ConnectionResult = await Client.WaitStateAsync(30000,
-						XmppState.Connected, XmppState.Offline, XmppState.Error);
+						XmppState.Connected, XmppState.Error);
 
 					if (ConnectionResult != 0)
 					{
 						await Client.DisposeAsync();
 						Client = null;
+
+						if (!HasError)
+						{
+							_ = Task.Delay(1000).ContinueWith(_ => ErrorReceived.TrySetResult(false));
+
+							await ErrorReceived.Task;
+						}
+
+						if (!HasError)
+						{
+							Error = "Connection failed, please try again.";
+							HasError = true;
+						}
 					}
 				}
 				catch (Exception)

@@ -87,7 +87,7 @@ namespace Waher.WebService.Tesseract.Test
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FileName));
 			TesseractApi Api = new();
 
-			using JwtFactory Factory = JwtFactory.CreateHmacSha256();
+			using JwtFactory Factory = JwtFactory.CreateHmacSha256("test");
 			Types.SetModuleParameter("JWT", Factory);
 
 			string Token = Factory.Create();

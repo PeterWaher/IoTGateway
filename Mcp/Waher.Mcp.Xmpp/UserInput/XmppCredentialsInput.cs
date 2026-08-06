@@ -16,7 +16,7 @@ namespace Waher.Mcp.Xmpp.UserInput
 		/// <summary>
 		/// User name (account name) of XMPP account.
 		/// </summary>
-		[McpStringParameter("UserName", "User name (account name) of XMPP account.", 1, 128)]
+		[McpStringParameter("User Name", "User name (account name) of XMPP account.", 1, 128)]
 		public string UserName = string.Empty;
 
 		/// <summary>
@@ -26,28 +26,34 @@ namespace Waher.Mcp.Xmpp.UserInput
 		public string Password = string.Empty;
 
 		/// <summary>
+		/// If the server certificate should be trusted by default.
+		/// </summary>
+		[McpParameter("Trust Server", "If the server certificate should be trusted by default.")]
+		public bool TrustServer = false;
+
+		/// <summary>
 		/// If insecure authentication mechanisms are allowed when connecting to 
 		/// XMPP server.
 		/// </summary>
-		[McpParameter("AllowInsecureMechanisms", "If insecure authentication mechanisms are allowed when connecting to XMPP server.")]
+		[McpParameter("Allow Insecure Mechanisms", "If insecure authentication mechanisms are allowed when connecting to XMPP server.")]
 		public bool AllowInsecureMechanisms = false;
 
 		/// <summary>
 		/// If a new account is to be created, rather than using an existing account.
 		/// </summary>
-		[McpParameter("CreateAccount", "If a new account is to be created, rather than using an existing account.")]
+		[McpParameter("Create Account", "If a new account is to be created, rather than using an existing account.")]
 		public bool CreateAccount = false;
 
 		/// <summary>
 		/// API Key to use when creating an account.
 		/// </summary>
-		[McpStringParameter("ApiKey", "API Key to use when creating an account.")]
+		[McpStringParameter("API Key", "API Key to use when creating an account.")]
 		public string ApiKey = string.Empty;
 
 		/// <summary>
 		/// API Secret to use when creating an account.
 		/// </summary>
-		[McpStringParameter("ApiSecret", "API Secret to use when creating an account.")]
+		[McpStringParameter("API Secret", "API Secret to use when creating an account.")]
 		public string ApiSecret = string.Empty;
 	}
 }

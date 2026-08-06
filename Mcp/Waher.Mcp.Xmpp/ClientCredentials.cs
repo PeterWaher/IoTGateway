@@ -25,6 +25,12 @@ namespace Waher.Mcp.Xmpp
 		}
 
 		/// <summary>
+		/// Object ID
+		/// </summary>
+		[ObjectId]
+		public string? ObjectID { get; set; }
+
+		/// <summary>
 		/// User name
 		/// </summary>
 		public string? UserName { get; set; }
@@ -33,6 +39,11 @@ namespace Waher.Mcp.Xmpp
 		/// XMPP domain or host.
 		/// </summary>
 		public string? Domain { get; set; }
+
+		/// <summary>
+		/// If the server certificate should be trusted by default.
+		/// </summary>
+		public bool TrustServer { get; set; }
 
 		/// <summary>
 		/// If insecure authentication mechanisms are allowed when connecting to 

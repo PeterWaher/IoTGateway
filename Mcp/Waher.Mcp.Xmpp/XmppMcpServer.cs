@@ -300,6 +300,7 @@ namespace Waher.Mcp.Xmpp
 						typeof(XmppMcpServer).Assembly)
 					{
 						RequestRosterOnStartup = true,
+						TrustServer = Credentials.TrustServer,
 						AllowCramMD5 = Credentials.AllowInsecureMechanisms,
 						AllowDigestMD5 = Credentials.AllowInsecureMechanisms,
 						AllowEncryption = true,
@@ -385,6 +386,7 @@ namespace Waher.Mcp.Xmpp
 						typeof(XmppMcpServer).Assembly)
 					{
 						RequestRosterOnStartup = true,
+						TrustServer = NewCredentials.TrustServer,
 						AllowCramMD5 = NewCredentials.AllowInsecureMechanisms,
 						AllowDigestMD5 = NewCredentials.AllowInsecureMechanisms,
 						AllowEncryption = true,
@@ -453,6 +455,7 @@ namespace Waher.Mcp.Xmpp
 				Domain = NewCredentials.Domain,
 				PasswordHash = Client.PasswordHash,
 				PasswordHashType = Client.PasswordHashMethod,
+				TrustServer = NewCredentials.TrustServer,
 				AllowInsecureMechanisms = NewCredentials.AllowInsecureMechanisms
 			};
 

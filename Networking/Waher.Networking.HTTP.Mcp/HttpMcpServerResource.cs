@@ -1253,7 +1253,14 @@ namespace Waher.Networking.HTTP.Mcp
 			return OAuthResource.HasScopePrivileges(Scopes, User, out MissingPrivilege);
 		}
 
-		private async Task<IUser?> GetAuthenticatedUser(HttpRequest Request,
+		/// <summary>
+		/// Gets the authenticated user in the MCP session.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Session">MCP session object.</param>
+		/// <returns>Authenticated user, if any.</returns>
+		protected async Task<IUser?> GetAuthenticatedUser(HttpRequest Request,
 			HttpResponse Response, Session Session)
 		{
 			IUser User = Request.User;
@@ -2239,13 +2246,34 @@ namespace Waher.Networking.HTTP.Mcp
 			}
 		}
 
-		private Task SendNotification(Predicate<IJsonRpcSession?> Filter,
+		/// <summary>
+		/// Sends a notification to all sessions that match the given filter.
+		/// </summary>
+		/// <param name="Filter">Filter to select sessions.</param>
+		/// <param name="Notification">Notification to send.</param>
+		/// <returns>Task representing the asynchronous operation.</returns>
+		protected Task SendNotification(Predicate<IJsonRpcSession?> Filter,
 			Dictionary<string, object> Notification)
 		{
 			return this.SendEvent(
 				Filter,
 				new KeyValuePair<string, object>("event", "message"),
 				new KeyValuePair<string, object>("data", JSON.Encode(Notification, false)));
+		}
+
+		/// <summary>
+		/// Sends a notification to all sessions that match the given filter.
+		/// </summary>
+		/// <param name="Filter">Filter to select sessions.</param>
+		/// <param name="Notification">Notification to send.</param>
+		/// <returns>Task representing the asynchronous operation.</returns>
+		protected Task SendNotification(Predicate<IJsonRpcSession?> Filter,
+			string Notification)
+		{
+			return this.SendEvent(
+				Filter,
+				new KeyValuePair<string, object>("event", "message"),
+				new KeyValuePair<string, object>("data", Notification));
 		}
 
 		/// <summary>

@@ -1,7 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Html;
+using Waher.Content.Markdown;
+using Waher.Content.Xml;
+using Waher.Mcp.Xmpp.Responses;
 using Waher.Mcp.Xmpp.UserInput;
+using Waher.Networking;
 using Waher.Networking.DNS;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
@@ -43,12 +49,12 @@ namespace Waher.Mcp.Xmpp
 		internal const string PresencePrivilege = ToolsPrivilege + ".Presence";
 		internal const string EditPrivilege = ToolsPrivilege + ".Edit";
 
-		private static readonly Cache<string, XmppClient> clients = CreateCache();
+		private static readonly Cache<string, ClientRec> clients = CreateCache();
 		private static XmppMcpServer? instance = null;
 
-		private static Cache<string, XmppClient> CreateCache()
+		private static Cache<string, ClientRec> CreateCache()
 		{
-			Cache<string, XmppClient> Result = new Cache<string, XmppClient>(int.MaxValue,
+			Cache<string, ClientRec> Result = new Cache<string, ClientRec>(int.MaxValue,
 				TimeSpan.MaxValue, TimeSpan.FromHours(1));
 			Result.Removed += Clients_Removed;
 
@@ -56,9 +62,24 @@ namespace Waher.Mcp.Xmpp
 		}
 
 		private static async Task Clients_Removed(object Sender,
-			CacheItemEventArgs<string, XmppClient> e)
+			CacheItemEventArgs<string, ClientRec> e)
 		{
-			await e.Value.DisposeAsync();
+			await e.Value.Client.DisposeAsync();
+			e.Value.Messages.Clear();
+		}
+
+		private class ClientRec
+		{
+			public ClientRec(string UserName, XmppClient Client)
+			{
+				this.UserName = UserName;
+				this.Client = Client;
+				this.Messages = new ChunkedList<MessageEventArgs>();
+			}
+
+			public string UserName;
+			public XmppClient Client;
+			public ChunkedList<MessageEventArgs> Messages = new ChunkedList<MessageEventArgs>();
 		}
 
 		/// <summary>
@@ -88,7 +109,10 @@ namespace Waher.Mcp.Xmpp
 				typeof(XmppMcpServer).Assembly.GetName().Version.ToString(),
 				"A Model Context Protocol (MCP) server resource permitting MCP clients " +
 				"to access the federated XMPP network and send and receive messages, " +
-				"perform information queries and publish their presence.",
+				"perform information queries and publish their presence. Before messages " +
+				"and queries can be made, the MCP client should first request the " + 
+				"presence subscription of the contact to whom messages are queries "+
+				"should be sent.",
 				Icons,
 				WebSiteUri,
 				"Each MCP Client gets associated with an XMPP account. If no user " +
@@ -96,7 +120,7 @@ namespace Waher.Mcp.Xmpp
 				"to input credentials for an XMPP account. Once connected, resources " +
 				"show which items are available in the roster, or messages that have " +
 				"been received. Tools can be used to send messages, information " +
-				"queries and presence stanzas, as well as manipulate the roster.It is " +
+				"queries and presence stanzas, as well as manipulate the roster. It is " +
 				"the responsability of the MCP Client to read incoming messages and " +
 				"store them if necessary.",
 				SnifferSet)
@@ -268,15 +292,26 @@ namespace Waher.Mcp.Xmpp
 		private async Task<XmppClient> GetClient(HttpRequest Request, IUser User,
 			Session Session)
 		{
-			if (clients.TryGetValue(User.UserName, out XmppClient? Client))
-				return Client;
+			if (clients.TryGetValue(User.UserName, out ClientRec? Rec))
+			{
+				if (Rec.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
+					McpXmppExtension.Register(Session.SessionId);
+
+				return Rec.Client;
+			}
 
 			using Semaphore Lock = await Semaphores.BeginWrite("mcp:xmpp:" + User.UserName);
 
-			if (clients.TryGetValue(User.UserName, out Client))
-				return Client;
+			if (clients.TryGetValue(User.UserName, out Rec))
+			{
+				if (Rec.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
+					McpXmppExtension.Register(Session.SessionId);
 
-			ClientCredentials? Credentials = await Database.FindFirstIgnoreRest<ClientCredentials>(
+				return Rec.Client;
+			}
+
+			XmppClient? Client = null;
+			ClientCredentials? Credentials = await Database.FindFirstDeleteRest<ClientCredentials>(
 				new FilterFieldEqualTo("UserName", User.UserName));
 
 			if (!(Credentials is null))
@@ -315,8 +350,9 @@ namespace Waher.Mcp.Xmpp
 
 					if (ConnectionResult == 0)
 					{
+						Client.RegisterExtension(new McpXmppExtension(Session.SessionId));
 						this.Setup(Client, User);
-						clients[User.UserName] = Client;
+						clients[User.UserName] = new ClientRec(User.UserName, Client);
 						return Client;
 					}
 
@@ -435,8 +471,14 @@ namespace Waher.Mcp.Xmpp
 						}
 					}
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
+					if (!HasError)
+					{
+						Error = ex.Message;
+						HasError = true;
+					}
+
 					if (!(Client is null))
 					{
 						await Client.DisposeAsync();
@@ -446,20 +488,35 @@ namespace Waher.Mcp.Xmpp
 			}
 			while (Client is null);
 
+			Client.RegisterExtension(new McpXmppExtension(Session.SessionId));
 			this.Setup(Client, User);
-			clients[User.UserName] = Client;
+			clients[User.UserName] = new ClientRec(User.UserName, Client);
 
-			Credentials = new ClientCredentials()
+			if (Credentials is null)
 			{
-				UserName = NewCredentials.Domain,
-				Domain = NewCredentials.Domain,
-				PasswordHash = Client.PasswordHash,
-				PasswordHashType = Client.PasswordHashMethod,
-				TrustServer = NewCredentials.TrustServer,
-				AllowInsecureMechanisms = NewCredentials.AllowInsecureMechanisms
-			};
+				Credentials = new ClientCredentials()
+				{
+					UserName = User.UserName,
+					Domain = NewCredentials.Domain,
+					PasswordHash = Client.PasswordHash,
+					PasswordHashType = Client.PasswordHashMethod,
+					TrustServer = NewCredentials.TrustServer,
+					AllowInsecureMechanisms = NewCredentials.AllowInsecureMechanisms
+				};
 
-			await Database.Insert(Credentials);
+				await Database.Insert(Credentials);
+			}
+			else
+			{
+				Credentials.UserName = User.UserName;
+				Credentials.Domain = NewCredentials.Domain;
+				Credentials.PasswordHash = Client.PasswordHash;
+				Credentials.PasswordHashType = Client.PasswordHashMethod;
+				Credentials.TrustServer = NewCredentials.TrustServer;
+				Credentials.AllowInsecureMechanisms = NewCredentials.AllowInsecureMechanisms;
+
+				await Database.Update(Credentials);
+			}
 
 			return Client;
 		}
@@ -473,6 +530,317 @@ namespace Waher.Mcp.Xmpp
 			Client.OnGroupChatMessage += this.Client_OnGroupChatMessage;
 			Client.OnChatMessage += this.Client_OnChatMessage;
 			Client.OnError += this.Client_OnError;
+			Client.OnPresence += this.Client_OnPresence;
+			Client.OnPresenceSubscribe += this.Client_OnPresenceSubscribe;
+			Client.OnPresenceSubscribed += this.Client_OnPresenceSubscribed;
+			Client.OnPresenceUnsubscribe += this.Client_OnPresenceUnsubscribe;
+			Client.OnPresenceUnsubscribed += this.Client_OnPresenceUnsubscribed;
+			Client.OnRosterItemAdded += this.Client_OnRosterItemAdded;
+			Client.OnRosterItemRemoved += this.Client_OnRosterItemRemoved;
+			Client.OnRosterItemUpdated += this.Client_OnRosterItemUpdated;
+			Client.OnStateChanged += this.Client_OnStateChanged;
+		}
+
+		/// <summary>
+		/// MCP Server Tool to send a presence subscription request to another user.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="To">Bare JID of the recipient of the presence subscription request.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Request Presence Subscription",
+			"Requests a presence subscription to another user's presence.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			true,   // Idempotent
+			true)]  // OpenWorldAccess
+		[return: McpParameter("Result", "Results of operation.")]
+		public async Task<GenericResponse> RequestPresenceSubscription(HttpRequest Request, HttpResponse Response,
+
+			[McpStringParameter("To", "Bare JID of the user to whom send a presence subscription request.", 3, 256)]
+			string To)
+		{
+			Session? Session = await this.TryGetMcpSession(Request, Response);
+			if (Session is null)
+				return new GenericResponse(false, "No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
+			if (Response.ResponseSent || User is null)
+				return new GenericResponse(false, "User not authenticated.");
+
+			XmppClient Client = await this.GetClient(Request, User, Session);
+
+			await Client.RequestPresenceSubscription(To);
+
+			return new GenericResponse(true, "Presence subscription request sent to " + To + ".");
+		}
+
+		/// <summary>
+		/// MCP Server Tool to accept a presence subscription request from another user.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="From">Bare JID of the sender of the presence subscription to accept.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Accept Presence Subscription",
+			"Accepts a presence subscription request from another user.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			true,   // Idempotent
+			true)]  // OpenWorldAccess
+		[return: McpParameter("Result", "Results of operation.")]
+		public async Task<GenericResponse> AcceptPresenceSubscription(
+			HttpRequest Request, HttpResponse Response,
+
+			[McpStringParameter("From", "Bare JID of the sender of the presence subscription request to accept.", 3, 256)]
+			string From)
+		{
+			Session? Session = await this.TryGetMcpSession(Request, Response);
+			if (Session is null)
+				return new GenericResponse(false, "No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
+			if (Response.ResponseSent || User is null)
+				return new GenericResponse(false, "User not authenticated.");
+
+			XmppClient Client = await this.GetClient(Request, User, Session);
+
+			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) || McpXmppExtension is null)
+				return new GenericResponse(false, "MCP XMPP extension not available.");
+
+			if (!McpXmppExtension.TryGetPresenceSubscriptionRequest(From, out PresenceEventArgs? e))
+				return new GenericResponse(false, "No presence subscription request from " + From + " available.");
+
+			await e.Accept();
+
+			return new GenericResponse(true, "Presence subscription request from " + From + " accepted.");
+		}
+
+		/// <summary>
+		/// MCP Server Tool to send a presence unsubscription request to another user.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="To">Bare JID of the recipient of the presence unsubscription request.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Request Presence Unsubscription",
+			"Requests a presence unsubscription from another user's presence.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			true,   // CanDestroyEnvironment
+			true,   // Idempotent
+			true)]  // OpenWorldAccess
+		[return: McpParameter("Result", "Results of operation.")]
+		public async Task<GenericResponse> RequestPresenceUnsubscription(HttpRequest Request, HttpResponse Response,
+
+			[McpStringParameter("To", "Bare JID of the user to whom send a presence subscription request.", 3, 256)]
+			string To)
+		{
+			Session? Session = await this.TryGetMcpSession(Request, Response);
+			if (Session is null)
+				return new GenericResponse(false, "No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
+			if (Response.ResponseSent || User is null)
+				return new GenericResponse(false, "User not authenticated.");
+
+			XmppClient Client = await this.GetClient(Request, User, Session);
+
+			await Client.RequestPresenceUnsubscription(To);
+
+			return new GenericResponse(true, "Request to ubsubscribe from presence from " + To + " sent.");
+		}
+
+		/// <summary>
+		/// MCP Server Tool to send a chat message to a recipient using XMPP.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="To">Bare JID of the recipient of the message.</param>
+		/// <param name="Message">Message content. Can be either plain text, or Markdown.</param>
+		/// <param name="IsMarkdown">Indicates if the message is in Markdown format (true),
+		/// or plain text (false).</param>
+		/// <param name="Language">ISO-639 code of language used in the message, if any.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Send Chat Message",
+			"Sends a Chat Message to a recipient using XMPP.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[return: McpParameter("Result", "Results of operation.")]
+		public async Task<GenericResponse> SendChatMessage(HttpRequest Request, HttpResponse Response,
+
+			[McpStringParameter("To", "Bare JID of the recipient of the message.", 3, 256)]
+			string To,
+
+			[McpStringParameter("Message", "Message content. Can be either plain text, or Markdown.", 1, 10000)]
+			string Message,
+
+			[McpParameter("Is Markdown", "Indicates if the message is in Markdown format (true), or plain text (false).")]
+			bool IsMarkdown = false,
+
+			[McpStringParameter("Language", "ISO-639 code of language used in the message, if any.", 0, 10)]
+			string Language = "")
+		{
+			Session? Session = await this.TryGetMcpSession(Request, Response);
+			if (Session is null)
+				return new GenericResponse(false, "No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
+			if (Response.ResponseSent || User is null)
+				return new GenericResponse(false, "User not authenticated.");
+
+			XmppClient Client = await this.GetClient(Request, User, Session);
+			string Markdown;
+			string Html;
+			string PlainText;
+
+			if (IsMarkdown)
+			{
+				MarkdownSettings Settings = new MarkdownSettings()
+				{
+					AllowHtml = false,
+					AllowInlineScript = false,
+					AllowScriptTag = false,
+					ParseMetaData = false
+				};
+				MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Message, Settings);
+				Markdown = await Doc.GenerateMarkdown();
+				Html = await Doc.GenerateHTML();
+				PlainText = await Doc.GeneratePlainText();
+			}
+			else
+			{
+				Markdown = string.Empty;
+				Html = string.Empty;
+				PlainText = Message;
+			}
+
+			StringBuilder Xml = new StringBuilder();
+			AppendMultiFormatChatMessageXml(Xml, PlainText, Html, Markdown);
+
+			TaskCompletionSource<DeliveryEventArgs> MessageSent = new TaskCompletionSource<DeliveryEventArgs>();
+
+			await Client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat,
+				To, Xml.ToString(), string.Empty, string.Empty, Language,
+				string.Empty, string.Empty,
+				(_, e) =>
+				{
+					MessageSent.TrySetResult(e);
+					return Task.CompletedTask;
+				}, null);
+
+			DeliveryEventArgs e = await MessageSent.Task;
+			if (e.Ok)
+				return new GenericResponse(true, "Message sent to " + To + ".");
+			else
+				return new GenericResponse(false, "Unable to send message to " + To + ".");
+		}
+
+		/// <summary>
+		/// Appends the XML for a multi-formatted chat message to a string being built.
+		/// </summary>
+		/// <param name="Xml">XML output.</param>
+		/// <param name="Text">Plain-text version of message. If empty or null, plain text is excluded from message.</param>
+		/// <param name="Html">HTML version of message. If empty or null, HTML is excluded from message.</param>
+		/// <param name="Markdown">Markdown containing message text. If empty or null, markdown is excluded from message.</param>
+		public static void AppendMultiFormatChatMessageXml(StringBuilder Xml, string Text, string Html, string Markdown)
+		{
+			if (string.IsNullOrEmpty(Text))
+				Xml.Append("<body/>");
+			else
+			{
+				Xml.Append("<body>");
+
+				if (Text.Contains("]]>"))
+					Xml.Append(XML.Encode(Text));
+				else
+				{
+					Xml.Append("<![CDATA[");
+					Xml.Append(Text);
+					Xml.Append("]]>");
+				}
+
+				Xml.Append("</body>");
+			}
+
+			if (!string.IsNullOrEmpty(Markdown))
+			{
+				Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">");
+
+				if (Markdown.Contains("]]>"))
+					Xml.Append(XML.Encode(Markdown));
+				else
+				{
+					Xml.Append("<![CDATA[");
+					Xml.Append(Markdown);
+					Xml.Append("]]>");
+				}
+
+				Xml.Append("</content>");
+			}
+
+			if (!string.IsNullOrEmpty(Html))
+			{
+				Xml.Append("<html xmlns='http://jabber.org/protocol/xhtml-im'>");
+				Xml.Append("<body xmlns='http://www.w3.org/1999/xhtml'>");
+
+				HtmlDocument Doc = new HtmlDocument("<root>" + Html + "</root>");
+				IEnumerable<HtmlNode> Children = (Doc.Body ?? Doc.Root).Children;
+
+				if (!(Children is null))
+				{
+					foreach (HtmlNode N in Children)
+						N.Export(Xml);
+				}
+
+				Xml.Append("</body></html>");
+			}
+		}
+
+		private async Task Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
+		{
+			if (e.Client.TryGetExtension(out McpXmppExtension? McpXmppExtension))
+			{
+				McpXmppExtension!.Add(e);
+
+				await this.SendNotification(McpXmppExtension.IsRegistered,
+					"Presence Subscription Request received from " + e.FromBareJID);
+
+				// TODO: Elicit user input to accept or reject subscription request.
+			}
+		}
+
+		private async Task Client_OnPresenceSubscribed(object Sender, PresenceEventArgs e)
+		{
+			if (e.Client.TryGetExtension(out McpXmppExtension? McpXmppExtension))
+			{
+				await this.SendNotification(McpXmppExtension!.IsRegistered,
+					"Presence Subscription Request to " + e.FromBareJID + " has been accepted.");
+			}
+		}
+
+		private Task Client_OnPresenceUnsubscribed(object Sender, PresenceEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task Client_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task Client_OnPresence(object Sender, PresenceEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
 		}
 
 		private Task Client_OnError(object Sender, Exception e)
@@ -494,5 +862,26 @@ namespace Waher.Mcp.Xmpp
 		{
 			return Task.CompletedTask;  // TODO
 		}
+
+		private Task Client_OnStateChanged(object Sender, XmppState e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task Client_OnRosterItemUpdated(object Sender, RosterItem e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task Client_OnRosterItemRemoved(object Sender, RosterItem e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task Client_OnRosterItemAdded(object Sender, RosterItem e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
 	}
 }

@@ -50,6 +50,7 @@ using Waher.IoTGateway.Setup.Legal;
 using Waher.IoTGateway.WebResources;
 using Waher.IoTGateway.WebResources.ExportFormats;
 using Waher.Jobs;
+using Waher.Mcp.Xmpp;
 using Waher.Networking;
 using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
@@ -4985,7 +4986,7 @@ namespace Waher.IoTGateway
 		public static string GetMultiFormatChatMessageXml(string Text, string Html, string Markdown)
 		{
 			StringBuilder Xml = new StringBuilder();
-			AppendMultiFormatChatMessageXml(Xml, Text, Html, Markdown);
+			XmppMcpServer.AppendMultiFormatChatMessageXml(Xml, Text, Html, Markdown);
 			return Xml.ToString();
 		}
 
@@ -4998,56 +4999,7 @@ namespace Waher.IoTGateway
 		/// <param name="Markdown">Markdown containing message text. If empty or null, markdown is excluded from message.</param>
 		public static void AppendMultiFormatChatMessageXml(StringBuilder Xml, string Text, string Html, string Markdown)
 		{
-			if (string.IsNullOrEmpty(Text))
-				Xml.Append("<body/>");
-			else
-			{
-				Xml.Append("<body>");
-
-				if (Text.Contains("]]>"))
-					Xml.Append(XML.Encode(Text));
-				else
-				{
-					Xml.Append("<![CDATA[");
-					Xml.Append(Text);
-					Xml.Append("]]>");
-				}
-
-				Xml.Append("</body>");
-			}
-
-			if (!string.IsNullOrEmpty(Markdown))
-			{
-				Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">");
-
-				if (Markdown.Contains("]]>"))
-					Xml.Append(XML.Encode(Markdown));
-				else
-				{
-					Xml.Append("<![CDATA[");
-					Xml.Append(Markdown);
-					Xml.Append("]]>");
-				}
-
-				Xml.Append("</content>");
-			}
-
-			if (!string.IsNullOrEmpty(Html))
-			{
-				Xml.Append("<html xmlns='http://jabber.org/protocol/xhtml-im'>");
-				Xml.Append("<body xmlns='http://www.w3.org/1999/xhtml'>");
-
-				HtmlDocument Doc = new HtmlDocument("<root>" + Html + "</root>");
-				IEnumerable<HtmlNode> Children = (Doc.Body ?? Doc.Root).Children;
-
-				if (!(Children is null))
-				{
-					foreach (HtmlNode N in Children)
-						N.Export(Xml);
-				}
-
-				Xml.Append("</body></html>");
-			}
+			XmppMcpServer.AppendMultiFormatChatMessageXml(Xml, Text, Html, Markdown);
 		}
 
 		private static async Task SendChatMessage(MessageType Type, string Markdown, string Text, string Html, string To, string MessageId, string ThreadId, bool Update)
@@ -5056,7 +5008,7 @@ namespace Waher.IoTGateway
 			{
 				StringBuilder Xml = new StringBuilder();
 
-				AppendMultiFormatChatMessageXml(Xml, Text, Html, Markdown);
+				XmppMcpServer.AppendMultiFormatChatMessageXml(Xml, Text, Html, Markdown);
 
 				if (Update && !string.IsNullOrEmpty(MessageId))
 				{

@@ -278,21 +278,17 @@ namespace Waher.Mcp.Xmpp
 			{
 				case "xmpp":
 					RosterItem Contact = Client[Uri.AbsolutePath];
-					if (Contact is null)
-						return null;
-					else
+					if (!(Contact is null))
 						return new RosterItemResource(Contact);
+					break;
 
 				case "mid":
 					if (Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
 						!(McpXmppExtension is null))
 					{
-						MessageEventArgs? Message = McpXmppExtension.Pop(Uri.AbsolutePath);
+						MessageEventArgs? Message = McpXmppExtension.TryGetMessage(Uri.AbsolutePath, false);
 						if (!(Message is null))
-						{
-							this.ResourcesUpdated(User);
 							return new MessageResource(Uri.AbsolutePath, Message);
-						}
 					}
 					break;
 			}
@@ -319,7 +315,7 @@ namespace Waher.Mcp.Xmpp
 			foreach (RosterItem Item in Client.Roster)
 				Resources.Add(new RosterItemResource(Item));
 
-			if (Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) && 
+			if (Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
 				!(McpXmppExtension is null))
 			{
 				foreach (string MessageId in McpXmppExtension.GetMessageIds())
@@ -362,7 +358,7 @@ namespace Waher.Mcp.Xmpp
 
 			XmppClient? Client = null;
 			ClientCredentials? Credentials = await Database.FindFirstDeleteRest<ClientCredentials>(
-				new FilterFieldEqualTo("UserName", User.UserName));
+				new FilterFieldEqualTo("McpUserName", User.UserName));
 
 			if (!(Credentials is null))
 			{
@@ -380,7 +376,7 @@ namespace Waher.Mcp.Xmpp
 
 				try
 				{
-					Client = new XmppClient(Host, Port, Credentials.UserName,
+					Client = new XmppClient(Host, Port, Credentials.XmppAccountName,
 						Credentials.PasswordHash, Credentials.PasswordHashType,
 						typeof(XmppMcpServer).Assembly)
 					{
@@ -421,7 +417,7 @@ namespace Waher.Mcp.Xmpp
 
 			XmppCredentialsInput NewCredentials = new XmppCredentialsInput()
 			{
-				UserName = Credentials?.UserName ?? string.Empty,
+				UserName = Credentials?.XmppAccountName ?? string.Empty,
 				Domain = Credentials?.Domain ?? string.Empty,
 				TrustServer = Credentials?.TrustServer ?? false
 			};
@@ -547,7 +543,8 @@ namespace Waher.Mcp.Xmpp
 			{
 				Credentials = new ClientCredentials()
 				{
-					UserName = NewCredentials.UserName,
+					McpUserName = User.UserName,
+					XmppAccountName = NewCredentials.UserName,
 					Domain = NewCredentials.Domain,
 					PasswordHash = Client.PasswordHash,
 					PasswordHashType = Client.PasswordHashMethod,
@@ -559,7 +556,7 @@ namespace Waher.Mcp.Xmpp
 			}
 			else
 			{
-				Credentials.UserName = NewCredentials.UserName;
+				Credentials.XmppAccountName = NewCredentials.UserName;
 				Credentials.Domain = NewCredentials.Domain;
 				Credentials.PasswordHash = Client.PasswordHash;
 				Credentials.PasswordHashType = Client.PasswordHashMethod;
@@ -861,6 +858,105 @@ namespace Waher.Mcp.Xmpp
 
 				Xml.Append("</body></html>");
 			}
+		}
+
+		/// <summary>
+		/// MCP Server Tool to retrieve a message received over XMPP.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="MessageId">The ID of the message to retrieve. Can be the 
+		/// identifier itself, or the message resource URI.</param>
+		/// <param name="Remove">Determines if the message should be removed from the list 
+		/// of received messages or not.</param>
+		/// <returns>Message, if found.</returns>
+		[McpServerTool(
+			"Get Message",
+			"Gets a message that has been received over XMPP.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			true,   // CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[return: McpParameter("Result", "Message, if found.")]
+		public async Task<MessageResponse> GetMessage(HttpRequest Request, HttpResponse Response,
+
+			[McpStringParameter("Message ID", "The ID of the message to retrieve. Can be the identifier itself, or the message resource URI.", 3, 256)]
+			string MessageId,
+
+			[McpParameter("Remove", "Determines if the message should be removed from the list of received messages or not.")]
+			bool Remove = false)
+		{
+			Session? Session = await this.TryGetMcpSession(Request, Response);
+			if (Session is null)
+				return new MessageResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
+			if (Response.ResponseSent || User is null)
+				return new MessageResponse("User not authenticated.");
+
+			XmppClient Client = await this.GetClient(Request, User, Session);
+
+			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
+				McpXmppExtension is null)
+			{
+				return new MessageResponse("XMPP Client not setup properly.");
+			}
+
+			if (MessageId.StartsWith("mid:"))
+				MessageId = MessageId[4..];
+
+			MessageEventArgs? Message = McpXmppExtension.TryGetMessage(MessageId, Remove);
+			if (Message is null)
+				return new MessageResponse("Message not found.");
+
+			if (Remove)
+				this.ResourcesUpdated(User);
+
+			return new MessageResponse(Message);
+		}
+
+		/// <summary>
+		/// MCP Server Tool to retrieve the first message received over XMPP, and then
+		/// remove it from the resource list.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <returns>Message, if found.</returns>
+		[McpServerTool(
+			"Pop Message",
+			"Gets the first message that has been received over XMPP, and then removes it from the resource list.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			true,   // CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[return: McpParameter("Result", "Message, if found.")]
+		public async Task<MessageResponse> PopMessage(HttpRequest Request, HttpResponse Response)
+		{
+			Session? Session = await this.TryGetMcpSession(Request, Response);
+			if (Session is null)
+				return new MessageResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
+			if (Response.ResponseSent || User is null)
+				return new MessageResponse("User not authenticated.");
+
+			XmppClient Client = await this.GetClient(Request, User, Session);
+
+			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
+				McpXmppExtension is null)
+			{
+				return new MessageResponse("XMPP Client not setup properly.");
+			}
+
+			MessageEventArgs? Message = McpXmppExtension.TryGetFirstMessage(true);
+			if (Message is null)
+				return new MessageResponse("No messages available.");
+
+			this.ResourcesUpdated(User);
+
+			return new MessageResponse(Message);
 		}
 
 		private async Task Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)

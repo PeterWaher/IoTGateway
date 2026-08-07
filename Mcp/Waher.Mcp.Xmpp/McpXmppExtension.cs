@@ -187,22 +187,53 @@ namespace Waher.Mcp.Xmpp
 		}
 
 		/// <summary>
-		/// Removes and returns the message associated with the specified message identifier.
+		/// Tries to retrieve a message associated with a specified message identifier.
 		/// </summary>
-		/// <param name="MessageId">The identifier of the message to remove.</param>
+		/// <param name="MessageId">The identifier of the message to retrieve.</param>
+		/// <param name="Pop">If the message should be removed, if found.</param>
 		/// <returns>The message event arguments if found; otherwise, null.</returns>
-		public MessageEventArgs? Pop(string MessageId)
+		public MessageEventArgs? TryGetMessage(string MessageId, bool Pop)
 		{
 			lock (this.messages)
 			{
 				if (this.messagesById.TryGetValue(MessageId, out MessageRec? Rec))
 				{
-					this.messagesById.Remove(MessageId);
-					this.messages.Remove(Rec);
+					if (Pop)
+					{
+						this.messagesById.Remove(MessageId);
+						this.messages.Remove(Rec);
+					}
+
 					return Rec.Message;
 				}
 				else
 					return null;
+			}
+		}
+
+		/// <summary>
+		/// Tries to retrieve the first message in the queue.
+		/// </summary>
+		/// <param name="Pop">If the message should be removed, if found.</param>
+		/// <returns>The message event arguments if found; otherwise, null.</returns>
+		public MessageEventArgs? TryGetFirstMessage(bool Pop)
+		{
+			lock (this.messages)
+			{
+				if (!this.messages.HasFirstItem)
+					return null;
+
+				if (!Pop)
+					return this.messages.FirstItem.Message;
+				else
+				{
+					MessageRec? Rec = this.messages.RemoveFirst();
+
+					this.messagesById.Remove(Rec.MessageId);
+					this.messages.Remove(Rec);
+				
+					return Rec.Message;
+				}
 			}
 		}
 

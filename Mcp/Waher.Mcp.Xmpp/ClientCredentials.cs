@@ -10,7 +10,7 @@ namespace Waher.Mcp.Xmpp
 	/// </summary>
 	[TypeName(TypeNameSerialization.None)]
 	[CollectionName("McpXmppClientCredentials")]
-	[Index("UserName")]
+	[Index("McpUserName")]
 	public class ClientCredentials : IEncryptedProperties
 	{
 		private static ICallStackCheck[]? approvedSources = null;
@@ -31,9 +31,14 @@ namespace Waher.Mcp.Xmpp
 		public string? ObjectID { get; set; }
 
 		/// <summary>
-		/// User name
+		/// MCP User name
 		/// </summary>
-		public string? UserName { get; set; }
+		public string? McpUserName { get; set; }
+
+		/// <summary>
+		/// XMPP Account name
+		/// </summary>
+		public string? XmppAccountName { get; set; }
 
 		/// <summary>
 		/// XMPP domain or host.

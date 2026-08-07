@@ -618,6 +618,9 @@ namespace Waher.Mcp.Xmpp
 			if (Response.ResponseSent || User is null)
 				return new GenericResponse(false, "User not authenticated.");
 
+			if (!XmppClient.BareJidRegEx.IsMatch(To))
+				return new GenericResponse(false, "Invalid Bare JID: " + To);
+
 			XmppClient Client = await this.GetClient(Request, User, Session);
 
 			await Client.RequestPresenceSubscription(To);
@@ -700,6 +703,9 @@ namespace Waher.Mcp.Xmpp
 			if (Response.ResponseSent || User is null)
 				return new GenericResponse(false, "User not authenticated.");
 
+			if (!XmppClient.BareJidRegEx.IsMatch(To))
+				return new GenericResponse(false, "Invalid Bare JID: " + To);
+
 			XmppClient Client = await this.GetClient(Request, User, Session);
 
 			await Client.RequestPresenceUnsubscription(To);
@@ -707,8 +713,169 @@ namespace Waher.Mcp.Xmpp
 			return new GenericResponse(true, "Request to ubsubscribe from presence from " + To + " sent.");
 		}
 
-		// TODO: Manage roster item groups.
-		// TODO: Manage roster item nick names.
+		/// <summary>
+		/// MCP Server Tool to add a contact to the roster of the XMPP account associated 
+		/// with the MCP Client.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="BareJid">Bare JID of the contact to add to roster.</param>
+		/// <param name="NickName">Optional nick name of the contact to add to roster.</param>
+		/// <param name="Groups">Optional groups to which the contact should be added.</param>
+		/// <returns>Results of operation.</returns>
+		[return: McpParameter("Result", "Results of operation.")]
+		public async Task<GenericResponse> AddToRoster(HttpRequest Request, HttpResponse Response,
+
+			[McpStringParameter("Bare JID", "Bare JID of the contact to add to roster.", 3, 256)]
+			string BareJid,
+
+			[McpStringParameter("Nick Name", "Optional nick name of the contact to add to roster.", 0, 256)]
+			string? NickName = null,
+
+			[McpParameter("Groups", "Optional groups to which the contact should be added.")]
+			string[]? Groups = null)
+		{
+			Session? Session = await this.TryGetMcpSession(Request, Response);
+			if (Session is null)
+				return new GenericResponse(false, "No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
+			if (Response.ResponseSent || User is null)
+				return new GenericResponse(false, "User not authenticated.");
+
+			if (!XmppClient.BareJidRegEx.IsMatch(BareJid))
+				return new GenericResponse(false, "Invalid Bare JID: " + BareJid);
+
+			XmppClient Client = await this.GetClient(Request, User, Session);
+
+			if (!(Client.GetRosterItem(BareJid) is null))
+				return new GenericResponse(false, "Contact already in roster.");
+
+			TaskCompletionSource<string?> RosterItemAdded = new TaskCompletionSource<string?>();
+			
+			await Client.AddRosterItem(new RosterItem(BareJid, NickName ?? string.Empty,
+				Groups ?? Array.Empty<string>()), (_, e) =>
+				{
+					RosterItemAdded.TrySetResult(e.Ok ? null : e.ErrorText ?? string.Empty);
+					return Task.CompletedTask;
+				}, null);
+
+			string? Error = await RosterItemAdded.Task;
+			if (Error is null)
+			{
+				this.ResourcesUpdated(User);
+				return new GenericResponse(true, "Contact added to roster.");
+			}
+			else
+				return new GenericResponse(false, "Unable to add contact to roster: " + Error);
+		}
+
+		/// <summary>
+		/// MCP Server Tool to update a contact in the roster of the XMPP account associated 
+		/// with the MCP Client.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="BareJid">Bare JID of the contact to update in roster.</param>
+		/// <param name="NickName">Optional nick name of the contact to update in roster.</param>
+		/// <param name="Groups">Optional groups to which the contact should belong.</param>
+		/// <returns>Results of operation.</returns>
+		[return: McpParameter("Result", "Results of operation.")]
+		public async Task<GenericResponse> UpdateRosterItem(HttpRequest Request, HttpResponse Response,
+
+			[McpStringParameter("Bare JID", "Bare JID of the contact to update in roster.", 3, 256)]
+			string BareJid,
+
+			[McpStringParameter("Nick Name", "Optional nick name of the contact to update in roster.", 0, 256)]
+			string? NickName = null,
+
+			[McpParameter("Groups", "Optional groups to which the contact should belong.")]
+			string[]? Groups = null)
+		{
+			Session? Session = await this.TryGetMcpSession(Request, Response);
+			if (Session is null)
+				return new GenericResponse(false, "No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
+			if (Response.ResponseSent || User is null)
+				return new GenericResponse(false, "User not authenticated.");
+
+			if (!XmppClient.BareJidRegEx.IsMatch(BareJid))
+				return new GenericResponse(false, "Invalid Bare JID: " + BareJid);
+
+			XmppClient Client = await this.GetClient(Request, User, Session);
+
+			RosterItem Item = Client.GetRosterItem(BareJid);
+			if (Item is null)
+				return new GenericResponse(false, "Contact not in roster.");
+
+			TaskCompletionSource<string?> RosterItemUpdated = new TaskCompletionSource<string?>();
+
+			await Client.UpdateRosterItem(BareJid, NickName ?? string.Empty,
+				Groups ?? Array.Empty<string>(), (_, e) =>
+				{
+					RosterItemUpdated.TrySetResult(e.Ok ? null : e.ErrorText ?? string.Empty);
+					return Task.CompletedTask;
+				}, null);
+
+			string? Error = await RosterItemUpdated.Task;
+			if (Error is null)
+			{
+				this.ResourceUpdated(User, RosterItemResource.CreateRosterUri(BareJid));
+				return new GenericResponse(true, "Contact updated in roster.");
+			}
+			else
+				return new GenericResponse(false, "Unable to update contact in roster: " + Error);
+		}
+
+		/// <summary>
+		/// MCP Server Tool to remove a contact from the roster of the XMPP account associated 
+		/// with the MCP Client.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="BareJid">Bare JID of the contact to remove from roster.</param>
+		/// <returns>Results of operation.</returns>
+		[return: McpParameter("Result", "Results of operation.")]
+		public async Task<GenericResponse> RemoveFromRoster(HttpRequest Request, HttpResponse Response,
+
+			[McpStringParameter("Bare JID", "Bare JID of the contact to remove from roster.", 3, 256)]
+			string BareJid)
+		{
+			Session? Session = await this.TryGetMcpSession(Request, Response);
+			if (Session is null)
+				return new GenericResponse(false, "No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
+			if (Response.ResponseSent || User is null)
+				return new GenericResponse(false, "User not authenticated.");
+
+			if (!XmppClient.BareJidRegEx.IsMatch(BareJid))
+				return new GenericResponse(false, "Invalid Bare JID: " + BareJid);
+
+			XmppClient Client = await this.GetClient(Request, User, Session);
+
+			RosterItem Item = Client.GetRosterItem(BareJid);
+			if (Item is null)
+				return new GenericResponse(false, "Contact not in roster.");
+
+			TaskCompletionSource<string?> RosterItemRemoved = new TaskCompletionSource<string?>();
+
+			await Client.RemoveRosterItem(BareJid, (_, e) =>
+				{
+					RosterItemRemoved.TrySetResult(e.Ok ? null : e.ErrorText ?? string.Empty);
+					return Task.CompletedTask;
+				}, null);
+
+			string? Error = await RosterItemRemoved.Task;
+			if (Error is null)
+			{
+				this.ResourcesUpdated(User);
+				return new GenericResponse(true, "Contact removed from roster.");
+			}
+			else
+				return new GenericResponse(false, "Unable to remove contact from roster: " + Error);
+		}
 
 		/// <summary>
 		/// MCP Server Tool to send a chat message to a recipient using XMPP.
@@ -741,8 +908,8 @@ namespace Waher.Mcp.Xmpp
 			[McpParameter("Is Markdown", "Indicates if the message is in Markdown format (true), or plain text (false).")]
 			bool IsMarkdown = false,
 
-			[McpStringParameter("Language", "ISO-639 code of language used in the message, if any.", 0, 10)]
-			string Language = "")
+			[McpStringParameter("Language", "Optional ISO-639 code of language used in the message, if any.", 0, 10)]
+			string? Language = null)
 		{
 			Session? Session = await this.TryGetMcpSession(Request, Response);
 			if (Session is null)
@@ -751,6 +918,9 @@ namespace Waher.Mcp.Xmpp
 			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
 			if (Response.ResponseSent || User is null)
 				return new GenericResponse(false, "User not authenticated.");
+
+			if (!XmppClient.BareJidRegEx.IsMatch(To))
+				return new GenericResponse(false, "Invalid Bare JID: " + To);
 
 			XmppClient Client = await this.GetClient(Request, User, Session);
 			string Markdown;

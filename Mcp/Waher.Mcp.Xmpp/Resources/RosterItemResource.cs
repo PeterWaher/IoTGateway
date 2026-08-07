@@ -6,7 +6,7 @@ using Waher.Networking.HTTP.Mcp.Model.Resources;
 using Waher.Networking.HTTP.Mcp.Model.Server;
 using Waher.Networking.XMPP;
 
-namespace Waher.Mcp.Xmpp
+namespace Waher.Mcp.Xmpp.Resources
 {
 	/// <summary>
 	/// Contains information about a Roster Item.
@@ -22,9 +22,29 @@ namespace Waher.Mcp.Xmpp
 		/// <param name="MetaData">Meta-data associated with resource.</param>
 		public RosterItemResource(RosterItem Item, params KeyValuePair<string, object>[] MetaData)
 			: base(Item.BareJid, Item.NameOrBareJid, "Roster item for " + Item.BareJid,
-				  new Uri("xmpp:" + Item.BareJid), MetaData)
+				  CreateRosterUri(Item), MetaData)
 		{
 			this.rosterItem = Item;
+		}
+
+		/// <summary>
+		/// Creates a Roster Item Resource URI.
+		/// </summary>
+		/// <param name="Item">Roster Item</param>
+		/// <returns>URI</returns>
+		public static Uri CreateRosterUri(RosterItem Item)
+		{
+			return CreateRosterUri(Item.BareJid);
+		}
+
+		/// <summary>
+		/// Creates a Roster Item Resource URI.
+		/// </summary>
+		/// <param name="BareJid">Bare JID of roster item.</param>
+		/// <returns>URI</returns>
+		public static Uri CreateRosterUri(string BareJid)
+		{
+			return new Uri("xmpp:" + BareJid);
 		}
 
 		/// <summary>

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.JsonRpc;
+using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Events;
+using Waher.Runtime.Collections;
 
 namespace Waher.Mcp.Xmpp
 {
@@ -17,6 +19,9 @@ namespace Waher.Mcp.Xmpp
 		private readonly HashSet<string> sessionIds = new HashSet<string>();
 		private readonly Dictionary<string, PresenceEventArgs> subscriptionRequests =
 			new Dictionary<string, PresenceEventArgs>(StringComparer.InvariantCultureIgnoreCase);
+		private readonly Dictionary<string,  MessageRec> messagesById =
+			new Dictionary<string, MessageRec>();
+		private readonly ChunkedList<MessageRec> messages = new ChunkedList<MessageRec>();
 
 		/// <summary>
 		/// Contains information about an MCP XMPP session.
@@ -130,6 +135,92 @@ namespace Waher.Mcp.Xmpp
 				}
 				else
 					return false;
+			}
+		}
+
+		/// <summary>
+		/// Registers a new incoming message.
+		/// </summary>
+		/// <param name="Message">Message received.</param>
+		/// <returns>Message ID</returns>
+		public string Register(MessageEventArgs Message)
+		{
+			lock (this.messages)
+			{
+				string Id;
+
+				do
+				{
+					Id = OAuth2Environment.GenerateRandomCode(16);
+				}
+				while (this.messagesById.ContainsKey(Id));
+
+				MessageRec Rec = new MessageRec(Id, Message);
+
+				this.messagesById[Id] = Rec;
+				this.messages.Add(Rec);
+
+				return Id;
+			}
+		}
+
+		private class MessageRec
+		{
+			public MessageRec(string MessageId, MessageEventArgs Message)
+			{
+				this.MessageId = MessageId;
+				this.Message = Message;
+			}
+
+			public MessageEventArgs Message;
+			public string MessageId;
+
+			public override bool Equals(object Obj)
+			{
+				return Obj is MessageRec Rec && this.MessageId.Equals(Rec.MessageId);
+			}
+
+			public override int GetHashCode()
+			{
+				return this.MessageId.GetHashCode();
+			}
+		}
+
+		/// <summary>
+		/// Removes and returns the message associated with the specified message identifier.
+		/// </summary>
+		/// <param name="MessageId">The identifier of the message to remove.</param>
+		/// <returns>The message event arguments if found; otherwise, null.</returns>
+		public MessageEventArgs? Pop(string MessageId)
+		{
+			lock (this.messages)
+			{
+				if (this.messagesById.TryGetValue(MessageId, out MessageRec? Rec))
+				{
+					this.messagesById.Remove(MessageId);
+					this.messages.Remove(Rec);
+					return Rec.Message;
+				}
+				else
+					return null;
+			}
+		}
+
+		/// <summary>
+		/// Gets the message identifiers of all registered messages, in order of reception.
+		/// </summary>
+		/// <returns>Message IDs in order of reception.</returns>
+		public string[] GetMessageIds()
+		{
+			lock (this.messages)
+			{
+				int i, c = this.messages.Count;
+				string[] Result = new string[c];
+
+				for (i = 0; i < c; i++)
+					Result[i] = this.messages[i].MessageId;
+
+				return Result;
 			}
 		}
 	}

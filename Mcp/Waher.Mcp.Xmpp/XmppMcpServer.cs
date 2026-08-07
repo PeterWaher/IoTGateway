@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
+using Waher.Mcp.Xmpp.Resources;
 using Waher.Mcp.Xmpp.Responses;
 using Waher.Mcp.Xmpp.UserInput;
 using Waher.Networking;
@@ -258,6 +259,48 @@ namespace Waher.Mcp.Xmpp
 		}
 
 		/// <summary>
+		/// Tries to get a resource, given its URI.
+		/// </summary>
+		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="User">MCP Client user requesting resources.</param>
+		/// <param name="Uri">URI of resource.</param>
+		/// <param name="Session">MCP Session, if available.</param>
+		/// <returns>Resource, if found (and user has access rights to it), null otherwise.</returns>
+		public override async Task<Resource?> TryGetResource(HttpRequest Request,
+			IUser? User, Uri Uri, Session? Session)
+		{
+			if (Session is null || User is null)
+				return null;
+
+			XmppClient Client = await this.GetClient(Request, User, Session);
+
+			switch (Uri.Scheme)
+			{
+				case "xmpp":
+					RosterItem Contact = Client[Uri.AbsolutePath];
+					if (Contact is null)
+						return null;
+					else
+						return new RosterItemResource(Contact);
+
+				case "mid":
+					if (Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
+						!(McpXmppExtension is null))
+					{
+						MessageEventArgs? Message = McpXmppExtension.Pop(Uri.AbsolutePath);
+						if (!(Message is null))
+						{
+							this.ResourcesUpdated(User);
+							return new MessageResource(Uri.AbsolutePath, Message);
+						}
+					}
+					break;
+			}
+
+			return await base.TryGetResource(Request, User, Uri, Session);
+		}
+
+		/// <summary>
 		/// Gets available resources.
 		/// </summary>
 		/// <param name="Request">HTTP Request object.</param>
@@ -275,6 +318,13 @@ namespace Waher.Mcp.Xmpp
 
 			foreach (RosterItem Item in Client.Roster)
 				Resources.Add(new RosterItemResource(Item));
+
+			if (Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) && 
+				!(McpXmppExtension is null))
+			{
+				foreach (string MessageId in McpXmppExtension.GetMessageIds())
+					Resources.Add(new MessageResource(MessageId, null));
+			}
 
 			return Resources.ToArray();
 		}
@@ -497,7 +547,7 @@ namespace Waher.Mcp.Xmpp
 			{
 				Credentials = new ClientCredentials()
 				{
-					UserName = User.UserName,
+					UserName = NewCredentials.UserName,
 					Domain = NewCredentials.Domain,
 					PasswordHash = Client.PasswordHash,
 					PasswordHashType = Client.PasswordHashMethod,
@@ -509,7 +559,7 @@ namespace Waher.Mcp.Xmpp
 			}
 			else
 			{
-				Credentials.UserName = User.UserName;
+				Credentials.UserName = NewCredentials.UserName;
 				Credentials.Domain = NewCredentials.Domain;
 				Credentials.PasswordHash = Client.PasswordHash;
 				Credentials.PasswordHashType = Client.PasswordHashMethod;
@@ -527,9 +577,9 @@ namespace Waher.Mcp.Xmpp
 			Client.SetTag("User", User);
 			Client.SetTag("Messages", new ChunkedList<MessageEventArgs>());
 
-			Client.OnNormalMessage += this.Client_OnNormalMessage;
-			Client.OnGroupChatMessage += this.Client_OnGroupChatMessage;
-			Client.OnChatMessage += this.Client_OnChatMessage;
+			Client.OnNormalMessage += this.Client_OnMessageReceived;
+			Client.OnGroupChatMessage += this.Client_OnMessageReceived;
+			Client.OnChatMessage += this.Client_OnMessageReceived;
 			Client.OnError += this.Client_OnError;
 			Client.OnPresence += this.Client_OnPresence;
 			Client.OnPresenceSubscribe += this.Client_OnPresenceSubscribe;
@@ -610,8 +660,11 @@ namespace Waher.Mcp.Xmpp
 
 			XmppClient Client = await this.GetClient(Request, User, Session);
 
-			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) || McpXmppExtension is null)
+			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
+				McpXmppExtension is null)
+			{
 				return new GenericResponse(false, "MCP XMPP extension not available.");
+			}
 
 			if (!McpXmppExtension.TryGetPresenceSubscriptionRequest(From, out PresenceEventArgs? e))
 				return new GenericResponse(false, "No presence subscription request from " + From + " available.");
@@ -812,9 +865,10 @@ namespace Waher.Mcp.Xmpp
 
 		private async Task Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
-			if (e.Client.TryGetExtension(out McpXmppExtension? McpXmppExtension))
+			if (e.Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
+				!(McpXmppExtension is null))
 			{
-				McpXmppExtension!.Add(e);
+				McpXmppExtension.Add(e);
 
 				await this.SendNotification(McpXmppExtension.IsRegistered,
 					"Presence Subscription Request received from " + e.FromBareJID);
@@ -872,67 +926,144 @@ namespace Waher.Mcp.Xmpp
 
 		private async Task Client_OnPresenceSubscribed(object Sender, PresenceEventArgs e)
 		{
-			if (e.Client.TryGetExtension(out McpXmppExtension? McpXmppExtension))
+			if (e.Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
+				!(McpXmppExtension is null))
 			{
-				await this.SendNotification(McpXmppExtension!.IsRegistered,
+				await this.SendNotification(McpXmppExtension.IsRegistered,
 					"Presence Subscription Request to " + e.FromBareJID + " has been accepted.");
 			}
 		}
 
-		private Task Client_OnPresenceUnsubscribed(object Sender, PresenceEventArgs e)
+		private async Task Client_OnPresenceUnsubscribed(object Sender, PresenceEventArgs e)
 		{
-			return Task.CompletedTask;  // TODO
+			if (e.Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
+				!(McpXmppExtension is null))
+			{
+				await this.SendNotification(McpXmppExtension.IsRegistered,
+					"Unsubscribed from Presence Subscription to " + e.FromBareJID + ".");
+			}
 		}
 
-		private Task Client_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
+		private async Task Client_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
 		{
-			return Task.CompletedTask;  // TODO
+			await e.Accept();
+
+			if (e.Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
+				!(McpXmppExtension is null))
+			{
+				await this.SendNotification(McpXmppExtension.IsRegistered,
+					e.FromBareJID + " unsubscribed from your presence.");
+			}
 		}
 
-		private Task Client_OnPresence(object Sender, PresenceEventArgs e)
+		private async Task Client_OnPresence(object Sender, PresenceEventArgs e)
 		{
-			return Task.CompletedTask;  // TODO
+			if (e.Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
+				!(McpXmppExtension is null))
+			{
+				await this.SendNotification(McpXmppExtension.IsRegistered,
+					"Presence received from " + e.FromBareJID + ": " +
+					e.Availability.ToString());
+			}
 		}
 
-		private Task Client_OnError(object Sender, Exception e)
+		private async Task Client_OnError(object Sender, Exception e)
 		{
-			return Task.CompletedTask;  // TODO
+			if (Sender is XmppClient Client &&
+				Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
+				!(McpXmppExtension is null))
+			{
+				await this.SendNotification(McpXmppExtension.IsRegistered,
+					"Error logged in XMPP communication: " + e.Message);
+			}
 		}
 
-		private Task Client_OnNormalMessage(object Sender, MessageEventArgs e)
+		private async Task Client_OnStateChanged(object Sender, XmppState e)
 		{
-			return Task.CompletedTask;  // TODO
-		}
-
-		private Task Client_OnChatMessage(object Sender, MessageEventArgs e)
-		{
-			return Task.CompletedTask;  // TODO
-		}
-
-		private Task Client_OnGroupChatMessage(object Sender, MessageEventArgs e)
-		{
-			return Task.CompletedTask;  // TODO
-		}
-
-		private Task Client_OnStateChanged(object Sender, XmppState e)
-		{
-			return Task.CompletedTask;  // TODO
-		}
-
-		private Task Client_OnRosterItemUpdated(object Sender, RosterItem e)
-		{
-			return Task.CompletedTask;  // TODO
-		}
-
-		private Task Client_OnRosterItemRemoved(object Sender, RosterItem e)
-		{
-			return Task.CompletedTask;  // TODO
+			if (Sender is XmppClient Client &&
+				Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
+				!(McpXmppExtension is null))
+			{
+				await this.SendNotification(McpXmppExtension.IsRegistered,
+					"State of connection changed: " + e.ToString());
+			}
 		}
 
 		private Task Client_OnRosterItemAdded(object Sender, RosterItem e)
 		{
-			return Task.CompletedTask;  // TODO
+			if (Sender is XmppClient Client &&
+				Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
+				!(McpXmppExtension is null))
+			{
+				this.RosterResourcesUpdated(McpXmppExtension);
+			}
+
+			return Task.CompletedTask;
 		}
 
+		private Task Client_OnRosterItemRemoved(object Sender, RosterItem e)
+		{
+			if (Sender is XmppClient Client &&
+				Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
+				!(McpXmppExtension is null))
+			{
+				this.RosterResourcesUpdated(McpXmppExtension);
+			}
+
+			return Task.CompletedTask;
+		}
+
+		private void RosterResourcesUpdated(McpXmppExtension McpXmppExtension)
+		{
+			foreach (string SessionId in McpXmppExtension.SessionIds)
+			{
+				if (this.TryGetMcpSession(SessionId, out Session? Session) &&
+					!(Session.User is null))
+				{
+					this.ResourcesUpdated(Session.User);
+				}
+			}
+		}
+
+		private Task Client_OnRosterItemUpdated(object Sender, RosterItem e)
+		{
+			if (Sender is XmppClient Client &&
+				Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
+				!(McpXmppExtension is null))
+			{
+				foreach (string SessionId in McpXmppExtension.SessionIds)
+				{
+					if (this.TryGetMcpSession(SessionId, out Session? Session) &&
+						!(Session.User is null))
+					{
+						this.ResourceUpdated(Session.User,
+							RosterItemResource.CreateRosterUri(e.BareJid));
+					}
+				}
+			}
+
+			return Task.CompletedTask;
+		}
+
+		private Task Client_OnMessageReceived(object Sender, MessageEventArgs e)
+		{
+			if (Sender is XmppClient Client &&
+				Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
+				!(McpXmppExtension is null))
+			{
+				McpXmppExtension.Register(e);
+
+				foreach (string SessionId in McpXmppExtension.SessionIds)
+				{
+					if (this.TryGetMcpSession(SessionId, out Session? Session) &&
+						!(Session.User is null))
+					{
+						this.ResourcesUpdated(Session.User);
+					}
+				}
+			}
+
+			return Task.CompletedTask;
+		}
 	}
 }

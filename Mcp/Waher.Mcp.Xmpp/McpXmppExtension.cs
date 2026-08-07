@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Events;
@@ -12,6 +13,7 @@ namespace Waher.Mcp.Xmpp
 	/// </summary>
 	internal class McpXmppExtension : IXmppExtension
 	{
+		private readonly HttpRequest firstRequest;
 		private readonly HashSet<string> sessionIds = new HashSet<string>();
 		private readonly Dictionary<string, PresenceEventArgs> subscriptionRequests =
 			new Dictionary<string, PresenceEventArgs>(StringComparer.InvariantCultureIgnoreCase);
@@ -19,9 +21,11 @@ namespace Waher.Mcp.Xmpp
 		/// <summary>
 		/// Contains information about an MCP XMPP session.
 		/// </summary>
+		/// <param name="Request">Request that generated the connection.</param>
 		/// <param name="SessionId">Session creating the object.</param>
-		public McpXmppExtension(string SessionId)
+		public McpXmppExtension(HttpRequest Request, string SessionId)
 		{
+			this.firstRequest = Request;
 			this.sessionIds.Add(SessionId);
 		}
 
@@ -29,6 +33,27 @@ namespace Waher.Mcp.Xmpp
 		/// Implemented extensions.
 		/// </summary>
 		public string[] Extensions => new string[] { "MCP" };
+
+		/// <summary>
+		/// First request that generated the connection.
+		/// </summary>
+		public HttpRequest FirstRequest => this.firstRequest;
+
+		/// <summary>
+		/// Registered session IDs
+		/// </summary>
+		public string[] SessionIds
+		{
+			get
+			{
+				lock (this.sessionIds)
+				{
+					string[] Result = new string[this.sessionIds.Count];
+					this.sessionIds.CopyTo(Result);
+					return Result;
+				}
+			}
+		}
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose()"/>

@@ -110,8 +110,8 @@ namespace Waher.Mcp.Xmpp
 				"A Model Context Protocol (MCP) server resource permitting MCP clients " +
 				"to access the federated XMPP network and send and receive messages, " +
 				"perform information queries and publish their presence. Before messages " +
-				"and queries can be made, the MCP client should first request the " + 
-				"presence subscription of the contact to whom messages are queries "+
+				"and queries can be made, the MCP client should first request the " +
+				"presence subscription of the contact to whom messages are queries " +
 				"should be sent.",
 				Icons,
 				WebSiteUri,
@@ -350,7 +350,7 @@ namespace Waher.Mcp.Xmpp
 
 					if (ConnectionResult == 0)
 					{
-						Client.RegisterExtension(new McpXmppExtension(Session.SessionId));
+						Client.RegisterExtension(new McpXmppExtension(Request, Session.SessionId));
 						this.Setup(Client, User);
 						clients[User.UserName] = new ClientRec(User.UserName, Client);
 						return Client;
@@ -373,6 +373,7 @@ namespace Waher.Mcp.Xmpp
 			{
 				UserName = Credentials?.UserName ?? string.Empty,
 				Domain = Credentials?.Domain ?? string.Empty,
+				TrustServer = Credentials?.TrustServer ?? false
 			};
 
 			if (Types.TryGetModuleParameter("Domain", out string Domain))
@@ -488,7 +489,7 @@ namespace Waher.Mcp.Xmpp
 			}
 			while (Client is null);
 
-			Client.RegisterExtension(new McpXmppExtension(Session.SessionId));
+			Client.RegisterExtension(new McpXmppExtension(Request, Session.SessionId));
 			this.Setup(Client, User);
 			clients[User.UserName] = new ClientRec(User.UserName, Client);
 
@@ -656,6 +657,9 @@ namespace Waher.Mcp.Xmpp
 			return new GenericResponse(true, "Request to ubsubscribe from presence from " + To + " sent.");
 		}
 
+		// TODO: Manage roster item groups.
+		// TODO: Manage roster item nick names.
+
 		/// <summary>
 		/// MCP Server Tool to send a chat message to a recipient using XMPP.
 		/// </summary>
@@ -815,7 +819,54 @@ namespace Waher.Mcp.Xmpp
 				await this.SendNotification(McpXmppExtension.IsRegistered,
 					"Presence Subscription Request received from " + e.FromBareJID);
 
-				// TODO: Elicit user input to accept or reject subscription request.
+				RosterItem Contact = e.Client[e.FromBareJID];
+				bool Mutual = !(Contact is null) && (Contact.State == SubscriptionState.To ||
+					Contact.State == SubscriptionState.Both);
+
+				foreach (string SessionId in McpXmppExtension.SessionIds)
+				{
+					if (!this.TryGetMcpSession(SessionId, out Session? Session))
+						continue;
+
+					PresenceSubscriptionRequest Request = new PresenceSubscriptionRequest()
+					{
+						Mutual = Mutual
+					};
+
+					bool? Result = await this.ElicitUserInput(McpXmppExtension.FirstRequest,
+						"A Presence Subscription Request was received from " +
+						e.FromBareJID + ". You can choose to Accept or Decline " +
+						"this request. Below, you can also select if you want " +
+						"the presence subscription to be mutual, in both directions.",
+						Request, false, Session, 5 * 60 * 1000);
+
+					if (!Result.HasValue)
+						continue;
+
+					if (!Result.Value)
+						break;
+
+					await e.Accept();
+
+					if (Request.Mutual)
+					{
+						if (Contact is null ||
+							Contact.State == SubscriptionState.None ||
+							Contact.State == SubscriptionState.From)
+						{
+							await e.Client.RequestPresenceSubscription(e.FromBareJID);
+						}
+					}
+					else
+					{
+						if (!(Contact is null) &&
+							(Contact.State == SubscriptionState.To ||
+							Contact.State == SubscriptionState.Both))
+						{
+							await e.Client.RequestPresenceUnsubscription(e.FromBareJID);
+						}
+					}
+				}
 			}
 		}
 

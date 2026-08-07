@@ -46,9 +46,17 @@ namespace Waher.Mcp.Xmpp
 		internal const string ListPrivilege = ResourcesPrivilege + ".List";
 		internal const string ReadPrivilege = ResourcesPrivilege + ".Read";
 		internal const string MessagePrivilege = ToolsPrivilege + ".Message";
-		internal const string InformationQueryPrivilege = ToolsPrivilege + ".InformationQuery";
+		internal const string GetMessagePrivilege = MessagePrivilege + ".Get";
+		internal const string SendMessagePrivilege = MessagePrivilege + ".Send";
+		internal const string RosterPrivilege = ToolsPrivilege + ".Roster";
+		internal const string AddRosterItemPrivilege = RosterPrivilege + ".Add";
+		internal const string UpdateRosterItemPrivilege = RosterPrivilege + ".Update";
+		internal const string RemoveRosterItemPrivilege = RosterPrivilege + ".Remove";
 		internal const string PresencePrivilege = ToolsPrivilege + ".Presence";
-		internal const string EditPrivilege = ToolsPrivilege + ".Edit";
+		internal const string SubscribePresencePrivilege = PresencePrivilege + ".Subscribe";
+		internal const string UnsubscribePresencePrivilege = PresencePrivilege + ".Unsubscribe";
+		internal const string AcceptPresencePrivilege = PresencePrivilege + ".Accept";
+		internal const string DeclinePresencePrivilege = PresencePrivilege + ".Decline";
 
 		private static readonly Cache<string, ClientRec> clients = CreateCache();
 		private static XmppMcpServer? instance = null;
@@ -604,6 +612,7 @@ namespace Waher.Mcp.Xmpp
 			false,  // CanDestroyEnvironment
 			true,   // Idempotent
 			true)]  // OpenWorldAccess
+		[RequiredPrivilege(SubscribePresencePrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
 		public async Task<GenericResponse> RequestPresenceSubscription(HttpRequest Request, HttpResponse Response,
 
@@ -641,8 +650,9 @@ namespace Waher.Mcp.Xmpp
 			"",     // IconsMethod, use default icons
 			true,   // CanModifyEnvironment
 			false,  // CanDestroyEnvironment
-			true,   // Idempotent
+			false,  // Idempotent
 			true)]  // OpenWorldAccess
+		[RequiredPrivilege(AcceptPresencePrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
 		public async Task<GenericResponse> AcceptPresenceSubscription(
 			HttpRequest Request, HttpResponse Response,
@@ -675,6 +685,53 @@ namespace Waher.Mcp.Xmpp
 		}
 
 		/// <summary>
+		/// MCP Server Tool to decline a presence subscription request from another user.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <param name="Response">HTTP response object.</param>
+		/// <param name="From">Bare JID of the sender of the presence subscription to decline.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Decline Presence Subscription",
+			"Declines a presence subscription request from another user.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(DeclinePresencePrivilege)]
+		[return: McpParameter("Result", "Results of operation.")]
+		public async Task<GenericResponse> DeclinePresenceSubscription(
+			HttpRequest Request, HttpResponse Response,
+
+			[McpStringParameter("From", "Bare JID of the sender of the presence subscription request to decline.", 3, 256)]
+			string From)
+		{
+			Session? Session = await this.TryGetMcpSession(Request, Response);
+			if (Session is null)
+				return new GenericResponse(false, "No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
+			if (Response.ResponseSent || User is null)
+				return new GenericResponse(false, "User not authenticated.");
+
+			XmppClient Client = await this.GetClient(Request, User, Session);
+
+			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
+				McpXmppExtension is null)
+			{
+				return new GenericResponse(false, "MCP XMPP extension not available.");
+			}
+
+			if (!McpXmppExtension.TryGetPresenceSubscriptionRequest(From, out PresenceEventArgs? e))
+				return new GenericResponse(false, "No presence subscription request from " + From + " available.");
+
+			await e.Decline();
+
+			return new GenericResponse(true, "Presence subscription request from " + From + " declined.");
+		}
+
+		/// <summary>
 		/// MCP Server Tool to send a presence unsubscription request to another user.
 		/// </summary>
 		/// <param name="Request">HTTP request object.</param>
@@ -689,6 +746,7 @@ namespace Waher.Mcp.Xmpp
 			true,   // CanDestroyEnvironment
 			true,   // Idempotent
 			true)]  // OpenWorldAccess
+		[RequiredPrivilege(UnsubscribePresencePrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
 		public async Task<GenericResponse> RequestPresenceUnsubscription(HttpRequest Request, HttpResponse Response,
 
@@ -723,6 +781,15 @@ namespace Waher.Mcp.Xmpp
 		/// <param name="NickName">Optional nick name of the contact to add to roster.</param>
 		/// <param name="Groups">Optional groups to which the contact should be added.</param>
 		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Add to Roster",  // Title
+			"Adds a contact to the roster of the XMPP account associated with the MCP Client.",   // Description
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(AddRosterItemPrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
 		public async Task<GenericResponse> AddToRoster(HttpRequest Request, HttpResponse Response,
 
@@ -780,6 +847,15 @@ namespace Waher.Mcp.Xmpp
 		/// <param name="NickName">Optional nick name of the contact to update in roster.</param>
 		/// <param name="Groups">Optional groups to which the contact should belong.</param>
 		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Update Roster Item",  // Title
+			"Updates a contact in the roster of the XMPP account associated with the MCP Client.",   // Description
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			true,   // CanDestroyEnvironment
+			true,   // Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(UpdateRosterItemPrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
 		public async Task<GenericResponse> UpdateRosterItem(HttpRequest Request, HttpResponse Response,
 
@@ -836,6 +912,15 @@ namespace Waher.Mcp.Xmpp
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="BareJid">Bare JID of the contact to remove from roster.</param>
 		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Remove from Roster",  // Title
+			"Removes a contact from the roster of the XMPP account associated with the MCP Client.",   // Description
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			true,   // CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(RemoveRosterItemPrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
 		public async Task<GenericResponse> RemoveFromRoster(HttpRequest Request, HttpResponse Response,
 
@@ -896,6 +981,7 @@ namespace Waher.Mcp.Xmpp
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			true)]  // OpenWorldAccess
+		[RequiredPrivilege(SendMessagePrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
 		public async Task<GenericResponse> SendChatMessage(HttpRequest Request, HttpResponse Response,
 
@@ -1048,6 +1134,7 @@ namespace Waher.Mcp.Xmpp
 			true,   // CanDestroyEnvironment
 			false,  // Idempotent
 			true)]  // OpenWorldAccess
+		[RequiredPrivilege(GetMessagePrivilege)]
 		[return: McpParameter("Result", "Message, if found.")]
 		public async Task<MessageResponse> GetMessage(HttpRequest Request, HttpResponse Response,
 
@@ -1101,6 +1188,7 @@ namespace Waher.Mcp.Xmpp
 			true,   // CanDestroyEnvironment
 			false,  // Idempotent
 			true)]  // OpenWorldAccess
+		[RequiredPrivilege(GetMessagePrivilege)]
 		[return: McpParameter("Result", "Message, if found.")]
 		public async Task<MessageResponse> PopMessage(HttpRequest Request, HttpResponse Response)
 		{

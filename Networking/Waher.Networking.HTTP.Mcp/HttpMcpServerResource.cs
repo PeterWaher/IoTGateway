@@ -1340,7 +1340,7 @@ namespace Waher.Networking.HTTP.Mcp
 			}
 
 			if (!Session.IsAuthenticated && !(User is null))
-				await Session.SetUserName(User.UserName);
+				await Session.SetUser(User);
 
 			return User;
 		}

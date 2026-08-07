@@ -5,6 +5,7 @@ using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.Mcp.Model.Client;
 using Waher.Networking.Sniffers;
+using Waher.Security;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Server
 {
@@ -17,6 +18,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		private readonly ISnifferSet? snifferSet;
 		private readonly bool hasSnifferSet;
 		private InMemorySniffer? unauthenticatedSniffer;
+		private IUser? user = null;
 		private string userName = "Not Authenticated";
 		private bool isAuthenticated = false;
 
@@ -71,6 +73,11 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		public string RemoteEndpoint { get; }
 
 		/// <summary>
+		/// User object reference.
+		/// </summary>
+		public IUser? User => this.user;
+
+		/// <summary>
 		/// User name used for session.
 		/// </summary>
 		public string UserName => this.userName;
@@ -107,20 +114,20 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		}
 
 		/// <summary>
-		/// Sets the user name of the session.
+		/// Sets the user of the session.
 		/// </summary>
-		/// <param name="UserName"></param>
-		/// <returns></returns>
-		internal async Task SetUserName(string UserName)
+		/// <param name="User">User reference</param>
+		internal async Task SetUser(IUser User)
 		{
-			this.userName = UserName;
+			this.user = User;
+			this.userName = User.UserName;
 
 			if (!this.isAuthenticated)
 			{
 				this.isAuthenticated = true;
 
 				if (this.hasSnifferSet)
-					this.unauthenticatedSniffer?.Replay(UserName, this.snifferSet);
+					this.unauthenticatedSniffer?.Replay(this.userName, this.snifferSet);
 
 				if (!(this.unauthenticatedSniffer is null))
 				{

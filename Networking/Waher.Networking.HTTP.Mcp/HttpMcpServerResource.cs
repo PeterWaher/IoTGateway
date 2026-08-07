@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -1134,6 +1135,18 @@ namespace Waher.Networking.HTTP.Mcp
 			}
 
 			return Session;
+		}
+
+		/// <summary>
+		/// Tries to get an MCP session object for the resource, if any.
+		/// </summary>
+		/// <param name="SessionId">Session ID of the MCP session.</param>
+		/// <param name="Session">Session object, if any.</param>
+		/// <returns>If a session with the given session identity was found.</returns>
+		protected bool TryGetMcpSession(string SessionId, 
+			[NotNullWhen(true)] out Session? Session)
+		{
+			return sessions.TryGetValue(SessionId, out Session);
 		}
 
 		/// <summary>

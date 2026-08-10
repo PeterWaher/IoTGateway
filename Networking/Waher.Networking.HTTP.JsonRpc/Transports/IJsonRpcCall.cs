@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Waher.Security;
 
@@ -22,7 +23,7 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 		/// <summary>
 		/// Authenticated user, if available, or null if not available.
 		/// </summary>
-		IUser User { get; set; }
+		IUser User { get; }
 
 		/// <summary>
 		/// If the connection is encrypted or not.
@@ -65,12 +66,6 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 		void SetSessionId(string SessionId);
 
 		/// <summary>
-		/// Sends a JSON-RPC error response.
-		/// </summary>
-		/// <param name="Error">Error to return.</param>
-		Task SendResponse(HttpException Error);
-
-		/// <summary>
 		/// Checks the authentication of the request, if not done already.
 		/// </summary>
 		/// <param name="Session">Sniffable session.</param>
@@ -82,11 +77,24 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 			HttpAuthenticationScheme[]? AuthenticationSchemes, string[]? RequiredPrivileges);
 
 		/// <summary>
-		/// Sends the response back to the client. If the resource is synchronous, there's no need to call this method. Only asynchronous
-		/// resources need to call this method explicitly.
+		/// Sends a JSON-RPC error response.
+		/// </summary>
+		/// <param name="Error">Error to return.</param>
+		Task SendResponse(Exception Error);
+
+		/// <summary>
+		/// Sends the response back to the client.
 		/// </summary>
 		/// <param name="StatusCode">HTTP status code.</param>
 		/// <param name="StatusMessage">HTTP status message.</param>
 		Task SendResponse(int StatusCode, string StatusMessage);
+
+		/// <summary>
+		/// Sends the response back to the client.
+		/// </summary>
+		/// <param name="StatusCode">HTTP status code.</param>
+		/// <param name="StatusMessage">HTTP status message.</param>
+		/// <param name="Response">Response object.</param>
+		Task SendResponse(int StatusCode, string StatusMessage, object? Response);
 	}
 }

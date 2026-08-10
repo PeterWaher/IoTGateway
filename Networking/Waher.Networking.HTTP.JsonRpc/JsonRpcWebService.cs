@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Binary;
 using Waher.Content.Html;
-using Waher.Content.Json;
 using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc.MetaData;
@@ -18,6 +17,7 @@ using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script;
+using Waher.Security;
 using Waher.Security.JWT;
 using Waher.Things.Http;
 
@@ -32,8 +32,6 @@ namespace Waher.Networking.HTTP.JsonRpc
 	/// </summary>
 	public abstract class JsonRpcWebService : HttpProtectedResource, IHttpGetMethod, IHttpPostMethod
 	{
-		private static readonly JsonCodec jsonCodec = new JsonCodec();
-
 		private readonly Dictionary<string, IJsonRpcClientRequest> requests = new Dictionary<string, IJsonRpcClientRequest>();
 		private readonly SortedDictionary<string, JsonRpcMethodInfo> methods;
 		private readonly bool userSessions;
@@ -79,7 +77,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			{
 				if (!Method.IsDefined(typeof(JsonRpcMethodAttribute), true))
 					continue;
-					
+
 				this.RegisterMethod(Method, GetRequiredPrivileges(Method));
 			}
 		}
@@ -610,7 +608,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="ParseResult">Function to parse incoming results.</param>
 		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <returns>Request object.</returns>
-		public JsonRpcClientRequest<T> CreateRequest<T>(string Message, string Method, 
+		public JsonRpcClientRequest<T> CreateRequest<T>(string Message, string Method,
 			object? Parameters, IJsonRpcSession Session, Func<object?, Task<T>> ParseResult,
 			IJsonRpcCall Call)
 		{
@@ -625,7 +623,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				}
 				while (this.requests.ContainsKey(Id));
 
-				Result = new JsonRpcClientRequest<T>(Message, Id, Method, Parameters, 
+				Result = new JsonRpcClientRequest<T>(Message, Id, Method, Parameters,
 					Session, ParseResult, this, Call);
 
 				this.requests[Id] = Result;
@@ -640,7 +638,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="Id">ID of the request.</param>
 		/// <param name="Request">The request object, if found.</param>
 		/// <returns>True if the request was found; otherwise, false.</returns>
-		public bool TryGetRequest(string Id, 
+		public bool TryGetRequest(string Id,
 			[NotNullWhen(true)] out IJsonRpcClientRequest? Request)
 		{
 			lock (this.requests)
@@ -797,7 +795,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			}
 
 			if (!await ServerRequest.BuildResponse(this, JsonRpcCall))
-				await this.SendResponse(Request, ServerRequest, Response);
+				await this.SendResponse(JsonRpcCall, ServerRequest);
 		}
 
 		/// <summary>
@@ -1532,59 +1530,115 @@ namespace Waher.Networking.HTTP.JsonRpc
 			}
 
 			if (!await JsonRpcRequest.BuildResponse(this, JsonRpcCall))
-				await this.SendResponse(Request, JsonRpcRequest, Response);
+				await this.SendResponse(JsonRpcCall, JsonRpcRequest);
 		}
 
-		private async Task SendResponse(HttpRequest HttpRequest,
-			JsonRpcServerRequest JsonRequest, HttpResponse Response)
+		/// <summary>
+		/// Executes a JSON-RPC request given as a JSON-RPC-encoded string and returns the 
+		/// response as a JSON-RPC encoded string.
+		/// </summary>
+		/// <param name="Input">JSON-RPC encoded string</param>
+		/// <param name="User">Authenticated user making the call.</param>
+		/// <param name="Server">Server managing calls.</param>
+		/// <param name="BaseUrl">Base URL of the web service.</param>
+		/// <returns>JSON-RPC encoded response string</returns>
+		public async Task<string> ExecuteJsonRpc(string Input, IUser User,
+			ICommunicationLayer Server, string BaseUrl)
 		{
-			if (JsonRequest.StatusCode == 204)
+			using JsonRpcServerRequest JsonRpcRequest = new JsonRpcServerRequest();
+			InternalJsonRpcCall JsonRpcCall = new InternalJsonRpcCall(Server, User, BaseUrl);
+
+			try
 			{
-				Response.StatusCode = JsonRequest.StatusCode;
-				Response.StatusMessage = JsonRequest.StatusMessage;
-			}
-			else if (JsonRequest.IsResult)
-			{
-				Response.StatusCode = 200;
-				Response.StatusMessage = "OK";
-			}
-			else
-			{
-				ContentResponse Encoded;
+				object Decoded = JSON.Parse(Input);
 
-				if (HttpRequest.Header.Accept.IsAcceptable(JsonCodec.JsonRpcContentType))
+				if (Decoded is Dictionary<string, object> RequestObj)
 				{
-					Encoded = await jsonCodec.EncodeAsync(JsonRequest.Response,
-						Encoding.UTF8, null, JsonCodec.JsonRpcContentType);
+					foreach (KeyValuePair<string, object> P in RequestObj)
+						this.ProcessQueryParameter(JsonRpcRequest, P.Key, P.Value);
 				}
-				else
+				else if (Decoded is Array Requests)
 				{
-					string ContentType = HttpRequest.Header.Accept.GetBestAlternative(JsonCodec.JsonContentTypes);
+					int i, c = Requests.Length;
 
-					Encoded = await jsonCodec.EncodeAsync(JsonRequest.Response,
-						Encoding.UTF8, null, ContentType);
-				}
-
-				if (Encoded.HasError)
-				{
-					await Response.SendResponse(Encoded.Error);
-					return;
-				}
-				else
-				{
-					Response.StatusCode = JsonRequest.StatusCode;
-					Response.StatusMessage = JsonRequest.StatusMessage;
-
-					if (JsonRequest.StatusCode != 204)
+					if (c == 0)
 					{
-						Response.ContentType = Encoded.ContentType;
+						JsonRpcRequest.SetError(-32600, "Empty request.",
+							BadRequestException.Code, BadRequestException.StatusMessage);
+					}
+					else
+					{
+						JsonRpcRequest.BatchRequests = new JsonRpcServerRequest[c];
 
-						await Response.Write(true, Encoded.Encoded, 0, Encoded.Encoded.Length);
+						for (i = 0; i < c; i++)
+						{
+							JsonRpcServerRequest ItemRequest = new JsonRpcServerRequest();
+							JsonRpcRequest.BatchRequests[i] = ItemRequest;
+
+							if (Requests.GetValue(i) is Dictionary<string, object> ItemRequestObj)
+							{
+								foreach (KeyValuePair<string, object> P in ItemRequestObj)
+									this.ProcessQueryParameter(ItemRequest, P.Key, P.Value);
+							}
+							else
+							{
+								ItemRequest.SetError(-32600, "Expected JSON object or array of JSON objects in request.",
+									BadRequestException.Code, BadRequestException.StatusMessage);
+							}
+						}
 					}
 				}
+				else
+				{
+					JsonRpcRequest.SetError(-32600, "Expected JSON object or array of JSON objects in request.",
+						BadRequestException.Code, BadRequestException.StatusMessage);
+				}
+
+				try
+				{
+					if (!await JsonRpcRequest.BuildResponse(this, JsonRpcCall))
+						await this.SendResponse(JsonRpcCall, JsonRpcRequest);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+
+					JsonRpcRequest.SetError(-32603, Log.UnnestException(ex).Message,
+						InternalServerErrorException.Code, InternalServerErrorException.StatusMessage);
+
+					await JsonRpcCall.SendResponse(ex);
+				}
+			}
+			catch (Exception)
+			{
+				JsonRpcRequest.SetError(-32700, "Unable to parse payload.",
+					InternalServerErrorException.Code, InternalServerErrorException.StatusMessage);
+
+				try
+				{
+					if (!await JsonRpcRequest.BuildResponse(this, JsonRpcCall))
+						await this.SendResponse(JsonRpcCall, JsonRpcRequest);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
 			}
 
-			await Response.SendResponse();
+			return JsonRpcCall.Response;
+		}
+
+		private async Task SendResponse(IJsonRpcCall Call, JsonRpcServerRequest JsonRequest)
+		{
+			if (JsonRequest.StatusCode == 204)
+				await Call.SendResponse(JsonRequest.StatusCode, JsonRequest.StatusMessage);
+			else if (JsonRequest.IsResult)
+				await Call.SendResponse(200, "OK");
+			else
+			{
+				await Call.SendResponse(JsonRequest.StatusCode, JsonRequest.StatusMessage,
+					JsonRequest.Response);
+			}
 		}
 
 		private void ProcessQueryParameter(JsonRpcServerRequest Request, string Key, object Value)

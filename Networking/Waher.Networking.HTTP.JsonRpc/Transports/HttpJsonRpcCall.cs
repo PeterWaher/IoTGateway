@@ -1,5 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
+using Waher.Content.Json;
 using Waher.Runtime.Collections;
 using Waher.Security;
 
@@ -10,6 +14,8 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 	/// </summary>
 	public class HttpJsonRpcCall : IJsonRpcCall
 	{
+		private static readonly JsonCodec jsonCodec = new JsonCodec();
+
 		private readonly HttpRequest request;
 		private readonly HttpResponse response;
 
@@ -40,7 +46,7 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 		public IUser User
 		{
 			get => this.request.User;
-			set => this.request.User = value;
+			internal set => this.request.User = value;
 		}
 
 		/// <summary>
@@ -102,15 +108,6 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 		public void SetSessionId(string SessionId)
 		{
 			this.response.SetHeader("MCP-Session-Id", SessionId);
-		}
-
-		/// <summary>
-		/// Sends a JSON-RPC error response.
-		/// </summary>
-		/// <param name="Error">Error to return.</param>
-		public Task SendResponse(HttpException Error)
-		{
-			return this.response.SendResponse(Error);
 		}
 
 		/// <summary>
@@ -207,6 +204,15 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 		}
 
 		/// <summary>
+		/// Sends a JSON-RPC error response.
+		/// </summary>
+		/// <param name="Error">Error to return.</param>
+		public Task SendResponse(Exception Error)
+		{
+			return this.response.SendResponse(Error);
+		}
+
+		/// <summary>
 		/// Sends the response back to the client. If the resource is synchronous, there's no need to call this method. Only asynchronous
 		/// resources need to call this method explicitly.
 		/// </summary>
@@ -218,6 +224,48 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 			this.response.StatusMessage = StatusMessage;
 
 			await this.response.SendResponse();
+		}
+
+		/// <summary>
+		/// Sends the response back to the client.
+		/// </summary>
+		/// <param name="StatusCode">HTTP status code.</param>
+		/// <param name="StatusMessage">HTTP status message.</param>
+		/// <param name="Response">Response object.</param>
+		public async Task SendResponse(int StatusCode, string StatusMessage, object? Response)
+		{
+			ContentResponse Encoded;
+
+			if (this.request.Header.Accept.IsAcceptable(JsonCodec.JsonRpcContentType))
+			{
+				Encoded = await jsonCodec.EncodeAsync(Response, Encoding.UTF8, null, 
+					JsonCodec.JsonRpcContentType);
+			}
+			else
+			{
+				string ContentType = this.request.Header.Accept.GetBestAlternative(
+					JsonCodec.JsonContentTypes);
+
+				Encoded = await jsonCodec.EncodeAsync(Response, Encoding.UTF8, null, 
+					ContentType);
+			}
+
+			if (Encoded.HasError)
+				await this.SendResponse(Encoded.Error);
+			else
+			{
+				this.response.StatusCode = StatusCode;
+				this.response.StatusMessage = StatusMessage;
+
+				if (StatusCode != 204)
+				{
+					this.response.ContentType = Encoded.ContentType;
+
+					await this.response.Write(true, Encoded.Encoded, 0, Encoded.Encoded.Length);
+				}
+
+				await this.response.SendResponse();
+			}
 		}
 	}
 }

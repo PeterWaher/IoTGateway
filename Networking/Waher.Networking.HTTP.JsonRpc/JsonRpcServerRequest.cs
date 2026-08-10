@@ -6,7 +6,6 @@ using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc.Transports;
 using Waher.Script;
 using Waher.Script.Model;
-using Waher.Security;
 
 namespace Waher.Networking.HTTP.JsonRpc
 {

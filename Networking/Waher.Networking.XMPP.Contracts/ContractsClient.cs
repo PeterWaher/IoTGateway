@@ -1902,7 +1902,7 @@ namespace Waher.Networking.XMPP.Contracts
 		#region ID Application Attributes
 
 		/// <summary>
-		/// Gets attributes relevant for application for legal identities on the broker.
+		/// Gets attributes relevant for applications for legal identities on the broker.
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
@@ -1916,7 +1916,7 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Gets attributes relevant for application for legal identities on the broker.
+		/// Gets attributes relevant for applications for legal identities on the broker.
 		/// </summary>
 		/// <returns>ID Application attributes</returns>
 		public async Task<IdApplicationAttributesEventArgs> GetIdApplicationAttributesAsync()

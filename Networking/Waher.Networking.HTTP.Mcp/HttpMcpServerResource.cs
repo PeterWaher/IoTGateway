@@ -16,6 +16,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.JsonRpc.MetaData;
+using Waher.Networking.HTTP.JsonRpc.Transports;
 using Waher.Networking.HTTP.Mcp.Model;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Networking.HTTP.Mcp.Model.Client;
@@ -347,7 +348,7 @@ namespace Waher.Networking.HTTP.Mcp
 				}
 				else
 				{
-					await Response.Return(await this.GenerateInputForm(Request, Response,
+					await Response.Return(await this.GenerateInputForm(Request, Response, 
 						ClientRequest));
 				}
 			}
@@ -909,8 +910,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// MCP initialize method. Called by client to initialize connection and exchange 
 		/// information about capabilities.
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
-		/// <param name="Response">HTTP Response object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="ProtocolVersion">Protocol Version</param>
 		/// <param name="Capabilities">Client capabilities</param>
 		/// <param name="ClientInfo">Client information</param>
@@ -920,8 +920,7 @@ namespace Waher.Networking.HTTP.Mcp
 			"connection and exchange information about capabilities.", true)]
 		[JsonRpcDocName("initialize")]
 		[return: JsonRpcDocumentation("Server capabilities and information.")]
-		protected Dictionary<string, object> Initialize(
-			HttpRequest Request, HttpResponse Response,
+		protected Dictionary<string, object> Initialize(IJsonRpcCall Call,
 
 			[JsonRpcDocumentation("Protocol Version")]
 			string ProtocolVersion,
@@ -938,7 +937,7 @@ namespace Waher.Networking.HTTP.Mcp
 			if (!Implementation.TryParse(ClientInfo, out Implementation? ClientInfoParsed))
 				ClientInfoParsed = null;
 
-			string RemoteEndpoint = Request.RemoteEndPoint.RemovePortNumber();
+			string RemoteEndpoint = Call.RemoteEndPoint.RemovePortNumber();
 			string SessionId;
 
 			do
@@ -958,7 +957,7 @@ namespace Waher.Networking.HTTP.Mcp
 				CapabilitiesParsed, ClientInfoParsed, RemoteEndpoint, this.snifferSet);
 
 			sessions[SessionId] = Session;
-			Response.SetHeader("MCP-Session-Id", SessionId);
+			Call.SetSessionId(SessionId);
 
 			if (this.hasSnifferSet)
 			{
@@ -1027,7 +1026,7 @@ namespace Waher.Networking.HTTP.Mcp
 
 			string? WebSite = this.WebSiteUri?.ToString();
 			if (string.IsNullOrEmpty(WebSite))
-				WebSite = Request.Header.GetURL(false, false);
+				WebSite = Call.GetBaseUrl();
 
 			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
@@ -1055,82 +1054,85 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Notification that the client has completed its initialization.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC request object.</param>
 		[JsonRpcMethod]
 		[JsonRpcDocumentation("Notification that the client has completed its " +
 			"initialization.")]
 		[JsonRpcDocName("notifications/initialized")]
-		protected async Task Notifications_Initialized(
-			HttpRequest Request, HttpResponse Response)
+		protected async Task Notifications_Initialized(IJsonRpcCall Call)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return;
 
 			if (this.hasSnifferSet)
 				Session.ReceiveText(this.Name + ".Initialized()");
 
-			Log.Informational("MCP client initialized: " + Request.RemoteEndPoint,
-				this.ResourceName, Request.RemoteEndPoint, "McpInitialized");
+			Log.Informational("MCP client initialized: " + Call.RemoteEndPoint,
+				this.ResourceName, Call.RemoteEndPoint, "McpInitialized");
 
-			Response.StatusCode = 202;
-			Response.StatusMessage = "Accepted";
-
-			await Response.SendResponse();
+				await Call.SendResponse(202, "Accepted");
 		}
 
 		/// <summary>
 		/// Tries to get an MCP session object for the resource, if any.
 		/// </summary>
-		/// <param name="Request">HTTP Request object</param>
-		/// <param name="Response">HTTP Response object</param>
+		/// <param name="Call">JSON-RPC Call object</param>
 		/// <returns>Session object, if any.</returns>
-		protected async Task<Session?> TryGetMcpSession(HttpRequest Request, HttpResponse Response)
+		public async Task<Session?> TryGetMcpSession(IJsonRpcCall Call)
 		{
-			return await this.TryGetSession(Request, Response) as Session;
+			return await this.TryGetSession(Call, true) as Session;
 		}
 
 		/// <summary>
 		/// Tries to get a session object for the resource, if any.
 		/// </summary>
-		/// <param name="Request">HTTP Request object</param>
-		/// <param name="Response">HTTP Response object</param>
+		/// <param name="Call">JSON-RPC Call object</param>
+		/// <param name="ErrorIfNone">If an error should be returned if no session is found.</param>
 		/// <returns>Session object, if any.</returns>
-		protected override async Task<IJsonRpcSession?> TryGetSession(HttpRequest Request, HttpResponse Response)
+		public override async Task<IJsonRpcSession?> TryGetSession(IJsonRpcCall Call,
+			bool ErrorIfNone)
 		{
-			if (!Request.Header.TryGetHeaderField("MCP-Session-Id", out HttpField SessionHeader))
+			if (!Call.TryGetSessionId(out string? SessionId))
 			{
-				await Response.SendResponse(new BadRequestException("Missing MCP-Session-Id header."));
+				if (ErrorIfNone)
+					await Call.SendResponse(new BadRequestException("Missing MCP-Session-Id header."));
+
 				return null;
 			}
-
-			string SessionId = SessionHeader.Value;
 
 			if (this.HasJwtFactory)
 			{
 				if (!JwtToken.TryParse(SessionId, out JwtToken Token))
 				{
-					await Response.SendResponse(new NotFoundException("Invalid MCP-Session-Id."));
+					if (ErrorIfNone)
+						await Call.SendResponse(new NotFoundException("Invalid MCP-Session-Id."));
+
 					return null;
 				}
 
 				if (!this.JwtFactory!.IsValid(Token))
 				{
-					await Response.SendResponse(new NotFoundException("MCP-Session-Id invalid or expired."));
+					if (ErrorIfNone)
+						await Call.SendResponse(new NotFoundException("MCP-Session-Id invalid or expired."));
+
 					return null;
 				}
 			}
 
 			if (!sessions.TryGetValue(SessionId, out Session? Session))
 			{
-				await Response.SendResponse(new NotFoundException("MCP-Session-Id expired or not found."));
+				if (ErrorIfNone)
+					await Call.SendResponse(new NotFoundException("MCP-Session-Id expired or not found."));
+
 				return null;
 			}
 
-			if (Session.RemoteEndpoint != Request.RemoteEndPoint.RemovePortNumber())
+			if (Session.RemoteEndpoint != Call.RemoteEndPoint.RemovePortNumber())
 			{
-				await Response.SendResponse(new NotFoundException("MCP-Session-Id not found for this endpoint."));
+				if (ErrorIfNone)
+					await Call.SendResponse(new NotFoundException("MCP-Session-Id not found for this endpoint."));
+
 				return null;
 			}
 
@@ -1152,26 +1154,24 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Lists available MCP server tools.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC request object.</param>
 		/// <param name="Cursor">Cursor for pagination.</param>
 		/// <returns>Dictionary containing the list of tools.</returns>
 		[JsonRpcMethod]
 		[JsonRpcDocumentation("Lists available MCP server tools.")]
 		[JsonRpcDocName("tools/list")]
 		[return: JsonRpcDocumentation("Dictionary containing the list of tools.")]
-		protected async Task<Dictionary<string, object>?> Tools_List(
-			HttpRequest Request, HttpResponse Response,
+		protected async Task<Dictionary<string, object>?> Tools_List(IJsonRpcCall Call,
 
 			[JsonRpcDocumentation("Cursor for pagination.")]
 			string? Cursor = null)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return null;
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent)
 				return null;
 
 			if (this.hasSnifferSet)
@@ -1196,7 +1196,7 @@ namespace Waher.Networking.HTTP.Mcp
 					if (!this.hasSnifferSet)
 						Session.Error("Invalid cursor: " + Cursor);
 
-					await Response.SendResponse(new BadRequestException("Invalid cursor."));
+					await Call.SendResponse(new BadRequestException("Invalid cursor."));
 					return null;
 				}
 			}
@@ -1269,76 +1269,19 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Gets the authenticated user in the MCP session.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="Session">MCP session object.</param>
 		/// <returns>Authenticated user, if any.</returns>
-		protected async Task<IUser?> GetAuthenticatedUser(HttpRequest Request,
-			HttpResponse Response, Session Session)
+		protected async Task<IUser?> GetAuthenticatedUser(IJsonRpcCall Call, 
+			Session Session)
 		{
-			IUser User = Request.User;
-			bool Encrypted = Request.Encrypted;
-			int Strength = Request.CipherStrength;
-
-			if ((this.requiresAuthentication || !(Request.Header.Authorization is null)) &&
-				User is null)
+			if (!await Call.CheckAuthentication(Session, this.requiresAuthentication,
+				this.AuthenticationSchemes, null))
 			{
-				if (this.AuthenticationSchemes is null)
-				{
-					await Response.SendResponse(new ForbiddenException());
-
-					if (this.hasSnifferSet)
-						Session.Error("Access denied. No authentication schemes available.");
-
-					return null;
-				}
-
-				foreach (HttpAuthenticationScheme Scheme in this.AuthenticationSchemes)
-				{
-					if (Scheme.RequireEncryption &&
-						(!Encrypted || Strength < Scheme.MinStrength))
-					{
-						continue;
-					}
-
-					if (Scheme.UserSessions && Request.Session is null)
-						Request.GetSessionFromCookie();
-
-					User = await Scheme.IsAuthenticated(Request);
-					if (!(User is null))
-					{
-						Request.User = User;
-						break;
-					}
-				}
-
-				if (User is null)
-				{
-					List<string> Challenges = new List<string>();
-
-					foreach (HttpAuthenticationScheme Scheme in this.AuthenticationSchemes
-						?? Array.Empty<HttpAuthenticationScheme>())
-					{
-						if (Scheme.RequireEncryption &&
-							(!Encrypted || Strength < Scheme.MinStrength))
-						{
-							continue;
-						}
-
-						foreach (string Challenge in Scheme.GetChallenges(Request))
-							Challenges.Add(Challenge);
-					}
-
-					await Response.SendResponse(new UnauthorizedException(
-						Challenges.ToArray()));
-
-					if (this.hasSnifferSet)
-						Session.Error("Access denied. Unauthorized.");
-
-					return null;
-				}
+				return null;
 			}
 
+			IUser User = Call.User;
 			if (!Session.IsAuthenticated && !(User is null))
 				await Session.SetUser(User);
 
@@ -1349,8 +1292,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// Calls an MCP server tool.
 		/// </summary>
 		/// <param name="Id">ID of request.</param>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="Name">Name of the tool to call.</param>
 		/// <param name="Arguments">Arguments for the tool.</param>
 		/// <param name="Task">If specified, the caller is requesting task-augmented 
@@ -1366,7 +1308,7 @@ namespace Waher.Networking.HTTP.Mcp
 		[JsonRpcDocName("tools/call")]
 		[return: JsonRpcDocumentation("Dictionary containing the result of the tool call.")]
 		protected async Task<Dictionary<string, object?>?> Tools_Call(
-			[JsonRpcId] object? Id, HttpRequest Request, HttpResponse Response,
+			[JsonRpcId] object? Id, IJsonRpcCall Call,
 
 			[JsonRpcDocumentation("Name of the tool to call.")]
 			string Name,
@@ -1385,12 +1327,12 @@ namespace Waher.Networking.HTTP.Mcp
 			[JsonRpcDocumentation("Associated meta-data, if available.")]
 			object? _Meta = null)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return null;
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent)
 				return null;
 
 			if (this.hasSnifferSet)
@@ -1430,7 +1372,7 @@ namespace Waher.Networking.HTTP.Mcp
 					if (this.hasSnifferSet)
 						Session.Error("Tool not found: " + Name);
 
-					await Response.SendResponse(new NotFoundException("Tool not found."));
+					await Call.SendResponse(new NotFoundException("Tool not found."));
 					return null;
 				}
 
@@ -1440,7 +1382,7 @@ namespace Waher.Networking.HTTP.Mcp
 					if (this.hasSnifferSet)
 						Session.Error("Access denied. Missing privilege: " + MissingPrivilege);
 
-					await Response.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
+					await Call.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
 						User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty));
 					return null;
 				}
@@ -1450,7 +1392,7 @@ namespace Waher.Networking.HTTP.Mcp
 
 				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 
-				if (Tool.TryBuildRequest(Id, Arguments, Request, Response, MetaData,
+				if (Tool.TryBuildRequest(Id, Arguments, Call, MetaData,
 					out string? Reason, out object?[]? Arguments2))
 				{
 					ToolResult = await ScriptNode.WaitPossibleTask(
@@ -1565,26 +1507,24 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Lists available MCP server prompts.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC request object.</param>
 		/// <param name="Cursor">Cursor for pagination.</param>
 		/// <returns>Dictionary containing the list of prompts.</returns>
 		[JsonRpcMethod]
 		[JsonRpcDocumentation("Lists available MCP server prompts.")]
 		[JsonRpcDocName("prompts/list")]
 		[return: JsonRpcDocumentation("Dictionary containing the list of prompts.")]
-		protected async Task<Dictionary<string, object>?> Prompts_List(
-			HttpRequest Request, HttpResponse Response,
+		protected async Task<Dictionary<string, object>?> Prompts_List(IJsonRpcCall Call,
 
 			[JsonRpcDocumentation("Cursor for pagination.")]
 			string? Cursor = null)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return null;
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent)
 				return null;
 
 			if (this.hasSnifferSet)
@@ -1609,7 +1549,7 @@ namespace Waher.Networking.HTTP.Mcp
 					if (!this.hasSnifferSet)
 						Session.Error("Invalid cursor: " + Cursor);
 
-					await Response.SendResponse(new BadRequestException("Invalid cursor."));
+					await Call.SendResponse(new BadRequestException("Invalid cursor."));
 					return null;
 				}
 			}
@@ -1666,8 +1606,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// Gets an MCP server prompt.
 		/// </summary>
 		/// <param name="Id">ID of request.</param>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC request object.</param>
 		/// <param name="Name">Name of the prompt to call.</param>
 		/// <param name="Arguments">Arguments for the prompt.</param>
 		/// <param name="_Meta">Associated meta-data, if available.</param>
@@ -1677,7 +1616,7 @@ namespace Waher.Networking.HTTP.Mcp
 		[JsonRpcDocName("prompts/get")]
 		[return: JsonRpcDocumentation("Dictionary containing the prompt.")]
 		protected async Task<Dictionary<string, object?>?> Prompts_Get(
-			[JsonRpcId] object? Id, HttpRequest Request, HttpResponse Response,
+			[JsonRpcId] object? Id, IJsonRpcCall Call,
 
 			[JsonRpcDocumentation("Name of the prompt to call.")]
 			string Name,
@@ -1689,12 +1628,12 @@ namespace Waher.Networking.HTTP.Mcp
 			[JsonRpcDocumentation("Associated meta-data, if available.")]
 			object? _Meta = null)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return null;
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent)
 				return null;
 
 			if (this.hasSnifferSet)
@@ -1728,7 +1667,7 @@ namespace Waher.Networking.HTTP.Mcp
 					if (this.hasSnifferSet)
 						Session.Error("Prompt not found: " + Name);
 
-					await Response.SendResponse(new NotFoundException("Prompt not found."));
+					await Call.SendResponse(new NotFoundException("Prompt not found."));
 					return null;
 				}
 
@@ -1738,7 +1677,7 @@ namespace Waher.Networking.HTTP.Mcp
 					if (this.hasSnifferSet)
 						Session.Error("Access denied. Missing privilege: " + MissingPrivilege);
 
-					await Response.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
+					await Call.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
 						User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty));
 					return null;
 				}
@@ -1748,7 +1687,7 @@ namespace Waher.Networking.HTTP.Mcp
 
 				Dictionary<string, object?>? MetaData = _Meta as Dictionary<string, object?>;
 
-				if (Prompt.TryBuildRequest(Id, Arguments, Request, Response, MetaData,
+				if (Prompt.TryBuildRequest(Id, Arguments, Call, MetaData,
 					out string? Reason, out object?[]? Arguments2))
 				{
 					PromptResult = await ScriptNode.WaitPossibleTask(
@@ -1857,8 +1796,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Lists available MCP server resources.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC request object.</param>
 		/// <param name="Cursor">Cursor for pagination.</param>
 		/// <returns>Dictionary containing the list of resources.</returns>
 		[JsonRpcMethod]
@@ -1866,17 +1804,17 @@ namespace Waher.Networking.HTTP.Mcp
 		[JsonRpcDocName("resources/list")]
 		[return: JsonRpcDocumentation("Dictionary containing the list of resources.")]
 		protected virtual async Task<Dictionary<string, object>?> Resources_List(
-			HttpRequest Request, HttpResponse Response,
+			IJsonRpcCall Call,
 
 			[JsonRpcDocumentation("Cursor for pagination.")]
 			string? Cursor = null)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return null;
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent)
 				return null;
 
 			if (this.hasSnifferSet)
@@ -1901,12 +1839,12 @@ namespace Waher.Networking.HTTP.Mcp
 					if (!this.hasSnifferSet)
 						Session.Error("Invalid cursor: " + Cursor);
 
-					await Response.SendResponse(new BadRequestException("Invalid cursor."));
+					await Call.SendResponse(new BadRequestException("Invalid cursor."));
 					return null;
 				}
 			}
 
-			Resource[] AllResources = await this.GetResources(Request, User, Session);
+			Resource[] AllResources = await this.GetResources(Call, User, Session);
 			ChunkedList<Resource> Resources = new ChunkedList<Resource>();
 			Dictionary<string, object> Result = new Dictionary<string, object>();
 			int Next = Offset + MaxCount;
@@ -1954,8 +1892,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Reads an MCP server resource.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC request object.</param>
 		/// <param name="Uri">URI of the resource to read.</param>
 		/// <param name="_Meta">Associated meta-data, if available.</param>
 		/// <returns>Dictionary containing the contents of the resource.</returns>
@@ -1964,7 +1901,7 @@ namespace Waher.Networking.HTTP.Mcp
 		[JsonRpcDocName("resources/read")]
 		[return: JsonRpcDocumentation("Dictionary containing the contents of the resource.")]
 		protected virtual async Task<Dictionary<string, object>?> Resources_Read(
-			HttpRequest Request, HttpResponse Response,
+			IJsonRpcCall Call,
 
 			[JsonRpcDocumentation("URI of the resource to read.")]
 			Uri Uri,
@@ -1973,12 +1910,12 @@ namespace Waher.Networking.HTTP.Mcp
 			[JsonRpcDocumentation("Associated meta-data, if available.")]
 			object? _Meta = null)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return null;
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent)
 				return null;
 
 			if (this.hasSnifferSet)
@@ -2000,14 +1937,14 @@ namespace Waher.Networking.HTTP.Mcp
 				Session.ReceiveText(sb.ToString());
 			}
 
-			Resource? Resource = await this.TryGetResource(Request, User, Uri, Session);
+			Resource? Resource = await this.TryGetResource(Call, User, Uri, Session);
 
 			if (Resource is null)
 			{
 				if (this.hasSnifferSet)
 					Session.Error("Resource not found: " + Uri);
 
-				await Response.SendResponse(new NotFoundException("Resource not found."));
+				await Call.SendResponse(new NotFoundException("Resource not found."));
 				return null;
 			}
 
@@ -2017,7 +1954,7 @@ namespace Waher.Networking.HTTP.Mcp
 				if (this.hasSnifferSet)
 					Session.Error("Access denied. Missing privilege: " + MissingPrivilege);
 
-				await Response.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
+				await Call.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
 					User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty));
 				return null;
 			}
@@ -2049,24 +1986,22 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Subscribes to an MCP server resource.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC request object.</param>
 		/// <param name="Uri">URI of the resource to subscribe to.</param>
 		[JsonRpcMethod]
 		[JsonRpcDocumentation("Subscribes to an MCP server resource.")]
 		[JsonRpcDocName("resources/subscribe")]
-		protected virtual async Task Resources_Subscribe(
-			HttpRequest Request, HttpResponse Response,
+		protected virtual async Task Resources_Subscribe(IJsonRpcCall Call,
 
 			[JsonRpcDocumentation("URI of the resource to subscribe to.")]
 			Uri Uri)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return;
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent)
 				return;
 
 			if (this.hasSnifferSet)
@@ -2081,14 +2016,14 @@ namespace Waher.Networking.HTTP.Mcp
 				Session.ReceiveText(sb.ToString());
 			}
 
-			Resource? Resource = await this.TryGetResource(Request, User, Uri, Session);
+			Resource? Resource = await this.TryGetResource(Call, User, Uri, Session);
 
 			if (Resource is null)
 			{
 				if (this.hasSnifferSet)
 					Session.Error("Resource not found: " + Uri);
 
-				await Response.SendResponse(new NotFoundException("Resource not found."));
+				await Call.SendResponse(new NotFoundException("Resource not found."));
 				return;
 			}
 
@@ -2098,7 +2033,7 @@ namespace Waher.Networking.HTTP.Mcp
 				if (this.hasSnifferSet)
 					Session.Error("Access denied. Missing privilege: " + MissingPrivilege);
 
-				await Response.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
+				await Call.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
 					User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty));
 				return;
 			}
@@ -2117,24 +2052,22 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Unsubscribes from an MCP server resource.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call.</param>
 		/// <param name="Uri">URI of the resource to unsubscribe from.</param>
 		[JsonRpcMethod]
 		[JsonRpcDocumentation("Unsubscribes from an MCP server resource.")]
 		[JsonRpcDocName("resources/unsubscribe")]
-		protected virtual async Task Resources_Unsubscribe(
-			HttpRequest Request, HttpResponse Response,
+		protected virtual async Task Resources_Unsubscribe(IJsonRpcCall Call,
 
 			[JsonRpcDocumentation("URI of the resource to unsubscribe from.")]
 			Uri Uri)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return;
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent)
 				return;
 
 			if (this.hasSnifferSet)
@@ -2149,14 +2082,14 @@ namespace Waher.Networking.HTTP.Mcp
 				Session.ReceiveText(sb.ToString());
 			}
 
-			Resource? Resource = await this.TryGetResource(Request, User, Uri, Session);
+			Resource? Resource = await this.TryGetResource(Call, User, Uri, Session);
 
 			if (Resource is null)
 			{
 				if (this.hasSnifferSet)
 					Session.Error("Resource not found: " + Uri);
 
-				await Response.SendResponse(new NotFoundException("Resource not found."));
+				await Call.SendResponse(new NotFoundException("Resource not found."));
 				return;
 			}
 
@@ -2166,7 +2099,7 @@ namespace Waher.Networking.HTTP.Mcp
 				if (this.hasSnifferSet)
 					Session.Error("Access denied. Missing privilege: " + MissingPrivilege);
 
-				await Response.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
+				await Call.SendResponse(ForbiddenException.AccessDenied(this.ResourceName,
 					User?.UserName ?? string.Empty, MissingPrivilege ?? string.Empty));
 				return;
 			}
@@ -2185,11 +2118,11 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Gets available resources.
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="User">MCP Client user requesting resources.</param>
 		/// <param name="Session">MCP Session, if available.</param>
 		/// <returns>Array of resources.</returns>
-		public virtual Task<Resource[]> GetResources(HttpRequest Request, IUser? User,
+		public virtual Task<Resource[]> GetResources(IJsonRpcCall Call, IUser? User,
 			Session? Session)
 		{
 			return Task.FromResult(Array.Empty<Resource>());
@@ -2212,12 +2145,12 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Tries to get a resource, given its URI.
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="User">MCP Client user requesting resources.</param>
 		/// <param name="Uri">URI of resource.</param>
 		/// <param name="Session">MCP Session, if available.</param>
 		/// <returns>Resource, if found (and user has access rights to it), null otherwise.</returns>
-		public virtual Task<Resource?> TryGetResource(HttpRequest Request, IUser? User,
+		public virtual Task<Resource?> TryGetResource(IJsonRpcCall Call, IUser? User,
 			Uri Uri, Session? Session)
 		{
 			return Task.FromResult<Resource?>(null);
@@ -2341,7 +2274,8 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task DELETE(HttpRequest Request, HttpResponse Response)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			HttpJsonRpcCall JsonRpcCall = new HttpJsonRpcCall(Request, Response);
+			Session? Session = await this.TryGetMcpSession(JsonRpcCall);
 			if (Session is null)
 				return;
 
@@ -2672,7 +2606,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Elicits input from the user, if the client supports elicitation.
 		/// </summary>
-		/// <param name="HttpRequest">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Request object.</param>
 		/// <param name="Message">Message to display to the user.</param>
 		/// <param name="InputRequest">Input request object.</param>
 		/// <param name="Sensitive">If information is sensitive.</param>
@@ -2681,8 +2615,8 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <returns>Returns true if used provided input (which will be stored in
 		/// <paramref name="InputRequest"/>, false if user declined to provide user
 		/// input, or null if request was cancelled or timed out.</returns>
-		public async Task<bool?> ElicitUserInput<T>(HttpRequest HttpRequest,
-			string Message, T InputRequest, bool Sensitive, Session Session, int Timeout)
+		public async Task<bool?> ElicitUserInput<T>(IJsonRpcCall Call, string Message, 
+			T InputRequest, bool Sensitive, Session Session, int Timeout)
 			where T : class
 		{
 			if (Session.ClientCapabilities?.Elicitation is null)
@@ -2766,13 +2700,13 @@ namespace Waher.Networking.HTTP.Mcp
 							throw new Exception("Unexpected action: " + Action);
 					}
 				},
-				HttpRequest);
+				Call);
 
 			Request.Tag = InputRequest;
 
 			if (UrlMode)
 			{
-				string Url = HttpRequest.Header.GetURL(false, false) + "/" + Request.Id;
+				string Url = Call.GetBaseUrl() + "/" + Request.Id;
 
 				ElicitationRequest["elicitationId"] = Request.Id;
 				ElicitationRequest["url"] = Url;

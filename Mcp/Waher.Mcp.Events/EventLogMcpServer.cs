@@ -7,6 +7,7 @@ using Waher.Events;
 using Waher.Events.Persistence;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.JsonRpc;
+using Waher.Networking.HTTP.JsonRpc.Transports;
 using Waher.Networking.HTTP.Mcp;
 using Waher.Networking.HTTP.Mcp.Model;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
@@ -553,7 +554,7 @@ namespace Waher.Mcp.Events
 		/// <summary>
 		/// Performs a search for events in the event log.
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="Offset">Offset into search result set where returned events begin.</param>
 		/// <param name="MaxCount">Maximum number of results to return.</param>
 		/// <param name="From">Start date/time for search, in UTC. If provided, only events newer than or equal to this point in time will be returned.</param>
@@ -586,7 +587,7 @@ namespace Waher.Mcp.Events
 			false)] // OpenWorldAccess
 		[RequiredPrivilege(SearchPrivilege)]
 		[return: McpParameter("Search Result", "Result set of the search for events, as well as information about if more events are available, and the offset to the next set of events.")]
-		public async Task<SearchResult> Search(HttpRequest Request,
+		public async Task<SearchResult> Search(IJsonRpcCall Call,
 
 			[McpIntegerParameter("Offset", "Offset into search result set where returned events begin.", 0, int.MaxValue)]
 			int Offset = 0,
@@ -752,7 +753,7 @@ namespace Waher.Mcp.Events
 
 			Log.Informational("Searching event log.",
 				string.Empty,
-				Request.RemoteEndPoint,
+				Call.RemoteEndPoint,
 				McpEventId,
 				Tags.ToArray());
 

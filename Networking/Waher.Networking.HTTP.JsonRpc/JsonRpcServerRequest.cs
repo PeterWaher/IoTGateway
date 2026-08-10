@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.HTTP.JsonRpc.Transports;
 using Waher.Script;
 using Waher.Script.Model;
 using Waher.Security;
@@ -62,13 +63,12 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// Prepares a response to the request.
 		/// </summary>
 		/// <param name="WebService">JSON-RPC web service object reference.</param>
-		/// <param name="HttpRequest">HTTP Request object.</param>
-		/// <param name="HttpResponse">HTTP Response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <returns>If a response has been returned</returns>
 		public async Task<bool> BuildResponse(JsonRpcWebService WebService,
-			HttpRequest HttpRequest, HttpResponse HttpResponse)
+			IJsonRpcCall Call)
 		{
-			bool HasSniffer = HttpRequest.Server.HasSniffers;
+			bool HasSniffer = Call.Server.HasSniffers;
 
 			if (this.IsResult)
 			{
@@ -208,11 +208,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 							if (this.MethodInfo.NrSpecialArguments > 0)
 							{
-								if (this.MethodInfo.RequestArgument.HasValue)
-									Parameters[this.MethodInfo.RequestArgument.Value] = HttpRequest;
-
-								if (this.MethodInfo.ResponseArgument.HasValue)
-									Parameters[this.MethodInfo.ResponseArgument.Value] = HttpResponse;
+								if (this.MethodInfo.CallArgument.HasValue)
+									Parameters[this.MethodInfo.CallArgument.Value] = Call;
 
 								if (this.MethodInfo.IdArgument.HasValue)
 									Parameters[this.MethodInfo.IdArgument.Value] = this.Id;
@@ -238,68 +235,18 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 								sb.Append(')');
 
-								HttpRequest.Server.Information(sb.ToString());
+								Call.Server.Information(sb.ToString());
 							}
 
-							IUser User = HttpRequest.User;
-							bool Encrypted = HttpRequest.Encrypted;
-							int Strength = HttpRequest.CipherStrength;
+							IJsonRpcSession? Session = await WebService.TryGetSession(Call, false);
 
-							if (this.MethodInfo.RequiresAuthentication && User is null)
-							{
-								HttpAuthenticationScheme[] Schemes = this.MethodInfo.AuthenticationMechanisms ?? Array.Empty<HttpAuthenticationScheme>();
+							await Call.CheckAuthentication(Session,
+								this.MethodInfo.RequiresAuthentication,
+								this.MethodInfo.AuthenticationMechanisms,
+								this.MethodInfo.RequiredPrivileges);
 
-								foreach (HttpAuthenticationScheme Scheme in Schemes)
-								{
-									if (Scheme.RequireEncryption &&
-										(!Encrypted || Strength < Scheme.MinStrength))
-									{
-										continue;
-									}
-
-									if (Scheme.UserSessions && HttpRequest.Session is null)
-										HttpRequest.GetSessionFromCookie();
-
-									User = await Scheme.IsAuthenticated(HttpRequest);
-									if (!(User is null))
-									{
-										HttpRequest.User = User;
-										break;
-									}
-								}
-
-								if (User is null)
-								{
-									List<string> Challenges = new List<string>();
-
-									foreach (HttpAuthenticationScheme Scheme in Schemes)
-									{
-										if (Scheme.RequireEncryption &&
-											(!Encrypted || Strength < Scheme.MinStrength))
-										{
-											continue;
-										}
-
-										foreach (string Challenge in Scheme.GetChallenges(HttpRequest))
-											Challenges.Add(Challenge);
-									}
-
-									await HttpResponse.SendResponse(new UnauthorizedException(
-										Challenges.ToArray()));
-									return true;
-								}
-
-								foreach (string Privilege in this.MethodInfo.RequiredPrivileges)
-								{
-									if (!User.HasPrivilege(Privilege))
-									{
-										await HttpResponse.SendResponse(ForbiddenException.AccessDenied(
-											HttpRequest.Resource.ResourceName,
-											User.UserName, Privilege));
-										return true;
-									}
-								}
-							}
+							if (Call.ResponseSent)
+								return true;
 
 							this.Result = await ScriptNode.WaitPossibleTask(
 								this.MethodInfo.Method.Invoke(WebService, Parameters));
@@ -307,24 +254,24 @@ namespace Waher.Networking.HTTP.JsonRpc
 							if (HasSniffer)
 							{
 								if (this.Result is null)
-									HttpRequest.Server.Information("Result: null");
+									Call.Server.Information("Result: null");
 								else if (Expression.IsVoid(this.Result.GetType()))
-									HttpRequest.Server.Information("Result: void");
+									Call.Server.Information("Result: void");
 								else
 								{
-									HttpRequest.Server.Information("Result: " +
+									Call.Server.Information("Result: " +
 										Expression.ToExpressionString(this.Result));
 								}
 							}
 
-							if (HttpResponse.ResponseSent)
+							if (Call.ResponseSent)
 								return true;
 						}
 					}
 					catch (Exception ex)
 					{
 						if (HasSniffer)
-							HttpRequest.Server.Exception(ex);
+							Call.Server.Exception(ex);
 
 						this.SetError(-32603, Log.UnnestException(ex).Message,
 							InternalServerErrorException.Code, InternalServerErrorException.StatusMessage);
@@ -369,7 +316,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				{
 					JsonRpcServerRequest Request = this.BatchRequests[i]!;
 
-					if (await Request.BuildResponse(WebService, HttpRequest, HttpResponse))
+					if (await Request.BuildResponse(WebService, Call))
 						return true;
 
 					if (!(Request.Id is null))

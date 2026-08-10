@@ -8,6 +8,7 @@ using System.Web;
 using Waher.Content;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.JsonRpc;
+using Waher.Networking.HTTP.JsonRpc.Transports;
 using Waher.Networking.HTTP.Mcp;
 using Waher.Networking.HTTP.Mcp.Model;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
@@ -209,66 +210,63 @@ namespace Waher.Mcp.Files
 		/// <summary>
 		/// Lists available MCP server resources.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="Cursor">Cursor for pagination.</param>
 		/// <returns>Dictionary containing the list of resources.</returns>
 		[RequiredPrivilege(ListPrivilege)]
-		protected override Task<Dictionary<string, object>?> Resources_List(HttpRequest Request,
-			HttpResponse Response, string? Cursor = null)
+		protected override Task<Dictionary<string, object>?> Resources_List(
+			IJsonRpcCall Call, string? Cursor = null)
 		{
-			return base.Resources_List(Request, Response, Cursor);
+			return base.Resources_List(Call, Cursor);
 		}
 
 		/// <summary>
 		/// Reads an MCP server resource.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="Uri">URI of the resource to read.</param>
 		/// <param name="_Meta">Associated meta-data, if available.</param>
 		/// <returns>Dictionary containing the result of the tool call.</returns>
 		[RequiredPrivilege(ReadPrivilege)]
-		protected override async Task<Dictionary<string, object>?> Resources_Read(HttpRequest Request,
-			HttpResponse Response, Uri Uri, [JsonRpcMetaDataArgument] object? _Meta = null)
+		protected override async Task<Dictionary<string, object>?> Resources_Read(
+			IJsonRpcCall Call, Uri Uri, 
+			[JsonRpcMetaDataArgument] object? _Meta = null)
 		{
-			return await base.Resources_Read(Request, Response, Uri, _Meta);
+			return await base.Resources_Read(Call, Uri, _Meta);
 		}
 
 		/// <summary>
 		/// Subscribes to an MCP server resource.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="Uri">URI of the resource to subscribe to.</param>
 		[RequiredPrivilege(ListPrivilege)]
-		protected override Task Resources_Subscribe(HttpRequest Request, HttpResponse Response,
-			Uri Uri)
+		protected override Task Resources_Subscribe(
+			IJsonRpcCall Call, Uri Uri)
 		{
-			return base.Resources_Subscribe(Request, Response, Uri);
+			return base.Resources_Subscribe(Call, Uri);
 		}
 
 		/// <summary>
 		/// Unsubscribes from an MCP server resource.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="Uri">URI of the resource to unsubscribe from.</param>
 		[RequiredPrivilege(ListPrivilege)]
-		protected override async Task Resources_Unsubscribe(HttpRequest Request, HttpResponse Response,
-			Uri Uri)
+		protected override async Task Resources_Unsubscribe(
+			IJsonRpcCall Call, Uri Uri)
 		{
-			await base.Resources_Unsubscribe(Request, Response, Uri);
+			await base.Resources_Unsubscribe(Call, Uri);
 		}
 
 		/// <summary>
 		/// Gets available resources.
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="User">MCP Client user requesting resources.</param>
 		/// <param name="Session">MCP Session, if available.</param>
 		/// <returns>Array of resources.</returns>
-		public override Task<Resource[]> GetResources(HttpRequest Request, IUser? User,
+		public override Task<Resource[]> GetResources(IJsonRpcCall Call, IUser? User,
 			Session? Session)
 		{
 			if (User is null)
@@ -285,7 +283,7 @@ namespace Waher.Mcp.Files
 			string[] Files = Directory.GetFiles(Folder, "*.*", SearchOption.AllDirectories);
 			int i, c = Files.Length;
 			Resource[] Resources = new Resource[c];
-			string BaseUri = Request.Header.GetURL(false, false);
+			string BaseUri = Call.GetBaseUrl();
 
 			lock (this.users)
 			{
@@ -314,12 +312,12 @@ namespace Waher.Mcp.Files
 		/// <summary>
 		/// Tries to get a resource, given its URI.
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="User">MCP Client user requesting resources.</param>
 		/// <param name="Uri">URI of resource.</param>
 		/// <param name="Session">MCP Session, if available.</param>
 		/// <returns>Resource, if found (and user has access rights to it), null otherwise.</returns>
-		public override Task<Resource?> TryGetResource(HttpRequest Request, IUser? User,
+		public override Task<Resource?> TryGetResource(IJsonRpcCall Call, IUser? User,
 			Uri Uri, Session? Session)
 		{
 			if (User is null)
@@ -327,7 +325,7 @@ namespace Waher.Mcp.Files
 
 			string UserName = User.UserName;
 			string FileName = Uri.OriginalString;
-			string BareUri = Request.Header.GetURL(false, false);
+			string BareUri = Call.GetBaseUrl();
 
 			if (!FileName.StartsWith(BareUri))
 				return Task.FromResult<Resource?>(null);
@@ -496,7 +494,7 @@ namespace Waher.Mcp.Files
 		/// If a file with the same name exists, it is replaced.
 		/// Text contents is stored UTF-8 encoded, with a Byte-Order-Mark (BOM).
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="LocalFileName">Local file name. Must not contain double period 
 		/// characters or begin with a path character, to attempt to escape file 
 		/// storage area. File extension must match Internet Content-Type of file 
@@ -519,7 +517,7 @@ namespace Waher.Mcp.Files
 		[RequiredPrivilege(CreatePrivilege)]
 		[return: McpParameter("Result", "URI of created file resource.")]
 		public async Task<string> CreateTextFile(
-			HttpRequest Request,
+			IJsonRpcCall Call,
 
 			[McpStringParameter("Local File Name", "Local file name. Must not contain " +
 			"double period characters or begin with a path character, to attempt to " +
@@ -535,14 +533,14 @@ namespace Waher.Mcp.Files
 			"(CRLF) is appended to the text content before creating the file.")]
 			bool AppendCrLf)
 		{
-			string? UserName = Request.User?.UserName;
+			string? UserName = Call.User?.UserName;
 			if (string.IsNullOrEmpty(UserName))
 				throw new ForbiddenException("User not authenticated.");
 
 			AssertLocalFileNameOk(LocalFileName);
 
 			string FullFileName = Path.Combine(this.rootFolder, UserName, LocalFileName);
-			string BaseUri = Request.Header.GetURL(false, false);
+			string BaseUri = Call.GetBaseUrl();
 			string Uri = CreateFileUrl(BaseUri, LocalFileName);
 
 			if (AppendCrLf)
@@ -557,7 +555,7 @@ namespace Waher.Mcp.Files
 		/// Creates a binary file in account-specific file storage. If a file with the 
 		/// same name exists, it is replaced.
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="LocalFileName">Local file name. Must not contain double period 
 		/// characters or begin with a path character, to attempt to escape file 
 		/// storage area. File extension must match Internet Content-Type of file 
@@ -577,7 +575,7 @@ namespace Waher.Mcp.Files
 		[RequiredPrivilege(CreatePrivilege)]
 		[return: McpParameter("Result", "URI of created file resource.")]
 		public async Task<string> CreateBinaryFile(
-			HttpRequest Request,
+			IJsonRpcCall Call,
 
 			[McpStringParameter("Local File Name", "Local file name. Must not contain " +
 			"double period characters or begin with a path character, to attempt to " +
@@ -590,14 +588,14 @@ namespace Waher.Mcp.Files
 			"information.")]
 			string Content)
 		{
-			string? UserName = Request.User?.UserName;
+			string? UserName = Call.User?.UserName;
 			if (string.IsNullOrEmpty(UserName))
 				throw new ForbiddenException("User not authenticated.");
 
 			AssertLocalFileNameOk(LocalFileName);
 
 			string FullFileName = Path.Combine(this.rootFolder, UserName, LocalFileName);
-			string BaseUri = Request.Header.GetURL(false, false);
+			string BaseUri = Call.GetBaseUrl();
 			string Uri = CreateFileUrl(BaseUri, LocalFileName);
 			byte[] Bin = Convert.FromBase64String(Content);
 
@@ -612,7 +610,7 @@ namespace Waher.Mcp.Files
 		/// Text contents is stored UTF-8 encoded (with a Byte-Order-Mark (BOM) if the 
 		/// file is created).
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="LocalFileName">Local file name. Must not contain double period 
 		/// characters or begin with a path character, to attempt to escape file 
 		/// storage area. File extension must match Internet Content-Type of file 
@@ -635,7 +633,7 @@ namespace Waher.Mcp.Files
 		[RequiredPrivilege(AppendPrivilege)]
 		[return: McpParameter("Result", "URI of appended file resource.")]
 		public async Task<string> AppendTextFile(
-			HttpRequest Request,
+			IJsonRpcCall Call,
 
 			[McpStringParameter("Local File Name", "Local file name. Must not contain " +
 			"double period characters or begin with a path character, to attempt to " +
@@ -651,14 +649,14 @@ namespace Waher.Mcp.Files
 			"(CRLF) is appended to the text content before appending it to the file.")]
 			bool AppendCrLf)
 		{
-			string? UserName = Request.User?.UserName;
+			string? UserName = Call.User?.UserName;
 			if (string.IsNullOrEmpty(UserName))
 				throw new ForbiddenException("User not authenticated.");
 
 			AssertLocalFileNameOk(LocalFileName);
 
 			string FullFileName = Path.Combine(this.rootFolder, UserName, LocalFileName);
-			string BaseUri = Request.Header.GetURL(false, false);
+			string BaseUri = Call.GetBaseUrl();
 			string Uri = CreateFileUrl(BaseUri, LocalFileName);
 
 			if (AppendCrLf)
@@ -679,7 +677,7 @@ namespace Waher.Mcp.Files
 		/// Appends a binary file in account-specific file storage. If the file does not 
 		/// exist, one is created.
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="LocalFileName">Local file name. Must not contain double period 
 		/// characters or begin with a path character, to attempt to escape file 
 		/// storage area. File extension must match Internet Content-Type of file 
@@ -699,7 +697,7 @@ namespace Waher.Mcp.Files
 		[RequiredPrivilege(AppendPrivilege)]
 		[return: McpParameter("Result", "URI of appended file resource.")]
 		public async Task<string> AppendBinaryFile(
-			HttpRequest Request,
+			IJsonRpcCall Call,
 
 			[McpStringParameter("Local File Name", "Local file name. Must not contain " +
 			"double period characters or begin with a path character, to attempt to " +
@@ -712,14 +710,14 @@ namespace Waher.Mcp.Files
 			"information.")]
 			string Content)
 		{
-			string? UserName = Request.User?.UserName;
+			string? UserName = Call.User?.UserName;
 			if (string.IsNullOrEmpty(UserName))
 				throw new ForbiddenException("User not authenticated.");
 
 			AssertLocalFileNameOk(LocalFileName);
 
 			string FullFileName = Path.Combine(this.rootFolder, UserName, LocalFileName);
-			string BaseUri = Request.Header.GetURL(false, false);
+			string BaseUri = Call.GetBaseUrl();
 			string Uri = CreateFileUrl(BaseUri, LocalFileName);
 			byte[] Bin = Convert.FromBase64String(Content);
 
@@ -733,7 +731,7 @@ namespace Waher.Mcp.Files
 		/// content with new content. The file must exist. Text contents is stored UTF-8 
 		/// encoded, with a Byte-Order-Mark (BOM).
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="LocalFileName">Local file name. Must not contain double period 
 		/// characters or begin with a path character, to attempt to escape file 
 		/// storage area. File extension must match Internet Content-Type of file 
@@ -756,7 +754,7 @@ namespace Waher.Mcp.Files
 		[RequiredPrivilege(UpdatePrivilege)]
 		[return: McpParameter("Result", "URI of updated file resource.")]
 		public async Task<string> UpdateTextFile(
-			HttpRequest Request,
+			IJsonRpcCall Call,
 
 			[McpStringParameter("Local File Name", "Local file name. Must not contain " +
 			"double period characters or begin with a path character, to attempt to " +
@@ -772,7 +770,7 @@ namespace Waher.Mcp.Files
 			"(CRLF) is appended to the text content before updating the file.")]
 			bool AppendCrLf)
 		{
-			string? UserName = Request.User?.UserName;
+			string? UserName = Call.User?.UserName;
 			if (string.IsNullOrEmpty(UserName))
 				throw new ForbiddenException("User not authenticated.");
 
@@ -782,7 +780,7 @@ namespace Waher.Mcp.Files
 			if (!File.Exists(FullFileName))
 				throw new NotFoundException("File not found.");
 
-			string BaseUri = Request.Header.GetURL(false, false);
+			string BaseUri = Call.GetBaseUrl();
 			string Uri = CreateFileUrl(BaseUri, LocalFileName);
 
 			if (AppendCrLf)
@@ -796,7 +794,7 @@ namespace Waher.Mcp.Files
 		/// <summary>
 		/// Updates a binary file in account-specific file storage. The file must exist.
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="LocalFileName">Local file name. Must not contain double period 
 		/// characters or begin with a path character, to attempt to escape file 
 		/// storage area. File extension must match Internet Content-Type of file 
@@ -815,7 +813,7 @@ namespace Waher.Mcp.Files
 		[RequiredPrivilege(UpdatePrivilege)]
 		[return: McpParameter("Result", "URI of updated file resource.")]
 		public async Task<string> UpdateBinaryFile(
-			HttpRequest Request,
+			IJsonRpcCall Call,
 
 			[McpStringParameter("Local File Name", "Local file name. Must not contain " +
 			"double period characters or begin with a path character, to attempt to " +
@@ -828,7 +826,7 @@ namespace Waher.Mcp.Files
 			"information.")]
 			string Content)
 		{
-			string? UserName = Request.User?.UserName;
+			string? UserName = Call.User?.UserName;
 			if (string.IsNullOrEmpty(UserName))
 				throw new ForbiddenException("User not authenticated.");
 
@@ -838,7 +836,7 @@ namespace Waher.Mcp.Files
 			if (!File.Exists(FullFileName))
 				throw new NotFoundException("File not found.");
 
-			string BaseUri = Request.Header.GetURL(false, false);
+			string BaseUri = Call.GetBaseUrl();
 			string Uri = CreateFileUrl(BaseUri, LocalFileName);
 			byte[] Bin = Convert.FromBase64String(Content);
 
@@ -851,7 +849,7 @@ namespace Waher.Mcp.Files
 		/// Deletes a file in account-specific file storage, regardless of type. The file 
 		/// must exist.
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="LocalFileName">Local file name. Must not contain double period 
 		/// characters or begin with a path character, to attempt to escape file 
 		/// storage area. File extension must match Internet Content-Type of file 
@@ -869,7 +867,7 @@ namespace Waher.Mcp.Files
 		[RequiredPrivilege(DeletePrivilege)]
 		[return: McpParameter("Result", "URI of deleted file resource.")]
 		public string DeleteFile(
-			HttpRequest Request,
+			IJsonRpcCall Call,
 
 			[McpStringParameter("Local File Name", "Local file name. Must not contain " +
 			"double period characters or begin with a path character, to attempt to " +
@@ -877,7 +875,7 @@ namespace Waher.Mcp.Files
 			"of file contents.", 3, 256)]
 			string LocalFileName)
 		{
-			string? UserName = Request.User?.UserName;
+			string? UserName = Call.User?.UserName;
 			if (string.IsNullOrEmpty(UserName))
 				throw new ForbiddenException("User not authenticated.");
 
@@ -887,7 +885,7 @@ namespace Waher.Mcp.Files
 			if (!File.Exists(FullFileName))
 				throw new NotFoundException("File not found.");
 
-			string BaseUri = Request.Header.GetURL(false, false);
+			string BaseUri = Call.GetBaseUrl();
 			string Uri = CreateFileUrl(BaseUri, LocalFileName);
 
 			File.Delete(FullFileName);
@@ -899,7 +897,7 @@ namespace Waher.Mcp.Files
 		/// Searches for files in account-specific file storage that have file names
 		/// matching a given search pattern.
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="Pattern">File name search pattern. Must not contain double period 
 		/// characters or path characters, to attempt to escape file storage area. Use 
 		/// asterisk (*) as wildcard, or questionmark (?) as a character wildcard.</param>
@@ -917,7 +915,7 @@ namespace Waher.Mcp.Files
 		[return: McpParameter("Result", "Search result of files in account-specific file " +
 			"storage.")]
 		public SearchResult SearchFiles(
-			HttpRequest Request,
+			IJsonRpcCall Call,
 
 			[McpStringParameter("Search Pattern", "File name search pattern. Must not " +
 			"contain double period characters or path characters, to attempt to " +
@@ -925,7 +923,7 @@ namespace Waher.Mcp.Files
 			"as a character wildcard.", 3, 256)]
 			string Pattern = "*.*")
 		{
-			string? UserName = Request.User?.UserName;
+			string? UserName = Call.User?.UserName;
 			if (string.IsNullOrEmpty(UserName))
 				throw new ForbiddenException("User not authenticated.");
 
@@ -937,7 +935,7 @@ namespace Waher.Mcp.Files
 				Directory.GetFiles(UserFolder, Pattern, SearchOption.AllDirectories);
 			int i, c = Files.Length;
 			string[] ResourceUris = new string[c];
-			string BaseUrl = Request.Header.GetURL(false, false);
+			string BaseUrl = Call.GetBaseUrl();
 
 			for (i = 0; i < c; i++)
 			{
@@ -951,8 +949,7 @@ namespace Waher.Mcp.Files
 		/// <summary>
 		/// Edits a file in account-specific file storage.
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
-		/// <param name="Response">HTTP Response object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="LocalFileName">Local file name. Must not contain double period 
 		/// characters or begin with a path character, to attempt to escape file 
 		/// storage area. File extension must match Internet Content-Type of file 
@@ -971,8 +968,7 @@ namespace Waher.Mcp.Files
 			false)] // OpenWorldAccess
 		[RequiredPrivilege(EditPrivilege)]
 		[return: McpParameter("Result", "URI of updated file resource.")]
-		public async Task<string> EditFile(
-			HttpRequest Request, HttpResponse Response,
+		public async Task<string> EditFile(IJsonRpcCall Call,
 
 			[McpStringParameter("Local File Name", "Local file name. Must not contain " +
 			"double period characters or begin with a path character, to attempt to " +
@@ -985,19 +981,19 @@ namespace Waher.Mcp.Files
 			"window and not inline.")]
 			bool Sensitive)
 		{
-			string? UserName = Request.User?.UserName;
+			string? UserName = Call.User?.UserName;
 			if (string.IsNullOrEmpty(UserName))
 				throw new ForbiddenException("User not authenticated.");
 
 			AssertLocalFileNameOk(LocalFileName);
 
-			string BaseUri = Request.Header.GetURL(false, false);
+			string BaseUri = Call.GetBaseUrl();
 			string Uri = CreateFileUrl(BaseUri, LocalFileName);
 			string FullFileName = Path.Combine(this.rootFolder, UserName, LocalFileName);
 			if (!File.Exists(FullFileName))
 				throw new NotFoundException("File not found.");
 
-			Session? Session = await this.TryGetMcpSession(Request, Response)
+			Session? Session = await this.TryGetMcpSession(Call)
 				?? throw new ForbiddenException("No MCP session active.");
 
 			InternetContent.TryGetContentType(Path.GetExtension(LocalFileName), out string? ContentType);
@@ -1009,7 +1005,7 @@ namespace Waher.Mcp.Files
 					FileContents = await Runtime.IO.Files.ReadAllTextAsync(FullFileName)
 				};
 
-				bool? Result = await this.ElicitUserInput(Request,
+				bool? Result = await this.ElicitUserInput(Call,
 					"Edit the contents of the following text file.",
 					Contents, Sensitive, Session, 5 * 60 * 1000);
 
@@ -1030,7 +1026,7 @@ namespace Waher.Mcp.Files
 						await Runtime.IO.Files.ReadAllBytesAsync(FullFileName))
 				};
 
-				bool? Result = await this.ElicitUserInput(Request,
+				bool? Result = await this.ElicitUserInput(Call,
 					"Edit the BASE64-encoded contents of the following binary file.",
 					Contents, Sensitive, Session, 5 * 60 * 1000);
 

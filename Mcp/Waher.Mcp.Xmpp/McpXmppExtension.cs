@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.JsonRpc;
+using Waher.Networking.HTTP.JsonRpc.Transports;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Events;
@@ -15,7 +15,7 @@ namespace Waher.Mcp.Xmpp
 	/// </summary>
 	internal class McpXmppExtension : IXmppExtension
 	{
-		private readonly HttpRequest firstRequest;
+		private readonly IJsonRpcCall firstCall;
 		private readonly HashSet<string> sessionIds = new HashSet<string>();
 		private readonly Dictionary<string, PresenceEventArgs> subscriptionRequests =
 			new Dictionary<string, PresenceEventArgs>(StringComparer.InvariantCultureIgnoreCase);
@@ -26,11 +26,11 @@ namespace Waher.Mcp.Xmpp
 		/// <summary>
 		/// Contains information about an MCP XMPP session.
 		/// </summary>
-		/// <param name="Request">Request that generated the connection.</param>
+		/// <param name="Call">Request that generated the connection.</param>
 		/// <param name="SessionId">Session creating the object.</param>
-		public McpXmppExtension(HttpRequest Request, string SessionId)
+		public McpXmppExtension(IJsonRpcCall Call, string SessionId)
 		{
-			this.firstRequest = Request;
+			this.firstCall = Call;
 			this.sessionIds.Add(SessionId);
 		}
 
@@ -40,9 +40,9 @@ namespace Waher.Mcp.Xmpp
 		public string[] Extensions => new string[] { "MCP" };
 
 		/// <summary>
-		/// First request that generated the connection.
+		/// First call that generated the connection.
 		/// </summary>
-		public HttpRequest FirstRequest => this.firstRequest;
+		public IJsonRpcCall FirstCall => this.firstCall;
 
 		/// <summary>
 		/// Registered session IDs

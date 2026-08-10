@@ -3,17 +3,11 @@
 	/// <summary>
 	/// Interface for JSON-RPC session objects.
 	/// </summary>
-	public interface IJsonRpcSession
+	public interface IJsonRpcSession : ICommunicationLayer
 	{
 		/// <summary>
 		/// Session ID
 		/// </summary>
 		string SessionId { get; }
-
-		/// <summary>
-		/// Is called when text has been transmitted.
-		/// </summary>
-		/// <param name="Text">Transmitted text.</param>
-		void TransmitText(string Text);
 	}
 }

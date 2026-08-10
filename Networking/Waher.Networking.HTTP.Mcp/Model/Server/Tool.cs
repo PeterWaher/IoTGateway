@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP.JsonRpc;
-using Waher.Networking.HTTP.JsonRpc.MetaData;
+using Waher.Networking.HTTP.JsonRpc.Transports;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Networking.HTTP.Mcp.Model.ContentBlocks;
 using Waher.Persistence;
@@ -278,12 +278,8 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 				foreach (ParameterInfo Parameter in Parameters)
 				{
 					Type ParameterType = Parameter.ParameterType;
-
-					if (ParameterType == typeof(HttpRequest) ||
-						ParameterType == typeof(HttpResponse))
-					{
+					if (ParameterType == typeof(IJsonRpcCall))
 						continue;
-					}
 
 					if (!Parameter.IsOptional && !Parameter.HasDefaultValue)
 						Required.Add(Parameter.Name);
@@ -553,27 +549,22 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// </summary>
 		/// <param name="Id">ID of request.</param>
 		/// <param name="Parameters">Named parameters.</param>
-		/// <param name="Request">HTTP Request object.</param>
-		/// <param name="Response">HTTP Response object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <param name="MetaData">Additional Meta-Data available for the request.</param>
 		/// <param name="Reason">Reason for not being able to create request.</param>
 		/// <param name="Arguments">Ordered set of typed arguments, to be used in a
 		/// call to the method.</param>
 		/// <returns>If able to prepare a request to the method.</returns>
 		public bool TryBuildRequest(object? Id, Dictionary<string, object?> Parameters,
-			HttpRequest Request, HttpResponse Response,
-			Dictionary<string, object?>? MetaData,
+			IJsonRpcCall Call, Dictionary<string, object?>? MetaData,
 			[NotNullWhen(false)] out string? Reason,
 			[NotNullWhen(true)] out object?[]? Arguments)
 		{
 			if (!this.TryBuildRequest(Id, Parameters, MetaData, out Reason, out Arguments))
 				return false;
 
-			if (this.RequestArgument.HasValue)
-				Arguments[this.RequestArgument.Value] = Request;
-
-			if (this.ResponseArgument.HasValue)
-				Arguments[this.ResponseArgument.Value] = Response;
+			if (this.CallArgument.HasValue)
+				Arguments[this.CallArgument.Value] = Call;
 
 			if (this.IdArgument.HasValue)
 				Arguments[this.IdArgument.Value] = Id;

@@ -12,6 +12,7 @@ using Waher.Content.Json;
 using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.HTTP.JsonRpc.MetaData;
+using Waher.Networking.HTTP.JsonRpc.Transports;
 using Waher.Networking.HTTP.OAuth;
 using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Runtime.Collections;
@@ -607,13 +608,13 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="Parameters">Parameters for the method.</param>
 		/// <param name="Session">Session to receive the request.</param>
 		/// <param name="ParseResult">Function to parse incoming results.</param>
-		/// <param name="HttpRequest">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Call object.</param>
 		/// <returns>Request object.</returns>
 		public JsonRpcClientRequest<T> CreateRequest<T>(string Message, string Method, 
 			object? Parameters, IJsonRpcSession Session, Func<object?, Task<T>> ParseResult,
-			HttpRequest HttpRequest)
+			IJsonRpcCall Call)
 		{
-			JsonRpcClientRequest<T> Request;
+			JsonRpcClientRequest<T> Result;
 			string Id;
 
 			lock (this.requests)
@@ -624,13 +625,13 @@ namespace Waher.Networking.HTTP.JsonRpc
 				}
 				while (this.requests.ContainsKey(Id));
 
-				Request = new JsonRpcClientRequest<T>(Message, Id, Method, Parameters, 
-					Session, ParseResult, this, HttpRequest);
+				Result = new JsonRpcClientRequest<T>(Message, Id, Method, Parameters, 
+					Session, ParseResult, this, Call);
 
-				this.requests[Id] = Request;
+				this.requests[Id] = Result;
 			}
 
-			return Request;
+			return Result;
 		}
 
 		/// <summary>
@@ -688,6 +689,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public virtual async Task GET(HttpRequest Request, HttpResponse Response)
 		{
+			IJsonRpcCall JsonRpcCall = new HttpJsonRpcCall(Request, Response);
+
 			if (Request.Header.IsAcceptable(HtmlCodec.DefaultContentType))
 			{
 				await this.GenerateDocumentation(Request, Response);
@@ -701,7 +704,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 					return;
 				}
 
-				IJsonRpcSession? Session = await this.TryGetSession(Request, Response);
+				IJsonRpcSession? Session = await this.TryGetSession(JsonRpcCall, true);
 				if (Response.ResponseSent)
 					return;
 
@@ -763,7 +766,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				return;
 			}
 
-			using JsonRpcServerRequest JsonRpcRequest = new JsonRpcServerRequest();
+			using JsonRpcServerRequest ServerRequest = new JsonRpcServerRequest();
 
 			if (!(Request.Header.QueryParameters is null))
 			{
@@ -780,7 +783,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 						}
 						catch (Exception ex)
 						{
-							JsonRpcRequest.SetError(-32700, "Unable to parse parameter: " +
+							ServerRequest.SetError(-32700, "Unable to parse parameter: " +
 								P.Key + ": " + Log.UnnestException(ex).Message,
 								InternalServerErrorException.Code, InternalServerErrorException.StatusMessage);
 							continue;
@@ -789,12 +792,12 @@ namespace Waher.Networking.HTTP.JsonRpc
 					else
 						Value = P.Value;
 
-					this.ProcessQueryParameter(JsonRpcRequest, P.Key, Value);
+					this.ProcessQueryParameter(ServerRequest, P.Key, Value);
 				}
 			}
 
-			if (!await JsonRpcRequest.BuildResponse(this, Request, Response))
-				await this.SendResponse(Request, JsonRpcRequest, Response);
+			if (!await ServerRequest.BuildResponse(this, JsonRpcCall))
+				await this.SendResponse(Request, ServerRequest, Response);
 		}
 
 		/// <summary>
@@ -1447,12 +1450,16 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <summary>
 		/// Tries to get a session object for the resource, if any.
 		/// </summary>
-		/// <param name="Request">HTTP Request object</param>
-		/// <param name="Response">HTTP Response object</param>
+		/// <param name="Call">JSON-RPC Call object</param>
+		/// <param name="ErrorIfNone">If an error should be returned if no session is found.</param>
 		/// <returns>Session object, if any.</returns>
-		protected virtual Task<IJsonRpcSession?> TryGetSession(HttpRequest Request, HttpResponse Response)
+		public virtual async Task<IJsonRpcSession?> TryGetSession(IJsonRpcCall Call,
+			bool ErrorIfNone)
 		{
-			return Task.FromResult<IJsonRpcSession?>(null);
+			if (ErrorIfNone)
+				await Call.SendResponse(new NotFoundException("No JSON-RPC session found."));
+
+			return null;
 		}
 
 		/// <summary>
@@ -1463,6 +1470,8 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public virtual async Task POST(HttpRequest Request, HttpResponse Response)
 		{
+			IJsonRpcCall JsonRpcCall = new HttpJsonRpcCall(Request, Response);
+
 			using JsonRpcServerRequest JsonRpcRequest = new JsonRpcServerRequest();
 
 			if (!Request.HasData)
@@ -1522,7 +1531,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				}
 			}
 
-			if (!await JsonRpcRequest.BuildResponse(this, Request, Response))
+			if (!await JsonRpcRequest.BuildResponse(this, JsonRpcCall))
 				await this.SendResponse(Request, JsonRpcRequest, Response);
 		}
 

@@ -14,6 +14,7 @@ using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.JsonRpc;
+using Waher.Networking.HTTP.JsonRpc.Transports;
 using Waher.Networking.HTTP.Mcp;
 using Waher.Networking.HTTP.Mcp.Model;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
@@ -214,73 +215,67 @@ namespace Waher.Mcp.Xmpp
 		/// <summary>
 		/// Lists available MCP server resources.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="Cursor">Cursor for pagination.</param>
 		/// <returns>Dictionary containing the list of resources.</returns>
 		[RequiredPrivilege(ListPrivilege)]
-		protected override Task<Dictionary<string, object>?> Resources_List(HttpRequest Request,
-			HttpResponse Response, string? Cursor = null)
+		protected override Task<Dictionary<string, object>?> Resources_List(
+			IJsonRpcCall Call, string? Cursor = null)
 		{
-			return base.Resources_List(Request, Response, Cursor);
+			return base.Resources_List(Call, Cursor);
 		}
 
 		/// <summary>
 		/// Reads an MCP server resource.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="Uri">URI of the resource to read.</param>
 		/// <param name="_Meta">Associated meta-data, if available.</param>
 		/// <returns>Dictionary containing the result of the tool call.</returns>
 		[RequiredPrivilege(ReadPrivilege)]
-		protected override async Task<Dictionary<string, object>?> Resources_Read(HttpRequest Request,
-			HttpResponse Response, Uri Uri, [JsonRpcMetaDataArgument] object? _Meta = null)
+		protected override async Task<Dictionary<string, object>?> Resources_Read(
+			IJsonRpcCall Call, Uri Uri, [JsonRpcMetaDataArgument] object? _Meta = null)
 		{
-			return await base.Resources_Read(Request, Response, Uri, _Meta);
+			return await base.Resources_Read(Call, Uri, _Meta);
 		}
 
 		/// <summary>
 		/// Subscribes to an MCP server resource.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="Uri">URI of the resource to subscribe to.</param>
 		[RequiredPrivilege(ListPrivilege)]
-		protected override Task Resources_Subscribe(HttpRequest Request, HttpResponse Response,
-			Uri Uri)
+		protected override Task Resources_Subscribe(IJsonRpcCall Call, Uri Uri)
 		{
-			return base.Resources_Subscribe(Request, Response, Uri);
+			return base.Resources_Subscribe(Call, Uri);
 		}
 
 		/// <summary>
 		/// Unsubscribes from an MCP server resource.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="Uri">URI of the resource to unsubscribe from.</param>
 		[RequiredPrivilege(ListPrivilege)]
-		protected override async Task Resources_Unsubscribe(HttpRequest Request, HttpResponse Response,
-			Uri Uri)
+		protected override async Task Resources_Unsubscribe(IJsonRpcCall Call, Uri Uri)
 		{
-			await base.Resources_Unsubscribe(Request, Response, Uri);
+			await base.Resources_Unsubscribe(Call, Uri);
 		}
 
 		/// <summary>
 		/// Tries to get a resource, given its URI.
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Request object.</param>
 		/// <param name="User">MCP Client user requesting resources.</param>
 		/// <param name="Uri">URI of resource.</param>
 		/// <param name="Session">MCP Session, if available.</param>
 		/// <returns>Resource, if found (and user has access rights to it), null otherwise.</returns>
-		public override async Task<Resource?> TryGetResource(HttpRequest Request,
+		public override async Task<Resource?> TryGetResource(IJsonRpcCall Call,
 			IUser? User, Uri Uri, Session? Session)
 		{
 			if (Session is null || User is null)
 				return null;
 
-			XmppClient Client = await this.GetClient(Request, User, Session);
+			XmppClient Client = await this.GetClient(Call, User, Session);
 
 			switch (Uri.Scheme)
 			{
@@ -301,23 +296,23 @@ namespace Waher.Mcp.Xmpp
 					break;
 			}
 
-			return await base.TryGetResource(Request, User, Uri, Session);
+			return await base.TryGetResource(Call, User, Uri, Session);
 		}
 
 		/// <summary>
 		/// Gets available resources.
 		/// </summary>
-		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Call">JSON-RPC Request object.</param>
 		/// <param name="User">MCP Client user requesting resources.</param>
 		/// <param name="Session">MCP Session, if available.</param>
 		/// <returns>Array of resources.</returns>
-		public override async Task<Resource[]> GetResources(HttpRequest Request, IUser? User,
-			Session? Session)
+		public override async Task<Resource[]> GetResources(
+			IJsonRpcCall Call, IUser? User, Session? Session)
 		{
 			if (User is null || Session is null)
 				return Array.Empty<Resource>();
 
-			XmppClient Client = await this.GetClient(Request, User, Session);
+			XmppClient Client = await this.GetClient(Call, User, Session);
 			ChunkedList<Resource> Resources = new ChunkedList<Resource>();
 
 			foreach (RosterItem Item in Client.Roster)
@@ -343,7 +338,7 @@ namespace Waher.Mcp.Xmpp
 			instance ??= this;
 		}
 
-		private async Task<XmppClient> GetClient(HttpRequest Request, IUser User,
+		private async Task<XmppClient> GetClient(IJsonRpcCall Call, IUser User,
 			Session Session)
 		{
 			if (clients.TryGetValue(User.UserName, out ClientRec? Rec))
@@ -404,7 +399,7 @@ namespace Waher.Mcp.Xmpp
 
 					if (ConnectionResult == 0)
 					{
-						Client.RegisterExtension(new McpXmppExtension(Request, Session.SessionId));
+						Client.RegisterExtension(new McpXmppExtension(Call, Session.SessionId));
 						this.Setup(Client, User);
 						clients[User.UserName] = new ClientRec(User.UserName, Client);
 						return Client;
@@ -445,7 +440,7 @@ namespace Waher.Mcp.Xmpp
 				if (HasError)
 					Message = "Error: " + Error + "\r\n\r\n" + Message;
 
-				bool? Result = await this.ElicitUserInput(Request, Message,
+				bool? Result = await this.ElicitUserInput(Call, Message,
 					NewCredentials, true, Session, 5 * 60 * 1000);
 
 				if (!Result.HasValue)
@@ -543,7 +538,7 @@ namespace Waher.Mcp.Xmpp
 			}
 			while (Client is null);
 
-			Client.RegisterExtension(new McpXmppExtension(Request, Session.SessionId));
+			Client.RegisterExtension(new McpXmppExtension(Call, Session.SessionId));
 			this.Setup(Client, User);
 			clients[User.UserName] = new ClientRec(User.UserName, Client);
 
@@ -600,8 +595,7 @@ namespace Waher.Mcp.Xmpp
 		/// <summary>
 		/// MCP Server Tool to send a presence subscription request to another user.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="To">Bare JID of the recipient of the presence subscription request.</param>
 		/// <returns>Results of operation.</returns>
 		[McpServerTool(
@@ -614,23 +608,24 @@ namespace Waher.Mcp.Xmpp
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(SubscribePresencePrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
-		public async Task<GenericResponse> RequestPresenceSubscription(HttpRequest Request, HttpResponse Response,
+		public async Task<GenericResponse> RequestPresenceSubscription(
+			IJsonRpcCall Call,
 
 			[McpStringParameter("To", "Bare JID of the user to whom send a presence subscription request.", 3, 256)]
 			string To)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return new GenericResponse(false, "No MCP session.");
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent || User is null)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
 				return new GenericResponse(false, "User not authenticated.");
 
 			if (!XmppClient.BareJidRegEx.IsMatch(To))
 				return new GenericResponse(false, "Invalid Bare JID: " + To);
 
-			XmppClient Client = await this.GetClient(Request, User, Session);
+			XmppClient Client = await this.GetClient(Call, User, Session);
 
 			await Client.RequestPresenceSubscription(To);
 
@@ -640,8 +635,7 @@ namespace Waher.Mcp.Xmpp
 		/// <summary>
 		/// MCP Server Tool to accept a presence subscription request from another user.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="From">Bare JID of the sender of the presence subscription to accept.</param>
 		/// <returns>Results of operation.</returns>
 		[McpServerTool(
@@ -655,20 +649,20 @@ namespace Waher.Mcp.Xmpp
 		[RequiredPrivilege(AcceptPresencePrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
 		public async Task<GenericResponse> AcceptPresenceSubscription(
-			HttpRequest Request, HttpResponse Response,
+			IJsonRpcCall Call,
 
 			[McpStringParameter("From", "Bare JID of the sender of the presence subscription request to accept.", 3, 256)]
 			string From)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return new GenericResponse(false, "No MCP session.");
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent || User is null)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
 				return new GenericResponse(false, "User not authenticated.");
 
-			XmppClient Client = await this.GetClient(Request, User, Session);
+			XmppClient Client = await this.GetClient(Call, User, Session);
 
 			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
 				McpXmppExtension is null)
@@ -687,8 +681,7 @@ namespace Waher.Mcp.Xmpp
 		/// <summary>
 		/// MCP Server Tool to decline a presence subscription request from another user.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="From">Bare JID of the sender of the presence subscription to decline.</param>
 		/// <returns>Results of operation.</returns>
 		[McpServerTool(
@@ -702,20 +695,20 @@ namespace Waher.Mcp.Xmpp
 		[RequiredPrivilege(DeclinePresencePrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
 		public async Task<GenericResponse> DeclinePresenceSubscription(
-			HttpRequest Request, HttpResponse Response,
+			IJsonRpcCall Call,
 
 			[McpStringParameter("From", "Bare JID of the sender of the presence subscription request to decline.", 3, 256)]
 			string From)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return new GenericResponse(false, "No MCP session.");
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent || User is null)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
 				return new GenericResponse(false, "User not authenticated.");
 
-			XmppClient Client = await this.GetClient(Request, User, Session);
+			XmppClient Client = await this.GetClient(Call, User, Session);
 
 			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
 				McpXmppExtension is null)
@@ -734,8 +727,7 @@ namespace Waher.Mcp.Xmpp
 		/// <summary>
 		/// MCP Server Tool to send a presence unsubscription request to another user.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="To">Bare JID of the recipient of the presence unsubscription request.</param>
 		/// <returns>Results of operation.</returns>
 		[McpServerTool(
@@ -748,23 +740,24 @@ namespace Waher.Mcp.Xmpp
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(UnsubscribePresencePrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
-		public async Task<GenericResponse> RequestPresenceUnsubscription(HttpRequest Request, HttpResponse Response,
+		public async Task<GenericResponse> RequestPresenceUnsubscription(
+			IJsonRpcCall Call,
 
 			[McpStringParameter("To", "Bare JID of the user to whom send a presence subscription request.", 3, 256)]
 			string To)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return new GenericResponse(false, "No MCP session.");
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent || User is null)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
 				return new GenericResponse(false, "User not authenticated.");
 
 			if (!XmppClient.BareJidRegEx.IsMatch(To))
 				return new GenericResponse(false, "Invalid Bare JID: " + To);
 
-			XmppClient Client = await this.GetClient(Request, User, Session);
+			XmppClient Client = await this.GetClient(Call, User, Session);
 
 			await Client.RequestPresenceUnsubscription(To);
 
@@ -775,8 +768,7 @@ namespace Waher.Mcp.Xmpp
 		/// MCP Server Tool to add a contact to the roster of the XMPP account associated 
 		/// with the MCP Client.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="BareJid">Bare JID of the contact to add to roster.</param>
 		/// <param name="NickName">Optional nick name of the contact to add to roster.</param>
 		/// <param name="Groups">Optional groups to which the contact should be added.</param>
@@ -791,7 +783,8 @@ namespace Waher.Mcp.Xmpp
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(AddRosterItemPrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
-		public async Task<GenericResponse> AddToRoster(HttpRequest Request, HttpResponse Response,
+		public async Task<GenericResponse> AddToRoster(
+			IJsonRpcCall Call,
 
 			[McpStringParameter("Bare JID", "Bare JID of the contact to add to roster.", 3, 256)]
 			string BareJid,
@@ -802,18 +795,18 @@ namespace Waher.Mcp.Xmpp
 			[McpParameter("Groups", "Optional groups to which the contact should be added.")]
 			string[]? Groups = null)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return new GenericResponse(false, "No MCP session.");
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent || User is null)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
 				return new GenericResponse(false, "User not authenticated.");
 
 			if (!XmppClient.BareJidRegEx.IsMatch(BareJid))
 				return new GenericResponse(false, "Invalid Bare JID: " + BareJid);
 
-			XmppClient Client = await this.GetClient(Request, User, Session);
+			XmppClient Client = await this.GetClient(Call, User, Session);
 
 			if (!(Client.GetRosterItem(BareJid) is null))
 				return new GenericResponse(false, "Contact already in roster.");
@@ -841,8 +834,7 @@ namespace Waher.Mcp.Xmpp
 		/// MCP Server Tool to update a contact in the roster of the XMPP account associated 
 		/// with the MCP Client.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="BareJid">Bare JID of the contact to update in roster.</param>
 		/// <param name="NickName">Optional nick name of the contact to update in roster.</param>
 		/// <param name="Groups">Optional groups to which the contact should belong.</param>
@@ -857,7 +849,8 @@ namespace Waher.Mcp.Xmpp
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(UpdateRosterItemPrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
-		public async Task<GenericResponse> UpdateRosterItem(HttpRequest Request, HttpResponse Response,
+		public async Task<GenericResponse> UpdateRosterItem(
+			IJsonRpcCall Call,
 
 			[McpStringParameter("Bare JID", "Bare JID of the contact to update in roster.", 3, 256)]
 			string BareJid,
@@ -868,18 +861,18 @@ namespace Waher.Mcp.Xmpp
 			[McpParameter("Groups", "Optional groups to which the contact should belong.")]
 			string[]? Groups = null)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return new GenericResponse(false, "No MCP session.");
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent || User is null)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
 				return new GenericResponse(false, "User not authenticated.");
 
 			if (!XmppClient.BareJidRegEx.IsMatch(BareJid))
 				return new GenericResponse(false, "Invalid Bare JID: " + BareJid);
 
-			XmppClient Client = await this.GetClient(Request, User, Session);
+			XmppClient Client = await this.GetClient(Call, User, Session);
 
 			RosterItem Item = Client.GetRosterItem(BareJid);
 			if (Item is null)
@@ -908,8 +901,7 @@ namespace Waher.Mcp.Xmpp
 		/// MCP Server Tool to remove a contact from the roster of the XMPP account associated 
 		/// with the MCP Client.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="BareJid">Bare JID of the contact to remove from roster.</param>
 		/// <returns>Results of operation.</returns>
 		[McpServerTool(
@@ -922,23 +914,24 @@ namespace Waher.Mcp.Xmpp
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(RemoveRosterItemPrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
-		public async Task<GenericResponse> RemoveFromRoster(HttpRequest Request, HttpResponse Response,
+		public async Task<GenericResponse> RemoveFromRoster(
+			IJsonRpcCall Call,
 
 			[McpStringParameter("Bare JID", "Bare JID of the contact to remove from roster.", 3, 256)]
 			string BareJid)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return new GenericResponse(false, "No MCP session.");
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent || User is null)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
 				return new GenericResponse(false, "User not authenticated.");
 
 			if (!XmppClient.BareJidRegEx.IsMatch(BareJid))
 				return new GenericResponse(false, "Invalid Bare JID: " + BareJid);
 
-			XmppClient Client = await this.GetClient(Request, User, Session);
+			XmppClient Client = await this.GetClient(Call, User, Session);
 
 			RosterItem Item = Client.GetRosterItem(BareJid);
 			if (Item is null)
@@ -965,8 +958,7 @@ namespace Waher.Mcp.Xmpp
 		/// <summary>
 		/// MCP Server Tool to send a chat message to a recipient using XMPP.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="To">Bare JID of the recipient of the message.</param>
 		/// <param name="Message">Message content. Can be either plain text, or Markdown.</param>
 		/// <param name="IsMarkdown">Indicates if the message is in Markdown format (true),
@@ -983,7 +975,7 @@ namespace Waher.Mcp.Xmpp
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(SendMessagePrivilege)]
 		[return: McpParameter("Result", "Results of operation.")]
-		public async Task<GenericResponse> SendChatMessage(HttpRequest Request, HttpResponse Response,
+		public async Task<GenericResponse> SendChatMessage(IJsonRpcCall Call,
 
 			[McpStringParameter("To", "Bare JID of the recipient of the message.", 3, 256)]
 			string To,
@@ -997,18 +989,18 @@ namespace Waher.Mcp.Xmpp
 			[McpStringParameter("Language", "Optional ISO-639 code of language used in the message, if any.", 0, 10)]
 			string? Language = null)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return new GenericResponse(false, "No MCP session.");
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent || User is null)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
 				return new GenericResponse(false, "User not authenticated.");
 
 			if (!XmppClient.BareJidRegEx.IsMatch(To))
 				return new GenericResponse(false, "Invalid Bare JID: " + To);
 
-			XmppClient Client = await this.GetClient(Request, User, Session);
+			XmppClient Client = await this.GetClient(Call, User, Session);
 			string Markdown;
 			string Html;
 			string PlainText;
@@ -1119,8 +1111,7 @@ namespace Waher.Mcp.Xmpp
 		/// <summary>
 		/// MCP Server Tool to retrieve a message received over XMPP.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="MessageId">The ID of the message to retrieve. Can be the 
 		/// identifier itself, or the message resource URI.</param>
 		/// <param name="Remove">Determines if the message should be removed from the list 
@@ -1136,7 +1127,7 @@ namespace Waher.Mcp.Xmpp
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(GetMessagePrivilege)]
 		[return: McpParameter("Result", "Message, if found.")]
-		public async Task<MessageResponse> GetMessage(HttpRequest Request, HttpResponse Response,
+		public async Task<MessageResponse> GetMessage(IJsonRpcCall Call,
 
 			[McpStringParameter("Message ID", "The ID of the message to retrieve. Can be the identifier itself, or the message resource URI.", 3, 256)]
 			string MessageId,
@@ -1144,15 +1135,15 @@ namespace Waher.Mcp.Xmpp
 			[McpParameter("Remove", "Determines if the message should be removed from the list of received messages or not.")]
 			bool Remove = false)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return new MessageResponse("No MCP session.");
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent || User is null)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
 				return new MessageResponse("User not authenticated.");
 
-			XmppClient Client = await this.GetClient(Request, User, Session);
+			XmppClient Client = await this.GetClient(Call, User, Session);
 
 			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
 				McpXmppExtension is null)
@@ -1177,8 +1168,7 @@ namespace Waher.Mcp.Xmpp
 		/// MCP Server Tool to retrieve the first message received over XMPP, and then
 		/// remove it from the resource list.
 		/// </summary>
-		/// <param name="Request">HTTP request object.</param>
-		/// <param name="Response">HTTP response object.</param>
+		/// <param name="Call">JSON-RPC call object.</param>
 		/// <returns>Message, if found.</returns>
 		[McpServerTool(
 			"Pop Message",
@@ -1190,17 +1180,17 @@ namespace Waher.Mcp.Xmpp
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(GetMessagePrivilege)]
 		[return: McpParameter("Result", "Message, if found.")]
-		public async Task<MessageResponse> PopMessage(HttpRequest Request, HttpResponse Response)
+		public async Task<MessageResponse> PopMessage(IJsonRpcCall Call)
 		{
-			Session? Session = await this.TryGetMcpSession(Request, Response);
+			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
 				return new MessageResponse("No MCP session.");
 
-			IUser? User = await this.GetAuthenticatedUser(Request, Response, Session);
-			if (Response.ResponseSent || User is null)
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
 				return new MessageResponse("User not authenticated.");
 
-			XmppClient Client = await this.GetClient(Request, User, Session);
+			XmppClient Client = await this.GetClient(Call, User, Session);
 
 			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
 				McpXmppExtension is null)
@@ -1241,7 +1231,7 @@ namespace Waher.Mcp.Xmpp
 						Mutual = Mutual
 					};
 
-					bool? Result = await this.ElicitUserInput(McpXmppExtension.FirstRequest,
+					bool? Result = await this.ElicitUserInput(McpXmppExtension.FirstCall,
 						"A Presence Subscription Request was received from " +
 						e.FromBareJID + ". You can choose to Accept or Decline " +
 						"this request. Below, you can also select if you want " +

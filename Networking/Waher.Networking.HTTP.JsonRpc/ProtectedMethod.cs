@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP.JsonRpc.MetaData;
+using Waher.Networking.HTTP.JsonRpc.Transports;
 using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Security;
@@ -56,27 +57,16 @@ namespace Waher.Networking.HTTP.JsonRpc
 				IsMetaDataArgument = false;
 				IsIdArgument = false;
 
-				if (P.ParameterType == typeof(HttpRequest))
+				if (P.ParameterType == typeof(IJsonRpcCall))
 				{
-					if (this.RequestArgument is null)
+					if (this.CallArgument is null)
 					{
-						this.RequestArgument = P.Position;
+						this.CallArgument = P.Position;
 						this.NrSpecialArguments++;
 						IsSpecialArgument = true;
 					}
 					else
-						throw new ArgumentException("Only one argument of type HttpRequest is allowed.", nameof(Method));
-				}
-				else if (P.ParameterType == typeof(HttpResponse))
-				{
-					if (this.ResponseArgument is null)
-					{
-						this.ResponseArgument = P.Position;
-						this.NrSpecialArguments++;
-						IsSpecialArgument = true;
-					}
-					else
-						throw new ArgumentException("Only one argument of type HttpResponse is allowed.", nameof(Method));
+						throw new ArgumentException("Only one argument of type IJsonRpcCall is allowed.", nameof(Method));
 				}
 				else if (P.ParameterType == typeof(Dictionary<string, object?>) &&
 					P.IsDefined(typeof(JsonRpcMetaDataArgumentAttribute), true))
@@ -175,14 +165,9 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public Dictionary<string, int> NamedArguments { get; }
 
 		/// <summary>
-		/// Request argument index
+		/// Call argument index
 		/// </summary>
-		public int? RequestArgument { get; }
-
-		/// <summary>
-		/// Response argument index
-		/// </summary>
-		public int? ResponseArgument { get; }
+		public int? CallArgument { get; }
 
 		/// <summary>
 		/// Meta-data argument index

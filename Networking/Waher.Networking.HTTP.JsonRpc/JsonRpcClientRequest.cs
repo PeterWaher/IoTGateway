@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
+using Waher.Networking.HTTP.JsonRpc.Transports;
 
 namespace Waher.Networking.HTTP.JsonRpc
 {
@@ -16,14 +17,14 @@ namespace Waher.Networking.HTTP.JsonRpc
 		private readonly IJsonRpcSession session;
 		private readonly TaskCompletionSource<T> result;
 		private readonly Func<object?, Task<T>> parseResult;
-		private readonly HttpRequest httpRequest;
+		private readonly IJsonRpcCall call;
 		private readonly string method;
 		private readonly object? parameters;
 		private bool processed = false;
 
 		internal JsonRpcClientRequest(string Message, object? Id, string Method,
 			object? Parameters, IJsonRpcSession Session, Func<object?, Task<T>> ParseResult,
-			JsonRpcWebService WebService, HttpRequest HttpRequest)
+			JsonRpcWebService WebService, IJsonRpcCall Call)
 		{
 			this.Message = Message;
 			this.Id = Id;
@@ -32,7 +33,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 			this.session = Session;
 			this.parseResult = ParseResult;
 			this.webService = WebService;
-			this.httpRequest = HttpRequest;
+			this.call = Call;
 			this.result = new TaskCompletionSource<T>();
 		}
 
@@ -222,7 +223,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				{
 					while (!Completed.Task.IsCompleted && (TP = DateTime.UtcNow) < Until)
 					{
-						this.httpRequest.Ping();
+						this.call.Ping();
 						await Task.Delay(Math.Min(1000, (int)Until.Subtract(TP).TotalMilliseconds));
 					}
 

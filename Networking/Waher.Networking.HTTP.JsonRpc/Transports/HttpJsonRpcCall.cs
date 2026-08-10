@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Waher.Networking.Sniffers;
 using Waher.Runtime.Collections;
 using Waher.Security;
 
@@ -220,6 +219,5 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 
 			await this.response.SendResponse();
 		}
-
 	}
 }

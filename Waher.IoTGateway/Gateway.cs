@@ -1453,11 +1453,15 @@ namespace Waher.IoTGateway
 					appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
 					7, BinaryPresentationMethod.ByteCount);
 
+				XmppMcpServer XmppMcpServer;
+
 				webServer.Register(new Mcp.Content.InternetContentMcpServer("/MCP/Content", Icons, null, mcpSniffers));
 				webServer.Register(new Mcp.Events.EventLogMcpServer("/MCP/EventLog", Icons, null, mcpSniffers));
 				webServer.Register(new Mcp.Files.FileStorageMcpServer("/MCP/Files",
 					Path.Combine(appDataFolder, "MCP", "Files"), Icons, null, mcpSniffers));
-				webServer.Register(new Mcp.Xmpp.XmppMcpServer("/MCP/XMPP", Icons, null, mcpSniffers));
+				webServer.Register(XmppMcpServer = new XmppMcpServer("/MCP/XMPP", Icons, null, mcpSniffers));
+				webServer.Register(new Mcp.Identity.IdentityMcpServer("/MCP/Identity",
+					Icons, null, XmppMcpServer, mcpSniffers));
 
 				if (emoji1_24x24 is null)
 				{

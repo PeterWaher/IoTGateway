@@ -395,6 +395,9 @@
 	<Assembly fileName="Waher.Mcp.Files.dll" />
 	<Assembly fileName="Waher.Mcp.Files.pdb" />
 	<Assembly fileName="Waher.Mcp.Files.xml" />
+	<Assembly fileName="Waher.Mcp.Identity.dll" />
+	<Assembly fileName="Waher.Mcp.Identity.pdb" />
+	<Assembly fileName="Waher.Mcp.Identity.xml" />
 	<Assembly fileName="Waher.Mcp.Xmpp.dll" />
 	<Assembly fileName="Waher.Mcp.Xmpp.pdb" />
 	<Assembly fileName="Waher.Mcp.Xmpp.xml" />

@@ -78,6 +78,7 @@ namespace Waher.Networking.HTTP.Mcp
 		private readonly string[] scopesSupported;
 		private readonly string title;
 		private readonly string description;
+		private readonly string markdownDescription;
 		private readonly bool hasScopes;
 		private readonly bool hasSnifferSet;
 		private bool hasPrompts;
@@ -170,11 +171,35 @@ namespace Waher.Networking.HTTP.Mcp
 		public HttpMcpServerResource(string ResourceName, string Name, string Title,
 			string Version, string Description, Icon[] Icons, Uri? WebSiteUri,
 			string Instructions, ISnifferSet? SnifferSet)
+			: this(ResourceName, Name, Title, Version, Description,
+				  MarkdownDocument.Encode(Description), Icons,
+				  WebSiteUri, Instructions, SnifferSet)
+		{
+		}
+
+		/// <summary>
+		/// Abstract base class for HTTP-based Model Context Protocol (MCP) server resource.
+		/// </summary>
+		/// <param name="ResourceName">Name of resource.</param>
+		/// <param name="Name">Name of server.</param>
+		/// <param name="Title">Title of server.</param>
+		/// <param name="Version">Version of server.</param>
+		/// <param name="Description">Description of server.</param>
+		/// <param name="MarkdownDescription">Markdown version of description.</param>
+		/// <param name="Icons">Icons of server.</param>
+		/// <param name="WebSiteUri">Website URI of server.</param>
+		/// <param name="Instructions">Instructions for server.</param>
+		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
+		/// with MCP service.</param>
+		public HttpMcpServerResource(string ResourceName, string Name, string Title,
+			string Version, string Description, string MarkdownDescription, Icon[] Icons, 
+			Uri? WebSiteUri, string Instructions, ISnifferSet? SnifferSet)
 			: base(ResourceName, false, false)
 		{
 			this.Name = Name;
 			this.title = Title;
 			this.description = Description;
+			this.markdownDescription = MarkdownDescription;
 			this.Version = Version;
 			this.Icons = new Icons(Icons);
 			this.WebSiteUri = WebSiteUri;
@@ -925,7 +950,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <summary>
 		/// Markdown description of web service.
 		/// </summary>
-		public override string MarkdownDescription => MarkdownDocument.Encode(this.description);
+		public override string MarkdownDescription => this.markdownDescription;
 
 		/// <summary>
 		/// Method called when a resource has been registered on a server.

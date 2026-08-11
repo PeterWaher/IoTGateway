@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Markdown;
 using Waher.Networking.HTTP.JsonRpc.Transports;
 using Waher.Networking.HTTP.Mcp.Model;
 using Waher.Networking.HTTP.Mcp.Model.Server;
@@ -38,6 +39,7 @@ namespace Waher.Networking.HTTP.Mcp
 			: base(ResourceName, Name, Title,
 				typeof(StdioMcpServer).Assembly.GetName().Version.ToString(),
 				GetDescription(Resources),
+				GetMarkdownDescription(Resources),
 				Icons,
 				WebSiteUri,
 				GetInstructions(Resources),
@@ -72,6 +74,27 @@ namespace Waher.Networking.HTTP.Mcp
 				sb.AppendLine(":");
 				sb.AppendLine();
 				sb.AppendLine(Resource.Description);
+			}
+
+			return sb.ToString();
+		}
+
+		private static string GetMarkdownDescription(HttpMcpServerResource[] Resources)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("This MCP Server joins the following MCP servers together, ");
+			sb.AppendLine("to provide a single endpoint for them all.");
+
+			foreach (HttpMcpServerResource Resource in Resources)
+			{
+				sb.AppendLine();
+				sb.AppendLine(Resource.Title);
+				sb.AppendLine(new string('-', Resource.Title.Length + 3));
+				sb.AppendLine();
+
+				sb.AppendLine();
+				sb.AppendLine(Resource.MarkdownDescription);
 			}
 
 			return sb.ToString();

@@ -17,11 +17,11 @@ namespace Waher.Mcp.Identity.Responses
 		public IdentityApplicationAttributesResponse(string ErrorMessage)
 			: base(false, ErrorMessage)
 		{
-			this.PeerReview = false;
-			this.NrReviewers = 0;
-			this.NrPhotos = 0;
-			this.Iso3166 = false;
-			this.RequiredProperties = Array.Empty<string>();
+			this.PeerReview = null;
+			this.NrReviewers = null;
+			this.NrPhotos = null;
+			this.Iso3166 = null;
+			this.RequiredProperties = null;
 		}
 
 		/// <summary>
@@ -42,30 +42,30 @@ namespace Waher.Mcp.Identity.Responses
 		/// If peer-review is allowed as a mechanism to approve ID applications.
 		/// </summary>
 		[McpParameter("Peer Review", "If peer-review is allowed as a mechanism to approve ID applications.")]
-		public bool PeerReview;
+		public bool? PeerReview;
 
 		/// <summary>
 		/// Number of peer reviewers required to get an ID approved using peer review.
 		/// </summary>
 		[McpIntegerParameter("Nr Reviewers", "Number of peer reviewers required to get an ID approved using peer review.", 0, null)]
-		public int NrReviewers;
+		public int? NrReviewers;
 
 		/// <summary>
 		/// Number of photos required in a peer-review.
 		/// </summary>
 		[McpIntegerParameter("Nr Photos", "Number of photos required in a peer-review.", 0, null)]
-		public int NrPhotos;
+		public int? NrPhotos;
 
 		/// <summary>
 		/// If ISO 3166 country codes are mandated in peer-review.
 		/// </summary>
 		[McpParameter("ISO 3166", "If ISO 3166 country codes are mandated in peer-review.")]
-		public bool Iso3166;
+		public bool? Iso3166;
 
 		/// <summary>
 		/// Required properties in an ID application for peer-review.
 		/// </summary>
 		[McpParameter("Required Properties", "Required properties in an ID application for peer-review.")]
-		public string[] RequiredProperties;
+		public string[]? RequiredProperties;
 	}
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Mcp.Identity.Resources;
 using Waher.Mcp.Identity.Responses;
+using Waher.Mcp.Identity.UserInput;
 using Waher.Mcp.Xmpp;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.JsonRpc;
@@ -278,10 +280,10 @@ namespace Waher.Mcp.Identity
 			"Gets identity application properties recommended by the server should " +
 			"be available in identity applications.",
 			"",     // IconsMethod, use default icons
-			true,   // CanModifyEnvironment
+			false,  // CanModifyEnvironment
 			false,  // CanDestroyEnvironment
 			true,   // Idempotent
-			true)]  // OpenWorldAccess
+			false)] // OpenWorldAccess
 		[RequiredPrivilege(ApplyPrivilege)]
 		[return: McpParameter("Result", "Identity application attributes.")]
 		public async Task<IdentityApplicationAttributesResponse> GetIdentityApplicationProperties(
@@ -300,6 +302,124 @@ namespace Waher.Mcp.Identity
 			IdApplicationAttributesEventArgs e = await Client.GetIdApplicationAttributesAsync();
 
 			return new IdentityApplicationAttributesResponse(e);
+		}
+
+		/// <summary>
+		/// MCP Server Tool to apply for a new personal identity.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Apply For New Personal Identity",
+			"Applies for a new personal identity.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			true,   // CanDestroyEnvironment
+			false,  // Idempotent
+			false)] // OpenWorldAccess
+		[RequiredPrivilege(ApplyPrivilege)]
+		[return: McpParameter("Result", "Identity application result.")]
+		public async Task<IdentityResponse> ApplyForNewPersonalIdentity(
+			IJsonRpcCall Call)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new IdentityResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new IdentityResponse("User not authenticated.");
+
+			ContractsClient Client = await this.GetClient(Call, User, Session);
+			PersonalInformationInput UserInput = new PersonalInformationInput();
+			LegalIdentity? Identity = null;
+			string? Error = null;
+
+			do
+			{
+				string Message = "Please provide the necessary personal information " +
+					"required to create a digital identity. The information must be " +
+					"true, and will be verified. (This input dialog is cancelled " +
+					"automatically after 15 minutes.)";
+
+				if (!string.IsNullOrEmpty(Error))
+					Message = "Error: " + Error + "\r\n\r\n" + Message;
+
+				bool? Result = await this.ElicitUserInput(Call, Message, UserInput, true,
+					Session, 15 * 60 * 1000);
+
+				if (!Result.HasValue)
+					return new IdentityResponse("User did not provide personal information.");
+
+				if (!Result.Value)
+					return new IdentityResponse("User cancelled the request.");
+
+				ChunkedList<Property> Properties = new ChunkedList<Property>();
+
+				if (!string.IsNullOrEmpty(UserInput.FirstName))
+					Properties.Add(new Property(PersonalInformation.FirstNameTag, UserInput.FirstName));
+
+				if (!string.IsNullOrEmpty(UserInput.MiddleNames))
+					Properties.Add(new Property(PersonalInformation.MiddleNamesTag, UserInput.MiddleNames));
+
+				if (!string.IsNullOrEmpty(UserInput.LastNames))
+					Properties.Add(new Property(PersonalInformation.LastNamesTag, UserInput.LastNames));
+
+				if (!string.IsNullOrEmpty(UserInput.PersonalNumber))
+					Properties.Add(new Property(PersonalInformation.PersonalNumberTag, UserInput.PersonalNumber));
+
+				if (!string.IsNullOrEmpty(UserInput.Address))
+					Properties.Add(new Property(PersonalInformation.AddressTag, UserInput.Address));
+
+				if (!string.IsNullOrEmpty(UserInput.Address2))
+					Properties.Add(new Property(PersonalInformation.Address2Tag, UserInput.Address2));
+
+				if (!string.IsNullOrEmpty(UserInput.Zip))
+					Properties.Add(new Property(PersonalInformation.PostalCodeTag, UserInput.Zip));
+
+				if (!string.IsNullOrEmpty(UserInput.Area))
+					Properties.Add(new Property(PersonalInformation.AreaTag, UserInput.Area));
+
+				if (!string.IsNullOrEmpty(UserInput.City))
+					Properties.Add(new Property(PersonalInformation.CityTag, UserInput.City));
+
+				if (!string.IsNullOrEmpty(UserInput.Region))
+					Properties.Add(new Property(PersonalInformation.RegionTag, UserInput.Region));
+
+				if (!string.IsNullOrEmpty(UserInput.Country))
+					Properties.Add(new Property(PersonalInformation.CountryTag, UserInput.Country));
+
+				if (!string.IsNullOrEmpty(UserInput.Nationality))
+					Properties.Add(new Property(PersonalInformation.NationalityTag, UserInput.Nationality));
+
+				if (UserInput.BirthDate.HasValue)
+				{
+					Properties.Add(new Property(PersonalInformation.BirthDayTag, UserInput.BirthDate.Value.Day.ToString()));
+					Properties.Add(new Property(PersonalInformation.BirthMonthTag, UserInput.BirthDate.Value.Month.ToString()));
+					Properties.Add(new Property(PersonalInformation.BirthYearTag, UserInput.BirthDate.Value.Year.ToString()));
+				}
+
+				if (UserInput.Gender.HasValue)
+				{
+					Properties.Add(new Property(PersonalInformation.GenderTag,
+						UserInput.Gender.Value.ToString()));
+				}
+
+				try
+				{
+					Error = null;
+					Identity = await Client.ApplyAsync(Properties.ToArray());
+				}
+				catch (Exception ex)
+				{
+					Error = Log.UnnestException(ex).Message;
+				}
+			}
+			while (Identity is null);
+
+			this.ResourcesUpdated(User);
+
+			return new IdentityResponse(Identity, "Identity application successfully registered.");
 		}
 
 	}

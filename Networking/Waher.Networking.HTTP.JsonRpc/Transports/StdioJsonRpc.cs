@@ -7,10 +7,24 @@ using Waher.Security;
 namespace Waher.Networking.HTTP.JsonRpc.Transports
 {
 	/// <summary>
+	/// Delegate for reading lines of text.
+	/// </summary>
+	/// <returns>Line read, or null if no more lines.</returns>
+	public delegate Task<string> ReadLineAsyncDelegate();
+
+	/// <summary>
+	/// Delegate for writing lines of text.
+	/// </summary>
+	/// <param name="Line">Line to write.</param>
+	public delegate Task WriteLineAsyncDelegate(string Line);
+
+	/// <summary>
 	/// JSON-RPC via Standard Input/Output (stdio).
 	/// </summary>
 	public class StdioJsonRpc
 	{
+		private readonly ReadLineAsyncDelegate readLine;
+		private readonly WriteLineAsyncDelegate writeLine;
 		private readonly TaskCompletionSource<bool> completed = new TaskCompletionSource<bool>();
 		private readonly JsonRpcWebService Service;
 		private readonly ICommunicationLayer server;
@@ -27,13 +41,31 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 		/// <param name="BaseUrl">Base URL of the web service.</param>
 		public StdioJsonRpc(JsonRpcWebService Service, IUser User,
 			ICommunicationLayer Server, string BaseUrl)
+			: this(Service,User,Server,BaseUrl,
+				  ConsoleIn.ReadLineAsync,
+				  ConsoleOut.WriteLineAsync)
+		{
+		}
+
+		/// <summary>
+		/// JSON-RPC via Standard Input/Output (stdio).
+		/// </summary>
+		/// <param name="Service">JSON-RPC web service.</param>
+		/// <param name="User">Authenticated user making the call.</param>
+		/// <param name="Server">Server managing calls.</param>
+		/// <param name="BaseUrl">Base URL of the web service.</param>
+		/// <param name="ReadLine">Method to call to read a line of text.</param>
+		/// <param name="WriteLine">Method to call to write a line of text.</param>
+		public StdioJsonRpc(JsonRpcWebService Service, IUser User,
+			ICommunicationLayer Server, string BaseUrl,
+			ReadLineAsyncDelegate ReadLine, WriteLineAsyncDelegate WriteLine)
 		{
 			this.Service = Service;
 			this.user = User;
 			this.server = Server;
 			this.baseUrl = BaseUrl;
-
-
+			this.readLine = ReadLine;
+			this.writeLine = WriteLine;
 
 			Task.Run(this.PerformWork);
 		}
@@ -51,14 +83,14 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 
 				while (true)
 				{
-					string? Input = await ConsoleIn.ReadLineAsync();
+					string? Input = await this.readLine();
 					if (Input is null)
 						break;
 
 					string Output = await this.Service.ExecuteJsonRpc(Input,
 						this.user, this.server, this.baseUrl, this.EventReceived);
 
-					await ConsoleOut.WriteLineAsync(Output);
+					await this.writeLine(Output);
 				}
 			}
 			catch (Exception ex)

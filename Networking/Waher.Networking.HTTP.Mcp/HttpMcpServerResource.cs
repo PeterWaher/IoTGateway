@@ -348,7 +348,7 @@ namespace Waher.Networking.HTTP.Mcp
 				}
 				else
 				{
-					await Response.Return(await this.GenerateInputForm(Request, Response, 
+					await Response.Return(await this.GenerateInputForm(Request, Response,
 						ClientRequest));
 				}
 			}
@@ -731,6 +731,20 @@ namespace Waher.Networking.HTTP.Mcp
 		}
 
 		/// <summary>
+		/// Gets an array of available tools.
+		/// </summary>
+		/// <returns>Array of tools.</returns>
+		public Tool[] GetTools()
+		{
+			lock (this.tools)
+			{
+				Tool[] Result = new Tool[this.tools.Count];
+				this.tools.Values.CopyTo(Result, 0);
+				return Result;
+			}
+		}
+
+		/// <summary>
 		/// Registers a MCP Server tool.
 		/// </summary>
 		/// <param name="Method">Method to call when tool is invoked.</param>
@@ -740,16 +754,17 @@ namespace Waher.Networking.HTTP.Mcp
 			lock (this.tools)
 			{
 				string Name = Method.Name;
+				string Suffix = string.Empty;
+				int i = 1;
 
-				if (this.tools.ContainsKey(Name))
-					throw new Exception("Tool already registered: " + Name);
+				while (this.tools.ContainsKey(Name + Suffix))
+				{
+					i++;
+					Suffix = "_" + i.ToString();
+				}
 
-				Tool Tool = new Tool(Method, Attributes.Title,
-					Attributes.Description, Attributes.IconsMethod,
-					Attributes.CanModifyEnvironment, Attributes.CanDestroyEnvironment,
-					Attributes.Idempotent, Attributes.OpenWorldAccess);
-
-				this.tools[Name] = Tool;
+				Tool Tool = new Tool(Method, Attributes);
+				this.tools[Name + Suffix] = Tool;
 
 				this.requiresAuthentication |= Tool.RequiresAuthentication;
 				this.hasTools = true;
@@ -786,6 +801,20 @@ namespace Waher.Networking.HTTP.Mcp
 		}
 
 		/// <summary>
+		/// Gets an array of available prompts.
+		/// </summary>
+		/// <returns>Array of prompts.</returns>
+		public Prompt[] GetPrompts()
+		{
+			lock (this.prompts)
+			{
+				Prompt[] Result = new Prompt[this.prompts.Count];
+				this.prompts.Values.CopyTo(Result, 0);
+				return Result;
+			}
+		}
+
+		/// <summary>
 		/// Registers a MCP Server prompt.
 		/// </summary>
 		/// <param name="Method">Method to call when prompt is invoked.</param>
@@ -795,14 +824,17 @@ namespace Waher.Networking.HTTP.Mcp
 			lock (this.prompts)
 			{
 				string Name = Method.Name;
+				string Suffix = string.Empty;
+				int i = 1;
 
-				if (this.prompts.ContainsKey(Name))
-					throw new Exception("Prompt already registered: " + Name);
+				while (this.prompts.ContainsKey(Name + Suffix))
+				{
+					i++;
+					Suffix = "_" + i.ToString();
+				}
 
-				Prompt Prompt = new Prompt(Method, Attributes.Title,
-					Attributes.Description, Attributes.IconsMethod);
-
-				this.prompts[Name] = Prompt;
+				Prompt Prompt = new Prompt(Method, Attributes);
+				this.prompts[Name + Suffix] = Prompt;
 
 				this.requiresAuthentication |= Prompt.RequiresAuthentication;
 				this.hasPrompts = true;
@@ -866,6 +898,11 @@ namespace Waher.Networking.HTTP.Mcp
 				return Attribute?.ResourceName ?? "MCP Server: " + this.Name;
 			}
 		}
+
+		/// <summary>
+		/// Description
+		/// </summary>
+		public string Description => this.description;
 
 		/// <summary>
 		/// Markdown description of web service.
@@ -1071,7 +1108,7 @@ namespace Waher.Networking.HTTP.Mcp
 			Log.Informational("MCP client initialized: " + Call.RemoteEndPoint,
 				this.ResourceName, Call.RemoteEndPoint, "McpInitialized");
 
-				await Call.SendResponse(202, "Accepted");
+			await Call.SendResponse(202, "Accepted");
 		}
 
 		/// <summary>
@@ -1145,7 +1182,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="SessionId">Session ID of the MCP session.</param>
 		/// <param name="Session">Session object, if any.</param>
 		/// <returns>If a session with the given session identity was found.</returns>
-		protected bool TryGetMcpSession(string SessionId, 
+		protected bool TryGetMcpSession(string SessionId,
 			[NotNullWhen(true)] out Session? Session)
 		{
 			return sessions.TryGetValue(SessionId, out Session);
@@ -1272,7 +1309,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="Session">MCP session object.</param>
 		/// <returns>Authenticated user, if any.</returns>
-		protected async Task<IUser?> GetAuthenticatedUser(IJsonRpcCall Call, 
+		protected async Task<IUser?> GetAuthenticatedUser(IJsonRpcCall Call,
 			Session Session)
 		{
 			if (!await Call.CheckAuthentication(Session, this.requiresAuthentication,
@@ -2615,7 +2652,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <returns>Returns true if used provided input (which will be stored in
 		/// <paramref name="InputRequest"/>, false if user declined to provide user
 		/// input, or null if request was cancelled or timed out.</returns>
-		public async Task<bool?> ElicitUserInput<T>(IJsonRpcCall Call, string Message, 
+		public async Task<bool?> ElicitUserInput<T>(IJsonRpcCall Call, string Message,
 			T InputRequest, bool Sensitive, Session Session, int Timeout)
 			where T : class
 		{

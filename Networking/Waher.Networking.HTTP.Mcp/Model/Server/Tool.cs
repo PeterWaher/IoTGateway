@@ -29,37 +29,13 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// Contains information about an MCP Server Tool
 		/// </summary>
 		/// <param name="Method">Method to invoke when tool is executed.</param>
-		/// <param name="Title">A human-readable title for the tool.</param>
-		/// <param name="Description">A human-readable description of the tool.
-		/// 
-		/// This can be used by clients to improve the LLM's understanding of available tools. 
-		/// It can be thought of like a "hint" to the model.</param>
-		/// <param name="IconsMethod">Name of method that returns an Icon?, an an Icon[]? 
-		/// or an Icons? resource representing the prompt. If null or empty, the icon of the 
-		/// MCP server will be used.</param>
-		/// <param name="CanModifyEnvironment">If the tool can modify the environment. If false, 
-		/// the tool is expected to be read-only and not cause any side effects.</param>
-		/// <param name="CanDestroyEnvironment">If true, the tool may perform destructive 
-		/// updates to its environment. If false, the tool performs only additive updates.</param>
-		/// <param name="Idempotent">If true, calling the tool repeatedly with the same 
-		/// arguments will have no additional effect on its environment.</param>
-		/// <param name="OpenWorldAccess">If true, this tool may interact with an 
-		/// "open world" of external entities. If false, the tool's domain of interaction 
-		/// is closed.</param>
+		/// <param name="Attributes">Attributes associated with tool.</param>
 		/// <param name="MetaData">Meta-data associated with tool.</param>
-		public Tool(MethodInfo Method, string Title, string Description,
-			string IconsMethod, bool CanModifyEnvironment, bool CanDestroyEnvironment,
-			bool Idempotent, bool OpenWorldAccess,
+		public Tool(MethodInfo Method, McpServerToolAttribute Attributes,
 			params KeyValuePair<string, object>[] MetaData)
 			: base(Method, false)
 		{
-			this.Title = Title;
-			this.Description = Description;
-			this.IconsMethod = IconsMethod;
-			this.CanModifyEnvironment = CanModifyEnvironment;
-			this.CanDestroyEnvironment = CanDestroyEnvironment;
-			this.Idempotent = Idempotent;
-			this.OpenWorldAccess = OpenWorldAccess;
+			this.Attributes = Attributes;
 			this.MetaData = MetaData;
 			this.HasStructuredReturnValue = this.HasReturnValue;
 
@@ -95,9 +71,14 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		}
 
 		/// <summary>
+		/// Attributes associated with tool.
+		/// </summary>
+		public McpServerToolAttribute Attributes { get; }
+
+		/// <summary>
 		/// A human-readable title for the tool.
 		/// </summary>
-		public string Title { get; }
+		public string Title => this.Attributes.Title;
 
 		/// <summary>
 		/// A human-readable description of the tool.
@@ -105,20 +86,20 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// This can be used by clients to improve the LLM's understanding of available tools. 
 		/// It can be thought of like a "hint" to the model.
 		/// </summary>
-		public string Description { get; }
+		public string Description => this.Attributes.Description;
 
 		/// <summary>
 		/// Name of method that returns an Icon?, an an Icon[]? or an Icons? resource 
 		/// representing the prompt. If null or empty, the icon of the MCP server will 
 		/// be used.
 		/// </summary>
-		public string IconsMethod { get; }
+		public string IconsMethod => this.Attributes.IconsMethod;
 
 		/// <summary>
 		/// If the tool can modify the environment. If false, the tool is expected to be 
 		/// read-only and not cause any side effects.
 		/// </summary>
-		public bool CanModifyEnvironment { get; }
+		public bool CanModifyEnvironment => this.Attributes.CanModifyEnvironment;
 
 		/// <summary>
 		/// If true, the tool may perform destructive updates to its environment.
@@ -127,7 +108,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <remarks>
 		/// This property is meaningful only when <see cref="CanModifyEnvironment"/> is true.
 		/// </remarks>
-		public bool CanDestroyEnvironment { get; }
+		public bool CanDestroyEnvironment => this.Attributes.CanDestroyEnvironment;
 
 		/// <summary>
 		/// If true, calling the tool repeatedly with the same arguments
@@ -136,13 +117,13 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <remarks>
 		/// This property is meaningful only when <see cref="CanModifyEnvironment"/> is true.
 		/// </remarks>
-		public bool Idempotent { get; }
+		public bool Idempotent => this.Attributes.Idempotent;
 
 		/// <summary>
 		/// If true, this tool may interact with an "open world" of external
 		/// entities.If false, the tool's domain of interaction is closed.
 		/// </summary>
-		public bool OpenWorldAccess { get; }
+		public bool OpenWorldAccess => this.Attributes.OpenWorldAccess;
 
 		/// <summary>
 		/// Meta-data associated with tool.

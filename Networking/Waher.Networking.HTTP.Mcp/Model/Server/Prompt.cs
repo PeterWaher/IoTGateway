@@ -20,30 +20,26 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// Contains information about an MCP Server Prompt
 		/// </summary>
 		/// <param name="Method">Method to invoke when prompt is executed.</param>
-		/// <param name="Title">A human-readable title for the prompt.</param>
-		/// <param name="Description">A human-readable description of the prompt.
-		/// 
-		/// This can be used by clients to improve the LLM's understanding of available prompts. 
-		/// It can be thought of like a "hint" to the model.</param>
-		/// <param name="IconsMethod">Name of method that returns an Icon?, an an Icon[]? 
-		/// or an Icons? resource representing the prompt. If null or empty, the icon of the 
-		/// MCP server will be used.</param>
+		/// <param name="Attributes">Attributes associated with prompt.</param>
 		/// <param name="MetaData">Meta-data associated with prompt.</param>
-		public Prompt(MethodInfo Method, string Title, string Description, 
-			string IconsMethod, params KeyValuePair<string, object>[] MetaData)
+		public Prompt(MethodInfo Method, McpServerPromptAttribute Attributes, 
+			params KeyValuePair<string, object>[] MetaData)
 			: base(Method, false)
 		{
-			this.Title = Title;
-			this.Description = Description;
-			this.IconsMethod = IconsMethod;
+			this.Attributes = Attributes;
 			this.MetaData = MetaData;
 			this.ReturnAttributes = Method.ReturnParameter?.GetCustomAttribute<McpParameterAttribute>();
 		}
 
 		/// <summary>
+		/// Attributes associated with prompt.
+		/// </summary>
+		public McpServerPromptAttribute Attributes { get; }
+
+		/// <summary>
 		/// A human-readable title for the prompt.
 		/// </summary>
-		public string Title { get; }
+		public string Title => this.Attributes.Title;
 
 		/// <summary>
 		/// A human-readable description of the prompt.
@@ -51,14 +47,14 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// This can be used by clients to improve the LLM's understanding of available prompts. 
 		/// It can be thought of like a "hint" to the model.
 		/// </summary>
-		public string Description { get; }
+		public string Description => this.Attributes.Description;
 
 		/// <summary>
 		/// Name of method that returns an Icon?, an an Icon[]? or an Icons? resource 
 		/// representing the prompt. If null or empty, the icon of the MCP server will 
 		/// be used.
 		/// </summary>
-		public string IconsMethod { get; }
+		public string IconsMethod => this.Attributes.IconsMethod;
 
 		/// <summary>
 		/// Meta-data associated with prompt.

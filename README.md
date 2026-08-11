@@ -305,12 +305,13 @@ The [Mcp](Mcp) folder contains projects that implement different Model Context P
 servers and services. These can be used to automate different features published on the gateway
 using A.I. agents.
 
-| Project                        | Type         | Link                                                       | Project description |
-|--------------------------------|--------------|------------------------------------------------------------|---------------------|
-| **Waher.Mcp.Content**          | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mcp.Content/) | The [Waher.Mcp.Content](Mcp/Waher.Mcp.Content) project provides an MCP Server for access to Internet Content. It contains tools for Getting, Posting, Putting, Deleting and Querying Internet resources, as well as encoding and decoding Internet Content. |
-| **Waher.Mcp.Events**           | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mcp.Events/)  | The [Waher.Mcp.Events](Mcp/Waher.Mcp.Events) project provides an MCP Server for the Event Log. It contains tools for logging and searching for events, as well as prompts to identify sensitive information in the log. |
-| **Waher.Mcp.Files**            | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mcp.Files/)   | The [Waher.Mcp.Files](Mcp/Waher.Mcp.Files) project provides an MCP Server that allows agents to store and manipulate files in a account-specific folder on the gateway. |
-| **Waher.Mcp.Xmpp**             | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mcp.Xmpp/)    | The [Waher.Mcp.Xmpp](Mcp/Waher.Mcp.Xmpp) project provides an MCP Server that allows agents to communicate using the XMPP protocol. |
+| Project                        | Type         | Link                                                        | Project description |
+|--------------------------------|--------------|-------------------------------------------------------------|---------------------|
+| **Waher.Mcp.Content**          | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mcp.Content/)  | The [Waher.Mcp.Content](Mcp/Waher.Mcp.Content) project provides an MCP Server for access to Internet Content. It contains tools for Getting, Posting, Putting, Deleting and Querying Internet resources, as well as encoding and decoding Internet Content. |
+| **Waher.Mcp.Events**           | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mcp.Events/)   | The [Waher.Mcp.Events](Mcp/Waher.Mcp.Events) project provides an MCP Server for the Event Log. It contains tools for logging and searching for events, as well as prompts to identify sensitive information in the log. |
+| **Waher.Mcp.Files**            | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mcp.Files/)    | The [Waher.Mcp.Files](Mcp/Waher.Mcp.Files) project provides an MCP Server that allows agents to store and manipulate files in a account-specific folder on the gateway. |
+| **Waher.Mcp.Identity**         | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mcp.Identity/) | The [Waher.Mcp.Identity](Mcp/Waher.Mcp.Identity) project provides an MCP Server that allows agents to apply for digital identities and use them to sign information. |
+| **Waher.Mcp.Xmpp**             | .NET Std 2.1 | [NuGet](https://www.nuget.org/packages/Waher.Mcp.Xmpp/)     | The [Waher.Mcp.Xmpp](Mcp/Waher.Mcp.Xmpp) project provides an MCP Server that allows agents to communicate using the XMPP protocol. |
 
 Mocks
 ----------------------

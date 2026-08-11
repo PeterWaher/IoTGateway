@@ -273,19 +273,19 @@ namespace Waher.Mcp.Xmpp
 			IUser? User, Uri Uri, Session? Session)
 		{
 			if (Session is null || User is null)
-				return null;
-
-			XmppClient Client = await this.GetClient(Call, User, Session);
+				return await base.TryGetResource(Call, User, Uri, Session);
 
 			switch (Uri.Scheme)
 			{
 				case "xmpp":
+					XmppClient Client = await this.GetClient(Call, User, Session);
 					RosterItem Contact = Client[Uri.AbsolutePath];
 					if (!(Contact is null))
 						return new RosterItemResource(Contact);
 					break;
 
 				case "mid":
+					Client = await this.GetClient(Call, User, Session);
 					if (Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
 						!(McpXmppExtension is null))
 					{
@@ -338,7 +338,15 @@ namespace Waher.Mcp.Xmpp
 			instance ??= this;
 		}
 
-		private async Task<XmppClient> GetClient(IJsonRpcCall Call, IUser User,
+		/// <summary>
+		/// Gets the XMPP client associated with a user. If no client is available, 
+		/// the user will be elicited to provide credentials for an XMPP account.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call originating the request.</param>
+		/// <param name="User">Authenticated user object.</param>
+		/// <param name="Session">MCP session object.</param>
+		/// <returns>XMPP Client</returns>
+		public async Task<XmppClient> GetClient(IJsonRpcCall Call, IUser User,
 			Session Session)
 		{
 			if (clients.TryGetValue(User.UserName, out ClientRec? Rec))

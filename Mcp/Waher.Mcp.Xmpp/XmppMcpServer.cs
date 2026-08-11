@@ -278,14 +278,14 @@ namespace Waher.Mcp.Xmpp
 			switch (Uri.Scheme)
 			{
 				case "xmpp":
-					XmppClient Client = await this.GetClient(Call, User, Session);
+					XmppClient Client = await this.GetClient(this, Call, User, Session);
 					RosterItem Contact = Client[Uri.AbsolutePath];
 					if (!(Contact is null))
 						return new RosterItemResource(Contact);
 					break;
 
 				case "mid":
-					Client = await this.GetClient(Call, User, Session);
+					Client = await this.GetClient(this, Call, User, Session);
 					if (Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) &&
 						!(McpXmppExtension is null))
 					{
@@ -312,7 +312,7 @@ namespace Waher.Mcp.Xmpp
 			if (User is null || Session is null)
 				return Array.Empty<Resource>();
 
-			XmppClient Client = await this.GetClient(Call, User, Session);
+			XmppClient Client = await this.GetClient(this, Call, User, Session);
 			ChunkedList<Resource> Resources = new ChunkedList<Resource>();
 
 			foreach (RosterItem Item in Client.Roster)
@@ -342,12 +342,13 @@ namespace Waher.Mcp.Xmpp
 		/// Gets the XMPP client associated with a user. If no client is available, 
 		/// the user will be elicited to provide credentials for an XMPP account.
 		/// </summary>
+		/// <param name="McpServer">MCP Server resource requesting the client.</param>
 		/// <param name="Call">JSON-RPC call originating the request.</param>
 		/// <param name="User">Authenticated user object.</param>
 		/// <param name="Session">MCP session object.</param>
 		/// <returns>XMPP Client</returns>
-		public async Task<XmppClient> GetClient(IJsonRpcCall Call, IUser User,
-			Session Session)
+		public async Task<XmppClient> GetClient(HttpMcpServerResource McpServer,
+			IJsonRpcCall Call, IUser User, Session Session)
 		{
 			if (clients.TryGetValue(User.UserName, out ClientRec? Rec))
 			{
@@ -357,7 +358,10 @@ namespace Waher.Mcp.Xmpp
 				return Rec.Client;
 			}
 
-			using Semaphore Lock = await Semaphores.BeginWrite("mcp:xmpp:" + User.UserName);
+			using Semaphore Lock = new Semaphore("mcp:xmpp:" + User.UserName);
+
+			if (!await Lock.TryBeginWrite(5 * 60 * 1000))
+				throw new Exception("Unable to obtain exclusive access to XMPP client for user " + User.UserName + ".");
 
 			if (clients.TryGetValue(User.UserName, out Rec))
 			{
@@ -448,7 +452,7 @@ namespace Waher.Mcp.Xmpp
 				if (HasError)
 					Message = "Error: " + Error + "\r\n\r\n" + Message;
 
-				bool? Result = await this.ElicitUserInput(Call, Message,
+				bool? Result = await McpServer.ElicitUserInput(Call, Message,
 					NewCredentials, true, Session, 5 * 60 * 1000);
 
 				if (!Result.HasValue)
@@ -633,7 +637,7 @@ namespace Waher.Mcp.Xmpp
 			if (!XmppClient.BareJidRegEx.IsMatch(To))
 				return new GenericResponse(false, "Invalid Bare JID: " + To);
 
-			XmppClient Client = await this.GetClient(Call, User, Session);
+			XmppClient Client = await this.GetClient(this, Call, User, Session);
 
 			await Client.RequestPresenceSubscription(To);
 
@@ -670,7 +674,7 @@ namespace Waher.Mcp.Xmpp
 			if (Call.ResponseSent || User is null)
 				return new GenericResponse(false, "User not authenticated.");
 
-			XmppClient Client = await this.GetClient(Call, User, Session);
+			XmppClient Client = await this.GetClient(this, Call, User, Session);
 
 			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
 				McpXmppExtension is null)
@@ -716,7 +720,7 @@ namespace Waher.Mcp.Xmpp
 			if (Call.ResponseSent || User is null)
 				return new GenericResponse(false, "User not authenticated.");
 
-			XmppClient Client = await this.GetClient(Call, User, Session);
+			XmppClient Client = await this.GetClient(this, Call, User, Session);
 
 			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
 				McpXmppExtension is null)
@@ -765,7 +769,7 @@ namespace Waher.Mcp.Xmpp
 			if (!XmppClient.BareJidRegEx.IsMatch(To))
 				return new GenericResponse(false, "Invalid Bare JID: " + To);
 
-			XmppClient Client = await this.GetClient(Call, User, Session);
+			XmppClient Client = await this.GetClient(this, Call, User, Session);
 
 			await Client.RequestPresenceUnsubscription(To);
 
@@ -814,7 +818,7 @@ namespace Waher.Mcp.Xmpp
 			if (!XmppClient.BareJidRegEx.IsMatch(BareJid))
 				return new GenericResponse(false, "Invalid Bare JID: " + BareJid);
 
-			XmppClient Client = await this.GetClient(Call, User, Session);
+			XmppClient Client = await this.GetClient(this, Call, User, Session);
 
 			if (!(Client.GetRosterItem(BareJid) is null))
 				return new GenericResponse(false, "Contact already in roster.");
@@ -880,7 +884,7 @@ namespace Waher.Mcp.Xmpp
 			if (!XmppClient.BareJidRegEx.IsMatch(BareJid))
 				return new GenericResponse(false, "Invalid Bare JID: " + BareJid);
 
-			XmppClient Client = await this.GetClient(Call, User, Session);
+			XmppClient Client = await this.GetClient(this, Call, User, Session);
 
 			RosterItem Item = Client.GetRosterItem(BareJid);
 			if (Item is null)
@@ -939,7 +943,7 @@ namespace Waher.Mcp.Xmpp
 			if (!XmppClient.BareJidRegEx.IsMatch(BareJid))
 				return new GenericResponse(false, "Invalid Bare JID: " + BareJid);
 
-			XmppClient Client = await this.GetClient(Call, User, Session);
+			XmppClient Client = await this.GetClient(this, Call, User, Session);
 
 			RosterItem Item = Client.GetRosterItem(BareJid);
 			if (Item is null)
@@ -1008,7 +1012,7 @@ namespace Waher.Mcp.Xmpp
 			if (!XmppClient.BareJidRegEx.IsMatch(To))
 				return new GenericResponse(false, "Invalid Bare JID: " + To);
 
-			XmppClient Client = await this.GetClient(Call, User, Session);
+			XmppClient Client = await this.GetClient(this, Call, User, Session);
 			string Markdown;
 			string Html;
 			string PlainText;
@@ -1151,7 +1155,7 @@ namespace Waher.Mcp.Xmpp
 			if (Call.ResponseSent || User is null)
 				return new MessageResponse("User not authenticated.");
 
-			XmppClient Client = await this.GetClient(Call, User, Session);
+			XmppClient Client = await this.GetClient(this, Call, User, Session);
 
 			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
 				McpXmppExtension is null)
@@ -1198,7 +1202,7 @@ namespace Waher.Mcp.Xmpp
 			if (Call.ResponseSent || User is null)
 				return new MessageResponse("User not authenticated.");
 
-			XmppClient Client = await this.GetClient(Call, User, Session);
+			XmppClient Client = await this.GetClient(this, Call, User, Session);
 
 			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
 				McpXmppExtension is null)

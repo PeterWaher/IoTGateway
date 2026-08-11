@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Mcp.Identity.Resources;
+using Waher.Mcp.Identity.Responses;
 using Waher.Mcp.Xmpp;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.JsonRpc;
@@ -15,6 +16,7 @@ using Waher.Networking.HTTP.OAuth.MetaData;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
+using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Runtime.Collections;
 using Waher.Security;
 
@@ -32,7 +34,7 @@ namespace Waher.Mcp.Identity
 		internal const string ResourcesPrivilege = BasePrivilege + ".Resources";
 		internal const string ListPrivilege = ResourcesPrivilege + ".List";
 		internal const string ReadPrivilege = ResourcesPrivilege + ".Read";
-		internal const string MessagePrivilege = ToolsPrivilege + ".Apply";
+		internal const string ApplyPrivilege = ToolsPrivilege + ".Apply";
 
 		private readonly XmppMcpServer xmppMcpServer;
 
@@ -226,7 +228,7 @@ namespace Waher.Mcp.Identity
 		public async Task<ContractsClient> GetClient(IJsonRpcCall Call, IUser User,
 			Session Session)
 		{
-			XmppClient Client = await this.xmppMcpServer.GetClient(Call, User, Session);
+			XmppClient Client = await this.xmppMcpServer.GetClient(this, Call, User, Session);
 
 			if (Client.TryGetExtension(out ContractsClient ContractsClient))
 				return ContractsClient;
@@ -263,6 +265,41 @@ namespace Waher.Mcp.Identity
 				Resources.Add(new IdentityResource(Item));
 
 			return Resources.ToArray();
+		}
+
+		/// <summary>
+		/// MCP Server Tool to get identity application properties recommended by the
+		/// server should be available in identity applications.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Get Identity Application Properties",
+			"Gets identity application properties recommended by the server should " +
+			"be available in identity applications.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			true,   // Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(ApplyPrivilege)]
+		[return: McpParameter("Result", "Identity application attributes.")]
+		public async Task<IdentityApplicationAttributesResponse> GetIdentityApplicationProperties(
+			IJsonRpcCall Call)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new IdentityApplicationAttributesResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new IdentityApplicationAttributesResponse("User not authenticated.");
+
+			ContractsClient Client = await this.GetClient(Call, User, Session);
+
+			IdApplicationAttributesEventArgs e = await Client.GetIdApplicationAttributesAsync();
+
+			return new IdentityApplicationAttributesResponse(e);
 		}
 
 	}

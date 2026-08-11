@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
+using Waher.Events;
 using Waher.Mcp.Xmpp.Resources;
 using Waher.Mcp.Xmpp.Responses;
 using Waher.Mcp.Xmpp.UserInput;
@@ -447,7 +448,8 @@ namespace Waher.Mcp.Xmpp
 			{
 				string Message = "Please provide credentials to your XMPP account you " +
 					"want to use, or an API key if you want to create an account on a " +
-					"server.";
+					"server. (This input dialog is cancelled automatically after 5 " + 
+					"minutes.)";
 
 				if (HasError)
 					Message = "Error: " + Error + "\r\n\r\n" + Message;
@@ -537,7 +539,7 @@ namespace Waher.Mcp.Xmpp
 				{
 					if (!HasError)
 					{
-						Error = ex.Message;
+						Error = Log.UnnestException(ex).Message;
 						HasError = true;
 					}
 

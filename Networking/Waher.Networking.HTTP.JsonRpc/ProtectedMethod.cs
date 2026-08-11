@@ -219,6 +219,11 @@ namespace Waher.Networking.HTTP.JsonRpc
 		public string Name { get; }
 
 		/// <summary>
+		/// Full name of method.
+		/// </summary>
+		public string FullName => this.Method.DeclaringType.FullName + "." + this.Method.Name;
+
+		/// <summary>
 		/// Checks if a user is authorized to call the method.
 		/// </summary>
 		/// <param name="User">User to check.</param>

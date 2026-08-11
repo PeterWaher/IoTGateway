@@ -753,18 +753,27 @@ namespace Waher.Networking.HTTP.Mcp
 		{
 			lock (this.tools)
 			{
+				Tool? First = null;
 				string Name = Method.Name;
 				string Suffix = string.Empty;
 				int i = 1;
 
-				while (this.tools.ContainsKey(Name + Suffix))
+				while (this.tools.TryGetValue(Name + Suffix, out Tool Prev))
 				{
+					First ??= Prev;
 					i++;
 					Suffix = "_" + i.ToString();
 				}
 
 				Tool Tool = new Tool(Method, Attributes);
 				this.tools[Name + Suffix] = Tool;
+
+				if (!string.IsNullOrEmpty(Suffix))
+				{
+					Log.Warning("Duplicate tool name: " + Name + ". Renamed to: " + Name + Suffix,
+						new KeyValuePair<string, object>("First", First?.FullName ?? string.Empty),
+						new KeyValuePair<string, object>("Duplicate", Tool.FullName));
+				}
 
 				this.requiresAuthentication |= Tool.RequiresAuthentication;
 				this.hasTools = true;
@@ -823,18 +832,27 @@ namespace Waher.Networking.HTTP.Mcp
 		{
 			lock (this.prompts)
 			{
+				Prompt? First = null;
 				string Name = Method.Name;
 				string Suffix = string.Empty;
 				int i = 1;
 
-				while (this.prompts.ContainsKey(Name + Suffix))
+				while (this.prompts.TryGetValue(Name + Suffix, out Prompt Prev))
 				{
+					First ??= Prev;
 					i++;
 					Suffix = "_" + i.ToString();
 				}
 
 				Prompt Prompt = new Prompt(Method, Attributes);
 				this.prompts[Name + Suffix] = Prompt;
+
+				if (!string.IsNullOrEmpty(Suffix))
+				{
+					Log.Warning("Duplicate prompt name: " + Name + ". Renamed to: " + Name + Suffix,
+						new KeyValuePair<string, object>("First", First?.FullName ?? string.Empty),
+						new KeyValuePair<string, object>("Duplicate", Prompt.FullName));
+				}
 
 				this.requiresAuthentication |= Prompt.RequiresAuthentication;
 				this.hasPrompts = true;

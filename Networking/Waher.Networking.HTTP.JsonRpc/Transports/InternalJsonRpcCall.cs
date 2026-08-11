@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Security;
 
 namespace Waher.Networking.HTTP.JsonRpc.Transports
@@ -11,11 +13,12 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 	/// </summary>
 	public class InternalJsonRpcCall : IJsonRpcCall
 	{
+		private readonly EventHandlerAsync<NotificationEventArgs> onEvent;
 		private readonly ICommunicationLayer server;
 		private readonly string baseUrl;
 		private IUser user;
 		private string? response = null;
-		private string sessionId = "Internal";
+		private string sessionId;
 
 		/// <summary>
 		/// JSON-RPC request over internal transport.
@@ -23,11 +26,32 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 		/// <param name="Server">Server managing calls.</param>
 		/// <param name="User">Authenticated user making the call.</param>
 		/// <param name="BaseUrl">Base URL of web service.</param>
-		public InternalJsonRpcCall(ICommunicationLayer Server, IUser User, string BaseUrl)
+		/// <param name="OnEvent">Event handler called when asynchromous events are
+		/// generated.</param>
+		public InternalJsonRpcCall(ICommunicationLayer Server, IUser User, string BaseUrl,
+			EventHandlerAsync<NotificationEventArgs> OnEvent)
+			: this(Server, User, BaseUrl, OnEvent, "Internal")
 		{
+		}
+
+		/// <summary>
+		/// JSON-RPC request over internal transport.
+		/// </summary>
+		/// <param name="Server">Server managing calls.</param>
+		/// <param name="User">Authenticated user making the call.</param>
+		/// <param name="BaseUrl">Base URL of web service.</param>
+		/// <param name="OnEvent">Event handler called when asynchromous events are
+		/// generated.</param>
+		/// <param name="Name">Name of the internal process.</param>
+		public InternalJsonRpcCall(ICommunicationLayer Server, IUser User, string BaseUrl,
+			EventHandlerAsync<NotificationEventArgs> OnEvent, string Name)
+		{
+			this.RemoteEndPoint = Name;
+			this.sessionId = Name;
 			this.server = Server;
 			this.user = User;
 			this.baseUrl = BaseUrl;
+			this.onEvent = OnEvent;
 		}
 
 		/// <summary>
@@ -38,7 +62,7 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 		/// <summary>
 		/// Remote endpoint of the request.
 		/// </summary>
-		public string RemoteEndPoint => "Internal";
+		public string RemoteEndPoint { get; }
 
 		/// <summary>
 		/// Authenticated user, if available, or null if not available.
@@ -153,5 +177,15 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 			this.response = JSON.Encode(Response, false);
 			return Task.CompletedTask;
 		}
+
+		/// <summary>
+		/// Sends an event.
+		/// </summary>
+		/// <param name="Event">Event to send.</param>
+		public Task SendEvent(NotificationEventArgs Event)
+		{
+			return this.onEvent.Raise(this.server, Event);
+		}
+
 	}
 }

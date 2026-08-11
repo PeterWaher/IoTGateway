@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Waher.Security;
@@ -96,5 +97,11 @@ namespace Waher.Networking.HTTP.JsonRpc.Transports
 		/// <param name="StatusMessage">HTTP status message.</param>
 		/// <param name="Response">Response object.</param>
 		Task SendResponse(int StatusCode, string StatusMessage, object? Response);
+
+		/// <summary>
+		/// Sends an event.
+		/// </summary>
+		/// <param name="Event">Event to send.</param>
+		Task SendEvent(NotificationEventArgs Event);
 	}
 }

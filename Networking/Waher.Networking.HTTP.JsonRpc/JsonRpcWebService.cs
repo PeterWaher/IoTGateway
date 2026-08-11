@@ -467,75 +467,13 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="Comment">Optional comment.</param>
 		/// <param name="Fields">Fields to emit.</param>
 		/// <returns>Number of clients the event was forwarded to.</returns>
-		public Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, string? Comment,
+		public async Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, string? Comment,
 			IEnumerable<KeyValuePair<string, object>> Fields)
 		{
 			if (!this.SupportsServerSentEvents)
 				throw new InvalidOperationException("Server-Sent Events (SSE) not supported by this resource.");
 
-			StringBuilder sb = new StringBuilder();
-			bool Empty = true;
-
-			if (!string.IsNullOrEmpty(Comment))
-			{
-				Empty = false;
-				sb.Append(Comment);
-				if (Comment.IndexOfAny(CommonTypes.CRLF) >= 0)
-				{
-					foreach (string Line in Comment.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
-					{
-						sb.Append(": ");
-						sb.Append(Line);
-						sb.Append("\r\n");
-					}
-				}
-				else
-				{
-					sb.Append(": ");
-					sb.Append(Comment);
-					sb.Append("\r\n");
-				}
-			}
-
-			if (!(Fields is null))
-			{
-				foreach (KeyValuePair<string, object> P in Fields)
-				{
-					Empty = false;
-
-					if (!(P.Value is string s))
-						s = JSON.Encode(P.Value, false);
-
-					if (s.IndexOfAny(CommonTypes.CRLF) >= 0)
-					{
-						foreach (string Line in s.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
-						{
-							sb.Append(P.Key);
-							sb.Append(": ");
-							sb.Append(Line);
-							sb.Append("\r\n");
-						}
-					}
-					else
-					{
-						sb.Append(P.Key);
-						sb.Append(": ");
-						sb.Append(s);
-						sb.Append("\r\n");
-					}
-				}
-			}
-
-			if (Empty)
-				sb.Append(":\r\n");
-
-			sb.Append("\r\n");
-
-			return this.SendEvent(Filter, sb.ToString());
-		}
-
-		private async Task<int> SendEvent(Predicate<IJsonRpcSession?> Filter, string Event)
-		{
+			NotificationEventArgs e = new NotificationEventArgs(Comment, Fields);
 			int Count = 0;
 
 			foreach (Subscription Subscription in this.eventSubscriptionsStatic)
@@ -544,8 +482,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 				{
 					if (Filter(Subscription.Session))
 					{
-						await Subscription.Response.Write(Event);
-						await Subscription.Response.Flush(false);
+						await Subscription.Call.SendEvent(e);
 						Count++;
 					}
 				}
@@ -568,12 +505,12 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 		private class Subscription
 		{
-			public readonly HttpResponse Response;
+			public readonly IJsonRpcCall Call;
 			public readonly IJsonRpcSession? Session;
 
-			public Subscription(HttpResponse Response, IJsonRpcSession? Session)
+			public Subscription(IJsonRpcCall Call, IJsonRpcSession? Session)
 			{
-				this.Response = Response;
+				this.Call = Call;
 				this.Session = Session;
 			}
 		}
@@ -706,6 +643,13 @@ namespace Waher.Networking.HTTP.JsonRpc
 				if (Response.ResponseSent)
 					return;
 
+				if (Session is null)
+				{
+					await Response.SendResponse(new ServiceUnavailableException(
+						"Unable to establish session required for Server-Sent Events (SSE)."));
+					return;
+				}
+
 				Response.StatusCode = 200;
 				Response.StatusMessage = "OK";
 				Response.ContentType = "text/event-stream";
@@ -738,29 +682,7 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 				await Response.Flush(false);
 
-				lock (this.eventSubscriptions)
-				{
-					foreach (Subscription Subscription in this.eventSubscriptions)
-					{
-						if (!(Subscription.Session is null) &&
-							!(Session is null) &&
-							Subscription.Session.SessionId == Session.SessionId)
-						{
-							this.eventSubscriptions.Remove(Subscription);
-							break;
-						}
-					}
-
-					this.eventSubscriptions.Add(new Subscription(Response, Session));
-					this.eventSubscriptionsStatic = this.eventSubscriptions.ToArray();
-
-					if (!this.eventSubscriptionsKeepAliveRunning)
-					{
-						this.eventSubscriptionsKeepAliveRunning = true;
-						this.KeepEventSubscrptionsAlive();
-					}
-				}
-
+				this.RegisterSession(JsonRpcCall, Session);
 				return;
 			}
 
@@ -796,6 +718,37 @@ namespace Waher.Networking.HTTP.JsonRpc
 
 			if (!await ServerRequest.BuildResponse(this, JsonRpcCall))
 				await this.SendResponse(JsonRpcCall, ServerRequest);
+		}
+
+		/// <summary>
+		/// Registers a session object.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call</param>
+		/// <param name="Session">Session object.</param>
+		public void RegisterSession(IJsonRpcCall Call, IJsonRpcSession Session)
+		{
+			lock (this.eventSubscriptions)
+			{
+				foreach (Subscription Subscription in this.eventSubscriptions)
+				{
+					if (!(Subscription.Session is null) &&
+						!(Session is null) &&
+						Subscription.Session.SessionId == Session.SessionId)
+					{
+						this.eventSubscriptions.Remove(Subscription);
+						break;
+					}
+				}
+
+				this.eventSubscriptions.Add(new Subscription(Call, Session));
+				this.eventSubscriptionsStatic = this.eventSubscriptions.ToArray();
+
+				if (!this.eventSubscriptionsKeepAliveRunning)
+				{
+					this.eventSubscriptionsKeepAliveRunning = true;
+					this.KeepEventSubscrptionsAlive();
+				}
+			}
 		}
 
 		/// <summary>
@@ -1541,12 +1494,16 @@ namespace Waher.Networking.HTTP.JsonRpc
 		/// <param name="User">Authenticated user making the call.</param>
 		/// <param name="Server">Server managing calls.</param>
 		/// <param name="BaseUrl">Base URL of the web service.</param>
+		/// <param name="OnEvent">Event handler called when asynchromous events are
+		/// generated.</param>
 		/// <returns>JSON-RPC encoded response string</returns>
 		public async Task<string> ExecuteJsonRpc(string Input, IUser User,
-			ICommunicationLayer Server, string BaseUrl)
+			ICommunicationLayer Server, string BaseUrl, 
+			EventHandlerAsync<NotificationEventArgs> OnEvent)
 		{
 			using JsonRpcServerRequest JsonRpcRequest = new JsonRpcServerRequest();
-			InternalJsonRpcCall JsonRpcCall = new InternalJsonRpcCall(Server, User, BaseUrl);
+			InternalJsonRpcCall JsonRpcCall = new InternalJsonRpcCall(Server, User, 
+				BaseUrl, OnEvent);
 
 			try
 			{

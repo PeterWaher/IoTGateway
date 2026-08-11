@@ -149,7 +149,7 @@ namespace Waher.Things.Http
 		/// is to be performed, null can be returned.</returns>
 		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(IAuthorization<HttpRequest> Authorization)
 		{
-			return GetAuthenticationSchemes(null, Authorization);
+			return GetAuthenticationSchemes(null, null, Authorization);
 		}
 
 		/// <summary>
@@ -254,12 +254,164 @@ namespace Waher.Things.Http
 		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(
 			Uri ResourceMetaData, IAuthorization<HttpRequest> Authorization)
 		{
+			return GetAuthenticationSchemes(null, ResourceMetaData, Authorization);
+		}
+
+		/// <summary>
+		/// Gets an array of authentication schemes available to authorize access to a
+		/// web resource.
+		/// </summary>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
+		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(
+			IUserSource UserSource)
+		{
+			return GetAuthenticationSchemes(UserSource, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Gets an array of authentication schemes available to authorize access to a
+		/// web resource.
+		/// </summary>
+		/// <param name="UserSource">User data source.</param>
+		/// <param name="RequiredPrivilege">Required privilege.</param>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
+		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(
+			IUserSource UserSource, string RequiredPrivilege)
+		{
+			return GetAuthenticationSchemes(UserSource, 
+				new SinglePrivilege<HttpRequest>(RequiredPrivilege));
+		}
+
+		/// <summary>
+		/// Gets an array of authentication schemes available to authorize access to a
+		/// web resource.
+		/// </summary>
+		/// <param name="UserSource">User data source.</param>
+		/// <param name="RequiredPrivileges">Required privileges.</param>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
+		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(
+			IUserSource UserSource, params string[] RequiredPrivileges)
+		{
+			if ((RequiredPrivileges?.Length ?? 0) == 0)
+				return GetAuthenticationSchemes(UserSource, (IAuthorization<HttpRequest>)null);
+			else
+			{
+				return GetAuthenticationSchemes(UserSource,
+					Networking.HTTP.Authentication.RequiredPrivileges.GetAuthorization(RequiredPrivileges));
+			}
+		}
+
+		/// <summary>
+		/// Gets an array of authentication schemes available to authorize access to a
+		/// web resource.
+		/// </summary>
+		/// <param name="UserSource">User data source.</param>
+		/// <param name="Authorization">Resource authorization</param>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
+		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(
+			IUserSource UserSource, IAuthorization<HttpRequest> Authorization)
+		{
+			return GetAuthenticationSchemes(UserSource, null, Authorization);
+		}
+
+		/// <summary>
+		/// Gets an array of authentication schemes available to authorize access to a
+		/// web resource.
+		/// </summary>
+		/// <param name="UserSource">User data source.</param>
+		/// <param name="ResourceMetaData">URI pointing to resource meta-data the
+		/// client can read to understand how it can authenticate itself to gain
+		/// access.</param>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
+		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(
+			IUserSource UserSource, Uri ResourceMetaData)
+		{
+			return GetAuthenticationSchemes(UserSource, ResourceMetaData, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Gets an array of authentication schemes available to authorize access to a
+		/// web resource.
+		/// </summary>
+		/// <param name="UserSource">User data source.</param>
+		/// <param name="ResourceMetaData">URI pointing to resource meta-data the
+		/// client can read to understand how it can authenticate itself to gain
+		/// access.</param>
+		/// <param name="RequiredPrivilege">Required privilege.</param>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
+		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(
+			IUserSource UserSource, Uri ResourceMetaData, string RequiredPrivilege)
+		{
+			return GetAuthenticationSchemes(UserSource, ResourceMetaData,
+				new SinglePrivilege<HttpRequest>(RequiredPrivilege));
+		}
+
+		/// <summary>
+		/// Gets an array of authentication schemes available to authorize access to a
+		/// web resource.
+		/// </summary>
+		/// <param name="UserSource">User data source.</param>
+		/// <param name="ResourceMetaData">URI pointing to resource meta-data the
+		/// client can read to understand how it can authenticate itself to gain
+		/// access.</param>
+		/// <param name="RequiredPrivileges">Required privileges.</param>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
+		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(
+			IUserSource UserSource, Uri ResourceMetaData, 
+			params string[] RequiredPrivileges)
+		{
+			if ((RequiredPrivileges?.Length ?? 0) == 0)
+			{
+				return GetAuthenticationSchemes(UserSource, ResourceMetaData,
+					(IAuthorization<HttpRequest>)null);
+			}
+			else
+			{
+				return GetAuthenticationSchemes(UserSource, ResourceMetaData,
+					Networking.HTTP.Authentication.RequiredPrivileges.GetAuthorization(RequiredPrivileges));
+			}
+		}
+
+		/// <summary>
+		/// Gets an array of authentication schemes available to authorize access to a
+		/// web resource.
+		/// </summary>
+		/// <param name="UserSource">Optional User data source. If not provided, the
+		/// default user data source will be used.</param>
+		/// <param name="ResourceMetaData">URI pointing to resource meta-data the
+		/// client can read to understand how it can authenticate itself to gain
+		/// access.</param>
+		/// <param name="Authorization">Resource authorization</param>
+		/// <returns>Array of authentication schemes (possibly empty) available for
+		/// authenticating the user making the request. If no default authentication
+		/// is to be performed, null can be returned.</returns>
+		public static HttpAuthenticationScheme[] GetAuthenticationSchemes(
+			IUserSource UserSource, Uri ResourceMetaData, 
+			IAuthorization<HttpRequest> Authorization)
+		{
 			List<HttpAuthenticationScheme> Schemes = new List<HttpAuthenticationScheme>();
 
 			GetDomainParameters(out string Domain, out int MinStrength, out bool Encrypted);
 
-			if (!Types.TryGetModuleParameter("Users", out IUserSource UserSource))
-				UserSource = Users.Source; // Default users source
+			if (UserSource is null)
+			{
+				if (!Types.TryGetModuleParameter("Users", out UserSource))
+					UserSource = Users.Source; // Default users source
+			}
 
 			if (Types.TryGetModuleParameter("JWT", out JwtFactory JwtFactory) &&
 				!JwtFactory.Disposed)

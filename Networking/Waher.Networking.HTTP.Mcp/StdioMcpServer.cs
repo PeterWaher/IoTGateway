@@ -68,8 +68,8 @@ namespace Waher.Networking.HTTP.Mcp
 			foreach (HttpMcpServerResource Resource in Resources)
 			{
 				sb.AppendLine();
-				sb.AppendLine(Resource.Title);
-				sb.AppendLine(new string('=', Resource.Title.Length + 3));
+				sb.Append(Resource.Title);
+				sb.AppendLine(":");
 				sb.AppendLine();
 				sb.AppendLine(Resource.Description);
 			}
@@ -87,8 +87,8 @@ namespace Waher.Networking.HTTP.Mcp
 			foreach (HttpMcpServerResource Resource in Resources)
 			{
 				sb.AppendLine();
-				sb.AppendLine(Resource.Title);
-				sb.AppendLine(new string('=', Resource.Title.Length + 3));
+				sb.Append(Resource.Title);
+				sb.AppendLine(":");
 				sb.AppendLine();
 				sb.AppendLine(Resource.Instructions);
 			}

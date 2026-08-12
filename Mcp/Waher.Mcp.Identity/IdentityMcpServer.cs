@@ -216,7 +216,7 @@ namespace Waher.Mcp.Identity
 			if (ContractsClient is null)
 				return null;
 
-			LegalIdentity Identity = await ContractsClient.GetLegalIdentityAsync(Uri.AbsoluteUri);
+			LegalIdentity Identity = await ContractsClient.GetLegalIdentityAsync(Uri.AbsolutePath);
 
 			return new IdentityResource(Identity);
 		}
@@ -394,8 +394,6 @@ namespace Waher.Mcp.Identity
 
 				if (!string.IsNullOrEmpty(UserInput.PersonalNumber))
 				{
-					Properties.Add(new Property(PersonalInformation.PersonalNumberTag, UserInput.PersonalNumber));
-
 					if (!UserInput.Country.HasValue)
 						Error = "Missing country.";
 					else
@@ -417,6 +415,8 @@ namespace Waher.Mcp.Identity
 								Error = "Invalid personal number.";
 						}
 					}
+
+					Properties.Add(new Property(PersonalInformation.PersonalNumberTag, UserInput.PersonalNumber));
 				}
 
 				if (!string.IsNullOrEmpty(UserInput.Address))

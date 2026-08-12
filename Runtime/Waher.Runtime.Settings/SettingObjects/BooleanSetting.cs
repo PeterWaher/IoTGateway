@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Waher.Persistence;
-using Waher.Persistence.Attributes;
-
-namespace Waher.Runtime.Settings.SettingObjects
+﻿namespace Waher.Runtime.Settings.SettingObjects
 {
 	/// <summary>
 	/// Boolean setting object.

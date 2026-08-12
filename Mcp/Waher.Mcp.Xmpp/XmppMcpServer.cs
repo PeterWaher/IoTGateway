@@ -422,8 +422,9 @@ namespace Waher.Mcp.Xmpp
 						AllowQuickLogin = true
 					};
 
+					await Client.Connect();
 					int ConnectionResult = await Client.WaitStateAsync(30000,
-						XmppState.Connected, XmppState.Offline, XmppState.Error);
+						XmppState.Connected, XmppState.Error);
 
 					if (ConnectionResult == 0)
 					{

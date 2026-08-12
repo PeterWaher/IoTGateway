@@ -146,7 +146,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
+			[McpParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
@@ -198,7 +198,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
+			[McpParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
@@ -250,7 +250,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
+			[McpParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
@@ -302,7 +302,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
+			[McpParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
@@ -354,7 +354,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
+			[McpParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
@@ -406,7 +406,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
+			[McpParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
@@ -460,7 +460,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
+			[McpParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]
@@ -513,7 +513,7 @@ namespace Waher.Mcp.Events
 			[McpStringParameter(ActorTitle, ActorDescription, 0, 128)]
 			string Actor = "",
 
-			[McpStringParameter(EventLevelTitle, EventLevelDescription)]
+			[McpParameter(EventLevelTitle, EventLevelDescription)]
 			[McpEnumValue(EventLevel.Minor, "Minor Event")]
 			[McpEnumValue(EventLevel.Medium, "Medium Event")]
 			[McpEnumValue(EventLevel.Major, "Major Event")]

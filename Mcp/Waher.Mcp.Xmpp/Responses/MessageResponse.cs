@@ -118,7 +118,7 @@ namespace Waher.Mcp.Xmpp.Responses
 		/// <summary>
 		/// Error type of error message, if available.
 		/// </summary>
-		[McpStringParameter("Error Message Type", "Error type of error message, if available.")]
+		[McpParameter("Error Message Type", "Error type of error message, if available.")]
 		[McpEnumValue(ErrorType.None, "No error")]
 		[McpEnumValue(ErrorType.Auth, "Retry after providing credentials")]
 		[McpEnumValue(ErrorType.Cancel, "Do not retry (the error cannot be remedied)")]

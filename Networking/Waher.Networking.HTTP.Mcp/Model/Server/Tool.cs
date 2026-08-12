@@ -11,6 +11,7 @@ using Waher.Persistence;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script;
+using Waher.Script.Functions.Runtime;
 using Waher.Script.Model;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Server
@@ -175,8 +176,8 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			if (this.HasStructuredReturnValue)
 			{
 				McpParameterAttribute ReturnInfo = this.Method.ReturnParameter.GetCustomAttribute<McpParameterAttribute>(true);
-				IEnumerable<McpEnumValueAttribute>? EnumValues = this.Method.ReturnType.IsEnum ?
-					this.Method.ReturnParameter.GetCustomAttributes<McpEnumValueAttribute>(true) : null;
+				IEnumerable<McpEnumValueAttribute> EnumValues =
+					this.Method.ReturnParameter.GetCustomAttributes<McpEnumValueAttribute>(true);
 
 				Result.Add("outputSchema", GenerateOutputSchema(this.Method.ReturnType,
 					ReturnInfo, EnumValues));
@@ -266,8 +267,8 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 						Required.Add(Parameter.Name);
 
 					McpParameterAttribute ParameterInfo = Parameter.GetCustomAttribute<McpParameterAttribute>(true);
-					IEnumerable<McpEnumValueAttribute>? EnumValues = ParameterType.IsEnum ?
-						Parameter.GetCustomAttributes<McpEnumValueAttribute>(true) : null;
+					IEnumerable<McpEnumValueAttribute> EnumValues =
+						Parameter.GetCustomAttributes<McpEnumValueAttribute>(true);
 
 					Properties[Parameter.Name] = GenerateSchema(ParameterType,
 						Parameter.HasDefaultValue, Parameter.DefaultValue, ParameterInfo,
@@ -282,7 +283,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		}
 
 		internal static Dictionary<string, object> GenerateOutputSchema(Type ReturnType,
-			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute>? EnumValues)
+			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute> EnumValues)
 		{
 			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
@@ -310,24 +311,21 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <param name="EnumValues">Enumeration values.</param>
 		/// <returns>Schema element.</returns>
 		internal static object GenerateSchema(Type T, bool HasDefault, object? Default,
-			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute>? EnumValues)
+			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute> EnumValues)
 		{
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
 			bool EmitDefault = HasDefault;
 
 			if (T.IsEnum)
 			{
-				ChunkedList<Dictionary<string, object>>? EnumValuesList;
+				ChunkedList<Dictionary<string,object>>? ValuesAndTitles = null;
 
-				if (EnumValues is null)
-					EnumValuesList = null;
-				else
+				if (!(EnumValues is null))
 				{
-					EnumValuesList = new ChunkedList<Dictionary<string, object>>();
-
 					foreach (McpEnumValueAttribute EnumValue in EnumValues)
 					{
-						EnumValuesList.Add(new Dictionary<string, object>()
+						ValuesAndTitles ??= new ChunkedList<Dictionary<string, object>>();
+						ValuesAndTitles.Add(new Dictionary<string, object>()
 						{
 							{ "const", EnumValue.Value.ToString() },
 							{ "title", EnumValue.Title ?? EnumValue.Value.ToString() }
@@ -335,34 +333,35 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 					}
 				}
 
+				if (ValuesAndTitles is null)
+				{
+					ValuesAndTitles = new ChunkedList<Dictionary<string, object>>();
+
+					string[] Names = Enum.GetNames(T);
+					Array.Sort(Names);
+
+					foreach (string Name in Names)
+					{
+						ValuesAndTitles.Add(new Dictionary<string, object>()
+						{
+							{ "const", Name },
+							{ "title", Name }
+						});
+					}
+				}
+
 				if (Attribute.IsDefined(T, typeof(FlagsAttribute)))
 				{
 					Result["type"] = "array";
-
-					if (EnumValuesList is null)
+					Result["items"] = new Dictionary<string, object>()
 					{
-						Result["items"] = new Dictionary<string, object>()
-						{
-							{ "type", "string" },
-							{ "enum", Enum.GetNames(T) }
-						};
-					}
-					else
-					{
-						Result["items"] = new Dictionary<string, object>()
-						{
-							{ "anyOf", EnumValuesList.ToArray() }
-						};
-					}
+						{ "anyOf", ValuesAndTitles }
+					};
 				}
 				else
 				{
 					Result["type"] = "string";
-
-					if (EnumValuesList is null)
-						Result["enum"] = Enum.GetNames(T);
-					else
-						Result["oneOf"] = EnumValuesList.ToArray();
+					Result["oneOf"] = ValuesAndTitles;
 				}
 			}
 			else
@@ -384,7 +383,8 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 						else if (T.IsArray)
 						{
 							Result["type"] = "array";
-							Result["items"] = GenerateSchema(T.GetElementType()!, false, null, null, null);
+							Result["items"] = GenerateSchema(T.GetElementType()!, false, null, null,
+								Array.Empty<McpEnumValueAttribute>());
 						}
 						else if (T == typeof(Dictionary<string, object>))
 						{
@@ -416,11 +416,11 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 							{
 								Type FieldType = FI.FieldType;
 								McpParameterAttribute FieldInfo = FI.GetCustomAttribute<McpParameterAttribute>(true);
-								IEnumerable<McpEnumValueAttribute>? EnumValues2 = FieldType.IsEnum ?
-									FI.GetCustomAttributes<McpEnumValueAttribute>(true) : null;
+								IEnumerable<McpEnumValueAttribute> EnumValues2 =
+									FI.GetCustomAttributes<McpEnumValueAttribute>(true);
 
 								object? FieldDefault = Default is null ? null : FI.GetValue(Default);
-								Properties[FI.Name] = GenerateSchema(FieldType, !(Default is null), 
+								Properties[FI.Name] = GenerateSchema(FieldType, !(Default is null),
 									FieldDefault, FieldInfo, EnumValues2);
 							}
 
@@ -428,11 +428,11 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 							{
 								Type PropertyType = PI.PropertyType;
 								McpParameterAttribute PropertyInfo = PI.GetCustomAttribute<McpParameterAttribute>(true);
-								IEnumerable<McpEnumValueAttribute>? EnumValues2 = PropertyType.IsEnum ?
-									PI.GetCustomAttributes<McpEnumValueAttribute>(true) : null;
+								IEnumerable<McpEnumValueAttribute> EnumValues2 =
+									PI.GetCustomAttributes<McpEnumValueAttribute>(true);
 
 								object? PropertyDefault = Default is null ? null : PI.GetValue(Default);
-								Properties[PI.Name] = GenerateSchema(PropertyType, !(Default is null), 
+								Properties[PI.Name] = GenerateSchema(PropertyType, !(Default is null),
 									PropertyDefault, PropertyInfo, EnumValues2);
 							}
 						}

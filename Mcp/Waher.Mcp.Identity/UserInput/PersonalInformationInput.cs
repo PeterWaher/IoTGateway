@@ -88,7 +88,7 @@ namespace Waher.Mcp.Identity.UserInput
 		/// <summary>
 		/// Country where the user is resident. Must conform to ISO 3166.
 		/// </summary>
-		[McpEnumValue(Iso3166CountryCode.AF, "Afghanistan")]
+		[McpParameter("Country", "Country where the user is resident.")]
 		[McpEnumValue(Iso3166CountryCode.AF, "AFGHANISTAN")]
 		[McpEnumValue(Iso3166CountryCode.AX, "ÅLAND ISLANDS")]
 		[McpEnumValue(Iso3166CountryCode.AL, "ALBANIA")]
@@ -339,7 +339,6 @@ namespace Waher.Mcp.Identity.UserInput
 		/// Nationality of the user. Must conform to ISO 3166.
 		/// </summary>
 		[McpParameter("Nationality", "Nationality of the user.")]
-		[McpEnumValue(Iso3166CountryCode.AF, "Afghanistan")]
 		[McpEnumValue(Iso3166CountryCode.AF, "AFGHANISTAN")]
 		[McpEnumValue(Iso3166CountryCode.AX, "ÅLAND ISLANDS")]
 		[McpEnumValue(Iso3166CountryCode.AL, "ALBANIA")]

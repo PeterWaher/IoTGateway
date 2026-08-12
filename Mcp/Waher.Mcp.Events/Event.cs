@@ -64,7 +64,7 @@ namespace Waher.Mcp.Events
 		/// <summary>
 		/// The level of the event being logged. Minor events occur frequently, Medium events update something, or reports something could cause a major event, Major events adds or destroys something, or reports something important is out of order.
 		/// </summary>
-		[McpStringParameter(EventLogMcpServer.EventLevelTitle, EventLogMcpServer.EventLevelDescription)]
+		[McpParameter(EventLogMcpServer.EventLevelTitle, EventLogMcpServer.EventLevelDescription)]
 		[McpEnumValue(EventLevel.Minor, "Minor Event")]
 		[McpEnumValue(EventLevel.Medium, "Medium Event")]
 		[McpEnumValue(EventLevel.Major, "Major Event")]

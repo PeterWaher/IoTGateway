@@ -147,6 +147,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private ICallStackCheck[] approvedSources = null;
 		private readonly string componentAddress;
 		private string keySettingsPrefix;
+		private string instanceName;
 		private string contractKeySettingsPrefix;
 		private bool keySettingsPrefixLocked = false;
 		private bool useKeysForE2e = false;
@@ -313,6 +314,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.aes.Mode = CipherMode.CBC;
 			this.aes.Padding = PaddingMode.None;
 
+			this.instanceName = string.Empty;
 			this.keySettingsPrefix = KeySettings;
 			this.contractKeySettingsPrefix = ContractKeySettings;
 		}
@@ -400,6 +402,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Prefix for client key runtime settings.
 		/// </summary>
 		public string KeySettingsPrefix => this.keySettingsPrefix;
+
+		/// <summary>
+		/// Key instance name.
+		/// </summary>
+		public string InstanceName => this.instanceName;
 
 		/// <summary>
 		/// Prefix for contract key runtime settings.
@@ -1378,6 +1385,8 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			if (this.keySettingsPrefixLocked)
 				throw new InvalidOperationException("Key settings instance is locked.");
+
+			this.instanceName = InstanceName;
 
 			if (string.IsNullOrEmpty(InstanceName))
 			{

@@ -253,7 +253,11 @@ namespace Waher.Mcp.Identity
 				throw new ServiceUnavailableException("No Legal Component found on the XMPP broker.");
 
 			ContractsClient = new ContractsClient(Client, LegalComponent);
+			ContractsClient.SetKeySettingsInstance("MCP." + User.UserName, true);
 			Client.RegisterExtension(ContractsClient);
+
+			if (!await ContractsClient.LoadKeys(false))
+				await ContractsClient.GenerateNewKeys();
 
 			this.ResourcesUpdated(User);
 
@@ -392,13 +396,13 @@ namespace Waher.Mcp.Identity
 				{
 					Properties.Add(new Property(PersonalInformation.PersonalNumberTag, UserInput.PersonalNumber));
 
-					if (string.IsNullOrEmpty(UserInput.Country))
+					if (!UserInput.Country.HasValue)
 						Error = "Missing country.";
 					else
 					{
 						PersonalNumberValidationEventArgs e = 
 							new PersonalNumberValidationEventArgs(
-							UserInput.PersonalNumber, UserInput.Country);
+							UserInput.PersonalNumber, UserInput.Country.Value.ToString());
 
 						await ValidatePersonalNumber.Raise(this, e);
 
@@ -433,11 +437,11 @@ namespace Waher.Mcp.Identity
 				if (!string.IsNullOrEmpty(UserInput.Region))
 					Properties.Add(new Property(PersonalInformation.RegionTag, UserInput.Region));
 
-				if (!string.IsNullOrEmpty(UserInput.Country))
-					Properties.Add(new Property(PersonalInformation.CountryTag, UserInput.Country));
+				if (UserInput.Country.HasValue)
+					Properties.Add(new Property(PersonalInformation.CountryTag, UserInput.Country.Value.ToString()));
 
-				if (!string.IsNullOrEmpty(UserInput.Nationality))
-					Properties.Add(new Property(PersonalInformation.NationalityTag, UserInput.Nationality));
+				if (UserInput.Nationality.HasValue)
+					Properties.Add(new Property(PersonalInformation.NationalityTag, UserInput.Nationality.Value.ToString()));
 
 				if (UserInput.BirthDate.HasValue)
 				{

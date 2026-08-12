@@ -5324,7 +5324,7 @@ namespace Waher.Script
 		/// <param name="E2">Element 2.</param>
 		/// <param name="Set2">Set containing element 2.</param>
 		/// <returns>If elements have been upgraded to become compatible.</returns>
-		public static bool UpgradeField(ref IElement E1, ref ISet Set1, 
+		public static bool UpgradeField(ref IElement E1, ref ISet Set1,
 			ref IElement E2, ref ISet Set2)
 		{
 			object O1 = E1?.AssociatedObjectValue;
@@ -5542,7 +5542,7 @@ namespace Waher.Script
 		/// conversion. 1 = no loss acceptable, 0 = loss of everything acceptable.</param>
 		/// <param name="Result">Converted object value, if successful.</param>
 		/// <returns>If conversion was successful.</returns>
-		public static bool TryConvert(object Value, Type DesiredType, 
+		public static bool TryConvert(object Value, Type DesiredType,
 			double WeightThreshold, out object Result)
 		{
 			if (Value is null)
@@ -5565,6 +5565,33 @@ namespace Waher.Script
 				Converter.TryConvert(Value, out Result))
 			{
 				return true;
+			}
+
+			if (DesiredType.IsGenericType)
+			{
+				Type GenericType = DesiredType.GetGenericTypeDefinition();
+
+				if (GenericType == typeof(Nullable<>))
+				{
+					Type[] TypeArguments = DesiredType.GetGenericArguments();
+					if (TypeArguments.Length == 1)
+					{
+						DesiredType = TypeArguments[0];
+
+						if (DesiredType.IsAssignableFrom(TI))
+						{
+							Result = Value;
+							return true;
+						}
+
+						if (TryGetTypeConverter(T, DesiredType, out Converter) &&
+							Converter.Weight >= WeightThreshold &&
+							Converter.TryConvert(Value, out Result))
+						{
+							return true;
+						}
+					}
+				}
 			}
 
 			if (DesiredType.IsEnum)

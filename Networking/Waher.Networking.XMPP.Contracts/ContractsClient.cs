@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.ExceptionServices;
@@ -842,8 +841,8 @@ namespace Waher.Networking.XMPP.Contracts
 				return null;
 			}
 
-			string KeyNamespace = string.IsNullOrEmpty(State.KeyNamespace) 
-				? EndpointSecurity.IoTHarmonizationE2ECurrent 
+			string KeyNamespace = string.IsNullOrEmpty(State.KeyNamespace)
+				? EndpointSecurity.IoTHarmonizationE2ECurrent
 				: State.KeyNamespace;
 
 			byte[] PrivateKey = State.PrivateKey;
@@ -891,7 +890,7 @@ namespace Waher.Networking.XMPP.Contracts
 			return Updated;
 		}
 
-		private async Task<LoadedKey> TryGetLegalIdentityEndpointAsync(LegalIdentityState State, 
+		private async Task<LoadedKey> TryGetLegalIdentityEndpointAsync(LegalIdentityState State,
 			bool MigrateLegacyState, bool Locked)
 		{
 			IE2eEndpoint Endpoint = this.TryCreateLegalIdentityEndpoint(State);
@@ -915,7 +914,7 @@ namespace Waher.Networking.XMPP.Contracts
 					return new LoadedKey(Endpoint, true, State.Timestamp);
 			}
 
-			bool MissingSnapshot = State?.HasPrivateKey != true || 
+			bool MissingSnapshot = State?.HasPrivateKey != true ||
 				string.IsNullOrEmpty(State.KeyName);
 
 			if (!MigrateLegacyState ||
@@ -937,7 +936,7 @@ namespace Waher.Networking.XMPP.Contracts
 				await Database.Update(State);
 
 			IE2eEndpoint Endpoint2 = this.TryCreateLegalIdentityEndpoint(State);
-			return Endpoint2 is null 
+			return Endpoint2 is null
 				? new LoadedKey(Endpoint, false, State.Timestamp)
 				: new LoadedKey(Endpoint2, true, State.Timestamp);
 		}
@@ -1628,7 +1627,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Timestamp">Optional Timestamp for when the public key was used, in UTC.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public Task GetServerPublicKey(DateTime? Timestamp, 
+		public Task GetServerPublicKey(DateTime? Timestamp,
 			EventHandlerAsync<KeyEventArgs> Callback, object State)
 		{
 			return this.GetServerPublicKey(this.componentAddress, Timestamp, Callback, State);
@@ -1709,12 +1708,12 @@ namespace Waher.Networking.XMPP.Contracts
 					DateTime? From = null;
 					DateTime? To = null;
 
-					if (e.Ok && 
-						!((E = e.FirstElement) is null) && 
+					if (e.Ok &&
+						!((E = e.FirstElement) is null) &&
 						E.LocalName == "publicKey")
 					{
 						From = XML.Attribute(E, "from", DateTime.MinValue);
-						To = E.HasAttribute("to") ? 
+						To = E.HasAttribute("to") ?
 							XML.Attribute(E, "to", DateTime.MaxValue) : (DateTime?)null;
 
 						foreach (XmlNode N in E.ChildNodes)
@@ -2049,75 +2048,96 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			this.AssertAllowed();
 
+			// Avoid signing inside an anonymous callback, as it may cause the
+			// callstack checks to fail.
+
+			TaskCompletionSource<IE2eEndpoint> KeyResult = new TaskCompletionSource<IE2eEndpoint>();
+
 			await this.GetMatchingLocalKey(Address, async (Sender, e) =>
 			{
 				if (e.Ok)
-				{
-					StringBuilder Xml = new StringBuilder();
-
-					Xml.Append("<apply xmlns=\"");
-					Xml.Append(NamespaceLegalIdentitiesCurrent);
-
-					if (Preview)
-						Xml.Append("\" preview=\"true");
-
-					if (Days.HasValue && Days.Value > 0)
-					{
-						Xml.Append("\" days=\"");
-						Xml.Append(Days.Value.ToString());
-					}
-
-					Xml.Append("\">");
-
-					StringBuilder Identity = new StringBuilder();
-
-					Identity.Append("<identity><clientPublicKey>");
-					e.Key.ToXml(Identity, NamespaceLegalIdentitiesCurrent);
-					Identity.Append("</clientPublicKey>");
-
-					foreach (Property Property in Properties)
-					{
-						Identity.Append("<property name=\"");
-						Identity.Append(XML.Encode(Property.Name));
-						Identity.Append("\" value=\"");
-						Identity.Append(XML.Encode(Property.Value));
-						Identity.Append("\"/>");
-					}
-
-					string s = Identity.ToString();
-					Xml.Append(s);
-
-					s += "</identity>";
-
-					byte[] Bin = Encoding.UTF8.GetBytes(s);
-					byte[] Signature = e.Key.Sign(Bin);
-
-					Xml.Append("<clientSignature>");
-					Xml.Append(Convert.ToBase64String(Signature));
-					Xml.Append("</clientSignature>");
-
-					Xml.Append("</identity></apply>");
-
-					await this.client.SendIqSet(Address, Xml.ToString(), async (sender2, e2) =>
-					{
-						LegalIdentity Identity2 = null;
-						XmlElement E;
-
-						if (e2.Ok && !((E = e2.FirstElement) is null) &&
-							E.LocalName == "identity")
-						{
-							Identity2 = LegalIdentity.Parse(E);
-							await this.UpdateSettings(Identity2, e.Key.PublicKey);
-						}
-						else
-							e2.Ok = false;
-
-						await Callback.Raise(this, new LegalIdentityEventArgs(e2, Identity2));
-					}, e.State);
-				}
+					KeyResult.TrySetResult(e.Key);
 				else
+				{
 					await Callback.Raise(this, new LegalIdentityEventArgs(e, null));
+					KeyResult.TrySetResult(null);
+				}
 			}, State);
+
+			IE2eEndpoint Key = await KeyResult.Task;
+			if (Key is null)
+				return;
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<apply xmlns=\"");
+			Xml.Append(NamespaceLegalIdentitiesCurrent);
+
+			if (Preview)
+				Xml.Append("\" preview=\"true");
+
+			if (Days.HasValue && Days.Value > 0)
+			{
+				Xml.Append("\" days=\"");
+				Xml.Append(Days.Value.ToString());
+			}
+
+			Xml.Append("\">");
+
+			StringBuilder Identity = new StringBuilder();
+
+			Identity.Append("<identity><clientPublicKey>");
+			Key.ToXml(Identity, NamespaceLegalIdentitiesCurrent);
+			Identity.Append("</clientPublicKey>");
+
+			foreach (Property Property in Properties)
+			{
+				Identity.Append("<property name=\"");
+				Identity.Append(XML.Encode(Property.Name));
+				Identity.Append("\" value=\"");
+				Identity.Append(XML.Encode(Property.Value));
+				Identity.Append("\"/>");
+			}
+
+			string s = Identity.ToString();
+			Xml.Append(s);
+
+			s += "</identity>";
+
+			byte[] Bin = Encoding.UTF8.GetBytes(s);
+			byte[] Signature = Key.Sign(Bin);
+
+			Xml.Append("<clientSignature>");
+			Xml.Append(Convert.ToBase64String(Signature));
+			Xml.Append("</clientSignature>");
+
+			Xml.Append("</identity></apply>");
+
+			// Avoid signing inside an anonymous callback, as it may cause the
+			// callstack checks to fail.
+
+			TaskCompletionSource<IqResultEventArgs> SetResult = new TaskCompletionSource<IqResultEventArgs>();
+
+			await this.client.SendIqSet(Address, Xml.ToString(), (sender2, e2) =>
+			{
+				SetResult.TrySetResult(e2);
+				return Task.CompletedTask;
+			}, State);
+
+			IqResultEventArgs e3 = await SetResult.Task;
+			LegalIdentity Identity2 = null;
+			XmlElement E;
+
+			if (e3.Ok && !((E = e3.FirstElement) is null) &&
+				E.LocalName == "identity")
+			{
+				Identity2 = LegalIdentity.Parse(E);
+				await this.UpdateSettings(Identity2, Key.PublicKey);
+			}
+			else
+				e3.Ok = false;
+
+			await Callback.Raise(this, new LegalIdentityEventArgs(e3, Identity2));
 		}
 
 		/// <summary>
@@ -2215,7 +2235,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Preview">If the application is a preview application, and the
 		/// generated identity should not be permanently registered.</param>
 		/// <returns>Identity object representing the application.</returns>
-		public async Task<LegalIdentity> ApplyAsync(string Address, Property[] Properties, 
+		public async Task<LegalIdentity> ApplyAsync(string Address, Property[] Properties,
 			int? Days, bool Preview)
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
@@ -2683,7 +2703,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Identity.Serialize(Xml, false, true, true, true, true, false, false);
 			Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
-			bool HasOldPublicKey = this.publicKeys.TryGetRecord(Identity.Provider, 
+			bool HasOldPublicKey = this.publicKeys.TryGetRecord(Identity.Provider,
 				Identity.Updated, out _);
 
 			await this.GetServerPublicKey(Identity.Provider, Identity.Updated, async (Sender, e) =>
@@ -3523,7 +3543,7 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					Signature = Key.Sign(Data);
 
-					await Callback.Raise(this, new SignatureEventArgs(Key, Signature, 
+					await Callback.Raise(this, new SignatureEventArgs(Key, Signature,
 						State, KeyInfo.Timestamp));
 				}
 			}
@@ -3614,7 +3634,7 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					Signature = Key.Sign(Data);
 
-					await Callback.Raise(this, new SignatureEventArgs(Key, Signature, 
+					await Callback.Raise(this, new SignatureEventArgs(Key, Signature,
 						State, KeyInfo.Timestamp));
 				}
 			}

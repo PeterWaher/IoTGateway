@@ -66,5 +66,15 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 			base.GetHtmlInputAttributes(Attributes);
 			Attributes["type"] = "email";
 		}
+
+		/// <summary>
+		/// Checks if a value is valid for the parameter.
+		/// </summary>
+		/// <param name="Value">Value to check.</param>
+		/// <returns>If the value is valid according to validation rules for the parameter.</returns>
+		public override bool IsValid(object Value)
+		{
+			return Value is string s && s.IndexOf('@') > 0;
+		}
 	}
 }

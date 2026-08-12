@@ -118,5 +118,19 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 			base.GetHtmlInputAttributes(Attributes);
 			Attributes["type"] = "url";
 		}
+
+		/// <summary>
+		/// Checks if a value is valid for the parameter.
+		/// </summary>
+		/// <param name="Value">Value to check.</param>
+		/// <returns>If the value is valid according to validation rules for the parameter.</returns>
+		public override bool IsValid(object Value)
+		{
+			if (Value is Uri URI)
+				return base.IsValid(URI.ToString());
+
+			return Value is string s && base.IsValid(s) &&
+				Uri.TryCreate(s, UriKind.Absolute, out _);
+		}
 	}
 }

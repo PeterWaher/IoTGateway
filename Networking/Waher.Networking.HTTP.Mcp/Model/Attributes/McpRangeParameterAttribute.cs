@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using Waher.Script;
 
@@ -107,6 +108,34 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 
 			if (!(this.MaxValue is null))
 				Attributes["max"] = this.GetHtmlAttributeValue(this.MaxValue);
+		}
+
+		/// <summary>
+		/// Checks if a value is valid for the parameter.
+		/// </summary>
+		/// <param name="Value">Value to check.</param>
+		/// <returns>If the value is valid according to validation rules for the parameter.</returns>
+		public override bool IsValid(object Value)
+		{
+			if (Value is null)
+				return false;
+
+			if (!base.IsValid(Value))
+				return false;
+
+			if (!(this.MinValue is null) && this.MinValue is IComparable MinComparable)
+			{
+				if (MinComparable.CompareTo(Value) > 0)
+					return false;
+			}
+
+			if (!(this.MaxValue is null) && this.MaxValue is IComparable MaxComparable)
+			{
+				if (MaxComparable.CompareTo(Value) < 0)
+					return false;
+			}
+
+			return true;
 		}
 	}
 }

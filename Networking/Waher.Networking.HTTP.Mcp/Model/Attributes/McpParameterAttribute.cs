@@ -71,5 +71,15 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		{
 			return Value?.ToString() ?? string.Empty;
 		}
+
+		/// <summary>
+		/// Checks if a value is valid for the parameter.
+		/// </summary>
+		/// <param name="Value">Value to check.</param>
+		/// <returns>If the value is valid according to validation rules for the parameter.</returns>
+		public virtual bool IsValid(object Value)
+		{
+			return !(Value is null);
+		}
 	}
 }

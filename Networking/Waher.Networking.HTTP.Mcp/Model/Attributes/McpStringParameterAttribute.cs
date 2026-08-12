@@ -89,5 +89,24 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 			if (this.MaxLength.HasValue)
 				Attributes["maxlength"] = this.MaxLength.ToString();
 		}
+
+		/// <summary>
+		/// Checks if a value is valid for the parameter.
+		/// </summary>
+		/// <param name="Value">Value to check.</param>
+		/// <returns>If the value is valid according to validation rules for the parameter.</returns>
+		public override bool IsValid(object Value)
+		{
+			if (!(Value is string s))
+				return false;
+
+			if (this.MinLength.HasValue && s.Length < this.MinLength.Value)
+				return false;
+
+			if (this.MaxLength.HasValue && s.Length > this.MaxLength.Value)
+				return false;
+
+			return true;
+		}
 	}
 }

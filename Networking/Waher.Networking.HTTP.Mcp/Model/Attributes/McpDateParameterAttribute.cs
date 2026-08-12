@@ -10,7 +10,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue |
 		AttributeTargets.Property | AttributeTargets.Field, 
 		Inherited = true, AllowMultiple = false)]
-	public class McpDateParameterAttribute : McpStringParameterAttribute
+	public class McpDateParameterAttribute : McpRangeParameterAttribute
 	{
 		/// <summary>
 		/// Provides meta-data about a date-valued parameter.
@@ -54,6 +54,16 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 				return XML.Encode(TP, true);
 			else
 				return base.GetHtmlAttributeValue(Value);
+		}
+
+		/// <summary>
+		/// Checks if a value is valid for the parameter.
+		/// </summary>
+		/// <param name="Value">Value to check.</param>
+		/// <returns>If the value is valid according to validation rules for the parameter.</returns>
+		public override bool IsValid(object Value)
+		{
+			return Value is DateTime TP && TP.TimeOfDay == TimeSpan.Zero;
 		}
 	}
 }

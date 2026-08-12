@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Waher.Events;
-using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 {

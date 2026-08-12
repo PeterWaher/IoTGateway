@@ -517,7 +517,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 				}
 			}
 
-			if (EmitDefault && !(Default is null))
+			if (EmitDefault && !(Default is null) && (ParameterInfo?.IsValid(Default) ?? true))
 				Result["default"] = Default;
 
 			ParameterInfo?.Annotate(Result);

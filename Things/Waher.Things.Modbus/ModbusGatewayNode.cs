@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
@@ -76,8 +75,7 @@ namespace Waher.Things.Modbus
 		/// <param name="Sniffer">Sniffer</param>
 		public void Add(ISniffer Sniffer)
 		{
-			if (!this.sniffers.Contains(Sniffer))
-				this.sniffers.Add(Sniffer);
+			this.sniffers.Add(Sniffer);
 		}
 
 		/// <summary>

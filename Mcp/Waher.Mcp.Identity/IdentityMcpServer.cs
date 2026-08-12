@@ -369,6 +369,8 @@ namespace Waher.Mcp.Identity
 				bool? Result = await this.ElicitUserInput(Call, Message, UserInput, true,
 					Session, 15 * 60 * 1000);
 
+				Error = null;
+
 				if (!Result.HasValue)
 					return new IdentityResponse("User did not provide personal information.");
 
@@ -387,7 +389,31 @@ namespace Waher.Mcp.Identity
 					Properties.Add(new Property(PersonalInformation.LastNamesTag, UserInput.LastNames));
 
 				if (!string.IsNullOrEmpty(UserInput.PersonalNumber))
+				{
 					Properties.Add(new Property(PersonalInformation.PersonalNumberTag, UserInput.PersonalNumber));
+
+					if (string.IsNullOrEmpty(UserInput.Country))
+						Error = "Missing country.";
+					else
+					{
+						PersonalNumberValidationEventArgs e = 
+							new PersonalNumberValidationEventArgs(
+							UserInput.PersonalNumber, UserInput.Country);
+
+						await ValidatePersonalNumber.Raise(this, e);
+
+						if (e.IsValid.HasValue)
+						{
+							if (e.IsValid.Value)
+							{
+								UserInput.PersonalNumber = e.NormalizedPersonalNumber
+									?? UserInput.PersonalNumber;
+							}
+							else
+								Error = "Invalid personal number.";
+						}
+					}
+				}
 
 				if (!string.IsNullOrEmpty(UserInput.Address))
 					Properties.Add(new Property(PersonalInformation.AddressTag, UserInput.Address));
@@ -426,14 +452,16 @@ namespace Waher.Mcp.Identity
 						UserInput.Gender.Value.ToString()));
 				}
 
-				try
+				if (Error is null)
 				{
-					Error = null;
-					Identity = await Client.ApplyAsync(Properties.ToArray());
-				}
-				catch (Exception ex)
-				{
-					Error = Log.UnnestException(ex).Message;
+					try
+					{
+						Identity = await Client.ApplyAsync(Properties.ToArray());
+					}
+					catch (Exception ex)
+					{
+						Error = Log.UnnestException(ex).Message;
+					}
 				}
 			}
 			while (Identity is null);
@@ -443,5 +471,9 @@ namespace Waher.Mcp.Identity
 			return new IdentityResponse(Identity, "Identity application successfully registered.");
 		}
 
+		/// <summary>
+		/// Event raised when a personal number needs to be validated.
+		/// </summary>
+		public static event EventHandlerAsync<PersonalNumberValidationEventArgs>? ValidatePersonalNumber;
 	}
 }

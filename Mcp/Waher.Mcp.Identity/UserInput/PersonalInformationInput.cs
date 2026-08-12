@@ -44,7 +44,8 @@ namespace Waher.Mcp.Identity.UserInput
 		/// defined in the country of residence.
 		/// </summary>
 		[McpStringParameter("Personal Number", "Personal number of the user. Must " +
-			"conform to the personal numbering scheme defined in the country of residence.",
+			"conform to the personal numbering scheme defined in the country of " +
+			"residence.",
 			1, 128)]
 		public string PersonalNumber = string.Empty;
 

@@ -212,7 +212,10 @@ namespace Waher.Mcp.Identity
 			if (Session is null || User is null || Uri.Scheme != "iotid")
 				return await base.TryGetResource(Call, User, Uri, Session);
 
-			ContractsClient ContractsClient = await this.GetClient(Call, User, Session);
+			ContractsClient? ContractsClient = await this.GetClient(Call, User, Session, true);
+			if (ContractsClient is null)
+				return null;
+
 			LegalIdentity Identity = await ContractsClient.GetLegalIdentityAsync(Uri.AbsoluteUri);
 
 			return new IdentityResource(Identity);
@@ -226,14 +229,22 @@ namespace Waher.Mcp.Identity
 		/// <param name="Call">JSON-RPC call originating the request.</param>
 		/// <param name="User">Authenticated user object.</param>
 		/// <param name="Session">MCP session object.</param>
-		/// <returns>Contracts Client</returns>
-		public async Task<ContractsClient> GetClient(IJsonRpcCall Call, IUser User,
-			Session Session)
+		/// <param name="CreateIfNotDefined">Create a client if one is not defined.</param>
+		/// <returns>Contracts Client, if found.</returns>
+		public async Task<ContractsClient?> GetClient(IJsonRpcCall Call, IUser User,
+			Session Session, bool CreateIfNotDefined)
 		{
-			XmppClient Client = await this.xmppMcpServer.GetClient(this, Call, User, Session);
+			XmppClient? Client = await this.xmppMcpServer.GetClient(this, Call, User,
+				Session, CreateIfNotDefined);
+
+			if (Client is null)
+				return null;
 
 			if (Client.TryGetExtension(out ContractsClient ContractsClient))
 				return ContractsClient;
+
+			if (!CreateIfNotDefined)
+				return null;
 
 			string LegalComponent = await Client.FindComponentAsync(Client.Domain,
 				ContractsClient.NamespaceLegalIdentitiesCurrent);
@@ -243,6 +254,8 @@ namespace Waher.Mcp.Identity
 
 			ContractsClient = new ContractsClient(Client, LegalComponent);
 			Client.RegisterExtension(ContractsClient);
+
+			this.ResourcesUpdated(User);
 
 			return ContractsClient;
 		}
@@ -260,7 +273,10 @@ namespace Waher.Mcp.Identity
 			if (User is null || Session is null)
 				return Array.Empty<Resource>();
 
-			ContractsClient ContractsClient = await this.GetClient(Call, User, Session);
+			ContractsClient? ContractsClient = await this.GetClient(Call, User, Session, false);
+			if (ContractsClient is null)
+				return Array.Empty<Resource>();
+
 			ChunkedList<Resource> Resources = new ChunkedList<Resource>();
 
 			foreach (LegalIdentity Item in await ContractsClient.GetLegalIdentitiesAsync())
@@ -297,7 +313,9 @@ namespace Waher.Mcp.Identity
 			if (Call.ResponseSent || User is null)
 				return new IdentityApplicationAttributesResponse("User not authenticated.");
 
-			ContractsClient Client = await this.GetClient(Call, User, Session);
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new IdentityApplicationAttributesResponse("MCP XMPP Contracts client available.");
 
 			IdApplicationAttributesEventArgs e = await Client.GetIdApplicationAttributesAsync();
 
@@ -330,7 +348,10 @@ namespace Waher.Mcp.Identity
 			if (Call.ResponseSent || User is null)
 				return new IdentityResponse("User not authenticated.");
 
-			ContractsClient Client = await this.GetClient(Call, User, Session);
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new IdentityResponse("MCP XMPP Contracts client available.");
+
 			PersonalInformationInput UserInput = new PersonalInformationInput();
 			LegalIdentity? Identity = null;
 			string? Error = null;

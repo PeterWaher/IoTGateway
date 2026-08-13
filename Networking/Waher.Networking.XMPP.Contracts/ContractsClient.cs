@@ -874,11 +874,9 @@ namespace Waher.Networking.XMPP.Contracts
 		private async Task<bool> SetLegalIdentityKeySnapshotAsync(LegalIdentityState State, IE2eEndpoint Endpoint)
 		{
 			Tuple<string, string, byte[]> P = State is null ? null : await this.GetPersistablePrivateKeyAsync(Endpoint);
-
+			
 			if (P is null)
-			{
 				return false;
-			}
 
 			string KeyName = P.Item1;
 			string KeyNamespace = P.Item2;

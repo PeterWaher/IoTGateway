@@ -709,7 +709,7 @@ namespace Waher.IoTGateway.Setup
 			if (!(Sender is XmppClient Client))
 				return;
 
-			if (!Client.TryGetTag("TabID", out object Obj) || !(Obj is string TabID))
+			if (!Client.TryGetTag("TabID", out string TabID))
 				TabID = null;
 
 			try
@@ -1028,7 +1028,7 @@ namespace Waher.IoTGateway.Setup
 							Msg = "Unable to connect properly.";
 							Error = true;
 
-							if (Client.TryGetTag("StartedAuthentication", out Obj) && Obj is bool b && b)
+							if (Client.TryGetTag("StartedAuthentication", out bool b) && b)
 							{
 								if (!string.IsNullOrEmpty(TabID))
 								{

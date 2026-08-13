@@ -340,8 +340,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							else
 							{
 								if (e2.Client.SupportsFeature(HttpxClient.Namespace) &&
-									e2.Client.TryGetTag("HttpxClient", out object Obj) &&
-									Obj is HttpxClient Client)
+									e2.Client.TryGetTag("HttpxClient", out HttpxClient Client))
 								{
 									Result.TrySetResult(Client);
 								}
@@ -394,8 +393,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				else
 				{
 					if (e.Client.SupportsFeature(HttpxClient.Namespace) &&
-						e.Client.TryGetTag("HttpxClient", out object Obj) &&
-						Obj is HttpxClient Client)
+						e.Client.TryGetTag("HttpxClient", out HttpxClient Client))
 					{
 						await this.SendRequest(Client, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID),
 							Rec.localUrl, Rec.request, Rec.response);

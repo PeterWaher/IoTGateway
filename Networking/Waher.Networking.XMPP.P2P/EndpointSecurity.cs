@@ -521,7 +521,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>If an endpoint security manager was found.</returns>
 		public static bool TryGetEndpointSecurity(XmppClient Client, out EndpointSecurity EndpointSecurity)
 		{
-			if (Client.TryGetTag("E2E", out object Obj) && Obj is EndpointSecurity Typed)
+			if (Client.TryGetTag("E2E", out EndpointSecurity Typed))
 			{
 				EndpointSecurity = Typed;
 				return true;
@@ -1163,7 +1163,7 @@ namespace Waher.Networking.XMPP.P2P
 		public virtual async Task<bool> Encrypt(XmppClient Client, string Id, string Type, string From,
 			string To, bool Pqc, int MinSecurityStrength, string DataXml, StringBuilder Xml)
 		{
-			bool SniffE2eInfo = Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b;
+			bool SniffE2eInfo = Client.HasSniffers && Client.TryGetTag("ShowE2E", out bool b) && b;
 			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(To, Pqc, MinSecurityStrength);
 			if (RemoteEndpoint is null)
 			{
@@ -1316,7 +1316,7 @@ namespace Waher.Networking.XMPP.P2P
 		public virtual Tuple<string, string> Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
 			IE2eSymmetricCipher SymmetricCipher)
 		{
-			bool SniffE2eInfo = Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b;
+			bool SniffE2eInfo = Client.HasSniffers && Client.TryGetTag("ShowE2E", out bool b) && b;
 			string EndpointReference = XML.Attribute(E2eElement, "r");
 			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(From, EndpointReference);
 			if (RemoteEndpoint is null)

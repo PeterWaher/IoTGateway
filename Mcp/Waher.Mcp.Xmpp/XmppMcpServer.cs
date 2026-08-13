@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Html;
@@ -387,9 +388,20 @@ namespace Waher.Mcp.Xmpp
 				return Rec.Client;
 			}
 
+			string Error = string.Empty;
+			bool HasError = false;
 			XmppClient? Client = null;
 			ClientCredentials? Credentials = await Database.FindFirstDeleteRest<ClientCredentials>(
 				new FilterFieldEqualTo("McpUserName", User.UserName));
+			TaskCompletionSource<bool> ErrorReceived = new TaskCompletionSource<bool>();
+
+			Task OnError(object sender, Exception e)
+			{
+				Error = Log.UnnestException(e).Message;
+				HasError = true;
+				ErrorReceived.TrySetResult(true);
+				return Task.CompletedTask;
+			};
 
 			if (!(Credentials is null))
 			{
@@ -422,23 +434,46 @@ namespace Waher.Mcp.Xmpp
 						AllowQuickLogin = true
 					};
 
+					Client.OnError += OnError;
+					Client.OnConnectionError += OnError;
+
 					await Client.Connect();
 					int ConnectionResult = await Client.WaitStateAsync(30000,
 						XmppState.Connected, XmppState.Error);
 
 					if (ConnectionResult == 0)
 					{
+						Client.OnError -= OnError;
+						Client.OnConnectionError -= OnError;
+
 						Client.RegisterExtension(new McpXmppExtension(Call, Session.SessionId));
 						this.Setup(Client, User);
 						clients[User.UserName] = new ClientRec(User.UserName, Client);
 						return Client;
 					}
+					else
+					{
+						await Client.DisposeAsync();
+						Client = null;
 
-					await Client.DisposeAsync();
-					Client = null;
+						if (!HasError)
+						{
+							_ = Task.Delay(1000).ContinueWith(_ => ErrorReceived.TrySetResult(false));
+							await ErrorReceived.Task;
+						}
+
+						if (!HasError)
+						{
+							Error = "Connection failed. Please review existing credentials, and try again.";
+							HasError = true;
+						}
+					}
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
+					Error = Log.UnnestException(ex).Message;
+					HasError = true;
+
 					if (!(Client is null))
 					{
 						await Client.DisposeAsync();
@@ -460,9 +495,6 @@ namespace Waher.Mcp.Xmpp
 			if (Types.TryGetModuleParameter("Domain", out string Domain))
 				NewCredentials.Domain = Domain;
 
-			string Error = string.Empty;
-			bool HasError = false;
-
 			do
 			{
 				string Message = "Please provide credentials to your XMPP account you " +
@@ -482,21 +514,24 @@ namespace Waher.Mcp.Xmpp
 				if (!Result.Value)
 					throw new Exception("User cancelled the request.");
 
-				ResourceRecord[]? Records = await DnsResolver.TryResolve(
-					"_xmpp-client._tcp." + NewCredentials.Domain, QTYPE.SRV, QCLASS.IN);
-
 				string Host = NewCredentials.Domain;
 				int Port = XmppCredentials.DefaultPort;
 
-				if ((Records?.Length ?? 0) > 0 && Records![0] is SRV SRV)
+				if (Host != "localhost" && !IPAddress.TryParse(Host, out _))
 				{
-					Host = SRV.TargetHost;
-					Port = SRV.Port;
+					ResourceRecord[]? Records = await DnsResolver.TryResolve(
+					"_xmpp-client._tcp." + NewCredentials.Domain, QTYPE.SRV, QCLASS.IN);
+
+					if ((Records?.Length ?? 0) > 0 && Records![0] is SRV SRV)
+					{
+						Host = SRV.TargetHost;
+						Port = SRV.Port;
+					}
 				}
 
 				try
 				{
-					TaskCompletionSource<bool> ErrorReceived = new TaskCompletionSource<bool>();
+					ErrorReceived = new TaskCompletionSource<bool>();
 					Error = string.Empty;
 					HasError = false;
 
@@ -515,27 +550,19 @@ namespace Waher.Mcp.Xmpp
 						AllowQuickLogin = true
 					};
 
-					Client.OnError += (sender, e) =>
-					{
-						Error = e.Message;
-						HasError = true;
-						ErrorReceived.TrySetResult(true);
-						return Task.CompletedTask;
-					};
-
-					Client.OnConnectionError += (sender, e) =>
-					{
-						Error = e.Message;
-						HasError = true;
-						ErrorReceived.TrySetResult(true);
-						return Task.CompletedTask;
-					};
+					Client.OnError += OnError;
+					Client.OnConnectionError += OnError;
 
 					await Client.Connect();
 					int ConnectionResult = await Client.WaitStateAsync(30000,
 						XmppState.Connected, XmppState.Error);
 
-					if (ConnectionResult != 0)
+					if (ConnectionResult == 0)
+					{
+						Client.OnError -= OnError;
+						Client.OnConnectionError -= OnError;
+					}
+					else
 					{
 						await Client.DisposeAsync();
 						Client = null;

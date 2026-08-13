@@ -259,6 +259,24 @@ namespace Waher.Mcp.Identity
 			if (!await ContractsClient.LoadKeys(false))
 				await ContractsClient.GenerateNewKeys();
 
+			ContractsClient.ClientMessage += this.ContractsClient_ClientMessage;
+			ContractsClient.ContractCreated += this.ContractsClient_ContractCreated;
+			ContractsClient.ContractDeleted += this.ContractsClient_ContractDeleted;
+			ContractsClient.ContractProposalReceived += this.ContractsClient_ContractProposalReceived;
+			ContractsClient.ContractSigned += this.ContractsClient_ContractSigned;
+			ContractsClient.ContractUpdated += this.ContractsClient_ContractUpdated;
+			ContractsClient.IdentityReview += this.ContractsClient_IdentityReview;
+			ContractsClient.IdentityUpdated += this.ContractsClient_IdentityUpdated;
+			ContractsClient.PetitionClientUrlReceived += this.ContractsClient_PetitionClientUrlReceived;
+			ContractsClient.PetitionedContractResponseReceived += this.ContractsClient_PetitionedContractResponseReceived;
+			ContractsClient.PetitionedIdentityResponseReceived += this.ContractsClient_PetitionedIdentityResponseReceived;
+			ContractsClient.PetitionedPeerReviewIDResponseReceived += this.ContractsClient_PetitionedPeerReviewIDResponseReceived;
+			ContractsClient.PetitionedSignatureResponseReceived += this.ContractsClient_PetitionedSignatureResponseReceived;
+			ContractsClient.PetitionForContractReceived += this.ContractsClient_PetitionForContractReceived;
+			ContractsClient.PetitionForIdentityReceived += this.ContractsClient_PetitionForIdentityReceived;
+			ContractsClient.PetitionForPeerReviewIDReceived += this.ContractsClient_PetitionForPeerReviewIDReceived;
+			ContractsClient.PetitionForSignatureReceived += this.ContractsClient_PetitionForSignatureReceived;
+
 			this.ResourcesUpdated(User);
 
 			return ContractsClient;
@@ -479,5 +497,97 @@ namespace Waher.Mcp.Identity
 		/// Event raised when a personal number needs to be validated.
 		/// </summary>
 		public static event EventHandlerAsync<PersonalNumberValidationEventArgs>? ValidatePersonalNumber;
+
+		private Task ContractsClient_IdentityUpdated(object Sender, LegalIdentityEventArgs e)
+		{
+			if (Sender is XmppClient Client &&
+				Client.TryGetTag("User", out IUser? User) &&
+				!(User is null))
+			{
+				this.ResourceUpdated(User, ContractsClient.LegalIdUri(e.Identity.Id));
+			}
+
+			return Task.CompletedTask;
+		}
+
+		private Task ContractsClient_IdentityReview(object Sender, IdentityReviewEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_ClientMessage(object Sender, ClientMessageEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_PetitionForSignatureReceived(object Sender, SignaturePetitionEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_PetitionForPeerReviewIDReceived(object Sender, SignaturePetitionEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_PetitionForIdentityReceived(object Sender, LegalIdentityPetitionEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_PetitionForContractReceived(object Sender, ContractPetitionEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_PetitionedSignatureResponseReceived(object Sender, SignaturePetitionResponseEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_PetitionedPeerReviewIDResponseReceived(object Sender, SignaturePetitionResponseEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_PetitionedIdentityResponseReceived(object Sender, LegalIdentityPetitionResponseEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_PetitionedContractResponseReceived(object Sender, ContractPetitionResponseEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_PetitionClientUrlReceived(object Sender, PetitionClientUrlEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_ContractUpdated(object Sender, ContractReferenceEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_ContractSigned(object Sender, ContractSignedEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_ContractProposalReceived(object Sender, ContractProposalEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_ContractDeleted(object Sender, ContractReferenceEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
+
+		private Task ContractsClient_ContractCreated(object Sender, ContractReferenceEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
+		}
 	}
 }

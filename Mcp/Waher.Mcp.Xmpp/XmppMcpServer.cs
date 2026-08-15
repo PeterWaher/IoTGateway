@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -408,20 +409,25 @@ namespace Waher.Mcp.Xmpp
 				string Host = Credentials.Domain ?? string.Empty;
 				int Port = XmppCredentials.DefaultPort;
 
-				ResourceRecord[]? Records = await DnsResolver.TryResolve(
+				if (Host != "localhost" && !IPAddress.TryParse(Host, out _))
+				{
+					ResourceRecord[]? Records = await DnsResolver.TryResolve(
 					"_xmpp-client._tcp." + Credentials.Domain, QTYPE.SRV, QCLASS.IN);
 
-				if ((Records?.Length ?? 0) > 0 && Records![0] is SRV SRV)
-				{
-					Host = SRV.TargetHost;
-					Port = SRV.Port;
+					if ((Records?.Length ?? 0) > 0 && Records![0] is SRV SRV)
+					{
+						Host = SRV.TargetHost;
+						Port = SRV.Port;
+					}
 				}
 
 				try
 				{
+					using InMemorySniffer Sniffer = new InMemorySniffer(200, "MCP." + User.UserName);
+
 					Client = new XmppClient(Host, Port, Credentials.XmppAccountName,
 						Credentials.PasswordHash, Credentials.PasswordHashType,
-						typeof(XmppMcpServer).Assembly)
+						string.Empty, typeof(XmppMcpServer).Assembly, Sniffer)
 					{
 						RequestRosterOnStartup = true,
 						TrustServer = Credentials.TrustServer,
@@ -467,6 +473,17 @@ namespace Waher.Mcp.Xmpp
 							Error = "Connection failed. Please review existing credentials, and try again.";
 							HasError = true;
 						}
+
+						if (Types.TryGetModuleParameter("AppData", out string AppData))
+						{
+							// TODO: Remove
+							using XmlFileSniffer Sniffer2 = new XmlFileSniffer("C:\\Temp\\Sniffers\\MCP.XMPP.xml",
+								AppData + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
+								BinaryPresentationMethod.ByteCount);
+
+							Sniffer.Replay(Sniffer2);
+							await Sniffer2.FlushAsync();
+						}
 					}
 				}
 				catch (Exception ex)
@@ -489,7 +506,8 @@ namespace Waher.Mcp.Xmpp
 			{
 				UserName = Credentials?.XmppAccountName ?? string.Empty,
 				Domain = Credentials?.Domain ?? string.Empty,
-				TrustServer = Credentials?.TrustServer ?? false
+				TrustServer = Credentials?.TrustServer ?? false,
+				AllowInsecureMechanisms = Credentials?.AllowInsecureMechanisms ?? false
 			};
 
 			if (Types.TryGetModuleParameter("Domain", out string Domain))

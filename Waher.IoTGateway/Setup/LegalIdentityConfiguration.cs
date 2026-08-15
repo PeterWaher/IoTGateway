@@ -11,6 +11,7 @@ using Waher.Content.Json;
 using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.IoTGateway.Setup.Legal;
+using Waher.Mcp.Identity;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
@@ -45,6 +46,12 @@ namespace Waher.IoTGateway.Setup
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex GetAttachmentRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?GetAttachmentAsync>?\w*[.]\w*",
 			RegexOptions.Compiled | RegexOptions.Singleline);
+		internal static readonly Regex IdentityMessageHandlerRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?IdentityMessageHandler>?\w*[.]\w*",
+			RegexOptions.Compiled | RegexOptions.Singleline);
+		internal static readonly Regex IdentitiesResponseRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?IdentitiesResponse>?\w*[.]\w*",
+			RegexOptions.Compiled | RegexOptions.Singleline);
+		internal static readonly Regex UpdateSettingsRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?UpdateSettings>?\w*[.]\w*",
+			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex CreateCredentialRegex = new Regex(@"Waher[.]Security[.]TOTP[.]ExternalCredential[.+](CreateAsync|<?CreateAsync>?\w*[.]\w*)",
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex ExportCredentialsRegex = new Regex(@"Waher[.]Security[.]TOTP[.]ExternalCredential[.+](ExportAsync|<?ExportAsync>?\w*[.]\w*)",
@@ -67,8 +74,12 @@ namespace Waher.IoTGateway.Setup
 			ApplyLegalIdentityRegex,
 			ApplyIdRegex,
 			typeof(LegalIdentityConfiguration),
+			typeof(IdentityMcpServer),
 			GenerateNewKeysRegex,
-			GetAttachmentRegex
+			GetAttachmentRegex,
+			IdentityMessageHandlerRegex,
+			IdentitiesResponseRegex,
+			UpdateSettingsRegex
 		});
 		private static readonly ICallStackCheck[] approvedOtpSources = Assert.Convert(new object[]
 		{

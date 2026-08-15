@@ -874,7 +874,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private async Task<bool> SetLegalIdentityKeySnapshotAsync(LegalIdentityState State, IE2eEndpoint Endpoint)
 		{
 			Tuple<string, string, byte[]> P = State is null ? null : await this.GetPersistablePrivateKeyAsync(Endpoint);
-			
+
 			if (P is null)
 				return false;
 
@@ -2934,22 +2934,20 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			await this.Validate(Identity, false, async (sender2, e2) =>
+			IdentityValidationEventArgs e2 = await this.ValidateAsync(Identity, false);
+
+			if (e2.Status != IdentityStatus.Valid)
 			{
-				if (e2.Status != IdentityStatus.Valid)
-				{
-					this.client.Warning("Invalid legal identity received and discarded. Validation status: " + e2.Status.ToString());
+				this.client.Warning("Invalid legal identity received and discarded. Validation status: " + e2.Status.ToString());
 
-					Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
-						new KeyValuePair<string, object>("Status", e2.Status));
+				Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
+					new KeyValuePair<string, object>("Status", e2.Status));
 
-					return;
-				}
+				return;
+			}
 
-				await this.UpdateSettings(Identity);
-				await this.IdentityUpdated.Raise(this, new LegalIdentityEventArgs(new IqResultEventArgs(e.Message, e.Id, e.To, e.From, e.Ok, null), Identity));
-
-			}, null);
+			await this.UpdateSettings(Identity);
+			await this.IdentityUpdated.Raise(this, new LegalIdentityEventArgs(new IqResultEventArgs(e.Message, e.Id, e.To, e.From, e.Ok, null), Identity));
 		}
 
 		private Task UpdateSettings(LegalIdentity Identity)

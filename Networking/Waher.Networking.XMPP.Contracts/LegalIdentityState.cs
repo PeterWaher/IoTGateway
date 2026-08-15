@@ -161,7 +161,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="ApprovedSources">Approved sources.</param>
 		/// <exception cref="NotSupportedException">If trying to change previously set sources.</exception>
-		public static void SetAllowedSources(ICallStackCheck[] ApprovedSources)
+		internal static void SetAllowedSources(ICallStackCheck[] ApprovedSources)
 		{
 			if (!(approvedSources is null))
 				throw new NotSupportedException("Changing approved sources not permitted.");

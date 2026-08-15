@@ -6,6 +6,7 @@ using Waher.Mcp.Identity.Resources;
 using Waher.Mcp.Identity.Responses;
 using Waher.Mcp.Identity.UserInput;
 using Waher.Mcp.Xmpp;
+using Waher.Mcp.Xmpp.Responses;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.JsonRpc.Transports;
@@ -37,6 +38,11 @@ namespace Waher.Mcp.Identity
 		internal const string ListPrivilege = ResourcesPrivilege + ".List";
 		internal const string ReadPrivilege = ResourcesPrivilege + ".Read";
 		internal const string ApplyPrivilege = ToolsPrivilege + ".Apply";
+		internal const string ObsoletePrivilege = ToolsPrivilege + ".Obsolete";
+		internal const string CompromisePrivilege = ToolsPrivilege + ".Compromise";
+		internal const string ReadyForApprovalPrivilege = ToolsPrivilege + ".ReadyForApproval";
+		internal const string AttachmentPrivilege = ToolsPrivilege + ".Attachment";
+		internal const string AddAttachmentPrivilege = AttachmentPrivilege + ".Add";
 
 		private readonly XmppMcpServer xmppMcpServer;
 
@@ -74,18 +80,20 @@ namespace Waher.Mcp.Identity
 				WebSiteUri,
 				"To be able to apply for a digital identity, the client first needs " +
 				"an XMPP account. Before applying, check what identity properties are " +
-				"are expected. When applying, the user will be elicited to input " +
+				"expected. When applying, the user will be elicited to input " +
 				"the necessary personal information required to create a digital " +
 				"identity. A digital identity has a state, which can be Created, " +
 				"Approved, Rejected, Obsoleted or Compromised. An Approved digital " +
 				"identity can be used to authenticate the user, and sign digital " +
 				"information. To create a Legal Identity, you first Apply for one " +
-				"with the Trust Providing hosting the MCP Server. To get it Approved " +
-				"the Trust Provider reviews the application, and if valid, will " +
-				"Approve it. If it is invalid, the Trust Provider will Reject it. " +
-				"Once an application has been Approved, it may be Obsoleted when " +
-				"it expires, and Compromised if the identity is reported as " +
-				"compromised.",
+				"with the Trust Providing hosting the MCP Server. You then attach " +
+				"photos, and then flags the application as ready to get approved. " +
+				"To get it Approved the Trust Provider reviews the application, and " +
+				"if it is valid, the Trust Provider will Approve it. If it is invalid, " +
+				"the Trust Provider will Reject it. In both cases, the Trust Provider " +
+				"will inform the applicant of the results.Once an application has been " +
+				"Approved, it may be Obsoleted when it expires, and Compromised if the " +
+				"identity is reported as compromised.",
 				XmppMcpServer,
 				SnifferSet)
 		{
@@ -351,7 +359,8 @@ namespace Waher.Mcp.Identity
 		/// <returns>Results of operation.</returns>
 		[McpServerTool(
 			"Apply For New Personal Identity",
-			"Applies for a new personal identity.",
+			"Applies for a new personal identity. Personal information will be " +
+			"elicited from the user.",
 			"",     // IconsMethod, use default icons
 			true,   // CanModifyEnvironment
 			true,   // CanDestroyEnvironment
@@ -508,6 +517,146 @@ namespace Waher.Mcp.Identity
 			}
 
 			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// MCP Server Tool to obsolete an identity or identity application.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="LegalId">Legal identity Identifier or Identity resource 
+		/// URI to obsolete.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Obsolete Identity",
+			"Obsoletes one of the identities or identity applications registered by " +
+			"the user.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			true,   // CanDestroyEnvironment
+			false,  // Idempotent
+			false)] // OpenWorldAccess
+		[RequiredPrivilege(ObsoletePrivilege)]
+		[return: McpParameter("Result", "Identity obsoletion result.")]
+		public async Task<IdentityResponse> ObsoleteIdentity(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("LegalId", "Legal identity Identifier or Identity resource URI to obsolete.")]
+			string LegalId)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new IdentityResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new IdentityResponse("User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new IdentityResponse("MCP XMPP Contracts client available.");
+
+			try
+			{
+				LegalIdentity? Identity = await Client.ObsoleteLegalIdentityAsync(LegalId);
+				return new IdentityResponse(Identity, "Identity obsoleted.");
+			}
+			catch (Exception ex)
+			{
+				return new IdentityResponse(Log.UnnestException(ex).Message);
+			}
+		}
+
+		/// <summary>
+		/// MCP Server Tool to report an identity or identity application as compromised.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="LegalId">Legal identity Identifier or Identity resource 
+		/// URI to report as compromised.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Compromise Identity",
+			"Reports one of the identities or identity applications registered by " +
+			"the user as compromised.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			true,   // CanDestroyEnvironment
+			false,  // Idempotent
+			false)] // OpenWorldAccess
+		[RequiredPrivilege(CompromisePrivilege)]
+		[return: McpParameter("Result", "Identity compromised report result.")]
+		public async Task<IdentityResponse> CompromiseIdentity(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("LegalId", "Legal identity Identifier or Identity resource URI to report as compromised.")]
+			string LegalId)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new IdentityResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new IdentityResponse("User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new IdentityResponse("MCP XMPP Contracts client available.");
+
+			try
+			{
+				LegalIdentity? Identity = await Client.CompromisedLegalIdentityAsync(LegalId);
+				return new IdentityResponse(Identity, "Identity reported as compromised.");
+			}
+			catch (Exception ex)
+			{
+				return new IdentityResponse(Log.UnnestException(ex).Message);
+			}
+		}
+
+		/// <summary>
+		/// MCP Server Tool to report an identity application as ready for approval.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="LegalId">Legal identity Identifier or Identity resource 
+		/// URI to report as ready for approval.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Ready For Approval Identity",
+			"Reports one of the identities or identity applications registered by " +
+			"the user as ready for approval.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			true,   // CanDestroyEnvironment
+			false,  // Idempotent
+			false)] // OpenWorldAccess
+		[RequiredPrivilege(ObsoletePrivilege)]
+		[return: McpParameter("Result", "Identity report result.")]
+		public async Task<GenericResponse> ReadyForApproval(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("LegalId", "Legal identity Identifier or Identity resource URI to report as ready for approval.")]
+			string LegalId)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new IdentityResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new GenericResponse(false, "User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new GenericResponse(false, "MCP XMPP Contracts client available.");
+			try
+			{
+				await Client.ReadyForApprovalAsync(LegalId);
+				return new GenericResponse(true, "Identity reported as ready for approval.");
+			}
+			catch (Exception ex)
+			{
+				return new GenericResponse(false, Log.UnnestException(ex).Message);
+			}
 		}
 
 		private Task ContractsClient_ClientMessage(object Sender, ClientMessageEventArgs e)

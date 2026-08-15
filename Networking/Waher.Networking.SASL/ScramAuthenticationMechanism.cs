@@ -247,7 +247,7 @@ namespace Waher.Networking.SASL
 		/// Gets a salt value, given a key.
 		/// </summary>
 		/// <param name="Key">Salt key.</param>
-		/// <returns>Base64-encoded salt value.§</returns>
+		/// <returns>Base64-encoded salt value.</returns>
 		public static async Task<string> GetSaltBase64(string Key)
 		{
 			string Result = await RuntimeSettings.GetAsync(Key, string.Empty);

@@ -351,6 +351,26 @@ namespace Waher.Mcp.Xmpp
 		}
 
 		/// <summary>
+		/// Checks if the MCP session is connected.
+		/// </summary>
+		/// <param name="User">Authenticated user object.</param>
+		/// <param name="Session">MCP session object.</param>
+		/// <returns>If the session is connected or not.</returns>
+		public bool IsConnected(IUser User, Session Session)
+		{
+			if (!clients.TryGetValue(User.UserName, out ClientRec? Rec))
+				return false;
+
+			if (!Rec.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
+				return false;
+
+			if (!McpXmppExtension.IsRegistered(Session.SessionId))
+				return false;
+			
+			return Rec.Client.State == XmppState.Connected;
+		}
+
+		/// <summary>
 		/// Gets the XMPP client associated with a user. If no client is available, 
 		/// the user will be elicited to provide credentials for an XMPP account.
 		/// </summary>

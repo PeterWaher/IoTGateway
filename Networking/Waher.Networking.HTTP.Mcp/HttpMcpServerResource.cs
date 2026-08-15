@@ -2702,7 +2702,7 @@ namespace Waher.Networking.HTTP.Mcp
 			if (Session.ClientCapabilities?.Elicitation is null)
 				throw new ServiceUnavailableException("MCP Client does not support elication of user input.");
 
-			Type InputType = typeof(T);
+			Type InputType = InputRequest?.GetType() ?? typeof(T);
 			McpParameterAttribute? ParameterInfo = InputType.GetCustomAttribute<McpParameterAttribute>();
 			IEnumerable<McpEnumValueAttribute> EnumValues = InputType.GetCustomAttributes<McpEnumValueAttribute>();
 			Dictionary<string, object?> ElicitationRequest;
@@ -2711,7 +2711,7 @@ namespace Waher.Networking.HTTP.Mcp
 			if (Session.ClientCapabilities.Elicitation.Form &&
 				(!Sensitive || !Session.ClientCapabilities.Elicitation.Url))
 			{
-				object InputSchema = Tool.GenerateSchema(InputType, true, InputRequest,
+				object InputSchema = await Tool.GenerateSchema(InputType, true, InputRequest,
 					ParameterInfo, EnumValues);
 
 				if (Sensitive)

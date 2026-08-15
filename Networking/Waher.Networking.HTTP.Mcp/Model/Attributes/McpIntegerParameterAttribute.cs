@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Attributes
@@ -104,9 +105,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// </summary>
 		/// <param name="Value">Value to check.</param>
 		/// <returns>If the value is valid according to validation rules for the parameter.</returns>
-		public override bool IsValid(object Value)
+		public override Task<bool> IsValid(object Value)
 		{
-			return !(Value is null) && IsIntegerType(Value);
+			return Task.FromResult(!(Value is null) && IsIntegerType(Value));
 		}
 	}
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading.Tasks;
+using Waher.Content.Binary;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.JsonRpc.Transports;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
@@ -159,7 +160,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 						{ "taskSupport", "optional" }
 					}
 				},
-				{ "inputSchema", GenerateSchema(this.Method) },
+				{ "inputSchema", await GenerateSchema(this.Method) },
 				{ "annotations", Annotations }
 			};
 
@@ -178,7 +179,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 				IEnumerable<McpEnumValueAttribute> EnumValues =
 					this.Method.ReturnParameter.GetCustomAttributes<McpEnumValueAttribute>(true);
 
-				Result.Add("outputSchema", GenerateOutputSchema(this.Method.ReturnType,
+				Result.Add("outputSchema", await GenerateOutputSchema(this.Method.ReturnType,
 					ReturnInfo, EnumValues));
 			}
 
@@ -241,7 +242,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// </summary>
 		/// <param name="Method">Method information.</param>
 		/// <returns>Input Schema</returns>
-		internal static Dictionary<string, object> GenerateSchema(MethodInfo Method)
+		internal static async Task<Dictionary<string, object>> GenerateSchema(MethodInfo Method)
 		{
 			ParameterInfo[] Parameters = Method.GetParameters();
 			Dictionary<string, object> Result = new Dictionary<string, object>()
@@ -269,7 +270,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 					IEnumerable<McpEnumValueAttribute> EnumValues =
 						Parameter.GetCustomAttributes<McpEnumValueAttribute>(true);
 
-					Properties[Parameter.Name] = GenerateSchema(ParameterType,
+					Properties[Parameter.Name] = await GenerateSchema(ParameterType,
 						Parameter.HasDefaultValue, Parameter.DefaultValue, ParameterInfo,
 						EnumValues);
 				}
@@ -281,13 +282,14 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 			return Result;
 		}
 
-		internal static Dictionary<string, object> GenerateOutputSchema(Type ReturnType,
-			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute> EnumValues)
+		internal static async Task<Dictionary<string, object>> GenerateOutputSchema(
+			Type ReturnType, McpParameterAttribute? ParameterInfo, 
+			IEnumerable<McpEnumValueAttribute> EnumValues)
 		{
 			Dictionary<string, object> Result = new Dictionary<string, object>()
 			{
 				{ "type", "object" },
-				{ "result", GenerateSchema(ReturnType, false, null, ParameterInfo, EnumValues) },
+				{ "result", await GenerateSchema(ReturnType, false, null, ParameterInfo, EnumValues) },
 				{ "title", McpToolResultTitle },
 				{ "description", McpToolResultDescription },
 			};
@@ -309,7 +311,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 		/// <param name="ParameterInfo">Parameter information.</param>
 		/// <param name="EnumValues">Enumeration values.</param>
 		/// <returns>Schema element.</returns>
-		internal static object GenerateSchema(Type T, bool HasDefault, object? Default,
+		internal static async Task<object> GenerateSchema(Type T, bool HasDefault, object? Default,
 			McpParameterAttribute? ParameterInfo, IEnumerable<McpEnumValueAttribute> EnumValues)
 		{
 			Dictionary<string, object?> Result = new Dictionary<string, object?>();
@@ -382,7 +384,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 						else if (T.IsArray)
 						{
 							Result["type"] = "array";
-							Result["items"] = GenerateSchema(T.GetElementType()!, false, null, null,
+							Result["items"] = await GenerateSchema(T.GetElementType()!, false, null, null,
 								Array.Empty<McpEnumValueAttribute>());
 						}
 						else if (T == typeof(Dictionary<string, object>))
@@ -390,6 +392,11 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 							EmitDefault = false;
 							Result["type"] = "object";
 							//Result["additionalProperties"] = true;// new Dictionary<string, object>();
+						}
+						else if (T == typeof(CustomEncoding))
+						{
+							Result["type"] = "string";
+							Result["pattern"] = McpFileUploadParameterAttribute.Base64Pattern;
 						}
 						else
 						{
@@ -400,7 +407,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 								if (GenericType == typeof(Nullable<>) ||
 									GenericType == typeof(Task<>))
 								{
-									return GenerateSchema(T.GenericTypeArguments[0], true, Default,
+									return await GenerateSchema(T.GenericTypeArguments[0], true, Default,
 										ParameterInfo, EnumValues);
 								}
 							}
@@ -419,7 +426,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 									FI.GetCustomAttributes<McpEnumValueAttribute>(true);
 
 								object? FieldDefault = Default is null ? null : FI.GetValue(Default);
-								Properties[FI.Name] = GenerateSchema(FieldType, !(Default is null),
+								Properties[FI.Name] = await GenerateSchema(FieldType, !(Default is null),
 									FieldDefault, FieldInfo, EnumValues2);
 							}
 
@@ -431,7 +438,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 									PI.GetCustomAttributes<McpEnumValueAttribute>(true);
 
 								object? PropertyDefault = Default is null ? null : PI.GetValue(Default);
-								Properties[PI.Name] = GenerateSchema(PropertyType, !(Default is null),
+								Properties[PI.Name] = await GenerateSchema(PropertyType, !(Default is null),
 									PropertyDefault, PropertyInfo, EnumValues2);
 							}
 						}
@@ -516,8 +523,13 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 				}
 			}
 
-			if (EmitDefault && !(Default is null) && (ParameterInfo?.IsValid(Default) ?? true))
+			if (EmitDefault &&
+				!(Default is null) &&
+				(ParameterInfo is null ||
+				await ParameterInfo.IsValid(Default)))
+			{
 				Result["default"] = Default;
+			}
 
 			ParameterInfo?.Annotate(Result);
 

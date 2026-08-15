@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Content;
+using Waher.Content.Binary;
 using Waher.Events;
 using Waher.Mcp.Identity.Resources;
 using Waher.Mcp.Identity.Responses;
@@ -242,6 +244,7 @@ namespace Waher.Mcp.Identity
 		public async Task<ContractsClient?> GetClient(IJsonRpcCall Call, IUser User,
 			Session Session, bool CreateIfNotDefined)
 		{
+			bool ConnectedAtStart = this.xmppMcpServer.IsConnected(User, Session);
 			XmppClient? Client = await this.xmppMcpServer.GetClient(this, Call, User,
 				Session, CreateIfNotDefined);
 
@@ -251,14 +254,16 @@ namespace Waher.Mcp.Identity
 			if (Client.TryGetExtension(out ContractsClient ContractsClient))
 				return ContractsClient;
 
-			if (!CreateIfNotDefined)
-				return null;
-
 			string LegalComponent = await Client.FindComponentAsync(Client.Domain,
 				ContractsClient.NamespaceLegalIdentitiesCurrent);
 
 			if (string.IsNullOrEmpty(LegalComponent))
+			{
+				if (!CreateIfNotDefined)
+					return null;
+
 				throw new ServiceUnavailableException("No Legal Component found on the XMPP broker.");
+			}
 
 			ContractsClient = new ContractsClient(Client, LegalComponent);
 			ContractsClient.SetKeySettingsInstance("MCP." + User.UserName, true);
@@ -285,7 +290,8 @@ namespace Waher.Mcp.Identity
 			ContractsClient.PetitionForPeerReviewIDReceived += this.ContractsClient_PetitionForPeerReviewIDReceived;
 			ContractsClient.PetitionForSignatureReceived += this.ContractsClient_PetitionForSignatureReceived;
 
-			this.ResourcesUpdated(User);
+			if (CreateIfNotDefined)	// From a tool; resources need updating
+				this.ResourcesUpdated(User);
 
 			return ContractsClient;
 		}
@@ -425,7 +431,7 @@ namespace Waher.Mcp.Identity
 						Error = "Missing country.";
 					else
 					{
-						PersonalNumberValidationEventArgs e = 
+						PersonalNumberValidationEventArgs e =
 							new PersonalNumberValidationEventArgs(
 							UserInput.PersonalNumber, UserInput.Country.Value.ToString());
 
@@ -520,10 +526,175 @@ namespace Waher.Mcp.Identity
 		}
 
 		/// <summary>
+		/// MCP Server Tool to add a photo attachment.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="LegalId">Legal Identity Identifier or Identity resource URI to 
+		/// which the attachment shall be added.</param>
+		/// <param name="PhotoType">Type of photo to be uploaded.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Add Photo Attachment",
+			"Adds a photo attachment to an identity application. The contents " +
+			"of the attachment will be elicited from the user.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			false)] // OpenWorldAccess
+		[RequiredPrivilege(AddAttachmentPrivilege)]
+		[return: McpParameter("Result", "Identity update result.")]
+		public async Task<IdentityResponse> AddPhotoAttachment(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("LegalId", "Legal Identity Identifier or Identity " +
+			"resource URI to which the attachment shall be added.")]
+			string LegalId,
+
+			[McpParameter("PhotoType", "Type of photo to be uploaded.")]
+			[McpEnumValue(PhotoType.ProfilePhoto, "Profile photo.")]
+			[McpEnumValue(PhotoType.Passport, "Photo of passport.")]
+			[McpEnumValue(PhotoType.IdCardFront, "Front of ID card.")]
+			[McpEnumValue(PhotoType.IdCardBack, "Back of ID card.")]
+			[McpEnumValue(PhotoType.DriverLicenseFront, "Front of Driver's License.")]
+			[McpEnumValue(PhotoType.DriverLicenseBack, "Back of Driver's License.")]
+			PhotoType PhotoType = PhotoType.ProfilePhoto)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new IdentityResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new IdentityResponse("User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new IdentityResponse("MCP XMPP Contracts client available.");
+
+			PhotoInput UserInput;
+			LegalIdentity? Identity = null;
+			string? Error = null;
+			string FileName;
+			string OrgMessage;
+
+			LegalId = RemoveUriScheme(LegalId);
+
+			switch (PhotoType)
+			{
+				case PhotoType.ProfilePhoto:
+					UserInput = new UserPhotoInput();
+					OrgMessage = "Please provide a recent profile photo to be added to " +
+						"the identity application.";
+					break;
+
+				case PhotoType.Passport:
+					UserInput = new EnvironmentPhotoInput();
+					OrgMessage = "Please provide a photo of your passport to be added to " +
+						"the identity application.";
+					break;
+
+				case PhotoType.IdCardFront:
+					UserInput = new EnvironmentPhotoInput();
+					OrgMessage = "Please provide a photo of the front of your ID card " +
+						"to be added to the identity application.";
+					break;
+
+				case PhotoType.IdCardBack:
+					UserInput = new EnvironmentPhotoInput();
+					OrgMessage = "Please provide a photo of the back of your ID card " +
+						"to be added to the identity application.";
+					break;
+
+				case PhotoType.DriverLicenseFront:
+					UserInput = new EnvironmentPhotoInput();
+					OrgMessage = "Please provide a photo of the front of your Driver's " +
+						"License to be added to the identity application.";
+					break;
+
+				case PhotoType.DriverLicenseBack:
+					UserInput = new EnvironmentPhotoInput();
+					OrgMessage = "Please provide a photo of the back of your Driver's " +
+						"License to be added to the identity application.";
+					break;
+
+				default:
+					return new IdentityResponse("Invalid photo type: " + PhotoType.ToString());
+			}
+
+			OrgMessage += " The photo will be verified. " +
+				"(This input dialog is cancelled automatically after 15 minutes.)";
+
+			do
+			{
+				string Message = OrgMessage;
+
+				if (!string.IsNullOrEmpty(Error))
+					Message = "Error: " + Error + "\r\n\r\n" + Message;
+
+				bool? Result = await this.ElicitUserInput(Call, Message, UserInput, true,
+					Session, 15 * 60 * 1000);
+
+				if (!Result.HasValue)
+					return new IdentityResponse("User did not provide the photo.");
+
+				if (!Result.Value)
+					return new IdentityResponse("User cancelled the request.");
+
+				Error = null;
+				CustomEncoding? Content = UserInput.GetContent();
+
+				if (Content?.Encoded is null || Content.Encoded.Length == 0)
+				{
+					Error = "No photo provided.";
+					continue;
+				}
+
+				if (!Content.ContentType.StartsWith("image/"))
+				{
+					Error = "Attachment not an image.";
+					continue;
+				}
+
+				if (!InternetContent.TryGetFileExtension(
+					Content.ContentType, out string FileExtension))
+				{
+					Error = "Unrecognized content type: " + Content.ContentType;
+					continue;
+				}
+
+				FileName = PhotoType.ToString() + "." + FileExtension;
+
+				try
+				{
+					Identity = await Client.UploadLegalIdAttachmentAsync(LegalId,
+						FileName, Content.Encoded, Content.ContentType);
+				}
+				catch (Exception ex)
+				{
+					Error = Log.UnnestException(ex).Message;
+				}
+			}
+			while (Identity is null);
+
+			this.ResourceUpdated(User, ContractsClient.LegalIdUri(LegalId));
+
+			return new IdentityResponse(Identity, "Identity attachment successfully uploaded.");
+		}
+
+		private static string RemoveUriScheme(string LegalId)
+		{
+			if (LegalId.StartsWith("iotid:", StringComparison.InvariantCultureIgnoreCase))
+				LegalId = LegalId[6..];
+
+			return LegalId;
+		}
+
+		/// <summary>
 		/// MCP Server Tool to obsolete an identity or identity application.
 		/// </summary>
 		/// <param name="Call">JSON-RPC call object.</param>
-		/// <param name="LegalId">Legal identity Identifier or Identity resource 
+		/// <param name="LegalId">Legal Identity Identifier or Identity resource 
 		/// URI to obsolete.</param>
 		/// <returns>Results of operation.</returns>
 		[McpServerTool(
@@ -540,7 +711,7 @@ namespace Waher.Mcp.Identity
 		public async Task<IdentityResponse> ObsoleteIdentity(
 			IJsonRpcCall Call,
 
-			[McpStringParameter("LegalId", "Legal identity Identifier or Identity resource URI to obsolete.")]
+			[McpStringParameter("LegalId", "Legal Identity Identifier or Identity resource URI to obsolete.")]
 			string LegalId)
 		{
 			Session? Session = await this.TryGetMcpSession(Call);
@@ -554,6 +725,8 @@ namespace Waher.Mcp.Identity
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
 				return new IdentityResponse("MCP XMPP Contracts client available.");
+
+			LegalId = RemoveUriScheme(LegalId);
 
 			try
 			{
@@ -570,7 +743,7 @@ namespace Waher.Mcp.Identity
 		/// MCP Server Tool to report an identity or identity application as compromised.
 		/// </summary>
 		/// <param name="Call">JSON-RPC call object.</param>
-		/// <param name="LegalId">Legal identity Identifier or Identity resource 
+		/// <param name="LegalId">Legal Identity Identifier or Identity resource 
 		/// URI to report as compromised.</param>
 		/// <returns>Results of operation.</returns>
 		[McpServerTool(
@@ -587,7 +760,7 @@ namespace Waher.Mcp.Identity
 		public async Task<IdentityResponse> CompromiseIdentity(
 			IJsonRpcCall Call,
 
-			[McpStringParameter("LegalId", "Legal identity Identifier or Identity resource URI to report as compromised.")]
+			[McpStringParameter("LegalId", "Legal Identity Identifier or Identity resource URI to report as compromised.")]
 			string LegalId)
 		{
 			Session? Session = await this.TryGetMcpSession(Call);
@@ -601,6 +774,8 @@ namespace Waher.Mcp.Identity
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
 				return new IdentityResponse("MCP XMPP Contracts client available.");
+
+			LegalId = RemoveUriScheme(LegalId);
 
 			try
 			{
@@ -617,7 +792,7 @@ namespace Waher.Mcp.Identity
 		/// MCP Server Tool to report an identity application as ready for approval.
 		/// </summary>
 		/// <param name="Call">JSON-RPC call object.</param>
-		/// <param name="LegalId">Legal identity Identifier or Identity resource 
+		/// <param name="LegalId">Legal Identity Identifier or Identity resource 
 		/// URI to report as ready for approval.</param>
 		/// <returns>Results of operation.</returns>
 		[McpServerTool(
@@ -629,12 +804,12 @@ namespace Waher.Mcp.Identity
 			true,   // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
-		[RequiredPrivilege(ObsoletePrivilege)]
+		[RequiredPrivilege(ReadyForApprovalPrivilege)]
 		[return: McpParameter("Result", "Identity report result.")]
 		public async Task<GenericResponse> ReadyForApproval(
 			IJsonRpcCall Call,
 
-			[McpStringParameter("LegalId", "Legal identity Identifier or Identity resource URI to report as ready for approval.")]
+			[McpStringParameter("LegalId", "Legal Identity Identifier or Identity resource URI to report as ready for approval.")]
 			string LegalId)
 		{
 			Session? Session = await this.TryGetMcpSession(Call);
@@ -648,6 +823,9 @@ namespace Waher.Mcp.Identity
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
 				return new GenericResponse(false, "MCP XMPP Contracts client available.");
+
+			LegalId = RemoveUriScheme(LegalId);
+
 			try
 			{
 				await Client.ReadyForApprovalAsync(LegalId);

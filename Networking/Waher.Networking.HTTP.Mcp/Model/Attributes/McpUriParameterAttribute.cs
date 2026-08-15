@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 {
@@ -124,12 +125,13 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// </summary>
 		/// <param name="Value">Value to check.</param>
 		/// <returns>If the value is valid according to validation rules for the parameter.</returns>
-		public override bool IsValid(object Value)
+		public override async Task<bool> IsValid(object Value)
 		{
 			if (Value is Uri URI)
-				return base.IsValid(URI.ToString());
+				return await base.IsValid(URI.ToString());
 
-			return Value is string s && base.IsValid(s) &&
+			return Value is string s && 
+				await base.IsValid(s) &&
 				Uri.TryCreate(s, UriKind.Absolute, out _);
 		}
 	}

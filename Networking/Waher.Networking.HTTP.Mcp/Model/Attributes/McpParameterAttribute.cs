@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Content.Markdown;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Attributes
@@ -77,9 +78,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// </summary>
 		/// <param name="Value">Value to check.</param>
 		/// <returns>If the value is valid according to validation rules for the parameter.</returns>
-		public virtual bool IsValid(object Value)
+		public virtual Task<bool> IsValid(object Value)
 		{
-			return !(Value is null);
+			return Task.FromResult(!(Value is null));
 		}
 	}
 }

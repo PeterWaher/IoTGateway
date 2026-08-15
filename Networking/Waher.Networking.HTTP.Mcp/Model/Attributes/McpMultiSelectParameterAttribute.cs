@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 {
@@ -73,10 +74,10 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// </summary>
 		/// <param name="Value">Value to check.</param>
 		/// <returns>If the value is valid according to validation rules for the parameter.</returns>
-		public override bool IsValid(object Value)
+		public override Task<bool> IsValid(object Value)
 		{
 			if (Value is null)
-				return false;
+				return Task.FromResult(false);
 
 			int Count;
 
@@ -89,15 +90,15 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 					Count++;
 			}
 			else
-				return false;
+				return Task.FromResult(false);
 
 			if (this.MinItems.HasValue && Count < this.MinItems.Value)
-				return false;
+				return Task.FromResult(false);
 
 			if (this.MaxItems.HasValue && Count > this.MaxItems.Value)
-				return false;
+				return Task.FromResult(false);
 
-			return true;
+			return Task.FromResult(true);
 		}
 	}
 }

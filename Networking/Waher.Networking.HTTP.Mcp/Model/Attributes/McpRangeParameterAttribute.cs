@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Script;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Attributes
@@ -115,12 +116,12 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// </summary>
 		/// <param name="Value">Value to check.</param>
 		/// <returns>If the value is valid according to validation rules for the parameter.</returns>
-		public override bool IsValid(object Value)
+		public override async Task<bool> IsValid(object Value)
 		{
 			if (Value is null)
 				return false;
 
-			if (!base.IsValid(Value))
+			if (!await base.IsValid(Value))
 				return false;
 
 			if (!(this.MinValue is null) && this.MinValue is IComparable MinComparable)

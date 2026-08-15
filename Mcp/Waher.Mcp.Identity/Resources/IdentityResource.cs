@@ -23,8 +23,8 @@ namespace Waher.Mcp.Identity.Resources
 		/// <param name="MetaData">Meta-data associated with resource.</param>
 		public IdentityResource(LegalIdentity Identity,
 			params KeyValuePair<string, object>[] MetaData)
-			: base(Identity.Id, XML.Encode(Identity.From, true),
-				  "Digital Identity object with identifier " + Identity.Id,
+			: base(Identity.Id, XML.Encode(Identity.From, true), Identity.State.ToString() + 
+				  " Digital Identity object with identifier " + Identity.Id,
 				  Identity.IdUri, MetaData)
 		{
 			this.identity = Identity;

@@ -259,14 +259,14 @@ namespace Waher.Mcp.Identity
 			if (!await ContractsClient.LoadKeys(false))
 				await ContractsClient.GenerateNewKeys();
 
+			ContractsClient.IdentityUpdated += this.ContractsClient_IdentityUpdated;
+			ContractsClient.IdentityReview += this.ContractsClient_IdentityReview;
 			ContractsClient.ClientMessage += this.ContractsClient_ClientMessage;
 			ContractsClient.ContractCreated += this.ContractsClient_ContractCreated;
 			ContractsClient.ContractDeleted += this.ContractsClient_ContractDeleted;
 			ContractsClient.ContractProposalReceived += this.ContractsClient_ContractProposalReceived;
 			ContractsClient.ContractSigned += this.ContractsClient_ContractSigned;
 			ContractsClient.ContractUpdated += this.ContractsClient_ContractUpdated;
-			ContractsClient.IdentityReview += this.ContractsClient_IdentityReview;
-			ContractsClient.IdentityUpdated += this.ContractsClient_IdentityUpdated;
 			ContractsClient.PetitionClientUrlReceived += this.ContractsClient_PetitionClientUrlReceived;
 			ContractsClient.PetitionedContractResponseReceived += this.ContractsClient_PetitionedContractResponseReceived;
 			ContractsClient.PetitionedIdentityResponseReceived += this.ContractsClient_PetitionedIdentityResponseReceived;
@@ -500,8 +500,8 @@ namespace Waher.Mcp.Identity
 
 		private Task ContractsClient_IdentityUpdated(object Sender, LegalIdentityEventArgs e)
 		{
-			if (Sender is XmppClient Client &&
-				Client.TryGetTag("User", out IUser? User) &&
+			if (Sender is ContractsClient ContractsClient &&
+				ContractsClient.Client.TryGetTag("User", out IUser? User) &&
 				!(User is null))
 			{
 				this.ResourceUpdated(User, ContractsClient.LegalIdUri(e.Identity.Id));
@@ -510,12 +510,12 @@ namespace Waher.Mcp.Identity
 			return Task.CompletedTask;
 		}
 
-		private Task ContractsClient_IdentityReview(object Sender, IdentityReviewEventArgs e)
+		private Task ContractsClient_ClientMessage(object Sender, ClientMessageEventArgs e)
 		{
 			return Task.CompletedTask;  // TODO
 		}
 
-		private Task ContractsClient_ClientMessage(object Sender, ClientMessageEventArgs e)
+		private Task ContractsClient_IdentityReview(object Sender, IdentityReviewEventArgs e)
 		{
 			return Task.CompletedTask;  // TODO
 		}

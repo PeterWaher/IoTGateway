@@ -297,7 +297,7 @@ namespace Waher.Mcp.Identity
 				await UploadClient.DiscoverAsync();
 			}
 
-			if (CreateIfNotDefined)	// From a tool; resources need updating
+			if (CreateIfNotDefined) // From a tool; resources need updating
 				this.ResourcesUpdated(User);
 
 			return ContractsClient;
@@ -533,7 +533,7 @@ namespace Waher.Mcp.Identity
 		}
 
 		/// <summary>
-		/// MCP Server Tool to add a photo attachment.
+		/// MCP Server Tool to add a photo attachment by eliciting the photo from the user.
 		/// </summary>
 		/// <param name="Call">JSON-RPC call object.</param>
 		/// <param name="LegalId">Legal Identity Identifier or Identity resource URI to 
@@ -541,9 +541,9 @@ namespace Waher.Mcp.Identity
 		/// <param name="PhotoType">Type of photo to be uploaded.</param>
 		/// <returns>Results of operation.</returns>
 		[McpServerTool(
-			"Add Photo Attachment",
-			"Adds a photo attachment to an identity application. The contents " +
-			"of the attachment will be elicited from the user.",
+			"Add Photo Attachment (User Input)",
+			"Adds a photo attachment to an identity application, by eliciting the user " +
+			"for the photo.",
 			"",     // IconsMethod, use default icons
 			true,   // CanModifyEnvironment
 			false,  // CanDestroyEnvironment
@@ -551,7 +551,7 @@ namespace Waher.Mcp.Identity
 			false)] // OpenWorldAccess
 		[RequiredPrivilege(AddAttachmentPrivilege)]
 		[return: McpParameter("Result", "Identity update result.")]
-		public async Task<IdentityResponse> AddPhotoAttachment(
+		public async Task<IdentityResponse> AddPhotoAttachmentElicitation(
 			IJsonRpcCall Call,
 
 			[McpStringParameter("LegalId", "Legal Identity Identifier or Identity " +
@@ -686,7 +686,236 @@ namespace Waher.Mcp.Identity
 
 			this.ResourceUpdated(User, ContractsClient.LegalIdUri(LegalId));
 
-			return new IdentityResponse(Identity, "Identity attachment successfully uploaded.");
+			return new IdentityResponse(Identity, "Identity attachment successfully added.");
+		}
+
+		/// <summary>
+		/// MCP Server Tool to add a photo attachment by providing a BASE64-encoded
+		/// binary of the photo together with its corresponding Content-Type.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="LegalId">Legal Identity Identifier or Identity resource URI to 
+		/// which the attachment shall be added.</param>
+		/// <param name="Base64Photo">BASE64-encoded photo to be uploaded.</param>
+		/// <param name="ContentTypePhoto">Content-Type of the photo to be uploaded.</param>
+		/// <param name="PhotoType">Type of photo to be uploaded.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Add Photo Attachment (BASE64 upload)",
+			"Adds a photo attachment to an identity application, by providing a " +
+			"BASE64-encoded binary of the photo together with its corresponding " +
+			"Content-Type.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			false)] // OpenWorldAccess
+		[RequiredPrivilege(AddAttachmentPrivilege)]
+		[return: McpParameter("Result", "Identity update result.")]
+		public async Task<IdentityResponse> AddPhotoAttachmentBase64Upload(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("LegalId", "Legal Identity Identifier or Identity " +
+			"resource URI to which the attachment shall be added.")]
+			string LegalId,
+
+			[McpStringParameter("Base64Photo", "BASE64-encoded photo to be uploaded.")]
+			string Base64Photo,
+
+			[McpStringParameter("ContentTypePhoto", "Content-Type of the photo to be uploaded.")]
+			string ContentTypePhoto,
+
+			[McpParameter("PhotoType", "Type of photo to be uploaded.")]
+			[McpEnumValue(PhotoType.ProfilePhoto, "Profile photo.")]
+			[McpEnumValue(PhotoType.Passport, "Photo of passport.")]
+			[McpEnumValue(PhotoType.IdCardFront, "Front of ID card.")]
+			[McpEnumValue(PhotoType.IdCardBack, "Back of ID card.")]
+			[McpEnumValue(PhotoType.DriverLicenseFront, "Front of Driver's License.")]
+			[McpEnumValue(PhotoType.DriverLicenseBack, "Back of Driver's License.")]
+			PhotoType PhotoType = PhotoType.ProfilePhoto)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new IdentityResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new IdentityResponse("User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new IdentityResponse("MCP XMPP Contracts client available.");
+
+			if (!ContentTypePhoto.StartsWith("image/"))
+				return new IdentityResponse("Attachment must be an image.");
+
+			if (!InternetContent.TryGetFileExtension(
+				ContentTypePhoto, out string FileExtension))
+			{
+				return new IdentityResponse("Unrecognized content type: " + ContentTypePhoto);
+			}
+
+			LegalId = RemoveUriScheme(LegalId);
+
+			string FileName = PhotoType.ToString() + "." + FileExtension;
+			byte[] Bin;
+
+			try
+			{
+				Bin = Convert.FromBase64String(Base64Photo);
+				ContentResponse Decoded = await InternetContent.DecodeAsync(ContentTypePhoto, Bin, null);
+				if (Decoded.HasError)
+					return new IdentityResponse("Invalid photo: " + Decoded.Error);
+			}
+			catch (Exception ex)
+			{
+				return new IdentityResponse("Invalid photo: " + Log.UnnestException(ex).Message);
+			}
+
+			try
+			{
+				LegalIdentity Identity = await Client.UploadLegalIdAttachmentAsync(LegalId,
+					FileName, Bin, ContentTypePhoto);
+
+				return new IdentityResponse(Identity, "Identity attachment successfully added.");
+			}
+			catch (Exception ex)
+			{
+				return new IdentityResponse("Unable to add attachment: " +
+					Log.UnnestException(ex).Message);
+			}
+		}
+
+		/// <summary>
+		/// MCP Server Tool to add a photo attachment by providing a URL to the photo
+		/// to be downloaded and then added as an attachment.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="LegalId">Legal Identity Identifier or Identity resource URI to 
+		/// which the attachment shall be added.</param>
+		/// <param name="PhotoUrl">URL of the photo to be downloaded.</param>
+		/// <param name="PhotoType">Type of photo to be uploaded.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Add Photo Attachment (URL Download)",
+			"Adds a photo attachment to an identity application, by providing a URL to " +
+			"the photo to be downloaded and then added as an attachment.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			false)] // OpenWorldAccess
+		[RequiredPrivilege(AddAttachmentPrivilege)]
+		[return: McpParameter("Result", "Identity update result.")]
+		public async Task<IdentityResponse> AddPhotoAttachmentUrlDownload(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("LegalId", "Legal Identity Identifier or Identity " +
+			"resource URI to which the attachment shall be added.")]
+			string LegalId,
+
+			[McpUriParameter("PhotoUrl", "URL of the photo to be downloaded.")]
+			Uri PhotoUrl,
+
+			[McpParameter("PhotoType", "Type of photo to be uploaded.")]
+			[McpEnumValue(PhotoType.ProfilePhoto, "Profile photo.")]
+			[McpEnumValue(PhotoType.Passport, "Photo of passport.")]
+			[McpEnumValue(PhotoType.IdCardFront, "Front of ID card.")]
+			[McpEnumValue(PhotoType.IdCardBack, "Back of ID card.")]
+			[McpEnumValue(PhotoType.DriverLicenseFront, "Front of Driver's License.")]
+			[McpEnumValue(PhotoType.DriverLicenseBack, "Back of Driver's License.")]
+			PhotoType PhotoType = PhotoType.ProfilePhoto)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new IdentityResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new IdentityResponse("User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new IdentityResponse("MCP XMPP Contracts client available.");
+
+			ContentResponse Content = await InternetContent.GetAsync(PhotoUrl,
+				new KeyValuePair<string, string>("Accept", "image/*"));
+			
+			if (Content.HasError)
+				return new IdentityResponse("Unable to download photo: " + Content.Error);
+
+			if (!Content.ContentType.StartsWith("image/"))
+				return new IdentityResponse("Downloaded content not an image.");
+
+			if (!InternetContent.TryGetFileExtension(
+				Content.ContentType, out string FileExtension))
+			{
+				return new IdentityResponse("Unrecognized content type: " + Content.ContentType);
+			}
+
+			LegalId = RemoveUriScheme(LegalId);
+
+			string FileName = PhotoType.ToString() + "." + FileExtension;
+
+			try
+			{
+				LegalIdentity Identity = await Client.UploadLegalIdAttachmentAsync(LegalId,
+					FileName, Content.Encoded, Content.ContentType);
+
+				return new IdentityResponse(Identity, "Identity attachment successfully added.");
+			}
+			catch (Exception ex)
+			{
+				return new IdentityResponse("Unable to add attachment: " +
+					Log.UnnestException(ex).Message);
+			}
+		}
+
+		/// <summary>
+		/// MCP Server Tool to remove an attachment from an identity application.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="AttachmentId">Attachment ID to be removed.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Remove Attachment",
+			"Removes an attachment from an identity application.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			false)] // OpenWorldAccess
+		[RequiredPrivilege(AddAttachmentPrivilege)]
+		[return: McpParameter("Result", "Identity update result.")]
+		public async Task<IdentityResponse> RemoveAttachment(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("AttachmentId", "Attachment ID to be removed.")]
+			string AttachmentId)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new IdentityResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new IdentityResponse("User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new IdentityResponse("MCP XMPP Contracts client available.");
+
+			try
+			{
+				LegalIdentity Identity = await Client.RemoveLegalIdAttachmentAsync(AttachmentId);
+
+				return new IdentityResponse(Identity, "Identity attachment successfully removed.");
+			}
+			catch (Exception ex)
+			{
+				return new IdentityResponse("Unable to remove attachment: " +
+					Log.UnnestException(ex).Message);
+			}
 		}
 
 		private static string RemoveUriScheme(string LegalId)

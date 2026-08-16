@@ -37,6 +37,7 @@ namespace Waher.Mcp.Identity
 	{
 		internal const string BasePrivilege = OAuthResource.OAuthScopePrivilegePrefix + "MCP.Identity";
 		internal const string ToolsPrivilege = BasePrivilege + ".Tools";
+		internal const string PromptsPrivilege = BasePrivilege + ".Prompts";
 		internal const string ResourcesPrivilege = BasePrivilege + ".Resources";
 		internal const string ListPrivilege = ResourcesPrivilege + ".List";
 		internal const string ReadPrivilege = ResourcesPrivilege + ".Read";
@@ -46,6 +47,9 @@ namespace Waher.Mcp.Identity
 		internal const string ReadyForApprovalPrivilege = ToolsPrivilege + ".ReadyForApproval";
 		internal const string AttachmentPrivilege = ToolsPrivilege + ".Attachment";
 		internal const string AddAttachmentPrivilege = AttachmentPrivilege + ".Add";
+		internal const string RemoveAttachmentPrivilege = AttachmentPrivilege + ".Remove";
+		internal const string CreatePromptPrivilege = PromptsPrivilege + ".Create";
+		internal const string CreatePersonalIdentityPrivilege = CreatePromptPrivilege + ".Create.PersonalId";
 
 		private readonly XmppMcpServer xmppMcpServer;
 
@@ -840,7 +844,7 @@ namespace Waher.Mcp.Identity
 
 			ContentResponse Content = await InternetContent.GetAsync(PhotoUrl,
 				new KeyValuePair<string, string>("Accept", "image/*"));
-			
+
 			if (Content.HasError)
 				return new IdentityResponse("Unable to download photo: " + Content.Error);
 
@@ -885,7 +889,7 @@ namespace Waher.Mcp.Identity
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			false)] // OpenWorldAccess
-		[RequiredPrivilege(AddAttachmentPrivilege)]
+		[RequiredPrivilege(RemoveAttachmentPrivilege)]
 		[return: McpParameter("Result", "Identity update result.")]
 		public async Task<IdentityResponse> RemoveAttachment(
 			IJsonRpcCall Call,
@@ -1071,6 +1075,55 @@ namespace Waher.Mcp.Identity
 			{
 				return new GenericResponse(false, Log.UnnestException(ex).Message);
 			}
+		}
+
+		/// <summary>
+		/// MCP Server Prompt to create a new personal legal identity for the user.
+		/// </summary>
+		/// <returns>Prompt messages</returns>
+		[McpServerPrompt("Create Personal Legal Identity",          // Title
+			"Creates a new Legal Personal Identity for the user.",  // Description
+			"")]                                                    // IconsMethod, use default icons
+		[RequiredPrivilege(CreatePersonalIdentityPrivilege)]
+		public PromptMessage[] CreatePersonalLegalIdentity()
+		{
+			return new PromptMessage[]
+			{
+				new PromptMessage(McpRole.User,
+					"Create a Personal Legal Identity for me."),
+				new PromptMessage(McpRole.Assistant,
+					"To create a Personal Legal Identity, follow these steps: You first " +
+					"need to Apply for a Personal Legal Identity. This will elicit " +
+					"sensitive personal information from the user. Once the Identity " +
+					"Application has been registered, a resource URI will be created " +
+					"correspondingly. The successful response to the identity " +
+					"application call will also contain a copy of the identity " +
+					"object created. This object contains the identifier of the identity " +
+					"application."),
+				new PromptMessage(McpRole.Assistant,
+					"The next step is to add a Profile Photo of the user, as a " +
+					"photo attachment to the registered identity application. You " +
+					"reference the application either using the identity identifier " +
+					"received from in the result to the application call, or from the " +
+					"identity resource URI generated as a result. You can choose " +
+					"either to elicit the user for a photo, upload a photo encoded using " +
+					"BASE64 or provide an URL to the photo. Once the photo has been attached, the "),
+				new PromptMessage(McpRole.Assistant,
+					"Once the profile photo has been attached, you need to upload proof " +
+					"of the validity of the claims in the application and the profile " +
+					"photo. This can be done either by taking a photo of a passport, " +
+					"two photos of the front and back of an ID card, or two photos " +
+					"of the front and back of a Driver's License. This or these photos " +
+					"also need to be added as attachments to the identity application."),
+				new PromptMessage(McpRole.Assistant,
+					"Once the photos have been uploaded, you report the identity " +
+					"application as being ready for approval. This will start a process " +
+					"review of the applcation. The application can either be automatically " +
+					"approved, automatically rejected, or passed on to manual review. " +
+					"Messages can also be sent indicating the state of the review, which " +
+					"claims have been approved, which ones have been rejected, amd which " +
+					"ones were unable to be validated.")
+			};
 		}
 
 		private Task ContractsClient_ClientMessage(object Sender, ClientMessageEventArgs e)

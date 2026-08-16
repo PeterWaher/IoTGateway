@@ -397,6 +397,9 @@ namespace Waher.Networking.HTTP.Mcp.Model.Server
 						{
 							Result["type"] = "string";
 							Result["pattern"] = McpFileUploadParameterAttribute.Base64Pattern;
+
+							if (Default is CustomEncoding CustomEncoding)
+								Default = Convert.ToBase64String(CustomEncoding.Encoded);
 						}
 						else
 						{

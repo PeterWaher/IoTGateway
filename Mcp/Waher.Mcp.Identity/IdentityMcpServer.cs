@@ -22,6 +22,7 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.Contracts.EventArguments;
+using Waher.Networking.XMPP.HttpFileUpload;
 using Waher.Runtime.Collections;
 using Waher.Security;
 
@@ -289,6 +290,12 @@ namespace Waher.Mcp.Identity
 			ContractsClient.PetitionForIdentityReceived += this.ContractsClient_PetitionForIdentityReceived;
 			ContractsClient.PetitionForPeerReviewIDReceived += this.ContractsClient_PetitionForPeerReviewIDReceived;
 			ContractsClient.PetitionForSignatureReceived += this.ContractsClient_PetitionForSignatureReceived;
+
+			if (!Client.TryGetExtension(out HttpFileUploadClient HttpFileUploadClient))
+			{
+				HttpFileUploadClient UploadClient = new HttpFileUploadClient(Client);
+				await UploadClient.DiscoverAsync();
+			}
 
 			if (CreateIfNotDefined)	// From a tool; resources need updating
 				this.ResourcesUpdated(User);

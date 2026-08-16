@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Binary;
 using Waher.Content.Html;
 using Waher.Content.Html.Elements;
 using Waher.Content.Html.JavaScript;
@@ -14,6 +15,7 @@ using Waher.Content.Images;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.JsonRpc;
 using Waher.Networking.HTTP.JsonRpc.MetaData;
 using Waher.Networking.HTTP.JsonRpc.Transports;
@@ -192,7 +194,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="SnifferSet">Optional sniffer set used to log agent interaction 
 		/// with MCP service.</param>
 		public HttpMcpServerResource(string ResourceName, string Name, string Title,
-			string Version, string Description, string MarkdownDescription, Icon[] Icons, 
+			string Version, string Description, string MarkdownDescription, Icon[] Icons,
 			Uri? WebSiteUri, string Instructions, ISnifferSet? SnifferSet)
 			: base(ResourceName, false, false)
 		{
@@ -2702,7 +2704,7 @@ namespace Waher.Networking.HTTP.Mcp
 			if (Session.ClientCapabilities?.Elicitation is null)
 				throw new ServiceUnavailableException("MCP Client does not support elication of user input.");
 
-			Type InputType = InputRequest?.GetType() ?? typeof(T);
+			Type InputType = InputRequest.GetType();
 			McpParameterAttribute? ParameterInfo = InputType.GetCustomAttribute<McpParameterAttribute>();
 			IEnumerable<McpEnumValueAttribute> EnumValues = InputType.GetCustomAttributes<McpEnumValueAttribute>();
 			Dictionary<string, object?> ElicitationRequest;
@@ -2840,6 +2842,7 @@ namespace Waher.Networking.HTTP.Mcp
 				object Value = P.Value;
 				Dictionary<string, object>? SubProperties = Value as Dictionary<string, object>;
 				bool IsSubProperties = !(SubProperties is null);
+				McpFileUploadParameterAttribute? FileParameter;
 
 				FieldInfo? FI = T.GetField(P.Key, BindingFlags.Public | BindingFlags.Instance);
 				if (!(FI is null))
@@ -2858,8 +2861,13 @@ namespace Waher.Networking.HTTP.Mcp
 					}
 					else if (Value is null || FI.FieldType.IsAssignableFrom(Value.GetType()))
 						FI.SetValue(Object, Value);
-					else if (Expression.TryConvert(Value, FI.FieldType, true, out object Value2))
+					else if (Expression.TryConvert(Value, FI.FieldType, true, out object? Value2))
 						FI.SetValue(Object, Value2);
+					else if (!((FileParameter = FI.GetCustomAttribute<McpFileUploadParameterAttribute>()) is null) &&
+						!((Value2 = await TryConvertFileInput(Value, FI.FieldType, FileParameter)) is null))
+					{
+						FI.SetValue(Object, Value2);
+					}
 					else
 					{
 						throw new InvalidCastException("Unable to convert value of type " +
@@ -2887,8 +2895,13 @@ namespace Waher.Networking.HTTP.Mcp
 					}
 					else if (Value is null || PI.PropertyType.IsAssignableFrom(Value.GetType()))
 						PI.SetValue(Object, Value);
-					else if (Expression.TryConvert(Value, PI.PropertyType, true, out object Value2))
+					else if (Expression.TryConvert(Value, PI.PropertyType, true, out object? Value2))
 						PI.SetValue(Object, Value2);
+					else if (!((FileParameter = PI.GetCustomAttribute<McpFileUploadParameterAttribute>()) is null) &&
+						!((Value2 = await TryConvertFileInput(Value, PI.PropertyType, FileParameter)) is null))
+					{
+						PI.SetValue(Object, Value2);
+					}
 					else
 					{
 						throw new InvalidCastException("Unable to convert value of type " +
@@ -2901,6 +2914,85 @@ namespace Waher.Networking.HTTP.Mcp
 
 				throw new InvalidOperationException("Unrecognized field ro property name: " + P.Key);
 			}
+		}
+
+		private static async Task<object?> TryConvertFileInput(object Value, Type DesiredType,
+			McpFileUploadParameterAttribute FileParameter)
+		{
+			string? Accept = FileParameter?.Accept;
+
+			if (!(Value is byte[] Bin))
+			{
+				if (Value is string s)
+				{
+					try
+					{
+						Bin = Convert.FromBase64String(s);
+					}
+					catch (Exception)
+					{
+						return null;
+					}
+				}
+				else
+					return null;
+			}
+
+			IContentDecoder[] Decoders;
+
+			if (!string.IsNullOrEmpty(Accept))
+			{
+				ChunkedList<IContentDecoder>? AcceptableDecoders = null;
+				HttpFieldAccept Field = new HttpFieldAccept("Accept", Accept);
+
+				foreach (AcceptRecord Record in Field.Records)
+				{
+					foreach (IContentDecoder Decoder in InternetContent.Decoders)
+					{
+						foreach (string ContentType in Decoder.ContentTypes)
+						{
+							if (Record.IsAcceptable(ContentType, out _, out _))
+							{
+								AcceptableDecoders ??= new ChunkedList<IContentDecoder>();
+								AcceptableDecoders.Add(Decoder);
+								break;
+							}
+						}
+					}
+				}
+
+				Decoders = AcceptableDecoders?.ToArray() ?? Array.Empty<IContentDecoder>();
+			}
+			else
+				Decoders = InternetContent.Decoders;
+
+			if ((Decoders?.Length ?? 0) == 0)
+				return false;
+
+			foreach (IContentDecoder Decoder in Decoders!)
+			{
+				try
+				{
+					ContentResponse Decoded = await Decoder.DecodeAsync(Accept, Bin,
+						Encoding.UTF8, Array.Empty<KeyValuePair<string, string>>(),
+						null, null);
+
+					if (Decoded.HasError)
+						continue;
+
+					if (DesiredType.IsAssignableFrom(Decoded.Decoded.GetType()))
+						return Decoded.Decoded;
+
+					if (DesiredType == typeof(CustomEncoding))
+						return new CustomEncoding(Decoded.ContentType, Decoded.Encoded);
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
+
+			return null;
 		}
 	}
 }

@@ -728,20 +728,49 @@ namespace Waher.Networking.HTTP.Mcp
 				return;
 			}
 
+			Type T = ClientRequest.Tag!.GetType();
+			FieldInfo FI;
+			PropertyInfo PI;
+
 			string[] Keys = new string[Form.Count];
 			Form.Keys.CopyTo(Keys, 0);
 
 			foreach (string Key in Keys)
 			{
+				FI = T.GetField(Key);
+				if (!(FI is null) &&
+					FI.FieldType == typeof(CustomEncoding) &&
+					Form.TryGetValue(Key + "_Binary", out Obj) &&
+					Obj is byte[] Bin &&
+					Form.TryGetValue(Key + "_ContentType", out Obj) &&
+					Obj is string ContentType)
+				{
+					Form[Key] = new CustomEncoding(ContentType, Bin);
+				}
+				else
+				{
+					PI = T.GetProperty(Key);
+					if (!(PI is null) &&
+						PI.PropertyType == typeof(CustomEncoding) &&
+						Form.TryGetValue(Key + "_Binary", out Obj) &&
+						Obj is byte[] Bin2 &&
+						Form.TryGetValue(Key + "_ContentType", out Obj) &&
+						Obj is string ContentType2)
+					{
+						Form[Key] = new CustomEncoding(ContentType2, Bin2);
+					}
+				}
+
 				Form.Remove(Key + "_Binary");
 				Form.Remove(Key + "_ContentType");
+				Form.Remove(Key + "_FileName");
 			}
 
 			Form.Remove("_p_");
 			Form.Remove("_r_");
 
 			if (ResponseValue)
-				await SetProperties(ClientRequest.Tag!, Form);
+				await SetProperties(ClientRequest.Tag, Form);
 
 			try
 			{

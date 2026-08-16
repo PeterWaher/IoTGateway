@@ -1,6 +1,7 @@
 ﻿using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
@@ -202,8 +203,50 @@ namespace Waher.Content.Images
 		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
 			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
-			SKBitmap Bitmap = SKBitmap.Decode(Data);
-			return Task.FromResult(new ContentResponse(ContentType, SKImage.FromBitmap(Bitmap), Data));
+			SKImage Image;
+
+			if (ContentType.IndexOf('*') >= 0)
+			{
+				using (MemoryStream ms = new MemoryStream(Data))
+				{
+					using (SKCodec Codec = SKCodec.Create(ms))
+					{
+						SKBitmap Bitmap = SKBitmap.Decode(Codec);
+						Image = SKImage.FromBitmap(Bitmap);
+
+						switch (Codec.EncodedFormat)
+						{
+							case SKEncodedImageFormat.Bmp:
+								ContentType = ContentTypeBmp;
+								break;
+
+							case SKEncodedImageFormat.Gif:
+								ContentType = ContentTypeGif;
+								break;
+
+							case SKEncodedImageFormat.Ico:
+								ContentType = ContentTypeIcon;
+								break;
+
+							case SKEncodedImageFormat.Jpeg:
+								ContentType = ContentTypeJpg;
+								break;
+
+							case SKEncodedImageFormat.Png:
+								ContentType = ContentTypePng;
+								break;
+
+							case SKEncodedImageFormat.Webp:
+								ContentType = ContentTypeWebP;
+								break;
+						}
+					}
+				}
+			}
+			else
+				Image = SKImage.FromEncodedData(Data);
+
+			return Task.FromResult(new ContentResponse(ContentType, Image, Data));
 		}
 
 		/// <summary>

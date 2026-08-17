@@ -331,18 +331,22 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			{
 				case FilePurpose.Backup:
 					Xml.Append("http://waher.se/Schema/Backups.xsd");
+					// TODO: urn:nfi:iot:upl:bk:1.0
 					break;
 
 				case FilePurpose.Encrypted:
 					Xml.Append("http://waher.se/Schema/EncryptedStorage.xsd");
+					// TODO: urn:nfi:iot:upl:es:1.0
 					break;
 
 				case FilePurpose.PubSub:
 					Xml.Append("http://waher.se/Schema/PubSub.xsd");
+					// TODO: urn:nfi:iot:upl:ps:1.0
 					break;
 
 				case FilePurpose.InternalTransfer:
 					Xml.Append("http://waher.se/Schema/InternalTransfer.xsd");
+					// TODO: urn:nfi:iot:upl:it:1.0
 					break;
 			}
 

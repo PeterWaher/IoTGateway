@@ -2030,6 +2030,7 @@ namespace Waher.Content.Html
 		/// <param name="Output">XML Output</param>
 		public void Export(XmlWriter Output)
 		{
+			this.AssertParsed();
 			this.root?.Export(Output, new Dictionary<string, string>());
 		}
 
@@ -2039,6 +2040,7 @@ namespace Waher.Content.Html
 		/// <param name="Output">XML Output</param>
 		public void Export(StringBuilder Output)
 		{
+			this.AssertParsed();
 			this.root?.Export(Output);
 		}
 

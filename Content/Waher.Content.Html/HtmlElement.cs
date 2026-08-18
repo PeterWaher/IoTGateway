@@ -261,6 +261,8 @@ namespace Waher.Content.Html
 			{
 				if (Namespaces.TryGetValue(this.prefix, out string s))
 					Output.WriteStartElement(this.prefix, this.localName, s);
+				else if (string.IsNullOrEmpty(this.@namespace))
+					Output.WriteStartElement(this.prefix, this.localName, this.prefix);
 				else
 					Output.WriteStartElement(this.prefix, this.localName, this.@namespace);
 			}

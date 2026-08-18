@@ -1962,7 +1962,7 @@ namespace Waher.Networking.XMPP
 								case "error":
 									EventHandlerAsync<IqResultEventArgs> Callback;
 									object State;
-									
+
 									Ok = (Type == "result");
 
 									if (uint.TryParse(Id, out uint SeqNr))
@@ -2859,7 +2859,7 @@ namespace Waher.Networking.XMPP
 				{
 					if (PrevHandler.Method == Handler.Method && PrevHandler.Target == Handler.Target)
 						return;
-					
+
 					throw new ArgumentException("Handler already registered: " + Namespace + "#" + LocalName, nameof(LocalName));
 				}
 
@@ -4856,7 +4856,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Callback">Method to call when stanza has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Status">Custom Status message, defined as a set of (language,text) pairs.</param>
-		public async Task SetPresence(Availability Availability, EventHandlerAsync<DeliveryEventArgs> Callback, 
+		public async Task SetPresence(Availability Availability, EventHandlerAsync<DeliveryEventArgs> Callback,
 			object State, params KeyValuePair<string, string>[] Status)
 		{
 			this.currentAvailability = Availability;
@@ -7146,7 +7146,7 @@ namespace Waher.Networking.XMPP
 								this.pendingRequestsBySeqNr.Remove(Request.SeqNr);
 								continue;   // Already processed
 							}
-							
+
 							if (Retry = Request.CanRetry())
 							{
 								TP = Request.Timeout;
@@ -7178,7 +7178,7 @@ namespace Waher.Networking.XMPP
 								Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Timeout.</text></error></iq>");
 
 								XmlDocument Doc = XML.ParseXml(Xml.ToString(), true);
-								
+
 								if (!(Request.IqCallback is null))
 								{
 									IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
@@ -7262,7 +7262,8 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Tries to get a tag from the client. Tags can be used to attached application specific objects to the client.
+		/// Tries to get a tag from the client. Tags can be used to attached application 
+		/// specific objects to the client.
 		/// </summary>
 		/// <param name="TagName">Name of tag.</param>
 		/// <param name="Tag">Tag value.</param>
@@ -7276,6 +7277,28 @@ namespace Waher.Networking.XMPP
 			}
 
 			return false;
+		}
+
+
+		/// <summary>
+		/// Tries to get a typed tag from the client. Tags can be used to attached 
+		/// application specific objects to the client.
+		/// </summary>
+		/// <param name="TagName">Name of tag.</param>
+		/// <param name="Tag">Tag value.</param>
+		/// <returns>If a tag was found with the corresponding name.</returns>
+		public bool TryGetTag<T>(string TagName, out T Tag)
+		{
+			if (this.tags.TryGetValue(TagName, out object Obj) && Obj is T Typed)
+			{
+				Tag = Typed;
+				return true;
+			}
+			else
+			{
+				Tag = default;
+				return false;
+			}
 		}
 
 		/// <summary>

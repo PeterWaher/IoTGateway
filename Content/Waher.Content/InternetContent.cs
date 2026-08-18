@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Binary;
+using Waher.Content.CharacterSets;
 using Waher.Events;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
@@ -748,6 +749,12 @@ namespace Waher.Content
 
 				case "UTF-8":
 					return Encoding.UTF8;
+
+				case "WINDOWS-1252":
+					return WindowsCodePage.Windows1252;
+
+				case "WINDOWS-1257":
+					return WindowsCodePage.Windows1257;
 
 				default:
 					return Encoding.GetEncoding(CharacterSet);

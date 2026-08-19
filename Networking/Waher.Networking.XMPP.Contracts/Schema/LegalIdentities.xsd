@@ -86,6 +86,11 @@
 					<xs:documentation>Indicates if the Trust Provider requires ISO 3166 country codes for identity applications.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
+			<xs:attribute name='reviewTimeout' type='xs:positiveInteger' use='optional' default='3600'>
+				<xs:annotation>
+					<xs:documentation>The time the client has (in seconds) to sign an identity review document and upload it as a signed attachment, measured from the time the application was approved.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 

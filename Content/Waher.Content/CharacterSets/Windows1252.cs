@@ -7,7 +7,6 @@ namespace Waher.Content.CharacterSets
 	/// </summary>
 	public class Windows1252 : WindowsCodePage
 	{
-		private readonly static Dictionary<char, byte> bytes = ReverseDictionary(chars);
 		private readonly static char?[] chars = new char?[256]
 		{
 			'\x00','\x01','\x02','\x03','\x04','\x05','\x06','\x07',	// 00
@@ -43,6 +42,7 @@ namespace Waher.Content.CharacterSets
 			'ð', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', '÷',						// F0
 			'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'þ', 'ÿ',
 		};
+		private readonly static Dictionary<char, byte> bytes = ReverseDictionary(chars);
 
 		/// <summary>
 		/// WINDOWS-1252 encoding.

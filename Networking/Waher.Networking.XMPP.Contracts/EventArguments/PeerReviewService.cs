@@ -1,0 +1,31 @@
+﻿using System.Collections.Generic;
+
+namespace Waher.Networking.XMPP.Contracts.EventArguments
+{
+	/// <summary>
+	/// Peer-review service reference.
+	/// </summary>
+	public class PeerReviewService : IdentityApplicationService
+	{
+		/// <summary>
+		/// Peer-review service reference.
+		/// </summary>
+		/// <param name="Id">ID of service</param>
+		/// <param name="Name">Name of service</param>
+		/// <param name="FullName">Fully qualified name of service</param>
+		/// <param name="IconUrl">URL of service icon</param>
+		/// <param name="IconWidth">Width of service icon</param>
+		/// <param name="IconHeight">Height of service icon</param>
+		/// <param name="Properties">Properties reviewed by service, and if they are
+		/// required (true) or optional (false)</param>
+		/// <param name="Attachments">Attachments reviewed by service, and if they are
+		/// required (true) or optional (false)</param>
+		public PeerReviewService(string Id, string Name, string FullName,
+			string IconUrl, int IconWidth, int IconHeight,
+			Dictionary<string, bool> Properties, Dictionary<string, bool> Attachments)
+			: base(Id, Name, FullName, IconUrl, IconWidth, IconHeight, Properties,
+				  Attachments)
+		{
+		}
+	}
+}

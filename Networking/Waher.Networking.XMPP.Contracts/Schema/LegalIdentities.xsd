@@ -64,6 +64,16 @@
 						<xs:documentation>Contains the name of a property that is required for an identity application to be allowed to participate in peer review.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
+				<xs:element name='authenticator' type='IdentityReviewService' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Contains requirements of an identity authenticator service.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name='peerReviewService' type='IdentityReviewService' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Contains requirements of an identity peer review service.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
 			</xs:sequence>
 			<xs:attribute name='peerReview' type='xs:boolean' use='optional' default='false'>
 				<xs:annotation>
@@ -93,6 +103,72 @@
 			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
+
+	<xs:complexType name='RequiredAndOptionalLists'>
+		<xs:annotation>
+			<xs:documentation>Type listing required and optional elements in a sequence.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name='required' type='xs:string' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Defines one required item.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='optional' type='xs:string' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Defines one optional item.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name='IdentityReviewService'>
+		<xs:annotation>
+			<xs:documentation>Represents a service used for reviewing identity applications.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name='properties' type='RequiredAndOptionalLists' minOccurs='0' maxOccurs='1'>
+				<xs:annotation>
+					<xs:documentation>Contains a list of required or optional properties expected by the service.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='attachments' type='RequiredAndOptionalLists' minOccurs='0' maxOccurs='1'>
+				<xs:annotation>
+					<xs:documentation>Contains a list of required or optional attachments expected by the service.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name='id' type='xs:string' use='required'>
+			<xs:annotation>
+				<xs:documentation>Identifier of the service.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='name' type='xs:string' use='required'>
+			<xs:annotation>
+				<xs:documentation>Name of the service.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='fqn' type='xs:string' use='required'>
+			<xs:annotation>
+				<xs:documentation>Fully qualified name of the service.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='iconUrl' type='xs:string' use='optional'>
+			<xs:annotation>
+				<xs:documentation>Optional icon associated with service.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='iconWidth' type='xs:positiveInteger' use='optional'>
+			<xs:annotation>
+				<xs:documentation>Witdh of optional icon associated with service.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='iconHeight' type='xs:positiveInteger' use='optional'>
+			<xs:annotation>
+				<xs:documentation>Height of optional icon associated with service.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
 
 	<xs:element name='apply'>
 		<xs:annotation>

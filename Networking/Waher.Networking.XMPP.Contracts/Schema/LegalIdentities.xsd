@@ -45,6 +45,50 @@
 		</xs:complexType>
 	</xs:element>
 
+	<xs:element name='applicationAttributes'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq get to a Trust Provider, to get a list of attributes and properties relevant for applications for legal identities on the broker.</xs:documentation>
+			<xs:documentation>Expected response element: idApplicationAttributes</xs:documentation>
+		</xs:annotation>
+		<xs:complexType/>
+	</xs:element>
+
+	<xs:element name='idApplicationAttributes'>
+		<xs:annotation>
+			<xs:documentation>Element sent as a response to an applicationAttributes request.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name='required' type='xs:string' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Contains the name of a property that is required for an identity application to be allowed to participate in peer review.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name='peerReview' type='xs:boolean' use='optional' default='false'>
+				<xs:annotation>
+					<xs:documentation>Indicates if the Trust Provider accepts peer reviews of identity applications.</xs:documentation>
+					<xs:documentation>If enabled, additional attributes and child elements detail what is expected by identity applications to be permitted to participate in peer reviews.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='nrReviewers' type='xs:positiveInteger' use='optional'>
+				<xs:annotation>
+					<xs:documentation>If peerReview is enabled, this attribute indicates the number of reviewers with positive reviews that are required for an identity application to be approved.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='nrPhotos' type='xs:nonNegativeInteger' use='optional' default='0'>
+				<xs:annotation>
+					<xs:documentation>If peerReview is enabled, number of photos required for an identity application to be allowed to participate in a peer review process.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='iso3166' type='xs:boolean' use='optional' default='false'>
+				<xs:annotation>
+					<xs:documentation>Indicates if the Trust Provider requires ISO 3166 country codes for identity applications.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
 	<xs:element name='apply'>
 		<xs:annotation>
 			<xs:documentation>Sent by a client in an iq set to a Trust Provider, to apply for a pairing between the online identity (bare JID) of the sender and a Legal Identity.</xs:documentation>
@@ -120,6 +164,7 @@
 								<xs:documentation>EMAIL = E-mail address.</xs:documentation>
 								<xs:documentation>JID = XMPP address (Jabber ID).</xs:documentation>
 								<xs:documentation>DOMAIN = If the ID represents the legal representative of a domain.</xs:documentation>
+								<xs:documentation>HOMEPAGE = If the ID represents the legal representative of a domain.</xs:documentation>
 								<xs:documentation>PREVIEW = A reference to a preview of the identity application.</xs:documentation>
 								<xs:documentation>PSEUDONYM = Lists which properties are pseudonymous. Comma-separated list.</xs:documentation>
 								<xs:documentation>PROFILE = Name of Identity Profile or Identity Profiles (Comma-separated list).</xs:documentation>
@@ -347,7 +392,7 @@
 					<xs:documentation>Binary data claimed to be signed.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
-			<xs:attribute name="s" type="xs:base64Binary" use="optional">
+			<xs:attribute name="s" type="xs:base64Binary" use="required">
 				<xs:annotation>
 					<xs:documentation>Digital signature to validate.</xs:documentation>
 				</xs:annotation>
@@ -491,9 +536,19 @@
 						</xs:annotation>
 					</xs:any>
 				</xs:sequence>
+				<xs:attribute name='id' type='xs:string' use='required'>
+					<xs:annotation>
+						<xs:documentation>Identifier of the legal identity referred to by the petition.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
 				<xs:attribute name='from' type='xs:string' use='required'>
 					<xs:annotation>
 						<xs:documentation>The Bare JID of the entity requesting the information.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='clientEp' type='xs:string' use='optional'>
+					<xs:annotation>
+						<xs:documentation>The remote endpoint of the entity requesting the information.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
 			</xs:extension>

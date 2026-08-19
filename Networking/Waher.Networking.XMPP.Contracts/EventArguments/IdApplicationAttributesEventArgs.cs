@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 
 								bool IsProperties = E2.LocalName == "properties";
 
-								foreach (XmlNode N3 in E.ChildNodes)
+								foreach (XmlNode N3 in E2.ChildNodes)
 								{
 									if (!(N3 is XmlElement E3))
 										continue;

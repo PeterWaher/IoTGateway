@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
@@ -13,8 +14,24 @@ namespace Waher.Networking.Sniffers
 	/// </summary>
 	public abstract class SnifferBase : ISniffer, ISniffEventProcessor, IDisposableAsync
 	{
+		private static readonly string[] defaultSensitiveWords = new string[]
+		{
+			"password",
+			"secret",
+			"key",
+			"authorization",
+			"access_token",
+			"refresh_token",
+			"session",
+			"code"
+		};
+
+		private string[] sensitiveWords = defaultSensitiveWords;
 		private AsyncProcessor<SnifferEvent> processor;
 		private readonly bool onlyBinaryCount;
+		private readonly object syncObj = new object();
+		private int nrSensitiveWords = defaultSensitiveWords.Length;
+		private bool maskText = true;
 
 		/// <summary>
 		/// Abstract base class for sniffers. Implements default method overloads.
@@ -68,6 +85,90 @@ namespace Waher.Networking.Sniffers
 		/// Number of items in queue.
 		/// </summary>
 		public int QueueSize => this.processor?.QueueSize ?? 0;
+
+		/// <summary>
+		/// Disables masking of sensitive words in text events.
+		/// </summary>
+		public void DisableMask()
+		{
+			lock (this.syncObj)
+			{
+				this.maskText = false;
+				this.nrSensitiveWords = 0;
+				this.sensitiveWords = Array.Empty<string>();
+			}
+		}
+
+		/// <summary>
+		/// Sets the sensitive words to mask in text events. If any of these words are
+		/// found in a text event, the entire line will be replaced with 
+		/// "******** MASKED ********".
+		/// </summary>
+		/// <param name="SensitiveWords">Array of sensitive words. Masking is disabled
+		/// if the array is empty.</param>
+		public void SetMask(params string[] SensitiveWords)
+		{
+			lock (this.syncObj)
+			{
+				this.nrSensitiveWords = SensitiveWords?.Length ?? 0;
+				this.sensitiveWords = SensitiveWords ?? Array.Empty<string>();
+				this.maskText = this.nrSensitiveWords > 0;
+			}
+		}
+
+		/// <summary>
+		/// Masks sensitive words in text events. If any of these words are found in a 
+		/// text event, the entire line will be replaced with "******** MASKED ********".
+		/// </summary>
+		/// <param name="Text">Text to mask.</param>
+		/// <returns>Masked text.</returns>
+		protected string Mask(string Text)
+		{
+			lock (this.syncObj)
+			{
+				if (!this.maskText)
+					return Text;
+
+				string s = Text?.ToLower() ?? string.Empty;
+				int i;
+
+				for (i = 0; i < this.nrSensitiveWords; i++)
+				{
+					if (s.Contains(this.sensitiveWords[i]))
+						break;
+				}
+
+				if (i >= this.nrSensitiveWords)
+					return Text;
+
+				StringBuilder sb = new StringBuilder();
+				string[] Rows = Text.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+				int j, k, d = Rows.Length;
+				string Row;
+
+				for (k = 0; k < d; k++)
+				{
+					Row = Rows[k];
+					s = Row.ToLower();
+
+					for (j = i; j < this.nrSensitiveWords; j++)
+					{
+						if (s.Contains(this.sensitiveWords[j]))
+							break;
+					}
+
+					if (k > 0)
+						sb.AppendLine();
+
+					if (j < this.nrSensitiveWords)
+						sb.Append("******** MASKED ********");
+					else
+						sb.Append(Row);
+				}
+
+				return sb.ToString();
+			}
+		}
 
 		/// <summary>
 		/// Called when binary data has been received.
@@ -266,7 +367,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Text">Text</param>
 		public void ReceiveText(string Text)
 		{
-			this.ReceiveText(DateTime.UtcNow, Text);
+			this.ReceiveText(DateTime.UtcNow, this.Mask(Text));
 		}
 
 		/// <summary>
@@ -276,7 +377,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Text">Text</param>
 		public void ReceiveText(DateTime Timestamp, string Text)
 		{
-			this.processor?.Queue(new SnifferRxText(Timestamp, Text, this));
+			this.processor?.Queue(new SnifferRxText(Timestamp, this.Mask(Text), this));
 		}
 
 		/// <summary>
@@ -285,7 +386,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Text">Text</param>
 		public void TransmitText(string Text)
 		{
-			this.TransmitText(DateTime.UtcNow, Text);
+			this.TransmitText(DateTime.UtcNow, this.Mask(Text));
 		}
 
 		/// <summary>
@@ -295,7 +396,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Text">Text</param>
 		public void TransmitText(DateTime Timestamp, string Text)
 		{
-			this.processor?.Queue(new SnifferTxText(Timestamp, Text, this));
+			this.processor?.Queue(new SnifferTxText(Timestamp, this.Mask(Text), this));
 		}
 
 		/// <summary>
@@ -304,7 +405,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Comment">Comment.</param>
 		public void Information(string Comment)
 		{
-			this.Information(DateTime.UtcNow, Comment);
+			this.Information(DateTime.UtcNow, this.Mask(Comment));
 		}
 
 		/// <summary>
@@ -314,7 +415,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Comment">Comment.</param>
 		public void Information(DateTime Timestamp, string Comment)
 		{
-			this.processor?.Queue(new SnifferInformation(Timestamp, Comment, this));
+			this.processor?.Queue(new SnifferInformation(Timestamp, this.Mask(Comment), this));
 		}
 
 		/// <summary>
@@ -323,7 +424,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Warning">Warning.</param>
 		public void Warning(string Warning)
 		{
-			this.Warning(DateTime.UtcNow, Warning);
+			this.Warning(DateTime.UtcNow, this.Mask(Warning));
 		}
 
 		/// <summary>
@@ -333,7 +434,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Warning">Warning.</param>
 		public void Warning(DateTime Timestamp, string Warning)
 		{
-			this.processor?.Queue(new SnifferWarning(Timestamp, Warning, this));
+			this.processor?.Queue(new SnifferWarning(Timestamp, this.Mask(Warning), this));
 		}
 
 		/// <summary>
@@ -342,7 +443,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Error">Error.</param>
 		public void Error(string Error)
 		{
-			this.Error(DateTime.UtcNow, Error);
+			this.Error(DateTime.UtcNow, this.Mask(Error));
 		}
 
 		/// <summary>
@@ -352,7 +453,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Error">Error.</param>
 		public void Error(DateTime Timestamp, string Error)
 		{
-			this.processor?.Queue(new SnifferError(Timestamp, Error, this));
+			this.processor?.Queue(new SnifferError(Timestamp, this.Mask(Error), this));
 		}
 
 		/// <summary>
@@ -361,7 +462,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Exception">Exception.</param>
 		public void Exception(string Exception)
 		{
-			this.Exception(DateTime.UtcNow, Exception);
+			this.Exception(DateTime.UtcNow, this.Mask(Exception));
 		}
 
 		/// <summary>
@@ -371,7 +472,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Exception">Exception.</param>
 		public void Exception(DateTime Timestamp, string Exception)
 		{
-			this.processor?.Queue(new SnifferException(Timestamp, Exception, this));
+			this.processor?.Queue(new SnifferException(Timestamp, this.Mask(Exception), this));
 		}
 
 		/// <summary>
@@ -410,7 +511,8 @@ namespace Waher.Networking.Sniffers
 					Inner.Add(Exception.InnerException);
 				}
 
-				this.Exception(Timestamp, Exception.Message + "\r\n\r\n" + Log.CleanStackTrace(Exception.StackTrace));
+				this.Exception(Timestamp, Exception.Message + "\r\n\r\n" + 
+					Log.CleanStackTrace(Exception.StackTrace));
 
 				if (!(Inner?.HasFirstItem ?? false))
 					Exception = null;

@@ -8044,11 +8044,16 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(RequestorFullJid));
 			Xml.Append("' response='");
 			Xml.Append(CommonTypes.Encode(Response));
-			Xml.Append("'><content>");
-			Xml.Append(Convert.ToBase64String(Content));
-			Xml.Append("</content><signature>");
-			Xml.Append(Convert.ToBase64String(Signature));
-			Xml.Append("</signature>");
+			Xml.Append("'>");
+
+			if (Response)
+			{
+				Xml.Append("<content>");
+				Xml.Append(Convert.ToBase64String(Content));
+				Xml.Append("</content><signature>");
+				Xml.Append(Convert.ToBase64String(Signature));
+				Xml.Append("</signature>");
+			}
 
 			if (!string.IsNullOrEmpty(ContextXml))
 				Xml.Append(ContextXml);
@@ -8158,6 +8163,8 @@ namespace Waher.Networking.XMPP.Contracts
 			string PetitionId = XML.Attribute(e.Content, "pid");
 			bool Response = XML.Attribute(e.Content, "response", false);
 			string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
+			string ContentStr = string.Empty;
+			byte[] Content = null;
 			string SignatureStr = string.Empty;
 			byte[] Signature = null;
 			LegalIdentity Identity = null;
@@ -8171,6 +8178,11 @@ namespace Waher.Networking.XMPP.Contracts
 					{
 						case "identity":
 							Identity = LegalIdentity.Parse(E);
+							break;
+
+						case "content":
+							ContentStr = E.InnerText;
+							Content = Convert.FromBase64String(ContentStr);
 							break;
 
 						case "signature":
@@ -8202,6 +8214,26 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					this.client.Warning("Identity missing. Response ignored.");
 					return;
+				}
+
+				if (!(Content is null))
+				{
+					int i, c = Content.Length;
+
+					if (c != P.Key.Length)
+					{
+						this.client.Warning("Content length does not match original petition. Response ignored.");
+						return;
+					}
+
+					for (i = 0; i < c; i++)
+					{
+						if (Content[i] != P.Key[i])
+						{
+							this.client.Warning("Content does not match original petition. Response ignored.");
+							return;
+						}
+					}
 				}
 
 				if (Signature is null)

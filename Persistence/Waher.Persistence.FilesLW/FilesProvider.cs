@@ -876,6 +876,7 @@ namespace Waher.Persistence.Files
 				RSACryptoServiceProvider rsa = null;
 				CspParameters CspParams = new CspParameters()
 				{
+					// Flags to only get existing key in machine store.
 					Flags =
 						CspProviderFlags.UseMachineKeyStore |
 						CspProviderFlags.NoPrompt |
@@ -889,10 +890,15 @@ namespace Waher.Persistence.Files
 				try
 				{
 					rsa = new RSACryptoServiceProvider(CspParams);
+
 					if (!FileExists)
 					{
 						if (this.deleteObsoleteKeys)
 							rsa.PersistKeyInCsp = false;    // Deletes key.
+						else if (rsa.KeySize > 1024)
+							KeyGenMode |= 1;
+						else if (rsa.KeySize == 768)
+							KeyGenMode |= 2;
 					}
 					else if (rsa.KeySize > 1024)
 						KeyGenMode |= 1;
@@ -918,53 +924,59 @@ namespace Waher.Persistence.Files
 					rsa?.Dispose();
 					rsa = null;
 
+					// Flags to create key in machine store, and not prompt for user
+					// interaction.
+
 					CspParams.Flags =
 						CspProviderFlags.UseMachineKeyStore |
 						CspProviderFlags.NoPrompt;
 
 					try
 					{
-						rsa = new RSACryptoServiceProvider(768, CspParams);
-
-						if ((KeyGenMode & 2) == 0)
-						{
-							Parameters = rsa.ExportParameters(true);
-
-							byte[] P = GetRandomBytes(48);
-							byte[] Q = GetRandomBytes(48);
-
-							P[47] = 1;
-							Q[47] = 1;
-
-							Parameters.P = P;
-							Parameters.Q = Q;
-
-							rsa.ImportParameters(Parameters);
-
-							KeyGenMode |= 2;
-						}
-					}
-					catch (CryptographicException)
-					{
-						try
-						{
-							rsa = new RSACryptoServiceProvider(4096, CspParams);
-						}
-						catch (CryptographicException)
-						{
-							try
-							{
-								rsa = new RSACryptoServiceProvider(CspParams);
-							}
-							catch (CryptographicException ex2)
-							{
-								throw new CryptographicException("Unable to get access to cryptographic key for database file " + FileName +
-									". (" + ex2.Message + ") Was the database created using another user?", ex2);
-							}
-						}
+						rsa = new RSACryptoServiceProvider(4096, CspParams);
 
 						if (rsa.KeySize > 1024)
 							KeyGenMode |= 1;
+						else if (rsa.KeySize == 768)
+							KeyGenMode |= 2;
+
+						// Using prime parameters as carriers of random keys seems no
+						// longer to be possible. May throw exception.
+						//
+						//if ((KeyGenMode & 2) == 0)
+						//{
+						//	Parameters = rsa.ExportParameters(true);
+						//
+						//	byte[] P = GetRandomBytes(48);
+						//	byte[] Q = GetRandomBytes(48);
+						//
+						//	P[47] = 1;
+						//	Q[47] = 1;
+						//
+						//	Parameters.P = P;
+						//	Parameters.Q = Q;
+						//
+						//	rsa.ImportParameters(Parameters);
+						//
+						//	KeyGenMode |= 2;
+						//}
+					}
+					catch (CryptographicException ex)
+					{
+						try
+						{
+							rsa = new RSACryptoServiceProvider(CspParams);
+
+							if (rsa.KeySize > 1024)
+								KeyGenMode |= 1;
+							else if (rsa.KeySize == 768)
+								KeyGenMode |= 2;
+						}
+						catch (CryptographicException ex2)
+						{
+							throw new CryptographicException("Unable to get access to cryptographic key for database file " + FileName +
+								". (" + ex2.Message + ") Was the database created using another user?", ex2);
+						}
 					}
 				}
 
@@ -973,11 +985,10 @@ namespace Waher.Persistence.Files
 				rsa.Dispose();
 				rsa = null;
 
-
-				if ((KeyGenMode & 2) != 0)
+				if ((KeyGenMode & 2) != 0)	// 768 bit key
 				{
-					Key = Parameters.P;
-					IV = Parameters.Q;
+					Key = (byte[])Parameters.P.Clone();
+					IV = (byte[])Parameters.Q.Clone();
 
 					Array.Resize(ref Key, 32);
 					Array.Resize(ref IV, 32);
@@ -986,7 +997,7 @@ namespace Waher.Persistence.Files
 				{
 					using (SHA256 Sha256 = SHA256.Create())
 					{
-						if ((KeyGenMode & 1) != 0)
+						if ((KeyGenMode & 1) != 0)	// > 1024 bit key (i.e. 4096 bit key)
 						{
 							int pLen = Parameters.P.Length;
 							int qLen = Parameters.Q.Length;
@@ -998,7 +1009,7 @@ namespace Waher.Persistence.Files
 							Key = Sha256.ComputeHash(Bin);
 							IV = Sha256.ComputeHash(Parameters.Modulus);
 						}
-						else
+						else	// 1024 bit key
 						{
 							IV = Sha256.ComputeHash(Parameters.P);
 							Key = Sha256.ComputeHash(Parameters.Q);

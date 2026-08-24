@@ -1892,8 +1892,11 @@ namespace Waher.IoTGateway
 							sb.AppendLine();
 							sb.Append("[Click here to review the new system configuration](http");
 
-							if (DomainConfiguration.Instance.UseEncryption && !string.IsNullOrEmpty(DomainConfiguration.Instance.Domain))
+							if (DomainConfiguration.Instance.UseEncryption &&
+								!string.IsNullOrEmpty(DomainConfiguration.Instance.Domain))
+							{
 								sb.Append('s');
+							}
 
 							sb.Append("://");
 							sb.Append(DomainConfiguration.Instance.Domain);

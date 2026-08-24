@@ -85,7 +85,6 @@ namespace Waher.Persistence.Files
 				this.file = File.Open(this.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
 			else
 				this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
-
 		}
 
 		/// <summary>

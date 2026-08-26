@@ -56,6 +56,7 @@ namespace Waher.Content.Xml.Text
 			if (Xml.HasChildNodes)
 			{
 				Dictionary<string, ChunkedList<XmlElement>> ChildElements = null;
+				ChunkedList<XmlElement> Ordered = null;
 				StringBuilder InnerText = null;
 
 				foreach (XmlNode N in Xml.ChildNodes)
@@ -71,7 +72,11 @@ namespace Waher.Content.Xml.Text
 							ChildElements[E.LocalName] = Elements;
 						}
 
+						if (Ordered is null)
+							Ordered = new ChunkedList<XmlElement>();
+
 						Elements.Add(E);
+						Ordered.Add(E);
 					}
 					else if (N is XmlText ||
 						N is XmlCDataSection ||
@@ -94,6 +99,9 @@ namespace Waher.Content.Xml.Text
 						else
 							AppendProperty(P.Key, P.Value, Indent, ref First, Json);
 					}
+
+					if (ChildElements.Count > 1)
+						AppendProperty("__ordered", Ordered.ToArray(), Indent, ref First, Json);
 
 					if (!(InnerText is null))
 					{

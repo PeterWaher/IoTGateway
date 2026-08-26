@@ -961,7 +961,7 @@ namespace Waher.Persistence.Files
 						//	KeyGenMode |= 2;
 						//}
 					}
-					catch (CryptographicException ex)
+					catch (CryptographicException)
 					{
 						try
 						{
@@ -1279,6 +1279,9 @@ namespace Waher.Persistence.Files
 
 			foreach (ObjectBTreeFile File in Files)
 			{
+				if (File is null)
+					continue;
+
 				await File.BeginWrite();
 				await File.EndWrite();   // Saves unsaved data.
 			}
@@ -3410,6 +3413,9 @@ namespace Waher.Persistence.Files
 			{
 				foreach (ObjectBTreeFile File in Files)
 				{
+					if (File is null)
+						continue;
+
 					if (!(CollectionNames is null) && Array.IndexOf(CollectionNames, File.CollectionName) < 0)
 						continue;
 
@@ -3598,6 +3604,9 @@ namespace Waher.Persistence.Files
 			{
 				foreach (ObjectBTreeFile File in Files)
 				{
+					if (File is null)
+						continue;
+
 					if (!(CollectionNames is null) && Array.IndexOf(CollectionNames, File.CollectionName) < 0)
 						continue;
 

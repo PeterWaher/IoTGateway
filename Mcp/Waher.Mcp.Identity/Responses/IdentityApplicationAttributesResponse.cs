@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Mcp.Xmpp.Responses;
+﻿using Waher.Mcp.Xmpp.Responses;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Networking.XMPP.Contracts.EventArguments;
 

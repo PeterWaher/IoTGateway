@@ -727,7 +727,7 @@ namespace Waher.Mcp.Xmpp
 
 			XmppClient? Client = await this.GetClient(this, Call, User, Session, true);
 			if (Client is null)
-				return new GenericResponse(false, "MCP XMPP client available.");
+				return new GenericResponse(false, "MCP XMPP client not available.");
 
 			await Client.RequestPresenceSubscription(To);
 
@@ -766,7 +766,7 @@ namespace Waher.Mcp.Xmpp
 
 			XmppClient? Client = await this.GetClient(this, Call, User, Session, true);
 			if (Client is null)
-				return new GenericResponse(false, "MCP XMPP client available.");
+				return new GenericResponse(false, "MCP XMPP client not available.");
 
 			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
 				McpXmppExtension is null)
@@ -814,7 +814,7 @@ namespace Waher.Mcp.Xmpp
 
 			XmppClient? Client = await this.GetClient(this, Call, User, Session, true);
 			if (Client is null)
-				return new GenericResponse(false, "MCP XMPP client available.");
+				return new GenericResponse(false, "MCP XMPP client not available.");
 
 			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
 				McpXmppExtension is null)
@@ -865,7 +865,7 @@ namespace Waher.Mcp.Xmpp
 
 			XmppClient? Client = await this.GetClient(this, Call, User, Session, true);
 			if (Client is null)
-				return new GenericResponse(false, "MCP XMPP client available.");
+				return new GenericResponse(false, "MCP XMPP client not available.");
 
 			await Client.RequestPresenceUnsubscription(To);
 
@@ -916,7 +916,7 @@ namespace Waher.Mcp.Xmpp
 
 			XmppClient? Client = await this.GetClient(this, Call, User, Session, true);
 			if (Client is null)
-				return new GenericResponse(false, "MCP XMPP client available.");
+				return new GenericResponse(false, "MCP XMPP client not available.");
 
 			if (!(Client.GetRosterItem(BareJid) is null))
 				return new GenericResponse(false, "Contact already in roster.");
@@ -984,7 +984,7 @@ namespace Waher.Mcp.Xmpp
 
 			XmppClient? Client = await this.GetClient(this, Call, User, Session, true);
 			if (Client is null)
-				return new GenericResponse(false, "MCP XMPP client available.");
+				return new GenericResponse(false, "MCP XMPP client not available.");
 
 			RosterItem Item = Client.GetRosterItem(BareJid);
 			if (Item is null)
@@ -1045,7 +1045,7 @@ namespace Waher.Mcp.Xmpp
 
 			XmppClient? Client = await this.GetClient(this, Call, User, Session, true);
 			if (Client is null)
-				return new GenericResponse(false, "MCP XMPP client available.");
+				return new GenericResponse(false, "MCP XMPP client not available.");
 
 			RosterItem Item = Client.GetRosterItem(BareJid);
 			if (Item is null)
@@ -1116,7 +1116,7 @@ namespace Waher.Mcp.Xmpp
 
 			XmppClient? Client = await this.GetClient(this, Call, User, Session, true);
 			if (Client is null)
-				return new GenericResponse(false, "MCP XMPP client available.");
+				return new GenericResponse(false, "MCP XMPP client not available.");
 
 			string Markdown;
 			string Html;
@@ -1262,7 +1262,7 @@ namespace Waher.Mcp.Xmpp
 
 			XmppClient? Client = await this.GetClient(this, Call, User, Session, true);
 			if (Client is null)
-				return new MessageResponse("MCP XMPP client available.");
+				return new MessageResponse("MCP XMPP client not available.");
 
 			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
 				McpXmppExtension is null)
@@ -1311,7 +1311,7 @@ namespace Waher.Mcp.Xmpp
 
 			XmppClient? Client = await this.GetClient(this, Call, User, Session, true);
 			if (Client is null)
-				return new MessageResponse("MCP XMPP client available.");
+				return new MessageResponse("MCP XMPP client not available.");
 
 			if (!Client.TryGetExtension(out McpXmppExtension? McpXmppExtension) ||
 				McpXmppExtension is null)

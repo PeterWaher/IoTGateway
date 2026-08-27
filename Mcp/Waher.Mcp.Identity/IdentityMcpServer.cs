@@ -249,7 +249,6 @@ namespace Waher.Mcp.Identity
 		public async Task<ContractsClient?> GetClient(IJsonRpcCall Call, IUser User,
 			Session Session, bool CreateIfNotDefined)
 		{
-			bool ConnectedAtStart = this.xmppMcpServer.IsConnected(User, Session);
 			XmppClient? Client = await this.xmppMcpServer.GetClient(this, Call, User,
 				Session, CreateIfNotDefined);
 
@@ -362,7 +361,7 @@ namespace Waher.Mcp.Identity
 
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
-				return new IdentityApplicationAttributesResponse("MCP XMPP Contracts client available.");
+				return new IdentityApplicationAttributesResponse("MCP XMPP Contracts client not available.");
 
 			IdApplicationAttributesEventArgs e = await Client.GetIdApplicationAttributesAsync();
 
@@ -398,7 +397,7 @@ namespace Waher.Mcp.Identity
 
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
-				return new IdentityResponse("MCP XMPP Contracts client available.");
+				return new IdentityResponse("MCP XMPP Contracts client not available.");
 
 			PersonalInformationInput UserInput = new PersonalInformationInput();
 			LegalIdentity? Identity = null;
@@ -581,7 +580,7 @@ namespace Waher.Mcp.Identity
 
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
-				return new IdentityResponse("MCP XMPP Contracts client available.");
+				return new IdentityResponse("MCP XMPP Contracts client not available.");
 
 			PhotoInput UserInput;
 			LegalIdentity? Identity = null;
@@ -748,7 +747,7 @@ namespace Waher.Mcp.Identity
 
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
-				return new IdentityResponse("MCP XMPP Contracts client available.");
+				return new IdentityResponse("MCP XMPP Contracts client not available.");
 
 			if (!ContentTypePhoto.StartsWith("image/"))
 				return new IdentityResponse("Attachment must be an image.");
@@ -840,7 +839,7 @@ namespace Waher.Mcp.Identity
 
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
-				return new IdentityResponse("MCP XMPP Contracts client available.");
+				return new IdentityResponse("MCP XMPP Contracts client not available.");
 
 			ContentResponse Content = await InternetContent.GetAsync(PhotoUrl,
 				new KeyValuePair<string, string>("Accept", "image/*"));
@@ -907,7 +906,7 @@ namespace Waher.Mcp.Identity
 
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
-				return new IdentityResponse("MCP XMPP Contracts client available.");
+				return new IdentityResponse("MCP XMPP Contracts client not available.");
 
 			try
 			{
@@ -964,7 +963,7 @@ namespace Waher.Mcp.Identity
 
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
-				return new IdentityResponse("MCP XMPP Contracts client available.");
+				return new IdentityResponse("MCP XMPP Contracts client not available.");
 
 			LegalId = RemoveUriScheme(LegalId);
 
@@ -1013,7 +1012,7 @@ namespace Waher.Mcp.Identity
 
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
-				return new IdentityResponse("MCP XMPP Contracts client available.");
+				return new IdentityResponse("MCP XMPP Contracts client not available.");
 
 			LegalId = RemoveUriScheme(LegalId);
 
@@ -1062,7 +1061,7 @@ namespace Waher.Mcp.Identity
 
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
-				return new GenericResponse(false, "MCP XMPP Contracts client available.");
+				return new GenericResponse(false, "MCP XMPP Contracts client not available.");
 
 			LegalId = RemoveUriScheme(LegalId);
 

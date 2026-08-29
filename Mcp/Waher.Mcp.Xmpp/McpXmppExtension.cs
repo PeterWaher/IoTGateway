@@ -13,7 +13,7 @@ namespace Waher.Mcp.Xmpp
 	/// <summary>
 	/// Contains information about an MCP XMPP session.
 	/// </summary>
-	internal class McpXmppExtension : IXmppExtension
+	public class McpXmppExtension : IXmppExtension
 	{
 		private readonly IJsonRpcCall firstCall;
 		private readonly HashSet<string> sessionIds = new HashSet<string>();

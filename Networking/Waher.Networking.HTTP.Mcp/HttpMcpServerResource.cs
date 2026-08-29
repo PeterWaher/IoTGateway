@@ -2723,7 +2723,7 @@ namespace Waher.Networking.HTTP.Mcp
 		/// <param name="Sensitive">If information is sensitive.</param>
 		/// <param name="Session">MCP session object.</param>
 		/// <param name="Timeout">Timeout in milliseconds.</param>
-		/// <returns>Returns true if used provided input (which will be stored in
+		/// <returns>Returns true if user provided input (which will be stored in
 		/// <paramref name="InputRequest"/>, false if user declined to provide user
 		/// input, or null if request was cancelled or timed out.</returns>
 		public async Task<bool?> ElicitUserInput<T>(IJsonRpcCall Call, string Message,
@@ -2857,9 +2857,86 @@ namespace Waher.Networking.HTTP.Mcp
 			return await Request.WaitForResultAsync(Timeout);
 		}
 
-		private void Request_ResultReturned(object sender, EventArgs e)
+		/// <summary>
+		/// Elicits input from the user, if the client supports elicitation.
+		/// </summary>
+		/// <param name="Call">JSON-RPC Request object.</param>
+		/// <param name="Message">Message to display to the user.</param>
+		/// <param name="Url">URL to open.</param>
+		/// <param name="Session">MCP session object.</param>
+		/// <returns>Returns true if URL propagated to user.</returns>
+		public async Task<bool> ElicitOpenUrl(IJsonRpcCall Call, string Message,
+			string Url, Session Session)
 		{
-			throw new System.NotImplementedException();
+			if (Session.ClientCapabilities?.Elicitation is null)
+				return false;
+
+			if (!Session.ClientCapabilities.Elicitation.Url)
+				return false;
+
+			Dictionary<string, object?> ElicitationRequest = new Dictionary<string, object?>()
+			{
+				{ "mode", "url" },
+				{ "message", Message },
+				{ "url", Url }
+			};
+
+			using JsonRpcClientRequest<bool?> Request = this.CreateRequest(
+				Message, "elicitation/create", ElicitationRequest, Session,
+				Result =>
+				{
+					if (!(Result is Dictionary<string, object> ResultObj))
+						return Task.FromResult<bool?>(false);
+
+					if (!ResultObj.TryGetValue("action", out object Obj) ||
+						!(Obj is string Action))
+					{
+						return Task.FromResult<bool?>(false);
+					}
+
+					return Action switch
+					{
+						"decline" => Task.FromResult<bool?>(false),
+						"cancel" => Task.FromResult<bool?>(null),
+						"accept" => Task.FromResult<bool?>(true),
+						_ => Task.FromResult<bool?>(false),
+					};
+				},
+				Call);
+
+			async Task Completed(object _, EventArgs e)
+			{
+				Dictionary<string, object> Notification = new Dictionary<string, object>()
+				{
+					{ "jsonrpc", "2.0" },
+					{ "method", "notifications/elicitation/complete" },
+					{ "params", new Dictionary<string, object?>()
+						{
+							{ "elicitationId", Request.Id }
+						}
+					}
+				};
+
+				await this.SendNotification(
+					Session2 =>
+					{
+						if (Session.SessionId != Session2?.SessionId)
+							return false;
+
+						Session2.TransmitText(JSON.Encode(Notification, false));
+
+						return true;
+					},
+					Notification);
+			}
+
+			Request.ResultReturned += Completed;
+			Request.ErrorReturned += Completed;
+			Request.Cancelled += Completed;
+
+			await Request.SendRequest();
+
+			return true;
 		}
 
 		internal static async Task SetProperties(object Object, Dictionary<string, object> Properties)

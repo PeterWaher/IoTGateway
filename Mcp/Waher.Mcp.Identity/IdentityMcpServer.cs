@@ -25,6 +25,7 @@ using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.HttpFileUpload;
 using Waher.Runtime.Collections;
+using Waher.Script.Constants;
 using Waher.Security;
 
 namespace Waher.Mcp.Identity
@@ -1188,7 +1189,7 @@ namespace Waher.Mcp.Identity
 			sb.AppendLine(e.Body);
 
 			AppendApplicationInfo(sb, e);
-			
+
 			await this.ElicitUserInput(Tag.Call, sb.ToString(), new Acknowledgement(),
 				false, Tag.Session, 5 * 60 * 1000);
 		}
@@ -1412,22 +1413,236 @@ namespace Waher.Mcp.Identity
 				false, Tag.Session, 5 * 60 * 1000);
 		}
 
-		private Task ContractsClient_PetitionForSignatureReceived(object Sender, SignaturePetitionEventArgs e)
+		private async Task ContractsClient_PetitionForIdentityReceived(object Sender,
+			LegalIdentityPetitionEventArgs e)
 		{
-			return Task.CompletedTask;  // TODO
+			if (!(Sender is ContractsClient ContractsClient))
+				return;
+
+			if (!ContractsClient.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
+				return;
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("A petition for one of your Legal Identities (");
+			sb.Append(e.RequestedIdentityId);
+			sb.Append(") has been received: ");
+			sb.Append(e.Purpose);
+
+			AppendQuestionAndRequestor(sb, e.RequestorIdentity, e.RequestorFullJid,
+				e.Properties, e.Attachments, e.ClientEndpoint);
+
+			foreach (string SessionId in McpXmppExtension.SessionIds)
+			{
+				if (this.TryGetMcpSession(SessionId, out Session? Session) &&
+					!(Session.User is null))
+				{
+					Petition Petition = new Petition();
+					bool? Result = await this.ElicitUserInput(McpXmppExtension.FirstCall,
+						sb.ToString(), Petition, true, Session, 5 * 60 * 1000);
+
+					if (Result.HasValue)
+					{
+						await ContractsClient.PetitionIdentityResponseAsync(
+							e.RequestedIdentityId, e.PetitionId, e.RequestorFullJid,
+							Result.Value);
+						break;
+					}
+				}
+			}
 		}
 
-		private Task ContractsClient_PetitionForPeerReviewIDReceived(object Sender, SignaturePetitionEventArgs e)
+		private static void AppendQuestionAndRequestor(StringBuilder sb, LegalIdentity Identity,
+			string FullJid, string[] Properties, string[] Attachments, string RemoteEndpoint)
 		{
-			return Task.CompletedTask;  // TODO
+			if (!string.IsNullOrEmpty(RemoteEndpoint))
+			{
+				sb.Append(" (Source: ");
+				sb.Append(RemoteEndpoint);
+				sb.Append(')');
+			}
+
+			sb.Append(" Do you want to accept or decline the request? ");
+			sb.AppendLine("Information about the requestor follows:");
+
+			bool JidIncluded = false;
+
+			foreach (Property P in Identity.Properties)
+			{
+				JidIncluded |= P.Name == PersonalInformation.JidTag;
+
+				sb.AppendLine();
+				sb.Append(P.Name);
+				sb.Append(": ");
+				sb.Append(P.Value);
+			}
+
+			if (!JidIncluded)
+			{
+				sb.AppendLine();
+				sb.Append(PersonalInformation.JidTag);
+				sb.Append(": ");
+				sb.Append(XmppClient.GetBareJID(FullJid));
+			}
+
+			if ((Properties?.Length ?? 0) > 0)
+			{
+				sb.AppendLine();
+				sb.AppendLine();
+				sb.AppendLine("Only these properties of your identity will be returned:");
+
+				foreach (string Name in Properties!)
+				{
+					sb.AppendLine();
+					sb.Append("* ");
+					sb.Append(Name);
+				}
+			}
+
+			if ((Attachments?.Length ?? 0) > 0)
+			{
+				sb.AppendLine();
+				sb.AppendLine();
+				sb.AppendLine("Only these attachments of your identity will be returned:");
+
+				foreach (string Name in Attachments!)
+				{
+					sb.AppendLine();
+					sb.Append("* ");
+					sb.Append(Name);
+				}
+			}
 		}
 
-		private Task ContractsClient_PetitionForIdentityReceived(object Sender, LegalIdentityPetitionEventArgs e)
+		private async Task ContractsClient_PetitionForSignatureReceived(object Sender, SignaturePetitionEventArgs e)
 		{
-			return Task.CompletedTask;  // TODO
+			if (!(Sender is ContractsClient ContractsClient))
+				return;
+
+			if (!ContractsClient.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
+				return;
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("A petition for a digital signature has been received: ");
+			sb.Append(e.Purpose);
+
+			AppendQuestionAndRequestor(sb, e.RequestorIdentity, e.RequestorFullJid,
+				e.Properties, e.Attachments, e.ClientEndpoint);
+
+			foreach (string SessionId in McpXmppExtension.SessionIds)
+			{
+				if (this.TryGetMcpSession(SessionId, out Session? Session) &&
+					!(Session.User is null))
+				{
+					Petition Petition = new Petition();
+					bool? Result = await this.ElicitUserInput(McpXmppExtension.FirstCall,
+						sb.ToString(), Petition, true, Session, 5 * 60 * 1000);
+
+					if (Result.HasValue)
+					{
+						byte[] Signature;
+
+						if (Result.Value)
+						{
+							Signature = await ContractsClient.SignAsync(e.ContentToSign,
+								SignWith.CurrentKeys);
+						}
+						else
+							Signature = Array.Empty<byte>();
+
+						await ContractsClient.PetitionSignatureResponseAsync(
+							e.SignatoryIdentityId, e.ContentToSign, Signature, e.PetitionId,
+							e.RequestorFullJid, Result.Value);
+						break;
+					}
+				}
+			}
 		}
 
-		private Task ContractsClient_PetitionForContractReceived(object Sender, ContractPetitionEventArgs e)
+		private async Task ContractsClient_PetitionForPeerReviewIDReceived(object Sender, SignaturePetitionEventArgs e)
+		{
+			if (!(Sender is ContractsClient ContractsClient))
+				return;
+
+			if (!ContractsClient.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
+				return;
+
+			await ContractsClient.PetitionSignatureResponseAsync(
+				e.SignatoryIdentityId, e.ContentToSign, Array.Empty<byte>(), e.PetitionId,
+				e.RequestorFullJid, false);
+		}
+
+		private async Task ContractsClient_PetitionForContractReceived(object Sender, ContractPetitionEventArgs e)
+		{
+			if (!(Sender is ContractsClient ContractsClient))
+				return;
+
+			if (!ContractsClient.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
+				return;
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("A petition for one of your Smart Contracts (");
+			sb.Append(e.RequestedContractId);
+			sb.Append(") has been received: ");
+			sb.Append(e.Purpose);
+
+			AppendQuestionAndRequestor(sb, e.RequestorIdentity, e.RequestorFullJid,
+				e.Properties, e.Attachments, e.ClientEndpoint);
+
+			foreach (string SessionId in McpXmppExtension.SessionIds)
+			{
+				if (this.TryGetMcpSession(SessionId, out Session? Session) &&
+					!(Session.User is null))
+				{
+					Petition Petition = new Petition();
+					bool? Result = await this.ElicitUserInput(McpXmppExtension.FirstCall,
+						sb.ToString(), Petition, true, Session, 5 * 60 * 1000);
+
+					if (Result.HasValue)
+					{
+						await ContractsClient.PetitionContractResponseAsync(
+							e.RequestedContractId, e.PetitionId, e.RequestorFullJid,
+							Result.Value);
+						break;
+					}
+				}
+			}
+		}
+
+		private async Task ContractsClient_PetitionClientUrlReceived(object Sender, PetitionClientUrlEventArgs e)
+		{
+			if (!(Sender is ContractsClient ContractsClient))
+				return;
+
+			if (!ContractsClient.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
+				return;
+
+			string Message = "The petition requests you to enter additional information " +
+				"using an online form.";
+
+			foreach (string SessionId in McpXmppExtension.SessionIds)
+			{
+				if (this.TryGetMcpSession(SessionId, out Session? Session) &&
+					!(Session.User is null))
+				{
+					if (await this.ElicitOpenUrl(McpXmppExtension.FirstCall, 
+						Message, e.ClientUrl, Session))
+					{
+						break;
+					}
+
+					if (await this.ElicitUserInput(McpXmppExtension.FirstCall, Message, 
+						new OpenUrl(e.ClientUrl), false, Session, 5 * 60 * 1000) ?? false)
+					{
+						break;
+					}
+				}
+			}
+		}
+
+		private Task ContractsClient_PetitionedIdentityResponseReceived(object Sender, LegalIdentityPetitionResponseEventArgs e)
 		{
 			return Task.CompletedTask;  // TODO
 		}
@@ -1442,17 +1657,7 @@ namespace Waher.Mcp.Identity
 			return Task.CompletedTask;  // TODO
 		}
 
-		private Task ContractsClient_PetitionedIdentityResponseReceived(object Sender, LegalIdentityPetitionResponseEventArgs e)
-		{
-			return Task.CompletedTask;  // TODO
-		}
-
 		private Task ContractsClient_PetitionedContractResponseReceived(object Sender, ContractPetitionResponseEventArgs e)
-		{
-			return Task.CompletedTask;  // TODO
-		}
-
-		private Task ContractsClient_PetitionClientUrlReceived(object Sender, PetitionClientUrlEventArgs e)
 		{
 			return Task.CompletedTask;  // TODO
 		}

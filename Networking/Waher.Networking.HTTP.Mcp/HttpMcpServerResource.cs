@@ -520,9 +520,8 @@ namespace Waher.Networking.HTTP.Mcp
 
 				Label.Append("</label>");
 
-				if (Value is Enum EnumValue)
+				if (IsEnum(ValueType, Value, out Type EnumType, out Enum? EnumValue))
 				{
-					Type EnumType = EnumValue.GetType();
 					IEnumerable<McpEnumValueAttribute> Options = MI.GetCustomAttributes<McpEnumValueAttribute>(true);
 
 					if (EnumType.IsDefined(typeof(FlagsAttribute)))
@@ -548,7 +547,7 @@ namespace Waher.Networking.HTTP.Mcp
 							Input.Append("<option value=\"");
 							Input.Append(XML.HtmlAttributeEncode(Option.Value.ToString()));
 
-							if (Option.Value.Equals(EnumValue))
+							if (!(EnumValue is null) && Option.Value.Equals(EnumValue))
 								Input.Append("\" selected=\"selected");
 
 							Input.Append("\">");
@@ -635,6 +634,43 @@ namespace Waher.Networking.HTTP.Mcp
 			Markdown.AppendLine();
 
 			return await ReturnHtml(Response, Markdown.ToString());
+		}
+
+		/// <summary>
+		/// Checks if a form field or property is an enumeration value, or a nullable
+		/// enumeration value.
+		/// </summary>
+		/// <param name="ValueType">Type of field or property value.</param>
+		/// <param name="Value">Value of field or property.</param>
+		/// <param name="EnumType">Enumeration type, if detected.</param>
+		/// <param name="EnumValue">Enumeration value, if detected.</param>
+		/// <returns>If the value is an enumeration value or a nullable enumeration 
+		/// value.</returns>
+		public static bool IsEnum(Type ValueType, object? Value, out Type EnumType, out Enum? EnumValue)
+		{
+			if (Value is Enum e)
+			{
+				EnumValue = e;
+				EnumType = e.GetType();
+				return true;
+			}
+
+			if (Value is null &&
+				ValueType.IsGenericType &&
+				ValueType.GetGenericTypeDefinition() == typeof(Nullable<>))
+			{
+				ValueType = ValueType.GetGenericArguments()[0];
+				if (ValueType.IsEnum)
+				{
+					EnumType = ValueType;
+					EnumValue = null;
+					return true;
+				}
+			}
+
+			EnumValue = null;
+			EnumType = typeof(Enum);
+			return false;
 		}
 
 		private static async Task<HtmlDocument> CloseForm(HttpResponse Response)

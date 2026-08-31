@@ -100,5 +100,16 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 
 			return Task.FromResult(true);
 		}
+
+		/// <summary>
+		/// If the parameter is required.
+		/// </summary>
+		public override bool IsRequired(Type ValueType)
+		{
+			if (this.MinItems.HasValue && this.MinItems.Value > 0)
+				return true;
+				
+			return ValueType.IsValueType;
+		}
 	}
 }

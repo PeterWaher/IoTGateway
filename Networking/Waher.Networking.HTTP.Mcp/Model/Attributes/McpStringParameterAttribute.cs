@@ -186,5 +186,24 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 
 			return Task.FromResult(true);
 		}
+
+		/// <summary>
+		/// If the parameter is required.
+		/// </summary>
+		public override bool IsRequired(Type ValueType)
+		{
+			if (this.MinLength.HasValue && this.MinLength.Value > 0)
+				return true;
+
+			if (!(this.regex is null))
+			{
+				Match M = this.regex.Match(string.Empty);
+
+				if (!M.Success)
+					return true;
+			}
+
+			return ValueType.IsValueType;
+		}
 	}
 }

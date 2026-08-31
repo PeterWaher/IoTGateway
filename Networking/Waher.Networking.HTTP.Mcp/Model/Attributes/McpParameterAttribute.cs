@@ -82,5 +82,19 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		{
 			return Task.FromResult(!(Value is null));
 		}
+
+		/// <summary>
+		/// If the parameter is required.
+		/// </summary>
+		public virtual bool IsRequired(Type ValueType)
+		{
+			if (ValueType.IsGenericType &&
+				ValueType.GetGenericTypeDefinition() == typeof(Nullable<>))
+			{
+				return false;
+			}
+
+			return ValueType.IsValueType;
+		}
 	}
 }

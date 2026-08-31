@@ -427,8 +427,11 @@ namespace Waher.Networking.HTTP.Mcp
 			Type T = ClientRequest.Tag!.GetType();
 			McpParameterAttribute? ParameterInfo;
 			Dictionary<string, string> InputAttributes = new Dictionary<string, string>();
+			Type ValueType;
+			string s;
 			object Value;
 			bool Password;
+			bool Required;
 			StringBuilder Label = new StringBuilder();
 			StringBuilder Input = new StringBuilder();
 			bool LabelFirst;
@@ -436,9 +439,15 @@ namespace Waher.Networking.HTTP.Mcp
 			foreach (MemberInfo MI in T.GetMembers(BindingFlags.Instance | BindingFlags.Public))
 			{
 				if (MI is FieldInfo FI)
+				{
 					Value = FI.GetValue(ClientRequest.Tag);
+					ValueType = FI.FieldType;
+				}
 				else if (MI is PropertyInfo PI)
+				{
 					Value = PI.GetValue(ClientRequest.Tag);
+					ValueType = PI.PropertyType;
+				}
 				else
 					continue;
 
@@ -446,6 +455,7 @@ namespace Waher.Networking.HTTP.Mcp
 				Password = ParameterInfo is McpPasswordParameterAttribute;
 				InputAttributes.Clear();
 				LabelFirst = true;
+				Required = ParameterInfo?.IsRequired(ValueType) ?? ValueType.IsValueType;
 
 				if (MI.Name == "_p_" ||
 					MI.Name == "_r_" ||
@@ -477,7 +487,7 @@ namespace Waher.Networking.HTTP.Mcp
 
 					LabelFirst = false;
 				}
-				else if (Value is string s)
+				else if (Value is string)
 					InputAttributes["type"] = "text";
 				else if (Value is TimeSpan)
 					InputAttributes["type"] = "time";
@@ -492,13 +502,22 @@ namespace Waher.Networking.HTTP.Mcp
 
 				ParameterInfo?.GetHtmlInputAttributes(InputAttributes);
 
+				if (Required)
+					InputAttributes["required"] = "required";
+
 				Label.Clear();
 				Input.Clear();
 
 				Label.Append("<label for=\"");
 				Label.Append(MI.Name);
 				Label.Append("\">");
-				Label.Append(ParameterInfo?.Title ?? MI.Name);
+				Label.Append(s = ParameterInfo?.Title ?? MI.Name);
+				if (!s.EndsWith(':'))
+					Label.Append(':');
+
+				if (Required)
+					Label.Append(" (Required)");
+
 				Label.Append("</label>");
 
 				if (Value is Enum EnumValue)
@@ -541,7 +560,7 @@ namespace Waher.Networking.HTTP.Mcp
 					}
 				}
 				else if (Value is string[] ||
-					(Value is string s && s.IndexOfAny(CommonTypes.CRLF) >= 0))
+					(Value is string s2 && s2.IndexOfAny(CommonTypes.CRLF) >= 0))
 				{
 					InputAttributes.Remove("value");
 					Input.Append("<textarea");

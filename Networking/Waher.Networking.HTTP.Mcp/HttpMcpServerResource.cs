@@ -2988,6 +2988,8 @@ namespace Waher.Networking.HTTP.Mcp
 						FI.SetValue(Object, Value);
 					else if (Expression.TryConvert(Value, FI.FieldType, true, out object? Value2))
 						FI.SetValue(Object, Value2);
+					else if (Value is string s && string.IsNullOrEmpty(s) && Expression.CanBeSetToNull(FI.FieldType))
+						FI.SetValue(Object, null);
 					else if (!((FileParameter = FI.GetCustomAttribute<McpFileUploadParameterAttribute>()) is null) &&
 						!((Value2 = await TryConvertFileInput(Value, FI.FieldType, FileParameter)) is null))
 					{
@@ -3022,6 +3024,8 @@ namespace Waher.Networking.HTTP.Mcp
 						PI.SetValue(Object, Value);
 					else if (Expression.TryConvert(Value, PI.PropertyType, true, out object? Value2))
 						PI.SetValue(Object, Value2);
+					else if (Value is string s && string.IsNullOrEmpty(s) && Expression.CanBeSetToNull(PI.PropertyType))
+						PI.SetValue(Object, null);
 					else if (!((FileParameter = PI.GetCustomAttribute<McpFileUploadParameterAttribute>()) is null) &&
 						!((Value2 = await TryConvertFileInput(Value, PI.PropertyType, FileParameter)) is null))
 					{

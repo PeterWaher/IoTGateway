@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content.Markdown;
+using Waher.Script;
 
 namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 {
@@ -94,7 +95,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 				return false;
 			}
 
-			return ValueType.IsValueType;
+			return !Expression.CanBeSetToNull(ValueType);
 		}
 	}
 }

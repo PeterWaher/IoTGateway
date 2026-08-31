@@ -455,7 +455,7 @@ namespace Waher.Networking.HTTP.Mcp
 				Password = ParameterInfo is McpPasswordParameterAttribute;
 				InputAttributes.Clear();
 				LabelFirst = true;
-				Required = ParameterInfo?.IsRequired(ValueType) ?? ValueType.IsValueType;
+				Required = ParameterInfo?.IsRequired(ValueType) ?? !Expression.CanBeSetToNull(ValueType);
 
 				if (MI.Name == "_p_" ||
 					MI.Name == "_r_" ||

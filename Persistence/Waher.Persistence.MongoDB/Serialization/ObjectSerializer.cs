@@ -17,6 +17,7 @@ using Waher.Persistence.Attributes;
 using Waher.Persistence.Exceptions;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
+using Waher.Script;
 
 namespace Waher.Persistence.MongoDB.Serialization
 {
@@ -173,7 +174,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			else if (this.type == typeof(void) || this.type == typeof(string))
 				this.isNullable = true;
 			else
-				this.isNullable = !this.typeInfo.IsValueType;
+				this.isNullable = Expression.CanBeSetToNull(this.typeInfo);
 
 			StringBuilder CSharp = new();
 			Type MemberType;

@@ -108,8 +108,8 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		{
 			if (this.MinItems.HasValue && this.MinItems.Value > 0)
 				return true;
-				
-			return ValueType.IsValueType;
+
+			return base.IsRequired(ValueType);
 		}
 	}
 }

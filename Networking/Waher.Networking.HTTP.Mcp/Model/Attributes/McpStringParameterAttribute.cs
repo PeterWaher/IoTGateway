@@ -203,7 +203,7 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 					return true;
 			}
 
-			return ValueType.IsValueType;
+			return base.IsRequired(ValueType);
 		}
 	}
 }

@@ -5507,7 +5507,7 @@ namespace Waher.Script
 					Result = Result2;
 					return true;
 				}
-				else if (Value is null && !typeof(T).IsValueType)
+				else if (Value is null && CanBeSetToNull(typeof(T)))
 				{
 					Result = default;
 					return true;
@@ -5534,6 +5534,22 @@ namespace Waher.Script
 		}
 
 		/// <summary>
+		/// Checks if a member of a specific type can be set to null.
+		/// </summary>
+		/// <param name="Type">Type of member.</param>
+		/// <returns>If the member can be set to null.</returns>
+		public static bool CanBeSetToNull(Type Type)
+		{
+			if (!Type.IsValueType)
+				return true;
+
+			if (Type.IsGenericType && Type.GetGenericTypeDefinition() == typeof(Nullable<>))
+				return true;
+
+			return false;
+		}
+
+		/// <summary>
 		/// Tries to convert an object <paramref name="Value"/> to an object of type <paramref name="DesiredType"/>.
 		/// </summary>
 		/// <param name="Value">Value to convert.</param>
@@ -5548,7 +5564,7 @@ namespace Waher.Script
 			if (Value is null)
 			{
 				Result = null;
-				return !DesiredType.IsValueType;
+				return CanBeSetToNull(DesiredType);
 			}
 
 			Type T = Value.GetType();
@@ -5769,7 +5785,7 @@ namespace Waher.Script
 			if (Obj is null)
 			{
 				Result = ObjectValue.Null;
-				return !DesiredType.IsValueType;
+				return CanBeSetToNull(DesiredType);
 			}
 
 			Type T = Obj.GetType();

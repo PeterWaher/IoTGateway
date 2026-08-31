@@ -18,6 +18,7 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
 using Waher.Script.Abstraction.Elements;
 using Waher.Runtime.Collections;
+using Waher.Script;
 
 namespace Waher.Persistence.Serialization
 {
@@ -329,7 +330,7 @@ namespace Waher.Persistence.Serialization
 			else if (this.type == typeof(void) || this.type == typeof(string))
 				this.isNullable = true;
 			else
-				this.isNullable = !this.typeInfo.IsValueType;
+				this.isNullable = Expression.CanBeSetToNull(this.typeInfo);
 
 			CollectionNameAttribute CollectionNameAttribute = this.typeInfo.GetCustomAttribute<CollectionNameAttribute>(true);
 			if (CollectionNameAttribute is null)

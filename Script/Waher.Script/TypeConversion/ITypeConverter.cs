@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography;
 using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.TypeConversion

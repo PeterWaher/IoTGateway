@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Binary;
@@ -1067,6 +1068,8 @@ namespace Waher.Mcp.Identity
 
 			try
 			{
+				Client.Client.SetTag(LegalId, new ApplicationTag(Call, Session, User));
+
 				await Client.ReadyForApprovalAsync(LegalId);
 				return new GenericResponse(true, "Identity reported as ready for approval.");
 			}
@@ -1074,6 +1077,20 @@ namespace Waher.Mcp.Identity
 			{
 				return new GenericResponse(false, Log.UnnestException(ex).Message);
 			}
+		}
+
+		private class ApplicationTag
+		{
+			public ApplicationTag(IJsonRpcCall Call, Session Session, IUser User)
+			{
+				this.Call = Call;
+				this.Session = Session;
+				this.User = User;
+			}
+
+			public IJsonRpcCall Call;
+			public Session Session;
+			public IUser User;
 		}
 
 		/// <summary>
@@ -1125,14 +1142,274 @@ namespace Waher.Mcp.Identity
 			};
 		}
 
-		private Task ContractsClient_ClientMessage(object Sender, ClientMessageEventArgs e)
+		private async Task ContractsClient_ClientMessage(object Sender, ClientMessageEventArgs e)
 		{
-			return Task.CompletedTask;  // TODO
+			if (!(Sender is ContractsClient ContractsClient))
+				return;
+
+			if (!ContractsClient.Client.TryGetTag(e.LegalId, out ApplicationTag Tag))
+				return;
+
+			ContractsClient.Client.RemoveTag(e.LegalId);
+
+			StringBuilder sb = new StringBuilder();
+
+			switch (e.ValidationErrorType)
+			{
+				case ValidationErrorType.Client:
+					if (e.Code != "ManualReview")
+					{
+						sb.Append("Some of the information provided could not be verified, " +
+							"or was incorrect. ");
+					}
+					break;
+
+				case ValidationErrorType.Service:
+					sb.Append("A service on the broker failed. ");
+					break;
+
+				case ValidationErrorType.Server:
+					sb.Append("An error occurred on the broker. ");
+					break;
+			}
+
+			sb.Append("Review the information below, and try again.");
+
+			if (!string.IsNullOrEmpty(e.Code))
+			{
+				sb.Append(" (Error Code: ");
+				sb.Append(e.Code);
+				sb.Append(')');
+			}
+
+			sb.AppendLine();
+			sb.AppendLine();
+
+			sb.AppendLine(e.Body);
+
+			AppendApplicationInfo(sb, e);
+			
+			await this.ElicitUserInput(Tag.Call, sb.ToString(), new Acknowledgement(),
+				false, Tag.Session, 5 * 60 * 1000);
 		}
 
-		private Task ContractsClient_IdentityReview(object Sender, IdentityReviewEventArgs e)
+		private static void AppendApplicationInfo(StringBuilder sb, IdentityReviewEventArgs e)
 		{
-			return Task.CompletedTask;  // TODO
+			if (e.HasErrors)
+			{
+				sb.AppendLine();
+				sb.AppendLine("Errors reported:");
+				sb.AppendLine();
+
+				foreach (ValidationError Error in e.ValidationErrors)
+				{
+					sb.Append("* ");
+
+					switch (Error.ErrorType)
+					{
+						case ValidationErrorType.Client:
+							sb.Append("Client error: ");
+							break;
+
+						case ValidationErrorType.Service:
+							sb.Append("Service error: ");
+							break;
+
+						case ValidationErrorType.Server:
+							sb.Append("Server error: ");
+							break;
+					}
+
+					sb.Append(Error.ErrorMessage);
+
+					bool Parenthesis = false;
+					bool First = true;
+
+					if (!string.IsNullOrEmpty(Error.ErrorCode))
+					{
+						sb.Append(" (Error Code: ");
+						sb.Append(Error.ErrorCode);
+
+						Parenthesis = true;
+						First = false;
+					}
+
+					if (!(Error.Tags is null) && Error.Tags.Length > 0)
+					{
+						if (!Parenthesis)
+						{
+							sb.Append(" (");
+							Parenthesis = true;
+						}
+
+						foreach (KeyValuePair<string, object> P in Error.Tags)
+						{
+							if (First)
+								First = false;
+							else
+								sb.Append(", ");
+
+							sb.Append(P.Key);
+							sb.Append("=");
+							sb.Append(P.Value?.ToString());
+						}
+					}
+
+					if (Parenthesis)
+						sb.Append(')');
+
+					sb.Append(" (");
+					sb.Append(Error.Service);
+					sb.AppendLine(")");
+				}
+			}
+
+			if ((e.InvalidClaims?.Length ?? 0) > 0)
+			{
+				sb.AppendLine();
+				sb.AppendLine("Invalid claims:");
+				sb.AppendLine();
+
+				foreach (InvalidClaim Claim in e.InvalidClaims!)
+				{
+					sb.Append("* ");
+					sb.Append(Claim.Claim);
+					sb.Append(": ");
+					sb.Append(Claim.Reason);
+
+					if (!string.IsNullOrEmpty(Claim.ReasonCode))
+					{
+						sb.Append(" (");
+						sb.Append(Claim.ReasonCode);
+						sb.Append(')');
+					}
+
+					sb.Append(" (");
+					sb.Append(Claim.Service);
+					sb.AppendLine(")");
+				}
+			}
+
+			if ((e.InvalidPhotos?.Length ?? 0) > 0)
+			{
+				sb.AppendLine();
+				sb.AppendLine("Invalid photos:");
+				sb.AppendLine();
+
+				foreach (InvalidPhoto Photo in e.InvalidPhotos!)
+				{
+					sb.Append("* ");
+					sb.Append(Photo.FileName);
+					sb.Append(": ");
+					sb.Append(Photo.Reason);
+
+					if (!string.IsNullOrEmpty(Photo.ReasonCode))
+					{
+						sb.Append(" (");
+						sb.Append(Photo.ReasonCode);
+						sb.Append(')');
+					}
+
+					sb.Append(" (");
+					sb.Append(Photo.Service);
+					sb.AppendLine(")");
+				}
+			}
+
+			if ((e.UnvalidatedClaims?.Length ?? 0) > 0)
+			{
+				sb.AppendLine();
+				sb.AppendLine("Unvalidated claims:");
+				sb.AppendLine();
+
+				foreach (string Claim in e.UnvalidatedClaims!)
+				{
+					sb.Append("* ");
+					sb.AppendLine(Claim);
+				}
+			}
+
+			if ((e.UnvalidatedPhotos?.Length ?? 0) > 0)
+			{
+				sb.AppendLine();
+				sb.AppendLine("Unvalidated photos:");
+				sb.AppendLine();
+
+				foreach (string Photo in e.UnvalidatedPhotos!)
+				{
+					sb.Append("* ");
+					sb.AppendLine(Photo);
+				}
+			}
+
+			if (e.HasValidatedClaims)
+			{
+				sb.AppendLine();
+				sb.AppendLine("Valid claims:");
+				sb.AppendLine();
+
+				foreach (ValidClaim Claim in e.ValidClaims)
+				{
+					sb.Append("* ");
+					sb.Append(Claim.Claim);
+					sb.Append(" (");
+					sb.Append(Claim.Service);
+					sb.AppendLine(")");
+				}
+			}
+
+			if (e.HasValidatedPhotos)
+			{
+				sb.AppendLine();
+				sb.AppendLine("Valid photos:");
+				sb.AppendLine();
+
+				foreach (ValidPhoto Photo in e.ValidPhotos)
+				{
+					sb.Append("* ");
+					sb.Append(Photo.FileName);
+					sb.Append(" (");
+					sb.Append(Photo.Service);
+					sb.AppendLine(")");
+				}
+			}
+
+			if (e.HasPotentialClaims)
+			{
+				sb.AppendLine();
+				sb.AppendLine("Potential claims that could be added:");
+				sb.AppendLine();
+
+				foreach (PotentialClaim Claim in e.PotentialClaims)
+				{
+					sb.Append("* ");
+					sb.Append(Claim.Claim);
+					sb.Append(": ");
+					sb.Append(Claim.Value);
+					sb.Append(" (");
+					sb.Append(Claim.Service);
+					sb.AppendLine(")");
+				}
+			}
+		}
+
+		private async Task ContractsClient_IdentityReview(object Sender, IdentityReviewEventArgs e)
+		{
+			if (!(Sender is ContractsClient ContractsClient))
+				return;
+
+			if (!ContractsClient.Client.TryGetTag(e.LegalId, out ApplicationTag Tag))
+				return;
+
+			ContractsClient.Client.RemoveTag(e.LegalId);
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("A review of the application has been completed.");
+			AppendApplicationInfo(sb, e);
+
+			await this.ElicitUserInput(Tag.Call, sb.ToString(), new Acknowledgement(),
+				false, Tag.Session, 5 * 60 * 1000);
 		}
 
 		private Task ContractsClient_PetitionForSignatureReceived(object Sender, SignaturePetitionEventArgs e)

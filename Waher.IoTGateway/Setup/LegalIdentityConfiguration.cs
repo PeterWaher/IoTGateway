@@ -46,6 +46,14 @@ namespace Waher.IoTGateway.Setup
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex GetAttachmentRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?GetAttachmentAsync>?\w*[.]\w*",
 			RegexOptions.Compiled | RegexOptions.Singleline);
+		internal static readonly Regex PetitionIdentityRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?PetitionIdentityAsync>?\w*[.]\w*",
+			RegexOptions.Compiled | RegexOptions.Singleline);
+		internal static readonly Regex PetitionSignatureRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?PetitionSignatureAsync>?\w*[.]\w*",
+			RegexOptions.Compiled | RegexOptions.Singleline);
+		internal static readonly Regex PetitionPeerReviewIDRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?PetitionPeerReviewIDAsync>?\w*[.]\w*",
+			RegexOptions.Compiled | RegexOptions.Singleline);
+		internal static readonly Regex PetitionContractAsync = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?PetitionContractAsync>?\w*[.]\w*",
+			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex IdentityMessageHandlerRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?IdentityMessageHandler>?\w*[.]\w*",
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex IdentitiesResponseRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?IdentitiesResponse>?\w*[.]\w*",
@@ -79,7 +87,11 @@ namespace Waher.IoTGateway.Setup
 			GetAttachmentRegex,
 			IdentityMessageHandlerRegex,
 			IdentitiesResponseRegex,
-			UpdateSettingsRegex
+			UpdateSettingsRegex,
+			PetitionIdentityRegex,
+			PetitionSignatureRegex,
+			PetitionPeerReviewIDRegex,
+			PetitionContractAsync
 		});
 		private static readonly ICallStackCheck[] approvedOtpSources = Assert.Convert(new object[]
 		{

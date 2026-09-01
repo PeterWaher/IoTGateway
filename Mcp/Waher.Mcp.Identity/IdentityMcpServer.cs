@@ -1454,7 +1454,22 @@ namespace Waher.Mcp.Identity
 		}
 
 		private static void AppendQuestionAndRequestor(StringBuilder sb, LegalIdentity Identity,
+			string FullJid, string RemoteEndpoint)
+		{
+			AppendQuestionAndRequestor(sb, Identity, FullJid,
+				Array.Empty<string>(), Array.Empty<string>(), RemoteEndpoint);
+		}
+
+		private static void AppendQuestionAndRequestor(StringBuilder sb, LegalIdentity Identity,
 			string FullJid, string[] Properties, string[] Attachments, string RemoteEndpoint)
+		{
+			AppendQuestionAndRequestor(sb, Identity,
+				"Do you want to accept or decline the request?", FullJid,
+				Properties, Attachments, RemoteEndpoint);
+		}
+
+		private static void AppendQuestionAndRequestor(StringBuilder sb, LegalIdentity Identity,
+			string Question, string FullJid, string[] Properties, string[] Attachments, string RemoteEndpoint)
 		{
 			if (!string.IsNullOrEmpty(RemoteEndpoint))
 			{
@@ -1463,8 +1478,9 @@ namespace Waher.Mcp.Identity
 				sb.Append(')');
 			}
 
-			sb.Append(" Do you want to accept or decline the request? ");
-			sb.AppendLine("Information about the requestor follows:");
+			sb.Append(' ');
+			sb.Append(Question);
+			sb.AppendLine(" Information about the requestor follows:");
 
 			bool JidIncluded = false;
 
@@ -1478,7 +1494,7 @@ namespace Waher.Mcp.Identity
 				sb.Append(P.Value);
 			}
 
-			if (!JidIncluded)
+			if (!JidIncluded && !string.IsNullOrEmpty(FullJid))
 			{
 				sb.AppendLine();
 				sb.Append(PersonalInformation.JidTag);
@@ -1625,13 +1641,13 @@ namespace Waher.Mcp.Identity
 				if (this.TryGetMcpSession(SessionId, out Session? Session) &&
 					!(Session.User is null))
 				{
-					if (await this.ElicitOpenUrl(McpXmppExtension.FirstCall, 
+					if (await this.ElicitOpenUrl(McpXmppExtension.FirstCall,
 						Message, e.ClientUrl, Session))
 					{
 						break;
 					}
 
-					if (await this.ElicitUserInput(McpXmppExtension.FirstCall, Message, 
+					if (await this.ElicitUserInput(McpXmppExtension.FirstCall, Message,
 						new OpenUrl(e.ClientUrl), false, Session, 5 * 60 * 1000) ?? false)
 					{
 						break;
@@ -1669,7 +1685,7 @@ namespace Waher.Mcp.Identity
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
 				return new PeerReviewProvidersResponse("MCP XMPP Contracts client not available.");
-			
+
 			ServiceProviderWithLegalId[] Providers = await Client.GetPeerReviewIdServiceProvidersAsync();
 			int i, c = Providers.Length;
 			PeerReviewProvider[] Providers2 = new PeerReviewProvider[c];
@@ -1717,7 +1733,7 @@ namespace Waher.Mcp.Identity
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
 				return new GenericResponse(false, "MCP XMPP Contracts client not available.");
-			
+
 			await Client.SelectPeerReviewServiceAsync(Id, Type);
 
 			return new GenericResponse(true, "Peer Review provider selected.");
@@ -1763,6 +1779,19 @@ namespace Waher.Mcp.Identity
 			if (Client is null)
 				return new GenericResponse(false, "MCP XMPP Contracts client not available.");
 
+			LegalIdentity? LatestCreated = await GetLatestApplication(Client);
+			if (LatestCreated is null)
+				return new GenericResponse(false, "No current Legal Identity application found.");
+
+			string PetitionId = Guid.NewGuid().ToString();
+
+			await Client.PetitionPeerReviewIDAsync(LegalId, LatestCreated, PetitionId, Purpose);
+
+			return new GenericResponse(true, "Peer Review identity petition sent.");
+		}
+
+		private static async Task<LegalIdentity?> GetLatestApplication(ContractsClient Client)
+		{
 			LegalIdentity[] Identities = await Client.GetLegalIdentitiesAsync();
 			LegalIdentity? LatestCreated = null;
 
@@ -1775,14 +1804,7 @@ namespace Waher.Mcp.Identity
 					LatestCreated = Identity;
 			}
 
-			if (LatestCreated is null)
-				return new GenericResponse(false, "No current Legal Identity application found.");
-
-			string PetitionId = Guid.NewGuid().ToString();
-
-			await Client.PetitionPeerReviewIDAsync(LegalId, LatestCreated, PetitionId, Purpose);
-
-			return new GenericResponse(true, "Peer Review identity petition sent.");
+			return LatestCreated;
 		}
 
 		/// <summary>
@@ -1837,17 +1859,90 @@ namespace Waher.Mcp.Identity
 			};
 		}
 
+		private async Task ContractsClient_PetitionedPeerReviewIDResponseReceived(object Sender, SignaturePetitionResponseEventArgs e)
+		{
+			if (!(Sender is ContractsClient ContractsClient))
+				return;
+
+			if (!ContractsClient.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
+				return;
+
+			LegalIdentity? ReviewedIdentity = await GetLatestApplication(ContractsClient);
+			if (ReviewedIdentity is null)
+				return;
+
+			StringBuilder sb = new StringBuilder();
+			LegalIdentity? ReviewerIdentity = null;
+			object? UserInput;
+
+			if (e.Response)
+			{
+				ReviewerIdentity = e.RequestedIdentity;
+				if (ReviewerIdentity is null)
+					return;
+
+				StringBuilder Xml = new StringBuilder();
+				ReviewedIdentity.Serialize(Xml, true, true, true, true, true, true, true);
+				string s = Xml.ToString();
+				byte[] Data = Encoding.UTF8.GetBytes(s);
+
+				bool? Valid = ContractsClient.ValidateSignature(ReviewerIdentity, Data, e.Signature);
+				if (!Valid.HasValue || !Valid.Value)
+				{
+					Log.Warning("A peer review was rejected as the signature could not be validated.",
+						new KeyValuePair<string, object>("Reviewed", ReviewedIdentity.Id),
+						new KeyValuePair<string, object>("Reviewer", ReviewerIdentity.Id));
+					return;
+				}
+
+				UserInput = new Petition();
+
+				sb.Append("A peer review petition has been successfully returned. ");
+				sb.Append("The review has been uploaded as an attachment to the ");
+				sb.Append("application. ");
+
+				AppendQuestionAndRequestor(sb, ReviewerIdentity,
+					"Do you want to upload it as an attachment? Once sufficient " +
+					"successful peer reviews have been uploaded, the application " +
+					"will become approved.", string.Empty, Array.Empty<string>(),
+					Array.Empty<string>(), e.ClientEndpoint);
+			}
+			else
+			{
+				sb.Append("Your peer review petition has been declined by the recipient.");
+				UserInput = new Acknowledgement();
+			}
+
+			foreach (string SessionId in McpXmppExtension.SessionIds)
+			{
+				if (this.TryGetMcpSession(SessionId, out Session? Session) &&
+					!(Session.User is null))
+				{
+					bool? Result = await this.ElicitUserInput(McpXmppExtension.FirstCall,
+						sb.ToString(), UserInput, true, Session, 5 * 60 * 1000);
+
+					if (Result.HasValue && Result.Value)
+					{
+						if (UserInput is Petition Petition &&
+							Petition.Accept.HasValue && 
+							Petition.Accept.Value &&
+							!(ReviewerIdentity is null))
+						{
+							ReviewedIdentity = await ContractsClient.AddPeerReviewIDAttachment(
+								ReviewedIdentity, ReviewerIdentity, e.Signature);
+						}
+						break;
+					}
+				}
+			}
+		}
+
 		private Task ContractsClient_PetitionedIdentityResponseReceived(object Sender, LegalIdentityPetitionResponseEventArgs e)
 		{
 			return Task.CompletedTask;  // TODO
 		}
 
 		private Task ContractsClient_PetitionedSignatureResponseReceived(object Sender, SignaturePetitionResponseEventArgs e)
-		{
-			return Task.CompletedTask;  // TODO
-		}
-
-		private Task ContractsClient_PetitionedPeerReviewIDResponseReceived(object Sender, SignaturePetitionResponseEventArgs e)
 		{
 			return Task.CompletedTask;  // TODO
 		}

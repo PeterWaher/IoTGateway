@@ -46,6 +46,8 @@ namespace Waher.IoTGateway.Setup
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex GetAttachmentRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?GetAttachmentAsync>?\w*[.]\w*",
 			RegexOptions.Compiled | RegexOptions.Singleline);
+		internal static readonly Regex GetLatestApprovedLegalIdRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?GetLatestApprovedLegalId>?\w*[.]\w*",
+			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex PetitionIdentityRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?PetitionIdentityAsync>?\w*[.]\w*",
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		internal static readonly Regex PetitionSignatureRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<?PetitionSignatureAsync>?\w*[.]\w*",
@@ -79,12 +81,14 @@ namespace Waher.IoTGateway.Setup
 			"Waher.Service.IoTBroker.Marketplace.MarketplaceProcessor",
 			"Waher.Service.IoTBroker.WebServices.Agent.Account.RemoteQuickLogin",
 			"Waher.Service.Abc4Io.Model.Actions.Contract.SignContract",
+			"Waher.Mcp.Payments.PaymentsMcpServer",
 			ApplyLegalIdentityRegex,
 			ApplyIdRegex,
 			typeof(LegalIdentityConfiguration),
 			typeof(IdentityMcpServer),
 			GenerateNewKeysRegex,
 			GetAttachmentRegex,
+			GetLatestApprovedLegalIdRegex,
 			IdentityMessageHandlerRegex,
 			IdentitiesResponseRegex,
 			UpdateSettingsRegex,

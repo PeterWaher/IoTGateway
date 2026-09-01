@@ -51,8 +51,11 @@ namespace Waher.Mcp.Identity
 		internal const string RemoveAttachmentPrivilege = AttachmentPrivilege + ".Remove";
 		internal const string CreatePromptPrivilege = PromptsPrivilege + ".Create";
 		internal const string CreatePersonalIdentityPrivilege = CreatePromptPrivilege + ".Create.PersonalId";
-		internal const string PeerReviewPrivilege = ToolsPrivilege + ".PeerReview";
-		internal const string RequestPeerReviewPrivilege = PeerReviewPrivilege + ".Request";
+		internal const string PetitionPrivilege = ToolsPrivilege + ".Petition";
+		internal const string PetitionPeerReviewPrivilege = PetitionPrivilege + ".PeerReview";
+		internal const string PetitionIdentityPrivilege = PetitionPrivilege + ".Identity";
+		internal const string PetitionContractPrivilege = PetitionPrivilege + ".Contract";
+		internal const string PetitionSignaturePrivilege = PetitionPrivilege + ".Signature";
 
 		private readonly XmppMcpServer xmppMcpServer;
 
@@ -1464,12 +1467,13 @@ namespace Waher.Mcp.Identity
 			string FullJid, string[] Properties, string[] Attachments, string RemoteEndpoint)
 		{
 			AppendQuestionAndRequestor(sb, Identity,
-				"Do you want to accept or decline the request?", FullJid,
+				"Do you want to accept or decline the request?", "requestor", FullJid,
 				Properties, Attachments, RemoteEndpoint);
 		}
 
 		private static void AppendQuestionAndRequestor(StringBuilder sb, LegalIdentity Identity,
-			string Question, string FullJid, string[] Properties, string[] Attachments, string RemoteEndpoint)
+			string Question, string Title, string FullJid, string[] Properties, 
+			string[] Attachments, string RemoteEndpoint)
 		{
 			if (!string.IsNullOrEmpty(RemoteEndpoint))
 			{
@@ -1478,9 +1482,15 @@ namespace Waher.Mcp.Identity
 				sb.Append(')');
 			}
 
-			sb.Append(' ');
-			sb.Append(Question);
-			sb.AppendLine(" Information about the requestor follows:");
+			if (!string.IsNullOrEmpty(Question))
+			{
+				sb.Append(' ');
+				sb.Append(Question);
+			}
+
+			sb.Append(" Information about the ");
+			sb.Append(Title);
+			sb.Append(" follows:");
 
 			bool JidIncluded = false;
 
@@ -1669,7 +1679,7 @@ namespace Waher.Mcp.Identity
 			false,  // CanDestroyEnvironment
 			true,   // Idempotent
 			false)] // OpenWorldAccess
-		[RequiredPrivilege(RequestPeerReviewPrivilege)]
+		[RequiredPrivilege(PetitionPeerReviewPrivilege)]
 		[return: McpParameter("Result", "Available peer review providers.")]
 		public async Task<PeerReviewProvidersResponse> GetPeerReviewProviders(
 			IJsonRpcCall Call)
@@ -1711,7 +1721,7 @@ namespace Waher.Mcp.Identity
 			false,  // CanDestroyEnvironment
 			true,   // Idempotent
 			false)] // OpenWorldAccess
-		[RequiredPrivilege(RequestPeerReviewPrivilege)]
+		[RequiredPrivilege(PetitionPeerReviewPrivilege)]
 		[return: McpParameter("Result", "Result of operation.")]
 		public async Task<GenericResponse> SelectPeerReviewProvider(
 			IJsonRpcCall Call,
@@ -1749,16 +1759,16 @@ namespace Waher.Mcp.Identity
 		/// of the review.</param>
 		/// <returns>Results of operation.</returns>
 		[McpServerTool(
-			"Select Peer Review Provider",
-			"Selects an internal Peer Review provider.",
+			"Petition Peer Review",
+			"Sends a petition to a peer for a review of an identity application.",
 			"",     // IconsMethod, use default icons
 			true,   // CanModifyEnvironment
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			true)]  // OpenWorldAccess
-		[RequiredPrivilege(RequestPeerReviewPrivilege)]
+		[RequiredPrivilege(PetitionPeerReviewPrivilege)]
 		[return: McpParameter("Result", "Result of operation.")]
-		public async Task<GenericResponse> PetitionPeerReview(
+		public async Task<PetitionIdResponse> PetitionPeerReview(
 			IJsonRpcCall Call,
 
 			[McpStringParameter("LegalId", "Identifier of Legal Identity to send the petition to.")]
@@ -1769,25 +1779,25 @@ namespace Waher.Mcp.Identity
 		{
 			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
-				return new GenericResponse(false, "No MCP session.");
+				return new PetitionIdResponse("No MCP session.");
 
 			IUser? User = await this.GetAuthenticatedUser(Call, Session);
 			if (Call.ResponseSent || User is null)
-				return new GenericResponse(false, "User not authenticated.");
+				return new PetitionIdResponse("User not authenticated.");
 
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
-				return new GenericResponse(false, "MCP XMPP Contracts client not available.");
+				return new PetitionIdResponse("MCP XMPP Contracts client not available.");
 
 			LegalIdentity? LatestCreated = await GetLatestApplication(Client);
 			if (LatestCreated is null)
-				return new GenericResponse(false, "No current Legal Identity application found.");
+				return new PetitionIdResponse("No current Legal Identity application found.");
 
 			string PetitionId = Guid.NewGuid().ToString();
 
 			await Client.PetitionPeerReviewIDAsync(LegalId, LatestCreated, PetitionId, Purpose);
 
-			return new GenericResponse(true, "Peer Review identity petition sent.");
+			return new PetitionIdResponse(PetitionId, "Peer Review petition sent.");
 		}
 
 		private static async Task<LegalIdentity?> GetLatestApplication(ContractsClient Client)
@@ -1815,7 +1825,7 @@ namespace Waher.Mcp.Identity
 			"Requests a Peer Review of a current Identity Application.",  // Description
 			"")]                                                    // IconsMethod, use default icons
 		[RequiredPrivilege(CreatePersonalIdentityPrivilege)]
-		[RequiredPrivilege(RequestPeerReviewPrivilege)]
+		[RequiredPrivilege(PetitionPeerReviewPrivilege)]
 		public PromptMessage[] RequestPeerReview()
 		{
 			return new PromptMessage[]
@@ -1890,6 +1900,7 @@ namespace Waher.Mcp.Identity
 				if (!Valid.HasValue || !Valid.Value)
 				{
 					Log.Warning("A peer review was rejected as the signature could not be validated.",
+						new KeyValuePair<string, object>("PetitionId", e.PetitionId),
 						new KeyValuePair<string, object>("Reviewed", ReviewedIdentity.Id),
 						new KeyValuePair<string, object>("Reviewer", ReviewerIdentity.Id));
 					return;
@@ -1897,19 +1908,24 @@ namespace Waher.Mcp.Identity
 
 				UserInput = new Petition();
 
-				sb.Append("A peer review petition has been successfully returned. ");
+				sb.Append("A peer review (Petition ID ");
+				sb.Append(e.PetitionId);
+				sb.Append(") has been successfully returned. ");
 				sb.Append("The review has been uploaded as an attachment to the ");
 				sb.Append("application. ");
 
 				AppendQuestionAndRequestor(sb, ReviewerIdentity,
 					"Do you want to upload it as an attachment? Once sufficient " +
 					"successful peer reviews have been uploaded, the application " +
-					"will become approved.", string.Empty, Array.Empty<string>(),
+					"will become approved.", "peer", string.Empty, Array.Empty<string>(),
 					Array.Empty<string>(), e.ClientEndpoint);
 			}
 			else
 			{
-				sb.Append("Your peer review petition has been declined by the recipient.");
+				sb.Append("Your peer review petition (Petition ID ");
+				sb.Append(e.PetitionId);
+				sb.Append(") has been declined by the recipient.");
+
 				UserInput = new Acknowledgement();
 			}
 
@@ -1924,7 +1940,7 @@ namespace Waher.Mcp.Identity
 					if (Result.HasValue && Result.Value)
 					{
 						if (UserInput is Petition Petition &&
-							Petition.Accept.HasValue && 
+							Petition.Accept.HasValue &&
 							Petition.Accept.Value &&
 							!(ReviewerIdentity is null))
 						{
@@ -1937,9 +1953,96 @@ namespace Waher.Mcp.Identity
 			}
 		}
 
-		private Task ContractsClient_PetitionedIdentityResponseReceived(object Sender, LegalIdentityPetitionResponseEventArgs e)
+		/// <summary>
+		/// MCP Server Tool to petition a user for one of its Legal Identities.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="LegalId">Identifier of Legal Identity to send the petition 
+		/// to.</param>
+		/// <param name="Purpose">Message to recipient of petition, explaining the purpose 
+		/// of the review.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Petition Legal Identity",
+			"Sends a petition to a user for one of its legal identities.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(PetitionIdentityPrivilege)]
+		[return: McpParameter("Result", "Result of operation.")]
+		public async Task<PetitionIdResponse> PetitionLegalIdentity(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("LegalId", "Identifier of Legal Identity to petition.")]
+			string LegalId,
+
+			[McpStringParameter("Purpose", "A message to the recipient of the petition, explaining the purpose of the petition.", 1, 1024)]
+			string Purpose)
 		{
-			return Task.CompletedTask;  // TODO
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new PetitionIdResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new PetitionIdResponse("User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new PetitionIdResponse("MCP XMPP Contracts client not available.");
+
+			string PetitionId = Guid.NewGuid().ToString();
+
+			await Client.PetitionIdentityAsync(LegalId, PetitionId, Purpose);
+
+			return new PetitionIdResponse(PetitionId, "Legal Identity petition sent.");
+		}
+
+		private async Task ContractsClient_PetitionedIdentityResponseReceived(object Sender, LegalIdentityPetitionResponseEventArgs e)
+		{
+			if (!(Sender is ContractsClient ContractsClient))
+				return;
+
+			if (!ContractsClient.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
+				return;
+
+			LegalIdentity? ReviewedIdentity = await GetLatestApplication(ContractsClient);
+			if (ReviewedIdentity is null)
+				return;
+
+			StringBuilder sb = new StringBuilder();
+
+			if (e.Response)
+			{
+				sb.Append("A Legal Identity you petitioned (Petition ID ");
+				sb.Append(e.PetitionId);
+				sb.Append(") has been successfully returned. ");
+
+				AppendQuestionAndRequestor(sb, e.RequestedIdentity, string.Empty,
+					"peer", string.Empty, Array.Empty<string>(), Array.Empty<string>(),
+					e.ClientEndpoint);
+			}
+			else
+			{
+				sb.Append("Your legal identity petition (Petition ID ");
+				sb.Append(e.PetitionId);
+				sb.Append(") has been declined by the recipient.");
+			}
+
+			foreach (string SessionId in McpXmppExtension.SessionIds)
+			{
+				if (this.TryGetMcpSession(SessionId, out Session? Session) &&
+					!(Session.User is null))
+				{
+					bool? Result = await this.ElicitUserInput(McpXmppExtension.FirstCall,
+						sb.ToString(), new Acknowledgement(), true, Session, 5 * 60 * 1000);
+					
+					if (Result.HasValue && Result.Value)
+						break;
+				}
+			}
 		}
 
 		private Task ContractsClient_PetitionedSignatureResponseReceived(object Sender, SignaturePetitionResponseEventArgs e)

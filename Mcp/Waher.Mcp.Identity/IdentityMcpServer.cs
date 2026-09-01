@@ -1565,9 +1565,6 @@ namespace Waher.Mcp.Identity
 			if (!(Sender is ContractsClient ContractsClient))
 				return;
 
-			if (!ContractsClient.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
-				return;
-
 			await ContractsClient.PetitionSignatureResponseAsync(
 				e.SignatoryIdentityId, e.ContentToSign, Array.Empty<byte>(), e.PetitionId,
 				e.RequestorFullJid, false);

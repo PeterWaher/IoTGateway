@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -24,8 +25,10 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.HttpFileUpload;
+using Waher.Runtime.Cache;
 using Waher.Runtime.Collections;
 using Waher.Security;
+using Waher.Security.Users;
 
 namespace Waher.Mcp.Identity
 {
@@ -57,6 +60,8 @@ namespace Waher.Mcp.Identity
 		internal const string PetitionContractPrivilege = PetitionPrivilege + ".Contract";
 		internal const string PetitionSignaturePrivilege = PetitionPrivilege + ".Signature";
 
+		private readonly Cache<string, CacheRec> petitionedObjects = new Cache<string, CacheRec>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromHours(1));
+		private readonly Dictionary<string, Dictionary<string, CacheRec>> objectsPerUserName = new Dictionary<string, Dictionary<string, CacheRec>>();
 		private readonly XmppMcpServer xmppMcpServer;
 
 		/// <summary>
@@ -133,6 +138,125 @@ namespace Waher.Mcp.Identity
 				Instructions, SnifferSet)
 		{
 			this.xmppMcpServer = XmppMcpServer;
+			this.petitionedObjects.Removed += this.PetitionedObjects_Removed;
+		}
+
+		private class CacheRec
+		{
+			public CacheRec(string ObjectId, object Object, IUser User)
+			{
+				this.ObjectId = ObjectId;
+				this.Object = Object;
+				this.User = User;
+			}
+
+			public string ObjectId;
+			public object Object;
+			public IUser User;
+		}
+
+		private static string? GetObjectId(object Object)
+		{
+			if (Object is LegalIdentity LegalIdentity)
+				return LegalIdentity.Id;
+			else if (Object is Contract Contract)
+				return Contract.ContractId;
+			else
+				return null;
+		}
+
+		private bool AddObjectToCache(IUser User, object Object)
+		{
+			string? ObjectId = GetObjectId(Object);
+			if (string.IsNullOrEmpty(ObjectId))
+				return false;
+
+			string UserName = User.UserName;
+			CacheRec Rec = new CacheRec(ObjectId, Object, User);
+
+			lock (this.objectsPerUserName)
+			{
+				if (!this.objectsPerUserName.TryGetValue(UserName,
+					out Dictionary<string, CacheRec> Objects))
+				{
+					Objects = new Dictionary<string, CacheRec>();
+					this.objectsPerUserName[UserName] = Objects;
+				}
+
+				Objects[ObjectId] = Rec;
+			}
+
+			string Key = UserName + "|" + ObjectId;
+			bool New = !this.petitionedObjects.ContainsKey(Key);
+
+			this.petitionedObjects[UserName + "|" + ObjectId] = Rec;
+
+			return New;
+		}
+
+		private object[] GetCachedObjects(string UserName)
+		{
+			lock (this.objectsPerUserName)
+			{
+				if (!this.objectsPerUserName.TryGetValue(UserName,
+					out Dictionary<string, CacheRec> Objects))
+				{
+					return Array.Empty<object>();
+				}
+
+				int i = 0;
+				int c = Objects.Count;
+				object[] Result = new object[c];
+
+				foreach (KeyValuePair<string, CacheRec> P in Objects)
+					Result[i++] = P.Value.Object;
+
+				return Result;
+			}
+		}
+
+		private bool TryGetCachedObject(string UserName, string ObjectId,
+			[NotNullWhen(true)] out object? Object)
+		{
+			lock (this.objectsPerUserName)
+			{
+				if (this.objectsPerUserName.TryGetValue(UserName,
+					out Dictionary<string, CacheRec> Objects) &&
+					Objects.TryGetValue(ObjectId, out CacheRec Rec))
+				{
+					Object = Rec.Object;
+					return true;
+				}
+			}
+
+			Object = null;
+			return false;
+		}
+
+		private Task PetitionedObjects_Removed(object Sender,
+			CacheItemEventArgs<string, CacheRec> e)
+		{
+			string UserName = e.Value.User.UserName;
+			string ObjectId = e.Value.ObjectId;
+
+			lock (this.objectsPerUserName)
+			{
+				if (!this.objectsPerUserName.TryGetValue(UserName,
+					out Dictionary<string, CacheRec> Objects))
+				{
+					return Task.CompletedTask;
+				}
+
+				if (!Objects.Remove(ObjectId))
+					return Task.CompletedTask;
+
+				if (Objects.Count == 0)
+					this.objectsPerUserName.Remove(UserName);
+			}
+
+			this.ResourcesUpdated(e.Value.User);
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -160,12 +284,19 @@ namespace Waher.Mcp.Identity
 				{
 					new KeyValuePair<bool, string>(true,
 						"Resources on the MCP server represents digital identities in " +
-						"their various states. Each digital identity is recognized " +
-						"by the use of the `iotid` URI scheme. Each identity as a " +
-						"State, a date when it was Created, a date when it was last " +
-						"Updated, a date from when the identity is valid to be used " +
-						"and a To date until when it is valid and after which it " +
-						"expires.")
+						"their various states, or petitioned smart contracts, or " +
+						"contract templates you have used."),
+					new KeyValuePair<bool, string>(true,
+						"Each identity has a State, a date when it was Created, a date " +
+						"when it was last Updated, a date from when the identity is " +
+						"valid to be used and a To date until when it is valid and " +
+						"after which it expires."),
+					new KeyValuePair<bool, string>(true,
+						"Each smart contract, or smart contract temaplte is recognized " +
+						"by the use of the `iotsc` URI scheme. Each smart contract has " +
+						"a State, a date when it was Created, a date when it was last " +
+						"updated, a duration, roles, parts who have signed the contract, " +
+						"parameters and human-readable and machine-readable contents.")
 				};
 			}
 		}
@@ -236,6 +367,14 @@ namespace Waher.Mcp.Identity
 			ContractsClient? ContractsClient = await this.GetClient(Call, User, Session, true);
 			if (ContractsClient is null)
 				return null;
+
+			if (this.TryGetCachedObject(User.UserName, Uri.AbsolutePath, out object? Object))
+			{
+				if (Object is LegalIdentity LegalIdentity)
+					return new IdentityResource(LegalIdentity);
+				else if (Object is Contract Contract)
+					return new ContractResource(Contract);
+			}
 
 			LegalIdentity Identity = await ContractsClient.GetLegalIdentityAsync(Uri.AbsolutePath);
 
@@ -333,6 +472,14 @@ namespace Waher.Mcp.Identity
 
 			foreach (LegalIdentity Item in await ContractsClient.GetLegalIdentitiesAsync())
 				Resources.Add(new IdentityResource(Item));
+
+			foreach (object Object in this.GetCachedObjects(User.UserName))
+			{
+				if (Object is LegalIdentity LegalIdentity)
+					Resources.Add(new IdentityResource(LegalIdentity));
+				else if (Object is Contract Contract)
+					Resources.Add(new ContractResource(Contract));
+			}
 
 			return Resources.ToArray();
 		}
@@ -1472,7 +1619,7 @@ namespace Waher.Mcp.Identity
 		}
 
 		private static void AppendQuestionAndRequestor(StringBuilder sb, LegalIdentity Identity,
-			string Question, string Title, string FullJid, string[] Properties, 
+			string Question, string Title, string FullJid, string[] Properties,
 			string[] Attachments, string RemoteEndpoint)
 		{
 			if (!string.IsNullOrEmpty(RemoteEndpoint))
@@ -1869,7 +2016,8 @@ namespace Waher.Mcp.Identity
 			};
 		}
 
-		private async Task ContractsClient_PetitionedPeerReviewIDResponseReceived(object Sender, SignaturePetitionResponseEventArgs e)
+		private async Task ContractsClient_PetitionedPeerReviewIDResponseReceived(object Sender,
+			SignaturePetitionResponseEventArgs e)
 		{
 			if (!(Sender is ContractsClient ContractsClient))
 				return;
@@ -1939,6 +2087,12 @@ namespace Waher.Mcp.Identity
 
 					if (Result.HasValue && Result.Value)
 					{
+						if (!(ReviewerIdentity is null))
+						{
+							if (this.AddObjectToCache(Session.User, ReviewerIdentity))
+								this.ResourcesUpdated(Session.User);
+						}
+
 						if (UserInput is Petition Petition &&
 							Petition.Accept.HasValue &&
 							Petition.Accept.Value &&
@@ -2000,16 +2154,13 @@ namespace Waher.Mcp.Identity
 			return new PetitionIdResponse(PetitionId, "Legal Identity petition sent.");
 		}
 
-		private async Task ContractsClient_PetitionedIdentityResponseReceived(object Sender, LegalIdentityPetitionResponseEventArgs e)
+		private async Task ContractsClient_PetitionedIdentityResponseReceived(object Sender,
+			LegalIdentityPetitionResponseEventArgs e)
 		{
 			if (!(Sender is ContractsClient ContractsClient))
 				return;
 
 			if (!ContractsClient.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
-				return;
-
-			LegalIdentity? ReviewedIdentity = await GetLatestApplication(ContractsClient);
-			if (ReviewedIdentity is null)
 				return;
 
 			StringBuilder sb = new StringBuilder();
@@ -2038,21 +2189,228 @@ namespace Waher.Mcp.Identity
 				{
 					bool? Result = await this.ElicitUserInput(McpXmppExtension.FirstCall,
 						sb.ToString(), new Acknowledgement(), true, Session, 5 * 60 * 1000);
-					
+
 					if (Result.HasValue && Result.Value)
+					{
+						if (!(e.RequestedIdentity is null))
+						{
+							if (this.AddObjectToCache(Session.User, e.RequestedIdentity))
+								this.ResourcesUpdated(Session.User);
+						}
+
 						break;
+					}
 				}
 			}
 		}
 
-		private Task ContractsClient_PetitionedSignatureResponseReceived(object Sender, SignaturePetitionResponseEventArgs e)
+		/// <summary>
+		/// MCP Server Tool to petition a user for a digital signature.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="LegalId">Identifier of Legal Identity to send the petition 
+		/// to.</param>
+		/// <param name="Content">BASE64-encoded content to sign.</param>
+		/// <param name="Purpose">Message to recipient of petition, explaining the purpose 
+		/// of the review.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Petition Digital Signature",
+			"Sends a petition to a user for a digital signature.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(PetitionSignaturePrivilege)]
+		[return: McpParameter("Result", "Result of operation.")]
+		public async Task<PetitionIdResponse> PetitionSignature(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("LegalId", "Identifier of Legal Identity to petition.")]
+			string LegalId,
+
+			[McpStringParameter("Content", "BASE64-encoded content to sign.")]
+			string Content,
+
+			[McpStringParameter("Purpose", "A message to the recipient of the petition, explaining the purpose of the petition.", 1, 1024)]
+			string Purpose)
 		{
-			return Task.CompletedTask;  // TODO
+			byte[] ContentBin;
+
+			try
+			{
+				ContentBin = Convert.FromBase64String(Content);
+			}
+			catch (Exception)
+			{
+				return new PetitionIdResponse("Content is not a valid BASE64-encoded string.");
+			}
+
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new PetitionIdResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new PetitionIdResponse("User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new PetitionIdResponse("MCP XMPP Contracts client not available.");
+
+			string PetitionId = Guid.NewGuid().ToString();
+
+			await Client.PetitionSignatureAsync(LegalId, ContentBin, PetitionId, Purpose);
+
+			return new PetitionIdResponse(PetitionId, "Signature petition sent.");
 		}
 
-		private Task ContractsClient_PetitionedContractResponseReceived(object Sender, ContractPetitionResponseEventArgs e)
+		private async Task ContractsClient_PetitionedSignatureResponseReceived(object Sender,
+			SignaturePetitionResponseEventArgs e)
 		{
-			return Task.CompletedTask;  // TODO
+			if (!(Sender is ContractsClient ContractsClient))
+				return;
+
+			if (!ContractsClient.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
+				return;
+
+			StringBuilder sb = new StringBuilder();
+
+			if (e.Response)
+			{
+				sb.Append("A digital signature you petitioned (Petition ID ");
+				sb.Append(e.PetitionId);
+				sb.Append(") has been successfully returned. ");
+
+				AppendQuestionAndRequestor(sb, e.RequestedIdentity, string.Empty,
+					"signatory", string.Empty, Array.Empty<string>(), Array.Empty<string>(),
+					e.ClientEndpoint);
+			}
+			else
+			{
+				sb.Append("Your digital signature petition (Petition ID ");
+				sb.Append(e.PetitionId);
+				sb.Append(") has been declined by the recipient.");
+			}
+
+			foreach (string SessionId in McpXmppExtension.SessionIds)
+			{
+				if (this.TryGetMcpSession(SessionId, out Session? Session) &&
+					!(Session.User is null))
+				{
+					bool? Result = await this.ElicitUserInput(McpXmppExtension.FirstCall,
+						sb.ToString(), new Acknowledgement(), true, Session, 5 * 60 * 1000);
+
+					if (Result.HasValue && Result.Value)
+					{
+						if (!(e.RequestedIdentity is null))
+						{
+							if (this.AddObjectToCache(Session.User, e.RequestedIdentity))
+								this.ResourcesUpdated(Session.User);
+						}
+
+						break;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// MCP Server Tool to petition the parts of a smart contract, for the smart contract.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="ContractId">Identifier of the Smart Contract to petition.</param>
+		/// <param name="Purpose">Message to recipients of petition, explaining the purpose 
+		/// of the review.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Petition Smart Contract",
+			"Sends a petition to the parts of a smart contract, for access to the smart contract.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(PetitionContractPrivilege)]
+		[return: McpParameter("Result", "Result of operation.")]
+		public async Task<PetitionIdResponse> PetitionSmartContract(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("ContractId", "Identifier of the Smart Contract to petition.")]
+			string ContractId,
+
+			[McpStringParameter("Purpose", "A message to the recipients of the petition, explaining the purpose of the petition.", 1, 1024)]
+			string Purpose)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new PetitionIdResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new PetitionIdResponse("User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new PetitionIdResponse("MCP XMPP Contracts client not available.");
+
+			string PetitionId = Guid.NewGuid().ToString();
+
+			await Client.PetitionContractAsync(ContractId, PetitionId, Purpose);
+
+			return new PetitionIdResponse(PetitionId, "Smart Contract petition sent.");
+		}
+
+		private async Task ContractsClient_PetitionedContractResponseReceived(object Sender,
+			ContractPetitionResponseEventArgs e)
+		{
+			if (!(Sender is ContractsClient ContractsClient))
+				return;
+
+			if (!ContractsClient.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
+				return;
+
+			StringBuilder sb = new StringBuilder();
+
+			if (e.Response)
+			{
+				sb.Append("A smart contract you petitioned (Petition ID ");
+				sb.Append(e.PetitionId);
+				sb.Append(") has been approved by a part in the contract and ");
+				sb.AppendLine("been successfully returned.");
+				sb.AppendLine();
+				sb.Append("You can access the smart contract via the resource: ");
+				sb.AppendLine(Networking.XMPP.Contracts.ContractsClient.ContractIdUri(
+					e.RequestedContract.ContractId).ToString());
+			}
+			else
+			{
+				sb.Append("Your smart contract petition (Petition ID ");
+				sb.Append(e.PetitionId);
+				sb.Append(") has been declined by a part in the contract.");
+			}
+
+			foreach (string SessionId in McpXmppExtension.SessionIds)
+			{
+				if (this.TryGetMcpSession(SessionId, out Session? Session) &&
+					!(Session.User is null))
+				{
+					bool? Result = await this.ElicitUserInput(McpXmppExtension.FirstCall,
+						sb.ToString(), new Acknowledgement(), true, Session, 5 * 60 * 1000);
+
+					if (Result.HasValue && Result.Value)
+					{
+						if (!(e.RequestedContract is null))
+						{
+							if (this.AddObjectToCache(Session.User, e.RequestedContract))
+								this.ResourcesUpdated(Session.User);
+						}
+
+						break;
+					}
+				}
+			}
 		}
 
 		private Task ContractsClient_ContractUpdated(object Sender, ContractReferenceEventArgs e)

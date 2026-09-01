@@ -25,7 +25,6 @@ using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.HttpFileUpload;
 using Waher.Runtime.Collections;
-using Waher.Script.Constants;
 using Waher.Security;
 
 namespace Waher.Mcp.Identity
@@ -52,6 +51,8 @@ namespace Waher.Mcp.Identity
 		internal const string RemoveAttachmentPrivilege = AttachmentPrivilege + ".Remove";
 		internal const string CreatePromptPrivilege = PromptsPrivilege + ".Create";
 		internal const string CreatePersonalIdentityPrivilege = CreatePromptPrivilege + ".Create.PersonalId";
+		internal const string PeerReviewPrivilege = ToolsPrivilege + ".PeerReview";
+		internal const string RequestPeerReviewPrivilege = PeerReviewPrivilege + ".Request";
 
 		private readonly XmppMcpServer xmppMcpServer;
 
@@ -1637,6 +1638,203 @@ namespace Waher.Mcp.Identity
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// MCP Server Tool to get Identity Peer Review providers.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Get Peer Review Providers",
+			"Gets a list of peer review providers that can be used to review identity applications.",
+			"",     // IconsMethod, use default icons
+			false,  // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			true,   // Idempotent
+			false)] // OpenWorldAccess
+		[RequiredPrivilege(RequestPeerReviewPrivilege)]
+		[return: McpParameter("Result", "Available peer review providers.")]
+		public async Task<PeerReviewProvidersResponse> GetPeerReviewProviders(
+			IJsonRpcCall Call)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new PeerReviewProvidersResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new PeerReviewProvidersResponse("User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new PeerReviewProvidersResponse("MCP XMPP Contracts client not available.");
+			
+			ServiceProviderWithLegalId[] Providers = await Client.GetPeerReviewIdServiceProvidersAsync();
+			int i, c = Providers.Length;
+			PeerReviewProvider[] Providers2 = new PeerReviewProvider[c];
+
+			for (i = 0; i < c; i++)
+				Providers2[i] = new PeerReviewProvider(Providers[i]);
+
+			return new PeerReviewProvidersResponse(Providers2);
+		}
+
+		/// <summary>
+		/// MCP Server Tool to select an internal Peer Review provider.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="Id">Peer Review Provider ID.</param>
+		/// <param name="Type">Peer Review Provider Type.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Select Peer Review Provider",
+			"Selects an internal Peer Review provider.",
+			"",     // IconsMethod, use default icons
+			false,  // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			true,   // Idempotent
+			false)] // OpenWorldAccess
+		[RequiredPrivilege(RequestPeerReviewPrivilege)]
+		[return: McpParameter("Result", "Result of operation.")]
+		public async Task<GenericResponse> SelectPeerReviewProvider(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("Id", "Peer Review Provider ID.")]
+			string Id,
+
+			[McpStringParameter("Type", "Peer Review Provider Type.")]
+			string Type)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new GenericResponse(false, "No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new GenericResponse(false, "User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new GenericResponse(false, "MCP XMPP Contracts client not available.");
+			
+			await Client.SelectPeerReviewServiceAsync(Id, Type);
+
+			return new GenericResponse(true, "Peer Review provider selected.");
+		}
+
+		/// <summary>
+		/// MCP Server Tool to petition a peer for a review of an identity application.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="LegalId">Identifier of Legal Identity to send the petition 
+		/// to.</param>
+		/// <param name="Purpose">Message to recipient of petition, explaining the purpose 
+		/// of the review.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Select Peer Review Provider",
+			"Selects an internal Peer Review provider.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(RequestPeerReviewPrivilege)]
+		[return: McpParameter("Result", "Result of operation.")]
+		public async Task<GenericResponse> PetitionPeerReview(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("LegalId", "Identifier of Legal Identity to send the petition to.")]
+			string LegalId,
+
+			[McpStringParameter("Purpose", "Message to recipient of petition, explaining the purpose of the review.", 1, 1024)]
+			string Purpose)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new GenericResponse(false, "No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new GenericResponse(false, "User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new GenericResponse(false, "MCP XMPP Contracts client not available.");
+
+			LegalIdentity[] Identities = await Client.GetLegalIdentitiesAsync();
+			LegalIdentity? LatestCreated = null;
+
+			foreach (LegalIdentity Identity in Identities)
+			{
+				if (Identity.State != Networking.XMPP.Contracts.IdentityState.Created)
+					continue;
+
+				if (LatestCreated is null || Identity.Created > LatestCreated.Created)
+					LatestCreated = Identity;
+			}
+
+			if (LatestCreated is null)
+				return new GenericResponse(false, "No current Legal Identity application found.");
+
+			string PetitionId = Guid.NewGuid().ToString();
+
+			await Client.PetitionPeerReviewIDAsync(LegalId, LatestCreated, PetitionId, Purpose);
+
+			return new GenericResponse(true, "Peer Review identity petition sent.");
+		}
+
+		/// <summary>
+		/// MCP Server Prompt to request a peer review of a current identity application.
+		/// </summary>
+		/// <returns>Prompt messages</returns>
+		[McpServerPrompt("Request Peer Review",          // Title
+			"Requests a Peer Review of a current Identity Application.",  // Description
+			"")]                                                    // IconsMethod, use default icons
+		[RequiredPrivilege(CreatePersonalIdentityPrivilege)]
+		[RequiredPrivilege(RequestPeerReviewPrivilege)]
+		public PromptMessage[] RequestPeerReview()
+		{
+			return new PromptMessage[]
+			{
+				new PromptMessage(McpRole.User,
+					"Request a peer review of my Identity Application."),
+				new PromptMessage(McpRole.Assistant,
+					"One way to get an identity application approved, is Peer Review. " +
+					"If the XMPP broker to which the client is connected supports " +
+					"and permits peer review, it will accept a given number of peer " +
+					"review results as proof the identity application is valid, and " +
+					"therefore approve it. To request a peer review, there are different " +
+					"options to take."),
+				new PromptMessage(McpRole.Assistant,
+					"One way is to beforehand know the identifier of the Legal Identity of " +
+					"the Peer of which the peer review will be petitioned. In that case, " +
+					"requesting a Peer Review is as simple as petitioning the peer for a " +
+					"peer review, using the tool for that purpose."),
+				new PromptMessage(McpRole.Assistant,
+					"If such an identifier is not known, you can check for featured peer " +
+					"reviewers, provided or referenced by the broker itself. If selecting " +
+					"this method, first use the tool to get Peer Review Providers from " +
+					"the broker. Each provider can be either External (i.e. referenced " +
+					"to by the Broker) or Internal (i.e. hosted on or in conjunction " +
+					"with the Broker itself). All providers also include an identifier " +
+					"of the Legal Identity to which the peer review should be " +
+					"petitioned. If an external peer reviewer is selected, you can " +
+					"continue directly to petitioning the peer review from the provider " +
+					"using the Peer Review petitioning tool. If the provider is Internal " +
+					"however, meaning, it is hosted by the Broker itself, and therefore " +
+					"shares the Legal Identifier of the broker itself, the provider " +
+					"must first be selected. Selecting a peer review provider is done " +
+					"using the tool for that purpose. After the peer review provider " +
+					"has been selected, you can continue to petition the peer review " +
+					"from the Legal Identity identifier provided for the provider."),
+				new PromptMessage(McpRole.Assistant,
+					"A petition does not guarantee that a peer review will actually " +
+					"be performed. It is only a request, and the request may be " +
+					"performed at a later time. Any results of the peer review will " +
+					"be notified to you, when the result is received.")
+			};
 		}
 
 		private Task ContractsClient_PetitionedIdentityResponseReceived(object Sender, LegalIdentityPetitionResponseEventArgs e)

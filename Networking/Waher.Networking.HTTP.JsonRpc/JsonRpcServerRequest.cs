@@ -12,25 +12,95 @@ namespace Waher.Networking.HTTP.JsonRpc
 	/// <summary>
 	/// Server-side information about a JSON-RPC request.
 	/// </summary>
-	internal class JsonRpcServerRequest : IDisposable
+	public class JsonRpcServerRequest : IDisposable
 	{
-		public JsonRpcServerRequest?[]? BatchRequests = null;
-		public Dictionary<string, object?>? ResponseObject = null;
-		public Dictionary<string, object?>[]? ResponseArray = null;
-		public object? Response = null;
-		public Dictionary<string, object?>? ParametersObj = null;
-		public JsonRpcMethodInfo? MethodInfo = null;
-		public Array? ParametersArray = null;
-		public string JsonVersion = string.Empty;
-		public object? Id = null;
-		public int? ErrorCode = null;
-		public int StatusCode = 204;
-		public string StatusMessage = "No Content";
-		public string? ErrorMessage = null;
-		public object? Result = null;
-		public bool IsResult = false;
-		public bool IsError = false;
+		/// <summary>
+		/// Batch of requests made in a single request.
+		/// </summary>
+		public JsonRpcServerRequest?[]? BatchRequests { get; set; } = null;
 
+		/// <summary>
+		/// Encoded Response object.
+		/// </summary>
+		public Dictionary<string, object?>? ResponseObject { get; set; } = null;
+
+		/// <summary>
+		/// Response array
+		/// </summary>
+		public Dictionary<string, object?>[]? ResponseArray { get; set; } = null;
+
+		/// <summary>
+		/// Response
+		/// </summary>
+		public object? Response { get; set; } = null;
+
+		/// <summary>
+		/// Parameters in request, as a dictionary.
+		/// </summary>
+		public Dictionary<string, object?>? ParametersObj { get; set; } = null;
+
+		/// <summary>
+		/// Method information.
+		/// </summary>
+		public JsonRpcMethodInfo? MethodInfo { get; set; } = null;
+
+		/// <summary>
+		/// Parameters in request, as an array.
+		/// </summary>
+		public Array? ParametersArray { get; set; } = null;
+
+		/// <summary>
+		/// JSON-RPC version
+		/// </summary>
+		public string JsonVersion { get; set; } = string.Empty;
+
+		/// <summary>
+		/// Request identifier
+		/// </summary>
+		public object? Id { get; set; } = null;
+
+		/// <summary>
+		/// Error code
+		/// </summary>
+		public int? ErrorCode { get; set; } = null;
+
+		/// <summary>
+		/// HTTP status code to return. Default is 204 (No Content).
+		/// </summary>
+		public int StatusCode { get; set; } = 204;
+
+		/// <summary>
+		/// HTTP status message to return. Default is "No Content".
+		/// </summary>
+		public string StatusMessage { get; set; } = "No Content";
+
+		/// <summary>
+		/// Error message
+		/// </summary>
+		public string? ErrorMessage { get; set; } = null;
+
+		/// <summary>
+		/// Result object.
+		/// </summary>
+		public object? Result { get; set; } = null;
+
+		/// <summary>
+		/// If the request object contains a result.
+		/// </summary>
+		public bool IsResult { get; set; } = false;
+
+		/// <summary>
+		/// If the request object contains an error.
+		/// </summary>
+		public bool IsError { get; set; } = false;
+
+		/// <summary>
+		/// Sets an error response to the request.
+		/// </summary>
+		/// <param name="ErrorCode">Error code</param>
+		/// <param name="ErrorMessage">Error message</param>
+		/// <param name="StatusCode">HTTP status code</param>
+		/// <param name="StatusMessage">HTTP status message</param>
 		public void SetError(int ErrorCode, string ErrorMessage, int StatusCode,
 			string StatusMessage)
 		{
@@ -40,6 +110,9 @@ namespace Waher.Networking.HTTP.JsonRpc
 			this.StatusMessage = StatusMessage;
 		}
 
+		/// <summary>
+		/// Disposes of the request object, and any associated dispoable response resources.
+		/// </summary>
 		public void Dispose()
 		{
 			if (this.Result is IDisposable Disposable)

@@ -499,6 +499,77 @@ namespace Waher.Networking.HTTP.JsonRpc
 			return Count;
 		}
 
+		/// <summary>
+		/// Formats an event notification into a string, according to the Server-Sent Events (SSE) 
+		/// specification.
+		/// </summary>
+		/// <param name="Event">Event to format.</param>
+		/// <returns>Formatted event notification.</returns>
+		public static string FormatEventNotification(NotificationEventArgs Event)
+		{
+			IEnumerable<KeyValuePair<string, object>> Fields = Event.Fields;
+			StringBuilder sb = new StringBuilder();
+			string? Comment = Event.Comment;
+			bool Empty = true;
+
+			if (!string.IsNullOrEmpty(Comment))
+			{
+				Empty = false;
+				sb.Append(Comment);
+				if (Comment.IndexOfAny(CommonTypes.CRLF) >= 0)
+				{
+					foreach (string Line in Comment.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
+					{
+						sb.Append(": ");
+						sb.Append(Line);
+						sb.Append("\r\n");
+					}
+				}
+				else
+				{
+					sb.Append(": ");
+					sb.Append(Comment);
+					sb.Append("\r\n");
+				}
+			}
+
+			if (!(Fields is null))
+			{
+				foreach (KeyValuePair<string, object> P in Fields)
+				{
+					Empty = false;
+
+					if (!(P.Value is string s))
+						s = JSON.Encode(P.Value, false);
+
+					if (s.IndexOfAny(CommonTypes.CRLF) >= 0)
+					{
+						foreach (string Line in s.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
+						{
+							sb.Append(P.Key);
+							sb.Append(": ");
+							sb.Append(Line);
+							sb.Append("\r\n");
+						}
+					}
+					else
+					{
+						sb.Append(P.Key);
+						sb.Append(": ");
+						sb.Append(s);
+						sb.Append("\r\n");
+					}
+				}
+			}
+
+			if (Empty)
+				sb.Append(":\r\n");
+
+			sb.Append("\r\n");
+
+			return sb.ToString();
+		}
+
 		private readonly ChunkedList<Subscription> eventSubscriptions = new ChunkedList<Subscription>();
 		private Subscription[] eventSubscriptionsStatic = Array.Empty<Subscription>();
 		private bool eventSubscriptionsKeepAliveRunning = false;

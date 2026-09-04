@@ -2188,6 +2188,7 @@ The following functions are available in the `Waher.Script.Content` library.
 | `QrEncode(Text,Level)`                             | Encodes text in `Text` to a QR Code using Error Correction level defined by `Level`. Response is a text string where the QR Code is encoded using block characters. | [Example][QrExample] |
 | `QrEncode(Text,Level[,Width[,Height]])`            | Encodes text in `Text` to a QR Code using Error Correction level defined by `Level`. Response is a bitmap with the specified dimensions. If only `Width` is specified, `Height` will be assued to be identical. | [Example][QrExample2] |
 | `SaveFile(Obj,FileName)`                           | Encodes an object `Obj` in accordance with its type and file extension, and saves it as a file. | [Example][SaveFileExample] |
+| `ToonEncode(Data)`                                 | Encodes data into a TOON string. | [Example][ToonEncodeExample] |
 | `UrlDecode(s)`                                     | Decodes a string taken from an URL. | [Example][UrlDecodeExample] |
 | `UrlEncode(s)`                                     | Encodes a string for inclusion in an URL. | [Example][UrlEncodeExample] |
 | `Utf8Decode(s)`                                    | Gets a string from UTF-8 encoded data. | [Example][Utf8DecodeExample] |
@@ -2225,6 +2226,7 @@ The following functions are available in the `Waher.Script.Content` library.
 [QrExample]: Prompt.md?Expression=QrEncode("Hello World","Q")
 [QrExample2]: Prompt.md?Expression=QrEncode("Hello World","Q",300)
 [SaveFileExample]: Prompt.md?Expression=SaveFile(Graph,%22Graph.png%22)
+[ToonEncodeExample]: Prompt.md?Expression=ToonEncode({'a':1,'b':2})
 [UrlDecodeExample]: Prompt.md?Expression=UrlDecode(%22Hello%2bWorld%22)
 [UrlEncodeExample]: Prompt.md?Expression=UrlEncode(%22Hello%20World%22)
 [Utf8DecodeExample]: Prompt.md?Expression=Utf8Decode(Base64Decode("SGVsbG8="))

@@ -1,10 +1,6 @@
-using System;
 using Waher.Content;
-using Waher.Script;
-using Waher.Script.Abstraction;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Content.Functions.Encoding
 {

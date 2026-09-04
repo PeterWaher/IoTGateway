@@ -8,6 +8,6 @@ namespace Waher.Mcp.Identity.UserInput
 	internal class Petition
 	{
 		[McpParameter("Accept", "If you accept the petition, and the requested information should be returned.")]
-		public bool? Accept;
+		public bool? Accept = null;
 	}
 }

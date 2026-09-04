@@ -11,8 +11,106 @@ namespace Waher.Mcp.Identity.Resources
 	/// <summary>
 	/// Contract resource extensions.
 	/// </summary>
-	public static class ContractResourceExtensions
+	public static class JsonExtensions
 	{
+		/// <summary>
+		/// Converts a legal identity to a dictionary for JSON encoding.
+		/// </summary>
+		/// <param name="Identity">Legal Identity</param>
+		/// <returns>Dictionary</returns>
+		public static Dictionary<string, object?>? ToJson(this LegalIdentity Identity)
+		{
+			if (Identity is null)
+				return null;
+
+			return new Dictionary<string, object?>()
+			{
+				{ "Id", Identity.Id },
+				{ "Provider", Identity.Provider },
+				{ "State", Identity.State },
+				{ "Created", Identity.Created },
+				{ "Updated", Identity.Updated },
+				{ "From", Identity.From },
+				{ "To", Identity.To },
+				{ "Properties", Identity.Properties.ToJson() },
+				{ "Attachments", Identity.Attachments.ToJson() },
+				{ "ClientKeyName", Identity.ClientKeyName },
+				{ "ClientPubKey", Identity.ClientPubKey },
+				{ "ClientSignature", Identity.ClientSignature }
+			};
+		}
+
+		/// <summary>
+		/// Converts a property to a dictionary for JSON encoding.
+		/// </summary>
+		/// <param name="Property">Property</param>
+		/// <returns>Dictionary</returns>
+		public static Dictionary<string, object?>? ToJson(this Property Property)
+		{
+			if (Property is null)
+				return null;
+
+			return new Dictionary<string, object?>()
+			{
+				{ "Name", Property.Name },
+				{ "Value", Property.Value }
+			};
+		}
+
+		/// <summary>
+		/// Converts an array of properties to an array of dictionaries for JSON encoding.
+		/// </summary>
+		/// <param name="Properties">Properties</param>
+		/// <returns>Dictionaries</returns>
+		public static Dictionary<string, object?>?[] ToJson(this Property[] Properties)
+		{
+			int i, c = Properties?.Length ?? 0;
+			Dictionary<string, object?>?[] Result = new Dictionary<string, object?>?[c];
+
+			for (i = 0; i < c; i++)
+				Result[i] = Properties![i].ToJson();
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Converts a attachment to a dictionary for JSON encoding.
+		/// </summary>
+		/// <param name="Attachment">Attachment</param>
+		/// <returns>Dictionary</returns>
+		public static Dictionary<string, object?>? ToJson(this Attachment Attachment)
+		{
+			if (Attachment is null)
+				return null;
+
+			return new Dictionary<string, object?>()
+			{
+				{ "Id", Attachment.Id },
+				{ "LegalId", Attachment.LegalId },
+				{ "ContentType", Attachment.ContentType },
+				{ "FileName", Attachment.FileName },
+				{ "Url", Attachment.Url },
+				{ "Signature", Attachment.Signature },
+				{ "Timestamp", Attachment.Timestamp }
+			};
+		}
+
+		/// <summary>
+		/// Converts an array of attachments to an array of dictionaries for JSON encoding.
+		/// </summary>
+		/// <param name="Attachments">Attachments</param>
+		/// <returns>Dictionaries</returns>
+		public static Dictionary<string, object?>?[] ToJson(this Attachment[] Attachments)
+		{
+			int i, c = Attachments?.Length ?? 0;
+			Dictionary<string, object?>?[] Result = new Dictionary<string, object?>?[c];
+
+			for (i = 0; i < c; i++)
+				Result[i] = Attachments![i].ToJson();
+
+			return Result;
+		}
+
 		/// <summary>
 		/// Converts a contract to a dictionary for JSON encoding.
 		/// </summary>

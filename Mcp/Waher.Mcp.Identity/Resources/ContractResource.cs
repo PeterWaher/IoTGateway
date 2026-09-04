@@ -51,7 +51,5 @@ namespace Waher.Mcp.Identity.Resources
 				new TextContent(this.Uri, s, ToonEncoder.DefaultContentType, MetaData)
 			});
 		}
-
-
 	}
 }

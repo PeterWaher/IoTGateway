@@ -1915,7 +1915,7 @@ namespace Waher.Mcp.Identity
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(PetitionPeerReviewPrivilege)]
 		[return: McpParameter("Result", "Result of operation.")]
-		public async Task<PetitionIdResponse> PetitionPeerReview(
+		public async Task<PetitionResponse> PetitionPeerReview(
 			IJsonRpcCall Call,
 
 			[McpStringParameter("LegalId", "Identifier of Legal Identity to send the petition to.")]
@@ -1926,25 +1926,25 @@ namespace Waher.Mcp.Identity
 		{
 			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
-				return new PetitionIdResponse("No MCP session.");
+				return new PetitionResponse("No MCP session.");
 
 			IUser? User = await this.GetAuthenticatedUser(Call, Session);
 			if (Call.ResponseSent || User is null)
-				return new PetitionIdResponse("User not authenticated.");
+				return new PetitionResponse("User not authenticated.");
 
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
-				return new PetitionIdResponse("MCP XMPP Contracts client not available.");
+				return new PetitionResponse("MCP XMPP Contracts client not available.");
 
 			LegalIdentity? LatestCreated = await GetLatestApplication(Client);
 			if (LatestCreated is null)
-				return new PetitionIdResponse("No current Legal Identity application found.");
+				return new PetitionResponse("No current Legal Identity application found.");
 
 			string PetitionId = Guid.NewGuid().ToString();
 
 			await Client.PetitionPeerReviewIDAsync(LegalId, LatestCreated, PetitionId, Purpose);
 
-			return new PetitionIdResponse(PetitionId, "Peer Review petition sent.");
+			return new PetitionResponse(PetitionId, "Peer Review petition sent.");
 		}
 
 		private static async Task<LegalIdentity?> GetLatestApplication(ContractsClient Client)
@@ -2126,7 +2126,7 @@ namespace Waher.Mcp.Identity
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(PetitionIdentityPrivilege)]
 		[return: McpParameter("Result", "Result of operation.")]
-		public async Task<PetitionIdResponse> PetitionLegalIdentity(
+		public async Task<PetitionResponse> PetitionLegalIdentity(
 			IJsonRpcCall Call,
 
 			[McpStringParameter("LegalId", "Identifier of Legal Identity to petition.")]
@@ -2137,21 +2137,31 @@ namespace Waher.Mcp.Identity
 		{
 			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
-				return new PetitionIdResponse("No MCP session.");
+				return new PetitionResponse("No MCP session.");
 
 			IUser? User = await this.GetAuthenticatedUser(Call, Session);
 			if (Call.ResponseSent || User is null)
-				return new PetitionIdResponse("User not authenticated.");
+				return new PetitionResponse("User not authenticated.");
 
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
-				return new PetitionIdResponse("MCP XMPP Contracts client not available.");
+				return new PetitionResponse("MCP XMPP Contracts client not available.");
+
+			try
+			{
+				LegalIdentity Identity = await Client.GetLegalIdentityAsync(LegalId);
+				return new PetitionResponse(Identity.ToJson(), "Legal Identity available in QuickResponse property. Access already granted. No petition sent.");
+			}
+			catch (Exception)
+			{
+				// Access not authorized; send petition.
+			}
 
 			string PetitionId = Guid.NewGuid().ToString();
 
 			await Client.PetitionIdentityAsync(LegalId, PetitionId, Purpose);
 
-			return new PetitionIdResponse(PetitionId, "Legal Identity petition sent.");
+			return new PetitionResponse(PetitionId, "Legal Identity petition sent.");
 		}
 
 		private async Task ContractsClient_PetitionedIdentityResponseReceived(object Sender,
@@ -2224,7 +2234,7 @@ namespace Waher.Mcp.Identity
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(PetitionSignaturePrivilege)]
 		[return: McpParameter("Result", "Result of operation.")]
-		public async Task<PetitionIdResponse> PetitionSignature(
+		public async Task<PetitionResponse> PetitionSignature(
 			IJsonRpcCall Call,
 
 			[McpStringParameter("LegalId", "Identifier of Legal Identity to petition.")]
@@ -2244,26 +2254,26 @@ namespace Waher.Mcp.Identity
 			}
 			catch (Exception)
 			{
-				return new PetitionIdResponse("Content is not a valid BASE64-encoded string.");
+				return new PetitionResponse("Content is not a valid BASE64-encoded string.");
 			}
 
 			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
-				return new PetitionIdResponse("No MCP session.");
+				return new PetitionResponse("No MCP session.");
 
 			IUser? User = await this.GetAuthenticatedUser(Call, Session);
 			if (Call.ResponseSent || User is null)
-				return new PetitionIdResponse("User not authenticated.");
+				return new PetitionResponse("User not authenticated.");
 
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
-				return new PetitionIdResponse("MCP XMPP Contracts client not available.");
+				return new PetitionResponse("MCP XMPP Contracts client not available.");
 
 			string PetitionId = Guid.NewGuid().ToString();
 
 			await Client.PetitionSignatureAsync(LegalId, ContentBin, PetitionId, Purpose);
 
-			return new PetitionIdResponse(PetitionId, "Signature petition sent.");
+			return new PetitionResponse(PetitionId, "Signature petition sent.");
 		}
 
 		private async Task ContractsClient_PetitionedSignatureResponseReceived(object Sender,
@@ -2334,7 +2344,7 @@ namespace Waher.Mcp.Identity
 			true)]  // OpenWorldAccess
 		[RequiredPrivilege(PetitionContractPrivilege)]
 		[return: McpParameter("Result", "Result of operation.")]
-		public async Task<PetitionIdResponse> PetitionSmartContract(
+		public async Task<PetitionResponse> PetitionSmartContract(
 			IJsonRpcCall Call,
 
 			[McpStringParameter("ContractId", "Identifier of the Smart Contract to petition.")]
@@ -2345,21 +2355,31 @@ namespace Waher.Mcp.Identity
 		{
 			Session? Session = await this.TryGetMcpSession(Call);
 			if (Session is null)
-				return new PetitionIdResponse("No MCP session.");
+				return new PetitionResponse("No MCP session.");
 
 			IUser? User = await this.GetAuthenticatedUser(Call, Session);
 			if (Call.ResponseSent || User is null)
-				return new PetitionIdResponse("User not authenticated.");
+				return new PetitionResponse("User not authenticated.");
 
 			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
 			if (Client is null)
-				return new PetitionIdResponse("MCP XMPP Contracts client not available.");
+				return new PetitionResponse("MCP XMPP Contracts client not available.");
+
+			try
+			{
+				Contract Contract = await Client.GetContractAsync(ContractId);
+				return new PetitionResponse(Contract.ToJson(), "Smart Contract available in QuickResponse property. Access already granted. No petition sent.");
+			}
+			catch (Exception)
+			{
+				// Access not authorized; send petition.
+			}
 
 			string PetitionId = Guid.NewGuid().ToString();
 
 			await Client.PetitionContractAsync(ContractId, PetitionId, Purpose);
 
-			return new PetitionIdResponse(PetitionId, "Smart Contract petition sent.");
+			return new PetitionResponse(PetitionId, "Smart Contract petition sent.");
 		}
 
 		private async Task ContractsClient_PetitionedContractResponseReceived(object Sender,

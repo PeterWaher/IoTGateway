@@ -43,23 +43,7 @@ namespace Waher.Mcp.Identity.Resources
 		public override Task<IResourceContent[]> Read(
 			Dictionary<string, object>? MetaData)
 		{
-			Dictionary<string, object> Contents = new Dictionary<string, object>()
-			{
-				{ "Id", this.identity.Id },
-				{ "Provider", this.identity.Provider },
-				{ "State", this.identity.State },
-				{ "Created", this.identity.Created },
-				{ "Updated", this.identity.Updated },
-				{ "From", this.identity.From },
-				{ "To", this.identity.To },
-				{ "Properties", this.identity.Properties },
-				{ "Attachments", this.identity.Attachments },
-				{ "ClientKeyName", this.identity.ClientKeyName },
-				{ "ClientPubKey", this.identity.ClientPubKey },
-				{ "ClientSignature", this.identity.ClientSignature }
-			};
-
-			string s = TOON.Encode(Contents, false);
+			string s = TOON.Encode(this.identity.ToJson(), false);
 
 			return Task.FromResult(new IResourceContent[]
 			{

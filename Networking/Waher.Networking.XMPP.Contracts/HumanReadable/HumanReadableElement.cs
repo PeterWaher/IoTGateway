@@ -6,7 +6,6 @@ using Waher.Content;
 using Waher.Content.Markdown;
 using Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements;
 using Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements;
-using Waher.Script.Functions.ComplexNumbers;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable
 {

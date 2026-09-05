@@ -13,6 +13,27 @@ using Waher.Runtime.Threading;
 namespace Waher.Mcp.Identity
 {
 	/// <summary>
+	/// Status of new cached item.
+	/// </summary>
+	public enum CacheItemStatus
+	{
+		/// <summary>
+		/// New item
+		/// </summary>
+		New,
+
+		/// <summary>
+		/// Updated existing item
+		/// </summary>
+		Updated,
+
+		/// <summary>
+		/// Same as existing item
+		/// </summary>
+		Same
+	}
+
+	/// <summary>
 	/// Static class managing the petition cache.
 	/// </summary>
 	public static class PetitionCache
@@ -76,9 +97,9 @@ namespace Waher.Mcp.Identity
 		/// </summary>
 		/// <param name="UserName">MCP user name.</param>
 		/// <param name="Identity">Legal identity object.</param>
-		/// <returns>If the object was added or updated (true) or if an identical object
-		/// was already available in the cache (false).</returns>
-		public static async Task<bool> AddLegalIdentity(string UserName, LegalIdentity Identity)
+		/// <returns>If the object was added or updated an identical object
+		/// was already available in the cache.</returns>
+		public static async Task<CacheItemStatus> AddLegalIdentity(string UserName, LegalIdentity Identity)
 		{
 			string Uri = "iotid:" + Identity.Id;
 			string Key = UserName + ":" + Uri;
@@ -104,17 +125,17 @@ namespace Waher.Mcp.Identity
 
 				await Database.Insert(Item);
 
-				return true;
+				return CacheItemStatus.New;
 			}
 			else if (Item.Xml != Xml)
 			{
 				Item.Xml = Xml;
 				await Database.Update(Item);
 
-				return true;
+				return CacheItemStatus.Updated;
 			}
 			else
-				return false;
+				return CacheItemStatus.Same;
 		}
 
 		/// <summary>
@@ -167,9 +188,9 @@ namespace Waher.Mcp.Identity
 		/// </summary>
 		/// <param name="UserName">MCP user name.</param>
 		/// <param name="Contract">Contract object.</param>
-		/// <returns>If the object was added or updated (true) or if an identical object
-		/// was already available in the cache (false).</returns>
-		public static async Task<bool> AddContract(string UserName, Contract Contract)
+		/// <returns>If the object was added or updated or if an identical object
+		/// was already available in the cache.</returns>
+		public static async Task<CacheItemStatus> AddContract(string UserName, Contract Contract)
 		{
 			string Uri = "iotsc:" + Contract.ContractId;
 			string Key = UserName + ":" + Uri;
@@ -195,17 +216,17 @@ namespace Waher.Mcp.Identity
 
 				await Database.Insert(Item);
 
-				return true;
+				return CacheItemStatus.New;
 			}
 			else if (Item.Xml != Xml)
 			{
 				Item.Xml = Xml;
 				await Database.Update(Item);
 
-				return true;
+				return CacheItemStatus.Updated;
 			}
 			else
-				return false;
+				return CacheItemStatus.Same;
 		}
 
 		/// <summary>
@@ -247,6 +268,22 @@ namespace Waher.Mcp.Identity
 			}
 
 			return Items.ToArray();
+		}
+
+		/// <summary>
+		/// Removes a cached object.
+		/// </summary>
+		/// <param name="UserName">User name.</param>
+		/// <param name="Uri">URI of object</param>
+		/// <returns>If an object was found and removed.</returns>
+		public static async Task<bool> RemoveCachedObject(string UserName, string Uri)
+		{
+			int Count = await Database.Delete<CachedPetitionItem>(
+				new FilterAnd(
+					new FilterFieldEqualTo("McpUserName", UserName),
+					new FilterFieldEqualTo("Uri", Uri)));
+
+			return Count > 0;
 		}
 	}
 }

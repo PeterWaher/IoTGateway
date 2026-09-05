@@ -59,6 +59,7 @@ namespace Waher.Mcp.Identity
 		internal const string ContractPrivilege = ToolsPrivilege + ".Contract";
 		internal const string SignContractPrivilege = ContractPrivilege + ".Sign";
 		internal const string ProposeContractPrivilege = ContractPrivilege + ".Propose";
+		internal const string CreateContractPrivilege = ContractPrivilege + ".Create";
 
 		private readonly XmppMcpServer xmppMcpServer;
 
@@ -588,8 +589,23 @@ namespace Waher.Mcp.Identity
 				ContractsClient.Client.TryGetTag("User", out IUser? User) &&
 				!(User is null))
 			{
-				if (await PetitionCache.AddLegalIdentity(User.UserName, e.Identity))
-					this.ResourceUpdated(User, ContractsClient.LegalIdUri(e.Identity.Id));
+				this.ProcessCacheResult(User,
+					await PetitionCache.AddLegalIdentity(User.UserName, e.Identity),
+					e.Identity.IdUri);
+			}
+		}
+
+		private void ProcessCacheResult(IUser User, CacheItemStatus Status, Uri Uri)
+		{
+			switch (Status)
+			{
+				case CacheItemStatus.New:
+					this.ResourcesUpdated(User);
+					break;
+
+				case CacheItemStatus.Updated:
+					this.ResourceUpdated(User, Uri);
+					break;
 			}
 		}
 
@@ -1994,8 +2010,9 @@ namespace Waher.Mcp.Identity
 					{
 						if (!(ReviewerIdentity is null))
 						{
-							if (await PetitionCache.AddLegalIdentity(Session.UserName, ReviewerIdentity))
-								this.ResourcesUpdated(Session.User);
+							this.ProcessCacheResult(Session.User,
+								await PetitionCache.AddLegalIdentity(Session.UserName, ReviewerIdentity),
+								ReviewerIdentity.IdUri);
 						}
 
 						if (UserInput is Petition Petition &&
@@ -2120,8 +2137,9 @@ namespace Waher.Mcp.Identity
 					{
 						if (!(e.RequestedIdentity is null))
 						{
-							if (await PetitionCache.AddLegalIdentity(Session.UserName, e.RequestedIdentity))
-								this.ResourcesUpdated(Session.User);
+							this.ProcessCacheResult(Session.User,
+								await PetitionCache.AddLegalIdentity(Session.UserName, e.RequestedIdentity),
+								e.RequestedIdentity.IdUri);
 						}
 
 						break;
@@ -2232,8 +2250,9 @@ namespace Waher.Mcp.Identity
 					{
 						if (!(e.RequestedIdentity is null))
 						{
-							if (await PetitionCache.AddLegalIdentity(Session.UserName, e.RequestedIdentity))
-								this.ResourcesUpdated(Session.User);
+							this.ProcessCacheResult(Session.User,
+								await PetitionCache.AddLegalIdentity(Session.UserName, e.RequestedIdentity),
+								e.RequestedIdentity.IdUri);
 						}
 
 						break;
@@ -2339,8 +2358,9 @@ namespace Waher.Mcp.Identity
 					{
 						if (!(e.RequestedContract is null))
 						{
-							if (await PetitionCache.AddContract(Session.UserName, e.RequestedContract))
-								this.ResourcesUpdated(Session.User);
+							this.ProcessCacheResult(Session.User,
+								await PetitionCache.AddContract(Session.UserName, e.RequestedContract),
+								e.RequestedContract.ContractIdUri);
 						}
 
 						break;
@@ -2357,8 +2377,9 @@ namespace Waher.Mcp.Identity
 			{
 				Contract Contract = await ContractsClient.GetContractAsync(e.ContractId);
 
-				if (await PetitionCache.AddContract(User.UserName, Contract))
-					this.ResourceUpdated(User, e.ContractIdUri);
+				this.ProcessCacheResult(User,
+					await PetitionCache.AddContract(User.UserName, Contract),
+					Contract.ContractIdUri);
 			}
 		}
 
@@ -2414,8 +2435,9 @@ namespace Waher.Mcp.Identity
 
 				Contract = await Client.SignContractAsync(Contract, Role, Transferable);
 
-				if (await PetitionCache.AddContract(User.UserName, Contract))
-					this.ResourceUpdated(User, Contract.ContractIdUri);
+				this.ProcessCacheResult(User,
+					await PetitionCache.AddContract(User.UserName, Contract),
+					Contract.ContractIdUri);
 
 				return new ContractResponse(Contract.ToJson(), "Smart Contract signed.");
 			}
@@ -2429,10 +2451,11 @@ namespace Waher.Mcp.Identity
 		{
 			if (Sender is ContractsClient ContractsClient &&
 				ContractsClient.Client.TryGetTag("User", out IUser? User) &&
-				!(User is null) &&
-				await PetitionCache.AddContract(User.UserName, e.Contract))
+				!(User is null))
 			{
-				this.ResourceUpdated(User, e.Contract.ContractIdUri);
+				this.ProcessCacheResult(User,
+					await PetitionCache.AddContract(User.UserName, e.Contract),
+					e.Contract.ContractIdUri);
 			}
 		}
 
@@ -2500,13 +2523,13 @@ namespace Waher.Mcp.Identity
 				!(User is null) &&
 				ContractsClient.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
 			{
-				Contract? Contract;
-
-				Contract = await PetitionCache.TryGetContract(User.UserName, e.ContractId, ContractsClient)
+				Contract? Contract = await PetitionCache.TryGetContract(User.UserName,
+					e.ContractId, ContractsClient)
 					?? await ContractsClient.GetContractAsync(e.ContractId);
 
-				if (await PetitionCache.AddContract(User.UserName, Contract))
-					this.ResourceUpdated(User, Contract.ContractIdUri);
+				this.ProcessCacheResult(User,
+					await PetitionCache.AddContract(User.UserName, Contract),
+					Contract.ContractIdUri);
 
 				StringBuilder sb = new StringBuilder();
 
@@ -2534,8 +2557,9 @@ namespace Waher.Mcp.Identity
 							{
 								Contract = await ContractsClient.SignContractAsync(Contract, e.Role, false);
 
-								if (await PetitionCache.AddContract(User.UserName, Contract))
-									this.ResourceUpdated(User, Contract.ContractIdUri);
+								this.ProcessCacheResult(User,
+									await PetitionCache.AddContract(User.UserName, Contract),
+									Contract.ContractIdUri);
 							}
 
 							break;
@@ -2545,14 +2569,163 @@ namespace Waher.Mcp.Identity
 			}
 		}
 
-		private Task ContractsClient_ContractDeleted(object Sender, ContractReferenceEventArgs e)
+		/// <summary>
+		/// MCP Server Tool to create a new open smart contract based on a contract 
+		/// template. (Open means here parts are not predefined.)
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="TemplateId">Identifier of the Smart Contract template to use as 
+		/// basis for the new smart contract.</param>
+		/// <param name="Parameters">Dictionary object of parameter values to use for the
+		/// contract. The parameters must be defined in the contract template, and the 
+		/// values must be valid in accordance with validation rules defined in the 
+		/// contract template.</param>
+		/// <param name="Visibility">Visibility of created contract.</param>
+		/// <param name="DurationDays">Duration of contracts, once signed, as a number 
+		/// of days.</param>
+		/// <param name="ArchiveRequiredDays">Required archiving time, once contract 
+		/// expires, as a number of days.</param>
+		/// <param name="ArchiveOptionalDays">Optional archiving time, once contract 
+		/// expires, as a number of days.</param>
+		/// <param name="SignAfter">Signatures will only be accepted after this point 
+		/// in time, if defined.</param>
+		/// <param name="SignBefore">Signatures will only be accepted before this point
+		/// in time, if defined.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Create Open Smart Contract",
+			"Creates a new open smart contract, based on a contract template. (Open means parts are not predefined.)",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(CreateContractPrivilege)]
+		[return: McpParameter("Result", "Result of operation.")]
+		public async Task<ContractResponse> CreateOpenContract(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("TemplateId", "Identifier of the Smart Contract template to use as basis for the new smart contract.")]
+			string TemplateId,
+
+			[McpParameter("Parameters", "Dictionary object of parameter values to use for the contract. The parameters must be defined in the contract template, and the values must be valid in accordance with validation rules defined in the contract template.")]
+			Dictionary<string,object> Parameters,
+
+			[McpParameter("Visibility", "Visibility of created contract.")]
+			[McpEnumValue(ContractVisibility.CreatorAndParts, "Creator and Parts")]
+			[McpEnumValue(ContractVisibility.DomainAndParts, "Domain")]
+			[McpEnumValue(ContractVisibility.Public, "Public")]
+			[McpEnumValue(ContractVisibility.PublicSearchable, "Public and Searchable")]
+			ContractVisibility Visibility,
+
+			[McpIntegerParameter("DurationDays", "Duration of contracts, once signed, as a number of days.", 1, null)]
+			int DurationDays,
+
+			[McpIntegerParameter("ArchiveRequiredDays", "Required archiving time, once contract expires, as a number of days.", 0, null)]
+			int ArchiveRequiredDays = 365,
+
+			[McpIntegerParameter("ArchiveOptionalDays", "Optional archiving time, once contract expires, as a number of days.", 0, null)]
+			int ArchiveOptionalDays = 0,
+
+			[McpDateTimeParameter("SignAfter", "Signatures will only be accepted after this point in time, if defined.")]
+			DateTime? SignAfter = null,
+
+			[McpDateTimeParameter("SignBefore", "Signatures will only be accepted before this point in time, if defined.")]
+			DateTime? SignBefore = null)
 		{
-			return Task.CompletedTask;  // TODO
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new ContractResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new ContractResponse("User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new ContractResponse("MCP XMPP Contracts client not available.");
+
+			try
+			{
+				Contract? Template = await PetitionCache.TryGetContract(User.UserName,
+					TemplateId, Client)
+					?? await Client.GetContractAsync(TemplateId);
+
+				this.ProcessCacheResult(User,
+					await PetitionCache.AddContract(User.UserName, Template),
+					Template.ContractIdUri);
+
+				ChunkedList<Parameter> Parameters2 = new ChunkedList<Parameter>();
+
+				foreach (Parameter P in Template.Parameters)
+				{
+					if (Parameters?.TryGetValue(P.Name, out object Value) ?? false)
+					{
+						try
+						{
+							P.SetValue(Value);
+							Parameters.Remove(P.Name);
+							Parameters2.Add(P);
+						}
+						catch (Exception ex)
+						{
+							return new ContractResponse("Parameter " + P.Name +
+								" has invalid value: " + ex.Message);
+						}
+					}
+				}
+
+				if ((Parameters?.Count ?? 0) > 0)
+				{
+					return new ContractResponse("Paramters not defined in template: " +
+						string.Join(", ", Parameters!.Keys));
+				}
+
+				Contract Contract = await Client.CreateContractAsync(TemplateId, null,
+					Parameters2.ToArray(), Visibility, ContractParts.Open,
+					Duration.FromDays(DurationDays),
+					Duration.FromDays(ArchiveRequiredDays),
+					Duration.FromDays(ArchiveOptionalDays),
+					SignAfter, SignBefore, false);
+
+				this.ProcessCacheResult(User,
+					await PetitionCache.AddContract(User.UserName, Contract),
+					Contract.ContractIdUri);
+
+				return new ContractResponse(Contract.ToJson(), "Contract created.");
+			}
+			catch (Exception ex)
+			{
+				return new ContractResponse(ex.Message);
+			}
 		}
 
-		private Task ContractsClient_ContractCreated(object Sender, ContractReferenceEventArgs e)
+		private async Task ContractsClient_ContractCreated(object Sender, ContractReferenceEventArgs e)
 		{
-			return Task.CompletedTask;  // TODO
+			if (Sender is ContractsClient ContractsClient &&
+				ContractsClient.Client.TryGetTag("User", out IUser? User) &&
+				!(User is null))
+			{
+				Contract? Contract = await ContractsClient.GetContractAsync(e.ContractId);
+
+				this.ProcessCacheResult(User,
+					await PetitionCache.AddContract(User.UserName, Contract),
+					Contract.ContractIdUri);
+			}
 		}
+
+		private async Task ContractsClient_ContractDeleted(object Sender, ContractReferenceEventArgs e)
+		{
+			if (Sender is ContractsClient ContractsClient &&
+				ContractsClient.Client.TryGetTag("User", out IUser? User) &&
+				!(User is null))
+			{
+				if (await PetitionCache.RemoveCachedObject(User.UserName, e.ContractIdUriString))
+					this.ResourcesUpdated(User);
+			}
+		}
+
+		// TODO: Create contract with user input elicitation
+		// TODO: Create contract with parts defined (with or without user input elicitation).
 	}
 }

@@ -26,6 +26,7 @@ using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.HttpFileUpload;
 using Waher.Runtime.Collections;
 using Waher.Security;
+using Waher.Security.Users;
 
 namespace Waher.Mcp.Identity
 {
@@ -251,7 +252,7 @@ namespace Waher.Mcp.Identity
 			else if (Object is Contract Contract)
 				return new ContractResource(Contract);
 
-			switch(Uri.Scheme)
+			switch (Uri.Scheme)
 			{
 				case "iotid":
 					LegalIdentity Identity = await ContractsClient.GetLegalIdentityAsync(Uri.AbsolutePath);
@@ -2353,15 +2354,84 @@ namespace Waher.Mcp.Identity
 				!(User is null))
 			{
 				Contract Contract = await ContractsClient.GetContractAsync(e.ContractId);
-				
+
 				if (await PetitionCache.AddContract(User.UserName, Contract))
 					this.ResourceUpdated(User, e.ContractIdUri);
 			}
 		}
 
-		private Task ContractsClient_ContractSigned(object Sender, ContractSignedEventArgs e)
+		/// <summary>
+		/// MCP Server Tool to sign a smart contract.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="ContractId">Identifier of the Smart Contract to sign.</param>
+		/// <param name="Role">Role to sign the contract as.</param>
+		/// <param name="Transferable">If the signature is transferable to another party 
+		/// during the life cycle of the contract.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Sign Smart Contract",
+			"Signs a smart contract as a specific role.",
+			"",     // IconsMethod, use default icons
+			true,   // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(PetitionContractPrivilege)]
+		[return: McpParameter("Result", "Result of operation.")]
+		public async Task<ContractResponse> SignContract(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("ContractId", "Identifier of the Smart Contract to sign.")]
+			string ContractId,
+
+			[McpStringParameter("Role", "Role to sign the contract as.")]
+			string Role,
+
+			[McpParameter("Transferable", "If the signature is transferable to another " +
+			"party during the life cycle of the contract.")]
+			bool Transferable = false)
 		{
-			return Task.CompletedTask;  // TODO
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new ContractResponse("No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new ContractResponse("User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new ContractResponse("MCP XMPP Contracts client not available.");
+
+			try
+			{
+				Contract? Contract = await PetitionCache.TryGetContract(User.UserName,
+					ContractId, Client)
+					?? await Client.GetContractAsync(ContractId);
+
+				Contract = await Client.SignContractAsync(Contract, Role, Transferable);
+
+				if (await PetitionCache.AddContract(User.UserName, Contract))
+					this.ResourceUpdated(User, Contract.ContractIdUri);
+
+				return new ContractResponse(Contract.ToJson(), "Smart Contract signed.");
+			}
+			catch (Exception ex)
+			{
+				return new ContractResponse(ex.Message);
+			}
+		}
+
+		private async Task ContractsClient_ContractSigned(object Sender, ContractSignedEventArgs e)
+		{
+			if (Sender is ContractsClient ContractsClient &&
+				ContractsClient.Client.TryGetTag("User", out IUser? User) &&
+				!(User is null) &&
+				await PetitionCache.AddContract(User.UserName, e.Contract))
+			{
+				this.ResourceUpdated(User, e.Contract.ContractIdUri);
+			}
 		}
 
 		private Task ContractsClient_ContractProposalReceived(object Sender, ContractProposalEventArgs e)

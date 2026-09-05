@@ -2493,9 +2493,56 @@ namespace Waher.Mcp.Identity
 			}
 		}
 
-		private Task ContractsClient_ContractProposalReceived(object Sender, ContractProposalEventArgs e)
+		private async Task ContractsClient_ContractProposalReceived(object Sender, ContractProposalEventArgs e)
 		{
-			return Task.CompletedTask;  // TODO
+			if (Sender is ContractsClient ContractsClient &&
+				ContractsClient.Client.TryGetTag("User", out IUser? User) &&
+				!(User is null) &&
+				ContractsClient.Client.TryGetExtension(out McpXmppExtension McpXmppExtension))
+			{
+				Contract? Contract;
+
+				Contract = await PetitionCache.TryGetContract(User.UserName, e.ContractId, ContractsClient)
+					?? await ContractsClient.GetContractAsync(e.ContractId);
+
+				if (await PetitionCache.AddContract(User.UserName, Contract))
+					this.ResourceUpdated(User, Contract.ContractIdUri);
+
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("You have received a contract proposal from ");
+				sb.Append(e.FromBareJID);
+				sb.Append(": ");
+				sb.AppendLine(e.MessageText);
+				sb.AppendLine();
+				sb.AppendLine("Contents of the contract proposal follows:");
+				sb.AppendLine();
+				sb.Append(await Contract.ToPlainText(Contract.DefaultLanguage));
+
+				foreach (string SessionId in McpXmppExtension.SessionIds)
+				{
+					if (this.TryGetMcpSession(SessionId, out Session? Session) &&
+						!(Session.User is null))
+					{
+						Petition Petition = new Petition();
+						bool? Result = await this.ElicitUserInput(McpXmppExtension.FirstCall,
+							sb.ToString(), Petition, true, Session, 15 * 60 * 1000);
+
+						if (Result.HasValue)
+						{
+							if (Result.Value)
+							{
+								Contract = await ContractsClient.SignContractAsync(Contract, e.Role, false);
+
+								if (await PetitionCache.AddContract(User.UserName, Contract))
+									this.ResourceUpdated(User, Contract.ContractIdUri);
+							}
+
+							break;
+						}
+					}
+				}
+			}
 		}
 
 		private Task ContractsClient_ContractDeleted(object Sender, ContractReferenceEventArgs e)

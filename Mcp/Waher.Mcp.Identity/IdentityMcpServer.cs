@@ -26,7 +26,6 @@ using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.HttpFileUpload;
 using Waher.Runtime.Collections;
 using Waher.Security;
-using Waher.Security.Users;
 
 namespace Waher.Mcp.Identity
 {
@@ -57,6 +56,9 @@ namespace Waher.Mcp.Identity
 		internal const string PetitionIdentityPrivilege = PetitionPrivilege + ".Identity";
 		internal const string PetitionContractPrivilege = PetitionPrivilege + ".Contract";
 		internal const string PetitionSignaturePrivilege = PetitionPrivilege + ".Signature";
+		internal const string ContractPrivilege = ToolsPrivilege + ".Contract";
+		internal const string SignContractPrivilege = ContractPrivilege + ".Sign";
+		internal const string ProposeContractPrivilege = ContractPrivilege + ".Propose";
 
 		private readonly XmppMcpServer xmppMcpServer;
 
@@ -2377,7 +2379,7 @@ namespace Waher.Mcp.Identity
 			false,  // CanDestroyEnvironment
 			false,  // Idempotent
 			true)]  // OpenWorldAccess
-		[RequiredPrivilege(PetitionContractPrivilege)]
+		[RequiredPrivilege(SignContractPrivilege)]
 		[return: McpParameter("Result", "Result of operation.")]
 		public async Task<ContractResponse> SignContract(
 			IJsonRpcCall Call,
@@ -2431,6 +2433,63 @@ namespace Waher.Mcp.Identity
 				await PetitionCache.AddContract(User.UserName, e.Contract))
 			{
 				this.ResourceUpdated(User, e.Contract.ContractIdUri);
+			}
+		}
+
+		/// <summary>
+		/// MCP Server Tool to send a smart contract proposal.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="ContractId">Identifier of the Smart Contract to propose.</param>
+		/// <param name="Role">Proposed role.</param>
+		/// <param name="To">Bare JID of recipient of proposal.</param>
+		/// <param name="Message">Message to show the recipient of the proposal.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Propose Smart Contract",
+			"Sends a proposal to sign a smart contract as a specific role.",
+			"",     // IconsMethod, use default icons
+			false,  // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(ProposeContractPrivilege)]
+		[return: McpParameter("Result", "Result of operation.")]
+		public async Task<GenericResponse> ProposeContract(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("ContractId", "Identifier of the Smart Contract to propose.")]
+			string ContractId,
+
+			[McpStringParameter("Role", "Role to propose.")]
+			string Role,
+
+			[McpStringParameter("To", "Bare JID of recipient of proposal.")]
+			string To,
+
+			[McpStringParameter("Message", "Message to show the recipient of the proposal.")]
+			string Message)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new GenericResponse(false, "No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new GenericResponse(false, "User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new GenericResponse(false, "MCP XMPP Contracts client not available.");
+
+			try
+			{
+				await Client.SendContractProposal(ContractId, Role, To, Message);
+				return new GenericResponse(true, "Contract proposal sent.");
+			}
+			catch (Exception ex)
+			{
+				return new GenericResponse(false, ex.Message);
 			}
 		}
 

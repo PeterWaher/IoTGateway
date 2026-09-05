@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -25,10 +24,8 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.HttpFileUpload;
-using Waher.Runtime.Cache;
 using Waher.Runtime.Collections;
 using Waher.Security;
-using Waher.Security.Users;
 
 namespace Waher.Mcp.Identity
 {
@@ -60,8 +57,6 @@ namespace Waher.Mcp.Identity
 		internal const string PetitionContractPrivilege = PetitionPrivilege + ".Contract";
 		internal const string PetitionSignaturePrivilege = PetitionPrivilege + ".Signature";
 
-		private readonly Cache<string, CacheRec> petitionedObjects = new Cache<string, CacheRec>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromHours(1));
-		private readonly Dictionary<string, Dictionary<string, CacheRec>> objectsPerUserName = new Dictionary<string, Dictionary<string, CacheRec>>();
 		private readonly XmppMcpServer xmppMcpServer;
 
 		/// <summary>
@@ -138,125 +133,6 @@ namespace Waher.Mcp.Identity
 				Instructions, SnifferSet)
 		{
 			this.xmppMcpServer = XmppMcpServer;
-			this.petitionedObjects.Removed += this.PetitionedObjects_Removed;
-		}
-
-		private class CacheRec
-		{
-			public CacheRec(string ObjectId, object Object, IUser User)
-			{
-				this.ObjectId = ObjectId;
-				this.Object = Object;
-				this.User = User;
-			}
-
-			public string ObjectId;
-			public object Object;
-			public IUser User;
-		}
-
-		private static string? GetObjectId(object Object)
-		{
-			if (Object is LegalIdentity LegalIdentity)
-				return LegalIdentity.Id;
-			else if (Object is Contract Contract)
-				return Contract.ContractId;
-			else
-				return null;
-		}
-
-		private bool AddObjectToCache(IUser User, object Object)
-		{
-			string? ObjectId = GetObjectId(Object);
-			if (string.IsNullOrEmpty(ObjectId))
-				return false;
-
-			string UserName = User.UserName;
-			CacheRec Rec = new CacheRec(ObjectId, Object, User);
-
-			lock (this.objectsPerUserName)
-			{
-				if (!this.objectsPerUserName.TryGetValue(UserName,
-					out Dictionary<string, CacheRec> Objects))
-				{
-					Objects = new Dictionary<string, CacheRec>();
-					this.objectsPerUserName[UserName] = Objects;
-				}
-
-				Objects[ObjectId] = Rec;
-			}
-
-			string Key = UserName + "|" + ObjectId;
-			bool New = !this.petitionedObjects.ContainsKey(Key);
-
-			this.petitionedObjects[UserName + "|" + ObjectId] = Rec;
-
-			return New;
-		}
-
-		private object[] GetCachedObjects(string UserName)
-		{
-			lock (this.objectsPerUserName)
-			{
-				if (!this.objectsPerUserName.TryGetValue(UserName,
-					out Dictionary<string, CacheRec> Objects))
-				{
-					return Array.Empty<object>();
-				}
-
-				int i = 0;
-				int c = Objects.Count;
-				object[] Result = new object[c];
-
-				foreach (KeyValuePair<string, CacheRec> P in Objects)
-					Result[i++] = P.Value.Object;
-
-				return Result;
-			}
-		}
-
-		private bool TryGetCachedObject(string UserName, string ObjectId,
-			[NotNullWhen(true)] out object? Object)
-		{
-			lock (this.objectsPerUserName)
-			{
-				if (this.objectsPerUserName.TryGetValue(UserName,
-					out Dictionary<string, CacheRec> Objects) &&
-					Objects.TryGetValue(ObjectId, out CacheRec Rec))
-				{
-					Object = Rec.Object;
-					return true;
-				}
-			}
-
-			Object = null;
-			return false;
-		}
-
-		private Task PetitionedObjects_Removed(object Sender,
-			CacheItemEventArgs<string, CacheRec> e)
-		{
-			string UserName = e.Value.User.UserName;
-			string ObjectId = e.Value.ObjectId;
-
-			lock (this.objectsPerUserName)
-			{
-				if (!this.objectsPerUserName.TryGetValue(UserName,
-					out Dictionary<string, CacheRec> Objects))
-				{
-					return Task.CompletedTask;
-				}
-
-				if (!Objects.Remove(ObjectId))
-					return Task.CompletedTask;
-
-				if (Objects.Count == 0)
-					this.objectsPerUserName.Remove(UserName);
-			}
-
-			this.ResourcesUpdated(e.Value.User);
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -368,17 +244,28 @@ namespace Waher.Mcp.Identity
 			if (ContractsClient is null)
 				return null;
 
-			if (this.TryGetCachedObject(User.UserName, Uri.AbsolutePath, out object? Object))
+			object? Object = await PetitionCache.TryGetObject(User.UserName, Uri, ContractsClient);
+
+			if (Object is LegalIdentity LegalIdentity)
+				return new IdentityResource(LegalIdentity);
+			else if (Object is Contract Contract)
+				return new ContractResource(Contract);
+
+			switch(Uri.Scheme)
 			{
-				if (Object is LegalIdentity LegalIdentity)
-					return new IdentityResource(LegalIdentity);
-				else if (Object is Contract Contract)
+				case "iotid":
+					LegalIdentity Identity = await ContractsClient.GetLegalIdentityAsync(Uri.AbsolutePath);
+					await PetitionCache.AddLegalIdentity(User.UserName, Identity);
+					return new IdentityResource(Identity);
+
+				case "iotsc":
+					Contract Contract = await ContractsClient.GetContractAsync(Uri.AbsolutePath);
+					await PetitionCache.AddContract(User.UserName, Contract);
 					return new ContractResource(Contract);
+
+				default:
+					throw new Exception("Identity MCP server does not recognize resource URI schema: " + Uri.Scheme);
 			}
-
-			LegalIdentity Identity = await ContractsClient.GetLegalIdentityAsync(Uri.AbsolutePath);
-
-			return new IdentityResource(Identity);
 		}
 
 		/// <summary>
@@ -469,16 +356,32 @@ namespace Waher.Mcp.Identity
 				return Array.Empty<Resource>();
 
 			ChunkedList<Resource> Resources = new ChunkedList<Resource>();
+			HashSet<string> Uris = new HashSet<string>();
 
-			foreach (LegalIdentity Item in await ContractsClient.GetLegalIdentitiesAsync())
-				Resources.Add(new IdentityResource(Item));
+			foreach (LegalIdentity Identity in await ContractsClient.GetLegalIdentitiesAsync())
+			{
+				Uris.Add(Identity.IdUriString);
+				Resources.Add(new IdentityResource(Identity));
+			}
 
-			foreach (object Object in this.GetCachedObjects(User.UserName))
+			foreach (object Object in await PetitionCache.GetCachedObjects(User.UserName, ContractsClient))
 			{
 				if (Object is LegalIdentity LegalIdentity)
+				{
+					if (Uris.Contains(LegalIdentity.IdUriString))
+						continue;
+
+					Uris.Add(LegalIdentity.IdUriString);
 					Resources.Add(new IdentityResource(LegalIdentity));
+				}
 				else if (Object is Contract Contract)
+				{
+					if (Uris.Contains(Contract.ContractIdUriString))
+						continue;
+
+					Uris.Add(Contract.ContractIdUriString);
 					Resources.Add(new ContractResource(Contract));
+				}
 			}
 
 			return Resources.ToArray();
@@ -676,16 +579,15 @@ namespace Waher.Mcp.Identity
 		/// </summary>
 		public static event EventHandlerAsync<PersonalNumberValidationEventArgs>? ValidatePersonalNumber;
 
-		private Task ContractsClient_IdentityUpdated(object Sender, LegalIdentityEventArgs e)
+		private async Task ContractsClient_IdentityUpdated(object Sender, LegalIdentityEventArgs e)
 		{
 			if (Sender is ContractsClient ContractsClient &&
 				ContractsClient.Client.TryGetTag("User", out IUser? User) &&
 				!(User is null))
 			{
-				this.ResourceUpdated(User, ContractsClient.LegalIdUri(e.Identity.Id));
+				if (await PetitionCache.AddLegalIdentity(User.UserName, e.Identity))
+					this.ResourceUpdated(User, ContractsClient.LegalIdUri(e.Identity.Id));
 			}
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -2089,7 +1991,7 @@ namespace Waher.Mcp.Identity
 					{
 						if (!(ReviewerIdentity is null))
 						{
-							if (this.AddObjectToCache(Session.User, ReviewerIdentity))
+							if (await PetitionCache.AddLegalIdentity(Session.UserName, ReviewerIdentity))
 								this.ResourcesUpdated(Session.User);
 						}
 
@@ -2149,8 +2051,19 @@ namespace Waher.Mcp.Identity
 
 			try
 			{
-				LegalIdentity Identity = await Client.GetLegalIdentityAsync(LegalId);
-				return new PetitionResponse(Identity.ToJson(), "Legal Identity available in QuickResponse property. Access already granted. No petition sent.");
+				LegalIdentity? Identity = await PetitionCache.TryGetLegalIdentity(
+					User.UserName, LegalId);
+
+				if (!(Identity is null))
+					return new PetitionResponse(Identity.ToJson(), "Legal Identity available in QuickResponse property. Taken from petition cache. No petition sent.");
+
+				Identity = await Client.GetLegalIdentityAsync(LegalId);
+
+				if (!(Identity is null))
+				{
+					await PetitionCache.AddLegalIdentity(User.UserName, Identity);
+					return new PetitionResponse(Identity.ToJson(), "Legal Identity available in QuickResponse property. Access already granted. No petition sent.");
+				}
 			}
 			catch (Exception)
 			{
@@ -2204,7 +2117,7 @@ namespace Waher.Mcp.Identity
 					{
 						if (!(e.RequestedIdentity is null))
 						{
-							if (this.AddObjectToCache(Session.User, e.RequestedIdentity))
+							if (await PetitionCache.AddLegalIdentity(Session.UserName, e.RequestedIdentity))
 								this.ResourcesUpdated(Session.User);
 						}
 
@@ -2316,7 +2229,7 @@ namespace Waher.Mcp.Identity
 					{
 						if (!(e.RequestedIdentity is null))
 						{
-							if (this.AddObjectToCache(Session.User, e.RequestedIdentity))
+							if (await PetitionCache.AddLegalIdentity(Session.UserName, e.RequestedIdentity))
 								this.ResourcesUpdated(Session.User);
 						}
 
@@ -2423,7 +2336,7 @@ namespace Waher.Mcp.Identity
 					{
 						if (!(e.RequestedContract is null))
 						{
-							if (this.AddObjectToCache(Session.User, e.RequestedContract))
+							if (await PetitionCache.AddContract(Session.UserName, e.RequestedContract))
 								this.ResourcesUpdated(Session.User);
 						}
 
@@ -2433,9 +2346,17 @@ namespace Waher.Mcp.Identity
 			}
 		}
 
-		private Task ContractsClient_ContractUpdated(object Sender, ContractReferenceEventArgs e)
+		private async Task ContractsClient_ContractUpdated(object Sender, ContractReferenceEventArgs e)
 		{
-			return Task.CompletedTask;  // TODO
+			if (Sender is ContractsClient ContractsClient &&
+				ContractsClient.Client.TryGetTag("User", out IUser? User) &&
+				!(User is null))
+			{
+				Contract Contract = await ContractsClient.GetContractAsync(e.ContractId);
+				
+				if (await PetitionCache.AddContract(User.UserName, Contract))
+					this.ResourceUpdated(User, e.ContractIdUri);
+			}
 		}
 
 		private Task ContractsClient_ContractSigned(object Sender, ContractSignedEventArgs e)

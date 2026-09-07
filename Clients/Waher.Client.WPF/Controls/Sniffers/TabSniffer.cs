@@ -7,11 +7,17 @@ using Waher.Networking.Sniffers.Model;
 
 namespace Waher.Client.WPF.Controls.Sniffers
 {
-	public class TabSniffer(SnifferView View) 
-		: SnifferBase("Tab Sniffer")
+	public class TabSniffer : SnifferBase
 	{
-		private readonly SnifferView view = View;
+		private readonly SnifferView view;
 		private string snifferId = null;
+
+		public TabSniffer(SnifferView View)
+			: base("Tab Sniffer")
+		{
+			this.view = View;
+			this.DisableMask();
+		}
 
 		public SnifferView View => this.view;
 

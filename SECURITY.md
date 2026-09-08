@@ -6,7 +6,7 @@ Security Policy
 If you discover a security vulnerability in IoTGateway, please report it privately:
 
 - By email: [peter@abc4.io](mailto:peter@abc4.io)
-- Online: [https://abc4.io/Feedback.md](https://waher.se/Feedback.md)
+- Online: [https://waher.se/Feedback.md](https://waher.se/Feedback.md)
 
 Please include enough information to understand and reproduce the issue, such as the affected 
 component or version, reproduction steps, potential impact, and any suggested fix.

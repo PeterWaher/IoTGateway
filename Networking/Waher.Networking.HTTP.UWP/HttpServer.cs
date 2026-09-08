@@ -2124,6 +2124,14 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Clears the set of sessions, forcing all users to re-authenticate.
+		/// </summary>
+		public void ClearSessions()
+		{
+			this.sessions?.Clear();
+		}
+
+		/// <summary>
 		/// Creates a new collection of variables, that contains access to the global set of variables.
 		/// </summary>
 		/// <returns>Variables collection.</returns>

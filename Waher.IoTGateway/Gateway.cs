@@ -1130,15 +1130,31 @@ namespace Waher.IoTGateway
 
 				ISystemConfiguration CurrentConfiguration = null;
 				LinkedList<HttpResource> SetupResources = null;
+				string StartupTokenFileName = Path.Combine(appDataFolder, "StartupToken.txt");
 
 				if (!Configured)
 				{
 					configuring = true;
 
-					if (loopbackIntefaceAvailable)
-						Log.Notice("System needs to be configured. This is done by navigating to the loopback interface using a browser on this machine.");
+					if (loopbackIntefaceAvailable && !RunsInContainer)
+					{
+						Log.Notice("System needs to be configured. This is done by " +
+							"navigating to the loopback interface using a browser on " +
+							"this machine.");
+					}
 					else
-						Log.Notice("System needs to be configured. This is done by navigating to the machine using a browser on another machine in the same network.");
+					{
+						string StartupToken = Base64Url.Encode(NextBytes(32));
+						File.WriteAllText(StartupTokenFileName, StartupToken);
+
+						Log.Notice("System needs to be configured. This is done by " +
+							"navigating to the machine using a browser on another " +
+							"machine in the same network. You need to manually add " +
+							"the query parameter ?StartupToken=" + StartupToken +
+							" to the URL, regardless of the URL you use.",
+							new KeyValuePair<string, object>("StartupToken", StartupToken),
+							new KeyValuePair<string, object>("RunsInContainer", RunsInContainer));
+					}
 
 					webServer = new HttpServer(GetConfigPorts("HTTP"), null, null)
 					{
@@ -1280,6 +1296,12 @@ namespace Waher.IoTGateway
 
 				configuring = false;
 				loginAuditor.Domain = DomainConfiguration.Instance.Domain;
+
+				if (File.Exists(StartupTokenFileName))
+				{
+					File.Delete(StartupTokenFileName);
+					webServer.ClearSessions();
+				}
 
 				if (!(webServer is null))
 				{
@@ -3464,9 +3486,9 @@ namespace Waher.IoTGateway
 					return;
 				}
 
-				if (!loopbackIntefaceAvailable && (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring))
+				if (CheckStartupToken(Request))
 				{
-					LoginAuditor.Success("User logged in by default, since XMPP not configued and loopback interface not available.",
+					LoginAuditor.Success("User logged in by default, using startup token.",
 						string.Empty, Request.RemoteEndPoint, "Web");
 
 					await Login.DoLogin(Request, From);
@@ -3787,10 +3809,14 @@ namespace Waher.IoTGateway
 					return false;
 				}
 
-				if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) &&
-					string.IsNullOrEmpty(XmppConfiguration.Instance?.Host) &&
-					Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
+				if (CheckStartupToken(Request))
 				{
+					if (DoLog)
+					{
+						Log.Debug("Startup token used.",
+							new KeyValuePair<string, object>("RemoteEndpoint", Request.RemoteEndPoint));
+					}
+
 					return true;
 				}
 
@@ -3802,6 +3828,56 @@ namespace Waher.IoTGateway
 					Log.Debug(ex.Message);
 
 				return false;
+			}
+		}
+
+		private static bool CheckStartupToken(HttpRequest Request)
+		{
+			if (loopbackIntefaceAvailable && !RunsInContainer)
+				return false;
+
+			if (!configuring)
+				return false;
+
+			if (!Request.Header.TryGetQueryParameter("StartupToken", out string StartupToken))
+				return false;
+
+			string FileName = Path.Combine(appDataFolder, "StartupToken.txt");
+			if (!File.Exists(FileName))
+				return false;
+
+			string Token = File.ReadAllText(FileName).Trim();
+			string Endpoint = Request.RemoteEndPoint.RemovePortNumber();
+			int i = Token.IndexOf('|');
+
+			if (i > 0)
+			{
+				string Endpoint0 = Token[(i + 1)..];
+				if (Endpoint0 != Endpoint)
+					return false;
+
+				Token = Token[..i];
+
+				return StartupToken == Token;
+			}
+			else if (StartupToken == Token)
+			{
+				Token += "|" + Endpoint;
+				File.WriteAllText(FileName, Token);
+				return true;
+			}
+			else
+				return false;
+		}
+
+		/// <summary>
+		/// If the gateway is running inside a container.
+		/// </summary>
+		public static bool RunsInContainer
+		{
+			get
+			{
+				return Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
 			}
 		}
 

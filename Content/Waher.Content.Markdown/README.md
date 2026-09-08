@@ -32,6 +32,7 @@ The [source code](https://github.com/PeterWaher/IoTGateway) and libraries provid
 * For **Security analysis**. If you perform any security analysis on the code, to see what security aspects the code might have, all that is 
 	asked of you, is that you inform the author of any findings at least forty-five days before publication of the findings, so that any vulnerabilities 
 	might be addressed. Such contributions are much appreciated and will be acknowledged.
+	Check the [Security Policy](/SECURITY.md) for information on how to report vulnerabilities.
 
 Commercial use of the code, in part or in full, in compiled binary form, or its source code, requires
 a **Commercial License**. Contact the author for details.

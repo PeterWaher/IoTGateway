@@ -14,7 +14,7 @@
 		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Persistence/Waher.Persistence.Queues</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
 		<RepositoryType>GitHub</RepositoryType>
-		<PackageTags>persistence queue enryption file storage</PackageTags>
+		<PackageTags>persistence queue encryption file storage</PackageTags>
 		<NeutralLanguage>English</NeutralLanguage>
 		<AssemblyVersion>1.0.1</AssemblyVersion>
 		<FileVersion>1.0.1</FileVersion>

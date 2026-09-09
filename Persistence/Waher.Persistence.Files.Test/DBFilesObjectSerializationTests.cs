@@ -11,6 +11,8 @@ using Waher.Runtime.Console;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 using Waher.Security;
+using System.Collections;
+
 
 
 #if !LW
@@ -2557,7 +2559,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
 			Assert.AreEqual(Obj.Function, Obj2.Function);
-			Assert.AreEqual(Obj.Digest, Obj2.Digest);
+			Assert.AreSequenceEqual(Obj.Digest, Obj2.Digest);
 			Assert.AreEqual(Obj.FileName, Obj2.FileName);
 			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
 
@@ -2569,7 +2571,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Assert.AreEqual(Obj.ObjectId, GenObj.ObjectId.ToString());
 			Assert.AreEqual(Obj.Function.ToString(), GenObj["Function"]);
-			Assert.AreEqual(Obj.Digest, GenObj["Digest"]);
+			Assert.AreSequenceEqual(Obj.Digest, GenObj["Digest"] as IEnumerable);
 			Assert.AreEqual(Obj.FileName, GenObj["FileName"]);
 			Assert.AreEqual(Obj.AccountName, GenObj["AccountName"]);
 
@@ -2586,7 +2588,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
 			Assert.AreEqual(Obj.Function, Obj2.Function);
-			Assert.AreEqual(Obj.Digest, Obj2.Digest);
+			Assert.AreSequenceEqual(Obj.Digest, Obj2.Digest);
 			Assert.AreEqual(Obj.FileName, Obj2.FileName);
 			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
 
@@ -3894,7 +3896,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
 			Assert.AreEqual(Obj.Function, Obj2.Function);
-			Assert.AreEqual(Obj.Digest, Obj2.Digest);
+			Assert.AreSequenceEqual(Obj.Digest, Obj2.Digest);
 			Assert.AreEqual(Obj.FileName, Obj2.FileName);
 			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
 
@@ -3923,7 +3925,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
 			Assert.AreEqual(Obj.Function, Obj2.Function);
-			Assert.AreEqual(Obj.Digest, Obj2.Digest);
+			Assert.AreSequenceEqual(Obj.Digest, Obj2.Digest);
 			Assert.AreEqual(Obj.FileName, Obj2.FileName);
 			Assert.AreEqual(Obj.AccountName, Obj2.AccountName);
 

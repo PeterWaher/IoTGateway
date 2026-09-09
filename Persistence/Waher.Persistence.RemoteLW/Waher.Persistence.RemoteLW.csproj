@@ -40,11 +40,14 @@
 			<PackagePath />
 		</None>
 	</ItemGroup>
-
 	<ItemGroup>
     <ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj" />
     <ProjectReference Include="..\Waher.Persistence.Serialization\Waher.Persistence.Serialization.csproj" />
     <ProjectReference Include="..\Waher.Persistence\Waher.Persistence.csproj" />
   </ItemGroup>
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="xcopy &quot;C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Remote\*.cs&quot; &quot;C:\My Projects\IoTGateway\Persistence\Waher.Persistence.RemoteLW&quot; /Y /S" Condition="'$(OS)'=='Windows_NT'" />
+		<Exec Command="rsync -avm --include='*.cs' --exclude='*' /My\ Projects/IoTGateway/Persistence/Waher.Persistence.Remote/ /My\ Projects/IoTGateway/Persistence/Waher.Persistence.RemoteLW/" Condition="'$(OS)'=='Unix'" />
+	</Target>
 
 </Project>

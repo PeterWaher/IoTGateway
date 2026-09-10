@@ -1,45 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Networking.MQTT;
 
 namespace Waher.Networking.PeerToPeer
 {
 	/// <summary>
-	/// Event arguments for game data events.
+	/// Event arguments for peer data events.
 	/// </summary>
-	public class GameDataEventArgs : EventArgs
+	public class PeerDataEventArgs : EventArgs
 	{
-		private readonly Player fromPlayer;
+		private readonly Peer fromPeer;
 		private readonly PeerConnection connection;
 		private readonly byte[] packet;
 		private readonly BinaryInput data;
 
-		internal GameDataEventArgs(Player FromPlayer, PeerConnection Connection, byte[] Packet)
+		internal PeerDataEventArgs(Peer FromPeer, PeerConnection Connection, byte[] Packet)
 		{
-			this.fromPlayer = FromPlayer;
+			this.fromPeer = FromPeer;
 			this.connection = Connection;
 			this.packet = Packet;
 			this.data = new BinaryInput(Packet);
 		}
 
 		/// <summary>
-		/// Game data received from this player.
+		/// Peer data received from this peer.
 		/// </summary>
-		public Player FromPlayer => this.fromPlayer;
+		public Peer FromPeer => this.fromPeer;
 
 		/// <summary>
-		/// Game data received over this connection.
+		/// Peer data received over this connection.
 		/// </summary>
 		public PeerConnection Connection => this.connection;
 
 		/// <summary>
-		/// Binary game data packet received.
+		/// Binary peer data packet received.
 		/// </summary>
 		public byte[] Packet => this.packet;
 
 		/// <summary>
-		/// Game data received.
+		/// Peer data received.
 		/// </summary>
 		public BinaryInput Data => this.data;
 	}

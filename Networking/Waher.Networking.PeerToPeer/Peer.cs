@@ -6,30 +6,31 @@ using System.Net;
 namespace Waher.Networking.PeerToPeer
 {
 	/// <summary>
-	/// Class containing information about a player.
+	/// Class containing information about a peer.
 	/// </summary>
-	public class Player : IEnumerable<KeyValuePair<string, string>>
+	public class Peer : IEnumerable<KeyValuePair<string, string>>
 	{
 		private int index = -1;
-		private Guid playerId;
+		private Guid peerId;
 		private IPEndPoint publicEndpoint;
 		private IPEndPoint localEndpoint;
-		private readonly Dictionary<string, string> playerMetaInfo;
+		private readonly Dictionary<string, string> peerMetaInfo;
 		private PeerConnection connection = null;
 
-		internal Player(Guid PlayerId, IPEndPoint PublicEndpoint, IPEndPoint LocalEndpoint, params KeyValuePair<string, string>[] PlayerMetaInfo)
+		internal Peer(Guid PeerId, IPEndPoint PublicEndpoint, IPEndPoint LocalEndpoint, 
+			params KeyValuePair<string, string>[] PeerMetaInfo)
 		{
-			this.playerId = PlayerId;
+			this.peerId = PeerId;
 			this.publicEndpoint = PublicEndpoint;
 			this.localEndpoint = LocalEndpoint;
-			this.playerMetaInfo = new Dictionary<string, string>();
+			this.peerMetaInfo = new Dictionary<string, string>();
 
-			foreach (KeyValuePair<string, string> P in PlayerMetaInfo)
-				this.playerMetaInfo[P.Key] = P.Value;
+			foreach (KeyValuePair<string, string> P in PeerMetaInfo)
+				this.peerMetaInfo[P.Key] = P.Value;
 		}
 
 		/// <summary>
-		/// Player index.
+		/// Peer index.
 		/// </summary>
 		public int Index
 		{
@@ -38,9 +39,9 @@ namespace Waher.Networking.PeerToPeer
 		}
 
 		/// <summary>
-		/// Player ID
+		/// Peer ID
 		/// </summary>
-		public Guid PlayerId => this.playerId;
+		public Guid PeerId => this.peerId;
 
 		/// <summary>
 		/// Public Endpoint
@@ -71,25 +72,25 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		public int Count
 		{
-			get { return this.playerMetaInfo.Count; }
+			get { return this.peerMetaInfo.Count; }
 		}
 
 		/// <summary>
-		/// Gets an enumerator for player meta information.
+		/// Gets an enumerator for peer meta information.
 		/// </summary>
 		/// <returns>Enumerator</returns>
 		public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
 		{
-			return this.playerMetaInfo.GetEnumerator();
+			return this.peerMetaInfo.GetEnumerator();
 		}
 
 		/// <summary>
-		/// Gets an enumerator for player meta information.
+		/// Gets an enumerator for peer meta information.
 		/// </summary>
 		/// <returns>Enumerator</returns>
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 		{
-			return this.playerMetaInfo.GetEnumerator();
+			return this.peerMetaInfo.GetEnumerator();
 		}
 
 		/// <summary>
@@ -101,7 +102,7 @@ namespace Waher.Networking.PeerToPeer
 		{
 			get
 			{
-				if (this.playerMetaInfo.TryGetValue(Key, out string Value))
+				if (this.peerMetaInfo.TryGetValue(Key, out string Value))
 					return Value;
 				else
 					return string.Empty;
@@ -122,7 +123,7 @@ namespace Waher.Networking.PeerToPeer
 		{
 			StringBuilder sb = null;
 
-			foreach (KeyValuePair<string, string> P in this.playerMetaInfo)
+			foreach (KeyValuePair<string, string> P in this.peerMetaInfo)
 			{
 				if (sb is null)
 				{

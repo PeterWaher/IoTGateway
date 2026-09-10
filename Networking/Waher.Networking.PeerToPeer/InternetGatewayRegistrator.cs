@@ -26,6 +26,7 @@ namespace Waher.Networking.PeerToPeer
 		internal IPAddress externalAddress;
 		internal Exception exception = null;
 		private readonly ISniffer[] sniffers;
+		private readonly bool onlyLocal;
 		private HashSet<string> deviceUrlsProcessed = new HashSet<string>();
 		private IInternetGateway internetGateway;
 		private PeerToPeerNetworkState state = PeerToPeerNetworkState.Created;
@@ -40,13 +41,34 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		/// <param name="Ports">Ports to register in the Internet Gateway.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public InternetGatewayRegistrator(InternetGatewayRegistration[] Ports, params ISniffer[] Sniffers)
+		public InternetGatewayRegistrator(InternetGatewayRegistration[] Ports,
+			params ISniffer[] Sniffers)
+			: this(false, Ports, Sniffers)
 		{
+		}
+
+		/// <summary>
+		/// Manages registration of TCP and UDP ports in an Internet Gateway
+		/// </summary>
+		/// <param name="OnlyLocal">If sufficient with only local access (i.e. no
+		/// search for internet gateways, with corresponding registration).</param>
+		/// <param name="Ports">Ports to register in the Internet Gateway.</param>
+		/// <param name="Sniffers">Sniffers</param>
+		public InternetGatewayRegistrator(bool OnlyLocal, InternetGatewayRegistration[] Ports,
+			params ISniffer[] Sniffers)
+		{
+			this.onlyLocal = OnlyLocal;
 			this.ports = Ports;
 			this.sniffers = Sniffers;
 
 			NetworkChange.NetworkAddressChanged += this.NetworkChange_NetworkAddressChanged;
 		}
+
+		/// <summary>
+		/// If sufficient with only local access (i.e. no search for internet gateways, 
+		/// with corresponding registration).
+		/// </summary>
+		public bool OnlyLocal => this.onlyLocal;
 
 		private async void NetworkChange_NetworkAddressChanged(object Sender, EventArgs e)
 		{
@@ -73,7 +95,7 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		public virtual async Task Start()
 		{
-			if (this.OnPublicNetwork())
+			if (this.OnPublicNetwork() || this.onlyLocal)
 				this.localAddress = this.externalAddress;
 			else
 				await this.SearchGateways();
@@ -142,18 +164,12 @@ namespace Waher.Networking.PeerToPeer
 						switch (Addr[1])
 						{
 							case 0:
-								switch (Addr[2])
+								return Addr[2] switch
 								{
-									case 0:             // 192.0.0.0/24 reserved for IANA IPv4 Special Purpose Address Registry
-										return false;
-
-									case 2:             // 192.0.2.X/24  reserved for TEST-NET-1
-										return false;
-
-									default:
-										return true;
-								}
-
+									0 => false, // 192.0.0.0/24 reserved for IANA IPv4 Special Purpose Address Registry
+									2 => false, // 192.0.2.X/24  reserved for TEST-NET-1
+									_ => true,
+								};
 							case 88:
 								return Addr[2] != 99;   // 192.88.99.X/24 reserved for 6to4 Relay Anycast
 
@@ -573,15 +589,11 @@ namespace Waher.Networking.PeerToPeer
 		/// <returns>true, if connections can be received, false if a peer-to-peer listener could not be created in the allotted time.</returns>
 		public bool Wait(int TimeoutMilliseconds)
 		{
-			switch (WaitHandle.WaitAny(new WaitHandle[] { this.ready, this.error }, TimeoutMilliseconds))
+			return WaitHandle.WaitAny(new WaitHandle[] { this.ready, this.error }, TimeoutMilliseconds) switch
 			{
-				case 0:
-					return true;
-
-				case 1:
-				default:
-					return false;
-			}
+				0 => true,
+				_ => false,
+			};
 		}
 
 		/// <summary>

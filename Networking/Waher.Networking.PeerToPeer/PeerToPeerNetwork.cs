@@ -41,7 +41,7 @@ namespace Waher.Networking.PeerToPeer
 		/// the same machine, each mapping needs a unique name.</param>
 		/// <param name="Sniffers">Sniffers</param>
 		public PeerToPeerNetwork(string ApplicationName, params ISniffer[] Sniffers)
-			: this(ApplicationName, DefaultPort, DefaultPort, DefaultBacklog, Sniffers)
+			: this(false, ApplicationName, DefaultPort, DefaultPort, DefaultBacklog, Sniffers)
 		{
 		}
 
@@ -54,8 +54,9 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="LocalPort">Desired local port number. If 0, a dynamic port number will be assigned.</param>
 		/// <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public PeerToPeerNetwork(string ApplicationName, ushort LocalPort, ushort ExternalPort, params ISniffer[] Sniffers)
-			: this(ApplicationName, LocalPort, ExternalPort, DefaultBacklog, Sniffers)
+		public PeerToPeerNetwork(string ApplicationName, ushort LocalPort, 
+			ushort ExternalPort, params ISniffer[] Sniffers)
+			: this(false, ApplicationName, LocalPort, ExternalPort, DefaultBacklog, Sniffers)
 		{
 		}
 
@@ -69,8 +70,58 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
 		/// <param name="Backlog">Connection backlog.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public PeerToPeerNetwork(string ApplicationName, ushort LocalPort, ushort ExternalPort, int Backlog, params ISniffer[] Sniffers)
-			: base(new InternetGatewayRegistration[] 
+		public PeerToPeerNetwork(string ApplicationName, ushort LocalPort, 
+			ushort ExternalPort, int Backlog, params ISniffer[] Sniffers)
+			: this(false, ApplicationName, LocalPort, ExternalPort, Backlog, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Manages a peer-to-peer network that can receive connections from outside of a NAT-enabled firewall.
+		/// </summary>
+		/// <param name="OnlyLocal">If sufficient with only local access (i.e. no
+		/// search for internet gateways, with corresponding registration).</param>
+		/// <param name="ApplicationName">Name of Peer-to-Peer application. Any NAT port mappings in the firewall
+		/// having the same name and pointing to the same machine will be removed. To allow multiple port mappings on
+		/// the same machine, each mapping needs a unique name.</param>
+		/// <param name="Sniffers">Sniffers</param>
+		public PeerToPeerNetwork(bool OnlyLocal, string ApplicationName, params ISniffer[] Sniffers)
+			: this(OnlyLocal, ApplicationName, DefaultPort, DefaultPort, DefaultBacklog, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Manages a peer-to-peer network that can receive connections from outside of a NAT-enabled firewall.
+		/// </summary>
+		/// <param name="OnlyLocal">If sufficient with only local access (i.e. no
+		/// search for internet gateways, with corresponding registration).</param>
+		/// <param name="ApplicationName">Name of Peer-to-Peer application. Any NAT port mappings in the firewall
+		/// having the same name and pointing to the same machine will be removed. To allow multiple port mappings on
+		/// the same machine, each mapping needs a unique name.</param>
+		/// <param name="LocalPort">Desired local port number. If 0, a dynamic port number will be assigned.</param>
+		/// <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
+		/// <param name="Sniffers">Sniffers</param>
+		public PeerToPeerNetwork(bool OnlyLocal, string ApplicationName, ushort LocalPort,
+			ushort ExternalPort, params ISniffer[] Sniffers)
+			: this(OnlyLocal, ApplicationName, LocalPort, ExternalPort, DefaultBacklog, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Manages a peer-to-peer network that can receive connections from outside of a NAT-enabled firewall.
+		/// </summary>
+		/// <param name="OnlyLocal">If sufficient with only local access (i.e. no
+		/// search for internet gateways, with corresponding registration).</param>
+		/// <param name="ApplicationName">Name of Peer-to-Peer application. Any NAT port mappings in the firewall
+		/// having the same name and pointing to the same machine will be removed. To allow multiple port mappings on
+		/// the same machine, each mapping needs a unique name.</param>
+		/// <param name="LocalPort">Desired local port number. If 0, a dynamic port number will be assigned.</param>
+		/// <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
+		/// <param name="Backlog">Connection backlog.</param>
+		/// <param name="Sniffers">Sniffers</param>
+		public PeerToPeerNetwork(bool OnlyLocal, string ApplicationName, ushort LocalPort, 
+			ushort ExternalPort, int Backlog, params ISniffer[] Sniffers)
+			: base(OnlyLocal, new InternetGatewayRegistration[] 
 			{ 
 				new InternetGatewayRegistration()
 				{
@@ -106,7 +157,7 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		public override async Task Start()
 		{
-			if (this.OnPublicNetwork())
+			if (this.OnPublicNetwork() || this.OnlyLocal)
 			{
 				try
 				{

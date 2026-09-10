@@ -4,17 +4,15 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content.Xml;
 using Waher.Runtime.Temporary;
-using Waher.Security;
 using Waher.Security.E2EE;
 
-namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
+namespace Waher.Security.ChaChaPoly.E2EE
 {
-    /// <summary>
-    /// Implements support for the ChaCha20 cipher in hybrid End-to-End encryption schemes.
-    /// </summary>
-    public class ChaCha20 : E2eSymmetricCipher
+	/// <summary>
+	/// Implements support for the ChaCha20 cipher in hybrid End-to-End encryption schemes.
+	/// </summary>
+	public class ChaCha20 : E2eSymmetricCipher
     {
         /// <summary>
         /// Implements support for the ChaCha20 cipher in hybrid End-to-End encryption schemes.
@@ -35,7 +33,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		/// <returns>If support is provided.</returns>
 		public override bool Supported(XmlElement E2e)
 		{
-			return XML.Attribute(E2e, "cha", false);
+			return E2e.HasAttribute("cha") && E2e.GetAttribute("cha") == "true";
 		}
 
 		/// <summary>
@@ -85,7 +83,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		public override byte[] Encrypt(byte[] Data, byte[] Key, byte[] IV, byte[] AssociatedData,
 			E2eBufferFillAlgorithm FillAlgorithm)
         {
-            Security.ChaChaPoly.ChaCha20 ChaCha20 = new Security.ChaChaPoly.ChaCha20(Key, 1, IV);
+            ChaChaPoly.ChaCha20 ChaCha20 = new ChaChaPoly.ChaCha20(Key, 1, IV);
             return ChaCha20.EncryptOrDecrypt(Data);
         }
 
@@ -158,6 +156,5 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
             return Key;
         }
-
     }
 }

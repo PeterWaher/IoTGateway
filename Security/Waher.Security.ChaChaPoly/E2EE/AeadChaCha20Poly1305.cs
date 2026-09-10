@@ -2,12 +2,10 @@
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content.Xml;
 using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
-using Waher.Security;
 
-namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
+namespace Waher.Security.ChaChaPoly.E2EE
 {
     /// <summary>
     /// Implements support for the AEAD-ChaCha20-Poly1305 cipher in hybrid End-to-End encryption schemes.
@@ -38,7 +36,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		/// <returns>If support is provided.</returns>
 		public override bool Supported(XmlElement E2e)
 		{
-			return XML.Attribute(E2e, "acp", false);
+			return E2e.HasAttribute("acp") && E2e.GetAttribute("acp") == "true";
 		}
 
 		/// <summary>
@@ -128,15 +126,16 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
             Security.ChaChaPoly.AeadChaCha20Poly1305 Acp = new Security.ChaChaPoly.AeadChaCha20Poly1305(Key, IV);
 
-			using TemporaryStream Temp = new TemporaryStream();
-			
-            Data.Position = 0;
-			await Crypto.CopyAsync(Data, Temp, c - 16);
+            using (TemporaryStream Temp = new TemporaryStream())
+            {
+                Data.Position = 0;
+                await Crypto.CopyAsync(Data, Temp, c - 16);
 
-			byte[] Mac = await Data.ReadAllAsync(16);
+                byte[] Mac = await Data.ReadAllAsync(16);
 
-			Temp.Position = 0;
-			return await Acp.Decrypt(Temp, AssociatedData, Mac);
+                Temp.Position = 0;
+                return await Acp.Decrypt(Temp, AssociatedData, Mac);
+            }
 		}
 
     }

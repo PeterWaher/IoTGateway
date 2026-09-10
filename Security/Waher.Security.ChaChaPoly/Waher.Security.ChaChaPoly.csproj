@@ -46,6 +46,7 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Temporary\Waher.Runtime.Temporary.csproj" />
+    <ProjectReference Include="..\Waher.Security.E2ee\Waher.Security.E2ee.csproj" />
   </ItemGroup>
 
 </Project>

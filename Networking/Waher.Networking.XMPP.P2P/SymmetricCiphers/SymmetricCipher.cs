@@ -1,5 +1,6 @@
 ﻿using System;
 using Waher.Security;
+using Waher.Security.ChaChaPoly.E2EE;
 using Waher.Security.E2EE;
 
 namespace Waher.Networking.XMPP.P2P.SymmetricCiphers

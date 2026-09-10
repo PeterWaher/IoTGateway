@@ -8,12 +8,12 @@ using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.Events;
-using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Profiling;
 using Waher.Security;
+using Waher.Security.ChaChaPoly.E2EE;
 using Waher.Security.E2EE;
 
 namespace Waher.Networking.XMPP.P2P

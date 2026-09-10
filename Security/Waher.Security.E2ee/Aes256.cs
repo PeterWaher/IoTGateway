@@ -4,9 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content.Xml;
 using Waher.Runtime.Temporary;
-using Waher.Security;
 
 namespace Waher.Security.E2EE
 {
@@ -44,7 +42,7 @@ namespace Waher.Security.E2EE
 		/// <returns>If support is provided.</returns>
 		public override bool Supported(XmlElement E2e)
 		{
-			return XML.Attribute(E2e, "aes", false);
+			return E2e.HasAttribute("aes") && E2e.GetAttribute("aes") == "true";
 		}
 
 		/// <summary>

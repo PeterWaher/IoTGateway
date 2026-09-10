@@ -15,6 +15,7 @@ using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Profiling;
 using Waher.Security;
+using Waher.Security.E2EE;
 
 namespace Waher.Networking.XMPP.P2P
 {
@@ -24,30 +25,6 @@ namespace Waher.Networking.XMPP.P2P
 	public class EndpointSecurity : IEndToEndEncryption
 	{
 		private static readonly Random rnd = new Random();
-
-		/// <summary>
-		/// urn:ieee:iot:e2e:1.0
-		/// </summary>
-		public const string IoTHarmonizationE2EIeeeV1 = "urn:ieee:iot:e2e:1.0";
-
-		/// <summary>
-		/// urn:nf:iot:e2e:1.0
-		/// </summary>
-		public const string IoTHarmonizationE2ENeuroFoundationV1 = "urn:nf:iot:e2e:1.0";
-
-		/// <summary>
-		/// Current namespace for End-to-End encryption.
-		/// </summary>
-		public const string IoTHarmonizationE2ECurrent = IoTHarmonizationE2ENeuroFoundationV1;
-
-		/// <summary>
-		/// Namespaces supported for End-to-end encryption.
-		/// </summary>
-		public static readonly string[] NamespacesIoTHarmonizationE2E = new string[]
-		{
-			IoTHarmonizationE2ENeuroFoundationV1,
-			IoTHarmonizationE2EIeeeV1
-		};
 
 		/// <summary>
 		/// urn:ieee:iot:p2p:1.0
@@ -559,32 +536,30 @@ namespace Waher.Networking.XMPP.P2P
 
 			#region Neuro-Foundation V1
 
-			Client?.RegisterMessageHandler("aes", IoTHarmonizationE2ENeuroFoundationV1, this.AesMessageHandler, false);
-			Client?.RegisterIqGetHandler("aes", IoTHarmonizationE2ENeuroFoundationV1, this.AesIqGetHandler, false);
-			Client?.RegisterIqSetHandler("aes", IoTHarmonizationE2ENeuroFoundationV1, this.AesIqSetHandler, false);
-			Client?.RegisterMessageHandler("acp", IoTHarmonizationE2ENeuroFoundationV1, this.AcpMessageHandler, false);
-			Client?.RegisterIqGetHandler("acp", IoTHarmonizationE2ENeuroFoundationV1, this.AcpIqGetHandler, false);
-			Client?.RegisterIqSetHandler("acp", IoTHarmonizationE2ENeuroFoundationV1, this.AcpIqSetHandler, false);
-			Client?.RegisterMessageHandler("cha", IoTHarmonizationE2ENeuroFoundationV1, this.ChaMessageHandler, false);
-			Client?.RegisterIqGetHandler("cha", IoTHarmonizationE2ENeuroFoundationV1, this.ChaIqGetHandler, false);
-			Client?.RegisterIqSetHandler("cha", IoTHarmonizationE2ENeuroFoundationV1, this.ChaIqSetHandler, false);
-			Client?.RegisterIqSetHandler("synchE2e", IoTHarmonizationE2ENeuroFoundationV1, this.SynchE2eHandler, false);
-
+			Client?.RegisterMessageHandler("aes", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.AesMessageHandler, false);
+			Client?.RegisterIqGetHandler("aes", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.AesIqGetHandler, false);
+			Client?.RegisterIqSetHandler("aes", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.AesIqSetHandler, false);
+			Client?.RegisterMessageHandler("acp", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.AcpMessageHandler, false);
+			Client?.RegisterIqGetHandler("acp", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.AcpIqGetHandler, false);
+			Client?.RegisterIqSetHandler("acp", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.AcpIqSetHandler, false);
+			Client?.RegisterMessageHandler("cha", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.ChaMessageHandler, false);
+			Client?.RegisterIqGetHandler("cha", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.ChaIqGetHandler, false);
+			Client?.RegisterIqSetHandler("cha", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.ChaIqSetHandler, false);
+			Client?.RegisterIqSetHandler("synchE2e", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.SynchE2eHandler, false);
 			#endregion
 
 			#region IEEE v1
 
-			Client?.RegisterMessageHandler("aes", IoTHarmonizationE2EIeeeV1, this.AesMessageHandler, false);
-			Client?.RegisterIqGetHandler("aes", IoTHarmonizationE2EIeeeV1, this.AesIqGetHandler, false);
-			Client?.RegisterIqSetHandler("aes", IoTHarmonizationE2EIeeeV1, this.AesIqSetHandler, false);
-			Client?.RegisterMessageHandler("acp", IoTHarmonizationE2EIeeeV1, this.AcpMessageHandler, false);
-			Client?.RegisterIqGetHandler("acp", IoTHarmonizationE2EIeeeV1, this.AcpIqGetHandler, false);
-			Client?.RegisterIqSetHandler("acp", IoTHarmonizationE2EIeeeV1, this.AcpIqSetHandler, false);
-			Client?.RegisterMessageHandler("cha", IoTHarmonizationE2EIeeeV1, this.ChaMessageHandler, false);
-			Client?.RegisterIqGetHandler("cha", IoTHarmonizationE2EIeeeV1, this.ChaIqGetHandler, false);
-			Client?.RegisterIqSetHandler("cha", IoTHarmonizationE2EIeeeV1, this.ChaIqSetHandler, false);
-			Client?.RegisterIqSetHandler("synchE2e", IoTHarmonizationE2EIeeeV1, this.SynchE2eHandler, false);
-
+			Client?.RegisterMessageHandler("aes", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.AesMessageHandler, false);
+			Client?.RegisterIqGetHandler("aes", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.AesIqGetHandler, false);
+			Client?.RegisterIqSetHandler("aes", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.AesIqSetHandler, false);
+			Client?.RegisterMessageHandler("acp", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.AcpMessageHandler, false);
+			Client?.RegisterIqGetHandler("acp", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.AcpIqGetHandler, false);
+			Client?.RegisterIqSetHandler("acp", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.AcpIqSetHandler, false);
+			Client?.RegisterMessageHandler("cha", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.ChaMessageHandler, false);
+			Client?.RegisterIqGetHandler("cha", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.ChaIqGetHandler, false);
+			Client?.RegisterIqSetHandler("cha", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.ChaIqSetHandler, false);
+			Client?.RegisterIqSetHandler("synchE2e", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.SynchE2eHandler, false);
 			#endregion
 
 			this.client.OnStateChanged += this.Client_OnStateChanged;
@@ -604,31 +579,30 @@ namespace Waher.Networking.XMPP.P2P
 
 			#region Neuro-Foundation V1
 
-			Client?.UnregisterMessageHandler("aes", IoTHarmonizationE2ENeuroFoundationV1, this.AesMessageHandler, false);
-			Client?.UnregisterIqGetHandler("aes", IoTHarmonizationE2ENeuroFoundationV1, this.AesIqGetHandler, false);
-			Client?.UnregisterIqSetHandler("aes", IoTHarmonizationE2ENeuroFoundationV1, this.AesIqSetHandler, false);
-			Client?.UnregisterMessageHandler("acp", IoTHarmonizationE2ENeuroFoundationV1, this.AcpMessageHandler, false);
-			Client?.UnregisterIqGetHandler("acp", IoTHarmonizationE2ENeuroFoundationV1, this.AcpIqGetHandler, false);
-			Client?.UnregisterIqSetHandler("acp", IoTHarmonizationE2ENeuroFoundationV1, this.AcpIqSetHandler, false);
-			Client?.UnregisterMessageHandler("cha", IoTHarmonizationE2ENeuroFoundationV1, this.ChaMessageHandler, false);
-			Client?.UnregisterIqGetHandler("cha", IoTHarmonizationE2ENeuroFoundationV1, this.ChaIqGetHandler, false);
-			Client?.UnregisterIqSetHandler("cha", IoTHarmonizationE2ENeuroFoundationV1, this.ChaIqSetHandler, false);
-			Client?.UnregisterIqSetHandler("synchE2e", IoTHarmonizationE2ENeuroFoundationV1, this.SynchE2eHandler, false);
-
+			Client?.UnregisterMessageHandler("aes", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.AesMessageHandler, false);
+			Client?.UnregisterIqGetHandler("aes", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.AesIqGetHandler, false);
+			Client?.UnregisterIqSetHandler("aes", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.AesIqSetHandler, false);
+			Client?.UnregisterMessageHandler("acp", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.AcpMessageHandler, false);
+			Client?.UnregisterIqGetHandler("acp", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.AcpIqGetHandler, false);
+			Client?.UnregisterIqSetHandler("acp", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.AcpIqSetHandler, false);
+			Client?.UnregisterMessageHandler("cha", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.ChaMessageHandler, false);
+			Client?.UnregisterIqGetHandler("cha", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.ChaIqGetHandler, false);
+			Client?.UnregisterIqSetHandler("cha", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.ChaIqSetHandler, false);
+			Client?.UnregisterIqSetHandler("synchE2e", E2eEndpoint.IoTHarmonizationE2ENeuroFoundationV1, this.SynchE2eHandler, false);
 			#endregion
 
 			#region IEEE v1
 
-			Client?.UnregisterMessageHandler("aes", IoTHarmonizationE2EIeeeV1, this.AesMessageHandler, false);
-			Client?.UnregisterIqGetHandler("aes", IoTHarmonizationE2EIeeeV1, this.AesIqGetHandler, false);
-			Client?.UnregisterIqSetHandler("aes", IoTHarmonizationE2EIeeeV1, this.AesIqSetHandler, false);
-			Client?.UnregisterMessageHandler("acp", IoTHarmonizationE2EIeeeV1, this.AcpMessageHandler, false);
-			Client?.UnregisterIqGetHandler("acp", IoTHarmonizationE2EIeeeV1, this.AcpIqGetHandler, false);
-			Client?.UnregisterIqSetHandler("acp", IoTHarmonizationE2EIeeeV1, this.AcpIqSetHandler, false);
-			Client?.UnregisterMessageHandler("cha", IoTHarmonizationE2EIeeeV1, this.ChaMessageHandler, false);
-			Client?.UnregisterIqGetHandler("cha", IoTHarmonizationE2EIeeeV1, this.ChaIqGetHandler, false);
-			Client?.UnregisterIqSetHandler("cha", IoTHarmonizationE2EIeeeV1, this.ChaIqSetHandler, false);
-			Client?.UnregisterIqSetHandler("synchE2e", IoTHarmonizationE2EIeeeV1, this.SynchE2eHandler, false);
+			Client?.UnregisterMessageHandler("aes", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.AesMessageHandler, false);
+			Client?.UnregisterIqGetHandler("aes", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.AesIqGetHandler, false);
+			Client?.UnregisterIqSetHandler("aes", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.AesIqSetHandler, false);
+			Client?.UnregisterMessageHandler("acp", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.AcpMessageHandler, false);
+			Client?.UnregisterIqGetHandler("acp", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.AcpIqGetHandler, false);
+			Client?.UnregisterIqSetHandler("acp", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.AcpIqSetHandler, false);
+			Client?.UnregisterMessageHandler("cha", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.ChaMessageHandler, false);
+			Client?.UnregisterIqGetHandler("cha", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.ChaIqGetHandler, false);
+			Client?.UnregisterIqSetHandler("cha", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.ChaIqSetHandler, false);
+			Client?.UnregisterIqSetHandler("synchE2e", E2eEndpoint.IoTHarmonizationE2EIeeeV1, this.SynchE2eHandler, false);
 
 			#endregion
 
@@ -1046,7 +1020,7 @@ namespace Waher.Networking.XMPP.P2P
 				}
 
 				if (EndpointReference.IndexOf('#') < 0)
-					EndpointReference = IoTHarmonizationE2ECurrent + "#" + EndpointReference;
+					EndpointReference = E2eEndpoint.IoTHarmonizationE2ECurrent + "#" + EndpointReference;
 				else
 					EndpointReference = EndpointReference.Replace("urn:ieee:", "urn:nf:");
 
@@ -1210,7 +1184,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>Matching key, or null if none found.</returns>
 		public IE2eEndpoint FindLocalEndpoint(string KeyName)
 		{
-			return this.FindLocalEndpoint(KeyName, IoTHarmonizationE2ECurrent);
+			return this.FindLocalEndpoint(KeyName, E2eEndpoint.IoTHarmonizationE2ECurrent);
 		}
 
 		/// <summary>
@@ -1222,7 +1196,7 @@ namespace Waher.Networking.XMPP.P2P
 		public IE2eEndpoint FindLocalEndpoint(string KeyName, string KeyNamespace)
 		{
 			if (string.IsNullOrEmpty(KeyNamespace))
-				KeyNamespace = IoTHarmonizationE2ECurrent;
+				KeyNamespace = E2eEndpoint.IoTHarmonizationE2ECurrent;
 
 			if (this.keys?.TryGetValue(KeyNamespace + "#" + KeyName, out IE2eEndpoint Result) ?? false)
 				return Result;
@@ -2327,11 +2301,11 @@ namespace Waher.Networking.XMPP.P2P
 			lock (this.synchObject)
 			{
 				Xml.Append("<e2e xmlns=\"");
-				Xml.Append(IoTHarmonizationE2ECurrent);
+				Xml.Append(E2eEndpoint.IoTHarmonizationE2ECurrent);
 				Xml.Append("\" aes=\"true\" cha=\"true\" acp=\"true\">");
 
 				foreach (IE2eEndpoint E2e in this.Keys)
-					E2e.ToXml(Xml, IoTHarmonizationE2ECurrent);
+					E2e.ToXml(Xml, E2eEndpoint.IoTHarmonizationE2ECurrent);
 
 				Xml.Append("</e2e>");
 			}
@@ -2411,7 +2385,7 @@ namespace Waher.Networking.XMPP.P2P
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<synchE2e xmlns=\"");
-			Xml.Append(IoTHarmonizationE2ECurrent);
+			Xml.Append(E2eEndpoint.IoTHarmonizationE2ECurrent);
 			Xml.Append("\">");
 
 			this.AppendE2eInfo(Xml);
@@ -2436,7 +2410,7 @@ namespace Waher.Networking.XMPP.P2P
 						switch (E2.LocalName)
 						{
 							case "e2e":
-								if (Array.IndexOf(NamespacesIoTHarmonizationE2E, E.NamespaceURI) >= 0)
+								if (Array.IndexOf(E2eEndpoint.NamespacesIoTHarmonizationE2E, E.NamespaceURI) >= 0)
 									E2E = E2;
 								break;
 
@@ -2487,7 +2461,7 @@ namespace Waher.Networking.XMPP.P2P
 							switch (E.LocalName)
 							{
 								case "e2e":
-									if (Array.IndexOf(NamespacesIoTHarmonizationE2E, E.NamespaceURI) >= 0)
+									if (Array.IndexOf(E2eEndpoint.NamespacesIoTHarmonizationE2E, E.NamespaceURI) >= 0)
 										E2E = E;
 									break;
 

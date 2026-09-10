@@ -1,11 +1,11 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
@@ -15,6 +15,7 @@ using Waher.Persistence.Filters;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Settings;
 using Waher.Security;
+using Waher.Security.E2EE;
 using CallStack = Waher.Security.CallStack;
 
 namespace Waher.Networking.XMPP.Test
@@ -442,7 +443,7 @@ namespace Waher.Networking.XMPP.Test
 			IE2eEndpoint RotatedEndpoint = GetLocalEndpoint(this.contractsClient, "ed448");
 			byte[] RotatedPublicKey = (byte[])RotatedEndpoint.PublicKey.Clone();
 			byte[] RotatedRuntimePrivateKey = await GetRuntimePrivateKeyAsync(this.contractsClient, "ed448");
-			IE2eEndpoint RotatedRuntimeEndpoint = CreatePrivateEndpoint("ed448", EndpointSecurity.IoTHarmonizationE2ECurrent, RotatedRuntimePrivateKey);
+			IE2eEndpoint RotatedRuntimeEndpoint = CreatePrivateEndpoint("ed448", E2eEndpoint.IoTHarmonizationE2ECurrent, RotatedRuntimePrivateKey);
 
 			try
 			{

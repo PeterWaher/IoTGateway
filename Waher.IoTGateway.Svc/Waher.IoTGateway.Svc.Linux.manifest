@@ -667,6 +667,9 @@
 	<Assembly fileName="Waher.Security.DTLS.dll" />
 	<Assembly fileName="Waher.Security.DTLS.pdb" />
 	<Assembly fileName="Waher.Security.DTLS.xml" />
+	<Assembly fileName="Waher.Security.E2ee.dll" />
+	<Assembly fileName="Waher.Security.E2ee.pdb" />
+	<Assembly fileName="Waher.Security.E2ee.xml" />
 	<Assembly fileName="Waher.Security.EllipticCurves.dll" />
 	<Assembly fileName="Waher.Security.EllipticCurves.pdb" />
 	<Assembly fileName="Waher.Security.EllipticCurves.xml" />

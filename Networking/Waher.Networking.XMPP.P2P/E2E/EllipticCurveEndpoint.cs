@@ -2,6 +2,7 @@
 using System.IO;
 using Waher.Runtime.Cache;
 using Waher.Security;
+using Waher.Security.E2EE;
 using Waher.Security.EllipticCurves;
 
 namespace Waher.Networking.XMPP.P2P.E2E

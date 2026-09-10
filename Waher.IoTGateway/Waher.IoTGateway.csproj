@@ -456,6 +456,7 @@
     <ProjectReference Include="..\Security\Waher.Security.CallStack\Waher.Security.CallStack.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.ChaChaPoly\Waher.Security.ChaChaPoly.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.DTLS\Waher.Security.DTLS.csproj" />
+    <ProjectReference Include="..\Security\Waher.Security.E2ee\Waher.Security.E2ee.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.JWS\Waher.Security.JWS.csproj" />
     <ProjectReference Include="..\Security\Waher.Security.JWT\Waher.Security.JWT.csproj" />

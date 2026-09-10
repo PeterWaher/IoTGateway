@@ -4,9 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Runtime.Counters;
-using Waher.Security;
 
-namespace Waher.Networking.XMPP.P2P.E2E
+namespace Waher.Security.E2EE
 {
 	/// <summary>
 	/// Abstract base class for End-to-End encryption schemes.
@@ -14,6 +13,30 @@ namespace Waher.Networking.XMPP.P2P.E2E
 	public abstract class E2eEndpoint : IE2eEndpoint
 	{
 		private const string E2eCounterName = "E2EE.Counter";
+
+		/// <summary>
+		/// urn:ieee:iot:e2e:1.0
+		/// </summary>
+		public const string IoTHarmonizationE2EIeeeV1 = "urn:ieee:iot:e2e:1.0";
+
+		/// <summary>
+		/// urn:nf:iot:e2e:1.0
+		/// </summary>
+		public const string IoTHarmonizationE2ENeuroFoundationV1 = "urn:nf:iot:e2e:1.0";
+
+		/// <summary>
+		/// Current namespace for End-to-End encryption.
+		/// </summary>
+		public const string IoTHarmonizationE2ECurrent = IoTHarmonizationE2ENeuroFoundationV1;
+
+		/// <summary>
+		/// Namespaces supported for End-to-end encryption.
+		/// </summary>
+		public static readonly string[] NamespacesIoTHarmonizationE2E = new string[]
+		{
+			IoTHarmonizationE2ENeuroFoundationV1,
+			IoTHarmonizationE2EIeeeV1
+		};
 
 		private IE2eSymmetricCipher defaultSymmetricCipher;
 		private IE2eEndpoint prev = null;
@@ -58,7 +81,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <summary>
 		/// Namespace of the E2E encryption scheme
 		/// </summary>
-		public virtual string Namespace => EndpointSecurity.IoTHarmonizationE2ECurrent;
+		public virtual string Namespace => IoTHarmonizationE2ECurrent;
 
 		/// <summary>
 		/// Remote public key.

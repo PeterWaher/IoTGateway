@@ -37,6 +37,7 @@ using Waher.Runtime.Threading;
 using Waher.Script;
 using Waher.Security;
 using Waher.Security.CallStack;
+using Waher.Security.E2EE;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -849,7 +850,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			string KeyNamespace = string.IsNullOrEmpty(State.KeyNamespace)
-				? EndpointSecurity.IoTHarmonizationE2ECurrent
+				? E2eEndpoint.IoTHarmonizationE2ECurrent
 				: State.KeyNamespace;
 
 			byte[] PrivateKey = State.PrivateKey;

@@ -7,6 +7,7 @@ using System.Xml;
 using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
 using Waher.Security;
+using Waher.Security.E2EE;
 
 namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 {
@@ -28,7 +29,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		/// <summary>
 		/// Namespace of the E2E symmetric cipher
 		/// </summary>
-		public virtual string Namespace => EndpointSecurity.IoTHarmonizationE2ECurrent;
+		public virtual string Namespace => E2eEndpoint.IoTHarmonizationE2ECurrent;
 
 		/// <summary>
 		/// If Authenticated Encryption with Associated Data is used
@@ -789,7 +790,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 			Xml.Append(" xmlns=\"");
 			Xml.Append(this.Namespace);
 			Xml.Append("\" r=\"");
-			if (Sender.Namespace != EndpointSecurity.IoTHarmonizationE2ECurrent)
+			if (Sender.Namespace != E2eEndpoint.IoTHarmonizationE2ECurrent)
 			{
 				Xml.Append(Sender.Namespace);
 				Xml.Append('#');

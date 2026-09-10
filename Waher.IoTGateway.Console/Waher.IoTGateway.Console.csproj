@@ -127,6 +127,7 @@
     <ProjectReference Include="..\Script\Waher.Script.XmlDSig\Waher.Script.XmlDSig.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Xml\Waher.Script.Xml.csproj" />
     <ProjectReference Include="..\Script\Waher.Script\Waher.Script.csproj" />
+    <ProjectReference Include="..\Security\Waher.Security.E2ee\Waher.Security.E2ee.csproj" />
     <ProjectReference Include="..\Themes\Waher.Theme.CactusRose\Waher.Theme.CactusRose.csproj" />
     <ProjectReference Include="..\Themes\Waher.Theme.GothicPeacock\Waher.Theme.GothicPeacock.csproj" />
     <ProjectReference Include="..\Themes\Waher.Theme.Retro64\Waher.Theme.Retro64.csproj" />

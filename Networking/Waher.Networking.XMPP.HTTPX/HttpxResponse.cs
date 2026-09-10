@@ -9,9 +9,9 @@ using Waher.Content;
 using Waher.Content.Binary;
 using Waher.Content.Xml;
 using Waher.Networking.HTTP;
-using Waher.Networking.XMPP.P2P;
 using Waher.Runtime.Temporary;
 using Waher.Security;
+using Waher.Security.E2EE;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
@@ -275,7 +275,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							StringBuilder sb = new StringBuilder();
 
-							if (EndpointReference.Namespace != EndpointSecurity.IoTHarmonizationE2ECurrent)
+							if (EndpointReference.Namespace != E2eEndpoint.IoTHarmonizationE2ECurrent)
 							{
 								sb.Append(EndpointReference.Namespace);
 								sb.Append('#');
@@ -286,7 +286,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							IE2eSymmetricCipher SymmetricCipher = EndpointReference.DefaultSymmetricCipher;
 
-							if (SymmetricCipher.Namespace != EndpointSecurity.IoTHarmonizationE2ECurrent)
+							if (SymmetricCipher.Namespace != E2eEndpoint.IoTHarmonizationE2ECurrent)
 							{
 								sb.Append(SymmetricCipher.Namespace);
 								sb.Append('#');

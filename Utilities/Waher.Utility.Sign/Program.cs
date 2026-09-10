@@ -9,6 +9,7 @@ using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Security;
+using Waher.Security.E2EE;
 
 namespace Waher.Utility.Sign
 {
@@ -72,7 +73,7 @@ namespace Waher.Utility.Sign
                                 throw new Exception("Missing cipher name.");
 
                             s = args[i++];
-                            if (!EndpointSecurity.TryCreateEndpoint(s, EndpointSecurity.IoTHarmonizationE2ECurrent, out Endpoint))
+                            if (!EndpointSecurity.TryCreateEndpoint(s, E2eEndpoint.IoTHarmonizationE2ECurrent, out Endpoint))
                                 throw new Exception("Algorithm not recognized: " + s);
 
                             break;
@@ -89,7 +90,7 @@ namespace Waher.Utility.Sign
                                 {
 									using IE2eEndpoint Endpoint2 = (IE2eEndpoint)Activator.CreateInstance(T);
 
-									if (Endpoint2.Namespace == EndpointSecurity.IoTHarmonizationE2ECurrent)
+									if (Endpoint2.Namespace == E2eEndpoint.IoTHarmonizationE2ECurrent)
 									{
 										if (Output is null)
 											ConsoleOut.WriteLine(Endpoint2.LocalName);

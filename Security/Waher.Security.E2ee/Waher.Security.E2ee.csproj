@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Counters\Waher.Runtime.Counters.csproj" />
+    <ProjectReference Include="..\Waher.Security\Waher.Security.csproj" />
+  </ItemGroup>
+
+</Project>

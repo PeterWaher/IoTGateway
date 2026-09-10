@@ -13,6 +13,16 @@ namespace Waher.Persistence.Remote
 	/// </summary>
 	public class RemoteDatabaseProvider : IDatabaseProvider, ISerializerContext, IDisposable
 	{
+		/// <summary>
+		/// Database provider acting as a proxy to a remote database provider.
+		/// </summary>
+		/// <param name="RemoteHost">Host of remote machine.</param>
+		/// <param name="RemotePort">Port of remote machine.</param>
+		/// <param name="Encrypted">If communication channel is encrypted.</param>
+		public RemoteDatabaseProvider(string RemoteHost, int RemotePort, bool Encrypted)
+		{
+		}
+
 		#region IDisposable
 
 		/// <summary>

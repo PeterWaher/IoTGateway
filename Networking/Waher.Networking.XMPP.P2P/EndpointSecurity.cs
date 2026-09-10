@@ -8,7 +8,6 @@ using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.Events;
-using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Runtime.Collections;

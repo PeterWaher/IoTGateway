@@ -7,6 +7,7 @@ using System.Xml;
 using Waher.Content.Xml;
 using Waher.Runtime.Temporary;
 using Waher.Security;
+using Waher.Security.E2EE;
 
 namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 {

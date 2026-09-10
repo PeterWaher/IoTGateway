@@ -128,17 +128,16 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
             Security.ChaChaPoly.AeadChaCha20Poly1305 Acp = new Security.ChaChaPoly.AeadChaCha20Poly1305(Key, IV);
 
-            using (TemporaryStream Temp = new TemporaryStream())
-            {
-                Data.Position = 0;
-                await Crypto.CopyAsync(Data, Temp, c - 16);
-            
-                byte[] Mac = await Data.ReadAllAsync(16);
+			using TemporaryStream Temp = new TemporaryStream();
+			
+            Data.Position = 0;
+			await Crypto.CopyAsync(Data, Temp, c - 16);
 
-                Temp.Position = 0;
-                return await Acp.Decrypt(Temp, AssociatedData, Mac);
-            }
-        }
+			byte[] Mac = await Data.ReadAllAsync(16);
+
+			Temp.Position = 0;
+			return await Acp.Decrypt(Temp, AssociatedData, Mac);
+		}
 
     }
 }

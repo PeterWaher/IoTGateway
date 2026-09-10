@@ -8,7 +8,7 @@ using Waher.Content.Xml;
 using Waher.Runtime.Temporary;
 using Waher.Security;
 
-namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
+namespace Waher.Security.E2EE
 {
 	/// <summary>
 	/// Implements support for the AES-256 cipher in hybrid End-to-End encryption schemes.
@@ -117,9 +117,10 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
 			lock (this.aes)
 			{
-				using ICryptoTransform Aes = this.aes.CreateEncryptor(Key, IV);
-				
-				Encrypted = Aes.TransformFinalBlock(Encrypted, 0, Encrypted.Length);
+				using (ICryptoTransform Aes = this.aes.CreateEncryptor(Key, IV))
+				{
+					Encrypted = Aes.TransformFinalBlock(Encrypted, 0, Encrypted.Length);
+				}
 			}
 
 			return Encrypted;
@@ -137,9 +138,10 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		{
 			lock (this.aes)
 			{
-				using ICryptoTransform Aes = this.aes.CreateDecryptor(Key, IV);
-				
-				Data = Aes.TransformFinalBlock(Data, 0, Data.Length);
+				using (ICryptoTransform Aes = this.aes.CreateDecryptor(Key, IV))
+				{
+					Data = Aes.TransformFinalBlock(Data, 0, Data.Length);
+				}
 			}
 
 			return base.Decrypt(Data, Key, IV, AssociatedData);

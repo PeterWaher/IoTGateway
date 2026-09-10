@@ -7,6 +7,7 @@ using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Security;
+using Waher.Security.E2EE;
 
 namespace Waher.Networking.XMPP.Test.E2eTests
 {

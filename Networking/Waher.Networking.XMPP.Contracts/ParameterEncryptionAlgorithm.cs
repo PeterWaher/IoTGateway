@@ -87,7 +87,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public static async Task<ParameterEncryptionAlgorithm> Create(string ContractId, SymmetricCipherAlgorithms Algorithm,
 			ContractsClient Client, string CreatorJid, byte[] Key)
 		{
-			IE2eSymmetricCipher Instance = E2eSymmetricCipher.Create(Algorithm);
+			IE2eSymmetricCipher Instance = SymmetricCipher.Create(Algorithm);
 
 			if (Key is null)
 			{

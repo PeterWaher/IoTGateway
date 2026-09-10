@@ -1,8 +1,6 @@
-﻿using Waher.Security;
-using Waher.Security.E2EE;
-using Waher.Security.PQC;
+﻿using Waher.Security.E2EE;
 
-namespace Waher.Networking.XMPP.P2P.E2E
+namespace Waher.Security.PQC.E2EE
 {
 	/// <summary>
 	/// Module Lattice endpoint with 192 bit security strength.

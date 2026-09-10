@@ -1,73 +1,71 @@
-﻿using Waher.Security;
-using Waher.Security.E2EE;
-using Waher.Security.EllipticCurves;
+﻿using Waher.Security.E2EE;
 
-namespace Waher.Networking.XMPP.P2P.E2E
+namespace Waher.Security.EllipticCurves.E2EE
 {
 	/// <summary>
-	/// NIST P-192 Curve
+	/// Brainpool P-192 Curve
 	/// </summary>
-	public class NistP192Endpoint : NistEndpoint
+	public class BrainpoolP192Endpoint : BrainpoolEndpoint
     {
         /// <summary>
-        /// NIST P-192 Curve
+        /// Brainpool P-192 Curve
         /// </summary>
-        public NistP192Endpoint()
-            : this(new NistP192())
+        public BrainpoolP192Endpoint()
+            : this(new BrainpoolP192())
         {
         }
 
         /// <summary>
-        /// NIST P-192 Curve
+        /// Brainpool P-192 Curve
         /// </summary>
         /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
-        public NistP192Endpoint(IE2eSymmetricCipher SymmetricCipher)
-            : this(new NistP192(), SymmetricCipher)
+        public BrainpoolP192Endpoint(IE2eSymmetricCipher SymmetricCipher)
+            : this(new BrainpoolP192(), SymmetricCipher)
         {
         }
 
         /// <summary>
-        /// NIST P-192 Curve
+        /// Brainpool P-192 Curve
         /// </summary>
         /// <param name="Curve">Curve instance</param>
-        public NistP192Endpoint(NistP192 Curve)
+        public BrainpoolP192Endpoint(BrainpoolP192 Curve)
             : this(Curve, new Aes256())
         {
         }
 
         /// <summary>
-        /// NIST P-192 Curve
+        /// Brainpool P-192 Curve
         /// </summary>
         /// <param name="Curve">Curve instance</param>
         /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
-        public NistP192Endpoint(NistP192 Curve, IE2eSymmetricCipher SymmetricCipher)
+        public BrainpoolP192Endpoint(BrainpoolP192 Curve, IE2eSymmetricCipher SymmetricCipher)
             : base(Curve, SymmetricCipher)
         {
         }
 
         /// <summary>
-        /// NIST P-192 Curve
+        /// Brainpool P-192 Curve
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
-        public NistP192Endpoint(byte[] PublicKey)
+        public BrainpoolP192Endpoint(byte[] PublicKey)
             : this(PublicKey, new Aes256())
         {
         }
 
         /// <summary>
-        /// NIST P-192 Curve
+        /// Brainpool P-192 Curve
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
         /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
-        public NistP192Endpoint(byte[] PublicKey, IE2eSymmetricCipher SymmetricCipher)
-            : base(PublicKey, new NistP192(), SymmetricCipher)
+        public BrainpoolP192Endpoint(byte[] PublicKey, IE2eSymmetricCipher SymmetricCipher)
+            : base(PublicKey, new BrainpoolP192(), SymmetricCipher)
         {
         }
 
 		/// <summary>
 		/// Local name of the E2E encryption scheme
 		/// </summary>
-		public override string LocalName => "p192";
+		public override string LocalName => "bp192";
 
 		/// <summary>
 		/// Security strength of End-to-End encryption scheme.
@@ -81,7 +79,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>New E2E endpoint.</returns>
 		public override IE2eEndpoint Create(int SecurityStrength)
 		{
-			return new NistP192Endpoint(this.DefaultSymmetricCipher.CreteNew());
+			return new BrainpoolP192Endpoint(this.DefaultSymmetricCipher.CreteNew());
 		}
 
         /// <summary>
@@ -91,7 +89,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>Endpoint object.</returns>
         public override IE2eEndpoint CreatePrivate(byte[] Secret)
 		{
-			return new NistP192Endpoint(new NistP192(Secret), this.DefaultSymmetricCipher.CreteNew());
+			return new BrainpoolP192Endpoint(new BrainpoolP192(Secret), this.DefaultSymmetricCipher.CreteNew());
 		}
 
         /// <summary>
@@ -101,7 +99,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>Endpoint object.</returns>
         public override IE2eEndpoint CreatePublic(byte[] PublicKey)
 		{
-			return new NistP192Endpoint(PublicKey, this.DefaultSymmetricCipher.CreteNew());
+			return new BrainpoolP192Endpoint(PublicKey, this.DefaultSymmetricCipher.CreteNew());
 		}
 	}
 }

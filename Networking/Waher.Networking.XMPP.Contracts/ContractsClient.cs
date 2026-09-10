@@ -22,7 +22,6 @@ using Waher.Networking.XMPP.Contracts.Search;
 using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.HttpFileUpload;
 using Waher.Networking.XMPP.P2P;
-using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Persistence;
@@ -38,6 +37,8 @@ using Waher.Script;
 using Waher.Security;
 using Waher.Security.CallStack;
 using Waher.Security.E2EE;
+using Waher.Security.EllipticCurves.E2EE;
+using Waher.Security.PQC.E2EE;
 
 namespace Waher.Networking.XMPP.Contracts
 {

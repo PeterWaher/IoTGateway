@@ -1,10 +1,8 @@
 ﻿using System;
 using System.IO;
-using Waher.Security;
 using Waher.Security.E2EE;
-using Waher.Security.PQC;
 
-namespace Waher.Networking.XMPP.P2P.E2E
+namespace Waher.Security.PQC.E2EE
 {
 	/// <summary>
 	/// Abstract base class for Module Lattice endpoints.

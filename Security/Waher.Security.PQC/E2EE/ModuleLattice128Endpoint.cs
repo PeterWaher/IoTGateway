@@ -1,65 +1,63 @@
-﻿using Waher.Security;
-using Waher.Security.E2EE;
-using Waher.Security.PQC;
+﻿using Waher.Security.E2EE;
 
-namespace Waher.Networking.XMPP.P2P.E2E
+namespace Waher.Security.PQC.E2EE
 {
 	/// <summary>
-	/// Module Lattice endpoint with 256 bit security strength.
+	/// Module Lattice endpoint with 128 bit security strength.
 	/// </summary>
-	public class ModuleLattice256Endpoint : ModuleLatticeEndpoint
+	public class ModuleLattice128Endpoint : ModuleLatticeEndpoint
 	{
 		/// <summary>
-		/// Module Lattice endpoint with 256 bit security strength.
+		/// Module Lattice endpoint with 128 bit security strength.
 		/// </summary>
-		public ModuleLattice256Endpoint()
+		public ModuleLattice128Endpoint()
 			: this(new Aes256())
 		{
 		}
 
 		/// <summary>
-		/// Module Lattice endpoint with 256 bit security strength.
+		/// Module Lattice endpoint with 128 bit security strength.
 		/// </summary>
 		/// <param name="DefaultSymmetricCipher">Default symmetric cipher.</param>
-		public ModuleLattice256Endpoint(IE2eSymmetricCipher DefaultSymmetricCipher)
-			: base(ML_KEM.ML_KEM_1024, ML_KEM.ML_KEM_1024.KeyGen(true),
-				  ML_DSA.ML_DSA_87, ML_DSA.ML_DSA_87.KeyGen(true),
+		public ModuleLattice128Endpoint(IE2eSymmetricCipher DefaultSymmetricCipher)
+			: base(ML_KEM.ML_KEM_512, ML_KEM.ML_KEM_512.KeyGen(true),
+				  ML_DSA.ML_DSA_44, ML_DSA.ML_DSA_44.KeyGen(true),
 				  DefaultSymmetricCipher)
 		{
 		}
 
 		/// <summary>
-		/// Module Lattice endpoint with 256 bit security strength.
+		/// Module Lattice endpoint with 128 bit security strength.
 		/// </summary>
 		/// <param name="PublicKey">Remote public key.</param>
 		/// <param name="DefaultSymmetricCipher">Default symmetric cipher.</param>
-		public ModuleLattice256Endpoint(byte[] PublicKey, IE2eSymmetricCipher DefaultSymmetricCipher)
-			: base(PublicKey, ML_KEM.ML_KEM_1024, ML_DSA.ML_DSA_87, DefaultSymmetricCipher)
+		public ModuleLattice128Endpoint(byte[] PublicKey, IE2eSymmetricCipher DefaultSymmetricCipher)
+			: base(PublicKey, ML_KEM.ML_KEM_512, ML_DSA.ML_DSA_44, DefaultSymmetricCipher)
 		{
 		}
 
 		/// <summary>
-		/// Module Lattice endpoint with 256 bit security strength.
+		/// Module Lattice endpoint with 128 bit security strength.
 		/// </summary>
 		/// <param name="KeyEncapsulationMechanismKeys">Key Encapsulation Mechanism Keys.</param>
 		/// <param name="SignatureAlgorithmKeys">Signature Algorithm Keys.</param>
 		/// <param name="DefaultSymmetricCipher">Default symmetric cipher.</param>
-		public ModuleLattice256Endpoint(ML_KEM_Keys KeyEncapsulationMechanismKeys, 
+		public ModuleLattice128Endpoint(ML_KEM_Keys KeyEncapsulationMechanismKeys, 
 			ML_DSA_Keys SignatureAlgorithmKeys, IE2eSymmetricCipher DefaultSymmetricCipher)
-			: base(ML_KEM.ML_KEM_1024, KeyEncapsulationMechanismKeys,
-				  ML_DSA.ML_DSA_87, SignatureAlgorithmKeys, DefaultSymmetricCipher)
+			: base(ML_KEM.ML_KEM_512, KeyEncapsulationMechanismKeys,
+				  ML_DSA.ML_DSA_44, SignatureAlgorithmKeys, DefaultSymmetricCipher)
 		{
 		}
 
 		/// <summary>
 		/// Security strength of End-to-End encryption scheme.
 		/// </summary>
-		public override int SecurityStrength => 256;
+		public override int SecurityStrength => 128;
 
 		/// <summary>
 		/// Local name of the E2E encryption scheme
 		/// </summary>
-		public override string LocalName => "ml256";
+		public override string LocalName => "ml128";
 
 		/// <summary>
 		/// Creates a new key.
@@ -68,7 +66,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>New E2E endpoint.</returns>
 		public override IE2eEndpoint Create(int SecurityStrength)
 		{
-			return new ModuleLattice256Endpoint(this.DefaultSymmetricCipher.CreteNew());
+			return new ModuleLattice128Endpoint(this.DefaultSymmetricCipher.CreteNew());
 		}
 
 		/// <summary>
@@ -79,7 +77,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		public override IE2eEndpoint CreatePrivate(byte[] Secret)
 		{
 			this.GeneratePrivateKeys(Secret, out ML_KEM_Keys KemKeys, out ML_DSA_Keys DsaKeys);
-			return new ModuleLattice256Endpoint(KemKeys, DsaKeys, this.DefaultSymmetricCipher.CreteNew());
+			return new ModuleLattice128Endpoint(KemKeys, DsaKeys, this.DefaultSymmetricCipher.CreteNew());
 		}
 
 		/// <summary>
@@ -89,7 +87,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>Endpoint object.</returns>
 		public override IE2eEndpoint CreatePublic(byte[] PublicKey)
 		{
-			return new ModuleLattice256Endpoint(PublicKey, this.DefaultSymmetricCipher.CreteNew());
+			return new ModuleLattice128Endpoint(PublicKey, this.DefaultSymmetricCipher.CreteNew());
 		}
 	}
 }

@@ -5,11 +5,11 @@ using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.P2P;
-using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Security;
 using Waher.Security.E2EE;
+using Waher.Security.EllipticCurves.E2EE;
 
 namespace Waher.Utility.Sign
 {

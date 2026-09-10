@@ -1,78 +1,76 @@
-﻿using Waher.Security;
-using Waher.Security.E2EE;
-using Waher.Security.EllipticCurves;
+﻿using Waher.Security.E2EE;
 
-namespace Waher.Networking.XMPP.P2P.E2E
+namespace Waher.Security.EllipticCurves.E2EE
 {
 	/// <summary>
-	/// Brainpool P-512 Curve
+	/// NIST P-256 Curve
 	/// </summary>
-	public class BrainpoolP512Endpoint : BrainpoolEndpoint
+	public class NistP256Endpoint : NistEndpoint
     {
         /// <summary>
-        /// Brainpool P-512 Curve
+        /// NIST P-256 Curve
         /// </summary>
-        public BrainpoolP512Endpoint()
-            : this(new BrainpoolP512())
+        public NistP256Endpoint()
+            : this(new NistP256())
         {
         }
 
         /// <summary>
-        /// Brainpool P-512 Curve
+        /// NIST P-256 Curve
         /// </summary>
         /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
-        public BrainpoolP512Endpoint(IE2eSymmetricCipher SymmetricCipher)
-            : this(new BrainpoolP512(), SymmetricCipher)
+        public NistP256Endpoint(IE2eSymmetricCipher SymmetricCipher)
+            : this(new NistP256(), SymmetricCipher)
         {
         }
 
         /// <summary>
-        /// Brainpool P-512 Curve
+        /// NIST P-256 Curve
         /// </summary>
         /// <param name="Curve">Curve instance</param>
-        public BrainpoolP512Endpoint(BrainpoolP512 Curve)
+        public NistP256Endpoint(NistP256 Curve)
             : this(Curve, new Aes256())
         {
         }
 
         /// <summary>
-        /// Brainpool P-512 Curve
+        /// NIST P-256 Curve
         /// </summary>
         /// <param name="Curve">Curve instance</param>
         /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
-        public BrainpoolP512Endpoint(BrainpoolP512 Curve, IE2eSymmetricCipher SymmetricCipher)
+        public NistP256Endpoint(NistP256 Curve, IE2eSymmetricCipher SymmetricCipher)
             : base(Curve, SymmetricCipher)
         {
         }
 
         /// <summary>
-        /// Brainpool P-512 Curve
+        /// NIST P-256 Curve
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
-        public BrainpoolP512Endpoint(byte[] PublicKey)
+        public NistP256Endpoint(byte[] PublicKey)
             : this(PublicKey, new Aes256())
         {
         }
 
         /// <summary>
-        /// Brainpool P-512 Curve
+        /// NIST P-256 Curve
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
         /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
-        public BrainpoolP512Endpoint(byte[] PublicKey, IE2eSymmetricCipher SymmetricCipher)
-            : base(PublicKey, new BrainpoolP512(), SymmetricCipher)
+        public NistP256Endpoint(byte[] PublicKey, IE2eSymmetricCipher SymmetricCipher)
+            : base(PublicKey, new NistP256(), SymmetricCipher)
         {
         }
 
         /// <summary>
         /// Local name of the E2E encryption scheme
         /// </summary>
-        public override string LocalName => "bp512";
+        public override string LocalName => "p256";
 
 		/// <summary>
 		/// Security strength of End-to-End encryption scheme.
 		/// </summary>
-		public override int SecurityStrength => 256;
+		public override int SecurityStrength => 128;
 
 		/// <summary>
 		/// Creates a new key.
@@ -81,7 +79,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>New E2E endpoint.</returns>
 		public override IE2eEndpoint Create(int SecurityStrength)
 		{
-			return new BrainpoolP512Endpoint(this.DefaultSymmetricCipher.CreteNew());
+			return new NistP256Endpoint(this.DefaultSymmetricCipher.CreteNew());
 		}
 
         /// <summary>
@@ -91,7 +89,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>Endpoint object.</returns>
         public override IE2eEndpoint CreatePrivate(byte[] Secret)
         {
-            return new BrainpoolP512Endpoint(new BrainpoolP512(Secret), this.DefaultSymmetricCipher.CreteNew());
+            return new NistP256Endpoint(new NistP256(Secret), this.DefaultSymmetricCipher.CreteNew());
         }
 
         /// <summary>
@@ -101,7 +99,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>Endpoint object.</returns>
         public override IE2eEndpoint CreatePublic(byte[] PublicKey)
         {
-            return new BrainpoolP512Endpoint(PublicKey, this.DefaultSymmetricCipher.CreteNew());
+            return new NistP256Endpoint(PublicKey, this.DefaultSymmetricCipher.CreteNew());
         }
     }
 }

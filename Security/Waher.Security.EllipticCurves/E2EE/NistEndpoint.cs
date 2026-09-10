@@ -1,50 +1,48 @@
-﻿using Waher.Security;
-using Waher.Security.E2EE;
-using Waher.Security.EllipticCurves;
+﻿using Waher.Security.E2EE;
 
-namespace Waher.Networking.XMPP.P2P.E2E
+namespace Waher.Security.EllipticCurves.E2EE
 {
 	/// <summary>
-	/// Abstract base class for Brainpool Curve endpoints
+	/// Abstract base class for NIST Curve endpoints
 	/// </summary>
-	public abstract class BrainpoolEndpoint : EllipticCurveEndpoint
+	public abstract class NistEndpoint : EllipticCurveEndpoint
     {
         /// <summary>
-        /// Abstract base class for Brainpool Curve endpoints
+        /// Abstract base class for NIST Curve endpoints
         /// </summary>
         /// <param name="Curve">Curve instance</param>
-        public BrainpoolEndpoint(EllipticCurve Curve)
+        public NistEndpoint(EllipticCurve Curve)
 			: base(Curve, new Aes256())
 		{
 		}
 
         /// <summary>
-        /// Abstract base class for Brainpool Curve endpoints
+        /// Abstract base class for NIST Curve endpoints
         /// </summary>
         /// <param name="Curve">Curve instance</param>
         /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
-        public BrainpoolEndpoint(EllipticCurve Curve, IE2eSymmetricCipher SymmetricCipher)
+        public NistEndpoint(EllipticCurve Curve, IE2eSymmetricCipher SymmetricCipher)
             : base(Curve, SymmetricCipher)
         {
         }
 
         /// <summary>
-        /// Abstract base class for Brainpool Curve endpoints
+        /// Abstract base class for NIST Curve endpoints
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
         /// <param name="ReferenceCurve">Reference curve</param>
-        public BrainpoolEndpoint(byte[] PublicKey, EllipticCurve ReferenceCurve)
+        public NistEndpoint(byte[] PublicKey, EllipticCurve ReferenceCurve)
 			: base(PublicKey, ReferenceCurve, new Aes256())
 		{
 		}
 
         /// <summary>
-        /// Abstract base class for Brainpool Curve endpoints
+        /// Abstract base class for NIST Curve endpoints
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
         /// <param name="ReferenceCurve">Reference curve</param>
         /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
-        public BrainpoolEndpoint(byte[] PublicKey, EllipticCurve ReferenceCurve, 
+        public NistEndpoint(byte[] PublicKey, EllipticCurve ReferenceCurve, 
             IE2eSymmetricCipher SymmetricCipher)
             : base(PublicKey, ReferenceCurve, SymmetricCipher)
         {

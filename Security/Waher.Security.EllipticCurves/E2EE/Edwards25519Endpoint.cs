@@ -1,78 +1,76 @@
-﻿using Waher.Security;
-using Waher.Security.E2EE;
-using Waher.Security.EllipticCurves;
+﻿using Waher.Security.E2EE;
 
-namespace Waher.Networking.XMPP.P2P.E2E
+namespace Waher.Security.EllipticCurves.E2EE
 {
 	/// <summary>
-	/// Brainpool P-384 Curve
+	/// Edwards25519 Twisted Edwards Curve
 	/// </summary>
-	public class BrainpoolP384Endpoint : BrainpoolEndpoint
+	public class Edwards25519Endpoint : EllipticCurveEndpoint
     {
         /// <summary>
-        /// Brainpool P-384 Curve
+        /// Edwards25519 Twisted Edwards Curve
         /// </summary>
-        public BrainpoolP384Endpoint()
-            : this(new BrainpoolP384())
+        public Edwards25519Endpoint()
+            : this(new Edwards25519())
         {
         }
 
         /// <summary>
-        /// Brainpool P-384 Curve
+        /// Edwards25519 Twisted Edwards Curve
         /// </summary>
         /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
-        public BrainpoolP384Endpoint(IE2eSymmetricCipher SymmetricCipher)
-            : this(new BrainpoolP384(), SymmetricCipher)
+        public Edwards25519Endpoint(IE2eSymmetricCipher SymmetricCipher)
+            : this(new Edwards25519(), SymmetricCipher)
         {
         }
 
         /// <summary>
-        /// Brainpool P-384 Curve
+        /// Edwards25519 Twisted Edwards Curve
         /// </summary>
-        /// <param name="Curve">Curve instance</param>
-        public BrainpoolP384Endpoint(BrainpoolP384 Curve)
-            : this(Curve, new Aes256())
+        /// <param name="Edwards">Edwards instance</param>
+        public Edwards25519Endpoint(Edwards25519 Edwards)
+            : this(Edwards, new Aes256())
         {
         }
 
         /// <summary>
-        /// Brainpool P-384 Curve
+        /// Edwards25519 Twisted Edwards Curve
         /// </summary>
-        /// <param name="Curve">Curve instance</param>
+        /// <param name="Edwards">Edwards instance</param>
         /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
-        public BrainpoolP384Endpoint(BrainpoolP384 Curve, IE2eSymmetricCipher SymmetricCipher)
-            : base(Curve, SymmetricCipher)
+        public Edwards25519Endpoint(Edwards25519 Edwards, IE2eSymmetricCipher SymmetricCipher)
+            : base(Edwards, SymmetricCipher)
         {
         }
 
         /// <summary>
-        /// Brainpool P-384 Curve
+        /// Edwards25519 Twisted Edwards Curve
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
-        public BrainpoolP384Endpoint(byte[] PublicKey)
+        public Edwards25519Endpoint(byte[] PublicKey)
             : this(PublicKey, new Aes256())
         {
         }
 
         /// <summary>
-        /// Brainpool P-384 Curve
+        /// Edwards25519 Twisted Edwards Curve
         /// </summary>
         /// <param name="PublicKey">Remote public key.</param>
         /// <param name="SymmetricCipher">Symmetric cipher to use by default.</param>
-        public BrainpoolP384Endpoint(byte[] PublicKey, IE2eSymmetricCipher SymmetricCipher)
-            : base(PublicKey, new BrainpoolP384(), SymmetricCipher)
+        public Edwards25519Endpoint(byte[] PublicKey, IE2eSymmetricCipher SymmetricCipher)
+            : base(PublicKey, new Edwards25519(), SymmetricCipher)
         {
         }
 
-        /// <summary>
-        /// Local name of the E2E encryption scheme
-        /// </summary>
-        public override string LocalName => "bp384";
+		/// <summary>
+		/// Local name of the E2E encryption scheme
+		/// </summary>
+		public override string LocalName => "ed25519";
 
 		/// <summary>
 		/// Security strength of End-to-End encryption scheme.
 		/// </summary>
-		public override int SecurityStrength => 192;
+		public override int SecurityStrength => 128;
 
 		/// <summary>
 		/// Creates a new key.
@@ -81,7 +79,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>New E2E endpoint.</returns>
 		public override IE2eEndpoint Create(int SecurityStrength)
 		{
-			return new BrainpoolP384Endpoint(this.DefaultSymmetricCipher.CreteNew());
+			return new Edwards25519Endpoint(this.DefaultSymmetricCipher.CreteNew());
 		}
 
         /// <summary>
@@ -90,9 +88,9 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <param name="Secret">Secret.</param>
         /// <returns>Endpoint object.</returns>
         public override IE2eEndpoint CreatePrivate(byte[] Secret)
-        {
-            return new BrainpoolP384Endpoint(new BrainpoolP384(Secret), this.DefaultSymmetricCipher.CreteNew());
-        }
+		{
+			return new Edwards25519Endpoint(new Edwards25519(Secret), this.DefaultSymmetricCipher.CreteNew());
+		}
 
         /// <summary>
         /// Creates a new endpoint given a public key.
@@ -100,8 +98,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <param name="PublicKey">Remote public key.</param>
         /// <returns>Endpoint object.</returns>
         public override IE2eEndpoint CreatePublic(byte[] PublicKey)
-        {
-            return new BrainpoolP384Endpoint(PublicKey, this.DefaultSymmetricCipher.CreteNew());
-        }
-    }
+		{
+			return new Edwards25519Endpoint(PublicKey, this.DefaultSymmetricCipher.CreteNew());
+		}
+	}
 }

@@ -2,11 +2,8 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using Waher.Networking.XMPP.P2P.SymmetricCiphers;
-using Waher.Security;
-using Waher.Security.E2EE;
 
-namespace Waher.Networking.XMPP.P2P.E2E
+namespace Waher.Security.E2EE
 {
 	/// <summary>
 	/// RSA / AES-256 hybrid cipher.
@@ -251,8 +248,8 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				if (i < 0)
 					continue;
 
-				Name = Part[..i];
-				Value = Convert.FromBase64String(Part[(i + 1)..]);
+				Name = Part.Substring(0, i);
+				Value = Convert.FromBase64String(Part.Substring(i + 1));
 
 				switch (Name)
 				{
@@ -492,16 +489,18 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>If signature valid.</returns>
 		public static bool Verify(byte[] Data, byte[] Signature, int KeySize, byte[] Modulus, byte[] Exponent)
 		{
-			using RSA Rsa = CreateRSA(KeySize);
-			RSAParameters P = new RSAParameters()
+			using (RSA Rsa = CreateRSA(KeySize))
 			{
-				Modulus = Modulus,
-				Exponent = Exponent
-			};
+				RSAParameters P = new RSAParameters()
+				{
+					Modulus = Modulus,
+					Exponent = Exponent
+				};
 
-			Rsa.ImportParameters(P);
+				Rsa.ImportParameters(P);
 
-			return Rsa.VerifyData(Data, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+				return Rsa.VerifyData(Data, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+			}
 		}
 
 		/// <summary>
@@ -515,16 +514,18 @@ namespace Waher.Networking.XMPP.P2P.E2E
 		/// <returns>If signature valid.</returns>
 		public static bool Verify(Stream Data, byte[] Signature, int KeySize, byte[] Modulus, byte[] Exponent)
 		{
-			using RSA Rsa = CreateRSA(KeySize);
-			RSAParameters P = new RSAParameters()
+			using (RSA Rsa = CreateRSA(KeySize))
 			{
-				Modulus = Modulus,
-				Exponent = Exponent
-			};
+				RSAParameters P = new RSAParameters()
+				{
+					Modulus = Modulus,
+					Exponent = Exponent
+				};
 
-			Rsa.ImportParameters(P);
+				Rsa.ImportParameters(P);
 
-			return Rsa.VerifyData(Data, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+				return Rsa.VerifyData(Data, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+			}
 		}
 
 		/// <summary>

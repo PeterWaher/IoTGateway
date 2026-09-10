@@ -1,11 +1,9 @@
 ﻿using System;
 using System.IO;
 using Waher.Runtime.Cache;
-using Waher.Security;
 using Waher.Security.E2EE;
-using Waher.Security.EllipticCurves;
 
-namespace Waher.Networking.XMPP.P2P.E2E
+namespace Waher.Security.EllipticCurves.E2EE
 {
 	/// <summary>
 	/// Abstract base class for Elliptic Curve endpoints.

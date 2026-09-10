@@ -56,6 +56,8 @@ Brainpool P-512
 
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Temporary\Waher.Runtime.Temporary.csproj" />
+    <ProjectReference Include="..\Waher.Security.ChaChaPoly\Waher.Security.ChaChaPoly.csproj" />
+    <ProjectReference Include="..\Waher.Security.E2ee\Waher.Security.E2ee.csproj" />
     <ProjectReference Include="..\Waher.Security.SHA3\Waher.Security.SHA3.csproj" />
     <ProjectReference Include="..\Waher.Security\Waher.Security.csproj" />
   </ItemGroup>

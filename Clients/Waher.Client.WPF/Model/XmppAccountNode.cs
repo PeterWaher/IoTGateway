@@ -31,7 +31,6 @@ using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.MUC;
 using Waher.Networking.XMPP.P2P;
-using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Networking.XMPP.P2P.SOCKS5;
 using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.PEP.Events;
@@ -41,6 +40,7 @@ using Waher.Networking.XMPP.RDP;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Networking.XMPP.Synchronization;
+using Waher.Security.EllipticCurves.E2EE;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 

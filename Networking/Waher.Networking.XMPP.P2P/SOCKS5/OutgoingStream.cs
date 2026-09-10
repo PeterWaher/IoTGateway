@@ -6,6 +6,7 @@ using Waher.Events;
 using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
 using Waher.Runtime.Threading;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.P2P.SOCKS5
 {

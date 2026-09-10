@@ -4,11 +4,11 @@ using System.Reflection;
 using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
-using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
+using Waher.Security;
 
 namespace Waher.Utility.Sign
 {
@@ -226,7 +226,7 @@ namespace Waher.Utility.Sign
                                 FileNames = Directory.GetFiles(Folder, FileName, Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
                             }
                             else
-                                FileNames = new string[] { s };
+                                FileNames = [s];
 
                             foreach (string FileName in FileNames)
                             {

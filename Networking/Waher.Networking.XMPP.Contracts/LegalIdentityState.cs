@@ -3,6 +3,7 @@ using System.Text;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
+using Waher.Security;
 using Waher.Security.CallStack;
 
 namespace Waher.Networking.XMPP.Contracts

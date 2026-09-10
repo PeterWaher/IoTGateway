@@ -6,12 +6,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Waher.Client.WPF.Dialogs.Legal;
 using Waher.Content.Markdown;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
-using Waher.Client.WPF.Dialogs.Legal;
 using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.P2P;
+using Waher.Security;
 
 namespace Waher.Client.WPF.Model.Legal
 {

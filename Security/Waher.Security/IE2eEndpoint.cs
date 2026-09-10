@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Waher.Networking.XMPP
+namespace Waher.Security
 {
 	/// <summary>
 	/// Abstract base class for End-to-End encryption schemes.

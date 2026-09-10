@@ -1,5 +1,6 @@
 ﻿using System;
 using Waher.Networking.XMPP.Events;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.Contracts.EventArguments
 {

@@ -1,4 +1,5 @@
 ﻿using Waher.Networking.XMPP.P2P.SymmetricCiphers;
+using Waher.Security;
 using Waher.Security.EllipticCurves;
 
 namespace Waher.Networking.XMPP.P2P.E2E

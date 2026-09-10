@@ -2,6 +2,7 @@
 using Waher.Mcp.Xmpp.Responses;
 using Waher.Networking.HTTP.Mcp.Model.Attributes;
 using Waher.Networking.XMPP.Contracts;
+using Waher.Security;
 
 namespace Waher.Mcp.Identity.Responses
 {

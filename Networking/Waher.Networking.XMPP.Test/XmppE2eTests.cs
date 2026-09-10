@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Security;
 
 [assembly: TestDataSourceDiscovery(TestDataSourceDiscoveryOption.DuringDiscovery)]
 

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.HTTP;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.HTTPX
 {

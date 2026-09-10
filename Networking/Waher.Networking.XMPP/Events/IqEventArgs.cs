@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.Events
 {

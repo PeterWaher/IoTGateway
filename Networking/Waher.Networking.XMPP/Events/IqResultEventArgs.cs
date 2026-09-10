@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.Events
 {

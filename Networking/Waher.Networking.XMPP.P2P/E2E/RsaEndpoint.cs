@@ -3,6 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.P2P.E2E
 {

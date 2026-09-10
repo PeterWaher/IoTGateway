@@ -14,6 +14,7 @@ using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Profiling;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.P2P
 {

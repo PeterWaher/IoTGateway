@@ -1875,7 +1875,7 @@ namespace Waher.Mcp.Identity
 
 			foreach (LegalIdentity Identity in Identities)
 			{
-				if (Identity.State != Networking.XMPP.Contracts.IdentityState.Created)
+				if (Identity.State != IdentityState.Created)
 					continue;
 
 				if (LatestCreated is null || Identity.Created > LatestCreated.Created)

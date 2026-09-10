@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Waher.Networking.XMPP
+namespace Waher.Security
 {
 	/// <summary>
 	/// How buffers are filler before E2E Encryption is performed.

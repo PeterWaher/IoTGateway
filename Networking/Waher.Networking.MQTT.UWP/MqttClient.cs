@@ -302,14 +302,14 @@ namespace Waher.Networking.MQTT
 					Payload.WriteString16BitLen(this.password);
 			}
 
-			byte[] PayloadData = Payload.GetPacket();
+			byte[] PayloadData = Payload.ToArray();
 
 			BinaryOutput Packet = new BinaryOutput();
 			Packet.WriteByte((byte)MqttControlPacketType.CONNECT << 4);
 			Packet.WriteVarLenUInt((uint)PayloadData.Length);
 			Packet.WriteRaw(PayloadData);
 
-			byte[] PacketData = Packet.GetPacket();
+			byte[] PacketData = Packet.ToArray();
 
 			if (this.HasSniffers)
 				this.Information("Tx.CONNECT");
@@ -725,7 +725,7 @@ namespace Waher.Networking.MQTT
 			Packet.WriteByte((byte)MqttControlPacketType.PINGREQ << 4);
 			Packet.WriteVarLenUInt(0);
 
-			byte[] PacketData = Packet.GetPacket();
+			byte[] PacketData = Packet.ToArray();
 
 			if (this.HasSniffers)
 				this.Information("Tx.PING");
@@ -741,7 +741,7 @@ namespace Waher.Networking.MQTT
 			Packet.WriteByte((byte)MqttControlPacketType.PINGRESP << 4);
 			Packet.WriteVarLenUInt(0);
 
-			byte[] PacketData = Packet.GetPacket();
+			byte[] PacketData = Packet.ToArray();
 
 			if (this.HasSniffers)
 				this.Information("Tx.PINGRESP");
@@ -888,7 +888,7 @@ namespace Waher.Networking.MQTT
 		/// <returns>Packet identifier assigned to data.</returns>
 		public Task<ushort> PUBLISH(string Topic, MqttQualityOfService QoS, bool Retain, BinaryOutput Data)
 		{
-			return this.PUBLISH(Topic, QoS, Retain, false, Data.GetPacket());
+			return this.PUBLISH(Topic, QoS, Retain, false, Data.ToArray());
 		}
 
 		private async Task<ushort> PUBLISH(string Topic, MqttQualityOfService QoS, bool Retain, bool Duplicate, byte[] Data)
@@ -911,7 +911,7 @@ namespace Waher.Networking.MQTT
 
 			Payload.WriteRaw(Data);
 
-			byte[] PayloadData = Payload.GetPacket();
+			byte[] PayloadData = Payload.ToArray();
 
 			BinaryOutput Packet = new BinaryOutput();
 			byte b = (byte)((int)MqttControlPacketType.PUBLISH << 4);
@@ -927,7 +927,7 @@ namespace Waher.Networking.MQTT
 			Packet.WriteVarLenUInt((uint)PayloadData.Length);
 			Packet.WriteRaw(PayloadData);
 
-			byte[] PacketData = Packet.GetPacket();
+			byte[] PacketData = Packet.ToArray();
 
 			if (this.HasSniffers)
 				this.Information("Tx.PUBLISH(" + QoS.ToString() + ":" + Topic + ")");
@@ -954,7 +954,7 @@ namespace Waher.Networking.MQTT
 			Packet.WriteVarLenUInt(2);
 			Packet.WriteUInt16(PacketIdentifier);
 
-			byte[] PacketData = Packet.GetPacket();
+			byte[] PacketData = Packet.ToArray();
 
 			return this.Write(true, PacketData, 0, null, null);
 		}
@@ -966,7 +966,7 @@ namespace Waher.Networking.MQTT
 			Packet.WriteVarLenUInt(2);
 			Packet.WriteUInt16(PacketIdentifier);
 
-			byte[] PacketData = Packet.GetPacket();
+			byte[] PacketData = Packet.ToArray();
 
 			if (this.HasSniffers)
 				this.Information("Tx.PUBREC");
@@ -981,7 +981,7 @@ namespace Waher.Networking.MQTT
 			Packet.WriteVarLenUInt(2);
 			Packet.WriteUInt16(PacketIdentifier);
 
-			byte[] PacketData = Packet.GetPacket();
+			byte[] PacketData = Packet.ToArray();
 
 			if (this.HasSniffers)
 				this.Information("Tx.PUBREL");
@@ -996,7 +996,7 @@ namespace Waher.Networking.MQTT
 			Packet.WriteVarLenUInt(2);
 			Packet.WriteUInt16(PacketIdentifier);
 
-			byte[] PacketData = Packet.GetPacket();
+			byte[] PacketData = Packet.ToArray();
 
 			if (this.HasSniffers)
 				this.Information("Tx.PUBCOMP");
@@ -1064,7 +1064,7 @@ namespace Waher.Networking.MQTT
 				Payload.WriteByte((byte)Pair.Value);
 			}
 
-			byte[] PayloadData = Payload.GetPacket();
+			byte[] PayloadData = Payload.ToArray();
 
 			BinaryOutput Packet = new BinaryOutput();
 			byte b = (byte)((int)MqttControlPacketType.SUBSCRIBE << 4);
@@ -1074,7 +1074,7 @@ namespace Waher.Networking.MQTT
 			Packet.WriteVarLenUInt((uint)PayloadData.Length);
 			Packet.WriteRaw(PayloadData);
 
-			byte[] PacketData = Packet.GetPacket();
+			byte[] PacketData = Packet.ToArray();
 
 			if (this.HasSniffers)
 			{
@@ -1134,7 +1134,7 @@ namespace Waher.Networking.MQTT
 			foreach (string Topic in Topics)
 				Payload.WriteString16BitLen(Topic);
 
-			byte[] PayloadData = Payload.GetPacket();
+			byte[] PayloadData = Payload.ToArray();
 
 			BinaryOutput Packet = new BinaryOutput();
 			byte b = (byte)((int)MqttControlPacketType.UNSUBSCRIBE << 4);
@@ -1144,7 +1144,7 @@ namespace Waher.Networking.MQTT
 			Packet.WriteVarLenUInt((uint)PayloadData.Length);
 			Packet.WriteRaw(PayloadData);
 
-			byte[] PacketData = Packet.GetPacket();
+			byte[] PacketData = Packet.ToArray();
 
 			if (this.HasSniffers)
 			{
@@ -1222,7 +1222,7 @@ namespace Waher.Networking.MQTT
 			Packet.WriteByte((byte)MqttControlPacketType.DISCONNECT << 4);
 			Packet.WriteVarLenUInt(2);
 
-			byte[] PacketData = Packet.GetPacket();
+			byte[] PacketData = Packet.ToArray();
 
 			TaskCompletionSource<bool> Done = new TaskCompletionSource<bool>();
 

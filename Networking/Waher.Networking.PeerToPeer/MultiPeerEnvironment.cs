@@ -457,7 +457,7 @@ namespace Waher.Networking.PeerToPeer
 			Output.WriteString16BitLen(this.ExternalEndpoint.Address.ToString());
 			Output.WriteUInt16((ushort)this.ExternalEndpoint.Port);
 
-			await Peer.SendTcp(true, Output.GetPacket());
+			await Peer.SendTcp(true, Output.ToArray());
 		}
 
 		private async Task<bool> Peer_OnReceived(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
@@ -878,7 +878,7 @@ namespace Waher.Networking.PeerToPeer
 			Output.WriteString16BitLen(this.ExternalAddress.ToString());
 			Output.WriteUInt16((ushort)this.ExternalEndpoint.Port);
 
-			await Connection.SendTcp(true, Output.GetPacket());
+			await Connection.SendTcp(true, Output.ToArray());
 
 			await this.OnPeerConnected.Raise(this, Peer);
 

@@ -61,6 +61,16 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
+		/// Writes a variable-length binary block of data.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		public void WriteData(byte[] Data)
+		{
+			this.WriteVarLenUInt((uint)Data.Length);
+			this.WriteRaw(Data);
+		}
+
+		/// <summary>
 		/// Writes a string to the binary output packet, using a 16-bit length field, and
 		/// UTF-8 encoding.
 		/// </summary>
@@ -95,7 +105,7 @@ namespace Waher.Networking
 		/// Gets the binary packet written so far.
 		/// </summary>
 		/// <returns>Binary packet.</returns>
-		public byte[] GetPacket()
+		public byte[] ToArray()
 		{
 			this.ms.Flush();
 			return this.ms.ToArray();

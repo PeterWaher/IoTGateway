@@ -71,6 +71,23 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
+		/// Reads a variable-length binary block of data.
+		/// </summary>
+		/// <exception cref="EndOfStreamException">If there is not sufficient bytes available.</exception>
+		/// <exception cref="IOException">If the length field is invalid.</exception>
+		public byte[] ReadData()
+		{
+			ulong Len = this.ReadVarLenUInt();
+			if (Len == 0)
+				return Array.Empty<byte>();
+
+			if (Len < 0 || Len > int.MaxValue)
+				throw new IOException("Invalid length of binary block of data.");
+
+			return this.ReadRaw((int)Len);
+		}
+
+		/// <summary>
 		/// Reads the next string of the stream, using a 16-bit length field, and
 		/// UTF-8 encoding.
 		/// </summary>

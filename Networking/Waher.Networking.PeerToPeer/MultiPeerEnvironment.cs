@@ -204,7 +204,7 @@ namespace Waher.Networking.PeerToPeer
 
 				BinaryOutput Output = new BinaryOutput();
 				Output.WriteByte(0);
-				Output.WriteString(this.applicationName);
+				Output.WriteString16BitLen(this.applicationName);
 
 				this.localPeer.SetEndpoints(this.p2pNetwork.ExternalEndpoint, this.p2pNetwork.LocalEndpoint);
 				this.Serialize(this.localPeer, Output);
@@ -219,42 +219,42 @@ namespace Waher.Networking.PeerToPeer
 
 		private void Serialize(Peer Peer, BinaryOutput Output)
 		{
-			Output.WriteString(Peer.PublicEndpoint.Address.ToString());
+			Output.WriteString16BitLen(Peer.PublicEndpoint.Address.ToString());
 			Output.WriteUInt16((ushort)Peer.PublicEndpoint.Port);
 
-			Output.WriteString(Peer.LocalEndpoint.Address.ToString());
+			Output.WriteString16BitLen(Peer.LocalEndpoint.Address.ToString());
 			Output.WriteUInt16((ushort)Peer.LocalEndpoint.Port);
 
 			Output.WriteGuid(Peer.PeerId);
-			Output.WriteUInt((uint)Peer.Count);
+			Output.WriteVarLenUInt((uint)Peer.Count);
 
 			foreach (KeyValuePair<string, string> P in Peer)
 			{
-				Output.WriteString(P.Key);
-				Output.WriteString(P.Value);
+				Output.WriteString16BitLen(P.Key);
+				Output.WriteString16BitLen(P.Value);
 			}
 		}
 
 		private Peer Deserialize(BinaryInput Input)
 		{
-			IPAddress PublicAddress = IPAddress.Parse(Input.ReadString());
+			IPAddress PublicAddress = IPAddress.Parse(Input.ReadString16BitLen());
 			ushort PublicPort = Input.ReadUInt16();
 			IPEndPoint PublicEndpoint = new IPEndPoint(PublicAddress, PublicPort);
 
-			IPAddress LocalAddress = IPAddress.Parse(Input.ReadString());
+			IPAddress LocalAddress = IPAddress.Parse(Input.ReadString16BitLen());
 			ushort LocalPort = Input.ReadUInt16();
 			IPEndPoint LocalEndpoint = new IPEndPoint(LocalAddress, LocalPort);
 
 			Guid PeerId = Input.ReadGuid();
 			bool LocalPeer = PeerId == this.localPeer.PeerId;
-			int i, c = (int)Input.ReadUInt();
+			int i, c = (int)Input.ReadVarLenUInt();
 			KeyValuePair<string, string>[] PeerMetaInfo = LocalPeer ? null : new KeyValuePair<string, string>[c];
 			string Key, Value;
 
 			for (i = 0; i < c; i++)
 			{
-				Key = Input.ReadString();
-				Value = Input.ReadString();
+				Key = Input.ReadString16BitLen();
+				Value = Input.ReadString16BitLen();
 				if (!LocalPeer)
 					PeerMetaInfo[i] = new KeyValuePair<string, string>(Key, Value);
 			}
@@ -273,7 +273,7 @@ namespace Waher.Networking.PeerToPeer
 			switch (Command)
 			{
 				case 0: // Hello
-					string ApplicationName = Input.ReadString();
+					string ApplicationName = Input.ReadString16BitLen();
 					if (ApplicationName != this.applicationName)
 						break;
 
@@ -299,7 +299,7 @@ namespace Waher.Networking.PeerToPeer
 					break;
 
 				case 1:     // Interconnect
-					ApplicationName = Input.ReadString();
+					ApplicationName = Input.ReadString16BitLen();
 					if (ApplicationName != this.applicationName)
 						break;
 
@@ -318,7 +318,7 @@ namespace Waher.Networking.PeerToPeer
 					Peer.Index = Index++;
 					Peers.AddLast(Peer);
 
-					c = (int)Input.ReadUInt();
+					c = (int)Input.ReadVarLenUInt();
 					for (i = 0; i < c; i++)
 					{
 						Peer = this.Deserialize(Input);
@@ -377,7 +377,7 @@ namespace Waher.Networking.PeerToPeer
 					break;
 
 				case 2:     // Bye
-					ApplicationName = Input.ReadString();
+					ApplicationName = Input.ReadString16BitLen();
 					if (ApplicationName != this.applicationName)
 						break;
 
@@ -454,7 +454,7 @@ namespace Waher.Networking.PeerToPeer
 			BinaryOutput Output = new BinaryOutput();
 
 			Output.WriteGuid(this.localPeer.PeerId);
-			Output.WriteString(this.ExternalEndpoint.Address.ToString());
+			Output.WriteString16BitLen(this.ExternalEndpoint.Address.ToString());
 			Output.WriteUInt16((ushort)this.ExternalEndpoint.Port);
 
 			await Peer.SendTcp(true, Output.GetPacket());
@@ -476,7 +476,7 @@ namespace Waher.Networking.PeerToPeer
 				try
 				{
 					PeerId = Input.ReadGuid();
-					PeerRemoteAddress = IPAddress.Parse(Input.ReadString());
+					PeerRemoteAddress = IPAddress.Parse(Input.ReadString16BitLen());
 					PeerRemoteEndpoint = new IPEndPoint(PeerRemoteAddress, Input.ReadUInt16());
 				}
 				catch (Exception)
@@ -763,7 +763,7 @@ namespace Waher.Networking.PeerToPeer
 			int Index = 0;
 			BinaryOutput Output = new BinaryOutput();
 			Output.WriteByte(1);
-			Output.WriteString(this.applicationName);
+			Output.WriteString16BitLen(this.applicationName);
 			this.localPeer.Index = Index++;
 			this.Serialize(this.localPeer, Output);
 
@@ -772,7 +772,7 @@ namespace Waher.Networking.PeerToPeer
 #endif
 			lock (this.remotePeersByEndpoint)
 			{
-				Output.WriteUInt((uint)this.remotePeersByEndpoint.Count);
+				Output.WriteVarLenUInt((uint)this.remotePeersByEndpoint.Count);
 
 				foreach (Peer Peer in this.remotePeersByEndpoint.Values)
 				{
@@ -840,7 +840,7 @@ namespace Waher.Networking.PeerToPeer
 				BinaryInput Input = new BinaryInput(Buffer, Offset, Count);
 
 				PeerId = Input.ReadGuid();
-				PeerRemoteAddress = IPAddress.Parse(Input.ReadString());
+				PeerRemoteAddress = IPAddress.Parse(Input.ReadString16BitLen());
 				PeerRemoteEndpoint = new IPEndPoint(PeerRemoteAddress, Input.ReadUInt16());
 			}
 			catch (Exception)
@@ -875,7 +875,7 @@ namespace Waher.Networking.PeerToPeer
 			BinaryOutput Output = new BinaryOutput();
 
 			Output.WriteGuid(this.localPeer.PeerId);
-			Output.WriteString(this.ExternalAddress.ToString());
+			Output.WriteString16BitLen(this.ExternalAddress.ToString());
 			Output.WriteUInt16((ushort)this.ExternalEndpoint.Port);
 
 			await Connection.SendTcp(true, Output.GetPacket());
@@ -1084,7 +1084,7 @@ namespace Waher.Networking.PeerToPeer
 				{
 					BinaryOutput Output = new BinaryOutput();
 					Output.WriteByte(2);
-					Output.WriteString(this.applicationName);
+					Output.WriteString16BitLen(this.applicationName);
 					Output.WriteGuid(this.localPeer.PeerId);
 
 					this.mqttTerminatedPacketIdentifier = await this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOnce, false, Output);

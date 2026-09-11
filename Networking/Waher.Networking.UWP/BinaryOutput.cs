@@ -55,16 +55,17 @@ namespace Waher.Networking
 		/// Writes a block of bytes to the binary output packet.
 		/// </summary>
 		/// <param name="Value">Value to write.</param>
-		public void WriteBytes(byte[] Value)
+		public void WriteRaw(byte[] Value)
 		{
 			this.ms.Write(Value, 0, Value.Length);
 		}
 
 		/// <summary>
-		/// Writes a string to the binary output packet.
+		/// Writes a string to the binary output packet, using a 16-bit length field, and
+		/// UTF-8 encoding.
 		/// </summary>
 		/// <param name="Value">Value to write.</param>
-		public void WriteString(string Value)
+		public void WriteString16BitLen(string Value)
 		{
 			byte[] Data = Encoding.UTF8.GetBytes(Value);
 			int Length = Data.Length;
@@ -73,7 +74,21 @@ namespace Waher.Networking
 
 			this.WriteByte((byte)(Length >> 8));
 			this.WriteByte((byte)Length);
-			this.WriteBytes(Data);
+			this.WriteRaw(Data);
+		}
+
+		/// <summary>
+		/// Writes a string to the binary output packet, using a variable-length field, 
+		/// and UTF-8 encoding.
+		/// </summary>
+		/// <param name="Value">Value to write.</param>
+		public void WriteString(string Value)
+		{
+			byte[] Data = Encoding.UTF8.GetBytes(Value);
+			int Length = Data.Length;
+
+			this.WriteVarLenUInt((uint)Length);
+			this.WriteRaw(Data);
 		}
 
 		/// <summary>
@@ -90,9 +105,7 @@ namespace Waher.Networking
 		/// Writes a variable-length unsigned integer.
 		/// </summary>
 		/// <param name="Value">Value to write.</param>
-//#pragma warning disable
-		public void WriteUInt(ulong Value)
-//#pragma warning restore
+		public void WriteVarLenUInt(ulong Value)
 		{
 			while (Value >= 128)
 			{
@@ -107,12 +120,12 @@ namespace Waher.Networking
 		/// Writes a variable-length signed integer.
 		/// </summary>
 		/// <param name="Value">Value to write.</param>
-		public void WriteInt(long Value)
+		public void WriteVarLenInt(long Value)
 		{
 			if (Value >= 0)
-				this.WriteUInt((uint)Value << 1);
+				this.WriteVarLenUInt((uint)Value << 1);
 			else
-				this.WriteUInt(((uint)(-Value) << 1) | 1);
+				this.WriteVarLenUInt(((uint)(-Value) << 1) | 1);
 		}
 
 		/// <summary>
@@ -157,7 +170,7 @@ namespace Waher.Networking
 		/// <param name="f">Value to write.</param>
 		public void WriteSingle(float f)
 		{
-			this.WriteBytes(BitConverter.GetBytes(f));
+			this.WriteRaw(BitConverter.GetBytes(f));
 		}
 
 		/// <summary>
@@ -166,7 +179,7 @@ namespace Waher.Networking
 		/// <param name="d">Value to write.</param>
 		public void WriteDouble(double d)
 		{
-			this.WriteBytes(BitConverter.GetBytes(d));
+			this.WriteRaw(BitConverter.GetBytes(d));
 		}
 
 		/// <summary>
@@ -193,7 +206,7 @@ namespace Waher.Networking
 		/// <param name="Guid">Value to write.</param>
 		public void WriteGuid(Guid Guid)
 		{
-			this.WriteBytes(Guid.ToByteArray());
+			this.WriteRaw(Guid.ToByteArray());
 		}
 
 		/// <summary>
@@ -204,6 +217,5 @@ namespace Waher.Networking
 		{
 			this.WriteByte((byte)(b ? 1 : 0));
 		}
-
 	}
 }

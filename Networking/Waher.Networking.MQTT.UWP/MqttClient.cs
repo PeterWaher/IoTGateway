@@ -254,7 +254,7 @@ namespace Waher.Networking.MQTT
 			this.secondTimer = new Timer(this.SecondTimer_Elapsed, null, 1000, 1000);
 
 			BinaryOutput Payload = new BinaryOutput();
-			Payload.WriteString("MQTT");
+			Payload.WriteString16BitLen("MQTT");
 			Payload.WriteByte(4);   // v3.1.1
 
 			byte b = 2;     // Clean session.
@@ -281,33 +281,33 @@ namespace Waher.Networking.MQTT
 			Payload.WriteByte((byte)(KeepAliveSeconds >> 8));
 			Payload.WriteByte((byte)KeepAliveSeconds);
 
-			Payload.WriteString(this.clientId);
+			Payload.WriteString16BitLen(this.clientId);
 
 			if (this.will)
 			{
-				Payload.WriteString(this.willTopic);
+				Payload.WriteString16BitLen(this.willTopic);
 
 				int l = this.willData.Length;
 
 				Payload.WriteByte((byte)(l >> 8));
 				Payload.WriteByte((byte)l);
-				Payload.WriteBytes(this.willData);
+				Payload.WriteRaw(this.willData);
 			}
 
 			if (!string.IsNullOrEmpty(this.userName))
 			{
-				Payload.WriteString(this.userName);
+				Payload.WriteString16BitLen(this.userName);
 
 				if (!string.IsNullOrEmpty(this.password))
-					Payload.WriteString(this.password);
+					Payload.WriteString16BitLen(this.password);
 			}
 
 			byte[] PayloadData = Payload.GetPacket();
 
 			BinaryOutput Packet = new BinaryOutput();
 			Packet.WriteByte((byte)MqttControlPacketType.CONNECT << 4);
-			Packet.WriteUInt((uint)PayloadData.Length);
-			Packet.WriteBytes(PayloadData);
+			Packet.WriteVarLenUInt((uint)PayloadData.Length);
+			Packet.WriteRaw(PayloadData);
 
 			byte[] PacketData = Packet.GetPacket();
 
@@ -603,7 +603,7 @@ namespace Waher.Networking.MQTT
 						break;
 
 					case MqttControlPacketType.PUBLISH:
-						string Topic = Packet.ReadString();
+						string Topic = Packet.ReadString16BitLen();
 
 						if (this.HasSniffers)
 							this.Information("Rx.PUBLISH(" + Header.QualityOfService.ToString() + ":" + Topic + ")");
@@ -614,7 +614,7 @@ namespace Waher.Networking.MQTT
 							Header.PacketIdentifier = 0;
 
 						int c = Packet.BytesLeft;
-						byte[] Data = Packet.ReadBytes(c);
+						byte[] Data = Packet.ReadRaw(c);
 						MqttContent Content = new MqttContent(Header, Topic, Data, this);
 
 						switch (Header.QualityOfService)
@@ -723,7 +723,7 @@ namespace Waher.Networking.MQTT
 		{
 			BinaryOutput Packet = new BinaryOutput();
 			Packet.WriteByte((byte)MqttControlPacketType.PINGREQ << 4);
-			Packet.WriteUInt(0);
+			Packet.WriteVarLenUInt(0);
 
 			byte[] PacketData = Packet.GetPacket();
 
@@ -739,7 +739,7 @@ namespace Waher.Networking.MQTT
 		{
 			BinaryOutput Packet = new BinaryOutput();
 			Packet.WriteByte((byte)MqttControlPacketType.PINGRESP << 4);
-			Packet.WriteUInt(0);
+			Packet.WriteVarLenUInt(0);
 
 			byte[] PacketData = Packet.GetPacket();
 
@@ -896,7 +896,7 @@ namespace Waher.Networking.MQTT
 			BinaryOutput Payload = new BinaryOutput();
 			ushort PacketIdentifier;
 
-			Payload.WriteString(Topic);
+			Payload.WriteString16BitLen(Topic);
 
 			if (QoS > MqttQualityOfService.AtMostOnce)
 			{
@@ -909,7 +909,7 @@ namespace Waher.Networking.MQTT
 			else
 				PacketIdentifier = 0;
 
-			Payload.WriteBytes(Data);
+			Payload.WriteRaw(Data);
 
 			byte[] PayloadData = Payload.GetPacket();
 
@@ -924,8 +924,8 @@ namespace Waher.Networking.MQTT
 				b |= 1;
 
 			Packet.WriteByte(b);
-			Packet.WriteUInt((uint)PayloadData.Length);
-			Packet.WriteBytes(PayloadData);
+			Packet.WriteVarLenUInt((uint)PayloadData.Length);
+			Packet.WriteRaw(PayloadData);
 
 			byte[] PacketData = Packet.GetPacket();
 
@@ -951,7 +951,7 @@ namespace Waher.Networking.MQTT
 		{
 			BinaryOutput Packet = new BinaryOutput();
 			Packet.WriteByte((byte)MqttControlPacketType.PUBACK << 4);
-			Packet.WriteUInt(2);
+			Packet.WriteVarLenUInt(2);
 			Packet.WriteUInt16(PacketIdentifier);
 
 			byte[] PacketData = Packet.GetPacket();
@@ -963,7 +963,7 @@ namespace Waher.Networking.MQTT
 		{
 			BinaryOutput Packet = new BinaryOutput();
 			Packet.WriteByte((byte)MqttControlPacketType.PUBREC << 4);
-			Packet.WriteUInt(2);
+			Packet.WriteVarLenUInt(2);
 			Packet.WriteUInt16(PacketIdentifier);
 
 			byte[] PacketData = Packet.GetPacket();
@@ -978,7 +978,7 @@ namespace Waher.Networking.MQTT
 		{
 			BinaryOutput Packet = new BinaryOutput();
 			Packet.WriteByte((byte)(((int)MqttControlPacketType.PUBREL << 4) | 2));
-			Packet.WriteUInt(2);
+			Packet.WriteVarLenUInt(2);
 			Packet.WriteUInt16(PacketIdentifier);
 
 			byte[] PacketData = Packet.GetPacket();
@@ -993,7 +993,7 @@ namespace Waher.Networking.MQTT
 		{
 			BinaryOutput Packet = new BinaryOutput();
 			Packet.WriteByte((byte)MqttControlPacketType.PUBCOMP << 4);
-			Packet.WriteUInt(2);
+			Packet.WriteVarLenUInt(2);
 			Packet.WriteUInt16(PacketIdentifier);
 
 			byte[] PacketData = Packet.GetPacket();
@@ -1060,7 +1060,7 @@ namespace Waher.Networking.MQTT
 
 			foreach (KeyValuePair<string, MqttQualityOfService> Pair in Topics)
 			{
-				Payload.WriteString(Pair.Key);
+				Payload.WriteString16BitLen(Pair.Key);
 				Payload.WriteByte((byte)Pair.Value);
 			}
 
@@ -1071,8 +1071,8 @@ namespace Waher.Networking.MQTT
 			b |= 2;
 
 			Packet.WriteByte(b);
-			Packet.WriteUInt((uint)PayloadData.Length);
-			Packet.WriteBytes(PayloadData);
+			Packet.WriteVarLenUInt((uint)PayloadData.Length);
+			Packet.WriteRaw(PayloadData);
 
 			byte[] PacketData = Packet.GetPacket();
 
@@ -1132,7 +1132,7 @@ namespace Waher.Networking.MQTT
 			Payload.WriteUInt16(PacketIdentifier);
 
 			foreach (string Topic in Topics)
-				Payload.WriteString(Topic);
+				Payload.WriteString16BitLen(Topic);
 
 			byte[] PayloadData = Payload.GetPacket();
 
@@ -1141,8 +1141,8 @@ namespace Waher.Networking.MQTT
 			b |= 2;
 
 			Packet.WriteByte(b);
-			Packet.WriteUInt((uint)PayloadData.Length);
-			Packet.WriteBytes(PayloadData);
+			Packet.WriteVarLenUInt((uint)PayloadData.Length);
+			Packet.WriteRaw(PayloadData);
 
 			byte[] PacketData = Packet.GetPacket();
 
@@ -1220,7 +1220,7 @@ namespace Waher.Networking.MQTT
 		{
 			BinaryOutput Packet = new BinaryOutput();
 			Packet.WriteByte((byte)MqttControlPacketType.DISCONNECT << 4);
-			Packet.WriteUInt(2);
+			Packet.WriteVarLenUInt(2);
 
 			byte[] PacketData = Packet.GetPacket();
 

@@ -335,13 +335,13 @@ namespace Waher.Things.Test
 
 			Assert.AreEqual(MqttControlPacketType.PUBLISH, Header.ControlPacketType);
 
-			string Topic = Packet.ReadString();
+			string Topic = Packet.ReadString16BitLen();
 			Console.Out.WriteLine("Topic: " + Topic);
 
 			if (Header.QualityOfService > MqttQualityOfService.AtMostOnce)
 				Packet.ReadUInt16();
 
-			Bin = Packet.ReadBytes(Packet.BytesLeft);
+			Bin = Packet.ReadRaw(Packet.BytesLeft);
 		}
 
 		[TestMethod]

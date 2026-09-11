@@ -62,7 +62,7 @@ namespace Waher.Networking
 		/// <param name="Length">Number of bytes to retrieve.</param>
 		/// <returns>Binary block of data.</returns>
 		/// <exception cref="EndOfStreamException">If there is not sufficient bytes available.</exception>
-		public byte[] ReadBytes(int Length)
+		public byte[] ReadRaw(int Length)
 		{
 			byte[] Result = new byte[Length];
 			this.ms.ReadAll(Result, 0, Length);
@@ -71,11 +71,12 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
-		/// Reads the next string of the stream.
+		/// Reads the next string of the stream, using a 16-bit length field, and
+		/// UTF-8 encoding.
 		/// </summary>
 		/// <returns>String value.</returns>
 		/// <exception cref="EndOfStreamException">If there is not sufficient bytes available.</exception>
-		public string ReadString()
+		public string ReadString16BitLen()
 		{
 			int Len = this.ReadByte();
 			Len <<= 8;
@@ -84,7 +85,28 @@ namespace Waher.Networking
 			if (Len == 0)
 				return string.Empty;
 
-			byte[] Data = this.ReadBytes(Len);
+			byte[] Data = this.ReadRaw(Len);
+
+			return Encoding.UTF8.GetString(Data);
+		}
+
+		/// <summary>
+		/// Reads the next string of the stream, using a variable-length field, and
+		/// UTF-8 encoding.
+		/// </summary>
+		/// <returns>String value.</returns>
+		/// <exception cref="EndOfStreamException">If there is not sufficient bytes available.</exception>
+		/// <exception cref="IOException">If the length field is invalid.</exception>
+		public string ReadString()
+		{
+			ulong Len = this.ReadVarLenUInt();
+			if (Len == 0)
+				return string.Empty;
+
+			if (Len < 0 || Len > int.MaxValue)
+				throw new IOException("Invalid length of string.");
+
+			byte[] Data = this.ReadRaw((int)Len);
 
 			return Encoding.UTF8.GetString(Data);
 		}
@@ -93,9 +115,7 @@ namespace Waher.Networking
 		/// Reads a variable-length unsigned integer from the stream.
 		/// </summary>
 		/// <returns>Unsigned integer.</returns>
-//#pragma warning disable
-		public ulong ReadUInt()
-//#pragma warning restore
+		public ulong ReadVarLenUInt()
 		{
 			byte b = this.ReadByte();
 			int Offset = 0;
@@ -115,9 +135,9 @@ namespace Waher.Networking
 		/// Reads a variable-length signed integer from the stream.
 		/// </summary>
 		/// <returns>Signed integer.</returns>
-		public long ReadInt()
+		public long ReadVarLenInt()
 		{
-			ulong l = this.ReadUInt();
+			ulong l = this.ReadVarLenUInt();
 
 			if ((l & 1) == 0)
 				return (long)(l >> 1);
@@ -182,7 +202,7 @@ namespace Waher.Networking
 		/// <returns>Single-precision floating point value</returns>
 		public float ReadSingle()
 		{
-			return BitConverter.ToSingle(this.ReadBytes(4), 0);
+			return BitConverter.ToSingle(this.ReadRaw(4), 0);
 		}
 
 		/// <summary>
@@ -191,7 +211,7 @@ namespace Waher.Networking
 		/// <returns>Double-precision floating point value</returns>
 		public double ReadDouble()
 		{
-			return BitConverter.ToDouble(this.ReadBytes(8), 0);
+			return BitConverter.ToDouble(this.ReadRaw(8), 0);
 		}
 
 		/// <summary>
@@ -243,7 +263,7 @@ namespace Waher.Networking
 		/// <returns>GUID.</returns>
 		public Guid ReadGuid()
 		{
-			byte[] Bin = this.ReadBytes(16);
+			byte[] Bin = this.ReadRaw(16);
 			return new Guid(Bin);
 		}
 
@@ -255,6 +275,5 @@ namespace Waher.Networking
 		{
 			return this.ReadByte() != 0;
 		}
-
 	}
 }

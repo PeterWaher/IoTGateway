@@ -123,22 +123,22 @@ namespace Waher.Networking.HTTP.Mcp.Model.Attributes
 		/// </summary>
 		/// <param name="Value">Value to check.</param>
 		/// <returns>If the value is valid according to validation rules for the parameter.</returns>
-		public override async Task<bool> IsValid(object Value)
+		public override Task<bool> IsValid(object Value)
 		{
 			if (Value is CustomEncoding || Value is byte[])
-				return true;
+				return Task.FromResult(true);
 
 			if (!(Value is string s))
-				return false;
+				return Task.FromResult(false);
 
 			try
 			{
 				Convert.FromBase64String(s);
-				return true;
+				return Task.FromResult(true);
 			}
 			catch (Exception)
 			{
-				return false;
+				return Task.FromResult(false);
 			}
 		}
 	}

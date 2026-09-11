@@ -41,6 +41,7 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.E2ee\Waher.Networking.E2ee.csproj" />
     <ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj" />
     <ProjectReference Include="..\Waher.Persistence.Serialization\Waher.Persistence.Serialization.csproj" />
     <ProjectReference Include="..\Waher.Persistence\Waher.Persistence.csproj" />

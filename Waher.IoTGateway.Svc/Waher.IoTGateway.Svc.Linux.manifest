@@ -409,6 +409,9 @@
 	<Assembly fileName="Waher.Networking.DNS.dll" />
 	<Assembly fileName="Waher.Networking.DNS.pdb" />
 	<Assembly fileName="Waher.Networking.DNS.xml" />
+	<Assembly fileName="Waher.Networking.E2ee.dll" />
+	<Assembly fileName="Waher.Networking.E2ee.pdb" />
+	<Assembly fileName="Waher.Networking.E2ee.xml" />
 	<Assembly fileName="Waher.Networking.HTTP.Brotli.dll" />
 	<Assembly fileName="Waher.Networking.HTTP.Brotli.pdb" />
 	<Assembly fileName="Waher.Networking.HTTP.Brotli.xml" />

@@ -819,7 +819,7 @@ namespace Waher.Networking.XMPP.Test
 
 		private static IE2eEndpoint CreatePrivateEndpoint(string KeyName, string KeyNamespace, byte[] PrivateKey)
 		{
-			Assert.IsTrue(EndpointSecurity.TryCreateEndpoint(KeyName, KeyNamespace, out IE2eEndpoint Template));
+			Assert.IsTrue(E2eEndpoint.TryCreateEndpoint(KeyName, KeyNamespace, out IE2eEndpoint Template));
 
 			try
 			{

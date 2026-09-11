@@ -524,7 +524,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 				return RsaEndpoint.Verify(Data, Signature, KeySize, this.clientPubKey);
 			}
-			else if (EndpointSecurity.TryCreateEndpoint(this.clientKeyName,
+			else if (E2eEndpoint.TryCreateEndpoint(this.clientKeyName,
 				this.@namespace.Replace(":iot:leg:id:", ":iot:e2e:").Replace("urn:ieee:","urn:nf:"), out IE2eEndpoint Endpoint) &&
                 Endpoint is EllipticCurveEndpoint LocalEc)
 			{

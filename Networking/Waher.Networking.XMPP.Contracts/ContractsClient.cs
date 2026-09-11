@@ -496,7 +496,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Thread?.NewState("Endpoints");
 
-			IE2eEndpoint[] AvailableEndpoints = EndpointSecurity.CreateEndpoints(256, 192,
+			IE2eEndpoint[] AvailableEndpoints = E2eEndpoint.CreateEndpoints(256, 192,
 				int.MaxValue, new Type[]
 				{
 					typeof(EllipticCurveEndpoint),
@@ -820,7 +820,7 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					byte[] RuntimePrivateKey = Convert.FromBase64String(RuntimeValue);
 
-					if (EndpointSecurity.TryCreateEndpoint(KeyName, KeyNamespace, out IE2eEndpoint Template))
+					if (E2eEndpoint.TryCreateEndpoint(KeyName, KeyNamespace, out IE2eEndpoint Template))
 					{
 						using (Template)
 						using (IE2eEndpoint RuntimeEndpoint = Template.CreatePrivate(RuntimePrivateKey))
@@ -856,7 +856,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			byte[] PrivateKey = State.PrivateKey;
 
-			if (PrivateKey is null || !EndpointSecurity.TryCreateEndpoint(State.KeyName,
+			if (PrivateKey is null || !E2eEndpoint.TryCreateEndpoint(State.KeyName,
 				KeyNamespace, out IE2eEndpoint Template))
 			{
 				return null;
@@ -2812,7 +2812,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				return RsaEndpoint.Verify(Data, Signature, KeySize, Identity.ClientPubKey);
 			}
-			else if (EndpointSecurity.TryGetEndpoint(Identity.ClientKeyName,
+			else if (E2eEndpoint.TryGetEndpoint(Identity.ClientKeyName,
 				Identity.Namespace.Replace(":iot:leg:id:", ":iot:e2e:").Replace("urn:ieee:", "urn:nf:"),
 				out IE2eEndpoint LocalKey) &&
 				LocalKey is EllipticCurveEndpoint LocalEc)
@@ -2841,7 +2841,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				return RsaEndpoint.Verify(Data, Signature, KeySize, Identity.ClientPubKey);
 			}
-			else if (EndpointSecurity.TryGetEndpoint(Identity.ClientKeyName,
+			else if (E2eEndpoint.TryGetEndpoint(Identity.ClientKeyName,
 				Identity.Namespace.Replace(":iot:leg:id:", ":iot:e2e:").Replace("urn:ieee:", "urn:nf:"),
 				out IE2eEndpoint LocalKey) &&
 				LocalKey is EllipticCurveEndpoint LocalEc)

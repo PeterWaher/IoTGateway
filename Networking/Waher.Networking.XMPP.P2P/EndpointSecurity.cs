@@ -10,8 +10,6 @@ using Waher.Events;
 using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Runtime.Collections;
-using Waher.Runtime.Inventory;
-using Waher.Runtime.Profiling;
 using Waher.Security;
 using Waher.Security.ChaChaPoly.E2EE;
 using Waher.Security.E2EE;
@@ -48,11 +46,6 @@ namespace Waher.Networking.XMPP.P2P
 			IoTHarmonizationP2PNeuroFoundationV1,
 			IoTHarmonizationP2PIeeeV1
 		};
-
-		private static Dictionary<string, IE2eEndpoint> endpointTypes = new Dictionary<string, IE2eEndpoint>();
-		private static bool initialized = false;
-		private static Type[] e2eTypes = null;
-		private static bool e2eTypesLocked = false;
 
 		private readonly Dictionary<string, RemoteEndPoints> contacts;
 		private XmppClient client;
@@ -129,7 +122,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (LocalEndpoints is null)
 			{
-				LocalEndpoints = CreateEndpoints(SecurityStrength, 0, int.MaxValue);
+				LocalEndpoints = E2eEndpoint.CreateEndpoints(SecurityStrength, 0, int.MaxValue);
 				this.ephemeralKeys = true;
 			}
 			else
@@ -183,224 +176,9 @@ namespace Waher.Networking.XMPP.P2P
 		}
 
 		/// <summary>
-		/// Creates a set of endpoints within a range of security strengths.
-		/// </summary>
-		/// <param name="DesiredSecurityStrength">Desired security strength.</param>
-		/// <param name="MinSecurityStrength">Minimum security strength.</param>
-		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
-		/// <returns>Array of local endpoint keys.</returns>
-		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength)
-		{
-			return CreateEndpoints(DesiredSecurityStrength, MinSecurityStrength, MaxSecurityStrength, null);
-		}
-
-		/// <summary>
-		/// Creates a set of endpoints within a range of security strengths.
-		/// </summary>
-		/// <param name="DesiredSecurityStrength">Desired security strength.</param>
-		/// <param name="MinSecurityStrength">Minimum security strength.</param>
-		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
-		/// <param name="OnlyIfDerivedFrom">Only return endpoints derived from these type s.</param>
-		/// <returns>Array of local endpoint keys.</returns>
-		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength,
-			params Type[] OnlyIfDerivedFrom)
-		{
-			return CreateEndpoints(DesiredSecurityStrength, MinSecurityStrength, MaxSecurityStrength, OnlyIfDerivedFrom, null);
-		}
-
-		/// <summary>
-		/// Creates a set of endpoints within a range of security strengths.
-		/// </summary>
-		/// <param name="DesiredSecurityStrength">Desired security strength.</param>
-		/// <param name="MinSecurityStrength">Minimum security strength.</param>
-		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
-		/// <param name="OnlyIfDerivedFrom">Only return endpoints derived from these types.</param>
-		/// <param name="Thread">Optional profiling thread.</param>
-		/// <returns>Array of local endpoint keys.</returns>
-		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength,
-			Type[] OnlyIfDerivedFrom, ProfilerThread Thread)
-		{
-			Thread = Thread?.CreateSubThread("Endpoints", ProfilerThreadType.Sequential);
-			try
-			{
-				Thread?.Start();
-				Thread?.NewState("Init");
-
-				int i, c = OnlyIfDerivedFrom?.Length ?? 0;
-				TypeInfo[] OnlyIfDerivedFromType = c == 0 ? null : new TypeInfo[c];
-
-				for (i = 0; i < c; i++)
-					OnlyIfDerivedFromType[i] = OnlyIfDerivedFrom[i].GetTypeInfo();
-
-				List<IE2eEndpoint> Result = new List<IE2eEndpoint>();
-				IEnumerable<IE2eEndpoint> Templates;
-				bool CheckHeritance = true;
-
-				lock (endpointTypes)
-				{
-					if (initialized)
-						Templates = endpointTypes.Values;
-					else
-					{
-						Dictionary<string, IE2eEndpoint> E2eTypes = new Dictionary<string, IE2eEndpoint>();
-						Dictionary<string, bool> TypeNames = new Dictionary<string, bool>();
-						TypeInfo E2eTypeInfo = typeof(IE2eEndpoint).GetTypeInfo();
-
-						foreach (KeyValuePair<string, IE2eEndpoint> P in endpointTypes)
-						{
-							E2eTypes[P.Key] = P.Value;
-							TypeNames[P.Value.GetType().FullName] = true;
-						}
-
-						foreach (Type T in e2eTypes ?? Types.GetTypesImplementingInterface(typeof(IE2eEndpoint)))
-						{
-							if (TypeNames.ContainsKey(T.FullName))
-								continue;
-
-							TypeInfo TI = T.GetTypeInfo();
-							if (!(e2eTypes is null) && !E2eTypeInfo.IsAssignableFrom(TI))
-								continue;
-
-							if (c > 0)
-							{
-								bool DerivedFrom = false;
-
-								for (i = 0; i < c; i++)
-								{
-									if (OnlyIfDerivedFromType[i].IsAssignableFrom(TI))
-									{
-										DerivedFrom = true;
-										break;
-									}
-								}
-
-								if (!DerivedFrom)
-									continue;
-							}
-
-							ConstructorInfo CI = Types.GetDefaultConstructor(T);
-							if (CI is null)
-								continue;
-
-							try
-							{
-								IE2eEndpoint Endpoint = (IE2eEndpoint)CI.Invoke(Types.NoParameters);
-								E2eTypes[Endpoint.Namespace + "#" + Endpoint.LocalName] = Endpoint;
-							}
-							catch (Exception ex)
-							{
-								Log.Exception(ex);
-								continue;
-							}
-						}
-
-						endpointTypes = E2eTypes;
-						Templates = E2eTypes.Values;
-
-						if (OnlyIfDerivedFromType is null)
-							initialized = true;
-						else
-							CheckHeritance = false;
-					}
-				}
-
-				foreach (IE2eEndpoint Endpoint in Templates)
-				{
-					if (CheckHeritance && c > 0)
-					{
-						bool DerivedFrom = false;
-
-						for (i = 0; i < c; i++)
-						{
-							if (OnlyIfDerivedFromType[i].IsAssignableFrom(Endpoint.GetType().GetTypeInfo()))
-							{
-								DerivedFrom = true;
-								break;
-							}
-						}
-
-						if (!DerivedFrom)
-							continue;
-					}
-
-					Thread?.NewState(Endpoint.LocalName);
-
-					IE2eEndpoint Endpoint2 = Endpoint.Create(DesiredSecurityStrength);
-					i = Endpoint2.SecurityStrength;
-					if (i >= MinSecurityStrength && i <= MaxSecurityStrength)
-						Result.Add(Endpoint2);
-					else
-						Endpoint2.Dispose();
-				}
-
-				return Result.ToArray();
-			}
-			finally
-			{
-				Thread?.Stop();
-			}
-		}
-
-		/// <summary>
 		/// ID of <see cref="IEndToEndEncryption"/> instance.
 		/// </summary>
 		public Guid InstanceId => this.instanceId;
-
-		/// <summary>
-		/// Sets allowed cipers in endpoint security.
-		/// </summary>
-		/// <param name="CipherTypes">Allowed cipher types. null=all types allowed.</param>
-		/// <param name="Lock">If set of ciphers should be locked.</param>
-		public static void SetCiphers(Type[] CipherTypes, bool Lock)
-		{
-			if (e2eTypesLocked)
-				throw new InvalidOperationException("Ciphers locked.");
-
-			e2eTypes = CipherTypes;
-			e2eTypesLocked = Lock;
-		}
-
-		/// <summary>
-		/// Tries to get an existing endpoint, given its qualified name.
-		/// </summary>
-		/// <param name="LocalName">Local name</param>
-		/// <param name="Namespace">Namespace</param>
-		/// <param name="Endpoint">Endpoint, or null if not found.</param>
-		/// <returns>If an endpoint was found with the given name.</returns>
-		public static bool TryGetEndpoint(string LocalName, string Namespace, out IE2eEndpoint Endpoint)
-		{
-			if (Namespace.StartsWith("urn:ieee:"))
-				Namespace = Namespace.Replace("urn:ieee:", "urn:nf:");
-
-			string Key = Namespace + "#" + LocalName;
-
-			if (endpointTypes.TryGetValue(Key, out Endpoint))
-				return true;
-			else if (initialized || endpointTypes.Count > 0)
-				return false;
-
-			CreateEndpoints(128, 0, int.MaxValue);
-
-			return endpointTypes.TryGetValue(Key, out Endpoint);
-		}
-
-		/// <summary>
-		/// Tries to create a new endpoint, given its qualified name.
-		/// </summary>
-		/// <param name="LocalName">Local name</param>
-		/// <param name="Namespace">Namespace</param>
-		/// <param name="Endpoint">Created endpoint, or null if not found.</param>
-		/// <returns>If an endpoint was found with the given name, and a new instance was created.</returns>
-		public static bool TryCreateEndpoint(string LocalName, string Namespace, out IE2eEndpoint Endpoint)
-		{
-			if (TryGetEndpoint(LocalName, Namespace, out Endpoint))
-			{
-				Endpoint = Endpoint.Create(Endpoint.SecurityStrength);
-				return true;
-			}
-			else
-				return false;
-		}
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -644,7 +422,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>E2E keys, if recognized, or null if not.</returns>
 		public static IE2eEndpoint ParseE2eKey(XmlElement E)
 		{
-			if (TryGetEndpoint(E.LocalName, E.NamespaceURI, out IE2eEndpoint Endpoint))
+			if (E2eEndpoint.TryGetEndpoint(E.LocalName, E.NamespaceURI, out IE2eEndpoint Endpoint))
 				return Endpoint.Parse(E);
 			else
 				return null;

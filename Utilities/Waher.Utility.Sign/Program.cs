@@ -73,7 +73,7 @@ namespace Waher.Utility.Sign
                                 throw new Exception("Missing cipher name.");
 
                             s = args[i++];
-                            if (!EndpointSecurity.TryCreateEndpoint(s, E2eEndpoint.IoTHarmonizationE2ECurrent, out Endpoint))
+                            if (!E2eEndpoint.TryCreateEndpoint(s, E2eEndpoint.IoTHarmonizationE2ECurrent, out Endpoint))
                                 throw new Exception("Algorithm not recognized: " + s);
 
                             break;

@@ -1,21 +1,29 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
+using Waher.Security;
+using Waher.Security.E2EE;
+using Waher.Security.EllipticCurves.E2EE;
+using Waher.Security.PQC.E2EE;
 
 namespace Waher.Networking.E2ee
 {
 	/// <summary>
 	/// Binary End-to-End encrypted protocol.
 	/// </summary>
-	public class BinaryE2eeProtocol : IBinaryTransportLayer, ICommunicationLayer
+	public class BinaryE2eeProtocol : CommunicationLayer, IBinaryTransportLayer
 	{
+		private readonly TaskCompletionSource<bool> remoteKeysReceived = new TaskCompletionSource<bool>();
 		private readonly IBinaryTransportLayer binaryTransport;
-		private readonly bool decoupledEvents;
+		private readonly IE2eSymmetricCipher[] symmetricCiphers;
+		private readonly IE2eSymmetricCipher[] remoteSymmetricCiphers;
+		private readonly IE2eEndpoint[] endpoints;
+		private readonly IE2eEndpoint[] remoteEndpoints;
 		private readonly bool initiator;
 		private bool disposed = false;
+		private bool hasSymmetricKey;
+		private byte[] symmetricKey;
 
 		/// <summary>
 		/// Binary End-to-End encrypted protocol.
@@ -23,14 +31,91 @@ namespace Waher.Networking.E2ee
 		/// <param name="BinaryTransport">Binary transport layer.</param>
 		/// <param name="Initiator">Initiator of the conversation, typically the
 		/// part that initiates a connection or conversation.</param>
+		/// <param name="DesiredSecurityStrength">Desired security strength.</param>
+		/// <param name="MinSecurityStrength">Minimum security strength.</param>
+		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
 		/// <param name="DecoupledEvents">If events raised from the communication layer 
 		/// are decoupled, i.e. executed in parallel with the source that raised them.</param>
+		/// <param name="Sniffers">Optional sniffers.</param>
 		public BinaryE2eeProtocol(IBinaryTransportLayer BinaryTransport, bool Initiator,
-			bool DecoupledEvents)
+			int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength,
+			bool DecoupledEvents, params ISniffer[] Sniffers)
+			: this(BinaryTransport, Initiator,
+				  DesiredSecurityStrength, MinSecurityStrength, MaxSecurityStrength,
+				  new Type[] { typeof(EllipticCurveEndpoint), typeof(ModuleLatticeEndpoint) },
+				  DecoupledEvents, Sniffers)
 		{
+		}
+
+
+		/// <summary>
+		/// Binary End-to-End encrypted protocol.
+		/// </summary>
+		/// <param name="BinaryTransport">Binary transport layer.</param>
+		/// <param name="Initiator">Initiator of the conversation, typically the
+		/// part that initiates a connection or conversation.</param>
+		/// <param name="DesiredSecurityStrength">Desired security strength.</param>
+		/// <param name="MinSecurityStrength">Minimum security strength.</param>
+		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
+		/// <param name="OnlyIfDerivedFrom">Only return endpoints derived from these types.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication layer 
+		/// are decoupled, i.e. executed in parallel with the source that raised them.</param>
+		/// <param name="Sniffers">Optional sniffers.</param>
+		public BinaryE2eeProtocol(IBinaryTransportLayer BinaryTransport, bool Initiator,
+			int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength,
+			Type[] OnlyIfDerivedFrom, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: this(BinaryTransport, Initiator, E2eEndpoint.CreateEndpoints(
+				DesiredSecurityStrength, MinSecurityStrength, MaxSecurityStrength,
+				OnlyIfDerivedFrom), DecoupledEvents, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Binary End-to-End encrypted protocol.
+		/// </summary>
+		/// <param name="BinaryTransport">Binary transport layer.</param>
+		/// <param name="Initiator">Initiator of the conversation, typically the
+		/// part that initiates a connection or conversation.</param>
+		/// <param name="DesiredSecurityStrength">Desired security strength.</param>
+		/// <param name="MinSecurityStrength">Minimum security strength.</param>
+		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
+		/// <param name="OnlyIfDerivedFrom">Only return endpoints derived from these types.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication layer 
+		/// are decoupled, i.e. executed in parallel with the source that raised them.</param>
+		/// <param name="Sniffers">Optional sniffers.</param>
+		public BinaryE2eeProtocol(IBinaryTransportLayer BinaryTransport, bool Initiator,
+			IE2eEndpoint[] Endpoints, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: this(BinaryTransport, Initiator, Endpoints, E2eEndpoint.CreateSymmetricCiphers(),
+				  DecoupledEvents, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Binary End-to-End encrypted protocol.
+		/// </summary>
+		/// <param name="BinaryTransport">Binary transport layer.</param>
+		/// <param name="Initiator">Initiator of the conversation, typically the
+		/// part that initiates a connection or conversation.</param>
+		/// <param name="Endpoints">Asymmetric ciphers.</param>
+		/// <param name="SymmetricCiphers">Symmetric ciphers.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication layer 
+		/// are decoupled, i.e. executed in parallel with the source that raised them.</param>
+		/// <param name="Sniffers">Optional sniffers.</param>
+		public BinaryE2eeProtocol(IBinaryTransportLayer BinaryTransport, bool Initiator,
+			IE2eEndpoint[] Endpoints, IE2eSymmetricCipher[] SymmetricCiphers,
+			bool DecoupledEvents, params ISniffer[] Sniffers)
+			: base(DecoupledEvents, Sniffers)
+		{
+			this.endpoints = Endpoints;
+			if (this.endpoints.Length == 0)
+				throw new Exception("No endpoints could be created with the specified security strength.");
+
+			this.symmetricCiphers = SymmetricCiphers;
+			if (this.symmetricCiphers.Length == 0)
+				throw new Exception("No symmetric ciphers available.");
+
 			this.binaryTransport = BinaryTransport;
 			this.initiator = Initiator;
-			this.decoupledEvents = DecoupledEvents;
 		}
 
 		#region IDisposable
@@ -49,6 +134,30 @@ namespace Waher.Networking.E2ee
 
 		#endregion
 
+		/// <summary>
+		/// Negotiates the keys to use during encrypted communication.
+		/// </summary>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		public async Task NegotiateKeys(int Timeout)
+		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(BinaryE2eeProtocol));
+
+			if (this.hasSymmetricKey)
+				throw new InvalidOperationException("Keys already negotiated.");
+
+			_ = Task.Delay(Timeout).ContinueWith(_ =>
+				this.remoteKeysReceived.TrySetException(new TimeoutException()));
+
+			if (!this.initiator)
+				await this.remoteKeysReceived.Task;
+
+
+
+			if (this.initiator)
+				await this.remoteKeysReceived.Task;
+		}
+
 		#region IBinaryTransmission
 
 		/// <summary>
@@ -60,7 +169,7 @@ namespace Waher.Networking.E2ee
 		/// <returns>If data was sent.</returns>
 		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet)
 		{
-			throw new NotImplementedException();	// TODO
+			throw new NotImplementedException();    // TODO
 		}
 
 		/// <summary>
@@ -145,363 +254,6 @@ namespace Waher.Networking.E2ee
 		/// Call this method to continue operation. Operation can be paused, by returning false from <see cref="OnReceived"/>.
 		/// </summary>
 		public void Continue()
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		#endregion
-
-		#region IObservableLayer
-
-		/// <summary>
-		/// If events raised from the communication layer are decoupled, i.e. executed
-		/// in parallel with the source that raised them.
-		/// </summary>
-		public bool DecoupledEvents => this.decoupledEvents;
-
-		/// <summary>
-		/// Called to inform the viewer of something.
-		/// </summary>
-		/// <param name="Comment">Comment.</param>
-		public void Information(string Comment)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called to inform the viewer of something.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Comment">Comment.</param>
-		public void Information(DateTime Timestamp, string Comment)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called to inform the viewer of a warning state.
-		/// </summary>
-		/// <param name="Warning">Warning.</param>
-		public void Warning(string Warning)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called to inform the viewer of a warning state.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Warning">Warning.</param>
-		public void Warning(DateTime Timestamp, string Warning)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called to inform the viewer of an error state.
-		/// </summary>
-		/// <param name="Error">Error.</param>
-		public void Error(string Error)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called to inform the viewer of an error state.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Error">Error.</param>
-		public void Error(DateTime Timestamp, string Error)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called to inform the viewer of an exception state.
-		/// </summary>
-		/// <param name="Exception">Exception.</param>
-		public void Exception(string Exception)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called to inform the viewer of an exception state.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Exception">Exception.</param>
-		public void Exception(DateTime Timestamp, string Exception)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called to inform the viewer of an exception state.
-		/// </summary>
-		/// <param name="Exception">Exception.</param>
-		public void Exception(Exception Exception)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called to inform the viewer of an exception state.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Exception">Exception.</param>
-		public void Exception(DateTime Timestamp, Exception Exception)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		#endregion
-
-		#region IEnumerable<ISniffer>
-
-		/// <summary>
-		/// Gets an enumerator of registered sniffers.
-		/// </summary>
-		/// <returns>Enumerator</returns>
-		public IEnumerator<ISniffer> GetEnumerator()
-		{
-			throw new NotImplementedException();
-		}
-
-		/// <summary>
-		/// Gets an enumerator of registered sniffers.
-		/// </summary>
-		/// <returns>Enumerator</returns>
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this.GetEnumerator();
-		}
-
-		#endregion
-
-		#region ICommunicationLayer
-
-		/// <summary>
-		/// Adds a sniffer to the node.
-		/// </summary>
-		/// <param name="Sniffer">Sniffer to add.</param>
-		public void Add(ISniffer Sniffer)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Adds a range of sniffers to the node.
-		/// </summary>
-		/// <param name="Sniffers">Sniffers to add.</param>
-		public void AddRange(IEnumerable<ISniffer> Sniffers)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Removes a sniffer, if registered.
-		/// </summary>
-		/// <param name="Sniffer">Sniffer to remove.</param>
-		/// <returns>If the sniffer was found and removed.</returns>
-		public bool Remove(ISniffer Sniffer)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Registered sniffers.
-		/// </summary>
-		public ISniffer[] Sniffers
-		{
-			get
-			{
-				throw new NotImplementedException();    // TODO
-			}
-		}
-
-		/// <summary>
-		/// If there are sniffers registered on the object.
-		/// </summary>
-		public bool HasSniffers
-		{
-			get
-			{
-				throw new NotImplementedException();    // TODO
-			}
-		}
-
-		/// <summary>
-		/// Called when binary data has been received.
-		/// </summary>
-		/// <param name="Count">Number of bytes received.</param>
-		public void ReceiveBinary(int Count)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when binary data has been received.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Count">Number of bytes received.</param>
-		public void ReceiveBinary(DateTime Timestamp, int Count)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when binary data has been received.
-		/// </summary>
-		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
-		/// or if the contents in the buffer may change after the call (false).</param>
-		/// <param name="Data">Binary Data.</param>
-		public void ReceiveBinary(bool ConstantBuffer, byte[] Data)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when binary data has been received.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
-		/// or if the contents in the buffer may change after the call (false).</param>
-		/// <param name="Data">Binary Data.</param>
-		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when binary data has been received.
-		/// </summary>
-		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
-		/// or if the contents in the buffer may change after the call (false).</param>
-		/// <param name="Data">Binary Data.</param>
-		/// <param name="Offset">Offset into buffer where received data begins.</param>
-		/// <param name="Count">Number of bytes received.</param>
-		public void ReceiveBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when binary data has been received.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
-		/// or if the contents in the buffer may change after the call (false).</param>
-		/// <param name="Data">Binary Data.</param>
-		/// <param name="Offset">Offset into buffer where received data begins.</param>
-		/// <param name="Count">Number of bytes received.</param>
-		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when binary data has been transmitted.
-		/// </summary>
-		/// <param name="Count">Number of bytes transmitted.</param>
-		public void TransmitBinary(int Count)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when binary data has been transmitted.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Count">Number of bytes transmitted.</param>
-		public void TransmitBinary(DateTime Timestamp, int Count)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when binary data has been transmitted.
-		/// </summary>
-		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
-		/// or if the contents in the buffer may change after the call (false).</param>
-		/// <param name="Data">Binary Data.</param>
-		public void TransmitBinary(bool ConstantBuffer, byte[] Data)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when binary data has been transmitted.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
-		/// or if the contents in the buffer may change after the call (false).</param>
-		/// <param name="Data">Binary Data.</param>
-		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when binary data has been transmitted.
-		/// </summary>
-		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
-		/// or if the contents in the buffer may change after the call (false).</param>
-		/// <param name="Data">Binary Data.</param>
-		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
-		/// <param name="Count">Number of bytes transmitted.</param>
-		public void TransmitBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when binary data has been transmitted.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
-		/// or if the contents in the buffer may change after the call (false).</param>
-		/// <param name="Data">Binary Data.</param>
-		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
-		/// <param name="Count">Number of bytes transmitted.</param>
-		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when text has been received.
-		/// </summary>
-		/// <param name="Text">Text</param>
-		public void ReceiveText(string Text)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when text has been received.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Text">Text</param>
-		public void ReceiveText(DateTime Timestamp, string Text)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when text has been transmitted.
-		/// </summary>
-		/// <param name="Text">Text</param>
-		public void TransmitText(string Text)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
-		/// <summary>
-		/// Called when text has been transmitted.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Text">Text</param>
-		public void TransmitText(DateTime Timestamp, string Text)
 		{
 			throw new NotImplementedException();    // TODO
 		}

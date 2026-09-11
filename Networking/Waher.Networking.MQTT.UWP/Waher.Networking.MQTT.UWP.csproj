@@ -110,8 +110,6 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="BinaryInput.cs" />
-    <Compile Include="BinaryOutput.cs" />
     <Compile Include="MqttClient.cs" />
     <Compile Include="MqttContent.cs" />
     <Compile Include="MqttControlPacketType.cs" />

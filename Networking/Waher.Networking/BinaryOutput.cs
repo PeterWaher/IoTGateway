@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Networking.MQTT
+namespace Waher.Networking
 {
 	/// <summary>
 	/// Class that helps serialize information into a a binary packet.

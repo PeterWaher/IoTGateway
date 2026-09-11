@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using Waher.Runtime.IO;
 
-namespace Waher.Networking.MQTT
+namespace Waher.Networking
 {
 	/// <summary>
 	/// Class that helps deserialize information stored in a binary packet.

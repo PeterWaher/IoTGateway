@@ -105,6 +105,8 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BinaryInput.cs" />
+    <Compile Include="BinaryOutput.cs" />
     <Compile Include="BinaryOutputStream.cs" />
     <Compile Include="BinaryTcpServer.cs" />
     <Compile Include="ClientCertificates.cs" />

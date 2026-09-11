@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading.Tasks;
+using Waher.Networking;
 using Waher.Networking.MQTT;
 using Waher.Runtime.Inventory;
 using Waher.Security;

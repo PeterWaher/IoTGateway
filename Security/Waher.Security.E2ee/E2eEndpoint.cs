@@ -45,9 +45,10 @@ namespace Waher.Security.E2EE
 		};
 
 
+		private static readonly Dictionary<string, IE2eSymmetricCipher> symmetricCiphers = new Dictionary<string, IE2eSymmetricCipher>();
 		private static Dictionary<string, IE2eEndpoint> endpointTypes = new Dictionary<string, IE2eEndpoint>();
-		private static bool initialized = false;
 		private static Type[] e2eTypes = null;
+		private static bool initialized = false;
 		private static bool e2eTypesLocked = false;
 
 		private IE2eSymmetricCipher defaultSymmetricCipher;
@@ -448,7 +449,12 @@ namespace Waher.Security.E2EE
 						Templates = E2eTypes.Values;
 
 						if (OnlyIfDerivedFromType is null)
+						{
+							foreach (IE2eSymmetricCipher Cipher in CreateSymmetricCiphers())
+								symmetricCiphers[Cipher.Namespace + "#" + Cipher.LocalName] = Cipher;
+
 							initialized = true;
+						}
 						else
 							CheckHeritance = false;
 					}
@@ -571,6 +577,49 @@ namespace Waher.Security.E2EE
 			if (TryGetEndpoint(LocalName, Namespace, out Endpoint))
 			{
 				Endpoint = Endpoint.Create(Endpoint.SecurityStrength);
+				return true;
+			}
+			else
+				return false;
+		}
+
+		/// <summary>
+		/// Tries to get a symmetric cipher, given its qualified name.
+		/// </summary>
+		/// <param name="LocalName">Local name</param>
+		/// <param name="Namespace">Namespace</param>
+		/// <param name="SymmetricCipher">Symmetric Cipher, or null if not found.</param>
+		/// <returns>If a symmetric cipher was found with the given name.</returns>
+		public static bool TryGetSymmetricCipher(string LocalName, string Namespace, 
+			out IE2eSymmetricCipher SymmetricCipher)
+		{
+			if (Namespace.StartsWith("urn:ieee:"))
+				Namespace = Namespace.Replace("urn:ieee:", "urn:nf:");
+
+			string Key = Namespace + "#" + LocalName;
+
+			if (symmetricCiphers.TryGetValue(Key, out SymmetricCipher))
+				return true;
+			else if (initialized || symmetricCiphers.Count > 0)
+				return false;
+
+			CreateEndpoints(128, 0, int.MaxValue);
+
+			return symmetricCiphers.TryGetValue(Key, out SymmetricCipher);
+		}
+
+		/// <summary>
+		/// Tries to create a new symmetric cipher, given its qualified name.
+		/// </summary>
+		/// <param name="LocalName">Local name</param>
+		/// <param name="Namespace">Namespace</param>
+		/// <param name="Cipher">Created symmetric cipher, or null if not found.</param>
+		/// <returns>If a symmetric cipher was found with the given name, and a new instance was created.</returns>
+		public static bool TryCreateSymmetricCipher(string LocalName, string Namespace, out IE2eSymmetricCipher Cipher)
+		{
+			if (TryGetSymmetricCipher(LocalName, Namespace, out Cipher))
+			{
+				Cipher = Cipher.CreteNew();
 				return true;
 			}
 			else

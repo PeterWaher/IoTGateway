@@ -90,10 +90,13 @@ namespace Waher.Networking.Test
 		}
 
 		[TestMethod]
-		public async Task Test_01_EllipticCurves()
+		[DataRow(false)]
+		[DataRow(true)]
+		public async Task Test_01_KeyNegotiation_EllipticCurves(bool SignedTransfers)
 		{
 			this.clientProtocol = new BinaryE2eeProtocol(this.client, true,
-				128, 128, 256, [typeof(EllipticCurveEndpoint)], false, true, this.sniffer);
+				128, 128, 256, [typeof(EllipticCurveEndpoint)], SignedTransfers, 
+				true, this.sniffer);
 
 			await this.TestKeyNegotiation();
 		}
@@ -114,32 +117,37 @@ namespace Waher.Networking.Test
 		}
 
 		[TestMethod]
-		public async Task Test_02_ModuleLattice()
+		[DataRow(false)]
+		[DataRow(true)]
+		public async Task Test_02_KeyNegotiation_ModuleLattice(bool SignedTransfers)
 		{
 			this.clientProtocol = new BinaryE2eeProtocol(this.client, true,
-				128, 128, 256, [typeof(ModuleLatticeEndpoint)], false, true, this.sniffer);
+				128, 128, 256, [typeof(ModuleLatticeEndpoint)], SignedTransfers, 
+				true, this.sniffer);
 
 			await this.TestKeyNegotiation();
 		}
 
 		[TestMethod]
-		public async Task Test_03_RSA()
+		[DataRow(false)]
+		[DataRow(true)]
+		public async Task Test_03_KeyNegotiation_RSA(bool SignedTransfers)
 		{
 			this.clientProtocol = new BinaryE2eeProtocol(this.client, true,
-				128, 128, 256, [typeof(RsaEndpoint)], false, true, this.sniffer);
+				128, 128, 256, [typeof(RsaEndpoint)], SignedTransfers, true, this.sniffer);
 
 			await this.TestKeyNegotiation();
 		}
 
 		[TestMethod]
-		public async Task Test_04_Any()
+		[DataRow(false)]
+		[DataRow(true)]
+		public async Task Test_04_KeyNegotiation_Any(bool SignedTransfers)
 		{
 			this.clientProtocol = new BinaryE2eeProtocol(this.client, true,
-				128, 128, 256, false, true, this.sniffer);
+				128, 128, 256, SignedTransfers, true, this.sniffer);
 
 			await this.TestKeyNegotiation();
 		}
-
-		// TODO: Signed transfers
 	}
 }

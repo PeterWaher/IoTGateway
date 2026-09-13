@@ -551,18 +551,52 @@ namespace Waher.Networking.E2ee
 		/// <returns>If data was sent.</returns>
 		public async Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet)
 		{
+			if (!this.hasSymmetricKey)
+			{
+				this.Error("Keys not negotiated.");
+				return false;
+			}
+
 			byte[] Encrypted = this.EncryptPacket(Packet);
 
+			return await this.SendPacket(ConstantBuffer, Packet, Encrypted, null, null);
+		}
+
+		private async Task<bool> SendPacket(bool ConstantBuffer, byte[] Packet,
+			byte[] Encrypted, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		{
 			this.TransmitBinary(ConstantBuffer, Packet);
 
-			return await this.binaryTransport.SendAsync(true, Encrypted);
+			if (Callback is null)
+			{
+				if (!await this.binaryTransport.SendAsync(true, Encrypted))
+					return false;
+			}
+			else
+			{
+				if (!await this.binaryTransport.SendAsync(true, Encrypted, Callback, State))
+					return false;
+			}
+
+			BinaryDataWrittenEventHandler h = this.OnSent;
+			if (!(h is null))
+			{
+				try
+				{
+					await h(this, ConstantBuffer, Packet, 0, Packet.Length);
+				}
+				catch (Exception ex)
+				{
+					this.Exception(ex);
+					Log.Exception(ex);
+				}
+			}
+
+			return true;
 		}
 
 		private byte[] EncryptPacket(byte[] Packet)
 		{
-			if (!this.hasSymmetricKey)
-				throw new InvalidOperationException("Keys not negotiated.");
-
 			byte[] IV = this.selectedSymmetricCipher.GetIV(string.Empty, string.Empty,
 				this.idStr, this.remoteIdStr, this.sendCounter++);
 
@@ -585,11 +619,15 @@ namespace Waher.Networking.E2ee
 		/// <returns>If data was sent.</returns>
 		public async Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
+			if (!this.hasSymmetricKey)
+			{
+				this.Error("Keys not negotiated.");
+				return false;
+			}
+
 			byte[] Encrypted = this.EncryptPacket(Packet);
 
-			this.TransmitBinary(ConstantBuffer, Packet);
-
-			return await this.binaryTransport.SendAsync(true, Encrypted, Callback, State);
+			return await this.SendPacket(ConstantBuffer, Packet, Encrypted, Callback, State);
 		}
 
 		/// <summary>
@@ -603,12 +641,16 @@ namespace Waher.Networking.E2ee
 		/// <returns>If data was sent.</returns>
 		public async Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
+			if (!this.hasSymmetricKey)
+			{
+				this.Error("Keys not negotiated.");
+				return false;
+			}
+
 			byte[] Packet = GetPacket(Buffer, Offset, Count, ref ConstantBuffer);
 			byte[] Encrypted = this.EncryptPacket(Packet);
 
-			this.TransmitBinary(ConstantBuffer, Packet);
-
-			return await this.binaryTransport.SendAsync(true, Encrypted);
+			return await this.SendPacket(ConstantBuffer, Packet, Encrypted, null, null);
 		}
 
 		private static byte[] GetPacket(byte[] Buffer, int Offset, int Count,
@@ -636,12 +678,16 @@ namespace Waher.Networking.E2ee
 		/// <returns>If data was sent.</returns>
 		public async Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
+			if (!this.hasSymmetricKey)
+			{
+				this.Error("Keys not negotiated.");
+				return false;
+			}
+
 			byte[] Packet = GetPacket(Buffer, Offset, Count, ref ConstantBuffer);
 			byte[] Encrypted = this.EncryptPacket(Packet);
 
-			this.TransmitBinary(ConstantBuffer, Packet);
-
-			return await this.binaryTransport.SendAsync(true, Encrypted, Callback, State);
+			return await this.SendPacket(ConstantBuffer, Packet, Encrypted, Callback, State);
 		}
 
 		/// <summary>
@@ -660,12 +706,12 @@ namespace Waher.Networking.E2ee
 		/// <summary>
 		/// Event raised when a packet has been sent.
 		/// </summary>
-		public event BinaryDataWrittenEventHandler OnSent;  // TODO
+		public event BinaryDataWrittenEventHandler OnSent;
 
 		/// <summary>
 		/// Event received when binary data has been received.
 		/// </summary>
-		public event BinaryDataReadEventHandler OnReceived; // TODO
+		public event BinaryDataReadEventHandler OnReceived;
 
 		private async Task<bool> BinaryTransport_OnReceived(object Sender, bool ConstantBuffer,
 			byte[] Buffer, int Offset, int Count)
@@ -741,8 +787,10 @@ namespace Waher.Networking.E2ee
 										break;
 
 									case 5:
-										await this.ProcessEncryptedBlock(this.inputBlock);
-										this.inputState--;
+										if (await this.ProcessEncryptedBlock(this.inputBlock))
+											this.inputState--;
+										else
+											this.inputState = -1;
 										break;
 								}
 
@@ -951,8 +999,43 @@ namespace Waher.Networking.E2ee
 			return true;
 		}
 
-		private async Task ProcessEncryptedBlock(byte[] Data)
+		private async Task<bool> ProcessEncryptedBlock(byte[] Data)
 		{
+			if (!this.hasSymmetricKey)
+			{
+				this.Error("Keys not negotiated.");
+				return false;
+			}
+
+			byte[] IV = this.selectedSymmetricCipher.GetIV(string.Empty, string.Empty,
+				this.remoteIdStr, this.idStr, this.receiveCounter++);
+
+			byte[] AssociatedData = Hashes.ComputeSHA256Hash(IV);
+			
+			byte[] Decrypted = this.selectedSymmetricCipher.Decrypt(Data, 
+				this.symmetricKey, IV, AssociatedData);
+
+			if (Decrypted is null)
+			{
+				this.Error("Unable to decrypt block.");
+				return false;
+			}
+
+			BinaryDataReadEventHandler h = this.OnReceived;
+			if (!(h is null))
+			{
+				try
+				{
+					await h(this, true, Decrypted, 0, Decrypted.Length);
+				}
+				catch (Exception ex)
+				{
+					this.Exception(ex);
+					Log.Exception(ex);
+				}
+			}
+
+			return true;
 		}
 
 		/// <summary>

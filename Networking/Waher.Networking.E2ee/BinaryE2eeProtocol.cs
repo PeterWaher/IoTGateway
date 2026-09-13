@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
@@ -19,6 +20,7 @@ namespace Waher.Networking.E2ee
 	{
 		private static readonly Random rnd = new Random();
 
+		private readonly TaskCompletionSource<bool> greetingPerformed = new TaskCompletionSource<bool>();
 		private readonly TaskCompletionSource<bool> remoteKeysReceived = new TaskCompletionSource<bool>();
 		private readonly TaskCompletionSource<bool> ciphersSelected = new TaskCompletionSource<bool>();
 		private readonly IBinaryTransportLayer binaryTransport;
@@ -30,11 +32,21 @@ namespace Waher.Networking.E2ee
 		private Dictionary<string, IE2eEndpoint> remoteEndpoints;
 		private IE2eEndpoint selectedEndpoint;
 		private IE2eSymmetricCipher selectedSymmetricCipher;
+		private Guid id;
+		private Guid remoteId;
+		private string idStr;
+		private string remoteIdStr;
+		private string remoteTypeName;
+		private string remoteAssemblyName;
+		private string remoteImageVersion;
+		private uint sendCounter = 0;
+		private uint receiveCounter = 0;
 		private bool disposed = false;
 		private bool hasSymmetricKey;
 		private byte[] symmetricKey;
 		private byte[] inputBlock = null;
 		private int inputState = 0;
+		private int inputOffset = 0;
 		private int inputBlockLen = 0;
 		private int inputBlockPos;
 
@@ -125,12 +137,6 @@ namespace Waher.Networking.E2ee
 			bool SignedTransfers, bool DecoupledEvents, params ISniffer[] Sniffers)
 			: base(DecoupledEvents, Sniffers)
 		{
-			if (Endpoints.Length == 0)
-			{
-				throw new ArgumentException("No endpoints could be created with the " +
-					"specified security strength.", nameof(Endpoints));
-			}
-
 			if (SignedTransfers)
 			{
 				ChunkedList<IE2eEndpoint> Filtered = new ChunkedList<IE2eEndpoint>();
@@ -142,6 +148,12 @@ namespace Waher.Networking.E2ee
 				}
 
 				Endpoints = Filtered.ToArray();
+			}
+
+			if (Endpoints.Length == 0)
+			{
+				throw new ArgumentException("No endpoints could be created with the " +
+					"specified security requirements.", nameof(Endpoints));
 			}
 
 			this.endpoints = Endpoints;
@@ -159,6 +171,21 @@ namespace Waher.Networking.E2ee
 
 			this.binaryTransport.OnReceived += this.BinaryTransport_OnReceived;
 		}
+
+		/// <summary>
+		/// Remote type name of communication class, as reported by remote party.
+		/// </summary>
+		public string RemoteTypeName => this.remoteTypeName;
+
+		/// <summary>
+		/// Remote assembly name of communication class, as reported by remote party.
+		/// </summary>
+		public string RemoteAssemblyName => this.remoteAssemblyName;
+
+		/// <summary>
+		/// Remote image version of communication class, as reported by remote party.
+		/// </summary>
+		public string RemoteImageVersion => this.remoteImageVersion;
 
 		#region IDisposable
 
@@ -191,12 +218,20 @@ namespace Waher.Networking.E2ee
 
 			_ = Task.Delay(Timeout).ContinueWith(_ =>
 			{
+				this.greetingPerformed.TrySetException(new TimeoutException());
 				this.remoteKeysReceived.TrySetException(new TimeoutException());
 				this.ciphersSelected.TrySetException(new TimeoutException());
 			});
 
-			if (!this.initiator)
+			if (this.initiator)
 			{
+				if (!await this.greetingPerformed.Task)
+					return false;
+			}
+			else
+			{
+				await this.SendHello();
+
 				if (!await this.remoteKeysReceived.Task)
 					return false;
 			}
@@ -232,6 +267,161 @@ namespace Waher.Networking.E2ee
 		private static string Key(string LocalName, string Namespace)
 		{
 			return Namespace + "#" + LocalName;
+		}
+
+		private async Task<bool> SendHello()
+		{
+			BinaryOutput Output = new BinaryOutput();
+			StringBuilder sb = this.HasSniffers ? new StringBuilder() : null;
+			Type T = this.GetType();
+			Assembly A = T.Assembly;
+
+			Output.WriteString(T.FullName);
+			Output.WriteString(A.FullName);
+			Output.WriteString(A.ImageRuntimeVersion);
+
+			byte[] Hello = Output.ToArray();
+
+			Output = new BinaryOutput();
+			Output.WriteData(Hello);
+
+			byte[] Block = Output.ToArray();
+
+			if (!(sb is null))
+			{
+				sb.AppendLine(T.FullName);
+				sb.AppendLine(A.FullName);
+				sb.AppendLine(A.ImageRuntimeVersion);
+
+				this.TransmitText(sb.ToString());
+			}
+
+			bool Result = await this.binaryTransport.SendAsync(true, Block);
+
+			this.greetingPerformed.TrySetResult(Result);
+
+			return Result;
+		}
+
+		private async Task<bool> SendCiphers()
+		{
+			ICollection<IE2eEndpoint> Endpoints;
+			ICollection<IE2eSymmetricCipher> Ciphers;
+
+			if (this.remoteEndpoints is null)
+				Endpoints = this.endpoints;
+			else
+			{
+				ChunkedList<IE2eEndpoint> Filtered = new ChunkedList<IE2eEndpoint>();
+
+				foreach (IE2eEndpoint Endpoint in this.endpoints)
+				{
+					if (this.remoteEndpoints.ContainsKey(Key(Endpoint)))
+						Filtered.Add(Endpoint);
+				}
+
+				Endpoints = Filtered;
+			}
+
+			if (Endpoints.Count == 0)
+			{
+				if (this.remoteEndpoints is null)
+					this.Error("No endpoints available.");
+				else
+					this.Error("No endpoints in common with remote party.");
+
+				return false;
+			}
+
+			if (this.remoteSymmetricCiphers is null)
+				Ciphers = this.symmetricCiphers;
+			else
+			{
+				ChunkedList<IE2eSymmetricCipher> Filtered = new ChunkedList<IE2eSymmetricCipher>();
+
+				foreach (IE2eSymmetricCipher Cipher in this.symmetricCiphers)
+				{
+					if (this.remoteSymmetricCiphers.ContainsKey(Key(Cipher)))
+						Filtered.Add(Cipher);
+				}
+
+				Ciphers = Filtered;
+			}
+
+			if (Ciphers.Count == 0)
+			{
+				if (this.remoteEndpoints is null)
+					this.Error("No symmetric ciphers available.");
+				else
+					this.Error("No symmetric ciphers in common with remote party.");
+
+				return false;
+			}
+
+			BinaryOutput Output = new BinaryOutput();
+			StringBuilder sb = this.HasSniffers ? new StringBuilder() : null;
+
+			this.id = Guid.NewGuid();
+			this.idStr = this.id.ToString();
+
+			Output.WriteGuid(this.id);
+			Output.WriteVarLenUInt((uint)Endpoints.Count);
+			Output.WriteVarLenUInt((uint)Ciphers.Count);
+
+			foreach (IE2eEndpoint Endpoint in Endpoints)
+			{
+				Output.WriteString(Endpoint.LocalName);
+				Output.WriteString(Endpoint.Namespace);
+
+				if (!(sb is null))
+				{
+					sb.Append(Endpoint.Namespace);
+					sb.Append('#');
+					sb.AppendLine(Endpoint.LocalName);
+				}
+			}
+
+			foreach (IE2eSymmetricCipher Cipher in Ciphers)
+			{
+				Output.WriteString(Cipher.LocalName);
+				Output.WriteString(Cipher.Namespace);
+
+				if (!(sb is null))
+				{
+					sb.Append(Cipher.Namespace);
+					sb.Append('#');
+					sb.AppendLine(Cipher.LocalName);
+				}
+			}
+
+			if (this.initiator)
+			{
+				Type T = this.GetType();
+				Assembly A = T.Assembly;
+
+				Output.WriteString(T.FullName);
+				Output.WriteString(A.FullName);
+				Output.WriteString(A.ImageRuntimeVersion);
+
+				if (!(sb is null))
+				{
+					sb.AppendLine(T.FullName);
+					sb.AppendLine(A.FullName);
+					sb.AppendLine(A.ImageRuntimeVersion);
+				}
+			}
+
+			byte[] CipherInfo = Output.ToArray();
+
+			Output = new BinaryOutput();
+			Output.WriteData(CipherInfo);
+
+			byte[] Block = Output.ToArray();
+
+			if (!(sb is null))
+				this.TransmitText(sb.ToString());
+
+			return await this.binaryTransport.SendAsync(true, Block);
 		}
 
 		private async Task<bool> SelectCipher()
@@ -343,97 +533,11 @@ namespace Waher.Networking.E2ee
 
 			CipherSelection.WriteData(CipherText ?? Array.Empty<byte>());
 
-			bool Result = await this.SendAsync(true, CipherSelection.ToArray());
+			bool Result = await this.binaryTransport.SendAsync(true, CipherSelection.ToArray());
 
 			this.ciphersSelected.TrySetResult(Result);
 
 			return Result;
-		}
-
-		private async Task<bool> SendCiphers()
-		{
-			ICollection<IE2eEndpoint> Endpoints;
-			ICollection<IE2eSymmetricCipher> Ciphers;
-
-			if (this.remoteEndpoints is null)
-				Endpoints = this.endpoints;
-			else
-			{
-				ChunkedList<IE2eEndpoint> Filtered = new ChunkedList<IE2eEndpoint>();
-
-				foreach (IE2eEndpoint Endpoint in this.endpoints)
-				{
-					if (this.remoteEndpoints.ContainsKey(Key(Endpoint)))
-						Filtered.Add(Endpoint);
-				}
-
-				Endpoints = Filtered;
-			}
-
-			if (Endpoints.Count == 0)
-				return false;
-
-			if (this.remoteSymmetricCiphers is null)
-				Ciphers = this.symmetricCiphers;
-			else
-			{
-				ChunkedList<IE2eSymmetricCipher> Filtered = new ChunkedList<IE2eSymmetricCipher>();
-
-				foreach (IE2eSymmetricCipher Cipher in this.symmetricCiphers)
-				{
-					if (this.remoteSymmetricCiphers.ContainsKey(Key(Cipher)))
-						Filtered.Add(Cipher);
-				}
-
-				Ciphers = Filtered;
-			}
-
-			if (Ciphers.Count == 0)
-				return false;
-
-			BinaryOutput Output = new BinaryOutput();
-			StringBuilder sb = this.HasSniffers ? new StringBuilder() : null;
-
-			Output.WriteVarLenUInt((uint)Endpoints.Count);
-			Output.WriteVarLenUInt((uint)Ciphers.Count);
-
-			foreach (IE2eEndpoint Endpoint in Endpoints)
-			{
-				Output.WriteString(Endpoint.LocalName);
-				Output.WriteString(Endpoint.Namespace);
-
-				if (!(sb is null))
-				{
-					sb.Append(Endpoint.Namespace);
-					sb.Append('#');
-					sb.AppendLine(Endpoint.LocalName);
-				}
-			}
-
-			foreach (IE2eSymmetricCipher Cipher in Ciphers)
-			{
-				Output.WriteString(Cipher.LocalName);
-				Output.WriteString(Cipher.Namespace);
-
-				if (!(sb is null))
-				{
-					sb.Append(Cipher.Namespace);
-					sb.Append('#');
-					sb.AppendLine(Cipher.LocalName);
-				}
-			}
-
-			byte[] CipherInfo = Output.ToArray();
-
-			Output = new BinaryOutput();
-			Output.WriteData(CipherInfo);
-
-			byte[] Block = Output.ToArray();
-
-			if (!(sb is null))
-				this.TransmitText(sb.ToString());
-
-			return await this.binaryTransport.SendAsync(true, Block);
 		}
 
 		#region IBinaryTransmission
@@ -445,12 +549,29 @@ namespace Waher.Networking.E2ee
 		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Packet">Binary packet.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet)
+		public async Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet)
+		{
+			byte[] Encrypted = this.EncryptPacket(Packet);
+
+			this.TransmitBinary(ConstantBuffer, Packet);
+
+			return await this.binaryTransport.SendAsync(true, Encrypted);
+		}
+
+		private byte[] EncryptPacket(byte[] Packet)
 		{
 			if (!this.hasSymmetricKey)
 				throw new InvalidOperationException("Keys not negotiated.");
 
-			throw new NotImplementedException();    // TODO
+			byte[] IV = this.selectedSymmetricCipher.GetIV(string.Empty, string.Empty,
+				this.idStr, this.remoteIdStr, this.sendCounter++);
+
+			byte[] AssociatedData = Hashes.ComputeSHA256Hash(IV);
+
+			byte[] Encrypted = this.selectedSymmetricCipher.Encrypt(Packet,
+				this.symmetricKey, IV, AssociatedData, E2eBufferFillAlgorithm.Random);
+
+			return Encrypted;
 		}
 
 		/// <summary>
@@ -462,12 +583,13 @@ namespace Waher.Networking.E2ee
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		public async Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
-			if (!this.hasSymmetricKey)
-				throw new InvalidOperationException("Keys not negotiated.");
+			byte[] Encrypted = this.EncryptPacket(Packet);
 
-			throw new NotImplementedException();    // TODO
+			this.TransmitBinary(ConstantBuffer, Packet);
+
+			return await this.binaryTransport.SendAsync(true, Encrypted, Callback, State);
 		}
 
 		/// <summary>
@@ -479,12 +601,26 @@ namespace Waher.Networking.E2ee
 		/// <param name="Offset">Start index of first byte written.</param>
 		/// <param name="Count">Number of bytes written.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
+		public async Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
-			if (!this.hasSymmetricKey)
-				throw new InvalidOperationException("Keys not negotiated.");
+			byte[] Packet = GetPacket(Buffer, Offset, Count, ref ConstantBuffer);
+			byte[] Encrypted = this.EncryptPacket(Packet);
 
-			throw new NotImplementedException();    // TODO
+			this.TransmitBinary(ConstantBuffer, Packet);
+
+			return await this.binaryTransport.SendAsync(true, Encrypted);
+		}
+
+		private static byte[] GetPacket(byte[] Buffer, int Offset, int Count,
+			ref bool ConstantBuffer)
+		{
+			if (Offset > 0 || Count < Buffer.Length)
+			{
+				ConstantBuffer = true;
+				return SnifferBase.CloneSection(Buffer, Offset, Count);
+			}
+			else
+				return Buffer;
 		}
 
 		/// <summary>
@@ -498,12 +634,14 @@ namespace Waher.Networking.E2ee
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		public async Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
-			if (!this.hasSymmetricKey)
-				throw new InvalidOperationException("Keys not negotiated.");
+			byte[] Packet = GetPacket(Buffer, Offset, Count, ref ConstantBuffer);
+			byte[] Encrypted = this.EncryptPacket(Packet);
 
-			throw new NotImplementedException();    // TODO
+			this.TransmitBinary(ConstantBuffer, Packet);
+
+			return await this.binaryTransport.SendAsync(true, Encrypted, Callback, State);
 		}
 
 		/// <summary>
@@ -512,10 +650,7 @@ namespace Waher.Networking.E2ee
 		/// <returns>If output has been flushed.</returns>
 		public Task<bool> FlushAsync()
 		{
-			if (!this.hasSymmetricKey)
-				throw new InvalidOperationException("Keys not negotiated.");
-
-			throw new NotImplementedException();    // TODO
+			return this.binaryTransport.FlushAsync();
 		}
 
 		#endregion
@@ -525,12 +660,12 @@ namespace Waher.Networking.E2ee
 		/// <summary>
 		/// Event raised when a packet has been sent.
 		/// </summary>
-		public event BinaryDataWrittenEventHandler OnSent;
+		public event BinaryDataWrittenEventHandler OnSent;  // TODO
 
 		/// <summary>
 		/// Event received when binary data has been received.
 		/// </summary>
-		public event BinaryDataReadEventHandler OnReceived;
+		public event BinaryDataReadEventHandler OnReceived; // TODO
 
 		private async Task<bool> BinaryTransport_OnReceived(object Sender, bool ConstantBuffer,
 			byte[] Buffer, int Offset, int Count)
@@ -547,11 +682,13 @@ namespace Waher.Networking.E2ee
 							byte b = Buffer[Offset++];
 							Count--;
 
-							this.inputBlockLen <<= 7;
-							this.inputBlockLen |= b & 0x7f;
+							this.inputBlockLen |= (b & 0x7f) << this.inputOffset;
+							this.inputOffset += 7;
+
 							if ((b & 0x80) == 0)
 							{
 								this.inputBlock = new byte[this.inputBlockLen];
+								this.inputOffset = 0;
 
 								if (this.inputBlockLen > 0)
 								{
@@ -568,34 +705,39 @@ namespace Waher.Networking.E2ee
 							System.Buffer.BlockCopy(Buffer, Offset, this.inputBlock, this.inputBlockPos, c);
 							Offset += c;
 							Count -= c;
+							this.inputBlockPos += c;
 
 							if (this.inputBlockLen == this.inputBlockPos)
 							{
 								switch (this.inputState)
 								{
 									case 1:
-										if (this.ProcessRemoteCiphers(this.inputBlock))
-										{
-											if (this.initiator)
-												this.inputState += 3;
-											else
-												this.inputState++;
-										}
+										bool Result;
+
+										if (this.initiator)
+											Result = this.ProcessHello(this.inputBlock);
+										else
+											Result = await this.ProcessRemoteCiphers(this.inputBlock);
+
+										if (Result)
+											this.inputState++;
 										else
 											this.inputState = -1;
 										break;
 
 									case 3:
-										if (this.CipherSelected(this.inputBlock))
-										{
-											this.ciphersSelected.TrySetResult(true);
-											this.inputState++;
-										}
+										if (this.initiator)
+											Result = await this.ProcessRemoteCiphers(this.inputBlock);
 										else
 										{
-											this.ciphersSelected.TrySetResult(false);
-											this.inputState = -1;
+											Result = this.CipherSelected(this.inputBlock);
+											this.ciphersSelected.TrySetResult(Result);
 										}
+
+										if (Result)
+											this.inputState++;
+										else
+											this.inputState = -1;
 										break;
 
 									case 5:
@@ -622,13 +764,40 @@ namespace Waher.Networking.E2ee
 			return true;
 		}
 
-		private bool ProcessRemoteCiphers(byte[] Data)
+		private bool ProcessHello(byte[] Data)
+		{
+			BinaryInput Input = new BinaryInput(Data);
+
+			this.remoteTypeName = Input.ReadString();
+			this.remoteAssemblyName = Input.ReadString();
+			this.remoteImageVersion = Input.ReadString();
+
+			if (this.HasSniffers)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.AppendLine(this.remoteTypeName);
+				sb.AppendLine(this.remoteAssemblyName);
+				sb.AppendLine(this.remoteImageVersion);
+
+				this.Information(sb.ToString());
+			}
+
+			this.greetingPerformed.TrySetResult(true);
+
+			return true;
+		}
+
+		private async Task<bool> ProcessRemoteCiphers(byte[] Data)
 		{
 			BinaryInput Input = new BinaryInput(Data);
 			StringBuilder sb = this.HasSniffers ? new StringBuilder() : null;
 
 			this.remoteEndpoints = new Dictionary<string, IE2eEndpoint>();
 			this.remoteSymmetricCiphers = new Dictionary<string, IE2eSymmetricCipher>();
+
+			this.remoteId = Input.ReadGuid();
+			this.remoteIdStr = this.remoteId.ToString();
 
 			string LocalName, Namespace;
 			int NrEndpoints = (int)Input.ReadVarLenUInt();
@@ -667,6 +836,22 @@ namespace Waher.Networking.E2ee
 					this.remoteSymmetricCiphers[Key(Cipher)] = Cipher;
 			}
 
+			if (!this.initiator)
+			{
+				this.remoteTypeName = Input.ReadString();
+				this.remoteAssemblyName = Input.ReadString();
+				this.remoteImageVersion = Input.ReadString();
+
+				if (!(sb is null))
+				{
+					sb.AppendLine(this.remoteTypeName);
+					sb.AppendLine(this.remoteAssemblyName);
+					sb.AppendLine(this.remoteImageVersion);
+
+					this.Information(sb.ToString());
+				}
+			}
+
 			if (!(sb is null))
 				this.ReceiveText(sb.ToString());
 
@@ -675,11 +860,36 @@ namespace Waher.Networking.E2ee
 
 			if (!Result)
 				this.Error("Missing algorithms.");
+			else
+			{
+				IE2eEndpoint[] RemoteEndpints = new IE2eEndpoint[this.remoteEndpoints.Count];
+				this.remoteEndpoints.Values.CopyTo(RemoteEndpints, 0);
+
+				IE2eSymmetricCipher[] RemoteCiphers = new IE2eSymmetricCipher[this.remoteSymmetricCiphers.Count];
+				this.remoteSymmetricCiphers.Values.CopyTo(RemoteCiphers, 0);
+
+				RemoteEndpointsEventArgs e = new RemoteEndpointsEventArgs(this.remoteId,
+					RemoteEndpints, RemoteCiphers);
+
+				await this.OnRemoteEndpoints.Raise(this, e);
+
+				if (!e.Valid)
+				{
+					this.Error("Remote endpoints not valid.");
+					Result = false;
+				}
+			}
 
 			this.remoteKeysReceived.TrySetResult(Result);
 
 			return Result;
 		}
+
+		/// <summary>
+		/// Event raised when the remote endpoints and symmetric ciphers have been
+		/// received. Provide an event handler to validate the remote endpoint.
+		/// </summary>
+		public event EventHandlerAsync<RemoteEndpointsEventArgs> OnRemoteEndpoints;
 
 		private bool CipherSelected(byte[] Data)
 		{
@@ -731,7 +941,7 @@ namespace Waher.Networking.E2ee
 			byte[] CipherText = Input.ReadData();
 
 			this.symmetricKey = Endpoint.GetSharedSecretForDecryption(Endpoint, CipherText);
-			
+
 			this.hasSymmetricKey = true;
 			this.selectedEndpoint = Endpoint;
 			this.selectedSymmetricCipher = Cipher;

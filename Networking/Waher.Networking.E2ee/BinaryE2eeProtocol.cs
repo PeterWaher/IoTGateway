@@ -25,8 +25,8 @@ namespace Waher.Networking.E2ee
 		private readonly TaskCompletionSource<bool> ciphersSelected = new TaskCompletionSource<bool>();
 		private readonly TaskCompletionSource<bool> goAhead = new TaskCompletionSource<bool>();
 		private readonly IBinaryTransportLayer binaryTransport;
-		private readonly IE2eSymmetricCipher[] symmetricCiphers;
-		private readonly IE2eEndpoint[] endpoints;
+		private readonly Dictionary<string, IE2eSymmetricCipher> localSymmetricCiphers;
+		private readonly Dictionary<string, IE2eEndpoint> localEndpoints;
 		private readonly bool initiator;
 		private readonly bool signedTransfers;
 		private Dictionary<string, IE2eSymmetricCipher> remoteSymmetricCiphers;
@@ -157,10 +157,16 @@ namespace Waher.Networking.E2ee
 					"specified security requirements.", nameof(Endpoints));
 			}
 
-			this.endpoints = Endpoints;
+			this.localEndpoints = new Dictionary<string, IE2eEndpoint>();
+			this.localSymmetricCiphers = new Dictionary<string, IE2eSymmetricCipher>();
 
-			this.symmetricCiphers = SymmetricCiphers;
-			if (this.symmetricCiphers.Length == 0)
+			foreach (IE2eEndpoint Endpoint in Endpoints)
+				this.localEndpoints[Key(Endpoint)] = Endpoint;
+
+			foreach (IE2eSymmetricCipher Cipher in SymmetricCiphers)
+				this.localSymmetricCiphers[Key(Cipher)] = Cipher;
+
+			if (this.localSymmetricCiphers.Count == 0)
 			{
 				throw new ArgumentException("No symmetric ciphers available.",
 					nameof(SymmetricCiphers));
@@ -310,12 +316,12 @@ namespace Waher.Networking.E2ee
 			ICollection<IE2eSymmetricCipher> Ciphers;
 
 			if (this.remoteEndpoints is null)
-				Endpoints = this.endpoints;
+				Endpoints = this.localEndpoints.Values;
 			else
 			{
 				ChunkedList<IE2eEndpoint> Filtered = new ChunkedList<IE2eEndpoint>();
 
-				foreach (IE2eEndpoint Endpoint in this.endpoints)
+				foreach (IE2eEndpoint Endpoint in this.localEndpoints.Values)
 				{
 					if (this.remoteEndpoints.TryGetValue(Key(Endpoint),
 						out IE2eEndpoint RemoteEndpoint) &&
@@ -333,18 +339,21 @@ namespace Waher.Networking.E2ee
 				if (this.remoteEndpoints is null)
 					this.Error("No endpoints available.");
 				else
+				{
 					this.Error("No endpoints in common with remote party.");
+					await this.SendBlock(Array.Empty<byte>());
+				}
 
 				return false;
 			}
 
 			if (this.remoteSymmetricCiphers is null)
-				Ciphers = this.symmetricCiphers;
+				Ciphers = this.localSymmetricCiphers.Values;
 			else
 			{
 				ChunkedList<IE2eSymmetricCipher> Filtered = new ChunkedList<IE2eSymmetricCipher>();
 
-				foreach (IE2eSymmetricCipher Cipher in this.symmetricCiphers)
+				foreach (IE2eSymmetricCipher Cipher in this.localSymmetricCiphers.Values)
 				{
 					if (this.remoteSymmetricCiphers.ContainsKey(Key(Cipher)))
 						Filtered.Add(Cipher);
@@ -379,12 +388,16 @@ namespace Waher.Networking.E2ee
 			{
 				Output.WriteString(Endpoint.LocalName);
 				Output.WriteString(Endpoint.Namespace);
+				Output.WriteData(Endpoint.PublicKey);
 
 				if (!(sb is null))
 				{
 					sb.Append(Endpoint.Namespace);
 					sb.Append('#');
-					sb.AppendLine(Endpoint.LocalName);
+					sb.Append(Endpoint.LocalName);
+					sb.Append(" (");
+					sb.Append(Endpoint.PublicKey.Length.ToString());
+					sb.AppendLine(" byte public key)");
 				}
 			}
 
@@ -440,7 +453,7 @@ namespace Waher.Networking.E2ee
 			IE2eEndpoint BestEndpoint = null;
 			IE2eEndpoint BestRemoteEndpoint = null;
 
-			foreach (IE2eEndpoint Endpoint in this.endpoints)
+			foreach (IE2eEndpoint Endpoint in this.localEndpoints.Values)
 			{
 				if (!this.remoteEndpoints.TryGetValue(Key(Endpoint), out IE2eEndpoint RemoteEndpoint))
 					continue;
@@ -511,7 +524,7 @@ namespace Waher.Networking.E2ee
 			ChunkedList<IE2eSymmetricCipher> CommonCiphers = new ChunkedList<IE2eSymmetricCipher>();
 			IE2eSymmetricCipher SelectedCipher = null;
 
-			foreach (IE2eSymmetricCipher Cipher in this.symmetricCiphers)
+			foreach (IE2eSymmetricCipher Cipher in this.localSymmetricCiphers.Values)
 			{
 				if (this.remoteSymmetricCiphers.ContainsKey(Key(Cipher)))
 					CommonCiphers.Add(Cipher);
@@ -767,13 +780,26 @@ namespace Waher.Networking.E2ee
 									this.inputBlockPos = 0;
 									this.inputState++;
 								}
-								else if (this.inputState == 4)
+								else
 								{
-									if (this.HasSniffers)
-										this.ReceiveText("Go ahead.");
+									switch (this.inputState)
+									{
+										case 2:
+											this.Error("No remote ciphers.");
+											this.remoteKeysReceived.TrySetResult(false);
+											this.ciphersSelected.TrySetResult(false);
+											this.goAhead.TrySetResult(false);
+											this.inputState = -1;
+											break;
 
-									this.goAhead.TrySetResult(true);
-									this.inputState += 2;
+										case 4:
+											if (this.HasSniffers)
+												this.ReceiveText("Go ahead.");
+
+											this.goAhead.TrySetResult(true);
+											this.inputState += 2;
+											break;
+									}
 								}
 							}
 							break;
@@ -898,6 +924,7 @@ namespace Waher.Networking.E2ee
 			sb?.AppendLine(this.remoteIdStr);
 
 			string LocalName, Namespace;
+			byte[] PublicKey;
 			int NrEndpoints = (int)Input.ReadVarLenUInt();
 			int NrSymmetricCiphers = (int)Input.ReadVarLenUInt();
 			int i;
@@ -906,16 +933,20 @@ namespace Waher.Networking.E2ee
 			{
 				LocalName = Input.ReadString();
 				Namespace = Input.ReadString();
+				PublicKey = Input.ReadData();
 
 				if (!(sb is null))
 				{
 					sb.Append(Namespace);
 					sb.Append('#');
-					sb.AppendLine(LocalName);
+					sb.Append(LocalName);
+					sb.Append(" (");
+					sb.Append(PublicKey.Length.ToString());
+					sb.AppendLine(" bytes public key)");
 				}
 
 				if (E2eEndpoint.TryCreateEndpoint(LocalName, Namespace, out IE2eEndpoint Endpoint))
-					this.remoteEndpoints[Key(Endpoint)] = Endpoint;
+					this.remoteEndpoints[Key(Endpoint)] = Endpoint.CreatePublic(PublicKey);
 			}
 
 			for (i = 0; i < NrSymmetricCiphers; i++)
@@ -1015,20 +1046,9 @@ namespace Waher.Networking.E2ee
 			if (CipherText.Length == 0)
 				CipherText = null;
 
-			IE2eEndpoint LocalEndpoint = null;
-
-			foreach (IE2eEndpoint Endpoint in this.endpoints)
-			{
-				if (Endpoint.LocalName == LocalNameAsym &&
-					Endpoint.Namespace == NamespaceAsym &&
-					Endpoint.PublicKey.Length == PublicKeyAsym.Length)
-				{
-					LocalEndpoint = Endpoint;
-					break;
-				}
-			}
-
-			if (LocalEndpoint is null)
+			if (!this.localEndpoints.TryGetValue(Key(LocalNameAsym, NamespaceAsym),
+				out IE2eEndpoint LocalEndpoint) ||
+				LocalEndpoint.PublicKey.Length != PublicKeyAsym.Length)
 			{
 				if (this.HasSniffers)
 				{
@@ -1046,26 +1066,15 @@ namespace Waher.Networking.E2ee
 				if (this.HasSniffers)
 				{
 					this.Error("Unable to select asymmetric cipher: " +
-						Key(LocalNameAsym, NamespaceAsym) + ": " + 
+						Key(LocalNameAsym, NamespaceAsym) + ": " +
 						Convert.ToBase64String(PublicKeyAsym));
 				}
 
 				return false;
 			}
 
-			IE2eSymmetricCipher LocalCipher = null;
-
-			foreach (IE2eSymmetricCipher Cipher in this.symmetricCiphers)
-			{
-				if (Cipher.LocalName == LocalNameSym &&
-					Cipher.Namespace == NamespaceSym)
-				{
-					LocalCipher = Cipher;
-					break;
-				}
-			}
-
-			if (LocalCipher is null)
+			if (!this.localSymmetricCiphers.TryGetValue(Key(LocalNameSym, NamespaceSym),
+				out IE2eSymmetricCipher LocalCipher))
 			{
 				if (this.HasSniffers)
 				{

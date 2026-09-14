@@ -16,6 +16,7 @@ namespace Waher.Networking.Test
 	{
 		private static BinaryTcpServer? server;
 		private static XmlFileSniffer? serverSniffer;
+		private static Random rnd = new Random();
 		private XmlFileSniffer? clientSniffer;
 		private BinaryTcpClient? client;
 		private BinaryE2eeProtocol? clientProtocol;
@@ -45,7 +46,7 @@ namespace Waher.Networking.Test
 			{
 				BinaryE2eeProtocol Protocol = new(e.Client, false, 128, 128, 256,
 					[
-						typeof(EllipticCurveEndpoint), 
+						typeof(EllipticCurveEndpoint),
 						typeof(ModuleLatticeEndpoint),
 						typeof(RsaEndpoint)
 					], false, true);
@@ -53,7 +54,7 @@ namespace Waher.Networking.Test
 				if (serverSniffer is not null)
 					Protocol.Add(serverSniffer);
 
-				Protocol.OnReceived += async (object Sender, bool ConstantBuffer, 
+				Protocol.OnReceived += async (object Sender, bool ConstantBuffer,
 					byte[] Buffer, int Offset, int Count) =>
 				{
 					byte[] Data = SnifferBase.CloneSection(Buffer, Offset, Count);
@@ -234,10 +235,10 @@ namespace Waher.Networking.Test
 		public async Task Test_05_SendReceive_EllipticCurves(bool SignedTransfers)
 		{
 			await this.Test_01_KeyNegotiation_EllipticCurves(SignedTransfers);
-			await this.TestSendReceive();
+			await this.TestSendReceiveBlock(256);
 		}
 
-		private async Task TestSendReceive()
+		private async Task TestSendReceiveBlock(int Length)
 		{
 			TaskCompletionSource<byte[]> Packet = new TaskCompletionSource<byte[]>();
 
@@ -250,22 +251,22 @@ namespace Waher.Networking.Test
 				return Task.FromResult(true);
 			};
 
-			_ = Task.Delay(10000).ContinueWith(_ => 
+			_ = Task.Delay(10000).ContinueWith(_ =>
 				Packet.TrySetException(new TimeoutException()));
 
-			byte[] Data = new byte[256];
+			byte[] Data = new byte[Length];
 			int i;
 
-			for (i = 0; i < 256; i++)
+			for (i = 0; i < Length; i++)
 				Data[i] = (byte)i;
 
 			Assert.IsTrue(await this.clientProtocol.SendAsync(true, Data));
 
 			Data = await Packet.Task;
-			Assert.AreEqual(256, Data.Length);
+			Assert.AreEqual(Length, Data.Length);
 
-			for (i = 0; i < 256; i++)
-				Assert.AreEqual((byte)(255 - i), Data[i]);
+			for (i = 0; i < Length; i++)
+				Assert.AreEqual((byte)(Length - i - 1), Data[i]);
 		}
 
 		[TestMethod]
@@ -274,7 +275,7 @@ namespace Waher.Networking.Test
 		public async Task Test_06_SendReceive_ModuleLattice(bool SignedTransfers)
 		{
 			await this.Test_02_KeyNegotiation_ModuleLattice(SignedTransfers);
-			await this.TestSendReceive();
+			await this.TestSendReceiveBlock(256);
 		}
 
 		[TestMethod]
@@ -283,7 +284,7 @@ namespace Waher.Networking.Test
 		public async Task Test_07_SendReceive_RSA(bool SignedTransfers)
 		{
 			await this.Test_03_KeyNegotiation_RSA(SignedTransfers);
-			await this.TestSendReceive();
+			await this.TestSendReceiveBlock(256);
 		}
 
 		[TestMethod]
@@ -292,7 +293,43 @@ namespace Waher.Networking.Test
 		public async Task Test_08_SendReceive_Any(bool SignedTransfers)
 		{
 			await this.Test_04_KeyNegotiation_Any(SignedTransfers);
-			await this.TestSendReceive();
+			await this.TestSendReceiveBlock(256);
+		}
+
+		[TestMethod]
+		[DataRow(false)]
+		[DataRow(true)]
+		public async Task Test_09_SendReceiveRandom_EllipticCurves(bool SignedTransfers)
+		{
+			await this.Test_01_KeyNegotiation_EllipticCurves(SignedTransfers);
+			await this.TestSendReceiveBlock(rnd.Next(1, 100000));
+		}
+
+		[TestMethod]
+		[DataRow(false)]
+		[DataRow(true)]
+		public async Task Test_10_SendReceiveRandom_ModuleLattice(bool SignedTransfers)
+		{
+			await this.Test_02_KeyNegotiation_ModuleLattice(SignedTransfers);
+			await this.TestSendReceiveBlock(rnd.Next(1, 100000));
+		}
+
+		[TestMethod]
+		[DataRow(false)]
+		[DataRow(true)]
+		public async Task Test_11_SendReceiveRandom_RSA(bool SignedTransfers)
+		{
+			await this.Test_03_KeyNegotiation_RSA(SignedTransfers);
+			await this.TestSendReceiveBlock(rnd.Next(1, 100000));
+		}
+
+		[TestMethod]
+		[DataRow(false)]
+		[DataRow(true)]
+		public async Task Test_12_SendReceiveRandom_Any(bool SignedTransfers)
+		{
+			await this.Test_04_KeyNegotiation_Any(SignedTransfers);
+			await this.TestSendReceiveBlock(rnd.Next(1, 100000));
 		}
 	}
 }

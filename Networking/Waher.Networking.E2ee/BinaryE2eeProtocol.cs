@@ -303,7 +303,7 @@ namespace Waher.Networking.E2ee
 				this.TransmitText(sb.ToString());
 			}
 
-			bool Result = await this.SendBlock(Output.ToArray());
+			bool Result = await this.SendBlock(Output.ToArray(), null, null);
 
 			this.greetingPerformed.TrySetResult(Result);
 
@@ -341,7 +341,7 @@ namespace Waher.Networking.E2ee
 				else
 				{
 					this.Error("No endpoints in common with remote party.");
-					await this.SendBlock(Array.Empty<byte>());
+					await this.SendBlock(Array.Empty<byte>(), null, null);
 				}
 
 				return false;
@@ -434,15 +434,16 @@ namespace Waher.Networking.E2ee
 			if (!(sb is null))
 				this.TransmitText(sb.ToString());
 
-			return await this.SendBlock(Output.ToArray());
+			return await this.SendBlock(Output.ToArray(), null, null);
 		}
 
-		private Task<bool> SendBlock(byte[] Block)
+		private Task<bool> SendBlock(byte[] Block, 
+			EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			BinaryOutput Output = new BinaryOutput();
 			Output.WriteData(Block);
 
-			return this.binaryTransport.SendAsync(true, Output.ToArray());
+			return this.binaryTransport.SendAsync(true, Output.ToArray(), Callback, State);
 		}
 
 		private async Task<bool> SelectCipher()
@@ -571,7 +572,7 @@ namespace Waher.Networking.E2ee
 				this.TransmitText(sb.ToString());
 			}
 
-			bool Result = await this.SendBlock(CipherSelection.ToArray());
+			bool Result = await this.SendBlock(CipherSelection.ToArray(), null, null);
 
 			this.ciphersSelected.TrySetResult(Result);
 
@@ -597,24 +598,16 @@ namespace Waher.Networking.E2ee
 
 			byte[] Encrypted = this.EncryptPacket(Packet);
 
-			return await this.SendPacket(ConstantBuffer, Packet, Encrypted, null, null);
+			return await this.SendEncryptedBlock(ConstantBuffer, Packet, Encrypted, null, null);
 		}
 
-		private async Task<bool> SendPacket(bool ConstantBuffer, byte[] Packet,
+		private async Task<bool> SendEncryptedBlock(bool ConstantBuffer, byte[] Packet,
 			byte[] Encrypted, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			this.TransmitBinary(ConstantBuffer, Packet);
 
-			if (Callback is null)
-			{
-				if (!await this.binaryTransport.SendAsync(true, Encrypted))
-					return false;
-			}
-			else
-			{
-				if (!await this.binaryTransport.SendAsync(true, Encrypted, Callback, State))
-					return false;
-			}
+			if (!await this.SendBlock(Encrypted, Callback, State))
+				return false;
 
 			BinaryDataWrittenEventHandler h = this.OnSent;
 			if (!(h is null))
@@ -665,7 +658,7 @@ namespace Waher.Networking.E2ee
 
 			byte[] Encrypted = this.EncryptPacket(Packet);
 
-			return await this.SendPacket(ConstantBuffer, Packet, Encrypted, Callback, State);
+			return await this.SendEncryptedBlock(ConstantBuffer, Packet, Encrypted, Callback, State);
 		}
 
 		/// <summary>
@@ -688,7 +681,7 @@ namespace Waher.Networking.E2ee
 			byte[] Packet = GetPacket(Buffer, Offset, Count, ref ConstantBuffer);
 			byte[] Encrypted = this.EncryptPacket(Packet);
 
-			return await this.SendPacket(ConstantBuffer, Packet, Encrypted, null, null);
+			return await this.SendEncryptedBlock(ConstantBuffer, Packet, Encrypted, null, null);
 		}
 
 		private static byte[] GetPacket(byte[] Buffer, int Offset, int Count,
@@ -725,7 +718,7 @@ namespace Waher.Networking.E2ee
 			byte[] Packet = GetPacket(Buffer, Offset, Count, ref ConstantBuffer);
 			byte[] Encrypted = this.EncryptPacket(Packet);
 
-			return await this.SendPacket(ConstantBuffer, Packet, Encrypted, Callback, State);
+			return await this.SendEncryptedBlock(ConstantBuffer, Packet, Encrypted, Callback, State);
 		}
 
 		/// <summary>
@@ -1005,6 +998,11 @@ namespace Waher.Networking.E2ee
 					this.Error("Remote endpoints not valid.");
 					Result = false;
 				}
+				else if (this.disposed)
+				{
+					this.Error("Protocol disposed.");
+					Result = false;
+				}
 			}
 
 			this.remoteKeysReceived.TrySetResult(Result);
@@ -1107,7 +1105,7 @@ namespace Waher.Networking.E2ee
 			if (this.HasSniffers)
 				this.TransmitText("Go ahead.");
 
-			return await this.SendBlock(Array.Empty<byte>());
+			return await this.SendBlock(Array.Empty<byte>(), null, null);
 		}
 
 		private async Task<bool> ProcessEncryptedBlock(byte[] Data)

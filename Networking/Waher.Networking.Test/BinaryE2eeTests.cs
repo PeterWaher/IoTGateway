@@ -53,6 +53,17 @@ namespace Waher.Networking.Test
 				if (serverSniffer is not null)
 					Protocol.Add(serverSniffer);
 
+				Protocol.OnReceived += async (object Sender, bool ConstantBuffer, 
+					byte[] Buffer, int Offset, int Count) =>
+				{
+					byte[] Data = SnifferBase.CloneSection(Buffer, Offset, Count);
+					Array.Reverse(Data);
+
+					await Protocol.SendAsync(true, Data);
+
+					return true;
+				};
+
 				Task.Run(async () =>
 				{
 					bool Result;
@@ -215,6 +226,73 @@ namespace Waher.Networking.Test
 				128, 128, 256, SignedTransfers, true, this.clientSniffer);
 
 			await this.TestKeyNegotiation();
+		}
+
+		[TestMethod]
+		[DataRow(false)]
+		[DataRow(true)]
+		public async Task Test_05_SendReceive_EllipticCurves(bool SignedTransfers)
+		{
+			await this.Test_01_KeyNegotiation_EllipticCurves(SignedTransfers);
+			await this.TestSendReceive();
+		}
+
+		private async Task TestSendReceive()
+		{
+			TaskCompletionSource<byte[]> Packet = new TaskCompletionSource<byte[]>();
+
+			this.clientProtocol!.OnReceived += (object Sender, bool ConstantBuffer,
+				byte[] Buffer, int Offset, int Count) =>
+			{
+				byte[] Data = SnifferBase.CloneSection(Buffer, Offset, Count);
+				Packet.TrySetResult(Data);
+
+				return Task.FromResult(true);
+			};
+
+			_ = Task.Delay(10000).ContinueWith(_ => 
+				Packet.TrySetException(new TimeoutException()));
+
+			byte[] Data = new byte[256];
+			int i;
+
+			for (i = 0; i < 256; i++)
+				Data[i] = (byte)i;
+
+			Assert.IsTrue(await this.clientProtocol.SendAsync(true, Data));
+
+			Data = await Packet.Task;
+			Assert.AreEqual(256, Data.Length);
+
+			for (i = 0; i < 256; i++)
+				Assert.AreEqual((byte)(255 - i), Data[i]);
+		}
+
+		[TestMethod]
+		[DataRow(false)]
+		[DataRow(true)]
+		public async Task Test_06_SendReceive_ModuleLattice(bool SignedTransfers)
+		{
+			await this.Test_02_KeyNegotiation_ModuleLattice(SignedTransfers);
+			await this.TestSendReceive();
+		}
+
+		[TestMethod]
+		[DataRow(false)]
+		[DataRow(true)]
+		public async Task Test_07_SendReceive_RSA(bool SignedTransfers)
+		{
+			await this.Test_03_KeyNegotiation_RSA(SignedTransfers);
+			await this.TestSendReceive();
+		}
+
+		[TestMethod]
+		[DataRow(false)]
+		[DataRow(true)]
+		public async Task Test_08_SendReceive_Any(bool SignedTransfers)
+		{
+			await this.Test_04_KeyNegotiation_Any(SignedTransfers);
+			await this.TestSendReceive();
 		}
 	}
 }

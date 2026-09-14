@@ -1,4 +1,5 @@
-﻿using Waher.Networking.E2ee;
+﻿using Waher.Events;
+using Waher.Networking.E2ee;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
 using Waher.Security;
@@ -13,14 +14,16 @@ namespace Waher.Networking.Test
 	[DoNotParallelize]
 	public sealed class BinaryE2eeTests
 	{
-		private ConsoleOutSniffer? sniffer;
-		private BinaryTcpServer? server;
+		private static BinaryTcpServer? server;
+		private static XmlFileSniffer? serverSniffer;
+		private XmlFileSniffer? clientSniffer;
 		private BinaryTcpClient? client;
 		private BinaryE2eeProtocol? clientProtocol;
-		private BinaryE2eeProtocol? serverProtocol;
+
+		public TestContext TestContext { get; set; }
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(
 				typeof(IE2eEndpoint).Assembly,
@@ -30,25 +33,91 @@ namespace Waher.Networking.Test
 				typeof(ChaCha20).Assembly);
 		}
 
+		[ClassInitialize]
+		public static async Task ClassInitialize(TestContext _)
+		{
+			if (Directory.Exists("Sniffers\\E2EE"))
+				Directory.Delete("Sniffers\\E2EE", true);
+
+			server = new BinaryTcpServer(true, 8081, TimeSpan.FromSeconds(10), false);
+
+			server.OnClientConnected += (_, e) =>
+			{
+				BinaryE2eeProtocol Protocol = new(e.Client, false, 128, 128, 256,
+					[
+						typeof(EllipticCurveEndpoint), 
+						typeof(ModuleLatticeEndpoint),
+						typeof(RsaEndpoint)
+					], false, true);
+
+				if (serverSniffer is not null)
+					Protocol.Add(serverSniffer);
+
+				Task.Run(async () =>
+				{
+					bool Result;
+
+					try
+					{
+						Result = await Protocol.NegotiateKeys(10000);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+						Result = false;
+					}
+
+					if (!Result)
+					{
+						try
+						{
+							await e.Client.DisposeAsync();
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
+					}
+				});
+
+				return Task.CompletedTask;
+			};
+
+			await server.Open();
+		}
+
+		[ClassCleanup(ClassCleanupBehavior.EndOfClass)]
+		public static void ClassCleanup()
+		{
+			if (server is not null)
+			{
+				server.Dispose();
+				server = null;
+			}
+		}
+
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
-			this.sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine);
-			this.server = new BinaryTcpServer(true, 8081, TimeSpan.FromSeconds(10), false);
+			this.clientSniffer = new XmlFileSniffer(
+				"Sniffers\\E2EE\\" + this.TestContext.TestName + "\\Client.xml",
+				"..\\..\\..\\..\\..\\Waher.IoTGateway.Resources\\Transforms\\SnifferXmlToHtml.xslt",
+				7, BinaryPresentationMethod.Hexadecimal);
+
+			serverSniffer = new XmlFileSniffer(
+				"Sniffers\\E2EE\\" + this.TestContext.TestName + "\\Server.xml",
+				"..\\..\\..\\..\\..\\Waher.IoTGateway.Resources\\Transforms\\SnifferXmlToHtml.xslt",
+				7, BinaryPresentationMethod.Hexadecimal);
+
 			this.client = new BinaryTcpClient(true);
 			this.clientProtocol = null;
-			this.serverProtocol = null;
 
-			this.server.OnClientConnected += (_, e) =>
-			{
-				this.serverProtocol = new BinaryE2eeProtocol(e.Client, false,
-					128, 128, 256, false, true);
+			this.clientSniffer.DisableMask();
+			serverSniffer.DisableMask();
 
-				return this.serverProtocol.NegotiateKeys(10000);
-			};
-
-			await this.server.Open();
-			Assert.IsTrue(await this.client.ConnectAsync("localhost", 8081));
+			this.clientSniffer.Information("Connecting to server...");
+			Assert.IsTrue(await this.client.ConnectAsync("localhost", 8081, true));
+			this.clientSniffer.Information("Connection to server established...");
 		}
 
 		[TestCleanup]
@@ -68,24 +137,18 @@ namespace Waher.Networking.Test
 				this.client = null;
 			}
 
-			if (this.sniffer is not null)
+			if (this.clientSniffer is not null)
 			{
-				await this.sniffer.FlushAsync();
-				await this.sniffer.DisposeAsync();
-				this.sniffer = null;
+				await this.clientSniffer.FlushAsync();
+				await this.clientSniffer.DisposeAsync();
+				this.clientSniffer = null;
 			}
 
-			if (this.serverProtocol is not null)
+			if (serverSniffer is not null)
 			{
-				await this.serverProtocol.FlushAsync();
-				this.serverProtocol.Dispose();
-				this.serverProtocol = null;
-			}
-
-			if (this.server is not null)
-			{
-				this.server.Dispose();
-				this.server = null;
+				await serverSniffer.FlushAsync();
+				await serverSniffer.DisposeAsync();
+				serverSniffer = null;
 			}
 		}
 
@@ -95,8 +158,8 @@ namespace Waher.Networking.Test
 		public async Task Test_01_KeyNegotiation_EllipticCurves(bool SignedTransfers)
 		{
 			this.clientProtocol = new BinaryE2eeProtocol(this.client, true,
-				128, 128, 256, [typeof(EllipticCurveEndpoint)], SignedTransfers, 
-				true, this.sniffer);
+				128, 128, 256, [typeof(EllipticCurveEndpoint)], SignedTransfers,
+				true, this.clientSniffer);
 
 			await this.TestKeyNegotiation();
 		}
@@ -105,11 +168,15 @@ namespace Waher.Networking.Test
 		{
 			this.clientProtocol!.OnRemoteEndpoints += (_, e) =>
 			{
-				this.sniffer?.Information("Remote endpoints received.");
+				this.clientSniffer?.Information("Remote endpoints received.");
 				return Task.CompletedTask;
 			};
 
+			this.clientProtocol.Information("Negotiating keys...");
+
 			Assert.IsTrue(await this.clientProtocol.NegotiateKeys(10000));
+
+			this.clientProtocol.Information("Keys negotiated...");
 
 			Assert.IsFalse(string.IsNullOrEmpty(this.clientProtocol.RemoteTypeName));
 			Assert.IsFalse(string.IsNullOrEmpty(this.clientProtocol.RemoteAssemblyName));
@@ -122,8 +189,8 @@ namespace Waher.Networking.Test
 		public async Task Test_02_KeyNegotiation_ModuleLattice(bool SignedTransfers)
 		{
 			this.clientProtocol = new BinaryE2eeProtocol(this.client, true,
-				128, 128, 256, [typeof(ModuleLatticeEndpoint)], SignedTransfers, 
-				true, this.sniffer);
+				128, 128, 256, [typeof(ModuleLatticeEndpoint)], SignedTransfers,
+				true, this.clientSniffer);
 
 			await this.TestKeyNegotiation();
 		}
@@ -134,7 +201,7 @@ namespace Waher.Networking.Test
 		public async Task Test_03_KeyNegotiation_RSA(bool SignedTransfers)
 		{
 			this.clientProtocol = new BinaryE2eeProtocol(this.client, true,
-				128, 128, 256, [typeof(RsaEndpoint)], SignedTransfers, true, this.sniffer);
+				128, 128, 256, [typeof(RsaEndpoint)], SignedTransfers, true, this.clientSniffer);
 
 			await this.TestKeyNegotiation();
 		}
@@ -145,7 +212,7 @@ namespace Waher.Networking.Test
 		public async Task Test_04_KeyNegotiation_Any(bool SignedTransfers)
 		{
 			this.clientProtocol = new BinaryE2eeProtocol(this.client, true,
-				128, 128, 256, SignedTransfers, true, this.sniffer);
+				128, 128, 256, SignedTransfers, true, this.clientSniffer);
 
 			await this.TestKeyNegotiation();
 		}

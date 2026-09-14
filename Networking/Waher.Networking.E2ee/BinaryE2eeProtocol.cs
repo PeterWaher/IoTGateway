@@ -23,6 +23,7 @@ namespace Waher.Networking.E2ee
 		private readonly TaskCompletionSource<bool> greetingPerformed = new TaskCompletionSource<bool>();
 		private readonly TaskCompletionSource<bool> remoteKeysReceived = new TaskCompletionSource<bool>();
 		private readonly TaskCompletionSource<bool> ciphersSelected = new TaskCompletionSource<bool>();
+		private readonly TaskCompletionSource<bool> goAhead = new TaskCompletionSource<bool>();
 		private readonly IBinaryTransportLayer binaryTransport;
 		private readonly IE2eSymmetricCipher[] symmetricCiphers;
 		private readonly IE2eEndpoint[] endpoints;
@@ -170,6 +171,9 @@ namespace Waher.Networking.E2ee
 			this.signedTransfers = SignedTransfers;
 
 			this.binaryTransport.OnReceived += this.BinaryTransport_OnReceived;
+
+			if (this.binaryTransport.Paused)
+				this.binaryTransport.Continue();
 		}
 
 		/// <summary>
@@ -221,6 +225,7 @@ namespace Waher.Networking.E2ee
 				this.greetingPerformed.TrySetException(new TimeoutException());
 				this.remoteKeysReceived.TrySetException(new TimeoutException());
 				this.ciphersSelected.TrySetException(new TimeoutException());
+				this.goAhead.TrySetException(new TimeoutException());
 			});
 
 			if (this.initiator)
@@ -249,6 +254,9 @@ namespace Waher.Networking.E2ee
 			}
 
 			if (!await this.ciphersSelected.Task)
+				return false;
+
+			if (!await this.goAhead.Task)
 				return false;
 
 			return true;
@@ -280,13 +288,6 @@ namespace Waher.Networking.E2ee
 			Output.WriteString(A.FullName);
 			Output.WriteString(A.ImageRuntimeVersion);
 
-			byte[] Hello = Output.ToArray();
-
-			Output = new BinaryOutput();
-			Output.WriteData(Hello);
-
-			byte[] Block = Output.ToArray();
-
 			if (!(sb is null))
 			{
 				sb.AppendLine(T.FullName);
@@ -296,7 +297,7 @@ namespace Waher.Networking.E2ee
 				this.TransmitText(sb.ToString());
 			}
 
-			bool Result = await this.binaryTransport.SendAsync(true, Block);
+			bool Result = await this.SendBlock(Output.ToArray());
 
 			this.greetingPerformed.TrySetResult(Result);
 
@@ -316,8 +317,12 @@ namespace Waher.Networking.E2ee
 
 				foreach (IE2eEndpoint Endpoint in this.endpoints)
 				{
-					if (this.remoteEndpoints.ContainsKey(Key(Endpoint)))
+					if (this.remoteEndpoints.TryGetValue(Key(Endpoint),
+						out IE2eEndpoint RemoteEndpoint) &&
+						Endpoint.PublicKey.Length == RemoteEndpoint.PublicKey.Length)
+					{
 						Filtered.Add(Endpoint);
+					}
 				}
 
 				Endpoints = Filtered;
@@ -368,6 +373,8 @@ namespace Waher.Networking.E2ee
 			Output.WriteVarLenUInt((uint)Endpoints.Count);
 			Output.WriteVarLenUInt((uint)Ciphers.Count);
 
+			sb?.AppendLine(this.idStr);
+
 			foreach (IE2eEndpoint Endpoint in Endpoints)
 			{
 				Output.WriteString(Endpoint.LocalName);
@@ -411,17 +418,18 @@ namespace Waher.Networking.E2ee
 				}
 			}
 
-			byte[] CipherInfo = Output.ToArray();
-
-			Output = new BinaryOutput();
-			Output.WriteData(CipherInfo);
-
-			byte[] Block = Output.ToArray();
-
 			if (!(sb is null))
 				this.TransmitText(sb.ToString());
 
-			return await this.binaryTransport.SendAsync(true, Block);
+			return await this.SendBlock(Output.ToArray());
+		}
+
+		private Task<bool> SendBlock(byte[] Block)
+		{
+			BinaryOutput Output = new BinaryOutput();
+			Output.WriteData(Block);
+
+			return this.binaryTransport.SendAsync(true, Output.ToArray());
 		}
 
 		private async Task<bool> SelectCipher()
@@ -484,16 +492,21 @@ namespace Waher.Networking.E2ee
 			}
 
 			BinaryOutput CipherSelection = new BinaryOutput();
+			StringBuilder sb = this.HasSniffers ? new StringBuilder() : null;
 
 			CipherSelection.WriteString(BestEndpoint.LocalName);
 			CipherSelection.WriteString(BestEndpoint.Namespace);
 			CipherSelection.WriteData(BestEndpoint.PublicKey);
 
-			if (this.HasSniffers)
+			if (!(sb is null))
 			{
-				this.Information("Asymmetric cipher selected: " + Key(BestEndpoint) + ": " +
-					BestEndpoint.PublicKeyBase64);
+				sb.AppendLine(BestEndpoint.LocalName);
+				sb.AppendLine(BestEndpoint.Namespace);
+				sb.AppendLine(BestEndpoint.PublicKeyBase64);
 			}
+
+			if (this.HasSniffers)
+				this.Information("Asymmetric cipher selected: " + Key(BestEndpoint));
 
 			ChunkedList<IE2eSymmetricCipher> CommonCiphers = new ChunkedList<IE2eSymmetricCipher>();
 			IE2eSymmetricCipher SelectedCipher = null;
@@ -521,6 +534,12 @@ namespace Waher.Networking.E2ee
 			CipherSelection.WriteString(SelectedCipher.LocalName);
 			CipherSelection.WriteString(SelectedCipher.Namespace);
 
+			if (!(sb is null))
+			{
+				sb.AppendLine(SelectedCipher.LocalName);
+				sb.AppendLine(SelectedCipher.Namespace);
+			}
+
 			if (this.HasSniffers)
 				this.Information("Symmetric cipher selected: " + Key(SelectedCipher));
 
@@ -533,7 +552,13 @@ namespace Waher.Networking.E2ee
 
 			CipherSelection.WriteData(CipherText ?? Array.Empty<byte>());
 
-			bool Result = await this.binaryTransport.SendAsync(true, CipherSelection.ToArray());
+			if (!(sb is null))
+			{
+				sb.AppendLine(Convert.ToBase64String(CipherText ?? Array.Empty<byte>()));
+				this.TransmitText(sb.ToString());
+			}
+
+			bool Result = await this.SendBlock(CipherSelection.ToArray());
 
 			this.ciphersSelected.TrySetResult(Result);
 
@@ -725,6 +750,7 @@ namespace Waher.Networking.E2ee
 						case 0:
 						case 2:
 						case 4:
+						case 6:
 							byte b = Buffer[Offset++];
 							Count--;
 
@@ -741,12 +767,21 @@ namespace Waher.Networking.E2ee
 									this.inputBlockPos = 0;
 									this.inputState++;
 								}
+								else if (this.inputState == 4)
+								{
+									if (this.HasSniffers)
+										this.ReceiveText("Go ahead.");
+
+									this.goAhead.TrySetResult(true);
+									this.inputState += 2;
+								}
 							}
 							break;
 
 						case 1:
 						case 3:
 						case 5:
+						case 7:
 							int c = Math.Min(Count, this.inputBlockLen - this.inputBlockPos);
 							System.Buffer.BlockCopy(Buffer, Offset, this.inputBlock, this.inputBlockPos, c);
 							Offset += c;
@@ -776,8 +811,14 @@ namespace Waher.Networking.E2ee
 											Result = await this.ProcessRemoteCiphers(this.inputBlock);
 										else
 										{
-											Result = this.CipherSelected(this.inputBlock);
+											Result = await this.CipherSelected(this.inputBlock);
 											this.ciphersSelected.TrySetResult(Result);
+
+											if (Result)
+											{
+												this.inputState += 2;
+												this.goAhead.TrySetResult(true);
+											}
 										}
 
 										if (Result)
@@ -787,6 +828,11 @@ namespace Waher.Networking.E2ee
 										break;
 
 									case 5:
+										this.goAhead.TrySetResult(true);
+										this.inputState++;
+										break;
+
+									case 7:
 										if (await this.ProcessEncryptedBlock(this.inputBlock))
 											this.inputState--;
 										else
@@ -807,6 +853,8 @@ namespace Waher.Networking.E2ee
 			catch (Exception ex)
 			{
 				this.Exception(ex);
+				this.Dispose();
+				return false;
 			}
 
 			return true;
@@ -828,7 +876,7 @@ namespace Waher.Networking.E2ee
 				sb.AppendLine(this.remoteAssemblyName);
 				sb.AppendLine(this.remoteImageVersion);
 
-				this.Information(sb.ToString());
+				this.ReceiveText(sb.ToString());
 			}
 
 			this.greetingPerformed.TrySetResult(true);
@@ -846,6 +894,8 @@ namespace Waher.Networking.E2ee
 
 			this.remoteId = Input.ReadGuid();
 			this.remoteIdStr = this.remoteId.ToString();
+
+			sb?.AppendLine(this.remoteIdStr);
 
 			string LocalName, Namespace;
 			int NrEndpoints = (int)Input.ReadVarLenUInt();
@@ -895,8 +945,6 @@ namespace Waher.Networking.E2ee
 					sb.AppendLine(this.remoteTypeName);
 					sb.AppendLine(this.remoteAssemblyName);
 					sb.AppendLine(this.remoteImageVersion);
-
-					this.Information(sb.ToString());
 				}
 			}
 
@@ -939,64 +987,118 @@ namespace Waher.Networking.E2ee
 		/// </summary>
 		public event EventHandlerAsync<RemoteEndpointsEventArgs> OnRemoteEndpoints;
 
-		private bool CipherSelected(byte[] Data)
+		private async Task<bool> CipherSelected(byte[] Data)
 		{
 			BinaryInput Input = new BinaryInput(Data);
 
-			string LocalName = Input.ReadString();
-			string Namespace = Input.ReadString();
-			byte[] PublicKey = Input.ReadData();
+			string LocalNameAsym = Input.ReadString();
+			string NamespaceAsym = Input.ReadString();
+			byte[] PublicKeyAsym = Input.ReadData();
+			string LocalNameSym = Input.ReadString();
+			string NamespaceSym = Input.ReadString();
+			byte[] CipherText = Input.ReadData();
 
-			if (this.remoteEndpoints.TryGetValue(Key(LocalName, Namespace),
-				out IE2eEndpoint Endpoint))
+			if (this.HasSniffers)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.AppendLine(LocalNameAsym);
+				sb.AppendLine(NamespaceAsym);
+				sb.AppendLine(Convert.ToBase64String(PublicKeyAsym));
+				sb.AppendLine(LocalNameSym);
+				sb.AppendLine(NamespaceSym);
+				sb.AppendLine(Convert.ToBase64String(CipherText));
+
+				this.ReceiveText(sb.ToString());
+			}
+
+			if (CipherText.Length == 0)
+				CipherText = null;
+
+			IE2eEndpoint LocalEndpoint = null;
+
+			foreach (IE2eEndpoint Endpoint in this.endpoints)
+			{
+				if (Endpoint.LocalName == LocalNameAsym &&
+					Endpoint.Namespace == NamespaceAsym &&
+					Endpoint.PublicKey.Length == PublicKeyAsym.Length)
+				{
+					LocalEndpoint = Endpoint;
+					break;
+				}
+			}
+
+			if (LocalEndpoint is null)
 			{
 				if (this.HasSniffers)
 				{
-					this.Information("Asymmetric cipher selected: " + Key(Endpoint) + ": " +
-						Endpoint.PublicKeyBase64);
+					this.Error("Asymmetric cipher not supported: " +
+						Key(LocalNameAsym, NamespaceAsym) + ": " +
+						Convert.ToBase64String(PublicKeyAsym));
 				}
+
+				return false;
 			}
-			else
+
+			if (!this.remoteEndpoints.TryGetValue(Key(LocalNameAsym, NamespaceAsym),
+				out IE2eEndpoint RemoteEndpoint))
 			{
 				if (this.HasSniffers)
 				{
 					this.Error("Unable to select asymmetric cipher: " +
-						Key(LocalName, Namespace) + ": " + Convert.ToBase64String(PublicKey));
+						Key(LocalNameAsym, NamespaceAsym) + ": " + 
+						Convert.ToBase64String(PublicKeyAsym));
 				}
 
-				this.ciphersSelected.TrySetResult(false);
 				return false;
 			}
 
-			LocalName = Input.ReadString();
-			Namespace = Input.ReadString();
+			IE2eSymmetricCipher LocalCipher = null;
 
-			if (this.remoteSymmetricCiphers.TryGetValue(Key(LocalName, Namespace),
-				out IE2eSymmetricCipher Cipher))
+			foreach (IE2eSymmetricCipher Cipher in this.symmetricCiphers)
 			{
-				if (this.HasSniffers)
-					this.Information("Symmetric cipher selected: " + Key(Cipher));
+				if (Cipher.LocalName == LocalNameSym &&
+					Cipher.Namespace == NamespaceSym)
+				{
+					LocalCipher = Cipher;
+					break;
+				}
 			}
-			else
+
+			if (LocalCipher is null)
 			{
 				if (this.HasSniffers)
-					this.Error("Unable to select symmetric cipher: " + Key(LocalName, Namespace));
+				{
+					this.Error("Symmetric cipher not supported: " +
+						Key(LocalNameSym, NamespaceSym));
+				}
 
-				this.ciphersSelected.TrySetResult(false);
 				return false;
 			}
 
-			byte[] CipherText = Input.ReadData();
+			if (!this.remoteSymmetricCiphers.TryGetValue(Key(LocalNameSym, NamespaceSym),
+				out IE2eSymmetricCipher RemoteCipher))
+			{
+				if (this.HasSniffers)
+				{
+					this.Error("Unable to select symmetric cipher: " +
+						Key(LocalNameSym, NamespaceSym));
+				}
 
-			this.symmetricKey = Endpoint.GetSharedSecretForDecryption(Endpoint, CipherText);
+				return false;
+			}
+
+			this.symmetricKey = LocalEndpoint.GetSharedSecretForDecryption(RemoteEndpoint,
+				CipherText);
 
 			this.hasSymmetricKey = true;
-			this.selectedEndpoint = Endpoint;
-			this.selectedSymmetricCipher = Cipher;
+			this.selectedEndpoint = LocalEndpoint;
+			this.selectedSymmetricCipher = LocalCipher;
 
-			this.ciphersSelected.TrySetResult(true);
+			if (this.HasSniffers)
+				this.TransmitText("Go ahead.");
 
-			return true;
+			return await this.SendBlock(Array.Empty<byte>());
 		}
 
 		private async Task<bool> ProcessEncryptedBlock(byte[] Data)
@@ -1011,8 +1113,8 @@ namespace Waher.Networking.E2ee
 				this.remoteIdStr, this.idStr, this.receiveCounter++);
 
 			byte[] AssociatedData = Hashes.ComputeSHA256Hash(IV);
-			
-			byte[] Decrypted = this.selectedSymmetricCipher.Decrypt(Data, 
+
+			byte[] Decrypted = this.selectedSymmetricCipher.Decrypt(Data,
 				this.symmetricKey, IV, AssociatedData);
 
 			if (Decrypted is null)

@@ -15,9 +15,10 @@ using Waher.Security.PQC.E2EE;
 namespace Waher.Networking.E2ee
 {
 	/// <summary>
-	/// Binary End-to-End encrypted protocol.
+	/// End-to-End encrypted communication layer.
 	/// </summary>
-	public class BinaryE2eeProtocol : CommunicationLayer, IBinaryTransportLayer
+	public class E2eeLayer : CommunicationLayer, IBinaryTransportLayer, 
+		ITextTransportLayer
 	{
 		private static readonly Random rnd = new Random();
 
@@ -55,7 +56,7 @@ namespace Waher.Networking.E2ee
 		private int inputBlockPos;
 
 		/// <summary>
-		/// Binary End-to-End encrypted protocol.
+		/// End-to-End encrypted communication layer.
 		/// </summary>
 		/// <param name="BinaryTransport">Binary transport layer.</param>
 		/// <param name="Initiator">Initiator of the conversation, typically the
@@ -67,7 +68,7 @@ namespace Waher.Networking.E2ee
 		/// <param name="DecoupledEvents">If events raised from the communication layer 
 		/// are decoupled, i.e. executed in parallel with the source that raised them.</param>
 		/// <param name="Sniffers">Optional sniffers.</param>
-		public BinaryE2eeProtocol(IBinaryTransportLayer BinaryTransport, bool Initiator,
+		public E2eeLayer(IBinaryTransportLayer BinaryTransport, bool Initiator,
 			int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength,
 			bool SignedTransfers, bool DecoupledEvents, params ISniffer[] Sniffers)
 			: this(BinaryTransport, Initiator,
@@ -78,7 +79,7 @@ namespace Waher.Networking.E2ee
 		}
 
 		/// <summary>
-		/// Binary End-to-End encrypted protocol.
+		/// End-to-End encrypted communication layer.
 		/// </summary>
 		/// <param name="BinaryTransport">Binary transport layer.</param>
 		/// <param name="Initiator">Initiator of the conversation, typically the
@@ -91,7 +92,7 @@ namespace Waher.Networking.E2ee
 		/// are decoupled, i.e. executed in parallel with the source that raised them.</param>
 		/// <param name="SignedTransfers">If all transfers must be signed.</param>
 		/// <param name="Sniffers">Optional sniffers.</param>
-		public BinaryE2eeProtocol(IBinaryTransportLayer BinaryTransport, bool Initiator,
+		public E2eeLayer(IBinaryTransportLayer BinaryTransport, bool Initiator,
 			int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength,
 			Type[] OnlyIfDerivedFrom, bool SignedTransfers, bool DecoupledEvents,
 			params ISniffer[] Sniffers)
@@ -102,7 +103,7 @@ namespace Waher.Networking.E2ee
 		}
 
 		/// <summary>
-		/// Binary End-to-End encrypted protocol.
+		/// End-to-End encrypted communication layer.
 		/// </summary>
 		/// <param name="BinaryTransport">Binary transport layer.</param>
 		/// <param name="Initiator">Initiator of the conversation, typically the
@@ -116,7 +117,7 @@ namespace Waher.Networking.E2ee
 		/// are decoupled, i.e. executed in parallel with the source that raised them.</param>
 		/// <param name="SignedTransfers">If all transfers must be signed.</param>
 		/// <param name="Sniffers">Optional sniffers.</param>
-		public BinaryE2eeProtocol(IBinaryTransportLayer BinaryTransport, bool Initiator,
+		public E2eeLayer(IBinaryTransportLayer BinaryTransport, bool Initiator,
 			int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength,
 			Type[] OnlyIfDerivedFromAsymmetric, Type[] OnlyIfDerivedFromSymmetric, bool SignedTransfers, 
 			bool DecoupledEvents, params ISniffer[] Sniffers)
@@ -130,7 +131,7 @@ namespace Waher.Networking.E2ee
 		}
 
 		/// <summary>
-		/// Binary End-to-End encrypted protocol.
+		/// End-to-End encrypted communication layer.
 		/// </summary>
 		/// <param name="BinaryTransport">Binary transport layer.</param>
 		/// <param name="Initiator">Initiator of the conversation, typically the
@@ -140,7 +141,7 @@ namespace Waher.Networking.E2ee
 		/// are decoupled, i.e. executed in parallel with the source that raised them.</param>
 		/// <param name="SignedTransfers">If all transfers must be signed.</param>
 		/// <param name="Sniffers">Optional sniffers.</param>
-		public BinaryE2eeProtocol(IBinaryTransportLayer BinaryTransport, bool Initiator,
+		public E2eeLayer(IBinaryTransportLayer BinaryTransport, bool Initiator,
 			IE2eEndpoint[] Endpoints, bool SignedTransfers, bool DecoupledEvents,
 			params ISniffer[] Sniffers)
 			: this(BinaryTransport, Initiator, Endpoints, E2eEndpoint.CreateSymmetricCiphers(),
@@ -149,7 +150,7 @@ namespace Waher.Networking.E2ee
 		}
 
 		/// <summary>
-		/// Binary End-to-End encrypted protocol.
+		/// End-to-End encrypted communication layer.
 		/// </summary>
 		/// <param name="BinaryTransport">Binary transport layer.</param>
 		/// <param name="Initiator">Initiator of the conversation, typically the
@@ -160,7 +161,7 @@ namespace Waher.Networking.E2ee
 		/// are decoupled, i.e. executed in parallel with the source that raised them.</param>
 		/// <param name="SignedTransfers">If all transfers must be signed.</param>
 		/// <param name="Sniffers">Optional sniffers.</param>
-		public BinaryE2eeProtocol(IBinaryTransportLayer BinaryTransport, bool Initiator,
+		public E2eeLayer(IBinaryTransportLayer BinaryTransport, bool Initiator,
 			IE2eEndpoint[] Endpoints, IE2eSymmetricCipher[] SymmetricCiphers,
 			bool SignedTransfers, bool DecoupledEvents, params ISniffer[] Sniffers)
 			: base(DecoupledEvents, Sniffers)
@@ -224,17 +225,30 @@ namespace Waher.Networking.E2ee
 		/// </summary>
 		public string RemoteImageVersion => this.remoteImageVersion;
 
-		#region IDisposable
+		#region IDisposable & IDisposableAsync
 
 		/// <summary>
 		/// Disposes the object and underlying transport layer.
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			if (!this.disposed)
 			{
 				this.disposed = true;
-				this.binaryTransport.Dispose();
+
+				if (this.binaryTransport is IDisposableAsync DisposableAsync)
+					await DisposableAsync.DisposeAsync();
+				else
+					this.binaryTransport.Dispose();
 			}
 		}
 
@@ -259,7 +273,7 @@ namespace Waher.Networking.E2ee
 		public async Task<bool> NegotiateKeys(int Timeout, CancellationToken Cancel)
 		{
 			if (this.disposed)
-				throw new ObjectDisposedException(nameof(BinaryE2eeProtocol));
+				throw new ObjectDisposedException(nameof(E2eeLayer));
 
 			if (this.hasSymmetricKey)
 				throw new InvalidOperationException("Keys already negotiated.");
@@ -977,7 +991,7 @@ namespace Waher.Networking.E2ee
 			catch (Exception ex)
 			{
 				this.Exception(ex);
-				this.Dispose();
+				await this.DisposeAsync();
 				return false;
 			}
 
@@ -1295,6 +1309,42 @@ namespace Waher.Networking.E2ee
 		/// Call this method to continue operation. Operation can be paused, by returning false from <see cref="OnReceived"/>.
 		/// </summary>
 		public void Continue() => this.binaryTransport.Continue();
+
+		#endregion
+
+		#region ITextTransportLayer
+
+		/// <summary>
+		/// Sends a text packet.
+		/// </summary>
+		/// <param name="Text">Text packet.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(string Text)
+		{
+			throw new NotImplementedException();	// TODO
+		}
+
+		/// <summary>
+		/// Sends a text packet.
+		/// </summary>
+		/// <param name="Text">Text packet.</param>
+		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(string Text, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
+		{
+			throw new NotImplementedException();    // TODO
+		}
+
+		/// <summary>
+		/// Event raised when a text packet has been sent.
+		/// </summary>
+		public event TextEventHandler OnTextSent;
+
+		/// <summary>
+		/// Event received when text data has been received.
+		/// </summary>
+		public event TextEventHandler OnTextReceived;
 
 		#endregion
 	}

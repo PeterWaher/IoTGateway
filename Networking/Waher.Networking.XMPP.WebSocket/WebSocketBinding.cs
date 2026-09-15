@@ -89,14 +89,14 @@ namespace Waher.Networking.XMPP.WebSocket
 		}
 
 		/// <summary>
-		/// Event raised when a packet has been sent.
+		/// Event raised when a text packet has been sent.
 		/// </summary>
-		public override event TextEventHandler OnSent;
+		public override event TextEventHandler OnTextSent;
 
 		/// <summary>
 		/// Event received when text data has been received.
 		/// </summary>
-		public override event TextEventHandler OnReceived;
+		public override event TextEventHandler OnTextReceived;
 
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting
@@ -116,7 +116,7 @@ namespace Waher.Networking.XMPP.WebSocket
 
 		private async Task<bool> RaiseOnSent(string Payload)
 		{
-			TextEventHandler h = this.OnSent;
+			TextEventHandler h = this.OnTextSent;
 			bool Result = true;
 
 			if (!(h is null))
@@ -136,7 +136,7 @@ namespace Waher.Networking.XMPP.WebSocket
 
 		private async Task<bool> RaiseOnReceived(string Payload)
 		{
-			TextEventHandler h = this.OnReceived;
+			TextEventHandler h = this.OnTextReceived;
 			bool Result = true;
 
 			if (!(h is null))

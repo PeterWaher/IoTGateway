@@ -481,7 +481,7 @@ namespace Waher.Networking.XMPP
 				{
 					IAlternativeTransport AlternativeTransport = Best.Instantiate(URI, this, new XmppBindingInterface(this));
 					this.textTransportLayer = AlternativeTransport;
-					this.textTransportLayer.OnReceived += this.TextTransportLayer_OnReceived_NoSniff;
+					this.textTransportLayer.OnTextReceived += this.TextTransportLayer_OnReceived_NoSniff;
 					this.sendHeartbeats = !AlternativeTransport.HandlesHeartbeats;
 				}
 				else
@@ -599,8 +599,8 @@ namespace Waher.Networking.XMPP
 			this.bareJid = this.fullJid = BareJid;
 			this.ResetState(false, true);
 
-			this.textTransportLayer.OnReceived += this.TextTransportLayer_OnReceived;
-			this.textTransportLayer.OnSent += this.TextTransportLayer_OnSent;
+			this.textTransportLayer.OnTextReceived += this.TextTransportLayer_OnReceived;
+			this.textTransportLayer.OnTextSent += this.TextTransportLayer_OnSent;
 		}
 
 		private Task<bool> TextTransportLayer_OnSent(object _, string Packet)
@@ -682,8 +682,8 @@ namespace Waher.Networking.XMPP
 				if (this.textTransportLayer is null)
 				{
 					this.client = new TextTcpClient(this.encoding, true);
-					this.client.OnReceived += this.OnReceived;
-					this.client.OnSent += this.OnSent;
+					this.client.OnTextReceived += this.OnReceived;
+					this.client.OnTextSent += this.OnSent;
 					this.client.OnError += this.Error;
 					this.client.OnDisconnected += this.Client_OnDisconnected;
 					this.client.OnPaused += this.Client_OnPaused;

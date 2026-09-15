@@ -119,8 +119,8 @@ namespace Waher.Networking.XMPP
 			try
 			{
 				this.client = new TextTcpClient(this.encoding, true);
-				this.client.OnReceived += this.OnReceived;
-				this.client.OnSent += this.OnSent;
+				this.client.OnTextReceived += this.OnReceived;
+				this.client.OnTextSent += this.OnSent;
 				this.client.OnError += this.Error;
 				this.client.OnDisconnected += this.Client_OnDisconnected;
 

@@ -20,7 +20,7 @@ namespace Waher.Networking.Test
 		private static XmlFileSniffer? serverSniffer;
 		private XmlFileSniffer? clientSniffer;
 		private BinaryTcpClient? client;
-		private BinaryE2eeProtocol? clientProtocol;
+		private E2eeLayer? clientProtocol;
 
 		public TestContext TestContext { get; set; }
 
@@ -45,7 +45,7 @@ namespace Waher.Networking.Test
 
 			server.OnClientConnected += (_, e) =>
 			{
-				BinaryE2eeProtocol Protocol = new(e.Client, false, 128, 128, 256,
+				E2eeLayer Protocol = new(e.Client, false, 128, 128, 256,
 					[
 						typeof(EllipticCurveEndpoint),
 						typeof(ModuleLatticeEndpoint),
@@ -138,7 +138,7 @@ namespace Waher.Networking.Test
 			if (this.clientProtocol is not null)
 			{
 				await this.clientProtocol.FlushAsync();
-				this.clientProtocol.Dispose();
+				await this.clientProtocol.DisposeAsync();
 				this.clientProtocol = null;
 			}
 
@@ -203,7 +203,7 @@ namespace Waher.Networking.Test
 			Type[]? SymmetricCiphers = SymmetricCipher is null ? null 
 				: [Types.GetType(SymmetricCipher)];
 
-			this.clientProtocol = new BinaryE2eeProtocol(this.client, true,
+			this.clientProtocol = new E2eeLayer(this.client, true,
 				128, 128, 256, AsymmetricCiphers, SymmetricCiphers, SignedTransfers,
 				true, this.clientSniffer);
 

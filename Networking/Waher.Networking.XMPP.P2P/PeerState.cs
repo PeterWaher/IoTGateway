@@ -39,12 +39,12 @@ namespace Waher.Networking.XMPP.P2P
 		/// <summary>
 		/// Event raised when a text packet has been sent.
 		/// </summary>
-		public event TextEventHandler OnSent = null;
+		public event TextEventHandler OnTextSent = null;
 
 		/// <summary>
 		/// Event raised when a text packet (XML fragment) has been received.
 		/// </summary>
-		public event TextEventHandler OnReceived = null;
+		public event TextEventHandler OnTextReceived = null;
 
 		/// <summary>
 		/// Peer connection state.
@@ -812,7 +812,7 @@ namespace Waher.Networking.XMPP.P2P
 		private async Task<bool> ProcessFragment(string Xml)
 		{
 			bool Result;
-			TextEventHandler h = this.OnReceived;
+			TextEventHandler h = this.OnTextReceived;
 
 			if (h is null)
 				Result = false;
@@ -883,7 +883,7 @@ namespace Waher.Networking.XMPP.P2P
 
 		private async Task Peer_OnSent(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
-			TextEventHandler h = this.OnSent;
+			TextEventHandler h = this.OnTextSent;
 			if (!(h is null))
 			{
 				try

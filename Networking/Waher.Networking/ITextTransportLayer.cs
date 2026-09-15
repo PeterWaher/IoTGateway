@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Events;
 
 namespace Waher.Networking
@@ -34,14 +33,14 @@ namespace Waher.Networking
 		Task<bool> SendAsync(string Text, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State);
 
 		/// <summary>
-		/// Event raised when a packet has been sent.
+		/// Event raised when a text packet has been sent.
 		/// </summary>
-		event TextEventHandler OnSent;
+		event TextEventHandler OnTextSent;
 
 		/// <summary>
 		/// Event received when text data has been received.
 		/// </summary>
-		event TextEventHandler OnReceived;
+		event TextEventHandler OnTextReceived;
 
 		/// <summary>
 		/// If the reading is paused.
@@ -52,7 +51,7 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
-		/// Call this method to continue operation. Operation can be paused, by returning false from <see cref="OnReceived"/>.
+		/// Call this method to continue operation. Operation can be paused, by returning false from <see cref="OnTextReceived"/>.
 		/// </summary>
 		void Continue();
 	}

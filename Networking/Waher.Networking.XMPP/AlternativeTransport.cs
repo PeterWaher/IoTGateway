@@ -11,14 +11,14 @@ namespace Waher.Networking.XMPP
 	public abstract class AlternativeTransport : IAlternativeTransport
 	{
 		/// <summary>
-		/// Event raised when a packet has been sent.
+		/// Event raised when a text packet has been sent.
 		/// </summary>
-		public abstract event TextEventHandler OnSent;
+		public abstract event TextEventHandler OnTextSent;
 
 		/// <summary>
 		/// Event received when text data has been received.
 		/// </summary>
-		public abstract event TextEventHandler OnReceived;
+		public abstract event TextEventHandler OnTextReceived;
 
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting
@@ -61,7 +61,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Call this method to continue operation. Operation can be paused, by returning false from <see cref="OnReceived"/>.
+		/// Call this method to continue operation. Operation can be paused, by returning false from <see cref="OnTextReceived"/>.
 		/// </summary>
 		public abstract void Continue();
 

@@ -139,7 +139,7 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
-		/// Number of bytes of current (or last) text received. Can be used in event handlers to <see cref="OnReceived"/>.
+		/// Number of bytes of current (or last) text received. Can be used in event handlers to <see cref="OnTextReceived"/>.
 		/// </summary>
 		public int LastReceivedBytes => this.lastReceivedBytes;
 
@@ -152,7 +152,7 @@ namespace Waher.Networking
 			if (this.sniffText && this.HasSniffers)
 				this.ReceiveText(Data);
 
-			TextEventHandler h = this.OnReceived;
+			TextEventHandler h = this.OnTextReceived;
 			if (h is null)
 				return true;
 			else
@@ -162,7 +162,7 @@ namespace Waher.Networking
 		/// <summary>
 		/// Event received when text data has been received.
 		/// </summary>
-		public new event TextEventHandler OnReceived;
+		public event TextEventHandler OnTextReceived;
 
 		/// <summary>
 		/// Sends a text packet.
@@ -201,7 +201,7 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
-		/// Number of bytes of current (or last) text transmitted. Can be used in event handlers to <see cref="OnSent"/>.
+		/// Number of bytes of current (or last) text transmitted. Can be used in event handlers to <see cref="OnTextSent"/>.
 		/// </summary>
 		public int LastTransmittedBytes => this.lastTransmittedBytes;
 
@@ -214,15 +214,15 @@ namespace Waher.Networking
 			if (this.sniffText && this.HasSniffers)
 				this.TransmitText(Text);
 
-			TextEventHandler h = this.OnSent;
+			TextEventHandler h = this.OnTextSent;
 			if (!(h is null))
 				await h(this, Text);
 		}
 
 		/// <summary>
-		/// Event raised when a packet has been sent.
+		/// Event raised when a text packet has been sent.
 		/// </summary>
-		public new event TextEventHandler OnSent;
+		public event TextEventHandler OnTextSent;
 
 	}
 }

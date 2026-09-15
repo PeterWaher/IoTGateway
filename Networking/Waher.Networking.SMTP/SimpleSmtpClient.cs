@@ -104,8 +104,8 @@ namespace Waher.Networking.SMTP
 			this.client.Client.ReceiveTimeout = 10000;
 			this.client.Client.SendTimeout = 10000;
 
-			this.client.OnReceived += this.Client_OnReceived;
-			this.client.OnSent += this.Client_OnSent;
+			this.client.OnTextReceived += this.Client_OnReceived;
+			this.client.OnTextSent += this.Client_OnSent;
 			this.client.OnError += this.Client_OnError;
 			this.client.OnInformation += this.Client_OnInformation;
 			this.client.OnWarning += this.Client_OnWarning;

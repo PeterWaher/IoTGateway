@@ -82,7 +82,7 @@ namespace Waher.Networking
 		/// layer are decoupled, i.e. executed in parallel with the source that raised 
 		/// them.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public BinaryTcpServer(bool C2S, int Port, TimeSpan ActivityTimeout, bool DecoupledEvents, ISniffer[] Sniffers)
+		public BinaryTcpServer(bool C2S, int Port, TimeSpan ActivityTimeout, bool DecoupledEvents, params ISniffer[] Sniffers)
 			: base(DecoupledEvents, Sniffers)
 		{
 			this.c2s = C2S;

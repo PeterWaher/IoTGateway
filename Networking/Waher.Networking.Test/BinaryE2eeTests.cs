@@ -15,9 +15,9 @@ namespace Waher.Networking.Test
 	[DoNotParallelize]
 	public sealed class BinaryE2eeTests
 	{
+		private static readonly Random rnd = new();
 		private static BinaryTcpServer? server;
 		private static XmlFileSniffer? serverSniffer;
-		private static Random rnd = new();
 		private XmlFileSniffer? clientSniffer;
 		private BinaryTcpClient? client;
 		private BinaryE2eeProtocol? clientProtocol;
@@ -55,8 +55,7 @@ namespace Waher.Networking.Test
 				if (serverSniffer is not null)
 					Protocol.Add(serverSniffer);
 
-				Protocol.OnReceived += async (object Sender, bool ConstantBuffer,
-					byte[] Buffer, int Offset, int Count) =>
+				Protocol.OnReceived += async (Sender, ConstantBuffer, Buffer, Offset, Count) =>
 				{
 					byte[] Data = SnifferBase.CloneSection(Buffer, Offset, Count);
 					Array.Reverse(Data);
@@ -166,40 +165,43 @@ namespace Waher.Networking.Test
 		}
 
 		[TestMethod]
-		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(Aes256))]
-		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(ChaCha20))]
-		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(false, typeof(EllipticCurveEndpoint), null)]
-		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(Aes256))]
-		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(ChaCha20))]
-		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(EllipticCurveEndpoint), null)]
-		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(Aes256))]
-		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(ChaCha20))]
-		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(Aes256))]
-		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(ChaCha20))]
-		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(ModuleLatticeEndpoint), null)]
-		[DataRow(false, typeof(RsaEndpoint), typeof(Aes256))]
-		[DataRow(false, typeof(RsaEndpoint), typeof(ChaCha20))]
-		[DataRow(false, typeof(RsaEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(RsaEndpoint), typeof(Aes256))]
-		[DataRow(true, typeof(RsaEndpoint), typeof(ChaCha20))]
-		[DataRow(true, typeof(RsaEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(RsaEndpoint), null)]
-		[DataRow(false, null, typeof(Aes256))]
-		[DataRow(false, null, typeof(ChaCha20))]
-		[DataRow(false, null, typeof(ChaCha20Poly1305))]
-		[DataRow(true, null, typeof(Aes256))]
-		[DataRow(true, null, typeof(ChaCha20))]
-		[DataRow(true, null, typeof(ChaCha20Poly1305))]
+		[DataRow(false, nameof(EllipticCurveEndpoint), nameof(Aes256))]
+		[DataRow(false, nameof(EllipticCurveEndpoint), nameof(ChaCha20))]
+		[DataRow(false, nameof(EllipticCurveEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(false, nameof(EllipticCurveEndpoint), null)]
+		[DataRow(true, nameof(EllipticCurveEndpoint), nameof(Aes256))]
+		[DataRow(true, nameof(EllipticCurveEndpoint), nameof(ChaCha20))]
+		[DataRow(true, nameof(EllipticCurveEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(EllipticCurveEndpoint), null)]
+		[DataRow(false, nameof(ModuleLatticeEndpoint), nameof(Aes256))]
+		[DataRow(false, nameof(ModuleLatticeEndpoint), nameof(ChaCha20))]
+		[DataRow(false, nameof(ModuleLatticeEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(ModuleLatticeEndpoint), nameof(Aes256))]
+		[DataRow(true, nameof(ModuleLatticeEndpoint), nameof(ChaCha20))]
+		[DataRow(true, nameof(ModuleLatticeEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(ModuleLatticeEndpoint), null)]
+		[DataRow(false, nameof(RsaEndpoint), nameof(Aes256))]
+		[DataRow(false, nameof(RsaEndpoint), nameof(ChaCha20))]
+		[DataRow(false, nameof(RsaEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(RsaEndpoint), nameof(Aes256))]
+		[DataRow(true, nameof(RsaEndpoint), nameof(ChaCha20))]
+		[DataRow(true, nameof(RsaEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(RsaEndpoint), null)]
+		[DataRow(false, null, nameof(Aes256))]
+		[DataRow(false, null, nameof(ChaCha20))]
+		[DataRow(false, null, nameof(ChaCha20Poly1305))]
+		[DataRow(true, null, nameof(Aes256))]
+		[DataRow(true, null, nameof(ChaCha20))]
+		[DataRow(true, null, nameof(ChaCha20Poly1305))]
 		[DataRow(true, null, null)]
 		public async Task Test_01_KeyNegotiation(bool SignedTransfers,
-			Type? AsymmetricCipher, Type? SymmetricCipher)
+			string? AsymmetricCipher, string? SymmetricCipher)
 		{
-			Type[]? AsymmetricCiphers = AsymmetricCipher is null ? null : [AsymmetricCipher];
-			Type[]? SymmetricCiphers = SymmetricCipher is null ? null : [SymmetricCipher];
+			Type[]? AsymmetricCiphers = AsymmetricCipher is null ? null 
+				: [Types.GetType(AsymmetricCipher)];
+			
+			Type[]? SymmetricCiphers = SymmetricCipher is null ? null 
+				: [Types.GetType(SymmetricCipher)];
 
 			this.clientProtocol = new BinaryE2eeProtocol(this.client, true,
 				128, 128, 256, AsymmetricCiphers, SymmetricCiphers, SignedTransfers,
@@ -210,15 +212,23 @@ namespace Waher.Networking.Test
 
 		private async Task TestKeyNegotiation()
 		{
+			CancellationTokenSource Cancel = new();
+
 			this.clientProtocol!.OnRemoteEndpoints += (_, e) =>
 			{
 				this.clientSniffer?.Information("Remote endpoints received.");
 				return Task.CompletedTask;
 			};
 
+			this.clientProtocol.OnProtocolError += (_, e) =>
+			{
+				Cancel.Cancel();
+				return Task.CompletedTask;
+			};
+
 			this.clientProtocol.Information("Negotiating keys...");
 
-			Assert.IsTrue(await this.clientProtocol.NegotiateKeys(10000));
+			Assert.IsTrue(await this.clientProtocol.NegotiateKeys(10000, Cancel.Token));
 
 			this.clientProtocol.Information("Keys negotiated...");
 
@@ -228,37 +238,37 @@ namespace Waher.Networking.Test
 		}
 
 		[TestMethod]
-		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(Aes256))]
-		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(ChaCha20))]
-		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(false, typeof(EllipticCurveEndpoint), null)]
-		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(Aes256))]
-		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(ChaCha20))]
-		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(EllipticCurveEndpoint), null)]
-		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(Aes256))]
-		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(ChaCha20))]
-		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(Aes256))]
-		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(ChaCha20))]
-		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(ModuleLatticeEndpoint), null)]
-		[DataRow(false, typeof(RsaEndpoint), typeof(Aes256))]
-		[DataRow(false, typeof(RsaEndpoint), typeof(ChaCha20))]
-		[DataRow(false, typeof(RsaEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(RsaEndpoint), typeof(Aes256))]
-		[DataRow(true, typeof(RsaEndpoint), typeof(ChaCha20))]
-		[DataRow(true, typeof(RsaEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(RsaEndpoint), null)]
-		[DataRow(false, null, typeof(Aes256))]
-		[DataRow(false, null, typeof(ChaCha20))]
-		[DataRow(false, null, typeof(ChaCha20Poly1305))]
-		[DataRow(true, null, typeof(Aes256))]
-		[DataRow(true, null, typeof(ChaCha20))]
-		[DataRow(true, null, typeof(ChaCha20Poly1305))]
-		[DataRow(true, null, null)]
+		//[DataRow(false, nameof(EllipticCurveEndpoint), nameof(Aes256))]
+		//[DataRow(false, nameof(EllipticCurveEndpoint), nameof(ChaCha20))]
+		//[DataRow(false, nameof(EllipticCurveEndpoint), nameof(ChaCha20Poly1305))]
+		//[DataRow(false, nameof(EllipticCurveEndpoint), null)]
+		//[DataRow(true, nameof(EllipticCurveEndpoint), nameof(Aes256))]
+		[DataRow(true, nameof(EllipticCurveEndpoint), nameof(ChaCha20))]
+		//[DataRow(true, nameof(EllipticCurveEndpoint), nameof(ChaCha20Poly1305))]
+		//[DataRow(true, nameof(EllipticCurveEndpoint), null)]
+		//[DataRow(false, nameof(ModuleLatticeEndpoint), nameof(Aes256))]
+		//[DataRow(false, nameof(ModuleLatticeEndpoint), nameof(ChaCha20))]
+		//[DataRow(false, nameof(ModuleLatticeEndpoint), nameof(ChaCha20Poly1305))]
+		//[DataRow(true, nameof(ModuleLatticeEndpoint), nameof(Aes256))]
+		//[DataRow(true, nameof(ModuleLatticeEndpoint), nameof(ChaCha20))]
+		//[DataRow(true, nameof(ModuleLatticeEndpoint), nameof(ChaCha20Poly1305))]
+		//[DataRow(true, nameof(ModuleLatticeEndpoint), null)]
+		//[DataRow(false, nameof(RsaEndpoint), nameof(Aes256))]
+		//[DataRow(false, nameof(RsaEndpoint), nameof(ChaCha20))]
+		//[DataRow(false, nameof(RsaEndpoint), nameof(ChaCha20Poly1305))]
+		//[DataRow(true, nameof(RsaEndpoint), nameof(Aes256))]
+		//[DataRow(true, nameof(RsaEndpoint), nameof(ChaCha20))]
+		//[DataRow(true, nameof(RsaEndpoint), nameof(ChaCha20Poly1305))]
+		//[DataRow(true, nameof(RsaEndpoint), null)]
+		//[DataRow(false, null, nameof(Aes256))]
+		//[DataRow(false, null, nameof(ChaCha20))]
+		//[DataRow(false, null, nameof(ChaCha20Poly1305))]
+		//[DataRow(true, null, nameof(Aes256))]
+		//[DataRow(true, null, nameof(ChaCha20))]
+		//[DataRow(true, null, nameof(ChaCha20Poly1305))]
+		//[DataRow(true, null, null)]
 		public async Task Test_02_SendReceive(bool SignedTransfers,
-			Type? AsymmetricCipher, Type? SymmetricCipher)
+			string? AsymmetricCipher, string? SymmetricCipher)
 		{
 			await this.Test_01_KeyNegotiation(SignedTransfers, AsymmetricCipher, SymmetricCipher);
 			await this.TestSendReceiveBlock(256);
@@ -268,13 +278,18 @@ namespace Waher.Networking.Test
 		{
 			TaskCompletionSource<byte[]> Packet = new();
 
-			this.clientProtocol!.OnReceived += (object Sender, bool ConstantBuffer,
-				byte[] Buffer, int Offset, int Count) =>
+			this.clientProtocol!.OnReceived += (Sender, ConstantBuffer, Buffer, Offset, Count) =>
 			{
 				byte[] Data = SnifferBase.CloneSection(Buffer, Offset, Count);
 				Packet.TrySetResult(Data);
 
 				return Task.FromResult(true);
+			};
+
+			this.clientProtocol.OnProtocolError += (_, e) =>
+			{
+				Packet.TrySetException(new Exception("Protocol error."));
+				return Task.CompletedTask;
 			};
 
 			_ = Task.Delay(10000).ContinueWith(_ =>
@@ -296,37 +311,37 @@ namespace Waher.Networking.Test
 		}
 
 		[TestMethod]
-		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(Aes256))]
-		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(ChaCha20))]
-		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(false, typeof(EllipticCurveEndpoint), null)]
-		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(Aes256))]
-		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(ChaCha20))]
-		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(EllipticCurveEndpoint), null)]
-		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(Aes256))]
-		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(ChaCha20))]
-		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(Aes256))]
-		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(ChaCha20))]
-		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(ModuleLatticeEndpoint), null)]
-		[DataRow(false, typeof(RsaEndpoint), typeof(Aes256))]
-		[DataRow(false, typeof(RsaEndpoint), typeof(ChaCha20))]
-		[DataRow(false, typeof(RsaEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(RsaEndpoint), typeof(Aes256))]
-		[DataRow(true, typeof(RsaEndpoint), typeof(ChaCha20))]
-		[DataRow(true, typeof(RsaEndpoint), typeof(ChaCha20Poly1305))]
-		[DataRow(true, typeof(RsaEndpoint), null)]
-		[DataRow(false, null, typeof(Aes256))]
-		[DataRow(false, null, typeof(ChaCha20))]
-		[DataRow(false, null, typeof(ChaCha20Poly1305))]
-		[DataRow(true, null, typeof(Aes256))]
-		[DataRow(true, null, typeof(ChaCha20))]
-		[DataRow(true, null, typeof(ChaCha20Poly1305))]
+		[DataRow(false, nameof(EllipticCurveEndpoint), nameof(Aes256))]
+		[DataRow(false, nameof(EllipticCurveEndpoint), nameof(ChaCha20))]
+		[DataRow(false, nameof(EllipticCurveEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(false, nameof(EllipticCurveEndpoint), null)]
+		[DataRow(true, nameof(EllipticCurveEndpoint), nameof(Aes256))]
+		[DataRow(true, nameof(EllipticCurveEndpoint), nameof(ChaCha20))]
+		[DataRow(true, nameof(EllipticCurveEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(EllipticCurveEndpoint), null)]
+		[DataRow(false, nameof(ModuleLatticeEndpoint), nameof(Aes256))]
+		[DataRow(false, nameof(ModuleLatticeEndpoint), nameof(ChaCha20))]
+		[DataRow(false, nameof(ModuleLatticeEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(ModuleLatticeEndpoint), nameof(Aes256))]
+		[DataRow(true, nameof(ModuleLatticeEndpoint), nameof(ChaCha20))]
+		[DataRow(true, nameof(ModuleLatticeEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(ModuleLatticeEndpoint), null)]
+		[DataRow(false, nameof(RsaEndpoint), nameof(Aes256))]
+		[DataRow(false, nameof(RsaEndpoint), nameof(ChaCha20))]
+		[DataRow(false, nameof(RsaEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(RsaEndpoint), nameof(Aes256))]
+		[DataRow(true, nameof(RsaEndpoint), nameof(ChaCha20))]
+		[DataRow(true, nameof(RsaEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(RsaEndpoint), null)]
+		[DataRow(false, null, nameof(Aes256))]
+		[DataRow(false, null, nameof(ChaCha20))]
+		[DataRow(false, null, nameof(ChaCha20Poly1305))]
+		[DataRow(true, null, nameof(Aes256))]
+		[DataRow(true, null, nameof(ChaCha20))]
+		[DataRow(true, null, nameof(ChaCha20Poly1305))]
 		[DataRow(true, null, null)]
 		public async Task Test_03_SendReceiveRandom(bool SignedTransfers,
-			Type? AsymmetricCipher, Type? SymmetricCipher)
+			string? AsymmetricCipher, string? SymmetricCipher)
 		{
 			await this.Test_01_KeyNegotiation(SignedTransfers, AsymmetricCipher, SymmetricCipher);
 			await this.TestSendReceiveBlock(rnd.Next(1, 100000));

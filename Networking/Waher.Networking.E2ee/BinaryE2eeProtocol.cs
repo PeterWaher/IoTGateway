@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
@@ -246,7 +247,18 @@ namespace Waher.Networking.E2ee
 		/// </summary>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		/// <returns>If key negotiation concluded successfully.</returns>
-		public async Task<bool> NegotiateKeys(int Timeout)
+		public Task<bool> NegotiateKeys(int Timeout)
+		{
+			return this.NegotiateKeys(Timeout, CancellationToken.None);
+		}
+
+		/// <summary>
+		/// Negotiates the keys to use during encrypted communication.
+		/// </summary>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <param name="Cancel">Cancellation token.</param>
+		/// <returns>If key negotiation concluded successfully.</returns>
+		public async Task<bool> NegotiateKeys(int Timeout, CancellationToken Cancel)
 		{
 			if (this.disposed)
 				throw new ObjectDisposedException(nameof(BinaryE2eeProtocol));
@@ -254,13 +266,16 @@ namespace Waher.Networking.E2ee
 			if (this.hasSymmetricKey)
 				throw new InvalidOperationException("Keys already negotiated.");
 
-			_ = Task.Delay(Timeout).ContinueWith(_ =>
+			void DoCancel()
 			{
 				this.greetingPerformed.TrySetException(new TimeoutException());
 				this.remoteKeysReceived.TrySetException(new TimeoutException());
 				this.ciphersSelected.TrySetException(new TimeoutException());
 				this.goAhead.TrySetException(new TimeoutException());
-			});
+			}
+
+			Cancel.Register(DoCancel);
+			_ = Task.Delay(Timeout).ContinueWith(_ => DoCancel());
 
 			if (this.initiator)
 			{
@@ -839,6 +854,8 @@ namespace Waher.Networking.E2ee
 											this.ciphersSelected.TrySetResult(false);
 											this.goAhead.TrySetResult(false);
 											this.inputState = -1;
+
+											await this.OnProtocolError.Raise(this, EventArgs.Empty);
 											break;
 
 										case 4:
@@ -847,6 +864,13 @@ namespace Waher.Networking.E2ee
 
 											this.goAhead.TrySetResult(true);
 											this.inputState += 2;
+											break;
+
+										default:
+											this.Error("Protocol error.");
+											this.inputState = -1;
+
+											await this.OnProtocolError.Raise(this, EventArgs.Empty);
 											break;
 									}
 								}
@@ -879,7 +903,10 @@ namespace Waher.Networking.E2ee
 										if (Result)
 											this.inputState++;
 										else
+										{
 											this.inputState = -1;
+											await this.OnProtocolError.Raise(this, EventArgs.Empty);
+										}
 										break;
 
 									case 3:
@@ -900,7 +927,10 @@ namespace Waher.Networking.E2ee
 										if (Result)
 											this.inputState++;
 										else
+										{
 											this.inputState = -1;
+											await this.OnProtocolError.Raise(this, EventArgs.Empty);
+										}
 										break;
 
 									case 5:
@@ -917,14 +947,20 @@ namespace Waher.Networking.E2ee
 										else if (await this.ProcessEncryptedBlock(this.inputBlock, null))
 											this.inputState--;
 										else
+										{
 											this.inputState = -1;
+											await this.OnProtocolError.Raise(this, EventArgs.Empty);
+										}
 										break;
 
 									case 9:
 										if (await this.ProcessEncryptedBlock(this.encryptedBlock, this.inputBlock))
 											this.inputState -= 3;
 										else
+										{
 											this.inputState = -1;
+											await this.OnProtocolError.Raise(this, EventArgs.Empty);
+										}
 										break;
 								}
 
@@ -948,6 +984,11 @@ namespace Waher.Networking.E2ee
 
 			return true;
 		}
+
+		/// <summary>
+		/// Event raised when a protocol error occurs.
+		/// </summary>
+		public event EventHandlerAsync OnProtocolError;
 
 		private bool ProcessHello(byte[] Data)
 		{
@@ -1213,13 +1254,15 @@ namespace Waher.Networking.E2ee
 			{
 				if (Signature is null)
 				{
-					this.Error("Missing signature.");
+					await this.SendBlock(Array.Empty<byte>(), null, null, null);
+					this.Error("Ignoring incoming packet. Missing signature.");
 					return false;
 				}
 
 				if (!this.selectedEndpoint.Verify(AssociatedData, Signature))
 				{
-					this.Error("Invalid signature.");
+					await this.SendBlock(Array.Empty<byte>(), null, null, null);
+					this.Error("Ignoring incoming packet. Invalid signature.");
 					return false;
 				}
 			}

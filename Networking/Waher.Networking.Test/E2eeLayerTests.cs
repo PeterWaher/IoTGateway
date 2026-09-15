@@ -13,7 +13,7 @@ namespace Waher.Networking.Test
 {
 	[TestClass]
 	[DoNotParallelize]
-	public sealed class BinaryE2eeTests
+	public sealed class E2eeLayerTests
 	{
 		private static readonly Random rnd = new();
 		private static BinaryTcpServer? server;

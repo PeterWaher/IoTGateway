@@ -138,14 +138,14 @@ namespace Waher.WebService.Queue.Test
 		[TestMethod]
 		public async Task Test_03_DequeueEnqueue()
 		{
-			_ = Task.Delay(2000).ContinueWith(async (_) =>
+			_ = Task.Delay(2000, CancellationToken.None).ContinueWith(async (_) =>
 			{
 				await InternetContent.PutAsync(
 					new Uri("http://localhost:8081/Queues/Test"),
 					"Test message",
 					new KeyValuePair<string, string>("Authorization", "Basic " +
 					Convert.ToBase64String(Encoding.ASCII.GetBytes("Test:Test"))));
-			});
+			}, CancellationToken.None);
 
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri("http://localhost:8081/Queues/Test"),
@@ -201,7 +201,7 @@ namespace Waher.WebService.Queue.Test
 
 			MixedContent? Mixed = Response.Decoded as MixedContent;
 			Assert.IsNotNull(Mixed);
-			Assert.AreEqual(2, Mixed.Content.Length);
+			Assert.HasCount(2, Mixed.Content);
 			Assert.AreEqual("Test message 1", Mixed.Content[0].Decoded);
 			Assert.AreEqual("Test message 2", Mixed.Content[1].Decoded);
 		}
@@ -209,14 +209,14 @@ namespace Waher.WebService.Queue.Test
 		[TestMethod]
 		public async Task Test_06_MinTimeout()
 		{
-			_ = Task.Delay(2000).ContinueWith(async (_) =>
+			_ = Task.Delay(2000, CancellationToken.None).ContinueWith(async (_) =>
 			{
 				await InternetContent.PutAsync(
 					new Uri("http://localhost:8081/Queues/Test"),
 					"Test message",
 					new KeyValuePair<string, string>("Authorization", "Basic " +
 					Convert.ToBase64String(Encoding.ASCII.GetBytes("Test:Test"))));
-			});
+			}, CancellationToken.None);
 
 			ContentResponse Response = await InternetContent.PostAsync(
 				new Uri("http://localhost:8081/Queues/Test?Count=2&MinTimeout=2000&Timeout=30000"),
@@ -229,7 +229,7 @@ namespace Waher.WebService.Queue.Test
 
 			MixedContent? Mixed = Response.Decoded as MixedContent;
 			Assert.IsNotNull(Mixed);
-			Assert.AreEqual(1, Mixed.Content.Length);
+			Assert.HasCount(1, Mixed.Content);
 			Assert.AreEqual("Test message", Mixed.Content[0].Decoded);
 		}
 
@@ -298,14 +298,14 @@ namespace Waher.WebService.Queue.Test
 		[TestMethod]
 		public async Task Test_09_Object()
 		{
-			QueuedEvent Event = new QueuedEvent()
+			QueuedEvent Event = new()
 			{
 				Timestamp = DateTime.Now,
 				Type = EventType.Notice,
 				Level = EventLevel.Medium,
 				Message = nameof(QueueWebServiceTests),
 				Object = nameof(Test_09_Object),
-				Actor = nameof(MSTestExecutor),
+				Actor = "MSTestExecutor",
 				EventId = "Test",
 				Facility = typeof(QueueWebServiceTests).Namespace,
 				Module = typeof(QueueWebServiceTests).Assembly.FullName,
@@ -366,7 +366,7 @@ namespace Waher.WebService.Queue.Test
 			Array? Tags = Event2["Tags"] as Array;
 			Assert.IsNotNull(Tags);
 
-			Assert.AreEqual(Event.Tags.Length, Tags.Length);
+			Assert.HasCount(Event.Tags.Length, Tags);
 
 			for (int i = 0; i < Event.Tags.Length; i++)
 			{

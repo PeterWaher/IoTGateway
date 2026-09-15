@@ -19,7 +19,7 @@ namespace Waher.Runtime.Geo.Test
 				typeof(GeoPosition).Assembly);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("10.2,20.3,100.1", 10.20, 20.30, 100.1)]
 		[DataRow("-10.2,20.3,100.1", -10.20, 20.30, 100.1)]
 		[DataRow("10.2,-20.3,100.1", 10.20, -20.30, 100.1)]
@@ -66,7 +66,7 @@ namespace Waher.Runtime.Geo.Test
 			Assert.AreEqual(Value, Position.XmlValue);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("10.2,20.3,100.1", 10.2, 20.3, 100.1)]
 		[DataRow("-10.2,20.3,100.1", -10.2, 20.3, 100.1)]
 		[DataRow("10.2,-20.3,100.1", 10.2, -20.3, 100.1)]
@@ -105,7 +105,7 @@ namespace Waher.Runtime.Geo.Test
 			Assert.AreEqual(Value, Pos.XmlValue);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("10° 12' 18.5\" N 20° 18' 24.5\" E 100.1")]
 		[DataRow("10° 12' 18.5\" S 20° 18' 24.5\" E 100.1")]
 		[DataRow("10° 12' 18.5\" N 20° 18' 24.5\" W 100.1")]
@@ -187,7 +187,7 @@ namespace Waher.Runtime.Geo.Test
 			Assert.AreEqual(Value.Length, M.Length);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("10° 12' 18.9\" N 20° 18' 36.9\" E 100.1", 10.20525, 20.31025, 100.1, false)]
 		[DataRow("10° 12' 18.9\" S 20° 18' 36.9\" E 100.1", -10.20525, 20.31025, 100.1, false)]
 		[DataRow("10° 12' 18.9\" N 20° 18' 36.9\" W 100.1", 10.20525, -20.31025, 100.1, false)]
@@ -279,7 +279,7 @@ namespace Waher.Runtime.Geo.Test
 				Assert.AreEqual(Value, Pos.HumanReadable);
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow("10° 20' N 30° 40' W")]
 		public void Test_05_GPS_RoundingErrors(string Value)
 		{

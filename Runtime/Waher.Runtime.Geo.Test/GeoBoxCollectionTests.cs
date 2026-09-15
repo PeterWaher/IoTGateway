@@ -65,7 +65,7 @@ namespace Waher.Runtime.Geo.Test
 
 			Console.WriteLine(collection.Export());
 
-			Assert.ThrowsException<ArgumentException>(() => collection.Add(box2));
+			Assert.Throws<ArgumentException>(() => collection.Add(box2));
 		}
 
 		[TestMethod]
@@ -150,7 +150,7 @@ namespace Waher.Runtime.Geo.Test
 
 			Console.WriteLine(collection.Export());
 
-			Assert.AreEqual(2, array.Length);
+			Assert.HasCount(2, array);
 			Assert.IsTrue(Array.Exists(array, b => b.Equals(box1)));
 			Assert.IsTrue(Array.Exists(array, b => b.Equals(box2)));
 		}
@@ -170,7 +170,7 @@ namespace Waher.Runtime.Geo.Test
 
 			Console.WriteLine(collection.Export());
 
-			Assert.AreEqual(2, found.Count);
+			Assert.HasCount(2, found);
 			Assert.IsTrue(found.Exists(b => b.Equals(box1)));
 			Assert.IsTrue(found.Exists(b => b.Equals(box2)));
 		}
@@ -187,7 +187,7 @@ namespace Waher.Runtime.Geo.Test
 
 			Console.WriteLine(collection.Export());
 
-			Assert.AreEqual(1, results.Length);
+			Assert.HasCount(1, results);
 			Assert.IsTrue(results[0].Equals(box));
 		}
 
@@ -203,7 +203,7 @@ namespace Waher.Runtime.Geo.Test
 
 			Console.WriteLine(collection.Export());
 
-			Assert.AreEqual(0, results.Length);
+			Assert.IsEmpty(results);
 		}
 
 		[TestMethod]
@@ -218,7 +218,7 @@ namespace Waher.Runtime.Geo.Test
 
 			Console.WriteLine(collection.Export());
 
-			Assert.AreEqual(1, results.Length);
+			Assert.HasCount(1, results);
 			Assert.IsTrue(results[0].Equals(box));
 		}
 
@@ -234,7 +234,7 @@ namespace Waher.Runtime.Geo.Test
 
 			Console.WriteLine(collection.Export());
 
-			Assert.AreEqual(0, results.Length);
+			Assert.IsEmpty(results);
 		}
 
 		[TestMethod]
@@ -253,7 +253,7 @@ namespace Waher.Runtime.Geo.Test
 
 			Console.WriteLine(collection.Export());
 
-			Assert.AreEqual(3, results.Length);
+			Assert.HasCount(3, results);
 			Assert.IsTrue(Array.Exists(results, b => b.Equals(box1)));
 			Assert.IsTrue(Array.Exists(results, b => b.Equals(box2)));
 			Assert.IsTrue(Array.Exists(results, b => b.Equals(box3)));
@@ -269,7 +269,7 @@ namespace Waher.Runtime.Geo.Test
 
 			Console.WriteLine(collection.Export());
 
-			Assert.AreEqual(0, results.Length);
+			Assert.IsEmpty(results);
 		}
 		[TestMethod]
 		public void Test_17_Add_Boxes_Exceeding_MaxCellCount_CreatesSubGrid()
@@ -310,7 +310,7 @@ namespace Waher.Runtime.Geo.Test
 			// All boxes should be found by a point in the overlapping region
 			var testPoint = new GeoPosition(15, 15);
 			var found = Collection.Find(testPoint);
-			Assert.AreEqual(MaxCellCount + 2, found.Length);
+			Assert.HasCount(MaxCellCount + 2, found);
 			foreach (var box in Boxes)
 				Assert.IsTrue(Array.Exists(found, b => b.Equals(box)));
 		}
@@ -349,13 +349,13 @@ namespace Waher.Runtime.Geo.Test
 			Assert.AreEqual(4 + maxCellCount + 1, collection.Count);
 
 			// All boxes should be found by a point in their respective regions
-			Assert.IsTrue(collection.Find(new GeoPosition(5, 5)).Length == 1); // Cell 1
-			Assert.IsTrue(collection.Find(new GeoPosition(5, 15)).Length == 1); // Cell 2
-			Assert.IsTrue(collection.Find(new GeoPosition(15, 5)).Length == 1); // Cell 3
-			Assert.IsTrue(collection.Find(new GeoPosition(15, 15)).Length == 1); // Cell 4
+			Assert.HasCount(1, collection.Find(new GeoPosition(5, 5))); // Cell 1
+			Assert.HasCount(1, collection.Find(new GeoPosition(5, 15))); // Cell 2
+			Assert.HasCount(1, collection.Find(new GeoPosition(15, 5))); // Cell 3
+			Assert.HasCount(1, collection.Find(new GeoPosition(15, 15))); // Cell 4
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow(100, 2, 2)]
 		[DataRow(100, 4, 4)]
 		[DataRow(100, 8, 8)]

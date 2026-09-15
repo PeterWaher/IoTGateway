@@ -7,7 +7,7 @@ namespace Waher.Runtime.Collections.Test
 		public void Test_001_DefaultConstructor()
 		{
 			ChunkedList<int> List = [];
-			Assert.AreEqual(0, List.Count);
+			Assert.IsEmpty(List);
 			Assert.IsFalse(List.IsReadOnly);
 		}
 
@@ -15,30 +15,26 @@ namespace Waher.Runtime.Collections.Test
 		public void Test_002_ConstructorWithInitialChunkSize()
 		{
 			ChunkedList<int> List = new(32);
-			Assert.AreEqual(0, List.Count);
+			Assert.IsEmpty(List);
 		}
 
 		[TestMethod]
 		public void Test_003_ConstructorWithInitialAndMaxChunkSize()
 		{
 			ChunkedList<int> List = new(32, 64);
-			Assert.AreEqual(0, List.Count);
+			Assert.IsEmpty(List);
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
 		public void Test_004_ConstructorWithInvalidInitialChunkSize()
 		{
-			ChunkedList<int> List = new(0);
-			Assert.AreEqual(0, List.Count);
+			Assert.Throws<ArgumentException>(() => new ChunkedList<int>(0));
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
 		public void Test_005_ConstructorWithMaxChunkSizeLessThanInitialChunkSize()
 		{
-			ChunkedList<int> List = new(64, 32);
-			Assert.AreEqual(0, List.Count);
+			Assert.Throws<ArgumentException>(() => new ChunkedList<int>(64, 32));
 		}
 
 		[TestMethod]
@@ -106,7 +102,7 @@ namespace Waher.Runtime.Collections.Test
 			ChunkedList<int> List = [];
 			List.Add(1);
 			List.Clear();
-			Assert.AreEqual(0, List.Count);
+			Assert.IsEmpty(List);
 			Assert.IsFalse(List.Contains(1));
 		}
 
@@ -155,11 +151,10 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(InvalidOperationException))]
 		public void Test_017_LastItem_EmptyList()
 		{
 			ChunkedList<int> List = [];
-			_ = List.LastItem; // Should throw InvalidOperationException
+			Assert.Throws<InvalidOperationException>(() => _ = List.LastItem);
 		}
 
 		[TestMethod]
@@ -182,11 +177,10 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(InvalidOperationException))]
 		public void Test_020_FirstItem_EmptyList()
 		{
 			ChunkedList<int> List = [];
-			_ = List.FirstItem; // Should throw InvalidOperationException
+			Assert.Throws<InvalidOperationException>(() => _ = List.FirstItem);
 		}
 
 		[TestMethod]
@@ -231,17 +225,16 @@ namespace Waher.Runtime.Collections.Test
 			Assert.AreEqual(2, List.LastItem);
 
 			List.RemoveFirst();
-			Assert.AreEqual(0, List.Count);
+			Assert.IsEmpty(List);
 			Assert.IsFalse(List.HasFirstItem);
 			Assert.IsFalse(List.HasLastItem);
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(InvalidOperationException))]
 		public void Test_024_RemoveFirst_EmptyList()
 		{
 			ChunkedList<int> List = [];
-			List.RemoveFirst(); // Should throw InvalidOperationException
+			Assert.Throws<InvalidOperationException>(() => List.RemoveFirst());
 		}
 
 		[TestMethod]
@@ -256,17 +249,16 @@ namespace Waher.Runtime.Collections.Test
 			Assert.AreEqual(1, List.LastItem);
 
 			List.RemoveLast();
-			Assert.AreEqual(0, List.Count);
+			Assert.IsEmpty(List);
 			Assert.IsFalse(List.HasFirstItem);
 			Assert.IsFalse(List.HasLastItem);
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(InvalidOperationException))]
 		public void Test_026_RemoveLast_EmptyList()
 		{
 			ChunkedList<int> List = [];
-			List.RemoveLast(); // Should throw InvalidOperationException
+			Assert.Throws<InvalidOperationException>(() => List.RemoveLast());
 		}
 
 		[TestMethod]
@@ -279,7 +271,7 @@ namespace Waher.Runtime.Collections.Test
 				List.AddLastItem(i);
 
 			Assert.AreEqual(10000, List.Count);
-			Assert.AreEqual(0, List.FirstItem);
+			Assert.IsEmpty(List);
 			Assert.AreEqual(9999, List.LastItem);
 
 			// Remove elements from the beginning
@@ -304,7 +296,7 @@ namespace Waher.Runtime.Collections.Test
 
 			Assert.AreEqual(5000, List.Count);
 			Assert.AreEqual(-4999, List.FirstItem);
-			Assert.AreEqual(0, List.LastItem);
+			Assert.IsEmpty(List);
 		}
 
 		[TestMethod]
@@ -338,7 +330,7 @@ namespace Waher.Runtime.Collections.Test
 
 			Assert.AreEqual(5000, List.Count);
 			Assert.AreEqual(-4999, List.FirstItem);
-			Assert.AreEqual(0, List.LastItem);
+			Assert.IsEmpty(List);
 		}
 		[TestMethod]
 		public void Test_029_Indexer_Get()
@@ -354,12 +346,11 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ArgumentOutOfRangeException))]
 		public void Test_030_Indexer_Get_OutOfRange()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
-			_ = List[1]; // Should throw ArgumentOutOfRangeException
+			Assert.Throws<ArgumentOutOfRangeException>(() => _ = List[1]);
 		}
 
 		[TestMethod]
@@ -378,12 +369,11 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ArgumentOutOfRangeException))]
 		public void Test_032_Indexer_Set_OutOfRange()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
-			List[1] = 5; // Should throw ArgumentOutOfRangeException
+			Assert.Throws<ArgumentOutOfRangeException>(() => List[1] = 5);
 		}
 
 		[TestMethod]
@@ -415,12 +405,11 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ArgumentOutOfRangeException))]
 		public void Test_035_Insert_OutOfRange()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
-			List.Insert(2, 2); // Should throw ArgumentOutOfRangeException
+			Assert.Throws<ArgumentOutOfRangeException>(() => List.Insert(2, 2));
 		}
 
 		[TestMethod]
@@ -439,12 +428,11 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ArgumentOutOfRangeException))]
 		public void Test_037_RemoveAt_OutOfRange()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
-			List.RemoveAt(1); // Should throw ArgumentOutOfRangeException
+			Assert.Throws<ArgumentOutOfRangeException>(() => List.RemoveAt(1));
 		}
 
 		[TestMethod]
@@ -618,11 +606,10 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ArgumentOutOfRangeException))]
 		public void Test_046_IndexOf_Item_Index_OutOfRange()
 		{
 			ChunkedList<int> List = [1, 2];
-			List.IndexOf(2, 3); // Should throw ArgumentOutOfRangeException
+			Assert.Throws<ArgumentOutOfRangeException>(() => List.IndexOf(2, 3));
 		}
 
 		[TestMethod]
@@ -636,11 +623,10 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ArgumentOutOfRangeException))]
 		public void Test_048_IndexOf_Item_Index_Count_OutOfRange()
 		{
 			ChunkedList<int> List = [1, 2];
-			List.IndexOf(2, 0, 3); // Should throw ArgumentOutOfRangeException
+			Assert.Throws<ArgumentException>(() => List.IndexOf(2, 0, 3));
 		}
 		[TestMethod]
 		public void Test_049_LastIndexOf_Item()
@@ -663,11 +649,10 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ArgumentOutOfRangeException))]
 		public void Test_051_LastIndexOf_Item_Index_OutOfRange()
 		{
 			ChunkedList<int> List = [1, 2];
-			List.LastIndexOf(2, 3); // Should throw ArgumentOutOfRangeException
+			Assert.Throws<ArgumentOutOfRangeException>(() => List.LastIndexOf(2, 3));
 		}
 
 		[TestMethod]
@@ -681,11 +666,10 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ArgumentOutOfRangeException))]
 		public void Test_053_LastIndexOf_Item_Index_Count_OutOfRange()
 		{
 			ChunkedList<int> List = [1, 2];
-			List.LastIndexOf(2, 0, 3); // Should throw ArgumentOutOfRangeException
+			Assert.Throws<ArgumentException>(() => List.LastIndexOf(2, 0, 3));
 		}
 
 		[TestMethod]
@@ -804,7 +788,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.AddRange(Range);
 
-			Assert.AreEqual(0, List.Count);
+			Assert.IsEmpty(List);
 		}
 
 		[TestMethod]
@@ -976,7 +960,7 @@ namespace Waher.Runtime.Collections.Test
 			ChunkedList<int> List = new(4);
 			int[] Result = [.. List];
 
-			Assert.AreEqual(0, Result.Length);
+			Assert.IsEmpty(Result);
 		}
 
 		[TestMethod]
@@ -1145,7 +1129,7 @@ namespace Waher.Runtime.Collections.Test
 			List.Update(UpdateCallback);
 
 			int[] Result = [.. List];
-			Assert.AreEqual(0, Result.Length);
+			Assert.IsEmpty(Result);
 		}
 
 		[TestMethod]
@@ -1387,7 +1371,7 @@ namespace Waher.Runtime.Collections.Test
 			List.Reverse();
 
 			int[] Result = [.. List];
-			Assert.AreEqual(0, Result.Length);
+			Assert.IsEmpty(Result);
 		}
 
 		[TestMethod]
@@ -1472,7 +1456,7 @@ namespace Waher.Runtime.Collections.Test
 			for (int i = 0; i < 4; i++)
 				List.Add(i);
 
-			Assert.AreEqual(0, List.FirstItem);
+			Assert.IsEmpty(List);
 
 			List.FirstItem = 10;
 			Assert.AreEqual(10, List.FirstItem);
@@ -1492,7 +1476,7 @@ namespace Waher.Runtime.Collections.Test
 			for (int i = 0; i < 8; i++)
 				List.Add(i);
 
-			Assert.AreEqual(0, List.FirstItem);
+			Assert.IsEmpty(List);
 
 			List.FirstItem = 10;
 			Assert.AreEqual(10, List.FirstItem);
@@ -1505,19 +1489,17 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(InvalidOperationException))]
 		public void Test_100_Get_LastItem_EmptyList()
 		{
 			ChunkedList<int> List = new(4);
-			_ = List.LastItem;
+			Assert.Throws<InvalidOperationException>(() => _ = List.LastItem);
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(InvalidOperationException))]
 		public void Test_101_Get_FirstItem_EmptyList()
 		{
 			ChunkedList<int> List = new(4);
-			_ = List.FirstItem;
+			Assert.Throws<InvalidOperationException>(() => _ = List.FirstItem);
 		}
 
 		[TestMethod]
@@ -1715,7 +1697,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.InsertRange(4, [100, 101]);
 
-			Assert.IsTrue(CountChunks(List) > InitialChunkCount, "Expected InsertRange to split an internal chunk.");
+			Assert.IsGreaterThan(InitialChunkCount, CountChunks(List), "Expected InsertRange to split an internal chunk.");
 			AssertListByIndexer(List, [0, 1, 2, 3, 100, 101, 4, 5, 6, 7, 8, 9, 10, 11]);
 		}
 
@@ -1727,7 +1709,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.InsertRange(5, [100, 101, 102]);
 
-			Assert.IsTrue(CountChunks(List) > InitialChunkCount, "Expected InsertRange to split an internal chunk.");
+			Assert.IsGreaterThan(InitialChunkCount, CountChunks(List), "Expected InsertRange to split an internal chunk.");
 			AssertListByIndexer(List, [0, 1, 2, 3, 4, 100, 101, 102, 5, 6, 7, 8, 9, 10, 11]);
 		}
 
@@ -1739,7 +1721,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.InsertRange(7, [100, 101, 102]);
 
-			Assert.IsTrue(CountChunks(List) > InitialChunkCount, "Expected InsertRange to split an internal chunk.");
+			Assert.IsGreaterThan(InitialChunkCount, CountChunks(List), "Expected InsertRange to split an internal chunk.");
 			AssertListByIndexer(List, [0, 1, 2, 3, 4, 5, 6, 100, 101, 102, 7, 8, 9, 10, 11]);
 		}
 
@@ -1751,7 +1733,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.InsertRange(6, [200, 201, 202, 203, 204, 205, 206, 207, 208, 209]);
 
-			Assert.IsTrue(CountChunks(List) > InitialChunkCount, "Expected a long InsertRange into an internal chunk to create additional chunks.");
+			Assert.IsGreaterThan(InitialChunkCount, CountChunks(List), "Expected a long InsertRange into an internal chunk to create additional chunks.");
 			AssertListByIndexer(List,
 			[
 				0, 1, 2, 3, 4, 5,
@@ -1770,7 +1752,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.InsertRange(3, [100, 101, 102]);
 
-			Assert.IsTrue(CountChunks(List) > InitialChunkCount, "Expected InsertRange to split an internal chunk after traversing a chunk with Start > 0.");
+			Assert.IsGreaterThan(InitialChunkCount, CountChunks(List), "Expected InsertRange to split an internal chunk after traversing a chunk with Start > 0.");
 			AssertListByIndexer(List, [2, 3, 4, 100, 101, 102, 5, 6, 7, 8, 9, 10, 11]);
 		}
 
@@ -1868,7 +1850,7 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = CreateList(8, 4);
 
-			Assert.IsTrue(CountChunks(List) > 1, "Test setup requires more than one chunk.");
+			Assert.IsGreaterThan(1, CountChunks(List), "Test setup requires more than one chunk.");
 			Assert.AreNotSame(List.FirstChunk, List.LastChunk, "FirstChunk and LastChunk must not expose the same node when the list spans multiple chunks.");
 			AssertCountEqualsChunkElementCount(List);
 			AssertListByIndexer(List, [0, 1, 2, 3, 4, 5, 6, 7]);
@@ -1971,7 +1953,7 @@ namespace Waher.Runtime.Collections.Test
 		[TestMethod]
 		public void Test_128_EmptyInitialArrayConstructor_AddFirstMaintainsFirstAndLastInvariants()
 		{
-			ChunkedList<int> List = new(Array.Empty<int>());
+			ChunkedList<int> List = new([]);
 
 			List.AddFirstItem(10);
 
@@ -1981,13 +1963,13 @@ namespace Waher.Runtime.Collections.Test
 			Assert.AreEqual(10, List.FirstItem);
 			Assert.AreEqual(10, List.LastItem);
 			Assert.AreEqual(10, List.RemoveFirst());
-			Assert.AreEqual(0, List.Count);
+			Assert.IsEmpty(List);
 		}
 
 		[TestMethod]
 		public void Test_129_EmptyInitialArrayConstructor_AddLastAllowsRemoveFirst()
 		{
-			ChunkedList<int> List = new(Array.Empty<int>());
+			ChunkedList<int> List = new([]);
 
 			List.AddLastItem(10);
 
@@ -1997,7 +1979,7 @@ namespace Waher.Runtime.Collections.Test
 			Assert.IsTrue(List.HasLastItem);
 			Assert.AreEqual(10, List.FirstItem);
 			Assert.AreEqual(10, List.RemoveFirst());
-			Assert.AreEqual(0, List.Count);
+			Assert.IsEmpty(List);
 		}
 
 		[TestMethod]
@@ -2095,7 +2077,7 @@ namespace Waher.Runtime.Collections.Test
 				3
 			};
 
-			Assert.ThrowsException<ArgumentOutOfRangeException>(() => 
+			Assert.Throws<ArgumentOutOfRangeException>(() => 
 				List.LastIndexOf(3, List.Count));
 		}
 
@@ -2109,7 +2091,7 @@ namespace Waher.Runtime.Collections.Test
 				3
 			};
 
-			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			Assert.Throws<ArgumentOutOfRangeException>(() =>
 				List.LastIndexOf(3, List.Count, 0));
 		}
 
@@ -2137,8 +2119,8 @@ namespace Waher.Runtime.Collections.Test
 				3
 			};
 
-			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
-				List.InsertRange(4, Array.Empty<int>()));
+			Assert.Throws<ArgumentOutOfRangeException>(() =>
+				List.InsertRange(4, []));
 		}
 
 		[TestMethod]
@@ -2203,7 +2185,7 @@ namespace Waher.Runtime.Collections.Test
 
 			int[] Destination = new int[3];
 
-			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			Assert.Throws<ArgumentOutOfRangeException>(() =>
 				List.CopyTo(-1, Destination, 0, 1));
 		}
 
@@ -2215,7 +2197,7 @@ namespace Waher.Runtime.Collections.Test
 				10
 			};
 
-			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			Assert.Throws<ArgumentOutOfRangeException>(() =>
 				List.AddRange([1, 2, 3], 1, -1));
 		}
 
@@ -2227,7 +2209,7 @@ namespace Waher.Runtime.Collections.Test
 				10
 			};
 
-			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			Assert.Throws<ArgumentOutOfRangeException>(() =>
 				List.AddRange([1, 2, 3], 4, 0));
 		}
 
@@ -2248,7 +2230,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		[Timeout(1000)]
+		[Timeout(1000, CooperativeCancellation = true)]
 		public void Test_147_InsertRange_LazySelfEnumerable_DoesNotEnumerateNewlyInsertedItems()
 		{
 			ChunkedList<int> List = new(4)
@@ -2270,7 +2252,7 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [];
 
-			Assert.ThrowsException<ArgumentOutOfRangeException>(()=>
+			Assert.Throws<ArgumentOutOfRangeException>(()=>
 				List.Reverse(1, 0));
 		}
 
@@ -2279,7 +2261,7 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [];
 
-			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			Assert.Throws<ArgumentOutOfRangeException>(() =>
 				List.Reverse(0, 1));
 		}
 
@@ -2288,7 +2270,7 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [];
 
-			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			Assert.Throws<ArgumentOutOfRangeException>(() =>
 				List.Sort(1, 0, Comparer<int>.Default));
 		}
 
@@ -2300,7 +2282,7 @@ namespace Waher.Runtime.Collections.Test
 				1
 			];
 
-			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			Assert.Throws<ArgumentOutOfRangeException>(() =>
 				List.Sort(0, 2, Comparer<int>.Default));
 		}
 
@@ -2309,7 +2291,7 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [];
 
-			Assert.ThrowsException<ArgumentNullException>(() =>
+			Assert.Throws<ArgumentNullException>(() =>
 				List.AddRange((int[]?)null));
 		}
 
@@ -2318,7 +2300,7 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [];
 
-			Assert.ThrowsException<ArgumentNullException>(() =>
+			Assert.Throws<ArgumentNullException>(() =>
 				List.InsertRange(0, null));
 		}
 		[TestMethod]
@@ -2383,7 +2365,7 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [];
 
-			Assert.ThrowsException<ArgumentNullException>(() =>
+			Assert.Throws<ArgumentNullException>(() =>
 				List.AddRange((ChunkedList<int>?)null));
 		}
 
@@ -2392,7 +2374,7 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [];
 
-			Assert.ThrowsException<ArgumentNullException>(() =>
+			Assert.Throws<ArgumentNullException>(() =>
 				List.AddRangeFirst((int[]?)null));
 		}
 
@@ -2401,7 +2383,7 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [];
 
-			Assert.ThrowsException<ArgumentNullException>(() =>
+			Assert.Throws<ArgumentNullException>(() =>
 				List.AddRangeFirst((IEnumerable<int>?)null));
 		}
 
@@ -2425,7 +2407,7 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [];
 
-			Assert.ThrowsException<ArgumentNullException>(() =>
+			Assert.Throws<ArgumentNullException>(() =>
 				List.Sort((Comparison<int>?)null));
 		}
 
@@ -2437,14 +2419,14 @@ namespace Waher.Runtime.Collections.Test
 				1
 			];
 
-			Assert.ThrowsException<ArgumentNullException>(() =>
+			Assert.Throws<ArgumentNullException>(() =>
 				List.Sort((Comparison<int>?)null));
 		}
 
 		[TestMethod]
 		public void Test_163_Constructor_NullInitialElements_ThrowsArgumentNullException()
 		{
-			Assert.ThrowsException<ArgumentNullException>(() =>
+			Assert.Throws<ArgumentNullException>(() =>
 				_ = new ChunkedList<int>((int[]?)null));
 		}
 
@@ -2524,7 +2506,7 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [1, 2, 3];
 
-			Assert.ThrowsException<ArgumentNullException>(() =>
+			Assert.Throws<ArgumentNullException>(() =>
 				List.ForEach(null));
 		}
 
@@ -2533,7 +2515,7 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [1, 2, 3];
 
-			Assert.ThrowsException<ArgumentNullException>(() =>
+			Assert.Throws<ArgumentNullException>(() =>
 				List.ForEachChunk(null));
 		}
 
@@ -2542,7 +2524,7 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [1, 2, 3];
 
-			Assert.ThrowsException<ArgumentNullException>(() =>
+			Assert.Throws<ArgumentNullException>(() =>
 				List.Update(null));
 		}
 
@@ -2551,7 +2533,7 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [1, 2, 3];
 
-			await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () =>
+			await Assert.ThrowsAsync<ArgumentNullException>(async () =>
 				await List.ForEachAsync(null));
 		}
 
@@ -2560,25 +2542,15 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [1, 2, 3];
 
-			await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () =>
+			await Assert.ThrowsAsync<ArgumentNullException>(async () =>
 				await List.ForEachChunkAsync(null));
 		}
-		private sealed class ParserNode
+		private sealed class ParserNode(int Id)
 		{
-			public ParserNode(int Id)
-			{
-				this.Id = Id;
-				this.Children = [];
-			}
+			public int Id { get; } = Id;
+			public ParserNode[] Children { get; set; } = [];
 
-			public int Id { get; }
-
-			public ParserNode[] Children { get; set; }
-
-			public override string ToString()
-			{
-				return this.Id.ToString();
-			}
+			public override string ToString() => this.Id.ToString();
 		}
 
 		private static ChunkedList<int> CreateList(int Count, int ChunkSize)
@@ -2630,7 +2602,7 @@ namespace Waher.Runtime.Collections.Test
 				}
 				catch (ArgumentOutOfRangeException ex)
 				{
-					Assert.Fail("Indexer threw " + ex.GetType().Name + " for index " + i.ToString() + " even though Count is " + List.Count.ToString() + ". " + ex.Message);
+					throw new Exception("Indexer threw " + ex.GetType().Name + " for index " + i.ToString() + " even though Count is " + List.Count.ToString() + ". " + ex.Message);
 				}
 			}
 		}
@@ -2642,7 +2614,7 @@ namespace Waher.Runtime.Collections.Test
 			List.ForEachChunk((Chunk, Offset, Count) =>
 			{
 				Result++;
-				Assert.IsTrue(Count > 0, "ForEachChunk should only report non-empty chunks.");
+				Assert.IsGreaterThan(0, Count, "ForEachChunk should only report non-empty chunks.");
 				return true;
 			});
 

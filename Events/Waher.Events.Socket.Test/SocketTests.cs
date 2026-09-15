@@ -76,7 +76,7 @@ namespace Waher.Events.Socket.Test
 			return Task.CompletedTask;
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow(EventType.Debug)]
 		[DataRow(EventType.Informational)]
 		[DataRow(EventType.Notice)]

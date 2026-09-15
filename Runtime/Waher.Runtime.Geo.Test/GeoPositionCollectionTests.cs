@@ -14,7 +14,7 @@
 			Assert.AreEqual(1, Collection.Count);
 
 			List<IGeoSpatialObjectReference> Objects = [.. Collection];
-			Assert.AreEqual(1, Objects.Count);
+			Assert.HasCount(1, Objects);
 			Assert.AreEqual("37.7749,-122.4194", Objects[0].GeoId);
 		}
 
@@ -30,13 +30,13 @@
 			Collection.Add(Object2);
 			Collection.Add(Object3);
 
-			Assert.AreEqual(3, Collection.Count);
+			Assert.HasCount(3, Collection);
 
 			List<IGeoSpatialObjectReference> Objects = [.. Collection];
-			Assert.AreEqual(3, Objects.Count);
-			Assert.IsTrue(Objects.Exists(o => o.GeoId == "37.7749,-122.4194"));
-			Assert.IsTrue(Objects.Exists(o => o.GeoId == "34.0522,-118.2437"));
-			Assert.IsTrue(Objects.Exists(o => o.GeoId == "40.7128,-74.0060"));
+			Assert.HasCount(3, Objects);
+			Assert.Contains("37.7749,-122.4194", Objects.Select(o => o.GeoId).ToList());
+			Assert.Contains("34.0522,-118.2437", Objects.Select(o => o.GeoId).ToList());
+			Assert.Contains("40.7128,-74.0060", Objects.Select(o => o.GeoId).ToList());
 		}
 
 		[TestMethod]
@@ -47,7 +47,7 @@
 			GeoSpatialObject DuplicateObject = new("37.7749,-122.4194", true);
 
 			Collection.Add(Object1);
-			Assert.ThrowsException<ArgumentException>(() => Collection.Add(DuplicateObject));
+			Assert.Throws<ArgumentException>(() => Collection.Add(DuplicateObject));
 		}
 
 		[TestMethod]
@@ -65,7 +65,7 @@
 			Assert.AreEqual(ObjectCount, Collection.Count);
 
 			List<IGeoSpatialObjectReference> Objects = [.. Collection];
-			Assert.AreEqual(ObjectCount, Objects.Count);
+			Assert.HasCount(ObjectCount, Objects);
 
 			for (int i = 0; i < ObjectCount; i++)
 				Assert.IsTrue(Objects.Exists(o =>
@@ -92,7 +92,7 @@
 			Assert.AreEqual(2, Collection.Count);
 
 			List<IGeoSpatialObjectReference> Objects = [.. Collection];
-			Assert.AreEqual(2, Objects.Count);
+			Assert.HasCount(2, Objects);
 			Assert.IsTrue(Objects.Exists(o => o.GeoId == "-90.0000,-180.0000"));
 			Assert.IsTrue(Objects.Exists(o => o.GeoId == "90.0000,180.0000"));
 		}
@@ -115,10 +115,10 @@
 				GeoIds.Add(Obj.GeoId);
 			}
 
-			Assert.AreEqual(3, GeoIds.Count);
-			Assert.IsTrue(GeoIds.Contains("37.7749,-122.4194"));
-			Assert.IsTrue(GeoIds.Contains("34.0522,-118.2437"));
-			Assert.IsTrue(GeoIds.Contains("40.7128,-74.0060"));
+			Assert.HasCount(3, GeoIds);
+			Assert.Contains("37.7749,-122.4194", GeoIds);
+			Assert.Contains("34.0522,-118.2437", GeoIds);
+			Assert.Contains("40.7128,-74.0060", GeoIds);
 		}
 
 		[TestMethod]
@@ -127,7 +127,7 @@
 			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 
 			// Ensure the collection is initially empty
-			Assert.AreEqual(0, Collection.Count);
+			Assert.IsEmpty(Collection);
 
 			// Clear the collection
 			Collection.Clear();
@@ -137,7 +137,7 @@
 
 			// Verify enumeration returns no elements
 			List<IGeoSpatialObjectReference> Objects = [.. Collection];
-			Assert.AreEqual(0, Objects.Count);
+			Assert.IsEmpty(Objects);
 		}
 
 		[TestMethod]
@@ -158,7 +158,7 @@
 
 			// Verify enumeration returns no elements
 			List<IGeoSpatialObjectReference> Objects = [.. Collection];
-			Assert.AreEqual(0, Objects.Count);
+			Assert.IsEmpty(Objects);
 		}
 
 		[TestMethod]
@@ -183,7 +183,7 @@
 
 			// Verify enumeration returns no elements
 			List<IGeoSpatialObjectReference> Objects = [.. Collection];
-			Assert.AreEqual(0, Objects.Count);
+			Assert.IsEmpty(Objects);
 		}
 
 		[TestMethod]
@@ -206,7 +206,7 @@
 
 			// Verify enumeration returns no elements
 			List<IGeoSpatialObjectReference> Objects = [.. Collection];
-			Assert.AreEqual(0, Objects.Count);
+			Assert.IsEmpty(Objects);
 		}
 
 		[TestMethod]
@@ -232,7 +232,7 @@
 
 			// Verify the new object is present
 			List<IGeoSpatialObjectReference> Objects = [.. Collection];
-			Assert.AreEqual(1, Objects.Count);
+			Assert.HasCount(1, Objects);
 			Assert.AreEqual("40.7128,-74.0060", Objects[0].GeoId);
 		}
 
@@ -371,7 +371,7 @@
 			Collection.CopyTo(Destination, 0);
 
 			// Verify that the object was copied correctly
-			Assert.AreEqual(1, Collection.Count);
+			Assert.HasCount(1, Collection);
 			Assert.IsNotNull(Destination[0]);
 			Assert.AreEqual("37.7749,-122.4194", Destination[0].GeoId);
 
@@ -454,7 +454,7 @@
 			Collection.Add(Object);
 
 			// Attempt to copy to a null destination array
-			Assert.ThrowsException<ArgumentNullException>(() => Collection.CopyTo(null, 0));
+			Assert.Throws<ArgumentNullException>(() => Collection.CopyTo(null, 0));
 		}
 
 		[TestMethod]
@@ -469,7 +469,7 @@
 			GeoSpatialObjectReference[] Destination = new GeoSpatialObjectReference[10];
 
 			// Attempt to copy with a negative offset
-			Assert.ThrowsException<ArgumentOutOfRangeException>(() => Collection.CopyTo(Destination, -1));
+			Assert.Throws<ArgumentOutOfRangeException>(() => Collection.CopyTo(Destination, -1));
 		}
 
 		[TestMethod]
@@ -486,7 +486,7 @@
 			GeoSpatialObjectReference[] Destination = new GeoSpatialObjectReference[1];
 
 			// Attempt to copy to an array that is too small
-			Assert.ThrowsException<ArgumentException>(() => Collection.CopyTo(Destination, 0));
+			Assert.Throws<ArgumentException>(() => Collection.CopyTo(Destination, 0));
 		}
 
 		[TestMethod]
@@ -498,7 +498,7 @@
 			IGeoSpatialObjectReference[] Result = [.. Collection];
 
 			// Verify that the resulting array is empty
-			Assert.AreEqual(0, Result.Length);
+			Assert.IsEmpty(Result);
 		}
 
 		[TestMethod]
@@ -514,7 +514,7 @@
 			IGeoSpatialObjectReference[] Result = [.. Collection];
 
 			// Verify that the resulting array contains the single object
-			Assert.AreEqual(1, Result.Length);
+			Assert.HasCount(1, Result);
 			Assert.AreEqual("37.7749,-122.4194", Result[0].GeoId);
 		}
 
@@ -535,7 +535,7 @@
 			IGeoSpatialObjectReference[] Result = [.. Collection];
 
 			// Verify that the resulting array contains all objects
-			Assert.AreEqual(3, Result.Length);
+			Assert.HasCount(3, Result);
 			Assert.IsTrue(Array.Exists(Result, o => o.GeoId == "37.7749,-122.4194"));
 			Assert.IsTrue(Array.Exists(Result, o => o.GeoId == "34.0522,-118.2437"));
 			Assert.IsTrue(Array.Exists(Result, o => o.GeoId == "40.7128,-74.0060"));
@@ -557,7 +557,7 @@
 			IGeoSpatialObjectReference[] Result = [.. Collection];
 
 			// Verify that the resulting array is empty
-			Assert.AreEqual(0, Result.Length);
+			Assert.IsEmpty(Result);
 		}
 
 		[TestMethod]
@@ -576,7 +576,7 @@
 			IGeoSpatialObjectReference[] Result = [.. Collection];
 
 			// Verify that the resulting array is empty
-			Assert.AreEqual(0, Result.Length);
+			Assert.IsEmpty(Result);
 		}
 
 		[TestMethod]
@@ -596,7 +596,7 @@
 			IGeoSpatialObjectReference[] Result = [.. Collection];
 
 			// Verify that the resulting array contains all objects
-			Assert.AreEqual(ObjectCount, Result.Length);
+			Assert.HasCount(ObjectCount, Result);
 
 			for (int i = 0; i < ObjectCount; i++)
 			{
@@ -624,7 +624,7 @@
 			}
 
 			// Verify that no objects were enumerated
-			Assert.AreEqual(0, EnumeratedObjects.Count);
+			Assert.IsEmpty(EnumeratedObjects);
 		}
 
 		[TestMethod]
@@ -644,7 +644,7 @@
 			}
 
 			// Verify that the single object was enumerated
-			Assert.AreEqual(1, EnumeratedObjects.Count);
+			Assert.HasCount(1, EnumeratedObjects);
 			Assert.AreEqual("37.7749,-122.4194", EnumeratedObjects[0].GeoId);
 		}
 
@@ -669,10 +669,10 @@
 			}
 
 			// Verify that all objects were enumerated
-			Assert.AreEqual(3, EnumeratedObjects.Count);
-			Assert.IsTrue(EnumeratedObjects.Exists(o => o.GeoId == "37.7749,-122.4194"));
-			Assert.IsTrue(EnumeratedObjects.Exists(o => o.GeoId == "34.0522,-118.2437"));
-			Assert.IsTrue(EnumeratedObjects.Exists(o => o.GeoId == "40.7128,-74.0060"));
+			Assert.HasCount(3, EnumeratedObjects);
+			Assert.Contains("37.7749,-122.4194", EnumeratedObjects.Select(o => o.GeoId).ToList());
+			Assert.Contains("34.0522,-118.2437", EnumeratedObjects.Select(o => o.GeoId).ToList());
+			Assert.Contains("40.7128,-74.0060", EnumeratedObjects.Select(o => o.GeoId).ToList());
 		}
 
 		[TestMethod]
@@ -686,7 +686,7 @@
 			Collection.Add(Object1);
 
 			// Attempt to modify the collection during enumeration
-			Assert.ThrowsException<InvalidOperationException>(() =>
+			Assert.Throws<InvalidOperationException>(() =>
 			{
 				foreach (IGeoSpatialObjectReference _ in Collection)
 					Collection.Add(Object2);
@@ -703,7 +703,7 @@
 			Collection.Add(Object1);
 
 			// Attempt to modify the collection during enumeration
-			Assert.ThrowsException<InvalidOperationException>(() =>
+			Assert.Throws<InvalidOperationException>(() =>
 			{
 				foreach (IGeoSpatialObjectReference _ in Collection)
 					Collection.Remove(new GeoSpatialObjectReference(Object1));
@@ -738,13 +738,13 @@
 			}
 
 			// Verify the first enumeration contains only the first object
-			Assert.AreEqual(1, EnumeratedObjectsBefore.Count);
+			Assert.HasCount(1, EnumeratedObjectsBefore);
 			Assert.AreEqual("37.7749,-122.4194", EnumeratedObjectsBefore[0].GeoId);
 
 			// Verify the second enumeration contains both objects
-			Assert.AreEqual(2, EnumeratedObjectsAfter.Count);
-			Assert.IsTrue(EnumeratedObjectsAfter.Exists(o => o.GeoId == "37.7749,-122.4194"));
-			Assert.IsTrue(EnumeratedObjectsAfter.Exists(o => o.GeoId == "34.0522,-118.2437"));
+			Assert.HasCount(2, EnumeratedObjectsAfter);
+			Assert.Contains("37.7749,-122.4194", EnumeratedObjectsAfter.Select(o => o.GeoId).ToList());
+			Assert.Contains("34.0522,-118.2437", EnumeratedObjectsAfter.Select(o => o.GeoId).ToList());
 		}
 
 		[TestMethod]
@@ -894,10 +894,10 @@
 
 			GeoSpatialObjectReference[] Results = Collection.Find(Box);
 
-			Assert.AreEqual(3, Results.Length);
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point1"));
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point2"));
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point3"));
+			Assert.HasCount(3, Results);
+			Assert.Contains("Point1", Results.Select(p => p.GeoId).ToList());
+			Assert.Contains("Point2", Results.Select(p => p.GeoId).ToList());
+			Assert.Contains("Point3", Results.Select(p => p.GeoId).ToList());
 		}
 
 		[TestMethod]
@@ -913,7 +913,7 @@
 
 			GeoSpatialObjectReference[] Results = Collection.Find(Box);
 
-			Assert.AreEqual(0, Results.Length);
+			Assert.IsEmpty(Results);
 		}
 
 		[TestMethod]
@@ -931,11 +931,11 @@
 
 			GeoSpatialObjectReference[] Results = Collection.Find(Box);
 
-			Assert.AreEqual(4, Results.Length);
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "NW"));
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "NE"));
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "SW"));
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "SE"));
+			Assert.HasCount(4, Results);
+			Assert.Contains("NW", Results.Select(p => p.GeoId).ToList());
+			Assert.Contains("NE", Results.Select(p => p.GeoId).ToList());
+			Assert.Contains("SW", Results.Select(p => p.GeoId).ToList());
+			Assert.Contains("SE", Results.Select(p => p.GeoId).ToList());
 		}
 
 		[TestMethod]
@@ -952,8 +952,8 @@
 
 			GeoSpatialObjectReference[] Results = Collection.Find(Box);
 
-			Assert.AreEqual(1, Results.Length);
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "PointInside"));
+			Assert.HasCount(1, Results);
+			Assert.Contains("PointInside", Results.Select(p => p.GeoId).ToList());
 		}
 
 		[TestMethod]
@@ -970,10 +970,10 @@
 
 			GeoSpatialObjectReference[] Results = Collection.Find(Box);
 
-			Assert.AreEqual(3, Results.Length);
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "PointOnMin"));
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "PointOnMax"));
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "PointInside"));
+			Assert.HasCount(3, Results);
+			Assert.Contains("PointOnMin", Results.Select(p => p.GeoId).ToList());
+			Assert.Contains("PointOnMax", Results.Select(p => p.GeoId).ToList());
+			Assert.Contains("PointInside", Results.Select(p => p.GeoId).ToList());
 		}
 
 		[TestMethod]
@@ -985,7 +985,7 @@
 
 			GeoSpatialObjectReference[] Results = Collection.Find(Box);
 
-			Assert.AreEqual(0, Results.Length);
+			Assert.IsEmpty(Results);
 		}
 
 		[TestMethod]
@@ -1001,9 +1001,9 @@
 
 			GeoSpatialObjectReference[] Results = Collection.Find(Box);
 
-			Assert.AreEqual(2, Results.Length);
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "PointMin"));
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "PointMax"));
+			Assert.HasCount(2, Results);
+			Assert.Contains("PointMin", Results.Select(p => p.GeoId).ToList());
+			Assert.Contains("PointMax", Results.Select(p => p.GeoId).ToList());
 		}
 
 		[TestMethod]
@@ -1020,8 +1020,8 @@
 
 			var Results = Collection.Find(Box);
 
-			Assert.AreEqual(1, Results.Length);
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point2"));
+			Assert.HasCount(1, Results);
+			Assert.Contains("Point2", Results.Select(p => p.GeoId).ToList());
 		}
 
 		[TestMethod]
@@ -1038,7 +1038,7 @@
 
 			var Results = Collection.Find(Box);
 
-			Assert.AreEqual(0, Results.Length);
+			Assert.IsEmpty(Results);
 		}
 
 		[TestMethod]
@@ -1055,10 +1055,10 @@
 
 			var Results = Collection.Find(Box);
 
-			Assert.AreEqual(3, Results.Length);
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point1"));
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point2"));
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point3"));
+			Assert.HasCount(3, Results);
+			Assert.Contains("Point1", Results.Select(p => p.GeoId).ToList());
+			Assert.Contains("Point2", Results.Select(p => p.GeoId).ToList());
+			Assert.Contains("Point3", Results.Select(p => p.GeoId).ToList());
 		}
 
 		[TestMethod]
@@ -1075,8 +1075,8 @@
 
 			var Results = Collection.Find(Box);
 
-			Assert.AreEqual(1, Results.Length);
-			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point2"));
+			Assert.HasCount(1, Results);
+			Assert.Contains("Point2", Results.Select(p => p.GeoId).ToList());
 		}
 
 		[TestMethod]
@@ -1094,12 +1094,12 @@
 
 			var Results = Collection.Find(Box);
 
-			Assert.AreEqual(2, Results.Length);
+			Assert.HasCount(2, Results);
 			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point2"));
 			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point3"));
 		}
 
-		[DataTestMethod]
+		[TestMethod]
 		[DataRow(100)]
 		[DataRow(500)]
 		[DataRow(1000)]
@@ -1122,7 +1122,7 @@
 			Assert.AreEqual(N, Collection.Count);
 
 			GeoSpatialObjectReference[] Result = Collection.Find(new GeoBoundingBox(new GeoPosition(-90, -180), new GeoPosition(90, 180)));
-			Assert.AreEqual(N, Result.Length);
+			Assert.HasCount(N, Result);
 
 			for (i = 0; i < N; i++)
 			{
@@ -1139,7 +1139,7 @@
 				Assert.AreEqual((i & 1) != 0, Collection.Contains(Positions[i]));
 
 			Result = Collection.Find(new GeoBoundingBox(new GeoPosition(-90, -180), new GeoPosition(90, 180)));
-			Assert.AreEqual(N / 2, Result.Length);
+			Assert.HasCount(N / 2, Result);
 
 			for (i = 0; i < N; i++)
 			{

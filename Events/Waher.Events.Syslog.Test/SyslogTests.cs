@@ -43,7 +43,7 @@ namespace Waher.Events.Syslog.Test
 				BinaryPresentationMethod.Hexadecimal, "TestContext");
 		}
 
-		[ClassCleanup(ClassCleanupBehavior.EndOfClass)]
+		[ClassCleanup]
 		public static async Task ClassCleanup()
 		{
 			if (client is not null)

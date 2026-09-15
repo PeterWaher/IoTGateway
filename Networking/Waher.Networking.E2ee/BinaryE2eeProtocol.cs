@@ -32,7 +32,8 @@ namespace Waher.Networking.E2ee
 		private bool signedTransfers;
 		private Dictionary<string, IE2eSymmetricCipher> remoteSymmetricCiphers;
 		private Dictionary<string, IE2eEndpoint> remoteEndpoints;
-		private IE2eEndpoint selectedEndpoint;
+		private IE2eEndpoint selectedLocalEndpoint;
+		private IE2eEndpoint selectedRemoteEndpoint;
 		private IE2eSymmetricCipher selectedSymmetricCipher;
 		private Guid id;
 		private Guid remoteId;
@@ -134,10 +135,7 @@ namespace Waher.Networking.E2ee
 		/// <param name="BinaryTransport">Binary transport layer.</param>
 		/// <param name="Initiator">Initiator of the conversation, typically the
 		/// part that initiates a connection or conversation.</param>
-		/// <param name="DesiredSecurityStrength">Desired security strength.</param>
-		/// <param name="MinSecurityStrength">Minimum security strength.</param>
-		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
-		/// <param name="OnlyIfDerivedFrom">Only return endpoints derived from these types.</param>
+		/// <param name="Endpoints">Asymmetric ciphers.</param>
 		/// <param name="DecoupledEvents">If events raised from the communication layer 
 		/// are decoupled, i.e. executed in parallel with the source that raised them.</param>
 		/// <param name="SignedTransfers">If all transfers must be signed.</param>
@@ -591,7 +589,8 @@ namespace Waher.Networking.E2ee
 				SelectedCipher = CommonCiphers[i];
 			}
 
-			this.selectedEndpoint = BestEndpoint;
+			this.selectedLocalEndpoint = BestEndpoint;
+			this.selectedRemoteEndpoint = BestRemoteEndpoint;
 			this.selectedSymmetricCipher = SelectedCipher;
 
 			if (this.selectedSymmetricCipher.AuthenticatedEncryption)
@@ -700,7 +699,7 @@ namespace Waher.Networking.E2ee
 				AssociatedData, E2eBufferFillAlgorithm.Random);
 
 			if (this.signedTransfers)
-				Signature = this.selectedEndpoint.Sign(AssociatedData);
+				Signature = this.selectedLocalEndpoint.Sign(AssociatedData);
 			else
 				Signature = null;
 		}
@@ -1219,7 +1218,8 @@ namespace Waher.Networking.E2ee
 				CipherText);
 
 			this.hasSymmetricKey = true;
-			this.selectedEndpoint = LocalEndpoint;
+			this.selectedLocalEndpoint = LocalEndpoint;
+			this.selectedRemoteEndpoint = RemoteEndpoint;
 			this.selectedSymmetricCipher = LocalCipher;
 			this.signedTransfers = Signatures;
 
@@ -1259,13 +1259,15 @@ namespace Waher.Networking.E2ee
 					return false;
 				}
 
-				if (!this.selectedEndpoint.Verify(AssociatedData, Signature))
+				if (!this.selectedRemoteEndpoint.Verify(AssociatedData, Signature))
 				{
 					await this.SendBlock(Array.Empty<byte>(), null, null, null);
 					this.Error("Ignoring incoming packet. Invalid signature.");
 					return false;
 				}
 			}
+
+			this.ReceiveBinary(true, Decrypted);
 
 			BinaryDataReadEventHandler h = this.OnReceived;
 			if (!(h is null))

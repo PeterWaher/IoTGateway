@@ -5291,7 +5291,7 @@ namespace Waher.IoTGateway
 		public static async Task<WebMenuItem[]> GetSettingsMenu(HttpRequest Request, string UserVariable)
 		{
 			ChunkedList<WebMenuItem> Result = new ChunkedList<WebMenuItem>();
-			Variables Session = Request.Session;
+			Variables Session = Request?.Session;
 			if (Session is null)
 				return Array.Empty<WebMenuItem>();
 

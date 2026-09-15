@@ -698,7 +698,10 @@ namespace Waher.Networking.E2ee
 			byte[] Packet, string Text, byte[] Encrypted, byte[] Signature, 
 			EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
-			this.TransmitBinary(ConstantBuffer, Packet);
+			if (IsText)
+				this.TransmitText(Text);
+			else
+				this.TransmitBinary(ConstantBuffer, Packet);
 
 			if (!await this.SendBlock(IsText, Encrypted, Signature, 
 				async (Sender, e) =>

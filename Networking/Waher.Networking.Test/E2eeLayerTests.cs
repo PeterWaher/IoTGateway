@@ -429,7 +429,7 @@ namespace Waher.Networking.Test
 			Assert.HasCount(Length, Data);
 
 			for (i = 0; i < Length; i++)
-				Assert.AreEqual((char)('A' + (i % 25)), s[i]);
+				Assert.AreEqual((char)('A' + ((Length - i - 1) % 25)), s[i]);
 		}
 
 		[TestMethod]

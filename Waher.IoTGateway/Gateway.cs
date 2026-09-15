@@ -5288,14 +5288,15 @@ namespace Waher.IoTGateway
 		/// <param name="Request">Current HTTP Request</param>
 		/// <param name="UserVariable">Name of user variable</param>
 		/// <returns>Array of web menu items.</returns>
-		public static WebMenuItem[] GetSettingsMenu(HttpRequest Request, string UserVariable)
+		public static async Task<WebMenuItem[]> GetSettingsMenu(HttpRequest Request, string UserVariable)
 		{
-			List<WebMenuItem> Result = new List<WebMenuItem>();
+			ChunkedList<WebMenuItem> Result = new ChunkedList<WebMenuItem>();
 			Variables Session = Request.Session;
 			if (Session is null)
 				return Array.Empty<WebMenuItem>();
 
-			Language Language = ScriptExtensions.Constants.Language.GetLanguageAsync(Session).Result;
+			Language Language = await ScriptExtensions.Constants.Language.GetLanguageAsync(Session)
+				?? await Translator.GetDefaultLanguageAsync();
 
 			if (Session is null ||
 				!Session.TryGetVariable(UserVariable, out Variable v) ||

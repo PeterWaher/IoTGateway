@@ -593,7 +593,8 @@ namespace Waher.Networking.XMPP.P2P
 					return SortedArray(Endpoints.ByFqn);
 			}
 
-			if (string.Compare(FullJid, this.client.BareJID) == 0)
+			if (!(this.client is null) && 
+				string.Compare(FullJid, this.client.BareJID) == 0)
 			{
 				StringBuilder Xml = new StringBuilder();
 

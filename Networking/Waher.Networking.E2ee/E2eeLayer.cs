@@ -17,8 +17,7 @@ namespace Waher.Networking.E2ee
 	/// <summary>
 	/// End-to-End encrypted communication layer.
 	/// </summary>
-	public class E2eeLayer : CommunicationLayer, IBinaryTransportLayer, 
-		ITextTransportLayer
+	public class E2eeLayer : CommunicationLayer, IBinaryTransportLayer, ITextTransportLayer
 	{
 		private static readonly Random rnd = new Random();
 
@@ -54,6 +53,7 @@ namespace Waher.Networking.E2ee
 		private int inputOffset = 0;
 		private int inputBlockLen = 0;
 		private int inputBlockPos;
+		private bool inputIsText;
 
 		/// <summary>
 		/// End-to-End encrypted communication layer.
@@ -358,7 +358,7 @@ namespace Waher.Networking.E2ee
 				this.TransmitText(sb.ToString());
 			}
 
-			bool Result = await this.SendBlock(Output.ToArray(), null, null, null);
+			bool Result = await this.SendBlock(false, Output.ToArray(), null, null, null);
 
 			this.greetingPerformed.TrySetResult(Result);
 
@@ -396,7 +396,7 @@ namespace Waher.Networking.E2ee
 				else
 				{
 					this.Error("No endpoints in common with remote party.");
-					await this.SendBlock(Array.Empty<byte>(), null, null, null);
+					await this.SendBlock(false, Array.Empty<byte>(), null, null, null);
 				}
 
 				return false;
@@ -489,19 +489,34 @@ namespace Waher.Networking.E2ee
 			if (!(sb is null))
 				this.TransmitText(sb.ToString());
 
-			return await this.SendBlock(Output.ToArray(), null, null, null);
+			return await this.SendBlock(false, Output.ToArray(), null, null, null);
 		}
 
-		private Task<bool> SendBlock(byte[] Block, byte[] Signature,
+		private Task<bool> SendBlock(bool IsText, byte[] Block, byte[] Signature,
 			EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			BinaryOutput Output = new BinaryOutput();
-			Output.WriteData(Block);
+			ulong Len = (uint)Block.Length;
+			
+			Len <<= 1;
+			if (IsText)
+				Len |= 1;
+
+			Output.WriteVarLenUInt(Len);
+			Output.WriteRaw(Block);
 
 			if (!(Signature is null))
-				Output.WriteData(Signature);
+			{
+				Len = (uint)Signature.Length;
+				Len <<= 1;
 
-			return this.binaryTransport.SendAsync(true, Output.ToArray(), Callback, State);
+				Output.WriteVarLenUInt(Len);
+				Output.WriteRaw(Signature);
+			}
+
+			byte[] Packet = Output.ToArray();
+
+			return this.binaryTransport.SendAsync(true, Packet, Callback, State);
 		}
 
 		private async Task<bool> SelectCipher()
@@ -646,7 +661,7 @@ namespace Waher.Networking.E2ee
 				this.TransmitText(sb.ToString());
 			}
 
-			bool Result = await this.SendBlock(CipherSelection.ToArray(), null, null, null);
+			bool Result = await this.SendBlock(false, CipherSelection.ToArray(), null, null, null);
 
 			this.ciphersSelected.TrySetResult(Result);
 
@@ -670,34 +685,62 @@ namespace Waher.Networking.E2ee
 				return false;
 			}
 
+			if (Packet.Length == 0)
+				return true;
+
 			this.EncryptPacket(Packet, out byte[] Encrypted, out byte[] Signature);
 
-			return await this.SendEncryptedBlock(ConstantBuffer, Packet, Encrypted,
-				Signature, null, null);
+			return await this.SendEncryptedBlock(false, ConstantBuffer, Packet, null,
+				Encrypted, Signature, null, null);
 		}
 
-		private async Task<bool> SendEncryptedBlock(bool ConstantBuffer, byte[] Packet,
-			byte[] Encrypted, byte[] Signature, 
+		private async Task<bool> SendEncryptedBlock(bool IsText, bool ConstantBuffer, 
+			byte[] Packet, string Text, byte[] Encrypted, byte[] Signature, 
 			EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			this.TransmitBinary(ConstantBuffer, Packet);
 
-			if (!await this.SendBlock(Encrypted, Signature, Callback, State))
-				return false;
+			if (!await this.SendBlock(IsText, Encrypted, Signature, 
+				async (Sender, e) =>
+				{
+					if (IsText)
+					{
+						TextEventHandler h = this.OnTextSent;
+						if (!(h is null))
+						{
+							try
+							{
+								await h(this, Text);
+							}
+							catch (Exception ex)
+							{
+								this.Exception(ex);
+								Log.Exception(ex);
+							}
+						}
+					}
+					else
+					{
+						BinaryDataWrittenEventHandler h = this.OnSent;
+						if (!(h is null))
+						{
+							try
+							{
+								await h(this, ConstantBuffer, Packet, 0, Packet.Length);
+							}
+							catch (Exception ex)
+							{
+								this.Exception(ex);
+								Log.Exception(ex);
+							}
+						}
+					}
 
-			BinaryDataWrittenEventHandler h = this.OnSent;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, ConstantBuffer, Packet, 0, Packet.Length);
-				}
-				catch (Exception ex)
-				{
-					this.Exception(ex);
-					Log.Exception(ex);
-				}
-			}
+					if (!(Callback is null))
+						await Callback.Raise(this, new DeliveryEventArgs(State, e.Ok));
+
+				}, State))
+				return false;
 
 			return true;
 		}
@@ -735,10 +778,13 @@ namespace Waher.Networking.E2ee
 				return false;
 			}
 
+			if (Packet.Length == 0)
+				return true;
+
 			this.EncryptPacket(Packet, out byte[] Encrypted, out byte[] Signature);
 
-			return await this.SendEncryptedBlock(ConstantBuffer, Packet, Encrypted,
-				Signature, Callback, State);
+			return await this.SendEncryptedBlock(false, ConstantBuffer, Packet, null,
+				Encrypted, Signature, Callback, State);
 		}
 
 		/// <summary>
@@ -750,7 +796,8 @@ namespace Waher.Networking.E2ee
 		/// <param name="Offset">Start index of first byte written.</param>
 		/// <param name="Count">Number of bytes written.</param>
 		/// <returns>If data was sent.</returns>
-		public async Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
+		public async Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset,
+			int Count)
 		{
 			if (!this.hasSymmetricKey)
 			{
@@ -758,11 +805,14 @@ namespace Waher.Networking.E2ee
 				return false;
 			}
 
+			if (Count == 0)
+				return true;
+
 			byte[] Packet = GetPacket(Buffer, Offset, Count, ref ConstantBuffer);
 			this.EncryptPacket(Packet, out byte[] Encrypted, out byte[] Signature);
 
-			return await this.SendEncryptedBlock(ConstantBuffer, Packet, Encrypted,
-				Signature, null, null);
+			return await this.SendEncryptedBlock(false, ConstantBuffer, Packet, null, 
+				Encrypted, Signature, null, null);
 		}
 
 		private static byte[] GetPacket(byte[] Buffer, int Offset, int Count,
@@ -797,11 +847,14 @@ namespace Waher.Networking.E2ee
 				return false;
 			}
 
+			if (Count == 0)
+				return true;
+
 			byte[] Packet = GetPacket(Buffer, Offset, Count, ref ConstantBuffer);
 			this.EncryptPacket(Packet, out byte[] Encrypted, out byte[] Signature);
 
-			return await this.SendEncryptedBlock(ConstantBuffer, Packet, Encrypted, 
-				Signature, Callback, State);
+			return await this.SendEncryptedBlock(false, ConstantBuffer, Packet, null, 
+				Encrypted, Signature, Callback, State);
 		}
 
 		/// <summary>
@@ -849,8 +902,19 @@ namespace Waher.Networking.E2ee
 
 							if ((b & 0x80) == 0)
 							{
+								this.inputIsText = (this.inputBlockLen & 1) != 0;
+								this.inputBlockLen >>= 1;
 								this.inputBlock = new byte[this.inputBlockLen];
 								this.inputOffset = 0;
+
+								if (this.inputIsText && !this.hasSymmetricKey)
+								{
+									this.Error("Protocol error.");
+									this.inputState = -1;
+
+									await this.OnProtocolError.Raise(this, EventArgs.Empty);
+									break;
+								}
 
 								if (this.inputBlockLen > 0)
 								{
@@ -880,10 +944,30 @@ namespace Waher.Networking.E2ee
 											break;
 
 										default:
-											this.Error("Protocol error.");
-											this.inputState = -1;
+											if (this.inputIsText && this.inputState != 9)
+											{
+												this.inputBlock = Array.Empty<byte>();
 
-											await this.OnProtocolError.Raise(this, EventArgs.Empty);
+												if (this.signedTransfers)
+												{
+													this.encryptedBlock = this.inputBlock;
+													this.inputState += 2;
+												}
+												else if (await this.ProcessEncryptedBlock(this.inputIsText, this.inputBlock, null))
+													this.inputBlockLen = 0;
+												else
+												{
+													this.inputState = -1;
+													await this.OnProtocolError.Raise(this, EventArgs.Empty);
+												}
+											}
+											else
+											{
+												this.Error("Protocol error.");
+												this.inputState = -1;
+
+												await this.OnProtocolError.Raise(this, EventArgs.Empty);
+											}
 											break;
 									}
 								}
@@ -957,8 +1041,11 @@ namespace Waher.Networking.E2ee
 											this.encryptedBlock = this.inputBlock;
 											this.inputState++;
 										}
-										else if (await this.ProcessEncryptedBlock(this.inputBlock, null))
+										else if (await this.ProcessEncryptedBlock(this.inputIsText, this.inputBlock, null))
+										{
+											this.inputBlockLen = 0;
 											this.inputState--;
+										}
 										else
 										{
 											this.inputState = -1;
@@ -967,8 +1054,16 @@ namespace Waher.Networking.E2ee
 										break;
 
 									case 9:
-										if (await this.ProcessEncryptedBlock(this.encryptedBlock, this.inputBlock))
+										if (this.inputIsText)
+										{
+											this.inputState = -1;
+											await this.OnProtocolError.Raise(this, EventArgs.Empty);
+										}
+										else if (await this.ProcessEncryptedBlock(this.inputIsText, this.encryptedBlock, this.inputBlock))
+										{
+											this.inputBlockLen = 0;
 											this.inputState -= 3;
+										}
 										else
 										{
 											this.inputState = -1;
@@ -1240,10 +1335,10 @@ namespace Waher.Networking.E2ee
 			if (this.HasSniffers)
 				this.TransmitText("Go ahead.");
 
-			return await this.SendBlock(Array.Empty<byte>(), null, null, null);
+			return await this.SendBlock(false, Array.Empty<byte>(), null, null, null);
 		}
 
-		private async Task<bool> ProcessEncryptedBlock(byte[] Data, byte[] Signature)
+		private async Task<bool> ProcessEncryptedBlock(bool IsText,byte[] Data, byte[] Signature)
 		{
 			if (!this.hasSymmetricKey)
 			{
@@ -1268,32 +1363,55 @@ namespace Waher.Networking.E2ee
 			{
 				if (Signature is null)
 				{
-					await this.SendBlock(Array.Empty<byte>(), null, null, null);
+					await this.SendBlock(false, Array.Empty<byte>(), null, null, null);
 					this.Error("Ignoring incoming packet. Missing signature.");
 					return false;
 				}
 
 				if (!this.selectedRemoteEndpoint.Verify(AssociatedData, Signature))
 				{
-					await this.SendBlock(Array.Empty<byte>(), null, null, null);
+					await this.SendBlock(false, Array.Empty<byte>(), null, null, null);
 					this.Error("Ignoring incoming packet. Invalid signature.");
 					return false;
 				}
 			}
 
-			this.ReceiveBinary(true, Decrypted);
-
-			BinaryDataReadEventHandler h = this.OnReceived;
-			if (!(h is null))
+			if (IsText)
 			{
-				try
+				string Text = Encoding.UTF8.GetString(Decrypted);
+
+				this.ReceiveText(Text);
+
+				TextEventHandler h = this.OnTextReceived;
+				if (!(h is null))
 				{
-					await h(this, true, Decrypted, 0, Decrypted.Length);
+					try
+					{
+						await h(this, Text);
+					}
+					catch (Exception ex)
+					{
+						this.Exception(ex);
+						Log.Exception(ex);
+					}
 				}
-				catch (Exception ex)
+			}
+			else
+			{
+				this.ReceiveBinary(true, Decrypted);
+
+				BinaryDataReadEventHandler h = this.OnReceived;
+				if (!(h is null))
 				{
-					this.Exception(ex);
-					Log.Exception(ex);
+					try
+					{
+						await h(this, true, Decrypted, 0, Decrypted.Length);
+					}
+					catch (Exception ex)
+					{
+						this.Exception(ex);
+						Log.Exception(ex);
+					}
 				}
 			}
 
@@ -1319,9 +1437,21 @@ namespace Waher.Networking.E2ee
 		/// </summary>
 		/// <param name="Text">Text packet.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(string Text)
+		public async Task<bool> SendAsync(string Text)
 		{
-			throw new NotImplementedException();	// TODO
+			if (!this.hasSymmetricKey)
+			{
+				this.Error("Keys not negotiated.");
+				return false;
+			}
+
+			// Note: Empty strings permitted.
+
+			byte[] Packet = Encoding.UTF8.GetBytes(Text);
+			this.EncryptPacket(Packet, out byte[] Encrypted, out byte[] Signature);
+
+			return await this.SendEncryptedBlock(true, true, Packet, Text, 
+				Encrypted, Signature, null, null);
 		}
 
 		/// <summary>
@@ -1331,9 +1461,22 @@ namespace Waher.Networking.E2ee
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(string Text, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
+		public async Task<bool> SendAsync(string Text, 
+			EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
 		{
-			throw new NotImplementedException();    // TODO
+			if (!this.hasSymmetricKey)
+			{
+				this.Error("Keys not negotiated.");
+				return false;
+			}
+
+			// Note: Empty strings permitted.
+
+			byte[] Packet = Encoding.UTF8.GetBytes(Text);
+			this.EncryptPacket(Packet, out byte[] Encrypted, out byte[] Signature);
+
+			return await this.SendEncryptedBlock(true, true, Packet, Text,
+				Encrypted, Signature, DeliveryCallback, State);
 		}
 
 		/// <summary>

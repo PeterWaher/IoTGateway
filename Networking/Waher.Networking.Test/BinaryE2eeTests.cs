@@ -71,7 +71,7 @@ namespace Waher.Networking.Test
 
 					try
 					{
-						Result = await Protocol.NegotiateKeys(10000);
+						Result = await Protocol.NegotiateKeys(10000, CancellationToken.None);
 					}
 					catch (Exception ex)
 					{
@@ -90,7 +90,7 @@ namespace Waher.Networking.Test
 							Log.Exception(ex);
 						}
 					}
-				});
+				}, CancellationToken.None);
 
 				return Task.CompletedTask;
 			};
@@ -98,7 +98,7 @@ namespace Waher.Networking.Test
 			await server.Open();
 		}
 
-		[ClassCleanup(ClassCleanupBehavior.EndOfClass)]
+		[ClassCleanup(InheritanceBehavior.None)]
 		public static void ClassCleanup()
 		{
 			if (server is not null)
@@ -292,7 +292,7 @@ namespace Waher.Networking.Test
 				return Task.CompletedTask;
 			};
 
-			_ = Task.Delay(10000).ContinueWith(_ =>
+			_ = Task.Delay(10000, CancellationToken.None).ContinueWith(_ =>
 				Packet.TrySetException(new TimeoutException()));
 
 			byte[] Data = new byte[Length];
@@ -304,7 +304,7 @@ namespace Waher.Networking.Test
 			Assert.IsTrue(await this.clientProtocol.SendAsync(true, Data));
 
 			Data = await Packet.Task;
-			Assert.AreEqual(Length, Data.Length);
+			Assert.HasCount(Length, Data);
 
 			for (i = 0; i < Length; i++)
 				Assert.AreEqual((byte)(Length - i - 1), Data[i]);

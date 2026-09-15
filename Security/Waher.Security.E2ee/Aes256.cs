@@ -31,6 +31,11 @@ namespace Waher.Security.E2EE
 		}
 
 		/// <summary>
+		/// Security strength of End-to-End encryption scheme.
+		/// </summary>
+		public override int SecurityStrength => 256;
+
+		/// <summary>
 		/// Local name of the E2E symmetric cipher
 		/// </summary>
 		public override string LocalName => "aes";

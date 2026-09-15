@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -383,92 +384,27 @@ namespace Waher.Security.E2EE
 				for (i = 0; i < c; i++)
 					OnlyIfDerivedFromType[i] = OnlyIfDerivedFrom[i].GetTypeInfo();
 
-				List<IE2eEndpoint> Result = new List<IE2eEndpoint>();
+				ChunkedList<IE2eEndpoint> Result = new ChunkedList<IE2eEndpoint>();
 				IEnumerable<IE2eEndpoint> Templates;
-				bool CheckHeritance = true;
 
 				lock (endpointTypes)
 				{
 					if (initialized)
 						Templates = endpointTypes.Values;
 					else
-					{
-						Dictionary<string, IE2eEndpoint> E2eTypes = new Dictionary<string, IE2eEndpoint>();
-						Dictionary<string, bool> TypeNames = new Dictionary<string, bool>();
-						TypeInfo E2eTypeInfo = typeof(IE2eEndpoint).GetTypeInfo();
-
-						foreach (KeyValuePair<string, IE2eEndpoint> P in endpointTypes)
-						{
-							E2eTypes[P.Key] = P.Value;
-							TypeNames[P.Value.GetType().FullName] = true;
-						}
-
-						foreach (Type T in e2eTypes ?? Types.GetTypesImplementingInterface(typeof(IE2eEndpoint)))
-						{
-							if (TypeNames.ContainsKey(T.FullName))
-								continue;
-
-							TypeInfo TI = T.GetTypeInfo();
-							if (!(e2eTypes is null) && !E2eTypeInfo.IsAssignableFrom(TI))
-								continue;
-
-							if (c > 0)
-							{
-								bool DerivedFrom = false;
-
-								for (i = 0; i < c; i++)
-								{
-									if (OnlyIfDerivedFromType[i].IsAssignableFrom(TI))
-									{
-										DerivedFrom = true;
-										break;
-									}
-								}
-
-								if (!DerivedFrom)
-									continue;
-							}
-
-							ConstructorInfo CI = Types.GetDefaultConstructor(T);
-							if (CI is null)
-								continue;
-
-							try
-							{
-								IE2eEndpoint Endpoint = (IE2eEndpoint)CI.Invoke(Types.NoParameters);
-								E2eTypes[Endpoint.Namespace + "#" + Endpoint.LocalName] = Endpoint;
-							}
-							catch (Exception ex)
-							{
-								Log.Exception(ex);
-								continue;
-							}
-						}
-
-						endpointTypes = E2eTypes;
-						Templates = E2eTypes.Values;
-
-						if (OnlyIfDerivedFromType is null)
-						{
-							foreach (IE2eSymmetricCipher Cipher in CreateSymmetricCiphers())
-								symmetricCiphers[Cipher.Namespace + "#" + Cipher.LocalName] = Cipher;
-
-							initialized = true;
-						}
-						else
-							CheckHeritance = false;
-					}
+						Templates = InitializeLocked(OnlyIfDerivedFromType);
 				}
 
 				foreach (IE2eEndpoint Endpoint in Templates)
 				{
-					if (CheckHeritance && c > 0)
+					if (c > 0)
 					{
+						TypeInfo TI = Endpoint.GetType().GetTypeInfo();
 						bool DerivedFrom = false;
 
 						for (i = 0; i < c; i++)
 						{
-							if (OnlyIfDerivedFromType[i].IsAssignableFrom(Endpoint.GetType().GetTypeInfo()))
+							if (OnlyIfDerivedFromType[i].IsAssignableFrom(TI))
 							{
 								DerivedFrom = true;
 								break;
@@ -497,13 +433,105 @@ namespace Waher.Security.E2EE
 			}
 		}
 
+		private static IEnumerable<IE2eEndpoint> InitializeLocked(TypeInfo[] OnlyIfDerivedFromType)
+		{
+			Dictionary<string, IE2eEndpoint> E2eTypes = new Dictionary<string, IE2eEndpoint>();
+			Dictionary<string, bool> TypeNames = new Dictionary<string, bool>();
+			TypeInfo E2eTypeInfo = typeof(IE2eEndpoint).GetTypeInfo();
+
+			int i, c = OnlyIfDerivedFromType?.Length ?? 0;
+
+			foreach (KeyValuePair<string, IE2eEndpoint> P in endpointTypes)
+			{
+				E2eTypes[P.Key] = P.Value;
+				TypeNames[P.Value.GetType().FullName] = true;
+			}
+
+			foreach (Type T in e2eTypes ?? Types.GetTypesImplementingInterface(typeof(IE2eEndpoint)))
+			{
+				if (TypeNames.ContainsKey(T.FullName))
+					continue;
+
+				TypeInfo TI = T.GetTypeInfo();
+				if (!(e2eTypes is null) && !E2eTypeInfo.IsAssignableFrom(TI))
+					continue;
+
+				if (c > 0)
+				{
+					bool DerivedFrom = false;
+
+					for (i = 0; i < c; i++)
+					{
+						if (OnlyIfDerivedFromType[i].IsAssignableFrom(TI))
+						{
+							DerivedFrom = true;
+							break;
+						}
+					}
+
+					if (!DerivedFrom)
+						continue;
+				}
+
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
+					continue;
+
+				try
+				{
+					IE2eEndpoint Endpoint = (IE2eEndpoint)CI.Invoke(Types.NoParameters);
+					E2eTypes[Endpoint.Namespace + "#" + Endpoint.LocalName] = Endpoint;
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+					continue;
+				}
+			}
+
+			endpointTypes = E2eTypes;
+
+			if (symmetricCiphers.Count == 0)
+			{
+				foreach (IE2eSymmetricCipher Cipher in CreateSymmetricCiphers())
+					symmetricCiphers[Cipher.Namespace + "#" + Cipher.LocalName] = Cipher;
+			}
+
+			if (OnlyIfDerivedFromType is null)
+				initialized = true;
+
+			return E2eTypes.Values;
+		}
+
 		/// <summary>
 		/// Creates an array of available symmetric ciphers.
 		/// </summary>
 		/// <returns>Available symmetric ciphers.</returns>
 		public static IE2eSymmetricCipher[] CreateSymmetricCiphers()
 		{
+			return CreateSymmetricCiphers(0, int.MaxValue, null);
+		}
+
+		/// <summary>
+		/// Creates a set of ciphers within a range of security strengths.
+		/// </summary>
+		/// <param name="MinSecurityStrength">Minimum security strength.</param>
+		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
+		/// <param name="OnlyIfDerivedFrom">Only return ciphers derived from these types.</param>
+		/// <returns>Array of symmetric ciphers.</returns>
+		public static IE2eSymmetricCipher[] CreateSymmetricCiphers(int MinSecurityStrength,
+			int MaxSecurityStrength, Type[] OnlyIfDerivedFrom)
+		{
 			ChunkedList<IE2eSymmetricCipher> Result = new ChunkedList<IE2eSymmetricCipher>();
+			int i, c = OnlyIfDerivedFrom?.Length ?? 0;
+
+			if (c == 1 && OnlyIfDerivedFrom[0] is null)
+				c = 0;
+
+			TypeInfo[] OnlyIfDerivedFromType = c == 0 ? null : new TypeInfo[c];
+
+			for (i = 0; i < c; i++)
+				OnlyIfDerivedFromType[i] = OnlyIfDerivedFrom[i].GetTypeInfo();
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IE2eSymmetricCipher)))
 			{
@@ -516,7 +544,33 @@ namespace Waher.Security.E2EE
 					if (CI is null)
 						continue;
 
-					Result.Add((IE2eSymmetricCipher)CI.Invoke(Types.NoParameters));
+					IE2eSymmetricCipher Cipher = (IE2eSymmetricCipher)CI.Invoke(Types.NoParameters);
+
+					if (Cipher.SecurityStrength < MinSecurityStrength ||
+						Cipher.SecurityStrength > MaxSecurityStrength)
+					{
+						continue;
+					}
+
+					if (c > 0)
+					{
+						TypeInfo TI = T.GetTypeInfo();
+						bool DerivedFrom = false;
+
+						for (i = 0; i < c; i++)
+						{
+							if (OnlyIfDerivedFromType[i].IsAssignableFrom(TI))
+							{
+								DerivedFrom = true;
+								break;
+							}
+						}
+
+						if (!DerivedFrom)
+							continue;
+					}
+
+					Result.Add(Cipher);
 				}
 				catch (Exception ex)
 				{
@@ -590,7 +644,7 @@ namespace Waher.Security.E2EE
 		/// <param name="Namespace">Namespace</param>
 		/// <param name="SymmetricCipher">Symmetric Cipher, or null if not found.</param>
 		/// <returns>If a symmetric cipher was found with the given name.</returns>
-		public static bool TryGetSymmetricCipher(string LocalName, string Namespace, 
+		public static bool TryGetSymmetricCipher(string LocalName, string Namespace,
 			out IE2eSymmetricCipher SymmetricCipher)
 		{
 			if (Namespace.StartsWith("urn:ieee:"))
@@ -625,6 +679,5 @@ namespace Waher.Security.E2EE
 			else
 				return false;
 		}
-
 	}
 }

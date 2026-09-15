@@ -75,7 +75,6 @@ namespace Waher.Networking.E2ee
 		{
 		}
 
-
 		/// <summary>
 		/// Binary End-to-End encrypted protocol.
 		/// </summary>
@@ -97,6 +96,34 @@ namespace Waher.Networking.E2ee
 			: this(BinaryTransport, Initiator, E2eEndpoint.CreateEndpoints(
 				DesiredSecurityStrength, MinSecurityStrength, MaxSecurityStrength,
 				OnlyIfDerivedFrom), SignedTransfers, DecoupledEvents, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Binary End-to-End encrypted protocol.
+		/// </summary>
+		/// <param name="BinaryTransport">Binary transport layer.</param>
+		/// <param name="Initiator">Initiator of the conversation, typically the
+		/// part that initiates a connection or conversation.</param>
+		/// <param name="DesiredSecurityStrength">Desired security strength.</param>
+		/// <param name="MinSecurityStrength">Minimum security strength.</param>
+		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
+		/// <param name="OnlyIfDerivedFromAsymmetric">Only use endpoints derived from these types.</param>
+		/// <param name="OnlyIfDerivedFromSymmetric">Only use ciphers derived from these types.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication layer 
+		/// are decoupled, i.e. executed in parallel with the source that raised them.</param>
+		/// <param name="SignedTransfers">If all transfers must be signed.</param>
+		/// <param name="Sniffers">Optional sniffers.</param>
+		public BinaryE2eeProtocol(IBinaryTransportLayer BinaryTransport, bool Initiator,
+			int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength,
+			Type[] OnlyIfDerivedFromAsymmetric, Type[] OnlyIfDerivedFromSymmetric, bool SignedTransfers, 
+			bool DecoupledEvents, params ISniffer[] Sniffers)
+			: this(BinaryTransport, Initiator, 
+				E2eEndpoint.CreateEndpoints(DesiredSecurityStrength, MinSecurityStrength, 
+					MaxSecurityStrength, OnlyIfDerivedFromAsymmetric),
+				E2eEndpoint.CreateSymmetricCiphers(MinSecurityStrength, MaxSecurityStrength, 
+					OnlyIfDerivedFromSymmetric), 
+				SignedTransfers, DecoupledEvents, Sniffers)
 		{
 		}
 

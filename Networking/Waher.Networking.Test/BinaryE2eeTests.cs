@@ -1,4 +1,5 @@
-﻿using Waher.Events;
+﻿using System.Security.Cryptography;
+using Waher.Events;
 using Waher.Networking.E2ee;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
@@ -16,7 +17,7 @@ namespace Waher.Networking.Test
 	{
 		private static BinaryTcpServer? server;
 		private static XmlFileSniffer? serverSniffer;
-		private static Random rnd = new Random();
+		private static Random rnd = new();
 		private XmlFileSniffer? clientSniffer;
 		private BinaryTcpClient? client;
 		private BinaryE2eeProtocol? clientProtocol;
@@ -165,12 +166,43 @@ namespace Waher.Networking.Test
 		}
 
 		[TestMethod]
-		[DataRow(false)]
-		[DataRow(true)]
-		public async Task Test_01_KeyNegotiation_EllipticCurves(bool SignedTransfers)
+		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(Aes256))]
+		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(ChaCha20))]
+		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(false, typeof(EllipticCurveEndpoint), null)]
+		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(Aes256))]
+		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(ChaCha20))]
+		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(EllipticCurveEndpoint), null)]
+		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(Aes256))]
+		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(ChaCha20))]
+		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(Aes256))]
+		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(ChaCha20))]
+		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(ModuleLatticeEndpoint), null)]
+		[DataRow(false, typeof(RsaEndpoint), typeof(Aes256))]
+		[DataRow(false, typeof(RsaEndpoint), typeof(ChaCha20))]
+		[DataRow(false, typeof(RsaEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(RsaEndpoint), typeof(Aes256))]
+		[DataRow(true, typeof(RsaEndpoint), typeof(ChaCha20))]
+		[DataRow(true, typeof(RsaEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(RsaEndpoint), null)]
+		[DataRow(false, null, typeof(Aes256))]
+		[DataRow(false, null, typeof(ChaCha20))]
+		[DataRow(false, null, typeof(ChaCha20Poly1305))]
+		[DataRow(true, null, typeof(Aes256))]
+		[DataRow(true, null, typeof(ChaCha20))]
+		[DataRow(true, null, typeof(ChaCha20Poly1305))]
+		[DataRow(true, null, null)]
+		public async Task Test_01_KeyNegotiation(bool SignedTransfers,
+			Type? AsymmetricCipher, Type? SymmetricCipher)
 		{
+			Type[]? AsymmetricCiphers = AsymmetricCipher is null ? null : [AsymmetricCipher];
+			Type[]? SymmetricCiphers = SymmetricCipher is null ? null : [SymmetricCipher];
+
 			this.clientProtocol = new BinaryE2eeProtocol(this.client, true,
-				128, 128, 256, [typeof(EllipticCurveEndpoint)], SignedTransfers,
+				128, 128, 256, AsymmetricCiphers, SymmetricCiphers, SignedTransfers,
 				true, this.clientSniffer);
 
 			await this.TestKeyNegotiation();
@@ -196,51 +228,45 @@ namespace Waher.Networking.Test
 		}
 
 		[TestMethod]
-		[DataRow(false)]
-		[DataRow(true)]
-		public async Task Test_02_KeyNegotiation_ModuleLattice(bool SignedTransfers)
+		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(Aes256))]
+		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(ChaCha20))]
+		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(false, typeof(EllipticCurveEndpoint), null)]
+		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(Aes256))]
+		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(ChaCha20))]
+		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(EllipticCurveEndpoint), null)]
+		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(Aes256))]
+		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(ChaCha20))]
+		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(Aes256))]
+		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(ChaCha20))]
+		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(ModuleLatticeEndpoint), null)]
+		[DataRow(false, typeof(RsaEndpoint), typeof(Aes256))]
+		[DataRow(false, typeof(RsaEndpoint), typeof(ChaCha20))]
+		[DataRow(false, typeof(RsaEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(RsaEndpoint), typeof(Aes256))]
+		[DataRow(true, typeof(RsaEndpoint), typeof(ChaCha20))]
+		[DataRow(true, typeof(RsaEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(RsaEndpoint), null)]
+		[DataRow(false, null, typeof(Aes256))]
+		[DataRow(false, null, typeof(ChaCha20))]
+		[DataRow(false, null, typeof(ChaCha20Poly1305))]
+		[DataRow(true, null, typeof(Aes256))]
+		[DataRow(true, null, typeof(ChaCha20))]
+		[DataRow(true, null, typeof(ChaCha20Poly1305))]
+		[DataRow(true, null, null)]
+		public async Task Test_02_SendReceive(bool SignedTransfers,
+			Type? AsymmetricCipher, Type? SymmetricCipher)
 		{
-			this.clientProtocol = new BinaryE2eeProtocol(this.client, true,
-				128, 128, 256, [typeof(ModuleLatticeEndpoint)], SignedTransfers,
-				true, this.clientSniffer);
-
-			await this.TestKeyNegotiation();
-		}
-
-		[TestMethod]
-		[DataRow(false)]
-		[DataRow(true)]
-		public async Task Test_03_KeyNegotiation_RSA(bool SignedTransfers)
-		{
-			this.clientProtocol = new BinaryE2eeProtocol(this.client, true,
-				128, 128, 256, [typeof(RsaEndpoint)], SignedTransfers, true, this.clientSniffer);
-
-			await this.TestKeyNegotiation();
-		}
-
-		[TestMethod]
-		[DataRow(false)]
-		[DataRow(true)]
-		public async Task Test_04_KeyNegotiation_Any(bool SignedTransfers)
-		{
-			this.clientProtocol = new BinaryE2eeProtocol(this.client, true,
-				128, 128, 256, SignedTransfers, true, this.clientSniffer);
-
-			await this.TestKeyNegotiation();
-		}
-
-		[TestMethod]
-		[DataRow(false)]
-		[DataRow(true)]
-		public async Task Test_05_SendReceive_EllipticCurves(bool SignedTransfers)
-		{
-			await this.Test_01_KeyNegotiation_EllipticCurves(SignedTransfers);
+			await this.Test_01_KeyNegotiation(SignedTransfers, AsymmetricCipher, SymmetricCipher);
 			await this.TestSendReceiveBlock(256);
 		}
 
 		private async Task TestSendReceiveBlock(int Length)
 		{
-			TaskCompletionSource<byte[]> Packet = new TaskCompletionSource<byte[]>();
+			TaskCompletionSource<byte[]> Packet = new();
 
 			this.clientProtocol!.OnReceived += (object Sender, bool ConstantBuffer,
 				byte[] Buffer, int Offset, int Count) =>
@@ -270,65 +296,39 @@ namespace Waher.Networking.Test
 		}
 
 		[TestMethod]
-		[DataRow(false)]
-		[DataRow(true)]
-		public async Task Test_06_SendReceive_ModuleLattice(bool SignedTransfers)
+		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(Aes256))]
+		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(ChaCha20))]
+		[DataRow(false, typeof(EllipticCurveEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(false, typeof(EllipticCurveEndpoint), null)]
+		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(Aes256))]
+		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(ChaCha20))]
+		[DataRow(true, typeof(EllipticCurveEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(EllipticCurveEndpoint), null)]
+		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(Aes256))]
+		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(ChaCha20))]
+		[DataRow(false, typeof(ModuleLatticeEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(Aes256))]
+		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(ChaCha20))]
+		[DataRow(true, typeof(ModuleLatticeEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(ModuleLatticeEndpoint), null)]
+		[DataRow(false, typeof(RsaEndpoint), typeof(Aes256))]
+		[DataRow(false, typeof(RsaEndpoint), typeof(ChaCha20))]
+		[DataRow(false, typeof(RsaEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(RsaEndpoint), typeof(Aes256))]
+		[DataRow(true, typeof(RsaEndpoint), typeof(ChaCha20))]
+		[DataRow(true, typeof(RsaEndpoint), typeof(ChaCha20Poly1305))]
+		[DataRow(true, typeof(RsaEndpoint), null)]
+		[DataRow(false, null, typeof(Aes256))]
+		[DataRow(false, null, typeof(ChaCha20))]
+		[DataRow(false, null, typeof(ChaCha20Poly1305))]
+		[DataRow(true, null, typeof(Aes256))]
+		[DataRow(true, null, typeof(ChaCha20))]
+		[DataRow(true, null, typeof(ChaCha20Poly1305))]
+		[DataRow(true, null, null)]
+		public async Task Test_03_SendReceiveRandom(bool SignedTransfers,
+			Type? AsymmetricCipher, Type? SymmetricCipher)
 		{
-			await this.Test_02_KeyNegotiation_ModuleLattice(SignedTransfers);
-			await this.TestSendReceiveBlock(256);
-		}
-
-		[TestMethod]
-		[DataRow(false)]
-		[DataRow(true)]
-		public async Task Test_07_SendReceive_RSA(bool SignedTransfers)
-		{
-			await this.Test_03_KeyNegotiation_RSA(SignedTransfers);
-			await this.TestSendReceiveBlock(256);
-		}
-
-		[TestMethod]
-		[DataRow(false)]
-		[DataRow(true)]
-		public async Task Test_08_SendReceive_Any(bool SignedTransfers)
-		{
-			await this.Test_04_KeyNegotiation_Any(SignedTransfers);
-			await this.TestSendReceiveBlock(256);
-		}
-
-		[TestMethod]
-		[DataRow(false)]
-		[DataRow(true)]
-		public async Task Test_09_SendReceiveRandom_EllipticCurves(bool SignedTransfers)
-		{
-			await this.Test_01_KeyNegotiation_EllipticCurves(SignedTransfers);
-			await this.TestSendReceiveBlock(rnd.Next(1, 100000));
-		}
-
-		[TestMethod]
-		[DataRow(false)]
-		[DataRow(true)]
-		public async Task Test_10_SendReceiveRandom_ModuleLattice(bool SignedTransfers)
-		{
-			await this.Test_02_KeyNegotiation_ModuleLattice(SignedTransfers);
-			await this.TestSendReceiveBlock(rnd.Next(1, 100000));
-		}
-
-		[TestMethod]
-		[DataRow(false)]
-		[DataRow(true)]
-		public async Task Test_11_SendReceiveRandom_RSA(bool SignedTransfers)
-		{
-			await this.Test_03_KeyNegotiation_RSA(SignedTransfers);
-			await this.TestSendReceiveBlock(rnd.Next(1, 100000));
-		}
-
-		[TestMethod]
-		[DataRow(false)]
-		[DataRow(true)]
-		public async Task Test_12_SendReceiveRandom_Any(bool SignedTransfers)
-		{
-			await this.Test_04_KeyNegotiation_Any(SignedTransfers);
+			await this.Test_01_KeyNegotiation(SignedTransfers, AsymmetricCipher, SymmetricCipher);
 			await this.TestSendReceiveBlock(rnd.Next(1, 100000));
 		}
 	}

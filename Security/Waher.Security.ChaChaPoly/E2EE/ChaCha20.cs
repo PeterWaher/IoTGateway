@@ -21,10 +21,15 @@ namespace Waher.Security.ChaChaPoly.E2EE
         {
         }
 
-        /// <summary>
-        /// Local name of the E2E symmetric cipher
-        /// </summary>
-        public override string LocalName => "cha";
+		/// <summary>
+		/// Security strength of End-to-End encryption scheme.
+		/// </summary>
+		public override int SecurityStrength => 256;
+
+		/// <summary>
+		/// Local name of the E2E symmetric cipher
+		/// </summary>
+		public override string LocalName => "cha";
 
 		/// <summary>
 		/// If the symmetric cipher is supported by a remote endpoint.

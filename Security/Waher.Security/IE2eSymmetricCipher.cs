@@ -29,6 +29,11 @@ namespace Waher.Security
 	public interface IE2eSymmetricCipher : IDisposable
 	{
 		/// <summary>
+		/// Security strength of End-to-End encryption scheme.
+		/// </summary>
+		int SecurityStrength { get; }
+
+		/// <summary>
 		/// Local name of the symmetric cipher
 		/// </summary>
 		string LocalName { get; }

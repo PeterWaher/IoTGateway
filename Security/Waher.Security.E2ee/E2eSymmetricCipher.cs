@@ -20,6 +20,11 @@ namespace Waher.Security.E2EE
 		protected readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 
 		/// <summary>
+		/// Security strength of End-to-End encryption scheme.
+		/// </summary>
+		public abstract int SecurityStrength { get; }
+
+		/// <summary>
 		/// Local name of the E2E symmetric cipher
 		/// </summary>
 		public abstract string LocalName { get; }

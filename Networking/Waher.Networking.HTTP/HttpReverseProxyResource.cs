@@ -524,12 +524,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Server">HTTP Server</param>
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
-		public override Task Execute(HttpServer Server, HttpRequest Request, HttpResponse Response)
-		{
-			return this.ProcessProxyRequest(Server, Request, Response);
-		}
-
-		private async Task ProcessProxyRequest(HttpServer Server, HttpRequest Request, HttpResponse Response)
+		public override async Task Execute(HttpServer Server, HttpRequest Request, HttpResponse Response)
 		{
 			try
 			{

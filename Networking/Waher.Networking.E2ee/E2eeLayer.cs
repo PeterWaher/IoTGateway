@@ -54,6 +54,7 @@ namespace Waher.Networking.E2ee
 		private int inputBlockLen = 0;
 		private int inputBlockPos;
 		private bool inputIsText;
+		private bool encryptedIsText;
 
 		/// <summary>
 		/// End-to-End encrypted communication layer.
@@ -954,6 +955,7 @@ namespace Waher.Networking.E2ee
 												if (this.signedTransfers)
 												{
 													this.encryptedBlock = this.inputBlock;
+													this.encryptedIsText = this.inputIsText;
 													this.inputState += 2;
 												}
 												else if (await this.ProcessEncryptedBlock(this.inputIsText, this.inputBlock, null))
@@ -1042,6 +1044,7 @@ namespace Waher.Networking.E2ee
 										if (this.signedTransfers)
 										{
 											this.encryptedBlock = this.inputBlock;
+											this.encryptedIsText = this.inputIsText;
 											this.inputState++;
 										}
 										else if (await this.ProcessEncryptedBlock(this.inputIsText, this.inputBlock, null))
@@ -1062,7 +1065,7 @@ namespace Waher.Networking.E2ee
 											this.inputState = -1;
 											await this.OnProtocolError.Raise(this, EventArgs.Empty);
 										}
-										else if (await this.ProcessEncryptedBlock(this.inputIsText, this.encryptedBlock, this.inputBlock))
+										else if (await this.ProcessEncryptedBlock(this.encryptedIsText, this.encryptedBlock, this.inputBlock))
 										{
 											this.inputBlockLen = 0;
 											this.inputState -= 3;

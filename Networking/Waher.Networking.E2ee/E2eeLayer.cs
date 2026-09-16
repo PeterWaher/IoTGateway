@@ -1229,6 +1229,8 @@ namespace Waher.Networking.E2ee
 				if (!e.Valid)
 				{
 					this.Error("Remote endpoints not valid.");
+					this.inputState = -1;
+					await this.OnProtocolError.Raise(this, EventArgs.Empty);
 					Result = false;
 				}
 				else if (this.disposed)

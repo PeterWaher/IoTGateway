@@ -42,6 +42,7 @@ namespace Waher.Networking.E2ee
 		private string remoteTypeName;
 		private string remoteAssemblyName;
 		private string remoteImageVersion;
+		private ulong remoteVersion;
 		private uint sendCounter = 0;
 		private uint receiveCounter = 0;
 		private bool disposed = false;
@@ -212,6 +213,11 @@ namespace Waher.Networking.E2ee
 		}
 
 		/// <summary>
+		/// Remote version of communication layer.
+		/// </summary>
+		public ulong RemoteVersion => this.remoteVersion;
+
+		/// <summary>
 		/// Remote type name of communication class, as reported by remote party.
 		/// </summary>
 		public string RemoteTypeName => this.remoteTypeName;
@@ -346,6 +352,7 @@ namespace Waher.Networking.E2ee
 			Type T = this.GetType();
 			Assembly A = T.Assembly;
 
+			Output.WriteVarLenUInt(1);
 			Output.WriteString(T.FullName);
 			Output.WriteString(A.FullName);
 			Output.WriteString(A.ImageRuntimeVersion);
@@ -1108,6 +1115,7 @@ namespace Waher.Networking.E2ee
 		{
 			BinaryInput Input = new BinaryInput(Data);
 
+			this.remoteVersion = Input.ReadVarLenUInt();
 			this.remoteTypeName = Input.ReadString();
 			this.remoteAssemblyName = Input.ReadString();
 			this.remoteImageVersion = Input.ReadString();

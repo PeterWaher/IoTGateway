@@ -72,7 +72,7 @@ namespace Waher.Networking.Test
 					Text = new string(Chars);
 
 					await Protocol.SendAsync(Text);
-					
+
 					return true;
 				};
 
@@ -225,27 +225,38 @@ namespace Waher.Networking.Test
 		{
 			CancellationTokenSource Cancel = new();
 
-			this.clientProtocol!.OnRemoteEndpoints += (_, e) =>
+			Task RemoteEndpoints(object Sender, EventArgs e)
 			{
 				this.clientSniffer?.Information("Remote endpoints received.");
 				return Task.CompletedTask;
-			};
+			}
 
-			this.clientProtocol.OnProtocolError += (_, e) =>
+			Task ProtocolError(object Sender, EventArgs e)
 			{
 				Cancel.Cancel();
 				return Task.CompletedTask;
-			};
+			}
 
-			this.clientProtocol.Information("Negotiating keys...");
+			this.clientProtocol!.OnRemoteEndpoints += RemoteEndpoints;
+			this.clientProtocol.OnProtocolError += ProtocolError;
 
-			Assert.IsTrue(await this.clientProtocol.NegotiateKeys(10000, Cancel.Token));
+			try
+			{
+				this.clientProtocol.Information("Negotiating keys...");
 
-			this.clientProtocol.Information("Keys negotiated...");
+				Assert.IsTrue(await this.clientProtocol.NegotiateKeys(10000, Cancel.Token));
 
-			Assert.IsFalse(string.IsNullOrEmpty(this.clientProtocol.RemoteTypeName));
-			Assert.IsFalse(string.IsNullOrEmpty(this.clientProtocol.RemoteAssemblyName));
-			Assert.IsFalse(string.IsNullOrEmpty(this.clientProtocol.RemoteImageVersion));
+				this.clientProtocol.Information("Keys negotiated...");
+
+				Assert.IsFalse(string.IsNullOrEmpty(this.clientProtocol.RemoteTypeName));
+				Assert.IsFalse(string.IsNullOrEmpty(this.clientProtocol.RemoteAssemblyName));
+				Assert.IsFalse(string.IsNullOrEmpty(this.clientProtocol.RemoteImageVersion));
+			}
+			finally
+			{
+				this.clientProtocol.OnRemoteEndpoints -= RemoteEndpoints;
+				this.clientProtocol.OnProtocolError -= ProtocolError;
+			}
 		}
 
 		[TestMethod]
@@ -289,36 +300,47 @@ namespace Waher.Networking.Test
 		{
 			TaskCompletionSource<byte[]> Packet = new();
 
-			this.clientProtocol!.OnReceived += (Sender, ConstantBuffer, Buffer, Offset, Count) =>
+			Task<bool> Received(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 			{
 				byte[] Data = SnifferBase.CloneSection(Buffer, Offset, Count);
 				Packet.TrySetResult(Data);
 
 				return Task.FromResult(true);
-			};
+			}
 
-			this.clientProtocol.OnProtocolError += (_, e) =>
+			Task ProtocolError(object Sender, EventArgs e)
 			{
 				Packet.TrySetException(new Exception("Protocol error."));
 				return Task.CompletedTask;
-			};
+			}
 
-			_ = Task.Delay(10000, CancellationToken.None).ContinueWith(_ =>
-				Packet.TrySetException(new TimeoutException()));
+			this.clientProtocol!.OnReceived += Received;
+			this.clientProtocol.OnProtocolError += ProtocolError;
 
-			byte[] Data = new byte[Length];
-			int i;
+			try
+			{
+				_ = Task.Delay(10000, CancellationToken.None).ContinueWith(_ =>
+					Packet.TrySetException(new TimeoutException()));
 
-			for (i = 0; i < Length; i++)
-				Data[i] = (byte)i;
+				byte[] Data = new byte[Length];
+				int i;
 
-			Assert.IsTrue(await this.clientProtocol.SendAsync(true, Data));
+				for (i = 0; i < Length; i++)
+					Data[i] = (byte)i;
 
-			Data = await Packet.Task;
-			Assert.HasCount(Length, Data);
+				Assert.IsTrue(await this.clientProtocol.SendAsync(true, Data));
 
-			for (i = 0; i < Length; i++)
-				Assert.AreEqual((byte)(Length - i - 1), Data[i]);
+				Data = await Packet.Task;
+				Assert.HasCount(Length, Data);
+
+				for (i = 0; i < Length; i++)
+					Assert.AreEqual((byte)(Length - i - 1), Data[i]);
+			}
+			finally
+			{
+				this.clientProtocol.OnReceived -= Received;
+				this.clientProtocol.OnProtocolError -= ProtocolError;
+			}
 		}
 
 		[TestMethod]
@@ -399,37 +421,48 @@ namespace Waher.Networking.Test
 		{
 			TaskCompletionSource<string> Packet = new();
 
-			this.clientProtocol!.OnTextReceived += (Sender, Text) =>
+			Task<bool> TextReceived(object Sender, string Text)
 			{
 				Packet.TrySetResult(Text);
 
 				return Task.FromResult(true);
-			};
+			}
 
-			this.clientProtocol.OnProtocolError += (_, e) =>
+			Task ProtocolError(object Sender, EventArgs e)
 			{
 				Packet.TrySetException(new Exception("Protocol error."));
 				return Task.CompletedTask;
-			};
+			}
 
-			_ = Task.Delay(10000, CancellationToken.None).ContinueWith(_ =>
-				Packet.TrySetException(new TimeoutException()));
+			this.clientProtocol!.OnTextReceived += TextReceived;
+			this.clientProtocol.OnProtocolError += ProtocolError;
 
-			char[] Data = new char[Length];
-			int i;
+			try
+			{
+				_ = Task.Delay(10000, CancellationToken.None).ContinueWith(_ =>
+					Packet.TrySetException(new TimeoutException()));
 
-			for (i = 0; i < Length; i++)
-				Data[i] = (char)('A' + (i % 25));
+				char[] Data = new char[Length];
+				int i;
 
-			string s = new(Data);
+				for (i = 0; i < Length; i++)
+					Data[i] = (char)('A' + (i % 25));
 
-			Assert.IsTrue(await this.clientProtocol.SendAsync(s));
+				string s = new(Data);
 
-			s = await Packet.Task;
-			Assert.HasCount(Length, Data);
+				Assert.IsTrue(await this.clientProtocol.SendAsync(s));
 
-			for (i = 0; i < Length; i++)
-				Assert.AreEqual((char)('A' + ((Length - i - 1) % 25)), s[i]);
+				s = await Packet.Task;
+				Assert.HasCount(Length, Data);
+
+				for (i = 0; i < Length; i++)
+					Assert.AreEqual((char)('A' + ((Length - i - 1) % 25)), s[i]);
+			}
+			finally
+			{
+				this.clientProtocol.OnTextReceived -= TextReceived;
+				this.clientProtocol.OnProtocolError -= ProtocolError;
+			}
 		}
 
 		[TestMethod]
@@ -462,7 +495,7 @@ namespace Waher.Networking.Test
 		[DataRow(true, null, nameof(ChaCha20))]
 		[DataRow(true, null, nameof(ChaCha20Poly1305))]
 		[DataRow(true, null, null)]
-		public async Task Test_05_SendReceiveRandom(bool SignedTransfers,
+		public async Task Test_05_SendReceiveTextRandom(bool SignedTransfers,
 			string? AsymmetricCipher, string? SymmetricCipher)
 		{
 			await this.Test_01_KeyNegotiation(SignedTransfers, AsymmetricCipher, SymmetricCipher);
@@ -499,11 +532,74 @@ namespace Waher.Networking.Test
 		[DataRow(true, null, nameof(ChaCha20))]
 		[DataRow(true, null, nameof(ChaCha20Poly1305))]
 		[DataRow(true, null, null)]
-		public async Task Test_06_SendReceiveEmpty(bool SignedTransfers,
+		public async Task Test_06_SendReceiveTextEmpty(bool SignedTransfers,
 			string? AsymmetricCipher, string? SymmetricCipher)
 		{
 			await this.Test_01_KeyNegotiation(SignedTransfers, AsymmetricCipher, SymmetricCipher);
 			await this.TestSendReceiveText(0);
+		}
+
+
+		[TestMethod]
+		[DataRow(false, nameof(EllipticCurveEndpoint), nameof(Aes256))]
+		[DataRow(false, nameof(EllipticCurveEndpoint), nameof(ChaCha20))]
+		[DataRow(false, nameof(EllipticCurveEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(false, nameof(EllipticCurveEndpoint), null)]
+		[DataRow(true, nameof(EllipticCurveEndpoint), nameof(Aes256))]
+		[DataRow(true, nameof(EllipticCurveEndpoint), nameof(ChaCha20))]
+		[DataRow(true, nameof(EllipticCurveEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(EllipticCurveEndpoint), null)]
+		[DataRow(false, nameof(ModuleLatticeEndpoint), nameof(Aes256))]
+		[DataRow(false, nameof(ModuleLatticeEndpoint), nameof(ChaCha20))]
+		[DataRow(false, nameof(ModuleLatticeEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(ModuleLatticeEndpoint), nameof(Aes256))]
+		[DataRow(true, nameof(ModuleLatticeEndpoint), nameof(ChaCha20))]
+		[DataRow(true, nameof(ModuleLatticeEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(ModuleLatticeEndpoint), null)]
+		[DataRow(false, nameof(RsaEndpoint), nameof(Aes256))]
+		[DataRow(false, nameof(RsaEndpoint), nameof(ChaCha20))]
+		[DataRow(false, nameof(RsaEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(RsaEndpoint), nameof(Aes256))]
+		[DataRow(true, nameof(RsaEndpoint), nameof(ChaCha20))]
+		[DataRow(true, nameof(RsaEndpoint), nameof(ChaCha20Poly1305))]
+		[DataRow(true, nameof(RsaEndpoint), null)]
+		[DataRow(false, null, nameof(Aes256))]
+		[DataRow(false, null, nameof(ChaCha20))]
+		[DataRow(false, null, nameof(ChaCha20Poly1305))]
+		[DataRow(true, null, nameof(Aes256))]
+		[DataRow(true, null, nameof(ChaCha20))]
+		[DataRow(true, null, nameof(ChaCha20Poly1305))]
+		[DataRow(true, null, null)]
+		public async Task Test_07_MultipleMessages(bool SignedTransfers,
+			string? AsymmetricCipher, string? SymmetricCipher)
+		{
+			await this.Test_01_KeyNegotiation(SignedTransfers, AsymmetricCipher, SymmetricCipher);
+
+			for (int i = 0; i < 100; i++)
+			{
+				switch (rnd.Next(5))
+				{
+					case 0:
+						await this.TestSendReceiveBlock(256);
+						break;
+
+					case 1:
+						await this.TestSendReceiveBlock(rnd.Next(1, 100000));
+						break;
+
+					case 2:
+						await this.TestSendReceiveText(256);
+						break;
+
+					case 3:
+						await this.TestSendReceiveText(rnd.Next(1, 100000));
+						break;
+
+					case 4:
+						await this.TestSendReceiveText(0);
+						break;
+				}
+			}
 		}
 
 	}

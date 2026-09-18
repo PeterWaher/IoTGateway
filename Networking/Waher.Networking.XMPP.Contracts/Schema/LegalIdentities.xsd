@@ -726,7 +726,7 @@
 					<xs:sequence>
 						<xs:element name='content' type='xs:base64Binary' minOccurs='1' maxOccurs='1'>
 							<xs:annotation>
-								<xs:documentation>A binary random string that the recipient of the signature needs to sign, if approving the request.</xs:documentation>
+								<xs:documentation>BASE64-encoded binary string that the recipient of the signature is requested to sign, if approving the request.</xs:documentation>
 							</xs:annotation>
 						</xs:element>
 						<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
@@ -756,7 +756,7 @@
 					<xs:sequence>
 						<xs:element name='content' type='xs:base64Binary' minOccurs='1' maxOccurs='1'>
 							<xs:annotation>
-								<xs:documentation>A binary random string that the recipient of the signature needs to sign, if approving the request.</xs:documentation>
+								<xs:documentation>BASE64-encoded binary string that the recipient of the signature is requested to sign, if approving the request.</xs:documentation>
 							</xs:annotation>
 						</xs:element>
 						<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
@@ -770,18 +770,54 @@
 		</xs:complexType>
 	</xs:element>
 
-	<xs:element name='petitionSignatureResponse' type='PetitionResponse'>
+	<xs:element name='petitionSignatureResponse'>
 		<xs:annotation>
 			<xs:documentation>Sent by a client in an iq set to a Trust Provider as an active response to a previous petition for information related to a legal identity owned by the client.</xs:documentation>
 			<xs:documentation>Expect an empty response on success.</xs:documentation>
 			<xs:documentation>A successfull request will forward the response, and the referenced legal identity if approved, to the entity making the request, by sending a petitionIdentityResponseMsg element in a normal message stanza.</xs:documentation>
 		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base='PetitionResponse'>
+					<xs:sequence>
+						<xs:element name='content' type='xs:base64Binary' minOccurs='0' maxOccurs='1'>
+							<xs:annotation>
+								<xs:documentation>BASE64-encoded binary string that the recipient of the signature is requested to sign, if approving the request.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name='signature' type='xs:base64Binary' minOccurs='0' maxOccurs='1'>
+							<xs:annotation>
+								<xs:documentation>BASE64-encoded binary signature of the content, if approving the request.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
 	</xs:element>
 
-	<xs:element name='petitionSignatureResponseMsg' type='PetitionResponseMessage'>
+	<xs:element name='petitionSignatureResponseMsg'>
 		<xs:annotation>
 			<xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a response on a petition made by the client for a legal identity.</xs:documentation>
 		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base='PetitionResponseMessage'>
+					<xs:sequence>
+						<xs:element name='content' type='xs:base64Binary' minOccurs='0' maxOccurs='1'>
+							<xs:annotation>
+								<xs:documentation>BASE64-encoded binary string that the recipient of the signature is requested to sign, if approving the request.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name='signature' type='xs:base64Binary' minOccurs='0' maxOccurs='1'>
+							<xs:annotation>
+								<xs:documentation>BASE64-encoded binary signature of the content, if approving the request.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
 	</xs:element>
 
 	<xs:element name='addAttachment'>
@@ -881,6 +917,196 @@
 		</xs:complexType>
 	</xs:element>
 
+	<xs:element name='getNetworkIdentity'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq get stanza from one	Broker or Legal Component to another Broker or Legal Component, to get the network identity of an identifier (Legal Identity or Account).</xs:documentation>
+			<xs:documentation>If a client sends this request, a forbidden error is returned.</xs:documentation>
+			<xs:documentation>Expected response element: networkIdentity</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the Legal Identity or Account to get the network address to.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='networkIdentity'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq result stanza as a response to a getNetworkIdentity request.</xs:documentation>
+			<xs:documentation>Contains information about the Bare JID of an identifier, and any associated connections currently open.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name='connection' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Represents an active connection.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name='clientEp' type='xs:string' use='required'>
+							<xs:annotation>
+								<xs:documentation>Representation of the remote endpoint of the connection.</xs:documentation>
+								<xs:documentation>Format and syntax of remote endpoint depend on binding and transport used for the connection. My be a remote IP-address of a socket connection, for example.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name='ts' type='xs:dateTime' use='required'>
+							<xs:annotation>
+								<xs:documentation>Timestamp (in UTC) of last presence stanza sent by client.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name='jid' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Bare JID associated with identifier.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='authorizeAccess'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq set stanza from a client to a Trust Provider, to add or remove authorization to access one of its Legal Identities.</xs:documentation>
+			<xs:documentation>A client can only control authorization to its own identities.</xs:documentation>
+			<xs:documentation>An empty response is expected to be returned, to acknowledge the request.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the Legal Identity to authorize access to.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='remoteId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Remote ID, either a Legal Identity identifier or a Bare JID.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='auth' type='xs:boolean' use='optional' default='true'>
+				<xs:annotation>
+					<xs:documentation>If true, authorizes access to the identity to the remote ID.</xs:documentation>
+					<xs:documentation>If false, removes authorization to access the identity from the remote ID.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='canSignAs'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq get stanza from a client to a Trust Provider, to check if a new Legal Identity can sign using the same Conceptual Identity as an obsoleted or compromized Legal Identity.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='referenceId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the obsoleted or compromized Legal Identity.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='signatoryId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the new Legal Identity.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='readyForApproval'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq set stanza from a client to a Trust Provider, to tell the Broker that Identity Authenticator services can initiate processing of the applcation.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the Legal Identity that is ready for approval.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='reviewIdProviders'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq get stanza from a client to a Trust Provider, to get a list of available Peer Review Service Providers on the broker.</xs:documentation>
+			<xs:documentation>Expected response element: providers</xs:documentation>
+		</xs:annotation>
+		<xs:complexType/>
+	</xs:element>
+
+	<xs:element name='providers'>
+		<xs:annotation>
+			<xs:documentation>Contains a list (possibly empty) of service providers.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name='provider' type='Provider' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Contains a reference to one service provider.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name='Provider'>
+		<xs:attribute name='id' type='xs:string' use='required'>
+			<xs:annotation>
+				<xs:documentation>Identifier of the service provider.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='type' type='xs:string' use='required'>
+			<xs:annotation>
+				<xs:documentation>Implementation-specific type name of the service provider.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='name' type='xs:string' use='required'>
+			<xs:annotation>
+				<xs:documentation>Displayable name of the service provider.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='legalId' type='xs:string' use='required'>
+			<xs:annotation>
+				<xs:documentation>Legal Identity identifier to invoke, if requesting Peer Review from the service.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='external' type='xs:boolean' use='required'>
+			<xs:annotation>
+				<xs:documentation>If the service is external (true) or runs internally in the broker (false).</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='iconUrl' type='xs:anyURI' use='optional'>
+			<xs:annotation>
+				<xs:documentation>Optional URL to an icon that can be presented for the service provider.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='iconWidth' type='xs:positiveInteger' use='optional'>
+			<xs:annotation>
+				<xs:documentation>Width, in pixels, of the optional icon, if provided.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='iconHeight' type='xs:positiveInteger' use='optional'>
+			<xs:annotation>
+				<xs:documentation>Height, in pixels, of the optional icon, if provided.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:element name='selectReviewService'>
+		<xs:annotation>
+			<xs:documentation>Selects a Peer Review service.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='provider' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Type of Peer Review service to select.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='serviceId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of Peer Review service to select.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
 	<xs:element name='clientMessage'>
 		<xs:annotation>
 			<xs:documentation>Contains information message about an identity application.</xs:documentation>
@@ -903,6 +1129,48 @@
 					</xs:attribute>
 				</xs:extension>
 			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='peerReview'>
+		<xs:annotation>
+			<xs:documentation>Contains information about a peer review of an identity application.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name='reviewed'>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref='identity' minOccurs='1' maxOccurs='1'>
+								<xs:annotation>
+									<xs:documentation>Legal Identity being reviewed.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name='reviewer'>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref='identity' minOccurs='1' maxOccurs='1'>
+								<xs:annotation>
+									<xs:documentation>Legal Identity of the reviewer.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name='s' type='xs:base64Binary' use='required'>
+				<xs:annotation>
+					<xs:documentation>Signature of the peer review, made by the reviewer.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='tp' type='xs:dateTime' use='required'>
+				<xs:annotation>
+					<xs:documentation>Timestamp (in UTC) when the peer review was received.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 
@@ -989,9 +1257,10 @@
 										<xs:documentation>Name of a meta-data tag.</xs:documentation>
 									</xs:annotation>
 								</xs:attribute>
-								<xs:attribute name='value' type='xs:string' use='required'>
+								<xs:attribute name='value' type='xs:string' use='optional'>
 									<xs:annotation>
 										<xs:documentation>Value of a meta-data tag.</xs:documentation>
+										<xs:documentation>A missing value is considered a null value.</xs:documentation>
 									</xs:annotation>
 								</xs:attribute>
 								<xs:attribute name='type' type='xs:string' use='optional'>
@@ -1034,6 +1303,11 @@
 							<xs:documentation>Identity claim key.</xs:documentation>
 						</xs:annotation>
 					</xs:attribute>
+					<xs:attribute name='service' type='xs:string' use='optional'>
+						<xs:annotation>
+							<xs:documentation>Reference to service validating claim.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
 				</xs:complexType>
 			</xs:element>
 			<xs:element name='validatedPhoto' minOccurs='0' maxOccurs='unbounded'>
@@ -1044,6 +1318,11 @@
 					<xs:attribute name='fileName' type='xs:string' use='required'>
 						<xs:annotation>
 							<xs:documentation>File name of photo.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name='service' type='xs:string' use='optional'>
+						<xs:annotation>
+							<xs:documentation>Reference to service validating photo.</xs:documentation>
 						</xs:annotation>
 					</xs:attribute>
 				</xs:complexType>
@@ -1148,6 +1427,23 @@
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='verifyTrustLink'>
+		<xs:annotation>
+			<xs:documentation>Sends a message using the parent connection of the Broker, to the sender of the request, to verify a Trust Link.</xs:documentation>
+			<xs:documentation>Can be sent in an iq set stanza to initiate verification.</xs:documentation>
+			<xs:documentation>Can be sent in a message stanza back to the sender of the request, to verify a trust link.</xs:documentation>
+			<xs:documentation>Empty response expected to the request.</xs:documentation>
+			<xs:documentation>The recipient of the verification message must verify the domain of the sender, to see that it matches the parent Broker in the trust chain, of the recipient of the original request.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='proof' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A string that will be forwarded in the verifyTrustLink message sent to the sender of the request using the parent broker connection.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 

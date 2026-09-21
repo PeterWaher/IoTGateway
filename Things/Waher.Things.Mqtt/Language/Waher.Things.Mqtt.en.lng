@@ -43,7 +43,7 @@
 			<String id="39">Quantity</String>
 			<String id="40">String</String>
 			<String id="41">XML</String>
-			<String id="42">BASE-64</String>
+			<String id="42">BASE64</String>
 			<String id="43">HEX</String>
 			<String id="44">Trust Server</String>
 			<String id="45">If the remote server certificate should be trusted even if it is not valid.</String>

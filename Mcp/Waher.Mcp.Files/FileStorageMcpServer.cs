@@ -560,7 +560,7 @@ namespace Waher.Mcp.Files
 		/// characters or begin with a path character, to attempt to escape file 
 		/// storage area. File extension must match Internet Content-Type of file 
 		/// contents.</param>
-		/// <param name="Content">BASE-64 encoded binary content of file to create. The 
+		/// <param name="Content">BASE64 encoded binary content of file to create. The 
 		/// contents must not be harmful, be executable, or contain illegal information.</param>
 		/// <returns>URI of created file resource.</returns>
 		[McpServerTool(
@@ -583,7 +583,7 @@ namespace Waher.Mcp.Files
 			"of file contents.", 3, 256)]
 			string LocalFileName,
 
-			[McpStringParameter("Content", "BASE-64 encoded binary content of file to " +
+			[McpStringParameter("Content", "BASE64 encoded binary content of file to " +
 			"create. The contents must not be harmful, be executable, or contain illegal " +
 			"information.")]
 			string Content)
@@ -682,7 +682,7 @@ namespace Waher.Mcp.Files
 		/// characters or begin with a path character, to attempt to escape file 
 		/// storage area. File extension must match Internet Content-Type of file 
 		/// contents.</param>
-		/// <param name="Content">BASE-64 encoded binary content of file to append. The 
+		/// <param name="Content">BASE64 encoded binary content of file to append. The 
 		/// contents must not be harmful, be executable, or contain illegal information.</param>
 		/// <returns>URI of appended (or created) file resource.</returns>
 		[McpServerTool(
@@ -705,7 +705,7 @@ namespace Waher.Mcp.Files
 			"of file contents.", 3, 256)]
 			string LocalFileName,
 
-			[McpStringParameter("Content", "BASE-64 encoded binary content of file to " +
+			[McpStringParameter("Content", "BASE64 encoded binary content of file to " +
 			"append. The contents must not be harmful, be executable, or contain illegal " +
 			"information.")]
 			string Content)
@@ -799,7 +799,7 @@ namespace Waher.Mcp.Files
 		/// characters or begin with a path character, to attempt to escape file 
 		/// storage area. File extension must match Internet Content-Type of file 
 		/// contents.</param>
-		/// <param name="Content">BASE-64 encoded binary content of file to update. The 
+		/// <param name="Content">BASE64 encoded binary content of file to update. The 
 		/// contents must not be harmful, be executable, or contain illegal information.</param>
 		/// <returns>URI of updated file resource.</returns>
 		[McpServerTool(
@@ -821,7 +821,7 @@ namespace Waher.Mcp.Files
 			"of file contents.", 3, 256)]
 			string LocalFileName,
 
-			[McpStringParameter("Content", "BASE-64 encoded binary content of file to " +
+			[McpStringParameter("Content", "BASE64 encoded binary content of file to " +
 			"update. The contents must not be harmful, be executable, or contain illegal " +
 			"information.")]
 			string Content)
@@ -1051,7 +1051,7 @@ namespace Waher.Mcp.Files
 
 		private class BinaryContents
 		{
-			[McpStringParameter("Binary", "BASE-64-encoded Binary contents of the file being edited.")]
+			[McpStringParameter("Binary", "BASE64-encoded Binary contents of the file being edited.")]
 			public string? FileContents;
 		}
 

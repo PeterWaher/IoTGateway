@@ -72,7 +72,7 @@
 		</xs:annotation>
 		<xs:attribute name="pub" type="xs:base64Binary" use="required">
 			<xs:annotation>
-				<xs:documentation>Public key, base-64 encoded.</xs:documentation>
+				<xs:documentation>Public key, BASE64 encoded.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>

@@ -108,7 +108,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		{
 			return new ControlParameter[]
 			{
-				new StringControlParameter("Value", "Publish", "Value:", "BASE-64 value of topic.", Base64Data.RegExString,
+				new StringControlParameter("Value", "Publish", "Value:", "BASE64 value of topic.", Base64Data.RegExString,
 					(n) => Task.FromResult<string>(Convert.ToBase64String(this.value)),
 					(n, v) =>
 					{

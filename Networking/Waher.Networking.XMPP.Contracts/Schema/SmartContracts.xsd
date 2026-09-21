@@ -1950,7 +1950,7 @@
 			<xs:simpleContent>
 				<xs:extension base='xs:base64Binary'>
 					<xs:annotation>
-						<xs:documentation>Digest is BASE-64 encoded.</xs:documentation>
+						<xs:documentation>Digest is BASE64 encoded.</xs:documentation>
 					</xs:annotation>
 					<xs:attribute name='function' type='HashFunction' use='required'>
 						<xs:annotation>
@@ -1987,7 +1987,7 @@
 	<xs:element name='schema' type='xs:base64Binary'>
 		<xs:annotation>
 			<xs:documentation>Contains the text representation of a specific schema.</xs:documentation>
-			<xs:documentation>Note: Even though the XML Schema is itself XML, it is returned as base-64 encoded binary BLOB, to avoid accidental processing, and to maintain digest integrity.</xs:documentation>
+			<xs:documentation>Note: Even though the XML Schema is itself XML, it is returned as BASE64 encoded binary BLOB, to avoid accidental processing, and to maintain digest integrity.</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 

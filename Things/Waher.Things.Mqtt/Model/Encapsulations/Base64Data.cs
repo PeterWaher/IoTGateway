@@ -93,7 +93,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MqttTopicNode), 42, "BASE-64");
+			return Language.GetStringAsync(typeof(MqttTopicNode), 42, "BASE64");
 		}
 
 		/// <summary>
@@ -134,7 +134,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		{
 			return new ControlParameter[]
 			{
-				new StringControlParameter("Value", "Publish", "Value:", "BASE-64 value of topic.", RegExString,
+				new StringControlParameter("Value", "Publish", "Value:", "BASE64 value of topic.", RegExString,
 					(n) => Task.FromResult<string>(Convert.ToBase64String(this.value)),
 					(n, v) =>
 					{

@@ -371,8 +371,37 @@
 					<xs:documentation>Note: Legal IDs are case insensitive in searches and references.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
+			<xs:attribute name='visibility' type='IdentityVisibility' use='optional' default='Private'>
+				<xs:annotation>
+					<xs:documentation>Visibility of Identity.</xs:documentation>
+					<xs:documentation>Attribute must only be serialized if not Private.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
+
+	<xs:simpleType name='IdentityVisibility'>
+		<xs:annotation>
+			<xs:documentation>Visibility types for Legal Identities.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base='xs:string'>
+			<xs:enumeration value='Private'>
+				<xs:annotation>
+					<xs:documentation>Identity is private, and must be petitioned for access.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Domain'>
+				<xs:annotation>
+					<xs:documentation>Identity is accessible to anyone with an account on the same domain. The rest must petition for access.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Public'>
+				<xs:annotation>
+					<xs:documentation>Identity is accessible to anyone.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
 
 	<xs:simpleType name='IdentityState'>
 		<xs:annotation>

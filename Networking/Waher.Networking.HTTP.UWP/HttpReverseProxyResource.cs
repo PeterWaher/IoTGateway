@@ -608,6 +608,9 @@ namespace Waher.Networking.HTTP
 
 			public override Task Execute(CancellationToken Cancel)
 			{
+				if (this.Response.ResponseSent)
+					return Task.CompletedTask;
+				
 				return this.Resource.DoExecute(this.Server, this.Request, this.Response);
 			}
 		}

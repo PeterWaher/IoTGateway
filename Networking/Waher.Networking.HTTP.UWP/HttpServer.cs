@@ -28,6 +28,7 @@ using Waher.Security;
 using Waher.Networking.HTTP.HTTP2;
 using Waher.Runtime.IO;
 using Waher.Networking.HTTP.Interfaces;
+using Waher.Networking.HTTP.ScriptExtensions;
 
 namespace Waher.Networking.HTTP
 {
@@ -2264,7 +2265,8 @@ namespace Waher.Networking.HTTP
 				Resource = Resource,
 				SubPath = SubPath,
 				ResourceStr = Request.Header.Resource,
-				Method = Request.Header.Method
+				Method = Request.Header.Method,
+				Request = Request
 			};
 
 			this.currentRequests?.Add(Request, Info);
@@ -2322,6 +2324,7 @@ namespace Waher.Networking.HTTP
 		{
 			public DateTime Received = DateTime.UtcNow;
 			public HttpResource Resource;
+			public HttpRequest Request;
 			public string ClientAddress;
 			public string SubPath;
 			public string Method;
@@ -2371,6 +2374,9 @@ namespace Waher.Networking.HTTP
 				Log.Warning("HTTP request timed out.", Info.ResourceStr,
 					new KeyValuePair<string, object>("From", Info.ClientAddress),
 					new KeyValuePair<string, object>("Method", Info.Method));
+
+				if (!(Info.Request.Response?.ResponseSent ?? true))
+					return Info.Request.Response.SendResponse(new TooManyRequestsException());
 			}
 
 			return Task.CompletedTask;

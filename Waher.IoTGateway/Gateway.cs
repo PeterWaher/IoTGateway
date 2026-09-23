@@ -1599,31 +1599,36 @@ namespace Waher.IoTGateway
 						if (!(N is XmlElement E))
 							continue;
 
+						HttpReverseProxyResource Proxy = null;
+						string RemoteDomain = XML.Attribute(E, "remoteDomain");
+						string RemoteFolder = XML.Attribute(E, "remoteFolder");
+						bool Encrypted = XML.Attribute(E, "encrypted", false);
+						int RemotePort = XML.Attribute(E, "remotePort", Encrypted ? HttpServer.DefaultHttpsPort : HttpServer.DefaultHttpPort);
+						bool UseSession = XML.Attribute(E, "useSession", false);
+						int TimeoutMs = XML.Attribute(E, "timeoutMs", 10000);
+						string Privilege = XML.Attribute(E, "privilege");
+						int MaxConcurrent = XML.Attribute(E, "maxConcurrent", 0);
+
 						switch (E.LocalName)
 						{
 							case "ProxyResource":
 								string LocalResource = XML.Attribute(E, "localResource");
-								string RemoteDomain = XML.Attribute(E, "remoteDomain");
-								string RemoteFolder = XML.Attribute(E, "remoteFolder");
-								bool Encrypted = XML.Attribute(E, "encrypted", false);
-								int RemotePort = XML.Attribute(E, "remotePort", Encrypted ? HttpServer.DefaultHttpsPort : HttpServer.DefaultHttpPort);
-								bool UseSession = XML.Attribute(E, "useSession", false);
-								int TimeoutMs = XML.Attribute(E, "timeoutMs", 10000);
-								string Privilege = XML.Attribute(E, "privilege");
 
 								try
 								{
 									if (string.IsNullOrEmpty(Privilege))
 									{
-										webServer.Register(new HttpReverseProxyResource(LocalResource, RemoteDomain, RemotePort, RemoteFolder, Encrypted,
-											TimeSpan.FromMilliseconds(TimeoutMs), UseSession));
+										Proxy = new HttpReverseProxyResource(LocalResource, RemoteDomain, RemotePort, RemoteFolder, Encrypted,
+											TimeSpan.FromMilliseconds(TimeoutMs), UseSession);
 									}
 									else
 									{
-										webServer.Register(new HttpReverseProxyResource(LocalResource, RemoteDomain, RemotePort, RemoteFolder, Encrypted,
+										Proxy = new HttpReverseProxyResource(LocalResource, RemoteDomain, RemotePort, RemoteFolder, Encrypted,
 											TimeSpan.FromMilliseconds(TimeoutMs), UseSession, HttpModule.GetAuthenticationSchemes(Privilege),
-											Privilege));
+											Privilege);
 									}
+
+									webServer.Register(Proxy);
 								}
 								catch (Exception ex)
 								{
@@ -1640,29 +1645,24 @@ namespace Waher.IoTGateway
 
 							case "ProxyDomain":
 								string LocalDomain = XML.Attribute(E, "localDomain");
-								RemoteDomain = XML.Attribute(E, "remoteDomain");
-								RemoteFolder = XML.Attribute(E, "remoteFolder");
-								Encrypted = XML.Attribute(E, "encrypted", false);
-								RemotePort = XML.Attribute(E, "remotePort", Encrypted ? HttpServer.DefaultHttpsPort : HttpServer.DefaultHttpPort);
-								UseSession = XML.Attribute(E, "useSession", false);
-								TimeoutMs = XML.Attribute(E, "timeoutMs", 10000);
-								Privilege = XML.Attribute(E, "privilege");
 
 								try
 								{
 									if (string.IsNullOrEmpty(Privilege))
 									{
-										webServer.RegisterDomainProxy(LocalDomain, new HttpReverseProxyResource(
+										Proxy = new HttpReverseProxyResource(
 											"/", RemoteDomain, RemotePort, RemoteFolder, Encrypted,
-											TimeSpan.FromMilliseconds(TimeoutMs), UseSession));
+											TimeSpan.FromMilliseconds(TimeoutMs), UseSession);
 									}
 									else
 									{
-										webServer.RegisterDomainProxy(LocalDomain, new HttpReverseProxyResource(
+										Proxy = new HttpReverseProxyResource(
 											"/", RemoteDomain, RemotePort, RemoteFolder, Encrypted,
 											TimeSpan.FromMilliseconds(TimeoutMs), UseSession,
-											HttpModule.GetAuthenticationSchemes(Privilege), Privilege));
+											HttpModule.GetAuthenticationSchemes(Privilege), Privilege);
 									}
+
+									webServer.RegisterDomainProxy(LocalDomain, Proxy);
 								}
 								catch (Exception ex)
 								{
@@ -1676,7 +1676,13 @@ namespace Waher.IoTGateway
 										new KeyValuePair<string, object>("TimeoutMs", TimeoutMs));
 								}
 								break;
+
+							default:
+								continue;
 						}
+
+						if (MaxConcurrent > 0)
+							await Proxy.EnableRateLimit(MaxConcurrent);
 					}
 				}
 

@@ -4,12 +4,14 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Getters;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.IO;
+using Waher.Runtime.Queue;
 using Waher.Script;
 using Waher.Security;
 
@@ -22,7 +24,7 @@ namespace Waher.Networking.HTTP
 	public class HttpReverseProxyResource : HttpAsynchronousResource, IHttpGetMethod, IHttpGetRangesMethod,
 		IHttpPostMethod, IHttpPostRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpOptionsMethod,
 		IHttpDeleteMethod, IHttpPatchMethod, IHttpPatchRangesMethod, IHttpTraceMethod,
-		ICommunicationLayer
+		ICommunicationLayer, IDisposableAsync
 	{
 		private static readonly SortedDictionary<string, string> httpHeaderFields = new SortedDictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
 		{
@@ -149,6 +151,9 @@ namespace Waher.Networking.HTTP
 		private readonly CommunicationLayer comLayer;
 		private readonly bool authorization;
 		private readonly bool onlyAbsoluteUris;
+		private AsyncQueue<RequestRec> queue = null;
+		private AsyncProcessor<RequestRec> processor = null;
+		private bool rateLimit = false;
 
 		/// <summary>
 		/// An HTTP Reverse proxy resource (of absolute links). Incoming requests are reverted 
@@ -175,7 +180,7 @@ namespace Waher.Networking.HTTP
 		/// as well. This allows the proxy resource to forward user infomration to underlying
 		/// services, etc. (Default=false)</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public HttpReverseProxyResource(string ResourceName, TimeSpan Timeout, 
+		public HttpReverseProxyResource(string ResourceName, TimeSpan Timeout,
 			bool UseProxySession, params ISniffer[] Sniffers)
 			: this(ResourceName, string.Empty, 0, string.Empty, true, Timeout,
 				  UseProxySession, null, null, Sniffers)
@@ -524,7 +529,90 @@ namespace Waher.Networking.HTTP
 		/// <param name="Server">HTTP Server</param>
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
-		public override async Task Execute(HttpServer Server, HttpRequest Request, HttpResponse Response)
+		public override Task Execute(HttpServer Server, HttpRequest Request, HttpResponse Response)
+		{
+			if (this.rateLimit)
+			{
+				this.queue.Queue(new RequestRec()
+				{
+					Resource = this,
+					Server = Server,
+					Request = Request,
+					Response = Response
+				});
+
+				return Task.CompletedTask;
+			}
+			else
+				return this.DoExecute(Server, Request, Response);
+		}
+
+		/// <summary>
+		/// Enables rate limiting of requests to the resource. Requests will be queued and 
+		/// processed in order, with a maximum number of concurrent requests
+		/// </summary>
+		/// <param name="MaxConcurrentRequests">Maximum number of concurrent requests.</param>
+		public async Task EnableRateLimit(int MaxConcurrentRequests)
+		{
+			await this.DisableRateLimit();
+
+			this.queue = new AsyncQueue<RequestRec>();
+			this.processor = new AsyncProcessor<RequestRec>(MaxConcurrentRequests, this.ResourceName);
+			
+			this.rateLimit = true;
+		}
+
+		/// <summary>
+		/// Disables rate limiting of requests to the resource.
+		/// </summary>
+		public async Task DisableRateLimit()
+		{
+			this.rateLimit = false;
+
+			if (!(this.processor is null))
+			{
+				if (!this.processor.Idle)
+					await this.processor.WaitUntilIdle();
+
+				await this.processor.DisposeAsync();
+				this.processor = null;
+			}
+
+			this.queue?.Dispose();
+			this.queue = null;
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		[Obsolete("Use the DisposeAsync() method.")]
+		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// Closes the connection and disposes of all resources.
+		/// </summary>
+		public virtual Task DisposeAsync()
+		{
+			return this.DisableRateLimit();
+		}
+
+		private class RequestRec : WorkItem
+		{
+			public HttpReverseProxyResource Resource;
+			public HttpServer Server;
+			public HttpRequest Request;
+			public HttpResponse Response;
+
+			public override Task Execute(CancellationToken Cancel)
+			{
+				return this.Resource.DoExecute(this.Server, this.Request, this.Response);
+			}
+		}
+
+		private async Task DoExecute(HttpServer Server, HttpRequest Request, HttpResponse Response)
 		{
 			try
 			{
@@ -858,7 +946,7 @@ namespace Waher.Networking.HTTP
 									break;
 
 								case "Connection":
-									if (Request.Http2Stream is null)	// Ignore if using HTTP/2
+									if (Request.Http2Stream is null)    // Ignore if using HTTP/2
 									{
 										foreach (string Value in Header.Value)
 											Response.SetHeader(FieldName, Value);

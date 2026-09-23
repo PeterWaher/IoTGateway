@@ -755,6 +755,23 @@ namespace Waher.Networking.HTTP
 			{
 				Log.Exception(ex);
 			}
+
+			foreach (HttpResource Resource in this.resources.Values)
+			{
+				try
+				{
+					if (Resource is IDisposableAsync AsyncDisposable)
+						await AsyncDisposable.DisposeAsync();
+					else if (Resource is IDisposable Disposable)
+						Disposable.Dispose();
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+			}
+
+			this.resources.Clear();
 		}
 
 		/// <summary>

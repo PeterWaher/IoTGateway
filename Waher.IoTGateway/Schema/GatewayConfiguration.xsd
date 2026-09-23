@@ -254,6 +254,7 @@
 									<xs:attribute name="useSession" type="xs:boolean" use="optional" default="false"/>
 									<xs:attribute name="timeoutMs" type="xs:positiveInteger" use="optional" default="10000"/>
 									<xs:attribute name="privilege" type="xs:string" use="optional"/>
+									<xs:attribute name="maxConcurrent" type="xs:positiveInteger" use="optional"/>
 								</xs:complexType>
 							</xs:element>
 							<xs:element name="ProxyDomain">
@@ -266,6 +267,7 @@
 									<xs:attribute name="useSession" type="xs:boolean" use="optional" default="false"/>
 									<xs:attribute name="timeoutMs" type="xs:positiveInteger" use="optional" default="10000"/>
 									<xs:attribute name="privilege" type="xs:string" use="optional"/>
+									<xs:attribute name="maxConcurrent" type="xs:positiveInteger" use="optional"/>
 								</xs:complexType>
 							</xs:element>
 						</xs:choice>

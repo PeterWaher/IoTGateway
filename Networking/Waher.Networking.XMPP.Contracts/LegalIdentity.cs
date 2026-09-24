@@ -964,11 +964,11 @@ namespace Waher.Networking.XMPP.Contracts
 						break;
 
 					case PersonalInformation.ProfileTag:
-						Result.Profile = P.Value;
+						Result.Profiles = P.Value.ToString().Split(',');
 						break;
 
 					case PersonalInformation.PseudonymTag:
-						Result.Pseudonym = P.Value.ToString();
+						Result.Pseudonyms = P.Value.ToString().Split(',');
 						break;
 				}
 			}

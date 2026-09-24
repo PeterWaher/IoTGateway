@@ -394,13 +394,13 @@ namespace Waher.Networking.XMPP.Contracts
 		public int Age => Duration.GetDurationBetween(this.BirthDate.Value, DateTime.Now).Years;
 
 		/// <summary>
-		/// Identity Profile
+		/// Identity Profiles
 		/// </summary>
-		public string Profile = null;
+		public string[] Profiles = Array.Empty<string>();
 
 		/// <summary>
-		/// Pseudonym
+		/// Pseudonyms
 		/// </summary>
-		public string Pseudonym = null;
+		public string[] Pseudonyms = Array.Empty<string>();
 	}
 }

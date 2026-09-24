@@ -195,6 +195,11 @@ namespace Waher.Networking.XMPP.Contracts
 		public const string DeviceIdTag = "DEVICE_ID";
 
 		/// <summary>
+		/// PROFILE
+		/// </summary>
+		public const string ProfileTag = "PROFILE";
+
+		/// <summary>
 		/// First name
 		/// </summary>
 		public CaseInsensitiveString FirstName = null;
@@ -382,5 +387,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Age
 		/// </summary>
 		public int Age => Duration.GetDurationBetween(this.BirthDate.Value, DateTime.Now).Years;
+
+		/// <summary>
+		/// Identity Profile
+		/// </summary>
+		public string Profile = null;
 	}
 }

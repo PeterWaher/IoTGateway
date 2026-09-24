@@ -962,6 +962,10 @@ namespace Waher.Networking.XMPP.Contracts
 					case PersonalInformation.JidTag:
 						Result.Jid = P.Value;
 						break;
+
+					case PersonalInformation.ProfileTag:
+						Result.Profile = P.Value;
+						break;
 				}
 			}
 

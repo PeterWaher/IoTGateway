@@ -200,6 +200,11 @@ namespace Waher.Networking.XMPP.Contracts
 		public const string ProfileTag = "PROFILE";
 
 		/// <summary>
+		/// PSEUDONYM
+		/// </summary>
+		public const string PseudonymTag = "PSEUDONYM";
+
+		/// <summary>
 		/// First name
 		/// </summary>
 		public CaseInsensitiveString FirstName = null;
@@ -392,5 +397,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Identity Profile
 		/// </summary>
 		public string Profile = null;
+
+		/// <summary>
+		/// Pseudonym
+		/// </summary>
+		public string Pseudonym = null;
 	}
 }

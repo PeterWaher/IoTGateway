@@ -966,6 +966,10 @@ namespace Waher.Networking.XMPP.Contracts
 					case PersonalInformation.ProfileTag:
 						Result.Profile = P.Value;
 						break;
+
+					case PersonalInformation.PseudonymTag:
+						Result.Pseudonym = P.Value.ToString();
+						break;
 				}
 			}
 

@@ -180,6 +180,7 @@ namespace Waher.IoTGateway
 		private static ProvisioningClient provisioningClient = null;
 		private static XmppCredentials xmppCredentials = null;
 		private static XmppClient xmppClient = null;
+		private static ChunkedList<XmppEventSink> awaitingXmppClient = null;
 		private static AvatarClient avatarClient = null;
 		private static Networking.XMPP.InBandBytestreams.IbbClient ibbClient = null;
 		private static Socks5Proxy socksProxy = null;
@@ -912,7 +913,14 @@ namespace Waher.IoTGateway
 													SinkId = XML.Attribute(E2, "id");
 													string Jid = XML.Attribute(E2, "jid");
 
-													Sinks.Add(new XmppEventSink(SinkId, xmppClient, Jid, false));
+													XmppEventSink XmppEventSink = new XmppEventSink(SinkId, xmppClient, Jid, false);
+													Sinks.Add(XmppEventSink);
+
+													if (xmppClient is null)
+													{
+														awaitingXmppClient ??= new ChunkedList<XmppEventSink>();
+														awaitingXmppClient.Add(XmppEventSink);
+													}
 													break;
 
 												case "EventFilter":
@@ -2402,6 +2410,14 @@ namespace Waher.IoTGateway
 			xmppClient = new XmppClient(xmppCredentials, "en", typeof(Gateway).Assembly);
 			xmppClient.OnValidateSender += XmppClient_OnValidateSender;
 			Types.SetModuleParameter("XMPP", xmppClient);
+
+			if (!(awaitingXmppClient is null))
+			{
+				foreach (XmppEventSink Sink in awaitingXmppClient)
+					Sink.SetXmppClient(xmppClient);
+
+				awaitingXmppClient = null;
+			}
 
 			if (xmppCredentials.Sniffer)
 			{

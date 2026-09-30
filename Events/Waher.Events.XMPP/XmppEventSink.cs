@@ -23,12 +23,13 @@ namespace Waher.Events.XMPP
 		/// </summary>
 		public const string NamespaceEventLogging = "urn:xmpp:eventlog";
 
-		private readonly XmppClient client;
+		private readonly object synchObj = new object();
 		private readonly string destination;
+		private readonly bool maintainConnected;
+		private XmppClient client;
+		private Timer timer = null;
 		private bool connected;
 		private uint eventsLost = 0;
-		private readonly object synchObj = new object();
-		private readonly Timer timer = null;
 
 		/// <summary>
 		/// Event sink sending events to a destination over the XMPP network. 
@@ -46,11 +47,36 @@ namespace Waher.Events.XMPP
 		{
 			this.client = Client;
 			this.destination = Destination;
+			this.maintainConnected = MaintainConnected;
 
+			if (this.client is null)
+				this.connected = false;
+			else
+			{
+				this.client.OnStateChanged += this.Client_OnStateChanged;
+				this.connected = this.client.State == XmppState.Connected;
+
+				if (MaintainConnected)
+					this.timer = new Timer(this.CheckConnection, null, 60000, 60000);
+			}
+		}
+
+		/// <summary>
+		/// Sets the XMPP Client, if not already set.
+		/// </summary>
+		/// <param name="Client">XMPP Client.</param>
+		/// <exception cref="InvalidOperationException">If an XMPP Client has already been
+		/// provided.</exception>
+		public void SetXmppClient(XmppClient Client)
+		{
+			if (!(this.client is null))
+				throw new InvalidOperationException("XMPP client has already been set.");
+
+			this.client = Client;
 			this.client.OnStateChanged += this.Client_OnStateChanged;
 			this.connected = this.client.State == XmppState.Connected;
 
-			if (MaintainConnected)
+			if (this.maintainConnected)
 				this.timer = new Timer(this.CheckConnection, null, 60000, 60000);
 		}
 

@@ -134,7 +134,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (!UsingTemplate)
 			{
 				Xml.Append(" altitude=\"");
-				Xml.Append(this.altitude.ToString().ToLower());
+				Xml.Append(this.altitude.ToString());
 				Xml.Append('"');
 
 				if (this.contractLocation)
@@ -333,7 +333,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.MinIncluded = XML.Attribute(Xml, "minIncluded", true);
 			this.Max = GeoPositionAttribute(Xml, "max");
 			this.MaxIncluded = XML.Attribute(Xml, "maxIncluded", true);
-			this.altitude = XML.Attribute(Xml, "altitude", true, AltitudeUse.Optional);
+			this.altitude = XML.Attribute(Xml, "altitude", AltitudeUse.Optional);
 
 			return base.Import(Xml);
 		}

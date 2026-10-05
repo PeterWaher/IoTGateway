@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -444,10 +445,62 @@ namespace Waher.Runtime.Inventory
 			if (Order is null)
 				Order = new DependencyOrder();
 
-			Modules.Sort(Order);
+            IModule[] AllModules = Modules.ToArray();
+            int[] DependencyCounts = new int[AllModules.Length];
+            List<int>[] Dependents = new List<int>[AllModules.Length];
+            List<IModule> Ordered = new List<IModule>(AllModules.Length);
+            SortedSet<int> Ready = new SortedSet<int>(Comparer<int>.Create((x, y) =>
+            {
+                int Result = Order.Compare(AllModules[x], AllModules[y]);
+                return Result == 0 ? x.CompareTo(y) : Result;
+            }));
 
-			return Modules.ToArray();
-		}
+            for (int i = 0; i < AllModules.Length; i++)
+                Dependents[i] = new List<int>();
+
+            for (int i = 0; i < AllModules.Length; i++)
+            {
+                ModuleDependencyAttribute[] Attributes = AllModules[i].GetType()
+                    .GetCustomAttributes<ModuleDependencyAttribute>().ToArray();
+
+                // Only loaded modules participate in the dependency graph.
+                for (int j = 0; j < AllModules.Length; j++)
+                {
+                    if (Attributes.Any(Attribute => Attribute.DependsOn(AllModules[j])))
+                    {
+                        DependencyCounts[i]++;
+                        Dependents[j].Add(i);
+                    }
+                }
+
+                if (DependencyCounts[i] == 0)
+                    Ready.Add(i);
+            }
+
+            while (Ready.Count > 0)
+            {
+                int i = Ready.Min;
+                Ready.Remove(i);
+                Ordered.Add(AllModules[i]);
+
+                foreach (int Dependent in Dependents[i])
+                {
+                    if (--DependencyCounts[Dependent] == 0)
+                        Ready.Add(Dependent);
+                }
+            }
+
+            if (Ordered.Count != AllModules.Length)
+            {
+                string[] Remaining = AllModules.Where((m, i) => DependencyCounts[i] > 0)
+                    .Select(m => m.GetType().FullName).ToArray();
+
+                throw new Exception("Circular module dependencies prevent ordering the following modules: " +
+                    string.Join(", ", Remaining));
+            }
+
+            return Ordered.ToArray();
+        }
 
 		/// <summary>
 		/// Starts all loaded modules.

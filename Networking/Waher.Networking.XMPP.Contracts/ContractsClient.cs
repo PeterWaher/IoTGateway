@@ -2692,7 +2692,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						this.client.Error("Attachment " + Attachment.Url + "unavailable: " + ex.Message);
+						this.client.Error("Attachment " + Attachment.Url + " is unavailable: " + ex.Message);
 						await this.ReturnStatus(IdentityStatus.AttachmentUnavailable, Callback, State,
 							new KeyValuePair<string, object>("AttachmentId", Attachment.Id),
 							new KeyValuePair<string, object>("AttachmentUrl", Attachment.Url),
@@ -2813,14 +2813,20 @@ namespace Waher.Networking.XMPP.Contracts
 				return RsaEndpoint.Verify(Data, Signature, KeySize, Identity.ClientPubKey);
 			}
 			else if (E2eEndpoint.TryGetEndpoint(Identity.ClientKeyName,
-				Identity.Namespace.Replace(":iot:leg:id:", ":iot:e2e:").Replace("urn:ieee:", "urn:nf:"),
-				out IE2eEndpoint LocalKey) &&
+				GetE2eNamespace(Identity.Namespace), out IE2eEndpoint LocalKey) &&
 				LocalKey is EllipticCurveEndpoint LocalEc)
 			{
 				return LocalEc.Verify(Data, Identity.ClientPubKey, Signature);
 			}
 			else
 				return null;
+		}
+
+		internal static string GetE2eNamespace(string Namespace)
+		{
+			return Namespace.
+				Replace(":iot:leg:id:", ":iot:e2e:").
+				Replace("urn:ieee:", "urn:nf:");
 		}
 
 		/// <summary>
@@ -2842,8 +2848,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return RsaEndpoint.Verify(Data, Signature, KeySize, Identity.ClientPubKey);
 			}
 			else if (E2eEndpoint.TryGetEndpoint(Identity.ClientKeyName,
-				Identity.Namespace.Replace(":iot:leg:id:", ":iot:e2e:").Replace("urn:ieee:", "urn:nf:"),
-				out IE2eEndpoint LocalKey) &&
+				GetE2eNamespace(Identity.Namespace), out IE2eEndpoint LocalKey) &&
 				LocalKey is EllipticCurveEndpoint LocalEc)
 			{
 				return LocalEc.Verify(Data, Identity.ClientPubKey, Signature);
@@ -7636,11 +7641,12 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (string.Compare(e.FromBareJID, this.componentAddress, true) == 0)
 			{
-				await this.Validate(Identity, false, async (sender2, e2) =>
+				await this.Validate(Identity, true, async (sender2, e2) =>
 				{
 					if (e2.Status != IdentityStatus.Valid)
 					{
-						this.client.Error("Invalid legal identity received and discarded.");
+						this.client.Error("Invalid legal identity received and discarded: " +
+							e2.Status.ToString());
 
 						Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
 							new KeyValuePair<string, object>("Status", e2.Status));
@@ -7659,8 +7665,8 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			ChunkedList<string> PropertyList = null;
 			ChunkedList<string> AttachmentList = null;
-			bool IsIdentityNamespace = IsNamespaceLegalIdentity(Query.NamespaceURI);
-			bool IsContractNamespace = IsNamespaceSmartContract(Query.NamespaceURI);
+			bool IsIdentityRequest = IsNamespaceLegalIdentity(Query.NamespaceURI);
+			bool IsContractRequest = IsNamespaceSmartContract(Query.NamespaceURI);
 			Context = null;
 			Properties = null;
 			Attachments = null;
@@ -7672,12 +7678,12 @@ namespace Waher.Networking.XMPP.Contracts
 				if (!(N is XmlElement E))
 					continue;
 
-				if (IsIdentityNamespace)
+				if (E.LocalName == "identity" || IsIdentityRequest)
 				{
 					if (!IsNamespaceLegalIdentity(E.NamespaceURI))
 						continue;
 				}
-				else if (IsContractNamespace)
+				else if (IsContractRequest)
 				{
 					if (!IsNamespaceSmartContract(E.NamespaceURI))
 						continue;
@@ -8137,11 +8143,12 @@ namespace Waher.Networking.XMPP.Contracts
 
 			EventHandlerAsync<SignaturePetitionEventArgs> h = PeerReview ? this.PetitionForPeerReviewIDReceived : this.PetitionForSignatureReceived;
 
-			await this.Validate(Identity, false, async (sender2, e2) =>
+			await this.Validate(Identity, !PeerReview, async (sender2, e2) =>
 			{
 				if (e2.Status != IdentityStatus.Valid && e2.Status != IdentityStatus.NoProviderSignature)
 				{
-					this.client.Error("Invalid legal identity received and discarded.");
+					this.client.Error("Invalid legal identity received and discarded: " +
+						e2.Status.ToString());
 
 					Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
 						new KeyValuePair<string, object>("Status", e2.Status));
@@ -8570,21 +8577,25 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			await this.Validate(Identity, false, async (sender2, e2) =>
+			if (string.Compare(e.FromBareJID, this.componentAddress, true) == 0)
 			{
-				if (e2.Status != IdentityStatus.Valid)
+				await this.Validate(Identity, true, async (sender2, e2) =>
 				{
-					this.client.Error("Invalid identity received and discarded.");
+					if (e2.Status != IdentityStatus.Valid)
+					{
+						this.client.Error("Invalid identity received and discarded: " +
+							e2.Status.ToString());
 
-					Log.Warning("Invalid identity received and discarded.", this.client.BareJID, e.From,
-						new KeyValuePair<string, object>("Status", e2.Status));
-					return;
-				}
+						Log.Warning("Invalid identity received and discarded.", this.client.BareJID, e.From,
+							new KeyValuePair<string, object>("Status", e2.Status));
+						return;
+					}
 
-				await this.PetitionForContractReceived.Raise(this, new ContractPetitionEventArgs(e,
-					Identity, From, ContractId, PetitionId, Purpose, ClientEndpoint, Context, Properties, Attachments));
+					await this.PetitionForContractReceived.Raise(this, new ContractPetitionEventArgs(e,
+						Identity, From, ContractId, PetitionId, Purpose, ClientEndpoint, Context, Properties, Attachments));
 
-			}, null);
+				}, null);
+			}
 		}
 
 		/// <summary>
@@ -8596,6 +8607,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			string PetitionId = XML.Attribute(e.Content, "pid");
 			bool Response = XML.Attribute(e.Content, "response", false);
+			string From = XML.Attribute(e.Content, "from");
 			string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
 			Contract Contract = null;
 			XmlElement Context = null;
@@ -8617,7 +8629,12 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			if (!Response || string.Compare(e.FromBareJID, Contract?.Provider ?? string.Empty, true) == 0)
-				await this.PetitionedContractResponseReceived.Raise(this, new ContractPetitionResponseEventArgs(e, Contract, PetitionId, Response, ClientEndpoint, Context));
+			{
+				ContractPetitionResponseEventArgs e2 = new ContractPetitionResponseEventArgs(
+					e, Contract, PetitionId, Response, From, ClientEndpoint, Context);
+
+				await this.PetitionedContractResponseReceived.Raise(this, e2);
+			}
 		}
 
 		/// <summary>

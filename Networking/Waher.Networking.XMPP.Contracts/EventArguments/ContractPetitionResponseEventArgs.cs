@@ -11,6 +11,7 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		private readonly Contract requestedContract;
 		private readonly string petitionId;
 		private readonly bool response;
+		private readonly string from;
 		private readonly string clientEndpoint;
 		private readonly XmlElement context;
 
@@ -21,15 +22,17 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		/// <param name="RequestedContract">Requested contract, if accepted, null if rejected.</param>
 		/// <param name="PetitionId">Petition ID. Identifies the petition.</param>
 		/// <param name="Response">If accepted (true) or rejected (false).</param>
+		/// <param name="From">The Bare JID of the part of the contract that consented to the petition.</param>
 		/// <param name="ClientEndpoint">Remote endpoint of remote party client.</param>
 		/// <param name="Context">Any machine-readable context XML element available in the petition response.</param>
 		public ContractPetitionResponseEventArgs(MessageEventArgs e, Contract RequestedContract, string PetitionId, 
-			bool Response, string ClientEndpoint, XmlElement Context)
+			bool Response, string From, string ClientEndpoint, XmlElement Context)
 			: base(e)
 		{
 			this.requestedContract = RequestedContract;
 			this.petitionId = PetitionId;
 			this.response = Response;
+			this.from = From;
 			this.clientEndpoint = ClientEndpoint;
 			this.context = Context;
 		}
@@ -48,6 +51,11 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		/// If accepted (true) or rejected (false).
 		/// </summary>
 		public bool Response => this.response;
+
+		/// <summary>
+		/// The Bare JID of the part of the contract that consented to the petition.
+		/// </summary>
+		public string ResponseFrom => this.from;
 
 		/// <summary>
 		/// Remote endpoint of remote party client.

@@ -1580,7 +1580,7 @@ namespace Waher.IoTGateway.Setup
 
 				Gateway.ScheduleEvent((P) =>
 				{
-					ContractPetitionResponseEventArgs e = new ContractPetitionResponseEventArgs(null, null, (string)P, false, string.Empty, null);
+					ContractPetitionResponseEventArgs e = new ContractPetitionResponseEventArgs(null, null, (string)P, false, string.Empty, string.Empty, null);
 					this.ContractsClient_PetitionedContractResponseReceived(Gateway.ContractsClient, e);
 				}, DateTime.Now.Add(Timeout), PetitionId);
 			}

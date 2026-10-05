@@ -335,7 +335,7 @@ namespace Waher.Runtime.Inventory
 		/// </summary>
 		/// <param name="Order">Order in which modules should be stopped.
 		/// Default order is the reverse starting order, if no other order is provided.</param>
-		public static async Task StopAllModules(IComparer<IModule> Order)
+		public static async Task StopAllModules(IModuleOrder Order)
 		{
 			if (isInitialized)
 			{
@@ -346,7 +346,10 @@ namespace Waher.Runtime.Inventory
 					if (Order is null)
 						Array.Reverse(Modules);
 					else
+					{
+						Order.SetModules(Modules);
 						Array.Sort(Modules, Order);
+					}
 
 					foreach (IModule Module in Modules)
 					{
@@ -418,7 +421,7 @@ namespace Waher.Runtime.Inventory
 		/// </summary>
 		/// <param name="Order">Optional sort order of modules.</param>
 		/// <returns>Array of loaded modules.</returns>
-		public static IModule[] GetLoadedModules(IComparer<IModule> Order)
+		public static IModule[] GetLoadedModules(IModuleOrder Order)
 		{
 			ChunkedList<IModule> Modules = new ChunkedList<IModule>();
 			IModule Module;
@@ -444,6 +447,7 @@ namespace Waher.Runtime.Inventory
 			if (Order is null)
 				Order = new DependencyOrder();
 
+			Order.SetModules(Modules);
 			Modules.Sort(Order);
 
 			return Modules.ToArray();
@@ -467,7 +471,7 @@ namespace Waher.Runtime.Inventory
 		/// <param name="Order">Order in which modules should be started.</param>
 		/// <returns>If all modules have been successfully started (true), or if at least one has not been
 		/// started within the time period defined by <paramref name="Timeout"/>.</returns>
-		public static Task<bool> StartAllModules(int Timeout, IComparer<IModule> Order)
+		public static Task<bool> StartAllModules(int Timeout, IModuleOrder Order)
 		{
 			return StartAllModules(Timeout, Order, null, null);
 		}
@@ -483,7 +487,7 @@ namespace Waher.Runtime.Inventory
 		/// modules that failed to load.</param>
 		/// <returns>If all modules have been successfully started (true), or if at least one has not been
 		/// started within the time period defined by <paramref name="Timeout"/>.</returns>
-		public static async Task<bool> StartAllModules(int Timeout, IComparer<IModule> Order,
+		public static async Task<bool> StartAllModules(int Timeout, IModuleOrder Order,
 			ChunkedList<IModule> LoadedModules, ChunkedList<IModule> FailedModules)
 		{
 			if (modules is null || modules.Length == 0)

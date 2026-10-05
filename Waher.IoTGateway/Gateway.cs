@@ -2142,10 +2142,25 @@ namespace Waher.IoTGateway
 				return Response.SendResponse(new NotFoundException("No default page defined."));
 		}
 
-		private class ModuleStartOrder : IComparer<IModule>
+		private class ModuleStartOrder : IModuleOrder
 		{
 			private readonly DependencyOrder dependencyOrder = new DependencyOrder();
 
+			/// <summary>
+			/// Sets the modules to order.
+			/// </summary>
+			/// <param name="Modules">Modules available.</param>
+			public void SetModules(IEnumerable<IModule> Modules)
+			{
+				this.dependencyOrder.SetModules(Modules);
+			}
+
+			/// <summary>
+			/// Compares two modules.
+			/// </summary>
+			/// <param name="x">Module 1</param>
+			/// <param name="y">Module 2</param>
+			/// <returns>Negative if x before y, positive if x after y.</returns>
 			public int Compare(IModule x, IModule y)
 			{
 				int c1 = this.ModuleCategory(x);

@@ -40,7 +40,7 @@ namespace Waher.Runtime.Inventory
 		/// <summary>
 		/// Module Type Name
 		/// </summary>
-		public string ModeTypeName => this.ModeTypeName;
+		public string ModuleTypeName => this.moduleTypeName;
 
 		/// <summary>
 		/// Checks if there is a dependency on a given module.

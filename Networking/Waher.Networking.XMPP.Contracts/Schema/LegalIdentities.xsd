@@ -486,6 +486,15 @@
 			<xs:documentation>Note: If neither id or bareJid are provided, current approved legal identities for the sender will be used to verify the signature.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
+			<xs:sequence>
+				<xs:element name='for' type='xs:string' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Contains a Bare JID of an entity for which the signature was presented.</xs:documentation>
+						<xs:documentation>During Identity Petitions, this element is used to identify the Bare JID associated with the requested Identity, authorizing it access to the requestor's Identity if signature is valid.</xs:documentation>
+						<xs:documentation>During Contract Petitions, this element is used once for each Bare JID associated with a part in the contract, authorizing them access to the requestor's Identity if signature is valid.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
 			<xs:attribute name='id' type='xs:string' use='optional'>
 				<xs:annotation>
 					<xs:documentation>Identifier of the legal identity to retrieve.</xs:documentation>
@@ -505,11 +514,6 @@
 			<xs:attribute name="s" type="xs:base64Binary" use="required">
 				<xs:annotation>
 					<xs:documentation>Digital signature to validate.</xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
-			<xs:attribute name='for' type='xs:string' use='optional'>
-				<xs:annotation>
-					<xs:documentation>May contain a Bare JID of entity for which the signature was presented.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 		</xs:complexType>

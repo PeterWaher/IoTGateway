@@ -1001,7 +1001,7 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("ContractId", ContractId)));
 		}
 
-		private async Task<bool> UpsertContractStateAsync(string ContractId, string CreatorJid, byte[] SharedSecret,
+		private async Task<bool> SaveContractStateAsync(string ContractId, string CreatorJid, byte[] SharedSecret,
 			SymmetricCipherAlgorithms KeyAlgorithm)
 		{
 			if (string.IsNullOrEmpty(ContractId) || SharedSecret is null)
@@ -1055,7 +1055,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			if (MigrateToState)
-				await this.UpsertContractStateAsync(ContractId, CreatorJid, SharedSecret, Algorithm);
+				await this.SaveContractStateAsync(ContractId, CreatorJid, SharedSecret, Algorithm);
 
 			return CreateContractSharedSecretTuple(Algorithm, CreatorJid, SharedSecret);
 		}
@@ -1089,7 +1089,7 @@ namespace Waher.Networking.XMPP.Contracts
 					continue;
 				}
 
-				if (await this.UpsertContractStateAsync(ContractId, CreatorJid, SharedSecret, Algorithm))
+				if (await this.SaveContractStateAsync(ContractId, CreatorJid, SharedSecret, Algorithm))
 				{
 					ContractSharedSecretState State = await this.GetContractStateAsync(ContractId);
 
@@ -1261,7 +1261,7 @@ namespace Waher.Networking.XMPP.Contracts
 								return false;
 							}
 
-							if (!await this.UpsertContractStateAsync(Name, CreatorJid, SharedSecret, ContractAlgorithm))
+							if (!await this.SaveContractStateAsync(Name, CreatorJid, SharedSecret, ContractAlgorithm))
 								return false;
 							break;
 						}
@@ -1286,7 +1286,7 @@ namespace Waher.Networking.XMPP.Contracts
 								return false;
 							}
 
-							if (!await this.UpsertContractStateAsync(ContractId, CreatorJid, SharedSecret, ContractAlgorithm))
+							if (!await this.SaveContractStateAsync(ContractId, CreatorJid, SharedSecret, ContractAlgorithm))
 								return false;
 							break;
 						}
@@ -6675,7 +6675,7 @@ namespace Waher.Networking.XMPP.Contracts
 					return false;
 			}
 
-			return await this.UpsertContractStateAsync(ContractId, CreatorJid, Key, KeyAlgorithm);
+			return await this.SaveContractStateAsync(ContractId, CreatorJid, Key, KeyAlgorithm);
 		}
 
 		internal async Task<Tuple<SymmetricCipherAlgorithms, string, byte[]>> TryLoadContractSharedSecret(string ContractId)

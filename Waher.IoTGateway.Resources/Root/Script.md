@@ -2553,7 +2553,9 @@ The following functions are available in web pages hosted by the IoT Gateway:
 |-------------------------------------------------------|-------------|
 | `BareJID(JID)`                                        | Returns the Bare JID of `JID` |
 | `ClearCaches()`                                       | Clears internal caches. |
+| `CreatePassword()`                                    | Alias for `RandomPassword()`. |
 | `FullJID(JID)`                                        | Returns the Full JID of `JID`. If `JID` is a Bare JID, the Full JID of the last online presence is returned. |
+| `GeneratePassword()`                                  | Alias for `RandomPassword()`. |
 | `GetDomainSetting(Host,Key,DefaultValue)`             | Gets a domain setting. If the Host (which can be a string or implement `Waher.Content.IHostReference`, such as an HTTP Request object for instance) is an alternative domain, it will be treated as a host setting, otherwise a runtime setting. |
 | `GetNode(NodeId[,SourceId[,Partition[,JID]]])`        | Gets the node object of a node in the gateway (if not providing a `JID`), or a provisional reference node to a node hosted by a remote gateway identified by `JID`. If the node is not found, null is returned. (If no Source ID is provided, the Metering Topology is assumed.) Authorization to view the node is required, and depends on the execution context. |
 | `GetSources()`                                        | Gets available sources of things. |
@@ -2562,6 +2564,7 @@ The following functions are available in web pages hosted by the IoT Gateway:
 | `GetTabIDs(User)`                                     | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be viewed by the user identitied by the user object `User`. |
 | `GetTabInformation(TabID)`                            | Gets information about a tab, the URI used, query parameters, session ID and session variables. If tab is not found, `null` is returned. |
 | `LoadResourceFile(LocalResource[,ContentType])`       | Loads a file from its local resource name and decodes it, taking into consideration defined web folders. By default, the content type defined by the file extension is used, if defined. You can also explicitly provide a content type. |
+| `NewPassword()`                                       | Alias for `RandomPassword()`. |
 | `PreprocessCssx(CSSX)`                                | Preprocesses a CSSX string `CSSX`, and returns it as a string. |
 | `PreprocessHtmlx(HTMLX)`                              | Preprocesses a HTMLX string `HTMLX`, and returns it as a string. |
 | `PushEvent(..., Event, Data)`                         | Pushes an event to all open pages (tabs), defined by the arguments defined by `...` (same types of arguments as for the `GetTabIDs` function), or a reference to a Tab ID. Data can be a string, or any object that can be encoded as JSON. The `Event` translates to a JavaScript function, with one argument, that will be called. The `Data` will be passed on as the argument. |

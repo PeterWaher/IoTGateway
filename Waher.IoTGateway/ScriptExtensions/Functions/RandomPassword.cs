@@ -37,6 +37,16 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		public override bool IsAsynchronous => false;
 
 		/// <summary>
+		/// Optional aliases. If there are no aliases for the function, null is returned.
+		/// </summary>
+		public override string[] Aliases => new string[]
+		{
+			"NewPassword",
+			"CreatePassword",
+			"GeneratePassword"
+		};
+
+		/// <summary>
 		/// Creates a random password.
 		/// </summary>
 		/// <param name="NrBytes">Number of random bytes.</param>

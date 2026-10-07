@@ -2785,7 +2785,7 @@
 			<xs:attribute name='url' type='xs:anyURI' use='required'>
 				<xs:annotation>
 					<xs:documentation>An URL to download the attachment.</xs:documentation>
-					<xs:documentation>Attachments must be protected using the Neuro.Foundation.Sign WWW-authentication mechanism to make sure only authorized clients can access the attachment.</xs:documentation>
+					<xs:documentation>Attachments must be protected using the NeuroFoundation.Sign WWW-authentication mechanism to make sure only authorized clients can access the attachment.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 		</xs:complexType>

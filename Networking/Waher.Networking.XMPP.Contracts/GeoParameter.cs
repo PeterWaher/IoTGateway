@@ -15,7 +15,7 @@ namespace Waher.Networking.XMPP.Contracts
 	/// </summary>
 	public class GeoParameter : Parameter
 	{
-		private AltitudeUse altitude = AltitudeUse.Optional;
+		private AltitudeUse? altitude = null;
 		private GeoPosition value;
 		private GeoPosition min = null;
 		private GeoPosition max = null;
@@ -86,7 +86,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public AltitudeUse Altitude
 		{
-			get => this.altitude;
+			get => this.altitude ?? AltitudeUse.Optional;
 			set => this.altitude = value;
 		}
 
@@ -105,9 +105,9 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (GeoPosition.TryParse(value, out GeoPosition D))
 				{
-					if (this.altitude == AltitudeUse.Prohibited && D.Altitude.HasValue)
+					if (this.Altitude == AltitudeUse.Prohibited && D.Altitude.HasValue)
 						this.Value = null;
-					else if (this.altitude == AltitudeUse.Required && !D.Altitude.HasValue)
+					else if (this.Altitude == AltitudeUse.Required && !D.Altitude.HasValue)
 						this.Value = null;
 					else
 						this.Value = D;
@@ -133,9 +133,12 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (!UsingTemplate)
 			{
-				Xml.Append(" altitude=\"");
-				Xml.Append(this.altitude.ToString());
-				Xml.Append('"');
+				if (this.altitude.HasValue)
+				{
+					Xml.Append(" altitude=\"");
+					Xml.Append(this.altitude.ToString());
+					Xml.Append('"');
+				}
 
 				if (this.contractLocation)
 					Xml.Append(" contractLocation=\"true\"");
@@ -294,7 +297,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return Task.FromResult(false);
 			}
 
-			switch (this.altitude)
+			switch (this.Altitude)
 			{
 				case AltitudeUse.Required:
 					if (!this.value.Altitude.HasValue)
@@ -333,7 +336,11 @@ namespace Waher.Networking.XMPP.Contracts
 			this.MinIncluded = XML.Attribute(Xml, "minIncluded", true);
 			this.Max = GeoPositionAttribute(Xml, "max");
 			this.MaxIncluded = XML.Attribute(Xml, "maxIncluded", true);
-			this.altitude = XML.Attribute(Xml, "altitude", AltitudeUse.Optional);
+
+			if (Xml.HasAttribute("altitude"))
+				this.altitude = XML.Attribute(Xml, "altitude", AltitudeUse.Optional);
+			else
+				this.altitude = null;
 
 			return base.Import(Xml);
 		}

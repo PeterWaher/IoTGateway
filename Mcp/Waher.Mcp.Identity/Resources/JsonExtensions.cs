@@ -338,7 +338,9 @@ namespace Waher.Mcp.Identity.Resources
 				Result["MinIncluded"] = GeoParameter.MinIncluded;
 				Result["Max"] = GeoParameter.Max.ToJson();
 				Result["MaxIncluded"] = GeoParameter.MaxIncluded;
-				Result["Altitude"] = GeoParameter.Altitude;
+				
+				if (GeoParameter.Altitude.HasValue)
+					Result["Altitude"] = GeoParameter.Altitude;
 			}
 			else if (Parameter is NumericalParameter NumericalParameter)
 			{

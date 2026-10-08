@@ -84,9 +84,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// How altitudes are managed by the parameter
 		/// </summary>
-		public AltitudeUse Altitude
+		public AltitudeUse? Altitude
 		{
-			get => this.altitude ?? AltitudeUse.Optional;
+			get => this.altitude;
 			set => this.altitude = value;
 		}
 
@@ -105,10 +105,15 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (GeoPosition.TryParse(value, out GeoPosition D))
 				{
-					if (this.Altitude == AltitudeUse.Prohibited && D.Altitude.HasValue)
-						this.Value = null;
-					else if (this.Altitude == AltitudeUse.Required && !D.Altitude.HasValue)
-						this.Value = null;
+					if (this.altitude.HasValue)
+					{
+						if (this.altitude.Value == AltitudeUse.Prohibited && D.Altitude.HasValue)
+							this.Value = null;
+						else if (this.altitude.Value == AltitudeUse.Required && !D.Altitude.HasValue)
+							this.Value = null;
+						else
+							this.Value = D;
+					}
 					else
 						this.Value = D;
 				}
@@ -297,27 +302,30 @@ namespace Waher.Networking.XMPP.Contracts
 				return Task.FromResult(false);
 			}
 
-			switch (this.Altitude)
+			if (this.altitude.HasValue)
 			{
-				case AltitudeUse.Required:
-					if (!this.value.Altitude.HasValue)
-					{
-						this.ErrorReason = ParameterErrorReason.Outside;
-						this.ErrorText = null;
+				switch (this.altitude.Value)
+				{
+					case AltitudeUse.Required:
+						if (!this.value.Altitude.HasValue)
+						{
+							this.ErrorReason = ParameterErrorReason.Outside;
+							this.ErrorText = null;
 
-						return Task.FromResult(false);
-					}
-					break;
+							return Task.FromResult(false);
+						}
+						break;
 
-				case AltitudeUse.Prohibited:
-					if (this.value.Altitude.HasValue)
-					{
-						this.ErrorReason = ParameterErrorReason.Outside;
-						this.ErrorText = null;
+					case AltitudeUse.Prohibited:
+						if (this.value.Altitude.HasValue)
+						{
+							this.ErrorReason = ParameterErrorReason.Outside;
+							this.ErrorText = null;
 
-						return Task.FromResult(false);
-					}
-					break;
+							return Task.FromResult(false);
+						}
+						break;
+				}
 			}
 
 			return base.IsParameterValid(Variables, Client);

@@ -1501,7 +1501,7 @@ namespace Waher.Mcp.Identity
 			sb.Append(") has been received: ");
 			sb.Append(e.Purpose);
 
-			AppendQuestionAndRequestor(sb, e.RequestorIdentity, e.RequestorFullJid,
+			AppendQuestionAndRequestor(sb, e.RequestorIdentity, e.RequestorBareJid,
 				e.Properties, e.Attachments, e.ClientEndpoint);
 
 			foreach (string SessionId in McpXmppExtension.SessionIds)
@@ -1516,7 +1516,7 @@ namespace Waher.Mcp.Identity
 					if (Result.HasValue)
 					{
 						await ContractsClient.PetitionIdentityResponseAsync(
-							e.RequestedIdentityId, e.PetitionId, e.RequestorFullJid,
+							e.RequestedIdentityId, e.PetitionId, e.RequestorBareJid,
 							Result.Value);
 						break;
 					}
@@ -1525,22 +1525,22 @@ namespace Waher.Mcp.Identity
 		}
 
 		private static void AppendQuestionAndRequestor(StringBuilder sb, LegalIdentity Identity,
-			string FullJid, string RemoteEndpoint)
+			string BareJid, string RemoteEndpoint)
 		{
-			AppendQuestionAndRequestor(sb, Identity, FullJid,
+			AppendQuestionAndRequestor(sb, Identity, BareJid,
 				Array.Empty<string>(), Array.Empty<string>(), RemoteEndpoint);
 		}
 
 		private static void AppendQuestionAndRequestor(StringBuilder sb, LegalIdentity Identity,
-			string FullJid, string[] Properties, string[] Attachments, string RemoteEndpoint)
+			string BareJid, string[] Properties, string[] Attachments, string RemoteEndpoint)
 		{
 			AppendQuestionAndRequestor(sb, Identity,
-				"Do you want to accept or decline the request?", "requestor", FullJid,
+				"Do you want to accept or decline the request?", "requestor", BareJid,
 				Properties, Attachments, RemoteEndpoint);
 		}
 
 		private static void AppendQuestionAndRequestor(StringBuilder sb, LegalIdentity Identity,
-			string Question, string Title, string FullJid, string[] Properties,
+			string Question, string Title, string BareJid, string[] Properties,
 			string[] Attachments, string RemoteEndpoint)
 		{
 			if (!string.IsNullOrEmpty(RemoteEndpoint))
@@ -1572,12 +1572,12 @@ namespace Waher.Mcp.Identity
 				sb.Append(P.Value);
 			}
 
-			if (!JidIncluded && !string.IsNullOrEmpty(FullJid))
+			if (!JidIncluded && !string.IsNullOrEmpty(BareJid))
 			{
 				sb.AppendLine();
 				sb.Append(PersonalInformation.JidTag);
 				sb.Append(": ");
-				sb.Append(XmppClient.GetBareJID(FullJid));
+				sb.Append(XmppClient.GetBareJID(BareJid));
 			}
 
 			if ((Properties?.Length ?? 0) > 0)
@@ -1622,7 +1622,7 @@ namespace Waher.Mcp.Identity
 			sb.Append("A petition for a digital signature has been received: ");
 			sb.Append(e.Purpose);
 
-			AppendQuestionAndRequestor(sb, e.RequestorIdentity, e.RequestorFullJid,
+			AppendQuestionAndRequestor(sb, e.RequestorIdentity, e.RequestorBareJid,
 				e.Properties, e.Attachments, e.ClientEndpoint);
 
 			foreach (string SessionId in McpXmppExtension.SessionIds)
@@ -1648,7 +1648,7 @@ namespace Waher.Mcp.Identity
 
 						await ContractsClient.PetitionSignatureResponseAsync(
 							e.SignatoryIdentityId, e.ContentToSign, Signature, e.PetitionId,
-							e.RequestorFullJid, Result.Value);
+							e.RequestorBareJid, Result.Value);
 						break;
 					}
 				}
@@ -1662,7 +1662,7 @@ namespace Waher.Mcp.Identity
 
 			await ContractsClient.PetitionSignatureResponseAsync(
 				e.SignatoryIdentityId, e.ContentToSign, Array.Empty<byte>(), e.PetitionId,
-				e.RequestorFullJid, false);
+				e.RequestorBareJid, false);
 		}
 
 		private async Task ContractsClient_PetitionForContractReceived(object Sender, ContractPetitionEventArgs e)
@@ -1680,7 +1680,7 @@ namespace Waher.Mcp.Identity
 			sb.Append(") has been received: ");
 			sb.Append(e.Purpose);
 
-			AppendQuestionAndRequestor(sb, e.RequestorIdentity, e.RequestorFullJid,
+			AppendQuestionAndRequestor(sb, e.RequestorIdentity, e.RequestorBareJid,
 				e.Properties, e.Attachments, e.ClientEndpoint);
 
 			foreach (string SessionId in McpXmppExtension.SessionIds)
@@ -1695,7 +1695,7 @@ namespace Waher.Mcp.Identity
 					if (Result.HasValue)
 					{
 						await ContractsClient.PetitionContractResponseAsync(
-							e.RequestedContractId, e.PetitionId, e.RequestorFullJid,
+							e.RequestedContractId, e.PetitionId, e.RequestorBareJid,
 							Result.Value);
 						break;
 					}

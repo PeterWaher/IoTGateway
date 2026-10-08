@@ -9,7 +9,7 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 	public abstract class PetitionEventArgs : MessageEventArgs
 	{
 		private readonly LegalIdentity requestorIdentity;
-		private readonly string requestorFullJid;
+		private readonly string requestorBareJid;
 		private readonly string petitionId;
 		private readonly string purpose;
 		private readonly string clientEndpoint;
@@ -22,7 +22,7 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		/// </summary>
 		/// <param name="e">Message event arguments.</param>
 		/// <param name="RequestorIdentity">Legal Identity of entity making the request.</param>
-		/// <param name="RequestorFullJid">Full JID of requestor.</param>
+		/// <param name="RequestorBareJid">Bare JID of requestor.</param>
 		/// <param name="PetitionId">Petition ID. Identifies the petition.</param>
 		/// <param name="Purpose">Purpose of petitioning the identity information.</param>
 		/// <param name="ClientEndpoint">Remote endpoint of remote party client.</param>
@@ -31,13 +31,13 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		/// highlighting which properties will be used in the response.</param>
 		/// <param name="Attachments">Optional attachment hints to provide to the remote party,
 		/// highlighting which attachments will be used in the response.</param>
-		public PetitionEventArgs(MessageEventArgs e, LegalIdentity RequestorIdentity, string RequestorFullJid,
+		public PetitionEventArgs(MessageEventArgs e, LegalIdentity RequestorIdentity, string RequestorBareJid,
 			string PetitionId, string Purpose, string ClientEndpoint, XmlElement Context, 
 			string[] Properties, string[] Attachments)
 			: base(e)
 		{
 			this.requestorIdentity = RequestorIdentity;
-			this.requestorFullJid = RequestorFullJid;
+			this.requestorBareJid = RequestorBareJid;
 			this.petitionId = PetitionId;
 			this.purpose = Purpose;
 			this.clientEndpoint = ClientEndpoint;
@@ -52,9 +52,9 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		public LegalIdentity RequestorIdentity => this.requestorIdentity;
 
 		/// <summary>
-		/// Full JID of requestor.
+		/// Bare JID of requestor.
 		/// </summary>
-		public string RequestorFullJid => this.requestorFullJid;
+		public string RequestorBareJid => this.requestorBareJid;
 
 		/// <summary>
 		/// Petition ID

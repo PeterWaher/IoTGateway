@@ -7776,8 +7776,13 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (N is XmlElement E)
 				{
-					if (E.LocalName == "identity" && E.NamespaceURI == e.Content.NamespaceURI)
-						Identity = LegalIdentity.Parse(E);
+					if (E.NamespaceURI == e.Content.NamespaceURI)
+					{
+						if (E.LocalName == "identity")
+							Identity = LegalIdentity.Parse(E);
+						else
+							return;
+					}
 					else if (!(Context is null))
 						return;
 					else
@@ -8192,28 +8197,34 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (N is XmlElement E)
 				{
-					switch (E.LocalName)
+					if (E.NamespaceURI == e.Content.NamespaceURI)
 					{
-						case "identity":
-							Identity = LegalIdentity.Parse(E);
-							break;
+						switch (E.LocalName)
+						{
+							case "identity":
+								Identity = LegalIdentity.Parse(E);
+								break;
 
-						case "content":
-							ContentStr = E.InnerText;
-							Content = Convert.FromBase64String(ContentStr);
-							break;
+							case "content":
+								ContentStr = E.InnerText;
+								Content = Convert.FromBase64String(ContentStr);
+								break;
 
-						case "signature":
-							SignatureStr = E.InnerText;
-							Signature = Convert.FromBase64String(SignatureStr);
-							break;
+							case "signature":
+								SignatureStr = E.InnerText;
+								Signature = Convert.FromBase64String(SignatureStr);
+								break;
 
-						default:
-							if (!(Context is null))
+							default:
 								return;
+						}
+					}
+					else
+					{
+						if (!(Context is null))
+							return;
 
-							Context = E;
-							break;
+						Context = E;
 					}
 				}
 			}
@@ -8632,10 +8643,15 @@ namespace Waher.Networking.XMPP.Contracts
 				if (!(N is XmlElement E))
 					continue;
 
-				if (E.LocalName == "contract" && E.NamespaceURI == e.Content.NamespaceURI)
+				if (E.NamespaceURI == e.Content.NamespaceURI)
 				{
-					ParsedContract Parsed = await Contract.Parse(E, this, false);
-					Contract = Parsed?.Contract;
+					if (E.LocalName == "contract")
+					{
+						ParsedContract Parsed = await Contract.Parse(E, this, false);
+						Contract = Parsed?.Contract;
+					}
+					else
+						return;
 				}
 				else if (!(Context is null))
 					return;

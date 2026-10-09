@@ -299,7 +299,7 @@
 				<xs:element name='status' minOccurs='0' maxOccurs='1'>
 					<xs:annotation>
 						<xs:documentation>The status object is created and managed by the Trust Provider.</xs:documentation>
-						<xs:documentation>Anyone can get the latest version of the legal identity by requesting it from the trust provider, given the id of the legal identity.</xs:documentation>
+						<xs:documentation>Authorized entities can get the latest version of the legal identity by requesting it from the trust provider, given the id of the legal identity.</xs:documentation>
 					</xs:annotation>
 					<xs:complexType>
 						<xs:attribute name='provider' type='xs:string' use='required'>
@@ -463,7 +463,7 @@
 	<xs:element name='getLegalIdentity'>
 		<xs:annotation>
 			<xs:documentation>Sent by a client in an iq get to a Trust Provider, to retrieve a specific legal identity given its ID.</xs:documentation>
-			<xs:documentation>The server should only return legal identities belonging to the same account.</xs:documentation>
+			<xs:documentation>The server should only return the legal identity if the client is authorized access.</xs:documentation>
 			<xs:documentation>Expected response element: identity</xs:documentation>
 			<xs:documentation>Note: To get the legal identity from a signature, see validateSignature.</xs:documentation>
 			<xs:documentation>Note: To get the legal identities related to contracts, see getLegalIdentities element in the smart contracts namespace.</xs:documentation>
@@ -626,7 +626,7 @@
 				<xs:attribute name='s' type='xs:base64Binary' use='required'>
 					<xs:annotation>
 						<xs:documentation>Digital signature of the request using the legal identity (or one of the approved legal identities) of the caller.</xs:documentation>
-						<xs:documentation>The signature is calculated on the following data: UTF8Encode(pid + ":" + id + ":" + purpose + ":" + nonce + ":" + fromBareJid), where fromBareJid is the Bare JID of the sender.</xs:documentation>
+						<xs:documentation>The signature is calculated on the following data: UTF8Encode(pid + ":" + id + ":" + purpose + ":" + nonce + ":" + lowercase(fromBareJid)), where fromBareJid is the Bare JID of the sender.</xs:documentation>
 						<xs:documentation>Note: If a sender has multiple approved legal identities associated with it, the Trust Provider uses the signature to identify which identity has been used to form the signature. It is this identity that is later forwarded to the owner of the requested identity.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
@@ -634,7 +634,7 @@
 		</xs:complexContent>
 	</xs:complexType>
 
-	<xs:complexType name='PetitionMessage' abstract='true'>
+	<xs:complexType name='PetitionMessage'>
 		<xs:complexContent>
 			<xs:extension base='Petition'>
 				<xs:sequence>
@@ -644,7 +644,7 @@
 							<xs:documentation>This information can be used by the recipient of the message to make an informed decision on wether to accept, deny or ignore the request.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
+					<xs:any minOccurs='0' maxOccurs='1' namespace='##other' processContents='skip'>
 						<xs:annotation>
 							<xs:documentation>Optional element that can provide machine-readable context for petition.</xs:documentation>
 						</xs:annotation>
@@ -684,9 +684,9 @@
 		</xs:annotation>
 	</xs:element>
 
-	<xs:complexType name='PetitionResponse' abstract='true'>
+	<xs:complexType name='PetitionResponse'>
 		<xs:sequence>
-			<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
+			<xs:any minOccurs='0' maxOccurs='1' namespace='##other' processContents='skip'>
 				<xs:annotation>
 					<xs:documentation>Optional element that can provide machine-readable context for petition response.</xs:documentation>
 				</xs:annotation>
@@ -728,7 +728,7 @@
 					<xs:documentation>This information must only be used for the purposes described in the original petition.</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
+			<xs:any minOccurs='0' maxOccurs='1' namespace='##other' processContents='skip'>
 				<xs:annotation>
 					<xs:documentation>Optional element that can provide machine-readable context for petition response.</xs:documentation>
 				</xs:annotation>
@@ -742,6 +742,11 @@
 		<xs:attribute name='response' type='xs:boolean' use='required'>
 			<xs:annotation>
 				<xs:documentation>If the Trust Provider can share the legal identity information with the entity making the petition.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='clientEp' type='xs:string' use='optional'>
+			<xs:annotation>
+				<xs:documentation>The remote endpoint of the entity responding to the information, if response is positive.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
@@ -762,7 +767,7 @@
 								<xs:documentation>BASE64-encoded binary string that the recipient of the signature is requested to sign, if approving the request.</xs:documentation>
 							</xs:annotation>
 						</xs:element>
-						<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
+						<xs:any minOccurs='0' maxOccurs='1' namespace='##other' processContents='skip'>
 							<xs:annotation>
 								<xs:documentation>Optional element that can provide machine-readable context for petition.</xs:documentation>
 							</xs:annotation>
@@ -792,11 +797,6 @@
 								<xs:documentation>BASE64-encoded binary string that the recipient of the signature is requested to sign, if approving the request.</xs:documentation>
 							</xs:annotation>
 						</xs:element>
-						<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
-							<xs:annotation>
-								<xs:documentation>Optional element that can provide machine-readable context for petition.</xs:documentation>
-							</xs:annotation>
-						</xs:any>
 					</xs:sequence>
 				</xs:extension>
 			</xs:complexContent>
@@ -807,7 +807,7 @@
 		<xs:annotation>
 			<xs:documentation>Sent by a client in an iq set to a Trust Provider as an active response to a previous petition for information related to a legal identity owned by the client.</xs:documentation>
 			<xs:documentation>Expect an empty response on success.</xs:documentation>
-			<xs:documentation>A successfull request will forward the response, and the referenced legal identity if approved, to the entity making the request, by sending a petitionIdentityResponseMsg element in a normal message stanza.</xs:documentation>
+			<xs:documentation>A successfull request will forward the response, and the referenced legal identity if approved, to the entity making the request, by sending a petitionSignatureResponseMsg element in a normal message stanza.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -831,7 +831,7 @@
 
 	<xs:element name='petitionSignatureResponseMsg'>
 		<xs:annotation>
-			<xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a response on a petition made by the client for a legal identity.</xs:documentation>
+			<xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a response on a petition made by the client for a digital signature.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -850,6 +850,25 @@
 					</xs:sequence>
 				</xs:extension>
 			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='petitionClientUrl'>
+		<xs:annotation>
+			<xs:documentation>Sent by a broker to a client petitioning a peer review signature from a peer review service.</xs:documentation>
+			<xs:documentation>The message identifies the petition, and provides an URL the client needs to open to complete the petition request.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='pid' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the petition causing the message to be sent.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='url' type='xs:anyURI' use='required'>
+				<xs:annotation>
+					<xs:documentation>The URL the client needs to open, to complete the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 
@@ -1124,7 +1143,7 @@
 
 	<xs:element name='selectReviewService'>
 		<xs:annotation>
-			<xs:documentation>Selects a Peer Review service.</xs:documentation>
+			<xs:documentation>Selects a Peer Review service. Sent in an iq set stanza.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:attribute name='provider' type='xs:string' use='required'>
@@ -1306,7 +1325,7 @@
 					</xs:sequence>
 					<xs:attribute name='message' type='xs:string' use='required'>
 						<xs:annotation>
-							<xs:documentation>Default message text explaining the reason for invalidating the photo.</xs:documentation>
+							<xs:documentation>Default message text explaining the reason for the error.</xs:documentation>
 						</xs:annotation>
 					</xs:attribute>
 					<xs:attribute name='type' type='ValidationErrorType' use='required'>

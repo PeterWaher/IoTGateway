@@ -1354,8 +1354,15 @@ namespace Waher.Networking.XMPP.Contracts
 			DateTime? FirstSignature = Result.FirstSignatureAt;
 			if (FirstSignature.HasValue)
 			{
-				Variables["Now"] = FirstSignature.Value.ToLocalTime();
-				Variables["NowUtc"] = FirstSignature.Value.ToUniversalTime();
+				DateTime Now = FirstSignature.Value.ToLocalTime();
+				DateTime NowUtc = FirstSignature.Value.ToUniversalTime();
+
+				Variables["Now"] = Now;
+				Variables["NowUtc"] = NowUtc;
+				Variables["Time"] = Now.TimeOfDay;
+				Variables["TimeUtc"] = NowUtc.TimeOfDay;
+				Variables["Today"] = Now.Date;
+				Variables["TodayUtc"] = NowUtc.Date;
 			}
 
 			foreach (Parameter Parameter in Parameters)

@@ -349,7 +349,7 @@
 		<PackageReference Include="SkiaSharp" Version="4.153.1" />
 		<PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="4.153.1" />
 		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="4.153.1" />
-		<PackageReference Include="System.ComponentModel.Composition" Version="10.0.12" />
+		<PackageReference Include="System.ComponentModel.Composition" Version="10.0.13" />
 		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
 		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
 		<PackageReference Include="System.Runtime.Loader" Version="4.3.0" />

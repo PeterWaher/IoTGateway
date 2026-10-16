@@ -1567,7 +1567,7 @@
 			<xs:documentation>Expected response element: contracts, if full contracts are to be returned.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
-			<xs:attribute name='offset' type='xs:nonNegativeInteger' use='optional'>
+			<xs:attribute name='offset' type='xs:nonNegativeInteger' use='optional' default='0'>
 				<xs:annotation>
 					<xs:documentation>Result will start with the response at this offset into result set.</xs:documentation>
 				</xs:annotation>
@@ -1685,7 +1685,7 @@
 			<xs:documentation>Expected response element: contracts, if full contracts are to be returned.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
-			<xs:attribute name='offset' type='xs:nonNegativeInteger' use='optional'>
+			<xs:attribute name='offset' type='xs:nonNegativeInteger' use='optional' default='0'>
 				<xs:annotation>
 					<xs:documentation>Result will start with the response at this offset into result set.</xs:documentation>
 				</xs:annotation>
@@ -2406,7 +2406,7 @@
 					</xs:annotation>
 				</xs:element>
 			</xs:sequence>
-			<xs:attribute name='offset' type='xs:nonNegativeInteger' use='optional'>
+			<xs:attribute name='offset' type='xs:nonNegativeInteger' use='optional' default='0'>
 				<xs:annotation>
 					<xs:documentation>Result will start with the response at this offset into result set.</xs:documentation>
 				</xs:annotation>

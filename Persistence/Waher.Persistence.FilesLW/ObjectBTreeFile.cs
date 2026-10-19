@@ -2814,6 +2814,9 @@ namespace Waher.Persistence.Files
 
 							await this.UpdateParentLinksLocked(0, MergeResult.ResultBlock);
 
+							if (!(MergeResult.Separator is null))
+								await this.ReinsertMergeOverflow(MergeResult, BlockIndex);
+
 							return await this.DeleteObjectLocked(ObjectId, false, false, Serializer, OldObject, MergeCount + 1);  // This time, the object will be lower in the tree.
 						}
 						else

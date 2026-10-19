@@ -3504,12 +3504,12 @@ namespace Waher.Persistence.Serialization
 				foreach (Type T in MemberTypes.Keys)
 					Dependencies.Add(GetLocation(T));
 
-				System.Reflection.TypeInfo LoopInfo;
-				Type Loop = Type;
 				s = Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "netstandard.dll");
-
 				if (File.Exists(s))
 					Dependencies.Add(s);
+
+				System.Reflection.TypeInfo LoopInfo;
+				Type Loop = Type;
 
 				while (!(Loop is null))
 				{

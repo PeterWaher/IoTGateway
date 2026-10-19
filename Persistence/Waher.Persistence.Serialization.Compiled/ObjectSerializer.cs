@@ -3485,52 +3485,52 @@ namespace Waher.Persistence.Serialization
 
 				string CSharpCode = CSharp.ToString();
 
-				Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
+				HashSet<string> Dependencies = new HashSet<string>()
 				{
-					{ GetLocation(typeof(object)), true },
-					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"), true },
-					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"), true },
-					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"), true },
-					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"), true },
-					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"), true },
-					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Dictionary<string, object>))), "System.Collections.dll"), true },
-					{ GetLocation(typeof(Types)), true },
-					{ GetLocation(typeof(Database)), true },
-					{ GetLocation(typeof(ObjectSerializer)), true },
-					{ GetLocation(typeof(MultiReadSingleWriteObject)), true },
-					{ GetLocation(typeof(IElement)), true }
+					{ GetLocation(typeof(object)) },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll") },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll") },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll") },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll") },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll") },
+					{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Dictionary<string, object>))), "System.Collections.dll") },
+					{ GetLocation(typeof(Types)) },
+					{ GetLocation(typeof(Database)) },
+					{ GetLocation(typeof(ObjectSerializer)) },
+					{ GetLocation(typeof(MultiReadSingleWriteObject)) },
+					{ GetLocation(typeof(IElement)) }
 				};
 
 				foreach (Type T in MemberTypes.Keys)
-					Dependencies[GetLocation(T)] = true;
+					Dependencies.Add(GetLocation(T));
 
 				System.Reflection.TypeInfo LoopInfo;
 				Type Loop = Type;
 				s = Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "netstandard.dll");
 
 				if (File.Exists(s))
-					Dependencies[s] = true;
+					Dependencies.Add(s);
 
 				while (!(Loop is null))
 				{
 					LoopInfo = Loop.GetTypeInfo();
-					Dependencies[GetLocation(Loop)] = true;
+					Dependencies.Add(GetLocation(Loop));
 
 					foreach (Type Interface in LoopInfo.ImplementedInterfaces)
 					{
 						s = GetLocation(Interface);
-						Dependencies[s] = true;
+						Dependencies.Add(s);
 					}
 
 					foreach (MemberInfo MI2 in LoopInfo.DeclaredMembers)
 					{
 						FI = MI2 as FieldInfo;
 						if (!(FI is null) && !((s = GetLocation(FI.FieldType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
-							Dependencies[s] = true;
+							Dependencies.Add(s);
 
 						PI = MI2 as PropertyInfo;
 						if (!(PI is null) && !((s = GetLocation(PI.PropertyType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
-							Dependencies[s] = true;
+							Dependencies.Add(s);
 					}
 
 					Loop = LoopInfo.BaseType;
@@ -3540,7 +3540,7 @@ namespace Waher.Persistence.Serialization
 
 				ChunkedList<MetadataReference> References = new ChunkedList<MetadataReference>();
 
-				foreach (string Location in Dependencies.Keys)
+				foreach (string Location in Dependencies)
 				{
 					if (!string.IsNullOrEmpty(Location))
 						References.Add(MetadataReference.CreateFromFile(Location));

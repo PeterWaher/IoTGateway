@@ -2603,12 +2603,16 @@ namespace Waher.Persistence.Files
 		private async Task DeleteObjectLocked(object Object, ObjectSerializer Serializer)
 		{
 			Guid ObjectId = await Serializer.GetObjectId(Object, false, NestedLocks.CreateIfNested(this, true, Serializer));
-			await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
 
-			if (!(this.indices is null))
+			if (ObjectId != Guid.Empty)
 			{
-				foreach (IndexBTreeFile Index in this.indices)
-					await Index.DeleteObjectLocked(ObjectId, Object, Serializer);
+				await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
+
+				if (!(this.indices is null))
+				{
+					foreach (IndexBTreeFile Index in this.indices)
+						await Index.DeleteObjectLocked(ObjectId, Object, Serializer);
+				}
 			}
 		}
 
@@ -6557,14 +6561,10 @@ namespace Waher.Persistence.Files
 			where T : class
 		{
 			ICursor<T> ResultSet = await this.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
-			IEnumerable<T> Result = await FilesProvider.LoadAllLocked<T>(ResultSet);
+			IEnumerable<T> Result = await FilesProvider.LoadAllLocked(ResultSet);
 
 			foreach (T Object in Result)
-			{
-				Guid ObjectId = await Serializer.GetObjectId(Object, false, NestedLocks.CreateIfNested(this, true, Serializer));
-				if (ObjectId != Guid.Empty)
-					await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
-			}
+				await this.DeleteObjectLocked(Object, Serializer);
 
 			return Result;
 		}
@@ -6636,7 +6636,7 @@ namespace Waher.Persistence.Files
 		private async Task<IEnumerable<object>> FindDeleteLocked(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
 			ICursor<object> ResultSet = await this.FindLocked<object>(Offset, MaxCount, Filter, SortOrder);
-			IEnumerable<object> Result = await FilesProvider.LoadAllLocked<object>(ResultSet);
+			IEnumerable<object> Result = await FilesProvider.LoadAllLocked(ResultSet);
 			ObjectSerializer Serializer = null;
 			Type LastType = null;
 			Type Type;
@@ -6651,9 +6651,7 @@ namespace Waher.Persistence.Files
 					LastType = Type;
 				}
 
-				Guid ObjectId = await Serializer.GetObjectId(Object, false, NestedLocks.CreateIfNested(this, true, Serializer));
-				if (ObjectId != Guid.Empty)
-					await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
+				await this.DeleteObjectLocked(Object, Serializer);
 			}
 
 			return Result;
@@ -6670,14 +6668,10 @@ namespace Waher.Persistence.Files
 				Filter = new FilterAnd(Filter, TypeFilter);
 
 			ICursor<object> ResultSet = await this.FindLocked<object>(Offset, MaxCount, Filter, SortOrder);
-			IEnumerable<object> Result = await FilesProvider.LoadAllLocked<object>(ResultSet);
+			IEnumerable<object> Result = await FilesProvider.LoadAllLocked(ResultSet);
 
 			foreach (object Object in Result)
-			{
-				Guid ObjectId = await Serializer.GetObjectId(Object, false, NestedLocks.CreateIfNested(this, true, Serializer));
-				if (ObjectId != Guid.Empty)
-					await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
-			}
+				await this.DeleteObjectLocked(Object, Serializer);
 
 			return Result;
 		}

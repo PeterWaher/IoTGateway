@@ -45,7 +45,6 @@ namespace Waher.Persistence.Files.Storage
 		private readonly int fieldCount;
 		private readonly bool[] ascending;
 		private readonly string collectionName;
-		private Guid objectId = Guid.Empty;
 		private readonly Encoding encoding;
 		private readonly int keySizeLimit;
 
@@ -3415,7 +3414,7 @@ namespace Waher.Persistence.Files.Storage
 		{
 			int Pos = Reader.Position;
 
-			if (!this.SkipKey(Reader, true))
+			if (!this.SkipKey(Reader, out _, true))
 				return null;
 
 			int Len = Reader.Position - Pos;
@@ -3427,11 +3426,6 @@ namespace Waher.Persistence.Files.Storage
 
 			return Key;
 		}
-
-		/// <summary>
-		/// Object ID
-		/// </summary>
-		public Guid ObjectId => this.objectId;
 
 		/// <summary>
 		/// Gets the payload size.
@@ -3480,24 +3474,21 @@ namespace Waher.Persistence.Files.Storage
 		/// <returns>If a key was skipped.</returns>
 		public bool SkipKey(BinaryDeserializer Reader)
 		{
-			return this.SkipKey(Reader, false);
+			return this.SkipKey(Reader, out _, false);
 		}
 
-		internal bool SkipKey(BinaryDeserializer Reader, bool ExtractObjectId)
+		internal bool SkipKey(BinaryDeserializer Reader, out Guid ObjectId, bool ExtractObjectId)
 		{
-			if (Reader.BytesLeft == 0 || !Reader.ReadBit())
-			{
-				if (ExtractObjectId)
-					this.objectId = Guid.Empty;
+			ObjectId = Guid.Empty;
 
+			if (Reader.BytesLeft == 0 || !Reader.ReadBit())
 				return false;
-			}
 
 			int i;
 
 			for (i = 0; i < this.fieldCount; i++)
 			{
-				switch ((uint)Reader.ReadBits(6))
+				switch (Reader.ReadBits(6))
 				{
 					case ObjectSerializer.TYPE_BOOLEAN:
 						Reader.SkipBit();
@@ -3602,7 +3593,7 @@ namespace Waher.Persistence.Files.Storage
 			}
 
 			if (ExtractObjectId)
-				this.objectId = Reader.ReadGuid();
+				ObjectId = Reader.ReadGuid();
 			else
 				Reader.SkipGuid();
 

@@ -161,8 +161,7 @@ namespace Waher.Persistence.Files
 		{
 			byte[] Key = (byte[])this.e.CurrentObjectId;
 			BinaryDeserializer Reader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, Key, this.file.BlockLimit);
-			this.recordHandler.SkipKey(Reader, true);
-			this.currentObjectId = this.recordHandler.ObjectId;
+			this.recordHandler.SkipKey(Reader, out this.currentObjectId, true);
 			object Obj;
 
 			try

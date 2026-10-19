@@ -3848,7 +3848,9 @@ namespace Waher.Persistence.Files
 								await this.StartBulk();
 								try
 								{
-									for (uint BlockIndex = 0; BlockIndex < FileStat.NrBlocks; BlockIndex++)
+									uint NrBlocks = (uint)(File.FileSizeBytesLocked / File.BlockSize);
+
+									for (uint BlockIndex = 0; BlockIndex < NrBlocks; BlockIndex++)
 									{
 										byte[] Block = await File.LoadBlockLocked(BlockIndex, false);
 										BinaryDeserializer Reader = new BinaryDeserializer(File.CollectionName, this.encoding, Block, File.BlockLimit);

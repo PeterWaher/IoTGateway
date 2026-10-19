@@ -283,6 +283,8 @@ namespace Waher.Persistence.Files
 		internal IRecordHandler RecordHandler => this.recordHandler;
 		internal GenericObjectSerializer GenericSerializer => this.genericSerializer;
 		internal MultiReadSingleWriteObject FileAccess => this.fileAccess;
+		internal long FileSizeBytesLocked => this.file.Length;
+		internal long BlobFileSizeBytesLocked => this.blobFile.Length;
 
 		/// <summary>
 		/// Identifier of the file.

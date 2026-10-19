@@ -3123,7 +3123,7 @@ namespace Waher.Persistence.Files
 					ParentHeader.BytesUsed = (ushort)(LastPos - 4 - BlockHeaderSize);
 					ParentHeader.LastBlockIndex = LastLink;
 					Buffer.BlockCopy(BitConverter.GetBytes(ParentHeader.BytesUsed), 0, ParentBlock, 0, 2);
-					Buffer.BlockCopy(BitConverter.GetBytes(ParentHeader.LastBlockIndex), 0, ParentBlock, 6, 2);
+					Buffer.BlockCopy(BitConverter.GetBytes(ParentHeader.LastBlockIndex), 0, ParentBlock, 6, 4);
 
 					this.QueueSaveBlockLocked(LastLink, MergeResult.ResultBlock);
 					this.QueueSaveBlockLocked(ParentBlockIndex, ParentBlock);

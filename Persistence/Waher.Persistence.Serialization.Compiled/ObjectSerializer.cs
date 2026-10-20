@@ -3546,14 +3546,11 @@ namespace Waher.Persistence.Serialization
 						References.Add(MetadataReference.CreateFromFile(Location));
 				}
 
-				sb.Clear();
-
-				sb.Append("WPSA.");
-				AppendType(this.type, sb);
-				sb.Append(this.context.Id.Replace('-', '_'));
-
 				string CsFolder;
 				string CsFileName;
+				string DllFileName;
+				string PdbFileName;
+				Assembly A;
 
 				if (Types.TryGetModuleParameter("Data", out string DataFolder))
 				{
@@ -3573,108 +3570,172 @@ namespace Waher.Persistence.Serialization
 						}
 
 						CsFileName = Path.Combine(CsFolder, TypeName + ".cs");
-						File.WriteAllText(CsFileName, CSharpCode, Encoding.UTF8);
+						DllFileName = Path.Combine(CsFolder, TypeName + ".dll");
+						PdbFileName = Path.Combine(CsFolder, TypeName + ".pdb");
+
+						bool DllFileExists = false;
+						bool PdbFileExists = false;
+
+						if (File.Exists(CsFileName) &&
+							(DllFileExists = File.Exists(DllFileName)) &&
+							(PdbFileExists = File.Exists(PdbFileName)) &&
+							File.ReadAllText(CsFileName, Encoding.UTF8) == CSharpCode)
+						{
+							FileStream Output0 = null;
+							FileStream PdbOutput0 = null;
+
+							try
+							{
+								Output0 = File.OpenRead(DllFileName);
+								PdbOutput0 = File.OpenRead(PdbFileName);
+
+								A = AssemblyLoadContext.Default.LoadFromStream(Output0, PdbOutput0);
+
+								sb.Clear();
+								sb.Append(Type.Namespace);
+								sb.Append(".Binary.Serializer");
+								sb.Append(TypeName);
+								sb.Append(this.context.Id.Replace('-', '_'));
+								Type T = A.GetType(sb.ToString());
+								this.customSerializer = (IObjectSerializer)Activator.CreateInstance(T, this.context);
+
+								CSharpCode = null;
+							}
+							catch (Exception ex)
+							{
+								Log.Exception(ex);
+							}
+							finally
+							{
+								Output0?.Dispose();
+								PdbOutput0?.Dispose();
+							}
+						}
+						else
+						{
+							File.WriteAllText(CsFileName, CSharpCode, Encoding.UTF8);
+
+							if (DllFileExists)
+								File.Delete(DllFileName);
+
+							if (PdbFileExists)
+								File.Delete(PdbFileName);
+						}
 					}
 					catch (Exception ex)
 					{
 						Log.Exception(ex, TypeName);
 						CsFolder = null;
 						CsFileName = null;
+						DllFileName = null;
+						PdbFileName = null;
 					}
 				}
 				else
 				{
 					CsFolder = null;
 					CsFileName = null;
+					DllFileName = null;
+					PdbFileName = null;
 				}
 
-				CSharpCompilation Compilation = CSharpCompilation.Create(sb.ToString(),
-					new SyntaxTree[] { CSharpSyntaxTree.ParseText(CSharpCode, path: CsFileName, encoding: Encoding.UTF8) },
-					References, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-
-				MemoryStream Output = new MemoryStream();
-				MemoryStream PdbOutput = new MemoryStream();
-
-				EmitResult CompilerResults = Compilation.Emit(Output, pdbStream: PdbOutput);
-
-				if (!CompilerResults.Success)
+				if (!string.IsNullOrEmpty(CSharpCode))
 				{
 					sb.Clear();
 
-					sb.Append("Unable to serialize objects of type ");
-					AppendType(Type, sb);
-					sb.AppendLine(". When generating serialization class, the following compiler errors were reported:");
-
-					foreach (Diagnostic Error in CompilerResults.Diagnostics)
-					{
-						sb.AppendLine();
-						sb.Append(Error.Location.ToString());
-						sb.Append(": ");
-						sb.Append(Error.GetMessage());
-					}
-
-					sb.AppendLine();
-					sb.AppendLine();
-					sb.AppendLine("Code generated:");
-					sb.AppendLine();
-					sb.AppendLine(CSharpCode);
-
-					throw new SerializationException(sb.ToString(), this.type);
-				}
-
-				if (!string.IsNullOrEmpty(CsFolder))
-				{
-					try
-					{
-						string FileName = Path.Combine(CsFolder, TypeName + ".dll");
-
-						using (FileStream fs = File.Create(FileName))
-						{
-							Output.Position = 0;
-							await Output.CopyToAsync(fs);
-						}
-
-						FileName = Path.Combine(CsFolder, TypeName + ".pdb");
-
-						using (FileStream fs = File.Create(FileName))
-						{
-							PdbOutput.Position = 0;
-							await PdbOutput.CopyToAsync(fs);
-						}
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex, TypeName);
-					}
-				}
-
-				Output.Position = 0;
-				PdbOutput.Position = 0;
-				Assembly A;
-
-				try
-				{
-					A = AssemblyLoadContext.Default.LoadFromStream(Output, PdbOutput);
-
-					sb.Clear();
-					sb.Append(Type.Namespace);
-					sb.Append(".Binary.Serializer");
-					sb.Append(TypeName);
+					sb.Append("WPSA.");
+					AppendType(this.type, sb);
 					sb.Append(this.context.Id.Replace('-', '_'));
 
-					Type T = A.GetType(sb.ToString());
-					this.customSerializer = (IObjectSerializer)Activator.CreateInstance(T, this.context);
-				}
-				catch (FileLoadException ex)
-				{
-					this.customSerializer = await this.context.GetObjectSerializer(Type); // Created in other thread?
-					if (this.customSerializer is null)
+					CSharpCompilation Compilation = CSharpCompilation.Create(sb.ToString(),
+						new SyntaxTree[] { CSharpSyntaxTree.ParseText(CSharpCode, path: CsFileName, encoding: Encoding.UTF8) },
+						References, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+					MemoryStream Output = new MemoryStream();
+					MemoryStream PdbOutput = new MemoryStream();
+
+					EmitResult CompilerResults = Compilation.Emit(Output, pdbStream: PdbOutput);
+
+					if (!CompilerResults.Success)
 					{
 						sb.Clear();
-						AppendType(Type, sb);
 
-						Log.Warning(ex.Message, sb.ToString());
-						this.customSerializer = await Create(Type, Context, false);
+						sb.Append("Unable to serialize objects of type ");
+						AppendType(Type, sb);
+						sb.AppendLine(". When generating serialization class, the following compiler errors were reported:");
+
+						foreach (Diagnostic Error in CompilerResults.Diagnostics)
+						{
+							sb.AppendLine();
+							sb.Append(Error.Location.ToString());
+							sb.Append(": ");
+							sb.Append(Error.GetMessage());
+						}
+
+						sb.AppendLine();
+						sb.AppendLine();
+						sb.AppendLine("Code generated:");
+						sb.AppendLine();
+						sb.AppendLine(CSharpCode);
+
+						throw new SerializationException(sb.ToString(), this.type);
+					}
+
+					if (!string.IsNullOrEmpty(CsFolder))
+					{
+						try
+						{
+							if (!string.IsNullOrEmpty(DllFileName))
+							{
+								using (FileStream fs = File.Create(DllFileName))
+								{
+									Output.Position = 0;
+									await Output.CopyToAsync(fs);
+								}
+							}
+
+							if (!string.IsNullOrEmpty(PdbFileName))
+							{
+								using (FileStream fs = File.Create(PdbFileName))
+								{
+									PdbOutput.Position = 0;
+									await PdbOutput.CopyToAsync(fs);
+								}
+							}
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex, TypeName);
+						}
+					}
+
+					Output.Position = 0;
+					PdbOutput.Position = 0;
+
+					try
+					{
+						A = AssemblyLoadContext.Default.LoadFromStream(Output, PdbOutput);
+
+						sb.Clear();
+						sb.Append(Type.Namespace);
+						sb.Append(".Binary.Serializer");
+						sb.Append(TypeName);
+						sb.Append(this.context.Id.Replace('-', '_'));
+
+						Type T = A.GetType(sb.ToString());
+						this.customSerializer = (IObjectSerializer)Activator.CreateInstance(T, this.context);
+					}
+					catch (FileLoadException ex)
+					{
+						this.customSerializer = await this.context.GetObjectSerializer(Type); // Created in other thread?
+						if (this.customSerializer is null)
+						{
+							sb.Clear();
+							AppendType(Type, sb);
+
+							Log.Warning(ex.Message, sb.ToString());
+							this.customSerializer = await Create(Type, Context, false);
+						}
 					}
 				}
 			}

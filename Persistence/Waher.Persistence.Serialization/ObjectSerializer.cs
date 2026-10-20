@@ -4897,8 +4897,6 @@ namespace Waher.Persistence.Serialization
 
 				if (Embedded)
 				{
-					ObjectId = Guid.Empty;
-
 					if (this.normalized)
 					{
 						if (string.IsNullOrEmpty(this.collectionName))

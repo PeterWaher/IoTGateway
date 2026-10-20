@@ -3,14 +3,42 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Persistence.Files.Test.Classes;
+using Waher.Content;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Console;
+using Waher.Runtime.Inventory;
+using Waher.Script;
+
+#if !LW
+using Waher.Persistence.Files.Test.Classes;
 
 namespace Waher.Persistence.Files.Test
+#else
+using Waher.Persistence.Files;
+using Waher.Persistence.FilesLW.Test.Classes;
+
+namespace Waher.Persistence.FilesLW.Test
+#endif
 {
 	[TestClass]
-	public class PersistenceTests
+	public class DBFilesPersistenceTests
 	{
+		internal const string Folder = "Data";
+
+		[AssemblyInitialize]
+		public static void AssemblyInitialize(TestContext _)
+		{
+			Types.Initialize(
+				typeof(FilesProvider).Assembly,
+				typeof(ObjectSerializer).Assembly,
+				typeof(DBFilesBTreeTests).Assembly,
+				typeof(Expression).Assembly,
+				typeof(Script.Persistence.SQL.Select).Assembly,
+				typeof(Duration).Assembly);
+
+			Types.SetModuleParameter("Data", Folder);
+		}
+
 		[ClassInitialize]
 		public static async Task ClassInitialize(TestContext Context)
 		{
@@ -110,12 +138,12 @@ namespace Waher.Persistence.Files.Test
 				Assert.IsTrue(Objects.Remove(e.Current.ObjectId), "Object not found or has been earlier removed.");
 			}
 
-			Assert.AreEqual(0, Objects.Count);
+			Assert.IsEmpty(Objects);
 		}
 
 		private static async Task<SortedDictionary<Guid, StringFields>> CreateObjects(int NrObjects)
 		{
-			SortedDictionary<Guid, StringFields> Result = new();
+			SortedDictionary<Guid, StringFields> Result = [];
 
 			await Database.StartBulk();
 			try

@@ -80,7 +80,7 @@ namespace Waher.Persistence.Files.Storage
 						Cloned = true;
 					}
 
-					this.fieldNames[i] = this.fieldNames[i].Substring(1);
+					this.fieldNames[i] = this.fieldNames[i][1..];
 					this.ascending[i] = false;
 				}
 				else
@@ -95,7 +95,7 @@ namespace Waher.Persistence.Files.Storage
 							Cloned = true;
 						}
 
-						this.fieldNames[i] = this.fieldNames[i].Substring(1);
+						this.fieldNames[i] = this.fieldNames[i][1..];
 					}
 				}
 			}
@@ -3244,21 +3244,12 @@ namespace Waher.Persistence.Files.Storage
 							break;
 
 						case ObjectSerializer.TYPE_NULL:
-							switch (yType)
+							j = yType switch
 							{
-								case ObjectSerializer.TYPE_MIN:
-									j = 1;
-									break;
-
-								case ObjectSerializer.TYPE_MAX:
-								default:
-									j = -1;
-									break;
-
-								case ObjectSerializer.TYPE_NULL:
-									j = 0;
-									break;
-							}
+								ObjectSerializer.TYPE_MIN => 1,
+								ObjectSerializer.TYPE_NULL => 0,
+								_ => -1,
+							};
 							break;
 
 						case ObjectSerializer.TYPE_MIN:
@@ -3777,14 +3768,14 @@ namespace Waher.Persistence.Files.Storage
 				if (s.StartsWith("-"))
 				{
 					Ascending = false;
-					s = s.Substring(1);
+					s = s[1..];
 				}
 				else
 				{
 					Ascending = true;
 
 					if (s.StartsWith("+"))
-						s = s.Substring(1);
+						s = s[1..];
 				}
 
 				while (FieldIndex < this.fieldCount)
@@ -3845,14 +3836,14 @@ namespace Waher.Persistence.Files.Storage
 				if (s.StartsWith("-"))
 				{
 					Ascending = false;
-					s = s.Substring(1);
+					s = s[1..];
 				}
 				else
 				{
 					Ascending = true;
 
 					if (s.StartsWith("+"))
-						s = s.Substring(1);
+						s = s[1..];
 				}
 
 				while (FieldIndex < this.fieldCount)

@@ -412,11 +412,10 @@ namespace Waher.Persistence.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
-			byte[] Data = new byte[16];
-			Buffer.BlockCopy(this.data, this.pos, Data, 0, 16);
+			Guid Result = new Guid(this.data.AsSpan(this.pos, 16));
 			this.pos += 16;
 
-			return new Guid(Data);
+			return Result;
 		}
 
 		/// <summary>

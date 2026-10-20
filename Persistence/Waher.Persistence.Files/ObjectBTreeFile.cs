@@ -757,10 +757,9 @@ namespace Waher.Persistence.Files
 
 			if (this.encrypted)
 			{
-				using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlockIndex) * this.blockSize)))
-				{
-					Block = Aes.TransformFinalBlock(Block, 0, Block.Length);
-				}
+				using ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlockIndex) * this.blockSize));
+				
+				Block = Aes.TransformFinalBlock(Block, 0, Block.Length);
 			}
 
 			if (AddToCache)
@@ -805,9 +804,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			if (this.blocksToSave is null)
-				this.blocksToSave = new SortedDictionary<uint, byte[]>();
-
+			this.blocksToSave ??= new SortedDictionary<uint, byte[]>();
 			this.blocksToSave[BlockIndex] = Block;
 			this.blockUpdateCounter++;
 
@@ -828,10 +825,9 @@ namespace Waher.Persistence.Files
 
 			if (this.encrypted)
 			{
-				using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)BlockIndex) * this.blockSize)))
-				{
-					EncryptedBlock = Aes.TransformFinalBlock(Block, 0, Block.Length);
-				}
+				using ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)BlockIndex) * this.blockSize));
+				
+				EncryptedBlock = Aes.TransformFinalBlock(Block, 0, Block.Length);
 			}
 			else
 				EncryptedBlock = (byte[])Block.Clone();
@@ -863,9 +859,7 @@ namespace Waher.Persistence.Files
 #if ASSERT_LOCKS
 			this.fileAccess.AssertWriting();
 #endif
-			if (this.emptyBlocks is null)
-				this.emptyBlocks = new SortedDictionary<uint, bool>(new ReverseOrder());
-
+			this.emptyBlocks ??= new SortedDictionary<uint, bool>(new ReverseOrder());
 			this.emptyBlocks[Block] = true;
 		}
 
@@ -1018,10 +1012,9 @@ namespace Waher.Persistence.Files
 
 				if (this.encrypted)
 				{
-					using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
-					{
-						EncryptedBlock = Aes.TransformFinalBlock(Block, 0, Block.Length);
-					}
+					using ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize));
+					
+					EncryptedBlock = Aes.TransformFinalBlock(Block, 0, Block.Length);
 				}
 				else
 					EncryptedBlock = (byte[])Block.Clone();
@@ -1075,10 +1068,9 @@ namespace Waher.Persistence.Files
 
 					if (this.encrypted)
 					{
-						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
-						{
-							DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
-						}
+						using ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize));
+						
+						DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
 					}
 					else
 						DecryptedBlock = (byte[])BlobBlock.Clone();
@@ -1172,10 +1164,9 @@ namespace Waher.Persistence.Files
 
 					if (this.encrypted)
 					{
-						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
-						{
-							DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
-						}
+						using ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize));
+						
+						DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
 					}
 					else
 						DecryptedBlock = (byte[])BlobBlock.Clone();
@@ -1207,10 +1198,9 @@ namespace Waher.Persistence.Files
 
 					if (this.encrypted)
 					{
-						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
-						{
-							DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
-						}
+						using ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize));
+						
+						DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
 					}
 					else
 						DecryptedBlock = (byte[])BlobBlock.Clone();
@@ -1271,10 +1261,9 @@ namespace Waher.Persistence.Files
 
 						if (this.encrypted)
 						{
-							using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)Prev) * this.blobBlockSize)))
-							{
-								DecryptedBlock2 = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
-							}
+							using ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)Prev) * this.blobBlockSize));
+							
+							DecryptedBlock2 = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
 						}
 						else
 							DecryptedBlock2 = BlobBlock;
@@ -1283,10 +1272,9 @@ namespace Waher.Persistence.Files
 
 						if (this.encrypted)
 						{
-							using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)Prev) * this.blobBlockSize)))
-							{
-								EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock2, 0, DecryptedBlock2.Length);
-							}
+							using ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)Prev) * this.blobBlockSize));
+							
+							EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock2, 0, DecryptedBlock2.Length);
 						}
 						else
 							EncryptedBlock = (byte[])DecryptedBlock2.Clone();
@@ -1304,10 +1292,9 @@ namespace Waher.Persistence.Files
 
 						if (this.encrypted)
 						{
-							using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)Next) * this.blobBlockSize)))
-							{
-								DecryptedBlock2 = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
-							}
+							using ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)Next) * this.blobBlockSize));
+							
+							DecryptedBlock2 = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
 						}
 						else
 							DecryptedBlock2 = BlobBlock;
@@ -1316,10 +1303,9 @@ namespace Waher.Persistence.Files
 
 						if (this.encrypted)
 						{
-							using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)Next) * this.blobBlockSize)))
-							{
-								EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock2, 0, DecryptedBlock2.Length);
-							}
+							using ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)Next) * this.blobBlockSize));
+							
+							EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock2, 0, DecryptedBlock2.Length);
 						}
 						else
 							EncryptedBlock = (byte[])DecryptedBlock2.Clone();
@@ -1330,10 +1316,9 @@ namespace Waher.Persistence.Files
 
 					if (this.encrypted)
 					{
-						using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
-						{
-							EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock, 0, DecryptedBlock.Length);
-						}
+						using ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize));
+						
+						EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock, 0, DecryptedBlock.Length);
 					}
 					else
 						EncryptedBlock = (byte[])DecryptedBlock.Clone();
@@ -1548,9 +1533,7 @@ namespace Waher.Persistence.Files
 		{
 			lock (this.synchObject)
 			{
-				if (this.objectsToSave is null)
-					this.objectsToSave = new ChunkedList<SaveRec>();
-
+				this.objectsToSave ??= new ChunkedList<SaveRec>();
 				this.objectsToSave.Add(new SaveRec()
 				{
 					Object = Object,
@@ -1565,8 +1548,7 @@ namespace Waher.Persistence.Files
 		{
 			lock (this.synchObject)
 			{
-				if (this.objectsToSave is null)
-					this.objectsToSave = new ChunkedList<SaveRec>();
+				this.objectsToSave ??= new ChunkedList<SaveRec>();
 
 				foreach (object Object in Objects)
 				{
@@ -1585,9 +1567,7 @@ namespace Waher.Persistence.Files
 		{
 			lock (this.synchObject)
 			{
-				if (this.objectsToSave is null)
-					this.objectsToSave = new ChunkedList<SaveRec>();
-
+				this.objectsToSave ??= new ChunkedList<SaveRec>();
 				this.objectsToSave.Add(new SaveRec()
 				{
 					Object = Rec,
@@ -2068,9 +2048,7 @@ namespace Waher.Persistence.Files
 		{
 			lock (this.synchObject)
 			{
-				if (this.objectsToLoad is null)
-					this.objectsToLoad = new ChunkedList<LoadRec>();
-
+				this.objectsToLoad ??= new ChunkedList<LoadRec>();
 				this.objectsToLoad.Add(new LoadRec()
 				{
 					ObjectId = ObjectId,
@@ -3007,9 +2985,7 @@ namespace Waher.Persistence.Files
 
 						if (Link != 0)
 						{
-							if (Links is null)
-								Links = new ChunkedList<uint>();
-
+							Links ??= new ChunkedList<uint>();
 							Links.Add(Link);
 						}
 
@@ -3019,9 +2995,7 @@ namespace Waher.Persistence.Files
 					BlockIndex = BitConverter.ToUInt32(Block, 6);
 					if (BlockIndex != 0)
 					{
-						if (Links is null)
-							Links = new ChunkedList<uint>();
-
+						Links ??= new ChunkedList<uint>();
 						Links.Add(BlockIndex);
 					}
 
@@ -3053,15 +3027,12 @@ namespace Waher.Persistence.Files
 			if (Header.LastBlockIndex != 0)
 			{
 				Object = await this.RotateLeftLocked(Header.LastBlockIndex, BlockIndex);
-
-				if (Object is null)
-					Object = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
+				Object ??= await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
 			}
 			else
 			{
 				Object = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
-				if (Object is null)
-					Object = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
+				Object ??= await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
 			}
 
 			if (Object is null)
@@ -4460,11 +4431,10 @@ namespace Waher.Persistence.Files
 				OmitXmlDeclaration = true
 			};
 
-			using (XmlWriter w = XmlWriter.Create(Output, Settings))
-			{
-				await this.ExportGraphXML(w, Properties, Locked);
-				w.Flush();
-			}
+			using XmlWriter w = XmlWriter.Create(Output, Settings);
+			
+			await this.ExportGraphXML(w, Properties, Locked);
+			w.Flush();
 		}
 
 		/// <summary>
@@ -4538,10 +4508,9 @@ namespace Waher.Persistence.Files
 
 					if (this.encrypted)
 					{
-						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
-						{
-							DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
-						}
+						using ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize));
+						
+						DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
 					}
 					else
 						DecryptedBlock = (byte[])BlobBlock.Clone();
@@ -4700,16 +4669,12 @@ namespace Waher.Persistence.Files
 				switch (TypeCode)
 				{
 					case ObjectSerializer.TYPE_ARRAY:
-						if (Arrays is null)
-							Arrays = new ChunkedList<KeyValuePair<string, Array>>();
-
+						Arrays ??= new ChunkedList<KeyValuePair<string, Array>>();
 						Arrays.Add(new KeyValuePair<string, Array>(s, (Array)Value));
 						break;
 
 					case ObjectSerializer.TYPE_OBJECT:
-						if (Objects is null)
-							Objects = new ChunkedList<KeyValuePair<string, GenericObject>>();
-
+						Objects ??= new ChunkedList<KeyValuePair<string, GenericObject>>();
 						Objects.Add(new KeyValuePair<string, GenericObject>(s, (GenericObject)Value));
 						break;
 
@@ -5297,10 +5262,10 @@ namespace Waher.Persistence.Files
 
 			s = SortOrder[0];
 			if (s.StartsWith("-"))
-				s = s.Substring(1);
+				s = s[1..];
 
 			if (Property.StartsWith("-"))
-				s2 = Property.Substring(1);
+				s2 = Property[1..];
 			else
 				s2 = Property;
 
@@ -5343,7 +5308,7 @@ namespace Waher.Persistence.Files
 			foreach (string s in Properties)
 			{
 				if (s.StartsWith("-"))
-					s2 = s.Substring(1);
+					s2 = s[1..];
 				else
 					s2 = s;
 
@@ -5353,7 +5318,7 @@ namespace Waher.Persistence.Files
 			foreach (string s in SortOrder)
 			{
 				if (s.StartsWith("-"))
-					s2 = s.Substring(1);
+					s2 = s[1..];
 				else
 					s2 = s;
 
@@ -5408,7 +5373,7 @@ namespace Waher.Persistence.Files
 			{
 				s = Properties[i];
 				if (s.StartsWith("-"))
-					s = s.Substring(1);
+					s = s[1..];
 
 				PropertyOrder[s] = i;
 			}
@@ -5668,8 +5633,7 @@ namespace Waher.Persistence.Files
 						{
 							if (!(FilterFieldValue is FilterFieldNotEqualTo))
 							{
-								if (Properties is null)
-									Properties = new ChunkedList<string>();
+								Properties ??= new ChunkedList<string>();
 
 								FieldName = FilterFieldValue.FieldName;
 								if (!Properties.Contains(FieldName))
@@ -5681,15 +5645,12 @@ namespace Waher.Persistence.Files
 							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(ChildFilter);
 							string ConstantPrefix = FilterFieldLikeRegEx.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 
-							if (RegExFields is null)
-								RegExFields = new ChunkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>>();
-
+							RegExFields ??= new ChunkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>>();
 							RegExFields.Add(new KeyValuePair<Searching.FilterFieldLikeRegEx, string>(FilterFieldLikeRegEx2, ConstantPrefix));
 
 							if (!string.IsNullOrEmpty(ConstantPrefix))
 							{
-								if (Properties is null)
-									Properties = new ChunkedList<string>();
+								Properties ??= new ChunkedList<string>();
 
 								FieldName = FilterFieldLikeRegEx2.FieldName;
 								if (!Properties.Contains(FieldName))
@@ -5797,9 +5758,7 @@ namespace Waher.Persistence.Files
 							if (!FieldOrder.TryGetValue(FilterFieldValue.FieldName, out i) || 
 								i >= NrFields || ChildFilter is FilterFieldNotEqualTo)
 							{
-								if (AdditionalFields is null)
-									AdditionalFields = new ChunkedList<Searching.IApplicableFilter>();
-
+								AdditionalFields ??= new ChunkedList<Searching.IApplicableFilter>();
 								AdditionalFields.Add(this.ConvertFilter(FilterFieldValue));
 								continue;
 							}
@@ -5855,9 +5814,7 @@ namespace Waher.Persistence.Files
 							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = P.Key;
 							string ConstantPrefix = P.Value;
 
-							if (AdditionalFields is null)
-								AdditionalFields = new ChunkedList<Searching.IApplicableFilter>();
-
+							AdditionalFields ??= new ChunkedList<Searching.IApplicableFilter>();
 							AdditionalFields.Add(FilterFieldLikeRegEx2);
 
 							if (!FieldOrder.TryGetValue(FilterFieldLikeRegEx.FieldName, out i) ||
@@ -5875,7 +5832,7 @@ namespace Waher.Persistence.Files
 
 							if (LastChar < char.MaxValue)
 							{
-								ConstantPrefix2 = ConstantPrefix.Substring(0, c) + new string((char)(LastChar + 1), 1);
+								ConstantPrefix2 = ConstantPrefix[..c] + new string((char)(LastChar + 1), 1);
 								MaxInclusive = false;
 							}
 							else
@@ -5905,9 +5862,7 @@ namespace Waher.Persistence.Files
 									{
 										foreach (Filter F in R)
 										{
-											if (AdditionalFields is null)
-												AdditionalFields = new ChunkedList<Searching.IApplicableFilter>();
-
+											AdditionalFields ??= new ChunkedList<Searching.IApplicableFilter>();
 											AdditionalFields.Add(this.ConvertFilter(F));
 										}
 									}
@@ -5918,9 +5873,7 @@ namespace Waher.Persistence.Files
 						}
 						else if (ChildFilter is ICustomFilter CustomFilter)
 						{
-							if (AdditionalFields is null)
-								AdditionalFields = new ChunkedList<Searching.IApplicableFilter>();
-
+							AdditionalFields ??= new ChunkedList<Searching.IApplicableFilter>();
 							AdditionalFields.Add(new Searching.FilterCustom(CustomFilter));
 						}
 						else
@@ -5939,9 +5892,7 @@ namespace Waher.Persistence.Files
 								{
 									foreach (Filter F in R)
 									{
-										if (AdditionalFields is null)
-											AdditionalFields = new ChunkedList<Searching.IApplicableFilter>();
-
+										AdditionalFields ??= new ChunkedList<Searching.IApplicableFilter>();
 										AdditionalFields.Add(this.ConvertFilter(F));
 									}
 								}
@@ -6207,7 +6158,7 @@ namespace Waher.Persistence.Files
 
 					if (LastChar < char.MaxValue)
 					{
-						string ConstantPrefix2 = ConstantPrefix.Substring(0, c) + new string((char)(LastChar + 1), 1);
+						string ConstantPrefix2 = ConstantPrefix[..c] + new string((char)(LastChar + 1), 1);
 
 						Cursor = new Searching.FilteredCursor<T>(Cursor,
 							new Searching.FilterFieldLesserThan(FilterFieldLikeRegEx.FieldName, ConstantPrefix2),
@@ -6328,9 +6279,7 @@ namespace Waher.Persistence.Files
 						{
 							if (!(FilterFieldValue is FilterFieldNotEqualTo))
 							{
-								if (Properties is null)
-									Properties = new ChunkedList<string>();
-
+								Properties ??= new ChunkedList<string>();
 								Properties.Add(FilterFieldValue.FieldName);
 							}
 						}
@@ -6339,16 +6288,12 @@ namespace Waher.Persistence.Files
 							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(ChildFilter);
 							string ConstantPrefix = FilterFieldLikeRegEx.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 
-							if (RegExFields is null)
-								RegExFields = new ChunkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>>();
-
+							RegExFields ??= new ChunkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>>();
 							RegExFields.Add(new KeyValuePair<Searching.FilterFieldLikeRegEx, string>(FilterFieldLikeRegEx2, ConstantPrefix));
 
 							if (!string.IsNullOrEmpty(ConstantPrefix))
 							{
-								if (Properties is null)
-									Properties = new ChunkedList<string>();
-
+								Properties ??= new ChunkedList<string>();
 								Properties.Add(FilterFieldLikeRegEx2.FieldName);
 							}
 						}
@@ -6730,8 +6675,7 @@ namespace Waher.Persistence.Files
 		{
 			this.GetFieldKeys(Property, ObjectId, out byte[] Key, out byte[] IV);
 
-			if (Data is null)
-				Data = Array.Empty<byte>();
+			Data ??= Array.Empty<byte>();
 
 			int i = Count;
 			int c = i;
@@ -6838,34 +6782,33 @@ namespace Waher.Persistence.Files
 			byte[] B;
 			int i, c;
 
-			using (SHA256 Sha256 = SHA256.Create())
-			{
-				Key = Sha256.ComputeHash(ObjectId.ToByteArray());
-				IV = Sha256.ComputeHash(Encoding.UTF8.GetBytes(Property));
+			using SHA256 Sha256 = SHA256.Create();
+			
+			Key = Sha256.ComputeHash(ObjectId.ToByteArray());
+			IV = Sha256.ComputeHash(Encoding.UTF8.GetBytes(Property));
 
-				if (this.aesKey.Length == (c = Key.Length))
-					B = this.aesKey;
-				else
-					B = Sha256.ComputeHash(this.aesKey);
+			if (this.aesKey.Length == (c = Key.Length))
+				B = this.aesKey;
+			else
+				B = Sha256.ComputeHash(this.aesKey);
 
-				for (i = 0; i < c; i++)
-					Key[i] ^= B[i];
+			for (i = 0; i < c; i++)
+				Key[i] ^= B[i];
 
-				if (this.ivSeedLen == c)
-					B = this.ivSeed;
-				else
-					B = Sha256.ComputeHash(this.ivSeed);
+			if (this.ivSeedLen == c)
+				B = this.ivSeed;
+			else
+				B = Sha256.ComputeHash(this.ivSeed);
 
-				for (i = 0; i < c; i++)
-					IV[i] ^= B[i];
+			for (i = 0; i < c; i++)
+				IV[i] ^= B[i];
 
-				c >>= 1;
+			c >>= 1;
 
-				for (i = 0; i < c; i++)
-					IV[i] ^= IV[i + 16];
+			for (i = 0; i < c; i++)
+				IV[i] ^= IV[i + 16];
 
-				Array.Resize(ref IV, 16);
-			}
+			Array.Resize(ref IV, 16);
 		}
 
 		#endregion

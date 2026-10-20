@@ -3695,20 +3695,18 @@ namespace Waher.Persistence.Serialization
 						{
 							if (!string.IsNullOrEmpty(DllFileName))
 							{
-								using (FileStream fs = File.Create(DllFileName))
-								{
-									Output.Position = 0;
-									await Output.CopyToAsync(fs);
-								}
+								using FileStream fs = File.Create(DllFileName);
+								
+								Output.Position = 0;
+								await Output.CopyToAsync(fs);
 							}
 
 							if (!string.IsNullOrEmpty(PdbFileName))
 							{
-								using (FileStream fs = File.Create(PdbFileName))
-								{
-									PdbOutput.Position = 0;
-									await PdbOutput.CopyToAsync(fs);
-								}
+								using FileStream fs = File.Create(PdbFileName);
+								
+								PdbOutput.Position = 0;
+								await PdbOutput.CopyToAsync(fs);
 							}
 						}
 						catch (Exception ex)
@@ -4307,9 +4305,7 @@ namespace Waher.Persistence.Serialization
 								throw new SerializationException(sb.ToString(), this.type);
 						}
 
-						if (Obsolete is null)
-							Obsolete = new Dictionary<string, object>();
-
+						Obsolete ??= new Dictionary<string, object>();
 						Obsolete[FieldName] = FieldValue;
 					}
 					else
@@ -4619,9 +4615,7 @@ namespace Waher.Persistence.Serialization
 									switch (FieldDataType)
 									{
 										case TYPE_OBJECT:
-											if (Member.NestedSerializer is null)
-												Member.NestedSerializer = await this.context.GetObjectSerializer(Member.MemberType);
-
+											Member.NestedSerializer ??= await this.context.GetObjectSerializer(Member.MemberType);
 											Member.Set(Result, await Member.NestedSerializer.Deserialize(Reader, FieldDataType, true));
 											break;
 
@@ -4801,8 +4795,7 @@ namespace Waher.Persistence.Serialization
 					Writer = Writer.CreateNew();
 
 				ISerializer WriterBak2 = Writer;
-				Guid ObjectId;
-				bool HasObjectId = false;
+				Guid? ObjectId = null;
 
 				if (!Embedded || this.hasEncrypted)
 				{
@@ -4817,35 +4810,26 @@ namespace Waher.Persistence.Serialization
 						{
 							ObjectIdType = 1;
 							if (ObjectIdObj is Guid Guid && !Guid.Equals(Guid.Empty))
-							{
 								ObjectId = Guid;
-								HasObjectId = true;
-							}
 						}
 						else if (this.objectIdMember.MemberFieldDataTypeCode == TYPE_STRING)
 						{
 							ObjectIdType = 2;
 
 							if (ObjectIdObj is string s && !string.IsNullOrEmpty(s))
-							{
 								ObjectId = new Guid(s);
-								HasObjectId = true;
-							}
 						}
 						else if (this.objectIdMember.MemberFieldDataTypeCode == TYPE_BYTEARRAY)
 						{
 							ObjectIdType = 3;
 
 							if (ObjectIdObj is byte[] Bin2)
-							{
 								ObjectId = new Guid(Bin2);
-								HasObjectId = true;
-							}
 						}
 						else
 							throw new SerializationException("Invalid Object ID type.", this.type);
 
-						if (!HasObjectId)
+						if (!ObjectId.HasValue)
 						{
 							ObjectId = this.context.CreateGuid();
 
@@ -4860,7 +4844,7 @@ namespace Waher.Persistence.Serialization
 									break;
 
 								case 3:
-									this.objectIdMember.Set(Value, ObjectId.ToByteArray());
+									this.objectIdMember.Set(Value, ObjectId.Value.ToByteArray());
 									break;
 							}
 						}
@@ -4882,9 +4866,13 @@ namespace Waher.Persistence.Serialization
 
 				if (Embedded && Writer.BitOffset > 0)
 				{
-					Writer.WriteBit(HasObjectId);
-					if (HasObjectId)
-						Writer.Write(ObjectId);
+					if (ObjectId.HasValue)
+					{
+						Writer.WriteBit(true);
+						Writer.Write(ObjectId.Value);
+					}
+					else
+						Writer.WriteBit(false);
 				}
 
 				if (this.typeNameSerialization == TypeNameSerialization.None)
@@ -5173,8 +5161,7 @@ namespace Waher.Persistence.Serialization
 								}
 								else
 								{
-									if (Member.NestedSerializer is null)
-										Member.NestedSerializer = await this.context.GetObjectSerializer(Member.MemberType);
+									Member.NestedSerializer ??= await this.context.GetObjectSerializer(Member.MemberType);
 
 									await Member.NestedSerializer.Serialize(Writer, true, true, MemberValue, State);
 								}
@@ -5185,8 +5172,12 @@ namespace Waher.Persistence.Serialization
 					if (Member.Encrypted)
 					{
 						Writer.FlushBits();
+						
 						byte[] Unencrypted = Writer.GetSerialization();
-						byte[] Encrypted = await this.context.Encrypt(Unencrypted, Member.Name, this.collectionName, ObjectId, Member.DecryptedMinLength);
+						byte[] Encrypted = await this.context.Encrypt(Unencrypted, 
+							Member.Name, this.collectionName, ObjectId.Value, 
+							Member.DecryptedMinLength);
+
 						Writer = WriterBak2;
 						Writer.WriteBits(TYPE_BYTEARRAY, 6);
 						Writer.Write(Encrypted);
@@ -5197,7 +5188,7 @@ namespace Waher.Persistence.Serialization
 
 				if (!Embedded)
 				{
-					WriterBak.Write(ObjectId);
+					WriterBak.Write(ObjectId.Value);
 
 					byte[] Bin = Writer.GetSerialization();
 
@@ -5565,7 +5556,7 @@ namespace Waher.Persistence.Serialization
 				int i = s.IndexOf('`');
 
 				if (i > 0)
-					s = s.Substring(0, i);
+					s = s[..i];
 
 				sb.Append(s);
 				sb.Append('<');

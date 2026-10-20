@@ -21,7 +21,6 @@ using Waher.Persistence.FilesLW.Test.Classes;
 namespace Waher.Persistence.FilesLW.Test
 #endif
 {
-	[TestClass]
 	public abstract class DBFilesIndexTests
 	{
 		internal const string ObjFileName = "Data\\LastObject.bin";
@@ -49,9 +48,9 @@ namespace Waher.Persistence.FilesLW.Test
 			DBFilesBTreeTests.DeleteFiles();
 
 #if LW
-			this.provider = await FilesProvider.CreateAsync(DBFilesBTreeTests.Folder, DBFilesBTreeTests.CollectionName, this.BlockSize, BlocksInCache, Math.Max(this.BlockSize / 2, 1024), Encoding.UTF8, 10000);
+			this.provider = await FilesProvider.CreateAsync(DBFilesPersistenceTests.Folder, DBFilesBTreeTests.CollectionName, this.BlockSize, BlocksInCache, Math.Max(this.BlockSize / 2, 1024), Encoding.UTF8, 10000);
 #else
-			this.provider = await FilesProvider.CreateAsync(DBFilesBTreeTests.Folder, DBFilesBTreeTests.CollectionName, this.BlockSize, BlocksInCache, Math.Max(this.BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
+			this.provider = await FilesProvider.CreateAsync(DBFilesPersistenceTests.Folder, DBFilesBTreeTests.CollectionName, this.BlockSize, BlocksInCache, Math.Max(this.BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
 #endif
 
 			this.file = await this.provider.GetFile(DBFilesBTreeTests.CollectionName);
@@ -684,14 +683,14 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used for benchmarking")]
 		public async Task DBFiles_Index_Test_10_UpdateObjects_10000()
 		{
 			await this.DBFiles_Index_Test_UpdateObjects(10000);
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used for benchmarking")]
 		public async Task DBFiles_Index_Test_11_UpdateObjects_100000()
 		{
 			await this.DBFiles_Index_Test_UpdateObjects(100000);
@@ -779,14 +778,14 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used for benchmarking")]
 		public async Task DBFiles_Index_Test_15_DeleteObject_10000()
 		{
 			await this.DBFiles_Index_Test_DeleteObjects(10000);
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used for benchmarking")]
 		public async Task DBFiles_Index_Test_16_DeleteObject_100000()
 		{
 			await this.DBFiles_Index_Test_DeleteObjects(100000);

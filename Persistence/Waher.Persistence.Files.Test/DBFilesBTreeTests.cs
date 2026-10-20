@@ -8,9 +8,7 @@ using System.Threading.Tasks;
 using Waher.Persistence.Exceptions;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Serialization;
-using Waher.Content;
 using Waher.Runtime.Console;
-using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Security;
 
@@ -25,7 +23,6 @@ using Waher.Persistence.FilesLW.Test.Classes;
 namespace Waher.Persistence.FilesLW.Test
 #endif
 {
-    [TestClass]
 	public abstract class DBFilesBTreeTests
 	{
 		internal const string MasterFileName = "Data\\Files.master";
@@ -45,7 +42,6 @@ namespace Waher.Persistence.FilesLW.Test
 		internal const string Index2FileName = "Data\\Default.btree.40059d366b589d4071aba631a3aa4fc1dc03e357.index";
 		internal const string Index3FileName = "Data\\Default.btree.f1c0be1209b1cdc095103cf364d416abeb3fdf2f.index";
 #endif
-		internal const string Folder = "Data";
 		internal const int BlocksInCache = 10000;
 		internal const int ObjectsToEnumerate = 1000;
 
@@ -59,29 +55,15 @@ namespace Waher.Persistence.FilesLW.Test
 			get;
 		}
 
-		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext _)
-		{
-			Types.Initialize(
-				typeof(FilesProvider).Assembly,
-				typeof(ObjectSerializer).Assembly,
-				typeof(DBFilesBTreeTests).Assembly,
-				typeof(Expression).Assembly,
-				typeof(Script.Persistence.SQL.Select).Assembly,
-				typeof(Duration).Assembly);
-
-			Types.SetModuleParameter("Data", Folder);
-		}
-
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
 			DeleteFiles();
 
 #if LW
-			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(this.BlockSize / 2, 1024), Encoding.UTF8, 10000);
+			this.provider = await FilesProvider.CreateAsync(DBFilesPersistenceTests.Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(this.BlockSize / 2, 1024), Encoding.UTF8, 10000);
 #else
-			this.provider = await FilesProvider.CreateAsync(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(this.BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
+			this.provider = await FilesProvider.CreateAsync(DBFilesPersistenceTests.Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(this.BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
 #endif
 			this.file = await this.provider.GetFile(CollectionName);
 			this.start = DateTime.Now;
@@ -294,7 +276,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used for troubleshooting")]
 		public async Task DBFiles_BTree_Test_01_X_Repeat_DBFiles_BTree_Test_01()
 		{
 			object LastObjectAdded = null;
@@ -646,7 +628,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used only for benchmarking")]
 		public async Task DBFiles_BTree_Test_08_SaveNew_10000()
 		{
 			await this.TestMultiple(10000, 100, 1000, false, null);
@@ -654,35 +636,35 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used only for benchmarking")]
 		public async Task DBFiles_BTree_Test_09_SaveNew_10000_Statistics()
 		{
 			await this.TestMultiple(10000, 100, 100, false, 100);
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used only for benchmarking")]
 		public async Task DBFiles_BTree_Test_10_SaveNew_100000()
 		{
 			await this.TestMultiple(100000, 100, 1000, false, null);
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used only for benchmarking")]
 		public async Task DBFiles_BTree_Test_11_SaveNew_100000_Statistics()
 		{
 			await this.TestMultiple(100000, 100, 1000, false, 1000);
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used only for benchmarking")]
 		public async Task DBFiles_BTree_Test_12_SaveNew_1000000()
 		{
 			await this.TestMultiple(1000000, 100, 1000, false, null);
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used only for benchmarking")]
 		public async Task DBFiles_BTree_Test_13_SaveNew_1000000_Statistics()
 		{
 			await this.TestMultiple(1000000, 100, 1000, false, 10000);
@@ -1069,14 +1051,14 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used only for benchmarking")]
 		public async Task DBFiles_BTree_Test_29_UpdateObjects_10000()
 		{
 			await this.DBFiles_BTree_Test_UpdateObjects(10000);
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used only for benchmarking")]
 		public async Task DBFiles_BTree_Test_30_UpdateObjects_100000()
 		{
 			await this.DBFiles_BTree_Test_UpdateObjects(100000);
@@ -1139,21 +1121,21 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used only for benchmarking")]
 		public async Task DBFiles_BTree_Test_34_DeleteObject_10000()
 		{
 			await this.DBFiles_BTree_Test_DeleteObjects(10000, 1000, false);
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used only for benchmarking")]
 		public async Task DBFiles_BTree_Test_35_DeleteObject_100000()
 		{
 			await this.DBFiles_BTree_Test_DeleteObjects(100000, 1000, false);
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used for troubleshooting")]
 		public async Task DBFiles_BTree_Test_36_DeleteObject_1000_UntilFailure()
 		{
 			while (true)

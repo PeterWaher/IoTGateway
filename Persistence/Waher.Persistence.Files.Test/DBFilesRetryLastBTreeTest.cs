@@ -58,9 +58,9 @@ namespace Waher.Persistence.FilesLW.Test
 			int BlockSize = LoadBlockSize();
 
 #if LW
-			this.provider = await FilesProvider.CreateAsync(DBFilesBTreeTests.Folder, DBFilesBTreeTests.CollectionName, BlockSize, 10000, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000);
+			this.provider = await FilesProvider.CreateAsync(DBFilesPersistenceTests.Folder, DBFilesBTreeTests.CollectionName, BlockSize, 10000, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000);
 #else
-			this.provider = await FilesProvider.CreateAsync(DBFilesBTreeTests.Folder, DBFilesBTreeTests.CollectionName, BlockSize, 10000, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
+			this.provider = await FilesProvider.CreateAsync(DBFilesPersistenceTests.Folder, DBFilesBTreeTests.CollectionName, BlockSize, 10000, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
 #endif
 			this.file = await this.provider.GetFile(DBFilesBTreeTests.CollectionName);
 			this.start = DateTime.Now;
@@ -111,7 +111,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used for benchmarking")]
 		public async Task DBFiles_RetryLastTest_01_Retry_SaveNew()
 		{
 			FileStatistics StatBefore = (await this.file.ComputeStatistics()).Key;
@@ -123,7 +123,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[Ignore]
+		[Ignore("Used for benchmarking")]
 		public async Task DBFiles_RetryLastTest_02_Retry_Delete()
 		{
 			FileStatistics StatBefore = (await this.file.ComputeStatistics()).Key;

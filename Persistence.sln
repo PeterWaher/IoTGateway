@@ -75,6 +75,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking", "Network
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.E2ee", "Networking\Waher.Networking.E2ee\Waher.Networking.E2ee.csproj", "{352A3269-580C-280E-D6F0-85A90677E010}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Cache", "Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj", "{FA95ED7C-7AA0-6C39-A9DA-39509FC3B1C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -201,6 +203,10 @@ Global
 		{352A3269-580C-280E-D6F0-85A90677E010}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{352A3269-580C-280E-D6F0-85A90677E010}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{352A3269-580C-280E-D6F0-85A90677E010}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA95ED7C-7AA0-6C39-A9DA-39509FC3B1C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA95ED7C-7AA0-6C39-A9DA-39509FC3B1C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA95ED7C-7AA0-6C39-A9DA-39509FC3B1C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA95ED7C-7AA0-6C39-A9DA-39509FC3B1C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

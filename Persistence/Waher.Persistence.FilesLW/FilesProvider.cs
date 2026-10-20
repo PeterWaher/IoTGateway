@@ -91,6 +91,7 @@ namespace Waher.Persistence.Files
 		private readonly int blockSize;
 		private readonly int blobBlockSize;
 		private readonly int timeoutMilliseconds;
+		private readonly int blocksInCache;
 		private int nrFiles = 0;
 		private int bulkCount = 0;
 		private string salt = null;
@@ -115,7 +116,8 @@ namespace Waher.Persistence.Files
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
 		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
 		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// database provider. The cache does not contain BLOB blocks. The cache may grow during updates, to ensure the integrity of 
+		/// the database during updates.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
@@ -156,7 +158,8 @@ namespace Waher.Persistence.Files
 			if (!string.IsNullOrEmpty(this.folder) && this.folder[this.folder.Length - 1] != Path.DirectorySeparatorChar)
 				this.folder += Path.DirectorySeparatorChar;
 
-			this.blocks = new Cache<long, byte[]>(BlocksInCache, TimeSpan.MaxValue, TimeSpan.FromHours(1), true);
+			this.blocksInCache = BlocksInCache;
+			this.blocks = new Cache<long, byte[]>(this.blocksInCache, TimeSpan.MaxValue, TimeSpan.FromHours(1), true);
 		}
 
 #if COMPILED
@@ -171,7 +174,8 @@ namespace Waher.Persistence.Files
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
 		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
 		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// database provider. The cache does not contain BLOB blocks. The cache may grow during updates, to ensure the integrity of 
+		/// the database during updates.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
@@ -195,7 +199,8 @@ namespace Waher.Persistence.Files
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
 		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
 		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// database provider. The cache does not contain BLOB blocks. The cache may grow during updates, to ensure the integrity of 
+		/// the database during updates.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
@@ -219,7 +224,8 @@ namespace Waher.Persistence.Files
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
 		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
 		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// database provider. The cache does not contain BLOB blocks. The cache may grow during updates, to ensure the integrity of 
+		/// the database during updates.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
@@ -243,7 +249,8 @@ namespace Waher.Persistence.Files
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
 		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
 		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// database provider. The cache does not contain BLOB blocks. The cache may grow during updates, to ensure the integrity of 
+		/// the database during updates.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
@@ -268,7 +275,8 @@ namespace Waher.Persistence.Files
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
 		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
 		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// database provider. The cache does not contain BLOB blocks. The cache may grow during updates, to ensure the integrity of 
+		/// the database during updates.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
@@ -293,7 +301,8 @@ namespace Waher.Persistence.Files
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
 		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
 		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// database provider. The cache does not contain BLOB blocks. The cache may grow during updates, to ensure the integrity of 
+		/// the database during updates.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
@@ -318,7 +327,8 @@ namespace Waher.Persistence.Files
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
 		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
 		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// database provider. The cache does not contain BLOB blocks. The cache may grow during updates, to ensure the integrity of 
+		/// the database during updates.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
@@ -343,7 +353,8 @@ namespace Waher.Persistence.Files
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
 		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
 		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// database provider. The cache does not contain BLOB blocks. The cache may grow during updates, to ensure the integrity of 
+		/// the database during updates.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
@@ -368,7 +379,8 @@ namespace Waher.Persistence.Files
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
 		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
 		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// database provider. The cache does not contain BLOB blocks. The cache may grow during updates, to ensure the integrity of 
+		/// the database during updates.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
@@ -394,7 +406,8 @@ namespace Waher.Persistence.Files
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
 		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
 		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
-		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// database provider. The cache does not contain BLOB blocks. The cache may grow during updates, to ensure the integrity of 
+		/// the database during updates.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
@@ -1303,6 +1316,26 @@ namespace Waher.Persistence.Files
 					return true;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Disables pruning of the cache. Each call to <see cref="DisableBlockCachePruning"/> must 
+		/// be matched with a call to <see cref="EnableBlockCachePruning"/> before pruning is 
+		/// re-enabled."/>
+		/// </summary>
+		internal void DisableBlockCachePruning()
+		{
+			this.blocks.DisablePruning();
+		}
+
+		/// <summary>
+		/// Enabled pruning of the cache. Each call to <see cref="DisableBlockCachePruning"/> must
+		/// be matched with a call to <see cref="EnableBlockCachePruning"/> before pruning is 
+		/// re-enabled."/>
+		/// </summary>
+		internal void EnableBlockCachePruning()
+		{
+			this.blocks.EnablePruning();
 		}
 
 		#endregion

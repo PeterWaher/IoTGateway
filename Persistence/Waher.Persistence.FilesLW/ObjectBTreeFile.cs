@@ -1141,206 +1141,214 @@ namespace Waher.Persistence.Files
 			if (this.blobFile is null)
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
-			SortedDictionary<uint, bool> BlocksToRemoveSorted = new SortedDictionary<uint, bool>();
-			ChunkedList<Tuple<uint, int, byte[]>> ReplacementBlocks = new ChunkedList<Tuple<uint, int, byte[]>>();
-			Dictionary<uint, uint> TranslationFromTo = new Dictionary<uint, uint>();
-			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, this.blobBlockLimit, Offset);
-			uint[] BlocksToRemove;
-			byte[] BlobBlock = new byte[this.blobBlockSize];
-			byte[] DecryptedBlock;
-			byte[] DecryptedBlock2;
-			byte[] EncryptedBlock;
-			object ObjectId = this.recordHandler.GetKey(Reader);
-			object ObjectId2;
-			BlockInfo Info;
-			uint BlobBlockIndex;
-			uint Index, Prev, Next, To, Len;
-			int i, c;
-			int KeySize1 = Reader.Position - Offset;
-			int KeySize2;
-
-			await this.recordHandler.GetFullPayloadSize(Reader);
-			BlobBlockIndex = Reader.ReadUInt32();
-
-			while (BlobBlockIndex != uint.MaxValue)
+			this.provider.DisableBlockCachePruning();
+			try
 			{
-				await this.blobFile.LoadBlock(BlobBlockIndex, BlobBlock);
-				this.nrBlockLoads++;
+				SortedDictionary<uint, bool> BlocksToRemoveSorted = new SortedDictionary<uint, bool>();
+				ChunkedList<Tuple<uint, int, byte[]>> ReplacementBlocks = new ChunkedList<Tuple<uint, int, byte[]>>();
+				Dictionary<uint, uint> TranslationFromTo = new Dictionary<uint, uint>();
+				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, this.blobBlockLimit, Offset);
+				uint[] BlocksToRemove;
+				byte[] BlobBlock = new byte[this.blobBlockSize];
+				byte[] DecryptedBlock;
+				byte[] DecryptedBlock2;
+				byte[] EncryptedBlock;
+				object ObjectId = this.recordHandler.GetKey(Reader);
+				object ObjectId2;
+				BlockInfo Info;
+				uint BlobBlockIndex;
+				uint Index, Prev, Next, To, Len;
+				int i, c;
+				int KeySize1 = Reader.Position - Offset;
+				int KeySize2;
 
-				if (this.encrypted)
+				await this.recordHandler.GetFullPayloadSize(Reader);
+				BlobBlockIndex = Reader.ReadUInt32();
+
+				while (BlobBlockIndex != uint.MaxValue)
 				{
-					using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
+					await this.blobFile.LoadBlock(BlobBlockIndex, BlobBlock);
+					this.nrBlockLoads++;
+
+					if (this.encrypted)
 					{
-						DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
+						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
+						{
+							DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
+						}
 					}
-				}
-				else
-					DecryptedBlock = (byte[])BlobBlock.Clone();
+					else
+						DecryptedBlock = (byte[])BlobBlock.Clone();
 
-				Reader.Restart(DecryptedBlock, 0);
-				ObjectId2 = this.recordHandler.GetKey(Reader);
-				if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
-					break;
-
-				BlocksToRemoveSorted[BlobBlockIndex] = true;
-
-				BlobBlockIndex = BitConverter.ToUInt32(DecryptedBlock, KeySize1 + 4);
-			}
-
-			c = BlocksToRemoveSorted.Count;
-			BlocksToRemove = new uint[c];
-			BlocksToRemoveSorted.Keys.CopyTo(BlocksToRemove, 0);
-
-			BlobBlockIndex = this.blobFile.BlockLimit;
-
-			for (i = c - 1; i >= 0; i--)
-			{
-				if (BlobBlockIndex == 0)
-					break;
-
-				BlobBlockIndex--;
-				await this.blobFile.LoadBlock(BlobBlockIndex, BlobBlock);
-				this.nrBlockLoads++;
-
-				if (this.encrypted)
-				{
-					using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
-					{
-						DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
-					}
-				}
-				else
-					DecryptedBlock = (byte[])BlobBlock.Clone();
-
-				Reader.Restart(DecryptedBlock, 0);
-				ObjectId2 = this.recordHandler.GetKey(Reader);
-				if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
-					ReplacementBlocks.AddFirstItem(new Tuple<uint, int, byte[]>(BlobBlockIndex, Reader.Position, DecryptedBlock));
-			}
-
-			i = 0;
-			foreach (Tuple<uint, int, byte[]> ReplacementBlock in ReplacementBlocks)
-			{
-				BlobBlockIndex = BlocksToRemove[i++];   // To
-				Index = ReplacementBlock.Item1;         // From
-
-				TranslationFromTo[Index] = BlobBlockIndex;
-			}
-
-			i = 0;
-			foreach (Tuple<uint, int, byte[]> ReplacementBlock in ReplacementBlocks)
-			{
-				BlobBlockIndex = BlocksToRemove[i++];   // To
-
-				Index = ReplacementBlock.Item1;           // From
-				KeySize2 = ReplacementBlock.Item2;
-				DecryptedBlock = ReplacementBlock.Item3;
-
-				Prev = BitConverter.ToUInt32(DecryptedBlock, KeySize2);
-				Next = BitConverter.ToUInt32(DecryptedBlock, KeySize2 + 4);
-
-				if (Prev == uint.MaxValue)
-				{
 					Reader.Restart(DecryptedBlock, 0);
 					ObjectId2 = this.recordHandler.GetKey(Reader);
+					if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
+						break;
 
-					Info = await this.FindNodeLocked(ObjectId2, false);
-					if (!(Info is null))
+					BlocksToRemoveSorted[BlobBlockIndex] = true;
+
+					BlobBlockIndex = BitConverter.ToUInt32(DecryptedBlock, KeySize1 + 4);
+				}
+
+				c = BlocksToRemoveSorted.Count;
+				BlocksToRemove = new uint[c];
+				BlocksToRemoveSorted.Keys.CopyTo(BlocksToRemove, 0);
+
+				BlobBlockIndex = this.blobFile.BlockLimit;
+
+				for (i = c - 1; i >= 0; i--)
+				{
+					if (BlobBlockIndex == 0)
+						break;
+
+					BlobBlockIndex--;
+					await this.blobFile.LoadBlock(BlobBlockIndex, BlobBlock);
+					this.nrBlockLoads++;
+
+					if (this.encrypted)
 					{
-						Reader.Restart(Info.Block, Info.InternalPosition + 4);
-						if (this.recordHandler.Compare(ObjectId2, this.recordHandler.GetKey(Reader)) == 0)
+						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
 						{
-							Len = await this.recordHandler.GetFullPayloadSize(Reader);
-							if (Reader.Position - Info.InternalPosition - 4 + Len > this.inlineObjectSizeLimit)
+							DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
+						}
+					}
+					else
+						DecryptedBlock = (byte[])BlobBlock.Clone();
+
+					Reader.Restart(DecryptedBlock, 0);
+					ObjectId2 = this.recordHandler.GetKey(Reader);
+					if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
+						ReplacementBlocks.AddFirstItem(new Tuple<uint, int, byte[]>(BlobBlockIndex, Reader.Position, DecryptedBlock));
+				}
+
+				i = 0;
+				foreach (Tuple<uint, int, byte[]> ReplacementBlock in ReplacementBlocks)
+				{
+					BlobBlockIndex = BlocksToRemove[i++];   // To
+					Index = ReplacementBlock.Item1;         // From
+
+					TranslationFromTo[Index] = BlobBlockIndex;
+				}
+
+				i = 0;
+				foreach (Tuple<uint, int, byte[]> ReplacementBlock in ReplacementBlocks)
+				{
+					BlobBlockIndex = BlocksToRemove[i++];   // To
+
+					Index = ReplacementBlock.Item1;           // From
+					KeySize2 = ReplacementBlock.Item2;
+					DecryptedBlock = ReplacementBlock.Item3;
+
+					Prev = BitConverter.ToUInt32(DecryptedBlock, KeySize2);
+					Next = BitConverter.ToUInt32(DecryptedBlock, KeySize2 + 4);
+
+					if (Prev == uint.MaxValue)
+					{
+						Reader.Restart(DecryptedBlock, 0);
+						ObjectId2 = this.recordHandler.GetKey(Reader);
+
+						Info = await this.FindNodeLocked(ObjectId2, false);
+						if (!(Info is null))
+						{
+							Reader.Restart(Info.Block, Info.InternalPosition + 4);
+							if (this.recordHandler.Compare(ObjectId2, this.recordHandler.GetKey(Reader)) == 0)
 							{
-								Buffer.BlockCopy(BitConverter.GetBytes(BlobBlockIndex), 0, Info.Block, Reader.Position, 4);
-								this.QueueSaveBlockLocked(Info.BlockIndex, Info.Block);
+								Len = await this.recordHandler.GetFullPayloadSize(Reader);
+								if (Reader.Position - Info.InternalPosition - 4 + Len > this.inlineObjectSizeLimit)
+								{
+									Buffer.BlockCopy(BitConverter.GetBytes(BlobBlockIndex), 0, Info.Block, Reader.Position, 4);
+									this.QueueSaveBlockLocked(Info.BlockIndex, Info.Block);
+								}
 							}
 						}
 					}
-				}
-				else if (TranslationFromTo.TryGetValue(Prev, out To))
-					Buffer.BlockCopy(BitConverter.GetBytes(To), 0, DecryptedBlock, KeySize2, 4);
-				else
-				{
-					await this.blobFile.LoadBlock(Prev, BlobBlock);
-					this.nrBlockLoads++;
+					else if (TranslationFromTo.TryGetValue(Prev, out To))
+						Buffer.BlockCopy(BitConverter.GetBytes(To), 0, DecryptedBlock, KeySize2, 4);
+					else
+					{
+						await this.blobFile.LoadBlock(Prev, BlobBlock);
+						this.nrBlockLoads++;
+
+						if (this.encrypted)
+						{
+							using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)Prev) * this.blobBlockSize)))
+							{
+								DecryptedBlock2 = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
+							}
+						}
+						else
+							DecryptedBlock2 = BlobBlock;
+
+						Buffer.BlockCopy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize2 + 4, 4);
+
+						if (this.encrypted)
+						{
+							using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)Prev) * this.blobBlockSize)))
+							{
+								EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock2, 0, DecryptedBlock2.Length);
+							}
+						}
+						else
+							EncryptedBlock = (byte[])DecryptedBlock2.Clone();
+
+						await this.blobFile.SaveBlock(Prev, EncryptedBlock);
+						this.nrBlockSaves++;
+					}
+
+					if (TranslationFromTo.TryGetValue(Next, out To))
+						Buffer.BlockCopy(BitConverter.GetBytes(To), 0, DecryptedBlock, KeySize2 + 4, 4);
+					else if (Next != uint.MaxValue)
+					{
+						await this.blobFile.LoadBlock(Next, BlobBlock);
+						this.nrBlockLoads++;
+
+						if (this.encrypted)
+						{
+							using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)Next) * this.blobBlockSize)))
+							{
+								DecryptedBlock2 = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
+							}
+						}
+						else
+							DecryptedBlock2 = BlobBlock;
+
+						Buffer.BlockCopy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize2, 4);
+
+						if (this.encrypted)
+						{
+							using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)Next) * this.blobBlockSize)))
+							{
+								EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock2, 0, DecryptedBlock2.Length);
+							}
+						}
+						else
+							EncryptedBlock = (byte[])DecryptedBlock2.Clone();
+
+						await this.blobFile.SaveBlock(Next, EncryptedBlock);
+						this.nrBlockSaves++;
+					}
 
 					if (this.encrypted)
 					{
-						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)Prev) * this.blobBlockSize)))
+						using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
 						{
-							DecryptedBlock2 = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
+							EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock, 0, DecryptedBlock.Length);
 						}
 					}
 					else
-						DecryptedBlock2 = BlobBlock;
+						EncryptedBlock = (byte[])DecryptedBlock.Clone();
 
-					Buffer.BlockCopy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize2 + 4, 4);
-
-					if (this.encrypted)
-					{
-						using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)Prev) * this.blobBlockSize)))
-						{
-							EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock2, 0, DecryptedBlock2.Length);
-						}
-					}
-					else
-						EncryptedBlock = (byte[])DecryptedBlock2.Clone();
-
-					await this.blobFile.SaveBlock(Prev, EncryptedBlock);
+					await this.blobFile.SaveBlock(BlobBlockIndex, EncryptedBlock);
 					this.nrBlockSaves++;
 				}
 
-				if (TranslationFromTo.TryGetValue(Next, out To))
-					Buffer.BlockCopy(BitConverter.GetBytes(To), 0, DecryptedBlock, KeySize2 + 4, 4);
-				else if (Next != uint.MaxValue)
-				{
-					await this.blobFile.LoadBlock(Next, BlobBlock);
-					this.nrBlockLoads++;
-
-					if (this.encrypted)
-					{
-						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)Next) * this.blobBlockSize)))
-						{
-							DecryptedBlock2 = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
-						}
-					}
-					else
-						DecryptedBlock2 = BlobBlock;
-
-					Buffer.BlockCopy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize2, 4);
-
-					if (this.encrypted)
-					{
-						using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)Next) * this.blobBlockSize)))
-						{
-							EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock2, 0, DecryptedBlock2.Length);
-						}
-					}
-					else
-						EncryptedBlock = (byte[])DecryptedBlock2.Clone();
-
-					await this.blobFile.SaveBlock(Next, EncryptedBlock);
-					this.nrBlockSaves++;
-				}
-
-				if (this.encrypted)
-				{
-					using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
-					{
-						EncryptedBlock = Aes.TransformFinalBlock(DecryptedBlock, 0, DecryptedBlock.Length);
-					}
-				}
-				else
-					EncryptedBlock = (byte[])DecryptedBlock.Clone();
-
-				await this.blobFile.SaveBlock(BlobBlockIndex, EncryptedBlock);
-				this.nrBlockSaves++;
+				await this.blobFile.Truncate((uint)(this.blobFile.BlockLimit - BlocksToRemove.Length));
+				this.blobBlockLimit = this.blobFile.BlockLimit;
 			}
-
-			await this.blobFile.Truncate((uint)(this.blobFile.BlockLimit - BlocksToRemove.Length));
-			this.blobBlockLimit = this.blobFile.BlockLimit;
+			finally
+			{
+				this.provider.EnableBlockCachePruning();
+			}
 		}
 
 		#endregion
@@ -2331,206 +2339,214 @@ namespace Waher.Persistence.Files
 #if ASSERT_LOCKS
 			this.fileAccess.AssertWriting();
 #endif
-			byte[] Block = Info.Block;
-			BlockHeader Header = Info.Header;
-			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit, Info.InternalPosition + 4);
-			this.recordHandler.SkipKey(Reader);
-
-			uint BlockIndex = Info.BlockIndex;
-			KeyValuePair<int, bool> P = await this.recordHandler.GetPayloadSizeEx(Reader);
-			int Len = P.Key;
-			bool IsBlob = P.Value;
-
-			if (IsBlob && DeleteBlob)
-				await this.DeleteBlobLocked(Block, Info.InternalPosition + 4);
-
-			if (DeleteBlob && Bin.Length > this.inlineObjectSizeLimit)
+			this.provider.DisableBlockCachePruning();
+			try
 			{
-				byte[] BlobReference = await this.SaveBlobLocked(Bin);
-				BlobReference = this.recordHandler.EncodeBlobReference(BlobReference, Bin);
+				byte[] Block = Info.Block;
+				BlockHeader Header = Info.Header;
+				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit, Info.InternalPosition + 4);
+				this.recordHandler.SkipKey(Reader);
 
-				if (BlobReference.Length > this.inlineObjectSizeLimit)
+				uint BlockIndex = Info.BlockIndex;
+				KeyValuePair<int, bool> P = await this.recordHandler.GetPayloadSizeEx(Reader);
+				int Len = P.Key;
+				bool IsBlob = P.Value;
+
+				if (IsBlob && DeleteBlob)
+					await this.DeleteBlobLocked(Block, Info.InternalPosition + 4);
+
+				if (DeleteBlob && Bin.Length > this.inlineObjectSizeLimit)
 				{
-					await this.DeleteBlobLocked(BlobReference, 0);
-					throw new ArgumentException("Key too long.");
-				}
+					byte[] BlobReference = await this.SaveBlobLocked(Bin);
+					BlobReference = this.recordHandler.EncodeBlobReference(BlobReference, Bin);
 
-				Bin = BlobReference;
-			}
-
-			int NewSize = Bin.Length;
-			int OldSize = Reader.Position + Len - (Info.InternalPosition + 4);
-			int DeltaSize = NewSize - OldSize;
-			int i;
-
-			if (Header.BytesUsed + BlockHeaderSize + DeltaSize <= this.blockSize)
-			{
-				if (DeltaSize != 0)
-				{
-					i = Header.BytesUsed + BlockHeaderSize - (Info.InternalPosition + 4 + OldSize);
-					if (i > 0)
-						Buffer.BlockCopy(Block, Info.InternalPosition + 4 + OldSize, Block, Info.InternalPosition + 4 + NewSize, i);
-
-					Header.BytesUsed += (ushort)DeltaSize;
-					Buffer.BlockCopy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
-
-					if (DeltaSize < 0)
-						Array.Clear(Block, Header.BytesUsed + BlockHeaderSize, -DeltaSize);
-				}
-
-				Buffer.BlockCopy(Bin, 0, Block, Info.InternalPosition + 4, NewSize);
-
-				this.QueueSaveBlockLocked(BlockIndex, Block);
-			}
-			else
-			{
-				BlockSplitter Splitter = new BlockSplitterMiddle(this.blockSize);
-				Tuple<uint, byte[]> Left;
-				Tuple<uint, byte[]> Right = await this.CreateNewBlockLocked();
-				uint LeftLink;
-				uint RightLink = Right.Item1;
-				bool CheckParentLinksLeft = false;
-				bool CheckParentLinksRight = true;
-
-				Splitter.RightBlock = Right.Item2;
-
-				if (BlockIndex == 0)   // Create new root
-				{
-					Left = await this.CreateNewBlockLocked();
-					LeftLink = Left.Item1;
-					Splitter.LeftBlock = Left.Item2;
-					CheckParentLinksLeft = true;
-				}
-				else                        // Reuse current node for new left node.
-				{
-					LeftLink = BlockIndex;
-					Splitter.LeftBlock = new byte[this.blockSize];
-				}
-
-				int Pos;
-				int c;
-				uint BlockLink;
-				uint ChildSize;
-				object ObjectId;
-				bool IsEmpty;
-				bool Leaf = true;
-
-				Reader.Restart(Block, BlockHeaderSize);
-
-				do
-				{
-					Pos = Reader.Position;
-
-					BlockLink = Reader.ReadBlockLink();                    // Block link.
-					ObjectId = this.recordHandler.GetKey(Reader);
-					IsEmpty = ObjectId is null;
-					if (IsEmpty)
-						break;
-
-					if (BlockLink != 0)
+					if (BlobReference.Length > this.inlineObjectSizeLimit)
 					{
-						Leaf = false;
-						ChildSize = await this.GetObjectSizeOfBlockLocked(BlockLink);
+						await this.DeleteBlobLocked(BlobReference, 0);
+						throw new ArgumentException("Key too long.");
 					}
-					else
-						ChildSize = 0;
 
-					Len = await this.recordHandler.GetPayloadSize(Reader);
-					c = Reader.Position - Pos + Len;
-
-					if (Pos == Info.InternalPosition)
-						Splitter.NextBlock(BlockLink, Bin, 0, Bin.Length, ChildSize);
-					else
-						Splitter.NextBlock(BlockLink, Block, Pos + 4, c - 4, ChildSize);
-
-					Reader.Position += Len;
+					Bin = BlobReference;
 				}
-				while (Reader.BytesLeft >= 4);
 
-				BlockLink = BitConverter.ToUInt32(Block, 6);
-				Splitter.RightLastBlockIndex = BlockLink;
-				if (BlockLink != 0)
-					Splitter.RightSizeSubtree += await this.GetObjectSizeOfBlockLocked(BlockLink);
+				int NewSize = Bin.Length;
+				int OldSize = Reader.Position + Len - (Info.InternalPosition + 4);
+				int DeltaSize = NewSize - OldSize;
+				int i;
 
-				ushort LeftBytesUsed = (ushort)(Splitter.LeftPos - BlockHeaderSize);
-				ushort RightBytesUsed = (ushort)(Splitter.RightPos - BlockHeaderSize);
-
-				uint ParentLink = BlockIndex == 0 ? 0 : Header.ParentBlockIndex;
-
-				Buffer.BlockCopy(BitConverter.GetBytes(LeftBytesUsed), 0, Splitter.LeftBlock, 0, 2);
-				Buffer.BlockCopy(BitConverter.GetBytes(Splitter.LeftSizeSubtree), 0, Splitter.LeftBlock, 2, 4);
-				Buffer.BlockCopy(BitConverter.GetBytes(ParentLink), 0, Splitter.LeftBlock, 10, 4);
-
-				Buffer.BlockCopy(BitConverter.GetBytes(RightBytesUsed), 0, Splitter.RightBlock, 0, 2);
-				Buffer.BlockCopy(BitConverter.GetBytes(Splitter.RightSizeSubtree), 0, Splitter.RightBlock, 2, 4);
-				Buffer.BlockCopy(BitConverter.GetBytes(ParentLink), 0, Splitter.RightBlock, 10, 4);
-
-				this.QueueSaveBlockLocked(LeftLink, Splitter.LeftBlock);
-				this.QueueSaveBlockLocked(RightLink, Splitter.RightBlock);
-
-				if (BlockIndex == 0)
+				if (Header.BytesUsed + BlockHeaderSize + DeltaSize <= this.blockSize)
 				{
-					ushort NewParentBytesUsed = (ushort)(4 + Splitter.ParentObject.Length);
-					uint NewParentSizeSubtree = 1 + Splitter.LeftSizeSubtree + Splitter.RightSizeSubtree;
-					byte[] NewParentBlock = new byte[this.blockSize];
+					if (DeltaSize != 0)
+					{
+						i = Header.BytesUsed + BlockHeaderSize - (Info.InternalPosition + 4 + OldSize);
+						if (i > 0)
+							Buffer.BlockCopy(Block, Info.InternalPosition + 4 + OldSize, Block, Info.InternalPosition + 4 + NewSize, i);
 
-					if (NewParentSizeSubtree <= Splitter.LeftSizeSubtree || NewParentSizeSubtree <= Splitter.RightSizeSubtree)
-						NewParentSizeSubtree = uint.MaxValue;
+						Header.BytesUsed += (ushort)DeltaSize;
+						Buffer.BlockCopy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 
-					Buffer.BlockCopy(BitConverter.GetBytes(NewParentBytesUsed), 0, NewParentBlock, 0, 2);
-					Buffer.BlockCopy(BitConverter.GetBytes(NewParentSizeSubtree), 0, NewParentBlock, 2, 4);
-					Buffer.BlockCopy(BitConverter.GetBytes(RightLink), 0, NewParentBlock, 6, 4);
-					Buffer.BlockCopy(BitConverter.GetBytes(LeftLink), 0, NewParentBlock, 14, 4);
-					Buffer.BlockCopy(Splitter.ParentObject, 0, NewParentBlock, 18, Splitter.ParentObject.Length);
+						if (DeltaSize < 0)
+							Array.Clear(Block, Header.BytesUsed + BlockHeaderSize, -DeltaSize);
+					}
 
-					this.QueueSaveBlockLocked(0, NewParentBlock);
+					Buffer.BlockCopy(Bin, 0, Block, Info.InternalPosition + 4, NewSize);
+
+					this.QueueSaveBlockLocked(BlockIndex, Block);
 				}
 				else
 				{
-					byte[] ParentBlock = await this.LoadBlockLocked(ParentLink, true);
-					BinaryDeserializer ParentReader = new BinaryDeserializer(this.collectionName, this.encoding, ParentBlock, this.blockLimit);
+					BlockSplitter Splitter = new BlockSplitterMiddle(this.blockSize);
+					Tuple<uint, byte[]> Left;
+					Tuple<uint, byte[]> Right = await this.CreateNewBlockLocked();
+					uint LeftLink;
+					uint RightLink = Right.Item1;
+					bool CheckParentLinksLeft = false;
+					bool CheckParentLinksRight = true;
 
-					BlockHeader ParentHeader = new BlockHeader(ParentReader);
-					int ParentLen;
-					int ParentPos;
-					uint ParentBlockIndex;
+					Splitter.RightBlock = Right.Item2;
 
-					if (ParentHeader.LastBlockIndex == LeftLink)
-						ParentPos = BlockHeaderSize + ParentHeader.BytesUsed;
-					else
+					if (BlockIndex == 0)   // Create new root
 					{
-						do
-						{
-							ParentPos = ParentReader.Position;
-
-							ParentBlockIndex = ParentReader.ReadBlockLink();                  // Block link.
-							if (!this.recordHandler.SkipKey(ParentReader))
-								break;
-
-							ParentLen = await this.recordHandler.GetPayloadSize(ParentReader);
-							ParentReader.Position += ParentLen;
-						}
-						while (ParentBlockIndex != LeftLink && ParentReader.BytesLeft >= 4);
-
-						if (ParentBlockIndex != LeftLink)
-						{
-							throw Database.FlagForRepair(this.collectionName, "Parent link points to parent block (" + ParentLink.ToString() +
-								") with no reference to child block (" + LeftLink.ToString() + ").");
-						}
+						Left = await this.CreateNewBlockLocked();
+						LeftLink = Left.Item1;
+						Splitter.LeftBlock = Left.Item2;
+						CheckParentLinksLeft = true;
+					}
+					else                        // Reuse current node for new left node.
+					{
+						LeftLink = BlockIndex;
+						Splitter.LeftBlock = new byte[this.blockSize];
 					}
 
-					await this.InsertObjectLocked(ParentLink, ParentHeader, ParentBlock, Splitter.ParentObject, ParentPos, RightLink,
-						Splitter.RightSizeSubtree, false, Info.LastObject);
-				}
+					int Pos;
+					int c;
+					uint BlockLink;
+					uint ChildSize;
+					object ObjectId;
+					bool IsEmpty;
+					bool Leaf = true;
 
-				if (!Leaf)
-				{
-					if (CheckParentLinksLeft)
-						await this.UpdateParentLinksLocked(LeftLink, Splitter.LeftBlock);
+					Reader.Restart(Block, BlockHeaderSize);
 
-					if (CheckParentLinksRight)
-						await this.UpdateParentLinksLocked(RightLink, Splitter.RightBlock);
+					do
+					{
+						Pos = Reader.Position;
+
+						BlockLink = Reader.ReadBlockLink();                    // Block link.
+						ObjectId = this.recordHandler.GetKey(Reader);
+						IsEmpty = ObjectId is null;
+						if (IsEmpty)
+							break;
+
+						if (BlockLink != 0)
+						{
+							Leaf = false;
+							ChildSize = await this.GetObjectSizeOfBlockLocked(BlockLink);
+						}
+						else
+							ChildSize = 0;
+
+						Len = await this.recordHandler.GetPayloadSize(Reader);
+						c = Reader.Position - Pos + Len;
+
+						if (Pos == Info.InternalPosition)
+							Splitter.NextBlock(BlockLink, Bin, 0, Bin.Length, ChildSize);
+						else
+							Splitter.NextBlock(BlockLink, Block, Pos + 4, c - 4, ChildSize);
+
+						Reader.Position += Len;
+					}
+					while (Reader.BytesLeft >= 4);
+
+					BlockLink = BitConverter.ToUInt32(Block, 6);
+					Splitter.RightLastBlockIndex = BlockLink;
+					if (BlockLink != 0)
+						Splitter.RightSizeSubtree += await this.GetObjectSizeOfBlockLocked(BlockLink);
+
+					ushort LeftBytesUsed = (ushort)(Splitter.LeftPos - BlockHeaderSize);
+					ushort RightBytesUsed = (ushort)(Splitter.RightPos - BlockHeaderSize);
+
+					uint ParentLink = BlockIndex == 0 ? 0 : Header.ParentBlockIndex;
+
+					Buffer.BlockCopy(BitConverter.GetBytes(LeftBytesUsed), 0, Splitter.LeftBlock, 0, 2);
+					Buffer.BlockCopy(BitConverter.GetBytes(Splitter.LeftSizeSubtree), 0, Splitter.LeftBlock, 2, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(ParentLink), 0, Splitter.LeftBlock, 10, 4);
+
+					Buffer.BlockCopy(BitConverter.GetBytes(RightBytesUsed), 0, Splitter.RightBlock, 0, 2);
+					Buffer.BlockCopy(BitConverter.GetBytes(Splitter.RightSizeSubtree), 0, Splitter.RightBlock, 2, 4);
+					Buffer.BlockCopy(BitConverter.GetBytes(ParentLink), 0, Splitter.RightBlock, 10, 4);
+
+					this.QueueSaveBlockLocked(LeftLink, Splitter.LeftBlock);
+					this.QueueSaveBlockLocked(RightLink, Splitter.RightBlock);
+
+					if (BlockIndex == 0)
+					{
+						ushort NewParentBytesUsed = (ushort)(4 + Splitter.ParentObject.Length);
+						uint NewParentSizeSubtree = 1 + Splitter.LeftSizeSubtree + Splitter.RightSizeSubtree;
+						byte[] NewParentBlock = new byte[this.blockSize];
+
+						if (NewParentSizeSubtree <= Splitter.LeftSizeSubtree || NewParentSizeSubtree <= Splitter.RightSizeSubtree)
+							NewParentSizeSubtree = uint.MaxValue;
+
+						Buffer.BlockCopy(BitConverter.GetBytes(NewParentBytesUsed), 0, NewParentBlock, 0, 2);
+						Buffer.BlockCopy(BitConverter.GetBytes(NewParentSizeSubtree), 0, NewParentBlock, 2, 4);
+						Buffer.BlockCopy(BitConverter.GetBytes(RightLink), 0, NewParentBlock, 6, 4);
+						Buffer.BlockCopy(BitConverter.GetBytes(LeftLink), 0, NewParentBlock, 14, 4);
+						Buffer.BlockCopy(Splitter.ParentObject, 0, NewParentBlock, 18, Splitter.ParentObject.Length);
+
+						this.QueueSaveBlockLocked(0, NewParentBlock);
+					}
+					else
+					{
+						byte[] ParentBlock = await this.LoadBlockLocked(ParentLink, true);
+						BinaryDeserializer ParentReader = new BinaryDeserializer(this.collectionName, this.encoding, ParentBlock, this.blockLimit);
+
+						BlockHeader ParentHeader = new BlockHeader(ParentReader);
+						int ParentLen;
+						int ParentPos;
+						uint ParentBlockIndex;
+
+						if (ParentHeader.LastBlockIndex == LeftLink)
+							ParentPos = BlockHeaderSize + ParentHeader.BytesUsed;
+						else
+						{
+							do
+							{
+								ParentPos = ParentReader.Position;
+
+								ParentBlockIndex = ParentReader.ReadBlockLink();                  // Block link.
+								if (!this.recordHandler.SkipKey(ParentReader))
+									break;
+
+								ParentLen = await this.recordHandler.GetPayloadSize(ParentReader);
+								ParentReader.Position += ParentLen;
+							}
+							while (ParentBlockIndex != LeftLink && ParentReader.BytesLeft >= 4);
+
+							if (ParentBlockIndex != LeftLink)
+							{
+								throw Database.FlagForRepair(this.collectionName, "Parent link points to parent block (" + ParentLink.ToString() +
+									") with no reference to child block (" + LeftLink.ToString() + ").");
+							}
+						}
+
+						await this.InsertObjectLocked(ParentLink, ParentHeader, ParentBlock, Splitter.ParentObject, ParentPos, RightLink,
+							Splitter.RightSizeSubtree, false, Info.LastObject);
+					}
+
+					if (!Leaf)
+					{
+						if (CheckParentLinksLeft)
+							await this.UpdateParentLinksLocked(LeftLink, Splitter.LeftBlock);
+
+						if (CheckParentLinksRight)
+							await this.UpdateParentLinksLocked(RightLink, Splitter.RightBlock);
+					}
 				}
+			}
+			finally
+			{
+				this.provider.EnableBlockCachePruning();
 			}
 		}
 

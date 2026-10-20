@@ -29,6 +29,7 @@ namespace Waher.Runtime.Cache
 		private Timer timer;
 		private int maxTimerIntervalMs = 5000;
 		private int minTimerIntervalMs = 100;
+		private int disablePruningCount = 0;
 		private bool hasExplicitExpiry = false;
 
 		/// <summary>
@@ -503,7 +504,8 @@ namespace Waher.Runtime.Cache
 				{
 					Reason = RemovedReason.Space;
 
-					if (this.valuesByKey.Count >= this.maxItems)
+					if (this.valuesByKey.Count >= this.maxItems &&
+						this.disablePruningCount == 0)
 					{
 						KeyType OldKey = default;
 						bool Found = false;
@@ -606,6 +608,111 @@ namespace Waher.Runtime.Cache
 			{
 				Log.Exception(ex);
 			}
+		}
+
+		/// <summary>
+		/// Disables pruning of the cache. Each call to <see cref="DisablePruning"/> must 
+		/// be matched with a call to <see cref="EnablePruning"/> before pruning is 
+		/// re-enabled."/>
+		/// </summary>
+		public void DisablePruning()
+		{
+			lock (this.synchObject)
+			{
+				this.disablePruningCount++;
+			}
+		}
+
+		/// <summary>
+		/// Enabled pruning of the cache. Each call to <see cref="DisablePruning"/> must
+		/// be matched with a call to <see cref="EnablePruning"/> before pruning is 
+		/// re-enabled."/>
+		/// </summary>
+		public void EnablePruning()
+		{
+			CacheItem<KeyType, ValueType>[] ToRemove;
+
+			lock (this.synchObject)
+			{
+				if (this.disablePruningCount == 0)
+					return;
+
+				this.disablePruningCount--;
+				if (this.disablePruningCount > 0)
+					return;
+
+				ToRemove = this.PruneLocked(this.maxItems);
+			}
+
+			if (ToRemove.Length > 0)
+				this.OnRemoved(ToRemove, RemovedReason.Space);
+		}
+
+		/// <summary>
+		/// Prunes the cache, evicting oldest items first, if necessary.
+		/// </summary>
+		/// <param name="MaxCount">Maximum size of cache.</param>
+		/// <returns>Number of elements evicted from the cache.</returns>
+		public int Prune(int MaxCount)
+		{
+			CacheItem<KeyType, ValueType>[] ToRemove;
+
+			lock (this.synchObject)
+			{
+				ToRemove = this.PruneLocked(MaxCount);
+			}
+
+			int c = ToRemove.Length;
+			if (c > 0)
+				this.OnRemoved(ToRemove, RemovedReason.Space);
+
+			return c;
+		}
+
+		private CacheItem<KeyType, ValueType>[] PruneLocked(int MaxCount)
+		{
+			CacheItem<KeyType, ValueType>[] ToRemove;
+			CacheItem<KeyType, ValueType> Item;
+			int i, c;
+
+			if (this.valuesByKey.Count <= MaxCount)
+				return Array.Empty<CacheItem<KeyType, ValueType>>();
+
+			i = 0;
+			c = this.valuesByKey.Count - MaxCount;
+			ToRemove = new CacheItem<KeyType, ValueType>[c];
+
+			foreach (KeyType Key2 in this.keysByLastUsage.Values)
+			{
+				ToRemove[i++] = this.valuesByKey[Key2];
+				if (i == c)
+					break;
+			}
+
+			if (i < c)
+			{
+				if (i == 0)
+					return Array.Empty<CacheItem<KeyType, ValueType>>();
+
+				c = i;
+			}
+
+			for (i = 0; i < c; i++)
+			{
+				Item = ToRemove[i];
+
+				this.valuesByKey.Remove(Item.Key);
+				this.keysByCreation.Remove(Item.Created);
+				this.keysByLastUsage.Remove(Item.LastUsed);
+
+				if (Item.Expires.HasValue &&
+					this.keysByExpiry.Remove(Item.Expires.Value))
+				{
+					this.hasExplicitExpiry = this.keysByExpiry.Count > 0;
+				}
+			}
+
+			return ToRemove;
 		}
 
 		/// <summary>

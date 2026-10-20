@@ -2264,11 +2264,11 @@ namespace Waher.Persistence.Files
 
 		private async Task UpdateObjectLocked(object Object, ObjectSerializer Serializer)
 		{
+			Guid ObjectId = await Serializer.GetObjectId(Object, false, NestedLocks.CreateIfNested(this, true, Serializer));
 			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
 			await Serializer.Serialize(Writer, false, false, Object, NestedLocks.CreateIfNested(this, true, Serializer));
 			byte[] Bin = Writer.GetSerialization();
 
-			Guid ObjectId = await Serializer.GetObjectId(Object, false, NestedLocks.CreateIfNested(this, true, Serializer));
 			BlockInfo Info = await this.FindNodeLocked(ObjectId, false)
 				?? throw new KeyNotFoundException("Object not found.");
 

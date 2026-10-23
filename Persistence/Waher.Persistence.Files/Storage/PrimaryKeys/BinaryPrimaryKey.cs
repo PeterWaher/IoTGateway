@@ -77,7 +77,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 			this.bin = new byte[Length];
 			Buffer.BlockCopy(Bin, Offset, this.bin, 0, Length);
 			this.len = this.maxLen = Length;
-			this.empty = Length > 0;
+			this.empty = Length == 0;
 		}
 
 		/// <summary>

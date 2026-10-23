@@ -334,11 +334,11 @@ namespace Waher.Persistence.Files.Storage
 		/// <summary>
 		/// Exports a key.
 		/// </summary>
-		/// <param name="ObjectId">Key</param>
+		/// <param name="PrimaryKey">Key</param>
 		/// <param name="Output">XML Output.</param>
-		public void ExportKey(object ObjectId, XmlWriter Output)
+		public void ExportKey(IPrimaryKey PrimaryKey, XmlWriter Output)
 		{
-			Output.WriteAttributeString("key", ObjectId.ToString());
+			Output.WriteAttributeString("key", PrimaryKey.ToString());
 		}
 
 		/// <summary>

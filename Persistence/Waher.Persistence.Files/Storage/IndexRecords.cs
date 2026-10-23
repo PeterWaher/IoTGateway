@@ -3637,146 +3637,151 @@ namespace Waher.Persistence.Files.Storage
 		/// <summary>
 		/// Exports a key to XML.
 		/// </summary>
-		/// <param name="ObjectId">Key to export.</param>
+		/// <param name="PrimaryKey">Key to export.</param>
 		/// <param name="Output">XML Output.</param>
-		public void ExportKey(object ObjectId, XmlWriter Output)
+		public void ExportKey(IPrimaryKey PrimaryKey, XmlWriter Output)
 		{
-			byte[] Bin = (byte[])ObjectId;
-			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, this.index?.BlockLimit ?? uint.MaxValue);
-
-			if (Reader.BytesLeft > 0 && Reader.ReadBit())
+			if (PrimaryKey is BinaryPrimaryKey ForeignKey)
 			{
-				string Value;
-				int i;
+				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName,
+					this.encoding, ForeignKey.Binary, 
+					this.index?.BlockLimit ?? uint.MaxValue,
+					0, ForeignKey.Length);
 
-				for (i = 0; i < this.fieldCount; i++)
+				if (Reader.BytesLeft > 0 && Reader.ReadBit())
 				{
-					switch ((uint)Reader.ReadBits(6))
+					string Value;
+					int i;
+
+					for (i = 0; i < this.fieldCount; i++)
 					{
-						case ObjectSerializer.TYPE_BOOLEAN:
-							Value = Reader.ReadBit() ? "true" : "false";
-							break;
+						switch (Reader.ReadBits(6))
+						{
+							case ObjectSerializer.TYPE_BOOLEAN:
+								Value = Reader.ReadBit() ? "true" : "false";
+								break;
 
-						case ObjectSerializer.TYPE_BYTE:
-							Value = Reader.ReadByte().ToString();
-							break;
+							case ObjectSerializer.TYPE_BYTE:
+								Value = Reader.ReadByte().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_INT16:
-							Value = Reader.ReadInt16().ToString();
-							break;
+							case ObjectSerializer.TYPE_INT16:
+								Value = Reader.ReadInt16().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_VARINT16:
-							Value = Reader.ReadVariableLengthInt16().ToString();
-							break;
+							case ObjectSerializer.TYPE_VARINT16:
+								Value = Reader.ReadVariableLengthInt16().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_INT32:
-							Value = Reader.ReadInt32().ToString();
-							break;
+							case ObjectSerializer.TYPE_INT32:
+								Value = Reader.ReadInt32().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_VARINT32:
-							Value = Reader.ReadVariableLengthInt32().ToString();
-							break;
+							case ObjectSerializer.TYPE_VARINT32:
+								Value = Reader.ReadVariableLengthInt32().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_INT64:
-							Value = Reader.ReadInt64().ToString();
-							break;
+							case ObjectSerializer.TYPE_INT64:
+								Value = Reader.ReadInt64().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_VARINT64:
-							Value = Reader.ReadVariableLengthInt64().ToString();
-							break;
+							case ObjectSerializer.TYPE_VARINT64:
+								Value = Reader.ReadVariableLengthInt64().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_SBYTE:
-							Value = Reader.ReadSByte().ToString();
-							break;
+							case ObjectSerializer.TYPE_SBYTE:
+								Value = Reader.ReadSByte().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_UINT16:
-							Value = Reader.ReadUInt16().ToString();
-							break;
+							case ObjectSerializer.TYPE_UINT16:
+								Value = Reader.ReadUInt16().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_VARUINT16:
-							Value = Reader.ReadVariableLengthUInt16().ToString();
-							break;
+							case ObjectSerializer.TYPE_VARUINT16:
+								Value = Reader.ReadVariableLengthUInt16().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_UINT32:
-							Value = Reader.ReadUInt32().ToString();
-							break;
+							case ObjectSerializer.TYPE_UINT32:
+								Value = Reader.ReadUInt32().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_VARUINT32:
-							Value = Reader.ReadVariableLengthUInt32().ToString();
-							break;
+							case ObjectSerializer.TYPE_VARUINT32:
+								Value = Reader.ReadVariableLengthUInt32().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_UINT64:
-							Value = Reader.ReadUInt64().ToString();
-							break;
+							case ObjectSerializer.TYPE_UINT64:
+								Value = Reader.ReadUInt64().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_VARUINT64:
-							Value = Reader.ReadVariableLengthUInt64().ToString();
-							break;
+							case ObjectSerializer.TYPE_VARUINT64:
+								Value = Reader.ReadVariableLengthUInt64().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_DECIMAL:
-							Value = Reader.ReadDecimal().ToString(CultureInfo.InvariantCulture);
-							break;
+							case ObjectSerializer.TYPE_DECIMAL:
+								Value = Reader.ReadDecimal().ToString(CultureInfo.InvariantCulture);
+								break;
 
-						case ObjectSerializer.TYPE_DOUBLE:
-							Value = Reader.ReadDouble().ToString(CultureInfo.InvariantCulture);
-							break;
+							case ObjectSerializer.TYPE_DOUBLE:
+								Value = Reader.ReadDouble().ToString(CultureInfo.InvariantCulture);
+								break;
 
-						case ObjectSerializer.TYPE_SINGLE:
-							Value = Reader.ReadSingle().ToString(CultureInfo.InvariantCulture);
-							break;
+							case ObjectSerializer.TYPE_SINGLE:
+								Value = Reader.ReadSingle().ToString(CultureInfo.InvariantCulture);
+								break;
 
-						case ObjectSerializer.TYPE_DATETIME:
-							Value = Reader.ReadDateTime().ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "z";
-							break;
+							case ObjectSerializer.TYPE_DATETIME:
+								Value = Reader.ReadDateTime().ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "z";
+								break;
 
-						case ObjectSerializer.TYPE_DATETIMEOFFSET:
-							Value = Reader.ReadDateTimeOffset().ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "z";
-							break;
+							case ObjectSerializer.TYPE_DATETIMEOFFSET:
+								Value = Reader.ReadDateTimeOffset().ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "z";
+								break;
 
-						case ObjectSerializer.TYPE_TIMESPAN:
-							Value = Reader.ReadTimeSpan().ToString();
-							break;
+							case ObjectSerializer.TYPE_TIMESPAN:
+								Value = Reader.ReadTimeSpan().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_CHAR:
-							Value = Reader.ReadChar().ToString();
-							break;
+							case ObjectSerializer.TYPE_CHAR:
+								Value = Reader.ReadChar().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_STRING:
-						case ObjectSerializer.TYPE_CI_STRING:
-						case ObjectSerializer.TYPE_ENUM:
-							Value = Reader.ReadString();
-							break;
+							case ObjectSerializer.TYPE_STRING:
+							case ObjectSerializer.TYPE_CI_STRING:
+							case ObjectSerializer.TYPE_ENUM:
+								Value = Reader.ReadString();
+								break;
 
-						case ObjectSerializer.TYPE_BYTEARRAY:
-							Value = Convert.ToBase64String(Reader.ReadByteArray());
-							break;
+							case ObjectSerializer.TYPE_BYTEARRAY:
+								Value = Convert.ToBase64String(Reader.ReadByteArray());
+								break;
 
-						case ObjectSerializer.TYPE_GUID:
-							Value = Reader.ReadGuid().ToString();
-							break;
+							case ObjectSerializer.TYPE_GUID:
+								Value = Reader.ReadGuid().ToString();
+								break;
 
-						case ObjectSerializer.TYPE_NULL:
-							Value = string.Empty;
-							break;
+							case ObjectSerializer.TYPE_NULL:
+								Value = string.Empty;
+								break;
 
-						case ObjectSerializer.TYPE_MIN:
-							Value = "MIN";
-							break;
+							case ObjectSerializer.TYPE_MIN:
+								Value = "MIN";
+								break;
 
-						case ObjectSerializer.TYPE_MAX:
-							Value = "MAX";
-							break;
+							case ObjectSerializer.TYPE_MAX:
+								Value = "MAX";
+								break;
 
-						case ObjectSerializer.TYPE_ARRAY:
-						case ObjectSerializer.TYPE_OBJECT:
-						default:
-							return;
+							case ObjectSerializer.TYPE_ARRAY:
+							case ObjectSerializer.TYPE_OBJECT:
+							default:
+								return;
+						}
+
+						Output.WriteAttributeString(this.fieldNames[i], Value);
 					}
 
-					Output.WriteAttributeString(this.fieldNames[i], Value);
+					Output.WriteAttributeString("objectId", Reader.ReadGuid().ToString());
 				}
-
-				Output.WriteAttributeString("objectId", Reader.ReadGuid().ToString());
 			}
 		}
 

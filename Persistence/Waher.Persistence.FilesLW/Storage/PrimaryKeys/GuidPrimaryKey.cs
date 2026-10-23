@@ -26,7 +26,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		public GuidPrimaryKey(Guid Id)
 		{
 			this.guid = Id;
-			this.empty = Id != Guid.Empty;
+			this.empty = Id == Guid.Empty;
 		}
 
 		/// <summary>
@@ -36,7 +36,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		public GuidPrimaryKey(string Id)
 		{
 			this.guid = new Guid(Id);
-			this.empty = false;
+			this.empty = this.guid == Guid.Empty;
 		}
 
 		/// <summary>
@@ -46,7 +46,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		public GuidPrimaryKey(byte[] Id)
 		{
 			this.guid = new Guid(Id);
-			this.empty = false;
+			this.empty = this.guid == Guid.Empty;
 		}
 
 		/// <summary>
@@ -58,7 +58,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		public GuidPrimaryKey(byte[] Bin, int Offset, int Length)
 		{
 			this.guid = new Guid(Bin.AsSpan(Offset, Length));
-			this.empty = false;
+			this.empty = this.guid == Guid.Empty;
 		}
 
 		/// <summary>
@@ -75,7 +75,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 			set
 			{
 				this.guid = value;
-				this.empty = this.guid != Guid.Empty;
+				this.empty = this.guid == Guid.Empty;
 			}
 		}
 
@@ -97,7 +97,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		public bool Set(Guid Id)
 		{
 			this.guid = Id;
-			this.empty = false;
+			this.empty = Id == Guid.Empty;
 			return true;
 		}
 
@@ -111,7 +111,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 			if (Guid.TryParse(Id, out Guid Parsed))
 			{
 				this.guid = Parsed;
-				this.empty = Parsed != Guid.Empty;
+				this.empty = Parsed == Guid.Empty;
 				return true;
 			}
 			else
@@ -128,7 +128,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 			try
 			{
 				this.guid = new Guid(Id);
-				this.empty = this.guid != Guid.Empty;
+				this.empty = this.guid == Guid.Empty;
 				return true;
 			}
 			catch (Exception)
@@ -149,7 +149,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 			try
 			{
 				this.guid = new Guid(Bin.AsSpan(Offset, Length));
-				this.empty = this.guid != Guid.Empty;
+				this.empty = this.guid == Guid.Empty;
 				
 				return true;
 			}

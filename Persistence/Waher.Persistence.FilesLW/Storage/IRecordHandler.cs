@@ -95,9 +95,9 @@ namespace Waher.Persistence.Files.Storage
 		/// <summary>
 		/// Exports a key to XML.
 		/// </summary>
-		/// <param name="ObjectId">Key to export.</param>
+		/// <param name="PrimaryKey">Key to export.</param>
 		/// <param name="Output">XML Output.</param>
-		void ExportKey(object ObjectId, XmlWriter Output);
+		void ExportKey(IPrimaryKey PrimaryKey, XmlWriter Output);
 
 		/// <summary>
 		/// Encodes a BLOB reference.

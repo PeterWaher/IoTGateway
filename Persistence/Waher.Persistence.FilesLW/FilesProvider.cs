@@ -3883,7 +3883,9 @@ namespace Waher.Persistence.Files
 										if (PrimaryKey.Empty)
 											break;
 
-										uint Len = await File.RecordHandler.GetFullPayloadSize(Reader);
+										uint Len = File.IsGetPayloadSizeAsync
+											? await File.RecordHandler.GetFullPayloadSizeAsync(Reader)
+											: File.RecordHandler.GetFullPayloadSize(Reader);
 
 										if (Len > 0)
 										{

@@ -3384,11 +3384,27 @@ namespace Waher.Persistence.Files.Storage
 		}
 
 		/// <summary>
+		/// If Getting payload size and full payload size is asynchronous (true) or
+		/// synchronous (false).
+		/// </summary>
+		public bool IsGetPayloadSizeAsync => false;
+
+		/// <summary>
 		/// Gets the full payload size.
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>Full size of the payload.</returns>
-		public Task<uint> GetFullPayloadSize(BinaryDeserializer Reader)
+		public uint GetFullPayloadSize(BinaryDeserializer Reader)
+		{
+			return 0;
+		}
+
+		/// <summary>
+		/// Gets the full payload size.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>Full size of the payload.</returns>
+		public Task<uint> GetFullPayloadSizeAsync(BinaryDeserializer Reader)
 		{
 			return Task.FromResult<uint>(0);
 		}
@@ -3440,7 +3456,17 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>Payload size.</returns>
-		public Task<int> GetPayloadSize(BinaryDeserializer Reader)
+		public int GetPayloadSize(BinaryDeserializer Reader)
+		{
+			return 0;
+		}
+
+		/// <summary>
+		/// Gets the payload size.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>Payload size.</returns>
+		public Task<int> GetPayloadSizeAsync(BinaryDeserializer Reader)
 		{
 			return Task.FromResult(0);
 		}

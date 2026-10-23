@@ -38,18 +38,38 @@ namespace Waher.Persistence.Files.Storage
 		bool SkipKey(BinaryDeserializer Reader);
 
 		/// <summary>
+		/// If Getting payload size and full payload size is asynchronous (true) or
+		/// synchronous (false).
+		/// </summary>
+		bool IsGetPayloadSizeAsync { get; }
+
+		/// <summary>
 		/// Gets the full payload size.
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>Full size of the payload.</returns>
-		Task<uint> GetFullPayloadSize(BinaryDeserializer Reader);
+		uint GetFullPayloadSize(BinaryDeserializer Reader);
+
+		/// <summary>
+		/// Gets the full payload size.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>Full size of the payload.</returns>
+		Task<uint> GetFullPayloadSizeAsync(BinaryDeserializer Reader);
 
 		/// <summary>
 		/// Gets the payload size.
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>Size of the payload.</returns>
-		Task<int> GetPayloadSize(BinaryDeserializer Reader);
+		int GetPayloadSize(BinaryDeserializer Reader);
+
+		/// <summary>
+		/// Gets the payload size.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>Size of the payload.</returns>
+		Task<int> GetPayloadSizeAsync(BinaryDeserializer Reader);
 
 		/// <summary>
 		/// Gets the payload size.

@@ -72,6 +72,7 @@ namespace Waher.Persistence.Files
 		private int ivSeedLen;
 		private readonly bool encrypted;
 		private readonly bool mainSynch;
+		private readonly bool isGetPayloadSizeAsync;
 
 		private enum WriteOp
 		{
@@ -139,6 +140,8 @@ namespace Waher.Persistence.Files
 				this.recordHandler = new PrimaryRecords(this.inlineObjectSizeLimit);
 			else
 				this.recordHandler = RecordHandler;
+
+			this.isGetPayloadSizeAsync = this.recordHandler.IsGetPayloadSizeAsync;
 
 			if (this.encrypted)
 			{
@@ -282,6 +285,7 @@ namespace Waher.Persistence.Files
 		}
 
 		internal IRecordHandler RecordHandler => this.recordHandler;
+		internal bool IsGetPayloadSizeAsync => this.isGetPayloadSizeAsync;
 		internal GenericObjectSerializer GenericSerializer => this.genericSerializer;
 		internal MultiReadSingleWriteObject FileAccess => this.fileAccess;
 		internal long FileSizeBytesLocked => this.file.Length;
@@ -967,7 +971,9 @@ namespace Waher.Persistence.Files
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, this.blockLimit);
 			this.recordHandler.SkipKey(Reader);
 			int KeySize = Reader.Position;
-			int Len = (int)await this.recordHandler.GetFullPayloadSize(Reader);
+			int Len = this.isGetPayloadSizeAsync 
+				? (int)await this.recordHandler.GetFullPayloadSizeAsync(Reader)
+				: (int)this.recordHandler.GetFullPayloadSize(Reader);
 			int HeaderSize = Reader.Position;
 
 			if (Len != Bin.Length - Reader.Position)
@@ -1041,7 +1047,9 @@ namespace Waher.Persistence.Files
 				IPrimaryKey PrimaryKey = this.recordHandler.ReadPrimaryKey(Reader);
 				IPrimaryKey PrimaryKey2 = this.recordHandler.CreateKey();
 				int KeySize = Reader.Position - Pos;
-				uint Len = await this.recordHandler.GetFullPayloadSize(Reader);
+				uint Len = this.isGetPayloadSizeAsync 
+					? await this.recordHandler.GetFullPayloadSizeAsync(Reader)
+					: this.recordHandler.GetFullPayloadSize(Reader);
 				int Bookmark = Reader.Position - Pos;
 				uint BlobBlockIndex = Reader.ReadUInt32();
 				uint ExpectedPrev = uint.MaxValue;
@@ -1156,7 +1164,11 @@ namespace Waher.Persistence.Files
 				int KeySize1 = Reader.Position - Offset;
 				int KeySize2;
 
-				await this.recordHandler.GetFullPayloadSize(Reader);
+				if (this.isGetPayloadSizeAsync)
+					await this.recordHandler.GetFullPayloadSizeAsync(Reader);
+				else
+					this.recordHandler.GetFullPayloadSize(Reader);
+
 				BlobBlockIndex = Reader.ReadUInt32();
 
 				while (BlobBlockIndex != uint.MaxValue)
@@ -1246,7 +1258,10 @@ namespace Waher.Persistence.Files
 							this.recordHandler.ReadPrimaryKey(Reader, PrimaryKey3);
 							if (PrimaryKey2.CompareTo(PrimaryKey3) == 0)
 							{
-								Len = await this.recordHandler.GetFullPayloadSize(Reader);
+								Len = this.isGetPayloadSizeAsync 
+									? await this.recordHandler.GetFullPayloadSizeAsync(Reader)
+									: this.recordHandler.GetFullPayloadSize(Reader);
+
 								if (Reader.Position - Info.InternalPosition - 4 + Len > this.inlineObjectSizeLimit)
 								{
 									Buffer.BlockCopy(BitConverter.GetBytes(BlobBlockIndex), 0, Info.Block, Reader.Position, 4);
@@ -1733,7 +1748,10 @@ namespace Waher.Persistence.Files
 					else
 						ChildSize = 0;
 
-					Len = await this.recordHandler.GetPayloadSize(Reader);
+					Len = this.isGetPayloadSizeAsync
+						? await this.recordHandler.GetPayloadSizeAsync(Reader)
+						: this.recordHandler.GetPayloadSize(Reader);
+
 					c = Reader.Position - Pos + Len;
 
 					if (Pos == InsertAt)
@@ -1824,7 +1842,10 @@ namespace Waher.Persistence.Files
 							if (!this.recordHandler.SkipKey(ParentReader))
 								break;
 
-							ParentLen = await this.recordHandler.GetPayloadSize(ParentReader);
+							ParentLen = this.isGetPayloadSizeAsync
+								? await this.recordHandler.GetPayloadSizeAsync(ParentReader)
+								: this.recordHandler.GetPayloadSize(ParentReader);
+
 							ParentReader.Position += ParentLen;
 						}
 						while (ParentBlockIndex != LeftLink && ParentReader.BytesLeft >= 4);
@@ -1871,7 +1892,9 @@ namespace Waher.Persistence.Files
 				if (PrimaryKey.Empty)
 					break;
 
-				Len = await this.recordHandler.GetPayloadSize(Reader);
+				Len = this.isGetPayloadSizeAsync
+					? await this.recordHandler.GetPayloadSizeAsync(Reader)
+					: this.recordHandler.GetPayloadSize(Reader);
 
 				if (ChildLink != 0)
 					await this.CheckChildParentLinkLocked(ChildLink, BlockIndex);
@@ -1943,7 +1966,10 @@ namespace Waher.Persistence.Files
 
 					Comparison = PrimaryKey.CompareTo(PrimaryKey2);
 
-					Len = await this.recordHandler.GetPayloadSize(Reader);
+					Len = this.isGetPayloadSizeAsync
+						? await this.recordHandler.GetPayloadSizeAsync(Reader)
+						: this.recordHandler.GetPayloadSize(Reader);
+
 					Reader.Position += Len;
 				}
 				while (Comparison > 0 && Reader.BytesLeft >= 4);
@@ -2139,7 +2165,10 @@ namespace Waher.Persistence.Files
 
 					Comparison = PrimaryKey.CompareTo(PrimaryKey2);
 
-					Len = await this.recordHandler.GetPayloadSize(Reader);
+					Len = this.isGetPayloadSizeAsync
+						? await this.recordHandler.GetPayloadSizeAsync(Reader)
+						: this.recordHandler.GetPayloadSize(Reader);
+
 					Reader.Position += Len;
 				}
 				while (Comparison > 0 && Reader.BytesLeft >= 4);
@@ -2426,7 +2455,10 @@ namespace Waher.Persistence.Files
 						else
 							ChildSize = 0;
 
-						Len = await this.recordHandler.GetPayloadSize(Reader);
+						Len = this.isGetPayloadSizeAsync
+							? await this.recordHandler.GetPayloadSizeAsync(Reader)
+							: this.recordHandler.GetPayloadSize(Reader);
+
 						c = Reader.Position - Pos + Len;
 
 						if (Pos == Info.InternalPosition)
@@ -2498,7 +2530,10 @@ namespace Waher.Persistence.Files
 								if (!this.recordHandler.SkipKey(ParentReader))
 									break;
 
-								ParentLen = await this.recordHandler.GetPayloadSize(ParentReader);
+								ParentLen = this.isGetPayloadSizeAsync
+									? await this.recordHandler.GetPayloadSizeAsync(ParentReader)
+									: this.recordHandler.GetPayloadSize(ParentReader);
+
 								ParentReader.Position += ParentLen;
 							}
 							while (ParentBlockIndex != LeftLink && ParentReader.BytesLeft >= 4);
@@ -3354,7 +3389,10 @@ namespace Waher.Persistence.Files
 				if (PrimaryKey.Empty)
 					break;
 
-				Len = await this.recordHandler.GetPayloadSize(Reader);
+				Len = this.isGetPayloadSizeAsync
+					? await this.recordHandler.GetPayloadSizeAsync(Reader)
+					: this.recordHandler.GetPayloadSize(Reader);
+
 				Reader.Position += Len;
 
 				c = Reader.Position - Pos - 4;
@@ -3387,7 +3425,10 @@ namespace Waher.Persistence.Files
 				if (PrimaryKey.Empty)
 					break;
 
-				Len = await this.recordHandler.GetPayloadSize(Reader);
+				Len = this.isGetPayloadSizeAsync
+					? await this.recordHandler.GetPayloadSizeAsync(Reader)
+					: this.recordHandler.GetPayloadSize(Reader);
+
 				Reader.Position += Len;
 
 				c = Reader.Position - Pos - 4;
@@ -3429,7 +3470,10 @@ namespace Waher.Persistence.Files
 						if (PrimaryKey.Empty)
 							break;
 
-						Len = await this.recordHandler.GetPayloadSize(Reader);
+						Len = this.isGetPayloadSizeAsync
+							? await this.recordHandler.GetPayloadSizeAsync(Reader)
+							: this.recordHandler.GetPayloadSize(Reader);
+
 						Reader.Position += Len;
 						LastPos = Pos;
 					}
@@ -3440,7 +3484,11 @@ namespace Waher.Persistence.Files
 						Reader.Position = LastPos;
 						Link = Reader.ReadBlockLink();
 						this.recordHandler.SkipKey(Reader);
-						Len = await this.recordHandler.GetPayloadSize(Reader);
+
+						Len = this.isGetPayloadSizeAsync
+							? await this.recordHandler.GetPayloadSizeAsync(Reader)
+							: this.recordHandler.GetPayloadSize(Reader);
+
 						c = Reader.Position + Len - LastPos - 4;
 
 						byte[] Separator = new byte[c];
@@ -3490,7 +3538,10 @@ namespace Waher.Persistence.Files
 					Prev2 = Prev;
 					Prev = Pos;
 
-					Len = await this.recordHandler.GetPayloadSize(Reader);
+					Len = this.isGetPayloadSizeAsync
+						? await this.recordHandler.GetPayloadSizeAsync(Reader)
+						: this.recordHandler.GetPayloadSize(Reader);
+
 					Reader.Position += Len;
 				}
 				while (Reader.BytesLeft >= 4);
@@ -3580,7 +3631,10 @@ namespace Waher.Persistence.Files
 							this.recordHandler.ReadPrimaryKey(Reader, PrimaryKey);
 							if (!PrimaryKey.Empty)
 							{
-								Len = await this.recordHandler.GetPayloadSize(Reader);
+								Len = this.isGetPayloadSizeAsync
+									? await this.recordHandler.GetPayloadSizeAsync(Reader)
+									: this.recordHandler.GetPayloadSize(Reader);
+
 								Reader.Position += Len;
 
 								Second = Reader.Position;
@@ -3642,7 +3696,10 @@ namespace Waher.Persistence.Files
 						break;
 					}
 
-					Len = await this.recordHandler.GetPayloadSize(Reader);
+					Len = this.isGetPayloadSizeAsync
+						? await this.recordHandler.GetPayloadSizeAsync(Reader)
+						: this.recordHandler.GetPayloadSize(Reader);
+
 					Reader.Position += Len;
 				}
 			}
@@ -3740,7 +3797,10 @@ namespace Waher.Persistence.Files
 				if (PrimaryKey.Empty)
 					return null;
 
-				Len = await this.recordHandler.GetPayloadSize(Reader);
+				Len = this.isGetPayloadSizeAsync
+					? await this.recordHandler.GetPayloadSizeAsync(Reader)
+					: this.recordHandler.GetPayloadSize(Reader);
+
 				Reader.Position += Len;
 			}
 			while (PrevBlockLink != ChildIndex && Reader.BytesLeft >= 4);
@@ -3789,7 +3849,10 @@ namespace Waher.Persistence.Files
 						return null;
 					}
 
-					Len = await this.recordHandler.GetPayloadSize(Reader);
+					Len = this.isGetPayloadSizeAsync
+						? await this.recordHandler.GetPayloadSizeAsync(Reader)
+						: this.recordHandler.GetPayloadSize(Reader);
+
 					Reader.Position += Len;
 				}
 				while (PrevBlockLink != ChildIndex && Reader.BytesLeft >= 4);
@@ -3847,6 +3910,7 @@ namespace Waher.Persistence.Files
 
 				BlockLink = Reader.ReadBlockLink();                  // Block link.
 				this.recordHandler.ReadPrimaryKey(Reader, PrimaryKey);
+				
 				if (PrimaryKey.Empty)
 				{
 					BlockLink = PrevBlockLink;
@@ -3855,7 +3919,10 @@ namespace Waher.Persistence.Files
 					break;
 				}
 
-				Len = await this.recordHandler.GetPayloadSize(Reader);
+				Len = this.isGetPayloadSizeAsync
+					? await this.recordHandler.GetPayloadSizeAsync(Reader)
+					: this.recordHandler.GetPayloadSize(Reader);
+
 				Reader.Position += Len;
 			}
 			while (BlockLink != ChildIndex && Reader.BytesLeft >= 4);
@@ -3913,7 +3980,10 @@ namespace Waher.Persistence.Files
 						break;
 					}
 
-					Len = await this.recordHandler.GetPayloadSize(Reader);
+					Len = this.isGetPayloadSizeAsync
+						? await this.recordHandler.GetPayloadSizeAsync(Reader)
+						: this.recordHandler.GetPayloadSize(Reader);
+
 					Reader.Position += Len;
 				}
 				while (BlockLink != ChildIndex && Reader.BytesLeft >= 4);
@@ -4258,7 +4328,10 @@ namespace Waher.Persistence.Files
 						ExistingIds, MinPrimaryKey, PrimaryKey);
 				}
 
-				Len = await this.recordHandler.GetFullPayloadSize(Reader);
+				Len = this.isGetPayloadSizeAsync
+					? await this.recordHandler.GetFullPayloadSizeAsync(Reader)
+					: this.recordHandler.GetFullPayloadSize(Reader);
+
 				Statistics.ReportObjectStatistics((uint)(Reader.Position - Pos - 4 + Len));
 
 				if (Len == 0)
@@ -4623,7 +4696,10 @@ namespace Waher.Persistence.Files
 				if (PrimaryKey.Empty)
 					break;
 
-				Len = await this.recordHandler.GetFullPayloadSize(Reader);
+				Len = this.isGetPayloadSizeAsync 
+					? await this.recordHandler.GetFullPayloadSizeAsync(Reader)
+					: this.recordHandler.GetFullPayloadSize(Reader);
+
 				if (Reader.Position - Pos - 4 + Len > this.inlineObjectSizeLimit)
 				{
 					BlobLink = Reader.ReadBlockLink();
@@ -4939,7 +5015,10 @@ namespace Waher.Persistence.Files
 				if (IncludeChildren && BlockLink != 0)
 					NrObjects += await this.GetObjectCountLocked(BlockLink, IncludeChildren);
 
-				Len = (uint)await this.recordHandler.GetPayloadSize(Reader);
+				Len = this.isGetPayloadSizeAsync
+					? (uint)await this.recordHandler.GetPayloadSizeAsync(Reader)
+					: (uint)this.recordHandler.GetPayloadSize(Reader);
+
 				Reader.Position += (int)Len;
 			}
 
@@ -5001,7 +5080,9 @@ namespace Waher.Persistence.Files
 				if (BlockLink != 0)
 					Rank += await this.GetObjectSizeOfBlockLocked(BlockLink);
 
-				Len = await this.recordHandler.GetPayloadSize(Reader);
+				Len = this.isGetPayloadSizeAsync
+					? await this.recordHandler.GetPayloadSizeAsync(Reader)
+					: this.recordHandler.GetPayloadSize(Reader);
 
 				if (PrimaryKey2.CompareTo(PrimaryKey) == 0)
 				{
@@ -5028,7 +5109,9 @@ namespace Waher.Persistence.Files
 							if (BlockLink != 0)
 								Rank += await this.GetObjectSizeOfBlockLocked(BlockLink);
 
-							Len = await this.recordHandler.GetPayloadSize(Reader);
+							Len = this.isGetPayloadSizeAsync
+								? await this.recordHandler.GetPayloadSizeAsync(Reader)
+								: this.recordHandler.GetPayloadSize(Reader);
 
 							Rank++;
 							Reader.Position += Len;
@@ -5619,7 +5702,7 @@ namespace Waher.Persistence.Files
 					continue;
 
 				ForeignKey = await Records.Serialize(Result.CurrentPrimaryKey.Guid, Result.Current, Result.CurrentSerializer, MissingFieldAction.Null);
-				SortedObjects[new Searching.SortedReference<T>(ForeignKey, 
+				SortedObjects[new Searching.SortedReference<T>(ForeignKey.Clone(), 
 					Result.Current, Result.CurrentSerializer, Result.CurrentPrimaryKey)] = true;
 			}
 

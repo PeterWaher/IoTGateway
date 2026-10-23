@@ -180,7 +180,8 @@ namespace Waher.Persistence.Files
 
 				if (ReplaceIfExists)
 				{
-					Info = await this.dictionaryFile.FindNodeLocked(PrimaryKey, true);
+					Info = await this.dictionaryFile.FindNodeLocked(PrimaryKey, true)
+						?? throw new KeyNotFoundException("Unable to serialize object or find insert position.");
 
 					if (Info.Match)
 						await this.dictionaryFile.ReplaceObjectLocked(Bin, Info, true);

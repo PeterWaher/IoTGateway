@@ -26,7 +26,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		public GuidPrimaryKey(Guid Id)
 		{
 			this.guid = Id;
-			this.empty = false;
+			this.empty = Id != Guid.Empty;
 		}
 
 		/// <summary>
@@ -72,7 +72,11 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		public Guid Value
 		{
 			get => this.guid;
-			set => this.guid = value;
+			set
+			{
+				this.guid = value;
+				this.empty = this.guid != Guid.Empty;
+			}
 		}
 
 		/// <summary>
@@ -142,7 +146,8 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		/// <param name="PrimaryKey">Recipient of the primary key value.</param>
 		public void CopyTo(GuidPrimaryKey PrimaryKey)
 		{
-			PrimaryKey.Value = this.guid;
+			PrimaryKey.guid = this.guid;
+			PrimaryKey.empty = this.empty;
 		}
 
 		/// <summary>

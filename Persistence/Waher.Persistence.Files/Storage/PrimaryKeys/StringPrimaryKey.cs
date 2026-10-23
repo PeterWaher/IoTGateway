@@ -37,7 +37,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		public StringPrimaryKey(string Id)
 		{
 			this.id = Id;
-			this.empty = false;
+			this.empty = !string.IsNullOrEmpty(Id);
 		}
 
 		/// <summary>
@@ -78,7 +78,11 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		public string Value
 		{
 			get => this.id;
-			set => this.id = value;
+			set
+			{
+				this.id = value;
+				this.empty = !string.IsNullOrEmpty(this.id);
+			}
 		}
 
 		/// <summary>
@@ -153,6 +157,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		public void CopyTo(StringPrimaryKey PrimaryKey)
 		{
 			PrimaryKey.id = this.id;
+			PrimaryKey.empty = this.empty;
 		}
 
 		/// <summary>

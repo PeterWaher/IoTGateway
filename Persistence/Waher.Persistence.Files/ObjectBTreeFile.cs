@@ -5703,7 +5703,7 @@ namespace Waher.Persistence.Files
 
 				ForeignKey = await Records.Serialize(Result.CurrentPrimaryKey.Guid, Result.Current, Result.CurrentSerializer, MissingFieldAction.Null);
 				SortedObjects[new Searching.SortedReference<T>(ForeignKey.Clone(), 
-					Result.Current, Result.CurrentSerializer, Result.CurrentPrimaryKey)] = true;
+					Result.Current, Result.CurrentSerializer, Result.CurrentPrimaryKey.Clone())] = true;
 			}
 
 			return new Searching.SortedCursor<T>(SortedObjects, Records);

@@ -16,6 +16,7 @@ namespace Waher.Persistence.FilesLW.Test
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class DBFilesProviderTests
 	{
 		internal const int BlocksInCache = 10000;

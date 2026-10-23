@@ -10,6 +10,7 @@ namespace Waher.Persistence.FilesLW.Test
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class DBFilesIncTests
 	{
 		[TestMethod]

@@ -12,6 +12,7 @@ namespace Waher.Persistence.FilesLW.Test
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class KeySetTests
 	{
 		[TestMethod]

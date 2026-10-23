@@ -9,7 +9,6 @@ using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Profiling;
 
-
 #if !LW
 using Waher.Persistence.Queues.Test.Classes;
 using Waher.Persistence.Queues.Test.Workers;
@@ -22,6 +21,7 @@ namespace Waher.Persistence.QueuesLW.Test
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public sealed class DBQueuesMultiFileTests
 	{
 		internal const string DataFolder = "Data";

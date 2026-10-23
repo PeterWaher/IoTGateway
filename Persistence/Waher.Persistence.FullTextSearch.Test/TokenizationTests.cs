@@ -1,9 +1,9 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Xml;
 
 namespace Waher.Persistence.FullTextSearch.Test
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class TokenizationTests
 	{
 		[TestMethod]

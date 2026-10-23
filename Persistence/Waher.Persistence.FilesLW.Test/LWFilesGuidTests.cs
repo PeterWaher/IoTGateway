@@ -11,6 +11,7 @@ namespace Waher.Persistence.FilesLW.Test
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class DBFilesGuidTests
 	{
 		private static SequentialGuidGenerator gen;

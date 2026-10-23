@@ -18,6 +18,7 @@ namespace Waher.Persistence.FilesLW.Test
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class DBFilesStringDictionaryTests
 	{
 		internal const string FileName = "Data\\Dictionary.btree";

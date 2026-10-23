@@ -21,6 +21,7 @@ namespace Waher.Persistence.FilesLW.Test
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class DBFilesPersistenceTests
 	{
 		internal const string Folder = "Data";

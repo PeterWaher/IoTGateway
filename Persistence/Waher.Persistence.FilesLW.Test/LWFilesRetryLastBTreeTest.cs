@@ -9,8 +9,6 @@ using Waher.Persistence.Serialization;
 using Waher.Runtime.Console;
 using Waher.Persistence.Files.Storage;
 
-
-
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
 
@@ -23,6 +21,7 @@ namespace Waher.Persistence.FilesLW.Test
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class DBFilesRetryLastBTreeTest
 	{
 		private ObjectBTreeFile file;

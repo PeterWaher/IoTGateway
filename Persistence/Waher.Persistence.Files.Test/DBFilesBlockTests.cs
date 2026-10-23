@@ -14,6 +14,7 @@ namespace Waher.Persistence.FilesLW.Test
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class BlocksTests
 	{
 		private const int BlockSize = 16384;

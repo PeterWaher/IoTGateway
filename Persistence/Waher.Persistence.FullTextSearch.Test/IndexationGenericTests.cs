@@ -1,10 +1,10 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.FullTextSearch.Test.Classes;
 using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.FullTextSearch.Test
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class IndexationGenericTests : IndexationTestsBase<GenericObject, GenericAccess>
 	{
 		public IndexationGenericTests()

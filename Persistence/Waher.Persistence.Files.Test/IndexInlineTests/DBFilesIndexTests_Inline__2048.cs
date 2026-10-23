@@ -7,6 +7,7 @@ namespace Waher.Persistence.FilesLW.Test.IndexInlineTests
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class DBFilesIndexTests_Inline__2048 : DBFilesIndexTests
 	{
 		public override int BlockSize

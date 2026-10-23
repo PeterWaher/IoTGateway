@@ -29,6 +29,7 @@ namespace Waher.Persistence.FilesLW.Test
 	}
 
 	[TestClass]
+	[DoNotParallelize]
 	public class DBBinarySerializationTests
 	{
 		[TestMethod]

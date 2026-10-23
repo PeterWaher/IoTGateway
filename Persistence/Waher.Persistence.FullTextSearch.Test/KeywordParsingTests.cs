@@ -1,4 +1,3 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using Waher.Events;
 using Waher.Events.Console;
@@ -11,6 +10,7 @@ using Waher.Runtime.Inventory;
 namespace Waher.Persistence.FullTextSearch.Test
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class KeywordParsingTests
 	{
 		private static FilesProvider? filesProvider = null;

@@ -9,6 +9,7 @@ namespace Waher.Persistence.FilesLW.Test
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class DBFilesRangeTests
 	{
 		private RangeInfo range;

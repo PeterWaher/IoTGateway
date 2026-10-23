@@ -1,4 +1,3 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.FullTextSearch.Files;
 using Waher.Persistence.FullTextSearch.Keywords;
 using Waher.Runtime.Console;
@@ -6,6 +5,7 @@ using Waher.Runtime.Console;
 namespace Waher.Persistence.FullTextSearch.Test
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class FilesTests
 	{
 		[ClassInitialize]

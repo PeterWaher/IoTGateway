@@ -11,6 +11,7 @@ namespace Waher.Persistence.FilesLW.Test.BTreeBlobTests
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class DBFilesBTreeTests_BLOB__1024 : DBFilesBTreeTests_Inline__1024 
 	{
 		public override int MaxStringLength

@@ -13,6 +13,7 @@ namespace Waher.Persistence.FilesLW.Test
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class DBFilesIndexKeyComparisonTests
 	{
 		private static FilesProvider provider;

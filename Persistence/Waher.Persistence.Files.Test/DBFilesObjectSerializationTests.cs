@@ -13,8 +13,6 @@ using Waher.Script.Objects;
 using Waher.Security;
 using System.Collections;
 
-
-
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
 
@@ -27,6 +25,7 @@ namespace Waher.Persistence.FilesLW.Test
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class DBFilesObjectSerializationTests
 	{
 		private static FilesProvider provider;

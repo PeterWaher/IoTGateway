@@ -12,7 +12,6 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.Profiling;
 using Waher.Script;
 
-
 #if !LW
 using Waher.Persistence.Queues.Test.Classes;
 using Waher.Persistence.Queues.Test.Workers;
@@ -25,6 +24,7 @@ namespace Waher.Persistence.QueuesLW.Test
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public sealed class DBQueuesSingleFileTests
 	{
 		internal const string Folder = "Data";

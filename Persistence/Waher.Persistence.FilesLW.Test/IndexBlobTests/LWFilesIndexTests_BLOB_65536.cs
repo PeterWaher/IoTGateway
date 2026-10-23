@@ -11,6 +11,7 @@ namespace Waher.Persistence.FilesLW.Test.IndexBlobTests
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class DBFilesIndexTests_BLOB_65536 : DBFilesIndexTests_Inline_65536
 	{
 		public override int MaxStringLength

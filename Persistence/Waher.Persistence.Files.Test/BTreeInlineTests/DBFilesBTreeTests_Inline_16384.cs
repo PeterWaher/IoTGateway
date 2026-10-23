@@ -7,6 +7,7 @@ namespace Waher.Persistence.FilesLW.Test.BTreeInlineTests
 #endif
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class DBFilesBTreeTests_Inline_16384 : DBFilesBTreeTests
 	{
 		public override int BlockSize

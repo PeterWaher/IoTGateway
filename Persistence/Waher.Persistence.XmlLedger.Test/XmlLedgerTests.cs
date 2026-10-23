@@ -7,6 +7,7 @@ using Waher.Runtime.Inventory;
 namespace Waher.Persistence.XmlLedger.Test
 {
 	[TestClass]
+	[DoNotParallelize]
 	public class XmlLedgerTests
 	{
 		private static FilesProvider? provider;

@@ -800,9 +800,10 @@ namespace Waher.Persistence.Files
 			if (Block is null || Block.Length != this.blockSize)
 				throw Database.FlagForRepair(this.collectionName, "Block not of the correct block size.");
 
-			if (this.provider.TryGetBlock(this.id, BlockIndex, out byte[] PrevBlock) && PrevBlock != Block)
+			if (this.provider.TryGetBlock(this.id, BlockIndex, out byte[] PrevBlock) &&
+				PrevBlock != Block)
 			{
-				if (Array.Equals(PrevBlock, Block))
+				if (PrevBlock.AsSpan().SequenceEqual(Block))
 				{
 					this.provider.AddBlockToCache(this.id, BlockIndex, Block);   // Update to new reference.
 					return;     // No need to save.

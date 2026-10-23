@@ -725,7 +725,9 @@ namespace Waher.Persistence.Files
 			this.recordHandler.SkipKey(this.currentReader);
 
 			BinaryDeserializer Reader = this.currentReader;
-			KeyValuePair<int, bool> P = await this.recordHandler.GetPayloadSizeEx(Reader);
+			KeyValuePair<int, bool> P = this.isGetPayloadSizeAsync
+				? await this.recordHandler.GetPayloadSizeExAsync(Reader)
+				: this.recordHandler.GetPayloadSizeEx(Reader);
 			int Len = P.Key;
 			bool IsBlob = P.Value;
 			int PosBak = this.currentReader.Position;

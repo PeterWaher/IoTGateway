@@ -3476,7 +3476,17 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>Size of the payload, and if the object is a BLOB.</returns>
-		public Task<KeyValuePair<int, bool>> GetPayloadSizeEx(BinaryDeserializer Reader)
+		public KeyValuePair<int, bool> GetPayloadSizeEx(BinaryDeserializer Reader)
+		{
+			return new KeyValuePair<int, bool>(0, false);
+		}
+
+		/// <summary>
+		/// Gets the payload size.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>Size of the payload, and if the object is a BLOB.</returns>
+		public Task<KeyValuePair<int, bool>> GetPayloadSizeExAsync(BinaryDeserializer Reader)
 		{
 			return Task.FromResult(new KeyValuePair<int, bool>(0, false));
 		}
@@ -3486,7 +3496,17 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>If the following object is a BLOB.</returns>
-		public Task<bool> IsBlob(BinaryDeserializer Reader)
+		public bool IsBlob(BinaryDeserializer Reader)
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Checks if the following object is a BLOB.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>If the following object is a BLOB.</returns>
+		public Task<bool> IsBlobAsync(BinaryDeserializer Reader)
 		{
 			return Task.FromResult(false);
 		}

@@ -138,15 +138,25 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>Size of the payload, and if the object is a BLOB.</returns>
-		public Task<KeyValuePair<int, bool>> GetPayloadSizeEx(BinaryDeserializer Reader)
+		public KeyValuePair<int, bool> GetPayloadSizeEx(BinaryDeserializer Reader)
 		{
 			int Pos = Reader.Position;
 			int Len = (int)Reader.ReadVariableLengthUInt64();
 
 			if (16 + Reader.Position - Pos + Len > this.inlineObjectSizeLimit)
-				return Task.FromResult(new KeyValuePair<int, bool>(4, true));
+				return new KeyValuePair<int, bool>(4, true);
 			else
-				return Task.FromResult(new KeyValuePair<int, bool>(Len, false));
+				return new KeyValuePair<int, bool>(Len, false);
+		}
+
+		/// <summary>
+		/// Gets the payload size.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>Size of the payload, and if the object is a BLOB.</returns>
+		public Task<KeyValuePair<int, bool>> GetPayloadSizeExAsync(BinaryDeserializer Reader)
+		{
+			return Task.FromResult(this.GetPayloadSizeEx(Reader));
 		}
 
 		/// <summary>
@@ -154,12 +164,22 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>If the following object is a BLOB.</returns>
-		public Task<bool> IsBlob(BinaryDeserializer Reader)
+		public bool IsBlob(BinaryDeserializer Reader)
 		{
 			int Pos = Reader.Position;
 			int Len = (int)Reader.ReadVariableLengthUInt64();
 
-			return Task.FromResult(16 + Reader.Position - Pos + Len > this.inlineObjectSizeLimit);
+			return 16 + Reader.Position - Pos + Len > this.inlineObjectSizeLimit;
+		}
+
+		/// <summary>
+		/// Checks if the following object is a BLOB.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>If the following object is a BLOB.</returns>
+		public Task<bool> IsBlobAsync(BinaryDeserializer Reader)
+		{
+			return Task.FromResult(this.IsBlob(Reader));
 		}
 
 		/// <summary>

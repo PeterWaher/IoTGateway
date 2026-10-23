@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence.Files.Storage;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
 
@@ -14,7 +15,7 @@ namespace Waher.Persistence.Files.Searching
 	/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 	internal class UnionCursor<T> : ICursor<T>
 	{
-		private readonly Dictionary<Guid, bool> returned = new Dictionary<Guid, bool>();
+		private readonly Dictionary<IPrimaryKey, bool> returned = new Dictionary<IPrimaryKey, bool>();
 		private ICursor<T> currentCursor;
 		private readonly Filter[] childFilters;
 		private readonly ObjectBTreeFile file;
@@ -65,11 +66,11 @@ namespace Waher.Persistence.Files.Searching
 		public bool CurrentTypeCompatible => this.CurrentCursor.CurrentTypeCompatible;
 
 		/// <summary>
-		/// Gets the Object ID of the current object.
+		/// Gets the Primary Key of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
 		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		public Guid CurrentObjectId => this.CurrentCursor.CurrentObjectId;
+		public IPrimaryKey CurrentPrimaryKey => this.CurrentCursor.CurrentPrimaryKey;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -121,7 +122,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public async Task<bool> MoveNextAsyncLocked()
 		{
-			Guid ObjectId;
+			IPrimaryKey PrimaryKey;
 
 			while (true)
 			{
@@ -142,11 +143,11 @@ namespace Waher.Persistence.Files.Searching
 				if (!this.currentCursor.CurrentTypeCompatible)
 					continue;
 
-				ObjectId = this.currentCursor.CurrentObjectId;
-				if (this.returned.ContainsKey(ObjectId))
+				PrimaryKey = this.currentCursor.CurrentPrimaryKey;
+				if (this.returned.ContainsKey(PrimaryKey))
 					continue;
 
-				this.returned[ObjectId] = true;
+				this.returned[PrimaryKey.Clone()] = true;
 				return true;
 			}
 		}

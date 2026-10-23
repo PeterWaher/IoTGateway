@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence.Files.Storage;
 using Waher.Persistence.Serialization;
 using Waher.Script.Units.BaseQuantities;
 
@@ -31,11 +32,11 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Gets the Object ID of the current object.
+		/// Gets the Primary Key of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
 		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		Guid CurrentObjectId
+		IPrimaryKey CurrentPrimaryKey
 		{
 			get;
 		}

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Persistence.Files.Storage.PrimaryKeys;
 using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.Files.Storage
@@ -37,7 +38,7 @@ namespace Waher.Persistence.Files.Storage
 	/// <summary>
 	/// Handles index storage of object references.
 	/// </summary>
-	public class IndexRecords : IRecordHandler, IComparer<byte[]>
+	public class IndexRecords : IRecordHandler
 	{
 		private IndexBTreeFile index;
 		private readonly string[] fieldNames;
@@ -126,14 +127,17 @@ namespace Waher.Persistence.Files.Storage
 		}
 
 		/// <summary>
-		/// Serializes the index key for a given object and the underlying index fields.
+		/// Serializes the index key (foreign key) for a given object and the underlying 
+		/// index fields.
 		/// </summary>
 		/// <param name="ObjectId">Object ID</param>
 		/// <param name="Object">Object</param>
 		/// <param name="Serializer">Serializer.</param>
 		/// <param name="MissingFields">How missing fields are to be treated.</param>
-		/// <returns>Serialized index, if object can be indexed using the current index, or null otherwise.</returns>
-		public async Task<byte[]> Serialize(Guid ObjectId, object Object, IObjectSerializer Serializer, MissingFieldAction MissingFields)
+		/// <returns>Serialized index. Index will be empty if the object can not be indexed 
+		/// using the current index.</returns>
+		public async Task<BinaryPrimaryKey> Serialize(Guid ObjectId, object Object, 
+			IObjectSerializer Serializer, MissingFieldAction MissingFields)
 		{
 			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
 			int i;
@@ -168,17 +172,17 @@ namespace Waher.Persistence.Files.Storage
 
 						case MissingFieldAction.Prohibit:
 						default:
-							return null;
+							return new BinaryPrimaryKey(this);
 					}
 				}
 
 				if (!this.Serialize(Writer, Value))
-					return null;
+					return new BinaryPrimaryKey(this);
 			}
 
 			Writer.Write(ObjectId);
 
-			return Writer.GetSerialization();
+			return new BinaryPrimaryKey(this, Writer.GetSerialization());
 		}
 
 		/// <summary>
@@ -351,47 +355,40 @@ namespace Waher.Persistence.Files.Storage
 		}
 
 		/// <summary>
-		/// Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
+		/// Compares two binary encoded foreign keys and returns a value indicating whether 
+		/// one is less than, equal to, or greater than the other.
 		/// </summary>
-		/// <param name="x">The first object to compare.</param>
-		/// <param name="y">The second object to compare.</param>
-		/// <returns>A signed integer that indicates the relative values of x and y, as shown in the following table.
-		///		Value Meaning Less than zero x is less than y.
-		///		Zero x equals y. 
-		///		Greater than zero x is greater than y.</returns>
-		public int Compare(object x, object y)
+		/// <param name="x">The first foreign key to compare.</param>
+		/// <param name="xLen">Length of <paramref name="x"/>.</param>
+		/// <param name="y">The second foreign key to compare.</param>
+		/// <param name="yLen">Length of <paramref name="y"/>.</param>
+		/// <returns>A signed integer that indicates the relative values of x and y, 
+		/// as shown in the following table.
+		/// 
+		///	Value Meaning Less than zero x is less than y.
+		///	Zero x equals y. 
+		///	Greater than zero x is greater than y.</returns>
+		public int Compare(byte[] x, int xLen, byte[] y, int yLen)
 		{
-			byte[] xBytes = (byte[])x;
-			byte[] yBytes = (byte[])y;
-
-			return this.Compare(xBytes, yBytes);
-		}
-
-		/// <summary>
-		/// Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
-		/// </summary>
-		/// <param name="x">The first object to compare.</param>
-		/// <param name="y">The second object to compare.</param>
-		/// <returns>A signed integer that indicates the relative values of x and y, as shown in the following table.
-		///		Value Meaning Less than zero x is less than y.
-		///		Zero x equals y. 
-		///		Greater than zero x is greater than y.</returns>
-		public int Compare(byte[] x, byte[] y)
-		{
-			if (x is null)
+			if (xLen == 0)
 			{
-				if (y is null)
+				if (yLen == 0)
 					return 0;
 				else
 					return -1;
 			}
-			else if (y is null)
+			else if (yLen == 0)
 				return 1;
 			else
 			{
 				uint BlockLimit = this.index?.BlockLimit ?? uint.MaxValue;
-				BinaryDeserializer xReader = new BinaryDeserializer(this.collectionName, this.encoding, x, BlockLimit);
-				BinaryDeserializer yReader = new BinaryDeserializer(this.collectionName, this.encoding, y, BlockLimit);
+				
+				BinaryDeserializer xReader = new BinaryDeserializer(this.collectionName, 
+					this.encoding, x, BlockLimit, 0, xLen);
+
+				BinaryDeserializer yReader = new BinaryDeserializer(this.collectionName, 
+					this.encoding, y, BlockLimit, 0, yLen);
+				
 				uint xType, yType;
 				int i, j;
 				long l;
@@ -3397,25 +3394,45 @@ namespace Waher.Persistence.Files.Storage
 		}
 
 		/// <summary>
-		/// Gets the key of the next record.
+		/// Creates an empty primary key object.
+		/// </summary>
+		/// <returns>Primary key object.</returns>
+		public IPrimaryKey CreateKey()
+		{
+			return new BinaryPrimaryKey(this);
+		}
+
+		/// <summary>
+		/// Reads the next primary key.
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
-		/// <returns>Key object.</returns>
-		public object GetKey(BinaryDeserializer Reader)
+		/// <returns>Primary key object.</returns>
+		public IPrimaryKey ReadPrimaryKey(BinaryDeserializer Reader)
+		{
+			IPrimaryKey Result = this.CreateKey();
+			this.ReadPrimaryKey(Reader, Result);
+			return Result;
+		}
+
+		/// <summary>
+		/// Reads the next primary key.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <param name="Key">Primary key object.</param>
+		public void ReadPrimaryKey(BinaryDeserializer Reader, IPrimaryKey Key)
 		{
 			int Pos = Reader.Position;
 
-			if (!this.SkipKey(Reader, out _, true))
-				return null;
-
-			int Len = Reader.Position - Pos;
-			if (Len > this.keySizeLimit)
-				return null;
-
-			byte[] Key = new byte[Len];
-			Buffer.BlockCopy(Reader.Data, Pos, Key, 0, Len);
-
-			return Key;
+			if (this.SkipKey(Reader, out _, true))
+			{
+				int Len = Reader.Position - Pos;
+				if (Len <= this.keySizeLimit)
+					Key.Set(Reader.Data, Pos, Len);
+				else
+					Key.Clear();
+			}
+			else
+				Key.Clear();
 		}
 
 		/// <summary>

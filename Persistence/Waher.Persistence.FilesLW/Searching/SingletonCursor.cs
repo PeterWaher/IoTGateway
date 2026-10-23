@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence.Files.Storage;
 using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.Files.Searching
@@ -15,7 +16,7 @@ namespace Waher.Persistence.Files.Searching
 		private readonly T value;
 		private readonly IObjectSerializer serializer;
 		private readonly ObjectSerializer objectSerializer;
-		private readonly Guid objectId;
+		private readonly IPrimaryKey primaryKey;
 		private bool isCurrent = false;
 
 		/// <summary>
@@ -23,13 +24,13 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		/// <param name="Value">Singleton value.</param>
 		/// <param name="Serializer">Serializer of <paramref name="Value"/>.</param>
-		///	<param name="ObjectId">Object ID.</param>
-		internal SingletonCursor(T Value, IObjectSerializer Serializer, Guid ObjectId)
+		///	<param name="PrimaryKey">Primary key.</param>
+		internal SingletonCursor(T Value, IObjectSerializer Serializer, IPrimaryKey PrimaryKey)
 		{
 			this.value = Value;
 			this.serializer = Serializer;
 			this.objectSerializer = Serializer as ObjectSerializer;
-			this.objectId = ObjectId;
+			this.primaryKey = PrimaryKey;
 		}
 
 		/// <summary>
@@ -69,16 +70,16 @@ namespace Waher.Persistence.Files.Searching
 		public bool CurrentTypeCompatible => true;
 
 		/// <summary>
-		/// Gets the Object ID of the current object.
+		/// Gets the Primary Key of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
 		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		public Guid CurrentObjectId
+		public IPrimaryKey CurrentPrimaryKey
 		{
 			get
 			{
 				if (this.isCurrent)
-					return this.objectId;
+					return this.primaryKey;
 				else
 					throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
 			}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Threading.Tasks;
+using Waher.Persistence.Files.Storage;
 using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.Files.Searching
@@ -59,17 +60,11 @@ namespace Waher.Persistence.Files.Searching
 		}
 
 		/// <summary>
-		/// Gets the Object ID of the current object.
+		/// Gets the Primary Key of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
 		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		public Guid CurrentObjectId
-		{
-			get
-			{
-				return this.cursor.CurrentObjectId;
-			}
-		}
+		public IPrimaryKey CurrentPrimaryKey => this.cursor.CurrentPrimaryKey;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>

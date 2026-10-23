@@ -99,29 +99,16 @@ namespace Waher.Persistence.Files.Searching
 
 		internal static string ToString(object Value, uint TypeCode)
 		{
-			switch (TypeCode)
+			return TypeCode switch
 			{
-				case ObjectSerializer.TYPE_NULL:
-					return string.Empty;
-
-				case ObjectSerializer.TYPE_DOUBLE:
-					return ((double)Value).ToString(CultureInfo.InvariantCulture);
-
-				case ObjectSerializer.TYPE_DECIMAL:
-					return ((decimal)Value).ToString(CultureInfo.InvariantCulture);
-
-				case ObjectSerializer.TYPE_DATETIME:
-					return ((DateTime)Value).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "z";
-
-				case ObjectSerializer.TYPE_DATETIMEOFFSET:
-					return ((DateTimeOffset)Value).ToUniversalTime().DateTime.ToString("yyyy-MM-ddTHH:mm:ss") + "z";
-
-				case ObjectSerializer.TYPE_BYTEARRAY:
-					return Convert.ToBase64String((byte[])Value);
-
-				default:
-					return Value?.ToString() ?? string.Empty;
-			}
+				ObjectSerializer.TYPE_NULL => string.Empty,
+				ObjectSerializer.TYPE_DOUBLE => ((double)Value).ToString(CultureInfo.InvariantCulture),
+				ObjectSerializer.TYPE_DECIMAL => ((decimal)Value).ToString(CultureInfo.InvariantCulture),
+				ObjectSerializer.TYPE_DATETIME => ((DateTime)Value).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "z",
+				ObjectSerializer.TYPE_DATETIMEOFFSET => ((DateTimeOffset)Value).ToUniversalTime().DateTime.ToString("yyyy-MM-ddTHH:mm:ss") + "z",
+				ObjectSerializer.TYPE_BYTEARRAY => Convert.ToBase64String((byte[])Value),
+				_ => Value?.ToString() ?? string.Empty,
+			};
 		}
 
 		private static void Upgrade(ref object Value, ref uint TypeCode)
@@ -1079,9 +1066,9 @@ namespace Waher.Persistence.Files.Searching
 			char ch = Value[c - 1];
 
 			if (ch == 0)
-				Value = Value.Substring(0, c - 1);
+				Value = Value[..(c - 1)];
 			else
-				Value = Value.Substring(0, c - 1) + ((char)(ch - 1)) + char.MaxValue;
+				Value = Value[..(c - 1)] + ((char)(ch - 1)) + char.MaxValue;
 
 			return true;
 		}

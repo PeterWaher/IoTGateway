@@ -8,6 +8,10 @@ using Waher.Persistence.Filters;
 using Waher.Runtime.Console;
 using Waher.Script;
 using Waher.Script.Objects.Matrices;
+using Waher.Persistence.Files.Storage;
+using Waher.Persistence.Files.Storage.PrimaryKeys;
+
+
 
 
 #if !LW
@@ -203,7 +207,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
 					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
-					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(Obj.ObjectId, e.CurrentPrimaryKey.Guid);
 				}
 
 				AssertEx.Same(0, Objects.Count);
@@ -223,7 +227,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(Objects2.Remove(Obj.ObjectId));
 
 					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
-					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(Obj.ObjectId, e.CurrentPrimaryKey.Guid);
 				}
 
 				AssertEx.Same(0, Objects2.Count);
@@ -243,7 +247,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(Objects3.Remove(Obj.ObjectId));
 
 					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
-					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(Obj.ObjectId, e.CurrentPrimaryKey.Guid);
 				}
 			}
 			finally
@@ -306,7 +310,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
 					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
-					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(Obj.ObjectId, e.CurrentPrimaryKey.Guid);
 				}
 			}
 			finally
@@ -334,7 +338,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(Objects2.Remove(Obj.ObjectId));
 
 					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
-					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(Obj.ObjectId, e.CurrentPrimaryKey.Guid);
 				}
 			}
 			finally
@@ -362,7 +366,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(Objects3.Remove(Obj.ObjectId));
 
 					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
-					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(Obj.ObjectId, e.CurrentPrimaryKey.Guid);
 				}
 			}
 			finally
@@ -425,7 +429,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
 					AssertEx.Same(--Rank, await e.GetCurrentRankLocked());
-					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(Obj.ObjectId, e.CurrentPrimaryKey.Guid);
 				}
 			}
 			finally
@@ -453,7 +457,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(Objects2.Remove(Obj.ObjectId));
 
 					AssertEx.Same(--Rank, await e.GetCurrentRankLocked());
-					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(Obj.ObjectId, e.CurrentPrimaryKey.Guid);
 				}
 			}
 			finally
@@ -481,7 +485,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(Objects3.Remove(Obj.ObjectId));
 
 					AssertEx.Same(--Rank, await e.GetCurrentRankLocked());
-					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(Obj.ObjectId, e.CurrentPrimaryKey.Guid);
 				}
 			}
 			finally
@@ -501,8 +505,8 @@ namespace Waher.Persistence.FilesLW.Test
 			while (NrObjects > 0)
 			{
 				Simple Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
-				Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
-				Result[ObjectId] = Obj;
+				IPrimaryKey PrimaryKey = await this.file.SaveNewObject(Obj, false, null);
+				Result[PrimaryKey.Guid] = Obj;
 				NrObjects--;
 			}
 
@@ -551,7 +555,7 @@ namespace Waher.Persistence.FilesLW.Test
 							DBFilesObjectSerializationTests.AssertEqual(Ordered[i + j], Obj);
 
 							AssertEx.Same(i + j, await e.GetCurrentRankLocked());
-							AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
+							AssertEx.Same(Obj.ObjectId, e.CurrentPrimaryKey.Guid);
 						}
 						while (await e.MoveNextAsyncLocked() && j++ < 10);
 					}
@@ -580,7 +584,7 @@ namespace Waher.Persistence.FilesLW.Test
 							DBFilesObjectSerializationTests.AssertEqual(Ordered[i - j], Obj);
 
 							AssertEx.Same(i - j, await e.GetCurrentRankLocked());
-							AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
+							AssertEx.Same(Obj.ObjectId, e.CurrentPrimaryKey.Guid);
 						}
 						while (await e.MovePreviousAsyncLocked() && j++ < 10);
 					}
@@ -616,7 +620,7 @@ namespace Waher.Persistence.FilesLW.Test
 			try
 			{
 				for (i = 0; i < c; i++)
-					AssertEx.Same(i, await this.index1.GetRankLocked(Ordered[i].ObjectId));
+					AssertEx.Same(i, await this.index1.GetRankLocked(new GuidPrimaryKey(Ordered[i].ObjectId)));
 			}
 			finally
 			{
@@ -648,7 +652,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(Objects.ContainsKey(Obj.ObjectId));
 
 					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
-					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(Obj.ObjectId, e.CurrentPrimaryKey.Guid);
 				}
 
 				e.Reset();
@@ -665,7 +669,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
 					AssertEx.Same(--Rank, await e.GetCurrentRankLocked());
-					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(Obj.ObjectId, e.CurrentPrimaryKey.Guid);
 				}
 			}
 			finally
@@ -721,7 +725,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 				Objects[i] = Obj;
 
-				Obj = await this.file.LoadObject<Simple>(Obj.ObjectId);
+				Obj = await this.file.LoadObject<Simple>(new GuidPrimaryKey(Obj.ObjectId));
 				DBFilesObjectSerializationTests.AssertEqual(Objects[i], Obj);
 			}
 
@@ -729,7 +733,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			for (i = 0; i < c; i++)
 			{
-				Obj = await this.file.LoadObject<Simple>(Objects[i].ObjectId);
+				Obj = await this.file.LoadObject<Simple>(new GuidPrimaryKey(Objects[i].ObjectId));
 				DBFilesObjectSerializationTests.AssertEqual(Objects[i], Obj);
 			}
 
@@ -742,7 +746,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 				while (await e.MoveNextAsyncLocked())
 				{
-					AssertEx.Same(e.Current.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(e.Current.ObjectId, e.CurrentPrimaryKey.Guid);
 					Assert.IsTrue(Ordered.Remove(e.Current.ObjectId));
 
 					if (Obj is not null)
@@ -828,8 +832,8 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_Index_Test_17_Clear()
 		{
 			Simple Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
-			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
-			AssertEx.NotSame(Guid.Empty, ObjectId);
+			IPrimaryKey PrimaryKey = await this.file.SaveNewObject(Obj, false, null);
+			Assert.IsFalse(PrimaryKey.Empty);
 			Assert.IsTrue(await this.file.ContainsAsync(Obj));
 			await this.file.ClearAsync();
 			Assert.IsFalse(await this.file.ContainsAsync(Obj));
@@ -2033,8 +2037,8 @@ namespace Waher.Persistence.FilesLW.Test
 			while (NrObjects > 0)
 			{
 				Default Obj = DBFilesBTreeTests.CreateDefault(this.MaxStringLength);
-				Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
-				Result[ObjectId] = Obj;
+				IPrimaryKey PrimaryKey = await this.file.SaveNewObject(Obj, false, null);
+				Result[PrimaryKey.Guid] = Obj;
 				NrObjects--;
 			}
 
@@ -2439,7 +2443,7 @@ namespace Waher.Persistence.FilesLW.Test
 					new FilterCustom<Simple>((Obj) => Obj.Byte + Obj.SByte > 0), "SByte", "CIString");
 
 				while (await Cursor.MoveNextAsyncLocked())
-					Objects.Remove(Cursor.CurrentObjectId);
+					Objects.Remove(Cursor.CurrentPrimaryKey.Guid);
 			}
 			finally
 			{
@@ -2466,7 +2470,7 @@ namespace Waher.Persistence.FilesLW.Test
 					"SByte", "CIString");
 
 				while (await Cursor.MoveNextAsyncLocked())
-					Objects.Remove(Cursor.CurrentObjectId);
+					Objects.Remove(Cursor.CurrentPrimaryKey.Guid);
 			}
 			finally
 			{
@@ -2497,7 +2501,7 @@ namespace Waher.Persistence.FilesLW.Test
 					"SByte", "CIString");
 
 				while (await Cursor.MoveNextAsyncLocked())
-					Objects.Remove(Cursor.CurrentObjectId);
+					Objects.Remove(Cursor.CurrentPrimaryKey.Guid);
 			}
 			finally
 			{

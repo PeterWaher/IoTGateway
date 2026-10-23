@@ -11,6 +11,7 @@ using Waher.Events;
 using Waher.Persistence.Exceptions;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
+using Waher.Persistence.Files.Storage.PrimaryKeys;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Queues;
 using Waher.Persistence.Serialization;
@@ -1907,6 +1908,7 @@ namespace Waher.Persistence.Files
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null));
+			IPrimaryKey PrimaryKey = new GuidPrimaryKey(ObjectId);
 
 			if (!(EmbeddedSetter is null))
 			{
@@ -1914,7 +1916,7 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						return (T)await File.TryLoadObjectLocked(ObjectId, Serializer);
+						return (T)await File.TryLoadObjectLocked(PrimaryKey, Serializer);
 					}
 					finally
 					{
@@ -1923,12 +1925,12 @@ namespace Waher.Persistence.Files
 				}
 				else
 				{
-					File.QueueForLoad(ObjectId, Serializer, EmbeddedSetter);
+					File.QueueForLoad(PrimaryKey, Serializer, EmbeddedSetter);
 					return default;
 				}
 			}
 			else
-				return (T)await File.TryLoadObject(ObjectId, Serializer);
+				return (T)await File.TryLoadObject(PrimaryKey, Serializer);
 		}
 
 		/// <summary>
@@ -1942,6 +1944,7 @@ namespace Waher.Persistence.Files
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(T);
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null));
+			IPrimaryKey PrimaryKey = new GuidPrimaryKey(ObjectId);
 
 			if (!(EmbeddedSetter is null))
 			{
@@ -1949,7 +1952,7 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						return await File.TryLoadObjectLocked(ObjectId, Serializer);
+						return await File.TryLoadObjectLocked(PrimaryKey, Serializer);
 					}
 					finally
 					{
@@ -1958,12 +1961,12 @@ namespace Waher.Persistence.Files
 				}
 				else
 				{
-					File.QueueForLoad(ObjectId, Serializer, EmbeddedSetter);
+					File.QueueForLoad(PrimaryKey, Serializer, EmbeddedSetter);
 					return null;
 				}
 			}
 			else
-				return await File.TryLoadObject(ObjectId, Serializer);
+				return await File.TryLoadObject(PrimaryKey, Serializer);
 		}
 
 		/// <summary>
@@ -1991,27 +1994,27 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// Loads an object given its Object ID <paramref name="PrimaryKey"/> and its base type <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Base type.</typeparam>
 		/// <param name="CollectionName">Name of collection in which the object resides.</param>
-		/// <param name="ObjectId">Object ID</param>
+		/// <param name="PrimaryKey">Primary Key of object to load</param>
 		/// <returns>Loaded object.</returns>
-		public Task<T> TryLoadObject<T>(string CollectionName, Guid ObjectId)
+		public Task<T> TryLoadObject<T>(string CollectionName, IPrimaryKey PrimaryKey)
 			where T : class
 		{
-			return this.TryLoadObject<T>(CollectionName, ObjectId, null);
+			return this.TryLoadObject<T>(CollectionName, PrimaryKey, null);
 		}
 
 		/// <summary>
-		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// Loads an object given its Object ID <paramref name="PrimaryKey"/> and its base type <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Base type.</typeparam>
 		/// <param name="CollectionName">Name of collection in which the object resides.</param>
-		/// <param name="ObjectId">Object ID</param>
+		/// <param name="PrimaryKey">Primary Key of object to load</param>
 		/// <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
 		/// <returns>Loaded object.</returns>
-		public async Task<T> TryLoadObject<T>(string CollectionName, Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
+		public async Task<T> TryLoadObject<T>(string CollectionName, IPrimaryKey PrimaryKey, EmbeddedObjectSetter EmbeddedSetter)
 			where T : class
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
@@ -2023,7 +2026,7 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						return (T)await File.TryLoadObjectLocked(ObjectId, Serializer);
+						return (T)await File.TryLoadObjectLocked(PrimaryKey, Serializer);
 					}
 					finally
 					{
@@ -2032,12 +2035,12 @@ namespace Waher.Persistence.Files
 				}
 				else
 				{
-					File.QueueForLoad(ObjectId, Serializer, EmbeddedSetter);
+					File.QueueForLoad(PrimaryKey, Serializer, EmbeddedSetter);
 					return default;
 				}
 			}
 			else
-				return (T)await File.TryLoadObject(ObjectId, Serializer);
+				return (T)await File.TryLoadObject(PrimaryKey, Serializer);
 		}
 
 		/// <summary>
@@ -2060,14 +2063,14 @@ namespace Waher.Persistence.Files
 		/// <returns>Loaded object.</returns>
 		public async Task<object> TryLoadObject(string CollectionName, object ObjectId, EmbeddedObjectSetter EmbeddedSetter)
 		{
-			Guid Id;
+			GuidPrimaryKey PrimaryKey;
 
 			if (ObjectId is Guid Guid)
-				Id = Guid;
+				PrimaryKey = new GuidPrimaryKey(Guid);
 			else if (ObjectId is string s)
-				Id = new Guid(s);
+				PrimaryKey = new GuidPrimaryKey(s);
 			else if (ObjectId is byte[] Bin)
-				Id = new Guid(Bin);
+				PrimaryKey = new GuidPrimaryKey(Bin);
 			else
 				throw new ArgumentException("Invalid type of Object ID: " + ObjectId.GetType().FullName, nameof(ObjectId));
 
@@ -2080,7 +2083,7 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						return await File.TryLoadObjectLocked(ObjectId, Serializer);
+						return await File.TryLoadObjectLocked(PrimaryKey, Serializer);
 					}
 					finally
 					{
@@ -2089,12 +2092,12 @@ namespace Waher.Persistence.Files
 				}
 				else
 				{
-					File.QueueForLoad(Id, Serializer, EmbeddedSetter);
+					File.QueueForLoad(PrimaryKey, Serializer, EmbeddedSetter);
 					return null;
 				}
 			}
 			else
-				return await File.TryLoadObject(Id, Serializer);
+				return await File.TryLoadObject(PrimaryKey, Serializer);
 
 		}
 
@@ -2124,12 +2127,12 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(Value));
 
 			if (!(State is NestedLocks NestedLocks))
-				return await File.SaveNewObject(Value, Serializer, false, null);
+				return (await File.SaveNewObject(Value, Serializer, false, null)).Guid;
 
 			if (NestedLocks.HasLock(File, out bool WriteLock))
 			{
 				if (WriteLock)
-					return await File.SaveNewObjectLocked(Value, Serializer, NestedLocks);
+					return (await File.SaveNewObjectLocked(Value, Serializer, NestedLocks)).Guid;
 				else
 					throw new InvalidOperationException("Not in a writing state.");
 			}
@@ -2139,7 +2142,7 @@ namespace Waher.Persistence.Files
 				try
 				{
 					NestedLocks.AddLock(File, true);
-					return await File.SaveNewObjectLocked(Value, Serializer, NestedLocks);
+					return (await File.SaveNewObjectLocked(Value, Serializer, NestedLocks)).Guid;
 				}
 				finally
 				{
@@ -3487,7 +3490,7 @@ namespace Waher.Persistence.Files
 									if (!(Filter is null) && !Filter.CanExportObject(Obj))
 										continue;
 
-									if (await Output.StartObject(ObjectIdToString(Obj.ObjectId), Obj.TypeName) is null)
+									if (await Output.StartObject(Obj.ObjectId.ToString(), Obj.TypeName) is null)
 										return false;
 									try
 									{
@@ -3510,9 +3513,9 @@ namespace Waher.Persistence.Files
 									if (!Continue)
 										return false;
 								}
-								else if (!(e.CurrentObjectId is null))
+								else if (!e.CurrentPrimaryKey.Empty)
 								{
-									if (!await Output.ReportError("Unable to load object " + ObjectIdToString(e.CurrentObjectId) + "."))
+									if (!await Output.ReportError("Unable to load object " + e.CurrentPrimaryKey.ToString() + "."))
 										return false;
 								}
 							}
@@ -3550,14 +3553,6 @@ namespace Waher.Persistence.Files
 			}
 
 			return Continue;
-		}
-
-		internal static string ObjectIdToString(object ObjectId)
-		{
-			if (ObjectId is byte[] Bin)
-				return Convert.ToBase64String(Bin);
-			else
-				return ObjectId.ToString();
 		}
 
 		private async Task<bool> ReportException(Exception ex, IDatabaseExport Output)
@@ -3644,8 +3639,8 @@ namespace Waher.Persistence.Files
 							{
 								if (e.CurrentTypeCompatible)
 									await Recipient.ProcessObject(e.Current);
-								else if (!(e.CurrentObjectId is null))
-									await Recipient.IncompatibleObject(e.CurrentObjectId);
+								else if (!(e.CurrentPrimaryKey is null))
+									await Recipient.IncompatibleObject(e.CurrentPrimaryKey.ObjectId);
 							}
 						}
 						finally
@@ -3852,6 +3847,8 @@ namespace Waher.Persistence.Files
 						string TempFileName = Path.GetTempFileName();
 						string TempBtreeFileName = TempFileName + ".btree";
 						string TempBlobFileName = TempFileName + ".blob";
+						IPrimaryKey PrimaryKey = File.RecordHandler.CreateKey();
+						GuidPrimaryKey GuidPrimaryKey = PrimaryKey as GuidPrimaryKey;
 
 						RepairThread?.Start();
 
@@ -3881,8 +3878,9 @@ namespace Waher.Persistence.Files
 									while (Reader.BytesLeft >= 4)
 									{
 										Reader.SkipBlockLink();
-										object ObjectId = File.RecordHandler.GetKey(Reader);
-										if (ObjectId is null)
+
+										File.RecordHandler.ReadPrimaryKey(Reader, PrimaryKey);
+										if (PrimaryKey.Empty)
 											break;
 
 										uint Len = await File.RecordHandler.GetFullPayloadSize(Reader);
@@ -3943,8 +3941,10 @@ namespace Waher.Persistence.Files
 												if (Len2 != 0)
 													break;
 
-												if (ObjectId is Guid Guid && !(Obj is null))
+												if (!(GuidPrimaryKey is null) && !(Obj is null))
 												{
+													Guid Guid = GuidPrimaryKey.Value;
+													
 													if (ObjectIds.ContainsKey(Guid))
 														FileStat.LogError("Object with Object ID " + Guid.ToString() + " occurred multiple times.");
 													else

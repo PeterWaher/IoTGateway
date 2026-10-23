@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Persistence.Files.Storage.PrimaryKeys;
 using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.Files.Storage
@@ -23,21 +24,44 @@ namespace Waher.Persistence.Files.Storage
 		}
 
 		/// <summary>
-		/// Gets the next record key.
+		/// Creates an empty primary key object.
+		/// </summary>
+		/// <returns>Primary key object.</returns>
+		public IPrimaryKey CreateKey()
+		{
+			return new GuidPrimaryKey();
+		}
+
+		/// <summary>
+		/// Reads the next primary key.
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
-		/// <returns>Next key value, or null if no more keys available.</returns>
-		public object GetKey(BinaryDeserializer Reader)
+		/// <returns>Primary key object.</returns>
+		public IPrimaryKey ReadPrimaryKey(BinaryDeserializer Reader)
 		{
-			if (Reader.BytesLeft < 17)
-				return null;
+			IPrimaryKey Result = this.CreateKey();
+			this.ReadPrimaryKey(Reader, Result);
+			return Result;
+		}
 
-			Guid Result = Reader.ReadGuid();
+		/// <summary>
+		/// Reads the next primary key.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <param name="Key">Primary key object.</param>
+		public void ReadPrimaryKey(BinaryDeserializer Reader, IPrimaryKey Key)
+		{
+			if (Reader.BytesLeft >= 17)
+			{
+				Guid Result = Reader.ReadGuid();
 
-			if (Result.Equals(Guid.Empty))
-				return null;
+				if (Result.Equals(Guid.Empty))
+					Key.Clear();
+				else
+					Key.Set(Result);
+			}
 			else
-				return Result;
+				Key.Clear();
 		}
 
 		/// <summary>
@@ -154,7 +178,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <param name="Output">XML Output.</param>
 		public void ExportKey(object ObjectId, XmlWriter Output)
 		{
-			Output.WriteAttributeString("objectId", FilesProvider.ObjectIdToString(ObjectId));
+			Output.WriteAttributeString("objectId", ObjectId.ToString());
 		}
 
 		/// <summary>

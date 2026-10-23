@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using Waher.Persistence.Files.Storage;
 using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.Files.Searching
@@ -10,34 +10,33 @@ namespace Waher.Persistence.Files.Searching
 	/// <typeparam name="T">Type of object being sorted.</typeparam>
 	internal class SortedReference<T> : IComparable
 	{
-		private readonly byte[] key;
-		private readonly IComparer<byte[]> comparer;
+		private readonly IPrimaryKey key;
 		private readonly T value;
 		private readonly IObjectSerializer serializer;
-		private readonly Guid id;
+		private readonly IPrimaryKey currentPrimaryKey;
 
 		/// <summary>
 		/// Sorted object reference.
 		/// </summary>
 		/// <param name="Key">Key</param>
-		/// <param name="Comparer">Comparer</param>
 		/// <param name="Value">Object value.</param>
 		/// <param name="Serializer">Serializer used.</param>
-		/// <param name="ObjectId">Object ID</param>
-		public SortedReference(byte[] Key, IComparer<byte[]> Comparer, 
-			T Value, IObjectSerializer Serializer, Guid ObjectId)
+		/// <param name="CurrentPrimaryKey">Current Primary key</param>
+		public SortedReference(IPrimaryKey Key, T Value, IObjectSerializer Serializer, 
+			IPrimaryKey CurrentPrimaryKey)
 		{
 			this.key = Key;
-			this.comparer = Comparer;
 			this.value = Value;
 			this.serializer = Serializer;
-			this.id = ObjectId;
+			this.currentPrimaryKey = CurrentPrimaryKey;
 		}
 
 		public int CompareTo(object obj)
 		{
-			SortedReference<T> Rec = (SortedReference<T>)obj;
-			return this.comparer.Compare(this.key, Rec.key);
+			if (obj is SortedReference<T> Rec)
+				return this.key.CompareTo(Rec.key);
+			else
+				return this.GetType().FullName.CompareTo(obj.GetType().FullName);
 		}
 
 		/// <summary>
@@ -51,14 +50,14 @@ namespace Waher.Persistence.Files.Searching
 		public IObjectSerializer Serializer => this.serializer;
 
 		/// <summary>
-		/// Object ID
+		/// Primary key
 		/// </summary>
-		public Guid ObjectId => this.id;
+		public IPrimaryKey PrimaryKey => this.currentPrimaryKey;
 
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			return this.id.ToString();
+			return this.currentPrimaryKey.ToString();
 		}
 	}
 }

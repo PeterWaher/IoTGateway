@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Persistence.Files.Storage.PrimaryKeys;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 
@@ -66,16 +67,37 @@ namespace Waher.Persistence.Files.Storage
 		}
 
 		/// <summary>
-		/// Gets the key of the next record.
+		/// Creates an empty primary key object.
 		/// </summary>
-		/// <param name="Reader">Binary deserializer.</param>
-		/// <returns>Key object.</returns>
-		public object GetKey(BinaryDeserializer Reader)
+		/// <returns>Primary key object.</returns>
+		public IPrimaryKey CreateKey()
+		{
+			return new StringPrimaryKey();
+		}
+
+		/// <summary>
+		/// Reads the next primary key.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>Primary key object.</returns>
+		public IPrimaryKey ReadPrimaryKey(BinaryDeserializer Reader)
+		{
+			IPrimaryKey Result = this.CreateKey();
+			this.ReadPrimaryKey(Reader, Result);
+			return Result;
+		}
+
+		/// <summary>
+		/// Reads the next primary key.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <param name="Key">Primary key object.</param>
+		public void ReadPrimaryKey(BinaryDeserializer Reader, IPrimaryKey Key)
 		{
 			if (Reader.BytesLeft == 0 || !Reader.ReadBit())
-				return null;
-
-			return Reader.ReadString();
+				Key.Clear();
+			else
+				Key.Set(Reader.ReadString());
 		}
 
 		/// <summary>
@@ -291,7 +313,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <param name="Output">XML Output.</param>
 		public void ExportKey(object ObjectId, XmlWriter Output)
 		{
-			Output.WriteAttributeString("key", FilesProvider.ObjectIdToString(ObjectId));
+			Output.WriteAttributeString("key", ObjectId.ToString());
 		}
 
 		/// <summary>

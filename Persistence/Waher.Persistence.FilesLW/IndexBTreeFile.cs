@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
-using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
+using Waher.Persistence.Files.Storage.PrimaryKeys;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Collections;
-using System.Diagnostics;
 
 namespace Waher.Persistence.Files
 {
@@ -144,9 +145,9 @@ namespace Waher.Persistence.Files
 			return ObjectBTreeFileCursor<object>.CreateLocked(this.indexFile, RecordHandler);
 		}
 
-		internal Task<object> TryLoadObjectLocked(Guid ObjectId, IObjectSerializer Serializer)
+		internal Task<object> TryLoadObjectLocked(IPrimaryKey PrimaryKey, IObjectSerializer Serializer)
 		{
-			return this.objectFile.TryLoadObjectLocked(ObjectId, Serializer);
+			return this.objectFile.TryLoadObjectLocked(PrimaryKey, Serializer);
 		}
 
 		internal Task ExportGraphXMLLocked(XmlWriter Output, bool Properties)
@@ -215,14 +216,17 @@ namespace Waher.Persistence.Files
 		/// <returns>If the object was saved in the index (true), or if the index property values of the object did not exist, or were too big to fit in an index record.</returns>
 		internal async Task<bool> SaveNewObjectLocked(Guid ObjectId, object Object, IObjectSerializer Serializer)
 		{
-			byte[] Bin = await this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
-			if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
+			BinaryPrimaryKey ForeignKey = await this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
+			if (ForeignKey.Empty || ForeignKey.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
-			BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin)
-				?? throw new FileException("Object is already available in index.", this.indexFile.FileName, this.collectionName);
+			BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(ForeignKey)
+				?? throw new FileException("Object is already available in index.", 
+				this.indexFile.FileName, this.collectionName);
 
-			await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+			await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, 
+				Leaf.Block, ForeignKey.Binary, ForeignKey.Length, Leaf.InternalPosition, 
+				0, 0, true, Leaf.LastObject);
 
 			return true;
 		}
@@ -246,14 +250,16 @@ namespace Waher.Persistence.Files
 
 				while (e1.MoveNext() && e2.MoveNext())
 				{
-					byte[] Bin = await this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
-					if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
+					BinaryPrimaryKey ForeignKey = await this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
+					if (ForeignKey.Empty || ForeignKey.Length > this.indexFile.InlineObjectSizeLimit)
 						return false;
 
-					BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin)
+					BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(ForeignKey)
 						?? throw new FileException("Object is already available in index.", this.indexFile.FileName, this.collectionName);
 
-					await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+					await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header,
+						Leaf.Block, ForeignKey.Binary, ForeignKey.Length, 
+						Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
 				}
 			}
 			finally
@@ -274,13 +280,14 @@ namespace Waher.Persistence.Files
 		/// <returns>If the object was deleted from the index (true), or if the object did not exist in the index.</returns>
 		internal async Task<bool> DeleteObjectLocked(Guid ObjectId, object Object, IObjectSerializer Serializer)
 		{
-			byte[] Bin = await this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
-			if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
+			BinaryPrimaryKey ForeignKey = await this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null);
+			if (ForeignKey.Empty || ForeignKey.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
 			try
 			{
-				await this.indexFile.DeleteObjectLocked(Bin, false, true, Serializer, null, 0);
+				await this.indexFile.DeleteObjectLocked(ForeignKey, false, true, 
+					Serializer, null, 0);
 			}
 			catch (KeyNotFoundException)
 			{
@@ -311,11 +318,14 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						byte[] Bin = await this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
-						if (Bin is null || Bin.Length > this.indexFile.InlineObjectSizeLimit)
+						BinaryPrimaryKey ForeignKey = await this.recordHandler.Serialize(
+							e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
+
+						if (ForeignKey.Empty || ForeignKey.Length > this.indexFile.InlineObjectSizeLimit)
 							continue;
 
-						await this.indexFile.DeleteObjectLocked(Bin, false, true, Serializer, null, 0);
+						await this.indexFile.DeleteObjectLocked(ForeignKey, false, true,
+							Serializer, null, 0);
 					}
 					catch (KeyNotFoundException)
 					{
@@ -340,36 +350,26 @@ namespace Waher.Persistence.Files
 		/// <returns>If the object was saved in the index (true), or if the index property values of the object did not exist, or were too big to fit in an index record.</returns>
 		internal async Task<bool> UpdateObjectLocked(Guid ObjectId, object OldObject, object NewObject, IObjectSerializer Serializer)
 		{
-			byte[] OldBin = await this.recordHandler.Serialize(ObjectId, OldObject, Serializer, MissingFieldAction.Null);
-			if (!(OldBin is null) && OldBin.Length > this.indexFile.InlineObjectSizeLimit)
+			BinaryPrimaryKey OldForeignKey = await this.recordHandler.Serialize(ObjectId, OldObject, Serializer, MissingFieldAction.Null);
+			if (OldForeignKey.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
-			byte[] NewBin = await this.recordHandler.Serialize(ObjectId, NewObject, Serializer, MissingFieldAction.Null);
-			if (!(NewBin is null) && NewBin.Length > this.indexFile.InlineObjectSizeLimit)
+			BinaryPrimaryKey NewForeignKey = await this.recordHandler.Serialize(ObjectId, NewObject, Serializer, MissingFieldAction.Null);
+			if (NewForeignKey.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
-			if (OldBin is null && NewBin is null)
+			if (OldForeignKey.Empty && NewForeignKey.Empty)
 				return false;
 
-			int i, c;
+			if (OldForeignKey.Equals(NewForeignKey))
+				return true;
 
-			if ((c = OldBin.Length) == NewBin.Length)
-			{
-				for (i = 0; i < c; i++)
-				{
-					if (OldBin[i] != NewBin[i])
-						break;
-				}
-
-				if (i == c)
-					return true;
-			}
-
-			if (!(OldBin is null))
+			if (!OldForeignKey.Empty)
 			{
 				try
 				{
-					await this.indexFile.DeleteObjectLocked(OldBin, false, true, Serializer, null, 0);
+					await this.indexFile.DeleteObjectLocked(OldForeignKey, false, true,
+						Serializer, null, 0);
 				}
 				catch (KeyNotFoundException)
 				{
@@ -377,13 +377,17 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			if (!(NewBin is null))
+			if (!NewForeignKey.Empty)
 			{
-				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(NewBin);
+				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(NewForeignKey);
 				if (Leaf is null)
 					throw Database.FlagForRepair(this.collectionName, "Object seems to exist twice in index.");
 				else
-					await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, NewBin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+				{
+					await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header,
+						Leaf.Block, NewForeignKey.Binary, NewForeignKey.Length, 
+						Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+				}
 			}
 
 			return true;
@@ -412,36 +416,26 @@ namespace Waher.Persistence.Files
 
 				while (e1.MoveNext() && e2.MoveNext() && e3.MoveNext())
 				{
-					byte[] OldBin = await this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
-					if (!(OldBin is null) && OldBin.Length > this.indexFile.InlineObjectSizeLimit)
+					BinaryPrimaryKey OldForeignKey = await this.recordHandler.Serialize(e1.Current, e2.Current, Serializer, MissingFieldAction.Null);
+					if (OldForeignKey.Length > this.indexFile.InlineObjectSizeLimit)
 						continue;
 
-					byte[] NewBin = await this.recordHandler.Serialize(e1.Current, e3.Current, Serializer, MissingFieldAction.Null);
-					if (!(NewBin is null) && NewBin.Length > this.indexFile.InlineObjectSizeLimit)
+					BinaryPrimaryKey NewForeignKey = await this.recordHandler.Serialize(e1.Current, e3.Current, Serializer, MissingFieldAction.Null);
+					if (NewForeignKey.Length > this.indexFile.InlineObjectSizeLimit)
 						continue;
 
-					if (OldBin is null && NewBin is null)
+					if (OldForeignKey.Empty && NewForeignKey.Empty)
 						continue;
 
-					int i, c;
+					if (OldForeignKey.Equals(NewForeignKey))
+						continue;
 
-					if ((c = OldBin.Length) == NewBin.Length)
-					{
-						for (i = 0; i < c; i++)
-						{
-							if (OldBin[i] != NewBin[i])
-								break;
-						}
-
-						if (i == c)
-							continue;
-					}
-
-					if (!(OldBin is null))
+					if (!OldForeignKey.Empty)
 					{
 						try
 						{
-							await this.indexFile.DeleteObjectLocked(OldBin, false, true, Serializer, null, 0);
+							await this.indexFile.DeleteObjectLocked(OldForeignKey, false, 
+								true, Serializer, null, 0);
 						}
 						catch (KeyNotFoundException)
 						{
@@ -449,10 +443,13 @@ namespace Waher.Persistence.Files
 						}
 					}
 
-					if (!(NewBin is null))
+					if (!NewForeignKey.Empty)
 					{
-						BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(NewBin);
-						await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, NewBin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+						BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(NewForeignKey);
+						
+						await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, 
+							Leaf.Block, NewForeignKey.Binary, NewForeignKey.Length, 
+							Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
 					}
 				}
 			}
@@ -497,20 +494,23 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Calculates the rank of an object in the database, given its Object ID.
 		/// </summary>
-		/// <param name="ObjectId">Object ID</param>
+		/// <param name="PrimaryKey">Object ID</param>
 		/// <returns>Rank of object in database.</returns>
 		/// <exception cref="KeyNotFoundException">If the object is not found.</exception>
-		public async Task<ulong> GetRankLocked(Guid ObjectId)
+		public async Task<ulong> GetRankLocked(IPrimaryKey PrimaryKey)
 		{
-			object Object = await this.objectFile.LoadObject(ObjectId);
+			object Object = await this.objectFile.LoadObject(PrimaryKey);
 
 			Type ObjectType = Object.GetType();
 			IObjectSerializer Serializer = await this.objectFile.Provider.GetObjectSerializer(ObjectType);
 
-			byte[] Key = await this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Null)
-				?? throw new KeyNotFoundException("Object not found.");
+			BinaryPrimaryKey ForeignKey = await this.recordHandler.Serialize(PrimaryKey.Guid, 
+				Object, Serializer, MissingFieldAction.Null);
 
-			return await this.indexFile.GetRankLocked(Key);
+			if (ForeignKey.Empty)
+				throw new KeyNotFoundException("Object not found.");
+
+			return await this.indexFile.GetRankLocked(ForeignKey);
 		}
 
 		/// <summary>
@@ -549,7 +549,7 @@ namespace Waher.Persistence.Files
 						LastSerializer = Serializer;
 					}
 
-					ObjectIds.Add((Guid)e.CurrentObjectId);
+					ObjectIds.Add(e.CurrentPrimaryKey.Guid);
 					Objects.Add(Obj);
 					c++;
 					Count++;
@@ -614,13 +614,13 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public async Task<IndexBTreeFileCursor<T>> FindFirstGreaterOrEqualToLocked<T>(GenericObject Object)
 		{
-			byte[] Key = await this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
-			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
+			BinaryPrimaryKey ForeignKey = await this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
+			if (ForeignKey.Empty || ForeignKey.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
 			IndexBTreeFileCursor<T> Result = await IndexBTreeFileCursor<T>.CreateLocked(this, this.recordHandler);
 
-			BlockInfo Node = await this.indexFile.FindNodeLocked(Key, true);
+			BlockInfo Node = await this.indexFile.FindNodeLocked(ForeignKey, true);
 			Result.SetStartingPoint(Node);
 
 			return Result;
@@ -651,13 +651,13 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public async Task<IndexBTreeFileCursor<T>> FindLastLesserOrEqualToLocked<T>(GenericObject Object)
 		{
-			byte[] Key = await this.recordHandler.Serialize(GuidMax, Object, this.genericSerializer, MissingFieldAction.Last);
-			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
+			BinaryPrimaryKey ForeignKey = await this.recordHandler.Serialize(GuidMax, Object, this.genericSerializer, MissingFieldAction.Last);
+			if (ForeignKey.Empty || ForeignKey.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
 			IndexBTreeFileCursor<T> Result = await IndexBTreeFileCursor<T>.CreateLocked(this, this.recordHandler);
 
-			BlockInfo Node = await this.indexFile.FindNodeLocked(Key, true);
+			BlockInfo Node = await this.indexFile.FindNodeLocked(ForeignKey, true);
 			Result.SetStartingPoint(Node);
 
 			return Result;
@@ -690,13 +690,13 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public async Task<IndexBTreeFileCursor<T>> FindFirstGreaterThanLocked<T>(GenericObject Object)
 		{
-			byte[] Key = await this.recordHandler.Serialize(GuidMax, Object, this.genericSerializer, MissingFieldAction.Last);
-			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
+			BinaryPrimaryKey ForeignKey = await this.recordHandler.Serialize(GuidMax, Object, this.genericSerializer, MissingFieldAction.Last);
+			if (ForeignKey.Empty || ForeignKey.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
 			IndexBTreeFileCursor<T> Result = await IndexBTreeFileCursor<T>.CreateLocked(this, this.recordHandler);
 
-			BlockInfo Node = await this.indexFile.FindNodeLocked(Key, true);
+			BlockInfo Node = await this.indexFile.FindNodeLocked(ForeignKey, true);
 			Result.SetStartingPoint(Node);
 
 			return Result;
@@ -727,13 +727,13 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public async Task<IndexBTreeFileCursor<T>> FindLastLesserThanLocked<T>(GenericObject Object)
 		{
-			byte[] Key = await this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
-			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
+			BinaryPrimaryKey ForeignKey = await this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
+			if (ForeignKey.Empty || ForeignKey.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
 			IndexBTreeFileCursor<T> Result = await IndexBTreeFileCursor<T>.CreateLocked(this, this.recordHandler);
 
-			BlockInfo Node = await this.indexFile.FindNodeLocked(Key, true);
+			BlockInfo Node = await this.indexFile.FindNodeLocked(ForeignKey, true);
 			Result.SetStartingPoint(Node);
 
 			return Result;

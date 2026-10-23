@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Console;
+using Waher.Persistence.Files.Storage;
+
 
 
 #if !LW
@@ -116,8 +118,8 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			FileStatistics StatBefore = (await this.file.ComputeStatistics()).Key;
 			Simple Obj = await this.LoadSimple();
-			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
-			Assert.AreNotEqual(Guid.Empty, ObjectId);
+			IPrimaryKey PrimaryKey = await this.file.SaveNewObject(Obj, false, null);
+			Assert.IsFalse(PrimaryKey.Empty);
 
 			await DBFilesBTreeTests.AssertConsistent(this.file, this.provider, (int)(StatBefore.NrObjects + 1), null, true);
 		}

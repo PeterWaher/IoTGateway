@@ -48,11 +48,11 @@ namespace Waher.Persistence.Files.Searching
 		public bool CurrentTypeCompatible => this.e.Current.Value != null;
 
 		/// <summary>
-		/// Gets the Object ID of the current object.
+		/// Gets the Primary Key of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
 		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		public Guid CurrentObjectId => this.e.Current.ObjectId;
+		public IPrimaryKey CurrentPrimaryKey => this.e.Current.PrimaryKey;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>

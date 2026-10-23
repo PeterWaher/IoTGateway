@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Waher.Persistence.Exceptions;
-using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
-using System.Runtime.ExceptionServices;
+using Waher.Persistence.Files.Storage.PrimaryKeys;
+using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.Files
 {
@@ -19,7 +20,8 @@ namespace Waher.Persistence.Files
 		private FilesProvider provider;
 		private IndexBTreeFile file;
 		private IndexRecords recordHandler;
-		private Guid currentObjectId;
+		private IPrimaryKey currentPrimaryKey;
+		private IPrimaryKey currentForeignKey;
 		private T current;
 		private bool hasCurrent;
 		private bool currentTypeCompatible;
@@ -32,7 +34,8 @@ namespace Waher.Persistence.Files
 				recordHandler = RecordHandler,
 				provider = File.Provider,
 				hasCurrent = false,
-				currentObjectId = Guid.Empty,
+				currentPrimaryKey = new GuidPrimaryKey(),
+				currentForeignKey = new BinaryPrimaryKey(RecordHandler),
 				current = default,
 				currentSerializer = null,
 				e = await File.GetCursor(RecordHandler)
@@ -85,16 +88,16 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Gets the Object ID of the current object.
+		/// Gets the Primary Key of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
 		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		public Guid CurrentObjectId
+		public IPrimaryKey CurrentPrimaryKey
 		{
 			get
 			{
 				if (this.hasCurrent)
-					return this.currentObjectId;
+					return this.currentPrimaryKey;
 				else
 					throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
 			}
@@ -159,44 +162,54 @@ namespace Waher.Persistence.Files
 
 		private async Task LoadObject()
 		{
-			byte[] Key = (byte[])this.e.CurrentObjectId;
-			BinaryDeserializer Reader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, Key, this.file.BlockLimit);
-			this.recordHandler.SkipKey(Reader, out this.currentObjectId, true);
-			object Obj;
-
-			try
+			if (this.e.CurrentPrimaryKey is BinaryPrimaryKey ForeignKey)
 			{
-				if (this.currentSerializer is null)
-					this.currentSerializer = await this.provider.GetObjectSerializer(typeof(T));
+				BinaryDeserializer Reader = new BinaryDeserializer(
+					this.file.CollectionName, this.file.Encoding, ForeignKey.Binary, 
+					this.file.BlockLimit, 0, ForeignKey.Length);
 
-				Obj = await this.file.TryLoadObjectLocked(this.currentObjectId, this.currentSerializer);
+				this.recordHandler.SkipKey(Reader, out Guid Guid, true);
+				object Obj;
 
-				if (Obj is null)
+				try
+				{
+					this.currentPrimaryKey.Set(Guid);
+					this.currentSerializer ??= await this.provider.GetObjectSerializer(typeof(T));
+
+					Obj = await this.file.TryLoadObjectLocked(this.currentPrimaryKey, this.currentSerializer);
+
+					if (Obj is null)
+					{
+						this.current = default;
+						this.currentTypeCompatible = false;
+
+						// TODO: Delete records pointing to objects that do not exist, after lock has been released.
+					}
+					else if (Obj is T T2)
+					{
+						this.current = T2;
+						this.currentTypeCompatible = true;
+					}
+					else
+					{
+						this.current = default;
+						this.currentTypeCompatible = false;
+					}
+				}
+				catch (InconsistencyException ex)
 				{
 					this.current = default;
 					this.currentTypeCompatible = false;
 
-					// TODO: Delete records pointing to objects that do not exist, after lock has been released.
+					ExceptionDispatchInfo.Capture(ex).Throw();
 				}
-				else if (Obj is T T2)
-				{
-					this.current = T2;
-					this.currentTypeCompatible = true;
-				}
-				else
+				catch (Exception)
 				{
 					this.current = default;
 					this.currentTypeCompatible = false;
 				}
 			}
-			catch (InconsistencyException ex)
-			{
-				this.current = default;
-				this.currentTypeCompatible = false;
-
-				ExceptionDispatchInfo.Capture(ex).Throw();
-			}
-			catch (Exception)
+			else
 			{
 				this.current = default;
 				this.currentTypeCompatible = false;
@@ -250,7 +263,7 @@ namespace Waher.Persistence.Files
 		/// object.</returns>
 		public async Task<bool> GoToObjectLocked(ulong ObjectIndex)
 		{
-			if (!await this.e.GoToObjectLocked(ObjectIndex))
+			if (!await this.e.GoToObjectLocked(ObjectIndex, this.currentForeignKey))
 			{
 				this.Reset();
 				return false;
@@ -267,10 +280,11 @@ namespace Waher.Persistence.Files
 		public void Reset()
 		{
 			this.hasCurrent = false;
-			this.currentObjectId = Guid.Empty;
 			this.current = default;
 			this.currentSerializer = null;
 
+			this.currentPrimaryKey?.Clear();
+			this.currentForeignKey?.Clear();
 			this.e.Reset();
 		}
 
@@ -281,10 +295,11 @@ namespace Waher.Persistence.Files
 		public void Reset(Bookmark StartingPoint)
 		{
 			this.hasCurrent = false;
-			this.currentObjectId = Guid.Empty;
 			this.current = default;
 			this.currentSerializer = null;
 
+			this.currentPrimaryKey?.Clear();
+			this.currentForeignKey?.Clear();
 			this.e.Reset(StartingPoint);
 		}
 
@@ -347,12 +362,11 @@ namespace Waher.Persistence.Files
 		/// <param name="LastItem">Last item in a previous process.</param>
 		public async Task ContinueAfterLocked(T LastItem)
 		{
-			if (this.currentSerializer is null)
-				this.currentSerializer = await this.provider.GetObjectSerializer(typeof(T));
+			this.currentSerializer ??= await this.provider.GetObjectSerializer(typeof(T));
 
-			byte[] Bin = await this.recordHandler.Serialize(IndexBTreeFile.GuidMax, LastItem, this.currentSerializer, MissingFieldAction.Last);
+			BinaryPrimaryKey ForeignKey = await this.recordHandler.Serialize(IndexBTreeFile.GuidMax, LastItem, this.currentSerializer, MissingFieldAction.Last);
 
-			await this.e.ContinueAfterLocked(Bin);
+			await this.e.ContinueAfterLocked(ForeignKey);
 		}
 
 		/// <summary>
@@ -361,12 +375,11 @@ namespace Waher.Persistence.Files
 		/// <param name="LastItem">Last item in a previous process.</param>
 		public async Task ContinueBeforeLocked(T LastItem)
 		{
-			if (this.currentSerializer is null)
-				this.currentSerializer = await this.provider.GetObjectSerializer(typeof(T));
+			this.currentSerializer ??= await this.provider.GetObjectSerializer(typeof(T));
 
-			byte[] Bin = await this.recordHandler.Serialize(Guid.Empty, LastItem, this.currentSerializer, MissingFieldAction.First);
+			BinaryPrimaryKey ForeignKey = await this.recordHandler.Serialize(Guid.Empty, LastItem, this.currentSerializer, MissingFieldAction.First);
 
-			await this.e.ContinueBeforeLocked(Bin);
+			await this.e.ContinueBeforeLocked(ForeignKey);
 		}
 
 		/// <summary>

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
 using Waher.Runtime.Collections;
+using Waher.Persistence.Files.Storage.PrimaryKeys;
 
 namespace Waher.Persistence.Files
 {
@@ -88,11 +89,11 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Determines whether the System.Collections.Generic.IDictionary{string,object} contains an element with the specified key.
 		/// </summary>
-		/// <param name="key">The key to locate in the System.Collections.Generic.IDictionary{string,object}.</param>
+		/// <param name="Key">The key to locate in the System.Collections.Generic.IDictionary{string,object}.</param>
 		/// <returns>true if the System.Collections.Generic.IDictionary{string,object} contains an element with the key; otherwise, false.</returns>
-		public bool ContainsKey(string key)
+		public bool ContainsKey(string Key)
 		{
-			Task<bool> Task = this.ContainsKeyAsync(key);
+			Task<bool> Task = this.ContainsKeyAsync(Key);
 			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			return Task.Result;
 		}
@@ -100,15 +101,15 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Determines whether the System.Collections.Generic.IDictionary{string,object} contains an element with the specified key.
 		/// </summary>
-		/// <param name="key">The key to locate in the System.Collections.Generic.IDictionary{string,object}.</param>
+		/// <param name="Key">The key to locate in the System.Collections.Generic.IDictionary{string,object}.</param>
 		/// <returns>true if the System.Collections.Generic.IDictionary{string,object} contains an element with the key; otherwise, false.</returns>
-		public async Task<bool> ContainsKeyAsync(string key)
+		public async Task<bool> ContainsKeyAsync(string Key)
 		{
 			if (!(this.inMemory is null))
 			{
 				lock (this.inMemory)
 				{
-					if (this.inMemory.ContainsKey(key))
+					if (this.inMemory.ContainsKey(Key))
 						return true;
 				}
 			}
@@ -119,7 +120,9 @@ namespace Waher.Persistence.Files
 			await this.dictionaryFile.BeginRead();
 			try
 			{
-				BlockInfo Info = await this.dictionaryFile.FindNodeLocked(key, false);
+				BlockInfo Info = await this.dictionaryFile.FindNodeLocked(
+					new StringPrimaryKey(Key), false);
+
 				return !(Info is null);
 			}
 			finally
@@ -131,52 +134,53 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Adds an element with the provided key and value to the System.Collections.Generic.IDictionary{string,object}.
 		/// </summary>
-		/// <param name="key">The object to use as the key of the element to add.</param>
-		/// <param name="value">The object to use as the value of the element to add.</param>
+		/// <param name="Key">The object to use as the key of the element to add.</param>
+		/// <param name="Value">The object to use as the value of the element to add.</param>
 		/// <exception cref="ArgumentNullException">key is null</exception>
 		/// <exception cref="ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
-		public void Add(string key, object value)
+		public void Add(string Key, object Value)
 		{
-			FilesProvider.Wait(this.AddAsync(key, value, false), this.timeoutMilliseconds);
+			FilesProvider.Wait(this.AddAsync(Key, Value, false), this.timeoutMilliseconds);
 		}
 
 		/// <summary>
 		/// Adds an element with the provided key and value to the System.Collections.Generic.IDictionary{string,object}.
 		/// </summary>
-		/// <param name="key">The object to use as the key of the element to add.</param>
-		/// <param name="value">The object to use as the value of the element to add.</param>
+		/// <param name="Key">The object to use as the key of the element to add.</param>
+		/// <param name="Value">The object to use as the value of the element to add.</param>
 		/// <exception cref="ArgumentNullException">key is null</exception>
 		/// <exception cref="ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
-		public Task AddAsync(string key, object value)
+		public Task AddAsync(string Key, object Value)
 		{
-			return this.AddAsync(key, value, false);
+			return this.AddAsync(Key, Value, false);
 		}
 
 		/// <summary>
 		/// Adds an element with the provided key and value to the System.Collections.Generic.IDictionary{string,object}.
 		/// </summary>
-		/// <param name="key">The object to use as the key of the element to add.</param>
-		/// <param name="value">The object to use as the value of the element to add.</param>
+		/// <param name="Key">The object to use as the key of the element to add.</param>
+		/// <param name="Value">The object to use as the value of the element to add.</param>
 		/// <param name="ReplaceIfExists">If replacement of any existing value is desired.</param>
 		/// <exception cref="ArgumentNullException">key is null</exception>
 		/// <exception cref="ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
-		public async Task AddAsync(string key, object value, bool ReplaceIfExists)
+		public async Task AddAsync(string Key, object Value, bool ReplaceIfExists)
 		{
-			if (key is null)
+			if (Key is null)
 				throw new ArgumentNullException("key is null.", "key");
 
-			Type Type = value?.GetType() ?? typeof(object);
+			Type Type = Value?.GetType() ?? typeof(object);
 			IObjectSerializer Serializer = await this.provider.GetObjectSerializer(Type);
 
 			await this.dictionaryFile.BeginWrite();
 			try
 			{
-				byte[] Bin = await this.SerializeLocked(key, value, Serializer);
+				byte[] Bin = await this.SerializeLocked(Key, Value, Serializer);
+				IPrimaryKey PrimaryKey = new StringPrimaryKey(Key);
 				BlockInfo Info;
 
 				if (ReplaceIfExists)
 				{
-					Info = await this.dictionaryFile.FindNodeLocked(key, true);
+					Info = await this.dictionaryFile.FindNodeLocked(PrimaryKey, true);
 
 					if (Info.Match)
 						await this.dictionaryFile.ReplaceObjectLocked(Bin, Info, true);
@@ -185,9 +189,9 @@ namespace Waher.Persistence.Files
 				}
 				else
 				{
-					Info = await this.dictionaryFile.FindLeafNodeLocked(key);
+					Info = await this.dictionaryFile.FindLeafNodeLocked(PrimaryKey);
 					if (Info is null)
-						throw new ArgumentException("A key with that value already exists.", nameof(key));
+						throw new ArgumentException("A key with that value already exists.", nameof(Key));
 
 					await this.dictionaryFile.SaveNewObjectLocked(Bin, Info);
 				}
@@ -201,7 +205,7 @@ namespace Waher.Persistence.Files
 			{
 				lock (this.inMemory)
 				{
-					this.inMemory[key] = value;
+					this.inMemory[Key] = Value;
 				}
 			}
 		}
@@ -229,12 +233,12 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Removes the element with the specified key from the System.Collections.IDictionary object.
 		/// </summary>
-		/// <param name="key">The key of the element to remove.</param>
+		/// <param name="Key">The key of the element to remove.</param>
 		/// <returns>If key was found and removed.</returns>
 		/// <exception cref="ArgumentNullException">key is null.</exception>
-		public bool Remove(string key)
+		public bool Remove(string Key)
 		{
-			Task<bool> Task = this.RemoveAsync(key);
+			Task<bool> Task = this.RemoveAsync(Key);
 			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			return Task.Result;
 		}
@@ -242,19 +246,19 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Removes the element with the specified key from the System.Collections.IDictionary object.
 		/// </summary>
-		/// <param name="key">The key of the element to remove.</param>
+		/// <param name="Key">The key of the element to remove.</param>
 		/// <returns>If key was found and removed.</returns>
 		/// <exception cref="ArgumentNullException">key is null.</exception>
-		public async Task<bool> RemoveAsync(string key)
+		public async Task<bool> RemoveAsync(string Key)
 		{
-			if (key is null)
+			if (Key is null)
 				throw new ArgumentNullException("key is null.", "key");
 
 			if (!(this.inMemory is null))
 			{
 				lock (this.inMemory)
 				{
-					this.inMemory.Remove(key);
+					this.inMemory.Remove(Key);
 				}
 			}
 
@@ -263,7 +267,9 @@ namespace Waher.Persistence.Files
 			await this.dictionaryFile.BeginWrite();
 			try
 			{
-				DeletedObject = await this.dictionaryFile.DeleteObjectLocked(key, false, true, this.keyValueSerializer, null, 0);
+				DeletedObject = await this.dictionaryFile.DeleteObjectLocked(
+					new StringPrimaryKey(Key), false, true, this.keyValueSerializer, 
+					null, 0);
 			}
 			catch (KeyNotFoundException)
 			{
@@ -280,25 +286,25 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Gets the value associated with the specified key.
 		/// </summary>
-		/// <param name="key">The key whose value to get.</param>
-		/// <param name="value">When this method returns, the value associated with the specified key, if the key is found; otherwise, 
+		/// <param name="Key">The key whose value to get.</param>
+		/// <param name="Value">When this method returns, the value associated with the specified key, if the key is found; otherwise, 
 		/// the default value for the type of the value parameter. This parameter is passed uninitialized.</param>
 		/// <returns>true if the object that implements System.Collections.Generic.IDictionary{string,object} contains an element with the specified key; 
 		/// otherwise, false.</returns>
 		/// <exception cref="ArgumentNullException">key is null.</exception>
-		public bool TryGetValue(string key, out object value)
+		public bool TryGetValue(string Key, out object Value)
 		{
-			Task<KeyValuePair<bool, object>> Task = this.TryGetValueAsync(key);
+			Task<KeyValuePair<bool, object>> Task = this.TryGetValueAsync(Key);
 			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			KeyValuePair<bool, object> P = Task.Result;
-			value = P.Value;
+			Value = P.Value;
 			return P.Key;
 		}
 
 		/// <summary>
 		/// Gets the value associated with the specified key.
 		/// </summary>
-		/// <param name="key">The key whose value to get.</param>
+		/// <param name="Key">The key whose value to get.</param>
 		/// <returns>Returns a pair of values:
 		/// 
 		/// First value is true if the object that implements System.Collections.Generic.IDictionary{string,object} contains an element 
@@ -306,16 +312,16 @@ namespace Waher.Persistence.Files
 		/// When this method returns, the second value associated with the specified key, if the key is found; otherwise, 
 		/// the default value for the type of the value parameter. This parameter is passed uninitialized.</returns>
 		/// <exception cref="ArgumentNullException">key is null.</exception>
-		public async Task<KeyValuePair<bool, object>> TryGetValueAsync(string key)
+		public async Task<KeyValuePair<bool, object>> TryGetValueAsync(string Key)
 		{
-			if (key is null)
+			if (Key is null)
 				throw new ArgumentNullException("key is null.", "key");
 
 			if (!(this.inMemory is null))
 			{
 				lock (this.inMemory)
 				{
-					if (this.inMemory.TryGetValue(key, out object value))
+					if (this.inMemory.TryGetValue(Key, out object value))
 						return new KeyValuePair<bool, object>(true, value);
 				}
 			}
@@ -323,11 +329,13 @@ namespace Waher.Persistence.Files
 			await this.dictionaryFile.BeginRead();
 			try
 			{
-				object Result = await this.dictionaryFile.TryLoadObjectLocked(key, this.keyValueSerializer);
+				object Result = await this.dictionaryFile.TryLoadObjectLocked(
+					new StringPrimaryKey(Key), this.keyValueSerializer);
+
 				if (Result is null)
 					return new KeyValuePair<bool, object>(false, null);
 				else if (Result is KeyValuePair<string, object> P)
-					return new KeyValuePair<bool, object>(P.Key == key, P.Value);
+					return new KeyValuePair<bool, object>(P.Key == Key, P.Value);
 				else
 					return new KeyValuePair<bool, object>(true, Result);
 			}
@@ -340,33 +348,34 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Gets the value associated with the specified key.
 		/// </summary>
-		/// <param name="key">The key whose value to get.</param>
+		/// <param name="Key">The key whose value to get.</param>
 		/// <returns>Returns the value associated with the specified key, if the key is found.</returns>
 		/// <exception cref="ArgumentNullException">key is null.</exception>
-		/// <exception cref="KeyNotFoundException">If <paramref name="key"/> was not found.</exception>
-		public async Task<KeyValuePair<string, object>> GetValueAsync(string key)
+		/// <exception cref="KeyNotFoundException">If <paramref name="Key"/> was not found.</exception>
+		public async Task<KeyValuePair<string, object>> GetValueAsync(string Key)
 		{
-			if (key is null)
+			if (Key is null)
 				throw new ArgumentNullException("key is null.", "key");
 
 			if (!(this.inMemory is null))
 			{
 				lock (this.inMemory)
 				{
-					if (this.inMemory.TryGetValue(key, out object value))
-						return new KeyValuePair<string, object>(key, value);
+					if (this.inMemory.TryGetValue(Key, out object Value))
+						return new KeyValuePair<string, object>(Key, Value);
 				}
 			}
 
 			await this.dictionaryFile.BeginRead();
 			try
 			{
-				object Obj = await this.dictionaryFile.LoadObjectLocked(key, this.keyValueSerializer);
+				object Obj = await this.dictionaryFile.LoadObjectLocked(
+					new StringPrimaryKey(Key), this.keyValueSerializer);
 
 				if (Obj is KeyValuePair<string, object> P)
 					return P;
 				else
-					return new KeyValuePair<string, object>(key, Obj);
+					return new KeyValuePair<string, object>(Key, Obj);
 			}
 			finally
 			{
@@ -377,9 +386,9 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// <see cref="ICollection{T}.Add(T)"/>
 		/// </summary>
-		public void Add(KeyValuePair<string, object> item)
+		public void Add(KeyValuePair<string, object> Item)
 		{
-			this.Add(item.Key, item.Value);
+			this.Add(Item.Key, Item.Value);
 		}
 
 		/// <summary>
@@ -410,32 +419,32 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// <see cref="ICollection{T}.Contains(T)"/>
 		/// </summary>
-		public bool Contains(KeyValuePair<string, object> item)
+		public bool Contains(KeyValuePair<string, object> Item)
 		{
-			if (!this.TryGetValue(item.Key, out object Value))
+			if (!this.TryGetValue(Item.Key, out object Value))
 				return false;
 
 			if (Value is null)
-				return item.Value is null;
+				return Item.Value is null;
 			else
-				return Value.Equals(item.Value);
+				return Value.Equals(Item.Value);
 		}
 
 		/// <summary>
 		/// <see cref="ICollection{T}.CopyTo(T[], int)"/>
 		/// </summary>
-		public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
+		public void CopyTo(KeyValuePair<string, object>[] Array, int ArrayIndex)
 		{
-			Task Task = this.CopyToAsync(array, arrayIndex);
+			Task Task = this.CopyToAsync(Array, ArrayIndex);
 			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 		}
 
 		/// <summary>
 		/// Copies the contents of the dicitionary to an array.
 		/// </summary>
-		/// <param name="array">Array</param>
-		/// <param name="arrayIndex">Start index</param>
-		public async Task CopyToAsync(KeyValuePair<string, object>[] array, int arrayIndex)
+		/// <param name="Array">Array</param>
+		/// <param name="ArrayIndex">Start index</param>
+		public async Task CopyToAsync(KeyValuePair<string, object>[] Array, int ArrayIndex)
 		{
 			await this.dictionaryFile.BeginRead();
 			try
@@ -443,7 +452,7 @@ namespace Waher.Persistence.Files
 				ObjectBTreeFileCursor<KeyValuePair<string, object>> e = await this.GetEnumeratorLocked();
 
 				while (await e.MoveNextAsyncLocked())
-					array[arrayIndex++] = e.Current;
+					Array[ArrayIndex++] = e.Current;
 			}
 			finally
 			{
@@ -488,12 +497,12 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// <see cref="ICollection{T}.Remove(T)"/>
 		/// </summary>
-		public bool Remove(KeyValuePair<string, object> item)
+		public bool Remove(KeyValuePair<string, object> Item)
 		{
-			if (!this.Contains(item))
+			if (!this.Contains(Item))
 				return false;
 			else
-				return this.Remove(item.Key);
+				return this.Remove(Item.Key);
 		}
 
 		/// <summary>
@@ -585,9 +594,7 @@ namespace Waher.Persistence.Files
 		{
 			get
 			{
-				if (this.keyCollection is null)
-					this.keyCollection = new KeyCollection(this);
-
+				this.keyCollection ??= new KeyCollection(this);
 				return this.keyCollection;
 			}
 		}
@@ -601,9 +608,7 @@ namespace Waher.Persistence.Files
 		{
 			get
 			{
-				if (this.valueCollection is null)
-					this.valueCollection = new ValueCollection(this);
-
+				this.valueCollection ??= new ValueCollection(this);
 				return this.valueCollection;
 			}
 		}
@@ -629,22 +634,22 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Gets or sets the element with the specified key.
 		/// </summary>
-		/// <param name="key">The key of the element to get or set.</param>
+		/// <param name="Key">The key of the element to get or set.</param>
 		/// <returns>The element with the specified key.</returns>
 		/// <exception cref="ArgumentNullException">key is null.</exception>
 		/// <exception cref="KeyNotFoundException">The property is retrieved and key is not found.</exception>
-		public object this[string key]
+		public object this[string Key]
 		{
 			get
 			{
-				Task<KeyValuePair<string, object>> Task = this.GetValueAsync(key);
+				Task<KeyValuePair<string, object>> Task = this.GetValueAsync(Key);
 				FilesProvider.Wait(Task, this.timeoutMilliseconds);
 				return Task.Result.Value;
 			}
 
 			set
 			{
-				FilesProvider.Wait(this.AddAsync(key, value, true), this.timeoutMilliseconds);
+				FilesProvider.Wait(this.AddAsync(Key, value, true), this.timeoutMilliseconds);
 			}
 		}
 
@@ -682,7 +687,9 @@ namespace Waher.Persistence.Files
 					Entries = await this.GetEnumeratorLocked();
 				else
 				{
-					BlockInfo Info = await this.dictionaryFile.FindNodeLocked(FromKey, true);
+					BlockInfo Info = await this.dictionaryFile.FindNodeLocked(
+						new StringPrimaryKey(FromKey), true);
+
 					ObjectBTreeFileCursor<KeyValuePair<string, object>> e =
 						await ObjectBTreeFileCursor<KeyValuePair<string, object>>.CreateLocked(this.dictionaryFile, this.recordHandler, this.keyValueSerializer);
 

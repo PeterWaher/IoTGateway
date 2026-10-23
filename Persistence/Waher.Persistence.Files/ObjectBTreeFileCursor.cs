@@ -5,6 +5,7 @@ using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Waher.Persistence.Exceptions;
 using Waher.Persistence.Files.Storage;
+using Waher.Persistence.Files.Storage.PrimaryKeys;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 
@@ -24,7 +25,7 @@ namespace Waher.Persistence.Files
 		private IObjectSerializer currentSerializer;
 		private BlockInfo startingPoint;
 		private IRecordHandler recordHandler;
-		private object currentObjectId;
+		private IPrimaryKey currentPrimaryKey;
 		private string objectIdMemberName;
 		private int fieldCount;
 		private T current;
@@ -138,32 +139,16 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Gets the Object ID of the current object.
+		/// Gets the Primary Key of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
 		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		public object CurrentObjectId
+		public IPrimaryKey CurrentPrimaryKey
 		{
 			get
 			{
 				if (this.hasCurrent)
-					return this.currentObjectId;
-				else
-					throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
-			}
-		}
-
-		/// <summary>
-		/// Gets the Object ID of the current object.
-		/// </summary>
-		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		Guid ICursor<T>.CurrentObjectId
-		{
-			get
-			{
-				if (this.hasCurrent)
-					return (Guid)this.currentObjectId;
+					return this.currentPrimaryKey;
 				else
 					throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
 			}
@@ -192,7 +177,7 @@ namespace Waher.Persistence.Files
 					if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
 						throw new InvalidOperationException("Contents of file has been changed.");
 
-					this.currentRank = await this.file.GetRankLocked(this.currentObjectId);
+					this.currentRank = await this.file.GetRankLocked(this.currentPrimaryKey);
 				}
 
 				return this.currentRank.Value;
@@ -237,7 +222,7 @@ namespace Waher.Persistence.Files
 			if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
 				throw new InvalidOperationException("Contents of file has been changed.");
 
-			object ObjectId;
+			IPrimaryKey PrimaryKey = this.recordHandler.CreateKey();
 			uint BlockLink;
 			int Pos;
 
@@ -256,23 +241,21 @@ namespace Waher.Persistence.Files
 						this.currentReader.SkipBlockLink(); // Must skip first left branch
 
 						Pos = this.currentReader.Position;
-						ObjectId = this.recordHandler.GetKey(this.currentReader);
-						if (!(ObjectId is null))
+						this.recordHandler.ReadPrimaryKey(this.currentReader, PrimaryKey);
+						if (!PrimaryKey.Empty)
 						{
-							await this.LoadObjectLocked(ObjectId, Pos);
+							await this.LoadObjectLocked(PrimaryKey, Pos);
 							return true;
 						}
 
 						Pos = this.currentReader.Position;
-						ObjectId = this.recordHandler.GetKey(this.currentReader);
-						if (!(ObjectId is null))
+						this.recordHandler.ReadPrimaryKey(this.currentReader, PrimaryKey);
+						if (!PrimaryKey.Empty)
 						{
-							await this.LoadObjectLocked(ObjectId, Pos);
+							await this.LoadObjectLocked(PrimaryKey, Pos);
 							return true;
 						}
 					}
-					else
-						ObjectId = null;
 				}
 				else
 					return await this.GoToFirstLocked();
@@ -286,23 +269,21 @@ namespace Waher.Persistence.Files
 				{
 					BlockLink = this.currentReader.ReadBlockLink();
 					if (BlockLink != 0)
-						return await this.GoToFirstLocked(BlockLink);
+						return await this.GoToFirstLocked(BlockLink, PrimaryKey);
 
 					Pos = this.currentReader.Position;
-					ObjectId = this.recordHandler.GetKey(this.currentReader);
-					if (!(ObjectId is null))
+					this.recordHandler.ReadPrimaryKey(this.currentReader, PrimaryKey);
+					if (!PrimaryKey.Empty)
 					{
-						await this.LoadObjectLocked(ObjectId, Pos);
+						await this.LoadObjectLocked(PrimaryKey, Pos);
 						return true;
 					}
 				}
-				else
-					ObjectId = null;
 			}
 
 			BlockLink = this.currentHeader.LastBlockIndex;
 			if (BlockLink != 0)
-				return await this.GoToFirstLocked(BlockLink);
+				return await this.GoToFirstLocked(BlockLink, PrimaryKey);
 
 			do
 			{
@@ -336,8 +317,8 @@ namespace Waher.Persistence.Files
 						BlockLink2 = this.currentReader.ReadBlockLink();
 						Pos = this.currentReader.Position;
 
-						ObjectId = this.recordHandler.GetKey(this.currentReader);
-						if (IsEmpty = (ObjectId is null))
+						this.recordHandler.ReadPrimaryKey(this.currentReader, PrimaryKey);
+						if (IsEmpty = PrimaryKey.Empty)
 							break;
 
 						Len = await this.recordHandler.GetPayloadSize(this.currentReader);
@@ -353,11 +334,11 @@ namespace Waher.Persistence.Files
 					this.currentBlockIndex = BlockLink;
 					this.currentHeader = ParentHeader;
 
-					await this.LoadObjectLocked(ObjectId, Pos);
+					await this.LoadObjectLocked(PrimaryKey, Pos);
 					return true;
 				}
 			}
-			while (ObjectId is null);
+			while (PrimaryKey.Empty);
 
 			this.Reset();
 			return false;
@@ -383,12 +364,11 @@ namespace Waher.Persistence.Files
 		internal Task<bool> GoToFirstLocked()
 		{
 			this.currentRank = 0;
-			return this.GoToFirstLocked(0);
+			return this.GoToFirstLocked(0, this.recordHandler.CreateKey());
 		}
 
-		private async Task<bool> GoToFirstLocked(uint StartBlock)
+		private async Task<bool> GoToFirstLocked(uint StartBlock, IPrimaryKey PrimaryKey)
 		{
-			object ObjectId;
 			uint BlockLink;
 			int Pos;
 			bool IsEmpty;
@@ -409,10 +389,9 @@ namespace Waher.Persistence.Files
 
 				BlockLink = this.currentReader.ReadBlockLink();
 				Pos = this.currentReader.Position;
-				ObjectId = this.recordHandler.GetKey(this.currentReader);
-				IsEmpty = (ObjectId is null);
+				this.recordHandler.ReadPrimaryKey(this.currentReader, PrimaryKey);
 
-				if (IsEmpty)
+				if (IsEmpty = PrimaryKey.Empty)
 					BlockLink = this.currentHeader.LastBlockIndex;
 			}
 			while (BlockLink != 0);
@@ -436,9 +415,8 @@ namespace Waher.Persistence.Files
 							BlockLink = this.currentReader.ReadBlockLink();
 							Pos = this.currentReader.Position;
 
-							ObjectId = this.recordHandler.GetKey(this.currentReader);
-							IsEmpty = (ObjectId is null);
-							if (IsEmpty)
+							this.recordHandler.ReadPrimaryKey(this.currentReader, PrimaryKey);
+							if (IsEmpty = PrimaryKey.Empty)
 								break;
 
 							if (BlockLink == ChildLink)
@@ -458,7 +436,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			await this.LoadObjectLocked(ObjectId, Pos);
+			await this.LoadObjectLocked(PrimaryKey, Pos);
 			return true;
 		}
 
@@ -488,8 +466,8 @@ namespace Waher.Persistence.Files
 			if (this.currentRank.HasValue)
 				this.currentRank--;
 
-			object ObjectId;
-			object LastObjectId;
+			IPrimaryKey PrimaryKey = this.recordHandler.CreateKey();
+			IPrimaryKey LastPrimaryKey = null;
 			uint BlockLink;
 			uint ParentBlockLink;
 			int LastPos;
@@ -506,7 +484,7 @@ namespace Waher.Persistence.Files
 					this.currentReader.SkipBlockLink();
 					Pos = this.currentReader.Position;
 
-					ObjectId = this.recordHandler.GetKey(this.currentReader);
+					this.recordHandler.ReadPrimaryKey(this.currentReader, PrimaryKey);
 
 					Len = await this.recordHandler.GetPayloadSize(this.currentReader);
 					this.currentReader.Position += Len;
@@ -517,17 +495,17 @@ namespace Waher.Persistence.Files
 
 				if (BlockLink == 0)
 				{
-					await this.LoadObjectLocked(ObjectId, Pos);
+					await this.LoadObjectLocked(PrimaryKey, Pos);
 					return true;
 				}
 				else
-					return await this.GoToLastLocked(BlockLink);
+					return await this.GoToLastLocked(BlockLink, PrimaryKey);
 			}
 			else
 			{
 				BlockLink = this.currentReader.ReadBlockLink();
 				if (BlockLink != 0)
-					return await this.GoToLastLocked(BlockLink);
+					return await this.GoToLastLocked(BlockLink, PrimaryKey);
 			}
 
 			while (this.currentBlockIndex != 0)
@@ -542,47 +520,55 @@ namespace Waher.Persistence.Files
 				else if (this.currentHeader.LastBlockIndex == this.currentBlockIndex)
 				{
 					LastPos = this.currentReader.Position;
-					LastObjectId = null;
+					LastPrimaryKey?.Clear();
 					do
 					{
 						this.currentReader.SkipBlockLink();
 						Pos = this.currentReader.Position;
 
-						ObjectId = this.recordHandler.GetKey(this.currentReader);
-						IsEmpty = (ObjectId is null);
-						if (IsEmpty)
+						this.recordHandler.ReadPrimaryKey(this.currentReader, PrimaryKey);
+						if (PrimaryKey.Empty)
 							break;
 
 						LastPos = Pos;
-						LastObjectId = ObjectId;
+
+						if (LastPrimaryKey is null)
+							LastPrimaryKey = PrimaryKey.Clone();
+						else
+							LastPrimaryKey.Set(PrimaryKey);
+
 						Len = await this.recordHandler.GetPayloadSize(this.currentReader);
 						this.currentReader.Position += Len;
 					}
 					while (this.currentReader.BytesLeft >= 4);
 
 					this.currentBlockIndex = ParentBlockLink;
-					await this.LoadObjectLocked(LastObjectId, LastPos);
+					await this.LoadObjectLocked(LastPrimaryKey, LastPos);
 					return true;
 				}
 				else
 				{
 					LastPos = 0;
-					LastObjectId = null;
+					LastPrimaryKey?.Clear();
 					do
 					{
 						BlockLink = this.currentReader.ReadBlockLink();
 						Pos = this.currentReader.Position;
 
-						ObjectId = this.recordHandler.GetKey(this.currentReader);
-						IsEmpty = (ObjectId is null);
-						if (IsEmpty)
+						this.recordHandler.ReadPrimaryKey(this.currentReader, PrimaryKey);
+						if (IsEmpty = PrimaryKey.Empty)
 							break;
 
 						if (BlockLink == this.currentBlockIndex)
 							break;
 
 						LastPos = Pos;
-						LastObjectId = ObjectId;
+
+						if (LastPrimaryKey is null)
+							LastPrimaryKey = PrimaryKey.Clone();
+						else
+							LastPrimaryKey.Set(PrimaryKey);
+
 						Len = await this.recordHandler.GetPayloadSize(this.currentReader);
 						this.currentReader.Position += Len;
 					}
@@ -598,7 +584,7 @@ namespace Waher.Persistence.Files
 
 					if (LastPos != 0)
 					{
-						await this.LoadObjectLocked(LastObjectId, LastPos);
+						await this.LoadObjectLocked(LastPrimaryKey, LastPos);
 						return true;
 					}
 				}
@@ -615,12 +601,11 @@ namespace Waher.Persistence.Files
 		internal Task<bool> GoToLastLocked()
 		{
 			this.currentRank = null;
-			return this.GoToLastLocked(0);
+			return this.GoToLastLocked(0, this.recordHandler.CreateKey());
 		}
 
-		private async Task<bool> GoToLastLocked(uint StartBlock)
+		private async Task<bool> GoToLastLocked(uint StartBlock, IPrimaryKey PrimaryKey)
 		{
-			object ObjectId;
 			uint BlockLink;
 			int Len;
 			int Pos;
@@ -651,9 +636,8 @@ namespace Waher.Persistence.Files
 				Pos = this.currentReader.Position;
 
 				this.currentReader.SkipBlockLink();
-				ObjectId = this.recordHandler.GetKey(this.currentReader);
-				IsEmpty = (ObjectId is null);
-				if (IsEmpty)
+				this.recordHandler.ReadPrimaryKey(this.currentReader, PrimaryKey);
+				if (PrimaryKey.Empty)
 					break;
 
 				LastPos = Pos;
@@ -664,10 +648,9 @@ namespace Waher.Persistence.Files
 
 			this.currentReader.Position = LastPos;
 			this.currentReader.SkipBlockLink();
-			ObjectId = this.recordHandler.GetKey(this.currentReader);
-			IsEmpty = (ObjectId is null);
+			this.recordHandler.ReadPrimaryKey(this.currentReader, PrimaryKey);
 
-			if (IsEmpty)
+			if (IsEmpty = PrimaryKey.Empty)
 			{
 				while (IsEmpty && this.currentBlockIndex != 0)
 				{
@@ -682,9 +665,8 @@ namespace Waher.Persistence.Files
 						Pos = this.currentReader.Position;
 
 						this.currentReader.SkipBlockLink();
-						ObjectId = this.recordHandler.GetKey(this.currentReader);
-						IsEmpty = (ObjectId is null);
-						if (IsEmpty)
+						this.recordHandler.ReadPrimaryKey(this.currentReader, PrimaryKey);
+						if (PrimaryKey.Empty)
 							break;
 
 						LastPos = Pos;
@@ -695,8 +677,8 @@ namespace Waher.Persistence.Files
 
 					this.currentReader.Position = LastPos;
 					this.currentReader.SkipBlockLink();
-					ObjectId = this.recordHandler.GetKey(this.currentReader);
-					IsEmpty = (ObjectId is null);
+					this.recordHandler.ReadPrimaryKey(this.currentReader, PrimaryKey);
+					IsEmpty = PrimaryKey.Empty;
 				}
 
 				if (IsEmpty)
@@ -706,11 +688,11 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			await this.LoadObjectLocked(ObjectId, LastPos + 4);
+			await this.LoadObjectLocked(PrimaryKey, LastPos + 4);
 			return true;
 		}
 
-		private async Task LoadObjectLocked(object ObjectId, int Start)
+		private async Task LoadObjectLocked(IPrimaryKey PrimaryKey, int Start)
 		{
 			this.currentSerializer = this.defaultSerializer;
 
@@ -793,7 +775,11 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			this.currentObjectId = ObjectId;
+			if (this.currentPrimaryKey is null)
+				this.currentPrimaryKey = PrimaryKey.Clone();
+			else
+				this.currentPrimaryKey.Set(PrimaryKey);
+
 			this.hasCurrent = true;
 		}
 
@@ -808,13 +794,13 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Finds the position of an object in the underlying database.
 		/// </summary>
-		/// <param name="ObjectId">Object ID</param>
+		/// <param name="PrimaryKey">Primary key of object.</param>
 		/// <returns>If the corresponding object was found. If so, the <see cref="Current"/> property will contain the corresponding
 		/// object.</returns>
-		public async Task<bool> GoToObjectLocked(object ObjectId)
+		public async Task<bool> GoToObjectLocked(IPrimaryKey PrimaryKey)
 		{
 			uint BlockIndex = 0;
-			object ObjectId2;
+			IPrimaryKey PrimaryKey2 = this.recordHandler.CreateKey();
 			int Len;
 			int Pos;
 			uint BlockLink;
@@ -840,16 +826,15 @@ namespace Waher.Persistence.Files
 					Pos = this.currentReader.Position;
 
 					BlockLink = this.currentReader.ReadBlockLink();                  // Block link.
-					ObjectId2 = this.recordHandler.GetKey(this.currentReader);                         // Object ID of object.
+					this.recordHandler.ReadPrimaryKey(this.currentReader, PrimaryKey2);                         // Object ID of object.
 
-					IsEmpty = (ObjectId2 is null);
-					if (IsEmpty)
+					if (IsEmpty = PrimaryKey2.Empty)
 					{
 						Comparison = 1;
 						break;
 					}
 
-					Comparison = this.recordHandler.Compare(ObjectId, ObjectId2);
+					Comparison = PrimaryKey.CompareTo(PrimaryKey2);
 
 					Len = await this.recordHandler.GetPayloadSize(this.currentReader);     // Remaining length of object.
 					this.currentReader.Position += Len;
@@ -858,7 +843,7 @@ namespace Waher.Persistence.Files
 
 				if (Comparison == 0)                                       // Object ID found.
 				{
-					await this.LoadObjectLocked(ObjectId2, Pos + 4);
+					await this.LoadObjectLocked(PrimaryKey2, Pos + 4);
 					return true;
 				}
 				else if (IsEmpty || Comparison > 0)
@@ -888,11 +873,12 @@ namespace Waher.Persistence.Files
 		/// Finds the object given its order in the underlying database.
 		/// </summary>
 		/// <param name="ObjectIndex">Order of object in database.</param>
+		/// <param name="PrimaryKey">Primary key object to use during navigation.</param>
 		/// <returns>If the corresponding object was found. If so, the <see cref="Current"/> property will contain the corresponding
 		/// object.</returns>
-		public async Task<bool> GoToObjectLocked(ulong ObjectIndex)
+		public async Task<bool> GoToObjectLocked(ulong ObjectIndex, IPrimaryKey PrimaryKey)
 		{
-			ulong? Index = await this.GoToObjectLocked(ObjectIndex, 0);
+			ulong? Index = await this.GoToObjectLocked(ObjectIndex, 0, PrimaryKey);
 
 			if (Index.HasValue && Index.Value == ObjectIndex + 1)
 			{
@@ -907,21 +893,20 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task<ulong?> GoToObjectLocked(ulong ObjectIndex, uint BlockIndex)
+		private async Task<ulong?> GoToObjectLocked(ulong ObjectIndex, uint BlockIndex,
+			IPrimaryKey PrimaryKey)
 		{
 			if (ObjectIndex == 0)
 			{
-				if (await this.GoToFirstLocked(BlockIndex))
+				if (await this.GoToFirstLocked(BlockIndex, PrimaryKey))
 					return 1;
 				else
 					return null;
 			}
 
-			object ObjectId;
 			int Len;
 			int Pos;
 			uint BlockLink;
-			bool IsEmpty;
 
 			byte[] Block = await this.LoadBlockLocked(BlockIndex);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, Block, this.file.BlockLimit);
@@ -937,10 +922,9 @@ namespace Waher.Persistence.Files
 				Pos = Reader.Position;
 
 				BlockLink = Reader.ReadBlockLink();                  // Block link.
-				ObjectId = this.recordHandler.GetKey(Reader);                         // Object ID of object.
 
-				IsEmpty = (ObjectId is null);
-				if (IsEmpty)
+				this.recordHandler.ReadPrimaryKey(Reader, PrimaryKey);
+				if (PrimaryKey.Empty)
 					break;
 
 				Len = await this.recordHandler.GetPayloadSize(Reader);     // Remaining length of object.
@@ -948,7 +932,9 @@ namespace Waher.Persistence.Files
 
 				if (BlockLink != 0)
 				{
-					SubtreeCount = await this.GoToObjectLocked(ObjectIndex - Count, BlockLink);
+					SubtreeCount = await this.GoToObjectLocked(ObjectIndex - Count, 
+						BlockLink, this.recordHandler.CreateKey());
+
 					if (SubtreeCount.HasValue)
 					{
 						Count += SubtreeCount.Value;
@@ -966,7 +952,7 @@ namespace Waher.Persistence.Files
 					this.currentReader = Reader;
 					this.currentHeader = Header;
 
-					await this.LoadObjectLocked(ObjectId, Pos + 4);
+					await this.LoadObjectLocked(PrimaryKey, Pos + 4);
 					return Count;
 				}
 			}
@@ -974,7 +960,9 @@ namespace Waher.Persistence.Files
 
 			if (Header.LastBlockIndex != 0)
 			{
-				SubtreeCount = await this.GoToObjectLocked(ObjectIndex - Count, Header.LastBlockIndex);
+				SubtreeCount = await this.GoToObjectLocked(ObjectIndex - Count, 
+					Header.LastBlockIndex, PrimaryKey);
+
 				if (SubtreeCount.HasValue)
 				{
 					Count += SubtreeCount.Value;
@@ -996,9 +984,10 @@ namespace Waher.Persistence.Files
 			this.hasCurrent = false;
 			this.currentTypeCompatible = false;
 			this.currentRank = null;
-			this.currentObjectId = null;
 			this.current = default;
 			this.currentSerializer = null;
+			
+			this.currentPrimaryKey?.Clear();
 		}
 
 		/// <summary>
@@ -1027,7 +1016,7 @@ namespace Waher.Persistence.Files
 			if (Rank < 0)
 				return false;
 
-			if (!await this.GoToObjectLocked((ulong)Rank))
+			if (!await this.GoToObjectLocked((ulong)Rank, this.recordHandler.CreateKey()))
 				return false;
 
 			return true;
@@ -1049,7 +1038,10 @@ namespace Waher.Persistence.Files
 					if (!await this.GoToFirstLocked())
 						return null;
 
-					BlockInfo Position = new BlockInfo(this.currentHeader, this.currentBlock, this.currentBlockIndex, this.currentObjPos, false, true);
+					BlockInfo Position = new BlockInfo(this.currentHeader,
+						this.currentBlock, this.currentBlockIndex, this.currentObjPos,
+						false, true);
+
 					this.Reset();
 
 					return new Bookmark(this.file, Position);
@@ -1090,14 +1082,14 @@ namespace Waher.Persistence.Files
 				if (s.StartsWith("-"))
 				{
 					Ascending = false;
-					s = s.Substring(1);
+					s = s[1..];
 				}
 				else
 				{
 					Ascending = true;
 
 					if (s.StartsWith("+"))
-						s = s.Substring(1);
+						s = s[1..];
 				}
 
 				while (FieldIndex < this.fieldCount)
@@ -1156,14 +1148,14 @@ namespace Waher.Persistence.Files
 				if (s.StartsWith("-"))
 				{
 					Ascending = false;
-					s = s.Substring(1);
+					s = s[1..];
 				}
 				else
 				{
 					Ascending = true;
 
 					if (s.StartsWith("+"))
-						s = s.Substring(1);
+						s = s[1..];
 				}
 
 				while (FieldIndex < this.fieldCount)
@@ -1210,25 +1202,15 @@ namespace Waher.Persistence.Files
 			ObjectSerializer Serializer = this.defaultSerializerEx ??
 				await this.file.Provider.GetObjectSerializerEx(typeof(T));
 
-			object ObjectId = await Serializer.GetObjectId(LastItem, false, null);
-			BlockInfo Info = await this.file.FindNodeLocked(ObjectId, false);
-			if (!(Info is null))
-			{
-				this.SetStartingPoint(Info);
-				await this.MoveNextAsyncLocked();
-			}
-			else
-			{
-				Info = await this.file.FindNodeLocked(ObjectId, true);
-				this.SetStartingPoint(Info);
-			}
+			IPrimaryKey LastKey = new GuidPrimaryKey(await Serializer.GetObjectId(LastItem, false, null));
+			await this.ContinueAfterLocked(LastKey);
 		}
 
 		/// <summary>
 		/// Continues operating after a given item.
 		/// </summary>
 		/// <param name="LastKey">Key of Last item in a previous process.</param>
-		public async Task ContinueAfterLocked(byte[] LastKey)
+		public async Task ContinueAfterLocked(IPrimaryKey LastKey)
 		{
 			BlockInfo Info = await this.file.FindNodeLocked(LastKey, false);
 			if (!(Info is null))
@@ -1252,25 +1234,15 @@ namespace Waher.Persistence.Files
 			ObjectSerializer Serializer = this.defaultSerializerEx ??
 				await this.file.Provider.GetObjectSerializerEx(typeof(T));
 
-			Guid ObjectId = await Serializer.GetObjectId(LastItem, false, null);
-			BlockInfo Info = await this.file.FindNodeLocked(ObjectId, false);
-			if (!(Info is null))
-			{
-				this.SetStartingPoint(Info);
-				await this.MovePreviousAsyncLocked();
-			}
-			else
-			{
-				Info = await this.file.FindNodeLocked(ObjectId, true);
-				this.SetStartingPoint(Info);
-			}
+			IPrimaryKey LastKey = new GuidPrimaryKey(await Serializer.GetObjectId(LastItem, false, null));
+			await this.ContinueBeforeLocked(LastKey);
 		}
 
 		/// <summary>
 		/// Continues operating before a given item.
 		/// </summary>
 		/// <param name="LastKey">Key of Last item in a previous process.</param>
-		public async Task ContinueBeforeLocked(byte[] LastKey)
+		public async Task ContinueBeforeLocked(IPrimaryKey LastKey)
 		{
 			BlockInfo Info = await this.file.FindNodeLocked(LastKey, false);
 			if (!(Info is null))

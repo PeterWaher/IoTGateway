@@ -12,6 +12,7 @@ namespace Waher.Persistence.Serialization
 		private readonly Encoding encoding;
 		private byte[] data;
 		private int pos;
+		private int len;
 		private byte bitOffset = 0;
 		private readonly uint blockLimit;
 
@@ -22,9 +23,15 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="Data">Binary data to deserialize.</param>
 		/// <param name="BlockLimit">Maximum block index + 1</param>
-		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data, uint BlockLimit)
-			: this(CollectionName, Encoding, Data, BlockLimit, 0)
+		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data,
+			uint BlockLimit)
 		{
+			this.collectionName = CollectionName;
+			this.encoding = Encoding;
+			this.data = Data;
+			this.pos = 0;
+			this.len = Data.Length;
+			this.blockLimit = BlockLimit;
 		}
 
 		/// <summary>
@@ -33,14 +40,36 @@ namespace Waher.Persistence.Serialization
 		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="Data">Binary data to deserialize.</param>
-		/// <param name="StartPosition">Starting position.</param>
 		/// <param name="BlockLimit">Maximum block index + 1</param>
-		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data, uint BlockLimit, int StartPosition)
+		/// <param name="Offset">Offset into binary data where deserialization begins.</param>
+		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data,
+			uint BlockLimit, int Offset)
 		{
 			this.collectionName = CollectionName;
 			this.encoding = Encoding;
 			this.data = Data;
-			this.pos = StartPosition;
+			this.pos = Offset;
+			this.len = Data.Length;
+			this.blockLimit = BlockLimit;
+		}
+
+		/// <summary>
+		/// Manages binary deserialization of data.
+		/// </summary>
+		/// <param name="CollectionName">Name of current collection.</param>
+		/// <param name="Encoding">Encoding to use for text.</param>
+		/// <param name="Data">Binary data to deserialize.</param>
+		/// <param name="BlockLimit">Maximum block index + 1</param>
+		/// <param name="Offset">Offset into binary data where deserialization begins.</param>
+		/// <param name="Length">Number of bytes to deserialize.</param>
+		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data,
+			uint BlockLimit, int Offset, int Length)
+		{
+			this.collectionName = CollectionName;
+			this.encoding = Encoding;
+			this.data = Data;
+			this.pos = Offset;
+			this.len = Length;
 			this.blockLimit = BlockLimit;
 		}
 
@@ -628,7 +657,7 @@ namespace Waher.Persistence.Serialization
 		{
 			get
 			{
-				int Result = this.data.Length - this.pos;
+				int Result = this.len - this.pos;
 
 				if (this.bitOffset > 0)
 					Result--;
@@ -640,10 +669,39 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Resets the serializer, allowing for the serialization of another object using the same resources.
 		/// </summary>
-		public void Restart(byte[] Data, int StartPosition)
+		/// <param name="Data">Binary data buffer.</param>
+		public void Restart(byte[] Data)
 		{
 			this.data = Data;
-			this.pos = StartPosition;
+			this.pos = 0;
+			this.len = Data.Length;
+			this.bitOffset = 0;
+		}
+
+		/// <summary>
+		/// Resets the serializer, allowing for the serialization of another object using the same resources.
+		/// </summary>
+		/// <param name="Data">Binary data buffer.</param>
+		/// <param name="Offset">Offset into binary data where deserialization begins.</param>
+		public void Restart(byte[] Data, int Offset)
+		{
+			this.data = Data;
+			this.pos = Offset;
+			this.len = Data.Length;
+			this.bitOffset = 0;
+		}
+
+		/// <summary>
+		/// Resets the serializer, allowing for the serialization of another object using the same resources.
+		/// </summary>
+		/// <param name="Data">Binary data buffer.</param>
+		/// <param name="Offset">Offset into binary data where deserialization begins.</param>
+		/// <param name="Length">Number of bytes to deserialize.</param>
+		public void Restart(byte[] Data, int Offset, int Length)
+		{
+			this.data = Data;
+			this.pos = Offset;
+			this.len = Length;
 			this.bitOffset = 0;
 		}
 

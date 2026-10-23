@@ -89,7 +89,7 @@ namespace Waher.Persistence.FilesLW.Test
 					byte[] xBin = xWriter.GetSerialization();
 					byte[] yBin = yWriter.GetSerialization();
 
-					int Comparison = Records.Compare(xBin, yBin);
+					int Comparison = Records.Compare(xBin, xBin.Length, yBin, yBin.Length);
 
 					Assert.AreEqual(Math.Sign(x.CompareTo(y)), Math.Sign(Comparison), "x: " + x.ToString() + ", y: " + y.ToString());
 				}

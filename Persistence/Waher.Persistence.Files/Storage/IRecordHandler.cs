@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Persistence.Serialization;
@@ -9,14 +8,27 @@ namespace Waher.Persistence.Files.Storage
 	/// <summary>
 	/// Interface for B-tree record handlers.
 	/// </summary>
-	public interface IRecordHandler : IComparer
+	public interface IRecordHandler
 	{
 		/// <summary>
-		/// Gets the next record key.
+		/// Creates an empty primary key object.
+		/// </summary>
+		/// <returns>Primary key object.</returns>
+		IPrimaryKey CreateKey();
+
+		/// <summary>
+		/// Reads the next primary key.
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
-		/// <returns>Next key value, or null if no more keys available.</returns>
-		object GetKey(BinaryDeserializer Reader);
+		/// <returns>Primary key object.</returns>
+		IPrimaryKey ReadPrimaryKey(BinaryDeserializer Reader);
+
+		/// <summary>
+		/// Reads the next primary key.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <param name="Key">Primary key object.</param>
+		void ReadPrimaryKey(BinaryDeserializer Reader, IPrimaryKey Key);
 
 		/// <summary>
 		/// Skips the next record key.

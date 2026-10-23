@@ -4175,7 +4175,7 @@ namespace Waher.Persistence.Files
 					}
 
 					if (ExportData)
-						await File.ExportGraphXML(Output, true);
+						await File.ExportGraphXML(Output, true, true);
 
 					Output.WriteEndElement();
 				}

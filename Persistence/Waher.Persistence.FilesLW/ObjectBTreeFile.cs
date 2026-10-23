@@ -4256,7 +4256,7 @@ namespace Waher.Persistence.Files
 			uint ObjectsInBlock = 0;
 			bool Leaf = true;
 			IPrimaryKey MinPrimaryKey = null;
-			IPrimaryKey LastPrimaryKey = MinExclusive;
+			IPrimaryKey LastPrimaryKey = MinExclusive?.Clone();
 			int NrChildLinks = 0;
 			int NrSeparators = 0;
 
@@ -5702,7 +5702,7 @@ namespace Waher.Persistence.Files
 					continue;
 
 				ForeignKey = await Records.Serialize(Result.CurrentPrimaryKey.Guid, Result.Current, Result.CurrentSerializer, MissingFieldAction.Null);
-				SortedObjects[new Searching.SortedReference<T>(ForeignKey.Clone(), 
+				SortedObjects[new Searching.SortedReference<T>(ForeignKey, 
 					Result.Current, Result.CurrentSerializer, Result.CurrentPrimaryKey.Clone())] = true;
 			}
 
@@ -6314,11 +6314,20 @@ namespace Waher.Persistence.Files
 			IPrimaryKey PrimaryKey = this.recordHandler.CreateKey();
 
 			if (Value is Guid Guid)
-				PrimaryKey.Set(Guid);
+			{
+				if (!PrimaryKey.Set(Guid))
+					return new Searching.EmptyCursor<T>();
+			}
 			else if (Value is string s)
-				PrimaryKey.Set(s);
+			{
+				if (!PrimaryKey.Set(s))
+					return new Searching.EmptyCursor<T>();
+			}
 			else if (Value is byte[] ba)
-				PrimaryKey.Set(ba);
+			{
+				if (!PrimaryKey.Set(ba))
+					return new Searching.EmptyCursor<T>();
+			}
 			else
 				return new Searching.EmptyCursor<T>();
 

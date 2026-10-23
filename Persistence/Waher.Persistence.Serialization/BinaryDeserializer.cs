@@ -69,7 +69,7 @@ namespace Waher.Persistence.Serialization
 			this.encoding = Encoding;
 			this.data = Data;
 			this.pos = Offset;
-			this.len = Length;
+			this.len = Offset + Length;
 			this.blockLimit = BlockLimit;
 		}
 
@@ -701,7 +701,7 @@ namespace Waher.Persistence.Serialization
 		{
 			this.data = Data;
 			this.pos = Offset;
-			this.len = Length;
+			this.len = Offset + Length;
 			this.bitOffset = 0;
 		}
 

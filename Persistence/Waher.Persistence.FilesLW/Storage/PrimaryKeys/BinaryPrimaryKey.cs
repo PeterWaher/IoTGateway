@@ -122,25 +122,28 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		/// Sets a new primary key.
 		/// </summary>
 		/// <param name="Id">Primary key</param>
-		public void Set(Guid Id)
+		/// <returns>If successful.</returns>
+		public bool Set(Guid Id)
 		{
-			throw new NotSupportedException("Incompatible key types.");
+			return false;
 		}
 
 		/// <summary>
 		/// Sets a new primary key.
 		/// </summary>
 		/// <param name="Id">Primary key</param>
-		public void Set(string Id)
+		/// <returns>If successful.</returns>
+		public bool Set(string Id)
 		{
-			throw new NotSupportedException("Incompatible key types.");
+			return false;
 		}
 
 		/// <summary>
 		/// Represents a primary key
 		/// </summary>
 		/// <param name="Id">Primary key</param>
-		public void Set(byte[] Id)
+		/// <returns>If successful.</returns>
+		public bool Set(byte[] Id)
 		{
 			this.len = Id.Length;
 			if (this.maxLen < this.len)
@@ -152,6 +155,8 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 				Buffer.BlockCopy(Id, 0, this.bin, 0, this.len);
 
 			this.empty = false;
+
+			return true;
 		}
 
 		/// <summary>
@@ -160,7 +165,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		/// <param name="Bin">Binary data</param>
 		/// <param name="Offset">Offset into buffer where primary key is stored.</param>
 		/// <param name="Length">Length of primary key.</param>
-		public void Set(byte[] Bin, int Offset, int Length)
+		public bool Set(byte[] Bin, int Offset, int Length)
 		{
 			this.len = Length;
 
@@ -177,42 +182,54 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 				Buffer.BlockCopy(Bin, Offset, this.bin, 0, Length);
 				this.empty = false;
 			}
+
+			return true;
 		}
 
 		/// <summary>
 		/// Sets the value of the primary key to the value of another primary key object.
 		/// </summary>
 		/// <param name="PrimaryKey"></param>
-		public void Set(IPrimaryKey PrimaryKey)
+		/// <returns>If successful.</returns>
+		public bool Set(IPrimaryKey PrimaryKey)
 		{
-			PrimaryKey.CopyTo(this);
+			return PrimaryKey.CopyTo(this);
 		}
 
 		/// <summary>
 		/// Copyes the value of the primary key to another primery key object.
 		/// </summary>
 		/// <param name="PrimaryKey">Recipient of the primary key value.</param>
-		public void CopyTo(GuidPrimaryKey PrimaryKey)
+		/// <returns>If successful.</returns>
+		public bool CopyTo(GuidPrimaryKey PrimaryKey)
 		{
-			throw new NotSupportedException("Incompatible key types.");
+			return false;
 		}
 
 		/// <summary>
 		/// Copyes the value of the primary key to another primery key object.
 		/// </summary>
 		/// <param name="PrimaryKey">Recipient of the primary key value.</param>
-		public void CopyTo(StringPrimaryKey PrimaryKey)
+		/// <returns>If successful.</returns>
+		public bool CopyTo(StringPrimaryKey PrimaryKey)
 		{
-			throw new NotSupportedException("Incompatible key types.");
+			return false;
 		}
 
 		/// <summary>
 		/// Copyes the value of the primary key to another primery key object.
 		/// </summary>
 		/// <param name="PrimaryKey">Recipient of the primary key value.</param>
-		public void CopyTo(BinaryPrimaryKey PrimaryKey)
+		/// <returns>If successful.</returns>
+		public bool CopyTo(BinaryPrimaryKey PrimaryKey)
 		{
-			PrimaryKey.Set(this.bin, 0, this.len);
+			if (this.empty)
+			{
+				PrimaryKey.Clear();
+				return true;
+			}
+			else
+				return PrimaryKey.Set(this.bin, 0, this.len);
 		}
 
 		/// <summary>
@@ -269,7 +286,13 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		/// Clones the primary key object.
 		/// </summary>
 		/// <returns>Cloned primary key.</returns>
-		public IPrimaryKey Clone() => new BinaryPrimaryKey(this.records, this.bin, 0, this.len);
+		public IPrimaryKey Clone()
+		{
+			if (this.empty)
+				return new BinaryPrimaryKey(this.records);
+			else
+				return new BinaryPrimaryKey(this.records, this.bin, 0, this.len);
+		}
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)

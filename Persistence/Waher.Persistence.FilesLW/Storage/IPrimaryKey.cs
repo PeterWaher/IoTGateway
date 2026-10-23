@@ -27,19 +27,22 @@ namespace Waher.Persistence.Files.Storage
 		/// Sets a new primary key.
 		/// </summary>
 		/// <param name="Id">Primary key</param>
-		void Set(Guid Id);
+		/// <returns>If successful.</returns>
+		bool Set(Guid Id);
 
 		/// <summary>
 		/// Sets a new primary key.
 		/// </summary>
 		/// <param name="Id">Primary key</param>
-		void Set(string Id);
+		/// <returns>If successful.</returns>
+		bool Set(string Id);
 
 		/// <summary>
 		/// Represents a primary key
 		/// </summary>
 		/// <param name="Id">Primary key</param>
-		void Set(byte[] Id);
+		/// <returns>If successful.</returns>
+		bool Set(byte[] Id);
 
 		/// <summary>
 		/// Represents a primary key
@@ -47,31 +50,36 @@ namespace Waher.Persistence.Files.Storage
 		/// <param name="Bin">Binary data</param>
 		/// <param name="Offset">Offset into buffer where primary key is stored.</param>
 		/// <param name="Length">Length of primary key.</param>
-		void Set(byte[] Bin, int Offset, int Length);
+		/// <returns>If successful.</returns>
+		bool Set(byte[] Bin, int Offset, int Length);
 
 		/// <summary>
 		/// Sets the value of the primary key to the value of another primary key object.
 		/// </summary>
 		/// <param name="PrimaryKey"></param>
-		void Set(IPrimaryKey PrimaryKey);
+		/// <returns>If successful.</returns>
+		bool Set(IPrimaryKey PrimaryKey);
 
 		/// <summary>
 		/// Copyes the value of the primary key to another primery key object.
 		/// </summary>
 		/// <param name="PrimaryKey">Recipient of the primary key value.</param>
-		void CopyTo(GuidPrimaryKey PrimaryKey);
+		/// <returns>If successful.</returns>
+		bool CopyTo(GuidPrimaryKey PrimaryKey);
 
 		/// <summary>
 		/// Copyes the value of the primary key to another primery key object.
 		/// </summary>
 		/// <param name="PrimaryKey">Recipient of the primary key value.</param>
-		void CopyTo(StringPrimaryKey PrimaryKey);
+		/// <returns>If successful.</returns>
+		bool CopyTo(StringPrimaryKey PrimaryKey);
 
 		/// <summary>
 		/// Copyes the value of the primary key to another primery key object.
 		/// </summary>
 		/// <param name="PrimaryKey">Recipient of the primary key value.</param>
-		void CopyTo(BinaryPrimaryKey PrimaryKey);
+		/// <returns>If successful.</returns>
+		bool CopyTo(BinaryPrimaryKey PrimaryKey);
 
 		/// <summary>
 		/// Clears the primary key.

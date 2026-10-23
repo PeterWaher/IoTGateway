@@ -173,27 +173,34 @@ namespace Waher.Persistence.Files
 
 				try
 				{
-					this.currentPrimaryKey.Set(Guid);
-					this.currentSerializer ??= await this.provider.GetObjectSerializer(typeof(T));
-
-					Obj = await this.file.TryLoadObjectLocked(this.currentPrimaryKey, this.currentSerializer);
-
-					if (Obj is null)
+					if (!this.currentPrimaryKey.Set(Guid))
 					{
 						this.current = default;
 						this.currentTypeCompatible = false;
-
-						// TODO: Delete records pointing to objects that do not exist, after lock has been released.
-					}
-					else if (Obj is T T2)
-					{
-						this.current = T2;
-						this.currentTypeCompatible = true;
 					}
 					else
 					{
-						this.current = default;
-						this.currentTypeCompatible = false;
+						this.currentSerializer ??= await this.provider.GetObjectSerializer(typeof(T));
+
+						Obj = await this.file.TryLoadObjectLocked(this.currentPrimaryKey, this.currentSerializer);
+
+						if (Obj is null)
+						{
+							this.current = default;
+							this.currentTypeCompatible = false;
+
+							// TODO: Delete records pointing to objects that do not exist, after lock has been released.
+						}
+						else if (Obj is T T2)
+						{
+							this.current = T2;
+							this.currentTypeCompatible = true;
+						}
+						else
+						{
+							this.current = default;
+							this.currentTypeCompatible = false;
+						}
 					}
 				}
 				catch (InconsistencyException ex)

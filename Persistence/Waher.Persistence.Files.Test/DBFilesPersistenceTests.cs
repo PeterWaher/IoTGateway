@@ -50,10 +50,22 @@ namespace Waher.Persistence.FilesLW.Test
 			catch
 			{
 #if LW
-				Database.Register(await FilesProvider.CreateAsync("Data", "Default", 8192, 8192, 8192, Encoding.UTF8, 10000));
+				Database.Register(await FilesProvider.CreateAsync("Data", "Default", 
+					8192, 8192, 8192, Encoding.UTF8, 10000), false);
 #else
-				Database.Register(await FilesProvider.CreateAsync("Data", "Default", 8192, 8192, 8192, Encoding.UTF8, 10000, true));
+				Database.Register(await FilesProvider.CreateAsync("Data", "Default", 
+					8192, 8192, 8192, Encoding.UTF8, 10000, true), false);
 #endif
+			}
+		}
+
+		[ClassCleanup]
+		public static async Task ClassCleanup()
+		{
+			if (Database.Provider is FilesProvider Provider)
+			{
+				await Provider.Flush();
+				await Provider.DisposeAsync();
 			}
 		}
 
@@ -86,7 +98,7 @@ namespace Waher.Persistence.FilesLW.Test
 			await Database.Clear("StringFields");
 
 			SortedDictionary<Guid, StringFields> Objects = await CreateObjects(100);
-			
+
 			await AssertAllEnumerated(await Database.Enumerate<StringFields>(20), Objects);
 		}
 

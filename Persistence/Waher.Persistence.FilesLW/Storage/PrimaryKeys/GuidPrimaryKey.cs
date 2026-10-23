@@ -150,7 +150,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 			{
 				this.guid = new Guid(Bin.AsSpan(Offset, Length));
 				this.empty = this.guid == Guid.Empty;
-				
+
 				return true;
 			}
 			catch (Exception)
@@ -188,7 +188,11 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		/// <returns>If successful.</returns>
 		public bool CopyTo(StringPrimaryKey PrimaryKey)
 		{
-			PrimaryKey.Value = this.guid.ToString();
+			if (this.empty)
+				PrimaryKey.Clear();
+			else
+				PrimaryKey.Value = this.guid.ToString();
+
 			return true;
 		}
 

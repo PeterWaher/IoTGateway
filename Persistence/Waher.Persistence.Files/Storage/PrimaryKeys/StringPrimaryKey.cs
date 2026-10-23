@@ -16,7 +16,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		/// </summary>
 		public StringPrimaryKey()
 		{
-			this.id = string.Empty;
+			this.id = null;
 			this.empty = true;
 		}
 
@@ -37,7 +37,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		public StringPrimaryKey(string Id)
 		{
 			this.id = Id;
-			this.empty = string.IsNullOrEmpty(Id);
+			this.empty = Id is null;
 		}
 
 		/// <summary>
@@ -46,16 +46,8 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		/// <param name="Id">Primary key</param>
 		public StringPrimaryKey(byte[] Id)
 		{
-			if (Id.Length == 0)
-			{
-				this.id = string.Empty;
-				this.empty = true;
-			}
-			else
-			{
-				this.id = Encoding.UTF8.GetString(Id);
-				this.empty = false;
-			}
+			this.id = Encoding.UTF8.GetString(Id);
+			this.empty = false;
 		}
 
 		/// <summary>
@@ -66,16 +58,8 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		/// <param name="Length">Length of primary key.</param>
 		public StringPrimaryKey(byte[] Bin, int Offset, int Length)
 		{
-			if (Length == 0)
-			{
-				this.id = string.Empty;
-				this.empty = true;
-			}
-			else
-			{
-				this.id = Encoding.UTF8.GetString(Bin, Offset, Length);
-				this.empty = false;
-			}
+			this.id = Encoding.UTF8.GetString(Bin, Offset, Length);
+			this.empty = false;
 		}
 
 		/// <summary>
@@ -97,7 +81,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 			set
 			{
 				this.id = value;
-				this.empty = string.IsNullOrEmpty(this.id);
+				this.empty = this.id is null;
 			}
 		}
 
@@ -126,7 +110,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		public bool Set(string Id)
 		{
 			this.id = Id;
-			this.empty = string.IsNullOrEmpty(Id);
+			this.empty = Id is null;
 			return true;
 		}
 
@@ -137,16 +121,8 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		/// <returns>If successful.</returns>
 		public bool Set(byte[] Id)
 		{
-			if (Id.Length == 0)
-			{
-				this.id = string.Empty;
-				this.empty = true;
-			}
-			else
-			{
-				this.id = Encoding.UTF8.GetString(Id);
-				this.empty = false;
-			}
+			this.id = Encoding.UTF8.GetString(Id);
+			this.empty = false;
 
 			return true;
 		}
@@ -160,16 +136,8 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		/// <returns>If successful.</returns>
 		public bool Set(byte[] Bin, int Offset, int Length)
 		{
-			if (Length == 0)
-			{
-				this.id = string.Empty;
-				this.empty = true;
-			}
-			else
-			{
-				this.id = Encoding.UTF8.GetString(Bin, Offset, Length);
-				this.empty = false;
-			}
+			this.id = Encoding.UTF8.GetString(Bin, Offset, Length);
+			this.empty = false;
 
 			return true;
 		}
@@ -191,8 +159,13 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		/// <returns>If successful.</returns>
 		public bool CopyTo(GuidPrimaryKey PrimaryKey)
 		{
-			PrimaryKey.Value = new Guid(this.id);
-			return true;
+			if (this.empty)
+			{
+				PrimaryKey.Clear();
+				return true;
+			}
+			else
+				return PrimaryKey.Set(this.id);
 		}
 
 		/// <summary>
@@ -221,7 +194,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		public void Clear()
 		{
 			this.empty = true;
-			this.id = string.Empty;
+			this.id = null;
 		}
 
 		/// <inheritdoc/>
@@ -243,7 +216,7 @@ namespace Waher.Persistence.Files.Storage.PrimaryKeys
 		public int CompareTo(IPrimaryKey Other)
 		{
 			if (Other is StringPrimaryKey Typed)
-				return this.id.CompareTo(Typed.id);
+				return string.Compare(this.id, Typed.id);
 			else
 				return this.GetType().FullName.CompareTo(Other.GetType().FullName);
 		}

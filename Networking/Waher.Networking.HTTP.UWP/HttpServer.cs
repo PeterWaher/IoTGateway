@@ -2349,6 +2349,7 @@ namespace Waher.Networking.HTTP
 				else if (StatusCode != 0)
 				{
 					Log.Warning("Late response.", Request.Header.Resource,
+						Request.RemoteEndPoint, "LateResponse",
 						new KeyValuePair<string, object>("Response", StatusCode),
 						new KeyValuePair<string, object>("Method", Request.Header.Method));
 				}

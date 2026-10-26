@@ -1881,7 +1881,7 @@ namespace Waher.Persistence.Files
 			else
 				throw new NotSupportedException("Unsupported type for Object ID: " + ObjectId.GetType().FullName);
 
-			return this.TryLoadObject<T>(new GuidPrimaryKey(OID));
+			return this.TryLoadObject<T>(OID);
 		}
 
 		/// <summary>

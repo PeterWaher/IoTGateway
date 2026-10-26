@@ -347,7 +347,8 @@ namespace Waher.Security.JWT
 					Request.AddMetaData("BearerError", new KeyValuePair<string, string>(
 						"invalid_token", Description));
 
-					LoginAuditor.Fail("Login attempt failed. Reason: " + Reason.ToString(), UserName ?? string.Empty, Request.RemoteEndPoint, "HTTP");
+					LoginAuditor.Fail("Login attempt failed. Reason: " + Reason.ToString(), UserName ?? string.Empty, Request.RemoteEndPoint, "HTTP",
+						new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
 					return null;
 				}
 
@@ -365,7 +366,8 @@ namespace Waher.Security.JWT
 						Request.AddMetaData("BearerError", new KeyValuePair<string, string>(
 							"invalid_token", "No used defined."));
 
-						LoginAuditor.Fail("Login attempt failed. No user defined.", string.Empty, Request.RemoteEndPoint, "HTTP");
+						LoginAuditor.Fail("Login attempt failed. No user defined.", string.Empty, Request.RemoteEndPoint, "HTTP",
+							new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
 						return null;
 					}
 
@@ -376,7 +378,8 @@ namespace Waher.Security.JWT
 						Request.AddMetaData("BearerError", new KeyValuePair<string, string>(
 							"invalid_token", "User not valid in this context."));
 
-						LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
+						LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP",
+							new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
 					}
 					else
 						await LoginAuditor.SilentSuccess("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");

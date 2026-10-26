@@ -193,6 +193,11 @@ namespace Waher.Networking.HTTP
 		public abstract bool UserSessions { get; }
 
 		/// <summary>
+		/// If the resource is a proxy.
+		/// </summary>
+		public virtual bool Proxy => false;
+
+		/// <summary>
 		/// Array of allowed methods.
 		/// </summary>
 		public string[] AllowedMethods => this.allowedMethods;

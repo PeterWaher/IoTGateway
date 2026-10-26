@@ -345,6 +345,11 @@ namespace Waher.Networking.HTTP
 		public override bool HandlesSubPaths => true;
 
 		/// <summary>
+		/// If the resource is a proxy.
+		/// </summary>
+		public override bool Proxy => true;
+
+		/// <summary>
 		/// If forwarding is encrypted.
 		/// </summary>
 		public bool Encrypted => this.encryption;

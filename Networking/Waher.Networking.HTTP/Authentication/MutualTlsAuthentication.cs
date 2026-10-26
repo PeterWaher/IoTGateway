@@ -93,7 +93,8 @@ namespace Waher.Networking.HTTP.Authentication
 
 			if (!Client.RemoteCertificateValid)
 			{
-				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
+				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP",
+					new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
 				return null;
 			}
 
@@ -101,7 +102,8 @@ namespace Waher.Networking.HTTP.Authentication
 			if (User is null)
 			{
 				LoginAuditor.Fail("Login attempt using invalid user name.", Certificate.Subject, Request.RemoteEndPoint, "HTTP",
-					new KeyValuePair<string, object>("UserName", UserName));
+					new KeyValuePair<string, object>("UserName", UserName),
+					new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
 				return null;
 			}
 			else

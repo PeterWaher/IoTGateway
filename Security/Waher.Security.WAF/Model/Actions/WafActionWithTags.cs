@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.Collections;
 
 namespace Waher.Security.WAF.Model.Actions
@@ -53,9 +54,17 @@ namespace Waher.Security.WAF.Model.Actions
 		public async Task<KeyValuePair<string, object>[]> EvaluateTags(ProcessingState State)
 		{
 			ChunkedList<KeyValuePair<string, object>> Result = new ChunkedList<KeyValuePair<string, object>>();
+			bool HasResource = false;
 
 			foreach (Tag Tag in this.tags)
-				Result.Add(await Tag.EvaluateTag(State));
+			{
+				KeyValuePair<string, object> P = await Tag.EvaluateTag(State);
+				HasResource |= P.Key == "Resource";
+				Result.Add(P);
+			}
+
+			if (!HasResource)
+				Result.Add(new KeyValuePair<string, object>("Resource", State.Request.Header.ResourcePart));
 
 			return Result.ToArray();
 		}

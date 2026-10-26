@@ -442,7 +442,8 @@ namespace Waher.Networking.HTTP.Authentication
 				}
 				else
 				{
-					LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
+					LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP",
+						new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
 					return null;
 				}
 			}

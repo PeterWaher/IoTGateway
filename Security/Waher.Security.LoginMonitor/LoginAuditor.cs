@@ -295,7 +295,8 @@ namespace Waher.Security.LoginMonitor
 		/// <param name="Reason">Reason for the failure. Will be logged with the state object, in case the remote endpoint
 		/// gets blocked.</param>
 		/// <returns>If the remote endpoint was or has been blocked as a result of the failure.</returns>
-		public async Task<bool> ProcessLoginFailure(string RemoteEndPoint, string Protocol, DateTime Timestamp, string Reason)
+		public async Task<bool> ProcessLoginFailure(string RemoteEndPoint, string Protocol,
+			DateTime Timestamp, string Reason)
 		{
 			RemoteEndpoint EP = await this.GetStateObject(RemoteEndPoint, Protocol, true);
 			LoginInterval[] Intervals = EP.Intervals?.Intervals ?? this.defaultIntervals;

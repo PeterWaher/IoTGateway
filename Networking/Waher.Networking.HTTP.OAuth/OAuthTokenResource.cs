@@ -440,7 +440,8 @@ namespace Waher.Networking.HTTP.OAuth
 							string Message = "Attempt to reuse refresh token. Has the token leaked? Deprecating all associated tokens.";
 
 							LoginAuditor.Fail(Message, TokenFamily.User.UserName,
-								Request.RemoteEndPoint, "OAUTH");
+								Request.RemoteEndPoint, "OAUTH",
+								new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
 
 							Log.Alert(Message, TokenFamily.User.UserName,
 								Request.RemoteEndPoint, "TokenLeakage",
@@ -645,7 +646,8 @@ namespace Waher.Networking.HTTP.OAuth
 			if (User is null)
 			{
 				LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Request.RemoteEndPoint, "OAUTH",
-					new KeyValuePair<string, object>("UserName", UserName));
+					new KeyValuePair<string, object>("UserName", UserName),
+					new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
 				return new LoginResult(User);
 			}
 
@@ -663,7 +665,8 @@ namespace Waher.Networking.HTTP.OAuth
 			}
 			else
 			{
-				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
+				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP",
+					new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
 				return new LoginResult(null);
 			}
 		}

@@ -863,7 +863,7 @@
 						<xs:documentation>If the max value is part of the valid range or not.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
-				<xs:attribute name='altitude' type='AltitudeUse' use='optional' default='optional'>
+				<xs:attribute name='altitude' type='AltitudeUse' use='optional' default='Optional'>
 					<xs:annotation>
 						<xs:documentation>Defines how to handle altitude in positions.</xs:documentation>
 					</xs:annotation>

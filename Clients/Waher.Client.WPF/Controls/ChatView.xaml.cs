@@ -1,32 +1,33 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Xsl;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Microsoft.Win32;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Xsl;
+using Waher.Client.WPF.Controls.Chat;
+using Waher.Client.WPF.Model;
+using Waher.Client.WPF.Model.Muc;
 using Waher.Content;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Images;
 using Waher.Content.Markdown;
 using Waher.Content.Markdown.Consolidation;
+using Waher.Content.Markdown.Rendering;
+using Waher.Content.Markdown.Wpf;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
-using Waher.Client.WPF.Controls.Chat;
-using Waher.Client.WPF.Model;
-using Waher.Client.WPF.Model.Muc;
-using Waher.Content.Markdown.Rendering;
-using Waher.Content.Markdown.Wpf;
 
 namespace Waher.Client.WPF.Controls
 {
@@ -626,7 +627,10 @@ namespace Waher.Client.WPF.Controls
 		private void Hyperlink_Click(object Sender, RoutedEventArgs e)
 		{
 			string Uri = ((Hyperlink)Sender).NavigateUri.ToString();
-			System.Diagnostics.Process.Start(Uri);
+			Process.Start(new ProcessStartInfo(Uri)
+			{
+				UseShellExecute = true
+			});
 		}
 
 		public void Event(string Message, string From, string ThreadId)

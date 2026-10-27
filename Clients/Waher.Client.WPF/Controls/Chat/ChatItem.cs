@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Markup;
 using System.Windows.Media;
+using Waher.Client.WPF.Model;
 using Waher.Content.Markdown;
 using Waher.Content.Markdown.Model;
-using Waher.Events;
-using Waher.Client.WPF.Model;
-using System.Threading.Tasks;
 using Waher.Content.Markdown.Wpf;
+using Waher.Events;
 
 namespace Waher.Client.WPF.Controls.Chat
 {
@@ -207,7 +208,7 @@ namespace Waher.Client.WPF.Controls.Chat
 				return;
 
 			string Uri = Link.NavigateUri.ToString();
-			System.Diagnostics.Process.Start(Uri);
+            Process.Start(new ProcessStartInfo(Uri) { UseShellExecute = true });
 		}
 
 		public Task Update(string Message, MarkdownDocument Markdown)

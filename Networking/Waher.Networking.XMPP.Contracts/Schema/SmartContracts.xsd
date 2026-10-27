@@ -1808,6 +1808,7 @@
 							<xs:annotation>
 								<xs:documentation>Legal identity reference.</xs:documentation>
 								<xs:documentation>Must reside on the destination Trust Provider.</xs:documentation>
+								<xs:documentation>Must not be Rejected or Compromized. May be Created, Approved or Obsoleted.</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 					</xs:complexType>

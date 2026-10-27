@@ -2049,10 +2049,8 @@
 			<xs:documentation>
 				<xs:documentation>Sent in an iq get stanza to the Trust Provider to retrieve any network identities associated with the legal identities that have signed the contract.</xs:documentation>
 				<xs:documentation>If the request is sent to the Trust Provider on which the contract is hosted, all network identities are returned, if authorized.</xs:documentation>
-				<xs:documentation>If the request is sent to a different Trust Provider, only network identities on that Trust Provider, associated with the contract are returned, if the sender is the same as the domain of the referenced contract.</xs:documentation>
 				<xs:documentation>Expected response element: networkIdentities</xs:documentation>
 				<xs:documentation>Note: Only clients authorized to view the contract itself, are allowed to view its associated network identities.</xs:documentation>
-				<xs:documentation>Note: Request is authorized only if (1) the client has access to smart contract, or (2) sender is the same domain hosting the referenced contract.</xs:documentation>
 			</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>

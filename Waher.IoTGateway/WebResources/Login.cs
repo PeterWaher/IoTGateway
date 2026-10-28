@@ -218,7 +218,8 @@ namespace Waher.IoTGateway.WebResources
 				Response.Request.Session.Remove(UserVariableName);
 
 				await Gateway.LoginAuditor.ProcessLoginFailure(Response.Request.RemoteEndPoint,
-					"HTTP", DateTime.Now, "Invalid From attribute: " + From);
+					"HTTP", DateTime.Now, "Invalid From attribute: " + From,
+					Response.Request.Header.ResourcePart);
 
 				throw new BadRequestException();
 			}

@@ -84,7 +84,7 @@ namespace Waher.Security.LoginMonitor
 					else
 						this.endpointIntervals[Intervals.Endpoint] = Intervals;
 				}
-		
+
 				this.ipRangesIntervals = IpRanges.ToArray();
 			}
 		}
@@ -107,8 +107,16 @@ namespace Waher.Security.LoginMonitor
 			switch (Event.EventId)
 			{
 				case "LoginFailure":
-					return this.ProcessLoginFailure(Event.Actor, this.FindProtocol(Event), Event.Timestamp,
-						"Repeatedly failing login attempts.");
+					if (this.TryFindResource(Event, out string Resource))
+					{
+						return this.ProcessLoginFailure(Event.Actor, this.FindProtocol(Event), Event.Timestamp,
+							"Repeatedly failing login attempts.", Resource);
+					}
+					else
+					{
+						return this.ProcessLoginFailure(Event.Actor, this.FindProtocol(Event), Event.Timestamp,
+							"Repeatedly failing login attempts.");
+					}
 
 				case "LoginSuccessful":
 					return this.ProcessLoginSuccessful(Event.Actor, this.FindProtocol(Event));
@@ -130,6 +138,24 @@ namespace Waher.Security.LoginMonitor
 			}
 
 			return string.Empty;
+		}
+
+		private bool TryFindResource(Event Event, out string Resource)
+		{
+			if (!(Event.Tags is null))
+			{
+				foreach (KeyValuePair<string, object> Tag in Event.Tags)
+				{
+					if (Tag.Key == "Resource")
+					{
+						Resource = Tag.Value?.ToString();
+						return true;
+					}
+				}
+			}
+
+			Resource = string.Empty;
+			return false;
 		}
 
 		/// <summary>
@@ -182,7 +208,7 @@ namespace Waher.Security.LoginMonitor
 				if (!this.endpointIntervals.TryGetValue(RemoteEndPoint, out Intervals))
 				{
 					Intervals = null;
-					
+
 					if (!(this.ipRangesIntervals is null) &&
 						IPAddress.TryParse(RemoteEndPoint.RemovePortNumber(), out IPAddress Address))
 					{
@@ -295,8 +321,27 @@ namespace Waher.Security.LoginMonitor
 		/// <param name="Reason">Reason for the failure. Will be logged with the state object, in case the remote endpoint
 		/// gets blocked.</param>
 		/// <returns>If the remote endpoint was or has been blocked as a result of the failure.</returns>
-		public async Task<bool> ProcessLoginFailure(string RemoteEndPoint, string Protocol,
+		public Task<bool> ProcessLoginFailure(string RemoteEndPoint, string Protocol,
 			DateTime Timestamp, string Reason)
+		{
+			return this.ProcessLoginFailure(RemoteEndPoint, Protocol, Timestamp, Reason, string.Empty);
+		}
+
+		/// <summary>
+		/// Processes a failed login attempt.
+		/// 
+		/// NOTE: Typically, logins are audited by listening on logged events.
+		/// This method should only be called directly when such events are not logged.
+		/// </summary>
+		/// <param name="RemoteEndPoint">String-representation of remote endpoint.</param>
+		/// <param name="Protocol">Protocol used to log in.</param>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Reason">Reason for the failure. Will be logged with the state object, in case the remote endpoint
+		/// gets blocked.</param>
+		/// <param name="LastResource">Last resource where login failure was detected.</param>
+		/// <returns>If the remote endpoint was or has been blocked as a result of the failure.</returns>
+		public async Task<bool> ProcessLoginFailure(string RemoteEndPoint, string Protocol,
+			DateTime Timestamp, string Reason, string LastResource)
 		{
 			RemoteEndpoint EP = await this.GetStateObject(RemoteEndPoint, Protocol, true);
 			LoginInterval[] Intervals = EP.Intervals?.Intervals ?? this.defaultIntervals;
@@ -325,7 +370,7 @@ namespace Waher.Security.LoginMonitor
 						i++;
 						if (i >= NrIntervals)
 						{
-							await this.Block(EP, Reason, Protocol);
+							await this.Block(EP, Reason, Protocol, LastResource);
 							return true;
 						}
 					}
@@ -353,14 +398,29 @@ namespace Waher.Security.LoginMonitor
 		/// <param name="Reason">Reason for blocking the endpoint.</param>
 		/// <returns>If the endpoint was blocked as a result of the call (true), 
 		/// or if the endpoint was already blocked (false).</returns>
-		public async Task<bool> BlockEndpoint(string RemoteEndPoint, string Protocol, string Reason)
+		public Task<bool> BlockEndpoint(string RemoteEndPoint, string Protocol, string Reason)
+		{
+			return this.BlockEndpoint(RemoteEndPoint, Protocol, Reason, string.Empty);
+		}
+
+		/// <summary>
+		/// Blocks and endpoint.
+		/// </summary>
+		/// <param name="RemoteEndPoint">Remote Endpoint to block.</param>
+		/// <param name="Protocol">Protocol used.</param>
+		/// <param name="Reason">Reason for blocking the endpoint.</param>
+		/// <param name="LastResource">Last resource where login failure was detected.</param>
+		/// <returns>If the endpoint was blocked as a result of the call (true), 
+		/// or if the endpoint was already blocked (false).</returns>
+		public async Task<bool> BlockEndpoint(string RemoteEndPoint, string Protocol, 
+			string Reason, string LastResource)
 		{
 			RemoteEndpoint EP = await this.GetStateObject(RemoteEndPoint, Protocol, true);
 			if (EP.Blocked)
 				return false;
 			else
 			{
-				await this.Block(EP, Reason, Protocol);
+				await this.Block(EP, Reason, Protocol, LastResource);
 				return true;
 			}
 		}
@@ -423,7 +483,8 @@ namespace Waher.Security.LoginMonitor
 				return Next;
 		}
 
-		private async Task Block(RemoteEndpoint EP, string Reason, string Protocol)
+		private async Task Block(RemoteEndpoint EP, string Reason, string Protocol,
+			string LastResource)
 		{
 			if (!EP.Blocked)
 			{
@@ -432,7 +493,8 @@ namespace Waher.Security.LoginMonitor
 
 				KeyValuePair<string, object>[] Tags = await EP.Annotate(
 					new KeyValuePair<string, object>("Reason", Reason),
-					new KeyValuePair<string, object>("Protocol", Protocol));
+					new KeyValuePair<string, object>("Protocol", Protocol),
+					new KeyValuePair<string, object>("LastResource", LastResource));
 				StringBuilder sb = new StringBuilder();
 
 				sb.Append("Remote endpoint blocked.");
@@ -538,7 +600,7 @@ namespace Waher.Security.LoginMonitor
 		/// <param name="UserName">Attempted user name.</param>
 		/// <param name="RemoteEndPoint">String representation of remote endpoint</param>
 		/// <param name="Protocol">Protocol</param>
-		public static void Fail(string Message, string UserName, string RemoteEndPoint, 
+		public static void Fail(string Message, string UserName, string RemoteEndPoint,
 			string Protocol)
 		{
 			Fail(Message, UserName, RemoteEndPoint, Protocol,

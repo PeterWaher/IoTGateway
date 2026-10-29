@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Mail;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Markdown;
@@ -54,6 +55,31 @@ namespace Waher.IoTGateway.Setup
 		{
 			get => this.urls;
 			set => this.urls = value;
+		}
+
+
+		/// <summary>
+		/// A string containing all addresses, delimited by "; ".
+		/// </summary>
+		public string AddressesString
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+				bool First = true;
+
+				foreach (string s in this.addresses)
+				{
+					if (First)
+						First = false;
+					else
+						sb.Append("; ");
+
+					sb.Append(s);
+				}
+
+				return sb.ToString();
+			}
 		}
 
 		/// <summary>

@@ -679,6 +679,26 @@ namespace Waher.Security.LoginMonitor
 		/// <param name="UserName">Attempted user name.</param>
 		/// <param name="RemoteEndPoint">String representation of remote endpoint</param>
 		/// <param name="Protocol">Protocol</param>
+		/// <param name="Resource">Resource where login success was detected.</param>
+		public static void Success(string Message, string UserName, 
+			string RemoteEndPoint, string Protocol, string Resource)
+		{
+			if (string.IsNullOrEmpty(Resource))
+			{
+				Success(Message, UserName, RemoteEndPoint, Protocol,
+					Array.Empty<KeyValuePair<string, object>>());
+			}
+			else
+				Success(Message, UserName, RemoteEndPoint, Protocol, ResourceTag(Resource));
+		}
+
+		/// <summary>
+		/// Handles a successful login attempt.
+		/// </summary>
+		/// <param name="Message">Log message</param>
+		/// <param name="UserName">Attempted user name.</param>
+		/// <param name="RemoteEndPoint">String representation of remote endpoint</param>
+		/// <param name="Protocol">Protocol</param>
 		/// <param name="Tags">Any informative tags.</param>
 		public static async void Success(string Message, string UserName, string RemoteEndPoint, string Protocol,
 			params KeyValuePair<string, object>[] Tags)

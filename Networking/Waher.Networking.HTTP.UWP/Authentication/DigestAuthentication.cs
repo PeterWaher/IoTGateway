@@ -356,10 +356,9 @@ namespace Waher.Networking.HTTP.Authentication
 					{
 						if (Pair.Key <= TP)
 						{
-							if (ToRemove is null)
-								ToRemove = new LinkedList<DateTime>();
-
+							ToRemove ??= new LinkedList<DateTime>();
 							ToRemove.AddLast(Pair.Key);
+
 							this.expirationByNonce.Remove(Pair.Value);
 						}
 						else
@@ -437,13 +436,14 @@ namespace Waher.Networking.HTTP.Authentication
 
 				if (Digest == Response)
 				{
-					LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
+					LoginAuditor.Success("Login successful.", UserName, 
+						Request.RemoteEndPoint, "HTTP", Request.Header.ResourcePart);
 					return User;
 				}
 				else
 				{
-					LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP",
-						LoginAuditor.ResourceTag(Request.Header.ResourcePart));
+					LoginAuditor.Fail("Login attempt failed.", UserName, 
+						Request.RemoteEndPoint, "HTTP", Request.Header.ResourcePart);
 					return null;
 				}
 			}

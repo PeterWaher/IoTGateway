@@ -154,13 +154,15 @@ namespace Waher.Networking.HTTP.Authentication
 
 			if (PasswordHash == ExpectedHash)
 			{
-				LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
+				LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, 
+					"HTTP", Request.Header.ResourcePart);
+
 				return User;
 			}
 			else
 			{
-				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP",
-					LoginAuditor.ResourceTag(Request.Header.ResourcePart));
+				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint,
+					"HTTP", Request.Header.ResourcePart);
 				return null;
 			}
 		}

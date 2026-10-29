@@ -248,7 +248,7 @@ namespace Waher.Security.JWT
 		{
 			HttpFieldAuthorization Authorization = Request.Header.Authorization;
 			if (!(Authorization is null) && Authorization.Value.StartsWith("Bearer ", StringComparison.CurrentCultureIgnoreCase))
-				return Authorization.Value.Substring(7).Trim();
+				return Authorization.Value[7..].Trim();
 
 			if (permitAccessTokenInQueryString)
 			{

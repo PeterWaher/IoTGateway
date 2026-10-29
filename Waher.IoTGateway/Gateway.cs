@@ -3526,7 +3526,8 @@ namespace Waher.IoTGateway
 				if (CheckStartupToken(Request))
 				{
 					LoginAuditor.Success("User logged in by default, using startup token.",
-						string.Empty, Request.RemoteEndPoint, "Web");
+						string.Empty, Request.RemoteEndPoint, "Web", 
+						Request.Header.ResourcePart);
 
 					await Login.DoLogin(Request, From);
 					return;
@@ -3564,7 +3565,9 @@ namespace Waher.IoTGateway
 				if (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring)
 #endif
 				{
-					LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
+					LoginAuditor.Success("Local user logged in.", string.Empty, 
+						Request.RemoteEndPoint, "Web", Request.Header.ResourcePart);
+
 					await Login.DoLogin(Request, From);
 					return;
 				}
@@ -3679,7 +3682,10 @@ namespace Waher.IoTGateway
 
 								if (P.SessionId == CurrentSession)
 								{
-									LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
+									LoginAuditor.Success("Local user logged in.", 
+										string.Empty, Request.RemoteEndPoint, "Web", 
+										Request.Header.ResourcePart);
+
 									await Login.DoLogin(Request, From);
 									return;
 								}
@@ -3707,7 +3713,9 @@ namespace Waher.IoTGateway
 
 								if (P.SessionId == CurrentSession)
 								{
-									LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
+									LoginAuditor.Success("Local user logged in.", string.Empty, 
+										Request.RemoteEndPoint, "Web", Request.Header.ResourcePart);
+
 									await Login.DoLogin(Request, From);
 									return;
 								}

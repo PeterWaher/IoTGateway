@@ -600,7 +600,7 @@ namespace Waher.Networking.HTTP.OAuth
 				int i = s.IndexOf(':');
 				if (i > 0)
 				{
-					ClientId = s.Substring(0, i);
+					ClientId = s[..i];
 					return true;
 				}
 			}
@@ -660,13 +660,16 @@ namespace Waher.Networking.HTTP.OAuth
 
 			if (PasswordHash == ExpectedHash)
 			{
-				LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
+				LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, 
+					"HTTP", Request.Header.ResourcePart);
+
 				return new LoginResult(User);
 			}
 			else
 			{
-				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP",
-					LoginAuditor.ResourceTag(Request.Header.ResourcePart));
+				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, 
+					"HTTP", Request.Header.ResourcePart);
+
 				return new LoginResult(null);
 			}
 		}

@@ -211,23 +211,28 @@ namespace Waher.Networking.SASL
             return Response;
         }
 
-        /// <summary>
-        /// Authentication request has been made.
-        /// </summary>
-        /// <param name="Data">Data in authentication request.</param>
-        /// <param name="Connection">Connection performing the authentication.</param>
-        /// <param name="PersistenceLayer">Persistence layer.</param>
-        /// <returns>If authentication was successful (true). If false, mechanism must send the corresponding challenge.</returns>
-        public abstract Task<bool?> AuthenticationRequest(string Data, ISaslServerSide Connection, ISaslPersistenceLayer PersistenceLayer);
+		/// <summary>
+		/// Authentication request has been made.
+		/// </summary>
+		/// <param name="Data">Data in authentication request.</param>
+		/// <param name="Connection">Connection performing the authentication.</param>
+		/// <param name="PersistenceLayer">Persistence layer.</param>
+		/// <param name="Resource">Resource being accessed.</param>
+		/// <returns>If authentication was successful (true). If false, mechanism must send the corresponding challenge.</returns>
+		public abstract Task<bool?> AuthenticationRequest(string Data, 
+            ISaslServerSide Connection, ISaslPersistenceLayer PersistenceLayer,
+            string Resource);
 
-        /// <summary>
-        /// Response request has been made.
-        /// </summary>
-        /// <param name="Data">Data in response request.</param>
-        /// <param name="Connection">Connection performing the authentication.</param>
-        /// <param name="PersistenceLayer">Persistence layer.</param>
-        /// <returns>If authentication was successful (true).</returns>
-        public abstract Task<bool?> ResponseRequest(string Data, ISaslServerSide Connection, ISaslPersistenceLayer PersistenceLayer);
+		/// <summary>
+		/// Response request has been made.
+		/// </summary>
+		/// <param name="Data">Data in response request.</param>
+		/// <param name="Connection">Connection performing the authentication.</param>
+		/// <param name="PersistenceLayer">Persistence layer.</param>
+		/// <param name="Resource">Resource being accessed.</param>
+		/// <returns>If authentication was successful (true).</returns>
+		public abstract Task<bool?> ResponseRequest(string Data, ISaslServerSide Connection, 
+            ISaslPersistenceLayer PersistenceLayer, string Resource);
 
 		/// <summary>
 		/// Performs intitialization of the mechanism. Can be used to set
@@ -242,8 +247,10 @@ namespace Waher.Networking.SASL
 		/// <param name="UserName">User Name</param>
 		/// <param name="Password">Password</param>
 		/// <param name="Connection">Connection</param>
+		/// <param name="Resource">Resource being accessed.</param>
 		/// <returns>If authentication was successful or not. If null is returned, the mechanism did not perform authentication.</returns>
-		public abstract Task<bool?> Authenticate(string UserName, string Password, ISaslClientSide Connection);
+		public abstract Task<bool?> Authenticate(string UserName, string Password,
+            ISaslClientSide Connection, string Resource);
 
 		/// <summary>
 		/// Gets an array of random bytes.

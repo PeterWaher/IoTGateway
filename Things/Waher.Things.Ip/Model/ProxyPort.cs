@@ -281,7 +281,8 @@ namespace Waher.Things.Ip.Model
 			}
 		}
 
-		private async Task SwitchToTls(BinaryTcpClient Incoming, BinaryTcpClient Outgoing, X509Certificate Certificate)
+		private async Task SwitchToTls(BinaryTcpClient Incoming, BinaryTcpClient Outgoing,
+			X509Certificate Certificate)
 		{
 			string RemoteEndpoint = Incoming.RemoteEndPoint.RemovePortNumber();
 
@@ -333,7 +334,10 @@ namespace Waher.Things.Ip.Model
 							return;
 						}
 						else
-							LoginAuditor.Success("Successful login using remote certificate.", User.UserName, RemoteEndPoint, "PROXY");
+						{
+							LoginAuditor.Success("Successful login using remote certificate.",
+								User.UserName, RemoteEndPoint, "PROXY");
+						}
 					}
 
 					if (this.HasSniffers)

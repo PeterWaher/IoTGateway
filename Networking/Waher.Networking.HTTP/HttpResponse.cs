@@ -1061,7 +1061,8 @@ namespace Waher.Networking.HTTP
 					w.WriteHeader("content-length", this.contentLength.Value.ToString(), IndexMode.NotIndexed, true);
 				else if (ExpectContent)
 				{
-					if (!(ContentEncoding is null) &&
+					if (!(this.Request?.Resource?.Proxy ?? false) &&
+						!(ContentEncoding is null) &&
 						(!this.contentLength.HasValue || (this.contentLength.Value >= 128 && this.contentLength.Value < 128 * 1024 * 1024)) &&
 						(string.IsNullOrEmpty(this.contentType) ||
 						!(this.contentType.StartsWith("image/") ||

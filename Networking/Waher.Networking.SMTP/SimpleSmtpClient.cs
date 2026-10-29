@@ -429,7 +429,7 @@ namespace Waher.Networking.SMTP
 
 						try
 						{
-							b = await M.Authenticate(this.userName, this.password, this);
+							b = await M.Authenticate(this.userName, this.password, this, "EHLO");
 							if (!b.HasValue)
 								continue;
 						}

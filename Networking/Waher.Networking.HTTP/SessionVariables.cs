@@ -182,7 +182,10 @@ namespace Waher.Networking.HTTP
 		public override bool TryGetVariable(string Name, out Variable Variable)
 		{
 			if (this.disposed)
-				throw new ObjectDisposedException(nameof(SessionVariables));
+			{
+				Variable = null;
+				return false;
+			}
 
 			if (base.TryGetVariable(Name, out Variable))
 				return true;
@@ -198,7 +201,7 @@ namespace Waher.Networking.HTTP
 		public override bool ContainsVariable(string Name)
 		{
 			if (this.disposed)
-				throw new ObjectDisposedException(nameof(SessionVariables));
+				return false;
 
 			if (base.ContainsVariable(Name))
 				return true;

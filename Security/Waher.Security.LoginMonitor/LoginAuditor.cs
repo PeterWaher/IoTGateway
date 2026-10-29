@@ -614,6 +614,36 @@ namespace Waher.Security.LoginMonitor
 		/// <param name="UserName">Attempted user name.</param>
 		/// <param name="RemoteEndPoint">String representation of remote endpoint</param>
 		/// <param name="Protocol">Protocol</param>
+		/// <param name="Resource">Resource where login failure was detected.</param>
+		public static void Fail(string Message, string UserName, string RemoteEndPoint,
+			string Protocol, string Resource)
+		{
+			if (string.IsNullOrEmpty(Resource))
+			{
+				Fail(Message, UserName, RemoteEndPoint, Protocol,
+					Array.Empty<KeyValuePair<string, object>>());
+			}
+			else
+				Fail(Message, UserName, RemoteEndPoint, Protocol, ResourceTag(Resource));
+		}
+
+		/// <summary>
+		/// Creates a resource tag, to be used when logging a failed login attempt.
+		/// </summary>
+		/// <param name="Resource">Resource</param>
+		/// <returns>Key-value pair representing the resource tag.</returns>
+		public static KeyValuePair<string, object> ResourceTag(string Resource)
+		{
+			return new KeyValuePair<string, object>("Resource", Resource);
+		}
+
+		/// <summary>
+		/// Handles a failed login attempt.
+		/// </summary>
+		/// <param name="Message">Log message</param>
+		/// <param name="UserName">Attempted user name.</param>
+		/// <param name="RemoteEndPoint">String representation of remote endpoint</param>
+		/// <param name="Protocol">Protocol</param>
 		/// <param name="Tags">Any informative tags.</param>
 		public static async void Fail(string Message, string UserName, string RemoteEndPoint,
 			string Protocol, params KeyValuePair<string, object>[] Tags)

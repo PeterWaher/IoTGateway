@@ -138,7 +138,7 @@ namespace Waher.Networking.HTTP.Authentication
 			{
 				LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Request.RemoteEndPoint, "HTTP",
 					new KeyValuePair<string, object>("UserName", UserName),
-					new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
+					LoginAuditor.ResourceTag(Request.Header.ResourcePart));
 				return null;
 			}
 
@@ -160,7 +160,7 @@ namespace Waher.Networking.HTTP.Authentication
 			else
 			{
 				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP",
-					new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
+					LoginAuditor.ResourceTag(Request.Header.ResourcePart));
 				return null;
 			}
 		}

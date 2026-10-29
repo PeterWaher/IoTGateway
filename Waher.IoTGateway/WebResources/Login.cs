@@ -7,6 +7,7 @@ using Waher.Networking.HTTP;
 using Waher.Script;
 using Waher.Security;
 using Waher.Security.JWT;
+using Waher.Security.LoginMonitor;
 using Waher.Security.Users;
 using Waher.Things;
 
@@ -106,7 +107,9 @@ namespace Waher.IoTGateway.WebResources
 				return;
 			}
 
-			LoginResult Result = await Users.Login(UserName, PasswordHash, Nonce, Request.RemoteEndPoint, "Web");
+			LoginResult Result = await Users.Login(UserName, PasswordHash, Nonce, 
+				Request.RemoteEndPoint, "Web",
+				LoginAuditor.ResourceTag(Request.Header.ResourcePart));
 
 			switch (Result.Type)
 			{

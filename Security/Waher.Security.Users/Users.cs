@@ -186,7 +186,25 @@ namespace Waher.Security.Users
 		/// <param name="Protocol">Protocol used for login.</param>
 		/// <returns>Login result.</returns>
 		[Obsolete("Use the Password Hash & Nonce overload to avoid sending passwords in clear text over the network.")]
-		public static async Task<LoginResult> Login(string UserName, string Password, string RemoteEndPoint, string Protocol)
+		public static Task<LoginResult> Login(string UserName, string Password, 
+			string RemoteEndPoint, string Protocol)
+		{
+			return Login(UserName, Password, RemoteEndPoint, Protocol, 
+				Array.Empty<KeyValuePair<string, object>>());
+		}
+
+		/// <summary>
+		/// Attempts to login in the system.
+		/// </summary>
+		/// <param name="UserName">User name</param>
+		/// <param name="Password">Password</param>
+		/// <param name="RemoteEndPoint">Remote endpoint of user attempting to login.</param>
+		/// <param name="Protocol">Protocol used for login.</param>
+		/// <param name="Tags">Tags to include in any log event.</param>
+		/// <returns>Login result.</returns>
+		[Obsolete("Use the Password Hash & Nonce overload to avoid sending passwords in clear text over the network.")]
+		public static async Task<LoginResult> Login(string UserName, string Password, 
+			string RemoteEndPoint, string Protocol, params KeyValuePair<string, object>[] Tags)
 		{
 			if (string.IsNullOrEmpty(Password))
 				return new LoginResult();
@@ -204,9 +222,9 @@ namespace Waher.Security.Users
 				User = null;
 
 			if (User is null)
-				LoginAuditor.Fail("Invalid login.", UserName, RemoteEndPoint, Protocol);
+				LoginAuditor.Fail("Invalid login.", UserName, RemoteEndPoint, Protocol, Tags);
 			else
-				LoginAuditor.Success("Successful login.", UserName, RemoteEndPoint, Protocol);
+				LoginAuditor.Success("Successful login.", UserName, RemoteEndPoint, Protocol, Tags);
 
 			return new LoginResult(User);
 		}
@@ -220,8 +238,26 @@ namespace Waher.Security.Users
 		/// <param name="RemoteEndPoint">Remote endpoint of user attempting to login.</param>
 		/// <param name="Protocol">Protocol used for login.</param>
 		/// <returns>Login result.</returns>
-		public static async Task<LoginResult> Login(string UserName, string PasswordHash, 
+		public static Task<LoginResult> Login(string UserName, string PasswordHash,
 			string Nonce, string RemoteEndPoint, string Protocol)
+		{
+			return Login(UserName, PasswordHash, Nonce, RemoteEndPoint, Protocol, 
+				Array.Empty<KeyValuePair<string, object>>());
+		}
+
+		/// <summary>
+		/// Attempts to login in the system.
+		/// </summary>
+		/// <param name="UserName">User name</param>
+		/// <param name="PasswordHash">A Password Hash computed by the client.</param>
+		/// <param name="Nonce">Nonce used in passord hash computation.</param>
+		/// <param name="RemoteEndPoint">Remote endpoint of user attempting to login.</param>
+		/// <param name="Protocol">Protocol used for login.</param>
+		/// <param name="Tags">Tags to include in any log event.</param>
+		/// <returns>Login result.</returns>
+		public static async Task<LoginResult> Login(string UserName, string PasswordHash, 
+			string Nonce, string RemoteEndPoint, string Protocol,
+			params KeyValuePair<string, object>[] Tags)
 		{
 			if (string.IsNullOrEmpty(PasswordHash))
 				return new LoginResult();
@@ -247,9 +283,9 @@ namespace Waher.Security.Users
 			}
 
 			if (User is null)
-				LoginAuditor.Fail("Invalid login.", UserName, RemoteEndPoint, Protocol);
+				LoginAuditor.Fail("Invalid login.", UserName, RemoteEndPoint, Protocol, Tags);
 			else
-				LoginAuditor.Success("Successful login.", UserName, RemoteEndPoint, Protocol);
+				LoginAuditor.Success("Successful login.", UserName, RemoteEndPoint, Protocol, Tags);
 
 			return new LoginResult(User);
 		}

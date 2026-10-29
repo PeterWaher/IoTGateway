@@ -441,7 +441,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 							LoginAuditor.Fail(Message, TokenFamily.User.UserName,
 								Request.RemoteEndPoint, "OAUTH",
-								new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
+								LoginAuditor.ResourceTag(Request.Header.ResourcePart));
 
 							Log.Alert(Message, TokenFamily.User.UserName,
 								Request.RemoteEndPoint, "TokenLeakage",
@@ -647,7 +647,7 @@ namespace Waher.Networking.HTTP.OAuth
 			{
 				LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Request.RemoteEndPoint, "OAUTH",
 					new KeyValuePair<string, object>("UserName", UserName),
-					new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
+					LoginAuditor.ResourceTag(Request.Header.ResourcePart));
 				return new LoginResult(User);
 			}
 
@@ -666,7 +666,7 @@ namespace Waher.Networking.HTTP.OAuth
 			else
 			{
 				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP",
-					new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
+					LoginAuditor.ResourceTag(Request.Header.ResourcePart));
 				return new LoginResult(null);
 			}
 		}

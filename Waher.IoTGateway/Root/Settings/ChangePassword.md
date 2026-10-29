@@ -78,7 +78,7 @@ if exists(Posted) then
 	else
 	(
 		WSU:=Waher.Security.Users;
-		Result := WSU.Users.Login(User.UserName,Posted.CurrentPassword,Request.RemoteEndPoint,"Web");
+		Result := WSU.Users.Login(User.UserName,Posted.CurrentPassword,Request.RemoteEndPoint,"Web",[Waher.Security.LoginMonitor.LoginAuditor.ResourceTag(Request.Header.ResourcePart)]);
 		if Result.Type=WSU.LoginResultType.PermanentlyBlocked then
 			]]<div class='error'>You've been permanently blocked. Operation blocked.</div>[[
 		else if Result.Type=WSU.LoginResultType.TemporarilyBlocked then

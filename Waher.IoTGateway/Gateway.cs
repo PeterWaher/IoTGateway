@@ -1590,7 +1590,7 @@ namespace Waher.IoTGateway
 							catch (Exception ex)
 							{
 								Log.Error("Unable to register redirection: " + ex.Message,
-									new KeyValuePair<string, object>("Resource", Resource),
+									LoginAuditor.ResourceTag(Resource),
 									new KeyValuePair<string, object>("Location", Location),
 									new KeyValuePair<string, object>("IncludeSubPaths", IncludeSubPaths),
 									new KeyValuePair<string, object>("Permanent", Permanent));
@@ -6140,7 +6140,7 @@ namespace Waher.IoTGateway
 				catch (Exception ex)
 				{
 					Log.Error("Invalid Runtime setting script. Resource could not be added.",
-						new KeyValuePair<string, object>("Resource", ResourceName),
+						LoginAuditor.ResourceTag(ResourceName),
 						new KeyValuePair<string, object>("Error", ex.Message),
 						new KeyValuePair<string, object>("ReferenceFileName", ReferenceFileName),
 						new KeyValuePair<string, object>("Script", Value));

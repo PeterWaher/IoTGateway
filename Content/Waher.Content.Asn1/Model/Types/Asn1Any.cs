@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
 
@@ -11,13 +9,30 @@ namespace Waher.Content.Asn1.Model.Types
 	/// </summary>
 	public class Asn1Any : Asn1Type
 	{
+		private readonly string definedBy;
+
 		/// <summary>
 		/// ANY
 		/// </summary>
 		public Asn1Any()
-			: base()
+			: this(null)
 		{
 		}
+
+		/// <summary>
+		/// ANY
+		/// </summary>
+		/// <param name="DefinedBy">Defined by reference.</param>
+		public Asn1Any(string DefinedBy)
+			: base()
+		{
+			this.definedBy = DefinedBy;
+		}
+
+		/// <summary>
+		/// Defined-by reference
+		/// </summary>
+		public string DefinedBy => this.definedBy;
 
 		/// <summary>
 		/// Parses the portion of the document at the current position, according to the type.

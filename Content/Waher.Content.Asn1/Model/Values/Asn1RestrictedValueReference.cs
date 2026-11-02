@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Asn1.Model.Values
+﻿namespace Waher.Content.Asn1.Model.Values
 {
 	/// <summary>
 	/// Represents a restricted ASN.1 value reference.

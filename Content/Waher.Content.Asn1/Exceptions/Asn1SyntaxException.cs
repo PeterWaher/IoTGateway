@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Asn1.Exceptions
+﻿namespace Waher.Content.Asn1.Exceptions
 {
 	/// <summary>
 	/// ASN.1 syntax exceptions.

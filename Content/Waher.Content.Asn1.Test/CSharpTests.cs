@@ -21,6 +21,14 @@ namespace Waher.Content.Asn1.Test
 			Asn1Document Doc = await ParsingTests.ParseAsn1Document(FileName);
 			CSharpExportSettings Settings = new(BaseNamespace, EncodingSchemes.All);
 			string CSharp = Doc.ExportCSharp(Settings);
+			string CSharpFileName = Path.Combine("Examples", Path.ChangeExtension(FileName, ".cs"));
+			string CSharpFolder = Path.GetDirectoryName(CSharpFileName);
+
+			if (!Directory.Exists(CSharpFolder))
+				Directory.CreateDirectory(CSharpFolder);
+
+			File.WriteAllText(CSharpFileName, CSharp);
+
 			List<SyntaxTree> Modules = [CSharpSyntaxTree.ParseText(CSharp)];
 
 			foreach (string ImportedModule in Settings.Modules)
@@ -40,6 +48,10 @@ namespace Waher.Content.Asn1.Test
 				GetLocation(typeof(Asn1Document))
 			];
 
+			string s = Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "netstandard.dll");
+			if (File.Exists(s))
+				Dependencies.Add(s);
+
 			List<MetadataReference> References = [];
 
 			foreach (string Location in Dependencies)
@@ -49,7 +61,7 @@ namespace Waher.Content.Asn1.Test
 			}
 
 			CSharpCompilation Compilation = CSharpCompilation.Create(
-				BaseNamespace, [.. Modules], References, 
+				BaseNamespace, [.. Modules], References,
 				new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
 			MemoryStream Output = new();
@@ -198,6 +210,12 @@ namespace Waher.Content.Asn1.Test
 		public async Task Test_16_1451_3()
 		{
 			await GenerateCSharp("IEEE1451\\P21451-N1-T3-MIB.asn1");
+		}
+
+		[TestMethod]
+		public async Task Test_17_X509_CertificateRequest()
+		{
+			await GenerateCSharp("X509\\PKIXCRMF.asn1");
 		}
 
 	}

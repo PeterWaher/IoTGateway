@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Waher.Content.Asn1.Model;
 
 namespace Waher.Content.Asn1

@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content.Asn1.Model.Values;
 
 namespace Waher.Content.Asn1.Model
 {
 	/// <summary>
 	/// Represents an ASN.1 field definition.
 	/// </summary>
+	[DebuggerDisplay("{Name} : {Type} [{Tag}]")]
 	public class Asn1FieldDefinition : Asn1Node, INamedNode
 	{
 		private readonly string fieldName;

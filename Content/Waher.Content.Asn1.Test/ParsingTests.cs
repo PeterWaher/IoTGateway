@@ -114,5 +114,11 @@ namespace Waher.Content.Asn1.Test
 		{
 			await ParseAsn1Document("IEEE1451\\P21451-N1-T3-MIB.asn1");
 		}
+
+		[TestMethod]
+		public async Task Test_17_X509_CertificateRequest()
+		{
+			await ParseAsn1Document("X509\\PKIXCRMF.asn1");
+		}
 	}
 }

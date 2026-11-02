@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Asn1.Model.Sets
+﻿namespace Waher.Content.Asn1.Model.Sets
 {
 	/// <summary>
 	/// Union of sets.

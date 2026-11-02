@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Asn1.Model.Restrictions
+﻿namespace Waher.Content.Asn1.Model.Restrictions
 {
 	/// <summary>
 	/// Abstract base class for set-based restrictions

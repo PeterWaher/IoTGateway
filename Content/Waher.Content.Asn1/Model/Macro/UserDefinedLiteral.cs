@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Asn1.Model.Macro
+﻿namespace Waher.Content.Asn1.Model.Macro
 {
 	/// <summary>
 	/// String literal

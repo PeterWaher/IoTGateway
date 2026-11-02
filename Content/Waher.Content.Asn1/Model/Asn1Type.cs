@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Content.Asn1.Model.Values;
+﻿using Waher.Content.Asn1.Model.Values;
 using Waher.Content.Asn1.Model.Macro;
 
 namespace Waher.Content.Asn1.Model
@@ -11,7 +8,7 @@ namespace Waher.Content.Asn1.Model
 	/// </summary>
 	public abstract class Asn1Type : Asn1Node
 	{
-		private bool _implicit;
+		private Asn1Tags? tags;
 		private Asn1Restriction restriction = null;
 		private bool? optional = false;
 		private bool? unique = false;
@@ -28,12 +25,12 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
-		/// Implicit type definition
+		/// Type definition
 		/// </summary>
-		public bool Implicit
+		public Asn1Tags? Tags
 		{
-			get => this._implicit;
-			internal set => this._implicit = value;
+			get => this.tags;
+			internal set => this.tags = value;
 		}
 
 		/// <summary>

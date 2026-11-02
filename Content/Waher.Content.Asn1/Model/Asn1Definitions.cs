@@ -38,6 +38,7 @@ namespace Waher.Content.Asn1.Model
 		private readonly bool _abstract;
 		private readonly Asn1Module body;
 		private readonly Asn1Document document;
+		private Dictionary<string, Asn1Document> imported;
 
 		/// <summary>
 		/// Represents a collection of ASN.1 definitions.
@@ -103,24 +104,36 @@ namespace Waher.Content.Asn1.Model
 			{
 				if (!(this.body.Imports is null))
 				{
-					foreach (Asn1Import Import in this.body.Imports)
+					if (this.imported is null)
 					{
-						if (string.IsNullOrEmpty(Import.Module))
-							continue;
+						this.imported = new Dictionary<string, Asn1Document>();
 
-						Asn1Document ImportedDocument;
-
-						if (State.Settings.ContainsCode(Import.Module))
-							ImportedDocument = State.Settings.GetDocument(Import.Module);
-						else
+						foreach (Asn1Import Import in this.body.Imports)
 						{
-							ImportedDocument = await Import.LoadDocument();
-							string CSharp = ImportedDocument.ExportCSharp(State.Settings);
-							State.Settings.AddCode(Import.Module, CSharp, ImportedDocument);
+							if (string.IsNullOrEmpty(Import.Module))
+								continue;
+
+							Asn1Document ImportedDocument;
+
+							if (State.Settings.ContainsCode(Import.Module))
+								ImportedDocument = State.Settings.GetDocument(Import.Module);
+							else
+								ImportedDocument = await Import.LoadDocument();
+
+							this.imported[Import.Module] = ImportedDocument;
+						}
+					}
+
+					foreach (KeyValuePair<string, Asn1Document> P in this.imported)
+					{
+						if (!State.Settings.ContainsCode(P.Key))
+						{
+							string CSharp = P.Value.ExportCSharp(State.Settings);
+							State.Settings.AddCode(P.Key, CSharp, P.Value);
 						}
 
 						Output.Append("using ");
-						Output.Append(State.Settings.Namespace(Import.Module));
+						Output.Append(State.Settings.Namespace(P.Key));
 						Output.AppendLine(";");
 					}
 

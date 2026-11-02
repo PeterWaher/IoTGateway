@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
-using Waher.Content.Asn1.Model.Values;
 
 namespace Waher.Content.Asn1.Model.Types
 {

@@ -43,6 +43,6 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <summary>
 		/// Corresponding C# type.
 		/// </summary>
-		public override string CSharpType => "UInt64";
+		public override string CSharpType => "ulong";
 	}
 }

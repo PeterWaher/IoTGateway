@@ -9,6 +9,7 @@ namespace Waher.Content.Asn1.Model.Values
 	public class Asn1NamedValue : Asn1ValueReference
 	{
 		private readonly Asn1Value value;
+		private bool enumeratedValue = false;
 
 		/// <summary>
 		/// Represents a named value.
@@ -28,6 +29,15 @@ namespace Waher.Content.Asn1.Model.Values
 		public Asn1Value Value => this.value;
 
 		/// <summary>
+		/// If the named value is part of an enumerated value definition.
+		/// </summary>
+		public bool EnumeratedValue
+		{
+			get => this.enumeratedValue;
+			internal set => this.enumeratedValue = value;
+		}
+
+		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
@@ -39,11 +49,20 @@ namespace Waher.Content.Asn1.Model.Values
 		{
 			if (Pass == CSharpExportPass.Explicit)
 			{
+				if (this.enumeratedValue)
+				{
+					await base.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
+					Output.Append(" = ");
+				}
+
 				await this.value.ExportCSharp(Output, State, Indent, Pass);
 
-				Output.Append(" /* ");
-				await base.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
-				Output.Append(" */");
+				if (!this.enumeratedValue)
+				{
+					Output.Append(" /* ");
+					await base.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
+					Output.Append(" */");
+				}
 			}
 		}
 	}

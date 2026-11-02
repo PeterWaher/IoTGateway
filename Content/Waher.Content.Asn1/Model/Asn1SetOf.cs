@@ -1,4 +1,7 @@
-﻿namespace Waher.Content.Asn1.Model
+﻿using System.Text;
+using System.Threading.Tasks;
+
+namespace Waher.Content.Asn1.Model
 {
 	/// <summary>
 	/// Represents a ASN.1 SET OF construct.
@@ -6,18 +9,18 @@
 	public class Asn1SetOf : Asn1Type
 	{
 		private readonly Asn1Values size;
-		private readonly Asn1Type type;
+		private readonly Asn1Type elementType;
 
 		/// <summary>
 		/// Represents a ASN.1 SET OF construct.
 		/// </summary>
 		/// <param name="Size">Optional SIZE</param>
-		/// <param name="Type">Type</param>
-		public Asn1SetOf(Asn1Values Size, Asn1Type Type)
+		/// <param name="ElementType">Element type.</param>
+		public Asn1SetOf(Asn1Values Size, Asn1Type ElementType)
 			: base()
 		{
 			this.size = Size;
-			this.type = Type;
+			this.elementType = ElementType;
 		}
 
 		/// <summary>
@@ -28,6 +31,24 @@
 		/// <summary>
 		/// Type.
 		/// </summary>
-		public Asn1Type Type => this.type;
+		public Asn1Type Type => this.elementType;
+
+		/// <summary>
+		/// Exports to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="Pass">Export pass</param>
+		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, CSharpExportPass Pass)
+		{
+			if (Pass == CSharpExportPass.Explicit)
+			{
+				Output.Append("Asn1.Array<");
+				await this.elementType.ExportCSharp(Output, State, Indent, Pass);
+				Output.Append(">");
+			}
+		}
 	}
 }

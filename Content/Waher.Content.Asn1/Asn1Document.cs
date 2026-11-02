@@ -1684,12 +1684,7 @@ namespace Waher.Content.Asn1
 		public void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings)
 		{
 			CSharpExportState State = new CSharpExportState(Settings);
-
-			Output.AppendLine("using System;");
-			Output.AppendLine("using System.Text;");
-			Output.AppendLine("using System.Collections.Generic;");
-			Output.AppendLine("using Waher.Content;");
-			Output.AppendLine("using Waher.Content.Asn1;");
+			Output.AppendLine("using Asn1 = Waher.Content.Asn1;");
 
 			this.root?.ExportCSharp(Output, State, 0, CSharpExportPass.Explicit);
 		}

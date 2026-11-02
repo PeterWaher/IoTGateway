@@ -27,7 +27,7 @@ namespace Waher.Content.Asn1.Model.Types
 		{
 			if (Pass == CSharpExportPass.Explicit)
 			{
-				Output.Append("DateTime");
+				Output.Append("System.DateTime");
 				if (this.Optional.HasValue && this.Optional.Value)
 					Output.Append('?');
 			}

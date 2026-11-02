@@ -44,6 +44,6 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <summary>
 		/// Corresponding C# type.
 		/// </summary>
-		public override string CSharpType => "Double";
+		public override string CSharpType => "double";
 	}
 }

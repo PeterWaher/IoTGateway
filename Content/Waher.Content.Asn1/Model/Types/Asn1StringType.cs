@@ -41,7 +41,7 @@ namespace Waher.Content.Asn1.Model.Types
 		public override Task ExportCSharp(StringBuilder Output, CSharpExportState State, int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
-				Output.Append("String");
+				Output.Append("string");
 		
 			return Task.CompletedTask;
 		}

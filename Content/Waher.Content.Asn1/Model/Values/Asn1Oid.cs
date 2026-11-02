@@ -38,7 +38,7 @@ namespace Waher.Content.Asn1.Model.Values
 			{
 				bool First = true;
 
-				Output.Append("new ObjectId(");
+				Output.Append("new Asn1.ObjectId(");
 
 				foreach (Asn1Node Node in this.values)
 				{
@@ -57,6 +57,6 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <summary>
 		/// Corresponding C# type.
 		/// </summary>
-		public override string CSharpType => "ObjectId";
+		public override string CSharpType => "Asn1.ObjectId";
 	}
 }

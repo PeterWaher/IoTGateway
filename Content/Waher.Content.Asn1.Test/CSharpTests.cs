@@ -35,6 +35,9 @@ namespace Waher.Content.Asn1.Test
 			{
 				string CSharp2 = Settings.GetCode(ImportedModule);
 				Modules.Add(CSharpSyntaxTree.ParseText(CSharp2));
+
+				string CSharpFileName2 = Path.Combine(CSharpFolder, ImportedModule + ".cs");
+				File.WriteAllText(CSharpFileName2, CSharp2);
 			}
 
 			HashSet<string> Dependencies =

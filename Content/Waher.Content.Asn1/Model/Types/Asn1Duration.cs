@@ -26,7 +26,7 @@ namespace Waher.Content.Asn1.Model.Types
 		public override Task ExportCSharp(StringBuilder Output, CSharpExportState State, int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
-				Output.Append("Duration");
+				Output.Append("Waher.Content.Duration");
 	
 			return Task.CompletedTask;
 		}

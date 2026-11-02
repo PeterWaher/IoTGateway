@@ -27,7 +27,7 @@ namespace Waher.Content.Asn1.Model.Types
 		{
 			if (Pass == CSharpExportPass.Explicit)
 			{
-				Output.Append("TimeSpan");
+				Output.Append("System.TimeSpan");
 				if (this.Optional.HasValue && this.Optional.Value)
 					Output.Append('?');
 			}

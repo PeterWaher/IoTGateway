@@ -42,7 +42,7 @@ namespace Waher.Content.Asn1.Model.Types
 		{
 			if (Pass == CSharpExportPass.Explicit)
 			{
-				Output.Append("Double");
+				Output.Append("double");
 				if (this.Optional.HasValue && this.Optional.Value)
 					Output.Append('?');
 			}

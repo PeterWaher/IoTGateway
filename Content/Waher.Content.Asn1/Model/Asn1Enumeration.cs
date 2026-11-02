@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Asn1.Model.Values;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -17,6 +18,11 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Enumeration(string Name, bool TypeDef, Asn1Node[] Nodes)
 			: base(Name, TypeDef, Nodes)
 		{
+			foreach (Asn1Node Node in Nodes)
+			{
+				if (Node is Asn1NamedValue NamedValue)
+					NamedValue.EnumeratedValue = true;
+			}
 		}
 
 		/// <summary>
@@ -34,18 +40,13 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State, 
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Explicit)
+			if (Pass == CSharpExportPass.Implicit)
 			{
-				Output.Append(ToCSharp(this.Name));
+				State.ClosePending(Output);
 
-				if (!this.TypeDefinition)
-					Output.Append("Enum");
+				foreach (Asn1Node Node in this.Nodes)
+					await Node.ExportCSharp(Output, State, Indent, Pass);
 
-				if (this.Optional.HasValue && this.Optional.Value)
-					Output.Append('?');
-			}
-			else if (Pass == CSharpExportPass.Implicit)
-			{
 				JSON.Indent(Output, Indent);
 				Output.Append("public enum ");
 				Output.Append(ToCSharp(this.Name));
@@ -53,7 +54,7 @@ namespace Waher.Content.Asn1.Model
 					Output.AppendLine("Enum");
 
 				JSON.Indent(Output, Indent);
-				Output.Append("{");
+				Output.AppendLine("{");
 
 				Indent++;
 
@@ -64,9 +65,8 @@ namespace Waher.Content.Asn1.Model
 					if (First)
 						First = false;
 					else
-						Output.Append(',');
+						Output.AppendLine(",");
 
-					Output.AppendLine();
 					JSON.Indent(Output, Indent);
 					await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 				}
@@ -77,6 +77,52 @@ namespace Waher.Content.Asn1.Model
 				JSON.Indent(Output, Indent);
 				Output.AppendLine("}");
 				Output.AppendLine();
+			}
+			else if (Pass == CSharpExportPass.Explicit)
+			{
+				if (this.TypeDefinition)
+				{
+					State.ClosePending(Output);
+
+					JSON.Indent(Output, Indent);
+					Output.Append("public enum ");
+					Output.AppendLine(ToCSharp(this.Name));
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
+
+					Indent++;
+
+					foreach (Asn1Node Node in this.Nodes)
+						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Implicit);
+
+					bool First = true;
+
+					foreach (Asn1Node Node in this.Nodes)
+					{
+						if (First)
+							First = false;
+						else
+							Output.AppendLine(",");
+
+						JSON.Indent(Output, Indent);
+						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
+					}
+
+					if (!First)
+						Output.AppendLine();
+
+					Indent--;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
+					Output.AppendLine();
+				}
+				else
+				{
+					Output.Append(ToCSharp(this.Name));
+					Output.Append("Enum");
+				}
 			}
 		}
 

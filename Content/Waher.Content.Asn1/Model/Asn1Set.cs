@@ -34,14 +34,7 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State, 
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Explicit)
-			{
-				Output.Append(ToCSharp(this.Name));
-
-				if (!this.TypeDefinition)
-					Output.Append("Set");
-			}
-			else if (Pass == CSharpExportPass.Implicit)
+			if (Pass == CSharpExportPass.Implicit)
 			{
 				State.ClosePending(Output);
 
@@ -64,9 +57,43 @@ namespace Waher.Content.Asn1.Model
 
 				Indent--;
 
+				Output.AppendLine();
 				JSON.Indent(Output, Indent);
 				Output.AppendLine("}");
 				Output.AppendLine();
+			}
+			else if (Pass == CSharpExportPass.Explicit)
+			{
+				if (this.TypeDefinition)
+				{
+					State.ClosePending(Output);
+
+					JSON.Indent(Output, Indent);
+					Output.Append("public class ");
+					Output.AppendLine(ToCSharp(this.Name));
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
+
+					Indent++;
+
+					foreach (Asn1Node Node in this.Nodes)
+						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Implicit);
+
+					foreach (Asn1Node Node in this.Nodes)
+						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
+
+					Indent--;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
+					Output.AppendLine();
+				}
+				else
+				{
+					Output.Append(ToCSharp(this.Name));
+					Output.Append("Set");
+				}
 			}
 		}
 	}

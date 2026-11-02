@@ -26,7 +26,7 @@ namespace Waher.Content.Asn1.Model.Types
 		public override Task ExportCSharp(StringBuilder Output, CSharpExportState State, int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
-				Output.Append("Array<Byte>");
+				Output.Append("Asn1.Array<byte>");
 		
 			return Task.CompletedTask;
 		}

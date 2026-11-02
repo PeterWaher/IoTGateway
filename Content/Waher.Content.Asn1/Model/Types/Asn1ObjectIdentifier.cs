@@ -50,7 +50,7 @@ namespace Waher.Content.Asn1.Model.Types
 		public override Task ExportCSharp(StringBuilder Output, CSharpExportState State, int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
-				Output.Append("ObjectId");
+				Output.Append("Asn1.ObjectId");
 		
 			return Task.CompletedTask;
 		}

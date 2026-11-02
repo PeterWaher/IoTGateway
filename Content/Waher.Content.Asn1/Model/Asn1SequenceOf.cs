@@ -48,7 +48,7 @@ namespace Waher.Content.Asn1.Model
 		{
 			if (Pass == CSharpExportPass.Explicit)
 			{
-				Output.Append("Array<");
+				Output.Append("Asn1.Array<");
 				await this.elementType.ExportCSharp(Output, State, Indent, Pass);
 				Output.Append(">");
 			}

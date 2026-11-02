@@ -21,7 +21,7 @@ namespace Waher.Content.Asn1.Test
 			Asn1Document Doc = await ParsingTests.ParseAsn1Document(FileName);
 			CSharpExportSettings Settings = new(BaseNamespace, EncodingSchemes.All);
 			string CSharp = Doc.ExportCSharp(Settings);
-			List<SyntaxTree> Modules = new() { CSharpSyntaxTree.ParseText(CSharp) };
+			List<SyntaxTree> Modules = [CSharpSyntaxTree.ParseText(CSharp)];
 
 			foreach (string ImportedModule in Settings.Modules)
 			{
@@ -29,27 +29,27 @@ namespace Waher.Content.Asn1.Test
 				Modules.Add(CSharpSyntaxTree.ParseText(CSharp2));
 			}
 
-			Dictionary<string, bool> Dependencies = new()
-			{
-				{ GetLocation(typeof(object)), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"), true },
-				{ GetLocation(typeof(Asn1Document)), true }
-			};
+			HashSet<string> Dependencies =
+			[
+				GetLocation(typeof(object)),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"),
+				GetLocation(typeof(Asn1Document))
+			];
 
-			List<MetadataReference> References = new();
+			List<MetadataReference> References = [];
 
-			foreach (string Location in Dependencies.Keys)
+			foreach (string Location in Dependencies)
 			{
 				if (!string.IsNullOrEmpty(Location))
 					References.Add(MetadataReference.CreateFromFile(Location));
 			}
 
 			CSharpCompilation Compilation = CSharpCompilation.Create(
-				BaseNamespace, Modules.ToArray(), References, 
+				BaseNamespace, [.. Modules], References, 
 				new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
 			MemoryStream Output = new();

@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading.Tasks;
 using Waher.Content.Asn1.Exceptions;
 using Waher.Content.Asn1.Model;
 using Waher.Content.Asn1.Model.Macro;
@@ -8,7 +9,6 @@ using Waher.Content.Asn1.Model.Restrictions;
 using Waher.Content.Asn1.Model.Sets;
 using Waher.Content.Asn1.Model.Types;
 using Waher.Content.Asn1.Model.Values;
-using System.Threading.Tasks;
 using Waher.Runtime.IO;
 
 namespace Waher.Content.Asn1
@@ -45,13 +45,10 @@ namespace Waher.Content.Asn1
 		/// <param name="Text">ASN.1 text to parse.</param>
 		/// <param name="Location">Location of file.</param>
 		/// <param name="ImportFolders">Import Folders.</param>
-		public async Task<Asn1Document> CreateAsync(string Text, string Location, string[] ImportFolders)
+		public static async Task<Asn1Document> CreateAsync(string Text, string Location, string[] ImportFolders)
 		{
-			Asn1Document Result = new Asn1Document(Text, Location, ImportFolders)
-			{
-				root = await this.ParseDefinitions()
-			};
-
+			Asn1Document Result = new Asn1Document(Text, Location, ImportFolders);
+			Result.root = await Result.ParseDefinitions();
 			return Result;
 		}
 
@@ -84,7 +81,7 @@ namespace Waher.Content.Asn1
 		public static async Task<Asn1Document> FromFile(string FileName, string[] ImportFolders)
 		{
 			string Text = await Files.ReadAllTextAsync(FileName);
-			return new Asn1Document(Text, FileName, ImportFolders);
+			return await CreateAsync(Text, FileName, ImportFolders);
 		}
 
 		internal void SkipWhiteSpace()

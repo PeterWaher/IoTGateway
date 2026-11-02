@@ -7,12 +7,12 @@ namespace Waher.Content.Asn1.Test
 	[TestClass]
 	public class ParsingTests
 	{
-		internal static readonly string[] ImportFolders = new string[]
-		{
+		internal static readonly string[] ImportFolders =
+		[
 			"Examples\\SNMPv1",
 			"Examples\\SNMPv2",
 			"Examples\\IEEE1451"
-		};
+		];
 
 		public static Task<Asn1Document> ParseAsn1Document(string FileName)
 		{

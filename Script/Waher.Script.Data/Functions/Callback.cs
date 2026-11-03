@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.Emit;
+﻿using CA = Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Emit;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -351,16 +352,35 @@ namespace Waher.Script.Data.Functions
 
 					if (!CompilerResults.Success)
 					{
+						CA.Diagnostic[] Errors = new CA.Diagnostic[CompilerResults.Diagnostics.Length];
+						CompilerResults.Diagnostics.CopyTo(Errors, 0);
+
+						Array.Sort(Errors, (e1, e2) =>
+						{
+							CA.FileLinePositionSpan p1 = e1.Location.GetLineSpan();
+							CA.FileLinePositionSpan p2 = e2.Location.GetLineSpan();
+							int k = p1.StartLinePosition.Line - p2.StartLinePosition.Line;
+							if (k != 0)
+								return k;
+							else
+								return p1.StartLinePosition.Character - p2.StartLinePosition.Character;
+						});
+
 						sb.Clear();
 
 						sb.Append("Unable to create a script proxy for callback methods of type ");
 						AppendType(Type, sb);
 						sb.AppendLine(". When generating proxy class, the following compiler errors were reported:");
 
-						foreach (Microsoft.CodeAnalysis.Diagnostic Error in CompilerResults.Diagnostics)
+						foreach (CA.Diagnostic Error in Errors)
 						{
+							CA.FileLinePositionSpan Pos = Error.Location.GetLineSpan();
+
 							sb.AppendLine();
-							sb.Append(Error.Location.ToString());
+							sb.Append("Row ");
+							sb.Append(Pos.StartLinePosition.Line + 1);
+							sb.Append(", Column ");
+							sb.Append(Pos.StartLinePosition.Character + 1);
 							sb.Append(": ");
 							sb.Append(Error.GetMessage());
 						}

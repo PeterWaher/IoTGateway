@@ -2199,12 +2199,31 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			if (!CompilerResults.Success)
 			{
+				Diagnostic[] Errors = new Diagnostic[CompilerResults.Diagnostics.Length];
+				CompilerResults.Diagnostics.CopyTo(Errors, 0);
+
+				Array.Sort(Errors, (e1, e2) =>
+				{
+					FileLinePositionSpan p1 = e1.Location.GetLineSpan();
+					FileLinePositionSpan p2 = e2.Location.GetLineSpan();
+					int i = p1.StartLinePosition.Line - p2.StartLinePosition.Line;
+					if (i != 0)
+						return i;
+					else
+						return p1.StartLinePosition.Character - p2.StartLinePosition.Character;
+				});
+
 				StringBuilder sb = new();
 
-				foreach (Diagnostic Error in CompilerResults.Diagnostics)
+				foreach (Diagnostic Error in Errors)
 				{
+					FileLinePositionSpan Pos = Error.Location.GetLineSpan();
+
 					sb.AppendLine();
-					sb.Append(Error.Location.ToString());
+					sb.Append("Row ");
+					sb.Append(Pos.StartLinePosition.Line + 1);
+					sb.Append(", Column ");
+					sb.Append(Pos.StartLinePosition.Character + 1);
 					sb.Append(": ");
 					sb.Append(Error.GetMessage());
 				}

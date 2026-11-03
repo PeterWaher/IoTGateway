@@ -6,10 +6,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Console;
+using Waher.Security;
 
 namespace Waher.Content.Asn1.Test
 {
@@ -30,97 +32,103 @@ namespace Waher.Content.Asn1.Test
 
 			File.WriteAllText(CSharpFileName, CSharp);
 
-			MemoryStream ms = new(Encoding.UTF8.GetBytes(CSharp));
-			try
+			List<SyntaxTree> Modules = [CSharpSyntaxTree.ParseText(CSharp)];
+
+			foreach (string ImportedModule in Settings.Modules)
 			{
-				SourceText Text = SourceText.From(ms, Encoding.UTF8);
-				List<SyntaxTree> Modules = [CSharpSyntaxTree.ParseText(Text)];
+				string CSharp2 = Settings.GetCode(ImportedModule);
 
-				foreach (string ImportedModule in Settings.Modules)
-				{
-					string CSharp2 = Settings.GetCode(ImportedModule);
+				Modules.Add(CSharpSyntaxTree.ParseText(CSharp2));
 
-					ms.Dispose();
-					ms = new(Encoding.UTF8.GetBytes(CSharp2));
-					Text = SourceText.From(ms, Encoding.UTF8);
+				string CSharpFileName2 = Path.Combine(CSharpFolder, ImportedModule + ".cs");
+				File.WriteAllText(CSharpFileName2, CSharp2);
+			}
 
-					Modules.Add(CSharpSyntaxTree.ParseText(Text));
-
-					string CSharpFileName2 = Path.Combine(CSharpFolder, ImportedModule + ".cs");
-					File.WriteAllText(CSharpFileName2, CSharp2);
-				}
-
-				HashSet<string> Dependencies =
-				[
-					GetLocation(typeof(object)),
+			HashSet<string> Dependencies =
+			[
+				GetLocation(typeof(object)),
 					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"),
 					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"),
 					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"),
 					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"),
 					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"),
 					GetLocation(typeof(Asn1Document))
-				];
+			];
 
-				string s = Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "netstandard.dll");
-				if (File.Exists(s))
-					Dependencies.Add(s);
+			string s = Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "netstandard.dll");
+			if (File.Exists(s))
+				Dependencies.Add(s);
 
-				List<MetadataReference> References = [];
+			List<MetadataReference> References = [];
 
-				foreach (string Location in Dependencies)
-				{
-					if (!string.IsNullOrEmpty(Location))
-						References.Add(MetadataReference.CreateFromFile(Location));
-				}
-
-				CSharpCompilation Compilation = CSharpCompilation.Create(
-					BaseNamespace, [.. Modules], References,
-					new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-
-				MemoryStream Output = new();
-				MemoryStream PdbOutput = new();
-
-				EmitResult CompilerResults = Compilation.Emit(Output, pdbStream: PdbOutput);
-
-				if (!CompilerResults.Success)
-				{
-					StringBuilder sb = new();
-
-					foreach (Diagnostic Error in CompilerResults.Diagnostics)
-					{
-						sb.AppendLine();
-						sb.Append(Error.Location.ToString());
-						sb.Append(": ");
-						sb.Append(Error.GetMessage());
-					}
-
-					sb.AppendLine();
-					sb.AppendLine();
-					sb.AppendLine("Code generated:");
-					sb.AppendLine();
-					sb.AppendLine(CSharp);
-
-					foreach (string ImportedModule in Settings.Modules)
-					{
-						string CSharp2 = Settings.GetCode(ImportedModule);
-
-						sb.AppendLine();
-						sb.AppendLine(new string('-', 80));
-						sb.AppendLine();
-						sb.AppendLine(CSharp2);
-					}
-
-					throw new Exception(sb.ToString());
-				}
-
-				ConsoleOut.WriteLine(CSharp);
-
-				return CSharp;
-			}
-			finally
+			foreach (string Location in Dependencies)
 			{
-				ms.Dispose();
+				if (!string.IsNullOrEmpty(Location))
+					References.Add(MetadataReference.CreateFromFile(Location));
 			}
+
+			CSharpCompilation Compilation = CSharpCompilation.Create(
+				BaseNamespace, [.. Modules], References,
+				new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+			MemoryStream Output = new();
+			MemoryStream PdbOutput = new();
+
+			EmitResult CompilerResults = Compilation.Emit(Output, pdbStream: PdbOutput);
+
+			if (!CompilerResults.Success)
+			{
+				Diagnostic[] Errors = new Diagnostic[CompilerResults.Diagnostics.Length];
+				CompilerResults.Diagnostics.CopyTo(Errors, 0);
+
+				Array.Sort(Errors, (e1, e2) =>
+				{
+					FileLinePositionSpan p1 = e1.Location.GetLineSpan();
+					FileLinePositionSpan p2 = e2.Location.GetLineSpan();
+					int i = p1.StartLinePosition.Line - p2.StartLinePosition.Line;
+					if (i != 0)
+						return i;
+					else
+						return p1.StartLinePosition.Character - p2.StartLinePosition.Character;
+				});
+
+				StringBuilder sb = new();
+
+				foreach (Diagnostic Error in Errors)
+				{
+					FileLinePositionSpan Pos = Error.Location.GetLineSpan();
+
+					sb.AppendLine();
+					sb.Append("Row ");
+					sb.Append(Pos.StartLinePosition.Line + 1);
+					sb.Append(", Column ");
+					sb.Append(Pos.StartLinePosition.Character + 1);
+					sb.Append(": ");
+					sb.Append(Error.GetMessage());
+				}
+
+				sb.AppendLine();
+				sb.AppendLine();
+				sb.AppendLine("Code generated:");
+				sb.AppendLine();
+				sb.AppendLine(CSharp);
+
+				foreach (string ImportedModule in Settings.Modules)
+				{
+					string CSharp2 = Settings.GetCode(ImportedModule);
+
+					sb.AppendLine();
+					sb.AppendLine(new string('-', 80));
+					sb.AppendLine();
+					sb.AppendLine(CSharp2);
+				}
+
+				throw new Exception(sb.ToString());
+			}
+
+			ConsoleOut.WriteLine(CSharp);
+
+			return CSharp;
 		}
 
 		private static string GetLocation(Type T)

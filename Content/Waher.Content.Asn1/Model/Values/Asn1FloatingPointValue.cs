@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,6 +25,9 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Value
 		/// </summary>
 		public double Value => this.value;
+
+		/// <inheritdoc/>
+		public override string ToString() => this.value.ToString(CultureInfo.InvariantCulture);
 
 		/// <summary>
 		/// Exports to C#

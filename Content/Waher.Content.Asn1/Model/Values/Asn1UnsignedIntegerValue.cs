@@ -44,5 +44,8 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Corresponding C# type.
 		/// </summary>
 		public override string CSharpType => "ulong";
+
+		/// <inheritdoc/>
+		public override string ToString() => this.value.ToString();
 	}
 }

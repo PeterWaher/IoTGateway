@@ -1,17 +1,14 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Console;
-using Waher.Security;
 
 namespace Waher.Content.Asn1.Test
 {
@@ -32,13 +29,13 @@ namespace Waher.Content.Asn1.Test
 
 			File.WriteAllText(CSharpFileName, CSharp);
 
-			List<SyntaxTree> Modules = [CSharpSyntaxTree.ParseText(CSharp)];
+			List<SyntaxTree> Modules = [CSharpSyntaxTree.ParseText(CSharp, path: FileName, encoding: Encoding.UTF8)];
 
 			foreach (string ImportedModule in Settings.Modules)
 			{
 				string CSharp2 = Settings.GetCode(ImportedModule);
 
-				Modules.Add(CSharpSyntaxTree.ParseText(CSharp2));
+				Modules.Add(CSharpSyntaxTree.ParseText(CSharp2, path: ImportedModule, encoding: Encoding.UTF8));
 
 				string CSharpFileName2 = Path.Combine(CSharpFolder, ImportedModule + ".cs");
 				File.WriteAllText(CSharpFileName2, CSharp2);
@@ -85,11 +82,15 @@ namespace Waher.Content.Asn1.Test
 				{
 					FileLinePositionSpan p1 = e1.Location.GetLineSpan();
 					FileLinePositionSpan p2 = e2.Location.GetLineSpan();
-					int i = p1.StartLinePosition.Line - p2.StartLinePosition.Line;
+					int i = p1.Path.CompareTo(p2.Path);
 					if (i != 0)
 						return i;
-					else
-						return p1.StartLinePosition.Character - p2.StartLinePosition.Character;
+
+					i = p1.StartLinePosition.Line - p2.StartLinePosition.Line;
+					if (i != 0)
+						return i;
+					
+					return p1.StartLinePosition.Character - p2.StartLinePosition.Character;
 				});
 
 				StringBuilder sb = new();
@@ -99,7 +100,8 @@ namespace Waher.Content.Asn1.Test
 					FileLinePositionSpan Pos = Error.Location.GetLineSpan();
 
 					sb.AppendLine();
-					sb.Append("Row ");
+					sb.Append(Pos.Path);
+					sb.Append(", Row ");
 					sb.Append(Pos.StartLinePosition.Line + 1);
 					sb.Append(", Column ");
 					sb.Append(Pos.StartLinePosition.Character + 1);

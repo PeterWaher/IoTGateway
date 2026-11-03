@@ -42,6 +42,23 @@ namespace Waher.Content.Asn1.Model
 		/// </summary>
 		public Asn1Type Definition => this.definition;
 
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(this.typeName);
+
+			if (this.tag.HasValue)
+			{
+				sb.Append(" [");
+				sb.Append(this.tag.Value.ToString());
+				sb.Append(']');
+			}
+
+			return sb.ToString();
+		}
+
 		/// <summary>
 		/// Parses the portion of the document at the current position, according to the type.
 		/// </summary>
@@ -63,8 +80,10 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
-			if (this.definition.ConstructedType)
-				await this.definition.ExportCSharp(Output, State, Indent, Pass);
+			if (this.definition.ConstructedType && Pass == CSharpExportPass.Explicit)
+			{
+				await this.definition.ExportCSharp(Output, State, Indent, CSharpExportPass.Implicit);
+			}
 		}
 	}
 }

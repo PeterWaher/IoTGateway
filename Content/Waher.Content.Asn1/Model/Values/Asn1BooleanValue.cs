@@ -24,6 +24,9 @@ namespace Waher.Content.Asn1.Model.Values
 		/// </summary>
 		public bool Value => this.value;
 
+		/// <inheritdoc/>
+		public override string ToString() => this.value.ToString();
+
 		/// <summary>
 		/// Exports to C#
 		/// </summary>

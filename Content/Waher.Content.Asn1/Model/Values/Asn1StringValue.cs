@@ -51,5 +51,8 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Corresponding C# type.
 		/// </summary>
 		public override string CSharpType => "string";
+
+		/// <inheritdoc/>
+		public override string ToString() => "\"" + JSON.Encode(this.value) + "\"";
 	}
 }

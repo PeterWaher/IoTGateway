@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Waher.Content.Asn1.Model.Values
@@ -36,6 +37,9 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Type definition.
 		/// </summary>
 		public Asn1Type TypeDefinition => this.typeDefinition;
+
+		/// <inheritdoc/>
+		public override string ToString() => this.value.ToString();
 
 		/// <summary>
 		/// If the named value is part of an enumerated value definition.

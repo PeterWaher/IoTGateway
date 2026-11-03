@@ -1,4 +1,6 @@
-﻿namespace Waher.Content.Asn1.Model.Values
+﻿using System.Text;
+
+namespace Waher.Content.Asn1.Model.Values
 {
 	/// <summary>
 	/// Represents a restricted ASN.1 value reference.
@@ -24,5 +26,17 @@
 		/// Restriction
 		/// </summary>
 		public Asn1Restriction Restriction => this.restriction;
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(base.ToString());
+			sb.Append('|');
+			sb.Append(this.restriction.ToString());
+
+			return sb.ToString();
+		}
 	}
 }

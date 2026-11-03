@@ -72,5 +72,8 @@ namespace Waher.Content.Asn1.Model.Values
 					this.GetType().FullName + " not implemented.");
 			}
 		}
+
+		/// <inheritdoc/>
+		public override string ToString() => this.identifier;
 	}
 }

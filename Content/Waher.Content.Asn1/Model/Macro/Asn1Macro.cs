@@ -88,12 +88,18 @@ namespace Waher.Content.Asn1.Model.Macro
 		/// Parses a type from the portion of the document at the current position, 
 		/// according to the instructions available in the macro.
 		/// </summary>
+		/// <param name="Name">Name of type.</param>
 		/// <param name="Document">ASN.1 document being parsed.</param>
 		/// <returns>Parsed ASN.1 type node.</returns>
-		public Asn1Type ParseType(Asn1Document Document)
+		public Asn1Type ParseType(string Name, Asn1Document Document)
 		{
 			if (this.typeNotation.Parse(Document, this) is Asn1Type Type)
+			{
+				if (Type is Asn1ComplexType ComplexType)
+					ComplexType.Name = Name;
+
 				return Type;
+			}
 			else
 				throw Document.SyntaxError("Unable to evaluate type.");
 		}
@@ -121,6 +127,9 @@ namespace Waher.Content.Asn1.Model.Macro
 			else
 				return new Types.Asn1Any();
 		}
+
+		/// <inheritdoc/>
+		public override string ToString() => this.name;
 
 	}
 }

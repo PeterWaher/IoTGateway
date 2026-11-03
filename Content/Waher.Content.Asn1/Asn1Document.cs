@@ -533,7 +533,7 @@ namespace Waher.Content.Asn1
 					}
 
 					this.AssertNextToken("END");
-
+					
 					return new Asn1Macro(s, TypeNotation, ValueNotation, SupportingSyntax.ToArray(), this);
 				}
 				else if (this.namedNodes.TryGetValue(s2, out Asn1Node Node) &&
@@ -612,7 +612,7 @@ namespace Waher.Content.Asn1
 						Node is Asn1Macro Macro)
 					{
 						this.pos += s2.Length;
-						Definition = Macro.ParseType(this);
+						Definition = Macro.ParseType(s, this);
 					}
 					else
 						Definition = this.ParseType(s, true);
@@ -1143,7 +1143,7 @@ namespace Waher.Content.Asn1
 					if (s == "{")
 					{
 						Asn1Node[] Nodes = this.ParseValues(true);
-						return new Asn1Enumeration(Name, TypeDef, Nodes);
+						return new Asn1Enumeration(Name, TypeDef, null, Nodes);
 					}
 					else
 						throw this.SyntaxError("{ expected.");
@@ -1161,7 +1161,15 @@ namespace Waher.Content.Asn1
 					return new Asn1Ia5String();
 
 				case "INTEGER":
-					return new Asn1Integer();
+					s = this.PeekNextToken();
+
+					if (s == "{")
+					{
+						Asn1Node[] Nodes = this.ParseValues(true);
+						return new Asn1Enumeration(Name, TypeDef, new Asn1Integer(), Nodes);
+					}
+					else
+						return new Asn1Integer();
 
 				case "ISO646String":
 					return new Asn1Iso646String();

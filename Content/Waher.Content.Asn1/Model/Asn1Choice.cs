@@ -102,7 +102,7 @@ namespace Waher.Content.Asn1.Model
 
 							Output.AppendLine();
 							JSON.Indent(Output, Indent);
-							Output.Append(Field.Name);
+							Output.Append(ToCSharp(Field.Name));
 						}
 					}
 
@@ -127,6 +127,9 @@ namespace Waher.Content.Asn1.Model
 					Output.AppendLine("{");
 
 					Indent++;
+
+					foreach (Asn1Node Node in this.Nodes)
+						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Implicit);
 
 					JSON.Indent(Output, Indent);
 					Output.Append("public ");

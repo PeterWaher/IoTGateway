@@ -58,5 +58,22 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Corresponding C# type.
 		/// </summary>
 		public override string CSharpType => "Asn1.ObjectId";
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+			bool First = true;
+
+			foreach (Asn1Value Value in this.values)
+			{
+				if (First)
+					First = false;
+				else
+					sb.Append('.');
+			}
+
+			return sb.ToString();
+		}
 	}
 }

@@ -87,5 +87,27 @@ namespace Waher.Content.Asn1.Model
 				Output.AppendLine(";");
 			}
 		}
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(this.fieldName);
+
+			if (!(this.type is null))
+			{
+				sb.Append(" : ");
+				sb.Append(this.type.ToString());
+			}
+
+			if (!(this.value is null))
+			{
+				sb.Append(" = ");
+				sb.Append(this.value.ToString());
+			}
+
+			return sb.ToString();
+		}
 	}
 }

@@ -1,13 +1,13 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Asn1.Model.Types;
+using Waher.Content.Asn1.Model.Values;
 
 namespace Waher.Content.Asn1.Model
 {
 	/// <summary>
 	/// Represents an ASN.1 field definition.
 	/// </summary>
-	[DebuggerDisplay("{Name} : {Type} [{Tag}]")]
 	public class Asn1FieldDefinition : Asn1Node, INamedNode
 	{
 		private readonly string fieldName;
@@ -46,7 +46,26 @@ namespace Waher.Content.Asn1.Model
 			get => this.tag;
 			internal set => this.tag = value;
 		}
-		
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(this.fieldName);
+			sb.Append(" : ");
+			sb.Append(this.type.ToString());
+
+			if (this.tag.HasValue)
+			{
+				sb.Append(" [");
+				sb.Append(this.tag.Value.ToString());
+				sb.Append(']');
+			}
+
+			return sb.ToString();
+		}
+
 		/// <summary>
 		/// Exports to C#
 		/// </summary>
@@ -68,7 +87,16 @@ namespace Waher.Content.Asn1.Model
 				if (!(this.type.Default is null))
 				{
 					Output.Append(" = ");
-					await this.type.Default.ExportCSharp(Output, State, Indent, Pass);
+
+					if (this.type.Default is Asn1ValueReference ValueReference &&
+						this.type is Asn1TypeReference TypeReference)
+					{
+						await TypeReference.ExportCSharp(Output, State, Indent, Pass);
+						Output.Append('.');
+						await ValueReference.ExportCSharp(Output, State, Indent, Pass);
+					}
+					else
+						await this.type.Default.ExportCSharp(Output, State, Indent, Pass);
 				}
 
 				Output.AppendLine(";");

@@ -5,8 +5,8 @@
 	/// </summary>
 	public abstract class Asn1ComplexType : Asn1Type
 	{
-		private readonly string name;
 		private readonly bool typeDef;
+		private string name;
 
 		/// <summary>
 		/// Abstract base class for complex types.
@@ -23,11 +23,21 @@
 		/// <summary>
 		/// Optional field or type name.
 		/// </summary>
-		public string Name => this.name;
+		public string Name
+		{
+			get => this.name;
+			internal set => this.name = value;
+		}
 
 		/// <summary>
 		/// If construct is part of a type definition.
 		/// </summary>
 		public bool TypeDefinition => this.typeDef;
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			return this.name;
+		}
 	}
 }

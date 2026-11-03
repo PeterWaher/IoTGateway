@@ -9,15 +9,20 @@ namespace Waher.Content.Asn1.Model
 	/// </summary>
 	public class Asn1Enumeration : Asn1List
 	{
+		private readonly Asn1Node baseType;
+
 		/// <summary>
 		/// ENUMERATED
 		/// </summary>
 		/// <param name="Name">Optional field or type name.</param>
 		/// <param name="TypeDef">If construct is part of a type definition.</param>
+		/// <param name="BaseType">Base type of enumeration.</param>
 		/// <param name="Nodes">Nodes</param>
-		public Asn1Enumeration(string Name, bool TypeDef, Asn1Node[] Nodes)
+		public Asn1Enumeration(string Name, bool TypeDef, Asn1Node BaseType, Asn1Node[] Nodes)
 			: base(Name, TypeDef, Nodes)
 		{
+			this.baseType = BaseType;
+
 			foreach (Asn1Node Node in Nodes)
 			{
 				if (Node is Asn1NamedValue NamedValue)
@@ -29,6 +34,11 @@ namespace Waher.Content.Asn1.Model
 		/// If the type is a constructed type.
 		/// </summary>
 		public override bool ConstructedType => true;
+
+		/// <summary>
+		/// Base type.
+		/// </summary>
+		public Asn1Node BaseType => this.baseType;
 
 		/// <summary>
 		/// Exports to C#

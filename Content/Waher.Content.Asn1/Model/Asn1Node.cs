@@ -161,7 +161,8 @@ namespace Waher.Content.Asn1.Model
 				case "when":
 				case "where":
 				case "yield":
-					return "_" + Identifier;
+				case "volatile":
+					return "@" + Identifier;
 
 				default:
 					int i = Identifier.IndexOf('-');

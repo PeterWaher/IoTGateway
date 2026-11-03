@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Waher.Content.Asn1.Model.Values
@@ -23,6 +24,9 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Value
 		/// </summary>
 		public long Value => this.value;
+
+		/// <inheritdoc/>
+		public override string ToString() => this.value.ToString();
 
 		/// <summary>
 		/// Exports to C#

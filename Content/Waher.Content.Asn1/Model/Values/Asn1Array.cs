@@ -56,6 +56,27 @@ namespace Waher.Content.Asn1.Model.Values
 			}
 		}
 
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+			bool First = true;
+
+			sb.Append('[');
+
+			foreach (Asn1Value Value in this.values)
+			{
+				if (First)
+					First = false;
+				else
+					sb.Append(", ");
+			}
+
+			sb.Append(']');
+
+			return sb.ToString();
+		}
+
 		/// <summary>
 		/// Corresponding C# type.
 		/// </summary>

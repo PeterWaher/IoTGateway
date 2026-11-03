@@ -38,7 +38,6 @@ namespace Waher.Content.Asn1.Model.Values
 			{
 				bool First = true;
 
-
 				Output.Append("new ");
 				Output.Append(this.CSharpType);
 				Output.Append(" { ");

@@ -1017,13 +1017,18 @@ namespace Waher.Content.Asn1
 							{
 								this.pos++;
 
-								NamedOptions.Add(new Asn1NamedValue(s2, this.ParseValue(), this));
+								Asn1Value Value = this.ParseValue();
+								
+								if (!this.namedNodes.ContainsKey(s2))
+									this.namedNodes[s2] = Value;
+
+								NamedOptions.Add(new Asn1NamedValue(s2, Value, Result, this));
 
 								if (this.NextToken() != ")")
 									throw this.SyntaxError(") expected");
 							}
 							else
-								NamedOptions.Add(new Asn1NamedValue(s2, null, this));
+								NamedOptions.Add(new Asn1NamedValue(s2, null, Result, this));
 
 							s2 = this.NextToken();
 
@@ -1369,7 +1374,7 @@ namespace Waher.Content.Asn1
 						int LastIndex = Items.Count - 1;
 
 						if (Items[LastIndex] is Asn1ValueReference Ref)
-							Items[LastIndex] = new Asn1NamedValue(Ref.Identifier, Value, this);
+							Items[LastIndex] = new Asn1NamedValue(Ref.Identifier, Value, null, this);
 						else
 							throw this.SyntaxError("Invalid value reference.");
 						break;
@@ -1541,13 +1546,13 @@ namespace Waher.Content.Asn1
 
 								this.pos++;
 								Asn1Value Value = this.ParseValue(false);
-								return new Asn1NamedValue(s, Value, this);
+								return new Asn1NamedValue(s, Value, null, this);
 
 							case "(":
 								Asn1Restriction Restriction = this.ParseRestriction();
 
 								if (Restriction is Asn1InSet Set && Set.Set is Asn1Element Element)
-									return new Asn1NamedValue(s, Element.Element, this);
+									return new Asn1NamedValue(s, Element.Element, null, this);
 								else
 									return new Asn1RestrictedValueReference(s, Restriction, this);
 

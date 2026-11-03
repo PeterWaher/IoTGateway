@@ -57,7 +57,6 @@ namespace Waher.Content.Asn1.Model
 
 				Indent--;
 
-				Output.AppendLine();
 				JSON.Indent(Output, Indent);
 				Output.AppendLine("}");
 				Output.AppendLine();

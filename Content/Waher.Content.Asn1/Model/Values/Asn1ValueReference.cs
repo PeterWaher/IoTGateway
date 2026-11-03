@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Waher.Content.Asn1.Model.Values
@@ -34,7 +35,7 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override Task ExportCSharp(StringBuilder Output, CSharpExportState State, 
+		public override Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
@@ -47,11 +48,29 @@ namespace Waher.Content.Asn1.Model.Values
 						Output.Append(".Values.");
 					}
 				}
-					
+
 				Output.Append(ToCSharp(this.identifier));
 			}
-		
+
 			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Corresponding C# type.
+		/// </summary>
+		public override string CSharpType
+		{
+			get
+			{
+				if (this.document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node) &&
+					Node is Asn1Value Value)
+				{
+					return Value.CSharpType;
+				}
+
+				throw new NotImplementedException("Support for value type " +
+					this.GetType().FullName + " not implemented.");
+			}
 		}
 	}
 }

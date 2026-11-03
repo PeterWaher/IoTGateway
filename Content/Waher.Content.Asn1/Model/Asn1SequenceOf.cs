@@ -46,7 +46,9 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Explicit)
+			if (Pass == CSharpExportPass.Implicit)
+				await this.elementType.ExportCSharp(Output, State, Indent, Pass);
+			else if (Pass == CSharpExportPass.Explicit)
 			{
 				Output.Append("Asn1.Array<");
 				await this.elementType.ExportCSharp(Output, State, Indent, Pass);

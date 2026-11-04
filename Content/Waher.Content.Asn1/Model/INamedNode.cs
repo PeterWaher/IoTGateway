@@ -8,9 +8,6 @@
 		/// <summary>
 		/// Name of node.
 		/// </summary>
-		string Name
-		{
-			get;
-		}
+		string Name { get; }
 	}
 }

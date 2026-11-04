@@ -11,7 +11,17 @@ namespace Waher.Content.Asn1.Model
 		/// Abstract base class for values.
 		/// </summary>
 		public Asn1Value()
+			: base()
 		{
+		}
+
+		/// <summary>
+		/// Makes the value 2^value, for use with <see cref="System.FlagsAttribute"/>
+		/// enumerations.
+		/// </summary>
+		public virtual void TwosPower()
+		{
+			throw new NotImplementedException("Invalid power of two.");
 		}
 
 		/// <summary>

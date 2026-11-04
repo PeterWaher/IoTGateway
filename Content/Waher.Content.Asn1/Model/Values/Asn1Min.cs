@@ -8,7 +8,8 @@
 		/// <summary>
 		/// MIN
 		/// </summary>
-		public Asn1Min()
+		public Asn1Min() 
+			: base()
 		{
 		}
 	}

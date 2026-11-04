@@ -14,9 +14,13 @@
 		/// <param name="From">From</param>
 		/// <param name="To">To</param>
 		public Asn1Interval(Asn1Value From, Asn1Value To)
+			: base()
 		{
 			this.from = From;
 			this.to = To;
+	
+			this.SetAsChild(this.from);
+			this.SetAsChild(this.to);
 		}
 
 		/// <summary>

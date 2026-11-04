@@ -18,6 +18,7 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <param name="Identifier">Identifier</param>
 		/// <param name="Document">ASN.1 Document containing the reference</param>
 		public Asn1ValueReference(string Identifier, Asn1Document Document)
+			: base()
 		{
 			this.identifier = Identifier;
 			this.document = Document;

@@ -1099,7 +1099,16 @@ namespace Waher.Content.Asn1
 
 				case "BIT":
 					this.AssertNextToken("STRING");
-					return new Asn1BitString();
+					
+					s = this.PeekNextToken();
+
+					if (s == "{")
+					{
+						Asn1Node[] Nodes = this.ParseValues(true);
+						return new Asn1Enumeration(Name, TypeDef, true, new Asn1BitString(), Nodes);
+					}
+					else
+						return new Asn1BitString();
 
 				case "BMPString":
 					return new Asn1BmpString();
@@ -1143,7 +1152,7 @@ namespace Waher.Content.Asn1
 					if (s == "{")
 					{
 						Asn1Node[] Nodes = this.ParseValues(true);
-						return new Asn1Enumeration(Name, TypeDef, null, Nodes);
+						return new Asn1Enumeration(Name, TypeDef, false, null, Nodes);
 					}
 					else
 						throw this.SyntaxError("{ expected.");
@@ -1166,7 +1175,7 @@ namespace Waher.Content.Asn1
 					if (s == "{")
 					{
 						Asn1Node[] Nodes = this.ParseValues(true);
-						return new Asn1Enumeration(Name, TypeDef, new Asn1Integer(), Nodes);
+						return new Asn1Enumeration(Name, TypeDef, false, new Asn1Integer(), Nodes);
 					}
 					else
 						return new Asn1Integer();

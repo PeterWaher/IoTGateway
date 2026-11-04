@@ -19,7 +19,9 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Identifiers">Identifiers to import.</param>
 		/// <param name="Module">Module reference.</param>
 		/// <param name="Document">ASN.1 Document</param>
-		public Asn1Import(string[] Identifiers, string Module, Asn1Document Document)
+		public Asn1Import(string[] Identifiers, string Module, 
+			Asn1Document Document)
+			: base()
 		{
 			this.identifiers = Identifiers;
 			this.module = Module;

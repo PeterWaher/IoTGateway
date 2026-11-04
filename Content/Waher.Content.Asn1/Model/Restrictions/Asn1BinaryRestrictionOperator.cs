@@ -13,10 +13,15 @@
 		/// </summary>
 		/// <param name="Left">Left set</param>
 		/// <param name="Right">Right set</param>
-		public Asn1BinaryRestrictionOperator(Asn1Restriction Left, Asn1Restriction Right)
+		public Asn1BinaryRestrictionOperator(Asn1Restriction Left, 
+			Asn1Restriction Right)
+			: base()
 		{
 			this.left = Left;
 			this.right = Right;
+
+			this.SetAsChild(this.left);
+			this.SetAsChild(this.right);
 		}
 
 		/// <summary>

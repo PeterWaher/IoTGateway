@@ -17,6 +17,7 @@
 			: base(Name, TypeDef)
 		{
 			this.nodes = Nodes;
+			this.SetAsChild(this.nodes);
 		}
 
 		/// <summary>

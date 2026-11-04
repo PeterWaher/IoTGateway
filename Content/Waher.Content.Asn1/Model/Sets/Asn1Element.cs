@@ -12,8 +12,10 @@
 		/// </summary>
 		/// <param name="Element">Element</param>
 		public Asn1Element(Asn1Value Element)
+			: base()
 		{
 			this.element = Element;
+			this.SetAsChild(this.element);
 		}
 
 		/// <summary>

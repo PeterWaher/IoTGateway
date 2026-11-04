@@ -9,6 +9,7 @@
 		/// Abstract base class for sets of values
 		/// </summary>
 		public Asn1Values()
+			: base()
 		{
 		}
 	}

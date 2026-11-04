@@ -21,6 +21,9 @@ namespace Waher.Content.Asn1.Model
 		{
 			this.size = Size;
 			this.elementType = ElementType;
+
+			this.SetAsChild(this.size);
+			this.SetAsChild(this.elementType);
 		}
 
 		/// <summary>

@@ -24,8 +24,10 @@ namespace Waher.Content.Asn1.Model.Macro
 		/// <param name="ValueNotation">Value Notation</param>
 		/// <param name="SupportingSyntax">Supporting Syntax</param>
 		/// <param name="Document">Document defining macro.</param>
-		public Asn1Macro(string Name, UserDefinedItem TypeNotation, UserDefinedItem ValueNotation,
-			SupportingSyntax[] SupportingSyntax, Asn1Document Document)
+		public Asn1Macro(string Name, UserDefinedItem TypeNotation, 
+			UserDefinedItem ValueNotation, SupportingSyntax[] SupportingSyntax, 
+			Asn1Document Document)
+			: base()
 		{
 			this.name = Name;
 			this.typeNotation = TypeNotation;

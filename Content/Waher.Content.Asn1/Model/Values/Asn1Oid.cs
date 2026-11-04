@@ -14,9 +14,11 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Represents an ASN.1 Object ID
 		/// </summary>
 		/// <param name="Values">OID values.</param>
-		public Asn1Oid(Asn1Node[] Values)
+		public Asn1Oid(Asn1Node[] Values) 
+			: base()
 		{
 			this.values = Values;
+			this.SetAsChild(this.values);
 		}
 
 		/// <summary>
@@ -65,12 +67,14 @@ namespace Waher.Content.Asn1.Model.Values
 			StringBuilder sb = new StringBuilder();
 			bool First = true;
 
-			foreach (Asn1Value Value in this.values)
+			foreach (Asn1Node Value in this.values)
 			{
 				if (First)
 					First = false;
 				else
 					sb.Append('.');
+
+				sb.Append(Value.ToString());
 			}
 
 			return sb.ToString();

@@ -20,12 +20,15 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <param name="Value">Optional Value</param>
 		/// <param name="TypeDefinition">Type definition.</param>
 		/// <param name="Document">ASN.1 Document containing the reference</param>
-		public Asn1NamedValue(string Identifier, Asn1Value Value, Asn1Type TypeDefinition, 
-			Asn1Document Document)
+		public Asn1NamedValue(string Identifier, Asn1Value Value, 
+			Asn1Type TypeDefinition, Asn1Document Document)
 			: base(Identifier, Document)
 		{
 			this.value = Value;
 			this.typeDefinition = TypeDefinition;
+		
+			this.SetAsChild(this.value);
+			this.SetAsChild(this.typeDefinition);
 		}
 
 		/// <summary>
@@ -37,6 +40,15 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Type definition.
 		/// </summary>
 		public Asn1Type TypeDefinition => this.typeDefinition;
+
+		/// <summary>
+		/// Makes the value 2^value, for use with <see cref="System.FlagsAttribute"/>
+		/// enumerations.
+		/// </summary>
+		public override void TwosPower()
+		{
+			this.value.TwosPower();
+		}
 
 		/// <inheritdoc/>
 		public override string ToString() => this.value.ToString();

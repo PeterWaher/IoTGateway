@@ -8,7 +8,8 @@
 		/// <summary>
 		/// All elements (in current context).
 		/// </summary>
-		public Asn1All()
+		public Asn1All() 
+			: base()
 		{
 		}
 	}

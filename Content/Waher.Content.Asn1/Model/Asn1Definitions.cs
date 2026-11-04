@@ -49,8 +49,9 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Abstract">If abstract syntax is used.</param>
 		/// <param name="Body">Definition body.</param>
 		/// <param name="Document">ASN.1 document</param>
-		public Asn1Definitions(string Identifier, Asn1Oid Oid, Asn1Tags? Tags, bool Abstract,
-			Asn1Module Body, Asn1Document Document)
+		public Asn1Definitions(string Identifier, Asn1Oid Oid, 
+			Asn1Tags? Tags, bool Abstract, Asn1Module Body, Asn1Document Document)
+			: base()
 		{
 			this.identifier = Identifier;
 			this.oid = Oid;
@@ -58,6 +59,9 @@ namespace Waher.Content.Asn1.Model
 			this._abstract = Abstract;
 			this.body = Body;
 			this.document = Document;
+
+			this.SetAsChild(this.oid);
+			this.SetAsChild(this.body);
 		}
 
 		/// <summary>

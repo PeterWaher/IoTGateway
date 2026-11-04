@@ -15,8 +15,10 @@ namespace Waher.Content.Asn1.Model.Values
 		/// </summary>
 		/// <param name="Values">Values</param>
 		public Asn1Array(Asn1Value[] Values)
+			: base()
 		{
 			this.values = Values;
+			this.SetAsChild(this.values);
 		}
 
 		/// <summary>

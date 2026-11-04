@@ -10,23 +10,33 @@ namespace Waher.Content.Asn1.Model
 	public class Asn1Enumeration : Asn1List
 	{
 		private readonly Asn1Node baseType;
+		private readonly bool flags;
 
 		/// <summary>
 		/// ENUMERATED
 		/// </summary>
 		/// <param name="Name">Optional field or type name.</param>
 		/// <param name="TypeDef">If construct is part of a type definition.</param>
+		/// <param name="Flags">If the enumeration lists options that can be combined.
+		/// <see cref="System.FlagsAttribute"/>.</param>
 		/// <param name="BaseType">Base type of enumeration.</param>
 		/// <param name="Nodes">Nodes</param>
-		public Asn1Enumeration(string Name, bool TypeDef, Asn1Node BaseType, Asn1Node[] Nodes)
+		public Asn1Enumeration(string Name, bool TypeDef, bool Flags, Asn1Node BaseType, 
+			Asn1Node[] Nodes)
 			: base(Name, TypeDef, Nodes)
 		{
 			this.baseType = BaseType;
+			this.flags = Flags;
+
+			this.SetAsChild(this.baseType);
 
 			foreach (Asn1Node Node in Nodes)
 			{
 				if (Node is Asn1NamedValue NamedValue)
 					NamedValue.EnumeratedValue = true;
+
+				if (Flags && Node is Asn1Value Value)
+					Value.TwosPower();
 			}
 		}
 
@@ -57,11 +67,18 @@ namespace Waher.Content.Asn1.Model
 				foreach (Asn1Node Node in this.Nodes)
 					await Node.ExportCSharp(Output, State, Indent, Pass);
 
+				if (this.flags)
+				{
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("[System.Flags]");
+				}
+
 				JSON.Indent(Output, Indent);
 				Output.Append("public enum ");
 				Output.Append(ToCSharp(this.Name));
 				if (!this.TypeDefinition)
-					Output.AppendLine("Enum");
+					Output.Append("Enum");
+				Output.AppendLine();
 
 				JSON.Indent(Output, Indent);
 				Output.AppendLine("{");
@@ -93,6 +110,12 @@ namespace Waher.Content.Asn1.Model
 				if (this.TypeDefinition)
 				{
 					State.ClosePending(Output);
+
+					if (this.flags)
+					{
+						JSON.Indent(Output, Indent);
+						Output.AppendLine("[System.Flags]");
+					}
 
 					JSON.Indent(Output, Indent);
 					Output.Append("public enum ");

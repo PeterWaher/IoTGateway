@@ -14,7 +14,8 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Boolean value
 		/// </summary>
 		/// <param name="Value">Value</param>
-		public Asn1BooleanValue(bool Value)
+		public Asn1BooleanValue(bool Value) 
+			: base()
 		{
 			this.value = Value;
 		}

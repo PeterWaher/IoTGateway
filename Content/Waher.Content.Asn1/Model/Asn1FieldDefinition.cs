@@ -20,12 +20,15 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="FieldName">Field name.</param>
 		/// <param name="Tag">Tag</param>
 		/// <param name="Type">Type.</param>
-		public Asn1FieldDefinition(string FieldName, int? Tag, Asn1Type Type)
+		public Asn1FieldDefinition(string FieldName, int? Tag, 
+			Asn1Type Type)
 			: base()
 		{
 			this.fieldName = FieldName;
 			this.type = Type;
 			this.tag = Tag;
+	
+			this.SetAsChild(this.type);
 		}
 
 		/// <summary>

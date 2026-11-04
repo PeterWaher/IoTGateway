@@ -45,7 +45,8 @@ namespace Waher.Content.Asn1.Model
 				Output.Append("public class ");
 				Output.Append(ToCSharp(this.Name));
 				if (!this.TypeDefinition)
-					Output.AppendLine("Set");
+					Output.Append("Set");
+				Output.AppendLine();
 
 				JSON.Indent(Output, Indent);
 				Output.AppendLine("{");

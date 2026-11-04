@@ -27,7 +27,7 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// Identifier
 		/// </summary>
-		public string Identifier => identifier;
+		public string Identifier => this.identifier;
 
 		/// <summary>
 		/// ASN.1 Document in where the value is defined.

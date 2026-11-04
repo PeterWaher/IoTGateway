@@ -11,9 +11,11 @@
 		/// Abstract base class for set-based restrictions
 		/// </summary>
 		/// <param name="Value">Item</param>
-		public Asn1ValueRestriction(Asn1Value Value)
+		public Asn1ValueRestriction(Asn1Value Value) 
+			: base()
 		{
 			this.value = Value;
+			this.SetAsChild(this.value);
 		}
 
 		/// <summary>

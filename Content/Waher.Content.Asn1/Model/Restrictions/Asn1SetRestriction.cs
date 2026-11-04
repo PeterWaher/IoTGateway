@@ -12,8 +12,10 @@
 		/// </summary>
 		/// <param name="Set">Set</param>
 		public Asn1SetRestriction(Asn1Values Set)
+			: base()
 		{
 			this.set = Set;
+			this.SetAsChild(this.set);
 		}
 
 		/// <summary>

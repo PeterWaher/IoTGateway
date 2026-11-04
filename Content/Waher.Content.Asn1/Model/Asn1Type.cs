@@ -21,6 +21,7 @@ namespace Waher.Content.Asn1.Model
 		/// Abstract base class for ASN.1 types.
 		/// </summary>
 		public Asn1Type()
+			: base()
 		{
 		}
 
@@ -39,7 +40,12 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Restriction Restriction
 		{
 			get => this.restriction;
-			internal set => this.restriction = value;
+			internal set
+			{
+				this.restriction?.SetParentNode(null);
+				this.restriction = value;
+				this.restriction?.SetParentNode(this);
+			}
 		}
 
 		/// <summary>
@@ -84,7 +90,12 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Node Default
 		{
 			get => this._default;
-			internal set => this._default = value;
+			internal set
+			{
+				this._default?.SetParentNode(null);
+				this._default = value;
+				this._default?.SetParentNode(this);
+			}
 		}
 
 		/// <summary>
@@ -93,7 +104,22 @@ namespace Waher.Content.Asn1.Model
 		public Asn1NamedValue[] NamedOptions
 		{
 			get => this.namedOptions;
-			internal set => this.namedOptions = value;
+			internal set
+			{
+				if (!(this.namedOptions is null))
+				{
+					foreach (Asn1NamedValue Value in this.namedOptions)
+						Value.SetParentNode(null);
+				}
+
+				this.namedOptions = value;
+
+				if (!(this.namedOptions is null))
+				{
+					foreach (Asn1NamedValue Value in this.namedOptions)
+						Value.SetParentNode(this);
+				}
+			}
 		}
 
 		/// <summary>

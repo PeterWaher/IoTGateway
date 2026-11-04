@@ -14,7 +14,8 @@ namespace Waher.Content.Asn1.Model.Values
 		/// String value
 		/// </summary>
 		/// <param name="Value">Value</param>
-		public Asn1StringValue(string Value)
+		public Asn1StringValue(string Value) 
+			: base()
 		{
 			this.value = Value;
 		}

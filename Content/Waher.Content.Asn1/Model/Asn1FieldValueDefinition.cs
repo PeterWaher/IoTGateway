@@ -20,14 +20,17 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Type">Type</param>
 		/// <param name="Value">Value</param>
 		/// <param name="Document">ASN.1 Document in where the value is defined.</param>
-		public Asn1FieldValueDefinition(string FieldName, Asn1Type Type, Asn1Value Value, 
-			Asn1Document Document)
+		public Asn1FieldValueDefinition(string FieldName, Asn1Type Type, 
+			Asn1Value Value, Asn1Document Document)
 			: base()
 		{
 			this.fieldName = FieldName;
 			this.type= Type;
 			this.value = Value;
 			this.document = Document;
+
+			this.SetAsChild(this.type);
+			this.SetAsChild(this.value);
 		}
 
 		/// <summary>

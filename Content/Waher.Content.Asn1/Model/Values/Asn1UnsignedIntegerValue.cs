@@ -8,13 +8,14 @@ namespace Waher.Content.Asn1.Model.Values
 	/// </summary>
 	public class Asn1UnsignedIntegerValue : Asn1Value
 	{
-		private readonly ulong value;
+		private ulong value;
 
 		/// <summary>
 		/// Integer value
 		/// </summary>
 		/// <param name="Value">Value</param>
-		public Asn1UnsignedIntegerValue(ulong Value)
+		public Asn1UnsignedIntegerValue(ulong Value) 
+			: base()
 		{
 			this.value = Value;
 		}
@@ -23,6 +24,18 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Value
 		/// </summary>
 		public ulong Value => this.value;
+
+		/// <summary>
+		/// Makes the value 2^value, for use with <see cref="System.FlagsAttribute"/>
+		/// enumerations.
+		/// </summary>
+		public override void TwosPower()
+		{
+			if (this.value >= 64)
+				base.TwosPower();
+			else
+				this.value = 1UL << (int)this.value;
+		}
 
 		/// <summary>
 		/// Exports to C#

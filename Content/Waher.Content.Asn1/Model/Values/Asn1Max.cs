@@ -8,7 +8,8 @@
 		/// <summary>
 		/// MAX
 		/// </summary>
-		public Asn1Max()
+		public Asn1Max() 
+			: base()
 		{
 		}
 	}

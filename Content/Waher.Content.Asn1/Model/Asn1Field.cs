@@ -5,5 +5,12 @@
 	/// </summary>
 	public class Asn1Field : Asn1Node
 	{
+		/// <summary>
+		/// Represents an ASN.1 named field.
+		/// </summary>
+		public Asn1Field()
+			: base()
+		{
+		}
 	}
 }

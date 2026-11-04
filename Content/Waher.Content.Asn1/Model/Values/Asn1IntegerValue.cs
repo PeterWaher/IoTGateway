@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+﻿using System;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,13 +9,14 @@ namespace Waher.Content.Asn1.Model.Values
 	/// </summary>
 	public class Asn1IntegerValue : Asn1Value
 	{
-		private readonly long value;
+		private long value;
 
 		/// <summary>
 		/// Integer value
 		/// </summary>
 		/// <param name="Value">Value</param>
-		public Asn1IntegerValue(long Value)
+		public Asn1IntegerValue(long Value) 
+			: base()
 		{
 			this.value = Value;
 		}
@@ -24,6 +25,18 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Value
 		/// </summary>
 		public long Value => this.value;
+
+		/// <summary>
+		/// Makes the value 2^value, for use with <see cref="System.FlagsAttribute"/>
+		/// enumerations.
+		/// </summary>
+		public override void TwosPower()
+		{
+			if (this.value < 0 || this.value >= 63)
+				base.TwosPower();
+			else
+				this.value = 1L << (int)this.value;
+		}
 
 		/// <inheritdoc/>
 		public override string ToString() => this.value.ToString();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,6 +36,48 @@ namespace Waher.Content.Asn1.Model
 	/// </summary>
 	public abstract class Asn1Node
 	{
+		private Asn1Node parent;
+
+		/// <summary>
+		/// Base class for all ASN.1 nodes.
+		/// </summary>
+		public Asn1Node()
+		{
+		}
+
+		/// <summary>
+		/// Parent node.
+		/// </summary>
+		public Asn1Node Parent => this.parent;
+
+		/// <summary>
+		/// Sets the parent reference.
+		/// </summary>
+		/// <param name="Parent"></param>
+		internal void SetParentNode(Asn1Node Parent)
+		{
+			this.parent = Parent;
+		}
+
+		/// <summary>
+		/// Defines a node as a child node of the current node.
+		/// </summary>
+		/// <param name="Child">Child node.</param>
+		internal void SetAsChild(Asn1Node Child)
+		{
+			Child.SetParentNode(this);
+		}
+
+		/// <summary>
+		/// Defines a node as a child node of the current node.
+		/// </summary>
+		/// <param name="Children">Child nodes.</param>
+		internal void SetAsChild(IEnumerable<Asn1Node> Children)
+		{
+			foreach (Asn1Node Child in Children)
+				Child.SetParentNode(this);
+		}
+
 		/// <summary>
 		/// Exports to C#
 		/// </summary>

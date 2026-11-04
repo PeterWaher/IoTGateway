@@ -147,6 +147,24 @@ namespace Waher.Content.Asn1.Model
 					Output.AppendLine();
 
 				JSON.Indent(Output, Indent);
+				Output.Append('/');
+				Output.AppendLine(new string('*', 80));
+				JSON.Indent(Output, Indent);
+				Output.AppendLine(" *");
+				JSON.Indent(Output, Indent);
+				Output.AppendLine(" * NOTE: This code has been automatically generated from ASN.1 file:");
+				JSON.Indent(Output, Indent);
+				Output.Append(" * ");
+				Output.AppendLine(this.document.Location);
+				JSON.Indent(Output, Indent);
+				Output.AppendLine(" *");
+				JSON.Indent(Output, Indent);
+				Output.Append(' ');
+				Output.Append(new string('*', 80));
+				Output.AppendLine("/");
+				Output.AppendLine();
+
+				JSON.Indent(Output, Indent);
 				Output.Append("namespace ");
 				Output.Append(State.Settings.BaseNamespace);
 				Output.Append('.');

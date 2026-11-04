@@ -42,7 +42,7 @@ namespace Waher.Content.Asn1.Model
 					await Node.ExportCSharp(Output, State, Indent, Pass);
 
 				JSON.Indent(Output, Indent);
-				Output.Append("public class ");
+				Output.Append("public partial class ");
 				Output.Append(ToCSharp(this.Name));
 				if (!this.TypeDefinition)
 					Output.Append("Seq");
@@ -69,7 +69,7 @@ namespace Waher.Content.Asn1.Model
 					State.ClosePending(Output);
 
 					JSON.Indent(Output, Indent);
-					Output.Append("public class ");
+					Output.Append("public partial class ");
 					Output.AppendLine(ToCSharp(this.Name));
 
 					JSON.Indent(Output, Indent);

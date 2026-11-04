@@ -117,7 +117,7 @@ namespace Waher.Content.Asn1.Model
 				if (Pass == CSharpExportPass.Implicit || Pass == CSharpExportPass.Explicit)
 				{
 					JSON.Indent(Output, Indent);
-					Output.Append("public class ");
+					Output.Append("public partial class ");
 					Output.Append(ToCSharp(this.Name));
 					if (!this.TypeDefinition)
 						Output.Append("Choice");

@@ -134,8 +134,7 @@ namespace Waher.Content.Asn1.Model
 					JSON.Indent(Output, Indent);
 					Output.Append("public ");
 					Output.Append(ToCSharp(this.Name));
-					if (!this.TypeDefinition)
-						Output.Append("Enum");
+					Output.Append("Enum");
 					Output.AppendLine(" _choice;");
 
 					foreach (Asn1Node Node in this.Nodes)

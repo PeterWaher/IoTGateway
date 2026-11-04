@@ -1536,7 +1536,7 @@ namespace Waher.Content.Asn1
 								if (Oid)
 									return new Asn1Oid(Items.ToArray());
 								else
-									return new Asn1Array(Items.ToArray());
+									return new Asn1Array(Items.ToArray(), this);
 
 							default:
 								if (Items.Count == 0)

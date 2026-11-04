@@ -7,12 +7,23 @@ namespace Waher.Content.Asn1.Model
 	/// </summary>
 	public abstract class Asn1Value : Asn1Node
 	{
+		private bool powerOfTwo = false;
+
 		/// <summary>
 		/// Abstract base class for values.
 		/// </summary>
 		public Asn1Value()
 			: base()
 		{
+		}
+
+		/// <summary>
+		/// If the value represents 2^original value.
+		/// </summary>
+		public bool PowerOfTwo
+		{
+			get => this.powerOfTwo;
+			protected set => this.powerOfTwo = value;
 		}
 
 		/// <summary>

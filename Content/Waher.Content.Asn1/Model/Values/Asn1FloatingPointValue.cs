@@ -33,7 +33,11 @@ namespace Waher.Content.Asn1.Model.Values
 		/// </summary>
 		public override void TwosPower()
 		{
-			this.value = Math.Pow(2, this.value);
+			if (!this.PowerOfTwo)
+			{
+				this.PowerOfTwo = true;
+				this.value = Math.Pow(2, this.value);
+			}
 		}
 
 		/// <inheritdoc/>

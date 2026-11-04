@@ -51,6 +51,11 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Node BaseType => this.baseType;
 
 		/// <summary>
+		/// If the enumeration represents a <see cref="System.FlagsAttribute"/> enumeration.
+		/// </summary>
+		public bool Flags => this.flags;
+
+		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>

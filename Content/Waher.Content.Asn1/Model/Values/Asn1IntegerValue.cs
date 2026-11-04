@@ -15,7 +15,7 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Integer value
 		/// </summary>
 		/// <param name="Value">Value</param>
-		public Asn1IntegerValue(long Value) 
+		public Asn1IntegerValue(long Value)
 			: base()
 		{
 			this.value = Value;
@@ -32,10 +32,15 @@ namespace Waher.Content.Asn1.Model.Values
 		/// </summary>
 		public override void TwosPower()
 		{
-			if (this.value < 0 || this.value >= 63)
-				base.TwosPower();
-			else
-				this.value = 1L << (int)this.value;
+			if (!this.PowerOfTwo)
+			{
+				this.PowerOfTwo = true;
+
+				if (this.value < 0 || this.value >= 63)
+					base.TwosPower();
+				else
+					this.value = 1L << (int)this.value;
+			}
 		}
 
 		/// <inheritdoc/>
@@ -53,7 +58,7 @@ namespace Waher.Content.Asn1.Model.Values
 		{
 			if (Pass == CSharpExportPass.Explicit)
 				Output.Append(this.value.ToString());
-	
+
 			return Task.CompletedTask;
 		}
 

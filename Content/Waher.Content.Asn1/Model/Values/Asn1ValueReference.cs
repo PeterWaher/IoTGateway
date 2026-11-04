@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Asn1.Model.Types;
 
 namespace Waher.Content.Asn1.Model.Values
 {
@@ -68,6 +69,9 @@ namespace Waher.Content.Asn1.Model.Values
 				{
 					return Value.CSharpType;
 				}
+
+				if (this.TryGetAncestor(out Asn1TypeReference TypeReference))
+					return TypeReference.Identifier;
 
 				throw new NotImplementedException("Support for value type " +
 					this.GetType().FullName + " not implemented.");

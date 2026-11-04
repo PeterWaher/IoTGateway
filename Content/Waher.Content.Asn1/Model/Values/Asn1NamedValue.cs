@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,13 +21,13 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <param name="Value">Optional Value</param>
 		/// <param name="TypeDefinition">Type definition.</param>
 		/// <param name="Document">ASN.1 Document containing the reference</param>
-		public Asn1NamedValue(string Identifier, Asn1Value Value, 
+		public Asn1NamedValue(string Identifier, Asn1Value Value,
 			Asn1Type TypeDefinition, Asn1Document Document)
 			: base(Identifier, Document)
 		{
 			this.value = Value;
 			this.typeDefinition = TypeDefinition;
-		
+
 			this.SetAsChild(this.value);
 			this.SetAsChild(this.typeDefinition);
 		}
@@ -47,7 +48,11 @@ namespace Waher.Content.Asn1.Model.Values
 		/// </summary>
 		public override void TwosPower()
 		{
-			this.value.TwosPower();
+			if (!this.PowerOfTwo)
+			{
+				this.PowerOfTwo = true;
+				this.value.TwosPower();
+			}
 		}
 
 		/// <inheritdoc/>
@@ -74,8 +79,8 @@ namespace Waher.Content.Asn1.Model.Values
 		{
 			if (Pass == CSharpExportPass.Implicit)
 			{
-				if (!this.enumeratedValue && 
-					!(this.value is null) && 
+				if (!this.enumeratedValue &&
+					!(this.value is null) &&
 					!(this.typeDefinition is null))
 				{
 					JSON.Indent(Output, State.ExportingValuesIndent);

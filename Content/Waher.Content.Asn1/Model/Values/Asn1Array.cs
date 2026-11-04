@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Asn1.Model.Types;
 
 namespace Waher.Content.Asn1.Model.Values
 {
@@ -9,15 +10,22 @@ namespace Waher.Content.Asn1.Model.Values
 	public class Asn1Array : Asn1Value
 	{
 		private readonly Asn1Value[] values;
+		private readonly Asn1Document document;
+		private Asn1TypeReference typeReference;
+		private Asn1Node type;
+		private bool? isFlagsEnum;
 
 		/// <summary>
 		/// Array of values
 		/// </summary>
 		/// <param name="Values">Values</param>
-		public Asn1Array(Asn1Value[] Values)
+		/// <param name="Document">ASN.1 document reference</param>
+		public Asn1Array(Asn1Value[] Values, Asn1Document Document)
 			: base()
 		{
 			this.values = Values;
+			this.document = Document;
+
 			this.SetAsChild(this.values);
 		}
 
@@ -40,21 +48,38 @@ namespace Waher.Content.Asn1.Model.Values
 			{
 				bool First = true;
 
-				Output.Append("new ");
-				Output.Append(this.CSharpType);
-				Output.Append(" { ");
-
-				foreach (Asn1Value Value in this.values)
+				if (this.IsFlagsEnum)
 				{
-					if (First)
-						First = false;
-					else
-						Output.Append(", ");
+					foreach (Asn1Value Value in this.values)
+					{
+						if (First)
+							First = false;
+						else
+							Output.Append(" | ");
 
-					await Value.ExportCSharp(Output, State, Indent, Pass);
+						Output.Append(this.typeReference.Identifier);
+						Output.Append('.');
+						await Value.ExportCSharp(Output, State, Indent, Pass);
+					}
 				}
+				else
+				{
+					Output.Append("new ");
+					Output.Append(this.CSharpType);
+					Output.Append(" { ");
 
-				Output.Append(" }");
+					foreach (Asn1Value Value in this.values)
+					{
+						if (First)
+							First = false;
+						else
+							Output.Append(", ");
+
+						await Value.ExportCSharp(Output, State, Indent, Pass);
+					}
+
+					Output.Append(" }");
+				}
 			}
 		}
 
@@ -80,23 +105,57 @@ namespace Waher.Content.Asn1.Model.Values
 		}
 
 		/// <summary>
+		/// If the array represents a <see cref="System.FlagsAttribute"/> enumeration value.
+		/// </summary>
+		public bool IsFlagsEnum
+		{
+			get
+			{
+				if (!this.isFlagsEnum.HasValue)
+					this.isFlagsEnum = this.CalcIsFlagsEnum();
+				
+				return this.isFlagsEnum.Value;
+			}
+		}
+
+		private bool CalcIsFlagsEnum()
+		{
+			if (!this.TryGetAncestor(out this.typeReference))
+				return false;
+
+			if (!this.document.namedNodes.TryGetValue(this.typeReference.Identifier,
+				out this.type))
+			{
+				return false;
+			}
+
+			if (this.type is Asn1TypeDefinition TypeDefinition)
+				this.type = TypeDefinition.Definition;
+
+			return this.type is Asn1Enumeration Enumeration && Enumeration.Flags;
+		}
+
+		/// <summary>
 		/// Corresponding C# type.
 		/// </summary>
 		public override string CSharpType
 		{
 			get
 			{
-				string CommonType = null;
+				if (this.IsFlagsEnum)
+					return this.typeReference.Identifier;
+				
+				string CommonTypeName = null;
 
 				foreach (Asn1Value Value in this.values)
 				{
-					if (CommonType is null)
-						CommonType = Value.CSharpType;
-					else if (CommonType != Value.CSharpType)
+					if (CommonTypeName is null)
+						CommonTypeName = Value.CSharpType;
+					else if (CommonTypeName != Value.CSharpType)
 						return "object[]";
 				}
 
-				return (CommonType ?? "object") + "[]";
+				return (CommonTypeName ?? "object") + "[]";
 			}
 		}
 

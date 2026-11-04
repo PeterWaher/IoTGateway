@@ -65,7 +65,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Child">Child node.</param>
 		internal void SetAsChild(Asn1Node Child)
 		{
-			Child.SetParentNode(this);
+			Child?.SetParentNode(this);
 		}
 
 		/// <summary>
@@ -74,8 +74,35 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Children">Child nodes.</param>
 		internal void SetAsChild(IEnumerable<Asn1Node> Children)
 		{
-			foreach (Asn1Node Child in Children)
-				Child.SetParentNode(this);
+			if (!(Children is null))
+			{
+				foreach (Asn1Node Child in Children)
+					Child.SetParentNode(this);
+			}
+		}
+
+		/// <summary>
+		/// Tries to get an ancestor node of a given type.
+		/// </summary>
+		/// <typeparam name="T">Type of ancestor to search for.</typeparam>
+		/// <param name="Result">Ancestor, if found.</param>
+		/// <returns>If an ancestor of the given type was found.</returns>
+		public bool TryGetAncestor<T>(out T Result)
+		{
+			Asn1Node Loop = this.Parent;
+			while (!(Loop is null))
+			{
+				if (Loop is T Typed)
+				{
+					Result = Typed;
+					return true;
+				}
+
+				Loop = Loop.Parent;
+			}
+
+			Result = default;
+			return false;
 		}
 
 		/// <summary>

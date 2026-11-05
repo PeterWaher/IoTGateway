@@ -414,7 +414,7 @@ namespace Waher.Things.Ip.Model
 		private async Task LoginFailure(Exception ex, BinaryTcpClient Incoming, BinaryTcpClient Outgoing, string RemoteIpEndpoint)
 		{
 			Exception ex2 = Log.UnnestException(ex);
-			LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "PROXY");
+			LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "TLS (PROXY)");
 
 			await Incoming.DisposeAsync();
 			await Outgoing.DisposeAsync();

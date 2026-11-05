@@ -107,15 +107,23 @@ namespace Waher.Security.LoginMonitor
 			switch (Event.EventId)
 			{
 				case "LoginFailure":
+					string Protocol = this.FindProtocol(Event);
+					string Message;
+
+					if (Protocol.StartsWith("TLS"))
+						Message = "Repeatedly failing TLS handshakes.";
+					else
+						Message = "Repeatedly failing login attempts.";
+
 					if (this.TryFindResource(Event, out string Resource))
 					{
-						return this.ProcessLoginFailure(Event.Actor, this.FindProtocol(Event), Event.Timestamp,
-							"Repeatedly failing login attempts.", Resource);
+						return this.ProcessLoginFailure(Event.Actor, Protocol, 
+							Event.Timestamp, Message, Resource);
 					}
 					else
 					{
-						return this.ProcessLoginFailure(Event.Actor, this.FindProtocol(Event), Event.Timestamp,
-							"Repeatedly failing login attempts.");
+						return this.ProcessLoginFailure(Event.Actor, Protocol,
+							Event.Timestamp, Message);
 					}
 
 				case "LoginSuccessful":

@@ -13,8 +13,9 @@
 		/// </summary>
 		/// <param name="From">From</param>
 		/// <param name="To">To</param>
-		public Asn1Interval(Asn1Value From, Asn1Value To)
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Interval(Asn1Value From, Asn1Value To, Asn1Document Document)
+			: base(Document)
 		{
 			this.from = From;
 			this.to = To;

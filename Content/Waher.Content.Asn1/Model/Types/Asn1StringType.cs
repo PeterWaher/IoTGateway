@@ -12,8 +12,9 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// Abstract base class for string types
 		/// </summary>
-		public Asn1StringType()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1StringType(Asn1Document Document)
+			: base(Document)
 		{
 		}
 

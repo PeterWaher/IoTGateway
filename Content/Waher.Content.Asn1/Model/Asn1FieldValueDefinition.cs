@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -8,10 +9,14 @@ namespace Waher.Content.Asn1.Model
 	/// </summary>
 	public class Asn1FieldValueDefinition : Asn1Node, INamedNode
 	{
+		/// <summary>
+		/// Name of structure holding public constant definitions.
+		/// </summary>
+		public const string DefinedValues = "_DefinedValues";
+
 		private readonly string fieldName;
 		private readonly Asn1Type type;
 		private readonly Asn1Value value;
-		private readonly Asn1Document document;
 
 		/// <summary>
 		/// Represents an ASN.1 field value definition.
@@ -22,12 +27,11 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Document">ASN.1 Document in where the value is defined.</param>
 		public Asn1FieldValueDefinition(string FieldName, Asn1Type Type, 
 			Asn1Value Value, Asn1Document Document)
-			: base()
+			: base(Document)
 		{
 			this.fieldName = FieldName;
 			this.type= Type;
 			this.value = Value;
-			this.document = Document;
 
 			this.SetAsChild(this.type);
 			this.SetAsChild(this.value);
@@ -39,6 +43,28 @@ namespace Waher.Content.Asn1.Model
 		public string Name => this.fieldName;
 
 		/// <summary>
+		/// If the named node represents a type.
+		/// </summary>
+		public bool IsType => false;
+
+		/// <summary>
+		/// Gets the fully qualified name, in reverse order.
+		/// </summary>
+		public void GetFullyQualifiedName(ChunkedList<string> Fqn)
+		{
+			Fqn.Add(this.Name);
+			Fqn.Add(DefinedValues);
+
+			if (this.TryGetAncestor(out INamedNode Container))
+				Container.GetFullyQualifiedName(Fqn);
+		}
+
+		/// <summary>
+		/// If the named element must be qualified.
+		/// </summary>
+		public bool MustBeQualified => true;
+
+		/// <summary>
 		/// Type
 		/// </summary>
 		public Asn1Type Type => this.type;
@@ -47,11 +73,6 @@ namespace Waher.Content.Asn1.Model
 		/// Type definition
 		/// </summary>
 		public Asn1Value Value => this.value;
-
-		/// <summary>
-		/// ASN.1 Document in where the value is defined.
-		/// </summary>
-		public Asn1Document Document => this.document;
 
 		/// <summary>
 		/// Exports to C#
@@ -70,7 +91,8 @@ namespace Waher.Content.Asn1.Model
 					State.ExportingValues = true;
 
 					JSON.Indent(Output, Indent);
-					Output.AppendLine("public static partial class Values");
+					Output.Append("public static partial class ");
+					Output.AppendLine(DefinedValues);
 
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");

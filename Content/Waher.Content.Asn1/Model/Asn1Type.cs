@@ -20,8 +20,9 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// Abstract base class for ASN.1 types.
 		/// </summary>
-		public Asn1Type()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Type(Asn1Document Document)
+			: base(Document)
 		{
 		}
 

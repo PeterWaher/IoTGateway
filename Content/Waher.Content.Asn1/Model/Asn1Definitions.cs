@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Values;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -30,14 +31,13 @@ namespace Waher.Content.Asn1.Model
 	/// <summary>
 	/// Represents a collection of ASN.1 definitions.
 	/// </summary>
-	public class Asn1Definitions : Asn1Node
+	public class Asn1Definitions : Asn1Node, INamedNode
 	{
 		private readonly string identifier;
 		private readonly Asn1Oid oid;
 		private readonly Asn1Tags? tags;
 		private readonly bool _abstract;
 		private readonly Asn1Module body;
-		private readonly Asn1Document document;
 		private Dictionary<string, Asn1Document> imported;
 
 		/// <summary>
@@ -48,17 +48,16 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Tags">How tags are handled.</param>
 		/// <param name="Abstract">If abstract syntax is used.</param>
 		/// <param name="Body">Definition body.</param>
-		/// <param name="Document">ASN.1 document</param>
+		/// <param name="Document">ASN.1 document hosting the node.</param>
 		public Asn1Definitions(string Identifier, Asn1Oid Oid, 
 			Asn1Tags? Tags, bool Abstract, Asn1Module Body, Asn1Document Document)
-			: base()
+			: base(Document)
 		{
 			this.identifier = Identifier;
 			this.oid = Oid;
 			this.tags = Tags;
 			this._abstract = Abstract;
 			this.body = Body;
-			this.document = Document;
 
 			this.SetAsChild(this.oid);
 			this.SetAsChild(this.body);
@@ -90,9 +89,27 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Module Body => this.body;
 
 		/// <summary>
-		/// ASN.1 document of which the definition is part.
+		/// Name of node.
 		/// </summary>
-		public Asn1Document Document => this.document;
+		public string Name => this.identifier;
+
+		/// <summary>
+		/// Gets the fully qualified name, in reverse order.
+		/// </summary>
+		public void GetFullyQualifiedName(ChunkedList<string> Fqn)
+		{
+			Fqn.Add(this.identifier);
+		}
+
+		/// <summary>
+		/// If the named element must be qualified.
+		/// </summary>
+		public bool MustBeQualified => false;
+
+		/// <summary>
+		/// If the named node represents a type.
+		/// </summary>
+		public bool IsType => false;
 
 		/// <summary>
 		/// Exports to C#
@@ -125,6 +142,8 @@ namespace Waher.Content.Asn1.Model
 								ImportedDocument = await Import.LoadDocument();
 
 							this.imported[Import.Module] = ImportedDocument;
+
+							ImportedDocument.DeclareTypes(State.Settings);
 						}
 					}
 
@@ -155,7 +174,7 @@ namespace Waher.Content.Asn1.Model
 				Output.AppendLine(" * NOTE: This code has been automatically generated from ASN.1 file:");
 				JSON.Indent(Output, Indent);
 				Output.Append(" * ");
-				Output.AppendLine(this.document.Location);
+				Output.AppendLine(this.Document.Location);
 				JSON.Indent(Output, Indent);
 				Output.AppendLine(" *");
 				JSON.Indent(Output, Indent);
@@ -166,7 +185,7 @@ namespace Waher.Content.Asn1.Model
 
 				JSON.Indent(Output, Indent);
 				Output.Append("namespace ");
-				Output.Append(State.Settings.BaseNamespace);
+				Output.Append(ToCSharp(State.Settings.BaseNamespace));
 				Output.Append('.');
 				Output.AppendLine(ToCSharp(this.identifier));
 				JSON.Indent(Output, Indent);

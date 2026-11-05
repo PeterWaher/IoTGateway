@@ -11,8 +11,9 @@
 		/// Set of one element.
 		/// </summary>
 		/// <param name="Element">Element</param>
-		public Asn1Element(Asn1Value Element)
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Element(Asn1Value Element, Asn1Document Document)
+			: base(Document)
 		{
 			this.element = Element;
 			this.SetAsChild(this.element);

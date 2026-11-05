@@ -10,8 +10,9 @@
 		/// UniversalString
 		/// ISO10646 character set
 		/// </summary>
-		public Asn1UniversalString()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1UniversalString(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

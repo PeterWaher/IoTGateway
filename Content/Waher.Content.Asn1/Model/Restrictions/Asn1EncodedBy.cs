@@ -9,8 +9,9 @@
 		/// ENCODED BY
 		/// </summary>
 		/// <param name="Value">Value</param>
-		public Asn1EncodedBy(Asn1Value Value) 
-			: base(Value)
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1EncodedBy(Asn1Value Value, Asn1Document Document) 
+			: base(Value, Document)
 		{
 		}
 	}

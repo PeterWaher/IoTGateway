@@ -11,8 +11,9 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// DATE-TIME
 		/// </summary>
-		public Asn1DateTime()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1DateTime(Asn1Document Document)
+			: base(Document)
 		{
 		}
 

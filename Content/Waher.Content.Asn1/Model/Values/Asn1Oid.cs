@@ -14,8 +14,9 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Represents an ASN.1 Object ID
 		/// </summary>
 		/// <param name="Values">OID values.</param>
-		public Asn1Oid(Asn1Node[] Values) 
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Oid(Asn1Node[] Values, Asn1Document Document) 
+			: base(Document)
 		{
 			this.values = Values;
 			this.SetAsChild(this.values);

@@ -13,8 +13,9 @@
 		/// </summary>
 		/// <param name="Name">Optional field or type name.</param>
 		/// <param name="TypeDef">If construct is part of a type definition.</param>
-		public Asn1ComplexType(string Name, bool TypeDef)
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1ComplexType(string Name, bool TypeDef, Asn1Document Document)
+			: base(Document)
 		{
 			this.name = Name;
 			this.typeDef = TypeDef;

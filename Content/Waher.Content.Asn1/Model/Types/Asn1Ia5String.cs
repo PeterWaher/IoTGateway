@@ -10,8 +10,9 @@
 		/// IA5String
 		/// International ASCII characters (International Alphabet 5)
 		/// </summary>
-		public Asn1Ia5String()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Ia5String(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

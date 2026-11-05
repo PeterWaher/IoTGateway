@@ -9,8 +9,9 @@
 		/// PATTERN
 		/// </summary>
 		/// <param name="RegularExpression">Regular Expression</param>
-		public Asn1Pattern(Asn1Value RegularExpression)
-			: base(RegularExpression)
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Pattern(Asn1Value RegularExpression, Asn1Document Document)
+			: base(RegularExpression, Document)
 		{
 		}
 	}

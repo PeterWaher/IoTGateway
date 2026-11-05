@@ -1,12 +1,13 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1.Model
 {
 	/// <summary>
 	/// Represents a ASN.1 SET construct.
 	/// </summary>
-	public class Asn1Set : Asn1List
+	public class Asn1Set : Asn1List, INamedNode
 	{
 		/// <summary>
 		/// Represents a ASN.1 SET construct.
@@ -14,8 +15,9 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Name">Optional field or type name.</param>
 		/// <param name="TypeDef">If construct is part of a type definition.</param>
 		/// <param name="Nodes">Nodes</param>
-		public Asn1Set(string Name, bool TypeDef, Asn1Node[] Nodes)
-			: base(Name, TypeDef, Nodes)
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Set(string Name, bool TypeDef, Asn1Node[] Nodes, Asn1Document Document)
+			: base(Name, TypeDef, Nodes, Document)
 		{
 		}
 
@@ -23,6 +25,27 @@ namespace Waher.Content.Asn1.Model
 		/// If the type is a constructed type.
 		/// </summary>
 		public override bool ConstructedType => true;
+
+		/// <summary>
+		/// If the named node represents a type.
+		/// </summary>
+		public bool IsType => true;
+
+		/// <summary>
+		/// Gets the fully qualified name, in reverse order.
+		/// </summary>
+		public void GetFullyQualifiedName(ChunkedList<string> Fqn)
+		{
+			Fqn.Add(this.Name);
+
+			if (this.TryGetAncestor(out INamedNode Container))
+				Container.GetFullyQualifiedName(Fqn);
+		}
+
+		/// <summary>
+		/// If the named element must be qualified.
+		/// </summary>
+		public bool MustBeQualified => false;
 
 		/// <summary>
 		/// Exports to C#
@@ -34,7 +57,7 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State, 
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Implicit)
+			/*if (Pass == CSharpExportPass.Implicit)
 			{
 				State.ClosePending(Output);
 
@@ -63,7 +86,7 @@ namespace Waher.Content.Asn1.Model
 				Output.AppendLine("}");
 				Output.AppendLine();
 			}
-			else if (Pass == CSharpExportPass.Explicit)
+			else*/ if (Pass == CSharpExportPass.Explicit)
 			{
 				if (this.TypeDefinition)
 				{
@@ -92,7 +115,7 @@ namespace Waher.Content.Asn1.Model
 				}
 				else
 				{
-					Output.Append(ToCSharp(this.Name));
+					Output.Append(ToCSharp(State, this, this.Name));
 					Output.Append("Set");
 				}
 			}

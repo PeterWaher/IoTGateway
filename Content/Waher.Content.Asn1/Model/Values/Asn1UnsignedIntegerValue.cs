@@ -15,8 +15,9 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Integer value
 		/// </summary>
 		/// <param name="Value">Value</param>
-		public Asn1UnsignedIntegerValue(ulong Value)
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1UnsignedIntegerValue(ulong Value, Asn1Document Document)
+			: base(Document)
 		{
 			this.value = Value;
 		}

@@ -11,8 +11,9 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// GeneralizedTime
 		/// </summary>
-		public Asn1GeneralizedTime()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1GeneralizedTime(Asn1Document Document)
+			: base(Document)
 		{
 		}
 

@@ -10,8 +10,9 @@
 		/// PrintableString
 		/// a-z, A-Z, ' () +,-.?:/= and SPACE
 		/// </summary>
-		public Asn1PrintableString()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1PrintableString(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

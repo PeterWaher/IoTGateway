@@ -19,7 +19,7 @@ namespace Waher.Content.Asn1.Test
 		{
 			string BaseNamespace = "Test";
 			Asn1Document Doc = await ParsingTests.ParseAsn1Document(FileName);
-			CSharpExportSettings Settings = new(BaseNamespace, EncodingSchemes.All);
+			CSharpExportSettings Settings = new(BaseNamespace);
 			string CSharp = Doc.ExportCSharp(Settings);
 			string CSharpFileName = Path.Combine("Examples", Path.ChangeExtension(FileName, ".cs"));
 			string CSharpFolder = Path.GetDirectoryName(CSharpFileName);

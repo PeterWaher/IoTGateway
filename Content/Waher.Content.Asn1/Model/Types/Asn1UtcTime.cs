@@ -11,8 +11,9 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// UTCTime
 		/// </summary>
-		public Asn1UtcTime()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1UtcTime(Asn1Document Document)
+			: base(Document)
 		{
 		}
 

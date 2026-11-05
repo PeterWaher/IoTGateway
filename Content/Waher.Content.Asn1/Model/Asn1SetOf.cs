@@ -16,8 +16,9 @@ namespace Waher.Content.Asn1.Model
 		/// </summary>
 		/// <param name="Size">Optional SIZE</param>
 		/// <param name="ElementType">Element type.</param>
-		public Asn1SetOf(Asn1Values Size, Asn1Type ElementType)
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1SetOf(Asn1Values Size, Asn1Type ElementType, Asn1Document Document)
+			: base(Document)
 		{
 			this.size = Size;
 			this.elementType = ElementType;

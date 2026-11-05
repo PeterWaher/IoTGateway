@@ -11,8 +11,9 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// TIME-OF-DAY
 		/// </summary>
-		public Asn1TimeOfDay()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1TimeOfDay(Asn1Document Document)
+			: base(Document)
 		{
 		}
 

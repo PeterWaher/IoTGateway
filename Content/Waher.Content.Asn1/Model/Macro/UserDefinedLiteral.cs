@@ -31,7 +31,7 @@
 		public override Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
 		{
 			Document.AssertNextToken(this.value);
-			return new Values.Asn1StringValue(this.value);
+			return new Values.Asn1StringValue(this.value, Document);
 		}
 
 		/// <inheritdoc/>

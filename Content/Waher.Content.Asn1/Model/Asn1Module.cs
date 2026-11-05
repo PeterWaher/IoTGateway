@@ -18,9 +18,10 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Imports">Optional Import instructions.</param>
 		/// <param name="Exports">Optional Export instructions.</param>
 		/// <param name="Items">Items in module.</param>
-		public Asn1Module(Asn1Import[] Imports, string[] Exports, 
-			Asn1Node[] Items)
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Module(Asn1Import[] Imports, string[] Exports, Asn1Node[] Items,
+			Asn1Document Document)
+			: base(Document)
 		{
 			this.imports = Imports;
 			this.exports = Exports;

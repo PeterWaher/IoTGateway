@@ -8,8 +8,9 @@
 		/// <summary>
 		/// All elements (in current context).
 		/// </summary>
-		public Asn1All() 
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1All(Asn1Document Document) 
+			: base(Document)
 		{
 		}
 	}

@@ -10,8 +10,9 @@
 		/// GraphicString
 		/// all registered G sets and SPACE
 		/// </summary>
-		public Asn1GraphicString()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1GraphicString(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

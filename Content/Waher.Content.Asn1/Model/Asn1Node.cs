@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -36,13 +37,26 @@ namespace Waher.Content.Asn1.Model
 	/// </summary>
 	public abstract class Asn1Node
 	{
+		private Asn1Document document;
 		private Asn1Node parent;
+		private ChunkedList<Asn1Node> children = null;
 
 		/// <summary>
 		/// Base class for all ASN.1 nodes.
 		/// </summary>
-		public Asn1Node()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Node(Asn1Document Document)
 		{
+			this.document = Document;
+		}
+
+		/// <summary>
+		/// ASN.1 document hosting the node.
+		/// </summary>
+		public Asn1Document Document
+		{
+			get => this.document;
+			protected set => this.document = value;
 		}
 
 		/// <summary>
@@ -56,7 +70,13 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Parent"></param>
 		internal void SetParentNode(Asn1Node Parent)
 		{
+			this.parent?.children?.Remove(this);
 			this.parent = Parent;
+
+			if (this.parent.children is null)
+				this.parent.children = new ChunkedList<Asn1Node>();
+
+			this.parent.children.Add(this);
 		}
 
 		/// <summary>
@@ -79,6 +99,29 @@ namespace Waher.Content.Asn1.Model
 				foreach (Asn1Node Child in Children)
 					Child.SetParentNode(this);
 			}
+		}
+
+		/// <summary>
+		/// Executes a callback method for each ASN.1 node in the syntax tree.
+		/// </summary>
+		/// <param name="Callback">Callback method.</param>
+		/// <returns>If the callback method was called on all nodes in the ASN.1 syntax
+		/// tree (true), or if the procedure was cancelled (false).</returns>
+		public bool ForEach(Predicate<Asn1Node> Callback)
+		{
+			if (!Callback.Invoke(this))
+				return false;
+
+			if (!(this.children is null))
+			{
+				foreach (Asn1Node Child in this.children)
+				{
+					if (!Child.ForEach(Callback))
+						return false;
+				}
+			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -124,7 +167,16 @@ namespace Waher.Content.Asn1.Model
 			return Task.CompletedTask;
 		}
 
-		internal static string ToCSharp(string Identifier)
+		internal static string ToCSharp(CSharpExportState State, Asn1Node Node,
+			string Identifier)
+		{
+			if (State?.Settings.ContainsMultipleDefinitions(Identifier) ?? false)
+				return ToCSharp(Node.Document.GetFullyQualifiedName(State.Settings, Identifier));
+			else 
+				return ToCSharp(Identifier);
+		}
+
+		private static string CheckKeyword(string Identifier)
 		{
 			switch (Identifier)
 			{
@@ -235,12 +287,24 @@ namespace Waher.Content.Asn1.Model
 					return "@" + Identifier;
 
 				default:
-					int i = Identifier.IndexOf('-');
-					if (i >= 0)
-						Identifier = Identifier.Replace('-', '_');
-
 					return Identifier;
 			}
+		}
+
+		internal static string ToCSharp(params string[] Identifier)
+		{
+			int i, c = Identifier.Length;
+			StringBuilder sb = new StringBuilder();
+
+			for (i = 0; i < c; i++)
+			{
+				if (i > 0)
+					sb.Append('.');
+
+				sb.Append(CheckKeyword(Identifier[i]).Replace('-', '_'));
+			}
+
+			return sb.ToString();
 		}
 	}
 }

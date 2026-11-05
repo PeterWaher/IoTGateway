@@ -10,7 +10,6 @@ namespace Waher.Content.Asn1.Model
 	{
 		private readonly string[] identifiers;
 		private readonly string module;
-		private readonly Asn1Document document;
 		private Asn1Document importedDocument;
 
 		/// <summary>
@@ -19,13 +18,11 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Identifiers">Identifiers to import.</param>
 		/// <param name="Module">Module reference.</param>
 		/// <param name="Document">ASN.1 Document</param>
-		public Asn1Import(string[] Identifiers, string Module, 
-			Asn1Document Document)
-			: base()
+		public Asn1Import(string[] Identifiers, string Module, Asn1Document Document)
+			: base(Document)
 		{
 			this.identifiers = Identifiers;
 			this.module = Module;
-			this.document = Document;
 			this.importedDocument = null;
 		}
 
@@ -48,15 +45,15 @@ namespace Waher.Content.Asn1.Model
 			if (!(this.importedDocument is null))
 				return this.importedDocument;
 
-			string Folder = Path.GetDirectoryName(this.document.Location);
-			string Extension = Path.GetExtension(this.document.Location);
+			string Folder = Path.GetDirectoryName(this.Document.Location);
+			string Extension = Path.GetExtension(this.Document.Location);
 			string FileName = Path.Combine(Folder, this.module) + Extension;
 
 			if (!File.Exists(FileName))
 			{
 				FileName = null;
 
-				foreach (string ImportFolder in this.document.ImportFolders)
+				foreach (string ImportFolder in this.Document.ImportFolders)
 				{
 					FileName = Path.Combine(ImportFolder, this.module) + Extension;
 					if (File.Exists(FileName))
@@ -69,7 +66,7 @@ namespace Waher.Content.Asn1.Model
 					throw new FileNotFoundException("Unable to find import file for module " + this.module);
 			}
 
-			this.importedDocument = await Asn1Document.FromFile(FileName, this.document.ImportFolders);
+			this.importedDocument = await Asn1Document.FromFile(FileName, this.Document.ImportFolders);
 
 			return this.importedDocument;
 		}

@@ -8,8 +8,9 @@
 		/// <summary>
 		/// Abstract base class for ASN.1 restrictions.
 		/// </summary>
-		public Asn1Restriction()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Restriction(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

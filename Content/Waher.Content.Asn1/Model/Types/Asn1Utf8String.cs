@@ -10,8 +10,9 @@
 		/// UTF8String
 		/// any character from a recognized alphabet (including ASCII control characters)
 		/// </summary>
-		public Asn1Utf8String()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Utf8String(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

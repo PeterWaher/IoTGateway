@@ -12,8 +12,9 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// BOOLEAN
 		/// </summary>
-		public Asn1Boolean()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Boolean(Asn1Document Document)
+			: base(Document)
 		{
 		}
 

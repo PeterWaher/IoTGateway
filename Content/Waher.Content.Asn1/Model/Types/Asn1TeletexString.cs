@@ -10,8 +10,9 @@
 		/// TeletexString
 		/// CCITT and T.101 character sets
 		/// </summary>
-		public Asn1TeletexString()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1TeletexString(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

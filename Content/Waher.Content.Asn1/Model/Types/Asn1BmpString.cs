@@ -10,8 +10,9 @@
 		/// BmpString (utf-16-be encoded string)
 		/// Basic Multilingual Plane of ISO/IEC/ITU 10646-1
 		/// </summary>
-		public Asn1BmpString()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1BmpString(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

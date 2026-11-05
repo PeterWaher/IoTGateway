@@ -10,8 +10,9 @@
 		/// VideotexString
 		/// CCITT's T.100 and T.101 character sets 
 		/// </summary>
-		public Asn1VideotexString()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1VideotexString(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

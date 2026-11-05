@@ -8,8 +8,9 @@
 		/// <summary>
 		/// Iso646String
 		/// </summary>
-		public Asn1Iso646String()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Iso646String(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

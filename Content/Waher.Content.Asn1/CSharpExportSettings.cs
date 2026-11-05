@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using Waher.Content.Asn1.Model;
 
 namespace Waher.Content.Asn1
@@ -10,36 +11,22 @@ namespace Waher.Content.Asn1
 	{
 		private readonly Dictionary<string, KeyValuePair<Asn1Document, string>> imported =
 			new Dictionary<string, KeyValuePair<Asn1Document, string>>();
-
-		/// <summary>
-		/// What encoders and decoders to include in the generation of C# code.
-		/// </summary>
-		public EncodingSchemes Codecs;
-
-		/// <summary>
-		/// Base Namespace
-		/// </summary>
-		public string BaseNamespace;
+		private readonly Dictionary<string, Dictionary<string, bool>> fullyQualifiedNames = new Dictionary<string, Dictionary<string, bool>>();
+		private readonly string baseNamespace;
 
 		/// <summary>
 		/// What encoders and decoders to include in the generation of C# code.
 		/// </summary>
 		/// <param name="BaseNamespace">Base namespace of generated code.</param>
 		public CSharpExportSettings(string BaseNamespace)
-			: this(BaseNamespace, EncodingSchemes.None)
 		{
+			this.baseNamespace = BaseNamespace;
 		}
 
 		/// <summary>
-		/// What encoders and decoders to include in the generation of C# code.
+		/// Base Namespace
 		/// </summary>
-		/// <param name="BaseNamespace">Base namespace of generated code.</param>
-		/// <param name="Codecs">Encoding schemes to support.</param>
-		public CSharpExportSettings(string BaseNamespace, EncodingSchemes Codecs)
-		{
-			this.BaseNamespace = BaseNamespace;
-			this.Codecs = Codecs;
-		}
+		public string BaseNamespace => this.baseNamespace;
 
 		/// <summary>
 		/// Namespace for a given identifier.
@@ -48,7 +35,7 @@ namespace Waher.Content.Asn1
 		/// <returns>Namespace</returns>
 		public string Namespace(string Identifier)
 		{
-			return this.BaseNamespace + "." + Asn1Node.ToCSharp(Identifier);
+			return this.baseNamespace + "." + Asn1Node.ToCSharp(Identifier);
 		}
 
 		/// <summary>
@@ -90,6 +77,60 @@ namespace Waher.Content.Asn1
 		public Asn1Document GetDocument(string Identifier)
 		{
 			return this.imported[Identifier].Key;
+		}
+
+		/// <summary>
+		/// Declares a type.
+		/// </summary>
+		/// <param name="Settings">C# export settings.</param>
+		/// <param name="Node">Node defining the type and identifier.</param>
+		/// <param name="Identifier">Name of type.</param>
+		/// <param name="MustBeQualified">If the identifier requires qualified access.</param>
+		public void DeclareType(CSharpExportSettings Settings, Asn1Node Node, 
+			string Identifier, bool MustBeQualified)
+		{
+			if (!this.fullyQualifiedNames.TryGetValue(Identifier, 
+				out Dictionary<string, bool> Namespaces))
+			{
+				Namespaces = new Dictionary<string, bool>();
+				this.fullyQualifiedNames[Identifier] = Namespaces;
+			}
+
+			StringBuilder sb = new StringBuilder();
+			string[] Fqn = Node.Document.GetFullyQualifiedName(Settings, Identifier);
+			int i, c = Fqn.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				if (i > 0)
+					sb.Append('.');
+
+				sb.Append(Fqn[i]);
+			}
+
+			Namespaces[sb.ToString()] = MustBeQualified;
+		}
+
+		/// <summary>
+		/// Checks if a type is declared multiple times.
+		/// </summary>
+		/// <param name="Identifier">Name of type.</param>
+		/// <returns>If the type has been declared multiple times.</returns>
+		public bool ContainsMultipleDefinitions(string Identifier)
+		{
+			if (!this.fullyQualifiedNames.TryGetValue(Identifier,
+				out Dictionary<string, bool> Namespaces))
+			{
+				return false;
+			}
+
+			if (Namespaces.Count > 1)
+				return true;
+
+			foreach (KeyValuePair<string, bool> P in Namespaces)
+				return P.Value;
+
+			return false;
 		}
 
 		/// <summary>

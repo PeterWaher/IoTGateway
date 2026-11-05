@@ -10,7 +10,6 @@ namespace Waher.Content.Asn1.Model.Values
 	public class Asn1Array : Asn1Value
 	{
 		private readonly Asn1Value[] values;
-		private readonly Asn1Document document;
 		private Asn1TypeReference typeReference;
 		private Asn1Node type;
 		private bool? isFlagsEnum;
@@ -21,11 +20,9 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <param name="Values">Values</param>
 		/// <param name="Document">ASN.1 document reference</param>
 		public Asn1Array(Asn1Value[] Values, Asn1Document Document)
-			: base()
+			: base(Document)
 		{
 			this.values = Values;
-			this.document = Document;
-
 			this.SetAsChild(this.values);
 		}
 
@@ -123,7 +120,7 @@ namespace Waher.Content.Asn1.Model.Values
 			if (!this.TryGetAncestor(out this.typeReference))
 				return false;
 
-			if (!this.document.namedNodes.TryGetValue(this.typeReference.Identifier,
+			if (!this.Document.namedNodes.TryGetValue(this.typeReference.Identifier,
 				out this.type))
 			{
 				return false;

@@ -8,8 +8,9 @@
 		/// <summary>
 		/// T61String
 		/// </summary>
-		public Asn1T61String()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1T61String(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

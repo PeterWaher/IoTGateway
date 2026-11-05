@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Types;
 using Waher.Content.Asn1.Model.Values;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -20,9 +21,10 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="FieldName">Field name.</param>
 		/// <param name="Tag">Tag</param>
 		/// <param name="Type">Type.</param>
-		public Asn1FieldDefinition(string FieldName, int? Tag, 
-			Asn1Type Type)
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1FieldDefinition(string FieldName, int? Tag, Asn1Type Type,
+			Asn1Document Document)
+			: base(Document)
 		{
 			this.fieldName = FieldName;
 			this.type = Type;
@@ -37,9 +39,30 @@ namespace Waher.Content.Asn1.Model
 		public string Name => this.fieldName;
 
 		/// <summary>
+		/// If the named node represents a type.
+		/// </summary>
+		public bool IsType => false;
+
+		/// <summary>
 		/// Type
 		/// </summary>
 		public Asn1Type Type => this.type;
+
+		/// <summary>
+		/// Gets the fully qualified name, in reverse order.
+		/// </summary>
+		public void GetFullyQualifiedName(ChunkedList<string> Fqn)
+		{
+			Fqn.Add(this.Name);
+
+			if (this.TryGetAncestor(out INamedNode Container))
+				Container.GetFullyQualifiedName(Fqn);
+		}
+
+		/// <summary>
+		/// If the named element must be qualified.
+		/// </summary>
+		public bool MustBeQualified => false;
 
 		/// <summary>
 		/// Tag

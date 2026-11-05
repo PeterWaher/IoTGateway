@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -19,9 +20,10 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="TypeName">Type name.</param>
 		/// <param name="Tag">Tag</param>
 		/// <param name="Definition">Definition</param>
-		public Asn1TypeDefinition(string TypeName, int? Tag, 
-			Asn1Type Definition)
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1TypeDefinition(string TypeName, int? Tag, Asn1Type Definition,
+			Asn1Document Document)
+			: base(Document)
 		{
 			this.typeName = TypeName;
 			this.definition = Definition;
@@ -34,6 +36,28 @@ namespace Waher.Content.Asn1.Model
 		/// Type Name
 		/// </summary>
 		public string Name => this.typeName;
+
+		/// <summary>
+		/// If the named node represents a type.
+		/// </summary>
+		public bool IsType => true;
+
+		/// <summary>
+		/// Gets the fully qualified name, in reverse order.
+		/// </summary>
+		public void GetFullyQualifiedName(ChunkedList<string> Fqn)
+		{
+			if (Fqn.Count == 0 || Fqn[Fqn.Count - 1] != this.Name)
+				Fqn.Add(this.Name);
+
+			if (this.TryGetAncestor(out INamedNode Container))
+				Container.GetFullyQualifiedName(Fqn);
+		}
+
+		/// <summary>
+		/// If the named element must be qualified.
+		/// </summary>
+		public bool MustBeQualified => false;
 
 		/// <summary>
 		/// Tag
@@ -83,10 +107,13 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
-			if (this.definition.ConstructedType && Pass == CSharpExportPass.Explicit)
-			{
+			if (!this.definition.ConstructedType)
+				return;
+
+			if (Pass == CSharpExportPass.Preprocess)
+				await this.definition.ExportCSharp(Output, State, Indent, CSharpExportPass.Preprocess);
+			else if (Pass == CSharpExportPass.Explicit)
 				await this.definition.ExportCSharp(Output, State, Indent, CSharpExportPass.Implicit);
-			}
 		}
 	}
 }

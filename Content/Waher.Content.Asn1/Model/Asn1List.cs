@@ -13,8 +13,9 @@
 		/// <param name="Name">Optional field or type name.</param>
 		/// <param name="TypeDef">If construct is part of a type definition.</param>
 		/// <param name="Nodes">Nodes</param>
-		public Asn1List(string Name, bool TypeDef, Asn1Node[] Nodes)
-			: base(Name, TypeDef)
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1List(string Name, bool TypeDef, Asn1Node[] Nodes, Asn1Document Document)
+			: base(Name, TypeDef, Document)
 		{
 			this.nodes = Nodes;
 			this.SetAsChild(this.nodes);

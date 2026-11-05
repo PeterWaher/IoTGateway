@@ -16,8 +16,9 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Floating-point value
 		/// </summary>
 		/// <param name="Value">Value</param>
-		public Asn1FloatingPointValue(double Value)
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1FloatingPointValue(double Value, Asn1Document Document)
+			: base(Document)
 		{
 			this.value = Value;
 		}

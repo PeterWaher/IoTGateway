@@ -1,13 +1,14 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Values;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1.Model
 {
 	/// <summary>
 	/// ENUMERATED
 	/// </summary>
-	public class Asn1Enumeration : Asn1List
+	public class Asn1Enumeration : Asn1List, INamedNode
 	{
 		private readonly Asn1Node baseType;
 		private readonly bool flags;
@@ -21,9 +22,10 @@ namespace Waher.Content.Asn1.Model
 		/// <see cref="System.FlagsAttribute"/>.</param>
 		/// <param name="BaseType">Base type of enumeration.</param>
 		/// <param name="Nodes">Nodes</param>
+		/// <param name="Document">ASN.1 document hosting the node.</param>
 		public Asn1Enumeration(string Name, bool TypeDef, bool Flags, Asn1Node BaseType, 
-			Asn1Node[] Nodes)
-			: base(Name, TypeDef, Nodes)
+			Asn1Node[] Nodes, Asn1Document Document)
+			: base(Name, TypeDef, Nodes, Document)
 		{
 			this.baseType = BaseType;
 			this.flags = Flags;
@@ -54,6 +56,27 @@ namespace Waher.Content.Asn1.Model
 		/// If the enumeration represents a <see cref="System.FlagsAttribute"/> enumeration.
 		/// </summary>
 		public bool Flags => this.flags;
+
+		/// <summary>
+		/// If the named node represents a type.
+		/// </summary>
+		public bool IsType => true;
+
+		/// <summary>
+		/// Gets the fully qualified name, in reverse order.
+		/// </summary>
+		public void GetFullyQualifiedName(ChunkedList<string> Fqn)
+		{
+			Fqn.Add(this.Name);
+
+			if (this.TryGetAncestor(out INamedNode Container))
+				Container.GetFullyQualifiedName(Fqn);
+		}
+
+		/// <summary>
+		/// If the named element must be qualified.
+		/// </summary>
+		public bool MustBeQualified => false;
 
 		/// <summary>
 		/// Exports to C#
@@ -158,7 +181,7 @@ namespace Waher.Content.Asn1.Model
 				}
 				else
 				{
-					Output.Append(ToCSharp(this.Name));
+					Output.Append(ToCSharp(State, this, this.Name));
 					Output.Append("Enum");
 				}
 			}

@@ -9,8 +9,9 @@
 		/// SIZE()
 		/// </summary>
 		/// <param name="Set">Set</param>
-		public Asn1Size(Asn1Values Set)
-			: base(Set)
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Size(Asn1Values Set, Asn1Document Document)
+			: base(Set, Document)
 		{
 		}
 	}

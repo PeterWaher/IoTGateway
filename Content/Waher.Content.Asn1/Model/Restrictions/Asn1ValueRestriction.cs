@@ -11,8 +11,9 @@
 		/// Abstract base class for set-based restrictions
 		/// </summary>
 		/// <param name="Value">Item</param>
-		public Asn1ValueRestriction(Asn1Value Value) 
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1ValueRestriction(Asn1Value Value, Asn1Document Document) 
+			: base(Document)
 		{
 			this.value = Value;
 			this.SetAsChild(this.value);

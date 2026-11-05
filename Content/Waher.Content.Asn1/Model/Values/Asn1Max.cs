@@ -8,8 +8,9 @@
 		/// <summary>
 		/// MAX
 		/// </summary>
-		public Asn1Max() 
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Max(Asn1Document Document) 
+			: base(Document)
 		{
 		}
 	}

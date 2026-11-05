@@ -10,7 +10,6 @@ namespace Waher.Content.Asn1.Model.Values
 	/// </summary>
 	public class Asn1ValueReference : Asn1Value
 	{
-		private readonly Asn1Document document;
 		private readonly string identifier;
 
 		/// <summary>
@@ -19,10 +18,9 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <param name="Identifier">Identifier</param>
 		/// <param name="Document">ASN.1 Document containing the reference</param>
 		public Asn1ValueReference(string Identifier, Asn1Document Document)
-			: base()
+			: base(Document)
 		{
 			this.identifier = Identifier;
-			this.document = Document;
 		}
 
 		/// <summary>
@@ -41,18 +39,7 @@ namespace Waher.Content.Asn1.Model.Values
 			int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
-			{
-				if (this.document.values.TryGetValue(this.identifier, out Asn1FieldValueDefinition ValueDef))
-				{
-					if (ValueDef.Document.Root.Identifier != this.document.Root.Identifier)
-					{
-						Output.Append(ToCSharp(ValueDef.Document.Root.Identifier));
-						Output.Append(".Values.");
-					}
-				}
-
-				Output.Append(ToCSharp(this.identifier));
-			}
+				Output.Append(ToCSharp(State, this, this.identifier));
 
 			return Task.CompletedTask;
 		}
@@ -64,7 +51,7 @@ namespace Waher.Content.Asn1.Model.Values
 		{
 			get
 			{
-				if (this.document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node) &&
+				if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node) &&
 					Node is Asn1Value Value)
 				{
 					return Value.CSharpType;

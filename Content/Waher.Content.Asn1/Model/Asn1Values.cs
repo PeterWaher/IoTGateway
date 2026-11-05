@@ -8,8 +8,9 @@
 		/// <summary>
 		/// Abstract base class for sets of values
 		/// </summary>
-		public Asn1Values()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Values(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

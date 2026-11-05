@@ -8,8 +8,9 @@
 		/// <summary>
 		/// MIN
 		/// </summary>
-		public Asn1Min() 
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Min(Asn1Document Document) 
+			: base(Document)
 		{
 		}
 	}

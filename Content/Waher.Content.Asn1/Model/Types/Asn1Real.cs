@@ -12,8 +12,9 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// REAL
 		/// </summary>
-		public Asn1Real()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Real(Asn1Document Document)
+			: base(Document)
 		{
 		}
 

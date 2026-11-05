@@ -2,13 +2,14 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1.Model
 {
 	/// <summary>
 	/// Represents a ASN.1 CHOICE construct.
 	/// </summary>
-	public class Asn1Choice : Asn1List
+	public class Asn1Choice : Asn1List, INamedNode
 	{
 		/// <summary>
 		/// Represents a ASN.1 CHOICE construct.
@@ -16,8 +17,9 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Name">Optional field or type name.</param>
 		/// <param name="TypeDef">If construct is part of a type definition.</param>
 		/// <param name="Nodes">Nodes</param>
-		public Asn1Choice(string Name, bool TypeDef, Asn1Node[] Nodes)
-			: base(Name, TypeDef, Nodes)
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Choice(string Name, bool TypeDef, Asn1Node[] Nodes, Asn1Document Document)
+			: base(Name, TypeDef, Nodes, Document)
 		{
 		}
 
@@ -25,6 +27,27 @@ namespace Waher.Content.Asn1.Model
 		/// If the type is a constructed type.
 		/// </summary>
 		public override bool ConstructedType => true;
+
+		/// <summary>
+		/// If the named node represents a type.
+		/// </summary>
+		public bool IsType => true;
+
+		/// <summary>
+		/// Gets the fully qualified name, in reverse order.
+		/// </summary>
+		public void GetFullyQualifiedName(ChunkedList<string> Fqn)
+		{
+			Fqn.Add(this.Name);
+
+			if (this.TryGetAncestor(out INamedNode Container))
+				Container.GetFullyQualifiedName(Fqn);
+		}
+
+		/// <summary>
+		/// If the named element must be qualified.
+		/// </summary>
+		public bool MustBeQualified => false;
 
 		/// <summary>
 		/// Parses the portion of the document at the current position, according to the type.
@@ -67,7 +90,7 @@ namespace Waher.Content.Asn1.Model
 		{
 			if (Pass == CSharpExportPass.Explicit && !this.TypeDefinition)
 			{
-				Output.Append(ToCSharp(this.Name));
+				Output.Append(ToCSharp(State, this, this.Name));
 				Output.Append("Choice");
 			}
 			else
@@ -78,12 +101,28 @@ namespace Waher.Content.Asn1.Model
 
 					foreach (Asn1Node Node in this.Nodes)
 						await Node.ExportCSharp(Output, State, Indent, Pass);
+				}
+
+				if (Pass == CSharpExportPass.Implicit || Pass == CSharpExportPass.Explicit)
+				{
+					JSON.Indent(Output, Indent);
+					Output.Append("public partial class ");
+					Output.Append(ToCSharp(this.Name));
+					if (!this.TypeDefinition)
+						Output.Append("Choice");
+					Output.AppendLine();
 
 					JSON.Indent(Output, Indent);
-					Output.Append("public enum ");
-					Output.Append(ToCSharp(this.Name));
-					Output.AppendLine("Enum");
+					Output.AppendLine("{");
 
+					Indent++;
+
+					foreach (Asn1Node Node in this.Nodes)
+						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Implicit);
+
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("public enum _Options");
 					JSON.Indent(Output, Indent);
 					Output.Append("{");
 
@@ -112,30 +151,9 @@ namespace Waher.Content.Asn1.Model
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("}");
 					Output.AppendLine();
-				}
-
-				if (Pass == CSharpExportPass.Implicit || Pass == CSharpExportPass.Explicit)
-				{
-					JSON.Indent(Output, Indent);
-					Output.Append("public partial class ");
-					Output.Append(ToCSharp(this.Name));
-					if (!this.TypeDefinition)
-						Output.Append("Choice");
-					Output.AppendLine();
 
 					JSON.Indent(Output, Indent);
-					Output.AppendLine("{");
-
-					Indent++;
-
-					foreach (Asn1Node Node in this.Nodes)
-						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Implicit);
-
-					JSON.Indent(Output, Indent);
-					Output.Append("public ");
-					Output.Append(ToCSharp(this.Name));
-					Output.Append("Enum");
-					Output.AppendLine(" _choice;");
+					Output.Append("public _Options _choice;");
 
 					foreach (Asn1Node Node in this.Nodes)
 						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);

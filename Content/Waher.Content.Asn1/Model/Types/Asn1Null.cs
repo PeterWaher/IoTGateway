@@ -12,8 +12,9 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// NULL
 		/// </summary>
-		public Asn1Null()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Null(Asn1Document Document)
+			: base(Document)
 		{
 		}
 

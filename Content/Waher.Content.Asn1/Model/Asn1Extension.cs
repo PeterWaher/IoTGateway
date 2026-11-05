@@ -8,8 +8,9 @@
 		/// <summary>
 		/// Extensions follow.
 		/// </summary>
-		public Asn1Extension()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Extension(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

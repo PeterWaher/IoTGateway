@@ -13,8 +13,9 @@
 		/// </summary>
 		/// <param name="Left">Left set</param>
 		/// <param name="Right">Right set</param>
-		public Asn1BinarySetOperator(Asn1Values Left, Asn1Values Right)
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1BinarySetOperator(Asn1Values Left, Asn1Values Right, Asn1Document Document)
+			: base(Document)
 		{
 			this.left = Left;
 			this.right = Right;

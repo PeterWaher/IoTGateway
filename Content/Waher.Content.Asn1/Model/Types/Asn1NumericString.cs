@@ -10,8 +10,9 @@
 		/// NumericString
 		/// 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, and SPACE 
 		/// </summary>
-		public Asn1NumericString()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1NumericString(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

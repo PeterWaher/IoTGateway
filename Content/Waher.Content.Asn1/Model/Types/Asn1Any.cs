@@ -14,8 +14,9 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// ANY
 		/// </summary>
-		public Asn1Any()
-			: this(null)
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Any(Asn1Document Document)
+			: this(null, Document)
 		{
 		}
 
@@ -23,8 +24,9 @@ namespace Waher.Content.Asn1.Model.Types
 		/// ANY
 		/// </summary>
 		/// <param name="DefinedBy">Defined by reference.</param>
-		public Asn1Any(string DefinedBy)
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Any(string DefinedBy, Asn1Document Document)
+			: base(Document)
 		{
 			this.definedBy = DefinedBy;
 		}

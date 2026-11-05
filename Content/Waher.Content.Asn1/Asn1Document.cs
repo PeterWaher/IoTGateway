@@ -11,6 +11,7 @@ using Waher.Content.Asn1.Model.Types;
 using Waher.Content.Asn1.Model.Values;
 using Waher.Runtime.IO;
 using Waher.Runtime.Collections;
+using System;
 
 namespace Waher.Content.Asn1
 {
@@ -480,7 +481,17 @@ namespace Waher.Content.Asn1
 				Node.ForEach(Node2 =>
 				{
 					if (Node2 is INamedNode NamedNode)
-						this.namedNodes[NamedNode.Name] = Node2;
+					{
+						if (this.namedNodes.TryGetValue(NamedNode.Name, out Asn1Node Prev))
+						{
+							if (NamedNode is Asn1TypeDefinition TypeDef)
+								this.namedNodes[NamedNode.Name] = TypeDef;
+							else if (!(Prev is Asn1TypeDefinition) && !Prev.Equals(NamedNode))
+								throw new Exception("Duplicate type: " + NamedNode.Name);
+						}
+						else
+							this.namedNodes[NamedNode.Name] = Node2;
+					}
 
 					return true;
 				});
@@ -1135,13 +1146,6 @@ namespace Waher.Content.Asn1
 					if (s == "{")
 					{
 						Asn1Node[] Nodes = this.ParseList();
-
-						foreach (Asn1Node Node in Nodes)
-						{
-							if (Node is Asn1FieldDefinition FieldDef && !this.namedNodes.ContainsKey(FieldDef.Name))
-								this.namedNodes[FieldDef.Name] = FieldDef;
-						}
-
 						return new Asn1Choice(Name, TypeDef, Nodes, this);
 					}
 					else

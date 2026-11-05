@@ -153,7 +153,7 @@ namespace Waher.Content.Asn1.Model
 					Output.AppendLine();
 
 					JSON.Indent(Output, Indent);
-					Output.Append("public _Options _choice;");
+					Output.AppendLine("public _Options _choice;");
 
 					foreach (Asn1Node Node in this.Nodes)
 						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);

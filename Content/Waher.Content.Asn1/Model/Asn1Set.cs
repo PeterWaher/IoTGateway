@@ -57,7 +57,7 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State, 
 			int Indent, CSharpExportPass Pass)
 		{
-			/*if (Pass == CSharpExportPass.Implicit)
+			if (Pass == CSharpExportPass.Implicit)
 			{
 				State.ClosePending(Output);
 
@@ -86,7 +86,7 @@ namespace Waher.Content.Asn1.Model
 				Output.AppendLine("}");
 				Output.AppendLine();
 			}
-			else*/ if (Pass == CSharpExportPass.Explicit)
+			else if (Pass == CSharpExportPass.Explicit)
 			{
 				if (this.TypeDefinition)
 				{

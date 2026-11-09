@@ -49,6 +49,20 @@ namespace Waher.Content.Asn1.Model
 		public bool MustBeQualified => false;
 
 		/// <summary>
+		/// Corresponding C# type.
+		/// </summary>
+		public override string CSharpType
+		{
+			get
+			{
+				string s = ToCSharp(this.Name);
+				if (!this.TypeDefinition)
+					s += "Seq";
+				return s;
+			}
+		}
+
+		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
@@ -58,43 +72,29 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State, 
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Implicit)
+			if (Pass == CSharpExportPass.Explicit && !this.TypeDefinition)
 			{
-				State.ClosePending(Output);
-
-				foreach (Asn1Node Node in this.Nodes)
-					await Node.ExportCSharp(Output, State, Indent, Pass);
-
-				JSON.Indent(Output, Indent);
-				Output.Append("public partial class ");
-				Output.Append(ToCSharp(this.Name));
-				if (!this.TypeDefinition)
-					Output.Append("Seq");
-				Output.AppendLine();
-
-				JSON.Indent(Output, Indent);
-				Output.AppendLine("{");
-
-				Indent++;
-
-				foreach (Asn1Node Node in this.Nodes)
-					await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
-
-				Indent--;
-
-				JSON.Indent(Output, Indent);
-				Output.AppendLine("}");
-				Output.AppendLine();
+				Output.Append(ToCSharp(State, this, this.Name));
+				Output.Append("Seq");
 			}
-			else if (Pass == CSharpExportPass.Explicit)
+			else
 			{
-				if (this.TypeDefinition)
+				if (Pass == CSharpExportPass.Implicit)
 				{
 					State.ClosePending(Output);
 
+					foreach (Asn1Node Node in this.Nodes)
+						await Node.ExportCSharp(Output, State, Indent, Pass);
+				}
+
+				if (Pass == CSharpExportPass.Implicit || Pass == CSharpExportPass.Explicit)
+				{
 					JSON.Indent(Output, Indent);
 					Output.Append("public partial class ");
-					Output.AppendLine(ToCSharp(this.Name));
+					Output.Append(ToCSharp(this.Name));
+					if (!this.TypeDefinition)
+						Output.Append("Seq");
+					Output.AppendLine();
 
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
@@ -107,18 +107,164 @@ namespace Waher.Content.Asn1.Model
 					foreach (Asn1Node Node in this.Nodes)
 						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 
+					Output.AppendLine();
+					JSON.Indent(Output, Indent);
+					Output.Append("public static ");
+					Output.Append(ToCSharp(State, this, this.Name));
+					if (!this.TypeDefinition)
+						Output.Append("Seq");
+					Output.AppendLine(" Create(Asn1F.AsnReader Reader)");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
+
+					Indent++;
+
+					JSON.Indent(Output, Indent);
+					Output.Append(ToCSharp(State, this, this.Name));
+					if (!this.TypeDefinition)
+						Output.Append("Seq");
+					Output.AppendLine(" _Result = new();");
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("_Result.Read(Reader);");
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("return _Result;");
+
+					Indent--;
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
+
+					Output.AppendLine();
+					JSON.Indent(Output, Indent);
+					Output.Append("public void ");
+					Output.AppendLine(" Read(Asn1F.AsnReader Reader0)");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
+
+					Indent++;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("Asn1F.AsnReader Reader = Reader0.ReadSequence();");
+
+					foreach (Asn1Node Node in this.Nodes)
+						await Node.ExportReadCSharp(Output, State, Indent, "this");
+
+					Indent--;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
+
+					Output.AppendLine();
+					JSON.Indent(Output, Indent);
+					Output.Append("public static bool TryCreate(Asn1F.AsnReader Reader0, out ");
+					Output.Append(ToCSharp(State, this, this.Name));
+					if (!this.TypeDefinition)
+						Output.Append("Seq");
+					Output.AppendLine(" _Result)");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
+
+					Indent++;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("Asn1F.AsnReader Reader = Asn1.Common.TryReadInnerVector(Reader0);");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("if (Reader is null)");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
+					JSON.Indent(Output, Indent + 1);
+					Output.AppendLine("_Result = null;");
+					JSON.Indent(Output, Indent + 1);
+					Output.AppendLine("return false;");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
+					Output.AppendLine();
+
+					JSON.Indent(Output, Indent);
+					Output.Append("_Result = new ");
+					Output.Append(ToCSharp(State, this, this.Name));
+					if (!this.TypeDefinition)
+						Output.Append("Seq");
+					Output.AppendLine("();");
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("_Result.Read(Reader);");
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("return true;");
+
+					Indent--;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
+
+					Output.AppendLine();
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("public void Write(Asn1F.AsnWriter Writer)");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
+
+					Indent++;
+
+					// TODO: ASN.1 Write method
+
+					Indent--;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
+
 					Indent--;
 
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("}");
 					Output.AppendLine();
 				}
-				else
-				{
-					Output.Append(ToCSharp(State, this, this.Name));
-					Output.Append("Seq");
-				}
 			}
+		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, string MemberOf)
+		{
+			Output.Append(ToCSharp(State, this, this.Name));
+			if (!this.TypeDefinition)
+				Output.Append("Seq");
+			Output.Append(".Create(Reader)");
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Exports optional read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="ItemName">Name of item variable.</param>
+		public override Task ExportTryReadCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+		{
+			Output.Append(ToCSharp(State, this, this.Name));
+			if (!this.TypeDefinition)
+				Output.Append("Seq");
+
+			if (string.IsNullOrEmpty(ItemName))
+				Output.Append(".TryCreate(Reader, out var _Item) ? _Item : default");
+			else
+			{
+				Output.Append(".TryCreate(Reader, out ");
+				Output.Append(ItemName);
+				Output.Append(')');
+			}
+
+			return Task.CompletedTask;
 		}
 
 	}

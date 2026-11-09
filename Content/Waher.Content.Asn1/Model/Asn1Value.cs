@@ -36,16 +36,5 @@ namespace Waher.Content.Asn1.Model
 			throw new NotImplementedException("Invalid power of two.");
 		}
 
-		/// <summary>
-		/// Corresponding C# type.
-		/// </summary>
-		public virtual string CSharpType
-		{
-			get
-			{
-				throw new NotImplementedException("Support for value type " +
-					this.GetType().FullName + " not implemented.");
-			}
-		}
 	}
 }

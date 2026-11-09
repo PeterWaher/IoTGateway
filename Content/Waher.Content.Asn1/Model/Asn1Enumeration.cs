@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Values;
 using Waher.Runtime.Collections;
@@ -77,6 +78,20 @@ namespace Waher.Content.Asn1.Model
 		/// If the named element must be qualified.
 		/// </summary>
 		public bool MustBeQualified => false;
+
+		/// <summary>
+		/// Corresponding C# type.
+		/// </summary>
+		public override string CSharpType
+		{
+			get
+			{
+				string s = ToCSharp(this.Name);
+				if (!this.TypeDefinition)
+					s += "Enum";
+				return s;
+			}
+		}
 
 		/// <summary>
 		/// Exports to C#
@@ -187,5 +202,50 @@ namespace Waher.Content.Asn1.Model
 			}
 		}
 
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, string MemberOf)
+		{
+			Output.Append("Asn1.Common.ReadEnumeration<");
+			Output.Append(ToCSharp(State, this, this.Name));
+			if (!this.TypeDefinition)
+				Output.Append("Enum");
+			Output.Append(">(Reader)");
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Exports optional read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="ItemName">Name of item variable.</param>
+		public override Task ExportTryReadCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+		{
+			Output.Append("Asn1.Common.TryReadEnumeration<");
+			Output.Append(ToCSharp(State, this, this.Name));
+			if (!this.TypeDefinition)
+				Output.Append("Enum");
+			Output.Append(">(Reader, out ");
+
+			if (string.IsNullOrEmpty(ItemName))
+				Output.Append("var Item) ? Item : default");
+			else
+			{
+				Output.Append(ItemName);
+				Output.Append(')');
+			}
+
+			return Task.CompletedTask;
+		}
 	}
 }

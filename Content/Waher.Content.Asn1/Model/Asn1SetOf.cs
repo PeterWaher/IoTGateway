@@ -38,6 +38,17 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Type Type => this.elementType;
 
 		/// <summary>
+		/// Corresponding C# type.
+		/// </summary>
+		public override string CSharpType
+		{
+			get
+			{
+				return "Asn1.Array<" + this.elementType.CSharpType + ">";
+			}
+		}
+
+		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
@@ -54,6 +65,52 @@ namespace Waher.Content.Asn1.Model
 				Output.Append("Asn1.Array<");
 				await this.elementType.ExportCSharp(Output, State, Indent, Pass);
 				Output.Append(">");
+			}
+		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		public override async Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, string MemberOf)
+		{
+			Output.Append("Asn1.Common.ReadArray<");
+			Output.Append(this.elementType.CSharpType);
+			Output.Append(">(Reader, (Reader, out _Item) => ");
+			await this.elementType.ExportTryReadCSharp(Output, State, Indent + 1,
+				string.Empty, "_Item");
+			Output.Append(")");
+		}
+
+		/// <summary>
+		/// Exports optional read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="ItemName">Name of item variable.</param>
+		public override async Task ExportTryReadCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+		{
+			Output.Append("Asn1.Common.TryReadArray<");
+			Output.Append(this.elementType.CSharpType);
+			Output.Append(">(Reader, (Reader, out _Item) => ");
+
+			await this.elementType.ExportTryReadCSharp(Output, State, Indent + 1,
+				string.Empty, "_Item");
+
+			if (string.IsNullOrEmpty(ItemName))
+				Output.Append(", out var _Item2) ? _Item2 : default");
+			else
+			{
+				Output.Append(", out ");
+				Output.Append(ItemName);
+				Output.Append(')');
 			}
 		}
 	}

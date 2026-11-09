@@ -9,7 +9,7 @@ namespace Waher.Content.Asn1.Model
 	/// <summary>
 	/// Represents an ASN.1 field definition.
 	/// </summary>
-	public class Asn1FieldDefinition : Asn1Node//, INamedNode
+	public class Asn1FieldDefinition : Asn1Node
 	{
 		private readonly string fieldName;
 		private readonly Asn1Type type;
@@ -129,6 +129,65 @@ namespace Waher.Content.Asn1.Model
 			}
 			else
 				await this.type.ExportCSharp(Output, State, Indent, Pass);
+		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		public override async Task ExportReadCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf)
+		{
+			JSON.Indent(Output, Indent);
+			Output.Append(MemberOf);
+			Output.Append('.');
+			Output.Append(ToCSharp(this.fieldName));
+			Output.Append(" = ");
+
+			await this.type.ExportReadCSharp(Output, State, Indent + 1, string.Empty);
+			
+			Output.AppendLine(";");
+		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="ItemName">Name of item variable.</param>
+		public override async Task ExportTryReadCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+		{
+			JSON.Indent(Output, Indent);
+			Output.Append(MemberOf);
+			Output.Append('.');
+			Output.Append(ToCSharp(this.fieldName));
+			Output.Append(" = ");
+
+			if (!string.IsNullOrEmpty(ItemName))
+			{
+				Output.Append(ItemName);
+				Output.Append(" = ");
+			}
+
+			await this.type.ExportTryReadCSharp(Output, State, Indent + 1, string.Empty, string.Empty);
+			Output.AppendLine(";");
+		}
+
+		/// <summary>
+		/// Exports write logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		public override Task ExportWriteCSharp(StringBuilder Output, CSharpExportState State, int Indent)
+		{
+			return base.ExportWriteCSharp(Output, State, Indent);	// TODO
 		}
 	}
 }

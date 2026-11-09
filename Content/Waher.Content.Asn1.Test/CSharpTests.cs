@@ -4,7 +4,9 @@ using Microsoft.CodeAnalysis.Emit;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Formats.Asn1;
 using System.IO;
+using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +22,7 @@ namespace Waher.Content.Asn1.Test
 			string BaseNamespace = "Test";
 			Asn1Document Doc = await ParsingTests.ParseAsn1Document(FileName);
 			CSharpExportSettings Settings = new(BaseNamespace);
-			string CSharp = Doc.ExportCSharp(Settings);
+			string CSharp = await Doc.ExportCSharp(Settings);
 			string CSharpFileName = Path.Combine("Examples", Path.ChangeExtension(FileName, ".cs"));
 			string CSharpFolder = Path.GetDirectoryName(CSharpFileName);
 
@@ -49,6 +51,8 @@ namespace Waher.Content.Asn1.Test
 					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"),
 					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"),
 					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"),
+					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(AsnReader))), "System.Formats.Asn1.dll"),
+					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(BigInteger))), "System.Runtime.Numerics.dll"),
 					GetLocation(typeof(Asn1Document))
 			];
 

@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
+using Waher.Content.Asn1.Model.Types;
 using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1.Model
@@ -28,7 +29,7 @@ namespace Waher.Content.Asn1.Model
 			this.typeName = TypeName;
 			this.definition = Definition;
 			this.tag = Tag;
-		
+
 			this.SetAsChild(this.definition);
 		}
 
@@ -98,6 +99,22 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
+		/// Corresponding C# type.
+		/// </summary>
+		public override string CSharpType
+		{
+			get
+			{
+				if (this.definition is Asn1TypeReference TypeRef)
+					return TypeRef.CSharpType;
+				else if (this.definition is Asn1Type Type)
+					return Type.CSharpType;
+				else
+					return ToCSharp(this.Name);
+			}
+		}
+
+		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
@@ -114,6 +131,33 @@ namespace Waher.Content.Asn1.Model
 				await this.definition.ExportCSharp(Output, State, Indent, CSharpExportPass.Preprocess);
 			else if (Pass == CSharpExportPass.Explicit)
 				await this.definition.ExportCSharp(Output, State, Indent, CSharpExportPass.Implicit);
+		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, string MemberOf)
+		{
+			return this.definition.ExportReadCSharp(Output, State, Indent, MemberOf);
+		}
+
+		/// <summary>
+		/// Exports optional read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="ItemName">Name of item variable.</param>
+		public override Task ExportTryReadCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+		{
+			return this.definition.ExportTryReadCSharp(Output, State, Indent, MemberOf, ItemName);
 		}
 	}
 }

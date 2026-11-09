@@ -12,6 +12,7 @@ using Waher.Content.Asn1.Model.Values;
 using Waher.Runtime.IO;
 using Waher.Runtime.Collections;
 using System;
+using System.Formats.Asn1;
 
 namespace Waher.Content.Asn1
 {
@@ -1125,7 +1126,7 @@ namespace Waher.Content.Asn1
 					if (s == "{")
 					{
 						Asn1Node[] Nodes = this.ParseValues(true);
-						return new Asn1Enumeration(Name, TypeDef, true, 
+						return new Asn1Enumeration(Name, TypeDef, true,
 							new Asn1BitString(this), Nodes, this);
 					}
 					else
@@ -1189,7 +1190,7 @@ namespace Waher.Content.Asn1
 					if (s == "{")
 					{
 						Asn1Node[] Nodes = this.ParseValues(true);
-						return new Asn1Enumeration(Name, TypeDef, false, 
+						return new Asn1Enumeration(Name, TypeDef, false,
 							new Asn1Integer(this), Nodes, this);
 					}
 					else
@@ -1743,12 +1744,12 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Settings">C# export settings.</param>
 		/// <returns>C# code</returns>
-		public string ExportCSharp(CSharpExportSettings Settings)
+		public async Task<string> ExportCSharp(CSharpExportSettings Settings)
 		{
 			this.DeclareTypes(Settings);
 
 			StringBuilder Output = new StringBuilder();
-			this.ExportCSharp(Output, Settings);
+			await this.ExportCSharp(Output, Settings);
 			return Output.ToString();
 		}
 
@@ -1757,12 +1758,14 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
 		/// <param name="Settings">C# export settings.</param>
-		public void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings)
+		public async Task ExportCSharp(StringBuilder Output, CSharpExportSettings Settings)
 		{
 			CSharpExportState State = new CSharpExportState(Settings);
 			Output.AppendLine("using Asn1 = Waher.Content.Asn1;");
+			Output.AppendLine("using Asn1F = System.Formats.Asn1;");
 
-			this.root?.ExportCSharp(Output, State, 0, CSharpExportPass.Explicit);
+			if (!(this.root is null))
+				await this.root.ExportCSharp(Output, State, 0, CSharpExportPass.Explicit);
 		}
 	}
 }

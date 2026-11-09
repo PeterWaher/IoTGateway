@@ -19,6 +19,11 @@ namespace Waher.Content.Asn1.Model.Types
 		}
 
 		/// <summary>
+		/// Corresponding C# type.
+		/// </summary>
+		public override string CSharpType => "object";
+
+		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
@@ -42,6 +47,42 @@ namespace Waher.Content.Asn1.Model.Types
 		public override Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
 		{
 			return null;
+		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, string MemberOf)
+		{
+			Output.Append("Asn1.Common.ReadNull(Reader)");
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Exports optional read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="ItemName">Name of item variable.</param>
+		public override Task ExportTryReadCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+		{
+			if (!string.IsNullOrEmpty(ItemName))
+			{
+				Output.Append(ItemName);
+				Output.Append(" = ");
+			}
+
+			Output.Append("Asn1.Common.TryReadNull(Reader)");
+
+			return Task.CompletedTask;
 		}
 
 	}

@@ -149,6 +149,18 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
+		/// Corresponding C# type.
+		/// </summary>
+		public virtual string CSharpType
+		{
+			get
+			{
+				throw new NotImplementedException("C# Type name for type " +
+					this.GetType().FullName + " not implemented.");
+			}
+		}
+
+		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
@@ -167,12 +179,54 @@ namespace Waher.Content.Asn1.Model
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		public virtual Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, string MemberOf)
+		{
+			throw new NotImplementedException("Read operation for objects of type " +
+				this.GetType().FullName + " not implemented.");
+		}
+
+		/// <summary>
+		/// Exports optional read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="ItemName">Name of item variable.</param>
+		public virtual Task ExportTryReadCSharp(StringBuilder Output, 
+			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+		{
+			throw new NotImplementedException("Optional read operation for objects of type " +
+				this.GetType().FullName + " not implemented.");
+		}
+
+		/// <summary>
+		/// Exports write logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		public virtual Task ExportWriteCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent)
+		{
+			throw new NotImplementedException("Write operation for objects of type " +
+				this.GetType().FullName + " not implemented.");
+		}
+
 		internal static string ToCSharp(CSharpExportState State, Asn1Node Node,
 			string Identifier)
 		{
 			if (State?.Settings.ContainsMultipleDefinitions(Identifier) ?? false)
 				return ToCSharp(Node.Document.GetFullyQualifiedName(State.Settings, Identifier));
-			else 
+			else
 				return ToCSharp(Identifier);
 		}
 

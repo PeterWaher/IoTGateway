@@ -151,7 +151,7 @@ namespace Waher.Content.Asn1.Model
 					{
 						if (!State.Settings.ContainsCode(P.Key))
 						{
-							string CSharp = P.Value.ExportCSharp(State.Settings);
+							string CSharp = await P.Value.ExportCSharp(State.Settings);
 							State.Settings.AddCode(P.Key, CSharp, P.Value);
 						}
 

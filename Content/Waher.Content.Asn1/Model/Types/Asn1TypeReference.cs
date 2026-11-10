@@ -42,6 +42,22 @@ namespace Waher.Content.Asn1.Model.Types
 		}
 
 		/// <summary>
+		/// If the node is optional
+		/// </summary>
+		public override bool? Optional
+		{
+			get
+			{
+				if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
+					return TypeDef.Optional;
+				else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+					return Node.Optional;
+				else
+					return base.Optional;
+			}
+		}
+
+		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>

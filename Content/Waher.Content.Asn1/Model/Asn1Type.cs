@@ -10,10 +10,10 @@ namespace Waher.Content.Asn1.Model
 	{
 		private Asn1Tags? tags;
 		private Asn1Restriction restriction = null;
-		private bool? optional = false;
-		private bool? unique = false;
-		private bool? present = false;
-		private bool? absent = false;
+		private bool? optional;
+		private bool? unique;
+		private bool? present;
+		private bool? absent;
 		private Asn1Node _default = null;
 		private Asn1NamedValue[] namedOptions = null;
 
@@ -50,12 +50,17 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
-		/// If the type is optional
+		/// If the node is optional
 		/// </summary>
-		public bool? Optional
-		{
-			get => this.optional;
-			internal set => this.optional = value;
+		public override bool? Optional => this.optional;
+
+		/// <summary>
+		/// Sets the <see cref="Optional"/> flag of the type.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		internal void SetOptional(bool? Value)
+		{ 
+			this.optional = Value;
 		}
 
 		/// <summary>

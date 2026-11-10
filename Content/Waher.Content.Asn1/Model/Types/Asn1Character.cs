@@ -24,7 +24,7 @@ namespace Waher.Content.Asn1.Model.Types
 		{
 			get
 			{
-				if (this.Optional.HasValue && this.Optional.Value)
+				if (this.Optional ?? false)
 					return "char?";
 				else
 					return "char";
@@ -43,7 +43,7 @@ namespace Waher.Content.Asn1.Model.Types
 			if (Pass == CSharpExportPass.Explicit)
 			{
 				Output.Append("char");
-				if (this.Optional.HasValue && this.Optional.Value)
+				if (this.Optional ?? false)
 					Output.Append('?');
 			}
 

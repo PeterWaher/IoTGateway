@@ -1067,7 +1067,7 @@ namespace Waher.Content.Asn1
 
 					case "OPTIONAL":
 						this.pos += 8;
-						Result.Optional = true;
+						Result.SetOptional(true);
 						break;
 
 					case "PRESENT":
@@ -1082,7 +1082,7 @@ namespace Waher.Content.Asn1
 
 					case "DEFAULT":
 						this.pos += 7;
-						Result.Optional = true;
+						Result.SetOptional(true);
 						Result.Default = this.ParseValue();
 						break;
 

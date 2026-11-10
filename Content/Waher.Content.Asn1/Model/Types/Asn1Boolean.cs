@@ -25,7 +25,7 @@ namespace Waher.Content.Asn1.Model.Types
 		{
 			get
 			{
-				if (this.Optional.HasValue && this.Optional.Value)
+				if (this.Optional ?? false)
 					return "bool?";
 				else
 					return "bool";
@@ -58,7 +58,7 @@ namespace Waher.Content.Asn1.Model.Types
 			if (Pass == CSharpExportPass.Explicit)
 			{
 				Output.Append("bool");
-				if (this.Optional.HasValue && this.Optional.Value)
+				if (this.Optional ?? false)
 					Output.Append('?');
 			}
 		

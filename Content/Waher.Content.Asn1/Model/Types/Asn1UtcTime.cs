@@ -24,7 +24,7 @@ namespace Waher.Content.Asn1.Model.Types
 		{
 			get
 			{
-				if (this.Optional.HasValue && this.Optional.Value)
+				if (this.Optional ?? false)
 					return "System.DateTimeOffset?";
 				else
 					return "System.DateTimeOffset";
@@ -43,7 +43,7 @@ namespace Waher.Content.Asn1.Model.Types
 			if (Pass == CSharpExportPass.Explicit)
 			{
 				Output.Append("System.DateTimeOffset");
-				if (this.Optional.HasValue && this.Optional.Value)
+				if (this.Optional ?? false)
 					Output.Append('?');
 			}
 		

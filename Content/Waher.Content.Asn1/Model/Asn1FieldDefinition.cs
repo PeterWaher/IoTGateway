@@ -73,6 +73,11 @@ namespace Waher.Content.Asn1.Model
 			internal set => this.tag = value;
 		}
 
+		/// <summary>
+		/// If the node is optional
+		/// </summary>
+		public override bool? Optional => this.type.Optional;
+
 		/// <inheritdoc/>
 		public override string ToString()
 		{
@@ -141,15 +146,23 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportReadCSharp(StringBuilder Output,
 			CSharpExportState State, int Indent, string MemberOf)
 		{
-			JSON.Indent(Output, Indent);
-			Output.Append(MemberOf);
-			Output.Append('.');
-			Output.Append(ToCSharp(this.fieldName));
-			Output.Append(" = ");
+			if (this.type.Optional ?? false)
+			{
+				await this.ExportTryReadCSharp(Output, State, Indent, string.Empty,
+					MemberOf + "." + ToCSharp(this.fieldName));
+			}
+			else
+			{
+				JSON.Indent(Output, Indent);
+				Output.Append(MemberOf);
+				Output.Append('.');
+				Output.Append(ToCSharp(this.fieldName));
+				Output.Append(" = ");
 
-			await this.type.ExportReadCSharp(Output, State, Indent + 1, string.Empty);
-			
-			Output.AppendLine(";");
+				await this.type.ExportReadCSharp(Output, State, Indent + 1, string.Empty);
+
+				Output.AppendLine(";");
+			}
 		}
 
 		/// <summary>
@@ -164,18 +177,30 @@ namespace Waher.Content.Asn1.Model
 			CSharpExportState State, int Indent, string MemberOf, string ItemName)
 		{
 			JSON.Indent(Output, Indent);
-			Output.Append(MemberOf);
-			Output.Append('.');
-			Output.Append(ToCSharp(this.fieldName));
-			Output.Append(" = ");
 
-			if (!string.IsNullOrEmpty(ItemName))
+			if (string.IsNullOrEmpty(ItemName))
 			{
-				Output.Append(ItemName);
-				Output.Append(" = ");
+				await this.type.ExportTryReadCSharp(Output, State, Indent, string.Empty, 
+					MemberOf + "." + ToCSharp(this.fieldName));
+			}
+			else
+			{
+				await this.type.ExportTryReadCSharp(Output, State, Indent, string.Empty,
+					ItemName);
+
+				if (!string.IsNullOrEmpty(MemberOf))
+				{
+					Output.AppendLine(";");
+
+					JSON.Indent(Output, Indent);
+					Output.Append(MemberOf);
+					Output.Append('.');
+					Output.Append(ToCSharp(this.fieldName));
+					Output.Append(" = ");
+					Output.Append(ItemName);
+				}
 			}
 
-			await this.type.ExportTryReadCSharp(Output, State, Indent + 1, string.Empty, string.Empty);
 			Output.AppendLine(";");
 		}
 

@@ -65,6 +65,11 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Node Parent => this.parent;
 
 		/// <summary>
+		/// If the node is optional
+		/// </summary>
+		public virtual bool? Optional => false;
+
+		/// <summary>
 		/// Sets the parent reference.
 		/// </summary>
 		/// <param name="Parent"></param>

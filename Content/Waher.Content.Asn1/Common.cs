@@ -21,7 +21,7 @@ namespace Waher.Content.Asn1
 	/// <param name="Reader">ASN.1 reader object.</param>
 	/// <param name="Item">Item read, if successful.</param>
 	/// <returns>If able to read item.</returns>
-	public delegate bool TryReadNullableItem<T>(AsnReader Reader, out Nullable<T> Item)
+	public delegate bool TryReadNullableItem<T>(AsnReader Reader, out T? Item)
 		where T : struct;
 
 	/// <summary>

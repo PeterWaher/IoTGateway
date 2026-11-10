@@ -115,6 +115,11 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
+		/// If the node is optional
+		/// </summary>
+		public override bool? Optional => this.definition.Optional;
+
+		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>

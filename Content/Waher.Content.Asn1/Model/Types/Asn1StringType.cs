@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
@@ -37,6 +37,28 @@ namespace Waher.Content.Asn1.Model.Types
 		/// Corresponding C# type.
 		/// </summary>
 		public override string CSharpType => "string";
+		
+		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags => acceptedTags;
+
+		private static readonly Asn1Tag[] acceptedTags = new Asn1Tag[]
+		{
+			new Asn1Tag(UniversalTagNumber.ObjectDescriptor),
+			new Asn1Tag(UniversalTagNumber.UTF8String),
+			new Asn1Tag(UniversalTagNumber.NumericString),
+			new Asn1Tag(UniversalTagNumber.PrintableString),
+			new Asn1Tag(UniversalTagNumber.TeletexString),
+			new Asn1Tag(UniversalTagNumber.VideotexString),
+			new Asn1Tag(UniversalTagNumber.IA5String),
+			new Asn1Tag(UniversalTagNumber.GraphicString),
+			new Asn1Tag(UniversalTagNumber.VisibleString),
+			new Asn1Tag(UniversalTagNumber.GeneralString),
+			new Asn1Tag(UniversalTagNumber.UniversalString),
+			new Asn1Tag(UniversalTagNumber.UnrestrictedCharacterString),
+			new Asn1Tag(UniversalTagNumber.BMPString)
+		};
 
 		/// <summary>
 		/// Exports to C#
@@ -54,16 +76,43 @@ namespace Waher.Content.Asn1.Model.Types
 		}
 
 		/// <summary>
+		/// Type of string
+		/// </summary>
+		public abstract UniversalTagNumber StringTag { get; }
+
+		/// <summary>
 		/// Exports read logic to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
-			int Indent, string MemberOf)
+			int Indent, string MemberOf, int Index)
 		{
-			Output.Append("Asn1.Common.ReadString(Reader)");
+			Output.Append("Asn1.Common.ReadString");
+
+			if (this.Tags.HasValue)
+				Output.Append(this.Tags.Value.ToString());
+
+			Output.Append("(Reader");
+
+			if (this.Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			if (this.Tags.HasValue && this.Tags.Value != Asn1Tags.Explicit)
+			{
+				Output.Append(", ");
+				Output.Append("Asn1F.UniversalTagNumber.");
+				Output.Append(this.StringTag.ToString());
+			}
+
+			Output.Append(')');
+
 			return Task.CompletedTask;
 		}
 
@@ -75,10 +124,32 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
 		/// <param name="ItemName">Name of item variable.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+			CSharpExportState State, int Indent, string MemberOf, string ItemName, 
+			int Index)
 		{
-			Output.Append("Asn1.Common.TryReadString(Reader, out ");
+			Output.Append("Asn1.Common.TryReadString");
+
+			if (this.Tags.HasValue)
+				Output.Append(this.Tags.Value.ToString());
+
+			Output.Append("(Reader");
+
+			if (this.Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			if (this.Tags.HasValue && this.Tags.Value != Asn1Tags.Explicit)
+			{
+				Output.Append(", ");
+				Output.Append("Asn1F.UniversalTagNumber.");
+				Output.Append(this.StringTag.ToString());
+			}
+
+			Output.Append(", out ");
 
 			if (string.IsNullOrEmpty(ItemName))
 				Output.Append("var Item) ? Item : null");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Formats.Asn1;
 using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,6 +28,16 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Value
 		/// </summary>
 		public double Value => this.value;
+
+		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags => acceptedTags;
+
+		private static readonly Asn1Tag[] acceptedTags = new Asn1Tag[]
+		{
+			new Asn1Tag(UniversalTagNumber.Real)
+		};
 
 		/// <summary>
 		/// Makes the value 2^value, for use with <see cref="System.FlagsAttribute"/>

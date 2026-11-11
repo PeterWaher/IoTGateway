@@ -27,7 +27,7 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
-		/// Type definition
+		/// How tags are encoded
 		/// </summary>
 		public Asn1Tags? Tags
 		{

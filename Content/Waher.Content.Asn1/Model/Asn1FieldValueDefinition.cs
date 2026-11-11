@@ -70,7 +70,7 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Type Type => this.type;
 
 		/// <summary>
-		/// Type definition
+		/// Value
 		/// </summary>
 		public Asn1Value Value => this.value;
 

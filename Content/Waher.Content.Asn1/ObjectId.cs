@@ -12,6 +12,20 @@ namespace Waher.Content.Asn1
 		/// <summary>
 		/// ASN.1 Object identifier
 		/// </summary>
+		/// <param name="Oid">Object Identifier</param>
+		public ObjectId(string Oid)
+		{
+			string[] Segments = Oid.Split('.');
+			int i, c = Segments.Length;
+			this.segments = new uint[c];
+
+			for (i = 0; i < c; i++)
+				this.segments[i] = uint.Parse(Segments[i]);
+		}
+
+		/// <summary>
+		/// ASN.1 Object identifier
+		/// </summary>
 		/// <param name="Segments">Segments</param>
 		public ObjectId(params uint[] Segments)
 		{

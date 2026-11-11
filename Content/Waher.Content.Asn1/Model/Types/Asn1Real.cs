@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Formats.Asn1;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
 
@@ -47,6 +48,16 @@ namespace Waher.Content.Asn1.Model.Types
 		}
 
 		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags => acceptedTags;
+
+		private static readonly Asn1Tag[] acceptedTags = new Asn1Tag[]
+		{
+			new Asn1Tag(UniversalTagNumber.Real)
+		};
+
+		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
@@ -72,10 +83,25 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
-			int Indent, string MemberOf)
+			int Indent, string MemberOf, int Index)
 		{
-			Output.Append("Asn1.Common.ReadReal(Reader)");
+			Output.Append("Asn1.Common.ReadReal");
+
+			if (this.Tags.HasValue)
+				Output.Append(this.Tags.Value.ToString());
+
+			Output.Append("(Reader");
+
+			if (this.Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			Output.Append(')');
+
 			return Task.CompletedTask;
 		}
 
@@ -87,10 +113,25 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
 		/// <param name="ItemName">Name of item variable.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+			CSharpExportState State, int Indent, string MemberOf, string ItemName,
+			int Index)
 		{
-			Output.Append("Asn1.Common.TryReadReal(Reader, out ");
+			Output.Append("Asn1.Common.TryReadReal");
+
+			if (this.Tags.HasValue)
+				Output.Append(this.Tags.Value.ToString());
+
+			Output.Append("(Reader");
+
+			if (this.Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			Output.Append(", out ");
 
 			if (string.IsNullOrEmpty(ItemName))
 				Output.Append("var Item) ? Item : null");

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Formats.Asn1;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Collections;
 
@@ -31,6 +32,16 @@ namespace Waher.Content.Asn1.Model
 		/// If the named node represents a type.
 		/// </summary>
 		public bool IsType => true;
+
+		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags => acceptedTags;
+
+		private static readonly Asn1Tag[] acceptedTags = new Asn1Tag[]
+		{
+			new Asn1Tag(UniversalTagNumber.Sequence)
+		};
 
 		/// <summary>
 		/// Gets the fully qualified name, in reverse order.
@@ -89,6 +100,8 @@ namespace Waher.Content.Asn1.Model
 
 				if (Pass == CSharpExportPass.Implicit || Pass == CSharpExportPass.Explicit)
 				{
+					// Class definition
+
 					JSON.Indent(Output, Indent);
 					Output.Append("public partial class ");
 					Output.Append(ToCSharp(this.Name));
@@ -99,6 +112,8 @@ namespace Waher.Content.Asn1.Model
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
 
+					// Properties
+
 					Indent++;
 
 					foreach (Asn1Node Node in this.Nodes)
@@ -106,6 +121,8 @@ namespace Waher.Content.Asn1.Model
 
 					foreach (Asn1Node Node in this.Nodes)
 						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
+
+					// public static T Create(Reader)
 
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
@@ -135,6 +152,8 @@ namespace Waher.Content.Asn1.Model
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("}");
 
+					// public void Read(Reader)
+
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
 					Output.Append("public void ");
@@ -147,13 +166,17 @@ namespace Waher.Content.Asn1.Model
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("Asn1F.AsnReader Reader = Reader0.ReadSequence();");
 
+					int Index = 0;
+
 					foreach (Asn1Node Node in this.Nodes)
-						await Node.ExportReadCSharp(Output, State, Indent, "this");
+						await Node.ExportReadCSharp(Output, State, Indent, "this", Index++);
 
 					Indent--;
 
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("}");
+
+					// public static T TryCreate(Reader, out Result)
 
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
@@ -199,6 +222,8 @@ namespace Waher.Content.Asn1.Model
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("}");
 
+					// public void Write(Writer)
+
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("public void Write(Asn1F.AsnWriter Writer)");
@@ -230,8 +255,9 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
-			int Indent, string MemberOf)
+			int Indent, string MemberOf, int Index)
 		{
 			Output.Append(ToCSharp(State, this, this.Name));
 			if (!this.TypeDefinition)
@@ -248,8 +274,10 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
 		/// <param name="ItemName">Name of item variable.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+			CSharpExportState State, int Indent, string MemberOf, string ItemName, 
+			int Index)
 		{
 			Output.Append(ToCSharp(State, this, this.Name));
 			if (!this.TypeDefinition)

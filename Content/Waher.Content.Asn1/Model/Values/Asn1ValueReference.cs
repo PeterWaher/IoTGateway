@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Types;
@@ -42,6 +43,20 @@ namespace Waher.Content.Asn1.Model.Values
 				Output.Append(ToCSharp(State, this, this.identifier));
 
 			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags
+		{
+			get
+			{
+				if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+					return Node.AcceptedTags;
+				else
+					return base.AcceptedTags;
+			}
 		}
 
 		/// <summary>

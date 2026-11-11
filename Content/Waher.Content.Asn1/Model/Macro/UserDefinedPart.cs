@@ -48,7 +48,7 @@
 			switch (this.identifier.ToLower())
 			{
 				case "empty": return null;
-				case "type": return Document.ParseType(this.identifier, false);
+				case "type": return Document.ParseType(this.identifier, false, null);
 				case "value": return Document.ParseValue();
 				default: throw Document.SyntaxError("Supporting syntax for " + this.identifier + " not found.");
 			}

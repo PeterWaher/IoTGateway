@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Formats.Asn1;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
 
@@ -38,6 +39,22 @@ namespace Waher.Content.Asn1.Model.Types
 					return TypeDef.CSharpType;
 				else
 					return ToCSharp(this.identifier);
+			}
+		}
+
+		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags
+		{
+			get
+			{
+				if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
+					return TypeDef.AcceptedTags;
+				else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+					return Node.AcceptedTags;
+				else
+					return base.AcceptedTags;
 			}
 		}
 
@@ -101,13 +118,21 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
-			int Indent, string MemberOf)
+			int Indent, string MemberOf, int Index)
 		{
-			if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
-				return TypeDef.ExportReadCSharp(Output, State, Indent, MemberOf);
-			else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
-				return Node.ExportReadCSharp(Output, State, Indent, MemberOf);
+			if (this.Document.aliases.TryGetValue(this.identifier,
+				out Asn1TypeDefinition TypeDef))
+			{
+				return TypeDef.ExportReadCSharp(Output, State, Indent, MemberOf,
+					Index);
+			}
+			else if (this.Document.namedNodes.TryGetValue(this.identifier,
+				out Asn1Node Node))
+			{
+				return Node.ExportReadCSharp(Output, State, Indent, MemberOf, Index);
+			}
 			else
 			{
 				Output.Append(ToCSharp(State, this, this.identifier));
@@ -125,13 +150,23 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
 		/// <param name="ItemName">Name of item variable.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+			CSharpExportState State, int Indent, string MemberOf, string ItemName, 
+			int Index)
 		{
-			if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
-				return TypeDef.ExportTryReadCSharp(Output, State, Indent, MemberOf, ItemName);
-			else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
-				return Node.ExportTryReadCSharp(Output, State, Indent, MemberOf, ItemName);
+			if (this.Document.aliases.TryGetValue(this.identifier,
+				out Asn1TypeDefinition TypeDef))
+			{
+				return TypeDef.ExportTryReadCSharp(Output, State, Indent, MemberOf,
+					ItemName, Index);
+			}
+			else if (this.Document.namedNodes.TryGetValue(this.identifier,
+				out Asn1Node Node))
+			{
+				return Node.ExportTryReadCSharp(Output, State, Indent, MemberOf, 
+					ItemName, Index);
+			}
 			else
 			{
 				if (string.IsNullOrEmpty(ItemName))

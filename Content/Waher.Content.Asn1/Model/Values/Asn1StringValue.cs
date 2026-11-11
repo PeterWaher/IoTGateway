@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Formats.Asn1;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Waher.Content.Asn1.Model.Values
@@ -25,6 +26,28 @@ namespace Waher.Content.Asn1.Model.Values
 		/// Value
 		/// </summary>
 		public string Value => this.value;
+
+		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags => acceptedTags;
+
+		private static readonly Asn1Tag[] acceptedTags = new Asn1Tag[]
+		{
+			new Asn1Tag(UniversalTagNumber.ObjectDescriptor),
+			new Asn1Tag(UniversalTagNumber.UTF8String),
+			new Asn1Tag(UniversalTagNumber.NumericString),
+			new Asn1Tag(UniversalTagNumber.PrintableString),
+			new Asn1Tag(UniversalTagNumber.TeletexString),
+			new Asn1Tag(UniversalTagNumber.VideotexString),
+			new Asn1Tag(UniversalTagNumber.IA5String),
+			new Asn1Tag(UniversalTagNumber.GraphicString),
+			new Asn1Tag(UniversalTagNumber.VisibleString),
+			new Asn1Tag(UniversalTagNumber.GeneralString),
+			new Asn1Tag(UniversalTagNumber.UniversalString),
+			new Asn1Tag(UniversalTagNumber.UnrestrictedCharacterString),
+			new Asn1Tag(UniversalTagNumber.BMPString)
+		};
 
 		/// <summary>
 		/// Exports to C#

@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Asn1.Exceptions;
 using Waher.Content.Asn1.Model.Macro;
+using Waher.Content.Asn1.Model.Types;
 using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1.Model
@@ -119,6 +122,8 @@ namespace Waher.Content.Asn1.Model
 
 				if (Pass == CSharpExportPass.Implicit || Pass == CSharpExportPass.Explicit)
 				{
+					// Class definition
+
 					JSON.Indent(Output, Indent);
 					Output.Append("public partial class ");
 					Output.Append(ToCSharp(this.Name));
@@ -128,6 +133,8 @@ namespace Waher.Content.Asn1.Model
 
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
+
+					// Properties
 
 					Indent++;
 
@@ -171,6 +178,8 @@ namespace Waher.Content.Asn1.Model
 					foreach (Asn1Node Node in this.Nodes)
 						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 
+					// public static T Create(Reader)
+
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
 					Output.Append("public static ");
@@ -199,6 +208,8 @@ namespace Waher.Content.Asn1.Model
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("}");
 
+					// public void Read(Reader)
+
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
 					Output.Append("public void ");
@@ -211,12 +222,118 @@ namespace Waher.Content.Asn1.Model
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("Asn1F.AsnReader Reader = Reader0.ReadSequence();");
 
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("Asn1F.Asn1Tag Tag = Reader.PeekTag();");
+					Output.AppendLine();
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("switch ((int)Tag.TagClass + Tag.TagValue)");
+					
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
+					Indent++;
+
+					Asn1Tag[] AcceptedTags;
+					int Index = 0;
+
+					foreach (Asn1Node Node in this.Nodes)
+					{
+						if (!(Node is Asn1FieldDefinition FieldDef))
+							throw new Exception("Expected ASN.1 field definitions inside CHOICE.");
+
+						Asn1Tags? Tags = this.Tags;
+
+						switch (Tags)
+						{
+							case Asn1Tags.Implicit:
+								AcceptedTags = new Asn1Tag[]
+								{
+									new Asn1Tag(TagClass.ContextSpecific, Index)
+								};
+								break;
+
+							case Asn1Tags.Explicit:
+							case Asn1Tags.Automatic:    // For CHOICE, AUTOMATIC equals EXPLICIT
+								Tags = Asn1Tags.Explicit;
+								AcceptedTags = new Asn1Tag[]
+								{
+									new Asn1Tag(TagClass.ContextSpecific, Index, true)
+								};
+								break;
+
+							default:
+								AcceptedTags = FieldDef.AcceptedTags;
+								break;
+						}
+
+						foreach (Asn1Tag Tag in AcceptedTags)
+						{
+							JSON.Indent(Output, Indent);
+							Output.Append("case ");
+							Output.Append(Tag.TagValue + (int)Tag.TagClass);
+							Output.Append(": // ");
+
+							switch (Tag.TagClass)
+							{
+								case TagClass.Universal:
+									Output.Append(((UniversalTagNumber)Tag.TagValue).ToString());
+									break;
+
+								case TagClass.Application:
+									Output.Append("APPLICATION [");
+									Output.Append(Tag.TagValue);
+									Output.Append(']');
+									break;
+
+								case TagClass.ContextSpecific:
+									Output.Append("CONTEXT SPECIFIC [");
+									Output.Append(Tag.TagValue);
+									Output.Append(']');
+									break;
+
+								case TagClass.Private:
+									Output.Append("PRIVATE [");
+									Output.Append(Tag.TagValue);
+									Output.Append(']');
+									break;
+							}
+							Output.AppendLine();
+						}
+
+						Indent++;
+
+						await Node.ExportReadCSharp(Output, State, Indent, "this", Index);
+
+						JSON.Indent(Output, Indent);
+						Output.Append("this._choice = _Options.");
+						Output.Append(ToCSharp(FieldDef.Name));
+						Output.AppendLine(";");
+
+						JSON.Indent(Output, Indent);
+						Output.AppendLine("break;");
+						Output.AppendLine();
+
+						Indent--;
+					}
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("default:");
+					JSON.Indent(Output, Indent + 1);
+					Output.Append("throw new System.Exception(\"Unexpected tag: \" + ");
+					Output.Append("Tag.TagClass.ToString() + \", \" + ");
+					Output.AppendLine("Tag.TagValue.ToString() + \".\");");
+
+					Indent--;
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
+
 					// TODO: ASN.1 Read method
 
 					Indent--;
 
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("}");
+
+					// public static T TryCreate(Reader, out Result)
 
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
@@ -262,6 +379,8 @@ namespace Waher.Content.Asn1.Model
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("}");
 
+					// public void Write(Writer)
+
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("public void Write(Asn1F.AsnWriter Writer)");
@@ -293,8 +412,9 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
-			int Indent, string MemberOf)
+			int Indent, string MemberOf, int Index)
 		{
 			Output.Append(ToCSharp(State, this, this.Name));
 			if (!this.TypeDefinition)
@@ -311,8 +431,10 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
 		/// <param name="ItemName">Name of item variable.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+			CSharpExportState State, int Indent, string MemberOf, string ItemName, 
+			int Index)
 		{
 			Output.Append(ToCSharp(State, this, this.Name));
 			if (!this.TypeDefinition)
@@ -326,7 +448,7 @@ namespace Waher.Content.Asn1.Model
 				Output.Append(ItemName);
 				Output.Append(')');
 			}
-			
+
 			return Task.CompletedTask;
 		}
 	}

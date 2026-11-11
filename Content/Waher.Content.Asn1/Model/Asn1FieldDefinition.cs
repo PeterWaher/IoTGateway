@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Formats.Asn1;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Types;
 using Waher.Content.Asn1.Model.Values;
@@ -13,7 +14,7 @@ namespace Waher.Content.Asn1.Model
 	{
 		private readonly string fieldName;
 		private readonly Asn1Type type;
-		private int? tag;
+		private Asn1Tag? tag;
 
 		/// <summary>
 		/// Represents an ASN.1 field definition.
@@ -22,7 +23,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Tag">Tag</param>
 		/// <param name="Type">Type.</param>
 		/// <param name="Document">ASN.1 document hosting the node.</param>
-		public Asn1FieldDefinition(string FieldName, int? Tag, Asn1Type Type,
+		public Asn1FieldDefinition(string FieldName, Asn1Tag? Tag, Asn1Type Type,
 			Asn1Document Document)
 			: base(Document)
 		{
@@ -44,7 +45,7 @@ namespace Waher.Content.Asn1.Model
 		public bool IsType => false;
 
 		/// <summary>
-		/// Type
+		/// ASN.1 type reference.
 		/// </summary>
 		public Asn1Type Type => this.type;
 
@@ -65,12 +66,27 @@ namespace Waher.Content.Asn1.Model
 		public bool MustBeQualified => false;
 
 		/// <summary>
-		/// Tag
+		/// Accepted ASN.1 tags
 		/// </summary>
-		public int? Tag
+		public override Asn1Tag[] AcceptedTags
 		{
-			get => this.tag;
-			internal set => this.tag = value;
+			get
+			{
+				if (!this.tag.HasValue)
+					return this.type.AcceptedTags;
+
+				ChunkedList<Asn1Tag> Tags = new ChunkedList<Asn1Tag>();
+				Tags.AddRange(this.type.AcceptedTags);
+				if (!Tags.Contains(this.tag.Value))
+					Tags.Add(this.tag.Value);
+
+				return Tags.ToArray();
+			}
+		}
+
+		internal void SetTag(Asn1Tag? Tag)
+		{
+			this.tag = Tag;
 		}
 
 		/// <summary>
@@ -143,13 +159,14 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
 		public override async Task ExportReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf)
+			CSharpExportState State, int Indent, string MemberOf, int Index)
 		{
 			if (this.type.Optional ?? false)
 			{
 				await this.ExportTryReadCSharp(Output, State, Indent, string.Empty,
-					MemberOf + "." + ToCSharp(this.fieldName));
+					MemberOf + "." + ToCSharp(this.fieldName), Index);
 			}
 			else
 			{
@@ -159,7 +176,8 @@ namespace Waher.Content.Asn1.Model
 				Output.Append(ToCSharp(this.fieldName));
 				Output.Append(" = ");
 
-				await this.type.ExportReadCSharp(Output, State, Indent + 1, string.Empty);
+				await this.type.ExportReadCSharp(Output, State, Indent + 1, string.Empty, 
+					Index);
 
 				Output.AppendLine(";");
 			}
@@ -173,20 +191,22 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
 		/// <param name="ItemName">Name of item variable.</param>
+		/// <param name="Index">Item index.</param>
 		public override async Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+			CSharpExportState State, int Indent, string MemberOf, string ItemName, 
+			int Index)
 		{
 			JSON.Indent(Output, Indent);
 
 			if (string.IsNullOrEmpty(ItemName))
 			{
 				await this.type.ExportTryReadCSharp(Output, State, Indent, string.Empty, 
-					MemberOf + "." + ToCSharp(this.fieldName));
+					MemberOf + "." + ToCSharp(this.fieldName), Index);
 			}
 			else
 			{
 				await this.type.ExportTryReadCSharp(Output, State, Indent, string.Empty,
-					ItemName);
+					ItemName, Index);
 
 				if (!string.IsNullOrEmpty(MemberOf))
 				{
@@ -210,9 +230,11 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Output">C# Output.</param>
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
-		public override Task ExportWriteCSharp(StringBuilder Output, CSharpExportState State, int Indent)
+		/// <param name="Index">Item index.</param>
+		public override Task ExportWriteCSharp(StringBuilder Output, 
+			CSharpExportState State, int Indent, int Index)
 		{
-			return base.ExportWriteCSharp(Output, State, Indent);	// TODO
+			return base.ExportWriteCSharp(Output, State, Indent, Index);	// TODO
 		}
 	}
 }

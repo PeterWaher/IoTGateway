@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Formats.Asn1;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
 using Waher.Content.Asn1.Model.Types;
@@ -13,7 +14,7 @@ namespace Waher.Content.Asn1.Model
 	{
 		private readonly string typeName;
 		private readonly Asn1Type definition;
-		private readonly int? tag;
+		private readonly Asn1Tag? tag;
 
 		/// <summary>
 		/// Represents an ASN.1 Type definition.
@@ -22,7 +23,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Tag">Tag</param>
 		/// <param name="Definition">Definition</param>
 		/// <param name="Document">ASN.1 document hosting the node.</param>
-		public Asn1TypeDefinition(string TypeName, int? Tag, Asn1Type Definition,
+		public Asn1TypeDefinition(string TypeName, Asn1Tag? Tag, Asn1Type Definition,
 			Asn1Document Document)
 			: base(Document)
 		{
@@ -60,10 +61,25 @@ namespace Waher.Content.Asn1.Model
 		/// </summary>
 		public bool MustBeQualified => false;
 
+
 		/// <summary>
-		/// Tag
+		/// Accepted ASN.1 tags
 		/// </summary>
-		public int? Tag => this.tag;
+		public override Asn1Tag[] AcceptedTags
+		{
+			get
+			{
+				if (!this.tag.HasValue)
+					return this.definition.AcceptedTags;
+
+				ChunkedList<Asn1Tag> Tags = new ChunkedList<Asn1Tag>();
+				Tags.AddRange(this.definition.AcceptedTags);
+				if (!Tags.Contains(this.tag.Value))
+					Tags.Add(this.tag.Value);
+
+				return Tags.ToArray();
+			}
+		}
 
 		/// <summary>
 		/// Type definition
@@ -79,9 +95,34 @@ namespace Waher.Content.Asn1.Model
 
 			if (this.tag.HasValue)
 			{
-				sb.Append(" [");
-				sb.Append(this.tag.Value.ToString());
-				sb.Append(']');
+				int TagNr = this.tag.Value.TagValue;
+
+				switch (this.tag.Value.TagClass)
+				{
+					case TagClass.Universal:
+						sb.Append(' ');
+						sb.Append((UniversalTagNumber)TagNr);
+						break;
+
+					case TagClass.Application:
+						sb.Append(" [APPLICATION ");
+						sb.Append(TagNr.ToString());
+						sb.Append(']');
+						break;
+
+					case TagClass.Private:
+						sb.Append(" [PRIVATE ");
+						sb.Append(TagNr.ToString());
+						sb.Append(']');
+						break;
+
+					case TagClass.ContextSpecific:
+						sb.Append(" [CONTEXT SPECIFIC ");
+						sb.Append(TagNr.ToString());
+						sb.Append(']');
+						break;
+
+				}
 			}
 
 			return sb.ToString();
@@ -145,10 +186,11 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
-			int Indent, string MemberOf)
+			int Indent, string MemberOf, int Index)
 		{
-			return this.definition.ExportReadCSharp(Output, State, Indent, MemberOf);
+			return this.definition.ExportReadCSharp(Output, State, Indent, MemberOf, Index);
 		}
 
 		/// <summary>
@@ -159,10 +201,13 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
 		/// <param name="ItemName">Name of item variable.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+			CSharpExportState State, int Indent, string MemberOf, string ItemName, 
+			int Index)
 		{
-			return this.definition.ExportTryReadCSharp(Output, State, Indent, MemberOf, ItemName);
+			return this.definition.ExportTryReadCSharp(Output, State, Indent, MemberOf, 
+				ItemName, Index);
 		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Collections;
@@ -68,6 +69,11 @@ namespace Waher.Content.Asn1.Model
 		/// If the node is optional
 		/// </summary>
 		public virtual bool? Optional => false;
+
+		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public virtual Asn1Tag[] AcceptedTags => Array.Empty<Asn1Tag>();
 
 		/// <summary>
 		/// Sets the parent reference.
@@ -191,8 +197,9 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
 		public virtual Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
-			int Indent, string MemberOf)
+			int Indent, string MemberOf, int Index)
 		{
 			throw new NotImplementedException("Read operation for objects of type " +
 				this.GetType().FullName + " not implemented.");
@@ -206,8 +213,10 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
 		/// <param name="ItemName">Name of item variable.</param>
+		/// <param name="Index">Item index.</param>
 		public virtual Task ExportTryReadCSharp(StringBuilder Output, 
-			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+			CSharpExportState State, int Indent, string MemberOf, string ItemName, 
+			int Index)
 		{
 			throw new NotImplementedException("Optional read operation for objects of type " +
 				this.GetType().FullName + " not implemented.");
@@ -219,8 +228,9 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Output">C# Output.</param>
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
+		/// <param name="Index">Item index.</param>
 		public virtual Task ExportWriteCSharp(StringBuilder Output, CSharpExportState State,
-			int Indent)
+			int Indent, int Index)
 		{
 			throw new NotImplementedException("Write operation for objects of type " +
 				this.GetType().FullName + " not implemented.");

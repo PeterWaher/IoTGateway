@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Formats.Asn1;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Waher.Content.Asn1.Model.Values
@@ -26,6 +27,16 @@ namespace Waher.Content.Asn1.Model.Values
 		/// OID values.
 		/// </summary>
 		public Asn1Node[] Values => this.values;
+
+		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags => acceptedTags;
+
+		private static readonly Asn1Tag[] acceptedTags = new Asn1Tag[]
+		{
+			new Asn1Tag(UniversalTagNumber.ObjectIdentifier)
+		};
 
 		/// <summary>
 		/// Exports to C#

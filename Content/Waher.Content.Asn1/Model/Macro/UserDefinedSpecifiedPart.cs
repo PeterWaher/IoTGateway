@@ -42,7 +42,7 @@
 		{
 			switch (this.Identifier.ToUpper())
 			{
-				case "TYPE": return Document.ParseType(this.Identifier, false);
+				case "TYPE": return Document.ParseType(this.Identifier, false, null);
 				case "VALUE": return Document.ParseValue();
 				default: return this.type.Parse(Document, Macro);
 			}

@@ -1,4 +1,6 @@
-﻿namespace Waher.Content.Asn1.Model.Types
+﻿using System.Formats.Asn1;
+
+namespace Waher.Content.Asn1.Model.Types
 {
 	/// <summary>
 	/// UTF8String
@@ -15,5 +17,10 @@
 			: base(Document)
 		{
 		}
+
+		/// <summary>
+		/// Type of string
+		/// </summary>
+		public override UniversalTagNumber StringTag => UniversalTagNumber.UTF8String;
 	}
 }

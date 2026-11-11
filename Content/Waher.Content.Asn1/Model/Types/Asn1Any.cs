@@ -74,10 +74,25 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
-			int Indent, string MemberOf)
+			int Indent, string MemberOf, int Index)
 		{
-			Output.Append("Asn1.Common.ReadAny(Reader)");
+			Output.Append("Asn1.Common.ReadAny");
+
+			if (this.Tags.HasValue)
+				Output.Append(this.Tags.Value.ToString());
+
+			Output.Append("(Reader");
+
+			if (this.Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			Output.Append(')');
+
 			return Task.CompletedTask;
 		}
 
@@ -89,10 +104,25 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
 		/// <param name="ItemName">Name of item variable.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+			CSharpExportState State, int Indent, string MemberOf, string ItemName,
+			int Index)
 		{
-			Output.Append("Asn1.Common.TryReadAny(Reader, out ");
+			Output.Append("Asn1.Common.TryReadAny");
+
+			if (this.Tags.HasValue)
+				Output.Append(this.Tags.Value.ToString());
+
+			Output.Append("(Reader");
+
+			if (this.Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			Output.Append(", out ");
 			
 			if (string.IsNullOrEmpty(ItemName))
 				Output.Append("var Item) ? Item : null");

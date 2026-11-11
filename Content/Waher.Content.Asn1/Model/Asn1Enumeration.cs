@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Values;
@@ -92,6 +93,17 @@ namespace Waher.Content.Asn1.Model
 				return s;
 			}
 		}
+
+		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags => acceptedTags;
+
+		private static readonly Asn1Tag[] acceptedTags = new Asn1Tag[]
+		{
+			new Asn1Tag(UniversalTagNumber.Enumerated),
+			new Asn1Tag(UniversalTagNumber.Integer)
+		};
 
 		/// <summary>
 		/// Exports to C#
@@ -209,14 +221,29 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
-			int Indent, string MemberOf)
+			int Indent, string MemberOf, int Index)
 		{
-			Output.Append("Asn1.Common.ReadEnumeration<");
+			Output.Append("Asn1.Common.ReadEnumeration");
+
+			if (this.Tags.HasValue)
+				Output.Append(this.Tags.Value.ToString());
+
+			Output.Append('<');
 			Output.Append(ToCSharp(State, this, this.Name));
 			if (!this.TypeDefinition)
 				Output.Append("Enum");
-			Output.Append(">(Reader)");
+			Output.Append(">(Reader");
+
+			if (this.Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			Output.Append(')');
+
 			return Task.CompletedTask;
 		}
 
@@ -228,17 +255,32 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
 		/// <param name="ItemName">Name of item variable.</param>
+		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string ItemName)
+			CSharpExportState State, int Indent, string MemberOf, string ItemName,
+			int Index)
 		{
-			Output.Append("Asn1.Common.TryReadEnumeration<");
+			Output.Append("Asn1.Common.TryReadEnumeration");
+
+			if (this.Tags.HasValue)
+				Output.Append(this.Tags.Value.ToString());
+
+			Output.Append('<');
 			Output.Append(ToCSharp(State, this, this.Name));
 			if (!this.TypeDefinition)
 				Output.Append("Enum");
-			Output.Append(">(Reader, out ");
+			Output.Append(">(Reader");
+
+			if (this.Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			Output.Append(", out ");
 
 			if (string.IsNullOrEmpty(ItemName))
-				Output.Append("var Item) ? Item : default");
+				Output.Append("var Item) ? Item : null");
 			else
 			{
 				Output.Append(ItemName);

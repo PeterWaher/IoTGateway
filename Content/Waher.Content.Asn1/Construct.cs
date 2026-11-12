@@ -25,10 +25,28 @@ namespace Waher.Content.Asn1
 		where T : struct;
 
 	/// <summary>
-	/// Common ASN.1 input/output methods.
+	/// Abstract base class for ASN.1 constructs
 	/// </summary>
-	public static class Common
+	public abstract class Construct
 	{
+		#region Tags
+
+		/// <summary>
+		/// Converts an ASN.1 tag to an integer.
+		/// </summary>
+		/// <param name="Tag">ASN.1 Tag</param>
+		/// <returns>Integer</returns>
+		public static int ToInt32(Asn1Tag Tag)
+		{
+			int Result = (int)Tag.TagClass;
+			Result |= Tag.TagValue;
+			if (Tag.IsConstructed)
+				Result |= 0x20;
+			return Result;
+		}
+
+		#endregion
+
 		#region Any
 
 		/// <summary>

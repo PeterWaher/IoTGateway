@@ -1,10 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content.Asn1.Exceptions;
 using Waher.Content.Asn1.Model.Macro;
-using Waher.Content.Asn1.Model.Types;
 using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1.Model
@@ -96,6 +95,27 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags
+		{
+			get
+			{
+				SortedDictionary<int, Asn1Tag> Tags = new SortedDictionary<int, Asn1Tag>();
+
+				foreach (Asn1Node Node in this.Nodes)
+				{
+					foreach (Asn1Tag Tag in Node.AcceptedTags)
+						Tags[Construct.ToInt32(Tag)] = Tag;
+				}
+
+				Asn1Tag[] Result = new Asn1Tag[Tags.Count];
+				Tags.Values.CopyTo(Result, 0);
+				return Result;
+			}
+		}
+
+		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
@@ -129,7 +149,7 @@ namespace Waher.Content.Asn1.Model
 					Output.Append(ToCSharp(this.Name));
 					if (!this.TypeDefinition)
 						Output.Append("Choice");
-					Output.AppendLine();
+					Output.AppendLine(" : Asn1.Construct");
 
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
@@ -213,21 +233,18 @@ namespace Waher.Content.Asn1.Model
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
 					Output.Append("public void ");
-					Output.AppendLine(" Read(Asn1F.AsnReader Reader0)");
+					Output.AppendLine(" Read(Asn1F.AsnReader Reader)");
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
 
 					Indent++;
 
 					JSON.Indent(Output, Indent);
-					Output.AppendLine("Asn1F.AsnReader Reader = Reader0.ReadSequence();");
-
-					JSON.Indent(Output, Indent);
 					Output.AppendLine("Asn1F.Asn1Tag Tag = Reader.PeekTag();");
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
-					Output.AppendLine("switch ((int)Tag.TagClass + Tag.TagValue)");
-					
+					Output.AppendLine("switch (ToInt32(Tag))");
+
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
 					Indent++;
@@ -301,7 +318,7 @@ namespace Waher.Content.Asn1.Model
 
 						Indent++;
 
-						await Node.ExportReadCSharp(Output, State, Indent, "this", Index);
+						await Node.ExportReadCSharp(Output, State, Indent, "this", Index++);
 
 						JSON.Indent(Output, Indent);
 						Output.Append("this._choice = _Options.");
@@ -318,7 +335,7 @@ namespace Waher.Content.Asn1.Model
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("default:");
 					JSON.Indent(Output, Indent + 1);
-					Output.Append("throw new System.Exception(\"Unexpected tag: \" + ");
+					Output.Append("throw new Asn1F.AsnContentException(\"Unexpected tag: \" + ");
 					Output.Append("Tag.TagClass.ToString() + \", \" + ");
 					Output.AppendLine("Tag.TagValue.ToString() + \".\");");
 
@@ -337,7 +354,7 @@ namespace Waher.Content.Asn1.Model
 
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
-					Output.Append("public static bool TryCreate(Asn1F.AsnReader Reader0, out ");
+					Output.Append("public static bool TryCreate(Asn1F.AsnReader Reader, out ");
 					Output.Append(ToCSharp(State, this, this.Name));
 					if (!this.TypeDefinition)
 						Output.Append("Choice");
@@ -348,18 +365,11 @@ namespace Waher.Content.Asn1.Model
 					Indent++;
 
 					JSON.Indent(Output, Indent);
-					Output.AppendLine("Asn1F.AsnReader Reader = Asn1.Common.TryReadInnerVector(Reader0);");
-					JSON.Indent(Output, Indent);
-					Output.AppendLine("if (Reader is null)");
+					Output.AppendLine("try");
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
-					JSON.Indent(Output, Indent + 1);
-					Output.AppendLine("_Result = null;");
-					JSON.Indent(Output, Indent + 1);
-					Output.AppendLine("return false;");
-					JSON.Indent(Output, Indent);
-					Output.AppendLine("}");
-					Output.AppendLine();
+
+					Indent++;
 
 					JSON.Indent(Output, Indent);
 					Output.Append("_Result = new ");
@@ -373,6 +383,27 @@ namespace Waher.Content.Asn1.Model
 
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("return true;");
+
+					Indent--;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("catch (System.Exception)");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
+
+					Indent++;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("_Result = null;");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("return false;");
+
+					Indent--;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
 
 					Indent--;
 
@@ -433,7 +464,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="ItemName">Name of item variable.</param>
 		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string ItemName, 
+			CSharpExportState State, int Indent, string MemberOf, string ItemName,
 			int Index)
 		{
 			Output.Append(ToCSharp(State, this, this.Name));

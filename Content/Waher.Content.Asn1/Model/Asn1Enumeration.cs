@@ -225,7 +225,7 @@ namespace Waher.Content.Asn1.Model
 		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, string MemberOf, int Index)
 		{
-			Output.Append("Asn1.Common.ReadEnumeration");
+			Output.Append("ReadEnumeration");
 
 			if (this.Tags.HasValue)
 				Output.Append(this.Tags.Value.ToString());
@@ -260,7 +260,7 @@ namespace Waher.Content.Asn1.Model
 			CSharpExportState State, int Indent, string MemberOf, string ItemName,
 			int Index)
 		{
-			Output.Append("Asn1.Common.TryReadEnumeration");
+			Output.Append("TryReadEnumeration");
 
 			if (this.Tags.HasValue)
 				Output.Append(this.Tags.Value.ToString());

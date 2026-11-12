@@ -106,7 +106,7 @@ namespace Waher.Content.Asn1.Model
 					Output.Append(ToCSharp(this.Name));
 					if (!this.TypeDefinition)
 						Output.Append("Set");
-					Output.AppendLine();
+					Output.AppendLine(" : Asn1.Construct");
 
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
@@ -190,7 +190,7 @@ namespace Waher.Content.Asn1.Model
 					Indent++;
 
 					JSON.Indent(Output, Indent);
-					Output.AppendLine("Asn1F.AsnReader Reader = Asn1.Common.TryReadInnerVector(Reader0);");
+					Output.AppendLine("Asn1F.AsnReader Reader = TryReadInnerVector(Reader0);");
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("if (Reader is null)");
 					JSON.Indent(Output, Indent);

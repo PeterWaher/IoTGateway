@@ -90,7 +90,7 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, string MemberOf, int Index)
 		{
-			Output.Append("Asn1.Common.ReadArray<");
+			Output.Append("ReadArray<");
 			Output.Append(this.elementType.CSharpType);
 			Output.Append(">(Reader, (Reader, out _Item) => ");
 			await this.elementType.ExportTryReadCSharp(Output, State, Indent + 1,
@@ -111,7 +111,7 @@ namespace Waher.Content.Asn1.Model
 			CSharpExportState State, int Indent, string MemberOf, string ItemName, 
 			int Index)
 		{
-			Output.Append("Asn1.Common.TryReadArray<");
+			Output.Append("TryReadArray<");
 			Output.Append(this.elementType.CSharpType);
 			Output.Append(">(Reader, (Reader, out _Item) => ");
 

@@ -69,15 +69,10 @@ namespace Waher.Content.Asn1.Model
 		{
 			get
 			{
-				if (!this.tag.HasValue)
+				if (this.tag.HasValue)
+					return new Asn1Tag[] { this.tag.Value };
+				else
 					return this.definition.AcceptedTags;
-
-				ChunkedList<Asn1Tag> Tags = new ChunkedList<Asn1Tag>();
-				Tags.AddRange(this.definition.AcceptedTags);
-				if (!Tags.Contains(this.tag.Value))
-					Tags.Add(this.tag.Value);
-
-				return Tags.ToArray();
 			}
 		}
 

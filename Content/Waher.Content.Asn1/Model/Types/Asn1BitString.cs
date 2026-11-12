@@ -59,7 +59,7 @@ namespace Waher.Content.Asn1.Model.Types
 		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, string MemberOf, int Index)
 		{
-			Output.Append("Asn1.Common.ReadBitString");
+			Output.Append("ReadBitString");
 
 			if (this.Tags.HasValue)
 				Output.Append(this.Tags.Value.ToString());
@@ -90,7 +90,7 @@ namespace Waher.Content.Asn1.Model.Types
 			CSharpExportState State, int Indent, string MemberOf, string ItemName, 
 			int Index)
 		{
-			Output.Append("Asn1.Common.TryReadBitString");
+			Output.Append("TryReadBitString");
 
 			if (this.Tags.HasValue)
 				Output.Append(this.Tags.Value.ToString());

@@ -585,6 +585,8 @@ namespace Waher.Content.Asn1
 
 				if (s2 == "[")
 				{
+					Class = TagClass.ContextSpecific;	// Default class when providing index.
+
 					this.pos++;
 					s2 = this.NextToken();
 

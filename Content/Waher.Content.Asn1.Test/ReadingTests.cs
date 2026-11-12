@@ -11,7 +11,7 @@ namespace Waher.Content.Asn1.Test
 	[TestClass]
 	public class ReadingTests
 	{
-		private static readonly Dictionary<string, Assembly> assemblies = new Dictionary<string, Assembly>();
+		private static readonly Dictionary<string, Assembly> assemblies = [];
 
 		[TestMethod]
 		[DataRow("V06_unicode_DER.bin", AsnEncodingRules.DER)]
@@ -211,7 +211,7 @@ namespace Waher.Content.Asn1.Test
 			Assert.IsNotNull(Create);
 
 			byte[] Bin = await Files.ReadAllBytesAsync(Binary);
-			AsnReader Reader = new AsnReader(Bin, Rules);
+			AsnReader Reader = new(Bin, Rules);
 			object Parsed = Create.Invoke(null, [Reader]);
 			Assert.IsNotNull(Parsed);
 		}

@@ -2815,7 +2815,7 @@ namespace Waher.Content.Asn1
 
 			ChunkedList<T> Items = new ChunkedList<T>();
 
-			while (ReadItem(Inner, out T Item))
+			while (Inner.HasData && ReadItem(Inner, out T Item))
 				Items.Add(Item);
 
 			Result = Items.ToArray();
@@ -2846,7 +2846,7 @@ namespace Waher.Content.Asn1
 
 			ChunkedList<T> Items = new ChunkedList<T>();
 
-			while (ReadItem(Inner, out T Item))
+			while (Inner.HasData && ReadItem(Inner, out T Item))
 				Items.Add(Item);
 
 			return Items.ToArray();
@@ -2872,7 +2872,7 @@ namespace Waher.Content.Asn1
 
 			ChunkedList<T> Items = new ChunkedList<T>();
 
-			while (ReadItem(Inner, out T? Item))
+			while (Inner.HasData && ReadItem(Inner, out T? Item))
 				Items.Add(Item.Value);
 
 			Result = Items.ToArray();
@@ -2905,7 +2905,7 @@ namespace Waher.Content.Asn1
 
 			ChunkedList<T> Items = new ChunkedList<T>();
 
-			while (ReadItem(Inner, out T? Item))
+			while (Inner.HasData && ReadItem(Inner, out T? Item))
 				Items.Add(Item.Value);
 
 			return Items.ToArray();

@@ -48,7 +48,7 @@ namespace Waher.Content.Asn1.Model
 		{
 			get
 			{
-				return "Asn1.Array<" + this.elementType.CSharpType + ">";
+				return this.elementType.CSharpType + "[]";
 			}
 		}
 
@@ -76,9 +76,8 @@ namespace Waher.Content.Asn1.Model
 				await this.elementType.ExportCSharp(Output, State, Indent, Pass);
 			else if (Pass == CSharpExportPass.Explicit)
 			{
-				Output.Append("Asn1.Array<");
 				await this.elementType.ExportCSharp(Output, State, Indent, Pass);
-				Output.Append(">");
+				Output.Append("[]");
 			}
 		}
 

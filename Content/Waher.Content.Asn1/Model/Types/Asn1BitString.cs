@@ -21,7 +21,7 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// Corresponding C# type.
 		/// </summary>
-		public override string CSharpType => "Asn1.Array<byte>";
+		public override string CSharpType => "byte[]";
 
 		/// <summary>
 		/// Accepted ASN.1 tags
@@ -43,7 +43,7 @@ namespace Waher.Content.Asn1.Model.Types
 		public override Task ExportCSharp(StringBuilder Output, CSharpExportState State, int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
-				Output.Append("Asn1.Array<byte>");
+				Output.Append("byte[]");
 		
 			return Task.CompletedTask;
 		}

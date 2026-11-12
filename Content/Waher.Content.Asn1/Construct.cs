@@ -344,7 +344,7 @@ namespace Waher.Content.Asn1
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadBitString(AsnReader Reader, out Array<byte> Result)
+		public static bool TryReadBitString(AsnReader Reader, out byte[] Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -368,7 +368,7 @@ namespace Waher.Content.Asn1
 		/// <param name="Index">Item index.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadBitStringAutomatic(AsnReader Reader, int Index, out Array<byte> Result)
+		public static bool TryReadBitStringAutomatic(AsnReader Reader, int Index, out byte[] Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
@@ -389,7 +389,7 @@ namespace Waher.Content.Asn1
 		/// <param name="Index">Item index.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadBitStringImplicit(AsnReader Reader, int Index, out Array<byte> Result)
+		public static bool TryReadBitStringImplicit(AsnReader Reader, int Index, out byte[] Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
@@ -418,7 +418,7 @@ namespace Waher.Content.Asn1
 		/// <param name="Index">Item index.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadBitStringExplicit(AsnReader Reader, int Index, out Array<byte> Result)
+		public static bool TryReadBitStringExplicit(AsnReader Reader, int Index, out byte[] Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
@@ -441,7 +441,7 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <returns>Value</returns>
-		public static Array<byte> ReadBitString(AsnReader Reader)
+		public static byte[] ReadBitString(AsnReader Reader)
 		{
 			return Reader.ReadBitString(out _);
 		}
@@ -452,7 +452,7 @@ namespace Waher.Content.Asn1
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
 		/// <returns>Value</returns>
-		public static Array<byte> ReadBitStringAutomatic(AsnReader Reader, int Index)
+		public static byte[] ReadBitStringAutomatic(AsnReader Reader, int Index)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
@@ -472,7 +472,7 @@ namespace Waher.Content.Asn1
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
 		/// <returns>Value</returns>
-		public static Array<byte> ReadBitStringImplicit(AsnReader Reader, int Index)
+		public static byte[] ReadBitStringImplicit(AsnReader Reader, int Index)
 		{
 			return Reader.ReadBitString(out _, new Asn1Tag(TagClass.ContextSpecific, Index));
 		}
@@ -483,7 +483,7 @@ namespace Waher.Content.Asn1
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
 		/// <returns>Value</returns>
-		public static Array<byte> ReadBitStringExplicit(AsnReader Reader, int Index)
+		public static byte[] ReadBitStringExplicit(AsnReader Reader, int Index)
 		{
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
@@ -2804,7 +2804,7 @@ namespace Waher.Content.Asn1
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadArray<T>(AsnReader Reader, TryReadItem<T> ReadItem,
-			out Array<T> Result)
+			out T[] Result)
 		{
 			AsnReader Inner = TryReadInnerVector(Reader);
 			if (Inner is null)
@@ -2818,7 +2818,7 @@ namespace Waher.Content.Asn1
 			while (ReadItem(Inner, out T Item))
 				Items.Add(Item);
 
-			Result = new Array<T>(Items.ToArray());
+			Result = Items.ToArray();
 			return true;
 		}
 
@@ -2829,7 +2829,7 @@ namespace Waher.Content.Asn1
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="ReadItem">Item read, if successful.</param>
 		/// <returns>Array of items.</returns>
-		public static Array<T> ReadArray<T>(AsnReader Reader, TryReadItem<T> ReadItem)
+		public static T[] ReadArray<T>(AsnReader Reader, TryReadItem<T> ReadItem)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			ReadOnlyMemory<byte> Section = Reader.ReadEncodedValue();
@@ -2849,7 +2849,7 @@ namespace Waher.Content.Asn1
 			while (ReadItem(Inner, out T Item))
 				Items.Add(Item);
 
-			return new Array<T>(Items.ToArray());
+			return Items.ToArray();
 		}
 
 		/// <summary>
@@ -2860,7 +2860,7 @@ namespace Waher.Content.Asn1
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadArray<T>(AsnReader Reader,
-			TryReadNullableItem<T> ReadItem, out Array<T> Result)
+			TryReadNullableItem<T> ReadItem, out T[] Result)
 			where T : struct
 		{
 			AsnReader Inner = TryReadInnerVector(Reader);
@@ -2875,7 +2875,7 @@ namespace Waher.Content.Asn1
 			while (ReadItem(Inner, out T? Item))
 				Items.Add(Item.Value);
 
-			Result = new Array<T>(Items.ToArray());
+			Result = Items.ToArray();
 			return true;
 		}
 
@@ -2886,7 +2886,7 @@ namespace Waher.Content.Asn1
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="ReadItem">Item read, if successful.</param>
 		/// <returns>Array of items.</returns>
-		public static Array<T> ReadArray<T>(AsnReader Reader,
+		public static T[] ReadArray<T>(AsnReader Reader,
 			TryReadNullableItem<T> ReadItem)
 			where T : struct
 		{
@@ -2908,7 +2908,7 @@ namespace Waher.Content.Asn1
 			while (ReadItem(Inner, out T? Item))
 				Items.Add(Item.Value);
 
-			return new Array<T>(Items.ToArray());
+			return Items.ToArray();
 		}
 
 		#endregion

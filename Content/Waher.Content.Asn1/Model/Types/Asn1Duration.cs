@@ -84,11 +84,12 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="DefaultName">Name of default value.</param>
 		/// <param name="ItemName">Name of item variable.</param>
 		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string ItemName,
-			int Index)
+			CSharpExportState State, int Indent, string MemberOf, string DefaultName, 
+			string ItemName, int Index)
 		{
 			Output.Append("TryReadDuration");
 
@@ -103,12 +104,13 @@ namespace Waher.Content.Asn1.Model.Types
 				Output.Append(Index.ToString());
 			}
 
-			Output.Append(", out ");
-
 			if (string.IsNullOrEmpty(ItemName))
-				Output.Append("var Item) ? Item : null");
+				Output.Append(", default, out var _Item) ? _Item : null");
 			else
 			{
+				Output.Append(", ");
+				Output.Append(DefaultName ?? "default");
+				Output.Append(", out ");
 				Output.Append(ItemName);
 				Output.Append(')');
 			}

@@ -95,8 +95,8 @@ namespace Waher.Content.Asn1.Model
 			Output.Append("ReadArray<");
 			Output.Append(this.elementType.CSharpType);
 			Output.Append(">(Reader, (Reader, out _Item) => ");
-			await this.elementType.ExportTryReadCSharp(Output, State, Indent + 1, 
-				string.Empty, "_Item", Index);
+			await this.elementType.ExportTryReadCSharp(Output, State, Indent + 1,
+				string.Empty, null, "_Item", Index);
 			Output.Append(")");
 		}
 
@@ -107,23 +107,26 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="DefaultName">Name of default value.</param>
 		/// <param name="ItemName">Name of item variable.</param>
 		/// <param name="Index">Item index.</param>
 		public override async Task ExportTryReadCSharp(StringBuilder Output, 
-			CSharpExportState State, int Indent, string MemberOf, string ItemName, 
-			int Index)
+			CSharpExportState State, int Indent, string MemberOf, string DefaultName, 
+			string ItemName, int Index)
 		{
 			Output.Append("TryReadArray<");
 			Output.Append(this.elementType.CSharpType);
 			Output.Append(">(Reader, (Reader, out _Item) => ");
 
 			await this.elementType.ExportTryReadCSharp(Output, State, Indent + 1,
-				string.Empty, "_Item", Index);
+				string.Empty, null, "_Item", Index);
 
 			if (string.IsNullOrEmpty(ItemName))
-				Output.Append(", out var _Item2) ? _Item2 : default");
+				Output.Append(", default, out var _Item2) ? _Item2 : default");
 			else
 			{
+				Output.Append(", ");
+				Output.Append(DefaultName ?? "default");
 				Output.Append(", out ");
 				Output.Append(ItemName);
 				Output.Append(')');

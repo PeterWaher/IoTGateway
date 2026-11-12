@@ -232,8 +232,7 @@ namespace Waher.Content.Asn1.Model
 
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
-					Output.Append("public void ");
-					Output.AppendLine(" Read(Asn1F.AsnReader Reader)");
+					Output.AppendLine("public void Read(Asn1F.AsnReader Reader)");
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
 
@@ -461,11 +460,12 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="DefaultName">Name of default value.</param>
 		/// <param name="ItemName">Name of item variable.</param>
 		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string ItemName,
-			int Index)
+			CSharpExportState State, int Indent, string MemberOf, string DefaultName, 
+			string ItemName, int Index)
 		{
 			Output.Append(ToCSharp(State, this, this.Name));
 			if (!this.TypeDefinition)

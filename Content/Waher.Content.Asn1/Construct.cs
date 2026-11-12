@@ -53,13 +53,14 @@ namespace Waher.Content.Asn1
 		/// Reads any value.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadAny(AsnReader Reader, out object Result)
+		public static bool TryReadAny(AsnReader Reader, object Default, out object Result)
 		{
 			if (!Reader.HasData)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -71,17 +72,18 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="ExpectedTag">Expected tag.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		private static bool TryReadAny(AsnReader Reader, Asn1Tag ExpectedTag,
-			out object Result)
+			object Default, out object Result)
 		{
 			if (ExpectedTag.TagClass == TagClass.Universal)
 			{
 				switch (ExpectedTag.TagValue)
 				{
 					case (int)UniversalTagNumber.EndOfContents:
-						Result = null;
+						Result = Default;
 						return false;
 
 					case (int)UniversalTagNumber.Boolean:
@@ -103,7 +105,7 @@ namespace Waher.Content.Asn1
 
 					case (int)UniversalTagNumber.Null:
 						Reader.ReadNull(ExpectedTag);
-						Result = null;
+						Result = Default;
 						return true;
 
 					case (int)UniversalTagNumber.ObjectIdentifier:
@@ -157,7 +159,7 @@ namespace Waher.Content.Asn1
 
 						ChunkedList<object> Elements = new ChunkedList<object>();
 
-						while (Inner.HasData && TryReadAny(Inner, out object Element))
+						while (Inner.HasData && TryReadAny(Inner, null, out object Element))
 							Elements.Add(Element);
 
 						Result = Elements.ToArray();
@@ -172,7 +174,7 @@ namespace Waher.Content.Asn1
 						return true;
 
 					default:
-						Result = null;
+						Result = Default;
 						return false;
 				}
 			}
@@ -183,7 +185,7 @@ namespace Waher.Content.Asn1
 				if (ExpectedTag.TagClass == TagClass.ContextSpecific && ExpectedTag.IsConstructed)  // EXPLICIT
 				{
 					AsnReader Inner = new AsnReader(Section, Reader.RuleSet);
-					return TryReadAny(Inner, out Result);
+					return TryReadAny(Inner, Default, out Result);
 				}
 				else
 				{
@@ -193,7 +195,7 @@ namespace Waher.Content.Asn1
 			}
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -203,20 +205,22 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadAnyAutomatic(AsnReader Reader, int Index, out object Result)
+		public static bool TryReadAnyAutomatic(AsnReader Reader, int Index,
+			object Default, out object Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadAnyExplicit(Reader, Index, out Result);
+					return TryReadAnyExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadAnyImplicit(Reader, Index, out Result);
+					return TryReadAnyImplicit(Reader, Index, Default, out Result);
 			}
 			else
-				return TryReadAny(Reader, out Result);
+				return TryReadAny(Reader, Default, out Result);
 		}
 
 		/// <summary>
@@ -224,15 +228,17 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadAnyImplicit(AsnReader Reader, int Index, out object Result)
+		public static bool TryReadAnyImplicit(AsnReader Reader, int Index,
+			object Default, out object Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -240,7 +246,7 @@ namespace Waher.Content.Asn1
 				return true;
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -250,23 +256,25 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadAnyExplicit(AsnReader Reader, int Index, out object Result)
+		public static bool TryReadAnyExplicit(AsnReader Reader, int Index,
+			object Default, out object Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadAny(Inner, out Result);
+			return TryReadAny(Inner, Default, out Result);
 
 		}
 
@@ -277,7 +285,7 @@ namespace Waher.Content.Asn1
 		/// <returns>Value</returns>
 		public static object ReadAny(AsnReader Reader)
 		{
-			if (TryReadAny(Reader, out object Result))
+			if (TryReadAny(Reader, null, out object Result))
 				return Result;
 			else
 				return null;
@@ -342,9 +350,11 @@ namespace Waher.Content.Asn1
 		/// Tries to read a bit string.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadBitString(AsnReader Reader, out byte[] Result)
+		public static bool TryReadBitString(AsnReader Reader, byte[] Default,
+			out byte[] Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -356,7 +366,7 @@ namespace Waher.Content.Asn1
 			}
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -366,20 +376,22 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadBitStringAutomatic(AsnReader Reader, int Index, out byte[] Result)
+		public static bool TryReadBitStringAutomatic(AsnReader Reader, int Index,
+			byte[] Default, out byte[] Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadBitStringExplicit(Reader, Index, out Result);
+					return TryReadBitStringExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadBitStringImplicit(Reader, Index, out Result);
+					return TryReadBitStringImplicit(Reader, Index, Default, out Result);
 			}
 			else
-				return TryReadBitString(Reader, out Result);
+				return TryReadBitString(Reader, Default, out Result);
 		}
 
 		/// <summary>
@@ -387,26 +399,29 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadBitStringImplicit(AsnReader Reader, int Index, out byte[] Result)
+		public static bool TryReadBitStringImplicit(AsnReader Reader, int Index,
+			byte[] Default, out byte[] Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			try
 			{
-				Result = Reader.ReadBitString(out _, new Asn1Tag(TagClass.ContextSpecific, Index));
+				Result = Reader.ReadBitString(out _,
+					new Asn1Tag(TagClass.ContextSpecific, Index));
 				return true;
 			}
 			catch (Exception)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -416,23 +431,25 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadBitStringExplicit(AsnReader Reader, int Index, out byte[] Result)
+		public static bool TryReadBitStringExplicit(AsnReader Reader, int Index,
+			byte[] Default, out byte[] Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadBitString(Inner, out Result);
+			return TryReadBitString(Inner, Default, out Result);
 
 		}
 
@@ -528,12 +545,13 @@ namespace Waher.Content.Asn1
 		}
 
 		/// <summary>
-		/// Tries to read a bit string.
+		/// Tries to read a string.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadString(AsnReader Reader, out string Result)
+		public static bool TryReadString(AsnReader Reader, string Default, out string Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -544,50 +562,52 @@ namespace Waher.Content.Asn1
 			}
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
 
 		/// <summary>
-		/// Tries to read a bit string.
+		/// Tries to read a string.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
 		/// <param name="TagNumber">Expected Tag number.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadStringAutomatic(AsnReader Reader, int Index,
-			UniversalTagNumber TagNumber, out string Result)
+			UniversalTagNumber TagNumber, string Default, out string Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadStringExplicit(Reader, Index, out Result);
+					return TryReadStringExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadStringImplicit(Reader, Index, TagNumber, out Result);
+					return TryReadStringImplicit(Reader, Index, TagNumber, Default, out Result);
 			}
 			else
-				return TryReadString(Reader, out Result);
+				return TryReadString(Reader, Default, out Result);
 		}
 
 		/// <summary>
-		/// Tries to read a bit string.
+		/// Tries to read a string.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
 		/// <param name="TagNumber">Expected Tag number.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadStringImplicit(AsnReader Reader, int Index,
-			UniversalTagNumber TagNumber, out string Result)
+			UniversalTagNumber TagNumber, string Default, out string Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -599,39 +619,40 @@ namespace Waher.Content.Asn1
 			}
 			catch (Exception)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
 
 		/// <summary>
-		/// Tries to read a bit string.
+		/// Tries to read a string.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadStringExplicit(AsnReader Reader, int Index,
-			out string Result)
+			string Default, out string Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadString(Inner, out Result);
+			return TryReadString(Inner, Default, out Result);
 
 		}
 
 		/// <summary>
-		/// Reads a bit string.
+		/// Reads a string.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <returns>Value</returns>
@@ -642,7 +663,7 @@ namespace Waher.Content.Asn1
 		}
 
 		/// <summary>
-		/// Reads a bit string.
+		/// Reads a string.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="TagNumber">Expected Tag number.</param>
@@ -664,7 +685,7 @@ namespace Waher.Content.Asn1
 		}
 
 		/// <summary>
-		/// Reads a bit string.
+		/// Reads a string.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
@@ -678,7 +699,7 @@ namespace Waher.Content.Asn1
 		}
 
 		/// <summary>
-		/// Reads a bit string.
+		/// Reads a string.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
@@ -699,9 +720,11 @@ namespace Waher.Content.Asn1
 		/// Tries to read a octet string.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadOctetString(AsnReader Reader, out byte[] Result)
+		public static bool TryReadOctetString(AsnReader Reader, byte[] Default,
+			out byte[] Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -713,7 +736,7 @@ namespace Waher.Content.Asn1
 			}
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -723,21 +746,22 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadOctetStringAutomatic(AsnReader Reader, int Index,
-			out byte[] Result)
+			byte[] Default, out byte[] Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadOctetStringExplicit(Reader, Index, out Result);
+					return TryReadOctetStringExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadOctetStringImplicit(Reader, Index, out Result);
+					return TryReadOctetStringImplicit(Reader, Index, Default, out Result);
 			}
 			else
-				return TryReadOctetString(Reader, out Result);
+				return TryReadOctetString(Reader, Default, out Result);
 		}
 
 		/// <summary>
@@ -745,16 +769,17 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadOctetStringImplicit(AsnReader Reader, int Index,
-			out byte[] Result)
+			byte[] Default, out byte[] Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -765,7 +790,7 @@ namespace Waher.Content.Asn1
 			}
 			catch (Exception)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -775,23 +800,25 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadOctetStringExplicit(AsnReader Reader, int Index, out byte[] Result)
+		public static bool TryReadOctetStringExplicit(AsnReader Reader, int Index,
+			byte[] Default, out byte[] Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadOctetString(Inner, out Result);
+			return TryReadOctetString(Inner, Default, out Result);
 
 		}
 
@@ -858,9 +885,10 @@ namespace Waher.Content.Asn1
 		/// Tries to read a Boolean.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadBoolean(AsnReader Reader, out bool? Result)
+		public static bool TryReadBoolean(AsnReader Reader, bool? Default, out bool? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -872,7 +900,7 @@ namespace Waher.Content.Asn1
 			}
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -882,21 +910,22 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadBooleanAutomatic(AsnReader Reader, int Index,
-			out bool? Result)
+			bool? Default, out bool? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadBooleanExplicit(Reader, Index, out Result);
+					return TryReadBooleanExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadBooleanImplicit(Reader, Index, out Result);
+					return TryReadBooleanImplicit(Reader, Index, Default, out Result);
 			}
 			else
-				return TryReadBoolean(Reader, out Result);
+				return TryReadBoolean(Reader, Default, out Result);
 		}
 
 		/// <summary>
@@ -904,16 +933,17 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadBooleanImplicit(AsnReader Reader, int Index,
-			out bool? Result)
+			bool? Default, out bool? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -924,7 +954,7 @@ namespace Waher.Content.Asn1
 			}
 			catch (Exception)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -934,23 +964,25 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadBooleanExplicit(AsnReader Reader, int Index, out bool? Result)
+		public static bool TryReadBooleanExplicit(AsnReader Reader, int Index,
+			bool? Default, out bool? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadBoolean(Inner, out Result);
+			return TryReadBoolean(Inner, Default, out Result);
 
 		}
 
@@ -1017,9 +1049,10 @@ namespace Waher.Content.Asn1
 		/// Tries to read a date.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadDate(AsnReader Reader, out DateTime? Result)
+		public static bool TryReadDate(AsnReader Reader, DateTime? Default, out DateTime? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -1030,7 +1063,7 @@ namespace Waher.Content.Asn1
 			}
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -1040,21 +1073,22 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadDateAutomatic(AsnReader Reader, int Index,
-			out DateTime? Result)
+			DateTime? Default, out DateTime? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadDateExplicit(Reader, Index, out Result);
+					return TryReadDateExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadDateImplicit(Reader, Index, out Result);
+					return TryReadDateImplicit(Reader, Index, Default, out Result);
 			}
 			else
-				return TryReadDate(Reader, out Result);
+				return TryReadDate(Reader, Default, out Result);
 		}
 
 		/// <summary>
@@ -1062,16 +1096,17 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadDateImplicit(AsnReader Reader, int Index,
-			out DateTime? Result)
+			DateTime? Default, out DateTime? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -1081,7 +1116,7 @@ namespace Waher.Content.Asn1
 			}
 			catch (Exception)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -1091,23 +1126,25 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadDateExplicit(AsnReader Reader, int Index, out DateTime? Result)
+		public static bool TryReadDateExplicit(AsnReader Reader, int Index,
+			DateTime? Default, out DateTime? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadDate(Inner, out Result);
+			return TryReadDate(Inner, Default, out Result);
 
 		}
 
@@ -1174,9 +1211,10 @@ namespace Waher.Content.Asn1
 		/// Tries to read a date and time.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadDateTime(AsnReader Reader, out DateTime? Result)
+		public static bool TryReadDateTime(AsnReader Reader, DateTime? Default, out DateTime? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -1187,7 +1225,7 @@ namespace Waher.Content.Asn1
 			}
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -1197,21 +1235,22 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadDateTimeAutomatic(AsnReader Reader, int Index,
-			out DateTime? Result)
+			DateTime? Default, out DateTime? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadDateTimeExplicit(Reader, Index, out Result);
+					return TryReadDateTimeExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadDateTimeImplicit(Reader, Index, out Result);
+					return TryReadDateTimeImplicit(Reader, Index, Default, out Result);
 			}
 			else
-				return TryReadDateTime(Reader, out Result);
+				return TryReadDateTime(Reader, Default, out Result);
 		}
 
 		/// <summary>
@@ -1219,16 +1258,17 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadDateTimeImplicit(AsnReader Reader, int Index,
-			out DateTime? Result)
+			DateTime? Default, out DateTime? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -1238,7 +1278,7 @@ namespace Waher.Content.Asn1
 			}
 			catch (Exception)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -1248,23 +1288,25 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadDateTimeExplicit(AsnReader Reader, int Index, out DateTime? Result)
+		public static bool TryReadDateTimeExplicit(AsnReader Reader, int Index,
+			DateTime? Default, out DateTime? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadDateTime(Inner, out Result);
+			return TryReadDateTime(Inner, Default, out Result);
 
 		}
 
@@ -1331,9 +1373,11 @@ namespace Waher.Content.Asn1
 		/// Tries to read a date.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadDuration(AsnReader Reader, out Duration? Result)
+		public static bool TryReadDuration(AsnReader Reader, Duration? Default,
+			out Duration? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -1344,7 +1388,7 @@ namespace Waher.Content.Asn1
 			}
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -1354,21 +1398,22 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadDurationAutomatic(AsnReader Reader, int Index,
-			out Duration? Result)
+			Duration? Default, out Duration? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadDurationExplicit(Reader, Index, out Result);
+					return TryReadDurationExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadDurationImplicit(Reader, Index, out Result);
+					return TryReadDurationImplicit(Reader, Index, Default, out Result);
 			}
 			else
-				return TryReadDuration(Reader, out Result);
+				return TryReadDuration(Reader, Default, out Result);
 		}
 
 		/// <summary>
@@ -1376,16 +1421,17 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadDurationImplicit(AsnReader Reader, int Index,
-			out Duration? Result)
+			Duration? Default, out Duration? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -1395,7 +1441,7 @@ namespace Waher.Content.Asn1
 			}
 			catch (Exception)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -1405,23 +1451,25 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadDurationExplicit(AsnReader Reader, int Index, out Duration? Result)
+		public static bool TryReadDurationExplicit(AsnReader Reader, int Index,
+			Duration? Default, out Duration? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadDuration(Inner, out Result);
+			return TryReadDuration(Inner, Default, out Result);
 
 		}
 
@@ -1488,9 +1536,11 @@ namespace Waher.Content.Asn1
 		/// Tries to read a generalized time.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadGeneralizedTime(AsnReader Reader, out TimeSpan? Result)
+		public static bool TryReadGeneralizedTime(AsnReader Reader, TimeSpan? Default,
+			out TimeSpan? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -1501,7 +1551,7 @@ namespace Waher.Content.Asn1
 			}
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -1511,21 +1561,22 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadGeneralizedTimeAutomatic(AsnReader Reader, int Index,
-			out TimeSpan? Result)
+			TimeSpan? Default, out TimeSpan? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadGeneralizedTimeExplicit(Reader, Index, out Result);
+					return TryReadGeneralizedTimeExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadGeneralizedTimeImplicit(Reader, Index, out Result);
+					return TryReadGeneralizedTimeImplicit(Reader, Index, Default, out Result);
 			}
 			else
-				return TryReadGeneralizedTime(Reader, out Result);
+				return TryReadGeneralizedTime(Reader, Default, out Result);
 		}
 
 		/// <summary>
@@ -1533,16 +1584,17 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadGeneralizedTimeImplicit(AsnReader Reader, int Index,
-			out TimeSpan? Result)
+			TimeSpan? Default, out TimeSpan? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -1552,7 +1604,7 @@ namespace Waher.Content.Asn1
 			}
 			catch (Exception)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -1562,23 +1614,25 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadGeneralizedTimeExplicit(AsnReader Reader, int Index, out TimeSpan? Result)
+		public static bool TryReadGeneralizedTimeExplicit(AsnReader Reader, int Index,
+			TimeSpan? Default, out TimeSpan? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadGeneralizedTime(Inner, out Result);
+			return TryReadGeneralizedTime(Inner, Default, out Result);
 
 		}
 
@@ -1645,9 +1699,11 @@ namespace Waher.Content.Asn1
 		/// Tries to read an integer.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadInteger(AsnReader Reader, out BigInteger? Result)
+		public static bool TryReadInteger(AsnReader Reader, BigInteger? Default,
+			out BigInteger? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -1659,7 +1715,7 @@ namespace Waher.Content.Asn1
 			}
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -1669,21 +1725,22 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadIntegerAutomatic(AsnReader Reader, int Index,
-			out BigInteger? Result)
+			BigInteger? Default, out BigInteger? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadIntegerExplicit(Reader, Index, out Result);
+					return TryReadIntegerExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadIntegerImplicit(Reader, Index, out Result);
+					return TryReadIntegerImplicit(Reader, Index, Default, out Result);
 			}
 			else
-				return TryReadInteger(Reader, out Result);
+				return TryReadInteger(Reader, Default, out Result);
 		}
 
 		/// <summary>
@@ -1691,16 +1748,17 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadIntegerImplicit(AsnReader Reader, int Index,
-			out BigInteger? Result)
+			BigInteger? Default, out BigInteger? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -1711,7 +1769,7 @@ namespace Waher.Content.Asn1
 			}
 			catch (Exception)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -1721,23 +1779,25 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadIntegerExplicit(AsnReader Reader, int Index, out BigInteger? Result)
+		public static bool TryReadIntegerExplicit(AsnReader Reader, int Index,
+			BigInteger? Default, out BigInteger? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadInteger(Inner, out Result);
+			return TryReadInteger(Inner, Default, out Result);
 
 		}
 
@@ -1804,9 +1864,11 @@ namespace Waher.Content.Asn1
 		/// Tries to read a Null value.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Result">Null result value.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadNull(AsnReader Reader)
+		public static bool TryReadNull(AsnReader Reader, out object Result)
 		{
+			Result = null;
 			Asn1Tag Tag = Reader.PeekTag();
 
 			if (Tag.TagClass == TagClass.Universal &&
@@ -1824,19 +1886,21 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Result">Null result value.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadNullAutomatic(AsnReader Reader, int Index)
+		public static bool TryReadNullAutomatic(AsnReader Reader, int Index,
+			out object Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadNullExplicit(Reader, Index);
+					return TryReadNullExplicit(Reader, Index, out Result);
 				else
-					return TryReadNullImplicit(Reader, Index);
+					return TryReadNullImplicit(Reader, Index, out Result);
 			}
 			else
-				return TryReadNull(Reader);
+				return TryReadNull(Reader, out Result);
 		}
 
 		/// <summary>
@@ -1844,9 +1908,12 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Result">Null result value.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadNullImplicit(AsnReader Reader, int Index)
+		public static bool TryReadNullImplicit(AsnReader Reader, int Index,
+			out object Result)
 		{
+			Result = null;
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
@@ -1870,9 +1937,12 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Result">Null result value.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadNullExplicit(AsnReader Reader, int Index)
+		public static bool TryReadNullExplicit(AsnReader Reader, int Index,
+			out object Result)
 		{
+			Result = null;
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
@@ -1884,7 +1954,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadNull(Inner);
+			return TryReadNull(Inner, out Result);
 
 		}
 
@@ -1953,9 +2023,11 @@ namespace Waher.Content.Asn1
 		/// Tries to read an object identifier.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadObjectId(AsnReader Reader, out ObjectId Result)
+		public static bool TryReadObjectId(AsnReader Reader, ObjectId Default,
+			out ObjectId Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -1967,7 +2039,7 @@ namespace Waher.Content.Asn1
 			}
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -1977,21 +2049,22 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadObjectIdAutomatic(AsnReader Reader, int Index,
-			out ObjectId Result)
+			ObjectId Default, out ObjectId Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadObjectIdExplicit(Reader, Index, out Result);
+					return TryReadObjectIdExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadObjectIdImplicit(Reader, Index, out Result);
+					return TryReadObjectIdImplicit(Reader, Index, Default, out Result);
 			}
 			else
-				return TryReadObjectId(Reader, out Result);
+				return TryReadObjectId(Reader, Default, out Result);
 		}
 
 		/// <summary>
@@ -1999,16 +2072,17 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadObjectIdImplicit(AsnReader Reader, int Index,
-			out ObjectId Result)
+			ObjectId Default, out ObjectId Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -2020,7 +2094,7 @@ namespace Waher.Content.Asn1
 			}
 			catch (Exception)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -2030,23 +2104,25 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadObjectIdExplicit(AsnReader Reader, int Index, out ObjectId Result)
+		public static bool TryReadObjectIdExplicit(AsnReader Reader, int Index,
+			ObjectId Default, out ObjectId Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadObjectId(Inner, out Result);
+			return TryReadObjectId(Inner, Default, out Result);
 
 		}
 
@@ -2114,9 +2190,11 @@ namespace Waher.Content.Asn1
 		/// Tries to read a floating-point value.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadReal(AsnReader Reader, out double? Result)
+		public static bool TryReadReal(AsnReader Reader, double? Default,
+			out double? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -2127,7 +2205,7 @@ namespace Waher.Content.Asn1
 			}
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -2137,21 +2215,22 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadRealAutomatic(AsnReader Reader, int Index,
-			out double? Result)
+			double Default, out double? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadRealExplicit(Reader, Index, out Result);
+					return TryReadRealExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadRealImplicit(Reader, Index, out Result);
+					return TryReadRealImplicit(Reader, Index, Default, out Result);
 			}
 			else
-				return TryReadReal(Reader, out Result);
+				return TryReadReal(Reader, Default, out Result);
 		}
 
 		/// <summary>
@@ -2159,16 +2238,17 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadRealImplicit(AsnReader Reader, int Index,
+		public static bool TryReadRealImplicit(AsnReader Reader, int Index, double Default,
 			out double? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -2178,7 +2258,7 @@ namespace Waher.Content.Asn1
 			}
 			catch (Exception)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -2188,23 +2268,25 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadRealExplicit(AsnReader Reader, int Index, out double? Result)
+		public static bool TryReadRealExplicit(AsnReader Reader, int Index,
+			double Default, out double? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadReal(Inner, out Result);
+			return TryReadReal(Inner, Default, out Result);
 		}
 
 		/// <summary>
@@ -2270,9 +2352,11 @@ namespace Waher.Content.Asn1
 		/// Tries to read a time of day.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadTimeOfDay(AsnReader Reader, out TimeSpan? Result)
+		public static bool TryReadTimeOfDay(AsnReader Reader, TimeSpan? Default,
+			out TimeSpan? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -2283,7 +2367,7 @@ namespace Waher.Content.Asn1
 			}
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -2293,21 +2377,22 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadTimeOfDayAutomatic(AsnReader Reader, int Index,
-			out TimeSpan? Result)
+			TimeSpan? Default, out TimeSpan? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadTimeOfDayExplicit(Reader, Index, out Result);
+					return TryReadTimeOfDayExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadTimeOfDayImplicit(Reader, Index, out Result);
+					return TryReadTimeOfDayImplicit(Reader, Index, Default, out Result);
 			}
 			else
-				return TryReadTimeOfDay(Reader, out Result);
+				return TryReadTimeOfDay(Reader, Default, out Result);
 		}
 
 		/// <summary>
@@ -2315,16 +2400,17 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadTimeOfDayImplicit(AsnReader Reader, int Index,
-			out TimeSpan? Result)
+			TimeSpan? Default, out TimeSpan? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -2334,7 +2420,7 @@ namespace Waher.Content.Asn1
 			}
 			catch (Exception)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -2344,23 +2430,25 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadTimeOfDayExplicit(AsnReader Reader, int Index, out TimeSpan? Result)
+		public static bool TryReadTimeOfDayExplicit(AsnReader Reader, int Index, 
+			TimeSpan? Default, out TimeSpan? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadTimeOfDay(Inner, out Result);
+			return TryReadTimeOfDay(Inner, Default, out Result);
 
 		}
 
@@ -2427,9 +2515,11 @@ namespace Waher.Content.Asn1
 		/// Tries to read a UTC timestamp.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadUtcTime(AsnReader Reader, out DateTimeOffset? Result)
+		public static bool TryReadUtcTime(AsnReader Reader, DateTimeOffset? Default,
+			out DateTimeOffset? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -2441,7 +2531,7 @@ namespace Waher.Content.Asn1
 			}
 			else
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -2451,21 +2541,22 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadUtcTimeAutomatic(AsnReader Reader, int Index,
-			out DateTimeOffset? Result)
+			DateTimeOffset? Default, out DateTimeOffset? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadUtcTimeExplicit(Reader, Index, out Result);
+					return TryReadUtcTimeExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadUtcTimeImplicit(Reader, Index, out Result);
+					return TryReadUtcTimeImplicit(Reader, Index, Default, out Result);
 			}
 			else
-				return TryReadUtcTime(Reader, out Result);
+				return TryReadUtcTime(Reader, Default, out Result);
 		}
 
 		/// <summary>
@@ -2473,16 +2564,17 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadUtcTimeImplicit(AsnReader Reader, int Index,
-			out DateTimeOffset? Result)
+			DateTimeOffset? Default, out DateTimeOffset? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -2493,7 +2585,7 @@ namespace Waher.Content.Asn1
 			}
 			catch (Exception)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -2503,23 +2595,25 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadUtcTimeExplicit(AsnReader Reader, int Index, out DateTimeOffset? Result)
+		public static bool TryReadUtcTimeExplicit(AsnReader Reader, int Index,
+			DateTimeOffset? Default, out DateTimeOffset? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadUtcTime(Inner, out Result);
+			return TryReadUtcTime(Inner, Default, out Result);
 
 		}
 
@@ -2586,15 +2680,17 @@ namespace Waher.Content.Asn1
 		/// Tries to read an integer.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadEnumeration<T>(AsnReader Reader, out T? Result)
+		public static bool TryReadEnumeration<T>(AsnReader Reader, T? Default, 
+			out T? Result)
 			where T : struct, Enum
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.Universal)
 			{
-				Result = default;
+				Result = Default;
 				return false;
 			}
 
@@ -2606,7 +2702,7 @@ namespace Waher.Content.Asn1
 					return true;
 			}
 
-			Result = default;
+			Result = Default;
 			return false;
 		}
 
@@ -2615,22 +2711,23 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadEnumerationAutomatic<T>(AsnReader Reader, int Index,
-			out T? Result)
+			T? Default, out T? Result)
 			where T : struct, Enum
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadEnumerationExplicit(Reader, Index, out Result);
+					return TryReadEnumerationExplicit(Reader, Index, Default, out Result);
 				else
-					return TryReadEnumerationImplicit(Reader, Index, out Result);
+					return TryReadEnumerationImplicit(Reader, Index, Default, out Result);
 			}
 			else
-				return TryReadEnumeration(Reader, out Result);
+				return TryReadEnumeration(Reader, Default, out Result);
 		}
 
 		/// <summary>
@@ -2638,17 +2735,18 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadEnumerationImplicit<T>(AsnReader Reader, int Index,
-			out T? Result)
+			T? Default, out T? Result)
 			where T : struct, Enum
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
 				Tag.TagValue != Index)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -2660,7 +2758,7 @@ namespace Waher.Content.Asn1
 			}
 			catch (Exception)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 		}
@@ -2670,10 +2768,11 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadEnumerationExplicit<T>(AsnReader Reader, int Index,
-			out T? Result)
+			T? Default, out T? Result)
 			where T : struct, Enum
 		{
 			Asn1Tag Tag = Reader.PeekTag();
@@ -2681,14 +2780,14 @@ namespace Waher.Content.Asn1
 				Tag.TagValue != Index ||
 				!Tag.IsConstructed)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadEnumeration(Inner, out Result);
+			return TryReadEnumeration(Inner, Default, out Result);
 
 		}
 
@@ -2801,15 +2900,16 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="ReadItem">Item read, if successful.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadArray<T>(AsnReader Reader, TryReadItem<T> ReadItem,
-			out T[] Result)
+			T[] Default, out T[] Result)
 		{
 			AsnReader Inner = TryReadInnerVector(Reader);
 			if (Inner is null)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 
@@ -2857,16 +2957,17 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="ReadItem">Item read, if successful.</param>
+		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadArray<T>(AsnReader Reader,
-			TryReadNullableItem<T> ReadItem, out T[] Result)
+			TryReadNullableItem<T> ReadItem, T[] Default, out T[] Result)
 			where T : struct
 		{
 			AsnReader Inner = TryReadInnerVector(Reader);
 			if (Inner is null)
 			{
-				Result = null;
+				Result = Default;
 				return false;
 			}
 

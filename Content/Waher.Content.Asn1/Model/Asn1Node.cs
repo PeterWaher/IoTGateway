@@ -212,11 +212,12 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="DefaultName">Name of default value.</param>
 		/// <param name="ItemName">Name of item variable.</param>
 		/// <param name="Index">Item index.</param>
 		public virtual Task ExportTryReadCSharp(StringBuilder Output, 
-			CSharpExportState State, int Indent, string MemberOf, string ItemName, 
-			int Index)
+			CSharpExportState State, int Indent, string MemberOf, string DefaultName, 
+			string ItemName, int Index)
 		{
 			throw new NotImplementedException("Optional read operation for objects of type " +
 				this.GetType().FullName + " not implemented.");

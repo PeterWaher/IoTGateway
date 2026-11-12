@@ -149,23 +149,24 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="DefaultName">Name of default value.</param>
 		/// <param name="ItemName">Name of item variable.</param>
 		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string ItemName, 
-			int Index)
+			CSharpExportState State, int Indent, string MemberOf, string DefaultName, 
+			string ItemName, int Index)
 		{
 			if (this.Document.aliases.TryGetValue(this.identifier,
 				out Asn1TypeDefinition TypeDef))
 			{
 				return TypeDef.ExportTryReadCSharp(Output, State, Indent, MemberOf,
-					ItemName, Index);
+					DefaultName, ItemName, Index);
 			}
 			else if (this.Document.namedNodes.TryGetValue(this.identifier,
 				out Asn1Node Node))
 			{
 				return Node.ExportTryReadCSharp(Output, State, Indent, MemberOf, 
-					ItemName, Index);
+					DefaultName, ItemName, Index);
 			}
 			else
 			{

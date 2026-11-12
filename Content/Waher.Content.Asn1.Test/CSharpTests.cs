@@ -17,9 +17,20 @@ namespace Waher.Content.Asn1.Test
 	[TestClass]
 	public class CSharpTests
 	{
-		public static async Task<string> GenerateCSharp(string FileName)
+		public class CSharpResults
 		{
-			string BaseNamespace = "Test";
+			public string CSharp;
+			public byte[] Dll;
+			public byte[] Pdb;
+		}
+
+		public static Task<CSharpResults> GenerateCSharp(string FileName)
+		{
+			return GenerateCSharp(FileName, "Test");
+		}
+
+		public static async Task<CSharpResults> GenerateCSharp(string FileName, string BaseNamespace)
+		{
 			Asn1Document Doc = await ParsingTests.ParseAsn1Document(FileName);
 			CSharpExportSettings Settings = new(BaseNamespace);
 			string CSharp = await Doc.ExportCSharp(Settings);
@@ -93,7 +104,7 @@ namespace Waher.Content.Asn1.Test
 					i = p1.StartLinePosition.Line - p2.StartLinePosition.Line;
 					if (i != 0)
 						return i;
-					
+
 					return p1.StartLinePosition.Character - p2.StartLinePosition.Character;
 				});
 
@@ -134,7 +145,12 @@ namespace Waher.Content.Asn1.Test
 
 			ConsoleOut.WriteLine(CSharp);
 
-			return CSharp;
+			return new CSharpResults()
+			{
+				CSharp = CSharp,
+				Dll = Output.ToArray(),
+				Pdb = PdbOutput.ToArray()
+			};
 		}
 
 		private static string GetLocation(Type T)

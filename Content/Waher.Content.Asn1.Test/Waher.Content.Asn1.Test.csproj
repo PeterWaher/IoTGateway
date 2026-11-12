@@ -7,6 +7,178 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Binaries\World-Schema\B01_explicit_default.bin" />
+    <None Remove="Binaries\World-Schema\B02_outer_indefinite_mixed.bin" />
+    <None Remove="Binaries\World-Schema\B03_speed_indefinite.bin" />
+    <None Remove="Binaries\World-Schema\B04_payload_indefinite.bin" />
+    <None Remove="Binaries\World-Schema\B05_constructed_name.bin" />
+    <None Remove="Binaries\World-Schema\B06_nested_constructed_message.bin" />
+    <None Remove="Binaries\World-Schema\B07_constructed_payload_string.bin" />
+    <None Remove="Binaries\World-Schema\B08_nonminimal_outer_length.bin" />
+    <None Remove="Binaries\World-Schema\B09_explicit_default_cer_framing.bin" />
+    <None Remove="Binaries\World-Schema\C01_primitive_1001.bin" />
+    <None Remove="Binaries\World-Schema\C02_constructed_short.bin" />
+    <None Remove="Binaries\World-Schema\C03_fragment999.bin" />
+    <None Remove="Binaries\World-Schema\C04_definite_payload.bin" />
+    <None Remove="Binaries\World-Schema\C05_definite_choice_wrapper.bin" />
+    <None Remove="Binaries\World-Schema\N01_empty_name_CER.bin" />
+    <None Remove="Binaries\World-Schema\N01_empty_name_DER.bin" />
+    <None Remove="Binaries\World-Schema\N02_name17_ascii_CER.bin" />
+    <None Remove="Binaries\World-Schema\N02_name17_ascii_DER.bin" />
+    <None Remove="Binaries\World-Schema\N03_name17_astral_CER.bin" />
+    <None Remove="Binaries\World-Schema\N03_name17_astral_DER.bin" />
+    <None Remove="Binaries\World-Schema\N04_fuel3_CER.bin" />
+    <None Remove="Binaries\World-Schema\N04_fuel3_DER.bin" />
+    <None Remove="Binaries\World-Schema\N05_fuel_negative_CER.bin" />
+    <None Remove="Binaries\World-Schema\N05_fuel_negative_DER.bin" />
+    <None Remove="Binaries\World-Schema\V01_minimum_BER.bin" />
+    <None Remove="Binaries\World-Schema\V01_minimum_CER.bin" />
+    <None Remove="Binaries\World-Schema\V01_minimum_DER.bin" />
+    <None Remove="Binaries\World-Schema\V02_mph100_BER.bin" />
+    <None Remove="Binaries\World-Schema\V02_mph100_CER.bin" />
+    <None Remove="Binaries\World-Schema\V02_mph100_DER.bin" />
+    <None Remove="Binaries\World-Schema\V03_kmph128_BER.bin" />
+    <None Remove="Binaries\World-Schema\V03_kmph128_CER.bin" />
+    <None Remove="Binaries\World-Schema\V03_kmph128_DER.bin" />
+    <None Remove="Binaries\World-Schema\V04_message_empty_BER.bin" />
+    <None Remove="Binaries\World-Schema\V04_message_empty_CER.bin" />
+    <None Remove="Binaries\World-Schema\V04_message_empty_DER.bin" />
+    <None Remove="Binaries\World-Schema\V05_name16_ascii_BER.bin" />
+    <None Remove="Binaries\World-Schema\V05_name16_ascii_CER.bin" />
+    <None Remove="Binaries\World-Schema\V05_name16_ascii_DER.bin" />
+    <None Remove="Binaries\World-Schema\V06_unicode_BER.bin" />
+    <None Remove="Binaries\World-Schema\V06_unicode_CER.bin" />
+    <None Remove="Binaries\World-Schema\V06_unicode_DER.bin" />
+    <None Remove="Binaries\World-Schema\V07_name16_astral_BER.bin" />
+    <None Remove="Binaries\World-Schema\V07_name16_astral_CER.bin" />
+    <None Remove="Binaries\World-Schema\V07_name16_astral_DER.bin" />
+    <None Remove="Binaries\World-Schema\V08_payload_order_BER.bin" />
+    <None Remove="Binaries\World-Schema\V08_payload_order_CER.bin" />
+    <None Remove="Binaries\World-Schema\V08_payload_order_DER.bin" />
+    <None Remove="Binaries\World-Schema\V09_minus1_BER.bin" />
+    <None Remove="Binaries\World-Schema\V09_minus1_CER.bin" />
+    <None Remove="Binaries\World-Schema\V09_minus1_DER.bin" />
+    <None Remove="Binaries\World-Schema\V10_minus128_BER.bin" />
+    <None Remove="Binaries\World-Schema\V10_minus128_CER.bin" />
+    <None Remove="Binaries\World-Schema\V10_minus128_DER.bin" />
+    <None Remove="Binaries\World-Schema\V11_minus129_BER.bin" />
+    <None Remove="Binaries\World-Schema\V11_minus129_CER.bin" />
+    <None Remove="Binaries\World-Schema\V11_minus129_DER.bin" />
+    <None Remove="Binaries\World-Schema\V12_plus127_BER.bin" />
+    <None Remove="Binaries\World-Schema\V12_plus127_CER.bin" />
+    <None Remove="Binaries\World-Schema\V12_plus127_DER.bin" />
+    <None Remove="Binaries\World-Schema\V13_plus255_BER.bin" />
+    <None Remove="Binaries\World-Schema\V13_plus255_CER.bin" />
+    <None Remove="Binaries\World-Schema\V13_plus255_DER.bin" />
+    <None Remove="Binaries\World-Schema\V14_plus256_BER.bin" />
+    <None Remove="Binaries\World-Schema\V14_plus256_CER.bin" />
+    <None Remove="Binaries\World-Schema\V14_plus256_DER.bin" />
+    <None Remove="Binaries\World-Schema\V15_big_positive_BER.bin" />
+    <None Remove="Binaries\World-Schema\V15_big_positive_CER.bin" />
+    <None Remove="Binaries\World-Schema\V15_big_positive_DER.bin" />
+    <None Remove="Binaries\World-Schema\V16_big_negative_BER.bin" />
+    <None Remove="Binaries\World-Schema\V16_big_negative_CER.bin" />
+    <None Remove="Binaries\World-Schema\V16_big_negative_DER.bin" />
+    <None Remove="Binaries\World-Schema\V17_message1000_BER.bin" />
+    <None Remove="Binaries\World-Schema\V17_message1000_CER.bin" />
+    <None Remove="Binaries\World-Schema\V17_message1000_DER.bin" />
+    <None Remove="Binaries\World-Schema\V18_message1001_BER.bin" />
+    <None Remove="Binaries\World-Schema\V18_message1001_CER.bin" />
+    <None Remove="Binaries\World-Schema\V18_message1001_DER.bin" />
+    <None Remove="Binaries\World-Schema\V19_utf8_fragment_split_BER.bin" />
+    <None Remove="Binaries\World-Schema\V19_utf8_fragment_split_CER.bin" />
+    <None Remove="Binaries\World-Schema\V19_utf8_fragment_split_DER.bin" />
+    <None Remove="Binaries\World-Schema\V20_payload_long_unicode_BER.bin" />
+    <None Remove="Binaries\World-Schema\V20_payload_long_unicode_CER.bin" />
+    <None Remove="Binaries\World-Schema\V20_payload_long_unicode_DER.bin" />
+    <None Remove="Binaries\World-Schema\V21_payload_many_BER.bin" />
+    <None Remove="Binaries\World-Schema\V21_payload_many_CER.bin" />
+    <None Remove="Binaries\World-Schema\V21_payload_many_DER.bin" />
+    <None Remove="Binaries\World-Schema\V22_controls_BER.bin" />
+    <None Remove="Binaries\World-Schema\V22_controls_CER.bin" />
+    <None Remove="Binaries\World-Schema\V22_controls_DER.bin" />
+    <None Remove="Binaries\World-Schema\V23_one_astral_BER.bin" />
+    <None Remove="Binaries\World-Schema\V23_one_astral_CER.bin" />
+    <None Remove="Binaries\World-Schema\V23_one_astral_DER.bin" />
+    <None Remove="Binaries\World-Schema\V24_payload1000_1001_BER.bin" />
+    <None Remove="Binaries\World-Schema\V24_payload1000_1001_CER.bin" />
+    <None Remove="Binaries\World-Schema\V24_payload1000_1001_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_both_speed_alternatives_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_both_speed_alternatives_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_duplicate_fuel_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_duplicate_fuel_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_duplicate_message_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_duplicate_message_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_duplicate_name_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_duplicate_name_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_duplicate_speed_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_duplicate_speed_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_empty_integer_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_empty_integer_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_empty_rocket_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_empty_rocket_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_empty_speed_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_empty_speed_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_explicit_mph_integer_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_explicit_mph_integer_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_missing_fuel_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_missing_fuel_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_missing_name_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_missing_name_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_missing_payload_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_missing_payload_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_nonminimal_tag_number_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_nonminimal_tag_number_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_payload_context_item_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_payload_context_item_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_payload_integer_item_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_payload_integer_item_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_primitive_indefinite_name_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_primitive_indefinite_name_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_primitive_outer_sequence_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_primitive_outer_sequence_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_primitive_payload_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_primitive_payload_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_primitive_speed_wrapper_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_primitive_speed_wrapper_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_redundant_negative_sign_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_redundant_negative_sign_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_redundant_positive_sign_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_redundant_positive_sign_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_set_instead_sequence_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_set_instead_sequence_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_speed_extra_null_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_speed_extra_null_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_speed_without_wrapper_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_speed_without_wrapper_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_standalone_eoc_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_standalone_eoc_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_trailing_top_level_value_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_trailing_top_level_value_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_truncated_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_truncated_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_universal_fuel_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_universal_fuel_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_universal_message_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_universal_message_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_universal_name_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_universal_name_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_universal_payload_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_universal_payload_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_universal_speed_integer_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_universal_speed_integer_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_unknown_speed_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_unknown_speed_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_unknown_trailing_field_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_unknown_trailing_field_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_utf8_overlong_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_utf8_overlong_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_utf8_surrogate_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_utf8_surrogate_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_utf8_truncated_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_utf8_truncated_DER.bin" />
+    <None Remove="Binaries\World-Schema\X_wrong_field_order_CER.bin" />
+    <None Remove="Binaries\World-Schema\X_wrong_field_order_DER.bin" />
     <None Remove="Examples\IEEE1451\P21451-N1-T1-MIB.asn1" />
     <None Remove="Examples\IEEE1451\P21451-N1-T2-MIB.asn1" />
     <None Remove="Examples\IEEE1451\P21451-N1-T3-MIB.asn1" />
@@ -26,6 +198,522 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Binaries\World-Schema\B01_explicit_default.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\B02_outer_indefinite_mixed.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\B03_speed_indefinite.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\B04_payload_indefinite.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\B05_constructed_name.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\B06_nested_constructed_message.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\B07_constructed_payload_string.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\B08_nonminimal_outer_length.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\B09_explicit_default_cer_framing.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\C01_primitive_1001.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\C02_constructed_short.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\C03_fragment999.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\C04_definite_payload.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\C05_definite_choice_wrapper.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\N01_empty_name_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\N01_empty_name_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\N02_name17_ascii_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\N02_name17_ascii_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\N03_name17_astral_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\N03_name17_astral_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\N04_fuel3_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\N04_fuel3_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\N05_fuel_negative_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\N05_fuel_negative_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V01_minimum_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V01_minimum_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V01_minimum_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V02_mph100_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V02_mph100_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V02_mph100_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V03_kmph128_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V03_kmph128_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V03_kmph128_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V04_message_empty_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V04_message_empty_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V04_message_empty_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V05_name16_ascii_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V05_name16_ascii_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V05_name16_ascii_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V06_unicode_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V06_unicode_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V06_unicode_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V07_name16_astral_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V07_name16_astral_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V07_name16_astral_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V08_payload_order_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V08_payload_order_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V08_payload_order_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V09_minus1_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V09_minus1_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V09_minus1_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V10_minus128_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V10_minus128_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V10_minus128_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V11_minus129_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V11_minus129_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V11_minus129_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V12_plus127_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V12_plus127_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V12_plus127_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V13_plus255_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V13_plus255_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V13_plus255_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V14_plus256_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V14_plus256_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V14_plus256_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V15_big_positive_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V15_big_positive_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V15_big_positive_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V16_big_negative_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V16_big_negative_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V16_big_negative_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V17_message1000_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V17_message1000_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V17_message1000_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V18_message1001_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V18_message1001_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V18_message1001_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V19_utf8_fragment_split_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V19_utf8_fragment_split_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V19_utf8_fragment_split_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V20_payload_long_unicode_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V20_payload_long_unicode_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V20_payload_long_unicode_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V21_payload_many_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V21_payload_many_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V21_payload_many_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V22_controls_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V22_controls_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V22_controls_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V23_one_astral_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V23_one_astral_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V23_one_astral_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V24_payload1000_1001_BER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V24_payload1000_1001_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\V24_payload1000_1001_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_both_speed_alternatives_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_both_speed_alternatives_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_duplicate_fuel_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_duplicate_fuel_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_duplicate_message_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_duplicate_message_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_duplicate_name_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_duplicate_name_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_duplicate_speed_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_duplicate_speed_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_empty_integer_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_empty_integer_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_empty_rocket_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_empty_rocket_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_empty_speed_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_empty_speed_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_explicit_mph_integer_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_explicit_mph_integer_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_missing_fuel_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_missing_fuel_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_missing_name_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_missing_name_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_missing_payload_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_missing_payload_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_nonminimal_tag_number_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_nonminimal_tag_number_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_payload_context_item_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_payload_context_item_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_payload_integer_item_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_payload_integer_item_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_primitive_indefinite_name_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_primitive_indefinite_name_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_primitive_outer_sequence_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_primitive_outer_sequence_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_primitive_payload_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_primitive_payload_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_primitive_speed_wrapper_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_primitive_speed_wrapper_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_redundant_negative_sign_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_redundant_negative_sign_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_redundant_positive_sign_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_redundant_positive_sign_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_set_instead_sequence_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_set_instead_sequence_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_speed_extra_null_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_speed_extra_null_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_speed_without_wrapper_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_speed_without_wrapper_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_standalone_eoc_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_standalone_eoc_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_trailing_top_level_value_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_trailing_top_level_value_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_truncated_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_truncated_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_universal_fuel_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_universal_fuel_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_universal_message_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_universal_message_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_universal_name_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_universal_name_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_universal_payload_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_universal_payload_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_universal_speed_integer_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_universal_speed_integer_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_unknown_speed_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_unknown_speed_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_unknown_trailing_field_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_unknown_trailing_field_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_utf8_overlong_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_utf8_overlong_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_utf8_surrogate_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_utf8_surrogate_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_utf8_truncated_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_utf8_truncated_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_wrong_field_order_CER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Binaries\World-Schema\X_wrong_field_order_DER.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Examples\IEEE1451\P21451-N1-T1-MIB.asn1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

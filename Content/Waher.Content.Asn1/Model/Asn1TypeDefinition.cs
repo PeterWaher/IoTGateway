@@ -168,8 +168,8 @@ namespace Waher.Content.Asn1.Model
 			if (!this.definition.ConstructedType)
 				return;
 
-			if (Pass == CSharpExportPass.Preprocess)
-				await this.definition.ExportCSharp(Output, State, Indent, CSharpExportPass.Preprocess);
+			if (Pass == CSharpExportPass.Preprocess || Pass == CSharpExportPass.Variables)
+				await this.definition.ExportCSharp(Output, State, Indent, Pass);
 			else if (Pass == CSharpExportPass.Explicit)
 				await this.definition.ExportCSharp(Output, State, Indent, CSharpExportPass.Implicit);
 		}
@@ -182,10 +182,10 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Indent">Indentation</param>
 		/// <param name="MemberOf">Member of statement.</param>
 		/// <param name="Index">Item index.</param>
-		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
+		public override async Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, string MemberOf, int Index)
 		{
-			return this.definition.ExportReadCSharp(Output, State, Indent, MemberOf, Index);
+			await this.definition.ExportReadCSharp(Output, State, Indent, MemberOf, Index);
 		}
 
 		/// <summary>
@@ -205,5 +205,20 @@ namespace Waher.Content.Asn1.Model
 			return this.definition.ExportTryReadCSharp(Output, State, Indent, MemberOf, 
 				DefaultName, ItemName, Index);
 		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="VariableName">Name of variable to check.</param>
+		public override Task ExportRestrictionCheck(StringBuilder Output,
+			CSharpExportState State, int Indent, string VariableName)
+		{
+			return this.definition.ExportRestrictionCheck(Output, State, Indent, 
+				VariableName);
+		}
+
 	}
 }

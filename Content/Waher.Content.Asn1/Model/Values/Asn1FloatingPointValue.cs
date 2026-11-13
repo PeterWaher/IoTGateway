@@ -66,7 +66,7 @@ namespace Waher.Content.Asn1.Model.Values
 			int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
-				Output.Append(this.value.ToString().Replace(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
+				Output.Append(this.value.ToString(CultureInfo.InvariantCulture));
 		
 			return Task.CompletedTask;
 		}

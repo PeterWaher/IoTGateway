@@ -37,7 +37,7 @@ namespace Waher.Content.Asn1.Model.Types
 		/// Corresponding C# type.
 		/// </summary>
 		public override string CSharpType => "string";
-		
+
 		/// <summary>
 		/// Accepted ASN.1 tags
 		/// </summary>
@@ -71,7 +71,7 @@ namespace Waher.Content.Asn1.Model.Types
 		{
 			if (Pass == CSharpExportPass.Explicit)
 				Output.Append("string");
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -104,12 +104,9 @@ namespace Waher.Content.Asn1.Model.Types
 				Output.Append(Index.ToString());
 			}
 
-			if (this.Tags.HasValue && this.Tags.Value != Asn1Tags.Explicit)
-			{
-				Output.Append(", ");
-				Output.Append("Asn1F.UniversalTagNumber.");
-				Output.Append(this.StringTag.ToString());
-			}
+			Output.Append(", ");
+			Output.Append("Asn1F.UniversalTagNumber.");
+			Output.Append(this.StringTag.ToString());
 
 			Output.Append(')');
 
@@ -127,7 +124,7 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <param name="ItemName">Name of item variable.</param>
 		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string DefaultName, 
+			CSharpExportState State, int Indent, string MemberOf, string DefaultName,
 			string ItemName, int Index)
 		{
 			Output.Append("TryReadString");
@@ -143,12 +140,9 @@ namespace Waher.Content.Asn1.Model.Types
 				Output.Append(Index.ToString());
 			}
 
-			if (this.Tags.HasValue && this.Tags.Value != Asn1Tags.Explicit)
-			{
-				Output.Append(", ");
-				Output.Append("Asn1F.UniversalTagNumber.");
-				Output.Append(this.StringTag.ToString());
-			}
+			Output.Append(", ");
+			Output.Append("Asn1F.UniversalTagNumber.");
+			Output.Append(this.StringTag.ToString());
 
 			if (string.IsNullOrEmpty(ItemName))
 				Output.Append(", default, out var _Item) ? _Item : null");

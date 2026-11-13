@@ -206,6 +206,20 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="VariableName">Name of variable to check.</param>
+		public virtual Task ExportRestrictionCheck(StringBuilder Output, 
+			CSharpExportState State, int Indent, string VariableName)
+		{
+			throw new NotImplementedException("Restriction check for objects of type " +
+				this.GetType().FullName + " not implemented.");
+		}
+
+		/// <summary>
 		/// Exports optional read logic to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>

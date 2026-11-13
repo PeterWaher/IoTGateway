@@ -9,7 +9,7 @@ namespace Waher.Content.Asn1.Model
 	/// </summary>
 	public class Asn1SetOf : Asn1Type
 	{
-		private readonly Asn1Values size;
+		private readonly Asn1SetOfValues size;
 		private readonly Asn1Type elementType;
 
 		/// <summary>
@@ -18,7 +18,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Size">Optional SIZE</param>
 		/// <param name="ElementType">Element type.</param>
 		/// <param name="Document">ASN.1 document hosting the node.</param>
-		public Asn1SetOf(Asn1Values Size, Asn1Type ElementType, Asn1Document Document)
+		public Asn1SetOf(Asn1SetOfValues Size, Asn1Type ElementType, Asn1Document Document)
 			: base(Document)
 		{
 			this.size = Size;
@@ -31,7 +31,7 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// Optional SIZE
 		/// </summary>
-		public Asn1Values Size => this.size;
+		public Asn1SetOfValues Size => this.size;
 
 		/// <summary>
 		/// Type.

@@ -125,7 +125,12 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Explicit && !this.TypeDefinition)
+			if (Pass == CSharpExportPass.Preprocess || Pass == CSharpExportPass.Variables)
+			{
+				foreach (Asn1Node Node in this.Nodes)
+					await Node.ExportCSharp(Output, State, Indent, Pass);
+			}
+			else if (Pass == CSharpExportPass.Explicit && !this.TypeDefinition)
 			{
 				Output.Append(ToCSharp(State, this, this.Name));
 				Output.Append("Choice");
@@ -318,6 +323,7 @@ namespace Waher.Content.Asn1.Model
 						Indent++;
 
 						await Node.ExportReadCSharp(Output, State, Indent, "this", Index++);
+						await Node.ExportRestrictionCheck(Output, State, Indent, "this");
 
 						JSON.Indent(Output, Indent);
 						Output.Append("this._choice = _Options.");
@@ -341,8 +347,6 @@ namespace Waher.Content.Asn1.Model
 					Indent--;
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("}");
-
-					// TODO: ASN.1 Read method
 
 					Indent--;
 
@@ -376,6 +380,12 @@ namespace Waher.Content.Asn1.Model
 					if (!this.TypeDefinition)
 						Output.Append("Choice");
 					Output.AppendLine("();");
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("Asn1F.AsnReader Reader2 = Reader.Clone();");
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("_Result.Read(Reader2);");
 
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("_Result.Read(Reader);");
@@ -482,5 +492,19 @@ namespace Waher.Content.Asn1.Model
 
 			return Task.CompletedTask;
 		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="VariableName">Name of variable to check.</param>
+		public override Task ExportRestrictionCheck(StringBuilder Output,
+			CSharpExportState State, int Indent, string VariableName)
+		{
+			return Task.CompletedTask;
+		}
+
 	}
 }

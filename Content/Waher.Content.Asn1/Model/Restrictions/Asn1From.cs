@@ -1,4 +1,7 @@
-﻿namespace Waher.Content.Asn1.Model.Restrictions
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace Waher.Content.Asn1.Model.Restrictions
 {
 	/// <summary>
 	/// FROM()
@@ -10,7 +13,7 @@
 		/// </summary>
 		/// <param name="Set">Set</param>
 		/// <param name="Document">ASN.1 document hosting the node.</param>
-		public Asn1From(Asn1Values Set, Asn1Document Document)
+		public Asn1From(Asn1SetOfValues Set, Asn1Document Document)
 			: base(Set, Document)
 		{
 		}

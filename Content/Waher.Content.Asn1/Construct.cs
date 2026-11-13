@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Formats.Asn1;
 using System.Numerics;
+using System.Text;
 using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1
@@ -47,6 +48,8 @@ namespace Waher.Content.Asn1
 
 		#endregion
 
+		#region Data Types
+
 		#region Any
 
 		/// <summary>
@@ -75,7 +78,7 @@ namespace Waher.Content.Asn1
 		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		private static bool TryReadAny(AsnReader Reader, Asn1Tag ExpectedTag,
+		public static bool TryReadAny(AsnReader Reader, Asn1Tag ExpectedTag,
 			object Default, out object Result)
 		{
 			if (ExpectedTag.TagClass == TagClass.Universal)
@@ -548,10 +551,12 @@ namespace Waher.Content.Asn1
 		/// Tries to read a string.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="TagNumber">Expected Tag number.</param>
 		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadString(AsnReader Reader, string Default, out string Result)
+		public static bool TryReadString(AsnReader Reader, UniversalTagNumber TagNumber,
+			string Default, out string Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 
@@ -559,6 +564,20 @@ namespace Waher.Content.Asn1
 			{
 				Result = Reader.ReadCharacterString((UniversalTagNumber)Tag.TagValue);
 				return true;
+			}
+			else if (Tag.TagClass == TagClass.Universal &&
+				Tag.TagValue == (int)UniversalTagNumber.OctetString)
+			{
+				try
+				{
+					Result = ReadString(Reader, TagNumber);
+					return true;
+				}
+				catch (Exception)
+				{
+					Result = Default;
+					return false;
+				}
 			}
 			else
 			{
@@ -583,12 +602,18 @@ namespace Waher.Content.Asn1
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return TryReadStringExplicit(Reader, Index, Default, out Result);
+				{
+					return TryReadStringExplicit(Reader, Index, TagNumber, Default,
+						out Result);
+				}
 				else
-					return TryReadStringImplicit(Reader, Index, TagNumber, Default, out Result);
+				{
+					return TryReadStringImplicit(Reader, Index, TagNumber, Default,
+						out Result);
+				}
 			}
 			else
-				return TryReadString(Reader, Default, out Result);
+				return TryReadString(Reader, TagNumber, Default, out Result);
 		}
 
 		/// <summary>
@@ -629,11 +654,12 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="TagNumber">Expected Tag number.</param>
 		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
 		public static bool TryReadStringExplicit(AsnReader Reader, int Index,
-			string Default, out string Result)
+			UniversalTagNumber TagNumber, string Default, out string Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
 			if (Tag.TagClass != TagClass.ContextSpecific ||
@@ -647,20 +673,108 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadString(Inner, Default, out Result);
+			if (!TryReadString(Inner, TagNumber, Default, out Result))
+				return false;
 
+			if (Inner.HasData)
+			{
+				StringBuilder sb = new StringBuilder(Result);
+
+				while (Inner.HasData && TryReadString(Inner, TagNumber, null, out Result))
+					sb.Append(Result);
+
+				Result = sb.ToString();
+			}
+
+			return true;
 		}
 
 		/// <summary>
 		/// Reads a string.
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="TagNumber">Expected Tag number.</param>
 		/// <returns>Value</returns>
-		public static string ReadString(AsnReader Reader)
+		public static string ReadString(AsnReader Reader, UniversalTagNumber TagNumber)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
-			return Reader.ReadCharacterString((UniversalTagNumber)Tag.TagValue);
+			if (IsString(Tag))
+				return Reader.ReadCharacterString((UniversalTagNumber)Tag.TagValue);
+
+			if (Tag.TagClass == TagClass.Universal && Tag.TagValue == (int)UniversalTagNumber.OctetString)
+			{
+				bool BuiltInCodec;
+
+				switch (TagNumber)
+				{
+					case UniversalTagNumber.UTF8String:
+					case UniversalTagNumber.NumericString:
+					case UniversalTagNumber.PrintableString:
+					case UniversalTagNumber.TeletexString: // Also T61String.
+					case UniversalTagNumber.IA5String:
+					case UniversalTagNumber.VisibleString: // Also ISO646String.
+					case UniversalTagNumber.BMPString:
+						BuiltInCodec = true;
+						break;
+
+					case UniversalTagNumber.UniversalString:
+						BuiltInCodec = false;
+						break;
+
+					case UniversalTagNumber.ObjectDescriptor:
+					case UniversalTagNumber.VideotexString:
+					case UniversalTagNumber.GraphicString:
+					case UniversalTagNumber.GeneralString:
+						throw new NotSupportedException(
+							TagNumber + " requires a suitable ISO-2022 character-set decoder.");
+
+					case UniversalTagNumber.UnrestrictedCharacterString:
+						throw new NotSupportedException(
+							"CHARACTER STRING requires decoding its identification " +
+							"and string-value components.");
+
+					default:
+						throw new ArgumentOutOfRangeException(nameof(TagNumber), TagNumber,
+							"Unsupported character-string type.");
+				}
+
+				byte[] Encoded = Reader.PeekEncodedValue().ToArray();
+				Encoded[0] = (byte)(0x80 | (Tag.IsConstructed ? 0x20 : 0));
+
+				Asn1Tag TemporaryTag = new Asn1Tag(TagClass.ContextSpecific, 0);
+				AsnReader ValueReader = new AsnReader(Encoded, Reader.RuleSet);
+
+				string Result;
+
+				if (BuiltInCodec)
+					Result = ValueReader.ReadCharacterString(TagNumber, TemporaryTag);
+				else
+				{
+					// UniversalString: four-octet, big-endian Unicode values.
+					byte[] Bin = ValueReader.ReadOctetString(TemporaryTag);
+
+					try
+					{
+						Result = universalString.GetString(Bin);
+					}
+					catch (DecoderFallbackException ex)
+					{
+						throw new AsnContentException(
+							"Invalid UniversalString contents.", ex);
+					}
+				}
+
+				ValueReader.ThrowIfNotEmpty();
+				Reader.ReadEncodedValue();
+
+				return Result;
+			}
+			else
+				throw new AsnContentException("Expected string tag, but read " + Tag.ToString());
 		}
+
+		private static readonly UTF32Encoding universalString = new UTF32Encoding(
+			bigEndian: true, byteOrderMark: false, throwOnInvalidCharacters: true);
 
 		/// <summary>
 		/// Reads a string.
@@ -676,12 +790,12 @@ namespace Waher.Content.Asn1
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return ReadStringExplicit(Reader, Index);
+					return ReadStringExplicit(Reader, Index, TagNumber);
 				else
 					return ReadStringImplicit(Reader, Index, TagNumber);
 			}
 			else
-				return ReadString(Reader);
+				return ReadString(Reader, TagNumber);
 		}
 
 		/// <summary>
@@ -703,13 +817,30 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Reader">ASN.1 reader</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="TagNumber">Expected Tag number.</param>
 		/// <returns>Value</returns>
-		public static string ReadStringExplicit(AsnReader Reader, int Index)
+		public static string ReadStringExplicit(AsnReader Reader, int Index,
+			UniversalTagNumber TagNumber)
 		{
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadString(Inner);
+			string s = ReadString(Inner, TagNumber);
+
+			if (Inner.HasData)
+			{
+				StringBuilder sb = new StringBuilder(s);
+
+				while (Inner.HasData)
+				{
+					s = ReadString(Inner, TagNumber);
+					sb.Append(s);
+				}
+
+				s = sb.ToString();
+			}
+
+			return s;
 		}
 
 		#endregion
@@ -2433,7 +2564,7 @@ namespace Waher.Content.Asn1
 		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadTimeOfDayExplicit(AsnReader Reader, int Index, 
+		public static bool TryReadTimeOfDayExplicit(AsnReader Reader, int Index,
 			TimeSpan? Default, out TimeSpan? Result)
 		{
 			Asn1Tag Tag = Reader.PeekTag();
@@ -2683,7 +2814,7 @@ namespace Waher.Content.Asn1
 		/// <param name="Default">Default value.</param>
 		/// <param name="Result">Result, if successful.</param>
 		/// <returns>If able to read item.</returns>
-		public static bool TryReadEnumeration<T>(AsnReader Reader, T? Default, 
+		public static bool TryReadEnumeration<T>(AsnReader Reader, T? Default,
 			out T? Result)
 			where T : struct, Enum
 		{
@@ -3011,6 +3142,264 @@ namespace Waher.Content.Asn1
 
 			return Items.ToArray();
 		}
+
+		#endregion
+
+		#endregion
+
+		#region Sets
+
+		/// <summary>
+		/// Abstract interface for sets.
+		/// </summary>
+		public interface ISet
+		{
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			bool Contains(object Element);
+		}
+
+		/// <summary>
+		/// Set of all values.
+		/// </summary>
+		public class AllValues : ISet
+		{
+			/// <summary>
+			/// Set of all values.
+			/// </summary>
+			public AllValues()
+			{
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(object Element) => true;
+		}
+
+		/// <summary>
+		/// Set containing a single value.
+		/// </summary>
+		public class SingleValue<T> : ISet
+		{
+			private readonly T value;
+
+			/// <summary>
+			/// Set containing a single value.
+			/// </summary>
+			/// <param name="Value">Value</param>
+			public SingleValue(T Value)
+			{
+				this.value = Value;
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(object Element) => this.value.Equals(Element);
+		}
+
+		/// <summary>
+		/// Set defined by an interval.
+		/// </summary>
+		public class Interval<T> : ISet
+			where T : IComparable
+		{
+			private readonly T from;
+			private readonly T to;
+
+			/// <summary>
+			/// Set defined by an interval.
+			/// </summary>
+			/// <param name="From">Start value of interval.</param>
+			/// <param name="To">Stop value of interval.</param>
+			public Interval(T From, T To)
+			{
+				this.from = From;
+				this.to = To;
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(object Element)
+			{
+				return
+					this.from.CompareTo(Element) >= 0 &&
+					this.to.CompareTo(Element) <= 0;
+			}
+		}
+
+		/// <summary>
+		/// Intersection of two sets.
+		/// </summary>
+		public class Intersection : ISet
+		{
+			private readonly ISet left;
+			private readonly ISet right;
+
+			/// <summary>
+			/// Intersection of two sets.
+			/// </summary>
+			/// <param name="Left">Left set.</param>
+			/// <param name="Right">Right set.</param>
+			public Intersection(ISet Left, ISet Right)
+			{
+				this.left = Left;
+				this.right = Right;
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(object Element)
+			{
+				return
+					this.left.Contains(Element) &&
+					this.right.Contains(Element);
+			}
+		}
+
+		/// <summary>
+		/// Union of two sets.
+		/// </summary>
+		public class Union : ISet
+		{
+			private readonly ISet left;
+			private readonly ISet right;
+
+			/// <summary>
+			/// Union of two sets.
+			/// </summary>
+			/// <param name="Left">Left set.</param>
+			/// <param name="Right">Right set.</param>
+			public Union(ISet Left, ISet Right)
+			{
+				this.left = Left;
+				this.right = Right;
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(object Element)
+			{
+				return
+					this.left.Contains(Element) ||
+					this.right.Contains(Element);
+			}
+		}
+
+		/// <summary>
+		/// Complement of right set in the left set.
+		/// </summary>
+		public class Complement : ISet
+		{
+			private readonly ISet left;
+			private readonly ISet right;
+
+			/// <summary>
+			/// Complement of right set in the left set.
+			/// </summary>
+			/// <param name="Left">Left set.</param>
+			/// <param name="Right">Right set.</param>
+			public Complement(ISet Left, ISet Right)
+			{
+				this.left = Left;
+				this.right = Right;
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(object Element)
+			{
+				return
+					this.left.Contains(Element) &&
+					!this.right.Contains(Element);
+			}
+		}
+
+		#endregion
+
+		#region Restrictions
+
+		#region Size
+
+		/// <summary>
+		/// Checks the size of a value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <param name="Valid">Set of valid values.</param>
+		/// <returns>If the size is within accepted bounds.</returns>
+		public static bool CheckSize(string Value, ISet Valid)
+		{
+			return Valid.Contains(Value.Length);
+		}
+
+		/// <summary>
+		/// Checks the size of a value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <param name="Valid">Set of valid values.</param>
+		/// <returns>If the size is within accepted bounds.</returns>
+		public static bool CheckSize(Array Value, ISet Valid)
+		{
+			return Valid.Contains(Value.Length);
+		}
+
+		/// <summary>
+		/// Checks the size of a value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <param name="Valid">Set of valid values.</param>
+		/// <returns>If the size is within accepted bounds.</returns>
+		public static bool CheckSize(object Value, ISet Valid)
+		{
+			if (Value is string s)
+				return CheckSize(s, Valid);
+			else if (Value is Array A)
+				return CheckSize(A, Valid);
+			else if (Value is null)
+				throw new AsnContentException("Null value incompatible with SIZE.");
+			else
+			{
+				throw new AsnContentException("Type incompatible with SIZE: " +
+					Value.GetType().FullName);
+			}
+		}
+
+		#endregion
+
+		#region InSet
+
+		/// <summary>
+		/// Checks if a value is a member of a set.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <param name="Valid">Set of valid values.</param>
+		/// <returns>If the value is in the set.</returns>
+		public static bool CheckInSet(object Value, ISet Valid)
+		{
+			return Valid.Contains(Value);
+		}
+
+		#endregion
 
 		#endregion
 	}

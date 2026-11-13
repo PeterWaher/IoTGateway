@@ -186,5 +186,30 @@ namespace Waher.Content.Asn1.Model.Types
 				return Task.CompletedTask;
 			}
 		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="VariableName">Name of variable to check.</param>
+		public override Task ExportRestrictionCheck(StringBuilder Output,
+			CSharpExportState State, int Indent, string VariableName)
+		{
+			if (this.Document.aliases.TryGetValue(this.identifier,
+				out Asn1TypeDefinition TypeDef))
+			{
+				return TypeDef.ExportRestrictionCheck(Output, State, Indent, VariableName);
+			}
+			else if (this.Document.namedNodes.TryGetValue(this.identifier,
+				out Asn1Node Node))
+			{
+				return Node.ExportRestrictionCheck(Output, State, Indent, VariableName);
+			}
+			else
+				return Task.CompletedTask;
+		}
+
 	}
 }

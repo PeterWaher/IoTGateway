@@ -876,18 +876,18 @@ namespace Waher.Content.Asn1
 			}
 		}
 
-		private Asn1Values ParseSet()
+		private Asn1SetOfValues ParseSet()
 		{
 			this.AssertNextToken("(");
-			Asn1Values Result = this.ParseUnions();
+			Asn1SetOfValues Result = this.ParseUnions();
 			this.AssertNextToken(")");
 
 			return Result;
 		}
 
-		private Asn1Values ParseUnions()
+		private Asn1SetOfValues ParseUnions()
 		{
-			Asn1Values Result = this.ParseIntersections();
+			Asn1SetOfValues Result = this.ParseIntersections();
 
 			string s = this.PeekNextToken();
 
@@ -901,9 +901,9 @@ namespace Waher.Content.Asn1
 			return Result;
 		}
 
-		private Asn1Values ParseIntersections()
+		private Asn1SetOfValues ParseIntersections()
 		{
-			Asn1Values Result = this.ParseIntervals();
+			Asn1SetOfValues Result = this.ParseIntervals();
 
 			string s = this.PeekNextToken();
 
@@ -917,7 +917,7 @@ namespace Waher.Content.Asn1
 			return Result;
 		}
 
-		private Asn1Values ParseIntervals()
+		private Asn1SetOfValues ParseIntervals()
 		{
 			string s = this.PeekNextToken();
 
@@ -925,7 +925,7 @@ namespace Waher.Content.Asn1
 			{
 				this.pos++;
 
-				Asn1Values Result = this.ParseUnions();
+				Asn1SetOfValues Result = this.ParseUnions();
 				this.AssertNextToken(")");
 
 				return Result;
@@ -1244,7 +1244,7 @@ namespace Waher.Content.Asn1
 					}
 					else
 					{
-						Asn1Values Size = this.ParseSizeOf(s);
+						Asn1SetOfValues Size = this.ParseSizeOf(s);
 						Asn1Type Type = this.ParseDataType(Name, TypeDef, DefaultTags);
 						return new Asn1SetOf(Size, Type, this);
 					}
@@ -1259,7 +1259,7 @@ namespace Waher.Content.Asn1
 					}
 					else
 					{
-						Asn1Values Size = this.ParseSizeOf(s);
+						Asn1SetOfValues Size = this.ParseSizeOf(s);
 						Asn1Type Type = this.ParseDataType(Name, false, DefaultTags);
 						return new Asn1SequenceOf(Name, TypeDef, Size, Type, this);
 					}
@@ -1305,9 +1305,9 @@ namespace Waher.Content.Asn1
 			}
 		}
 
-		private Asn1Values ParseSizeOf(string s)
+		private Asn1SetOfValues ParseSizeOf(string s)
 		{
-			Asn1Values Size = null;
+			Asn1SetOfValues Size = null;
 			bool InParenthesis;
 			bool ParsingProperties = true;
 

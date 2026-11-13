@@ -1,5 +1,8 @@
-﻿using Waher.Content.Asn1.Model.Values;
+﻿using System;
+using System.Text;
+using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
+using Waher.Content.Asn1.Model.Values;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -143,5 +146,50 @@ namespace Waher.Content.Asn1.Model
 		{
 			return Document.ParseValue();
 		}
+
+		/// <summary>
+		/// Exports any restriction to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="VariableName">Name of variable to check.</param>
+		/// <param name="Pass">Export pass</param>
+		public virtual Task ExportRestrictionCSharp(StringBuilder Output, 
+			CSharpExportState State, int Indent, string VariableName, CSharpExportPass Pass)
+		{
+			if (Pass == CSharpExportPass.Variables && !(this.restriction is null))
+			{
+				return this.restriction.ExportRestrictionVariables(Output, State, Indent,
+					VariableName);
+			}
+			else
+				return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="VariableName">Name of variable to check.</param>
+		public override async Task ExportRestrictionCheck(StringBuilder Output,
+			CSharpExportState State, int Indent, string VariableName)
+		{
+			if (this.restriction is null)
+				return;
+
+			JSON.Indent(Output, Indent);
+			Output.Append("if (!(");
+			await this.restriction.RenderChecks(Output, State, VariableName, this);
+			Output.AppendLine("))");
+			
+			JSON.Indent(Output, Indent + 1);
+			Output.Append("throw new Asn1F.AsnContentException(");
+			Output.Append(VariableName);
+			Output.AppendLine(" + \" out of bounds.\");");
+		}
+
 	}
 }

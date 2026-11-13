@@ -83,7 +83,12 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State, 
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Explicit && !this.TypeDefinition)
+			if (Pass == CSharpExportPass.Preprocess || Pass == CSharpExportPass.Variables)
+			{
+				foreach (Asn1Node Node in this.Nodes)
+					await Node.ExportCSharp(Output, State, Indent, Pass);
+			}
+			else if (Pass == CSharpExportPass.Explicit && !this.TypeDefinition)
 			{
 				Output.Append(ToCSharp(State, this, this.Name));
 				Output.Append("Seq");
@@ -168,7 +173,10 @@ namespace Waher.Content.Asn1.Model
 					int Index = 0;
 
 					foreach (Asn1Node Node in this.Nodes)
+					{
 						await Node.ExportReadCSharp(Output, State, Indent, "this", Index++);
+						await Node.ExportRestrictionCheck(Output, State, Indent, "this");
+					}
 
 					Indent--;
 
@@ -292,6 +300,19 @@ namespace Waher.Content.Asn1.Model
 				Output.Append(')');
 			}
 
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="VariableName">Name of variable to check.</param>
+		public override Task ExportRestrictionCheck(StringBuilder Output,
+			CSharpExportState State, int Indent, string VariableName)
+		{
 			return Task.CompletedTask;
 		}
 

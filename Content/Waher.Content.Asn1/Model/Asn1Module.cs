@@ -59,7 +59,8 @@ namespace Waher.Content.Asn1.Model
 			foreach (Asn1Node Item in this.items)
 				await Item.ExportCSharp(Output, State, Indent, Pass);
 
-			State.ClosePending(Output);
+			if (Pass != CSharpExportPass.Preprocess)
+				State.ClosePending(Output);
 		}
 
 

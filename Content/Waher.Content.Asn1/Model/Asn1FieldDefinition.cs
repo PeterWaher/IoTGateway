@@ -13,6 +13,7 @@ namespace Waher.Content.Asn1.Model
 	public class Asn1FieldDefinition : Asn1Node
 	{
 		private readonly string fieldName;
+		private readonly string fieldNameCSharp;
 		private readonly Asn1Type type;
 		private Asn1Tag? tag;
 
@@ -28,9 +29,10 @@ namespace Waher.Content.Asn1.Model
 			: base(Document)
 		{
 			this.fieldName = FieldName;
+			this.fieldNameCSharp = ToCSharp(FieldName);
 			this.type = Type;
 			this.tag = Tag;
-	
+
 			this.SetAsChild(this.type);
 		}
 
@@ -118,13 +120,18 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Explicit)
+			if (Pass == CSharpExportPass.Preprocess || Pass == CSharpExportPass.Variables)
+			{
+				await this.type.ExportRestrictionCSharp(Output, State, Indent,
+					this.fieldNameCSharp, Pass);
+			}
+			else if (Pass == CSharpExportPass.Explicit)
 			{
 				JSON.Indent(Output, Indent);
 				Output.Append("public ");
 				await this.type.ExportCSharp(Output, State, Indent, Pass);
 				Output.Append(' ');
-				Output.Append(ToCSharp(this.fieldName));
+				Output.Append(this.fieldNameCSharp);
 
 				if (!(this.type.Default is null))
 				{
@@ -158,25 +165,70 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportReadCSharp(StringBuilder Output,
 			CSharpExportState State, int Indent, string MemberOf, int Index)
 		{
+			string Name = MemberOf + "." + this.fieldNameCSharp;
+
 			if (this.type.Optional ?? false)
 			{
-				string Name = MemberOf + "." + ToCSharp(this.fieldName);
-
 				await this.ExportTryReadCSharp(Output, State, Indent, string.Empty,
 					Name, Name, Index);
 			}
 			else
 			{
 				JSON.Indent(Output, Indent);
-				Output.Append(MemberOf);
-				Output.Append('.');
-				Output.Append(ToCSharp(this.fieldName));
+				Output.Append(Name);
 				Output.Append(" = ");
 
-				await this.type.ExportReadCSharp(Output, State, Indent + 1, string.Empty, 
+				await this.type.ExportReadCSharp(Output, State, Indent + 1, string.Empty,
 					Index);
 
 				Output.AppendLine(";");
+			}
+		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="VariableName">Name of variable to check.</param>
+		public override async Task ExportRestrictionCheck(StringBuilder Output,
+			CSharpExportState State, int Indent, string VariableName)
+		{
+			StringBuilder Temp = new StringBuilder();
+			string Name = VariableName + "." + this.fieldNameCSharp;
+
+			if (this.type.Optional ?? false)
+				await this.type.ExportRestrictionCheck(Temp, State, Indent + 1, Name);
+			else
+				await this.type.ExportRestrictionCheck(Temp, State, Indent, Name);
+
+			string Check = Temp.ToString();
+
+			if (!string.IsNullOrWhiteSpace(Check))
+			{
+				if (this.type.Optional ?? false)
+				{
+					JSON.Indent(Output, Indent);
+					Output.Append("if (!(");
+					Output.Append(Name);
+					Output.AppendLine(" is default))");
+
+					if (Check.IndexOfAny(CommonTypes.CRLF) >= 0)
+					{
+						JSON.Indent(Output, Indent);
+						Output.AppendLine("{");
+
+						Output.Append(Check);
+
+						JSON.Indent(Output, Indent);
+						Output.AppendLine("}");
+					}
+					else
+						Output.Append(Check);
+				}
+				else
+					Output.Append(Check);
 			}
 		}
 
@@ -191,15 +243,15 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="ItemName">Name of item variable.</param>
 		/// <param name="Index">Item index.</param>
 		public override async Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string DefaultName, 
+			CSharpExportState State, int Indent, string MemberOf, string DefaultName,
 			string ItemName, int Index)
 		{
 			JSON.Indent(Output, Indent);
 
 			if (string.IsNullOrEmpty(ItemName))
 			{
-				await this.type.ExportTryReadCSharp(Output, State, Indent, string.Empty, 
-					null, MemberOf + "." + ToCSharp(this.fieldName), Index);
+				await this.type.ExportTryReadCSharp(Output, State, Indent, string.Empty,
+					null, MemberOf + "." + this.fieldNameCSharp, Index);
 			}
 			else
 			{
@@ -213,7 +265,7 @@ namespace Waher.Content.Asn1.Model
 					JSON.Indent(Output, Indent);
 					Output.Append(MemberOf);
 					Output.Append('.');
-					Output.Append(ToCSharp(this.fieldName));
+					Output.Append(this.fieldNameCSharp);
 					Output.Append(" = ");
 					Output.Append(ItemName);
 				}
@@ -229,10 +281,10 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Index">Item index.</param>
-		public override Task ExportWriteCSharp(StringBuilder Output, 
+		public override Task ExportWriteCSharp(StringBuilder Output,
 			CSharpExportState State, int Indent, int Index)
 		{
-			return base.ExportWriteCSharp(Output, State, Indent, Index);	// TODO
+			return base.ExportWriteCSharp(Output, State, Indent, Index);    // TODO
 		}
 	}
 }

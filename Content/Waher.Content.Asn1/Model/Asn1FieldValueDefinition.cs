@@ -15,6 +15,7 @@ namespace Waher.Content.Asn1.Model
 		public const string DefinedValues = "_DefinedValues";
 
 		private readonly string fieldName;
+		private readonly string fieldNameCSharp;
 		private readonly Asn1Type type;
 		private readonly Asn1Value value;
 
@@ -30,6 +31,7 @@ namespace Waher.Content.Asn1.Model
 			: base(Document)
 		{
 			this.fieldName = FieldName;
+			this.fieldNameCSharp = ToCSharp(FieldName);
 			this.type= Type;
 			this.value = Value;
 
@@ -84,7 +86,12 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Variables)
+			if (Pass == CSharpExportPass.Preprocess)
+			{
+				await this.type.ExportRestrictionCSharp(Output, State, Indent,
+					this.fieldNameCSharp, Pass);
+			}
+			else if (Pass == CSharpExportPass.Variables)
 			{
 				if (!State.ExportingValues)
 				{
@@ -100,13 +107,16 @@ namespace Waher.Content.Asn1.Model
 					State.ExportingValuesIndent = Indent + 1;
 				}
 
+				await this.type.ExportRestrictionCSharp(Output, State, Indent,
+					this.fieldNameCSharp, CSharpExportPass.Variables);
+
 				JSON.Indent(Output, State.ExportingValuesIndent);
 				Output.Append("public static readonly ");
 
 				await this.type.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 
 				Output.Append(' ');
-				Output.Append(ToCSharp(this.fieldName));
+				Output.Append(this.fieldNameCSharp);
 				Output.Append(" = ");
 				await this.value.ExportCSharp(Output, State, State.ExportingValuesIndent, CSharpExportPass.Explicit);
 				Output.AppendLine(";");

@@ -218,8 +218,6 @@ namespace Waher.Content.Asn1.Model
 				}
 
 				await this.body.ExportCSharp(Output, State, Indent, CSharpExportPass.Preprocess);
-				State.ClosePending(Output);
-
 				await this.body.ExportCSharp(Output, State, Indent, CSharpExportPass.Variables);
 				State.ClosePending(Output);
 

@@ -1,5 +1,5 @@
-﻿using System;
-using System.Formats.Asn1;
+﻿using System.Formats.Asn1;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,14 +10,14 @@ namespace Waher.Content.Asn1.Model.Values
 	/// </summary>
 	public class Asn1IntegerValue : Asn1Value
 	{
-		private long value;
+		private BigInteger value;
 
 		/// <summary>
 		/// Integer value
 		/// </summary>
 		/// <param name="Value">Value</param>
 		/// <param name="Document">ASN.1 document hosting the node.</param>
-		public Asn1IntegerValue(long Value, Asn1Document Document)
+		public Asn1IntegerValue(BigInteger Value, Asn1Document Document)
 			: base(Document)
 		{
 			this.value = Value;
@@ -26,7 +26,7 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <summary>
 		/// Value
 		/// </summary>
-		public long Value => this.value;
+		public BigInteger Value => this.value;
 
 		/// <summary>
 		/// Accepted ASN.1 tags
@@ -50,8 +50,10 @@ namespace Waher.Content.Asn1.Model.Values
 
 				if (this.value < 0 || this.value >= 63)
 					base.TwosPower();
+				else if (this.value >= 0 && this.value <= int.MaxValue)
+					this.value = BigInteger.Pow(2, (int)this.value);
 				else
-					this.value = 1L << (int)this.value;
+					throw new AsnContentException("Invalid power of two.");
 			}
 		}
 
@@ -77,6 +79,6 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <summary>
 		/// Corresponding C# type.
 		/// </summary>
-		public override string CSharpType => "long";
+		public override string CSharpType => "System.Numerics.BigInteger";
 	}
 }

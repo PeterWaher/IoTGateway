@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Formats.Asn1;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Runtime.IO;
 
 namespace Waher.Content.Asn1.Test
@@ -186,27 +188,36 @@ namespace Waher.Content.Asn1.Test
 		[DataRow("V05_name16_ascii_DER.bin", AsnEncodingRules.DER, null)]
 		[DataRow("V06_unicode_BER.bin", AsnEncodingRules.BER, null)]
 		[DataRow("V06_unicode_CER.bin", AsnEncodingRules.CER, null)]
-		public async Task Test_01_WorldSchema(string Binary, AsnEncodingRules Rules, 
+		public async Task Test_01_WorldSchema(string Binary, AsnEncodingRules Rules,
 			string ExpectedError)
 		{
-			if (string.IsNullOrEmpty(ExpectedError))
+			try
 			{
 				await Read("World-Schema.asn1", "Test_01_WorldSchema", "World_Schema",
 					"Rocket", "Binaries\\World-Schema\\" + Binary, Rules);
+
+				if (!string.IsNullOrEmpty(ExpectedError))
+					Assert.Fail(ExpectedError);
 			}
-			else
+			catch (AsnContentException ex)
 			{
-				Assert.Throws<Exception>(async () =>
-				{
-					await Read("World-Schema.asn1", "Test_01_WorldSchema", "World_Schema",
-						"Rocket", "Binaries\\World-Schema\\" + Binary, Rules);
-				}, ExpectedError);
+				if (string.IsNullOrEmpty(ExpectedError))
+					ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+			catch (Exception ex)
+			{
+				ex = Log.UnnestException(ex);
+				if (string.IsNullOrEmpty(ExpectedError))
+					ExceptionDispatchInfo.Capture(ex).Throw();
+
+				if (ex is not AsnContentException)
+					ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 		}
 
 		private static async Task Read(string Definition, string Namespace, string ModuleName,
 			string TypeName, string Binary, AsnEncodingRules Rules)
-		{ 
+		{
 			if (!assemblies.TryGetValue(Namespace, out Assembly A))
 			{
 				CSharpTests.CSharpResults Compiled = await CSharpTests.GenerateCSharp(

@@ -1,4 +1,7 @@
-﻿namespace Waher.Content.Asn1.Model.Restrictions
+﻿using System.Text;
+using System.Threading.Tasks;
+
+namespace Waher.Content.Asn1.Model.Restrictions
 {
 	/// <summary>
 	/// Abstract base class of binary restriction operators
@@ -34,5 +37,19 @@
 		/// Right restriction
 		/// </summary>
 		public Asn1Restriction Right => this.right;
+		
+		/// <summary>
+		/// Exports restriction variable definitions to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="VariableName">Name of variable to check.</param>
+		public override async Task ExportRestrictionVariables(StringBuilder Output,
+			CSharpExportState State, int Indent, string VariableName)
+		{
+			await this.left.ExportRestrictionVariables(Output, State, Indent, VariableName);
+			await this.right.ExportRestrictionVariables(Output, State, Indent, VariableName);
+		}
 	}
 }

@@ -3,6 +3,7 @@ using System.Formats.Asn1;
 using System.Numerics;
 using System.Text;
 using Waher.Runtime.Collections;
+using Waher.Script.TypeConversion.ToDouble;
 
 namespace Waher.Content.Asn1
 {
@@ -3203,7 +3204,23 @@ namespace Waher.Content.Asn1
 			/// </summary>
 			/// <param name="Element">Element to check</param>
 			/// <returns>If the set contains the element.</returns>
-			public bool Contains(object Element) => this.value.Equals(Element);
+			public bool Contains(T Element)
+			{
+				return this.value.Equals(Element);
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(object Element)
+			{
+				if (!(Element is T Typed))
+					Typed = (T)Convert.ChangeType(Element, typeof(T));
+
+				return this.Contains(Typed);
+			}
 		}
 
 		/// <summary>
@@ -3231,11 +3248,106 @@ namespace Waher.Content.Asn1
 			/// </summary>
 			/// <param name="Element">Element to check</param>
 			/// <returns>If the set contains the element.</returns>
-			public bool Contains(object Element)
+			public bool Contains(T Element)
 			{
 				return
-					this.from.CompareTo(Element) >= 0 &&
-					this.to.CompareTo(Element) <= 0;
+					this.from.CompareTo(Element) <= 0 &&
+					this.to.CompareTo(Element) >= 0;
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(object Element)
+			{
+				if (!(Element is T Typed))
+					Typed = (T)Convert.ChangeType(Element, typeof(T));
+
+				return this.Contains(Typed);
+			}
+		}
+
+		/// <summary>
+		/// Set defined by an interval that is open upwards.
+		/// </summary>
+		public class IntervalOpenUp<T> : ISet
+			where T : IComparable
+		{
+			private readonly T from;
+
+			/// <summary>
+			/// Set defined by an interval that is open upwards.
+			/// </summary>
+			/// <param name="From">Start value of interval.</param>
+			public IntervalOpenUp(T From)
+			{
+				this.from = From;
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(T Element)
+			{
+				return this.from.CompareTo(Element) <= 0;
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(object Element)
+			{
+				if (!(Element is T Typed))
+					Typed = (T)Convert.ChangeType(Element, typeof(T));
+
+				return this.Contains(Typed);
+			}
+		}
+
+		/// <summary>
+		/// Set defined by an interval that is open downwards.
+		/// </summary>
+		public class IntervalOpenDown<T> : ISet
+			where T : IComparable
+		{
+			private readonly T to;
+
+			/// <summary>
+			/// Set defined by an interval that is open downwards.
+			/// </summary>
+			/// <param name="To">Stop value of interval.</param>
+			public IntervalOpenDown(T To)
+			{
+				this.to = To;
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(T Element)
+			{
+				return this.to.CompareTo(Element) >= 0;
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(object Element)
+			{
+				if (!(Element is T Typed))
+					Typed = (T)Convert.ChangeType(Element, typeof(T));
+
+				return this.Contains(Typed);
 			}
 		}
 
@@ -3349,7 +3461,7 @@ namespace Waher.Content.Asn1
 		/// <returns>If the size is within accepted bounds.</returns>
 		public static bool CheckSize(string Value, ISet Valid)
 		{
-			return Valid.Contains(Value.Length);
+			return Valid.Contains((BigInteger)Value.Length);
 		}
 
 		/// <summary>
@@ -3360,7 +3472,7 @@ namespace Waher.Content.Asn1
 		/// <returns>If the size is within accepted bounds.</returns>
 		public static bool CheckSize(Array Value, ISet Valid)
 		{
-			return Valid.Contains(Value.Length);
+			return Valid.Contains((BigInteger)Value.Length);
 		}
 
 		/// <summary>
@@ -3400,6 +3512,51 @@ namespace Waher.Content.Asn1
 		}
 
 		#endregion
+
+		#region From
+
+		/// <summary>
+		/// Checks if a value conforms to a given alphabet.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <param name="Valid">Set of valid characters.</param>
+		/// <returns>If the value conforms to the alphabet.</returns>
+		public static bool CheckFrom(string Value, ISet Valid)
+		{
+			foreach (char ch in Value)
+			{
+				if (!Valid.Contains(ch))
+					return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Checks if a value conforms to a given alphabet.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <param name="Valid">Set of valid characters.</param>
+		/// <returns>If the value conforms to the alphabet.</returns>
+		public static bool CheckFrom(object Value, ISet Valid)
+		{
+			if (Value is string s)
+				return CheckFrom(s, Valid);
+			else if (Value is null)
+				throw new AsnContentException("Null value incompatible with FROM.");
+			else
+			{
+				throw new AsnContentException("Type incompatible with FROM: " +
+					Value.GetType().FullName);
+			}
+		}
+
+		#endregion
+
+		// TODO: CheckContaining
+		// TODO: CheckEncodedBy
+		// TODO: CheckPattern
+		// TODO: CheckWithComponents
 
 		#endregion
 	}

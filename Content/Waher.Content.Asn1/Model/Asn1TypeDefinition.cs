@@ -207,6 +207,21 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
+		/// Exports any restriction to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="VariableName">Name of variable to check.</param>
+		/// <param name="Pass">Export pass</param>
+		public override Task ExportRestrictionCSharp(StringBuilder Output, 
+			CSharpExportState State, int Indent, string VariableName, CSharpExportPass Pass)
+		{
+			return this.definition.ExportRestrictionCSharp(Output, State, Indent, 
+				VariableName, Pass);
+		}
+
+		/// <summary>
 		/// Exports read logic to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>

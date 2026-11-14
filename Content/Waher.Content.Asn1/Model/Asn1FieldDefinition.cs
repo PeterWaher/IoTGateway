@@ -120,12 +120,7 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Preprocess || Pass == CSharpExportPass.Variables)
-			{
-				await this.type.ExportRestrictionCSharp(Output, State, Indent,
-					this.fieldNameCSharp, Pass);
-			}
-			else if (Pass == CSharpExportPass.Explicit)
+			if (Pass == CSharpExportPass.Explicit)
 			{
 				JSON.Indent(Output, Indent);
 				Output.Append("public ");
@@ -151,7 +146,15 @@ namespace Waher.Content.Asn1.Model
 				Output.AppendLine(";");
 			}
 			else
+			{
+				if (Pass == CSharpExportPass.Preprocess || Pass == CSharpExportPass.Variables)
+				{
+					await this.type.ExportRestrictionCSharp(Output, State, Indent,
+						this.fieldNameCSharp, Pass);
+				}
+
 				await this.type.ExportCSharp(Output, State, Indent, Pass);
+			}
 		}
 
 		/// <summary>
@@ -212,7 +215,7 @@ namespace Waher.Content.Asn1.Model
 					JSON.Indent(Output, Indent);
 					Output.Append("if (!(");
 					Output.Append(Name);
-					Output.AppendLine(" is default))");
+					Output.AppendLine(" is null))");
 
 					if (Check.IndexOfAny(CommonTypes.CRLF) >= 0)
 					{

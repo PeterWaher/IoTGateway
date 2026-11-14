@@ -13,6 +13,7 @@ using Waher.Runtime.IO;
 using Waher.Runtime.Collections;
 using System;
 using System.Formats.Asn1;
+using System.Numerics;
 
 namespace Waher.Content.Asn1
 {
@@ -1501,7 +1502,7 @@ namespace Waher.Content.Asn1
 						case "H":
 						case "h":
 							this.pos++;
-							if (long.TryParse(s, NumberStyles.HexNumber, null, out long l))
+							if (BigInteger.TryParse(s, NumberStyles.HexNumber, null, out BigInteger l))
 								return new Asn1IntegerValue(l, this);
 							else
 								throw this.SyntaxError("Invalid hexadecimal string.");
@@ -1509,7 +1510,7 @@ namespace Waher.Content.Asn1
 						case "D":
 						case "d":
 							this.pos++;
-							if (long.TryParse(s, out l))
+							if (BigInteger.TryParse(s, out l))
 								return new Asn1IntegerValue(l, this);
 							else
 								throw this.SyntaxError("Invalid decimal string.");
@@ -1615,7 +1616,7 @@ namespace Waher.Content.Asn1
 							this.pos++;
 						}
 
-						if (ulong.TryParse(s, out ulong l))
+						if (BigInteger.TryParse(s, out BigInteger l))
 						{
 							this.pos += s.Length;
 
@@ -1656,12 +1657,7 @@ namespace Waher.Content.Asn1
 								return new Asn1FloatingPointValue(d, this);
 							}
 
-							if (l <= long.MaxValue)
-								return new Asn1IntegerValue(Sign ? -(long)l : (long)l, this);
-							else if (Sign)
-								throw this.SyntaxError("Number does not fit into a 64-bit signed integer.");
-							else
-								return new Asn1UnsignedIntegerValue(l, this);
+							return new Asn1IntegerValue(Sign ? -l : l, this);
 						}
 					}
 					break;
@@ -1670,7 +1666,7 @@ namespace Waher.Content.Asn1
 			throw this.SyntaxError("Value expected.");
 		}
 
-		private static bool TryParseBinary(string s, out long l)
+		private static bool TryParseBinary(string s, out BigInteger l)
 		{
 			l = 0;
 
@@ -1679,18 +1675,14 @@ namespace Waher.Content.Asn1
 				if (ch < '0' || ch > '1')
 					return false;
 
-				long l2 = l;
 				l <<= 1;
-				if (l < l2)
-					return false;
-
-				l |= (byte)(ch - '0');
+				l += (byte)(ch - '0');
 			}
 
 			return true;
 		}
 
-		private static bool TryParseOctal(string s, out long l)
+		private static bool TryParseOctal(string s, out BigInteger l)
 		{
 			l = 0;
 
@@ -1699,12 +1691,8 @@ namespace Waher.Content.Asn1
 				if (ch < '0' || ch > '7')
 					return false;
 
-				long l2 = l;
 				l <<= 3;
-				if (l < l2)
-					return false;
-
-				l |= (byte)(ch - '0');
+				l += (byte)(ch - '0');
 			}
 
 			return true;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace Waher.Content.Asn1
 {
@@ -32,6 +33,32 @@ namespace Waher.Content.Asn1
 			this.segments = Segments;
 		}
 
+
+		/// <summary>
+		/// ASN.1 Object identifier
+		/// </summary>
+		/// <param name="Segments">Segments</param>
+		public ObjectId(params BigInteger[] Segments)
+			: this(ToUIntArray(Segments))
+		{
+		}
+
+		private static uint[] ToUIntArray(BigInteger[] Segments)
+		{
+			int i, c = Segments.Length;
+			uint[] Result = new uint[c];
+
+			for (i = 0; i < c; i++)
+			{
+				if (Segments[i] >= 0 && Segments[i] <= uint.MaxValue)
+					Result[i] = (uint)Segments[i];
+				else
+					throw new ArgumentOutOfRangeException(nameof(Segments));
+			}
+
+			return Result;
+		}
+
 		/// <summary>
 		/// ASN.1 Object identifier
 		/// </summary>
@@ -46,6 +73,16 @@ namespace Waher.Content.Asn1
 
 			Buffer.BlockCopy(Id.segments, 0, this.segments, 0, c);
 			Buffer.BlockCopy(Segments, 0, this.segments, c, d);
+		}
+
+		/// <summary>
+		/// ASN.1 Object identifier
+		/// </summary>
+		/// <param name="Id">First part of object identifier.</param>
+		/// <param name="Segments">Segments</param>
+		public ObjectId(ObjectId Id, params BigInteger[] Segments)
+			: this(Id, ToUIntArray(Segments))
+		{
 		}
 
 		/// <summary>
@@ -69,7 +106,51 @@ namespace Waher.Content.Asn1
 		/// Implicit converter from an integer array
 		/// </summary>
 		/// <param name="Segments">Segments</param>
-		public static implicit operator ObjectId(int[] Segments) => new ObjectId(Segments);
+		public static implicit operator ObjectId(BigInteger[] Segments)
+		{
+			int i, c = Segments.Length;
+			uint[] Segments2 = new uint[c];
+			BigInteger l;
+
+			for (i = 0; i < c; i++)
+			{
+				l = Segments[i];
+				if (l >= uint.MinValue && l <= uint.MaxValue)
+					Segments2[i] = (uint)l;
+				else
+				{
+					throw new ArgumentOutOfRangeException(nameof(Segments),
+						"Segments must be within the range of 32-bit integers.");
+				}
+			}
+
+			return new ObjectId(Segments2);
+		}
+
+		/// <summary>
+		/// Implicit converter from an integer array
+		/// </summary>
+		/// <param name="Segments">Segments</param>
+		public static implicit operator ObjectId(int[] Segments)
+		{
+			int i, c = Segments.Length;
+			uint[] Segments2 = new uint[c];
+			int l;
+
+			for (i = 0; i < c; i++)
+			{
+				l = Segments[i];
+				if (l >= 0)
+					Segments2[i] = (uint)l;
+				else
+				{
+					throw new ArgumentOutOfRangeException(nameof(Segments),
+						"Segments must be unsigned 32-bit integers.");
+				}
+			}
+
+			return new ObjectId(Segments2);
+		}
 
 		/// <summary>
 		/// Implicit converter from an integer array

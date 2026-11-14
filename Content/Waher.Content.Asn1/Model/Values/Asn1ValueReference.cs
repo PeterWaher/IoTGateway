@@ -66,10 +66,12 @@ namespace Waher.Content.Asn1.Model.Values
 		{
 			get
 			{
-				if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node) &&
-					Node is Asn1Value Value)
+				if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
 				{
-					return Value.CSharpType;
+					if (Node is Asn1Value Value)
+						return Value.CSharpType;
+					else if (Node is Asn1FieldValueDefinition FieldValueDef)
+						return FieldValueDef.Value.CSharpType;
 				}
 
 				if (this.TryGetAncestor(out Asn1TypeReference TypeReference))

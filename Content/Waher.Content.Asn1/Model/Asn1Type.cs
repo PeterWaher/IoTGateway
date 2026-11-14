@@ -62,7 +62,7 @@ namespace Waher.Content.Asn1.Model
 		/// </summary>
 		/// <param name="Value">Value</param>
 		internal void SetOptional(bool? Value)
-		{ 
+		{
 			this.optional = Value;
 		}
 
@@ -155,7 +155,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Indent">Indentation</param>
 		/// <param name="VariableName">Name of variable to check.</param>
 		/// <param name="Pass">Export pass</param>
-		public virtual Task ExportRestrictionCSharp(StringBuilder Output, 
+		public virtual Task ExportRestrictionCSharp(StringBuilder Output,
 			CSharpExportState State, int Indent, string VariableName, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Variables && !(this.restriction is null))
@@ -184,11 +184,16 @@ namespace Waher.Content.Asn1.Model
 			Output.Append("if (!(");
 			await this.restriction.RenderChecks(Output, State, VariableName, this);
 			Output.AppendLine("))");
-			
+
 			JSON.Indent(Output, Indent + 1);
-			Output.Append("throw new Asn1F.AsnContentException(");
-			Output.Append(VariableName);
-			Output.AppendLine(" + \" out of bounds.\");");
+			Output.Append("throw new Asn1F.AsnContentException(\"");
+			
+			if (VariableName.StartsWith("this."))
+				Output.Append(VariableName.Substring(5));
+			else
+				Output.Append(VariableName);
+			
+			Output.AppendLine(" out of bounds.\");");
 		}
 
 	}

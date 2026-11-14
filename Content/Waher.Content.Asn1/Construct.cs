@@ -3,7 +3,6 @@ using System.Formats.Asn1;
 using System.Numerics;
 using System.Text;
 using Waher.Runtime.Collections;
-using Waher.Script.TypeConversion.ToDouble;
 
 namespace Waher.Content.Asn1
 {
@@ -2830,7 +2829,7 @@ namespace Waher.Content.Asn1
 			{
 				case (int)UniversalTagNumber.Integer:
 				case (int)UniversalTagNumber.Enumerated:
-					Result = ReadEnumeration<T>(Reader);
+					Result = AssertValidEnum(ReadEnumeration<T>(Reader));
 					return true;
 			}
 
@@ -2884,8 +2883,8 @@ namespace Waher.Content.Asn1
 
 			try
 			{
-				Result = (T)Reader.ReadEnumeratedValue(typeof(T),
-					new Asn1Tag(TagClass.ContextSpecific, Index));
+				Result = AssertValidEnum((T)Reader.ReadEnumeratedValue(typeof(T),
+					new Asn1Tag(TagClass.ContextSpecific, Index)));
 				return true;
 			}
 			catch (Exception)
@@ -2931,7 +2930,18 @@ namespace Waher.Content.Asn1
 		public static T ReadEnumeration<T>(AsnReader Reader)
 			where T : struct, Enum
 		{
-			return (T)Reader.ReadEnumeratedValue(typeof(T));
+			return AssertValidEnum((T)Reader.ReadEnumeratedValue(typeof(T)));
+		}
+
+		private static T AssertValidEnum<T>(T Value)
+		{
+			if (!Enum.IsDefined(typeof(T), Value))
+			{
+				throw new AsnContentException("Invalid enumeration of type " +
+					typeof(T).FullName + ": " + Value.ToString());
+			}
+
+			return Value;
 		}
 
 		/// <summary>
@@ -2944,15 +2954,16 @@ namespace Waher.Content.Asn1
 			where T : struct, Enum
 		{
 			Asn1Tag Tag = Reader.PeekTag();
+
 			if (Tag.TagClass == TagClass.ContextSpecific)
 			{
 				if (Tag.IsConstructed)
-					return ReadEnumerationExplicit<T>(Reader, Index);
+					return AssertValidEnum(ReadEnumerationExplicit<T>(Reader, Index));
 				else
-					return ReadEnumerationImplicit<T>(Reader, Index);
+					return AssertValidEnum(ReadEnumerationImplicit<T>(Reader, Index));
 			}
 			else
-				return ReadEnumeration<T>(Reader);
+				return AssertValidEnum(ReadEnumeration<T>(Reader));
 		}
 
 		/// <summary>
@@ -2964,8 +2975,8 @@ namespace Waher.Content.Asn1
 		public static T ReadEnumerationImplicit<T>(AsnReader Reader, int Index)
 			where T : struct, Enum
 		{
-			return (T)Reader.ReadEnumeratedValue(typeof(T),
-				new Asn1Tag(TagClass.ContextSpecific, Index));
+			return AssertValidEnum((T)Reader.ReadEnumeratedValue(typeof(T),
+				new Asn1Tag(TagClass.ContextSpecific, Index)));
 		}
 
 		/// <summary>

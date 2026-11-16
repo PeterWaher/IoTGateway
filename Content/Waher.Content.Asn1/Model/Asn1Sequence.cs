@@ -122,9 +122,6 @@ namespace Waher.Content.Asn1.Model
 					Indent++;
 
 					foreach (Asn1Node Node in this.Nodes)
-						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Implicit);
-
-					foreach (Asn1Node Node in this.Nodes)
 						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 
 					// public static T Create(Reader)

@@ -57,14 +57,14 @@ namespace Waher.Content.Asn1.Test
 			HashSet<string> Dependencies =
 			[
 				GetLocation(typeof(object)),
-					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"),
-					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"),
-					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"),
-					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"),
-					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"),
-					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(AsnReader))), "System.Formats.Asn1.dll"),
-					Path.Combine(Path.GetDirectoryName(GetLocation(typeof(BigInteger))), "System.Runtime.Numerics.dll"),
-					GetLocation(typeof(Asn1Document))
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(AsnReader))), "System.Formats.Asn1.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(BigInteger))), "System.Runtime.Numerics.dll"),
+				GetLocation(typeof(Asn1Document))
 			];
 
 			string s = Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "netstandard.dll");

@@ -277,8 +277,23 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadAny(Inner, Default, out Result);
+			return CheckComplete(TryReadAny(Inner, Default, out Result), Inner);
+		}
 
+		private static bool CheckComplete(bool Result, AsnReader Reader)
+		{
+			if (Result && Reader.HasData)
+				throw new AsnContentException("Unexpected inner content found.");
+
+			return Result;
+		}
+
+		private static T CheckComplete<T>(T Result, AsnReader Reader)
+		{
+			if (Reader.HasData)
+				throw new AsnContentException("Unexpected inner content found.");
+
+			return Result;
 		}
 
 		/// <summary>
@@ -342,7 +357,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadAny(Inner);
+			return CheckComplete(ReadAny(Inner), Inner);
 		}
 
 		#endregion
@@ -452,7 +467,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadBitString(Inner, Default, out Result);
+			return CheckComplete(TryReadBitString(Inner, Default, out Result), Inner);
 
 		}
 
@@ -508,7 +523,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadBitString(Inner);
+			return CheckComplete(ReadBitString(Inner), Inner);
 		}
 
 		#endregion
@@ -686,7 +701,7 @@ namespace Waher.Content.Asn1
 				Result = sb.ToString();
 			}
 
-			return true;
+			return CheckComplete(true, Inner);
 		}
 
 		/// <summary>
@@ -840,7 +855,7 @@ namespace Waher.Content.Asn1
 				s = sb.ToString();
 			}
 
-			return s;
+			return CheckComplete(s, Inner);
 		}
 
 		#endregion
@@ -949,7 +964,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadOctetString(Inner, Default, out Result);
+			return CheckComplete(TryReadOctetString(Inner, Default, out Result), Inner);
 
 		}
 
@@ -1005,7 +1020,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadOctetString(Inner);
+			return CheckComplete(ReadOctetString(Inner), Inner);
 		}
 
 		#endregion
@@ -1113,7 +1128,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadBoolean(Inner, Default, out Result);
+			return CheckComplete(TryReadBoolean(Inner, Default, out Result), Inner);
 
 		}
 
@@ -1169,7 +1184,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadBoolean(Inner);
+			return CheckComplete(ReadBoolean(Inner), Inner);
 		}
 
 		#endregion
@@ -1275,7 +1290,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadDate(Inner, Default, out Result);
+			return CheckComplete(TryReadDate(Inner, Default, out Result), Inner);
 
 		}
 
@@ -1331,7 +1346,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadDate(Inner);
+			return CheckComplete(ReadDate(Inner), Inner);
 		}
 
 		#endregion
@@ -1437,7 +1452,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadDateTime(Inner, Default, out Result);
+			return CheckComplete(TryReadDateTime(Inner, Default, out Result), Inner);
 
 		}
 
@@ -1493,7 +1508,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadDateTime(Inner);
+			return CheckComplete(ReadDateTime(Inner), Inner);
 		}
 
 		#endregion
@@ -1600,7 +1615,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadDuration(Inner, Default, out Result);
+			return CheckComplete(TryReadDuration(Inner, Default, out Result), Inner);
 
 		}
 
@@ -1656,7 +1671,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadDuration(Inner);
+			return CheckComplete(ReadDuration(Inner), Inner);
 		}
 
 		#endregion
@@ -1763,7 +1778,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadGeneralizedTime(Inner, Default, out Result);
+			return CheckComplete(TryReadGeneralizedTime(Inner, Default, out Result), Inner);
 
 		}
 
@@ -1819,7 +1834,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadGeneralizedTime(Inner);
+			return CheckComplete(ReadGeneralizedTime(Inner), Inner);
 		}
 
 		#endregion
@@ -1928,7 +1943,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadInteger(Inner, Default, out Result);
+			return CheckComplete(TryReadInteger(Inner, Default, out Result), Inner);
 
 		}
 
@@ -1984,7 +1999,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadInteger(Inner);
+			return CheckComplete(ReadInteger(Inner), Inner);
 		}
 
 		#endregion
@@ -2085,7 +2100,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadNull(Inner, out Result);
+			return CheckComplete(TryReadNull(Inner, out Result), Inner);
 
 		}
 
@@ -2143,7 +2158,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadNull(Inner);
+			return CheckComplete(ReadNull(Inner), Inner);
 		}
 
 		#endregion
@@ -2253,7 +2268,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadObjectId(Inner, Default, out Result);
+			return CheckComplete(TryReadObjectId(Inner, Default, out Result), Inner);
 
 		}
 
@@ -2310,7 +2325,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadObjectId(Inner);
+			return CheckComplete(ReadObjectId(Inner), Inner);
 		}
 
 		#endregion
@@ -2417,7 +2432,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadReal(Inner, Default, out Result);
+			return CheckComplete(TryReadReal(Inner, Default, out Result), Inner);
 		}
 
 		/// <summary>
@@ -2472,7 +2487,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadReal(Inner);
+			return CheckComplete(ReadReal(Inner), Inner);
 		}
 
 		#endregion
@@ -2579,7 +2594,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadTimeOfDay(Inner, Default, out Result);
+			return CheckComplete(TryReadTimeOfDay(Inner, Default, out Result), Inner);
 
 		}
 
@@ -2635,7 +2650,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadTimeOfDay(Inner);
+			return CheckComplete(ReadTimeOfDay(Inner), Inner);
 		}
 
 		#endregion
@@ -2744,7 +2759,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return TryReadUtcTime(Inner, Default, out Result);
+			return CheckComplete(TryReadUtcTime(Inner, Default, out Result), Inner);
 
 		}
 
@@ -2800,7 +2815,7 @@ namespace Waher.Content.Asn1
 			AsnReader Inner = Reader.ReadSequence(
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
-			return ReadUtcTime(Inner);
+			return CheckComplete(ReadUtcTime(Inner), Inner);
 		}
 
 		#endregion
@@ -3472,7 +3487,18 @@ namespace Waher.Content.Asn1
 		/// <returns>If the size is within accepted bounds.</returns>
 		public static bool CheckSize(string Value, ISet Valid)
 		{
-			return Valid.Contains((BigInteger)Value.Length);
+			int Count = 0;
+			int i, c = Value.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				if (char.IsSurrogatePair(Value, i))
+					i++;
+
+				Count++;
+			}
+
+			return Valid.Contains((BigInteger)Count);
 		}
 
 		/// <summary>

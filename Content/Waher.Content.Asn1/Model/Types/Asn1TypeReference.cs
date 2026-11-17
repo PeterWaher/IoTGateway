@@ -28,6 +28,12 @@ namespace Waher.Content.Asn1.Model.Types
 		/// </summary>
 		public string Identifier => this.identifier;
 
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			return "Reference: " + this.identifier;
+		}
+
 		/// <summary>
 		/// Corresponding C# type.
 		/// </summary>
@@ -36,9 +42,60 @@ namespace Waher.Content.Asn1.Model.Types
 			get
 			{
 				if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
-					return TypeDef.CSharpType;
+				{
+					string s = TypeDef.CSharpType;
+
+					if (!TypeDef.ByReference &&
+						(this.Optional ?? false) &&
+						!(TypeDef.Optional ?? false))
+					{
+						s += "?";
+					}
+
+					return s;
+				}
+				else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+					return Node.CSharpType;
 				else
 					return ToCSharp(this.identifier);
+			}
+		}
+
+		/// <summary>
+		/// If the type is passed by reference.
+		/// </summary>
+		public override bool ByReference
+		{
+			get
+			{
+				if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
+					return TypeDef.ByReference;
+				else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node) &&
+					Node is Asn1Type Type)
+				{
+					return Type.ByReference;
+				}
+				else
+					return true;
+			}
+		}
+
+		/// <summary>
+		/// If the type is a constructed type.
+		/// </summary>
+		public override bool ConstructedType
+		{
+			get
+			{
+				if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
+					return TypeDef.ConstructedType;
+				else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node) &&
+					Node is Asn1Type Type)
+				{
+					return Type.ConstructedType;
+				}
+				else
+					return true;
 			}
 		}
 
@@ -65,7 +122,9 @@ namespace Waher.Content.Asn1.Model.Types
 		{
 			get
 			{
-				if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
+				if (base.Optional.HasValue)
+					return base.Optional;
+				else if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
 					return TypeDef.Optional;
 				else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
 					return Node.Optional;
@@ -87,6 +146,8 @@ namespace Waher.Content.Asn1.Model.Types
 			{
 				if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
 					await TypeDef.Definition.ExportCSharp(Output, State, Indent, Pass);
+				else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+					Output.Append(ToCSharp(State, this, Node.CSharpType));
 				else
 					Output.Append(ToCSharp(State, this, this.identifier));
 			}
@@ -231,6 +292,34 @@ namespace Waher.Content.Asn1.Model.Types
 			}
 			else
 				return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Exports write logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Tags">How to encode tags.</param>
+		public override Task ExportWriteCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf, int Index, 
+			Asn1Tags? Tags)
+		{
+			if (this.Document.aliases.TryGetValue(this.identifier,
+				out Asn1TypeDefinition TypeDef))
+			{
+				return TypeDef.ExportWriteCSharp(Output, State, Indent, MemberOf,
+					Index, Tags);
+			}
+			else if (this.Document.namedNodes.TryGetValue(this.identifier,
+				out Asn1Node Node))
+			{
+				return Node.ExportWriteCSharp(Output, State, Indent, MemberOf, Index, Tags);
+			}
+			else
+				throw new AsnContentException("Type " + this.identifier + " not found.");
 		}
 
 	}

@@ -23,6 +23,8 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Choice(string Name, bool TypeDef, Asn1Node[] Nodes, Asn1Document Document)
 			: base(Name, TypeDef, Nodes, Document)
 		{
+			foreach (Asn1Node Node in Nodes)
+				Node.SetOptional(true);
 		}
 
 		/// <summary>
@@ -237,7 +239,7 @@ namespace Waher.Content.Asn1.Model
 
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
-					Output.AppendLine("public void Read(Asn1F.AsnReader Reader)");
+					Output.AppendLine("public override void Read(Asn1F.AsnReader Reader)");
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
 
@@ -423,13 +425,55 @@ namespace Waher.Content.Asn1.Model
 
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
-					Output.AppendLine("public void Write(Asn1F.AsnWriter Writer)");
+					Output.AppendLine("public override void Write(Asn1F.AsnWriter Writer)");
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
 
 					Indent++;
 
-					// TODO: ASN.1 Write method
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("switch (this._choice)");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
+
+					Indent++;
+					Index = 0;
+
+					foreach (Asn1Node Node in this.Nodes)
+					{
+						if (!(Node is Asn1FieldDefinition FieldDef))
+							throw new Exception("Expected ASN.1 field definitions inside CHOICE.");
+
+						JSON.Indent(Output, Indent);
+						Output.Append("case _Options.");
+						Output.Append(ToCSharp(FieldDef.Name));
+						Output.AppendLine(":");
+
+						Indent++;
+
+						Asn1Tags? Tags = this.Tags;
+						if (Tags.HasValue && Tags.Value == Asn1Tags.Automatic)
+							Tags = Asn1Tags.Explicit;   // For CHOICE, AUTOMATIC equals EXPLICIT
+
+						await Node.ExportRestrictionCheck(Output, State, Indent, "this");
+						await Node.ExportWriteCSharp(Output, State, Indent, "this", Index++, Tags);
+
+						JSON.Indent(Output, Indent);
+						Output.AppendLine("break;");
+						Output.AppendLine();
+
+						Indent--;
+					}
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("default:");
+					JSON.Indent(Output, Indent + 1);
+					Output.AppendLine("throw new Asn1F.AsnContentException(\"No option selected.\");");
+
+					Indent--;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
 
 					Indent--;
 
@@ -503,6 +547,24 @@ namespace Waher.Content.Asn1.Model
 		public override Task ExportRestrictionCheck(StringBuilder Output,
 			CSharpExportState State, int Indent, string VariableName)
 		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Exports write logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Tags">How to encode tags.</param>
+		public override Task ExportWriteCSharp(StringBuilder Output, 
+			CSharpExportState State, int Indent, string MemberOf, int Index, 
+			Asn1Tags? Tags)
+		{
+			Output.Append(MemberOf);
+			Output.Append(".Write(Writer)");
 			return Task.CompletedTask;
 		}
 

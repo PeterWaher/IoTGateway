@@ -2,6 +2,7 @@
 using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Asn1.Model.Types;
 using Waher.Content.Asn1.Model.Values;
 using Waher.Runtime.Collections;
 
@@ -21,11 +22,11 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Name">Optional field or type name.</param>
 		/// <param name="TypeDef">If construct is part of a type definition.</param>
 		/// <param name="Flags">If the enumeration lists options that can be combined.
-		/// <see cref="System.FlagsAttribute"/>.</param>
+		/// <see cref="FlagsAttribute"/>.</param>
 		/// <param name="BaseType">Base type of enumeration.</param>
 		/// <param name="Nodes">Nodes</param>
 		/// <param name="Document">ASN.1 document hosting the node.</param>
-		public Asn1Enumeration(string Name, bool TypeDef, bool Flags, Asn1Node BaseType, 
+		public Asn1Enumeration(string Name, bool TypeDef, bool Flags, Asn1Node BaseType,
 			Asn1Node[] Nodes, Asn1Document Document)
 			: base(Name, TypeDef, Nodes, Document)
 		{
@@ -47,7 +48,12 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// If the type is a constructed type.
 		/// </summary>
-		public override bool ConstructedType => true;
+		public override bool ConstructedType => false;
+
+		/// <summary>
+		/// If the type is passed by reference.
+		/// </summary>
+		public override bool ByReference => false;
 
 		/// <summary>
 		/// Base type.
@@ -55,7 +61,7 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Node BaseType => this.baseType;
 
 		/// <summary>
-		/// If the enumeration represents a <see cref="System.FlagsAttribute"/> enumeration.
+		/// If the enumeration represents a <see cref="FlagsAttribute"/> enumeration.
 		/// </summary>
 		public bool Flags => this.flags;
 
@@ -90,6 +96,10 @@ namespace Waher.Content.Asn1.Model
 				string s = ToCSharp(this.Name);
 				if (!this.TypeDefinition)
 					s += "Enum";
+
+				if (this.Optional ?? false)
+					s += "?";
+
 				return s;
 			}
 		}
@@ -112,7 +122,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State, 
+		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Implicit)
@@ -258,7 +268,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="ItemName">Name of item variable.</param>
 		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string DefaultName, 
+			CSharpExportState State, int Indent, string MemberOf, string DefaultName,
 			string ItemName, int Index)
 		{
 			Output.Append("TryReadEnumeration");
@@ -291,5 +301,53 @@ namespace Waher.Content.Asn1.Model
 
 			return Task.CompletedTask;
 		}
+
+		/// <summary>
+		/// Exports write logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Tags">How to encode tags.</param>
+		public override Task ExportWriteCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, string MemberOf, int Index, Asn1Tags? Tags)
+		{
+			bool AsInteger = this.baseType is Asn1Integer;
+			bool AsBitString = this.baseType is Asn1BitString;
+
+			if (AsInteger)
+				Output.Append("WriteInteger");
+			else if (AsBitString)
+				Output.Append("WriteBitString");
+			else
+				Output.Append("WriteEnumeration");
+
+			if (!Tags.HasValue)
+				Tags = this.Tags;
+
+			if (Tags.HasValue)
+				Output.Append(Tags.Value.ToString());
+
+			Output.Append("(Writer");
+
+			if (Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			Output.Append(", ");
+			if (AsInteger || AsBitString)
+				Output.Append("(int)");
+
+			Output.Append(MemberOf);
+
+			Output.Append(')');
+
+			return Task.CompletedTask;
+		}
+
 	}
 }

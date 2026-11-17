@@ -43,7 +43,7 @@ namespace Waher.Content.Asn1.Model
 		}
 
 		/// <summary>
-		/// Makes the value 2^value, for use with <see cref="System.FlagsAttribute"/>
+		/// Makes the value 2^value, for use with <see cref="FlagsAttribute"/>
 		/// enumerations.
 		/// </summary>
 		public virtual void TwosPower()

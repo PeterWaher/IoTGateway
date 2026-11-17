@@ -21,7 +21,21 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// Corresponding C# type.
 		/// </summary>
-		public override string CSharpType => "Waher.Content.Duration";
+		public override string CSharpType
+		{
+			get
+			{
+				if (this.Optional ?? false)
+					return "Waher.Content.Duration?";
+				else
+					return "Waher.Content.Duration";
+			}
+		}
+
+		/// <summary>
+		/// If the type is passed by reference.
+		/// </summary>
+		public override bool ByReference => false;
 
 		/// <summary>
 		/// Accepted ASN.1 tags
@@ -43,7 +57,11 @@ namespace Waher.Content.Asn1.Model.Types
 		public override Task ExportCSharp(StringBuilder Output, CSharpExportState State, int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
+			{
 				Output.Append("Waher.Content.Duration");
+				if (this.Optional ?? false)
+					Output.Append('?');
+			}
 	
 			return Task.CompletedTask;
 		}
@@ -114,6 +132,42 @@ namespace Waher.Content.Asn1.Model.Types
 				Output.Append(ItemName);
 				Output.Append(')');
 			}
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Exports write logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Tags">How to encode tags.</param>
+		public override Task ExportWriteCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, string MemberOf, int Index, Asn1Tags? Tags)
+		{
+			Output.Append("WriteDuration");
+
+			if (!Tags.HasValue)
+				Tags = this.Tags;
+
+			if (Tags.HasValue)
+				Output.Append(Tags.Value.ToString());
+
+			Output.Append("(Writer");
+
+			if (Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			Output.Append(", ");
+			Output.Append(MemberOf);
+
+			Output.Append(')');
 
 			return Task.CompletedTask;
 		}

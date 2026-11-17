@@ -33,6 +33,11 @@ namespace Waher.Content.Asn1.Model.Types
 		}
 
 		/// <summary>
+		/// If the type is passed by reference.
+		/// </summary>
+		public override bool ByReference => false;
+
+		/// <summary>
 		/// Accepted ASN.1 tags
 		/// </summary>
 		public override Asn1Tag[] AcceptedTags => acceptedTags;
@@ -127,6 +132,42 @@ namespace Waher.Content.Asn1.Model.Types
 				Output.Append(ItemName);
 				Output.Append(')');
 			}
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Exports write logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Tags">How to encode tags.</param>
+		public override Task ExportWriteCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, string MemberOf, int Index, Asn1Tags? Tags)
+		{
+			Output.Append("WriteDateTime");
+
+			if (!Tags.HasValue)
+				Tags = this.Tags;
+
+			if (Tags.HasValue)
+				Output.Append(Tags.Value.ToString());
+
+			Output.Append("(Writer");
+
+			if (Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			Output.Append(", ");
+			Output.Append(MemberOf);
+
+			Output.Append(')');
 
 			return Task.CompletedTask;
 		}

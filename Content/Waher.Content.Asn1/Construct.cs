@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Formats.Asn1;
 using System.Numerics;
+using System.Reflection;
 using System.Text;
+using Waher.Content.Asn1.Model.Restrictions;
 using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1
@@ -30,6 +32,22 @@ namespace Waher.Content.Asn1
 	/// </summary>
 	public abstract class Construct
 	{
+		#region Encoding/Decoding
+
+		/// <summary>
+		/// Decodes the object from an ASN.1 encoding.
+		/// </summary>
+		/// <param name="Reader">ASN.1 reader.</param>
+		public abstract void Read(AsnReader Reader);
+
+		/// <summary>
+		/// Encodes the object to an ASN.1 encoding.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer.</param>
+		public abstract void Write(AsnWriter Writer);
+
+		#endregion
+
 		#region Tags
 
 		/// <summary>
@@ -360,6 +378,172 @@ namespace Waher.Content.Asn1
 			return CheckComplete(ReadAny(Inner), Inner);
 		}
 
+		/// <summary>
+		/// Writes any value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteAny(AsnWriter Writer, object Value)
+		{
+			WriteAny(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes any value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteAnyImplicit(AsnWriter Writer, int Index, object Value)
+		{
+			WriteAny(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes any value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteAnyExplicit(AsnWriter Writer, int Index, object Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteAny(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes any value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteAny(AsnWriter Writer, Asn1Tag? Tag, object Value)
+		{
+			if (Value is null)
+			{
+				WriteNull(Writer, Tag);
+				return;
+			}
+			else
+			{
+				switch (Convert.GetTypeCode(Value))
+				{
+					case TypeCode.Empty:
+					case TypeCode.DBNull:
+						WriteNull(Writer, Tag);
+						return;
+
+					case TypeCode.Object:
+						break;
+
+					case TypeCode.Boolean:
+						WriteBoolean(Writer, Tag, (bool)Value);
+						return;
+
+					case TypeCode.Char:
+						WriteString(Writer, Tag, new string((char)Value, 1),
+							UniversalTagNumber.UTF8String);
+						return;
+
+					case TypeCode.SByte:
+						WriteInteger(Writer, Tag, (sbyte)Value);
+						return;
+
+					case TypeCode.Byte:
+						WriteInteger(Writer, Tag, (byte)Value);
+						return;
+
+					case TypeCode.Int16:
+						WriteInteger(Writer, Tag, (short)Value);
+						return;
+
+					case TypeCode.UInt16:
+						WriteInteger(Writer, Tag, (ushort)Value);
+						return;
+
+					case TypeCode.Int32:
+						WriteInteger(Writer, Tag, (int)Value);
+						return;
+
+					case TypeCode.UInt32:
+						WriteInteger(Writer, Tag, (uint)Value);
+						return;
+
+					case TypeCode.Int64:
+						WriteInteger(Writer, Tag, (long)Value);
+						return;
+
+					case TypeCode.UInt64:
+						WriteInteger(Writer, Tag, (ulong)Value);
+						return;
+
+					case TypeCode.Single:
+						WriteReal(Writer, Tag, (float)Value);
+						return;
+
+					case TypeCode.Double:
+						WriteReal(Writer, Tag, (double)Value);
+						return;
+
+					case TypeCode.Decimal:
+						WriteReal(Writer, Tag, (double)(decimal)Value);
+						return;
+
+					case TypeCode.DateTime:
+						WriteDateTime(Writer, Tag, (DateTime)Value);
+						return;
+
+					case TypeCode.String:
+						WriteString(Writer, Tag, (string)Value,
+							UniversalTagNumber.UTF8String);
+						return;
+				}
+			}
+
+			if (Value is Enum Enum)
+			{
+				WriteEnumeration(Writer, Tag, Enum);
+				return;
+			}
+			else if (Value is byte[] Bin)
+			{
+				WriteOctetString(Writer, Tag, Bin);
+				return;
+			}
+			else if (Value is ObjectId ObjectId)
+			{
+				WriteObjectId(Writer, Tag, ObjectId);
+				return;
+			}
+			else if (Value is TimeSpan TimeSpan)
+			{
+				WriteGeneralizedTime(Writer, Tag, TimeSpan);
+				return;
+			}
+			else if (Value is DateTimeOffset DateTimeOffset)
+			{
+				WriteUtcTime(Writer, Tag, DateTimeOffset);
+				return;
+			}
+			else if (Value is Duration Duration)
+			{
+				WriteDuration(Writer, Tag, Duration);
+				return;
+			}
+			else if (Value is Array A)
+			{
+				WriteArray(Writer, Tag, A);
+				return;
+			}
+			else
+			{
+				throw new ArgumentException("Unsupported value type: " +
+					Value.GetType().FullName, nameof(Value));
+			}
+		}
+
 		#endregion
 
 		#region Bit String
@@ -524,6 +708,55 @@ namespace Waher.Content.Asn1
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
 			return CheckComplete(ReadBitString(Inner), Inner);
+		}
+
+		/// <summary>
+		/// Writes a bit string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteBitString(AsnWriter Writer, byte[] Value)
+		{
+			WriteBitString(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes a bit string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteBitStringImplicit(AsnWriter Writer, int Index, byte[] Value)
+		{
+			WriteBitString(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes a bit string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteBitStringExplicit(AsnWriter Writer, int Index, byte[] Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteBitString(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes a bit string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteBitString(AsnWriter Writer, Asn1Tag? Tag, byte[] Value)
+		{
+			if (Value is null)
+				throw new ArgumentNullException(nameof(Value));
+
+			Writer.WriteBitString(Value, 0, Tag);
 		}
 
 		#endregion
@@ -858,6 +1091,64 @@ namespace Waher.Content.Asn1
 			return CheckComplete(s, Inner);
 		}
 
+		/// <summary>
+		/// Writes a string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		/// <param name="TagNumber">How to encode string.</param>
+		public static void WriteString(AsnWriter Writer, string Value,
+			UniversalTagNumber TagNumber)
+		{
+			WriteString(Writer, new Asn1Tag(TagNumber), Value, TagNumber);
+		}
+
+		/// <summary>
+		/// Writes a string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		/// <param name="TagNumber">How to encode string.</param>
+		public static void WriteStringImplicit(AsnWriter Writer, int Index, string Value,
+			UniversalTagNumber TagNumber)
+		{
+			WriteString(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value,
+				TagNumber);
+		}
+
+		/// <summary>
+		/// Writes a string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		/// <param name="TagNumber">How to encode string.</param>
+		public static void WriteStringExplicit(AsnWriter Writer, int Index, string Value,
+			UniversalTagNumber TagNumber)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteString(Writer, Value, TagNumber);
+			}
+		}
+
+		/// <summary>
+		/// Writes a string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		/// <param name="TagNumber">How to encode string.</param>
+		private static void WriteString(AsnWriter Writer, Asn1Tag? Tag, string Value,
+			UniversalTagNumber TagNumber)
+		{
+			if (Value is null)
+				throw new ArgumentNullException(nameof(Value));
+
+			Writer.WriteCharacterString(TagNumber, Value, Tag);
+		}
+
 		#endregion
 
 		#region Octet String
@@ -1021,6 +1312,55 @@ namespace Waher.Content.Asn1
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
 			return CheckComplete(ReadOctetString(Inner), Inner);
+		}
+
+		/// <summary>
+		/// Writes a octet string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteOctetString(AsnWriter Writer, byte[] Value)
+		{
+			WriteOctetString(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes a octet string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteOctetStringImplicit(AsnWriter Writer, int Index, byte[] Value)
+		{
+			WriteOctetString(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes a octet string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteOctetStringExplicit(AsnWriter Writer, int Index, byte[] Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteOctetString(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes a octet string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteOctetString(AsnWriter Writer, Asn1Tag? Tag, byte[] Value)
+		{
+			if (Value is null)
+				throw new ArgumentNullException(nameof(Value));
+
+			Writer.WriteOctetString(Value, Tag);
 		}
 
 		#endregion
@@ -1187,6 +1527,52 @@ namespace Waher.Content.Asn1
 			return CheckComplete(ReadBoolean(Inner), Inner);
 		}
 
+		/// <summary>
+		/// Writes a Boolean value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteBoolean(AsnWriter Writer, bool Value)
+		{
+			WriteBoolean(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes a Boolean value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteBooleanImplicit(AsnWriter Writer, int Index, bool Value)
+		{
+			WriteBoolean(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes a Boolean value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteBooleanExplicit(AsnWriter Writer, int Index, bool Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteBoolean(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes a Boolean value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteBoolean(AsnWriter Writer, Asn1Tag? Tag, bool Value)
+		{
+			Writer.WriteBoolean(Value, Tag);
+		}
+
 		#endregion
 
 		#region Date
@@ -1349,6 +1735,52 @@ namespace Waher.Content.Asn1
 			return CheckComplete(ReadDate(Inner), Inner);
 		}
 
+		/// <summary>
+		/// Writes a date value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteDate(AsnWriter Writer, DateTime Value)
+		{
+			WriteDate(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes a date value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteDateImplicit(AsnWriter Writer, int Index, DateTime Value)
+		{
+			WriteDate(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes a date value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteDateExplicit(AsnWriter Writer, int Index, DateTime Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteDate(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes a date value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteDate(AsnWriter Writer, Asn1Tag? Tag, DateTime Value)
+		{
+			throw new NotImplementedException("Implement Date type.");    // TODO
+		}
+
 		#endregion
 
 		#region Date and Time
@@ -1509,6 +1941,52 @@ namespace Waher.Content.Asn1
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
 			return CheckComplete(ReadDateTime(Inner), Inner);
+		}
+
+		/// <summary>
+		/// Writes a date and time value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteDateTime(AsnWriter Writer, DateTime Value)
+		{
+			WriteDateTime(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes a date and time value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteDateTimeImplicit(AsnWriter Writer, int Index, DateTime Value)
+		{
+			WriteDateTime(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes a date and time value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteDateTimeExplicit(AsnWriter Writer, int Index, DateTime Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteDateTime(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes a date and time value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteDateTime(AsnWriter Writer, Asn1Tag? Tag, DateTime Value)
+		{
+			throw new NotImplementedException("Implement DateTime type.");    // TODO
 		}
 
 		#endregion
@@ -1674,6 +2152,52 @@ namespace Waher.Content.Asn1
 			return CheckComplete(ReadDuration(Inner), Inner);
 		}
 
+		/// <summary>
+		/// Writes a duration value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteDuration(AsnWriter Writer, Duration Value)
+		{
+			WriteDuration(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes a duration value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteDurationImplicit(AsnWriter Writer, int Index, Duration Value)
+		{
+			WriteDuration(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes a duration value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteDurationExplicit(AsnWriter Writer, int Index, Duration Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteDuration(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes a duration value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteDuration(AsnWriter Writer, Asn1Tag? Tag, Duration Value)
+		{
+			throw new NotImplementedException("Implement Duration type.");    // TODO
+		}
+
 		#endregion
 
 		#region Generalized Time
@@ -1835,6 +2359,52 @@ namespace Waher.Content.Asn1
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
 			return CheckComplete(ReadGeneralizedTime(Inner), Inner);
+		}
+
+		/// <summary>
+		/// Writes a generalized time value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteGeneralizedTime(AsnWriter Writer, TimeSpan Value)
+		{
+			WriteGeneralizedTime(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes a generalized time value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteGeneralizedTimeImplicit(AsnWriter Writer, int Index, TimeSpan Value)
+		{
+			WriteGeneralizedTime(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes a generalized time value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteGeneralizedTimeExplicit(AsnWriter Writer, int Index, TimeSpan Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteGeneralizedTime(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes a generalized time value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteGeneralizedTime(AsnWriter Writer, Asn1Tag? Tag, TimeSpan Value)
+		{
+			throw new NotImplementedException("Implement GeneralizedTime type.");    // TODO
 		}
 
 		#endregion
@@ -2002,6 +2572,52 @@ namespace Waher.Content.Asn1
 			return CheckComplete(ReadInteger(Inner), Inner);
 		}
 
+		/// <summary>
+		/// Writes an integer value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteInteger(AsnWriter Writer, BigInteger Value)
+		{
+			WriteInteger(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes an integer value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteIntegerImplicit(AsnWriter Writer, int Index, BigInteger Value)
+		{
+			WriteInteger(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes an integer value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteIntegerExplicit(AsnWriter Writer, int Index, BigInteger Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteInteger(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes an integer value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteInteger(AsnWriter Writer, Asn1Tag? Tag, BigInteger Value)
+		{
+			Writer.WriteInteger(Value, Tag);
+		}
+
 		#endregion
 
 		#region Null
@@ -2159,6 +2775,48 @@ namespace Waher.Content.Asn1
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
 			return CheckComplete(ReadNull(Inner), Inner);
+		}
+
+		/// <summary>
+		/// Writes a null value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		public static void WriteNull(AsnWriter Writer)
+		{
+			WriteNull(Writer, null);
+		}
+
+		/// <summary>
+		/// Writes a null value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		public static void WriteNullImplicit(AsnWriter Writer, int Index)
+		{
+			WriteNull(Writer, new Asn1Tag(TagClass.ContextSpecific, Index));
+		}
+
+		/// <summary>
+		/// Writes a null value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		public static void WriteNullExplicit(AsnWriter Writer, int Index)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteNull(Writer);
+			}
+		}
+
+		/// <summary>
+		/// Writes a null value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		private static void WriteNull(AsnWriter Writer, Asn1Tag? Tag)
+		{
+			Writer.WriteNull(Tag);
 		}
 
 		#endregion
@@ -2328,6 +2986,52 @@ namespace Waher.Content.Asn1
 			return CheckComplete(ReadObjectId(Inner), Inner);
 		}
 
+		/// <summary>
+		/// Writes an object identifier value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteObjectId(AsnWriter Writer, ObjectId Value)
+		{
+			WriteObjectId(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes an object identifier value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteObjectIdImplicit(AsnWriter Writer, int Index, ObjectId Value)
+		{
+			WriteObjectId(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes an object identifier value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteObjectIdExplicit(AsnWriter Writer, int Index, ObjectId Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteObjectId(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes an object identifier value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteObjectId(AsnWriter Writer, Asn1Tag? Tag, ObjectId Value)
+		{
+			Writer.WriteObjectIdentifier(Value.Oid, Tag);
+		}
+
 		#endregion
 
 		#region Real
@@ -2488,6 +3192,52 @@ namespace Waher.Content.Asn1
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
 			return CheckComplete(ReadReal(Inner), Inner);
+		}
+
+		/// <summary>
+		/// Writes a floating-point value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteReal(AsnWriter Writer, double Value)
+		{
+			WriteReal(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes a floating-point value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteRealImplicit(AsnWriter Writer, int Index, double Value)
+		{
+			WriteReal(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes a floating-point value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteRealExplicit(AsnWriter Writer, int Index, double Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteReal(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes a floating-point value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteReal(AsnWriter Writer, Asn1Tag? Tag, double Value)
+		{
+			throw new NotImplementedException("Implement Real type.");    // TODO
 		}
 
 		#endregion
@@ -2651,6 +3401,52 @@ namespace Waher.Content.Asn1
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
 			return CheckComplete(ReadTimeOfDay(Inner), Inner);
+		}
+
+		/// <summary>
+		/// Writes a time of day value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteTimeOfDay(AsnWriter Writer, TimeSpan Value)
+		{
+			WriteTimeOfDay(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes a time of day value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteTimeOfDayImplicit(AsnWriter Writer, int Index, TimeSpan Value)
+		{
+			WriteTimeOfDay(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes a time of day value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteTimeOfDayExplicit(AsnWriter Writer, int Index, TimeSpan Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteTimeOfDay(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes a time of day value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteTimeOfDay(AsnWriter Writer, Asn1Tag? Tag, TimeSpan Value)
+		{
+			throw new NotImplementedException("Implement TimeOfDay type.");    // TODO
 		}
 
 		#endregion
@@ -2818,6 +3614,52 @@ namespace Waher.Content.Asn1
 			return CheckComplete(ReadUtcTime(Inner), Inner);
 		}
 
+		/// <summary>
+		/// Writes a UTC timestamp value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteUtcTime(AsnWriter Writer, DateTimeOffset Value)
+		{
+			WriteUtcTime(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes a UTC timestamp value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteUtcTimeImplicit(AsnWriter Writer, int Index, DateTimeOffset Value)
+		{
+			WriteUtcTime(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes a UTC timestamp value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteUtcTimeExplicit(AsnWriter Writer, int Index, DateTimeOffset Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteUtcTime(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes a UTC timestamp value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteUtcTime(AsnWriter Writer, Asn1Tag? Tag, DateTimeOffset Value)
+		{
+			Writer.WriteUtcTime(Value, Tag);
+		}
+
 		#endregion
 
 		#region Enumeration
@@ -2898,8 +3740,7 @@ namespace Waher.Content.Asn1
 
 			try
 			{
-				Result = AssertValidEnum((T)Reader.ReadEnumeratedValue(typeof(T),
-					new Asn1Tag(TagClass.ContextSpecific, Index)));
+				Result = ReadEnumeration<T>(Reader);
 				return true;
 			}
 			catch (Exception)
@@ -2945,7 +3786,46 @@ namespace Waher.Content.Asn1
 		public static T ReadEnumeration<T>(AsnReader Reader)
 			where T : struct, Enum
 		{
-			return AssertValidEnum((T)Reader.ReadEnumeratedValue(typeof(T)));
+			return ReadEnumeration<T>(Reader, null);
+		}
+
+		/// <summary>
+		/// Reads an integer.
+		/// </summary>
+		/// <param name="Reader">ASN.1 reader</param>
+		/// <param name="ExpectedTag">Expected tag.</param>
+		/// <returns>Value</returns>
+		public static T ReadEnumeration<T>(AsnReader Reader, Asn1Tag? ExpectedTag)
+			where T : struct, Enum
+		{
+			Type EnumType = typeof(T);
+
+			if (EnumType.GetCustomAttribute<FlagsAttribute>() is null)
+			{
+				return AssertValidEnum((T)Reader.ReadEnumeratedValue(EnumType,
+					ExpectedTag));
+			}
+			else
+			{
+				byte[] Bin = Reader.ReadBitString(out _, ExpectedTag);
+				switch (Bin.Length)
+				{
+					case 1: return (T)Enum.ToObject(EnumType, Bin[0]);
+					case 2: return (T)Enum.ToObject(EnumType, BitConverter.ToUInt16(Bin, 0));
+					case 3:
+						Array.Resize(ref Bin, 4);
+						return (T)Enum.ToObject(EnumType, BitConverter.ToUInt32(Bin, 0));
+					case 4: return (T)Enum.ToObject(EnumType, BitConverter.ToUInt32(Bin, 0));
+					case 5:
+					case 6:
+					case 7:
+						Array.Resize(ref Bin, 8);
+						return (T)Enum.ToObject(EnumType, BitConverter.ToUInt64(Bin, 0));
+					case 8: return (T)Enum.ToObject(EnumType, BitConverter.ToUInt64(Bin, 0));
+					default:
+						throw new AsnContentException("Unsupported Flags enum size: " + Bin.Length.ToString() + " bytes");
+				}
+			}
 		}
 
 		private static T AssertValidEnum<T>(T Value)
@@ -2990,8 +3870,7 @@ namespace Waher.Content.Asn1
 		public static T ReadEnumerationImplicit<T>(AsnReader Reader, int Index)
 			where T : struct, Enum
 		{
-			return AssertValidEnum((T)Reader.ReadEnumeratedValue(typeof(T),
-				new Asn1Tag(TagClass.ContextSpecific, Index)));
+			return ReadEnumeration<T>(Reader, new Asn1Tag(TagClass.ContextSpecific, Index));
 		}
 
 		/// <summary>
@@ -3007,6 +3886,101 @@ namespace Waher.Content.Asn1
 				new Asn1Tag(TagClass.ContextSpecific, Index, true));
 
 			return ReadEnumeration<T>(Inner);
+		}
+
+		/// <summary>
+		/// Writes an enumerated value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteEnumeration(AsnWriter Writer, Enum Value)
+		{
+			WriteEnumeration(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes an enumerated value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteEnumerationImplicit(AsnWriter Writer, int Index, Enum Value)
+		{
+			WriteEnumeration(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes an enumerated value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteEnumerationExplicit(AsnWriter Writer, int Index, Enum Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteEnumeration(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes an enumerated value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteEnumeration(AsnWriter Writer, Asn1Tag? Tag, Enum Value)
+		{
+			Type EnumType = Value.GetType();
+
+			if (EnumType.GetCustomAttribute<FlagsAttribute>() is null)
+				Writer.WriteEnumeratedValue(Value, Tag);
+			else
+			{
+				Type UnderlyingType = Enum.GetUnderlyingType(EnumType);
+				byte[] Bin;
+
+				switch (Convert.GetTypeCode(UnderlyingType))
+				{
+					case TypeCode.SByte:
+						Bin = new byte[] { (byte)Convert.ToSByte(Value) };
+						break;
+
+					case TypeCode.Byte:
+						Bin = new byte[] { Convert.ToByte(Value) };
+						break;
+
+					case TypeCode.Int16:
+						Bin = BitConverter.GetBytes(Convert.ToInt16(Value));
+						break;
+
+					case TypeCode.UInt16:
+						Bin = BitConverter.GetBytes(Convert.ToUInt16(Value));
+						break;
+
+					case TypeCode.Int32:
+						Bin = BitConverter.GetBytes(Convert.ToInt32(Value));
+						break;
+
+					case TypeCode.UInt32:
+						Bin = BitConverter.GetBytes(Convert.ToUInt32(Value));
+						break;
+
+					case TypeCode.Int64:
+						Bin = BitConverter.GetBytes(Convert.ToInt64(Value));
+						break;
+
+					case TypeCode.UInt64:
+						Bin = BitConverter.GetBytes(Convert.ToUInt64(Value));
+						break;
+
+					default:
+						throw new AsnContentException("Unsupported enumeration type: " +
+							UnderlyingType.FullName);
+				}
+
+				Writer.WriteBitString(Bin, 0, Tag);
+			}
 		}
 
 		#endregion
@@ -3168,6 +4142,56 @@ namespace Waher.Content.Asn1
 				Items.Add(Item.Value);
 
 			return Items.ToArray();
+		}
+
+		/// <summary>
+		/// Writes an array of values.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteArray(AsnWriter Writer, Array Value)
+		{
+			WriteArray(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes an array of values.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteArrayImplicit(AsnWriter Writer, int Index, Array Value)
+		{
+			WriteArray(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes an array of values.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteArrayExplicit(AsnWriter Writer, int Index, Array Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteArray(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes an array of values.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteArray(AsnWriter Writer, Asn1Tag? Tag, Array Value)
+		{
+			using (Writer.PushSequence(Tag))
+			{
+				foreach (object Item in Value)
+					WriteAny(Writer, Item);
+			}
 		}
 
 		#endregion

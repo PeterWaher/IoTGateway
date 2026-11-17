@@ -41,6 +41,7 @@ namespace Waher.Content.Asn1.Model
 		private Asn1Document document;
 		private Asn1Node parent;
 		private ChunkedList<Asn1Node> children = null;
+		private bool? optional;
 
 		/// <summary>
 		/// Base class for all ASN.1 nodes.
@@ -68,12 +69,21 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// If the node is optional
 		/// </summary>
-		public virtual bool? Optional => false;
+		public virtual bool? Optional => this.optional;
 
 		/// <summary>
 		/// Accepted ASN.1 tags
 		/// </summary>
 		public virtual Asn1Tag[] AcceptedTags => Array.Empty<Asn1Tag>();
+		
+		/// <summary>
+		/// Sets the <see cref="Optional"/> flag of the type.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		internal virtual void SetOptional(bool? Value)
+		{
+			this.optional = Value;
+		}
 
 		/// <summary>
 		/// Sets the parent reference.
@@ -243,9 +253,11 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Output">C# Output.</param>
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
 		/// <param name="Index">Item index.</param>
+		/// <param name="Tags">How to encode tags.</param>
 		public virtual Task ExportWriteCSharp(StringBuilder Output, CSharpExportState State,
-			int Indent, int Index)
+			int Indent, string MemberOf, int Index, Asn1Tags? Tags)
 		{
 			throw new NotImplementedException("Write operation for objects of type " +
 				this.GetType().FullName + " not implemented.");

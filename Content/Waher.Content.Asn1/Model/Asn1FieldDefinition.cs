@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Types;
 using Waher.Content.Asn1.Model.Values;
 using Waher.Runtime.Collections;
+using Waher.Script.Functions.Analytic;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -89,7 +90,7 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// If the node is optional
 		/// </summary>
-		public override bool? Optional => this.type.Optional;
+		public override bool? Optional => base.Optional ?? this.type.Optional;
 
 		/// <inheritdoc/>
 		public override string ToString()
@@ -124,7 +125,15 @@ namespace Waher.Content.Asn1.Model
 			{
 				JSON.Indent(Output, Indent);
 				Output.Append("public ");
-				await this.type.ExportCSharp(Output, State, Indent, Pass);
+				Output.Append(this.type.CSharpType);
+
+				if (!this.type.ByReference &&
+					(this.Optional ?? false) &&
+					!(this.type.Optional ?? false))
+				{
+					Output.Append('?');
+				}
+
 				Output.Append(' ');
 				Output.Append(this.fieldNameCSharp);
 
@@ -135,7 +144,11 @@ namespace Waher.Content.Asn1.Model
 					if (this.type.Default is Asn1ValueReference ValueReference &&
 						this.type is Asn1TypeReference TypeReference)
 					{
-						await TypeReference.ExportCSharp(Output, State, Indent, Pass);
+						string s = TypeReference.CSharpType;
+						if (s.EndsWith("?"))
+							s = s.Substring(0, s.Length - 1);
+
+						Output.Append(s);
 						Output.Append('.');
 						await ValueReference.ExportCSharp(Output, State, Indent, Pass);
 					}
@@ -283,11 +296,60 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Output">C# Output.</param>
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
 		/// <param name="Index">Item index.</param>
-		public override Task ExportWriteCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, int Index)
+		/// <param name="Tags">How to encode tags.</param>
+		public override async Task ExportWriteCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf, int Index, 
+			Asn1Tags? Tags)
 		{
-			return base.ExportWriteCSharp(Output, State, Indent, Index);    // TODO
+			string Name = MemberOf + "." + this.fieldNameCSharp;
+
+			JSON.Indent(Output, Indent);
+
+			if (this.Optional ?? this.type.Optional ?? false)
+			{
+				Output.Append("if (");
+
+				if (this.type.ByReference)
+				{
+					Output.Append("!(");
+					Output.Append(ToCSharp(Name));
+					Output.AppendLine(" is null))");
+				}
+				else
+				{
+					Output.Append(ToCSharp(Name));
+					Output.AppendLine(".HasValue)");
+				}
+
+				JSON.Indent(Output, Indent + 1);
+
+				if (this.type.ConstructedType)
+				{
+					Output.Append(Name);
+					Output.Append(".Write(Writer)");
+				}
+				else if (this.type.ByReference)
+				{
+					await this.type.ExportWriteCSharp(Output, State, Indent + 1,
+						Name, Index, Tags);
+				}
+				else
+				{
+					await this.type.ExportWriteCSharp(Output, State, Indent + 1,
+						Name + ".Value", Index, Tags);
+				}
+			}
+			else if (this.type.ConstructedType)
+			{
+				Output.Append(Name);
+				Output.Append(".Write(Writer)");
+			}
+			else
+				await this.type.ExportWriteCSharp(Output, State, Indent, Name, Index, Tags);
+
+			Output.AppendLine(";");
 		}
 	}
 }

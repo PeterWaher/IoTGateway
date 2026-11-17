@@ -1,4 +1,5 @@
-﻿using System.Formats.Asn1;
+﻿using System;
+using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
@@ -61,7 +62,6 @@ namespace Waher.Content.Asn1.Model
 		/// </summary>
 		public bool MustBeQualified => false;
 
-
 		/// <summary>
 		/// Accepted ASN.1 tags
 		/// </summary>
@@ -75,6 +75,16 @@ namespace Waher.Content.Asn1.Model
 					return this.definition.AcceptedTags;
 			}
 		}
+
+		/// <summary>
+		/// If the type is passed by reference.
+		/// </summary>
+		public override bool ByReference => this.definition.ByReference;
+
+		/// <summary>
+		/// If the type is a constructed type.
+		/// </summary>
+		public override bool ConstructedType => this.definition.ConstructedType;
 
 		/// <summary>
 		/// Type definition
@@ -143,17 +153,17 @@ namespace Waher.Content.Asn1.Model
 			{
 				if (this.definition is Asn1TypeReference TypeRef)
 					return TypeRef.CSharpType;
-				else if (this.definition is Asn1Type Type)
-					return Type.CSharpType;
-				else
+				else if (this.definition.ConstructedType)
 					return ToCSharp(this.Name);
+				else
+					return this.definition.CSharpType;
 			}
 		}
 
 		/// <summary>
 		/// If the node is optional
 		/// </summary>
-		public override bool? Optional => this.definition.Optional;
+		public override bool? Optional => base.Optional ?? this.definition.Optional;
 
 		/// <summary>
 		/// Exports to C#
@@ -165,9 +175,9 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
-			if (!this.definition.ConstructedType)
+			if (!this.definition.ConstructedType && !(this.definition is Asn1Enumeration))
 				return;
-
+			
 			if (Pass == CSharpExportPass.Preprocess || Pass == CSharpExportPass.Variables)
 				await this.definition.ExportCSharp(Output, State, Indent, Pass);
 			else if (Pass == CSharpExportPass.Explicit)
@@ -233,6 +243,22 @@ namespace Waher.Content.Asn1.Model
 		{
 			return this.definition.ExportRestrictionCheck(Output, State, Indent, 
 				VariableName);
+		}
+
+		/// <summary>
+		/// Exports write logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Tags">How to encode tags.</param>
+		public override Task ExportWriteCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, string MemberOf, int Index, Asn1Tags? Tags)
+		{
+			return this.definition.ExportWriteCSharp(Output, State, Indent, MemberOf,
+				Index, Tags);
 		}
 
 	}

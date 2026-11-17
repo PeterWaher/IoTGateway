@@ -114,7 +114,7 @@ namespace Waher.Content.Asn1.Model.Values
 		}
 
 		/// <summary>
-		/// If the array represents a <see cref="System.FlagsAttribute"/> enumeration value.
+		/// If the array represents a <see cref="FlagsAttribute"/> enumeration value.
 		/// </summary>
 		public bool IsFlagsEnum
 		{

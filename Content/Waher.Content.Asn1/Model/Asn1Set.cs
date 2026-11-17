@@ -160,7 +160,7 @@ namespace Waher.Content.Asn1.Model
 
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
-					Output.AppendLine("public void Read(Asn1F.AsnReader Reader0)");
+					Output.AppendLine("public override void Read(Asn1F.AsnReader Reader0)");
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
 
@@ -232,13 +232,23 @@ namespace Waher.Content.Asn1.Model
 
 					Output.AppendLine();
 					JSON.Indent(Output, Indent);
-					Output.AppendLine("public void Write(Asn1F.AsnWriter Writer)");
+					Output.AppendLine("public override void Write(Asn1F.AsnWriter Writer)");
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("{");
 
 					Indent++;
 
-					// TODO: ASN.1 Write method
+					Index = 0;
+
+					foreach (Asn1Node Node in this.Nodes)
+					{
+						Asn1Tags? Tags = this.Tags;
+						if (Tags.HasValue && Tags.Value == Asn1Tags.Automatic)
+							Tags = Asn1Tags.Implicit;   // For SET, AUTOMATIC equals IMPLICIT
+
+						await Node.ExportRestrictionCheck(Output, State, Indent, "this");
+						await Node.ExportWriteCSharp(Output, State, Indent, "this", Index++, Tags);
+					}
 
 					Indent--;
 
@@ -312,6 +322,24 @@ namespace Waher.Content.Asn1.Model
 		public override Task ExportRestrictionCheck(StringBuilder Output,
 			CSharpExportState State, int Indent, string VariableName)
 		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Exports write logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Tags">How to encode tags.</param>
+		public override Task ExportWriteCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf, int Index,
+			Asn1Tags? Tags)
+		{
+			Output.Append(MemberOf);
+			Output.Append(".Write(Writer)");
 			return Task.CompletedTask;
 		}
 

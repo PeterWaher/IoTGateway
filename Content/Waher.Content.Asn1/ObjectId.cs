@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Text;
 
 namespace Waher.Content.Asn1
 {
@@ -9,6 +10,7 @@ namespace Waher.Content.Asn1
 	public class ObjectId
 	{
 		private readonly uint[] segments;
+		private readonly string oid;
 
 		/// <summary>
 		/// ASN.1 Object identifier
@@ -19,6 +21,7 @@ namespace Waher.Content.Asn1
 			string[] Segments = Oid.Split('.');
 			int i, c = Segments.Length;
 			this.segments = new uint[c];
+			this.oid = Oid;
 
 			for (i = 0; i < c; i++)
 				this.segments[i] = uint.Parse(Segments[i]);
@@ -31,8 +34,26 @@ namespace Waher.Content.Asn1
 		public ObjectId(params uint[] Segments)
 		{
 			this.segments = Segments;
+			this.oid = ToString(Segments);
 		}
 
+		private static string ToString(uint[] Segments)
+		{
+			StringBuilder sb = new StringBuilder();
+			bool First = true;
+
+			foreach (uint Segment in Segments)
+			{
+				if (First)
+					First = false;
+				else
+					sb.Append('.');
+
+				sb.Append(Segment.ToString());
+			}
+
+			return sb.ToString();
+		}
 
 		/// <summary>
 		/// ASN.1 Object identifier
@@ -73,6 +94,8 @@ namespace Waher.Content.Asn1
 
 			Buffer.BlockCopy(Id.segments, 0, this.segments, 0, c);
 			Buffer.BlockCopy(Segments, 0, this.segments, c, d);
+		
+			this.oid = ToString(this.segments);
 		}
 
 		/// <summary>
@@ -86,9 +109,20 @@ namespace Waher.Content.Asn1
 		}
 
 		/// <summary>
+		/// String-representation of object identifier.
+		/// </summary>
+		/// <returns>String value</returns>
+		public override string ToString() => this.oid;
+
+		/// <summary>
 		/// Segments of Object Identifier
 		/// </summary>
 		public uint[] Segments => this.segments;
+
+		/// <summary>
+		/// String-representation of object identifier.
+		/// </summary>
+		public string Oid => this.oid;
 
 		/// <summary>
 		/// Implicit converter to an integer array

@@ -1,4 +1,5 @@
-﻿using System.Formats.Asn1;
+﻿using System;
+using System.Formats.Asn1;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,7 +40,7 @@ namespace Waher.Content.Asn1.Model.Values
 		};
 
 		/// <summary>
-		/// Makes the value 2^value, for use with <see cref="System.FlagsAttribute"/>
+		/// Makes the value 2^value, for use with <see cref="FlagsAttribute"/>
 		/// enumerations.
 		/// </summary>
 		public override void TwosPower()

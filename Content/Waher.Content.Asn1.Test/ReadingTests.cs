@@ -215,8 +215,8 @@ namespace Waher.Content.Asn1.Test
 			}
 		}
 
-		private static async Task Read(string Definition, string Namespace, string ModuleName,
-			string TypeName, string Binary, AsnEncodingRules Rules)
+		internal static async Task<Construct> Read(string Definition, string Namespace,
+			string ModuleName, string TypeName, string Binary, AsnEncodingRules Rules)
 		{
 			if (!assemblies.TryGetValue(Namespace, out Assembly A))
 			{
@@ -230,13 +230,21 @@ namespace Waher.Content.Asn1.Test
 			Type T = A.GetType(Namespace + "." + ModuleName + "." + TypeName);
 			Assert.IsNotNull(T);
 
+			byte[] Bin = await Files.ReadAllBytesAsync(Binary);
+
+			return (Construct)Create(T, Bin, Rules);
+		}
+
+		internal static object Create(Type T, byte[] Bin, AsnEncodingRules Rules)
+		{
 			MethodInfo Create = T.GetMethod("Create", BindingFlags.Public | BindingFlags.Static);
 			Assert.IsNotNull(Create);
 
-			byte[] Bin = await Files.ReadAllBytesAsync(Binary);
 			AsnReader Reader = new(Bin, Rules);
-			object Parsed = Create.Invoke(null, [Reader]);
+			Construct Parsed = (Construct)Create.Invoke(null, [Reader]);
 			Assert.IsNotNull(Parsed);
+
+			return Parsed;
 		}
 
 	}

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
 using Waher.Content.Asn1.Model.Values;
@@ -13,7 +12,6 @@ namespace Waher.Content.Asn1.Model
 	{
 		private Asn1Tags? tags;
 		private Asn1Restriction restriction = null;
-		private bool? optional;
 		private bool? unique;
 		private bool? present;
 		private bool? absent;
@@ -50,20 +48,6 @@ namespace Waher.Content.Asn1.Model
 				this.restriction = value;
 				this.restriction?.SetParentNode(this);
 			}
-		}
-
-		/// <summary>
-		/// If the node is optional
-		/// </summary>
-		public override bool? Optional => this.optional;
-
-		/// <summary>
-		/// Sets the <see cref="Optional"/> flag of the type.
-		/// </summary>
-		/// <param name="Value">Value</param>
-		internal void SetOptional(bool? Value)
-		{
-			this.optional = Value;
 		}
 
 		/// <summary>
@@ -135,6 +119,11 @@ namespace Waher.Content.Asn1.Model
 		/// If the type is a constructed type.
 		/// </summary>
 		public virtual bool ConstructedType => false;
+
+		/// <summary>
+		/// If the type is passed by reference.
+		/// </summary>
+		public virtual bool ByReference => true;
 
 		/// <summary>
 		/// Parses the portion of the document at the current position, according to the type.

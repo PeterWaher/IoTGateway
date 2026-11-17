@@ -115,6 +115,13 @@ namespace Waher.Content.Asn1.Model
 
 				await this.type.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 
+				if (!this.type.ByReference &&
+					(this.Optional ?? false) &&
+					!(this.type.Optional ?? false))
+				{
+					Output.Append('?');
+				}
+
 				Output.Append(' ');
 				Output.Append(this.fieldNameCSharp);
 				Output.Append(" = ");

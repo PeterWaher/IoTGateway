@@ -13,7 +13,7 @@ if exists(from) then
 (
 	if len(from)>256 || !Waher.IoTGateway.LocalContent.IsLocal(from,true) then
 	(
-		Waher.Security.LoginMonitor.LoginAuditor.Fail("Invalid from parameter.","",Request.RemoteEndPoint,"HTTP");
+		Waher.Security.LoginMonitor.LoginAuditor.Fail("Invalid from parameter.","",Request.RemoteEndPoint,"HTTP",Request.Header.ResourcePart);
 		BadRequest("Invalid from parameter.");
 	)
 );

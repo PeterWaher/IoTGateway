@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Asn1.Model
+﻿namespace Waher.Content.Asn1.Model
 {
 	/// <summary>
 	/// Extensions follow.
@@ -12,8 +8,9 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// Extensions follow.
 		/// </summary>
-		public Asn1Extension()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Extension(Asn1Document Document)
+			: base(Document)
 		{
 		}
 	}

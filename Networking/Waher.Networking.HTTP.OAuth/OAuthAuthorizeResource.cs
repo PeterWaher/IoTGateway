@@ -190,7 +190,7 @@ namespace Waher.Networking.HTTP.OAuth
 							LoginAuditor.Fail("Credentials mismatch. User name in request: " +
 								ClientId + ", user name in authenticated user: " + User.UserName,
 								User.UserName, Request.RemoteEndPoint, "OAUTH",
-								new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
+								LoginAuditor.ResourceTag(Request.Header.ResourcePart));
 
 							await Forbidden(Response, "invalid_request", "Invalid credentials.");
 							return;

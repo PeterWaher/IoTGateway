@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1.Model.Macro
 {
@@ -14,7 +14,6 @@ namespace Waher.Content.Asn1.Model.Macro
 		internal readonly SupportingSyntax[] supportingSyntaxArray;
 		private readonly UserDefinedItem typeNotation;
 		private readonly UserDefinedItem valueNotation;
-		private readonly Asn1Document document;
 		private readonly string name;
 
 		/// <summary>
@@ -25,14 +24,15 @@ namespace Waher.Content.Asn1.Model.Macro
 		/// <param name="ValueNotation">Value Notation</param>
 		/// <param name="SupportingSyntax">Supporting Syntax</param>
 		/// <param name="Document">Document defining macro.</param>
-		public Asn1Macro(string Name, UserDefinedItem TypeNotation, UserDefinedItem ValueNotation,
-			SupportingSyntax[] SupportingSyntax, Asn1Document Document)
+		public Asn1Macro(string Name, UserDefinedItem TypeNotation, 
+			UserDefinedItem ValueNotation, SupportingSyntax[] SupportingSyntax, 
+			Asn1Document Document)
+			: base(Document)
 		{
 			this.name = Name;
 			this.typeNotation = TypeNotation;
 			this.valueNotation = ValueNotation;
 			this.supportingSyntaxArray = SupportingSyntax;
-			this.document = Document;
 
 			this.supportingSyntax = new Dictionary<string, SupportingSyntax>();
 
@@ -44,6 +44,27 @@ namespace Waher.Content.Asn1.Model.Macro
 		/// Name of macro.
 		/// </summary>
 		public string Name => this.name;
+
+		/// <summary>
+		/// If the named node represents a type.
+		/// </summary>
+		public bool IsType => false;
+
+		/// <summary>
+		/// Gets the fully qualified name, in reverse order.
+		/// </summary>
+		public void GetFullyQualifiedName(ChunkedList<string> Fqn)
+		{
+			Fqn.Add(this.Name);
+
+			if (this.TryGetAncestor(out INamedNode Container))
+				Container.GetFullyQualifiedName(Fqn);
+		}
+
+		/// <summary>
+		/// If the named element must be qualified.
+		/// </summary>
+		public bool MustBeQualified => false;
 
 		/// <summary>
 		/// Type notation
@@ -59,11 +80,6 @@ namespace Waher.Content.Asn1.Model.Macro
 		/// Supporting syntax
 		/// </summary>
 		public SupportingSyntax[] SupportingSyntax => this.supportingSyntaxArray;
-
-		/// <summary>
-		/// ASN.1 document defining macro.
-		/// </summary>
-		public Asn1Document Document => this.document;
 
 		/// <summary>
 		/// Parses a value from the portion of the document at the current position, 
@@ -89,12 +105,18 @@ namespace Waher.Content.Asn1.Model.Macro
 		/// Parses a type from the portion of the document at the current position, 
 		/// according to the instructions available in the macro.
 		/// </summary>
+		/// <param name="Name">Name of type.</param>
 		/// <param name="Document">ASN.1 document being parsed.</param>
 		/// <returns>Parsed ASN.1 type node.</returns>
-		public Asn1Type ParseType(Asn1Document Document)
+		public Asn1Type ParseType(string Name, Asn1Document Document)
 		{
 			if (this.typeNotation.Parse(Document, this) is Asn1Type Type)
+			{
+				if (Type is Asn1ComplexType ComplexType)
+					ComplexType.Name = Name;
+
 				return Type;
+			}
 			else
 				throw Document.SyntaxError("Unable to evaluate type.");
 		}
@@ -120,8 +142,11 @@ namespace Waher.Content.Asn1.Model.Macro
 			if (this.valueNotation is UserDefinedSpecifiedPart Part)
 				return Part.Type;
 			else
-				return new Types.Asn1Any();
+				return new Types.Asn1Any(this.Document);
 		}
+
+		/// <inheritdoc/>
+		public override string ToString() => this.name;
 
 	}
 }

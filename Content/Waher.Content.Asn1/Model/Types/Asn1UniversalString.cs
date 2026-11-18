@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Formats.Asn1;
 
 namespace Waher.Content.Asn1.Model.Types
 {
@@ -14,9 +12,15 @@ namespace Waher.Content.Asn1.Model.Types
 		/// UniversalString
 		/// ISO10646 character set
 		/// </summary>
-		public Asn1UniversalString()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1UniversalString(Asn1Document Document)
+			: base(Document)
 		{
 		}
+
+		/// <summary>
+		/// Type of string
+		/// </summary>
+		public override UniversalTagNumber StringTag => UniversalTagNumber.UniversalString;
 	}
 }

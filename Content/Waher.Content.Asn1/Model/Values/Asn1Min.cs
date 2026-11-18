@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Asn1.Model.Values
+﻿namespace Waher.Content.Asn1.Model.Values
 {
 	/// <summary>
 	/// MIN
@@ -12,7 +8,9 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <summary>
 		/// MIN
 		/// </summary>
-		public Asn1Min()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Min(Asn1Document Document) 
+			: base(Document)
 		{
 		}
 	}

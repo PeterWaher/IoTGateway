@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content.Asn1;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -11,7 +9,7 @@ namespace Waher.Content.Asn1.Model
 	/// </summary>
 	public class Asn1SequenceOf : Asn1ComplexType
 	{
-		private readonly Asn1Values size;
+		private readonly Asn1SetOfValues size;
 		private readonly Asn1Type elementType;
 
 		/// <summary>
@@ -21,23 +19,48 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="TypeDef">If construct is part of a type definition.</param>
 		/// <param name="Size">Optional SIZE</param>
 		/// <param name="ElementType">Element type.</param>
-		public Asn1SequenceOf(string Name, bool TypeDef, Asn1Values Size,
-			Asn1Type ElementType)
-			: base(Name, TypeDef)
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1SequenceOf(string Name, bool TypeDef, Asn1SetOfValues Size, 
+			Asn1Type ElementType, Asn1Document Document)
+			: base(Name, TypeDef, Document)
 		{
 			this.size = Size;
 			this.elementType = ElementType;
+	
+			this.SetAsChild(this.size);
+			this.SetAsChild(this.elementType);
 		}
 
 		/// <summary>
 		/// Optional SIZE
 		/// </summary>
-		public Asn1Values Size => this.size;
+		public Asn1SetOfValues Size => this.size;
 
 		/// <summary>
 		/// Element Type
 		/// </summary>
 		public Asn1Type ElementType => this.elementType;
+
+		/// <summary>
+		/// Corresponding C# type.
+		/// </summary>
+		public override string CSharpType
+		{
+			get
+			{
+				return this.elementType.CSharpType + "[]";
+			}
+		}
+
+		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags => acceptedTags;
+
+		private static readonly Asn1Tag[] acceptedTags = new Asn1Tag[]
+		{
+			new Asn1Tag(UniversalTagNumber.SequenceOf)
+		};
 
 		/// <summary>
 		/// Exports to C#
@@ -49,12 +72,101 @@ namespace Waher.Content.Asn1.Model
 		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
-			if (Pass == CSharpExportPass.Explicit)
-			{
-				Output.Append("Array<");
+			if (Pass == CSharpExportPass.Implicit)
 				await this.elementType.ExportCSharp(Output, State, Indent, Pass);
-				Output.Append(">");
+			else if (Pass == CSharpExportPass.Explicit)
+			{
+				await this.elementType.ExportCSharp(Output, State, Indent, Pass);
+				Output.Append("[]");
 			}
+		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
+		public override async Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, string MemberOf, int Index)
+		{
+			Output.Append("ReadArray<");
+			Output.Append(this.elementType.CSharpType);
+			Output.Append(">(Reader, (Reader, out _Item) => ");
+			await this.elementType.ExportTryReadCSharp(Output, State, Indent + 1,
+				string.Empty, null, "_Item", Index);
+			Output.Append(")");
+		}
+
+		/// <summary>
+		/// Exports optional read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="DefaultName">Name of default value.</param>
+		/// <param name="ItemName">Name of item variable.</param>
+		/// <param name="Index">Item index.</param>
+		public override async Task ExportTryReadCSharp(StringBuilder Output, 
+			CSharpExportState State, int Indent, string MemberOf, string DefaultName, 
+			string ItemName, int Index)
+		{
+			Output.Append("TryReadArray<");
+			Output.Append(this.elementType.CSharpType);
+			Output.Append(">(Reader, (Reader, out _Item) => ");
+
+			await this.elementType.ExportTryReadCSharp(Output, State, Indent + 1,
+				string.Empty, null, "_Item", Index);
+
+			if (string.IsNullOrEmpty(ItemName))
+				Output.Append(", default, out var _Item2) ? _Item2 : default");
+			else
+			{
+				Output.Append(", ");
+				Output.Append(DefaultName ?? "default");
+				Output.Append(", out ");
+				Output.Append(ItemName);
+				Output.Append(')');
+			}
+		}
+
+		/// <summary>
+		/// Exports write logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Tags">How to encode tags.</param>
+		public override Task ExportWriteCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, string MemberOf, int Index, Asn1Tags? Tags)
+		{
+			Output.Append("WriteArray");
+
+			if (!Tags.HasValue)
+				Tags = this.Tags;
+
+			if (Tags.HasValue)
+				Output.Append(Tags.Value.ToString());
+
+			Output.Append("(Writer");
+
+			if (Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			Output.Append(", ");
+			Output.Append(MemberOf);
+
+			Output.Append(')');
+
+			return Task.CompletedTask;
 		}
 
 	}

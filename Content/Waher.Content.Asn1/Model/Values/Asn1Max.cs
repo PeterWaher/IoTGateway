@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Asn1.Model.Values
+﻿namespace Waher.Content.Asn1.Model.Values
 {
 	/// <summary>
 	/// MAX
@@ -12,7 +8,9 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <summary>
 		/// MAX
 		/// </summary>
-		public Asn1Max()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Max(Asn1Document Document) 
+			: base(Document)
 		{
 		}
 	}

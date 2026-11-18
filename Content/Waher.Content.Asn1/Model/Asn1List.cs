@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Asn1.Model
+﻿namespace Waher.Content.Asn1.Model
 {
 	/// <summary>
 	/// Abstract base class for list constructs.
@@ -17,10 +13,12 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Name">Optional field or type name.</param>
 		/// <param name="TypeDef">If construct is part of a type definition.</param>
 		/// <param name="Nodes">Nodes</param>
-		public Asn1List(string Name, bool TypeDef, Asn1Node[] Nodes)
-			: base(Name, TypeDef)
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1List(string Name, bool TypeDef, Asn1Node[] Nodes, Asn1Document Document)
+			: base(Name, TypeDef, Document)
 		{
 			this.nodes = Nodes;
+			this.SetAsChild(this.nodes);
 		}
 
 		/// <summary>

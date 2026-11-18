@@ -145,12 +145,14 @@ namespace Waher.Security.TOTP
 		/// <param name="RemoteEndPoint">String-representation of remote endpoint.</param>
 		/// <param name="Timestamp">Compute code for this point in time.</param>
 		/// <param name="PassCode">Pass code to validate.</param>
+		/// <param name="Resource">Resource being accessed.</param>
 		/// <returns>Validation result.</returns>
 		public Task<ValidationResult> Validate(string OtpEndpoint, string RemoteEndPoint,
-			DateTime Timestamp, int PassCode)
+			DateTime Timestamp, int PassCode, string Resource)
 		{
 			return Validate(this.nrDigits, this.secret, this.hashFunction, OtpEndpoint,
-				RemoteEndPoint, Timestamp, this.timeStepSeconds, PassCode, this.auditor);
+				RemoteEndPoint, Timestamp, this.timeStepSeconds, PassCode, Resource,
+				this.auditor);
 		}
 
 		/// <summary>
@@ -166,10 +168,11 @@ namespace Waher.Security.TOTP
 		/// <returns>Validation result.</returns>
 		public static Task<ValidationResult> Validate(byte[] Secret, string OtpEndpoint,
 			string RemoteEndPoint, DateTime Timestamp, int TimeStepSeconds, int PassCode,
-			LoginAuditor Auditor)
+			string Resource, LoginAuditor Auditor)
 		{
 			return Validate(HotpCalculator.DefaultNrDigits, Secret, OtpEndpoint,
-				RemoteEndPoint, Timestamp, TimeStepSeconds, PassCode, Auditor);
+				RemoteEndPoint, Timestamp, TimeStepSeconds, PassCode, Resource,
+				Auditor);
 		}
 
 		/// <summary>
@@ -182,14 +185,16 @@ namespace Waher.Security.TOTP
 		/// <param name="Timestamp">Compute code for this point in time.</param>
 		/// <param name="TimeStepSeconds">Time step in seconds.</param>
 		/// <param name="PassCode">Pass code to validate.</param>
+		/// <param name="Resource">Resource being accessed.</param>
 		/// <param name="Auditor">Login auditor.</param>
 		/// <returns>Validation result.</returns>
 		public static Task<ValidationResult> Validate(int NrDigits, byte[] Secret,
 			string OtpEndpoint, string RemoteEndPoint, DateTime Timestamp, int TimeStepSeconds,
-			int PassCode, LoginAuditor Auditor)
+			int PassCode, string Resource, LoginAuditor Auditor)
 		{
 			return Validate(NrDigits, Secret, HotpCalculator.DefaultHashFunction,
-				OtpEndpoint, RemoteEndPoint, Timestamp, TimeStepSeconds, PassCode, Auditor);
+				OtpEndpoint, RemoteEndPoint, Timestamp, TimeStepSeconds, PassCode,
+				Resource, Auditor);
 		}
 
 		/// <summary>
@@ -203,15 +208,17 @@ namespace Waher.Security.TOTP
 		/// <param name="Timestamp">Compute code for this point in time.</param>
 		/// <param name="TimeStepSeconds">Time step in seconds.</param>
 		/// <param name="PassCode">Pass code to validate.</param>
+		/// <param name="Resource">Resource being accessed.</param>
 		/// <param name="Auditor">Login auditor.</param>
 		/// <returns>Validation result.</returns>
 		public static async Task<ValidationResult> Validate(int NrDigits, byte[] Secret,
 			HashFunction HashFunction, string OtpEndpoint, string RemoteEndPoint,
-			DateTime Timestamp, int TimeStepSeconds, int PassCode, LoginAuditor Auditor)
+			DateTime Timestamp, int TimeStepSeconds, int PassCode, string Resource,
+			LoginAuditor Auditor)
 		{
 			return await Validate(NrDigits, Secret, HashFunction, OtpEndpoint,
 				RemoteEndPoint, Timestamp, TimeStepSeconds, TotpCalculator.DefaultT0,
-				PassCode, Auditor);
+				PassCode, Resource, Auditor);
 		}
 
 		/// <summary>
@@ -226,12 +233,13 @@ namespace Waher.Security.TOTP
 		/// <param name="TimeStepSeconds">Time step in seconds.</param>
 		/// <param name="T0">Unix Time when starting counting steps.</param>
 		/// <param name="PassCode">Pass code to validate.</param>
+		/// <param name="Resource">Resource being accessed.</param>
 		/// <param name="Auditor">Login auditor.</param>
 		/// <returns>Validation result.</returns>
 		public static async Task<ValidationResult> Validate(int NrDigits, byte[] Secret,
 			HashFunction HashFunction, string OtpEndpoint, string RemoteEndPoint,
 			DateTime Timestamp, int TimeStepSeconds, long T0, int PassCode,
-			LoginAuditor Auditor)
+			string Resource, LoginAuditor Auditor)
 		{
 			using Semaphore Lock = await Semaphores.BeginWrite(ProtocolName + ":" + OtpEndpoint);
 
@@ -242,7 +250,7 @@ namespace Waher.Security.TOTP
 			if (Counter <= LastCounter)
 			{
 				LoginAuditor.Fail("Counter value not valid (replay attack?).", OtpEndpoint,
-					RemoteEndPoint, ProtocolName);
+					RemoteEndPoint, ProtocolName, Resource);
 				return new ValidationResult();
 			}
 
@@ -277,12 +285,12 @@ namespace Waher.Security.TOTP
 			if (Ok)
 			{
 				LoginAuditor.Success(ProtocolName + " authentication successful.",
-					OtpEndpoint, RemoteEndPoint, ProtocolName);
+					OtpEndpoint, RemoteEndPoint, ProtocolName, Resource);
 			}
 			else
 			{
 				LoginAuditor.Fail(ProtocolName + " authentication failed.",
-					OtpEndpoint, RemoteEndPoint, ProtocolName);
+					OtpEndpoint, RemoteEndPoint, ProtocolName, Resource);
 			}
 
 			return new ValidationResult(Ok);

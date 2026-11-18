@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Asn1.Model.Types;
 
 namespace Waher.Content.Asn1.Model.Values
 {
@@ -10,7 +11,6 @@ namespace Waher.Content.Asn1.Model.Values
 	/// </summary>
 	public class Asn1ValueReference : Asn1Value
 	{
-		private readonly Asn1Document document;
 		private readonly string identifier;
 
 		/// <summary>
@@ -19,9 +19,9 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <param name="Identifier">Identifier</param>
 		/// <param name="Document">ASN.1 Document containing the reference</param>
 		public Asn1ValueReference(string Identifier, Asn1Document Document)
+			: base(Document)
 		{
 			this.identifier = Identifier;
-			this.document = Document;
 		}
 
 		/// <summary>
@@ -36,24 +36,53 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override Task ExportCSharp(StringBuilder Output, CSharpExportState State, 
+		public override Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
-			{
-				if (this.document.values.TryGetValue(this.identifier, out Asn1FieldValueDefinition ValueDef))
-				{
-					if (ValueDef.Document.Root.Identifier != this.document.Root.Identifier)
-					{
-						Output.Append(ToCSharp(ValueDef.Document.Root.Identifier));
-						Output.Append(".Values.");
-					}
-				}
-					
-				Output.Append(ToCSharp(this.identifier));
-			}
-		
+				Output.Append(ToCSharp(State, this, this.identifier));
+
 			return Task.CompletedTask;
 		}
+
+		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags
+		{
+			get
+			{
+				if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+					return Node.AcceptedTags;
+				else
+					return base.AcceptedTags;
+			}
+		}
+
+		/// <summary>
+		/// Corresponding C# type.
+		/// </summary>
+		public override string CSharpType
+		{
+			get
+			{
+				if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+				{
+					if (Node is Asn1Value Value)
+						return Value.CSharpType;
+					else if (Node is Asn1FieldValueDefinition FieldValueDef)
+						return FieldValueDef.Value.CSharpType;
+				}
+
+				if (this.TryGetAncestor(out Asn1TypeReference TypeReference))
+					return TypeReference.Identifier;
+
+				throw new NotImplementedException("Support for value type " +
+					this.GetType().FullName + " not implemented.");
+			}
+		}
+
+		/// <inheritdoc/>
+		public override string ToString() => this.identifier;
 	}
 }

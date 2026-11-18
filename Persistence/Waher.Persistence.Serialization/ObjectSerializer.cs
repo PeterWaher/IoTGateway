@@ -3666,13 +3666,27 @@ namespace Waher.Persistence.Serialization
 
 					if (!CompilerResults.Success)
 					{
+						Diagnostic[] Errors = new Diagnostic[CompilerResults.Diagnostics.Length];
+						CompilerResults.Diagnostics.CopyTo(Errors, 0);
+
+						Array.Sort(Errors, (e1, e2) =>
+						{
+							FileLinePositionSpan p1 = e1.Location.GetLineSpan();
+							FileLinePositionSpan p2 = e2.Location.GetLineSpan();
+							int k = p1.StartLinePosition.Line - p2.StartLinePosition.Line;
+							if (k != 0)
+								return k;
+							else
+								return p1.StartLinePosition.Character - p2.StartLinePosition.Character;
+						});
+
 						sb.Clear();
 
 						sb.Append("Unable to serialize objects of type ");
 						AppendType(Type, sb);
 						sb.AppendLine(". When generating serialization class, the following compiler errors were reported:");
 
-						foreach (Diagnostic Error in CompilerResults.Diagnostics)
+						foreach (Diagnostic Error in Errors)
 						{
 							sb.AppendLine();
 							sb.Append(Error.Location.ToString());

@@ -1,0 +1,11 @@
+{
+	"name": "waher-things-matter-test-devices",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Matter test devices based on the matter.js open-source reference implementation, used by the Waher.Things.Matter.Test unit tests.",
+	"type": "module",
+	"dependencies": {
+		"@matter/main": "0.18.0",
+		"@matter/nodejs": "0.18.0"
+	}
+}

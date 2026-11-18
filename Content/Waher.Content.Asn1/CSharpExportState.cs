@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 
 namespace Waher.Content.Asn1
@@ -16,7 +15,6 @@ namespace Waher.Content.Asn1
 
 		internal int ExportingValuesIndent = 0;
 		internal bool ExportingValues = false;
-		internal string CurrentNamespace = null;
 
 		/// <summary>
 		/// C# export state

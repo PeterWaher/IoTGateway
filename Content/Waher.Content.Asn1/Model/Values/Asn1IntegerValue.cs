@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Formats.Asn1;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,13 +11,15 @@ namespace Waher.Content.Asn1.Model.Values
 	/// </summary>
 	public class Asn1IntegerValue : Asn1Value
 	{
-		private readonly long value;
+		private BigInteger value;
 
 		/// <summary>
 		/// Integer value
 		/// </summary>
 		/// <param name="Value">Value</param>
-		public Asn1IntegerValue(long Value)
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1IntegerValue(BigInteger Value, Asn1Document Document)
+			: base(Document)
 		{
 			this.value = Value;
 		}
@@ -24,7 +27,39 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <summary>
 		/// Value
 		/// </summary>
-		public long Value => this.value;
+		public BigInteger Value => this.value;
+
+		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags => acceptedTags;
+
+		private static readonly Asn1Tag[] acceptedTags = new Asn1Tag[]
+		{
+			new Asn1Tag(UniversalTagNumber.Integer)
+		};
+
+		/// <summary>
+		/// Makes the value 2^value, for use with <see cref="FlagsAttribute"/>
+		/// enumerations.
+		/// </summary>
+		public override void TwosPower()
+		{
+			if (!this.PowerOfTwo)
+			{
+				this.PowerOfTwo = true;
+
+				if (this.value < 0 || this.value >= 63)
+					base.TwosPower();
+				else if (this.value >= 0 && this.value <= int.MaxValue)
+					this.value = BigInteger.Pow(2, (int)this.value);
+				else
+					throw new AsnContentException("Invalid power of two.");
+			}
+		}
+
+		/// <inheritdoc/>
+		public override string ToString() => this.value.ToString();
 
 		/// <summary>
 		/// Exports to C#
@@ -38,13 +73,13 @@ namespace Waher.Content.Asn1.Model.Values
 		{
 			if (Pass == CSharpExportPass.Explicit)
 				Output.Append(this.value.ToString());
-	
+
 			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Corresponding C# type.
 		/// </summary>
-		public override string CSharpType => "Int64";
+		public override string CSharpType => "System.Numerics.BigInteger";
 	}
 }

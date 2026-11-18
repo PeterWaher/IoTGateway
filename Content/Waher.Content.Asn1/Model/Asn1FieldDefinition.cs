@@ -1,19 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Asn1.Model.Types;
 using Waher.Content.Asn1.Model.Values;
+using Waher.Runtime.Collections;
+using Waher.Script.Functions.Analytic;
 
 namespace Waher.Content.Asn1.Model
 {
 	/// <summary>
 	/// Represents an ASN.1 field definition.
 	/// </summary>
-	public class Asn1FieldDefinition : Asn1Node, INamedNode
+	public class Asn1FieldDefinition : Asn1Node
 	{
 		private readonly string fieldName;
+		private readonly string fieldNameCSharp;
 		private readonly Asn1Type type;
-		private int? tag;
+		private Asn1Tag? tag;
 
 		/// <summary>
 		/// Represents an ASN.1 field definition.
@@ -21,12 +24,17 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="FieldName">Field name.</param>
 		/// <param name="Tag">Tag</param>
 		/// <param name="Type">Type.</param>
-		public Asn1FieldDefinition(string FieldName, int? Tag, Asn1Type Type)
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1FieldDefinition(string FieldName, Asn1Tag? Tag, Asn1Type Type,
+			Asn1Document Document)
+			: base(Document)
 		{
 			this.fieldName = FieldName;
+			this.fieldNameCSharp = ToCSharp(FieldName);
 			this.type = Type;
 			this.tag = Tag;
+
+			this.SetAsChild(this.type);
 		}
 
 		/// <summary>
@@ -35,19 +43,74 @@ namespace Waher.Content.Asn1.Model
 		public string Name => this.fieldName;
 
 		/// <summary>
-		/// Type
+		/// If the named node represents a type.
+		/// </summary>
+		public bool IsType => false;
+
+		/// <summary>
+		/// ASN.1 type reference.
 		/// </summary>
 		public Asn1Type Type => this.type;
 
 		/// <summary>
-		/// Tag
+		/// Gets the fully qualified name, in reverse order.
 		/// </summary>
-		public int? Tag
+		public void GetFullyQualifiedName(ChunkedList<string> Fqn)
 		{
-			get => this.tag;
-			internal set => this.tag = value;
+			Fqn.Add(this.Name);
+
+			if (this.TryGetAncestor(out INamedNode Container))
+				Container.GetFullyQualifiedName(Fqn);
 		}
-		
+
+		/// <summary>
+		/// If the named element must be qualified.
+		/// </summary>
+		public bool MustBeQualified => false;
+
+		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags
+		{
+			get
+			{
+				if (this.tag.HasValue)
+					return new Asn1Tag[] { this.tag.Value };
+				else
+					return this.type.AcceptedTags;
+			}
+		}
+
+		internal void SetTag(Asn1Tag? Tag)
+		{
+			this.tag = Tag;
+		}
+
+		/// <summary>
+		/// If the node is optional
+		/// </summary>
+		public override bool? Optional => base.Optional ?? this.type.Optional;
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(this.fieldName);
+			sb.Append(" : ");
+			sb.Append(this.type.ToString());
+
+			if (this.tag.HasValue)
+			{
+				sb.Append(" [");
+				sb.Append(this.tag.Value.ToString());
+				sb.Append(']');
+			}
+
+			return sb.ToString();
+		}
+
 		/// <summary>
 		/// Exports to C#
 		/// </summary>
@@ -62,20 +125,231 @@ namespace Waher.Content.Asn1.Model
 			{
 				JSON.Indent(Output, Indent);
 				Output.Append("public ");
-				await this.type.ExportCSharp(Output, State, Indent, Pass);
+				Output.Append(this.type.CSharpType);
+
+				if (!this.type.ByReference &&
+					(this.Optional ?? false) &&
+					!(this.type.Optional ?? false))
+				{
+					Output.Append('?');
+				}
+
 				Output.Append(' ');
-				Output.Append(ToCSharp(this.fieldName));
+				Output.Append(this.fieldNameCSharp);
 
 				if (!(this.type.Default is null))
 				{
 					Output.Append(" = ");
-					await this.type.Default.ExportCSharp(Output, State, Indent, Pass);
+
+					if (this.type.Default is Asn1ValueReference ValueReference &&
+						this.type is Asn1TypeReference TypeReference)
+					{
+						string s = TypeReference.CSharpType;
+						if (s.EndsWith("?"))
+							s = s.Substring(0, s.Length - 1);
+
+						Output.Append(s);
+						Output.Append('.');
+						await ValueReference.ExportCSharp(Output, State, Indent, Pass);
+					}
+					else
+						await this.type.Default.ExportCSharp(Output, State, Indent, Pass);
 				}
 
 				Output.AppendLine(";");
 			}
 			else
+			{
+				if (Pass == CSharpExportPass.Preprocess || Pass == CSharpExportPass.Variables)
+				{
+					await this.type.ExportRestrictionCSharp(Output, State, Indent,
+						this.fieldNameCSharp, Pass);
+				}
+
 				await this.type.ExportCSharp(Output, State, Indent, Pass);
+			}
+		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
+		public override async Task ExportReadCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf, int Index)
+		{
+			string Name = MemberOf + "." + this.fieldNameCSharp;
+
+			if (this.type.Optional ?? false)
+			{
+				await this.ExportTryReadCSharp(Output, State, Indent, string.Empty,
+					Name, Name, Index);
+			}
+			else
+			{
+				JSON.Indent(Output, Indent);
+				Output.Append(Name);
+				Output.Append(" = ");
+
+				await this.type.ExportReadCSharp(Output, State, Indent + 1, string.Empty,
+					Index);
+
+				Output.AppendLine(";");
+			}
+		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="VariableName">Name of variable to check.</param>
+		public override async Task ExportRestrictionCheck(StringBuilder Output,
+			CSharpExportState State, int Indent, string VariableName)
+		{
+			StringBuilder Temp = new StringBuilder();
+			string Name = VariableName + "." + this.fieldNameCSharp;
+
+			if (this.type.Optional ?? false)
+				await this.type.ExportRestrictionCheck(Temp, State, Indent + 1, Name);
+			else
+				await this.type.ExportRestrictionCheck(Temp, State, Indent, Name);
+
+			string Check = Temp.ToString();
+
+			if (!string.IsNullOrWhiteSpace(Check))
+			{
+				if (this.type.Optional ?? false)
+				{
+					JSON.Indent(Output, Indent);
+					Output.Append("if (!(");
+					Output.Append(Name);
+					Output.AppendLine(" is null))");
+
+					if (Check.IndexOfAny(CommonTypes.CRLF) >= 0)
+					{
+						JSON.Indent(Output, Indent);
+						Output.AppendLine("{");
+
+						Output.Append(Check);
+
+						JSON.Indent(Output, Indent);
+						Output.AppendLine("}");
+					}
+					else
+						Output.Append(Check);
+				}
+				else
+					Output.Append(Check);
+			}
+		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="DefaultName">Name of default value.</param>
+		/// <param name="ItemName">Name of item variable.</param>
+		/// <param name="Index">Item index.</param>
+		public override async Task ExportTryReadCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf, string DefaultName,
+			string ItemName, int Index)
+		{
+			JSON.Indent(Output, Indent);
+
+			if (string.IsNullOrEmpty(ItemName))
+			{
+				await this.type.ExportTryReadCSharp(Output, State, Indent, string.Empty,
+					null, MemberOf + "." + this.fieldNameCSharp, Index);
+			}
+			else
+			{
+				await this.type.ExportTryReadCSharp(Output, State, Indent, string.Empty,
+					DefaultName, ItemName, Index);
+
+				if (!string.IsNullOrEmpty(MemberOf))
+				{
+					Output.AppendLine(";");
+
+					JSON.Indent(Output, Indent);
+					Output.Append(MemberOf);
+					Output.Append('.');
+					Output.Append(this.fieldNameCSharp);
+					Output.Append(" = ");
+					Output.Append(ItemName);
+				}
+			}
+
+			Output.AppendLine(";");
+		}
+
+		/// <summary>
+		/// Exports write logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Tags">How to encode tags.</param>
+		public override async Task ExportWriteCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf, int Index, 
+			Asn1Tags? Tags)
+		{
+			string Name = MemberOf + "." + this.fieldNameCSharp;
+
+			JSON.Indent(Output, Indent);
+
+			if (this.Optional ?? this.type.Optional ?? false)
+			{
+				Output.Append("if (");
+
+				if (this.type.ByReference)
+				{
+					Output.Append("!(");
+					Output.Append(ToCSharp(Name));
+					Output.AppendLine(" is null))");
+				}
+				else
+				{
+					Output.Append(ToCSharp(Name));
+					Output.AppendLine(".HasValue)");
+				}
+
+				JSON.Indent(Output, Indent + 1);
+
+				if (this.type.ConstructedType)
+				{
+					Output.Append(Name);
+					Output.Append(".Write(Writer)");
+				}
+				else if (this.type.ByReference)
+				{
+					await this.type.ExportWriteCSharp(Output, State, Indent + 1,
+						Name, Index, Tags);
+				}
+				else
+				{
+					await this.type.ExportWriteCSharp(Output, State, Indent + 1,
+						Name + ".Value", Index, Tags);
+				}
+			}
+			else if (this.type.ConstructedType)
+			{
+				Output.Append(Name);
+				Output.Append(".Write(Writer)");
+			}
+			else
+				await this.type.ExportWriteCSharp(Output, State, Indent, Name, Index, Tags);
+
+			Output.AppendLine(";");
 		}
 	}
 }

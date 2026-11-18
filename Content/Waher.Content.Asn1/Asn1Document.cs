@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading.Tasks;
 using Waher.Content.Asn1.Exceptions;
 using Waher.Content.Asn1.Model;
 using Waher.Content.Asn1.Model.Macro;
@@ -8,15 +9,18 @@ using Waher.Content.Asn1.Model.Restrictions;
 using Waher.Content.Asn1.Model.Sets;
 using Waher.Content.Asn1.Model.Types;
 using Waher.Content.Asn1.Model.Values;
-using System.Threading.Tasks;
 using Waher.Runtime.IO;
+using Waher.Runtime.Collections;
+using System;
+using System.Formats.Asn1;
+using System.Numerics;
 
 namespace Waher.Content.Asn1
 {
 	/// <summary>
 	/// Represents an ASN.1 document.
 	/// </summary>
-	public class Asn1Document
+	public class Asn1Document : Asn1Node
 	{
 		internal readonly Dictionary<string, Asn1Node> namedNodes = new Dictionary<string, Asn1Node>();
 		internal readonly Dictionary<string, Asn1TypeDefinition> aliases = new Dictionary<string, Asn1TypeDefinition>();
@@ -31,12 +35,14 @@ namespace Waher.Content.Asn1
 		private int unnamedIndex = 1;
 
 		private Asn1Document(string Text, string Location, string[] ImportFolders)
+			: base(null)
 		{
 			this.text = Text;
 			this.location = Location;
 			this.importFolders = ImportFolders;
 			this.len = this.text.Length;
 			this.lenm1 = this.len - 1;
+			this.Document = this;
 		}
 
 		/// <summary>
@@ -45,13 +51,11 @@ namespace Waher.Content.Asn1
 		/// <param name="Text">ASN.1 text to parse.</param>
 		/// <param name="Location">Location of file.</param>
 		/// <param name="ImportFolders">Import Folders.</param>
-		public async Task<Asn1Document> CreateAsync(string Text, string Location, string[] ImportFolders)
+		public static async Task<Asn1Document> CreateAsync(string Text, string Location, string[] ImportFolders)
 		{
-			Asn1Document Result = new Asn1Document(Text, Location, ImportFolders)
-			{
-				root = await this.ParseDefinitions()
-			};
-
+			Asn1Document Result = new Asn1Document(Text, Location, ImportFolders);
+			Result.root = await Result.ParseDefinitions();
+			Result.root.SetParentNode(Result);
 			return Result;
 		}
 
@@ -84,7 +88,7 @@ namespace Waher.Content.Asn1
 		public static async Task<Asn1Document> FromFile(string FileName, string[] ImportFolders)
 		{
 			string Text = await Files.ReadAllTextAsync(FileName);
-			return new Asn1Document(Text, FileName, ImportFolders);
+			return await CreateAsync(Text, FileName, ImportFolders);
 		}
 
 		internal void SkipWhiteSpace()
@@ -252,14 +256,26 @@ namespace Waher.Content.Asn1
 			string s = this.PeekNextToken();
 			Asn1Oid Oid = null;
 
-			if (s == "{")
+			while (true)
 			{
-				Oid = this.ParseOid();
-				s = this.PeekNextToken();
-			}
+				if (s == "{")
+				{
+					Oid = this.ParseOid();
+					s = this.PeekNextToken();
 
-			if (s != "DEFINITIONS")
-				throw this.SyntaxError("DEFINITIONS expected.");
+					if (s == "DEFINITIONS")
+						break;
+
+					this.namedNodes[Identifier] = Oid;
+					Identifier = s;
+					this.pos += s.Length;
+					s = this.PeekNextToken();
+				}
+				else if (s == "DEFINITIONS")
+					break;
+				else
+					throw this.SyntaxError("DEFINITIONS expected.");
+			}
 
 			this.pos += 11;
 
@@ -271,26 +287,26 @@ namespace Waher.Content.Asn1
 				switch (s = this.NextToken())
 				{
 					case "AUTOMATIC":
+						if (Tags.HasValue)
+							throw this.SyntaxError("TAGS already specified.");
+
+						Tags = Asn1Tags.Automatic;
+						this.AssertNextToken("TAGS");
+						break;
+
 					case "IMPLICIT":
+						if (Tags.HasValue)
+							throw this.SyntaxError("TAGS already specified.");
+
+						Tags = Asn1Tags.Implicit;
+						this.AssertNextToken("TAGS");
+						break;
+
 					case "EXPLICIT":
 						if (Tags.HasValue)
 							throw this.SyntaxError("TAGS already specified.");
 
-						switch (s)
-						{
-							case "AUTOMATIC":
-								Tags = Asn1Tags.Automatic;
-								break;
-
-							case "IMPLICIT":
-								Tags = Asn1Tags.Implicit;
-								break;
-
-							case "EXPLICIT":
-								Tags = Asn1Tags.Explicit;
-								break;
-						}
-
+						Tags = Asn1Tags.Explicit;
 						this.AssertNextToken("TAGS");
 						break;
 
@@ -310,12 +326,12 @@ namespace Waher.Content.Asn1
 					break;
 			}
 
-			Asn1Module Body = await this.ParseModule();
+			Asn1Module Body = await this.ParseModule(Tags);
 
 			return new Asn1Definitions(Identifier, Oid, Tags, Abstract, Body, this);
 		}
 
-		private async Task<Asn1Module> ParseModule()
+		private async Task<Asn1Module> ParseModule(Asn1Tags? DefaultTags)
 		{
 			string s;
 
@@ -354,6 +370,21 @@ namespace Waher.Content.Asn1
 							Identifiers.Clear();
 
 							s = this.PeekNextToken();
+
+							if (s == "{")
+							{
+								Asn1Oid Oid = this.ParseOid();
+								if (this.namedNodes.TryGetValue(ModuleRef, out Asn1Node PrevModuleDef))
+								{
+									if (!Oid.Equals(PrevModuleDef))
+										throw this.SyntaxError(ModuleRef + " already defined.");
+								}
+								else
+									this.namedNodes[ModuleRef] = Oid;
+
+								s = this.PeekNextToken();
+							}
+
 							if (s != ";")
 								continue;
 						}
@@ -446,19 +477,34 @@ namespace Waher.Content.Asn1
 				if (string.IsNullOrEmpty(s))
 					throw this.SyntaxError("END expected.");
 
-				Asn1Node Node = this.ParseStatement();
+				Asn1Node Node = this.ParseStatement(DefaultTags);
 				Items.Add(Node);
 
-				if (Node is INamedNode NamedNode)
-					this.namedNodes[NamedNode.Name] = Node;
+				Node.ForEach(Node2 =>
+				{
+					if (Node2 is INamedNode NamedNode)
+					{
+						if (this.namedNodes.TryGetValue(NamedNode.Name, out Asn1Node Prev))
+						{
+							if (NamedNode is Asn1TypeDefinition TypeDef)
+								this.namedNodes[NamedNode.Name] = TypeDef;
+							else if (!(Prev is Asn1TypeDefinition) && !Prev.Equals(NamedNode))
+								throw new Exception("Duplicate type: " + NamedNode.Name);
+						}
+						else
+							this.namedNodes[NamedNode.Name] = Node2;
+					}
+
+					return true;
+				});
 			}
 
 			this.pos += 3;
 
-			return new Asn1Module(Imports?.ToArray(), Exports?.ToArray(), Items.ToArray());
+			return new Asn1Module(Imports?.ToArray(), Exports?.ToArray(), Items.ToArray(), this);
 		}
 
-		private Asn1Node ParseStatement()
+		private Asn1Node ParseStatement(Asn1Tags? DefaultTags)
 		{
 			string s = this.PeekNextToken();
 			if (string.IsNullOrEmpty(s))
@@ -492,20 +538,20 @@ namespace Waher.Content.Asn1
 					this.AssertNextToken("NOTATION");
 					this.AssertNextToken("::=");
 
-					UserDefinedItem TypeNotation = this.ParseUserDefinedOptions("VALUE");
+					UserDefinedItem TypeNotation = this.ParseUserDefinedOptions("VALUE", DefaultTags);
 
 					this.AssertNextToken("VALUE");
 					this.AssertNextToken("NOTATION");
 					this.AssertNextToken("::=");
 
-					UserDefinedItem ValueNotation = this.ParseUserDefinedOptions("END");
+					UserDefinedItem ValueNotation = this.ParseUserDefinedOptions("END", DefaultTags);
 					List<SupportingSyntax> SupportingSyntax = new List<SupportingSyntax>();
 
 					while (this.PeekNextToken() != "END")
 					{
 						string Name = this.ParseIdentifier();
 						this.AssertNextToken("::=");
-						SupportingSyntax.Add(new SupportingSyntax(Name, this.ParseUserDefinedOptions("END")));
+						SupportingSyntax.Add(new SupportingSyntax(Name, this.ParseUserDefinedOptions("END", DefaultTags)));
 					}
 
 					this.AssertNextToken("END");
@@ -535,11 +581,13 @@ namespace Waher.Content.Asn1
 					}
 				}
 
-				int? Tag = null;
 				TagClass? Class = null;
+				int? TagValue = null;
 
 				if (s2 == "[")
 				{
+					Class = TagClass.ContextSpecific;	// Default class when providing index.
+
 					this.pos++;
 					s2 = this.NextToken();
 
@@ -570,10 +618,7 @@ namespace Waher.Content.Asn1
 					if (!int.TryParse(s2, out int i))
 						throw this.SyntaxError("Tag expected.");
 
-					if (Class.HasValue)
-						i |= ((int)Class) << 6;
-
-					Tag = i;
+					TagValue = i;
 
 					this.AssertNextToken("]");
 
@@ -588,12 +633,15 @@ namespace Waher.Content.Asn1
 						Node is Asn1Macro Macro)
 					{
 						this.pos += s2.Length;
-						Definition = Macro.ParseType(this);
+						Definition = Macro.ParseType(s, this);
 					}
 					else
-						Definition = this.ParseType(s, true);
+						Definition = this.ParseType(s, true, DefaultTags);
 
-					Asn1TypeDefinition TypeDef = new Asn1TypeDefinition(s, Tag, Definition);
+					Asn1TypeDefinition TypeDef = new Asn1TypeDefinition(s,
+						Class.HasValue && TagValue.HasValue ? 
+						new Asn1Tag(Class.Value, TagValue.Value) : (Asn1Tag?)null, 
+						Definition, this);
 
 					if (!Definition.ConstructedType)
 						this.aliases[s] = TypeDef;
@@ -605,7 +653,7 @@ namespace Waher.Content.Asn1
 					if (!IsTypeIdentifier(s2))
 						throw this.SyntaxError("Type name expected.");
 
-					Asn1Type Type = this.ParseType(s, false);
+					Asn1Type Type = this.ParseType(s, false, DefaultTags);
 
 					if (this.PeekNextToken() == "::=")
 					{
@@ -618,21 +666,26 @@ namespace Waher.Content.Asn1
 						return ValueDef;
 					}
 					else
-						return new Asn1FieldDefinition(s, Tag, Type);
+					{
+						return new Asn1FieldDefinition(s,
+							Class.HasValue && TagValue.HasValue ?
+							new Asn1Tag(Class.Value, TagValue.Value) : (Asn1Tag?)null, 
+							Type, this);
+					}
 				}
 			}
 			else if (s == "...")
 			{
 				this.pos += 3;
-				return new Asn1Extension();
+				return new Asn1Extension(this);
 			}
 			else
 				throw this.SyntaxError("Identifier expected.");
 		}
 
-		private UserDefinedItem ParseUserDefinedOptions(string EndKeyWord)
+		private UserDefinedItem ParseUserDefinedOptions(string EndKeyWord, Asn1Tags? DefaultTags)
 		{
-			UserDefinedItem Item = this.ParseUserDefinedOption(EndKeyWord);
+			UserDefinedItem Item = this.ParseUserDefinedOption(EndKeyWord, DefaultTags);
 			List<UserDefinedItem> Options = null;
 
 			while (this.PeekNextToken() == "|")
@@ -643,7 +696,7 @@ namespace Waher.Content.Asn1
 					Options = new List<UserDefinedItem>();
 
 				Options.Add(Item);
-				Item = this.ParseUserDefinedOption(EndKeyWord);
+				Item = this.ParseUserDefinedOption(EndKeyWord, DefaultTags);
 			}
 
 			if (Options is null)
@@ -655,7 +708,7 @@ namespace Waher.Content.Asn1
 			}
 		}
 
-		private UserDefinedItem ParseUserDefinedOption(string EndKeyWord)
+		private UserDefinedItem ParseUserDefinedOption(string EndKeyWord, Asn1Tags? DefaultTags)
 		{
 			UserDefinedItem Item = null;
 			List<UserDefinedItem> Items = new List<UserDefinedItem>();
@@ -673,7 +726,7 @@ namespace Waher.Content.Asn1
 				}
 
 				PosBak = this.pos;
-				Item = this.ParseUserDefinedItem();
+				Item = this.ParseUserDefinedItem(DefaultTags);
 			}
 
 			if (Item is null)
@@ -696,7 +749,7 @@ namespace Waher.Content.Asn1
 			return new UserDefinedOption(Items.ToArray());
 		}
 
-		private UserDefinedItem ParseUserDefinedItem()
+		private UserDefinedItem ParseUserDefinedItem(Asn1Tags? DefaultTags)
 		{
 			string s = this.PeekNextToken();
 
@@ -725,7 +778,7 @@ namespace Waher.Content.Asn1
 				}
 				else
 				{
-					Asn1Type Type = this.ParseType(Name, false);
+					Asn1Type Type = this.ParseType(Name, false, DefaultTags);
 
 					this.AssertNextToken(")");
 
@@ -754,7 +807,7 @@ namespace Waher.Content.Asn1
 			while (s == "|")
 			{
 				this.pos++;
-				Result = new Asn1Or(Result, this.ParseAnds());
+				Result = new Asn1Or(Result, this.ParseAnds(), this);
 				s = this.PeekNextToken();
 			}
 
@@ -770,7 +823,7 @@ namespace Waher.Content.Asn1
 			while (s == "^")
 			{
 				this.pos++;
-				Result = new Asn1And(Result, this.ParseRestrictionRule());
+				Result = new Asn1And(Result, this.ParseRestrictionRule(), this);
 				s = this.PeekNextToken();
 			}
 
@@ -793,79 +846,79 @@ namespace Waher.Content.Asn1
 
 				case "SIZE":
 					this.pos += 4;
-					return new Asn1Size(this.ParseSet());
+					return new Asn1Size(this.ParseSet(), this);
 
 				case "PATTERN":
 					this.pos += 7;
-					return new Asn1Pattern(this.ParseValue());
+					return new Asn1Pattern(this.ParseValue(), this);
 
 				case "FROM":
 					this.pos += 4;
-					return new Asn1From(this.ParseSet());
+					return new Asn1From(this.ParseSet(), this);
 
 				case "CONTAINING":
 					this.pos += 10;
-					return new Asn1Containing(this.ParseValue());
+					return new Asn1Containing(this.ParseValue(), this);
 
 				case "ENCODED":
 					this.pos += 7;
 					this.AssertNextToken("BY");
 
-					return new Asn1EncodedBy(this.ParseValue());
+					return new Asn1EncodedBy(this.ParseValue(), this);
 
 				case "WITH":
 					this.pos += 4;
 					this.AssertNextToken("COMPONENTS");
 
-					return new Asn1WithComponents(this.ParseValue());
+					return new Asn1WithComponents(this.ParseValue(), this);
 
 				default:
-					return new Asn1InSet(this.ParseUnions());
+					return new Asn1InSet(this.ParseUnions(), this);
 			}
 		}
 
-		private Asn1Values ParseSet()
+		private Asn1SetOfValues ParseSet()
 		{
 			this.AssertNextToken("(");
-			Asn1Values Result = this.ParseUnions();
+			Asn1SetOfValues Result = this.ParseUnions();
 			this.AssertNextToken(")");
 
 			return Result;
 		}
 
-		private Asn1Values ParseUnions()
+		private Asn1SetOfValues ParseUnions()
 		{
-			Asn1Values Result = this.ParseIntersections();
+			Asn1SetOfValues Result = this.ParseIntersections();
 
 			string s = this.PeekNextToken();
 
 			while (s == "|" || s == "UNION")
 			{
 				this.pos += s.Length;
-				Result = new Asn1Union(Result, this.ParseIntersections());
+				Result = new Asn1Union(Result, this.ParseIntersections(), this);
 				s = this.PeekNextToken();
 			}
 
 			return Result;
 		}
 
-		private Asn1Values ParseIntersections()
+		private Asn1SetOfValues ParseIntersections()
 		{
-			Asn1Values Result = this.ParseIntervals();
+			Asn1SetOfValues Result = this.ParseIntervals();
 
 			string s = this.PeekNextToken();
 
 			while (s == "^" || s == "INTERSECTION")
 			{
 				this.pos += s.Length;
-				Result = new Asn1Union(Result, this.ParseIntervals());
+				Result = new Asn1Union(Result, this.ParseIntervals(), this);
 				s = this.PeekNextToken();
 			}
 
 			return Result;
 		}
 
-		private Asn1Values ParseIntervals()
+		private Asn1SetOfValues ParseIntervals()
 		{
 			string s = this.PeekNextToken();
 
@@ -873,7 +926,7 @@ namespace Waher.Content.Asn1
 			{
 				this.pos++;
 
-				Asn1Values Result = this.ParseUnions();
+				Asn1SetOfValues Result = this.ParseUnions();
 				this.AssertNextToken(")");
 
 				return Result;
@@ -881,7 +934,7 @@ namespace Waher.Content.Asn1
 			else if (s == "ALL")
 			{
 				this.pos += 3;
-				return new Asn1All();
+				return new Asn1All(this);
 			}
 			else
 			{
@@ -892,10 +945,10 @@ namespace Waher.Content.Asn1
 					this.pos += 2;
 					Asn1Value Value2 = this.ParseValue();
 
-					return new Asn1Interval(Value, Value2);
+					return new Asn1Interval(Value, Value2, this);
 				}
 				else
-					return new Asn1Element(Value);
+					return new Asn1Element(Value, this);
 			}
 		}
 
@@ -938,26 +991,35 @@ namespace Waher.Content.Asn1
 
 		private Asn1Oid ParseOid()
 		{
-			Asn1Node[] Values = this.ParseValues();
-			return new Asn1Oid(Values);
+			Asn1Node[] Values = this.ParseValues(false);
+			return new Asn1Oid(Values, this);
 		}
 
-		internal Asn1Type ParseType(string Name, bool TypeDef)
+		internal Asn1Type ParseType(string Name, bool TypeDef, Asn1Tags? DefaultTags)
 		{
-			bool Implicit = false;
+			Asn1Tags? Tags = DefaultTags;
 
 			switch (this.PeekNextToken())
 			{
 				case "IMPLICIT":
 					this.pos += 8;
-					Implicit = true;
+					Tags = Asn1Tags.Implicit;
+					break;
+
+				case "EXPLICIT":
+					this.pos += 8;
+					Tags = Asn1Tags.Explicit;
+					break;
+
+				case "AUTOMATIC":
+					this.pos += 9;
+					Tags = Asn1Tags.Automatic;
 					break;
 			}
 
-			Asn1Type Result = this.ParseDataType(Name, TypeDef);
-			Result.Implicit = Implicit;
-
 			string s2;
+			Asn1Type Result = this.ParseDataType(Name, TypeDef, DefaultTags);
+			Result.Tags = Tags;
 
 			while (true)
 			{
@@ -984,13 +1046,18 @@ namespace Waher.Content.Asn1
 							{
 								this.pos++;
 
-								NamedOptions.Add(new Asn1NamedValue(s2, this.ParseValue(), this));
+								Asn1Value Value = this.ParseValue();
+
+								if (!this.namedNodes.ContainsKey(s2))
+									this.namedNodes[s2] = Value;
+
+								NamedOptions.Add(new Asn1NamedValue(s2, Value, Result, this));
 
 								if (this.NextToken() != ")")
 									throw this.SyntaxError(") expected");
 							}
 							else
-								NamedOptions.Add(new Asn1NamedValue(s2, null, this));
+								NamedOptions.Add(new Asn1NamedValue(s2, null, Result, this));
 
 							s2 = this.NextToken();
 
@@ -1008,7 +1075,7 @@ namespace Waher.Content.Asn1
 
 					case "OPTIONAL":
 						this.pos += 8;
-						Result.Optional = true;
+						Result.SetOptional(true);
 						break;
 
 					case "PRESENT":
@@ -1023,7 +1090,7 @@ namespace Waher.Content.Asn1
 
 					case "DEFAULT":
 						this.pos += 7;
-						Result.Optional = true;
+						Result.SetOptional(true);
 						Result.Default = this.ParseValue();
 						break;
 
@@ -1038,7 +1105,7 @@ namespace Waher.Content.Asn1
 			}
 		}
 
-		private Asn1Type ParseDataType(string Name, bool TypeDef)
+		private Asn1Type ParseDataType(string Name, bool TypeDef, Asn1Tags? DefaultTags)
 		{
 			string s = this.NextToken();
 			if (string.IsNullOrEmpty(s))
@@ -1047,218 +1114,180 @@ namespace Waher.Content.Asn1
 			switch (s)
 			{
 				case "ANY":
-					return new Asn1Any();
+					s = this.PeekNextToken();
+					if (s != "DEFINED")
+						return new Asn1Any(this);
+
+					this.pos += 7;
+					s = this.NextToken();
+					if (s != "BY")
+						throw this.SyntaxError("BY expected.");
+
+					s = this.ParseIdentifier();
+					return new Asn1Any(s, this);
 
 				case "BIT":
 					this.AssertNextToken("STRING");
-					return new Asn1BitString();
+
+					s = this.PeekNextToken();
+
+					if (s == "{")
+					{
+						Asn1Node[] Nodes = this.ParseValues(true);
+						return new Asn1Enumeration(Name, TypeDef, true,
+							new Asn1BitString(this), Nodes, this);
+					}
+					else
+						return new Asn1BitString(this);
 
 				case "BMPString":
-					return new Asn1BmpString();
+					return new Asn1BmpString(this);
 
 				case "BOOLEAN":
-					return new Asn1Boolean();
+					return new Asn1Boolean(this);
 
 				case "CHARACTER":
-					return new Asn1Character();
+					this.AssertNextToken("STRING");
+					return new Asn1UnrestrictedCharacterString(this);
 
 				case "CHOICE":
 					s = this.PeekNextToken();
 
 					if (s == "{")
 					{
-						Asn1Node[] Nodes = this.ParseList();
-
-						foreach (Asn1Node Node in Nodes)
-						{
-							if (Node is Asn1FieldDefinition FieldDef && !this.namedNodes.ContainsKey(FieldDef.Name))
-								this.namedNodes[FieldDef.Name] = FieldDef;
-						}
-
-						return new Asn1Choice(Name, TypeDef, Nodes);
+						Asn1Node[] Nodes = this.ParseList(DefaultTags);
+						return new Asn1Choice(Name, TypeDef, Nodes, this);
 					}
 					else
 						throw this.SyntaxError("{ expected.");
 
 				case "DATE":
-					return new Asn1Date();
+					return new Asn1Date(this);
 
 				case "DATE-TIME":
-					return new Asn1DateTime();
+					return new Asn1DateTime(this);
 
 				case "DURATION":
-					return new Asn1Duration();
+					return new Asn1Duration(this);
 
 				case "ENUMERATED":
 					s = this.PeekNextToken();
 
 					if (s == "{")
 					{
-						Asn1Node[] Nodes = this.ParseValues();
-						return new Asn1Enumeration(Name, TypeDef, Nodes);
+						Asn1Node[] Nodes = this.ParseValues(true);
+						return new Asn1Enumeration(Name, TypeDef, false, null, Nodes, this);
 					}
 					else
 						throw this.SyntaxError("{ expected.");
 
 				case "GeneralizedTime":
-					return new Asn1GeneralizedTime();
+					return new Asn1GeneralizedTime(this);
 
 				case "GeneralString":
-					return new Asn1GeneralString();
+					return new Asn1GeneralString(this);
 
 				case "GraphicString":
-					return new Asn1GraphicString();
+					return new Asn1GraphicString(this);
 
 				case "IA5String":
-					return new Asn1Ia5String();
+					return new Asn1Ia5String(this);
 
 				case "INTEGER":
-					return new Asn1Integer();
+					s = this.PeekNextToken();
+
+					if (s == "{")
+					{
+						Asn1Node[] Nodes = this.ParseValues(true);
+						return new Asn1Enumeration(Name, TypeDef, false,
+							new Asn1Integer(this), Nodes, this);
+					}
+					else
+						return new Asn1Integer(this);
 
 				case "ISO646String":
-					return new Asn1Iso646String();
+					return new Asn1Iso646String(this);
 
 				case "NULL":
-					return new Asn1Null();
+					return new Asn1Null(this);
 
 				case "NumericString":
-					return new Asn1NumericString();
+					return new Asn1NumericString(this);
 
 				case "OBJECT":
 					this.AssertNextToken("IDENTIFIER");
-					return new Asn1ObjectIdentifier(false);
+					return new Asn1ObjectIdentifier(false, this);
 
 				case "OCTET":
 					this.AssertNextToken("STRING");
-					return new Asn1OctetString();
+					return new Asn1OctetString(this);
 
 				case "PrintableString":
-					return new Asn1PrintableString();
+					return new Asn1PrintableString(this);
 
 				case "REAL":
-					return new Asn1Real();
+					return new Asn1Real(this);
 
 				case "RELATIVE":
 					this.AssertNextToken("OID");
-					return new Asn1ObjectIdentifier(true);
+					return new Asn1ObjectIdentifier(true, this);
 
 				case "RELATIVE-OID":
-					return new Asn1ObjectIdentifier(true);
+					return new Asn1ObjectIdentifier(true, this);
 
 				case "SET":
 					s = this.PeekNextToken();
 
 					if (s == "{")
 					{
-						Asn1Node[] Nodes = this.ParseList();
-						return new Asn1Set(Name, TypeDef, Nodes);
-					}
-					else if (s == "(")
-					{
-						this.pos++;
-
-						Asn1Values Size = null;
-
-						while (true)
-						{
-							s = this.PeekNextToken();
-
-							if (s == "SIZE")
-							{
-								if (!(Size is null))
-									throw this.SyntaxError("SIZE already specified.");
-
-								this.pos += 4;
-								Size = this.ParseSet();
-							}
-							else if (s == ")")
-							{
-								this.pos++;
-								break;
-							}
-							else
-								throw this.SyntaxError("Unexpected token.");
-						}
-
-						this.AssertNextToken("OF");
-
-						if (Size is null)
-							throw this.SyntaxError("SIZE expected.");
-
-						s = this.ParseTypeNameIdentifier();
-
-						return new Asn1SetOf(Size, s);
+						Asn1Node[] Nodes = this.ParseList(DefaultTags);
+						return new Asn1Set(Name, TypeDef, Nodes, this);
 					}
 					else
-						throw this.SyntaxError("{ expected.");
+					{
+						Asn1SetOfValues Size = this.ParseSizeOf(s);
+						Asn1Type Type = this.ParseDataType(Name, TypeDef, DefaultTags);
+						return new Asn1SetOf(Size, Type, this);
+					}
 
 				case "SEQUENCE":
 					s = this.PeekNextToken();
 
 					if (s == "{")
 					{
-						Asn1Node[] Nodes = this.ParseList();
-						return new Asn1Sequence(Name, TypeDef, Nodes);
+						Asn1Node[] Nodes = this.ParseList(DefaultTags);
+						return new Asn1Sequence(Name, TypeDef, Nodes, this);
 					}
 					else
 					{
-						Asn1Values Size = null;
-
-						if (s == "(")
-						{
-							this.pos++;
-
-							while (true)
-							{
-								s = this.PeekNextToken();
-
-								if (s == "SIZE")
-								{
-									if (!(Size is null))
-										throw this.SyntaxError("SIZE already specified.");
-
-									this.pos += 4;
-									Size = this.ParseSet();
-								}
-								else if (s == ")")
-								{
-									this.pos++;
-									break;
-								}
-								else
-									throw this.SyntaxError("Unexpected token.");
-							}
-						}
-
-						if (this.NextToken() != "OF")
-							throw this.SyntaxError("Unexpected token.");
-
-						return new Asn1SequenceOf(Name, TypeDef, Size, this.ParseType(Name, TypeDef));
+						Asn1SetOfValues Size = this.ParseSizeOf(s);
+						Asn1Type Type = this.ParseDataType(Name, false, DefaultTags);
+						return new Asn1SequenceOf(Name, TypeDef, Size, Type, this);
 					}
 
 				case "T61String":
-					return new Asn1T61String();
+					return new Asn1T61String(this);
 
 				case "TeletexString":
-					return new Asn1TeletexString();
+					return new Asn1TeletexString(this);
 
 				case "TIME-OF-DAY":
-					return new Asn1TimeOfDay();
+					return new Asn1TimeOfDay(this);
 
 				case "UniversalString":
-					return new Asn1UniversalString();
+					return new Asn1UniversalString(this);
 
 				case "UTCTime":
-					return new Asn1UtcTime();
+					return new Asn1UtcTime(this);
 
 				case "UTF8String":
-					return new Asn1Utf8String();
+					return new Asn1Utf8String(this);
 
 				case "VideotexString":
-					return new Asn1VideotexString();
+					return new Asn1VideotexString(this);
 
 				case "VisibleString":
-					return new Asn1VisibleString();
+					return new Asn1VisibleString(this);
 
 				case "ObjectDescriptor":
 				case "EXTERNAL":
@@ -1277,7 +1306,63 @@ namespace Waher.Content.Asn1
 			}
 		}
 
-		private Asn1Node[] ParseList()
+		private Asn1SetOfValues ParseSizeOf(string s)
+		{
+			Asn1SetOfValues Size = null;
+			bool InParenthesis;
+			bool ParsingProperties = true;
+
+			if (s == "(")
+			{
+				this.pos++;
+				InParenthesis = true;
+			}
+			else
+				InParenthesis = false;
+
+			while (ParsingProperties)
+			{
+				s = this.PeekNextToken();
+
+				switch (s)
+				{
+					case "SIZE":
+						if (!(Size is null))
+							throw this.SyntaxError("SIZE already specified.");
+
+						this.pos += 4;
+						Size = this.ParseSet();
+						break;
+
+					case ")":
+						if (InParenthesis)
+						{
+							this.pos++;
+							ParsingProperties = false;
+						}
+						else
+							throw this.SyntaxError("Unexpected ).");
+
+						break;
+
+					case "OF":
+						if (InParenthesis)
+							throw this.SyntaxError(") expected.");
+						else
+							ParsingProperties = false;
+						break;
+
+					default:
+						throw this.SyntaxError("Unexpected token.");
+				}
+			}
+
+			this.AssertNextToken("OF");
+
+			return Size;
+		}
+
+		private Asn1Node[] ParseList(Asn1Tags? DefaultTags)
 		{
 			this.AssertNextToken("{");
 
@@ -1285,7 +1370,7 @@ namespace Waher.Content.Asn1
 
 			while (true)
 			{
-				Items.Add(this.ParseStatement());
+				Items.Add(this.ParseStatement(DefaultTags));
 
 				switch (this.PeekNextToken())
 				{
@@ -1303,7 +1388,7 @@ namespace Waher.Content.Asn1
 			}
 		}
 
-		private Asn1Node[] ParseValues()
+		private Asn1Node[] ParseValues(bool RequireDelimiters)
 		{
 			this.AssertNextToken("{");
 
@@ -1331,13 +1416,15 @@ namespace Waher.Content.Asn1
 						int LastIndex = Items.Count - 1;
 
 						if (Items[LastIndex] is Asn1ValueReference Ref)
-							Items[LastIndex] = new Asn1NamedValue(Ref.Identifier, Value, this);
+							Items[LastIndex] = new Asn1NamedValue(Ref.Identifier, Value, null, this);
 						else
 							throw this.SyntaxError("Invalid value reference.");
 						break;
 
 					default:
-						throw this.SyntaxError(", or } expected.");
+						if (RequireDelimiters)
+							throw this.SyntaxError(", or } expected.");
+						break;
 				}
 			}
 		}
@@ -1357,31 +1444,31 @@ namespace Waher.Content.Asn1
 			{
 				case "FALSE":
 					this.pos += 5;
-					return new Asn1BooleanValue(false);
+					return new Asn1BooleanValue(false, this);
 
 				case "MAX":
 					this.pos += 3;
-					return new Asn1Max();
+					return new Asn1Max(this);
 
 				case "MIN":
 					this.pos += 3;
-					return new Asn1Min();
+					return new Asn1Min(this);
 
 				case "TRUE":
 					this.pos += 4;
-					return new Asn1BooleanValue(true);
+					return new Asn1BooleanValue(true, this);
 
 				case "INF":
 					this.pos += 3;
-					return new Asn1FloatingPointValue(double.PositiveInfinity);
+					return new Asn1FloatingPointValue(double.PositiveInfinity, this);
 
 				case "NaN":
 					this.pos += 3;
-					return new Asn1FloatingPointValue(double.NaN);
+					return new Asn1FloatingPointValue(double.NaN, this);
 
 				case "...":
 					this.pos += 3;
-					return new Asn1Extension();
+					return new Asn1Extension(this);
 
 				case "\"":
 					int Start = ++this.pos;
@@ -1396,7 +1483,7 @@ namespace Waher.Content.Asn1
 					s = this.text.Substring(Start, this.pos - Start);
 					this.pos++;
 
-					return new Asn1StringValue(s);
+					return new Asn1StringValue(s, this);
 
 				case "'":
 					Start = ++this.pos;
@@ -1415,16 +1502,16 @@ namespace Waher.Content.Asn1
 						case "H":
 						case "h":
 							this.pos++;
-							if (long.TryParse(s, NumberStyles.HexNumber, null, out long l))
-								return new Asn1IntegerValue(l);
+							if (BigInteger.TryParse(s, NumberStyles.HexNumber, null, out BigInteger l))
+								return new Asn1IntegerValue(l, this);
 							else
 								throw this.SyntaxError("Invalid hexadecimal string.");
 
 						case "D":
 						case "d":
 							this.pos++;
-							if (long.TryParse(s, out l))
-								return new Asn1IntegerValue(l);
+							if (BigInteger.TryParse(s, out l))
+								return new Asn1IntegerValue(l, this);
 							else
 								throw this.SyntaxError("Invalid decimal string.");
 
@@ -1432,7 +1519,7 @@ namespace Waher.Content.Asn1
 						case "b":
 							this.pos++;
 							if (TryParseBinary(s, out l))
-								return new Asn1IntegerValue(l);
+								return new Asn1IntegerValue(l, this);
 							else
 								throw this.SyntaxError("Invalid binary string.");
 
@@ -1440,7 +1527,7 @@ namespace Waher.Content.Asn1
 						case "o":
 							this.pos++;
 							if (TryParseOctal(s, out l))
-								return new Asn1IntegerValue(l);
+								return new Asn1IntegerValue(l, this);
 							else
 								throw this.SyntaxError("Invalid octal string.");
 
@@ -1472,9 +1559,9 @@ namespace Waher.Content.Asn1
 								Items.Add(Value);
 
 								if (Oid)
-									return new Asn1Oid(Items.ToArray());
+									return new Asn1Oid(Items.ToArray(), this);
 								else
-									return new Asn1Array(Items.ToArray());
+									return new Asn1Array(Items.ToArray(), this);
 
 							default:
 								if (Items.Count == 0)
@@ -1501,13 +1588,13 @@ namespace Waher.Content.Asn1
 
 								this.pos++;
 								Asn1Value Value = this.ParseValue(false);
-								return new Asn1NamedValue(s, Value, this);
+								return new Asn1NamedValue(s, Value, null, this);
 
 							case "(":
 								Asn1Restriction Restriction = this.ParseRestriction();
 
 								if (Restriction is Asn1InSet Set && Set.Set is Asn1Element Element)
-									return new Asn1NamedValue(s, Element.Element, this);
+									return new Asn1NamedValue(s, Element.Element, null, this);
 								else
 									return new Asn1RestrictedValueReference(s, Restriction, this);
 
@@ -1529,7 +1616,7 @@ namespace Waher.Content.Asn1
 							this.pos++;
 						}
 
-						if (ulong.TryParse(s, out ulong l))
+						if (BigInteger.TryParse(s, out BigInteger l))
 						{
 							this.pos += s.Length;
 
@@ -1567,15 +1654,10 @@ namespace Waher.Content.Asn1
 								if (!double.TryParse(s, out double d))
 									throw this.SyntaxError("Invalid floating-point number.");
 
-								return new Asn1FloatingPointValue(d);
+								return new Asn1FloatingPointValue(d, this);
 							}
 
-							if (l <= long.MaxValue)
-								return new Asn1IntegerValue(Sign ? -(long)l : (long)l);
-							else if (Sign)
-								throw this.SyntaxError("Number does not fit into a 64-bit signed integer.");
-							else
-								return new Asn1UnsignedIntegerValue(l);
+							return new Asn1IntegerValue(Sign ? -l : l, this);
 						}
 					}
 					break;
@@ -1584,7 +1666,7 @@ namespace Waher.Content.Asn1
 			throw this.SyntaxError("Value expected.");
 		}
 
-		private static bool TryParseBinary(string s, out long l)
+		private static bool TryParseBinary(string s, out BigInteger l)
 		{
 			l = 0;
 
@@ -1593,18 +1675,14 @@ namespace Waher.Content.Asn1
 				if (ch < '0' || ch > '1')
 					return false;
 
-				long l2 = l;
 				l <<= 1;
-				if (l < l2)
-					return false;
-
-				l |= (byte)(ch - '0');
+				l += (byte)(ch - '0');
 			}
 
 			return true;
 		}
 
-		private static bool TryParseOctal(string s, out long l)
+		private static bool TryParseOctal(string s, out BigInteger l)
 		{
 			l = 0;
 
@@ -1613,15 +1691,48 @@ namespace Waher.Content.Asn1
 				if (ch < '0' || ch > '7')
 					return false;
 
-				long l2 = l;
 				l <<= 3;
-				if (l < l2)
-					return false;
-
-				l |= (byte)(ch - '0');
+				l += (byte)(ch - '0');
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Declares named types.
+		/// </summary>
+		/// <param name="Settings">C# export settings.</param>
+		public void DeclareTypes(CSharpExportSettings Settings)
+		{
+			foreach (Asn1Node Node in this.namedNodes.Values)
+			{
+				if (Node is INamedNode NamedNode)
+					Settings.DeclareType(Settings, Node, NamedNode.Name, NamedNode.MustBeQualified);
+			}
+		}
+
+		/// <summary>
+		/// Gets the fully qualified name of an identifier.
+		/// </summary>
+		/// <param name="Settings">C# export settings.</param>
+		/// <param name="Identifier">Identifier</param>
+		/// <returns>Fully qualified name of identifier, as segments.</returns>
+		public string[] GetFullyQualifiedName(CSharpExportSettings Settings,
+			string Identifier)
+		{
+			if (this.namedNodes.TryGetValue(Identifier, out Asn1Node Node) &&
+				Node is INamedNode NamedNode)
+			{
+				ChunkedList<string> Fqn = new ChunkedList<string>();
+				NamedNode.GetFullyQualifiedName(Fqn);
+				Fqn.Add(Settings.BaseNamespace);
+
+				Fqn.Reverse();
+
+				return Fqn.ToArray();
+			}
+			else
+				return new string[] { Identifier };
 		}
 
 		/// <summary>
@@ -1629,10 +1740,12 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Settings">C# export settings.</param>
 		/// <returns>C# code</returns>
-		public string ExportCSharp(CSharpExportSettings Settings)
+		public async Task<string> ExportCSharp(CSharpExportSettings Settings)
 		{
+			this.DeclareTypes(Settings);
+
 			StringBuilder Output = new StringBuilder();
-			this.ExportCSharp(Output, Settings);
+			await this.ExportCSharp(Output, Settings);
 			return Output.ToString();
 		}
 
@@ -1641,17 +1754,14 @@ namespace Waher.Content.Asn1
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
 		/// <param name="Settings">C# export settings.</param>
-		public void ExportCSharp(StringBuilder Output, CSharpExportSettings Settings)
+		public async Task ExportCSharp(StringBuilder Output, CSharpExportSettings Settings)
 		{
 			CSharpExportState State = new CSharpExportState(Settings);
+			Output.AppendLine("using Asn1 = Waher.Content.Asn1;");
+			Output.AppendLine("using Asn1F = System.Formats.Asn1;");
 
-			Output.AppendLine("using System;");
-			Output.AppendLine("using System.Text;");
-			Output.AppendLine("using System.Collections.Generic;");
-			Output.AppendLine("using Waher.Content;");
-			Output.AppendLine("using Waher.Content.Asn1;");
-
-			this.root?.ExportCSharp(Output, State, 0, CSharpExportPass.Explicit);
+			if (!(this.root is null))
+				await this.root.ExportCSharp(Output, State, 0, CSharpExportPass.Explicit);
 		}
 	}
 }

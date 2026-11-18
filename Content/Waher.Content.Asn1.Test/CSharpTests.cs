@@ -4,7 +4,9 @@ using Microsoft.CodeAnalysis.Emit;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Formats.Asn1;
 using System.IO;
+using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,41 +17,70 @@ namespace Waher.Content.Asn1.Test
 	[TestClass]
 	public class CSharpTests
 	{
-		public static async Task<string> GenerateCSharp(string FileName)
+		public class CSharpResults
 		{
-			string BaseNamespace = "Test";
+			public string CSharp;
+			public byte[] Dll;
+			public byte[] Pdb;
+		}
+
+		public static Task<CSharpResults> GenerateCSharp(string FileName)
+		{
+			return GenerateCSharp(FileName, "Test");
+		}
+
+		public static async Task<CSharpResults> GenerateCSharp(string FileName, string BaseNamespace)
+		{
 			Asn1Document Doc = await ParsingTests.ParseAsn1Document(FileName);
-			CSharpExportSettings Settings = new(BaseNamespace, EncodingSchemes.All);
-			string CSharp = Doc.ExportCSharp(Settings);
-			List<SyntaxTree> Modules = new() { CSharpSyntaxTree.ParseText(CSharp) };
+			CSharpExportSettings Settings = new(BaseNamespace);
+			string CSharp = await Doc.ExportCSharp(Settings);
+			string CSharpFileName = Path.Combine("Examples", Path.ChangeExtension(FileName, ".cs"));
+			string CSharpFolder = Path.GetDirectoryName(CSharpFileName);
+
+			if (!Directory.Exists(CSharpFolder))
+				Directory.CreateDirectory(CSharpFolder);
+
+			File.WriteAllText(CSharpFileName, CSharp);
+
+			List<SyntaxTree> Modules = [CSharpSyntaxTree.ParseText(CSharp, path: FileName, encoding: Encoding.UTF8)];
 
 			foreach (string ImportedModule in Settings.Modules)
 			{
 				string CSharp2 = Settings.GetCode(ImportedModule);
-				Modules.Add(CSharpSyntaxTree.ParseText(CSharp2));
+
+				Modules.Add(CSharpSyntaxTree.ParseText(CSharp2, path: ImportedModule, encoding: Encoding.UTF8));
+
+				string CSharpFileName2 = Path.Combine(CSharpFolder, ImportedModule + ".cs");
+				File.WriteAllText(CSharpFileName2, CSharp2);
 			}
 
-			Dictionary<string, bool> Dependencies = new()
-			{
-				{ GetLocation(typeof(object)), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"), true },
-				{ GetLocation(typeof(Asn1Document)), true }
-			};
+			HashSet<string> Dependencies =
+			[
+				GetLocation(typeof(object)),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(AsnReader))), "System.Formats.Asn1.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(BigInteger))), "System.Runtime.Numerics.dll"),
+				GetLocation(typeof(Asn1Document))
+			];
 
-			List<MetadataReference> References = new();
+			string s = Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "netstandard.dll");
+			if (File.Exists(s))
+				Dependencies.Add(s);
 
-			foreach (string Location in Dependencies.Keys)
+			List<MetadataReference> References = [];
+
+			foreach (string Location in Dependencies)
 			{
 				if (!string.IsNullOrEmpty(Location))
 					References.Add(MetadataReference.CreateFromFile(Location));
 			}
 
 			CSharpCompilation Compilation = CSharpCompilation.Create(
-				BaseNamespace, Modules.ToArray(), References, 
+				BaseNamespace, [.. Modules], References,
 				new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
 			MemoryStream Output = new();
@@ -59,12 +90,36 @@ namespace Waher.Content.Asn1.Test
 
 			if (!CompilerResults.Success)
 			{
+				Diagnostic[] Errors = new Diagnostic[CompilerResults.Diagnostics.Length];
+				CompilerResults.Diagnostics.CopyTo(Errors, 0);
+
+				Array.Sort(Errors, (e1, e2) =>
+				{
+					FileLinePositionSpan p1 = e1.Location.GetLineSpan();
+					FileLinePositionSpan p2 = e2.Location.GetLineSpan();
+					int i = p1.Path.CompareTo(p2.Path);
+					if (i != 0)
+						return i;
+
+					i = p1.StartLinePosition.Line - p2.StartLinePosition.Line;
+					if (i != 0)
+						return i;
+
+					return p1.StartLinePosition.Character - p2.StartLinePosition.Character;
+				});
+
 				StringBuilder sb = new();
 
-				foreach (Diagnostic Error in CompilerResults.Diagnostics)
+				foreach (Diagnostic Error in Errors)
 				{
+					FileLinePositionSpan Pos = Error.Location.GetLineSpan();
+
 					sb.AppendLine();
-					sb.Append(Error.Location.ToString());
+					sb.Append(Pos.Path);
+					sb.Append(", Row ");
+					sb.Append(Pos.StartLinePosition.Line + 1);
+					sb.Append(", Column ");
+					sb.Append(Pos.StartLinePosition.Character + 1);
 					sb.Append(": ");
 					sb.Append(Error.GetMessage());
 				}
@@ -90,7 +145,12 @@ namespace Waher.Content.Asn1.Test
 
 			ConsoleOut.WriteLine(CSharp);
 
-			return CSharp;
+			return new CSharpResults()
+			{
+				CSharp = CSharp,
+				Dll = Output.ToArray(),
+				Pdb = PdbOutput.ToArray()
+			};
 		}
 
 		private static string GetLocation(Type T)
@@ -198,6 +258,12 @@ namespace Waher.Content.Asn1.Test
 		public async Task Test_16_1451_3()
 		{
 			await GenerateCSharp("IEEE1451\\P21451-N1-T3-MIB.asn1");
+		}
+
+		[TestMethod]
+		public async Task Test_17_X509_CertificateRequest()
+		{
+			await GenerateCSharp("X509\\PKIXCRMF.asn1");
 		}
 
 	}

@@ -55,7 +55,8 @@ namespace Waher.Security.WAF.Model.Actions
 		{
 			string Reason = await this.reason.EvaluateAsync(State.Variables, string.Empty);
 
-			await State.Firewall.LoginAuditor.BlockEndpoint(State.Request.RemoteEndPoint, "HTTP", Reason);
+			await State.Firewall.LoginAuditor.BlockEndpoint(State.Request.RemoteEndPoint, 
+				"HTTP", Reason, State.Request.Header.ResourcePart);
 
 			return null;
 		}

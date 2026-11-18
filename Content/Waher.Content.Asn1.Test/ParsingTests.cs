@@ -7,12 +7,12 @@ namespace Waher.Content.Asn1.Test
 	[TestClass]
 	public class ParsingTests
 	{
-		internal static readonly string[] ImportFolders = new string[]
-		{
+		internal static readonly string[] ImportFolders =
+		[
 			"Examples\\SNMPv1",
 			"Examples\\SNMPv2",
 			"Examples\\IEEE1451"
-		};
+		];
 
 		public static Task<Asn1Document> ParseAsn1Document(string FileName)
 		{
@@ -113,6 +113,12 @@ namespace Waher.Content.Asn1.Test
 		public async Task Test_16_1451_3()
 		{
 			await ParseAsn1Document("IEEE1451\\P21451-N1-T3-MIB.asn1");
+		}
+
+		[TestMethod]
+		public async Task Test_17_X509_CertificateRequest()
+		{
+			await ParseAsn1Document("X509\\PKIXCRMF.asn1");
 		}
 	}
 }

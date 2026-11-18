@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.Collections;
+using Waher.Security.LoginMonitor;
 
 namespace Waher.Security.WAF.Model.Actions
 {
@@ -64,7 +65,7 @@ namespace Waher.Security.WAF.Model.Actions
 			}
 
 			if (!HasResource)
-				Result.Add(new KeyValuePair<string, object>("Resource", State.Request.Header.ResourcePart));
+				Result.Add(LoginAuditor.ResourceTag(State.Request.Header.ResourcePart));
 
 			return Result.ToArray();
 		}

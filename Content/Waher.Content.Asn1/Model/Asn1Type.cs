@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Content.Asn1.Model.Values;
+﻿using System.Text;
+using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
+using Waher.Content.Asn1.Model.Values;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -11,29 +10,30 @@ namespace Waher.Content.Asn1.Model
 	/// </summary>
 	public abstract class Asn1Type : Asn1Node
 	{
-		private bool _implicit;
+		private Asn1Tags? tags;
 		private Asn1Restriction restriction = null;
-		private bool? optional = false;
-		private bool? unique = false;
-		private bool? present = false;
-		private bool? absent = false;
+		private bool? unique;
+		private bool? present;
+		private bool? absent;
 		private Asn1Node _default = null;
 		private Asn1NamedValue[] namedOptions = null;
 
 		/// <summary>
 		/// Abstract base class for ASN.1 types.
 		/// </summary>
-		public Asn1Type()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Type(Asn1Document Document)
+			: base(Document)
 		{
 		}
 
 		/// <summary>
-		/// Implicit type definition
+		/// How tags are encoded
 		/// </summary>
-		public bool Implicit
+		public Asn1Tags? Tags
 		{
-			get => this._implicit;
-			internal set => this._implicit = value;
+			get => this.tags;
+			internal set => this.tags = value;
 		}
 
 		/// <summary>
@@ -42,16 +42,12 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Restriction Restriction
 		{
 			get => this.restriction;
-			internal set => this.restriction = value;
-		}
-
-		/// <summary>
-		/// If the type is optional
-		/// </summary>
-		public bool? Optional
-		{
-			get => this.optional;
-			internal set => this.optional = value;
+			internal set
+			{
+				this.restriction?.SetParentNode(null);
+				this.restriction = value;
+				this.restriction?.SetParentNode(this);
+			}
 		}
 
 		/// <summary>
@@ -87,7 +83,12 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Node Default
 		{
 			get => this._default;
-			internal set => this._default = value;
+			internal set
+			{
+				this._default?.SetParentNode(null);
+				this._default = value;
+				this._default?.SetParentNode(this);
+			}
 		}
 
 		/// <summary>
@@ -96,13 +97,33 @@ namespace Waher.Content.Asn1.Model
 		public Asn1NamedValue[] NamedOptions
 		{
 			get => this.namedOptions;
-			internal set => this.namedOptions = value;
+			internal set
+			{
+				if (!(this.namedOptions is null))
+				{
+					foreach (Asn1NamedValue Value in this.namedOptions)
+						Value.SetParentNode(null);
+				}
+
+				this.namedOptions = value;
+
+				if (!(this.namedOptions is null))
+				{
+					foreach (Asn1NamedValue Value in this.namedOptions)
+						Value.SetParentNode(this);
+				}
+			}
 		}
 
 		/// <summary>
 		/// If the type is a constructed type.
 		/// </summary>
 		public virtual bool ConstructedType => false;
+
+		/// <summary>
+		/// If the type is passed by reference.
+		/// </summary>
+		public virtual bool ByReference => true;
 
 		/// <summary>
 		/// Parses the portion of the document at the current position, according to the type.
@@ -114,5 +135,55 @@ namespace Waher.Content.Asn1.Model
 		{
 			return Document.ParseValue();
 		}
+
+		/// <summary>
+		/// Exports any restriction to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="VariableName">Name of variable to check.</param>
+		/// <param name="Pass">Export pass</param>
+		public virtual Task ExportRestrictionCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string VariableName, CSharpExportPass Pass)
+		{
+			if (Pass == CSharpExportPass.Variables && !(this.restriction is null))
+			{
+				return this.restriction.ExportRestrictionVariables(Output, State, Indent,
+					VariableName);
+			}
+			else
+				return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="VariableName">Name of variable to check.</param>
+		public override async Task ExportRestrictionCheck(StringBuilder Output,
+			CSharpExportState State, int Indent, string VariableName)
+		{
+			if (this.restriction is null)
+				return;
+
+			JSON.Indent(Output, Indent);
+			Output.Append("if (!(");
+			await this.restriction.RenderChecks(Output, State, VariableName, this);
+			Output.AppendLine("))");
+
+			JSON.Indent(Output, Indent + 1);
+			Output.Append("throw new Asn1F.AsnContentException(\"");
+			
+			if (VariableName.StartsWith("this."))
+				Output.Append(VariableName.Substring(5));
+			else
+				Output.Append(VariableName);
+			
+			Output.AppendLine(" out of bounds.\");");
+		}
+
 	}
 }

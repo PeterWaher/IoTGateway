@@ -47,8 +47,11 @@ namespace Waher.Networking.SASL
 		/// <param name="Data">Data in authentication request.</param>
 		/// <param name="Connection">Connection performing the authentication.</param>
 		/// <param name="PersistenceLayer">Persistence layer.</param>
+		/// <param name="Resource">Resource being accessed.</param>
 		/// <returns>If authentication was successful (true). If null, mechanism must send the corresponding challenge. If false, connection must close.</returns>
-		public override Task<bool?> AuthenticationRequest(string Data, ISaslServerSide Connection, ISaslPersistenceLayer PersistenceLayer)
+		public override Task<bool?> AuthenticationRequest(string Data,
+			ISaslServerSide Connection, ISaslPersistenceLayer PersistenceLayer,
+			string Resource)
 		{
 			byte[] Bin = Convert.FromBase64String(Data);
 			string Request = Encoding.UTF8.GetString(Bin);
@@ -73,7 +76,9 @@ namespace Waher.Networking.SASL
 			if (UserName is null || Nonce is null)
 			{
 				Connection.SaslErrorMalformedRequest();
-				LoginAuditor.Fail("Login attempt using malformed request.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
+				LoginAuditor.Fail("Login attempt using malformed request.", UserName,
+					Connection.RemoteEndPoint, Connection.Protocol, Resource);
+
 				return Task.FromResult<bool?>(null);
 			}
 
@@ -85,7 +90,16 @@ namespace Waher.Networking.SASL
 			Bin = Encoding.UTF8.GetBytes(Challenge);
 			string ChallengeBase64 = Convert.ToBase64String(Bin);
 
-			Connection.Tag = new object[] { UserName, Nonce, NrIterations, ServerNonce, Request, Challenge };
+			Connection.Tag = new object[] 
+			{ 
+				UserName, 
+				Nonce, 
+				NrIterations, 
+				ServerNonce, 
+				Request, 
+				Challenge 
+			};
+
 			Connection.SaslChallenge(ChallengeBase64);
 
 			return Task.FromResult<bool?>(null);
@@ -97,8 +111,11 @@ namespace Waher.Networking.SASL
 		/// <param name="Data">Data in response request.</param>
 		/// <param name="Connection">Connection performing the authentication.</param>
 		/// <param name="PersistenceLayer">Persistence layer.</param>
+		/// <param name="Resource">Resource being accessed.</param>
 		/// <returns>If authentication was successful (true). If null, mechanism must send the corresponding error. If false, connection must close.</returns>
-		public override async Task<bool?> ResponseRequest(string Data, ISaslServerSide Connection, ISaslPersistenceLayer PersistenceLayer)
+		public override async Task<bool?> ResponseRequest(string Data, 
+			ISaslServerSide Connection, ISaslPersistenceLayer PersistenceLayer,
+			string Resource)
 		{
 			byte[] Bin = Convert.FromBase64String(Data);
 			string Request = Encoding.UTF8.GetString(Bin);
@@ -126,7 +143,10 @@ namespace Waher.Networking.SASL
 						if (ServerNonce != Pair.Value)
 						{
 							await Connection.SaslErrorMalformedRequest();
-							LoginAuditor.Fail("Login attempt using malformed request.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
+							LoginAuditor.Fail("Login attempt using malformed request.", 
+								UserName, Connection.RemoteEndPoint, Connection.Protocol,
+								Resource);
+
 							return null;
 						}
 						break;
@@ -140,22 +160,28 @@ namespace Waher.Networking.SASL
 			if (!ServerNonceChecked)
 			{
 				await Connection.SaslErrorMalformedRequest();
-				LoginAuditor.Fail("Login attempt using malformed request.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
+				LoginAuditor.Fail("Login attempt using malformed request.", UserName,
+					Connection.RemoteEndPoint, Connection.Protocol, Resource);
 				return null;
 			}
 
 			IAccount Account = await PersistenceLayer.GetAccount(UserName);
 			if (Account is null)
 			{
-				LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Connection.RemoteEndPoint, Connection.Protocol,
-					new KeyValuePair<string, object>("UserName", UserName));
+				LoginAuditor.Fail("Login attempt using invalid user name.", UserName,
+					Connection.RemoteEndPoint, Connection.Protocol,
+					new KeyValuePair<string, object>("UserName", UserName),
+					LoginAuditor.ResourceTag(Resource));
+
 				await Connection.SaslErrorNotAuthorized();
 				return null;
 			}
 
 			if (!Account.Enabled)
 			{
-				LoginAuditor.Fail("Login attempt using disabled account.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
+				LoginAuditor.Fail("Login attempt using disabled account.", UserName, 
+					Connection.RemoteEndPoint, Connection.Protocol, Resource);
+
 				await Connection.SaslErrorAccountDisabled();
 				return null;
 			}
@@ -173,7 +199,7 @@ namespace Waher.Networking.SASL
 			if (i < 0)
 				sb.Append(ClientRequest);
 			else
-				sb.Append(ClientRequest.Substring(i));
+				sb.Append(ClientRequest[i..]);
 
 			sb.Append(',');
 			sb.Append(ServerChallenge);
@@ -183,7 +209,7 @@ namespace Waher.Networking.SASL
 			if (i < 0)
 				sb.Append(Request);
 			else
-				sb.Append(Request.Substring(0, i));
+				sb.Append(Request[..i]);
 
 			byte[] AuthenticationMessage = Encoding.UTF8.GetBytes(sb.ToString());
 			byte[] ClientSignature = this.HMAC(StoredKey, AuthenticationMessage);
@@ -202,12 +228,14 @@ namespace Waher.Networking.SASL
 
 				Connection.ResetState(true);
 				await Connection.SaslSuccess(Response);
-				LoginAuditor.Success("Login successful.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
+				LoginAuditor.Success("Login successful.", UserName,
+					Connection.RemoteEndPoint, Connection.Protocol, Resource);
 			}
 			else
 			{
 				await Connection.SaslErrorNotAuthorized();
-				LoginAuditor.Fail("Login attempt failed.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
+				LoginAuditor.Fail("Login attempt failed.", UserName,
+					Connection.RemoteEndPoint, Connection.Protocol, Resource);
 			}
 
 			return null;
@@ -273,8 +301,10 @@ namespace Waher.Networking.SASL
 		/// <param name="UserName">User Name</param>
 		/// <param name="Password">Password</param>
 		/// <param name="Connection">Connection</param>
+		/// <param name="Resource">Resource being accessed.</param>
 		/// <returns>If authentication was successful or not. If null is returned, the mechanism did not perform authentication.</returns>
-		public override async Task<bool?> Authenticate(string UserName, string Password, ISaslClientSide Connection)
+		public override async Task<bool?> Authenticate(string UserName, string Password, 
+			ISaslClientSide Connection, string Resource)
 		{
 			string Nonce = Convert.ToBase64String(GetRandomBytes(16));
 			string s = "n,,n=" + UserName + ",r=" + Nonce;
@@ -306,8 +336,13 @@ namespace Waher.Networking.SASL
 				}
 			}
 
-			if (string.IsNullOrEmpty(ServerNonce) || !ServerNonce.StartsWith(Nonce) || Salt is null || NrIterations <= 0)
+			if (string.IsNullOrEmpty(ServerNonce) ||
+				!ServerNonce.StartsWith(Nonce) ||
+				Salt is null ||
+				NrIterations <= 0)
+			{
 				return null;
+			}
 
 			byte[] SaltedPassword = this.Hi(Encoding.UTF8.GetBytes(Password.Normalize()), Salt, NrIterations);
 

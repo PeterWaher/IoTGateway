@@ -108,7 +108,7 @@ namespace Waher.Security.TOTP.Test
 			await RuntimeCounters.IncrementCounter("TOTP.UnitTest", PrevCounter - UsedCounter);
 
 			TotpValidator Totp = new(NrDigits, Encoding.ASCII.GetBytes(Secret), HashFunction, TimeStepSeconds, "UnitTest", auditor);
-			ValidationResult Result = await Totp.Validate("UnitTest", "EP", ParsedTimestamp, Password);
+			ValidationResult Result = await Totp.Validate("UnitTest", "EP", ParsedTimestamp, Password, "Unit test");
 
 			Assert.AreEqual(ExpectedResult, Result.Result);
 		}

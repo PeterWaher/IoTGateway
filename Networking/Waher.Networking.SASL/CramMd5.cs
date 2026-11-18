@@ -50,8 +50,11 @@ namespace Waher.Networking.SASL
 		/// <param name="Data">Data in authentication request.</param>
 		/// <param name="Connection">Connection performing the authentication.</param>
 		/// <param name="PersistenceLayer">Persistence layer.</param>
+		/// <param name="Resource">Resource being accessed.</param>
 		/// <returns>If authentication was successful (true). If null, mechanism must send the corresponding challenge. If false, connection must close.</returns>
-		public override Task<bool?> AuthenticationRequest(string Data, ISaslServerSide Connection, ISaslPersistenceLayer PersistenceLayer)
+		public override Task<bool?> AuthenticationRequest(string Data, 
+			ISaslServerSide Connection, ISaslPersistenceLayer PersistenceLayer,
+			string Resource)
 		{
 			byte[] Nonce = PersistenceLayer.GetRandomNumbers(32);
 
@@ -67,8 +70,11 @@ namespace Waher.Networking.SASL
 		/// <param name="Data">Data in response request.</param>
 		/// <param name="Connection">Connection performing the authentication.</param>
 		/// <param name="PersistenceLayer">Persistence layer.</param>
+		/// <param name="Resource">Resource being accessed.</param>
 		/// <returns>If authentication was successful (true). If null, mechanism must send the corresponding error. If false, connection must close.</returns>
-		public override async Task<bool?> ResponseRequest(string Data, ISaslServerSide Connection, ISaslPersistenceLayer PersistenceLayer)
+		public override async Task<bool?> ResponseRequest(string Data, 
+			ISaslServerSide Connection, ISaslPersistenceLayer PersistenceLayer,
+			string Resource)
 		{
 			byte[] Bin = Convert.FromBase64String(Data);
 			string Cram = Encoding.UTF8.GetString(Bin);
@@ -79,14 +85,16 @@ namespace Waher.Networking.SASL
 
 			if (i > 0)
 			{
-				UserName = Cram.Substring(0, i);
-				Cram = Cram.Substring(i + 1);
+				UserName = Cram[..i];
+				Cram = Cram[(i + 1)..];
 			}
 
 			IAccount Account = await PersistenceLayer.GetAccount(UserName);
 			if (Account is null)
 			{
-				LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Connection.RemoteEndPoint, Connection.Protocol,
+				LoginAuditor.Fail("Login attempt using invalid user name.", UserName, 
+					Connection.RemoteEndPoint, Connection.Protocol,
+					LoginAuditor.ResourceTag(Resource),
 					new KeyValuePair<string, object>("UserName", UserName));
 				await Connection.SaslErrorNotAuthorized();
 				return null;
@@ -94,7 +102,9 @@ namespace Waher.Networking.SASL
 
 			if (!Account.Enabled)
 			{
-				LoginAuditor.Fail("Login attempt using disabled account.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
+				LoginAuditor.Fail("Login attempt using disabled account.", UserName, 
+					Connection.RemoteEndPoint, Connection.Protocol, Resource);
+
 				await Connection.SaslErrorAccountDisabled();
 				return null;
 			}
@@ -110,13 +120,15 @@ namespace Waher.Networking.SASL
 				Connection.ResetState(true);
 				await Connection.SaslSuccess(null);
 
-				LoginAuditor.Success("Login successful.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
+				LoginAuditor.Success("Login successful.", UserName, 
+					Connection.RemoteEndPoint, Connection.Protocol, Resource);
 			}
 			else
 			{
 				await Connection.SaslErrorNotAuthorized();
 				
-				LoginAuditor.Fail("Login attempt failed.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
+				LoginAuditor.Fail("Login attempt failed.", UserName, 
+					Connection.RemoteEndPoint, Connection.Protocol, Resource);
 			}
 
 			return null;
@@ -138,8 +150,10 @@ namespace Waher.Networking.SASL
 		/// <param name="UserName">User Name</param>
 		/// <param name="Password">Password</param>
 		/// <param name="Connection">Connection</param>
+		/// <param name="Resource">Resource being accessed.</param>
 		/// <returns>If authentication was successful or not. If null is returned, the mechanism did not perform authentication.</returns>
-		public override async Task<bool?> Authenticate(string UserName, string Password, ISaslClientSide Connection)
+		public override async Task<bool?> Authenticate(string UserName, string Password,
+			ISaslClientSide Connection, string Resource)
 		{
 			string Challenge = await Connection.Initiate(this, null);
 			byte[] ChallengeBinary = Convert.FromBase64String(Challenge);

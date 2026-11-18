@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Asn1.Model.Restrictions
+﻿namespace Waher.Content.Asn1.Model.Restrictions
 {
 	/// <summary>
 	/// Abstract base class for value-based restrictions
@@ -15,9 +11,12 @@ namespace Waher.Content.Asn1.Model.Restrictions
 		/// Abstract base class for set-based restrictions
 		/// </summary>
 		/// <param name="Value">Item</param>
-		public Asn1ValueRestriction(Asn1Value Value)
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1ValueRestriction(Asn1Value Value, Asn1Document Document) 
+			: base(Document)
 		{
 			this.value = Value;
+			this.SetAsChild(this.value);
 		}
 
 		/// <summary>

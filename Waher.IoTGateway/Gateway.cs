@@ -1590,7 +1590,7 @@ namespace Waher.IoTGateway
 							catch (Exception ex)
 							{
 								Log.Error("Unable to register redirection: " + ex.Message,
-									new KeyValuePair<string, object>("Resource", Resource),
+									LoginAuditor.ResourceTag(Resource),
 									new KeyValuePair<string, object>("Location", Location),
 									new KeyValuePair<string, object>("IncludeSubPaths", IncludeSubPaths),
 									new KeyValuePair<string, object>("Permanent", Permanent));
@@ -3526,7 +3526,8 @@ namespace Waher.IoTGateway
 				if (CheckStartupToken(Request))
 				{
 					LoginAuditor.Success("User logged in by default, using startup token.",
-						string.Empty, Request.RemoteEndPoint, "Web");
+						string.Empty, Request.RemoteEndPoint, "Web", 
+						Request.Header.ResourcePart);
 
 					await Login.DoLogin(Request, From);
 					return;
@@ -3564,7 +3565,9 @@ namespace Waher.IoTGateway
 				if (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring)
 #endif
 				{
-					LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
+					LoginAuditor.Success("Local user logged in.", string.Empty, 
+						Request.RemoteEndPoint, "Web", Request.Header.ResourcePart);
+
 					await Login.DoLogin(Request, From);
 					return;
 				}
@@ -3679,7 +3682,10 @@ namespace Waher.IoTGateway
 
 								if (P.SessionId == CurrentSession)
 								{
-									LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
+									LoginAuditor.Success("Local user logged in.", 
+										string.Empty, Request.RemoteEndPoint, "Web", 
+										Request.Header.ResourcePart);
+
 									await Login.DoLogin(Request, From);
 									return;
 								}
@@ -3707,7 +3713,9 @@ namespace Waher.IoTGateway
 
 								if (P.SessionId == CurrentSession)
 								{
-									LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
+									LoginAuditor.Success("Local user logged in.", string.Empty, 
+										Request.RemoteEndPoint, "Web", Request.Header.ResourcePart);
+
 									await Login.DoLogin(Request, From);
 									return;
 								}
@@ -6140,7 +6148,7 @@ namespace Waher.IoTGateway
 				catch (Exception ex)
 				{
 					Log.Error("Invalid Runtime setting script. Resource could not be added.",
-						new KeyValuePair<string, object>("Resource", ResourceName),
+						LoginAuditor.ResourceTag(ResourceName),
 						new KeyValuePair<string, object>("Error", ex.Message),
 						new KeyValuePair<string, object>("ReferenceFileName", ReferenceFileName),
 						new KeyValuePair<string, object>("Script", Value));

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Values;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -30,14 +31,14 @@ namespace Waher.Content.Asn1.Model
 	/// <summary>
 	/// Represents a collection of ASN.1 definitions.
 	/// </summary>
-	public class Asn1Definitions : Asn1Node
+	public class Asn1Definitions : Asn1Node, INamedNode
 	{
 		private readonly string identifier;
 		private readonly Asn1Oid oid;
 		private readonly Asn1Tags? tags;
 		private readonly bool _abstract;
 		private readonly Asn1Module body;
-		private readonly Asn1Document document;
+		private Dictionary<string, Asn1Document> imported;
 
 		/// <summary>
 		/// Represents a collection of ASN.1 definitions.
@@ -47,16 +48,19 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Tags">How tags are handled.</param>
 		/// <param name="Abstract">If abstract syntax is used.</param>
 		/// <param name="Body">Definition body.</param>
-		/// <param name="Document">ASN.1 document</param>
-		public Asn1Definitions(string Identifier, Asn1Oid Oid, Asn1Tags? Tags, bool Abstract,
-			Asn1Module Body, Asn1Document Document)
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Definitions(string Identifier, Asn1Oid Oid, 
+			Asn1Tags? Tags, bool Abstract, Asn1Module Body, Asn1Document Document)
+			: base(Document)
 		{
 			this.identifier = Identifier;
 			this.oid = Oid;
 			this.tags = Tags;
 			this._abstract = Abstract;
 			this.body = Body;
-			this.document = Document;
+
+			this.SetAsChild(this.oid);
+			this.SetAsChild(this.body);
 		}
 
 		/// <summary>
@@ -85,9 +89,27 @@ namespace Waher.Content.Asn1.Model
 		public Asn1Module Body => this.body;
 
 		/// <summary>
-		/// ASN.1 document of which the definition is part.
+		/// Name of node.
 		/// </summary>
-		public Asn1Document Document => this.document;
+		public string Name => this.identifier;
+
+		/// <summary>
+		/// Gets the fully qualified name, in reverse order.
+		/// </summary>
+		public void GetFullyQualifiedName(ChunkedList<string> Fqn)
+		{
+			Fqn.Add(this.identifier);
+		}
+
+		/// <summary>
+		/// If the named element must be qualified.
+		/// </summary>
+		public bool MustBeQualified => false;
+
+		/// <summary>
+		/// If the named node represents a type.
+		/// </summary>
+		public bool IsType => false;
 
 		/// <summary>
 		/// Exports to C#
@@ -103,24 +125,38 @@ namespace Waher.Content.Asn1.Model
 			{
 				if (!(this.body.Imports is null))
 				{
-					foreach (Asn1Import Import in this.body.Imports)
+					if (this.imported is null)
 					{
-						if (string.IsNullOrEmpty(Import.Module))
-							continue;
+						this.imported = new Dictionary<string, Asn1Document>();
 
-						Asn1Document ImportedDocument;
-
-						if (State.Settings.ContainsCode(Import.Module))
-							ImportedDocument = State.Settings.GetDocument(Import.Module);
-						else
+						foreach (Asn1Import Import in this.body.Imports)
 						{
-							ImportedDocument = await Import.LoadDocument();
-							string CSharp = ImportedDocument.ExportCSharp(State.Settings);
-							State.Settings.AddCode(Import.Module, CSharp, ImportedDocument);
+							if (string.IsNullOrEmpty(Import.Module))
+								continue;
+
+							Asn1Document ImportedDocument;
+
+							if (State.Settings.ContainsCode(Import.Module))
+								ImportedDocument = State.Settings.GetDocument(Import.Module);
+							else
+								ImportedDocument = await Import.LoadDocument();
+
+							this.imported[Import.Module] = ImportedDocument;
+
+							ImportedDocument.DeclareTypes(State.Settings);
+						}
+					}
+
+					foreach (KeyValuePair<string, Asn1Document> P in this.imported)
+					{
+						if (!State.Settings.ContainsCode(P.Key))
+						{
+							string CSharp = await P.Value.ExportCSharp(State.Settings);
+							State.Settings.AddCode(P.Key, CSharp, P.Value);
 						}
 
 						Output.Append("using ");
-						Output.Append(State.Settings.Namespace(Import.Module));
+						Output.Append(State.Settings.Namespace(P.Key));
 						Output.AppendLine(";");
 					}
 
@@ -130,8 +166,26 @@ namespace Waher.Content.Asn1.Model
 					Output.AppendLine();
 
 				JSON.Indent(Output, Indent);
+				Output.Append('/');
+				Output.AppendLine(new string('*', 80));
+				JSON.Indent(Output, Indent);
+				Output.AppendLine(" *");
+				JSON.Indent(Output, Indent);
+				Output.AppendLine(" * NOTE: This code has been automatically generated from ASN.1 file:");
+				JSON.Indent(Output, Indent);
+				Output.Append(" * ");
+				Output.AppendLine(this.Document.Location);
+				JSON.Indent(Output, Indent);
+				Output.AppendLine(" *");
+				JSON.Indent(Output, Indent);
+				Output.Append(' ');
+				Output.Append(new string('*', 80));
+				Output.AppendLine("/");
+				Output.AppendLine();
+
+				JSON.Indent(Output, Indent);
 				Output.Append("namespace ");
-				Output.Append(State.Settings.BaseNamespace);
+				Output.Append(ToCSharp(State.Settings.BaseNamespace));
 				Output.Append('.');
 				Output.AppendLine(ToCSharp(this.identifier));
 				JSON.Indent(Output, Indent);
@@ -164,8 +218,6 @@ namespace Waher.Content.Asn1.Model
 				}
 
 				await this.body.ExportCSharp(Output, State, Indent, CSharpExportPass.Preprocess);
-				State.ClosePending(Output);
-
 				await this.body.ExportCSharp(Output, State, Indent, CSharpExportPass.Variables);
 				State.ClosePending(Output);
 

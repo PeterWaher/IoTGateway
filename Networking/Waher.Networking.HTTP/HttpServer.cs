@@ -1413,7 +1413,7 @@ namespace Waher.Networking.HTTP
 		private async Task LoginFailure(Exception ex, BinaryTcpClient Client, string RemoteIpEndpoint)
 		{
 			Exception ex2 = Log.UnnestException(ex);
-			Security.LoginMonitor.LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "HTTPS");
+			Security.LoginMonitor.LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "TLS (HTTP)");
 
 			if (this.HasSniffers)
 				this.Error("Connection closed (authentication failed).");

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace Waher.Content.Asn1.Model.Values
 {
@@ -17,16 +15,29 @@ namespace Waher.Content.Asn1.Model.Values
 		/// <param name="Identifier">Identifier</param>
 		/// <param name="Restriction">Restriction</param>
 		/// <param name="Document">ASN.1 Document containing the reference</param>
-		public Asn1RestrictedValueReference(string Identifier, Asn1Restriction Restriction, 
-			Asn1Document Document)
+		public Asn1RestrictedValueReference(string Identifier, 
+			Asn1Restriction Restriction, Asn1Document Document)
 			: base(Identifier, Document)
 		{
 			this.restriction = Restriction;
+			this.SetAsChild(this.restriction);
 		}
 
 		/// <summary>
 		/// Restriction
 		/// </summary>
 		public Asn1Restriction Restriction => this.restriction;
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(base.ToString());
+			sb.Append('|');
+			sb.Append(this.restriction.ToString());
+
+			return sb.ToString();
+		}
 	}
 }

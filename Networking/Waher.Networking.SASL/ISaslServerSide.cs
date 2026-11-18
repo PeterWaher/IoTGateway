@@ -11,43 +11,27 @@ namespace Waher.Networking.SASL
 		/// <summary>
 		/// ID client claims to have
 		/// </summary>
-		string AuthId
-		{
-			get;
-		}
+		string AuthId { get; }
 
 		/// <summary>
 		/// User name
 		/// </summary>
-		CaseInsensitiveString UserName
-		{
-			get;
-		}
+		CaseInsensitiveString UserName { get; }
 
 		/// <summary>
 		/// Remote endpoint.
 		/// </summary>
-		string RemoteEndPoint
-		{
-			get;
-		}
+		string RemoteEndPoint { get; }
 
 		/// <summary>
 		/// String representing protocol being used.
 		/// </summary>
-		string Protocol
-		{
-			get;
-		}
+		string Protocol { get; }
 
 		/// <summary>
 		/// Object tagged to the connection.
 		/// </summary>
-		object Tag
-		{
-			get;
-			set;
-		}
+		object Tag { get; set; }
 
 		/// <summary>
 		/// Sets the account for the connection.

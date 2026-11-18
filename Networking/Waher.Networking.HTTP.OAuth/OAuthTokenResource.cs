@@ -441,7 +441,7 @@ namespace Waher.Networking.HTTP.OAuth
 
 							LoginAuditor.Fail(Message, TokenFamily.User.UserName,
 								Request.RemoteEndPoint, "OAUTH",
-								new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
+								LoginAuditor.ResourceTag(Request.Header.ResourcePart));
 
 							Log.Alert(Message, TokenFamily.User.UserName,
 								Request.RemoteEndPoint, "TokenLeakage",
@@ -600,7 +600,7 @@ namespace Waher.Networking.HTTP.OAuth
 				int i = s.IndexOf(':');
 				if (i > 0)
 				{
-					ClientId = s.Substring(0, i);
+					ClientId = s[..i];
 					return true;
 				}
 			}
@@ -647,7 +647,7 @@ namespace Waher.Networking.HTTP.OAuth
 			{
 				LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Request.RemoteEndPoint, "OAUTH",
 					new KeyValuePair<string, object>("UserName", UserName),
-					new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
+					LoginAuditor.ResourceTag(Request.Header.ResourcePart));
 				return new LoginResult(User);
 			}
 
@@ -660,13 +660,16 @@ namespace Waher.Networking.HTTP.OAuth
 
 			if (PasswordHash == ExpectedHash)
 			{
-				LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
+				LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, 
+					"HTTP", Request.Header.ResourcePart);
+
 				return new LoginResult(User);
 			}
 			else
 			{
-				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP",
-					new KeyValuePair<string, object>("Resource", Request.Header.ResourcePart));
+				LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, 
+					"HTTP", Request.Header.ResourcePart);
+
 				return new LoginResult(null);
 			}
 		}

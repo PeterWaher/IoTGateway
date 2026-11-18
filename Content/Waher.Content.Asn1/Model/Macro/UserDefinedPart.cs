@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Asn1.Model.Macro
+﻿namespace Waher.Content.Asn1.Model.Macro
 {
 	/// <summary>
 	/// Un-typed user-defined part.
@@ -51,8 +47,8 @@ namespace Waher.Content.Asn1.Model.Macro
 
 			switch (this.identifier.ToLower())
 			{
-				case "empty":return null;
-				case "type":return Document.ParseType(this.Identifier, false);
+				case "empty": return null;
+				case "type": return Document.ParseType(this.identifier, false, null);
 				case "value": return Document.ParseValue();
 				default: throw Document.SyntaxError("Supporting syntax for " + this.identifier + " not found.");
 			}

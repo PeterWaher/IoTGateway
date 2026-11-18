@@ -47,7 +47,8 @@ namespace Waher.Security.TOTP.Test
 
 			HotpValidator Hotp = new(NrDigits, Hashes.StringToBinary(Secret), HashFunction,
 				"UnitTest", TotpTests.Auditor);
-			ValidationResult Result = await Hotp.Validate("UnitTest", "EP", Counter, Password);
+			ValidationResult Result = await Hotp.Validate("UnitTest", "EP", Counter, 
+				Password, "Unit test");
 
 			Assert.AreEqual(ExpectedResult, Result.Result);
 		}

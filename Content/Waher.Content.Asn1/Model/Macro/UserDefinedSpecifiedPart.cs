@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Asn1.Model.Macro
+﻿namespace Waher.Content.Asn1.Model.Macro
 {
 	/// <summary>
 	/// Typed user-defined part.
@@ -46,7 +42,7 @@ namespace Waher.Content.Asn1.Model.Macro
 		{
 			switch (this.Identifier.ToUpper())
 			{
-				case "TYPE": return Document.ParseType(this.Identifier, false);
+				case "TYPE": return Document.ParseType(this.Identifier, false, null);
 				case "VALUE": return Document.ParseValue();
 				default: return this.type.Parse(Document, Macro);
 			}

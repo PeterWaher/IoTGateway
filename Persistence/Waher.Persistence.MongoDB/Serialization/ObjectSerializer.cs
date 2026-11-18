@@ -2129,21 +2129,21 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			string CSharpCode = CSharp.ToString();
 
-			Dictionary<string, bool> Dependencies = new()
+			HashSet<string> Dependencies = new()
 			{
-				{ GetLocation(typeof(object)), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Dictionary<string, object>))), "System.Collections.dll"), true },
-				{ GetLocation(typeof(Types)), true },
-				{ GetLocation(typeof(Database)), true },
-				{ GetLocation(typeof(ObjectSerializer)), true },
-				{ GetLocation(typeof(MultiReadSingleWriteObject)), true },
-				{ GetLocation(typeof(MongoClient)), true },
-				{ GetLocation(typeof(BsonDocument)), true }
+				GetLocation(typeof(object)),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Dictionary<string, object>))), "System.Collections.dll"),
+				GetLocation(typeof(Types)),
+				GetLocation(typeof(Database)),
+				GetLocation(typeof(ObjectSerializer)),
+				GetLocation(typeof(MultiReadSingleWriteObject)),
+				GetLocation(typeof(MongoClient)),
+				GetLocation(typeof(BsonDocument))
 			};
 
 			System.Reflection.TypeInfo LoopInfo;
@@ -2151,28 +2151,28 @@ namespace Waher.Persistence.MongoDB.Serialization
 			string s = Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "netstandard.dll");
 
 			if (File.Exists(s))
-				Dependencies[s] = true;
+				Dependencies.Add(s);
 
 			while (Loop is not null)
 			{
 				LoopInfo = Loop.GetTypeInfo();
-				Dependencies[GetLocation(Loop)] = true;
+				Dependencies.Add(GetLocation(Loop));
 
 				foreach (Type Interface in LoopInfo.ImplementedInterfaces)
 				{
 					s = GetLocation(Interface);
-					Dependencies[s] = true;
+					Dependencies.Add(s);
 				}
 
 				foreach (MemberInfo MI2 in LoopInfo.DeclaredMembers)
 				{
 					FI = MI2 as FieldInfo;
 					if (FI is not null && !((s = GetLocation(FI.FieldType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
-						Dependencies[s] = true;
+						Dependencies.Add(s);
 
 					PI = MI2 as PropertyInfo;
 					if (PI is not null && !((s = GetLocation(PI.PropertyType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
-						Dependencies[s] = true;
+						Dependencies.Add(s);
 				}
 
 				Loop = LoopInfo.BaseType;
@@ -2182,7 +2182,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			List<MetadataReference> References = [];
 
-			foreach (string Location in Dependencies.Keys)
+			foreach (string Location in Dependencies)
 			{
 				if (!string.IsNullOrEmpty(Location))
 					References.Add(MetadataReference.CreateFromFile(Location));
@@ -2199,12 +2199,31 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			if (!CompilerResults.Success)
 			{
+				Diagnostic[] Errors = new Diagnostic[CompilerResults.Diagnostics.Length];
+				CompilerResults.Diagnostics.CopyTo(Errors, 0);
+
+				Array.Sort(Errors, (e1, e2) =>
+				{
+					FileLinePositionSpan p1 = e1.Location.GetLineSpan();
+					FileLinePositionSpan p2 = e2.Location.GetLineSpan();
+					int i = p1.StartLinePosition.Line - p2.StartLinePosition.Line;
+					if (i != 0)
+						return i;
+					else
+						return p1.StartLinePosition.Character - p2.StartLinePosition.Character;
+				});
+
 				StringBuilder sb = new();
 
-				foreach (Diagnostic Error in CompilerResults.Diagnostics)
+				foreach (Diagnostic Error in Errors)
 				{
+					FileLinePositionSpan Pos = Error.Location.GetLineSpan();
+
 					sb.AppendLine();
-					sb.Append(Error.Location.ToString());
+					sb.Append("Row ");
+					sb.Append(Pos.StartLinePosition.Line + 1);
+					sb.Append(", Column ");
+					sb.Append(Pos.StartLinePosition.Character + 1);
 					sb.Append(": ");
 					sb.Append(Error.GetMessage());
 				}

@@ -208,7 +208,10 @@ namespace Waher.Client.WPF.Controls.Chat
 				return;
 
 			string Uri = Link.NavigateUri.ToString();
-            Process.Start(new ProcessStartInfo(Uri) { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo(Uri) 
+			{ 
+				UseShellExecute = true 
+			});
 		}
 
 		public Task Update(string Message, MarkdownDocument Markdown)

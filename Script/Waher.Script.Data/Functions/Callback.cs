@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.Emit;
+﻿using CA = Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Emit;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,21 +70,21 @@ namespace Waher.Script.Data.Functions
 			if (!(Arguments[i++].AssociatedObjectValue is Type Type))
 				throw new ScriptRuntimeException("Expected a type in the first argument.", this);
 
-			Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
+			HashSet<string> Dependencies = new HashSet<string>()
 			{
-				{ GetLocation(typeof(object)), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"), true },
-				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Dictionary<string, object>))), "System.Collections.dll"), true },
-				{ GetLocation(typeof(Types)), true },
-				{ GetLocation(typeof(Expression)), true },
-				{ GetLocation(typeof(Callback)), true }
+				GetLocation(typeof(object)),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"),
+				Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Dictionary<string, object>))), "System.Collections.dll"),
+				GetLocation(typeof(Types)),
+				GetLocation(typeof(Expression)),
+				GetLocation(typeof(Callback))
 			};
 
-			Dependencies[GetLocation(Type)] = true;
+			Dependencies.Add(GetLocation(Type));
 
 			if (c > 2)
 			{
@@ -91,7 +92,7 @@ namespace Waher.Script.Data.Functions
 					throw new ScriptRuntimeException("Expected a type in the second argument.", this);
 
 
-				Dependencies[GetLocation(TArg1)] = true;
+				Dependencies.Add(GetLocation(TArg1));
 
 				Type = Type.MakeGenericType(TArg1);
 			}
@@ -299,27 +300,28 @@ namespace Waher.Script.Data.Functions
 					s = Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "netstandard.dll");
 
 					if (File.Exists(s))
-						Dependencies[s] = true;
+						Dependencies.Add(s);
 
 					while (!(Loop is null))
 					{
 						LoopInfo = Loop.GetTypeInfo();
-						Dependencies[GetLocation(Loop)] = true;
+						Dependencies.Add(GetLocation(Loop));
 
 						foreach (Type Interface in LoopInfo.ImplementedInterfaces)
 						{
 							s = GetLocation(Interface);
-							Dependencies[s] = true;
+							Dependencies.Add(s);
 						}
 
 						foreach (MemberInfo MI2 in LoopInfo.DeclaredMembers)
 						{
 							FI = MI2 as FieldInfo;
 							if (!(FI is null) && !((s = GetLocation(FI.FieldType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
-								Dependencies[s] = true;
+								Dependencies.Add(s);
+							
 							PI = MI2 as PropertyInfo;
 							if (!(PI is null) && !((s = GetLocation(PI.PropertyType)).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
-								Dependencies[s] = true;
+								Dependencies.Add(s);
 						}
 						Loop = LoopInfo.BaseType;
 						if (Loop == typeof(object))
@@ -328,7 +330,7 @@ namespace Waher.Script.Data.Functions
 
 					List<Microsoft.CodeAnalysis.MetadataReference> References = new List<Microsoft.CodeAnalysis.MetadataReference>();
 
-					foreach (string Location in Dependencies.Keys)
+					foreach (string Location in Dependencies)
 					{
 						if (!string.IsNullOrEmpty(Location))
 							References.Add(Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(Location));
@@ -350,16 +352,35 @@ namespace Waher.Script.Data.Functions
 
 					if (!CompilerResults.Success)
 					{
+						CA.Diagnostic[] Errors = new CA.Diagnostic[CompilerResults.Diagnostics.Length];
+						CompilerResults.Diagnostics.CopyTo(Errors, 0);
+
+						Array.Sort(Errors, (e1, e2) =>
+						{
+							CA.FileLinePositionSpan p1 = e1.Location.GetLineSpan();
+							CA.FileLinePositionSpan p2 = e2.Location.GetLineSpan();
+							int k = p1.StartLinePosition.Line - p2.StartLinePosition.Line;
+							if (k != 0)
+								return k;
+							else
+								return p1.StartLinePosition.Character - p2.StartLinePosition.Character;
+						});
+
 						sb.Clear();
 
 						sb.Append("Unable to create a script proxy for callback methods of type ");
 						AppendType(Type, sb);
 						sb.AppendLine(". When generating proxy class, the following compiler errors were reported:");
 
-						foreach (Microsoft.CodeAnalysis.Diagnostic Error in CompilerResults.Diagnostics)
+						foreach (CA.Diagnostic Error in Errors)
 						{
+							CA.FileLinePositionSpan Pos = Error.Location.GetLineSpan();
+
 							sb.AppendLine();
-							sb.Append(Error.Location.ToString());
+							sb.Append("Row ");
+							sb.Append(Pos.StartLinePosition.Line + 1);
+							sb.Append(", Column ");
+							sb.Append(Pos.StartLinePosition.Character + 1);
 							sb.Append(": ");
 							sb.Append(Error.GetMessage());
 						}

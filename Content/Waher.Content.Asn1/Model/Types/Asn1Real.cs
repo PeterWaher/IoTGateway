@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
@@ -14,8 +13,9 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <summary>
 		/// REAL
 		/// </summary>
-		public Asn1Real()
-			: base()
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1Real(Asn1Document Document)
+			: base(Document)
 		{
 		}
 
@@ -34,6 +34,35 @@ namespace Waher.Content.Asn1.Model.Types
 		}
 
 		/// <summary>
+		/// Corresponding C# type.
+		/// </summary>
+		public override string CSharpType
+		{
+			get
+			{
+				if (this.Optional ?? false)
+					return "double?";
+				else
+					return "double";
+			}
+		}
+
+		/// <summary>
+		/// If the type is passed by reference.
+		/// </summary>
+		public override bool ByReference => false;
+
+		/// <summary>
+		/// Accepted ASN.1 tags
+		/// </summary>
+		public override Asn1Tag[] AcceptedTags => acceptedTags;
+
+		private static readonly Asn1Tag[] acceptedTags = new Asn1Tag[]
+		{
+			new Asn1Tag(UniversalTagNumber.Real)
+		};
+
+		/// <summary>
 		/// Exports to C#
 		/// </summary>
 		/// <param name="Output">C# Output.</param>
@@ -44,12 +73,119 @@ namespace Waher.Content.Asn1.Model.Types
 		{
 			if (Pass == CSharpExportPass.Explicit)
 			{
-				Output.Append("Double");
-				if (this.Optional.HasValue && this.Optional.Value)
+				Output.Append("double");
+				if (this.Optional ?? false)
 					Output.Append('?');
 			}
 		
 			return Task.CompletedTask;
 		}
+
+		/// <summary>
+		/// Exports read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
+		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, string MemberOf, int Index)
+		{
+			Output.Append("ReadReal");
+
+			if (this.Tags.HasValue)
+				Output.Append(this.Tags.Value.ToString());
+
+			Output.Append("(Reader");
+
+			if (this.Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			Output.Append(')');
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Exports optional read logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="DefaultName">Name of default value.</param>
+		/// <param name="ItemName">Name of item variable.</param>
+		/// <param name="Index">Item index.</param>
+		public override Task ExportTryReadCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf, string DefaultName, 
+			string ItemName, int Index)
+		{
+			Output.Append("TryReadReal");
+
+			if (this.Tags.HasValue)
+				Output.Append(this.Tags.Value.ToString());
+
+			Output.Append("(Reader");
+
+			if (this.Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			if (string.IsNullOrEmpty(ItemName))
+				Output.Append(", default, out var _Item) ? _Item : null");
+			else
+			{
+				Output.Append(", ");
+				Output.Append(DefaultName ?? "default");
+				Output.Append(", out ");
+				Output.Append(ItemName);
+				Output.Append(')');
+			}
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Exports write logic to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="MemberOf">Member of statement.</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Tags">How to encode tags.</param>
+		public override Task ExportWriteCSharp(StringBuilder Output, CSharpExportState State,
+			int Indent, string MemberOf, int Index, Asn1Tags? Tags)
+		{
+			Output.Append("WriteReal");
+
+			if (!Tags.HasValue)
+				Tags = this.Tags;
+
+			if (Tags.HasValue)
+				Output.Append(Tags.Value.ToString());
+
+			Output.Append("(Writer");
+
+			if (Tags.HasValue)
+			{
+				Output.Append(", ");
+				Output.Append(Index.ToString());
+			}
+
+			Output.Append(", ");
+			Output.Append(MemberOf);
+
+			Output.Append(')');
+
+			return Task.CompletedTask;
+		}
+
 	}
 }

@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <Description>Integrates Matter devices (sensors and actuators) into the IoT Gateway architecture. Contains a Matter controller (commissioner and administrator) supporting on-network commissioning (PASE), device attestation, operational credentials, CASE sessions, the Interaction Model (read, write, invoke, subscribe), DNS-SD discovery, onboarding payloads, and metering nodes publishing Matter endpoints as sensors and actuators.</Description>
+    <Copyright>Copyright © Waher Data AB 2026. All rights reserved.</Copyright>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Things/Waher.Things.Matter</PackageProjectUrl>
+    <PackageIcon>Icon_64x64.png</PackageIcon>
+    <PackageIconUrl />
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>IoT Matter CSA Smart-Home Commissioning</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+    <None Remove="Language\Waher.Things.Matter.en.lng" />
+    <None Include="..\..\Images\Icon_64x64.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Language\Waher.Things.Matter.en.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Certificates\Trust\**\*.der" />
+    <EmbeddedResource Include="DataModel\MatterDataModel.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj" />
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj" />
+    <ProjectReference Include="..\Waher.Things.Ip\Waher.Things.Ip.csproj" />
+    <ProjectReference Include="..\Waher.Things.Metering\Waher.Things.Metering.csproj" />
+    <ProjectReference Include="..\Waher.Things\Waher.Things.csproj" />
+  </ItemGroup>
+
+</Project>

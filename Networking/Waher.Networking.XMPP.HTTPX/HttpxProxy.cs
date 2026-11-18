@@ -449,7 +449,8 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (i > 0)
 					s = s[..i];
 
-				if (this.httpxCache.CanCache(BareJID, LocalUrl, InternetContent.GetContentType(s)))
+				if (!(this.httpxCache is null) &&
+					this.httpxCache.CanCache(BareJID, LocalUrl, InternetContent.GetContentType(s)))
 				{
 					LinkedListNode<HttpField> Loop = Headers.First;
 					LinkedListNode<HttpField> Next;

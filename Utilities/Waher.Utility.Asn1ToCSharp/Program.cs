@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content.Asn1;
 using Waher.Runtime.Console;
 
@@ -12,9 +13,6 @@ namespace Waher.Utility.Asn1ToCSharp
 	/// 
 	/// Command line switches:
 	/// 
-	/// -BER                  Adds support for BER enconding.
-	/// -CER                  Adds support for CER enconding.
-	/// -DER                  Adds support for DER enconding.
 	/// -n NAMESPACE          Defines a base namespace. Can be
 	///                       used multiple times, to place code
 	///                       in different namespaces.
@@ -35,13 +33,13 @@ namespace Waher.Utility.Asn1ToCSharp
 	/// </summary>
 	class Program
 	{
-		static int Main(string[] args)
+		static async Task<int> Main(string[] args)
 		{
 			try
 			{
-				CSharpExportSettings Settings = new(string.Empty, EncodingSchemes.None);
-				List<string> ImportFolders = new();
-				Dictionary<string, bool> ExportedModules = new();
+				CSharpExportSettings Settings = new(string.Empty);
+				List<string> ImportFolders = [];
+				Dictionary<string, bool> ExportedModules = [];
 				SearchOption SearchOption = SearchOption.TopDirectoryOnly;
 				string OutputFolder = null;
 				string s;
@@ -54,23 +52,11 @@ namespace Waher.Utility.Asn1ToCSharp
 
 					switch (s)
 					{
-						case "-ber":
-							Settings.Codecs |= EncodingSchemes.BER;
-							break;
-
-						case "-cer":
-							Settings.Codecs |= EncodingSchemes.CER;
-							break;
-
-						case "-der":
-							Settings.Codecs |= EncodingSchemes.DER;
-							break;
-
 						case "-n":
 							if (i >= c)
 								throw new Exception("Missing namespace.");
 
-							Settings.BaseNamespace = args[i++];
+							Settings = new CSharpExportSettings(args[i++]);
 							break;
 
 						case "-o":
@@ -117,7 +103,7 @@ namespace Waher.Utility.Asn1ToCSharp
 
 							s = args[i++];
 
-							List<string> InputFiles = new();
+							List<string> InputFiles = [];
 
 							if (File.Exists(s))
 								InputFiles.Add(s);
@@ -134,11 +120,11 @@ namespace Waher.Utility.Asn1ToCSharp
 							{
 								ConsoleOut.WriteLine("Loading " + FileName + "...");
 
-								Asn1Document Doc = Asn1Document.FromFile(FileName, ImportFolders.ToArray()).Result;
+								Asn1Document Doc = await Asn1Document.FromFile(FileName, [.. ImportFolders]);
 
 								ConsoleOut.WriteLine("Generating C#...");
 
-								string CSharp = Doc.ExportCSharp(Settings);
+								string CSharp = await Doc.ExportCSharp(Settings);
 								string OutputFileName = Path.Combine(OutputFolder, Path.ChangeExtension(Path.GetFileName(FileName), "cs"));
 
 								ConsoleOut.WriteLine("Exporting " + OutputFileName + "...");
@@ -168,9 +154,6 @@ namespace Waher.Utility.Asn1ToCSharp
 							ConsoleOut.WriteLine();
 							ConsoleOut.WriteLine("Command line switches:");
 							ConsoleOut.WriteLine();
-							ConsoleOut.WriteLine("-BER                  Adds support for BER enconding.");
-							ConsoleOut.WriteLine("-CER                  Adds support for CER enconding.");
-							ConsoleOut.WriteLine("-DER                  Adds support for DER enconding.");
 							ConsoleOut.WriteLine("-n NAMESPACE          Defines a base namespace. Can be");
 							ConsoleOut.WriteLine("                      used multiple times, to place code");
 							ConsoleOut.WriteLine("                      in different namespaces.");

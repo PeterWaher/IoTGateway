@@ -110,7 +110,12 @@ namespace Waher.Utility.Asn1ToCSharp
 							else
 							{
 								string Pattern = Path.GetFileName(s);
-								string Folder = Path.GetFullPath(Path.GetDirectoryName(s));
+
+								s = Path.GetDirectoryName(s);
+								if (string.IsNullOrEmpty(s))
+									throw new Exception("Pattern must have a search path.");
+
+								string Folder = Path.GetFullPath(s);
 
 								foreach (string FileName in Directory.GetFiles(Folder, Pattern, SearchOption))
 									InputFiles.Add(FileName);

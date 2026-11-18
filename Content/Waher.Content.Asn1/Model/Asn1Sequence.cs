@@ -237,8 +237,15 @@ namespace Waher.Content.Asn1.Model
 
 					Indent++;
 
-					Index = 0;
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("using (Writer.PushSequence())");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
 
+					Indent++;
+
+					Index = 0;
+					
 					foreach (Asn1Node Node in this.Nodes)
 					{
 						Asn1Tags? Tags = this.Tags;
@@ -248,6 +255,81 @@ namespace Waher.Content.Asn1.Model
 						await Node.ExportRestrictionCheck(Output, State, Indent, "this");
 						await Node.ExportWriteCSharp(Output, State, Indent, "this", Index++, Tags);
 					}
+
+					Indent--;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
+
+					Indent--;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
+
+					// public bool Equals(object)
+
+					Output.AppendLine();
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("public override bool Equals(object Object)");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
+
+					Indent++;
+
+					JSON.Indent(Output, Indent);
+					Output.Append("if (!(Object is ");
+					Output.Append(ToCSharp(this.Name));
+					if (!this.TypeDefinition)
+						Output.Append("Seq");
+					Output.AppendLine(" _Typed)) return false;");
+
+					foreach (Asn1Node Node in this.Nodes)
+					{
+						if (!(Node is Asn1FieldDefinition FieldDef))
+							continue;
+
+						JSON.Indent(Output, Indent);
+						Output.Append("if (!AreEqual(this.");
+						Output.Append(ToCSharp(FieldDef.Name));
+						Output.Append(", _Typed.");
+						Output.Append(ToCSharp(FieldDef.Name));
+						Output.AppendLine(")) return false;");
+					}
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("return true;");
+
+					Indent--;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
+
+					// public int GetHashCode()
+
+					Output.AppendLine();
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("public override int GetHashCode()");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
+
+					Indent++;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("int _Result = 0;");
+
+					foreach (Asn1Node Node in this.Nodes)
+					{
+						if (!(Node is Asn1FieldDefinition FieldDef))
+							continue;
+
+						JSON.Indent(Output, Indent);
+						Output.Append("_Result ^= _Result << 5 ^ CalcHashCode(this.");
+						Output.Append(ToCSharp(FieldDef.Name));
+						Output.AppendLine(");");
+					}
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("return _Result;");
 
 					Indent--;
 

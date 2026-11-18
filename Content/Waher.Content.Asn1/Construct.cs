@@ -3,7 +3,6 @@ using System.Formats.Asn1;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
-using Waher.Content.Asn1.Model.Restrictions;
 using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1
@@ -4667,6 +4666,99 @@ namespace Waher.Content.Asn1
 		// TODO: CheckEncodedBy
 		// TODO: CheckPattern
 		// TODO: CheckWithComponents
+
+		#endregion
+
+		#region Comparisons
+
+		/// <summary>
+		/// Checks if two objects are equal.
+		/// </summary>
+		/// <param name="Object1">Object 1</param>
+		/// <param name="Object2">Object 2</param>
+		/// <returns>If objects are equal</returns>
+		public static bool AreEqual(object Object1, object Object2)
+		{
+			if ((Object1 is null) ^ (Object2 is null))
+				return false;
+
+			if (Object1 is null)
+				return true;
+
+			return Object1.Equals(Object2);
+		}
+
+		/// <summary>
+		/// Checks if two arrays are equal.
+		/// </summary>
+		/// <param name="Array1">Arrat 1</param>
+		/// <param name="Array2">Arrat 2</param>
+		/// <returns>If arrays are equal.</returns>
+		public static bool AreEqual(Array Array1, Array Array2)
+		{
+			if ((Array1 is null) ^ (Array2 is null))
+				return false;
+
+			if (Array1 is null)
+				return true;
+
+			int i, c = Array1.Length;
+			if (Array2.Length != c)
+				return false;
+
+			for (i = 0; i < c; i++)
+			{
+				object Element1 = Array1.GetValue(i);
+				object Element2 = Array2.GetValue(i);
+
+				if (Element1 is Array A1 && Element2 is Array A2)
+				{
+					if (!AreEqual(A1, A2))
+						return false;
+				}
+				else if (!AreEqual(Element1, Element2))
+					return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Calculates the hash code for an object.
+		/// </summary>
+		/// <param name="Object">Object.</param>
+		/// <returns>Hash code.</returns>
+		public static int CalcHashCode(object Object)
+		{
+			return Object?.GetHashCode() ?? 0;
+		}
+
+		/// <summary>
+		/// Calculates the hash code for an array.
+		/// </summary>
+		/// <param name="Array">Array.</param>
+		/// <returns>Hash code.</returns>
+		public static int CalcHashCode(Array Array)
+		{
+			if (Array is null)
+				return 0;
+
+			int i, c = Array.Length;
+			int Result = 0;
+			object Element;
+
+			for (i = 0; i < c; i++)
+			{
+				Element = Array.GetValue(i);
+
+				if (Element is Array A)
+					Result ^= Result << 5 ^ CalcHashCode(A);
+				else
+					Result ^= Result << 5 ^ Element.GetHashCode();
+			}
+
+			return Result;
+		}
 
 		#endregion
 	}

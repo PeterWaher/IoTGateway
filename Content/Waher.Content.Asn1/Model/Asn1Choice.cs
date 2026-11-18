@@ -480,6 +480,76 @@ namespace Waher.Content.Asn1.Model
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("}");
 
+					// public bool Equals(object)
+
+					Output.AppendLine();
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("public override bool Equals(object Object)");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
+
+					Indent++;
+
+					JSON.Indent(Output, Indent);
+					Output.Append("if (!(Object is ");
+					Output.Append(ToCSharp(this.Name));
+					if (!this.TypeDefinition)
+						Output.Append("Choice");
+					Output.AppendLine(" _Typed)) return false;");
+
+					foreach (Asn1Node Node in this.Nodes)
+					{
+						if (!(Node is Asn1FieldDefinition FieldDef))
+							continue;
+
+						JSON.Indent(Output, Indent);
+						Output.Append("if (!AreEqual(this.");
+						Output.Append(ToCSharp(FieldDef.Name));
+						Output.Append(", _Typed.");
+						Output.Append(ToCSharp(FieldDef.Name));
+						Output.AppendLine(")) return false;");
+					}
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("return true;");
+
+					Indent--;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
+
+					// public int GetHashCode()
+
+					Output.AppendLine();
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("public override int GetHashCode()");
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("{");
+
+					Indent++;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("int _Result = 0;");
+
+					foreach (Asn1Node Node in this.Nodes)
+					{
+						if (!(Node is Asn1FieldDefinition FieldDef))
+							continue;
+
+						JSON.Indent(Output, Indent);
+						Output.Append("_Result ^= _Result << 5 ^ CalcHashCode(this.");
+						Output.Append(ToCSharp(FieldDef.Name));
+						Output.AppendLine(");");
+					}
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("return _Result;");
+
+					Indent--;
+
+					JSON.Indent(Output, Indent);
+					Output.AppendLine("}");
+
 					Indent--;
 
 					JSON.Indent(Output, Indent);
@@ -518,7 +588,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="ItemName">Name of item variable.</param>
 		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string DefaultName, 
+			CSharpExportState State, int Indent, string MemberOf, string DefaultName,
 			string ItemName, int Index)
 		{
 			Output.Append(ToCSharp(State, this, this.Name));
@@ -559,8 +629,8 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="MemberOf">Member of statement.</param>
 		/// <param name="Index">Item index.</param>
 		/// <param name="Tags">How to encode tags.</param>
-		public override Task ExportWriteCSharp(StringBuilder Output, 
-			CSharpExportState State, int Indent, string MemberOf, int Index, 
+		public override Task ExportWriteCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string MemberOf, int Index,
 			Asn1Tags? Tags)
 		{
 			Output.Append(MemberOf);

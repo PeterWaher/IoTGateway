@@ -339,11 +339,10 @@ namespace Waher.Content.Asn1.Model
 			}
 
 			Output.Append(", ");
-			if (AsInteger || AsBitString)
+			if (AsInteger)
 				Output.Append("(int)");
 
 			Output.Append(MemberOf);
-
 			Output.Append(')');
 
 			return Task.CompletedTask;

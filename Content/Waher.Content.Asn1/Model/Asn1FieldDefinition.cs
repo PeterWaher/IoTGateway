@@ -125,8 +125,12 @@ namespace Waher.Content.Asn1.Model
 			{
 				JSON.Indent(Output, Indent);
 				Output.Append("public ");
-				Output.Append(this.type.CSharpType);
 
+				if (this.type is Asn1TypeReference TypeRef)
+					Output.Append(await TypeRef.GetCSharpIdentifier(State));
+				else
+					Output.Append(this.type.CSharpType);
+				
 				if (!this.type.ByReference &&
 					(this.Optional ?? false) &&
 					!(this.type.Optional ?? false))

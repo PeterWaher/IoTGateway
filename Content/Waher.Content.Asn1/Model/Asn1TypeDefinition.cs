@@ -1,5 +1,4 @@
-﻿using System;
-using System.Formats.Asn1;
+﻿using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
@@ -91,6 +90,11 @@ namespace Waher.Content.Asn1.Model
 		/// </summary>
 		public Asn1Type Definition => this.definition;
 
+		/// <summary>
+		/// If the node is optional
+		/// </summary>
+		public override bool? Optional => base.Optional ?? this.definition.Optional;
+
 		/// <inheritdoc/>
 		public override string ToString()
 		{
@@ -159,11 +163,6 @@ namespace Waher.Content.Asn1.Model
 					return this.definition.CSharpType;
 			}
 		}
-
-		/// <summary>
-		/// If the node is optional
-		/// </summary>
-		public override bool? Optional => base.Optional ?? this.definition.Optional;
 
 		/// <summary>
 		/// Exports to C#

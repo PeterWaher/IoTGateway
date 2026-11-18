@@ -154,6 +154,59 @@ namespace Waher.Content.Asn1.Model.Types
 		}
 
 		/// <summary>
+		/// Gets a C# identifier reference for the referenced type.
+		/// </summary>
+		/// <param name="State">C# export state.</param>
+		/// <returns>C# identifier.</returns>
+		public async Task<string> GetCSharpIdentifier(CSharpExportState State)
+		{
+			if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
+				return await this.GetCSharpIdentifier(State, TypeDef);
+			else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+			{
+				if (Node is Asn1TypeDefinition TypeDef2)
+					return await this.GetCSharpIdentifier(State, TypeDef2);
+				else
+					return ToCSharp(State, Node, this.identifier);
+			}
+			else
+				return ToCSharp(State, this, this.identifier);
+		}
+
+		/// <summary>
+		/// Gets a C# identifier reference for the referenced type.
+		/// </summary>
+		/// <param name="State">C# export state.</param>
+		/// <param name="TypeDef">Type definition</param>
+		/// <returns>C# identifier.</returns>
+		public async Task<string> GetCSharpIdentifier(CSharpExportState State,
+			Asn1TypeDefinition TypeDef)
+		{
+			string s;
+
+			if ((TypeDef.ConstructedType && !(TypeDef.Definition is Asn1TypeReference)) ||
+				TypeDef.Definition is Asn1Enumeration)
+			{
+				s = ToCSharp(State, TypeDef.Definition, this.identifier);
+			}
+			else
+			{
+				StringBuilder sb = new StringBuilder();
+				await TypeDef.Definition.ExportCSharp(sb, State, 0, CSharpExportPass.Explicit);
+				s = sb.ToString();
+			}
+
+			if (!TypeDef.ByReference &&
+				(this.Optional ?? false) &&
+				!(TypeDef.Optional ?? false))
+			{
+				s += "?";
+			}
+
+			return s;
+		}
+
+		/// <summary>
 		/// Parses the portion of the document at the current position, according to the type.
 		/// </summary>
 		/// <param name="Document">ASN.1 document being parsed.</param>
@@ -214,7 +267,7 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <param name="ItemName">Name of item variable.</param>
 		/// <param name="Index">Item index.</param>
 		public override Task ExportTryReadCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, string DefaultName, 
+			CSharpExportState State, int Indent, string MemberOf, string DefaultName,
 			string ItemName, int Index)
 		{
 			if (this.Document.aliases.TryGetValue(this.identifier,
@@ -226,7 +279,7 @@ namespace Waher.Content.Asn1.Model.Types
 			else if (this.Document.namedNodes.TryGetValue(this.identifier,
 				out Asn1Node Node))
 			{
-				return Node.ExportTryReadCSharp(Output, State, Indent, MemberOf, 
+				return Node.ExportTryReadCSharp(Output, State, Indent, MemberOf,
 					DefaultName, ItemName, Index);
 			}
 			else
@@ -256,15 +309,20 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <param name="Indent">Indentation</param>
 		/// <param name="VariableName">Name of variable to check.</param>
 		/// <param name="Pass">Export pass</param>
-		public override Task ExportRestrictionCSharp(StringBuilder Output, 
-			CSharpExportState State, int Indent, string VariableName, 
+		public override Task ExportRestrictionCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string VariableName,
 			CSharpExportPass Pass)
 		{
 			if (this.Document.aliases.TryGetValue(this.identifier,
 				out Asn1TypeDefinition TypeDef))
 			{
-				return TypeDef.ExportRestrictionCSharp(Output, State, Indent, 
+				return TypeDef.ExportRestrictionCSharp(Output, State, Indent,
 					VariableName, Pass);
+			}
+			else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node) &&
+				Node is Asn1Type Type)
+			{
+				return Type.ExportRestrictionCSharp(Output, State, Indent, VariableName, Pass);
 			}
 			else
 				return Task.CompletedTask;
@@ -304,7 +362,7 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <param name="Index">Item index.</param>
 		/// <param name="Tags">How to encode tags.</param>
 		public override Task ExportWriteCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string MemberOf, int Index, 
+			CSharpExportState State, int Indent, string MemberOf, int Index,
 			Asn1Tags? Tags)
 		{
 			if (this.Document.aliases.TryGetValue(this.identifier,

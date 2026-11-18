@@ -759,6 +759,98 @@ namespace Waher.Content.Asn1
 			Writer.WriteBitString(Value, 0, Tag);
 		}
 
+		/// <summary>
+		/// Writes a bit string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteBitString(AsnWriter Writer, Enum Value)
+		{
+			WriteBitString(Writer, null, Value);
+		}
+
+		/// <summary>
+		/// Writes a bit string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteBitStringImplicit(AsnWriter Writer, int Index, Enum Value)
+		{
+			WriteBitString(Writer, new Asn1Tag(TagClass.ContextSpecific, Index), Value);
+		}
+
+		/// <summary>
+		/// Writes a bit string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Index">Item index.</param>
+		/// <param name="Value">Value to write.</param>
+		public static void WriteBitStringExplicit(AsnWriter Writer, int Index, Enum Value)
+		{
+			using (Writer.PushSequence(new Asn1Tag(TagClass.ContextSpecific, Index, true)))
+			{
+				WriteBitString(Writer, Value);
+			}
+		}
+
+		/// <summary>
+		/// Writes a bit string value.
+		/// </summary>
+		/// <param name="Writer">ASN.1 writer</param>
+		/// <param name="Tag">How to encode tag.</param>
+		/// <param name="Value">Value to write.</param>
+		private static void WriteBitString(AsnWriter Writer, Asn1Tag? Tag, Enum Value)
+		{
+			if (Value is null)
+				throw new ArgumentNullException(nameof(Value));
+
+			Type EnumType = Value.GetType();
+			Type UnderlyingType = Enum.GetUnderlyingType(EnumType);
+			byte[] Bin;
+
+			switch (Convert.GetTypeCode(UnderlyingType))
+			{
+				case TypeCode.SByte:
+					Bin = new byte[] { (byte)Convert.ToSByte(Value) };
+					break;
+
+				case TypeCode.Byte:
+					Bin = new byte[] { Convert.ToByte(Value) };
+					break;
+
+				case TypeCode.Int16:
+					Bin = BitConverter.GetBytes(Convert.ToInt16(Value));
+					break;
+
+				case TypeCode.UInt16:
+					Bin = BitConverter.GetBytes(Convert.ToUInt16(Value));
+					break;
+
+				case TypeCode.Int32:
+					Bin = BitConverter.GetBytes(Convert.ToInt32(Value));
+					break;
+
+				case TypeCode.UInt32:
+					Bin = BitConverter.GetBytes(Convert.ToUInt32(Value));
+					break;
+
+				case TypeCode.Int64:
+					Bin = BitConverter.GetBytes(Convert.ToInt64(Value));
+					break;
+
+				case TypeCode.UInt64:
+					Bin = BitConverter.GetBytes(Convert.ToUInt64(Value));
+					break;
+
+				default:
+					throw new AsnContentException("Unsupported enumeration type: " +
+						UnderlyingType.FullName);
+			}
+
+			Writer.WriteBitString(Bin, 0, Tag);
+		}
+
 		#endregion
 
 		#region String
@@ -3686,7 +3778,8 @@ namespace Waher.Content.Asn1
 			{
 				case (int)UniversalTagNumber.Integer:
 				case (int)UniversalTagNumber.Enumerated:
-					Result = AssertValidEnum(ReadEnumeration<T>(Reader));
+				case (int)UniversalTagNumber.BitString:
+					Result = AssertValidEnum(ReadEnumeration<T>(Reader, Tag));
 					return true;
 			}
 
@@ -3936,51 +4029,7 @@ namespace Waher.Content.Asn1
 			if (EnumType.GetCustomAttribute<FlagsAttribute>() is null)
 				Writer.WriteEnumeratedValue(Value, Tag);
 			else
-			{
-				Type UnderlyingType = Enum.GetUnderlyingType(EnumType);
-				byte[] Bin;
-
-				switch (Convert.GetTypeCode(UnderlyingType))
-				{
-					case TypeCode.SByte:
-						Bin = new byte[] { (byte)Convert.ToSByte(Value) };
-						break;
-
-					case TypeCode.Byte:
-						Bin = new byte[] { Convert.ToByte(Value) };
-						break;
-
-					case TypeCode.Int16:
-						Bin = BitConverter.GetBytes(Convert.ToInt16(Value));
-						break;
-
-					case TypeCode.UInt16:
-						Bin = BitConverter.GetBytes(Convert.ToUInt16(Value));
-						break;
-
-					case TypeCode.Int32:
-						Bin = BitConverter.GetBytes(Convert.ToInt32(Value));
-						break;
-
-					case TypeCode.UInt32:
-						Bin = BitConverter.GetBytes(Convert.ToUInt32(Value));
-						break;
-
-					case TypeCode.Int64:
-						Bin = BitConverter.GetBytes(Convert.ToInt64(Value));
-						break;
-
-					case TypeCode.UInt64:
-						Bin = BitConverter.GetBytes(Convert.ToUInt64(Value));
-						break;
-
-					default:
-						throw new AsnContentException("Unsupported enumeration type: " +
-							UnderlyingType.FullName);
-				}
-
-				Writer.WriteBitString(Bin, 0, Tag);
-			}
+				WriteBitString(Writer, Tag, Value);
 		}
 
 		#endregion

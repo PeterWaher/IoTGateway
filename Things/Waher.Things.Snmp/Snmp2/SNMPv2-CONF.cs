@@ -1,10 +1,14 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using Waher.Content;
-using Waher.Content.Asn1;
-using Waher.Things.Snmp.Snmp1.SNMPv2_SMI;
+﻿using Asn1 = Waher.Content.Asn1;
+using Asn1F = System.Formats.Asn1;
+using Waher.Things.Snmp.Snmp2.SNMPv2_SMI;
 
-namespace Waher.Things.Snmp.Snmp1.SNMPv2_CONF
+/********************************************************************************
+ *
+ * NOTE: This code has been automatically generated from ASN.1 file:
+ * C:\My Projects\IoTGateway\Things\Waher.Things.Snmp\Snmp2\Asn1\SNMPv2-CONF.asn1
+ *
+ ********************************************************************************/
+
+namespace Waher.Things.Snmp.Snmp2.SNMPv2_CONF
 {
 }

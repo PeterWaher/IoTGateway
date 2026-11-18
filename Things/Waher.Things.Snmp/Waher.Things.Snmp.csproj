@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -57,5 +57,46 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Asn1\Waher.Content.Asn1.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Snmp1\Asn1\RFC1155-SMI.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Snmp1\Asn1\RFC1157-SNMP.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Snmp1\Asn1\RFC1158-MIB.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Snmp1\Asn1\RFC1212.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Snmp1\Asn1\RFC1213-MIB.asn1">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Snmp1\Asn1\RFC1215.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Snmp2\Asn1\COMMUNITY-BASED-SNMPv2.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Snmp2\Asn1\SNMPv2-CONF.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Snmp2\Asn1\SNMPv2-PDU.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Snmp2\Asn1\SNMPv2-SMI.asn1">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Snmp2\Asn1\SNMPv2-TC.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="&quot;$(ProjectDir)..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Debug\net8.0\win-x86\Waher.Utility.Asn1ToCSharp.exe&quot; -n Waher.Things.Snmp.Snmp1 -o &quot;$(ProjectDir)Snmp1&quot; -t -i &quot;$(ProjectDir)Snmp1\Asn1\*.asn1&quot;" />
+		<Exec Command="&quot;$(ProjectDir)..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Debug\net8.0\win-x86\Waher.Utility.Asn1ToCSharp.exe&quot; -n Waher.Things.Snmp.Snmp2 -o &quot;$(ProjectDir)Snmp2&quot; -t -i &quot;$(ProjectDir)Snmp2\Asn1\*.asn1&quot;" />
+	</Target>
 
 </Project>

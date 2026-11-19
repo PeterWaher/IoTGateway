@@ -9,6 +9,8 @@ using Waher.Things.Snmp.Snmp1.RFC1155_SMI;
  *
  ********************************************************************************/
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Waher.Things.Snmp.Snmp1.RFC1212
 {
 	public static partial class _DefinedValues
@@ -37,7 +39,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1212
 
 		public static IndexSyntax Create(Asn1F.AsnReader Reader)
 		{
-			IndexSyntax _Result = new();
+			IndexSyntax _Result = new IndexSyntax();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -160,3 +162,5 @@ namespace Waher.Things.Snmp.Snmp1.RFC1212
 	}
 
 }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

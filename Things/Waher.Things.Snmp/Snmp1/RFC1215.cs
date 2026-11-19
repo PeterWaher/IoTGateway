@@ -10,6 +10,8 @@ using Waher.Things.Snmp.Snmp1.RFC1213_MIB;
  *
  ********************************************************************************/
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Waher.Things.Snmp.Snmp1.RFC1215
 {
 	public static partial class _DefinedValues
@@ -24,3 +26,5 @@ namespace Waher.Things.Snmp.Snmp1.RFC1215
 	}
 
 }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

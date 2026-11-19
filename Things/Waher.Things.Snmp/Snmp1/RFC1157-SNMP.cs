@@ -9,6 +9,8 @@ using Waher.Things.Snmp.Snmp1.RFC1155_SMI;
  *
  ********************************************************************************/
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Waher.Things.Snmp.Snmp1.RFC1157_SNMP
 {
 	public static partial class _DefinedValues
@@ -29,7 +31,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1157_SNMP
 
 		public static Message Create(Asn1F.AsnReader Reader)
 		{
-			Message _Result = new();
+			Message _Result = new Message();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -105,7 +107,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1157_SNMP
 
 		public static PDUs Create(Asn1F.AsnReader Reader)
 		{
-			PDUs _Result = new();
+			PDUs _Result = new PDUs();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -239,7 +241,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1157_SNMP
 
 		public static PDU Create(Asn1F.AsnReader Reader)
 		{
-			PDU _Result = new();
+			PDU _Result = new PDU();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -250,7 +252,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1157_SNMP
 			this.request_id = ReadInteger(Reader);
 			this.error_status = ReadEnumeration<error_statusEnum>(Reader);
 			this.error_index = ReadInteger(Reader);
-			this.variable_bindings = ReadArray<VarBind>(Reader, (Reader, out _Item) => VarBind.TryCreate(Reader, out _Item));
+			this.variable_bindings = ReadArray<VarBind>(Reader, (Asn1F.AsnReader Reader, out VarBind _Item) => VarBind.TryCreate(Reader, out _Item));
 		}
 
 		public static bool TryCreate(Asn1F.AsnReader Reader0, out PDU _Result)
@@ -321,7 +323,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1157_SNMP
 
 		public static Trap_PDU Create(Asn1F.AsnReader Reader)
 		{
-			Trap_PDU _Result = new();
+			Trap_PDU _Result = new Trap_PDU();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -336,7 +338,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1157_SNMP
 			this.time_stamp = ReadIntegerImplicit(Reader, 4);
 			if (!(Asn1.Construct.CheckInSet(this.time_stamp, _DefinedValues.time_stampInSet)))
 				throw new Asn1F.AsnContentException("time_stamp out of bounds.");
-			this.variable_bindings = ReadArray<VarBind>(Reader, (Reader, out _Item) => VarBind.TryCreate(Reader, out _Item));
+			this.variable_bindings = ReadArray<VarBind>(Reader, (Asn1F.AsnReader Reader, out VarBind _Item) => VarBind.TryCreate(Reader, out _Item));
 		}
 
 		public static bool TryCreate(Asn1F.AsnReader Reader0, out Trap_PDU _Result)
@@ -400,7 +402,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1157_SNMP
 
 		public static VarBind Create(Asn1F.AsnReader Reader)
 		{
-			VarBind _Result = new();
+			VarBind _Result = new VarBind();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -453,3 +455,5 @@ namespace Waher.Things.Snmp.Snmp1.RFC1157_SNMP
 	}
 
 }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

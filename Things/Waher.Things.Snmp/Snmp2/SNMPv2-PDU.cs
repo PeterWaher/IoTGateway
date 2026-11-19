@@ -8,6 +8,8 @@ using Asn1F = System.Formats.Asn1;
  *
  ********************************************************************************/
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Waher.Things.Snmp.Snmp2.SNMPv2_PDU
 {
 	public static partial class _DefinedValues
@@ -41,7 +43,7 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_PDU
 
 		public static Waher.Things.Snmp.Snmp2.SNMPv2_PDU.ObjectSyntax Create(Asn1F.AsnReader Reader)
 		{
-			Waher.Things.Snmp.Snmp2.SNMPv2_PDU.ObjectSyntax _Result = new();
+			Waher.Things.Snmp.Snmp2.SNMPv2_PDU.ObjectSyntax _Result = new Waher.Things.Snmp.Snmp2.SNMPv2_PDU.ObjectSyntax();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -143,7 +145,7 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_PDU
 
 		public static Waher.Things.Snmp.Snmp2.SNMPv2_PDU.SimpleSyntax Create(Asn1F.AsnReader Reader)
 		{
-			Waher.Things.Snmp.Snmp2.SNMPv2_PDU.SimpleSyntax _Result = new();
+			Waher.Things.Snmp.Snmp2.SNMPv2_PDU.SimpleSyntax _Result = new Waher.Things.Snmp.Snmp2.SNMPv2_PDU.SimpleSyntax();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -264,7 +266,7 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_PDU
 
 		public static Waher.Things.Snmp.Snmp2.SNMPv2_PDU.ApplicationSyntax Create(Asn1F.AsnReader Reader)
 		{
-			Waher.Things.Snmp.Snmp2.SNMPv2_PDU.ApplicationSyntax _Result = new();
+			Waher.Things.Snmp.Snmp2.SNMPv2_PDU.ApplicationSyntax _Result = new Waher.Things.Snmp.Snmp2.SNMPv2_PDU.ApplicationSyntax();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -437,7 +439,7 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_PDU
 
 		public static PDUs Create(Asn1F.AsnReader Reader)
 		{
-			PDUs _Result = new();
+			PDUs _Result = new PDUs();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -620,7 +622,7 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_PDU
 
 		public static PDU Create(Asn1F.AsnReader Reader)
 		{
-			PDU _Result = new();
+			PDU _Result = new PDU();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -635,7 +637,7 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_PDU
 			this.error_index = ReadInteger(Reader);
 			if (!(Asn1.Construct.CheckInSet(this.error_index, _DefinedValues.error_indexInSet)))
 				throw new Asn1F.AsnContentException("error_index out of bounds.");
-			this.variable_bindings = ReadArray<VarBind>(Reader, (Reader, out _Item) => VarBind.TryCreate(Reader, out _Item));
+			this.variable_bindings = ReadArray<VarBind>(Reader, (Asn1F.AsnReader Reader, out VarBind _Item) => VarBind.TryCreate(Reader, out _Item));
 		}
 
 		public static bool TryCreate(Asn1F.AsnReader Reader0, out PDU _Result)
@@ -697,7 +699,7 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_PDU
 
 		public static BulkPDU Create(Asn1F.AsnReader Reader)
 		{
-			BulkPDU _Result = new();
+			BulkPDU _Result = new BulkPDU();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -714,7 +716,7 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_PDU
 			this.max_repetitions = ReadInteger(Reader);
 			if (!(Asn1.Construct.CheckInSet(this.max_repetitions, _DefinedValues.max_repetitionsInSet)))
 				throw new Asn1F.AsnContentException("max_repetitions out of bounds.");
-			this.variable_bindings = ReadArray<VarBind>(Reader, (Reader, out _Item) => VarBind.TryCreate(Reader, out _Item));
+			this.variable_bindings = ReadArray<VarBind>(Reader, (Asn1F.AsnReader Reader, out VarBind _Item) => VarBind.TryCreate(Reader, out _Item));
 		}
 
 		public static bool TryCreate(Asn1F.AsnReader Reader0, out BulkPDU _Result)
@@ -789,7 +791,7 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_PDU
 
 		public static unnamed1Choice Create(Asn1F.AsnReader Reader)
 		{
-			unnamed1Choice _Result = new();
+			unnamed1Choice _Result = new unnamed1Choice();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -919,7 +921,7 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_PDU
 
 		public static VarBind Create(Asn1F.AsnReader Reader)
 		{
-			VarBind _Result = new();
+			VarBind _Result = new VarBind();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -972,3 +974,5 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_PDU
 	}
 
 }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

@@ -8,6 +8,8 @@ using Asn1F = System.Formats.Asn1;
  *
  ********************************************************************************/
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Waher.Things.Snmp.Snmp1.RFC1155_SMI
 {
 	public static partial class _DefinedValues
@@ -39,7 +41,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1155_SMI
 
 		public static ObjectSyntax Create(Asn1F.AsnReader Reader)
 		{
-			ObjectSyntax _Result = new();
+			ObjectSyntax _Result = new ObjectSyntax();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -143,7 +145,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1155_SMI
 
 		public static SimpleSyntax Create(Asn1F.AsnReader Reader)
 		{
-			SimpleSyntax _Result = new();
+			SimpleSyntax _Result = new SimpleSyntax();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -266,7 +268,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1155_SMI
 
 		public static ApplicationSyntax Create(Asn1F.AsnReader Reader)
 		{
-			ApplicationSyntax _Result = new();
+			ApplicationSyntax _Result = new ApplicationSyntax();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -405,7 +407,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1155_SMI
 
 		public static NetworkAddress Create(Asn1F.AsnReader Reader)
 		{
-			NetworkAddress _Result = new();
+			NetworkAddress _Result = new NetworkAddress();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -477,3 +479,5 @@ namespace Waher.Things.Snmp.Snmp1.RFC1155_SMI
 	}
 
 }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

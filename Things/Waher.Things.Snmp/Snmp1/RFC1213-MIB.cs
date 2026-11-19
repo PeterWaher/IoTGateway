@@ -10,6 +10,8 @@ using Waher.Things.Snmp.Snmp1.RFC1212;
  *
  ********************************************************************************/
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Waher.Things.Snmp.Snmp1.RFC1213_MIB
 {
 	public static partial class _DefinedValues
@@ -280,7 +282,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1213_MIB
 
 		public static Waher.Things.Snmp.Snmp1.RFC1213_MIB.IfEntry Create(Asn1F.AsnReader Reader)
 		{
-			Waher.Things.Snmp.Snmp1.RFC1213_MIB.IfEntry _Result = new();
+			Waher.Things.Snmp.Snmp1.RFC1213_MIB.IfEntry _Result = new Waher.Things.Snmp.Snmp1.RFC1213_MIB.IfEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -476,7 +478,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1213_MIB
 
 		public static Waher.Things.Snmp.Snmp1.RFC1213_MIB.AtEntry Create(Asn1F.AsnReader Reader)
 		{
-			Waher.Things.Snmp.Snmp1.RFC1213_MIB.AtEntry _Result = new();
+			Waher.Things.Snmp.Snmp1.RFC1213_MIB.AtEntry _Result = new Waher.Things.Snmp.Snmp1.RFC1213_MIB.AtEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -542,7 +544,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1213_MIB
 
 		public static Waher.Things.Snmp.Snmp1.RFC1213_MIB.IpAddrEntry Create(Asn1F.AsnReader Reader)
 		{
-			Waher.Things.Snmp.Snmp1.RFC1213_MIB.IpAddrEntry _Result = new();
+			Waher.Things.Snmp.Snmp1.RFC1213_MIB.IpAddrEntry _Result = new Waher.Things.Snmp.Snmp1.RFC1213_MIB.IpAddrEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -636,7 +638,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1213_MIB
 
 		public static Waher.Things.Snmp.Snmp1.RFC1213_MIB.IpRouteEntry Create(Asn1F.AsnReader Reader)
 		{
-			Waher.Things.Snmp.Snmp1.RFC1213_MIB.IpRouteEntry _Result = new();
+			Waher.Things.Snmp.Snmp1.RFC1213_MIB.IpRouteEntry _Result = new Waher.Things.Snmp.Snmp1.RFC1213_MIB.IpRouteEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -753,7 +755,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1213_MIB
 
 		public static Waher.Things.Snmp.Snmp1.RFC1213_MIB.IpNetToMediaEntry Create(Asn1F.AsnReader Reader)
 		{
-			Waher.Things.Snmp.Snmp1.RFC1213_MIB.IpNetToMediaEntry _Result = new();
+			Waher.Things.Snmp.Snmp1.RFC1213_MIB.IpNetToMediaEntry _Result = new Waher.Things.Snmp.Snmp1.RFC1213_MIB.IpNetToMediaEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -827,7 +829,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1213_MIB
 
 		public static Waher.Things.Snmp.Snmp1.RFC1213_MIB.TcpConnEntry Create(Asn1F.AsnReader Reader)
 		{
-			Waher.Things.Snmp.Snmp1.RFC1213_MIB.TcpConnEntry _Result = new();
+			Waher.Things.Snmp.Snmp1.RFC1213_MIB.TcpConnEntry _Result = new Waher.Things.Snmp.Snmp1.RFC1213_MIB.TcpConnEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -914,7 +916,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1213_MIB
 
 		public static Waher.Things.Snmp.Snmp1.RFC1213_MIB.UdpEntry Create(Asn1F.AsnReader Reader)
 		{
-			Waher.Things.Snmp.Snmp1.RFC1213_MIB.UdpEntry _Result = new();
+			Waher.Things.Snmp.Snmp1.RFC1213_MIB.UdpEntry _Result = new Waher.Things.Snmp.Snmp1.RFC1213_MIB.UdpEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -994,7 +996,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1213_MIB
 
 		public static Waher.Things.Snmp.Snmp1.RFC1213_MIB.EgpNeighEntry Create(Asn1F.AsnReader Reader)
 		{
-			Waher.Things.Snmp.Snmp1.RFC1213_MIB.EgpNeighEntry _Result = new();
+			Waher.Things.Snmp.Snmp1.RFC1213_MIB.EgpNeighEntry _Result = new Waher.Things.Snmp.Snmp1.RFC1213_MIB.EgpNeighEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -1135,3 +1137,5 @@ namespace Waher.Things.Snmp.Snmp1.RFC1213_MIB
 	}
 
 }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

@@ -9,6 +9,8 @@ using Waher.Things.Snmp.Snmp1.RFC1155_SMI;
  *
  ********************************************************************************/
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Waher.Things.Snmp.Snmp1.RFC1158_MIB
 {
 	public static partial class _DefinedValues
@@ -279,7 +281,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1158_MIB
 
 		public static IfEntry Create(Asn1F.AsnReader Reader)
 		{
-			IfEntry _Result = new();
+			IfEntry _Result = new IfEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -475,7 +477,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1158_MIB
 
 		public static AtEntry Create(Asn1F.AsnReader Reader)
 		{
-			AtEntry _Result = new();
+			AtEntry _Result = new AtEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -541,7 +543,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1158_MIB
 
 		public static IpAddrEntry Create(Asn1F.AsnReader Reader)
 		{
-			IpAddrEntry _Result = new();
+			IpAddrEntry _Result = new IpAddrEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -633,7 +635,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1158_MIB
 
 		public static IpRouteEntry Create(Asn1F.AsnReader Reader)
 		{
-			IpRouteEntry _Result = new();
+			IpRouteEntry _Result = new IpRouteEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -742,7 +744,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1158_MIB
 
 		public static IpNetToMediaEntry Create(Asn1F.AsnReader Reader)
 		{
-			IpNetToMediaEntry _Result = new();
+			IpNetToMediaEntry _Result = new IpNetToMediaEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -816,7 +818,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1158_MIB
 
 		public static TcpConnEntry Create(Asn1F.AsnReader Reader)
 		{
-			TcpConnEntry _Result = new();
+			TcpConnEntry _Result = new TcpConnEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -903,7 +905,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1158_MIB
 
 		public static UdpEntry Create(Asn1F.AsnReader Reader)
 		{
-			UdpEntry _Result = new();
+			UdpEntry _Result = new UdpEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -983,7 +985,7 @@ namespace Waher.Things.Snmp.Snmp1.RFC1158_MIB
 
 		public static EgpNeighEntry Create(Asn1F.AsnReader Reader)
 		{
-			EgpNeighEntry _Result = new();
+			EgpNeighEntry _Result = new EgpNeighEntry();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -1124,3 +1126,5 @@ namespace Waher.Things.Snmp.Snmp1.RFC1158_MIB
 	}
 
 }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

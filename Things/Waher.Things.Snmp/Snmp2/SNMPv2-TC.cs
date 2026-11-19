@@ -9,6 +9,8 @@ using Waher.Things.Snmp.Snmp2.SNMPv2_SMI;
  *
  ********************************************************************************/
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Waher.Things.Snmp.Snmp2.SNMPv2_TC
 {
 	public enum TruthValueEnum
@@ -37,3 +39,5 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_TC
 	}
 
 }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

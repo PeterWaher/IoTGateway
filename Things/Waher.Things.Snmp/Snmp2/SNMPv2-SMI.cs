@@ -8,6 +8,8 @@ using Asn1F = System.Formats.Asn1;
  *
  ********************************************************************************/
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Waher.Things.Snmp.Snmp2.SNMPv2_SMI
 {
 	public static partial class _DefinedValues
@@ -52,7 +54,7 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_SMI
 
 		public static Waher.Things.Snmp.Snmp2.SNMPv2_SMI.ObjectSyntax Create(Asn1F.AsnReader Reader)
 		{
-			Waher.Things.Snmp.Snmp2.SNMPv2_SMI.ObjectSyntax _Result = new();
+			Waher.Things.Snmp.Snmp2.SNMPv2_SMI.ObjectSyntax _Result = new Waher.Things.Snmp.Snmp2.SNMPv2_SMI.ObjectSyntax();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -154,7 +156,7 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_SMI
 
 		public static Waher.Things.Snmp.Snmp2.SNMPv2_SMI.SimpleSyntax Create(Asn1F.AsnReader Reader)
 		{
-			Waher.Things.Snmp.Snmp2.SNMPv2_SMI.SimpleSyntax _Result = new();
+			Waher.Things.Snmp.Snmp2.SNMPv2_SMI.SimpleSyntax _Result = new Waher.Things.Snmp.Snmp2.SNMPv2_SMI.SimpleSyntax();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -275,7 +277,7 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_SMI
 
 		public static Waher.Things.Snmp.Snmp2.SNMPv2_SMI.ApplicationSyntax Create(Asn1F.AsnReader Reader)
 		{
-			Waher.Things.Snmp.Snmp2.SNMPv2_SMI.ApplicationSyntax _Result = new();
+			Waher.Things.Snmp.Snmp2.SNMPv2_SMI.ApplicationSyntax _Result = new Waher.Things.Snmp.Snmp2.SNMPv2_SMI.ApplicationSyntax();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -423,3 +425,5 @@ namespace Waher.Things.Snmp.Snmp2.SNMPv2_SMI
 	}
 
 }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

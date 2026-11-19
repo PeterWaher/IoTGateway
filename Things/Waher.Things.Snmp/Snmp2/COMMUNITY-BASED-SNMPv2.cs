@@ -8,6 +8,8 @@ using Asn1F = System.Formats.Asn1;
  *
  ********************************************************************************/
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Waher.Things.Snmp.Snmp2.COMMUNITY_BASED_SNMPv2
 {
 	public enum versionEnum
@@ -23,7 +25,7 @@ namespace Waher.Things.Snmp.Snmp2.COMMUNITY_BASED_SNMPv2
 
 		public static Message Create(Asn1F.AsnReader Reader)
 		{
-			Message _Result = new();
+			Message _Result = new Message();
 			_Result.Read(Reader);
 			return _Result;
 		}
@@ -80,3 +82,5 @@ namespace Waher.Things.Snmp.Snmp2.COMMUNITY_BASED_SNMPv2
 	}
 
 }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

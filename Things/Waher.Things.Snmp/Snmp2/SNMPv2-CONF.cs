@@ -9,6 +9,10 @@ using Waher.Things.Snmp.Snmp2.SNMPv2_SMI;
  *
  ********************************************************************************/
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Waher.Things.Snmp.Snmp2.SNMPv2_CONF
 {
 }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Types;
 using Waher.Content.Asn1.Model.Values;
 using Waher.Runtime.Collections;
-using Waher.Script.Functions.Analytic;
 
 namespace Waher.Content.Asn1.Model
 {

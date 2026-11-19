@@ -1,0 +1,12 @@
+﻿Class DEFINITIONS AUTOMATIC TAGS ::= 
+BEGIN
+    PLAIN-ITEM ::= CLASS {
+        &code  INTEGER,
+        &label UTF8String
+    }
+
+    plainItem PLAIN-ITEM ::= {
+        &label "Alpha",
+        &code 1
+    }
+END

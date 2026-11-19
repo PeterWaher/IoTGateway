@@ -1,0 +1,20 @@
+﻿ClassFieldReferences DEFINITIONS AUTOMATIC TAGS ::= 
+BEGIN
+    SETTING ::= CLASS {
+        &Type,
+        &value &Type
+    }
+    WITH SYNTAX { TYPE &Type VALUE &value }
+
+    numberSetting SETTING ::= {
+        TYPE INTEGER VALUE 42
+    }
+
+    flagSetting SETTING ::= {
+        TYPE BOOLEAN VALUE TRUE
+    }
+
+    textSetting SETTING ::= {
+        TYPE UTF8String VALUE "abc"
+    }
+END

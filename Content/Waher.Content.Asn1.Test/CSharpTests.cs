@@ -266,5 +266,35 @@ namespace Waher.Content.Asn1.Test
 			await GenerateCSharp("X509\\PKIXCRMF.asn1");
 		}
 
+		[TestMethod]
+		public async Task Test_18_Class_Plain()
+		{
+			await GenerateCSharp("Class.asn1");
+		}
+
+		[TestMethod]
+		public async Task Test_19_Class_With_Syntax()
+		{
+			await GenerateCSharp("ClassWithSyntax.asn1");
+		}
+
+		[TestMethod]
+		public async Task Test_20_Class_IdentifiedBy()
+		{
+			await GenerateCSharp("ClassIdentifiedBy.asn1");
+		}
+
+		[TestMethod]
+		public async Task Test_21_Class_Syntax_Groups()
+		{
+			await GenerateCSharp("ClassSyntaxGroups.asn1");
+		}
+
+		[TestMethod]
+		public async Task Test_22_Class_Field_References()
+		{
+			await GenerateCSharp("ClassFieldReferences.asn1");
+		}
+
 	}
 }

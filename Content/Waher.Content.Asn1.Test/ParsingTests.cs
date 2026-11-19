@@ -120,5 +120,36 @@ namespace Waher.Content.Asn1.Test
 		{
 			await ParseAsn1Document("X509\\PKIXCRMF.asn1");
 		}
+
+		[TestMethod]
+		public async Task Test_18_Class_Plain()
+		{
+			await ParseAsn1Document("Class.asn1");
+		}
+
+		[TestMethod]
+		public async Task Test_19_Class_With_Syntax()
+		{
+			await ParseAsn1Document("ClassWithSyntax.asn1");
+		}
+
+		[TestMethod]
+		public async Task Test_20_Class_IdentifiedBy()
+		{
+			await ParseAsn1Document("ClassIdentifiedBy.asn1");
+		}
+
+		[TestMethod]
+		public async Task Test_21_Class_Syntax_Groups()
+		{
+			await ParseAsn1Document("ClassSyntaxGroups.asn1");
+		}
+
+		[TestMethod]
+		public async Task Test_22_Class_Field_References()
+		{
+			await ParseAsn1Document("ClassFieldReferences.asn1");
+		}
+
 	}
 }

@@ -1,0 +1,12 @@
+﻿ClassWithSyntax DEFINITIONS AUTOMATIC TAGS ::= 
+BEGIN
+    NAMED-ITEM ::= CLASS {
+        &code  INTEGER,
+        &label UTF8String
+    }
+    WITH SYNTAX { CODE &code, LABEL &label }
+
+    namedItem NAMED-ITEM ::= {
+        CODE 1, LABEL "Alpha"
+    }
+END

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Exceptions;
 using Waher.Content.Asn1.Model;
+using Waher.Content.Asn1.Model.Classes;
 using Waher.Content.Asn1.Model.Macro;
 using Waher.Content.Asn1.Model.Restrictions;
 using Waher.Content.Asn1.Model.Sets;
@@ -525,9 +526,28 @@ namespace Waher.Content.Asn1
 					if (!char.IsUpper(ch))   // !Type = XML notation
 						throw this.SyntaxError("XML notation not supported.");
 
-					this.pos += s2.Length;
+					this.pos += 3;
 
 					s2 = this.PeekNextToken();
+
+					if (s2 == "CLASS")
+					{
+						this.pos += 5;
+
+						Asn1Node[] Fields = this.ParseList(DefaultTags);
+						int i, c = Fields.Length;
+						Asn1PropertyDefinition[] Properties = new Asn1PropertyDefinition[c];
+
+						for (i = 0; i < c; i++)
+						{
+							if (!(Fields[i] is Asn1PropertyDefinition PropertyDef))
+								throw this.SyntaxError("Invalid class property.");
+
+							Properties[i] = PropertyDef;
+						}
+
+						return new Asn1ClassDefinition(s, Properties, this);
+					}
 				}
 				else if (s2 == "MACRO")
 				{
@@ -586,7 +606,7 @@ namespace Waher.Content.Asn1
 
 				if (s2 == "[")
 				{
-					Class = TagClass.ContextSpecific;	// Default class when providing index.
+					Class = TagClass.ContextSpecific;   // Default class when providing index.
 
 					this.pos++;
 					s2 = this.NextToken();
@@ -639,8 +659,8 @@ namespace Waher.Content.Asn1
 						Definition = this.ParseType(s, true, DefaultTags);
 
 					Asn1TypeDefinition TypeDef = new Asn1TypeDefinition(s,
-						Class.HasValue && TagValue.HasValue ? 
-						new Asn1Tag(Class.Value, TagValue.Value) : (Asn1Tag?)null, 
+						Class.HasValue && TagValue.HasValue ?
+						new Asn1Tag(Class.Value, TagValue.Value) : (Asn1Tag?)null,
 						Definition, this);
 
 					if (!Definition.ConstructedType)
@@ -669,7 +689,7 @@ namespace Waher.Content.Asn1
 					{
 						return new Asn1FieldDefinition(s,
 							Class.HasValue && TagValue.HasValue ?
-							new Asn1Tag(Class.Value, TagValue.Value) : (Asn1Tag?)null, 
+							new Asn1Tag(Class.Value, TagValue.Value) : (Asn1Tag?)null,
 							Type, this);
 					}
 				}
@@ -678,6 +698,15 @@ namespace Waher.Content.Asn1
 			{
 				this.pos += 3;
 				return new Asn1Extension(this);
+			}
+			else if (s == "&")
+			{
+				this.pos++;
+
+				string Name = this.ParseIdentifier();
+				Asn1Type Type = this.ParseType(Name, false, DefaultTags);
+
+				return new Asn1PropertyDefinition(Name, Type, this);
 			}
 			else
 				throw this.SyntaxError("Identifier expected.");

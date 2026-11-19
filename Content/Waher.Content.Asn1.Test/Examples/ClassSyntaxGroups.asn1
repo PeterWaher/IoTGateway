@@ -1,0 +1,29 @@
+﻿ClassSyntaxGroups DEFINITIONS AUTOMATIC TAGS ::= 
+BEGIN
+    FEATURE ::= CLASS {
+        &id          INTEGER UNIQUE,
+        &description UTF8String OPTIONAL,
+        &enabled     BOOLEAN DEFAULT TRUE
+    }
+    WITH SYNTAX {
+        [DESCRIPTION &description]
+        [ENABLED &enabled]
+        ID &id
+    }
+
+    minimalFeature FEATURE ::= {
+        ID 1
+    }
+
+    describedFeature FEATURE ::= {
+        DESCRIPTION "Second" ID 2
+    }
+
+    disabledFeature FEATURE ::= {
+        ENABLED FALSE ID 3
+    }
+
+    completeFeature FEATURE ::= {
+        DESCRIPTION "Fourth" ENABLED FALSE ID 4
+    }
+END

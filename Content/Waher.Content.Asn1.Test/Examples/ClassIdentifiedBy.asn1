@@ -1,0 +1,24 @@
+﻿ClassIdentifiedBy DEFINITIONS AUTOMATIC TAGS ::= 
+BEGIN
+    PAYLOAD ::= CLASS {
+        &id OBJECT IDENTIFIER UNIQUE,
+        &Type
+    }
+    WITH SYNTAX { &Type IDENTIFIED BY &id }
+
+    integerPayload PAYLOAD ::= {
+        INTEGER IDENTIFIED BY { 1 2 3 1 }
+    }
+
+    recordPayload PAYLOAD ::= {
+        SEQUENCE {
+            count  INTEGER,
+            active BOOLEAN
+        }
+        IDENTIFIED BY { 1 2 3 2 }
+    }
+
+    Payloads PAYLOAD ::= {
+        integerPayload | recordPayload
+    }
+END

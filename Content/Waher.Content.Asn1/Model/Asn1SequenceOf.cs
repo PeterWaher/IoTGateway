@@ -94,7 +94,11 @@ namespace Waher.Content.Asn1.Model
 		{
 			Output.Append("ReadArray<");
 			Output.Append(this.elementType.CSharpType);
-			Output.Append(">(Reader, (Reader, out _Item) => ");
+			Output.Append(">(Reader, (Asn1F.AsnReader Reader, out ");
+			Output.Append(this.elementType.CSharpType);
+			if (!this.elementType.ByReference)
+				Output.Append('?');
+			Output.Append(" _Item) => ");
 			await this.elementType.ExportTryReadCSharp(Output, State, Indent + 1,
 				string.Empty, null, "_Item", Index);
 			Output.Append(")");
@@ -116,7 +120,11 @@ namespace Waher.Content.Asn1.Model
 		{
 			Output.Append("TryReadArray<");
 			Output.Append(this.elementType.CSharpType);
-			Output.Append(">(Reader, (Reader, out _Item) => ");
+			Output.Append(">(Reader, (Asn1F.AsnReader Reader, out ");
+			Output.Append(this.elementType.CSharpType);
+			if (!this.elementType.ByReference)
+				Output.Append('?');
+			Output.Append(" _Item) => ");
 
 			await this.elementType.ExportTryReadCSharp(Output, State, Indent + 1,
 				string.Empty, null, "_Item", Index);

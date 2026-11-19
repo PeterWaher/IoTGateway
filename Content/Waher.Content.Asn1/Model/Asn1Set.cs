@@ -144,7 +144,11 @@ namespace Waher.Content.Asn1.Model
 					Output.Append(ToCSharp(State, this, this.Name));
 					if (!this.TypeDefinition)
 						Output.Append("Set");
-					Output.AppendLine(" _Result = new();");
+					Output.Append(" _Result = new ");
+					Output.Append(ToCSharp(State, this, this.Name));
+					if (!this.TypeDefinition)
+						Output.Append("Set");
+					Output.AppendLine("();");
 
 					JSON.Indent(Output, Indent);
 					Output.AppendLine("_Result.Read(Reader);");

@@ -183,6 +183,9 @@ namespace Waher.Content.Asn1.Model
 				Output.AppendLine("/");
 				Output.AppendLine();
 
+				Output.AppendLine("#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member");
+				Output.AppendLine();
+
 				JSON.Indent(Output, Indent);
 				Output.Append("namespace ");
 				Output.Append(ToCSharp(State.Settings.BaseNamespace));
@@ -227,6 +230,10 @@ namespace Waher.Content.Asn1.Model
 				Indent--;
 				JSON.Indent(Output, Indent);
 				Output.AppendLine("}");
+				Output.AppendLine();
+
+				Output.AppendLine("#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member");
+
 			}
 		}
 	}

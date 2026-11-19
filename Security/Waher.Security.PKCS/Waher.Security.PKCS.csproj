@@ -51,32 +51,8 @@
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Certificates\Asn1\AttributeCertificateVersion1.asn1">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Certificates\Asn1\CryptographicMessageSyntax.asn1">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Certificates\Asn1\CryptographicMessageSyntax2004.asn1">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Certificates\Asn1\PKIX1Explicit88.asn1">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Certificates\Asn1\PKIX1Implicit88.asn1">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Certificates\Asn1\PKIXAttributeCertificate.asn1">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Certificates\Asn1\PKIXCRMF.asn1">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-		<Exec Command="&quot;$(ProjectDir)..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Debug\net8.0\win-x86\Waher.Utility.Asn1ToCSharp.exe&quot; -n Waher.Security.PKCS.Certificates -o &quot;$(ProjectDir)Certificates&quot; -t -i &quot;$(ProjectDir)Certificates\Asn1\*.asn1&quot;" />
+		<Exec Command="&quot;$(ProjectDir)..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Debug\net8.0\win-x86\Waher.Utility.Asn1ToCSharp.exe&quot; -n Waher.Security.PKCS.Certificates -o &quot;$(ProjectDir)Certificates&quot; -f &quot;$(ProjectDir)Certificates\Asn1\NIST&quot; -r -i &quot;$(ProjectDir)Certificates\Asn1\*.asn1&quot;" />
 	</Target>
 
 </Project>

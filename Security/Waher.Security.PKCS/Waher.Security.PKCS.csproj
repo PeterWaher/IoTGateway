@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -29,6 +29,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Asn1\Waher.Content.Asn1.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\Waher.Security\Waher.Security.csproj" />
   </ItemGroup>
@@ -45,8 +46,37 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Formats.Asn1" Version="11.0.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Certificates\Asn1\AttributeCertificateVersion1.asn1">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Certificates\Asn1\CryptographicMessageSyntax.asn1">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Certificates\Asn1\CryptographicMessageSyntax2004.asn1">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Certificates\Asn1\PKIX1Explicit88.asn1">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Certificates\Asn1\PKIX1Implicit88.asn1">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Certificates\Asn1\PKIXAttributeCertificate.asn1">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Certificates\Asn1\PKIXCRMF.asn1">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="&quot;$(ProjectDir)..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Debug\net8.0\win-x86\Waher.Utility.Asn1ToCSharp.exe&quot; -n Waher.Security.PKCS.Certificates -o &quot;$(ProjectDir)Certificates&quot; -t -i &quot;$(ProjectDir)Certificates\Asn1\*.asn1&quot;" />
+	</Target>
 
 </Project>

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Security.PKCS
+﻿namespace Waher.Security.PKCS
 {
 	/// <summary>
 	/// Contains information about a Certificate Signing Request (CSR).

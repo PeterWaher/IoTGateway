@@ -1296,13 +1296,13 @@ namespace Waher.Content.Asn1
 				case "COMPONENTS":
 				case "INSTANCE":
 				case "OID-IRI":
-					throw this.SyntaxError("Token not implemented.");
+					throw this.SyntaxError("Token not implemented: " + s);
 
 				default:
 					if (char.IsUpper(s[0]))
 						return new Asn1TypeReference(s, this);
 					else
-						throw this.SyntaxError("Type name expected.");
+						throw this.SyntaxError("Type name expected: " + s);
 			}
 		}
 

@@ -231,7 +231,7 @@ namespace Waher.Security.ACME
 		/// </summary>
 		/// <param name="CertificateRequest">Certificate request.</param>
 		/// <returns>New order object.</returns>
-		public Task<AcmeOrder> FinalizeOrder(CertificateRequest CertificateRequest)
+		public Task<AcmeOrder> FinalizeOrder(PKCS.CertificateRequest CertificateRequest)
 		{
 			return this.Client.FinalizeOrder(this.AccountLocation, this.finalize, CertificateRequest);
 		}

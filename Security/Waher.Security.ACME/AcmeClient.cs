@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
-using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -708,7 +705,8 @@ namespace Waher.Security.ACME
 		/// <param name="FinalizeLocation">Finalize location.</param>
 		/// <param name="CertificateRequest">Certificate request.</param>
 		/// <returns>New order object.</returns>
-		public async Task<AcmeOrder> FinalizeOrder(Uri AccountLocation, Uri FinalizeLocation, CertificateRequest CertificateRequest)
+		public async Task<AcmeOrder> FinalizeOrder(Uri AccountLocation, 
+			Uri FinalizeLocation, PKCS.CertificateRequest CertificateRequest)
 		{
 			byte[] CSR = CertificateRequest.BuildCSR();
 			AcmeResponse Response = await this.POST(FinalizeLocation, AccountLocation,

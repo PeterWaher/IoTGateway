@@ -337,7 +337,7 @@ namespace Waher.Security.ACME.Test
 		{
 			using RSACryptoServiceProvider RSA = new(4096);
 			AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
-			await Order.FinalizeOrder(new CertificateRequest(new RsaSha256(RSA))
+			await Order.FinalizeOrder(new PKCS.CertificateRequest(new RsaSha256(RSA))
 			{
 				//Country = "SE",
 				//StateOrProvince = "Stockholm",

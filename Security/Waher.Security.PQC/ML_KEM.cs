@@ -1198,10 +1198,10 @@ namespace Waher.Security.PQC
 		/// <returns>Shared Key, Cipher text.</returns>
 		public ML_KEM_Encapsulation Encapsulate(ML_KEM_Keys Keys)
 		{
-			if (Keys.EncapsulationKey.Length < 384)
+			if (Keys.EncapsulationKey.Length < this.k384)
 				throw new ArgumentException("Encapsulation key length mismatch.", nameof(Keys));
 
-			ushort[] x = ByteDecode(Keys.EncapsulationKey, 0, 384, 12);
+			ushort[] x = ByteDecode(Keys.EncapsulationKey, 0, this.k384, 12);
 			int i, c = x.Length;
 
 			for (i = 0; i < c; i++)

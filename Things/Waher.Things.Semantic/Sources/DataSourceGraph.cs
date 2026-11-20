@@ -115,7 +115,11 @@ namespace Waher.Things.Semantic.Sources
 				return null;
 
 			if (string.IsNullOrEmpty(Parts[c - 1]))
+			{
 				c--;
+				if (c == 0)
+					return null;
+			}
 
 			if (c == 1)
 				return new MachineGraph();

@@ -14,6 +14,7 @@ using Waher.Runtime.IO;
 using Waher.Runtime.Collections;
 using System.Formats.Asn1;
 using System.Numerics;
+using System.Net;
 
 namespace Waher.Content.Asn1
 {
@@ -567,61 +568,9 @@ namespace Waher.Content.Asn1
 						{
 							this.pos += 4;
 							this.AssertNextToken("SYNTAX");
-							this.AssertNextToken("{");
 
-							ChunkedList<Asn1SyntaxNode> Syntax = new ChunkedList<Asn1SyntaxNode>()
-							{
-								new Asn1ExpectedToken("{", this)
-							};
-
-							s2 = this.PeekNextToken();
-							while (s2 != "}")
-							{
-								if (s2 == "&")
-								{
-									this.pos++;
-									Syntax.Add(new Asn1PropertyReference(
-										this.ParseIdentifier(), this));
-								}
-								else
-								{
-									this.pos += s2.Length;
-									Syntax.Add(new Asn1ExpectedToken(s2, this));
-
-									if (s2 == "IDENTIFIED")
-									{
-										s2 = this.PeekNextToken();
-										if (s2 == "BY" && 
-											Syntax.Count>=2 &&
-											Syntax[Syntax.Count-2] is 
-											Asn1PropertyReference Identified)
-										{
-											this.pos += s2.Length;
-											Syntax.Add(new Asn1ExpectedToken(s2, this));
-
-											s2 = this.PeekNextToken();
-											if (s2 == "&")
-											{
-												this.pos++;
-												Asn1PropertyReference Identifier =
-													new Asn1PropertyReference(
-														this.ParseIdentifier(), this);
-												
-												Syntax.Add(Identifier);
-
-												ClassDef.AddIdentifier(Identified.Property,
-													Identifier.Property);
-											}
-										}
-									}
-								}
-
-								s2 = this.PeekNextToken();
-							}
-
-							Syntax.Add(new Asn1ExpectedToken("}", this));
-
-							ClassDef.Syntax = Syntax.ToArray();
+							ClassDef.Syntax = this.ParseSyntaxElements("{", "}", true, 
+								ClassDef);
 						}
 
 						this.pos++;
@@ -813,6 +762,73 @@ namespace Waher.Content.Asn1
 			}
 			else
 				throw this.SyntaxError("Identifier expected.");
+		}
+
+		private Asn1SyntaxNode[] ParseSyntaxElements(string StartToken, string EndToken,
+			bool IncludeStartEndTokensAsElements, Asn1ClassDefinition ClassDef)
+		{
+			this.AssertNextToken(StartToken);
+
+			ChunkedList<Asn1SyntaxNode> Syntax = new ChunkedList<Asn1SyntaxNode>();
+
+			if (IncludeStartEndTokensAsElements)
+				Syntax.Add(new Asn1ExpectedToken(StartToken, this));
+
+			string s2 = this.PeekNextToken();
+			while (s2 != EndToken)
+			{
+				if (s2 == "&")
+				{
+					this.pos++;
+					Syntax.Add(new Asn1PropertyReference(this.ParseIdentifier(), this));
+				}
+				else if (s2 == "[")
+				{
+					Syntax.Add(new Asn1OptionalSyntaxGroup(
+						this.ParseSyntaxElements("[", "]", false, ClassDef), this));
+				}
+				else
+				{
+					this.pos += s2.Length;
+					Syntax.Add(new Asn1ExpectedToken(s2, this));
+
+					if (s2 == "IDENTIFIED")
+					{
+						s2 = this.PeekNextToken();
+						if (s2 == "BY" &&
+							Syntax.Count >= 2 &&
+							Syntax[Syntax.Count - 2] is
+							Asn1PropertyReference Identified)
+						{
+							this.pos += s2.Length;
+							Syntax.Add(new Asn1ExpectedToken(s2, this));
+
+							s2 = this.PeekNextToken();
+							if (s2 == "&")
+							{
+								this.pos++;
+								Asn1PropertyReference Identifier =
+									new Asn1PropertyReference(
+										this.ParseIdentifier(), this);
+
+								Syntax.Add(Identifier);
+
+								ClassDef.AddIdentifier(Identified.Property,
+									Identifier.Property);
+							}
+						}
+					}
+				}
+
+				s2 = this.PeekNextToken();
+			}
+
+			if (IncludeStartEndTokensAsElements)
+				Syntax.Add(new Asn1ExpectedToken("}", this));
+
+			this.pos += EndToken.Length;
+
+			return Syntax.ToArray();
 		}
 
 		private UserDefinedItem ParseUserDefinedOptions(string EndKeyWord, Asn1Tags? DefaultTags)
@@ -1562,10 +1578,8 @@ namespace Waher.Content.Asn1
 
 			foreach (Asn1PropertyDefinition PropertyDefinition in ClassDef.Properties)
 			{
-				if (!Properties.TryGetValue(PropertyDefinition.Name, out Asn1PropertyValue Value))
-					throw this.SyntaxError("Missing property: " + PropertyDefinition.Name);
-
-				Value.Type = PropertyDefinition.Type;   // TODO: Clone & set Parent
+				if (Properties.TryGetValue(PropertyDefinition.Name, out Asn1PropertyValue Value))
+					Value.Type = PropertyDefinition.Type;   // TODO: Clone & set Parent
 			}
 
 			foreach (Asn1PropertyValue Value in Properties.Values)

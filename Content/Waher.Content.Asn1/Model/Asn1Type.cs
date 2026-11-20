@@ -30,7 +30,7 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// How tags are encoded
 		/// </summary>
-		public Asn1Tags? Tags
+		public virtual Asn1Tags? Tags
 		{
 			get => this.tags;
 			internal set => this.tags = value;
@@ -39,7 +39,7 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// Any restrictions placed on the type.
 		/// </summary>
-		public Asn1Restriction Restriction
+		public virtual Asn1Restriction Restriction
 		{
 			get => this.restriction;
 			internal set
@@ -53,7 +53,7 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// If values must be unique.
 		/// </summary>
-		public bool? Unique
+		public virtual bool? Unique
 		{
 			get => this.unique;
 			internal set => this.unique = value;
@@ -62,7 +62,7 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// If the type must be present
 		/// </summary>
-		public bool? Present
+		public virtual bool? Present
 		{
 			get => this.present;
 			internal set => this.present = value;
@@ -71,7 +71,7 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// If the type must be absent
 		/// </summary>
-		public bool? Absent
+		public virtual bool? Absent
 		{
 			get => this.absent;
 			internal set => this.absent = value;
@@ -80,7 +80,7 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// Default value for type
 		/// </summary>
-		public Asn1Node Default
+		public virtual Asn1Node Default
 		{
 			get => this._default;
 			internal set

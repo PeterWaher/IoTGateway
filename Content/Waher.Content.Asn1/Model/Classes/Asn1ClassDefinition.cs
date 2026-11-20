@@ -7,6 +7,7 @@ namespace Waher.Content.Asn1.Model.Classes
 	/// </summary>
 	public class Asn1ClassDefinition : Asn1Node
 	{
+		private readonly Asn1TypeDeclaration[] typeDeclarations;
 		private readonly Asn1PropertyDefinition[] properties;
 		private readonly string name;
 		private Dictionary<string, string> identifiers;
@@ -16,13 +17,15 @@ namespace Waher.Content.Asn1.Model.Classes
 		/// Defines a class.
 		/// </summary>
 		/// <param name="Name">Class name.</param>
+		/// <param name="TypeDeclarations">Type declarations.</param>
 		/// <param name="Properties">Class properties.</param>
 		/// <param name="Document">ASN.1 document hosting the node.</param>
-		public Asn1ClassDefinition(string Name, Asn1PropertyDefinition[] Properties,
-			Asn1Document Document)
+		public Asn1ClassDefinition(string Name, Asn1TypeDeclaration[] TypeDeclarations,
+			Asn1PropertyDefinition[] Properties, Asn1Document Document)
 			: base(Document)
 		{
 			this.name = Name;
+			this.typeDeclarations = TypeDeclarations;
 			this.properties = Properties;
 		}
 
@@ -30,6 +33,11 @@ namespace Waher.Content.Asn1.Model.Classes
 		/// Class name
 		/// </summary>
 		public string Name => this.name;
+
+		/// <summary>
+		/// Type declarations.
+		/// </summary>
+		public Asn1TypeDeclaration[] TypeDeclarations => this.typeDeclarations;
 
 		/// <summary>
 		/// Property definitions

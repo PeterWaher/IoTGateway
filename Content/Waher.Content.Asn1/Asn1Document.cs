@@ -555,8 +555,12 @@ namespace Waher.Content.Asn1
 					{
 						this.pos += 5;
 
-						Asn1PropertyDefinition[] Properties = this.ParsePropertyDefinitions(DefaultTags);
-						Asn1ClassDefinition ClassDef = new Asn1ClassDefinition(s, Properties, this);
+						this.ParsePropertyDefinitions(DefaultTags,
+							out Asn1TypeDeclaration[] Types,
+							out Asn1PropertyDefinition[] Properties);
+
+						Asn1ClassDefinition ClassDef = new Asn1ClassDefinition(s,
+							Types, Properties, this);
 
 						if (this.namedNodes.ContainsKey(s))
 							throw this.SyntaxError("Identifier already defined: " + s);
@@ -569,7 +573,7 @@ namespace Waher.Content.Asn1
 							this.pos += 4;
 							this.AssertNextToken("SYNTAX");
 
-							ClassDef.Syntax = this.ParseSyntaxElements("{", "}", true, 
+							ClassDef.Syntax = this.ParseSyntaxElements("{", "}", true,
 								ClassDef);
 						}
 
@@ -748,6 +752,9 @@ namespace Waher.Content.Asn1
 				this.pos++;
 
 				string Name = this.ParseIdentifier();
+
+				if (char.IsUpper(Name[0]))
+					return new Asn1TypeDeclaration(Name, this);
 
 				if (ClassInstance)
 				{
@@ -1446,10 +1453,13 @@ namespace Waher.Content.Asn1
 				case "VisibleString":
 					return new Asn1VisibleString(this);
 
+				case "&":
+					s = this.ParseIdentifier();
+					return new Asn1TypeDeclaration(s, this);
+
 				case "ObjectDescriptor":
 				case "EXTERNAL":
 				case "EMBEDDED":
-				case "CLASS":
 				case "COMPONENTS":
 				case "INSTANCE":
 				case "OID-IRI":
@@ -1524,21 +1534,26 @@ namespace Waher.Content.Asn1
 			return Size;
 		}
 
-		private Asn1PropertyDefinition[] ParsePropertyDefinitions(Asn1Tags? DefaultTags)
+		private void ParsePropertyDefinitions(Asn1Tags? DefaultTags,
+			out Asn1TypeDeclaration[] TypeDeclarations,
+			out Asn1PropertyDefinition[] PropertyDeclarations)
 		{
 			Asn1Node[] Fields = this.ParseList(DefaultTags, false);
-			int i, c = Fields.Length;
-			Asn1PropertyDefinition[] Properties = new Asn1PropertyDefinition[c];
+			ChunkedList<Asn1TypeDeclaration> Types = new ChunkedList<Asn1TypeDeclaration>();
+			ChunkedList<Asn1PropertyDefinition> Properties = new ChunkedList<Asn1PropertyDefinition>();
 
-			for (i = 0; i < c; i++)
+			foreach (Asn1Node Field in Fields)
 			{
-				if (!(Fields[i] is Asn1PropertyDefinition PropertyDef))
-					throw this.SyntaxError("Invalid class property.");
-
-				Properties[i] = PropertyDef;
+				if (Field is Asn1TypeDeclaration TypeDef)
+					Types.Add(TypeDef);
+				else if (Field is Asn1PropertyDefinition PropertyDef)
+					Properties.Add(PropertyDef);
+				else
+					throw this.SyntaxError("Expected field or type declaration.");
 			}
 
-			return Properties;
+			TypeDeclarations = Types.ToArray();
+			PropertyDeclarations = Properties.ToArray();
 		}
 
 		private Dictionary<string, Asn1PropertyValue> ParsePropertyValues(Asn1Tags? DefaultTags)
@@ -1575,6 +1590,15 @@ namespace Waher.Content.Asn1
 			}
 			else
 				Properties = this.ParsePropertyValues(DefaultTags);
+
+			foreach (Asn1TypeDeclaration TypeDeclaration in ClassDef.TypeDeclarations)
+			{
+				if (Properties.TryGetValue(TypeDeclaration.Name, out Asn1PropertyValue Value) &&
+					Value.Value is Asn1TypeValue TypeValue)
+				{
+					Value.Type = TypeValue.Type;   // TODO: Clone & set Parent
+				}
+			}
 
 			foreach (Asn1PropertyDefinition PropertyDefinition in ClassDef.Properties)
 			{

@@ -12,7 +12,6 @@ using Waher.Content.Asn1.Model.Types;
 using Waher.Content.Asn1.Model.Values;
 using Waher.Runtime.IO;
 using Waher.Runtime.Collections;
-using System;
 using System.Formats.Asn1;
 using System.Numerics;
 
@@ -26,7 +25,6 @@ namespace Waher.Content.Asn1
 		internal readonly Dictionary<string, Asn1Node> namedNodes = new Dictionary<string, Asn1Node>();
 		internal readonly Dictionary<string, Asn1TypeDefinition> aliases = new Dictionary<string, Asn1TypeDefinition>();
 		internal readonly Dictionary<string, Asn1FieldValueDefinition> values = new Dictionary<string, Asn1FieldValueDefinition>();
-		internal readonly Dictionary<string, Asn1ClassDefinition> classes = new Dictionary<string, Asn1ClassDefinition>();
 		internal int pos = 0;
 		private readonly string text;
 		private readonly string location;
@@ -268,6 +266,9 @@ namespace Waher.Content.Asn1
 					if (s == "DEFINITIONS")
 						break;
 
+					if (this.namedNodes.ContainsKey(Identifier))
+						throw this.SyntaxError("Identifier already defined: " + Identifier);
+
 					this.namedNodes[Identifier] = Oid;
 					Identifier = s;
 					this.pos += s.Length;
@@ -382,7 +383,12 @@ namespace Waher.Content.Asn1
 										throw this.SyntaxError(ModuleRef + " already defined.");
 								}
 								else
+								{
+									if (this.namedNodes.ContainsKey(ModuleRef))
+										throw this.SyntaxError("Identifier already defined: " + ModuleRef);
+
 									this.namedNodes[ModuleRef] = Oid;
+								}
 
 								s = this.PeekNextToken();
 							}
@@ -427,6 +433,9 @@ namespace Waher.Content.Asn1
 						{
 							if (!Doc.namedNodes.TryGetValue(Identifier, out Asn1Node ImportedNode))
 								throw this.SyntaxError(Identifier + " not found in " + Import.Module);
+
+							if (this.namedNodes.ContainsKey(Identifier))
+								throw this.SyntaxError("Identifier already defined: " + Identifier);
 
 							this.namedNodes[Identifier] = ImportedNode;
 
@@ -489,12 +498,22 @@ namespace Waher.Content.Asn1
 						if (this.namedNodes.TryGetValue(NamedNode.Name, out Asn1Node Prev))
 						{
 							if (NamedNode is Asn1TypeDefinition TypeDef)
+							{
+								if (this.namedNodes.ContainsKey(NamedNode.Name))
+									throw this.SyntaxError("Identifier already defined: " + NamedNode.Name);
+
 								this.namedNodes[NamedNode.Name] = TypeDef;
+							}
 							else if (!(Prev is Asn1TypeDefinition) && !Prev.Equals(NamedNode))
 								throw this.SyntaxError("Duplicate type: " + NamedNode.Name);
 						}
 						else
+						{
+							if (this.namedNodes.ContainsKey(NamedNode.Name))
+								throw this.SyntaxError("Identifier already defined: " + NamedNode.Name);
+
 							this.namedNodes[NamedNode.Name] = Node2;
+						}
 					}
 
 					return true;
@@ -538,7 +557,74 @@ namespace Waher.Content.Asn1
 						Asn1PropertyDefinition[] Properties = this.ParsePropertyDefinitions(DefaultTags);
 						Asn1ClassDefinition ClassDef = new Asn1ClassDefinition(s, Properties, this);
 
-						this.classes[s] = ClassDef;
+						if (this.namedNodes.ContainsKey(s))
+							throw this.SyntaxError("Identifier already defined: " + s);
+
+						this.namedNodes[s] = ClassDef;
+
+						s2 = this.PeekNextToken();
+						if (s2 == "WITH")
+						{
+							this.pos += 4;
+							this.AssertNextToken("SYNTAX");
+							this.AssertNextToken("{");
+
+							ChunkedList<Asn1SyntaxNode> Syntax = new ChunkedList<Asn1SyntaxNode>()
+							{
+								new Asn1ExpectedToken("{", this)
+							};
+
+							s2 = this.PeekNextToken();
+							while (s2 != "}")
+							{
+								if (s2 == "&")
+								{
+									this.pos++;
+									Syntax.Add(new Asn1PropertyReference(
+										this.ParseIdentifier(), this));
+								}
+								else
+								{
+									this.pos += s2.Length;
+									Syntax.Add(new Asn1ExpectedToken(s2, this));
+
+									if (s2 == "IDENTIFIED")
+									{
+										s2 = this.PeekNextToken();
+										if (s2 == "BY" && 
+											Syntax.Count>=2 &&
+											Syntax[Syntax.Count-2] is 
+											Asn1PropertyReference Identified)
+										{
+											this.pos += s2.Length;
+											Syntax.Add(new Asn1ExpectedToken(s2, this));
+
+											s2 = this.PeekNextToken();
+											if (s2 == "&")
+											{
+												this.pos++;
+												Asn1PropertyReference Identifier =
+													new Asn1PropertyReference(
+														this.ParseIdentifier(), this);
+												
+												Syntax.Add(Identifier);
+
+												ClassDef.AddIdentifier(Identified.Property,
+													Identifier.Property);
+											}
+										}
+									}
+								}
+
+								s2 = this.PeekNextToken();
+							}
+
+							Syntax.Add(new Asn1ExpectedToken("}", this));
+
+							ClassDef.Syntax = Syntax.ToArray();
+						}
+
+						this.pos++;
 
 						return ClassDef;
 					}
@@ -584,29 +670,20 @@ namespace Waher.Content.Asn1
 
 					return ValueDef;
 				}
-				else if (this.classes.TryGetValue(s2, out Asn1ClassDefinition ClassDef))
+				else if (this.namedNodes.TryGetValue(s2, out Asn1Node Node2) &&
+					Node2 is Asn1ClassDefinition ClassDef)
 				{
 					this.pos += s2.Length;
 
 					this.AssertNextToken("::=");
 
-					Dictionary<string, Asn1PropertyValue> Properties = this.ParsePropertyValues(DefaultTags);
-
-					foreach (Asn1PropertyDefinition PropertyDefinition in ClassDef.Properties)
+					if (char.IsUpper(s[0]))
 					{
-						if (!Properties.TryGetValue(PropertyDefinition.Name, out Asn1PropertyValue Value))
-							throw this.SyntaxError("Missing property: " + PropertyDefinition.Name);
-
-						Value.Type = PropertyDefinition.Type;	// TODO: Clone & set Parent
+						return new Asn1ClassSet(
+							this.ParseClassInstanceSet(ClassDef, DefaultTags), this);
 					}
-
-					foreach (Asn1PropertyValue Value in Properties.Values)
-					{
-						if (Value.Type is null)
-							throw this.SyntaxError("Property not defined: " + Value.Name);
-					}
-
-					return new Asn1ClassInstance(ClassDef, Properties, this);
+					else
+						return this.ParseClassInstance(ClassDef, DefaultTags);
 				}
 				else
 				{
@@ -674,7 +751,7 @@ namespace Waher.Content.Asn1
 						Definition = Macro.ParseType(s, this);
 					}
 					else
-						Definition = this.ParseType(s, true, DefaultTags);
+						Definition = this.ParseType(s, true, DefaultTags, false);
 
 					Asn1TypeDefinition TypeDef = new Asn1TypeDefinition(s,
 						Class.HasValue && TagValue.HasValue ?
@@ -691,7 +768,7 @@ namespace Waher.Content.Asn1
 					if (!IsTypeIdentifier(s2))
 						throw this.SyntaxError("Type name expected.");
 
-					Asn1Type Type = this.ParseType(s, false, DefaultTags);
+					Asn1Type Type = this.ParseType(s, false, DefaultTags, false);
 
 					if (this.PeekNextToken() == "::=")
 					{
@@ -730,7 +807,7 @@ namespace Waher.Content.Asn1
 				}
 				else
 				{
-					Asn1Type Type = this.ParseType(Name, false, DefaultTags);
+					Asn1Type Type = this.ParseType(Name, false, DefaultTags, true);
 					return new Asn1PropertyDefinition(Name, Type, this);
 				}
 			}
@@ -833,7 +910,7 @@ namespace Waher.Content.Asn1
 				}
 				else
 				{
-					Asn1Type Type = this.ParseType(Name, false, DefaultTags);
+					Asn1Type Type = this.ParseType(Name, false, DefaultTags, false);
 
 					this.AssertNextToken(")");
 
@@ -1050,7 +1127,8 @@ namespace Waher.Content.Asn1
 			return new Asn1Oid(Values, this);
 		}
 
-		internal Asn1Type ParseType(string Name, bool TypeDef, Asn1Tags? DefaultTags)
+		internal Asn1Type ParseType(string Name, bool TypeDef, Asn1Tags? DefaultTags,
+			bool PermitUndefinedType)
 		{
 			Asn1Tags? Tags = DefaultTags;
 
@@ -1073,7 +1151,7 @@ namespace Waher.Content.Asn1
 			}
 
 			string s2;
-			Asn1Type Result = this.ParseDataType(Name, TypeDef, DefaultTags);
+			Asn1Type Result = this.ParseDataType(Name, TypeDef, DefaultTags, PermitUndefinedType);
 			Result.Tags = Tags;
 
 			while (true)
@@ -1103,8 +1181,10 @@ namespace Waher.Content.Asn1
 
 								Asn1Value Value = this.ParseValue();
 
-								if (!this.namedNodes.ContainsKey(s2))
-									this.namedNodes[s2] = Value;
+								if (this.namedNodes.ContainsKey(s2))
+									throw this.SyntaxError("Identifier already defined: " + s2);
+
+								this.namedNodes[s2] = Value;
 
 								NamedOptions.Add(new Asn1NamedValue(s2, Value, Result, this));
 
@@ -1160,11 +1240,17 @@ namespace Waher.Content.Asn1
 			}
 		}
 
-		private Asn1Type ParseDataType(string Name, bool TypeDef, Asn1Tags? DefaultTags)
+		private Asn1Type ParseDataType(string Name, bool TypeDef, Asn1Tags? DefaultTags,
+			bool PermitUndefinedType)
 		{
 			string s = this.NextToken();
 			if (string.IsNullOrEmpty(s))
-				throw this.SyntaxError("Unexpected end of file.");
+			{
+				if (PermitUndefinedType)
+					return new Asn1UndefinedType(this);
+				else
+					throw this.SyntaxError("Unexpected end of file.");
+			}
 
 			switch (s)
 			{
@@ -1301,7 +1387,7 @@ namespace Waher.Content.Asn1
 					else
 					{
 						Asn1SetOfValues Size = this.ParseSizeOf(s);
-						Asn1Type Type = this.ParseDataType(Name, TypeDef, DefaultTags);
+						Asn1Type Type = this.ParseDataType(Name, TypeDef, DefaultTags, false);
 						return new Asn1SetOf(Size, Type, this);
 					}
 
@@ -1316,7 +1402,7 @@ namespace Waher.Content.Asn1
 					else
 					{
 						Asn1SetOfValues Size = this.ParseSizeOf(s);
-						Asn1Type Type = this.ParseDataType(Name, false, DefaultTags);
+						Asn1Type Type = this.ParseDataType(Name, false, DefaultTags, false);
 						return new Asn1SequenceOf(Name, TypeDef, Size, Type, this);
 					}
 
@@ -1356,6 +1442,11 @@ namespace Waher.Content.Asn1
 				default:
 					if (char.IsUpper(s[0]))
 						return new Asn1TypeReference(s, this);
+					else if (PermitUndefinedType)
+					{
+						this.pos -= s.Length;
+						return new Asn1UndefinedType(this);
+					}
 					else
 						throw this.SyntaxError("Type name expected: " + s);
 			}
@@ -1449,6 +1540,78 @@ namespace Waher.Content.Asn1
 			}
 
 			return Properties;
+		}
+
+		private Asn1ClassInstance ParseClassInstance(Asn1ClassDefinition ClassDef,
+			Asn1Tags? DefaultTags)
+		{
+			Dictionary<string, Asn1PropertyValue> Properties;
+
+			if (ClassDef.HasSyntax)
+			{
+				Properties = new Dictionary<string, Asn1PropertyValue>();
+
+				foreach (Asn1SyntaxNode SyntaxNode in ClassDef.Syntax)
+				{
+					if (!SyntaxNode.MatchesNext(Properties))
+						throw SyntaxNode.GetException();
+				}
+			}
+			else
+				Properties = this.ParsePropertyValues(DefaultTags);
+
+			foreach (Asn1PropertyDefinition PropertyDefinition in ClassDef.Properties)
+			{
+				if (!Properties.TryGetValue(PropertyDefinition.Name, out Asn1PropertyValue Value))
+					throw this.SyntaxError("Missing property: " + PropertyDefinition.Name);
+
+				Value.Type = PropertyDefinition.Type;   // TODO: Clone & set Parent
+			}
+
+			foreach (Asn1PropertyValue Value in Properties.Values)
+			{
+				if (Value.Type is null)
+					throw this.SyntaxError("Property not defined: " + Value.Name);
+			}
+
+			return new Asn1ClassInstance(ClassDef, Properties, this);
+		}
+
+		private Asn1ClassInstanceElement[] ParseClassInstanceSet(Asn1ClassDefinition ClassDef,
+			Asn1Tags? DefaultTags)
+		{
+			this.AssertNextToken("{");
+
+			List<Asn1ClassInstanceElement> Items = new List<Asn1ClassInstanceElement>();
+			string s = this.PeekNextToken();
+
+			while (s != "}")
+			{
+				if (s == "{")
+					Items.Add(this.ParseClassInstance(ClassDef, DefaultTags));
+				else if (!IsIdentifier(s))
+					throw this.SyntaxError("Expected identifier or class instance.");
+				else
+				{
+					Items.Add(new Asn1ClassInstanceReference(s, this));
+					this.pos += s.Length;
+				}
+
+				s = this.PeekNextToken();
+				if (s == "," || s == "|")
+				{
+					this.pos++;
+					s = this.PeekNextToken();
+					if (s == "}")
+						throw this.SyntaxError("Expected identifier.");
+				}
+				else if (s != "}")
+					throw this.SyntaxError(", or | or } expected.");
+			}
+
+			this.AssertNextToken("}");
+
+			return Items.ToArray();
 		}
 
 		private Asn1Node[] ParseList(Asn1Tags? DefaultTags, bool ClassInstance)
@@ -1667,6 +1830,8 @@ namespace Waher.Content.Asn1
 				default:
 					if (char.IsLetter(s[0]))
 					{
+						int Bak = this.pos;
+
 						this.pos += s.Length;
 
 						switch (this.PeekNextToken())
@@ -1691,7 +1856,14 @@ namespace Waher.Content.Asn1
 								if (!char.IsUpper(s[0]))
 									return new Asn1ValueReference(s, this);
 								else
-									throw this.SyntaxError("Type references not permitted here.");
+								{
+									this.pos = Bak;
+
+									Asn1Type Type = this.ParseDataType(string.Empty, true,
+										null, false);
+
+									return new Asn1TypeValue(Type, this);
+								}
 						}
 					}
 					else

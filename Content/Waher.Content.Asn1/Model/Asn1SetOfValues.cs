@@ -64,6 +64,10 @@ namespace Waher.Content.Asn1.Model
 			}
 
 			Name += Suffix;
+
+			if (this.Document.namedNodes.ContainsKey(Name))
+				throw this.Document.SyntaxError("Identifier already defined: " + Name);
+
 			this.Document.namedNodes[Name] = this;
 
 			if (this.setNamesPerVariable is null)

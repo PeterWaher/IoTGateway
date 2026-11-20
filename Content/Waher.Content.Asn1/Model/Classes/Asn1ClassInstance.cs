@@ -5,7 +5,7 @@ namespace Waher.Content.Asn1.Model.Classes
 	/// <summary>
 	/// Instance of a class.
 	/// </summary>
-	public class Asn1ClassInstance : Asn1Node
+	public class Asn1ClassInstance : Asn1ClassInstanceElement
 	{
 		private readonly Dictionary<string, Asn1PropertyValue> properties;
 		private readonly Asn1ClassDefinition @class;

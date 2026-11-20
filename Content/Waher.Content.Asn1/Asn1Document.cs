@@ -26,6 +26,7 @@ namespace Waher.Content.Asn1
 		internal readonly Dictionary<string, Asn1Node> namedNodes = new Dictionary<string, Asn1Node>();
 		internal readonly Dictionary<string, Asn1TypeDefinition> aliases = new Dictionary<string, Asn1TypeDefinition>();
 		internal readonly Dictionary<string, Asn1FieldValueDefinition> values = new Dictionary<string, Asn1FieldValueDefinition>();
+		internal readonly Dictionary<string, Asn1ClassDefinition> classes = new Dictionary<string, Asn1ClassDefinition>();
 		internal int pos = 0;
 		private readonly string text;
 		private readonly string location;
@@ -478,7 +479,7 @@ namespace Waher.Content.Asn1
 				if (string.IsNullOrEmpty(s))
 					throw this.SyntaxError("END expected.");
 
-				Asn1Node Node = this.ParseStatement(DefaultTags);
+				Asn1Node Node = this.ParseStatement(DefaultTags, false);
 				Items.Add(Node);
 
 				Node.ForEach(Node2 =>
@@ -490,7 +491,7 @@ namespace Waher.Content.Asn1
 							if (NamedNode is Asn1TypeDefinition TypeDef)
 								this.namedNodes[NamedNode.Name] = TypeDef;
 							else if (!(Prev is Asn1TypeDefinition) && !Prev.Equals(NamedNode))
-								throw new Exception("Duplicate type: " + NamedNode.Name);
+								throw this.SyntaxError("Duplicate type: " + NamedNode.Name);
 						}
 						else
 							this.namedNodes[NamedNode.Name] = Node2;
@@ -505,7 +506,7 @@ namespace Waher.Content.Asn1
 			return new Asn1Module(Imports?.ToArray(), Exports?.ToArray(), Items.ToArray(), this);
 		}
 
-		private Asn1Node ParseStatement(Asn1Tags? DefaultTags)
+		private Asn1Node ParseStatement(Asn1Tags? DefaultTags, bool ClassInstance)
 		{
 			string s = this.PeekNextToken();
 			if (string.IsNullOrEmpty(s))
@@ -534,19 +535,12 @@ namespace Waher.Content.Asn1
 					{
 						this.pos += 5;
 
-						Asn1Node[] Fields = this.ParseList(DefaultTags);
-						int i, c = Fields.Length;
-						Asn1PropertyDefinition[] Properties = new Asn1PropertyDefinition[c];
+						Asn1PropertyDefinition[] Properties = this.ParsePropertyDefinitions(DefaultTags);
+						Asn1ClassDefinition ClassDef = new Asn1ClassDefinition(s, Properties, this);
 
-						for (i = 0; i < c; i++)
-						{
-							if (!(Fields[i] is Asn1PropertyDefinition PropertyDef))
-								throw this.SyntaxError("Invalid class property.");
+						this.classes[s] = ClassDef;
 
-							Properties[i] = PropertyDef;
-						}
-
-						return new Asn1ClassDefinition(s, Properties, this);
+						return ClassDef;
 					}
 				}
 				else if (s2 == "MACRO")
@@ -589,6 +583,30 @@ namespace Waher.Content.Asn1
 					this.values[s] = ValueDef;
 
 					return ValueDef;
+				}
+				else if (this.classes.TryGetValue(s2, out Asn1ClassDefinition ClassDef))
+				{
+					this.pos += s2.Length;
+
+					this.AssertNextToken("::=");
+
+					Dictionary<string, Asn1PropertyValue> Properties = this.ParsePropertyValues(DefaultTags);
+
+					foreach (Asn1PropertyDefinition PropertyDefinition in ClassDef.Properties)
+					{
+						if (!Properties.TryGetValue(PropertyDefinition.Name, out Asn1PropertyValue Value))
+							throw this.SyntaxError("Missing property: " + PropertyDefinition.Name);
+
+						Value.Type = PropertyDefinition.Type;	// TODO: Clone & set Parent
+					}
+
+					foreach (Asn1PropertyValue Value in Properties.Values)
+					{
+						if (Value.Type is null)
+							throw this.SyntaxError("Property not defined: " + Value.Name);
+					}
+
+					return new Asn1ClassInstance(ClassDef, Properties, this);
 				}
 				else
 				{
@@ -704,9 +722,17 @@ namespace Waher.Content.Asn1
 				this.pos++;
 
 				string Name = this.ParseIdentifier();
-				Asn1Type Type = this.ParseType(Name, false, DefaultTags);
 
-				return new Asn1PropertyDefinition(Name, Type, this);
+				if (ClassInstance)
+				{
+					Asn1Value Value = this.ParseValue();
+					return new Asn1PropertyValue(Name, Value, this);
+				}
+				else
+				{
+					Asn1Type Type = this.ParseType(Name, false, DefaultTags);
+					return new Asn1PropertyDefinition(Name, Type, this);
+				}
 			}
 			else
 				throw this.SyntaxError("Identifier expected.");
@@ -1184,7 +1210,7 @@ namespace Waher.Content.Asn1
 
 					if (s == "{")
 					{
-						Asn1Node[] Nodes = this.ParseList(DefaultTags);
+						Asn1Node[] Nodes = this.ParseList(DefaultTags, false);
 						return new Asn1Choice(Name, TypeDef, Nodes, this);
 					}
 					else
@@ -1269,7 +1295,7 @@ namespace Waher.Content.Asn1
 
 					if (s == "{")
 					{
-						Asn1Node[] Nodes = this.ParseList(DefaultTags);
+						Asn1Node[] Nodes = this.ParseList(DefaultTags, false);
 						return new Asn1Set(Name, TypeDef, Nodes, this);
 					}
 					else
@@ -1284,7 +1310,7 @@ namespace Waher.Content.Asn1
 
 					if (s == "{")
 					{
-						Asn1Node[] Nodes = this.ParseList(DefaultTags);
+						Asn1Node[] Nodes = this.ParseList(DefaultTags, false);
 						return new Asn1Sequence(Name, TypeDef, Nodes, this);
 					}
 					else
@@ -1391,7 +1417,41 @@ namespace Waher.Content.Asn1
 			return Size;
 		}
 
-		private Asn1Node[] ParseList(Asn1Tags? DefaultTags)
+		private Asn1PropertyDefinition[] ParsePropertyDefinitions(Asn1Tags? DefaultTags)
+		{
+			Asn1Node[] Fields = this.ParseList(DefaultTags, false);
+			int i, c = Fields.Length;
+			Asn1PropertyDefinition[] Properties = new Asn1PropertyDefinition[c];
+
+			for (i = 0; i < c; i++)
+			{
+				if (!(Fields[i] is Asn1PropertyDefinition PropertyDef))
+					throw this.SyntaxError("Invalid class property.");
+
+				Properties[i] = PropertyDef;
+			}
+
+			return Properties;
+		}
+
+		private Dictionary<string, Asn1PropertyValue> ParsePropertyValues(Asn1Tags? DefaultTags)
+		{
+			Asn1Node[] Fields = this.ParseList(DefaultTags, true);
+			int i, c = Fields.Length;
+			Dictionary<string, Asn1PropertyValue> Properties = new Dictionary<string, Asn1PropertyValue>();
+
+			for (i = 0; i < c; i++)
+			{
+				if (!(Fields[i] is Asn1PropertyValue PropertyValue))
+					throw this.SyntaxError("Invalid class instance property value.");
+
+				Properties[PropertyValue.Name] = PropertyValue;
+			}
+
+			return Properties;
+		}
+
+		private Asn1Node[] ParseList(Asn1Tags? DefaultTags, bool ClassInstance)
 		{
 			this.AssertNextToken("{");
 
@@ -1399,7 +1459,7 @@ namespace Waher.Content.Asn1
 
 			while (true)
 			{
-				Items.Add(this.ParseStatement(DefaultTags));
+				Items.Add(this.ParseStatement(DefaultTags, ClassInstance));
 
 				switch (this.PeekNextToken())
 				{

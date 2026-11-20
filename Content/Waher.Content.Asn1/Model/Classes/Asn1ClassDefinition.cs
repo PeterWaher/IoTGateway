@@ -21,5 +21,18 @@
 			this.name = Name;
 			this.properties = Properties;
 		}
+
+		/// <summary>
+		/// Class name
+		/// </summary>
+		public string Name => this.name;
+
+		/// <summary>
+		/// Property definitions
+		/// </summary>
+		public Asn1PropertyDefinition[] Properties => this.properties;
+
+		/// <inheritdoc/>
+		public override string ToString() => this.name;
 	}
 }

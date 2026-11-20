@@ -265,7 +265,7 @@ namespace Waher.Content.Asn1.Model
 					foreach (Asn1Node Node in this.Nodes)
 					{
 						if (!(Node is Asn1FieldDefinition FieldDef))
-							throw new Exception("Expected ASN.1 field definitions inside CHOICE.");
+							throw new AsnContentException("Expected ASN.1 field definitions inside CHOICE.");
 
 						Asn1Tags? Tags = this.Tags;
 
@@ -446,7 +446,7 @@ namespace Waher.Content.Asn1.Model
 					foreach (Asn1Node Node in this.Nodes)
 					{
 						if (!(Node is Asn1FieldDefinition FieldDef))
-							throw new Exception("Expected ASN.1 field definitions inside CHOICE.");
+							throw new AsnContentException("Expected ASN.1 field definitions inside CHOICE.");
 
 						JSON.Indent(Output, Indent);
 						Output.Append("case _Options.");

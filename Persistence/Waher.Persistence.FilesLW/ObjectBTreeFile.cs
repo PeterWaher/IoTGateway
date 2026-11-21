@@ -6915,13 +6915,14 @@ namespace Waher.Persistence.Files
 
 			int Pos = 0;
 			int c = 0;
+			int Shift = 0;
 			byte b;
 
 			do
 			{
-				c <<= 7;
 				b = Bin[Pos++];
-				c |= b & 0x7f;
+				c |= (b & 0x7f) << Shift;
+				Shift += 7;
 			}
 			while (b >= 0x80);
 

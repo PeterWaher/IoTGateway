@@ -21,7 +21,7 @@ IMPORTS
 
 id-sha224, id-sha256, id-sha384, id-sha512, id-sha512-224,
 id-sha512-256
-    FROM NIST-SHA2 {
+    FROM AlgorithmObjectIdentifiers {
         joint-iso-itu-t(2) country(16) us(840) organization(1)
         gov(101) csor(3) nistalgorithm(4) hashAlgs(2)
     };

@@ -52,9 +52,7 @@
   </ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-		<!--
-		<Exec Command="&quot;$(ProjectDir)..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Debug\net8.0\win-x86\Waher.Utility.Asn1ToCSharp.exe&quot; -n Waher.Security.PKCS.Certificates -o &quot;$(ProjectDir)Certificates&quot; -f &quot;$(ProjectDir)Certificates\Asn1\NIST&quot; -r -i &quot;$(ProjectDir)Certificates\Asn1\*.asn1&quot;" />
-		-->
+		<Exec Command="&quot;$(ProjectDir)..\..\Utilities\Waher.Utility.Asn1ToCSharp\bin\Debug\net8.0\win-x86\Waher.Utility.Asn1ToCSharp.exe&quot; -n Waher.Security.PKCS.Certificates -o &quot;$(ProjectDir)Certificates&quot; -f &quot;$(ProjectDir)Certificates\Asn1\X.509 PKIX&quot; -r -i &quot;$(ProjectDir)Certificates\Asn1\*.asn1&quot;" />
 	</Target>
 
 </Project>

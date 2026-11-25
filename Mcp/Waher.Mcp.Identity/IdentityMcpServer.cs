@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Waher.Content;
 using Waher.Content.Binary;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Mcp.Identity.Resources;
 using Waher.Mcp.Identity.Responses;
@@ -48,6 +50,7 @@ namespace Waher.Mcp.Identity
 		internal const string ReadyForApprovalPrivilege = ToolsPrivilege + ".ReadyForApproval";
 		internal const string AttachmentPrivilege = ToolsPrivilege + ".Attachment";
 		internal const string AddAttachmentPrivilege = AttachmentPrivilege + ".Add";
+		internal const string QuickLoginPrivilege = ToolsPrivilege + ".QuickLogin";
 		internal const string RemoveAttachmentPrivilege = AttachmentPrivilege + ".Remove";
 		internal const string CreatePromptPrivilege = PromptsPrivilege + ".Create";
 		internal const string CreatePersonalIdentityPrivilege = CreatePromptPrivilege + ".Create.PersonalId";
@@ -2722,6 +2725,115 @@ namespace Waher.Mcp.Identity
 			{
 				if (await PetitionCache.RemoveCachedObject(User.UserName, e.ContractIdUriString))
 					this.ResourcesUpdated(User);
+			}
+		}
+
+		/// <summary>
+		/// MCP Server Tool to perform a quick-login using the currently approved
+		/// Legal Identity.
+		/// </summary>
+		/// <param name="Call">JSON-RPC call object.</param>
+		/// <param name="Uri">URI having the tagsign URI scheme.</param>
+		/// <returns>Results of operation.</returns>
+		[McpServerTool(
+			"Initiate Quick-Login",
+			"Initiates the Quick-Login procedure given a URI with the tagsign URI " +
+			"scheme, using the currently approved Legal Identity associated with the " +
+			"account.",
+			"",     // IconsMethod, use default icons
+			false,  // CanModifyEnvironment
+			false,  // CanDestroyEnvironment
+			false,  // Idempotent
+			true)]  // OpenWorldAccess
+		[RequiredPrivilege(QuickLoginPrivilege)]
+		[return: McpParameter("Result", "Result of operation.")]
+		public async Task<GenericResponse> InitiateQuickLogin(
+			IJsonRpcCall Call,
+
+			[McpStringParameter("Uri", "URI having the tagsign URI scheme.")]
+			string Uri)
+		{
+			Session? Session = await this.TryGetMcpSession(Call);
+			if (Session is null)
+				return new GenericResponse(false, "No MCP session.");
+
+			IUser? User = await this.GetAuthenticatedUser(Call, Session);
+			if (Call.ResponseSent || User is null)
+				return new GenericResponse(false, "User not authenticated.");
+
+			ContractsClient? Client = await this.GetClient(Call, User, Session, true);
+			if (Client is null)
+				return new GenericResponse(false, "MCP XMPP Contracts client not available.");
+
+			if (!Uri.StartsWith("tagsign:"))
+				return new GenericResponse(false, "Invalid tagsign URI.");
+
+			Uri = Uri[8..];
+
+			int Separator = Uri.IndexOf(',');
+			if (Separator <= 0 ||
+				Separator == Uri.Length - 1)
+			{
+				return new GenericResponse(false, "Invalid tagsign URI.");
+			}
+
+			foreach (char ch in Uri)
+			{
+				if (char.IsControl(ch))
+					return new GenericResponse(false, "Invalid tagsign URI.");
+			}
+
+			string Jid = HttpUtility.UrlDecode(Uri[..Separator]);
+			string Key = Uri[(Separator + 1)..];
+			int QueryStart = Key.IndexOf('?');
+			if (QueryStart >= 0)
+				Key = Key[..QueryStart];
+
+			if (string.IsNullOrEmpty(Key) ||
+				string.IsNullOrEmpty(Jid) ||
+				(!XmppClient.FullJidRegEx.IsMatch(Jid) &&
+				!XmppClient.DomainJidRegEx.IsMatch(Jid)))
+			{
+				return new GenericResponse(false, "Invalid tagsign URI.");
+			}
+
+			foreach (char ch in Key)
+			{
+				if (char.IsWhiteSpace(ch))
+					return new GenericResponse(false, "Invalid tagsign URI.");
+			}
+
+			foreach (char ch in Jid)
+			{
+				if (char.IsWhiteSpace(ch))
+					return new GenericResponse(false, "Invalid tagsign URI.");
+			}
+
+			try
+			{
+				string LegalId = await Client.GetLatestApprovedLegalId();
+				if (string.IsNullOrEmpty(LegalId))
+					return new GenericResponse(false, "No approved Legal Identity associated with account.");
+
+				LegalIdentity Identity = await Client.GetLegalIdentityAsync(LegalId);
+				if (Identity is null)
+					return new GenericResponse(false, "Legal Identity not found.");
+
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<ql xmlns='https://tagroot.io/schema/Signature' key='");
+				Xml.Append(XML.Encode(Key));
+				Xml.Append("' legalId='");
+				Xml.Append(XML.Encode(LegalId));
+				Xml.Append("'/>");
+
+				await Client.Client.IqSetAsync(Jid, Xml.ToString());
+
+				return new GenericResponse(true, "Signature request successfully initiated.");
+			}
+			catch (Exception ex)
+			{
+				return new GenericResponse(false, ex.Message);
 			}
 		}
 

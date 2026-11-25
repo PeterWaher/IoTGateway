@@ -15,6 +15,7 @@ using Waher.Runtime.Collections;
 using System.Formats.Asn1;
 using System.Numerics;
 using System.Net;
+using System;
 
 namespace Waher.Content.Asn1
 {
@@ -125,9 +126,15 @@ namespace Waher.Content.Asn1
 				{
 					this.pos += 2;
 
-					while ((this.pos < this.len && this.text[this.pos] != '*') ||
-						(this.pos < this.lenm1 && this.text[this.pos + 1] != '/'))
+					while (this.pos < this.len)
 					{
+						ch = this.text[this.pos];
+						if (ch == '*' && this.pos < this.len - 1 && this.text[this.pos + 1] == '/')
+						{
+							this.pos += 2;
+							break;
+						}
+
 						this.pos++;
 					}
 				}
@@ -364,23 +371,34 @@ namespace Waher.Content.Asn1
 
 						s = this.PeekNextToken();
 
+						if (s == "{")
+						{
+							Asn1Node[] Nodes = this.ParseList(DefaultTags, false);
+							// TODO: What to do with these?
+
+							s = this.PeekNextToken();
+						}
+
 						if (s == "FROM")
 						{
 							this.pos += 4;
 							Identifiers.Add(Identifier);
 							ModuleRef = this.ParseTypeNameIdentifier();
 
-							Imports.Add(new Asn1Import(Identifiers.ToArray(), ModuleRef, this));
+							Asn1Import Import = new Asn1Import(Identifiers.ToArray(),
+								ModuleRef, this);
+
+							Imports.Add(Import);
 							Identifiers.Clear();
 
 							s = this.PeekNextToken();
 
 							if (s == "{")
 							{
-								Asn1Oid Oid = this.ParseOid();
+								Import.Oid = this.ParseOid();
 								if (this.namedNodes.TryGetValue(ModuleRef, out Asn1Node PrevModuleDef))
 								{
-									if (!Oid.Equals(PrevModuleDef))
+									if (!Import.Oid.Equals(PrevModuleDef))
 										throw this.SyntaxError(ModuleRef + " already defined.");
 								}
 								else
@@ -388,10 +406,19 @@ namespace Waher.Content.Asn1
 									if (this.namedNodes.ContainsKey(ModuleRef))
 										throw this.SyntaxError("Identifier already defined: " + ModuleRef);
 
-									this.namedNodes[ModuleRef] = Oid;
+									this.namedNodes[ModuleRef] = Import;
 								}
 
 								s = this.PeekNextToken();
+
+								if (s == "WITH")
+								{
+									this.pos += 4;
+									this.AssertNextToken("SUCCESSORS");
+									Import.WithSuccessors = true;
+
+									s = this.PeekNextToken();
+								}
 							}
 
 							if (s != ";")
@@ -429,7 +456,7 @@ namespace Waher.Content.Asn1
 					foreach (Asn1Import Import in Imports)
 					{
 						Asn1Document Doc = await Import.LoadDocument();
-
+						
 						foreach (string Identifier in Import.Identifiers)
 						{
 							if (!Doc.namedNodes.TryGetValue(Identifier, out Asn1Node ImportedNode))
@@ -1653,6 +1680,12 @@ namespace Waher.Content.Asn1
 		private Asn1Node[] ParseList(Asn1Tags? DefaultTags, bool ClassInstance)
 		{
 			this.AssertNextToken("{");
+
+			if (this.PeekNextToken() == "}")
+			{
+				this.pos++;
+				return Array.Empty<Asn1Node>();
+			}
 
 			List<Asn1Node> Items = new List<Asn1Node>();
 

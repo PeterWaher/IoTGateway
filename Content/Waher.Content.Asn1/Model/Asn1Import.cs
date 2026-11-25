@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using Waher.Content.Asn1.Model.Values;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -10,7 +11,9 @@ namespace Waher.Content.Asn1.Model
 	{
 		private readonly string[] identifiers;
 		private readonly string module;
+		private Asn1Oid oid;
 		private Asn1Document importedDocument;
+		private bool withSuccessors = false;
 
 		/// <summary>
 		/// Represents one import instruction.
@@ -35,6 +38,24 @@ namespace Waher.Content.Asn1.Model
 		/// Module reference.
 		/// </summary>
 		public string Module => this.module;
+
+		/// <summary>
+		/// Object Identifier of module.
+		/// </summary>
+		public Asn1Oid Oid
+		{
+			get => this.oid;
+			internal set => this.oid = value;
+		}
+
+		/// <summary>
+		/// If a successor module is acceptable.
+		/// </summary>
+		public bool WithSuccessors
+		{
+			get => this.withSuccessors;
+			internal set => this.withSuccessors = value;
+		}
 
 		/// <summary>
 		/// Loads the ASN.1 document to import.

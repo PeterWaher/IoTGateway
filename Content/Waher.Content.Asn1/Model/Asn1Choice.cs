@@ -262,12 +262,14 @@ namespace Waher.Content.Asn1.Model
 					Asn1Tag[] AcceptedTags;
 					int Index = 0;
 
+					Asn1Tags? Tags = this.Tags;
+					if (Tags.HasValue && Tags.Value == Asn1Tags.Automatic)
+						Tags = Asn1Tags.Explicit;   // For CHOICE, AUTOMATIC equals EXPLICIT
+
 					foreach (Asn1Node Node in this.Nodes)
 					{
 						if (!(Node is Asn1FieldDefinition FieldDef))
 							throw new AsnContentException("Expected ASN.1 field definitions inside CHOICE.");
-
-						Asn1Tags? Tags = this.Tags;
 
 						switch (Tags)
 						{
@@ -454,10 +456,6 @@ namespace Waher.Content.Asn1.Model
 						Output.AppendLine(":");
 
 						Indent++;
-
-						Asn1Tags? Tags = this.Tags;
-						if (Tags.HasValue && Tags.Value == Asn1Tags.Automatic)
-							Tags = Asn1Tags.Explicit;   // For CHOICE, AUTOMATIC equals EXPLICIT
 
 						await Node.ExportRestrictionCheck(Output, State, Indent, "this");
 						await Node.ExportWriteCSharp(Output, State, Indent, "this", Index++, Tags);

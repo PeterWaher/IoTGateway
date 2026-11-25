@@ -1,6 +1,7 @@
 ﻿using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Asn1.Model.Macro;
 using Waher.Content.Asn1.Model.Types;
 
 namespace Waher.Content.Asn1.Model.Classes
@@ -22,7 +23,7 @@ namespace Waher.Content.Asn1.Model.Classes
 			: base(Document)
 		{
 			this.name = Name;
-			this.declaration = new Asn1UndefinedType(Document);
+			this.declaration = new Asn1Any(Document);
 		}
 
 		/// <summary>
@@ -38,46 +39,6 @@ namespace Waher.Content.Asn1.Model.Classes
 			get => this.declaration;
 			internal set => this.declaration = value;
 		}
-
-		/// <summary>
-		/// How tags are encoded
-		/// </summary>
-		public override Asn1Tags? Tags => base.Tags ?? this.declaration.Tags;
-
-		/// <summary>
-		/// Any restrictions placed on the type.
-		/// </summary>
-		public override Asn1Restriction Restriction => base.Restriction ?? this.declaration.Restriction;
-
-		/// <summary>
-		/// If values must be unique.
-		/// </summary>
-		public override bool? Unique => base.Unique ?? this.declaration.Unique;
-
-		/// <summary>
-		/// If the type must be present
-		/// </summary>
-		public override bool? Present => base.Present ?? this.declaration.Present;
-
-		/// <summary>
-		/// If the type must be absent
-		/// </summary>
-		public override bool? Absent => base.Absent ?? this.declaration.Absent;
-
-		/// <summary>
-		/// Default value for type
-		/// </summary>
-		public override Asn1Node Default => base.Default ?? this.declaration.Default;
-		
-		/// <summary>
-		/// If the type is a constructed type.
-		/// </summary>
-		public override bool ConstructedType => this.declaration.ConstructedType;
-
-		/// <summary>
-		/// If the type is passed by reference.
-		/// </summary>
-		public override bool ByReference => this.declaration.ByReference;
 
 		/// <summary>
 		/// Corresponding C# type.
@@ -97,6 +58,73 @@ namespace Waher.Content.Asn1.Model.Classes
 		/// <inheritdoc/>
 		public override string ToString() => this.name;
 
+
+		/// <summary>
+		/// How tags are encoded
+		/// </summary>
+		public override Asn1Tags? Tags => this.declaration.Tags;
+
+		/// <summary>
+		/// Any restrictions placed on the type.
+		/// </summary>
+		public override Asn1Restriction Restriction => this.declaration.Restriction;
+
+		/// <summary>
+		/// If values must be unique.
+		/// </summary>
+		public override bool? Unique => this.declaration.Unique;
+
+		/// <summary>
+		/// If the type must be present
+		/// </summary>
+		public override bool? Present => this.declaration.Present;
+
+		/// <summary>
+		/// If the type must be absent
+		/// </summary>
+		public override bool? Absent => this.declaration.Absent;
+
+		/// <summary>
+		/// Default value for type
+		/// </summary>
+		public override Asn1Node Default => this.declaration.Default;
+
+		/// <summary>
+		/// If the type is a constructed type.
+		/// </summary>
+		public override bool ConstructedType => this.declaration.ConstructedType;
+
+		/// <summary>
+		/// If the type is passed by reference.
+		/// </summary>
+		public override bool ByReference => this.declaration.ByReference;
+
+		/// <summary>
+		/// Parses the portion of the document at the current position, according to the type.
+		/// </summary>
+		/// <param name="Document">ASN.1 document being parsed.</param>
+		/// <param name="Macro">Macro performing parsing.</param>
+		/// <returns>Parsed ASN.1 node.</returns>
+		public override Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
+		{
+			return this.declaration.Parse(Document, Macro);
+		}
+
+		/// <summary>
+		/// Exports any restriction to C#
+		/// </summary>
+		/// <param name="Output">C# Output.</param>
+		/// <param name="State">C# export state.</param>
+		/// <param name="Indent">Indentation</param>
+		/// <param name="VariableName">Name of variable to check.</param>
+		/// <param name="Pass">Export pass</param>
+		public override Task ExportRestrictionCSharp(StringBuilder Output,
+			CSharpExportState State, int Indent, string VariableName, CSharpExportPass Pass)
+		{
+			return this.declaration.ExportRestrictionCSharp(Output, State, Indent,
+				VariableName, Pass);
+		}
+
 		/// <summary>
 		/// Exports to C#
 		/// </summary>
@@ -107,7 +135,16 @@ namespace Waher.Content.Asn1.Model.Classes
 		public override Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
-			return this.declaration.ExportCSharp(Output, State, Indent, Pass);
+			if (Pass == CSharpExportPass.Explicit)
+			{
+				Output.Append("public ");
+				this.declaration.ExportCSharp(Output, State, Indent, Pass);
+				Output.Append(';');
+
+				return Task.CompletedTask;
+			}
+			else
+				return this.declaration.ExportCSharp(Output, State, Indent, Pass);
 		}
 
 		/// <summary>
@@ -167,22 +204,7 @@ namespace Waher.Content.Asn1.Model.Classes
 		public override Task ExportWriteCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, string MemberOf, int Index, Asn1Tags? Tags)
 		{
-			return this.ExportWriteCSharp(Output, State, Indent, MemberOf, Index, Tags);
-		}
-
-		/// <summary>
-		/// Exports any restriction to C#
-		/// </summary>
-		/// <param name="Output">C# Output.</param>
-		/// <param name="State">C# export state.</param>
-		/// <param name="Indent">Indentation</param>
-		/// <param name="VariableName">Name of variable to check.</param>
-		/// <param name="Pass">Export pass</param>
-		public override Task ExportRestrictionCSharp(StringBuilder Output,
-			CSharpExportState State, int Indent, string VariableName, CSharpExportPass Pass)
-		{
-			return this.declaration.ExportRestrictionCSharp(Output, State, Indent,
-				VariableName, Pass);
+			return this.declaration.ExportWriteCSharp(Output, State, Indent, MemberOf, Index, Tags);
 		}
 
 	}

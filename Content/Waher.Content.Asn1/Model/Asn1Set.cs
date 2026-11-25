@@ -251,12 +251,12 @@ namespace Waher.Content.Asn1.Model
 
 					Index = 0;
 
+					Asn1Tags? Tags = this.Tags;
+					if (Tags.HasValue && Tags.Value == Asn1Tags.Automatic)
+						Tags = Asn1Tags.Implicit;   // For SET, AUTOMATIC equals IMPLICIT
+
 					foreach (Asn1Node Node in this.Nodes)
 					{
-						Asn1Tags? Tags = this.Tags;
-						if (Tags.HasValue && Tags.Value == Asn1Tags.Automatic)
-							Tags = Asn1Tags.Implicit;   // For SET, AUTOMATIC equals IMPLICIT
-
 						await Node.ExportRestrictionCheck(Output, State, Indent, "this");
 						await Node.ExportWriteCSharp(Output, State, Indent, "this", Index++, Tags);
 					}

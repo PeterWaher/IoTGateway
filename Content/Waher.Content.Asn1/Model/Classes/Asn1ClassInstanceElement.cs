@@ -3,7 +3,7 @@
 	/// <summary>
 	/// Abstract base class for class instance elements.
 	/// </summary>
-	public abstract class Asn1ClassInstanceElement : Asn1Node
+	public abstract class Asn1ClassInstanceElement : Asn1Type
 	{
 		/// <summary>
 		/// Abstract base class for class instance elements.

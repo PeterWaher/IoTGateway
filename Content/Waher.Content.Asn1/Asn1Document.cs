@@ -560,7 +560,7 @@ namespace Waher.Content.Asn1
 							out Asn1PropertyDefinition[] Properties);
 
 						Asn1ClassDefinition ClassDef = new Asn1ClassDefinition(s,
-							Types, Properties, this);
+							Types, DefaultTags, Properties, this);
 
 						if (this.namedNodes.ContainsKey(s))
 							throw this.SyntaxError("Identifier already defined: " + s);
@@ -576,8 +576,6 @@ namespace Waher.Content.Asn1
 							ClassDef.Syntax = this.ParseSyntaxElements("{", "}", true,
 								ClassDef);
 						}
-
-						this.pos++;
 
 						return ClassDef;
 					}
@@ -632,11 +630,11 @@ namespace Waher.Content.Asn1
 
 					if (char.IsUpper(s[0]))
 					{
-						return new Asn1ClassSet(
+						return new Asn1ClassSet(s, ClassDef,
 							this.ParseClassInstanceSet(ClassDef, DefaultTags), this);
 					}
 					else
-						return this.ParseClassInstance(ClassDef, DefaultTags);
+						return this.ParseClassInstance(s, ClassDef, DefaultTags);
 				}
 				else
 				{
@@ -754,7 +752,7 @@ namespace Waher.Content.Asn1
 				string Name = this.ParseIdentifier();
 
 				if (char.IsUpper(Name[0]))
-					return new Asn1TypeDeclaration(Name, this);
+					return new Asn1PropertyDefinition(Name, new Asn1Any(this), this);
 
 				if (ClassInstance)
 				{
@@ -1270,7 +1268,7 @@ namespace Waher.Content.Asn1
 			if (string.IsNullOrEmpty(s))
 			{
 				if (PermitUndefinedType)
-					return new Asn1UndefinedType(this);
+					return new Asn1Any(this);
 				else
 					throw this.SyntaxError("Unexpected end of file.");
 			}
@@ -1471,7 +1469,7 @@ namespace Waher.Content.Asn1
 					else if (PermitUndefinedType)
 					{
 						this.pos -= s.Length;
-						return new Asn1UndefinedType(this);
+						return new Asn1Any(this);
 					}
 					else
 						throw this.SyntaxError("Type name expected: " + s);
@@ -1573,8 +1571,8 @@ namespace Waher.Content.Asn1
 			return Properties;
 		}
 
-		private Asn1ClassInstance ParseClassInstance(Asn1ClassDefinition ClassDef,
-			Asn1Tags? DefaultTags)
+		private Asn1ClassInstance ParseClassInstance(string Name,
+			Asn1ClassDefinition ClassDef, Asn1Tags? DefaultTags)
 		{
 			Dictionary<string, Asn1PropertyValue> Properties;
 
@@ -1612,7 +1610,7 @@ namespace Waher.Content.Asn1
 					throw this.SyntaxError("Property not defined: " + Value.Name);
 			}
 
-			return new Asn1ClassInstance(ClassDef, Properties, this);
+			return new Asn1ClassInstance(Name, ClassDef, DefaultTags, Properties, this);
 		}
 
 		private Asn1ClassInstanceElement[] ParseClassInstanceSet(Asn1ClassDefinition ClassDef,
@@ -1626,7 +1624,7 @@ namespace Waher.Content.Asn1
 			while (s != "}")
 			{
 				if (s == "{")
-					Items.Add(this.ParseClassInstance(ClassDef, DefaultTags));
+					Items.Add(this.ParseClassInstance(string.Empty, ClassDef, DefaultTags));
 				else if (!IsIdentifier(s))
 					throw this.SyntaxError("Expected identifier or class instance.");
 				else

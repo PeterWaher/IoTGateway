@@ -296,5 +296,11 @@ namespace Waher.Content.Asn1.Test
 			await GenerateCSharp("ClassFieldReferences.asn1");
 		}
 
+		[TestMethod]
+		public async Task Test_23_PKCS_1()
+		{
+			await GenerateCSharp("PKCS\\PKCS#1\\RFC8017.asn1");
+		}
+
 	}
 }

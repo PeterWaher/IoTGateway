@@ -151,5 +151,11 @@ namespace Waher.Content.Asn1.Test
 			await ParseAsn1Document("ClassFieldReferences.asn1");
 		}
 
+		[TestMethod]
+		public async Task Test_23_PKCS_1()
+		{
+			await ParseAsn1Document("PKCS\\PKCS#1\\RFC8017.asn1");
+		}
+
 	}
 }

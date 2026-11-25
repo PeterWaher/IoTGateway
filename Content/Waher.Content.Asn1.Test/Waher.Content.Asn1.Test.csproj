@@ -183,6 +183,30 @@
     <None Remove="Examples\IEEE1451\P21451-N1-T2-MIB.asn1" />
     <None Remove="Examples\IEEE1451\P21451-N1-T3-MIB.asn1" />
     <None Remove="Examples\MyShopPurchaseOrders.asn1" />
+    <None Remove="Examples\PKCS\PKCS#10\RFC2986.asn1" />
+    <None Remove="Examples\PKCS\PKCS#12\RFC7292.asn1" />
+    <None Remove="Examples\PKCS\PKCS#1\RFC8017.asn1" />
+    <None Remove="Examples\PKCS\PKCS#5\RFC8018.asn1" />
+    <None Remove="Examples\PKCS\PKCS#8\RFC5208.asn1" />
+    <None Remove="Examples\PKCS\X.501\ITU-T X.509 InformationFramework.asn1" />
+    <None Remove="Examples\PKCS\X.501\ITU-T X.509 UsefulDefinitions.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\AlgorithmInformation-2009 - RFC5912.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\AlgorithmObjectIdentifiers.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\AttributeCertificateVersion1-2009 - RFC5912.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\EnrollmentMessageSyntax-2009 - RFC5912.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\OCSP-2009 - RFC5912.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\PKIX-CommonTypes-2009 - RFC5912.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\PKIX-X400Address-2009 - RFC5912.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\PKIX1-PSS-OAEP-Algorithms - RFC4055.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\PKIX1-PSS-OAEP-Algorithms-2009 - RFC5912.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\PKIX1Explicit-2009 - RFC5912.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\PKIX1Explicit88 - RFC5280.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\PKIX1Implicit-2009 - RFC5912.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\PKIXAlgs-2009 - RFC5912.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\PKIXAttributeCertificate-2009 - RFC5912.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\PKIXCMP-2009 - RFC5912.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\PKIXCRMF-2009 - RFC5912.asn1" />
+    <None Remove="Examples\PKCS\X.509 PKIX\SCVP-2009 - RFC5912.asn1" />
     <None Remove="Examples\RFC1157-SNMP.asn1" />
     <None Remove="Examples\SNMPv1\RFC1155-SMI.asn1" />
     <None Remove="Examples\SNMPv1\RFC1158-MIB.asn1" />
@@ -733,6 +757,87 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Examples\IEEE1451\P21451-N1-T3-MIB.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\PKCS#10\RFC2986.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\PKCS#12\RFC7292.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\PKCS#1\UsefulDefinitions.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\PKCS#1\AuthenticationFramework.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\PKCS#1\AlgorithmObjectIdentifiers.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\PKCS#1\RFC8017.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\PKCS#5\RFC8018.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\PKCS#8\RFC5208.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\ITU-T X.509 InformationFramework.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\ITU-T X.509 UsefulDefinitions.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\AlgorithmInformation-2009 - RFC5912.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\AlgorithmObjectIdentifiers.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\AttributeCertificateVersion1-2009 - RFC5912.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\EnrollmentMessageSyntax-2009 - RFC5912.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\OCSP-2009 - RFC5912.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\PKIX-CommonTypes-2009 - RFC5912.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\PKIX-X400Address-2009 - RFC5912.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\PKIX1-PSS-OAEP-Algorithms - RFC4055.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\PKIX1-PSS-OAEP-Algorithms-2009 - RFC5912.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\PKIX1Explicit-2009 - RFC5912.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\PKIX1Explicit88 - RFC5280.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\PKIX1Implicit-2009 - RFC5912.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\PKIXAlgs-2009 - RFC5912.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\PKIXAttributeCertificate-2009 - RFC5912.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\PKIXCMP-2009 - RFC5912.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\PKIXCRMF-2009 - RFC5912.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509 PKIX\SCVP-2009 - RFC5912.asn1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Examples\SNMPv1\RFC1155-SMI.asn1">

@@ -5016,7 +5016,12 @@ namespace Waher.Networking.XMPP
 			else
 			{
 				if (!XML.IsValidXml(CustomXml, true, true, true, true, false, false))
-					throw new ArgumentException("Not valid XML.", nameof(CustomXml));
+				{
+					if (CustomXml.Length > 1000)
+						CustomXml = CustomXml[..1000] + "...";
+
+					throw new ArgumentException("Not valid XML: " + CustomXml, nameof(CustomXml));
+				}
 
 				Xml.Append(">");
 				Xml.Append(CustomXml);
@@ -5261,7 +5266,12 @@ namespace Waher.Networking.XMPP
 			else
 			{
 				if (!XML.IsValidXml(CustomXml, true, true, true, true, false, false))
-					throw new ArgumentException("Not valid XML.", nameof(CustomXml));
+				{
+					if (CustomXml.Length > 1000)
+						CustomXml = CustomXml[..1000] + "...";
+
+					throw new ArgumentException("Not valid XML: " + CustomXml, nameof(CustomXml));
+				}
 
 				Xml.Append(">");
 				Xml.Append(CustomXml);
@@ -5567,7 +5577,12 @@ namespace Waher.Networking.XMPP
 			if (!string.IsNullOrEmpty(CustomXml))
 			{
 				if (!XML.IsValidXml(CustomXml, true, true, true, true, false, false))
-					throw new ArgumentException("Not valid XML.", nameof(CustomXml));
+				{
+					if (CustomXml.Length > 1000)
+						CustomXml = CustomXml[..1000] + "...";
+
+					throw new ArgumentException("Not valid XML: " + CustomXml, nameof(CustomXml));
+				}
 
 				Xml.Append(CustomXml);
 			}

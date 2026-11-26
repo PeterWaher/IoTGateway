@@ -26,9 +26,9 @@ namespace Waher.Content.Asn1.Model.Classes
 		/// </summary>
 		/// <param name="Properties">Properties parsed.</param>
 		/// <returns>If the node matches the current position.</returns>
-		public override bool MatchesNext(Dictionary<string, Asn1PropertyValue> Properties)
+		public override bool MatchesNext(Dictionary<string, Asn1Node> Properties)
 		{
-			Dictionary<string, Asn1PropertyValue> Properties2 = new Dictionary<string, Asn1PropertyValue>();
+			Dictionary<string, Asn1Node> Properties2 = new Dictionary<string, Asn1Node>();
 			int Bak = this.Document.pos;
 
 			foreach (Asn1SyntaxNode SyntaxNode in this.syntax)
@@ -40,7 +40,7 @@ namespace Waher.Content.Asn1.Model.Classes
 				}
 			}
 
-			foreach (KeyValuePair<string, Asn1PropertyValue> P in Properties2)
+			foreach (KeyValuePair<string, Asn1Node> P in Properties2)
 				Properties[P.Key] = P.Value;
 
 			return true;

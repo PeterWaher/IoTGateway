@@ -10,6 +10,7 @@ namespace Waher.Content.Asn1.Model.Classes
 	{
 		private readonly Asn1ClassInstanceElement[] classes;
 		private readonly Asn1ClassDefinition @class;
+		private readonly string className;
 		private readonly string name;
 
 		/// <summary>
@@ -25,6 +26,24 @@ namespace Waher.Content.Asn1.Model.Classes
 		{
 			this.name = Name;
 			this.@class = Class;
+			this.className = Class.Name;
+			this.classes = Classes;
+		}
+
+		/// <summary>
+		/// Set of classes.
+		/// </summary>
+		/// <param name="Name">Class set name.</param>
+		/// <param name="ClassName">Class name.</param>
+		/// <param name="Classes">Class instance elements.</param>
+		/// <param name="Document">ASN.1 document hosting the node.</param>
+		public Asn1ClassSet(string Name, string ClassName,
+			Asn1ClassInstanceElement[] Classes, Asn1Document Document)
+			: base(Document)
+		{
+			this.name = Name;
+			this.@class = null;
+			this.className = ClassName;
 			this.classes = Classes;
 		}
 
@@ -37,6 +56,11 @@ namespace Waher.Content.Asn1.Model.Classes
 		/// Class definition.
 		/// </summary>
 		public Asn1ClassDefinition Class => this.@class;
+
+		/// <summary>
+		/// Class name.
+		/// </summary>
+		public string ClassName => this.className;
 
 		/// <summary>
 		/// Class instance elements.

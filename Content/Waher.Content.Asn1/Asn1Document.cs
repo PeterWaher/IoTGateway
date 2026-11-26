@@ -143,6 +143,67 @@ namespace Waher.Content.Asn1
 			}
 		}
 
+		internal void SkipWhiteSpace(out string Comment)
+		{
+			StringBuilder sb = null;
+			char ch;
+
+			while (this.pos < this.len)
+			{
+				ch = this.text[this.pos];
+
+				if (ch <= ' ' || ch == (char)160)
+					this.pos++;
+				else if (ch == '-' && this.pos < this.lenm1 && this.text[this.pos + 1] == '-')
+				{
+					this.pos += 2;
+
+					if (sb is null)
+						sb = new StringBuilder();
+
+					while (this.pos < this.len)
+					{
+						ch = this.text[this.pos];
+						if (ch == '\r' || ch == '\n')
+							break;
+
+						if (ch == '-' && this.pos < this.len - 1 && this.text[this.pos + 1] == '-')
+						{
+							this.pos += 2;
+							break;
+						}
+
+						sb.Append(ch);
+						this.pos++;
+					}
+				}
+				else if (ch == '/' && this.pos < this.lenm1 && this.text[this.pos + 1] == '*')
+				{
+					this.pos += 2;
+
+					if (sb is null)
+						sb = new StringBuilder();
+
+					while (this.pos < this.len)
+					{
+						ch = this.text[this.pos];
+						if (ch == '*' && this.pos < this.len - 1 && this.text[this.pos + 1] == '/')
+						{
+							this.pos += 2;
+							break;
+						}
+
+						sb.Append(ch);
+						this.pos++;
+					}
+				}
+				else
+					break;
+			}
+
+			Comment = sb?.ToString() ?? string.Empty;
+		}
+
 		internal char NextChar()
 		{
 			if (this.pos < this.len)
@@ -348,8 +409,8 @@ namespace Waher.Content.Asn1
 
 			this.AssertNextToken("BEGIN");
 
-			List<Asn1Import> Imports = null;
-			List<string> Exports = null;
+			ChunkedList<Asn1Import> Imports = null;
+			ChunkedList<string> Exports = null;
 
 			do
 			{
@@ -360,29 +421,36 @@ namespace Waher.Content.Asn1
 					this.pos += 7;
 
 					if (Imports is null)
-						Imports = new List<Asn1Import>();
+						Imports = new ChunkedList<Asn1Import>();
 
-					List<string> Identifiers = new List<string>();
+					ChunkedList<Asn1IdentifierReference> Identifiers = new ChunkedList<Asn1IdentifierReference>();
 
 					do
 					{
 						string Identifier = this.ParseIdentifier();
 						string ModuleRef;
+						Asn1ClassReference ClassReference = null;
 
 						s = this.PeekNextToken();
 
 						if (s == "{")
 						{
-							Asn1Node[] Nodes = this.ParseList(DefaultTags, false);
-							// TODO: What to do with these?
+							this.pos++;
+							s = this.PeekNextToken();
 
+							if (s != "}")
+								ClassReference = this.ParseClassReference();
+
+							this.AssertNextToken("}");
 							s = this.PeekNextToken();
 						}
 
 						if (s == "FROM")
 						{
 							this.pos += 4;
-							Identifiers.Add(Identifier);
+							Identifiers.Add(new Asn1IdentifierReference(Identifier,
+								ClassReference, this));
+
 							ModuleRef = this.ParseTypeNameIdentifier();
 
 							Asn1Import Import = new Asn1Import(Identifiers.ToArray(),
@@ -429,11 +497,33 @@ namespace Waher.Content.Asn1
 							this.pos++;
 							ModuleRef = Identifier;
 							Identifier = this.ParseIdentifier();
-							Imports.Add(new Asn1Import(new string[] { ModuleRef }, Identifier, this));
+							ClassReference = null;
+
+							s = this.PeekNextToken();
+
+							if (s == "{")
+							{
+								this.pos++;
+								s = this.PeekNextToken();
+
+								if (s != "}")
+									ClassReference = this.ParseClassReference();
+
+								this.AssertNextToken("}");
+							}
+
+							Imports.Add(new Asn1Import(new Asn1IdentifierReference[]
+								{
+									new Asn1IdentifierReference(Identifier, ClassReference, this)
+								}, ModuleRef, this));
+
 							s = this.PeekNextToken();
 						}
 						else
-							Identifiers.Add(Identifier);
+						{
+							Identifiers.Add(new Asn1IdentifierReference(Identifier,
+								ClassReference, this));
+						}
 
 						if (s == ",")
 						{
@@ -456,22 +546,34 @@ namespace Waher.Content.Asn1
 					foreach (Asn1Import Import in Imports)
 					{
 						Asn1Document Doc = await Import.LoadDocument();
-						
-						foreach (string Identifier in Import.Identifiers)
+
+						foreach (Asn1IdentifierReference Identifier in Import.Identifiers)
 						{
-							if (!Doc.namedNodes.TryGetValue(Identifier, out Asn1Node ImportedNode))
+							if (!Doc.namedNodes.TryGetValue(Identifier.Identifier,
+								out Asn1Node ImportedNode))
+							{
 								throw this.SyntaxError(Identifier + " not found in " + Import.Module);
+							}
 
-							if (this.namedNodes.ContainsKey(Identifier))
-								throw this.SyntaxError("Identifier already defined: " + Identifier);
+							if (this.namedNodes.ContainsKey(Identifier.Identifier))
+							{
+								throw this.SyntaxError("Identifier already defined: " +
+									Identifier.Identifier);
+							}
 
-							this.namedNodes[Identifier] = ImportedNode;
+							this.namedNodes[Identifier.Identifier] = ImportedNode;
 
-							if (Doc.aliases.TryGetValue(Identifier, out Asn1TypeDefinition TypeDef))
-								this.aliases[Identifier] = TypeDef;
+							if (Doc.aliases.TryGetValue(Identifier.Identifier,
+								out Asn1TypeDefinition TypeDef))
+							{
+								this.aliases[Identifier.Identifier] = TypeDef;
+							}
 
-							if (Doc.values.TryGetValue(Identifier, out Asn1FieldValueDefinition ValueDef))
-								this.values[Identifier] = ValueDef;
+							if (Doc.values.TryGetValue(Identifier.Identifier,
+								out Asn1FieldValueDefinition ValueDef))
+							{
+								this.values[Identifier.Identifier] = ValueDef;
+							}
 						}
 					}
 				}
@@ -480,7 +582,7 @@ namespace Waher.Content.Asn1
 					this.pos += 7;
 
 					if (Exports is null)
-						Exports = new List<string>();
+						Exports = new ChunkedList<string>();
 
 					do
 					{
@@ -509,14 +611,14 @@ namespace Waher.Content.Asn1
 			}
 			while (true);
 
-			List<Asn1Node> Items = new List<Asn1Node>();
+			ChunkedList<Asn1Node> Items = new ChunkedList<Asn1Node>();
 
 			while ((s = this.PeekNextToken()) != "END")
 			{
 				if (string.IsNullOrEmpty(s))
 					throw this.SyntaxError("END expected.");
 
-				Asn1Node Node = this.ParseStatement(DefaultTags, false);
+				Asn1Node Node = this.ParseStatement(DefaultTags, false, true);
 				Items.Add(Node);
 
 				Node.ForEach(Node2 =>
@@ -553,7 +655,42 @@ namespace Waher.Content.Asn1
 			return new Asn1Module(Imports?.ToArray(), Exports?.ToArray(), Items.ToArray(), this);
 		}
 
-		private Asn1Node ParseStatement(Asn1Tags? DefaultTags, bool ClassInstance)
+		private Asn1ClassReference[] ParseClassReferences()
+		{
+			ChunkedList<Asn1ClassReference> ClassReferences = new ChunkedList<Asn1ClassReference>();
+
+			this.AssertNextToken("{");
+
+			while (this.PeekNextToken() != "}")
+			{
+				ClassReferences.Add(this.ParseClassReference());
+
+				if (this.PeekNextToken() == ",")
+					this.pos++;
+				else
+					break;
+			}
+
+			this.AssertNextToken("}");
+
+			return ClassReferences.ToArray();
+		}
+
+		private Asn1ClassReference ParseClassReference()
+		{
+			string s = this.ParseIdentifier();
+			if (this.PeekNextToken() != ":")
+				return new Asn1ClassReference(s);
+
+			this.pos++;
+
+			string s2 = this.ParseIdentifier();
+
+			return new Asn1ClassReference(s, s2);
+		}
+
+		private Asn1Node ParseStatement(Asn1Tags? DefaultTags, bool ClassInstance,
+			bool ModuleStatements)
 		{
 			string s = this.PeekNextToken();
 			if (string.IsNullOrEmpty(s))
@@ -568,6 +705,14 @@ namespace Waher.Content.Asn1
 
 				this.pos += s.Length;
 				s2 = this.PeekNextToken();
+
+				Asn1ClassReference[] ClassReferences = null;
+
+				if (ModuleStatements && s2 == "{")
+				{
+					ClassReferences = this.ParseClassReferences();
+					s2 = this.PeekNextToken();
+				}
 
 				if (s2 == "::=")
 				{
@@ -623,7 +768,7 @@ namespace Waher.Content.Asn1
 					this.AssertNextToken("::=");
 
 					UserDefinedItem ValueNotation = this.ParseUserDefinedOptions("END", DefaultTags);
-					List<SupportingSyntax> SupportingSyntax = new List<SupportingSyntax>();
+					ChunkedList<SupportingSyntax> SupportingSyntax = new ChunkedList<SupportingSyntax>();
 
 					while (this.PeekNextToken() != "END")
 					{
@@ -663,10 +808,26 @@ namespace Waher.Content.Asn1
 					else
 						return this.ParseClassInstance(s, ClassDef, DefaultTags);
 				}
-				else
+				else if (char.IsUpper(ch))   // Type or macro
 				{
-					if (char.IsUpper(ch))   // Type or macro
+					int Bak = this.pos;
+					this.pos += s2.Length;
+
+					if (this.PeekNextToken() == "::=")
 					{
+						this.pos += 3;
+
+						this.AssertNextToken("{");
+						this.AssertNextToken("...");
+						this.AssertNextToken("}");
+
+						return new Asn1ClassSet(s, s2,
+							Array.Empty<Asn1ClassInstanceElement>(), this);
+					}
+					else
+					{
+						this.pos = Bak;
+						
 						s2 = s;
 						s = "unnamed" + (this.unnamedIndex++).ToString();
 						ch = 'u';
@@ -734,7 +895,7 @@ namespace Waher.Content.Asn1
 					Asn1TypeDefinition TypeDef = new Asn1TypeDefinition(s,
 						Class.HasValue && TagValue.HasValue ?
 						new Asn1Tag(Class.Value, TagValue.Value) : (Asn1Tag?)null,
-						Definition, this);
+						Definition, ClassReferences, this);
 
 					if (!Definition.ConstructedType)
 						this.aliases[s] = TypeDef;
@@ -779,7 +940,17 @@ namespace Waher.Content.Asn1
 				string Name = this.ParseIdentifier();
 
 				if (char.IsUpper(Name[0]))
-					return new Asn1PropertyDefinition(Name, new Asn1Any(this), this);
+				{
+					Asn1Type Type;
+
+					s = this.PeekNextToken();
+					if (s == "," || s == ")" || s == "}")
+						Type = new Asn1Any(this);
+					else
+						Type = this.ParseType(s, false, DefaultTags, false);
+
+					return new Asn1PropertyDefinition(Name, Type, this);
+				}
 
 				if (ClassInstance)
 				{
@@ -866,14 +1037,14 @@ namespace Waher.Content.Asn1
 		private UserDefinedItem ParseUserDefinedOptions(string EndKeyWord, Asn1Tags? DefaultTags)
 		{
 			UserDefinedItem Item = this.ParseUserDefinedOption(EndKeyWord, DefaultTags);
-			List<UserDefinedItem> Options = null;
+			ChunkedList<UserDefinedItem> Options = null;
 
 			while (this.PeekNextToken() == "|")
 			{
 				this.pos++;
 
 				if (Options is null)
-					Options = new List<UserDefinedItem>();
+					Options = new ChunkedList<UserDefinedItem>();
 
 				Options.Add(Item);
 				Item = this.ParseUserDefinedOption(EndKeyWord, DefaultTags);
@@ -891,7 +1062,7 @@ namespace Waher.Content.Asn1
 		private UserDefinedItem ParseUserDefinedOption(string EndKeyWord, Asn1Tags? DefaultTags)
 		{
 			UserDefinedItem Item = null;
-			List<UserDefinedItem> Items = new List<UserDefinedItem>();
+			ChunkedList<UserDefinedItem> Items = new ChunkedList<UserDefinedItem>();
 			string s;
 			int PosBak = this.pos;
 
@@ -900,7 +1071,7 @@ namespace Waher.Content.Asn1
 				if (!(Item is null))
 				{
 					if (Items is null)
-						Items = new List<UserDefinedItem>();
+						Items = new ChunkedList<UserDefinedItem>();
 
 					Items.Add(Item);
 				}
@@ -1052,6 +1223,17 @@ namespace Waher.Content.Asn1
 
 					return new Asn1WithComponents(this.ParseValue(), this);
 
+				case "CONSTRAINED":
+					this.pos += 11;
+					this.AssertNextToken("BY");
+					this.AssertNextToken("{");
+
+					this.SkipWhiteSpace(out string Comment);
+
+					this.AssertNextToken("}");
+
+					return new Asn1ConstrainedBy(Comment, this);
+
 				default:
 					return new Asn1InSet(this.ParseUnions(), this);
 			}
@@ -1132,7 +1314,7 @@ namespace Waher.Content.Asn1
 			}
 		}
 
-		private string ParseIdentifier()
+		internal string ParseIdentifier()
 		{
 			string s = this.NextToken();
 
@@ -1160,7 +1342,11 @@ namespace Waher.Content.Asn1
 		private static bool IsTypeIdentifier(string s)
 		{
 			char ch;
-			return !string.IsNullOrEmpty(s) && char.IsLetter(ch = s[0]) && char.IsUpper(ch);
+			
+			return 
+				!string.IsNullOrEmpty(s) && 
+				char.IsLetter(ch = s[0]) && 
+				char.IsUpper(ch);
 		}
 
 		private static bool IsFieldIdentifier(string s)
@@ -1215,7 +1401,7 @@ namespace Waher.Content.Asn1
 					case "{":
 						this.pos++;
 
-						List<Asn1NamedValue> NamedOptions = new List<Asn1NamedValue>();
+						ChunkedList<Asn1NamedValue> NamedOptions = new ChunkedList<Asn1NamedValue>();
 
 						while (true)
 						{
@@ -1492,7 +1678,40 @@ namespace Waher.Content.Asn1
 
 				default:
 					if (char.IsUpper(s[0]))
-						return new Asn1TypeReference(s, this);
+					{
+						if (this.PeekNextToken() == ".")
+						{
+							this.pos++;
+							this.AssertNextToken("&");
+
+							string PropertyName = this.ParseIdentifier();
+							string ClassSet = null;
+							string LookupKey = null;
+
+							if (this.PeekNextToken() == "(")
+							{
+								this.AssertNextToken("(");
+								this.AssertNextToken("{");
+								ClassSet = this.ParseIdentifier();
+								this.AssertNextToken("}");
+
+								if (this.PeekNextToken() == "{")
+								{
+									this.AssertNextToken("{");
+									this.AssertNextToken("@");
+									LookupKey = this.ParseIdentifier();
+									this.AssertNextToken("}");
+								}
+
+								this.AssertNextToken(")");
+							}
+
+							return new Asn1PropertyTypeReference(s, ClassSet, PropertyName,
+								LookupKey, this);
+						}
+						else
+							return new Asn1TypeReference(s, this);
+					}
 					else if (PermitUndefinedType)
 					{
 						this.pos -= s.Length;
@@ -1581,11 +1800,11 @@ namespace Waher.Content.Asn1
 			PropertyDeclarations = Properties.ToArray();
 		}
 
-		private Dictionary<string, Asn1PropertyValue> ParsePropertyValues(Asn1Tags? DefaultTags)
+		private Dictionary<string, Asn1Node> ParsePropertyValues(Asn1Tags? DefaultTags)
 		{
 			Asn1Node[] Fields = this.ParseList(DefaultTags, true);
 			int i, c = Fields.Length;
-			Dictionary<string, Asn1PropertyValue> Properties = new Dictionary<string, Asn1PropertyValue>();
+			Dictionary<string, Asn1Node> Properties = new Dictionary<string, Asn1Node>();
 
 			for (i = 0; i < c; i++)
 			{
@@ -1601,11 +1820,11 @@ namespace Waher.Content.Asn1
 		private Asn1ClassInstance ParseClassInstance(string Name,
 			Asn1ClassDefinition ClassDef, Asn1Tags? DefaultTags)
 		{
-			Dictionary<string, Asn1PropertyValue> Properties;
+			Dictionary<string, Asn1Node> Properties;
 
 			if (ClassDef.HasSyntax)
 			{
-				Properties = new Dictionary<string, Asn1PropertyValue>();
+				Properties = new Dictionary<string, Asn1Node>();
 
 				foreach (Asn1SyntaxNode SyntaxNode in ClassDef.Syntax)
 				{
@@ -1618,34 +1837,41 @@ namespace Waher.Content.Asn1
 
 			foreach (Asn1TypeDeclaration TypeDeclaration in ClassDef.TypeDeclarations)
 			{
-				if (Properties.TryGetValue(TypeDeclaration.Name, out Asn1PropertyValue Value) &&
-					Value.Value is Asn1TypeValue TypeValue)
+				if (Properties.TryGetValue(TypeDeclaration.Name, out Asn1Node Value) &&
+					Value is Asn1PropertyValue Asn1PropertyValue &&
+					Asn1PropertyValue.Value is Asn1TypeValue TypeValue)
 				{
-					Value.Type = TypeValue.Type;   // TODO: Clone & set Parent
+					Asn1PropertyValue.Type = TypeValue.Type;   // TODO: Clone & set Parent
 				}
 			}
 
 			foreach (Asn1PropertyDefinition PropertyDefinition in ClassDef.Properties)
 			{
-				if (Properties.TryGetValue(PropertyDefinition.Name, out Asn1PropertyValue Value))
-					Value.Type = PropertyDefinition.Type;   // TODO: Clone & set Parent
+				if (Properties.TryGetValue(PropertyDefinition.Name, out Asn1Node Value) &&
+					Value is Asn1PropertyValue Asn1PropertyValue)
+				{
+					Asn1PropertyValue.Type = PropertyDefinition.Type;   // TODO: Clone & set Parent
+				}
 			}
 
-			foreach (Asn1PropertyValue Value in Properties.Values)
+			foreach (Asn1Node Value in Properties.Values)
 			{
-				if (Value.Type is null)
-					throw this.SyntaxError("Property not defined: " + Value.Name);
+				if (Value is Asn1PropertyValue PropertyValue)
+				{
+					if (PropertyValue.Type is null)
+						throw this.SyntaxError("Property not defined: " + PropertyValue.Name);
+				}
 			}
 
 			return new Asn1ClassInstance(Name, ClassDef, DefaultTags, Properties, this);
 		}
 
-		private Asn1ClassInstanceElement[] ParseClassInstanceSet(Asn1ClassDefinition ClassDef,
-			Asn1Tags? DefaultTags)
+		private Asn1ClassInstanceElement[] ParseClassInstanceSet(
+			Asn1ClassDefinition ClassDef, Asn1Tags? DefaultTags)
 		{
 			this.AssertNextToken("{");
 
-			List<Asn1ClassInstanceElement> Items = new List<Asn1ClassInstanceElement>();
+			ChunkedList<Asn1ClassInstanceElement> Items = new ChunkedList<Asn1ClassInstanceElement>();
 			string s = this.PeekNextToken();
 
 			while (s != "}")
@@ -1687,11 +1913,11 @@ namespace Waher.Content.Asn1
 				return Array.Empty<Asn1Node>();
 			}
 
-			List<Asn1Node> Items = new List<Asn1Node>();
+			ChunkedList<Asn1Node> Items = new ChunkedList<Asn1Node>();
 
 			while (true)
 			{
-				Items.Add(this.ParseStatement(DefaultTags, ClassInstance));
+				Items.Add(this.ParseStatement(DefaultTags, ClassInstance, false));
 
 				switch (this.PeekNextToken())
 				{
@@ -1713,7 +1939,7 @@ namespace Waher.Content.Asn1
 		{
 			this.AssertNextToken("{");
 
-			List<Asn1Node> Items = new List<Asn1Node>();
+			ChunkedList<Asn1Node> Items = new ChunkedList<Asn1Node>();
 
 			while (true)
 			{
@@ -1859,7 +2085,7 @@ namespace Waher.Content.Asn1
 				case "{":
 					this.pos++;
 
-					List<Asn1Value> Items = new List<Asn1Value>();
+					ChunkedList<Asn1Value> Items = new ChunkedList<Asn1Value>();
 					bool Oid = false;
 
 					while (true)

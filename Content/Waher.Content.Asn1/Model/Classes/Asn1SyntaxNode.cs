@@ -22,7 +22,7 @@ namespace Waher.Content.Asn1.Model.Classes
 		/// </summary>
 		/// <param name="Properties">Properties parsed.</param>
 		/// <returns>If the node matches the current position.</returns>
-		public abstract bool MatchesNext(Dictionary<string, Asn1PropertyValue> Properties);
+		public abstract bool MatchesNext(Dictionary<string, Asn1Node> Properties);
 
 		/// <summary>
 		/// Gets a syntax error exception object.

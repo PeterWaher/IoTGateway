@@ -1,7 +1,5 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
-using Waher.Content.Asn1.Model.Types;
-using Waher.Content.Asn1.Model.Values;
 
 namespace Waher.Content.Asn1.Model.Classes
 {

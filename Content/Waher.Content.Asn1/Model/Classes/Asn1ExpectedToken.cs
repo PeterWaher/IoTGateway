@@ -34,7 +34,7 @@ namespace Waher.Content.Asn1.Model.Classes
 		/// </summary>
 		/// <param name="Properties">Properties parsed.</param>
 		/// <returns>If the node matches the current position.</returns>
-		public override bool MatchesNext(Dictionary<string, Asn1PropertyValue> Properties)
+		public override bool MatchesNext(Dictionary<string, Asn1Node> Properties)
 		{
 			if (this.Document.PeekNextToken() == this.token)
 			{

@@ -9,7 +9,7 @@ namespace Waher.Content.Asn1.Model.Classes
 	/// </summary>
 	public class Asn1ClassInstance : Asn1ClassInstanceElement
 	{
-		private readonly Dictionary<string, Asn1PropertyValue> properties;
+		private readonly Dictionary<string, Asn1Node> properties;
 		private readonly Asn1ClassDefinition @class;
 		private readonly string name;
 
@@ -22,7 +22,7 @@ namespace Waher.Content.Asn1.Model.Classes
 		/// <param name="Properties">Instance property values.</param>
 		/// <param name="Document">ASN.1 document hosting the node.</param>
 		public Asn1ClassInstance(string Name, Asn1ClassDefinition Class,
-			Asn1Tags? Tags, Dictionary<string, Asn1PropertyValue> Properties, 
+			Asn1Tags? Tags, Dictionary<string, Asn1Node> Properties, 
 			Asn1Document Document)
 			: base(Document)
 		{
@@ -45,7 +45,7 @@ namespace Waher.Content.Asn1.Model.Classes
 		/// <summary>
 		/// Class instance property values.
 		/// </summary>
-		public Dictionary<string, Asn1PropertyValue> Properties => this.properties;
+		public Dictionary<string, Asn1Node> Properties => this.properties;
 
 		/// <inheritdoc/>
 		public override string ToString() => this.Name + " : " + this.@class.ToString();
@@ -64,7 +64,7 @@ namespace Waher.Content.Asn1.Model.Classes
 			{
 				// TODO: All properties in class definition also, if not available in the instance list
 
-				foreach (Asn1PropertyValue PropertyValue in this.properties.Values)
+				foreach (Asn1Node PropertyValue in this.properties.Values)
 					await PropertyValue.ExportCSharp(Output, State, Indent, Pass);
 			}
 			else
@@ -73,13 +73,13 @@ namespace Waher.Content.Asn1.Model.Classes
 				{
 					State.ClosePending(Output);
 
-					foreach (Asn1PropertyValue PropertyValue in this.properties.Values)
+					foreach (Asn1Node PropertyValue in this.properties.Values)
 						await PropertyValue.ExportCSharp(Output, State, Indent, Pass);
 				}
 
 				if (Pass == CSharpExportPass.Implicit || Pass == CSharpExportPass.Explicit)
 				{
-					foreach (Asn1PropertyValue PropertyValue in this.properties.Values)
+					foreach (Asn1Node PropertyValue in this.properties.Values)
 						await PropertyValue.ExportCSharp(Output, State, Indent, CSharpExportPass.Implicit);
 
 					// Class definition
@@ -106,7 +106,7 @@ namespace Waher.Content.Asn1.Model.Classes
 
 					Indent++;
 
-					foreach (Asn1PropertyValue PropertyValue in this.properties.Values)
+					foreach (Asn1Node PropertyValue in this.properties.Values)
 						await PropertyValue.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 
 					Indent--;

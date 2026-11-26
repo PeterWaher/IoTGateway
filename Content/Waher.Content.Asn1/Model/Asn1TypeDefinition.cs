@@ -1,6 +1,8 @@
-﻿using System.Formats.Asn1;
+﻿using System;
+using System.Formats.Asn1;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Asn1.Model.Classes;
 using Waher.Content.Asn1.Model.Macro;
 using Waher.Content.Asn1.Model.Types;
 using Waher.Runtime.Collections;
@@ -12,9 +14,11 @@ namespace Waher.Content.Asn1.Model
 	/// </summary>
 	public class Asn1TypeDefinition : Asn1Type, INamedNode
 	{
-		private readonly string typeName;
+		private readonly Asn1ClassReference[] classReferences;
 		private readonly Asn1Type definition;
 		private readonly Asn1Tag? tag;
+		private readonly string typeName;
+		private readonly bool hasClassReferences;
 
 		/// <summary>
 		/// Represents an ASN.1 Type definition.
@@ -22,14 +26,17 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="TypeName">Type name.</param>
 		/// <param name="Tag">Tag</param>
 		/// <param name="Definition">Definition</param>
+		/// <param name="ClassReferences">Optional class references.</param>
 		/// <param name="Document">ASN.1 document hosting the node.</param>
 		public Asn1TypeDefinition(string TypeName, Asn1Tag? Tag, Asn1Type Definition,
-			Asn1Document Document)
+			Asn1ClassReference[] ClassReferences, Asn1Document Document)
 			: base(Document)
 		{
 			this.typeName = TypeName;
 			this.definition = Definition;
 			this.tag = Tag;
+			this.classReferences = ClassReferences ?? Array.Empty<Asn1ClassReference>();
+			this.hasClassReferences = this.classReferences.Length > 0;
 
 			this.SetAsChild(this.definition);
 		}
@@ -43,6 +50,16 @@ namespace Waher.Content.Asn1.Model
 		/// If the named node represents a type.
 		/// </summary>
 		public bool IsType => true;
+
+		/// <summary>
+		/// Class references, if any.
+		/// </summary>
+		public Asn1ClassReference[] ClassReferences => this.classReferences;
+
+		/// <summary>
+		/// If type definition has class references.
+		/// </summary>
+		public bool HasClassReferences => this.hasClassReferences;
 
 		/// <summary>
 		/// Gets the fully qualified name, in reverse order.

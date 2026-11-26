@@ -9,7 +9,7 @@ namespace Waher.Content.Asn1.Model
 	/// </summary>
 	public class Asn1Import : Asn1Node
 	{
-		private readonly string[] identifiers;
+		private readonly Asn1IdentifierReference[] identifiers;
 		private readonly string module;
 		private Asn1Oid oid;
 		private Asn1Document importedDocument;
@@ -21,7 +21,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="Identifiers">Identifiers to import.</param>
 		/// <param name="Module">Module reference.</param>
 		/// <param name="Document">ASN.1 Document</param>
-		public Asn1Import(string[] Identifiers, string Module, Asn1Document Document)
+		public Asn1Import(Asn1IdentifierReference[] Identifiers, string Module, Asn1Document Document)
 			: base(Document)
 		{
 			this.identifiers = Identifiers;
@@ -32,7 +32,7 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// Identifiers to import.
 		/// </summary>
-		public string[] Identifiers => this.identifiers;
+		public Asn1IdentifierReference[] Identifiers => this.identifiers;
 
 		/// <summary>
 		/// Module reference.

@@ -14,7 +14,7 @@ namespace Waher.Content.Asn1.Model
 	{
 		private readonly string fieldName;
 		private readonly string fieldNameCSharp;
-		private readonly Asn1Type type;
+		private Asn1Type type;
 		private Asn1Tag? tag;
 
 		/// <summary>
@@ -49,7 +49,11 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// ASN.1 type reference.
 		/// </summary>
-		public Asn1Type Type => this.type;
+		public Asn1Type Type
+		{
+			get => this.type;
+			internal set => this.type = value;
+		}
 
 		/// <summary>
 		/// Gets the fully qualified name, in reverse order.

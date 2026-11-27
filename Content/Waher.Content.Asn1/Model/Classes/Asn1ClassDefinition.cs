@@ -15,6 +15,7 @@ namespace Waher.Content.Asn1.Model.Classes
 		private readonly string name;
 		private Dictionary<string, string> identifiers;
 		private Asn1SyntaxNode[] syntax = null;
+		private Asn1TypeDefinition serialization = null;
 
 		/// <summary>
 		/// Defines a class.
@@ -56,6 +57,15 @@ namespace Waher.Content.Asn1.Model.Classes
 		{
 			get => this.syntax;
 			internal set => this.syntax = value;
+		}
+
+		/// <summary>
+		/// Associated serialization, if any.
+		/// </summary>
+		public Asn1TypeDefinition Serialization
+		{
+			get => this.serialization;
+			internal set => this.serialization = value;
 		}
 
 		/// <summary>

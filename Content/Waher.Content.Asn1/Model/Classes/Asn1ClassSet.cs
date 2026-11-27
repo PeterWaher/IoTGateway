@@ -13,6 +13,7 @@ namespace Waher.Content.Asn1.Model.Classes
 		private readonly Asn1ClassDefinition @class;
 		private readonly string className;
 		private readonly string name;
+		private readonly bool extensible;
 
 		/// <summary>
 		/// Set of classes.
@@ -20,15 +21,17 @@ namespace Waher.Content.Asn1.Model.Classes
 		/// <param name="Name">Class set name.</param>
 		/// <param name="Class">Class definition</param>
 		/// <param name="Classes">Class instance elements.</param>
+		/// <param name="Extensible">If the class set is extensible.</param>
 		/// <param name="Document">ASN.1 document hosting the node.</param>
 		public Asn1ClassSet(string Name, Asn1ClassDefinition Class,
-			Asn1ClassInstanceElement[] Classes, Asn1Document Document)
+			Asn1ClassInstanceElement[] Classes, bool Extensible, Asn1Document Document)
 			: base(Document)
 		{
 			this.name = Name;
 			this.@class = Class;
 			this.className = Class.Name;
 			this.classes = Classes;
+			this.extensible = Extensible;
 		}
 
 		/// <summary>
@@ -37,15 +40,17 @@ namespace Waher.Content.Asn1.Model.Classes
 		/// <param name="Name">Class set name.</param>
 		/// <param name="ClassName">Class name.</param>
 		/// <param name="Classes">Class instance elements.</param>
+		/// <param name="Extensible">If the class set is extensible.</param>
 		/// <param name="Document">ASN.1 document hosting the node.</param>
 		public Asn1ClassSet(string Name, string ClassName,
-			Asn1ClassInstanceElement[] Classes, Asn1Document Document)
+			Asn1ClassInstanceElement[] Classes, bool Extensible, Asn1Document Document)
 			: base(Document)
 		{
 			this.name = Name;
 			this.@class = null;
 			this.className = ClassName;
 			this.classes = Classes;
+			this.extensible = Extensible;
 		}
 
 		/// <summary>
@@ -67,6 +72,11 @@ namespace Waher.Content.Asn1.Model.Classes
 		/// Class instance elements.
 		/// </summary>
 		public Asn1ClassInstanceElement[] Classes => this.classes;
+
+		/// <summary>
+		/// If the class set is extensible.
+		/// </summary>
+		public bool Extensible => this.extensible;
 
 		/// <inheritdoc/>
 		public override string ToString() => this.Name;

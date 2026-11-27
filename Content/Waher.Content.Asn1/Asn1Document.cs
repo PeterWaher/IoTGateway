@@ -14,8 +14,10 @@ using Waher.Runtime.IO;
 using Waher.Runtime.Collections;
 using System.Formats.Asn1;
 using System.Numerics;
-using System.Net;
 using System;
+using System.IO;
+using Waher.Security;
+using Waher.Content.Multipart;
 
 namespace Waher.Content.Asn1
 {
@@ -28,6 +30,8 @@ namespace Waher.Content.Asn1
 		internal readonly Dictionary<string, Asn1TypeDefinition> aliases = new Dictionary<string, Asn1TypeDefinition>();
 		internal readonly Dictionary<string, Asn1FieldValueDefinition> values = new Dictionary<string, Asn1FieldValueDefinition>();
 		internal int pos = 0;
+		internal int row = 0;
+		internal int rowPos = 0;
 		private readonly string text;
 		private readonly string location;
 		private readonly string[] importFolders;
@@ -102,7 +106,26 @@ namespace Waher.Content.Asn1
 				ch = this.text[this.pos];
 
 				if (ch <= ' ' || ch == (char)160)
+				{
 					this.pos++;
+
+					if (ch == '\n')
+					{
+						if (this.pos < this.len && this.text[this.pos] == '\r')
+							this.pos++;
+
+						this.row++;
+						this.rowPos = this.pos;
+					}
+					else if (ch == '\r')
+					{
+						if (this.pos < this.len && this.text[this.pos] == '\n')
+							this.pos++;
+
+						this.row++;
+						this.rowPos = this.pos;
+					}
+				}
 				else if (ch == '-' && this.pos < this.lenm1 && this.text[this.pos + 1] == '-')
 				{
 					this.pos += 2;
@@ -133,6 +156,22 @@ namespace Waher.Content.Asn1
 						{
 							this.pos += 2;
 							break;
+						}
+						else if (ch == '\n')
+						{
+							if (this.pos < this.len && this.text[this.pos] == '\r')
+								this.pos++;
+
+							this.row++;
+							this.rowPos = this.pos;
+						}
+						else if (ch == '\r')
+						{
+							if (this.pos < this.len && this.text[this.pos] == '\n')
+								this.pos++;
+
+							this.row++;
+							this.rowPos = this.pos;
 						}
 
 						this.pos++;
@@ -153,7 +192,26 @@ namespace Waher.Content.Asn1
 				ch = this.text[this.pos];
 
 				if (ch <= ' ' || ch == (char)160)
+				{
 					this.pos++;
+
+					if (ch == '\n')
+					{
+						if (this.pos < this.len && this.text[this.pos] == '\r')
+							this.pos++;
+
+						this.row++;
+						this.rowPos = this.pos;
+					}
+					else if (ch == '\r')
+					{
+						if (this.pos < this.len && this.text[this.pos] == '\n')
+							this.pos++;
+
+						this.row++;
+						this.rowPos = this.pos;
+					}
+				}
 				else if (ch == '-' && this.pos < this.lenm1 && this.text[this.pos + 1] == '-')
 				{
 					this.pos += 2;
@@ -192,6 +250,22 @@ namespace Waher.Content.Asn1
 							this.pos += 2;
 							break;
 						}
+						else if (ch == '\n')
+						{
+							if (this.pos < this.len && this.text[this.pos] == '\r')
+								this.pos++;
+
+							this.row++;
+							this.rowPos = this.pos;
+						}
+						else if (ch == '\r')
+						{
+							if (this.pos < this.len && this.text[this.pos] == '\n')
+								this.pos++;
+
+							this.row++;
+							this.rowPos = this.pos;
+						}
 
 						sb.Append(ch);
 						this.pos++;
@@ -202,14 +276,6 @@ namespace Waher.Content.Asn1
 			}
 
 			Comment = sb?.ToString() ?? string.Empty;
-		}
-
-		internal char NextChar()
-		{
-			if (this.pos < this.len)
-				return this.text[this.pos++];
-			else
-				return (char)0;
 		}
 
 		internal char PeekNextChar()
@@ -224,7 +290,10 @@ namespace Waher.Content.Asn1
 		{
 			this.SkipWhiteSpace();
 
-			char ch = this.NextChar();
+			if (this.pos >= this.len)
+				return string.Empty;
+
+			char ch = this.text[this.pos++];
 
 			if (char.IsLetter(ch) || char.IsDigit(ch) || ch == '-' || ch == '_')
 			{
@@ -297,6 +366,16 @@ namespace Waher.Content.Asn1
 			}
 		}
 
+		internal string PeekNextToken(int PosDelta)
+		{
+			int Bak = this.pos;
+			this.pos += PosDelta;
+			string Result = this.PeekNextToken();
+			this.pos = Bak;
+
+			return Result;
+		}
+
 		internal string PeekNextToken()
 		{
 			this.SkipWhiteSpace();
@@ -316,7 +395,8 @@ namespace Waher.Content.Asn1
 
 		internal Asn1SyntaxException SyntaxError(string Message)
 		{
-			return new Asn1SyntaxException(Message, this.text, this.pos);
+			return new Asn1SyntaxException(Message, this.text, this.pos, this.row + 1,
+				this.pos - this.rowPos + 1, Path.GetFileName(this.location));
 		}
 
 		private async Task<Asn1Definitions> ParseDefinitions()
@@ -545,6 +625,9 @@ namespace Waher.Content.Asn1
 
 					foreach (Asn1Import Import in Imports)
 					{
+						if (this.Document.namedNodes.ContainsKey(Import.Module))
+							continue;   // Already imported
+
 						Asn1Document Doc = await Import.LoadDocument();
 
 						foreach (Asn1IdentifierReference Identifier in Import.Identifiers)
@@ -707,6 +790,7 @@ namespace Waher.Content.Asn1
 				s2 = this.PeekNextToken();
 
 				Asn1ClassReference[] ClassReferences = null;
+				Asn1ClassDefinition ClassDefinition = null;
 
 				if (ModuleStatements && s2 == "{")
 				{
@@ -751,6 +835,13 @@ namespace Waher.Content.Asn1
 
 						return ClassDef;
 					}
+					else if (!(ClassReferences is null) &&
+						ClassReferences.Length == 1 &&
+						this.namedNodes.TryGetValue(ClassReferences[0].ClassName, out Asn1Node Node) &&
+						Node is Asn1ClassDefinition ClassRef)
+					{
+						ClassDefinition = ClassRef;
+					}
 				}
 				else if (s2 == "MACRO")
 				{
@@ -794,7 +885,8 @@ namespace Waher.Content.Asn1
 					return ValueDef;
 				}
 				else if (this.namedNodes.TryGetValue(s2, out Asn1Node Node2) &&
-					Node2 is Asn1ClassDefinition ClassDef)
+					Node2 is Asn1ClassDefinition ClassDef &&
+					this.PeekNextToken(s2.Length) == "::=")
 				{
 					this.pos += s2.Length;
 
@@ -802,8 +894,10 @@ namespace Waher.Content.Asn1
 
 					if (char.IsUpper(s[0]))
 					{
-						return new Asn1ClassSet(s, ClassDef,
-							this.ParseClassInstanceSet(ClassDef, DefaultTags), this);
+						Asn1ClassInstanceElement[] Elements = this.ParseClassInstanceSet(
+							ClassDef, DefaultTags, out bool Extensible);
+
+						return new Asn1ClassSet(s, ClassDef, Elements, Extensible, this);
 					}
 					else
 						return this.ParseClassInstance(s, ClassDef, DefaultTags);
@@ -822,12 +916,12 @@ namespace Waher.Content.Asn1
 						this.AssertNextToken("}");
 
 						return new Asn1ClassSet(s, s2,
-							Array.Empty<Asn1ClassInstanceElement>(), this);
+							Array.Empty<Asn1ClassInstanceElement>(), true, this);
 					}
 					else
 					{
 						this.pos = Bak;
-						
+
 						s2 = s;
 						s = "unnamed" + (this.unnamedIndex++).ToString();
 						ch = 'u';
@@ -899,6 +993,9 @@ namespace Waher.Content.Asn1
 
 					if (!Definition.ConstructedType)
 						this.aliases[s] = TypeDef;
+
+					if (!(ClassDefinition is null) && ClassDefinition.Serialization is null)
+						ClassDefinition.Serialization = TypeDef;
 
 					return TypeDef;
 				}
@@ -1342,10 +1439,10 @@ namespace Waher.Content.Asn1
 		private static bool IsTypeIdentifier(string s)
 		{
 			char ch;
-			
-			return 
-				!string.IsNullOrEmpty(s) && 
-				char.IsLetter(ch = s[0]) && 
+
+			return
+				!string.IsNullOrEmpty(s) &&
+				char.IsLetter(ch = s[0]) &&
 				char.IsUpper(ch);
 		}
 
@@ -1711,6 +1808,10 @@ namespace Waher.Content.Asn1
 								{
 									this.AssertNextToken("{");
 									this.AssertNextToken("@");
+
+									if (this.PeekNextToken() == ".")
+										this.pos++;
+
 									LookupKey = this.ParseIdentifier();
 									this.AssertNextToken("}");
 								}
@@ -1879,17 +1980,24 @@ namespace Waher.Content.Asn1
 		}
 
 		private Asn1ClassInstanceElement[] ParseClassInstanceSet(
-			Asn1ClassDefinition ClassDef, Asn1Tags? DefaultTags)
+			Asn1ClassDefinition ClassDef, Asn1Tags? DefaultTags, out bool Extensible)
 		{
 			this.AssertNextToken("{");
 
 			ChunkedList<Asn1ClassInstanceElement> Items = new ChunkedList<Asn1ClassInstanceElement>();
 			string s = this.PeekNextToken();
 
+			Extensible = false;
+
 			while (s != "}")
 			{
 				if (s == "{")
 					Items.Add(this.ParseClassInstance(string.Empty, ClassDef, DefaultTags));
+				else if (s == "...")
+				{
+					this.pos += 3;
+					Extensible = true;
+				}
 				else if (!IsIdentifier(s))
 					throw this.SyntaxError("Expected identifier or class instance.");
 				else
@@ -2061,32 +2169,45 @@ namespace Waher.Content.Asn1
 						case "H":
 						case "h":
 							this.pos++;
-							if (BigInteger.TryParse(s, NumberStyles.HexNumber, null, out BigInteger l))
-								return new Asn1IntegerValue(l, this);
-							else
+							try
+							{
+								byte[] Bin = Hashes.StringToBinary(s);
+								return new Asn1OctetStringValue(Bin, this);
+							}
+							catch (Exception)
+							{
 								throw this.SyntaxError("Invalid hexadecimal string.");
+							}
 
 						case "D":
 						case "d":
+							BigInteger l;
+
 							this.pos++;
-							if (BigInteger.TryParse(s, out l))
-								return new Asn1IntegerValue(l, this);
+							if (string.IsNullOrEmpty(s))
+								return new Asn1OctetStringValue(Array.Empty<byte>(), this);
+							else if (BigInteger.TryParse(s, out l))
+								return new Asn1OctetStringValue(l.ToByteArray(), this);
 							else
 								throw this.SyntaxError("Invalid decimal string.");
 
 						case "B":
 						case "b":
 							this.pos++;
-							if (TryParseBinary(s, out l))
-								return new Asn1IntegerValue(l, this);
+							if (string.IsNullOrEmpty(s))
+								return new Asn1OctetStringValue(Array.Empty<byte>(), this);
+							else if (TryParseBinary(s, out l))
+								return new Asn1OctetStringValue(l.ToByteArray(), this);
 							else
 								throw this.SyntaxError("Invalid binary string.");
 
 						case "O":
 						case "o":
 							this.pos++;
-							if (TryParseOctal(s, out l))
-								return new Asn1IntegerValue(l, this);
+							if (string.IsNullOrEmpty(s))
+								return new Asn1OctetStringValue(Array.Empty<byte>(), this);
+							else if (TryParseOctal(s, out l))
+								return new Asn1OctetStringValue(l.ToByteArray(), this);
 							else
 								throw this.SyntaxError("Invalid octal string.");
 

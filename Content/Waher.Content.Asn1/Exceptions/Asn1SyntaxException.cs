@@ -1,4 +1,6 @@
-﻿namespace Waher.Content.Asn1.Exceptions
+﻿using System.Text;
+
+namespace Waher.Content.Asn1.Exceptions
 {
 	/// <summary>
 	/// ASN.1 syntax exceptions.
@@ -6,7 +8,10 @@
 	public class Asn1SyntaxException : Asn1Exception
 	{
 		private readonly string text;
+		private readonly string module;
 		private readonly int pos;
+		private readonly int row;
+		private readonly int column;
 
 		/// <summary>
 		/// ASN.1 syntax exceptions.
@@ -14,11 +19,18 @@
 		/// <param name="Message">Exception message.</param>
 		/// <param name="Text">ASN.1 text</param>
 		/// <param name="Position">Position where exception was raised.</param>
-		public Asn1SyntaxException(string Message, string Text, int Position)
-			: base(Format(Message, Text, Position))
+		/// <param name="Row">Row number</param>
+		/// <param name="Column">Column number</param>
+		/// <param name="Module">Module where error was found</param>
+		public Asn1SyntaxException(string Message, string Text, int Position,
+			int Row, int Column, string Module)
+			: base(Format(Message, Text, Position, Row, Column, Module))
 		{
 			this.text = Text;
 			this.pos = Position;
+			this.row = Row;
+			this.column = Column;
+			this.module = Module;
 		}
 
 		/// <summary>
@@ -31,7 +43,23 @@
 		/// </summary>
 		public int Position => this.pos;
 
-		private static string Format(string Message, string Text, int Position)
+		/// <summary>
+		/// Row number
+		/// </summary>
+		public int Row => this.row;
+
+		/// <summary>
+		/// Column number
+		/// </summary>
+		public int Column => this.column;
+
+		/// <summary>
+		/// Module where error was found
+		/// </summary>
+		public string Module => this.module;
+
+		private static string Format(string Message, string Text, int Position,
+			int Row, int Column, string Module)
 		{
 			int Pos = Position - 100;
 			int End = Pos + 200;
@@ -49,7 +77,21 @@
 			string s = Text.Substring(Pos, End - Pos);
 			s = s.Insert(NewPos, "^^^-------- " + Message + " -----");
 
-			return Message + "\r\n\r\n" + s;
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(Message);
+			sb.Append(" (");
+			sb.Append(Module);
+			sb.Append(", row ");
+			sb.Append(Row.ToString());
+			sb.Append(", column ");
+			sb.Append(Column.ToString());
+			sb.Append(')');
+			sb.AppendLine();
+			sb.AppendLine();
+			sb.Append(s);
+
+			return sb.ToString();
 		}
 	}
 }

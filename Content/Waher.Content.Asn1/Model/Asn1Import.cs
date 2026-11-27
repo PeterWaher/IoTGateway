@@ -57,6 +57,9 @@ namespace Waher.Content.Asn1.Model
 			internal set => this.withSuccessors = value;
 		}
 
+		/// <inheritdoc/>
+		public override string ToString() => this.module;
+
 		/// <summary>
 		/// Loads the ASN.1 document to import.
 		/// </summary>

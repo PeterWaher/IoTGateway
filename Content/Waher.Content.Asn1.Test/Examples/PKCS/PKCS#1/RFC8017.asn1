@@ -283,8 +283,8 @@ RSAPrivateKey ::= SEQUENCE {
 
 Version ::= INTEGER { two-prime(0), multi(1) }
     (CONSTRAINED BY
-        {-- version MUST
-be multi if otherPrimeInfos present --})
+        {/* version MUST
+be multi if otherPrimeInfos present */})
 
 OtherPrimeInfos ::= SEQUENCE SIZE(1..MAX) OF OtherPrimeInfo
 

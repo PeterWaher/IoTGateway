@@ -186,6 +186,7 @@
     <None Remove="Examples\PKCS\PKCS#10\RFC2986.asn1" />
     <None Remove="Examples\PKCS\PKCS#12\RFC7292.asn1" />
     <None Remove="Examples\PKCS\PKCS#1\RFC8017.asn1" />
+    <None Remove="Examples\PKCS\PKCS#1\SupportedInformationObjects.asn1" />
     <None Remove="Examples\PKCS\PKCS#5\RFC8018.asn1" />
     <None Remove="Examples\PKCS\PKCS#8\RFC5208.asn1" />
     <None Remove="Examples\PKCS\PKIX\AlgorithmInformation-2009 - RFC5912.asn1" />
@@ -205,6 +206,40 @@
     <None Remove="Examples\PKCS\PKIX\PKIXCMP-2009 - RFC5912.asn1" />
     <None Remove="Examples\PKCS\PKIX\PKIXCRMF-2009 - RFC5912.asn1" />
     <None Remove="Examples\PKCS\PKIX\SCVP-2009 - RFC5912.asn1" />
+    <None Remove="Examples\PKCS\X.501\AttributeCertificateDefinitions.asn" />
+    <None Remove="Examples\PKCS\X.501\AuthenticationFramework.asn" />
+    <None Remove="Examples\PKCS\X.501\BasicAccessControl.asn" />
+    <None Remove="Examples\PKCS\X.501\CertificateExtensions.asn" />
+    <None Remove="Examples\PKCS\X.501\CommonProtocolSpecification.asn" />
+    <None Remove="Examples\PKCS\X.501\DirectoryAbstractService.asn" />
+    <None Remove="Examples\PKCS\X.501\DirectoryOperationalBindingTypes.asn" />
+    <None Remove="Examples\PKCS\X.501\DirectoryOSIProtocols.asn" />
+    <None Remove="Examples\PKCS\X.501\DirectoryShadowAbstractService.asn" />
+    <None Remove="Examples\PKCS\X.501\DistributedOperations.asn" />
+    <None Remove="Examples\PKCS\X.501\DSAOperationalAttributeTypes.asn" />
+    <None Remove="Examples\PKCS\X.501\EnhancedSecurity.asn" />
+    <None Remove="Examples\PKCS\X.501\HierarchicalOperationalBindings.asn" />
+    <None Remove="Examples\PKCS\X.501\InformationFramework.asn" />
+    <None Remove="Examples\PKCS\X.501\LdapSystemSchema.asn" />
+    <None Remove="Examples\PKCS\X.501\Lightweight-Directory-Access-Protocol-V3.asn" />
+    <None Remove="Examples\PKCS\X.501\OperationalBindingManagement.asn" />
+    <None Remove="Examples\PKCS\X.501\OSIProtocolSpecification.asn" />
+    <None Remove="Examples\PKCS\X.501\PasswordPolicy.asn" />
+    <None Remove="Examples\PKCS\X.501\PkiPmiExternalDataTypes.asn" />
+    <None Remove="Examples\PKCS\X.501\SchemaAdministration.asn" />
+    <None Remove="Examples\PKCS\X.501\SelectedAttributeTypes.asn" />
+    <None Remove="Examples\PKCS\X.501\ServiceAdministration.asn" />
+    <None Remove="Examples\PKCS\X.501\SpkmGssTokens.asn" />
+    <None Remove="Examples\PKCS\X.501\SupportedInformationObjects.asn" />
+    <None Remove="Examples\PKCS\X.501\UsefulDefinitions.asn" />
+    <None Remove="Examples\PKCS\X.509\AlgorithmObjectIdentifiers.asn" />
+    <None Remove="Examples\PKCS\X.509\AttributeCertificateDefinitions.asn" />
+    <None Remove="Examples\PKCS\X.509\AuthenticationFramework.asn" />
+    <None Remove="Examples\PKCS\X.509\CertificateExtensions.asn" />
+    <None Remove="Examples\PKCS\X.509\ExtensionAttributes.asn" />
+    <None Remove="Examples\PKCS\X.509\PkiPmiExternalDataTypes.asn" />
+    <None Remove="Examples\PKCS\X.509\SupportedInformationObjects.asn" />
+    <None Remove="Examples\PKCS\X.509\UsefulDefinitions.asn" />
     <None Remove="Examples\RFC1157-SNMP.asn1" />
     <None Remove="Examples\SNMPv1\RFC1155-SMI.asn1" />
     <None Remove="Examples\SNMPv1\RFC1158-MIB.asn1" />
@@ -763,6 +798,9 @@
     <Content Include="Examples\PKCS\PKCS#12\RFC7292.asn1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Examples\PKCS\PKCS#1\SupportedInformationObjects.asn1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Examples\PKCS\PKCS#1\UsefulDefinitions.asn1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -779,33 +817,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Examples\PKCS\PKCS#8\RFC5208.asn1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Examples\PKCS\X.501\UsefulDefinitions.asn1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Examples\PKCS\X.501\ServiceAdministration.asn1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Examples\PKCS\X.501\SchemaAdministration.asn1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Examples\PKCS\X.501\OperationalBindingManagement.asn1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Examples\PKCS\X.501\LdapSystemSchema.asn1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Examples\PKCS\X.501\InformationFramework.asn1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Examples\PKCS\X.501\EnhancedSecurity.asn1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Examples\PKCS\X.501\DSAOperationalAttributeTypes.asn1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Examples\PKCS\X.501\BasicAccessControl.asn1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Examples\PKCS\PKIX\AlgorithmInformation-2009 - RFC5912.asn1">
@@ -859,22 +870,106 @@
     <Content Include="Examples\PKCS\PKIX\SCVP-2009 - RFC5912.asn1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Examples\PKCS\X.509\AlgorithmObjectIdentifiers.asn1">
+    <Content Include="Examples\PKCS\X.501\AttributeCertificateDefinitions.asn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Examples\PKCS\X.509\PkiPmiExternalDataTypes.asn1">
+    <Content Include="Examples\PKCS\X.501\AuthenticationFramework.asn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Examples\PKCS\X.509\ExtensionAttributes.asn1">
+    <Content Include="Examples\PKCS\X.501\BasicAccessControl.asn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Examples\PKCS\X.509\CertificateExtensions.asn1">
+    <Content Include="Examples\PKCS\X.501\CertificateExtensions.asn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Examples\PKCS\X.509\AuthenticationFramework.asn1">
+    <Content Include="Examples\PKCS\X.501\CommonProtocolSpecification.asn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Examples\PKCS\X.509\AttributeCertificateDefinitions.asn1">
+    <Content Include="Examples\PKCS\X.501\DirectoryAbstractService.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\DirectoryOperationalBindingTypes.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\DirectoryOSIProtocols.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\DirectoryShadowAbstractService.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\DistributedOperations.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\DSAOperationalAttributeTypes.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\EnhancedSecurity.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\HierarchicalOperationalBindings.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\InformationFramework.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\LdapSystemSchema.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\Lightweight-Directory-Access-Protocol-V3.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\OperationalBindingManagement.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\OSIProtocolSpecification.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\PasswordPolicy.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\PkiPmiExternalDataTypes.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\SchemaAdministration.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\SelectedAttributeTypes.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\ServiceAdministration.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\SpkmGssTokens.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\SupportedInformationObjects.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.501\UsefulDefinitions.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509\AlgorithmObjectIdentifiers.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509\AttributeCertificateDefinitions.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509\AuthenticationFramework.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509\CertificateExtensions.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509\ExtensionAttributes.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509\PkiPmiExternalDataTypes.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509\SupportedInformationObjects.asn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples\PKCS\X.509\UsefulDefinitions.asn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Examples\SNMPv1\RFC1155-SMI.asn1">

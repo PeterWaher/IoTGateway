@@ -1,0 +1,46 @@
+
+SupportedInformationObjects
+ {joint-iso-itu-t ds(5) module(1) supportedInformationObjects(49) 10}
+DEFINITIONS
+IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+
+  ALGORITHM, EXTENSION
+    FROM AuthenticationFramework
+      {joint-iso-itu-t ds(5) module(1) authenticationFramework(7) 10} WITH SUCCESSORS
+
+  ATTRIBUTE
+    FROM UsefulDefinitions
+     {joint-iso-itu-t ds(5) module(1) usefulDefinitions(0) 10} WITH SUCCESSORS;
+
+SupportedPublicKeyAlgorithms        ALGORITHM ::= {...}
+SupportedAltPublicKeyAlgorithms     ALGORITHM ::= {...}
+
+SupportedSignatureAlgorithms        ALGORITHM ::= {...}
+SupportedAltSignatureAlgorithms     ALGORITHM ::= {...}
+
+SupportedKeyEstablishmentAlgos      ALGORITHM ::= {...}
+SupportedAltKeyEstablishmentAlgos   ALGORITHM ::= {...}
+
+SupportedKeyDerivationAlgos         ALGORITHM ::= {...}
+SupportedAltKeyDerivationAlgos      ALGORITHM ::= {...}
+
+SupportedHashAlgorithms             ALGORITHM ::= {...}
+SupportedAltHashAlgorithms          ALGORITHM ::= {...}
+
+SupportedSymmetricKeyAlgorithms     ALGORITHM ::= {...}
+SupportedAltSymmetricKeyAlgorithms  ALGORITHM ::= {...}
+
+SupportedAuthenEncryptAlgorithms    ALGORITHM ::= {...}
+SupportedAltAuthenEncryptAlgorithms ALGORITHM ::= {...}
+
+SupportedIcvAlgorithms              ALGORITHM ::= {...}
+SupportedAltIcvAlgorithms           ALGORITHM ::= {...}
+
+SupportedAttributes          ATTRIBUTE ::= {...}
+SupportedExtensionAttributes ATTRIBUTE ::= {...}
+
+ExtensionSet EXTENSION ::= {...}
+
+END

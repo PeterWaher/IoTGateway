@@ -1,0 +1,702 @@
+--  A.3 - Attribute Certificate Framework module
+AttributeCertificateDefinitions
+  {joint-iso-itu-t ds(5) module(1) attributeCertificateDefinitions(32) 10}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+
+-- EXPORTS ALL 
+
+IMPORTS
+
+  id-asx, id-at, id-ce, id-mr, id-oc,
+  ATTRIBUTE, Attribute{}, AttributeType, AttributeTypeAndValue, directoryString,
+  MATCHING-RULE,   OBJECT-CLASS, SupportedAttributes, SYNTAX-NAME, top, TimeSpecification,
+  -- TSB: informal correction agreed with the editor (not in the Cor.3 text): SupportedAttributes added
+  UnboundedDirectoryString
+    FROM UsefulDefinitions
+      {joint-iso-itu-t ds(5) module(1) usefulDefinitions(0) 10} WITH SUCCESSORS
+
+/* 
+  The below ASN.1 items have been moved from the InformationFrameword module
+  to the UsefulDefinitions module. 
+  ATTRIBUTE, Attribute{}, AttributeType, AttributeTypeAndValue, MATCHING-RULE, Name,
+  OBJECT-CLASS, RelativeDistinguishedName, SupportedAttributes, SYNTAX-NAME, top
+    FROM InformationFramework
+      {joint-iso-itu-t ds(5) module(1) informationFramework(1) 9} WITH SUCCESSORS
+*/ 
+
+  ALGORITHM, AlgorithmIdentifier, Certificate, CertificateList, CertificateSerialNumber,
+  EXTENSION, Extensions, InfoSyntax, PolicySyntax, SIGNED{}, SupportedAlgorithms,
+  UniqueIdentifier, x509CertificateList
+    FROM AuthenticationFramework
+      {joint-iso-itu-t ds(5) module(1) authenticationFramework(7) 10} WITH SUCCESSORS
+/*
+  TimeSpecification, UnboundedDirectoryString, UniqueIdentifier
+    FROM SelectedAttributeTypes
+      {joint-iso-itu-t ds(5) module(1) selectedAttributeTypes(5) 9} WITH SUCCESSORS
+*/
+  certificateListExactMatch, GeneralName, GeneralNames, NameConstraintsSyntax
+    FROM CertificateExtensions
+      {joint-iso-itu-t ds(5) module(1) certificateExtensions(26) 10} WITH SUCCESSORS ;
+
+
+-- Unless explicitly noted otherwise, there is no significance to the ordering
+-- of components of a SEQUENCE OF construct in this Specification.
+
+-- attribute certificate constructs 
+
+AttributeCertificate ::= SIGNED{TBSAttributeCertificate}
+
+TBSAttributeCertificate ::= SEQUENCE {
+  version                 AttCertVersion, -- version is v2
+  holder                  Holder,
+  issuer                  AttCertIssuer,
+  signature               AlgorithmIdentifier{{SupportedAlgorithms}},
+  serialNumber            CertificateSerialNumber,
+  attrCertValidityPeriod  AttCertValidityPeriod,
+  attributes              SEQUENCE OF Attribute{{SupportedAttributes}},
+  issuerUniqueID          UniqueIdentifier OPTIONAL,
+  ...,
+  ...,
+  extensions              Extensions OPTIONAL
+ }  (CONSTRAINED BY { -- shall be DER encoded -- } )
+
+AttCertVersion ::= INTEGER {v2(1)}
+
+Holder ::= SEQUENCE {
+  baseCertificateID  [0]  IssuerSerial OPTIONAL,
+  entityName         [1]  GeneralNames OPTIONAL,
+  objectDigestInfo   [2]  ObjectDigestInfo OPTIONAL }
+  (WITH COMPONENTS {..., baseCertificateID  PRESENT } |
+   WITH COMPONENTS {..., entityName  PRESENT } |
+   WITH COMPONENTS {..., objectDigestInfo  PRESENT } )
+
+IssuerSerial ::= SEQUENCE {
+  issuer     GeneralNames,
+  serial     CertificateSerialNumber,
+  issuerUID  UniqueIdentifier OPTIONAL,
+  ... }
+
+ObjectDigestInfo ::= SEQUENCE {
+  digestedObjectType   ENUMERATED {
+    publicKey        (0),
+    publicKeyCert    (1),
+    otherObjectTypes (2)},
+  otherObjectTypeID   OBJECT IDENTIFIER OPTIONAL,
+  digestAlgorithm     AlgorithmIdentifier{{SupportedAlgorithms}},
+  objectDigest        BIT STRING,
+  ... }
+
+AttCertIssuer ::= [0]  SEQUENCE {
+  issuerName              GeneralNames OPTIONAL,
+  baseCertificateID  [0]  IssuerSerial OPTIONAL,
+  objectDigestInfo   [1]  ObjectDigestInfo OPTIONAL,
+  ... }
+  (WITH COMPONENTS {..., issuerName  PRESENT } |
+   WITH COMPONENTS {..., baseCertificateID  PRESENT } |
+   WITH COMPONENTS {..., objectDigestInfo  PRESENT } )
+
+AttCertValidityPeriod ::= SEQUENCE {
+  notBeforeTime  GeneralizedTime,
+  notAfterTime   GeneralizedTime,
+  ... }
+
+AttributeCertificationPath ::= SEQUENCE {
+  attributeCertificate  AttributeCertificate,
+  acPath                SEQUENCE OF ACPathData OPTIONAL,
+  ... }
+
+ACPathData ::= SEQUENCE {
+  certificate           [0]  Certificate OPTIONAL,
+  attributeCertificate  [1]  AttributeCertificate OPTIONAL,
+  ... }
+
+PrivilegePolicy ::= OBJECT IDENTIFIER
+
+-- privilege attributes
+
+-- Start X.509 (2019) Cor. 2 update
+role ATTRIBUTE ::= {
+  WITH SYNTAX  RoleSyntax
+  LDAP-SYNTAX  ldapRoleSyntax.&id
+  LDAP-NAME    {"role"}
+  LDAP-DESC    "LDAP role"
+  ID           id-at-role }
+-- End X.509 (2019) Cor. 2 update
+
+RoleSyntax ::= SEQUENCE {
+  roleAuthority  [0]  GeneralNames OPTIONAL,
+  roleName       [1]  GeneralName,
+  ... }
+
+-- Start X.509 (2019) Cor. 2 update
+xmlPrivilegeInfo ATTRIBUTE ::= {
+  WITH SYNTAX  UTF8String --contains XML-encoded privilege information
+  LDAP-SYNTAX  directoryString.&id
+  LDAP-NAME    {"xmlPrivInfo"}
+  LDAP-DESC    "XML Privilege Info"
+  ID           id-at-xMLPrivilegeInfo }
+-- End X.509 (2019) Cor. 2 update
+
+-- Start X.509 (2019) Cor. 2 update
+permission ATTRIBUTE ::= {
+  WITH SYNTAX             DualStringSyntax
+  EQUALITY MATCHING RULE  dualStringMatch
+  LDAP-SYNTAX             ldapDualStringSyntax.&id
+  LDAP-NAME               {"permission"}
+  LDAP-DESC               "LDAP permission"
+  ID                      id-at-permission }
+-- End X.509 (2019) Cor. 2 update
+
+DualStringSyntax ::= SEQUENCE {
+  operation  [0]  UnboundedDirectoryString,
+  object     [1]  UnboundedDirectoryString,
+  ... }
+
+-- Start X.509 (2019) Cor. 2 update
+dualStringMatch MATCHING-RULE ::= {
+  SYNTAX  DualStringSyntax
+  LDAP-SYNTAX    ldapDualStringSyntax.&id
+  LDAP-NAME      {"permission"}
+  LDAP-DESC      "LDAP permission match"
+  ID      id-mr-dualStringMatch }
+-- End X.509 (2019) Cor. 2 update
+
+timeSpecification EXTENSION ::= {
+  SYNTAX         TimeSpecification
+  IDENTIFIED BY  id-ce-timeSpecification }
+
+targetingInformation EXTENSION ::= {
+  SYNTAX         SEQUENCE SIZE (1..MAX) OF Targets
+  IDENTIFIED BY  id-ce-targetingInformation }
+
+Targets ::= SEQUENCE SIZE (1..MAX) OF Target
+
+Target ::= CHOICE {
+  targetName   [0]  GeneralName,
+  targetGroup  [1]  GeneralName,
+  targetCert   [2]  TargetCert,
+  ... }
+
+TargetCert ::= SEQUENCE {
+  targetCertificate  IssuerSerial,
+  targetName         GeneralName OPTIONAL,
+  certDigestInfo     ObjectDigestInfo OPTIONAL }
+
+userNotice EXTENSION ::= {
+  SYNTAX         SEQUENCE SIZE (1..MAX) OF UserNotice
+  IDENTIFIED BY  id-ce-userNotice }
+
+-- Copied from IETF RFC 5280
+
+UserNotice ::= SEQUENCE {
+  noticeRef     NoticeReference OPTIONAL,
+  explicitText  DisplayText OPTIONAL }
+
+NoticeReference ::= SEQUENCE {
+  organization   DisplayText,
+  noticeNumbers  SEQUENCE OF INTEGER }
+
+DisplayText ::= CHOICE {
+  visibleString  VisibleString(SIZE (1..200)),
+  bmpString      BMPString(SIZE (1..200)),
+  utf8String     UTF8String(SIZE (1..200)) }
+
+acceptablePrivilegePolicies EXTENSION ::= {
+  SYNTAX         AcceptablePrivilegePoliciesSyntax
+  IDENTIFIED BY  id-ce-acceptablePrivilegePolicies }
+
+AcceptablePrivilegePoliciesSyntax ::= SEQUENCE SIZE (1..MAX) OF PrivilegePolicy
+
+singleUse EXTENSION ::= {
+  SYNTAX         NULL
+  IDENTIFIED BY  id-ce-singleUse }
+
+groupAC EXTENSION ::= {
+  SYNTAX         NULL
+  IDENTIFIED BY  id-ce-groupAC }
+
+noRevAvail EXTENSION ::= {
+  SYNTAX         NULL
+  IDENTIFIED BY  id-ce-noRevAvail }
+
+sOAIdentifier EXTENSION ::= {
+  SYNTAX         NULL
+  IDENTIFIED BY  id-ce-sOAIdentifier }
+
+attributeDescriptor EXTENSION ::= {
+  SYNTAX         AttributeDescriptorSyntax
+  IDENTIFIED BY  id-ce-attributeDescriptor } -- X.509 (2019) Cor.3 (2026) DR 440
+
+AttributeDescriptorSyntax ::= SEQUENCE {
+  identifier             AttributeIdentifier,
+  attributeSyntax        OCTET STRING(SIZE (1..MAX)),
+  name              [0]  AttributeName OPTIONAL,
+  description       [1]  AttributeDescription OPTIONAL,
+  dominationRule         PrivilegePolicyIdentifier,
+  ... }
+
+AttributeIdentifier ::= ATTRIBUTE.&id({AttributeIDs})
+
+AttributeIDs ATTRIBUTE ::= {...}
+
+AttributeName ::= UTF8String(SIZE (1..MAX))
+
+AttributeDescription ::= UTF8String(SIZE (1..MAX))
+
+PrivilegePolicyIdentifier ::= SEQUENCE {
+  privilegePolicy  PrivilegePolicy,
+  privPolSyntax    InfoSyntax,
+  ... }
+
+roleSpecCertIdentifier EXTENSION ::= {
+  SYNTAX         RoleSpecCertIdentifierSyntax
+  IDENTIFIED BY  id-ce-roleSpecCertIdentifier } -- X.509 (2019) Cor.3 (2026) DR 440
+
+RoleSpecCertIdentifierSyntax ::=
+  SEQUENCE SIZE (1..MAX) OF RoleSpecCertIdentifier
+
+RoleSpecCertIdentifier ::= SEQUENCE {
+  roleName              [0]  GeneralName,
+  roleCertIssuer        [1]  GeneralName,
+  roleCertSerialNumber  [2]  CertificateSerialNumber OPTIONAL,
+  roleCertLocator       [3]  GeneralNames OPTIONAL,
+  ... }
+
+basicAttConstraints EXTENSION ::= {
+  SYNTAX         BasicAttConstraintsSyntax
+  IDENTIFIED BY  id-ce-basicAttConstraints } -- X.509 (2019) Cor.3 (2026) DR 440
+
+BasicAttConstraintsSyntax ::= SEQUENCE {
+  authority          BOOLEAN DEFAULT FALSE,
+  pathLenConstraint  INTEGER(0..MAX) OPTIONAL,
+  ... }
+
+delegatedNameConstraints EXTENSION ::= {
+  SYNTAX         NameConstraintsSyntax
+  IDENTIFIED BY  id-ce-delegatedNameConstraints }
+
+acceptableCertPolicies EXTENSION ::= {
+  SYNTAX         AcceptableCertPoliciesSyntax
+  IDENTIFIED BY  id-ce-acceptableCertPolicies }
+
+AcceptableCertPoliciesSyntax ::= SEQUENCE SIZE (1..MAX) OF CertPolicyId
+
+CertPolicyId ::= OBJECT IDENTIFIER
+
+authorityAttributeIdentifier EXTENSION ::= {
+  SYNTAX         AuthorityAttributeIdentifierSyntax
+  IDENTIFIED BY  id-ce-authorityAttributeIdentifier } -- X.509 (2019) Cor.3 (2026) DR 440
+
+AuthorityAttributeIdentifierSyntax ::= SEQUENCE SIZE (1..MAX) OF AuthAttId
+
+AuthAttId ::= IssuerSerial
+
+indirectIssuer EXTENSION ::= {
+  SYNTAX         NULL
+  IDENTIFIED BY  id-ce-indirectIssuer }
+
+issuedOnBehalfOf EXTENSION ::= {
+  SYNTAX         GeneralName
+  IDENTIFIED BY  id-ce-issuedOnBehalfOf }
+
+noAssertion EXTENSION ::= {
+  SYNTAX         NULL
+  IDENTIFIED BY  id-ce-noAssertion }
+
+allowedAttributeAssignments EXTENSION ::= {
+  SYNTAX         AllowedAttributeAssignments
+  IDENTIFIED BY  id-ce-allowedAttributeAssignments }
+
+AllowedAttributeAssignments ::= SET OF SEQUENCE {
+  attributes              [0]  SET OF CHOICE {
+    attributeType           [0]  AttributeType,
+    attributeTypeandValues  [1]  Attribute{{SupportedAttributes}},
+    ... },
+  holderDomain            [1]  GeneralName,
+  ... }
+
+attributeMappings EXTENSION ::= {
+  SYNTAX         AttributeMappings
+  IDENTIFIED BY  id-ce-attributeMappings }
+
+AttributeMappings ::= SET OF CHOICE {
+  typeMappings      [0]  SEQUENCE {
+    local             [0]  AttributeType,
+    remote            [1]  AttributeType,
+    ... },
+  typeValueMappings [1]  SEQUENCE {
+    local             [0]  AttributeTypeAndValue,
+    remote            [1]  AttributeTypeAndValue,
+    ... } }
+
+holderNameConstraints EXTENSION ::= {
+  SYNTAX         HolderNameConstraintsSyntax
+  IDENTIFIED BY  id-ce-holderNameConstraints }
+
+HolderNameConstraintsSyntax ::= SEQUENCE {
+  permittedSubtrees  [0]  GeneralSubtrees,
+  excludedSubtrees   [1]  GeneralSubtrees OPTIONAL,
+  ... }
+
+GeneralSubtrees ::= SEQUENCE SIZE (1..MAX) OF GeneralSubtree
+
+GeneralSubtree ::= SEQUENCE {
+  base          GeneralName,
+  minimum  [0]  BaseDistance DEFAULT 0,
+  maximum  [1]  BaseDistance OPTIONAL,
+  ... }
+
+BaseDistance ::= INTEGER(0..MAX)
+
+-- PMI object classes 
+
+-- Start X.509 (2019) Cor. 2 update
+pmiUser OBJECT-CLASS ::= {
+  SUBCLASS OF  {top}
+  KIND         auxiliary
+  MAY CONTAIN  {attributeCertificateAttribute}
+  LDAP-NAME    {"pmiUser"}
+  LDAP-DESC    "Privilege holder"
+  ID           id-oc-pmiUser }
+-- End X.509 (2019) Cor. 2 update
+
+-- Start X.509 (2019) Cor. 2 update
+pmiAA OBJECT-CLASS ::= { -- a PMI AA
+  SUBCLASS OF  {top}
+  KIND         auxiliary
+  MAY CONTAIN  {aACertificate |
+                attributeCertificateRevocationList |
+                eeAttrCertificateRevocationList |
+                attributeAuthorityRevocationList}
+  LDAP-NAME    {"pmiAA"}
+  LDAP-DESC    "Privilege authority"
+  ID           id-oc-pmiAA }
+-- End X.509 (2019) Cor. 2 update
+
+-- Start X.509 (2019) Cor. 2 update
+pmiSOA OBJECT-CLASS ::= { -- a PMI Source of Authority
+  SUBCLASS OF  {top}
+  KIND         auxiliary
+  MAY CONTAIN  {attributeCertificateRevocationList |
+                eeAttrCertificateRevocationList |
+                attributeAuthorityRevocationList |
+                attributeDescriptorCertificate}
+  LDAP-NAME    {"pmiSOA"}
+  LDAP-DESC    "Source of authority"				
+  ID           id-oc-pmiSOA }
+-- End X.509 (2019) Cor. 2 update
+
+-- Start X.509 (2019) Cor. 2 update
+attCertCRLDistributionPt OBJECT-CLASS ::= {
+  SUBCLASS OF  {top}
+  KIND         auxiliary
+  MAY CONTAIN  {attributeCertificateRevocationList |
+                eeAttrCertificateRevocationList |
+                attributeAuthorityRevocationList}
+  LDAP-NAME    {"ACRL distribution point"}
+  ID           id-oc-attCertCRLDistributionPts }
+-- End X.509 (2019) Cor. 2 update
+
+-- Start X.509 (2019) Cor. 2 update
+pmiDelegationPath OBJECT-CLASS ::= {
+  SUBCLASS OF  {top}
+  KIND         auxiliary
+  MAY CONTAIN  {delegationPath}
+  LDAP-NAME    {"pmiDelegationPath"}
+  LDAP-DESC    "Privilege delegation path" 
+  ID           id-oc-pmiDelegationPath }
+-- End X.509 (2019) Cor. 2 update
+
+-- Start X.509 (2019) Cor. 2 update
+privilegePolicy OBJECT-CLASS ::= {
+  SUBCLASS OF  {top}
+  KIND         auxiliary
+  MAY CONTAIN  {privPolicy}
+  LDAP-NAME    {"privilegePolicy"}
+  LDAP-DESC    "Privilege policy"
+  ID           id-oc-privilegePolicy }
+-- End X.509 (2019) Cor. 2 update
+
+-- Start X.509 (2019) Cor. 2 update
+protectedPrivilegePolicy OBJECT-CLASS ::= {
+  SUBCLASS OF  {top}
+  KIND         auxiliary
+  MAY CONTAIN  {protPrivPolicy}
+  LDAP-NAME    {"protectedPrivilegePolicy"}
+  LDAP-DESC    "Protected privilege policy"
+  ID           id-oc-protectedPrivilegePolicy }
+-- End X.509 (2019) Cor. 2 update
+
+
+-- PMI directory attributes 
+-- Start X.509 (2019) Cor. 2 update
+attributeCertificateAttribute ATTRIBUTE ::= {
+  WITH SYNTAX             AttributeCertificate
+  EQUALITY MATCHING RULE  attributeCertificateExactMatch
+  LDAP-SYNTAX             x509AttributeCertificate.&id
+  LDAP-NAME               {"attributeCertificateAttribute"}
+  LDAP-DESC               "X.509 Attr certificate attribute"
+  ID                      id-at-attributeCertificate }
+-- End X.509 (2019) Cor. 2 update
+
+-- Start X.509 (2019) Cor. 2 update
+aACertificate ATTRIBUTE ::= {
+  WITH SYNTAX             AttributeCertificate
+  EQUALITY MATCHING RULE  attributeCertificateExactMatch
+  LDAP-SYNTAX             x509AttributeCertificate.&id
+  LDAP-NAME               {"aACertificate"}
+  LDAP-DESC               "X.509 AA certificate"
+  ID                      id-at-aACertificate }
+-- End X.509 (2019) Cor. 2 update
+
+-- Start X.509 (2019) Cor. 2 update
+attributeDescriptorCertificate ATTRIBUTE ::= {
+  WITH SYNTAX             AttributeCertificate
+  EQUALITY MATCHING RULE  attributeCertificateExactMatch
+  LDAP-SYNTAX             x509AttributeCertificate.&id
+  LDAP-NAME               {"AttributeDescriptorCertificate"}
+  LDAP-DESC               "X.509 Attr descriptor certificate"
+  ID                      id-at-attributeDescriptorCertificate }
+-- End X.509 (2019) Cor. 2 update
+
+
+attributeCertificateRevocationList ATTRIBUTE ::= {
+  WITH SYNTAX             CertificateList
+  EQUALITY MATCHING RULE  certificateListExactMatch
+  LDAP-SYNTAX             x509CertificateList.&id
+  LDAP-NAME               {"AttrCertificateRevocationList"}
+  LDAP-DESC               "X.509 Attr certificate revocation list"
+  ID                      id-at-attributeCertificateRevocationList }
+
+eeAttrCertificateRevocationList ATTRIBUTE ::= {
+  WITH SYNTAX             CertificateList
+  EQUALITY MATCHING RULE  certificateListExactMatch
+  LDAP-SYNTAX             x509CertificateList.&id
+  LDAP-NAME               {"EEAttrCertificateRevocationList"}
+  LDAP-DESC               "X.509 EEAttr certificate revocation list"
+  ID                      id-at-eeAttrCertificateRevocationList }
+
+attributeAuthorityRevocationList ATTRIBUTE ::= {
+  WITH SYNTAX             CertificateList
+  EQUALITY MATCHING RULE  certificateListExactMatch
+  LDAP-SYNTAX             x509CertificateList.&id
+  LDAP-NAME               {"AACertificateRevocationList"}
+  LDAP-DESC               "X.509 AA certificate revocation list"
+  ID                      id-at-attributeAuthorityRevocationList }
+
+-- Start X.509 (2019) Cor. 2 update
+delegationPath ATTRIBUTE ::= {
+  WITH SYNTAX  AttCertPath
+  LDAP-SYNTAX             ldapAttCertPath.&id
+  LDAP-NAME               {"delegationPath"}
+  LDAP-DESC               "LDAP delegation path"
+  ID           id-at-delegationPath }
+-- End X.509 (2019) Cor. 2 update
+
+AttCertPath ::= SEQUENCE OF AttributeCertificate
+
+-- Start X.509 (2019) Cor. 2 update
+privPolicy ATTRIBUTE ::= {
+  WITH SYNTAX  PolicySyntax
+  LDAP-SYNTAX             ldapPolicySyntax.&id -- TSB: informal correction agreed with the editor (not in the Cor.3 text): was x509PolicySyntax
+  LDAP-NAME               {"privPolicy"}
+  LDAP-DESC               "X.509 privPolicy"
+  ID           id-at-privPolicy }
+-- End X.509 (2019) Cor. 2 update
+
+-- Start X.509 (2019) Cor. 2 update
+protPrivPolicy ATTRIBUTE ::= {
+  WITH SYNTAX             AttributeCertificate
+  EQUALITY MATCHING RULE  attributeCertificateExactMatch
+  LDAP-SYNTAX             x509AttributeCertificate.&id
+  LDAP-NAME               {"protPrivPolicy"}
+  LDAP-DESC               "X.509 prot priv policy"
+  ID                      id-at-protPrivPolicy }
+-- End X.509 (2019) Cor. 2 update
+
+-- Start X.509 (2019) Cor. 2 update
+xmlPrivPolicy ATTRIBUTE ::= {
+  WITH SYNTAX	UTF8String -- XML-encoded privilege policy information
+  LDAP-SYNTAX 	directoryString.&id
+  LDAP-NAME		{"xmlPrivPolicy"}
+  LDAP-DESC		"LDAP XML Priv Policy"
+  ID           id-at-xmlPrivPolicy }
+-- End X.509 (2019) Cor. 2 update
+
+-- Attribute certificate extensions and matching rules 
+
+-- Start X.509 (2019) Cor. 2 update
+attributeCertificateExactMatch MATCHING-RULE ::= {
+  SYNTAX  AttributeCertificateExactAssertion
+  LDAP-SYNTAX  attCertExactAssertion.&id
+  LDAP-NAME    {"attributeCertificateExactMatch"}
+  LDAP-DESC    "Attribute Certificate Exact Match"
+  ID      id-mr-attributeCertificateExactMatch }
+-- End X.509 (2019) Cor. 2 update
+
+AttributeCertificateExactAssertion ::= SEQUENCE {
+  serialNumber  CertificateSerialNumber,
+  issuer        AttCertIssuer,
+  ... }
+
+-- Start X.509 (2019) Cor. 2 update
+attributeCertificateMatch MATCHING-RULE ::= {
+  SYNTAX  AttributeCertificateAssertion
+  LDAP-SYNTAX  attCertAssertion.&id
+  LDAP-NAME    {"attributeCertificateMatch"}
+  LDAP-DESC    "Attribute Certificate Match"
+  ID      id-mr-attributeCertificateMatch }
+-- End X.509 (2019) Cor. 2 update
+
+AttributeCertificateAssertion ::= SEQUENCE {
+  holder             [0]  CHOICE {
+    baseCertificateID  [0]  IssuerSerial,
+    holderName         [1]  GeneralNames,
+    ...} OPTIONAL,
+  issuer             [1]  GeneralNames OPTIONAL,
+  attCertValidity    [2]  GeneralizedTime OPTIONAL,
+  attType            [3]  SET OF AttributeType OPTIONAL,
+  ... }
+
+-- At least one component of the sequence shall be present
+
+holderIssuerMatch MATCHING-RULE ::= {
+  SYNTAX  HolderIssuerAssertion
+  ID      id-mr-holderIssuerMatch }
+
+HolderIssuerAssertion ::= SEQUENCE {
+  holder  [0]  Holder OPTIONAL,
+  issuer  [1]  AttCertIssuer OPTIONAL,
+  ... }
+
+delegationPathMatch MATCHING-RULE ::= {
+  SYNTAX  DelMatchSyntax
+  ID      id-mr-delegationPathMatch }
+
+DelMatchSyntax ::= SEQUENCE {
+  firstIssuer  AttCertIssuer,
+  lastHolder   Holder,
+  ... }
+
+extensionPresenceMatch MATCHING-RULE ::= {
+  SYNTAX  EXTENSION.&id
+  ID      id-mr-extensionPresenceMatch }
+  
+-- Start X.509 (2019) Cor. 2 update
+ldapRoleSyntax SYNTAX-NAME ::= {
+  LDAP-DESC         "LDAP RoleSyntax"
+  DIRECTORY SYNTAX  RoleSyntax
+  ID                id-asx-x509RoleSyntax }
+
+ldapDualStringSyntax SYNTAX-NAME ::= {
+  LDAP-DESC         "LDAP DualStringSyntax"
+  DIRECTORY SYNTAX  DualStringSyntax
+  ID                id-asx-x509DualStringSyntax }
+
+x509AttributeCertificate SYNTAX-NAME ::= {
+  LDAP-DESC         "X.509 AttributeCertificate"
+  DIRECTORY SYNTAX  AttributeCertificate
+  ID                id-asx-x509AttributeCertificateSyntax }
+
+ldapAttCertPath SYNTAX-NAME ::= {
+  LDAP-DESC         "LDAP AttCertPath"
+  DIRECTORY SYNTAX  AttCertPath
+  ID                id-asx-x509AttCertPath }
+
+ldapPolicySyntax SYNTAX-NAME ::= {
+  LDAP-DESC         "LDAP Policy syntax"
+  DIRECTORY SYNTAX  PolicySyntax
+  ID                id-asx-x509PolicySyntax }
+
+attCertExactAssertion SYNTAX-NAME ::= {
+  LDAP-DESC         "Attribute Certificate Exact Match"
+  DIRECTORY SYNTAX  AttributeCertificateExactAssertion
+  ID                id-asx-attCertExactAssertion }
+
+attCertAssertion SYNTAX-NAME ::= {					
+  LDAP-DESC         "Attribute Certificate Match"
+  DIRECTORY SYNTAX  AttributeCertificateAssertion
+  ID                id-asx-attCertAssertion }
+-- End X.509 (2019) Cor. 2 update 
+  
+
+-- object identifier assignments 
+
+-- object classes 
+
+id-oc-pmiUser                            OBJECT IDENTIFIER ::= {id-oc 24}
+id-oc-pmiAA                              OBJECT IDENTIFIER ::= {id-oc 25}
+id-oc-pmiSOA                             OBJECT IDENTIFIER ::= {id-oc 26}
+id-oc-attCertCRLDistributionPts          OBJECT IDENTIFIER ::= {id-oc 27}
+id-oc-privilegePolicy                    OBJECT IDENTIFIER ::= {id-oc 32}
+id-oc-pmiDelegationPath                  OBJECT IDENTIFIER ::= {id-oc 33}
+id-oc-protectedPrivilegePolicy           OBJECT IDENTIFIER ::= {id-oc 34}
+
+-- directory attributes 
+
+id-at-attributeCertificate               OBJECT IDENTIFIER ::= {id-at 58}
+id-at-attributeCertificateRevocationList OBJECT IDENTIFIER ::= {id-at 59}
+id-at-aACertificate                      OBJECT IDENTIFIER ::= {id-at 61}
+id-at-attributeDescriptorCertificate     OBJECT IDENTIFIER ::= {id-at 62}
+id-at-attributeAuthorityRevocationList   OBJECT IDENTIFIER ::= {id-at 63}
+id-at-privPolicy                         OBJECT IDENTIFIER ::= {id-at 71}
+id-at-role                               OBJECT IDENTIFIER ::= {id-at 72}
+id-at-delegationPath                     OBJECT IDENTIFIER ::= {id-at 73}
+id-at-protPrivPolicy                     OBJECT IDENTIFIER ::= {id-at 74}
+id-at-xMLPrivilegeInfo                   OBJECT IDENTIFIER ::= {id-at 75}
+id-at-xmlPrivPolicy                      OBJECT IDENTIFIER ::= {id-at 76}
+id-at-permission                         OBJECT IDENTIFIER ::= {id-at 82}
+id-at-eeAttrCertificateRevocationList    OBJECT IDENTIFIER ::= {id-at 102}
+
+-- attribute certificate extensions 
+
+id-ce-authorityAttributeIdentifier       OBJECT IDENTIFIER ::= {id-ce 38}
+id-ce-roleSpecCertIdentifier             OBJECT IDENTIFIER ::= {id-ce 39}
+id-ce-basicAttConstraints                OBJECT IDENTIFIER ::= {id-ce 41}
+id-ce-delegatedNameConstraints           OBJECT IDENTIFIER ::= {id-ce 42}
+id-ce-timeSpecification                  OBJECT IDENTIFIER ::= {id-ce 43}
+id-ce-attributeDescriptor                OBJECT IDENTIFIER ::= {id-ce 48}
+id-ce-userNotice                         OBJECT IDENTIFIER ::= {id-ce 49}
+id-ce-sOAIdentifier                      OBJECT IDENTIFIER ::= {id-ce 50}
+id-ce-acceptableCertPolicies             OBJECT IDENTIFIER ::= {id-ce 52}
+id-ce-targetingInformation               OBJECT IDENTIFIER ::= {id-ce 55}
+id-ce-noRevAvail                         OBJECT IDENTIFIER ::= {id-ce 56}
+id-ce-acceptablePrivilegePolicies        OBJECT IDENTIFIER ::= {id-ce 57}
+id-ce-indirectIssuer                     OBJECT IDENTIFIER ::= {id-ce 61}
+id-ce-noAssertion                        OBJECT IDENTIFIER ::= {id-ce 62}
+id-ce-issuedOnBehalfOf                   OBJECT IDENTIFIER ::= {id-ce 64}
+id-ce-singleUse                          OBJECT IDENTIFIER ::= {id-ce 65}
+id-ce-groupAC                            OBJECT IDENTIFIER ::= {id-ce 66}
+id-ce-allowedAttributeAssignments        OBJECT IDENTIFIER ::= {id-ce 67}
+id-ce-attributeMappings                  OBJECT IDENTIFIER ::= {id-ce 68}
+id-ce-holderNameConstraints              OBJECT IDENTIFIER ::= {id-ce 69}
+
+-- PMI matching rules 
+
+id-mr-attributeCertificateMatch          OBJECT IDENTIFIER ::= {id-mr 42}
+id-mr-attributeCertificateExactMatch     OBJECT IDENTIFIER ::= {id-mr 45}
+id-mr-holderIssuerMatch                  OBJECT IDENTIFIER ::= {id-mr 46}
+-- id-mr-authAttIdMatch                     OBJECT IDENTIFIER ::= {id-mr 53} obsolete, X.509 (2019) Cor.3 (2026) DR 441
+-- id-mr-roleSpecCertIdMatch                OBJECT IDENTIFIER ::= {id-mr 54} obsolete, X.509 (2019) Cor.3 (2026) DR 441
+-- id-mr-basicAttConstraintsMatch           OBJECT IDENTIFIER ::= {id-mr 55} obsolete, X.509 (2019) Cor.3 (2026) DR 441
+-- id-mr-delegatedNameConstraintsMatch      OBJECT IDENTIFIER ::= {id-mr 56} obsolete, X.509 (2019) Cor.3 (2026) DR 441
+-- id-mr-timeSpecMatch                      OBJECT IDENTIFIER ::= {id-mr 57} obsolete, X.509 (2019) Cor.3 (2026) DR 441
+-- id-mr-attDescriptorMatch                 OBJECT IDENTIFIER ::= {id-mr 58} obsolete, X.509 (2019) Cor.3 (2026) DR 441
+-- id-mr-acceptableCertPoliciesMatch        OBJECT IDENTIFIER ::= {id-mr 59} obsolete, X.509 (2019) Cor.3 (2026) DR 441
+id-mr-delegationPathMatch                OBJECT IDENTIFIER ::= {id-mr 61}
+-- id-mr-sOAIdentifierMatch                 OBJECT IDENTIFIER ::= {id-mr 66} obsolete, X.509 (2019) Cor.3 (2026) DR 441
+id-mr-extensionPresenceMatch             OBJECT IDENTIFIER ::= {id-mr 67}
+id-mr-dualStringMatch                    OBJECT IDENTIFIER ::= {id-mr 69}
+
+-- Start X.509 (2019) Cor. 2 update 
+id-asx-x509RoleSyntax                    OBJECT IDENTIFIER ::= {id-asx 13}
+id-asx-x509DualStringSyntax              OBJECT IDENTIFIER ::= {id-asx 14}
+id-asx-x509AttributeCertificateSyntax    OBJECT IDENTIFIER ::= {id-asx 15}
+id-asx-x509AttCertPath                   OBJECT IDENTIFIER ::= {id-asx 16}
+id-asx-x509PolicySyntax                  OBJECT IDENTIFIER ::= {id-asx 17}
+id-asx-attCertExactAssertion             OBJECT IDENTIFIER ::= {id-asx 18}
+id-asx-attCertAssertion                  OBJECT IDENTIFIER ::= {id-asx 19}
+-- End X.509 (2019) Cor. 2 update 
+
+END -- AttributeCertificateDefinitions

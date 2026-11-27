@@ -1,0 +1,697 @@
+UsefulDefinitions {joint-iso-itu-t ds(5) module(1) usefulDefinitions(0) 10}
+DEFINITIONS ::=
+BEGIN
+
+-- EXPORTS All
+/*
+The types and values defined in this module are exported for use in the other ASN.1
+modules contained within the Directory Specifications and within the X.500 
+cybersecurity soecifications. It mau also be used by other applications which will use
+them to access Directory services or cybersecurity services. Other applications
+may use them for their own purposes, but this will not constrain extensions and
+modifications needed to maintain or improve the Directory and cybersecurity services
+
+Several types and values that are part of the Directory specificationhave been moved from 
+the formal ASN.1 modules into this module also to be used by the cybersecurity modules.
+The specification in the main text of the affected Directory specification parts are
+left unchanged.  
+*/
+
+/*
+The following ASN.1 specifications within the InformationFramework module from
+Rec. ITU-T X.501 | ISO/IEC 9594-2 have been moved into this module
+*/
+
+Attribute {ATTRIBUTE:SupportedAttributes} ::= SEQUENCE {
+  type                ATTRIBUTE.&id({SupportedAttributes}),
+  values              SET SIZE (0..MAX) OF ATTRIBUTE.&Type({SupportedAttributes}{@type}),
+  valuesWithContext   SET SIZE (1..MAX) OF SEQUENCE {
+    value               ATTRIBUTE.&Type({SupportedAttributes}{@type}),
+    contextList         SET SIZE (1..MAX) OF Context,
+    ...} OPTIONAL,
+  ... }
+
+AttributeType ::= ATTRIBUTE.&id
+
+Context ::= SEQUENCE {
+  contextType    CONTEXT.&id({SupportedContexts}),
+  contextValues
+    SET SIZE (1..MAX) OF CONTEXT.&Type({SupportedContexts}{@contextType}),
+  fallback       BOOLEAN DEFAULT FALSE,
+  ... }
+
+SupportedAttributes ATTRIBUTE ::= {...}
+
+SupportedContexts CONTEXT ::= {...}
+
+-- Naming
+
+Name ::= CHOICE { 
+  rdnSequence  RDNSequence,
+  dnsName      DomainName,
+  oid          OBJECT IDENTIFIER }
+
+DomainName ::= UTF8String (CONSTRAINED BY {
+  -- Conforms to the format of an (internationalized) domain name. -- })
+
+RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
+
+RelativeDistinguishedName ::= SET SIZE (1..MAX) OF AttributeTypeAndValue
+
+DistinguishedName ::= RDNSequence
+
+AttributeTypeAndValue ::= SEQUENCE {
+  type                  ATTRIBUTE.&id ({SupportedAttributes}),
+  value                 ATTRIBUTE.&Type ({SupportedAttributes}{@type}),
+  ... }
+
+OBJECT-CLASS ::= CLASS {
+  &Superclasses         OBJECT-CLASS OPTIONAL,
+  &kind                 ObjectClassKind DEFAULT structural,
+  &MandatoryAttributes  ATTRIBUTE OPTIONAL,
+  &OptionalAttributes   ATTRIBUTE OPTIONAL,
+  &ldapName             SEQUENCE SIZE(1..MAX) OF UTF8String OPTIONAL,
+  &ldapDesc             UTF8String OPTIONAL,
+  &id                   OBJECT IDENTIFIER UNIQUE }
+WITH SYNTAX {
+  [SUBCLASS OF          &Superclasses]
+  [KIND                 &kind]
+  [MUST CONTAIN         &MandatoryAttributes]
+  [MAY CONTAIN          &OptionalAttributes]
+  [LDAP-NAME            &ldapName]
+  [LDAP-DESC            &ldapDesc]
+  ID                    &id }
+
+ObjectClassKind ::= ENUMERATED {
+  abstract   (0),
+  structural (1),
+  auxiliary  (2)}
+
+top OBJECT-CLASS ::= {
+  KIND          abstract
+  MUST CONTAIN  {objectClass}
+  LDAP-NAME     {"top"}
+  ID            id-oc-top }
+
+id-oc-top OBJECT IDENTIFIER ::= {id-oc 0}
+
+-- Information object classes from Information Framework
+
+ATTRIBUTE ::= CLASS {
+  &derivation               ATTRIBUTE OPTIONAL,
+  &Type                     OPTIONAL, -- either &Type or &derivation required 
+  &equality-match           MATCHING-RULE OPTIONAL,
+  &ordering-match           MATCHING-RULE OPTIONAL,
+  &substrings-match         MATCHING-RULE OPTIONAL,
+  &single-valued            BOOLEAN DEFAULT FALSE,
+  &collective               BOOLEAN DEFAULT FALSE,
+  &dummy                    BOOLEAN DEFAULT FALSE,
+  -- operational extensions 
+  &no-user-modification     BOOLEAN DEFAULT FALSE,
+  &usage                    AttributeUsage DEFAULT userApplications,
+  &ldapSyntax               SYNTAX-NAME.&id OPTIONAL,
+  &ldapName                 SEQUENCE SIZE(1..MAX) OF UTF8String OPTIONAL,
+  &ldapDesc                 UTF8String OPTIONAL,
+  &obsolete                 BOOLEAN DEFAULT FALSE,
+  &id                       OBJECT IDENTIFIER UNIQUE }
+WITH SYNTAX {
+  [SUBTYPE OF               &derivation]
+  [WITH SYNTAX              &Type]
+  [EQUALITY MATCHING RULE   &equality-match]
+  [ORDERING MATCHING RULE   &ordering-match]
+  [SUBSTRINGS MATCHING RULE &substrings-match]
+  [SINGLE VALUE             &single-valued]
+  [COLLECTIVE               &collective]
+  [DUMMY                    &dummy]
+  [NO USER MODIFICATION     &no-user-modification]
+  [USAGE                    &usage]
+  [LDAP-SYNTAX              &ldapSyntax]
+  [LDAP-NAME                &ldapName]
+  [LDAP-DESC                &ldapDesc]
+  [OBSOLETE                 &obsolete]
+  ID                        &id }
+
+AttributeUsage ::= ENUMERATED {
+  userApplications     (0),
+  directoryOperation   (1),
+  distributedOperation (2),
+  dSAOperation         (3),
+  ... }
+
+objectClass ATTRIBUTE ::= {
+  WITH SYNTAX             OBJECT IDENTIFIER
+  EQUALITY MATCHING RULE  objectIdentifierMatch
+  LDAP-SYNTAX             oid.&id
+  LDAP-NAME               {"objectClass"}
+  ID                      id-at-objectClass }
+
+id-at-objectClass         OBJECT IDENTIFIER ::= {id-at 0}
+
+-- MATCHING-RULE information object class specification
+ 
+MATCHING-RULE ::= CLASS {
+  &ParentMatchingRules    MATCHING-RULE OPTIONAL,
+  &AssertionType          OPTIONAL,
+  &uniqueMatchIndicator   ATTRIBUTE OPTIONAL,
+  &ldapSyntax             SYNTAX-NAME.&id OPTIONAL,
+  &ldapName               SEQUENCE SIZE(1..MAX) OF UTF8String OPTIONAL,
+  &ldapDesc               UTF8String OPTIONAL,
+  &id                     OBJECT IDENTIFIER UNIQUE }
+WITH SYNTAX {
+  [PARENT                 &ParentMatchingRules]
+  [SYNTAX                 &AssertionType]
+  [UNIQUE-MATCH-INDICATOR &uniqueMatchIndicator]
+  [LDAP-SYNTAX            &ldapSyntax]
+  [LDAP-NAME              &ldapName]
+  [LDAP-DESC              &ldapDesc]
+  ID                      &id }
+
+objectIdentifierMatch MATCHING-RULE ::= {
+  SYNTAX       OBJECT IDENTIFIER
+  LDAP-SYNTAX  oid.&id
+  LDAP-NAME    {"objectIdentifierMatch"}
+  ID           id-mr-objectIdentifierMatch }
+
+id-mr-objectIdentifierMatch OBJECT IDENTIFIER ::= {id-mr 0}
+
+NAME-FORM ::= CLASS {
+  &namedObjectClass     OBJECT-CLASS,
+  &MandatoryAttributes  ATTRIBUTE,
+  &OptionalAttributes   ATTRIBUTE OPTIONAL,
+  &ldapName             SEQUENCE SIZE(1..MAX) OF UTF8String OPTIONAL,
+  &ldapDesc             UTF8String OPTIONAL,
+  &id                   OBJECT IDENTIFIER UNIQUE }
+WITH SYNTAX {
+  NAMES                 &namedObjectClass
+  WITH ATTRIBUTES       &MandatoryAttributes
+  [AND OPTIONALLY       &OptionalAttributes]
+  [LDAP-NAME            &ldapName]
+  [LDAP-DESC            &ldapDesc]
+  ID                    &id }
+
+CONTEXT ::= CLASS {
+  &Type,
+  &defaultValue   &Type OPTIONAL,
+  &Assertion      OPTIONAL,
+  &absentMatch    BOOLEAN DEFAULT TRUE,
+  &id             OBJECT IDENTIFIER UNIQUE }
+WITH SYNTAX {
+  WITH SYNTAX     &Type
+  [DEFAULT-VALUE  &defaultValue]
+  [ASSERTED AS    &Assertion]
+  [ABSENT-MATCH   &absentMatch]
+  ID              &id }
+
+SYNTAX-NAME ::= CLASS {
+  &ldapDesc               UTF8String,
+  &Type                   OPTIONAL,
+  &id                     OBJECT IDENTIFIER UNIQUE }
+WITH SYNTAX {
+  LDAP-DESC               &ldapDesc
+  [DIRECTORY SYNTAX       &Type]
+  ID                      &id }
+
+/*
+The following ASN.1 specifications within the SelectedAttributeTypes module from
+Rec. ITU-T X.520 | ISO/IEC 9594-6 have been moved into this module
+*/
+
+UnboundedDirectoryString ::= CHOICE {
+  teletexString    TeletexString(SIZE (1..MAX)),
+  printableString  PrintableString(SIZE (1..MAX)),
+  bmpString        BMPString(SIZE (1..MAX)),
+  universalString  UniversalString(SIZE (1..MAX)),
+  uTF8String       UTF8String(SIZE (1..MAX)) }
+
+
+name ATTRIBUTE ::= {
+  WITH SYNTAX              UnboundedDirectoryString
+  EQUALITY MATCHING RULE   caseIgnoreMatch
+  SUBSTRINGS MATCHING RULE caseIgnoreSubstringsMatch
+  LDAP-SYNTAX              directoryString.&id
+  LDAP-NAME                {"name"}
+  ID                       id-at-name } 
+
+id-at-name OBJECT IDENTIFIER ::= {id-at 41}
+
+commonName ATTRIBUTE ::= {
+  SUBTYPE OF               name
+  WITH SYNTAX              UnboundedDirectoryString
+  LDAP-SYNTAX              directoryString.&id
+  LDAP-NAME                {"cn", "commonName"}
+  ID                       id-at-commonName }
+
+id-at-commonName OBJECT IDENTIFIER ::= {id-at 3}
+
+dnsName ATTRIBUTE ::= {
+  WITH SYNTAX             DomainName
+  EQUALITY MATCHING RULE  dnsNameMatch
+  LDAP-SYNTAX             dnsString.&id
+  LDAP-NAME               {"DNS name"}
+  ID                      id-at-dnsName }
+
+id-at-dnsName OBJECT IDENTIFIER ::= {id-at 100}
+
+dnsNameMatch MATCHING-RULE ::= {
+  SYNTAX       DomainName
+  LDAP-SYNTAX  dnsString.&id
+  LDAP-NAME    {"dnsNameMatch"}
+  ID           id-mr-dnsNameMatch }
+
+id-mr-dnsNameMatch OBJECT IDENTIFIER ::= {id-mr 74}
+
+dnsString SYNTAX-NAME ::= {
+  LDAP-DESC         "DNS Name String"
+  DIRECTORY SYNTAX  DomainName
+  ID                id-asx-dnsString }
+
+id-asx-dnsString OBJECT IDENTIFIER ::= {id-asx 9}
+
+objectIdentifier ATTRIBUTE ::= {
+  WITH SYNTAX             OBJECT IDENTIFIER
+  EQUALITY MATCHING RULE  objectIdentifierMatch
+  SINGLE VALUE            TRUE
+  LDAP-SYNTAX             oid.&id
+  LDAP-NAME               {"Object Identifier"}
+  ID                      id-at-objectIdentifier }
+
+id-at-objectIdentifier OBJECT IDENTIFIER ::= {id-at 106}
+
+PresentationAddress ::= SEQUENCE {
+  pSelector   [0]  OCTET STRING OPTIONAL,
+  sSelector   [1]  OCTET STRING OPTIONAL,
+  tSelector   [2]  OCTET STRING OPTIONAL,
+  nAddresses  [3]  SET SIZE (1..MAX) OF OCTET STRING,
+  ... }
+
+caseIgnoreMatch MATCHING-RULE ::= {
+  SYNTAX       UnboundedDirectoryString
+  LDAP-SYNTAX  directoryString.&id
+  LDAP-NAME    {"caseIgnoreMatch"}
+  ID           id-mr-caseIgnoreMatch }
+
+id-mr-caseIgnoreMatch OBJECT IDENTIFIER ::= {id-mr 2}
+
+caseIgnoreSubstringsMatch MATCHING-RULE ::= {
+  SYNTAX       SubstringAssertion
+  LDAP-SYNTAX  substringAssertion.&id
+  LDAP-NAME    {"caseIgnoreSubstringsMatch"}
+  ID           id-mr-caseIgnoreSubstringsMatch }
+
+SubstringAssertion ::= SEQUENCE OF CHOICE {
+  initial  [0]  UnboundedDirectoryString,
+  any      [1]  UnboundedDirectoryString,
+  final    [2]  UnboundedDirectoryString,
+    -- at most one initial and one final component
+  control       Attribute{{SupportedAttributes}},
+    -- Use-d to specify interpretation of the following items
+  ... }
+
+id-mr-caseIgnoreSubstringsMatch OBJECT IDENTIFIER ::= {id-mr 4}
+
+integerMatch MATCHING-RULE ::= {
+  SYNTAX       INTEGER
+  LDAP-SYNTAX  integer.&id
+  LDAP-NAME    {"integerMatch"}
+  ID           id-mr-integerMatch }
+
+id-mr-integerMatch OBJECT IDENTIFIER ::= {id-mr 14}
+
+octetStringMatch MATCHING-RULE ::= {
+  SYNTAX       OCTET STRING
+  LDAP-SYNTAX  octetString.&id
+  LDAP-NAME    {"octetStringMatch"}
+  ID           id-mr-octetStringMatch }
+
+id-mr-octetStringMatch OBJECT IDENTIFIER ::= {id-mr 17}
+
+-- Copy of Syntax Names from Selected attribute types
+
+directoryString SYNTAX-NAME ::= {
+  LDAP-DESC         "Directory String"
+  DIRECTORY SYNTAX  UnboundedDirectoryString
+  ID                id-lsx-directoryString }
+
+id-lsx-directoryString OBJECT IDENTIFIER ::= {id-lsx 15}
+
+integer SYNTAX-NAME ::= {
+  LDAP-DESC         "INTEGER"
+  DIRECTORY SYNTAX  INTEGER
+  ID                id-lsx-integer }
+
+id-lsx-integer OBJECT IDENTIFIER ::= {id-lsx 27}
+
+oid SYNTAX-NAME ::= {
+  LDAP-DESC         "OID"
+  DIRECTORY SYNTAX  OBJECT IDENTIFIER
+  ID                id-lsx-oid }
+
+id-lsx-oid OBJECT IDENTIFIER ::= {id-lsx 38}
+
+octetString SYNTAX-NAME ::= {
+  LDAP-DESC         "Octet String"
+  DIRECTORY SYNTAX  OCTET STRING
+  ID                id-lsx-octetString }
+
+id-lsx-octetString OBJECT IDENTIFIER ::= {id-lsx 40}
+
+substringAssertion SYNTAX-NAME ::= {
+  LDAP-DESC         "Substring Assertion"
+  DIRECTORY SYNTAX  SubstringAssertion
+  ID                id-lsx-substringAssertion }
+
+id-lsx-substringAssertion OBJECT IDENTIFIER ::= {id-lsx 58}
+
+TimeSpecification ::= SEQUENCE {
+  time           CHOICE {
+    absolute       SEQUENCE {
+      startTime [0]  GeneralizedTime OPTIONAL,
+      endTime   [1]  GeneralizedTime OPTIONAL,
+      ... },
+    periodic      SET SIZE (1..MAX) OF Period},
+  notThisTime   BOOLEAN DEFAULT FALSE,
+  timeZone      TimeZone OPTIONAL,
+  ... }
+
+Period ::= SEQUENCE {
+  timesOfDay  [0]  SET SIZE (1..MAX) OF DayTimeBand OPTIONAL,
+  days        [1]  CHOICE {
+    intDay           SET OF INTEGER,
+    bitDay           BIT STRING {
+      sunday    (0),
+      monday    (1),
+      tuesday   (2),
+      wednesday (3),
+      thursday  (4),
+      friday    (5),
+      saturday  (6)},
+    dayOf            XDayOf,
+    ...} OPTIONAL,
+  weeks       [2]  CHOICE {
+    allWeeks         NULL,
+    intWeek          SET OF INTEGER,
+    bitWeek          BIT STRING {
+      week1     (0),
+      week2     (1),
+      week3     (2),
+      week4     (3),
+      week5     (4)},
+    ... } OPTIONAL,
+  months      [3]  CHOICE {
+    allMonths        NULL,
+    intMonth         SET OF INTEGER,
+    bitMonth         BIT STRING {
+      january   (0),
+      february  (1),
+      march     (2),
+      april     (3),
+      may       (4),
+      june      (5),
+      july      (6),
+      august    (7),
+      september (8),
+      october   (9),
+      november  (10),
+      december  (11)},
+    ...} OPTIONAL,
+  years       [4]  SET OF INTEGER(1000..MAX) OPTIONAL,
+  ... }
+
+XDayOf ::= CHOICE {
+  first   [1]  NamedDay,
+  second  [2]  NamedDay,
+  third   [3]  NamedDay,
+  fourth  [4]  NamedDay,
+  fifth   [5]  NamedDay }
+
+NamedDay ::= CHOICE {
+  intNamedDays ENUMERATED {
+    sunday      (1),
+    monday      (2),
+    tuesday     (3),
+    wednesday   (4),
+    thursday    (5),
+    friday      (6),
+    saturday    (7)},
+  bitNamedDays BIT STRING {
+    sunday      (0), 
+    monday      (1),
+    tuesday     (2),
+    wednesday   (3),
+    thursday    (4),
+    friday      (5),
+    saturday    (6)} }
+
+DayTimeBand ::= SEQUENCE {
+  startDayTime  [0]  DayTime DEFAULT {hour 0},
+  endDayTime    [1]  DayTime DEFAULT {hour 23, minute 59, second 59},
+  ... }
+
+DayTime ::= SEQUENCE {
+  hour    [0]  INTEGER(0..23),
+  minute  [1]  INTEGER(0..59) DEFAULT 0,
+  second  [2]  INTEGER(0..59) DEFAULT 0,
+  ... }
+
+TimeZone ::= INTEGER(-12..12)
+
+ID    ::= OBJECT IDENTIFIER
+
+ds ID ::= {joint-iso-itu-t ds(5)}
+
+-- The following definition is for ASN.1 definitions moved from 
+-- Rec. ITU-T X.660 | ISO/IEC 9834-1:
+
+id ID ::= {joint-iso-itu-t registration-procedures(17) module(1) directory-defs(2)}
+
+-- The following defition is for ASN.1 definitions of LDAP schema
+
+internet            ID ::= {iso(1) identified-organization(3) dod(6) internet(1)}
+ldap-dir            ID ::= {internet directory(1)}
+intSecurity         ID ::= {internet security(5)}
+ldap-enterprise     ID ::= {internet private(4) enterprise(1)}
+ldap-x509           ID ::= {ldap-dir x509(15)}
+ldap-openLDAP       ID ::= {ldap-enterprise openLDAP(4203) ldap(1)}
+openLDAP-attributes ID ::= {ldap-openLDAP attributeType(3)}
+openLDAP-controls   ID ::= {ldap-openLDAP controls(10)}
+ldap-wall           ID ::= {ldap-enterprise wahl(1466)}
+ldap-dynExt         ID ::= {ldap-wall 101 119}
+ldap-attr           ID ::= {ldap-wall 101 120}
+ldap-match          ID ::= {ldap-wall 109 114}
+ldap-syntax         ID ::= {ldap-wall 115 121 1}
+cosine              ID ::= {itu-t(0) data(9) pss(2342) ucl(19200300) pilot(100)}
+cosineAttr          ID ::= {cosine pilotAttributeType(1)} 
+
+-- categories of information object 
+
+module                                   ID ::= {ds 1}
+serviceElement                           ID ::= {ds 2}
+applicationContext                       ID ::= {ds 3}
+attributeType                            ID ::= {ds 4}
+attributeSyntaxVendor                    ID ::= {ds 5}
+-- This arc will not be used by these Directory Specifications
+objectClass-oid                          ID ::= {ds 6}
+-- attributeSet                          ID ::= {ds 7}
+-- algorithm                             ID ::= {ds 8}
+abstractSyntax                           ID ::= {ds 9}
+-- object                                ID ::= {ds 10}
+-- port                                  ID ::= {ds 11}
+dsaOperationalAttribute                  ID ::= {ds 12}
+matchingRule                             ID ::= {ds 13}
+knowledgeMatchingRule                    ID ::= {ds 14}
+nameForm                                 ID ::= {ds 15}
+group                                    ID ::= {ds 16}
+subentry                                 ID ::= {ds 17}
+operationalAttributeType                 ID ::= {ds 18}
+operationalBinding                       ID ::= {ds 19}
+schemaObjectClass                        ID ::= {ds 20}
+schemaOperationalAttribute               ID ::= {ds 21}
+administrativeRoles                      ID ::= {ds 23}
+accessControlAttribute                   ID ::= {ds 24}
+--rosObject                              ID ::= {ds 25}
+--contract                               ID ::= {ds 26}
+--package                                ID ::= {ds 27}
+accessControlSchemes                     ID ::= {ds 28}
+certificateExtension                     ID ::= {ds 29}
+managementObject                         ID ::= {ds 30}
+attributeValueContext                    ID ::= {ds 31}
+-- securityExchange                      ID ::= {ds 32}
+idmProtocol                              ID ::= {ds 33}
+problem                                  ID ::= {ds 34}
+notification                             ID ::= {ds 35}
+matchingRestriction                      ID ::= {ds 36} -- None are currently defined
+controlAttributeType                     ID ::= {ds 37}
+keyPurposes                              ID ::= {ds 38}
+passwordQuality                          ID ::= {ds 39}
+attributeSyntax                          ID ::= {ds 40}
+avRestriction                            ID ::= {ds 41}
+cmsContentType                           ID ::= {ds 42}
+wrapperProtocolType                      ID ::= {ds 43}
+algorithm                                ID ::= {ds 44}
+
+/*
+-- modules 
+
+usefulDefinitions                        ID ::= {module usefulDefinitions(0) x}
+informationFramework                     ID ::= {module informationFramework(1) x}
+directoryAbstractService                 ID ::= {module directoryAbstractService(2) 8}
+distributedOperations                    ID ::= {module distributedOperations(3) 8}
+-- protocolObjectIdentifiers             ID ::= {module protocolObjectIdentifiers(4) 8}
+selectedAttributeTypes                   ID ::= {module selectedAttributeTypes(5) 8}
+selectedObjectClasses                    ID ::= {module selectedObjectClasses(6) 8}
+authenticationFramework                  ID ::= {module authenticationFramework(7) 8}
+algorithmObjectIdentifiers               ID ::= {module algorithmObjectIdentifiers(8) 8}
+directoryObjectIdentifiers               ID ::= {module directoryObjectIdentifiers(9) 8}
+-- upperBounds                           ID ::= {module upperBounds(10) 8}
+-- dap                                   ID ::= {module dap(11) 8}
+-- dsp                                   ID ::= {module dsp(12) 8}
+distributedDirectoryOIDs                 ID ::= {module distributedDirectoryOIDs(13) 8}
+directoryShadowOIDs                      ID ::= {module directoryShadowOIDs(14) 8}
+directoryShadowAbstractService           ID ::= {module
+                                                directoryShadowAbstractService(15) 8}
+-- disp                                  ID ::= {module disp(16) 7}
+-- dop                                   ID ::= {module dop(17) 7}
+opBindingManagement                      ID ::= {module opBindingManagement(18) 8}
+opBindingOIDs                            ID ::= {module opBindingOIDs(19) 8}
+hierarchicalOperationalBindings          ID ::= {module 
+                                                hierarchicalOperationalBindings(20) 8}
+dsaOperationalAttributeTypes             ID ::= {module
+                                                dsaOperationalAttributeTypes(22) 8}
+schemaAdministration                     ID ::= {module schemaAdministration(23) 8}
+basicAccessControl                       ID ::= {module basicAccessControl(24) 8}
+directoryOperationalBindingTypes         ID ::= {module
+                                                directoryOperationalBindingTypes(25) 8}
+certificateExtensions                    ID ::= {module certificateExtensions(26) 8}
+directoryManagement                      ID ::= {module directoryManagement(27) 8}
+enhancedSecurity                         ID ::= {module enhancedSecurity(28) 8}
+-- directorySecurityExchanges            ID ::= {module
+--                                              directorySecurityExchanges (29) 8}
+iDMProtocolSpecification                 ID ::= {module iDMProtocolSpecification(30) 8}
+directoryIDMProtocols                    ID ::= {module directoryIDMProtocols(31) 8}
+attributeCertificateDefinitions          ID ::= {module attributeCertificateDefinitions(32) 8}
+serviceAdministration                    ID ::= {module serviceAdministration(33) 8}
+ldapAttributes                           ID ::= {module ldapAttributes(34) 8}
+commonProtocolSpecification              ID ::= {module
+                                                commonProtocolSpecification(35) 8}
+oSIProtocolSpecification                 ID ::= {module oSIProtocolSpecification(36) 8}
+directoryOSIProtocols                    ID ::= {module directoryOSIProtocols(37) 8}
+ldapSystemSchema                         ID ::= {module ldapSystemSchema(38) 8}
+passwordPolicy                           ID ::= {module passwordPolicy(39) x}
+pkiPmiExternalDataTypes                  ID ::= {module pkiPmiExternalDataTypes(40) x}
+extensionAttributes                      ID ::= {module extensionAttributes(41) xx}
+-- X.510
+cryptoTools                              ID ::= {module cryptoTools(42) x}
+wrapper                                  ID ::= {module wrapper(43) x}
+avlManagement                            ID ::= {module avlManagement(44) x}
+caSubsription                            ID ::= {module caSubsription (45) x}
+trustBrokerProtocol                      ID ::= {module trustBrokerProtocol(46) x}
+protProtocols                            ID ::= {module protProtocols(47) x}
+genAlgo                                  ID ::= {module genAlgo(48) x}
+-- X509
+supportedInformationObjects              ID ::= {module supportedInformationObjects(49) x}
+-- DPKI
+dpki-asn1-use                            ID ::= {module dpki-asn1-use(49) x)
+ca-handling                              ID ::= {module ca-handling(50) x}
+aa-handling                              ID ::= {module aa-handling(51) x}
+transactionGeneration                    ID ::= {module transactionGeneration(52) x}
+transactionValidation                    ID ::= {module transactionValidation(53) x}
+blockchainHandling                       ID ::= {module blockchainHandling(54) x}
+config                                   ID ::= {module config(55) x}
+relyingPartiHandling                     ID ::= {module relyingPartiHandling(56) x}
+stateDirectory                           ID ::= {module stateDirectory(57) x}
+p2pProt                                  ID ::= {module p2pProt(58) x}
+consensus                                ID ::= {module consensus(59) x}
+dirSchema                                ID ::= {module dirSchema(60) x}
+
+
+
+*/
+-- synonyms 
+
+id-oc                                    ID ::= objectClass-oid
+id-at                                    ID ::= attributeType
+id-as                                    ID ::= abstractSyntax
+id-mr                                    ID ::= matchingRule
+id-nf                                    ID ::= nameForm
+id-sc                                    ID ::= subentry
+id-oa                                    ID ::= operationalAttributeType
+id-ob                                    ID ::= operationalBinding
+id-doa                                   ID ::= dsaOperationalAttribute
+id-kmr                                   ID ::= knowledgeMatchingRule
+id-soc                                   ID ::= schemaObjectClass
+id-soa                                   ID ::= schemaOperationalAttribute
+id-ar                                    ID ::= administrativeRoles
+id-aca                                   ID ::= accessControlAttribute
+id-ac                                    ID ::= applicationContext
+-- id-rosObject                          ID ::= rosObject
+-- id-contract                           ID ::= contract
+-- id-package                            ID ::= package
+id-acScheme                              ID ::= accessControlSchemes
+id-ce                                    ID ::= certificateExtension
+id-mgt                                   ID ::= managementObject
+id-avc                                   ID ::= attributeValueContext
+-- id-se                                 ID ::= securityExchange
+id-idm                                   ID ::= idmProtocol
+id-pr                                    ID ::= problem
+id-not                                   ID ::= notification
+id-mre                                   ID ::= matchingRestriction
+id-cat                                   ID ::= controlAttributeType
+id-kp                                    ID ::= keyPurposes
+id-pq                                    ID ::= passwordQuality
+id-ats                                   ID ::= attributeSyntax
+--id-lc                                  ID ::= ldapControl
+id-asx                                   ID ::= attributeSyntax  -- LDAP attribute syntaxes as defined by this specification
+id-lsx                                   ID ::= ldap-syntax      -- LDAP syntaxes as defined by LDAP
+id-ldx                                   ID ::= ldap-x509        -- 
+id-lat                                   ID ::= ldap-attr
+id-lmr                                   ID ::= ldap-match
+id-oat                                   ID ::= openLDAP-attributes
+id-coat                                  ID ::= cosineAttr
+id-avr                                   ID ::= avRestriction
+id-cmsct                                 ID ::= cmsContentType
+id-wrprot                                ID ::= wrapperProtocolType
+id-algo                                  ID ::= algorithm
+
+-- LDAP syntax object identifiers
+
+--userpwdMatch                           ID ::= {id-ls 0}
+--userPwdHisoricMatch                    ID ::= {id-ls 1}
+
+-- LDAP control object identifiers
+
+--pwdControl                             ID ::= {id-lc 0}
+--pwdResponse                            ID ::= {id-lc 1}
+
+
+-- obsolete module identifiers 
+
+-- usefulDefinition                      ID ::= {module 0}
+-- informationFramework                  ID ::= {module 1}
+-- directoryAbstractService              ID ::= {module 2}
+-- distributedOperations                 ID ::= {module 3}
+-- protocolObjectIdentifiers             ID ::= {module 4}
+-- selectedAttributeTypes                ID ::= {module 5}
+-- selectedObjectClasses                 ID ::= {module 6}
+-- authenticationFramework               ID ::= {module 7}
+-- algorithmObjectIdentifiers            ID ::= {module 8}
+-- directoryObjectIdentifiers            ID ::= {module 9}
+-- upperBounds                           ID ::= {module 10}
+-- dap                                   ID ::= {module 11}
+-- dsp                                   ID ::= {module 12}
+-- distributedDirectoryObjectIdentifiers ID ::= {module 13}
+
+-- unused module identifiers 
+
+-- directoryShadowOIDs                   ID ::= {module 14}
+-- directoryShadowAbstractService        ID ::= {module 15}
+-- disp                                  ID ::= {module 16}
+-- dop                                   ID ::= {module 17}
+-- opBindingManagement                   ID ::= {module 18}
+-- opBindingOIDs                         ID ::= {module 19}
+-- hierarchicalOperationalBindings       ID ::= {module 20}
+-- dsaOperationalAttributeTypes          ID ::= {module 22}
+-- schemaAdministration                  ID ::= {module 23}
+-- basicAccessControl                    ID ::= {module 24}
+-- operationalBindingOIDs                ID ::= {module 25}
+
+END -- UsefulDefinitions

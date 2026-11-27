@@ -17,6 +17,7 @@ namespace Waher.Content.Asn1.Model
 		private bool? absent;
 		private Asn1Node _default = null;
 		private Asn1NamedValue[] namedOptions = null;
+		private string classSetReference = null;
 
 		/// <summary>
 		/// Abstract base class for ASN.1 types.
@@ -113,6 +114,15 @@ namespace Waher.Content.Asn1.Model
 						Value.SetParentNode(this);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Optional class set reference associated with type.
+		/// </summary>
+		public string ClassSetReference
+		{
+			get => this.classSetReference;
+			internal set => this.classSetReference = value;
 		}
 
 		/// <summary>

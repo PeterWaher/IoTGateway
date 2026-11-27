@@ -1401,44 +1401,56 @@ namespace Waher.Content.Asn1
 					case "{":
 						this.pos++;
 
-						ChunkedList<Asn1NamedValue> NamedOptions = new ChunkedList<Asn1NamedValue>();
-
-						while (true)
+						if (this.PeekNextToken() == "{")
 						{
-							s2 = this.NextToken();
-							if (!IsFieldIdentifier(s2))
-								throw this.SyntaxError("Value name expected.");
+							this.AssertNextToken("{");
+							s2 = this.ParseIdentifier();
+							this.AssertNextToken("}");
+							this.AssertNextToken("}");
 
-							if (this.PeekNextToken() == "(")
+							Result.ClassSetReference = s2;
+						}
+						else
+						{
+							ChunkedList<Asn1NamedValue> NamedOptions = new ChunkedList<Asn1NamedValue>();
+
+							while (true)
 							{
-								this.pos++;
+								s2 = this.NextToken();
+								if (!IsFieldIdentifier(s2))
+									throw this.SyntaxError("Value name expected.");
 
-								Asn1Value Value = this.ParseValue();
+								if (this.PeekNextToken() == "(")
+								{
+									this.pos++;
 
-								if (this.namedNodes.ContainsKey(s2))
-									throw this.SyntaxError("Identifier already defined: " + s2);
+									Asn1Value Value = this.ParseValue();
 
-								this.namedNodes[s2] = Value;
+									if (this.namedNodes.ContainsKey(s2))
+										throw this.SyntaxError("Identifier already defined: " + s2);
 
-								NamedOptions.Add(new Asn1NamedValue(s2, Value, Result, this));
+									this.namedNodes[s2] = Value;
 
-								if (this.NextToken() != ")")
-									throw this.SyntaxError(") expected");
+									NamedOptions.Add(new Asn1NamedValue(s2, Value, Result, this));
+
+									if (this.NextToken() != ")")
+										throw this.SyntaxError(") expected");
+								}
+								else
+									NamedOptions.Add(new Asn1NamedValue(s2, null, Result, this));
+
+								s2 = this.NextToken();
+
+								if (s2 == ",")
+									continue;
+								else if (s2 == "}")
+								{
+									Result.NamedOptions = NamedOptions.ToArray();
+									break;
+								}
+								else
+									throw this.SyntaxError("Unexpected token.");
 							}
-							else
-								NamedOptions.Add(new Asn1NamedValue(s2, null, Result, this));
-
-							s2 = this.NextToken();
-
-							if (s2 == ",")
-								continue;
-							else if (s2 == "}")
-							{
-								Result.NamedOptions = NamedOptions.ToArray();
-								break;
-							}
-							else
-								throw this.SyntaxError("Unexpected token.");
 						}
 						break;
 

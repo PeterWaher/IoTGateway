@@ -33,5 +33,14 @@ namespace Waher.Content.Asn1.Model
 		/// Optional class reference
 		/// </summary>
 		public Asn1ClassReference ClassReference => this.classReference;
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			if (this.classReference is null)
+				return this.identifier;
+			else
+				return this.identifier + " : " + this.classReference.ToString();
+		}
 	}
 }

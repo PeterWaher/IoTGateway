@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Asn1.Model.Classes
 {
 	/// <summary>
 	/// Instance of a class.
 	/// </summary>
-	public class Asn1ClassInstance : Asn1ClassInstanceElement
+	public class Asn1ClassInstance : Asn1ClassInstanceElement, INamedNode
 	{
 		private readonly Dictionary<string, Asn1Node> properties;
 		private readonly Asn1ClassDefinition @class;
@@ -49,6 +50,27 @@ namespace Waher.Content.Asn1.Model.Classes
 
 		/// <inheritdoc/>
 		public override string ToString() => this.Name + " : " + this.@class.ToString();
+
+		/// <summary>
+		/// If the named element must be qualified.
+		/// </summary>
+		public bool MustBeQualified => false;
+
+		/// <summary>
+		/// If the named node represents a type.
+		/// </summary>
+		public bool IsType => true;
+
+		/// <summary>
+		/// Gets the fully qualified name, in reverse order.
+		/// </summary>
+		public void GetFullyQualifiedName(ChunkedList<string> Fqn)
+		{
+			Fqn.Add(this.Name);
+
+			if (this.TryGetAncestor(out INamedNode Container))
+				Container.GetFullyQualifiedName(Fqn);
+		}
 
 		/// <summary>
 		/// Exports to C#

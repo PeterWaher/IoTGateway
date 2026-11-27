@@ -54,7 +54,7 @@ namespace Waher.Content.Asn1.Model.Types
 
 					return s;
 				}
-				else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+				else if (this.Document.TryGetNamedNode(this.identifier, out Asn1Node Node))
 					return Node.CSharpType;
 				else
 					return ToCSharp(this.identifier);
@@ -68,13 +68,8 @@ namespace Waher.Content.Asn1.Model.Types
 		{
 			get
 			{
-				if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
-					return TypeDef.ByReference;
-				else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node) &&
-					Node is Asn1Type Type)
-				{
+				if (this.Document.TryGetNamedNode(this.identifier, out Asn1Type Type))
 					return Type.ByReference;
-				}
 				else
 					return true;
 			}
@@ -87,13 +82,8 @@ namespace Waher.Content.Asn1.Model.Types
 		{
 			get
 			{
-				if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
-					return TypeDef.ConstructedType;
-				else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node) &&
-					Node is Asn1Type Type)
-				{
+				if (this.Document.TryGetNamedNode(this.identifier, out Asn1Type Type))
 					return Type.ConstructedType;
-				}
 				else
 					return true;
 			}
@@ -108,7 +98,7 @@ namespace Waher.Content.Asn1.Model.Types
 			{
 				if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
 					return TypeDef.AcceptedTags;
-				else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+				else if (this.Document.TryGetNamedNode(this.identifier, out Asn1Node Node))
 					return Node.AcceptedTags;
 				else
 					return base.AcceptedTags;
@@ -126,7 +116,7 @@ namespace Waher.Content.Asn1.Model.Types
 					return base.Optional;
 				else if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
 					return TypeDef.Optional;
-				else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+				else if (this.Document.TryGetNamedNode(this.identifier, out Asn1Node Node))
 					return Node.Optional;
 				else
 					return base.Optional;
@@ -146,7 +136,7 @@ namespace Waher.Content.Asn1.Model.Types
 			{
 				if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
 					await TypeDef.Definition.ExportCSharp(Output, State, Indent, Pass);
-				else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+				else if (this.Document.TryGetNamedNode(this.identifier, out Asn1Node Node))
 					Output.Append(ToCSharp(State, this, Node.CSharpType));
 				else
 					Output.Append(ToCSharp(State, this, this.identifier));
@@ -162,7 +152,7 @@ namespace Waher.Content.Asn1.Model.Types
 		{
 			if (this.Document.aliases.TryGetValue(this.identifier, out Asn1TypeDefinition TypeDef))
 				return await this.GetCSharpIdentifier(State, TypeDef);
-			else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+			else if (this.Document.TryGetNamedNode(this.identifier, out Asn1Node Node))
 			{
 				if (Node is Asn1TypeDefinition TypeDef2)
 					return await this.GetCSharpIdentifier(State, TypeDef2);
@@ -214,7 +204,7 @@ namespace Waher.Content.Asn1.Model.Types
 		/// <returns>Parsed ASN.1 node.</returns>
 		public override Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
 		{
-			if (!Macro.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+			if (!Macro.Document.TryGetNamedNode(this.identifier, out Asn1Node Node))
 				throw Document.SyntaxError("Type named " + this.identifier + " not found.");
 
 			if (Node is Asn1Type Type)
@@ -236,17 +226,8 @@ namespace Waher.Content.Asn1.Model.Types
 		public override Task ExportReadCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, string MemberOf, int Index)
 		{
-			if (this.Document.aliases.TryGetValue(this.identifier,
-				out Asn1TypeDefinition TypeDef))
-			{
-				return TypeDef.ExportReadCSharp(Output, State, Indent, MemberOf,
-					Index);
-			}
-			else if (this.Document.namedNodes.TryGetValue(this.identifier,
-				out Asn1Node Node))
-			{
+			if (this.Document.TryGetNamedNode(this.identifier, out Asn1Node Node))
 				return Node.ExportReadCSharp(Output, State, Indent, MemberOf, Index);
-			}
 			else
 			{
 				Output.Append(ToCSharp(State, this, this.identifier));
@@ -270,14 +251,7 @@ namespace Waher.Content.Asn1.Model.Types
 			CSharpExportState State, int Indent, string MemberOf, string DefaultName,
 			string ItemName, int Index)
 		{
-			if (this.Document.aliases.TryGetValue(this.identifier,
-				out Asn1TypeDefinition TypeDef))
-			{
-				return TypeDef.ExportTryReadCSharp(Output, State, Indent, MemberOf,
-					DefaultName, ItemName, Index);
-			}
-			else if (this.Document.namedNodes.TryGetValue(this.identifier,
-				out Asn1Node Node))
+			if (this.Document.TryGetNamedNode(this.identifier, out Asn1Node Node))
 			{
 				return Node.ExportTryReadCSharp(Output, State, Indent, MemberOf,
 					DefaultName, ItemName, Index);
@@ -313,17 +287,8 @@ namespace Waher.Content.Asn1.Model.Types
 			CSharpExportState State, int Indent, string VariableName,
 			CSharpExportPass Pass)
 		{
-			if (this.Document.aliases.TryGetValue(this.identifier,
-				out Asn1TypeDefinition TypeDef))
-			{
-				return TypeDef.ExportRestrictionCSharp(Output, State, Indent,
-					VariableName, Pass);
-			}
-			else if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node) &&
-				Node is Asn1Type Type)
-			{
+			if (this.Document.TryGetNamedNode(this.identifier, out Asn1Type Type))
 				return Type.ExportRestrictionCSharp(Output, State, Indent, VariableName, Pass);
-			}
 			else
 				return Task.CompletedTask;
 		}
@@ -338,16 +303,8 @@ namespace Waher.Content.Asn1.Model.Types
 		public override Task ExportRestrictionCheck(StringBuilder Output,
 			CSharpExportState State, int Indent, string VariableName)
 		{
-			if (this.Document.aliases.TryGetValue(this.identifier,
-				out Asn1TypeDefinition TypeDef))
-			{
-				return TypeDef.ExportRestrictionCheck(Output, State, Indent, VariableName);
-			}
-			else if (this.Document.namedNodes.TryGetValue(this.identifier,
-				out Asn1Node Node))
-			{
+			if (this.Document.TryGetNamedNode(this.identifier, out Asn1Node Node))
 				return Node.ExportRestrictionCheck(Output, State, Indent, VariableName);
-			}
 			else
 				return Task.CompletedTask;
 		}
@@ -365,19 +322,24 @@ namespace Waher.Content.Asn1.Model.Types
 			CSharpExportState State, int Indent, string MemberOf, int Index,
 			Asn1Tags? Tags)
 		{
-			if (this.Document.aliases.TryGetValue(this.identifier,
-				out Asn1TypeDefinition TypeDef))
-			{
-				return TypeDef.ExportWriteCSharp(Output, State, Indent, MemberOf,
-					Index, Tags);
-			}
-			else if (this.Document.namedNodes.TryGetValue(this.identifier,
-				out Asn1Node Node))
-			{
+			if (this.Document.TryGetNamedNode(this.identifier, out Asn1Node Node))
 				return Node.ExportWriteCSharp(Output, State, Indent, MemberOf, Index, Tags);
-			}
 			else
 				throw new AsnContentException("Type " + this.identifier + " not found.");
+		}
+
+		/// <summary>
+		/// Tries to get a typed node from the node.
+		/// </summary>
+		/// <typeparam name="T">Type of node to get.</typeparam>
+		/// <param name="Result">Typed result, if successful.</param>
+		/// <returns>If a typed node of the specific type could be retrieved.</returns>
+		public override bool TryGetType<T>(out T Result)
+		{
+			if (this.Document.TryGetNamedNode(this.identifier,out Result))
+				return true;
+			else
+				return base.TryGetType(out Result);
 		}
 
 	}

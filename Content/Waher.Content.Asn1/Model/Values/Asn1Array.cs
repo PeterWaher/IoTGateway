@@ -132,11 +132,8 @@ namespace Waher.Content.Asn1.Model.Values
 			if (!this.TryGetAncestor(out this.typeReference))
 				return false;
 
-			if (!this.Document.namedNodes.TryGetValue(this.typeReference.Identifier,
-				out this.type))
-			{
+			if (!this.Document.TryGetNamedNode(this.typeReference.Identifier, out this.type))
 				return false;
-			}
 
 			if (this.type is Asn1TypeDefinition TypeDefinition)
 				this.type = TypeDefinition.Definition;

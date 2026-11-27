@@ -52,7 +52,7 @@ namespace Waher.Content.Asn1.Model.Values
 		{
 			get
 			{
-				if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+				if (this.Document.TryGetNamedNode(this.identifier, out Asn1Node Node))
 					return Node.AcceptedTags;
 				else
 					return base.AcceptedTags;
@@ -66,7 +66,7 @@ namespace Waher.Content.Asn1.Model.Values
 		{
 			get
 			{
-				if (this.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+				if (this.Document.TryGetNamedNode(this.identifier, out Asn1Node Node))
 				{
 					if (Node is Asn1Value Value)
 						return Value.CSharpType;

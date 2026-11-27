@@ -1,6 +1,10 @@
-﻿using System.Text;
+﻿using System;
 using System.Collections.Generic;
+using System.Formats.Asn1;
 using System.Globalization;
+using System.IO;
+using System.Numerics;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Asn1.Exceptions;
 using Waher.Content.Asn1.Model;
@@ -10,19 +14,18 @@ using Waher.Content.Asn1.Model.Restrictions;
 using Waher.Content.Asn1.Model.Sets;
 using Waher.Content.Asn1.Model.Types;
 using Waher.Content.Asn1.Model.Values;
-using Waher.Runtime.IO;
 using Waher.Runtime.Collections;
-using System.Formats.Asn1;
-using System.Numerics;
-using System;
-using System.IO;
+using Waher.Runtime.IO;
 using Waher.Security;
-using Waher.Content.Multipart;
 
 namespace Waher.Content.Asn1
 {
 	/// <summary>
 	/// Represents an ASN.1 document.
+	/// 
+	/// References:
+	/// https://www.itu.int/ITU-T/studygroups/com17/languages/X.680-0207.pdf
+	/// https://www.itu.int/ITU-T/studygroups/com17/languages/X.681-0207.pdf
 	/// </summary>
 	public class Asn1Document : Asn1Node
 	{
@@ -49,6 +52,60 @@ namespace Waher.Content.Asn1
 			this.len = this.text.Length;
 			this.lenm1 = this.len - 1;
 			this.Document = this;
+
+			// Predefined TYPE-IDENTIFIER class definition, defined in X.681, Annex A
+
+			Asn1ClassDefinition TypeIdentifier =
+				new Asn1ClassDefinition("TYPE-IDENTIFIER",
+					Array.Empty<Asn1TypeDeclaration>(), null,
+					new Asn1PropertyDefinition[]
+					{
+						new Asn1PropertyDefinition("id", new Asn1ObjectIdentifier(false, this), this),
+						new Asn1PropertyDefinition("Type", new Asn1Any(this), this)
+					}, this)
+				{
+					Syntax = new Asn1SyntaxNode[]
+					{
+						new Asn1ExpectedToken("{", this),
+						new Asn1PropertyReference("Type", this),
+						new Asn1ExpectedToken("IDENTIFIED", this),
+						new Asn1ExpectedToken("BY", this),
+						new Asn1PropertyReference("id", this),
+						new Asn1ExpectedToken("}", this)
+					}
+				};
+
+			// Predefined ABSTRACT-SYNTAX class definition, defined in X.681, Annex B
+
+			Asn1ClassDefinition AbstractSyntax =
+				new Asn1ClassDefinition("ABSTRACT-SYNTAX",
+					Array.Empty<Asn1TypeDeclaration>(), null,
+					new Asn1PropertyDefinition[]
+					{
+						new Asn1PropertyDefinition("id", new Asn1ObjectIdentifier(false, this), this),
+						new Asn1PropertyDefinition("Type", new Asn1Any(this), this),
+						new Asn1PropertyDefinition("property", new Asn1BitString(this), this)
+					}, this)
+				{
+					Syntax = new Asn1SyntaxNode[]
+					{
+						new Asn1ExpectedToken("{", this),
+						new Asn1PropertyReference("Type", this),
+						new Asn1ExpectedToken("IDENTIFIED", this),
+						new Asn1ExpectedToken("BY", this),
+						new Asn1PropertyReference("id", this),
+						new Asn1OptionalSyntaxGroup(new Asn1SyntaxNode[]
+						{
+							new Asn1ExpectedToken("HAS", this),
+							new Asn1ExpectedToken("PROPERTY", this),
+							new Asn1PropertyReference("property", this)
+						}, this),
+						new Asn1ExpectedToken("}", this)
+					}
+				};
+
+			this.namedNodes[TypeIdentifier.Name] = TypeIdentifier;
+			this.namedNodes[AbstractSyntax.Name] = AbstractSyntax;
 		}
 
 		/// <summary>
@@ -544,7 +601,7 @@ namespace Waher.Content.Asn1
 							if (s == "{")
 							{
 								Import.Oid = this.ParseOid();
-								if (this.namedNodes.TryGetValue(ModuleRef, out Asn1Node PrevModuleDef))
+								if (this.TryGetNamedNode(ModuleRef, out Asn1Node PrevModuleDef))
 								{
 									if (!Import.Oid.Equals(PrevModuleDef))
 										throw this.SyntaxError(ModuleRef + " already defined.");
@@ -632,7 +689,7 @@ namespace Waher.Content.Asn1
 
 						foreach (Asn1IdentifierReference Identifier in Import.Identifiers)
 						{
-							if (!Doc.namedNodes.TryGetValue(Identifier.Identifier,
+							if (!Doc.TryGetNamedNode(Identifier.Identifier,
 								out Asn1Node ImportedNode))
 							{
 								throw this.SyntaxError(Identifier + " not found in " + Import.Module);
@@ -708,7 +765,7 @@ namespace Waher.Content.Asn1
 				{
 					if (Node2 is INamedNode NamedNode)
 					{
-						if (this.namedNodes.TryGetValue(NamedNode.Name, out Asn1Node Prev))
+						if (this.TryGetNamedNode(NamedNode.Name, out Asn1Node Prev))
 						{
 							if (NamedNode is Asn1TypeDefinition TypeDef)
 							{
@@ -837,8 +894,8 @@ namespace Waher.Content.Asn1
 					}
 					else if (!(ClassReferences is null) &&
 						ClassReferences.Length == 1 &&
-						this.namedNodes.TryGetValue(ClassReferences[0].ClassName, out Asn1Node Node) &&
-						Node is Asn1ClassDefinition ClassRef)
+						this.TryGetNamedNode(ClassReferences[0].ClassName, 
+						out Asn1ClassDefinition ClassRef))
 					{
 						ClassDefinition = ClassRef;
 					}
@@ -872,8 +929,7 @@ namespace Waher.Content.Asn1
 
 					return new Asn1Macro(s, TypeNotation, ValueNotation, SupportingSyntax.ToArray(), this);
 				}
-				else if (this.namedNodes.TryGetValue(s2, out Asn1Node Node) &&
-					Node is Asn1Macro Macro)
+				else if (this.TryGetNamedNode(s2, out Asn1Macro Macro))
 				{
 					this.pos += s2.Length;
 
@@ -884,8 +940,7 @@ namespace Waher.Content.Asn1
 
 					return ValueDef;
 				}
-				else if (this.namedNodes.TryGetValue(s2, out Asn1Node Node2) &&
-					Node2 is Asn1ClassDefinition ClassDef &&
+				else if (this.TryGetNamedNode(s2, out Asn1ClassDefinition ClassDef) &&
 					this.PeekNextToken(s2.Length) == "::=")
 				{
 					this.pos += s2.Length;
@@ -977,8 +1032,7 @@ namespace Waher.Content.Asn1
 				{
 					Asn1Type Definition;
 
-					if (this.namedNodes.TryGetValue(s2, out Asn1Node Node) &&
-						Node is Asn1Macro Macro)
+					if (this.TryGetNamedNode(s2, out Asn1Macro Macro))
 					{
 						this.pos += s2.Length;
 						Definition = Macro.ParseType(s, this);
@@ -1062,6 +1116,32 @@ namespace Waher.Content.Asn1
 			}
 			else
 				throw this.SyntaxError("Identifier expected.");
+		}
+
+		/// <summary>
+		/// Tries to get a node, given its name and type.
+		/// </summary>
+		/// <typeparam name="T">Type of node to get.</typeparam>
+		/// <param name="Name">Name of node.</param>
+		/// <param name="Result">Node, if found.</param>
+		/// <returns>If a node with the given name and type was found.</returns>
+		public bool TryGetNamedNode<T>(string Name, out T Result)
+			where T : class
+		{
+			if (this.namedNodes.TryGetValue(Name, out Asn1Node Node) &&
+				Node.TryGetType(out Result))
+			{
+				return true;
+			}
+
+			if (this.aliases.TryGetValue(Name, out Asn1TypeDefinition TypeDef) &&
+				TypeDef.TryGetType(out Result))
+			{
+				return true;
+			}
+
+			Result = null;
+			return false;
 		}
 
 		private Asn1SyntaxNode[] ParseSyntaxElements(string StartToken, string EndToken,
@@ -1819,8 +1899,8 @@ namespace Waher.Content.Asn1
 								this.AssertNextToken(")");
 							}
 
-							return new Asn1PropertyTypeReference(s, ClassSet, PropertyName,
-								LookupKey, this);
+							return new Model.Types.Asn1PropertyTypeReference(s, 
+								ClassSet, PropertyName, LookupKey, this);
 						}
 						else
 							return new Asn1TypeReference(s, this);
@@ -1999,7 +2079,7 @@ namespace Waher.Content.Asn1
 					Extensible = true;
 				}
 				else if (!IsIdentifier(s))
-					throw this.SyntaxError("Expected identifier or class instance.");
+					throw this.SyntaxError("Expected identifier or class instance: " + s);
 				else
 				{
 					Items.Add(new Asn1ClassInstanceReference(s, this));
@@ -2409,11 +2489,10 @@ namespace Waher.Content.Asn1
 		public string[] GetFullyQualifiedName(CSharpExportSettings Settings,
 			string Identifier)
 		{
-			if (this.namedNodes.TryGetValue(Identifier, out Asn1Node Node) &&
-				Node is INamedNode NamedNode)
+			if (this.TryGetNamedNode(Identifier, out INamedNode Node))
 			{
 				ChunkedList<string> Fqn = new ChunkedList<string>();
-				NamedNode.GetFullyQualifiedName(Fqn);
+				Node.GetFullyQualifiedName(Fqn);
 				Fqn.Add(Settings.BaseNamespace);
 
 				Fqn.Reverse();

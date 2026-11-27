@@ -277,5 +277,18 @@ namespace Waher.Content.Asn1.Model
 				Index, Tags);
 		}
 
+		/// <summary>
+		/// Tries to get a typed node from the node.
+		/// </summary>
+		/// <typeparam name="T">Type of node to get.</typeparam>
+		/// <param name="Result">Typed result, if successful.</param>
+		/// <returns>If a typed node of the specific type could be retrieved.</returns>
+		public override bool TryGetType<T>(out T Result)
+		{
+			if (this.definition.TryGetType(out Result))
+				return true;
+			else
+				return base.TryGetType(out Result);
+		}
 	}
 }

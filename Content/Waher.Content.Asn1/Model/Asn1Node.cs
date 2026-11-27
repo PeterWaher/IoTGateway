@@ -402,5 +402,24 @@ namespace Waher.Content.Asn1.Model
 
 			return sb.ToString();
 		}
+
+		/// <summary>
+		/// Tries to get a typed node from the node.
+		/// </summary>
+		/// <typeparam name="T">Type of node to get.</typeparam>
+		/// <param name="Result">Typed result, if successful.</param>
+		/// <returns>If a typed node of the specific type could be retrieved.</returns>
+		public virtual bool TryGetType<T>(out T Result)
+			where T : class
+		{
+			if (this is T Typed)
+			{
+				Result = Typed;
+				return true;
+			}
+
+			Result = null;
+			return false;
+		}
 	}
 }

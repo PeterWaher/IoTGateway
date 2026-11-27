@@ -30,7 +30,7 @@
 		/// <returns>Parsed ASN.1 node.</returns>
 		public override Asn1Node Parse(Asn1Document Document, Asn1Macro Macro)
 		{
-			if (Macro.Document.namedNodes.TryGetValue(this.identifier, out Asn1Node Node))
+			if (Macro.Document.TryGetNamedNode(this.identifier, out Asn1Node Node))
 			{
 				if (Node is Asn1TypeDefinition TypeDef)
 					return TypeDef.Definition.Parse(Document, Macro);

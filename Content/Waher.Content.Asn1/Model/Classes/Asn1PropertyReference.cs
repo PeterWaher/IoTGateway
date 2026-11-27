@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Waher.Content.Asn1.Exceptions;
 using Waher.Content.Asn1.Model.Values;
+using Waher.Script.Units.DerivedQuantities;
 
 namespace Waher.Content.Asn1.Model.Classes
 {
@@ -10,6 +11,7 @@ namespace Waher.Content.Asn1.Model.Classes
 	public class Asn1PropertyReference : Asn1SyntaxNode
 	{
 		private readonly string property;
+		private readonly bool isTypeReference;
 
 		/// <summary>
 		/// Defines an reference to a class property.
@@ -20,12 +22,18 @@ namespace Waher.Content.Asn1.Model.Classes
 			: base(Document)
 		{
 			this.property = Property;
+			this.isTypeReference = char.IsUpper(Property[0]);
 		}
 
 		/// <summary>
 		/// Expected token.
 		/// </summary>
 		public string Property => this.property;
+
+		/// <summary>
+		/// If the reference is a type reference.
+		/// </summary>
+		public bool IsTypeReference => this.isTypeReference;
 
 		/// <inheritdoc/>
 		public override string ToString() => this.property;
@@ -37,21 +45,30 @@ namespace Waher.Content.Asn1.Model.Classes
 		/// <returns>If the node matches the current position.</returns>
 		public override bool MatchesNext(Dictionary<string, Asn1Node> Properties)
 		{
-			Asn1Value Value = this.Document.ParseValue();
-
-			if (Value is Asn1ValueReference ValueRef &&
-				this.Document.PeekNextToken() == ".")
+			if (this.isTypeReference)
 			{
-				this.Document.pos++;
-				this.Document.AssertNextToken("&");
-
-				string PropertyName = this.Document.ParseIdentifier();
-
-				Properties[this.property] = new Asn1PropertyValueReference(this.property, 
-					ValueRef.Identifier, PropertyName, this.Document);
+				Asn1Type Type = this.Document.ParseType(this.property, false, null, false);
+				Properties[this.property] = Type;
 			}
 			else
-				Properties[this.property] = new Asn1PropertyValue(this.property, Value, this.Document);
+			{
+				Asn1Value Value = this.Document.ParseValue();
+
+				if (Value is Asn1ValueReference ValueRef &&
+					this.Document.PeekNextToken() == ".")
+				{
+					this.Document.pos++;
+					this.Document.AssertNextToken("&");
+
+					string PropertyName = this.Document.ParseIdentifier();
+
+					Properties[this.property] = new Asn1PropertyValueReference(this.property,
+						ValueRef.Identifier, PropertyName, this.Document);
+				}
+				else
+					Properties[this.property] = new Asn1PropertyValue(this.property, Value, this.Document);
+			}
+
 			return true;
 		}
 

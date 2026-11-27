@@ -302,5 +302,29 @@ namespace Waher.Content.Asn1.Test
 			await GenerateCSharp("PKCS\\PKCS#1\\RFC8017.asn1");
 		}
 
+		[TestMethod]
+		public async Task Test_24_PKCS_5()
+		{
+			await GenerateCSharp("PKCS\\PKCS#5\\RFC8018.asn1");
+		}
+
+		[TestMethod]
+		public async Task Test_25_PKCS_8()
+		{
+			await GenerateCSharp("PKCS\\PKCS#8\\RFC5208.asn1");
+		}
+
+		[TestMethod]
+		public async Task Test_26_PKCS_10()
+		{
+			await GenerateCSharp("PKCS\\PKCS#10\\RFC2986.asn1");
+		}
+
+		[TestMethod]
+		public async Task Test_27_PKCS_12()
+		{
+			await GenerateCSharp("PKCS\\PKCS#12\\RFC7292.asn1");
+		}
+
 	}
 }

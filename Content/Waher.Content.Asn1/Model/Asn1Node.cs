@@ -421,5 +421,11 @@ namespace Waher.Content.Asn1.Model
 			Result = null;
 			return false;
 		}
+
+		/// <summary>
+		/// Gets the components associated with the node.
+		/// </summary>
+		/// <returns>Array of components.</returns>
+		public virtual Asn1Node[] GetComponents() => new Asn1Node[] { this };
 	}
 }

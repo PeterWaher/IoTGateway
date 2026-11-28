@@ -348,5 +348,14 @@ namespace Waher.Content.Asn1.Model
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// Gets the components associated with the node.
+		/// </summary>
+		/// <returns>Array of components.</returns>
+		public override Asn1Node[] GetComponents()
+		{
+			return new Asn1Node[] { this };
+		}
+
 	}
 }

@@ -40,5 +40,12 @@
 		{
 			return this.name;
 		}
+
+		/// <summary>
+		/// Gets the components associated with the node.
+		/// </summary>
+		/// <returns>Array of components.</returns>
+		public abstract override Asn1Node[] GetComponents();
+
 	}
 }

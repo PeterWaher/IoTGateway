@@ -1,4 +1,5 @@
 ﻿using System.Formats.Asn1;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -175,6 +176,15 @@ namespace Waher.Content.Asn1.Model
 			Output.Append(')');
 
 			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Gets the components associated with the node.
+		/// </summary>
+		/// <returns>Array of components.</returns>
+		public override Asn1Node[] GetComponents()
+		{
+			return new Asn1Node[] { this.elementType };
 		}
 
 	}

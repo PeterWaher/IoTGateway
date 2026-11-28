@@ -1897,10 +1897,14 @@ namespace Waher.Content.Asn1
 					s = this.ParseIdentifier();
 					return new Asn1TypeDeclaration(s, this);
 
+				case "COMPONENTS":
+					this.AssertNextToken("OF");
+					s = this.ParseIdentifier();
+					return new Asn1ComponentsOf(s, this);
+
 				case "ObjectDescriptor":
 				case "EXTERNAL":
 				case "EMBEDDED":
-				case "COMPONENTS":
 				case "INSTANCE":
 				case "OID-IRI":
 					throw this.SyntaxError("Token not implemented: " + s);

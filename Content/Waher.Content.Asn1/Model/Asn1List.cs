@@ -1,4 +1,7 @@
-﻿namespace Waher.Content.Asn1.Model
+﻿using Waher.Content.Asn1.Model.Types;
+using Waher.Runtime.Collections;
+
+namespace Waher.Content.Asn1.Model
 {
 	/// <summary>
 	/// Abstract base class for list constructs.
@@ -6,6 +9,7 @@
 	public abstract class Asn1List : Asn1ComplexType
 	{
 		private readonly Asn1Node[] nodes;
+		private Asn1Node[] nodesIncludingComponents;
 
 		/// <summary>
 		/// Abstract base class for list constructs.
@@ -24,6 +28,36 @@
 		/// <summary>
 		/// Nodes
 		/// </summary>
-		public Asn1Node[] Nodes => this.nodes;
+		public Asn1Node[] Nodes
+		{
+			get
+			{
+				if (this.nodesIncludingComponents is null)
+				{
+					ChunkedList<Asn1Node> Nodes = new ChunkedList<Asn1Node>();
+
+					foreach (Asn1Node Node in this.nodes)
+					{
+						if (Node is Asn1ComponentsOf ComponentsOf)
+							Nodes.AddRange(ComponentsOf.GetComponents());
+						else
+							Nodes.Add(Node);
+					}
+
+					this.nodesIncludingComponents = Nodes.ToArray();
+				}
+
+				return this.nodesIncludingComponents;
+			}
+		}
+
+		/// <summary>
+		/// Gets the components associated with the node.
+		/// </summary>
+		/// <returns>Array of components.</returns>
+		public override Asn1Node[] GetComponents()
+		{
+			return this.nodes;
+		}
 	}
 }

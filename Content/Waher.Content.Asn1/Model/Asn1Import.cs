@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
-using Waher.Content.Asn1.Model.Values;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -11,7 +10,7 @@ namespace Waher.Content.Asn1.Model
 	{
 		private readonly Asn1IdentifierReference[] identifiers;
 		private readonly string module;
-		private Asn1Oid oid;
+		private Asn1Value oid;
 		private Asn1Document importedDocument;
 		private bool withSuccessors = false;
 
@@ -42,7 +41,7 @@ namespace Waher.Content.Asn1.Model
 		/// <summary>
 		/// Object Identifier of module.
 		/// </summary>
-		public Asn1Oid Oid
+		public Asn1Value Oid
 		{
 			get => this.oid;
 			internal set => this.oid = value;

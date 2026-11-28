@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Formats.Asn1;
 using System.Numerics;
 using System.Reflection;
@@ -4282,6 +4283,26 @@ namespace Waher.Content.Asn1
 		}
 
 		/// <summary>
+		/// Empty set.
+		/// </summary>
+		public class NoValues : ISet
+		{
+			/// <summary>
+			/// Empty set.
+			/// </summary>
+			public NoValues()
+			{
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(object Element) => false;
+		}
+
+		/// <summary>
 		/// Set containing a single value.
 		/// </summary>
 		public class SingleValue<T> : ISet
@@ -4305,6 +4326,58 @@ namespace Waher.Content.Asn1
 			public bool Contains(T Element)
 			{
 				return this.value.Equals(Element);
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(object Element)
+			{
+				if (!(Element is T Typed))
+					Typed = (T)Convert.ChangeType(Element, typeof(T));
+
+				return this.Contains(Typed);
+			}
+		}
+
+		/// <summary>
+		/// Set containing an enumerable set of values.
+		/// </summary>
+		public class EnumerableSetOfValues<T> : ISet
+		{
+			private readonly HashSet<T> values;
+
+			/// <summary>
+			/// Set containing an enumerable set of values.
+			/// </summary>
+			/// <param name="Values">Enumerable set of values</param>
+			public EnumerableSetOfValues(params T[] Values)
+				: this((IEnumerable<T>)Values)
+			{ 
+			}
+
+			/// <summary>
+			/// Set containing an enumerable set of values.
+			/// </summary>
+			/// <param name="Values">Enumerable set of values</param>
+			public EnumerableSetOfValues(IEnumerable<T> Values)
+			{
+				this.values = new HashSet<T>();
+
+				foreach (T Value in Values)
+					this.values.Add(Value);
+			}
+
+			/// <summary>
+			/// Checks if the set contains an element.
+			/// </summary>
+			/// <param name="Element">Element to check</param>
+			/// <returns>If the set contains the element.</returns>
+			public bool Contains(T Element)
+			{
+				return this.values.Contains(Element);
 			}
 
 			/// <summary>

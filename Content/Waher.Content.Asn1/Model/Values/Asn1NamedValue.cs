@@ -62,7 +62,7 @@ namespace Waher.Content.Asn1.Model.Values
 		}
 
 		/// <inheritdoc/>
-		public override string ToString() => this.value.ToString();
+		public override string ToString() => this.Identifier + " (" + this.value.ToString() + ")";
 
 		/// <summary>
 		/// If the named value is part of an enumerated value definition.

@@ -599,8 +599,22 @@ namespace Waher.Content.Asn1
 							s = this.PeekNextToken();
 
 							if (s == "{")
-							{
 								Import.Oid = this.ParseOid();
+							else if (IsIdentifier(s))
+							{
+								int Bak = this.pos;
+								this.pos += s.Length;
+
+								string s2 = this.PeekNextToken();
+
+								this.pos = Bak;
+
+								if (IsIdentifier(s2) && s2 != "FROM")
+									Import.Oid = this.ParseValue();
+							}
+
+							if (!(Import.Oid is null))
+							{
 								if (this.TryGetNamedNode(ModuleRef, out Asn1Node PrevModuleDef))
 								{
 									if (!Import.Oid.Equals(PrevModuleDef))
@@ -615,15 +629,15 @@ namespace Waher.Content.Asn1
 								}
 
 								s = this.PeekNextToken();
+							}
 
-								if (s == "WITH")
-								{
-									this.pos += 4;
-									this.AssertNextToken("SUCCESSORS");
-									Import.WithSuccessors = true;
+							if (s == "WITH")
+							{
+								this.pos += 4;
+								this.AssertNextToken("SUCCESSORS");
+								Import.WithSuccessors = true;
 
-									s = this.PeekNextToken();
-								}
+								s = this.PeekNextToken();
 							}
 
 							if (s != ";")
@@ -894,7 +908,7 @@ namespace Waher.Content.Asn1
 					}
 					else if (!(ClassReferences is null) &&
 						ClassReferences.Length == 1 &&
-						this.TryGetNamedNode(ClassReferences[0].ClassName, 
+						this.TryGetNamedNode(ClassReferences[0].ClassName,
 						out Asn1ClassDefinition ClassRef))
 					{
 						ClassDefinition = ClassRef;
@@ -1479,15 +1493,41 @@ namespace Waher.Content.Asn1
 			{
 				Asn1Value Value = this.ParseValue();
 
-				if (this.PeekNextToken() == "..")
+				switch (this.PeekNextToken())
 				{
-					this.pos += 2;
-					Asn1Value Value2 = this.ParseValue();
+					case "..":
+						this.pos += 2;
+						Asn1Value Value2 = this.ParseValue();
 
-					return new Asn1Interval(Value, Value2, this);
+						return new Asn1Interval(Value, Value2, this);
+
+					case ",":
+						ChunkedList<Asn1Value> Values = new ChunkedList<Asn1Value>()
+						{
+							Value
+						};
+						bool Extensible = false;
+
+						s = this.PeekNextToken();
+
+						while (s == ",")
+						{
+							this.pos++;
+							Value = this.ParseValue();
+
+							if (Value is Asn1Extension)
+								Extensible = true;
+							else
+								Values.Add(Value);
+
+							s = this.PeekNextToken();
+						}
+
+						return new Asn1ExplicitSet(Values.ToArray(), Extensible, this);
+
+					default:
+						return new Asn1Element(Value, this);
 				}
-				else
-					return new Asn1Element(Value, this);
 			}
 		}
 
@@ -1899,7 +1939,7 @@ namespace Waher.Content.Asn1
 								this.AssertNextToken(")");
 							}
 
-							return new Model.Types.Asn1PropertyTypeReference(s, 
+							return new Model.Types.Asn1PropertyTypeReference(s,
 								ClassSet, PropertyName, LookupKey, this);
 						}
 						else
